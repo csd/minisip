@@ -24,7 +24,6 @@
 #include"Media.h"
 #include"../codecs/Codec.h"
 #include"../soundcard/SoundIO.h"
-#include"../soundcard/FileSoundSource.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include"MediaStream.h"
 #include"RtpReceiver.h"
@@ -41,7 +40,6 @@
 #endif
 #include<libmutil/print_hex.h>
 
-#define RINGTONE_SOURCE_ID 0x42124212
 
 using namespace std;
 
@@ -104,144 +102,3 @@ void Media::addSdpAttribute( string attribute ){
 void Media::handleMHeader( MRef< SdpHeaderM * > m ){
 }
 
-AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
-		Media(codec),
-		soundIo(soundIo){
-	// for audio media, we assume that we can both send and receive
-	receive = true;
-	send = true;
-	MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
-
-	soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ *  acodec->getSamplingSizeMs() / 1000, false );
-
-	seqNo = 0;
-//#ifdef IPAQ
-//	iIPAQ = 0;
-//#endif
-	resampler = Resampler::create( SOUND_CARD_FREQ, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
-}
-
-string AudioMedia::getSdpMediaType(){
-	return "audio";
-}
-
-void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
-	sendersLock.lock();
-	if( senders.empty() ){
-		sendersLock.unlock();
-		soundIo->startRecord();
-		sendersLock.lock();
-	}
-
-	senders.push_back( sender );
-	sendersLock.unlock();
-}
-
-void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
-	bool emptyList;
-	sendersLock.lock();
-	senders.remove( sender );
-	emptyList = senders.empty();
-	sendersLock.unlock();
-
-
-	if(  emptyList ){
-		soundIo->stopRecord();
-	}
-}
-
-void AudioMedia::registerMediaSource( uint32_t ssrc ){
-	soundIo->registerSource( ssrc );
-}
-
-void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
-	soundIo->unRegisterSource( ssrc );
-}
-
-void AudioMedia::playData( RtpPacket * packet ){
-	short output[1600];
-	RtpHeader hdr = packet->getHeader();
-
-	if( packet->getContentLength() == (uint32_t) ((AudioCodec *)*codec)->getEncodedNrBytes() ){
-		((AudioCodec *)*codec)->decode( packet->getContent(), packet->getContentLength(), output );
-	}
-	else{
-		delete packet;
-		return;
-	}
-
-/*#ifdef IPAQ
-	// The iPAQ doen't support 8kHz, we need to resample to 16kHz
-	short buffer1[1600];
-	short buffer2[1600];
-	int i;
-	for( int i =0; i < 80; i++ ){
-		buffer1[2*i] = output[i]/32; // /32 to reduce the output volume ...
-		buffer1[2*i+1] = output[i]/32; // /32 to reduce the output volume ...
-	}
-	for( int i =0; i < 80; i++ ){
-		buffer2[2*i] = output[80+i]/32; // /32 to reduce the output volume ...
-		buffer2[2*i+1] = output[80+i]/32; // /32 to reduce the output volume ...
-	}
-	
-	soundIo->pushSound( ssrc, buffer1, 
-		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
-	
-	soundIo->pushSound( ssrc, buffer2, 
-		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
-#else
-*/
-	soundIo->pushSound( hdr.getSSRC(), output, 
-		((AudioCodec*)*codec)->getInputNrSamples(), hdr.getSeqNo() );
-		
-	delete packet;
-		
-//#endif
-}
-
-void AudioMedia::srcb_handleSound( void * data ){
-
-#if 0
-	//#ifdef IPAQ
-	uint32_t i;
-	short sent[160];
-	// The iPAQ does not support 8kHz, so we use 16kHz and resample
-	if( iIPAQ % 2 ){
-		// save the sample
-		memcpy( saved, data, 160*sizeof(short) );
-		iIPAQ ++;
-		return;
-	}
-	else{
-		// mix with the old sample
-		for( i = 0; i < 80; i++ ){
-			sent[i] = saved[i*2];
-		}
-		for( i = 0; i < 80; i++ ){
-			sent[80+i] = ((short *)data)[i*2];
-		}
-		data = (void *)sent;
-		iIPAQ ++;
-	}
-			
-#endif
-//	cerr << "Before resample: " << print_hex( (unsigned char*)data, 882 ) << endl;
-	resampler->resample( (short *)data, resampledData );
-//	cerr << "After resample: " << print_hex( (unsigned char *)resampledData, 160 ) << endl;
-	
-	((AudioCodec *)*codec)->encode( resampledData, ((AudioCodec*)*codec)->getInputNrSamples()*sizeof(short), encoded );
-	uint32_t encodedLength = ((AudioCodec *)*codec)->getEncodedNrBytes();
-
-
-	
-	sendData( encoded, encodedLength, seqNo * ((AudioCodec*)*codec)->getInputNrSamples() );
-	seqNo ++;
-}
-
-void AudioMedia::startRinging( string ringtoneFile ){
-	soundIo->registerSource( new FileSoundSource( ringtoneFile,RINGTONE_SOURCE_ID, 44100, 2, SOUND_CARD_FREQ, 20, 2, true ) );
-}
-
-void AudioMedia::stopRinging(){
-	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
-}

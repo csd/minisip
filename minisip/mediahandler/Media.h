@@ -89,35 +89,5 @@ class Media : public MObject{
 		std::list<std::string> sdpAttributes;
 };
 
-class AudioMedia : public Media, public SoundRecorderCallback{
-
-	public:
-		AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec );
-		virtual std::string getMemObjectType(){return "AudioMedia";}
-		virtual std::string getSdpMediaType();
-		
-
-		virtual void playData( RtpPacket * rtpPacket );
-		
-		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void registerMediaSource( uint32_t ssrc );
-		virtual void unRegisterMediaSource( uint32_t ssrc );
-
-		virtual void srcb_handleSound( void *samplearr );
-
-		void startRinging( std::string ringtoneFile );
-		void stopRinging();
-	private:
-		MRef<Resampler *> resampler;
-		MRef<SoundIO *> soundIo;
-		uint32_t seqNo;
-		byte_t encoded[1600];
-		short resampledData[160];
-#ifdef IPAQ
-		uint32_t iIPAQ;
-		short saved[160];
-#endif
-};
 
 #endif

@@ -26,6 +26,7 @@
 #include<libmutil/MemObject.h>
 
 #include"Media.h"
+#include"AudioMedia.h"
 #include"MediaStream.h"
 #include"Session.h"
 #include"RtpReceiver.h"
