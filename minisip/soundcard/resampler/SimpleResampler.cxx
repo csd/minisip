@@ -130,6 +130,8 @@ void SimpleResampler::upSample( short * input, short * output ){
 		sampleGroupSize = outputFrames - outputOffset / nChannels;
 
 
+		output[outputOffset] = input[i*nChannels + channel];
+		
 		step = input[(i+1)*nChannels + channel] / sampleGroupSize  
 		     - input[i*nChannels + channel] / sampleGroupSize;  
 			
@@ -144,6 +146,8 @@ void SimpleResampler::upSample( short * input, short * output ){
 		}
 		*/
 	}
+
+//	cerr << "output: " << print_hex( (unsigned char *)output, 2*nChannels*outputFrames ) << endl;
 
 
 }
