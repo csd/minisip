@@ -137,7 +137,7 @@ void TextUI::guimain(){
 //	UDPSocket ispaceSocket(false, 3300);
 	cout << promptText << "$ "<< flush;
 	while (1){
-		char c;
+		char c=' ';
 #ifdef LINUX
 /*		FD_ZERO(&set);
 		FD_SET(STDIN_FILENO, &set);

@@ -19,14 +19,19 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
-#include<windows.h>
-#include<config.h>
+//#ifdef _MSC_VER
+//#include<windows.h>
+//#endif
+
 #include<libmutil/CondVar.h>
+
+#include<config.h>
 
 #ifdef HAVE_PTHREAD_H
 #include<pthread.h>
 #include<sys/time.h>
 #include<time.h>
+
 
 #define INTERNAL_COND_WAIT ((pthread_cond_t *)internalStruct)
 #define INTERNAL_MUTEX ((pthread_mutex_t *)internalMutexStruct)
