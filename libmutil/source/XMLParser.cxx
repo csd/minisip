@@ -35,7 +35,7 @@ static bool is_blank(char c){
 }
 
 static int32_t skipws(const char *s, int32_t i){
-	while (isblank(s[i]))
+	while (is_blank(s[i]))
 		i++;
 	return i;
 }
@@ -50,7 +50,7 @@ static string parseWord(const char *s, int32_t &i){
 			word = word + s[i++];
 		i++;
 	}else{
-		while ( ! ( isblank(s[i]) || s[i]=='<' || s[i]=='/' || s[i]=='>' || s[i]=='=' || s[i]=='\"' || s[i]==0))
+		while ( ! ( is_blank(s[i]) || s[i]=='<' || s[i]=='/' || s[i]=='>' || s[i]=='=' || s[i]=='\"' || s[i]==0))
 			word+=s[i++];
 	}
 	
