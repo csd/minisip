@@ -95,6 +95,8 @@ class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
 		void phoneTreeClicked( GdkEventButton * event );
 		void im();
 		void invite();
+		void inviteFromTreeview( const Gtk::TreeModel::Path&,
+				         Gtk::TreeViewColumn * );
 		void gotCommand();
 		void gotLogEntry();
 		void addCall( string callId, string remoteUri, bool incoming,

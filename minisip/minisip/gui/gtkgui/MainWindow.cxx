@@ -152,6 +152,8 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	
 	callMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::invite ) );
 
+	phoneBookTreeView->signal_row_activated().connect( SigC::slot( *this, &MainWindow::inviteFromTreeview ) );
+
 	refXml->get_widget( "imButton", imButton );
 
 	imButton->signal_clicked().connect( SigC::slot( *this, &MainWindow::im ) );
@@ -436,6 +438,11 @@ void MainWindow::removeIm( string uri ){
 			return;
 		}
 	}
+}
+
+void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
+		                     Gtk::TreeViewColumn * ){
+	invite();
 }
 
 void MainWindow::invite(){
