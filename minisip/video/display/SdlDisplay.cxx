@@ -25,6 +25,8 @@
 #include<sys/time.h>
 #include<SDL/SDL_syswm.h>
 
+#include<iostream>
+
 using namespace std;
 
 #define NB_IMAGES 3
@@ -34,6 +36,7 @@ SdlDisplay::SdlDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->height = height;
 	baseWindowWidth = this->width;
 	baseWindowHeight = this->height;
+	fullscreen = false;
 }
 
 void SdlDisplay::openDisplay(){
@@ -84,33 +87,35 @@ void SdlDisplay::createWindow(){
 
 void SdlDisplay::initWm(){
 #ifdef IPAQ
-        int ret;
-        SDL_SysWMinfo wmInfo;
+	if( !fullscreen ){
+		int ret;
+		SDL_SysWMinfo wmInfo;
 
-        SDL_VERSION( &wmInfo.version );
-        ret = SDL_GetWMInfo( &wmInfo );
+		SDL_VERSION( &wmInfo.version );
+		ret = SDL_GetWMInfo( &wmInfo );
 
-        if( ret > 0 && !fullscreen ){
-                XClientMessageEvent event;
-                display = wmInfo.info.x11.display;
-                window = wmInfo.info.x11.wmwindow;
-                Atom type = XInternAtom( display, "_NET_WM_WINDOW_TYPE", False );
-                Atom typeDialog = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False );
+		if( ret > 0 ){
+			XClientMessageEvent event;
+			display = wmInfo.info.x11.display;
+			window = wmInfo.info.x11.wmwindow;
+			Atom type = XInternAtom( display, "_NET_WM_WINDOW_TYPE", False );
+			Atom typeDialog = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False );
 
-                XChangeProperty( display, window, type,
-                        XA_ATOM, 32, PropModeReplace,
-                        (unsigned char *) &typeDialog, 1);
+			XChangeProperty( display, window, type,
+					XA_ATOM, 32, PropModeReplace,
+					(unsigned char *) &typeDialog, 1);
 
 
 
-                XUnmapWindow( display, window );
-                XResizeWindow( display, window, width, height );
-		XMapWindow( display, window );
-        }
-        else{
-                fprintf( stderr, "SDL Error when getting WM info: %s\n",
-                                SDL_GetError() );
-        }
+			XUnmapWindow( display, window );
+			XResizeWindow( display, window, width, height );
+			XMapWindow( display, window );
+		}
+		else{
+			fprintf( stderr, "SDL Error when getting WM info: %s\n",
+					SDL_GetError() );
+		}
+	}
 #endif
 }
 
@@ -198,15 +203,18 @@ void SdlDisplay::handleEvents(){
 
 	while( SDL_PollEvent( &event ) ){
 		if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f || event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT ){
-			fullscreen = ! fullscreen;
 #ifdef IPAQ
 			if( fullscreen ){
-				baseWindowWidth = 240;
-				baseWindowHeight = 180;
-			}
-			else{
+				cerr << "not fullscreen" << endl;
 				baseWindowWidth = width;
 				baseWindowHeight = height;
+				fullscreen = false;
+			}
+			else{
+				cerr << "fullscreen" << endl;
+				baseWindowWidth = 240;
+				baseWindowHeight = 180;
+				fullscreen = true;
 			}
 
                 	//XResizeWindow( display, window, baseWindowWidth, baseWindowHeight );
@@ -226,6 +234,7 @@ void SdlDisplay::handleEvents(){
 			if( fullscreen ){
 				SDL_WM_ToggleFullScreen( surface );
 			}
+			break;
 		}
 	}
 }

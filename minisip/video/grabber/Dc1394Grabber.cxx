@@ -24,6 +24,7 @@
 #include"../ImageHandler.h"
 #include"../VideoMedia.h"
 #include<stdio.h>
+#include<libmutil/mtime.h>
 
 
 #define NUM_BUFFERS 2
@@ -208,6 +209,9 @@ void Dc1394Grabber::read( ImageHandler * handler ){
 			mixer->addMixedImage( image );
 		}
 		*/
+
+		// FIXME: get it from the camera
+		image->mTime = mtime();
 
 		if( handler ){
 			handler->handle( image );
