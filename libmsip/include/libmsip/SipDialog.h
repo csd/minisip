@@ -43,7 +43,6 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
-#include<libmsip/SipStack.h>
 
 using namespace std;
 
@@ -162,6 +161,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipStack.h>
 
 
 #endif
