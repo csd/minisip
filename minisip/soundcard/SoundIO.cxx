@@ -488,6 +488,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	lookupleft = new short[65536];
 	lookupright = new short[65536];
 	initLookup(numSources);
+	pointer = 0;
 	
 }
 
