@@ -101,6 +101,7 @@ Dbg& Dbg::operator<<(int i){
 	else
 		std::cout << i;
     }
+    return (*this);
 }
 
 Dbg& Dbg::operator<<(char c){
