@@ -27,7 +27,7 @@
 #include"../sip/SipDialogSecurityConfig.h"
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMIMEContent.h>
-
+#include <fcntl.h>
 
 class MsipIpsecRequest{
 	public:
@@ -35,8 +35,9 @@ class MsipIpsecRequest{
 		~MsipIpsecRequest();
 		virtual int set()=0;	// -1 = error, 0 = already exist
 		virtual int update()=0;	// -1 = error, 0 = no change
-		virtual int remove()=0;	// -1 = error, 0 = don't exist
+		virtual int remove(bool valid)=0;	// -1 = error, 0 = don't exist
 		bool exist;
+		bool valid;
 		int so;
 		u_int32_t seq;
 		struct sockaddr *src;
@@ -67,7 +68,7 @@ class MsipIpsecSA : public MsipIpsecRequest{
 		
 		virtual int set();
 		virtual int update();
-		virtual int remove();
+		virtual int remove(bool valid = true);
 
 		u_int satype;
 		u_int mode;	// IPSEC SA mode
@@ -101,7 +102,7 @@ class MsipIpsecPolicy : public MsipIpsecRequest{
 		
 		virtual int set();
 		virtual int update();
-		virtual int remove();
+		virtual int remove(bool valid = true);
 
 		u_int prefs, prefd, proto;
 		char * policy;

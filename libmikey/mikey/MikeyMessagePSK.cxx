@@ -347,7 +347,7 @@ if( saltKey != NULL )
 
 MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 	
-	if( ka->getV() ){
+	if( ka->getV() || ka->getCsIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 		// Build the response message
 		MikeyMessage * result = new MikeyMessage();
 		result->addPayload( 
@@ -394,7 +394,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 		throw new MikeyExceptionMessageContent( 
 				"Expected PSK response message" );
 
-	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
+	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		csIdMap = hdr->csIdMap();
 	}
 	else{

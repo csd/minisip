@@ -20,10 +20,11 @@
  *
 */
 
-#include <fcntl.h> 
+ 
 #include <config.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <linux/ipsec.h>
 #include "MsipIpsecAPI.h"
 #include <libmikey/keyagreement.h>
@@ -59,7 +60,7 @@ MsipIpsecAPI::~MsipIpsecAPI(){
 	int i;	
 	list <MsipIpsecRequest *>::iterator iter;
 	for( iter = madeREQ.begin(); iter != madeREQ.end()  ; iter++ ){
-		i = (*iter)->remove();
+		i = (*iter)->remove(false);
 		if(i == -1)
 			fprintf( stderr, "Either a SA or a policy entry was not be removed, fix it!!!");
 		delete *iter;
@@ -154,16 +155,13 @@ bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		return false;
 	}
-	cerr <<  "SetMikeyIpsecOffer OK! " << flush << endl;
 	return true;
 }
 
 //---------------------------------------------------------------------------------------------------//
 // Construct responder MIKEY
 MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
-	cerr <<  "getMikeyIpsecAnswer 1 " << securityConfig.use_ipsec << flush << endl;
 	if( securityConfig.use_ipsec && initMSipIpsec() ){
-		cerr <<  "getMikeyIpsecAnswer 2 " << flush << endl;
 		// string keyMgmtAnswer;
 		// Generate the key management answer message
 		if( ! ( securityConfig.ka_type & KEY_MGMT_METHOD_MIKEY ) ){
@@ -230,23 +228,21 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 		if( responseMessage != NULL && securityConfig.use_ipsec){
 			if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH )
                                 ((KeyAgreementDH *)*ka)->computeTgk();
-			cerr << " About to run start" << flush << endl;
 			if(start() == -1){
 				cerr << " I returned NULL, not good!" << flush << endl;
 				return NULL;
 			}
-			cerr << " About to return responce message!" << flush << endl;
-			return new SipMimeContent("application/mikey", responseMessage->b64Message());
+			cerr <<  "getMikeyIpsecAnswer 3 " << flush << endl;
+			return new SipMimeContent("application/mikey", responseMessage->b64Message(),"");
 		}
 	}
-	cerr <<  "getMikeyIpsecAnswer 3 " << flush << endl;
 	return NULL;
 }
 
 //---------------------------------------------------------------------------------------------------//
 //Handle responded MIKEY
 bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
-
+	cerr << "Aleast I'm here!" << endl;
 	if (MikeyM->getContentType() != "application/mikey")
 		return false;
 	if( !initiatorAuthenticate( MikeyM->getString() ) ){
@@ -334,7 +330,7 @@ int MsipIpsecAPI::stop(){
 	list <MsipIpsecRequest *>::iterator iter;
 	for( iter = madeREQ.begin(); iter != madeREQ.end() ; iter++ ){
 		if((*iter)->exist)
-			if((*iter)->remove() == -1)
+			if((*iter)->remove(true) == -1)
 				notgood = -1;
 	}
 	return notgood;
@@ -345,9 +341,7 @@ int MsipIpsecAPI::stop(){
 int MsipIpsecAPI::start(){
 	list <MsipIpsecRequest *>::iterator iter;
 	for( iter = madeREQ.begin(); iter != madeREQ.end() ; iter++ ){
-		cerr << "In the first level!" << flush << endl;
 		if(!((*iter)->exist)){
-			cerr << "In the second level!" << flush << endl;
 			if((*iter)->set() == -1)
 				return -1;
 		}
@@ -372,10 +366,10 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 	MsipIpsecSA *sa = new MsipIpsecSA(so, SADB_SATYPE_ESP, IPSEC_MODE_TRANSPORT, reqid, seq++, 
 				(struct sockaddr *) &src, (struct sockaddr *) &dst);
 	madeREQ.push_back((MsipIpsecRequest*) sa);
-	int result = sa->set();
-	if (result == -1)
+	//int result = sa->set();
+	if (sa->set() == -1)
 		return 0;
-	return result;
+	return sa->spi;
 }
 
 //---------------------------------------------------------------------------------------------------//
@@ -386,7 +380,7 @@ void MsipIpsecAPI::addSAToKa(uint8_t policyNo){
 	assert(offerspi);
 	ka->addIpsecSA( offerspi, 0, localIp, policyNo);
 	/* Placeholder for the receiver to place his SPI */
-	ka->addIpsecSA( 0, localIp, 0, policyNo);
+	ka->addIpsecSA( htonl(0), localIp, 0, policyNo);
 }
 
 //---------------------------------------------------------------------------------------------------//
@@ -432,11 +426,11 @@ bool MsipIpsecAPI::initMSipIpsec(){
 				spi = getOfferSPI();
 				CsId->spi = spi;
 			}
-			cerr <<  "SPI: " << spi << " CdId#: " << i+1 << endl;
 			sa = findReqSPI(spi);
-			if(sa != NULL)
-				if( sa->remove() == -1 )
-					return false;
+			if(sa != NULL){
+				if( sa->remove(false) == -1 )
+					return false;	
+			}
 			satype 	 = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_IPSEC4, MIKEY_IPSEC_SATYPE);
 			mode	 = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_IPSEC4, MIKEY_IPSEC_MODE);
 			e_type 	 = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_IPSEC4, MIKEY_IPSEC_EALG);
@@ -450,11 +444,11 @@ bool MsipIpsecAPI::initMSipIpsec(){
 			ka->genAuth( i+1, a_key, a_keylen );
 			//Making src and dst structs
 			src.sin_family = AF_INET;
-			src.sin_port   = 0;
+			src.sin_port   = htons(0);
 			addr.s_addr = spiSrcaddr;
 			src.sin_addr = addr;
 			dst.sin_family = AF_INET;
-			dst.sin_port   = 0;
+			dst.sin_port   = htons(0);
 			addr.s_addr = spiDstaddr;
 			dst.sin_addr = addr;
 			//Making a SA
@@ -707,8 +701,10 @@ bool MsipIpsecAPI::initiatorAuthenticate( string message ){
 //Constructor
 MsipIpsecRequest::MsipIpsecRequest(struct sockaddr *src, struct sockaddr * dst, int so, u_int32_t seq, int otype){
 	exist = false;
+	valid = true;
 	this->so = so;
 	this->seq = seq;
+	cerr << "Seq: " << seq << endl;
 	//Here might be a good idea to check for ipv6
 	struct sockaddr_in *source;
 	struct sockaddr_in *destination;
@@ -784,46 +780,67 @@ MsipIpsecSA::~MsipIpsecSA(){
 //---------------------------------------------------------------------------------------------------//
 //Set SA into kernel -1 = error, 0 = already exist
 int MsipIpsecSA::set(){
-	int result, i;
-	cerr << "MsipIpsecSA::set()" << flush << endl;
-	u_int32_t min = htonl(5000);
-	u_int32_t max = htonl(15000);
+	int result;
 	struct sadb_msg * msg;
 	// There might be a good idea to check the result & return values below!!!
-	if(!spi && !exist){
+	if(!spi && !exist && valid){
 		struct sadb_sa * m_sa;
-
+		u_int32_t min = htonl(5000);
+		u_int32_t max = htonl(12000);
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_getspi(so, satype, mode, src, dst, min, max, reqid, seq);
 		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
-		// The result value is -1 wonder why? but it works
 		if (result == -1){
-			merr << "Problem with IPSEC pfkey_send_getspi" << end;
 			return result;
 		}
 		caddr_t next[18];
 		result = pfkey_align (msg, next);
 		result = pfkey_check(next);
 		m_sa = (struct sadb_sa *)next[SADB_EXT_SA];
-		spi = (u_int32_t)ntohl(m_sa->sadb_sa_spi);
+		spi = m_sa->sadb_sa_spi;
 		exist = true;
 		return (int)spi;
 	}
-	if(spi && !exist) {
+	if(spi && !exist && valid) {
 		caddr_t keymat;
 		keymat = (caddr_t)malloc(e_keylen + a_keylen);
-		strcpy(keymat, e_key);
-		strcat(keymat, a_key);
+		int i;
+		for (i = 0; i < e_keylen; i++)
+			keymat[i] = e_key[i];
+		for (int j = 0; j < a_keylen ; j++){
+			i++;
+			keymat[i] = a_key[j];
+		}
 		cerr << "MsipIpsecSA::set() pfkey_send_add" << flush << endl;
+		cerr << "so: "<< so << endl;
+		cerr << "satype: "<< satype << endl;
+		cerr << "mode: "<< mode << endl;
+		cerr << "src->sin_addr->s_addr: "<< ((struct sockaddr_in *)src)->sin_addr.s_addr << endl;
+		cerr << "dst->sin_addr->s_addr: "<< ((struct sockaddr_in *)dst)->sin_addr.s_addr << endl;
+		cerr << "spi: "<< spi << endl;
+		cerr << "reqid: "<< reqid << endl;
+		cerr << "wsize: "<< wsize << endl;
+		cerr << "e_type: "<< e_type << endl;
+		cerr << "e_keylen: "<< e_keylen << endl;
+		cerr << "a_type: "<< a_type << endl;
+		cerr << "a_keylen: "<< a_keylen << endl;
+		cerr << "flags: "<< flags << endl;
+		cerr << "l_alloc: "<< l_alloc << endl;
+		cerr << "l_alloc: "<< l_alloc << endl;
+		cerr << "l_bytes: "<< l_bytes << endl;
+		cerr << "l_addtime: "<< l_addtime << endl;
+		cerr << "l_usetime: "<< l_usetime << endl;
+		cerr << "seq: "<< seq << endl;
+
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
+		result = pfkey_send_add(so, satype, mode, src, dst, ntohl(spi), reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
 					flags, l_alloc, l_bytes, l_addtime, l_usetime, seq);
-		//msg = pfkey_recv(so);
+		msg = pfkey_recv(so);
 /* end---------------------------------------------------------------------------------**********************/
-		if (result = -1){
-			merr << "Problem with IPSEC pfkey_send_add" << end;
+		if (result == -1){
+			merr << "Problem with IPSEC pfkey_send_add: " << end;
 			return result;
 		}
 		exist = true;
@@ -839,16 +856,16 @@ int MsipIpsecSA::update(){return 0;}
 
 //---------------------------------------------------------------------------------------------------//
 //Remove SA from kernel  -1 = error, 0 = don't exist
-int MsipIpsecSA::remove(){
+int MsipIpsecSA::remove(bool valid){
 	int result;
 	struct sadb_msg *msg;
-	cerr << "MsipIpsecSA::remove()" << flush << endl;
 	if(exist){
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_delete (so, satype, mode, src, dst, spi);
 		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 		exist = false;
+		this->valid = valid;
 		return result;
 	}
 	else
@@ -867,9 +884,10 @@ MsipIpsecPolicy::MsipIpsecPolicy(int so, struct sockaddr * src, struct sockaddr 
 	this->prefd = prefd;
 	this->proto = proto;
 	this->policylen = policylen;
-	this->policy = (char *)malloc(policylen);
-	for(int i=0; i< policylen; i++)
-			this->policy[i] = policy[i];
+	this->policy = (char *)calloc( policylen, sizeof(char) );
+	for(int i=0; i< policylen; i++){
+		this->policy[i] = policy[i];
+	}
 }
 //---------------------------------------------------------------------------------------------------//
 //Destructor
@@ -881,17 +899,16 @@ MsipIpsecPolicy::~MsipIpsecPolicy(){
 //---------------------------------------------------------------------------------------------------//
 //Set policy into kernel -1 = error, 0 = already exist
 int MsipIpsecPolicy::set(){
-	cerr << "MsipIpsecPolicy::set()" << flush << endl;
+	if(exist || !valid)
+		return 0;
 	int result;
 	struct sadb_msg *msg;
-	if(exist)
-		return 0;
-	caddr_t pol =  ipsec_set_policy(policy,policylen);
-	int len = ipsec_get_policylen(policy);
+	caddr_t pol = ipsec_set_policy(policy, policylen);
+	int len = ipsec_get_policylen(pol);
 	// There might be a good idea to check the result & return values below!!!
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 	result = pfkey_send_spdadd(so, src, prefs, dst, prefd, proto, pol, len, seq); 
-	msg = pfkey_recv(so);
+	//msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 	exist = true;
 	return result;
@@ -903,7 +920,7 @@ int MsipIpsecPolicy::update(){return 0;}
 
 //---------------------------------------------------------------------------------------------------//
 //Remove policy from kernel -1 = error, 0 = don't exist
-int MsipIpsecPolicy::remove(){
+int MsipIpsecPolicy::remove(bool valid){
 	int result;
 	struct sadb_msg *msg;
 	if(exist){
@@ -912,6 +929,7 @@ int MsipIpsecPolicy::remove(){
 		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 		exist = false;
+		this->valid = valid;
 		return result;
 	}
 	return 0;
