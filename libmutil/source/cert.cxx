@@ -21,9 +21,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 #include<libmutil/cert.h>
 
-#include<config.h>
 
 #include<iostream>
 #include<stdio.h>

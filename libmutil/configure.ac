@@ -57,6 +57,8 @@ AC_ARG_ENABLE(memdebug,
       fi ])
 
 
+dnl REDHAT fix
+AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
 
 dnl Check for libssl 0.9.7
