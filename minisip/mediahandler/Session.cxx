@@ -87,9 +87,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 	string keyMgmtMessage;
 
 	result = emptySdp();
-	fprintf( stderr, "secure before create: %i\n",securityConfig.secured );
 	if( securityConfig.secured ){
-		fprintf( stderr, "The call is secure, adding MIKEY header\n");
 		MRef<SdpHeaderA *> a;
 		keyMgmtMessage = initiatorCreate();  //in KeyAgreement.cxx
 		if( ! securityConfig.secured ){
@@ -178,7 +176,6 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 				((SdpHeaderM*)*(answer->getHeaders()[i]));
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
-				fprintf( stderr, "trying format %i\n", j );
 				receiver = matchFormat( m, j, remoteAddress );
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
@@ -232,7 +229,6 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 }
 
 bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by the responder when receiving the first message
-	fprintf( stderr, "setSdpOffer started\n" );
 	unsigned int i;
 	int j;
 	MRef<MediaStream *> receiver;

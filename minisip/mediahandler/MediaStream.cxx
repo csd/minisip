@@ -179,8 +179,11 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 		ka->genTek( csId,  masterKey,  16 );
 		ka->genSalt( csId, masterSalt, 14 );
 
+#ifdef DEBUG_OUTPUT
+		fprintf( stderr, "csId: %i\n", csId );
 		cerr << "SSRC: "<< ssrc <<" - TEK: " << print_hex( masterKey, 16 ) << endl;
 		cerr << "SSRC: "<< ssrc <<" - SALT: " << print_hex( masterSalt, 14 )<< endl;
+#endif
 
 		if( csId != 0 ){
 			cryptoContext = new CryptoContext( ssrc, roc, keydr, 

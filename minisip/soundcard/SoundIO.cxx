@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
 /*
@@ -304,7 +305,6 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 		}
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
 //		(*i)->initLookup(nextSize);
-		cerr << "Source " << j << " in position " << (*i)->getPos() << endl;
 	}
 	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize,8000,BS));
 	queueLock.unlock();
@@ -340,20 +340,17 @@ void SoundIO::unRegisterSource(int sourceId){
                         i!=sources.end(); 
                         i++){
 		if ((*i)->getId()==sourceId){
-			cerr << "Erasing a source" << endl;
 			sources.erase(i);
 			break;
 		}
 			
         }
 	int32_t nextSize=sources.size();
-	cerr << "Repositioning sources" << endl;
 	for (list<MRef<SoundSource *> >::iterator i = sources.begin(); 
                         i!=sources.end(); 
                         i++, j++){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
 //		(*i)->initLookup(nextSize);
-		cerr << "Source position: " << (*i)->getPos() << endl;
         }
 	queueLock.unlock();
 }
@@ -451,22 +448,15 @@ void *SoundIO::playerLoop(void *arg){
 		for (list<MRef<SoundSource *> >::iterator 
 				i = active_soundcard->sources.begin(); 
 				i != active_soundcard->sources.end(); i++){
-//			if ((*i)->getId()!=-1 && (*i)->getId()!=-2){
-				(*i)->getSound(tmpbuf, BS, nChannels - 1);
-				
-				/* spatial audio */
-//				cerr << "before resample" << mtime() << endl;
-				(*i)->resample( tmpbuf,resbuf );
-//				cerr << "after resample" << mtime() << endl;
-				(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
-//				cerr << "After spatialize " << mtime() << endl;
-				
-//				cerr << "OUTBUF: " << print_hex( (unsigned char*)outbuf, 1764*2) << endl;
-				for (uint32_t j=0; j<nFrames*nChannels; j++){
-//					buf[j]+=tmpbuf[j];
-					buf[j]+=outbuf[j];
-				}
-//			}
+			(*i)->getSound(tmpbuf, BS, nChannels - 1);
+
+			/* spatial audio */
+			(*i)->resample( tmpbuf,resbuf );
+			(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
+
+			for (uint32_t j=0; j<nFrames*nChannels; j++){
+				buf[j]+=outbuf[j];
+			}
 		}
 		active_soundcard->queueLock.unlock();
 		if( !(counter++ % 100) ){
@@ -474,9 +464,7 @@ void *SoundIO::playerLoop(void *arg){
 		}
 
 		if( active_soundcard->soundDev->isOpenedPlayback() ){
-//			cerr << "before send_to_card" << mtime() << endl;
 			active_soundcard->send_to_card(buf, nFrames);
-//			cerr << "after send_to_card" << mtime() << endl;
 		}
 		
 	}

@@ -239,11 +239,9 @@ void AudioMedia::srcb_handleSound( void * data ){
 }
 
 void AudioMedia::startRinging( string ringtoneFile ){
-	cerr << "Registering ringtone" << endl;
 	soundIo->registerSource( new FileSoundSource( ringtoneFile,RINGTONE_SOURCE_ID, true ) );
 }
 
 void AudioMedia::stopRinging(){
-	cerr << "unRegistering ringtone" << endl;
 	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
 }
