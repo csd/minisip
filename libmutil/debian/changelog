@@ -1,3 +1,9 @@
+libmutil (0.3.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Thu, 17 Feb 2005 14:15:51 +0100
+
 libmutil (0.2.2-1) unstable; urgency=low
 
   * New upstream release.

@@ -1,5 +1,5 @@
 %define name		libmutil
-%define version		0.2.2
+%define version		0.3.0
 %define release		1
 
 %define major		0
