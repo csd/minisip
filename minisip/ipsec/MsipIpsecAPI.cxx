@@ -24,7 +24,6 @@
 #include <config.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <net/pfkeyv2.h>
 #include <linux/ipsec.h>
 #include "MsipIpsecAPI.h"
 #include <libmikey/keyagreement.h>
@@ -35,7 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 extern "C" {
-#include <libpfkey.h>
+#include "libpfkey.h"
 }
 //---------------------------------------------------------------------------------------------------//
 //---------------------------------------------------------------------------------------------------//
