@@ -20,35 +20,23 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef STREAMSOCKET_H
-#define STREAMSOCKET_H
+#include<config.h>
 
-#include"Socket.h"
+#include<libmnetutil/StreamSocket.h>
+#include<libmnetutil/IPAddress.h>
 
-#include<string>
-using namespace std;
+StreamSocket::~StreamSocket(){
+}
 
-class IPAddress;
-class IP4Address;
+bool StreamSocket::matchesPeer(IPAddress& address, uint16_t port){
+	return return *peerAddress == address && port == peerPort;
+}
 
-class StreamSocket : public Socket{
-	public:
-		virtual ~StreamSocket();
-		virtual int32_t write(string)=0;
-		virtual int32_t write(void *buf, int32_t count)=0;
-		virtual int32_t read(void *buf, int32_t cound)=0;
+IPAddress * StreamSocket::getPeerAddress(){
+	return peerAddress;
+}
 
-		// Buffer of the received data;
-		string received;
+uint16_t StreamSocket::getPeerPort(){
+	return peerPort;
+}
 
-		bool matchesPeer(IPAddress& address, uint16_t port);
-
-		IPAddress * getPeerAddress();
-		uint16_t getPeerPort();
-	protected:
-		IPAddress * peerAddress;
-		uint16_t peerPort;
-
-};
-
-#endif
