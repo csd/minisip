@@ -29,7 +29,7 @@
 #include"../ImageHandler.h"
 
 #include<libmutil/MemObject.h>
-#include<libavcodec/avcodec.h>
+#include<avcodec.h>
 
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
 

@@ -22,7 +22,7 @@
 
 #ifndef AVDECODER_H
 #define AVDECODER_H
-#include<libavcodec/avcodec.h>
+#include<avcodec.h>
 #include<libmutil/MemObject.h>
 #include<string>
 

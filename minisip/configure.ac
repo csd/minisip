@@ -106,13 +106,13 @@ AC_ARG_ENABLE(buzzer,
       fi ])
 
 
-dnl --with-ffmpeg argument
-AC_ARG_WITH(ffmpeg,
-    [ --with-ffmpeg=DIR location of the ffmpeg tree],
-    [ if test "${with_ffmpeg}" != "no"
+dnl --with-avcodec argument
+AC_ARG_WITH(avcodec,
+    [ --with-avcodec=DIR location of the libavcodec tree],
+    [ if test "${with_avcodec}" != "no"
       then
-        AVCODEC_CPPFLAGS="-I${with_ffmpeg}"
-        AVCODEC_LDFLAGS="-L${with_ffmpeg}/libavcodec"
+        AVCODEC_CPPFLAGS="-I${with_avcodec}"
+        AVCODEC_LDFLAGS="-L${with_avcodec}"
       fi ])
 
 
@@ -153,7 +153,7 @@ dnl first check for libavcodec
 	CPPFLAGS="${CPPFLAGS} ${AVCODEC_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
 	
-	AC_CHECK_HEADER([libavcodec/avcodec.h], [], [AC_MSG_ERROR(
+	AC_CHECK_HEADER([avcodec.h], [], [AC_MSG_ERROR(
 	  [Could not locate avcodec header files. Please install libavcodec-devel.])])
 	AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
 	  [Could not locate libavcodec, required for video features.])])
