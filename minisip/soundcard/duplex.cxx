@@ -111,9 +111,9 @@ class Sampler : public SoundRecorderCallback{
 			if (silence)
 				for (int ii=0; ii<160; ii++)
 					data[ii]=0;
-			//cerr << "before pushSound" << flush;
+//			cerr << "before pushSound" << flush;
 			scp->pushSound(34, data, SAMPLES_READ, index++, false);
-			//cerr << "after pushSound" << flush;
+//			cerr << "after pushSound" << flush;
 			if (index %1000==0){
 				for (int i=0; i<MAX_NOICE_TABLE; i++){
                                         cerr << i<<": ";
@@ -143,24 +143,21 @@ int main(int argc, char **argv){
 	}
 
 	SoundIO sc(new OssSoundDevice(argv[1]), 1, 8000);
-//	sc.registerSource(33,NULL);
-	//sc.open();
-	sc.openRecord();
-	sc.openPlayback();
 	dummy d;
-//	sc.set_plc_interface(&d);
 	scp = &sc;
 
-//	sc.set_start_playing_threshold(2);
 
 	cerr << "Starting player"<< endl;
 	sc.start_sound_player();
-	
-	sleep(5);
-	cerr << "Registring receiver"<< endl;
-        sc.register_recorder_receiver(&sampler, SAMPLES_READ, false);
+	sleep( 1 );
+	sc.registerSource(34,NULL);
 	cerr << "Starting recorder"<< endl;
 	sc.start_recorder();
+	
+	cerr << "Registring receiver"<< endl;
+        sc.register_recorder_receiver(&sampler, SAMPLES_READ, false);
+	sleep(1);
+	sc.startRecord();
 
 
 	while (1)
