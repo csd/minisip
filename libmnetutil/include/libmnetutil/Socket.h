@@ -35,17 +35,12 @@
 #define LIBMNETUTIL_API
 #endif
 
-//#include<config.h>
-
-
 #define SOCKET_TYPE_STREAM	0x10
 #define SOCKET_TYPE_TCP		0x11
 #define SOCKET_TYPE_TLS		0x12
 
 #define SOCKET_TYPE_UDP		0x20
 
-//#include<stdint.h>
-#include<config.h>
 #include<libmutil/MemObject.h>
 
 class LIBMNETUTIL_API Socket : public MObject{
