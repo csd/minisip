@@ -52,7 +52,7 @@
 
 class SipResponse;
 
-class LIBMSIP_API SipTransactionInviteServer : public SipTransaction{
+class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 	public:
 		SipTransactionInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		

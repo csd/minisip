@@ -126,3 +126,22 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 }
 
 
+SipTransactionClient::SipTransactionClient(MRef<SipDialog*> d, int seq_no, const string &branch, string callid):
+	SipTransaction(d,seq_no,branch,callid)
+{
+	
+}
+
+SipTransactionClient::~SipTransactionClient(){
+
+}
+
+SipTransactionServer::SipTransactionServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid):
+	SipTransaction(d,seq_no,branch,callid)
+{
+	
+}
+
+SipTransactionServer::~SipTransactionServer(){
+
+}

@@ -383,7 +383,7 @@ void SipTransactionInviteServer::setUpStateMachine(){
 
 
 SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch,string callid) : 
-		SipTransaction(/*"SipTransactionInviteServer",*/ d, seq_no, branch,callid),
+		SipTransactionServer(d, seq_no, branch,callid),
 		lastResponse(NULL),
 		timerG(500)
 {

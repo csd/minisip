@@ -50,7 +50,7 @@
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
 
-class LIBMSIP_API SipTransactionNonInviteServer: public SipTransaction{
+class LIBMSIP_API SipTransactionNonInviteServer: public SipTransactionServer{
 	public:
 		SipTransactionNonInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		

@@ -60,7 +60,7 @@ class SipMessageDispatcher;
 class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
-		SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, int cseq, const string &branch, string callid);
+		SipTransaction(MRef<SipDialog*> d, int cseq, const string &branch, string callid);
                 
 		virtual ~SipTransaction();
 		
@@ -98,6 +98,22 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 
 		string debugTransType;
 };
+
+
+class LIBMSIP_API SipTransactionClient: public SipTransaction{
+        public:
+                SipTransactionClient(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                ~SipTransactionClient();
+};
+
+class LIBMSIP_API SipTransactionServer: public SipTransaction{
+        public:
+                SipTransactionServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                ~SipTransactionServer();
+};
+
+
+
 
 #include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipDialog.h>

@@ -282,7 +282,7 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
-			SipTransaction(/*"SipTransactionNonInviteClient",*/ d, seq_no, "", callid),
+			SipTransactionClient(d, seq_no, "", callid),
 			lastRequest(NULL),
 			timerT1(500)
 {

@@ -52,7 +52,7 @@
 #include<libmsip/SipDialogContainer.h>
 
 
-class LIBMSIP_API SipTransactionNonInviteClient: public SipTransaction{
+class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
 		SipTransactionNonInviteClient(MRef<SipDialog*> d, int seq_no, string callid);
                 ~SipTransactionNonInviteClient();
