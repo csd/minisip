@@ -69,7 +69,7 @@
  |    +-------------+              |
  |           |                     |
  |a4:        | a2: transport_error |
- |timerTO    |     set timerTO=2min|
+ |timerTO    |     set timerTO=5min|
  |new TC(S)  V                     |  a1: 200 OK
  |    +-------------+              |      -
  |<---| retry_wait  |              |

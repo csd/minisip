@@ -68,12 +68,13 @@ class SipDialogPresenceServer: public SipDialog{
 		void setUpStateMachine();
 
 	private:
-		void sendNoticeToAll(string user);
+		void sendNoticeToAll(string onlineStatus);
+		void sendNotice(string onlinestatus, string user);
 		void sendSubscribeOk(MRef<SipSubscribe *> sub);
 		void removeUser(string user);
 		void addUser(string user);
 		
-//		void sendNotify(const string &branch);
+		void sendNotify(const string &branch, string toUri, string callId);
 //		void createNotifyClientTransaction();
 		
 		bool a0_start_default_startpresenceserver(const SipSMCommand &command);
@@ -85,6 +86,9 @@ class SipDialogPresenceServer: public SipDialog{
 
 		bool useSTUN;
 		minilist<string> subscribing_users;
+		Mutex usersLock;
+
+		string onlineStatus;
 };
 
 #endif

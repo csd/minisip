@@ -38,6 +38,7 @@
 #include"../p2t/GroupListServer.h"
 #include"../p2t/GroupList.h"
 #include"../mediahandler/MediaHandler.h"
+#include"PresenceMessageContent.h"
 
 #include<assert.h>
 
@@ -67,6 +68,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 void Sip::init(){
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
+	SipMessage::contentFactories.addFactory("application/xpidf+xml", presenceSipMessageContentFactory);
 	phoneconfig->inherited.sipTransport->setSipSMCommandReceiver(this);
 }
 

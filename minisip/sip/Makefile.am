@@ -7,6 +7,7 @@ libsip_a_SOURCES = SipDialogVoip.cxx \
 		   SipDialogPresenceServer.cxx \
 		   SipSoftPhoneConfiguration.cxx \
                    DefaultDialogHandler.cxx \
+                   PresenceMessageContent.cxx \
                    SipDialogSecurityConfig.cxx \
 		   Sip.cxx
 		   
@@ -15,5 +16,6 @@ noinst_HEADERS  = SipDialogVoip.h \
 		  SipDialogPresenceClient.h \
 		  SipDialogPresenceServer.h \
                   DefaultDialogHandler.h \
+                  PresenceMessageContent.h \
                   SipDialogSecurityConfig.h \
 		  Sip.h
