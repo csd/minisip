@@ -35,6 +35,24 @@
 #include<libmsip/SipUtils.h>
 #include<exception>
 
+#ifndef WIN32
+#ifdef DEBUG_OUTPUT
+#include<signal.h>
+#endif
+#endif
+
+#ifndef WIN32
+#ifdef DEBUG_OUTPUT
+static void signal_handler( int signal ){
+        if( signal == SIGUSR1 ){
+                merr << "Minisip was stopped" << end;
+                ts.print();
+        }
+	exit( 1 );
+}
+#endif
+#endif
+
 
 static void *tcp_server_thread(void *arg){
         assert( arg != NULL );
@@ -89,6 +107,13 @@ Minisip::Minisip( int argc, char**argv ){
         }
 
         srand(time(0));
+
+#ifndef WIN32
+#ifdef DEBUG_OUTPUT
+	signal( SIGUSR1, signal_handler );
+#endif
+#endif
+	
 
 	mout << "Initializing NetUtil"<<end;
 
