@@ -230,8 +230,8 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 		}
 
 		if( responseMessage != NULL && securityConfig.use_ipsec){
-			if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH )
-                                ((KeyAgreementDH *)*ka)->computeTgk();
+			//if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH )
+                        //        ((KeyAgreementDH *)*ka)->computeTgk();
 			if(start() == -1){
 				cerr << " I returned NULL, not good!" << flush << endl;
 				return NULL;
@@ -319,9 +319,9 @@ bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 		delete exc;
 		return false;
 	}
-	if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
-		((KeyAgreementDH *)*ka)->computeTgk();
-	}
+	//if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+	//	((KeyAgreementDH *)*ka)->computeTgk();
+	//}
 	if(initMSipIpsec())
 		if (start() == 0){
 			offered = true;
@@ -411,6 +411,8 @@ bool MsipIpsecAPI::initMSipIpsec(){
 		struct sockaddr_in src, dst;
 		struct in_addr addr;
 		int nCs = (int) ka->nCs();
+		if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH )
+			((KeyAgreementDH *)*ka)->computeTgk();
 		for(int i = 0 ; i < nCs ; i++){
 			CsId = CsIdMap->getCsIdnumber(i+1);
 			if(!CsId){
