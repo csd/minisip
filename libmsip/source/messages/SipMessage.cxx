@@ -215,8 +215,8 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
 			MRef<SipMessageContent*> smcref;
-			string contentType = ((SipHeaderValueContentType*)*h)->getContentType();
-			//cerr <<  "Content type parsed to "<< contentType<< endl;
+			string contentType = ((SipHeaderValueContentType*)*(h->getHeaderValue(0)))->getContentType();
+		//	cerr <<  "Content type parsed to "<< contentType<< endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
 			if (contentFactory){
 				MRef<SipMessageContent*> smcref = contentFactory(content);
@@ -415,6 +415,7 @@ MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 MRef<SipHeader *> SipMessage::getHeaderOfType(int t){
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == t){
+			cerr << "Returning header of type " << t << endl;
 			return headers[i];
 		}
 	}
