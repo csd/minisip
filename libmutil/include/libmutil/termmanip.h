@@ -46,8 +46,8 @@
 #define BG_RED "\033[41m"
 #define BG_WHITE "\033[47m"
 
-#define BOLD "\033[5m\033[1m"
-#define BREW "\033[5m\033[1m\033[7m"
+#define BOLD "\033[2m\033[1m"
+#define BREW "\033[2m\033[1m\033[7m"
 #define PLAIN "\033[m"
 #define FG_ERROR FG_RED
 

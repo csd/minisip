@@ -46,7 +46,7 @@ const int TextUI::red=2;
 const int TextUI::blue=3;
 const int TextUI::green=4;
 
-char *termCodes[]= { "\033[m", "\033[5m\033[1m", "\033[31m", "\033[34m", "\033[42m" };
+char *termCodes[]= { "\033[m", "\033[2m\033[1m", "\033[31m", "\033[34m", "\033[42m" };
 
 static int nonblockin_stdin() 
 {
