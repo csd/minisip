@@ -35,18 +35,8 @@
 
 /* STL replacement */
 
-#ifdef USE_STL
 using namespace std;
 #include<string>
-
-#else
-#include<String.h>
-namespace minisip{
-	        typedef string String;
-}
-using namespace minisip;
-
-#endif
 
 typedef uint8_t byte_t;
 
