@@ -52,6 +52,7 @@
 #include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipHeaderContentType.h>
 #include<libmsip/SipHeaderMaxForwards.h>
+#include<libmsip/SipHeaderWarning.h>
 
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>
@@ -488,3 +489,12 @@ list<string> SipMessage::getRouteSet(){
 	return ret;
 }
 
+
+string SipMessage::getWarningMessage(){
+	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
+		if ((headers[i])->getType() == SIP_HEADER_TYPE_WARNING){
+			string warning = ((SipHeaderWarning *)*(headers[i]))->getWarning();
+			return warning;
+		}
+	return "";
+}

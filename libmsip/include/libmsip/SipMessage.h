@@ -167,6 +167,11 @@ class SipMessage : public MObject{
                  */
                 virtual string getHeadersAndContent();
 
+		/**
+		 * @return The warning message contained in Warning: header
+		 */
+		string getWarningMessage();
+
                 
 ///		void setSocket(Socket* sock){socket = sock;};
 ///		Socket* getSocket(){return socket;};

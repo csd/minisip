@@ -59,12 +59,12 @@ SipHeaderWarning::SipHeaderWarning(const string &build_from)
 }
 
 
-SipHeaderWarning::SipHeaderWarning()
+SipHeaderWarning::SipHeaderWarning(string domainName, uint16_t errorCode, string warning)
 		: SipHeader(SIP_HEADER_TYPE_WARNING)
 {
-	errorCode=0;
-	domainName="";
-	warning="";
+	this->errorCode=errorCode;
+	this->domainName=domainName;
+	this->warning=warning;
 }
 
 SipHeaderWarning::~SipHeaderWarning(){

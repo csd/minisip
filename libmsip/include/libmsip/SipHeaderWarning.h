@@ -40,7 +40,7 @@
 
 class SipHeaderWarning: public SipHeader{
 	public:
-		SipHeaderWarning();
+		SipHeaderWarning(string domainName, uint16_t errorCode, string warning);
 		SipHeaderWarning(const string &build_from);
 
 		virtual ~SipHeaderWarning();
