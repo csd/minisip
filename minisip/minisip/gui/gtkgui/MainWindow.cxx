@@ -47,7 +47,7 @@
 #define BIND sigc::bind
 #endif
 
-MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
+MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	Gtk::Button * callButton;
 	Gtk::Button * imButton;

@@ -55,7 +55,7 @@ class MainWindow : public Gui, public LogEntryHandler
 #endif
 {
 	public:
-		MainWindow( int32_t argc, char ** argv );
+		MainWindow( int argc, char ** argv );
 		~MainWindow();
 
 		bool isVisible();

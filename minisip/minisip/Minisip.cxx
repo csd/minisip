@@ -69,7 +69,7 @@ static void *tls_server_thread(void *arg){
 		
 }
 
-Minisip::Minisip( int32_t argc, char**argv ){
+Minisip::Minisip( int argc, char**argv ){
 
 	if( argc == 2){
 		conffile = argv[1];
