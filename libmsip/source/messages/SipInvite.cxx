@@ -60,6 +60,8 @@ SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from
 	//check if it is a P2T Invite packet
 	MRef<SipHeaderValueAcceptContact*> acp;
 	P2T=false;
+	ConfJoin=false;
+	ConfConnect=false;
 	
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
@@ -67,6 +69,10 @@ SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from
 			
 			if(acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
 				P2T=true;
+			else if(acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"")
+				ConfJoin=true;
+			else if(acp->getFeaturetag()=="+sip.confconnect=\"TRUE\"")
+				ConfConnect=true;
 		}
 	}	
 }
@@ -208,7 +214,16 @@ void SipInvite::set_P2T() {
 	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.p2t=\"TRUE\"",true,false);
 	addHeader(new SipHeader(*acp) );
 }
-
+void SipInvite::set_ConfJoin(){
+	this->ConfJoin=true;
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.confjoin=\"TRUE\"",true,false);
+	addHeader(new SipHeader(*acp) );
+}
+void SipInvite::set_ConfConnect(){
+	this->ConfConnect=true;
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.confconnect=\"TRUE\"",true,false);
+	addHeader(new SipHeader(*acp) );
+}
 
 /**
  * SipInvite::is_P2T()
@@ -218,4 +233,10 @@ void SipInvite::set_P2T() {
  */
 bool SipInvite::is_P2T() {
 	return P2T;
+}
+bool SipInvite::is_ConfJoin() {
+	return ConfJoin;
+}
+bool SipInvite::is_ConfConnect() {
+	return ConfConnect;
 }

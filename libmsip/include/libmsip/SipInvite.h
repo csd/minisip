@@ -134,12 +134,15 @@ class LIBMSIP_API SipInvite : public SipMessage{
 		 * set the P2T flag
 		 */
 		void set_P2T();
+		void set_ConfJoin();
+		void set_ConfConnect();
 		
 		/**
 		 *@returns true for a P2T invitation
 		 */
 		bool is_P2T();
-		
+		bool is_ConfJoin();
+		bool is_ConfConnect();
 		
 	private:
 		void createHeadersAndContent( const string &call_id,
@@ -164,6 +167,8 @@ class LIBMSIP_API SipInvite : public SipMessage{
 		 * to a P2T session
 		 */
 		bool P2T;
+		bool ConfJoin;
+		bool ConfConnect;
 };
 
 #endif

@@ -293,16 +293,16 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	
 #else	
-	MRef<SipDialog*> voipCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession)); 
 
 #endif
 
-	/*dialogContainer*/sipstack->addDialog(voipCall);
+	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 	
-	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
+	CommandString inv(voipConfCall->getCallId(), SipCommandString::invite, user);
 #ifndef _MSC_VER
 	ts.save( TMP );
 #endif
@@ -311,7 +311,7 @@ MRef<Session *> mediaSession =
 	
 	sipstack->handleCommand(cmd);
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-	return voipCall->getCallId();
+	return voipConfCall->getCallId();
 }
 
 void Sip::run(){
