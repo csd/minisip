@@ -246,6 +246,12 @@ static XMLNode *parseElement(const char *s, int32_t &i){
 		return parseElement(s, i);
 	}
 
+	if (s[i]=='<' && s[i+1]=='!'){
+		while (s[i]!='>')
+			i++;
+		i++;
+		return parseElement(s, i);
+	}
 	
 	//cerr << "parseElement with s="<<s+i<<" and i=" << i <<endl;
 	if (s[i]==0)
