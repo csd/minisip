@@ -26,6 +26,7 @@
 #include<config.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include<assert.h>
 
 // BSD 5.x: malloc.h has been replaced by stdlib.h
 // #include<malloc.h>
@@ -105,11 +106,14 @@ Mutex::~Mutex(){
 //	free(handle_ptr);
 
 #elif defined WIN32
-#warning Mutex delete not implemented
+	if (!ReleaseMutex( *((HANDLE*)handle_ptr) )){
+		assert(1==0 /*Could not release W32 mutex*/ );
+	}
+
 
 
 #elif defined WINCE
-#warning Mutex delete not implemented
+#error Mutex delete not implemented
 #endif
 
 
@@ -156,11 +160,11 @@ void Mutex::unlock(){
 //	}
 
 #elif defined WIN32
-	if (locked){
+//	if (locked){
 //	    ReleaseMutex(hMutex);
 	    ReleaseMutex( *( (HANDLE*)handle_ptr) );
 //	    locked=false;
-	}
+//	}
 
 #elif defined _WINCE_
 	    ReleaseMutex(*((HANDLE*)handle_ptr));

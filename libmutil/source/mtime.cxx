@@ -21,7 +21,7 @@
 */
 
 
-#include<stdint.h>
+#include<config.h>
 
 #ifdef WIN32
 #include <sys/timeb.h>

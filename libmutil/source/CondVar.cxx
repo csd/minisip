@@ -49,8 +49,8 @@ CondVar::CondVar(){
 	init = true;
 #elif defined WIN32
 #define MINISIP_CONDVAR_IMPLEMENTED
-	INTERNAL_COND_WAIT = CreateEvent( NULL, FALSE, FALSE, NULL );
-	INTERNAL_MUTEX = CreateMutex(NULL, FALSE, NULL);
+	*INTERNAL_COND_WAIT = CreateEvent( NULL, FALSE, FALSE, NULL );
+	*INTERNAL_MUTEX = CreateMutex(NULL, FALSE, NULL);
 	WaitForSingleObject( INTERNAL_MUTEX, INFINITE );
 	
 #endif

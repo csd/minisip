@@ -30,12 +30,20 @@
 #ifdef HAVE_TERMIOS_H
 #include<termios.h>
 #endif
+
 #ifdef WIN32
 #include<conio.h>
 #endif
+
+#ifdef _MSC_VER
+#include <sys/types.h>  
+#include <sys/stat.h>
+#include <fcntl.h>
+#include<io.h>
+#else
 #include<unistd.h>
+#endif
 #include<libmutil/trim.h>
-//#include<libmnetutil/UDPSocket.h>
 
 #include<iostream>
 
@@ -292,7 +300,7 @@ string TextUI::displaySuggestions(string hint){
 	//callback plus the ones matching from "command")
 	
 	bool cont = true;
-	unsigned index = hint.size();
+	unsigned index = (unsigned)hint.size();
 	while (cont){
 		char c=0;
 		for (i=0; i< cbSuggest.size(); i++){

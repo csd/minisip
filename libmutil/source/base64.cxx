@@ -23,6 +23,8 @@
 #include <libmutil/base64.h>
 #define LINE_LENGTH 60
 
+#include<config.h>
+
 #include<iostream>
 using namespace std;
 
@@ -68,9 +70,9 @@ string base64_encode( unsigned char * input, int length )
 unsigned char *  base64_decode( string input, int * output_length )
 {
 	string input_cpy = input;
-	uint32_t pos;
+	size_t pos;
 	uint32_t i;
-	int nb_equals;
+	size_t nb_equals;
 	unsigned char * output;
 	unsigned char * p_cursor;
 #define XX 255
@@ -120,13 +122,13 @@ unsigned char *  base64_decode( string input, int * output_length )
 
 	switch( nb_equals ) {
 		case 0:
-			*output_length = 3 * input_cpy.length() / 4;
+			*output_length = (int) (3 * input_cpy.length() / 4);
 			break;
 		case 1:
-			*output_length = 3 * ( input_cpy.length() / 4 - 1 ) + 2;
+			*output_length = (int) (3 * ( input_cpy.length() / 4 - 1 ) + 2);
 			break;
 		case 2:
-			*output_length = 3 * ( input_cpy.length() / 4 - 1 ) + 1;
+			*output_length = (int) (3 * ( input_cpy.length() / 4 - 1 ) + 1);
 			break;
 		default:
 #ifdef DEBUG_OUTPUT

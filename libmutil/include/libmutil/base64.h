@@ -23,7 +23,7 @@
 #ifndef BASE64_H
 #define BASE64_H
 
-#include<stdint.h>
+//#include<stdint.h>
 
 #include<string>
 

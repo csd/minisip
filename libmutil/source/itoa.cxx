@@ -34,10 +34,12 @@
 
 #include<libmutil/itoa.h>
 #include<stdio.h>
-
+#include<config.h>
+#include<assert.h>
 using namespace std;
 
 string itoa(int i){
+	assert(sizeof(uint64_t)==8); //TODO: remove this check
 	char buf[16];
 	for (int j=0; j<16; j++)
 		buf[j]=0;

@@ -20,11 +20,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include <libmutil/XMLParser.h>
+#include<libmutil/XMLParser.h>
 #include<fstream>
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 #include<iostream>
+#include<sys/types.h>
+#include<config.h>
+#include<assert.h>
+
 
 static bool is_blank(char c){
 	if (c=='\t' || c==' ' || c=='\r' || c=='\n')
@@ -95,7 +99,7 @@ void XMLParser::addValue(XMLNode *cur, const char *path, string &value, int32_t 
 	string part = parseWord(path, i);
 	if (part[part.length()-1]==']'){
 		string sindex;
-		int32_t ii=part.length()-2;
+		int32_t ii=(int32_t)part.length()-2;
 		while (part[ii]!='['){
 			sindex= part[ii]+sindex;
 			ii--;

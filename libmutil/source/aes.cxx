@@ -27,11 +27,12 @@
 #ifdef DEBUG_OUTPUT
 #include<iostream>
 #include<libmutil/print_hex.h>
+using namespace std;
 #endif
 
 #include<string.h>
 
-using namespace std;
+
 
 #ifndef HAVE_OPENSSL_AES_H
 
