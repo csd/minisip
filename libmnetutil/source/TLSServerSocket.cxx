@@ -103,7 +103,7 @@ StreamSocket *TLSServerSocket::accept(){
 		perror("in ServerSocket::accept(): accept:");
 	}
 
-	return new TLSSocket( new TCPSocket( cli ), ssl_ctx );
+	return new TLSSocket( new TCPSocket( cli, &sin ), ssl_ctx );
 }
 
 #endif //NO_SECURITY

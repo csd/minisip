@@ -60,7 +60,7 @@ struct sockaddr *IP4ServerSocket::getSockaddrStruct(int32_t &ret_length){
 	return (struct sockaddr *)sin;
 }
 
-TCPSocket * IP4ServerSocket::createSocket(int32_t fd, struct sockaddr *saddr){ //FIXME: saddr is not used!!!
-	return new TCPSocket(fd);
+TCPSocket * IP4ServerSocket::createSocket(int32_t fd, struct sockaddr *saddr){
+	return new TCPSocket(fd, saddr);
 }
 

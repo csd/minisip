@@ -46,6 +46,8 @@ class IPAddress{
 
 		virtual bool operator ==(const IPAddress &i) const =0;
 		virtual IPAddress * clone() const =0;
+
+		static IPAddress * create(sockaddr * addr);
 		
 	protected:
 		void setAddressFamily(int af);

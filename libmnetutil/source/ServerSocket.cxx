@@ -103,8 +103,7 @@ StreamSocket *ServerSocket::accept(){
 #endif
 		perror("in ServerSocket::accept(): accept:");
 	}
-	//return create_socket(cli,sin);
-	return new TCPSocket(cli);
+	return new TCPSocket(cli,&sin);
 }
 
 int32_t ServerSocket::getPort(){

@@ -85,10 +85,11 @@ TCPSocket::TCPSocket(IPAddress &ipaddress, int32_t port){
 	ipaddress.connect(*this, port);
 }
 
-TCPSocket::TCPSocket(int32_t fd){
+TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr){
 	type = SOCKET_TYPE_TCP;
 	this->fd=fd;
-//	this->ipaddr=0;
+	this->peerAddress = IPAddress::create( addr );
+	this->peerPort = ntoh16( ((sockaddr_in *)addr)->sin_port );
 }
 
 TCPSocket::TCPSocket(TCPSocket &sock){

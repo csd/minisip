@@ -33,6 +33,7 @@ class IP6Address : public IPAddress{
 	public:
 		IP6Address(std::string addr);
 		IP6Address(const IP6Address&);
+		IP6Address(struct sockaddr *);
 		~IP6Address();
 		
 		virtual std::string getString();

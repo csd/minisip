@@ -84,6 +84,17 @@ IP6Address::IP6Address(string addr){
 	memcpy(&sockaddress->sin6_addr,hp->h_addr, hp->h_length);
 }
 
+IP6Address::IP6Address(struct sockaddr * addr){
+	type = IP_ADDRESS_TYPE_V6;
+	setAddressFamily(AF_INET6);
+	setProtocolFamily(PF_INET6);
+	sockaddress = new sockaddr_in6;
+	memcpy(sockaddress, addr, sizeof(sockaddr_in6));
+	for (int32_t i=0; i<8; i++)
+		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+}
+
+
 IP6Address::IP6Address(const IP6Address& other){
 	type = IP_ADDRESS_TYPE_V6;
 	setAddressFamily(AF_INET6);
@@ -93,6 +104,7 @@ IP6Address::IP6Address(const IP6Address& other){
 	sockaddress = new sockaddr_in6;
 	memcpy(sockaddress, other.sockaddress, sizeof(sockaddr_in6));
 }
+
 
 IP6Address::~IP6Address(){
 	delete sockaddress;

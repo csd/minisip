@@ -30,7 +30,7 @@ using namespace std;
 
 class TCPSocket : public StreamSocket{
 	public:
-		TCPSocket(int32_t fd);
+		TCPSocket(int32_t fd, sockaddr * addr);
 		TCPSocket(string addr,int32_t port=0);
 		TCPSocket(IPAddress &addr,int32_t port=0);
 		TCPSocket(TCPSocket &sock);

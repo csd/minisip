@@ -24,8 +24,12 @@
 #include<config.h>
 #endif
 
+#include<netinet/in.h>
+
 
 #include<libmnetutil/IPAddress.h>
+#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IP6Address.h>
 
 IPAddress::~IPAddress(){
 
@@ -45,4 +49,15 @@ int IPAddress::getProtocolFamily(){
 
 void IPAddress::setProtocolFamily(int pf){
 	protocol_family=pf;
+}
+
+IPAddress * IPAddress::create( sockaddr * addr ){
+	if( ((sockaddr_in*)addr)->sin_family == AF_INET ){
+		return new IP4Address( (sockaddr_in *)addr );
+	}
+	else if( ((sockaddr_in*)addr)->sin_family == AF_INET6 ){
+		return new IP6Address( addr );
+	}
+	// FIXME exception
+	else return NULL;
 }
