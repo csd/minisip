@@ -127,7 +127,7 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		//MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)
 		//	*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
@@ -318,7 +318,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 				dialogState.seqNo
 				));
 
-	sub->getHeaderValueFrom()->setTag(dialogState.localTag);
+	sub->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pktr(*sub);
 #ifdef MINISIP_MEMDEBUG

@@ -168,7 +168,7 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 
 	    //We must maintain the dialog state. We copy the remote tag and
 	    //the remote sequence number
-	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 	    dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
 	    
 	    string peerUri = command.getCommandPacket()->getFrom().getString();
@@ -191,7 +191,7 @@ bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &comm
 {
 
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		return true;
 	}else{
 		return false;
@@ -212,7 +212,7 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
 
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 						
                 CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",(getMediaSession()->isSecure()?"secure":"unprotected"));
@@ -402,7 +402,7 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		//We must maintain our dialog state. This is the first
 		//message we receive for this dialog and we copy the remote
 		//tag and the remote sequence number.
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getParameter("tag");
 		dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
 		//dialogState.seqNo = command.getCommandPacket()->getCSeq(); (we do not need to set to the same at the remote one - remove)
 //		setLocalCalled(true);
@@ -568,7 +568,7 @@ bool SipDialogVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &comma
 		
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		//int seqNo = requestSeqNo();
 		++dialogState.seqNo;
@@ -597,7 +597,7 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		string peerUri = resp->getFrom().getString();
 		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
@@ -614,7 +614,7 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 
 bool SipDialogVoip::a22_callingauth_callingauth_1xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		return true;
 	}else{
 		return false;
@@ -630,7 +630,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
 
-		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 
 		CommandString cmdstr(dialogState.callId, 
@@ -987,7 +987,7 @@ void SipDialogVoip::sendInvite(const string &branch){
 #ifdef MINISIP_MEMDEBUG
 	inv.setUser("SipDialogVoip");
 #endif
-	inv->getHeaderValueFrom()->setTag(dialogState.localTag );
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
 
 //	mdbg << "SipDialogVoip::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
@@ -1051,7 +1051,7 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword,
 				getDialogConfig()->inherited.transport);
 
-	inv->getHeaderValueFrom()->setTag(dialogState.localTag);
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
@@ -1198,8 +1198,8 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 			///localCalled
 			);
 
-	bye->getHeaderValueFrom()->setTag(dialogState.localTag);
-	bye->getHeaderValueTo()->setTag(dialogState.remoteTag);
+	bye->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	bye->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*bye);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1220,19 +1220,18 @@ void SipDialogVoip::sendCancel(const string &branch){
 			///localCalled
 			);
 
-	cancel->getHeaderValueFrom()->setTag(dialogState.localTag);
-	cancel->getHeaderValueTo()->setTag(dialogState.remoteTag);
+	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	cancel->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*cancel);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand( cmd );
 	getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-
 }
 
 void SipDialogVoip::sendInviteOk(const string &branch){
 	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
-	ok->getHeaderValueTo()->setTag(dialogState.localTag);
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
@@ -1307,7 +1306,7 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 
 void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-	ok->getHeaderValueTo()->setTag(dialogState.localTag);
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 //	setLastResponse(ok);
         MRef<SipMessage*> pref(*ok);
@@ -1318,7 +1317,7 @@ void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 
 void SipDialogVoip::sendReject(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
-	ringing->getHeaderValueTo()->setTag(dialogState.localTag);
+	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(ringing);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
@@ -1328,7 +1327,7 @@ void SipDialogVoip::sendReject(const string &branch){
 
 void SipDialogVoip::sendRinging(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", MRef<SipMessage*>(*getLastInvite()));	
-	ringing->getHeaderValueTo()->setTag(dialogState.localTag);
+	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(ringing);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1346,7 +1345,7 @@ void SipDialogVoip::sendNotAcceptable(const string &branch){
 			new SipHeader(new SipHeaderValueWarning(getDialogConfig()->inherited.externalContactIP, 399, mediaSession->getErrorString() ) ));
 	}
 
-	not_acceptable->getHeaderValueTo()->setTag(dialogState.localTag);
+	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(not_acceptable);
         MRef<SipMessage*> pref(*not_acceptable);
 #ifdef MINISIP_MEMDEBUG

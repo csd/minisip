@@ -177,7 +177,7 @@ bool SipDialogP2Tuser::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &c
 #endif
 	    CommandString cmdstr(/*vc->*/getCallId(), SipCommandString::remote_ringing);
 	    //vc->getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-	    /*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+	    /*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 	    MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
 	    if ( !sdp.isNull() ){
@@ -199,7 +199,7 @@ bool SipDialogP2Tuser::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &c
 
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		return true;
 	}else{
 		return false;
@@ -220,7 +220,7 @@ bool SipDialogP2Tuser::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		/*vc->*/getLogEntry()->start = time( NULL );
 		/*vc->*/getLogEntry()->peerSipUri = resp->getFrom().getString();
 
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 #if 0
 		/* Key Agreement response message treatment */
@@ -513,7 +513,7 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 		/*vc->*/ /*setSeqNo(command.getCommandPacket()->getCSeq() );*/
 		dialogState.seqNo = command.getCommandPacket()->getCSeq();
 		
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getParameter("tag");
 
 		/*vc->*/setLocalCalled(true);
 		/*vc->*/setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
@@ -727,7 +727,7 @@ bool SipDialogP2Tuser::a20_callingnoauth_callingauth_40X( const SipSMCommand &co
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		//int seqNo = /*vc->*/requestSeqNo();
 		++dialogState.seqNo;
@@ -758,7 +758,7 @@ bool SipDialogP2Tuser::a21_callingauth_callingauth_18X(
 
 		CommandString cmdstr(/*vc->*/getCallId(), SipCommandString::remote_ringing);
 		/*vc->*/getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		if ( !resp->getContent().isNull()){
 			/*vc->*/handleSdp(MRef<SdpPacket*>((SdpPacket*)*resp->getContent()) );
 		}
@@ -778,7 +778,7 @@ bool SipDialogP2Tuser::a22_callingauth_callingauth_1xx(
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
 		//SipDialogP2Tuser *vc= (SipDialogP2Tuser *)sipStateMachine;
 
-		/*vc->*/dialogState.remoteTag= command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag= command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		return true;
 	}else{
 		return false;
@@ -797,7 +797,7 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 		/*vc->*/getLogEntry()->start = time( NULL );
 		/*vc->*/getLogEntry()->peerSipUri = resp->getFrom().getString();
 
-		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		
 #if 0
@@ -1276,7 +1276,7 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 	inv.setUser("SipDialogP2Tuser");
 #endif
 	
-	inv->getHeaderValueFrom()->setTag(dialogState.localTag);
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	
 	//add P2T stuff to the invite message
 	modifyP2TInvite(inv);
@@ -1349,7 +1349,7 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 			/*getDialogConfig().inherited.codecs,*/
 			getDialogConfig()->inherited.transport);
 
-	inv->getHeaderValueFrom()->setTag(dialogState.localTag);
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
 //	mdbg << "SipDialogP2Tuser::sendInvite(): sending INVITE to transaction"<<end;
 #ifndef _MSC_VER
@@ -1438,8 +1438,8 @@ void SipDialogP2Tuser::sendBye(const string &branch, int bye_seq_no){
 			///localCalled
 			);
 
-	bye->getHeaderValueFrom()->setTag(dialogState.localTag);
-	bye->getHeaderValueTo()->setTag(dialogState.remoteTag);
+	bye->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	bye->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*bye);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1459,8 +1459,8 @@ void SipDialogP2Tuser::sendCancel(const string &branch){
 			///localCalled
 			);
 
-	cancel->getHeaderValueFrom()->setTag(dialogState.localTag);
-	cancel->getHeaderValueTo()->setTag(dialogState.remoteTag);
+	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	cancel->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*cancel);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1471,7 +1471,7 @@ void SipDialogP2Tuser::sendCancel(const string &branch){
 
 void SipDialogP2Tuser::sendInviteOk(const string &branch){
 	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
-	ok->getHeaderValueTo()->setTag(dialogState.localTag);
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 
 #ifdef OLD_MEDIA
@@ -1513,7 +1513,7 @@ void SipDialogP2Tuser::sendInviteOk(const string &branch){
 
 void SipDialogP2Tuser::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-	ok->getHeaderValueTo()->setTag(dialogState.localTag);
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 //	setLastResponse(ok);
         MRef<SipMessage*> pref(*ok);
@@ -1524,7 +1524,7 @@ void SipDialogP2Tuser::sendByeOk(MRef<SipBye*> bye, const string &branch){
 
 void SipDialogP2Tuser::sendReject(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
-	ringing->getHeaderValueTo()->setTag(dialogState.localTag);
+	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(ringing);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
@@ -1534,7 +1534,7 @@ void SipDialogP2Tuser::sendReject(const string &branch){
 
 void SipDialogP2Tuser::sendRinging(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", MRef<SipMessage*>(*getLastInvite()));	
-	ringing->getHeaderValueTo()->setTag(dialogState.localTag);
+	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(ringing);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1547,7 +1547,7 @@ void SipDialogP2Tuser::sendNotAcceptable(const string &branch){
 #ifdef MINISIP_MEMDEBUG
 	not_acceptable.setUser("SipDialogP2Tuser");
 #endif
-	not_acceptable->getHeaderValueTo()->setTag(dialogState.localTag);
+	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(not_acceptable);
         MRef<SipMessage*> pref(*not_acceptable);
 #ifdef MINISIP_MEMDEBUG

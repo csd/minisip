@@ -748,7 +748,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderValueTo()->setTag(dialogState.localTag);
+        ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -779,8 +779,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			msg
                         );
 
-        im->getHeaderValueFrom()->setTag(dialogState.localTag);
-        im->getHeaderValueTo()->setTag(dialogState.remoteTag);
+        im->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+        im->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*im);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);

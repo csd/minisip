@@ -263,7 +263,7 @@ void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
 	getDialogContainer()->enqueueCommand(c, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	
 	MRef<SipResponse*> ok= new SipResponse(sr->getBranch(), 200,"OK", MRef<SipMessage*>(*sub));
-	ok->getHeaderValueTo()->setTag(dialogState.localTag);
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -312,7 +312,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				dialogState.seqNo
 				));
 
-	notify->getHeaderValueFrom()->setTag(dialogState.localTag);
+	notify->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
 	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited.sipIdentity->getSipUri(),
 				toId->getSipUri(),
