@@ -644,6 +644,14 @@ bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &
 				SipSMCommand::DIALOGCONTAINER);
 
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+
+#ifdef IPSEC_SUPPORT
+		if(ipsecSession){
+			cerr << "Clearing ipsec sa/policy in a25" << endl;
+			if(ipsecSession->stop() != 0)
+				cerr << "But not all was confired cleared. Check and remove manually." << endl;
+		}
+#endif
 		return true;
 	}else{
 		return false;
