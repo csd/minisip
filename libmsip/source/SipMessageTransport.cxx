@@ -173,10 +173,10 @@ void SipMessageParser::expandBuffer(){
 
 uint32_t SipMessageParser::findContentLength(){
 	uint32_t i = 0;
-	const char * contentLengthString = "\nContentLength: ";
+	const char * contentLengthString = "\nContent-Length: ";
 
-	for( i = 0; i + 16 < index; i++ ){
-		if( strncasecmp( contentLengthString, (char *)(buffer + i) , 16  ) == 0 ){
+	for( i = 0; i + 17 < index; i++ ){
+		if( strncasecmp( contentLengthString, (char *)(buffer + i) , 17  ) == 0 ){
 			uint32_t j = 0;
 			string num;
 			
@@ -184,9 +184,9 @@ uint32_t SipMessageParser::findContentLength(){
 				j++;
 			}
 			
-			for( ; i + 16 + j < index ; j++ ){
-				if( buffer[i+j+16] >= '0' && buffer[i+j+16] <= '9' ){
-					num += buffer[i+j+16];
+			for( ; i + 17 + j < index ; j++ ){
+				if( buffer[i+j+17] >= '0' && buffer[i+j+18] <= '9' ){
+					num += buffer[i+j+17];
 				}
 				else break;
 			}
