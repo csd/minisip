@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipDialogPresence.cxx
+ * 	SipDialogPresenceClient.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -30,17 +30,12 @@
 
 
 #include<assert.h>
-#include"SipDialogPresence.h"
+#include"SipDialogPresenceClient.h"
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipSubscribe.h>
 #include<libmsip/SipNotify.h>
-//#include<libmsip/SipBye.h>
-//#include<libmsip/SipCancel.h>
-//#include<libmsip/SipAck.h>
 #include<libmsip/SipMessageTransport.h>
-//#include<libmsip/SipTransactionInviteClientUA.h>
-//#include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipTransactionClient.h>
 #include<libmsip/SipTransactionServer.h>
 #include<libmsip/SipTransactionUtils.h>
@@ -104,7 +99,7 @@ stop_presence|    +------+
 */
 
 
-void SipDialogPresence::createSubscribeClientTransaction(){
+void SipDialogPresenceClient::createSubscribeClientTransaction(){
 	int seqNo = requestSeqNo();
 	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, callId);
 //	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
@@ -113,11 +108,11 @@ void SipDialogPresence::createSubscribeClientTransaction(){
 }
    
 
-bool SipDialogPresence::a0_start_trying_presence(const SipSMCommand &command){
+bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::start_presence)){
+	if (transitionMatch(command, SipCommandString::start_presence_client)){
 #ifdef DEBUG_OUTPUT
-		merr << "SipDialogPresence::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< end;
+		merr << "SipDialogPresenceClient::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< end;
 #endif
 		toUri = MRef<SipIdentity*>( new SipIdentity(command.getCommandString().getParam()) );
 		createSubscribeClientTransaction();
@@ -128,17 +123,17 @@ bool SipDialogPresence::a0_start_trying_presence(const SipSMCommand &command){
 
 }
 
-bool SipDialogPresence::a1_X_subscribing_200OK(const SipSMCommand &command){
+bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-		getDialogConfig().tag_foreign = command.getCommandPacket()->getHeaderTo()->getTag();
+		getDialogConfig()->tag_foreign = command.getCommandPacket()->getHeaderTo()->getTag();
 
 		MRef<SipHeaderExpires *> expireshdr = (SipHeaderExpires*)*resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES);
 		int timeout;
 		if (expireshdr){
 			timeout = expireshdr->getTimeout();
 		}else{
-			mdbg << "WARNING: SipDialogPresence did not contain any expires header - using 300 seconds"<<end;
+			mdbg << "WARNING: SipDialogPresenceClient did not contain any expires header - using 300 seconds"<<end;
 			timeout = 300;
 		}
 		
@@ -153,7 +148,7 @@ bool SipDialogPresence::a1_X_subscribing_200OK(const SipSMCommand &command){
 	}
 }
 
-bool SipDialogPresence::a2_trying_retrywait_transperror(const SipSMCommand &command){
+bool SipDialogPresenceClient::a2_trying_retrywait_transperror(const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::transport_error )){
 		mdbg << "WARNING: Transport error when subscribing - trying again in five minutes"<< end;
 		requestTimeout(300, "timerDoSubscribe");
@@ -164,7 +159,7 @@ bool SipDialogPresence::a2_trying_retrywait_transperror(const SipSMCommand &comm
 
 }
 
-bool SipDialogPresence::a4_X_trying_timerTO(const SipSMCommand &command){
+bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 	if (transitionMatch(command, "timerDoSubscribe")){
 		createSubscribeClientTransaction();
 		return true;
@@ -173,9 +168,9 @@ bool SipDialogPresence::a4_X_trying_timerTO(const SipSMCommand &command){
 	}
 }
 
-bool SipDialogPresence::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
+bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
 	if (transitionMatch(command, SipNotify::type, SipSMCommand::remote, IGN)){
-		CommandString cmdstr(callId, SipCommandString::presence_update,"UNIMPLEMENTED_INFO");
+		CommandString cmdstr(callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		return true;
 	}else{
@@ -183,7 +178,7 @@ bool SipDialogPresence::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &co
 	}
 }
 
-bool SipDialogPresence::a6_subscribing_termwait_stoppresence(const SipSMCommand &command){
+bool SipDialogPresenceClient::a6_subscribing_termwait_stoppresence(const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::hang_up)){
 		signalIfNoTransactions();
 		return true;
@@ -193,7 +188,7 @@ bool SipDialogPresence::a6_subscribing_termwait_stoppresence(const SipSMCommand 
 
 }
 
-bool SipDialogPresence::a7_termwait_terminated_notransactions(const SipSMCommand &command){
+bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::no_transactions) ){
 		SipSMCommand cmd( CommandString( callId, SipCommandString::call_terminated),
 				  SipSMCommand::TU,
@@ -206,7 +201,7 @@ bool SipDialogPresence::a7_termwait_terminated_notransactions(const SipSMCommand
 }
 
 
-void SipDialogPresence::setUpStateMachine(){
+void SipDialogPresenceClient::setUpStateMachine(){
 
 	State<SipSMCommand,string> *s_start = new State<SipSMCommand,string>(this,"start");
 	addState(s_start);
@@ -228,27 +223,27 @@ void SipDialogPresence::setUpStateMachine(){
 
 	
 	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_presence",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a0_start_trying_presence,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a0_start_trying_presence,
 		s_start, s_trying);
 	
  	new StateTransition<SipSMCommand,string>(this, "transition_trying_subscribing_200OK",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a1_X_subscribing_200OK,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a1_X_subscribing_200OK,
 		s_trying, s_subscribing);
        
  	new StateTransition<SipSMCommand,string>(this, "transition_trying_retrywait",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a2_trying_retrywait_transperror,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a2_trying_retrywait_transperror,
 		s_trying, s_retry_wait);
  
  	new StateTransition<SipSMCommand,string>(this, "transition_retrywait_subscribing_200OK",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a1_X_subscribing_200OK,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a1_X_subscribing_200OK,
 		s_retry_wait, s_subscribing);
 
  	new StateTransition<SipSMCommand,string>(this, "transition_subscribing_trying_timerTO",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a4_X_trying_timerTO,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a4_X_trying_timerTO,
 		s_subscribing, s_trying);
 	
  	new StateTransition<SipSMCommand,string>(this, "transition_retrywait_trying_timerTO",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a4_X_trying_timerTO,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a4_X_trying_timerTO,
 		s_subscribing, s_trying);
 
 
@@ -256,15 +251,15 @@ void SipDialogPresence::setUpStateMachine(){
 	//Should add this/similar transition to the trying case (when
 	//updating registration, we should be ready to receive a NOTIFY).
 	new StateTransition<SipSMCommand,string>(this, "transition_subscribing_subscribing_NOTIFY",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a5_subscribing_subscribing_NOTIFY,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY,
 			s_subscribing, s_subscribing);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_subscribing_termwait_stoppresence",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a6_subscribing_termwait_stoppresence,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a6_subscribing_termwait_stoppresence,
 			s_subscribing, s_termwait);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_termwait_terminated_notransactions",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresence::a7_termwait_terminated_notransactions,
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a7_termwait_terminated_notransactions,
 		s_termwait, s_terminated);
 
 	setCurrentState(s_start);
@@ -272,8 +267,9 @@ void SipDialogPresence::setUpStateMachine(){
 
 
 
-SipDialogPresence::SipDialogPresence(MRef<SipDialogContainer*> dContainer, 
-		const SipDialogConfig &callconfig, 
+SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipDialogContainer*> dContainer, 
+		//const SipDialogConfig &callconfig, 
+		MRef<SipDialogConfig*> callconfig,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, 
 		bool use_stun) : 
                 	SipDialog(dContainer,callconfig, tp),
@@ -281,30 +277,30 @@ SipDialogPresence::SipDialogPresence(MRef<SipDialogContainer*> dContainer,
 {
 
 	//setCallId( itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP);
-	callId = itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP;
+	callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	
-	getDialogConfig().tag_local=itoa(rand());
+	getDialogConfig()->tag_local=itoa(rand());
 	
 	setUpStateMachine();
 }
 
-SipDialogPresence::~SipDialogPresence(){	
+SipDialogPresenceClient::~SipDialogPresenceClient(){	
 }
 
-void SipDialogPresence::sendSubscribe(const string &branch){
+void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	
 	MRef<SipSubscribe*> sub;
 	int32_t localSipPort;
 
-	if(getDialogConfig().inherited.transport=="TCP")
-		localSipPort = getDialogConfig().inherited.localTcpPort;
-	else if(getDialogConfig().inherited.transport=="TLS")
-		localSipPort = getDialogConfig().inherited.localTlsPort;
+	if(getDialogConfig()->inherited.transport=="TCP")
+		localSipPort = getDialogConfig()->inherited.localTcpPort;
+	else if(getDialogConfig()->inherited.transport=="TLS")
+		localSipPort = getDialogConfig()->inherited.localTlsPort;
 	else{ /* UDP, may use STUN */
             if( /*phoneconf->*/useSTUN ){
-		localSipPort = getDialogConfig().inherited.externalContactUdpPort;
+		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
             } else {
-                localSipPort = getDialogConfig().inherited.localUdpPort;
+                localSipPort = getDialogConfig()->inherited.localUdpPort;
             }
         }
 	
@@ -312,17 +308,17 @@ void SipDialogPresence::sendSubscribe(const string &branch){
 				branch,
 				callId,
 				toUri,
-				getDialogConfig().inherited.sipIdentity,
-				getDialogConfig().inherited.localUdpPort,
+				getDialogConfig()->inherited.sipIdentity,
+				getDialogConfig()->inherited.localUdpPort,
 //				im_seq_no
-				getDialogConfig().seqNo
+				getDialogConfig()->seqNo
 				));
 
-	sub->getHeaderFrom()->setTag(getDialogConfig().tag_local);
+	sub->getHeaderFrom()->setTag(getDialogConfig()->tag_local);
 
         MRef<SipMessage*> pktr(*sub);
 #ifdef MINISIP_MEMDEBUG
-	pktr.setUser("SipDialogPresence");
+	pktr.setUser("SipDialogPresenceClient");
 #endif
 
         SipSMCommand scmd(
@@ -336,13 +332,13 @@ void SipDialogPresence::sendSubscribe(const string &branch){
 
 }
 
-bool SipDialogPresence::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogPresence::handleCommand got "<< c << end;
-	merr << "XXXSipDialogPresence::handleCommand got "<< c << end;
+bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
+	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << end;
+	merr << "XXXSipDialogPresenceClient::handleCommand got "<< c << end;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
 		if (c.getCommandString().getDestinationId() != callId ){
-			cerr << "SipDialogPresence returning false based on callId"<< endl;
+			cerr << "SipDialogPresenceClient returning false based on callId"<< endl;
 			return false;
 		}
 	}
@@ -352,7 +348,7 @@ bool SipDialogPresence::handleCommand(const SipSMCommand &c){
 			return false;
 		}
 		if (c.getType()!=SipSMCommand::COMMAND_PACKET && 
-				c.getCommandPacket()->getCSeq()!= getDialogConfig().seqNo){
+				c.getCommandPacket()->getCSeq()!= getDialogConfig()->seqNo){
 			return false;
 		}
 	
@@ -362,8 +358,8 @@ bool SipDialogPresence::handleCommand(const SipSMCommand &c){
 //			c.getCommandPacket()->getCSeq()!= command_seq_no)
 //		return false;
 	
-	mdbg << "SipDialogPresence::handlePacket() got "<< c << end;
-	merr << "SipDialogPresence returning dialogs handleCommand"<< end;
+	mdbg << "SipDialogPresenceClient::handlePacket() got "<< c << end;
+	merr << "SipDialogPresenceClient returning dialogs handleCommand"<< end;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -372,13 +368,13 @@ bool SipDialogPresence::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
 		if (c.getCommandString().getDestinationId() == callId ){
-			mdbg << "Warning: SipDialogPresence ignoring command with matching call id"<< end;
+			mdbg << "Warning: SipDialogPresenceClient ignoring command with matching call id"<< end;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && callId.length()>0){
 		if (c.getCommandPacket()->getCallId() == callId){
-			mdbg << "Warning: SipDialogPresence ignoring packet with matching call id"<< end;
+			mdbg << "Warning: SipDialogPresenceClient ignoring packet with matching call id"<< end;
 			return true;
 		}
 	}

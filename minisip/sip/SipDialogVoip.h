@@ -53,7 +53,7 @@ class LogEntry;
 
 class SipDialogVoip: public SipDialog{
 	public:
-		SipDialogVoip(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
 		
 		virtual ~SipDialogVoip();
 

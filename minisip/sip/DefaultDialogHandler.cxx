@@ -26,7 +26,8 @@
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
 #include"SipDialogVoip.h"
-#include"SipDialogPresence.h"
+#include"SipDialogPresenceClient.h"
+#include"SipDialogPresenceServer.h"
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipIMMessage.h>
 #include<libmsip/SipMessageContentIM.h>
@@ -45,14 +46,15 @@
 
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipDialogContainer*> dContainer, 
-            SipDialogConfig &conf,
+            //SipDialogConfig &conf,
+	    MRef<SipDialogConfig *> conf,
 	    MRef<SipSoftPhoneConfiguration*> pconf,
 	    MRef<MediaHandler *>mediaHandler): 
                 SipDialog(dContainer, conf, pconf->timeoutProvider),
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
-	callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP;
+	callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	//Initialize GroupListServer
 	grpListServer=NULL;
 }
@@ -73,13 +75,13 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipMessage*> pref(*no_call);
 
 		Socket *snull=NULL;
-		getDialogConfig().inherited.sipTransport->sendMessage(pref,
-				*(getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort, //port,
+		getDialogConfig()->inherited.sipTransport->sendMessage(pref,
+				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort, //port,
 				//                              sock, //(Socket *)NULL, //socket,
 				snull,
 				string(""), //branch
-				getDialogConfig().inherited.transport
+				getDialogConfig()->inherited.transport
 				);
 
 		return true;
@@ -111,7 +113,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 				mediaHandler->createSession(
 						phoneconf->securityConfig );
 
-			SipDialogConfig callConf(phoneconf->inherited);
+			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 			MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, phoneconf, mediaSession, pkt->getCallId());
 #ifdef MINISIP_MEMDEBUG
 			voipCall.setUser("DefaultDialogHandler");
@@ -178,12 +180,30 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		return true;
 	}
 
-	if (cmdstr.getOp() == SipCommandString::start_presence){
-		cerr << "DefaultDialogHandler: Creating SipDialogPresence for start_presence command"<< endl;
+	if (cmdstr.getOp() == SipCommandString::start_presence_client){
+		cerr << "DefaultDialogHandler: Creating SipDialogPresenceClient for start_presence_client command"<< endl;
 		
-		SipDialogConfig conf(phoneconf->inherited);
+		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 
-		MRef<SipDialogPresence*> pres(new SipDialogPresence(getDialogContainer(), conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
+		MRef<SipDialogPresenceClient*> pres(new SipDialogPresenceClient(getDialogContainer(), conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
+
+		getDialogContainer()->addDialog( MRef<SipDialog*>(*pres) );
+		
+		CommandString command(cmdstr);
+		cmdstr.setDestinationId(pres->getCallId());
+		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
+		cmd.setDispatchCount(dispatchCount);
+		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+
+		return true;
+	}
+	
+	if (cmdstr.getOp() == SipCommandString::start_presence_server){
+		cerr << "DefaultDialogHandler: Creating SipDialogPresenceServer for start_presence_server command"<< endl;
+		
+		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
+
+		MRef<SipDialogPresenceServer*> pres(new SipDialogPresenceServer(getDialogContainer(), conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
 
 		getDialogContainer()->addDialog( MRef<SipDialog*>(*pres) );
 		
@@ -210,7 +230,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 
 	if (cmdstr.getOp() == SipCommandString::proxy_register){
 		//mdbg << "DefaultCallhandler: got proxy_register: "<< command << end;
-		SipDialogConfig conf(phoneconf->inherited);
+		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 		//cerr << "sipDomain="<< phoneconf -> inherited.sipIdentity->sipDomain<<endl;
 		//if (phoneconf->pstnIdentity){
 		//	cerr << "pstnSipDomain="<< phoneconf -> pstnIdentity->sipDomain<<endl;
@@ -220,7 +240,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 
 		if (phoneconf->pstnIdentity && (cmdstr.getDestinationId()=="pstn" 
 					|| (proxyDomainArg!="" && proxyDomainArg==phoneconf->pstnIdentity->sipDomain))){
-			conf.useIdentity( phoneconf->pstnIdentity, false);
+			conf->useIdentity( phoneconf->pstnIdentity, false);
 
 		}
 		MRef<SipDialogRegister*> reg(new SipDialogRegister(getDialogContainer(), conf, phoneconf->timeoutProvider ));
@@ -288,7 +308,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 			return true;
 		}
 
-		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), **callConf, phoneconf, p2tDialog);
+		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), callConf, phoneconf, p2tDialog);
 #ifdef MINISIP_MEMDEBUG 
 		p2tUserDialog.setUser("DefaultDialogHandler");
 #endif
@@ -380,7 +400,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	if(getP2TDialog(gID, p2tDialog)==false){
 		//start new SipDialogP2T
 		callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
-		p2tDialog = new SipDialogP2T(getDialogContainer(), **callConf, phoneconf); 
+		p2tDialog = new SipDialogP2T(getDialogContainer(), callConf, phoneconf); 
 #ifdef MINISIP_MEMDEBUG 
 		p2tDialog.setUser("DefaultDialogHandler");
 #endif
@@ -402,7 +422,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	
 	//start SipDialogP2Tuser for inviting user
 	callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
-	MRef<SipDialogP2Tuser*> p2tDialogUser = new SipDialogP2Tuser(getDialogContainer(), **callConf, phoneconf, p2tDialog);
+	MRef<SipDialogP2Tuser*> p2tDialogUser = new SipDialogP2Tuser(getDialogContainer(), callConf, phoneconf, p2tDialog);
 #ifdef MINISIP_MEMDEBUG
 	p2tDialogUser.setUser("DefaultDialogHandler");
 #endif
@@ -527,7 +547,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 		
 		//filter out own username
 //		if(user==getDialogConfig().inherited.userUri)
-		if(user==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(user==getDialogConfig()->inherited.sipIdentity->getSipUri())
 			continue;
 			
 		// filter out users that have already started
@@ -546,7 +566,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 		
 			
 				
-		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), **callConf, phoneconf, p2tDialog);
+		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), callConf, phoneconf, p2tDialog);
 #ifdef MINISIP_MEMDEBUG 
 		p2tUserDialog.setUser("DefaultDialogHandler");
 #endif
@@ -575,7 +595,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 
 	//Start SipDialogP2T
 	MRef<SipDialogConfig*> callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
-	MRef<SipDialogP2T*> p2tDialog( new SipDialogP2T(getDialogContainer(), **callConf, phoneconf)); 
+	MRef<SipDialogP2T*> p2tDialog( new SipDialogP2T(getDialogContainer(), callConf, phoneconf)); 
 #ifdef MINISIP_MEMDEBUG 
 	p2tDialog.setUser("DefaultDialogHandler");
 #endif
@@ -601,7 +621,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		
 		//filter out own username
 		//if(user==getDialogConfig().inherited.userUri)
-		if(user==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(user==getDialogConfig()->inherited.sipIdentity->getSipUri())
 			continue;
 		
 		
@@ -614,7 +634,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 			continue;
 		}
 		
-		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), **callConf, phoneconf, p2tDialog);
+		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(getDialogContainer(), callConf, phoneconf, p2tDialog);
 #ifdef MINISIP_MEMDEBUG 
 		p2tUserDialog.setUser("DefaultDialogHandler");
 #endif
@@ -713,7 +733,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderTo()->setTag(getDialogConfig().tag_local);
+        ok->getHeaderTo()->setTag(getDialogConfig()->tag_local);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -723,7 +743,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branc
 
 void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
 
-        string tmp = getDialogConfig().inherited.sipIdentity->getSipUri();
+        string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
         uint32_t i = tmp.find("@");
         assert(i!=string::npos);
         i++;
@@ -738,14 +758,14 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
                         std::string(branch),
 			std::string(callId),
 			toId,
-			getDialogConfig().inherited.sipIdentity,
-			getDialogConfig().inherited.localUdpPort,
+			getDialogConfig()->inherited.sipIdentity,
+			getDialogConfig()->inherited.localUdpPort,
                         im_seq_no,
 			msg
                         );
 
-        im->getHeaderFrom()->setTag(getDialogConfig().tag_local);
-        im->getHeaderTo()->setTag(getDialogConfig().tag_foreign);
+        im->getHeaderFrom()->setTag(getDialogConfig()->tag_local);
+        im->getHeaderTo()->setTag(getDialogConfig()->tag_foreign);
 
         MRef<SipMessage*> pref(*im);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);

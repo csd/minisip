@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipDialogPresence.h
+ * 	SipDialogPresenceClient.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -30,8 +30,8 @@
 
 
 
-#ifndef SipDialogPresence_H
-#define SipDialogPresence_H
+#ifndef SipDialogPresenceClient_H
+#define SipDialogPresenceClient_H
 
 
 #include<config.h>
@@ -51,15 +51,15 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogPresence: public SipDialog{
+class SipDialogPresenceClient: public SipDialog{
 	public:
-		SipDialogPresence(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconfig/*, MRef<SipSoftPhoneConfiguration*> phoneconf,*/ , MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, bool use_stun);
+		SipDialogPresenceClient(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig/*, MRef<SipSoftPhoneConfiguration*> phoneconf,*/ , MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, bool use_stun);
 		
-		virtual ~SipDialogPresence();
+		virtual ~SipDialogPresenceClient();
 
-		virtual std::string getMemObjectType(){return "SipDialogPresence";}
+		virtual std::string getMemObjectType(){return "SipDialogPresenceClient";}
 		
-		virtual string getName(){return "SipDialogPresence[callid="+callId +"]";}
+		virtual string getName(){return "SipDialogPresenceClient[callid="+callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);

@@ -53,7 +53,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	phoneconfig.setUser("Sip/addr:phoneconfig");
 #endif
 
-	SipDialogConfig callconf(phoneconfig->inherited);
+	MRef<SipDialogConfig*> callconf = new SipDialogConfig(phoneconfig->inherited);
 	MRef<DefaultDialogHandler*> defaultDialogHandler = 
 			MRef<DefaultDialogHandler*>( new DefaultDialogHandler(dialogContainer,callconf,phoneconfig,mediaHandler) );
 	
@@ -157,7 +157,7 @@ string Sip::invite(string &user){
 	MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 	
-	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, **callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession)); 
 #ifdef MINISIP_MEMDEBUG 
 	voipCall.setUser("Sip");
 #endif
