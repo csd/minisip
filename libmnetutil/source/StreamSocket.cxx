@@ -29,7 +29,7 @@ StreamSocket::~StreamSocket(){
 }
 
 bool StreamSocket::matchesPeer(IPAddress& address, uint16_t port){
-	return return *peerAddress == address && port == peerPort;
+	return *peerAddress == address && port == peerPort;
 }
 
 IPAddress * StreamSocket::getPeerAddress(){

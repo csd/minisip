@@ -20,5 +20,6 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/TLSSocket.cxx \
 		    source/NsLookup.cxx \
 		    source/NetUtil.cxx \
-		    source/UDPSocket.cxx
+		    source/UDPSocket.cxx \
+		    source/StreamSocket.cxx
 
