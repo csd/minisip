@@ -48,19 +48,16 @@ class SipMessageDispatcher;
 class SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
-		SipTransaction(const string &memType, MRef<SipDialog*> d, const string &branch, string callid);
+		SipTransaction(const string &memType, MRef<SipDialog*> d, int cseq, const string &branch, string callid);
                 
 		virtual ~SipTransaction();
 		
 		virtual string getName()=0;
 
-	
-
-		virtual bool handleCommand(const SipSMCommand &command)=0;
+		virtual bool handleCommand(const SipSMCommand &command);
 
 		virtual void handleTimeout(const string &c);
 		
-		void setBranch(const string &b);
 		string getBranch();
 		
 		void setDialog(MRef<SipDialog*> );
@@ -71,8 +68,11 @@ class SipTransaction : public StateMachine<SipSMCommand,string>{
                 virtual std::string getMemObjectType(){return "SipTransaction";}
 		void setDebugTransType(string t){debugTransType = t;}
 		string getDebugTransType(){return debugTransType;}
+
+		int getCSeqNo(){return cSeqNo;}
                 
 	protected:
+		void setCSeqNo(int n){cSeqNo=n;}
 		MRef<SipDialog*> dialog; 
 		Socket * socket;
 		IPAddress * toaddr;             //FIXME: This is leaked?
@@ -82,6 +82,7 @@ class SipTransaction : public StateMachine<SipSMCommand,string>{
 		MRef<SipMessageDispatcher*> dispatcher;
 		string command;
 		string branch;
+		int cSeqNo;
 
 		string debugTransType;
 };

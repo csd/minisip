@@ -380,12 +380,10 @@ void SipTransactionInviteServer::setUpStateMachine(){
 }
 
 
-
 SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch,string callid) : 
-		SipTransaction("SipTransactionInviteServer",d, branch,callid),
+		SipTransaction("SipTransactionInviteServer",d, seq_no, branch,callid),
 		lastResponse(NULL),
-		timerG(500),
-		command_seq_no(seq_no) 
+		timerG(500)
 {
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
@@ -395,33 +393,4 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipDialog*> d, int s
 SipTransactionInviteServer::~SipTransactionInviteServer(){
 }
 	
-
-bool SipTransactionInviteServer::handleCommand(const SipSMCommand &c){
-
-	if (! (c.getDestination()==SipSMCommand::transaction 
-				|| c.getDestination()==SipSMCommand::ANY 
-				|| c.getDestination()==IGN) )
-	{
-		if (c.getDestination()!=SipSMCommand::ANY && c.getDestination()==IGN){
-			cerr << "SipTransactionInviteServer::handleCommand: WARNINGWARNING: c.getDestination==IGN !!!!!!!!!!!!!!!!!!!!!!!!!"<< endl;
-		}
-		cerr <<"SipTransactionInviteServer::handleCommand: returning false based on destination"<< endl;
-		return false;
-	}
-	
-	//check also CallId from Dialog
-	if (c.getType()==SipSMCommand::COMMAND_PACKET && 
-			c.getCommandPacket()->getCallId()!= callId){
-		
-		return false;
-	}
-		
-	if (c.getType()==SipSMCommand::COMMAND_PACKET && 
-			c.getCommandPacket()->getCSeq()!= command_seq_no){
-		return false;
-	}
-	
-	return StateMachine<SipSMCommand,string>::handleCommand(c);
-}
-
 

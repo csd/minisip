@@ -46,8 +46,6 @@ class SipTransactionServer: public SipTransaction{
 
 		virtual string getName(){return "transaction_server[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
-		virtual bool handleCommand(const SipSMCommand &command);
-
 		void setUpStateMachine();
 
 	private:
@@ -63,13 +61,9 @@ class SipTransactionServer: public SipTransaction{
 		bool a8_completed_terminated_transperr(const SipSMCommand &command);
 		bool a9_completed_terminated_timerJ(const SipSMCommand &command);
 
-//		MRef<SipMessage*> received_request;
-//		string call_id;
 		MRef<SipResponse*> lastResponse;
 
 		int timerT1, timerJ;
-		
-		int32_t command_seq_no;
 };
 
 #endif

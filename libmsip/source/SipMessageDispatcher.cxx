@@ -80,25 +80,25 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 		mdbg<< "Dispatcher(0): Trying to find transaction"<<end;
 #endif
 
-		if (branch==""){
-			merr <<  "WARNING: SipMessageDispatcher::handleCommand could not find branch parameter from packet"<<end;
+		bool hasBranch = (branch!="");
+		if (!hasBranch){
+			mdbg <<  "WARNING: SipMessageDispatcher::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
 		}
-		if (branch!=""){
-			for (int i=0; i< transactions.size(); i++){
-				if (transactions[i]->getBranch()== branch ){
-					bool ret = transactions[i]->handleCommand(c);
+		
+		for (int i=0; i< transactions.size(); i++){
+			if ( !hasBranch || transactions[i]->getBranch()== branch ){
+				bool ret = transactions[i]->handleCommand(c);
 #ifdef DEBUG_OUTPUT
-					if (!ret)
-						merr << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
+				if (!ret && hasBranch)
+					merr << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
 #endif
-					if (ret){
-						dialogListLock.unlock();
-						return ret;
-					}
+				if (ret){
+					dialogListLock.unlock();
+					return ret;
 				}
 			}
-
 		}
+
 	}else{
 #ifdef DEBUG_OUTPUT
 		mdbg<< "Dispatcher(0): NOT trying to find transaction (destination is other than transaction)"<<end;

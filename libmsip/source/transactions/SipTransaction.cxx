@@ -42,10 +42,11 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const string &b, string callid): 
+SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, int cseq, const string &b, string callid): 
 		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		dialog(d), 
 		socket(NULL),
+		cSeqNo(cseq),
 		branch(b)
 {
 #ifdef MINISIP_MEMDEBUG 
@@ -71,10 +72,6 @@ SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const 
 
 SipTransaction::~SipTransaction(){
 
-}
-
-void SipTransaction::setBranch(const string &b){
-	branch = b;
 }
 
 string SipTransaction::getBranch(){
@@ -110,5 +107,26 @@ void SipTransaction::send(MRef<SipMessage*> pack, string br){
 		
 		return;
 }
-	
+
+
+bool SipTransaction::handleCommand(const SipSMCommand &command){
+        if (! (command.getDestination()==SipSMCommand::transaction 
+				|| command.getDestination()==SipSMCommand::ANY)){
+                return false;
+	}
+
+        if (command.getType()==SipSMCommand::COMMAND_PACKET 
+				&& command.getCommandPacket()->getCSeq()!= getCSeqNo() 
+				&& getCSeqNo()!=-1){
+                return false;
+        }
+
+	if (command.getType()==SipSMCommand::COMMAND_PACKET &&
+			command.getCommandPacket()->getCallId()!= callId){
+		return false;
+	}
+	 
+        return StateMachine<SipSMCommand,string>::handleCommand(command);
+}
+
 

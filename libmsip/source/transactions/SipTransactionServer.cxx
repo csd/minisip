@@ -271,13 +271,10 @@ void SipTransactionServer::setUpStateMachine(){
 	setCurrentState(s_start);
 }
 
-
-
 SipTransactionServer::SipTransactionServer(MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
-		SipTransaction("SipTransactionServer",call, branch, callid),
+		SipTransaction("SipTransactionServer",call, seq_no, branch, callid),
 		lastResponse(NULL),
-		timerT1(500),
-		command_seq_no(seq_no)
+		timerT1(500)
 {
 	dialog->getDialogConfig()->local_called=false;
 	
@@ -288,17 +285,5 @@ SipTransactionServer::SipTransactionServer(MRef<SipDialog*> call, int seq_no, co
 }
 
 SipTransactionServer::~SipTransactionServer(){
-}
-
-bool SipTransactionServer::handleCommand(const SipSMCommand &c)
-{
-
-	if (! (c.getDestination()==SipSMCommand::transaction || c.getDestination()==SipSMCommand::ANY))
-		return false;
-	
-	if (c.getType()==SipSMCommand::COMMAND_PACKET && c.getCommandPacket()->getCSeq()!= command_seq_no)
-		return false;
-	
-	return StateMachine<SipSMCommand,string>::handleCommand(c);
 }
 

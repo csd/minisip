@@ -47,8 +47,6 @@ class SipTransactionClient: public SipTransaction{
 
 		virtual string getName(){return "transaction_client[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
-		virtual bool handleCommand(const SipSMCommand &command);
-
 		void setUpStateMachine();
 
 	private:
@@ -66,9 +64,6 @@ class SipTransactionClient: public SipTransaction{
 		
 		MRef<SipMessage*> lastRequest;
 		int timerT1;
-		int32_t command_seq_no;
-
-
 };
 
 #endif

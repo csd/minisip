@@ -48,8 +48,6 @@ class SipTransactionInviteClient: public SipTransaction{
 
 		virtual string getName(){return "transaction_invite_client[branch="+getBranch()+"]";}
 
-		virtual bool handleCommand(const SipSMCommand &command);
-
 		void setUpStateMachine();
 
 		void sendAck(MRef<SipResponse *>, string branch=""); //if no branch specified, use transaction branch attribute
@@ -71,9 +69,6 @@ class SipTransactionInviteClient: public SipTransaction{
 		MRef<SipInvite*> lastInvite;
 		int timerT1;
 		int timerA;
-		int32_t command_seq_no;
-
-
 };
 
 #endif

@@ -280,10 +280,9 @@ void SipTransactionClient::setUpStateMachine(){
 SipTransactionClient::SipTransactionClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
-			SipTransaction("SipTransactionClient",d, "", callid),
+			SipTransaction("SipTransactionClient", d, seq_no, "", callid),
 			lastRequest(NULL),
-			timerT1(500),
-			command_seq_no(seq_no)
+			timerT1(500)
 {
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
@@ -291,17 +290,5 @@ SipTransactionClient::SipTransactionClient(
 }
 
 SipTransactionClient::~SipTransactionClient(){
-}
-
-bool SipTransactionClient::handleCommand(const SipSMCommand &c){
-
-	if (! (c.getDestination()==SipSMCommand::transaction || c.getDestination()==SipSMCommand::ANY))
-		return false;
-	
-	if (c.getType()==SipSMCommand::COMMAND_PACKET && 
-			c.getCommandPacket()->getCSeq()!= command_seq_no){
-		return false;
-	}
-	return StateMachine<SipSMCommand,string>::handleCommand(c);
 }
 
