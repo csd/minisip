@@ -74,14 +74,10 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipResponse*> no_call= new SipResponse("nobranch", 481,"Call Leg/Transaction Does Not Exist", MRef<SipMessage*>(*pkt));
 		MRef<SipMessage*> pref(*no_call);
 
-		Socket *snull=NULL;
 		getDialogConfig()->inherited.sipTransport->sendMessage(pref,
 				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
 				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort, //port,
-				//                              sock, //(Socket *)NULL, //socket,
-				snull,
-				string(""), //branch
-				getDialogConfig()->inherited.transport
+				string("") //branch
 				);
 
 		return true;
