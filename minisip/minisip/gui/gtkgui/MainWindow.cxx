@@ -550,12 +550,13 @@ void MainWindow::phoneSelected(){
 }
 
 void MainWindow::phoneTreeClicked( GdkEventButton * event ){
+/*
 	if( event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS ){
 		phoneSelected();
 		invite();
 		return;
 	}
-	
+*/	
 	if( event->button == 3 ){
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection2 = 
 			phoneBookTreeView->get_selection();
