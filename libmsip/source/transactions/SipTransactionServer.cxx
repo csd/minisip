@@ -228,78 +228,46 @@ void SipTransactionServer::setUpStateMachine(){
 	State<SipSMCommand,string> *s_terminated=new State<SipSMCommand,string>(this,"terminated");
 	addState(s_terminated);
 
-//	StateTransition<SipSMCommand,string> *dummy;
+	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_request",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a0_start_trying_request, 
+			s_start, s_trying);
 
-//	StateTransition<SipSMCommand,string> *transition_start_trying_request=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_start_trying_request",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a0_start_trying_request, 
-				s_start, s_trying
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_trying_proceeding=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_trying_proceeding_1xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a1_trying_proceeding_1xx, 
-				s_trying, s_proceeding
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_proceeding_1xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a1_trying_proceeding_1xx, 
+			s_trying, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_trying_completed=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_trying_completed_non1xxresp",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a2_trying_completed_non1xxresp, 
-				s_trying, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_completed_non1xxresp",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a2_trying_completed_non1xxresp, 
+			s_trying, s_completed);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_completed_resp=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_completed_non1xxresp",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a3_proceeding_completed_non1xxresp, 
-				s_proceeding, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_non1xxresp",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a3_proceeding_completed_non1xxresp, 
+			s_proceeding, s_completed);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_proceeding_request=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_proceeding_request",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a4_proceeding_proceeding_request,
-				s_proceeding, s_proceeding
-				);
-		
-//	StateTransition<SipSMCommand,string> *transition_proceeding_proceeding_1xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_proceeding_1xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a5_proceeding_proceeding_1xx,
-				s_proceeding, s_proceeding
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_request",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a4_proceeding_proceeding_request,
+			s_proceeding, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_terminated_transperr=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_terminated_transperr",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a6_proceeding_terminated_transperr,
-				s_proceeding, s_terminated
-				);
-		
-//	StateTransition<SipSMCommand,string> *transition_completed_completed_request=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_completed_request",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a7_completed_completed_request,
-				s_completed, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_1xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a5_proceeding_proceeding_1xx,
+			s_proceeding, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_completed_terminated_transperr=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_terminated_transperr",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a8_completed_terminated_transperr,
-				s_completed, s_terminated
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_terminated_transperr",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a6_proceeding_terminated_transperr,
+			s_proceeding, s_terminated);
 
-//	StateTransition<SipSMCommand,string> *transition_completed_terminated_timerJ=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_terminated_timerJ",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a9_completed_terminated_timerJ,
-				s_completed, s_terminated
-				);
-		
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_request",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a7_completed_completed_request,
+			s_completed, s_completed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_terminated_transperr",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a8_completed_terminated_transperr,
+			s_completed, s_terminated);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_terminated_timerJ",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionServer::a9_completed_terminated_timerJ,
+			s_completed, s_terminated);
+
 	setCurrentState(s_start);
 }
 

@@ -124,13 +124,9 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 	State<SipSMCommand, string> *s_completed = getState("completed");
 	assert(s_completed);
 		
-		
-//	StateTransition<SipSMCommand,string> *transition_proceeding_completed_2xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_completed_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServerUA::a1001_proceeding_completed_2xx,
-				s_proceeding, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServerUA::a1001_proceeding_completed_2xx,
+			s_proceeding, s_completed);
 }
 
 

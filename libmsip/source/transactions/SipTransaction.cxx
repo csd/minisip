@@ -43,7 +43,7 @@
 #include<libmnetutil/NetworkException.h>
 
 SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const string &b, string callid): 
-		StateMachine<SipSMCommand, string>(/*d->getDialogConfig().inherited.timeoutProvider*/ d->getTimeoutProvider() ), 
+		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		dialog(d), 
 		socket(NULL),
 		branch(b)

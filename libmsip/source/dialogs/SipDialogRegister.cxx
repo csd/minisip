@@ -76,7 +76,6 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
 bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
 
     if (transitionMatch(command, SipCommandString::proxy_register)){
-			//SipDialogRegister *regcall = (SipDialogRegister *)sipStateMachine;
 
 			if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
 				getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyUsername = command.getCommandString().getParam();
@@ -86,7 +85,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 			int seqNo;
 			setSeqNo(seqNo = requestSeqNo());
 			
-			MRef<SipTransaction*> trans = new SipTransactionClient(/*regcall*/ this, seqNo, /*getDialogConfig().callId*/ callId);
+			MRef<SipTransaction*> trans = new SipTransactionClient(this, seqNo, callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
                         CommandString cmdstr( callId, SipCommandString::register_sent);
@@ -347,104 +346,62 @@ void SipDialogRegister::setUpStateMachine(){
 	addState(terminated);
 	
 
-//	StateTransition<SipSMCommand,string> *transition_start_tryingnoauth_register=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_start_tryingnoauth_register",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a0_start_tryingnoauth_register,
-				s0_start, s1_tryingnoauth
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_tryingnoauth_registred_2xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingnouath_registred_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a1_tryingnoauth_registred_2xx,
-				s1_tryingnoauth, s2_registred
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_start_tryingnoauth_register",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a0_start_tryingnoauth_register,
+			s0_start, s1_tryingnoauth);
 
-//	StateTransition<SipSMCommand,string> *transition_tryingnoauth_tryingstored_401haspass =
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingnouath_tryingstored_401haspass",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass,
-				s1_tryingnoauth, s3_tryingstored
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_registred_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a1_tryingnoauth_registred_2xx,
+			s1_tryingnoauth, s2_registred);
 
-//	StateTransition<SipSMCommand,string> *transition_tryingnoauth_askpassword_401nopass =
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingnouath_askpassword_401nopass",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a3_tryingnoauth_askpassword_401nopass,
-				s1_tryingnoauth, s4_askpassword
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_tryingstored_askpassword_401=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingstored_askpassword_401",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a4_tryingstored_askpassword_401,
-				s3_tryingstored, s4_askpassword
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_askpassword_askpassword_setpass=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_askpassword_askpassword_setpass",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a5_askpassword_askpassword_setpassword,
-				s4_askpassword, s4_askpassword
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_askpassword_registred_2xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_askpassword_registred_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a6_askpassword_registred_2xx,
-				s4_askpassword, s2_registred
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_askpassword_askpassword_401=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_askpassword_askpassword_401",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a7_askpassword_askpassword_401,
-				s4_askpassword, s4_askpassword
-				);
-		
-//	StateTransition<SipSMCommand,string> *transition_tryingstored_registred_2xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingstored_registred_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a8_tryingstored_registred_2xx,
-				s3_tryingstored, s2_registred
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_askpassword_failed_cancel=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_askpassword_failed_cancel",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a9_askpassword_failed_cancel,
-				s4_askpassword, s5_failed
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_tryingnoauth_failed_transporterror=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingnoauth_failed_transporterror",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
-				s1_tryingnoauth, s5_failed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_tryingstored_401haspass",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass,
+			s1_tryingnoauth, s3_tryingstored);
 
-//	StateTransition<SipSMCommand,string> *transition_tryingauth_failed_transporterror=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_tryingauth_failed_transporterror",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
-				s3_tryingstored, s5_failed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_askpassword_401nopass",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a3_tryingnoauth_askpassword_401nopass,
+			s1_tryingnoauth, s4_askpassword);
 
-//	StateTransition<SipSMCommand,string> *transition_registred_tryingnoauth_proxyregister=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_registred_tryingnoauth_proxyregister",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a12_registred_tryingnoauth_proxyregister,
-				s2_registred, s1_tryingnoauth
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_failed_terminated_notransactions=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_failed_terminated_notransactions",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a13_failed_terminated_notransactions,
-				s5_failed, terminated 
-				);
-	
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingstored_askpassword_401",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a4_tryingstored_askpassword_401,
+			s3_tryingstored, s4_askpassword);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_askpassword_setpass",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a5_askpassword_askpassword_setpassword,
+			s4_askpassword, s4_askpassword);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_registred_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a6_askpassword_registred_2xx,
+			s4_askpassword, s2_registred);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_askpassword_401",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a7_askpassword_askpassword_401,
+			s4_askpassword, s4_askpassword);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingstored_registred_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a8_tryingstored_registred_2xx,
+			s3_tryingstored, s2_registred);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_failed_cancel",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a9_askpassword_failed_cancel,
+			s4_askpassword, s5_failed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingnoauth_failed_transporterror",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
+			s1_tryingnoauth, s5_failed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_tryingauth_failed_transporterror",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
+			s3_tryingstored, s5_failed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_registred_tryingnoauth_proxyregister",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a12_registred_tryingnoauth_proxyregister,
+			s2_registred, s1_tryingnoauth);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_failed_terminated_notransactions",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a13_failed_terminated_notransactions,
+			s5_failed, terminated );
+
 	setCurrentState(s0_start);
 }
 

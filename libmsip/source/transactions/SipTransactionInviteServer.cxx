@@ -332,84 +332,50 @@ void SipTransactionInviteServer::setUpStateMachine(){
 	addState(s_terminated);
 
 
-//	StateTransition<SipSMCommand,string> *transition_start_proceeding_INVITE =
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_start_proceeding_INVITE",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a0_start_proceeding_INVITE, 
-				s_start, s_proceeding
-				);
-	
-//	StateTransition<SipSMCommand,string> *transition_proceeding_proceeding_INVITE=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_proceeding_INVITE",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a1_proceeding_proceeding_INVITE, 
-				s_proceeding, s_proceeding
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_start_proceeding_INVITE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a0_start_proceeding_INVITE, 
+			s_start, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_proceeding_1xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_proceeding_1xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a2_proceeding_proceeding_1xx, 
-				s_proceeding, s_proceeding
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_INVITE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a1_proceeding_proceeding_INVITE, 
+			s_proceeding, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_completed_resp36=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_completed_resp36",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a3_proceeding_completed_resp36, 
-				s_proceeding, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_1xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a2_proceeding_proceeding_1xx, 
+			s_proceeding, s_proceeding);
 
-//	StateTransition<SipSMCommand,string> *transition_proceeding_terminated_Err=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_terminated_Err",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a4_proceeding_terminated_err,
-				s_proceeding, s_terminated
-				);
-		
-//	StateTransition<SipSMCommand,string> *transition_proceeding_terminated_2xx=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_proceeding_terminated_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a5_proceeding_terminated_2xx,
-				s_proceeding, s_terminated
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_resp36",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a3_proceeding_completed_resp36, 
+			s_proceeding, s_completed);
 
-//	StateTransition<SipSMCommand,string> *transition_completed_completed_INVITE=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_completed_INVITE",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a6_completed_completed_INVITE,
-				s_completed, s_completed
-				);
-		
-//	StateTransition<SipSMCommand,string> *transition_completed_confirmed_ACK=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_confirmed_ACK",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a7_completed_confirmed_ACK,
-				s_completed, s_confirmed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_terminated_Err",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a4_proceeding_terminated_err,
+			s_proceeding, s_terminated);
 
-//	StateTransition<SipSMCommand,string> *transition_completed_completed_timerG=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_completed_timerG",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a8_completed_completed_timerG,
-				s_completed, s_completed
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_terminated_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a5_proceeding_terminated_2xx,
+			s_proceeding, s_terminated);
 
-//	StateTransition<SipSMCommand,string> *transition_completed_terminated_errOrTimerH=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_completed_terminated_errOrTimerH",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a9_completed_terminated_errOrTimerH,
-				s_completed, s_terminated
-				);
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_INVITE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a6_completed_completed_INVITE,
+			s_completed, s_completed);
 
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_confirmed_ACK",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a7_completed_confirmed_ACK,
+			s_completed, s_confirmed);
 
-//	StateTransition<SipSMCommand,string> *transition_confirmed_terminated_timerI=
-		new StateTransition<SipSMCommand,string>(this,
-				"transition_confirmed_terminated_timerI",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a10_confirmed_terminated_timerI,
-				s_confirmed, s_terminated
-				);
-	
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_timerG",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a8_completed_completed_timerG,
+			s_completed, s_completed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_terminated_errOrTimerH",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a9_completed_terminated_errOrTimerH,
+			s_completed, s_terminated);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_confirmed_terminated_timerI",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a10_confirmed_terminated_timerI,
+			s_confirmed, s_terminated);
+
 	setCurrentState(s_start);
 }
 

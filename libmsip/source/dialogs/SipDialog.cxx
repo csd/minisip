@@ -33,7 +33,7 @@
 
 
 SipDialog::SipDialog(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
-                StateMachine<SipSMCommand,string>(/*callconf.inherited.timeoutProvider*/ tp), 
+                StateMachine<SipSMCommand,string>(tp), 
                 dialogContainer(dContainer), 
                 callConfig(callconf)
 {
@@ -50,7 +50,7 @@ SipDialogConfig &SipDialog::getDialogConfig(){
 
 void SipDialog::handleTimeout(const string &c){
 	SipSMCommand cmd( 
-			CommandString( /*callConfig.callId*/ callId, c), 
+			CommandString(callId, c), 
 			SipSMCommand::TU, 
 			SipSMCommand::TU );
 
@@ -80,7 +80,7 @@ void SipDialog::registerTransaction(MRef<SipTransaction*> trans){
 void SipDialog::signalIfNoTransactions(){
 	if (transactions.size()==0){
 		SipSMCommand cmd(
-				CommandString(/*callConfig.callId*/ callId, SipCommandString::no_transactions), 
+				CommandString(callId, SipCommandString::no_transactions), 
 				SipSMCommand::TU, 
 				SipSMCommand::TU 
 				);
@@ -98,7 +98,6 @@ void SipDialog::signalIfNoTransactions(){
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
 	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
-//	merr << "SipDialog: command type is" << command.getType()<<end;
 	
 //	if (command.getCallId()!= getCallId())
 //		return false
@@ -133,7 +132,6 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 	}
 
 	mdbg << "SipDialog::handleCommand: sending command to state machine"<< end;
-//	merr << "SipDialog: command type is" << command.getType()<<end;
 	bool ret=StateMachine<SipSMCommand,string>::handleCommand(command);
 	mdbg << "SipDialog::handleCommand returning "<< ret << end;
 
