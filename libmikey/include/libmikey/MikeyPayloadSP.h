@@ -110,6 +110,7 @@
 class MikeyPolicyParam{
         public:
                 MikeyPolicyParam( uint8_t type, uint8_t length, byte_t * value );
+		~MikeyPolicyParam();
                 uint8_t type;	// As defined above
                 uint8_t length;	// Length of value in bytes
                 byte_t * value; // type value

@@ -30,8 +30,17 @@
 // MikeyPolicyParam
 //
 MikeyPolicyParam::MikeyPolicyParam( uint8_t type, uint8_t length, byte_t * value ):
-	type(type), length(length), value(value){};
-
+	type(type), length(length){
+	this->type=type;
+	this->length=length;
+	this->value = (byte_t*) calloc (length,sizeof(byte_t));
+	for(int i=0; i< length; i++)
+			this->value[i] = value[i];
+}
+//Destructor
+MikeyPolicyParam::~MikeyPolicyParam(){
+	free(value);
+}
 //
 // MikeyPayloadSP
 //
@@ -85,19 +94,15 @@ MikeyPayloadSP::MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type, bool def){
 //Destructor
 MikeyPayloadSP::~MikeyPayloadSP(){
 	list<MikeyPolicyParam *>::iterator i;
-	for( i = param.begin(); i != param.end() ; i++ ){
-		free((*i)->value);
+	for( i = param.begin(); i != param.end() ; i++ )
 		delete *i;
-	}
+	param.clear();
 }
 //Add a policytype i.e. add one MikeyPolicyParam in list<MikeyPolicyParam *> param
 void MikeyPayloadSP::addMikeyPolicyParam( uint8_t type, uint8_t length, byte_t * value){
 	if(this->getParameterType(type) != NULL)
 		this->deleteMikeyPolicyParam(type);
-	byte_t *val  = (byte_t*) calloc (length,sizeof(byte_t));
-	for(int i=0; i< length; i++)
-			val[i] = value[i];
-	param.push_back (new MikeyPolicyParam(type, length, val));
+	param.push_back (new MikeyPolicyParam(type, length, value));
 	this->policy_param_length = this->policy_param_length + length + 2;
 }
 //Get the MikeyPolicyParam in list<MikeyPolicyParam *> param with type type
@@ -139,6 +144,9 @@ int MikeyPayloadSP::noOfPolicyParam(){
 void MikeyPayloadSP::deleteMikeyPolicyParam(uint8_t type){
 	list<MikeyPolicyParam *>::iterator i;
 	for( i = param.begin(); i != param.end()  ; i++ )
-		if( (*i)->type == type )
-			param.erase(i);
+		if( (*i)->type == type ){
+			this->policy_param_length = this->policy_param_length - (*i)->length - 2;
+			delete *i;
+			i=param.erase(i);
+		}
 }
