@@ -20,14 +20,21 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include"Bell.h"
 #include<stdlib.h>
-#include<unistd.h>
 #include<stdio.h>
 #include<signal.h>
-#include<sys/time.h>
 #include<sys/stat.h>
 #include<sys/types.h>
+
+#ifdef _MSC_VER
+
+#else
+#include<sys/time.h>
+#include<unistd.h>
+#endif
 
 #ifdef IPAQ
 #include <sys/ioctl.h>

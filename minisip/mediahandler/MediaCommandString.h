@@ -23,10 +23,12 @@
 #ifndef MEDIA_COMMAND_STRING_H
 #define MEDIA_COMMAND_STRING_H
 
+#include<string>
+
 class MediaCommandString{
 	public:
-		static const string start_ringing;
-		static const string stop_ringing;
+		static const std::string start_ringing;
+		static const std::string stop_ringing;
 	
 };
 

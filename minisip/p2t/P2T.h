@@ -26,8 +26,11 @@
 #ifndef P2TDEFINITIONS_H
 #define P2TDEFINITIONS_H
 
+#include<config.h>
+
 #include<string>
 
+using namespace std;
 
 //reason codes for DENY messages
 //#define P2T_NO_USER_SPECIFIED	0 //cname field was empty

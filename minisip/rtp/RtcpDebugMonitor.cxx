@@ -24,7 +24,6 @@
 
 #include<stdlib.h>
 #include<stdio.h>
-#include<unistd.h>
 #include<libmnetutil/UDPSocket.h>
 #ifdef LINUX
 #include<netinet/in.h>
@@ -32,6 +31,10 @@
 #endif
 #ifdef WIN32
 #include<winsock2.h>
+#endif
+
+#ifndef _MSC_VER
+#include<unistd.h>
 #endif
 
 #include"RtcpDebugMonitor.h"

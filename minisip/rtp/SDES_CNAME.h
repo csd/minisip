@@ -26,6 +26,7 @@
 #include<config.h>
 
 #include"SDESItem.h"
+#include<string>
 
 
 class SDES_CNAME : public SDESItem{
@@ -41,7 +42,7 @@ class SDES_CNAME : public SDESItem{
 #endif
 
 	private:
-		string cname;
+		std::string cname;
 };
 
 #endif

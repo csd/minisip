@@ -54,6 +54,7 @@
 #include"../minisip/LogEntry.h"
 #include<libmsip/SipCommandString.h>
 
+using namespace std;
 /*
                                                              a13:reject/send40X
                                                                   +------------+
@@ -170,7 +171,9 @@ bool SipDialogP2Tuser::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &c
 	    MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
 
 	    //MRef<SipDialogP2Tuser *>vc= (SipDialogP2Tuser *)sipStateMachine;
-	    ts.save( RINGING );
+#ifndef _MSC_VER
+		ts.save( RINGING );
+#endif
 	    CommandString cmdstr(/*vc->*/getCallId(), SipCommandString::remote_ringing);
 	    //vc->getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 	    /*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -213,7 +216,7 @@ bool SipDialogP2Tuser::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
 		/*vc->*/setLogEntry( new LogEntryOutgoingCompletedCall() );
-		/*vc->*/getLogEntry()->start = std::time( NULL );
+		/*vc->*/getLogEntry()->start = time( NULL );
 		/*vc->*/getLogEntry()->peerSipUri = resp->getFrom().getString();
 
 		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -455,7 +458,7 @@ bool SipDialogP2Tuser::a9_callingnoauth_termwait_36( const SipSMCommand &command
 		//MRef<SipDialogP2Tuser *> vc = (SipDialogP2Tuser *)sipStateMachine;
 		
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
-		rejectedLog->start = std::time( NULL );
+		rejectedLog->start = time( NULL );
 		rejectedLog->peerSipUri = /*vc->*/dialogState.remoteUri;
 		dynamic_cast<LogEntryFailure *>(*rejectedLog)->error =
 			"Remote user rejected the call";
@@ -563,7 +566,9 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 bool SipDialogP2Tuser::a11_ringing_incall_accept( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipCommandString::accept_invite)){
+#ifndef _MSC_VER
 		ts.save(USER_ACCEPT);
+#endif
 		//MRef<SipDialogP2Tuser *>vc= (SipDialogP2Tuser *)sipStateMachine;
 
 #if 0
@@ -741,7 +746,10 @@ bool SipDialogP2Tuser::a21_callingauth_callingauth_18X(
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
+
+#ifndef _MSC_VER
 		ts.save( RINGING );
+#endif
 
 		CommandString cmdstr(/*vc->*/getCallId(), SipCommandString::remote_ringing);
 		/*vc->*/getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
@@ -781,7 +789,7 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
 		/*vc->*/setLogEntry( new LogEntryOutgoingCompletedCall() );
-		/*vc->*/getLogEntry()->start = std::time( NULL );
+		/*vc->*/getLogEntry()->start = time( NULL );
 		/*vc->*/getLogEntry()->peerSipUri = resp->getFrom().getString();
 
 		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -1338,8 +1346,9 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 	inv->getHeaderValueFrom()->setTag(dialogState.localTag);
 
 //	mdbg << "SipDialogP2Tuser::sendInvite(): sending INVITE to transaction"<<end;
+#ifndef _MSC_VER
 	ts.save( INVITE_END );
-        
+#endif
 	//add p2t stuff to the INVITE message
 	modifyP2TInvite(inv);
 	

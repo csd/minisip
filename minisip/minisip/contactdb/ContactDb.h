@@ -25,6 +25,9 @@
 
 #include<config.h>
 #include<libmutil/MemObject.h>
+#include<string>
+
+using namespace std;
 
 class ContactDb;
 class PhoneBookPerson;

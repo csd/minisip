@@ -20,10 +20,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-using namespace std;
 #include<config.h>
 #include<string>
 #include"LogEntry.h"
+
+using namespace std;
+
 
 LogEntryHandler * LogEntry::handler = NULL;
 

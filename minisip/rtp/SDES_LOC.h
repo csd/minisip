@@ -26,6 +26,7 @@
 #include<config.h>
 
 #include"SDESItem.h"
+#include<string>
 
 
 
@@ -42,7 +43,7 @@ class SDES_LOC : public SDESItem{
 #endif
 
 	private:
-		string loc;
+		std::string loc;
 };
 
 #endif

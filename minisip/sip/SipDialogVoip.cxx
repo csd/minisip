@@ -29,6 +29,7 @@
  * 
 */
 
+#include<config.h>
 
 #include<assert.h>
 #include"SipDialogVoip.h"
@@ -60,6 +61,9 @@
 #include"../mediahandler/MediaHandler.h"
 #include<libmutil/MemObject.h>
 #include <iostream>
+#include<time.h>
+
+using namespace std;
 
 
 /*
@@ -126,8 +130,9 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 #ifdef MINISIP_MEMDEBUG
 		vc.setUser("WARNING - transaction");
 #endif
+#ifndef _MSC_VER
 		ts.save("a0_start_callingnoauth_invite");
-
+#endif
 		int seqNo = requestSeqNo();
 //		setLocalCalled(false);
 		localCalled=false;
@@ -154,7 +159,9 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 
 	    MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
 
+#ifndef _MSC_VER
 	    ts.save( RINGING );
+#endif
 	    CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 	    getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -190,12 +197,14 @@ bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &comm
 bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+#ifndef _MSC_VER
 		ts.save("a3_callingnoauth_incall_2xx");
+#endif
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
 		string peerUri = resp->getFrom().getString();
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
-		getLogEntry()->start = std::time( NULL );
+		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -227,7 +236,7 @@ bool SipDialogVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 		//mdbg << "log stuff"<< end;
 		if( getLogEntry() ){
 			((LogEntrySuccess *)(*( getLogEntry() )))->duration = 
-			std::time( NULL ) - getLogEntry()->start; 
+			time( NULL ) - getLogEntry()->start; 
 
 			getLogEntry()->handle();
 		}
@@ -270,7 +279,7 @@ bool SipDialogVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 		sendBye(byetrans->getBranch(), bye_seq_no);
 		
 		if (getLogEntry()){
-			(dynamic_cast< LogEntrySuccess * >(*( getLogEntry() )))->duration = std::time( NULL ) - getLogEntry()->start; 
+			(dynamic_cast< LogEntrySuccess * >(*( getLogEntry() )))->duration = time( NULL ) - getLogEntry()->start; 
 			getLogEntry()->handle();
 		}
 		
@@ -332,7 +341,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
 		
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
-		rejectedLog->start = std::time( NULL );
+		rejectedLog->start = time( NULL );
 		rejectedLog->peerSipUri = dialogState.remoteTag;
 		
 		if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"404")){
@@ -438,7 +447,9 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipCommandString::accept_invite)){
+#ifndef _MSC_VER
 		ts.save(USER_ACCEPT);
+#endif
 
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::invite_ok,"",
@@ -453,7 +464,7 @@ bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 
 		MRef<LogEntry *> logEntry = new LogEntryIncomingCompletedCall();
 
-		logEntry->start = std::time( NULL );
+		logEntry->start = time( NULL );
 		logEntry->peerSipUri = getLastInvite()->getFrom().getString();
 		
 		setLogEntry( logEntry );
@@ -563,7 +574,9 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 	
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
+#ifndef _MSC_VER
 		ts.save( RINGING );
+#endif
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
@@ -598,7 +611,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 		
 		string peerUri = resp->getFrom().getString().substr(4);
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
-		getLogEntry()->start = std::time( NULL );
+		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
@@ -900,9 +913,13 @@ void SipDialogVoip::sendInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+#ifndef _MSC_VER
 		ts.save("getSdpOffer");
+#endif
 		sdp = mediaSession->getSdpOffer();
+#ifndef _MSC_VER
 		ts.save("getSdpOffer");
+#endif
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -1020,9 +1037,13 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+#ifndef _MSC_VER
 		ts.save("getSdpOffer");
+#endif
 		sdp = mediaSession->getSdpOffer();
+#ifndef _MSC_VER
 		ts.save("getSdpOffer");
+#endif
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -1197,9 +1218,13 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+#ifndef _MSC_VER
 		ts.save("getSdpAnswer");
+#endif
 		sdp = mediaSession->getSdpAnswer();
+#ifndef _MSC_VER
 		ts.save("getSdpAnswer");
+#endif
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -1384,11 +1409,14 @@ MRef<Session *> SipDialogVoip::getMediaSession(){
 	return mediaSession;
 }
 
+
+
 #ifdef IPSEC_SUPPORT
 MRef<MsipIpsecAPI *> SipDialogVoip::getIpsecSession(){
 	return ipsecSession;
 }
 #endif
+
 
 bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
 	if (Offer){
@@ -1401,7 +1429,7 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 			}
 		}
 #ifdef IPSEC_SUPPORT
-		if( (Offer->getContentType()).substr(0,17) == "application/mikey")
+		if( (Offer->getContentType()).substr(0,17) == "application/mikey"){
 			switch (type){
 				case 10:
 					ts.save("setMikeyIpsecOffer");
@@ -1418,26 +1446,36 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 				default:
 					return false;
 			}
+		}
 #endif
-		if( (Offer->getContentType()).substr(0,15) == "application/sdp")
+		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
 			switch (type){
 				case 10:
+#ifndef _MSC_VER
 					ts.save("setSdpOffer");
+#endif
 					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
+#ifndef _MSC_VER
 					ts.save("setSdpOffer");
+#endif
 					return true;
 				case 3:
+#ifndef _MSC_VER
 					ts.save("setSdpAnswer");
+#endif
 					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
 					getMediaSession()->start();
+#ifndef _MSC_VER
 					ts.save("setSdpAnswer");
+#endif
 					return true;
 				default:
 					merr << "No SDP match" << end;
 					return false;
 			}
+		}
 	}
 	return true;
 }

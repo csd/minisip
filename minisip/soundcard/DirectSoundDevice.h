@@ -28,7 +28,7 @@
 
 
 
-typedef uint8_t byte_t;
+//typedef uint8_t byte_t;
 
 class DirectSoundDevice : public SoundDevice{
 	public:

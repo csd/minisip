@@ -32,7 +32,7 @@
 
 #include<assert.h>
 #include"SdpHeaderA.h"
-#include<stdint.h>
+
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 #include<iostream>

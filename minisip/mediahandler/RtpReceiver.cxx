@@ -33,12 +33,17 @@
 #include<iostream>
 
 #include<stdio.h>
-#include<sys/time.h>
 #include<sys/types.h>
-#include<unistd.h>
 
 #ifdef WIN32
 #include<winsock2.h>
+#endif
+
+#ifdef _MSC_VER
+
+#else
+#include<sys/time.h>
+#include<unistd.h>
 #endif
 
 using namespace std;

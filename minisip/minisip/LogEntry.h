@@ -24,6 +24,9 @@
 #define LOG_ENTRY_H
 
 #include<libmutil/MemObject.h>
+#include<string>
+
+using namespace std;
 
 class LogEntryHandler;
 

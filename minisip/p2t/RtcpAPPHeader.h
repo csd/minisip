@@ -25,6 +25,9 @@
 
 #include<vector>
 #include<config.h>
+#include<string>
+
+using namespace std;
 
 /**
  * the header fields for a RTCP APP packet.

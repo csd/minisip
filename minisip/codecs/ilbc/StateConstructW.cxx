@@ -40,7 +40,7 @@
        /* decoding of the maximum value */ 
     
        maxVal = state_frgqTbl[idxForMax]; 
-       maxVal = (float)pow(10,maxVal)/(float)4.5; 
+       maxVal = (float)pow(10.0F,maxVal)/(float)4.5; 
             
        /* initialization of buffers and coefficients */ 
         

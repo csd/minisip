@@ -441,7 +441,11 @@ void MinisipTextUI::showTransactions(string command){
 							(*i)->getName() 
 							+ "   State: "
 							+ (*i)->getCurrentStateName()
+#ifdef _MSC_VER
+							);
+#else
 							+ "  ObjecdId: " + itoa((int)*(*i)));
+#endif
 					n++;
 				}
 			}

@@ -169,7 +169,7 @@
           and corresponding scaling of start state */ 
     
        maxVal=state_frgqTbl[*idxForMax]; 
-       qmax = (float)pow(10,maxVal); 
+       qmax = (float)pow(10.0F,maxVal); 
        scal = (float)(4.5)/qmax; 
        for(k=0;k<len;k++){ 
            fout[k] *= scal; 

@@ -36,7 +36,13 @@
 #endif
 
 #include<stdio.h>
+
+#ifdef _MSC_VER
+
+#else
 #include<unistd.h>
+#endif
+
 
 #include<errno.h>
 

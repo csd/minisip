@@ -21,7 +21,14 @@
 */
 
 #include"STUNMessage.h"
+
+#ifdef _MSC_VER
+#include<winsock2.h>
+#include<io.h>
+#else
 #include<unistd.h>
+#endif
+
 #include<assert.h>
 //#include<netinet/in.h>
 
@@ -143,8 +150,11 @@ void STUNMessage::sendMessage(int fd){
 	int retLength;
 	unsigned char *data = getMessageData(retLength);
 	
+#ifdef _MSC_VER
+	::_write(fd,data, (unsigned int)retLength);
+#else
 	write(fd,data, retLength);
-
+#endif
 	delete []data;
 }
 

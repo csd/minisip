@@ -58,9 +58,11 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 #endif		
 
 		//time measurement
-		if(/*vc->*/p2tPerformance)
+#ifndef _MSC_VER
+		if(/*vc->*/p2tPerformance){
 			ts.start();
-		
+		}
+#endif
 		//increment sequence number
 		/*vc->*/dialogState.seqNo++;
 
@@ -131,8 +133,10 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 		
 		//time measurements
 		if(/*vc->*/p2tPerformance){
+#ifndef _MSC_VER
 			ts.stop();
 			merr<<"used time:"<<ts.writeElapsedTime("Push-2-Talk delay")<<end;
+#endif
 		}
 		
 		//send Floor TAKEN to all
@@ -320,10 +324,12 @@ bool SipDialogP2T::a5_listenreq_listen( const SipSMCommand &command){
 		//MRef<SipDialogP2T *>vc= (SipDialogP2T *)sipStateMachine;
 		
 		//time measurements
+#ifndef _MSC_VER
 		if(/*vc->*/p2tPerformance){
 			ts.stop();
 			merr<<"Used time:"<<ts.writeElapsedTime("Push-2-Talk delay")<<end;
 		}
+#endif
 		
 		/******
 		 inform GUI
@@ -744,10 +750,12 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 		
 		
 		//time measurements
+#ifndef _MSC_VER
 		if(/*vc->*/p2tPerformance){
 			ts.stop();
 			merr<<"used time:"<<ts.writeElapsedTime("Push-2-Talk delay")<<end;
 		}
+#endif
 		
 		
 		//send Floor TAKEN to all
@@ -1233,9 +1241,12 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 #endif		
 
 		//time measurement
-		if(/*vc->*/p2tPerformance)
+#ifndef _MSC_VER
+		if(/*vc->*/p2tPerformance){
 			ts.start();
-		
+		}
+#endif		
+
 		//increment sequence number
 		/*vc->*/dialogState.seqNo++;
 
@@ -1312,7 +1323,9 @@ bool SipDialogP2T::a98_idle_idle_performance( const SipSMCommand &command){
 		init_data += "timerGrantFloorTERMINATE;" + itoa(P2T::timerGrantFloorTERMINATE) + "\r\n";
 		init_data += "timerRelFloorTERMINATE;" + itoa(P2T::timerRelFloorTERMINATE)  + "\r\n";
 		init_data += "timerIdleFloorTERMINATE;" + itoa(P2T::timerIdleFloorTERMINATE) + "\r\n";
+#ifndef _MSC_VER
 		ts.init(P2T::PERFORMANCE_FILE, init_data);
+#endif
 		return true;
 	}else{
 		return false;

@@ -35,7 +35,6 @@
 #include<libmutil/aes.h>
 #include<libmutil/hmac.h>
 #include<libmutil/MemObject.h>
-#include<stdint.h>
 
 //#include"../keyagreement/keyagreement.h"
 #define REPLAY_WINDOW_SIZE 64

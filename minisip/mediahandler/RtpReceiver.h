@@ -26,11 +26,12 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
+#include"../minisip/ipprovider/IpProvider.h"
 
 class UDPSocket;
 class MediaStreamReceiver;
 class CryptoContext;
-class IpProvider;
+
 
 class RtpReceiver : public Runnable, public MObject{
 	public:

@@ -26,8 +26,10 @@
 #include<config.h>
 #include<sys/types.h>
 #include<signal.h>
+#include<string>
 //#include<libmutil/TimeoutProvider.h>
 
+using namespace std;
 
 class Bell: public MObject{
 	public:

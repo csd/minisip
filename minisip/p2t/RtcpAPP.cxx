@@ -33,8 +33,12 @@
 #endif
 
 #include<stdio.h>
-#include<unistd.h>
 
+#ifdef _MSC_VER
+
+#else
+#include<unistd.h>
+#endif
 
 #include<errno.h>
 #include"RtcpAPP.h"

@@ -347,14 +347,14 @@ STUNAttributeErrorCode::STUNAttributeErrorCode(char *msg, int errorCode)
 {
 	this->errorCode = errorCode;
 	
-	messageLength = strlen(msg);
+	messageLength = (int)strlen(msg);
 	if (messageLength%4!=0)				//add padding length
 		messageLength+= 4-messageLength%4;
 	message = new char[messageLength];
 
 	memcpy(message,msg, strlen(msg));
 	
-	for (int i=strlen(msg); i<messageLength; i++)	//pad with spaces
+	for (int i=(int)strlen(msg); i<messageLength; i++)	//pad with spaces
 		message[i]=' ';
 }
 

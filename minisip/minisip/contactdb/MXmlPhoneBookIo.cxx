@@ -27,6 +27,7 @@
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
+#include<string>
 
 using namespace std;
 

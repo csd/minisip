@@ -26,9 +26,8 @@
 #include<libmutil/MemObject.h>
 #include"../sip/SipDialogSecurityConfig.h"
 #include<libmikey/keyagreement.h>
-
+#include<../sdp/SdpPacket.h>
 class MediaStream;
-class SdpPacket;
 class SdpHeaderM;
 //class KeyAgreement;
 class IPAddress;

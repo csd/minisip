@@ -23,8 +23,13 @@
 #ifndef _SILENCESENSOR_H
 #define _SILENCESENSOR_H
 
+#ifdef _MSC_VER
+#ifndef uint16_t
+typedef unsigned short  uint16_t;
+#endif
+#else
 #include<inttypes.h>
-
+#endif
 
 class SilenceSensor{
     public:

@@ -25,14 +25,25 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
+
+#ifndef _MSC_VER
 #include<stdint.h>
+#else
+#ifndef uint16_t
+typedef unsigned short  uint16_t;
+#endif
+#ifndef uint32_t
+typedef unsigned int  uint32_t;
+#endif
+#endif
+
 #include"../soundcard/SoundRecorderCallback.h"
 #include"../soundcard/SoundIO.h"
 #ifdef VIDEO_SUPPORT
 #include"../video/codec/VideoEncoderCallback.h"
 #endif
 
-class Codec;
+#include<../codecs/Codec.h>
 
 class SoundIO;
 class MediaStreamSender;

@@ -38,6 +38,7 @@
  *
 */
 
+#include<config.h>
 
 #include<sys/types.h>
 #include<sys/stat.h>
@@ -45,18 +46,24 @@
 #include<errno.h>
 #include<iostream>
 #include<stdio.h>
-#include<stdint.h>
+
 #include"SoundIO.h"
 #include<assert.h>
 #include<signal.h>
-#include<sys/time.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Thread.h>
-#include<unistd.h>
 #include"../spaudio/SpAudio.h"
 #include<samplerate.h>
 #include<libmutil/mtime.h>
 #include<libmutil/print_hex.h>
+
+#ifdef _MSC_VER
+
+#else
+#include<sys/time.h>
+#include<unistd.h>
+#endif
+
 
 #define BS 160
 

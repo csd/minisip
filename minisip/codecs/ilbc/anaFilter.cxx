@@ -13,10 +13,11 @@
     
    ******************************************************************/ 
     
-   using namespace std;
 
-   #include <string.h> 
-   #include "iLBC_define.h" 
+#include <string.h> 
+#include "iLBC_define.h" 
+
+//using namespace std;
 
     
    /*----------------------------------------------------------------* 

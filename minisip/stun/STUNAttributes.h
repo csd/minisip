@@ -25,7 +25,6 @@
 
 #include<config.h>
 
-#include<stdint.h>
 #include<libmutil/itoa.h>
 
 #include <sys/types.h>

@@ -21,8 +21,12 @@
 */
 
 #include"RtcpSender.h"
-#include<unistd.h>
+
 #include<config.h>
+
+#ifndef _MSC_VER
+#include<unistd.h>
+#endif
 
 #ifdef HAVE_NETINET_IN_H
 #include<netinet/in.h>
@@ -35,8 +39,11 @@
 
 #include<stdio.h>
 #include"../p2t/RtcpAPP.h"
-#include<sys/time.h>
 #include<libmutil/print_hex.h>
+
+#ifndef _MSC_VER
+#include<sys/time.h>
+#endif
 
 #ifdef OPIE
 int srcb_count=1;

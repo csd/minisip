@@ -26,6 +26,7 @@
 #include<config.h>
 
 #include"SDESItem.h"
+#include<string>
 
 
 class SDES_PHONE : public SDESItem{
@@ -41,7 +42,7 @@ class SDES_PHONE : public SDESItem{
 #endif
 
 	private:
-		string phone;
+		std::string phone;
 };
 
 #endif

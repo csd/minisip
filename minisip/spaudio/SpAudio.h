@@ -27,6 +27,13 @@
 #include<samplerate.h>
 #include<libmutil/MemObject.h>
 
+#ifdef _MSC_VER
+#ifndef int32_t
+typedef __int32  int32_t;
+#endif
+#else
+#include<stdint.h>
+#endif
 
 #define POS 5
 #define MAXSOURCES 10

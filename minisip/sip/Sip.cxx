@@ -99,7 +99,9 @@ void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
 //returns a the call id
 string Sip::invite(string &user){
 	SipDialogSecurityConfig securityConfig;
+#ifndef _MSC_VER
 	ts.save( INVITE_START );
+#endif
 	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
 
 	securityConfig = phoneconfig->securityConfig;
@@ -187,7 +189,9 @@ MRef<Session *> mediaSession =
 	dialogContainer->addDialog(voipCall);
 	
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
+#ifndef _MSC_VER
 	ts.save( TMP );
+#endif
 	
         SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
 	dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );

@@ -26,5 +26,7 @@
 
 #include"MediaCommandString.h"
 
+using namespace std;
+
 const string MediaCommandString::start_ringing="start_ringing";
 const string MediaCommandString::stop_ringing="stop_ringing";

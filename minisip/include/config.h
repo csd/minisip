@@ -23,8 +23,56 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include<stdint.h>
+
 #include<libmutil/MemObject.h>
+
+
+//#define DISABLE_OSS
+//#define DISABLE_ALSA
+
+/* Compilation time configuration */
+
+#ifdef _MSC_VER
+#ifndef WIN32
+#define WIN32
+#endif
+
+#ifndef uint8_t
+typedef unsigned char  uint8_t;
+#endif
+
+#ifndef byte_t
+typedef unsigned char  byte_t;
+#endif
+
+#ifndef int16_t
+typedef __int16  int16_t;
+#endif
+
+#ifndef uint16_t
+typedef unsigned short  uint16_t;
+#endif
+
+#ifndef int32_t
+typedef __int32  int32_t;
+#endif
+
+#ifndef uint32_t
+typedef unsigned int  uint32_t;
+#endif
+
+#ifndef int64_t
+typedef __int64  int64_t;
+#endif
+
+#ifndef uint64_t
+typedef unsigned long long  uint64_t;
+#endif
+
+#else
+#include"compilation_config.h"/* STL replacement */
+#include<stdint.h>
+#endif
 
 // FIXME!!
 
@@ -32,11 +80,6 @@
 #define LINUX
 #endif
 
-//#define DISABLE_OSS
-//#define DISABLE_ALSA
-
-/* Compilation time configuration */
-#include"compilation_config.h"/* STL replacement */
 
 #ifdef USE_STL
 #undef __NO_ISOCEXT

@@ -27,7 +27,12 @@ void ConsoleDebugger::showMem(){
 void ConsoleDebugger::run(){
 	while(true){
 		char c;
+#ifdef _MSC_VER
+		int n=1;
+		c= _getch();
+#else
 		int n = read(STDIN_FILENO, &c, 1);
+#endif
 		if (n==1){
 			switch (c){
 			case ' ':

@@ -23,7 +23,12 @@
 #ifndef STUNTEST_H
 #define STUNTEST_H
 
+#ifdef _MSC_VER
+typedef unsigned short uint16_t;
+#else
 #include<stdint.h>
+#endif
+
 #include"STUNMessage.h"
 
 #include<libmnetutil/UDPSocket.h>

@@ -25,6 +25,9 @@
 
 #include<config.h>
 #include"PhoneBook.h"
+#include<string>
+
+using namespace std;
 
 /* Uses mutil/XMLParser to read and save a phonebook file */
 

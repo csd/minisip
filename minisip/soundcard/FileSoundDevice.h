@@ -31,6 +31,8 @@
 #include <fcntl.h>
 #include<iostream>
 
+using namespace std;
+
 class FileSoundDevice: public SoundDevice{
 	public:
 		FileSoundDevice( string in_file, string out_file, int  nChannels, int32_t speed );

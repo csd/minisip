@@ -20,6 +20,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 
 #include <stdio.h>
 #include <errno.h>
@@ -29,7 +30,6 @@
 #include <libmutil/XMLParser.h>
 
 #include<ctype.h>
-#include<stdint.h>
 
 #ifdef WIN32
 /* Headerfiles for Windows */

@@ -1,5 +1,9 @@
 #include<config.h>
+
+#ifndef _MSC_VER
 #include<unistd.h>
+#endif
+
 #include"Minisip.h"
 
 #ifdef TEXT_UI
@@ -98,7 +102,8 @@ Minisip::Minisip( int argc, char**argv ){
 			merr << "WARNING: Could not determine home directory"<<end;
 
 #ifdef WIN32
-                        conffile=string("c:\\minisip.conf"); #else
+                        conffile=string("c:\\minisip.conf"); 
+#else
                         conffile = string("/.minisip.conf");
 #endif
                 }else{

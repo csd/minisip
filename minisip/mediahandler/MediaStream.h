@@ -28,12 +28,12 @@
 #include"Media.h"
 #include"MediaStream.h"
 #include"Session.h"
+#include"RtpReceiver.h"
 
 class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
 class SRtpPacket;
-class RtpReceiver;
 class IpProvider;
 
 class MediaStream : public MObject{

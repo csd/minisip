@@ -20,22 +20,26 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
+#include<config.h>
+
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<errno.h>
 #include<iostream>
 #include<stdio.h>
-#include<stdint.h>
 #include<assert.h>
 #include<signal.h>
-#include<sys/time.h>
 #include<time.h>
 #include<libmutil/itoa.h>
 #include<libmutil/mtime.h>
-#include<unistd.h>
-#include<stdint.h>
 
+#ifdef _MSC_VER
+#include<io.h>
+#else
+#include<sys/time.h>
+#include<unistd.h>
+#endif
 
 #include"SoundDevice.h"
 #include"FileSoundDevice.h"
@@ -92,7 +96,11 @@ int FileSoundDevice::openRecord(int32_t samplerate, int nChannels, int format){
 int FileSoundDevice::openPlayback(int32_t samplerate, int nChannels, int format){
 	this->nChannelsPlay = nChannels;
 
-	out_fd=::open(out_file.c_str(), O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);
+#ifdef _MSC_VER
+	out_fd=::_open(out_file.c_str(), _O_WRONLY | _O_CREAT,   _S_IREAD | _S_IWRITE );
+#else
+	out_fd=::open(out_file.c_str(), O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);	
+#endif
 	if (out_fd==-1){
 		perror(("open "+out_file).c_str());
 		exit(-1); //FIX: handle nicer - exception

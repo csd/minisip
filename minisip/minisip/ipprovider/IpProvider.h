@@ -23,7 +23,14 @@
 #ifndef IP_PROVIDER_H
 #define IP_PROVIDER_H
 
+#ifdef _MSC_VER
+#ifndef uint16_t
+typedef unsigned short  uint16_t;
+#endif
+#else
 #include<stdint.h>
+#endif
+
 #include<libmutil/MemObject.h>
 
 class UDPSocket;

@@ -23,7 +23,21 @@
 #ifndef SOUND_DEVICE_H
 #define SOUND_DEVICE_H
 
+#ifdef _MSC_VER
+#ifndef byte_t
+typedef unsigned char  byte_t;
+#endif
+#ifndef int32_t
+typedef __int32  int32_t;
+#endif
+#ifndef uint32_t
+typedef unsigned int  uint32_t;
+#endif
+
+#else
 #include<stdint.h>
+#endif
+
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 
@@ -34,8 +48,15 @@
 #define SOUND_U16LE	0xF2
 #define SOUND_U16BE	0xF3
 
+#ifdef _MSC_VER
+#ifndef byte_t
+typedef unsigned char  byte_t;
+#endif
+#else
+#include<stdint.h>
+#endif
 
-typedef uint8_t byte_t;
+//typedef uint8_t byte_t;
 
 class SoundDevice: public MObject{
 	public:
