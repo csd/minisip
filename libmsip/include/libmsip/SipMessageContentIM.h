@@ -28,6 +28,8 @@
 #include<iostream>
 using namespace std;
 
+MRef<SipMessageContent*> sipIMMessageContentFactory(const string &);
+
 class SipMessageContentIM : public SipMessageContent{
 public:
 	SipMessageContentIM(string m);

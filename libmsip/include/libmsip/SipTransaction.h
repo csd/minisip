@@ -81,8 +81,8 @@ class SipTransaction : public StateMachine<SipSMCommand,string>{
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
 		string command;
-		string branch;
 		int cSeqNo;
+		string branch;
 
 		string debugTransType;
 };

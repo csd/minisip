@@ -25,6 +25,7 @@
 #include"DefaultDialogHandler.h"
 #include"../mediahandler/MediaHandler.h"
 #include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipMessageContentIM.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
@@ -64,6 +65,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 }
 
 void Sip::init(){
+	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
 	phoneconfig->inherited.sipTransport->setSipSMCommandReceiver(this);
 }
