@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="include;../libmutil/include;../openssl/inc32"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMNETUTIL_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMNETUTIL_EXPORTS;HAVE_CONFIG_H"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="include;../libmutil/include;../openssl/inc32"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMNETUTIL_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMNETUTIL_EXPORTS;HAVE_CONFIG_H"
 				RuntimeLibrary="0"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -192,6 +192,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\include\config.h">
+			</File>
+			<File
 				RelativePath=".\include\libmnetutil\IP4Address.h">
 			</File>
 			<File
@@ -259,9 +262,6 @@
 		</File>
 		<File
 			RelativePath="..\libmutil\Debug\libmutil.lib">
-		</File>
-		<File
-			RelativePath="..\..\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib\msvcrtd.lib">
 		</File>
 		<File
 			RelativePath=".\ReadMe.txt">

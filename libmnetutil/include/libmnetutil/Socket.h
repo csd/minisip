@@ -43,6 +43,13 @@
 
 #include<libmutil/MemObject.h>
 
+#ifdef _MSC_VER
+#ifndef int32_t
+typedef __int32  int32_t;
+#endif
+#endif
+
+
 class LIBMNETUTIL_API Socket : public MObject{
 	public:
 		Socket();

@@ -26,6 +26,9 @@
 #define STREAMSOCKET_H
 
 #ifdef _MSC_VER
+#ifndef uint16_t
+typedef unsigned short  uint16_t;
+#endif
 #ifdef LIBMNETUTIL_EXPORTS
 #define LIBMNETUTIL_API __declspec(dllexport)
 #else

@@ -98,7 +98,7 @@ TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr){
 	type = SOCKET_TYPE_TCP;
 	this->fd=fd;
 	this->peerAddress = IPAddress::create( addr );
-	this->peerPort = ntoh16( ((sockaddr_in *)addr)->sin_port );
+	this->peerPort = ntohs( ((sockaddr_in *)addr)->sin_port );
 }
 
 TCPSocket::TCPSocket(TCPSocket &sock){
