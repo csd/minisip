@@ -41,6 +41,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
+#include<libmsip/SipAck.h>
 #include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
@@ -59,9 +60,15 @@ class LogEntry;
 class SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string list[10], int num, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+#else
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string list[10], int num, string callId="");
+#endif
+#ifdef IPSEC_SUPPORT
 		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
 		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+
 
 #endif		
 		virtual ~SipDialogConfVoip();
@@ -87,7 +94,9 @@ class SipDialogConfVoip: public SipDialog{
 	private:
 		
 		void setUpStateMachine();
-		
+		string connectedList[10];
+		string type;
+		int numConnected;
 		MRef<SipInvite*> getLastInvite();
 		void setLastInvite(MRef<SipInvite*> i);
 		
@@ -100,8 +109,10 @@ class SipDialogConfVoip: public SipDialog{
 		void sendReject(const string &branch);
 		void sendRinging(const string &branch);
 		void sendNotAcceptable(const string &branch);
-
-
+		void modifyConfJoinInvite(MRef<SipInvite*>inv);
+		void modifyConfConnectInvite(MRef<SipInvite*>inv);
+		void modifyConfAck(MRef<SipAck*>ack);
+		void modifyConfOk(MRef<SipResponse*> ok);
 		bool a0_start_callingnoauth_invite( const SipSMCommand &command);
 		bool a1_callingnoauth_callingnoauth_18X( const SipSMCommand &command);
 		bool a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &command);
@@ -140,6 +151,7 @@ class SipDialogConfVoip: public SipDialog{
 
 #ifdef IPSEC_SUPPORT
 		MRef<MsipIpsecAPI *> ipsecSession;
+		string list;
 #endif
 
 };

@@ -26,6 +26,7 @@
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
 #include"SipDialogVoip.h"
+#include"SipDialogConfVoip.h"
 #include"SipDialogPresenceClient.h"
 #include"SipDialogPresenceServer.h"
 #include<libmsip/SipMessage.h>
@@ -101,6 +102,121 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		//check if it's a regular INVITE or a P2T INVITE
 		if(inv->is_P2T()) {
 			inviteP2Treceived(SipSMCommand(pkt,source,destination));	
+		}
+		else if(inv->is_ConfJoin()) {
+#ifdef DEBUG_OUTPUT			
+			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
+#endif			
+			//MRef<SipMessage*> pack = command.getCommandPacket();
+			//MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
+	
+			//get the GroupList from the remote GroupListServer
+			//MRef<GroupList*>grpList;
+			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
+			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
+			string connectList[10];
+			int num = 0;
+
+   //--- Convert each digit char and add into result.
+   			int t=0;
+			while (numToConnect[t] >= '0' && numToConnect[t] <='9') {
+      				num = (num * 10) + (numToConnect[t] - '0');
+      				t++;
+   			}
+			for(t=0;t<num;t++)
+				connectList[t]=sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
+			cerr << "DDH: "+numToConnect[0]<< endl;
+			cerr << "DDH: "+numToConnect[1]<< endl;
+			cerr << "DDH: "+itoa(num)<< endl;
+			//int num=atoi(numToConnect);
+			//string gID = sdp->getSessionLevelAttribute("p2tGroupIdentity");
+			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
+			// get a session from the mediaHandler
+			MRef<Session *> mediaSession = 
+				mediaHandler->createSession(phoneconf->securityConfig );
+
+			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+
+#ifdef IPSEC_SUPPORT
+			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
+			
+			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
+			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
+								phoneconf, mediaSession, connectList, num, pkt->getCallId(), ipsecSession )); 
+	
+#else	
+			
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
+								phoneconf, mediaSession, connectList, num, pkt->getCallId()));
+#endif
+#ifdef MINISIP_MEMDEBUG
+			voipConfCall.setUser("DefaultDialogHandler");
+#endif
+			sipStack->addDialog(voipConfCall);
+
+			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
+			cmd.setDispatchCount(dispatchCount);
+
+			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			mdbg << cmd << end;
+		}
+		else if(inv->is_ConfConnect()) {
+#ifdef DEBUG_OUTPUT			
+			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
+#endif			
+			//MRef<SipMessage*> pack = command.getCommandPacket();
+			//MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
+	
+			//get the GroupList from the remote GroupListServer
+			//MRef<GroupList*>grpList;
+			/*assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
+			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
+			string connectList[10];
+			int num = 0;
+
+   //--- Convert each digit char and add into result.
+   			int t=0;
+			while (numToConnect[t] >= '0' && numToConnect[t] <='9') {
+      				num = (num * 10) + (numToConnect[t] - '0');
+      				t++;
+   			}
+			for(t=0;t<num;t++)
+				connectList[t]=sdp->getSessionLevelAttribute("participant_"+itoa(t+1));*/
+			//int num=atoi(numToConnect);
+			//string gID = sdp->getSessionLevelAttribute("p2tGroupIdentity");
+			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
+			// get a session from the mediaHandler
+			MRef<Session *> mediaSession = 
+				mediaHandler->createSession(phoneconf->securityConfig );
+
+			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+
+#ifdef IPSEC_SUPPORT
+			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
+			
+			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
+			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
+								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
+	
+#else	
+			
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
+								phoneconf, mediaSession, pkt->getCallId()));
+#endif
+#ifdef MINISIP_MEMDEBUG
+			voipConfCall.setUser("DefaultDialogHandler");
+#endif
+			sipStack->addDialog(voipConfCall);
+
+			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
+			cmd.setDispatchCount(dispatchCount);
+
+			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			mdbg << cmd << end;
 		}
 		//start SipDialogVoIP
 		else{

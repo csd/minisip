@@ -868,6 +868,42 @@ void SipDialogConfVoip::setUpStateMachine(){
 
 
 #ifdef IPSEC_SUPPORT
+SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string list[10], int num, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
+                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                lastInvite(NULL), 
+		phoneconf(pconf),
+		mediaSession(mediaSession), ipsecSession(ipsecSession)
+#else
+SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string list[10], int num, string cid) : 
+                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                lastInvite(NULL), 
+		phoneconf(pconf),
+		mediaSession(mediaSession)
+#endif
+
+{
+	numConnected= num;
+	type="join";
+	for(int t=0;t<10;t++)
+	{
+		connectedList[t]=list[t];
+	}
+	cerr << "CONFDIALOG: "+list[0]<< endl;
+	cerr << "CONFDIALOG: "+list[1]<< endl;
+	cerr << "CONFDIALOG: "+itoa(num)<< endl;
+	if (cid=="")
+		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	else
+		dialogState.callId = cid;
+	
+	dialogState.localTag = itoa(rand());
+	
+	/* We will fill that later, once we know if that succeeded */
+	logEntry = NULL;
+
+	setUpStateMachine();
+}
+#ifdef IPSEC_SUPPORT
 SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
                 SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
@@ -882,6 +918,8 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 #endif
 
 {
+	cerr << "CONFDIALOG: received"<< endl;
+	type="connect";
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	else
@@ -999,7 +1037,10 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	inv.setUser("SipDialogConfVoip");
 #endif
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
-
+	if(type=="join")
+		modifyConfJoinInvite(inv);
+	else
+		modifyConfConnectInvite(inv);
 //	mdbg << "SipDialogVoip::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
         MRef<SipMessage*> pktr(*inv);
@@ -1063,6 +1104,10 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 				getDialogConfig()->inherited.transport);
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	if(type=="join")
+		modifyConfJoinInvite(inv);
+	else
+		modifyConfConnectInvite(inv);
 	
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
@@ -1154,6 +1199,15 @@ void SipDialogConfVoip::sendAck(string branch){
 	//	if(socket == NULL){
 	// No StreamSocket, create one or use UDP
 //	Socket *sock=NULL;
+	MRef<SdpPacket *> sdp;
+
+	
+	ack->setContent( *sdp );
+
+//-------------------------------------------------------------------------------------------------------------//
+	
+	
+	modifyConfAck(ack);
 	
 	if(getDialogConfig()->proxyConnection == NULL){
 		getDialogConfig()->inherited.sipTransport->sendMessage(ack,
@@ -1165,6 +1219,7 @@ void SipDialogConfVoip::sendAck(string branch){
 				getDialogConfig()->inherited.transport
 				);
 	}else{
+		
 		// A StreamSocket exists, try to use it
 		mdbg << "Sending packet using existing StreamSocket"<<end;
 		getDialogConfig()->inherited.sipTransport->sendMessage(
@@ -1307,7 +1362,7 @@ void SipDialogConfVoip::sendInviteOk(const string &branch){
 //	/* if sdp is NULL, the offer was refused, send 606 */
 //	// FIXME
 //	else return; 
-
+	modifyConfOk(ok);
 //	setLastResponse(ok);
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1508,3 +1563,54 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 	}
 	return true;
 }
+void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
+	//Add Accept-Contact Header
+	inv->set_ConfJoin();
+		
+	//Add SDP Session Level Attributes
+	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	for(int t=0;t<numConnected;t++)
+	{
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+	}
+}
+void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
+	//Add Accept-Contact Header
+	ack->set_Conf();
+		
+	//Add SDP Session Level Attributes
+	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
+	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	for(int t=0;t<numConnected;t++)
+	{
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+	}
+}
+void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
+	//Add Accept-Contact Header
+	//ack->set_Conf();
+		
+	//Add SDP Session Level Attributes
+	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
+	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	for(int t=0;t<numConnected;t++)
+	{
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+	}
+}
+void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){
+	//Add Accept-Contact Header
+	inv->set_ConfConnect();
+		
+	//Add SDP Session Level Attributes
+	//assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	//MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
+	/*sdp->setSessionLevelAttribute("p2tGroupListServer", getDialogConfig()->inherited.externalContactIP + ":" + itoa(getPhoneConfig()->p2tGroupListServerPort));
+	sdp->setSessionLevelAttribute("p2tGroupIdentity", getP2TDialog()->getGroupList()->getGroupIdentity());
+	sdp->setSessionLevelAttribute("p2tGroupListProt","http/xml");*/	
+}
+

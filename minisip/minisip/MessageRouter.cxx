@@ -92,8 +92,13 @@ void MessageRouter::guicb_handleCommand(CommandString &cmd){
 	sip->getSipStack()->handleCommand(sipcmd);
 }
 
-string MessageRouter::confcb_doInvite(string user){
+string MessageRouter::confcb_doJoin(string user, string list[10], int num){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
-	return sip->confinvite(user);
+	return sip->confjoin(user, list, num);
+}
+string MessageRouter::confcb_doConnect(string user){
+//	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
+	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
+	return sip->confconnect(user);
 }

@@ -62,6 +62,10 @@ class ConferenceControl{
         string callId;
         string state;
 	ConfCallback *callback;
+	int numConnected;
+	int numPending;
+	string connectedList[10];
+	string pendingList[10];
 	
 	
 	///a P2T Group Member List

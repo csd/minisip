@@ -86,12 +86,14 @@ class LIBMSIP_API SipAck : public SipMessage{
                  * @return The complete ACK message as a string.
                  */
 		string getString();
-
+		void set_Conf();
+		bool is_Conf();
 
 	private:
 		string username;
 		string ipaddr;
 		int32_t port;
+		bool Conf;
 
 };
 

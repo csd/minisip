@@ -35,6 +35,7 @@
 #include<libmsip/SipAck.h>
 #include<assert.h>
 #include<libmsip/SipHeaderVia.h>
+#include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipHeaderCallID.h>
@@ -86,6 +87,12 @@ string SipAck::getString(){
 	ret = ret + getHeadersAndContent();
 	return ret;
 }
-
-
+void SipAck::set_Conf() {
+	this->Conf=true;
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.conf=\"TRUE\"",true,false);
+	addHeader(new SipHeader(*acp) );
+}
+bool SipAck::is_Conf() {
+	return Conf;
+}
 
