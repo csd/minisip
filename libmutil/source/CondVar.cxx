@@ -39,8 +39,8 @@
 
 CondVar::CondVar(){
 #ifdef HAVE_PTHREAD_H
-	INTERNAL_COND_WAIT = new pthread_cond_t;
-	INTERNAL_MUTEX = new pthread_mutex_t;
+	/*INTERNAL_COND_WAIT*/ internalStruct = new pthread_cond_t;
+	/*INTERNAL_MUTEX*/ internalMutexStruct = new pthread_mutex_t;
 
 	pthread_cond_init( INTERNAL_COND_WAIT, NULL );
 	pthread_mutex_init( INTERNAL_MUTEX, NULL );
