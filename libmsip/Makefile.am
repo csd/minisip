@@ -7,6 +7,7 @@ libmsip_la_CPPFLAGS = $(CPPFLAGS) -I../../include/libmsip
 libmsip_la_SOURCES = $(msip_src)
 
 msip_src =           source/SipDialogConfig.cxx \
+		     source/SipStack.cxx \
 		     source/SipUtils.cxx \
 		     source/SipDialogContainer.cxx \
 		     source/SipMessageDispatcher.cxx \

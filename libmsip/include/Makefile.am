@@ -1,4 +1,5 @@
 pkginclude_HEADERS = libmsip/SipHeader.h \
+                     libmsip/SipStack.h \
                      libmsip/SipHeaderAccept.h \
 		     libmsip/SipHeaderAcceptContact.h \
                      libmsip/SipUtils.h \
