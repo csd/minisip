@@ -25,6 +25,7 @@
 
 #include<vector>
 #include"IPAddress.h"
+#include<stdint.h>
 
 using namespace std;
 
@@ -33,6 +34,9 @@ class NetworkFunctions{
 		static vector<string> getAllInterfaces();
 		static string getInterfaceIPStr(string iface);
 		static string getHostHandlingService(string service, string domain, uint16_t &ret_port);
+		static bool isLocalIP(uint32_t ip, vector<string> &localIPs);
+
+		static void binIp2String(uint32_t ip, char *strBufMin16); //OBS: ip is host byte order 
 
 	private:
 

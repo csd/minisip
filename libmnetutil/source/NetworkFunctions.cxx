@@ -50,6 +50,7 @@
 #include<iostream>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/itoa.h>
+#include<stdio.h>
 
 #define BUFFER_SIZE 1024 /* bytes */
 
@@ -241,4 +242,26 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
     return ret;
 
 
+}
+
+
+void NetworkFunctions::binIp2String(uint32_t ip, char *strBufMin16){
+//      uint32_t nip = htonl(ip);
+//      inet_ntop(AF_INET, &nip, strBufMin16, 16);
+    sprintf( strBufMin16, "%i.%i.%i.%i", ( ip>>24 )&0xFF,
+                                         ( ip>>16 )&0xFF,
+                                         ( ip>> 8 )&0xFF,
+                                         ( ip     )&0xFF );
+}
+
+bool NetworkFunctions::isLocalIP(uint32_t ip, vector<string> &localIPs){
+    char sip[20];
+    binIp2String(ip,sip);
+    string ssip(sip);
+    
+    for (vector<string>::iterator i=localIPs.begin(); i!=localIPs.end(); i++)
+        if (ssip == (*i))
+            return true;
+    
+    return false;
 }
