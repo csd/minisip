@@ -186,13 +186,16 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	}
 		
 	short * tempBuffer=NULL;
+	bool tempBufferAllocated = false;
 
 	while( true ){
 
 		if( ! soundcard->recording ){
 			if( soundcard->soundDev->isOpenedRecord() ){
 				soundcard->closeRecord();
-				delete [] tempBuffer;
+				if( tempBufferAllocated ){
+					delete [] tempBuffer;
+				}
 				tempBuffer = NULL;
 			}
 
@@ -217,6 +220,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		if( soundcard->soundDev->getNChannelsRecord() > 1 ){
 			if( !tempBuffer ){
 				tempBuffer = new short[soundcard->recorder_buffer_size];
+				tempBufferAllocated = true;
 			}
 
 			for( int j = 0; j < soundcard->recorder_buffer_size; j++ ){
