@@ -43,18 +43,20 @@ SipHeaderWarning::SipHeaderWarning(const string &build_from)
 	if (blank1Pos==string::npos){
 		return;
 	}
-	blank2Pos = build_from.substr(blank1Pos,string::npos).find(" ");
+	blank2Pos = blank1Pos + 1 + 
+		build_from.substr(blank1Pos+1,string::npos).find(" ");
 	if (blank2Pos==string::npos){
 		return;
 	}
-	blank3Pos = build_from.substr(blank2Pos,string::npos).find(" ");
+	blank3Pos = blank2Pos + 1 +
+		build_from.substr(blank2Pos+1,string::npos).find(" ");
 	if (blank3Pos==string::npos){
 		return;
 	}
 
 	errorCode=atoi(build_from.substr(blank1Pos+1, 3).c_str());
 	domainName=build_from.substr(blank2Pos+1, blank3Pos-blank2Pos);
-	warning=build_from.substr(blank3Pos+2, build_from.size()-blank3Pos-1);
+	warning=build_from.substr(blank3Pos+2, build_from.size()-blank3Pos-3);
 
 }
 
