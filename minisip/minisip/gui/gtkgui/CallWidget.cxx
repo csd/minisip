@@ -280,9 +280,9 @@ void CallWidget::stopRinging(){
 
 StockButton::StockButton( Gtk::StockID stockId, Glib::ustring text ):
 	box( 2 ), image( stockId, Gtk::ICON_SIZE_SMALL_TOOLBAR ), label( text ){
-	box.add( image );
-	box.add( label );
-	add(box);
+	box.pack_start( image, false, false );
+	box.pack_end( label, true, true );
+	add( box );
 	show_all();
 }
 

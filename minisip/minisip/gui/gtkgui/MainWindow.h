@@ -109,7 +109,7 @@ class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
 		MRef<ContactDb *> contactDb;
 
 
-		Glib::RefPtr<Gnome::Glade::Xml>  refXml;
+		//Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 		Gtk::Window * mainWindowWidget;
 		Gtk::Notebook * mainTabWidget;
 		Gtk::TreeView * phoneBookTreeView;
@@ -118,6 +118,7 @@ class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
 		Gtk::MenuItem * phoneAddAddressMenu;
 		Gtk::MenuItem * phoneRemoveMenu;
 		Gtk::MenuItem * phoneEditMenu;
+		Gtk::Entry * uriEntry;
 		PhoneBookModel * phoneBookModel;
 		PhoneBookTree * phoneBookTree;
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection;

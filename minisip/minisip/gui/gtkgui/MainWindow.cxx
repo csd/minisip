@@ -53,15 +53,13 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * editContactMenu;
 	Gtk::MenuItem * callMenu;
 	Gtk::MenuItem * imMenu;
+	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 
-  	try
-  	{
+  	try{
     		refXml = Gnome::Glade::Xml::create((string)MINISIP_DATADIR + "/minisip.glade");
   	}
   
-	catch(const Gnome::Glade::XmlError& ex)
-  
-	{
+	catch(const Gnome::Glade::XmlError& ex){
     		std::cerr << ex.what() << std::endl;
     		exit( 1 );
   	}
@@ -162,6 +160,8 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, certificateDialog );
+	
+	refXml->get_widget( "uriEntry", uriEntry );
 
 	refXml->get_widget( "prefMenu", prefMenu );
 	refXml->get_widget( "certMenu", certMenu );
@@ -477,13 +477,7 @@ void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
 }
 
 void MainWindow::invite(){
-	Gtk::Entry * uriEntry;
 	string uri;
-
-	refXml->get_widget( "uriEntry", uriEntry );
-	if( uriEntry == NULL ){
-		exit( 1 );
-	}
 
 	uri = uriEntry->get_text();
 
@@ -500,13 +494,7 @@ void MainWindow::invite(){
 }
 
 void MainWindow::im(){
-	Gtk::Entry * uriEntry;
 	string uri;
-
-	refXml->get_widget( "uriEntry", uriEntry );
-	if( uriEntry == NULL ){
-		exit( 1 );
-	}
 
 	uri = uriEntry->get_text();
 
@@ -541,8 +529,6 @@ void MainWindow::phoneSelected(){
 	Gtk::TreeModel::iterator iter = treeSelection2->get_selected();
 
 	if( iter ){
-		Gtk::Entry * uriEntry;
-		refXml->get_widget( "uriEntry", uriEntry );
 		if( uriEntry ){
 			uriEntry->set_text( (*iter)[phoneBookModel->tree->uri] );
 		}

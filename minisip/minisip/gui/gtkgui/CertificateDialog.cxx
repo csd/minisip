@@ -24,7 +24,7 @@
 
 
 CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
-	this->refXml = refXml;
+//	this->refXml = refXml;
 
 	refXml->get_widget( "certLabel", certLabel );
 	refXml->get_widget( "pkeyLabel", pkeyLabel );

@@ -44,7 +44,7 @@ class CertificateDialog : public SigC::Object {
 
 	private:
 
-		Glib::RefPtr<Gnome::Glade::Xml>  refXml;
+	//	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 
 		MRef<certificate_chain *> certChain;
 		MRef<ca_db *> caDb;
