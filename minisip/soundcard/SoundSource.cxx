@@ -70,11 +70,11 @@ BasicSoundSource::BasicSoundSource(int32_t id,
         numSources=nSources;
         sampRate=sRate;
 	
-	resampler = Resampler::create( 8000, 44100, 20, 2 );
+	resampler = Resampler::create( 8000, SOUND_CARD_FREQ, 20, 2 );
 
         /* spatial audio initialization */
-        leftch = new short[950];
-        rightch = new short[950];
+        leftch = new short[1028];
+        rightch = new short[1028];
         lookupleft = new short[65536];
         lookupright = new short[65536];
 //      initLookup(numSources);

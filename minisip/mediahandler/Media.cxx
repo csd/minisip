@@ -112,13 +112,13 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 	send = true;
 	MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
 
-	soundIo->register_recorder_receiver( this, 882, false );
+	soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ *  acodec->getSamplingSizeMs() / 1000, false );
 
 	seqNo = 0;
 //#ifdef IPAQ
 //	iIPAQ = 0;
 //#endif
-	resampler = Resampler::create( 44100, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
+	resampler = Resampler::create( SOUND_CARD_FREQ, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
 }
 
 string AudioMedia::getSdpMediaType(){

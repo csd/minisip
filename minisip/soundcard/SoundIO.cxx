@@ -200,7 +200,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	assert(soundcard!=NULL);
 	int32_t nread; /* IN SAMPLES */
 	//FIXME
-	soundcard->recorder_buffer_size = 882;
+	soundcard->recorder_buffer_size = SOUND_CARD_FREQ*20/1000;
 	
 	for (i=0; i<2; i++){
 		//buffers[i] = (short *)malloc(soundcard->recorder_buffer_size*sizeof(short)*2);
@@ -427,10 +427,11 @@ void *SoundIO::playerLoop(void *arg){
 			nChannels = active_soundcard->soundDev->getNChannelsPlay();
 			active_soundcard->queueLock.lock();
 		}
+		int nFrames = (SOUND_CARD_FREQ * 20) / 1000;
 
                 
 		if( !buf ){
-			buf = new short[1764];
+			buf = new short[nChannels * nFrames];
 		}
 
 		if( !tmpbuf ){
@@ -438,14 +439,14 @@ void *SoundIO::playerLoop(void *arg){
 		}
 
 		if( !resbuf ){
-		  resbuf = new short[1764];
+		  resbuf = new short[nChannels * nFrames];
 		}
 		
 		if( !outbuf ){
-		  outbuf = new short[1764];
+		  outbuf = new short[nChannels * nFrames];
 		}
 		
-		memset( buf, '\0', 1764*2 );
+		memset( buf, '\0', nChannels * nFrames * sizeof( short ) );
                 
 		for (list<MRef<SoundSource *> >::iterator 
 				i = active_soundcard->sources.begin(); 
@@ -461,7 +462,7 @@ void *SoundIO::playerLoop(void *arg){
 //				cerr << "After spatialize " << mtime() << endl;
 				
 //				cerr << "OUTBUF: " << print_hex( (unsigned char*)outbuf, 1764*2) << endl;
-				for (uint32_t j=0; j<1764; j++){
+				for (uint32_t j=0; j<nFrames*nChannels; j++){
 //					buf[j]+=tmpbuf[j];
 					buf[j]+=outbuf[j];
 				}
@@ -474,7 +475,7 @@ void *SoundIO::playerLoop(void *arg){
 
 		if( active_soundcard->soundDev->isOpenedPlayback() ){
 //			cerr << "before send_to_card" << mtime() << endl;
-			active_soundcard->send_to_card(buf, 1764/2);
+			active_soundcard->send_to_card(buf, nFrames);
 //			cerr << "after send_to_card" << mtime() << endl;
 		}
 		

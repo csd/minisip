@@ -37,9 +37,12 @@ SimpleResampler::SimpleResampler( uint32_t inputFreq, uint32_t outputFreq,
 
 	this->nChannels = nChannels;
 
+	previousFrame = new short[ nChannels ];
+
 }
 
 SimpleResampler::~SimpleResampler(){
+	delete [] previousFrame;
 }
 
 void SimpleResampler::resample( short * input, short * output ){
@@ -96,6 +99,7 @@ void SimpleResampler::upSample( short * input, short * output ){
 	int sampleGroupSize;
 	int sample;
 	int step;
+	int lastInputSample;
 	
 	if( inputFrames == 1 ){
 		for( channel = 0 ; channel < nChannels ; channel ++ ){
@@ -110,18 +114,21 @@ void SimpleResampler::upSample( short * input, short * output ){
 
 	for( channel = 0; channel < nChannels; channel ++ ){
 		outputOffset = channel;
-		sampleGroupSize = outputFrames / (inputFrames - 1);
-		for (i = 0; i < inputFrames - 2; i++){
+		sampleGroupSize = outputFrames / inputFrames;
+		lastInputSample = previousFrame[ channel ];
+		for (i = 0; i < inputFrames - 1; i++){
 
-			step = input[(i+1)*nChannels + channel] / sampleGroupSize  - input[i*nChannels + channel] / sampleGroupSize;  
+			step = input[(i)*nChannels + channel] / sampleGroupSize  - lastInputSample / sampleGroupSize;  
 
-			output[outputOffset] = input[i*nChannels + channel];
+			output[outputOffset] = lastInputSample;
 			
 			for (j = 1; j < sampleGroupSize; j++){
 				output[outputOffset + j*nChannels] = output[outputOffset + (j - 1)*nChannels] + step;
 			}
 
 			outputOffset += sampleGroupSize*nChannels;
+
+			lastInputSample = input[i*nChannels + channel];
 		}
 		
 		/* For the last case, we take a slightly bigger sampleGroupSize
@@ -129,26 +136,19 @@ void SimpleResampler::upSample( short * input, short * output ){
 		
 		sampleGroupSize = outputFrames - outputOffset / nChannels;
 
-
-		output[outputOffset] = input[i*nChannels + channel];
+		output[outputOffset] = lastInputSample;
 		
-		step = input[(i+1)*nChannels + channel] / sampleGroupSize  
-		     - input[i*nChannels + channel] / sampleGroupSize;  
+		step = input[(i)*nChannels + channel] / sampleGroupSize  
+		     - lastInputSample / sampleGroupSize;  
 			
 		for (j = 1; j < sampleGroupSize; j++){
 			output[outputOffset + j*nChannels] = output[outputOffset + (j - 1)*nChannels] + step;
 		}
 
-		/*
-
-		for( i = outputOffset ; i < outputFrames*nChannels ; i += nChannels ){
-			output[i] = input[(inputFrames - 1)*nChannels + channel];
-		}
-		*/
 	}
-
-//	cerr << "output: " << print_hex( (unsigned char *)output, 2*nChannels*outputFrames ) << endl;
-
+	
+	/* Save the last input frame for smooth transition */
+	memcpy( previousFrame, &input[ (inputFrames - 1)*nChannels ], nChannels * sizeof(short) );
 
 }
 

@@ -44,6 +44,8 @@ class SimpleResampler : public Resampler {
 		uint32_t nChannels;
 		uint32_t sampleRatio;
 
+		short * previousFrame;
+
 };
 
 
