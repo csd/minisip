@@ -39,8 +39,8 @@
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipTransactionInviteServerUA.h>
-#include<libmsip/SipTransactionClient.h>
-#include<libmsip/SipTransactionServer.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
+#include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
@@ -307,7 +307,7 @@ bool SipDialogP2Tuser::a5_incall_termwait_BYE( const SipSMCommand &command)
 */
 		/*vc->*/getLogEntry()->handle();
 
-		MRef<SipTransaction*> byeresp = new SipTransactionServer(MRef<SipDialog*>(/* *vc */ this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
+		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(MRef<SipDialog*>(/* *vc */ this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
 
 		/*vc->*/registerTransaction(byeresp);
 		SipSMCommand cmd(command);
@@ -356,7 +356,7 @@ bool SipDialogP2Tuser::a6_incall_termwait_hangup(
 		int bye_seq_no= /*vc->*/requestSeqNo();
 		
 		
-		MRef<SipTransaction*> byetrans( new SipTransactionClient(MRef<SipDialog*>(/* *vc */ this), bye_seq_no, dialogState.callId)); 
+		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), bye_seq_no, dialogState.callId)); 
 
 		/*vc->*/registerTransaction(byetrans);
 		/*vc->*/sendBye(byetrans->getBranch(), bye_seq_no);
@@ -405,7 +405,7 @@ bool SipDialogP2Tuser::a7_callingnoauth_termwait_CANCEL(
 //		/*vc->*/setCurrentState(toState);
 
 		MRef<SipTransaction*> cancelresp( 
-				new SipTransactionServer(
+				new SipTransactionNonInviteServer(
 					MRef<SipDialog*>(/* *vc */ this), 
 					command.getCommandPacket()->getCSeq(), 
 					command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
@@ -435,7 +435,7 @@ bool SipDialogP2Tuser::a8_callingnoauth_termwait_cancel(
 		//MRef<SipDialogP2Tuser *> vc = (SipDialogP2Tuser *)sipStateMachine;
 //		/*vc->*/setCurrentState(toState);
 
-		MRef<SipTransaction*> canceltrans( new SipTransactionClient(MRef<SipDialog*>(/* *vc */ this), /*vc->*/dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), /*vc->*/dialogState.seqNo, dialogState.callId)); 
 
 		/*vc->*/registerTransaction(canceltrans);
 		/*vc->*/sendCancel(canceltrans->getBranch());
@@ -640,7 +640,7 @@ bool SipDialogP2Tuser::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 
 		//FIXME: is this correct - this should probably be handled
 		//in the already existing transaction.
-		MRef<SipTransaction*> cr( new SipTransactionServer(MRef<SipDialog*>(/* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(MRef<SipDialog*>(/* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
 		/*vc->*/registerTransaction(cr);
 
 		SipSMCommand cmd(command);
@@ -879,7 +879,7 @@ bool SipDialogP2Tuser::a24_calling_termwait_2xx(
 		int bye_seq_no= /*vc->*/requestSeqNo();
 //		/*vc->*/setCurrentState(toState);
 
-		MRef<SipTransaction*> byetrans = new SipTransactionClient(MRef<SipDialog*>(/* *vc */), /*vc->*/dialogState.seqNo, dialogState.callId); 
+		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */), /*vc->*/dialogState.seqNo, dialogState.callId); 
 
 
 		/*vc->*/registerTransaction(byetrans);
