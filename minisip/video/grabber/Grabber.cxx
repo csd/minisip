@@ -43,13 +43,8 @@ MRef<Grabber *> Grabber::create( string device ){
 	if( device.substr( 0, 3 ) == "fw:" ){
 		uint32_t portId = atoi( device.substr( 3, 1 ).c_str() );
 		uint32_t cameraId = atoi( device.substr( 5, 1 ).c_str() );
-
-		fprintf( stderr, "portId: %i\n", portId );
-		fprintf( stderr, "cameraId: %i\n", cameraId );
 		
 		Dc1394Grabber * dc1394Grabber = new Dc1394Grabber( portId, cameraId );
-		fprintf( stderr, "After new\n" );
-		fprintf( stderr, "dc1394Grabber: %x\n", dc1394Grabber );
 		result = (Grabber *)dc1394Grabber;
 		return result;
 	}

@@ -77,12 +77,11 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	codec = avcodec_find_encoder( CODEC_ID_H263 );
 
 	if( codec == NULL ){
-		fprintf( stderr, "libavcodec does not support H261" );
+		fprintf( stderr, "libavcodec does not support H.263" );
 		exit( 1 );
 	}
 
 	context = avcodec_alloc_context();
-        fprintf( stderr,"context->flags %i\n", context->flags );
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
@@ -90,7 +89,7 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	context->bit_rate_tolerance = 2*1024*1024;
 
 	context->frame_rate = 1000; 
-//	context->frame_rate = 25; 
+//	context->frame_rate = 15;
 	context->frame_rate_base = 1;
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
@@ -100,7 +99,7 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
 
 	context->rtp_mode = 1;
-	context->rtp_payload_size = 500;
+	context->rtp_payload_size = 1000;
 	context->rtp_callback = &rtpCallback;
 
 
