@@ -76,4 +76,14 @@ const string SipCommandString::start_presence_server= "start_presence_server";
 const string SipCommandString::stop_presence_server= "stop_presence_server";
 const string SipCommandString::local_presence_update= "local_presence_update";
 
-const string SipCommandString::transfer= "transfer";
+/* Transfer initiation */
+const string SipCommandString::user_transfer = "user_transfer";
+const string SipCommandString::transfer_pending = "transfer_pending";
+const string SipCommandString::transfer_refused = "transfer_refused";
+const string SipCommandString::transfer_failed = "transfer_failed";
+
+/* Transfer answering */
+const string SipCommandString::transfer_requested = "transfer_requested";
+const string SipCommandString::user_transfer_accept = "user_transfer_accept";
+const string SipCommandString::user_transfer_refuse = "user_transfer_refuse";
+const string SipCommandString::call_transferred = "call_transferred";

@@ -95,6 +95,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler
 
 	private:
 
+                void registerIcons();
 		void hideSlot();
 		void phoneTreeClicked( GdkEventButton * event );
 		void im();

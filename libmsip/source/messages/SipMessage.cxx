@@ -63,6 +63,7 @@
 #include<libmsip/SipBye.h>
 #include<libmsip/SipSubscribe.h>
 #include<libmsip/SipNotify.h>
+#include<libmsip/SipRefer.h>
 #include<libmsip/SipIMMessage.h>
 #include<libmsip/SipUtils.h>
 
@@ -127,6 +128,9 @@ MRef<SipMessage*> SipMessage::createMessage(string &data){
 		}
 		if (n> 6 && data.substr(0, 6)=="NOTIFY"){
 			return MRef<SipMessage*>(new SipNotify(data));
+		}
+		if (n> 5 && data.substr(0, 5)=="REFER"){
+			return MRef<SipMessage*>(new SipRefer(data));
 		}
 
 		throw new SipExceptionInvalidStart;

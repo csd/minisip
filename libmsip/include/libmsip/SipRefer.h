@@ -81,6 +81,12 @@ class LIBMSIP_API SipRefer : public SipMessage{
 				int cSeqNo
 				);
 
+		/**
+		 * @returns the (first URI) contained in a Refer-To: header
+		 * (or an empty string)
+		 */
+		string getReferredUri();
+
 		virtual std::string getMemObjectType(){return "SipRefer";}
 
 		string getString();

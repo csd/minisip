@@ -188,8 +188,10 @@ string Sip::invite(string &user){
 	}
 
 
+        cerr << "Before new mediaSession" << endl;
 MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
+        cerr << "After new mediaSession" << endl;
 
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
@@ -201,7 +203,9 @@ MRef<Session *> mediaSession =
 
 #endif
 
+        cerr << "Before addDialog" << endl;
 	/*dialogContainer*/sipstack->addDialog(voipCall);
+        cerr << "After addDialog" << endl;
 	
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifndef _MSC_VER
@@ -210,7 +214,9 @@ MRef<Session *> mediaSession =
 	
         SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
 	
+        cerr << "Before handleCommand" << endl;
 	sipstack->handleCommand(cmd);
+        cerr << "After handleCommand" << endl;
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipCall->getCallId();
 }

@@ -63,6 +63,8 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * imMenu;
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 
+        registerIcons();
+
   	try{
     		refXml = Gnome::Glade::Xml::create((string)MINISIP_DATADIR + "/minisip.glade");
   	}
@@ -448,7 +450,7 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 void MainWindow::removeCall( string callId ){
 	for( list<CallWidget *>::iterator i = callWidgets.begin();
 			i != callWidgets.end(); i++ ){
-		if( (*i)->getCallId() == callId ){
+		if( (*i)->getMainCallId() == callId ){
 			mainTabWidget->remove_page( *(*i) );
 			callWidgets.erase( i );
 			return;
@@ -601,4 +603,33 @@ void MainWindow::setCallback( GuiCallback * callback ){
 void MainWindow::runCertificateSettings(){
 	certificateDialog->run();
 	config->save();
+}
+
+void MainWindow::registerIcons(){
+        const Glib::RefPtr<Gtk::IconFactory> factory = 
+                Gtk::IconFactory::create();
+        
+        Gtk::IconSet * iconSet = new Gtk::IconSet;
+        Gtk::IconSource * iconSource = new Gtk::IconSource;
+
+        iconSource->set_filename( (string)MINISIP_DATADIR + "/secure.png" );
+        iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
+        iconSet->add_source( *iconSource );
+
+        factory->add( Gtk::StockID( "minisip_secure" ), *iconSet );
+
+        delete iconSource;
+        delete iconSet;
+        iconSource = new Gtk::IconSource;
+        iconSet = new Gtk::IconSet;
+        
+        iconSource->set_filename( (string)MINISIP_DATADIR + "/insecure.png" );
+        iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
+        iconSet->add_source( *iconSource );
+
+        factory->add( Gtk::StockID( "minisip_insecure" ), *iconSet );
+
+        factory->add_default();
+        delete iconSet;
+        delete iconSource;
 }

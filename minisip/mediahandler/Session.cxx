@@ -95,7 +95,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			return NULL;
 		}
 		result->setSessionLevelAttribute( 
-                                "key-mgmt", "mikey "+keyMgmtMessage );
+                                "key-mgmt", keyMgmtMessage );
 		
 	}
 

@@ -40,19 +40,53 @@
 
 
 
-CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool incoming, string secure):
+CallWidget::CallWidget( string callId, string remoteUri, 
+                        MainWindow * mw, bool incoming, string secure):
 		mainWindow( mw ),
-                callId( callId ),
-		status( "" ),
-		secStatus( "" ),
+		status( "", Gtk::ALIGN_LEFT ),
+		secStatus( "", Gtk::ALIGN_LEFT ),
+                buttonBox(/*homogenius*/ true ),
+#ifndef OLDLIBGLADEMM
+                transferArrow( "Call transfer" ),
+                transferHBox( false ),
+                transferButton( "Transfer" ),
+#endif
+                secureImage(),// Gtk::StockID( "minisip_insecure" ), 
+                          //   Gtk::ICON_SIZE_DIALOG ),
+                insecureImage( Gtk::StockID( "minisip_insecure" ), 
+                             Gtk::ICON_SIZE_DIALOG ),
                 acceptButton( Gtk::Stock::OK, "Accept" ),
                 rejectButton( Gtk::Stock::CANCEL, "Reject" ),
-		bell(/*NULL*/)//,
+		bell(),
+                mainCallId( callId )
 {
-	bell = NULL;
 
-	add( status );
-	add( secStatus );
+	bell = NULL;
+        callIds.push_back( callId );
+
+
+        Gtk::HBox * topBox = manage( new Gtk::HBox );
+
+        topBox->pack_start( secureImage, false, false, 5 );
+
+        Gtk::VBox * rightTopBox = manage( new Gtk::VBox );
+        topBox->pack_start( *rightTopBox, false, false, 5 );
+
+        
+        rightTopBox->pack_start( status, false, false, 5 );
+        rightTopBox->pack_start( secStatus, false, false, 5 );
+        
+        pack_start( *topBox, false, false, 5 );
+
+        Pango::AttrList attrList( "<big><b></b></big>" );
+        status.set_attributes( attrList );
+
+        Gtk::HSeparator * separator = manage( new Gtk::HSeparator );
+        pack_start( *separator, false, false, 5 );
+        separator->show();
+
+//	add( status );
+//	add( secStatus );
 	pack_end( buttonBox, false, true );
 
 	//buttonBox.set_expand( false );
@@ -60,28 +94,57 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 	status.set_use_markup( true );
 	secStatus.set_use_markup( true );
 
+#ifndef OLDLIBGLADEMM
+        Gtk::VBox * vbox = manage( new Gtk::VBox );
+        vbox->add( transferHBox );
+        vbox->add( transferHBox2 );
+        transferArrow.add( *vbox );
+
+        transferButton.signal_clicked().connect( 
+                        SLOT( *this, &CallWidget::transfer ) );
+                
+        transferHBox.pack_end( transferButton, false, false ), 
+        transferHBox.pack_end( transferEntry, false, true ), 
+        
+        transferHBox2.pack_end( transferProgress, true, true );
+
+        pack_start( transferArrow, false, false, 10 );
+#endif
+
 	buttonBox.add( acceptButton );
 	buttonBox.add( rejectButton );
 
-	status.show();
-	secStatus.show();
+
+//	status.show();
+//	secStatus.show();
+        topBox->show_all();
 	buttonBox.show_all();
-	rejectButton.show();
+//	rejectButton.show();
+//        acceptButton.hide();
 
 	acceptButton.signal_clicked().connect( SLOT( *this, &CallWidget::accept ) );
 	rejectButton.signal_clicked().connect( SLOT( *this, &CallWidget::reject ) );
 
 	if( incoming ){
 		state = CALL_WIDGET_STATE_INCOMING;
-		acceptButton.show();
-		status.set_markup( "Incoming call from \n<b>" + remoteUri
-				+ "</b>");
+//		acceptButton.show();
+		status.set_markup( "<big><b>Incoming call from \n" + remoteUri
+				+ "</b></big>");
 		secStatus.set_markup( "The call is <b>" + secure +"</b>." );
+                if( secure == "secure" ){
+                        secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
+                }
+                else{
+                        secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
+                }
+
 		startRinging();
 	}
 	else{
+                acceptButton.set_sensitive( false );
 		state = CALL_WIDGET_STATE_CONNECTING;
-		status.set_text( "Connecting..." );
+		status.set_markup( "<big><b>Connecting...</b></big>" );
+//                secStatus.set_markup( "Security requested" );
 		rejectButton.set_label( "Cancel" );
 	}
 }
@@ -90,12 +153,25 @@ CallWidget::~CallWidget(){
 }
 
 void CallWidget::accept(){
-	if( state == CALL_WIDGET_STATE_INCOMING ){
+        CommandString * cmd = NULL;
+        switch( state ){
+                
+	        case CALL_WIDGET_STATE_INCOMING:
 	
-		CommandString accept( callId, SipCommandString::accept_invite );
-		mainWindow->getCallback()->guicb_handleCommand( accept );
-	}
-	stopRinging();
+                        cmd = new CommandString( mainCallId, 
+                                        SipCommandString::accept_invite );
+                        mainWindow->getCallback()->guicb_handleCommand( *cmd );
+                        stopRinging();
+                        break;
+                        
+                case CALL_WIDGET_STATE_INCOMING_TRANSFER:
+			cmd = new CommandString( mainCallId, SipCommandString::user_transfer_accept );
+			mainWindow->getCallback()->guicb_handleCommand( *cmd );
+                        break;
+        }
+        if( cmd ){
+                delete cmd;
+        }
 }
 
 void CallWidget::reject(){
@@ -104,19 +180,24 @@ void CallWidget::reject(){
 
 	switch( state ){
 		case CALL_WIDGET_STATE_TERMINATED:
-			mainWindow->removeCall( callId );
+			mainWindow->removeCall( mainCallId );
 			break;
 		case CALL_WIDGET_STATE_INCALL:
 		case CALL_WIDGET_STATE_CONNECTING:
 		case CALL_WIDGET_STATE_RINGING:
-			mainWindow->removeCall( callId );
-			cmdstr = CommandString( callId, SipCommandString::hang_up );
+			mainWindow->removeCall( mainCallId );
+			cmdstr = CommandString( mainCallId, SipCommandString::hang_up );
 			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
 			break;
 		case CALL_WIDGET_STATE_INCOMING:
-			mainWindow->removeCall( callId );
-			cmdstr = CommandString( callId, SipCommandString::reject_invite);
+			mainWindow->removeCall( mainCallId );
+			cmdstr = CommandString( mainCallId, SipCommandString::reject_invite);
 			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+                case CALL_WIDGET_STATE_INCOMING_TRANSFER:
+			cmdstr = CommandString( mainCallId, SipCommandString::user_transfer_refuse );
+			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+                        status.set_markup( "<big><b>In call</b></big>" );
+                        state = CALL_WIDGET_STATE_INCALL; 
 			
 			break;
 
@@ -125,15 +206,11 @@ void CallWidget::reject(){
 }
 
 void CallWidget::hideAcceptButton(){
-	acceptButton.hide();
-}
-
-string CallWidget::getCallId(){
-	return callId;
+	acceptButton.set_sensitive( false );
 }
 
 bool CallWidget::handleCommand( CommandString command ){
-	if( callId == command.getDestinationId() ){
+	if( handlesCallId( command.getDestinationId() ) ){
 		if( command.getOp() == SipCommandString::remote_user_not_found ){
 			hideAcceptButton();
 			status.set_markup( "<b>User not found</b>" );
@@ -147,10 +224,22 @@ bool CallWidget::handleCommand( CommandString command ){
 				who = " with " + command.getParam();
 			}
 
-			status.set_text( "In call" + who );
+			status.set_markup( "<big><b>In call" + who + "</b></big>" );
+
+#ifndef OLDLIBGLADEMM
+                        transferArrow.show_all();
+#endif
 
 			secStatus.set_markup( "The call is <b>" + 
 					command.getParam2() + "</b>" );
+
+                        if( command.getParam2() == "secure" ){
+                                secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
+                        }
+                        else{
+                                secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
+                        }
+
 			rejectButton.set_label( "Hang up" );
 			hideAcceptButton();
 			stopRinging();
@@ -191,10 +280,13 @@ bool CallWidget::handleCommand( CommandString command ){
 		if( command.getOp() == SipCommandString::remote_hang_up ){
 			stopRinging();
 
-			status.set_text( "Call ended" );
-			secStatus.set_text( "" );
-			rejectButton.set_label( "Close" );
-			state = CALL_WIDGET_STATE_TERMINATED;
+                        callIds.remove( command.getDestinationId() );
+                        if( command.getDestinationId() == mainCallId ){
+                                status.set_markup( "<b><big>Call ended</big></b>" );
+                                secStatus.set_text( "" );
+                                rejectButton.set_label( "Close" );
+                                state = CALL_WIDGET_STATE_TERMINATED;
+                        }
 		}
 
 		if( command.getOp() == SipCommandString::remote_reject ){
@@ -216,7 +308,7 @@ bool CallWidget::handleCommand( CommandString command ){
 		}
 
 		if( command.getOp() == SipCommandString::remote_ringing ){
-			status.set_text( "Ringing..." );
+			status.set_markup( "<b><big>Ringing...</big></b>" );
 			rejectButton.set_label( "Hang up" );
 			state = CALL_WIDGET_STATE_RINGING;
 		}
@@ -241,6 +333,37 @@ bool CallWidget::handleCommand( CommandString command ){
 			rejectButton.set_label( "Close" );
 			state = CALL_WIDGET_STATE_TERMINATED;
 		}
+		
+                if( command.getOp() == SipCommandString::transfer_requested ){
+			status.set_text( "Accept transfer to " + command.getParam() + "?" );
+			secStatus.set_text( "" );
+                        
+                        acceptButton.show();
+                        acceptButton.set_label( "Accept" );
+			rejectButton.set_label( "Reject" );
+			state = CALL_WIDGET_STATE_INCOMING_TRANSFER;
+		}
+
+                if( command.getOp() == SipCommandString::call_transferred ){
+                        /* Change the callId so that we get next commands */
+                        mainCallId = command.getParam();
+                        callIds.push_back( mainCallId );
+
+                        status.set_text( "Call transferred... ");
+                }
+                
+                if( command.getOp() == SipCommandString::transfer_pending ){
+                        transferProgress.set_text( "Transfer accepted..." );
+                        //transferProgress.pulse();
+
+                }
+                
+                if( command.getOp() == SipCommandString::transfer_refused ){
+                        transferProgress.set_text( "Transfer rejected." );
+                        transferEntry.set_sensitive( true );
+                        transferButton.set_sensitive( true );
+
+                }
 
 		return true;
 	}
@@ -265,6 +388,41 @@ void CallWidget::stopRinging(){
 	}
 	CommandString cmdstr = CommandString( "", MediaCommandString::stop_ringing );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+}
+
+#ifndef OLDLIBGLADEMM
+
+void CallWidget::transfer(){
+        string uri = Glib::locale_from_utf8( transferEntry.get_text() );
+        if( uri.size() > 0 ){
+        
+                CommandString transfer( mainCallId, 
+                                SipCommandString::user_transfer, uri );
+                mainWindow->getCallback()->guicb_handleCommand( transfer );
+
+                transferEntry.set_sensitive( false );
+                transferButton.set_sensitive( false );
+
+                transferProgress.set_text( "Transfer requested..." );
+//                transferProgress.pulse();
+        }
+}
+
+#endif
+
+string CallWidget::getMainCallId(){
+        return mainCallId;
+}
+
+bool CallWidget::handlesCallId( string callId ){
+        list<string>::iterator iCallId;
+
+        for( iCallId = callIds.begin(); iCallId != callIds.end(); iCallId++ ){
+                if( *iCallId == callId ){
+                        return true;
+                }
+        }
+        return false;
 }
 
 StockButton::StockButton( Gtk::StockID stockId, Glib::ustring text ):

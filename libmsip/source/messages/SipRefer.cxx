@@ -125,3 +125,12 @@ string SipRefer::getString(){
 	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }
 
+
+string SipRefer::getReferredUri(){
+        for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
+                if ((headers[i])->getType() == SIP_HEADER_TYPE_REFERTO){
+                        string referredUri = ((SipHeaderValueReferTo *)*(headers[i]->getHeaderValue(0)))->getUri();
+                        return referredUri;
+                }
+        return "";
+}

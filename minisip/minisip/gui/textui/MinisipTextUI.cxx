@@ -65,6 +65,8 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     addCommand("show transactions");
     addCommand("show packets");
     addCommand("cmd");
+    addCommand("transfer");
+    addCommand("refuse");
     addCommand("conf");
     addCommand("accept"); //accept incoming P2T Session
     addCommand("deny");   //deny incoming P2T Session
@@ -158,6 +160,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
    
     if (cmd.getOp()=="invite_ok"){
 	    state="INCALL";
+            inCall = true;
 	    setPrompt(state);
 	    displayMessage("PROGRESS: remote participant accepted the call...", blue);
     }
@@ -165,7 +168,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
     if (cmd.getOp()=="remote_ringing"){
 	    state="REMOTE RINGING";
 	    setPrompt(state);
-	    displayMessage("PROGRESS: the remove UA is ringing...", blue);
+	    displayMessage("PROGRESS: the remote UA is ringing...", blue);
     }
 
 
@@ -228,6 +231,30 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	    
 	    }
 	    
+    }
+    
+    if (cmd.getOp()==SipCommandString::transfer_pending){
+	    if(inCall){
+		    displayMessage( "Call transfer in progress..." );
+	    }
+	    
+    }
+    
+    if (cmd.getOp()==SipCommandString::transfer_requested){
+            cerr << "TestUI got transfer_requested" << endl;
+	    if(inCall){
+		    state="TRANSFER?";
+		    setPrompt(state);
+		    displayMessage("Accept call transfer to "+cmd.getParam(), blue );
+	    }
+	    
+    }
+
+    if (cmd.getOp()==SipCommandString::call_transferred){
+            callId = cmd.getParam();
+            state="INCALL";
+            displayMessage("Call transferred ...");
+            setPrompt(state);
     }
 
     //P2T commands
@@ -727,6 +754,19 @@ void MinisipTextUI::guiExecute(string cmd){
 		callback->guicb_handleCommand(command);
 		displayMessage("A call with the most recent callId will be accepted");
 		handled=true;
+                inCall = true;
+	}
+	
+	if (command == "accept" && state == "TRANSFER?"){
+		CommandString command(callId, SipCommandString::user_transfer_accept);
+		callback->guicb_handleCommand(command);
+		handled=true;
+	}
+	
+        if (command == "reject" && state == "TRANSFER?"){
+		CommandString command(callId, SipCommandString::user_transfer_refuse);
+		callback->guicb_handleCommand(command);
+		handled=true;
 	}
 
 	if (command == "show all"){
@@ -796,6 +836,22 @@ void MinisipTextUI::guiExecute(string cmd){
 		}
 		handled=true;
 	}
+	
+        if ((command.size()>=8) && (command.substr(0,8) == "transfer")){
+		if (command.size()>=8){
+			if (state!="INCALL"){
+				displayMessage("Not in a call!", red);
+			}else{
+				string uri = trim(command.substr(9));
+				CommandString transfer(callId, SipCommandString::user_transfer, uri);
+				callback->guicb_handleCommand(transfer);
+			}
+		}else{
+			displayMessage("Usage: transfer <userid>");
+		}
+		handled=true;
+	}
+        
 	if ((command.size()>=4) && (command.substr(0,4) == "addc")){
 		if (command.size()>=6){
 			if (state!="IDLE"){
@@ -875,7 +931,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}	
 	
 	//accept a p2t invitation
-	if (command == "accept" ){
+	if (command == "accept" /*FIXME*/&& state != "TRANSFER?" ){
 		
 		//add P2T commands
 		addCommand("add");

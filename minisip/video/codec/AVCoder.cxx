@@ -96,7 +96,6 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	}
 
 	context = avcodec_alloc_context();
-        fprintf( stderr,"context->flags %i\n", context->flags );
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
@@ -108,9 +107,9 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	context->frame_rate_base = 1;
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
-        context->rc_max_rate = 2000000;
+        context->rc_max_rate = 1000000;
         context->rc_min_rate = 1000000;
-        context->rc_buffer_size = 5000000;
+        context->rc_buffer_size = 10000;
 
 
 	context->rtp_mode = 1;

@@ -37,6 +37,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipBye.h>
 #include<libmsip/SipCancel.h>
+#include<libmsip/SipRefer.h>
 #include<libmsip/SipAck.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
@@ -95,11 +96,11 @@ gui(failed)              |                                    |                |
   |              +---------------+                            |                |
   |                      |                                    |                |
   |                      | 2xx                                |                |
-  |                      v a23: [Xsend ACKX]                  |                |
-  |              +---------------+                            |                |
-  |              |               |<---------------------------+                |
+  |   refer              v a23: [Xsend ACKX]                  |                |
+  |   a27        +---------------+                            |                |
+  |  (1)---------|               |<---------------------------+                |
   |              |   in call     |-------+                                     |
-  |              |               |       |                                     |
+  |     -------->|               |       |                                     |
   |              +---------------+       |                                     |
   |                      |               | bye                                 |
   |cancel                | BYE           | a6:TransByeInit                     |
@@ -120,6 +121,63 @@ gui(failed)              |                                    |                |
 		 
    CANCEL
    a7:TrnsCnclRsp
+
+   CALL TRANSFER init:
+
+                                      refer
+                 +---------------+    a27 new TrsnReferInit
+                 |               | <-----------(1)
+                 | transf_request|  3-699 a31
+                 |               | ----------->(2)
+                 +---------------+
+                         |
+                         | 202
+                         | a28 new subscription
+                         |
+        NOTIFY 3-699     V          NOTIFY 1XX
+        a30      +---------------+  a29 (NULL)
+   (2) <---------|               |----------------+
+                 | transf_pending|                |
+   +-------------|               |<---------------+
+   |             +---------------+
+   |    BYE           |    | 
+   |    a5:new ByeResp|    | bye 
+   |                  |    | a6 TransByeInit
+   |                  V    V
+   |             +---------------+
+   |NOTIFY 2XX   |               |
+   |a32 TransByeI|  termwait     |
+   +------------>|               |
+                 +---------------+
+
+   CALL TRANSFER answer:
+
+                                      REFER
+                 +---------------+    a33 new TrsnReferResp
+                 |               | <-----------(1)
+                 |transf_ask_user|  transfer_refuse 
+                 |               |  a35 send 403
+                 +---------------+ ----------->(2)
+                         |
+                         | transfer_accept
+                         | a34 send 202, start new call
+                         |
+                         V  
+                 +---------------+
+                 |               |----+ transferred_call_progress
+                 | transf_started|    | a36 send NOTIFY 
+                 |               |<---+
+                 +---------------+
+       BYE           |    | 
+       a5:new ByeResp|    | bye 
+                     |    | a6 TransByeInit
+                     V    V
+                 +---------------+
+                 |               |
+                 |  termwait     |
+                 |               |
+                 +---------------+
+
    
 */
  
@@ -171,7 +229,7 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 	    dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
 	    
-	    string peerUri = command.getCommandPacket()->getFrom().getString();
+	    string peerUri = command.getCommandPacket()->getTo().getString();
 
 	    MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
 	    if ( !sdp.isNull() ){
@@ -392,7 +450,6 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 
 bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 {
-	fprintf( stderr, "SipDialogVoip::a10_start_ringing_INVITE\n" );
 	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::TU)){
 
 		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
@@ -683,6 +740,7 @@ bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::no_transactions) ){
 		lastInvite=NULL;
+                
 		SipSMCommand cmd(
 				CommandString( dialogState.callId, SipCommandString::call_terminated),
 				SipSMCommand::TU,
@@ -731,6 +789,113 @@ bool SipDialogVoip::a26_callingauth_termwait_cancel( const SipSMCommand &command
 	}
 }
 
+bool SipDialogVoip::a27_incall_transferrequested_transfer( const SipSMCommand &command)
+{
+//	merr << "EEEEEEEE: a6: got command."<< end;
+//	merr <<"EEEEE: type is "<< command.getType()<< end;
+	if (transitionMatch(command, SipCommandString::user_transfer)){
+//		merr << "EEEEEE match"<< end;
+//		setCurrentState(toState);
+		//int bye_seq_no= requestSeqNo();
+                string referredUri = command.getCommandString().getParam();
+		++dialogState.seqNo;
+		MRef<SipTransaction*> refertrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId)); 
+
+		registerTransaction(refertrans);
+		sendRefer(refertrans->getBranch(), dialogState.seqNo, referredUri);
+
+		return true;
+	}else{
+//		merr << "EEEEEE no match"<< end;
+		return false;
+	}
+}
+
+bool SipDialogVoip::a28_transferrequested_transferpending_202( const SipSMCommand &command){
+	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "202")){
+		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
+
+		CommandString cmdstr(dialogState.callId, 
+				SipCommandString::transfer_pending
+				);
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogVoip::a31_transferrequested_incall_36( const SipSMCommand &command)
+{
+	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
+                
+                CommandString cmdstr( dialogState.callId, SipCommandString::transfer_refused, command.getCommandPacket()->getWarningMessage());
+                getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogVoip::a33_incall_transferaskuser_REFER( const SipSMCommand &command)
+{
+
+	if (transitionMatch(command, SipRefer::type, IGN, IGN)){
+
+		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(MRef<SipDialog*>(this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+		registerTransaction(cr);
+
+		SipSMCommand cmd(command);
+		cmd.setDestination(SipSMCommand::transaction);
+
+		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		
+                lastRefer = dynamic_cast<SipRefer *>(*command.getCommandPacket());
+
+		/* Tell the GUI */
+		CommandString cmdstr(dialogState.callId, SipCommandString::transfer_requested,lastRefer->getReferredUri());
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+
+
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogVoip::a34_transferaskuser_transferstarted_accept( const SipSMCommand &command)
+{
+	if (transitionMatch(command, SipCommandString::user_transfer_accept)){
+
+		sendReferOk(lastRefer->getDestinationBranch() );
+
+		/* start a new call ... */
+		string uri = lastRefer->getReferredUri();
+                string newCallId = phoneconf->sip->invite( uri );
+
+                /* Send the new callId to the GUI */
+		CommandString cmdstr(dialogState.callId, SipCommandString::call_transferred, newCallId);
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogVoip::a35_transferaskuser_incall_refuse( const SipSMCommand &command)
+{
+	if (transitionMatch(command, SipCommandString::user_transfer_refuse)){
+
+		sendReferReject(lastRefer->getDestinationBranch());
+
+		return true;
+	}else{
+		return false;
+	}
+}
+
 
 void SipDialogVoip::setUpStateMachine(){
 
@@ -754,6 +919,18 @@ void SipDialogVoip::setUpStateMachine(){
 	
 	State<SipSMCommand,string> *s_ringing=new State<SipSMCommand,string>(this,"ringing");
 	addState(s_ringing);
+	
+        State<SipSMCommand,string> *s_transferrequested=new State<SipSMCommand,string>(this,"transferrequested");
+	addState(s_transferrequested);
+        
+	State<SipSMCommand,string> *s_transferpending=new State<SipSMCommand,string>(this,"transferpending");
+	addState(s_transferpending);
+	
+	State<SipSMCommand,string> *s_transferaskuser=new State<SipSMCommand,string>(this,"transferaskuser");
+	addState(s_transferaskuser);
+	
+	State<SipSMCommand,string> *s_transferstarted=new State<SipSMCommand,string>(this,"transferstarted");
+	addState(s_transferstarted);
 
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_callingnoauth_invite",
@@ -851,6 +1028,50 @@ void SipDialogVoip::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_cancel",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a26_callingauth_termwait_cancel,
 			s_callingauth, s_termwait);
+	
+        new StateTransition<SipSMCommand,string>(this, "transition_incall_transferrequested_transfer",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a27_incall_transferrequested_transfer,
+			s_incall, s_transferrequested);
+        
+	new StateTransition<SipSMCommand,string>(this, "transition_transferrequested_transferpending_202",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a28_transferrequested_transferpending_202,
+			s_transferrequested, s_transferpending);
+	
+        new StateTransition<SipSMCommand,string>(this, "transition_transferrequested_incall_36",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a31_transferrequested_incall_36,
+			s_transferrequested, s_incall);
+	
+	new StateTransition<SipSMCommand,string>(this, "transition_transferpending_termwait_BYE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a6_incall_termwait_hangup,
+			s_transferpending, s_termwait);
+	
+	new StateTransition<SipSMCommand,string>(this, "transition_transferpending_termwait_bye",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a5_incall_termwait_BYE,
+			s_transferpending, s_termwait);
+	
+	new StateTransition<SipSMCommand,string>(this, "transition_incall_transferaskuser_REFER",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a33_incall_transferaskuser_REFER,
+			s_incall, s_transferaskuser);
+	
+	new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_transferstarted_accept",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a34_transferaskuser_transferstarted_accept,
+			s_transferaskuser, s_transferstarted);
+	
+        new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_transferstarted_accept",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a34_transferaskuser_transferstarted_accept,
+			s_transferaskuser, s_transferstarted);
+        
+        new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_incall_refuse",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a35_transferaskuser_incall_refuse,
+			s_transferaskuser, s_incall);
+	
+        new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_BYE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a6_incall_termwait_hangup,
+			s_transferstarted, s_termwait);
+        
+        new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_bye",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a5_incall_termwait_BYE,
+			s_transferstarted, s_termwait);
 
 	setCurrentState(s_start);
 }
@@ -1207,6 +1428,34 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
+void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const string referredUri){
+/*
+	string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
+	uint32_t i = tmp.find("@");
+	assert(i!=string::npos);
+	i++;
+	string domain;
+	for ( ; i < tmp.length() ; i++)
+		domain = domain+tmp[i];
+*/
+	MRef<SipRefer*> refer = new SipRefer(
+			branch,
+			getLastInvite(),
+			dialogState.remoteUri,
+			getDialogConfig()->inherited.sipIdentity->getSipUri(),
+			getDialogConfig()->inherited.sipIdentity->sipDomain,
+                        referredUri,
+			refer_seq_no
+			);
+
+	refer->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	refer->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+
+        MRef<SipMessage*> pref(*refer);
+        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
 void SipDialogVoip::sendCancel(const string &branch){
 	assert( !lastInvite.isNull());
 	MRef<SipCancel*> cancel = new SipCancel(
@@ -1304,6 +1553,16 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
+void SipDialogVoip::sendReferOk(const string &branch){
+	MRef<SipResponse*> ok= new SipResponse(branch, 202,"OK", MRef<SipMessage*>(*lastRefer));	
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+
+        MRef<SipMessage*> pref(*ok);
+        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+//	handleCommand(cmd);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
 void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
@@ -1320,6 +1579,16 @@ void SipDialogVoip::sendReject(const string &branch){
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(ringing);
         MRef<SipMessage*> pref(*ringing);
+        SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
+//	handleCommand(cmd);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
+void SipDialogVoip::sendReferReject(const string &branch){
+	MRef<SipResponse*> forbidden = new SipResponse(branch,403,"Forbidden", MRef<SipMessage*>(*lastRefer));	
+	forbidden->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+//	setLastResponse(ringing);
+        MRef<SipMessage*> pref(*forbidden);
         SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);

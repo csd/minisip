@@ -146,6 +146,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 */	
 	// 2. If not any branch parameter or the transaction was not found, try with each dialog
 	int j=0;
+        MRef<SipDialog *> dialog;
 	if (c.getDestination()==SipSMCommand::ANY || c.getDestination()==SipSMCommand::TU){
 #ifdef DEBUG_OUTPUT
 		mdbg<< "Dispatcher(2): trying all dialogs"<<end;
@@ -156,11 +157,14 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 //#ifdef DEBUG_OUTPUT
 //			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
 //#endif
+                        dialog = dialogs[i];
+                        dialogListLock.unlock();
 			
-			if ( dialogs[i]->handleCommand(c) ){
-				dialogListLock.unlock();
+			if ( dialog->handleCommand(c) ){
+				//dialogListLock.unlock();
 				return true;
 			}
+                        dialogListLock.lock();
 		}
 		}catch(exception &exc){
 			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!1caught exception i="<< i << endl;

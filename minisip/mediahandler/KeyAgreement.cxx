@@ -50,6 +50,8 @@ bool Session::responderAuthenticate( string message ){
 	
 	if(message.substr(0,6) == "mikey "){
 
+                cerr << message << endl;
+
 		string b64Message = message.substr(6, message.length()-6);
 
 		if( message == "" )
@@ -378,6 +380,7 @@ string Session::initiatorCreate(){
 		}
 		
 		string b64Message = message->b64Message();
+                cerr << b64Message << endl;
 		delete message;
 		return "mikey "+b64Message;
 	}

@@ -94,7 +94,17 @@ class LIBMSIP_API SipCommandString{
 		static const string stop_presence_server;
 		static const string local_presence_update;
 		
-		static const string transfer;
+		/* Transfer initiation */
+		static const string user_transfer;
+		static const string transfer_pending;
+		static const string transfer_refused;
+		static const string transfer_failed;
+		
+		/* Transfer answering */
+		static const string transfer_requested;
+		static const string user_transfer_accept;
+		static const string user_transfer_refuse;
+		static const string call_transferred;
 		
 };
 

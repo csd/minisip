@@ -35,6 +35,8 @@
 #define CALL_WIDGET_STATE_CONNECTING 	2
 #define CALL_WIDGET_STATE_RINGING 	3
 #define CALL_WIDGET_STATE_INCOMING 	4
+#define CALL_WIDGET_STATE_TRANSFER_PENDING	5
+#define CALL_WIDGET_STATE_INCOMING_TRANSFER	6
 
 class MainWindow;
 
@@ -63,26 +65,43 @@ class CallWidget : public Gtk::VBox{
 		void accept();
 		void reject();
 
-		string getCallId();
+		string getMainCallId();
+                bool handlesCallId( string callId );
 
 	private:
 		void startRinging();
 		void stopRinging();
 
+#ifndef OLDLIBGLADEMM
+                void transfer();
+#endif
+
 		MainWindow * mainWindow;
-		string callId;
 
 		int32_t state;
 		//Gtk::VBox vBox;
 		Gtk::Label status;
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
+#ifndef OLDLIBGLADEMM
+                Gtk::Expander transferArrow;
+                Gtk::HBox transferHBox;
+                Gtk::HBox transferHBox2;
+                Gtk::Entry transferEntry;
+                Gtk::Button transferButton;
+        //        Gtk::ProgressBar transferProgress;
+                Gtk::Label transferProgress;
+#endif
+                Gtk::Image secureImage;
+                Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
-//		TimeoutProvider<string> *timeoutProvider;
+//		TimeoutProvider<string> *timeoutProvider;      
+                list<string> callIds;
+                string mainCallId;
 };
 
 #endif
