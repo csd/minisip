@@ -26,6 +26,7 @@
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
 #include"SipDialogVoip.h"
+#include"SipDialogPresence.h"
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipIMMessage.h>
 #include<libmsip/SipMessageContentIM.h>
@@ -111,24 +112,15 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 						phoneconf->securityConfig );
 
 			SipDialogConfig callConf(phoneconf->inherited);
-			MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, phoneconf, mediaSession);
+			MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, phoneconf, mediaSession, pkt->getCallId());
 #ifdef MINISIP_MEMDEBUG
 			voipCall.setUser("DefaultDialogHandler");
 #endif
-
-			voipCall->setCallId(pkt->getCallId());
 			getDialogContainer()->addDialog(*voipCall);
-
-			//voipCall->getDialogConfig().callId = command.getCommandPacket()->getCallId();
 
 			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
 			cmd.setDispatchCount(dispatchCount);
 
-//			SipSMCommand cmd(command);
-//			cmd.setSource(SipSMCommand::remote);
-//			cmd.setDestination(SipSMCommand::TU);
-
-			//voipCall->handleCommand(command);
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
 
@@ -185,6 +177,25 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		merr << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
 		return true;
 	}
+
+	if (cmdstr.getOp() == SipCommandString::start_presence){
+		cerr << "DefaultDialogHandler: Creating SipDialogPresence for start_presence command"<< endl;
+		
+		SipDialogConfig conf(phoneconf->inherited);
+
+		MRef<SipDialogPresence*> pres(new SipDialogPresence(getDialogContainer(), conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
+
+		getDialogContainer()->addDialog( MRef<SipDialog*>(*pres) );
+		
+		CommandString command(cmdstr);
+		cmdstr.setDestinationId(pres->getCallId());
+		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
+		cmd.setDispatchCount(dispatchCount);
+		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+
+		return true;
+	}
+
 
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
