@@ -110,7 +110,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 
 	secured = parser->getValue("secured","no")=="yes";
 	use_srtp = parser->getValue("use_srtp","no")=="yes";		
-	use_ipsec = parser->getValue("use_srtp","no")=="yes";
+	use_ipsec = parser->getValue("use_ipsec","no")=="yes";
 	
 	dh_enabled   = parser->getValue("dh_enabled","no")=="yes";
 	psk_enabled  = parser->getValue("psk_enabled","no")=="yes";

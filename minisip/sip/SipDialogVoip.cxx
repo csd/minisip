@@ -18,7 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *	    Joachim Orrblad <joachim@orrblad.com>
+ *	    Joachim Orrblad <joachim[at]orrblad.com>
 */
 
 /* Name
@@ -902,7 +902,6 @@ void SipDialogVoip::sendInvite(const string &branch){
 	MRef<SipMimeContent*> mikey;
 	if (ipsecSession){
 		mikey = ipsecSession->getMikeyIpsecOffer();
-		merr << "\nI should have an MikeyIPSEC offer!!\n" << end;
 		if (!mikey){
 			merr << "Mikey was NULL in sendInvite" << end;
 			return; 

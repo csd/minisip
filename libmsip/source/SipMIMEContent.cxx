@@ -97,7 +97,6 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentTyp) {
 
 std::string SipMimeContent::getString() {
 	if(ContentType.substr(0,9) == "multipart"){
-		merr << "I am where I should be!!!!" << end;
 		std::list <MRef<SipMessageContent*> >::iterator iter;
 		std::string mes;
 		if(Message != "")
@@ -111,11 +110,9 @@ std::string SipMimeContent::getString() {
 				mes = mes + (*iter)->getString() + "\r\n\r\n";
 			}
 		mes = mes + "--" + boundry + "--" + "\r\n";
-		merr << "\nReturning" << mes << end;
 		return mes;
 	}
 	else{
-		merr << "I am where I should NOT be!!!!" << end;
 		return Message;
 	}
 }

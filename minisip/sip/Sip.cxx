@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim[at]orrblad.com>
 */
 
 #include"Sip.h"
@@ -171,7 +172,7 @@ MRef<Session *> mediaSession =
 
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession;
-	if (!securityConfig.use_ipsec){
+	if (securityConfig.use_ipsec){
 		ipsecSession = new	MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	}
 	else{

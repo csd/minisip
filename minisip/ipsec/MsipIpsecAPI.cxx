@@ -100,7 +100,7 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 		
 		string b64Message = message->b64Message();
 		delete message;
-		return new SipMimeContent("application/mikey", b64Message);
+		return new SipMimeContent("application/mikey", b64Message, "");
 	}
 	catch( certificate_exception * exc ){
 		// FIXME: tell the GUI
@@ -360,7 +360,6 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 				(struct sockaddr *) &src, (struct sockaddr *) &dst);
 	madeREQ.push_back((MsipIpsecRequest*) sa);
 	int result = sa->set();
-	merr << "Result from SET: " << result << end;
 	if (result == -1)
 		return 0;
 	return result;
@@ -371,7 +370,6 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 void MsipIpsecAPI::addSAToKa(uint8_t policyNo){
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_IPSEC4_ID);
 	uint32_t offerspi = getOfferSPI();
-	merr << "\nDid get this far! OfferSPI: "<< (int)offerspi  << end;
 	assert(offerspi);
 	ka->addIpsecSA( offerspi, 0, localIp, policyNo);
 	/* Placeholder for the receiver to place his SPI */
@@ -784,7 +782,6 @@ int MsipIpsecSA::set(){
 		result = pfkey_check(next);
 		m_sa = (struct sadb_sa *)next[SADB_EXT_SA];
 		spi = (u_int32_t)ntohl(m_sa->sadb_sa_spi);
-		merr << "\nDid get this far! with SPI: " << (int)spi << end;
 		exist = true;
 		return (int)spi;
 	}
