@@ -170,14 +170,14 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 	    //the remote sequence number
 	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 	    dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
+	    
+	    string peerUri = command.getCommandPacket()->getFrom().getString();
 
-	 //   MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
-	   // if ( !sdp.isNull() ){
-	    //	vc->getMediaSession()->setSdpAnswer( sdp );
-	    //}
-	    //		else{
-	    //			mdbg << "WARNING: 200 OK did not contain any session description"<< end;
-	    //		}
+	    MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
+	    if ( !sdp.isNull() ){
+		    //Early media
+		    getMediaSession()->setSdpAnswer( sdp, peerUri );
+	    }
 
 	    return true;
 	}
@@ -317,6 +317,7 @@ bool SipDialogVoip::a7_callingnoauth_termwait_CANCEL( const SipSMCommand &comman
 		cmd.setDestination(SipSMCommand::transaction);
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -334,6 +335,7 @@ bool SipDialogVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &comman
 		registerTransaction(canceltrans);
 		sendCancel(canceltrans->getBranch());
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -380,6 +382,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 				" that could not be handled (unimplemented)"<< end;
                 }
 		
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -509,6 +512,7 @@ bool SipDialogVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 
 		sendInviteOk(cr->getBranch() ); 
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -525,6 +529,7 @@ bool SipDialogVoip::a13_ringing_termwait_reject( const SipSMCommand &command)
 
 		sendReject( getLastInvite()->getDestinationBranch() );
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -593,14 +598,13 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
-//		if ( !resp->getContent().isNull()){
-//			MRef<SdpPacket *> sdp = (SdpPacket*)*resp->getContent();
-//			vc->getMediaSession()->setSdpAnswer( sdp );
-//
-//		}
-		//		else{
-		//			merr << "WARNING: 200 OK did not contain any session description"<< end;
-		//		}
+
+		string peerUri = resp->getFrom().getString();
+		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
+		if ( !sdp.isNull() ){
+			//Early media
+			getMediaSession()->setSdpAnswer( sdp, peerUri );
+		}
 
 		return true;
 	}else{
@@ -667,6 +671,7 @@ bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	} else{
@@ -718,6 +723,7 @@ bool SipDialogVoip::a26_callingauth_termwait_cancel( const SipSMCommand &command
 		registerTransaction(canceltrans);
 		sendCancel(canceltrans->getBranch());
 
+		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
 	}else{

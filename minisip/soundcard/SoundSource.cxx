@@ -107,6 +107,7 @@ void BasicSoundSource::pushSound(short * samples,
                                 int32_t index,
                                 bool isStereo)
 {
+//	cerr << "Calling pushSound for source " << getId() << endl;
         index++; //dummy op
         npush++;
         if (nprint)
@@ -148,6 +149,7 @@ int nget=1;
 void BasicSoundSource::getSound(short *dest,
                 bool dequeue)
 {
+//	cerr << "Calling getSound for source " << getId() << endl;
         nget++;
         if (nget%1000==0)
                 nprint=true,cerr << "nget="<< nget<< endl;

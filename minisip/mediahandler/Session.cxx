@@ -181,6 +181,10 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 					/* This offer was rejected */
 					receiver->disabled = true;
 				}
+				else{
+					/* Be ready to receive */
+					receiver->start();
+				}
 			}
 		}
 	}

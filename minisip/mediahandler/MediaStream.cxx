@@ -149,6 +149,7 @@ void MediaStream::addToM( MRef<SdpPacket*> packet, MRef<SdpHeaderM *> m ){
 MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 	MRef<CryptoContext *> cryptoContext;
 	
+	kaLock.lock();
 	if( !ka ){
 		/* Dummy cryptocontext */
 		cryptoContext = new CryptoContext( ssrc );
@@ -197,18 +198,22 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 	}
 
 	cryptoContexts.push_back( cryptoContext );
+	kaLock.unlock();
 	return cryptoContext;
 }
 
 MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc ){
+	kaLock.lock();
 	list< MRef<CryptoContext *> >::iterator i;
 
 	for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
 		if( (*i)->getSsrc() == ssrc ){
+			kaLock.unlock();
 			return (*i);
 		}
 	}
 
+	kaLock.unlock();
 	return initCrypto( ssrc );
 }
 
@@ -217,7 +222,13 @@ uint32_t MediaStream::getSsrc(){
 }
 
 void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
+	kaLock.lock();
 	this->ka = ka;
+
+	/* Reset the CryptoContext since we have a new KeyAgreement */
+	cryptoContexts.clear();
+
+	kaLock.unlock();
 }
 
 
@@ -230,6 +241,7 @@ MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 	id = rand();
 	externalPort = 0;
 	ssrc = 0;
+	running = false;
 }
 
 uint32_t MediaStreamReceiver::getId(){
@@ -237,7 +249,10 @@ uint32_t MediaStreamReceiver::getId(){
 }
 
 void MediaStreamReceiver::start(){
-	rtpReceiver->registerMediaStream( this );
+	if( !running ){
+		rtpReceiver->registerMediaStream( this );
+		running = true;
+	}
 }
 
 void MediaStreamReceiver::stop(){
@@ -250,6 +265,8 @@ void MediaStreamReceiver::stop(){
 	}
 	ssrcList.clear();
 	ssrcListLock.unlock();
+	
+	running = false;
 }
 
 

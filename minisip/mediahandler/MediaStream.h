@@ -70,6 +70,7 @@ class MediaStream : public MObject{
 	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );
 		MRef<KeyAgreement *> ka;
+		Mutex kaLock;
 		std::list< MRef<CryptoContext *> > cryptoContexts;
 };
 
@@ -94,6 +95,8 @@ class MediaStreamReceiver : public MediaStream{
 
 		std::list<uint32_t> ssrcList;
 		Mutex ssrcListLock;
+
+		bool running;
 
 };
 

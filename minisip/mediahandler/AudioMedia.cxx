@@ -159,8 +159,6 @@ void AudioMediaSource::playData( RtpPacket * rtpPacket ){
                  	outputSize, hdr.getSeqNo() );
 		
         }
-
-	delete rtpPacket;
 }
 
 MRef<AudioCodec *> AudioMediaSource::findCodec( uint8_t payloadType ){
