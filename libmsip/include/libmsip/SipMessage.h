@@ -60,6 +60,8 @@ class SipMessage : public MObject{
 		SipMessage(int type, string &build_from);
 		virtual ~SipMessage();
 
+		static MRef<SipMessage*> createMessage(string &buf); 
+
                 /**
                  * There are two ways to determine what kind of SIP message
                  * a SipMessage really is - dynamic_cast and getType.
@@ -119,7 +121,7 @@ class SipMessage : public MObject{
                 /**
                  * @return Content of the SIP message
                  */
-		MRef<SipMessageContent*> getContent();
+		MRef<SipMessageContent *> getContent();
 		
                 /**
                  * @return The command sequence identifier (integer part).

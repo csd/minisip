@@ -71,10 +71,8 @@
 #include<libmutil/trim.h>
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
-
-#ifdef DEBUG_OUTPUT
 #include<libmsip/SipResponse.h>
-#endif
+
 
 SMCFCollection SipMessage::contentFactories=SMCFCollection();
 
@@ -90,6 +88,42 @@ string SipMessage::getDescription(){
 
 SipMessage::~SipMessage(){
 
+}
+
+MRef<SipMessage*> SipMessage::createMessage(string &data){
+	
+	int n = data.size();
+
+	if (n>3   &&    (data[0]=='S'||data[0]=='s') &&
+			(data[1]=='I'||data[1]=='i') &&
+			(data[2]=='P'||data[2]=='p' )){
+		return MRef<SipMessage*>(new SipResponse(data));
+	}else{
+		if (n> 7 && data.substr(0, 7) == "MESSAGE"){
+			return MRef<SipMessage*>(new SipIMMessage(data));
+		}
+		if (n> 6 && data.substr(0, 6) == "CANCEL"){
+			return MRef<SipMessage*>(new SipCancel(data));
+		}
+		if (n> 3 && data.substr(0, 3)=="BYE"){
+			return MRef<SipMessage*>(new SipBye(data));
+		}
+		if (n> 6 && data.substr(0, 6)=="INVITE"){
+			return MRef<SipMessage*>(new SipInvite(data));
+		}
+		if (n> 3 && data.substr(0, 3)=="ACK"){
+			return MRef<SipMessage*>(new SipAck(data));
+		}
+		if (n> 9 && data.substr(0, 9)=="SUBSCRIBE"){
+			return MRef<SipMessage*>(new SipSubscribe(data));
+		}
+		if (n> 6 && data.substr(0, 6)=="NOTIFY"){
+			return MRef<SipMessage*>(new SipNotify(data));
+		}
+
+		throw new SipExceptionInvalidStart;
+	}
+	return NULL;
 }
 
 ostream & operator<<(ostream &out, SipMessage &p){
