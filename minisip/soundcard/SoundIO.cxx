@@ -444,6 +444,10 @@ int SoundSource::getId(){
 	return sourceId;
 }
 
+int SoundSource::getPos(){
+	return sourcePos;
+}
+
 // Two cases - might have to "wrap around"
 //            v-firstFree
 // 1:  ...xxxx..........

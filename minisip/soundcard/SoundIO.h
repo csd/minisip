@@ -91,6 +91,11 @@ class SoundSource : public MObject{
 		int getId();
 
 		/**
+		 * @return		Spatial position of the source.
+		 */
+		int getPos();
+
+		/**
 		 * @param samples	Buffer with samples that will be enqueued.
 		 * @param nSamples	Number of samples (per channel) in buffer.
 		 * @isStereo		Indicates if one or two channels are used.
@@ -113,6 +118,7 @@ class SoundSource : public MObject{
 		
 	private:
 		int sourceId;
+		int sourcePos;
 };
 
 class BasicSoundSource: public SoundSource{
