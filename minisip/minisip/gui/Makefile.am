@@ -1,5 +1,5 @@
 if TEXT_UI
-SUBDIRS = textui conferencecontroller
+SUBDIRS = textui
 else
 if GTK_GUI
 SUBDIRS = gtkgui
