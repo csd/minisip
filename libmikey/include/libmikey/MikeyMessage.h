@@ -40,6 +40,7 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 
+
 #define MIKEY_TYPE_PSK_INIT    0
 #define MIKEY_TYPE_PSK_RESP    1
 #define MIKEY_TYPE_PK_INIT     2 
@@ -126,6 +127,7 @@ class MikeyMessage{
 		byte_t *rawData;
 		
 };
+
 
 
 #endif

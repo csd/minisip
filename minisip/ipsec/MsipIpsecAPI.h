@@ -24,7 +24,18 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include"../sip/SipDialogSecurityConfig.h"
+#include<libmutil/MemObject.h>
+#include<libmsip/SipMessageContent.h>
 
+class MikeyPacket : public SipMessageContent{
+	public:
+		MikeyPacket(string b64Message) {this->b64Message = b64Message;}
+		virtual std::string getString() {return b64Message;}
+		virtual std::string getContentType() {return "application/mikey";}
+		virtual std::string getMemObjectType(){return "MikeyPacket";}
+	private:
+		string b64Message;
+};
 
 class MsipIpsecRequest{
 	public:
@@ -106,19 +117,20 @@ class MsipIpsecPolicy : public MsipIpsecRequest{
 };
 
 
-class MsipIpsecAPI{
+class MsipIpsecAPI : public MObject{
         public:
 		MsipIpsecAPI(string localIp, SipDialogSecurityConfig &securityConfig);
 		~MsipIpsecAPI();
-		
+		virtual std::string getMemObjectType(){return "MsipIpsecAPI";}
+
 		// Get initial MIKEY offer
-		string getMikeyIpsecOffer();
+		MRef<MikeyPacket *> getMikeyIpsecOffer();
 		// Handle received offer
-		bool setMikeyIpsecOffer(string MikeyM);
+		bool setMikeyIpsecOffer(MRef<MikeyPacket *> MikeyM);
 		// Build answer
-		string getMikeyIpsecAnswer();
+		MRef<MikeyPacket *> getMikeyIpsecAnswer();
 		// Handle received answer
-                bool setMikeyIpsecAnswer(string MikeyM);
+                bool setMikeyIpsecAnswer(MRef<MikeyPacket *> MikeyM);
 		//Remove SA and policy from kernel, -1 == error
 		int stop();
 		//Write SA and policy to kernel -1 == error

@@ -33,7 +33,6 @@
 #include <libmikey/MikeyMessage.h>
 #include <libmikey/MikeyPayloadSP.h>
 #include<libmikey/MikeyException.h>
-//#include <libmnetutil/NetworkFunctions.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -69,7 +68,7 @@ MsipIpsecAPI::~MsipIpsecAPI(){
 //-MsipIpsecAPI-PUBLIC-------------------------------------------------------------------------------//
 //---------------------------------------------------------------------------------------------------//
 // Construct offer MIKEY
-string MsipIpsecAPI::getMikeyIpsecOffer(){
+MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecOffer(){
 	MikeyMessage * message;
 	
 	try{
@@ -102,28 +101,28 @@ string MsipIpsecAPI::getMikeyIpsecOffer(){
 		
 		string b64Message = message->b64Message();
 		delete message;
-		return b64Message;
+		return new MikeyPacket(b64Message);
 	}
 	catch( certificate_exception * exc ){
 		// FIXME: tell the GUI
-		merr << "Could not open certificate" <<end;
+		merr << "Could not open certificate" << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
-		return "";
+		return NULL;
 	}
 	catch( MikeyException * exc ){
 		merr << "MikeyException caught: " << exc->message() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec=false;
-		return "";
+		return NULL;
 	}
 }
 
 //---------------------------------------------------------------------------------------------------//
 // Handle offered MIKEY
-bool MsipIpsecAPI::setMikeyIpsecOffer(string MikeyM){
-	if( MikeyM != "" && securityConfig.use_ipsec){
-		if( !responderAuthenticate( MikeyM ) ){
+bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<MikeyPacket *> MikeyM){
+	if( MikeyM->getContentType() == "application/mikey" && securityConfig.use_ipsec){
+		if( !responderAuthenticate( MikeyM->getString() ) ){
 			string errorString =  "Incoming key management message could not be authenticated";
 			if( ka ){
 				errorString += ka->authError();
@@ -158,21 +157,21 @@ bool MsipIpsecAPI::setMikeyIpsecOffer(string MikeyM){
 
 //---------------------------------------------------------------------------------------------------//
 // Construct responder MIKEY
-string MsipIpsecAPI::getMikeyIpsecAnswer(){
+MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecAnswer(){
 	if( securityConfig.use_ipsec && initMSipIpsec() ){
-		string keyMgmtAnswer;
+		// string keyMgmtAnswer;
 		// Generate the key management answer message
 		if( ! ( securityConfig.ka_type & KEY_MGMT_METHOD_MIKEY ) ){
 			merr << "Unknown type of key agreement" << end;
 			securityConfig.use_ipsec = false;
-			return "";
+			return NULL;
 		}
 		MikeyMessage * responseMessage = NULL;
 		MikeyMessage * initMessage = (MikeyMessage *)ka->initiatorData();
 		if( initMessage == NULL ){
 			merr << "Uninitialized message, this is a bug" << end;
 			securityConfig.use_ipsec = false;
-			return "";
+			return NULL;
 		}
 		try{
 			switch( securityConfig.ka_type ){
@@ -227,18 +226,20 @@ string MsipIpsecAPI::getMikeyIpsecAnswer(){
 			if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH )
                                 ((KeyAgreementDH *)*ka)->computeTgk();
 			if(start() == -1)
-				return string("");
-			return responseMessage->b64Message();
+				return NULL;
+			return new MikeyPacket(responseMessage->b64Message());
 		}
 	}
-	return string("");
+	return NULL;
 }
 
 //---------------------------------------------------------------------------------------------------//
 //Handle responded MIKEY
-bool MsipIpsecAPI::setMikeyIpsecAnswer(string MikeyM){
+bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<MikeyPacket *> MikeyM){
 
-	if( !initiatorAuthenticate( MikeyM ) ){
+	if (MikeyM->getContentType() != "application/mikey")
+		return false;
+	if( !initiatorAuthenticate( MikeyM->getString() ) ){
 		string errorString = "Could not authenticate the key management message";
 		fprintf( stderr, "Auth failed\n");
 		return false;
