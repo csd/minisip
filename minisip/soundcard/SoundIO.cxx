@@ -53,7 +53,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/Thread.h>
 #include"../spaudio/SpAudio.h"
-#include<samplerate.h>
 #include<libmutil/mtime.h>
 #include<libmutil/print_hex.h>
 
