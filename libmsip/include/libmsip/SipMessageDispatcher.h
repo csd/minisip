@@ -6,13 +6,12 @@
 #include<list>
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
-
-//#include<libmutil/minilist.h>
+#include<libmutil/minilist.h>
+#include<libmsip/SipDialog.h>
+#include<libmsip/SipTransaction.h>
 
 using namespace std;
 
-class SipTransaction;
-class SipDialog;
 
 class SipMessageDispatcher : public SipSMCommandReceiver{
 	public:
@@ -46,9 +45,7 @@ class SipMessageDispatcher : public SipSMCommandReceiver{
 		}
 
 	private:
-//		list<MRef<SipTransaction*> > transactions;
 		minilist<MRef<SipTransaction*> > transactions;
-//		list<MRef<SipDialog*> > dialogs;
 		minilist<MRef<SipDialog*> > dialogs;
 		Mutex dialogListLock;
 };

@@ -114,6 +114,8 @@ class SipMessageTransport : public virtual MObject{
 
 };
 
+#include<libmsip/SipMessage.h>
+#include<libmsip/SipDialogContainer.h>
 
 
 #endif

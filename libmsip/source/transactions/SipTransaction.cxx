@@ -57,7 +57,7 @@ SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const 
 	}
 
 	try{
-		toaddr = new IP4Address(dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyAddressString);
+		toaddr = new IP4Address(dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyAddressString);
 	}
 	catch( HostNotFound * exc ){
 		toaddr = NULL;
@@ -66,7 +66,7 @@ SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const 
 		delete exc;
 	}
 
-	port = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort;
+	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 }
 
 SipTransaction::~SipTransaction(){
@@ -95,14 +95,14 @@ void SipTransaction::send(MRef<SipMessage*> pack, string br){
 
 		if(toaddr){
 		
-			dialog->getDialogConfig().inherited.sipTransport->sendMessage(pack,
+			dialog->getDialogConfig()->inherited.sipTransport->sendMessage(pack,
 					*toaddr,
 					port, 
 					//	getDialog()->getDialogContainer()->getPhoneConfig()->proxyConnection, 
 					dummy,
 					//branch,
 					br,
-					dialog->getDialogConfig().inherited.transport  );
+					dialog->getDialogConfig()->inherited.transport  );
 		}
 #ifdef DEBUG_OUTPUT
 		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<end;

@@ -68,7 +68,10 @@ const string SipCommandString::setpassword="setpassword";
 const string SipCommandString::incoming_im="incoming_im";
 const string SipCommandString::outgoing_im="outgoing_im";
 
-const string SipCommandString::start_presence="start_presence";
-const string SipCommandString::stop_presence="stop_presence";
-const string SipCommandString::presence_update="presence_update";
+const string SipCommandString::start_presence_client="start_presence_client";
+const string SipCommandString::stop_presence_client="stop_presence_client";
+const string SipCommandString::remote_presence_update="remote_presence_update";
 
+const string SipCommandString::start_presence_server= "start_presence_server";
+const string SipCommandString::stop_presence_server= "stop_presence_server";
+const string SipCommandString::local_presence_update= "local_presence_update";

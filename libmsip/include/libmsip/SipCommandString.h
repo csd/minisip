@@ -75,9 +75,13 @@ class SipCommandString{
 		static const string incoming_im;
 		static const string outgoing_im;
 
-		static const string start_presence;
-		static const string stop_presence;
-		static const string presence_update;
+		static const string start_presence_client;
+		static const string stop_presence_client;
+		static const string remote_presence_update;
+
+		static const string start_presence_server;
+		static const string stop_presence_server;
+		static const string local_presence_update;
 		
 };
 

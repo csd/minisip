@@ -399,8 +399,8 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipDialog*> call,
 		timerA(500),
 		command_seq_no(seq_no)
 {
-	toaddr = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort;
+	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
+	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 	
 	setUpStateMachine();
 }
@@ -421,8 +421,8 @@ bool SipTransactionInviteClient::handleCommand(const SipSMCommand &c){
 
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
         MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->getDialogConfig().uri_foreign, 
-			dialog->getDialogConfig().inherited.sipIdentity->sipDomain
+	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->getDialogConfig()->uri_foreign, 
+			dialog->getDialogConfig()->inherited.sipIdentity->sipDomain
 			); 
 	//TODO:
 	//ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );

@@ -28,7 +28,7 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipMessageDispatcher.h>
-#include<libmsip/SipDialog.h>
+#include<libmsip/SipSMCommand.h>
 
 
 using namespace std;
@@ -43,6 +43,8 @@ using namespace std;
 #define PRIO_LAST_IN_QUEUE 1
 #define PRIO_FIRST_IN_QUEUE 2
 
+class SipTransaction;
+class SipDialog;
 
 /**
  * queue_type: For internal use only!
@@ -171,5 +173,8 @@ class SipDialogContainer : public MObject{
                 Mutex mlock;
                 
 };
+
+#include<libmsip/SipTransaction.h>
+#include<libmsip/SipDialog.h>
 
 #endif

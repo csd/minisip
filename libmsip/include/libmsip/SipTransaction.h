@@ -34,11 +34,11 @@
 
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipSMCommand.h>
-#include<libmsip/SipMessageDispatcher.h>
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 
 class SipDialog;
+class SipMessageDispatcher;
 
 /**
  * SipTransaction
@@ -83,5 +83,8 @@ class SipTransaction : public StateMachine<SipSMCommand,string>{
 
 		string debugTransType;
 };
+
+#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipDialog.h>
 
 #endif

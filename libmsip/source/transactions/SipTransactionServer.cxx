@@ -279,11 +279,10 @@ SipTransactionServer::SipTransactionServer(MRef<SipDialog*> call, int seq_no, co
 		timerT1(500),
 		command_seq_no(seq_no)
 {
-	SipDialogConfig * config = &dialog->getDialogConfig();
-	config->local_called=false;
+	dialog->getDialogConfig()->local_called=false;
 	
-	toaddr = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort;
+	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
+	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 	
 	setUpStateMachine();
 }

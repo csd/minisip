@@ -23,11 +23,8 @@
 #ifndef SIPDIALOG_H
 #define SIPDIALOG_H
 
-#include<libmsip/SipMessage.h>
-#include<libmsip/SipDialogConfig.h>
 #include<libmsip/SdpPacket.h>
 
-#include<libmsip/SipTransaction.h>
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
@@ -35,6 +32,8 @@
 using namespace std;
 
 class SipDialogContainer;
+class SipTransaction;
+class SipDialogConfig;
 
 /**
  * A dialog is a long term relationship between two or more clients and
@@ -54,7 +53,8 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 		 * @param callconf   The Dialog Configuration
 		 */
 		SipDialog(MRef<SipDialogContainer*> dContainer, 
-				const SipDialogConfig &callconf, 
+//				const SipDialogConfig &callconf, 
+				MRef<SipDialogConfig*> callconf,
 				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider );
 		
 		/**
@@ -76,7 +76,7 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 		 * get the dialog configuration
 		 * @return reference to the <code>SipDialogConfig</code>
 		 */
-		SipDialogConfig &getDialogConfig();
+		MRef<SipDialogConfig*> getDialogConfig();
 
 		int32_t requestSeqNo();
 		void setSeqNo(int32_t seq);
@@ -118,8 +118,13 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 	private:
 		
 		///the dialog configuration
-		SipDialogConfig callConfig;
+		MRef<SipDialogConfig*> callConfig;
 };
+
+#include<libmsip/SipTransaction.h>
+#include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipDialogConfig.h>
+
 
 #endif
 

@@ -387,8 +387,8 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipDialog*> d, int s
 		timerG(500),
 		command_seq_no(seq_no) 
 {
-	toaddr = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort;
+	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
+	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();
 }
 

@@ -32,7 +32,7 @@
 #include<libmutil/CommandString.h>
 
 
-SipDialog::SipDialog(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
+SipDialog::SipDialog(MRef<SipDialogContainer*> dContainer, /*const SipDialogConfig &callconf*/ MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
                 StateMachine<SipSMCommand,string>(tp), 
                 dialogContainer(dContainer), 
                 callConfig(callconf)
@@ -44,7 +44,7 @@ SipDialog::~SipDialog(){
 
 }
 
-SipDialogConfig &SipDialog::getDialogConfig(){
+MRef<SipDialogConfig*> SipDialog::getDialogConfig(){
 	return callConfig;
 }
 
@@ -61,11 +61,11 @@ void SipDialog::handleTimeout(const string &c){
 }
 
 int32_t SipDialog::requestSeqNo(){
-	return ++(getDialogConfig().seqNo);
+	return ++(getDialogConfig()->seqNo);
 }
 
 void SipDialog::setSeqNo(int32_t s){
-	(getDialogConfig().seqNo)=s;
+	(getDialogConfig()->seqNo)=s;
 }
 
 MRef<SipDialogContainer*> SipDialog::getDialogContainer(){

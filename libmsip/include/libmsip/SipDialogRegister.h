@@ -31,16 +31,16 @@
 
 class SipDialogRegister : public SipDialog{
 	public:
-		SipDialogRegister(MRef<SipDialogContainer*> dContainer, SipDialogConfig &conf,MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider);
+		SipDialogRegister(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> conf,MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider);
 		virtual ~SipDialogRegister();
 
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual string getName(){return "SipDialogRegister["+getDialogConfig().inherited.sipIdentity->sipDomain+"]";}
+		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited.sipIdentity->sipDomain+"]";}
 		
 //#ifdef DEBUG_OUTPUT	
-		virtual std::string getMemObjectType(){return "SipDialogRegister["+getDialogConfig().inherited.sipIdentity->sipDomain+"]";}
+		virtual std::string getMemObjectType(){return "SipDialogRegister["+getDialogConfig()->inherited.sipIdentity->sipDomain+"]";}
 //#endif
 
 
