@@ -799,14 +799,13 @@ int MsipIpsecSA::set(){
 	// There might be a good idea to check the result & return values below!!!
 	if(!spi && !exist && valid){
 		struct sadb_sa * m_sa;
-		u_int32_t min = htonl(5000);
-		u_int32_t max = htonl(12000);
+		u_int32_t min = 5000;
+		u_int32_t max = 12000;
+		//u_int32_t min = htonl(5000);
+		//u_int32_t max = htonl(12000);
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		ts.save("pfkey_send_getspi");
 		result = pfkey_send_getspi(so, satype, mode, src, dst, min, max, reqid, seq);
-		ts.save("pfkey_send_getspi");
 		msg = pfkey_recv(so);
-		ts.save("pfkey_send_getspi");
 /* end --------------------------------------------------------------------------------**********************/
 		if (result == -1){
 			return result;
@@ -832,13 +831,10 @@ int MsipIpsecSA::set(){
 		
 		//cerr << "Adding SA SPI: " << ntohl(spi) << endl;
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		ts.save("pfkey_send_add");
 		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
 					flags, l_alloc, l_bytes, l_addtime, l_usetime, seq);
-		ts.save("pfkey_send_add");
 		msg = pfkey_recv(so);
-		ts.save("pfkey_send_add");
 /* end---------------------------------------------------------------------------------**********************/
 		if (result == -1){
 			merr << "Problem with IPSEC pfkey_send_add: " << end;
@@ -908,11 +904,8 @@ int MsipIpsecPolicy::set(){
 	int len = ipsec_get_policylen(pol);
 	// There might be a good idea to check the result & return values below!!!
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-	ts.save("pfkey_send_spdadd");
 	result = pfkey_send_spdadd(so, src, prefs, dst, prefd, proto, pol, len, seq); 
-	ts.save("pfkey_send_spdadd");
 	msg = pfkey_recv(so);
-	ts.save("pfkey_send_spdadd");
 /* end --------------------------------------------------------------------------------**********************/
 	exist = true;
 	return result;
