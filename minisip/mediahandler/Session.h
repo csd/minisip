@@ -50,6 +50,7 @@ class Session : public MObject{
 		void addMediaStreamSender( MRef<MediaStream *> );
 
 		std::string getErrorString();
+		uint16_t getErrorCode();
 
 		bool isSecure();
 
@@ -79,6 +80,7 @@ class Session : public MObject{
 		bool secured;
 
 		std::string errorString;
+		uint16_t errorCode;
 		SipDialogSecurityConfig securityConfig;
 
 };

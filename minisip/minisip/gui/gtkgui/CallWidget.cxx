@@ -187,6 +187,9 @@ bool CallWidget::handleCommand( CommandString command ){
 		
 		if( command.getOp() == SipCommandString::remote_unacceptable ){
 			status.set_text( "The remote user could not\nhandle the call." );
+			if( command.getParam() != "" ){
+				secStatus.set_markup( "<small>" + command.getParam() + "</small>" );
+			}
 			hideAcceptButton();
 			rejectButton.set_label( "Close" );
 			state = CALL_WIDGET_STATE_TERMINATED;

@@ -374,6 +374,10 @@ string Session::getErrorString(){
 	return errorString;
 }
 
+uint16_t Session::getErrorCode(){
+	return errorCode;
+}
+
 bool Session::isSecure(){
 	return securityConfig.secured;
 }

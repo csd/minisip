@@ -44,6 +44,7 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipHeaderWarning.h>
 #include"DefaultDialogHandler.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
@@ -348,7 +349,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 			setLogEntry( rejectedLog );
 			rejectedLog->handle();
                         
-                        CommandString cmdstr( callId, SipCommandString::remote_unacceptable);
+                        CommandString cmdstr( callId, SipCommandString::remote_unacceptable, command.getCommandPacket()->getWarningMessage());
 			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		}
 		else if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"4**")){
@@ -1135,6 +1136,11 @@ void SipDialogVoip::sendNotAcceptable(const string &branch){
 #ifdef MINISIP_MEMDEBUG
 	not_acceptable.setUser("SipDialogVoip");
 #endif
+	if( mediaSession && mediaSession->getErrorString() != "" ){
+		not_acceptable->addHeader( 
+			new SipHeaderWarning(getDialogConfig()->inherited.externalContactIP, 399, mediaSession->getErrorString() ) );
+	}
+
 	not_acceptable->getHeaderTo()->setTag(getDialogConfig()->tag_local);
 //	setLastResponse(not_acceptable);
         MRef<SipMessage*> pref(*not_acceptable);
