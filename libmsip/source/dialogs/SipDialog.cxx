@@ -37,7 +37,8 @@ SipDialog::SipDialog(MRef<SipDialogContainer*> dContainer, /*const SipDialogConf
                 dialogContainer(dContainer), 
                 callConfig(callconf)
 {
-	
+	dialogState.seqNo=100;
+	dialogState.remoteSeqNo=-1;
 }
 
 SipDialog::~SipDialog(){
@@ -50,7 +51,7 @@ MRef<SipDialogConfig*> SipDialog::getDialogConfig(){
 
 void SipDialog::handleTimeout(const string &c){
 	SipSMCommand cmd( 
-			CommandString(callId, c), 
+			CommandString(dialogState.callId, c), 
 			SipSMCommand::TU, 
 			SipSMCommand::TU );
 
@@ -61,11 +62,11 @@ void SipDialog::handleTimeout(const string &c){
 }
 
 int32_t SipDialog::requestSeqNo(){
-	return ++(getDialogConfig()->seqNo);
+	return ++(/*getDialogConfig()->*/dialogState.seqNo);
 }
 
 void SipDialog::setSeqNo(int32_t s){
-	(getDialogConfig()->seqNo)=s;
+	(/*getDialogConfig()->*/dialogState.seqNo)=s;
 }
 
 MRef<SipDialogContainer*> SipDialog::getDialogContainer(){
@@ -80,7 +81,7 @@ void SipDialog::registerTransaction(MRef<SipTransaction*> trans){
 void SipDialog::signalIfNoTransactions(){
 	if (transactions.size()==0){
 		SipSMCommand cmd(
-				CommandString(callId, SipCommandString::no_transactions), 
+				CommandString(dialogState.callId, SipCommandString::no_transactions), 
 				SipSMCommand::TU, 
 				SipSMCommand::TU 
 				);
@@ -126,7 +127,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 		return false;
 	}
 
-	if (command.getType()==SipSMCommand::COMMAND_PACKET && callId!="" && callId != command.getCommandPacket()->getCallId()){
+	if (command.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId!="" && dialogState.callId != command.getCommandPacket()->getCallId()){
 		mdbg << "SipDialog: denying command based on destination id"<< end;
 		return false;
 	}

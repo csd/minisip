@@ -62,7 +62,7 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 			ts.start();
 		
 		//increment sequence number
-		/*vc->*/getDialogConfig()->seqNo++;
+		/*vc->*/dialogState.seqNo++;
 
 		//start RtcpTransactionGetFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
@@ -78,9 +78,9 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc*/ this), 
-				/*vc->*/getDialogConfig()->seqNo, 
+				/*vc->*/dialogState.seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
-				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), callId);
+				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), dialogState.callId);
 			
 			
 			MRef<RtcpTransactionGetFloor*>gf_casted = MRef<RtcpTransactionGetFloor*>((RtcpTransactionGetFloor*)*gf);
@@ -90,7 +90,7 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig()->seqNo), 
+				itoa(/*vc->*/dialogState.seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -149,17 +149,17 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 			//start RtcpTransactionTakenFloor
 			MRef<SipTransaction*> gf = new 
 				RtcpTransactionTakenFloor(MRef<SipDialog*>(/* *vc */ this), 
-					/*vc->*/getDialogConfig()->seqNo, 
+					/*vc->*/dialogState.seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), 
-					callId,
+					dialogState.callId,
 					/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC());
 			/*vc->*/registerTransaction(gf);
 
 					
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendTaken", 
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()),
-				itoa(/*vc->*/getDialogConfig()->seqNo));
+				itoa(/*vc->*/dialogState.seqNo));
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
 			/*vc->*/getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
@@ -210,17 +210,17 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 				
 			//start transaction
 			MRef<SipTransaction*> rf = new RtcpTransactionReleaseFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig()->seqNo, 
+				/*vc->*/dialogState.seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
-				callId,
+				dialogState.callId,
 				/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC());
 	
 			/*vc->*/registerTransaction(rf);
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tReleaseFloor",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig()->seqNo), 
+				itoa(/*vc->*/dialogState.seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -296,7 +296,7 @@ bool SipDialogP2T::a4_idle_listenreq( const SipSMCommand &command){
 			ue->setStatus(P2T::STATUS_REQUESTING);
 		
 			MRef<SipTransaction*> gf = new 
-				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), callId, ssrc);				
+				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), dialogState.callId, ssrc);				
 			/*vc->*/registerTransaction(gf);
 		
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendGrant", itoa(ssrc), itoa(sNo), uri);
@@ -399,7 +399,7 @@ bool SipDialogP2T::a6_listen_idle( const SipSMCommand &command){
 			MRef<GroupListUserElement*> ue = /*vc->*/getGroupList()->getUser(ssrc);
 	
 			MRef<SipTransaction*> gf = new 
-				RtcpTransactionIdleFloor(MRef<SipDialog*>(/* *vc */ this), ue->getSeqNo(), ue->getAddress(), ue->getRTCPport(), callId, ssrc);
+				RtcpTransactionIdleFloor(MRef<SipDialog*>(/* *vc */ this), ue->getSeqNo(), ue->getAddress(), ue->getRTCPport(), dialogState.callId, ssrc);
 			/*vc->*/registerTransaction(gf);
 		
 
@@ -480,7 +480,7 @@ bool SipDialogP2T::a7_talkreq_listenreq( const SipSMCommand &command){
 				/*vc->*/getGroupList()->getUser(users.at(k))->getSeqNo(), 
 				/*vc->*/getGroupList()->getUser(users.at(k))->getAddress(), 
 				/*vc->*/getGroupList()->getUser(users.at(k))->getRTCPport(), 
-				callId,
+				dialogState.callId,
 				/*vc->*/getGroupList()->getUser(users.at(k))->getSSRC());
 			
 			/*vc->*/registerTransaction(gf);
@@ -597,7 +597,7 @@ bool SipDialogP2T::a9_collision_listenreq( const SipSMCommand &command){
 			if(ue->getSeqNo()==sNo && ue->getStatus()==P2T::STATUS_COLLISION){
 			
 				MRef<SipTransaction*> gf = new 
-					RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), callId, ssrc);
+					RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), dialogState.callId, ssrc);
 				
 				//set collision counter value for the Floor GRANT message
 				MRef<RtcpTransactionGrantFloor*>gf_casted = MRef<RtcpTransactionGrantFloor*>((RtcpTransactionGrantFloor*)*gf);
@@ -647,10 +647,10 @@ bool SipDialogP2T::a10_collision_resent_timer( const SipSMCommand &command){
 				
 				//start transaction
 				MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc*/ this), 
-					/*vc->*/getDialogConfig()->seqNo, 
+					/*vc->*/dialogState.seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
-					callId,
+					dialogState.callId,
 					/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC());
 				
 				merr<<"Collision with "<< /*vc->*/getGroupList()->getAllUser().at(k)->getUri()<<end;
@@ -664,7 +664,7 @@ bool SipDialogP2T::a10_collision_resent_timer( const SipSMCommand &command){
 		
 				CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 					itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-					itoa(/*vc->*/getDialogConfig()->seqNo), 
+					itoa(/*vc->*/dialogState.seqNo), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 				SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -763,17 +763,17 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 			//start RtcpTransactionTakenFloor
 			MRef<SipTransaction*> gf = new 
 				RtcpTransactionTakenFloor(MRef<SipDialog*>(/* *vc */ this), 
-					/*vc->*/getDialogConfig()->seqNo, 
+					/*vc->*/dialogState.seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), 
-					callId,
+					dialogState.callId,
 					/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC());
 			/*vc->*/registerTransaction(gf);
 
 					
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendTaken", 
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()),
-				itoa(/*vc->*/getDialogConfig()->seqNo));
+				itoa(/*vc->*/dialogState.seqNo));
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
 			/*vc->*/getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
@@ -949,7 +949,7 @@ bool SipDialogP2T::a17_listen_idle_revoke( const SipSMCommand &command){
 				ue->getSeqNo(), 
 				ue->getAddress(), 
 				ue->getRTCPport(), 
-				callId,
+				dialogState.callId,
 				ue->getSSRC());
 		/*vc->*/registerTransaction(gf);
 		
@@ -989,7 +989,7 @@ bool SipDialogP2T::a18_talk_talk_revoke( const SipSMCommand &command){
 		for(uint32_t x=0;x<command.getCommandString().getParam().size();x++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[x]-'0');
 			
-		if(sNo==/*vc->*/getDialogConfig()->seqNo){
+		if(sNo==/*vc->*/dialogState.seqNo){
 			//inform GUI
 			CommandString cmd2(/*vc->*/getCallId(),string("p2tFloorRevokePassiv"),
 			/*vc->*/getGroupList()->getUser(ssrc)->getUri(),
@@ -1052,7 +1052,7 @@ bool SipDialogP2T::a19_listenreq_listenreq( const SipSMCommand &command){
 			ue->setStatus(P2T::STATUS_REQUESTING);
 			
 			MRef<SipTransaction*> gf = new 
-				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */), sNo, ue->getAddress(), ue->getRTCPport(), callId, ssrc);
+				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */), sNo, ue->getAddress(), ue->getRTCPport(), dialogState.callId, ssrc);
 			/*vc->*/registerTransaction(gf);
 		
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendGrant", itoa(ssrc), itoa(sNo), uri);
@@ -1072,7 +1072,7 @@ bool SipDialogP2T::a19_listenreq_listenreq( const SipSMCommand &command){
 			ue->setStatus(P2T::STATUS_REQUESTING);
 			
 			MRef<SipTransaction*> gf = new 
-				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), callId, ssrc);
+				RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), sNo, ue->getAddress(), ue->getRTCPport(), dialogState.callId, ssrc);
 			/*vc->*/registerTransaction(gf);
 		
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendGrant", itoa(ssrc), itoa(sNo), uri);
@@ -1149,17 +1149,17 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> rf = new RtcpTransactionReleaseFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig()->seqNo, 
+				/*vc->*/dialogState.seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
-				callId,
+				dialogState.callId,
 				/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC());
 	
 			/*vc->*/registerTransaction(rf);
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tReleaseFloor",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig()->seqNo), 
+				itoa(/*vc->*/dialogState.seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1235,7 +1235,7 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 			ts.start();
 		
 		//increment sequence number
-		/*vc->*/getDialogConfig()->seqNo++;
+		/*vc->*/dialogState.seqNo++;
 
 		//start RtcpTransactionGetFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
@@ -1251,9 +1251,9 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig()->seqNo, 
+				/*vc->*/dialogState.seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
-				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), callId);
+				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), dialogState.callId);
 			
 			
 			MRef<RtcpTransactionGetFloor*>gf_casted = MRef<RtcpTransactionGetFloor*>((RtcpTransactionGetFloor*)*gf);
@@ -1269,7 +1269,7 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig()->seqNo), 
+				itoa(/*vc->*/dialogState.seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1619,10 +1619,10 @@ SipDialogP2T::SipDialogP2T(MRef<SipDialogContainer*> dContainer, MRef<SipDialogC
 	//floorControlReceiver->flush();
 					
 	//generate GroupIdentity
-	/*getDialogConfig().callId*/ callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	/*getDialogConfig().callId*/ dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	
 	//initialize sequence number
-	getDialogConfig()->seqNo = 0;
+	dialogState.seqNo = 0;
 	
 	counterRevoke=0;
 	counterCollision=0;

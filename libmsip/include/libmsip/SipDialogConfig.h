@@ -208,13 +208,14 @@ class SipDialogConfig : public MObject{
 		string proxyNonce;
 		string proxyRealm;
 
-		int32_t seqNo;
+/////		int32_t seqNo;
+		
 //		string callId;
 
-		string tag_local;
-		string tag_foreign;
+/////		string tag_local;
+/////		string tag_foreign;
 		
-		string uri_foreign;
+/////		string uri_foreign;
 
 		uint32_t local_ssrc;
 

@@ -409,7 +409,7 @@ SipTransactionInviteClient::~SipTransactionInviteClient(){
 
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
         MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->getDialogConfig()->uri_foreign, 
+	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri, //dialog->getDialogConfig()->uri_foreign, 
 			dialog->getDialogConfig()->inherited.sipIdentity->sipDomain
 			); 
 	//TODO:

@@ -179,7 +179,7 @@ class SipMessage : public MObject{
 ///		void setSocket(Socket* sock){socket = sock;};
 ///		Socket* getSocket(){return socket;};
 
-		list<string> getRouteSet();
+//		list<string> getRouteSet();
 
 
 //		vector<MRef<SipHeader*> > headers;
@@ -188,10 +188,8 @@ class SipMessage : public MObject{
                 std::string getDescription();
 		
 
-		int getNoHeaders();
-		MRef<SipHeader*> getHeaderNo(int i);
-		MRef<SipHeader*> getHeaderOfType(int t);
 		
+		MRef<SipHeaderValue*> getHeaderValueNo(int type, int i);
 
 		
 		void setDestinationBranch(string b){branch = b;}
@@ -214,7 +212,12 @@ class SipMessage : public MObject{
 
 		
 
+		int getNoHeaders();
+		MRef<SipHeader*> getHeaderNo(int i);
+
 	protected:
+
+
 
 //		vector<MRef<SipHeader*> > getHeaders(){return headers;};
 		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
@@ -228,6 +231,9 @@ class SipMessage : public MObject{
 		// Socket on which the packet was received
 ///		Socket* socket;
 	private: 
+
+		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
+		
 		int parseHeaders(const string &buf, int startIndex);
 		string getViaHeaderBranch(bool first);
 		string branch;

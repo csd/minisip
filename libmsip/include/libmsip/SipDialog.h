@@ -33,6 +33,25 @@ class SipDialogContainer;
 class SipTransaction;
 class SipDialogConfig;
 
+
+class SipDialogState{
+	public:
+		string callId;
+		string localTag;
+		string remoteTag;
+		
+		int seqNo;
+		int remoteSeqNo;
+//		string localUri;	// not used yet
+		string remoteUri;
+		string remoteTarget;
+		bool secure;
+		list<string> routeSet;
+	
+		bool isEarly;
+};
+
+
 /**
  * A dialog is a long term relationship between two or more clients and
  * servers. SipDialog is the base class for all dialogs in libmsip. It
@@ -83,7 +102,7 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 		 * get the Call-Id of the dialog
 		 * @return string containing the Call-Id
 		 */
-		string getCallId(){return callId;}
+		string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * get a reference to the dialog container.
@@ -99,19 +118,22 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 		 */
 		void registerTransaction(MRef<SipTransaction*> trans);
 
-		list<string> getRouteSet(){return routeSet;}
+		list<string> getRouteSet(){return dialogState.routeSet;}
 		
                 list<MRef<SipTransaction*> > getTransactions(){return transactions;}
 
+		SipDialogState dialogState;
+		
 	protected:
 		///a list containing all transactions
 		list<MRef<SipTransaction*> > transactions;
 
-		list<string> routeSet;
+/////		list<string> routeSet;
 		
 		///the dialog container
 		MRef<SipDialogContainer*> dialogContainer;
-		string callId;
+/////		string callId;
+		
 
 	private:
 		

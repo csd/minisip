@@ -112,7 +112,11 @@ string SipIMMessage::getString(){
 }
 
 int SipIMMessage::getExpiresTimeout(){
-	MRef<SipHeaderValueExpires*> exp = MRef<SipHeaderValueExpires*>((SipHeaderValueExpires*)*(getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0)));
+//	MRef<SipHeaderValueExpires*> exp = MRef<SipHeaderValueExpires*>((SipHeaderValueExpires*)
+//			*(getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0)));
+	assert(dynamic_cast<SipHeaderValueExpires*>( *getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 ) ));
+	
+	MRef<SipHeaderValueExpires*> exp = (SipHeaderValueExpires*)*getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 );
 	
 	if (exp){
 		return exp->getTimeout();

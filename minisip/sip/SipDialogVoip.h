@@ -59,7 +59,7 @@ class SipDialogVoip: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogVoip";}
 		
-		virtual string getName(){return "SipDialogVoip[callid="+callId +"]";}
+		virtual string getName(){return "SipDialogVoip[callid="+dialogState.callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);

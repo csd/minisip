@@ -86,8 +86,8 @@ class SipDialogP2Tuser: public SipDialog{
 		 */
 		virtual ~SipDialogP2Tuser();
 	
-		void setCallId(string id){callId = id;}
-		string getCallId(){return callId;}
+		void setCallId(string id){dialogState.callId = id;}
+		string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * returns the type of the dialog. Used by the memory management.

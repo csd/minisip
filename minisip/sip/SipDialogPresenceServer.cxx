@@ -140,7 +140,7 @@ bool SipDialogPresenceServer::a3_default_termwait_stoppresenceserver(const SipSM
 
 bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::no_transactions) ){
-		SipSMCommand cmd( CommandString( callId, SipCommandString::call_terminated), //FIXME: callId is ""
+		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
 				  SipSMCommand::TU,
 				  SipSMCommand::DIALOGCONTAINER);
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
@@ -223,9 +223,9 @@ SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipDialogContainer*> dCont
 {
 
 //	callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
-	callId="";
+	dialogState.callId="";
 	
-	getDialogConfig()->tag_local=itoa(rand());
+	dialogState.localTag=itoa(rand());
 	
 	setUpStateMachine();
 }
@@ -262,7 +262,7 @@ void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
 	getDialogContainer()->enqueueCommand(c, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	
 	MRef<SipResponse*> ok= new SipResponse(sr->getBranch(), 200,"OK", MRef<SipMessage*>(*sub));
-	ok->getHeaderValueTo()->setTag(getDialogConfig()->tag_local);
+	ok->getHeaderValueTo()->setTag(dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -308,10 +308,10 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				toId,
 				getDialogConfig()->inherited.sipIdentity,
 				getDialogConfig()->inherited.localUdpPort,
-				getDialogConfig()->seqNo
+				dialogState.seqNo
 				));
 
-	notify->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
+	notify->getHeaderValueFrom()->setTag(dialogState.localTag);
 
 	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited.sipIdentity->getSipUri(),
 				toId->getSipUri(),

@@ -101,7 +101,7 @@ stop_presence|    +------+
 
 void SipDialogPresenceClient::createSubscribeClientTransaction(){
 	int seqNo = requestSeqNo();
-	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, callId);
+	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, dialogState.callId);
 //	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
 	registerTransaction(subscribetrans);
 	sendSubscribe(subscribetrans->getBranch());
@@ -126,9 +126,12 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-		getDialogConfig()->tag_foreign = command.getCommandPacket()->getHeaderValueTo()->getTag();
+		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
-		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
+		//MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)
+		//	*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
+		assert(dynamic_cast<SipHeaderValueExpires*>(*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0)));		
+		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0);
 		int timeout;
 		if (expireshdr){
 			timeout = expireshdr->getTimeout();
@@ -170,7 +173,7 @@ bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 
 bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
 	if (transitionMatch(command, SipNotify::type, SipSMCommand::remote, IGN)){
-		CommandString cmdstr(callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
+		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		return true;
 	}else{
@@ -190,7 +193,7 @@ bool SipDialogPresenceClient::a6_subscribing_termwait_stoppresence(const SipSMCo
 
 bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::no_transactions) ){
-		SipSMCommand cmd( CommandString( callId, SipCommandString::call_terminated),
+		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated),
 				  SipSMCommand::TU,
 				  SipSMCommand::DIALOGCONTAINER);
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
@@ -277,9 +280,9 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipDialogContainer*> dCont
 {
 
 	//setCallId( itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP);
-	callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	
-	getDialogConfig()->tag_local=itoa(rand());
+	dialogState.localTag = itoa(rand());
 	
 	setUpStateMachine();
 }
@@ -306,15 +309,15 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	
 	sub = MRef<SipSubscribe*>(new SipSubscribe(
 				branch,
-				callId,
+				dialogState.callId,
 				toUri,
 				getDialogConfig()->inherited.sipIdentity,
 				getDialogConfig()->inherited.localUdpPort,
 //				im_seq_no
-				getDialogConfig()->seqNo
+				dialogState.seqNo
 				));
 
-	sub->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
+	sub->getHeaderValueFrom()->setTag(dialogState.localTag);
 
         MRef<SipMessage*> pktr(*sub);
 #ifdef MINISIP_MEMDEBUG
@@ -336,19 +339,19 @@ bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << end;
 //	merr << "XXXSipDialogPresenceClient::handleCommand got "<< c << end;
 
-	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
-		if (c.getCommandString().getDestinationId() != callId ){
+	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
+		if (c.getCommandString().getDestinationId() != dialogState.callId ){
 			cerr << "SipDialogPresenceClient returning false based on callId"<< endl;
 			return false;
 		}
 	}
 	
-	if (c.getType()==SipSMCommand::COMMAND_PACKET  && callId.length()>0){
-		if (c.getCommandPacket()->getCallId() != callId ){
+	if (c.getType()==SipSMCommand::COMMAND_PACKET  && dialogState.callId.length()>0){
+		if (c.getCommandPacket()->getCallId() != dialogState.callId ){
 			return false;
 		}
 		if (c.getType()!=SipSMCommand::COMMAND_PACKET && 
-				c.getCommandPacket()->getCSeq()!= getDialogConfig()->seqNo){
+				c.getCommandPacket()->getCSeq()!= dialogState.seqNo){
 			return false;
 		}
 	
@@ -366,14 +369,14 @@ bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 		return true;
 	}
 	
-	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
-		if (c.getCommandString().getDestinationId() == callId ){
+	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
+		if (c.getCommandString().getDestinationId() == dialogState.callId ){
 			mdbg << "Warning: SipDialogPresenceClient ignoring command with matching call id"<< end;
 			return true;
 		}
 	}
-	if (c.getType()==SipSMCommand::COMMAND_PACKET && callId.length()>0){
-		if (c.getCommandPacket()->getCallId() == callId){
+	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
+		if (c.getCommandPacket()->getCallId() == dialogState.callId){
 			mdbg << "Warning: SipDialogPresenceClient ignoring packet with matching call id"<< end;
 			return true;
 		}

@@ -114,9 +114,11 @@ int SipMessage::getType(){
 	return type;
 }
 
+
 MRef<SipHeader*> SipMessage::getHeaderNo(int i){
 	return headers[i];
 }
+
 
 int SipMessage::getNoHeaders(){
 	return headers.size();
@@ -412,10 +414,13 @@ MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 
 }
 
-MRef<SipHeader *> SipMessage::getHeaderOfType(int t){
+MRef<SipHeader *> SipMessage::getHeaderOfType(int t, int i){
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == t){
-			return headers[i];
+			if (i==0)
+				return headers[i];
+			else
+				i--;
 		}
 	}
 	MRef<SipHeader*> nullhdr;
@@ -424,6 +429,30 @@ MRef<SipHeader *> SipMessage::getHeaderOfType(int t){
 	
 }
 
+
+MRef<SipHeaderValue*> SipMessage::getHeaderValueNo(int type, int i){
+	int headerindex=0;
+	int valueindex=0;
+	do{
+		MRef<SipHeader *> h = getHeaderOfType(type, headerindex);
+		if (h){
+			int nval = h->getNoValues();
+			if (i < valueindex+nval){	//the value we want is in this header
+				return h->getHeaderValue(i-valueindex);
+			}
+			valueindex += nval;
+			headerindex++;
+		}else{
+			MRef<SipHeaderValue*> nullhdr;
+			return nullhdr;
+		}
+	}while(true);
+
+}
+
+
+
+/*
 list<string> SipMessage::getRouteSet(){
 	list<string> ret;
 	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
@@ -445,7 +474,7 @@ list<string> SipMessage::getRouteSet(){
 		}
 	return ret;
 }
-
+*/
 
 string SipMessage::getWarningMessage(){
 	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)

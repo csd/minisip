@@ -59,7 +59,7 @@ class SipDialogPresenceClient: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogPresenceClient";}
 		
-		virtual string getName(){return "SipDialogPresenceClient[callid="+callId +"]";}
+		virtual string getName(){return "SipDialogPresenceClient[callid="+dialogState.callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);

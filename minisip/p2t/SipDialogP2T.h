@@ -288,8 +288,8 @@ class SipDialogP2T: public SipDialog{
 
 		virtual std::string getMemObjectType(){return getName();}
 
-		void setCallId(string id){callId = id;}
-		string getCallId(){return callId;}
+		void setCallId(string id){dialogState.callId = id;}
+		string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * handles the incoming commands. Accepts commands only if they have the

@@ -147,7 +147,7 @@ SipDialogConfig::SipDialogConfig(SipCommonConfig &commonconf)/*: MObject("SipDia
     last_invite.setUser("SipDialogConfig/last_invite");
 #endif
 
-    seqNo=100;
+/////    seqNo=100;
 
     //	callId = itoa(rand())+"@"+inherited.localIpString;
 //    callId = itoa(rand())+"@"+inherited.externalContactIP;

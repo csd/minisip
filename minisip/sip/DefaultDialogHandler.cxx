@@ -54,7 +54,7 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipDialogContainer*> dContainer,
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
-	callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	//Initialize GroupListServer
 	grpListServer=NULL;
 }
@@ -222,7 +222,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
 		int im_seq_no= requestSeqNo();
-		MRef<SipTransaction*> trans = new SipTransactionClient(this, im_seq_no, callId);
+		MRef<SipTransaction*> trans = new SipTransactionClient(this, im_seq_no, dialogState.callId);
 		mdbg << "WWWWWWW: transaction created, branch id is <"<<trans->getBranch()<<">."<< end; 
 		//cerr << "command standard arguments is <"<< command.getCommandString().getString() <<">"<< endl;
 		registerTransaction(trans);
@@ -736,7 +736,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderValueTo()->setTag(getDialogConfig()->tag_local);
+        ok->getHeaderValueTo()->setTag(dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -759,7 +759,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 //      mdbg << "///////////Creating bye with uri_foreign="<<getDialogConfig().uri_foreign << " and doman="<< domain<< end;
         MRef<SipIMMessage*> im = new SipIMMessage(
                         std::string(branch),
-			std::string(callId),
+			std::string(dialogState.callId),
 			toId,
 			getDialogConfig()->inherited.sipIdentity,
 			getDialogConfig()->inherited.localUdpPort,
@@ -767,8 +767,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			msg
                         );
 
-        im->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
-        im->getHeaderValueTo()->setTag(getDialogConfig()->tag_foreign);
+        im->getHeaderValueFrom()->setTag(dialogState.localTag);
+        im->getHeaderValueTo()->setTag(dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*im);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
