@@ -32,6 +32,8 @@
 
 #define SOCKET_TYPE_UDP		0x20
 
+#include<stdint.h>
+
 class Socket{
 	public:
 		virtual int32_t getFd();
