@@ -61,8 +61,7 @@ SipCommonConfig::SipCommonConfig(): /*MObject("SipCommonConfig"),*/
 	//proxyAddr(NULL),
 //	proxyPort(0),
 	transport(("")),
-	autoAnswer(false),
-	sipTransport(){
+	autoAnswer(false){
 //            merr << "running SipCommonConfig constructor"<< end;
 
 #ifdef MINISIP_MEMDEBUG
