@@ -153,6 +153,9 @@
 /* iPAQ buzzer support */
 #undef IPAQ_BUZZER
 
+/* Adding ipsec support */
+#undef IPSEC_SUPPORT
+
 /* Debug autocalling */
 #undef MINISIP_AUTOCALL
 

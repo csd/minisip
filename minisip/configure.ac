@@ -121,8 +121,11 @@ dnl #############
 ipsec_enable=no
 AC_ARG_ENABLE(ipsec-enable,
     [ --enable-ipsec-enable enables ipsec features (default disabled)],
-   [ ipsec_enable=yes])
+    [	ipsec_enable=yes
+	AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])])
 AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
+
+
 
 
 dnl #############

@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 /* Name
@@ -827,12 +828,20 @@ void SipDialogVoip::setUpStateMachine(){
 }
 
 
-
+#ifdef IPSEC_SUPPORT
+SipDialogVoip::SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
+                SipDialog(dContainer,callconfig, pconf->timeoutProvider),
+                lastInvite(NULL), 
+		phoneconf(pconf),
+		mediaSession(mediaSession), ipsecSession(ipsecSession)
+#else
 SipDialogVoip::SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
                 SipDialog(dContainer,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession)
+#endif
+
 {
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;

@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 /* Name
@@ -46,6 +47,10 @@
 
 #include"SipSoftPhoneConfiguration.h"
 
+#ifdef IPSEC_SUPPORT
+#include<../ipsec/MsipIpsecAPI.h>
+#endif
+
 class Session;
 class SipDialogContainer;
 class SipDialogConfig;
@@ -53,8 +58,12 @@ class LogEntry;
 
 class SipDialogVoip: public SipDialog{
 	public:
+#ifdef IPSEC_SUPPORT
+		SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession = NULL);
+#else
 		SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
-		
+
+#endif		
 		virtual ~SipDialogVoip();
 
 		virtual std::string getMemObjectType(){return "SipDialogVoip";}
@@ -124,6 +133,11 @@ class SipDialogVoip: public SipDialog{
 		string realm;
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<Session *> mediaSession;
+
+#ifdef IPSEC_SUPPORT
+		MRef<MsipIpsecAPI *> ipsecSession;
+#endif
+
 };
 
 #endif
