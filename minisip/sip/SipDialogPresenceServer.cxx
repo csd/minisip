@@ -155,7 +155,7 @@ bool SipDialogPresenceServer::a5_default_default_SUBSCRIBE(const SipSMCommand &c
 	if (transitionMatch(command, SipSubscribe::type, SipSMCommand::remote, IGN)){
 		MRef<SipSubscribe *> sub = (SipSubscribe*)*command.getCommandPacket();
 		
-		string user = sub->getHeaderTo()->getUri().getUserIpString();
+		string user = sub->getHeaderValueTo()->getUri().getUserIpString();
 		cerr <<"SipDialogPresenceServer::a5_default_default_SUBSCRIBE: got subscribe request from <"<<user<<">"<<endl;
 
 		addUser(user);
@@ -262,14 +262,14 @@ void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
 	getDialogContainer()->enqueueCommand(c, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	
 	MRef<SipResponse*> ok= new SipResponse(sr->getBranch(), 200,"OK", MRef<SipMessage*>(*sub));
-	ok->getHeaderTo()->setTag(getDialogConfig()->tag_local);
+	ok->getHeaderValueTo()->setTag(getDialogConfig()->tag_local);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
         getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
 
-	sendNotice(onlineStatus, sub->getHeaderFrom()->getUri().getUserIpString());
+	sendNotice(onlineStatus, sub->getFrom().getUserIpString());
 }
 
 void SipDialogPresenceServer::removeUser(string user){
@@ -311,7 +311,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				getDialogConfig()->seqNo
 				));
 
-	notify->getHeaderFrom()->setTag(getDialogConfig()->tag_local);
+	notify->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
 
 	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited.sipIdentity->getSipUri(),
 				toId->getSipUri(),

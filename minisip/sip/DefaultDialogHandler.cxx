@@ -157,8 +157,10 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 		MRef<SipMessageContentIM*> imref = (SipMessageContentIM*)*im->getContent();
 
-		string from =  im->getHeaderFrom()->getUri().getUserId()+"@"+ im->getHeaderFrom()->getUri().getIp();
-		string to =  im->getHeaderTo()->getUri().getUserId()+"@"+ im->getHeaderTo()->getUri().getIp();
+		string from =  im->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
+			im->getHeaderValueFrom()->getUri().getIp();
+		string to =  im->getHeaderValueTo()->getUri().getUserId()+"@"+ 
+			im->getHeaderValueTo()->getUri().getIp();
 
 		CommandString cmdstr("", SipCommandString::incoming_im, imref->getString(), from, to );
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
@@ -390,7 +392,8 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	
 	
 	//get inviting user name
-	string inv_user = inv->getHeaderFrom()->getUri().getUserId()+"@"+ inv->getHeaderFrom()->getUri().getIp();	
+	string inv_user = inv->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
+		inv->getHeaderValueFrom()->getUri().getIp();	
 	
 	//start SipDialogP2T only, if there isn't already
 	//one started with this GroupIdentity
@@ -733,7 +736,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderTo()->setTag(getDialogConfig()->tag_local);
+        ok->getHeaderValueTo()->setTag(getDialogConfig()->tag_local);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -764,8 +767,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			msg
                         );
 
-        im->getHeaderFrom()->setTag(getDialogConfig()->tag_local);
-        im->getHeaderTo()->setTag(getDialogConfig()->tag_foreign);
+        im->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
+        im->getHeaderValueTo()->setTag(getDialogConfig()->tag_foreign);
 
         MRef<SipMessage*> pref(*im);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);

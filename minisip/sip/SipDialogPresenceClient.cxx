@@ -126,9 +126,9 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-		getDialogConfig()->tag_foreign = command.getCommandPacket()->getHeaderTo()->getTag();
+		getDialogConfig()->tag_foreign = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
-		MRef<SipHeaderExpires *> expireshdr = (SipHeaderExpires*)*resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES);
+		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
 		int timeout;
 		if (expireshdr){
 			timeout = expireshdr->getTimeout();
@@ -314,7 +314,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 				getDialogConfig()->seqNo
 				));
 
-	sub->getHeaderFrom()->setTag(getDialogConfig()->tag_local);
+	sub->getHeaderValueFrom()->setTag(getDialogConfig()->tag_local);
 
         MRef<SipMessage*> pktr(*sub);
 #ifdef MINISIP_MEMDEBUG
