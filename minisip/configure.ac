@@ -6,7 +6,7 @@ AC_INIT(minisip, 0.7, BUG-REPORT-ADDRESS)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(minisip, 0.7.0)
+AM_INIT_AUTOMAKE(minisip, 0.7.1)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 

@@ -1,5 +1,5 @@
 %define name		libmikey
-%define version		0.4.0
+%define version		0.4.1
 %define release		1
 
 %define major		0
@@ -83,6 +83,8 @@ rm -rf %buildroot
 
 
 %changelog
+* Fri Mar 18 2005 Johan Bilien <jobi@via.ecp.fr>
+- new upstream release
 * Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>

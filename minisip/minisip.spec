@@ -12,10 +12,10 @@ URL:			http://www.minisip.org/
 Group:			Applications/Communication
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
-Requires:		libmikey0 >= 0.4.0
-Requires:		libmutil0 >= 0.3.0
-Requires:		libmnetutil0 >= 0.3.0
-Requires:		libmsip0 >= 0.3.0
+Requires:		libmikey0 >= 0.4.1
+Requires:		libmutil0 >= 0.3.1
+Requires:		libmnetutil0 >= 0.3.1
+Requires:		libmsip0 >= 0.3.1
 Requires:		libglademm2 >= 0.2 
 
 
@@ -45,6 +45,8 @@ rm -rf %buildroot
 /usr/share/minisip/tray_icon.png
 
 %changelog
+* Fri Mar 17 2005 Johan Bilien <jobi@via.ecp.fr>
+- new upstream release
 * Fri Feb 17 2005 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>

@@ -1,3 +1,9 @@
+libmnetutil (0.3.1-1) unstable; urgency=low
+
+  * New upstream release. 
+
+ -- Johan Bilien <jobi@bilien.org>  Fri, 18 Mar 2005 10:14:48 +0100
+
 libmnetutil (0.3.0-1) unstable; urgency=low
 
   * New upstream release.

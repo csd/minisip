@@ -1,3 +1,9 @@
+minisip (0.7.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Fri, 18 Mar 2005 10:25:03 +0100
+
 minisip (0.7.0-3) unstable; urgency=low
 
   * Link against libglademm-2.4, not 2.0

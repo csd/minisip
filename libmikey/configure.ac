@@ -6,7 +6,7 @@ AC_INIT(libmikey, 0.4, jobi@via.ecp.fr)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmikey, 0.4.0)
+AM_INIT_AUTOMAKE(libmikey, 0.4.1)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
