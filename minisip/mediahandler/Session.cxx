@@ -204,6 +204,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 		if( (*iStream)->matches( m, iFormat ) ){
 			//fprintf( stderr, "Found sender for %s\n", (*iStream)->getSdpMediaType().c_str() );
 			mdbg << "Found sender for " << (*iStream)->getSdpMediaType().c_str()<< end;
+#if 0
 			if( ka ){
 				ka->addSrtpStream( (*iStream)->getSsrc(),
 					0, /*ROC */
@@ -211,6 +212,8 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 					2*j/* CSID */
 					);
 			}
+#endif
+	
 			(*iStream)->setPort( m->getPort() );
 			((MediaStreamSender *)*(*iStream))->setRemoteAddress( remoteAddress );
 		}

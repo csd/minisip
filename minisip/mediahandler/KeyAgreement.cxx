@@ -248,6 +248,7 @@ string Session::responderParse(){
 				ts.save( MIKEY_PARSE_START );
 #endif
 
+				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP), false );
 				responseMessage = initMessage->buildResponse((KeyAgreementDH *)*ka);
 #ifndef _MSC_VER
 				ts.save( MIKEY_PARSE_END );
@@ -257,6 +258,8 @@ string Session::responderParse(){
 #ifndef _MSC_VER
 				ts.save( MIKEY_PARSE_START );
 #endif
+				
+				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP), false );
 
 				responseMessage = initMessage->buildResponse((KeyAgreementPSK *)*ka);
 #ifndef _MSC_VER
@@ -601,17 +604,26 @@ string Session::initiatorParse(){
 
 }
 
-void Session::addStreamsToKa(uint8_t policyNo){
+void Session::addStreamsToKa(uint8_t policyNo, bool initiating){
 	list< MRef<MediaStream *> >::iterator iSender;
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_SRTP_ID);
+	uint8_t j = 1;
 	for( iSender = mediaStreamSenders.begin(); 
 	     iSender != mediaStreamSenders.end();
-	     iSender ++ ){
-		ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/, 
-				policyNo );
-		/* Placeholder for the receiver to place his SSRC */
-		ka->addSrtpStream( 0, 0/*ROC*/, 
-				policyNo );
+	     iSender ++, j++ ){
+
+		if( initiating ){ 
+			ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/, 
+					policyNo );
+			/* Placeholder for the receiver to place his SSRC */
+			ka->addSrtpStream( 0, 0/*ROC*/, 
+					policyNo );
+		}
+		else{
+			ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/,
+					policyNo, 2*j /*CsId*/ );
+		}
+
 	}
 }
 
