@@ -455,7 +455,13 @@ void *SoundIO::playerLoop(void *arg){
 			(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
 
 			for (uint32_t j=0; j<nFrames*nChannels; j++){
+#ifdef IPAQ
+				/* iPAQ hack, to reduce the volume of the
+				 * output */
+				buf[j]+=(outbuf[j]/32);
+#else
 				buf[j]+=outbuf[j];
+#endif
 			}
 		}
 		active_soundcard->queueLock.unlock();
