@@ -27,7 +27,8 @@
 #define MAX_SOURCE 256
 
 
-ImageMixer::ImageMixer(){
+ImageMixer::ImageMixer():mainSource(0),newMainSource(0),
+			 mainSourceImagesCounter(0){
 }
 
 void ImageMixer::init( uint32_t width, uint32_t height ){
@@ -46,9 +47,16 @@ MImage * ImageMixer::provideImage(){
 MImage * ImageMixer::provideImage( uint32_t ssrc ){
 
 	MImage * image;
+	
+	if( mainSourceImagesCounter == 0 && newMainSource != mainSource ){
+		mainSource = newMainSource;
+		fprintf( stderr, "Set main source to %i\n", mainSource );
+	}
+	
 	if( ssrc == mainSource ){
 		image = output->provideImage();
 		image->ssrc = ssrc;
+		mainSourceImagesCounter ++;
 		return image;
 	}
 
@@ -96,6 +104,16 @@ void ImageMixer::handle( MImage * image ){
 		media->releaseImagesToSources( images, nImagesToMix );
 		
 		output->handle( image );
+		
+		mainSourceImagesCounter --;
+	}
+
+	if( media->getSource( mainSource ).isNull() ){
+		/* The main source is no longer available,
+		 * switch to that one */
+
+		fprintf( stderr, "Main source not available, switching to %i\n", image->ssrc );
+		selectMainSource( image->ssrc );
 	}
 }
 
@@ -169,5 +187,5 @@ void ImageMixer::setMedia( MRef<VideoMedia *> media ){
 }
 
 void ImageMixer::selectMainSource( uint32_t ssrc ){
-	mainSource = ssrc;
+	newMainSource = ssrc;
 }

@@ -65,6 +65,9 @@ class ImageMixer : public ImageHandler, public MObject{
 		uint32_t height;
 
 		uint32_t mainSource;
+		uint32_t newMainSource;
+
+		uint32_t mainSourceImagesCounter;
 
 		MRef<VideoMedia *> media;
 
