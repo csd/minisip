@@ -28,15 +28,14 @@
 #include<libmnetutil/IP6ServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
 
-#ifdef LINUX
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<netdb.h>
-#endif
 
 #ifdef WIN32
 #include<winsock2.h>
 #include<ws2tcpip.h>
+#elif defined HAVE_NETDB_H
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include<netdb.h>
 #endif
 
 #include<stdio.h>

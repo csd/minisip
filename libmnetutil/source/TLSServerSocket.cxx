@@ -28,16 +28,15 @@
 
 #ifndef NO_SECURITY
 
-#ifdef LINUX
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_ARPA_INET_H
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #endif
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

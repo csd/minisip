@@ -32,15 +32,14 @@
 #include<stdio.h>
 #include<errno.h>
 
-#ifdef LINUX
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_NETINET_TCP_H
 #include<sys/socket.h>
 #include<netinet/tcp.h>
 #include<netinet/in.h>
 #endif
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
 
 #include<unistd.h>
 #include<errno.h>

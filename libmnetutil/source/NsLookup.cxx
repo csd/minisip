@@ -26,7 +26,7 @@
 
 #include<libmnetutil/NsLookup.h>
 
-#ifdef LINUX
+#ifdef HAVE_NETDB_H
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -40,21 +40,12 @@
 using namespace std;
 
 IPAddress *staticLookup(std::string addr){
-#ifdef LINUX    
 	std::cerr << "ERROR: NsLookup::staticLookup: UNIMPLEMENTED"<< std::endl;
 	exit(1);
-#endif
-    
-#ifdef WIN32
-    cerr << "ERROR: NsLookup::staticLookup: UNIMPLEMENTED"<< endl;
-    exit(1);
-
-#endif
-    
 }
 
 string NsLookup::staticLookup_str(string addr){
-#ifdef LINUX    
+#ifdef HAVE_NETDB_H
 
         hostent* ret = gethostbyname2(addr.c_str(), AF_INET); //FIXME: Only IPv4 - BUG - do getaddrinfo + change API of netutil
         return string((ret->h_addr_list[0]));
@@ -70,9 +61,8 @@ string NsLookup::staticLookup_str(string addr){
             exit(1);
         }
 */        
-#endif
     
-#ifdef WIN32
+#elif defined WIN32
     cerr << "ERROR: NsLookup::staticLookup_str: UNIMPLEMENTED"<< endl;
     exit(1);
 

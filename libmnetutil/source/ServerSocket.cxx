@@ -51,11 +51,10 @@ ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 	this->listen_port=listenport;
 	fd = socket(domain, SOCK_STREAM, IPPROTO_TCP);
 	int32_t on=1;
-#ifdef LINUX
-	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
-#endif
 #ifdef WIN32
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
+#else
+	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
 #endif
 	if (fd<0){
 		throw new SetSockOptFailed( errno );

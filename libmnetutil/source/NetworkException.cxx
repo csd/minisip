@@ -42,14 +42,13 @@ NetworkException::NetworkException():errorNumber(0){};
 
 string NetworkException::errorDescription(){
 
-#ifdef LINUX
+#ifdef WIN32
+	return string( strerror( errorNumber ));
+#else
 	char buf[256];
 	buf[0]=0;
 	strerror_r( errorNumber, buf, 256 );
 	return string( (const char *)buf );
-#endif
-#ifdef WIN32
-	return string( strerror( errorNumber ));
 #endif
 	return "NOT_SET";
 }

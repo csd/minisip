@@ -28,13 +28,12 @@
 
 #ifndef NO_SECURITY
 
-#ifdef LINUX
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_SYS_SOCKET_H
 #include<sys/socket.h>
 #endif
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
 
 #include<iostream>
 

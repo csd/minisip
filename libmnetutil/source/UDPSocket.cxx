@@ -32,17 +32,16 @@
 #include<stdlib.h>
 #include<errno.h>
 
-#ifdef LINUX
-#include<sys/socket.h>
-#include<stdio.h>
-#include<netinet/tcp.h>
-#include<netinet/in.h>
-#include<netdb.h>
-#endif
-
 #ifdef WIN32
 #include<winsock2.h>
+#elif defined HAVE_NETINET_IN_H
+#include<sys/socket.h>
+#include<stdio.h>
+//#include<netinet/tcp.h>
+#include<netinet/in.h>
+//#include<netdb.h>
 #endif
+
 
 #include<unistd.h>
 #include<iostream>

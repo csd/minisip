@@ -26,14 +26,6 @@
 #include<stdint.h>
 
 
-// FIXME!!
-                                                                                                                             
-#ifndef WIN32
-#define LINUX
-#endif
-                                                                                                                             
-                                                                                                                             
-
 /* Compilation time configuration */
 #include"compilation_config.h"
 

@@ -26,19 +26,14 @@
 
 #include<libmnetutil/NetworkException.h>
 
-
-
-#ifdef LINUX
-#include <linux/sockios.h> /* for SIOCG* */
-#include <arpa/inet.h> /* inet_ntoa */
-#include <sys/types.h> /* socket() */
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef LINUX
+#ifdef HAVE_ARPA_INET_H
+#include <linux/sockios.h> /* for SIOCG* */
+#include <arpa/inet.h> /* inet_ntoa */
+#include <sys/types.h> /* socket() */
 #include <net/if.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

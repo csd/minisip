@@ -29,15 +29,14 @@
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
 
-#ifdef LINUX
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_NETDB_H
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<netdb.h>
 #endif
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
 
 #include<stdio.h>
 #include<unistd.h>
