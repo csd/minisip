@@ -88,7 +88,7 @@ void SipSoftPhoneConfiguration::save(){
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
 	uint32_t ii = 0;
-		
+
 	string accountPath;
 
 	for( iIdent = identities.begin(); iIdent != identities.end(); ii++, iIdent ++){
@@ -119,6 +119,12 @@ void SipSoftPhoneConfiguration::save(){
 	}
 	
 	parser->changeValue( "sound_device", soundDevice );
+#ifdef VIDEO_SUPPORT
+	parser->changeValue( "video_device", videoDevice );
+	parser->changeValue( "frame_width", itoa( frameWidth ) );
+	parser->changeValue( "frame_height", itoa( frameHeight ) );
+#endif
+		
 
 	/************************************************************
 	 * PhoneBooks
