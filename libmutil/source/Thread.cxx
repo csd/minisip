@@ -176,7 +176,7 @@ int Thread::createThread(void f()){
 	pthread_t threadHandle;
 //	cerr << "Running createThread"<< endl;
 	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarter, (void*)f);
-	return threadHandle;
+	return (int)threadHandle;
 #endif
 
 }
@@ -211,7 +211,7 @@ int Thread::createThread(void *f(void*), void *arg){
 	pthread_t threadHandle;
 //	cerr << "Running createThread"<< endl;
 	pthread_create(&threadHandle, NULL, f, arg);
-	return threadHandle;
+	return (int)threadHandle;
 #endif
 
 }

@@ -27,7 +27,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include<malloc.h>
+// BSD 5.x: malloc.h has been replaced by stdlib.h
+// #include<malloc.h>
 
 #ifdef WIN32
 #include<windows.h>

@@ -26,7 +26,7 @@
 #include<libmutil/trim.h>
 #include<iostream>
 
-static bool isblank(char c){
+static bool is_blank(char c){
 	if (c=='\t' || c==' ' || c=='\r' || c=='\n')
 		return true;
 	else
@@ -427,8 +427,8 @@ void XMLElement::print(){
 }
 */
 XMLAttribute::XMLAttribute(string name, string value):XMLNode(XML_NODE_TYPE_ATTRIBUTE,name,value){
-	
-}
+
+};
 
 /*
 void XMLAttribute::print(){
