@@ -85,8 +85,6 @@ void SipTransaction::handleTimeout(const string &c){
 
 
 void SipTransaction::send(MRef<SipMessage*> pack, string br){
-		// No StreamSocket, create one or use UDP
-		Socket *dummy=NULL;
 		if (br=="")
 			br = branch;
 
@@ -95,11 +93,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, string br){
 			dialog->getDialogConfig()->inherited.sipTransport->sendMessage(pack,
 					*toaddr,
 					port, 
-					//	getDialog()->getDialogContainer()->getPhoneConfig()->proxyConnection, 
-					dummy,
-					//branch,
-					br,
-					dialog->getDialogConfig()->inherited.transport  );
+					br);
 		}
 #ifdef DEBUG_OUTPUT
 		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<end;

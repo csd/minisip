@@ -106,6 +106,7 @@ static MRef<SipMessage*> checkType(string data);
 SipMessageTransport::SipMessageTransport(
                         string local_ip, 
                         string contactIP, 
+			string preferredTransport,
 //                        MRef<SipDialogContainer*> dContainer, 
                         int32_t externalContactUdpPort, 
                         int32_t local_udp_port, 
@@ -120,6 +121,7 @@ SipMessageTransport::SipMessageTransport(
                                         udpsock(false,local_udp_port),
                                         localIP(local_ip),
                                         contactIP(contactIP),
+					preferredTransport(preferredTransport),
                                         externalContactUdpPort(externalContactUdpPort),
                                         localUDPPort(local_udp_port),
                                         localTCPPort(local_tcp_port)
@@ -132,177 +134,107 @@ SipMessageTransport::SipMessageTransport(
 #endif
 							
 {
-/*    
-	socks_lock = new pthread_mutex_t;
-	if( pthread_mutex_init (socks_lock, NULL) < 0 ){
-		merr<< "An error occured when creating sockets mutex"<<end;
-		exit(1);
-	}
-*/
-
-/*
-	semaphore = semget( rand(), 1, 0600 | IPC_CREAT );
-
-	if (semaphore<0){
-		perror("Could not create semaphore");
-		exit(1);
-	}
-	union semun {
-		int val;
-		struct semid_ds *buf;
-		ushort * array;
-	} argument;
-
-	argument.val = 0;
-
-	if( semctl(semaphore, 0, SETVAL, argument) < 0) {
-		fprintf( stderr, "Cannot set semaphore value.\n");
-		exit(1);
-	}
-*/
-    
-//	pthread_t udp, stream;
 	int i;
-
-        
-        
-	//if( pthread_create( &udp, NULL, udpThread, this ) ){
-	//	merr << "Could not create transport thread" << end;
-	//	exit(1);
-	//}
-//	mout << "Creating udpThread..."<<end;
         Thread::createThread(udpThread, this);
-//	mout<< "Done creating thread"<< end;
 	
 	for( i=0; i < NB_THREADS ; i++ ){
-		//if( pthread_create( &stream, NULL, streamThread, this ) ){
-		//	merr << "Could not create transport thread" << end;
-		//	exit(1);
-		//}
             Thread::createThread(streamThread, this);
 	}
 }
 
-
 void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
-//	cerr << "SipMessageTransport::setSipSMCommandReceiver: setting commandReceiver"<<endl;
 	commandReceiver = rec;
-//	cerr << "SipMessageTransport::setSipSMCommandReceiver: done setting commandReceiver"<<endl;
 }
 
-/*
-void SipMessageTransport::setSipMessageReceiver(MRef<SipMessageReceiver *> rcvr){
-//	cerr << "SipMessageTransport::setSipMessageReceiver: setting messageReceiver"<<endl;
-	messageReceiver = rcvr;
-//	cerr << "SipMessageTransport::setSipMessageReceiver: done setting messageReceiver"<<endl;
+void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
+		                        StreamSocket * socket,
+					string branch ){
+	string transport;
+	uint16_t port;
+
+	if( socket ){
+		if( socket->getType() == SOCKET_TYPE_TLS ){
+			transport = "TLS";
+			port = localTLSPort;
+		}
+		else{
+			transport = "TCP";
+			port = localTCPPort;
+		}
+	}
+	else{
+		transport = "UDP";
+		port = localUDPPort;
+	}
+	
+	MRef<SipHeaderValue*> hdrVal = 
+		new SipHeaderValueVia(transport, localIP, port, branch);
+	
+	MRef<SipHeader*> hdr = new SipHeader( hdrVal );
+	
+	pack->addHeader( hdr );
 }
-*/
 
-
-//Create a socket and send on this one.
 void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
                                      IPAddress &ip_addr, 
                                      int32_t port, 
-                                     Socket * &socket, 
-				     string branch,
-                                     string transport
+				     string branch
 				     )
 {
-	try{
-		if (transport=="ANY" || transport=="UDP"){
-			string packet_string;
-			if( pack->getType() != SipResponse::type ){
-//#ifdef DEBUG_OUTPUT
-//                                merr << "Transport layer adding via with port "<< externalContactUdpPort << end;
-//#endif
-	
-//				if (pack->getType()==SipAck::type)
-//					pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("UDP", localIP, localUDPPort, branch+"ACK")));
-//				else
+	StreamSocket * socket;
 
-				MRef<SipHeaderValue*> hdrVal = new SipHeaderValueVia("UDP", localIP, localUDPPort, branch);
-				MRef<SipHeader*> hdr = new SipHeader(hdrVal);
-				pack->addHeader(hdr);
-//pack->addHeader(MRef<SipHeader*>(new SipHeader(SIP_HEADER_TYPE_VIA, "Via:", MRef<SipHeaderValue*>(new SipHeaderVia("UDP", localIP, localUDPPort, branch))));
-				
-//				
+	try{
+		socket = findStreamSocket(ip_addr, port);
+
+		if( socket == NULL && preferredTransport != "UDP" ){
+			/* No existing StreamSocket to that host,
+			 * create one */
+
+			if( preferredTransport == "TLS" ){
+				socket = new TLSSocket( ip_addr, 
+						port, tls_ctx, cert, cert_db );
+
+				addSocket( socket );
+			}
+
+			else{ /* TCP */
+				socket = new TCPSocket( ip_addr, port );
+
+				addSocket( socket );
 			}
 			
-			packet_string = pack->getString();
-#ifndef WIN32
-			ts.save( PACKET_OUT );
-#endif
-#ifdef DEBUG_OUTPUT
-//			mout << "OUT (UDP), From localhost:"<<udpsock.get_port()
-//					<< " to "<<ip_addr.get_string()
-//					<<":"<<port<<end;
-
-			printMessage("OUT (UDP)", packet_string);
-#endif
-#if 0
-			if( sendto(udpsock.getFd(), 
-					packet_string.c_str(), 
-					packet_string.length(), 
-					0, 
-					ip_addr.getSockaddrptr(port), 
-					ip_addr.getSockaddrLength()
-				  ) == -1){
-				perror("Could not send a SIP packet through UDP:");
+			if( pack->getType() != SipResponse::type ){
+				MRef<SipHeaderValue*> hval = 
+					new SipHeaderValueVia(preferredTransport, localIP, localTCPPort, branch);
+				
+				MRef<SipHeader*> hdr = new SipHeader(hval);
+				
+				pack->addHeader(hdr);
 			}
-#endif
+		}
+
+		addViaHeader( pack, socket, branch );
+
+		string packetString = pack->getString();
+		
+		if( socket ){
+			/* At this point if socket != we send on a 
+			 * streamsocket */
+			if( socket->write( packetString ) == -1 ){
+				throw new SendFailed( errno );
+			}
+		}
+		else{
+			/* otherwise use the UDP socket */
 			if( udpsock.sendTo( ip_addr, port, 
-					(const void*)packet_string.c_str(),
-					(int32_t)packet_string.length() ) == -1 ){
+					(const void*)packetString.c_str(),
+					(int32_t)packetString.length() ) == -1 ){
 			
 				throw new SendFailed( errno );
 			
 			}; 
-	
-		} else if (transport=="TCP"){
-			TCPSocket * tcpsock;
-			addSocket(tcpsock = new TCPSocket(ip_addr, port));
-			if( pack->getType() != SipResponse::type ){
-				MRef<SipHeaderValue*> hval = new SipHeaderValueVia(transport, localIP, localTCPPort, branch);
-				MRef<SipHeader*> hdr = new SipHeader(hval);
-				pack->addHeader(hdr);
-				//pack->addHeader(MRef<SipHeader*>(new SipHeaderVia(transport, localIP, localTCPPort, branch))); //FIXME: WARNING: if we are behind NAT TCP will not get any incoming connections--EE
-			}
-			ts.save( PACKET_OUT );
-#ifdef DEBUG_OUTPUT
-			printMessage("OUT (TCP)", pack->getString());
-#endif
-			if( tcpsock->write(pack->getString()) == -1 ){
-				throw new SendFailed( errno );
-			}
-
-			merr << "Created new TCP Socket" << end;
-			socket = tcpsock;
-#ifndef NO_SECURITY
-		} else if (transport=="TLS"){
-			TLSSocket * tlssock;
-			ts.save( TLS_START );
-			tlssock = new TLSSocket(ip_addr, 5061/*FIXME*/,tls_ctx, cert, cert_db);
-			ts.save( TLS_END );
-			socket = tlssock; //socket is a reference
-			
-			addSocket( tlssock );
-			if( pack->getType() != SipResponse::type ){     //WARNING: If behind NAT, TLS will not get any incoming connections.
-				pack->addHeader(new SipHeader(new SipHeaderValueVia("TLS"/*SER fix "TCP"*/, localIP, localTLSPort, branch)));
-			}
-			merr << "Created new TLS Socket" << end;
-			ts.save( PACKET_OUT );
-#ifdef DEBUG_OUTPUT
-			printMessage("OUT (TLS)", pack->getString());
-#endif
-			if( tlssock->write(pack->getString()) == -1 ){
-				throw new SendFailed( errno );
-			}
-#endif //NO_SECURITY
-		}else{
-			merr << "SipMessageTransport: ERROR: unimplemented transport protocol: "<< transport << end;
-			socket = NULL;
 		}
-	} 
+	}
 	catch( NetworkException * exc ){
 		string message = exc->errorDescription();
 		string callId = pack->getCallId();
@@ -319,8 +251,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 		delete exc;
 
-		
-//		commandReceiver->enqueueCommand( transportErrorCommand );
 		if (! commandReceiver.isNull())
 			commandReceiver->handleCommand( transportErrorCommand );
 		else
@@ -329,33 +259,25 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 	
 }
 
-//Use a previously created socket
-void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, StreamSocket * socket, string branch){
-	assert(socket != NULL);
-	
-	if( pack->getType() != SipResponse::type ){
-		if( socket->getType() == SOCKET_TYPE_TCP ){
-			pack->addHeader(MRef<SipHeader*>(new SipHeader(new SipHeaderValueVia("TCP", contactIP, localTCPPort, branch))));
-		}else{
-			pack->addHeader(MRef<SipHeader*>(new SipHeader(new SipHeaderValueVia("TCP"/*SER fix "TCP"*/, contactIP, localTLSPort, branch))));
-		}
-	}
-
-	ts.save( PACKET_OUT );
-	socket->write(pack->getString());
+void SipMessageTransport::addSocket(StreamSocket * sock){
+	socks_lock.lock();
+	this->socks.push_back(sock);
+	socks_lock.unlock();
+        semaphore.inc();
 }
 
-void SipMessageTransport::addSocket(StreamSocket * sock){
-	this->socks.push_back(sock);
-/*
-	struct sembuf operations[1];
-	operations[0].sem_num = 0;
-	operations[0].sem_op = 1;
-	operations[0].sem_flg = 0;
+StreamSocket * SipMessageTransport::findStreamSocket( IPAddress & address, uint16_t port ){
+	list<StreamSocket *>::iterator i;
 
-	semop(semaphore, operations, 1 );
-*/
-        semaphore.inc();
+	socks_lock.lock();
+	for( i=socks.begin(); i != socks.end(); i++ ){
+		if( (*i)->matchesPeer(address, port) ){
+			socks_lock.unlock();
+			return *i;
+		}
+	}
+	socks_lock.unlock();
+	return NULL;
 }
 
 void SipMessageTransport::udpSocketRead(){
@@ -367,29 +289,18 @@ void SipMessageTransport::udpSocketRead(){
 	pack.setUser("SipMessageTransport::udpSocketRead:pack");
 #endif
 	int32_t nread;
-//	struct sockaddr_in from;                        //FIXME: This should be handled by netutil --EE
-//	int32_t fromlen = sizeof(from);
     	fd_set set;
 	
 	while( true ){
-		//p[0].fd = udpsock.getFd();
-		//p[0].events = POLLIN;
 	        FD_ZERO(&set);
         	FD_SET(udpsock.getFd(), &set);
 
 		do{
             		avail = select(udpsock.getFd()+1,&set,NULL,NULL,NULL );
-			//avail = poll( p, 1, -1);
 		} while( avail < 0 );
 
-		//if( p[0].revents != 0 ){
 		if( FD_ISSET( udpsock.getFd(), &set )){
-//#ifndef WIN32
-			//nread = recvfrom(udpsock.getFd(), buffer, 16384, 0, (struct sockaddr *)&from, (socklen_t *)&fromlen);
 			nread = udpsock.recv(buffer, 16384);
-//#else
-//			nread = recvfrom(udpsock.getFd(), buffer, 16384, 0, (struct sockaddr *)&from, (int *)&fromlen);
-//#endif
 			
 			if (nread == -1){
 				merr << "Some error occured while reading from UdpSocket"<<end;
@@ -454,24 +365,13 @@ void SipMessageTransport::threadPool(){
 	while(true){
 
 		StreamSocket * socket;
-
-/*
-                struct sembuf operations[1];
-		operations[0].sem_num = 0;
-		operations[0].sem_op = -1;
-		operations[0].sem_flg = 0;
-		
-		semop(semaphore, operations, 1);
-*/
                 semaphore.dec();
                 
-		//pthread_mutex_lock( socks_lock );
                 socks_lock.lock();
                 
 		socket = socks.front();
 		socks.pop_front();
 		
-                //pthread_mutex_unlock( socks_lock );
 		socks_lock.unlock();
                 
 		streamSocketRead( socket );

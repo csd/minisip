@@ -43,6 +43,7 @@ class SipMessageTransport : public virtual MObject{
 	public:
 		SipMessageTransport(string local_ip, 
                         string contactIP,
+			string preferredTransport="UDP",
                         int32_t externalContactUdpPort=5060, 
                         int32_t local_udp_port=5060, 
                         int32_t local_tcp_port=5060 
@@ -64,12 +65,8 @@ class SipMessageTransport : public virtual MObject{
 		void sendMessage(MRef<SipMessage*> pack, 
 				IPAddress &toaddr, 
 				int32_t port, 
-				Socket* &socket,
-				string branch,
-				string transport="ANY"
+				string branch
 				);
-		
-		void sendMessage(MRef<SipMessage*> pack, StreamSocket* socket, string branch);
 			
 		void addSocket(StreamSocket* sock);
 
@@ -88,6 +85,8 @@ class SipMessageTransport : public virtual MObject{
 		void threadPool();
 
 	private:
+		void addViaHeader( MRef<SipMessage*> pack, StreamSocket * socket, string branch );
+		StreamSocket * findStreamSocket(IPAddress&, uint16_t);
 		
 		UDPSocket udpsock;
 		list<StreamSocket *> socks;
@@ -96,6 +95,7 @@ class SipMessageTransport : public virtual MObject{
 
 		string localIP;
 		string contactIP;
+		string preferredTransport;
 		int32_t externalContactUdpPort;
 		int32_t localUDPPort;
 		int32_t localTCPPort;
