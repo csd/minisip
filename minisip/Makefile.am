@@ -1,4 +1,3 @@
-pkgdatadir = @datadir@/minisip
 CPPFLAGS = @CPPFLAGS@ -DDATADIR="$(datadir)"
 LDFLAGS = @LDFLAGS@
 
