@@ -72,7 +72,7 @@ string MediaStream::getRtpMap(){
 
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	string rtpmap;
-	int i;
+//	int i;
 	uint8_t rtpPayloadType = m->getFormat(formatIndex);
 
 	media->handleMHeader( m );

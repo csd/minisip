@@ -61,7 +61,7 @@ void GroupListServer::run(){
 	
 	TCPSocket* socket;
 	char buffer[16384];
-	int avail;
+//	int avail;
 	int32_t nread=1;
 	string received;
 	
@@ -87,7 +87,7 @@ void GroupListServer::run(){
 		if(starts_with(received, "GET")) {
 			
 			//parse groupId
-			for(int x=4;x<received.size();x++){
+			for(uint32_t x=4;x<received.size();x++){
 				if(received[x]!='\n' && received[x]!='\r')
 					groupId+=received[x];
 				else
@@ -99,7 +99,7 @@ void GroupListServer::run(){
 			mdbg<<"GroupID: *" << groupId<<"*"<<end;
 #endif
 			//find correct GroupList and send it
-			for(int k=0;k<grpLists.size();k++){
+			for(uint32_t k=0;k<grpLists.size();k++){
 				
 				if(grpLists.at(k)->getGroupIdentity()==groupId){
 					socket->write("GET\r\n\r\n"+grpLists.at(k)->print());
@@ -159,7 +159,7 @@ void GroupListServer::addGroupList(MRef<GroupList*> grpList){
 
 MRef<GroupList*> GroupListServer::getGroupList(string groupId){
 	
-	for (int k=0; k<grpLists.size();k++){
+	for (uint32_t k=0; k<grpLists.size();k++){
 		if(grpLists.at(k)->getGroupIdentity()==groupId)
 			return grpLists.at(k);
 	}	

@@ -99,21 +99,21 @@ void RtcpTransactionIdleFloor::setUpStateMachine(){
 	addState(s_terminated);
 
 
-	StateTransition<SipSMCommand,string> *transition_start_idlesent=
+//	StateTransition<SipSMCommand,string> *transition_start_idlesent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_idlesent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionIdleFloor::a0_start_idlesent, 
 				s_start, s_idle_sent
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_idlesent_idlesent=
+//	StateTransition<SipSMCommand,string> *transition_idlesent_idlesent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idlesent_idlesent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionIdleFloor::a1_idlesent_idlesent, 
 				s_idle_sent, s_idle_sent
 				);
 
-	StateTransition<SipSMCommand,string> *transition_idlesent_terminated=
+//	StateTransition<SipSMCommand,string> *transition_idlesent_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idlesent_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionIdleFloor::a2_idlesent_terminated, 

@@ -85,7 +85,7 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-	for (int j=0; j< torequests.size(); j++,jj++){
+	for (uint32_t j=0; j< torequests.size(); j++,jj++){
 		if ( *d == *((*jj).get_subscriber()) ){
 			int ms= (*jj).get_ms_to_timeout();
 			cerr << string("            timeout: ")+ (*jj).get_command()
@@ -116,7 +116,7 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 
 			int ntimeouts=0;
 			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-			for (int j=0; j< torequests.size(); j++, jj++){
+			for (uint32_t j=0; j< torequests.size(); j++, jj++){
 				if ( *((*i)) == *((*jj).get_subscriber()) ){
 					int ms= (*jj).get_ms_to_timeout();
 					cerr << string("                        timeout: ")

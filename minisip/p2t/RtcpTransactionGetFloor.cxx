@@ -100,7 +100,7 @@ bool RtcpTransactionGetFloor::a2_reqsent_completed_grant( const SipSMCommand &co
 		//set ssrc
 		int ssrc=0;
 		
-		for(int k=0;k<command.getCommandString().getParam().size();k++) 
+		for(uint32_t k=0;k<command.getCommandString().getParam().size();k++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[k]-'0');
 		
 		if(/*gf->*/getDialogP2T()->getGroupList()->isParticipant(/*gf->*/getUser()))
@@ -157,11 +157,11 @@ bool RtcpTransactionGetFloor::a3_reqsent_completed_request( const SipSMCommand &
 		//set ssrc and store his sequence number
 		//maybe we have to grant him later the floor.
 		int ssrc=0;
-		for(int k=0;k<command.getCommandString().getParam().size();k++) 
+		for(uint32_t k=0;k<command.getCommandString().getParam().size();k++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[k]-'0');
 			
 		int sNo=0;
-		for(int x=0;x<command.getCommandString().getParam2().size();x++) 
+		for(uint32_t x=0;x<command.getCommandString().getParam2().size();x++) 
 			sNo = (sNo*10) + (command.getCommandString().getParam2()[x]-'0');
 		
 		
@@ -360,49 +360,49 @@ void RtcpTransactionGetFloor::setUpStateMachine(){
 	addState(s_terminated);
 
 
-	StateTransition<SipSMCommand,string> *transition_start_reqsent=
+//	StateTransition<SipSMCommand,string> *transition_start_reqsent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_reqsent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a0_start_reqsent, 
 				s_start, s_req_sent
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_reqsent_reqsent=
+//	StateTransition<SipSMCommand,string> *transition_reqsent_reqsent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_reqsent_reqsent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a1_reqsent_reqsent, 
 				s_req_sent, s_req_sent
 				);
 
-	StateTransition<SipSMCommand,string> *transition_reqsent_completed_grant=
+//	StateTransition<SipSMCommand,string> *transition_reqsent_completed_grant=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_reqsent_completed_grant",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a2_reqsent_completed_grant, 
 				s_req_sent, s_completed
 				);
 
-	StateTransition<SipSMCommand,string> *transition_reqsent_completed_request=
+//	StateTransition<SipSMCommand,string> *transition_reqsent_completed_request=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_reqsent_completed_request",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a3_reqsent_completed_request, 
 				s_req_sent, s_completed
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_reqsent_completed_timer=
+//	StateTransition<SipSMCommand,string> *transition_reqsent_completed_timer=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_reqsent_completed_timer",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a4_reqsent_completed_timer, 
 				s_req_sent, s_completed
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_completed_terminated=
+//	StateTransition<SipSMCommand,string> *transition_completed_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_completed_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a5_completed_terminated, 
 				s_completed, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_reqsent_terminated=
+//	StateTransition<SipSMCommand,string> *transition_reqsent_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_reqsent_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a6_reqsent_terminated, 
@@ -416,7 +416,7 @@ void RtcpTransactionGetFloor::setUpStateMachine(){
 				s_completed, s_completed
 				);*/
 	
-	StateTransition<SipSMCommand,string> *transition_completed_completed_request=
+//	StateTransition<SipSMCommand,string> *transition_completed_completed_request=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_completed_completed_request",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGetFloor::a8_completed_completed_request, 

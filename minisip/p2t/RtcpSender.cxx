@@ -77,7 +77,7 @@ void RtcpSender::send_APP_FC(unsigned subtype, unsigned ssrc, string name, IPAdd
 
 				
 		//add appdata2 (sdes cname) for REQUEST and GRANT messages
-		if (subtype==P2T::APP_REQUEST || subtype==P2T::APP_GRANT) {
+		if (subtype==(unsigned)P2T::APP_REQUEST || subtype==(unsigned)P2T::APP_GRANT) {
 			//string uri = call->getDialogConfig().inherited.userUri;
 			string uri = call->getDialogConfig().inherited.sipIdentity->getSipUri();
 			

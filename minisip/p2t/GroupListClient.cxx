@@ -60,11 +60,11 @@ MRef<GroupList*> GroupListClient::getGroupList(string GroupId, char *srv_addr, i
 
 	//remove first line with xml info
 	if(starts_with(content,"<?xml")){
-		int i=0;
-		for(i;content[i]!='\n';i++){}
+		uint32_t i=0;
+		for(/*i*/;content[i]!='\n';i++){}
 		i++;
 		
-		for(i;i<content.size();i++)
+		for(/*i*/;i<content.size();i++)
 			xml+=content[i];
 		
 	}
@@ -90,11 +90,11 @@ MRef<GroupList*> GroupListClient::downloadGroupList(string file, char *srv_addr,
 	
 	//remove first line with xml info
 	if(starts_with(content,"<?xml")){
-		int i=0;
-		for(i;content[i]!='\n';i++){}
+		uint32_t i=0;
+		for(/*i*/;content[i]!='\n';i++){}
 		i++;
 		
-		for(i;i<content.size();i++)
+		for(/*i*/;i<content.size();i++)
 			xml+=content[i];
 		
 	}
@@ -124,7 +124,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
 	int sock;
    	struct sockaddr_in server;
     	struct hostent *host_info;
-    	unsigned long addr;
+//    	unsigned long addr;
     	int count;
 	char buffer[8192];
 	
@@ -194,13 +194,13 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
 	// with '\r' '\n' '\r' '\n' characters
 	string header="";
 	string content="";
-	int i=0;
+	uint32_t i=0;
 	
-	bool n_received;
-	bool r_received;
+	bool n_received=false;
+	bool r_received=false;
 
 	//header
-	for (i;!(n_received && r_received && data[i]=='\n');i++){
+	for (/*i*/;!(n_received && r_received && data[i]=='\n');i++){
 	
 		if(data[i]=='\n')
 			n_received=true;	
@@ -217,7 +217,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
 	
 	//content
 	i++;
-	for (i; i<data.size(); i++){
+	for (/*i*/; i<data.size(); i++){
 		content += data[i];
 	}
 	//close(sock)

@@ -60,7 +60,7 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 	Gtk::StockID stockGoForw( Gtk::Stock::GO_FORWARD );
 	Gtk::IconSize menuIconSize( Gtk::ICON_SIZE_SMALL_TOOLBAR  );
 
-	bool red = false;
+//	bool red = false;
 
 	if( dynamic_cast<LogEntryIncoming *>( *entry ) != NULL ){
 		(*iter)[ typeColumn ] = render_icon( stockGoBack, menuIconSize );

@@ -130,6 +130,10 @@ Minisip::Minisip( int32_t argc, char**argv ){
 	gui->setContactDb(contactDb);
 }
 
+Minisip::~Minisip(){
+
+}
+
 void Minisip::exit(){
 	//TODO
 	/* End on-going calls the best we can */
@@ -273,7 +277,7 @@ void Minisip::initParseConfig(){
                         }
 
                         if (ret.length()>0){
-                                bool ok;
+                                //bool ok;
                                 gui->displayErrorMessage(ret);
 				/*
                                 ok = gui->configDialog( phoneConf );

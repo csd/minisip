@@ -41,7 +41,7 @@
 
 #define SESSION_LINE "s=Minisip Session"
 
-Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):localIpString(localIp),ka(NULL){
+Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp){
 	this->securityConfig = securityConfig; // hardcopy
 }
 
@@ -136,7 +136,8 @@ MRef<SdpPacket *> Session::getSdpOffer(){
 
 bool Session::setSdpAnswer( MRef<SdpPacket *> answer ){
 	fprintf( stderr, "setSdpAnswer started\n" );
-	unsigned int i, j;
+	unsigned int i;
+	int j;
 	MRef<MediaStream *> receiver;
 	IPAddress * remoteAddress;
 	// Not used
@@ -230,7 +231,8 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 
 bool Session::setSdpOffer( MRef<SdpPacket *> offer ){
 	fprintf( stderr, "setSdpOffer started\n" );
-	unsigned int i,j;
+	unsigned int i;
+	int j;
 	MRef<MediaStream *> receiver;
 	MRef<SdpPacket *> packet;
 	IPAddress * remoteAddress;

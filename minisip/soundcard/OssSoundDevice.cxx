@@ -246,8 +246,8 @@ int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 
 	int nReadBytes = 0;
 	int totalBytesRead = 0;
-	struct timeval tv, tv2;
-	struct timezone tz;
+//	struct timeval tv, tv2;
+//	struct timezone tz;
 
         //FIXME: Hack to make sampleSize correct - I don't understand the
         //getSampleSize method... -Erik

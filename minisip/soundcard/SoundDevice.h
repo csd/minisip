@@ -77,8 +77,8 @@ class SoundDevice: public MObject{
 		int nChannelsRecord;
 		int format;
 		int sampleSize;
-		bool openedPlayback;
 		bool openedRecord;
+		bool openedPlayback;
 	private:
                 Mutex mLockRead;
                 Mutex mLockWrite;

@@ -324,9 +324,9 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	//parse gServer
 	string server="";
 	int port=0;
-	int k=0;
+	uint32_t k=0;
 				
-	for(k;k<gServer.size();k++){
+	for(/*k*/;k<gServer.size();k++){
 		if(gServer[k]!=':')
 			server+=gServer[k];
 		else
@@ -492,7 +492,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	grpListServer->addGroupList(grpList);
 	
 	//send accept_invite to all waiting SipDialogP2Tuser dialogs for this session
-	for(int l=0; l<grpList->getAllUser().size(); l++){
+	for(uint32_t l=0; l<grpList->getAllUser().size(); l++){
 		if(grpList->getAllUser().at(l)->getStatus()==P2T::STATUS_WAITACCEPT){
 			CommandString cmds(grpList->getAllUser().at(l)->getCallId(), SipCommandString::accept_invite);
 			SipSMCommand scmd(cmds, SipSMCommand::remote, SipSMCommand::TU);
@@ -504,7 +504,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	//Start SipDialogP2Tuser for all remaining participants in the Group Member List
 	MRef<SipDialogConfig*> callConf;
 	string user="";
-	for(int k=0; k<grpList->getAllUser().size(); k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size(); k++){
 		user=grpList->getAllUser().at(k)->getUri();
 		
 		//filter out own username
@@ -578,7 +578,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		
 	//Start SipDialogP2Tuser for all participants in the Group Member List
 	string user="";
-	for(int k=0; k<grpList->getAllUser().size(); k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size(); k++){
 		user=grpList->getAllUser().at(k)->getUri();
 		
 		//filter out own username
@@ -658,7 +658,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 		
 		string proxy;
 		string port;
-		int i=startAddr;
+		uint32_t i=startAddr;
 		while (user[i]!='@')
 			if (user[i]==':')
 				return false; //malformed
@@ -706,7 +706,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branc
 void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
 
         string tmp = getDialogConfig().inherited.sipIdentity->getSipUri();
-        int i = tmp.find("@");
+        uint32_t i = tmp.find("@");
         assert(i!=string::npos);
         i++;
         string domain;

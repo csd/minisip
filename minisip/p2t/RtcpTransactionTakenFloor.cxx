@@ -91,21 +91,21 @@ void RtcpTransactionTakenFloor::setUpStateMachine(){
 	addState(s_terminated);
 
 
-	StateTransition<SipSMCommand,string> *transition_start_takensent=
+//	StateTransition<SipSMCommand,string> *transition_start_takensent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_takensent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionTakenFloor::a0_start_takensent, 
 				s_start, s_taken_sent
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_takensent_takensent=
+//	StateTransition<SipSMCommand,string> *transition_takensent_takensent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_takensent_takensent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionTakenFloor::a1_takensent_takensent, 
 				s_taken_sent, s_taken_sent
 				);
 
-	StateTransition<SipSMCommand,string> *transition_takensent_terminated=
+//	StateTransition<SipSMCommand,string> *transition_takensent_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_takensent_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionTakenFloor::a2_takensent_terminated, 

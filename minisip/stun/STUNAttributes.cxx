@@ -385,6 +385,7 @@ int STUNAttributeErrorCode::getValue(unsigned char *buf){
 	uint32_t *uip = (uint32_t *)buf;
 	*uip = (errorCode/100 << 8) | errorCode % 100;
 	memcpy(&buf[4], message, messageLength);
+	return messageLength; //XXX: Is this correct?
 }
 
 int STUNAttributeErrorCode::getValueLength(){
@@ -441,6 +442,7 @@ STUNAttributeUnknownAttributes::STUNAttributeUnknownAttributes(
 
 int STUNAttributeUnknownAttributes::getValue(unsigned char *buf){
 	memcpy(buf, attributes, nAttributes * sizeof(uint16_t));
+	return nAttributes * sizeof(uint16_t); //XXX: Is this correct?
 }
 
 int STUNAttributeUnknownAttributes::getValueLength(){

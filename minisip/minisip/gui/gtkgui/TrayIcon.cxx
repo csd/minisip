@@ -93,5 +93,6 @@ bool MTrayIcon::buttonPressed( GdkEventButton * event ){
 			break;
 	}
 			
+	return true;
 }
 #endif

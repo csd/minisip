@@ -65,7 +65,7 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 		/*vc->*/getDialogConfig().seqNo++;
 
 		//start RtcpTransactionGetFloor
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
@@ -136,7 +136,7 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 		}
 		
 		//send Floor TAKEN to all
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
@@ -194,7 +194,7 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 #endif		
 		
 		//start RtcpTransactionReleaseFloor
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
@@ -282,10 +282,10 @@ bool SipDialogP2T::a4_idle_listenreq( const SipSMCommand &command){
 		int sNo=0;
 		int ssrc=0;
 		
-		for(int x=0;x<p2.size();x++) 
+		for(uint32_t x=0;x<p2.size();x++) 
 			sNo = (sNo*10) + (p2[x]-'0');
 		
-		for(int k=0;k<p.size();k++) 
+		for(uint32_t k=0;k<p.size();k++) 
 			ssrc = (ssrc*10) + (p[k]-'0');
 		
 		//check if user is participating in the session
@@ -331,7 +331,7 @@ bool SipDialogP2T::a5_listenreq_listen( const SipSMCommand &command){
 		string user="";
 		int ssrc=0;
 		
-		for(int k=0;k<command.getCommandString().getParam().size();k++) 
+		for(uint32_t k=0;k<command.getCommandString().getParam().size();k++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[k]-'0');
 		
 		//get user and set STATUS_TALKING in the Group Member List
@@ -378,7 +378,7 @@ bool SipDialogP2T::a6_listen_idle( const SipSMCommand &command){
 		
 		//find talking user
 		int talk_ssrc = 0;
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getStatus()==P2T::STATUS_TALKING)
 				talk_ssrc = /*vc->*/getGroupList()->getAllUser().at(k)->getSSRC();
 		}
@@ -386,7 +386,7 @@ bool SipDialogP2T::a6_listen_idle( const SipSMCommand &command){
 		//start transaction
 		string p = command.getCommandString().getParam();
 		int ssrc=0;
-		for(int k=0;k<p.size();k++) 
+		for(uint32_t k=0;k<p.size();k++) 
 			ssrc = (ssrc*10) + (p[k]-'0');		
 		
 		//int sNo=0;
@@ -474,7 +474,7 @@ bool SipDialogP2T::a7_talkreq_listenreq( const SipSMCommand &command){
 		
 		}
 		
-		for(int k=0;k<users.size();k++){
+		for(uint32_t k=0;k<users.size();k++){
 				
 		MRef<SipTransaction*> gf = new RtcpTransactionGrantFloor(MRef<SipDialog*>(/* *vc */ this), 
 				/*vc->*/getGroupList()->getUser(users.at(k))->getSeqNo(), 
@@ -575,13 +575,13 @@ bool SipDialogP2T::a9_collision_listenreq( const SipSMCommand &command){
 		int ssrc=0;
 		int cc=0;
 		
-		for(int k=0;k<p3.size();k++) 
+		for(uint32_t k=0;k<p3.size();k++) 
 			cc = (cc*10) + (p3[k]-'0');
 			
-		for(int x=0;x<p2.size();x++) 
+		for(uint32_t x=0;x<p2.size();x++) 
 			sNo = (sNo*10) + (p2[x]-'0');
 		
-		for(int l=0;l<p.size();l++) 
+		for(uint32_t l=0;l<p.size();l++) 
 			ssrc = (ssrc*10) + (p[l]-'0');
 		
 		
@@ -636,7 +636,7 @@ bool SipDialogP2T::a10_collision_resent_timer( const SipSMCommand &command){
 		merr<<"----------------------"<<end;
 		
 		//start RtcpTransactionGetFloor
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 				
 			//take only COLLISIONED users
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getStatus()==P2T::STATUS_COLLISION){
@@ -750,7 +750,7 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 		
 		
 		//send Floor TAKEN to all
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
@@ -835,7 +835,7 @@ bool SipDialogP2T::a14_listen_listen( const SipSMCommand &command){
 		
 		//find talking user
 		string uri = "";
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getStatus()==P2T::STATUS_TALKING)
 				uri = /*vc->*/getGroupList()->getAllUser().at(k)->getUri();
 		}
@@ -923,7 +923,7 @@ bool SipDialogP2T::a17_listen_idle_revoke( const SipSMCommand &command){
 	
 		//find talking user
 		string uri = "";
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getStatus()==P2T::STATUS_TALKING)
 				uri = /*vc->*/getGroupList()->getAllUser().at(k)->getUri();
 		}
@@ -982,11 +982,11 @@ bool SipDialogP2T::a18_talk_talk_revoke( const SipSMCommand &command){
 		
 		//check sequence number
 		int sNo=0;
-		for(int x=0;x<command.getCommandString().getParam2().size();x++) 
+		for(uint32_t x=0;x<command.getCommandString().getParam2().size();x++) 
 			sNo = (sNo*10) + (command.getCommandString().getParam2()[x]-'0');
 		
 		int ssrc=0;
-		for(int x=0;x<command.getCommandString().getParam().size();x++) 
+		for(uint32_t x=0;x<command.getCommandString().getParam().size();x++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[x]-'0');
 			
 		if(sNo==/*vc->*/getDialogConfig().seqNo){
@@ -1021,7 +1021,7 @@ bool SipDialogP2T::a19_listenreq_listenreq( const SipSMCommand &command){
 		string p = command.getCommandString().getParam();
 		int ssrc=0;
 
-		for(int k=0;k<p.size(); k++){
+		for(uint32_t k=0;k<p.size(); k++){
 			ssrc = (ssrc*10)+(p[k]-'0');
 		}
 		
@@ -1036,7 +1036,7 @@ bool SipDialogP2T::a19_listenreq_listenreq( const SipSMCommand &command){
 		int sNo=0;
 		
 		
-		for(int x=0;x<p2.size();x++) 
+		for(uint32_t x=0;x<p2.size();x++) 
 			sNo = (sNo*10) + (p2[x]-'0');
 		
 		//check if user is participating in the session
@@ -1137,7 +1137,7 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 #endif		
 		
 		//start RtcpTransactionReleaseFloor
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
@@ -1238,7 +1238,7 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 		/*vc->*/getDialogConfig().seqNo++;
 
 		//start RtcpTransactionGetFloor
-		for(int k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
@@ -1367,28 +1367,28 @@ void SipDialogP2T::setUpStateMachine(){
 	
 
 	//transactions:
-	StateTransition<SipSMCommand,string> *transition_idle_talkreq=
+//	StateTransition<SipSMCommand,string> *transition_idle_talkreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_talkreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a0_idle_talkreq, 
 				s_idle, s_talk_req
 				);
 
-	StateTransition<SipSMCommand,string> *transition_talkreq_talk=
+//	StateTransition<SipSMCommand,string> *transition_talkreq_talk=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talkreq_talk",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a1_talkreq_talk, 
 				s_talk_req, s_talk
 				);
 
-	StateTransition<SipSMCommand,string> *transition_talk_releasepend=
+//	StateTransition<SipSMCommand,string> *transition_talk_releasepend=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talk_releasepend",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a2_talk_releasepend, 
 				s_talk, s_release_pend
 				);
 
-	StateTransition<SipSMCommand,string> *transition_releasepend_idle=
+//	StateTransition<SipSMCommand,string> *transition_releasepend_idle=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_releasepend_idle",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a3_releasepend_idle, 
@@ -1396,70 +1396,70 @@ void SipDialogP2T::setUpStateMachine(){
 				);
 
 
-	StateTransition<SipSMCommand,string> *transition_idle_listenreq=
+//	StateTransition<SipSMCommand,string> *transition_idle_listenreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_listenreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a4_idle_listenreq,
 				s_idle, s_listen_req
 				);
 
-	StateTransition<SipSMCommand,string> *transition_listenreq_listen=
+//	StateTransition<SipSMCommand,string> *transition_listenreq_listen=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listenreq_listen",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a5_listenreq_listen,
 				s_listen_req, s_listen
 				);
 
-	StateTransition<SipSMCommand,string> *transition_listen_idle=
+//	StateTransition<SipSMCommand,string> *transition_listen_idle=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listen_idle",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a6_listen_idle,
 				s_listen, s_idle
 				);
 
-	StateTransition<SipSMCommand,string> *transition_talkreq_listenreq=
+//	StateTransition<SipSMCommand,string> *transition_talkreq_listenreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talkreq_listenreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a7_talkreq_listenreq,
 				s_talk_req, s_listen_req
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_talkreq_collision=
+//	StateTransition<SipSMCommand,string> *transition_talkreq_collision=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talkreq_collision",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a8_talkreq_collision,
 				s_talk_req, s_collision
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_collision_listenreq=
+//	StateTransition<SipSMCommand,string> *transition_collision_listenreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_collision_listenreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a9_collision_listenreq,
 				s_collision, s_listen_req
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_collision_resent_timer=
+//	StateTransition<SipSMCommand,string> *transition_collision_resent_timer=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_collision_resent_timer",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a10_collision_resent_timer,
 				s_collision, s_resent
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_resent_collision_collision=
+//	StateTransition<SipSMCommand,string> *transition_resent_collision_collision=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_resent_collision_collision",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a11_resent_collision_collision,
 				s_resent, s_collision
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_resent_talk=
+//	StateTransition<SipSMCommand,string> *transition_resent_talk=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_resent_talk",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a12_resent_talk,
 				s_resent, s_talk
 				);
 
-	StateTransition<SipSMCommand,string> *transition_resent_resent=
+//	StateTransition<SipSMCommand,string> *transition_resent_resent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_resent_resent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a13_resent_resent,
@@ -1467,97 +1467,97 @@ void SipDialogP2T::setUpStateMachine(){
 				);	
 
 	
-	StateTransition<SipSMCommand,string> *transition_listen_listen=
+//	StateTransition<SipSMCommand,string> *transition_listen_listen=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listen_listen",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a14_listen_listen,
 				s_listen, s_listen
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_talkreq_talkreq=
+//	StateTransition<SipSMCommand,string> *transition_talkreq_talkreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talkreq_talkreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a15_talkreq_talkreq,
 				s_talk_req, s_talk_req
 				);
 
-	StateTransition<SipSMCommand,string> *transition_releasepend_releasepend=
+//	StateTransition<SipSMCommand,string> *transition_releasepend_releasepend=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_releasepend_releasepend",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a16_releasepend_releasepend,
 				s_release_pend, s_release_pend
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_listen_idle_revoke=
+//	StateTransition<SipSMCommand,string> *transition_listen_idle_revoke=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listen_idle_revoke",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a17_listen_idle_revoke,
 				s_listen, s_idle
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_talk_talk_revoke=
+//	StateTransition<SipSMCommand,string> *transition_talk_talk_revoke=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talk_talk_revoke",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a18_talk_talk_revoke,
 				s_talk, s_talk
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_listenreq_listenreq=
+//	StateTransition<SipSMCommand,string> *transition_listenreq_listenreq=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listenreq_listenreq",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a19_listenreq_listenreq,
 				s_listen_req, s_listen_req
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_idle_terminated=
+//	StateTransition<SipSMCommand,string> *transition_idle_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a80_idle_terminated,
 				s_idle, s_terminated
 				);						
 
-	StateTransition<SipSMCommand,string> *transition_talkreq_terminated=
+//	StateTransition<SipSMCommand,string> *transition_talkreq_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talkreq_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a81_talkreq_terminated,
 				s_talk_req, s_terminated
 				);
-	StateTransition<SipSMCommand,string> *transition_listenreq_terminated=
+//	StateTransition<SipSMCommand,string> *transition_listenreq_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listenreq_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a82_listenreq_terminated,
 				s_listen_req, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_talk_terminated=
+//	StateTransition<SipSMCommand,string> *transition_talk_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_talk_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a83_talk_terminated,
 				s_talk, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_collision_terminated=
+//	StateTransition<SipSMCommand,string> *transition_collision_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_collision_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a84_collision_terminated,
 				s_collision, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_listen_terminated=
+//	StateTransition<SipSMCommand,string> *transition_listen_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_listen_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a85_listen_terminated,
 				s_listen, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_releasepend_terminated=
+//	StateTransition<SipSMCommand,string> *transition_releasepend_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_releasepend_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a86_releasepend_terminated,
 				s_release_pend, s_terminated
 				);	
 	
-	StateTransition<SipSMCommand,string> *transition_resent_terminated=
+//	StateTransition<SipSMCommand,string> *transition_resent_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_resent_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a87_resent_terminated,
@@ -1567,7 +1567,7 @@ void SipDialogP2T::setUpStateMachine(){
 	//used for development
 	//forces the local UA to produce a collision, if the p2tCollisioner
 	//variable is set.	
-	StateTransition<SipSMCommand,string> *transition_idle_talkreq_collisioner=
+//	StateTransition<SipSMCommand,string> *transition_idle_talkreq_collisioner=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_talkreq_collisioner",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a97_idle_talkreq_collisioner,
@@ -1576,7 +1576,7 @@ void SipDialogP2T::setUpStateMachine(){
 	
 	//used for development. 
 	//can be used to set the p2tPerformance variable			
-	StateTransition<SipSMCommand,string> *transition_idle_idle_performance=
+//	StateTransition<SipSMCommand,string> *transition_idle_idle_performance=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_idle_performance",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a98_idle_idle_performance,
@@ -1585,7 +1585,7 @@ void SipDialogP2T::setUpStateMachine(){
 	
 	//used for development.
 	//can be used to set the p2tCollisioner variable.
-	StateTransition<SipSMCommand,string> *transition_idle_idle_collisioner=
+//	StateTransition<SipSMCommand,string> *transition_idle_idle_collisioner=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_idle_idle_collisioner",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2T::a99_idle_idle_collisioner,
@@ -1687,8 +1687,8 @@ bool SipDialogP2T::modifyUser(string uri, IPAddress *ip, int RTPport, int RTCPpo
 			return true;
 		}
 	}
-	else
-		return false;	
+
+	return false;	
 }
 
 
@@ -1732,7 +1732,7 @@ void SipDialogP2T::setGroupList(MRef<GroupList*> GrpList){
 bool SipDialogP2T::checkStates(int status){
 	bool ret=true;
 	
-	for(int k=0; k<grpList->getAllUser().size();k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size();k++){
 		
 		//filter out own user
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
@@ -1755,7 +1755,7 @@ bool SipDialogP2T::allAnswered(){
 	//merr<<end<<"*****************************"<<end;
 	//merr<<"SipDialogP2T::allAnswered()"<<end;
 	
-	for(int k=0; k<grpList->getAllUser().size();k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size();k++){
 		
 		//filter out own user
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
@@ -1783,14 +1783,14 @@ bool SipDialogP2T::allAnswered(){
 }
 
 void SipDialogP2T::setStates(int status){
-	for(int k=0; k<grpList->getAllUser().size();k++)
+	for(uint32_t k=0; k<grpList->getAllUser().size();k++)
 		grpList->getAllUser().at(k)->setStatus(status);
 }
 
 void SipDialogP2T::terminateSession(){
 
 
-	for(int k=0; k<grpList->getAllUser().size();k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size();k++){
 		
 		
 	
@@ -1819,7 +1819,7 @@ bool SipDialogP2T::highestPrio(int status,vector<string> &users){
 	int myPrio = getGroupList()->getUser(getDialogConfig().inherited.sipIdentity->getSipUri())->getPriority();
 		
 	//find highest priority from the other users
-	for(int k=0; k<grpList->getAllUser().size();k++){
+	for(uint32_t k=0; k<grpList->getAllUser().size();k++){
 		//filter out own user 
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
 		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.sipIdentity->getSipUri())

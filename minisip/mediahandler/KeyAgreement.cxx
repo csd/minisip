@@ -54,7 +54,7 @@ bool Session::responderAuthenticate( string message ){
 			try{
 				MikeyMessage * init_mes = new MikeyMessage(b64Message);
 				
-				MikeyMessage * resp_mes = NULL;
+//				MikeyMessage * resp_mes = NULL;
 				switch( init_mes->type() ){
 					case MIKEY_TYPE_DH_INIT:
 

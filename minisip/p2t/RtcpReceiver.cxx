@@ -85,7 +85,7 @@ RtcpReceiver::RtcpReceiver(MRef<SipSoftPhoneConfiguration*> config, int RTPport)
             IP4Address localAddr(config->inherited.localIpString);
             IP4Address stunAddr(config->stunServerIpString);
 ///            cerr << "local ip="<<phoneConf->inherited.localIpString<< endl;
-            uint16_t localPort = rtcp_sock->getPort();
+//            uint16_t localPort = rtcp_sock->getPort();
             char mappedip[16];
             uint16_t mappedport;
 #ifdef DEBUG_OUTOUT
@@ -144,8 +144,9 @@ void RtcpReceiver::run() {
 		if(rtcp->getHeader().getPayloadtype()==204) {
 			string cmd;
 			string param3="";
-			int dest, src;
-			int seqNo, optional, length, sdes;
+			int dest=0;
+			int src=0;
+			int seqNo=0, optional=0, length, sdes;
 			char * buf;
 			char * uri;
 					

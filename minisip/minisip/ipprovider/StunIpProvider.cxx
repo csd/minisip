@@ -111,7 +111,7 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
                 
 	do{
 		done=true;
-		uint16_t port;
+		uint16_t port=0;
 		string proxy = findStunServer(phoneConf, port);
 
 		try{
@@ -144,7 +144,7 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 	uint16_t localPort = sock.getPort();
 	char mappedip[16];
 	uint16_t mappedport;
-	uint32_t natType = STUN::getNatType( *stunIp, stunPort, 
+	int32_t natType = STUN::getNatType( *stunIp, stunPort, 
 			sock, localips, localPort, mappedip, mappedport );
 
 	if( natType == STUN::STUN_ERROR ){
@@ -165,10 +165,11 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 }
 
 StunIpProvider::StunIpProvider( uint32_t natType, string externalIp, IPAddress * stunIp, uint16_t stunPort ):
-		natType(natType),
 		stunIp(stunIp),
 		stunPort(stunPort),
-		externalIp(externalIp){
+		externalIp(externalIp),
+		natType(natType)
+{
 }
 
 string StunIpProvider::getExternalIp(){
@@ -179,7 +180,7 @@ uint16_t StunIpProvider::getExternalPort( UDPSocket * socket ){
 	char mappedIPBuffer[16];
 	uint16_t mappedPort;
 
-	if( natType == STUN::STUNTYPE_OPEN_INTERNET ){
+	if( natType == (unsigned)STUN::STUNTYPE_OPEN_INTERNET ){
 		/* In that case, don't bother do the STUN query */
 		return socket->getPort();
 	}

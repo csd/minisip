@@ -20,6 +20,7 @@ class ConsoleDebugger;
 class Minisip : public Runnable{
 	public:
 		Minisip( int32_t argc, char**argv );
+		virtual ~Minisip();
 		void exit();
 		void startSip();
 		void runGui();

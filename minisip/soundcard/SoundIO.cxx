@@ -118,7 +118,7 @@ void SoundIO::play_testtone( int secs ){
 		if (i%4==3)data[i]=-10000;
 	}
 	byte_t *ptr = (byte_t *)data;
-	int32_t i=0;
+//	int32_t i=0;
 
 	soundDev->write( ptr, nSamples );
 }
@@ -186,7 +186,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		buffers[i] = (short *)malloc(2048);
 	}
 		
-	short * tempBuffer;
+	short * tempBuffer=NULL;
 
 	while( true ){
 
@@ -378,7 +378,7 @@ void *SoundIO::playerLoop(void *arg){
 				i != active_soundcard->sources.end(); i++,j++){
 			if ((*i)->getId()!=-1 && (*i)->getId()!=-2){
 				(*i)->getSound(tmpbuf, BS, nChannels - 1);
-				for (int32_t j=0; j<BS*nChannels; j++)
+				for (uint32_t j=0; j<BS*nChannels; j++)
 					buf[j]+=tmpbuf[j];
 			}
 		}

@@ -81,7 +81,7 @@ void GroupList::addMember(string uri){
 }
 
 bool GroupList::isMember(string uri){
-	for(int x=0; x<members.size();x++){
+	for(uint32_t x=0; x<members.size();x++){
 		if (members[x]==uri)
 			return true;
 		}
@@ -90,7 +90,7 @@ bool GroupList::isMember(string uri){
 
 
 bool GroupList::isParticipant(string uri){
-	for(int x=0; x<users.size();x++){
+	for(uint32_t x=0; x<users.size();x++){
 		if (users[x]->getUri()==uri){
 			return true;
 		}
@@ -99,7 +99,7 @@ bool GroupList::isParticipant(string uri){
 }
 
 bool GroupList::isParticipant(int ssrc){
-	for(int x=0; x<users.size();x++){
+	for(uint32_t x=0; x<users.size();x++){
 		if (users[x]->getSSRC()==ssrc){
 			return true;
 		}
@@ -120,7 +120,7 @@ void GroupList::addUser(string uri, IPAddress* to_addr, int RTPport, int RTCPpor
 }
 
 MRef<GroupListUserElement*> GroupList::getUser(string uri){
-	for(int x=0; x<users.size();x++) {
+	for(uint32_t x=0; x<users.size();x++) {
 		if(users[x]->getUri()==uri)
 			return users[x];
 	}
@@ -128,7 +128,7 @@ MRef<GroupListUserElement*> GroupList::getUser(string uri){
 }
 
 MRef<GroupListUserElement*> GroupList::getUser(int ssrc){
-	for(int x=0; x<users.size();x++) {
+	for(uint32_t x=0; x<users.size();x++) {
 		if(users[x]->getSSRC()==ssrc)
 			return users[x];
 	}
@@ -147,7 +147,7 @@ void GroupList::addUser(string uri, int priority, int status){
 void GroupList::removeUser(string uri){
 	
 	vector<MRef<GroupListUserElement*> >::iterator iter = users.begin();	
-	for(int x=0; x<users.size();x++) {
+	for(uint32_t x=0; x<users.size();x++) {
 
 		if(users[x]->getUri()==uri)
 			users.erase(iter);
@@ -184,7 +184,7 @@ string GroupList::print(){
 	if(members.empty()==false){
 		xml += "<members size=\"" + itoa(members.size()) + "\">\n";
 		
-		for(int k=0; k<members.size();k++) 
+		for(uint32_t k=0; k<members.size();k++) 
 			xml+="<member uri=\""+members[k]+"\"/>\n";
 		
 		xml += "</members>\n";
@@ -193,7 +193,7 @@ string GroupList::print(){
 	if(users.empty()==false){
 		xml += "<participants size=\"" + itoa(users.size()) + "\">\n";
 		
-		for(int k=0; k<users.size();k++) 
+		for(uint32_t k=0; k<users.size();k++) 
 			xml+="<user uri=\""+users[k]->getUri()+"\" prio=\"" + itoa(users[k]->getPriority())+"\"/>\n";
 		
 		xml += "</participants>\n";
@@ -218,7 +218,7 @@ string GroupList::print_debug(){
 	if(members.empty()==false){
 		xml += "<members size=\"" + itoa(members.size()) + "\">\n";
 		
-		for(int k=0; k<members.size();k++) 
+		for(uint32_t k=0; k<members.size();k++) 
 			xml+="<member uri=\""+members[k]+"\"/>\n";
 		
 		xml += "</members>\n";
@@ -227,7 +227,7 @@ string GroupList::print_debug(){
 	if(users.empty()==false){
 		xml += "<participants size=\"" + itoa(users.size()) + "\">\n";
 		
-		for(int k=0; k<users.size();k++) {
+		for(uint32_t k=0; k<users.size();k++) {
 			xml+="<user uri=\""+users[k]->getUri()+"\" prio=\"" + itoa(users[k]->getPriority())+"\" ";
 			xml+="status=" + itoa(users[k]->getStatus()) + " ";
 			xml+="callID="+users[k]->getCallId() + " />\n";

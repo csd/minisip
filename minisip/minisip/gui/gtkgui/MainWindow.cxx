@@ -294,7 +294,7 @@ void MainWindow::updateConfig(){
 			);
 	}
 
-	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
+//	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
 
 	phoneBookTreeView->expand_all();
 }

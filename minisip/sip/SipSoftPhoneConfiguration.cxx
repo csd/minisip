@@ -68,10 +68,10 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	dynamicSipPort(false),
 	usePSTNProxy(false),
 	tcp_server(false),
-	p2tGroupListServerPort(0)
 #ifndef NO_SECURITY
-	, tls_server(false)
+	tls_server(false),
 #endif
+	p2tGroupListServerPort(0)
 {
 #ifdef MINISIP_MEMDEBUG 
 	//dialogContainer.setUser("SipSoftPhoneConfiguration/sipphone");

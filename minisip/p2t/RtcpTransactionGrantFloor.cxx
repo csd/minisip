@@ -169,48 +169,48 @@ void RtcpTransactionGrantFloor::setUpStateMachine(){
 	addState(s_terminated);
 
 
-	StateTransition<SipSMCommand,string> *transition_start_grantsent=
+//	StateTransition<SipSMCommand,string> *transition_start_grantsent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_grantsent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a0_start_grantsent, 
 				s_start, s_grant_sent
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_grantsent_completed=
+//	StateTransition<SipSMCommand,string> *transition_grantsent_completed=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_grantsent_completed",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a1_grantsent_completed, 
 				s_grant_sent, s_completed
 				);
 
-	StateTransition<SipSMCommand,string> *transition_grantsent_grantsent=
+//	StateTransition<SipSMCommand,string> *transition_grantsent_grantsent=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_grantsent_grantsent",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a2_grantsent_grantsent, 
 				s_grant_sent, s_grant_sent
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_completed_terminated=
+//	StateTransition<SipSMCommand,string> *transition_completed_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_completed_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a3_completed_terminated, 
 				s_completed, s_terminated
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_grantsent_terminated=
+//	StateTransition<SipSMCommand,string> *transition_grantsent_terminated=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_grantsent_terminated",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a4_grantsent_terminated, 
 				s_grant_sent, s_terminated
 				);
-	StateTransition<SipSMCommand,string> *transition_grantsent_grantsent_timer=
+//	StateTransition<SipSMCommand,string> *transition_grantsent_grantsent_timer=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_grantsent_grantsent_timer",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a5_grantsent_grantsent_timer, 
 				s_grant_sent, s_grant_sent
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_completed_completed=
+//	StateTransition<SipSMCommand,string> *transition_completed_completed=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_completed_completed",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &RtcpTransactionGrantFloor::a6_completed_completed, 

@@ -966,28 +966,28 @@ void SipDialogP2Tuser::setUpStateMachine(){
 	addState(s_ringing);
 
 
-	StateTransition<SipSMCommand,string> *transition_start_callingnoauth_invite=
+//	StateTransition<SipSMCommand,string> *transition_start_callingnoauth_invite=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_callingnoauth_invite",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a0_start_callingnoauth_invite, 
 				s_start, s_callingnoauth
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingnoauth_18X=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingnoauth_18X=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_callingnoauth_18X",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a1_callingnoauth_callingnoauth_18X, 
 				s_callingnoauth, s_callingnoauth
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingnoauth_1xx=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingnoauth_1xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_callingnoauth_1xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a2_callingnoauth_callingnoauth_1xx, 
 				s_callingnoauth, s_callingnoauth
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_incall_2xx=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_incall_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_incall_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a3_callingnoauth_incall_2xx, 
@@ -995,7 +995,7 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 
 #ifndef NO_SECURITY
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_2xx=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_termwait_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a24_calling_termwait_2xx,
@@ -1003,28 +1003,28 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 #endif
 
-	StateTransition<SipSMCommand,string> *transition_incall_termwait_BYE=
+//	StateTransition<SipSMCommand,string> *transition_incall_termwait_BYE=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_incall_termwait_BYE",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a5_incall_termwait_BYE,
 				s_incall, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_incall_termwait_hangup=
+//	StateTransition<SipSMCommand,string> *transition_incall_termwait_hangup=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_incall_termwait_hangup",
 				(bool (StateMachine<SipSMCommand,string>::*)(/*State<SipSMCommand, string> *,State<SipSMCommand, string> *,*/const SipSMCommand&)) &SipDialogP2Tuser::a6_incall_termwait_hangup,
 				s_incall, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_CANCEL=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_CANCEL=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_termwait_CANCEL",
 				(bool (StateMachine<SipSMCommand,string>::*)(/*State<SipSMCommand, string> *,State<SipSMCommand, string> *,*/const SipSMCommand&)) &SipDialogP2Tuser::a7_callingnoauth_termwait_CANCEL,
 				s_callingnoauth, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_cancel=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_cancel=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_termwait_cancel",
 				(bool (StateMachine<SipSMCommand,string>::*)(/*State<SipSMCommand, string> *,State<SipSMCommand, string> *,*/const SipSMCommand&)) &SipDialogP2Tuser::a8_callingnoauth_termwait_cancel,
@@ -1032,7 +1032,7 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 
 	
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingauth_40X=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_callingauth_40X=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_callingauth_40X",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a20_callingnoauth_callingauth_40X,
@@ -1040,63 +1040,63 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 	
 
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_36=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_36=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_termwait_36",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a9_callingnoauth_termwait_36,
 				s_callingnoauth, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_start_ringing_INVITE=
+//	StateTransition<SipSMCommand,string> *transition_start_ringing_INVITE=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_ringing_INVITE",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a10_start_ringing_INVITE,
 				s_start, s_ringing
 				);
 
-	StateTransition<SipSMCommand,string> *transition_ringing_incall_accept=
+//	StateTransition<SipSMCommand,string> *transition_ringing_incall_accept=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_ringing_incall_accept",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a11_ringing_incall_accept,
 				s_ringing, s_incall
 				);
 			
-	StateTransition<SipSMCommand,string> *transition_ringing_termwait_CANCEL=
+//	StateTransition<SipSMCommand,string> *transition_ringing_termwait_CANCEL=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_ringing_termwait_CANCEL",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a12_ringing_termwait_CANCEL,
 				s_ringing, s_termwait
 				);
 				
-	StateTransition<SipSMCommand,string> *transition_ringing_termwait_reject=
+//	StateTransition<SipSMCommand,string> *transition_ringing_termwait_reject=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_ringing_termwait_reject",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a13_ringing_termwait_reject,
 				s_ringing, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_start_termwait_INVITE=
+//	StateTransition<SipSMCommand,string> *transition_start_termwait_INVITE=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_start_termwait_INVITE",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a16_start_termwait_INVITE,
 				s_start, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingauth_callingauth_18X=
+//	StateTransition<SipSMCommand,string> *transition_callingauth_callingauth_18X=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_callingauth_18X",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a21_callingauth_callingauth_18X, 
 				s_callingauth, s_callingauth
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingauth_callingauth_1xx=
+//	StateTransition<SipSMCommand,string> *transition_callingauth_callingauth_1xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_callingauth_1xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a22_callingauth_callingauth_1xx, 
 				s_callingauth, s_callingauth
 				);
 
-	StateTransition<SipSMCommand,string> *transition_callingauth_incall_2xx=
+//	StateTransition<SipSMCommand,string> *transition_callingauth_incall_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_incall_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a23_callingauth_incall_2xx, 
@@ -1104,7 +1104,7 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 	
 #ifndef NO_SECURITY
-	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_2xx=
+//	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_termwait_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(/*State<SipSMCommand, string> *,State<SipSMCommand, string> *,*/const SipSMCommand&)) &SipDialogP2Tuser::a24_calling_termwait_2xx,
@@ -1112,21 +1112,21 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				);
 #endif
         
-	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_resp36=
+//	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_resp36=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_termwait_resp36",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a9_callingnoauth_termwait_36,
 				s_callingauth, s_termwait
 				);
 
-	StateTransition<SipSMCommand,string> *transition_termwait_terminated_notransactions=
+//	StateTransition<SipSMCommand,string> *transition_termwait_terminated_notransactions=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_termwait_terminated_notransactions",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a25_termwait_terminated_notransactions,
 				s_termwait, s_terminated
 				);
        
-	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_transporterror=
+//	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_transporterror=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingnoauth_termwait_transporterror",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a26_callingnoauth_termwait_transporterror,
@@ -1403,7 +1403,7 @@ void SipDialogP2Tuser::sendBye(const string &branch, int bye_seq_no){
 
 	//string tmp = getDialogConfig().inherited.userUri;
 	string tmp = getDialogConfig().inherited.sipIdentity->getSipUri();
-	int i = tmp.find("@");
+	uint32_t i = tmp.find("@");
 	assert(i!=string::npos);
 	i++;
 	string domain;

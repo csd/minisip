@@ -120,7 +120,7 @@ string Sip::invite(string &user){
 		
 		string proxy;
 		string port;
-		int i=startAddr;
+		uint32_t i=startAddr;
 		while (user[i]!='@')
 			if (user[i]==':')
 				return "malformed";
@@ -136,7 +136,7 @@ string Sip::invite(string &user){
 			else
 				port = port + user[i++];
 		
-		int iport = atoi(port.c_str());
+		//int iport = atoi(port.c_str());
 				
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
@@ -180,6 +180,7 @@ void Sip::run(){
 
 bool Sip::handleCommand(const SipSMCommand &command){
 	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	return true;
 }
 
 void Sip::setMediaHandler( MRef<MediaHandler *> mediaHandler ){

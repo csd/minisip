@@ -42,6 +42,7 @@
 class LocationDetector : public Runnable {
 	public:
 		LocationDetector(MRef<SipDialogContainer*> callback);
+		virtual ~LocationDetector(){}
                 virtual void run();
 	private:
 		MRef<SipDialogContainer*> callback;

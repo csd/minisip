@@ -86,6 +86,7 @@ int FileSoundDevice::openRecord(int samplerate, int nChannels, int format){
 	}
 	openedRecord=true;
 
+	return 0;
 }
 
 int FileSoundDevice::openPlayback(int samplerate, int nChannels, int format){
@@ -99,6 +100,7 @@ int FileSoundDevice::openPlayback(int samplerate, int nChannels, int format){
 
 	openedPlayback=true;
 
+	return 0;
 }
 
 int FileSoundDevice::closePlayback(){

@@ -141,7 +141,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 	cert = new certificate_chain();
 
 	if( certFile != "" ){
-		certificate * cert;
+		certificate * cert=NULL;
 
 		try{
 			cert = new certificate( certFile );
