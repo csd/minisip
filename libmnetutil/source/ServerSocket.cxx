@@ -49,15 +49,15 @@ ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 	this->domain=domain;
 	this->listen_port=listenport;
 	fd = socket(domain, SOCK_STREAM, IPPROTO_TCP);
+	if (fd<0){
+		throw new SocketFailed( errno );
+	}
 	int32_t on=1;
 #ifdef WIN32
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
 #else
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
 #endif
-	if (fd<0){
-		throw new SetSockOptFailed( errno );
-	}
 
 }
 
@@ -80,7 +80,7 @@ void ServerSocket::listen(string local_ip, int32_t local_port, int32_t backlog){
 	local_addr.sin_port = htons((int16_t)local_port);
 	local_addr.sin_addr.s_addr = inet_addr(local_ip.c_str());
 	memset(&(local_addr.sin_zero), '\0', 8);
-	
+
 	if (bind(fd,(struct sockaddr*)&local_addr, sizeof(struct sockaddr))!=0){
 		throw new BindFailed( errno );
 	}

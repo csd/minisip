@@ -50,7 +50,6 @@ string NetworkException::errorDescription(){
 	strerror_r( errorNumber, buf, 256 );
 	return string( (const char *)buf );
 #endif
-	return "NOT_SET";
 }
 
 #ifndef NO_SECURITY

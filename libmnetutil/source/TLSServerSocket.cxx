@@ -87,12 +87,6 @@ TLSServerSocket::TLSServerSocket(int32_t listen_port, MRef<certificate *> cert):
 
 		exit( 1 );
 	}
-
-	struct sockaddr_in sin;
-        memset(&sin, '\0', sizeof(sin));
-        sin.sin_family = AF_INET;
-        sin.sin_port = htons(listen_port);
-        this->listen((struct sockaddr *)&sin,sizeof(sin),20);
 }
 
 StreamSocket *TLSServerSocket::accept(){
