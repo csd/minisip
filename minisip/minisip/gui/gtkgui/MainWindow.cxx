@@ -46,6 +46,13 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
+	Gtk::MenuBar  * minisipMenubar;
+	Gtk::MenuItem * addContactMenu;
+	Gtk::MenuItem * addAddressContactMenu;
+	Gtk::MenuItem * removeContactMenu;
+	Gtk::MenuItem * editContactMenu;
+	Gtk::MenuItem * callMenu;
+	Gtk::MenuItem * imMenu;
 
   	try
   	{
@@ -73,6 +80,14 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "phoneRemoveMenu", phoneRemoveMenu );
 	refXml->get_widget( "phoneEditMenu", phoneEditMenu );
 	
+	refXml->get_widget( "addContactMenu", addContactMenu );
+	refXml->get_widget( "addAddressContactMenu", addAddressContactMenu );
+	refXml->get_widget( "removeContactMenu", removeContactMenu );
+	refXml->get_widget( "editContactMenu", editContactMenu );
+
+	refXml->get_widget( "callMenu", callMenu );
+	refXml->get_widget( "imMenu", imMenu );
+
 	treeSelection = phoneBookTreeView->get_selection();
 
 //	treeSelection->set_select_function( SigC::slot( *this, 
@@ -89,6 +104,7 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
 		SigC::slot( *this, &MainWindow::phoneTreeClicked ), false );
 
+	/* Context menu */
 	phoneAddAddressMenu->signal_activate().connect(
 		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool >(
 		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
@@ -108,16 +124,39 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
 		SigC::slot( *phoneBookModel, &PhoneBookModel::editContact ),
 		treeSelection ));
-
-
+	
+	/* Contact menu from the menubar */
+	addAddressContactMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool >(
+		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		treeSelection, true ));
+	
+	addContactMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool>(
+		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		treeSelection, false ));
+	
+	removeContactMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
+		SigC::slot( *phoneBookModel, &PhoneBookModel::removeContact ),
+		treeSelection ));
+	
+	editContactMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
+		SigC::slot( *phoneBookModel, &PhoneBookModel::editContact ),
+		treeSelection ));
 	
 	refXml->get_widget( "callButton", callButton );
 
 	callButton->signal_clicked().connect( SigC::slot( *this, &MainWindow::invite ) );
+	
+	callMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::invite ) );
 
 	refXml->get_widget( "imButton", imButton );
 
 	imButton->signal_clicked().connect( SigC::slot( *this, &MainWindow::im ) );
+	
+	imMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::im ) );
 	
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, certificateDialog );

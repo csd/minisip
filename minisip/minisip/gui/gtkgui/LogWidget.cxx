@@ -104,7 +104,7 @@ void LogWidget::setFont( Gtk::CellRenderer * renderer,
 		callDetail = contactEntry->getName();
 	}
 	else{
-		callDetail = logEntry->peerSipUri;
+		callDetail = "<u><span foreground=\"#0000FF\">" + logEntry->peerSipUri + "</span></u>";
 	}
 	
 	MRef<LogEntryFailure *> failureEntry;
