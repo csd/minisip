@@ -819,7 +819,7 @@ int MsipIpsecSA::set(){
 			keymat[i] = a_key[j];
 		}
 		
-		cerr << "Adding SA SPI: " << ntohl(spi) << endl;
+		//cerr << "Adding SA SPI: " << ntohl(spi) << endl;
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
