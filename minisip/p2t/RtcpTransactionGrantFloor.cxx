@@ -280,7 +280,7 @@ MRef<SipDialogP2T*> RtcpTransactionGrantFloor::getDialogP2T() {
 void RtcpTransactionGrantFloor::sendGrant() {
 
 		getDialogP2T()->getFloorControlSender()
-			->send_APP_FC(P2T::APP_GRANT, /*getDialog()*/ dialog->getDialogConfig().local_ssrc, 
+			->send_APP_FC(P2T::APP_GRANT, /*getDialog()*/ dialog->getDialogConfig()->local_ssrc, 
 				P2T::APP_NAME, toaddr, port, seqNo, CollisionCounter);
 
 }

@@ -62,14 +62,14 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 			ts.start();
 		
 		//increment sequence number
-		/*vc->*/getDialogConfig().seqNo++;
+		/*vc->*/getDialogConfig()->seqNo++;
 
 		//start RtcpTransactionGetFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -78,7 +78,7 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc*/ this), 
-				/*vc->*/getDialogConfig().seqNo, 
+				/*vc->*/getDialogConfig()->seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), callId);
 			
@@ -90,7 +90,7 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig().seqNo), 
+				itoa(/*vc->*/getDialogConfig()->seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -139,7 +139,7 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -149,7 +149,7 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 			//start RtcpTransactionTakenFloor
 			MRef<SipTransaction*> gf = new 
 				RtcpTransactionTakenFloor(MRef<SipDialog*>(/* *vc */ this), 
-					/*vc->*/getDialogConfig().seqNo, 
+					/*vc->*/getDialogConfig()->seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), 
 					callId,
@@ -159,7 +159,7 @@ bool SipDialogP2T::a1_talkreq_talk( const SipSMCommand &command){
 					
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendTaken", 
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()),
-				itoa(/*vc->*/getDialogConfig().seqNo));
+				itoa(/*vc->*/getDialogConfig()->seqNo));
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
 			/*vc->*/getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
@@ -197,7 +197,7 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -210,7 +210,7 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 				
 			//start transaction
 			MRef<SipTransaction*> rf = new RtcpTransactionReleaseFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig().seqNo, 
+				/*vc->*/getDialogConfig()->seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
 				callId,
@@ -220,7 +220,7 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tReleaseFloor",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig().seqNo), 
+				itoa(/*vc->*/getDialogConfig()->seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -647,7 +647,7 @@ bool SipDialogP2T::a10_collision_resent_timer( const SipSMCommand &command){
 				
 				//start transaction
 				MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc*/ this), 
-					/*vc->*/getDialogConfig().seqNo, 
+					/*vc->*/getDialogConfig()->seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
 					callId,
@@ -664,7 +664,7 @@ bool SipDialogP2T::a10_collision_resent_timer( const SipSMCommand &command){
 		
 				CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 					itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-					itoa(/*vc->*/getDialogConfig().seqNo), 
+					itoa(/*vc->*/getDialogConfig()->seqNo), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 				SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -753,7 +753,7 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -763,7 +763,7 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 			//start RtcpTransactionTakenFloor
 			MRef<SipTransaction*> gf = new 
 				RtcpTransactionTakenFloor(MRef<SipDialog*>(/* *vc */ this), 
-					/*vc->*/getDialogConfig().seqNo, 
+					/*vc->*/getDialogConfig()->seqNo, 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 					/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), 
 					callId,
@@ -773,7 +773,7 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 					
 			CommandString cmd(/*vc->*/getCallId(), "p2tSendTaken", 
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()),
-				itoa(/*vc->*/getDialogConfig().seqNo));
+				itoa(/*vc->*/getDialogConfig()->seqNo));
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
 			/*vc->*/getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
@@ -860,7 +860,7 @@ bool SipDialogP2T::a14_listen_listen( const SipSMCommand &command){
 		/*vc->*/requestTimeout(P2T::timerREVOKE, "timerREVOKE");
 		
 		/*vc->*/getFloorControlSender()
-			->send_APP_FC(P2T::APP_REVOKE, /*vc->*/getDialogConfig().local_ssrc, 
+			->send_APP_FC(P2T::APP_REVOKE, /*vc->*/getDialogConfig()->local_ssrc, 
 				P2T::APP_NAME, 
 				/*vc->*/getGroupList()->getUser(uri)->getAddress(),
 				/*vc->*/getGroupList()->getUser(uri)->getRTCPport(), 
@@ -935,7 +935,7 @@ bool SipDialogP2T::a17_listen_idle_revoke( const SipSMCommand &command){
 		
 		//send Revoke message
 		/*vc->*/getFloorControlSender()
-			->send_APP_FC(P2T::APP_REVOKE, /*vc->*/getDialogConfig().local_ssrc, 
+			->send_APP_FC(P2T::APP_REVOKE, /*vc->*/getDialogConfig()->local_ssrc, 
 				P2T::APP_NAME, 
 				/*vc->*/getGroupList()->getUser(uri)->getAddress(),
 				/*vc->*/getGroupList()->getUser(uri)->getRTCPport(), 
@@ -989,7 +989,7 @@ bool SipDialogP2T::a18_talk_talk_revoke( const SipSMCommand &command){
 		for(uint32_t x=0;x<command.getCommandString().getParam().size();x++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[x]-'0');
 			
-		if(sNo==/*vc->*/getDialogConfig().seqNo){
+		if(sNo==/*vc->*/getDialogConfig()->seqNo){
 			//inform GUI
 			CommandString cmd2(/*vc->*/getCallId(),string("p2tFloorRevokePassiv"),
 			/*vc->*/getGroupList()->getUser(ssrc)->getUri(),
@@ -1140,7 +1140,7 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -1149,7 +1149,7 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> rf = new RtcpTransactionReleaseFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig().seqNo, 
+				/*vc->*/getDialogConfig()->seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(),
 				callId,
@@ -1159,7 +1159,7 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tReleaseFloor",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig().seqNo), 
+				itoa(/*vc->*/getDialogConfig()->seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1235,14 +1235,14 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 			ts.start();
 		
 		//increment sequence number
-		/*vc->*/getDialogConfig().seqNo++;
+		/*vc->*/getDialogConfig()->seqNo++;
 
 		//start RtcpTransactionGetFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			
 			//filter out own user
 			//if(vc->getGroupList()->getAllUser().at(k)->getUri()==vc->getDialogConfig().inherited.userUri)
-			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig().inherited.sipIdentity->getSipUri())
+			if(/*vc->*/getGroupList()->getAllUser().at(k)->getUri()==/*vc->*/getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 				
 			//filter out NOTAVAILABLE users
@@ -1251,7 +1251,7 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 			
 			//start transaction
 			MRef<SipTransaction*> gf = new RtcpTransactionGetFloor(MRef<SipDialog *>(/* *vc */ this), 
-				/*vc->*/getDialogConfig().seqNo, 
+				/*vc->*/getDialogConfig()->seqNo, 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getAddress(), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getRTCPport(), callId);
 			
@@ -1269,7 +1269,7 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 		
 			CommandString cmd(/*vc->*/getCallId(),"p2tSendRequest",
 				itoa(/*vc->*/getGroupList()->getAllUser().at(k)->getSSRC()), 
-				itoa(/*vc->*/getDialogConfig().seqNo), 
+				itoa(/*vc->*/getDialogConfig()->seqNo), 
 				/*vc->*/getGroupList()->getAllUser().at(k)->getUri());
 			
 			SipSMCommand scmd(cmd, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1595,7 +1595,7 @@ void SipDialogP2T::setUpStateMachine(){
 }
 
 
-SipDialogP2T::SipDialogP2T(MRef<SipDialogContainer*> dContainer, SipDialogConfig &callconfig, MRef<SipSoftPhoneConfiguration*> pconf) : 
+SipDialogP2T::SipDialogP2T(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf) : 
                 SipDialog(dContainer,callconfig,pconf->timeoutProvider),
 		phoneconf(pconf)
 {
@@ -1619,10 +1619,10 @@ SipDialogP2T::SipDialogP2T(MRef<SipDialogContainer*> dContainer, SipDialogConfig
 	//floorControlReceiver->flush();
 					
 	//generate GroupIdentity
-	/*getDialogConfig().callId*/ callId = itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP;
+	/*getDialogConfig().callId*/ callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	
 	//initialize sequence number
-	getDialogConfig().seqNo = 0;
+	getDialogConfig()->seqNo = 0;
 	
 	counterRevoke=0;
 	counterCollision=0;
@@ -1736,7 +1736,7 @@ bool SipDialogP2T::checkStates(int status){
 		
 		//filter out own user
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
-		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 		
 		if(grpList->getAllUser().at(k)->getStatus()==status 
@@ -1759,7 +1759,7 @@ bool SipDialogP2T::allAnswered(){
 		
 		//filter out own user
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
-		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig()->inherited.sipIdentity->getSipUri())
 				continue;
 		
 		//merr<<grpList->getAllUser().at(k)->getUri()<<"="<<P2T::getStatus(grpList->getAllUser().at(k)->getStatus())<<end;
@@ -1796,7 +1796,7 @@ void SipDialogP2T::terminateSession(){
 	
 		//filter out own username
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
-		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig()->inherited.sipIdentity->getSipUri())
 			continue;
 		
 		//send hang_up message to all SipDialogP2Tuser dialogs
@@ -1816,13 +1816,13 @@ bool SipDialogP2T::highestPrio(int status,vector<string> &users){
 		
 	//find my priority
 	//int myPrio = getGroupList()->getUser(getDialogConfig().inherited.userUri)->getPriority();
-	int myPrio = getGroupList()->getUser(getDialogConfig().inherited.sipIdentity->getSipUri())->getPriority();
+	int myPrio = getGroupList()->getUser(getDialogConfig()->inherited.sipIdentity->getSipUri())->getPriority();
 		
 	//find highest priority from the other users
 	for(uint32_t k=0; k<grpList->getAllUser().size();k++){
 		//filter out own user 
 		//if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.userUri)
-		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig().inherited.sipIdentity->getSipUri())
+		if(grpList->getAllUser().at(k)->getUri()==getDialogConfig()->inherited.sipIdentity->getSipUri())
 			continue;
 		
 		if(grpList->getAllUser().at(k)->getStatus()==status ){

@@ -180,7 +180,7 @@ MRef<SipDialogP2T*> RtcpTransactionIdleFloor::getDialogP2T() {
 void RtcpTransactionIdleFloor::sendIdle() {
 
 		getDialogP2T()->getFloorControlSender()
-			->send_APP_FC(P2T::APP_IDLE, /*getDialog()*/dialog->getDialogConfig().local_ssrc, 
+			->send_APP_FC(P2T::APP_IDLE, /*getDialog()*/dialog->getDialogConfig()->local_ssrc, 
 				P2T::APP_NAME, toaddr, port,seqNo);
 }
 

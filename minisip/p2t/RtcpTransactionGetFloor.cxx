@@ -537,7 +537,7 @@ MRef<SipDialogP2T*> RtcpTransactionGetFloor::getDialogP2T() {
 
 void RtcpTransactionGetFloor::sendRequest() {
 		getDialogP2T()->getFloorControlSender()
-			->send_APP_FC(P2T::APP_REQUEST, /*getDialog()*/dialog->getDialogConfig().local_ssrc, 
+			->send_APP_FC(P2T::APP_REQUEST, /*getDialog()*/dialog->getDialogConfig()->local_ssrc, 
 				P2T::APP_NAME, toaddr, port, seqNo, CollisionCounter);
 }			
 

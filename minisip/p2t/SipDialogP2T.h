@@ -274,7 +274,7 @@ class SipDialogP2T: public SipDialog{
 		 * @param callconfig  the Call configuration
 		 * @param phoneconf   the Phone configuration
 		 */
-		SipDialogP2T(MRef<SipDialogContainer*> dContainer, SipDialogConfig &callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf);
+		SipDialogP2T(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf);
 		
 		/**
 		 * Deconstructor

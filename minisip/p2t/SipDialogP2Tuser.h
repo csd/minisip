@@ -77,7 +77,7 @@ class SipDialogP2Tuser: public SipDialog{
 		 * @param p2tDialog  the <code>SipDialogP2T</code> where this dialog
 		 *                   belongs to
 		 */
-		SipDialogP2Tuser(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconfig, 
+		SipDialogP2Tuser(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, 
 			MRef<SipSoftPhoneConfiguration*> phoneconf,
 			MRef<SipDialogP2T*>p2tDialog);
 		
