@@ -211,7 +211,7 @@ MikeyIPSEC4Cs::MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiSrcadd
 	policyNo( policyNo ), spi( spi ), spiSrcaddr( spiSrcaddr ), spiDstaddr( spiDstaddr ){};
 
 MikeyCsIdMapSrtp::MikeyCsIdMapSrtp(){
-	cs = list<MikeySrtpCs *>::list();
+	cs = vector<MikeySrtpCs *>::vector();
 }
 //added 041201 JOOR
 MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4(){
@@ -273,7 +273,7 @@ MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4( byte_t * data, int length ){
 }
 
 MikeyCsIdMapSrtp::~MikeyCsIdMapSrtp(){
-	list<MikeySrtpCs *>::iterator i;
+	vector<MikeySrtpCs *>::iterator i;
 
 	for( i = cs.begin(); i!= cs.end() ; i++ )
 		delete *i;
@@ -301,7 +301,7 @@ void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
 	}
 
 	int j = 0,k;
-	list<MikeySrtpCs *>::iterator i;
+	vector<MikeySrtpCs *>::iterator i;
 
 	for( i = cs.begin(); i != cs.end(); i++ ){
 		start[ 9*j ] = (*i)->policyNo & 0xFF;
@@ -340,7 +340,7 @@ void MikeyCsIdMapIPSEC4::writeData( byte_t * start, int expectedLength ){
 }
 
 byte_t MikeyCsIdMapSrtp::findCsId( uint32_t ssrc ){
-	list<MikeySrtpCs *>::iterator i;
+	vector<MikeySrtpCs *>::iterator i;
 	uint8_t j = 1;
 
 	for( i = cs.begin(); i != cs.end()  ; i++,j++ ){
@@ -364,7 +364,7 @@ byte_t MikeyCsIdMapIPSEC4::findCsId( uint32_t spi, uint32_t spiSrcaddr, uint32_t
 }
 //added 041214 JOOR
 byte_t MikeyCsIdMapSrtp::findpolicyNo( uint32_t ssrc ){
-	list<MikeySrtpCs *>::iterator i;
+	vector<MikeySrtpCs *>::iterator i;
 	for( i = cs.begin(); i != cs.end()  ; i++ ){
 		if( (*i)->ssrc == ssrc ){
 			return (*i)->policyNo;
@@ -397,7 +397,7 @@ byte_t MikeyCsIdMapIPSEC4::findpolicyNo( uint32_t spi, uint32_t spiSrcaddr, uint
 
 
 uint32_t MikeyCsIdMapSrtp::findRoc( uint32_t ssrc ){
-	list<MikeySrtpCs *>::iterator i;
+	vector<MikeySrtpCs *>::iterator i;
 
 	for( i = cs.begin(); i != cs.end()  ; i++ ){
 		if( (*i)->ssrc == ssrc ){
@@ -407,22 +407,37 @@ uint32_t MikeyCsIdMapSrtp::findRoc( uint32_t ssrc ){
 	return 0;
 }
 
+void MikeyCsIdMapSrtp::setSsrc( uint32_t ssrc, uint8_t csId ){
+	if( csId > cs.size() ){
+		return;
+	}
+
+	(cs[ csId - 1 ])->ssrc = ssrc;
+}
+
+void MikeyCsIdMapSrtp::setRoc( uint32_t roc, uint8_t csId ){
+	if( csId > cs.size() ){
+		return;
+	}
+
+	(cs[ csId - 1 ])->roc = roc;
+}
+	
+
+
 void MikeyCsIdMapSrtp::addStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, byte_t csId ){
 	if( csId == 0 ){
 		cs.push_back( new MikeySrtpCs( policyNo, ssrc, roc ) );
 		return;
 	}
 
-	list<MikeySrtpCs *>::iterator i;
-	uint8_t j = 1;
-	for( i = cs.begin(); i != cs.end() ; i++,j++ ){
-		if( j == csId ){
-			(*i)->ssrc = ssrc;
-			(*i)->policyNo = policyNo;
-			(*i)->roc = roc;
-		}
+	if( csId > cs.size()  ){
+		return;
 	}
-
+	
+	(cs[csId - 1])->ssrc = ssrc;
+	(cs[csId - 1])->policyNo = policyNo;
+	(cs[csId - 1])->roc = roc;
 	return;
 }
 //added 041201 JOOR

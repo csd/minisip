@@ -348,8 +348,27 @@ uint8_t KeyAgreement::findpolicyNo( uint32_t ssrc ){
 	if( csIdMap == NULL ){
 		return 0;
 	}
-	return csIdMap->findRoc( ssrc );
+	return csIdMap->findpolicyNo( ssrc );
 }
+
+void KeyAgreement::setSrtpStreamSsrc( uint32_t ssrc, uint8_t csId ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+	if( csIdMap == NULL ){
+		return;
+	}
+	csIdMap->setSsrc( ssrc, csId );
+}
+
+void KeyAgreement::setSrtpStreamRoc( uint32_t roc, uint8_t csId ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+	if( csIdMap == NULL ){
+		return;
+	}
+	csIdMap->setRoc( roc, csId );
+}
+
 
 void KeyAgreement::addSrtpStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, byte_t csId ){
 	MikeyCsIdMapSrtp * csIdMap = 

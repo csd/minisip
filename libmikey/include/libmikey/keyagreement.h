@@ -161,6 +161,11 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		uint32_t getSrtpRoc( uint32_t ssrc );
 		uint8_t findpolicyNo( uint32_t ssrc );
 
+		/* Set the parametter in an existing CS (used
+		 * by the receiver */
+		void setSrtpStreamSsrc( uint32_t ssrc, uint8_t csId );
+		void setSrtpStreamRoc( uint32_t roc, uint8_t csId );
+
 		/* Add an SRTP stream to protect to the CSID map 
 		 * If csId == 0, add (initiator), else modify existing
 		 * (responder) */

@@ -38,7 +38,7 @@
 
 #define HDR_CS_ID_MAP_TYPE_SRTP_ID 0
 #define HDR_CS_ID_MAP_TYPE_IPSEC4_ID 7
-#include<list>
+#include<vector>
 #include<libmutil/MemObject.h>
 
 // CS# info for srtp
@@ -85,8 +85,11 @@ class LIBMIKEY_API MikeyCsIdMapSrtp : public MikeyCsIdMap{
 		void addStream( uint32_t ssrc, uint32_t roc=0,
 				byte_t policyNo=0, byte_t csId=0 );
 
+		void setRoc( uint32_t roc, uint8_t csId );
+		void setSsrc( uint32_t ssrc, uint8_t csId );
+
         private:
-		std::list<MikeySrtpCs *> cs;
+		std::vector<MikeySrtpCs *> cs;
 };
 
 // ipv4 IPSEC map
