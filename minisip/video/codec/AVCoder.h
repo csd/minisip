@@ -53,7 +53,8 @@ class AVEncoder: public ImageHandler, public MObject{
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();
 		
-		uint8_t rtpPayload[5000];
+		uint8_t rtpPayload[10000];
+                uint32_t mbCounter;
 
 		VideoEncoderCallback * getCallback(){return callback;};
 		void setCallback( VideoEncoderCallback * cb ){this->callback = cb;};

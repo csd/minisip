@@ -29,6 +29,7 @@
 
 #include<stdio.h>
 #include<fcntl.h>
+#include<iostream>
 
 using namespace std;
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
@@ -39,7 +40,7 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 
 	MRef<AVEncoder *> encoder = (AVEncoder *)context->opaque;
 
-        fprintf( stderr, "RTP payload size: %i\n", size );
+//        fprintf( stderr, "RTP payload size: %i\n", size );
 	
 	encoder->rtpPayload[1] |= 
 		( ( context->coded_frame->pict_type == FF_P_TYPE )?1:0 << 4 );
@@ -48,9 +49,22 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 	
 	memcpy( encoder->rtpPayload + 4, data, size );
 
+        encoder->mbCounter += packetNumber;
+        bool endOfFrame = ( encoder->mbCounter == 
+                        ((context->width+15)/16)*((context->height+15)/16) );
+//        cerr << "NB_MACROBLOCK: " << packetNumber << endl;
+//        cerr << "MACROBLOCK_COUNTER: " << encoder->mbCounter << endl;
+//        cerr << "PACKET_SIZE: " << size << endl;
+//        cerr << "WIDTH: " << context->width << endl;
+//        cerr << "HEIGHT: " << context->height << endl;
+
+        if( endOfFrame ){
+                encoder->mbCounter = 0;
+        }
+
 
 	if( encoder->getCallback() ){
-		encoder->getCallback()->sendVideoData( encoder->rtpPayload, size + 4, ts, packetNumber == 1 );	
+		encoder->getCallback()->sendVideoData( encoder->rtpPayload, size + 4, ts, endOfFrame );	
 	}
 }
 
@@ -72,11 +86,18 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
-	context->bit_rate = 5*1024*1024;
+	context->bit_rate = 1000000;
 	context->bit_rate_tolerance = 2*1024*1024;
 
 	context->frame_rate = 1000; 
+//	context->frame_rate = 25; 
 	context->frame_rate_base = 1;
+        context->flags |= CODEC_FLAG_QP_RD;
+        context->mb_decision = FF_MB_DECISION_RD;
+        context->rc_max_rate = 1000000;
+        context->rc_min_rate = 1000000;
+        context->rc_buffer_size = 1;
+
 
 	context->rtp_mode = 1;
 	context->rtp_payload_size = 500;
@@ -91,10 +112,11 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
         context->i_quant_offset = 0.0;
         context->i_quant_factor = -0.8;
 
-        context->qmin = 0;
-        context->mb_qmin = 0;
-        context->qmax = 10;
-        context->mb_qmax = 10;
+        //context->qmin = 0;
+        //context->mb_qmin = 0;
+        context->qmax = 4;
+        //context->mb_qmax = 10;
+//        context->flags |= CODEC_FLAG_QP_RD;
 	
 	context->gop_size = 0;
 
@@ -104,6 +126,8 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
 	/* H263 RTP header mode A (see RFC2190) */
 	rtpPayload[1] = 0x60;
+
+        mbCounter = 0;
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
@@ -179,6 +203,7 @@ void AVEncoder::handle( MImage * image ){
         else{
                 frame.pts = image->mTime * 1000;
         }
+        //frame.pts = AV_NOPTS_VALUE;
 //        fprintf( stderr, "PTS: %i\n", frame.pts);
 
 	ret = avcodec_encode_video( context, outBuffer+4,
