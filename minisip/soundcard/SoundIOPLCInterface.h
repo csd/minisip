@@ -38,7 +38,7 @@
 class SoundIOPLCInterface{
 
 	public:
-		virtual short *get_plc_sound(int32_t &ret_size)=0;
+		virtual short *get_plc_sound(uint32_t &ret_size)=0;
 		
 };
 
