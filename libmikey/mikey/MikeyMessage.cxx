@@ -226,7 +226,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 				      byte_t * iv,
 				      byte_t * authKey,
 				      int encrAlg, int macAlg ){
-	byte_t encrData[ tgkLength ];
+	byte_t * encrData = new byte_t[ tgkLength ];
 	AES * aes;
 	MikeyPayload * last;
 	
@@ -246,6 +246,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_KW_128:
 			//TODO
 		default:
+			delete [] encrData;
 			throw new MikeyException( "Unknown encryption algorithm" );
 	}
 	
@@ -274,12 +275,14 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 				tgkLength, encrData, macAlg, NULL ) );
 			break;
 		default:
+			delete [] encrData;
 			throw new MikeyException( "Unknown MAC algorithm" );
 	}
 	compiled = false;
+	delete [] encrData;
 }
 
-void MikeyMessage::addVPayload( int macAlg, unsigned long long t,
+void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 		byte_t * authKey, unsigned int authKeyLength ){
 		MikeyPayloadV * payload;
 		unsigned int hmacOutputLength;

@@ -41,7 +41,7 @@ class KeyAgreementPSK : public KeyAgreement{
 		KeyAgreementPSK( byte_t * psk, int pskLength );
 		~KeyAgreementPSK();
 
-		void generateTgk( unsigned int tgkLength = 192 );
+		void generateTgk( uint32_t tgkLength = 192 );
 
 		void genTranspEncrKey( byte_t * encrKey, int encrKeyLength );
 
@@ -49,14 +49,14 @@ class KeyAgreementPSK : public KeyAgreement{
 		
 		void genTranspAuthKey( byte_t * encrKey, int encrKeyLength );
 
-		unsigned long long tSent();
-		void setTSent( unsigned long long tSent );
+		uint64_t tSent();
+		void setTSent( uint64_t tSent );
 
 	private:
 		byte_t * pskPtr;
 		int pskLengthValue;
 
-		unsigned long long tSentValue;
+		uint64_t tSentValue;
 };
 
 #endif

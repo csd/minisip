@@ -38,7 +38,7 @@
 class MikeyPayloadT : public MikeyPayload{
 	public:
 		MikeyPayloadT(); // Will compute the timestamp	
-		MikeyPayloadT( int type, unsigned long long value );
+		MikeyPayloadT( int type, uint64_t value );
 		MikeyPayloadT( byte_t * start, int lengthLimit );
 		~MikeyPayloadT();
 
@@ -47,14 +47,14 @@ class MikeyPayloadT : public MikeyPayload{
 		virtual void writeData( byte_t *start, int expectedLength );
 		virtual std::string debugDump();
 
-		long long offset( int type, unsigned long long ts );
-		bool checkOffset( unsigned long long max );
+		int64_t offset( int type, uint64_t ts );
+		bool checkOffset( uint64_t max );
 
-		unsigned long long ts();
+		uint64_t ts();
 
 	private:
 		int tsTypeValue;
-		unsigned long long tsValue;
+		uint64_t tsValue;
 };
 
 

@@ -60,7 +60,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 	addPayload( tPayload = new MikeyPayloadT() );
 
 	// keep a copy of the time stamp
-	unsigned long long t = tPayload->ts();
+	uint64_t t = tPayload->ts();
 	ka->setTSent( t );
 
 	addPayload( randPayload = new MikeyPayloadRAND() );
@@ -120,7 +120,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 				ka->tgkLength(), 
 				ka->keyValidity() );
 	
-	byte_t rawKeyData[ keydata->length() ];
+	byte_t * rawKeyData = new byte_t[ keydata->length() ];
 	keydata->writeData( rawKeyData, keydata->length() );
 	
 	addKemacPayload( rawKeyData,
@@ -138,6 +138,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 		delete [] authKey;
 
 	delete keydata;
+	delete [] rawKeyData;
 }
 
 MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
@@ -145,8 +146,8 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	int v = false;
-	unsigned int csbId;
-	unsigned long long t_received;
+	uint32_t csbId;
+	uint64_t t_received;
 	MRef<MikeyCsIdMap *> csIdMap;
 	MikeyMessage * errorMessage = new MikeyMessage();
 	uint8_t nCs;
@@ -362,7 +363,6 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	MikeyMessage * errorMessage = new MikeyMessage();
-	unsigned int csbId = ka->csbId();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
@@ -412,7 +412,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	unsigned long long t_received = ((MikeyPayloadT*)i)->ts();
+	uint64_t t_received = ((MikeyPayloadT*)i)->ts();
 
 	if( error ){
 		byte_t authKey[20];
@@ -436,8 +436,6 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 	int macAlg;
 	byte_t * receivedMac;
 	byte_t * macInput;
-	byte_t * rand;
-	unsigned int rand_length;
 	unsigned int macInputLength;
 	list<MikeyPayload *>::iterator payload_i;
  
@@ -484,7 +482,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 			return false;
 		}
 		MikeyPayloadV * v;
-		unsigned long long t_sent = ka->tSent();
+		uint64_t t_sent = ka->tSent();
 		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
 			throw new MikeyException( 
 			   "PSK response did not end with a V payload" );

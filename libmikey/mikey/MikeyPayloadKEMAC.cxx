@@ -144,7 +144,7 @@ list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData(
 		byte_t * encrKey, int encrKeyLength,
 		byte_t * iv){
 	
-	byte_t decrData[ encrDataLengthValue ];
+	byte_t * decrData = new byte_t[ encrDataLengthValue ];
 	AES * aes;
 	int limit = encrDataLengthValue;
 	list<MikeyPayloadKeyData *> output;
@@ -163,6 +163,7 @@ list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData(
 		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_KW_128:
 			//TODO
 		default:
+			delete [] decrData;
 			throw new MikeyException( 
 					"Unknown encryption algorithm" );
 			break;
@@ -175,6 +176,7 @@ list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData(
 	} while( payload->nextPayloadType() != MIKEYPAYLOAD_LAST_PAYLOAD );
 
 	assert( limit == 0 );
+	delete [] decrData;
 	return output;
 }
 

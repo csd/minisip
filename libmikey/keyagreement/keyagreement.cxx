@@ -101,7 +101,7 @@ void p( unsigned char * s, unsigned int sLength,
 {
 	unsigned int i;
 	unsigned int hmac_output_length;
-	unsigned char hmac_input[ labelLength + 20 ];
+	byte_t * hmac_input = new byte_t[ labelLength + 20 ];
 
 	/* initial step */
 	hmac_sha1( s, sLength,
@@ -129,6 +129,8 @@ void p( unsigned char * s, unsigned int sLength,
 	      	      &output[ 20 * (i-1) ], &hmac_output_length );
 		assert( hmac_output_length == 20 );
 	}
+
+	delete [] hmac_input;
 }
 
 /* Described in draft-ietf-msec-mikey-07.txt Section 4.1.3 */
@@ -173,7 +175,7 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 			      unsigned char * key, unsigned int keyLength ,
 			      int type ){
 
-	unsigned char label[4+4+1+randLengthValue];
+	byte_t * label = new byte_t[4+4+1+randLengthValue];
 
 	switch( type ){
 		case KEY_DERIV_TEK:
@@ -219,6 +221,8 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 	memcpy( &label[9], randPtr, randLengthValue );
 
 	prf( inkey, inkeyLength, label, 9 + randLengthValue, key, keyLength );
+
+	delete [] label;
 }
 
 void KeyAgreement::genTek( unsigned char csId,

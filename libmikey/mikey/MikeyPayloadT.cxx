@@ -178,7 +178,7 @@ string MikeyPayloadT::debugDump(){
 		"> tsValue_value=<" + itoa( tsValue ) + ">";
 }
 
-long long MikeyPayloadT::offset( int type, uint64_t tsValue ){
+int64_t MikeyPayloadT::offset( int type, uint64_t tsValue ){
 	return this->tsValue - tsValue; 
 }
 

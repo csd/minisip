@@ -75,8 +75,8 @@ class MikeyMessage{
 		void addPayload( MikeyPayload * payload );
 		void operator+=( MikeyPayload * payload );
 		void addSignaturePayload( MRef<certificate *> cert );
-		void addVPayload( int macAlg, unsigned long long receivedT,
-			byte_t * authKey, unsigned int authKeyLength);
+		void addVPayload( int macAlg, uint64_t receivedT,
+			byte_t * authKey, uint32_t authKeyLength);
 		void addKemacPayload(
 				byte_t * tgk, int tgkLength,
 				byte_t * encrKey, byte_t * iv,
@@ -94,7 +94,7 @@ class MikeyMessage{
 		void remove( MikeyPayload * );
 
 		int type();
-		unsigned int csbId();
+		uint32_t csbId();
 
 		std::string b64Message();
 
