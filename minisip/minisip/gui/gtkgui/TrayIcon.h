@@ -23,6 +23,7 @@
 #ifndef TRAY_ICON_H
 #define TRAY_ICON_H
 
+#include<config.h>
 #include<libmutil/MemObject.h>
 #include<gtkmm.h>
 #include<libglademm/xml.h>
