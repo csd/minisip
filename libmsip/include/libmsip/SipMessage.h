@@ -58,7 +58,7 @@ class SipMessage : public MObject{
 
 		SipMessage(string branch, int type);
 		SipMessage(int type, string &build_from);
-		virtual ~SipMessage(){};
+		virtual ~SipMessage();
 
                 /**
                  * There are two ways to determine what kind of SIP message

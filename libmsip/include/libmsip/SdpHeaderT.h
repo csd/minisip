@@ -40,7 +40,7 @@ class SdpHeaderT : public SdpHeader{
 	public:
 		SdpHeaderT(string buildFrom);
 		SdpHeaderT(int32_t start_time, int32_t stop_time);
-		virtual ~SdpHeaderT(){};
+		~SdpHeaderT();
 
 		virtual std::string getMemObjectType(){return "SdpHeaderT";}
 

@@ -69,6 +69,10 @@ SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, const 
 	port = dialog->getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyPort;
 }
 
+SipTransaction::~SipTransaction(){
+
+}
+
 void SipTransaction::setBranch(const string &b){
 	branch = b;
 }

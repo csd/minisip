@@ -97,6 +97,9 @@ SdpHeaderO::SdpHeaderO(string username, string session_id, string version, strin
 	this->addr=addr;
 }
 
+SdpHeaderO::~SdpHeaderO(){
+
+}
 
 string SdpHeaderO::getUsername(){
 	return username;

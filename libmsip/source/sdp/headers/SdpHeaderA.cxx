@@ -43,6 +43,10 @@ SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 9){
 	attributes= trim(buildFrom.substr(2, buildFrom.length()-2));
 }
 
+SdpHeaderA::~SdpHeaderA(){
+
+}
+
 string SdpHeaderA::getAttributes(){
 	return attributes;
 }

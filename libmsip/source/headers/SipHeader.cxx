@@ -24,6 +24,10 @@ SipHeader::SipHeader(int type):type(type){
 
 }
 
+SipHeader::~SipHeader(){
+
+}
+
 MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(line,"Via:")){

@@ -40,7 +40,7 @@ class SdpHeaderC : public SdpHeader{
 	public:
 		SdpHeaderC(std::string buildFrom);
 		SdpHeaderC(std::string netType, std::string addrType, std::string addr);
-		virtual ~SdpHeaderC(){};
+		virtual ~SdpHeaderC();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderC";}
 

@@ -40,7 +40,7 @@ class SdpHeaderO : public SdpHeader{
 	public:
 		SdpHeaderO(string buildFrom);
 		SdpHeaderO(string username, string session_id, string version, string net_type, string addr_type, string addr);
-		virtual ~SdpHeaderO(){};
+		virtual ~SdpHeaderO();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderO";}
 

@@ -70,6 +70,10 @@ SdpHeaderT::SdpHeaderT(int32_t start, int32_t stop):SdpHeader(SDP_HEADER_TYPE_T,
 	this->stop_time=stop;
 }
 
+SdpHeaderT::~SdpHeaderT(){
+
+}
+
 int32_t SdpHeaderT::getStartTime(){
 	return start_time;
 }

@@ -68,7 +68,7 @@ using namespace std;
 class SipHeader : public MObject{
 	public:
                 SipHeader(int type);
-		virtual ~SipHeader(){}
+		virtual ~SipHeader();
 
 		virtual string getString()=0;
 

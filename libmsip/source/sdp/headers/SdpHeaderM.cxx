@@ -112,6 +112,9 @@ SdpHeaderM::SdpHeaderM(string media,
 	this->transport=transport;
 }
 
+SdpHeaderM::~SdpHeaderM(){
+
+}
 
 string SdpHeaderM::getMedia(){
 	return media;

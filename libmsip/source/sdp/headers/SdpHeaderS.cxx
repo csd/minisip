@@ -43,6 +43,10 @@ SdpHeaderS::SdpHeaderS(string buildFrom):SdpHeader(SDP_HEADER_TYPE_S, 3){
 	session_name = trim(buildFrom.substr(2, buildFrom.length()-2));
 }
 
+SdpHeaderS::~SdpHeaderS(){
+
+}
+
 string SdpHeaderS::getSessionName(){
 	return session_name;
 }

@@ -40,7 +40,7 @@ using namespace std;
 class SdpHeaderS : public SdpHeader{
 	public:
 		SdpHeaderS(string buildFrom);
-		virtual ~SdpHeaderS(){};
+		virtual ~SdpHeaderS();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderS";}
 

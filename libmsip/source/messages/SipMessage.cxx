@@ -84,6 +84,10 @@ string SipMessage::getDescription(){
 	return ret;
 }
 
+SipMessage::~SipMessage(){
+
+}
+
 ostream & operator<<(ostream &out, SipMessage &p){
         out << p.getDescription();
 	return out;

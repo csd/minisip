@@ -68,6 +68,10 @@ SdpHeaderC::SdpHeaderC(string net_type, string addr_type, string addr):SdpHeader
 	this->addr=addr;
 }
 
+SdpHeaderC::~SdpHeaderC(){
+
+}
+
 string SdpHeaderC::getNetType(){
 	return netType;
 }
