@@ -1,8 +1,8 @@
 %define name		libmikey
-%define version		0.2
+%define version		0.3.1
 %define release		1
 
-%define major		1
+%define major		0
 %define lib_name	%{name}%{major}
 
 Summary: 		A C++ library implementing the Multimedia Internet KEYing protocol.
@@ -26,7 +26,7 @@ Summary: 		A C++ library implementing the Multimedia Internet KEYing protocol.
 Group:			System/Libraries
 Provides:		%{name}
 Requires:       	openssl >= 0.9.6
-Requires:       	libmutil >= 0.1
+Requires:       	libmutil0 >= 0.2
 
 
 %description -n %{lib_name}

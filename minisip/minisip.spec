@@ -1,5 +1,5 @@
 %define name		minisip
-%define version		0.2
+%define version		0.6.1
 %define release		1
 
 Summary: 		A secure SIP user agent
@@ -12,10 +12,11 @@ URL:			http://www.minisip.org/
 Group:			Applications/Communication
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
-Requires:		libmikey1 >= 0.2
-Requires:		libmutil1 >= 0.1
-Requires:		libmnetutil1 >= 0.1
-Requires:		libmsip1 >= 0.1
+Requires:		libmikey0 >= 0.3
+Requires:		libmutil0 >= 0.2
+Requires:		libmnetutil0 >= 0.2
+Requires:		libmsip0 >= 0.2
+Requires:		libglademm2 >= 0.2 
 
 
 %description
@@ -27,7 +28,7 @@ which allow end-to-end authentication, and protection of the media stream.
 
 
 %build
-%configure --enable-color-terminal --enable-debug
+%configure
 make
 
 %install
@@ -40,6 +41,8 @@ rm -rf %buildroot
 %defattr(-,root,root,-)
 %doc AUTHORS README COPYING ChangeLog
 /usr/bin/minisip
+/usr/share/minisip/minisip.glade
+/usr/share/minisip/tray_icon.png
 
 %changelog
 * Thu May 6 2004 Johan Bilien <jobi@via.ecp.fr>

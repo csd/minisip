@@ -1,8 +1,8 @@
 %define name		libmutil
-%define version		0.1
+%define version		0.2.1
 %define release		1
 
-%define major		1
+%define major		0
 %define lib_name	%{name}%{major}
 
 Summary: 		A C++ library providing various utilities
