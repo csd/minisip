@@ -70,7 +70,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 	/* First, check if this is a packet that could not be handled by
 	 * any transaction and send 481 response if that is the case */
 	if (source==SipSMCommand::remote && dispatchCount>=2){ // this is the packets second run of handling.
-		merr << "DefaultCallHandler::handleCommand: Detected dispatched already - sending 481"<< end;
+		mdbg << "DefaultCallHandler::handleCommand: Detected dispatched already - sending 481"<< end;
 
 		//FIXME: Check what branch parameter to send.
 		MRef<SipResponse*> no_call= new SipResponse("nobranch", 481,"Call Leg/Transaction Does Not Exist", MRef<SipMessage*>(*pkt));
@@ -180,7 +180,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 	}
 
 //	if (command.getType()==SipSMCommand::COMMAND_PACKET){
-	merr << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
+	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
 //	}
 
 	return false;
@@ -189,7 +189,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 bool DefaultDialogHandler::handleCommandString(int source, int destination, CommandString &cmdstr, int dispatchCount ){
 	if (dispatchCount>=2){
-		merr << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
+		mdbg << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
 		return true;
 	}
 
@@ -340,7 +340,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		return true;
 	}
 
-	merr << "DefaultDialogHandler ignoring command " << cmdstr.getString() << end; 
+	mdbg << "DefaultDialogHandler ignoring command " << cmdstr.getString() << end; 
 
 	return false;
 }
@@ -397,7 +397,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	}
 	else{
 #ifdef DEBUG_OUTPUT			
-		merr << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< end;
+		mdbg << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< end;
 #endif
 		return;
 	}
@@ -534,7 +534,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	//get P2TDialog
 	MRef<SipDialogP2T*> p2tDialog;
 	if(getP2TDialog(command.getCommandString().getParam(), p2tDialog)==false){	
-		merr<<"DefaultDialogHandler::Couldn't find SipDialogP2T!"<<end;
+		mdbg<<"DefaultDialogHandler::Couldn't find SipDialogP2T!"<<end;
 		return;
 	}
 
