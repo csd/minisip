@@ -75,7 +75,7 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 				break;
 			case SIP_HEADER_TYPE_TO:
 				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag( ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getTag() );
-				((SipHeaderValueTo*)*header)->getUri().setUserId(to_uri);
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CSEQ:
