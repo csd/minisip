@@ -64,26 +64,20 @@ SipNotify::SipNotify(string &build_from): SipMessage(/*"SipNotify",*/ SipNotify:
 
 SipNotify::SipNotify(string branch, 
 		    string call_id, 
-                    string tel_no, 
-                    IPAddress &proxy_addr, 
-                    IPAddress &local_addr, 
+		    MRef<SipIdentity*> toIdentity,
+		    MRef<SipIdentity*> fromId,
                     int local_port, 
-                    string from_resource, 
-                    int32_t seq_no, 
-                    int32_t local_media_port): 
-                            SipMessage(branch, SipNotify::type)
+                    int32_t seq_no 
+                    ): 
+                            SipMessage(branch, SipNotify::type), fromIdentity(fromId)
 {
-	this->user = tel_no;
-	ip=proxy_addr.getString();
-	user_type="phone";
+	toUser = toIdentity->sipUsername;
+	toDomain = toIdentity->sipDomain;
 	
-//	SipHeaderVia *viap = new SipHeaderVia("UDP",local_addr.get_string(),local_addr.get_port());
-//	add_header(viap);
-	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(from_resource, proxy_addr.getString() );
+	MRef<SipHeader*> fromp = new SipHeaderFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(fromp);
 
-	MRef<SipHeader*> top = new SipHeaderTo(user, proxy_addr.getString());
+	MRef<SipHeader*> top = new SipHeaderTo(toIdentity->sipUsername, toIdentity->sipDomain);
 	addHeader(top);
 	
 	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
@@ -98,12 +92,14 @@ SipNotify::SipNotify(string branch,
 	seqp->setCSeq(seq_no);
 	addHeader(MRef<SipHeader*>(*seqp));
 	
+/*
 	MRef<SipHeader*> contactp = new SipHeaderContact(from_resource, 
                                                         local_addr.getString(), 
                                                         local_port,
                                                         "phone",
                                                         "UDP");
 	addHeader(contactp);
+*/
 	
 	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
 	uap->setUserAgent("Minisip");
@@ -112,10 +108,6 @@ SipNotify::SipNotify(string branch,
 	MRef<SipHeaderEvent*> ep = new SipHeaderEvent();
 	ep->setEvent("presence");	
 	addHeader(MRef<SipHeader*>(*ep));
-	
-	MRef<SipHeaderContentType*> contenttypep = new SipHeaderContentType();
-	contenttypep->setContentType("application/ee_xpidf+xml");
-	addHeader(MRef<SipHeader*>(*contenttypep));
 }
 
 SipNotify::~SipNotify(){
@@ -123,7 +115,7 @@ SipNotify::~SipNotify(){
 }
 
 string SipNotify::getString(){
-	return  "SUBSCRIBE sip:"+user+"@"+ip+";user="+user_type+" SIP/2.0\r\n" + getHeadersAndContent();
+	return  "NOTIFY sip:"+toUser+"@"+toDomain+" SIP/2.0\r\n" + getHeadersAndContent();
 
 }
 

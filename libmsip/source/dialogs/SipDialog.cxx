@@ -126,7 +126,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 		return false;
 	}
 
-	if (command.getType()==SipSMCommand::COMMAND_PACKET && /*getCallId()*/ /*callConfig.callId*/ callId != command.getCommandPacket()->getCallId()){
+	if (command.getType()==SipSMCommand::COMMAND_PACKET && callId!="" && callId != command.getCommandPacket()->getCallId()){
 		mdbg << "SipDialog: denying command based on destination id"<< end;
 		return false;
 	}

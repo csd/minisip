@@ -34,6 +34,7 @@
 #define SIPNOTIFY_H
 
 #include<libmsip/SipMessage.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmnetutil/IPAddress.h>
 #include<vector>
 #include<sys/types.h>
@@ -64,13 +65,10 @@ class SipNotify : public SipMessage{
 		 */
 		SipNotify(string branch,
 				string call_id, 
-				string resource, 
-				IPAddress &proxy, 
-				IPAddress &local_ip, 
+				MRef<SipIdentity*> toIdentity,
+				MRef<SipIdentity*> fromId,
                                 int local_port,
-				string from_tel_no, 
-				int32_t seq_no, 
-				int32_t local_media_port
+				int32_t seq_no
 				);
 		
 		virtual ~SipNotify();
@@ -80,9 +78,9 @@ class SipNotify : public SipMessage{
 		virtual string getString();
 		
 	private:
-		string user; //telephone number for example
-		string ip;
-		string user_type; //phone or ip
+		MRef<SipIdentity *> fromIdentity;
+		string toUser; //telephone number for example
+		string toDomain;
 };
 
 #endif
