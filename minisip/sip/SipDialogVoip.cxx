@@ -918,7 +918,7 @@ void SipDialogVoip::sendInvite(const string &branch){
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
 	if (getIpsecSession()->required()){
-		mikey = ipsecSession->getMikeyIpsecAnswer();
+		mikey = ipsecSession->getMikeyIpsecOffer();
 		if (!mikey){
 			merr << "Mikey was NULL" << end;
 			merr << "Still some errors with IPSEC" << end;
@@ -1034,7 +1034,7 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
 	if (getIpsecSession()->required()){
-		mikey = ipsecSession->getMikeyIpsecAnswer();
+		mikey = ipsecSession->getMikeyIpsecOffer();
 		if (!mikey){
 			merr << "Mikey was NULL" << end;
 			merr << "Still some errors with IPSEC" << end;
