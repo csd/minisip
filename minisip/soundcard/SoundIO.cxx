@@ -538,10 +538,9 @@ void BasicSoundSource::getSound(short *dest,
 	}else{
 		for (int32_t i=0; i<nMono; i++){
 			dest[i]=stereoBuffer[((playoutPtr-stereoBuffer)+i*2)%
-                                                (bufferSizeInMonoSamples*2) ];
+                                                (bufferSizeInMonoSamples*2) ]/2;
 			dest[i]+=stereoBuffer[((playoutPtr-stereoBuffer)+i*2+1)%
-                                                (bufferSizeInMonoSamples*2) ];
-			dest[i] /= 2;
+                                                (bufferSizeInMonoSamples*2) ]/2;
 		}
 	}	
 	if (playoutPtr+nMono*2>=endOfBufferPtr)
