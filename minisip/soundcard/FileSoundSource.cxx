@@ -25,8 +25,8 @@
 
 using namespace std;
 
-FileSoundSource::FileSoundSource(string filename, bool rep):
-                SoundSource(0), 
+FileSoundSource::FileSoundSource(string filename, uint32_t id, bool rep):
+                SoundSource(id), 
                 enabled(false),
                 repeat(rep),
                 index(0)

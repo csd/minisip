@@ -32,6 +32,7 @@
 #include"Media.h"
 #include"Session.h"
 #include"RtpReceiver.h"
+#include"MediaCommandString.h"
 #include<libmnetutil/UDPSocket.h>
 
 #include"../soundcard/SoundIO.h"
@@ -83,7 +84,12 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
                 // FIXME: go through the codecs and add all
                 MRef<AudioMedia *> media = new AudioMedia( soundIo, new G711CODEC() );
                 registerMedia( *media );
+		if( !audioMedia ){
+			audioMedia = media;
+		}
         }
+
+	ringtoneFile = config->ringtone;
 }
 
 MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityConfig ){
@@ -118,4 +124,20 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 
 void MediaHandler::registerMedia( MRef<Media*> media ){
 	this->media.push_back( media );
+}
+
+void MediaHandler::handleCommand( CommandString command ){
+	if( command.getOp() == MediaCommandString::start_ringing ){
+		if( audioMedia && ringtoneFile != "" ){
+			audioMedia->startRinging( ringtoneFile );
+		}
+		return;
+	}
+
+	if( command.getOp() == MediaCommandString::stop_ringing ){
+		if( audioMedia ){
+			audioMedia->stopRinging();
+		}
+		return;
+	}
 }

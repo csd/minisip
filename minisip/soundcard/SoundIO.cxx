@@ -266,7 +266,7 @@ void SoundIO::start_recorder(){
 
 void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){	
 	queueLock.lock();
-	for (list<SoundSource *>::iterator i=sources.begin(); 
+	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
                         i!= sources.end(); 
                         i++){
 		if (sourceId==(*i)->getId()){
@@ -280,9 +280,26 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 	sourceListCond.broadcast();
 }
 
+void SoundIO::registerSource( MRef<SoundSource *> source ){
+	queueLock.lock();
+	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
+                        i!= sources.end(); 
+                        i++){
+		if (source->getId()==(*i)->getId()){
+			queueLock.unlock();
+			sourceListCond.broadcast();
+			return;
+		}
+        }
+	sources.push_front(source);
+	queueLock.unlock();
+	sourceListCond.broadcast();
+}
+
+
 void SoundIO::unRegisterSource(int sourceId){
 	queueLock.lock();
-	for (list<SoundSource *>::iterator i = sources.begin(); 
+	for (list<MRef<SoundSource *> >::iterator i = sources.begin(); 
                         i!=sources.end(); 
                         i++){
 		if ((*i)->getId()==sourceId){
@@ -306,7 +323,7 @@ void SoundIO::pushSound(int sourceId,
         
 	queueLock.lock();
 
-	for (list<SoundSource *>::iterator i=sources.begin(); i!= sources.end(); i++){
+	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); i!= sources.end(); i++){
 		if (sourceId==(*i)->getId()){
 			(*i)->pushSound(buf, nMonoSamples, index, isStereo);
 			queueLock.unlock();	
@@ -326,8 +343,8 @@ void SoundIO::send_to_card(short *buf, int32_t n_samples){
 }
 
 
-SoundSource *SoundIO::getSoundSource(int32_t id){
-	for (list<SoundSource *>::iterator i = sources.begin(); 
+MRef<SoundSource *> SoundIO::getSoundSource(int32_t id){
+	for (list<MRef<SoundSource *> >::iterator i = sources.begin(); 
                         i!= sources.end(); i++){
 		if ((*i)->getId()==id)
 			return *i;
@@ -373,7 +390,7 @@ void *SoundIO::playerLoop(void *arg){
 		memset( buf, '\0', BS*nChannels*2 );
                 
 		int j=0;
-		for (list<SoundSource *>::iterator 
+		for (list<MRef<SoundSource *> >::iterator 
 				i = active_soundcard->sources.begin(); 
 				i != active_soundcard->sources.end(); i++,j++){
 			if ((*i)->getId()!=-1 && (*i)->getId()!=-2){

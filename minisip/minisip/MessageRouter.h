@@ -44,10 +44,13 @@ class MessageRouter: public SipCallback, public GuiCallback{
 		
 		void setSipStateMachine(MRef<Sip*> ssp);
 		void setGui(Gui *guiptr){gui = guiptr;};
+		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
+			this->mediaHandler = mediaHandler;}
 
 		virtual void sipcb_handleCommand(CommandString &command);
 
 		virtual void guicb_handleCommand(CommandString &command);
+		virtual void guicb_handleMediaCommand(CommandString &command);
 
 		virtual string guicb_doInvite(string sip_url);
 			
@@ -55,6 +58,7 @@ class MessageRouter: public SipCallback, public GuiCallback{
 		
 		Gui *gui;
 		MRef<Sip*> sip_machine;
+		MRef<MediaHandler *> mediaHandler;
 };
 
 #endif

@@ -137,6 +137,8 @@ class SipSoftPhoneConfiguration : public MObject{
 		string autoCall;
 #endif
 
+		string ringtone;
+
 		void save();
 		std::string load( std::string filename );
 		

@@ -30,6 +30,7 @@
 #include"Session.h"
 #include"RtpReceiver.h"
 #include"../minisip/ipprovider/IpProvider.h"
+#include<libmutil/CommandString.h>
 
 
 class SipSoftPhoneConfiguration;
@@ -43,10 +44,16 @@ class MediaHandler : public MObject{
 		MRef<Session *>createSession( SipDialogSecurityConfig &config );
 		
 		void registerMedia( MRef<Media *> media );
+
+		void handleCommand( CommandString command );
 		
 		virtual std::string getMemObjectType(){return "MediaHandler";}
 	private:
 		std::list< MRef<Media *> > media;
+
+		string ringtoneFile;
+
+		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
 };
 

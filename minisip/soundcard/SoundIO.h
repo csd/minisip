@@ -80,7 +80,7 @@ using namespace std;
 */
 
 
-class SoundSource{
+class SoundSource : public MObject{
 	public:
 		SoundSource(int id);
 		virtual ~SoundSource(){};
@@ -109,6 +109,8 @@ class SoundSource{
 		 */
 		virtual void getSound(short *dest, int32_t nMono, bool stereo, bool dequeue=true)=0;
 		
+		virtual std::string getMemObjectType(){return "SoundSource";};
+		
 	private:
 		int sourceId;
 };
@@ -135,6 +137,7 @@ class BasicSoundSource: public SoundSource{
 		virtual void getSound(short *dest, int32_t nMono, bool stereo, bool dequeue=true);
 
 //		void addLatest(short *dest, int32_t nMono, int factor=1);
+//
 	private:
 		SoundIOPLCInterface *plcProvider;
 		short *stereoBuffer;
@@ -226,6 +229,8 @@ class SoundIO : public MObject{
 		 */
 		void registerSource(int sourceId, 
                                     SoundIOPLCInterface *plc=NULL);
+
+		void registerSource(MRef<SoundSource *> source);
                 
 		void unRegisterSource(int sourceId);
                 
@@ -243,7 +248,7 @@ class SoundIO : public MObject{
 
 		void read_from_card(short *buf, int32_t n_samples);
 		 
-		SoundSource *getSoundSource(int32_t id);
+		MRef<SoundSource *> getSoundSource(int32_t id);
 
 		std::string getDevice(){return soundDev?soundDev->dev:"";};
 
@@ -264,7 +269,7 @@ class SoundIO : public MObject{
 		
 
 		CondVar sourceListCond;
-		list<SoundSource *> sources;
+		list<MRef<SoundSource *> > sources;
 		list<RecorderReceiver *> recorder_callbacks;
 		CondVar recorderCond;
 		volatile int32_t recorder_buffer_size;

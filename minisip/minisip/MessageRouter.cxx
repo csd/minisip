@@ -45,6 +45,10 @@ void MessageRouter::sipcb_handleCommand(CommandString &command){
 	gui->handleCommand(command);
 }
 
+void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
+	mediaHandler->handleCommand(cmd);
+}
+
 
 string MessageRouter::guicb_doInvite(string user){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;

@@ -204,6 +204,7 @@ void Minisip::run(){
                 mout << BOLD << "init 5.5/9: Creating MediaHandler" << PLAIN << end;
 #endif
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
+		ehandler->setMediaHandler( mediaHandler );
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 6/9: Creating main SIP logic" << PLAIN << end;

@@ -27,6 +27,7 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include"../../Bell.h"
+#include"../../../mediahandler/MediaCommandString.h"
 
 
 
@@ -41,6 +42,7 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 		bell(/*NULL*/)//,
 //		timeoutProvider(tp)
 {
+	bell = NULL;
 
 	add( status );
 	add( secStatus );
@@ -68,8 +70,7 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 		status.set_markup( "Incoming call from \n<b>" + remoteUri
 				+ "</b>");
 		secStatus.set_markup( "The call is <b>" + secure +"</b>." );
-		bell = new Bell(/*timeoutProvider*/);
-		bell->start();
+		startRinging();
 	}
 	else{
 		state = CALL_WIDGET_STATE_CONNECTING;
@@ -88,24 +89,19 @@ void CallWidget::update(){
 }
 #endif
 
+
 void CallWidget::accept(){
 	if( state == CALL_WIDGET_STATE_INCOMING ){
 	
 		CommandString accept( callId, SipCommandString::accept_invite );
 		mainWindow->getCallback()->guicb_handleCommand( accept );
 	}
-	if (bell){
-		bell->stop();
-		bell=NULL;
-	}
+	stopRinging();
 }
 
 void CallWidget::reject(){
 	CommandString cmdstr("","");
-	if (bell){
-		bell->stop();
-		bell=NULL;
-	}
+	stopRinging();
 
 	switch( state ){
 		case CALL_WIDGET_STATE_TERMINATED:
@@ -196,11 +192,7 @@ bool CallWidget::handleCommand( CommandString command ){
 		}
 
 		if( command.getOp() == SipCommandString::remote_hang_up ){
-			if (bell){
-				bell->stop();
-				bell=NULL;
-			}
-
+			stopRinging();
 
 			status.set_text( "Call ended" );
 			secStatus.set_text( "" );
@@ -222,10 +214,7 @@ bool CallWidget::handleCommand( CommandString command ){
 		}
 
 		if( command.getOp() == SipCommandString::remote_cancelled_invite ){
-			if (bell){
-				bell->stop();
-				bell=NULL;
-			}
+			stopRinging();
 
 
 			status.set_text( "Remote side cancelled the call" );
@@ -257,11 +246,7 @@ bool CallWidget::handleCommand( CommandString command ){
 		}
 
 		if( command.getOp() == SipCommandString::security_failed ){
-			if (bell){
-				bell->stop();
-				bell=NULL;
-			}
-
+			stopRinging();
 
 			status.set_text( "Security is not handled by the receiver" );
 			secStatus.set_text( "" );
@@ -273,4 +258,23 @@ bool CallWidget::handleCommand( CommandString command ){
 	}
 
 	return false;
+}
+
+void CallWidget::startRinging(){
+	if(!bell){
+		bell = new Bell();
+	}
+	bell->start();
+	CommandString cmdstr = CommandString( 0, MediaCommandString::start_ringing );
+	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+
+}
+
+void CallWidget::stopRinging(){
+	if (bell){
+		bell->stop();
+		bell=NULL;
+	}
+	CommandString cmdstr = CommandString( 0, MediaCommandString::stop_ringing );
+	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 }

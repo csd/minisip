@@ -5,10 +5,12 @@ libmediahandler_a_SOURCES = MediaHandler.cxx \
 			    MediaStream.cxx \
 			    Media.cxx \
 			    RtpReceiver.cxx \
-			    KeyAgreement.cxx
+			    KeyAgreement.cxx \
+			    MediaCommandString.cxx
 			    
 noinst_HEADERS = MediaHandler.h \
                  Session.h \
 		 MediaStream.h \
 		 Media.h \
-		 RtpReceiver.h
+		 RtpReceiver.h \
+		 MediaCommandString.h

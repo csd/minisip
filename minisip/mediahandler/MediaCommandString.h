@@ -20,22 +20,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef GUICALLBACK_H
-#define GUICALLBACK_H
+#ifndef MEDIA_COMMAND_STRING_H
+#define MEDIA_COMMAND_STRING_H
 
-#include<config.h>
-
-#include<libmutil/CommandString.h>
-
-//TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
-//package move to the callback as much as possible --EE
-
-class GuiCallback{
-	
+class MediaCommandString{
 	public:
-		virtual string guicb_doInvite(string sip_url)=0;
-                virtual void guicb_handleCommand(CommandString &)=0;
-                virtual void guicb_handleMediaCommand(CommandString &)=0;
+		static const string start_ringing;
+		static const string stop_ringing;
+	
 };
+
 
 #endif

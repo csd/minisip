@@ -71,6 +71,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 #ifndef NO_SECURITY
 	tls_server(false),
 #endif
+	ringtone(""),
 	p2tGroupListServerPort(0)
 {
 #ifdef MINISIP_MEMDEBUG 
@@ -158,8 +159,11 @@ void SipSoftPhoneConfiguration::save(){
 	parser->changeValue("tls_server", tls_server? "yes":"no");
 #endif
 
+	parser->changeValue("ringtone", ringtone);
+
 	parser->saveToFile( configFileName );
 	delete( parser );
+
 
 }
 
@@ -294,6 +298,8 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		}
 		i++;
 	}while(s!="");
+
+	ringtone = parser->getValue("ringtone","");
 
 	inherited.load( parser );
 	securityConfig.load( parser );

@@ -57,6 +57,9 @@ class CallWidget : public Gtk::VBox{
 #endif
 
 	private:
+		void startRinging();
+		void stopRinging();
+
 		MainWindow * mainWindow;
 		string callId;
 

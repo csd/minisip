@@ -24,6 +24,7 @@
 #include"Media.h"
 #include"../codecs/Codec.h"
 #include"../soundcard/SoundIO.h"
+#include"../soundcard/FileSoundSource.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include"MediaStream.h"
 #include"RtpReceiver.h"
@@ -38,6 +39,8 @@
 #include"../video/display/VideoDisplay.h"
 #include"../video/mixer/ImageMixer.h"
 #endif
+
+#define RINGTONE_SOURCE_ID 0x42124212
 
 using namespace std;
 
@@ -220,4 +223,12 @@ void AudioMedia::srcb_handleSound( void * data ){
 	
 	sendData( encoded, encodedLength, seqNo * ((AudioCodec*)*codec)->getInputNrSamples() );
 	seqNo ++;
+}
+
+void AudioMedia::startRinging( string ringtoneFile ){
+	soundIo->registerSource( new FileSoundSource( ringtoneFile,RINGTONE_SOURCE_ID, true ) );
+}
+
+void AudioMedia::stopRinging(){
+	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
 }

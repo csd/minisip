@@ -46,8 +46,9 @@ class FileSoundSource : public SoundSource{
          *                      will be returned by the sound source after
          *                      all samples have been played. The default
          *                      is false.
+	 * @arg id              SoundSource id     
          */
-        FileSoundSource(string filename, bool repeat=false);
+        FileSoundSource(string filename, uint32_t id, bool repeat=false);
 
 
         /**

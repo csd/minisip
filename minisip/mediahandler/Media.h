@@ -27,6 +27,7 @@
 #include<libmutil/Mutex.h>
 #include<stdint.h>
 #include"../soundcard/SoundRecorderCallback.h"
+#include"../soundcard/SoundIO.h"
 #ifdef VIDEO_SUPPORT
 #include"../video/codec/VideoEncoderCallback.h"
 #endif
@@ -92,6 +93,9 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		virtual void unRegisterMediaSource( uint32_t ssrc );
 
 		virtual void srcb_handleSound( void *samplearr );
+
+		void startRinging( std::string ringtoneFile );
+		void stopRinging();
 	private:
 		MRef<SoundIO *> soundIo;
 		uint32_t seqNo;
