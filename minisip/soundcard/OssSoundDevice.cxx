@@ -110,6 +110,9 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 	
 	int setSpeed;
+	
+	/* remove because of the use of spatial audio
+
 #ifdef IPAQ
 	// The iPAQ h5550 is known not to support 8kHz, we use 16kHz and
 	// resample
@@ -119,7 +122,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	}
 	else
 #endif
-
+	*/
 	setSpeed = samplingRate;
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
@@ -192,6 +195,8 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	}
 
 	int setSpeed;
+
+	/*
 #ifdef IPAQ
 	// The iPAQ h5550 is known not to support 8kHz, we use 16kHz and
 	// resample
@@ -201,6 +206,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	}
 	else
 #endif
+	*/
 	setSpeed = samplingRate;
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){

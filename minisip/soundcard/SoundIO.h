@@ -47,6 +47,9 @@
 
 #include<iostream>
 #include<list>
+#include"../spaudio/SpAudio.h"
+#include<samplerate.h>
+
 
 #ifdef HAVE_LIBASOUND
 #define ALSA_PCM_NEW_HW_PARAMS_API
@@ -93,7 +96,13 @@ class SoundSource : public MObject{
 		/**
 		 * @return		Spatial position of the source.
 		 */
-		int getPos();
+		int32_t getPos();
+
+
+		/**
+		 * @set	                Spatial position of the source.
+		 */
+		void setPos(int32_t position);
 
 		/**
 		 * @param samples	Buffer with samples that will be enqueued.
@@ -118,7 +127,7 @@ class SoundSource : public MObject{
 		
 	private:
 		int sourceId;
-		int sourcePos;
+		int32_t sourcePos;
 };
 
 class BasicSoundSource: public SoundSource{
@@ -142,7 +151,20 @@ class BasicSoundSource: public SoundSource{
 
 
 		
-		virtual void getSound(short *dest, int32_t nMono, bool stereo, bool dequeue=true);
+		virtual void getSound(short *dest,
+				      int32_t nMono,
+				      bool stereo, 
+				      bool dequeue=true);
+
+		short* getLeftBuf();
+
+		short* getRightBuf();
+
+		short* getLookupLeft();
+
+		short* getLookupRight();
+
+		int32_t getPointer();
 
 //		void addLatest(short *dest, int32_t nMono, int factor=1);
 //
@@ -153,6 +175,17 @@ class BasicSoundSource: public SoundSource{
 		short *playoutPtr;
 		short *firstFreePtr;
 		int32_t lap_diff; //roll over counter
+
+		/* spatial audio variables */
+		short *leftChannelBuffer;
+		short *rightChannelBuffer;
+		short *lookupleft;
+		short *lookupright;
+		int32_t pointer;
+
+		SRC_DATA src_data;
+		SRC_STATE *src_state;
+
 //		int lastPushSize;
 };
 
@@ -275,6 +308,9 @@ class SoundIO : public MObject{
 
 		static void *playerLoop(void *);
 		
+
+		SpAudio spAudio;
+
 
 		CondVar sourceListCond;
 		list<MRef<SoundSource *> > sources;
