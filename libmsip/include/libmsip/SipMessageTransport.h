@@ -45,7 +45,6 @@
 #include<libmsip/SipSMCommand.h>
 #include<list>
 #include<libmsip/SipMessage.h>
-//#include<libmsip/SipMessageReceiver.h>
 
 class SipDialogContainer;
 
@@ -68,8 +67,6 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		
 		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
 		
-//		void setSipMessageReceiver(MRef<SipMessageReceiver*> rec);
-
 		void setCommandReceiver(MRef<CommandStringReceiver* > rcvr);
 
                 virtual std::string getMemObjectType(){return "SipMessageTransport";}
@@ -93,9 +90,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		MRef<certificate *> getCertificate(){ return cert; };
 #endif
 
-		//void streamSocketRead( MRef<StreamSocket *> socket );
 		void udpSocketRead();
-		//void threadPool();
 
 	private:
 		void addViaHeader( MRef<SipMessage*> pack, MRef<StreamSocket *> socket, string branch );
@@ -123,7 +118,6 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 #endif
 
 		MRef<SipSMCommandReceiver *> commandReceiver;
-//		MRef<SipMessageReceiver*> messageReceiver;
 
                 Semaphore semaphore;
 

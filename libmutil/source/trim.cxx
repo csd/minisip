@@ -37,8 +37,6 @@
 
 using namespace std;
 
-
-
 LIBMUTIL_API string trim(string line){
 	while (line.length()>0 && isspace(line[0]))
 		line = line.substr(1, line.length()-1);
@@ -46,3 +44,4 @@ LIBMUTIL_API string trim(string line){
 		line = line.substr(0, line.length()-1);
 	return line;
 }
+

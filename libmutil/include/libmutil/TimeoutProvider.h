@@ -38,11 +38,6 @@
  *TODO: Handle destruction ("join" threads)
 */ 
 
-/*
-#ifdef HAVE_CONFIG_H
-#include<config.h>
-#endif
-*/
 #include<list>
 
 #ifdef _MSC_VER
@@ -55,29 +50,8 @@
 #define LIBMUTIL_API
 #endif
 
-/*
-#ifdef HAVE_SIGNAL_H
-#include <sys/types.h>
-#include<signal.h>
-#include<sys/time.h>
-#endif
-*/
-
-/*
-#ifdef WIN32
-#include<windows.h>
-#endif
-*/
-
 #include<assert.h>
 #include"Mutex.h"
-
-//#ifdef WIN32
-//#include<libmutil/gettimeofday.h>
-//#else
-//#include<sys/time.h>
-//#include<time.h>
-//#endif
 
 #include<libmutil/mtime.h>
 
@@ -87,8 +61,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CondVar.h>
-//#include<stdint.h>
-
 
 /**
  * NOTE: This class is only used internaly.
@@ -163,17 +135,13 @@ class TimeoutProvider : public MObject{
 
 	public:
 		string getMemObjectType(){return "TimeoutProvider";}
-//#ifdef DEBUG_OUTPUT
 		string getTimeouts(){
 			string ret;
 
 			synch_lock.lock();
-			//typename std::list<TPRequest<TOCommand> >::iterator i=requests.begin();
 			
 			for (int i=0 ; i<requests.size(); i++){
-				//int ms= (*i).get_ms_to_timeout();
 				int ms= requests[i].get_ms_to_timeout();
-				//TimeoutSubscriberInterface<TOCommand, TOSubscriber> *receiver = requests[i].get_subscriber();
 				TOSubscriber receiver = requests[i].get_subscriber();
 				ret = ret + "      " 
 					+ string("Command: ") + requests[i].get_command() 
@@ -190,13 +158,10 @@ class TimeoutProvider : public MObject{
 			synch_lock.lock();
 			for (int i=0; i< requests.size(); i++)
 				retlist.push_back(requests[i]);
-//			retlist = requests;
 			synch_lock.unlock();
 			
-			//return requests;   
 			return retlist;   
 		}
-//#endif
 
 		/**
 		 * @param signal_no	The TimeoutProvider uses signals internally. Which 
@@ -264,9 +229,7 @@ class TimeoutProvider : public MObject{
 		 * @see request_timeout
 		 */
 		void cancel_request(TOSubscriber subscriber, const TOCommand &command){
-			//typename std::list<TPRequest<TOCommand, TOSubscriber> >::iterator i;
                         synch_lock.lock();
-			//int size=requests.size();
 			int loop_count=0;
 			for (int i=0; loop_count<requests.size(); i++){
 				if (requests[i].get_subscriber()==subscriber && requests[i].get_command()==command){
@@ -318,7 +281,6 @@ class TimeoutProvider : public MObject{
 		static void *loop_starter(void *tp){
 			TimeoutProvider *t = (TimeoutProvider*)tp;
 			t->loop();
-//			((TimeoutProvider<TOCommand, TOSubscriber> *)tp)->loop();
 			return NULL;
 		}
 		

@@ -89,7 +89,6 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 #endif
 		throw new SipExceptionInvalidMessage();
 	}
-//	setContent(NULL);
 		//strlen(SIP/2.0)==7
 	int afterws=7;
 	while (resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
@@ -112,73 +111,6 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 		}
 		status_desc=status_desc+resp[i];
 	}
-	
-/*
-	bool done=false;
-	int32_t nr_n, nr_r;
-	
-	string line;
-	do{
-		if (resp[i]=='\r' || resp[i]=='\n'){
-			nr_n=nr_r=0;
-			while (resp[i]=='\r' || resp[i]=='\n'){
-				if (resp[i]=='\r')
-					nr_r++;
-				if (resp[i]=='\n')
-					nr_n++;
-				i++;
-				if(resp.size() == i){
-					break;
-				}
-			}	
-			done = (nr_n>1) || (nr_r >1);
-		}
-		if (!done){
-			line="";
-			
-			while ( (resp[i] != '\r') && (resp[i] != '\n') ){
-				line = line + string(string("")+resp[i]);
-				i++;
-				if(resp.size() == i){
-					throw new SipExceptionInvalidMessage();
-				}
-			}
-			string ln = line;
-			if (!addLine(ln)){
-#ifdef DEBUG_OUTPUT
-				//merr << "Info: Could not copy line to new Message: " << line << " (unknown)" << end;
-#endif	
-				if (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")){
-					unsigned r_pos = ln.find("realm=");
-					unsigned n_pos = ln.find("nonce=");
-					if (r_pos == string::npos || n_pos ==string::npos)
-						merr << "ERROR: could not extract nonce and realm in line: " << ln << end;
-					int32_t r_end = ln.find("\"",r_pos+7);
-					int32_t n_end = ln.find("\"",n_pos+7);
-					nonce = ln.substr(n_pos+7, n_end-(n_pos+7));
-					realm = ln.substr(r_pos+7, r_end-(r_pos+7));
-				}
-			}
-			
-		}		
-	}while (!done);
-	string sdp;
-	
-	while ((resp[i]=='\r' || resp[i]=='\n') && !((unsigned)i>=resp.length())){
-		i++;
-	}
-
-	if (getContentLength() > 0){
-		if (getContentLength() > (int)resp.length() - (int)i)
-			throw new SipExceptionInvalidMessage();
-		else
-			sdp = resp.substr(i, i+getContentLength());
-			setContent(MRef<SipMessageContent*>(new SdpPacket(sdp)));
-	}
-	resp.erase(0, i+getContentLength());
-	
-	setDestinationBranch( getLastViaBranch() );
-*/
 }
 
 string SipResponse::getString(){
@@ -195,8 +127,3 @@ string SipResponse::getStatusDesc(){
 	return status_desc;
 }
 
-/*
-MRef<SdpPacket*> SipResponse::getSdp(){
-	return MRef<SdpPacket*>((SdpPacket*)*content);
-}
-*/

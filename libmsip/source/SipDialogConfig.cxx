@@ -26,18 +26,16 @@
 
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
-//#include<libmsip/SipSoftPhoneConfiguration.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipDialogContainer.h>
-//#include<libmsip/dialogs/DefaultDialogHandler.h>
 #include<libmsip/SipInvite.h>
 
 
 
-SipIdentity::SipIdentity(string addr)/*: sipProxyPort(0), sipProxyIpAddr(NULL)*/ : securitySupport(false),registerToProxy(false){
+SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(false){
 	setSipUri(addr);
 	securitySupport = false;
 }
@@ -55,17 +53,14 @@ void SipIdentity::setSipUri(string addr){
 }
 
 
-SipCommonConfig::SipCommonConfig(): /*MObject("SipCommonConfig"),*/
+SipCommonConfig::SipCommonConfig():
 	localUdpPort(0),
 	localTcpPort(0),
 #ifndef NO_SECURITY
 	localTlsPort(0),
 #endif
-	//proxyAddr(NULL),
-//	proxyPort(0),
 	transport(("")),
 	autoAnswer(false){
-//            merr << "running SipCommonConfig constructor"<< end;
 
 #ifdef MINISIP_MEMDEBUG
 	sipTransport.setUser("SipCommonConfig/messageTransport");
@@ -73,15 +68,6 @@ SipCommonConfig::SipCommonConfig(): /*MObject("SipCommonConfig"),*/
 }
 
 void SipCommonConfig::save( XMLFileParser * parser ){
-	/***********************************************************
-	 * General settings
-	 ***********************************************************/
-#if 0
-	parser->changeValue("sip_address", sipIdentity->sipUsername +"@" + sipIdentity->sipDomain);
-	parser->changeValue("proxy_username",sipIdentity->sipProxy.sipProxyUsername);
-	parser->changeValue("proxy_password",sipIdentity->sipProxy.sipProxyPassword);
-#endif
-
 
 	/***********************************************************
 	 * Advanced settings
@@ -159,43 +145,11 @@ SipDialogConfig::SipDialogConfig(SipCommonConfig &commonconf)/*: MObject("SipDia
 }
 
 void SipDialogConfig::useIdentity(
-			//IPAddress *proxy,
 			MRef<SipIdentity*> identity,
-//			string domain,
-//			int proxyPort, 
-//			string user, 
-//			string proxyUsername, 
-//			string proxyPassword,
 			bool useSecurity,
 			string transport)
 {
-//	inherited.proxyAddr = phoneconf->pstnProxy;
-//	inherited.proxyAddr = proxy;
-//	inherited.sipIdentity.sipProxy.sipProxyIpAddr = proxy;
 	inherited.sipIdentity = identity;
-	
-//	inherited.sipIdentity.sipDomain = domain;
-	//inherited.sipDomain = domain;
-	
-//	inherited.proxyPort = phoneconf->pstnProxyPort;
-
-//	inherited.sipIdentity.sipProxyPort = proxyPort;
-//	inherited.proxyPort = proxyPort;
-	
-//	proxyIPAddress = phoneconf->pstn_proxy;
-
-//	inherited.proxyUsername = phoneconf->pstnProxyUsername;
-
-//	inherited.sipIdentity.sipProxyUsername = proxyUsername;
-	//inherited.proxyUsername = proxyUsername;
-	
-//	inherited.proxyPassword = phoneconf->pstnProxyPassword;
-
-//	inherited.sipIdentity.sipProxyPassword = proxyPassword;
-//	inherited.proxyPassword = proxyPassword;
-	
-//	inherited.userUri = phoneconf->pstnNumber + "@" + inherited.proxyAddr->get_string(); 
-//	inherited.userUri = user + "@" + proxy->getString(); 
 	inherited.transport = transport;
 }
 

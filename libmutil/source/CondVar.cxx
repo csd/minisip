@@ -22,10 +22,6 @@
 */
 
 
-//#ifdef _MSC_VER
-//#include<windows.h>
-//#endif
-
 #include<libmutil/CondVar.h>
 
 #include<config.h>
@@ -49,12 +45,11 @@
 CondVar::CondVar(){
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_CONDVAR_IMPLEMENTED
-	/*INTERNAL_COND_WAIT*/ internalStruct = new pthread_cond_t;
-	/*INTERNAL_MUTEX*/ internalMutexStruct = new pthread_mutex_t;
+	internalStruct = new pthread_cond_t;
+	internalMutexStruct = new pthread_mutex_t;
 
 	pthread_cond_init( INTERNAL_COND_WAIT, NULL );
 	pthread_mutex_init( INTERNAL_MUTEX, NULL );
-	//pthread_mutex_lock( INTERNAL_MUTEX );
 	init = true;
 #elif defined _MSC_VER
 #define MINISIP_CONDVAR_IMPLEMENTED

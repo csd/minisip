@@ -49,8 +49,6 @@ LIBMUTIL_API string base64_encode( unsigned char * input, int length )
 		output += alphabet[ ( (input[i] << 4) | (input[i+1] >> 4) ) & 0x3F];
 		output += alphabet[ ( (input[i+1] << 2 ) | (input[i+2] >> 6) ) & 0x3F];
 		output += alphabet[ input[i+2] & 0x3F ];
-		//if( counter % LINE_LENGTH == 0 )
-		//	output += '\n';
 	}
 
 	switch( length % 3) {
@@ -144,9 +142,7 @@ LIBMUTIL_API unsigned char *  base64_decode( string input, int * output_length )
 	}
 
 	output = new unsigned char[*output_length * sizeof( unsigned char * )];
-	//output = (unsigned char *) malloc( *output_length * sizeof( unsigned char * ) );
 	
-	//memset( *output, 0, *output_length );
 	if( output == NULL )
 	{
 

@@ -41,6 +41,11 @@
  
   Pitfall 2: You MAY _NOT_ create a reference to "this" in a constructor.
   
+  Pitfall 3: If objects reference each other in such a way that
+   	it forms a circle (for example A->B, B->A or A->B, B->C, C->A)
+	then the memory will not be freed automatically. Break the
+	circle by putting one of the refecences to NULL and the whole
+	list will be freed.
 */
 
 #include<string>
@@ -77,15 +82,6 @@ class MRef{
 			}
 		}
 		
-/*		MRef(std::string u, OPType optr){ 
-			user=u;
-			objp = optr; 
-			if (objp!=NULL){
-				assert(dynamic_cast<MObject*>(optr)!=NULL);
-				objp->incRefCount(); 
-			}
-		}
-*/
 		MRef(const MRef<OPType> &r){
 			this->objp = r.objp;
 			if (objp!=NULL){
@@ -173,11 +169,6 @@ class MRef{
 			return objp; 
 		}
 
-
-//		bool operator==(const MRef<OPType> ptr){return objp==ptr->objp; }
-//		bool operator==(OPType o){return objp==o; }
-//		bool operator!=(const MRef<OPType> ptr){return objp!=ptr->objp; }
-
 		OPType operator*(){
 			return objp;
 		}
@@ -194,11 +185,13 @@ class MRef{
 };
 
 /**
- * used for Memory Handling.
- */
-
-
-
+ * The MObject class contains a reference counter that is
+ * used to determine when the object should be removed
+ * from the heap (when no one is referencing it).
+ *
+ * Use this as superclass and use MRef instead of pointers.
+ *
+*/
 class LIBMUTIL_API MObject{
 	public:
 	
@@ -213,23 +206,10 @@ class LIBMUTIL_API MObject{
 		virtual ~MObject();
 
 		int decRefCount();
-/*		{
-			int ref;
-			refLock.lock();
-			ref=refCount--;
-			refLock.unlock();
-			return ref;
-		}
-*/
+		
 		void incRefCount();
-/*		{
-
-			refLock.lock();
-			refCount++;
-			refLock.unlock();
-		}
-*/
-		//	virtual std::string getMemObjectType(){return "(unknown)";}
+		
+//		virtual std::string getMemObjectType(){return "(unknown)";}
 
 		virtual std::string getMemObjectType()=0;
 

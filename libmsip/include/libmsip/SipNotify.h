@@ -52,9 +52,8 @@
 #include<sys/types.h>
 
 /**
- * Representation of a SIP SUBSCRIBE method.
+ * Representation of a SIP NOTIFY method.
  * @author Erik Eliasson, eliasson@it.kth.se
- * @version 0.01
  */
 class LIBMSIP_API SipNotify : public SipMessage{
 
@@ -79,7 +78,6 @@ class LIBMSIP_API SipNotify : public SipMessage{
 				string call_id, 
 				MRef<SipIdentity*> toIdentity,
 				MRef<SipIdentity*> fromId,
-                                //int local_port,
 				int32_t seq_no
 				);
 		

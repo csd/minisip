@@ -51,30 +51,24 @@ bool sipResponseFilterMatch(MRef<SipResponse*> resp, const string &pattern){
 }
 
 
-
-
 bool transitionMatch(const SipSMCommand &command,
 		int packetType,
 		int source,
 		int destination,
 		const string &respFilter)
 {
-
 	if (source!=IGN &&      command.getSource()!=SipSMCommand::ANY &&      command.getSource() != source){
 		return false;
 	}
 	if (destination!=IGN && command.getDestination()!=SipSMCommand::ANY && command.getDestination() != destination){
 		return false;
 	}
-	
 	if (command.getType()!=SipSMCommand::COMMAND_PACKET){
 		return false;
 	}
-
 	if (packetType!=IGN && command.getCommandPacket()->getType()!=packetType){
 		return false;
 	}
-
 	if (respFilter.size()>0){
 		vector<string> filters = split_in_lines(respFilter);
 		for (vector<string>::iterator i=filters.begin(); i!=filters.end(); i++){
@@ -84,7 +78,6 @@ bool transitionMatch(const SipSMCommand &command,
 		}
 		return false;
 	}
-
 	return true;
 }
 
@@ -94,7 +87,6 @@ bool transitionMatch(const SipSMCommand &command,
 		int source,
 		int destination)
 {
-
 	if (command.getType()!=SipSMCommand::COMMAND_STRING){
 		return false;
 	}

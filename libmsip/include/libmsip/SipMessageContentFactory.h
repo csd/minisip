@@ -43,7 +43,6 @@
 
 using namespace std;
 
-// MRef<SipMessageContent*> minfunc(const string &){}
 typedef MRef<SipMessageContent*>(*SipMessageContentFactoryFuncPtr)(const string & buf, const string & ContentType);
 
 class LIBMSIP_API SMCFCollection{

@@ -87,7 +87,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * @param callconf   The Dialog Configuration
 		 */
 		SipDialog(MRef<SipDialogContainer*> dContainer, 
-//				const SipDialogConfig &callconf, 
 				MRef<SipDialogConfig*> callconf,
 				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider );
 		
@@ -114,9 +113,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		MRef<SipDialogConfig*> getDialogConfig();
 
-		//int32_t requestSeqNo();
-		//void setSeqNo(int32_t seq);
-		
 		/**
 		 * get the Call-Id of the dialog
 		 * @return string containing the Call-Id
@@ -147,12 +143,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		///a list containing all transactions
 		list<MRef<SipTransaction*> > transactions;
 
-/////		list<string> routeSet;
-		
 		///the dialog container
 		MRef<SipDialogContainer*> dialogContainer;
-/////		string callId;
-		
 
 	private:
 		

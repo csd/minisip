@@ -36,11 +36,7 @@
 #include<stdlib.h> //rand...
 #include<libmsip/SipInvite.h>
 #include<libmutil/vmd5.h>
-//#include<sys/socket.h>
-//#include<netinet/in.h>
 #include<libmsip/SipMessage.h>
-//#include"state_machines/DefaultCallHandler.h"
-//#include"../minisip/SoundSender.h"
 #include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
 
@@ -55,7 +51,6 @@
 #include<libmsip/SipHeaderContentType.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmsip/SipHeaderMaxForwards.h>
-//#include<libmsip/CODECInterface.h>
 #include<libmsip/SipMessageContent.h>
 
 const int SipInvite::type=1;
@@ -85,8 +80,6 @@ SipInvite::SipInvite(const string &branch,
 		int32_t localSipPort, 
 		const string &from_tel_no, 
 		int32_t seq_no, 
-//		int32_t local_media_port, 
-//		vector<CODECInterface *> &codecs,
 		const string &transport
 		):SipMessage(branch, SipInvite::type)
 {
@@ -112,8 +105,6 @@ SipInvite::SipInvite(const string &branch,
 		const string &nonce, 
 		const string &realm, 
 		const string &password,
-//		int32_t local_media_port, 
-//		vector<CODECInterface *> &codecs,
 		const string &transport
 		):SipMessage(branch, SipInvite::type)
 {
@@ -140,10 +131,7 @@ void SipInvite::createHeadersAndContent(
 		const string &nonce,
 		const string &realm,
 		const string &password,
-//		int32_t local_media_port,
-//		vector<CODECInterface *> &codecs,
 		const string &transport
-//		const string &key_mgmt
 		)
 {
 	SipURI uri(tel_no,proxyAddr,"phone",proxyPort);
@@ -151,9 +139,6 @@ void SipInvite::createHeadersAndContent(
 	this->username = tel_no;
 	this->ip=proxyAddr;
 	this->user_type="phone";
-	
-	//SipHeaderVia *viap = new SipHeaderVia("UDP",localAddr, localSipPort);
-	//add_header(viap);
 	
 	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(from_tel_no, proxyAddr ) );
 	addHeader(fromp);
@@ -182,11 +167,6 @@ void SipInvite::createHeadersAndContent(
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
 	addHeader(new SipHeader(*uap));
-	
-//        MRef<SipHeaderContentType*> contenttypep = new SipHeaderContentType();
-        /*contenttypep->setContentType( sdpref->getContentType() ); */
-//	addHeader(MRef<SipHeader*>(*contenttypep));
-
 }
 
 

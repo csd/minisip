@@ -37,7 +37,6 @@
 #include<libmsip/SipSubscribe.h>
 #include<libmutil/vmd5.h>
 #include<libmsip/SipMessage.h>
-//#include"../minisip/SoundSender.h"
 #include<libmutil/itoa.h>
 
 #include<libmsip/SipHeaderVia.h>
@@ -52,11 +51,9 @@
 #include<libmsip/SipHeaderEvent.h>
 #include<libmsip/SipHeaderAccept.h>
 
-//#include"state_machines/DefaultCallHandler.h"
-
 const int SipSubscribe::type=7;
 
-SipSubscribe::SipSubscribe(string &build_from): SipMessage(/*"SipSubscribe",*/ SipSubscribe::type, build_from){
+SipSubscribe::SipSubscribe(string &build_from): SipMessage(SipSubscribe::type, build_from){
 	
 }
 
@@ -64,25 +61,12 @@ SipSubscribe::SipSubscribe(string branch,
 		string call_id, 
 		MRef<SipIdentity*> toIdentity,
 		MRef<SipIdentity*> fromIdentity,
-		//int local_port,
 		int32_t seq_no)
-/*
-		string resource, 
-		IPAddress &proxy_addr, 
-	//	IPAddress &local_addr, 
-		string from_tel_no, 
-		int32_t seq_no, 
-		int32_t local_media_port)*/
 		: SipMessage(branch, SipSubscribe::type), fromIdentity(fromIdentity)
 {
 	toUser = toIdentity->sipUsername;
 	toDomain = toIdentity->sipDomain;
 
-	
-/*	this->resource = resource;
-	ip=proxy_addr.getString();
-	user_type="phone";
-*/	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(new SipHeader(*fromp));
 
@@ -98,14 +82,6 @@ SipSubscribe::SipSubscribe(string branch,
 	seqp->setCSeq(seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	/*SipHeaderContact *contactp = new SipHeaderContact(
-				from_tel_no, 
-				local_addr.get_string(), 
-				local_addr.get_port(),
-				"phone",
-				"UDP");
-	add_header(contactp);
-	*/
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
 	addHeader(new SipHeader(*uap));

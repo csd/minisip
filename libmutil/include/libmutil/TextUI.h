@@ -39,13 +39,6 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
 
-/**
- *
- *
- *
- * 
-*/
-
 class LIBMUTIL_API TextUICompletionCallback{
 public:
 	virtual minilist<string> textuiCompletionSuggestion(string match)=0;
@@ -59,9 +52,21 @@ struct completion_cb_item{
 };
 
 
-
+/**
+ * General purpose text ui implementation with 
+ * auto-complete functionality.
+ *
+ * Extend this class to generate a user interface. Implement 
+ * the TextUICompletionsCallback to support "dynamic" auto-complete.
+ * For normal auto-complete with a fixed set of commands, register
+ * the commands with the addCommand method.
+ *
+ * You must implement the guiExecute method to interpret the user
+ * input.
+*/
 class LIBMUTIL_API TextUI{
 public:
+	///Colors that can be used when displaying text
 	static const int plain;
 	static const int bold;
 	static const int red;
@@ -72,21 +77,51 @@ public:
 	TextUI();
 	virtual ~TextUI(){};
 
+	/**
+	 * Method to be implemented by a sub-class.
+	 * @param cmd	Command entered by the user (single line)
+	 */
 	virtual void guiExecute(string cmd)=0;
 	
+	/**
+	 * @param msg	String to be displayed on the screen
+	 * @param style	Color/bold/plain
+	 */
 	virtual void displayMessage(string msg, int style=-1);
 
+	/**
+	 * Blocks and runs the gui
+	 */
 	void guimain();
 
+	/**
+	 * Set the prompt of the UI
+	 */
 	void setPrompt(string p);
 
+	/**
+	 * Add a string to the list of auto-complete commands.
+	 * @param c 	String that the TextUI will use to auto-complete
+	 */
 	void addCommand(string c);
+
+	/**
+	 * A fixed set of strings to auto-complete with is not
+	 * enough in all situations. Therefore the TextUI supports
+	 * callbacks to retreive strings depending on what the
+	 * user has already written.
+	 */
 	void addCompletionCallback(string match, TextUICompletionCallback *cb);
 
 protected:
 	///The maximum number of hints that will be output to the screen.
 	//The default is 2000.
 	int maxHints;
+
+	/**
+	 * If the sub-class wants to react on individual key presses,
+	 * implement the keyPressed method.
+	 */
 	virtual void keyPressed(int ){}; /// key pressed is the argument.
 private:
 	void outputSuggestions(minilist<string> &l);

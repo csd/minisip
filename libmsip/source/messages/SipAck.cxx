@@ -54,7 +54,7 @@ SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string p
 	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
 	addHeader(mf);
 	int noHeaders = pack->getNoHeaders();
-	for (int32_t i=0; i< noHeaders; i++){			//FIX: deep copy
+	for (int32_t i=0; i< noHeaders; i++){			//FIX: deep copy?
 		MRef<SipHeader *> header = pack->getHeaderNo(i);
 		int headerType = header->getType();
 		switch (headerType){

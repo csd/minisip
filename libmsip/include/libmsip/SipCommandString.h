@@ -45,7 +45,6 @@ class LIBMSIP_API SipCommandString{
 		/*
 		 * Predefined command strings
 		 */
-//		static const string garbage_collect;
 		static const string transaction_terminated;
 		static const string call_terminated;
 		static const string no_transactions;

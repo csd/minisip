@@ -49,9 +49,6 @@ void SipMessageDispatcher::removeTransaction(MRef<SipTransaction*> t){
 
 
 void SipMessageDispatcher::addDialog(MRef<SipDialog*> d){
-#ifdef MINISIP_MEMDEBUG 
-	d.setUser("SipMessageDispatcher");
-#endif
 	dialogListLock.lock();
 	dialogs.push_front(d);
 	dialogListLock.unlock();
@@ -66,7 +63,6 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	
 	string branch;
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
-		//branch = c.getCommandPacket()->getLastViaBranch();
 		branch = c.getCommandPacket()->getDestinationBranch();
 	}
 
@@ -154,16 +150,8 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 #ifdef DEBUG_OUTPUT
 		mdbg<< "Dispatcher(2): trying all dialogs"<<end;
 #endif
-/*		for (list<MRef<SipDialog*> >::iterator i=dialogs.begin(); i!=dialogs.end(); i++){
-#ifdef DEBUG_OUTPUT
-			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
-#endif
-			if ( (*i)->handleCommand(c) )
-				return true;
-		}*/
 		for (int i=0; i<dialogs.size(); i++){
 //#ifdef DEBUG_OUTPUT
-			
 //			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
 //#endif
 			

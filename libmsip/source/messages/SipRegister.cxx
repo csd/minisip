@@ -60,10 +60,6 @@ SipRegister::SipRegister(string branch,
 		string transport
 		) : SipMessage(branch, SipRegister::type), domain(domainarg)
 {
-
-	//SipHeaderVia *viap = new SipHeaderVia("UDP",localIp, atoi(sip_listen_port.c_str()));
-	//add_header(viap);
-	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
 	addHeader(new SipHeader(*fromp));
 	
@@ -114,12 +110,8 @@ SipRegister::SipRegister(string branch,
 		string password
 		): SipMessage(branch, SipRegister::type), domain(domainarg)
 {
-
 	SipURI uri("", localIp,"phone", sip_listen_port);
 	 
-	//SipHeaderVia *viap = new SipHeaderVia("UDP",localIp, atoi(sip_listen_port.c_str()));
-	//add_header(viap);
-	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
 	addHeader(new SipHeader(fromp));
 	

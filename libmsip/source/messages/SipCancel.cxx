@@ -51,8 +51,7 @@ SipCancel::SipCancel(string &resp):SipMessage(SipCancel::type, resp){
 SipCancel::SipCancel(string branch, MRef<SipInvite*> inv, 
 		string to_uri, 
 		string from_uri, 
-		string proxy//, 
-		//bool local_called
+		string proxy
 		):SipMessage(branch, type)
 {
 	this->ipaddr=proxy;

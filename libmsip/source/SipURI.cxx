@@ -43,7 +43,7 @@
 #endif
 
 //TODO: Fix better parser. handle for example: 1234567;user=phone
-SipURI::SipURI(string build_from)/*:MObject("SipURI")*/{
+SipURI::SipURI(string build_from){
 
 	this->port=0;
 	this->type="";
@@ -130,23 +130,14 @@ SipURI::SipURI(string build_from)/*:MObject("SipURI")*/{
         
 	if (port.length()>0)
 		this->port=atoi(port.c_str());
-
-//        merr << "SipUri constructor:After parsing:\n\tusers_name=<"<<users_name<<
-//                ">\n\tuser_id=<"<<user_id<<
-//                ">\n\tip=<"<<ip<<
-//                ">\n\tport=<"<<port<<
-//                ">\n\ttype=<"<<type<<
-//                ">\n\ttransport=<"<<transport<<">"<<end;
-
 }
 
-SipURI::SipURI(string id, string ip, string type,int32_t port)/*:MObject("SipURI")*/{
+SipURI::SipURI(string id, string ip, string type,int32_t port){
 	this->user_id=id;
 	this->ip=ip;
 	this->port=port;
 	this->type=type;
 	this->users_name="";
-//	this->tag="";
 	this->transport="";
 }
 
@@ -192,31 +183,21 @@ string SipURI::getTransport(){
 }
 
 string SipURI::getString(){
-//	merr << "SipURI::getString"<< end;
 	string uri="sip:";
-//	merr << "uri so far: "<< uri<<end;
 	if (user_id.length()>4 && user_id.substr(0,4)=="sip:")
 		uri="";
 	
-//	merr << "uri so far(2): "<< uri<<end;
 	if (user_id.length()>0)
 		uri+=user_id;
-//	merr << "uri so far(3): "<< uri<<end;
 	if (user_id.find("@")==string::npos){		
 		uri=uri+"@"+ip;
 	}
-//	merr << "uri so far(4): "<< uri<<end;
 	if (port!=0)
 		uri=uri+":"+itoa(port);
-//	merr << "uri so far(5): "<< uri<<end;
 	if (type!="")
 		uri=uri+";user="+type;
-//	merr << "uri so far(6): "<< uri<<end;
-//	if (tag!="")
-//		uri=uri+";tag="+tag;
 	if (transport!="")
 		uri=uri+";transport="+transport;
-//	merr << "uri so far(7) (final): "<< uri<<end;
 	return uri;
 }
 

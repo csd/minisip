@@ -53,6 +53,11 @@ public:
 };
 
 
+/**
+ * 
+ * TODO: Add join capability.
+ *       Add support for interrupting system calls (easy on all platforms?)
+ */
 class LIBMUTIL_API Thread{
 public:
 	Thread(Runnable *runnable);

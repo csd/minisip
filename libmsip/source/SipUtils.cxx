@@ -89,7 +89,7 @@ int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
 				return i-3;
 		
 		}
-/* alt. impl.		
+/* alt. impl. that might be easier to understand
 		switch (parserState){
 			case 0:
 				switch (c){

@@ -56,7 +56,6 @@ class LIBMUTIL_API Dbg{
         Dbg &operator<<(int);
         Dbg &operator<<(char);
         Dbg &operator<<(DbgEndl &endl);
-//        void operator<<(bool);
 	void setEnabled(bool enabled);
 	bool getEnabled();
     private:

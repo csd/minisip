@@ -37,7 +37,6 @@ MObject::~MObject(){
 
 }
 
-
 int MObject::decRefCount(){
 	int ref;
 	refLock.lock();
@@ -51,5 +50,4 @@ void MObject::incRefCount(){
 	refCount++;
 	refLock.unlock();
 }
-
 

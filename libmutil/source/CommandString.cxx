@@ -28,12 +28,7 @@ CommandString::CommandString(string destination_id,
 		string operation, 
 		string parameter, 
 		string parameter2, 
-		string parameter3)/* :
-                                        destination_id(destination_id), 
-					op(operation), 
-					param(parameter), 
-					param2(parameter2),
-				       	param3(parameter3)*/
+		string parameter3)
 {
 	keys["destination_id"] = destination_id;
 	keys["op"] = operation;
@@ -43,62 +38,47 @@ CommandString::CommandString(string destination_id,
 }
 
 CommandString::CommandString(const CommandString &smc){
-//	this->destination_id = smc.destination_id;
-//	this->op = smc.op;
-//	this->param = smc.param;
-//	this->param2 = smc.param2;
-//	this->param3 = smc.param3;
 	this->keys = smc.keys;
 }
 
 string CommandString::getDestinationId(){
 	return keys["destination_id"];
-//	return destination_id;
 }
 
 void CommandString::setDestinationId(string id){
 	keys["destination_id"] = id;
-//	destination_id=id;
 }
 
 string CommandString::getOp(){
 	return keys["op"];
-//	return op;
 }
 
 void CommandString::setOp(string o){
 	keys["op"] = o;
-//	this->op=o;
 }
 
 string CommandString::getParam(){
 	return keys["param"];
-//	return param;
 }
 
 void CommandString::setParam(string p){
 	keys["param"]=p;
-//	param=p;
 }
 
 string CommandString::getParam2(){
 	return keys["param2"];
-//	return param2;
 }
 
 void CommandString::setParam2(string p){
 	keys["param2"] = p;
-//	param2=p;
 }
 
 string CommandString::getParam3(){
 	return keys["param3"];
-//	return param3;
 }
 
 void CommandString::setParam3(string p){
 	keys["param3"] = p;
-//	param3=p;
 }
 
 string CommandString::getString(){

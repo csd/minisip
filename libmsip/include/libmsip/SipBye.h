@@ -68,11 +68,10 @@ class LIBMSIP_API SipBye : public SipMessage{
 		 */
 		SipBye(string branch,
 				MRef<SipInvite*> inv, 
-				string to_uri, //string to_tag,
-				string from_uri,// string from_tag,
+				string to_uri,
+				string from_uri,
 				string proxyAddr, 
-				int32_t seq_no//, 
-				//bool made_call
+				int32_t seq_no
 				);
                 
 

@@ -188,19 +188,10 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		
 		MRef<SipIdentity*> sipIdentity;
 		
-/*		
-		int32_t proxyPort;
-		string proxyUsername;	//General->Users proxy username
-		string proxyPassword;	//General->Users proxy password
-		string sipDomain;
-*/
-		
 		string transport;
 	
 		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
 		
-//		TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *timeoutProvider;
-//
 		bool autoAnswer;
 
 		void save( XMLFileParser * parser );
@@ -211,7 +202,6 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 
 class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
-		//SipDialogConfig(MRef<SipCommonConfig*> phone_config);
 		SipDialogConfig(SipCommonConfig &phone_config);
 
 		virtual std::string getMemObjectType(){return "SipDialogConfig";}
@@ -224,25 +214,13 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		string proxyNonce;
 		string proxyRealm;
 
-/////		int32_t seqNo;
-		
-//		string callId;
-
-/////		string tag_local;
-/////		string tag_foreign;
-		
-/////		string uri_foreign;
-
 		uint32_t local_ssrc;
 
-		bool local_called;
-		
 		MRef<SipInvite*> last_invite;
 
 		void useIdentity( MRef<SipIdentity*> identity,
 				bool useSecurity,
 				string transport="UDP");
-
 
 };
 

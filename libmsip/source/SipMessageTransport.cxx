@@ -212,21 +212,14 @@ StreamThreadData::StreamThreadData( MRef<SipMessageTransport *> transport){
 bool sipdebug_print_packets=false;
 #ifdef DEBUG_OUTPUT
 
-//struct timeval startTime={0};
 uint64_t startTime = 0;
 
 void printMessage(string header, string packet){
-	//if (startTime.tv_sec==0)
-	//	gettimeofday(&startTime,NULL);
 	if (startTime==0)
 		startTime = mtime();
-//	struct timeval t;
 	uint64_t t;
 	t=mtime();
-//	gettimeofday(&t, NULL);
 	int64_t sec = t / 1000 - startTime / 1000;
-//	long sec = t.tv_sec - startTime.tv_sec;
-//	int64_t msec = sec*1000 + (t.tv_usec - startTime.tv_usec)/1000;
 	int64_t msec = t - startTime;
 	
 	header = (sec<100?string("0"):string("")) + (sec<10?"0":"") + itoa(msec/1000)+":"+(msec<10?"0":"")+ (msec<100?"0":"")+itoa(msec%1000)+ " " + header;
@@ -251,7 +244,6 @@ SipMessageTransport::SipMessageTransport(
                         string local_ip, 
                         string contactIP, 
 			string preferredTransport,
-//                        MRef<SipDialogContainer*> dContainer, 
                         int32_t externalContactUdpPort, 
                         int32_t local_udp_port, 
                         int32_t local_tcp_port,
@@ -426,7 +418,6 @@ MRef<StreamSocket *> SipMessageTransport::findStreamSocket( IPAddress & address,
 void SipMessageTransport::udpSocketRead(){
 	char buffer[16384];
 	int avail;
-	//struct pollfd p[1];
 	MRef<SipMessage*> pack;
 #ifdef MINISIP_MEMDEBUG
 	pack.setUser("SipMessageTransport::udpSocketRead:pack");
@@ -472,7 +463,6 @@ void SipMessageTransport::udpSocketRead(){
 ///				pack->setSocket( NULL );
 
 				
-//				dialogContainer->enqueuePacket( pack );
 				SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
 				
 				if (!commandReceiver.isNull())

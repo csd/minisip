@@ -76,15 +76,7 @@ class LIBMSIP_API SipSubscribe : public SipMessage{
 				string call_id, 
 				MRef<SipIdentity*> toIdentity,
 				MRef<SipIdentity*> fromIdentity,
-				//int local_port,
-				int32_t seq_no
-/*												
-				string resource, 
-				IPAddress &proxy, 
-				string from_tel_no, 
-				int32_t seq_no, 
-				int32_t local_media_port 
-*/				);
+				int32_t seq_no);
 		
 		virtual ~SipSubscribe();
 
@@ -93,11 +85,6 @@ class LIBMSIP_API SipSubscribe : public SipMessage{
 		virtual string getString();
 		
 	private:
-/*		string resource; //telephone number for example
-		string ip;
-		string user_type; //phone or ip
-*/
-
 		MRef<SipIdentity *> fromIdentity;
 		string toUser; //telephone number for example
 		string toDomain;

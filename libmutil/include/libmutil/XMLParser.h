@@ -70,6 +70,10 @@ In the following example "name" is a attribute and FILE is an element
 */
 
 
+/**
+ * TODO: Actually implement XML support ;) 
+ */
+
 class LIBMUTIL_API XMLElementNotFound{
 	public:
 		XMLElementNotFound(string msg){this->msg=msg;};
@@ -135,10 +139,6 @@ class LIBMUTIL_API XMLNode{
 		void addNode(XMLNode *node);
 
 		virtual void print(){
-//#ifdef DEBUG_OUTPUT			
-//			cerr << "root";
-//#endif
-		
 		};
 
 		std::list<XMLNode *>& getNodes();
@@ -163,8 +163,6 @@ class LIBMUTIL_API XMLAttribute : public XMLNode {
 		XMLAttribute(string name, string value);
 		~XMLAttribute();
 		
-
-//		virtual void print();
 	private:
 };
 

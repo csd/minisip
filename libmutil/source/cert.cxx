@@ -33,11 +33,11 @@
 
 using namespace std;
 
-certificate::certificate():/*MObject("certificate"),*/private_key(NULL),cert(NULL){
+certificate::certificate():private_key(NULL),cert(NULL){
 
 }
 
-certificate::certificate( X509 * openssl_cert ):/*MObject("certificate"),*/private_key(NULL){
+certificate::certificate( X509 * openssl_cert ):private_key(NULL){
 	if( openssl_cert == NULL ){
 		throw new certificate_exception;
 	}
@@ -45,7 +45,7 @@ certificate::certificate( X509 * openssl_cert ):/*MObject("certificate"),*/priva
 	cert = openssl_cert;
 }
 
-certificate::certificate( const string cert_filename ):/*MObject("certificate"),*/private_key(NULL){
+certificate::certificate( const string cert_filename ):private_key(NULL){
 	FILE * fp;
 
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -68,7 +68,7 @@ certificate::certificate( const string cert_filename ):/*MObject("certificate"),
 	file = cert_filename;
 }
 
-certificate::certificate( const string cert_filename, const string private_key_filename )/*:MObject("certificate")*/{
+certificate::certificate( const string cert_filename, const string private_key_filename ){
 	FILE * fp;
 	
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -93,7 +93,7 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	file = cert_filename;
 }
 
-certificate::certificate( unsigned char * der_cert, int length ):/*MObject("certificate"),*/private_key(NULL){
+certificate::certificate( unsigned char * der_cert, int length ):private_key(NULL){
 	cert = X509_new();
 
 	if( cert == NULL )
@@ -319,10 +319,8 @@ int certificate::control( ca_db * cert_db ){
 }
 	
 
-ca_db::ca_db()/*:MObject("ca_db")*/{
+ca_db::ca_db(){
 	cert_db = X509_STORE_new();
-
-//	pthread_mutex_init( &mLock, NULL );
 
 	if( cert_db == NULL ){
 		throw new certificate_exception_init(
@@ -336,13 +334,10 @@ ca_db::~ca_db(){
 }
 
 void ca_db::lock(){
-//	pthread_mutex_lock( &mLock );
         mLock.lock();
 }
 
 void ca_db::unlock(){
-//	pthread_mutex_unlock( &mLock );
-//
         mLock.unlock();
 }
 
@@ -439,13 +434,12 @@ ca_db_item * ca_db::get_next(){
 	return tmp;
 }
 
-certificate_chain::certificate_chain()/*:MObject("certificate_chain")*/{
-//	pthread_mutex_init( &mLock, NULL );
+certificate_chain::certificate_chain(){
 	item = cert_list.begin();
 
 }
 
-certificate_chain::certificate_chain( MRef<certificate *> cert )/*: MObject("certificate_chain")*/{
+certificate_chain::certificate_chain( MRef<certificate *> cert ){
 	
 	cert_list.push_back( cert );
 	item = cert_list.begin();

@@ -72,12 +72,6 @@ class LIBMUTIL_API CommandString : public MObject{
 		string &operator[](string key);
 
 	private:
-//		string destination_id;
-//		string op;
-//		string param;
-//		string param2;
-//		string param3;
-		
 		map<string, string> keys;
 };
 

@@ -67,7 +67,6 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		bool hasPassword();
 
-		//void setSeqNo(int n){seqNo=n;}
 		bool getGuiFeedback(){return guiFeedback;}
 		void setGuiFeedback(bool fb){guiFeedback=fb;}
 
@@ -93,7 +92,6 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		string realm;
 		string nonce;
 		uint32_t failCount;
-		//uint32_t seqNo;
 		bool guiFeedback;
 };
 

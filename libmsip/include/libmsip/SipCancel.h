@@ -74,8 +74,7 @@ class LIBMSIP_API SipCancel : public SipMessage{
 				MRef<SipInvite*> inv, 
 				string to_uri, 
 				string from_uri, 
-				string proxy//, 
-				//bool local_called
+				string proxy 
 				);
 
 		virtual std::string getMemObjectType(){return "SipCancel";}

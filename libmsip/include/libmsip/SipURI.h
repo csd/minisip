@@ -87,7 +87,6 @@ class LIBMSIP_API SipURI : public MObject{
 		int32_t port;
 		string type;
 		string transport;
-		//string tag;
 };
 
 #endif

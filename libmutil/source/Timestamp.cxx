@@ -39,7 +39,6 @@ using namespace std;
 string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end", "ringing", "packet_in", "packet_out", "tls_start", "tls_end", "dh_precompute_start", "dh_precompute_end", "mikey_create_start", "mikey_create_end", "rand_start", "rand_end", "sign_start", "sign_end", "auth_start", "auth_end",  "mikey_parse_start", "mikey_parse_end", "tgk_start", "tgk_end", "user_accept" ,"tmp"};
 
 Timestamp::Timestamp(){
-	//tv = new struct timeval;
 	tz = new struct timezone;
 	values = new struct timeval[ MAX_TIMESTAMPS ];
 	strings= new string[ MAX_TIMESTAMPS + 1];
@@ -50,7 +49,6 @@ Timestamp::Timestamp(){
 
 Timestamp::~Timestamp(){
 	delete tz;
-	//delete tv;
 	delete [] values;
 	delete [] strings;
 	delete [] ids;

@@ -63,17 +63,6 @@ void SipDialog::handleTimeout(const string &c){
 			);
 }
 
-/*
-int32_t SipDialog::requestSeqNo(){
-	return ++dialogState.seqNo;
-}
-*/
-
-/*
-void SipDialog::setSeqNo(int32_t s){
-	dialogState.seqNo=s;
-}
-*/
 MRef<SipDialogContainer*> SipDialog::getDialogContainer(){
 	return dialogContainer;
 }
@@ -105,9 +94,6 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 
 	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
 	
-//	if (command.getCallId()!= getCallId())
-//		return false
-
 	if (command.getType()==SipSMCommand::COMMAND_STRING 
 			&& command.getCommandString().getOp()==SipCommandString::transaction_terminated){
 		
@@ -128,7 +114,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 	}
 	
 	if (! (command.getDestination()==SipSMCommand::TU||command.getDestination()==SipSMCommand::ANY) ){
-		merr << "SipDialog::handleCommand: returning false based on command destination"<< end;
+		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< end;
 		return false;
 	}
 

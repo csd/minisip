@@ -60,7 +60,6 @@ SipIMMessage::SipIMMessage(string branch,
 		    string call_id, 
 		    MRef<SipIdentity*> toIdentity,
 		    MRef<SipIdentity*> fromIdentity,
-                    //int local_port, 
                     int32_t seq_no, string msg): 
                             SipMessage(branch, SipIMMessage::type),
 			    fromIdentity(fromIdentity)
@@ -68,11 +67,6 @@ SipIMMessage::SipIMMessage(string branch,
 	
 	toUser = toIdentity->sipUsername;
 	toDomain = toIdentity->sipDomain;
-	
-//	this->user = tel_no;
-//	ip = proxyString;
-
-	//	ip=proxy_addr.getString();
 	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(new SipHeader(*fromp));
@@ -98,10 +92,6 @@ SipIMMessage::SipIMMessage(string branch,
 	addHeader(new SipHeader(*uap));
 
 	setContent(new SipMessageContentIM(msg));
-
-//	MRef<SipHeaderContentType*> contenttypep = new SipHeaderContentType();
-//	contenttypep->setContentType("text/plain");
-//	addHeader(MRef<SipHeader*>(*contenttypep));
 }
 
 SipIMMessage::~SipIMMessage(){
@@ -114,8 +104,6 @@ string SipIMMessage::getString(){
 }
 
 int SipIMMessage::getExpiresTimeout(){
-//	MRef<SipHeaderValueExpires*> exp = MRef<SipHeaderValueExpires*>((SipHeaderValueExpires*)
-//			*(getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0)));
 	assert(dynamic_cast<SipHeaderValueExpires*>( *getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 ) ));
 	
 	MRef<SipHeaderValueExpires*> exp = (SipHeaderValueExpires*)*getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 );

@@ -37,12 +37,8 @@
 #include<stdlib.h> //rand...
 #include<libmsip/SipNotify.h>
 #include<libmutil/vmd5.h>
-//#include<sys/socket.h>
-//#include<netinet/in.h>
 #include<libmsip/SipMessage.h>
-//#include"../minisip/SoundSender.h"
 #include<libmutil/itoa.h>
-
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
@@ -56,11 +52,9 @@
 #include<libmsip/SipHeaderEvent.h>
 #include<libmsip/SipHeaderAccept.h>
 
-//#include"state_machines/DefaultCallHandler.h"
-
 const int SipNotify::type=6;
 
-SipNotify::SipNotify(string &build_from): SipMessage(/*"SipNotify",*/ SipNotify::type, build_from){
+SipNotify::SipNotify(string &build_from): SipMessage(SipNotify::type, build_from){
 	
 }
 
@@ -68,7 +62,6 @@ SipNotify::SipNotify(string branch,
 		    string call_id, 
 		    MRef<SipIdentity*> toIdentity,
 		    MRef<SipIdentity*> fromId,
-                    //int local_port, 
                     int32_t seq_no 
                     ): 
                             SipMessage(branch, SipNotify::type), fromIdentity(fromId)
@@ -93,15 +86,6 @@ SipNotify::SipNotify(string branch,
 	seqp->setMethod("NOTIFY");
 	seqp->setCSeq(seq_no);
 	addHeader(new SipHeader(*seqp));
-	
-/*
-	MRef<SipHeader*> contactp = new SipHeaderContact(from_resource, 
-                                                        local_addr.getString(), 
-                                                        local_port,
-                                                        "phone",
-                                                        "UDP");
-	addHeader(new SipHeader(*contactp) );
-*/
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");

@@ -46,27 +46,19 @@
 
 const int SipBye::type=3;
 
-SipBye::SipBye(string &resp):SipMessage(/*"SipBye",*/ SipBye::type, resp){
+SipBye::SipBye(string &resp):SipMessage(SipBye::type, resp){
 }
 
 
 SipBye::SipBye(string branch, MRef<SipInvite*> inv, 
 		string to_uri, 
-//		string to_tag,
 		string from_uri, 
-//		string from_tag,
 		string domain, 
-	//	int32_t localSipPort, 
-	//	string localAddr, 
-		int32_t seq_no/*, 
-		bool made_call*/
+		int32_t seq_no
 		):SipMessage(branch, SipBye::type)
 {
 	this->username = to_uri;
 	this->domain= domain;
-	
-	//SipHeaderVia *viap = new SipHeaderVia(transport, localAddr, localSipPort);
-        //add_header(viap);
 	
 	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
         addHeader(mf);

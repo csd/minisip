@@ -60,13 +60,10 @@
 #endif
 
 #include"SipHeader.h"
-//#include"../../netutil/IPAddress.h"
-
 
 /**
  * @author Florian Maurer
 */
-
 class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 
 	public:

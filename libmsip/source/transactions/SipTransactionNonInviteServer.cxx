@@ -293,8 +293,6 @@ SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipDialog*> ca
 		lastResponse(NULL),
 		timerT1(500)
 {
-	dialog->getDialogConfig()->local_called=false;
-	
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 	

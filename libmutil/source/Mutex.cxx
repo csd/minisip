@@ -65,18 +65,14 @@ Mutex::Mutex(const Mutex &){
 void Mutex::createMutex(){
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_MUTEX_IMPLEMENTED
-	//handle_ptr = malloc(sizeof(pthread_mutex_t));
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
 
 #elif defined _MSC_VER
 #define MINISIP_MUTEX_IMPLEMENTED
-	//handle_ptr = malloc(sizeof(HANDLE));
 	handle_ptr = new HANDLE;
-	//    hMutex = CreateMutex(NULL, FALSE, NULL);
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
 	if (handle_ptr==NULL){  //TODO: handle better
-		//fprintf( stderr, "could not create mutex!" );
 		cerr << "could not create mutex!" << endl;
 		exit(1);
 	}else{
@@ -107,7 +103,6 @@ Mutex::~Mutex(){
 #ifdef HAVE_PTHREAD_H
 	pthread_mutex_destroy((pthread_mutex_t*)handle_ptr);
 	delete (pthread_mutex_t*)handle_ptr;
-//	free(handle_ptr);
 
 #elif defined _MSC_VER
 	if (!ReleaseMutex( *((HANDLE*)handle_ptr) )){
@@ -126,7 +121,6 @@ Mutex::~Mutex(){
 
 void Mutex::lock(){
 #ifdef HAVE_PTHREAD_H
-	    //pthread_mutex_lock(&mutexlock);
 	    
 	    int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
 	    if (ret!=0){

@@ -25,10 +25,6 @@
 #ifndef TIMESTAMP_H
 #define TIMESTAMP_H
 
-//#ifdef HAVE_CONFIG_H
-//#include<config.h>
-//#endif
-
 #ifndef _MSC_VER
 
 #include<stdint.h>
@@ -119,7 +115,6 @@ class LIBMUTIL_API Timestamp{
 	private:
 		uint32_t index;
 		
-	//	struct timeval * tv;
 		struct timezone * tz;
 		
 		struct timeval * values;

@@ -221,7 +221,6 @@ void SipDialogContainer::addDialog(MRef<SipDialog*> call){
 #ifdef MINISIP_MEMDEBUG
 	call.setUser("SipDialogContainer");
 #endif
-//	dialogs.push_front(call);
 	dispatcher->addDialog(call);
 }
 

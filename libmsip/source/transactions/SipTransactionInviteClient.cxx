@@ -94,16 +94,11 @@ resp. to TU |  1xx             V                     |
 bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &command){
 
 	if (transitionMatch(command, SipInvite::type, SipSMCommand::TU, IGN)){
-		//SipTransactionInviteClient *invtrans= (SipTransactionInviteClient *)sipStateMachine;
-//		SipTransactionInviteClient *invtrans= dynamic_cast<SipTransactionInviteClient *>(sipStateMachine);
-//		cerr << "XXXXXXxx a0_start_calling_INVITE: packet ptr is " << (int) (*command.getCommandPacket())<<endl;
-//		/*invtrans->*/setLastInvite((SipInvite *) *command.getCommandPacket() );
-
 		lastInvite = (SipInvite *) *command.getCommandPacket();
-		/*invtrans->*/requestTimeout( /*invtrans->*/ /*getTimerT1()*/ timerT1, "timerA" );
+		requestTimeout( timerT1, "timerA" );
 		
-		/*invtrans->*/requestTimeout( /*invtrans->*/ /*getTimerT1()*/ timerT1*64, "timerB" );
-		/*invtrans->*/send( command.getCommandPacket(), true ); // add via header
+		requestTimeout( timerT1*64, "timerB" );
+		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
 		return false;
@@ -353,12 +348,6 @@ void SipTransactionInviteClient::setUpStateMachine(){
 			s_completed, s_terminated);
 
 
-
-
-
-	
-	
-
 	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClient::a0_start_calling_INVITE, 
 			s_start, s_calling);
@@ -429,7 +418,7 @@ SipTransactionInviteClient::~SipTransactionInviteClient(){
 
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
         MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri, //dialog->getDialogConfig()->uri_foreign, 
+	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri,
 			dialog->getDialogConfig()->inherited.sipIdentity->sipDomain
 			); 
 	//TODO:

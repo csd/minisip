@@ -48,9 +48,7 @@ public:
 	Mutex& operator=(const Mutex &m);
 private:
 	void createMutex();
-//	bool locked;
 	void *handle_ptr;
-
 };
 
 

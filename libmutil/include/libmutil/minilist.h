@@ -58,6 +58,13 @@ class node{
 		
 };
 
+/**
+ * Template implementation of a signle-linked list. If
+ * MINILIST_FORWARD_ITERATOR_OPTIMIZE is defined, then
+ * iterating over the list is O(1) in each access instead 
+ * of the expected O(n).
+ * (mylist[x] -> x-lastx iterations iff x>lastx)
+*/
 template<class T>
 class minilist{
 	public:

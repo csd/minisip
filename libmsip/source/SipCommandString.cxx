@@ -26,13 +26,11 @@
 
 #include<libmsip/SipCommandString.h>
 
-//const string SipCommandString::garbage_collect="garbage_collect";
 const string SipCommandString::transaction_terminated="transaction_terminated";
 const string SipCommandString::call_terminated="call_terminated";
 const string SipCommandString::no_transactions="no_transactions";
 
 const string SipCommandString::error_message="error_message";
-//const string SipCommandString::log="log";
 
 const string SipCommandString::authentication_failed="authentication_failed";
 const string SipCommandString::transport_error="transport_error";

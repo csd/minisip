@@ -83,8 +83,6 @@ SMCFCollection SipMessage::contentFactories=SMCFCollection();
 
 string SipMessage::getDescription(){
         string ret;
-//	char *str[11]={"UNKNOWN","INVITE", "REGISTER","BYE","CANCEL","ACK","NOTIFY","SUBSCRIBE","RESPONSE", "MESSAGE","TYPEUNKNOWN-FIXME"};
-//	ret= str[type];
 	ret = getTypeString();
 	if (type==SipResponse::type)
 		ret +="_"+itoa(((SipResponse*)(this))->getStatusCode());
@@ -146,7 +144,6 @@ void SipMessage::addHeader(MRef<SipHeader*> header){
 	header.setUser("SipMessage");
 #endif
 	headers.push_back(header);
-//	headers.validate();
 }
 
 int SipMessage::getType(){
@@ -178,7 +175,6 @@ string SipMessage::getHeadersAndContent(){
 	string req="";
 	int32_t clen=-1;
 
-//	headers.validate();
 	for (int32_t i=0; i< headers.size(); i++){
 		req=req+headers[i]->getString()+"\r\n";
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CONTENTLENGTH){
@@ -260,7 +256,6 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
 			if (contentFactory){
 				MRef<SipMessageContent*> smcref = contentFactory(content, contentType);
-				//MRef<SipMessageContent*> smcref = contentFactory->createContent(content);
 				setContent(smcref);
 			}else{ //TODO: Better error handling
 				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<end;
@@ -302,7 +297,6 @@ bool SipMessage::addLine(string line){
 
 
 void SipMessage::setContent(MRef<SipMessageContent*> content){
-//void SipMessage::setContent(MRef<SdpPacket*> content){
 #ifdef MINISIP_MEMDEBUG
 	if (content.getUser()=="")
 		content.setUser("SipMessage");
@@ -319,19 +313,7 @@ void SipMessage::setContent(MRef<SipMessageContent*> content){
 	}
 }
 
-//MRef<SipMessageContent*> SipMessage::getContent(){
 MRef<SipMessageContent*> SipMessage::getContent(){
-//#ifdef MINISIP_MEMDEBUG
-//	MRef<SdpMessage*> nouser(*content);
-//	nouser.setUser("(ret from SipMessage)");
-//	return nouser;
-//#else
-//#endif
-	
-#ifdef MINISIP_MEMDEBUG
-	content.setUser("(ret from SipMessage)");
-		
-#endif
 	return content;
 }
 
@@ -381,9 +363,6 @@ string SipMessage::getLastViaBranch(){
 }
 
 string SipMessage::getDestinationBranch(){
-//#ifdef DEBUG_OUTPUT
-//	assert(type!=SipResponse::type);
-//#endif
 	return branch;
 }
 
@@ -424,20 +403,17 @@ void SipMessage::removeAllViaHeaders(){
 	while (!done){
 		done=true;
 
-//		for (vector<MRef<SipHeader*> >::iterator i=headers.begin(); i!=headers.end(); i++){
 		for (int i=0; i<headers.size(); i++){
 			if ((headers[i])->getType()==SIP_HEADER_TYPE_VIA){
 				headers.remove(i);
 				done=false;
 				n++;
-//				i=headers.begin();
 				i--;
 				break;
 			}
 			
 		}
 	}
-//	mout << "removeAllViaHeaders:: remove "<< n << " via headers"<< end;
 }
 
 MRef<SipHeaderValueFrom*> SipMessage::getHeaderValueFrom(){
@@ -464,8 +440,6 @@ MRef<SipHeader *> SipMessage::getHeaderOfType(int t, int i){
 	}
 	MRef<SipHeader*> nullhdr;
 	return nullhdr; 
-
-	
 }
 
 
