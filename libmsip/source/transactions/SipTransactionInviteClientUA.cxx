@@ -149,33 +149,33 @@ bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCom
 
 
 void SipTransactionInviteClientUA::changeStateMachine(){
-	State<SipSMCommand, string> *s_calling = getState("calling");
+	MRef<State<SipSMCommand, string> *> s_calling = getState("calling");
 	bool success = s_calling->removeTransition("transition_calling_terminated_2xx");
 	if (!success)
 		merr << "ERROR: Could not remove transition from state machine in SipTransactionInviteClientUA (BUGBUG!!)"<< end;
 
 	
-	State<SipSMCommand, string> *s_proceeding = getState("proceeding");
+	MRef<State<SipSMCommand, string> *>s_proceeding = getState("proceeding");
 	success = s_proceeding->removeTransition("transition_proceeding_terminated_2xx");
 	if (!success)
 		merr << "ERROR: Could not remove transition(2) from state machine in SipTransactionInviteClientUA (BUGBUG!!)"<< end;
 	
 
-	State<SipSMCommand, string> *s_completed= getState("completed");
+	MRef<State<SipSMCommand, string> *> s_completed= getState("completed");
 
 
 	
-		new StateTransition<SipSMCommand,string>(this, "transition_calling_completed_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1001_calling_completed_2xx,
-				s_calling, s_completed);
-	
-		new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1002_proceeding_completed_2xx,
-				s_proceeding, s_completed);
-	
-		new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_2xx",
-				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1003_completed_completed_2xx,
-				s_completed, s_completed);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_completed_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1001_calling_completed_2xx,
+			s_calling, s_completed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1002_proceeding_completed_2xx,
+			s_proceeding, s_completed);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1003_completed_completed_2xx,
+			s_completed, s_completed);
 }
 
 

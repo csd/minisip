@@ -54,46 +54,64 @@
 #undef SM_DEBUG_COMMAND
 
 
-
 using namespace std;
 
 template<class CommandType, class TimeoutType> class StateTransition;
 template<class CommandType, class TimeoutType> class State;
 
+/**
+ * Implementation of a generic state machine.
+ * 
+ * Note:  State machines, states and transitions are using the MRef/MObject
+ * classes to handle "garbage collection". The state machines and the
+ * transitions reference each other. Therefore we must break the circel 
+ * so that the it becomes a chain that none references (and therefore will
+ * be freed). For this purpose you have the freeStateMachine method which
+ * you (unfortunately) must run on any object you want to be removed
+ * from the heap.
+*/
 template<class CommandType, class TimeoutType> class StateMachine : public virtual MObject{
 	public:
-		StateMachine( MRef<TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType, TimeoutType> *>    > *> tp): 
+		StateMachine( MRef<TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType, TimeoutType> *>  > *> tp): 
 				current_state(NULL), 
 				timeoutProvider(tp)
 		{
-//#ifdef SM_DEBUG
-//			sm_id = ++sm_counter;
-////			cerr << "SM_DEBUG"<<sm_id<<endl;		
-//#endif		
-		};
-				
-		virtual ~StateMachine(){//TODO: delete states and transitions
 		}
-//#ifdef SM_DEBUG
-//		int getId()const {return sm_id;}
-//#endif
+					
+		virtual ~StateMachine(){
+			freeStateMachine();	//Note: this is not needed and we should not 
+						//run the destructor if it
+						//has not already been run
+		}
+
+		void freeStateMachine(){
+			current_state=NULL;
+			timeoutProvider=NULL;
+
+			for (typename list<MRef<State<CommandType,TimeoutType> *> >::iterator i=states.begin(); 
+					i!=states.end(); i++){
+				(*i)->freeState();			//Break the state<---->transition circle
+			
+			}
+				
+			states.clear();
+		}
+		
 		string getMemObjectType(){return "StateMachine";}
 		
-		
-		
-		void addState(State<CommandType, TimeoutType> *state){
+		void addState(MRef<State<CommandType, TimeoutType> *> state){
 			states.push_back(state);
 		}
 
-		State<CommandType, TimeoutType> *getState(const string &name){
-			for (typename list<State<CommandType,TimeoutType> *>::iterator i=states.begin(); i!=states.end(); i++)
+		MRef<State<CommandType, TimeoutType> *> getState(const string &name){
+			for (typename list<MRef<State<CommandType,TimeoutType> *> >::iterator i=states.begin(); i!=states.end(); i++)
 				if ((*i)->getName()==name)
 					return *i;
 			return NULL;
 		}
 
 		
-		void setCurrentState(State<CommandType,TimeoutType> *state){
+		void setCurrentState(MRef<State<CommandType,TimeoutType> *> state){
 			current_state = state;
 		}
 		
@@ -102,7 +120,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		}
 
 		virtual bool handleCommand(const CommandType &command){
-			if (current_state != NULL){
+			if (current_state){
 				return current_state->handleCommand(command);
 			}else{
 				return false;
@@ -123,41 +141,45 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		void timeout(const TimeoutType &command){handleTimeout(command);};
 
 	private:
-		list<State<CommandType,TimeoutType> *> states;
-		State<CommandType,TimeoutType> *current_state;
+		list<MRef<State<CommandType,TimeoutType>*> > states;
+		MRef<State<CommandType,TimeoutType>*> current_state;
 		MRef< TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType,TimeoutType> *> > *> timeoutProvider;
-//#ifdef SM_DEBUG
-//		static int sm_counter;
-//		int sm_id;
-//#endif	
 		
 };
 
-//template<class CommandType, class TimeoutType>
-//int StateMachine<CommandType, TimeoutType>::sm_counter=0;
-
 template<class CommandType, class TimeoutType>
-class State{
+class State : public MObject{
 	public:
-		State(StateMachine<CommandType,TimeoutType> *stateMachine, 
+		State(MRef<StateMachine<CommandType,TimeoutType> *> stateMachine, 
 				const string &name):
 					stateMachine(stateMachine),
 					name(name)
 		{}
+
+		~State(){
+			freeState();
+		}
+
+		void freeState(){
+			stateMachine=NULL; 
+			transitions.clear();	
+		}
+
+		string getMemObjectType(){return "State";}
 		
-		void register_transition(StateTransition<CommandType, TimeoutType> *transition){
+		void register_transition(MRef<StateTransition<CommandType, TimeoutType> *> transition){
 			transitions.push_back(transition);
 		}
 
-		StateTransition<CommandType, TimeoutType> * getTransition(const string &name){
-			for (typename list<StateTransition<CommandType,TimeoutType> *>::iterator i=transitions.begin(); i!=transitions.end(); i++)
+		MRef<StateTransition<CommandType, TimeoutType> *> getTransition(const string &name){
+			for (typename list<MRef<StateTransition<CommandType,TimeoutType> *> >::iterator i=transitions.begin(); i!=transitions.end(); i++)
 				if ((*i)->getName()==name)
 					return *i;
 			return NULL;
 		}
 
 		bool removeTransition(const string &name){
-			for (typename list<StateTransition<CommandType,TimeoutType> *>::iterator i=transitions.begin(); i!=transitions.end(); i++){
+			for (typename list<MRef<StateTransition<CommandType,TimeoutType> *> >::iterator i=transitions.begin(); i!=transitions.end(); i++){
 				if ((*i)->getName()==name){
 					transitions.erase(i);
 					return true;
@@ -168,7 +190,7 @@ class State{
 
 		
 		bool handleCommand(const CommandType &command){
-			for (typename list<StateTransition<CommandType,TimeoutType> *>::iterator i=transitions.begin(); i!=transitions.end(); i++){
+			for (typename list<MRef<StateTransition<CommandType,TimeoutType> *> >::iterator i=transitions.begin(); i!=transitions.end(); i++){
 				if ((*i)->handleCommand(command)){
 					return true;
 				}
@@ -181,70 +203,42 @@ class State{
 		}
 		
 	private:
-		StateMachine<CommandType, TimeoutType> *stateMachine;
+		MRef<StateMachine<CommandType, TimeoutType> *>stateMachine;
 		string name;
-		list<StateTransition<CommandType,TimeoutType> *> transitions;
+		list<MRef<StateTransition<CommandType,TimeoutType>*> > transitions;
 };
 
 
 template<class CommandType, class TimeoutType>
-class StateTransition{
+class StateTransition : public MObject{
 	public:
 
-/*
-		StateTransition(StateMachine<CommandType, TimeoutType> *stateMachine, 
+		StateTransition(MRef<StateMachine<CommandType, TimeoutType> *> stateMachine, 
 				const string &name, 
-				//bool (*action)( StateMachine<CommandType, TimeoutType> *, State<CommandType, TimeoutType> *, State<CommandType, TimeoutType> *, const CommandType&),
-				bool (StateMachine<CommandType, TimeoutType>::*action)(State<CommandType, TimeoutType> *, State<CommandType, TimeoutType> *, const CommandType& ),
-				State<CommandType, TimeoutType> *from_state, 
-				State<CommandType, TimeoutType> *to_state):
+				bool (StateMachine<CommandType, TimeoutType>::*a)(const CommandType& ),
+				MRef<State<CommandType,TimeoutType> *> from_state, 
+				MRef<State<CommandType,TimeoutType> *> to_state):
 					stateMachine(stateMachine), 
 					name(name), 
-					action_v1(action),
-					action_v2(NULL),
+					action(action),
 					from_state(from_state),
 					to_state(to_state)
 		{
 			from_state->register_transition(this);
 		}
-*/									
-		StateTransition(StateMachine<CommandType, TimeoutType> *stateMachine, 
-				const string &name, 
-				//bool (*action)(StateMachine<CommandType, TimeoutType> *, const CommandType&),
-				bool (StateMachine<CommandType, TimeoutType>::*action)(const CommandType& ),
-				State<CommandType,TimeoutType> *from_state, 
-				State<CommandType,TimeoutType> *to_state):
-					stateMachine(stateMachine), 
-					name(name), 
-//					action_v1(NULL),
-					action_v2(action),
-					from_state(from_state),
-					to_state(to_state)
-		{
-			from_state->register_transition(this);
+
+		~StateTransition(){
+			stateMachine=NULL;	//Note: Setting the references to null
+			from_state=NULL;	//makes sure we have no circular referencing
+			to_state=NULL; 
 		}
 				
+		string getMemObjectType(){return "StateTransition";}
 
 		bool handleCommand(const CommandType &c){
 			bool handled;
-/*			if (action_v1!=NULL){
-				//if (handled=action_v1(stateMachine, from_state, to_state, c)){
-				if (handled=( (*stateMachine).*action_v1)(from_state, to_state, c) ){
-					stateMachine->setCurrentState(to_state);
-#ifdef SM_DEBUG
-					merr << "SM_DEBUG"<<stateMachine->getId()<<": "<< name << ": " << from_state->getName()
-						<<" -> "<<to_state->getName();
-#ifdef SM_DEBUG_COMMAND
-					merr << " ("<< c << ")" << end;
-#endif
-					merr << end;
-#endif
-				}
-				return handled;
-			}else{
-*/				//if (handled=action_v2(stateMachine, c)){
-				assert(action_v2!=NULL);
-				if (handled= ((*stateMachine).*action_v2)(c) ){
+				assert(action!=NULL);
+				if (handled= ((**stateMachine).*action)(c) ){
 			                stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG
 					merr << "SM_DEBUG" << stateMachine->getId() << ": " << name << ": " << from_state->getName()
@@ -256,21 +250,18 @@ class StateTransition{
 #endif
 				}
 				return handled;
-/*			}
-*/		}
+		}
 
 		string getName(){return name;}
 	private:
-		StateMachine<CommandType,TimeoutType> *stateMachine;
+		MRef<StateMachine<CommandType,TimeoutType> *> stateMachine;
 		string name;
-		//bool (*action_v1)(StateMachine<CommandType,TimeoutType> *, State<CommandType,TimeoutType> *, State<CommandType,TimeoutType> *, const CommandType &);
-//		bool (StateMachine<CommandType, TimeoutType>::*action_v1)(State<CommandType, TimeoutType> *, State<CommandType, TimeoutType> *, const CommandType& );
-		//bool (*action_v2)(StateMachine<CommandType,TimeoutType> *, const CommandType &);
-		bool (StateMachine<CommandType, TimeoutType>::*action_v2)(const CommandType& );
+		bool (StateMachine<CommandType, TimeoutType>::*action)(const CommandType& );
 		
-		State<CommandType, TimeoutType> *from_state;
-		State<CommandType, TimeoutType> *to_state;
+		MRef<State<CommandType, TimeoutType> *>from_state;
+		MRef<State<CommandType, TimeoutType> *>to_state;
 };
 
 
 #endif
+
