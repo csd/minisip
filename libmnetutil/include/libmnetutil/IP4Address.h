@@ -46,10 +46,12 @@ class IP4Address : public IPAddress{
 		virtual struct sockaddr * getSockaddrptr(int32_t port=0);
 		virtual int32_t getSockaddrLength();
 		
+		virtual bool operator ==(const IP4Address r) const;
+		
 	private:
 		std::string ipaddr;
-		unsigned char num_ip[4];
 		struct sockaddr_in * sockaddress;
+		uint32_t numIp;
 };
 
 #endif

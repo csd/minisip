@@ -59,22 +59,12 @@ IP4Address::IP4Address(struct sockaddr_in *sin){
 	setAddressFamily(AF_INET);
 	setProtocolFamily(PF_INET);
 	
-//	unsigned char *ip_bytes = (unsigned char *)&sin->sin_addr;
-	
-	//bcopy((char *)&sockaddress, (char *)sin, sizeof(struct sockaddr_in));
-	//bcopy((char *)num_ip, (char *)&sin->sin_addr, 4);
-	memcpy( sin, sockaddress, sizeof(struct sockaddr_in));
-	memcpy(&sin->sin_addr,num_ip, 4);
+	memcpy(sockaddress, sin, sizeof(struct sockaddr_in));
+	numIp = ntoh32(sin->sin_addr.s_addr);
 } 
 
 uint32_t IP4Address::getBinaryIP(){
-	uint32_t bip;
-//	bcopy((char *)&bip, (char *)&(sockaddress.sin_addr), 4);
-	
-//	bcopy((char *)&(sockaddress.sin_addr), (char*)&bip, 4);
-	memcpy(&bip, &(sockaddress->sin_addr), 4);
-	bip = htonl(bip);
-	return bip;
+	return numIp;
 }
 
 
@@ -91,12 +81,12 @@ IP4Address::IP4Address(string addr){
 
 	setAddressFamily(AF_INET);
 	setProtocolFamily(PF_INET);
-	unsigned char *ip;
-	unsigned long int ip_data;
-	if (inet_aton(addr.c_str(),(struct in_addr *)&ip_data)){
-		ip = (unsigned char *)&ip_data;
+	struct in_addr ip_data;
+	if (inet_aton(addr.c_str(),&ip_data)){
+		numIp = ntoh32(ip_data);
 	}else{
 
+		unsigned char *ip;
 		
 #ifndef WIN32
 		struct hostent *hp= gethostbyname2(ipaddr.c_str(), AF_INET);	
@@ -111,25 +101,24 @@ IP4Address::IP4Address(string addr){
 #endif
 
 		
-		if (!hp){ //throw host not found exception here
+		if (!hp){
 			throw new HostNotFound( addr );
 		}
-		ip = (unsigned char *)hp->h_addr;
+		
+		numIp = ntoh32(*((uint32_t*)(hp->h_addr)));
+
 		assert(hp->h_length==4);
+		cerr << *this << endl;
 	}
-	
-	for (int32_t i=0; i<4; i++)
-		num_ip[i] = ip[i];
 
 	memset(sockaddress, '\0', sizeof(sockaddress));
 	sockaddress->sin_family=AF_INET;
-	memcpy(&(sockaddress->sin_addr), ip, sizeof(ip_data));
+	sockaddress->sin_addr.s_addr = hton32(numIp);
 	sockaddress->sin_port=0;
-//	unsigned char *ip_bytes = (unsigned char *)ip;
 }
 
  struct sockaddr * IP4Address::getSockaddrptr(int32_t port){
-	sockaddress->sin_port=htons(port);
+	sockaddress->sin_port=hton16(port);
 	return (sockaddr *)sockaddress;
 }
 
@@ -179,7 +168,12 @@ void IP4Address::connect(Socket &socket, int32_t port){
 std::ostream& operator<<(std::ostream& out, IP4Address &a){
 	out << a.ipaddr;
 	
-	unsigned char *ip = (unsigned char*)&a.num_ip;
+	unsigned char ip[4];
+	uint32_t beIp = hton32(a.numIp);
+	ip[3] = (unsigned char)(beIp >> 24);
+	ip[2] = (unsigned char)(beIp >> 16);
+	ip[1] = (unsigned char)(beIp >>  8);
+	ip[0] = (unsigned char)(beIp);
 	cerr << " (";
 
 	for (int32_t i=0; i<4; i++){
@@ -192,5 +186,9 @@ std::ostream& operator<<(std::ostream& out, IP4Address &a){
 	cerr << ")";
 
 	return out;
+}
+
+bool IP4Address::operator ==(const IP4Address r) const{
+	return this->numIp == r.numIp;
 }
 

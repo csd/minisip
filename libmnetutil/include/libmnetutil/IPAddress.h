@@ -43,6 +43,8 @@ class IPAddress{
 
 		virtual struct sockaddr* getSockaddrptr(int32_t port=0)=0;
 		virtual int32_t getSockaddrLength()=0;
+
+//		virtual bool operator ==(const IPAddress r) const =0;
 		
 	protected:
 		void setAddressFamily(int af);
