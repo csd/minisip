@@ -25,7 +25,7 @@
 #include<stdio.h>
 #include<vector>
 #include"MinisipTextUI.h"
-
+#include"../../../conf/ConferenceControl.h"
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
 #include<libmutil/termmanip.h>
@@ -65,6 +65,7 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     addCommand("show transactions");
     addCommand("show packets");
     addCommand("cmd");
+    addCommand("conf");
     addCommand("accept"); //accept incoming P2T Session
     addCommand("deny");   //deny incoming P2T Session
     addCommand("im");   //deny incoming P2T Session
@@ -774,8 +775,54 @@ void MinisipTextUI::guiExecute(string cmd){
 		}
 		handled=true;
 	}
+	if ((command.size()>=4) && (command.substr(0,4) == "conf")){
+		if (command.size()>=6){
+			if (state!="IDLE"){
+				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
+			}else{
+				currentconfname = trim(command.substr(5));
+				ConferenceControl *conf=new ConferenceControl();
+				//conf->setGui(this);
+				currentconf=conf;
+				//currentconf->setCallback(callback);
+				//state="CONF";
+				displayMessage("	Conf. Name: "+currentconfname);
+				callback->guicb_handleConfCommand(currentconf,command);
+				addCommand("addc");
+			}
+		}else{
+			displayMessage("Usage: call <userid>");
+//			displayHelp("call");
+		}
+		handled=true;
+	}
+	if ((command.size()>=4) && (command.substr(0,4) == "addc")){
+		if (command.size()>=6){
+			if (state!="IDLE"){
+				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
+			}else{
+				string uri = trim(command.substr(5));
+				displayMessage("Conf.Uri: "+uri);
+				callback->guicb_confDoInvite(currentconf,uri);
+				/*callId = callback->guicb_doInvite(uri);
+				if (callId=="malformed"){
+					state="IDLE";
+					setPrompt(state);
+					displayMessage("The URI is not a valid SIP URI", red);
+					callId="";
 
-
+				}else{
+					state="TRYING";
+					setPrompt(state);
+					displayMessage(string("Created call with id=")+callId);    
+				}*/
+			}
+		}else{
+			displayMessage("Usage: call <userid>");
+//			displayHelp("call");
+		}
+		handled=true;
+	}
 	/**
 	 * send any command you want.
 	 * Syntax: cmd <command> <param>

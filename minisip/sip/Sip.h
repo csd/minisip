@@ -106,7 +106,7 @@ class Sip: public MObject, public Runnable{
 		//void registerMediaStream(MRef<SdpPacket*> sdppack);
 
 		string invite(string &user);
-
+		string confinvite(string &user);
 		MRef<SipStack*>	getSipStack(){return sipstack;}
 //		MRef<SipDialogContainer*> getDialogContainer();//{return dialogContainer;}
 

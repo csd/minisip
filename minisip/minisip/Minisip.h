@@ -2,7 +2,7 @@
 #define MINISIP_H
 
 #include<config.h>
-
+#include"../conf/ConferenceControl.h"
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
 #include<libmutil/TimeoutProvider.h>
@@ -15,6 +15,7 @@ class SipSoftPhoneConfiguration;
 class Sip;
 class SipSMCommand;
 class ConsoleDebugger;
+class ConferenceControl;
 
 
 class Minisip : public Runnable{

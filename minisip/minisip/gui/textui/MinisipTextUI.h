@@ -24,6 +24,7 @@
 #define _MINISIPTEXTUI_H
 
 #include<libmutil/CommandString.h>
+#include"../../../conf/ConferenceControl.h"
 #include"../../../sip/SipSoftPhoneConfiguration.h"
 #include"../Gui.h"
 #include"../../../p2t/GroupList.h"
@@ -61,7 +62,9 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
         void showTransactions(string);
         void showTimeouts(string);
 	void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header);
-
+	
+	ConferenceControl *currentconf;
+	string currentconfname;
         string input;
         string callId;
         string state;

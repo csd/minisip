@@ -32,31 +32,45 @@
 //#include"sip/SipStateMachine.h"
 #include"../sip/Sip.h"
 #include"gui/Gui.h"
+#include"../conf/ConferenceControl.h" 
+#include "../conf/ConfCallback.h"
 #include"../sip/SipSoftPhoneConfiguration.h"
 
 #include<config.h>
 
 
-class MessageRouter: public SipCallback, public GuiCallback{
+class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback{
 	public:
 		MessageRouter();
 		virtual ~MessageRouter(){}
 		
 		void setSip(MRef<Sip*> ssp);
 		void setGui(Gui *guiptr){gui = guiptr;};
+		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
+		//void setConference(ConferenceControl *confptr){conf = confptr;};//bm
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
 			this->mediaHandler = mediaHandler;}
 
 		virtual void sipcb_handleCommand(CommandString &command);
-
+		virtual void sipcb_handleConfCommand(CommandString &command);
+		//virtual void sipcb_handleConfCommand(CommandString &command);
+		//virtual void confcb_handleSipCommand(CommandString &command);
+		//void confcb_handleGuiCommand(CommandString &command);
 		virtual void guicb_handleCommand(CommandString &command);
+		virtual void guicb_handleConfCommand(ConferenceControl *conf,string &command);
+		virtual string guicb_confDoInvite(ConferenceControl *conf,string sip_url);
 		virtual void guicb_handleMediaCommand(CommandString &command);
-
+		
 		virtual string guicb_doInvite(string sip_url);
-			
+		
+		virtual string confcb_doInvite(string user);
+		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
+		virtual void confcb_handleSipCommand(string &command){}
+		virtual void confcb_handleGuiCommand(string &command){}	
 	private:
 		
 		Gui *gui;
+		ConferenceControl *confrout;//bm
 		MRef<Sip*> sip;
 		MRef<MediaHandler *> mediaHandler;
 };

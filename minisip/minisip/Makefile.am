@@ -45,7 +45,8 @@ endif
 minisip_LDADD +=../sdp/libsdp.a \
 		contactdb/libcontactdb.a \
                 ../p2t/libp2t.a \
-                ../mediahandler/libmediahandler.a
+                ../mediahandler/libmediahandler.a \
+		../conf/libconf.a
 
 
 

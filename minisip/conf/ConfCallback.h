@@ -20,26 +20,23 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef GUICALLBACK_H
-#define GUICALLBACK_H
+#ifndef CONFCALLBACK_H
+#define CONFCALLBACK_H
 
 #include<config.h>
-#include"../../conf/ConferenceControl.h"
+
 #include<libmutil/CommandString.h>
 
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
 
-class GuiCallback{
+class ConfCallback{
 	
 	public:
-		virtual string guicb_doInvite(string sip_url)=0;
-                virtual void guicb_handleCommand(CommandString &)=0;
-                virtual void guicb_handleMediaCommand(CommandString &)=0;
-		virtual void guicb_handleConfCommand(ConferenceControl *conf,string &commmand)=0;
-		virtual string guicb_confDoInvite(ConferenceControl *conf,string sip_url)=0;
-		//virtual void confcb_handleSipCommand(string &)=0;
-		//virtual void confcb_handleGuiCommand(string &)=0;
+		//virtual void guicb_handleConfCommand(string &)=0;
+		virtual void confcb_handleSipCommand(string &)=0;
+		virtual void confcb_handleGuiCommand(string &)=0;
+		virtual string confcb_doInvite(string user)=0;
 };
 
 #endif

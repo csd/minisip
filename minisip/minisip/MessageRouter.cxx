@@ -27,6 +27,7 @@
 #include"../sip/SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogContainer.h>
 #include"../sip/DefaultDialogHandler.h"
+//#include"../conf/ConferenceControl.h" 
 
 
 MessageRouter::MessageRouter(){
@@ -44,7 +45,37 @@ void MessageRouter::setSip(MRef<Sip*> s){
 void MessageRouter::sipcb_handleCommand(CommandString &command){
 	gui->handleCommand(command);
 }
+void MessageRouter::sipcb_handleConfCommand(CommandString &command){
+	confrout->handleSipCommand(command);
+}
 
+/*
+void MessageRouter::sipcb_handleConfCommand(CommandString &command){
+	ConferenceControl->handleCommand(command);
+}//bm*/
+
+/*void MessageRouter::confcb_handleSipCommand(CommandString &cmd){
+	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
+	sip->getSipStack()->handleCommand(sipcmd);
+}//bm*/
+/*void MessageRouter::confcb_handleGuiCommand(CommandString &command){
+	gui->handleCommand(command);
+}//bm*/
+
+void MessageRouter::guicb_handleConfCommand(ConferenceControl *conf,string &command){
+	confrout=conf;
+	confrout->setCallback(this);
+	cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
+	confrout->handleGuiCommand(command);
+	
+}//bm
+
+string MessageRouter::guicb_confDoInvite(ConferenceControl *conf,string sip_url){
+	confrout=conf;
+	cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
+	confrout->handleGuiDoInviteCommand(sip_url);
+	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
+}//bm
 void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
 	mediaHandler->handleCommand(cmd);
 }
@@ -61,3 +92,8 @@ void MessageRouter::guicb_handleCommand(CommandString &cmd){
 	sip->getSipStack()->handleCommand(sipcmd);
 }
 
+string MessageRouter::confcb_doInvite(string user){
+//	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
+	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
+	return sip->confinvite(user);
+}

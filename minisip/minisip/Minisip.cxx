@@ -35,6 +35,8 @@
 #include"LogEntry.h"
 #include"contactdb/ContactDb.h"
 #include"../mediahandler/MediaHandler.h"
+#include"../conf/ConferenceControl.h"
+#include"../conf/ConfCallback.h"
 #include"MessageRouter.h"
 
 #include<libmsip/SipUtils.h>

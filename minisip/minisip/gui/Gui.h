@@ -24,7 +24,7 @@
 #define GUI_H
 
 #include<config.h>
-
+//#include "../../conf/ConferenceControl.h"
 #include"GuiCallback.h"
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
