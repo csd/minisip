@@ -47,10 +47,6 @@ using namespace std;
 #define LIBMUTIL_API
 #endif
 
-
 LIBMUTIL_API string itoa(int i);
-
-LIBMUTIL_API int eef(int i);
-
 
 #endif

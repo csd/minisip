@@ -40,12 +40,7 @@
 #include<assert.h>
 using namespace std;
 
-LIBMUTIL_API int eef(int i){
-	return i*2;
-}
-
 LIBMUTIL_API string itoa(int i){
-	assert(sizeof(uint64_t)==8); //TODO: remove this check
 	char buf[16];
 	for (int j=0; j<16; j++)
 		buf[j]=0;
