@@ -41,6 +41,7 @@
 using namespace std;
 
 
+#ifdef _MSC_VER
 static int nocaseequal(char c1, char c2){
 	if ( ((c1>='A') && (c1<='Z')) ){
 		return (c1==c2) || (c1 == (c2 - ('a'-'A')));
@@ -64,6 +65,7 @@ static int strcasecmp(const char *s1, const char *s2){
 		return -1;
 	return 0;
 }
+#endif
 
 MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
 	disabled = false;

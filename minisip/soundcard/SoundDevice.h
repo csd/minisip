@@ -23,6 +23,8 @@
 #ifndef SOUND_DEVICE_H
 #define SOUND_DEVICE_H
 
+#include<config.h>
+
 #ifdef _MSC_VER
 #ifndef byte_t
 typedef unsigned char  byte_t;
@@ -47,16 +49,6 @@ typedef unsigned int  uint32_t;
 #define SOUND_S16BE 	0xF1
 #define SOUND_U16LE	0xF2
 #define SOUND_U16BE	0xF3
-
-#ifdef _MSC_VER
-#ifndef byte_t
-typedef unsigned char  byte_t;
-#endif
-#else
-#include<stdint.h>
-#endif
-
-//typedef uint8_t byte_t;
 
 class SoundDevice: public MObject{
 	public:
