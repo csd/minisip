@@ -38,6 +38,19 @@
 
 class MainWindow;
 
+/* Button that contains a stock icon, but not the associated label */
+class StockButton : public Gtk::Button{
+	public:
+		StockButton( Gtk::StockID, Glib::ustring label );
+		
+//		void setText( const Glib::ustring& label );
+		void 	set_label (const Glib::ustring& label);
+	private:
+		Gtk::HBox box;
+		Gtk::Image image;
+		Gtk::Label label;
+};
+
 class CallWidget : public Gtk::VBox{
 	public:
 		CallWidget( string callId, string remoteUri, MainWindow * mw, bool incoming, std::string secure="unprotected");
@@ -68,8 +81,8 @@ class CallWidget : public Gtk::VBox{
 		Gtk::Label status;
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
-		Gtk::Button acceptButton;
-		Gtk::Button rejectButton;
+		StockButton acceptButton;
+		StockButton rejectButton;
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;

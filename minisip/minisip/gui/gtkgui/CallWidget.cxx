@@ -37,10 +37,9 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
                 callId( callId ),
 		status( "" ),
 		secStatus( "" ),
-                acceptButton( "Accept" ),
-                rejectButton( "Reject" ),
+                acceptButton( Gtk::Stock::OK, "Accept" ),
+                rejectButton( Gtk::Stock::CANCEL, "Reject" ),
 		bell(/*NULL*/)//,
-//		timeoutProvider(tp)
 {
 	bell = NULL;
 
@@ -58,7 +57,7 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 
 	status.show();
 	secStatus.show();
-	buttonBox.show();
+	buttonBox.show_all();
 	rejectButton.show();
 
 	acceptButton.signal_clicked().connect( SigC::slot( *this, &CallWidget::accept ) );
@@ -277,4 +276,16 @@ void CallWidget::stopRinging(){
 	}
 	CommandString cmdstr = CommandString( "", MediaCommandString::stop_ringing );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+}
+
+StockButton::StockButton( Gtk::StockID stockId, Glib::ustring text ):
+	box( 2 ), image( stockId, Gtk::ICON_SIZE_SMALL_TOOLBAR ), label( text ){
+	box.add( image );
+	box.add( label );
+	add(box);
+	show_all();
+}
+
+void StockButton::set_label (const Glib::ustring& label){
+	this->label.set_text( label );
 }
