@@ -85,6 +85,7 @@ typedef __int32 int32_t;
 #define SIP_HEADER_TYPE_UNSUPPORTED             19
 #define SIP_HEADER_TYPE_ACCEPTCONTACT		20
 #define SIP_HEADER_TYPE_WARNING			21
+#define SIP_HEADER_TYPE_REFERTO			22
 
 using namespace std;
 

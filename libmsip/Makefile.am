@@ -34,6 +34,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/messages/SipNotify.cxx \
                      source/messages/SipMessage.cxx \
                      source/messages/SipIMMessage.cxx \
+                     source/messages/SipRefer.cxx \
                      source/messages/SipRegister.cxx \
                      source/messages/SipResponse.cxx \
                      source/messages/SipSubscribe.cxx \
@@ -54,6 +55,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderProxyAuthenticate.cxx \
                      source/headers/SipHeaderProxyAuthorization.cxx \
                      source/headers/SipHeaderRecordRoute.cxx \
+                     source/headers/SipHeaderReferTo.cxx \
                      source/headers/SipHeaderRoute.cxx \
                      source/headers/SipHeaderSubject.cxx \
                      source/headers/SipHeaderTo.cxx \
