@@ -44,6 +44,8 @@ class SdlDisplay: public VideoDisplay{
 		uint32_t height;
 		uint32_t width;
 
+		uint32_t baseWindowHeight;
+		uint32_t baseWindowWidth;
 
 		void openDisplay();
                 virtual void createWindow();
@@ -53,6 +55,8 @@ class SdlDisplay: public VideoDisplay{
 
                 virtual MImage * allocateImage();
                 virtual void deallocateImage( MImage * image );
+
+		virtual void handleEvents();
 
 		Window window;
 		Display * display;

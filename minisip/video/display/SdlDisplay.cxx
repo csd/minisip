@@ -186,3 +186,13 @@ void SdlDisplay::displayImage( MImage * mimage ){
 	SDL_LockYUVOverlay( overlay);
 
 }
+
+void SdlDisplay::handleEvents(){
+	SDL_Event event;
+
+	while( SDL_PollEvent( &event ) ){
+		if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f ){
+			SDL_WM_ToggleFullScreen( surface );
+		}
+	}
+}
