@@ -6,7 +6,7 @@ AC_INIT(libmsip, 0.3, eliasson@imit.kth.se)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmsip, 0.3.0)
+AM_INIT_AUTOMAKE(libmsip, 0.3.1)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
