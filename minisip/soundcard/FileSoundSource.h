@@ -112,7 +112,7 @@ class FileSoundSource : public SoundSource{
 
     private:
         short *audio;           /// Pointer to raw audio data.
-        short nSamples;         /// Number of samples in audio buffer.
+        uint32_t nSamples;         /// Number of samples in audio buffer.
         bool enabled;           /// true->playing, false->silence
         bool repeat;            /// Play the audio in a audio.
         int index;              /// Play out position
