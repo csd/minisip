@@ -118,7 +118,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession );
-			MRef<SipDialog*> voipCall( new SipDialogVoip(getDialogContainer(), callConf, 
+			MRef<SipDialog*> voipCall( new SipDialogVoip(sipStack, callConf, 
 								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
 	
 #else	

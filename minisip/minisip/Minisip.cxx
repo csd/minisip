@@ -40,6 +40,7 @@
 #include<libmsip/SipUtils.h>
 #include<exception>
 #include<libmutil/Timestamp.h>
+#include<libmutil/TextUI.h>
 
 extern TextUI *debugtextui;
 
