@@ -59,6 +59,9 @@ inet_aton(const char *cp, struct in_addr *addr)
 
 #include<iostream>
 
+#include<exception>
+#include<typeinfo>
+
 IP4Address::IP4Address(struct sockaddr_in *sin){
         sockaddress = new sockaddr_in;
 	type = IP_ADDRESS_TYPE_V4;
