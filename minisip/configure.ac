@@ -448,7 +448,6 @@ AC_OUTPUT([codecs/Makefile
                  minisip/gui/qtgui/Makefile
                  minisip/gui/gtkgui/Makefile
                  minisip/gui/textui/Makefile
-		 minisip/gui/conferencecontroller/Makefile
                  rtp/Makefile
                  sip/Makefile
                  soundcard/Makefile
