@@ -83,6 +83,12 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 
 		int getCSeqNo(){return cSeqNo;}
                 
+
+		//The transition to cancel a transaction is common to all
+		//transactions and is defined in this class.
+		bool a1000_cancel_transaction(const SipSMCommand &command);
+
+		
 	protected:
 		void setCSeqNo(int n){cSeqNo=n;}
 		MRef<SipDialog*> dialog; 
@@ -91,9 +97,6 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		int32_t port;
 		string callId;
 
-		//The transition to cancel a transaction is common to all
-		//transactions and is defined in this class.
-		bool a1000_cancel_transaction(const SipSMCommand &command);
 		
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
