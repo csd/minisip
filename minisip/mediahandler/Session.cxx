@@ -94,9 +94,8 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			// something went wrong
 			return NULL;
 		}
-		a = new SdpHeaderA("a=X");
-		a->setAttributes( "key-mgmt:"+keyMgmtMessage );
-		result->addHeader( *a );
+		result->setSessionLevelAttribute( 
+                                "key-mgmt", "mikey "+keyMgmtMessage );
 		
 	}
 
@@ -142,6 +141,8 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	// Not used
 	int port;
 
+        cerr << "Called Session::setSdpAnswer with: " << answer->getString() << endl;
+        cerr << "peerUri = " << peerUri << endl;
 	this->peerUri = peerUri;
 	
 	if( securityConfig.secured ){
@@ -174,6 +175,8 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = 
 				((SdpHeaderM*)*(answer->getHeaders()[i]));
+                        cerr << "m header: " << m->getString() << endl;
+                        cerr << "m NoFormats:  " << m->getNrFormats() << endl;
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
@@ -181,9 +184,9 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 					/* This offer was rejected */
 					receiver->disabled = true;
 				}
-				else{
+				else if( receiver ){
 					/* Be ready to receive */
-					receiver->start();
+                                        receiver->start();
 				}
 			}
 		}
@@ -195,15 +198,12 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 	list< MRef<MediaStream *> >::iterator iStream;
 
 	/* If we have a sender for this format, activate it */
-	//fprintf( stderr, "Starting senders loop\n" );
 	mdbg << "Starting senders loop" << end;
 	uint8_t j = 1;
 	for( iStream =  mediaStreamSenders.begin();
 			iStream != mediaStreamSenders.end(); iStream++,j++ ){
-		//fprintf( stderr, "Trying a sender\n" );
 		mdbg << "Trying a sender"<< end;
 		if( (*iStream)->matches( m, iFormat ) ){
-			//fprintf( stderr, "Found sender for %s\n", (*iStream)->getSdpMediaType().c_str() );
 			mdbg << "Found sender for " << (*iStream)->getSdpMediaType().c_str()<< end;
 #if 0
 			if( ka ){
@@ -220,7 +220,6 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 		}
 	}
 	/* Look for a receiver */
-	//fprintf( stderr, "Starting receivers loop\n" );
 	mdbg << "Starting receivers loop"<< end;
 	for( iStream =  mediaStreamReceivers.begin();
 			iStream != mediaStreamReceivers.end(); iStream ++ ){

@@ -87,10 +87,15 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 				break;
 			case 'a':
 				attr=new SdpHeaderA(lines[i]);
-				addHeader(*attr);
 				if(lastM){
+                                        // media level attribute
 					lastM->addAttribute(attr);
 				}
+                                else{
+                                        // Session level attribute
+                                        addHeader(*attr);
+                                }
+                                
 				break;
 			default:
 				cerr << "ERROR: unknown SDP header: "<< lines[i]<< endl;
