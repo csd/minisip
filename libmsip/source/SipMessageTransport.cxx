@@ -323,8 +323,14 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			 * create one */
 
 			if( preferredTransport == "TLS" ){
-				socket = new TLSSocket( ip_addr, 
-						port, tls_ctx, getMyCertificate(), cert_db );
+				//FIXME have a different port per transport,
+				//to avoid this ...
+				socket = findStreamSocket(ip_addr, 5061);
+				if( socket.isNull() ){
+					socket = new TLSSocket( ip_addr, 
+		                        5061, tls_ctx, getMyCertificate(),
+					cert_db );
+				}
 
 				addSocket( socket );
 			}
@@ -371,7 +377,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc->errorDescription();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		merr << "Transport error in SipMessageTransport"<< end;
+		merr << "Transport error in SipMessageTransport: " << message << end;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
