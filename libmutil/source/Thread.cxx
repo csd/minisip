@@ -82,11 +82,11 @@ static DWORD WINAPI StaticThreadStarter(LPVOID lpParam)
 static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 {
 	
-	printf("StaticThreadStarter: ALIVE - thread created\n");
+	//printf("StaticThreadStarter: ALIVE - thread created\n");
         tmpstruct *tmp = (tmpstruct*)lpParam;
 	void* (*f)(void*);
 	//f=(void())&lpParam;
-	printf("StaticThreadStarter: running function");
+	//printf("StaticThreadStarter: running function");
 	f=(void* (*)(void*)) tmp->fun;
 	(*f)(tmp->arg);
 //	((void (void)) lpParam)();
@@ -141,7 +141,9 @@ Thread::Thread(Runnable *runnable){
 #ifdef WIN32
 	DWORD threadId;
 
-	handle_ptr = malloc(sizeof(HANDLE));
+	//handle_ptr = malloc(sizeof(HANDLE));
+	handle_ptr = new HANDLE;
+
 //	threadHandle = CreateThread(
 	*((HANDLE*)handle_ptr) = CreateThread(
 			NULL,                        // default security attributes
@@ -158,7 +160,8 @@ Thread::Thread(Runnable *runnable){
 #endif //WIN32
 
 #ifdef HAVE_PTHREAD_H
-	handle_ptr = malloc(sizeof(pthread_t));
+	//handle_ptr = malloc(sizeof(pthread_t));
+	handle_ptr = new pthread_t;
 //	if (pthread_create(&threadHandle, NULL, LinuxThreadStarter, runnable)){
 	if (pthread_create((pthread_t*)handle_ptr, NULL, LinuxThreadStarter, runnable)){
 		throw new ThreadException("Could not create thread.");
@@ -202,14 +205,15 @@ int Thread::createThread(void *f(void*), void *arg){
 #ifdef WIN32
 //        assert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
 
-        tmpstruct *argptr = (tmpstruct*)malloc(sizeof (tmpstruct));
+        //tmpstruct *argptr = (tmpstruct*)malloc(sizeof (tmpstruct));
+		tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
         
 	HANDLE threadHandle;
 	DWORD id;
 	
-	printf("createThread: Creating thread\n");
+	//printf("createThread: Creating thread\n");
 	threadHandle = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size  
@@ -217,7 +221,7 @@ int Thread::createThread(void *f(void*), void *arg){
 			argptr,                // argument to thread function 
 			0,                           // use default creation flags 
 			&id);
-	printf("createThread: done Creating thread\n");
+	//printf("createThread: done Creating thread\n");
 
 	if (threadHandle==NULL)
 		throw new ThreadException("Could not create thread.");

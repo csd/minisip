@@ -205,7 +205,7 @@ class TimeoutProvider : public MObject{
 		 * 			internal thread (but it still has side effects such
 		 * 			as setting signal handler).
 		 */		
-		TimeoutProvider(): requests(){
+		TimeoutProvider(): requests(),waitCond(),synch_lock(){
 			Thread::createThread(loop_starter, (void*)this);
 		}
 

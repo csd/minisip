@@ -31,6 +31,8 @@ using namespace std;
 
 #include<iostream>
 
+#include<malloc.h>
+
 LIBMUTIL_API string base64_encode( unsigned char * input, int length )
 {
 	int counter = 0;
@@ -141,7 +143,9 @@ LIBMUTIL_API unsigned char *  base64_decode( string input, int * output_length )
 			return NULL;
 	}
 
-	output = (unsigned char *) malloc( *output_length * sizeof( unsigned char * ) );
+	output = new unsigned char[*output_length * sizeof( unsigned char * )];
+	//output = (unsigned char *) malloc( *output_length * sizeof( unsigned char * ) );
+	
 	//memset( *output, 0, *output_length );
 	if( output == NULL )
 	{

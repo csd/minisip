@@ -56,11 +56,13 @@ CondVar::CondVar(){
 	pthread_mutex_init( INTERNAL_MUTEX, NULL );
 	//pthread_mutex_lock( INTERNAL_MUTEX );
 	init = true;
-#elif defined WIN32
+#elif defined _MSC_VER
 #define MINISIP_CONDVAR_IMPLEMENTED
+	internalStruct = new HANDLE;
+	internalMutexStruct = new HANDLE;
 	*INTERNAL_COND_WAIT = CreateEvent( NULL, FALSE, FALSE, NULL );
 	*INTERNAL_MUTEX = CreateMutex(NULL, FALSE, NULL);
-	WaitForSingleObject( INTERNAL_MUTEX, INFINITE );
+	WaitForSingleObject( *INTERNAL_MUTEX, INFINITE );
 	
 #endif
 
@@ -77,9 +79,13 @@ CondVar::~CondVar(){
 
 	pthread_cond_destroy( INTERNAL_COND_WAIT );
 	delete INTERNAL_COND_WAIT;
-#elif defined WIN32
-	CloseHandle( INTERNAL_COND_WAIT );
-	CloseHandle( INTERNAL_MUTEX );
+#elif defined _MSC_VER
+	CloseHandle( *INTERNAL_COND_WAIT );
+	CloseHandle( *INTERNAL_MUTEX );
+	delete internalStruct;
+	internalStruct=NULL;
+	delete internalMutexStruct;
+	internalMutexStruct=NULL;
 #endif
 }
 
@@ -116,14 +122,14 @@ void CondVar::wait( uint32_t timeout ){
 	if( timeout == 0 ){
 		SignalObjectAndWait(0,0,0,1);
 
-		SignalObjectAndWait( (HANDLE)INTERNAL_MUTEX, (HANDLE)INTERNAL_COND_WAIT, 
-			     (DWORD)INFINITE, (BOOL)FALSE );
+		SignalObjectAndWait( *INTERNAL_MUTEX, *INTERNAL_COND_WAIT, 
+			     INFINITE, FALSE );
 	}
 	else{
-		SignalObjectAndWait( INTERNAL_MUTEX, INTERNAL_COND_WAIT,
+		SignalObjectAndWait( *INTERNAL_MUTEX, *INTERNAL_COND_WAIT,
 		timeout, FALSE );
 	}
-	WaitForSingleObject( INTERNAL_MUTEX, INFINITE );
+	WaitForSingleObject( *INTERNAL_MUTEX, INFINITE );
 #endif
 }
 
@@ -131,7 +137,7 @@ void CondVar::broadcast(){
 #ifdef HAVE_PTHREAD_H
 	pthread_cond_broadcast( INTERNAL_COND_WAIT );
 #elif defined WIN32
-	PulseEvent( INTERNAL_COND_WAIT );
+	PulseEvent( *INTERNAL_COND_WAIT );
 #endif
 }
 
@@ -139,7 +145,7 @@ void CondVar::signal(){
 #ifdef HAVE_PTHREAD_H
 	pthread_cond_signal( INTERNAL_COND_WAIT );
 #elif defined WIN32
-	PulseEvent( INTERNAL_COND_WAIT );
+	PulseEvent( *INTERNAL_COND_WAIT );
 #endif
 }
 

@@ -95,7 +95,9 @@ class MRef{
 
 		virtual ~MRef(){          
 			if (objp!=NULL){
+#ifndef _MSC_VER
 				assert(dynamic_cast<MObject*>(objp)!=NULL);
+#endif
 				int rc = objp->decRefCount();
 				if (rc<=0){
 					if (rc<0){

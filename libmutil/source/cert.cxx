@@ -21,12 +21,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
+#include<libmutil/cert.h>
 
 #include<config.h>
-#include<iostream>
 
-#include<libmutil/cert.h>
+#include<iostream>
+#include<stdio.h>
+#include<assert.h>
 
 #ifndef NO_SECURITY
 
@@ -300,13 +301,14 @@ int certificate::control( ca_db * cert_db ){
 
 	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert ,NULL );
 	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
-		fprintf(stderr, "Could not initialize X509_STORE_CTX");
+		//fprintf(stderr, "Could not initialize X509_STORE_CTX");
+		cerr << "Could not initialize X509_STORE_CTX" << endl;
 		exit( 1 );
 	}
 
 	result = X509_verify_cert( &cert_store_ctx );
 
-	fprintf(stderr, "result: %d\n", result );
+	//fprintf(stderr, "result: %d\n", result );
 #ifdef DEBUG_OUTPUT
 	if( result == 0 ){
 		cerr << result << endl;
@@ -519,7 +521,8 @@ int certificate_chain::control( MRef<ca_db *> cert_db){
 
 	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert, cert_stack);
 	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
-		fprintf(stderr, "Could not initialize X509_STORE_CTX");
+		//fprintf(stderr, "Could not initialize X509_STORE_CTX");
+		cerr << "Could not initialize X509_STORE_CTX" << endl;
 		exit( 1 );
 	}
 

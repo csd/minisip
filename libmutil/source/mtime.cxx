@@ -26,11 +26,12 @@
 #include<config.h>
 
 
-#if defined WIN32 || defined _MSC_VER
+#include<time.h>
+
+#if ((defined WIN32) || (defined _MSC_VER))
 #include <sys/timeb.h>
 #else
 #include<sys/time.h>
-#include<time.h>
 #endif
 
 
