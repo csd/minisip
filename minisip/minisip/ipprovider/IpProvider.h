@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -33,7 +33,7 @@ class Gui;
 class IpProvider: public MObject{
 	public:
 		virtual std::string getExternalIp()=0;
-		virtual uint16_t getExternalPort( UDPSocket * sock )=0;
+		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock )=0;
 
 		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config, Gui * gui );
 		

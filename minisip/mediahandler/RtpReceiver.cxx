@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -85,7 +85,7 @@ uint16_t RtpReceiver::getPort(){
 	return externalPort;
 }
 
-UDPSocket * RtpReceiver::getSocket(){
+MRef<UDPSocket *> RtpReceiver::getSocket(){
 	return socket;
 }
 			
@@ -119,7 +119,7 @@ void RtpReceiver::run(){
 		}
 
 		try{
-			packet = SRtpPacket::readPacket( *socket );
+			packet = SRtpPacket::readPacket( **socket );
 		}
 
 		catch (NetworkException * exc ){

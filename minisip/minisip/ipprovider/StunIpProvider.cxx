@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -176,7 +176,7 @@ string StunIpProvider::getExternalIp(){
 	return externalIp;
 }
 
-uint16_t StunIpProvider::getExternalPort( UDPSocket * socket ){
+uint16_t StunIpProvider::getExternalPort( MRef<UDPSocket *> socket ){
 	char mappedIPBuffer[16];
 	uint16_t mappedPort;
 
@@ -187,7 +187,7 @@ uint16_t StunIpProvider::getExternalPort( UDPSocket * socket ){
 	
 	STUN::getExternalMapping( *((IP4Address*)stunIp),
                                    stunPort,
-                                  *socket,
+                                  **socket,
                                   mappedIPBuffer,
                                   mappedPort );
 

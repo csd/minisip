@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -85,7 +85,6 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	
 	/* If we have an rtpmap:, it should be the same */
 	rtpmap = m->getRtpMap( rtpPayloadType );
-	cerr << rtpmap << endl;
 	if( getRtpMap() != "" ){
 		// FIXME
 		size_t s1 = getRtpMap().find("/");
@@ -266,12 +265,17 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
 	ssrcListLock.unlock();
 }
 
-MediaStreamSender::MediaStreamSender( MRef<Media *> media ):
+MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket ):
 	MediaStream( media ){
 	remotePort = 0; 
 	seqNo = 0;
 	ssrc = rand();
-	senderSock = new UDPSocket;
+	if( senderSocket ){
+		this->senderSock = senderSocket;
+	}
+	else{
+		senderSock = new UDPSocket;
+	}
 }
 
 void MediaStreamSender::start(){
@@ -302,7 +306,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t ts, bool 
 
 	packet->protect( getCryptoContext( ssrc ) );
 
-	packet->sendTo( *senderSock, *remoteAddress, remotePort );
+	packet->sendTo( **senderSock, *remoteAddress, remotePort );
 	delete packet;
 }
 

@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -32,7 +32,7 @@ class SimpleIpProvider: public IpProvider{
 		
 		virtual std::string getExternalIp();
 		virtual std::string getLocalIp();
-		virtual uint16_t getExternalPort( UDPSocket * sock );
+		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock );
 
 		virtual std::string getMemObjectType(){return "SimpleIpProvider";};
 

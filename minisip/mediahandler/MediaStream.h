@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -99,7 +99,8 @@ class MediaStreamReceiver : public MediaStream{
 
 class MediaStreamSender : public MediaStream{ 
 	public:
-		MediaStreamSender( MRef<Media *> media );
+		MediaStreamSender( MRef<Media *> media, 
+				   MRef<UDPSocket *> senderSock=NULL );
 		virtual void start();
 		virtual void stop();
 
@@ -109,7 +110,7 @@ class MediaStreamSender : public MediaStream{
 		void send( byte_t * data, uint32_t length, uint32_t ts, bool marker = false );
 		void setRemoteAddress( IPAddress * remoteAddress );
 	private:
-		UDPSocket * senderSock;
+		MRef<UDPSocket *> senderSock;
 		uint16_t remotePort;
 		uint16_t seqNo;
 		IPAddress * remoteAddress;
