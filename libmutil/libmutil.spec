@@ -1,5 +1,5 @@
 %define name		libmutil
-%define version		0.2.1
+%define version		0.2.2
 %define release		1
 
 %define major		0
@@ -82,6 +82,8 @@ rm -rf %buildroot
 
 
 %changelog
+* Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>
+- new upstream release
 * Wed Jun 9 2004 Johan Bilien <jobi@via.ecp.fr>
 - initial release
 

@@ -7,7 +7,7 @@ Standards-Version: 3.6.1
 Package: libmnetutil-dev
 Section: devel
 Architecture: any
-Depends: libmnetutil0 (= ${Source-Version}), libssl-dev (>= 0.9.6), libmutil-dev (>= 0.2)
+Depends: libmnetutil0 (= ${Source-Version}), libssl-dev (>= 0.9.6), libmutil-dev (>= 0.2.2)
 Description: different utilities classes for portable networking C++ development
  libmnetutil contains different classes useful to write portable networking
  applications in C++. It includes UDP, TCP and TLS sockets, DNS resolving...
@@ -18,7 +18,7 @@ Description: different utilities classes for portable networking C++ development
 Package: libmnetutil0
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, libssl0.9.7 (>= 0.9.7), libmutil0 (>= 0.2)
+Depends: ${shlibs:Depends}, libssl0.9.7 (>= 0.9.7), libmutil0 (>= 0.2.2)
 Description: different utilities classes for portable networking C++ development
  libmnetutil contains different classes useful to write portable networking
  applications in C++. It includes UDP, TCP and TLS sockets, DNS resolving...

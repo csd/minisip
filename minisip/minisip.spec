@@ -1,5 +1,5 @@
 %define name		minisip
-%define version		0.6.1
+%define version		0.6.2
 %define release		1
 
 Summary: 		A secure SIP user agent
@@ -12,10 +12,10 @@ URL:			http://www.minisip.org/
 Group:			Applications/Communication
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
-Requires:		libmikey0 >= 0.3
-Requires:		libmutil0 >= 0.2
-Requires:		libmnetutil0 >= 0.2
-Requires:		libmsip0 >= 0.2
+Requires:		libmikey0 >= 0.3.2
+Requires:		libmutil0 >= 0.2.2
+Requires:		libmnetutil0 >= 0.2.2
+Requires:		libmsip0 >= 0.2.2
 Requires:		libglademm2 >= 0.2 
 
 
@@ -45,6 +45,8 @@ rm -rf %buildroot
 /usr/share/minisip/tray_icon.png
 
 %changelog
+* Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>
+- new upstream release
 * Thu May 6 2004 Johan Bilien <jobi@via.ecp.fr>
 - initial release
 
