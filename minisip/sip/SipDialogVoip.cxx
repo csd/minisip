@@ -126,7 +126,7 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 #ifdef MINISIP_MEMDEBUG
 		vc.setUser("WARNING - transaction");
 #endif
-
+		ts.save("a0_start_callingnoauth_invite");
 
 		int seqNo = requestSeqNo();
 //		setLocalCalled(false);
@@ -190,7 +190,7 @@ bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &comm
 bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
-
+		ts.save("a3_callingnoauth_incall_2xx");
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
 		string peerUri = resp->getFrom().getString();
@@ -900,7 +900,9 @@ void SipDialogVoip::sendInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+		ts.save("getSdpOffer");
 		sdp = mediaSession->getSdpOffer();
+		ts.save("getSdpOffer");
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -918,7 +920,9 @@ void SipDialogVoip::sendInvite(const string &branch){
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
 	if (getIpsecSession()->required()){
+		ts.save("getMikeyIpsecOffer");
 		mikey = ipsecSession->getMikeyIpsecOffer();
+		ts.save("getMikeyIpsecOffer");
 		if (!mikey){
 			merr << "Mikey was NULL" << end;
 			merr << "Still some errors with IPSEC" << end;
@@ -1016,7 +1020,9 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+		ts.save("getSdpOffer");
 		sdp = mediaSession->getSdpOffer();
+		ts.save("getSdpOffer");
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -1034,7 +1040,9 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
 	if (getIpsecSession()->required()){
+		ts.save("getMikeyIpsecOffer");
 		mikey = ipsecSession->getMikeyIpsecOffer();
+		ts.save("getMikeyIpsecOffer");
 		if (!mikey){
 			merr << "Mikey was NULL" << end;
 			merr << "Still some errors with IPSEC" << end;
@@ -1189,7 +1197,9 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+		ts.save("getSdpAnswer");
 		sdp = mediaSession->getSdpAnswer();
+		ts.save("getSdpAnswer");
 		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -1207,7 +1217,9 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
 	if (getIpsecSession()->required()){
+		ts.save("getMikeyIpsecAnswer");
 		mikey = ipsecSession->getMikeyIpsecAnswer();
+		ts.save("getMikeyIpsecAnswer");
 		if (!mikey){
 			merr << "Mikey was NULL in sendInviteOk" << end;
 			merr << "Still some errors with IPSEC" << end;
@@ -1392,12 +1404,16 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 		if( (Offer->getContentType()).substr(0,17) == "application/mikey")
 			switch (type){
 				case 10:
+					ts.save("setMikeyIpsecOffer");
 					if(!getIpsecSession()->setMikeyIpsecOffer((SipMimeContent*)*Offer))
 						return false;
+					ts.save("setMikeyIpsecOffer");
 					return true;
 				case 3:
+					ts.save("setMikeyIpsecAnswer");
 					if(!getIpsecSession()->setMikeyIpsecAnswer((SipMimeContent*)*Offer))
 						return false;
+					ts.save("setMikeyIpsecAnswer");
 					return true;
 				default:
 					return false;
@@ -1406,13 +1422,17 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp")
 			switch (type){
 				case 10:
+					ts.save("setSdpOffer");
 					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
+					ts.save("setSdpOffer");
 					return true;
 				case 3:
+					ts.save("setSdpAnswer");
 					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
 					getMediaSession()->start();
+					ts.save("setSdpAnswer");
 					return true;
 				default:
 					merr << "No SDP match" << end;
