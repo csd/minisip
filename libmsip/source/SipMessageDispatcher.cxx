@@ -84,7 +84,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			merr <<  "WARNING: SipMessageDispatcher::handleCommand could not find branch parameter from packet"<<end;
 		}
 		if (branch!=""){
-			int j=0;
+			//int j=0;
 			for (int i=0; i< transactions.size(); i++){
 				if (transactions[i]->getBranch()== branch ){
 					//					mdbg << ">>>>>>>>>>> found transaction based on branc"<< end;

@@ -62,7 +62,7 @@ SipResponse::SipResponse(string branch,
 	addHeader(mf);
 	
 	int noHeaders = inv->getNoHeaders();
-	for (uint32_t i=0 ; i < noHeaders; i++){			//FIX: deep copy
+	for (uint32_t i=0 ; i < (uint32_t)noHeaders; i++){			//FIX: deep copy
 		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_VIA)
 			addHeader(inv->getHeader(i));
 		
@@ -99,7 +99,7 @@ SipResponse::SipResponse(string &resp): SipMessage("", SipResponse::type)
 	status_code = (resp[afterws+0]-'0')*100 + (resp[afterws+1]-'0')*10 + resp[afterws+2]-'0';
 
 	status_desc="";
-	int32_t i;
+	uint32_t i;
 	for (i=12; resp[i]!='\r' && resp[i]!='\n'; i++){
 		if(resp.size() == i){
 			throw new SipExceptionInvalidMessage();
@@ -162,7 +162,7 @@ SipResponse::SipResponse(string &resp): SipMessage("", SipResponse::type)
 	}
 
 	if (getContentLength() > 0){
-		if (getContentLength() > resp.length() - i)
+		if (getContentLength() > (int)resp.length() - (int)i)
 			throw new SipExceptionInvalidMessage();
 		else
 			sdp = resp.substr(i, i+getContentLength());

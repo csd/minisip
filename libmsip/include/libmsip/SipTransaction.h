@@ -71,10 +71,10 @@ class SipTransaction : public StateMachine<SipSMCommand,string>{
 		string getDebugTransType(){return debugTransType;}
                 
 	protected:
+		MRef<SipDialog*> dialog; 
 		Socket * socket;
 		IPAddress * toaddr;             //FIXME: This is leaked?
 		int32_t port;
-		MRef<SipDialog*> dialog; 
 		string callId;
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;

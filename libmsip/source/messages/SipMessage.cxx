@@ -86,6 +86,7 @@ string SipMessage::getDescription(){
 
 ostream & operator<<(ostream &out, SipMessage &p){
         out << p.getDescription();
+	return out;
 }
 
 
@@ -114,7 +115,7 @@ int SipMessage::getNoHeaders(){
 }
 
 int32_t SipMessage::getContentLength(){
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderContentLength*> len;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CONTENTLENGTH){
 			len = MRef<SipHeaderContentLength*>((SipHeaderContentLength*)*headers[i]);
@@ -129,7 +130,7 @@ string SipMessage::getHeadersAndContent(){
 	int32_t clen=-1;
 
 //	headers.validate();
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		req=req+headers[i]->getString()+"\r\n";
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CONTENTLENGTH){
 			clen=0;
@@ -159,7 +160,7 @@ SipMessage::SipMessage(int type, string &build_from): type(type)
 #ifdef MINISIP_MEMDEBUG
 	content.setUser("SipMessage");
 #endif
-	int32_t i;
+	uint32_t i;
 	string header;
 	for (i=0; build_from[i]!='\r' && build_from[i]!='\n'; i++){
 		if(i==build_from.size())
@@ -292,7 +293,7 @@ MRef<SipMessageContent*> SipMessage::getContent(){
 }
 
 string SipMessage::getCallId(){
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderCallID*> id;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CALLID){
 			id = MRef<SipHeaderCallID*>((SipHeaderCallID*)*headers[i]);
@@ -303,7 +304,7 @@ string SipMessage::getCallId(){
 }
 
 int32_t  SipMessage::getCSeq(){
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderCSeq*> seq;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CSEQ){
 			seq = MRef<SipHeaderCSeq*>((SipHeaderCSeq *)*headers[i]);
@@ -316,7 +317,7 @@ int32_t  SipMessage::getCSeq(){
 
 string SipMessage::getViaHeaderBranch(bool first){
 	string b;
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderVia*> via;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_VIA){
 			via = MRef<SipHeaderVia*>((SipHeaderVia*)*headers[i]);
@@ -344,7 +345,7 @@ string SipMessage::getDestinationBranch(){
 }
 
 string SipMessage::getCSeqMethod(){
-	for (uint32_t i=0; i < headers.size(); i++){
+	for (int32_t i=0; i < headers.size(); i++){
 		MRef<SipHeaderCSeq*> seq;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CSEQ){
 			seq = MRef<SipHeaderCSeq*>((SipHeaderCSeq *)(*headers[i]));
@@ -357,7 +358,7 @@ string SipMessage::getCSeqMethod(){
 }
 
 SipURI SipMessage::getFrom(){
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderFrom*> from;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
 			from = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
@@ -368,7 +369,7 @@ SipURI SipMessage::getFrom(){
 }
 
 SipURI SipMessage::getTo(){
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderTo*> to;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
 			to = MRef<SipHeaderTo*>((SipHeaderTo *)(*headers[i]));
@@ -402,7 +403,7 @@ void SipMessage::removeAllViaHeaders(){
 
 MRef<SipHeaderFrom*> SipMessage::getHeaderFrom(){
 	MRef<SipHeaderFrom*> from;
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
 			from = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
 			return from;
@@ -413,7 +414,7 @@ MRef<SipHeaderFrom*> SipMessage::getHeaderFrom(){
 
 MRef<SipHeaderTo*> SipMessage::getHeaderTo(){
 	MRef<SipHeaderTo*> to;
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_TO){
 			to = MRef<SipHeaderTo*>((SipHeaderTo *)(*headers[i]));
 			return to;
@@ -424,12 +425,12 @@ MRef<SipHeaderTo*> SipMessage::getHeaderTo(){
 
 list<string> SipMessage::getRouteSet(){
 	list<string> ret;
-	for (int i = 0; i< headers.size(); i++)
+	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_RECORDROUTE){
 			string route = ((SipHeaderRecordRoute *)*(headers[i]))->getRoute();
 			int i=0;
 			string part;
-			while (i<route.size()){
+			while (i<(int)route.size()){
 				if (route[i]==','){
 					ret.push_back(trim(part));
 					part="";

@@ -72,7 +72,7 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 	MRef<SipHeaderFrom*> from;
 	MRef<SipHeaderTo*> to;
 
-	for (uint32_t i=0; i<inv->getNoHeaders()/*headers.size()*/; i++){
+	for (int32_t i=0; i<inv->getNoHeaders()/*headers.size()*/; i++){
 		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_VIA){
 //			add_header(inv->headers[i]);
 		}

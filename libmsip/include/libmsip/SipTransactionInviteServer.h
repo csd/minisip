@@ -74,13 +74,14 @@ class SipTransactionInviteServer : public SipTransaction{
 		bool a9_completed_terminated_errOrTimerH( const SipSMCommand &command);
 		bool a10_confirmed_terminated_timerI( const SipSMCommand &command);
 		
-		int32_t command_seq_no;
 
 		bool user_has_accepted;
 		bool user_has_rejected;
 
 		string key_mgmt;
 		int32_t key_mgmt_method;
+
+		int32_t command_seq_no;
 };
 
 #endif

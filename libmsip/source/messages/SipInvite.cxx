@@ -64,7 +64,7 @@ SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from
 	MRef<SipHeaderAcceptContact*> acp;
 	P2T=false;
 	
-	for (uint32_t i=0; i< headers.size(); i++){
+	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
 			acp = MRef<SipHeaderAcceptContact*>((SipHeaderAcceptContact *)(*headers[i]));
 			
@@ -190,7 +190,7 @@ void SipInvite::createHeadersAndContent(
 
 string SipInvite::getRemoteTelNo(){
 	MRef<SipHeaderFrom*> fromp;
-	for (uint32_t i=0; i< headers.size(); i++)
+	for (int32_t i=0; i< headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
 			fromp = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
 			return fromp->getUri().getUserId();

@@ -68,7 +68,7 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 	addHeader(mf);
 	MRef<SipHeader *> hdr;
 	int noHeaders = inv->getNoHeaders();
-	for (uint32_t i=0; i< noHeaders; i++){
+	for (int32_t i=0; i< noHeaders; i++){
 		hdr = inv->getHeader(i);
 		int type = hdr->getType();
 		if (type == SIP_HEADER_TYPE_VIA){

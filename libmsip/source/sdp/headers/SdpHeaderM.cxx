@@ -180,7 +180,7 @@ void SdpHeaderM::addAttribute(MRef<SdpHeaderA*> a){
 
 string SdpHeaderM::getAttribute(string key, uint32_t n){
 	list<MRef<SdpHeaderA *> >::iterator i;
-	int nAttr = 0;
+	uint32_t nAttr = 0;
 
 	for(i=attributes.begin(); i!=attributes.end(); i++){
 		if((*i)->getAttributeType() == key){

@@ -72,8 +72,8 @@
 #define NB_THREADS 5
 
 
-#ifdef DEBUG_OUTPUT
 bool sipdebug_print_packets=false;
+#ifdef DEBUG_OUTPUT
 
 struct timeval startTime={0};
 
@@ -127,10 +127,10 @@ SipMessageTransport::SipMessageTransport(
                                         localTCPPort(local_tcp_port)
 #ifndef NO_SECURITY
 					, localTLSPort(local_tls_port),
-                                        tls_ctx(NULL), 
 //                                        dialogContainer(dContainer), //FIXME: Bug in older versions when not using security
                                         cert(cert), 
-                                        cert_db(cert_db)
+                                        cert_db(cert_db),
+                                        tls_ctx(NULL)
 #endif
 							
 {
@@ -393,7 +393,7 @@ void SipMessageTransport::udpSocketRead(){
 				break;
 			}
 
-			if (nread<strlen("SIP/2.0")){
+			if (nread < (int)strlen("SIP/2.0")){
 				continue;
 			}
 

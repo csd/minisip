@@ -64,11 +64,11 @@ class SipTransactionClient: public SipTransaction{
 		bool a8_trying_trying_timerE(const SipSMCommand &comman);
 		bool a9_completed_terminated_timerK(const SipSMCommand &comman);
 		
+		MRef<SipMessage*> lastRequest;
+		int timerT1;
 		int32_t command_seq_no;
 
-		MRef<SipMessage*> lastRequest;
 
-		int timerT1;
 };
 
 #endif

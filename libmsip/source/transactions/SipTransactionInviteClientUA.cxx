@@ -166,21 +166,21 @@ void SipTransactionInviteClientUA::changeStateMachine(){
 
 
 	
-	StateTransition<SipSMCommand,string> *transition_calling_completed_2xx=
+//	StateTransition<SipSMCommand,string> *transition_calling_completed_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_calling_completed_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1001_calling_completed_2xx,
 				s_calling, s_completed
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_proceeding_completed_2xx=
+//	StateTransition<SipSMCommand,string> *transition_proceeding_completed_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_proceeding_completed_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1002_proceeding_completed_2xx,
 				s_proceeding, s_completed
 				);
 	
-	StateTransition<SipSMCommand,string> *transition_completed_completed_2xx=
+//	StateTransition<SipSMCommand,string> *transition_completed_completed_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_completed_completed_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClientUA::a1003_completed_completed_2xx,

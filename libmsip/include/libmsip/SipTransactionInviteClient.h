@@ -68,12 +68,12 @@ class SipTransactionInviteClient: public SipTransaction{
 		bool a10_completed_terminated_TErr( const SipSMCommand &command);
 		bool a11_completed_terminated_timerD( const SipSMCommand &command);
 		
-		int32_t command_seq_no;
-
 		MRef<SipInvite*> lastInvite;
-
 		int timerT1;
 		int timerA;
+		int32_t command_seq_no;
+
+
 };
 
 #endif
