@@ -133,7 +133,8 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 #ifndef _MSC_VER
 		ts.save("a0_start_callingnoauth_invite");
 #endif
-		int seqNo = requestSeqNo();
+		//int seqNo = requestSeqNo();
+		++dialogState.seqNo;
 //		setLocalCalled(false);
 		localCalled=false;
 		dialogState.remoteUri= command.getCommandString().getParam();
@@ -164,7 +165,11 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 #endif
 	    CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 	    getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+
+	    //We must maintain the dialog state. We copy the remote tag and
+	    //the remote sequence number
 	    dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
+	    dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
 
 	 //   MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
 	   // if ( !sdp.isNull() ){
@@ -272,11 +277,12 @@ bool SipDialogVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 	if (transitionMatch(command, SipCommandString::hang_up)){
 //		merr << "EEEEEE match"<< end;
 //		setCurrentState(toState);
-		int bye_seq_no= requestSeqNo();
-		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(this), bye_seq_no, dialogState.callId)); 
+		//int bye_seq_no= requestSeqNo();
+		++dialogState.seqNo;
+		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId)); 
 
 		registerTransaction(byetrans);
-		sendBye(byetrans->getBranch(), bye_seq_no);
+		sendBye(byetrans->getBranch(), dialogState.seqNo);
 		
 		if (getLogEntry()){
 			(dynamic_cast< LogEntrySuccess * >(*( getLogEntry() )))->duration = time( NULL ) - getLogEntry()->start; 
@@ -390,10 +396,15 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
 		getDialogConfig()->inherited.sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
 
-		setSeqNo(command.getCommandPacket()->getCSeq() );
+		//We must maintain our dialog state. This is the first
+		//message we receive for this dialog and we copy the remote
+		//tag and the remote sequence number.
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getTag();
+		dialogState.remoteSeqNo = command.getCommandPacket()->getCSeq();
+		//dialogState.seqNo = command.getCommandPacket()->getCSeq(); (we do not need to set to the same at the remote one - remove)
 //		setLocalCalled(true);
 		localCalled=true;
+		
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
 		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
@@ -554,8 +565,9 @@ bool SipDialogVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &comma
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
-		int seqNo = requestSeqNo();
-		MRef<SipTransaction*> trans( new SipTransactionInviteClientUA(MRef<SipDialog*>(this), seqNo, dialogState.callId));
+		//int seqNo = requestSeqNo();
+		++dialogState.seqNo;
+		MRef<SipTransaction*> trans( new SipTransactionInviteClientUA(MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId));
 		registerTransaction(trans);
 		
 		realm = resp->getRealm();
@@ -642,14 +654,15 @@ bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 
-		int bye_seq_no= requestSeqNo();
+		//int bye_seq_no= requestSeqNo();
+		++dialogState.seqNo;
 //		setCurrentState(toState);
 
 		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId); 
 
 
 		registerTransaction(byetrans);
-		sendBye(byetrans->getBranch(), bye_seq_no);
+		sendBye(byetrans->getBranch(), dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);

@@ -231,12 +231,13 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
-		int im_seq_no= requestSeqNo();
-		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, im_seq_no, dialogState.callId);
+		//int im_seq_no= requestSeqNo();
+		++dialogState.seqNo;
+		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, dialogState.seqNo, dialogState.callId);
 		mdbg << "WWWWWWW: transaction created, branch id is <"<<trans->getBranch()<<">."<< end; 
 		//cerr << "command standard arguments is <"<< command.getCommandString().getString() <<">"<< endl;
 		registerTransaction(trans);
-		sendIM( trans->getBranch(), cmdstr.getParam(), im_seq_no, cmdstr.getParam2() );
+		sendIM( trans->getBranch(), cmdstr.getParam(), dialogState.seqNo, cmdstr.getParam2() );
 		return true;
 	}
 

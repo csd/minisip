@@ -144,7 +144,8 @@ bool SipDialogP2Tuser::a0_start_callingnoauth_invite( const SipSMCommand &comman
 		}
 #endif
 
-		int seqNo = /*vc->*/requestSeqNo();
+		//int seqNo = /*vc->*/requestSeqNo();
+		++dialogState.seqNo;
 		/*vc->*/setLocalCalled(false);
 		/*vc->*/dialogState.remoteUri = command.getCommandString().getParam();
 
@@ -356,13 +357,14 @@ bool SipDialogP2Tuser::a6_incall_termwait_hangup(
 		
 		//MRef<SipDialogP2Tuser *>vc = (SipDialogP2Tuser *)sipStateMachine;
 //		/*vc->*/setCurrentState(toState);
-		int bye_seq_no= /*vc->*/requestSeqNo();
+		//int bye_seq_no= /*vc->*/requestSeqNo();
+		++dialogState.seqNo;
 		
 		
-		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), bye_seq_no, dialogState.callId)); 
+		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId)); 
 
 		/*vc->*/registerTransaction(byetrans);
-		/*vc->*/sendBye(byetrans->getBranch(), bye_seq_no);
+		/*vc->*/sendBye(byetrans->getBranch(), dialogState.seqNo);
 		
 
 		/////BUG: Here. Receive Segmentation fault if dialog was started by a incoming INVITE message
@@ -508,7 +510,9 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 		//vc->getDialogConfig().inherited.userUri = command.getCommandPacket()->getHeaderTo()->getUri().getUserIpString().substr(4);
 		/*vc->*/getDialogConfig()->inherited.sipIdentity->setSipUri(  command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4)  );
 
-		/*vc->*/setSeqNo(command.getCommandPacket()->getCSeq() );
+		/*vc->*/ /*setSeqNo(command.getCommandPacket()->getCSeq() );*/
+		dialogState.seqNo = command.getCommandPacket()->getCSeq();
+		
 		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getTag();
 
 		/*vc->*/setLocalCalled(true);
@@ -725,7 +729,8 @@ bool SipDialogP2Tuser::a20_callingnoauth_callingauth_40X( const SipSMCommand &co
 
 		/*vc->*/dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
-		int seqNo = /*vc->*/requestSeqNo();
+		//int seqNo = /*vc->*/requestSeqNo();
+		++dialogState.seqNo;
 		MRef<SipTransaction*> trans( new SipTransactionInviteClientUA(MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId));
 		/*vc->*/registerTransaction(trans);
 		
@@ -884,14 +889,15 @@ bool SipDialogP2Tuser::a24_calling_termwait_2xx(
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 
 		//MRef<SipDialogP2Tuser *> vc = (SipDialogP2Tuser *)sipStateMachine;
-		int bye_seq_no= /*vc->*/requestSeqNo();
+		//int bye_seq_no= /*vc->*/requestSeqNo();
+		++dialogState.seqNo;
 //		/*vc->*/setCurrentState(toState);
 
 		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */), /*vc->*/dialogState.seqNo, dialogState.callId); 
 
 
 		/*vc->*/registerTransaction(byetrans);
-		/*vc->*/sendBye(byetrans->getBranch(), bye_seq_no);
+		/*vc->*/sendBye(byetrans->getBranch(), dialogState.seqNo);
 
 		CommandString cmdstr(/*vc->*/getCallId(), SipCommandString::security_failed);
 		/*vc->*/getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);

@@ -234,9 +234,10 @@ SipDialogPresenceServer::~SipDialogPresenceServer(){
 }
 
 void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ //FIXME: use onlineStatus 
-	int seqNo = requestSeqNo();
+	//int seqNo = requestSeqNo();
+	++dialogState.seqNo;
 	string cid = "FIXME"+itoa(rand());
-	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(MRef<SipDialog *>(this), seqNo, /*callId*/cid);
+	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(MRef<SipDialog *>(this), dialogState.seqNo, /*callId*/cid);
 	registerTransaction(subscribetrans);
 	sendNotify(subscribetrans->getBranch(), user, cid);
 
