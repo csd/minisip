@@ -188,9 +188,10 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
+		string peerUri = resp->getFrom().getString();
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = std::time( NULL );
-		getLogEntry()->peerSipUri = resp->getFrom().getString();
+		getLogEntry()->peerSipUri = peerUri;
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
@@ -201,7 +202,7 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		
 		MRef<SdpPacket *> sdp = (SdpPacket*)*resp->getContent();
 		if ( sdp ){
-			if( !getMediaSession()->setSdpAnswer( sdp ) ){
+			if( !getMediaSession()->setSdpAnswer( sdp, peerUri ) ){
 				// Some error occured, session rejected
 				return false;
 			}
@@ -388,12 +389,14 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		localCalled=true;
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
+		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
+
 		/* Give the SDP to the MediaSession */
 		MRef<SdpPacket *> sdpOffer = 
 			(SdpPacket*)*command.getCommandPacket()->getContent();
 		
 		if( sdpOffer ){
-			if( !getMediaSession()->setSdpOffer( sdpOffer ) ){
+			if( !getMediaSession()->setSdpOffer( sdpOffer, peerUri ) ){
 				// The offer is rejected, send 6XX;
 				return false;
 			}
@@ -597,9 +600,10 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
+		string peerUri = resp->getFrom().getString().substr(4);
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = std::time( NULL );
-		getLogEntry()->peerSipUri = resp->getFrom().getString();
+		getLogEntry()->peerSipUri = peerUri;
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getTag();
 
@@ -614,7 +618,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 
 		MRef<SdpPacket *> sdp = (SdpPacket*)*resp->getContent();
 		if ( sdp ){
-			if( !getMediaSession()->setSdpAnswer( sdp ) ){
+			if( !getMediaSession()->setSdpAnswer( sdp, peerUri ) ){
 				// Some error occured, session rejected
 				return false;
 			}

@@ -43,8 +43,8 @@ class Session : public MObject{
 		MRef<SdpPacket *> getSdpAnswer();
 		
 		/* returns whether or not we accept the answer */
-		bool setSdpAnswer( MRef<SdpPacket *> answer );
-		bool setSdpOffer ( MRef<SdpPacket *> offer );
+		bool setSdpAnswer( MRef<SdpPacket *> answer, std::string peerUri );
+		bool setSdpOffer ( MRef<SdpPacket *> offer, std::string peerUri );
 
 		void addMediaStreamReceiver( MRef<MediaStream *> );
 		void addMediaStreamSender( MRef<MediaStream *> );
@@ -68,6 +68,7 @@ class Session : public MObject{
 
 		void addStreamsToKa();
 
+		std::string peerUri;
 		
 		MRef<SdpPacket *> emptySdp();
 		MRef<MediaStream *> matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, IPAddress * remoteAddress );

@@ -134,7 +134,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){
 	return result;
 }
 
-bool Session::setSdpAnswer( MRef<SdpPacket *> answer ){
+bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	fprintf( stderr, "setSdpAnswer started\n" );
 	unsigned int i;
 	int j;
@@ -142,6 +142,8 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer ){
 	IPAddress * remoteAddress;
 	// Not used
 	int port;
+
+	this->peerUri = peerUri;
 	
 	if( securityConfig.secured ){
 		/* get the keymgt: attribute */
@@ -229,7 +231,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 	return NULL;
 }
 
-bool Session::setSdpOffer( MRef<SdpPacket *> offer ){
+bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){
 	fprintf( stderr, "setSdpOffer started\n" );
 	unsigned int i;
 	int j;
@@ -241,6 +243,8 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer ){
 	string keyMgmtMessage;
 	std::list<std::string>::iterator iAttribute;
 	std::list<std::string> attributes;
+
+	this->peerUri = peerUri;
 
 	keyMgmtMessage = offer->getSessionLevelAttribute( "key-mgmt" );
 
