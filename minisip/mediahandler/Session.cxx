@@ -39,6 +39,7 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmutil/dbg.h>
+#include<libmutil/itoa.h>
 
 #define SESSION_LINE "s=Minisip Session"
 
