@@ -104,6 +104,7 @@ class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
 		void addIm( string uri );
 		void updateConfig();
 		void doDisplayErrorMessage( string s );
+		void runCertificateSettings();
 
 		MRef<ContactDb *> contactDb;
 

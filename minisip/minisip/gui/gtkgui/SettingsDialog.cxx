@@ -45,7 +45,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 
 	refXml->get_widget( "certificateButton", certificateButton );
 
-	certificateButton->signal_clicked().connect( SigC::slot( *certificateDialog, &CertificateDialog::show ) );
+	certificateButton->signal_clicked().connect( SigC::slot( *certificateDialog, &CertificateDialog::run ) );
 	
 	generalSettings = new GeneralSettings( refXml );
 	securitySettings = new SecuritySettings( refXml );

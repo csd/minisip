@@ -170,7 +170,7 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "viewCallListMenu", viewCallListMenu );
 
 	prefMenu->signal_activate().connect( SigC::slot( *settingsDialog, &SettingsDialog::show ) );
-	certMenu->signal_activate().connect( SigC::slot( *certificateDialog, &CertificateDialog::show ) );
+	certMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::runCertificateSettings ) );
 	quitMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::quit ) );
 	
 	viewCallListMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::viewCallListToggle ) );
@@ -569,4 +569,9 @@ void MainWindow::viewCallListToggle(){
 void MainWindow::setCallback( GuiCallback * callback ){
 	handleCommand( CommandString( "", "sip_ready" ) );
 	Gui::setCallback( callback );
+}
+
+void MainWindow::runCertificateSettings(){
+	certificateDialog->run();
+	config->save();
 }

@@ -78,8 +78,8 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 }
 
-void CertificateDialog::show(){
-	certDialog->show();
+void CertificateDialog::run(){
+	certDialog->run();
 }
 
 void CertificateDialog::chooseCert(){

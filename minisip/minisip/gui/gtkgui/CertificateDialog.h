@@ -40,7 +40,7 @@ class CertificateDialog : public SigC::Object {
 		void setCertChain( MRef<certificate_chain *> chain );
 		void setRootCa( MRef<ca_db *> caDb );
 
-		void show();
+		void run();
 
 	private:
 
