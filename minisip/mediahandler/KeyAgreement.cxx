@@ -248,7 +248,7 @@ string Session::responderParse(){
 				ts.save( MIKEY_PARSE_START );
 #endif
 
-				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP), false );
+				addStreamsToKa( false );
 				responseMessage = initMessage->buildResponse((KeyAgreementDH *)*ka);
 #ifndef _MSC_VER
 				ts.save( MIKEY_PARSE_END );
@@ -259,7 +259,7 @@ string Session::responderParse(){
 				ts.save( MIKEY_PARSE_START );
 #endif
 				
-				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP), false );
+				addStreamsToKa( false );
 
 				responseMessage = initMessage->buildResponse((KeyAgreementPSK *)*ka);
 #ifndef _MSC_VER
@@ -341,7 +341,7 @@ string Session::initiatorCreate(){
 				if( !ka ){
 					ka = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 				}
-				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
+				addStreamsToKa();
 #ifndef _MSC_VER
 				ts.save( DH_PRECOMPUTE_END );
 #endif
@@ -355,7 +355,7 @@ string Session::initiatorCreate(){
 				ts.save( DH_PRECOMPUTE_START );
 #endif
 				ka = new KeyAgreementPSK( securityConfig.psk, securityConfig.psk_length );
-				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
+				addStreamsToKa();
 #ifndef _MSC_VER
 				ts.save( DH_PRECOMPUTE_END );
 #endif
@@ -604,7 +604,7 @@ string Session::initiatorParse(){
 
 }
 
-void Session::addStreamsToKa(uint8_t policyNo, bool initiating){
+void Session::addStreamsToKa( bool initiating ){
 	list< MRef<MediaStream *> >::iterator iSender;
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_SRTP_ID);
 	uint8_t j = 1;
@@ -613,6 +613,7 @@ void Session::addStreamsToKa(uint8_t policyNo, bool initiating){
 	     iSender ++, j++ ){
 
 		if( initiating ){ 
+			uint8_t policyNo = ka->setdefaultPolicy( MIKEY_PROTO_SRTP );
 			ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/, 
 					policyNo );
 			/* Placeholder for the receiver to place his SSRC */
@@ -620,8 +621,8 @@ void Session::addStreamsToKa(uint8_t policyNo, bool initiating){
 					policyNo );
 		}
 		else{
-			ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/,
-					policyNo, 2*j /*CsId*/ );
+			ka->setSrtpStreamSsrc( (*iSender)->getSsrc(), 2*j );
+			ka->setSrtpStreamRoc ( 0, 2*j );
 		}
 
 	}
