@@ -22,23 +22,31 @@
 */
 
 #include<config.h>
-#include<Resampler.h>
+#include"FloatResampler.h"
 #include<iostream>
 
 
-Resampler::Resampler(){
-	src_data = NULL;
-	src_state = NULL;
-}
-
-Resampler::Resampler( uint32_t inputFreq, uint32_t outputFreq, 
+FloatResampler::FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 
 		      uint32_t duration, uint32_t nChannels ){
 
-	initResampler( inputFreq, outputFreq, duration, nChannels );
+	src_data = new SRC_DATA();
+	src_data->input_frames  = inputFreq * duration / 1000;
+        src_data->output_frames = outputFreq * duration / 1000;
+
+        inputLength  = src_data->input_frames  * nChannels;
+        outputLength = src_data->output_frames * nChannels;
+
+        src_data->src_ratio = (float)outputFreq / inputFreq;
+	cerr << "FloatResampler ratio set to " << src_data->src_ratio << endl;
+
+        src_data->data_in  = new float[inputLength];
+        src_data->data_out = new float[outputLength];
+
+        src_state=src_new( 2, nChannels, &error );
 
 }
 
-Resampler::~Resampler(){
+FloatResampler::~FloatResampler(){
 	if( src_data ){
 		delete [] src_data->data_in;
 		delete [] src_data->data_out;
@@ -50,26 +58,7 @@ Resampler::~Resampler(){
 	}
 }
 
-void Resampler::initResampler( uint32_t inputFreq, uint32_t outputFreq, 
-		               uint32_t duration, uint32_t nChannels ){
-
-	src_data = new SRC_DATA();
-	src_data->input_frames  = inputFreq * duration / 1000;
-        src_data->output_frames = outputFreq * duration / 1000;
-
-        inputLength  = src_data->input_frames  * nChannels;
-        outputLength = src_data->output_frames * nChannels;
-
-        src_data->src_ratio = (float)outputFreq / inputFreq;
-	cerr << "Resampler ratio set to " << src_data->src_ratio << endl;
-
-        src_data->data_in  = new float[inputLength];
-        src_data->data_out = new float[outputLength];
-
-        src_state=src_new( 2, nChannels, &error );
-}
-
-void Resampler::resample( short * input, short * output ){
+void FloatResampler::resample( short * input, short * output ){
 	if( src_data && src_state ){
 		src_short_to_float_array( input, src_data->data_in, inputLength );
 		src_process(src_state,src_data);

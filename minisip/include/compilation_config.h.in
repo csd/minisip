@@ -12,6 +12,9 @@
 /* Use DirectSound sound driver */
 #undef DSOUND
 
+/* Use the advanced floating point based resampler */
+#undef FLOAT_RESAMPLER
+
 /* Use the GTK GUI */
 #undef GTK_GUI
 

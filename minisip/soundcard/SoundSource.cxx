@@ -44,6 +44,10 @@ void SoundSource::setPos(int32_t position){
 	this->position=position;
 }
 
+void SoundSource::resample( short * input, short * output ){
+	resampler->resample( input, output );
+}
+
 
 BasicSoundSource::BasicSoundSource(int32_t id,
                                    SoundIOPLCInterface *plc,
@@ -66,7 +70,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
         numSources=nSources;
         sampRate=sRate;
 	
-	initResampler( 8000, 44100, 20, 2 );
+	resampler = Resampler::create( 8000, 44100, 20, 2 );
 
         /* spatial audio initialization */
         leftch = new short[950];

@@ -120,11 +120,12 @@ dnl Check for libsamplerate
 AC_CHECK_HEADER([samplerate.h], 
 	[
 		AC_CHECK_LIB([samplerate], [main],
-			[LIBS="-lsamplerate ${LIBS}"],
-			[AC_MSG_ERROR([Could not find the samplerate library. Please install the corresponding package.])])
-	], 
-	[AC_MSG_ERROR([Could not find samplerate.h. Please install the libsamplerate development package])]
+			[LIBS="-lsamplerate ${LIBS}"
+			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])])
+			 FLOAT_RESAMPLER="yes"
+	]
 )
+AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
 
 dnl #############
 dnl IPSEC SUPPORT

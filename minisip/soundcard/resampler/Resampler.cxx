@@ -14,58 +14,29 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
+#include<config.h>
+#include"Resampler.h"
+#include"SimpleResampler.h"
 
-#ifndef SPATIAL_AUDIO_H
-#define SPATIAL_AUDIO_H
-
-#include<libmutil/MemObject.h>
-
-#ifdef _MSC_VER
-#ifndef int32_t
-typedef __int32  int32_t;
+#ifdef FLOAT_RESAMPLER
+#include"FloatResampler.h"
 #endif
+
+#include<iostream>
+
+MRef<Resampler *> Resampler::create( uint32_t inputFreq, uint32_t outputFreq,
+		                     uint32_t duration, uint32_t nChannels ){
+
+#if defined FLOAT_RESAMPLER && not defined IPAQ
+	return new FloatResampler( inputFreq, outputFreq, duration, nChannels );
 #else
-#include<stdint.h>
+	return new SimpleResampler( inputFreq, outputFreq, duration, nChannels );
 #endif
-
-#define POS 5
-#define MAXSOURCES 10
-
-class SoundSource;
-
-class SpAudio{
-
- public:
-
-  SpAudio(int32_t numPos);
-  
-
-  int32_t getNumPos();
-
-  int32_t spatialize (short *input,
-
-		      MRef<SoundSource *> src,
-		      short *outbuff);
-
-
-  int32_t assignPos(int row,
-		    int col);
-
-  static int32_t lchdelay[POS];
-  static int32_t rchdelay[POS];
-
-  static int32_t assmatrix[MAXSOURCES][MAXSOURCES];
-
- private:
-
-  int32_t nPos;
- 
-};
-
-#endif
+}

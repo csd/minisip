@@ -25,12 +25,11 @@
 #ifndef SOUND_SOURCE_H
 #define SOUND_SOURCE_H
 
-#include<samplerate.h>
 #include"SoundIOPLCInterface.h"
-#include"Resampler.h"
+#include"resampler/Resampler.h"
 
 
-class SoundSource : public MObject, public Resampler{
+class SoundSource : public MObject{
         public:
                 SoundSource(int id);
                 virtual ~SoundSource(){};
@@ -87,10 +86,13 @@ class SoundSource : public MObject, public Resampler{
                 int32_t getPointer();
 
                 void setPointer(int32_t wpointer);
+
+		void resample( short * input, short * output );
         private:
                 int sourceId;
 
         protected:
+		MRef<Resampler *> resampler;
                 int32_t position;
                 double sampRate;
                 short *leftch;

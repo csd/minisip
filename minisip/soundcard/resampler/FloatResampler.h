@@ -21,24 +21,20 @@
  *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
-#ifndef RESAMPLER_H
-#define RESAMPLER_H
+#ifndef FLOAT_RESAMPLER_H
+#define FLOAT_RESAMPLER_H
 
+#include"Resampler.h"
 #include<samplerate.h>
 
-class Resampler {
+class FloatResampler : public Resampler {
 	public: 
-		void resample( short * input, short * output );
+		virtual void resample( short * input, short * output );
 	protected:
-		Resampler();
-		Resampler( uint32_t inputFreq, uint32_t outputFreq, 
-			   uint32_t duration, uint32_t nChannels );
+		FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 
+			        uint32_t duration, uint32_t nChannels );
 
-		~Resampler();
-
-		void initResampler( uint32_t inputFreq, uint32_t outputFreq,
-		                    uint32_t duration, uint32_t nChannels );
-
+		~FloatResampler();
 
 	private:
 		uint32_t inputLength;
@@ -50,6 +46,7 @@ class Resampler {
 		int error;
 
 };
+
 
 #endif
 

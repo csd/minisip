@@ -22,7 +22,6 @@
 
 
 #include<config.h>
-#include<samplerate.h> //include this in the installation instructions
 #include <assert.h>
 #include <iostream>
 #include "SpAudio.h"

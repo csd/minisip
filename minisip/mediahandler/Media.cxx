@@ -118,7 +118,7 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 //#ifdef IPAQ
 //	iIPAQ = 0;
 //#endif
-	initResampler( 44100, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
+	resampler = Resampler::create( 44100, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
 }
 
 string AudioMedia::getSdpMediaType(){
@@ -226,7 +226,7 @@ void AudioMedia::srcb_handleSound( void * data ){
 			
 #endif
 //	cerr << "Before resample: " << print_hex( (unsigned char*)data, 882 ) << endl;
-	resample( (short *)data, resampledData );
+	resampler->resample( (short *)data, resampledData );
 //	cerr << "After resample: " << print_hex( (unsigned char *)resampledData, 160 ) << endl;
 	
 	((AudioCodec *)*codec)->encode( resampledData, ((AudioCodec*)*codec)->getInputNrSamples()*sizeof(short), encoded );
