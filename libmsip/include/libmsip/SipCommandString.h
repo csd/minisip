@@ -77,6 +77,7 @@ class SipCommandString{
 
 		static const string start_presence;
 		static const string stop_presence;
+		static const string presence_update;
 		
 };
 

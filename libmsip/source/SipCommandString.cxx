@@ -70,4 +70,5 @@ const string SipCommandString::outgoing_im="outgoing_im";
 
 const string SipCommandString::start_presence="start_presence";
 const string SipCommandString::stop_presence="stop_presence";
+const string SipCommandString::presence_update="presence_update";
 
