@@ -55,7 +55,7 @@ typedef struct MImage{
 	int linesize[4];
 	uint32_t ssrc;       
 	uint32_t chroma;
-	uint32_t mTime;      /* TimeStamp in µsec */
+	uint64_t mTime;      /* TimeStamp in msec */
 	void * privateData;  /* Can be used by the ImageHandlers */
 } MImage;
 
