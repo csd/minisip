@@ -94,11 +94,6 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 		if (add){
 			addHeader(header);
 		}
-
-		MRef<SipHeaderValueReferTo *> val = new SipHeaderValueReferTo();
-		val->setUri(referredUri);
-		header = new SipHeader( *val );
-		addHeader(header);
 	}
 
 	/* Add the CSeq: header */
