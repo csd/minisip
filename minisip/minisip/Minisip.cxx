@@ -38,6 +38,9 @@
 
 #include<libmsip/SipUtils.h>
 #include<exception>
+#include<libmutil/TextUI.h>
+
+extern TextUI *debugtextui;
 
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
@@ -157,7 +160,10 @@ Minisip::Minisip( int argc, char**argv ){
 #endif
 
 #ifdef TEXT_UI
-        gui = new MinisipTextUI();
+        /*gui = */debugtextui = new MinisipTextUI();
+	gui = dynamic_cast<Gui*>(debugtextui);
+	assert(gui);
+	//debugtextui = gui;
         LogEntry::handler = NULL;
 #else //!TEXT_UI
 #ifdef GTK_GUI
@@ -320,6 +326,13 @@ void Minisip::run(){
 //		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
 //		gui->handleCommand(pupd);
 
+#ifdef TEXT_UI
+		if (debugtextui){
+			debugtextui->displayMessage("");
+			debugtextui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
+			debugtextui->displayMessage("");
+		}
+#endif
                 sip->run();
 
 

@@ -74,7 +74,6 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     
     state="IDLE";
     setPrompt("IDLE");
-    
 }
 
 void MinisipTextUI::run(){
