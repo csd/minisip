@@ -68,7 +68,7 @@ class SipMessageTransport : public virtual MObject{
 				string branch
 				);
 			
-		void addSocket(StreamSocket* sock);
+		void addSocket(MRef<StreamSocket *> sock);
 
 		string getLocalIP(){return localIP;};
 
@@ -80,18 +80,20 @@ class SipMessageTransport : public virtual MObject{
 		MRef<certificate *> getCertificate(){ return cert; };
 #endif
 
-		void streamSocketRead( StreamSocket * socket );
+		//void streamSocketRead( MRef<StreamSocket *> socket );
 		void udpSocketRead();
-		void threadPool();
+		//void threadPool();
 
 	private:
-		void addViaHeader( MRef<SipMessage*> pack, StreamSocket * socket, string branch );
-		StreamSocket * findStreamSocket(IPAddress&, uint16_t);
+		void addViaHeader( MRef<SipMessage*> pack, MRef<StreamSocket *> socket, string branch );
+		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
 		
 		UDPSocket udpsock;
-		list<StreamSocket *> socks;
                 
-                Mutex socks_lock;
+                Mutex socksLock;
+		list<MRef<StreamSocket *> > socks;
+                Mutex socksPendingLock;
+		list<MRef<StreamSocket *> > socksPending;
 
 		string localIP;
 		string contactIP;
@@ -111,6 +113,8 @@ class SipMessageTransport : public virtual MObject{
 //		MRef<SipMessageReceiver*> messageReceiver;
 
                 Semaphore semaphore;
+
+		friend class StreamThreadData;
 
 };
 

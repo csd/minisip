@@ -28,20 +28,6 @@
 
 #include<config.h>
 
-#if 0
-#ifdef LINUX
-#include<netinet/in.h>
-#include<sys/socket.h>
-#endif
-
-#ifdef WIN32
-#include<winsock2.h>
-#endif
-
-#endif
-
-//#include<sys/poll.h>
-//#include<sys/types.h>
 #include<errno.h>
 #include<stdio.h>
 
@@ -64,11 +50,127 @@
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 
-//#include<libmsip/dialogs/DefaultCallHandler.h>
 
 #define TIMEOUT 600000
 #define NB_THREADS 5
+#define BUFFER_UNIT 1024
 
+class SipMessageParser{
+	public:
+		SipMessageParser();
+		~SipMessageParser();
+
+		MRef<SipMessage *> feed( uint8_t data );
+	private:
+		void expandBuffer();
+		uint32_t findContentLength();
+		uint8_t * buffer;
+		uint32_t length;
+		uint32_t index;
+		uint8_t state;
+		uint32_t contentIndex;
+		uint32_t contentLength;
+};
+
+SipMessageParser::SipMessageParser(){
+	buffer = (uint8_t *)malloc( BUFFER_UNIT * sizeof( uint8_t ) );
+	length = BUFFER_UNIT;
+	index = 0;
+	contentIndex = 0;
+	state = 0;
+
+}
+
+SipMessageParser::~SipMessageParser(){
+	free( buffer );
+}
+
+MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
+	char data = (char)udata;
+	if( index >= length ){
+		expandBuffer();
+	}
+
+	buffer[index++] = udata;
+
+	switch( state ){
+		case 0:
+			if( data == '\n' )
+				state = 1;
+			break;
+		case 1:
+			if( data == '\n' ){
+				/* Reached the end of the Header */
+				state = 2;
+				contentLength = findContentLength();
+				if( contentLength == 0 ){
+					string messageString( (char *)buffer, index );
+					realloc( buffer, BUFFER_UNIT );
+					state = 0;
+					index = 0;
+					return SipMessage::createMessage( messageString );
+				}
+				contentIndex = 0;
+			}
+			else if( data != '\r' )
+				state = 0;
+			break;
+		case 2:
+			if( ++contentIndex == contentLength ){
+				string messageString( (char*)buffer, index );
+				realloc( buffer, BUFFER_UNIT );
+				state = 0;
+				index = 0;
+				contentIndex = 0;
+				return SipMessage::createMessage( messageString );
+			}
+	}
+	return NULL;
+}
+
+
+void SipMessageParser::expandBuffer(){
+	buffer = (uint8_t *)realloc( buffer, BUFFER_UNIT * ( length / BUFFER_UNIT + 1 ) );
+	length += BUFFER_UNIT;
+}
+
+uint32_t SipMessageParser::findContentLength(){
+	uint32_t i = 0;
+	const char * contentLengthString = "\nContentLength: ";
+
+	for( i = 0; i + 16 < index; i++ ){
+		if( strncasecmp( contentLengthString, (char *)(buffer + i) , 16  ) == 0 ){
+			uint32_t j = 0;
+			string num;
+			
+			while( i + j < index && (buffer[i+j] == ' ' || buffer[i+j] == '\t') ){
+				j++;
+			}
+			
+			for( ; i + 16 + j < index ; j++ ){
+				if( buffer[i+j+16] >= '0' && buffer[i+j+16] <= '9' ){
+					num += buffer[i+j+16];
+				}
+				else break;
+			}
+			return atoi( num.c_str() );
+		}
+	}
+	return 0;
+}
+
+class StreamThreadData{
+	public:
+		StreamThreadData( MRef<SipMessageTransport *> );
+		SipMessageParser parser;
+		MRef<SipMessageTransport  *> transport;
+		void run();
+		void streamSocketRead( MRef<StreamSocket *> socket );
+};
+
+StreamThreadData::StreamThreadData( MRef<SipMessageTransport *> transport){
+	this->transport = transport;
+}
 
 bool sipdebug_print_packets=false;
 #ifdef DEBUG_OUTPUT
@@ -98,10 +200,8 @@ void printMessage(string header, string packet){
 }
 #endif
 
-
 static void * udpThread( void * arg );
 static void * streamThread( void * arg );
-static MRef<SipMessage*> checkType(string data);
 
 SipMessageTransport::SipMessageTransport(
                         string local_ip, 
@@ -138,7 +238,7 @@ SipMessageTransport::SipMessageTransport(
         Thread::createThread(udpThread, this);
 	
 	for( i=0; i < NB_THREADS ; i++ ){
-            Thread::createThread(streamThread, this);
+            Thread::createThread(streamThread, new StreamThreadData(this));
 	}
 }
 
@@ -147,7 +247,7 @@ void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> re
 }
 
 void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
-		                        StreamSocket * socket,
+		                        MRef<StreamSocket *> socket,
 					string branch ){
 	string transport;
 	uint16_t port;
@@ -181,12 +281,12 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				     string branch
 				     )
 {
-	StreamSocket * socket;
+	MRef<StreamSocket *> socket;
 
 	try{
 		socket = findStreamSocket(ip_addr, port);
 
-		if( socket == NULL && preferredTransport != "UDP" ){
+		if( socket.isNull() && preferredTransport != "UDP" ){
 			/* No existing StreamSocket to that host,
 			 * create one */
 
@@ -203,14 +303,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				addSocket( socket );
 			}
 			
-			if( pack->getType() != SipResponse::type ){
-				MRef<SipHeaderValue*> hval = 
-					new SipHeaderValueVia(preferredTransport, localIP, localTCPPort, branch);
-				
-				MRef<SipHeader*> hdr = new SipHeader(hval);
-				
-				pack->addHeader(hdr);
-			}
 		}
 
 		addViaHeader( pack, socket, branch );
@@ -259,24 +351,27 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 	
 }
 
-void SipMessageTransport::addSocket(StreamSocket * sock){
-	socks_lock.lock();
+void SipMessageTransport::addSocket(MRef<StreamSocket *> sock){
+	socksLock.lock();
 	this->socks.push_back(sock);
-	socks_lock.unlock();
+	socksLock.unlock();
+	socksPendingLock.lock();
+	this->socksPending.push_back(sock);
+	socksPendingLock.unlock();
         semaphore.inc();
 }
 
-StreamSocket * SipMessageTransport::findStreamSocket( IPAddress & address, uint16_t port ){
-	list<StreamSocket *>::iterator i;
+MRef<StreamSocket *> SipMessageTransport::findStreamSocket( IPAddress & address, uint16_t port ){
+	list<MRef<StreamSocket *> >::iterator i;
 
-	socks_lock.lock();
+	socksLock.lock();
 	for( i=socks.begin(); i != socks.end(); i++ ){
 		if( (*i)->matchesPeer(address, port) ){
-			socks_lock.unlock();
+			socksLock.unlock();
 			return *i;
 		}
 	}
-	socks_lock.unlock();
+	socksLock.unlock();
 	return NULL;
 }
 
@@ -322,7 +417,7 @@ void SipMessageTransport::udpSocketRead(){
 #ifdef DEBUG_OUTPUT
 				printMessage("IN (UDP)", data);
 #endif
-				pack = checkType( data );
+				pack = SipMessage::createMessage( data );
 				
 ///				pack->setSocket( NULL );
 
@@ -361,26 +456,29 @@ void SipMessageTransport::udpSocketRead(){
 	}// while true
 }
 
-void SipMessageTransport::threadPool(){
+void StreamThreadData::run(){
 	while(true){
 
-		StreamSocket * socket;
-                semaphore.dec();
+		MRef<StreamSocket *> socket;
+                transport->semaphore.dec();
                 
-                socks_lock.lock();
+		/* Take the last socket pending to be read */
+                transport->socksPendingLock.lock();
+		socket = transport->socksPending.front();
+		transport->socksPending.pop_front();
+		transport->socksPendingLock.unlock();
                 
-		socket = socks.front();
-		socks.pop_front();
-		
-		socks_lock.unlock();
-                
+		/* Read from it until it gets closed */
 		streamSocketRead( socket );
 
-		delete socket;
+		/* The socket was closed */
+		transport->socksLock.lock();
+		transport->socks.remove( socket );
+		transport->socksLock.unlock();
 	}
 }
 
-void SipMessageTransport::streamSocketRead( StreamSocket * socket ){
+void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	char buffer[16384];
 	int avail;
 	//struct pollfd p[1];
@@ -389,32 +487,30 @@ void SipMessageTransport::streamSocketRead( StreamSocket * socket ){
 	pack.setUser("SipMessageTransport::streamSocketRead:pack");
 #endif
 	int32_t nread;
-    fd_set set;
-    struct timeval tv;
-    tv.tv_sec = 600;
-    tv.tv_usec = 0;
+	fd_set set;
+	struct timeval tv;
+	tv.tv_sec = 600;
+	tv.tv_usec = 0;
 
 	
 	while( true ){
-        FD_ZERO(&set);
-        FD_SET(udpsock.getFd(), &set);
-		//p[0].fd = socket->getFd();
-		//p[0].events = POLLIN;
+		FD_ZERO(&set);
+		FD_SET(socket->getFd(), &set);
 
 		do{
-			//avail = poll( p, 1, TIMEOUT );
-            avail = select(1,&set,NULL,NULL,&tv );
+			avail = select(socket->getFd()+1,&set,NULL,NULL,&tv );
 		} while( avail <= 0 );
 
 		if( avail == 0 ){
 #ifdef DEBUG_OUTPUT
-			merr << "Closing Stream socket due to inactivity" << end;
+			mdbg << "Closing Stream socket due to inactivity" << end;
 #endif
 			break;
 		}
 
 		//if( p[0].revents != 0 ){
-		if( FD_ISSET( udpsock.getFd(), &set )){
+		if( FD_ISSET( socket->getFd(), &set )){
+			cerr << "Before read" << endl;
 			nread = socket->read( buffer, 16384 );
 
 			if (nread == -1){
@@ -427,41 +523,38 @@ void SipMessageTransport::streamSocketRead( StreamSocket * socket ){
 				break;
 			}
 
+			cerr << "Got data on stream socket" << endl;
+
 			ts.save( PACKET_IN );
 			socket->received += string( buffer, nread );
 
 			try{
-				while( true ){
-					
-					if( socket->received.length() > 0 ){
-						pack = checkType( socket->received );
-					}
-					else{
-						break;
-					}
-///					pack->setSocket( socket );
+				uint32_t i;
+				for( i = 0; i < nread; i++ ){
+					pack = parser.feed( buffer[i] );
+					if( pack ){
+						printMessage("IN (STREAM)", buffer);
+						//					dialogContainer->enqueueMessage( pack );
 
-#ifdef DEBUG_OUTPUT
-					printMessage("IN (STREAM)", buffer);
-#endif
-//					dialogContainer->enqueueMessage( pack );
-
-					SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
-					if (!commandReceiver.isNull())
-						commandReceiver->handleCommand( cmd );
-					else
-						merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
+						if (!transport->commandReceiver.isNull())
+							transport->commandReceiver->handleCommand( cmd );
+						else
+							merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+					}
 
 				}
 			}
 			
 			catch(SipExceptionInvalidMessage * exc){
+#if 0
 				// Check that we received data
 				// is not too big, in which case close
 				// the socket, to avoid DoS
 				if(socket->received.size() > 8192){
 					break;
 				}
+#endif
 				delete exc;
 				/* Probably we don't have enough data
 				 * so go back to reading */
@@ -479,52 +572,10 @@ void SipMessageTransport::streamSocketRead( StreamSocket * socket ){
 	}// while true
 }
 
-
-
-
-	
-
-
-static MRef<SipMessage*> checkType(string data){
-
-	int n = data.size();
-
-	if (n>3   &&    (data[0]=='S'||data[0]=='s') && 
-			(data[1]=='I'||data[1]=='i') && 
-			(data[2]=='P'||data[2]=='p' )){
-		return MRef<SipMessage*>(new SipResponse(data));
-	}else{
-		if (n> 7 && data.substr(0, 7) == "MESSAGE"){
-			return MRef<SipMessage*>(new SipIMMessage(data));
-		}
-		if (n> 6 && data.substr(0, 6) == "CANCEL"){
-			return MRef<SipMessage*>(new SipCancel(data));
-		}
-		if (n> 3 && data.substr(0, 3)=="BYE"){
-			return MRef<SipMessage*>(new SipBye(data));
-		}
-		if (n> 6 && data.substr(0, 6)=="INVITE"){
-			return MRef<SipMessage*>(new SipInvite(data));
-		}
-		if (n> 3 && data.substr(0, 3)=="ACK"){
-			return MRef<SipMessage*>(new SipAck(data));
-		}
-		if (n> 9 && data.substr(0, 9)=="SUBSCRIBE"){
-			return MRef<SipMessage*>(new SipSubscribe(data));
-		}
-		if (n> 6 && data.substr(0, 6)=="NOTIFY"){
-			return MRef<SipMessage*>(new SipNotify(data));
-		}
-
-		throw new SipExceptionInvalidStart;
-	}
-	return NULL;
-}
-
 static void * streamThread( void * arg ){
-	MRef<SipMessageTransport*>  trans((SipMessageTransport *)arg);
+	StreamThreadData * data((StreamThreadData *)arg);
 
-	trans->threadPool();
+	data->run();
 	return NULL;
 }
 
