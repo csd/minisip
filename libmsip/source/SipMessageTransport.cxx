@@ -61,6 +61,7 @@ class SipMessageParser{
 		~SipMessageParser();
 
 		MRef<SipMessage *> feed( uint8_t data );
+		void init();
 	private:
 		void expandBuffer();
 		uint32_t findContentLength();
@@ -79,6 +80,14 @@ SipMessageParser::SipMessageParser(){
 	contentIndex = 0;
 	state = 0;
 
+}
+
+void SipMessageParser::init(){
+	realloc( buffer, BUFFER_UNIT );
+	length = BUFFER_UNIT;
+	state = 0;
+	index = 0;
+	contentIndex = 0;
 }
 
 SipMessageParser::~SipMessageParser(){
@@ -105,9 +114,7 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				contentLength = findContentLength();
 				if( contentLength == 0 ){
 					string messageString( (char *)buffer, index );
-					realloc( buffer, BUFFER_UNIT );
-					state = 0;
-					index = 0;
+					init();
 					return SipMessage::createMessage( messageString );
 				}
 				contentIndex = 0;
@@ -118,10 +125,7 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 		case 2:
 			if( ++contentIndex == contentLength ){
 				string messageString( (char*)buffer, index );
-				realloc( buffer, BUFFER_UNIT );
-				state = 0;
-				index = 0;
-				contentIndex = 0;
+				init();
 				return SipMessage::createMessage( messageString );
 			}
 	}
@@ -210,28 +214,22 @@ SipMessageTransport::SipMessageTransport(
 //                        MRef<SipDialogContainer*> dContainer, 
                         int32_t externalContactUdpPort, 
                         int32_t local_udp_port, 
-                        int32_t local_tcp_port 
-#ifndef NO_SECURITY
-                        ,int32_t local_tls_port,
+                        int32_t local_tcp_port,
+                        int32_t local_tls_port,
 			MRef<certificate *> cert, 
                         MRef<ca_db *> cert_db
-#endif
-			):/*MObject("SipMessageTransport"),*/
-//                                        commandReceiver(NULL), 
+			):
                                         udpsock(false,local_udp_port),
                                         localIP(local_ip),
                                         contactIP(contactIP),
 					preferredTransport(preferredTransport),
                                         externalContactUdpPort(externalContactUdpPort),
                                         localUDPPort(local_udp_port),
-                                        localTCPPort(local_tcp_port)
-#ifndef NO_SECURITY
-					, localTLSPort(local_tls_port),
-//                                        dialogContainer(dContainer), //FIXME: Bug in older versions when not using security
+                                        localTCPPort(local_tcp_port),
+					localTLSPort(local_tls_port),
                                         cert(cert), 
                                         cert_db(cert_db),
                                         tls_ctx(NULL)
-#endif
 							
 {
 	int i;
@@ -475,13 +473,17 @@ void StreamThreadData::run(){
 		transport->socksLock.lock();
 		transport->socks.remove( socket );
 		transport->socksLock.unlock();
+#ifdef DEBUG_OUTPUT
+		mdbg << "StreamSocket closed" << end;
+#endif
+
+		parser.init();
 	}
 }
 
 void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	char buffer[16384];
 	int avail;
-	//struct pollfd p[1];
 	MRef<SipMessage*> pack;
 #ifdef MINISIP_MEMDEBUG
 	pack.setUser("SipMessageTransport::streamSocketRead:pack");
@@ -508,9 +510,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			break;
 		}
 
-		//if( p[0].revents != 0 ){
 		if( FD_ISSET( socket->getFd(), &set )){
-			cerr << "Before read" << endl;
 			nread = socket->read( buffer, 16384 );
 
 			if (nread == -1){
@@ -522,8 +522,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// Connection was closed
 				break;
 			}
-
-			cerr << "Got data on stream socket" << endl;
 
 			ts.save( PACKET_IN );
 			socket->received += string( buffer, nread );
@@ -580,9 +578,7 @@ static void * streamThread( void * arg ){
 }
 
 static void * udpThread( void * arg ){
-//	mout << "ALIVE: udpThread started... casting arg"<<end;
 	MRef<SipMessageTransport*>  trans( (SipMessageTransport *)arg);
-//	mout << "udpThread: done casting arg"<<end;
 
 	trans->udpSocketRead();
 	return NULL;
