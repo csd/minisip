@@ -61,7 +61,7 @@ IP4Address::IP4Address(struct sockaddr_in *sin){
 	setAddressFamily(AF_INET);
 	setProtocolFamily(PF_INET);
 	
-	unsigned char *ip_bytes = (unsigned char *)&sin->sin_addr;
+//	unsigned char *ip_bytes = (unsigned char *)&sin->sin_addr;
 	
 	//bcopy((char *)&sockaddress, (char *)sin, sizeof(struct sockaddr_in));
 	//bcopy((char *)num_ip, (char *)&sin->sin_addr, 4);
@@ -127,7 +127,7 @@ IP4Address::IP4Address(string addr){
 	sockaddress->sin_family=AF_INET;
 	memcpy(&(sockaddress->sin_addr), ip, sizeof(ip_data));
 	sockaddress->sin_port=0;
-	unsigned char *ip_bytes = (unsigned char *)ip;
+//	unsigned char *ip_bytes = (unsigned char *)ip;
 }
 
  struct sockaddr * IP4Address::getSockaddrptr(int32_t port){

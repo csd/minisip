@@ -83,6 +83,7 @@ string TLSConnectFailed::errorDescription(){
 		case SSL_ERROR_SSL:
 			return string( "SSL Error: Error in the SSL protocol" );
 	}
+	return "";
 }
 #endif
 
