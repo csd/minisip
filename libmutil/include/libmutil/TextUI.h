@@ -55,6 +55,7 @@ public:
 
 
 	TextUI();
+	virtual ~TextUI(){};
 
 	virtual void guiExecute(string cmd)=0;
 	

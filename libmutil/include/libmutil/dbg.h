@@ -48,8 +48,8 @@ class Dbg{
 	void setEnabled(bool enabled);
 	bool getEnabled();
     private:
-	bool enabled;
 	bool error_out;
+	bool enabled;
 	std::string str;
 };
 

@@ -108,6 +108,7 @@ static void *LinuxStaticThreadStarter(void *arg){
 	return NULL;
 }
 
+/*
 static void *LinuxStaticThreadStarter(void *obj, void *arg){
 //	printf("LinuxStaticThreadStarter: thread created");
 	void* (*f)(void*);
@@ -117,7 +118,7 @@ static void *LinuxStaticThreadStarter(void *obj, void *arg){
 //	printf("LinuxStaticThreadStarter: thread terminated");
 	return NULL;
 }
-
+*/
 #endif
 
 Thread::Thread(Runnable *runnable){

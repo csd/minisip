@@ -51,6 +51,7 @@ Mutex::Mutex()/*:locked(false)*/{
 
 Mutex& Mutex::operator=(const Mutex &m){
 	//Do not copy the Mutex reference - keep our own.
+	return *this;
 }
 
 Mutex::Mutex(const Mutex &m){

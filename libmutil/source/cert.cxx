@@ -215,7 +215,7 @@ string certificate::get_name(){
 
 string certificate::get_cn(){
 	string name = get_name();
-	int pos, pos2;
+	unsigned pos, pos2;
 
 	pos = name.find( "/CN=" );
 
@@ -237,7 +237,7 @@ string certificate::get_issuer(){
 
 string certificate::get_issuer_cn(){
 	string name = get_issuer();
-	int pos, pos2;
+	unsigned pos, pos2;
 
 	pos = name.find( "/CN=" );
 

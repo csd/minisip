@@ -103,7 +103,7 @@ class Timestamp{
 		std::string writeElapsedTime(std::string descr);
 
 	private:
-		int32_t index;
+		uint32_t index;
 		
 	//	struct timeval * tv;
 		struct timezone * tz;

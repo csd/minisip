@@ -100,6 +100,7 @@ Dbg &Dbg::operator<<(DbgEndl &endl){
 		std::cout << std::endl;
 #endif
 
+	return *this;
 }
 
 Dbg& Dbg::operator<<(int i){

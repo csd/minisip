@@ -113,7 +113,7 @@ void TextUI::displayMessage(string msg, int style){
 //	    cout << "will loop for "<< input.size()+prompt.size()-msg.size()+1 << endl;
 //	    cout << "input.size="<< input.size() << " prompt.size=" << prompt.size()<< endl;
 //	    cout << "prompt is <"<< prompt << ">"<< endl;
-	    for (int i=0; i< input.size()+promptText.size()+2-msg.size(); i++){
+	    for (unsigned i=0; i< input.size()+promptText.size()+2-msg.size(); i++){
 		    cout << ' ';
 	    }
     }
@@ -128,7 +128,7 @@ void TextUI::guimain(){
 	while (1){
 		char c;
 #ifdef LINUX
-		int n = read(STDIN_FILENO, &c, 1);
+		/*int n =*/ read(STDIN_FILENO, &c, 1);
 #endif
 #ifdef WIN32
 		c= _getch();
@@ -166,7 +166,7 @@ void TextUI::guimain(){
 			input = input.substr(0, input.size()-1);
 			cout << (char)13<<promptText<< "$ ";
 
-			for (int i=0; i< input.size()+1; i++)
+			for (unsigned i=0; i< input.size()+1; i++)
 				cout << ' ';
 			cout << (char)13<<promptText<<"$ ";
 			cout << termCodes[bold]<< input << termCodes[plain] << flush;
@@ -259,7 +259,7 @@ string TextUI::displaySuggestions(string hint){
 	//callback plus the ones matching from "command")
 	
 	bool cont = true;
-	int index = hint.size();
+	unsigned index = hint.size();
 	while (cont){
 		char c=0;
 		for (int i=0; i< cbSuggest.size(); i++){

@@ -282,6 +282,7 @@ class minilist{
 				last = tmp;
 				l2cur = l2cur->getNext();
 			}
+			return *this;
 		}
 
 		
