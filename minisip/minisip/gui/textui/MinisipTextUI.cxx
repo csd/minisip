@@ -458,54 +458,54 @@ void MinisipTextUI::showTimeouts(string command){
 }
 
 
-void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
+void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header){
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		config->timeoutProvider->getTimeoutRequests();
+			config->timeoutProvider->getTimeoutRequests();
 
 	if (usesStateMachine){
-		displayMessage(/*string("    (")+itoa(ii)+") " +*/ d->getName() + "   State: " + d->getCurrentStateName());
+		displayMessage(header + d->getName() + "   State: " + d->getCurrentStateName());
 	}else{
-		displayMessage( d->getName());
+		displayMessage(header + d->getName());
 	}
-	displayMessage("        Timeouts:", bold);
-//	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
+//	displayMessage("        Timeouts:", bold);
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
 	for (uint32_t j=0; j< torequests.size(); j++,jj++){
 		if ( *d == *((*jj).get_subscriber()) ){
 			int ms= (*jj).get_ms_to_timeout();
-			displayMessage("            timeout: "+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-//			cerr << string("            timeout: ")+ (*jj).get_command()
-//				+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
+			string theader = ntimeouts==0?"        Timeouts: ": "                  ";
+			displayMessage(theader+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
 			ntimeouts++;
 		}
 	}
 	if (ntimeouts==0){
-		displayMessage("            (no timeouts)");
+		displayMessage("        (no timeouts)");
 	}
 
 
-	displayMessage( "        Transactions:", bold);
+//	displayMessage( "        Transactions:", bold);
 	list<MRef<SipTransaction*> > transactions = d->getTransactions();
 	if (transactions.size()==0)
-		displayMessage("            (no transactions)");
+		displayMessage("        (no transactions)");
 	else{
 		int n=0;
 		for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
 				i!=transactions.end(); i++){
 			
-			displayMessage( string("            (")+itoa(n)+") "+ (*i)->getName() + "   State: " + (*i)->getCurrentStateName());
+			string header =  n==0 ? "        Transactions: " : "                      " ;
+			displayMessage(header +  string("(")+itoa(n)+") "+ (*i)->getName() + "   State: " + (*i)->getCurrentStateName());
 			n++;
 
-			displayMessage("                Timeouts:", bold);
+//			displayMessage("                Timeouts:", bold);
 
 			int ntimeouts=0;
 			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
 			for (uint32_t j=0; j< torequests.size(); j++, jj++){
 				if ( *((*i)) == *((*jj).get_subscriber()) ){
 					int ms= (*jj).get_ms_to_timeout();
-					displayMessage(string("                        timeout: ")
+					string header = ntimeouts==0?"            Timeouts: " : "                      ";
+					displayMessage(header + string("      timeout: ")
 						+ (*jj).get_command()
 						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
 					ntimeouts++;
@@ -527,77 +527,17 @@ void MinisipTextUI::showStat(string command){
 
 	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->timeoutProvider->getTimeoutRequests();
 
-	displayMessage(" Default dialog handler:", bold);
-	showDialogInfo(config->sip->getDialogContainer()->getDefaultHandler(), false);
-	
+//	displayMessage(" Default dialog handler:", bold);
+	showDialogInfo(config->sip->getDialogContainer()->getDefaultHandler(), false, "  Default dialog handler: ");
+
 	displayMessage(" Calls:", bold);
 	if (calls.size()==0)
 		displayMessage("    (no calls)");
 	else{
-		//        for (int i=0; i<calls->getSize(); i++){
 		int ii=0;
 		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!= calls.end(); i++, ii++){
-			displayMessage(string("    (")+itoa(ii)+") ");
-			showDialogInfo(*i,true);
-#if 0
-			displayMessage(string("    (")+itoa(ii)+") "
-					//            displayMessage(string("    ")
-				+ (*i)->getName() 
-				+ "   State: "
-				+ (*i)->getCurrentStateName());
-
-
-					displayMessage("        Timeouts:", bold);
-					int ntimeouts=0;
-					std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-					for (int j=0; j< torequests.size(); j++,jj++){
-					if ( *(*i) == *(*jj).get_subscriber() ){
-					int ms= (*jj).get_ms_to_timeout();
-					displayMessage(string("            timeout: ")+ (*jj).get_command()
-						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-					ntimeouts++;
-					}
-					}
-					if (ntimeouts==0){
-					displayMessage(       "            (no timeouts)");
-					}
-
-
-
-					displayMessage("        Transactions:", bold);
-					list<MRef<SipTransaction*> > transactions = (*i)->getTransactions();
-					if (transactions.size()==0)
-						displayMessage("            (no transactions)");
-					else{
-						int n=0;
-                for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-                        i!=transactions.end(); i++){
-                    displayMessage(string("            (")+itoa(n)+") "+
-                            (*i)->getName() 
-                            + "   State: "
-                            + (*i)->getCurrentStateName());
-                    n++;
-
-                    displayMessage("                Timeouts:", bold);
-                    
-                    int ntimeouts=0;
-                    std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-                    for (int j=0; j< torequests.size(); j++, jj++){
-                        if ( (*(*i)) == *(*jj).get_subscriber() ){
-                            int ms= (*jj).get_ms_to_timeout();
-                            displayMessage(string("                        timeout: ")
-                                        + (*jj).get_command()
-                                        + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) );
-                            ntimeouts++;
-                        }
-                    }
-                    if (ntimeouts==0)
-                        displayMessage(       "                        (no timeouts)");
-                }
-            }
-
-#endif
-        }
+			showDialogInfo(*i,true, string("    (")+itoa(ii)+") ");
+		}
 	}
 
 }
@@ -679,14 +619,10 @@ void MinisipTextUI::keyPressed(int key){
 	case '+':
 		showStat("");
 		break;
-
 	}
-
-
 }
 
 void MinisipTextUI::guiExecute(string cmd){
-
 	string command = trim(cmd);
 	string regproxy;
 	bool handled = false;

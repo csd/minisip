@@ -266,14 +266,14 @@ void Minisip::run(){
 
                         }
                 }
-
-/*		cerr << "Minisip: starting presence client for someone@ssvl.kth.se"<< endl;
-		
+/*
+		mdbg << "Starting presence server"<< end;
 		CommandString subscribeserver("", SipCommandString::start_presence_server);
 		SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
 		sip->handleCommand(sipcmdss);
+*/
 
-
+/*		cerr << "Minisip: starting presence client for someone@ssvl.kth.se"<< endl;
 		
 		CommandString subscribe("", SipCommandString::start_presence_client,"erik_kphone@ssvl.kth.se");
 		SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);

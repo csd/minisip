@@ -60,7 +60,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
         void showStat(string);
         void showTransactions(string);
         void showTimeouts(string);
-	void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine);
+	void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header);
 
         string input;
         string callId;
