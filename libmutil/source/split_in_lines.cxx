@@ -37,7 +37,7 @@
 
 using namespace std;
 
-std::vector<string> split(string s, bool do_trim, char delim, bool includeEmpty){
+LIBMUTIL_API std::vector<string> split(string s, bool do_trim, char delim, bool includeEmpty){
 	std::vector<string> ret;
 	unsigned i=0;
 	do{
@@ -65,7 +65,7 @@ std::vector<string> split(string s, bool do_trim, char delim, bool includeEmpty)
  *   1.3 move past new line chars
  *
  * */
-std::vector<string> split_in_lines(string s, bool do_trim){
+LIBMUTIL_API std::vector<string> split_in_lines(string s, bool do_trim){
 	std::vector<string> ret;
 	unsigned i=0;
 	do{

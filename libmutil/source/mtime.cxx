@@ -22,8 +22,9 @@
 */
 
 
-
+#include<libmutil/mtime.h>
 #include<config.h>
+
 
 #if defined WIN32 || defined _MSC_VER
 #include <sys/timeb.h>
@@ -32,7 +33,9 @@
 #include<time.h>
 #endif
 
-uint64_t mtime(){
+
+
+LIBMUTIL_API uint64_t mtime(){
 #if defined WIN32 || defined _MSC_VER
 	struct _timeb tb;
 	_ftime (&tb);

@@ -28,10 +28,21 @@
 
 //#include<stdint.h>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
 #include<string>
 
-std::string base64_encode( unsigned char *, int );
-unsigned char * base64_decode( std::string, int * );
-unsigned char * base64_decode( unsigned char *, int, int * );
+LIBMUTIL_API std::string base64_encode( unsigned char *, int );
+LIBMUTIL_API unsigned char * base64_decode( std::string, int * );
+LIBMUTIL_API unsigned char * base64_decode( unsigned char *, int, int * );
 
 #endif

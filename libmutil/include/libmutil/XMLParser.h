@@ -45,6 +45,16 @@
 
 using namespace std;
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
 /*
 In the following example "name" is a attribute and FILE is an element
    
@@ -60,7 +70,7 @@ In the following example "name" is a attribute and FILE is an element
 */
 
 
-class XMLElementNotFound{
+class LIBMUTIL_API XMLElementNotFound{
 	public:
 		XMLElementNotFound(string msg){this->msg=msg;};
 		string what(){return msg;};
@@ -68,15 +78,15 @@ class XMLElementNotFound{
 		string msg;
 };
 
-class XMLParserCallback{
+class LIBMUTIL_API XMLParserCallback{
 	public:
 		virtual bool parsedElement(string path, string enclosedText)=0;
 		virtual bool parsedAttribute(string path, string value)=0;
 };
 
-class XMLNode;
+class LIBMUTIL_API XMLNode;
 
-class XMLParser{
+class LIBMUTIL_API XMLParser{
 	public:
 		XMLParser(XMLParserCallback *cb=NULL);
 		~XMLParser();
@@ -102,7 +112,7 @@ class XMLParser{
 		XMLNode *root;
 };
 
-class XMLFileParser : public XMLParser{
+class LIBMUTIL_API XMLFileParser : public XMLParser{
 	public:
 		XMLFileParser(string filename="", XMLParserCallback *cb=NULL);
 		void saveToFile(string file="");
@@ -110,12 +120,12 @@ class XMLFileParser : public XMLParser{
 		string filename;
 };
 
-class XMLstringParser : public XMLParser{
+class LIBMUTIL_API XMLstringParser : public XMLParser{
 	public: 
 		XMLstringParser(const string &s, XMLParserCallback *cb=NULL);
 };
 
-class XMLNode{
+class LIBMUTIL_API XMLNode{
 	public:
 		XMLNode(int32_t type, string name, string value="");
 		virtual ~XMLNode();
@@ -148,7 +158,7 @@ class XMLNode{
 };
 
 
-class XMLAttribute : public XMLNode {
+class LIBMUTIL_API XMLAttribute : public XMLNode {
 	public:
 		XMLAttribute(string name, string value);
 		~XMLAttribute();
@@ -158,7 +168,7 @@ class XMLAttribute : public XMLNode {
 	private:
 };
 
-class XMLElement : public XMLNode {
+class LIBMUTIL_API XMLElement : public XMLNode {
 	public:
 		XMLElement(string name);
 		~XMLElement();

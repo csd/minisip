@@ -27,10 +27,11 @@
 
 #include<config.h>
 
-#include<iostream>
 using namespace std;
 
-string base64_encode( unsigned char * input, int length )
+#include<iostream>
+
+LIBMUTIL_API string base64_encode( unsigned char * input, int length )
 {
 	int counter = 0;
 	int i;
@@ -69,7 +70,7 @@ string base64_encode( unsigned char * input, int length )
 	return "";
 }
 
-unsigned char *  base64_decode( string input, int * output_length )
+LIBMUTIL_API unsigned char *  base64_decode( string input, int * output_length )
 {
 	string input_cpy = input;
 	size_t pos;
@@ -211,7 +212,7 @@ unsigned char *  base64_decode( string input, int * output_length )
 	return NULL;
 }
 
-unsigned char * base64_decode( unsigned char * input, int input_length,
+LIBMUTIL_API unsigned char * base64_decode( unsigned char * input, int input_length,
 		   int * output_length ){
 	string s( (char *)input, input_length );
 

@@ -25,6 +25,17 @@
 #ifndef _TEXTUI_H
 #define _TEXTUI_H
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
 
@@ -35,7 +46,7 @@
  * 
 */
 
-class TextUICompletionCallback{
+class LIBMUTIL_API TextUICompletionCallback{
 public:
 	virtual minilist<string> textuiCompletionSuggestion(string match)=0;
 	
@@ -47,7 +58,7 @@ struct completion_cb_item{
 	
 };
 
-class TextUI{
+class LIBMUTIL_API TextUI{
 public:
 	static const int plain;
 	static const int bold;

@@ -44,7 +44,17 @@
 */
 #include<string>
 
-std::string trim(std::string s);
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+LIBMUTIL_API std::string trim(std::string s);
 
 
 #endif //TRIM_H

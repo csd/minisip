@@ -53,6 +53,8 @@
 //#define SM_DEBUG_COMMAND
 #undef SM_DEBUG_COMMAND
 
+
+
 using namespace std;
 
 template<class CommandType, class TimeoutType> class StateTransition;
@@ -135,7 +137,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 //int StateMachine<CommandType, TimeoutType>::sm_counter=0;
 
 template<class CommandType, class TimeoutType>
-class State{
+class DLL_DECL State{
 	public:
 		State(StateMachine<CommandType,TimeoutType> *stateMachine, 
 				const string &name):
@@ -186,7 +188,7 @@ class State{
 
 
 template<class CommandType, class TimeoutType>
-class StateTransition{
+class DLL_DECL StateTransition{
 	public:
 
 /*

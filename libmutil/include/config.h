@@ -28,6 +28,10 @@
 #ifdef _MSC_VER
 #define WIN32
 
+#ifndef LIBMUTIL_EXPORTS
+#error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMUTIL_EXPORTS not defined).
+#endif
+
 #ifndef uint8_t
 typedef unsigned char  uint8_t;
 #endif

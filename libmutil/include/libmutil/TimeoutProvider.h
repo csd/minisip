@@ -45,6 +45,16 @@
 */
 #include<list>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
 /*
 #ifdef HAVE_SIGNAL_H
 #include <sys/types.h>
@@ -85,7 +95,7 @@
  * @author Erik Eliasson
 */
 template<class TOCommand, class TOSubscriber>
-class TPRequest{
+class LIBMUTIL_API TPRequest{
 	public:
 		TPRequest(){}
 		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){

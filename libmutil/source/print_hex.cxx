@@ -28,7 +28,7 @@
 
 using namespace std;
 
-string print_hex( unsigned char * data, int length ){
+LIBMUTIL_API string print_hex( unsigned char * data, int length ){
 	
 	string result = "";
 	char hex_number[3];

@@ -25,7 +25,18 @@
 #ifndef _MUTEX_H
 #define _MUTEX_H
 
-class Mutex{
+
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+class LIBMUTIL_API Mutex{
 public:
 	Mutex();
 	~Mutex();

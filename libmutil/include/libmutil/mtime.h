@@ -32,7 +32,16 @@
 #include<stdint.h>
 #endif
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
 
-uint64_t mtime();
+LIBMUTIL_API uint64_t mtime();
 
 #endif

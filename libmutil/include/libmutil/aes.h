@@ -35,6 +35,15 @@
 #include"rijndael-alg-fst.h"
 #endif
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
 
 #include <stdlib.h>
 
@@ -45,6 +54,7 @@
 // <paulo.barreto@terra.com.br> implementation instead, 
 // to avoid the requirement for libssl 0.9.7
 #define NB_ROUND 10 /* 128 bits keys */
+
 struct AES_KEY_s{
 	unsigned int key[4*(NB_ROUND+1)];
 };
@@ -52,7 +62,7 @@ struct AES_KEY_s{
 typedef AES_KEY_s AES_KEY;
 #endif
 
-class AES{
+class LIBMUTIL_API AES{
 	public:
 		AES();
 		AES( unsigned char * key, int key_length );

@@ -39,7 +39,7 @@ using namespace std;
 
 
 
-string trim(string line){
+LIBMUTIL_API string trim(string line){
 	while (line.length()>0 && isspace(line[0]))
 		line = line.substr(1, line.length()-1);
 	while (line.length()>0 && isspace(line[line.length()-1]))

@@ -50,11 +50,20 @@
 #include<libmutil/dbg.h>
 #include<libmutil/Mutex.h>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
 
 class MObject;
 
 template<class OPType>
-class MRef{
+class LIBMUTIL_API MRef{
 	public:
 		MRef(){
 			objp=NULL;
@@ -179,7 +188,10 @@ class MRef{
 /**
  * used for Memory Handling.
  */
-class MObject{
+
+
+
+class LIBMUTIL_API MObject{
 	public:
 	
 		/**

@@ -38,7 +38,7 @@
 #endif
 
 
-
+#include<assert.h>
 #include<stdio.h>
 
 using namespace std;
@@ -172,6 +172,7 @@ Thread::Thread(Runnable *runnable){
 int Thread::createThread(void f()){
 #ifdef WIN32
 	HANDLE threadHandle;
+	assert(sizeof(threadHandle)==4);
 	DWORD id;
 	LPVOID fptr;
 	fptr = (void*)f;

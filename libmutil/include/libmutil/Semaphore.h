@@ -33,7 +33,17 @@
 #ifndef _MINISIPSEMAPHORE_H
 #define _MINISIPSEMAPHORE_H
 
-class Semaphore{
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+class LIBMUTIL_API Semaphore{
     public:
         Semaphore();
         ~Semaphore();

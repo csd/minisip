@@ -32,9 +32,20 @@
 #define MINILIST_FORWARD_ITERATOR_OPTIMIZE 1
 //#undef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
 //Node for single linked list
 template<class T>
-class node{
+class LIBMUTIL_API node{
 	public:
 		node(T v, node *next=NULL):value(v), next(next){}
 		node *getNext(){return next;}
@@ -48,7 +59,7 @@ class node{
 };
 
 template<class T>
-class minilist{
+class LIBMUTIL_API minilist{
 	public:
 		
 		minilist():head(NULL),end(NULL),nelem(0)

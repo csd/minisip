@@ -43,14 +43,24 @@ extern "C"{
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
 
 class certificate;
+
 
 #define CERT_DB_ITEM_TYPE_OTHER  0
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
 
-class ca_db_item{
+class LIBMUTIL_API ca_db_item{
 	public:
 		std::string item;
 		int type;
@@ -61,7 +71,7 @@ class ca_db_item{
 };
 
 
-class ca_db: public MObject{
+class LIBMUTIL_API ca_db: public MObject{
 	public:
 		ca_db();
 		~ca_db();
@@ -92,7 +102,7 @@ class ca_db: public MObject{
 		
 };
 
-class certificate: public MObject{
+class LIBMUTIL_API certificate: public MObject{
 	public:
 		certificate();
 		certificate( X509 * openssl_cert );
@@ -132,7 +142,7 @@ class certificate: public MObject{
 		std::string pk_file;
 };
 
-class certificate_chain: public MObject{
+class LIBMUTIL_API certificate_chain: public MObject{
 	public:
 		certificate_chain();
 		certificate_chain( MRef<certificate *> cert );
@@ -164,7 +174,7 @@ class certificate_chain: public MObject{
                 Mutex mLock;
 };
 
-class certificate_exception{
+class LIBMUTIL_API certificate_exception{
 	public:
 		certificate_exception(){};
 		certificate_exception( std::string message ):message(message){};
@@ -174,22 +184,22 @@ class certificate_exception{
 		std::string message;
 };
 
-class certificate_exception_file : public certificate_exception{
+class LIBMUTIL_API certificate_exception_file : public certificate_exception{
 	public:
 		certificate_exception_file( std::string message ):certificate_exception(message){};
 };
 
-class certificate_exception_init : public certificate_exception{
+class LIBMUTIL_API certificate_exception_init : public certificate_exception{
 	public:
 		certificate_exception_init( std::string message ):certificate_exception(message){};
 };
 
-class certificate_exception_pkey : public certificate_exception{
+class LIBMUTIL_API certificate_exception_pkey : public certificate_exception{
 	public:
 		certificate_exception_pkey( std::string message ):certificate_exception(message){};
 };
 
-class certificate_exception_chain : public certificate_exception{
+class LIBMUTIL_API certificate_exception_chain : public certificate_exception{
 	public:
 		certificate_exception_chain( std::string message ):certificate_exception(message){};
 };

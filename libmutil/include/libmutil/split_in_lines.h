@@ -36,11 +36,22 @@
 #include<vector>
 #include<string>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
 using namespace std;
 
-std::vector<string> split(string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
+LIBMUTIL_API std::vector<string> split(string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
 
-std::vector<string> split_in_lines(string s, bool do_trim = true);
+LIBMUTIL_API std::vector<string> split_in_lines(string s, bool do_trim = true);
 
 
 #endif

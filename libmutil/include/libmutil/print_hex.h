@@ -27,8 +27,20 @@
 
 #include<string>
 
+
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
 using namespace std;
 
-string print_hex( unsigned char * data, int length );
+LIBMUTIL_API string print_hex( unsigned char * data, int length );
 
 #endif

@@ -30,7 +30,17 @@
 #define DBG_INFO 0
 #define DBG_ERROR 1
 
-class DbgEndl{
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+class LIBMUTIL_API DbgEndl{
     public:
         DbgEndl(){}
     private:
@@ -38,7 +48,7 @@ class DbgEndl{
 };
 
 
-class Dbg{
+class LIBMUTIL_API Dbg{
     public:
         static const DbgEndl endl;
 	Dbg(bool error_output=false, bool enabled=true);
@@ -55,10 +65,10 @@ class Dbg{
 	std::string str;
 };
 
-extern Dbg mout;
-extern Dbg merr;
-extern Dbg mdbg;
-extern DbgEndl end;
+extern LIBMUTIL_API Dbg mout;
+extern LIBMUTIL_API Dbg merr;
+extern LIBMUTIL_API Dbg mdbg;
+extern LIBMUTIL_API DbgEndl end;
 
 
 #endif

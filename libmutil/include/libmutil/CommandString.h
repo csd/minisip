@@ -29,9 +29,19 @@
 #include<string>
 #include<map>
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
 using namespace std;
 
-class CommandString : public MObject{
+class LIBMUTIL_API CommandString : public MObject{
 	public:
 		CommandString(const string destination_id, 
 				const string operation, 
@@ -71,7 +81,7 @@ class CommandString : public MObject{
 		map<string, string> keys;
 };
 
-class CommandStringReceiver{
+class LIBMUTIL_API CommandStringReceiver{
 	public:
 		virtual void handleCommand(const CommandString &)=0;
 };

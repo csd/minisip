@@ -3,9 +3,8 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="libmutil"
-	ProjectGUID="{931478F1-1560-4069-9497-0920CACA227C}"
-	RootNamespace="libmutil"
-	Keyword="MFCDLLProj">
+	ProjectGUID="{7073ADA7-F39C-4DFF-A559-2E4B9A026BD2}"
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
@@ -16,17 +15,15 @@
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="2"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="include;X:\erik\openssl\inc32"
-				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
+				AdditionalIncludeDirectories="include;..\openssl\inc32"
+				PreprocessorDefinitions="_DLL;LIBMUTIL_EXPORTS;_WIN32_WINNT=0x0500"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="TRUE"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -35,18 +32,17 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="kernel32.lib Ws2_32.lib "
 				OutputFile="$(OutDir)/libmutil.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="X:\erik\openssl\out32dll"
-				ModuleDefinitionFile=".\libmutil.def"
+				AdditionalLibraryDirectories="..\openssl\out32dll"
 				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/libmutil.pdb"
 				SubSystem="2"
 				ImportLibrary="$(OutDir)/libmutil.lib"
 				TargetMachine="1"/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -54,10 +50,7 @@
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1053"
-				AdditionalIncludeDirectories="$(IntDir);$(IntDir)/include"/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -74,14 +67,12 @@
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="2"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="include;X:\erik\openssl\inc32"
-				PreprocessorDefinitions="_WIN32_WINNT=0x0500"
-				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="TRUE"
+				AdditionalIncludeDirectories="include;..\openssl\inc32"
+				PreprocessorDefinitions="_DLL;LIBMUTIL_EXPORTS;_WIN32_WINNT=0x0500"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -92,8 +83,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libmutil.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="X:\erik\openssl\out32dll"
-				ModuleDefinitionFile=".\libmutil.def"
+				AdditionalLibraryDirectories="..\openssl\out32dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -101,9 +91,7 @@
 				ImportLibrary="$(OutDir)/libmutil.lib"
 				TargetMachine="1"/>
 			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="FALSE"/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -111,10 +99,7 @@
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1053"
-				AdditionalIncludeDirectories="$(IntDir);$(IntDir)/include"/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -160,9 +145,6 @@
 			</File>
 			<File
 				RelativePath=".\libmutil.cpp">
-			</File>
-			<File
-				RelativePath=".\libmutil.def">
 			</File>
 			<File
 				RelativePath=".\source\MemObject.cxx">
@@ -269,9 +251,6 @@
 				RelativePath=".\include\libmutil\print_hex.h">
 			</File>
 			<File
-				RelativePath=".\Resource.h">
-			</File>
-			<File
 				RelativePath=".\include\libmutil\rijndael-alg-fst.h">
 			</File>
 			<File
@@ -316,20 +295,17 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath=".\libmutil.rc">
+				RelativePath="..\openssl\out32dll\libeay32.lib">
 			</File>
 			<File
-				RelativePath=".\res\libmutil.rc2">
+				RelativePath="..\openssl\out32dll\ssleay32.lib">
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\openssl\out32dll\libeay32.lib">
+			RelativePath="..\..\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib\msvcrtd.lib">
 		</File>
 		<File
 			RelativePath=".\ReadMe.txt">
-		</File>
-		<File
-			RelativePath="..\openssl\out32dll\ssleay32.lib">
 		</File>
 	</Files>
 	<Globals>

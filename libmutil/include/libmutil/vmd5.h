@@ -26,6 +26,15 @@ static const char* const vmd5HeaderVersion =
  * Still in the public domain.
  */
 
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -41,10 +50,10 @@ extern "C"
         unsigned int in[16];
     };
 
-    void MD5Init(struct MD5Context *context);
-    void MD5Update(struct MD5Context *context, md5byte const *buf, unsigned len);
-    void MD5Final(unsigned char digest[16], struct MD5Context *context);
-    void MD5Transform(unsigned int buf[4], unsigned int const in[16]);
+    LIBMUTIL_API void MD5Init(struct MD5Context *context);
+    LIBMUTIL_API void MD5Update(struct MD5Context *context, md5byte const *buf, unsigned len);
+    LIBMUTIL_API void MD5Final(unsigned char digest[16], struct MD5Context *context);
+    LIBMUTIL_API void MD5Transform(unsigned int buf[4], unsigned int const in[16]);
 
 #ifdef __cplusplus
 }

@@ -37,7 +37,20 @@
 #include<string>
 using namespace std;
 
-string itoa(int i);
+#ifdef _MSC_VER
+#ifdef LIBMUTIL_EXPORTS
+#define LIBMUTIL_API __declspec(dllexport)
+#else
+#define LIBMUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMUTIL_API
+#endif
+
+
+LIBMUTIL_API string itoa(int i);
+
+LIBMUTIL_API int eef(int i);
 
 
 #endif
