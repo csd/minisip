@@ -481,11 +481,11 @@ void MainWindow::removeIm( string uri ){
 
 void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
 		                     Gtk::TreeViewColumn * ){
+	phoneSelected();
 	invite();
 }
 
 void MainWindow::invite(){
-	phoneSelected();
 	string uri;
 
 	uri = uriEntry->get_text();
