@@ -46,7 +46,7 @@ class MediaHandler : public MObject{
 		void registerMedia( MRef<Media *> media );
 
 		void handleCommand( CommandString command );
-		
+		std::string getExtIP();
 		virtual std::string getMemObjectType(){return "MediaHandler";}
 	private:
 		std::list< MRef<Media *> > media;

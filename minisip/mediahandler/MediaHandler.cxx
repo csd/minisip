@@ -141,3 +141,7 @@ void MediaHandler::handleCommand( CommandString command ){
 		return;
 	}
 }
+
+std::string MediaHandler::getExtIP(){
+	ipProvider->getExternalIp();
+}

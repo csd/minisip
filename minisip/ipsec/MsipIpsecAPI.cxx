@@ -44,7 +44,7 @@ extern "C" {
 //Constructor
 MsipIpsecAPI::MsipIpsecAPI(string localIpString, SipDialogSecurityConfig &securityConfig) {
 	this->so = pfkey_open();
-	assert(this->so < 0);
+	assert(this->so >= 0);
 	this->reqid = (u_int32_t)getpid();
 	this->seq = 3;
 	this->securityConfig = securityConfig;
@@ -70,7 +70,6 @@ MsipIpsecAPI::~MsipIpsecAPI(){
 // Construct offer MIKEY
 MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 	MikeyMessage * message;
-	
 	try{
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
@@ -121,6 +120,7 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 //---------------------------------------------------------------------------------------------------//
 // Handle offered MIKEY
 bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
+	fprintf( stderr, "\nJa djävlar!!!!gång 2 !!!!!!!!!\n");
 	if( MikeyM->getContentType() == "application/mikey" && securityConfig.use_ipsec){
 		if( !responderAuthenticate( MikeyM->getString() ) ){
 			string errorString =  "Incoming key management message could not be authenticated";
@@ -360,9 +360,10 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 				(struct sockaddr *) &src, (struct sockaddr *) &dst);
 	madeREQ.push_back((MsipIpsecRequest*) sa);
 	int result = sa->set();
-	if (result = -1)
+	merr << "Result from SET: " << result << end;
+	if (result == -1)
 		return 0;
-	return (uint32_t) result;
+	return result;
 }
 
 //---------------------------------------------------------------------------------------------------//
@@ -370,6 +371,7 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 void MsipIpsecAPI::addSAToKa(uint8_t policyNo){
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_IPSEC4_ID);
 	uint32_t offerspi = getOfferSPI();
+	merr << "\nDid get this far! OfferSPI: "<< (int)offerspi  << end;
 	assert(offerspi);
 	ka->addIpsecSA( offerspi, 0, localIp, policyNo);
 	/* Placeholder for the receiver to place his SPI */
@@ -767,19 +769,24 @@ int MsipIpsecSA::set(){
 	// There might be a good idea to check the result & return values below!!!
 	if(!spi && !exist){
 		struct sadb_sa * m_sa;
+
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_getspi(so, satype, mode, src, dst, min, max, reqid, seq);
 		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
-		if (result = -1)
+		// The result value is -1 wonder why? but it works
+		if (result == -1){
+			merr << "Problem with IPSEC pfkey_send_getspi" << end;
 			return result;
+		}
 		caddr_t next[18];
 		result = pfkey_align (msg, next);
 		result = pfkey_check(next);
 		m_sa = (struct sadb_sa *)next[SADB_EXT_SA];
 		spi = (u_int32_t)ntohl(m_sa->sadb_sa_spi);
+		merr << "\nDid get this far! with SPI: " << (int)spi << end;
 		exist = true;
-		return spi;
+		return (int)spi;
 	}
 	if(spi && !exist) {
 		caddr_t keymat;

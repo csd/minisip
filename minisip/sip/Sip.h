@@ -63,6 +63,10 @@
 #include<libmsip/SipDialogContainer.h>
 #include"../sdp/SdpPacket.h"
 
+#ifdef IPSEC_SUPPORT
+#include<../ipsec/MsipIpsecAPI.h>
+#endif
+
 #include<libmsip/SipDialog.h>
 
 

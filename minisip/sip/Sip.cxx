@@ -31,6 +31,8 @@
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
 
+
+
 #include"SipSoftPhoneConfiguration.h"
 #include"SipDialogVoip.h"
 #include<libmsip/SipCommandString.h>
@@ -163,10 +165,26 @@ string Sip::invite(string &user){
 		
 	}
 
-	MRef<Session *> mediaSession = 
+
+MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
+
+#ifdef IPSEC_SUPPORT
+	MRef<MsipIpsecAPI *> ipsecSession;
+	if (!securityConfig.use_ipsec){
+		ipsecSession = new	MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
+	}
+	else{
+		ipsecSession = NULL;
+	}
+	string callID = "";
+	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	
+#else	
 	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession)); 
+
+#endif
+
 #ifdef MINISIP_MEMDEBUG 
 	voipCall.setUser("Sip");
 #endif

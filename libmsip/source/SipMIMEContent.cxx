@@ -48,7 +48,7 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentTyp) {
 	std::string boundry;
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
-	if(ContentType.substr(0,8) == "multipart"){
+	if(ContentType.substr(0,9) == "multipart"){
 		this->ContentType = ContentType.substr(0 , ContentType.find(";",0) - 1 );
 		index2 = ContentType.find("; boundary=",0);
 		assert(index2 != string::npos);
@@ -96,7 +96,8 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentTyp) {
 }
 
 std::string SipMimeContent::getString() {
-	if(ContentType.substr(0,8) == "multipart"){
+	if(ContentType.substr(0,9) == "multipart"){
+		merr << "I am where I should be!!!!" << end;
 		std::list <MRef<SipMessageContent*> >::iterator iter;
 		std::string mes;
 		if(Message != "")
@@ -110,14 +111,17 @@ std::string SipMimeContent::getString() {
 				mes = mes + (*iter)->getString() + "\r\n\r\n";
 			}
 		mes = mes + "--" + boundry + "--" + "\r\n";
+		merr << "\nReturning" << mes << end;
 		return mes;
 	}
-	else
+	else{
+		merr << "I am where I should NOT be!!!!" << end;
 		return Message;
+	}
 }
 
 std::string SipMimeContent::getContentType() {
-	if(ContentType.substr(0,8) == "multipart")
+	if(ContentType.substr(0,9) == "multipart")
 		return ContentType +"; boundary=" + boundry;
 	else
 		return ContentType;

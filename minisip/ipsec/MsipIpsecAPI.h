@@ -19,7 +19,8 @@
  * Authors:     Joachim Orrblad <joachim@orrblad.com>
  *
 */
-
+#ifndef MINISIPIPSEC_H
+#define MINISIPIPSEC_H
 
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
@@ -161,7 +162,7 @@ class MsipIpsecAPI : public MObject{
 };
 
 
-
+#endif
 
 
 

@@ -902,6 +902,7 @@ void SipDialogVoip::sendInvite(const string &branch){
 	MRef<SipMimeContent*> mikey;
 	if (ipsecSession){
 		mikey = ipsecSession->getMikeyIpsecOffer();
+		merr << "\nI should have an MikeyIPSEC offer!!\n" << end;
 		if (!mikey){
 			merr << "Mikey was NULL in sendInvite" << end;
 			return; 
