@@ -137,8 +137,7 @@ void TextUI::guimain(){
 //	UDPSocket ispaceSocket(false, 3300);
 	cout << promptText << "$ "<< flush;
 	while (1){
-		char c=' ';
-#ifdef LINUX
+		char c = ' ';
 /*		FD_ZERO(&set);
 		FD_SET(STDIN_FILENO, &set);
 		FD_SET(ispaceSocket.getFd(), &set);
@@ -153,7 +152,6 @@ void TextUI::guimain(){
                 if( FD_ISSET( STDIN_FILENO, &set )){
                         displayMessage("data on STDIN");
 */
-		read(STDIN_FILENO, &c, 1);
 /*
                 }else{
                         displayMessage("data on iSpace connection");
@@ -168,10 +166,11 @@ void TextUI::guimain(){
 			keyPressed(c);
                 }
 */
-#endif
 #if defined WIN32 || defined _MSC_VER
 		c= _getch();
 //		displayMessage(string("read: ")+c+"("+itoa((int)c)+")");
+#else
+		read(STDIN_FILENO, &c, 1);
 #endif
 		keyPressed(c);
 
