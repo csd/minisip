@@ -35,21 +35,20 @@
 class MikeySrtpCs{
         public:
                 MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc=0 );
-
                 uint8_t policyNo;
                 uint32_t ssrc;
                 uint32_t roc;
 };
 
 // CS# info for ipv4 IPSEC
-// each CS# is related to an unique combination of spi and spiaddr. 
+// each CS# is related to an unique combination of spi and spiaddresses. 
 class MikeyIPSEC4Cs{
         public:
-                MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiaddr );
-
+                MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr );
                 uint8_t policyNo;
                 uint32_t spi;
-                uint32_t spiaddr;
+                uint32_t spiDstaddr;
+		uint32_t spiSrcaddr;
 };
 
 class MikeyCsIdMap : public MObject{
@@ -90,11 +89,11 @@ class MikeyCsIdMapIPSEC4 : public MikeyCsIdMap{
                 virtual int length();
                 virtual void writeData( byte_t * start,
                                          int expectedLength );
-
-		byte_t findCsId( uint32_t spi, uint32_t spiaddr );
-		byte_t findpolicyNo( uint32_t spi, uint32_t spiaddr );
-		void addSA( uint32_t spi, uint32_t spiaddr=0,
-				byte_t policyNo=0, byte_t csId=0 );
+		MikeyIPSEC4Cs * getCsIdnumber(int number);
+		byte_t findCsId( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr );
+		byte_t findpolicyNo( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr);
+		void addSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr,
+				byte_t policyNo=0, byte_t csId = 0 );
 
         private:
 		std::list<MikeyIPSEC4Cs *> cs;

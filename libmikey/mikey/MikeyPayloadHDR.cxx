@@ -202,8 +202,8 @@ MRef<MikeyCsIdMap *> MikeyPayloadHDR::csIdMap(){
 MikeySrtpCs::MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc ):
 	policyNo( policyNo ), ssrc( ssrc ), roc( roc ){};
 //added 041201 JOOR
-MikeyIPSEC4Cs::MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiaddr ):
-	policyNo( policyNo ), spi( spi ), spiaddr( spiaddr ){};
+MikeyIPSEC4Cs::MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr ):
+	policyNo( policyNo ), spi( spi ), spiSrcaddr( spiSrcaddr ), spiDstaddr( spiDstaddr ){};
 
 MikeyCsIdMapSrtp::MikeyCsIdMapSrtp(){
 	cs = list<MikeySrtpCs *>::list();
@@ -239,27 +239,31 @@ MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
 }
 //added 041201 JOOR
 MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4( byte_t * data, int length ){
-	if( length % 9 ){
+	if( length % 13 ){
 		throw new MikeyException( 
 				"Invalid length of IPSEC4_ID map info" );
 	}
 
-	uint8_t nCs = length / 9;
+	uint8_t nCs = length / 13;
 	uint8_t i;
-	uint32_t spi, spiaddr;
+	uint32_t spi, spiSrcaddr, spiDstaddr;
 	byte_t policyNo;
 
 	for( i = 0; i < nCs; i++ ){
-		policyNo = data[ i*9 ];
-		spi = (uint32_t)data[ i*9 + 1 ] << 24 |
-		      (uint32_t)data[ i*9 + 2 ] << 16 |
-		      (uint32_t)data[ i*9 + 3 ] <<  8 |
-		      (uint32_t)data[ i*9 + 4 ];
-		spiaddr  = (uint32_t)data[ i*9 + 5 ] << 24 |
-		      (uint32_t)data[ i*9 + 6 ] << 16 |
-		      (uint32_t)data[ i*9 + 7 ] <<  8 |
-		      (uint32_t)data[ i*9 + 8 ];
-		addSA( spi, spiaddr, policyNo );
+		policyNo = data[ i*13 ];
+		spi = (uint32_t)data[ i*13 + 1 ] << 24 |
+		      (uint32_t)data[ i*13 + 2 ] << 16 |
+		      (uint32_t)data[ i*13 + 3 ] <<  8 |
+		      (uint32_t)data[ i*13 + 4 ];
+		spiSrcaddr  = (uint32_t)data[ i*13 + 5 ] << 24 |
+		      (uint32_t)data[ i*13 + 6 ] << 16 |
+		      (uint32_t)data[ i*13 + 7 ] <<  8 |
+		      (uint32_t)data[ i*13 + 8 ];
+		spiDstaddr  = (uint32_t)data[ i*13 + 9 ] << 24 |
+		      (uint32_t)data[ i*13 + 10 ] << 16 |
+		      (uint32_t)data[ i*13 + 11 ] <<  8 |
+		      (uint32_t)data[ i*13 + 12 ];
+		addSA( spi, spiSrcaddr, spiDstaddr, policyNo );
 	}
 }
 
@@ -316,12 +320,15 @@ void MikeyCsIdMapIPSEC4::writeData( byte_t * start, int expectedLength ){
 	list<MikeyIPSEC4Cs *>::iterator i;
 
 	for( i = cs.begin(); i != cs.end(); i++ ){
-		start[ 9*j ] = (*i)->policyNo & 0xFF;
+		start[ 13*j ] = (*i)->policyNo & 0xFF;
 		for( k = 0; k < 4; k++ ){
-			start[9*j+1+k] = ((*i)->spi >> 8*(3-k)) & 0xFF;
+			start[13*j+1+k] = ((*i)->spi >> 8*(3-k)) & 0xFF;
 		}
 		for( k = 0; k < 4; k++ ){
-			start[9*j+5+k] = ((*i)->spiaddr >> 8*(3-k)) & 0xFF;
+			start[13*j+5+k] = ((*i)->spiSrcaddr >> 8*(3-k)) & 0xFF;
+		}
+		for( k = 0; k < 4; k++ ){
+			start[13*j+9+k] = ((*i)->spiDstaddr >> 8*(3-k)) & 0xFF;
 		}
 		j++;
 	}
@@ -339,12 +346,12 @@ byte_t MikeyCsIdMapSrtp::findCsId( uint32_t ssrc ){
 	return 0;
 }
 //added 041201 JOOR
-byte_t MikeyCsIdMapIPSEC4::findCsId( uint32_t spi, uint32_t spiaddr ){
+byte_t MikeyCsIdMapIPSEC4::findCsId( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr ){
 	list<MikeyIPSEC4Cs *>::iterator i;
 	uint8_t j = 1;
 
 	for( i = cs.begin(); i != cs.end()  ; i++,j++ ){
-		if( (*i)->spi == spi && (*i)->spiaddr == spiaddr ){
+		if( (*i)->spi == spi && (*i)->spiSrcaddr == spiSrcaddr && (*i)->spiDstaddr == spiDstaddr){
 			return j;
 		}
 	}
@@ -360,18 +367,28 @@ byte_t MikeyCsIdMapSrtp::findpolicyNo( uint32_t ssrc ){
 	}
 	return 0;
 }
+//added 050110 JOOR
+MikeyIPSEC4Cs * MikeyCsIdMapIPSEC4::getCsIdnumber(int number){
+	list<MikeyIPSEC4Cs *>::iterator i;
+	int j = 1;
+	for( i = cs.begin(); i != cs.end()  ; i++ ){
+		if(j == number)
+			return (*i);
+	j++;
+	}
+	return NULL;
+}
 
 //added 041201 JOOR
-byte_t MikeyCsIdMapIPSEC4::findpolicyNo( uint32_t spi, uint32_t spiaddr ){
+byte_t MikeyCsIdMapIPSEC4::findpolicyNo( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr ){
 	list<MikeyIPSEC4Cs *>::iterator i;
 	for( i = cs.begin(); i != cs.end()  ; i++ ){
-		if( (*i)->spi == spi && (*i)->spiaddr == spiaddr ){
+		if( (*i)->spi == spi && (*i)->spiSrcaddr == spiSrcaddr && (*i)->spiDstaddr == spiDstaddr ){
 			return (*i)->policyNo;
 		}
 	}
 	return 0;
 }
-
 
 
 uint32_t MikeyCsIdMapSrtp::findRoc( uint32_t ssrc ){
@@ -404,9 +421,9 @@ void MikeyCsIdMapSrtp::addStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, 
 	return;
 }
 //added 041201 JOOR
-void MikeyCsIdMapIPSEC4::addSA( uint32_t spi, uint32_t spiaddr, byte_t policyNo, byte_t csId){
+void MikeyCsIdMapIPSEC4::addSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr, byte_t policyNo, byte_t csId){
 	if( csId == 0 ){
-		cs.push_back( new MikeyIPSEC4Cs( policyNo, spi, spiaddr ) );
+		cs.push_back( new MikeyIPSEC4Cs( policyNo, spi, spiSrcaddr, spiDstaddr ) );
 		return;
 	}
 
@@ -416,7 +433,8 @@ void MikeyCsIdMapIPSEC4::addSA( uint32_t spi, uint32_t spiaddr, byte_t policyNo,
 		if( j == csId ){
 			(*i)->spi = spi;
 			(*i)->policyNo = policyNo;
-			(*i)->spiaddr = spiaddr;
+			(*i)->spiSrcaddr = spiSrcaddr;
+			(*i)->spiDstaddr = spiDstaddr;
 		}
 	}
 

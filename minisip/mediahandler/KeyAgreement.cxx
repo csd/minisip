@@ -298,26 +298,22 @@ string Session::responderParse(){
 
 string Session::initiatorCreate(){
 	MikeyMessage * message;
-
+	
+	
 	try{
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
 				if( !securityConfig.cert || securityConfig.cert->is_empty() ){
 					throw new MikeyException( "No certificate provided for DH key agreement" );
 				}
-
 				ts.save( DH_PRECOMPUTE_START );
-
 				if( ka && ka->type() != KEY_AGREEMENT_TYPE_DH ){
 					ka = NULL;
 				}
-
 				if( !ka ){
 					ka = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 				}
-
 				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
-
 				ts.save( DH_PRECOMPUTE_END );
 				message = new MikeyMessage( ((KeyAgreementDH *)*ka) );
 				ts.save( MIKEY_CREATE_END );
@@ -325,7 +321,6 @@ string Session::initiatorCreate(){
 			case KEY_MGMT_METHOD_MIKEY_PSK:
 				ts.save( DH_PRECOMPUTE_START );
 				ka = new KeyAgreementPSK( securityConfig.psk, securityConfig.psk_length );
-				
 				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
 				ts.save( DH_PRECOMPUTE_END );
 				((KeyAgreementPSK *)*ka)->generateTgk();

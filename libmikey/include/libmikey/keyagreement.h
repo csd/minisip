@@ -38,6 +38,8 @@
 #define KEY_DERIV_TRANS_ENCR   2
 #define KEY_DERIV_TRANS_SALT   3
 #define KEY_DERIV_TRANS_AUTH   4
+#define KEY_DERIV_ENCR		5
+#define KEY_DERIV_AUTH		6
 
 #define KEY_AGREEMENT_TYPE_DH 	0
 #define KEY_AGREEMENT_TYPE_PSK 	1
@@ -76,7 +78,11 @@ class KeyAgreement : public MObject{
 			     byte_t * tek, unsigned int tek_length );
 		void genSalt( byte_t cs_id,
 			      byte_t * salt, unsigned int salt_length );
-
+		
+		void genEncr( byte_t cs_id,
+			      byte_t * e_key, unsigned int e_keylength );
+		void genAuth( byte_t cs_id,
+			      byte_t * a_key, unsigned int a_keylength );
 		/* CSB ID: should be random in most cases and generated
 		 * by the initiator */
 		unsigned int csbId();
@@ -88,7 +94,7 @@ class KeyAgreement : public MObject{
 		MRef<MikeyCsIdMap *> csIdMap();
 		void setCsIdMap( MRef<MikeyCsIdMap *> idMap );
 
-		/* Number of cryptosessions (updated when adding streams) */
+		/* Number of cryptosessions (updated when adding streams) (...or IPsec SA) */
 		byte_t nCs();
 		void setnCs(uint8_t value);
 
@@ -133,6 +139,10 @@ class KeyAgreement : public MObject{
 
 		virtual std::string getMemObjectType(){return "KeyAgreement";}
 
+		/* IPSEC Specific */
+		void addIpsecSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr, 
+				byte_t policyNo, byte_t csId = 0);
+		
 		/* SRTP Specific */
 
 		/* Get the CSID given the RTP SSRC */

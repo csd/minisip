@@ -116,6 +116,16 @@ AC_ARG_WITH(ffmpeg,
       fi ])
 
 dnl #############
+dnl IPSEC SUPPORT
+dnl #############
+ipsec_enable=no
+AC_ARG_ENABLE(ipsec-enable,
+    [ --enable-ipsec-enable enables ipsec features (default disabled)],
+   [ ipsec_enable=yes])
+AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
+
+
+dnl #############
 dnl VIDEO SUPPORT
 dnl #############
 AC_ARG_ENABLE(video,
@@ -189,6 +199,8 @@ AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
+
+
       
 
 dnl ALSA sound interface
@@ -368,7 +380,6 @@ fi
 
 AM_CONDITIONAL(NO_SECURITY, [test "${enable_security}" = "no"])
 
-
 dnl OPIE
 AC_ARG_ENABLE(opie,
     [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
@@ -421,6 +432,7 @@ AC_OUTPUT([codecs/Makefile
                  sip/Makefile
                  soundcard/Makefile
                  stun/Makefile
+		 ipsec/Makefile
                  sdp/Makefile
                  p2t/Makefile
 		 mediahandler/Makefile

@@ -168,6 +168,9 @@
 /* Disable MIKEY/SRTP - not recommended */
 #undef NO_SECURITY
 
+/* Use libglademm-2.0 */
+#undef OLDLIBGLADEMM
+
 /* No Kerberos in OpenSSL */
 #undef OPENSSL_NO_KRB5
 

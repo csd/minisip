@@ -144,8 +144,7 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 }
 
 bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &command)
-{
-	
+{	
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
 
 	    MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
@@ -164,7 +163,8 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 	    //		}
 
 	    return true;
-	}else{
+	}
+	else{
 	    return false;
 	}
 }
@@ -891,8 +891,10 @@ void SipDialogVoip::sendInvite(const string &branch){
 				getDialogConfig()->inherited.transport));
 
 	/* Get the session description from the Session */
+		
+//      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp = mediaSession->getSdpOffer();
-
+	
 	if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
@@ -900,9 +902,20 @@ void SipDialogVoip::sendInvite(const string &branch){
 		merr << "Sdp was NULL in sendInvite" << end;
 		return; 
 	}
-
-	/* Add the latter to the INVITE message */
+	/* Add the latter to the INVITE message */ // If it exists
 	inv->setContent( *sdp );
+//-------------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------------------------------------------------------------//
+	// Create a MIKEY message for IPSEC if stated in the config file.
+	
+//-------------------------------------------------------------------------------------------------------------//
+
+	
+//-------------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------------------------------------------------------------//
+	// If there exist a MIKEY message for IPSEC, add it.
+	// inv->addContent
+//-------------------------------------------------------------------------------------------------------------//
 	
 #ifdef MINISIP_MEMDEBUG
 	inv.setUser("SipDialogVoip");

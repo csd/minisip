@@ -216,7 +216,18 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 			label[2] = 0xAC;
 			label[3] = 0x75;
 			break;
-
+		case KEY_DERIV_ENCR:
+			label[0] = 0x15;
+			label[1] = 0x79;
+			label[2] = 0x8C;
+			label[3] = 0xEF;  
+			break;
+		case KEY_DERIV_AUTH:
+			label[0] = 0x1B;
+			label[1] = 0x5C;
+			label[2] = 0x79;
+			label[3] = 0x73;
+			break;
 	}
 	
 	label[4] = csId;
@@ -243,6 +254,18 @@ void KeyAgreement::genSalt( unsigned char csId,
 			     unsigned char * salt, unsigned int saltLength ){
 	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
 			salt, saltLength, KEY_DERIV_SALT );
+}
+
+void KeyAgreement::genEncr( unsigned char csId,
+			     unsigned char * e_key, unsigned int e_keylen ){
+	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
+			e_key, e_keylen, KEY_DERIV_ENCR );
+}
+
+void KeyAgreement::genAuth( unsigned char csId,
+			     unsigned char * a_key, unsigned int a_keylen ){
+	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
+			a_key, a_keylen, KEY_DERIV_AUTH );
 }
 
 unsigned int KeyAgreement::csbId(){
@@ -342,9 +365,19 @@ void KeyAgreement::addSrtpStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, 
 	
 	csIdMap->addStream( ssrc, roc, policyNo, csId );
 
-	if( csId == 0 ){
+	if( csId == 0 )
 		nCsValue ++;
+}
+
+void KeyAgreement::addIpsecSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr, byte_t policyNo, byte_t csId){
+	MikeyCsIdMapIPSEC4 * csIdMap = dynamic_cast<MikeyCsIdMapIPSEC4 *>( *csIdMapPtr );
+	if( csIdMap == NULL ){
+		csIdMapPtr = new MikeyCsIdMapIPSEC4();
+		csIdMap = (MikeyCsIdMapIPSEC4 *)(*csIdMapPtr);
 	}
+	csIdMap->addSA(spi, spiSrcaddr, spiDstaddr, policyNo, csId);
+	if( csId == 0 )
+		nCsValue ++;
 }
 
 void KeyAgreement::setCsIdMapType(uint8_t type){

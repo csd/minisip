@@ -42,6 +42,11 @@ if VIDEO_SUPPORT
 minisip_LDADD += ../video/libvideo.a
 AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
 endif
+
+if IPSEC_SUPPORT
+minisip_LDADD += ../ipsec/libmsipipsecapi.a
+AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
+endif
                 
 minisip_LDADD +=../rtp/librtp.a \
                 ../minisip/gui/libminisip_gui.a \
