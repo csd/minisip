@@ -63,6 +63,8 @@ class XvDisplay: public VideoDisplay{
 
 		virtual void displayImage( MImage * image );
 
+		void toggleFullscreen();
+
 		int xvPort;
 		Display * display;
 		int screen;
@@ -70,5 +72,7 @@ class XvDisplay: public VideoDisplay{
 		Window videoWindow;
 
 		GC gc;
+
+		bool fullscreen;
 
 };

@@ -31,6 +31,7 @@ XvDisplay::XvDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->width = width;
 	this->height = height;
 	xvPort = -1;
+	fullscreen = false;
 
 	//openDisplay();
 }
@@ -154,7 +155,8 @@ void XvDisplay::createWindow(){
 	windowAttributes.backing_store = Always;
 	windowAttributes.background_pixel = BlackPixel( display, screen );
 
-	windowAttributes.event_mask = ExposureMask | StructureNotifyMask;
+	windowAttributes.event_mask = ExposureMask | StructureNotifyMask|
+		                      KeyPressMask;
 
 	sizeHints.base_width = width;
 	sizeHints.base_height = height;
@@ -194,7 +196,7 @@ void XvDisplay::createWindow(){
 		}
 	} while( !( exposeSent && configureNotifySent && mapNotifySent ) );
 
-    	XSelectInput( display, baseWindow, StructureNotifyMask );
+    	XSelectInput( display, baseWindow, StructureNotifyMask | KeyPressMask );
 //                  StructureNotifyMask | KeyPressMask |
 //                  ButtonPressMask | ButtonReleaseMask |
 //                  PointerMotionMask );
@@ -293,7 +295,7 @@ void XvDisplay::handleEvents(){
 	XEvent xEvent;
 	
 	while( XCheckWindowEvent( display, baseWindow, 
-			StructureNotifyMask, &xEvent ) == True ){
+			StructureNotifyMask | KeyPressMask, &xEvent ) == True ){
 
 		if( xEvent.type == ConfigureNotify ){
 			fprintf( stderr, "Got ConfigureNotify event\n");
@@ -307,6 +309,42 @@ void XvDisplay::handleEvents(){
 					baseWindowWidth, baseWindowHeight );
 			}
 		}
+
+		else if( xEvent.type == KeyPress ){
+			fprintf( stderr, "KeyPressed event\n");
+			KeySym xKeySymbol;
+
+			xKeySymbol = XKeycodeToKeysym( display, xEvent.xkey.keycode, 0 );
+			char keyVal;// = ConvertKey( (int)xKeySymbol );
+
+			XLookupString( &xEvent.xkey, &keyVal, 1, NULL, NULL );
+
+			if( keyVal == 'f' ){
+				fprintf( stderr, "f pressed\n" );
+				toggleFullscreen();
+			}
+		}
 	}
 
+}
+
+void XvDisplay::toggleFullscreen(){
+	XClientMessageEvent event;
+
+	memset( &event, '\0', sizeof( XClientMessageEvent ) );
+
+	event.type = ClientMessage;
+	event.message_type = XInternAtom( display, "_NET_WM_STATE", False ); 
+	event.display = display;
+	event.window = baseWindow;
+	event.format = 32;
+	event.data.l[ 0 ] = (fullscreen)?0:1;
+	event.data.l[ 1 ] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN",
+			False );
+
+	XSendEvent( display, DefaultRootWindow( display ), False, 
+			SubstructureRedirectMask, (XEvent*)&event );
+
+	fullscreen = !fullscreen;
+	 
 }
