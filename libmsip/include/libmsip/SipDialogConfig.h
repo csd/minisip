@@ -228,7 +228,7 @@ class SipDialogConfig : public MObject{
 		MRef<SipInvite*> last_invite;
 
 		void useIdentity( MRef<SipIdentity*> identity,
-				//bool useSecurity,
+				bool useSecurity,
 				string transport="UDP");
 
 

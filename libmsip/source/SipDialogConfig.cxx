@@ -163,7 +163,7 @@ void SipDialogConfig::useIdentity(
 //			string user, 
 //			string proxyUsername, 
 //			string proxyPassword,
-			///bool useSecurity,
+			bool useSecurity,
 			string transport)
 {
 //	inherited.proxyAddr = phoneconf->pstnProxy;
