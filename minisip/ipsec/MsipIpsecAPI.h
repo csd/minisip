@@ -129,6 +129,9 @@ class MsipIpsecAPI : public MObject{
 		//Write SA and policy to kernel -1 == error
 		int start();
 
+		bool required();
+		bool offered;
+
 	private:
 
 

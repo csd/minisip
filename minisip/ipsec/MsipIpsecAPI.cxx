@@ -54,6 +54,7 @@ MsipIpsecAPI::MsipIpsecAPI(string localIpString, SipDialogSecurityConfig &securi
 	seq = 3;
 	securityConfig = securityConf;
 	ka = NULL;
+	offered = false;
 	localIp = inet_addr(localIpString.c_str());
 }
 //Destructor
@@ -125,7 +126,8 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 //---------------------------------------------------------------------------------------------------//
 // Handle offered MIKEY
 bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
-	if( MikeyM->getContentType() == "application/mikey" && securityConfig.use_ipsec){
+	securityConfig.use_ipsec = true;
+	if( MikeyM->getContentType() == "application/mikey"){
 		if( !responderAuthenticate( MikeyM->getString() ) ){
 			string errorString =  "Incoming key management message could not be authenticated";
 			if( ka ){
@@ -156,6 +158,7 @@ bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		return false;
 	}
+	offered = true;
 	return true;
 }
 
@@ -233,7 +236,6 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 				cerr << " I returned NULL, not good!" << flush << endl;
 				return NULL;
 			}
-			cerr <<  "getMikeyIpsecAnswer 3 " << flush << endl;
 			return new SipMimeContent("application/mikey", responseMessage->b64Message(),"");
 		}
 	}
@@ -321,8 +323,10 @@ bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 		((KeyAgreementDH *)*ka)->computeTgk();
 	}
 	if(initMSipIpsec())
-		if (start() == 0)
+		if (start() == 0){
+			offered = true;
 			return true;
+		}
 	return false;
 }
 
@@ -336,6 +340,8 @@ int MsipIpsecAPI::stop(){
 			if((*iter)->remove(false) == -1)
 				notgood = -1;
 	}
+	// This is a work around due to unsoled issues when deleting IPSEC policys in the kernel. 
+	// It should not be needed, and can cause problems if more than one IPSEC call exist
 	if(notgood == -1){
 		int result = pfkey_send_spdflush(so);
 	}
@@ -353,6 +359,11 @@ int MsipIpsecAPI::start(){
 		}
 	}
 	return 0;
+}
+
+//---------------------------------------------------------------------------------------------------//
+bool MsipIpsecAPI::required(){
+	return securityConfig.use_ipsec;
 }
 
 //---------------------------------------------------------------------------------------------------//
@@ -405,7 +416,6 @@ bool MsipIpsecAPI::initMSipIpsec(){
 		struct sockaddr_in src, dst;
 		struct in_addr addr;
 		int nCs = (int) ka->nCs();
-		cerr <<  "#Cs: " << nCs << flush << endl;
 		for(int i = 0 ; i < nCs ; i++){
 			CsId = CsIdMap->getCsIdnumber(i+1);
 			if(!CsId){
@@ -529,7 +539,7 @@ bool MsipIpsecAPI::responderAuthenticate( string b64Message ){
 				}
 				if( !securityConfig.dh_enabled ){
 					merr << "Cannot handle DH key agreement" << end;
-					securityConfig.secured = false;
+					securityConfig.use_ipsec = false;
 					securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 					return false;
 				}
@@ -575,7 +585,7 @@ bool MsipIpsecAPI::responderAuthenticate( string b64Message ){
 				securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 				break;
 			case MIKEY_TYPE_PK_INIT:
-				securityConfig.secured = false;
+				securityConfig.use_ipsec = false;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				return false;
 			default:

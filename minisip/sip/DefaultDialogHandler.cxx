@@ -113,13 +113,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
 #ifdef IPSEC_SUPPORT
-			MRef<MsipIpsecAPI *> ipsecSession;
-			if (phoneconf->securityConfig.use_ipsec){
-				ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-			}
-			else{
-				ipsecSession = NULL;
-			}
+			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
+			
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession );
 			MRef<SipDialog*> voipCall( new SipDialogVoip(getDialogContainer(), callConf, 

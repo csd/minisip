@@ -172,13 +172,7 @@ MRef<Session *> mediaSession =
 		mediaHandler->createSession( securityConfig );
 
 #ifdef IPSEC_SUPPORT
-	MRef<MsipIpsecAPI *> ipsecSession;
-	if (securityConfig.use_ipsec){
-		ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
-	}
-	else{
-		ipsecSession = NULL;
-	}
+	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
 	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	

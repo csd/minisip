@@ -207,7 +207,11 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
-
+#ifdef IPSEC_SUPPORT
+		// Check if IPSEC was required
+		if (ipsecSession->required() && !ipsecSession->offered)
+			return false;
+#endif
 		return true;
 	}else{
 		return false;
@@ -384,12 +388,18 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
 		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
-
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
 			return false;
 		}
+#ifdef IPSEC_SUPPORT
+		// Check if IPSEC was required
+		if (ipsecSession->required() && !ipsecSession->offered){
+			cerr << "I require IPSEC or nothing at all!" << endl;
+			return false;
+		}
+#endif
 		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
 						MRef<SipDialog*>( this ), 
 						command.getCommandPacket()->getCSeq(),
@@ -604,7 +614,11 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
-
+#ifdef IPSEC_SUPPORT
+		// Check if IPSEC was required
+		if (ipsecSession->required() && !ipsecSession->offered)
+			return false;
+#endif
 		return true;
 	}else{
 		return false;
@@ -903,23 +917,26 @@ void SipDialogVoip::sendInvite(const string &branch){
 #ifdef IPSEC_SUPPORT	
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
-	if (ipsecSession){
-		mikey = ipsecSession->getMikeyIpsecOffer();
+	if (getIpsecSession()->required()){
+		mikey = ipsecSession->getMikeyIpsecAnswer();
 		if (!mikey){
-			merr << "Mikey was NULL in sendInvite" << end;
-			return; 
+			merr << "Mikey was NULL" << end;
+			merr << "Still some errors with IPSEC" << end;
+			//return; 
 		}
 	}
+	else
+		mikey = NULL;
 	MRef<SipMimeContent*> multi;
-	if (ipsecSession && mediaSession){
+	if (mikey && mediaSession){
 		multi = new SipMimeContent("multipart/mixed");
 		multi->addPart(*mikey);
 		multi->addPart(*sdp);
 		inv->setContent( *multi);
 	}
-	if (ipsecSession && !mediaSession)
+	if (mikey && !mediaSession)
 		inv->setContent( *mikey);
-	if (!ipsecSession && mediaSession)
+	if (!mikey && mediaSession)
 		inv->setContent( *sdp );
 #else
 	
@@ -1016,24 +1033,26 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 #ifdef IPSEC_SUPPORT	
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
-	
-	if (ipsecSession){
-		mikey = ipsecSession->getMikeyIpsecOffer();
+	if (getIpsecSession()->required()){
+		mikey = ipsecSession->getMikeyIpsecAnswer();
 		if (!mikey){
-			merr << "Mikey was NULL in sendInvite" << end;
-			return; 
+			merr << "Mikey was NULL" << end;
+			merr << "Still some errors with IPSEC" << end;
+			//return; 
 		}
 	}
+	else
+		mikey = NULL;
 	MRef<SipMimeContent*> multi;
-	if (ipsecSession && mediaSession){
+	if (mikey && mediaSession){
 		multi = new SipMimeContent("multipart/mixed");
 		multi->addPart(*mikey);
 		multi->addPart(*sdp);
 		inv->setContent( *multi);
 	}
-	if (ipsecSession && !mediaSession)
+	if (mikey && !mediaSession)
 		inv->setContent( *mikey);
-	if (!ipsecSession && mediaSession)
+	if (!mikey && mediaSession)
 		inv->setContent( *sdp );
 #else
 	
@@ -1187,25 +1206,26 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 #ifdef IPSEC_SUPPORT	
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
-	if (ipsecSession){
+	if (getIpsecSession()->required()){
 		mikey = ipsecSession->getMikeyIpsecAnswer();
 		if (!mikey){
 			merr << "Mikey was NULL in sendInviteOk" << end;
 			merr << "Still some errors with IPSEC" << end;
-			ipsecSession = NULL;
 			//return; 
 		}
 	}
+	else
+		mikey = NULL;
 	MRef<SipMimeContent*> multi;
-	if (ipsecSession && mediaSession){
+	if (mikey && mediaSession){
 		multi = new SipMimeContent("multipart/mixed");
 		multi->addPart(*mikey);
 		multi->addPart(*sdp);
 		ok->setContent( *multi);
 	}
-	if (ipsecSession && !mediaSession)
+	if (mikey && !mediaSession)
 		ok->setContent( *mikey);
-	if (!ipsecSession && mediaSession)
+	if (!mikey && mediaSession)
 		ok->setContent( *sdp );
 #else
 	
@@ -1374,13 +1394,12 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 				case 10:
 					if(!getIpsecSession()->setMikeyIpsecOffer((SipMimeContent*)*Offer))
 						return false;
-					break;
+					return true;
 				case 3:
 					if(!getIpsecSession()->setMikeyIpsecAnswer((SipMimeContent*)*Offer))
 						return false;
-					break;
+					return true;
 				default:
-					merr << "No IPSEC match" << end;
 					return false;
 			}
 #endif
@@ -1389,12 +1408,12 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 				case 10:
 					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
-					break;
+					return true;
 				case 3:
 					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
 					getMediaSession()->start();
-					break;
+					return true;
 				default:
 					merr << "No SDP match" << end;
 					return false;
