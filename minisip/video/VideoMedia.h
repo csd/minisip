@@ -41,6 +41,7 @@ class Grabber;
 class VideoMediaSource;
 class AVDecoder;
 class ImageMixer;
+class RtpPacket;
 
 class VideoMedia : public Media, public VideoEncoderCallback{
 
@@ -50,7 +51,7 @@ class VideoMedia : public Media, public VideoEncoderCallback{
 
                 virtual std::string getSdpMediaType();
 
-                virtual void playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts );
+                virtual void playData( RtpPacket * rtpPacket );
 
                 virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
@@ -93,8 +94,7 @@ class VideoMediaSource : public MObject {
                 void addEmptyImage( MImage * image );
                 void addFilledImage( MImage * image );
                 
-		virtual void playData( byte_t * data, uint32_t length, 
-				uint16_t seqNo, bool marker, uint32_t ts );
+		virtual void playData( RtpPacket * packet ); 
 
 		MRef<AVDecoder *> getDecoder();
 
@@ -102,6 +102,8 @@ class VideoMediaSource : public MObject {
 
 		virtual std::string getMemObjectType(){ return "VideoMediaSource"; };
 	private:
+		void addPacketToFrame( RtpPacket * packet );
+
 		MRef<AVDecoder *> decoder;
 
                 uint32_t width;
@@ -118,6 +120,8 @@ class VideoMediaSource : public MObject {
 
                 std::list<MImage *> filledImages;
                 Mutex filledImagesLock;
+
+		RtpPacket * savedPacket;
 };
 
 

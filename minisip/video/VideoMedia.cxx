@@ -79,12 +79,15 @@ void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
 
 
 
-void VideoMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts ){
+void VideoMedia::playData( RtpPacket * packet ){
 
-	MRef<VideoMediaSource *> source = getSource( ssrc );
+	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
-		source->playData( data, length, seqNo, marker, ts );
+		source->playData( packet );
+	}
+	else{
+		delete packet;
 	}
 
 }
@@ -204,6 +207,7 @@ VideoMediaSource::VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t heig
 	index = 0;
 	packetLoss = false;
 	expectedSeqNo = 0;
+	savedPacket = NULL;
 
         for( i = 0; i < SOURCE_QUEUE_SIZE ; i++ ){
                 image = new MImage();
@@ -270,25 +274,56 @@ MRef<AVDecoder *> VideoMediaSource::getDecoder(){
 	return decoder;
 }
 
-void VideoMediaSource::playData( byte_t * data, uint32_t length, uint16_t seqNo, bool marker, uint32_t ts ){
-        if( seqNo != expectedSeqNo + 1 ){
-		fprintf( stderr, "seqNo: %i\n", seqNo );
-		fprintf( stderr, "expectedseqNo: %i\n", expectedSeqNo+1 );
-                packetLoss = true;
+void VideoMediaSource::playData( RtpPacket * packet ){
+	int seqNo = packet->getHeader().getSeqNo();
+
+	if( savedPacket ){
+		if( seqNo != expectedSeqNo - 2 ){
+			packetLoss = true;
+			delete savedPacket;
+			savedPacket = NULL;
+			merr << "Packet lost in video stream, dropping one frame(seqNo == expectedSeqNo - 2)" << end;
 #ifdef DEBUG_OUTPUT
-                merr << "Packet lost in video stream, dropping one frame" << end;
+			merr << "Packet lost in video stream, dropping one frame" << end;
 #endif
+		}
+	}
+
+	else if( seqNo != expectedSeqNo ){
+		if( seqNo == expectedSeqNo + 1 ){
+			savedPacket = packet;
+        		expectedSeqNo = seqNo + 1;
+			return;
+		}
+		else{
+			packetLoss = true;
+			merr << "Packet lost in video stream, dropping one frame seqNo == expectedSeqNo + 1)" << end;
+#ifdef DEBUG_OUTPUT
+			merr << "Packet lost in video stream, dropping one frame" << end;
+#endif
+		}
         }
 
-        expectedSeqNo = seqNo;
 
+	addPacketToFrame( packet );
+	if( savedPacket ){
+        	expectedSeqNo = seqNo + 2;
+		addPacketToFrame( savedPacket );
+		savedPacket = NULL;
+	}
+	else{
+		expectedSeqNo = seqNo + 1;
+	}	
+	
+}
+
+void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
         if( !packetLoss ){
-                memcpy( frame + index, data + 4, length - 4 );
-                index += length - 4 ;
-
+                memcpy( frame + index, packet->getContent() + 4, packet->getContentLength() - 4 );
+                index += packet->getContentLength() - 4 ;
         }
 
-        if( marker ){
+        if( packet->getHeader().marker ){
                 if( ! packetLoss ){
                         /* We have a frame */
                         decoder->decodeFrame( frame, index );
@@ -296,5 +331,6 @@ void VideoMediaSource::playData( byte_t * data, uint32_t length, uint16_t seqNo,
                 index = 0;
                 packetLoss = false;
         }
-}
 
+	delete packet;
+}

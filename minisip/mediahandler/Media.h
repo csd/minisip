@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -38,6 +38,7 @@ class SoundIO;
 class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
+class RtpPacket;
 
 
 typedef uint8_t byte_t;
@@ -51,7 +52,7 @@ class Media : public MObject{
 		virtual uint8_t getRtpPayloadType();
 		virtual std::string getRtpMap();
 
-		virtual void playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts )=0;
+		virtual void playData( RtpPacket * rtpPacket )=0;
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
 		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
@@ -85,7 +86,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		virtual std::string getSdpMediaType();
 		
 
-		virtual void playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts );
+		virtual void playData( RtpPacket * rtpPacket );
 		
 		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
 		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );

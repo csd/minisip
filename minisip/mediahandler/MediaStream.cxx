@@ -246,7 +246,7 @@ void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
 
 	gotSsrc( packetSsrc );
 
-	media->playData( id, data, size, packetSsrc, seqNo, marker, ts );
+	media->playData( packet );
 }
 
 void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){

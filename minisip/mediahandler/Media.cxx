@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -155,11 +155,16 @@ void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
 	soundIo->unRegisterSource( ssrc );
 }
 
-void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts ){
+void AudioMedia::playData( RtpPacket * packet ){
 	short output[1600];
+	RtpHeader hdr = packet->getHeader();
 
-	if( length == (uint32_t) ((AudioCodec *)*codec)->getEncodedNrBytes() ){
-		((AudioCodec *)*codec)->decode( data, length, output );
+	if( packet->getContentLength() == (uint32_t) ((AudioCodec *)*codec)->getEncodedNrBytes() ){
+		((AudioCodec *)*codec)->decode( packet->getContent(), packet->getContentLength(), output );
+	}
+	else{
+		delete packet;
+		return;
 	}
 
 /*#ifdef IPAQ
@@ -183,8 +188,10 @@ void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 #else
 */
-	soundIo->pushSound( ssrc, output, 
-		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
+	soundIo->pushSound( hdr.getSSRC(), output, 
+		((AudioCodec*)*codec)->getInputNrSamples(), hdr.getSeqNo() );
+		
+	delete packet;
 		
 //#endif
 }

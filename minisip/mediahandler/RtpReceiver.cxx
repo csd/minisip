@@ -141,7 +141,7 @@ void RtpReceiver::run(){
 		}
 		
 		mediaStreamsLock.unlock();
-		delete packet;
+		//delete packet;
 
 	}
 	threadRunningLock.unlock();
