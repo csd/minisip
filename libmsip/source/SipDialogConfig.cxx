@@ -48,7 +48,7 @@ void SipIdentity::setSipUri(string addr){
 
         sipUsername = addr.substr(0, addr.find("@"));
         sipDomain = addr.substr(addr.find("@")+1);
-        cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
+        //cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
 }
 
 

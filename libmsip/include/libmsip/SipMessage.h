@@ -181,7 +181,9 @@ class SipMessage : public MObject{
 		
 
 		int getNoHeaders();
-		MRef<SipHeader*> getHeader(int i);
+		MRef<SipHeader*> getHeaderNo(int i);
+		MRef<SipHeader*> getHeaderOfType(int t);
+		
 
 		
 		void setDestinationBranch(string b){branch = b;}

@@ -50,54 +50,45 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 		string to_uri, 
 		string from_uri, 
 		string proxy, 
-		//string localIp, 
-		//string localSipPort, 
 		bool local_called
 		):SipMessage(branch, type)
 {
 	this->ipaddr=proxy;
 	username = to_uri;
 
-	//SipHeaderVia *viap = new SipHeaderVia("UDP",localIp, atoi(localSipPort.c_str()));
-	//add_header(viap);
-	
 	MRef<SipHeaderFrom*> from;
 	MRef<SipHeaderTo*> to;
 
 	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
 	addHeader(mf);
-	MRef<SipHeader *> hdr;
+	MRef<SipHeader *> header;
 	int noHeaders = inv->getNoHeaders();
 	for (int32_t i=0; i< noHeaders; i++){
-		hdr = inv->getHeader(i);
-		int type = hdr->getType();
-		if (type == SIP_HEADER_TYPE_VIA){
-		//				add_header(inv->headers[i]);
+		header = inv->getHeaderNo(i);
+		int type = header->getType();
+		bool add=false;
+		switch (type){
+			case SIP_HEADER_TYPE_FROM:
+				((SipHeaderFrom*)*header)->setTag(((SipHeaderFrom*)(*header))->getTag());
+				((SipHeaderFrom*)*header)->getUri().setUserId(from_uri);
+				add=true;
+				break;
+			case SIP_HEADER_TYPE_TO:
+				((SipHeaderTo*)*header)->setTag( ((SipHeaderTo*)(*header))->getTag() );
+				((SipHeaderTo*)*header)->getUri().setUserId(to_uri);
+				add=true;
+				break;
+			case SIP_HEADER_TYPE_CSEQ:
+				((SipHeaderCSeq*)*header)->setCSeq(  ((SipHeaderCSeq *)(*header))->getCSeq() );
+				((SipHeaderCSeq*)*header)->setMethod("CANCEL");
+				add=true;
+				break;
+			case SIP_HEADER_TYPE_CALLID:
+				add=true;
+				break;
 		}
-		if (type == SIP_HEADER_TYPE_FROM){
-			from = MRef<SipHeaderFrom*>((SipHeaderFrom*)*hdr /*inv->getHeader(i)*//*headers[i]*/);
-		//	from->set_tag("");
-			from->setTag( ((SipHeaderFrom*)(*hdr))->getTag() );
-			from->getUri().setUserId(from_uri);
-			addHeader(hdr);
-		}
-		if (type == SIP_HEADER_TYPE_TO){
-			to = MRef<SipHeaderTo*>((SipHeaderTo*)*hdr);
-		//	to->set_tag("");
-			to->setTag( ((SipHeaderTo*)(*hdr))->getTag() );
-			to->getUri().setUserId(to_uri);
-			addHeader(hdr);
-
-		}
-		if (type == SIP_HEADER_TYPE_CSEQ){
-			MRef<SipHeaderCSeq*> seq = new SipHeaderCSeq();
-			seq->setCSeq( ((SipHeaderCSeq *)*hdr)->getCSeq() );
-			seq->setMethod("CANCEL");
-			addHeader(MRef<SipHeader*>(*seq) );
-//			merr <<"TMPDEBUG: seq no in CANCEL is parsed from inv to be "<<seq->get_cseq()<< end;
-		}
-		if (type == SIP_HEADER_TYPE_CALLID){
-			addHeader(hdr);
+		if (add){
+			addHeader(header);
 		}
 	}
 }

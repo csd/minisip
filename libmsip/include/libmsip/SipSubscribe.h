@@ -35,6 +35,7 @@
 
 #include<libmsip/SipMessage.h>
 #include<libmsip/SdpPacket.h>
+#include<libmsip/SipDialogConfig.h>
 #include<vector>
 
 /**
@@ -62,12 +63,17 @@ class SipSubscribe : public SipMessage{
 		 */
 		SipSubscribe(string branch,
 				string call_id, 
+				MRef<SipIdentity*> toIdentity,
+				MRef<SipIdentity*> fromIdentity,
+				int local_port,
+				int32_t seq_no
+/*												
 				string resource, 
 				IPAddress &proxy, 
 				string from_tel_no, 
 				int32_t seq_no, 
 				int32_t local_media_port 
-				);
+*/				);
 		
 		virtual ~SipSubscribe();
 
@@ -76,9 +82,15 @@ class SipSubscribe : public SipMessage{
 		virtual string getString();
 		
 	private:
-		string resource; //telephone number for example
+/*		string resource; //telephone number for example
 		string ip;
 		string user_type; //phone or ip
+*/
+
+		MRef<SipIdentity *> fromIdentity;
+		string toUser; //telephone number for example
+		string toDomain;
+
 };
 
 #endif

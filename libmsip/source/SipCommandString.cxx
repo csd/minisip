@@ -68,24 +68,6 @@ const string SipCommandString::setpassword="setpassword";
 const string SipCommandString::incoming_im="incoming_im";
 const string SipCommandString::outgoing_im="outgoing_im";
 
-/*
-SipCommandString::SipCommandString(string call_id, 
-		string operation, 
-		string parameter, 
-		string parameter2, 
-		string parameter3) : CommandString(call_id, 
-						operation, 
-						parameter, 
-						parameter2, 
-						parameter3)
-{
-	
-}
-
-
-SipCommandString::SipCommandString(const SipCommandString &smc):CommandString(smc){
-}
-*/
-
-
+const string SipCommandString::start_presence="start_presence";
+const string SipCommandString::stop_presence="stop_presence";
 

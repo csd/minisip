@@ -106,7 +106,7 @@ int SipMessage::getType(){
 	return type;
 }
 
-MRef<SipHeader*> SipMessage::getHeader(int i){
+MRef<SipHeader*> SipMessage::getHeaderNo(int i){
 	return headers[i];
 }
 
@@ -358,6 +358,13 @@ string SipMessage::getCSeqMethod(){
 }
 
 SipURI SipMessage::getFrom(){
+	SipURI ret("","");
+	MRef<SipHeaderFrom*> hto = getHeaderFrom();
+	if (hto)
+		ret = hto->getUri();
+
+	return ret;
+/*
 	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderFrom*> from;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
@@ -366,9 +373,17 @@ SipURI SipMessage::getFrom(){
 		}
 	}
 	return SipURI("","");
+*/
 }
 
 SipURI SipMessage::getTo(){
+	SipURI ret("","");
+	MRef<SipHeaderTo*> hto = getHeaderTo();
+	if (hto)
+		ret = hto->getUri();
+
+	return ret;
+/*
 	for (int32_t i=0; i< headers.size(); i++){
 		MRef<SipHeaderTo*> to;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
@@ -377,6 +392,7 @@ SipURI SipMessage::getTo(){
 		}
 	}
 	return SipURI("","");
+*/
 }
 
 void SipMessage::removeAllViaHeaders(){
@@ -402,6 +418,10 @@ void SipMessage::removeAllViaHeaders(){
 }
 
 MRef<SipHeaderFrom*> SipMessage::getHeaderFrom(){
+
+	return MRef<SipHeaderFrom*> ((SipHeaderFrom*)*(getHeaderOfType(SIP_HEADER_TYPE_FROM)));
+
+/*
 	MRef<SipHeaderFrom*> from;
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
@@ -410,9 +430,15 @@ MRef<SipHeaderFrom*> SipMessage::getHeaderFrom(){
 		}
 	}
 	return from; 
+*/
+	
 }
 
 MRef<SipHeaderTo*> SipMessage::getHeaderTo(){
+
+	return MRef<SipHeaderTo*>((SipHeaderTo*)*(getHeaderOfType(SIP_HEADER_TYPE_TO)));
+
+/*
 	MRef<SipHeaderTo*> to;
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_TO){
@@ -421,6 +447,19 @@ MRef<SipHeaderTo*> SipMessage::getHeaderTo(){
 		}
 	}
 	return to; 
+*/
+}
+
+MRef<SipHeader *> SipMessage::getHeaderOfType(int t){
+	for (int32_t i=0; i< headers.size(); i++){
+		if ((headers[i])->getType() == t){
+			return headers[i];
+		}
+	}
+	MRef<SipHeader*> nullhdr;
+	return nullhdr; 
+
+	
 }
 
 list<string> SipMessage::getRouteSet(){

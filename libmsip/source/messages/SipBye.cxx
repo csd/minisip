@@ -72,29 +72,35 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 	MRef<SipHeaderFrom*> from;
 	MRef<SipHeaderTo*> to;
 
-	for (int32_t i=0; i<inv->getNoHeaders()/*headers.size()*/; i++){
-		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_VIA){
-//			add_header(inv->headers[i]);
+	int noHeaders = inv->getNoHeaders();
+	for (int32_t i=0; i < noHeaders; i++){
+		MRef<SipHeader *> header = inv->getHeaderNo(i);
+		int headerType = header->getType();
+		bool add = false;
+		switch (headerType){
+			case SIP_HEADER_TYPE_FROM:
+				((SipHeaderFrom*)*header)->setTag("");
+				((SipHeaderFrom*)*header)->getUri().setUserId(from_uri);
+				add = true;
+				break;
+			case SIP_HEADER_TYPE_TO:
+				((SipHeaderTo*)*header)->setTag("");
+				((SipHeaderTo*)*header)->getUri().setUserId(to_uri);
+				add = true;
+				break;
+	
+			case SIP_HEADER_TYPE_CSEQ:
+				((SipHeaderCSeq*)*header)->setMethod("BYE");
+				((SipHeaderCSeq*)*header)->setCSeq(seq_no);
+				add=true;
+				break;
+			case SIP_HEADER_TYPE_CALLID:
+				add=true;
+				break;
+			
 		}
-		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_FROM){
-			from = MRef<SipHeaderFrom*>((SipHeaderFrom*)*inv->getHeader(i)/*headers[i]*/);
-			from->setTag("");
-			from->getUri().setUserId(from_uri);
-			addHeader(inv->getHeader(i)/*headers[i]*/);
-		}
-		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_TO){
-			to = MRef<SipHeaderTo*>((SipHeaderTo*)*inv->getHeader(i))/*headers[i])*/;
-			to->setTag("");
-			to->getUri().setUserId(to_uri);
-			addHeader(inv->getHeader(i)/*headers[i]*/);
-		}
-		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_CSEQ){
-			addHeader(inv->getHeader(i)/*headers[i]*/);
-			((SipHeaderCSeq *)(*inv->getHeader(i)/*headers[i]*/))->setMethod("BYE");
-			((SipHeaderCSeq *)(*inv->getHeader(i)/*headers[i]*/))->setCSeq(seq_no);
-		}
-		if ((inv->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_CALLID){
-			addHeader(inv->getHeader(i)/*headers[i]*/);
+		if (add){
+			addHeader(header);
 		}
 	}	
 }

@@ -47,32 +47,23 @@ SipAck::SipAck(string &build_from):SipMessage(type, build_from){
 }
 
 SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string proxy): SipMessage(branch, type){
-
 	this->username = to_tel_no;
-	//this->port = atoi(local_sip_port.c_str());
-	this->ipaddr = proxy/*.get_string()*/;
-	
+	this->ipaddr = proxy;
 	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
 	addHeader(mf);
-
-//	SipMessage* msg = *pack;
-
-	for (int32_t i=0; i< pack->getNoHeaders()/*headers.size()*/; i++){			//FIX: deep copy
-		if ((pack->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_FROM){
-			addHeader(pack->getHeader(i)/*headers[i]*/);
+	int noHeaders = pack->getNoHeaders();
+	for (int32_t i=0; i< noHeaders; i++){			//FIX: deep copy
+		MRef<SipHeader *> header = pack->getHeaderNo(i);
+		int headerType = header->getType();
+		switch (headerType){
+			case SIP_HEADER_TYPE_CSEQ:
+				((SipHeaderCSeq*)*header)->setMethod("ACK");
+			case SIP_HEADER_TYPE_FROM:
+			case SIP_HEADER_TYPE_TO:
+			case SIP_HEADER_TYPE_CALLID:
+				addHeader(header);
+				break;
 		}
-		if ((pack->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_TO)
-			addHeader(pack->getHeader(i)/*headers[i]*/);
-		if ((pack->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_CALLID)
-			addHeader(pack->getHeader(i)/*headers[i]*/);
-		if ((pack->getHeader(i)/*headers[i]*/)->getType() == SIP_HEADER_TYPE_CSEQ){
-			MRef<SipHeaderCSeq*> seq = MRef<SipHeaderCSeq*>((SipHeaderCSeq *)(*pack->getHeader(i)/*headers[i]*/));
-			seq->setMethod("ACK");
-			addHeader(MRef<SipHeader*>(*seq));
-		}
-//		if (dynamic_cast<SipHeaderVia *>(pack.headers[i])!=NULL){
-//			add_header(pack.headers[i]);
-//		}
 	}
 };
 

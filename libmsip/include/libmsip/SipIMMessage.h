@@ -58,7 +58,10 @@ class SipIMMessage : public SipMessage{
 		virtual std::string getMemObjectType(){return "SipIMMessage";}
 
 		virtual string getString();
+
+		int getExpiresTimeout();
 		
+	
 	private:
 		MRef<SipIdentity *> fromIdentity;
 		string toUser; //telephone number for example

@@ -62,22 +62,18 @@ SipResponse::SipResponse(string branch,
 	addHeader(mf);
 	
 	int noHeaders = inv->getNoHeaders();
-	for (uint32_t i=0 ; i < (uint32_t)noHeaders; i++){			//FIX: deep copy
-		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_VIA)
-			addHeader(inv->getHeader(i));
-		
-		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_FROM)
-			addHeader(inv->getHeader(i));
-		
-		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_TO)
-			addHeader(inv->getHeader(i));
-		
-		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_CALLID)
-			addHeader(inv->getHeader(i));
-		
-		if ((inv->getHeader(i))->getType() == SIP_HEADER_TYPE_CSEQ)
-			addHeader(inv->getHeader(i));
-		
+	for (int i=0 ; i < noHeaders; i++){			//FIX: deep copy
+		MRef<SipHeader*> header = inv->getHeaderNo(i);
+		int headerType = header->getType();
+		switch (headerType){
+			case SIP_HEADER_TYPE_VIA:
+			case SIP_HEADER_TYPE_FROM:
+			case SIP_HEADER_TYPE_TO:
+			case SIP_HEADER_TYPE_CALLID:
+			case SIP_HEADER_TYPE_CSEQ:
+				addHeader(header);
+				break;
+		}
 	}
 }
 

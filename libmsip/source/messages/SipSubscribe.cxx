@@ -60,25 +60,31 @@ SipSubscribe::SipSubscribe(string &build_from): SipMessage(/*"SipSubscribe",*/ S
 
 SipSubscribe::SipSubscribe(string branch,
 		string call_id, 
+		MRef<SipIdentity*> toIdentity,
+		MRef<SipIdentity*> fromIdentity,
+		int local_port,
+		int32_t seq_no)
+/*
 		string resource, 
 		IPAddress &proxy_addr, 
 	//	IPAddress &local_addr, 
 		string from_tel_no, 
 		int32_t seq_no, 
-		int32_t local_media_port): SipMessage(branch, SipSubscribe::type)
+		int32_t local_media_port)*/
+		: SipMessage(branch, SipSubscribe::type), fromIdentity(fromIdentity)
 {
-	this->resource = resource;
+	toUser = toIdentity->sipUsername;
+	toDomain = toIdentity->sipDomain;
+
+	
+/*	this->resource = resource;
 	ip=proxy_addr.getString();
 	user_type="phone";
-	
-	//SipHeaderVia *viap = new SipHeaderVia("UDP",local_addr.get_string(),local_addr.get_port());
-	//add_header(viap);
-	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(from_tel_no, proxy_addr.getString() );
+*/	
+	MRef<SipHeader*> fromp = new SipHeaderFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(fromp);
-	
 
-	MRef<SipHeader*> top = new SipHeaderTo(resource, proxy_addr.getString());
+	MRef<SipHeader*> top = new SipHeaderTo(toIdentity->sipUsername, toIdentity->sipDomain);
 	addHeader(top);
 	
 	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
@@ -107,7 +113,7 @@ SipSubscribe::SipSubscribe(string branch,
 	addHeader(MRef<SipHeader*>(*ep));
 
 	MRef<SipHeaderAccept*> ap = new SipHeaderAccept();
-	ap->setAccept("application/xpidf+xml");
+	ap->setAccept("application/pidf+xml");
 	addHeader(MRef<SipHeader*>(*ap));
 }
 
@@ -116,6 +122,6 @@ SipSubscribe::~SipSubscribe(){
 }
 
 string SipSubscribe::getString(){
-	return  "SUBSCRIBE sip:"+resource+"@"+ip+";user="+user_type+" SIP/2.0\r\n" + getHeadersAndContent();
+	return  "SUBSCRIBE sip:"+toUser+"@"+toDomain+" SIP/2.0\r\n" + getHeadersAndContent();
 }
 

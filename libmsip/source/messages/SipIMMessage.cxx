@@ -45,6 +45,7 @@
 #include<libmsip/SipHeaderMaxForwards.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmsip/SipHeaderEvent.h>
+#include<libmsip/SipHeaderExpires.h>
 #include<libmsip/SipHeaderAccept.h>
 
 const int SipIMMessage::type=9;
@@ -108,5 +109,15 @@ SipIMMessage::~SipIMMessage(){
 string SipIMMessage::getString(){
 	return  "MESSAGE sip:"+toUser+"@"+toDomain+" SIP/2.0\r\n" + getHeadersAndContent();
 
+}
+
+int SipIMMessage::getExpiresTimeout(){
+	MRef<SipHeaderExpires*> exp = MRef<SipHeaderExpires*>((SipHeaderExpires*)*getHeaderOfType(SIP_HEADER_TYPE_EXPIRES));
+	
+	if (exp){
+		return exp->getTimeout();
+	}else{
+		return -1;
+	}
 }
 
