@@ -114,8 +114,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		MRef<SipDialogConfig*> getDialogConfig();
 
-		int32_t requestSeqNo();
-		void setSeqNo(int32_t seq);
+		//int32_t requestSeqNo();
+		//void setSeqNo(int32_t seq);
 		
 		/**
 		 * get the Call-Id of the dialog

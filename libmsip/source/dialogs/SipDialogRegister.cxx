@@ -84,10 +84,11 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword = command.getCommandString().getParam2();
 			}
 			
-			int seqNo;
-			setSeqNo(seqNo = requestSeqNo());
-			
-			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, seqNo, dialogState.callId);
+			//int seqNo;
+			//setSeqNo(seqNo = ++dialogState.seqNo);
+			++dialogState.seqNo;
+
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, /*seqNo*/ dialogState.seqNo, dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
                         CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
@@ -124,10 +125,11 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMCommand &command){
 	
 	if ( hasPassword() && transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "401")){
-                int seqNo;
-                setSeqNo(seqNo = requestSeqNo());
+                //int seqNo;
+                //setSeqNo(seqNo = ++dialogState.seqNo);
+		++dialogState.seqNo;
 
-                MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, seqNo, dialogState.callId));
+                MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, /*seqNo*/dialogState.seqNo, dialogState.callId));
                 registerTransaction(trans);
 
                 //extract authentication info from received response
@@ -190,10 +192,11 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 //		mdbg << "DEBUG: INFO: set username to "<<regDialog->getDialogConfig().proxyUsername 
 //			<< " and password to "<<regcall->getDialogConfig().proxyPassword << end;
 		
-		int seqNo;
-		setSeqNo(seqNo = requestSeqNo());
+		//int seqNo;
+		//setSeqNo(seqNo = requestSeqNo());
+		++dialogState.seqNo;
 
-		MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, seqNo, dialogState.callId));
+		MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, /*seqNo*/dialogState.seqNo, dialogState.callId));
 		registerTransaction(trans);
 
 		send_auth(trans->getBranch());
@@ -294,10 +297,10 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword = command.getCommandString().getParam2();
 			}
 			
-			int seqNo;
-			setSeqNo(seqNo = requestSeqNo());
-			
-			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, seqNo,dialogState.callId);
+			//int seqNo;
+			//setSeqNo(seqNo = requestSeqNo());
+			++dialogState.seqNo;
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, /*seqNo*/dialogState.seqNo, dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
 			
@@ -505,7 +508,7 @@ void SipDialogRegister::send_noauth(string branch){
 			localSipPort,
 //			getDialogConfig()->inherited.userUri,
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
-			seqNo,
+			dialogState.seqNo,
 			getDialogConfig()->inherited.transport);
         SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);
 	dialogContainer->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
@@ -531,7 +534,7 @@ void SipDialogRegister::send_auth(string branch){
 			localSipPort, 
 			//getDialogConfig().inherited.userUri, 
 			getDialogConfig()->inherited.sipIdentity->getSipUri(), 
-			seqNo, 
+			dialogState.seqNo, 
 			getDialogConfig()->inherited.transport,
 			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyUsername, 
 			realm, 
