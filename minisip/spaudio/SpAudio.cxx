@@ -54,7 +54,7 @@ SpAudio::SpAudio(int32_t numPos){
 
 }
 
-void SpAudio::resample(short *input,
+/*void SpAudio::resample(short *input,
 		       short *output,
 		       int32_t isize,
 		       int32_t osize,
@@ -70,6 +70,8 @@ void SpAudio::resample(short *input,
   
   src_float_to_short_array(src_data->data_out,output,osize);
 }
+
+*/
 
 int32_t SpAudio::spatialize(short *input,
 			    short *leftch,

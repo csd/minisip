@@ -291,7 +291,7 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
 		j++;
 	}
-	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize));
+	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize),8000,BS);
 	queueLock.unlock();
 	sourceListCond.broadcast();
 }
@@ -427,7 +427,7 @@ void *SoundIO::playerLoop(void *arg){
 				(*i)->getSound(tmpbuf, BS, nChannels - 1);
 				
 				/* spatial audio */
-				spAudio.resample(tmpbuf,resbuf,320,1764,(*i)->getSrcData(),(*i)->getSrcState());
+				(*i)->resample(tmpbuf,resbuf,BS*nChannels,1764);
 				(*i)->setPointer(spAudio.spatialize(resbuf,(*i)->getLeftBuf(),(*i)->getRightBuf(),
 								     (*i)->getLookupLeft(),(*i)->getLookupRight(),
 								     (*i)->getPos(),(*i)->getPointer(),outbuf));
@@ -458,7 +458,9 @@ int error;
 BasicSoundSource::BasicSoundSource(int32_t id, 
 				   SoundIOPLCInterface *plc,
 				   int32_t position,
-				   int32_t nSources, 
+				   int32_t nSources,
+				   double sRate,
+				   int32_t frameSize; 
 				   int32_t bufferNMonoSamples):
                 SoundSource(id), 
 		plcProvider(plc),
@@ -472,12 +474,13 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	playoutPtr = stereoBuffer;
 	sourcePos=position;
 	numSources=nSources;
+	sampRate=sRate;
 
 	/* spatial audio initialization */
 	src_data = new SRC_DATA();
-	src_data->input_frames = 160;
+	src_data->input_frames = frameSize;
 	src_data->output_frames = 882;
-	src_data->src_ratio = 5.5125;
+	src_data->src_ratio = 44100.0/sampRate;
 	src_data->data_in  = new float[src_data->input_frames  * 2];
 	src_data->data_out = new float[src_data->output_frames * 2];
 
@@ -529,7 +532,7 @@ void BasicSoundSource::initLookup(int32_t nSources){
  int32_t SoundSource::getPointer(){
    return pointer;
  }
-
+/*
  SRC_DATA* SoundSource::getSrcData(){
    return src_data;
  }
@@ -537,7 +540,7 @@ void BasicSoundSource::initLookup(int32_t nSources){
  SRC_STATE* SoundSource::getSrcState(){
    return src_state;
  }
-
+*/
 
  void SoundSource::setPointer(int32_t wpointer){
    pointer=wpointer;
@@ -666,6 +669,23 @@ void BasicSoundSource::getSound(short *dest,
                                                 (bufferSizeInMonoSamples*2);
 	}
 }
+
+
+void BasicSoundSource::resample(short *input,
+				short *output,
+				int32_t isize,
+				int32_t osize)
+{
+  
+  int32_t error;
+  
+  src_short_to_float_array (input, src_data->data_in, isize);
+  
+  src_process(src_state,src_data);
+  
+  src_float_to_short_array(src_data->data_out,output,osize);
+}
+
 
 RecorderReceiver::RecorderReceiver(SoundRecorderCallback *cb, 
                                     bool stereo) : 
