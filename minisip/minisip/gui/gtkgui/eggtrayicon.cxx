@@ -88,7 +88,7 @@ egg_tray_icon_class_init (EggTrayIconClass *klass)
 }
 
 static GdkFilterReturn
-egg_tray_icon_manager_filter (GdkXEvent *xevent, GdkEvent *event, gpointer user_data)
+egg_tray_icon_manager_filter (GdkXEvent *xevent, GdkEvent * /*event*/, gpointer user_data)
 {
   EggTrayIcon *icon = (EggTrayIcon*)user_data;
   XEvent *xev = (XEvent *)xevent;
@@ -120,7 +120,7 @@ egg_tray_icon_unrealize (GtkWidget *widget)
     {
       GdkWindow *gdkwin;
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
       gdkwin = gdk_window_lookup_for_display (gtk_widget_get_display (widget),
                                               icon->manager_window);
 #else
@@ -130,7 +130,7 @@ egg_tray_icon_unrealize (GtkWidget *widget)
       gdk_window_remove_filter (gdkwin, egg_tray_icon_manager_filter, icon);
     }
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
   root_window = gdk_screen_get_root_window (gtk_widget_get_screen (widget));
 #else
   root_window = gdk_window_lookup (gdk_x11_get_default_root_xwindow ());
@@ -163,7 +163,7 @@ egg_tray_icon_send_manager_message (EggTrayIcon *icon,
   ev.data.l[3] = data2;
   ev.data.l[4] = data3;
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
   display = GDK_DISPLAY_XDISPLAY (gtk_widget_get_display (GTK_WIDGET (icon)));
 #else
   display = gdk_display;
@@ -191,7 +191,7 @@ egg_tray_icon_update_manager_window (EggTrayIcon *icon)
 {
   Display *xdisplay;
   
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
   xdisplay = GDK_DISPLAY_XDISPLAY (gtk_widget_get_display (GTK_WIDGET (icon)));
 #else
   xdisplay = gdk_display;
@@ -201,7 +201,7 @@ egg_tray_icon_update_manager_window (EggTrayIcon *icon)
     {
       GdkWindow *gdkwin;
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
       gdkwin = gdk_window_lookup_for_display (gtk_widget_get_display (GTK_WIDGET (icon)),
 					      icon->manager_window);
 #else
@@ -227,7 +227,7 @@ egg_tray_icon_update_manager_window (EggTrayIcon *icon)
     {
       GdkWindow *gdkwin;
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
       gdkwin = gdk_window_lookup_for_display (gtk_widget_get_display (GTK_WIDGET (icon)),
 					      icon->manager_window);
 #else
@@ -253,7 +253,7 @@ egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
   icon = (EggTrayIcon*)g_object_new (EGG_TYPE_TRAY_ICON, NULL);
   gtk_window_set_title (GTK_WINDOW (icon), name);
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
   /* FIXME: this code does not compile, screen is undefined. Now try
    * getting the GdkScreen from xscreen (:. Dunno how to solve this
    * (there is probably some easy way I cant think of right now)
@@ -282,7 +282,7 @@ egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
 
   egg_tray_icon_update_manager_window (icon);
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
   root_window = gdk_screen_get_root_window (gtk_widget_get_screen (screen));
 #else
   root_window = gdk_window_lookup (gdk_x11_get_default_root_xwindow ());
@@ -295,7 +295,7 @@ egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
   return icon;
 }
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
 EggTrayIcon *
 egg_tray_icon_new_for_screen (GdkScreen *screen, const char *name)
 {
@@ -346,7 +346,7 @@ egg_tray_icon_send_message (EggTrayIcon *icon,
       XClientMessageEvent ev;
       Display *xdisplay;
 
-#if HAVE_GTK_MULTIHEAD
+#ifdef HAVE_GTK_MULTIHEAD
       xdisplay = GDK_DISPLAY_XDISPLAY (gtk_widget_get_display (GTK_WIDGET (icon)));
 #else
       xdisplay = gdk_display;

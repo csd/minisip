@@ -272,7 +272,7 @@ void SipTransactionServer::setUpStateMachine(){
 }
 
 SipTransactionServer::SipTransactionServer(MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
-		SipTransaction("SipTransactionServer",call, seq_no, branch, callid),
+		SipTransaction(/*"SipTransactionServer",*/ call, seq_no, branch, callid),
 		lastResponse(NULL),
 		timerT1(500)
 {

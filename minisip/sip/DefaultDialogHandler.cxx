@@ -762,7 +762,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			std::string(dialogState.callId),
 			toId,
 			getDialogConfig()->inherited.sipIdentity,
-			getDialogConfig()->inherited.localUdpPort,
+			//getDialogConfig()->inherited.localUdpPort,
                         im_seq_no,
 			msg
                         );

@@ -268,14 +268,15 @@ void MainWindow::gotCommand(){
 
 	if (command.getOp() == SipCommandString::incoming_im){
 
-		for (list<ImWidget *>::iterator i = imWidgets.begin(); i != imWidgets.end(); i++ ){
+		list<ImWidget *>::iterator i;
+		for (i = imWidgets.begin(); i != imWidgets.end(); i++ ){
 			if( (*i)->handleIm( command.getParam(), command.getParam2()/*, command.getParam3()*/ ) ){
 				return;
 			}
 
 		}
 		addIm(command.getParam2());
-		for (list<ImWidget *>::iterator i = imWidgets.begin(); i != imWidgets.end(); i++ ){
+		for (i = imWidgets.begin(); i != imWidgets.end(); i++ ){
 			if( (*i)->handleIm( command.getParam(), command.getParam2()/*, command.getParam3()*/ ) ){
 				return;
 			}
@@ -321,7 +322,7 @@ void MainWindow::gotCommand(){
 	merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
 }	
 
-void MainWindow::gotPacket( int32_t i ){
+void MainWindow::gotPacket( int32_t /*i*/ ){
 }
 
 void MainWindow::displayErrorMessage( string s ){
@@ -385,7 +386,7 @@ bool MainWindow::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
 	return ( ret == Gtk::RESPONSE_OK );
 }
 
-void MainWindow::log( int type, string msg ){
+void MainWindow::log( int /*type*/, string /*msg*/ ){
 }
 
 void MainWindow::addCall( string callId, string remoteUri, bool incoming,

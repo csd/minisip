@@ -66,7 +66,7 @@ SipNotify::SipNotify(string branch,
 		    string call_id, 
 		    MRef<SipIdentity*> toIdentity,
 		    MRef<SipIdentity*> fromId,
-                    int local_port, 
+                    //int local_port, 
                     int32_t seq_no 
                     ): 
                             SipMessage(branch, SipNotify::type), fromIdentity(fromId)

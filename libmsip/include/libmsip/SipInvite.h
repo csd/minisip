@@ -34,7 +34,6 @@
 #define SIPINVITE_H
 
 #include<libmsip/SipMessage.h>
-//#include<libmsip/CODECInterface.h>
 #include<vector>
 #include<sys/types.h>
 

@@ -251,7 +251,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			}
 #endif
 			if( udpsock.sendTo( ip_addr, port, 
-					(void*)packet_string.c_str(),
+					(const void*)packet_string.c_str(),
 					packet_string.length() ) == -1 ){
 			
 				throw new SendFailed( errno );

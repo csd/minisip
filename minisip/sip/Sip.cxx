@@ -82,9 +82,11 @@ SipCallback *Sip::getCallback(){
 	return callback;
 }
 
+/*
 void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
 
 }
+*/
 
 //returns a the call id
 string Sip::invite(string &user){

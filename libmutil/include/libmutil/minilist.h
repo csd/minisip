@@ -227,17 +227,18 @@ class minilist{
 
 		void validate(){
 			node<T> *cur = head;
+			int i;
 			
-			for (int i=0; i<nelem; i++){
+			for (i=0; i<nelem; i++){
 				if (i==nelem-1){
 					assert(cur->getNext()==NULL);
 				}
 				cur= cur->getNext();
 			}
-			for (int i=0; i<size(); i++){
+			for (i=0; i<size(); i++){
 				T t = (*this)[i];
 			}
-			for (int i=nelem-1; i>=0; i--){
+			for (i=nelem-1; i>=0; i--){
 				T t = (*this)[i];
 			}
 			

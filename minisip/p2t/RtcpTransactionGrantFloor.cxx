@@ -222,7 +222,7 @@ void RtcpTransactionGrantFloor::setUpStateMachine(){
 
 
 RtcpTransactionGrantFloor::RtcpTransactionGrantFloor(MRef<SipDialog*> dialog, int seqNo, IPAddress *toaddr, int32_t port, string callId,unsigned remoteSSRC) : 
-		SipTransaction("RtcpTransactionGrantFloor",dialog, seqNo, "", callId),
+		SipTransaction(/*"RtcpTransactionGrantFloor",*/dialog, seqNo, "", callId),
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {

@@ -40,7 +40,7 @@ const string sipHeaderValueTypeUserAgentTypeStr = "User-Agent";
 SipHeaderValueUserAgent::SipHeaderValueUserAgent(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr)
 {
-	user_agent="NOT_SET";
+	user_agent=build_from;
 }
 
 SipHeaderValueUserAgent::SipHeaderValueUserAgent()

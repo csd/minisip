@@ -72,7 +72,7 @@ int STUNAttribute::getMessageDataTLV(unsigned char *buf){
 	return 2+2+getValueLength();
 }
 
-STUNAttribute *STUNAttribute::parseAttribute(unsigned char *data, int maxLength, int &retParsedLength){
+STUNAttribute *STUNAttribute::parseAttribute(unsigned char *data, int /*maxLength*/, int &retParsedLength){//TODO: use maxLength
 	uint16_t *shortptr = (uint16_t *)data;
 	int type   = ntohs(shortptr[0]);
 	int length = ntohs(shortptr[1]);
@@ -246,7 +246,7 @@ STUNAttributeSourceAddress::STUNAttributeSourceAddress(
 
 
 
-STUNAttributeChangeRequest::STUNAttributeChangeRequest(unsigned char *data, int length): 
+STUNAttributeChangeRequest::STUNAttributeChangeRequest(unsigned char *data, int /*length*/): //TODO: use length parameter
 		STUNAttribute(STUNAttribute::CHANGE_REQUEST)
 {
 	uint32_t flags = ntohl( *((uint32_t *)data) );

@@ -40,7 +40,7 @@ const string sipHeaderValueSubjectTypeStr = "Subject";
 SipHeaderValueSubject::SipHeaderValueSubject(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr)
 {
-	subject="NOT_SET";
+	subject=build_from;
 }
 
 SipHeaderValueSubject::SipHeaderValueSubject()

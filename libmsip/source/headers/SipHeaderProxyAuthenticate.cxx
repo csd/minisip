@@ -41,7 +41,7 @@ SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate()
 }
 		
 
-SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &build_from)
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &/*build_from*/) //TODO: Parse proxy authenticate header value
 		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
 {
 	

@@ -151,7 +151,8 @@ int32_t XMLParser::getIntValue(string path, int32_t defaultValue){
 
 string XMLNode::generatestring(int32_t indent, XMLNode *cur){
 	string ret;
-	for (int32_t j=0; j<indent; j++)
+	int32_t j;
+	for (j=0; j<indent; j++)
 		ret = ret+"\t";
 	if (indent>=0)
 		ret=ret+"<"+cur->getName();
@@ -169,13 +170,13 @@ string XMLNode::generatestring(int32_t indent, XMLNode *cur){
 		ret = ret+'\n';
 	}
 	bool hassub=false;
-	for (list<XMLNode *>::iterator i=cur->subnodes.begin(); i!=cur->subnodes.end(); i++)
-		if ((*i)->getType()==XML_NODE_TYPE_ELEMENT){
-			ret = ret + generatestring(indent+1, *i);
+	for (list<XMLNode *>::iterator itt=cur->subnodes.begin(); itt!=cur->subnodes.end(); itt++)
+		if ((*itt)->getType()==XML_NODE_TYPE_ELEMENT){
+			ret = ret + generatestring(indent+1, *itt);
 			hassub=true;
 		}
 	
-	for (int32_t j=0; j<indent; j++)
+	for (j=0; j<indent; j++)
 		ret = ret+"\t";
 	
 	if (indent>=0)

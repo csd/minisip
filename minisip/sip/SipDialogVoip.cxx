@@ -850,9 +850,11 @@ SipDialogVoip::SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialo
 SipDialogVoip::~SipDialogVoip(){	
 }
 
+/*
 void SipDialogVoip::handleSdp(MRef<SdpPacket*> sdp){
 
 }
+*/
 
 void SipDialogVoip::sendInvite(const string &branch){
 	//	mdbg << "ERROR: SipDialogVoip::sendInvite() UNIMPLEMENTED"<< end;
@@ -1053,8 +1055,8 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
 			domain,
 //			getDialogConfig().seqNo+1,
-			bye_seq_no,
-			localCalled
+			bye_seq_no///,
+			///localCalled
 			);
 
 	bye->getHeaderValueFrom()->setTag(dialogState.localTag);
@@ -1075,8 +1077,8 @@ void SipDialogVoip::sendCancel(const string &branch){
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
 			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-			getDialogConfig()->inherited.sipIdentity->sipDomain,
-			localCalled
+			getDialogConfig()->inherited.sipIdentity->sipDomain///,
+			///localCalled
 			);
 
 	cancel->getHeaderValueFrom()->setTag(dialogState.localTag);

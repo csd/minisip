@@ -29,7 +29,7 @@
 #include"../sip/DefaultDialogHandler.h"
 
 
-MessageRouter::MessageRouter(MRef<SipSoftPhoneConfiguration *> phoneconf){
+MessageRouter::MessageRouter(){
 }
 
 void MessageRouter::setSipStateMachine(MRef<Sip*> ssp){

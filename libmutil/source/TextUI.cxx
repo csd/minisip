@@ -170,6 +170,7 @@ void TextUI::guimain(){
 
 		string command;
 		string autocomplete;
+		unsigned i;
 
 		switch(c){
 		case 9: autocomplete=displaySuggestions(input);
@@ -197,7 +198,7 @@ void TextUI::guimain(){
 			input = input.substr(0, input.size()-1);
 			cout << (char)13<<promptText<< "$ ";
 
-			for (unsigned i=0; i< input.size()+1; i++)
+			for (i=0; i< input.size()+1; i++)
 				cout << ' ';
 			cout << (char)13<<promptText<<"$ ";
 			cout << termCodes[bold]<< input << termCodes[plain] << flush;
@@ -226,7 +227,8 @@ void TextUI::outputSuggestions(minilist<string> &strings){
 
 string TextUI::displaySuggestions(string hint){
 	minilist<string> cbSuggest;
-	for (int i=0; i< completionCallbacks.size();i++){
+	int i;
+	for (i=0; i< completionCallbacks.size();i++){
 		minilist<string> tmp;
 		if (completionCallbacks[i].match == trim(hint).substr(0,completionCallbacks[i].match.size())){
 			tmp = completionCallbacks[i].callback->textuiCompletionSuggestion(hint);
@@ -247,7 +249,7 @@ string TextUI::displaySuggestions(string hint){
 	minilist<string> res;
 	
 	int nfound=0;
-	for (int i=0; i<ncmds; i++){ //Find possible matches
+	for (i=0; i<ncmds; i++){ //Find possible matches
 		if (hint=="" || 
 				(commands[i].size()>=hint.size() && 
 				 commands[i].substr(0,hint.size())==hint )){
@@ -281,7 +283,7 @@ string TextUI::displaySuggestions(string hint){
 	}
 
 
-	for (int i=0; i<res.size(); i++){
+	for (i=0; i<res.size(); i++){
 		cbSuggest.push_back(res[i]);
 	}
 	
@@ -293,7 +295,7 @@ string TextUI::displaySuggestions(string hint){
 	unsigned index = hint.size();
 	while (cont){
 		char c=0;
-		for (int i=0; i< cbSuggest.size(); i++){
+		for (i=0; i< cbSuggest.size(); i++){
 			if (cbSuggest[i].size()<=index){
 				cont = false;
 			}else{

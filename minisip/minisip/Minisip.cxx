@@ -166,7 +166,7 @@ void Minisip::run(){
 	initParseConfig();
 
 	try{
-		MessageRouter *ehandler =  new MessageRouter(phoneConf);
+		MessageRouter *ehandler =  new MessageRouter();
 		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT

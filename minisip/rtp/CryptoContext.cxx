@@ -129,11 +129,12 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 		uint32_t ssrc = rtp->getHeader().getSSRC();
 		memcpy( iv, k_s, 4 );
 		
-		for( int i = 4; i < 8; i++ ){
+		int i;
+		for(i = 4; i < 8; i++ ){
 			iv[i] = ( 0xFF & ( ssrc >> ((7-i)*8) ) ) ^ k_s[i];
 		}
 
-		for( int i = 8; i < 14; i++ ){
+		for(i = 8; i < 14; i++ ){
 			iv[i] = ( 0xFF & ( index >> ((13-i)*8) ) ) ^ k_s[i];
 		}
 
@@ -193,11 +194,12 @@ static void compute_iv( unsigned char * iv, uint64_t label, uint64_t index, int 
         IV:          XX XX XX XX XX XX XX XX XX XX XX XX XX XX 00 00
         */
 
-        for( int i = 0; i < 7 ; i++ ){
+	int i;
+        for(i = 0; i < 7 ; i++ ){
                 iv[i] = master_salt[i];
         }
 
-        for( int i = 7; i < 14 ; i++ ){
+        for(i = 7; i < 14 ; i++ ){
                 iv[i] = (0xFF & (key_id >> (8*(13-i)))) ^
                         master_salt[i];
         }

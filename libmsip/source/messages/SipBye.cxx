@@ -56,8 +56,8 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 		string domain, 
 	//	int32_t localSipPort, 
 	//	string localAddr, 
-		int32_t seq_no, 
-		bool made_call
+		int32_t seq_no/*, 
+		bool made_call*/
 		):SipMessage(branch, SipBye::type)
 {
 	this->username = to_uri;

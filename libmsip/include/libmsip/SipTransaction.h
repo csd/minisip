@@ -48,7 +48,7 @@ class SipMessageDispatcher;
 class SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
-		SipTransaction(const string &memType, MRef<SipDialog*> d, int cseq, const string &branch, string callid);
+		SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, int cseq, const string &branch, string callid);
                 
 		virtual ~SipTransaction();
 		

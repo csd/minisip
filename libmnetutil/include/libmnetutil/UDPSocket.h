@@ -23,8 +23,6 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
-//#include<config.h>
-
 #include"Socket.h"
 #include"IPAddress.h"
 
@@ -36,7 +34,7 @@ class UDPSocket : public Socket{
 		virtual ~UDPSocket();
 		
 		int32_t getPort();
-		int32_t sendTo(IPAddress &to_addr, int32_t port, void *msg, int32_t len);
+		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
 		int32_t recvFrom(void *buf, int32_t len, IPAddress *& from);
 		int32_t recv(void *buf, int32_t len);
 		

@@ -40,7 +40,6 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipURI.h>
 #include<libmsip/SipMessageContent.h>
-#include<sys/types.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContentFactory.h>
 
@@ -175,24 +174,12 @@ class SipMessage : public MObject{
 		 */
 		string getWarningMessage();
 
-                
-///		void setSocket(Socket* sock){socket = sock;};
-///		Socket* getSocket(){return socket;};
-
-//		list<string> getRouteSet();
-
-
-//		vector<MRef<SipHeader*> > headers;
-		
 		friend ostream & operator<<(ostream &out, SipMessage &);
                 std::string getDescription();
-		
-
 		
 		MRef<SipHeaderValue*> getHeaderValueNo(int type, int i);
 
 		
-		void setDestinationBranch(string b){branch = b;}
 		
 		string getDestinationBranch();
 
@@ -202,13 +189,11 @@ class SipMessage : public MObject{
                  * @returns Nonce in this repsonse if available.
                  */
                 string getNonce();
-                void setNonce(string n);
 
                 /**
                  * @returns Realm in this response if available.
                  */
                 string getRealm();
-                void setRealm(string r);
 
 		
 
@@ -216,21 +201,18 @@ class SipMessage : public MObject{
 		MRef<SipHeader*> getHeaderNo(int i);
 
 	protected:
+		void setDestinationBranch(string b){branch = b;}
+                void setNonce(string n);
+                void setRealm(string r);
 
-
-
-//		vector<MRef<SipHeader*> > getHeaders(){return headers;};
 		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
-
 
 		minilist<MRef<SipHeader*> > headers;
 		
 		bool addLine(string line);
-		MRef<SipMessageContent*> content;
-		//MRef<SdpPacket*> content;
-		// Socket on which the packet was received
-///		Socket* socket;
+		
 	private: 
+		MRef<SipMessageContent*> content;
 
 		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		

@@ -39,7 +39,7 @@
 
 class MessageRouter: public SipCallback, public GuiCallback{
 	public:
-		MessageRouter(MRef<SipSoftPhoneConfiguration *>phoneconf);
+		MessageRouter();
 		virtual ~MessageRouter(){}
 		
 		void setSipStateMachine(MRef<Sip*> ssp);

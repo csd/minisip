@@ -1187,7 +1187,7 @@ SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipDialogContainer*> dContainer, MRef<Si
 SipDialogP2Tuser::~SipDialogP2Tuser(){	
 }
 
-void SipDialogP2Tuser::handleSdp(MRef<SdpPacket*> sdp){
+void SipDialogP2Tuser::handleSdp(MRef<SdpPacket*> /*sdp*/){
 #ifdef OLD_MEDIA
 	int codec=0;
 	Codec *c=NULL;
@@ -1419,8 +1419,8 @@ void SipDialogP2Tuser::sendBye(const string &branch, int bye_seq_no){
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
 			domain,
 //			getDialogConfig().seqNo+1,
-			bye_seq_no,
-			localCalled
+			bye_seq_no///,
+			///localCalled
 			);
 
 	bye->getHeaderValueFrom()->setTag(dialogState.localTag);
@@ -1440,8 +1440,8 @@ void SipDialogP2Tuser::sendCancel(const string &branch){
 			dialogState.remoteUri,
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-			localCalled
+			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString()///,
+			///localCalled
 			);
 
 	cancel->getHeaderValueFrom()->setTag(dialogState.localTag);

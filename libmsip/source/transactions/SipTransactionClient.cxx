@@ -280,7 +280,7 @@ void SipTransactionClient::setUpStateMachine(){
 SipTransactionClient::SipTransactionClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
-			SipTransaction("SipTransactionClient", d, seq_no, "", callid),
+			SipTransaction(/*"SipTransactionClient",*/ d, seq_no, "", callid),
 			lastRequest(NULL),
 			timerT1(500)
 {

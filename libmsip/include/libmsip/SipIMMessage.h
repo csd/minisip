@@ -48,7 +48,7 @@ class SipIMMessage : public SipMessage{
 				string call_id, 
 				MRef<SipIdentity*> toIdentity,
 				MRef<SipIdentity*> fromIdentity,
-                                int local_port,
+                                //int local_port,
 				int32_t seq_no,
 				string msg
 				);

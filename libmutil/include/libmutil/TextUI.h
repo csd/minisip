@@ -72,7 +72,7 @@ protected:
 	///The maximum number of hints that will be output to the screen.
 	//The default is 2000.
 	int maxHints;
-	virtual void keyPressed(int key){};
+	virtual void keyPressed(int ){}; /// key pressed is the argument.
 private:
 	void outputSuggestions(minilist<string> &l);
 	string displaySuggestions(string);

@@ -240,7 +240,7 @@ void RtcpTransactionReleaseFloor::setUpStateMachine(){
 
 
 RtcpTransactionReleaseFloor::RtcpTransactionReleaseFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port, string callid, unsigned remoteSSRC) : 
-		SipTransaction("RtcpTransactionReleaseFloor",call,seqNo,"", callid),
+		SipTransaction(/*"RtcpTransactionReleaseFloor",*/call,seqNo,"", callid),
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {

@@ -75,7 +75,7 @@ string CommandString::getParam(){
 }
 
 void CommandString::setParam(string p){
-	keys["param"];
+	keys["param"]=p;
 //	param=p;
 }
 

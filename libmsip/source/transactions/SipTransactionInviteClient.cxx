@@ -393,7 +393,7 @@ void SipTransactionInviteClient::setUpStateMachine(){
 
 SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipDialog*> call, 
             int seq_no, string callid): 
-		SipTransaction("SipTransactionInviteClient",call, seq_no, "", callid),
+		SipTransaction(/*"SipTransactionInviteClient",*/ call, seq_no, "", callid),
 		lastInvite(NULL),
 		timerT1(500),
 		timerA(500)

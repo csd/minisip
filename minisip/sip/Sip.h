@@ -86,7 +86,7 @@ class Sip: public SipSMCommandReceiver, public Runnable{
 		
                 virtual void run();
 
-		void registerMediaStream(MRef<SdpPacket*> sdppack);
+		//void registerMediaStream(MRef<SdpPacket*> sdppack);
 
 		string invite(string &user);
 

@@ -67,7 +67,7 @@ TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
 TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 		MRef<certificate *> cert, MRef<ca_db *> cert_db ){
 	type = SOCKET_TYPE_TLS;
-	unsigned char * sid_ctx = (unsigned char *)"Minisip TLS";
+	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
 	SSL_METHOD *meth = SSLv23_client_method();
 	this->ssl_ctx = (SSL_CTX *)ssl_ctx;
@@ -141,7 +141,7 @@ TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx,
 		MRef<certificate *> cert, 
 		MRef<ca_db *> cert_db ){
 	type = SOCKET_TYPE_TLS;
-	unsigned char * sid_ctx = (unsigned char *)"Minisip TLS";
+	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
 	SSL_METHOD *meth = SSLv23_client_method();
 	this->cert_db = cert_db;

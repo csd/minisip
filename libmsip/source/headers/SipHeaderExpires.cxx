@@ -37,7 +37,7 @@
 
 const string sipHeaderValueExpiresTypeStr = "Expires";
 
-SipHeaderValueExpires::SipHeaderValueExpires(const string &build_from)
+SipHeaderValueExpires::SipHeaderValueExpires(const string &/*build_from*/) //TODO: parse expires header
 		: SipHeaderValue(SIP_HEADER_TYPE_EXPIRES,sipHeaderValueExpiresTypeStr)
 {
 	timeout=300;			//TODO: XXX

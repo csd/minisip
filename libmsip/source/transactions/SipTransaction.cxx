@@ -42,7 +42,7 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-SipTransaction::SipTransaction(const string &memType, MRef<SipDialog*> d, int cseq, const string &b, string callid): 
+SipTransaction::SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, int cseq, const string &b, string callid): 
 		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		dialog(d), 
 		socket(NULL),

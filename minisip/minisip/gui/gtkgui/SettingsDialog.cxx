@@ -338,7 +338,7 @@ string SecuritySettings::apply(){
 
 
 	string s = pskEntry->get_text();
-        unsigned char * psk = (unsigned char *)s.c_str();
+        const unsigned char * psk = (const unsigned char *)s.c_str();
         unsigned int psk_length = s.size();
         if( config->securityConfig.psk != NULL )
                 delete [] config->securityConfig.psk;

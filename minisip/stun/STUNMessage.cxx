@@ -121,7 +121,8 @@ void STUNMessage::parseAttributes(unsigned char *data, int length){
 unsigned char* STUNMessage::getMessageData(int &retLength){
 	int length=0;
 	length+=header.getHeaderLength();
-	for (list<STUNAttribute*>::iterator i=attributes.begin(); i!=attributes.end(); i++)
+	list<STUNAttribute*>::iterator i;
+	for (i=attributes.begin(); i!=attributes.end(); i++)
 		length+=2+2+(*i)->getValueLength(); //T+L+V
 	
 	header.setPayloadLength(length-header.getHeaderLength());
@@ -130,7 +131,7 @@ unsigned char* STUNMessage::getMessageData(int &retLength){
 
 	int index = header.getData(rawData);
 
-	for (list<STUNAttribute*>::iterator i=attributes.begin(); i!=attributes.end(); i++)
+	for (i=attributes.begin(); i!=attributes.end(); i++)
 		index+= (*i)->getMessageDataTLV(&rawData[index]);
 	
 	assert(index==length);

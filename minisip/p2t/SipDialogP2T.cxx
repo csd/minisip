@@ -378,7 +378,8 @@ bool SipDialogP2T::a6_listen_idle( const SipSMCommand &command){
 		
 		//find talking user
 		int talk_ssrc = 0;
-		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
+		uint32_t k;
+		for(k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			if(/*vc->*/getGroupList()->getAllUser().at(k)->getStatus()==P2T::STATUS_TALKING)
 				talk_ssrc = /*vc->*/getGroupList()->getAllUser().at(k)->getSSRC();
 		}
@@ -386,7 +387,7 @@ bool SipDialogP2T::a6_listen_idle( const SipSMCommand &command){
 		//start transaction
 		string p = command.getCommandString().getParam();
 		int ssrc=0;
-		for(uint32_t k=0;k<p.size();k++) 
+		for(k=0;k<p.size();k++) 
 			ssrc = (ssrc*10) + (p[k]-'0');		
 		
 		//int sNo=0;
@@ -982,11 +983,12 @@ bool SipDialogP2T::a18_talk_talk_revoke( const SipSMCommand &command){
 		
 		//check sequence number
 		int sNo=0;
-		for(uint32_t x=0;x<command.getCommandString().getParam2().size();x++) 
+		uint32_t x;
+		for(x=0;x<command.getCommandString().getParam2().size();x++) 
 			sNo = (sNo*10) + (command.getCommandString().getParam2()[x]-'0');
 		
 		int ssrc=0;
-		for(uint32_t x=0;x<command.getCommandString().getParam().size();x++) 
+		for(x=0;x<command.getCommandString().getParam().size();x++) 
 			ssrc = (ssrc*10) + (command.getCommandString().getParam()[x]-'0');
 			
 		if(sNo==/*vc->*/dialogState.seqNo){

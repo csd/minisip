@@ -415,10 +415,11 @@ MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 }
 
 MRef<SipHeader *> SipMessage::getHeaderOfType(int t, int i){
-	for (int32_t i=0; i< headers.size(); i++){
-		if ((headers[i])->getType() == t){
+	
+	for (int32_t j=0; j< headers.size(); j++){
+		if ((headers[j])->getType() == t){
 			if (i==0)
-				return headers[i];
+				return headers[j];
 			else
 				i--;
 		}

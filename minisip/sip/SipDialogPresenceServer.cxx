@@ -233,7 +233,7 @@ SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipDialogContainer*> dCont
 SipDialogPresenceServer::~SipDialogPresenceServer(){	
 }
 
-void SipDialogPresenceServer::sendNotice(string onlineStatus, string user){
+void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ //FIXME: use onlineStatus 
 	int seqNo = requestSeqNo();
 	string cid = "FIXME"+itoa(rand());
 	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, /*callId*/cid);
@@ -307,7 +307,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				cid,
 				toId,
 				getDialogConfig()->inherited.sipIdentity,
-				getDialogConfig()->inherited.localUdpPort,
+				//getDialogConfig()->inherited.localUdpPort,
 				dialogState.seqNo
 				));
 

@@ -59,8 +59,8 @@ class SipBye : public SipMessage{
 				string to_uri, //string to_tag,
 				string from_uri,// string from_tag,
 				string proxyAddr, 
-				int32_t seq_no, 
-				bool made_call
+				int32_t seq_no//, 
+				//bool made_call
 				);
                 
 

@@ -109,7 +109,7 @@ int32_t UDPSocket::getPort(){
 		return port2;
 }
 
-int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, void *msg, int32_t len){
+int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len){
 	if (use_ipv6 && ( to_addr.getType() != IP_ADDRESS_TYPE_V6)){
 		cerr << "Error: trying to send to IPv6 address using IPv4 socket" << endl;
 		throw new SendFailed( errno );
@@ -163,15 +163,19 @@ int32_t UDPSocket::recv(void *buf, int32_t len){
 
 }
 	
+/*
 ostream& operator<<(ostream& out, UDPSocket& s){
 //	int32_t buf[1024*10];
 //	int32_t n = s.read(buf,1024*10);
 //	out.write(buf,n);
 	return out;
 }
+*/
 
+/*
 UDPSocket& operator<<(UDPSocket& sock, string str){
 //	sock.write(str);
 	return sock;
 }
+*/
 

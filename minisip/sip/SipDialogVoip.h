@@ -69,7 +69,7 @@ class SipDialogVoip: public SipDialog{
 
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
-		void handleSdp(MRef<SdpPacket*> );
+		//void handleSdp(MRef<SdpPacket*> );
                 
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );

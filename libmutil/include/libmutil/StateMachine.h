@@ -114,7 +114,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 
 		MRef< TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType,TimeoutType> *> > *> getTimeoutProvider(){return timeoutProvider;}
 
-		virtual void handleTimeout(const TimeoutType &command){cerr <<"WARNING: UNIMPLEMENTED handleTimeout"<<endl;};
+		virtual void handleTimeout(const TimeoutType &){cerr <<"WARNING: UNIMPLEMENTED handleTimeout"<<endl;};
 
 		void timeout(const TimeoutType &command){handleTimeout(command);};
 

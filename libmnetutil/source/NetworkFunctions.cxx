@@ -175,8 +175,8 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	char hostname[256];
 	unsigned char *messageindex = answerbuffer+sizeof(HEADER);
 //	cerr << "Query fields returned:"<<endl;
-	int32_t n;
-	for (int32_t i=0; i< qdcount; i++){                         // 3.
+	int32_t n,i;
+	for (i=0; i< qdcount; i++){                         // 3.
 		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
 			perror("dn_expand:");
 		}
@@ -185,7 +185,7 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	}
 
 //	cerr << "Answer fields returned:"<<endl;
-	for (int32_t i=0; i< ancount; i++){                 // 4.
+	for (i=0; i< ancount; i++){                 // 4.
 		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
 			perror("dn_expand:");
 		}
