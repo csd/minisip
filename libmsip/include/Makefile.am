@@ -22,6 +22,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderUnsupported.h \
                      libmsip/SipHeaderUserAgent.h \
 		     libmsip/SipHeaderVia.h \
+		     libmsip/SipHeaderWarning.h \
 		     libmsip/SipDialogConfig.h \
 		     libmsip/SipDialogContainer.h \
 		     libmsip/SipMessageDispatcher.h \

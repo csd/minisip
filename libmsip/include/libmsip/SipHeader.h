@@ -62,6 +62,7 @@
 #define SIP_HEADER_TYPE_VIA			18
 #define SIP_HEADER_TYPE_UNSUPPORTED             19
 #define SIP_HEADER_TYPE_ACCEPTCONTACT		20
+#define SIP_HEADER_TYPE_WARNING			21
 
 using namespace std;
 

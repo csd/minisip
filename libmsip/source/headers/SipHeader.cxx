@@ -18,6 +18,7 @@
 #include<libmsip/SipHeaderContentType.h>
 #include<libmsip/SipHeaderMaxForwards.h>
 #include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipHeaderWarning.h>
 
 
 SipHeader::SipHeader(int type):type(type){
@@ -88,6 +89,10 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(line,"Accept-Contact:")){
 		return new SipHeaderAcceptContact(line);
+	}
+
+	if (SipUtils::startsWith(line,"Warning:")){
+		return new SipHeaderWarning(line);
 	}
 
 

@@ -58,6 +58,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderUserAgent.cxx \
                      source/headers/SipHeaderAcceptContact.cxx \
                      source/headers/SipHeaderVia.cxx \
+                     source/headers/SipHeaderWarning.cxx \
                      source/sdp/SdpPacket.cxx \
                      source/sdp/headers/SdpHeader.cxx \
                      source/sdp/headers/SdpHeaderA.cxx \
