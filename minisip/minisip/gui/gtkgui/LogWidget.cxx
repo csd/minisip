@@ -33,13 +33,18 @@ LogWidget::LogWidget( MainWindow * mainWindow ){
 	columns.add( typeColumn );
 	columns.add( uriColumn );
 	columns.add( statusColumn );
+	columns.add( entry );
 	
 	listStore = Gtk::ListStore::create( columns );
 
 	set_model( listStore );
 	append_column( "Start", startColumn );
 	append_column( "Type", typeColumn );
-	append_column( "From", uriColumn );
+	
+	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
+	
+	insert_column_with_data_func( 2, "From", *renderer,
+		SigC::slot( *this, &LogWidget::setFont ) );
 
 	set_headers_visible( false );
 	set_rules_hint( true );
@@ -57,7 +62,6 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 
 	bool red = false;
 
-
 	if( dynamic_cast<LogEntryIncoming *>( *entry ) != NULL ){
 		(*iter)[ typeColumn ] = render_icon( stockGoBack, menuIconSize );
 	}
@@ -66,6 +70,10 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 		(*iter)[ typeColumn ] = render_icon( stockGoForw, menuIconSize );
 	}
 
+	(*iter)[ this->entry ] = entry;
+
+#if 0
+	item
 	string callDetail = entry->peerSipUri;
 	
 	if( dynamic_cast<LogEntryFailure *>( *entry ) != NULL ){
@@ -99,6 +107,7 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 	r->property_attributes().set_value( attrList );
 	
 		
+#endif
 	
 	
 	struct tm * startTm = new struct tm;
@@ -114,5 +123,28 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 bool LogWidget::lineSelect( const Glib::RefPtr<Gtk::TreeModel>& model,
 		            const Gtk::TreeModel::Path& path, bool ){
 	return false;
+}
+
+void LogWidget::setFont( Gtk::CellRenderer * renderer,
+		         const Gtk::TreeModel::iterator & iter ){
+
+	Gtk::CellRendererText * textR =
+		(Gtk::CellRendererText *)renderer;
+
+	MRef<LogEntry *> logEntry = (*iter)[ this->entry ];
+	
+	string callDetail = logEntry->peerSipUri;
+	
+	MRef<LogEntryFailure *> failureEntry;
+
+	failureEntry = dynamic_cast<LogEntryFailure *>( *logEntry );
+	
+	if( *failureEntry != NULL ){
+		callDetail += ((string)"\n" + "<small><span foreground=\"#FF0000\">" +
+			       failureEntry->error + "</span></small>");
+	}
+
+	textR->property_markup().set_value( callDetail );
+
 }
 

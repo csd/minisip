@@ -94,6 +94,10 @@ void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
 }
 
 void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
+	if( selection->count_selected_rows() == 0 ){
+		return;
+	}
+	
 	ContactDialog dialog;
 	MRef<ContactEntry *> entry;
 	MRef<PhoneBookPerson *> person;

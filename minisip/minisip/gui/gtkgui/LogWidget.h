@@ -47,6 +47,7 @@ class LogWidget: public Gtk::TreeView{
 		Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > typeColumn;
 		Gtk::TreeModelColumn<Glib::ustring> uriColumn;
 		Gtk::TreeModelColumn<Glib::ustring> statusColumn;
+		Gtk::TreeModelColumn<MRef<LogEntry *> > entry;
 		Gtk::TreeModel::ColumnRecord columns;
 
 		Gtk::CellRendererPixbuf * iconRenderer;
@@ -55,6 +56,9 @@ class LogWidget: public Gtk::TreeView{
 
 		bool lineSelect( const Glib::RefPtr<Gtk::TreeModel>& model,
 				 const Gtk::TreeModel::Path& path, bool );
+
+		void setFont( Gtk::CellRenderer * renderer,
+			      const Gtk::TreeModel::iterator & iter );
 		
 
 };
