@@ -46,7 +46,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 	int mode = O_WRONLY; 	
 	/* FIXME */
-	this->fragment_setting = 0x00040008;
+	this->fragment_setting = 0x00080008;
 	
 	fdPlayback = ::open( dev.c_str(), mode );
 	
@@ -291,6 +291,7 @@ int OssSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 	int nWrittenBytes = 0;
 	int totalBytesWritten = 0;
 	int nBytesToWrite = nSamples * getSampleSizePlay();
+	cerr << getSampleSizePlay() << endl;
 
 	if( fdPlayback == -1 ){
 		return -1;

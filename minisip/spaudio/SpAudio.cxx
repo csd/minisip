@@ -58,26 +58,17 @@ void SpAudio::resample(short *input,
 		       short *output,
 		       int32_t isize,
 		       int32_t osize,
-		       SRC_DATA src_data,
+		       SRC_DATA *src_data,
 		       SRC_STATE *src_state)
 {
 
   int32_t error;
-  
-  float *finput = new float[isize];
-  float *foutput = new float[osize];
 
-  src_data.data_in=finput;
-  src_data.data_out=foutput;
-
-  src_short_to_float_array (input, finput, isize);
+  src_short_to_float_array (input, src_data->data_in, isize);
   
-  src_process(src_state,&src_data);
+  src_process(src_state,src_data);
   
-  src_float_to_short_array(foutput,output,osize);
-  
-  delete [] finput;
-  delete [] foutput;
+  src_float_to_short_array(src_data->data_out,output,osize);
 }
 
 int32_t SpAudio::spatialize(short *input,

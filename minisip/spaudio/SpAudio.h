@@ -44,7 +44,7 @@ class SpAudio{
 		 short *output, 
 		 int32_t isize,
 		 int32_t osize, 
-		 SRC_DATA src_data,
+		 SRC_DATA *src_data,
 		 SRC_STATE *src_state);
 
   int32_t spatialize (short *input,

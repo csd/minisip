@@ -138,7 +138,7 @@ class SoundSource : public MObject{
 
 		void setPointer(int32_t wpointer);
 
-		SRC_DATA getSrcData();
+		SRC_DATA* getSrcData();
 
 		SRC_STATE* getSrcState();
 		
@@ -153,7 +153,7 @@ class SoundSource : public MObject{
 		short *lookupright;
 		int32_t pointer;
 		int32_t numSources;
-		SRC_DATA src_data;
+		SRC_DATA* src_data;
 		SRC_STATE *src_state;
 
 };

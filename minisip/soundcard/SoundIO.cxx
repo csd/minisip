@@ -474,9 +474,12 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	numSources=nSources;
 
 	/* spatial audio initialization */
-	src_data.input_frames = 160;
-	src_data.output_frames = 882;
-	src_data.src_ratio = 5.5125;
+	src_data = new SRC_DATA();
+	src_data->input_frames = 160;
+	src_data->output_frames = 882;
+	src_data->src_ratio = 5.5125;
+	src_data->data_in  = new float[src_data->input_frames  * 2];
+	src_data->data_out = new float[src_data->output_frames * 2];
 
 	src_state=src_new(0,2,&error);
 
@@ -494,6 +497,9 @@ BasicSoundSource::~BasicSoundSource(){
 	delete [] rightChannelBuffer;
 	delete [] lookupleft;
 	delete [] lookupright;
+	delete [] src_data->data_in;
+	delete [] src_data->data_out;
+	delete src_data;
 }
 
 void BasicSoundSource::initLookup(int32_t nSources){
@@ -523,7 +529,7 @@ void BasicSoundSource::initLookup(int32_t nSources){
    return pointer;
  }
 
- SRC_DATA SoundSource::getSrcData(){
+ SRC_DATA* SoundSource::getSrcData(){
    return src_data;
  }
 
