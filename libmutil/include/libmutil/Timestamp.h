@@ -27,6 +27,8 @@
 //#include<config.h>
 //#endif
 
+#ifndef _MSC_VER
+
 #include<stdint.h>
 #include<sys/time.h>
 #include<time.h>
@@ -128,5 +130,7 @@ class Timestamp{
 };
 
 extern Timestamp ts;
+
+#endif
 
 #endif

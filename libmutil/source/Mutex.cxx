@@ -31,7 +31,7 @@
 // BSD 5.x: malloc.h has been replaced by stdlib.h
 // #include<malloc.h>
 
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 #include<windows.h>
 #endif
 
@@ -67,7 +67,7 @@ void Mutex::createMutex(){
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
 
-#elif defined WIN32
+#elif defined WIN32 || defined _MSC_VER
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(sizeof(HANDLE));
 	//    hMutex = CreateMutex(NULL, FALSE, NULL);

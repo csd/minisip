@@ -19,7 +19,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
-
+#include<windows.h>
 #include<config.h>
 #include<libmutil/CondVar.h>
 
@@ -32,6 +32,7 @@
 #define INTERNAL_MUTEX ((pthread_mutex_t *)internalMutexStruct)
 #elif defined WIN32
 #include<windows.h>
+
 #define INTERNAL_COND_WAIT ((HANDLE *)internalStruct)
 #define INTERNAL_MUTEX ((HANDLE *)internalMutexStruct)
 
@@ -105,8 +106,10 @@ void CondVar::wait( uint32_t timeout ){
 				
 #elif defined WIN32
 	if( timeout == 0 ){
-		SignalObjectAndWait( INTERNAL_MUTEX, INTERNAL_COND_WAIT, 
-			     INFINITE, FALSE );
+		SignalObjectAndWait(0,0,0,1);
+
+		SignalObjectAndWait( (HANDLE)INTERNAL_MUTEX, (HANDLE)INTERNAL_COND_WAIT, 
+			     (DWORD)INFINITE, (BOOL)FALSE );
 	}
 	else{
 		SignalObjectAndWait( INTERNAL_MUTEX, INTERNAL_COND_WAIT,

@@ -75,7 +75,7 @@
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CondVar.h>
-#include<stdint.h>
+//#include<stdint.h>
 
 
 /**
@@ -86,7 +86,7 @@ template<class TOCommand, class TOSubscriber>
 class TPRequest{
 	public:
 		TPRequest(){}
-		TPRequest( TOSubscriber tsi, int32_t timeout_ms, const TOCommand &command):subscriber(tsi){
+		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){
 			
 			when_ms = mtime();
 			when_ms += timeout_ms;
@@ -110,7 +110,7 @@ class TPRequest{
 		 * Number of milli seconds until timeout from when this method is
 		 * called
 		 */
-		int32_t get_ms_to_timeout(){
+		int get_ms_to_timeout(){
 			uint64_t now=mtime();
 			if (happens_before(now))
 				return 0;

@@ -148,7 +148,7 @@ class certificate_chain: public MObject{
 
 		void clear();
 
-		int length(){ return cert_list.size(); };
+		int length(){ return (int)cert_list.size(); };
 		void lock();
 		void unlock();
 

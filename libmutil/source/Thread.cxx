@@ -26,10 +26,16 @@
 
 #include<config.h>
 
-#ifdef WIN32
+#ifdef WIN32 
 //#include"stdafx.h"
 #include<windows.h>
 #endif
+
+#ifdef _MSC_VER
+#include<windows.h>
+#endif
+
+
 
 #include<stdio.h>
 

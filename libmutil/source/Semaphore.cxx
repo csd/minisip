@@ -33,7 +33,7 @@ using namespace std;
 #include<libmutil/dbg.h>
 
 
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 #include<windows.h>
 #define SEMHANDLE (*((HANDLE*)(handlePtr)))
 #else

@@ -352,7 +352,7 @@ XMLNode *XMLNode::getNode(XMLNode *cur, const char *path, int32_t i){
 	string part = parseWord(path, i);
 	if (part[part.length()-1]==']'){
 		string sindex;
-		int32_t ii=part.length()-2;
+		int32_t ii=(int32_t)part.length()-2;
 		while (part[ii]!='['){
 			sindex= part[ii]+sindex;
 			ii--;

@@ -22,6 +22,7 @@
 
 
 #ifndef WIN32
+#ifndef _MSC_VER
 #include<libmutil/Timestamp.h>
 
 
@@ -53,7 +54,7 @@ Timestamp::~Timestamp(){
 	delete [] ids;
 }
 
-void Timestamp::save( uint32_t id ){
+void Timestamp::save( unsigned int id ){
 	ids[index] = id;
 	gettimeofday( &values[index], tz );
 	index = ( index + 1 ) % MAX_TIMESTAMPS;
@@ -127,4 +128,5 @@ string Timestamp::writeElapsedTime(std::string descr){
 	return s_elapsedTime;
 	
 }
+#endif
 #endif

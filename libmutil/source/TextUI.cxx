@@ -31,7 +31,7 @@
 #include<termios.h>
 #endif
 
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 #include<conio.h>
 #endif
 
@@ -169,7 +169,7 @@ void TextUI::guimain(){
                 }
 */
 #endif
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 		c= _getch();
 //		displayMessage(string("read: ")+c+"("+itoa((int)c)+")");
 #endif

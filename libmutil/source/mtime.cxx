@@ -23,7 +23,7 @@
 
 #include<config.h>
 
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 #include <sys/timeb.h>
 #else
 #include<sys/time.h>
@@ -31,7 +31,7 @@
 #endif
 
 uint64_t mtime(){
-#ifdef WIN32
+#if defined WIN32 || defined _MSC_VER
 	struct _timeb tb;
 	_ftime (&tb);
 

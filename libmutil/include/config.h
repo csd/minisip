@@ -26,7 +26,7 @@
 
 
 #ifdef _MSC_VER
-
+#define WIN32
 
 #ifndef uint8_t
 typedef unsigned char  uint8_t;
