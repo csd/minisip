@@ -93,7 +93,6 @@ void FileSoundSource::getSound(short *dest,
 	    else
         	index=nSamples;
     }
-    cerr << index << endl;
 
     int mul = stereo ? 2 : 1 ;
 
