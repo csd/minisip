@@ -303,6 +303,7 @@ void MainWindow::updateConfig(){
 
 void MainWindow::setContactDb( MRef<ContactDb *> contactDb ){
 	this->contactDb = contactDb;
+	logWidget->setContactDb( contactDb );
 }
 	
 bool MainWindow::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){

@@ -24,6 +24,7 @@
 
 #include"../../LogEntry.h"
 #include<libmutil/itoa.h>
+#include"../../contactdb/ContactDb.h"
 
 
 LogWidget::LogWidget( MainWindow * mainWindow ){
@@ -71,44 +72,6 @@ void LogWidget::addLogEntry( MRef<LogEntry *> entry ){
 	}
 
 	(*iter)[ this->entry ] = entry;
-
-#if 0
-	item
-	string callDetail = entry->peerSipUri;
-	
-	if( dynamic_cast<LogEntryFailure *>( *entry ) != NULL ){
-		callDetail += "\n" + 
-			dynamic_cast<LogEntryFailure *>(*entry)->error;
-		red = true;
-	}
-		
-	(*iter)[ uriColumn ] = callDetail;
-
-	/* Build a list of attribute for the status message */
-	Pango::AttrList attrList;
-	
-	Pango::Attribute attrScale;
-	attrScale = Pango::Attribute::create_attr_scale(
-			Pango::SCALE_SMALL );
-	attrScale.set_start_index( entry->peerSipUri.length() + 1 );
-	attrScale.set_end_index( callDetail.length() );
-	attrList.insert( attrScale );
-
-	Pango::Attribute attrColor;
-	attrColor = Pango::Attribute::create_attr_foreground( red?65535:0, 0, 0  );
-	attrColor.set_start_index( entry->peerSipUri.length() + 1 );
-	attrColor.set_end_index( callDetail.length() );
-	attrList.insert( attrColor );
-	
-	/* Apply that attribute list to the CellRenderer */
-	Gtk::CellRendererText * r = 
-		(Gtk::CellRendererText*)get_column_cell_renderer( 2 );
-
-	r->property_attributes().set_value( attrList );
-	
-		
-#endif
-	
 	
 	struct tm * startTm = new struct tm;
 #ifndef WIN32
@@ -133,7 +96,16 @@ void LogWidget::setFont( Gtk::CellRenderer * renderer,
 
 	MRef<LogEntry *> logEntry = (*iter)[ this->entry ];
 	
-	string callDetail = logEntry->peerSipUri;
+	string callDetail;
+	ContactEntry * contactEntry;
+	
+	if( contactDb && 
+		( contactEntry = contactDb->lookUp( logEntry->peerSipUri ) )){
+		callDetail = contactEntry->getName();
+	}
+	else{
+		callDetail = logEntry->peerSipUri;
+	}
 	
 	MRef<LogEntryFailure *> failureEntry;
 
@@ -148,3 +120,7 @@ void LogWidget::setFont( Gtk::CellRenderer * renderer,
 
 }
 
+
+void LogWidget::setContactDb( MRef<ContactDb *> contactDb ){
+	this->contactDb = contactDb;
+}

@@ -30,6 +30,7 @@
 
 class LogEntry;
 class MainWindow;
+class ContactDb;
 
 
 
@@ -38,6 +39,8 @@ class LogWidget: public Gtk::TreeView{
 		LogWidget( MainWindow * mainWindow );
 
 		void addLogEntry( MRef<LogEntry *> );
+
+		void setContactDb( MRef<ContactDb *> );
 
 	private:
 		//list< MRref<LogEntry *> > entries;
@@ -59,7 +62,8 @@ class LogWidget: public Gtk::TreeView{
 
 		void setFont( Gtk::CellRenderer * renderer,
 			      const Gtk::TreeModel::iterator & iter );
-		
+
+		MRef<ContactDb *> contactDb;
 
 };
 
