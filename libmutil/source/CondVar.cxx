@@ -39,6 +39,7 @@
 
 CondVar::CondVar(){
 #ifdef HAVE_PTHREAD_H
+#define MINISIP_CONDVAR_IMPLEMENTED
 	/*INTERNAL_COND_WAIT*/ internalStruct = new pthread_cond_t;
 	/*INTERNAL_MUTEX*/ internalMutexStruct = new pthread_mutex_t;
 
@@ -47,10 +48,16 @@ CondVar::CondVar(){
 	//pthread_mutex_lock( INTERNAL_MUTEX );
 	init = true;
 #elif defined WIN32
+#define MINISIP_CONDVAR_IMPLEMENTED
 	INTERNAL_COND_WAIT = CreateEvent( NULL, FALSE, FALSE, NULL );
 	INTERNAL_MUTEX = CreateMutex(NULL, FALSE, NULL);
 	WaitForSingleObject( INTERNAL_MUTEX, INFINITE );
 	
+#endif
+
+
+#ifndef MINISIP_CONDVAR_IMPLEMENTED
+#error CondVar not fully implemented
 #endif
 }
 

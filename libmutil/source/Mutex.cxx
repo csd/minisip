@@ -45,7 +45,7 @@ using namespace std;
 ///See: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dllproc/base/mutex_objects.asp
 
 //TODO: Check return values
-Mutex::Mutex()/*:locked(false)*/{
+Mutex::Mutex(){
 	createMutex();
 }
 
@@ -61,12 +61,14 @@ Mutex::Mutex(const Mutex &m){
 
 void Mutex::createMutex(){
 #ifdef HAVE_PTHREAD_H
+#define MINISIP_MUTEX_IMPLEMENTED
 	//handle_ptr = malloc(sizeof(pthread_mutex_t));
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
 #endif
 
 #ifdef WIN32
+#define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(sizeof(HANDLE));
 	//    hMutex = CreateMutex(NULL, FALSE, NULL);
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
@@ -79,6 +81,7 @@ void Mutex::createMutex(){
 #endif
 
 #ifdef WINCE
+#define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(1, sizeof(HANDLE));
 	//    hMutex = CreateMutex(NULL, FALSE, NULL);
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
@@ -90,7 +93,9 @@ void Mutex::createMutex(){
 	}
 #endif
 
-
+#ifndef MINISIP_MUTEX_IMPLEMENTED
+#error Mutex not fully implemented
+#endif
 
 }
 

@@ -44,6 +44,7 @@ string ThreadException::what(){
 }
 
 #ifdef WIN32
+#define MINISIP_THREAD_IMPLEMENTED
 static DWORD WINAPI ThreadStarter( LPVOID lpParam ) 
 { 
 //	printf("ThreadStarter: thread created\n");
@@ -91,6 +92,7 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 #endif //WIN32
 
 #ifdef HAVE_PTHREAD_H
+#define MINISIP_THREAD_IMPLEMENTED
 static void *LinuxThreadStarter(void *arg){
 //	cerr << "LinuxThreadStarter: thread created"<< endl;
 	((Runnable *)arg)->run();
@@ -120,6 +122,12 @@ static void *LinuxStaticThreadStarter(void *obj, void *arg){
 }
 */
 #endif
+
+
+#ifndef MINISIP_THREAD_IMPLEMENTED
+#error Thread not fully implemented
+#endif
+
 
 Thread::Thread(Runnable *runnable){
 #ifdef WIN32
