@@ -429,7 +429,7 @@ void RtcpTransactionGetFloor::setUpStateMachine(){
 
 
 RtcpTransactionGetFloor::RtcpTransactionGetFloor(MRef<SipDialog*> dialog, int seqNo, IPAddress *toaddr, int32_t port, string callId, unsigned remoteSSRC) : 
-		SipTransaction("RtcpTransactionGetFloor",dialog,"", callId),
+		SipTransaction("RtcpTransactionGetFloor",dialog,seqNo,"", callId),
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {

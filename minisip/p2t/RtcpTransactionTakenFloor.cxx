@@ -119,7 +119,7 @@ void RtcpTransactionTakenFloor::setUpStateMachine(){
 
 
 RtcpTransactionTakenFloor::RtcpTransactionTakenFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port, string callid, unsigned remoteSSRC) : 
-		SipTransaction("RtcpTransactionTakenFloor",call,"", callid),
+		SipTransaction("RtcpTransactionTakenFloor",call,seqNo,"", callid),
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {
