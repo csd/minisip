@@ -544,7 +544,9 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				for( i = 0; i < nread; i++ ){
 					pack = parser.feed( buffer[i] );
 					if( pack ){
+#ifdef DEBUG_OUTPUT
 						printMessage("IN (STREAM)", buffer);
+#endif
 						//					dialogContainer->enqueueMessage( pack );
 
 						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
