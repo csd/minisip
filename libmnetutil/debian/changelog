@@ -1,3 +1,9 @@
+libmnetutil (0.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Tue, 19 Oct 2004 00:28:41 +0200
+
 libmnetutil (0.2-1) unstable; urgency=low
 
   * Initial Release.
