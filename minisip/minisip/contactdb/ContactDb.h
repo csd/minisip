@@ -29,6 +29,10 @@
 class ContactDb;
 class PhoneBookPerson;
 
+#define CONTACT_STATUS_ONLINE 1
+#define CONTACT_STATUS_OFFLINE 2
+#define CONTACT_STATUS_UNKNOWN 3
+
 class ContactEntry : public MObject{
 
 	public:
@@ -49,6 +53,11 @@ class ContactEntry : public MObject{
 
 		uint32_t getId();
 
+		bool isOnline(){return onlineStatus==CONTACT_STATUS_ONLINE;}
+		bool isOffline(){return onlineStatus==CONTACT_STATUS_OFFLINE;}
+		void setOnlineStatus(int s){onlineStatus=s;}
+		void setOnlineStatusDesc(string s){onlineStatusDesc=s;}
+
 		virtual std::string getMemObjectType(){return "ContactEntry";}
 	private:
 		static MRef<ContactDb *> db;
@@ -59,6 +68,9 @@ class ContactEntry : public MObject{
 		uint32_t type;
 		MRef< PhoneBookPerson * > person;
 
+		std::string location;
+		int onlineStatus;
+		std::string onlineStatusDesc;
 };
 
 class ContactDb : public MObject{
@@ -70,8 +82,9 @@ class ContactDb : public MObject{
 
 		void addEntry( ContactEntry * entry );
 		void delEntry( ContactEntry * entry );
-		
+
 		virtual std::string getMemObjectType(){return "ContactDb";}
+
 	private:
 
 		std::list< ContactEntry * > entries;

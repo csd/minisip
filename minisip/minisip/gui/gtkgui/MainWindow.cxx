@@ -288,7 +288,37 @@ void MainWindow::gotCommand(){
 	if( command.getOp() == SipCommandString::incoming_available ){
 		addCall( command.getDestinationId(), command.getParam(), true,
 			 command.getParam2() );
+		return;
 	}
+	
+	if( command.getOp() == SipCommandString::remote_presence_update){
+		MRef<ContactEntry*> ce = contactDb->lookUp(command.getParam());
+		if (ce){
+			string state = command.getParam2();
+			cerr << "State is: "<< state << endl;
+			if (state =="online"){
+				cerr << "Changed status to online "<< endl;
+				ce->setOnlineStatus(CONTACT_STATUS_ONLINE);
+			}else if (state=="offline")
+				ce->setOnlineStatus(CONTACT_STATUS_OFFLINE);
+			else
+				ce->setOnlineStatus(CONTACT_STATUS_UNKNOWN);
+			ce->setOnlineStatusDesc(command.getParam3());
+			phoneBookTreeView->queue_draw();
+			
+		}else{
+			cerr << "MainWindow::gotCommand: WARNING: did not find uri <"<< command.getParam()<< "> to change presence info"<< endl;
+		}
+		return;
+	}
+	
+	if( command.getOp() == SipCommandString::register_sent 
+			|| command.getOp() == SipCommandString::register_ok ){
+		//ignore these commands
+		return;
+	}
+
+	merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
 }	
 
 void MainWindow::gotPacket( int32_t i ){

@@ -289,7 +289,6 @@ void PhoneBookModel::editContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
 
 }
 
-
 void PhoneBookModel::setFont( Gtk::CellRenderer * renderer, 
 		const Gtk::TreeModel::iterator & iter ){
 
@@ -309,9 +308,17 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 		MRef<ContactEntry *> entry = (*iter)[tree->contactEntry];
 		MRef<PhoneBook *> pb = (*iter)[tree->phonebook];
 		if( entry ){
+			string col;
+			if (entry->isOnline()){
+				col = "#20FF20";
+			}else if (entry->isOffline()){
+				col = "#FF2020";
+			}else{
+				col = "#0000FF";
+			}
 			textR->property_markup().set_value( 
 				entry->getDesc() + ": " + 
-				"<small><span foreground=\"#0000FF\">" + 
+				"<small><span foreground=\"" + col +  "\">" + 
 				entry->getUri() + "</span></small>" );
 		}
 		/*

@@ -23,14 +23,12 @@
 #ifndef GTK_PHONE_BOOK_H
 #define GTK_PHONE_BOOK_H
 
-
 #include<gtkmm.h>
 #include<libmutil/MemObject.h>
 
 class PhoneBookPerson;
 class PhoneBook;
 class ContactEntry;
-
 
 class PhoneBookTree : public Gtk::TreeModel::ColumnRecord{
 	
@@ -44,7 +42,6 @@ class PhoneBookTree : public Gtk::TreeModel::ColumnRecord{
 		Gtk::TreeModelColumn< MRef<PhoneBook *> > phonebook;
 	private:
 		
-
 };
 
 class PhoneBookModel : public Gtk::TreeStore{
@@ -59,7 +56,7 @@ class PhoneBookModel : public Gtk::TreeStore{
 		void editContact( Glib::RefPtr<Gtk::TreeSelection> selection );
 		void addContact( Glib::RefPtr<Gtk::TreeSelection> selection,
 				 bool address );
-
+		
 		void setFont( Gtk::CellRenderer * renderer, const Gtk::TreeModel::iterator & iter );
 
 	private:

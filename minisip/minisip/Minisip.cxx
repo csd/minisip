@@ -279,8 +279,13 @@ void Minisip::run(){
 		SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
 		sip->handleCommand(sipcmd2);
 */
+		
                 gui->setCallback(ehandler);
 //		sleep(5);
+		
+//		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
+//		gui->handleCommand(pupd);
+
                 sip->run();
 
 

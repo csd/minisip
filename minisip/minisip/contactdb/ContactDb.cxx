@@ -28,7 +28,7 @@ using namespace std;
 
 MRef<ContactDb *> ContactEntry::db = NULL;
 
-ContactEntry::ContactEntry():person(NULL){
+ContactEntry::ContactEntry():person(NULL), onlineStatus(CONTACT_STATUS_UNKNOWN){
 	if( ! db.isNull() ){
 		db->addEntry( this );
 	}
@@ -40,7 +40,8 @@ ContactEntry::ContactEntry( string uri, string desc,
 		MRef<PhoneBookPerson *> person ):
 	uri(uri),
 	desc(desc),
-	person(person){
+	person(person),
+	onlineStatus(CONTACT_STATUS_UNKNOWN){
 	
 	
 	if( ! db.isNull() ){
