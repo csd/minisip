@@ -220,7 +220,7 @@ class StateTransition : public MObject{
 				MRef<State<CommandType,TimeoutType> *> to_state):
 					stateMachine(stateMachine), 
 					name(name), 
-					action(action),
+					action(a),
 					from_state(from_state),
 					to_state(to_state)
 		{
