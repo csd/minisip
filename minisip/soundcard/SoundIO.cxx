@@ -169,8 +169,7 @@ void SoundIO::set_recorder_buffer_size(int32_t bs){
 	recorder_buffer_size=bs;
 }
 
-void SoundIO::fileIOTimeout(int dummy){
-	dummy++;
+void SoundIO::fileIOTimeout(int ){
 }
 
 void *SoundIO::recorderLoop(void *sc_arg){
