@@ -49,7 +49,7 @@ SipAck::SipAck(string &build_from):SipMessage(type, build_from){
 SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string proxy): SipMessage(branch, type){
 	this->username = to_tel_no;
 	this->ipaddr = proxy;
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
+	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
 	addHeader(mf);
 	int noHeaders = pack->getNoHeaders();
 	for (int32_t i=0; i< noHeaders; i++){			//FIX: deep copy
@@ -57,7 +57,7 @@ SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string p
 		int headerType = header->getType();
 		switch (headerType){
 			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderCSeq*)*header)->setMethod("ACK");
+				((SipHeaderValueCSeq*) *(header->getHeaderValue(0)))->setMethod("ACK");
 			case SIP_HEADER_TYPE_FROM:
 			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:

@@ -40,11 +40,11 @@
 */
 
 
-class SipHeaderProxyAuthorization: public SipHeaderAuthorization{
+class SipHeaderValueProxyAuthorization: public SipHeaderValueAuthorization{
 	public:
-		SipHeaderProxyAuthorization();
-		SipHeaderProxyAuthorization(const string &build_from);
-		SipHeaderProxyAuthorization(const string &sip_method,
+		SipHeaderValueProxyAuthorization();
+		SipHeaderValueProxyAuthorization(const string &build_from);
+		SipHeaderValueProxyAuthorization(const string &sip_method,
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
@@ -54,7 +54,7 @@ class SipHeaderProxyAuthorization: public SipHeaderAuthorization{
 				const string &auth_method="DIGEST");
 		
 
-		virtual ~SipHeaderProxyAuthorization();
+		virtual ~SipHeaderValueProxyAuthorization();
 
                 virtual std::string getMemObjectType(){return "SipHeaderProxyAuthorization";}
 		

@@ -54,17 +54,19 @@
  * @author Florian Maurer
 */
 
-class SipHeaderAcceptContact: public SipHeader{
+class SipHeaderValueAcceptContact: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderAcceptContact();
-		SipHeaderAcceptContact(string build_from);
-		SipHeaderAcceptContact(string featuretag, 
+		SipHeaderValueAcceptContact();
+		SipHeaderValueAcceptContact(string build_from);
+		SipHeaderValueAcceptContact(string featuretag, 
 				bool set_require, 
 				bool set_explicit);
 
-		virtual ~SipHeaderAcceptContact();
+		virtual ~SipHeaderValueAcceptContact();
+
+		string getMemObjectType(){return "SipHeaderAcceptContact";}
 		
 		/**
 		 * returns string representation of the header

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderAcceptContact.cxx
+ * 	SipHeaderValueAcceptContact.cxx
  * Author
  * 	Florian Maurer, florian.maurer@floHweb.ch
  * Purpose
@@ -50,10 +50,12 @@
 
 #include<libmsip/SipHeaderAcceptContact.h>
 
+const string sipHeaderValueValueTypeStr = "Accept-Contact";
+
 /**
  * Constructor
  */	
-SipHeaderAcceptContact::SipHeaderAcceptContact():SipHeader(SIP_HEADER_TYPE_ACCEPTCONTACT){
+SipHeaderValueAcceptContact::SipHeaderValueAcceptContact():SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT, sipHeaderValueValueTypeStr){
 
 }
 
@@ -65,7 +67,7 @@ SipHeaderAcceptContact::SipHeaderAcceptContact():SipHeader(SIP_HEADER_TYPE_ACCEP
  *			  Accept-Contact: *;featuretag;require;explicit
  *			  'request' and 'explicit' are optional
  */
-SipHeaderAcceptContact::SipHeaderAcceptContact(string build_from):SipHeader(SIP_HEADER_TYPE_ACCEPTCONTACT) {
+SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT,sipHeaderValueValueTypeStr) {
 	
 	//Initialisation
 	featuretag="NOT DEFINED";
@@ -120,9 +122,9 @@ SipHeaderAcceptContact::SipHeaderAcceptContact(string build_from):SipHeader(SIP_
  * @param set_explicit set the explicit flag
  */
 
-SipHeaderAcceptContact::SipHeaderAcceptContact(string featuretag, 
+SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string featuretag, 
 		bool set_require, bool set_explicit)
-		:SipHeader(SIP_HEADER_TYPE_ACCEPTCONTACT){
+		:SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT,sipHeaderValueValueTypeStr){
 	this->featuretag = featuretag;
 	this->set_require = set_require;
 	this->set_explicit = set_explicit;
@@ -131,7 +133,7 @@ SipHeaderAcceptContact::SipHeaderAcceptContact(string featuretag,
 /**
  * Deconstructor
  */
-SipHeaderAcceptContact::~SipHeaderAcceptContact(){
+SipHeaderValueAcceptContact::~SipHeaderValueAcceptContact(){
 
 }
 
@@ -139,9 +141,9 @@ SipHeaderAcceptContact::~SipHeaderAcceptContact(){
  * returns the string representation of
  * the Accept-Contact header field
  */
-string SipHeaderAcceptContact::getString(){
+string SipHeaderValueAcceptContact::getString(){
 	string answer;
-	answer = "Accept-Contact: *;" + featuretag;
+	answer = /*"Accept-Contact: */ "*;" + featuretag;
 	
 	if(set_require)
 		answer = answer + ";require";

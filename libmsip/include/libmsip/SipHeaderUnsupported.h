@@ -37,11 +37,11 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderUnsupported: public SipHeader{
+class SipHeaderValueUnsupported: public SipHeaderValue{
 	public:
-		SipHeaderUnsupported(const string &build_from);
+		SipHeaderValueUnsupported(const string &build_from);
 
-		virtual ~SipHeaderUnsupported();
+		virtual ~SipHeaderValueUnsupported();
 
                 virtual std::string getMemObjectType(){return "SipHeaderUnsupported";}
 		

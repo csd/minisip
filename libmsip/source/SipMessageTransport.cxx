@@ -221,7 +221,11 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 //				if (pack->getType()==SipAck::type)
 //					pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("UDP", localIP, localUDPPort, branch+"ACK")));
 //				else
-					pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("UDP", localIP, localUDPPort, branch)));
+
+				MRef<SipHeaderValue*> hdrVal = new SipHeaderValueVia("UDP", localIP, localUDPPort, branch);
+				MRef<SipHeader*> hdr = new SipHeader(hdrVal);
+				pack->addHeader(hdr);
+//pack->addHeader(MRef<SipHeader*>(new SipHeader(SIP_HEADER_TYPE_VIA, "Via:", MRef<SipHeaderValue*>(new SipHeaderVia("UDP", localIP, localUDPPort, branch))));
 				
 //				
 			}
@@ -258,7 +262,10 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			TCPSocket * tcpsock;
 			addSocket(tcpsock = new TCPSocket(ip_addr, port));
 			if( pack->getType() != SipResponse::type ){
-				pack->addHeader(MRef<SipHeader*>(new SipHeaderVia(transport, localIP, localTCPPort, branch))); //FIXME: WARNING: if we are behind NAT TCP will not get any incoming connections--EE
+				MRef<SipHeaderValue*> hval = new SipHeaderValueVia(transport, localIP, localTCPPort, branch);
+				MRef<SipHeader*> hdr = new SipHeader(hval);
+				pack->addHeader(hdr);
+				//pack->addHeader(MRef<SipHeader*>(new SipHeaderVia(transport, localIP, localTCPPort, branch))); //FIXME: WARNING: if we are behind NAT TCP will not get any incoming connections--EE
 			}
 			ts.save( PACKET_OUT );
 #ifdef DEBUG_OUTPUT
@@ -280,7 +287,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			
 			addSocket( tlssock );
 			if( pack->getType() != SipResponse::type ){     //WARNING: If behind NAT, TLS will not get any incoming connections.
-				pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("TLS"/*SER fix "TCP"*/, localIP, localTLSPort, branch)));
+				pack->addHeader(new SipHeader(new SipHeaderValueVia("TLS"/*SER fix "TCP"*/, localIP, localTLSPort, branch)));
 			}
 			merr << "Created new TLS Socket" << end;
 			ts.save( PACKET_OUT );
@@ -327,10 +334,11 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, StreamSocket * soc
 	assert(socket != NULL);
 	
 	if( pack->getType() != SipResponse::type ){
-		if( socket->getType() == SOCKET_TYPE_TCP )
-			pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("TCP", contactIP, localTCPPort, branch)));
-		else
-			pack->addHeader(MRef<SipHeader*>(new SipHeaderVia("TCP"/*SER fix "TCP"*/, contactIP, localTLSPort, branch)));
+		if( socket->getType() == SOCKET_TYPE_TCP ){
+			pack->addHeader(MRef<SipHeader*>(new SipHeader(new SipHeaderValueVia("TCP", contactIP, localTCPPort, branch))));
+		}else{
+			pack->addHeader(MRef<SipHeader*>(new SipHeader(new SipHeaderValueVia("TCP"/*SER fix "TCP"*/, contactIP, localTLSPort, branch))));
+		}
 	}
 
 	ts.save( PACKET_OUT );

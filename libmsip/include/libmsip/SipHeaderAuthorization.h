@@ -40,15 +40,15 @@
 */
 
 
-class SipHeaderAuthorization: public SipHeader{
+class SipHeaderValueAuthorization: public SipHeaderValue{
 	public:
-		SipHeaderAuthorization();
-		SipHeaderAuthorization(int type);
+		SipHeaderValueAuthorization();
+		SipHeaderValueAuthorization(int type, const string &typeStr);
 		
-		SipHeaderAuthorization(const string &build_from);
-		SipHeaderAuthorization(int type, const string &build_from);
+		SipHeaderValueAuthorization(const string &build_from);
+		SipHeaderValueAuthorization(int type, const string &build_from, const string &typeStr);
 		
-		SipHeaderAuthorization(const string &sip_method,
+		SipHeaderValueAuthorization(const string &sip_method,
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
@@ -57,17 +57,18 @@ class SipHeaderAuthorization: public SipHeader{
 				const string &password,
 				const string &auth_method="DIGEST");
 		
-		SipHeaderAuthorization(int type, const string &sip_method,
+		SipHeaderValueAuthorization(int type, const string &sip_method,
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
 				const SipURI &uri, 
 				const string &auth_id, 
 				const string &password,
-				const string &auth_method="DIGEST");
+				const string &auth_method,
+				const string &typeStr);
 
 		
-		virtual ~SipHeaderAuthorization();
+		virtual ~SipHeaderValueAuthorization();
 
                 virtual std::string getMemObjectType(){return "SipHeaderAuthorization";}
 		

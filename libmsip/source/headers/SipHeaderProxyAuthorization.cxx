@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderProxyAuthorization.cxx
+ * 	SipHeaderValueProxyAuthorization.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -33,19 +33,20 @@
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmutil/vmd5.h>
 
+const string sipHeaderValueProxyAuthorization = "Proxy-Authorization";
 
-SipHeaderProxyAuthorization::SipHeaderProxyAuthorization() : SipHeaderAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION){
+SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization() : SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,sipHeaderValueProxyAuthorization){
 //	type = SIP_HEADER_TYPE_PROXYAUTHORIZATION;
 }
 		
 
-SipHeaderProxyAuthorization::SipHeaderProxyAuthorization(const string &build_from) 
-		: SipHeaderAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION, build_from)
+SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string &build_from) 
+		: SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION, build_from,sipHeaderValueProxyAuthorization)
 {
 
 }
 
-SipHeaderProxyAuthorization::SipHeaderProxyAuthorization(const string &sip_method,
+SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string &sip_method,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
@@ -53,7 +54,7 @@ SipHeaderProxyAuthorization::SipHeaderProxyAuthorization(const string &sip_metho
 		const string &auth_id, 
 		const string &password,
 		const string &auth_method)
-			: SipHeaderAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,
+			: SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,
 						sip_method,
 						username,
 						realm,
@@ -61,16 +62,16 @@ SipHeaderProxyAuthorization::SipHeaderProxyAuthorization(const string &sip_metho
 						uri,
 						auth_id,
 						password,
-						auth_method)
+						auth_method,sipHeaderValueProxyAuthorization)
 {
 
 }
 
-SipHeaderProxyAuthorization::~SipHeaderProxyAuthorization() {
+SipHeaderValueProxyAuthorization::~SipHeaderValueProxyAuthorization() {
 
 }
 		
-string SipHeaderProxyAuthorization::getString(){
-	return "Proxy-"+SipHeaderAuthorization::getString();
+string SipHeaderValueProxyAuthorization::getString(){
+	return /*"Proxy-"+*/SipHeaderValueAuthorization::getString(); //FIXME: XXX XXX
 } 
 

@@ -40,14 +40,14 @@
 
 // Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
 // 
-class SipHeaderAccept: public SipHeader{
+class SipHeaderValueAccept: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderAccept();
-		SipHeaderAccept(const string &build_from);
+		SipHeaderValueAccept();
+		SipHeaderValueAccept(const string &build_from);
 
-		virtual ~SipHeaderAccept();
+		virtual ~SipHeaderValueAccept();
 		
 
                 virtual std::string getMemObjectType(){return "SipHeaderAccept";}

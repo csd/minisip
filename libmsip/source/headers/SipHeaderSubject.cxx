@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderSubject.cxx
+ * 	SipHeaderValueSubject.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,32 +35,32 @@
 
 #include<libmutil/itoa.h>
 
-// Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
+const string sipHeaderValueSubjectTypeStr = "Subject";
 
-SipHeaderSubject::SipHeaderSubject(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_SUBJECT)
+SipHeaderValueSubject::SipHeaderValueSubject(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr)
 {
 	subject="NOT_SET";
 }
 
-SipHeaderSubject::SipHeaderSubject()
-		: SipHeader(SIP_HEADER_TYPE_SUBJECT)
+SipHeaderValueSubject::SipHeaderValueSubject()
+		: SipHeaderValue(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr)
 {
 	subject="NOT_SET";
 }
 
-SipHeaderSubject::~SipHeaderSubject(){
+SipHeaderValueSubject::~SipHeaderValueSubject(){
 }
 
-string SipHeaderSubject::getString(){
-	return "Subject: "+subject;
+string SipHeaderValueSubject::getString(){
+	return /*"Subject: "+*/subject;
 }
 
-string SipHeaderSubject::getSubject(){
+string SipHeaderValueSubject::getSubject(){
 	return subject;
 }
 		
-void SipHeaderSubject::setSubject(const string &subject){
+void SipHeaderValueSubject::setSubject(const string &subject){
 	this->subject=subject;
 }
 

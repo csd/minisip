@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderVia.cxx
+ * 	SipHeaderValueVia.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -34,12 +34,12 @@
 
 #include<libmutil/itoa.h>
 
-// Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
+const string sipHeaderValueViaTypeStr = "Via";
 
-SipHeaderVia::SipHeaderVia(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_VIA)
+SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
-	unsigned i=17;
+	unsigned i=0;
 	ip="";
 	port=0;
 	while (build_from[i]==' ')
@@ -76,16 +76,16 @@ SipHeaderVia::SipHeaderVia(const string &build_from)
 
 }
 
-SipHeaderVia::SipHeaderVia()
-		: SipHeader(SIP_HEADER_TYPE_VIA)
+SipHeaderValueVia::SipHeaderValueVia()
+		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	port=0;
 	protocol="UDP";
 	ip="UNKNOWN_IP";
 }
 
-SipHeaderVia::SipHeaderVia(const string &proto, const string &ip, int32_t port, const string &branch)
-		: SipHeader(SIP_HEADER_TYPE_VIA)
+SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip, int32_t port, const string &branch)
+		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	setProtocol(proto);
 	setIp(ip);
@@ -93,20 +93,20 @@ SipHeaderVia::SipHeaderVia(const string &proto, const string &ip, int32_t port, 
 	setBranch(branch);
 }
 
-SipHeaderVia::~SipHeaderVia(){
+SipHeaderValueVia::~SipHeaderValueVia(){
 }
 
-string SipHeaderVia::getString(){
+string SipHeaderValueVia::getString(){
 //	if (!(protocol=="TCP" || protocol=="UDP")){
 //		cerr << "Protocol not set"<< endl;
 //		throw new string("Protocol not set in Via header");
 //	}
 ///	if (port==0){
-///		cerr << "ERROR: In SipHeaderVia: port not set"<< endl;
+///		cerr << "ERROR: In SipHeaderValueVia: port not set"<< endl;
 ///		throw new string("Port not set in Via header");
 ///	}
 	string via;
-	via = "Via: SIP/2.0/"+protocol+" "+ip;
+	via = /*"Via: */ "SIP/2.0/"+protocol+" "+ip;
 	if (port>0)
 		via=via+":"+itoa(port);
 	if (branch.length()>0)
@@ -114,35 +114,35 @@ string SipHeaderVia::getString(){
 	return via;
 }
 
-string SipHeaderVia::getProtocol(){
+string SipHeaderValueVia::getProtocol(){
 	return protocol;
 }
 
-void SipHeaderVia::setProtocol(const string &protocol){
+void SipHeaderValueVia::setProtocol(const string &protocol){
 	this->protocol=protocol;
 }
 		
-string SipHeaderVia::getIp(){
+string SipHeaderValueVia::getIp(){
 	return ip;
 }
 		
-void SipHeaderVia::setIp(const string &ip){
+void SipHeaderValueVia::setIp(const string &ip){
 	this->ip=ip;
 }
 
-int32_t SipHeaderVia::getPort(){
+int32_t SipHeaderValueVia::getPort(){
 	return port;
 }
 
-void SipHeaderVia::setPort(int32_t p){
+void SipHeaderValueVia::setPort(int32_t p){
 	this->port=p;
 }
 
-void SipHeaderVia::setBranch(const string &branch){
+void SipHeaderValueVia::setBranch(const string &branch){
 	this->branch = branch;
 }
 		
-string SipHeaderVia::getBranch(){
+string SipHeaderValueVia::getBranch(){
 	return branch;
 }
 

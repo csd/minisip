@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderEvent.cxx
+ * 	SipHeaderValueEvent.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -41,36 +41,35 @@
 #include<iostream>
 #endif
 
-// Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
+const string sipHeaderValueEventTypeStr = "Event";
 
-SipHeaderEvent::SipHeaderEvent(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_EVENT)
+SipHeaderValueEvent::SipHeaderValueEvent(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_EVENT,sipHeaderValueEventTypeStr)
 {
-	assert(build_from.size()>6);
-	event= trim(build_from.substr(5));
+	event= trim(build_from);
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: parsed Event to: "<< event << endl;;
 #endif
 }
 
-SipHeaderEvent::SipHeaderEvent()
-		: SipHeader(SIP_HEADER_TYPE_EVENT)
+SipHeaderValueEvent::SipHeaderValueEvent()
+		: SipHeaderValue(SIP_HEADER_TYPE_EVENT,sipHeaderValueEventTypeStr)
 {
 	event="NOT_SET";
 }
 
-SipHeaderEvent::~SipHeaderEvent(){
+SipHeaderValueEvent::~SipHeaderValueEvent(){
 }
 
-string SipHeaderEvent::getString(){
-	return "Event: "+event;
+string SipHeaderValueEvent::getString(){
+	return /*"Event: "+*/ event;
 }
 
-string SipHeaderEvent::getEvent(){
+string SipHeaderValueEvent::getEvent(){
 	return event;
 }
 		
-void SipHeaderEvent::setEvent(const string &event){
+void SipHeaderValueEvent::setEvent(const string &event){
 	this->event=event;
 }
 

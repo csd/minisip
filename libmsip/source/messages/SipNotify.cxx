@@ -74,23 +74,23 @@ SipNotify::SipNotify(string branch,
 	toUser = toIdentity->sipUsername;
 	toDomain = toIdentity->sipDomain;
 	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
+	MRef<SipHeader*> fromp = new SipHeader(new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain ));
 	addHeader(fromp);
 
-	MRef<SipHeader*> top = new SipHeaderTo(toIdentity->sipUsername, toIdentity->sipDomain);
+	MRef<SipHeader*> top = new SipHeader(new SipHeaderValueTo(toIdentity->sipUsername, toIdentity->sipDomain));
 	addHeader(top);
 	
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
-	addHeader(mf);
+	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
+	addHeader(new SipHeader(*mf));
 
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp));
+	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("NOTIFY");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
 /*
 	MRef<SipHeader*> contactp = new SipHeaderContact(from_resource, 
@@ -98,16 +98,16 @@ SipNotify::SipNotify(string branch,
                                                         local_port,
                                                         "phone",
                                                         "UDP");
-	addHeader(contactp);
+	addHeader(new SipHeader(*contactp) );
 */
 	
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 
-	MRef<SipHeaderEvent*> ep = new SipHeaderEvent();
+	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent();
 	ep->setEvent("presence");	
-	addHeader(MRef<SipHeader*>(*ep));
+	addHeader(new SipHeader(*ep));
 }
 
 SipNotify::~SipNotify(){

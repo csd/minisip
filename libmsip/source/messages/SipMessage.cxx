@@ -124,9 +124,9 @@ int SipMessage::getNoHeaders(){
 
 int32_t SipMessage::getContentLength(){
 	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderContentLength*> len;
+		MRef<SipHeaderValueContentLength*> len;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CONTENTLENGTH){
-			len = MRef<SipHeaderContentLength*>((SipHeaderContentLength*)*headers[i]);
+			len = MRef<SipHeaderValueContentLength*>((SipHeaderValueContentLength*)*(headers[i]->getHeaderValue(0)));
 			return len->getContentLength();
 		}
 	}
@@ -149,7 +149,7 @@ string SipMessage::getHeadersAndContent(){
 			clen=content->getString().length();
 		else
 			clen=0;
-		SipHeaderContentLength content_length(clen);
+		SipHeader content_length(new SipHeaderValueContentLength(clen));
 		req=req+content_length.getString()+"\r\n";
 	}
 	req=req+"\r\n";
@@ -195,8 +195,12 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 	uint32_t i;
 	string header;
 	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
-		if(i==buildFrom.size())
+		if(i==buildFrom.size()){
+#ifdef DEBUG_OUTPUT
+			cerr << "SipMessage::SipMessage: Size is too short - throwing exception"<< endl;
+#endif
 			throw new SipExceptionInvalidMessage();
+		}
 		header = header + buildFrom[i];
 
 	}
@@ -211,7 +215,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
 			MRef<SipMessageContent*> smcref;
-			string contentType = ((SipHeaderContentType*)*h)->getContentType();
+			string contentType = ((SipHeaderValueContentType*)*h)->getContentType();
 			//cerr <<  "Content type parsed to "<< contentType<< endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
 			if (contentFactory){
@@ -268,9 +272,9 @@ void SipMessage::setContent(MRef<SipMessageContent*> content){
 	if( content ){
 		string contentType = content->getContentType();
 		if( contentType != "" ){
-			MRef<SipHeaderContentType*> contenttypep = new SipHeaderContentType();
+			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType();
 			contenttypep->setContentType( contentType );
-			addHeader(MRef<SipHeader*>(*contenttypep));
+			addHeader(new SipHeader(*contenttypep));
 		}
 	}
 }
@@ -293,9 +297,9 @@ MRef<SipMessageContent*> SipMessage::getContent(){
 
 string SipMessage::getCallId(){
 	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderCallID*> id;
+		MRef<SipHeaderValueCallID*> id;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CALLID){
-			id = MRef<SipHeaderCallID*>((SipHeaderCallID*)*headers[i]);
+			id = MRef<SipHeaderValueCallID*>((SipHeaderValueCallID*)*(headers[i]->getHeaderValue(0)));
 			return id->getId();
 		}
 	}
@@ -304,9 +308,9 @@ string SipMessage::getCallId(){
 
 int32_t  SipMessage::getCSeq(){
 	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderCSeq*> seq;
+		MRef<SipHeaderValueCSeq*> seq;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CSEQ){
-			seq = MRef<SipHeaderCSeq*>((SipHeaderCSeq *)*headers[i]);
+			seq = MRef<SipHeaderValueCSeq*>((SipHeaderValueCSeq *)*(headers[i]->getHeaderValue(0)));
 			return seq->getCSeq();
 		}
 	}
@@ -317,9 +321,9 @@ int32_t  SipMessage::getCSeq(){
 string SipMessage::getViaHeaderBranch(bool first){
 	string b;
 	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderVia*> via;
+		MRef<SipHeaderValueVia*> via;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_VIA){
-			via = MRef<SipHeaderVia*>((SipHeaderVia*)*headers[i]);
+			via = MRef<SipHeaderValueVia*>((SipHeaderValueVia*)*(headers[i]->getHeaderValue(0)));
 			b = via->getBranch();
 			if (first)
 				return b;
@@ -345,9 +349,9 @@ string SipMessage::getDestinationBranch(){
 
 string SipMessage::getCSeqMethod(){
 	for (int32_t i=0; i < headers.size(); i++){
-		MRef<SipHeaderCSeq*> seq;
+		MRef<SipHeaderValueCSeq*> seq;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CSEQ){
-			seq = MRef<SipHeaderCSeq*>((SipHeaderCSeq *)(*headers[i]));
+			seq = MRef<SipHeaderValueCSeq*>((SipHeaderValueCSeq *)*(headers[i]->getHeaderValue(0)));
 			return seq->getMethod();
 		}
 	
@@ -358,40 +362,20 @@ string SipMessage::getCSeqMethod(){
 
 SipURI SipMessage::getFrom(){
 	SipURI ret("","");
-	MRef<SipHeaderFrom*> hto = getHeaderFrom();
-	if (hto)
-		ret = hto->getUri();
+	MRef<SipHeaderValueFrom*> hfrom = getHeaderValueFrom();
+	if (hfrom)
+		ret = hfrom->getUri();
 
 	return ret;
-/*
-	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderFrom*> from;
-		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
-			from = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
-			return from->getUri();
-		}
-	}
-	return SipURI("","");
-*/
 }
 
 SipURI SipMessage::getTo(){
 	SipURI ret("","");
-	MRef<SipHeaderTo*> hto = getHeaderTo();
+	MRef<SipHeaderValueTo*> hto = getHeaderValueTo();
 	if (hto)
 		ret = hto->getUri();
 
 	return ret;
-/*
-	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderTo*> to;
-		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
-			to = MRef<SipHeaderTo*>((SipHeaderTo *)(*headers[i]));
-			return to->getUri();
-		}
-	}
-	return SipURI("","");
-*/
 }
 
 void SipMessage::removeAllViaHeaders(){
@@ -416,37 +400,16 @@ void SipMessage::removeAllViaHeaders(){
 //	mout << "removeAllViaHeaders:: remove "<< n << " via headers"<< end;
 }
 
-MRef<SipHeaderFrom*> SipMessage::getHeaderFrom(){
+MRef<SipHeaderValueFrom*> SipMessage::getHeaderValueFrom(){
 
-	return MRef<SipHeaderFrom*> ((SipHeaderFrom*)*(getHeaderOfType(SIP_HEADER_TYPE_FROM)));
+	return MRef<SipHeaderValueFrom*> ( (SipHeaderValueFrom*)*( getHeaderOfType(SIP_HEADER_TYPE_FROM)->getHeaderValue(0)) );
 
-/*
-	MRef<SipHeaderFrom*> from;
-	for (int32_t i=0; i< headers.size(); i++){
-		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
-			from = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
-			return from;
-		}
-	}
-	return from; 
-*/
-	
 }
 
-MRef<SipHeaderTo*> SipMessage::getHeaderTo(){
+MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 
-	return MRef<SipHeaderTo*>((SipHeaderTo*)*(getHeaderOfType(SIP_HEADER_TYPE_TO)));
+	return MRef<SipHeaderValueTo*>( (SipHeaderValueTo*)*(getHeaderOfType(SIP_HEADER_TYPE_TO)->getHeaderValue(0)));
 
-/*
-	MRef<SipHeaderTo*> to;
-	for (int32_t i=0; i< headers.size(); i++){
-		if ((headers[i])->getType() == SIP_HEADER_TYPE_TO){
-			to = MRef<SipHeaderTo*>((SipHeaderTo *)(*headers[i]));
-			return to;
-		}
-	}
-	return to; 
-*/
 }
 
 MRef<SipHeader *> SipMessage::getHeaderOfType(int t){
@@ -465,7 +428,7 @@ list<string> SipMessage::getRouteSet(){
 	list<string> ret;
 	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_RECORDROUTE){
-			string route = ((SipHeaderRecordRoute *)*(headers[i]))->getRoute();
+			string route = ((SipHeaderValueRecordRoute *)*(headers[i]->getHeaderValue(0)))->getRoute();
 			int i=0;
 			string part;
 			while (i<(int)route.size()){
@@ -487,7 +450,7 @@ list<string> SipMessage::getRouteSet(){
 string SipMessage::getWarningMessage(){
 	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_WARNING){
-			string warning = ((SipHeaderWarning *)*(headers[i]))->getWarning();
+			string warning = ((SipHeaderValueWarning *)*(headers[i]->getHeaderValue(0)))->getWarning();
 			return warning;
 		}
 	return "";

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderExpires.cxx
+ * 	SipHeaderValueExpires.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,30 +35,32 @@
 
 #include<libmutil/itoa.h>
 
-SipHeaderExpires::SipHeaderExpires(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_EXPIRES)
+const string sipHeaderValueExpiresTypeStr = "Expires";
+
+SipHeaderValueExpires::SipHeaderValueExpires(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_EXPIRES,sipHeaderValueExpiresTypeStr)
 {
 	timeout=300;			//TODO: XXX
 }
 
-SipHeaderExpires::SipHeaderExpires()
-		: SipHeader(SIP_HEADER_TYPE_EXPIRES)
+SipHeaderValueExpires::SipHeaderValueExpires()
+		: SipHeaderValue(SIP_HEADER_TYPE_EXPIRES,sipHeaderValueExpiresTypeStr)
 {
 	timeout=300;
 }
 
-SipHeaderExpires::~SipHeaderExpires(){
+SipHeaderValueExpires::~SipHeaderValueExpires(){
 }
 
-string SipHeaderExpires::getString(){
-	return "Expires: "+timeout;
+string SipHeaderValueExpires::getString(){
+	return /*"Expires: "+*/ itoa(timeout);
 }
 
-int32_t SipHeaderExpires::getTimeout(){
+int32_t SipHeaderValueExpires::getTimeout(){
 	return timeout;
 }
 		
-void SipHeaderExpires::setTimeout(int32_t timeout){
+void SipHeaderValueExpires::setTimeout(int32_t timeout){
 	this->timeout=timeout;
 }
 

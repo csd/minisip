@@ -38,13 +38,13 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderTo: public SipHeader{
+class SipHeaderValueTo: public SipHeaderValue{
 	public:
-		SipHeaderTo();
-		SipHeaderTo(const string &build_from);
-		SipHeaderTo(const string &username, const string &ip);
+		SipHeaderValueTo();
+		SipHeaderValueTo(const string &build_from);
+		SipHeaderValueTo(const string &username, const string &ip);
 
-		virtual ~SipHeaderTo();
+		virtual ~SipHeaderValueTo();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderTo";}
 		

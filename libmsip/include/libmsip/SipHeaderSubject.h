@@ -37,12 +37,12 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderSubject: public SipHeader{
+class SipHeaderValueSubject: public SipHeaderValue{
 	public:
-		SipHeaderSubject();
-		SipHeaderSubject(const string &build_from);
+		SipHeaderValueSubject();
+		SipHeaderValueSubject(const string &build_from);
 
-		virtual ~SipHeaderSubject();
+		virtual ~SipHeaderValueSubject();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderSubject";}
 		

@@ -57,8 +57,13 @@ SipURI::SipURI(string build_from)/*:MObject("SipURI")*/{
 		i++;
 
 	while (!(build_from[i]==' ' || build_from[i]==':' || build_from[i]=='@' || build_from[i]==';')){
-		if (i == build_from.size())
+		if (i == build_from.size()){
+#ifdef DEBUG_OUTPUT
+			cerr<< "SipURI::SipURI: found invalue URI - throwing exception "<< endl;
+			cerr << "Uri is <"<< build_from<<">"<< endl;
+#endif
 			throw new SipExceptionInvalidURI();
+		}
 		part1+=build_from[i];
 		i++;
 	}
@@ -92,8 +97,12 @@ SipURI::SipURI(string build_from)/*:MObject("SipURI")*/{
 //			merr << "Somethihng else happened - CHECK"<< end;
 			if (build_from[i]==' ')
 				ip=part1;
-			else
+			else{
+#ifdef DEBUG_OUTPUT
+			cerr<< "SipURI::SipURI: found invalid URI(2) - throwing exception "<< endl;
+#endif
 				throw new SipExceptionInvalidURI();
+			}
 				//merr << "ERROR while parsing SIP URI"<< end;
 		}
 		

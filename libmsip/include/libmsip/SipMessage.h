@@ -85,7 +85,7 @@ class SipMessage : public MObject{
                  * message. 
                  * @param header        Header to add.
                  */
-		virtual void addHeader(MRef<SipHeader*> header);
+		void addHeader(MRef<SipHeader*> header);
 
                 /**
                  * @return Size in bytes of the content of the SIP message.
@@ -102,12 +102,12 @@ class SipMessage : public MObject{
                 /**
                  * @return The "From:" header.
                  */
-		MRef<SipHeaderFrom*> getHeaderFrom();
+		MRef<SipHeaderValueFrom*> getHeaderValueFrom();
 		
                 /**
                  * @return The "To:" header.
                  */
-                MRef<SipHeaderTo*> getHeaderTo();
+                MRef<SipHeaderValueTo*> getHeaderValueTo();
 		
                 /**
                  * @param content       Content of the SIP message. This

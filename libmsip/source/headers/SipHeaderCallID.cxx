@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderCallID.cxx
+ * 	SipHeaderValueCallID.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -39,11 +39,12 @@
 #include<iostream>
 #endif
 
+const string sipHeaderValueCallIdTypeStr = "Call-ID";
 
-SipHeaderCallID::SipHeaderCallID(const string &build_from)
-	: SipHeader(SIP_HEADER_TYPE_CALLID)
+SipHeaderValueCallID::SipHeaderValueCallID(const string &build_from)
+	: SipHeaderValue(SIP_HEADER_TYPE_CALLID,sipHeaderValueCallIdTypeStr)
 {
-	unsigned i=9;
+	unsigned i=0;
 	while (!(i>=build_from.length())){
 		id+=build_from[i];
 		i++;
@@ -51,30 +52,30 @@ SipHeaderCallID::SipHeaderCallID(const string &build_from)
 	id=trim(id);
 }
 
-SipHeaderCallID::SipHeaderCallID()
-	: SipHeader(SIP_HEADER_TYPE_CALLID)
+SipHeaderValueCallID::SipHeaderValueCallID()
+	: SipHeaderValue(SIP_HEADER_TYPE_CALLID,sipHeaderValueCallIdTypeStr)
 {
 	id="NOT_SET";
 }
 
-SipHeaderCallID::~SipHeaderCallID(){
+SipHeaderValueCallID::~SipHeaderValueCallID(){
 }
 
-string SipHeaderCallID::getString(){
-	return "Call-ID: "+id;
+string SipHeaderValueCallID::getString(){
+	return /*"Call-ID: "+*/id;
 }
 
-string SipHeaderCallID::getId(){
+string SipHeaderValueCallID::getId(){
 	return id;
 }
 		
-void SipHeaderCallID::setId(const string &id){
+void SipHeaderValueCallID::setId(const string &id){
 	this->id=id;
 }
 
-void SipHeaderCallID::generateId(){
+void SipHeaderValueCallID::generateId(){
 #ifdef DEBUG_OUTPUT
-	cerr<<"TODO: running not implemented function (SipHeaderCallID::generate_id)"<< endl;
+	cerr<<"TODO: running not implemented function (SipHeaderValueCallID::generate_id)"<< endl;
 #endif
 	this->id = string("RANDOM_NUMBER")+"@"+"LOCAL_IP";
 }

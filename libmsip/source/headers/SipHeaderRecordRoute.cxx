@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderRecordRoute.cxx
+ * 	SipHeaderValueRecordRoute.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -42,24 +42,25 @@
 
 // Ex: Record-Route: <sip:vatn@213.100.38.57;ftag=2064763305;lr>,<...>
 
-SipHeaderRecordRoute::SipHeaderRecordRoute(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_RECORDROUTE)
+const string sipHeaderValueRecordRouteTypeStr = "Record-Route";
+
+SipHeaderValueRecordRoute::SipHeaderValueRecordRoute(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_RECORDROUTE,sipHeaderValueRecordRouteTypeStr)
 {
-	assert(build_from.size()>13);
-	route = trim(build_from.substr(13));
+	route = trim(build_from);
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: parsed route to: "<< route << endl;;
 #endif
 }
 
-SipHeaderRecordRoute::~SipHeaderRecordRoute(){
+SipHeaderValueRecordRoute::~SipHeaderValueRecordRoute(){
 }
 
-string SipHeaderRecordRoute::getString(){
-	return "Record-Route: "+route;
+string SipHeaderValueRecordRoute::getString(){
+	return /*"Record-Route: "+*/route;
 }
 
-string SipHeaderRecordRoute::getRoute(){
+string SipHeaderValueRecordRoute::getRoute(){
 	return route;
 }
 

@@ -39,19 +39,19 @@
 */
 
 
-class SipHeaderContact: public SipHeader{
+class SipHeaderValueContact: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderContact();
-		SipHeaderContact(const string &build_from);
-		SipHeaderContact(const string &username, 
+		SipHeaderValueContact();
+		SipHeaderValueContact(const string &build_from);
+		SipHeaderValueContact(const string &username, 
 				const string &ip, 
 				int32_t port, 
 				const string &usertype="phone", 
 				const string &transport="");
 
-		virtual ~SipHeaderContact();
+		virtual ~SipHeaderValueContact();
 
                 virtual std::string getMemObjectType(){return "SipHeaderContact";}
 		

@@ -40,12 +40,12 @@
 */
 
 
-class SipHeaderProxyAuthenticate: public SipHeader{
+class SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 	public:
-		SipHeaderProxyAuthenticate();
-		SipHeaderProxyAuthenticate(const string &build_from);
+		SipHeaderValueProxyAuthenticate();
+		SipHeaderValueProxyAuthenticate(const string &build_from);
 
-		virtual ~SipHeaderProxyAuthenticate();
+		virtual ~SipHeaderValueProxyAuthenticate();
 
                 virtual std::string getMemObjectType(){return "SipHeaderProxyAuthenticate";}
 		

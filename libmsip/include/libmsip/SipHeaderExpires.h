@@ -38,12 +38,12 @@
 */
 
 
-class SipHeaderExpires: public SipHeader{
+class SipHeaderValueExpires: public SipHeaderValue{
 	public:
-		SipHeaderExpires();
-		SipHeaderExpires(const string &build_from);
+		SipHeaderValueExpires();
+		SipHeaderValueExpires(const string &build_from);
 
-		virtual ~SipHeaderExpires();
+		virtual ~SipHeaderValueExpires();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderExpires";}
 		

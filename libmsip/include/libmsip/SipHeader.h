@@ -35,6 +35,7 @@
 //#include<config.h>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/minilist.h>
 
 #include<sys/types.h>
 /**
@@ -66,21 +67,43 @@
 
 using namespace std;
 
+class SipHeaderValue : public MObject{
+	public:
+		SipHeaderValue(int type, const string &hName);
+		virtual string getString()=0;	
+		int getType(){return type;}
+
+		const string &headerName;
+	protected:
+		int type;
+		
+};
+
 class SipHeader : public MObject{
 	public:
-                SipHeader(int type);
+                SipHeader(MRef<SipHeaderValue*> value);
 		virtual ~SipHeader();
 
-		virtual string getString()=0;
+		string getString();
+		void addHeaderValue(MRef<SipHeaderValue*> v);
 
                 virtual std::string getMemObjectType(){return "SipHeader";}
 
 		int32_t getType(){return type;};
+		int getNoValues(){return headerValues.size();}
+		MRef<SipHeaderValue *> getHeaderValue(int i){
+			assert(i < headerValues.size() );
+			return headerValues[i];
+		}
 
 		static MRef<SipHeader *> parseHeader(const string &buildFrom);
 
 	private:
 		int32_t type;
+		string headerName;
+
+		minilist<MRef<SipHeaderValue*> > headerValues;
 };
+
 
 #endif

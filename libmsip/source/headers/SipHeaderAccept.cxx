@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderAccept.cxx
+ * 	SipHeaderValueAccept.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -41,30 +41,31 @@
 #include<iostream>
 #endif
 
-SipHeaderAccept::SipHeaderAccept(const string &build_from):SipHeader(SIP_HEADER_TYPE_ACCEPT){
-	assert(build_from.size()>7);		//TODO: remove assertions - exception
-	accept = trim(build_from.substr(6));
+const string sipHeaderValueAcceptTypeStr="Accept";
+
+SipHeaderValueAccept::SipHeaderValueAccept(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_ACCEPT, sipHeaderValueAcceptTypeStr){
+	accept = trim(build_from);
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: parsed Accept to: "<< accept<< endl;;
 #endif
 }
 
-SipHeaderAccept::SipHeaderAccept():SipHeader(SIP_HEADER_TYPE_ACCEPT){
+SipHeaderValueAccept::SipHeaderValueAccept():SipHeaderValue(SIP_HEADER_TYPE_ACCEPT,sipHeaderValueAcceptTypeStr){
 	accept="NOT_SET";
 }
 
-SipHeaderAccept::~SipHeaderAccept(){
+SipHeaderValueAccept::~SipHeaderValueAccept(){
 }
 
-string SipHeaderAccept::getString(){
-	return "Accept: "+accept;
+string SipHeaderValueAccept::getString(){
+	return /*"Accept: "+*/accept;
 }
 
-string SipHeaderAccept::getAccept(){
+string SipHeaderValueAccept::getAccept(){
 	return accept;
 }
 		
-void SipHeaderAccept::setAccept(const string &accept){
+void SipHeaderValueAccept::setAccept(const string &accept){
 	this->accept=accept;
 }
 

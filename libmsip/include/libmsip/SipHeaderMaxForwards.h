@@ -38,12 +38,12 @@
 */
 
 
-class SipHeaderMaxForwards: public SipHeader{
+class SipHeaderValueMaxForwards: public SipHeaderValue{
 	public:
-		SipHeaderMaxForwards(int32_t mf);
-		SipHeaderMaxForwards(const string &build_from);
+		SipHeaderValueMaxForwards(int32_t mf);
+		SipHeaderValueMaxForwards(const string &build_from);
 
-		virtual ~SipHeaderMaxForwards();
+		virtual ~SipHeaderValueMaxForwards();
 
                 virtual std::string getMemObjectType(){return "SipHeaderMaxForwards";}
 		

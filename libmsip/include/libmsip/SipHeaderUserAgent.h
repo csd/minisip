@@ -37,12 +37,12 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderUserAgent: public SipHeader{
+class SipHeaderValueUserAgent: public SipHeaderValue{
 	public:
-		SipHeaderUserAgent();
-		SipHeaderUserAgent(const string &build_from);
+		SipHeaderValueUserAgent();
+		SipHeaderValueUserAgent(const string &build_from);
 
-		virtual ~SipHeaderUserAgent();
+		virtual ~SipHeaderValueUserAgent();
 
                 virtual std::string getMemObjectType(){return "SipHeaderUserAgent";}
 		

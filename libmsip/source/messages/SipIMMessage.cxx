@@ -72,28 +72,28 @@ SipIMMessage::SipIMMessage(string branch,
 
 	//	ip=proxy_addr.getString();
 	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(/*from_resource*/ fromIdentity->sipUsername, /*proxyString*/ fromIdentity->sipDomain );
-	addHeader(fromp);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromIdentity->sipUsername, fromIdentity->sipDomain );
+	addHeader(new SipHeader(*fromp));
 
-	MRef<SipHeader*> top = new SipHeaderTo(toUser, toDomain);
-	addHeader(top);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(toUser, toDomain);
+	addHeader(new SipHeader(*top));
 	
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
-	addHeader(mf);
+	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
+	addHeader(new SipHeader(*mf));
 
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp));
+	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("MESSAGE");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
 	
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 
 	setContent(new SipMessageContentIM(msg));
 
@@ -112,7 +112,7 @@ string SipIMMessage::getString(){
 }
 
 int SipIMMessage::getExpiresTimeout(){
-	MRef<SipHeaderExpires*> exp = MRef<SipHeaderExpires*>((SipHeaderExpires*)*getHeaderOfType(SIP_HEADER_TYPE_EXPIRES));
+	MRef<SipHeaderValueExpires*> exp = MRef<SipHeaderValueExpires*>((SipHeaderValueExpires*)*(getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0)));
 	
 	if (exp){
 		return exp->getTimeout();

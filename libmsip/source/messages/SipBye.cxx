@@ -66,11 +66,11 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 	//SipHeaderVia *viap = new SipHeaderVia(transport, localAddr, localSipPort);
         //add_header(viap);
 	
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
+	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
         addHeader(mf);
 	
-	MRef<SipHeaderFrom*> from;
-	MRef<SipHeaderTo*> to;
+	MRef<SipHeaderValueFrom*> from;
+	MRef<SipHeaderValueTo*> to;
 
 	int noHeaders = inv->getNoHeaders();
 	for (int32_t i=0; i < noHeaders; i++){
@@ -79,19 +79,19 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 		bool add = false;
 		switch (headerType){
 			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderFrom*)*header)->setTag("");
-				((SipHeaderFrom*)*header)->getUri().setUserId(from_uri);
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setTag("");
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
 				add = true;
 				break;
 			case SIP_HEADER_TYPE_TO:
-				((SipHeaderTo*)*header)->setTag("");
-				((SipHeaderTo*)*header)->getUri().setUserId(to_uri);
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag("");
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
 				add = true;
 				break;
 	
 			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderCSeq*)*header)->setMethod("BYE");
-				((SipHeaderCSeq*)*header)->setCSeq(seq_no);
+				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setMethod("BYE");
+				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setCSeq(seq_no);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CALLID:

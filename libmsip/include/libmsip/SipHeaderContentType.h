@@ -37,12 +37,12 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderContentType: public SipHeader{
+class SipHeaderValueContentType: public SipHeaderValue{
 	public:
-		SipHeaderContentType();
-		SipHeaderContentType(const string &build_from);
+		SipHeaderValueContentType();
+		SipHeaderValueContentType(const string &build_from);
 
-		virtual ~SipHeaderContentType();
+		virtual ~SipHeaderValueContentType();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderContentType";}
 		

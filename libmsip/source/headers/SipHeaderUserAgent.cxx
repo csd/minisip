@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderUserAgent.cxx
+ * 	SipHeaderValueUserAgent.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,31 +35,33 @@
 
 #include<libmutil/itoa.h>
 
-SipHeaderUserAgent::SipHeaderUserAgent(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_USERAGENT)
+const string sipHeaderValueTypeUserAgentTypeStr = "User-Agent";
+
+SipHeaderValueUserAgent::SipHeaderValueUserAgent(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr)
 {
 	user_agent="NOT_SET";
 }
 
-SipHeaderUserAgent::SipHeaderUserAgent()
-		: SipHeader(SIP_HEADER_TYPE_USERAGENT)
+SipHeaderValueUserAgent::SipHeaderValueUserAgent()
+		: SipHeaderValue(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr)
 {
 	user_agent="NOT_SET";
 }
 
-SipHeaderUserAgent::~SipHeaderUserAgent(){
+SipHeaderValueUserAgent::~SipHeaderValueUserAgent(){
 
 }
 
-string SipHeaderUserAgent::getString(){
-	return "User-Agent: "+user_agent;
+string SipHeaderValueUserAgent::getString(){
+	return /*"User-Agent: "+*/ user_agent;
 }
 
-string SipHeaderUserAgent::getUserAgent(){
+string SipHeaderValueUserAgent::getUserAgent(){
 	return user_agent;
 }
 		
-void SipHeaderUserAgent::setUserAgent(const string &ua){
+void SipHeaderValueUserAgent::setUserAgent(const string &ua){
 	this->user_agent=ua;
 }
 

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderProxyAuthenticate.cxx
+ * 	SipHeaderValueProxyAuthenticate.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -32,57 +32,58 @@
 
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 
+const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
-SipHeaderProxyAuthenticate::SipHeaderProxyAuthenticate()
-		: SipHeader(SIP_HEADER_TYPE_PROXYAUTHENTICATE)
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate()
+		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
 {
 	
 }
 		
 
-SipHeaderProxyAuthenticate::SipHeaderProxyAuthenticate(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_PROXYAUTHENTICATE)
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
 {
 	
 }
 
-SipHeaderProxyAuthenticate::~SipHeaderProxyAuthenticate(){
+SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
 
 }
 		
-string SipHeaderProxyAuthenticate::getString(){
-	return "Proxy-Authenticate: "+method+", realm="+realm+", nonce="+nonce+", algorithm="+algorithm;
+string SipHeaderValueProxyAuthenticate::getString(){
+	return /*"Proxy-Authenticate: "+*/method+", realm="+realm+", nonce="+nonce+", algorithm="+algorithm;
 } 
 
-string SipHeaderProxyAuthenticate::getMethod(){
+string SipHeaderValueProxyAuthenticate::getMethod(){
 	return method;
 }
 
-void SipHeaderProxyAuthenticate::setMethod(const string &m){
+void SipHeaderValueProxyAuthenticate::setMethod(const string &m){
 	this->method=m;
 }
 	
-string SipHeaderProxyAuthenticate::getNonce(){
+string SipHeaderValueProxyAuthenticate::getNonce(){
 	return nonce;
 }
 
-void SipHeaderProxyAuthenticate::setNonce(const string &n){
+void SipHeaderValueProxyAuthenticate::setNonce(const string &n){
 	this->nonce=n;
 }
 		
-string SipHeaderProxyAuthenticate::getRealm(){
+string SipHeaderValueProxyAuthenticate::getRealm(){
 	return realm;
 }
 
-void SipHeaderProxyAuthenticate::setRealm(const string &r){
+void SipHeaderValueProxyAuthenticate::setRealm(const string &r){
 	this->realm=r;
 }
 			
-string SipHeaderProxyAuthenticate::getAlgorithm(){
+string SipHeaderValueProxyAuthenticate::getAlgorithm(){
 	return algorithm;
 }
 
-void SipHeaderProxyAuthenticate::setAlgorithm(const string &a){
+void SipHeaderValueProxyAuthenticate::setAlgorithm(const string &a){
 	this->algorithm=a;
 }
 	

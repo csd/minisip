@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderAuthorization.cxx
+ * 	SipHeaderValueAuthorization.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -34,34 +34,35 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmutil/vmd5.h>
 
+const string sipHeaderValueAuthorizationTypeString="Authorization";
 
-SipHeaderAuthorization::SipHeaderAuthorization() 
-	: SipHeader(SIP_HEADER_TYPE_AUTHORIZATION),uri("NONAME","0.0.0.0", "phone",0)
+SipHeaderValueAuthorization::SipHeaderValueAuthorization() 
+	: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION,sipHeaderValueAuthorizationTypeString),uri("NONAME","0.0.0.0", "phone",0)
 {
 
 }
 
-SipHeaderAuthorization::SipHeaderAuthorization(int type) 
-	: SipHeader(type),uri("NONAME","0.0.0.0", "phone",0)
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &typeStr) 
+	: SipHeaderValue(type, typeStr),uri("NONAME","0.0.0.0", "phone",0)
 {
 	
 }	
 
-SipHeaderAuthorization::SipHeaderAuthorization(const string &build_from) 
-		: SipHeader(SIP_HEADER_TYPE_AUTHORIZATION), 
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &build_from) 
+		: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString), 
 		uri("NONAME","0.0.0.0", "phone",0)
 {
 	
 }
 
-SipHeaderAuthorization::SipHeaderAuthorization(int type, const string &build_from) 
-		: SipHeader(type), 
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &build_from, const string &typeStr) 
+		: SipHeaderValue(type,typeStr), 
 		uri("NONAME","0.0.0.0", "phone",0){
 //	type = SIP_HEADER_TYPE_AUTHORIZATION;
 
 }
 
-SipHeaderAuthorization::SipHeaderAuthorization(const string &sip_method,
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &sip_method,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
@@ -69,7 +70,7 @@ SipHeaderAuthorization::SipHeaderAuthorization(const string &sip_method,
 		const string &auth_id, 
 		const string &password,
 		const string &auth_method)
-			: SipHeader(SIP_HEADER_TYPE_AUTHORIZATION),
+			: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString),
                         sipMethod(sip_method),
 			username(username),
 			realm(realm),
@@ -82,7 +83,7 @@ SipHeaderAuthorization::SipHeaderAuthorization(const string &sip_method,
 
 }
 
-SipHeaderAuthorization::SipHeaderAuthorization(int type,
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
 		const string &sip_method,
 		const string &username, 
 		const string &realm, 
@@ -90,9 +91,10 @@ SipHeaderAuthorization::SipHeaderAuthorization(int type,
 		const SipURI &uri, 
 		const string &auth_id, 
 		const string &password,
-		const string &auth_method
+		const string &auth_method,
+		const string &typeStr
 		)
-			: SipHeader(type),
+			: SipHeaderValue(type,typeStr),
                         sipMethod(sip_method),
 			username(username),
 			realm(realm),
@@ -105,20 +107,20 @@ SipHeaderAuthorization::SipHeaderAuthorization(int type,
 
 }
 
-SipHeaderAuthorization::~SipHeaderAuthorization() {
+SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
 
 }
-		
-string SipHeaderAuthorization::getString(){
+
+string SipHeaderValueAuthorization::getString(){
 	uri.setUserType("");
-	return "Authorization: "+auth_method+
+	return /*"Authorization: "+*/ auth_method+
 		" algoritm=\"md5\""+", username=\""+auth_id+
 		"\", realm=\""+realm+"\", nonce=\""+nonce+
 		"\", uri=\""+uri.getUserIpString()+"\", response=\""+
 		calcResponse()+"\"";
 } 
 
-string SipHeaderAuthorization::md5ToString(unsigned char *md5){
+string SipHeaderValueAuthorization::md5ToString(unsigned char *md5){
 	char *digits = {"0123456789abcdef"};
 	char strsum[33] = {'\0'};
 	for (int i=0 ; i<16; i++){
@@ -131,7 +133,7 @@ string SipHeaderAuthorization::md5ToString(unsigned char *md5){
 
 
 
-string SipHeaderAuthorization::calcResponse(){
+string SipHeaderValueAuthorization::calcResponse(){
 	unsigned char digest[16];
 	MD5Context context;
 	MD5Init(&context);
@@ -159,44 +161,44 @@ string SipHeaderAuthorization::calcResponse(){
 	return auth_string;
 }
 
-string SipHeaderAuthorization::getSipMethod(){
+string SipHeaderValueAuthorization::getSipMethod(){
 	return sipMethod;
 }
 
-void SipHeaderAuthorization::setSipMethod(const string &m){
+void SipHeaderValueAuthorization::setSipMethod(const string &m){
 	this->sipMethod=m;
 }
 
-string SipHeaderAuthorization::getUsername(){
+string SipHeaderValueAuthorization::getUsername(){
 	return username;
 }
 
-void SipHeaderAuthorization::setUsername(const string &un){
+void SipHeaderValueAuthorization::setUsername(const string &un){
 	this->username=un;
 }
 
 
-string SipHeaderAuthorization::getNonce(){
+string SipHeaderValueAuthorization::getNonce(){
 	return nonce;
 }
 
-void SipHeaderAuthorization::setNonce(const string &n){
+void SipHeaderValueAuthorization::setNonce(const string &n){
 	this->nonce=n;
 }
 
-string SipHeaderAuthorization::getRealm(){
+string SipHeaderValueAuthorization::getRealm(){
 	return realm;
 }
 
-void SipHeaderAuthorization::setRealm(const string &r){
+void SipHeaderValueAuthorization::setRealm(const string &r){
 	this->realm=r;
 }
 
-SipURI SipHeaderAuthorization::getUri(){
+SipURI SipHeaderValueAuthorization::getUri(){
 	return uri;
 }
 
-void SipHeaderAuthorization::setUri(const SipURI &uri){
+void SipHeaderValueAuthorization::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 

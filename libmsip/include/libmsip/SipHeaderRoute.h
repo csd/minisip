@@ -38,12 +38,12 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderRoute: public SipHeader{
+class SipHeaderValueRoute: public SipHeaderValue{
 	public:
-		SipHeaderRoute(list<string> &routeSet);
-		SipHeaderRoute(const string &build_from);
+		SipHeaderValueRoute(list<string> &routeSet);
+		SipHeaderValueRoute(const string &build_from);
 
-		virtual ~SipHeaderRoute();
+		virtual ~SipHeaderValueRoute();
 
                 virtual std::string getMemObjectType(){return "SipHeaderRoute";}
 		

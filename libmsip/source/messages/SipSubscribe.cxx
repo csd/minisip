@@ -81,20 +81,20 @@ SipSubscribe::SipSubscribe(string branch,
 	ip=proxy_addr.getString();
 	user_type="phone";
 */	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
-	addHeader(fromp);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
+	addHeader(new SipHeader(*fromp));
 
-	MRef<SipHeader*> top = new SipHeaderTo(toIdentity->sipUsername, toIdentity->sipDomain);
-	addHeader(top);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(toIdentity->sipUsername, toIdentity->sipDomain);
+	addHeader(new SipHeader(*top));
 	
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp));
+	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("SUBSCRIBE");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
 	/*SipHeaderContact *contactp = new SipHeaderContact(
 				from_tel_no, 
@@ -104,17 +104,17 @@ SipSubscribe::SipSubscribe(string branch,
 				"UDP");
 	add_header(contactp);
 	*/
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 
-	MRef<SipHeaderEvent*> ep = new SipHeaderEvent();
+	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent();
 	ep->setEvent("presence");	
-	addHeader(MRef<SipHeader*>(*ep));
+	addHeader(new SipHeader(*ep));
 
-	MRef<SipHeaderAccept*> ap = new SipHeaderAccept();
+	MRef<SipHeaderValueAccept*> ap = new SipHeaderValueAccept();
 	ap->setAccept("application/pidf+xml");
-	addHeader(MRef<SipHeader*>(*ap));
+	addHeader(new SipHeader(*ap));
 }
 
 SipSubscribe::~SipSubscribe(){

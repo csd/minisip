@@ -40,13 +40,13 @@
 
 // Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
 // 
-class SipHeaderVia: public SipHeader{
+class SipHeaderValueVia: public SipHeaderValue{
 	public:
-		SipHeaderVia();
-		SipHeaderVia(const string &build_from);
-		SipHeaderVia(const string &proto, const string &ip, int32_t port, const string &branch);
+		SipHeaderValueVia();
+		SipHeaderValueVia(const string &build_from);
+		SipHeaderValueVia(const string &proto, const string &ip, int32_t port, const string &branch);
 
-		virtual ~SipHeaderVia();
+		virtual ~SipHeaderValueVia();
 
                 virtual std::string getMemObjectType(){return "SipHeaderVia";}
 		

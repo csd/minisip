@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderMaxForwards.cxx
+ * 	SipHeaderValueMaxForwards.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,32 +35,33 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
+const string sipHeaderValueMaxForwardsTypeStr = "Max-Forwards";
 
-SipHeaderMaxForwards::SipHeaderMaxForwards(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_MAXFORWARDS),
+SipHeaderValueMaxForwards::SipHeaderValueMaxForwards(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_MAXFORWARDS,sipHeaderValueMaxForwardsTypeStr),
 		max(-1)
 {
-	max = atoi( trim( build_from.substr(13) ).c_str()); //strlen("max-forwards:")==13
+	max = atoi( trim( build_from).c_str()); //strlen("max-forwards:")==13
 }
 
-SipHeaderMaxForwards::SipHeaderMaxForwards(int32_t mf)
-		: SipHeader(SIP_HEADER_TYPE_MAXFORWARDS),
+SipHeaderValueMaxForwards::SipHeaderValueMaxForwards(int32_t mf)
+		: SipHeaderValue(SIP_HEADER_TYPE_MAXFORWARDS,sipHeaderValueMaxForwardsTypeStr),
 		max(mf)
 {
 }
 
-SipHeaderMaxForwards::~SipHeaderMaxForwards(){
+SipHeaderValueMaxForwards::~SipHeaderValueMaxForwards(){
 }
 
-string SipHeaderMaxForwards::getString(){
-	return "Max-Forwards: "+itoa(max);
+string SipHeaderValueMaxForwards::getString(){
+	return /*"Max-Forwards: "+*/itoa(max);
 }
 
-int32_t SipHeaderMaxForwards::getMaxForwards(){
+int32_t SipHeaderValueMaxForwards::getMaxForwards(){
 	return max;
 }
 		
-void SipHeaderMaxForwards::setMaxForwards(int32_t m){
+void SipHeaderValueMaxForwards::setMaxForwards(int32_t m){
 	max=m;
 }
 

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderContentLength.cxx
+ * 	SipHeaderValueContentLength.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,10 +35,12 @@
 
 #include<libmutil/itoa.h>
 
-SipHeaderContentLength::SipHeaderContentLength(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_CONTENTLENGTH)
+const string sipHeaderValueContentLengthTypeStr = "Content-Length";
+
+SipHeaderValueContentLength::SipHeaderValueContentLength(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {
-	unsigned i=15;
+	unsigned i=0;
 	while (build_from[i]==' ')
 		i++;
 	string num="";
@@ -49,30 +51,30 @@ SipHeaderContentLength::SipHeaderContentLength(const string &build_from)
 	content_length=atoi(num.c_str());
 }
 
-SipHeaderContentLength::SipHeaderContentLength()
-		: SipHeader(SIP_HEADER_TYPE_CONTENTLENGTH)
+SipHeaderValueContentLength::SipHeaderValueContentLength()
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {
 	content_length=0;
 }
 
-SipHeaderContentLength::SipHeaderContentLength(int32_t length)
-		: SipHeader(SIP_HEADER_TYPE_CONTENTLENGTH)
+SipHeaderValueContentLength::SipHeaderValueContentLength(int32_t length)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {
 	content_length=length;
 }
 
-SipHeaderContentLength::~SipHeaderContentLength(){
+SipHeaderValueContentLength::~SipHeaderValueContentLength(){
 }
 
-string SipHeaderContentLength::getString(){
-	return "Content-Length: "+itoa(content_length);
+string SipHeaderValueContentLength::getString(){
+	return /*"Content-Length: "+*/itoa(content_length);
 }
 
-int32_t SipHeaderContentLength::getContentLength(){
+int32_t SipHeaderValueContentLength::getContentLength(){
 	return content_length;
 }
 		
-void SipHeaderContentLength::setContentLength(int32_t content_length){
+void SipHeaderValueContentLength::setContentLength(int32_t content_length){
 	this->content_length=content_length;
 }
 

@@ -38,13 +38,13 @@
 */
 
 
-class SipHeaderContentLength: public SipHeader{
+class SipHeaderValueContentLength: public SipHeaderValue{
 	public:
-		SipHeaderContentLength();
-		SipHeaderContentLength(int32_t length);
-		SipHeaderContentLength(const string &build_from);
+		SipHeaderValueContentLength();
+		SipHeaderValueContentLength(int32_t length);
+		SipHeaderValueContentLength(const string &build_from);
 
-		virtual ~SipHeaderContentLength();
+		virtual ~SipHeaderValueContentLength();
 		
 
                 virtual std::string getMemObjectType(){return "SipHeaderContentLength";}
@@ -52,7 +52,7 @@ class SipHeaderContentLength: public SipHeader{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		virtual string getString(); 
 
 		/**
 		 * @return The IP address of the contact header.

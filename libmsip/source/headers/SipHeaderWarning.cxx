@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderWarning.cxx
+ * 	SipHeaderValueWarning.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -35,68 +35,64 @@
 
 #include<libmutil/itoa.h>
 
-SipHeaderWarning::SipHeaderWarning(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_WARNING)
+const string sipHeaderValueWarningTypeStr = "Warning";
+
+SipHeaderValueWarning::SipHeaderValueWarning(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_WARNING,sipHeaderValueWarningTypeStr)
 {
+	errorCode = 0;
 	size_t blank1Pos = build_from.find(" ");
-	size_t blank2Pos, blank3Pos;
+	size_t blank2Pos;
 	if (blank1Pos==string::npos){
 		return;
 	}
-	blank2Pos = blank1Pos + 1 + 
-		build_from.substr(blank1Pos+1,string::npos).find(" ");
+	blank2Pos = blank1Pos + 1 + build_from.substr(blank1Pos+1,string::npos).find(" ");
 	if (blank2Pos==string::npos){
 		return;
 	}
-	blank3Pos = blank2Pos + 1 +
-		build_from.substr(blank2Pos+1,string::npos).find(" ");
-	if (blank3Pos==string::npos){
-		return;
-	}
-
-	errorCode=atoi(build_from.substr(blank1Pos+1, 3).c_str());
-	domainName=build_from.substr(blank2Pos+1, blank3Pos-blank2Pos);
-	warning=build_from.substr(blank3Pos+2, build_from.size()-blank3Pos-3);
-
+	
+	errorCode = atoi(build_from.substr(0,3).c_str());
+	domainName = build_from.substr(blank1Pos+1, blank2Pos-blank1Pos);
+	warning = build_from.substr(blank2Pos);
 }
 
 
-SipHeaderWarning::SipHeaderWarning(string domainName, uint16_t errorCode, string warning)
-		: SipHeader(SIP_HEADER_TYPE_WARNING)
+SipHeaderValueWarning::SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning)
+		: SipHeaderValue(SIP_HEADER_TYPE_WARNING,sipHeaderValueWarningTypeStr)
 {
 	this->errorCode=errorCode;
 	this->domainName=domainName;
 	this->warning=warning;
 }
 
-SipHeaderWarning::~SipHeaderWarning(){
+SipHeaderValueWarning::~SipHeaderValueWarning(){
 
 }
 
-string SipHeaderWarning::getString(){
-	return "Warning: "+itoa(errorCode)+" "+domainName+" \""+warning+"\"";
+string SipHeaderValueWarning::getString(){
+	return /*"Warning: "+*/ itoa(errorCode)+" "+domainName+" \""+warning+"\"";
 }
 
-string SipHeaderWarning::getWarning(){
+string SipHeaderValueWarning::getWarning(){
 	return warning;
 }
 		
-void SipHeaderWarning::setWarning(const string &warning){
+void SipHeaderValueWarning::setWarning(const string &warning){
 	this->warning=warning;
 }
 
-string SipHeaderWarning::getDomainName(){
+string SipHeaderValueWarning::getDomainName(){
 	return domainName;
 }
 
-void SipHeaderWarning::setDomainName(const string &domainName){
+void SipHeaderValueWarning::setDomainName(const string &domainName){
 	this->domainName=domainName;
 }
 
-uint16_t SipHeaderWarning::getErrorCode(){
+uint16_t SipHeaderValueWarning::getErrorCode(){
 	return errorCode;
 }
 
-void SipHeaderWarning::setErrorCode(const uint16_t& errorCode){
+void SipHeaderValueWarning::setErrorCode(const uint16_t& errorCode){
 	this->errorCode=errorCode;
 }

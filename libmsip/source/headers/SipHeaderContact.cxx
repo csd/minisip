@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderContact.cxx
+ * 	SipHeaderValueContact.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -32,15 +32,16 @@
 
 #include<libmsip/SipHeaderContact.h>
 
+const string sipHeaderValueContactTypeStr = "Contact";
 		
-SipHeaderContact::SipHeaderContact()
-	: SipHeader(SIP_HEADER_TYPE_CONTACT),uri("Erik","0.0.0.0","phone",0)
+SipHeaderValueContact::SipHeaderValueContact()
+	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","phone",0)
 {
 	featuretag= "";	
 }
 
-SipHeaderContact::SipHeaderContact(const string &build_from) 
-		: SipHeader(SIP_HEADER_TYPE_CONTACT), uri("UNKNOWN","0.0.0.0","phone",0)
+SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr), uri("UNKNOWN","0.0.0.0","phone",0)
 {
 	unsigned i=0;
 	while (build_from[i]!='<')
@@ -59,30 +60,30 @@ SipHeaderContact::SipHeaderContact(const string &build_from)
 	featuretag="";
 }
 
-SipHeaderContact::SipHeaderContact(const string &username, 
+SipHeaderValueContact::SipHeaderValueContact(const string &username, 
 		const string &ip, 
 		int32_t port, 
 		const string &user_type, 
 		const string &transport
 		)
-			:SipHeader(SIP_HEADER_TYPE_CONTACT),
+			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),
 			 uri(username,ip,user_type,port)
 {
 	if (transport!="")
 		uri.setTransport(transport);
 }
 
-SipHeaderContact::~SipHeaderContact(){
+SipHeaderValueContact::~SipHeaderValueContact(){
 
 }
 		
-string SipHeaderContact::getString(){
-//	merr << "SipHeaderContact::getString"<<end;
+string SipHeaderValueContact::getString(){
+//	merr << "SipHeaderValueContact::getString"<<end;
 
 //	return "Contact: <+erik@debug.org>;expires=1000"; //TODO: XXX
 	
 	string user = uri.getString();
-//	merr << "SipHeaderContact::getString: "<< user <<end;
+//	merr << "SipHeaderValueContact::getString: "<< user <<end;
 	string name;
 	if (user.find("@")!=string::npos){
 		name = "";
@@ -97,18 +98,18 @@ string SipHeaderContact::getString(){
 		
 		user = name+"@"+uri.getIp()+args;
 	}
-//	merr << "SipHeaderContact::getString: creating ret" <<end;
+//	merr << "SipHeaderValueContact::getString: creating ret" <<end;
 	
-	string ret = "Contact: <"+user+">;" + featuretag + "expires=1000"; //TODO: XXX
-//	merr << "SipHeaderContact::getString: ret="<< ret<<end;
+	string ret = /*"Contact: */"<"+user+">;" + featuretag + "expires=1000"; //TODO: XXX
+//	merr << "SipHeaderValueContact::getString: ret="<< ret<<end;
 	return ret;
 } 
 
-SipURI SipHeaderContact::getUri(){
+SipURI SipHeaderValueContact::getUri(){
 	return uri;
 }
 
-void SipHeaderContact::setUri(const SipURI &uri){
+void SipHeaderValueContact::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderRoute.cxx
+ * 	SipHeaderValueRoute.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -39,15 +39,16 @@
 
 // Ex: Route: <sip:vatn@213.100.38.57;ftag=2064763305;lr>,<...>
 
-SipHeaderRoute::SipHeaderRoute(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_ROUTE)
+const string sipHeaderValueRouteTypeStr = "Route";
+
+SipHeaderValueRoute::SipHeaderValueRoute(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_ROUTE,sipHeaderValueRouteTypeStr)
 {
-	assert(build_from.size()>6);
-	route = trim(build_from.substr(6));
+	route = trim(build_from);
 }
 
-SipHeaderRoute::SipHeaderRoute(list<string> &routeSet)
-		: SipHeader(SIP_HEADER_TYPE_ROUTE)
+SipHeaderValueRoute::SipHeaderValueRoute(list<string> &routeSet)
+		: SipHeaderValue(SIP_HEADER_TYPE_ROUTE,sipHeaderValueRouteTypeStr)
 {
 	for (list<string>::iterator i=routeSet.begin(); i!=routeSet.end(); i++){
 		if (i!=routeSet.begin())
@@ -56,14 +57,14 @@ SipHeaderRoute::SipHeaderRoute(list<string> &routeSet)
 	}
 }
 
-SipHeaderRoute::~SipHeaderRoute(){
+SipHeaderValueRoute::~SipHeaderValueRoute(){
 }
 
-string SipHeaderRoute::getString(){
-	return "Route: "+route;
+string SipHeaderValueRoute::getString(){
+	return /*"Route: "+*/route;
 }
 
-string SipHeaderRoute::getRoute(){
+string SipHeaderValueRoute::getRoute(){
 	return route;
 }
 

@@ -56,10 +56,10 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 	this->ipaddr=proxy;
 	username = to_uri;
 
-	MRef<SipHeaderFrom*> from;
-	MRef<SipHeaderTo*> to;
+	MRef<SipHeaderValueFrom*> from;
+	MRef<SipHeaderValueTo*> to;
 
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
+	MRef<SipHeader*> mf = new SipHeader( new SipHeaderValueMaxForwards(70));
 	addHeader(mf);
 	MRef<SipHeader *> header;
 	int noHeaders = inv->getNoHeaders();
@@ -69,18 +69,18 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 		bool add=false;
 		switch (type){
 			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderFrom*)*header)->setTag(((SipHeaderFrom*)(*header))->getTag());
-				((SipHeaderFrom*)*header)->getUri().setUserId(from_uri);
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setTag(((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getTag());
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_TO:
-				((SipHeaderTo*)*header)->setTag( ((SipHeaderTo*)(*header))->getTag() );
-				((SipHeaderTo*)*header)->getUri().setUserId(to_uri);
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag( ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getTag() );
+				((SipHeaderValueTo*)*header)->getUri().setUserId(to_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderCSeq*)*header)->setCSeq(  ((SipHeaderCSeq *)(*header))->getCSeq() );
-				((SipHeaderCSeq*)*header)->setMethod("CANCEL");
+				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setCSeq(  ((SipHeaderValueCSeq *)*(header->getHeaderValue(0)))->getCSeq() );
+				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setMethod("CANCEL");
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CALLID:

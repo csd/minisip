@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderUnsupported.cxx
+ * 	SipHeaderValueUnsupported.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -32,16 +32,18 @@
 
 #include<libmsip/SipHeaderUnsupported.h>
 
-SipHeaderUnsupported::SipHeaderUnsupported(const string &build_from)
-		:SipHeader(SIP_HEADER_TYPE_UNSUPPORTED)
+const string sipHeaderUnsupportedTypeString ="";
+
+SipHeaderValueUnsupported::SipHeaderValueUnsupported(const string &build_from)
+		:SipHeaderValue(SIP_HEADER_TYPE_UNSUPPORTED,sipHeaderUnsupportedTypeString)
 {
 	string_data = build_from;
 }
 
-SipHeaderUnsupported::~SipHeaderUnsupported(){
+SipHeaderValueUnsupported::~SipHeaderValueUnsupported(){
 }
 
-string SipHeaderUnsupported::getString(){
+string SipHeaderValueUnsupported::getString(){
 	return string_data;
 }
 

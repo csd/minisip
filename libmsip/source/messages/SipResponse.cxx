@@ -58,8 +58,8 @@ SipResponse::SipResponse(string branch,
 	this->status_code=status;
 	this->status_desc=status_desc;
 
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
-	addHeader(mf);
+	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
+	addHeader(new SipHeader(*mf));
 	
 	int noHeaders = inv->getNoHeaders();
 	for (int i=0 ; i < noHeaders; i++){			//FIX: deep copy
@@ -71,7 +71,7 @@ SipResponse::SipResponse(string branch,
 			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:
 			case SIP_HEADER_TYPE_CSEQ:
-				addHeader(header);
+				addHeader(header);		//FIXME: Other headers should be copies as well XXX
 				break;
 		}
 	}
@@ -82,6 +82,9 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 {
 
 	if(resp.size() < 11){
+#ifdef DEBUG_OUTPUT
+		cerr << "SipResponse::SipResponse: message too short - throwing exception"<< endl;
+#endif
 		throw new SipExceptionInvalidMessage();
 	}
 //	setContent(NULL);
@@ -99,6 +102,10 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 	uint32_t i;
 	for (i=12; resp[i]!='\r' && resp[i]!='\n'; i++){
 		if(resp.size() == i){
+#ifdef DEBUG_OUTPUT
+		cerr << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
+#endif
+
 			throw new SipExceptionInvalidMessage();
 		}
 		status_desc=status_desc+resp[i];

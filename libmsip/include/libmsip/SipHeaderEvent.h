@@ -38,12 +38,12 @@
 */
 
 
-class SipHeaderEvent: public SipHeader{
+class SipHeaderValueEvent: public SipHeaderValue{
 	public:
-		SipHeaderEvent();
-		SipHeaderEvent(const string &build_from);
+		SipHeaderValueEvent();
+		SipHeaderValueEvent(const string &build_from);
 
-		virtual ~SipHeaderEvent();
+		virtual ~SipHeaderValueEvent();
 
                 virtual std::string getMemObjectType(){return "SipHeaderEvent";}
 		

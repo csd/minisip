@@ -38,14 +38,14 @@
 */
 
 
-class SipHeaderCallID: public SipHeader{
+class SipHeaderValueCallID: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderCallID();
-		SipHeaderCallID(const string &build_from);
+		SipHeaderValueCallID();
+		SipHeaderValueCallID(const string &build_from);
 
-		virtual ~SipHeaderCallID();
+		virtual ~SipHeaderValueCallID();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderCallID";}
 		

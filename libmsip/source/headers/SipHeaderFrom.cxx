@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderFrom.cxx
+ * 	SipHeaderValueFrom.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -34,21 +34,23 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmutil/trim.h>
 
+const string sipHeaderValueFrom = "From";
 		
-SipHeaderFrom::SipHeaderFrom()
-		: SipHeader(SIP_HEADER_TYPE_FROM),
+SipHeaderValueFrom::SipHeaderValueFrom()
+		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),
 		uri("Erik","0.0.0.0","phone",0)
 {
 	tag="";
 }
 		
 
-SipHeaderFrom::SipHeaderFrom(const string &build_from) 
-		: SipHeader(SIP_HEADER_TYPE_FROM), 
+SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from) 
+		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom), 
 		uri("UNKNOWN","0.0.0.0","phone",0)
 {
+	
 	string users_name;
-	unsigned i=5;
+	unsigned i=0;
 	while (build_from[i]!='<'){
 		users_name+=build_from[i];
 		i++;
@@ -74,38 +76,38 @@ SipHeaderFrom::SipHeaderFrom(const string &build_from)
 	}
 }
 
-SipHeaderFrom::SipHeaderFrom(const string &username, const string &ip)
-		: SipHeader(SIP_HEADER_TYPE_FROM),
+SipHeaderValueFrom::SipHeaderValueFrom(const string &username, const string &ip)
+		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),
 		uri(username,ip,"phone",0)
 {
 }
 
-SipHeaderFrom::~SipHeaderFrom(){
+SipHeaderValueFrom::~SipHeaderValueFrom(){
 
 }
 		
-string SipHeaderFrom::getString(){
-//	merr << "SipHeaderFrom: Runnign get_string"<< end;
-	string ret = "From: "+uri.getUsersName()+"<"+uri.getString()+">";
-//	merr << "SipHeaderFrom: Runnign get_string(2)"<< end;
+string SipHeaderValueFrom::getString(){
+//	merr << "SipHeaderValueFrom: Runnign get_string"<< end;
+	string ret = /*"From: "+*/uri.getUsersName()+"<"+uri.getString()+">";
+//	merr << "SipHeaderValueFrom: Runnign get_string(2)"<< end;
 	if (tag.length()>0)
 		ret=ret+";tag="+tag;
-//	merr << "SipHeaderFrom: returning string: "<< ret<< end;
+//	merr << "SipHeaderValueFrom: returning string: "<< ret<< end;
 	return ret;
 } 
 
-SipURI &SipHeaderFrom::getUri(){
+SipURI &SipHeaderValueFrom::getUri(){
 	return uri;
 }
 
-void SipHeaderFrom::setUri(const SipURI &uri){
+void SipHeaderValueFrom::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 		
-void SipHeaderFrom::setTag(const string &tag){
+void SipHeaderValueFrom::setTag(const string &tag){
 	this->tag = tag;
 }
 
-string SipHeaderFrom::getTag(){
+string SipHeaderValueFrom::getTag(){
 	return tag;
 }

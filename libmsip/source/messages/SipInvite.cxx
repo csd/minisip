@@ -61,12 +61,12 @@ const int SipInvite::type=1;
 SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from){
 
 	//check if it is a P2T Invite packet
-	MRef<SipHeaderAcceptContact*> acp;
+	MRef<SipHeaderValueAcceptContact*> acp;
 	P2T=false;
 	
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
-			acp = MRef<SipHeaderAcceptContact*>((SipHeaderAcceptContact *)(*headers[i]));
+			acp = MRef<SipHeaderValueAcceptContact*>((SipHeaderValueAcceptContact *)*(headers[i]->getHeaderValue(0)));
 			
 			if(acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
 				P2T=true;
@@ -153,33 +153,33 @@ void SipInvite::createHeadersAndContent(
 	//SipHeaderVia *viap = new SipHeaderVia("UDP",localAddr, localSipPort);
 	//add_header(viap);
 	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(from_tel_no, proxyAddr );
+	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(from_tel_no, proxyAddr ) );
 	addHeader(fromp);
 
-	MRef<SipHeader*> top = new SipHeaderTo(tel_no, proxyAddr);
+	MRef<SipHeader*> top = new SipHeader( new SipHeaderValueTo(tel_no, proxyAddr) );
 	addHeader(top);
 	
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID() ;
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp) );
+	addHeader(new SipHeader(*callidp) );
         
 	if ( username.length()>0 || nonce.length()>0 || realm.length()>0 ){
-		MRef<SipHeader*> authp = new SipHeaderProxyAuthorization("INVITE",tel_no,realm, nonce, uri, username, password,"DIGEST");
+		MRef<SipHeader*> authp = new SipHeader( new SipHeaderValueProxyAuthorization("INVITE",tel_no,realm, nonce, uri, username, password,"DIGEST") );
 		addHeader(authp);
 	}
 
 
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("INVITE");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeader*> contactp = new SipHeaderContact(from_tel_no, localAddr, localSipPort,"phone",transport);
-	addHeader(contactp);
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"phone",transport);
+	addHeader(new SipHeader(contactp));
 	
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 	
 //        MRef<SipHeaderContentType*> contenttypep = new SipHeaderContentType();
         /*contenttypep->setContentType( sdpref->getContentType() ); */
@@ -189,10 +189,10 @@ void SipInvite::createHeadersAndContent(
 
 
 string SipInvite::getRemoteTelNo(){
-	MRef<SipHeaderFrom*> fromp;
+	MRef<SipHeaderValueFrom*> fromp;
 	for (int32_t i=0; i< headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
-			fromp = MRef<SipHeaderFrom*>((SipHeaderFrom *)(*headers[i]));
+			fromp = MRef<SipHeaderValueFrom*>((SipHeaderValueFrom *)*(headers[i]->getHeaderValue(0)));
 			return fromp->getUri().getUserId();
 		}
 	merr << "ERROR: Could not find user_id (tel. no.) in SipInvite"<< end;
@@ -223,8 +223,8 @@ string SipInvite::getString(){
  */
 void SipInvite::set_P2T() {
 	this->P2T=true;
-	MRef<SipHeaderAcceptContact*> acp = new SipHeaderAcceptContact("+sip.p2t=\"TRUE\"",true,false);
-	addHeader(MRef<SipHeader*>(*acp) );
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.p2t=\"TRUE\"",true,false);
+	addHeader(new SipHeader(*acp) );
 }
 
 

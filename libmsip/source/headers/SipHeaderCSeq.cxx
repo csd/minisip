@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderCSeq.cxx
+ * 	SipHeaderValueCSeq.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -36,8 +36,10 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
-SipHeaderCSeq::SipHeaderCSeq(const string &build_from):SipHeader(SIP_HEADER_TYPE_CSEQ){
-	unsigned i=5;
+const string sipHeaderValueCSeqTypeStr = "CSeq";
+
+SipHeaderValueCSeq::SipHeaderValueCSeq(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){
+	unsigned i=0;
 	while (build_from[i]==' ')
 		i++;
 	string num;
@@ -57,29 +59,29 @@ SipHeaderCSeq::SipHeaderCSeq(const string &build_from):SipHeader(SIP_HEADER_TYPE
 	setCSeq(atoi((trim(num)).c_str()));
 }
 
-SipHeaderCSeq::SipHeaderCSeq() : SipHeader(SIP_HEADER_TYPE_CSEQ){
+SipHeaderValueCSeq::SipHeaderValueCSeq() : SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){
 	method="NOT_SET";
 }
 
-SipHeaderCSeq::~SipHeaderCSeq(){
+SipHeaderValueCSeq::~SipHeaderValueCSeq(){
 }
 
-string SipHeaderCSeq::getString(){
-	return "CSeq: "+itoa(seq)+" "+method;
+string SipHeaderValueCSeq::getString(){
+	return /*"CSeq: "+*/itoa(seq)+" "+method;
 }
 
-string SipHeaderCSeq::getMethod(){
+string SipHeaderValueCSeq::getMethod(){
 	return method;
 }
 		
-void SipHeaderCSeq::setMethod(const string &method){
+void SipHeaderValueCSeq::setMethod(const string &method){
 	this->method=method;
 }
 
-void SipHeaderCSeq::setCSeq(int32_t n){
+void SipHeaderValueCSeq::setCSeq(int32_t n){
 	this->seq = n;
 }
 
-int32_t SipHeaderCSeq::getCSeq(){
+int32_t SipHeaderValueCSeq::getCSeq(){
 	return seq;
 }

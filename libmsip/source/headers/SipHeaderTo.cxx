@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderTo.cxx
+ * 	SipHeaderValueTo.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -33,21 +33,22 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmutil/trim.h>
 
+const string sipHeaderValueToTypeStr = "To";
 		
-SipHeaderTo::SipHeaderTo()
-		: SipHeader(SIP_HEADER_TYPE_TO),
+SipHeaderValueTo::SipHeaderValueTo()
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
 		uri("Erik","0.0.0.0","phone",0)
 {
 	
 }
 		
 
-SipHeaderTo::SipHeaderTo(const string &build_from) 
-		: SipHeader(SIP_HEADER_TYPE_TO),
+SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
 		uri("UNKNOWN","0.0.0.0","phone",0)
 {
 	string users_name;
-	int32_t i=3;
+	int32_t i=0;
 	tag="";
 	while (build_from[i]!='<'){ 		//FIX not past eos
 		users_name+=build_from[i];
@@ -77,39 +78,39 @@ SipHeaderTo::SipHeaderTo(const string &build_from)
 }
 
 
-SipHeaderTo::SipHeaderTo(const string &username, const string &ip)
-		: SipHeader(SIP_HEADER_TYPE_TO),
+SipHeaderValueTo::SipHeaderValueTo(const string &username, const string &ip)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
 		uri(username, ip,"phone",0)
 {
 
 }
 
-SipHeaderTo::~SipHeaderTo(){
+SipHeaderValueTo::~SipHeaderValueTo(){
 
 }
 
-string SipHeaderTo::getString(){
+string SipHeaderValueTo::getString(){
 	//cerr << "To::get_string" << endl;
-	string ret = "To: "+uri.getUsersName()+"<"+uri.getString()+">";
+	string ret = /*"To: "+*/ uri.getUsersName()+"<"+uri.getString()+">";
 	if (tag.length()>0)
 		ret=ret+";tag="+tag;
 	
 	return ret;
 } 
 
-SipURI &SipHeaderTo::getUri(){
+SipURI &SipHeaderValueTo::getUri(){
 	return uri;
 }
 
-void SipHeaderTo::setUri(const SipURI &uri){
+void SipHeaderValueTo::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 		
-void SipHeaderTo::setTag(const string &tag){
+void SipHeaderValueTo::setTag(const string &tag){
 	this->tag=tag;
 }
 
-string SipHeaderTo::getTag(){
+string SipHeaderValueTo::getTag(){
 	return tag;
 }
 

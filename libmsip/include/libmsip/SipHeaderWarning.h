@@ -38,12 +38,12 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderWarning: public SipHeader{
+class SipHeaderValueWarning: public SipHeaderValue{
 	public:
-		SipHeaderWarning(string domainName, uint16_t errorCode, string warning);
-		SipHeaderWarning(const string &build_from);
+		SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning);
+		SipHeaderValueWarning(const string &build_from);
 
-		virtual ~SipHeaderWarning();
+		virtual ~SipHeaderValueWarning();
 
                 virtual std::string getMemObjectType(){return "SipHeaderWarning";}
 		

@@ -38,14 +38,14 @@
 */
 
 
-class SipHeaderCSeq: public SipHeader{
+class SipHeaderValueCSeq: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderCSeq();
-		SipHeaderCSeq(const string &build_from);
+		SipHeaderValueCSeq();
+		SipHeaderValueCSeq(const string &build_from);
 
-		virtual ~SipHeaderCSeq();
+		virtual ~SipHeaderValueCSeq();
 		
                 virtual std::string getMemObjectType(){return "SipHeaderCSeq";}
 		

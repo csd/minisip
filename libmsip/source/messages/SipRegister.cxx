@@ -62,25 +62,25 @@ SipRegister::SipRegister(string branch,
 	//SipHeaderVia *viap = new SipHeaderVia("UDP",localIp, atoi(sip_listen_port.c_str()));
 	//add_header(viap);
 	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(from_tel_no, domain);
-	addHeader(fromp);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
+	addHeader(new SipHeader(*fromp));
 	
-	MRef<SipHeader*> top = new SipHeaderTo(from_tel_no, domain);
-	addHeader(top);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(from_tel_no, domain);
+	addHeader(new SipHeader(*top));
 	
-	MRef<SipHeader*> mf= new SipHeaderMaxForwards(70);
-	addHeader(mf);
+	MRef<SipHeaderValue*> mf= new SipHeaderValueMaxForwards(70);
+	addHeader(new SipHeader(*mf));
 	
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp));
+	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("REGISTER");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeader*> contactp = new SipHeaderContact(from_tel_no, 
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, 
 			localIp, 
 			sip_listen_port,
 			"phone",
@@ -88,14 +88,14 @@ SipRegister::SipRegister(string branch,
 			); //EE: append ";expires=3600" ?!
 	
 	//add P2T featuretag
-	MRef<SipHeaderContact*>contactp_casted = MRef<SipHeaderContact*>((SipHeaderContact*) *contactp);
+	MRef<SipHeaderValueContact*>contactp_casted = MRef<SipHeaderValueContact*>((SipHeaderValueContact*) *contactp);
 	contactp_casted->setFeatureTag("+sip.p2t=\"true\";");
 			
-	addHeader(contactp);
+	addHeader(new SipHeader(*contactp));
 	
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 }
 
 SipRegister::SipRegister(string branch,
@@ -118,33 +118,33 @@ SipRegister::SipRegister(string branch,
 	//SipHeaderVia *viap = new SipHeaderVia("UDP",localIp, atoi(sip_listen_port.c_str()));
 	//add_header(viap);
 	
-	MRef<SipHeader*> fromp = new SipHeaderFrom(from_tel_no, domain);
-	addHeader(fromp);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
+	addHeader(new SipHeader(fromp));
 	
-	MRef<SipHeader*> top = new SipHeaderTo(from_tel_no, domain);
-	addHeader(top);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(from_tel_no, domain);
+	addHeader(new SipHeader(top));
 	
-	MRef<SipHeader*> mf = new SipHeaderMaxForwards(70);
-	addHeader(mf);
+	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
+	addHeader(new SipHeader(*mf));
 	
-	MRef<SipHeaderCallID*> callidp = new SipHeaderCallID();
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
 	callidp->setId(call_id);
-	addHeader(MRef<SipHeader*>(*callidp));
+	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderCSeq*> seqp = new SipHeaderCSeq();
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
 	seqp->setMethod("REGISTER");
 	seqp->setCSeq(seq_no);
-	addHeader(MRef<SipHeader*>(*seqp));
+	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeader*> contactp = new SipHeaderContact(from_tel_no, localIp, sip_listen_port,"phone",transport);
-	addHeader(contactp);
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"phone",transport);
+	addHeader(new SipHeader(*contactp));
 	
-	MRef<SipHeaderUserAgent*> uap = new SipHeaderUserAgent();
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent("Minisip");
-	addHeader(MRef<SipHeader*>(*uap));
+	addHeader(new SipHeader(*uap));
 	
-        MRef<SipHeader*> authp = 
-		new SipHeaderAuthorization(
+        MRef<SipHeaderValue*> authp = 
+		new SipHeaderValueAuthorization(
 				"REGISTER",
 				from_tel_no, 
 				realm, 
@@ -153,7 +153,7 @@ SipRegister::SipRegister(string branch,
 				auth_id, 
 				password,
 				"Digest");
-	addHeader(authp);
+	addHeader(new SipHeader(*authp));
 	
 	setContent(NULL);
 }

@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipHeaderContentType.cxx
+ * 	SipHeaderValueContentType.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -39,32 +39,32 @@
 #include<iostream>
 using namespace std;
 
-// Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
+const string sipHeaderValueContentTypeTypeStr = "Content-Type"; 
 
-SipHeaderContentType::SipHeaderContentType(const string &build_from)
-		: SipHeader(SIP_HEADER_TYPE_CONTENTTYPE)
+SipHeaderValueContentType::SipHeaderValueContentType(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTTYPE,sipHeaderValueContentTypeTypeStr)
 {
-	content_type=trim(build_from.substr(13)); //strlen("Content-Type:")
+	content_type=trim(build_from); //strlen("Content-Type:")
 }
 
-SipHeaderContentType::SipHeaderContentType()
-		: SipHeader(SIP_HEADER_TYPE_CONTENTTYPE)
+SipHeaderValueContentType::SipHeaderValueContentType()
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTTYPE,sipHeaderValueContentTypeTypeStr)
 {
 	content_type="NOT_SET";
 }
 
-SipHeaderContentType::~SipHeaderContentType(){
+SipHeaderValueContentType::~SipHeaderValueContentType(){
 }
 
-string SipHeaderContentType::getString(){
-	return "Content-Type: "+content_type;
+string SipHeaderValueContentType::getString(){
+	return /*"Content-Type: "+*/content_type;
 }
 
-string SipHeaderContentType::getContentType(){
+string SipHeaderValueContentType::getContentType(){
 	return content_type;
 }
 		
-void SipHeaderContentType::setContentType(const string &content_type){
+void SipHeaderValueContentType::setContentType(const string &content_type){
 	this->content_type=content_type;
 }
 
