@@ -63,6 +63,7 @@ class LIBMSIP_API SipCallback{
 		 * @param invite The invite message of the calling user agent.
 		 */
 		virtual void sipcb_handleCommand(CommandString &command)=0;
+		virtual void sipcb_handleConfCommand(CommandString &command)=0;
 		
 };
 
