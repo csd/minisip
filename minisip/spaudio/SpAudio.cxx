@@ -63,6 +63,9 @@ SpAudio::SpAudio(int32_t numPos){
 
 }
 
+extern short int lookupleftGlobal[65536][POS];
+extern short int lookuprightGlobal[65536][POS];
+
 int32_t SpAudio::spatialize(short *input,
 			    MRef<SoundSource *> src,
 			    short *outbuff)
@@ -82,8 +85,8 @@ int32_t SpAudio::spatialize(short *input,
   }
 
   for(int32_t i=0; i<882;i++){
-    outbuff[(2*i)]=src->lookupleft[src->leftch[src->pointer]+32768];
-    outbuff[(2*i)+1]=src->lookupright[src->rightch[src->pointer]+32768];
+    outbuff[(2*i)]=lookupleftGlobal[src->leftch[src->pointer]+32768][src->position-1];
+    outbuff[(2*i)+1]=lookuprightGlobal[src->rightch[src->pointer]+32768][src->position -1];
     src->pointer=(src->pointer+1)%950;
   }
   return src->pointer;

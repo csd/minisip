@@ -102,6 +102,7 @@ SoundIO::SoundIO(
 	/* Create the SoundPlayerLoop */
 	start_sound_player();
 	start_recorder();
+	initLookup();
 
 }
 
@@ -303,7 +304,7 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 			return;
 		}
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
-		(*i)->initLookup(nextSize);
+//		(*i)->initLookup(nextSize);
 		cerr << "Source " << j << " in position " << (*i)->getPos() << endl;
 	}
 	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize,8000,BS));
@@ -324,7 +325,7 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 			return;
 		}
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
-		(*i)->initLookup(nextSize);
+//		(*i)->initLookup(nextSize);
 		j++;
 	}
 	sources.push_front(source);
@@ -352,7 +353,7 @@ void SoundIO::unRegisterSource(int sourceId){
                         i!=sources.end(); 
                         i++, j++){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
-		(*i)->initLookup(nextSize);
+//		(*i)->initLookup(nextSize);
 		cerr << "Source position: " << (*i)->getPos() << endl;
         }
 	queueLock.unlock();
@@ -408,6 +409,7 @@ void *SoundIO::playerLoop(void *arg){
 	short *resbuf = NULL;
 	short *outbuf = NULL;
 	uint32_t nChannels = 0;
+	uint32_t counter = 0;
 	
 	while( true ){
 
@@ -460,11 +462,16 @@ void *SoundIO::playerLoop(void *arg){
 //				cerr << "After spatialize " << mtime() << endl;
 				
 //				cerr << "OUTBUF: " << print_hex( (unsigned char*)outbuf, 1764*2) << endl;
-				for (uint32_t j=0; j<1764; j++)
+				for (uint32_t j=0; j<1764; j++){
+//					buf[j]+=tmpbuf[j];
 					buf[j]+=outbuf[j];
+				}
 //			}
 		}
 		active_soundcard->queueLock.unlock();
+		if( !(counter++ % 100) ){
+			fprintf(stderr ,  ".\n" );
+		}
 
 		if( active_soundcard->soundDev->isOpenedPlayback() ){
 //			cerr << "before send_to_card" << mtime() << endl;
@@ -513,6 +520,8 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	src_data->src_ratio = 44100.0/sampRate;
 	src_data->data_in  = new float[src_data->input_frames  * 2];
 	src_data->data_out = new float[src_data->output_frames * 2];
+	memset( src_data->data_in, '\0', src_data->input_frames  * 8 );
+	memset( src_data->data_out, '\0', src_data->output_frames  * 8 );
 
 	src_state=src_new(2,2,&error);
 
@@ -520,7 +529,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	rightch = new short[950];
 	lookupleft = new short[65536];
 	lookupright = new short[65536];
-	initLookup(numSources);
+//	initLookup(numSources);
 	pointer = 0;
 	j=0;
 	k=0;
@@ -536,8 +545,10 @@ BasicSoundSource::~BasicSoundSource(){
 	delete [] src_data->data_in;
 	delete [] src_data->data_out;
 	delete src_data;
+	src_delete( src_state );
 }
 
+#if 0
 void SoundSource::initLookup(int32_t nSources){
 	cerr << "nSources in initLookup" << nSources << endl;
 	cerr << "sourcePos in initLookup" << position << endl;
@@ -552,8 +563,27 @@ void SoundSource::initLookup(int32_t nSources){
      */
 
    } 
-   
 }
+#endif
+
+short int lookupleftGlobal[65536][POS]; 
+short int lookuprightGlobal[65536][POS]; 
+void SoundIO::initLookup(){
+	for(int32_t j=0; j < POS; j++ ){
+		for(int32_t i=0;i<65536;i++){
+			/* without gain control */
+			lookupleftGlobal[i][j]=(short)((float)(i-32768)*lchvol[j]);
+			lookuprightGlobal[i][j]=(short)((float)(i-32768)*rchvol[j]);
+
+			/* with gain control 
+			   lookupleft[i]=(short)((float)(i-32768)*lchvol[nSources-1][position-1]);
+			   lookupright[i]=(short)((float)(i-32768)*rchvol[nSources-1][position-1]);
+			   */
+
+		} 
+	}
+}
+
 
  short* SoundSource::getLeftBuf(){
    return leftch;

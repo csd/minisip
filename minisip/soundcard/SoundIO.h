@@ -150,7 +150,7 @@ class SoundSource : public MObject{
 
 		SRC_STATE* getSrcState();
 		*/
-		void initLookup(int32_t nSources);
+//		void initLookup(int32_t nSources);
 	private:
 		int sourceId;
 		
@@ -332,6 +332,8 @@ class SoundIO : public MObject{
 
 		virtual std::string getMemObjectType(){return "SoundIO";};
 	private:
+
+		void initLookup();
 		
 		void send_to_card(short *buf, int32_t n_samples);
 

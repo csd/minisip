@@ -196,6 +196,10 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 
 	int setSpeed;
 
+	// FIXME
+	// We always use 8kHz for recording
+	samplingRate = 8000;
+
 #ifdef IPAQ
 	// The iPAQ h5550 is known not to support 8kHz, we use 16kHz and
 	// resample
@@ -205,7 +209,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	}
 	else
 #endif
-	setSpeed = 8000; //samplingRate;
+	setSpeed = samplingRate;
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
 		perror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
@@ -303,6 +307,11 @@ int OssSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 			/* FIXME */
 			cerr << "Error while writing to soundcard" << endl;
 			return -1;
+		}
+
+		if( nWrittenBytes != nBytesToWrite - totalBytesWritten ){
+			cerr << "Soundcard did not write all the samples" << endl;
+			cerr << "nWrittenBytes" << nWrittenBytes << endl;
 		}
 
 		totalBytesWritten += nWrittenBytes;
