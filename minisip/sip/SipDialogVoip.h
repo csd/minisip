@@ -75,7 +75,9 @@ class SipDialogVoip: public SipDialog{
 
 	
 		MRef<Session *> getMediaSession();
-
+#ifdef IPSEC_SUPPORT
+		MRef<MsipIpsecAPI *> getIpsecSession();
+#endif
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
 		//void handleSdp(MRef<SdpPacket*> );
@@ -123,7 +125,9 @@ class SipDialogVoip: public SipDialog{
 		bool a25_termwait_terminated_notransactions( const SipSMCommand &command);
 		bool a26_callingnoauth_termwait_transporterror( const SipSMCommand &command);
 
-		bool a26_callingauth_termwait_cancel( const SipSMCommand &command);		
+		bool a26_callingauth_termwait_cancel( const SipSMCommand &command);
+		
+		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
 		MRef<LogEntry *> logEntry;
 
 		MRef<SipInvite*> lastInvite;

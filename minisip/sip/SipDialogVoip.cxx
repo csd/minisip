@@ -205,19 +205,9 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		
-		MRef<SdpPacket *> sdp = (SdpPacket*)*resp->getContent();
-		if ( sdp ){
-			if( !getMediaSession()->setSdpAnswer( sdp, peerUri ) ){
-				// Some error occured, session rejected
-				return false;
-			}
+		if(!sortMIME(*resp->getContent(), peerUri, 3))
+			return false;
 
-			getMediaSession()->start();
-		
-		}else{
-			merr << "WARNING: 200 OK did not contain any session description"<< end;
-		}
-		
 		return true;
 	}else{
 		return false;
@@ -396,15 +386,11 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
 
-		/* Give the SDP to the MediaSession */
-		MRef<SdpPacket *> sdpOffer = 
-			(SdpPacket*)*command.getCommandPacket()->getContent();
-		
-		if( sdpOffer ){
-			if( !getMediaSession()->setSdpOffer( sdpOffer, peerUri ) ){
-				// The offer is rejected, send 6XX;
-				return false;
-			}
+		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
+	
+		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
+			merr << "No MIME match" << end;
+			return false;
 		}
 
 		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
@@ -621,19 +607,8 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 
 
-		MRef<SdpPacket *> sdp = (SdpPacket*)*resp->getContent();
-		if ( sdp ){
-			if( !getMediaSession()->setSdpAnswer( sdp, peerUri ) ){
-				// Some error occured, session rejected
-				return false;
-			}
-
-			getMediaSession()->start();
-
-		}else{
-			merr << "WARNING: 200 OK did not contain any session description"<< end;
-		}
-
+		if(!sortMIME(*resp->getContent(), peerUri, 3))
+			return false;
 
 		return true;
 	}else{
@@ -1018,11 +993,59 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 
 	inv->getHeaderValueFrom()->setTag(dialogState.localTag);
 	
-	/* Get the session description from the Session */
-	MRef<SdpPacket *> sdp = mediaSession->getSdpOffer();
+//      There might be so that there are no SDP. Check!
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+		sdp = mediaSession->getSdpOffer();
+		if( !sdp ){
+		// FIXME: this most probably means that the
+		// creation of the MIKEY message failed, it 
+		// should not happen
+		merr << "Sdp was NULL in sendInvite" << end;
+		return; 
+		}
+	}
+	
+	/* Add the latter to the INVITE message */ // If it exists
+	
 
-	/* Add the latter to the INVITE message */
+//-------------------------------------------------------------------------------------------------------------//
+#ifdef IPSEC_SUPPORT	
+	// Create a MIKEY message for IPSEC if stated in the config file.
+	MRef<SipMimeContent*> mikey;
+	if (ipsecSession){
+		mikey = ipsecSession->getMikeyIpsecOffer();
+		if (!mikey){
+			merr << "Mikey was NULL in sendInvite" << end;
+			return; 
+		}
+	}
+	MRef<SipMimeContent*> multi;
+	if (ipsecSession && mediaSession){
+		multi = new SipMimeContent("multipart/mixed");
+		multi->addPart(*mikey);
+		multi->addPart(*sdp);
+		inv->setContent( *multi);
+	}
+	if (ipsecSession && !mediaSession)
+		inv->setContent( *mikey);
+	if (!ipsecSession && mediaSession)
+		inv->setContent( *sdp );
+#else
+	
 	inv->setContent( *sdp );
+#endif
+//-------------------------------------------------------------------------------------------------------------//
+
+
+
+
+
+//	/* Get the session description from the Session */
+//	MRef<SdpPacket *> sdp = mediaSession->getSdpOffer();
+//
+//	/* Add the latter to the INVITE message */
+//	inv->setContent( *sdp );
 
         MRef<SipMessage*> pref(*inv);
         SipSMCommand cmd(pref, SipSMCommand::TU, SipSMCommand::transaction);
@@ -1140,16 +1163,58 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
 	ok->getHeaderValueTo()->setTag(dialogState.localTag);
 
-
-	/* Get the SDP Answer from the MediaSession */
-	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();
-
-	if( sdpAnswer ){
-		ok->setContent( *sdpAnswer );
+//      There might be so that there are no SDP. Check!
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+		sdp = mediaSession->getSdpAnswer();
+		if( !sdp ){
+		// FIXME: this most probably means that the
+		// creation of the MIKEY message failed, it 
+		// should not happen
+		merr << "Sdp was NULL in sendInvite" << end;
+		return; 
+		}
 	}
-	/* if sdp is NULL, the offer was refused, send 606 */
-	// FIXME
-	else return; 
+	
+	/* Add the latter to the INVITE message */ // If it exists
+	
+
+//-------------------------------------------------------------------------------------------------------------//
+#ifdef IPSEC_SUPPORT	
+	// Create a MIKEY message for IPSEC if stated in the config file.
+	MRef<SipMimeContent*> mikey;
+	if (ipsecSession){
+		mikey = ipsecSession->getMikeyIpsecAnswer();
+		if (!mikey){
+			merr << "Mikey was NULL in sendInvite" << end;
+			return; 
+		}
+	}
+	MRef<SipMimeContent*> multi;
+	if (ipsecSession && mediaSession){
+		multi = new SipMimeContent("multipart/mixed");
+		multi->addPart(*mikey);
+		multi->addPart(*sdp);
+		ok->setContent( *multi);
+	}
+	if (ipsecSession && !mediaSession)
+		ok->setContent( *mikey);
+	if (!ipsecSession && mediaSession)
+		ok->setContent( *sdp );
+#else
+	
+	ok->setContent( *sdp );
+#endif
+//-------------------------------------------------------------------------------------------------------------//
+//	/* Get the SDP Answer from the MediaSession */
+//	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();
+//
+//	if( sdpAnswer ){
+//		ok->setContent( *sdpAnswer );
+//	}
+//	/* if sdp is NULL, the offer was refused, send 606 */
+//	// FIXME
+//	else return; 
 
 //	setLastResponse(ok);
         MRef<SipMessage*> pref(*ok);
@@ -1281,3 +1346,53 @@ MRef<Session *> SipDialogVoip::getMediaSession(){
 	return mediaSession;
 }
 
+#ifdef IPSEC_SUPPORT
+MRef<MsipIpsecAPI *> SipDialogVoip::getIpsecSession(){
+	return ipsecSession;
+}
+#endif
+
+bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
+	if (Offer){
+		if ( Offer->getContentType().substr(0,9) == "multipart"){
+			MRef<SipMessageContent *> part;
+			part = ((SipMimeContent*)*Offer)->popFirstPart();
+			while( *part != NULL){
+				sortMIME(part, peerUri, type);
+				part = ((SipMimeContent*)*Offer)->popFirstPart();
+			}
+		}
+#ifdef IPSEC_SUPPORT
+		if( (Offer->getContentType()).substr(0,17) == "application/mikey")
+			switch (type){
+				case 10:
+					if(!getIpsecSession()->setMikeyIpsecOffer((SipMimeContent*)*Offer))
+						return false;
+					break;
+				case 3:
+					if(!getIpsecSession()->setMikeyIpsecAnswer((SipMimeContent*)*Offer))
+						return false;
+					break;
+				default:
+					merr << "No IPSEC match" << end;
+					return false;
+			}
+#endif
+		if( (Offer->getContentType()).substr(0,15) == "application/sdp")
+			switch (type){
+				case 10:
+					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
+						return false;
+					break;
+				case 3:
+					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
+						return false;
+					getMediaSession()->start();
+					break;
+				default:
+					merr << "No SDP match" << end;
+					return false;
+			}
+	}
+	return true;
+}
