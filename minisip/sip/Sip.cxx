@@ -193,7 +193,7 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
+	MRef<SipDialog*> voipCall( new SipDialogVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	
 #else	
 	MRef<SipDialog*> voipCall( new SipDialogVoip(sipstack, callconf, phoneconfig, mediaSession)); 
