@@ -20,7 +20,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
 */
-
+#include<config.h>
 #include<libmsip/SipStack.h>
 
 #include<libmsip/SipMessageTransport.h>
