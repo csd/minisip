@@ -485,6 +485,7 @@ void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
 }
 
 void MainWindow::invite(){
+	phoneSelected();
 	string uri;
 
 	uri = uriEntry->get_text();
