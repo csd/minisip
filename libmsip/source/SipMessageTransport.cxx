@@ -72,7 +72,7 @@ static int nocaseequal(char c1, char c2){
 	return c1==c2;
 }
 static int strncasecmp(const char *s1, const char *s2, int n){
-	for (int i=0; i<n; i++){
+	for (int i=0; s1[i]!=0 && s2[i]!=0 && i<n; i++){
 		if ( nocaseequal(s1[i],s2[i]) ){
 			if (s1[i]<s2[i])
 				return -1;
@@ -81,6 +81,8 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 		}
 			
 	}
+	if (s2[i]!=0)
+		return -1;
 	return 0;
 }
 #endif

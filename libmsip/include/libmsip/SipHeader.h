@@ -51,7 +51,9 @@
 #include<sys/types.h>
 
 #ifdef _MSC_VER
+#ifndef int32_t
 typedef __int32 int32_t;
+#endif
 #else
 #include<stdint.h>
 #endif
