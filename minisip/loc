@@ -1,9 +1,0 @@
-#!/bin/sh
-
-
-wc minisip/*.h minisip/*.cxx sdp/*.h sdp/*.cxx sdp/headers/*.cxx sdp/headers/*.h netutil/*.h netutil/*.cxx sip/*.h sip/*.cxx sip/headers/*.h sip/headers/*.cxx soundcard/*.h soundcard/*.cxx minisip/gui/*.h minisip/gui/*.cxx rtp/*.h rtp/*.cxx codecs/*.cxx codecs/*.h sip/state_machines/*.h sip/state_machines/*.cxx minisip/gui/qtgui/*.h minisip/gui/qtgui/*.cxx util/*.h util/*.cxx stun/*.h stun/*.cxx
-
-echo In `ls minisip/*.h minisip/*.cxx sdp/*.h sdp/*.cxx sdp/headers/*.cxx sdp/headers/*.h netutil/*.h netutil/*.cxx sip/*.h sip/*.cxx sip/headers/*.h sip/headers/*.cxx soundcard/*.h soundcard/*.cxx minisip/gui/*.h minisip/gui/*.cxx rtp/*.h rtp/*.cxx codecs/*.cxx codecs/*.h sip/state_machines/*.h sip/state_machines/*.cxx minisip/gui/qtgui/*.h minisip/gui/qtgui/*.cxx util/*.h util/*.cxx stun/*.cxx stun/*.h | wc -l ` files in sip rtp/rtcp/srtp/srtcp sdp soundcard util netutil gui codec interfaces stun and minisip 
-
-echo
-echo LOC=`wc -l minisip/*.h minisip/*.cxx util/*.cxx util/*.h sdp/*.h sdp/*.cxx sdp/headers/*.h sdp/headers/*.cxx netutil/*.h netutil/*.cxx sip/*.h sip/*.cxx sip/headers/*.h sip/headers/*.cxx soundcard/*.h soundcard/*.cxx codecs/g711/*.h codecs/g711/*.cxx codecs/ilbc/*.h codecs/ilbc/*.cxx minisip/gui/*.h minisip/gui/*.cxx rtp/*.h rtp/*.cxx codecs/*.cxx codecs/*.h sip/state_machines/*.h sip/state_machines/*.cxx minisip/gui/qtgui/*.h minisip/gui/qtgui/*.cxx stun/*.h stun/*.cxx | tail -1` in entire project
