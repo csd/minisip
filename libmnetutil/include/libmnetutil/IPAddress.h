@@ -25,13 +25,24 @@
 #ifndef IPADDRESS_H
 #define IPADDRESS_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include<libmnetutil/Socket.h>
 
 #define IP_ADDRESS_TYPE_V4 	0
 #define IP_ADDRESS_TYPE_V6	1
 
 #include<string>
-class IPAddress{
+
+class LIBMNETUTIL_API IPAddress{
 	public:
 		virtual ~IPAddress();
 

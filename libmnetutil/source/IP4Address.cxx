@@ -52,7 +52,11 @@ inet_aton(const char *cp, struct in_addr *addr)
 #include<stdio.h>
 #include<assert.h>
 #include<libmutil/itoa.h>
+
+#ifndef _MSC_VER
 #include<strings.h>
+#endif
+
 #include<iostream>
 
 IP4Address::IP4Address(struct sockaddr_in *sin){
@@ -81,7 +85,7 @@ IP4Address::IP4Address(string addr){
 		numIp = ntoh32(ip_data);
 	}else{
 
-		unsigned char *ip;
+		//unsigned char *ip;
 		
 #ifndef WIN32
 		struct hostent *hp= gethostbyname2(ipaddr.c_str(), AF_INET);	
@@ -207,7 +211,7 @@ bool IP4Address::operator ==(const IPAddress &i) const{
 		const IP4Address &i4 = dynamic_cast<const IP4Address&>(i);
 		return (*this == i4);
 	}
-	catch(std::bad_cast &ex){
+	catch(std::bad_cast &){
 		// Comparing IPv6 and IPv4 addresses
 		return false;
 	}

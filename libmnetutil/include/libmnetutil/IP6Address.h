@@ -25,13 +25,23 @@
 #ifndef IP6ADDRESS_H
 #define IP6ADDRESS_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include "IPAddress.h"
 
 #include<iostream>
 
 struct sockaddr_in6;
 
-class IP6Address : public IPAddress{
+class LIBMNETUTIL_API IP6Address : public IPAddress{
 	public:
 		IP6Address(std::string addr);
 		IP6Address(const IP6Address&);

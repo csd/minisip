@@ -25,10 +25,20 @@
 #ifndef IP4SERVERSOCKET_H
 #define IP4SERVERSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include"ServerSocket.h"
 #include"TCPSocket.h"
 
-class IP4ServerSocket : public ServerSocket{
+class LIBMNETUTIL_API IP4ServerSocket : public ServerSocket{
 	public:
 		IP4ServerSocket(int32_t listenport, int32_t backlog=25);
 

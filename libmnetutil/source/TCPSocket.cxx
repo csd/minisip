@@ -34,6 +34,10 @@
 #include<netinet/in.h>
 #endif
 
+#ifdef _MSC_VER
+#include<io.h>
+#endif
+
 
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/IPAddress.h>
@@ -44,8 +48,10 @@
 #include<errno.h>
 
 
-
+#ifndef _MSC_VER
 #include<unistd.h>
+#endif
+
 #include<errno.h>
 
 #include<iostream>
@@ -56,7 +62,7 @@ TCPSocket::TCPSocket(string addr, int32_t port){
 	peerAddress = new IP4Address(addr);
 	port = port;
 	
-	if ((fd = ::socket(peerAddress->getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
+	if ((fd = (int32_t)::socket(peerAddress->getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
 		throw new SocketFailed( errno );
 	}
 	int32_t on=1;
@@ -75,7 +81,7 @@ TCPSocket::TCPSocket(IPAddress &ipaddress, int32_t port){
 	peerPort = port;
 
 	type = SOCKET_TYPE_TCP;
-	if ((fd = ::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
+	if ((fd = (int32_t)::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
 		throw new SocketFailed( errno );
 	}
 	int32_t on=1;
@@ -97,7 +103,13 @@ TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr){
 
 TCPSocket::TCPSocket(TCPSocket &sock){
 	type = SOCKET_TYPE_TCP;
+
+#ifdef _MSC_VER
+	this->fd = ::_dup(sock.fd);
+#else
 	this->fd = dup(sock.fd);
+#endif
+
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: In TCPSocket copy constructor: First free descriptor number is " << this->fd << endl;
 #endif
@@ -115,7 +127,12 @@ TCPSocket::~TCPSocket(){
 }
 
 int32_t TCPSocket::write(string data){
+#ifdef _MSC_VER
+	return ::_write(fd, data.c_str(), (unsigned int)data.length());
+#else
 	return ::write(fd, data.c_str(), data.length());
+#endif
+	
 }
 
 int32_t TCPSocket::write(void *buf, int32_t count){

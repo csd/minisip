@@ -25,10 +25,20 @@
 #ifndef IP6SERVERSOCKET_H
 #define IP6SERVERSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include"ServerSocket.h"
 #include"TCPSocket.h"
 
-class IP6ServerSocket : public ServerSocket{
+class LIBMNETUTIL_API IP6ServerSocket : public ServerSocket{
 	public:
 		IP6ServerSocket(int32_t listenport, int32_t backlog=25);
 

@@ -51,7 +51,7 @@
 ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 	this->domain=domain;
 	this->listen_port=listenport;
-	fd = socket(domain, SOCK_STREAM, IPPROTO_TCP);
+	fd = (int32_t)::socket(domain, SOCK_STREAM, IPPROTO_TCP);
 	if (fd<0){
 		throw new SocketFailed( errno );
 	}
@@ -102,7 +102,7 @@ StreamSocket *ServerSocket::accept(){
 #ifndef WIN32
 	if ((cli=::accept(fd, &sin, (socklen_t*)&sinlen))<0){
 #else
-	if ((cli=::accept(fd, &sin, (int*)&sinlen))<0){
+	if ((cli=(int32_t)::accept(fd, &sin, (int*)&sinlen))<0){
 #endif
 		perror("in ServerSocket::accept(): accept:");
 	}

@@ -42,8 +42,11 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 
 #include<stdio.h>
 #include<errno.h>
+
+#ifndef _MSC_VER
 #include<unistd.h>
-#include<errno.h>
+#endif
+
 
 #include<iostream>
 
@@ -93,10 +96,15 @@ IP6Address::IP6Address(struct sockaddr * addr){
 	sockaddress = new sockaddr_in6;
 	memcpy(sockaddress, addr, sizeof(sockaddr_in6));
 	for (int32_t i=0; i<8; i++)
-#ifdef WIN32
+
+#ifdef _MSC_VER
+		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.u.Word[i];
+#else
+#ifdef WIN32	// Should be __CYGWIN__?
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr._S6_un._S6_u16[i];
 #else
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+#endif
 #endif
 
 }
@@ -194,7 +202,7 @@ bool IP6Address::operator ==(const IPAddress &i) const{
                 const IP6Address &i6 = dynamic_cast<const IP6Address&>(i);
                 return (*this == i6);
         }
-        catch(std::bad_cast &ex){
+        catch(std::bad_cast &){
                 // Comparing IPv6 and IPv4 addresses
                 return false;
         }

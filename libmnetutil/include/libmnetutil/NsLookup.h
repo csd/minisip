@@ -25,13 +25,23 @@
 #ifndef _NSLOOKUP_H
 #define _NSLOOKUP_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 //#include<hash_map>
 
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/IPAddress.h>
 
 
-class NsLookup{
+class LIBMNETUTIL_API NsLookup{
     public:
 //        NsLookup(int maxCacheTimeout=900);
 //        IPAddress *lookup(string addr);
@@ -44,7 +54,7 @@ class NsLookup{
 //        hash_map<string, string> cache;
 };
 
-class NsLookupHostNotFound : public NetworkException{
+class LIBMNETUTIL_API NsLookupHostNotFound : public NetworkException{
     public:
         NsLookupHostNotFound(std::string host);
         

@@ -25,6 +25,16 @@
 #ifndef IP4ADDRESS_H
 #define IP4ADDRESS_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include <libmnetutil/IPAddress.h>
 
 #ifdef _MSC_VER
@@ -34,7 +44,7 @@ typedef unsigned int uint32_t;
 #endif
 struct sockaddr_in;
 
-class IP4Address : public IPAddress{
+class LIBMNETUTIL_API IP4Address : public IPAddress{
 	public:
 		IP4Address(std::string addr);
 		IP4Address(struct sockaddr_in *sin);

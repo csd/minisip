@@ -25,12 +25,22 @@
 #ifndef TCPSOCKET_H
 #define TCPSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include"StreamSocket.h"
 #include"IPAddress.h"
 
 using namespace std;
 
-class TCPSocket : public StreamSocket{
+class LIBMNETUTIL_API TCPSocket : public StreamSocket{
 	public:
 		TCPSocket(int32_t fd, sockaddr * addr);
 		TCPSocket(string addr,int32_t port=0);

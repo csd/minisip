@@ -45,8 +45,10 @@
 #include<errno.h>
 
 
-
+#ifndef _MSC_VER
 #include<unistd.h>
+#endif
+
 #include<iostream>
 #include<errno.h>
 
@@ -57,7 +59,11 @@ UDPSocket::UDPSocket(bool use_ipv6, int32_t port){
 	type = SOCKET_TYPE_UDP;
 	this->use_ipv6 = use_ipv6;
 	
-	if ((fd = socket(use_ipv6? PF_INET6:PF_INET, SOCK_DGRAM, IPPROTO_UDP ))<0){
+#ifdef _MSC_VER
+	assert(sizeof(SOCKET)==4);
+#endif
+
+	if ((fd = (int32_t)socket(use_ipv6? PF_INET6:PF_INET, SOCK_DGRAM, IPPROTO_UDP ))<0){
 		throw new SocketFailed( errno );
 	}
 	int32_t on=1;

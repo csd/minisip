@@ -25,6 +25,16 @@
 #ifndef TLSSOCKET_H
 #define TLSSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 //#include<config.h>
 
 //#ifndef NO_SECURITY
@@ -41,10 +51,19 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#include<libmutil/MemObject.h>
 
 using namespace std;
 
-class TLSSocket : public StreamSocket{
+
+//Okay - another MSVC thing. Looks like I must explicitely instantiate 
+//the MRef template like this to avoid linking errors --Erik.
+#ifdef _MSC_VER
+template class __declspec(dllexport) MRef<certificate*>;
+template class __declspec(dllexport) MRef<ca_db*>;
+#endif
+
+class LIBMNETUTIL_API TLSSocket : public StreamSocket{
 	public:
 		TLSSocket(string addr, int32_t port, void * &ssl_ctx, 
 		          MRef<certificate *> cert = NULL, 

@@ -25,6 +25,16 @@
 #ifndef NETWORK_EXCEPTION_H
 #define NETWORK_EXCEPTION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 //#include<config.h>
 
 #include<string.h>
@@ -35,7 +45,7 @@
 
 #include<string>
 
-class NetworkException{
+class LIBMNETUTIL_API NetworkException{
 	public:
 		virtual ~NetworkException(){}
 		virtual std::string errorDescription();
@@ -45,7 +55,7 @@ class NetworkException{
 		int errorNumber;
 };
 
-class HostNotFound : public NetworkException{
+class LIBMNETUTIL_API HostNotFound : public NetworkException{
 	public:
 		HostNotFound( std::string host ):host(host){};
 		virtual std::string errorDescription(){ return
@@ -55,48 +65,48 @@ class HostNotFound : public NetworkException{
 		std::string host;
 };
 
-class ResolvError : public NetworkException{
+class LIBMNETUTIL_API ResolvError : public NetworkException{
 	public:
 		ResolvError( int errorNumber );
 };
 
-class ConnectFailed : public NetworkException{
+class LIBMNETUTIL_API ConnectFailed : public NetworkException{
 	public:
 		ConnectFailed( int errorNumber );
 };
 
-class SocketFailed : public NetworkException{
+class LIBMNETUTIL_API SocketFailed : public NetworkException{
 	public:
 		SocketFailed( int errorNumber );
 };
 
-class BindFailed : public NetworkException{
+class LIBMNETUTIL_API BindFailed : public NetworkException{
 	public:
 		BindFailed( int errorNumber );
 };
 
-class SendFailed : public NetworkException{
+class LIBMNETUTIL_API SendFailed : public NetworkException{
 	public:
 		SendFailed( int errorNumber );
 };
 
-class SetSockOptFailed : public NetworkException{
+class LIBMNETUTIL_API SetSockOptFailed : public NetworkException{
 	public:
 		SetSockOptFailed( int errorNumber );
 };
 
-class ListenFailed : public NetworkException{
+class LIBMNETUTIL_API ListenFailed : public NetworkException{
 	public:
 		ListenFailed( int errorNumber );
 };
 
-class GetSockNameFailed : public NetworkException{
+class LIBMNETUTIL_API GetSockNameFailed : public NetworkException{
 	public:
 		GetSockNameFailed( int errorNumber );
 };
 
 #ifndef NO_SECURITY
-class TLSConnectFailed : public ConnectFailed{
+class LIBMNETUTIL_API TLSConnectFailed : public ConnectFailed{
 	public:
 		TLSConnectFailed( int errorNumber, SSL * ssl  );
 		virtual std::string errorDescription();
@@ -105,7 +115,7 @@ class TLSConnectFailed : public ConnectFailed{
 		SSL * ssl;
 };
 
-class TLSInitFailed : public NetworkException{
+class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
 	public:
 		TLSInitFailed();
 		virtual std::string errorDescription(){return
@@ -113,7 +123,7 @@ class TLSInitFailed : public NetworkException{
 		};
 };
 
-class TLSContextInitFailed : public NetworkException{
+class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
 	public:
 		TLSContextInitFailed();
 		virtual std::string errorDescription(){return

@@ -41,6 +41,8 @@
 #include<iostream>
 
 #include<libmnetutil/NetworkException.h>
+#include<libmutil/MemObject.h>
+
 
 // When created by a TLS Server
 TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
@@ -116,7 +118,7 @@ TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 
 	ssl = SSL_new( this->ssl_ctx );
 	
-	SSL_set_session_id_context( ssl, sid_ctx, strlen( (const char *)sid_ctx ) );
+	SSL_set_session_id_context( ssl, sid_ctx, (unsigned int)strlen( (const char *)sid_ctx ) );
 
 	if( this->ssl_ctx->session_cache_head != NULL )
         	SSL_set_session( ssl, this->ssl_ctx->session_cache_head );
@@ -136,7 +138,7 @@ TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	try{
 		peer_cert = new certificate( SSL_get_peer_certificate (ssl) );
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception *){
 		//FIXME
 		cerr << "Could not get server certificate" << endl;
 		peer_cert = NULL;
@@ -187,7 +189,7 @@ TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx,
 
 	ssl = SSL_new( this->ssl_ctx );
 
-	SSL_set_session_id_context( ssl, sid_ctx, strlen( (const char *)sid_ctx ) );
+	SSL_set_session_id_context( ssl, sid_ctx, (unsigned int)strlen( (const char *)sid_ctx ) );
 
 	if( this->ssl_ctx->session_cache_head != NULL )
         	SSL_set_session( ssl, this->ssl_ctx->session_cache_head );
@@ -207,7 +209,7 @@ TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx,
 	try{
 		peer_cert = new certificate( SSL_get_peer_certificate (ssl) );
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception * ){
 		//FIXME
 		cerr << "Could not get server certificate" << endl;
 		peer_cert = NULL;
@@ -224,7 +226,7 @@ TLSSocket::~TLSSocket(){
 }
 
 int32_t TLSSocket::write( string data ){
-	return SSL_write( ssl, data.c_str(), data.length() );
+	return SSL_write( ssl, data.c_str(), (int)data.length() );
 }
 
 int32_t TLSSocket::write( void *buf, int32_t count ){

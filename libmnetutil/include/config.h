@@ -24,8 +24,12 @@
 #define CONFIG_H
 
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER 
+
+
+#ifndef WIN32
 #define WIN32
+#endif
 
 #ifndef uint8_t
 typedef unsigned char  uint8_t;
@@ -52,7 +56,7 @@ typedef unsigned int  uint32_t;
 #endif
 
 #ifndef int64_t
-typedef int64  int64_t;
+typedef __int64  int64_t;
 #endif
 
 #ifndef uint64_t
@@ -60,7 +64,7 @@ typedef unsigned long long  uint64_t;
 #endif
 
 #else
-
+ 
 #include<stdint.h>
 
 #ifdef __CYGWIN__

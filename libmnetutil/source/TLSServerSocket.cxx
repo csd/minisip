@@ -101,7 +101,8 @@ StreamSocket *TLSServerSocket::accept(){
 #ifndef WIN32
 	if ((cli=::accept(fd, &sin, (socklen_t*)&sinlen))<0){
 #else
-	if ((cli=::accept(fd, &sin, (int*)&sinlen))<0){
+	assert(sizeof(SOCKET)==4);
+	if ((cli=(int32_t)::accept(fd, &sin, (int*)&sinlen))<0){
 #endif
 		perror("in ServerSocket::accept(): accept:");
 	}

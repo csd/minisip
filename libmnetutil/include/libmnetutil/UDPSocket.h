@@ -25,12 +25,22 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include"Socket.h"
 #include"IPAddress.h"
 
 using namespace std;
 
-class UDPSocket : public Socket{
+class LIBMNETUTIL_API UDPSocket : public Socket{
 	public:
 		UDPSocket(bool use_ipv6=false, int32_t port=0);
 		virtual ~UDPSocket();

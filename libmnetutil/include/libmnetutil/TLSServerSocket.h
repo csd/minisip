@@ -25,6 +25,16 @@
 #ifndef TLSSERVERSOCKET_H
 #define TLSSERVERSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 //#include<config.h>
 
 ////#ifndef NO_SECURITY
@@ -40,7 +50,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-class TLSServerSocket : public IP4ServerSocket{
+class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
 
 	public:
 		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert );

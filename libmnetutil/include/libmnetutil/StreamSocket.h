@@ -25,6 +25,16 @@
 #ifndef STREAMSOCKET_H
 #define STREAMSOCKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMNETUTIL_EXPORTS
+#define LIBMNETUTIL_API __declspec(dllexport)
+#else
+#define LIBMNETUTIL_API __declspec(dllimport)
+#endif
+#else
+#define LIBMNETUTIL_API
+#endif
+
 #include"Socket.h"
 
 #include<string>
@@ -33,7 +43,7 @@ using namespace std;
 class IPAddress;
 class IP4Address;
 
-class StreamSocket : public Socket{
+class LIBMNETUTIL_API StreamSocket : public Socket{
 	public:
 		virtual ~StreamSocket();
 		virtual int32_t write(string)=0;
