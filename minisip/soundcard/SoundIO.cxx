@@ -232,8 +232,10 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		}
 		
 		soundcard->soundDev->lockRead();
-                nread = soundcard->soundDev->read( (byte_t *)buffers[i%2], 
-                                        soundcard->recorder_buffer_size );
+		if( soundcard->soundDev->isOpenedRecord() ){
+				nread = soundcard->soundDev->read( (byte_t *)buffers[i%2], soundcard->recorder_buffer_size );
+		}
+				
 		soundcard->soundDev->unlockRead();
 
 		if( nread < 0 ){
@@ -386,7 +388,9 @@ void SoundIO::send_to_card(short *buf, int32_t n_samples){
 	int32_t nWritten;
 
 	soundDev->lockWrite();
-	nWritten = soundDev->write( ptr, n_samples );
+	if( soundDev->isOpenedPlayback() ){
+		nWritten = soundDev->write( ptr, n_samples );
+	}
 	soundDev->unlockWrite();
 }
 

@@ -166,12 +166,17 @@ Minisip::Minisip( int argc, char**argv ){
 	gui = dynamic_cast<Gui*>(debugtextui);
 	assert(gui);
 	//debugtextui = gui;
+	merr.setExternalHandler( gui );
         LogEntry::handler = NULL;
 #else //!TEXT_UI
 #ifdef GTK_GUI
 
         gui = new MainWindow( argc, argv );
         LogEntry::handler = dynamic_cast<LogEntryHandler *>(gui);
+	
+	DbgHandler * dbgHandler = dynamic_cast<MainWindow *>( gui );
+	fprintf( stderr, "dbgHandler: %x\n", dbgHandler );
+	merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) );
 
 #ifdef DEBUG_OUTPUT
 	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
@@ -392,7 +397,7 @@ void Minisip::initParseConfig(){
 
                         if (ret.length()>0){
                                 //bool ok;
-                                gui->displayErrorMessage(ret);
+                                merr << ret << end;
 				/*
                                 ok = gui->configDialog( phoneConf );
                                 if( !ok ){
@@ -407,7 +412,7 @@ void Minisip::initParseConfig(){
 #ifdef DEBUG_OUTPUT
                         merr << FG_ERROR << "Element not found: "<< enf->what()<< PLAIN << end;
 #endif
-                        gui->displayErrorMessage("Could not parse configuration item: "+enf->what());
+                        merr << "Could not parse configuration item: "+enf->what() << end;
                         gui->configDialog( phoneConf );
                         done=false;
                 }

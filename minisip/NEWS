@@ -2,4 +2,5 @@ Version 0.7.0 (21/02/2005)
 - Spatial audio when having several simultaneous calls.
 - Experimental IPSEC support (--enable-ipsec-enable).
 - Support for libglademm >= 2.4.
-- Bugfixes (security, compatibility with Xlite, ...)
+- TCP / TLS should be fixed.
+- Bugfixes (security, compatibility with Xlite, ...).

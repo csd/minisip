@@ -48,7 +48,7 @@ class Gui : public Runnable {
                  * @param s     Message that will be displayed to the
                  * user.
                  */
-		virtual void displayErrorMessage(string s)=0;
+		//virtual void displayErrorMessage(string s)=0;
 
                 /**
                  * Purpose: The user interface will probably need a

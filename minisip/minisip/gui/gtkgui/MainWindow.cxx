@@ -110,6 +110,8 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
 		SLOT( *this, &MainWindow::phoneTreeClicked ), false );
 
+	//phoneBookTreeView->set_hover_expand( true );
+
 	/* Context menu */
 	phoneAddAddressMenu->signal_activate().connect(
 		BIND<Glib::RefPtr<Gtk::TreeSelection>, bool >(
@@ -333,8 +335,9 @@ void MainWindow::gotCommand(){
 void MainWindow::gotPacket( int32_t /*i*/ ){
 }
 
-void MainWindow::displayErrorMessage( string s ){
-	handleCommand( CommandString( "", "error_message", s ) );
+void MainWindow::displayMessage( string s, int style ){
+	handleCommand( CommandString( "", "error_message", 
+		Glib::locale_to_utf8( s ) ) );
 }
 
 void MainWindow::doDisplayErrorMessage( string s ){

@@ -49,7 +49,7 @@ class LogEntry;
 class ImWidget;
 class ContactDb;
 
-class MainWindow : public Gui, public LogEntryHandler
+class MainWindow : public Gui, public LogEntryHandler, public DbgHandler
 #ifdef OLDLIBGLADEMM
 		   ,public SigC::Object
 #endif
@@ -68,7 +68,7 @@ class MainWindow : public Gui, public LogEntryHandler
 
 		virtual void handleCommand( CommandString command );
 		virtual void gotPacket( int32_t i );
-		virtual void displayErrorMessage( string s );
+		virtual void displayMessage( string s, int style=-1 );
 		virtual void setSipSoftPhoneConfiguration( 
 				MRef<SipSoftPhoneConfiguration *> config );
 		MRef<SipSoftPhoneConfiguration *>  getSipSoftPhoneConfiguration();

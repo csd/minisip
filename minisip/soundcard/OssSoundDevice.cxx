@@ -39,6 +39,7 @@ OssSoundDevice::OssSoundDevice( string device ):SoundDevice( device ){
 }
 
 int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int format ){
+	this->nChannelsPlay = nChannels;
 
 	if( isOpenedPlayback() ){
 		return 0;
@@ -51,8 +52,10 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	fdPlayback = ::open( dev.c_str(), mode );
 	
 	if( fdPlayback == -1 ){
-		perror(("open "+dev).c_str());
-		exit(-1); //FIX: handle nicer - exception
+		merr << "Could not open the sound device " << dev << 
+			" for playback: "
+			<< strerror( errno ) << end;
+		return -1;
 	}
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
@@ -140,6 +143,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format ){
 
+	this->nChannelsRecord = nChannels;
 	if( isOpenedRecord() ){
 		return 0;
 	}
@@ -151,8 +155,10 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	fdRecord = ::open( dev.c_str(), mode );
 	
 	if( fdRecord == -1 ){
-		perror(("open "+dev).c_str());
-		exit(-1); //FIX: handle nicer - exception
+		merr << "Could not open the sound device " << dev << 
+			" for recording: "
+			<< strerror( errno ) << end;
+		return -1;
 	}
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){

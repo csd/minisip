@@ -239,7 +239,7 @@ void AudioMedia::srcb_handleSound( void * data ){
 }
 
 void AudioMedia::startRinging( string ringtoneFile ){
-	soundIo->registerSource( new FileSoundSource( ringtoneFile,RINGTONE_SOURCE_ID, 48000, 2, SOUND_CARD_FREQ, 20, 2, true ) );
+	soundIo->registerSource( new FileSoundSource( ringtoneFile,RINGTONE_SOURCE_ID, 44100, 2, SOUND_CARD_FREQ, 20, 2, true ) );
 }
 
 void AudioMedia::stopRinging(){

@@ -317,9 +317,10 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 				col = "#0000FF";
 			}
 			textR->property_markup().set_value( 
-				entry->getDesc() + ": " + 
-				"<small><span foreground=\"" + col +  "\">" + 
-				entry->getUri() + "</span></small>" );
+				entry->getDesc() + "\n     " + 
+				"<span size=\"x-small\"foreground=\"" + 
+				col +  "\">" + 
+				entry->getUri() + "</span>" );
 		}
 		/*
 		else{

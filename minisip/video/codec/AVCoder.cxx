@@ -113,7 +113,8 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
         //context->qmin = 0;
         //context->mb_qmin = 0;
-        context->qmax = 4;
+        //context->qmax = 4;
+        context->qmax = 2;
         //context->mb_qmax = 10;
 //        context->flags |= CODEC_FLAG_QP_RD;
 	

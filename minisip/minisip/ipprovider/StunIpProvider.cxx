@@ -126,8 +126,8 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 				exit( 0 );
 			}
 			*/
-			gui->displayErrorMessage( "Could not find your STUN server. "
-					   "STUN will be disabled." );
+			merr << "Could not find your STUN server. "
+			        "STUN will be disabled." << end;
 			return NULL;
 			done = false;
 		}
