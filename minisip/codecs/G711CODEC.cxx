@@ -37,14 +37,16 @@ void G711CODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 		out_data[i]=linear2ulaw(in_data[i]);
 }
 
-void G711CODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
-	assert(in_buf_size==getEncodedNrBytes());
+uint32_t G711CODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
+//	assert(in_buf_size==getEncodedNrBytes());
 	
 	unsigned char *in_data = (unsigned char*)in_buf;
 	short *out_data = (short*)out_buf;
 	
-	for (int32_t i=0; i< getInputNrSamples(); i++)
+	for (int32_t i=0; i< in_buf_size; i++)
 		out_data[i]=ulaw2linear(in_data[i]);
+
+	return in_buf_size;
 }
 
 void G711CODEC::decode(void *out_buf){

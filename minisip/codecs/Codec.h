@@ -67,9 +67,9 @@ class AudioCodec : public Codec{
 
 		/**
 		 * 
-		 * @returns Number of bytes in output buffer
+		 * @returns Number of frames in output buffer
 		 */
-		virtual void decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
+		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
 
 		/**
 		 * Decodes a frame without having any input. Typically done when

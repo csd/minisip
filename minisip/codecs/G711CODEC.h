@@ -35,9 +35,9 @@ class G711CODEC : public AudioCodec{
 
 		/**
 		 * 
-		 * @returns Number of bytes in output buffer
+		 * @returns Number of samples in output buffer
 		 */
-		virtual void decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
 		/**
 		 * Decodes a frame without having any input. Typically done when

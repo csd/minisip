@@ -40,8 +40,8 @@ void ILBCCODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	iLBC_encode((unsigned char *)out_buf, block, &enc_inst);
 }
 
-void ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
-	float decblock[240], dtmp;
+uint32_t ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
+	float decblock[BLOCKL], dtmp;
 	int32_t k;
 	int s = in_buf_size;
 	s;//dummy op 
@@ -56,6 +56,8 @@ void ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 			dtmp=MAX_SAMPLE; 
 		((short*)out_buf)[k] = (short) dtmp; 
 	} 
+
+	return BLOCKL;
 }
 
 void ILBCCODEC::decode(void *out_buf){
