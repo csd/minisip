@@ -30,7 +30,7 @@
 
 #include<config.h>
 
-#include<libmsip/SdpHeaderC.h>
+#include"SdpHeaderC.h"
 #include<libmutil/itoa.h>
 #include<iostream>
 

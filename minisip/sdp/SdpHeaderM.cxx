@@ -30,7 +30,7 @@
 
 #include<config.h>
 
-#include<libmsip/SdpHeaderM.h>
+#include"SdpHeaderM.h"
 #include<libmutil/itoa.h>
 
 #ifdef DEBUG_OUTPUT
@@ -39,7 +39,7 @@
 
 using namespace std;
 
-#include<libmsip/SdpHeaderA.h>
+#include"SdpHeaderA.h"
 
 SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 

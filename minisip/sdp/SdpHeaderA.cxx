@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SdpHeaderS.cxx
+ * 	SdpHeaderA.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -30,30 +30,51 @@
 
 #include<config.h>
 
-
-#include<libmsip/SdpHeaderS.h>
+#include<assert.h>
+#include"SdpHeaderA.h"
+#include<stdint.h>
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
-#include<assert.h>
+#include<iostream>
 
-using namespace std;
 
-SdpHeaderS::SdpHeaderS(string buildFrom):SdpHeader(SDP_HEADER_TYPE_S, 3){
-	assert(buildFrom.substr(0,2)=="s=");
-	session_name = trim(buildFrom.substr(2, buildFrom.length()-2));
+SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 9){
+	assert(buildFrom.substr(0,2)=="a=");
+	attributes= trim(buildFrom.substr(2, buildFrom.length()-2));
 }
 
-SdpHeaderS::~SdpHeaderS(){
+SdpHeaderA::~SdpHeaderA(){
 
 }
 
-string SdpHeaderS::getSessionName(){
-	return session_name;
+string SdpHeaderA::getAttributes(){
+	return attributes;
 }
-void SdpHeaderS::setSessionName(string s){
-	this->session_name = s;
+void SdpHeaderA::setAttributes(string attr){
+	this->attributes= attr;
 }
 
-string SdpHeaderS::getString(){
-	return "s="+session_name;
+string SdpHeaderA::getString(){
+	return "a="+attributes;
 }
+
+string SdpHeaderA::getAttributeType(){
+	uint32_t pos;
+	
+	if(( pos = attributes.find( ":" )) == string::npos )
+		return "property";
+	return attributes.substr( 0, pos );
+}
+
+string SdpHeaderA::getAttributeValue(){
+	if( getAttributeType() == "property" )
+		return attributes;
+	uint32_t pos = attributes.find( ":" );
+	if( attributes.length() <= pos + 1 )
+	{
+		cerr << "Invalid a field in SDP packet" << endl;
+		return "";
+	}
+	return attributes.substr( pos + 1, attributes.length() - 2 );
+}
+

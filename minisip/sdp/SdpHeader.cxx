@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SdpHeaderV.cxx
+ * 	SdpHeader.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -30,27 +30,8 @@
 
 #include<config.h>
 
-#include<libmsip/SdpHeaderV.h>
-#include<libmutil/itoa.h>
+#include"SdpHeader.h"
 
-using namespace std;
+SdpHeader::SdpHeader(int type, int prio):type(type),priority(prio){
 
-SdpHeaderV::SdpHeaderV(string buildFrom):SdpHeader(SDP_HEADER_TYPE_V, 1){
-	v=0;	//FIXME
 }
-
-SdpHeaderV::SdpHeaderV(int32_t ver):SdpHeader(SDP_HEADER_TYPE_V, 1){
-	v=ver;
-}
-
-int32_t SdpHeaderV::getVersion(){
-	return v;
-}
-void SdpHeaderV::setVersion(int32_t ver){
-	this->v = ver;
-}
-
-string SdpHeaderV::getString(){
-	return "v="+itoa(v);
-}
-

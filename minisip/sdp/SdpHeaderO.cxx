@@ -30,7 +30,7 @@
 
 #include<config.h>
 
-#include<libmsip/SdpHeaderO.h>
+#include"SdpHeaderO.h"
 #include<libmutil/itoa.h>
 
 #ifdef DEBUG_OUTPUT
