@@ -124,10 +124,38 @@ class SoundSource : public MObject{
 		virtual void getSound(short *dest, int32_t nMono, bool stereo, bool dequeue=true)=0;
 		
 		virtual std::string getMemObjectType(){return "SoundSource";};
+
+		
+		short* getLeftBuf();
+
+		short* getRightBuf();
+
+		short* getLookupLeft();
+
+		short* getLookupRight();
+
+		int32_t getPointer();
+
+		void setPointer(int32_t wpointer);
+
+		SRC_DATA getSrcData();
+
+		SRC_STATE* getSrcState();
 		
 	private:
 		int sourceId;
+		
+        protected:
 		int32_t sourcePos;
+		short *leftChannelBuffer;
+		short *rightChannelBuffer;
+		short *lookupleft;
+		short *lookupright;
+		int32_t pointer;
+		int32_t numSources;
+		SRC_DATA src_data;
+		SRC_STATE *src_state;
+
 };
 
 class BasicSoundSource: public SoundSource{
@@ -140,7 +168,7 @@ class BasicSoundSource: public SoundSource{
 		 * 			to decode the audio data can provide a PLC mechanism.
 		 * @param buffersize	Number of samples in buffer (per channel)
 		 */
-		BasicSoundSource(int32_t id, SoundIOPLCInterface *plc, int32_t buffernmonosamples=16000);
+		BasicSoundSource(int32_t id, SoundIOPLCInterface *plc, int32_t position, int32_t nSources, int32_t buffernmonosamples=16000);
                 
 		virtual ~BasicSoundSource();
 		
@@ -166,6 +194,14 @@ class BasicSoundSource: public SoundSource{
 
 		int32_t getPointer();
 
+		void setPointer(int32_t wpointer);
+
+		void initLookup(int32_t nSources);
+
+		SRC_DATA getSrcData();
+
+		SRC_STATE* getSrcState();
+
 //		void addLatest(short *dest, int32_t nMono, int factor=1);
 //
 	private:
@@ -176,7 +212,7 @@ class BasicSoundSource: public SoundSource{
 		short *firstFreePtr;
 		int32_t lap_diff; //roll over counter
 
-		/* spatial audio variables */
+		/* spatial audio variables 
 		short *leftChannelBuffer;
 		short *rightChannelBuffer;
 		short *lookupleft;
@@ -185,7 +221,7 @@ class BasicSoundSource: public SoundSource{
 
 		SRC_DATA src_data;
 		SRC_STATE *src_state;
-
+		*/
 //		int lastPushSize;
 };
 
@@ -309,7 +345,7 @@ class SoundIO : public MObject{
 		static void *playerLoop(void *);
 		
 
-		SpAudio spAudio;
+		static SpAudio spAudio;
 
 
 		CondVar sourceListCond;

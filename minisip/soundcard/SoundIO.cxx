@@ -275,34 +275,40 @@ void SoundIO::start_recorder(){
 //bool done=false;
 
 void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){	
-	queueLock.lock();
-	for (list<MRef<SoundSource *> >::iterator i=sources.begin(),int32_t j=1; 
+	int32_t j=1;
+	int32_t nextSize=sources.size();
+        queueLock.lock();
+	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
                         i!= sources.end(); 
-                        i++,j++){
+                        i++){
 		if (sourceId==(*i)->getId()){
 			queueLock.unlock();
 			sourceListCond.broadcast();
 			return;
 		}
-		(*i)->setPos(spAudio->assignPos(j,sources.size()+1));
-        }
-	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio->assignPos(sources.size()+1,sources.size()+1));
+		(*i)->setPos(spAudio.assignPos(j,nextSize));
+		j++;
+	}
+	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize));
 	queueLock.unlock();
 	sourceListCond.broadcast();
 }
 
 void SoundIO::registerSource( MRef<SoundSource *> source ){
-        queueLock.lock();
-	for (list<MRef<SoundSource *> >::iterator i=sources.begin(),int32_t j=1; 
+       int32_t j=1;
+       int32_t nextSize=sources.size(); 
+       queueLock.lock();
+       for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
                         i!= sources.end(); 
-                        i++,j++){
+                        i++){
 		if (source->getId()==(*i)->getId()){
 			queueLock.unlock();
 			sourceListCond.broadcast();
 			return;
 		}
-		(*i)->setPos(spAudio->assignPos(j,sources.size()+1));
-        }
+		(*i)->setPos(spAudio.assignPos(j,nextSize));
+		j++;
+	}
 	sources.push_front(source);
 	queueLock.unlock();
 	sourceListCond.broadcast();
@@ -419,9 +425,9 @@ void *SoundIO::playerLoop(void *arg){
 				(*i)->getSound(tmpbuf, BS, nChannels - 1);
 				
 				/* spatial audio */
-				spAudio->resample(tmpbuf,resbuf,320,1764,(*i)->getSrcData(),(*i)->getSrcState());
-				(*i)->setPointer(spAudio->spatialize(resbuf,(*i)->getLeftBuf(),(*i)->getRightBuf(),
-								     (*i)->getLookupLeft(),(i*)->getLookupRight(),
+				spAudio.resample(tmpbuf,resbuf,320,1764,(*i)->getSrcData(),(*i)->getSrcState());
+				(*i)->setPointer(spAudio.spatialize(resbuf,(*i)->getLeftBuf(),(*i)->getRightBuf(),
+								     (*i)->getLookupLeft(),(*i)->getLookupRight(),
 								     (*i)->getPos(),(*i)->getPointer(),outbuf));
 
 				for (uint32_t j=0; j<1764; j++)
@@ -449,7 +455,8 @@ int error;
 
 BasicSoundSource::BasicSoundSource(int32_t id, 
 				   SoundIOPLCInterface *plc,
-				   int32_t position, 
+				   int32_t position,
+				   int32_t nSources, 
 				   int32_t bufferNMonoSamples):
                 SoundSource(id), 
 		plcProvider(plc),
@@ -462,6 +469,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	firstFreePtr = stereoBuffer;
 	playoutPtr = stereoBuffer;
 	sourcePos=position;
+	numSources=nSources;
 
 	/* spatial audio initialization */
 	src_data.input_frames = 160;
@@ -474,7 +482,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	rightChannelBuffer = new short[950];
 	lookupleft = new short[65536];
 	lookupright = new short[65536];
-	initLookup();
+	initLookup(numSources);
 	
 }
 
@@ -486,10 +494,10 @@ BasicSoundSource::~BasicSoundSource(){
 	delete [] lookupright;
 }
 
-void BasicSoundSource::initLookup(){
+void BasicSoundSource::initLookup(int32_t nSources){
    for(int32_t i=0;i<65536;i++){
-     lookupleft[i]=(short)((float)(i-32768)*lchvol[sourcePos]/sources.size());
-     lookupright[i]=(short)((float)(i-32768)*rchvol[sourcePos]/sources.size());
+     lookupleft[i]=(short)((float)(i-32768)*lchvol[sourcePos]/nSources);
+     lookupright[i]=(short)((float)(i-32768)*rchvol[sourcePos]/nSources);
    } 
 }
 
@@ -512,6 +520,15 @@ void BasicSoundSource::initLookup(){
  int32_t BasicSoundSource::getPointer(){
    return pointer;
  }
+
+ SRC_DATA BasicSoundSource::getSrcData(){
+   return src_data;
+ }
+
+ SRC_STATE* BasicSoundSource::getSrcState(){
+   return src_state;
+ }
+
 
  void BasicSoundSource::setPointer(int32_t wpointer){
    pointer=wpointer;
