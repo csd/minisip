@@ -237,7 +237,7 @@ class StateTransition : public MObject{
 
 		bool handleCommand(const CommandType &c){
 			bool handled;
-				assert(action!=NULL);
+				assert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
 				if (handled= ((**stateMachine).*action)(c) ){
 			                stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG
