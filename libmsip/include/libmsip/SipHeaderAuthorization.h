@@ -33,6 +33,15 @@
 #ifndef SIPHEADERAUTHORIZATION_H
 #define SIPHEADERAUTHORIZATION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
 #include"SipHeader.h"
 #include<libmsip/SipURI.h>
@@ -42,7 +51,7 @@
 */
 
 
-class SipHeaderValueAuthorization: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 	public:
 		SipHeaderValueAuthorization();
 		SipHeaderValueAuthorization(int type, const string &typeStr);

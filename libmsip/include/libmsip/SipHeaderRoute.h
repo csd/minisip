@@ -33,6 +33,16 @@
 #ifndef SIPHEADERROUTE_H
 #define SIPHEADERROUTE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<list>
 #include<libmsip/SipHeader.h>
 
@@ -40,7 +50,7 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderValueRoute: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 	public:
 		SipHeaderValueRoute(list<string> &routeSet);
 		SipHeaderValueRoute(const string &build_from);

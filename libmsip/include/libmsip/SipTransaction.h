@@ -34,6 +34,16 @@
 #ifndef SIPTRANSACTION_H
 #define SIPTRANSACTION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmutil/StateMachine.h>
@@ -47,7 +57,7 @@ class SipMessageDispatcher;
 /**
  * SipTransaction
  */
-class SipTransaction : public StateMachine<SipSMCommand,string>{
+class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
 		SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, int cseq, const string &branch, string callid);

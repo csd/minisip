@@ -34,6 +34,16 @@
 #ifndef SIPCALLBACK_H
 #define SIPCALLBACK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmutil/CommandString.h>
 
 /**
@@ -44,7 +54,7 @@
  * @version 0.00
  * @see SipStateMachine
  */
-class SipCallback{
+class LIBMSIP_API SipCallback{
 	public:
 		/**
 		 * A incoming call is available. This method is intended to signal

@@ -35,12 +35,22 @@
 #ifndef SIPTRANSACTIONINVITESERVERUA_H
 #define SIPTRANSACTIONINVITESERVERUA_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
 
-class SipTransactionInviteServerUA: public SipTransactionInviteServer{
+class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
 		SipTransactionInviteServerUA(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		

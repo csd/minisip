@@ -33,6 +33,15 @@
 #ifndef SIPHEADER_H
 #define SIPHEADER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
 //#include<config.h>
 
@@ -76,7 +85,7 @@ typedef __int32 int32_t;
 
 using namespace std;
 
-class SipHeaderValue : public MObject{
+class LIBMSIP_API SipHeaderValue : public MObject{
 	public:
 		SipHeaderValue(int type, const string &hName);
 		virtual string getString()=0;	
@@ -88,7 +97,7 @@ class SipHeaderValue : public MObject{
 		
 };
 
-class SipHeader : public MObject{
+class LIBMSIP_API SipHeader : public MObject{
 	public:
                 SipHeader(MRef<SipHeaderValue*> value);
 		virtual ~SipHeader();

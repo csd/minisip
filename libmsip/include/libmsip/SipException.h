@@ -21,12 +21,25 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef SIPEXCEPTION_H
+#define SIPEXCEPTION_H
 
-class SipException{};
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
-class SipExceptionInvalidMessage : public SipException {};
+class LIBMSIP_API SipException{};
 
-class SipExceptionInvalidStart : public SipException {};
+class LIBMSIP_API SipExceptionInvalidMessage : public SipException {};
 
-class SipExceptionInvalidURI : public SipExceptionInvalidMessage {};
+class LIBMSIP_API SipExceptionInvalidStart : public SipException {};
 
+class LIBMSIP_API SipExceptionInvalidURI : public SipExceptionInvalidMessage {};
+
+#endif

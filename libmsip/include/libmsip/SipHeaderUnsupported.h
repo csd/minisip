@@ -33,13 +33,23 @@
 #ifndef SIPHEADERUNSUPPORTED_H
 #define SIPHEADERUNSUPPORTED_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
  * @author Erik Eliasson
 */
 
-class SipHeaderValueUnsupported: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueUnsupported: public SipHeaderValue{
 	public:
 		SipHeaderValueUnsupported(const string &build_from);
 

@@ -26,6 +26,16 @@
 #ifndef _SIPMESSAGECONTENTFACTORY_H
 #define _SIPMESSAGECONTENTFACTORY_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<map>
 #include<libmsip/SipMessageContent.h>
 #include<string>
@@ -36,7 +46,7 @@ using namespace std;
 // MRef<SipMessageContent*> minfunc(const string &){}
 typedef MRef<SipMessageContent*>(*SipMessageContentFactoryFuncPtr)(const string & buf, const string & ContentType);
 
-class SMCFCollection{
+class LIBMSIP_API SMCFCollection{
 public:
 	void addFactory(string contentType, SipMessageContentFactoryFuncPtr);
 	SipMessageContentFactoryFuncPtr getFactory(const string contentType);

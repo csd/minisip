@@ -25,6 +25,16 @@
 #ifndef SIPMESSAGETRANSPORT_H
 #define SIPMESSAGETRANSPORT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/TLSSocket.h>
@@ -41,7 +51,7 @@ class SipDialogContainer;
 
 class SipMessage;
 
-class SipMessageTransport : public virtual MObject{
+class LIBMSIP_API SipMessageTransport : public virtual MObject{
 	public:
 		SipMessageTransport(string local_ip, 
                         string contactIP,

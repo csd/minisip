@@ -33,6 +33,16 @@
 #ifndef SIPHEADERCONTENTLENGTH_H
 #define SIPHEADERCONTENTLENGTH_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
@@ -40,7 +50,7 @@
 */
 
 
-class SipHeaderValueContentLength: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 	public:
 		SipHeaderValueContentLength();
 		SipHeaderValueContentLength(int32_t length);

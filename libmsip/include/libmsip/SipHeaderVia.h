@@ -33,6 +33,16 @@
 #ifndef SIPHEADERVIA_H
 #define SIPHEADERVIA_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
@@ -42,7 +52,7 @@
 
 // Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
 // 
-class SipHeaderValueVia: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 	public:
 		SipHeaderValueVia();
 		SipHeaderValueVia(const string &build_from);

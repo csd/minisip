@@ -33,6 +33,16 @@
 #ifndef SIPHEADERTO_H
 #define SIPHEADERTO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipURI.h>
 
@@ -40,7 +50,7 @@
  * @author Erik Eliasson
 */
 
-class SipHeaderValueTo: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 	public:
 		SipHeaderValueTo();
 		SipHeaderValueTo(const string &build_from);

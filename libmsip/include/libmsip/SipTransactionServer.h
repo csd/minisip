@@ -35,12 +35,22 @@
 #ifndef SIPTRANSACTIONSERVER_H
 #define SIPTRANSACTIONSERVER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
 
-class SipTransactionServer: public SipTransaction{
+class LIBMSIP_API SipTransactionServer: public SipTransaction{
 	public:
 		SipTransactionServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		

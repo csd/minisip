@@ -61,6 +61,31 @@
 #define NB_THREADS 5
 #define BUFFER_UNIT 1024
 
+#ifdef _MSC_VER
+static int nocaseequal(char c1, char c2){
+	if ( ((c1>='A') && (c1<='Z')) ){
+		return (c1==c2) || (c1 == (c2 - ('a'-'A')));
+	}
+	if ( (c1>='a') && (c1<='z') ){
+		return (c1==c2) || (c1 == (c2 + ('a'-'A')));
+	}
+	return c1==c2;
+}
+static int strncasecmp(const char *s1, const char *s2, int n){
+	for (int i=0; i<n; i++){
+		if ( nocaseequal(s1[i],s2[i]) ){
+			if (s1[i]<s2[i])
+				return -1;
+			else
+				return 1;
+		}
+			
+	}
+	return 0;
+}
+#endif
+
+
 class SipMessageParser{
 	public:
 		SipMessageParser();
@@ -423,7 +448,9 @@ void SipMessageTransport::udpSocketRead(){
 			}
 
 			try{
+#ifndef _MSC_VER
 				ts.save( PACKET_IN );
+#endif
 				string data = string(buffer, nread);
 #ifdef DEBUG_OUTPUT
 				printMessage("IN (UDP)", data);
@@ -535,13 +562,14 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// Connection was closed
 				break;
 			}
-
+#ifndef _MSC_VER
 			ts.save( PACKET_IN );
+#endif
 			socket->received += string( buffer, nread );
 
 			try{
 				uint32_t i;
-				for( i = 0; i < nread; i++ ){
+				for( i = 0; i < (uint32_t)nread; i++ ){
 					pack = parser.feed( buffer[i] );
 					if( pack ){
 #ifdef DEBUG_OUTPUT

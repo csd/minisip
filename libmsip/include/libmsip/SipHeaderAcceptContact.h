@@ -49,6 +49,16 @@
 #ifndef SIPHEADERACCEPTCONTACT_H
 #define SIPHEADERACCEPTCONTACT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipHeader.h"
 //#include"../../netutil/IPAddress.h"
 
@@ -57,7 +67,7 @@
  * @author Florian Maurer
 */
 
-class SipHeaderValueAcceptContact: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 
 	public:
 		

@@ -33,6 +33,16 @@
 #ifndef SIPHEADEREVENT_H
 #define SIPHEADEREVENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
@@ -40,7 +50,7 @@
 */
 
 
-class SipHeaderValueEvent: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueEvent: public SipHeaderValue{
 	public:
 		SipHeaderValueEvent();
 		SipHeaderValueEvent(const string &build_from);

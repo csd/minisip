@@ -34,6 +34,16 @@
 #ifndef SIPRESPONSE_H
 #define SIPRESPONSE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipMessage.h"
 #include"SipInvite.h"
 
@@ -43,7 +53,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class SipResponse : public SipMessage{
+class LIBMSIP_API SipResponse : public SipMessage{
 
 	public:
 		static const int type;

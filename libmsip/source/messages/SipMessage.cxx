@@ -75,6 +75,9 @@
 #include<libmutil/itoa.h>
 #include<libmsip/SipResponse.h>
 
+#ifdef _MSC_VER
+template class __declspec(dllexport) MRef<SipMessage*>;
+#endif
 
 SMCFCollection SipMessage::contentFactories=SMCFCollection();
 

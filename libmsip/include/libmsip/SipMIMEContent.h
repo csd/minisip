@@ -24,13 +24,23 @@
 #ifndef _SIPMIMECONTENT_H
 #define _SIPMIMECONTENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
 #include<string.h>
 
-MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const std::string & ContentType);
+MRef<SipMessageContent*> LIBMSIP_API SipMIMEContentFactory(const std::string & buf, const std::string & ContentType);
 
-class SipMimeContent : public SipMessageContent{
+class LIBMSIP_API SipMimeContent : public SipMessageContent{
 	public:
 		SipMimeContent(std::string ContentType);
 		SipMimeContent(std::string ContentType, std::string Message, std::string boundry);

@@ -33,13 +33,23 @@
 #ifndef SIPHEADERUSERAGENT_H
 #define SIPHEADERUSERAGENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
  * @author Erik Eliasson
 */
 
-class SipHeaderValueUserAgent: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValue{
 	public:
 		SipHeaderValueUserAgent();
 		SipHeaderValueUserAgent(const string &build_from);

@@ -33,6 +33,16 @@
 #ifndef SIPHEADERWARNING_H
 #define SIPHEADERWARNING_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 #ifdef _MSC_VER
@@ -44,7 +54,7 @@ typedef unsigned short uint16_t;
  * @author Erik Eliasson
 */
 
-class SipHeaderValueWarning: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 	public:
 		SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning);
 		SipHeaderValueWarning(const string &build_from);

@@ -25,13 +25,23 @@
 #ifndef SIPDialogREGISTER_H
 #define SIPDialogREGISTER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
 
-class SipDialogRegister : public SipDialog{
+class LIBMSIP_API SipDialogRegister : public SipDialog{
 	public:
 		SipDialogRegister(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> conf,MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider);
 		virtual ~SipDialogRegister();

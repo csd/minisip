@@ -36,6 +36,16 @@
 #ifndef SIPCANCEL_H
 #define SIPCANCEL_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipMessage.h"
 
 class SipInvite;
@@ -45,7 +55,7 @@ class SipInvite;
  * with a user agent
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class SipCancel : public SipMessage{
+class LIBMSIP_API SipCancel : public SipMessage{
 	public:
 		static const int type;
                 

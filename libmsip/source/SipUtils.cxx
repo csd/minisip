@@ -43,7 +43,7 @@ bool SipUtils::startsWith(std::string line, std::string part){
 }
 
 int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
-	int bufSize = buf.size();
+	unsigned bufSize = buf.size();
 	int endi=bufSize;
 	int i;
 	int parserState=0;  	// Parser states:

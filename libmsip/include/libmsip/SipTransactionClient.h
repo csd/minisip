@@ -35,6 +35,16 @@
 #ifndef SIPTRANSACTIONCLIENT_H
 #define SIPTRANSACTIONCLIENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
@@ -42,7 +52,7 @@
 #include<libmsip/SipDialogContainer.h>
 
 
-class SipTransactionClient: public SipTransaction{
+class LIBMSIP_API SipTransactionClient: public SipTransaction{
 	public:
 		SipTransactionClient(MRef<SipDialog*> d, int seq_no, string callid);
                 ~SipTransactionClient();

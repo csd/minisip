@@ -26,7 +26,17 @@
 #ifndef _SIPTIMERS_H
 #define _SIPTIMERS_H
 
-class SipTimers{
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
+class LIBMSIP_API SipTimers{
 	public:
 		static const int T1;
 		static const int T2;

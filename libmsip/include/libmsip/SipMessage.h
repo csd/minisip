@@ -35,6 +35,15 @@
 #ifndef sipMessage_h
 #define sipMessage_h
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
 #include<libmutil/minilist.h>
 #include<libmsip/SipHeader.h>
@@ -53,7 +62,7 @@
  * 
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class SipMessage : public MObject{
+class LIBMSIP_API SipMessage : public MObject{
 
 	public:
 		static SMCFCollection contentFactories;

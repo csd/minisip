@@ -34,6 +34,16 @@
 #ifndef SIPDialogCONFIG_H
 #define SIPDialogCONFIG_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<vector>
 #include<libmsip/SipInvite.h>
 #include<libmutil/TimeoutProvider.h>
@@ -60,7 +70,7 @@
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
 
 
-class SipProxy{
+class LIBMSIP_API SipProxy{
 	public:
 		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0;}
 
@@ -123,7 +133,7 @@ class SipProxy{
 
 };
 
-class SipIdentity : public MObject{
+class LIBMSIP_API SipIdentity : public MObject{
         public:
 		SipIdentity(){/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ registerToProxy=false; securitySupport=false;}
                 SipIdentity(string sipuri);
@@ -157,7 +167,7 @@ class SipIdentity : public MObject{
 };
 
 
-class SipCommonConfig : public MObject{
+class LIBMSIP_API SipCommonConfig : public MObject{
 	public:
 		SipCommonConfig();
 
@@ -199,7 +209,7 @@ class SipCommonConfig : public MObject{
 };
 
 
-class SipDialogConfig : public MObject{
+class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
 		//SipDialogConfig(MRef<SipCommonConfig*> phone_config);
 		SipDialogConfig(SipCommonConfig &phone_config);

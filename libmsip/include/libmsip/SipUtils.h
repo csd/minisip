@@ -25,9 +25,19 @@
 #ifndef _SIPUTILS_H
 #define _SIPUTILS_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<string>
 
-class SipUtils{
+class LIBMSIP_API SipUtils{
 	public:
 
 		static bool startsWith(std::string line, std::string part);

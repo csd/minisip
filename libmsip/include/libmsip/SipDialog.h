@@ -30,6 +30,16 @@
 #ifndef SIPDIALOG_H
 #define SIPDIALOG_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
@@ -41,7 +51,7 @@ class SipTransaction;
 class SipDialogConfig;
 
 
-class SipDialogState{
+class LIBMSIP_API SipDialogState{
 	public:
 		string callId;
 		string localTag;
@@ -68,7 +78,7 @@ class SipDialogState{
  * @author Erik Eliasson, eliasson@it.kth.se
  */
 
-class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,string>{
+class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,string>{
 
 	public:
 		/**

@@ -25,6 +25,16 @@
 #ifndef SIPREGISTER_H
 #define SIPREGISTER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipMessage.h"
 
 /**
@@ -33,7 +43,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class SipRegister : public SipMessage{
+class LIBMSIP_API SipRegister : public SipMessage{
 
 	public:
 		static const int type;

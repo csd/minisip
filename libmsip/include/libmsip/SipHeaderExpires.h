@@ -33,6 +33,16 @@
 #ifndef SIPHEADEREXPIRES_H
 #define SIPHEADEREXPIRES_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 
 /**
@@ -40,7 +50,7 @@
 */
 
 
-class SipHeaderValueExpires: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 	public:
 		SipHeaderValueExpires();
 		SipHeaderValueExpires(const string &build_from);

@@ -34,6 +34,16 @@
 #ifndef SIPBYE_H
 #define SIPBYE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipMessage.h"
 #include<sys/types.h>
 
@@ -43,7 +53,7 @@ class SipInvite;
  * Implementation of the BYE method in sip only for a user agent.
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class SipBye : public SipMessage{
+class LIBMSIP_API SipBye : public SipMessage{
 	public:
 		static const int type;
 

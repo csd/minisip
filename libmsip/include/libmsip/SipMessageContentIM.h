@@ -25,14 +25,23 @@
 #ifndef _SIPMESSAGECONTENTIM_H
 #define _SIPMESSAGECONTENTIM_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
 #include<libmsip/SipMessageContent.h>
 #include<iostream>
 using namespace std;
 
-MRef<SipMessageContent*> sipIMMessageContentFactory(const string &, const string &ContentType);
+MRef<SipMessageContent*> LIBMSIP_API sipIMMessageContentFactory(const string &, const string &ContentType);
 
-class SipMessageContentIM : public SipMessageContent{
+class LIBMSIP_API SipMessageContentIM : public SipMessageContent{
 public:
 	SipMessageContentIM(string m);
 	

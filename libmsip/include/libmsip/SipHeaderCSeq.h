@@ -33,6 +33,16 @@
 #ifndef SIPHEADERCSEQ_H
 #define SIPHEADERCSEQ_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include"SipHeader.h"
 
 /**
@@ -40,7 +50,7 @@
 */
 
 
-class SipHeaderValueCSeq: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 
 	public:
 		

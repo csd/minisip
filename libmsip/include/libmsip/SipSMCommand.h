@@ -25,6 +25,16 @@
 #ifndef SIPSMCOMMAND_H
 #define SIPSMCOMMAND_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessage.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MemObject.h>
@@ -37,7 +47,7 @@
  *
  * @author Erik Eliasson <eliasson@it.kth.se>
  */
-class SipSMCommand : public MObject{
+class LIBMSIP_API SipSMCommand : public MObject{
 	public:
 		static const int COMMAND_PACKET;
 		static const int COMMAND_STRING;
@@ -97,7 +107,7 @@ class SipSMCommand : public MObject{
 /**
  * the receiver for SipSMCommand objects.
  */
-class SipSMCommandReceiver : public virtual MObject{
+class LIBMSIP_API SipSMCommandReceiver : public virtual MObject{
 	public:
 		/**
 		 * handles the incoming commands.

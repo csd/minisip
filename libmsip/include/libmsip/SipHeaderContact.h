@@ -33,6 +33,16 @@
 #ifndef SIPHEADERCONTACT_H
 #define SIPHEADERCONTACT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipURI.h>
 
@@ -41,7 +51,7 @@
 */
 
 
-class SipHeaderValueContact: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 
 	public:
 		

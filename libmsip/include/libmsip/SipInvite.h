@@ -35,6 +35,16 @@
 #ifndef SIPINVITE_H
 #define SIPINVITE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessage.h>
 #include<vector>
 #include<sys/types.h>
@@ -43,7 +53,7 @@
  * Representation of a SIP INVITE method.
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class SipInvite : public SipMessage{
+class LIBMSIP_API SipInvite : public SipMessage{
 
 	public:
 		const static int type;

@@ -35,6 +35,16 @@
 #ifndef SIPURI_H
 #define SIPURI_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #define SIP_URI_USERNAME_DEFAULT "UNKNOWN"
 #define SIP_URI_USER_TYPE_DEFAULT "phone"
 
@@ -44,7 +54,7 @@
 
 using namespace std;
 
-class SipURI : public MObject{
+class LIBMSIP_API SipURI : public MObject{
 	public:
 		SipURI(string build_from);
 		SipURI(string id, string ip, string type=/*"phone"*/ "",int32_t port=0);

@@ -35,6 +35,16 @@
 #ifndef SIPSUBSCRIBE_H
 #define SIPSUBSCRIBE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipDialogConfig.h>
 #include<vector>
@@ -44,7 +54,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class SipSubscribe : public SipMessage{
+class LIBMSIP_API SipSubscribe : public SipMessage{
 
 	public:
 		static const int type;

@@ -25,6 +25,16 @@
 #ifndef _SIPMESSAGEDISPATCHER_H
 #define _SIPMESSAGEDISPATCHER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipSMCommand.h>
 
 #include<list>
@@ -37,7 +47,7 @@
 using namespace std;
 
 
-class SipMessageDispatcher : public SipSMCommandReceiver{
+class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
 	public:
 		void addTransaction(MRef<SipTransaction*> t);
 		void removeTransaction(MRef<SipTransaction*> t);

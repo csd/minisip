@@ -35,10 +35,20 @@
 #ifndef SIPTRANSACTIONINVITEICLIENTUA_H
 #define SIPTRANSACTIONINVITEICLIENTUA_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransactionInviteClient.h>
 
-class SipTransactionInviteClientUA: public SipTransactionInviteClient{
+class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClient{
 	public:
 		SipTransactionInviteClientUA(MRef<SipDialog*> d, int seq_no, string callid);
 		

@@ -21,6 +21,18 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef SIPTRANSACTIONUTILS_H
+#define SIPTRANSACTIONUTILS_H
+
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
 
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
@@ -33,19 +45,20 @@ class SipResponse;
  * @param resp 		SIP response to check against, for example "100 OK"
  * @param pattern	Pattern, for example "100" or "1**"
  */
-bool sipResponseFilterMatch(MRef<SipResponse*> resp, const string &pattern);
+bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const string &pattern);
 	
 
 #define IGN -1
 
-bool transitionMatch(const SipSMCommand &command,
+bool LIBMSIP_API transitionMatch(const SipSMCommand &command,
 	int packetType=IGN,
 	int source=IGN,
 	int destination=IGN,
 	const string &respFilter="");
 
-bool transitionMatch(const SipSMCommand &command,
+bool LIBMSIP_API transitionMatch(const SipSMCommand &command,
 	const string &cmd_str,
 	int source=IGN,
 	int destination=IGN);
 
+#endif

@@ -35,11 +35,21 @@
 #ifndef SIPIMMESSAGE_H
 #define SIPIMMESSAGE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 
-class SipIMMessage : public SipMessage{
+class LIBMSIP_API SipIMMessage : public SipMessage{
 
 	public:
 		static const int type;

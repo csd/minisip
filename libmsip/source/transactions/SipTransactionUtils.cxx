@@ -29,6 +29,9 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/split_in_lines.h>
 
+
+
+
 /**
  * Checks if a response packet has the response code indicated by a
  * pattern. The pattern may contain wild cards (*)

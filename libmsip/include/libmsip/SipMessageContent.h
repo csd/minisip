@@ -25,6 +25,16 @@
 #ifndef _SIPMESSAGECONTENT_H
 #define _SIPMESSAGECONTENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMSIP_EXPORTS
+#define LIBMSIP_API __declspec(dllexport)
+#else
+#define LIBMSIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMSIP_API
+#endif
+
 #include<libmutil/MemObject.h>
 
 /**
@@ -33,7 +43,7 @@
  * the SIP message and a content type.
  * @author Erik Eliasson
 */
-class SipMessageContent : public virtual MObject{
+class LIBMSIP_API SipMessageContent : public virtual MObject{
     public:
         
         /**
