@@ -239,11 +239,12 @@ int32_t TLSSocket::read( void *buf, int32_t count ){
 	int ret;
 	ret = SSL_read( ssl, buf, count );
 	if( ret == 0 )
-		if( SSL_get_error( ssl, ret ) == SSL_ERROR_ZERO_RETURN )
+//		if( SSL_get_error( ssl, ret ) == SSL_ERROR_ZERO_RETURN )
 			// Connection closed
 			return 0;
-		else
-			return -1;
+	
+//		else
+//			return -1;
 	else 
 		return ret;
 }
