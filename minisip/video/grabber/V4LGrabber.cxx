@@ -31,6 +31,8 @@
 #include<iostream>
 #include<fstream>
 
+#include<libmutil/mtime.h>
+
 
 using namespace std;
 
@@ -413,8 +415,12 @@ void V4LGrabber::read( ImageHandler * handler ){
 				image->data[0] = buffers[i]->start;
 				image->data[1] = NULL;
 				image->data[2] = NULL;
-				image->data[3] = NULL;
+				image->data[3] = NULL;       
 			}
+
+                        /* FIXME get it from the camera */
+
+                        image->mTime = mtime();
 
 			if( handler ){
 				handler->handle( image );

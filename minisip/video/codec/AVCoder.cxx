@@ -23,6 +23,7 @@
 #include"AVCoder.h"
 #include<sys/time.h>
 #include<libmnetutil/IP4Address.h>
+#include<libmutil/mtime.h>
 #include"VideoEncoderCallback.h"
 //#include"RtpPacket.h"
 
@@ -37,6 +38,8 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 	          int size, int packetNumber ){
 
 	MRef<AVEncoder *> encoder = (AVEncoder *)context->opaque;
+
+        fprintf( stderr, "RTP payload size: %i\n", size );
 	
 	encoder->rtpPayload[1] |= 
 		( ( context->coded_frame->pict_type == FF_P_TYPE )?1:0 << 4 );
@@ -65,17 +68,20 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	}
 
 	context = avcodec_alloc_context();
+        fprintf( stderr,"context->flags %i\n", context->flags );
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
-	context->bit_rate = 2048*1024;
+	context->bit_rate = 5*1024*1024;
+	context->bit_rate_tolerance = 2*1024*1024;
 
-	context->frame_rate = 25; 
+	context->frame_rate = 1000; 
 	context->frame_rate_base = 1;
 
 	context->rtp_mode = 1;
-	context->rtp_payload_size = 1000;
+	context->rtp_payload_size = 500;
 	context->rtp_callback = &rtpCallback;
+
 
 	/* from ffmpeg */
 	context->qblur = 0.5;
@@ -84,6 +90,11 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
         context->b_quant_factor = 1.25;
         context->i_quant_offset = 0.0;
         context->i_quant_factor = -0.8;
+
+        context->qmin = 0;
+        context->mb_qmin = 0;
+        context->qmax = 10;
+        context->mb_qmax = 10;
 	
 	context->gop_size = 0;
 
@@ -162,8 +173,14 @@ void AVEncoder::handle( MImage * image ){
 	}
 
 	frame.pict_type = 0;
-	frame.pts = tv.tv_sec * 1000000 + tv.tv_usec;
-	
+        if( !image->mTime ){
+                frame.pts = mtime() * 1000;
+        }
+        else{
+                frame.pts = image->mTime * 1000;
+        }
+//        fprintf( stderr, "PTS: %i\n", frame.pts);
+
 	ret = avcodec_encode_video( context, outBuffer+4,
 			            AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
 
