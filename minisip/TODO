@@ -1,43 +1,12 @@
-Must/should be fixed before first release:
-
- X Start (enable) GUI first and output all critical error messages at start up to GUI.
- * Check/Fix CANCEL behavour (hang up before in call).
- * Add reject call functionality.
- * Correct behaviour when pressing the X button in the top right corner for all window.
- * "Embedded call dialogs" for the iPAQ (./configure argument).
- X Implement Re-register.
  * Do a proper shut down:
    - De-register from proxy
-   - Remove semaphore
  * Fix presence information compatible with MSN messenger (SIP mode).
- * Separate threads for reading phone books (prevent hang while trying to download).
+ * Separate threads for reading web phone books (prevent hang while trying to download).
  * Multiple calls handled correctly:
    - local audio mixing
-   - multiple sound sources
  * Implement recording/replaying of calls.
- X find a way to throw exceptions on iPAQ's
- X solve the crash when minisip is launched from an OPIE .desktop file
- * Decide on license, understand it and add it to each file.
- * Remove the possibility to call yourself.
- ? Number/SIP addr presentation
- X If a DNS SRV is not available, then "minisip" will seg. fault when 
-   started on an IPAQ (probably exception not supported) - fix it.
+ * Fix best way of handling calling our self
  * Write manual page?
- * Create homepage
  * Create icon
- * Implement support for the sound card and network interface drop boxes in the settings dialog.
- X Check why we can not detect the SRV record for ssvl.kth.se and fix the bug
- * Investigate IPAQ frequency problem.
- * Ring in headphone when remote ringing
- X Integrate STUN
- * Enable editing of local phone books in the GUI.
- * move from linux primitive types to our own definitions (uint16_t -> own 
-   def.) to make application more easily portable (Windows)
- * Use STUN to determine which local interface will most likely be used.  
- * Make RTP compile with big endian architectures.
+ * Ring in headphone when remote ringing?!
  * Implement dis-continuous transmission of audio streams.
-
- * Fix branch parameter in ACK message. Now it is determined in
-   SipMessageTransport - (bad design/solution)
- * Make timeout provider not have pointer to for example transaction - they
- 	can be a dangling reference.
