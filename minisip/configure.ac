@@ -229,9 +229,13 @@ AC_ARG_ENABLE(gtk,
 
 if test "x${enable_gtk}" != "xno"
   then
-    PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
+    PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
       [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])],
-      [AC_MSG_ERROR([Could not find the glademm-2.0 library])]
+      [PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
+        [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
+	 AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])],
+        [AC_MSG_ERROR([Could not find the glademm-2.0 library])]
+      )]
     )
     QTGUI="no"
 fi

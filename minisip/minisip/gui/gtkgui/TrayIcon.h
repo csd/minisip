@@ -31,7 +31,11 @@
 
 class MainWindow;
 
-class MTrayIcon: public MObject, public SigC::Object{
+class MTrayIcon: public MObject
+#ifdef OLDLIBGLADEMM
+, public SigC::Object
+#endif
+{
 	public:
 		MTrayIcon( MainWindow * mainWindow, 
 			   Glib::RefPtr<Gnome::Glade::Xml>  refXml );

@@ -37,7 +37,11 @@ class AdvancedSettings;
 class SipSoftPhoneConfiguration;
 class CertificateDialog;
 
-class SettingsDialog : public SigC::Object {
+class SettingsDialog 
+#ifdef OLDLIBGLADEMM
+: public SigC::Object 
+#endif
+{
 	public:
 		SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml, 
 				CertificateDialog * certDialog );
@@ -62,7 +66,11 @@ class SettingsDialog : public SigC::Object {
 		MRef<SipSoftPhoneConfiguration *> config;
 };
 
-class GeneralSettings : public SigC::Object{
+class GeneralSettings 
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
 
 	public:
 		GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
@@ -92,7 +100,11 @@ class GeneralSettings : public SigC::Object{
 
 };
 
-class SecuritySettings : public SigC::Object{
+class SecuritySettings
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
 
 	public:
 		SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
@@ -126,7 +138,11 @@ class SecuritySettings : public SigC::Object{
 
 };
 
-class AdvancedSettings : public SigC::Object{
+class AdvancedSettings
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
 
 	public:
 		AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );

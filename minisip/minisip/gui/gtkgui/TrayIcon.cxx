@@ -24,6 +24,14 @@
 #include"TrayIcon.h"
 #include"MainWindow.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
+
 MTrayIcon::MTrayIcon( MainWindow * mainWindow, 
 		      Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	this->mainWindow = mainWindow;
@@ -42,7 +50,7 @@ MTrayIcon::MTrayIcon( MainWindow * mainWindow,
 
 //	button.signal_clicked().connect( SigC::slot( *this, 
 //				&MTrayIcon::buttonPressed ) );
-	box.signal_button_press_event().connect( SigC::slot( *this, 
+	box.signal_button_press_event().connect( SLOT( *this, 
 				&MTrayIcon::buttonPressed ) );
 
 	gtk_widget_show_all( GTK_WIDGET( trayIcon ));
@@ -55,9 +63,9 @@ MTrayIcon::MTrayIcon( MainWindow * mainWindow,
 	//	SigC::slot( *mainWindow, &MainWindow::runPref ) );
 
 	quitTrayMenu->signal_activate().connect(
-		SigC::slot( *getWindow(), &Gtk::EventBox::hide ) );
+		SLOT( *getWindow(), &Gtk::EventBox::hide ) );
 	prefTrayMenu->signal_activate().connect(
-		SigC::slot( *mainWindow, &MainWindow::runPref ) );
+		SLOT( *mainWindow, &MainWindow::runPref ) );
 
 }
 

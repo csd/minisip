@@ -24,6 +24,13 @@
 #include"AccountDialog.h"
 #include"AccountsList.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
 
 
 AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", true ){
@@ -64,9 +71,9 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	add_button( Gtk::Stock::OK, Gtk::RESPONSE_OK );
 	add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
 
-	requiresAuthCheck->signal_toggled().connect( SigC::slot(
+	requiresAuthCheck->signal_toggled().connect( SLOT(
 		*this, &AccountDialog::requiresAuthCheckChanged ) );
-	autodetectProxyCheck->signal_toggled().connect( SigC::slot(
+	autodetectProxyCheck->signal_toggled().connect( SLOT(
 		*this, &AccountDialog::autodetectProxyCheckChanged ) );
 	
 	autodetectProxyCheck->set_active( true );

@@ -22,6 +22,17 @@
 
 #include"CertificateDialog.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#define MESSAGE_DIALOG_ARG Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,false,true 
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#define MESSAGE_DIALOG_ARG false,Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,true 
+#endif
+
+
 
 CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 //	this->refXml = refXml;
@@ -48,24 +59,24 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "closeButton", closeButton );
 
-	certButton->signal_clicked().connect( SigC::slot( *this, 
+	certButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::chooseCert ));
-	pkeyButton->signal_clicked().connect( SigC::slot( *this, 
+	pkeyButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::choosePKey ));
 
-	addCertButton->signal_clicked().connect(  SigC::slot( *this, 
+	addCertButton->signal_clicked().connect(  SLOT( *this, 
 				&CertificateDialog::addCert ));
-	removeCertButton->signal_clicked().connect(  SigC::slot( *this, 
+	removeCertButton->signal_clicked().connect(  SLOT( *this, 
 				&CertificateDialog::removeCert ));
 
-	addFileCaButton->signal_clicked().connect( SigC::slot( *this, 
+	addFileCaButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::addFileCa ));
-	addDirCaButton->signal_clicked().connect( SigC::slot( *this, 
+	addDirCaButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::addDirCa ));
-	removeCaButton->signal_clicked().connect( SigC::slot( *this, 
+	removeCaButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::removeCa ));
 
-	closeButton->signal_clicked().connect( SigC::slot( *certDialog,
+	closeButton->signal_clicked().connect( SLOT( *certDialog,
 				&Gtk::Dialog::hide ));
 
 	certTreeStore = new CertTreeStore();
@@ -100,8 +111,7 @@ void CertificateDialog::chooseCert(){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that certificate file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded certificate.", Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+                        "PEM-encoded certificate.", MESSAGE_DIALOG_ARG );
 
 			messageDialog.run();
 			delete dialog;
@@ -150,8 +160,7 @@ void CertificateDialog::choosePKey(){
 			Gtk::MessageDialog messageDialog( 
 			"The private key file you selected does not. "
 			"match the selected certificate ",
-                        Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+			MESSAGE_DIALOG_ARG );
 
 			messageDialog.run();
 			delete dialog;
@@ -161,8 +170,8 @@ void CertificateDialog::choosePKey(){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded private key.", Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+                        "PEM-encoded private key.",
+			MESSAGE_DIALOG_ARG );
 
 			messageDialog.run();
 			delete dialog;
@@ -201,8 +210,7 @@ void CertificateDialog::addCert(){
 			"The selected certificate is not "
 			"assigned to the issuer of the previous "
 			"one.",
-                        Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+			MESSAGE_DIALOG_ARG );
 
 			certChain->unlock();
 			messageDialog.run();
@@ -213,8 +221,8 @@ void CertificateDialog::addCert(){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded certificate.", Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+                        "PEM-encoded certificate.", 
+			MESSAGE_DIALOG_ARG );
 
 			certChain->unlock();
 			messageDialog.run();
@@ -272,8 +280,8 @@ void CertificateDialog::addFileCa(){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded certificate.", Gtk::MESSAGE_WARNING,
-			Gtk::BUTTONS_OK, false, true );
+                        "PEM-encoded certificate.", 
+			MESSAGE_DIALOG_ARG );
 
 			messageDialog.run();
 			delete dialog;

@@ -25,6 +25,14 @@
 #include"AccountsList.h"
 #include"../../../sip/SipSoftPhoneConfiguration.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
+
 
 SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 		                CertificateDialog * certificateDialog){
@@ -39,13 +47,13 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	refXml->get_widget( "settingsOkButton", settingsOkButton );
 	refXml->get_widget( "settingsCancelButton", settingsCancelButton );
 
-	settingsOkButton->signal_clicked().connect( SigC::slot( *this, &SettingsDialog::accept ) );
-	settingsCancelButton->signal_clicked().connect( SigC::slot( *this, &SettingsDialog::reject ) );
+	settingsOkButton->signal_clicked().connect( SLOT( *this, &SettingsDialog::accept ) );
+	settingsCancelButton->signal_clicked().connect( SLOT( *this, &SettingsDialog::reject ) );
 
 
 	refXml->get_widget( "certificateButton", certificateButton );
 
-	certificateButton->signal_clicked().connect( SigC::slot( *certificateDialog, &CertificateDialog::run ) );
+	certificateButton->signal_clicked().connect( SLOT( *certificateDialog, &CertificateDialog::run ) );
 	
 	generalSettings = new GeneralSettings( refXml );
 	securitySettings = new SecuritySettings( refXml );
@@ -96,9 +104,17 @@ void SettingsDialog::accept(){
 	config->save();
 
 	if( warning != "" ){
+#ifdef OLDLIBGLADEMM
 		Gtk::MessageDialog messageDialog( warning, 
-				Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK, false,
-				true );
+				Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK, 
+				/* use markup */false,
+				/* Modal */true );
+#else
+		Gtk::MessageDialog messageDialog( warning,
+				/* use markup */false, 
+				Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK,
+				/* Modal */ true );
+#endif
 		messageDialog.run();
 	}
 	
@@ -154,15 +170,15 @@ GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ):
 	accountsTreeView->set_rules_hint( true );
 	accountsList->setTreeView( accountsTreeView );
 
-	accountsAddButton->signal_clicked().connect( SigC::slot( *accountsList, &AccountsList::addAccount ) );
+	accountsAddButton->signal_clicked().connect( SLOT( *accountsList, &AccountsList::addAccount ) );
 	accountsEditButton->signal_clicked().connect( 
-			SigC::slot( *this, &GeneralSettings::editAccount ));
+			SLOT( *this, &GeneralSettings::editAccount ));
 	accountsRemoveButton->signal_clicked().connect( 
-			SigC::slot( *this, &GeneralSettings::removeAccount ));
+			SLOT( *this, &GeneralSettings::removeAccount ));
 	defaultButton->signal_clicked().connect( 
-			SigC::slot( *this, &GeneralSettings::setDefaultAccount ));
+			SLOT( *this, &GeneralSettings::setDefaultAccount ));
 	pstnButton->signal_clicked().connect( 
-			SigC::slot( *this, &GeneralSettings::setPstnAccount ));
+			SLOT( *this, &GeneralSettings::setPstnAccount ));
 
 
 #ifdef IPAQ
@@ -180,10 +196,19 @@ void GeneralSettings::editAccount(){
 
 void GeneralSettings::removeAccount(){
 	if( accountsTreeView->get_selection()->get_selected() ){
+#ifdef OLDLIBGLADEMM
 		Gtk::MessageDialog dialog( "Are you sure you want to erase "
 			"this account?", 
 			Gtk::MESSAGE_QUESTION, 
 			Gtk::BUTTONS_YES_NO, true, false );
+#else
+		Gtk::MessageDialog dialog( "Are you sure you want to erase "
+			"this account?", 
+			/* use markup*/false,
+			Gtk::MESSAGE_QUESTION, 
+			Gtk::BUTTONS_YES_NO, 
+			/* Modal */true );
+#endif
 		if( dialog.run() == Gtk::RESPONSE_YES ){
 			accountsList->erase( 
 			accountsTreeView->get_selection()->get_selected() );
@@ -236,13 +261,13 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "pskBox", pskBox );
 
 	
-	dhCheck->signal_toggled().connect( SigC::slot( 
+	dhCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::kaChange ) );
 	
-	pskCheck->signal_toggled().connect( SigC::slot( 
+	pskCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::kaChange ) );
 
-	secureCheck->signal_toggled().connect( SigC::slot( 
+	secureCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::secureChange ) );
 
 	
@@ -380,12 +405,12 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "stunAutodetectCheck", stunAutodetectCheck );
 	refXml->get_widget( "stunEntry", stunEntry );
 	
-	tcpCheck->signal_toggled().connect( SigC::slot( 
+	tcpCheck->signal_toggled().connect( SLOT( 
 		*this, &AdvancedSettings::transportChange ) );
-	tlsCheck->signal_toggled().connect( SigC::slot( 
+	tlsCheck->signal_toggled().connect( SLOT( 
 		*this, &AdvancedSettings::transportChange ) );
 	
-	stunAutodetectCheck->signal_toggled().connect( SigC::slot( 
+	stunAutodetectCheck->signal_toggled().connect( SLOT( 
 		*this, &AdvancedSettings::stunAutodetectChange ) );
 
 	transportCombo->set_value_in_list( true );

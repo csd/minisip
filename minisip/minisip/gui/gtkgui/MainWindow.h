@@ -49,7 +49,11 @@ class LogEntry;
 class ImWidget;
 class ContactDb;
 
-class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
+class MainWindow : public Gui, public LogEntryHandler
+#ifdef OLDLIBGLADEMM
+		   ,public SigC::Object
+#endif
+{
 	public:
 		MainWindow( int32_t argc, char ** argv );
 		~MainWindow();

@@ -33,7 +33,11 @@
 class CertTreeStore;
 class CaListStore;
 
-class CertificateDialog : public SigC::Object {
+class CertificateDialog
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
 	public:
 		CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 

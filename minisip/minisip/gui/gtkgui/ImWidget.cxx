@@ -24,6 +24,14 @@
 #include"MainWindow.h"
 #include<libmsip/SipCommandString.h>
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
+
 ImWidget::ImWidget( MainWindow * mainWindow, string toUri, string fromUri ){
 	this->mainWindow = mainWindow;
 	this->toUri = toUri;
@@ -45,8 +53,8 @@ ImWidget::ImWidget( MainWindow * mainWindow, string toUri, string fromUri ){
 
 	buttonBox->pack_end( *closeButton, false, true );
 
-	closeButton->signal_clicked().connect( SigC::bind<string>( 
-		SigC::slot( *mainWindow, &MainWindow::removeIm ), toUri ) );
+	closeButton->signal_clicked().connect( BIND<string>( 
+		SLOT( *mainWindow, &MainWindow::removeIm ), toUri ) );
 	
 
 	historyWindow->add( *historyView );

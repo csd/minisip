@@ -29,6 +29,14 @@
 #include"../../Bell.h"
 #include"../../../mediahandler/MediaCommandString.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
+
 
 
 
@@ -60,8 +68,8 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 	buttonBox.show_all();
 	rejectButton.show();
 
-	acceptButton.signal_clicked().connect( SigC::slot( *this, &CallWidget::accept ) );
-	rejectButton.signal_clicked().connect( SigC::slot( *this, &CallWidget::reject ) );
+	acceptButton.signal_clicked().connect( SLOT( *this, &CallWidget::accept ) );
+	rejectButton.signal_clicked().connect( SLOT( *this, &CallWidget::reject ) );
 
 	if( incoming ){
 		state = CALL_WIDGET_STATE_INCOMING;

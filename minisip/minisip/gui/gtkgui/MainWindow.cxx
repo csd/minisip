@@ -38,6 +38,14 @@
 #include"../../contactdb/ContactDb.h"
 #include<libmsip/SipCommandString.h>
 //#include<libmsip/SipSoftPhone.h>
+//
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind 
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b) 
+#define BIND sigc::bind
+#endif
 
 MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 
@@ -92,7 +100,7 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 //				&MainWindow::phoneSelect ) );
 	
 	treeSelection->signal_changed().connect(
-		SigC::slot( *this, &MainWindow::phoneSelected ) );
+		SLOT( *this, &MainWindow::phoneSelected ) );
 
 	phoneBookTree = new PhoneBookTree;
 	phoneBookModel = new PhoneBookModel( phoneBookTree );
@@ -100,63 +108,63 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	phoneBookTreeView->set_headers_visible( false );
 	phoneBookTreeView->set_rules_hint( false );
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
-		SigC::slot( *this, &MainWindow::phoneTreeClicked ), false );
+		SLOT( *this, &MainWindow::phoneTreeClicked ), false );
 
 	/* Context menu */
 	phoneAddAddressMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection>, bool >(
+		SLOT( *phoneBookModel, &PhoneBookModel::addContact ),
 		treeSelection, true ));
 	
 	phoneAddMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool>(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection>, bool>(
+		SLOT( *phoneBookModel, &PhoneBookModel::addContact ),
 		treeSelection, false ));
 	
 	phoneRemoveMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::removeContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
+		SLOT( *phoneBookModel, &PhoneBookModel::removeContact ),
 		treeSelection ));
 	
 	phoneEditMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::editContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
+		SLOT( *phoneBookModel, &PhoneBookModel::editContact ),
 		treeSelection ));
 	
 	/* Contact menu from the menubar */
 	addAddressContactMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection>, bool >(
+		SLOT( *phoneBookModel, &PhoneBookModel::addContact ),
 		treeSelection, true ));
 	
 	addContactMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool>(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection>, bool>(
+		SLOT( *phoneBookModel, &PhoneBookModel::addContact ),
 		treeSelection, false ));
 	
 	removeContactMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::removeContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
+		SLOT( *phoneBookModel, &PhoneBookModel::removeContact ),
 		treeSelection ));
 	
 	editContactMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
-		SigC::slot( *phoneBookModel, &PhoneBookModel::editContact ),
+		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
+		SLOT( *phoneBookModel, &PhoneBookModel::editContact ),
 		treeSelection ));
 	
 	refXml->get_widget( "callButton", callButton );
 
-	callButton->signal_clicked().connect( SigC::slot( *this, &MainWindow::invite ) );
+	callButton->signal_clicked().connect( SLOT( *this, &MainWindow::invite ) );
 	
-	callMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::invite ) );
+	callMenu->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
 
-	phoneBookTreeView->signal_row_activated().connect( SigC::slot( *this, &MainWindow::inviteFromTreeview ) );
+	phoneBookTreeView->signal_row_activated().connect( SLOT( *this, &MainWindow::inviteFromTreeview ) );
 
 	refXml->get_widget( "imButton", imButton );
 
-	imButton->signal_clicked().connect( SigC::slot( *this, &MainWindow::im ) );
+	imButton->signal_clicked().connect( SLOT( *this, &MainWindow::im ) );
 	
-	imMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::im ) );
+	imMenu->signal_activate().connect( SLOT( *this, &MainWindow::im ) );
 	
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, certificateDialog );
@@ -169,24 +177,24 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	
 	refXml->get_widget( "viewCallListMenu", viewCallListMenu );
 
-	prefMenu->signal_activate().connect( SigC::slot( *settingsDialog, &SettingsDialog::show ) );
-	certMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::runCertificateSettings ) );
-	quitMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::quit ) );
+	prefMenu->signal_activate().connect( SLOT( *settingsDialog, &SettingsDialog::show ) );
+	certMenu->signal_activate().connect( SLOT( *this, &MainWindow::runCertificateSettings ) );
+	quitMenu->signal_activate().connect( SLOT( *this, &MainWindow::quit ) );
 	
-	viewCallListMenu->signal_activate().connect( SigC::slot( *this, &MainWindow::viewCallListToggle ) );
+	viewCallListMenu->signal_activate().connect( SLOT( *this, &MainWindow::viewCallListToggle ) );
 
-	dispatcher.connect( SigC::slot( *this, &MainWindow::gotCommand ) );
+	dispatcher.connect( SLOT( *this, &MainWindow::gotCommand ) );
 
 #ifndef WIN32
 	trayIcon = new MTrayIcon( this, refXml );
 
-	mainWindowWidget->signal_hide().connect( SigC::slot( *this, &MainWindow::hideSlot ));
+	mainWindowWidget->signal_hide().connect( SLOT( *this, &MainWindow::hideSlot ));
 #endif
 	logWidget = new LogWidget( this );
 
 	mainTabWidget->append_page( *logWidget, "Call list" );
 
-	logDispatcher.connect( SigC::slot( *this, &MainWindow::gotLogEntry ) );
+	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
 	mainWindowWidget->set_sensitive( false );
 
@@ -364,7 +372,7 @@ void MainWindow::updateConfig(){
 //		  phoneBookTreeView->append_column( "Contact", phoneBookTree->name );
 		  phoneBookTreeView->insert_column_with_data_func( 0, 
 			"Contact", *renderer,
-			SigC::slot( *phoneBookModel, &PhoneBookModel::setFont )
+			SLOT( *phoneBookModel, &PhoneBookModel::setFont )
 			);
 	}
 

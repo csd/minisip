@@ -26,6 +26,13 @@
 #include<libmutil/itoa.h>
 #include"../../contactdb/ContactDb.h"
 
+#ifdef OLDLIBGLADEMM
+#define SLOT(a,b) SigC::slot(a,b)
+#define BIND SigC::bind
+#else
+#define SLOT(a,b) sigc::mem_fun(a,b)
+#define BIND sigc::bind
+#endif
 
 LogWidget::LogWidget( MainWindow * mainWindow ){
 	this->mainWindow = mainWindow;
@@ -45,11 +52,11 @@ LogWidget::LogWidget( MainWindow * mainWindow ){
 	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
 	
 	insert_column_with_data_func( 2, "From", *renderer,
-		SigC::slot( *this, &LogWidget::setFont ) );
+		SLOT( *this, &LogWidget::setFont ) );
 
 	set_headers_visible( false );
 	set_rules_hint( true );
-	get_selection()->set_select_function( SigC::slot( *this, &LogWidget::lineSelect ) );
+	get_selection()->set_select_function( SLOT( *this, &LogWidget::lineSelect ) );
 
 	iconRenderer = (Gtk::CellRendererPixbuf*)get_column_cell_renderer( 1 );
 
