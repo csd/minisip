@@ -296,6 +296,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	}
 	nCs = hdr->nCs();
 #undef hdr
+	ka->setCsIdMap( csIdMap );
 	//FIXME look at the other fields!
 	
 	errorMessage->addPayload(

@@ -459,7 +459,7 @@ uint8_t KeyAgreement::getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_ty
 	return 0;
 }
 
-Policy_type::Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+Policy_type::Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value){
 	this->policy_No = policy_No;
 	this->prot_type = prot_type;
 	this->policy_type = policy_type;

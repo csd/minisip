@@ -49,12 +49,12 @@
 // Class to hold Security Policy (SP) info
 class Policy_type {
 	public:
-		Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value);
 		~Policy_type();
 		uint8_t policy_No;
 		uint8_t prot_type;
 		uint8_t policy_type;
-		uint16_t length;
+		uint8_t length;
 		byte_t * value;
 	private:
 };
