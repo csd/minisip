@@ -29,12 +29,13 @@
 
 class FloatResampler : public Resampler {
 	public: 
-		virtual void resample( short * input, short * output );
-	protected:
+
 		FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 
 			        uint32_t duration, uint32_t nChannels );
 
 		~FloatResampler();
+
+		virtual void resample( short * input, short * output );
 
 	private:
 		uint32_t inputLength;

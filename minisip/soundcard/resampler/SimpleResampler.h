@@ -21,8 +21,8 @@
  *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
-#ifndef FLOAT_RESAMPLER_H
-#define FLOAT_RESAMPLER_H
+#ifndef SIMPLE_RESAMPLER_H
+#define SIMPLE_RESAMPLER_H
 
 #include"Resampler.h"
 
