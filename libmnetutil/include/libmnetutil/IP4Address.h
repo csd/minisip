@@ -25,9 +25,11 @@
 
 #include <libmnetutil/IPAddress.h>
 
-
+#ifdef _MSC_VER
+typedef unsigned int uint32_t;
+#else
 #include<stdint.h>
-
+#endif
 struct sockaddr_in;
 
 class IP4Address : public IPAddress{
