@@ -101,7 +101,7 @@ bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCo
 		
 		requestTimeout(32000,"timerH");
 		
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true);
 
 		return true;
 	}else{

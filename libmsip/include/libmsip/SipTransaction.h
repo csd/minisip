@@ -73,7 +73,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		string getBranch();
 		
 		void setDialog(MRef<SipDialog*> );
-		void send(MRef<SipMessage*>  pack, string branch=""); // if not specified branch, use the attribute one - ok in most cases.
+		void send(MRef<SipMessage*>  pack, bool addVia, string branch=""); // if not specified branch, use the attribute one - ok in most cases.
 		void setSocket(Socket * sock){socket=sock;};
 		Socket * getSocket(){return socket;};
 

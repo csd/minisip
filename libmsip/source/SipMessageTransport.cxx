@@ -316,7 +316,8 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
                                      IPAddress &ip_addr, 
                                      int32_t port, 
-				     string branch
+				     string branch,
+				     bool addVia
 				     )
 {
 	MRef<StreamSocket *> socket;
@@ -344,7 +345,9 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			
 		}
 
-		addViaHeader( pack, socket, branch );
+		if (addVia){
+			addViaHeader( pack, socket, branch );
+		}
 
 		string packetString = pack->getString();
 		

@@ -77,7 +77,8 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		void sendMessage(MRef<SipMessage*> pack, 
 				IPAddress &toaddr, 
 				int32_t port, 
-				string branch
+				string branch,
+				bool addVia
 				);
 			
 		void addSocket(MRef<StreamSocket *> sock);

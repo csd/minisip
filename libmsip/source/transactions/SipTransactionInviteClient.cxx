@@ -103,7 +103,7 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		/*invtrans->*/requestTimeout( /*invtrans->*/ /*getTimerT1()*/ timerT1, "timerA" );
 		
 		/*invtrans->*/requestTimeout( /*invtrans->*/ /*getTimerT1()*/ timerT1*64, "timerB" );
-		/*invtrans->*/send( command.getCommandPacket() );
+		/*invtrans->*/send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
 		return false;
@@ -116,7 +116,7 @@ bool SipTransactionInviteClient::a1_calling_calling_timerA( const SipSMCommand &
 		timerA *= 2; 
 		requestTimeout( timerA, "timerA" );
 		
-		send(MRef<SipMessage*>((SipMessage*)* lastInvite));
+		send(MRef<SipMessage*>((SipMessage*)* lastInvite), false);
 		
 		return true;
 	}else{
@@ -416,6 +416,6 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 			); 
 	//TODO:
 	//ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
-	send(MRef<SipMessage*>(*ack), br);
+	send(MRef<SipMessage*>(*ack), true, br);
 }
 

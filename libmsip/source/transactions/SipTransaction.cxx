@@ -86,7 +86,7 @@ void SipTransaction::handleTimeout(const string &c){
 }
 
 
-void SipTransaction::send(MRef<SipMessage*> pack, string br){
+void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 		if (br=="")
 			br = branch;
 
@@ -95,7 +95,8 @@ void SipTransaction::send(MRef<SipMessage*> pack, string br){
 			dialog->getDialogConfig()->inherited.sipTransport->sendMessage(pack,
 					*toaddr,
 					port, 
-					br);
+					br,
+					addVia);
 		}
 #ifdef DEBUG_OUTPUT
 		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<end;

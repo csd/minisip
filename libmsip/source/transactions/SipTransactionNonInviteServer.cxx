@@ -63,7 +63,7 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true);
 		return true;
 	}else{
 		return false;
@@ -76,7 +76,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true); 		//Add via header
 		requestTimeout(64 * timerT1, "timerJ");
 		return true;
 	}else{
@@ -89,7 +89,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(),true);
 		requestTimeout(64 * timerT1, "timerJ");
 		return true;
 	}else{
@@ -112,7 +112,7 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 	}
 	
 	assert( !lastResponse.isNull());
-	send(MRef<SipMessage*>(* lastResponse));
+	send(MRef<SipMessage*>(* lastResponse),false);		//We are re-sending last response, do not add via header
 	
 	return true;
 }
@@ -123,7 +123,7 @@ bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
-		send(MRef<SipMessage*>(*pack));
+		send(MRef<SipMessage*>(*pack),true);		// add via header
 		return true;
 	}else
 		return false;
@@ -168,7 +168,7 @@ bool SipTransactionNonInviteServer::a7_completed_completed_request(
 		return false;
 	}
 	assert( !lastResponse.isNull());
-	send(MRef<SipMessage*>(* lastResponse));
+	send(MRef<SipMessage*>(* lastResponse), false);		//We are re-sending response, do not add via header
 	return true;
 }
 

@@ -127,7 +127,7 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 			merr << FG_ERROR << "Invite server transaction failed to deliver response before remote side retransmitted. Bug?"<< PLAIN << end;
 #endif
 		}else{
-			send(MRef<SipMessage*>(*resp));
+			send(MRef<SipMessage*>(*resp), false);
 		}
 		return true;
 	}else{
@@ -142,7 +142,7 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true);
 		return true;
 	}else{
 		return false;
@@ -163,7 +163,7 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 		timerG = 500;
 		requestTimeout(timerG, "timerG");
 		requestTimeout(32000,"timerH");
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true);
 		return true;
 	}else
 		return false;
@@ -205,7 +205,7 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(), true);
 
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transaction_terminated),
@@ -229,7 +229,7 @@ bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMComma
 	if (transitionMatch(command, SipInvite::type, SipSMCommand::remote, SipSMCommand::transaction)){
 		MRef<SipResponse*> resp = lastResponse;
 		
-		send(MRef<SipMessage*>(*resp));
+		send(MRef<SipMessage*>(*resp), false);
 		return true;
 	}else{
 		return false;
@@ -264,7 +264,7 @@ bool SipTransactionInviteServer::a8_completed_completed_timerG( const SipSMComma
 		MRef<SipResponse*> resp = lastResponse;
 		timerG *= 2;
 		requestTimeout( timerG, "timerG");
-		send(MRef<SipMessage*>(*resp));
+		send(MRef<SipMessage*>(*resp), false);
 		return true;
 	}else{
 		return false;

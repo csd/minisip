@@ -51,7 +51,7 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 		lastRequest = command.getCommandPacket();
 		requestTimeout(500, "timerE");
 		requestTimeout(64000, "timerF");
-		send(command.getCommandPacket());
+		send(command.getCommandPacket(),true);
 		return true;
 	}else{
 		return false;
@@ -124,7 +124,7 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 	if (transitionMatch(command, "timerE")){
 		assert(!lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
-		send( lastRequest);	
+		send( lastRequest,false);	//do not add via header when re-sending.	
 		return true;
 	}else{
 		return false;
@@ -196,7 +196,7 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 		requestTimeout(1000,"timerE");
 		assert( !lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
-		send( lastRequest);	
+		send( lastRequest, false);		// do not add via header when re-sending 
 		return true;
 	}else{
 		return false;
