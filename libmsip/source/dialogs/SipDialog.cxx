@@ -34,9 +34,9 @@
 #include<libmutil/CommandString.h>
 
 
-SipDialog::SipDialog(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
+SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
                 StateMachine<SipSMCommand,string>(tp), 
-                dialogContainer(dContainer), 
+                sipStack(stack), 
                 callConfig(callconf)
 {
 	dialogState.seqNo=100 * (rand()%9+1);
@@ -57,18 +57,18 @@ void SipDialog::handleTimeout(const string &c){
 			SipSMCommand::TU, 
 			SipSMCommand::TU );
 
-	dialogContainer->enqueueTimeout(
+	sipStack->getDialogContainer()->enqueueTimeout(
 			MRef<SipDialog*>(this),
 			cmd
 			);
 }
 
 MRef<SipDialogContainer*> SipDialog::getDialogContainer(){
-	return dialogContainer;
+	return sipStack->getDialogContainer();
 }
 
 void SipDialog::registerTransaction(MRef<SipTransaction*> trans){
-	dialogContainer->getDispatcher()->addTransaction(trans);
+	sipStack->getDialogContainer()->getDispatcher()->addTransaction(trans);
 	transactions.push_front(trans);
 }
 
@@ -100,7 +100,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 		bool handled =false;
 		for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
 			if ((*i)->getCurrentStateName()=="terminated"){
-				dialogContainer->getDispatcher()->removeTransaction(*i);
+				sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
 				transactions.erase(i);
 				i=transactions.begin();
 				handled=true;
@@ -131,4 +131,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 }
 
 
+MRef<SipStack*> SipDialog::getSipStack(){
+	return sipStack;
+}
 

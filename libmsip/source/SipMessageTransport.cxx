@@ -248,7 +248,7 @@ SipMessageTransport::SipMessageTransport(
                         int32_t local_udp_port, 
                         int32_t local_tcp_port,
                         int32_t local_tls_port,
-			MRef<certificate *> cert, 
+			MRef<certificate_chain *> cchain, 
                         MRef<ca_db *> cert_db
 			):
                                         udpsock(false,local_udp_port),
@@ -259,7 +259,7 @@ SipMessageTransport::SipMessageTransport(
                                         localUDPPort(local_udp_port),
                                         localTCPPort(local_tcp_port),
 					localTLSPort(local_tls_port),
-                                        cert(cert), 
+                                        cert_chain(cchain), 
                                         cert_db(cert_db),
                                         tls_ctx(NULL)
 							
@@ -324,7 +324,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 			if( preferredTransport == "TLS" ){
 				socket = new TLSSocket( ip_addr, 
-						port, tls_ctx, cert, cert_db );
+						port, tls_ctx, getMyCertificate(), cert_db );
 
 				addSocket( socket );
 			}

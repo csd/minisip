@@ -43,12 +43,14 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
+#include<libmsip/SipStack.h>
 
 using namespace std;
 
-class SipDialogContainer;
+class SipStack;
 class SipTransaction;
 class SipDialogConfig;
+class SipDialogContainer;
 
 
 class LIBMSIP_API SipDialogState{
@@ -86,7 +88,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * @param dContainer The Dialog Container
 		 * @param callconf   The Dialog Configuration
 		 */
-		SipDialog(MRef<SipDialogContainer*> dContainer, 
+		SipDialog(MRef<SipStack*> stack, 
 				MRef<SipDialogConfig*> callconf,
 				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider );
 		
@@ -125,6 +127,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		MRef<SipDialogContainer*> getDialogContainer();
 
+		MRef<SipStack*> getSipStack();
+
 		void signalIfNoTransactions();
 
 		/**
@@ -143,8 +147,11 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		///a list containing all transactions
 		list<MRef<SipTransaction*> > transactions;
 
-		///the dialog container
-		MRef<SipDialogContainer*> dialogContainer;
+		//the dialog container
+		//MRef<SipDialogContainer*> dialogContainer;
+
+		///
+		MRef<SipStack*> sipStack;
 
 	private:
 		
@@ -153,8 +160,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 };
 
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialogConfig.h>
+#include<libmsip/SipDialogContainer.h>
 
 
 #endif

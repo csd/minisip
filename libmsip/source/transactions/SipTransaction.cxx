@@ -103,7 +103,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 
 		if(toaddr){
 		
-			dialog->getDialogConfig()->inherited.sipTransport->sendMessage(pack,
+			dialog->getSipStack()->getSipTransportLayer()->sendMessage(pack,
 					*toaddr,
 					port, 
 					br,

@@ -399,8 +399,8 @@ void SipDialogRegister::setUpStateMachine(){
 	setCurrentState(s0_start);
 }
 
-SipDialogRegister::SipDialogRegister(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp)
-		: SipDialog(dContainer, callconf, tp),
+SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp)
+		: SipDialog(stack, callconf, tp),
 			realm(""),
 			nonce(""),
 			failCount(0),
@@ -500,7 +500,7 @@ void SipDialogRegister::send_noauth(string branch){
 			dialogState.seqNo,
 			getDialogConfig()->inherited.transport);
         SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);
-	dialogContainer->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
 void SipDialogRegister::send_auth(string branch){
@@ -528,7 +528,7 @@ void SipDialogRegister::send_auth(string branch){
 			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword
 		       );
         SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);
-	dialogContainer->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
 

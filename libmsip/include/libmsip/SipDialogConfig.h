@@ -52,7 +52,7 @@
 #include<libmutil/XMLParser.h>
 #include<libmutil/cert.h>
 #include<libmutil/itoa.h>
-#include<libmsip/SipMessageTransport.h>
+//#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkFunctions.h>
@@ -190,7 +190,7 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		
 		string transport;
 	
-		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
+//		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
 		
 		bool autoAnswer;
 
