@@ -38,7 +38,13 @@
 #include<vector>
 #include"IPAddress.h"
 
-#include<config.h>
+#ifdef _MSC_VER
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
+#else
+#include<stdint.h>
+#endif
+
 
 using namespace std;
 
