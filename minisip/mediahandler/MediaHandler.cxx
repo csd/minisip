@@ -46,11 +46,11 @@
 #include"../video/codec/AVCoder.h"
 #include"../video/codec/AVDecoder.h"
 #include"../video/mixer/ImageMixer.h"
-//#ifdef IPAQ
+#ifdef IPAQ
 #include"../video/display/SdlDisplay.h"
-//#else
-//#include"../video/display/XvDisplay.h"
-//#endif
+#else
+#include"../video/display/XvDisplay.h"
+#endif
 #endif
 
 using namespace std;
@@ -62,14 +62,16 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 #ifdef VIDEO_SUPPORT
 	MRef<Grabber *> grabber = Grabber::create( config->videoDevice );
 	MRef<VideoCodec *> videoCodec = new VideoCodec();
+	MRef<ImageMixer *> mixer = new ImageMixer();
 	//FIXME
-//#ifdef IPAQ
+#ifdef IPAQ
 	MRef<VideoDisplay *> display = new SdlDisplay( config->frameWidth, config->frameHeight);
-//#else
-//	MRef<VideoDisplay *> display = new XvDisplay( config->frameWidth, config->frameHeight);
-//#endif
+#else
+	MRef<VideoDisplay *> display = new XvDisplay( config->frameWidth, config->frameHeight);
+#endif
 
-	MRef<VideoMedia *> videoMedia = new VideoMedia( videoCodec, display, grabber, config->frameWidth, config->frameHeight );
+	MRef<VideoMedia *> videoMedia = new VideoMedia( videoCodec, display, mixer, grabber, config->frameWidth, config->frameHeight );
+	mixer->setMedia( videoMedia );
 	registerMedia( *videoMedia );
 #endif
 

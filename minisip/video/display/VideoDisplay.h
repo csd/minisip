@@ -52,6 +52,7 @@ class VideoDisplay : public ImageHandler, public MObject, public Runnable{
 		// Need to be implemented by the subclass
 		virtual void createWindow()=0;
 		virtual void destroyWindow()=0;
+		virtual void handleEvents()=0;
 		virtual void displayImage( MImage * image )=0;
 		virtual MImage * allocateImage()=0;
 		virtual void deallocateImage( MImage * image )=0;

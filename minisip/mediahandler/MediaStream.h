@@ -90,6 +90,11 @@ class MediaStreamReceiver : public MediaStream{
 		MRef<IpProvider *> ipProvider;
 		uint16_t externalPort;
 
+		void gotSsrc( uint32_t ssrc );
+
+		std::list<uint32_t> ssrcList;
+		Mutex ssrcListLock;
+
 };
 
 class MediaStreamSender : public MediaStream{ 

@@ -53,6 +53,7 @@ typedef struct MData{
 typedef struct MImage{
 	uint8_t *data[4];
 	int linesize[4];
+	uint32_t ssrc;       
 	uint32_t chroma;
 	uint32_t mTime;      /* TimeStamp in µsec */
 	void * privateData;  /* Can be used by the ImageHandlers */
@@ -68,6 +69,7 @@ class ImageHandler{
 		virtual void handle( MImage * )=0;
 		
 		virtual MImage * provideImage()=0;
+		virtual MImage * provideImage( uint32_t ssrc ){ return provideImage(); };
 		virtual void releaseImage( MImage * )=0;
 		virtual bool providesImage()=0;
 

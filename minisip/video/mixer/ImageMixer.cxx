@@ -22,6 +22,9 @@
 
 #include<config.h>
 #include"ImageMixer.h"
+#include"../VideoMedia.h"
+
+#define MAX_SOURCE 256
 
 
 ImageMixer::ImageMixer(){
@@ -40,72 +43,113 @@ MImage * ImageMixer::provideImage(){
 	return output->provideImage();
 }
 
+MImage * ImageMixer::provideImage( uint32_t ssrc ){
+
+	MImage * image;
+	if( ssrc == mainSource ){
+		image = output->provideImage();
+		image->ssrc = ssrc;
+		return image;
+	}
+
+	MRef<VideoMediaSource *> source = media->getSource( ssrc );
+
+	if( source ){
+		return source->provideEmptyImage();
+	}
+	
+	return NULL;
+}
+
 void ImageMixer::releaseImage( MImage * image ){
-	output->releaseImage( image );
+	if( output ){
+		output->releaseImage( image );
+	}
 }
 
 bool ImageMixer::handlesChroma( uint32_t chroma ){
-	return chroma == M_CHROMA_I420;
+	if( output ){
+		return output->handlesChroma( chroma );
+	}
+
+	return false;
 }
 
 
 void ImageMixer::handle( MImage * image ){
-	MImage * toMix;
-	uint32_t i,j;
-	uint8_t * yd, *ud, *vd, *ys, *us, *vs;
-	uint32_t factor = 6;
-	uint32_t widthOffset = 10;
-	uint32_t heightOffset = height - height / factor - 10;
 
-	mixedImagesLock.lock();
-	
-	if( !mixedImages.empty() ){
-		toMix = (*mixedImages.begin());
-	}
-	else return;
-
-	yd = image->data[0] + heightOffset*image->linesize[0] + widthOffset;
-	ud = image->data[1] + heightOffset*image->linesize[1]/2 + widthOffset/2;
-	vd = image->data[2] + heightOffset*image->linesize[1]/2 + widthOffset/2;
-	
-	ys = toMix->data[0];
-	us = toMix->data[1];
-	vs = toMix->data[2];
-	
-	for( j = 0; (j < (height)/(2*factor)) && (heightOffset + 2*j<height); j++ ){
-		for( i = 0; (i < image->linesize[0] / (2*factor)) && (widthOffset + 2*i < width ); i++ ){
-			yd[2*i] = ys[2*i*factor];
-			yd[2*i+1] = ys[2*i*factor+1];
-			yd[2*i+image->linesize[0]] = ys[2*i*factor+image->linesize[0]];
-			yd[2*i+image->linesize[0]+1] = ys[2*i*factor+image->linesize[0]+1];
-			ud[i] = us[i*factor];
-			vd[i] = vs[i*factor];
+	if( image->ssrc != mainSource ){
+		/* It's not the main source, we just store it */
+		MRef<VideoMediaSource *> source = media->getSource( image->ssrc );
+		if( source ){
+			source->addFilledImage( image );
 		}
-		yd += image->linesize[0]*2;
-		ud += image->linesize[1];
-		vd += image->linesize[2];
-
-		ys += toMix->linesize[0]*2*factor;
-		us += toMix->linesize[1]*factor;
-		vs += toMix->linesize[2]*factor;
-		
 	}
-	mixedImagesLock.unlock();
+	else{
+		/* It's the main source, we will mix it with the other sources
+		 * and display it */
 
-	output->handle( image );
+		media->getImagesFromSources( images, nImagesToMix, mainSource );
+
+		mix( image );
+
+		media->releaseImagesToSources( images, nImagesToMix );
+		
+		output->handle( image );
+	}
+}
+
+
+void ImageMixer::mix( MImage * image ){
+	uint32_t i;
+
+
+	for( i = 0; i < nImagesToMix; i++ ){
+
+		MImage * toMix = images[i];
+
+		if( !images[i] ){
+			continue;
+		}
+		
+		uint32_t i,j;
+		uint8_t * yd, *ud, *vd, *ys, *us, *vs;
+		uint32_t factor = 4;
+		uint32_t widthOffset = 10;
+		uint32_t heightOffset = height - height / factor - 10;
+
+		
+
+		yd = image->data[0] + heightOffset*image->linesize[0] + widthOffset;
+		ud = image->data[1] + heightOffset*image->linesize[1]/2 + widthOffset/2;
+		vd = image->data[2] + heightOffset*image->linesize[1]/2 + widthOffset/2;
+
+		ys = toMix->data[0];
+		us = toMix->data[1];
+		vs = toMix->data[2];
+
+		for( j = 0; (j < (height)/(2*factor)) && (heightOffset + 2*j<height); j++ ){
+			for( i = 0; (i < image->linesize[0] / (2*factor)) && (widthOffset + 2*i < width ); i++ ){
+				yd[2*i] = ys[2*i*factor];
+				yd[2*i+1] = ys[2*i*factor+1];
+				yd[2*i+image->linesize[0]] = ys[2*i*factor+image->linesize[0]];
+				yd[2*i+image->linesize[0]+1] = ys[2*i*factor+image->linesize[0]+1];
+				ud[i] = us[i*factor];
+				vd[i] = vs[i*factor];
+			}
+			yd += image->linesize[0]*2;
+			ud += image->linesize[1];
+			vd += image->linesize[2];
+
+			ys += toMix->linesize[0]*2*factor;
+			us += toMix->linesize[1]*factor;
+			vs += toMix->linesize[2]*factor;
+
+		}
+
+	}
+
 	
-}
-
-void ImageMixer::addMixedImage( MImage * image ){
-	mixedImagesLock.lock();
-	mixedImages.push_back( image );
-	mixedImagesLock.unlock();
-}
-
-void ImageMixer::removeMixedImage( MImage * image ){
-	mixedImagesLock.lock();
-	mixedImages.remove( image );
-	mixedImagesLock.unlock();
 }
 
 void ImageMixer::setOutput( ImageHandler * output ){
@@ -118,4 +162,12 @@ uint32_t ImageMixer::getRequiredWidth(){
 
 uint32_t ImageMixer::getRequiredHeight(){
 	return output->getRequiredHeight();
+}
+
+void ImageMixer::setMedia( MRef<VideoMedia *> media ){
+	this->media = media;
+}
+
+void ImageMixer::selectMainSource( uint32_t ssrc ){
+	mainSource = ssrc;
 }

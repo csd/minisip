@@ -39,12 +39,6 @@ class MediaStreamReceiver;
 class SdpHeaderM;
 
 
-#ifdef VIDEO_SUPPORT
-class Grabber;
-class VideoDisplay;
-class VideoCodec;
-#endif
-
 typedef uint8_t byte_t;
 
 
@@ -61,9 +55,9 @@ class Media : public MObject{
 
 		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
 		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void unRegisterMediaSource( uint32_t ssrc );
 		
-		virtual void registerMediaReceiver( MRef<MediaStreamReceiver *> sender );
-		virtual void unRegisterMediaReceiver( MRef<MediaStreamReceiver *> sender );
 		
 		bool receive;
 		bool send;
@@ -76,50 +70,11 @@ class Media : public MObject{
 		Media( MRef<Codec *> codec );
 		MRef<Codec *> codec;
 		std::list< MRef<MediaStreamSender *> > senders;
-		std::list< MRef<MediaStreamReceiver *> > receivers;
 		Mutex sendersLock;
-		Mutex receiversLock;
+		Mutex sourcesLock;
 		
 		std::list<std::string> sdpAttributes;
 };
-
-#ifdef VIDEO_SUPPORT
-class VideoMedia : public Media, public VideoEncoderCallback{
-
-	public: 
-		VideoMedia( MRef<VideoCodec *> codec, MRef<VideoDisplay *> display, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
-		virtual std::string getMemObjectType(){return "VideoMedia";}
-		
-		virtual std::string getSdpMediaType();
-		
-		virtual void playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts );
-
-		virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
-		
-		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void registerMediaReceiver( MRef<MediaStreamReceiver *> sender );
-		virtual void unRegisterMediaReceiver( MRef<MediaStreamReceiver *> sender );
-		virtual void handleMHeader( MRef<SdpHeaderM *> m );
-
-
-		
-	private:
-		MRef<Grabber *> grabber; // NULL if receive only
-		MRef<VideoDisplay *> display;
-
-		byte_t frame[100000];
-		uint32_t index;
-                bool packetLoss;
-                uint16_t expectedSeqNo;
-
-		uint32_t receivingWidth;
-		uint32_t receivingHeight;
-		
-		uint32_t sendingWidth;
-		uint32_t sendingHeight;
-};
-#endif
 
 class AudioMedia : public Media, public SoundRecorderCallback{
 
@@ -133,8 +88,8 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		
 		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
 		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void registerMediaReceiver( MRef<MediaStreamReceiver *> sender );
-		virtual void unRegisterMediaReceiver( MRef<MediaStreamReceiver *> sender );
+		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void unRegisterMediaSource( uint32_t ssrc );
 
 		virtual void srcb_handleSound( void *samplearr );
 	private:

@@ -49,11 +49,6 @@ class Grabber : public MObject, public Runnable{
 		virtual void setHandler( ImageHandler * handler )=0;
 
 		virtual std::string getMemObjectType(){return "Grabber";}
-
-		virtual void setMixer( MRef<ImageMixer *> mixer );
-
-	protected:
-		MRef<ImageMixer *> mixer;
 		
 };
 

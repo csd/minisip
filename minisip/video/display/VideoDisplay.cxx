@@ -98,6 +98,7 @@ void VideoDisplay::run(){
 
         while( true ){
 
+		fprintf( stderr, "starting display main loop\n");
                 showCond.wait();
                 showWindow();
 
@@ -105,6 +106,8 @@ void VideoDisplay::run(){
                 emptyImagesLock.unlock();
 
                 while( show ){
+
+			handleEvents();
 
                         filledImagesLock.lock();
 
@@ -146,6 +149,8 @@ void VideoDisplay::run(){
                         filledImages.pop_front();
 
                         displayImage( imageToDisplay );
+                        
+			emptyImages.push_back( imageToDisplay );
 
                 }
 

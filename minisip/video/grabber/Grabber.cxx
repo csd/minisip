@@ -21,7 +21,10 @@
 */
 
 #include<config.h>
-#include"../mixer/ImageMixer.h"
+#include"../VideoMedia.h"
+#include"../../codecs/Codec.h"
+#include"../display/VideoDisplay.h"
+#include"../codec/AVDecoder.h"
 #include"Grabber.h"
 #include"V4LGrabber.h"
 
@@ -58,8 +61,4 @@ MRef<Grabber *> Grabber::create( string device ){
 	}
 
 	return result;
-}
-
-void Grabber::setMixer( MRef<ImageMixer *> mixer ){
-	this->mixer = mixer;
 }

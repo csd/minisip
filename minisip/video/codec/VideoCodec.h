@@ -55,8 +55,6 @@ class VideoCodec : public Codec{
 		void setEncoderCallback( VideoEncoderCallback * cb );
 
 		void startSend( uint32_t width, uint32_t height );
-		void startReceive( uint32_t width, uint32_t height );
-		void stopReceive();
 		void stopSend();
 
 

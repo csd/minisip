@@ -134,8 +134,8 @@ Minisip::Minisip( int32_t argc, char**argv ){
         LogEntry::handler = dynamic_cast<LogEntryHandler *>(gui);
 
 #ifdef DEBUG_OUTPUT
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-	consoleDbg->startThread();
+//	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+//	consoleDbg->startThread();
 #endif
 
 #else //!GTK_GUI

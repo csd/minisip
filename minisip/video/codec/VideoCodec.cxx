@@ -27,7 +27,6 @@
 #include"../../codecs/Codec.h"
 #include"../grabber/Grabber.h"
 #include"../display/VideoDisplay.h"
-#include"../mixer/ImageMixer.h"
 
 
 VideoCodec::VideoCodec(){
@@ -93,14 +92,6 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
 	
 }
 
-void VideoCodec::startReceive( uint32_t width, uint32_t height ){
-	fprintf( stderr, "Before display init\n");
-	//display->init( width, height );
-	display->start();
-	fprintf( stderr, "After display init\n");
-	
-}
-
 void VideoCodec::stopSend(){
 	fprintf( stderr, "stopSend called\n");
 
@@ -111,13 +102,4 @@ void VideoCodec::stopSend(){
 	fprintf( stderr, "Closing coder\n" );
 	coder->close();
 
-}
-
-void VideoCodec::stopReceive(){
-	fprintf( stderr, "stopReceive called\n");
-	// At this point the MediaStream should have been unregistered
-	// from the RtpReceiver, so that no data will be sent, we can
-	// close safely
-	decoder->close();
-	display->stop();
 }

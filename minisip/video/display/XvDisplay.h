@@ -50,9 +50,13 @@ class XvDisplay: public VideoDisplay{
 		uint32_t height;
 		uint32_t width;
 
+		uint32_t baseWindowWidth;
+		uint32_t baseWindowHeight;
+
 		void openDisplay();
 		virtual void createWindow();
 		virtual void destroyWindow();
+		virtual void handleEvents();
 
 		virtual MImage * allocateImage();
 		virtual void deallocateImage( MImage * image );

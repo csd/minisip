@@ -38,9 +38,11 @@ codec_hdr = codec/AVCoder.h codec/AVDecoder.h codec/VideoCodec.h
 libvideo_a_SOURCES = $(display_src) \
                      $(grabber_src) \
                      $(codec_src) \
-		     $(mixer_src)
+		     $(mixer_src) \
+		     VideoMedia.cxx
 
 noinst_HEADERS =  ImageHandler.h \
+                  VideoMedia.h \
                   $(display_hdr) $(grabber_hdr) $(codec_hdr) $(mixer_hdr)
 
 

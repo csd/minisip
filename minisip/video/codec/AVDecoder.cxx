@@ -32,7 +32,10 @@ int AVDecoder::ffmpegGetBuffer( struct AVCodecContext * context, AVFrame * frame
 	AVDecoder * decoder = (AVDecoder*)context->opaque;
 	
 	/* get an image from the handler */
-	decoder->lastImage = decoder->handler->provideImage();
+	MImage * image = decoder->handler->provideImage( decoder->ssrc );
+	if( image ){
+		decoder->lastImage = image;
+	}
 	
 	frame->pts = 0;
 	frame->type = FF_BUFFER_TYPE_USER;
@@ -112,3 +115,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 
 	}
 }	
+
+void AVDecoder::setSsrc( uint32_t ssrc ){
+	this->ssrc = ssrc;
+}

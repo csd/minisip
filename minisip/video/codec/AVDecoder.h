@@ -38,7 +38,7 @@ class AVDecoder : public MObject{
 	public:
 		AVDecoder();
 
-		void init( uint32_t width, uint32_t height );
+		//void init( uint32_t width, uint32_t height );
 
 		void setHandler( ImageHandler * handler );
 
@@ -48,6 +48,8 @@ class AVDecoder : public MObject{
 
 		void close();
 
+		void setSsrc( uint32_t ssrc );
+
 	private:
 		static void ffmpegReleaseBuffer( struct AVCodecContext * context, AVFrame * frame );
 		static int ffmpegGetBuffer( struct AVCodecContext * context, AVFrame * frame );
@@ -56,6 +58,8 @@ class AVDecoder : public MObject{
 
 		AVCodec * codec;
 		AVCodecContext * context;
+
+		uint32_t ssrc;
 
 };
 

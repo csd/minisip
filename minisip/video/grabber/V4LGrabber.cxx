@@ -21,8 +21,8 @@
 */
 
 #include"V4LGrabber.h"
+#include"../VideoMedia.h"
 #include"../ImageHandler.h"
-#include"../mixer/ImageMixer.h"
 #include<stdio.h>
 #include<fcntl.h>
 #include<sys/ioctl.h>
@@ -41,7 +41,6 @@ V4LGrabber::V4LGrabber( string device ):device(device){
 	imageFormat = NULL;
         imageWindow = NULL;
 	stopped = false;
-	mixer = NULL;
 }
 
 void V4LGrabber::open(){

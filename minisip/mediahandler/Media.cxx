@@ -71,16 +71,10 @@ void Media::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
 	sendersLock.unlock();
 }
 
-void Media::registerMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	receiversLock.lock();
-	receivers.push_back( receiver );
-	receiversLock.unlock();
+void Media::registerMediaSource( uint32_t ssrc ){
 }
 
-void Media::unRegisterMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	receiversLock.lock();
-	receivers.remove( receiver );
-	receiversLock.unlock();
+void Media::unRegisterMediaSource( uint32_t ssrc ){
 }
 
 void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
@@ -150,15 +144,12 @@ void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
 	}
 }
 
-void AudioMedia::registerMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	Media::registerMediaReceiver( receiver );
-	soundIo->registerSource( receiver->getId() );
+void AudioMedia::registerMediaSource( uint32_t ssrc ){
+	soundIo->registerSource( ssrc );
 }
 
-void AudioMedia::unRegisterMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	Media::unRegisterMediaReceiver( receiver );
-
-	soundIo->unRegisterSource( receiver->getId() );
+void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
+	soundIo->unRegisterSource( ssrc );
 }
 
 void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts ){
@@ -182,14 +173,14 @@ void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, 
 		buffer2[2*i+1] = output[80+i]/32; // /32 to reduce the output volume ...
 	}
 	
-	soundIo->pushSound( receiverId, buffer1, 
+	soundIo->pushSound( ssrc, buffer1, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 	
-	soundIo->pushSound( receiverId, buffer2, 
+	soundIo->pushSound( ssrc, buffer2, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 #else
 
-	soundIo->pushSound( receiverId, output, 
+	soundIo->pushSound( ssrc, output, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 		
 #endif
@@ -230,125 +221,3 @@ void AudioMedia::srcb_handleSound( void * data ){
 	sendData( encoded, encodedLength, seqNo * ((AudioCodec*)*codec)->getInputNrSamples() );
 	seqNo ++;
 }
-
-#ifdef VIDEO_SUPPORT
-
-VideoMedia::VideoMedia( MRef<VideoCodec *> codec, MRef<VideoDisplay *> display, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
-		Media( *codec ),display(display),grabber(grabber),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
-	
-	receive = true;
-	send = (!grabber.isNull());
-	index = 0;
-        packetLoss = false;
-        expectedSeqNo = 0;
-	codec->setDisplay( display );
-	codec->setGrabber( grabber );
-	codec->setEncoderCallback( this );
-	sendingWidth = 176;
-	sendingHeight = 144;
-
-	addSdpAttribute( "framesize:34 " + itoa( receivingWidth ) + "-" + itoa( receivingHeight ) );
-}
-
-
-string VideoMedia::getSdpMediaType(){
-
-	return "video";
-}
-
-void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
-	string framesizeString = m->getAttribute( "framesize", 0 );
-	cerr << "FRAMESIZE" << framesizeString << endl;
-	if( framesizeString != "" ){
-		size_t space = framesizeString.find( " " );
-		size_t coma = framesizeString.find( "-" );
-
-		if( space != string::npos && coma != string::npos ){
-			string widthString = framesizeString.substr( space+1,coma );
-			string heightString = framesizeString.substr( coma+1, framesizeString.size() );
-
-			sendingWidth = atoi( widthString.c_str() );
-			sendingHeight = atoi( heightString.c_str() );
-		}
-	}
-}
-
-void VideoMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts ){
-	
-        if( seqNo != expectedSeqNo + 1 ){
-                packetLoss = true;
-#ifdef DEBUG_OUTPUT
-                merr << "Packet lost in video stream, dropping one frame" << end;
-#endif
-        }
-
-        expectedSeqNo = seqNo;
-
-        if( !packetLoss ){
-	        memcpy( frame + index, data + 4, length - 4 );
-	        index += length - 4 ;
-        
-        }
-        
-        if( marker ){
-                if( ! packetLoss ){
-                        /* We have a frame */
-                        ((VideoCodec *)*codec)->decode( frame, index );
-                }
-                index = 0;
-                packetLoss = false;
-        }
-}
-
-void VideoMedia::sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
-	Media::sendData( data, length, ts, marker );
-}
-
-void VideoMedia::registerMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	receiversLock.lock();
-	if( receivers.size() == 0 ){
-		receiversLock.unlock();
-		((VideoCodec *)*codec)->startReceive( receivingWidth, receivingHeight );
-		receiversLock.lock();
-	}
-
-	receivers.push_back( receiver );
-	receiversLock.unlock();
-}
-
-void VideoMedia::unRegisterMediaReceiver( MRef<MediaStreamReceiver *> receiver ){
-	receiversLock.lock();
-	receivers.remove( receiver );
-	receiversLock.unlock();
-
-	if( receivers.size() == 0 ){
-		((VideoCodec *)*codec)->stopReceive();
-	}
-}
-
-void VideoMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
-	sendersLock.lock();
-	if( senders.size() == 0 ){
-		sendersLock.unlock();
-		((VideoCodec *)*codec)->startSend( sendingWidth, sendingHeight );
-		sendersLock.lock();
-	}
-
-	senders.push_back( sender );
-	sendersLock.unlock();
-}
-
-void VideoMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
-	sendersLock.lock();
-	senders.remove( sender );
-	sendersLock.unlock();
-
-	if( senders.size() == 0 ){
-		((VideoCodec *)*codec)->stopSend();
-	}
-}
-
-
-
-
-#endif

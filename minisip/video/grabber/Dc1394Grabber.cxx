@@ -22,7 +22,7 @@
 
 #include"Dc1394Grabber.h"
 #include"../ImageHandler.h"
-#include"../mixer/ImageMixer.h"
+#include"../VideoMedia.h"
 #include<stdio.h>
 
 
@@ -38,7 +38,6 @@ static void yuv422_to_yuv420p(MData *dst, const MData *src,
 Dc1394Grabber::Dc1394Grabber( uint32_t portId, uint32_t cameraId ){
 	this->portId = portId;
 	this->cameraId = cameraId;
-	this->mixer = NULL;
 }
 
 void Dc1394Grabber::open(){
@@ -203,10 +202,12 @@ void Dc1394Grabber::read( ImageHandler * handler ){
 				   handlerInputWidth, handlerInputHeight,
 				   downsamplingFactor );
 
+		/*
 		if( mixer ){
 			mixer->removeMixedImage( oldImage );
 			mixer->addMixedImage( image );
 		}
+		*/
 
 		if( handler ){
 			handler->handle( image );

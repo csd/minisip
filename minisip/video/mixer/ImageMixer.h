@@ -27,6 +27,8 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
+#include"../VideoMedia.h"
+
 
 class ImageMixer : public ImageHandler, public MObject{
 	public:
@@ -39,29 +41,37 @@ class ImageMixer : public ImageHandler, public MObject{
                 virtual void handle( MImage * );
 
                 virtual MImage * provideImage();
+                
+		virtual MImage * provideImage( uint32_t ssrc );
                 virtual void releaseImage( MImage * );
                 virtual bool providesImage();
 
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();
 
-		void addMixedImage( MImage * image );
-		void removeMixedImage( MImage * image );
+		virtual void selectMainSource( uint32_t ssrc );
 
-		void setOutput( ImageHandler * output );
+		virtual void setOutput( ImageHandler * output );
+
+		virtual void mix( MImage * image );
+
+		void setMedia( MRef<VideoMedia *> media );
 
 		virtual std::string getMemObjectType(){return "ImageMixer";};
 	private:
 		ImageHandler * output;
 
-	 	std::list<MImage *> mixedImages;
-		Mutex mixedImagesLock;
-
 		uint32_t width;
 		uint32_t height;
 
+		uint32_t mainSource;
+
+		MRef<VideoMedia *> media;
+
+		MImage * images[MAX_SOURCES];
+		uint32_t nImagesToMix;
+
 		
 };
-
 
 #endif

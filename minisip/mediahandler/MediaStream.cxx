@@ -191,13 +191,19 @@ uint32_t MediaStreamReceiver::getId(){
 }
 
 void MediaStreamReceiver::start(){
-	media->registerMediaReceiver( this );
 	rtpReceiver->registerMediaStream( this );
 }
 
 void MediaStreamReceiver::stop(){
+	list<uint32_t>::iterator i;
 	rtpReceiver->unregisterMediaStream( this );
-	media->unRegisterMediaReceiver( this );
+
+	ssrcListLock.lock();
+	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
+		media->unRegisterMediaSource( *i );
+	}
+	ssrcList.clear();
+	ssrcListLock.unlock();
 }
 
 
@@ -213,7 +219,6 @@ void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
 	
 	if( packet->unprotect( getCryptoContext( packetSsrc ) )){
 		// Authentication or replay protection failed
-		cerr << "Marker was: "<< packet->getHeader().getMarker()<< endl;
 		return;
 	}
 
@@ -223,7 +228,26 @@ void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
 	bool marker = packet->getHeader().getMarker();
 	uint32_t ts = packet->getHeader().getTimestamp();
 
+	gotSsrc( packetSsrc );
+
 	media->playData( id, data, size, packetSsrc, seqNo, marker, ts );
+}
+
+void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
+	list<uint32_t>::iterator i;
+
+	ssrcListLock.lock();
+	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
+		if( (*i) == ssrc ){
+			ssrcListLock.unlock();
+			return;
+		}
+	}
+	fprintf( stderr, "Registering media stream %s\n", media->getSdpMediaType().c_str() );
+	
+	media->registerMediaSource( ssrc );
+	ssrcList.push_back( ssrc );
+	ssrcListLock.unlock();
 }
 
 MediaStreamSender::MediaStreamSender( MRef<Media *> media ):

@@ -32,7 +32,7 @@ XvDisplay::XvDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->height = height;
 	xvPort = -1;
 
-	openDisplay();
+	//openDisplay();
 }
 
 void XvDisplay::openDisplay(){
@@ -141,8 +141,10 @@ void XvDisplay::createWindow(){
 	bool configureNotifySent = false;
 	XEvent event;
 
-	this->height = height;
-	this->width = width;
+	this->height = this->baseWindowHeight = height;
+	this->width = this->baseWindowWidth = width;
+
+	openDisplay();
 
 	/* Create the window */
 
@@ -166,7 +168,7 @@ void XvDisplay::createWindow(){
                            CWBackingStore | CWBackPixel | CWEventMask,
                            &windowAttributes );
 
-	XSetWMNormalHints( display, baseWindow, &sizeHints );
+	//XSetWMNormalHints( display, baseWindow, &sizeHints );
 
 	XStoreName( display, baseWindow, "Minisip XVideo" );
 
@@ -187,15 +189,15 @@ void XvDisplay::createWindow(){
 		else if( ( event.type == ConfigureNotify )
 			&& ( event.xconfigure.window == baseWindow ) ){
 			configureNotifySent = true;
-			//p_win->i_width = xevent.xconfigure.width;
-			//p_win->i_height = xevent.xconfigure.height;
+			baseWindowWidth = event.xconfigure.width;
+			baseWindowHeight = event.xconfigure.height;
 		}
 	} while( !( exposeSent && configureNotifySent && mapNotifySent ) );
 
-    	XSelectInput( display, baseWindow,
-                  StructureNotifyMask | KeyPressMask |
-                  ButtonPressMask | ButtonReleaseMask |
-                  PointerMotionMask );
+    	XSelectInput( display, baseWindow, StructureNotifyMask );
+//                  StructureNotifyMask | KeyPressMask |
+//                  ButtonPressMask | ButtonReleaseMask |
+//                  PointerMotionMask );
 
 
 
@@ -220,12 +222,16 @@ void XvDisplay::createWindow(){
 }
 
 void XvDisplay::destroyWindow(){
+	XvUngrabPort( display, xvPort, CurrentTime );
 	XSync( display, False );
+	fprintf( stderr, "Destroying video window\n");
 	XDestroyWindow( display, videoWindow );
 	XFreeGC( display, gc );
 
+	fprintf( stderr, "Destroying base window\n");
 	XUnmapWindow( display, baseWindow );
 	XDestroyWindow( display, baseWindow );
+	XCloseDisplay( display );
 }
 
 MImage * XvDisplay::allocateImage(){
@@ -254,6 +260,8 @@ MImage * XvDisplay::allocateImage(){
 void XvDisplay::deallocateImage( MImage * mimage ){
 	char * imageData = ( char * )malloc( width * height * 3 );
 	XvImage * image = (XvImage *)mimage->privateData;
+
+	XFree( image );
 	
 	delete mimage;
 	
@@ -270,7 +278,7 @@ void XvDisplay::displayImage( MImage * mimage ){
                     (XvImage*)(mimage->privateData),
                     0 /*src_x*/, 0 /*src_y*/,
                     width, height,
-                    0 /*dest_x*/, 0 /*dest_y*/, width, height );
+                    0 /*dest_x*/, 0 /*dest_y*/, baseWindowWidth, baseWindowHeight );
 }
 
 uint32_t XvDisplay::getRequiredWidth(){
@@ -279,4 +287,26 @@ uint32_t XvDisplay::getRequiredWidth(){
 
 uint32_t XvDisplay::getRequiredHeight(){
 	return height;
+}
+
+void XvDisplay::handleEvents(){
+	XEvent xEvent;
+	
+	while( XCheckWindowEvent( display, baseWindow, 
+			StructureNotifyMask, &xEvent ) == True ){
+
+		if( xEvent.type == ConfigureNotify ){
+			fprintf( stderr, "Got ConfigureNotify event\n");
+			if( (uint32_t)xEvent.xconfigure.width 
+					!= baseWindowWidth ||
+			    (uint32_t)xEvent.xconfigure.height
+			                != baseWindowHeight ){
+				baseWindowWidth  = xEvent.xconfigure.width;
+				baseWindowHeight = xEvent.xconfigure.height;
+				XMoveResizeWindow( display, videoWindow, 0, 0, 
+					baseWindowWidth, baseWindowHeight );
+			}
+		}
+	}
+
 }
