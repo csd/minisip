@@ -5,8 +5,8 @@ Minisip is a SIP user agent. It implements both normal and secured
 (SRTP/MIKEY) VoIP calls.
 
 Requirements:
-   . libmsip, libmikey
-   . QT libraries, version 3.0+ or libglademm-2.0 for the GUI
+   . libmutil, libmnetutil, libmsip, libmikey
+   . libglademm-2.0 (and its dependencies: glib, GTK+, gtkmm, ...) for the GUI
 
 Installation:
    Please refer to the INSTALL file for installation instructions.
@@ -20,6 +20,8 @@ Installation:
 
    For the security features, you will need a X509 certificate (in its pem
    form) and the matching private key. You will find examples in test_cert/
+   
+   For the experimental video support, have a look at Documentation/video.
 
 License:
    Please refer to the COPYING file for license information.

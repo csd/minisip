@@ -1,4 +1,5 @@
-Initial version 0.0.1
----------------------
-
-    . First pre-release
+Version 0.7.0 (21/02/2005)
+- Spatial audio when having several simultaneous calls.
+- Experimental IPSEC support (--enable-ipsec-enable).
+- Support for libglademm >= 2.4.
+- Bugfixes (security, compatibility with Xlite, ...)
