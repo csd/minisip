@@ -101,8 +101,8 @@ void GroupListServer::run(){
 			//find correct GroupList and send it
 			for(uint32_t k=0;k<grpLists.size();k++){
 				
-				if(grpLists.at(k)->getGroupIdentity()==groupId){
-					socket->write("GET\r\n\r\n"+grpLists.at(k)->print());
+				if(grpLists[k]->getGroupIdentity()==groupId){
+					socket->write("GET\r\n\r\n"+grpLists[k]->print());
 					break;
 				}
 			}
@@ -160,8 +160,8 @@ void GroupListServer::addGroupList(MRef<GroupList*> grpList){
 MRef<GroupList*> GroupListServer::getGroupList(string groupId){
 	
 	for (uint32_t k=0; k<grpLists.size();k++){
-		if(grpLists.at(k)->getGroupIdentity()==groupId)
-			return grpLists.at(k);
+		if(grpLists[k]->getGroupIdentity()==groupId)
+			return grpLists[k];
 	}	
 
 	return NULL;
