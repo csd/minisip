@@ -62,9 +62,14 @@
 
 bool nprint=false;
 
+/* lookup tables without gain control */
 float lchvol[POS]={1,0.8,1,0.6,0};
 float rchvol[POS]={0,0.6,1,0.8,1};
 
+/* lookup tables for gain control
+float lchvol[POS][POS]={{1,0.8,1,0.6,0},{1,0,0,0,0},{0.5,0,0.5,0,0},{0.5,0.5,0,0.3,0},{0.5,0.5,0.5,0.3,0}};
+float rchvol[POS][POS]={{0,0.6,1,0.8,1},{0,0,0,0,1},{0,0,0.5,0,0.5},{0,0.3,0,0.5,0.5},{0,0.3,0.5,0.5,0.5}};
+*/
 
 SpAudio SoundIO::spAudio(5);
 
@@ -530,8 +535,15 @@ void SoundSource::initLookup(int32_t nSources){
 	cerr << "nSources in initLookup" << nSources << endl;
 	cerr << "sourcePos in initLookup" << position << endl;
    for(int32_t i=0;i<65536;i++){
-     lookupleft[i]=(short)((float)(i-32768)*lchvol[position-1]/nSources);
-     lookupright[i]=(short)((float)(i-32768)*rchvol[position-1]/nSources);
+     /* without gain control */
+     lookupleft[i]=(short)((float)(i-32768)*lchvol[position-1]);
+     lookupright[i]=(short)((float)(i-32768)*rchvol[position-1]);
+     
+     /* with gain control 
+     lookupleft[i]=(short)((float)(i-32768)*lchvol[nSources-1][position-1]);
+     lookupright[i]=(short)((float)(i-32768)*rchvol[nSources-1][position-1]);
+     */
+
    } 
    
 }

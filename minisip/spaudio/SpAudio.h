@@ -24,7 +24,7 @@
 #ifndef SPATIAL_AUDIO_H
 #define SPATIAL_AUDIO_H
 
-#include<samplerate.h> //include this in the installation instructions
+#include<samplerate.h>
 #include<libmutil/MemObject.h>
 
 
@@ -41,25 +41,8 @@ class SpAudio{
 
   int32_t getNumPos();
 
-  /*
-  void resample (short *input,
-		 short *output, 
-		 int32_t isize,
-		 int32_t osize, 
-		 SRC_DATA *src_data,
-		 SRC_STATE *src_state);
-
-  */
-
   int32_t spatialize (short *input,
-		  /*
-		      short *leftch,
-		      short *rightch,
-		      short *lookupleft,
-		      short *lookupright,
-		      int32_t position,
-		      int32_t pointer,
-		      */
+
 		      MRef<SoundSource *> src,
 		      short *outbuff);
 
