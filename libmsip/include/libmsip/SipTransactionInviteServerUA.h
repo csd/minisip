@@ -56,6 +56,9 @@ class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServe
 		
 		virtual ~SipTransactionInviteServerUA();
 
+		//virtual bool handleCommand(const SipSMCommand &command);
+
+
 		virtual string getName(){return "transaction_ua_invite_server[branch="+getBranch()+"]";}
 
 		void changeStateMachine();

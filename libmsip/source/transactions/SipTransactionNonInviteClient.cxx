@@ -23,7 +23,7 @@
 
 
 /* Name
- * 	SipTransactionClient.cxx
+ * 	SipTransactionNonInviteClient.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -34,7 +34,7 @@
 
 #include<assert.h>
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipTransactionClient.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipCommandString.h>
@@ -43,7 +43,7 @@
 #include<libmutil/dbg.h>
 #endif
 
-bool SipTransactionClient::a0_start_trying_request( const SipSMCommand &command) {
+bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand &command) {
 	if (transitionMatch(command, IGN, SipSMCommand::TU,IGN)){
 #ifdef DEBUG_OUTPUT
 		setDebugTransType(command.getCommandPacket()->getTypeString() );
@@ -58,7 +58,7 @@ bool SipTransactionClient::a0_start_trying_request( const SipSMCommand &command)
 	}
 }
 
-bool SipTransactionClient::a1_trying_proceeding_1xx( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
 		cancelTimeout("timerE");
@@ -75,7 +75,7 @@ bool SipTransactionClient::a1_trying_proceeding_1xx( const SipSMCommand &command
 	}
 }
 
-bool SipTransactionClient::a2_trying_terminated_TimerFOrErr( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipCommandString::transport_error) 
 			|| transitionMatch(command, "timerF")){
@@ -100,7 +100,7 @@ bool SipTransactionClient::a2_trying_terminated_TimerFOrErr( const SipSMCommand 
 	}
 }
 
-bool SipTransactionClient::a3_proceeding_completed_non1xxresp( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const SipSMCommand &command){
 
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
@@ -119,7 +119,7 @@ bool SipTransactionClient::a3_proceeding_completed_non1xxresp( const SipSMComman
 	}
 }
 
-bool SipTransactionClient::a4_proceeding_proceeding_timerE( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSMCommand &command){
 	
 	if (transitionMatch(command, "timerE")){
 		assert(!lastRequest.isNull());
@@ -131,7 +131,7 @@ bool SipTransactionClient::a4_proceeding_proceeding_timerE( const SipSMCommand &
 	}
 }
 
-bool SipTransactionClient::a5_proceeding_proceeding_1xx( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
@@ -147,7 +147,7 @@ bool SipTransactionClient::a5_proceeding_proceeding_1xx( const SipSMCommand &com
 }
 
 //TODO: make sure  transport_error is sent when it should be
-bool SipTransactionClient::a6_proceeding_terminated_transperrOrTimerF( const SipSMCommand &command){
+bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( const SipSMCommand &command){
 		
 	if (transitionMatch(command, SipCommandString::transport_error) || transitionMatch(command, "timerF")){
 
@@ -171,7 +171,7 @@ bool SipTransactionClient::a6_proceeding_terminated_transperrOrTimerF( const Sip
 }
 
 
-bool SipTransactionClient::a7_trying_completed_non1xxresp( const SipSMCommand &command) {
+bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMCommand &command) {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		cancelTimeout("timerE");
@@ -190,7 +190,7 @@ bool SipTransactionClient::a7_trying_completed_non1xxresp( const SipSMCommand &c
 	}
 }
 
-bool SipTransactionClient::a8_trying_trying_timerE( const SipSMCommand &command) {
+bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand &command) {
 		
 	if (transitionMatch(command, "timerE")){
 		requestTimeout(1000,"timerE");
@@ -203,7 +203,7 @@ bool SipTransactionClient::a8_trying_trying_timerE( const SipSMCommand &command)
 	}
 }
 
-bool SipTransactionClient::a9_completed_terminated_timerK( const SipSMCommand &command) {
+bool SipTransactionNonInviteClient::a9_completed_terminated_timerK( const SipSMCommand &command) {
 	if (transitionMatch(command, "timerK")){
 		SipSMCommand cmd(
 			CommandString( callId, SipCommandString::transaction_terminated),
@@ -216,7 +216,7 @@ bool SipTransactionClient::a9_completed_terminated_timerK( const SipSMCommand &c
 	}
 }
 
-void SipTransactionClient::setUpStateMachine(){
+void SipTransactionNonInviteClient::setUpStateMachine(){
 	
 	State<SipSMCommand,string> *s_start=new State<SipSMCommand,string>(this,"start");
 	addState(s_start);
@@ -235,43 +235,43 @@ void SipTransactionClient::setUpStateMachine(){
 
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_request",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a0_start_trying_request, 
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a0_start_trying_request, 
 			s_start, s_trying);
 	
 	new StateTransition<SipSMCommand,string>(this, "transition_trying_proceeding_1xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a1_trying_proceeding_1xx, 
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a1_trying_proceeding_1xx, 
 			s_trying, s_proceeding);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_trying_terminated_TimerFOrErr",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a2_trying_terminated_TimerFOrErr, 
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr, 
 			s_trying, s_terminated);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_non1xxresp",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a3_proceeding_completed_non1xxresp, 
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp, 
 			s_proceeding, s_completed);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_timerE",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a4_proceeding_proceeding_timerE,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE,
 			s_proceeding, s_proceeding);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_1xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a5_proceeding_proceeding_1xx,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx,
 			s_proceeding, s_proceeding);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_terminated_transperrOrTimerF",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a6_proceeding_terminated_transperrOrTimerF,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF,
 			s_proceeding, s_terminated);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_trying_completed_non1xxresp",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a7_trying_completed_non1xxresp,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a7_trying_completed_non1xxresp,
 			s_trying, s_completed);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_trying_trying_timerE",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a8_trying_trying_timerE,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a8_trying_trying_timerE,
 			s_trying, s_trying);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_completed_terminated_timerK",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionClient::a9_completed_terminated_timerK,
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a9_completed_terminated_timerK,
 			s_completed, s_terminated);
 
 	setCurrentState(s_start);
@@ -279,10 +279,10 @@ void SipTransactionClient::setUpStateMachine(){
 
 
 
-SipTransactionClient::SipTransactionClient(
+SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
-			SipTransaction(/*"SipTransactionClient",*/ d, seq_no, "", callid),
+			SipTransaction(/*"SipTransactionNonInviteClient",*/ d, seq_no, "", callid),
 			lastRequest(NULL),
 			timerT1(500)
 {
@@ -291,6 +291,6 @@ SipTransactionClient::SipTransactionClient(
 	setUpStateMachine();
 }
 
-SipTransactionClient::~SipTransactionClient(){
+SipTransactionNonInviteClient::~SipTransactionNonInviteClient(){
 }
 

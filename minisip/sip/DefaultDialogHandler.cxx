@@ -33,8 +33,8 @@
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipTransactionServer.h>
-#include<libmsip/SipTransactionClient.h>
+#include<libmsip/SipTransactionNonInviteServer.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
 #include"../p2t/SipDialogP2T.h"
 #include"../p2t/SipDialogP2Tuser.h"
 #include"../mediahandler/MediaHandler.h"
@@ -149,7 +149,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #endif			
 		string branch = im->getDestinationBranch();
 
-		MRef<SipTransaction*> trans = new SipTransactionServer(this, im->getCSeq(), branch, im->getCallId());
+		MRef<SipTransaction*> trans = new SipTransactionNonInviteServer(this, im->getCSeq(), branch, im->getCallId());
 		registerTransaction(trans);
 
 		SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::transaction);
@@ -232,7 +232,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
 		int im_seq_no= requestSeqNo();
-		MRef<SipTransaction*> trans = new SipTransactionClient(this, im_seq_no, dialogState.callId);
+		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, im_seq_no, dialogState.callId);
 		mdbg << "WWWWWWW: transaction created, branch id is <"<<trans->getBranch()<<">."<< end; 
 		//cerr << "command standard arguments is <"<< command.getCommandString().getString() <<">"<< endl;
 		registerTransaction(trans);

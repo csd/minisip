@@ -62,3 +62,4 @@ bool LIBMSIP_API transitionMatch(const SipSMCommand &command,
 	int destination=IGN);
 
 #endif
+

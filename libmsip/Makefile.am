@@ -20,8 +20,8 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipMIMEContent.cxx \
                      source/transactions/SipTransactionUtils.cxx \
                      source/transactions/SipTransaction.cxx \
-		     source/transactions/SipTransactionClient.cxx \
-		     source/transactions/SipTransactionServer.cxx \
+		     source/transactions/SipTransactionNonInviteClient.cxx \
+		     source/transactions/SipTransactionNonInviteServer.cxx \
 		     source/transactions/SipTransactionInviteClient.cxx \
 		     source/transactions/SipTransactionInviteServer.cxx \
 		     source/transactions/SipTransactionInviteClientUA.cxx \

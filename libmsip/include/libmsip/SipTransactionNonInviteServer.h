@@ -32,31 +32,21 @@
 
 
 
-#ifndef SIPTRANSACTIONSERVER_H
-#define SIPTRANSACTIONSERVER_H
-
-#ifdef _MSC_VER
-#ifdef LIBMSIP_EXPORTS
-#define LIBMSIP_API __declspec(dllexport)
-#else
-#define LIBMSIP_API __declspec(dllimport)
-#endif
-#else
-#define LIBMSIP_API
-#endif
+#ifndef SIPTRANSACTIONNONINVITESERVER_H
+#define SIPTRANSACTIONNONINVITESERVER_H
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
 
-class LIBMSIP_API SipTransactionServer: public SipTransaction{
+class SipTransactionNonInviteServer: public SipTransaction{
 	public:
-		SipTransactionServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+		SipTransactionNonInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		
-		virtual ~SipTransactionServer();
+		virtual ~SipTransactionNonInviteServer();
 
-		virtual string getName(){return "transaction_server[branch="+getBranch()+",type="+getDebugTransType()+"]";}
+		virtual string getName(){return "transaction_noninviteserver[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
 		void setUpStateMachine();
 

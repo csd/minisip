@@ -36,8 +36,8 @@
 #include<libmsip/SipSubscribe.h>
 #include<libmsip/SipNotify.h>
 #include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipTransactionClient.h>
-#include<libmsip/SipTransactionServer.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
+#include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
@@ -101,7 +101,7 @@ stop_presence|    +------+
 
 void SipDialogPresenceClient::createSubscribeClientTransaction(){
 	int seqNo = requestSeqNo();
-	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, dialogState.callId);
+	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(MRef<SipDialog *>(this), seqNo, dialogState.callId);
 //	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
 	registerTransaction(subscribetrans);
 	sendSubscribe(subscribetrans->getBranch());

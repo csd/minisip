@@ -43,3 +43,4 @@ class LIBMSIP_API SipExceptionInvalidStart : public SipException {};
 class LIBMSIP_API SipExceptionInvalidURI : public SipExceptionInvalidMessage {};
 
 #endif
+

@@ -28,7 +28,7 @@
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipTransactionClient.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipRegister.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipCommandString.h>
@@ -87,7 +87,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 			int seqNo;
 			setSeqNo(seqNo = requestSeqNo());
 			
-			MRef<SipTransaction*> trans = new SipTransactionClient(this, seqNo, dialogState.callId);
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, seqNo, dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
                         CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
@@ -127,7 +127,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
                 int seqNo;
                 setSeqNo(seqNo = requestSeqNo());
 
-                MRef<SipTransaction*> trans( new SipTransactionClient(this, seqNo, dialogState.callId));
+                MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, seqNo, dialogState.callId));
                 registerTransaction(trans);
 
                 //extract authentication info from received response
@@ -193,7 +193,7 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 		int seqNo;
 		setSeqNo(seqNo = requestSeqNo());
 
-		MRef<SipTransaction*> trans( new SipTransactionClient(this, seqNo, dialogState.callId));
+		MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, seqNo, dialogState.callId));
 		registerTransaction(trans);
 
 		send_auth(trans->getBranch());
@@ -297,7 +297,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 			int seqNo;
 			setSeqNo(seqNo = requestSeqNo());
 			
-			MRef<SipTransaction*> trans = new SipTransactionClient(this, seqNo,dialogState.callId);
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, seqNo,dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
 			

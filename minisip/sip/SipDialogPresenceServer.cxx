@@ -36,8 +36,8 @@
 #include<libmsip/SipSubscribe.h>
 #include<libmsip/SipNotify.h>
 #include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipTransactionClient.h>
-#include<libmsip/SipTransactionServer.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
+#include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
@@ -236,7 +236,7 @@ SipDialogPresenceServer::~SipDialogPresenceServer(){
 void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ //FIXME: use onlineStatus 
 	int seqNo = requestSeqNo();
 	string cid = "FIXME"+itoa(rand());
-	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, /*callId*/cid);
+	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(MRef<SipDialog *>(this), seqNo, /*callId*/cid);
 	registerTransaction(subscribetrans);
 	sendNotify(subscribetrans->getBranch(), user, cid);
 
@@ -251,7 +251,7 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 }
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
-	MRef<SipTransaction*> sr( new SipTransactionServer(MRef<SipDialog*>(this),
+	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(MRef<SipDialog*>(this),
 				sub->getCSeq(),
 				sub->getLastViaBranch(),
 				sub->getCallId()) );
