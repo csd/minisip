@@ -800,17 +800,20 @@ int MsipIpsecSA::set(){
 		//u_int32_t max = htonl(12000);
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_getspi(so, satype, mode, src, dst, min, max, reqid, seq);
-		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 		if (result == -1){
 			return result;
 		}
 		caddr_t next[18];
-		result = pfkey_align (msg, next);
+		if ((msg = pfkey_recv(so)) == NULL)
+			cerr << "ERROR: pfkey_recv failure!";
+		if (pfkey_align(msg, next) < 0)
+			cerr << "ERROR: pfkey_align failure!";
 		result = pfkey_check(next);
 		m_sa = (struct sadb_sa *)next[SADB_EXT_SA];
 		spi = m_sa->sadb_sa_spi;
 		exist = true;
+		free(msg);
 		return (int)spi;
 	}
 	if(spi && !exist && valid) {
@@ -825,13 +828,10 @@ int MsipIpsecSA::set(){
 		}
 		
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		ts.save("pfkey_send_add");
 		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
 					flags, l_alloc, l_bytes, l_addtime, l_usetime, seq);
-		ts.save("pfkey_send_add");
 		msg = pfkey_recv(so);
-		ts.save("pfkey_send_add");
 /* end---------------------------------------------------------------------------------**********************/
 		if (result == -1){
 			merr << "Problem with IPSEC pfkey_send_add: " << end;
@@ -839,6 +839,7 @@ int MsipIpsecSA::set(){
 		}
 		exist = true;
 		free (keymat);
+		free(msg);
 		return spi;
 	}	
 	return 0;
@@ -860,6 +861,7 @@ int MsipIpsecSA::remove(bool valid){
 /* end --------------------------------------------------------------------------------**********************/
 		exist = false;
 		this->valid = valid;
+		free(msg);
 		return result;
 	}
 	else
@@ -903,7 +905,6 @@ int MsipIpsecPolicy::set(){
 	// There might be a good idea to check the result & return values below!!!
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 	result = pfkey_send_spdadd(so, src, prefs, dst, prefd, proto, pol, len, seq); 
-
 	caddr_t mhp[SADB_EXT_MAX + 1];
 	if ((msg = pfkey_recv(so)) == NULL)
 		cerr << "ERROR: pfkey_recv failure!";
@@ -915,6 +916,7 @@ int MsipIpsecPolicy::set(){
 /* end --------------------------------------------------------------------------------**********************/
 	exist = true;
 	free(pol);
+	free(msg);
 	return result;
 }
 
@@ -928,16 +930,14 @@ int MsipIpsecPolicy::remove(bool valid){
 	int result;
 	struct sadb_msg *msg;
 	if(exist){
-		caddr_t pol = ipsec_set_policy(policy, policylen);
-		int len = ipsec_get_policylen(pol);	
+			
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 		result = pfkey_send_spddelete2(so, spid);
-		//result = pfkey_send_spddelete(so, src, prefs, dst, prefd, proto, pol, len, seq);
-		//msg = pfkey_recv(so);
+		msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 		exist = false;
 		this->valid = valid;
-		free(pol);
+		free(msg);
 		return result;
 	}
 	return 0;
