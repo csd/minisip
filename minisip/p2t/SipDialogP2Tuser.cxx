@@ -1153,9 +1153,9 @@ void SipDialogP2Tuser::setUpStateMachine(){
 
 
 
-SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, 
+SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, 
 	MRef<SipSoftPhoneConfiguration*> pconf, MRef<SipDialogP2T*>p2tDialog) : 
-                SipDialog(dContainer,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf)
 {

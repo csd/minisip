@@ -396,7 +396,7 @@ bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
 
 void MinisipTextUI::showCalls(string command){
 	//list<MRef<SipDialog*> > *calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
-	list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 	displayMessage(string("Calls:"));
 	if (calls.size()==0)
 		displayMessage("    (no calls)");
@@ -413,7 +413,7 @@ void MinisipTextUI::showCalls(string command){
 }
 
 void MinisipTextUI::showTransactions(string command){
-	list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
 	string tno = trim(command).substr(17);
 	int itno=0;
@@ -548,12 +548,12 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, st
 }
 
 void MinisipTextUI::showStat(string command){
-	list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
 	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->timeoutProvider->getTimeoutRequests();
 
 //	displayMessage(" Default dialog handler:", bold);
-	showDialogInfo(config->sip->getDialogContainer()->getDefaultHandler(), false, "  Default dialog handler: ");
+	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(), false, "  Default dialog handler: ");
 
 	displayMessage(" Calls:", bold);
 	if (calls.size()==0)
@@ -731,7 +731,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	if (command == "show all"){
 		showCalls(command);
 
-		list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
+		list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 		for (uint32_t i=0; i<calls.size(); i++){
 			showTransactions("show transactions "+itoa(i));
 		}

@@ -42,7 +42,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/cert.h>
 
-#include<libmsip/SipMessageTransport.h>
+//#include<libmsip/SipMessageTransport.h>
 
 #include<libmsip/SipDialogConfig.h>
 #include"SipDialogSecurityConfig.h"

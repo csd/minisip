@@ -68,24 +68,37 @@
 #endif
 
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipStack.h>
 
 
 class SipSoftPhoneConfiguration;
 class LogEntry;
 class MediaHandler;
 
+
 using namespace std;
 
-class Sip: public SipSMCommandReceiver, public Runnable{
+class Sip: public MObject, public Runnable{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
-		    MRef<MediaHandler*> mediaHandler);
+				MRef<MediaHandler*> mediaHandler,
+				string localIpString,
+				string externalContactIP,
+				int32_t localUdpPort=5060,
+				int32_t localTcpPort=5060,
+				int32_t externalContactUdpPort=5060,
+				string defaultTransportProtocol="UDP"
+#ifndef NO_SECURITY
+				,int32_t localTlsPort=5061,
+				MRef<certificate_chain *> cert=NULL,    //The certificate chain is used by TLS
+				//TODO: TLS should use the whole chain instead of only the f$
+				MRef<ca_db *> cert_db = NULL
+#endif
+		    );
 
 		virtual std::string getMemObjectType(){return "Sip";}
 		
-		void init();
-
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig();
 		
                 virtual void run();
@@ -94,23 +107,25 @@ class Sip: public SipSMCommandReceiver, public Runnable{
 
 		string invite(string &user);
 
-		MRef<SipDialogContainer*> getDialogContainer(){return dialogContainer;}
+		MRef<SipStack*>	getSipStack(){return sipstack;}
+//		MRef<SipDialogContainer*> getDialogContainer();//{return dialogContainer;}
 
 		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
 
-		bool handleCommand(const SipSMCommand &command);
+//		bool handleCommand(const SipSMCommand &command);
 		
-		void setCallback(SipCallback *callback);
-
-		SipCallback *getCallback();
+//		void setCallback(SipCallback *callback);
+//
+//		SipCallback *getCallback();
                 
 	private:
+		MRef<SipStack *> sipstack;
 		MRef<SipSoftPhoneConfiguration*> phoneconfig;
 		MRef<MediaHandler *> mediaHandler;
 		
-		SipCallback *callback;
+//		SipCallback *callback;
 
-		MRef<SipDialogContainer*> dialogContainer;
+//		MRef<SipDialogContainer*> dialogContainer;
                 
 };
 

@@ -41,54 +41,71 @@
 #include"../p2t/GroupListClient.h"
 #include"../p2t/GroupListServer.h"
 #include"../p2t/GroupList.h"
-#include"../mediahandler/MediaHandler.h"
 #include"PresenceMessageContent.h"
 
 #include<assert.h>
 
 #include<libmutil/dbg.h>
 
-Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler){
-	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
+Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler,
+		string localIpString, 
+		string externalContactIP, 
+		int32_t localUdpPort,
+		int32_t localTcpPort,
+		int32_t externalContactUdpPort,
+		string defaultTransportProtocol
+#ifndef NO_SECURITY
+		,int32_t localTlsPort,
+		MRef<certificate_chain *> cert_chain,
+		MRef<ca_db *> cert_db
+#endif
+
+		
+		){
+//	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
+	
+
+
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
 	
-#ifdef MINISIP_MEMDEBUG 
-	phoneconfig.setUser("Sip/addr:phoneconfig");
-#endif
+	sipstack = new SipStack(/*defaultDialogHandler*/ NULL, localIpString, externalContactIP,localUdpPort,localTcpPort,
+			externalContactUdpPort,defaultTransportProtocol,localTlsPort,cert_chain,cert_db
+			);
 
+	sipstack->init();
+	
 	MRef<SipDialogConfig*> callconf = new SipDialogConfig(phoneconfig->inherited);
-	MRef<DefaultDialogHandler*> defaultDialogHandler = 
-			MRef<DefaultDialogHandler*>( new DefaultDialogHandler(dialogContainer,callconf,phoneconfig,mediaHandler) );
+	MRef<DefaultDialogHandler*> defaultDialogHandler = new DefaultDialogHandler(sipstack,
+					callconf,phoneconfig,mediaHandler);
 	
-#ifdef MINISIP_MEMDEBUG
-	defaultDialogHandler.setUser("Sip/attr:defaultDialogHandler");
-#endif
-	
-	dialogContainer->setDefaultHandler(MRef<SipDialog*>(*defaultDialogHandler));
+	sipstack->setDefaultHandler(MRef<SipDialog*>(*defaultDialogHandler));
 
-}
 
-void Sip::init(){
-	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
+	//Register content factories that are able to parse the content of
+	//sip messages. text/plain, multipart/mixed, multipart/alternative
+	//and multipart/parallel are implemented by libmsip
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/mikey", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("application/xpidf+xml", presenceSipMessageContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
-	phoneconfig->inherited.sipTransport->setSipSMCommandReceiver(this);
+
+
+
 }
 
+
+/*
 void Sip::setCallback(SipCallback *callback){
 	this->callback = callback;
 	dialogContainer->setCallback(callback);
 }
+*/
 
-
+/*
 SipCallback *Sip::getCallback(){
 	return callback;
 }
+*/
 
 /*
 void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
@@ -179,14 +196,11 @@ MRef<Session *> mediaSession =
 	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	
 #else	
-	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipCall( new SipDialogVoip(sipstack, callconf, phoneconfig, mediaSession)); 
 
 #endif
 
-#ifdef MINISIP_MEMDEBUG 
-	voipCall.setUser("Sip");
-#endif
-	dialogContainer->addDialog(voipCall);
+	/*dialogContainer*/sipstack->addDialog(voipCall);
 	
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifndef _MSC_VER
@@ -194,21 +208,27 @@ MRef<Session *> mediaSession =
 #endif
 	
         SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
-	dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+	
+	sipstack->handleCommand(cmd);
+	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipCall->getCallId();
 }
 
 
 void Sip::run(){
 
-	dialogContainer->run();
+	/*dialogContainer*/sipstack->run();
 }
 
 
+/*
 bool Sip::handleCommand(const SipSMCommand &command){
-	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	sipstack->handleCommand(command);
+//	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	
 	return true;
 }
+*/
 
 void Sip::setMediaHandler( MRef<MediaHandler *> mediaHandler ){
 	this->mediaHandler = mediaHandler;

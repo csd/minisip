@@ -160,14 +160,14 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 }
 
 void ConsoleDebugger::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
 		config->timeoutProvider->getTimeoutRequests();
 
 
 	cerr << "    (DefaultHandler) ";
-	showDialogInfo(config->sip->getDialogContainer()->getDefaultHandler(),false);
+	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(),false);
 	
 	cerr << BOLD << " Calls:" << PLAIN << endl;
 	if (calls.size()==0)

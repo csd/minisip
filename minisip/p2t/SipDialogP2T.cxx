@@ -1610,8 +1610,8 @@ void SipDialogP2T::setUpStateMachine(){
 }
 
 
-SipDialogP2T::SipDialogP2T(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf) : 
-                SipDialog(dContainer,callconfig,pconf->timeoutProvider),
+SipDialogP2T::SipDialogP2T(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf) : 
+                SipDialog(stack,callconfig,pconf->timeoutProvider),
 		phoneconf(pconf)
 {
 	

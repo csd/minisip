@@ -53,7 +53,7 @@ class LogEntry;
 
 class SipDialogPresenceClient: public SipDialog{
 	public:
-		SipDialogPresenceClient(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig/*, MRef<SipSoftPhoneConfiguration*> phoneconf,*/ , MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, bool use_stun);
+		SipDialogPresenceClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, bool use_stun);
 		
 		virtual ~SipDialogPresenceClient();
 

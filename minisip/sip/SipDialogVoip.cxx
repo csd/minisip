@@ -851,14 +851,14 @@ void SipDialogVoip::setUpStateMachine(){
 
 
 #ifdef IPSEC_SUPPORT
-SipDialogVoip::SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-                SipDialog(dContainer,callconfig, pconf->timeoutProvider),
+SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
+                SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
-SipDialogVoip::SipDialogVoip(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-                SipDialog(dContainer,callconfig, pconf->timeoutProvider),
+SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
+                SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession)

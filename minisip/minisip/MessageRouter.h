@@ -42,7 +42,7 @@ class MessageRouter: public SipCallback, public GuiCallback{
 		MessageRouter();
 		virtual ~MessageRouter(){}
 		
-		void setSipStateMachine(MRef<Sip*> ssp);
+		void setSip(MRef<Sip*> ssp);
 		void setGui(Gui *guiptr){gui = guiptr;};
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
 			this->mediaHandler = mediaHandler;}
@@ -57,7 +57,7 @@ class MessageRouter: public SipCallback, public GuiCallback{
 	private:
 		
 		Gui *gui;
-		MRef<Sip*> sip_machine;
+		MRef<Sip*> sip;
 		MRef<MediaHandler *> mediaHandler;
 };
 

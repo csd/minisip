@@ -31,6 +31,7 @@
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
+#include<libmsip/SipStack.h>
 #include<libmutil/StateMachine.h>
 #include<libmnetutil/IPAddress.h>
 #include"../codecs/Codec.h"
@@ -274,7 +275,7 @@ class SipDialogP2T: public SipDialog{
 		 * @param callconfig  the Call configuration
 		 * @param phoneconf   the Phone configuration
 		 */
-		SipDialogP2T(MRef<SipDialogContainer*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf);
+		SipDialogP2T(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf);
 		
 		/**
 		 * Deconstructor

@@ -32,13 +32,13 @@
 MessageRouter::MessageRouter(){
 }
 
-void MessageRouter::setSipStateMachine(MRef<Sip*> ssp){
-	if (ssp.isNull()){
+void MessageRouter::setSip(MRef<Sip*> s){
+	if (s.isNull()){
 #ifdef DEBUG_OUTPUT		
-		cerr << "ERROR: SipStateMachine is NULL in set_sip_state_machine in MessageRouter"<< endl;
+		cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
 #endif
 	}
-	sip_machine = ssp;
+	sip= s;
 }
 
 void MessageRouter::sipcb_handleCommand(CommandString &command){
@@ -52,12 +52,12 @@ void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
 
 string MessageRouter::guicb_doInvite(string user){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
-	return sip_machine->invite(user);
+	return sip->invite(user);
 }
 
 void MessageRouter::guicb_handleCommand(CommandString &cmd){
 	//return sip_machine->enqueueCommand(cmd);
 	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
-	sip_machine->handleCommand(sipcmd);
+	sip->getSipStack()->handleCommand(sipcmd);
 }
 

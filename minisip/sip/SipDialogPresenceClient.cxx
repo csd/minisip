@@ -271,12 +271,12 @@ void SipDialogPresenceClient::setUpStateMachine(){
 
 
 
-SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipDialogContainer*> dContainer, 
+SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack, 
 		//const SipDialogConfig &callconfig, 
 		MRef<SipDialogConfig*> callconfig,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, 
 		bool use_stun) : 
-                	SipDialog(dContainer,callconfig, tp),
+                	SipDialog(stack,callconfig, tp),
 			useSTUN(use_stun)
 {
 

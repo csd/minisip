@@ -8,6 +8,7 @@
 
 #ifdef TEXT_UI
 #include"gui/textui/MinisipTextUI.h"
+#include<libmutil/TextUI.h>
 #else //!TEXT_UI
 #ifdef GTK_GUI
 #include"gui/gtkgui/MainWindow.h"
@@ -38,7 +39,7 @@
 
 #include<libmsip/SipUtils.h>
 #include<exception>
-#include<libmutil/TextUI.h>
+#include<libmutil/Timestamp.h>
 
 extern TextUI *debugtextui;
 
@@ -82,7 +83,7 @@ static void *tls_server_thread(void *arg){
         assert( arg != NULL );
         MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
 	try{
-        	TLSServerSocket server(transport->getLocalTLSPort(),transport->getCertificate());
+        	TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate());
         	while(true){
                 	transport->addSocket(server.accept());
         	}
@@ -212,19 +213,21 @@ void Minisip::run(){
 #endif
                 MRef<IpProvider *> ipProvider =
                         IpProvider::create( phoneConf, gui );
-#ifdef DEBUG_OUTPUT
-                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
-#endif
+//#ifdef DEBUG_OUTPUT
+//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
+//#endif
                 string localIpString;
                 string externalContactIP;
 
                 // FIXME: This should be done more often
-                localIpString = externalContactIP = ipProvider->getExternalIp();                UDPSocket udpSocket( false, phoneConf->inherited.localUdpPort );                phoneConf->inherited.localUdpPort =
+                localIpString = externalContactIP = ipProvider->getExternalIp();                
+		UDPSocket udpSocket( false, phoneConf->inherited.localUdpPort );                
+		phoneConf->inherited.localUdpPort =
                         ipProvider->getExternalPort( &udpSocket );
                 phoneConf->inherited.localIpString = externalContactIP;
                 phoneConf->inherited.externalContactIP = externalContactIP;
                 udpSocket.close();
-
+/*
                 phoneConf->inherited.sipTransport= MRef<SipMessageTransport*>(new
                         SipMessageTransport(
                                         localIpString,
@@ -238,24 +241,37 @@ void Minisip::run(){
                                         phoneConf->securityConfig.cert_db
                                 )
                         );
-
+*/
 #ifdef DEBUG_OUTPUT
-                mout << BOLD << "init 5.5/9: Creating MediaHandler" << PLAIN << end;
+                mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
 
 #ifdef DEBUG_OUTPUT
-                mout << BOLD << "init 6/9: Creating main SIP logic" << PLAIN << end;
+                mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
 #endif
-                MRef<Sip*> sip= MRef<Sip*>(new Sip(phoneConf,mediaHandler));
-                sip->init();
+		MRef<Sip*> sip=new Sip(phoneConf,mediaHandler,
+					localIpString,
+					externalContactIP,
+					phoneConf->inherited.localUdpPort,
+					phoneConf->inherited.localTcpPort,
+					phoneConf->inherited.externalContactUdpPort,
+					phoneConf->inherited.transport
+#ifndef NO_SECURITY
+					,phoneConf->inherited.localTlsPort,
+					phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
+					//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
+					phoneConf->securityConfig.cert_db
+#endif
+					);
+		//sip->init();
 
                 phoneConf->sip = sip;
 
-                sip->setCallback(ehandler);
+                sip->getSipStack()->setCallback(ehandler);
 
-                ehandler->setSipStateMachine(sip);
+                ehandler->setSip(sip);
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
@@ -270,7 +286,7 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                         mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
 #endif
-                        Thread::createThread(tcp_server_thread, *(phoneConf->inherited.sipTransport));
+                        Thread::createThread(tcp_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer() ));
 
                 }
 
@@ -282,7 +298,7 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                                 mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
 #endif
-                                Thread::createThread(tls_server_thread, *(phoneConf->inherited.sipTransport));
+                                Thread::createThread(tls_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer()));
                         }
                 }
 		}
@@ -302,7 +318,7 @@ void Minisip::run(){
                                 CommandString reg("",SipCommandString::proxy_register);
                                 reg["proxy_domain"] = (*i)->sipDomain;
                                 SipSMCommand sipcmd(reg, SipSMCommand::remote, SipSMCommand::TU);
-                                sip->handleCommand(sipcmd);
+                                sip->getSipStack()->handleCommand(sipcmd);
 
                         }
                 }
