@@ -75,3 +75,5 @@ const string SipCommandString::remote_presence_update="remote_presence_update";
 const string SipCommandString::start_presence_server= "start_presence_server";
 const string SipCommandString::stop_presence_server= "stop_presence_server";
 const string SipCommandString::local_presence_update= "local_presence_update";
+
+const string SipCommandString::transfer= "transfer";

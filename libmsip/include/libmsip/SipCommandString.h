@@ -94,6 +94,8 @@ class LIBMSIP_API SipCommandString{
 		static const string stop_presence_server;
 		static const string local_presence_update;
 		
+		static const string transfer;
+		
 };
 
 #endif

@@ -62,9 +62,13 @@
  * 
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class LIBMSIP_API SipMessage : public MObject{
+
+MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
+
+class LIBMSIP_API SipMessage : public SipMessageContent{
 
 	public:
+		virtual std::string getContentType(){ return "message/sipfrag"; };
 		static SMCFCollection contentFactories;
 
 		SipMessage(string branch, int type);
@@ -84,8 +88,8 @@ class LIBMSIP_API SipMessage : public MObject{
                  */
 		int getType();
 		string getTypeString(){
-			char *types[11]={"TYPE0","INVITE","REGISTER","BYE","CANCEL","ACK","NOTIFY","SUBSCRIBE","RESPONSE","MESSAGE","TYPE10"};
-			if (getType()>10)
+			char *types[12]={"TYPE0","INVITE","REGISTER","BYE","CANCEL","ACK","NOTIFY","SUBSCRIBE","RESPONSE","MESSAGE","REFER","TYPE11"};
+			if (getType()>11)
 				return "UNDEFINED";
 			return string(types[getType()]);
 		}

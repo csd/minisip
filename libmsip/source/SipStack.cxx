@@ -52,6 +52,7 @@
 #include<libmsip/SipHeaderRecordRoute.h>
 #include<libmsip/SipHeaderAccept.h>
 #include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmsip/SipHeaderSubject.h>
 #include<libmsip/SipHeaderCallID.h>
@@ -98,6 +99,7 @@ SipStack::SipStack(MRef<SipDialog*> defaultDialog,
 	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);
 	SipHeader::headerFactories.addFactory("Record-Route", sipHeaderRecordRouteFactory);
+	SipHeader::headerFactories.addFactory("Refer-To", sipHeaderReferToFactory);
 	SipHeader::headerFactories.addFactory("Route", sipHeaderRouteFactory);
 	SipHeader::headerFactories.addFactory("Subject", sipHeaderSubjectFactory);
 	SipHeader::headerFactories.addFactory("s", sipHeaderSubjectFactory);
@@ -139,6 +141,7 @@ void SipStack::init(){
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
 	transportLayer->setSipSMCommandReceiver(this);
 }
 

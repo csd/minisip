@@ -77,7 +77,8 @@ class LIBMSIP_API SipRefer : public SipMessage{
 				string to_uri, 
 				string from_uri, 
 				string proxy,
-				string referredUri
+				string referredUri,
+				int cSeqNo
 				);
 
 		virtual std::string getMemObjectType(){return "SipRefer";}

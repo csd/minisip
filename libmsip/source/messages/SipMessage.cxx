@@ -79,6 +79,11 @@
 template class __declspec(dllexport) MRef<SipMessage*>;
 #endif
 
+MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType){
+	string tmp = buf;
+	return (*SipMessage::createMessage(tmp));
+}
+
 SMCFCollection SipMessage::contentFactories=SMCFCollection();
 
 string SipMessage::getDescription(){

@@ -45,7 +45,7 @@
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmutil/dbg.h>
 
-const int SipRefer::type=4;
+const int SipRefer::type=10;
 
 SipRefer::SipRefer(string &resp):SipMessage(SipRefer::type, resp){
 }
@@ -54,7 +54,8 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 		string to_uri, 
 		string from_uri, 
 		string proxy,
-		string referredUri
+		string referredUri,
+		int cSeqNo
 		):SipMessage(branch, type)
 {
 	this->ipaddr=proxy;
@@ -74,24 +75,22 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 		bool add=false;
 		switch (type){
 			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getParameter("tag"));
+				// ??
+//				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getParameter("tag"));
+//				
 				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_TO:
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getParameter("tag") );
+//				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getParameter("tag") );
 				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
-				add=true;
-				break;
-			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setCSeq(  ((SipHeaderValueCSeq *)*(header->getHeaderValue(0)))->getCSeq() );
-				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setMethod("REFER");
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CALLID:
 				add=true;
 				break;
 		}
+		
 		if (add){
 			addHeader(header);
 		}
@@ -101,6 +100,19 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 		header = new SipHeader( *val );
 		addHeader(header);
 	}
+
+	/* Add the CSeq: header */
+	MRef<SipHeaderValueCSeq *> cseqVal = new SipHeaderValueCSeq();
+	cseqVal->setMethod("REFER");
+	cseqVal->setCSeq(cSeqNo);
+	header = new SipHeader( *cseqVal );
+	addHeader(header);
+	
+	/* Add the Refer-To: header */
+	MRef<SipHeaderValueReferTo *> rtVal = new SipHeaderValueReferTo();
+	rtVal->setUri(referredUri);
+	header = new SipHeader( *rtVal );
+	addHeader(header);
 }
 
 string SipRefer::getString(){
