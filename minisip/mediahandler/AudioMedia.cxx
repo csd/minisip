@@ -30,6 +30,7 @@
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
+class G711CODEC;
 
 AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
                 Media(codec),
@@ -42,6 +43,7 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
         soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ *  acodec->getSamplingSizeMs() / 1000, false );
 
         seqNo = 0;
+	resampler = Resampler::create( SOUND_CARD_FREQ, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
 }
 		
 
@@ -77,29 +79,33 @@ void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
 }
 
 void AudioMedia::registerMediaSource( uint32_t ssrc ){
-        soundIo->registerSource( ssrc );
+	MRef<AudioMediaSource *> source;
+
+	source = new AudioMediaSource( ssrc, this );
+
+	soundIo->registerSource( *source );
+	sources.push_back( source );
 }
 
 void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
-        soundIo->unRegisterSource( ssrc );
+	std::list< MRef<AudioMediaSource *> >::iterator iSource;
+
+	soundIo->unRegisterSource( ssrc );
+
+	for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
+		if( (*iSource)->getSsrc() == ssrc ){
+			sources.erase( iSource );
+			return;
+		}
+	}
 }
 
 void AudioMedia::playData( RtpPacket * packet ){
-        short output[1600];
-        RtpHeader hdr = packet->getHeader();
+	MRef<AudioMediaSource *> source = getSource( packet->getHeader().SSRC );
 
-        if( packet->getContentLength() == (uint32_t) ((AudioCodec *)*codec)->getEncodedNrBytes() ){
-                ((AudioCodec *)*codec)->decode( packet->getContent(), packet->getContentLength(), output );
-        }
-        else{
-                delete packet;
-                return;
-        }
-
-        soundIo->pushSound( hdr.getSSRC(), output,
-                ((AudioCodec*)*codec)->getInputNrSamples(), hdr.getSeqNo() );
-
-        delete packet;
+	if( source ){
+		source->playData( packet );
+	}
 
 }
 
@@ -124,3 +130,60 @@ void AudioMedia::stopRinging(){
 	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
 }
 
+MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
+	std::list<MRef<AudioMediaSource *> >::iterator i;
+
+        for( i = sources.begin(); i != sources.end(); i++ ){
+                if( (*i)->getSsrc() == ssrc ){
+                        return (*i);
+                }
+        }
+        return NULL;
+}
+
+AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
+	BasicSoundSource( ssrc, NULL, 0/*position*/, SOUND_CARD_FREQ, 20, 2 ),
+	media(media),ssrc(ssrc)
+{
+
+}
+
+void AudioMediaSource::playData( RtpPacket * rtpPacket ){
+        RtpHeader hdr = rtpPacket->getHeader();
+	MRef<AudioCodec *> codec = findCodec( hdr.getPayloadType() );
+
+	if( codec ){
+        	if( rtpPacket->getContentLength() == (codec->getEncodedNrBytes() ))
+		{
+                	codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
+		}
+
+        	pushSound( codecOutput,
+                 	codec->getInputNrSamples(), hdr.getSeqNo() );
+		
+        }
+
+	delete rtpPacket;
+}
+
+MRef<AudioCodec *> AudioMediaSource::findCodec( uint8_t payloadType ){
+	std::list< MRef<AudioCodec *> >::iterator iCodec;
+	MRef<AudioCodec *> newCodec;
+
+	for( iCodec = codecs.begin(); iCodec != codecs.end(); iCodec ++ ){
+		if( (*iCodec)->getSdpMediaType() == payloadType ){
+			return (*iCodec);
+		}
+	}
+	
+	newCodec = AudioCodec::create( payloadType );
+	if( newCodec ){
+		codecs.push_back( newCodec );
+	}
+
+	return newCodec;
+}
+
+uint32_t AudioMediaSource::getSsrc(){
+	return ssrc;
+}

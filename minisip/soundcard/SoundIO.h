@@ -164,8 +164,8 @@ class SoundIO : public MObject{
 		 * Pushes a buffer of 160 bytes to the souncard output queue.
 		 * @param buf Pointer to a buffer with sound samples.
 		 */
-		void registerSource(int sourceId, 
-                                    SoundIOPLCInterface *plc=NULL);
+	//	void registerSource(int sourceId, 
+        //                            SoundIOPLCInterface *plc=NULL);
 
 		void registerSource(MRef<SoundSource *> source);
                 

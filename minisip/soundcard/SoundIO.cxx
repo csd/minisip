@@ -293,7 +293,9 @@ void SoundIO::start_recorder(){
 
 //bool done=false;
 
+#if 0
 void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){	
+	cerr << "Calling register source on ID " << sourceId << endl;
 	int32_t j=1;
 	int32_t nextSize=sources.size()+1;
         queueLock.lock();
@@ -316,8 +318,10 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 	queueLock.unlock();
 	sourceListCond.broadcast();
 }
+#endif
 
 void SoundIO::registerSource( MRef<SoundSource *> source ){
+	cerr << "Calling register source on created source " << source->getId() << endl;
        int32_t j=1;
        int32_t nextSize=sources.size()+1; 
        queueLock.lock();
@@ -333,6 +337,7 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 //		(*i)->initLookup(nextSize);
 		j++;
 	}
+        source->setPos( spAudio.assignPos(j,nextSize) );
 	sources.push_front(source);
 	queueLock.unlock();
 	sourceListCond.broadcast();

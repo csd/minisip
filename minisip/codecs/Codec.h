@@ -55,6 +55,12 @@ class Codec: public MObject{
 class AudioCodec : public Codec{
 	public:
 		/**
+		 * @returns A CODEC instance for the given payloadType
+		 * (NULL if not handled)
+		 */
+		static MRef<AudioCodec *> create( uint8_t payloadType );
+
+		/**
 		 * @returns Number of bytes in output buffer
 		 */
 		virtual void encode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;

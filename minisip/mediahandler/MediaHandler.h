@@ -49,6 +49,9 @@ class MediaHandler : public MObject{
 		void handleCommand( CommandString command );
 		std::string getExtIP();
 		virtual std::string getMemObjectType(){return "MediaHandler";}
+
+		MRef<Codec *> createCodec( uint8_t payloadType );
+
 	private:
 		std::list< MRef<Media *> > media;
 
@@ -56,6 +59,7 @@ class MediaHandler : public MObject{
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
+
 };
 
 #endif

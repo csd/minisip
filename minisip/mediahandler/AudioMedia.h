@@ -23,6 +23,8 @@
 
 #include"Media.h"
 
+class AudioMediaSource;
+
 
 class AudioMedia : public Media, public SoundRecorderCallback{
 
@@ -42,8 +44,33 @@ class AudioMedia : public Media, public SoundRecorderCallback{
                 virtual void srcb_handleSound( void *samplearr );
 
                 void startRinging( std::string ringtoneFile );
-                void stopRinging();         private:
+                void stopRinging();         
+
+	private:
+		MRef<AudioMediaSource *> getSource( uint32_t ssrc );
+
                 MRef<Resampler *> resampler;
-                MRef<SoundIO *> soundIo;                 uint32_t seqNo;
-                byte_t encoded[1600];                 short resampledData[160];
+                MRef<SoundIO *> soundIo;                 
+		uint32_t seqNo;
+                byte_t encoded[1600];                 
+		short resampledData[160];
+
+		std::list< MRef<AudioCodec *> > codecs;
+		std::list< MRef<AudioMediaSource *> > sources;
+};
+
+class AudioMediaSource : public BasicSoundSource{
+	public:
+		AudioMediaSource( uint32_t ssrc, MRef<Media *> media );
+
+		void playData( RtpPacket * rtpPacket );
+		uint32_t getSsrc();
+
+	private:
+		MRef<AudioCodec *> findCodec( uint8_t payloadType );
+		std::list< MRef<AudioCodec *> > codecs;
+		MRef<Media *> media;
+		short codecOutput[16384];
+		uint32_t ssrc;
+
 };
