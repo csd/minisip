@@ -471,10 +471,14 @@ void MainWindow::phoneSelected(){
 }
 
 void MainWindow::phoneTreeClicked( GdkEventButton * event ){
-	switch( event->button ){
-		case 3:
-			phoneMenu->popup( event->button, gtk_get_current_event_time() );
-			break;
+	if( event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS ){
+		phoneSelected();
+		invite();
+		return;
+	}
+	
+	if( event->button == 3 ){
+		phoneMenu->popup( event->button, gtk_get_current_event_time() );
 	}
 }
 

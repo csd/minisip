@@ -180,7 +180,14 @@ void GeneralSettings::editAccount(){
 
 void GeneralSettings::removeAccount(){
 	if( accountsTreeView->get_selection()->get_selected() ){
-		accountsList->erase( accountsTreeView->get_selection()->get_selected() );
+		Gtk::MessageDialog dialog( "Are you sure you want to erase "
+			"this account?", 
+			Gtk::MESSAGE_QUESTION, 
+			Gtk::BUTTONS_YES_NO, true, false );
+		if( dialog.run() == Gtk::RESPONSE_YES ){
+			accountsList->erase( 
+			accountsTreeView->get_selection()->get_selected() );
+		}
 	}
 }
 
@@ -275,6 +282,10 @@ void SecuritySettings::kaChange(){
 	
 	secureCheck->set_sensitive( pskCheck->get_active() 
 			|| dhCheck->get_active() );
+
+	if( !( pskCheck->get_active() || dhCheck->get_active() ) ){
+		secureCheck->set_active( false );
+	}
 
 	kaCombo->set_sensitive( pskCheck->get_active()
 			     || dhCheck->get_active() );
