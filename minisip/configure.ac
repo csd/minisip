@@ -458,6 +458,7 @@ AC_OUTPUT([codecs/Makefile
                  p2t/Makefile
 		 mediahandler/Makefile
                  video/Makefile
+		 conf/Makefile
 		 debian/Makefile
 		 Makefile])
 
