@@ -109,7 +109,7 @@ class LIBMUTIL_API MRef{
 			objp=NULL;
 		}
 		
-		void operator=(const MRef &r){
+		void operator=(const MRef<OPType> &r){
 			if (this->objp!=NULL){
 				assert(dynamic_cast<MObject*>(objp)!=NULL);
 				int rc = objp->decRefCount();
@@ -131,7 +131,7 @@ class LIBMUTIL_API MRef{
 			}
 		}
 
-		bool operator ==(const MRef r) const {
+		bool operator ==(const MRef<OPType> r) const {
 			return this->objp == r.objp;
 		}
 
