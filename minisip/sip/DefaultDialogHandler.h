@@ -68,6 +68,9 @@ class DefaultDialogHandler : public SipDialog{
 		virtual bool handleCommand(const SipSMCommand &command);
 		
 	private:
+		bool handleCommandPacket(int source, int destination, MRef<SipMessage*> pkt, int dispatchCount);
+		bool handleCommandString(int source, int destination, CommandString &command, int dispatchCount);
+		
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<MediaHandler*> mediaHandler;
 		

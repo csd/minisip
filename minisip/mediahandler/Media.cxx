@@ -164,7 +164,7 @@ void AudioMedia::unRegisterMediaReceiver( MRef<MediaStreamReceiver *> receiver )
 void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, uint32_t ssrc, uint16_t seqNo, bool marker, uint32_t ts ){
 	short output[1600];
 
-	if( length == ((AudioCodec *)*codec)->getEncodedNrBytes() ){
+	if( length == (uint32_t) ((AudioCodec *)*codec)->getEncodedNrBytes() ){
 		((AudioCodec *)*codec)->decode( data, length, output );
 	}
 
