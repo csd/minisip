@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
@@ -37,7 +38,7 @@ MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, int csbId,
 	this->nCsValue = nCs;
 	this->prfFunc = prfFunc;
 	this->csbIdValue = csbId;
-	if( mapType == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
+	if( mapType == HDR_CS_ID_MAP_TYPE_SRTP_ID || mapType == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		this->csIdMapTypeValue = mapType;
 		this->csIdMapPtr = map;
 	}
@@ -69,14 +70,19 @@ MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):
 		           (int)start[7];
 	this->nCsValue = start[8];
 	this->csIdMapTypeValue = start[9];
-	if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
+	if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID || 
+		csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		if( lengthLimit < 10 + nCsValue * 9 ){
 			throw new MikeyExceptionMessageLengthException(
 			"Given data is too short to form a HDR Payload" );
 			return;
 		}
-		this->csIdMapPtr = 
-		   new MikeyCsIdMapSrtp( &start[10], 9 * nCsValue );
+		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID )
+			this->csIdMapPtr = 
+		   		new MikeyCsIdMapSrtp( &start[10], 9 * nCsValue );
+		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID )
+			this->csIdMapPtr = 
+		   		new MikeyCsIdMapIPSEC4( &start[10], 9 * nCsValue );
 		this->endPtr = startPtr + 10 + 9 * this->nCsValue;
 	}
 	else{
@@ -160,6 +166,8 @@ string MikeyPayloadHDR::debugDump(){
 	ret += " CS ID map type=";
 	if ( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID )
 		ret += "<SRTP-ID>";
+	if ( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID )
+		ret += "<IPSEC4-ID>";
 	else
 		ret += "<unknown (" + itoa( csIdMapTypeValue ) + ")>";
 	
@@ -191,9 +199,16 @@ MRef<MikeyCsIdMap *> MikeyPayloadHDR::csIdMap(){
 }
 MikeySrtpCs::MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc ):
 	policyNo( policyNo ), ssrc( ssrc ), roc( roc ){};
+//added 041201 JOOR
+MikeyIPSEC4Cs::MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiaddr ):
+	policyNo( policyNo ), spi( spi ), spiaddr( spiaddr ){};
 
 MikeyCsIdMapSrtp::MikeyCsIdMapSrtp(){
 	cs = list<MikeySrtpCs *>::list();
+}
+//added 041201 JOOR
+MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4(){
+	cs = list<MikeyIPSEC4Cs *>::list();
 }
 
 MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
@@ -204,7 +219,8 @@ MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
 
 	uint8_t nCs = length / 9;
 	uint8_t i;
-	uint32_t policyNo, ssrc, roc;
+	uint32_t ssrc, roc;
+	byte_t policyNo;
 
 	for( i = 0; i < nCs; i++ ){
 		policyNo = data[ i*9 ];
@@ -219,8 +235,31 @@ MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
 		addStream( ssrc, roc, policyNo );
 	}
 }
+//added 041201 JOOR
+MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4( byte_t * data, int length ){
+	if( length % 9 ){
+		throw new MikeyException( 
+				"Invalid length of IPSEC4_ID map info" );
+	}
 
+	uint8_t nCs = length / 9;
+	uint8_t i;
+	uint32_t spi, spiaddr;
+	byte_t policyNo;
 
+	for( i = 0; i < nCs; i++ ){
+		policyNo = data[ i*9 ];
+		spi = (uint32_t)data[ i*9 + 1 ] << 24 |
+		      (uint32_t)data[ i*9 + 2 ] << 16 |
+		      (uint32_t)data[ i*9 + 3 ] <<  8 |
+		      (uint32_t)data[ i*9 + 4 ];
+		spiaddr  = (uint32_t)data[ i*9 + 5 ] << 24 |
+		      (uint32_t)data[ i*9 + 6 ] << 16 |
+		      (uint32_t)data[ i*9 + 7 ] <<  8 |
+		      (uint32_t)data[ i*9 + 8 ];
+		addSA( spi, spiaddr, policyNo );
+	}
+}
 
 MikeyCsIdMapSrtp::~MikeyCsIdMapSrtp(){
 	list<MikeySrtpCs *>::iterator i;
@@ -228,8 +267,19 @@ MikeyCsIdMapSrtp::~MikeyCsIdMapSrtp(){
 	for( i = cs.begin(); i!= cs.end() ; i++ )
 		delete *i;
 }
+//added 041201 JOOR
+MikeyCsIdMapIPSEC4::~MikeyCsIdMapIPSEC4(){
+	list<MikeyIPSEC4Cs *>::iterator i;
+
+	for( i = cs.begin(); i!= cs.end() ; i++ )
+		delete *i;
+}
 
 int MikeyCsIdMapSrtp::length(){
+	return 9 * cs.size();
+}
+//added 041201 JOOR
+int MikeyCsIdMapIPSEC4::length(){
 	return 9 * cs.size();
 }
 
@@ -253,6 +303,27 @@ void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
 		j++;
 	}
 }
+//added 041202 JOOR
+void MikeyCsIdMapIPSEC4::writeData( byte_t * start, int expectedLength ){
+	if( expectedLength < length() ){
+		throw new MikeyExceptionMessageLengthException(
+				"CsIPSEC4Id is too long" );
+	}
+
+	int j = 0,k;
+	list<MikeyIPSEC4Cs *>::iterator i;
+
+	for( i = cs.begin(); i != cs.end(); i++ ){
+		start[ 9*j ] = (*i)->policyNo & 0xFF;
+		for( k = 0; k < 4; k++ ){
+			start[9*j+1+k] = ((*i)->spi >> 8*(3-k)) & 0xFF;
+		}
+		for( k = 0; k < 4; k++ ){
+			start[9*j+5+k] = ((*i)->spiaddr >> 8*(3-k)) & 0xFF;
+		}
+		j++;
+	}
+}
 
 byte_t MikeyCsIdMapSrtp::findCsId( uint32_t ssrc ){
 	list<MikeySrtpCs *>::iterator i;
@@ -265,6 +336,30 @@ byte_t MikeyCsIdMapSrtp::findCsId( uint32_t ssrc ){
 	}
 	return 0;
 }
+//added 041201 JOOR
+byte_t MikeyCsIdMapIPSEC4::findCsId( uint32_t spi, uint32_t spiaddr ){
+	list<MikeyIPSEC4Cs *>::iterator i;
+	uint8_t j = 1;
+
+	for( i = cs.begin(); i != cs.end()  ; i++,j++ ){
+		if( (*i)->spi == spi && (*i)->spiaddr == spiaddr ){
+			return j;
+		}
+	}
+	return 0;
+}
+//added 041201 JOOR
+byte_t MikeyCsIdMapIPSEC4::findpolicyNo( uint32_t spi, uint32_t spiaddr ){
+	list<MikeyIPSEC4Cs *>::iterator i;
+	for( i = cs.begin(); i != cs.end()  ; i++ ){
+		if( (*i)->spi == spi && (*i)->spiaddr == spiaddr ){
+			return (*i)->policyNo;
+		}
+	}
+	return 0;
+}
+
+
 
 uint32_t MikeyCsIdMapSrtp::findRoc( uint32_t ssrc ){
 	list<MikeySrtpCs *>::iterator i;
@@ -277,7 +372,7 @@ uint32_t MikeyCsIdMapSrtp::findRoc( uint32_t ssrc ){
 	return 0;
 }
 
-void MikeyCsIdMapSrtp::addStream( uint32_t ssrc, uint32_t roc,                                                    byte_t policyNo, byte_t csId ){
+void MikeyCsIdMapSrtp::addStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, byte_t csId ){
 	if( csId == 0 ){
 		cs.push_back( new MikeySrtpCs( policyNo, ssrc, roc ) );
 		return;
@@ -295,3 +390,24 @@ void MikeyCsIdMapSrtp::addStream( uint32_t ssrc, uint32_t roc,                  
 
 	return;
 }
+//added 041201 JOOR
+void MikeyCsIdMapIPSEC4::addSA( uint32_t spi, uint32_t spiaddr, byte_t policyNo, byte_t csId){
+	if( csId == 0 ){
+		cs.push_back( new MikeyIPSEC4Cs( policyNo, spi, spiaddr ) );
+		return;
+	}
+
+	list<MikeyIPSEC4Cs *>::iterator i;
+	uint8_t j = 1;
+	for( i = cs.begin(); i != cs.end() ; i++,j++ ){
+		if( j == csId ){
+			(*i)->spi = spi;
+			(*i)->policyNo = policyNo;
+			(*i)->spiaddr = spiaddr;
+		}
+	}
+
+	return;
+}
+
+

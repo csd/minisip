@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #ifndef MIKEYPAYLOADGENERALEXTENSIONS_H
@@ -27,16 +28,26 @@
 
 #define MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE 21
 
-/**
- * @author Erik Eliasson
-*/
+#define MIKEY_EXT_TYPE_VENDOR_ID	0 //Vendor specific byte string
+#define MIKEY_EXT_TYPE_SDP_ID		1 //List of SDP key mgmt IDs (allocated for use in [KMASDP])
+    
+
+
 class MikeyPayloadGeneralExtensions : public MikeyPayload{
 	public:
-		
+		//Constructor when receiving Mikey message i.e. contruct MikeyPayloadGeneralExtensions from bytestream.
 		MikeyPayloadGeneralExtensions(byte_t *start_of_header, int lengthLimit);
-
+		//Constructor when constructing new MikeyPayloadGeneralExtension message
+		MikeyPayloadGeneralExtensions(uint8_t type, uint16_t length, byte_t * data);
+		//Destructor
+		~MikeyPayloadGeneralExtensions();
+		//Generate bytestream of MikeyPayloadGeneralExtension
 		virtual void writeData(byte_t *start, int expectedLength);
-		virtual int length();
+		//Return the length of the GeneralExtension in bytes
+		virtual int length();								
+		uint8_t type;
+		uint16_t leng;
+		byte_t * data;
 
 	private:
 		

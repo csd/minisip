@@ -18,15 +18,18 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Joachim Orrblad <joachim@orrblad.com>
 */
 
 #ifndef MIKEYCSIDMAP_H
 #define MIKEYCSIDMAP_H
 
 #define HDR_CS_ID_MAP_TYPE_SRTP_ID 0
+#define HDR_CS_ID_MAP_TYPE_IPSEC4_ID 7
 #include<list>
 #include<libmutil/MemObject.h>
 
+// CS# info for srtp
 class MikeySrtpCs{
         public:
                 MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc=0 );
@@ -34,6 +37,17 @@ class MikeySrtpCs{
                 uint8_t policyNo;
                 uint32_t ssrc;
                 uint32_t roc;
+};
+
+// CS# info for ipv4 IPSEC
+// each CS# is related to an unique combination of spi and spiaddr. 
+class MikeyIPSEC4Cs{
+        public:
+                MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiaddr );
+
+                uint8_t policyNo;
+                uint32_t spi;
+                uint32_t spiaddr;
 };
 
 class MikeyCsIdMap : public MObject{
@@ -44,6 +58,7 @@ class MikeyCsIdMap : public MObject{
 		virtual std::string getMemObjectType(){ return "MikeyCsIdMap";};
 };
 
+// Srtp map
 class MikeyCsIdMapSrtp : public MikeyCsIdMap{
         public:
                 MikeyCsIdMapSrtp();
@@ -61,6 +76,26 @@ class MikeyCsIdMapSrtp : public MikeyCsIdMap{
 
         private:
 		std::list<MikeySrtpCs *> cs;
+};
+
+// ipv4 IPSEC map
+class MikeyCsIdMapIPSEC4 : public MikeyCsIdMap{
+        public:
+                MikeyCsIdMapIPSEC4();
+                MikeyCsIdMapIPSEC4( byte_t * data, int length );
+                ~MikeyCsIdMapIPSEC4();
+
+                virtual int length();
+                virtual void writeData( byte_t * start,
+                                         int expectedLength );
+
+		byte_t findCsId( uint32_t spi, uint32_t spiaddr );
+		byte_t findpolicyNo( uint32_t spi, uint32_t spiaddr );
+		void addSA( uint32_t spi, uint32_t spiaddr=0,
+				byte_t policyNo=0, byte_t csId=0 );
+
+        private:
+		std::list<MikeyIPSEC4Cs *> cs;
 };
 
 

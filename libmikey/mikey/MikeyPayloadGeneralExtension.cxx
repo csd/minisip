@@ -18,21 +18,50 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include <assert.h>
 #include<config.h>
 #include<libmikey/MikeyPayloadGeneralExtension.h>
 
-
+//Constructor when receiving Mikey message i.e. contruct MikeyPayloadGeneralExtensions from bytestream.
 MikeyPayloadGeneralExtensions::MikeyPayloadGeneralExtensions(byte_t *start, int lengthLimit):MikeyPayload(start){
-
+	this->payloadTypeValue = MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE;
+	this->nextPayloadTypeValue = start[0];
+	this->type = start[1];
+	this->leng = (uint16_t)start[2] << 8 | (uint16_t)start[3];
+	this->data  = (byte_t*) calloc (lengthLimit - 4 ,sizeof(byte_t));
+	for(int i=4; i< lengthLimit; i++)
+			this->data[i] = start[i];
 }
-
+//Constructor when constructing new MikeyPayloadGeneralExtension message
+MikeyPayloadGeneralExtensions::MikeyPayloadGeneralExtensions(uint8_t type, uint16_t length, byte_t * data){
+	this->payloadTypeValue = MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE;
+	this->type = type;
+	this->leng = length;
+	this->data  = (byte_t*) calloc (length ,sizeof(byte_t));
+	for(int i=4; i< length; i++)
+			this->data[i] = data[i];
+}
+//Destructor
+MikeyPayloadGeneralExtensions::~MikeyPayloadGeneralExtensions(){
+	free(data);
+}
+//Return the length of the GeneralExtension in bytes
 int MikeyPayloadGeneralExtensions::length(){
-
-	return 0;
+	return this->leng + 4;
 }
-
+//Generate bytestream of MikeyPayloadGeneralExtension
 void MikeyPayloadGeneralExtensions::writeData(byte_t *start, int expectedLength){
-
+	assert( expectedLength == this->length() );
+	start[0] = this->nextPayloadTypeValue;
+	start[1] = this->type;
+	start[2] = (byte_t) ((this->leng & 0xFF00) >> 8);
+	start[3] = (byte_t) (this->leng & 0xFF);
+	for(int i= 4; i< expectedLength; i++)
+		start[i] = data[i-4];
 }
+
+
+
