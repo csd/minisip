@@ -195,7 +195,6 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				
 				ident->setDoRegister(parser->getValue(accountPath + "register","")=="yes");
 
-				fprintf( stderr, "Starting try...\n");
 				try{
 					if (proxy!=""){
 						ident->sipProxy = SipProxy(proxy);
@@ -217,8 +216,6 @@ string SipSoftPhoneConfiguration::load( string filename ){
 					      + ident->identityIdentifier + ".";
 					ident->setDoRegister( false );
 				}
-				fprintf( stderr, "Passed try...\n");
-				
 				ident->sipProxy.sipProxyPort = proxyPort;
 				string proxyUser = parser->getValue(accountPath +"proxy_username", "");
 
