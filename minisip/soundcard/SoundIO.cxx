@@ -219,7 +219,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			if( !tempBuffer ){
 				tempBuffer = new short[soundcard->recorder_buffer_size];
 			}
-r:1106
+
 			for( int j = 0; j < soundcard->recorder_buffer_size; j++ ){
 				tempBuffer[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() ];
 			}
