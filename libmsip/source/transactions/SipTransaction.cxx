@@ -31,8 +31,8 @@
 #include<config.h>
 
 
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>

@@ -1,3 +1,9 @@
+libmsip (0.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:47:56 +0100
+
 libmsip (0.2.1-1) unstable; urgency=low
 
   * New upstream release.

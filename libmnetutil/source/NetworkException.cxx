@@ -74,8 +74,10 @@ string TLSConnectFailed::errorDescription(){
 			return string( "SSL Error: Could not perform the write opearation on the underlying TCP connection" );
 		case SSL_ERROR_WANT_CONNECT:
 			return string( "SSL Error: The underlying TCP connection is not connected" );
+#ifdef SSL_ERROR_WANT_ACCEPT
 		case SSL_ERROR_WANT_ACCEPT:
 			return string( "SSL Error: The underlying TCP connection is not accepted" );
+#endif
 		case SSL_ERROR_WANT_X509_LOOKUP:
 			return string( "SSL Error: Error in the X509 lookup" );
 		case SSL_ERROR_SYSCALL:

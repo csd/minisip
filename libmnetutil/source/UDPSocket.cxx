@@ -30,6 +30,7 @@
 #include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<stdlib.h>
+#include<errno.h>
 
 #ifdef LINUX
 #include<sys/socket.h>

@@ -2,8 +2,8 @@
 
 #include<config.h>
 
-#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipCommandString.h>
 

@@ -38,6 +38,7 @@
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #endif
 #include<stdio.h>
+#include<errno.h>
 #include<unistd.h>
 #include<errno.h>
 

@@ -78,12 +78,12 @@
 #include<config.h>
 
 #include<assert.h>
+#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 
 #ifdef DEBUG_OUTPUT

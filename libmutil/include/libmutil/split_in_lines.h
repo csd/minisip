@@ -32,6 +32,7 @@
 #define SPLIT_IN_LINES
 
 #include<vector>
+#include<string>
 
 using namespace std;
 

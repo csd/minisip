@@ -33,7 +33,7 @@ mixer_hdr = mixer/ImageMixer.h
 
 codec_src = codec/AVCoder.cxx codec/AVDecoder.cxx codec/VideoCodec.cxx
 
-codec_hdr = codec/AVCoder.h codec/AVDecoder.h codec/VideoCodec.h
+codec_hdr = codec/AVCoder.h codec/AVDecoder.h codec/VideoCodec.h codec/VideoEncoderCallback.h
 
 libvideo_a_SOURCES = $(display_src) \
                      $(grabber_src) \

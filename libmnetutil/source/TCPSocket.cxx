@@ -30,6 +30,7 @@
 #include<libmnetutil/NetworkException.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<errno.h>
 
 #ifdef LINUX
 #include<sys/socket.h>

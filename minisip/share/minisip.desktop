@@ -5,4 +5,4 @@ Exec=minisip
 Terminal=0
 Type=Application
 Icon=minisip.png
-Categories=PIM;GPE
+Categories=PIM;GPE;Application;Network

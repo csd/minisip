@@ -31,10 +31,10 @@
 #include<config.h>
 
 #include<assert.h>
+#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 
 #ifdef DEBUG_OUTPUT

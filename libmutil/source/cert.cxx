@@ -296,7 +296,8 @@ int certificate::control( ca_db * cert_db ){
 	int result;
 	X509_STORE_CTX cert_store_ctx;
 
-	if( X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert ,NULL ) < 0 ){
+	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert ,NULL );
+	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
 		fprintf(stderr, "Could not initialize X509_STORE_CTX");
 		exit( 1 );
 	}
@@ -514,7 +515,8 @@ int certificate_chain::control( MRef<ca_db *> cert_db){
 		sk_X509_push( cert_stack, (*i)->get_openssl_certificate() );
 	}
 
-	if( X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert, cert_stack ) < 0 ){
+	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert, cert_stack);
+	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
 		fprintf(stderr, "Could not initialize X509_STORE_CTX");
 		exit( 1 );
 	}

@@ -1,3 +1,9 @@
+minisip (0.6.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:48:16 +0100
+
 minisip (0.6.1-1) unstable; urgency=low
 
   * New upstream release.
