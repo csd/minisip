@@ -121,9 +121,9 @@ class KeyAgreement : public MObject{
 		 */	
 		std::list <Policy_type *> policy; //Contains the security policy
 		//Set the first Parameter Type in a new security policy. Returns the new Policy number.
-		uint8_t setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		uint8_t setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value);
 		//Add or modify a parameter in an existing policy
-		void setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		void setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value);
 		//Create a default policy 
 		uint8_t setdefaultPolicy(uint8_t prot_type);
 		//Get a policy entry

@@ -386,7 +386,7 @@ uint8_t KeyAgreement::getCsIdMapType(){
 
 /* Security Policy */
 		 	
-void KeyAgreement::setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+void KeyAgreement::setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value){
 	Policy_type * pol;
 	if ( (pol = getPolicyParamType(policy_No, prot_type, policy_type) ) == NULL)
 		policy.push_back (new Policy_type(policy_No, prot_type, policy_type, length, value));
@@ -397,7 +397,7 @@ void KeyAgreement::setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint
 	}
 }
 
-uint8_t KeyAgreement::setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+uint8_t KeyAgreement::setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value){
 	list<Policy_type *>::iterator i;
 	uint8_t policyNo = 0;
 	i = policy.begin();
