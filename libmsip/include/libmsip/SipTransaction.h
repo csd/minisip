@@ -90,6 +90,11 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		IPAddress * toaddr;             //FIXME: This is leaked?
 		int32_t port;
 		string callId;
+
+		//The transition to cancel a transaction is common to all
+		//transactions and is defined in this class.
+		bool a1000_cancel_transaction(const SipSMCommand &command);
+		
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
 		string command;

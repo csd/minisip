@@ -341,6 +341,24 @@ void SipTransactionInviteClient::setUpStateMachine(){
 	State<SipSMCommand,string> *s_terminated=new State<SipSMCommand,string>(this,"terminated");
 	addState(s_terminated);
 
+	//Set up cancel transitions
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_calling, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_proceeding, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_completed, s_terminated);
+
+
+
+
+
+	
+	
+
 	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClient::a0_start_calling_INVITE, 
 			s_start, s_calling);

@@ -70,10 +70,10 @@ class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 		bool a4_proceeding_proceeding_timerE( const SipSMCommand &command);
 		bool a5_proceeding_proceeding_1xx( const SipSMCommand &command);
 		bool a6_proceeding_terminated_transperrOrTimerF( const SipSMCommand &command);
-		bool a7_trying_completed_non1xxresp(const SipSMCommand &comman);
-		bool a8_trying_trying_timerE(const SipSMCommand &comman);
-		bool a9_completed_terminated_timerK(const SipSMCommand &comman);
-		
+		bool a7_trying_completed_non1xxresp(const SipSMCommand &command);
+		bool a8_trying_trying_timerE(const SipSMCommand &command);
+		bool a9_completed_terminated_timerK(const SipSMCommand &command);
+
 		MRef<SipMessage*> lastRequest;
 		int timerT1;
 };

@@ -41,10 +41,11 @@
 #include<libmutil/dbg.h>
 
 #include<libmsip/SipTransaction.h>
+#include<libmsip/SipTransactionUtils.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-SipTransaction::SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, int cseq, const string &b, string callid): 
+SipTransaction::SipTransaction(MRef<SipDialog*> d, int cseq, const string &b, string callid): 
 		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		dialog(d), 
 		socket(NULL),
@@ -74,6 +75,16 @@ SipTransaction::SipTransaction(/*const string &memType,*/ MRef<SipDialog*> d, in
 
 SipTransaction::~SipTransaction(){
 
+}
+
+
+
+bool SipTransaction::a1000_cancel_transaction(const SipSMCommand &command){
+	if (transitionMatch(command, "cancel_transaction")){
+		return true;
+	}else{
+		return false;
+	}
 }
 
 string SipTransaction::getBranch(){

@@ -142,7 +142,7 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), true);
+		send(command.getCommandPacket(), false);
 		return true;
 	}else{
 		return false;
@@ -163,7 +163,7 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 		timerG = 500;
 		requestTimeout(timerG, "timerG");
 		requestTimeout(32000,"timerH");
-		send(command.getCommandPacket(), true);
+		send(command.getCommandPacket(), false);
 		return true;
 	}else
 		return false;
@@ -205,7 +205,7 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
-		send(command.getCommandPacket(), true);
+		send(command.getCommandPacket(), false);
 
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transaction_terminated),
@@ -332,6 +332,19 @@ void SipTransactionInviteServer::setUpStateMachine(){
 	
 	State<SipSMCommand,string> *s_terminated=new State<SipSMCommand,string>(this,"terminated");
 	addState(s_terminated);
+
+	///Set up transitions to enable cancellation of this transaction
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_proceeding, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_completed, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_confirmed, s_terminated);
+	//
+
 
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_proceeding_INVITE",

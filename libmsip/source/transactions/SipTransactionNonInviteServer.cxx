@@ -63,7 +63,7 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), true);
+		send(command.getCommandPacket(), false);
 		return true;
 	}else{
 		return false;
@@ -76,7 +76,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), true); 		//Add via header
+		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		requestTimeout(64 * timerT1, "timerJ");
 		return true;
 	}else{
@@ -89,7 +89,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(),true);
+		send(command.getCommandPacket(),false);
 		requestTimeout(64 * timerT1, "timerJ");
 		return true;
 	}else{
@@ -123,7 +123,7 @@ bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
-		send(MRef<SipMessage*>(*pack),true);		// add via header
+		send(MRef<SipMessage*>(*pack),false);		// do not add via header to responses
 		return true;
 	}else
 		return false;
@@ -229,6 +229,21 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 
 	State<SipSMCommand,string> *s_terminated=new State<SipSMCommand,string>(this,"terminated");
 	addState(s_terminated);
+
+	
+	///Set up transitions to enable cancellation of this transaction
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_trying, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_proceeding, s_terminated);
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_completed, s_terminated);
+	//
+
+
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_request",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteServer::a0_start_trying_request, 
