@@ -56,7 +56,7 @@ static void *tls_server_thread(void *arg){
         assert( arg != NULL );
         MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
 	try{
-        	TLSServerSocket server(transport->getLocalTCPPort(),transport->getCertificate());
+        	TLSServerSocket server(transport->getLocalTLSPort(),transport->getCertificate());
         	while(true){
                 	transport->addSocket(server.accept());
         	}
