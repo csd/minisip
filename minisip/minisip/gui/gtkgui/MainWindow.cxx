@@ -46,9 +46,6 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
-	Gtk::MenuItem * phoneAddMenu;
-	Gtk::MenuItem * phoneRemoveMenu;
-	Gtk::MenuItem * phoneEditMenu;
 
   	try
   	{
@@ -72,11 +69,11 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	
 	refXml->get_widget( "phoneMenu", phoneMenu );
 	refXml->get_widget( "phoneAddMenu", phoneAddMenu );
+	refXml->get_widget( "phoneAddAddressMenu", phoneAddAddressMenu );
 	refXml->get_widget( "phoneRemoveMenu", phoneRemoveMenu );
 	refXml->get_widget( "phoneEditMenu", phoneEditMenu );
 	
-	Glib::RefPtr<Gtk::TreeSelection> treeSelection = 
-		phoneBookTreeView->get_selection();
+	treeSelection = phoneBookTreeView->get_selection();
 
 //	treeSelection->set_select_function( SigC::slot( *this, 
 //				&MainWindow::phoneSelect ) );
@@ -92,10 +89,15 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
 		SigC::slot( *this, &MainWindow::phoneTreeClicked ), false );
 
-	phoneAddMenu->signal_activate().connect(
-		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
+	phoneAddAddressMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool >(
 		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
-		treeSelection ));
+		treeSelection, true ));
+	
+	phoneAddMenu->signal_activate().connect(
+		SigC::bind<Glib::RefPtr<Gtk::TreeSelection>, bool>(
+		SigC::slot( *phoneBookModel, &PhoneBookModel::addContact ),
+		treeSelection, false ));
 	
 	phoneRemoveMenu->signal_activate().connect(
 		SigC::bind<Glib::RefPtr<Gtk::TreeSelection> >(
@@ -478,6 +480,12 @@ void MainWindow::phoneTreeClicked( GdkEventButton * event ){
 	}
 	
 	if( event->button == 3 ){
+		Glib::RefPtr<Gtk::TreeSelection> treeSelection2 = 
+			phoneBookTreeView->get_selection();
+		bool noSelect = (treeSelection2->count_selected_rows() == 0 );
+		phoneAddAddressMenu->set_sensitive( !noSelect );
+		phoneRemoveMenu->set_sensitive( !noSelect );
+		phoneEditMenu->set_sensitive( !noSelect );
 		phoneMenu->popup( event->button, gtk_get_current_event_time() );
 	}
 }

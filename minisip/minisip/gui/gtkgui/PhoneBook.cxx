@@ -47,20 +47,26 @@ PhoneBookModel::PhoneBookModel( PhoneBookTree * tree ):
 
 void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
         string phonebookName;
+	
+	if( !defaultPhonebook ){
+		defaultPhonebook = phonebook;
+	}
                 
 	phonebookName = phonebook->getName();
         
 	list< MRef<PhoneBookPerson *> > persons = phonebook->getPersons();
 	list< MRef<PhoneBookPerson *> >::iterator iPerson;
 
-	/*
+	
+#if 0
 
 	Gtk::TreeModel::iterator phonebookparent = append();
 	(*phonebookparent)[tree->name] = Glib::locale_to_utf8( phonebookName ); //FIXME: BUG: Throws exception that is not caught if there is a strange character in the string.
 	(*phonebookparent)[tree->phonebook] = phonebook;
 	(*phonebookparent)[tree->person] = NULL;
 	(*phonebookparent)[tree->contactEntry] = NULL;
-	*/
+	
+#endif
 	string contact;
 
 	for( iPerson = persons.begin(); iPerson != persons.end(); iPerson++ ){
@@ -93,31 +99,49 @@ void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
 	}                                       
 }
 
-void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
-	if( selection->count_selected_rows() == 0 ){
+void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection, 
+			bool address ){
+	if( address && selection->count_selected_rows() == 0 ){
 		return;
 	}
+
 	
 	ContactDialog dialog;
 	MRef<ContactEntry *> entry;
 	MRef<PhoneBookPerson *> person;
 	MRef<PhoneBook *> phonebook;
 	Gtk::TreeModel::iterator newItem;
-
 	TreeModel::iterator i =  selection->get_selected();
-	dialog.addContact( (*i)[tree->person] );
-	person = (*i)[tree->person];
-	phonebook = (*i)[tree->phonebook];
+	
+	if( selection->count_selected_rows() == 0 ){
+		phonebook = defaultPhonebook;
+		if( !phonebook ){
+			/* No phonebook, we can't do anything */
+			return;
+		}
+		person = NULL;
+	}
+	else{
+		person = (*i)[tree->person];
+		phonebook = (*i)[tree->phonebook];
+	}
+
+	if( address ){
+		dialog.addContact( (*i)[tree->person] );
+	}
+	else{
+		dialog.addContact( NULL );
+	}
+
 	
 	if( dialog.run() != Gtk::RESPONSE_OK || dialog.getNameString() == "" ){
 		return;
 	}
 
 	/* If we are not at the root, we add a contact entry */
-	if( ! person.isNull() ){
+	if( address ){
 		MRef<ContactEntry *> selectedEntry = (*i)[tree->contactEntry];
-		
-		
+
 		/* If we have selected a person */
 		if( selectedEntry.isNull() ){
 			newItem = append( (*i)->children() );
@@ -133,7 +157,7 @@ void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
 		phonebook->addPerson( person );
 
 		/* Add the GUI line for that person */
-		newPersonItem = append( (*i)->children() );
+		newPersonItem = append();
 
 		(*newPersonItem)[tree->name] = dialog.getNameString();
 		(*newPersonItem)[tree->uri] = "";
@@ -163,7 +187,7 @@ void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
 }
 
 void PhoneBookModel::removeContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
-	if( ! selection ){
+	if( selection->count_selected_rows() == 0 ){
 		return;
 	}
 	TreeModel::iterator i =  selection->get_selected();
@@ -283,10 +307,20 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 	}
 	else{
 		MRef<ContactEntry *> entry = (*iter)[tree->contactEntry];
-		textR->property_markup().set_value( 
-			entry->getDesc() + ": " + 
-			"<small><span foreground=\"#0000FF\">" + 
-			entry->getUri() + "</span></small>" );
+		MRef<PhoneBook *> pb = (*iter)[tree->phonebook];
+		if( entry ){
+			textR->property_markup().set_value( 
+				entry->getDesc() + ": " + 
+				"<small><span foreground=\"#0000FF\">" + 
+				entry->getUri() + "</span></small>" );
+		}
+		/*
+		else{
+			textR->property_markup().set_value( "<b><u>" + 
+				pb->getName() + "</u></b>" );
+		}
+		*/
+
 	}
 }
 		

@@ -111,6 +111,10 @@ class MainWindow : public Gui, public LogEntryHandler, public SigC::Object{
 		Gtk::Notebook * mainTabWidget;
 		Gtk::TreeView * phoneBookTreeView;
 		Gtk::Menu * phoneMenu;
+		Gtk::MenuItem * phoneAddMenu;
+		Gtk::MenuItem * phoneAddAddressMenu;
+		Gtk::MenuItem * phoneRemoveMenu;
+		Gtk::MenuItem * phoneEditMenu;
 		PhoneBookModel * phoneBookModel;
 		PhoneBookTree * phoneBookTree;
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection;
