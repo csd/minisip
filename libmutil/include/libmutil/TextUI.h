@@ -38,6 +38,7 @@
 
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
+#include<libmutil/dbg.h>
 
 class LIBMUTIL_API TextUICompletionCallback{
 public:
@@ -64,7 +65,7 @@ struct completion_cb_item{
  * You must implement the guiExecute method to interpret the user
  * input.
 */
-class LIBMUTIL_API TextUI{
+class LIBMUTIL_API TextUI : public DbgHandler{
 public:
 	///Colors that can be used when displaying text
 	static const int plain;

@@ -47,6 +47,12 @@ class LIBMUTIL_API DbgEndl{
         int i;
 };
 
+class LIBMUTIL_API DbgHandler{
+	private:
+		virtual void displayMessage(std::string output,int style=-1)=0;
+		friend class Dbg;
+};
+
 
 class LIBMUTIL_API Dbg{
     public:
@@ -58,10 +64,12 @@ class LIBMUTIL_API Dbg{
         Dbg &operator<<(DbgEndl &endl);
 	void setEnabled(bool enabled);
 	bool getEnabled();
+	void setExternalHandler(DbgHandler * dbgHandler);
     private:
 	bool error_out;
 	bool enabled;
 	std::string str;
+	DbgHandler * debugHandler;
 };
 
 extern LIBMUTIL_API Dbg mout;

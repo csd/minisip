@@ -29,17 +29,14 @@
 
 #include<iostream>
 
-#include"libmutil/TextUI.h"
 #include<libmutil/itoa.h>
 
-TextUI *debugtextui=NULL;
-
 Dbg mout;
-Dbg merr(true);
+Dbg merr(false);
 Dbg mdbg(true, false);
 DbgEndl end;
 
-Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled){
+Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), debugHandler(NULL){
 }
 
 void Dbg::setEnabled(bool e){
@@ -53,16 +50,15 @@ bool Dbg::getEnabled(){
 Dbg &Dbg::operator<<(std::string s){
 	if (!enabled)
 		return *this;
-#ifdef TEXT_UI
 	//    std::cerr << "Doing textui output"<< std::endl;
 	
-	if (textui!=NULL){
+	if (debugHandler!=NULL){
 		str +=s;
 		if (str[str.size()-1]=='\n'){
 			if (error_out)
 				std::cerr << str << std::flush;
 			else
-				textui->displayMessage(str,0);
+				debugHandler->displayMessage(str,0);
 			str="";
 		}
 	}else{
@@ -71,12 +67,6 @@ Dbg &Dbg::operator<<(std::string s){
 		else
 			std::cout<<s;
 	}
-#else
-	if (error_out)
-		std::cerr << s;
-	else
-		std::cout << s;
-#endif
 	return *this;
 }
 
@@ -85,8 +75,7 @@ Dbg &Dbg::operator<<(DbgEndl &){
 	if (!enabled)
 		return *this;
 	//    std::cerr << "DbgEndl called"<< std::endl;
-#ifdef TEXT_UI
-	if (textui!=NULL){
+	if (debugHandler!=NULL){
 		str+="\n";
 		(*this)<< "";
 	}else{
@@ -95,12 +84,6 @@ Dbg &Dbg::operator<<(DbgEndl &){
 		else
 			std::cout << std::endl;
 	}
-#else
-	if (error_out)
-		std::cerr << std::endl;
-	else
-		std::cout << std::endl;
-#endif
 
 	return *this;
 }
@@ -110,8 +93,7 @@ Dbg& Dbg::operator<<(int i){
 	if (!enabled)
 		return *this;
     
-#ifdef TEXT_UI
-    if (textui!=NULL)
+    if (debugHandler!=NULL)
         str += itoa(i);
     else{
 	if (error_out)
@@ -119,13 +101,6 @@ Dbg& Dbg::operator<<(int i){
 	else
 		std::cout << i;
     }
-#else
-    if (error_out)
-	    std::cerr << i;
-    else
-	    std::cout << i;
-#endif
-    return *this;
 }
 
 Dbg& Dbg::operator<<(char c){
@@ -133,8 +108,7 @@ Dbg& Dbg::operator<<(char c){
 	if (!enabled)
 		return *this;
 
-#ifdef TEXT_UI
-	if (textui!=NULL)
+	if (debugHandler!=NULL)
 		str += c;
 	else{
 		if (error_out)
@@ -142,12 +116,11 @@ Dbg& Dbg::operator<<(char c){
 		else
 			std::cout << c;
 	}
-#else
-	if (error_out)
-		std::cerr << c;
-	else
-		std::cout << c;
-#endif
 	return *this;
 }
 
+void Dbg::setExternalHandler(DbgHandler * debugHandler){
+	this->debugHandler = debugHandler;
+}
+
+//#endif
