@@ -137,7 +137,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 //int StateMachine<CommandType, TimeoutType>::sm_counter=0;
 
 template<class CommandType, class TimeoutType>
-class DLL_DECL State{
+class State{
 	public:
 		State(StateMachine<CommandType,TimeoutType> *stateMachine, 
 				const string &name):
@@ -188,7 +188,7 @@ class DLL_DECL State{
 
 
 template<class CommandType, class TimeoutType>
-class DLL_DECL StateTransition{
+class StateTransition{
 	public:
 
 /*
