@@ -48,7 +48,8 @@
 #include<iostream>
 #include<list>
 #include"../spaudio/SpAudio.h"
-#include<samplerate.h>
+
+#include"SoundSource.h"
 
 
 #ifdef HAVE_LIBASOUND
@@ -82,149 +83,6 @@ using namespace std;
  * 
 */
 
-
-class SoundSource : public MObject{
-	public:
-		SoundSource(int id);
-		virtual ~SoundSource(){};
-
-		/**
-		 * @return		Identifier of source that generated the audio.
-		 */
-		int getId();
-
-		/**
-		 * @return		Spatial position of the source.
-		 */
-		int32_t getPos();
-
-
-		/**
-		 * @set	                Spatial position of the source.
-		 */
-		void setPos(int32_t position);
-
-		/**
-		 * @param samples	Buffer with samples that will be enqueued.
-		 * @param nSamples	Number of samples (per channel) in buffer.
-		 * @isStereo		Indicates if one or two channels are used.
-		 */
-		virtual void pushSound(short *samples, 
-				int32_t nSamples, 
-				int32_t index,
-				bool isStereo=false)=0;
-		
-		/**
-		 * @param dest		Buffer to which samples will be "dequeued".
-		 * @param nMono		Number of samples per channel to retrieve.
-		 * @param stereo	Indicates if one or two channels will be retrieved
-		 * @param dequeue	Indicates of the retrieved samples should be removed
-		 * 			from the queue.
-		 */
-		virtual void getSound(short *dest,
-				      int32_t nMono,
-				      bool stereo,
-				      bool dequeue=true)=0;
-		
-		virtual std::string getMemObjectType(){return "SoundSource";};
-
-		
-		void resample (short *input,
-				       short *output, 
-				       int32_t isize,
-				       int32_t osize); 
-				
-		short* getLeftBuf();
-
-		short* getRightBuf();
-
-		short* getLookupLeft();
-
-		short* getLookupRight();
-
-		int32_t getPointer();
-
-		void setPointer(int32_t wpointer);
-		/*
-		SRC_DATA* getSrcData();
-
-		SRC_STATE* getSrcState();
-		*/
-//		void initLookup(int32_t nSources);
-	private:
-		int sourceId;
-		
-        protected:
-		int32_t position;
-		double sampRate;
-		short *leftch;
-		short *rightch;
-		short *lookupleft;
-		short *lookupright;
-		int32_t pointer;
-		int32_t numSources;
-		SRC_DATA *src_data;
-		SRC_STATE *src_state;
-		int32_t j;
-		int32_t k;
-
-		friend class SpAudio;
-
-};
-
-class BasicSoundSource: public SoundSource{
-	public:
-		/**
-		 * Implementation of very simple queueing algorithm.
-		 * @param id		Identifier of sound source that is generating audio for
-		 * 			stream.
-		 * @param pcl		Packet loss concealment provider. The codec that is used
-		 * 			to decode the audio data can provide a PLC mechanism.
-		 * @param buffersize	Number of samples in buffer (per channel)
-		 */
-  BasicSoundSource(int32_t id,
-		   SoundIOPLCInterface *plc,
-		   int32_t position,
-		   int32_t nSources,
-		   double sRate,
-		   int32_t frameSize,
-		   int32_t buffernmonosamples=16000);
-                
-		virtual ~BasicSoundSource();
-		
-		void pushSound(short *samples, 
-				int32_t nSamples, 
-				int32_t index,
-				bool isStereo=false);
-
-
-		
-		virtual void getSound(short *dest,
-				      int32_t nMono,
-				      bool stereo, 
-				      bool dequeue=true);
-
-
-		/*void resample (short *input,
-			       short *output, 
-			       int32_t isize,
-			       int32_t osize); */
-
-
-
-
-//		void addLatest(short *dest, int32_t nMono, int factor=1);
-//
-	private:
-		SoundIOPLCInterface *plcProvider;
-		short *stereoBuffer;
-		int32_t bufferSizeInMonoSamples;
-		short *playoutPtr;
-		short *firstFreePtr;
-		int32_t lap_diff; //roll over counter
-
-//		int lastPushSize;
-};
 
 class RecorderReceiver{
 	public:

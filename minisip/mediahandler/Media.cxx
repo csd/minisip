@@ -39,6 +39,7 @@
 #include"../video/display/VideoDisplay.h"
 #include"../video/mixer/ImageMixer.h"
 #endif
+#include<libmutil/print_hex.h>
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
@@ -109,13 +110,15 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 	// for audio media, we assume that we can both send and receive
 	receive = true;
 	send = true;
+	MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
 
-	soundIo->register_recorder_receiver( this, ((AudioCodec *)*codec)->getInputNrSamples(), false );
+	soundIo->register_recorder_receiver( this, 882, false );
 
 	seqNo = 0;
-#ifdef IPAQ
-	iIPAQ = 0;
-#endif
+//#ifdef IPAQ
+//	iIPAQ = 0;
+//#endif
+	initResampler( 44100, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
 }
 
 string AudioMedia::getSdpMediaType(){
@@ -197,9 +200,9 @@ void AudioMedia::playData( RtpPacket * packet ){
 }
 
 void AudioMedia::srcb_handleSound( void * data ){
-	byte_t encoded[1600];
 
-#ifdef IPAQ
+#if 0
+	//#ifdef IPAQ
 	uint32_t i;
 	short sent[160];
 	// The iPAQ does not support 8kHz, so we use 16kHz and resample
@@ -222,8 +225,11 @@ void AudioMedia::srcb_handleSound( void * data ){
 	}
 			
 #endif
-
-	((AudioCodec *)*codec)->encode( data, ((AudioCodec*)*codec)->getInputNrSamples()*sizeof(short), encoded );
+//	cerr << "Before resample: " << print_hex( (unsigned char*)data, 882 ) << endl;
+	resample( (short *)data, resampledData );
+//	cerr << "After resample: " << print_hex( (unsigned char *)resampledData, 160 ) << endl;
+	
+	((AudioCodec *)*codec)->encode( resampledData, ((AudioCodec*)*codec)->getInputNrSamples()*sizeof(short), encoded );
 	uint32_t encodedLength = ((AudioCodec *)*codec)->getEncodedNrBytes();
 
 

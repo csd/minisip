@@ -196,10 +196,6 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 
 	int setSpeed;
 
-	// FIXME
-	// We always use 8kHz for recording
-	samplingRate = 8000;
-
 #ifdef IPAQ
 	// The iPAQ h5550 is known not to support 8kHz, we use 16kHz and
 	// resample

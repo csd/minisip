@@ -42,6 +42,7 @@
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
 #include<signal.h>
+#include<libmutil/Timestamp.h>
 #endif
 #endif
 

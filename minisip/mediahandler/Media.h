@@ -89,7 +89,7 @@ class Media : public MObject{
 		std::list<std::string> sdpAttributes;
 };
 
-class AudioMedia : public Media, public SoundRecorderCallback{
+class AudioMedia : public Media, public SoundRecorderCallback, public Resampler{
 
 	public:
 		AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec );
@@ -111,6 +111,8 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 	private:
 		MRef<SoundIO *> soundIo;
 		uint32_t seqNo;
+		byte_t encoded[1600];
+		short resampledData[160];
 #ifdef IPAQ
 		uint32_t iIPAQ;
 		short saved[160];

@@ -44,6 +44,9 @@ ImWidget::ImWidget( MainWindow * mainWindow, string toUri, string fromUri ){
 	closeButton = new Gtk::Button( "Close" );
 	buttonBox = new Gtk::HBox();
 
+	historyView->set_wrap_mode( Gtk::WRAP_WORD );
+	messageView->set_wrap_mode( Gtk::WRAP_WORD );
+
 	historyIter = historyView->get_buffer()->begin();
 
 	pack_start( *historyWindow, true, true );

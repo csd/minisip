@@ -67,7 +67,6 @@
 
 #define BS 160
 
-bool nprint=false;
 
 /* lookup tables without gain control */
 float lchvol[POS]={1,0.8,1,0.6,0};
@@ -201,11 +200,12 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	short *buffers[2];	// Two sound buffers for "double buffering"
 	assert(soundcard!=NULL);
 	int32_t nread; /* IN SAMPLES */
-	soundcard->recorder_buffer_size = 160;
+	//FIXME
+	soundcard->recorder_buffer_size = 882;
 	
 	for (i=0; i<2; i++){
 		//buffers[i] = (short *)malloc(soundcard->recorder_buffer_size*sizeof(short)*2);
-		buffers[i] = (short *)malloc(2048);
+		buffers[i] = (short *)malloc(4096);
 	}
 		
 	short * tempBuffer=NULL;
@@ -456,7 +456,7 @@ void *SoundIO::playerLoop(void *arg){
 				
 				/* spatial audio */
 //				cerr << "before resample" << mtime() << endl;
-				(*i)->resample(tmpbuf,resbuf,BS*nChannels,1764);
+				(*i)->resample( tmpbuf,resbuf );
 //				cerr << "after resample" << mtime() << endl;
 				(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
 //				cerr << "After spatialize " << mtime() << endl;
@@ -487,87 +487,9 @@ void SoundIO::start_sound_player(){
         Thread::createThread(playerLoop, this);
 }
 
-SoundSource::SoundSource(int id):sourceId(id){
-}
-
-int error;
-
-BasicSoundSource::BasicSoundSource(int32_t id, 
-				   SoundIOPLCInterface *plc,
-				   int32_t position,
-				   int32_t nSources,
-				   double sRate,
-				   int32_t frameSize, 
-				   int32_t bufferNMonoSamples):
-                SoundSource(id), 
-		plcProvider(plc),
-		bufferSizeInMonoSamples(bufferNMonoSamples),
-		playoutPtr(0), 
-		firstFreePtr(0),
-		lap_diff(0)
-{
-	stereoBuffer = new short[bufferNMonoSamples*2];
-	firstFreePtr = stereoBuffer;
-	playoutPtr = stereoBuffer;
-	this->position=position;
-	numSources=nSources;
-	sampRate=sRate;
-
-	/* spatial audio initialization */
-	src_data = new SRC_DATA();
-	src_data->input_frames = frameSize;
-	src_data->output_frames = 882;
-	src_data->src_ratio = 44100.0/sampRate;
-	src_data->data_in  = new float[src_data->input_frames  * 2];
-	src_data->data_out = new float[src_data->output_frames * 2];
-	memset( src_data->data_in, '\0', src_data->input_frames  * 8 );
-	memset( src_data->data_out, '\0', src_data->output_frames  * 8 );
-
-	src_state=src_new(2,2,&error);
-
-	leftch = new short[950];
-	rightch = new short[950];
-	lookupleft = new short[65536];
-	lookupright = new short[65536];
-//	initLookup(numSources);
-	pointer = 0;
-	j=0;
-	k=0;
-	
-}
-
-BasicSoundSource::~BasicSoundSource(){
-	delete [] stereoBuffer;
-	delete [] leftch;
-	delete [] rightch;
-	delete [] lookupleft;
-	delete [] lookupright;
-	delete [] src_data->data_in;
-	delete [] src_data->data_out;
-	delete src_data;
-	src_delete( src_state );
-}
-
-#if 0
-void SoundSource::initLookup(int32_t nSources){
-	cerr << "nSources in initLookup" << nSources << endl;
-	cerr << "sourcePos in initLookup" << position << endl;
-   for(int32_t i=0;i<65536;i++){
-     /* without gain control */
-     lookupleft[i]=(short)((float)(i-32768)*lchvol[position-1]);
-     lookupright[i]=(short)((float)(i-32768)*rchvol[position-1]);
-     
-     /* with gain control 
-     lookupleft[i]=(short)((float)(i-32768)*lchvol[nSources-1][position-1]);
-     lookupright[i]=(short)((float)(i-32768)*rchvol[nSources-1][position-1]);
-     */
-
-   } 
-}
-#endif
-
 short int lookupleftGlobal[65536][POS]; 
 short int lookuprightGlobal[65536][POS]; 
+
 void SoundIO::initLookup(){
 	for(int32_t j=0; j < POS; j++ ){
 		for(int32_t i=0;i<65536;i++){
@@ -583,181 +505,6 @@ void SoundIO::initLookup(){
 		} 
 	}
 }
-
-
- short* SoundSource::getLeftBuf(){
-   return leftch;
- }
-
- short* SoundSource::getRightBuf(){
-   return rightch;
- }
-
- short* SoundSource::getLookupLeft(){
-   return lookupleft;
- }
-
- short* SoundSource::getLookupRight(){
-   return lookupright;
- }
-
- int32_t SoundSource::getPointer(){
-   return pointer;
- }
-/*
- SRC_DATA* SoundSource::getSrcData(){
-   return src_data;
- }
-
- SRC_STATE* SoundSource::getSrcState(){
-   return src_state;
- }
-*/
-
- void SoundSource::setPointer(int32_t wpointer){
-   pointer=wpointer;
- }
-
-int SoundSource::getId(){
-	return sourceId;
-}
-
-int32_t SoundSource::getPos(){
-	return position;
-}
-
-void SoundSource::setPos(int32_t position){
-  this->position=position;
-}
-
-// Two cases - might have to "wrap around"
-//            v-firstFree
-// 1:  ...xxxx..........
-// 2:  ............xxxx.
-
-int npush=1;
-void BasicSoundSource::pushSound(short * samples, 
-                                int32_t nMonoSamples, 
-                                int32_t index, 
-                                bool isStereo)
-{
-	index++; //dummy op
-	npush++;
-	if (nprint)
-		nprint=false,cerr << "npush="<< npush<< endl;;
-	
-	short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
-
-		
-	if (firstFreePtr+nMonoSamples*2 >= endOfBufferPtr){
-		if (lap_diff==0 && 
-                            stereoBuffer+
-                            (((firstFreePtr-stereoBuffer)+
-                            nMonoSamples*2)%(bufferSizeInMonoSamples*2)) 
-                            > playoutPtr  ){
-			cerr << "Buffer overflow - dropping packet"<<endl;
-			return;
-		}
-		lap_diff=1;
-	}
-	
-	if (isStereo){
-		for (int32_t i=0; i< nMonoSamples*2; i++)
-			stereoBuffer[((firstFreePtr-stereoBuffer)+i)%
-                                (bufferSizeInMonoSamples*2)] = samples[i];
-	}else{
-		for (int32_t i=0; i< nMonoSamples; i++){
-			stereoBuffer[((( (firstFreePtr-stereoBuffer)/2)+i)*2)%
-                                    (bufferSizeInMonoSamples*2)] = samples[i];
-			stereoBuffer[((( (firstFreePtr-stereoBuffer)/2)+i)*2)%
-                                    (bufferSizeInMonoSamples*2)+1] = samples[i];
-		}
-	}
-	firstFreePtr = stereoBuffer + ((firstFreePtr-stereoBuffer)+
-                        nMonoSamples*2)%(bufferSizeInMonoSamples*2);
-}
-
-
-int nget=1;
-void BasicSoundSource::getSound(short *dest, 
-                int32_t nMono, 
-                bool stereo, 
-                bool dequeue)
-{
-	nget++;
-	if (nget%1000==0)
-		nprint=true,cerr << "nget="<< nget<< endl;
-	short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
-#ifdef DEBUG_OUTPUT
-	static int counter = 0;
-	static bool do_print=false;
-	if (counter%1000==0)
-		do_print=true;
-	
-	if (do_print && !lap_diff){
-		do_print=false;
-	}
-	counter++;
-#endif
-	if ((!lap_diff && (firstFreePtr-playoutPtr< nMono*2)) || 
-                        (lap_diff && (firstFreePtr-stereoBuffer+
-                        endOfBufferPtr-playoutPtr<nMono*2))){
-                
-                /* Underflow */
-#ifdef DEBUG_OUTPUT
-		cerr << "u"<< flush;
-#endif
-		if (plcProvider){
-			cerr << "PLC!"<< endl;
-			short *b = plcProvider->get_plc_sound(nMono);
-			memcpy(dest, b, nMono);
-		}else{
-
-			for (int32_t i=0; i < nMono * (stereo?2:1); i++){
-				dest[i]=0;
-			}
-		}
-		return;
-	}
-
-	if (stereo){
-		for (int32_t i=0; i<nMono*2; i++){
-			dest[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
-                                        (bufferSizeInMonoSamples*2) ];
-		}
-	}else{
-		for (int32_t i=0; i<nMono; i++){
-			dest[i]=stereoBuffer[((playoutPtr-stereoBuffer)+i*2)%
-                                                (bufferSizeInMonoSamples*2) ]/2;
-			dest[i]+=stereoBuffer[((playoutPtr-stereoBuffer)+i*2+1)%
-                                                (bufferSizeInMonoSamples*2) ]/2;
-		}
-	}	
-	if (playoutPtr+nMono*2>=endOfBufferPtr)
-		lap_diff=0;
-	
-	if (dequeue){
-		playoutPtr = stereoBuffer + ((playoutPtr-stereoBuffer)+nMono*2)%
-                                                (bufferSizeInMonoSamples*2);
-	}
-}
-
-
-void SoundSource::resample(short *input,
-		        	short *output,
-				int32_t isize,
-				int32_t osize)
-{
-  
-  int32_t error;
-  
-  src_short_to_float_array (input, src_data->data_in, isize);
-  
-  src_process(src_state,src_data);
-  
-  src_float_to_short_array(src_data->data_out,output,osize);
-}
-
 
 RecorderReceiver::RecorderReceiver(SoundRecorderCallback *cb, 
                                     bool stereo) : 
