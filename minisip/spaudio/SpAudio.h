@@ -29,6 +29,7 @@
 
 
 #define POS 5
+#define MAXSOURCES 10
 
 class SoundSource;
 
@@ -53,7 +54,7 @@ class SpAudio{
   static int32_t lchdelay[POS];
   static int32_t rchdelay[POS];
 
-  static int32_t assmatrix[POS][POS];
+  static int32_t assmatrix[MAXSOURCES][MAXSOURCES];
 
  private:
 
