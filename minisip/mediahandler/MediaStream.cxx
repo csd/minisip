@@ -113,7 +113,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	
 	/* If we have an rtpmap:, it should be the same */
 	rtpmap = m->getRtpMap( rtpPayloadType );
-	if( getRtpMap() != "" ){
+	if( rtpmap != "" && getRtpMap() != "" ){
 		// FIXME
 		size_t s1 = getRtpMap().find("/");
 		size_t s2 = rtpmap.find("/");

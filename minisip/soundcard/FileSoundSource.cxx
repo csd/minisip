@@ -53,13 +53,13 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id,
         nOutputFrames = ( outputDurationMs * inputFreq ) / 1000;
         cerr << "nOutputFrames: " << nOutputFrames << endl;
         
-        audio = new short[nSamples*outputNChannels];
         input = new short[nSamples*inputNChannels];
         
         file.seekg (0, ios::beg);
         file.read( (char*)input, nSamples*sizeof(short));
 
         if( inputNChannels > outputNChannels ){
+        	audio = new short[nSamples*outputNChannels];
                 if( inputNChannels % outputNChannels == 0 ){
                         /* do some mixing */
                         for( uint32_t sample = 0; sample < nSamples; sample++ ){
@@ -73,19 +73,25 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id,
                 }
                 else{
                         /* Just take the first channels */
-                        for( uint32_t sample = 0; sample < nSamples; nSamples++ ){
+                        for( uint32_t sample = 0; sample < nSamples; sample++ ){
                                 for( uint32_t oChannel = 0; oChannel < outputNChannels; oChannel++ ){
                                         audio[sample*outputNChannels+oChannel] = input[sample*inputNChannels+oChannel];
                                 }
                         }
                 }
+        	delete [] input;
         }
+	else if( inputNChannels == outputNChannels ){
+		audio = input;
+	}
         else{
-                for( uint32_t sample = 0; sample < nSamples; nSamples++ ){
+        	audio = new short[nSamples*outputNChannels];
+                for( uint32_t sample = 0; sample < nSamples; sample++ ){
                         for( uint32_t oChannel = 0; oChannel < outputNChannels; oChannel++ ){
                                 audio[sample*outputNChannels+oChannel] = input[sample*inputNChannels];
                         }
                 }
+		delete [] input;
         }
 
         nChannels = outputNChannels;
@@ -93,7 +99,6 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id,
         resampler = Resampler::create( inputFreq, outputFreq, outputDurationMs, outputNChannels );
 
         cerr << "After constructor " << nOutputFrames << endl;
-        delete [] input;
 }
 
                 
@@ -141,7 +146,6 @@ void FileSoundSource::pushSound(short *samples,
 
 
 void FileSoundSource::getSound( short *dest, bool dequeue ){
-        cerr << "Calling getSound " << nOutputFrames << endl;
         if( index + nOutputFrames >= nSamples ){
                 if (repeat)
                         index = 0;
