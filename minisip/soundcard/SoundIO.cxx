@@ -291,7 +291,7 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
 		j++;
 	}
-	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize),8000,BS);
+	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize,8000,BS));
 	queueLock.unlock();
 	sourceListCond.broadcast();
 }
@@ -460,7 +460,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 				   int32_t position,
 				   int32_t nSources,
 				   double sRate,
-				   int32_t frameSize; 
+				   int32_t frameSize, 
 				   int32_t bufferNMonoSamples):
                 SoundSource(id), 
 		plcProvider(plc),
@@ -671,8 +671,8 @@ void BasicSoundSource::getSound(short *dest,
 }
 
 
-void BasicSoundSource::resample(short *input,
-				short *output,
+void SoundSource::resample(short *input,
+		        	short *output,
 				int32_t isize,
 				int32_t osize)
 {
