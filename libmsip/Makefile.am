@@ -16,6 +16,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipURI.cxx \
 		     source/SipTimers.cxx \
 		     source/SipMessageContentIM.cxx \
+		     source/SipMessageContentFactory.cxx \
                      source/transactions/SipTransactionUtils.cxx \
                      source/transactions/SipTransaction.cxx \
 		     source/transactions/SipTransactionClient.cxx \
@@ -58,16 +59,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderUserAgent.cxx \
                      source/headers/SipHeaderAcceptContact.cxx \
                      source/headers/SipHeaderVia.cxx \
-                     source/headers/SipHeaderWarning.cxx \
-                     source/sdp/SdpPacket.cxx \
-                     source/sdp/headers/SdpHeader.cxx \
-                     source/sdp/headers/SdpHeaderA.cxx \
-                     source/sdp/headers/SdpHeaderC.cxx \
-                     source/sdp/headers/SdpHeaderM.cxx \
-                     source/sdp/headers/SdpHeaderO.cxx \
-                     source/sdp/headers/SdpHeaderS.cxx \
-                     source/sdp/headers/SdpHeaderT.cxx \
-                     source/sdp/headers/SdpHeaderV.cxx
+                     source/headers/SipHeaderWarning.cxx
 
 
 

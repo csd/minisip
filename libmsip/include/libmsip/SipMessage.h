@@ -42,7 +42,7 @@
 #include<libmsip/SipMessageContent.h>
 #include<sys/types.h>
 #include<libmutil/MemObject.h>
-#include<libmsip/SdpPacket.h>
+#include<libmsip/SipMessageContentFactory.h>
 
 
 /**
@@ -55,6 +55,7 @@
 class SipMessage : public MObject{
 
 	public:
+		static SMCFCollection contentFactories;
 
 		SipMessage(string branch, int type);
 		SipMessage(int type, string &build_from);
@@ -76,6 +77,8 @@ class SipMessage : public MObject{
 				return "UNDEFINED";
 			return string(types[getType()]);
 		}
+		
+
 		
                 /**
                  * Adds one header (specialization of SipHeader) to the SIP
@@ -194,6 +197,21 @@ class SipMessage : public MObject{
 		void setDestinationBranch(string b){branch = b;}
 		
 		string getDestinationBranch();
+
+
+
+                /**
+                 * @returns Nonce in this repsonse if available.
+                 */
+                string getNonce();
+                void setNonce(string n);
+
+                /**
+                 * @returns Realm in this response if available.
+                 */
+                string getRealm();
+                void setRealm(string r);
+
 		
 
 	protected:
@@ -210,9 +228,13 @@ class SipMessage : public MObject{
 		// Socket on which the packet was received
 ///		Socket* socket;
 	private: 
+		int parseHeaders(const string &buf, int startIndex);
 		string getViaHeaderBranch(bool first);
 		string branch;
 		int type;
+		string realm;
+		string nonce;
+
 };
 
 #endif

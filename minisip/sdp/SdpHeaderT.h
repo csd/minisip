@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SdpHeaderS.h
+ * 	SdpHeaderT.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -29,29 +29,32 @@
 */
 
 
+#ifndef SDPHEADERT_H
+#define SDPHEADERT_H
 
-#ifndef SDPHEADERS_H
-#define SDPHEADERS_H
-
-#include<libmsip/SdpHeader.h>
+#include"../sdp/SdpHeader.h"
 
 using namespace std;
 
-class SdpHeaderS : public SdpHeader{
+class SdpHeaderT : public SdpHeader{
 	public:
-		SdpHeaderS(string buildFrom);
-		virtual ~SdpHeaderS();
+		SdpHeaderT(string buildFrom);
+		SdpHeaderT(int32_t start_time, int32_t stop_time);
+		~SdpHeaderT();
+
+		virtual std::string getMemObjectType(){return "SdpHeaderT";}
+
+		int32_t getStartTime();
+		void setStartTime(int32_t time);
 		
-		virtual std::string getMemObjectType(){return "SdpHeaderS";}
+		int32_t getStopTime();
+		void setStopTime(int32_t time);
 
-		string getSessionName();
-		void setSessionName(string s);
-
-		virtual  string getString();
+		virtual string getString();
 
 	private:
-		string session_name;
-
+		int32_t start_time;
+		int32_t stop_time;
 };
 
 #endif

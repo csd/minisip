@@ -21,7 +21,7 @@
 */
 
 /* Name
- * 	SipResponse.h
+ * 	SdpHeaderV.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
@@ -29,55 +29,28 @@
 */
 
 
-#ifndef SIPRESPONSE_H
-#define SIPRESPONSE_H
+#ifndef SDPHEADERV_H
+#define SDPHEADERV_H
 
-#include"SipMessage.h"
-#include"SipInvite.h"
+#include"../sdp/SdpHeader.h"
 
+using namespace std;
 
-/**
- * 
- * @author Erik Eliasson, eliasson@it.kth.se
- * @version 0.01
- */
-class SipResponse : public SipMessage{
-
+class SdpHeaderV : public SdpHeader{
 	public:
-		static const int type;
+		SdpHeaderV(string buildFrom);
+		SdpHeaderV(int32_t ver);
 
-		SipResponse(string branch, int32_t status, string status_desc, MRef<SipMessage*> inv);
+		virtual std::string getMemObjectType(){return "SdpHeaderV";}
 
+		int32_t getVersion();
+		void setVersion(int32_t ver);
 
-		virtual std::string getMemObjectType(){return "SipResponse";}
-		
-		/**
-		 * Parses response packet from string representation.
-		 * @param respstr string representation of response packet.
-		 */
-		SipResponse(string &respstr);
-
-		/**
-		 * @returns Status code of this response.
-		 */
-		int32_t getStatusCode();
-
-		/**
-		 * @resutns Returns status description of this response.
-		 */
-		string getStatusDesc();
-
-		string getString();
+		virtual string getString();
 
 	private:
-		int32_t status_code;
-		string status_desc;
+		int32_t v;
 
-		string realm;
-		string nonce;
-
-		string tag;
 };
-
 
 #endif

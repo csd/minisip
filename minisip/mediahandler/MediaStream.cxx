@@ -22,9 +22,9 @@
 
 #include<config.h>
 #include<libmikey/keyagreement.h>
-#include<libmsip/SdpHeaderM.h>
-#include<libmsip/SdpHeaderA.h>
-#include<libmsip/SdpPacket.h>
+#include"../sdp/SdpHeaderM.h"
+#include"../sdp/SdpHeaderA.h"
+#include"../sdp/SdpPacket.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmutil/itoa.h>
 #include"MediaStream.h"

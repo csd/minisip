@@ -32,6 +32,7 @@
 #include"../mediahandler/MediaHandler.h"
 #include"MessageRouter.h"
 
+#include<libmsip/SipUtils.h>
 
 
 static void *tcp_server_thread(void *arg){
@@ -266,7 +267,20 @@ void Minisip::run(){
                         }
                 }
 
+/*		cerr << "Minisip: starting presence client for someone@ssvl.kth.se"<< endl;
+		
+		CommandString subscribeserver("", SipCommandString::start_presence_server);
+		SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
+		sip->handleCommand(sipcmdss);
+
+
+		
+		CommandString subscribe("", SipCommandString::start_presence_client,"erik_kphone@ssvl.kth.se");
+		SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
+		sip->handleCommand(sipcmd2);
+*/
                 gui->setCallback(ehandler);
+//		sleep(5);
                 sip->run();
 
 

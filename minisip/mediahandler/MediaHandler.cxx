@@ -21,7 +21,7 @@
 */
 
 #include<config.h>
-#include<libmsip/SdpPacket.h>
+#include"../sdp/SdpPacket.h"
 #include<libmikey/keyagreement.h>
 #include"../sip/SipDialogSecurityConfig.h"
 #include"../sip/SipSoftPhoneConfiguration.h"

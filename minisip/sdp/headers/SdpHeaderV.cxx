@@ -21,40 +21,36 @@
 */
 
 /* Name
- * 	SdpHeaderT.h
+ * 	SdpHeaderV.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
  * 
 */
 
+#include<config.h>
 
-#ifndef SDPHEADERT_H
-#define SDPHEADERT_H
-
-#include<libmsip/SdpHeader.h>
+#include<libmsip/SdpHeaderV.h>
+#include<libmutil/itoa.h>
 
 using namespace std;
 
-class SdpHeaderT : public SdpHeader{
-	public:
-		SdpHeaderT(string buildFrom);
-		SdpHeaderT(int32_t start_time, int32_t stop_time);
-		~SdpHeaderT();
+SdpHeaderV::SdpHeaderV(string buildFrom):SdpHeader(SDP_HEADER_TYPE_V, 1){
+	v=0;	//FIXME
+}
 
-		virtual std::string getMemObjectType(){return "SdpHeaderT";}
+SdpHeaderV::SdpHeaderV(int32_t ver):SdpHeader(SDP_HEADER_TYPE_V, 1){
+	v=ver;
+}
 
-		int32_t getStartTime();
-		void setStartTime(int32_t time);
-		
-		int32_t getStopTime();
-		void setStopTime(int32_t time);
+int32_t SdpHeaderV::getVersion(){
+	return v;
+}
+void SdpHeaderV::setVersion(int32_t ver){
+	this->v = ver;
+}
 
-		virtual string getString();
+string SdpHeaderV::getString(){
+	return "v="+itoa(v);
+}
 
-	private:
-		int32_t start_time;
-		int32_t stop_time;
-};
-
-#endif

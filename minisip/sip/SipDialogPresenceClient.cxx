@@ -334,7 +334,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 
 bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << end;
-	merr << "XXXSipDialogPresenceClient::handleCommand got "<< c << end;
+//	merr << "XXXSipDialogPresenceClient::handleCommand got "<< c << end;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
 		if (c.getCommandString().getDestinationId() != callId ){

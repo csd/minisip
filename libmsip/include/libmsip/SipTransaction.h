@@ -36,6 +36,8 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
+#include<libmnetutil/Socket.h>
+#include<libmnetutil/IPAddress.h>
 
 class SipDialog;
 class SipMessageDispatcher;

@@ -34,18 +34,22 @@
 
 #include<libmnetutil/IPAddress.h>
 #include<vector>
-#include<libmsip/SdpHeader.h>
+#include"../sdp/SdpPacket.h"
+#include"../sdp/SdpHeader.h"
 //#include<libmsip/CODECInterface.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>
+#include<libmsip/SipMessageContentFactory.h>
 
-class SdpPacket : public SipMessageContent {
+MRef<SipMessageContent*> sdpSipMessageContentFactory(const string &);
+
+class SdpPacket : public SipMessageContent{
 	public:
 		SdpPacket();
 		SdpPacket(std::string build_from);
 	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs);
 	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs, string key_mgmt);
-
+	
 		virtual std::string getMemObjectType(){return "SdpPacket";}
 		
 		IPAddress *getRemoteAddr(int &ret_port);

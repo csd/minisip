@@ -21,63 +21,39 @@
 */
 
 /* Name
- * 	SipResponse.h
+ * 	SdpHeaderS.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
  * 
 */
 
-
-#ifndef SIPRESPONSE_H
-#define SIPRESPONSE_H
-
-#include"SipMessage.h"
-#include"SipInvite.h"
+#include<config.h>
 
 
-/**
- * 
- * @author Erik Eliasson, eliasson@it.kth.se
- * @version 0.01
- */
-class SipResponse : public SipMessage{
+#include<libmsip/SdpHeaderS.h>
+#include<libmutil/itoa.h>
+#include<libmutil/trim.h>
+#include<assert.h>
 
-	public:
-		static const int type;
+using namespace std;
 
-		SipResponse(string branch, int32_t status, string status_desc, MRef<SipMessage*> inv);
+SdpHeaderS::SdpHeaderS(string buildFrom):SdpHeader(SDP_HEADER_TYPE_S, 3){
+	assert(buildFrom.substr(0,2)=="s=");
+	session_name = trim(buildFrom.substr(2, buildFrom.length()-2));
+}
 
+SdpHeaderS::~SdpHeaderS(){
 
-		virtual std::string getMemObjectType(){return "SipResponse";}
-		
-		/**
-		 * Parses response packet from string representation.
-		 * @param respstr string representation of response packet.
-		 */
-		SipResponse(string &respstr);
+}
 
-		/**
-		 * @returns Status code of this response.
-		 */
-		int32_t getStatusCode();
+string SdpHeaderS::getSessionName(){
+	return session_name;
+}
+void SdpHeaderS::setSessionName(string s){
+	this->session_name = s;
+}
 
-		/**
-		 * @resutns Returns status description of this response.
-		 */
-		string getStatusDesc();
-
-		string getString();
-
-	private:
-		int32_t status_code;
-		string status_desc;
-
-		string realm;
-		string nonce;
-
-		string tag;
-};
-
-
-#endif
+string SdpHeaderS::getString(){
+	return "s="+session_name;
+}

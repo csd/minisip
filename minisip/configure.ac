@@ -318,8 +318,8 @@ AC_CHECK_LIB([ssl], [main])
 
 AC_CHECK_LIB([mutil], [main])
 AC_CHECK_LIB([mnetutil], [main])
-AC_CHECK_LIB([mikey], [main])
 AC_CHECK_LIB([msip], [main])
+AC_CHECK_LIB([mikey], [main])
 
 
 dnl Check for QT libraries
@@ -417,6 +417,7 @@ AC_OUTPUT([codecs/Makefile
                  sip/Makefile
                  soundcard/Makefile
                  stun/Makefile
+                 sdp/Makefile
                  p2t/Makefile
 		 mediahandler/Makefile
                  video/Makefile

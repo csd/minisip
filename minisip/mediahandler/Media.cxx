@@ -28,8 +28,8 @@
 #include"MediaStream.h"
 #include"RtpReceiver.h"
 #include<libmutil/itoa.h>
-#include<libmsip/SdpHeaderM.h>
-#include<libmsip/SdpHeaderA.h>
+#include"../sdp/SdpHeaderM.h"
+#include"../sdp/SdpHeaderA.h"
 
 #ifdef VIDEO_SUPPORT
 #include"../video/codec/VideoCodec.h"

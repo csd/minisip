@@ -61,6 +61,7 @@
 #include<libmutil/minilist.h>
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipDialogContainer.h>
+#include"../sdp/SdpPacket.h"
 
 #include<libmsip/SipDialog.h>
 

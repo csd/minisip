@@ -9,6 +9,6 @@ endif
 
 dist_pkgdata_DATA = share/tray_icon.png share/minisip.glade
 EXTRA_DIST = test_cert/*.pem
-SUBDIRS = codecs soundcard rtp sip stun p2t mediahandler $(video_dir) minisip
+SUBDIRS = codecs soundcard rtp sip stun p2t mediahandler $(video_dir) sdp minisip
 DIST_SUBDIRS = $(SUBDIRS) video debian
 

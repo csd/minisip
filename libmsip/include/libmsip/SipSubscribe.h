@@ -34,7 +34,6 @@
 #define SIPSUBSCRIBE_H
 
 #include<libmsip/SipMessage.h>
-#include<libmsip/SdpPacket.h>
 #include<libmsip/SipDialogConfig.h>
 #include<vector>
 

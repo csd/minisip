@@ -23,8 +23,6 @@
 #ifndef SIPDIALOG_H
 #define SIPDIALOG_H
 
-#include<libmsip/SdpPacket.h>
-
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>

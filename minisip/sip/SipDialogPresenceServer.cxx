@@ -364,7 +364,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch){
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){
 	mdbg << "SipDialogPresenceServer::handleCommand got "<< c << end;
-	merr << "XXXSipDialogPresenceServer::handleCommand got "<< c << end;
+//	merr << "XXXSipDialogPresenceServer::handleCommand got "<< c << end;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
 		if (c.getCommandString().getDestinationId() != callId ){

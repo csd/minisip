@@ -33,6 +33,7 @@ endif !GTK_GUI
 minisip_LDADD +=gui/libminisip_gui.a \
                 libminisip.a \
                 ../sip/libsip.a \
+                ../sdp/libsdp.a \
 		contactdb/libcontactdb.a \
                 ../p2t/libp2t.a \
                 ../mediahandler/libmediahandler.a

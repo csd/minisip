@@ -34,7 +34,7 @@
 #define SIPNOTIFY_H
 
 #include<libmsip/SipMessage.h>
-#include<libmsip/SdpPacket.h>
+#include<libmnetutil/IPAddress.h>
 #include<vector>
 #include<sys/types.h>
 

@@ -29,20 +29,12 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipCallback.h \
 		     libmsip/SipMessageContent.h \
 		     libmsip/SipMessageContentIM.h \
+		     libmsip/SipMessageContentFactory.h \
 		     libmsip/SipMessageTransport.h \
 		     libmsip/SipSMCommand.h \
 		     libmsip/SipCommandString.h \
 		     libmsip/SipURI.h \
 		     libmsip/SipException.h \
-		     libmsip/SdpPacket.h \
-		     libmsip/SdpHeader.h \
-		     libmsip/SdpHeaderA.h \
-		     libmsip/SdpHeaderC.h \
-		     libmsip/SdpHeaderM.h \
-		     libmsip/SdpHeaderO.h \
-		     libmsip/SdpHeaderS.h \
-		     libmsip/SdpHeaderT.h \
-		     libmsip/SdpHeaderV.h \
 		     libmsip/SipTransactionUtils.h \
 		     libmsip/SipTransaction.h \
 		     libmsip/SipTransactionClient.h \

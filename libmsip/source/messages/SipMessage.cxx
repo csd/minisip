@@ -36,6 +36,7 @@
 #include<errno.h>
 #include<ctype.h>
 
+#include<libmsip/SipMessageContentFactory.h>
 #include<libmsip/SipHeaderContentLength.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderFrom.h>
@@ -74,6 +75,8 @@
 #ifdef DEBUG_OUTPUT
 #include<libmsip/SipResponse.h>
 #endif
+
+SMCFCollection SipMessage::contentFactories=SMCFCollection();
 
 string SipMessage::getDescription(){
         string ret;
@@ -158,82 +161,75 @@ string SipMessage::getHeadersAndContent(){
 	return req;
 }
 
-SipMessage::SipMessage(int type, string &build_from): type(type)
-{
-	//socket=NULL;
-	content=NULL;
-#ifdef MINISIP_MEMDEBUG
-	content.setUser("SipMessage");
+/**
+ * @return Index where the content of the message starts (if any)
+ */
+int SipMessage::parseHeaders(const string &buf, int startIndex){
+	int i=startIndex;
+	int end = buf.size();
+	do{
+		if (i+2<=end && buf[i]=='\n' && buf[i+1]=='\n')	// i points to first after header
+			return i+2;				// return pointer to start of content
+
+		if (i+4<=end && buf[i]=='\r' && buf[i+1]=='\n' 
+				&& buf[i+2]=='\r' && buf[i+3]=='\n' )	// i points to first after header
+			return i+4;				// return pointer to start of content
+		if (i+4<=end && buf[i]=='\n' && buf[i+1]=='\r' 
+				&& buf[i+2]=='\n' && buf[i+3]=='\r' )	// i points to first after header
+			return i+4;				// return pointer to start of content
+	
+		int eoh = SipUtils::findEndOfHeader(buf, i);	// i will be adjusted to start of header
+		string header = buf.substr(i, eoh-i+1);
+		if (!addLine(header)){
+#ifdef DEBUG_OUTPUT
+			mdbg << "Info: Could not copy line to new Message: " << header << " (unknown)" << end;
 #endif
+		}
+		i=eoh+1;
+	}while (i<end);
+	return i;
+}
+
+SipMessage::SipMessage(int type, string &buildFrom): type(type)
+{
 	uint32_t i;
 	string header;
-	for (i=0; build_from[i]!='\r' && build_from[i]!='\n'; i++){
-		if(i==build_from.size())
+	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
+		if(i==buildFrom.size())
 			throw new SipExceptionInvalidMessage();
-		header = header + build_from[i];
+		header = header + buildFrom[i];
 
 	}
 	
-	bool done=false;
-	int32_t nr_n, nr_r;
-	do{
-		if (build_from[i]=='\r' || build_from[i]=='\n'){
-			nr_n=nr_r=0;
-			while ((i!=build_from.size()) && (build_from[i]=='\r' || build_from[i]=='\n')){
-				if (build_from[i]=='\r')
-					nr_r++;
-				if (build_from[i]=='\n')
-					nr_n++;
-				i++;
-			}	
-			done = (nr_n>1) || (nr_r >1);
+	int contentStart = parseHeaders(buildFrom, i);
+	int clen = getContentLength();
+	if (clen>0){
+		string content=buildFrom.substr(contentStart, clen);
+		if ((int)content.length() != clen){
+			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<content.length()<<")"<<endl;
 		}
-		if (!done){
-			string line="";
-			while (build_from[i] != '\r' && build_from[i] != '\n'){
-				line = line + build_from[i];
-				i++;
-				if(i==build_from.size()){
-					throw new SipExceptionInvalidMessage();}
+		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
+		if (h){	
+			MRef<SipMessageContent*> smcref;
+			string contentType = ((SipHeaderContentType*)*h)->getContentType();
+			//cerr <<  "Content type parsed to "<< contentType<< endl;
+			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
+			if (contentFactory){
+				MRef<SipMessageContent*> smcref = contentFactory(content);
+				//MRef<SipMessageContent*> smcref = contentFactory->createContent(content);
+				setContent(smcref);
+			}else{ //TODO: Better error handling
+				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<end;
 			}
-			if (!addLine(line)){
-#ifdef DEBUG_OUTPUT
-				mdbg << "Info: Could not copy line to new Message: " << line << " (unknown)" << end;
-#endif
-			}
-		}		
-	}while (!done);
-	
-	string content="";
-	
-	nr_n=nr_r=0;
-	done=false;
-
-	if (getContentLength()>0){
-		if(i+getContentLength()>build_from.size())
-		{	
-			throw new SipExceptionInvalidMessage();}
-		for (int32_t j=0; j<getContentLength(); j++){
-			content+=build_from[i+j];
+			
+		}else{ //TODO: Better error handling
+			merr << "WARNING: Sip message has content, but no content type! Content ignored."<< end;
 		}
-		MRef<SipMessageContent*> sdpOrIm;
-		if (type==SipIMMessage::type){
-			sdpOrIm = new SipMessageContentIM(trim(content));
-		}else{
-			sdpOrIm = new SdpPacket(trim(content));
-		}
-                //MRef<SipMessageContent*> sdp(new SdpPacket(trim(content)));
-#ifdef MINISIP_MEMDEBUG
-		sdp.setUser("SipMessage");
-#endif
-		setContent( sdpOrIm );
-	}else{
-		setContent(NULL);
 	}
-	build_from.erase(0,i+getContentLength());
-
+	
 	branch = getLastViaBranch();
 }
+
 
 
 
@@ -243,22 +239,20 @@ bool SipMessage::addLine(string line){
 	hdr.setUser("SipMessage");
 #endif
 	addHeader(hdr);
-
 	string ln = line;	//Hack to get realm an nonce... FIXME
 	if (getType()==SipResponse::type && (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){
-
 		unsigned r_pos = ln.find("realm=");
 		unsigned n_pos = ln.find("nonce=");
-		if (r_pos == string::npos || n_pos ==string::npos)
+		if (r_pos == string::npos || n_pos ==string::npos){
 			merr << "ERROR: could not extract nonce and realm in line: " << ln << end;
+		}
 		int32_t r_end = ln.find("\"",r_pos+7);
 		int32_t n_end = ln.find("\"",n_pos+7);
-		(static_cast<SipResponse*>(this))->setNonce(ln.substr(n_pos+7, n_end-(n_pos+7)));
-		(static_cast<SipResponse*>(this))->setRealm( ln.substr(r_pos+7, r_end-(r_pos+7)) );
-
-
+		string sub = ln.substr(n_pos+7, n_end-(n_pos+7));
+		setNonce(sub);
+		sub = ln.substr(r_pos+7, r_end-(r_pos+7));
+		setRealm( sub );
 	}
-	
 	return true;
 }
 
@@ -497,4 +491,21 @@ string SipMessage::getWarningMessage(){
 			return warning;
 		}
 	return "";
+}
+
+
+string SipMessage::getRealm(){
+        return realm;
+}
+
+void SipMessage::setRealm(string r){
+        realm = r;
+}
+
+string SipMessage::getNonce(){
+        return nonce;
+}
+
+void SipMessage::setNonce(string n){
+        nonce=n;
 }

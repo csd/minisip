@@ -77,13 +77,14 @@ SipResponse::SipResponse(string branch,
 	}
 }
 
-SipResponse::SipResponse(string &resp): SipMessage("", SipResponse::type)
+//TODO: This constructor needs rewriting (re-use from sipmessage)
+SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 {
-	
+
 	if(resp.size() < 11){
 		throw new SipExceptionInvalidMessage();
 	}
-	setContent(NULL);
+//	setContent(NULL);
 		//strlen(SIP/2.0)==7
 	int afterws=7;
 	while (resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
@@ -103,6 +104,7 @@ SipResponse::SipResponse(string &resp): SipMessage("", SipResponse::type)
 		status_desc=status_desc+resp[i];
 	}
 	
+/*
 	bool done=false;
 	int32_t nr_n, nr_r;
 	
@@ -167,20 +169,13 @@ SipResponse::SipResponse(string &resp): SipMessage("", SipResponse::type)
 	resp.erase(0, i+getContentLength());
 	
 	setDestinationBranch( getLastViaBranch() );
+*/
 }
 
 string SipResponse::getString(){
 	string rep = "SIP/2.0 "+itoa(status_code)+" "+status_desc+"\r\n";
 	rep = rep + getHeadersAndContent();
 	return rep;
-}
-
-string SipResponse::getRealm(){
-	return realm;
-}
-
-string SipResponse::getNonce(){
-	return nonce;
 }
 
 int32_t SipResponse::getStatusCode(){
@@ -191,7 +186,8 @@ string SipResponse::getStatusDesc(){
 	return status_desc;
 }
 
+/*
 MRef<SdpPacket*> SipResponse::getSdp(){
 	return MRef<SdpPacket*>((SdpPacket*)*content);
 }
-
+*/

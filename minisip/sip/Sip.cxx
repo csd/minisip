@@ -33,7 +33,6 @@
 #include"SipDialogVoip.h"
 #include<libmsip/SipCommandString.h>
 #include"../p2t/SipDialogP2T.h"
-//#include"SipCallP2Tuser.h"
 #include"../p2t/GroupListClient.h"
 #include"../p2t/GroupListServer.h"
 #include"../p2t/GroupList.h"
@@ -42,7 +41,6 @@
 #include<assert.h>
 
 #include<libmutil/dbg.h>
-
 
 Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler){
 	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
@@ -66,6 +64,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 }
 
 void Sip::init(){
+	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
 	phoneconfig->inherited.sipTransport->setSipSMCommandReceiver(this);
 }
 

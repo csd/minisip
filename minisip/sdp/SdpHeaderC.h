@@ -32,7 +32,7 @@
 #ifndef SDPHEADERC_H
 #define SDPHEADERC_H
 
-#include<libmsip/SdpHeader.h>
+#include"../sdp/SdpHeader.h"
 
 #include<string>
 

@@ -34,7 +34,6 @@
 #define SIPINVITE_H
 
 #include<libmsip/SipMessage.h>
-#include<libmsip/SdpPacket.h>
 //#include<libmsip/CODECInterface.h>
 #include<vector>
 #include<sys/types.h>
@@ -113,7 +112,7 @@ class SipInvite : public SipMessage{
 		/**
 		 * @returns IP+port where the remote ua accepts sound data.
 		 */
-		MRef<SdpPacket*> getSdp();
+//		MRef<SdpPacket*> getSdp();
 		
 
 		string getRemoteTelNo();
