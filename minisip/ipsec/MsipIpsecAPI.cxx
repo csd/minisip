@@ -243,7 +243,6 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 //---------------------------------------------------------------------------------------------------//
 //Handle responded MIKEY
 bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
-	cerr << "Atleast I'm here!" << endl;
 	if (MikeyM->getContentType() != "application/mikey")
 		return false;
 	if( !initiatorAuthenticate( MikeyM->getString() ) ){
@@ -461,8 +460,7 @@ bool MsipIpsecAPI::initMSipIpsec(){
 			//Making a SA
 			madeREQ.push_back(new MsipIpsecSA(so, satype, mode, reqid, seq++, 
 				(struct sockaddr *) &src, (struct sockaddr *) &dst,
-				spi, e_type, a_type, e_keylen, a_keylen, (char*)e_key, (char*)a_key, 64, flags,
-				1000, 1073741824, 1073741824, 1073741824 ));
+				spi, e_type, a_type, e_keylen, a_keylen, (char*)e_key, (char*)a_key, 64, flags));
 			//Making a Traffic Policy. Please make it dynamic
 			if (spiDstaddr == localIp)
 				policy = "in ipsec esp/transport//require";

@@ -60,7 +60,7 @@ class MsipIpsecSA : public MsipIpsecRequest{
 				char * a_key = NULL,
 				u_int wsize = 64,
 				u_int flags = 0,
-				u_int32_t l_alloc = 1000,
+				u_int32_t l_alloc = 200000000,
 				u_int64_t l_bytes = 1073741824,
 				u_int64_t l_addtime = 1073741824,
 				u_int64_t l_usetime = 1073741824 );
