@@ -76,16 +76,20 @@ MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):
 		csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		if( lengthLimit < 10 + nCsValue * 9 ){
 			throw new MikeyExceptionMessageLengthException(
-			"Given data is too short to form a HDR Payload" );
+			"Given data is too short to form any HDR Payload" );
 			return;
 		}
-		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID )
+		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
 			this->csIdMapPtr = 
 		   		new MikeyCsIdMapSrtp( &start[10], 9 * nCsValue );
-		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID )
+			this->endPtr = startPtr + 10 + 9 * this->nCsValue;
+		}
+		if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 			this->csIdMapPtr = 
-		   		new MikeyCsIdMapIPSEC4( &start[10], 9 * nCsValue );
-		this->endPtr = startPtr + 10 + 9 * this->nCsValue;
+		   		new MikeyCsIdMapIPSEC4( &start[10], 13 * nCsValue );
+			this->endPtr = startPtr + 10 + 13 * this->nCsValue;
+		}
+		
 	}
 	else{
 		throw new MikeyExceptionMessageContent( 
@@ -286,7 +290,7 @@ int MikeyCsIdMapSrtp::length(){
 }
 //added 041201 JOOR
 int MikeyCsIdMapIPSEC4::length(){
-	return 9 * cs.size();
+	return 13 * cs.size();
 }
 
 void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
@@ -426,7 +430,6 @@ void MikeyCsIdMapIPSEC4::addSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiD
 		cs.push_back( new MikeyIPSEC4Cs( policyNo, spi, spiSrcaddr, spiDstaddr ) );
 		return;
 	}
-
 	list<MikeyIPSEC4Cs *>::iterator i;
 	uint8_t j = 1;
 	for( i = cs.begin(); i != cs.end() ; i++,j++ ){

@@ -64,7 +64,6 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	// 0. Find transaction based on branch parameter
 	// 
 	
-	
 	string branch;
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
 		//branch = c.getCommandPacket()->getLastViaBranch();
@@ -95,7 +94,6 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			return false;
 		}
 	}
-
 	if ((c.getDestination()==SipSMCommand::ANY || c.getDestination()==SipSMCommand::transaction )
 			&& c.getType()==SipSMCommand::COMMAND_PACKET){	
 
@@ -163,11 +161,12 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			if ( (*i)->handleCommand(c) )
 				return true;
 		}*/
-		
 		for (int i=0; i<dialogs.size(); i++){
-#ifdef DEBUG_OUTPUT
-			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
-#endif
+//#ifdef DEBUG_OUTPUT
+			
+//			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
+//#endif
+			
 			if ( dialogs[i]->handleCommand(c) ){
 				dialogListLock.unlock();
 				return true;

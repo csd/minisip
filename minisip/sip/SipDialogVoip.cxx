@@ -59,7 +59,7 @@
 #include<libmsip/SipCommandString.h>
 #include"../mediahandler/MediaHandler.h"
 #include<libmutil/MemObject.h>
-
+#include <iostream>
 
 
 /*
@@ -370,16 +370,15 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 
 bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 {
+	fprintf( stderr, "SipDialogVoip::a10_start_ringing_INVITE\n" );
 	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::TU)){
 
 		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
-
 		getDialogConfig()->inherited.sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
 
 		setSeqNo(command.getCommandPacket()->getCSeq() );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueFrom()->getTag();
-
 //		setLocalCalled(true);
 		localCalled=true;
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
@@ -387,19 +386,16 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
 
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
-	
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
 			return false;
 		}
-
 		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
 						MRef<SipDialog*>( this ), 
 						command.getCommandPacket()->getCSeq(),
 						command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
 
 		registerTransaction(ir);
-
 		//	command.setSource(SipSMCommand::TU);
 		//	command.setDestination(SipSMCommand::transaction);
 
@@ -416,7 +412,6 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		
 		sendRinging(ir->getBranch());
 		
 		if( getDialogConfig()->inherited.autoAnswer ){
@@ -1013,6 +1008,7 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 #ifdef IPSEC_SUPPORT	
 	// Create a MIKEY message for IPSEC if stated in the config file.
 	MRef<SipMimeContent*> mikey;
+	
 	if (ipsecSession){
 		mikey = ipsecSession->getMikeyIpsecOffer();
 		if (!mikey){
@@ -1186,8 +1182,10 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 	if (ipsecSession){
 		mikey = ipsecSession->getMikeyIpsecAnswer();
 		if (!mikey){
-			merr << "Mikey was NULL in sendInvite" << end;
-			return; 
+			merr << "Mikey was NULL in sendInviteOk" << end;
+			merr << "Still some errors with IPSEC" << end;
+			ipsecSession = NULL;
+			//return; 
 		}
 	}
 	MRef<SipMimeContent*> multi;

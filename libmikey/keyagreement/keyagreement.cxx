@@ -151,10 +151,9 @@ void prf( unsigned char * inkey,  unsigned int inkeyLength,
 	unsigned int i;
 	unsigned int j;
 	unsigned char * p_output;
-
 	n = inkeyLength / 64 + 1;
 	m = outkeyLength / 20 + 1;
-
+	
 	p_output = new unsigned char[ m * 20 ];
 
 	memset( outkey, 0, outkeyLength );
@@ -186,13 +185,13 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 	byte_t * label = new byte_t[4+4+1+randLengthValue];
 
 	switch( type ){
-		case KEY_DERIV_TEK:
+		case KEY_DERIV_SALT:
 			label[0] = 0x39;
 			label[1] = 0xA2;
 			label[2] = 0xC1;
 			label[3] = 0x4B;
 			break;
-		case KEY_DERIV_SALT:
+		case KEY_DERIV_TEK:
 			label[0] = 0x2A;
 			label[1] = 0xD0;
 			label[2] = 0x1C;
@@ -236,9 +235,7 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 	label[6] = (unsigned char)((csbIdValue>>16) & 0xFF);
 	label[7] = (unsigned char)((csbIdValue>>8) & 0xFF);
 	label[8] = (unsigned char)(csbIdValue & 0xFF);
-
 	memcpy( &label[9], randPtr, randLengthValue );
-
 	prf( inkey, inkeyLength, label, 9 + randLengthValue, key, keyLength );
 
 	delete [] label;
@@ -440,7 +437,7 @@ uint8_t KeyAgreement::setdefaultPolicy(uint8_t prot_type){
 	case MIKEY_PROTO_IPSEC4:
 		arraysize = 7;
 		for(i=0; i< arraysize; i++)
-			policy.push_back (new Policy_type(policyNo, prot_type, i, 1, &srtpvalues[i]));
+			policy.push_back (new Policy_type(policyNo, prot_type, i, 1, &ipsec4values[i]));
 		break;
 	}
 	return policyNo;

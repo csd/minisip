@@ -39,7 +39,9 @@
 #include"../p2t/SipDialogP2Tuser.h"
 #include"../mediahandler/MediaHandler.h"
 
-
+#ifdef IPSEC_SUPPORT
+#include<../ipsec/MsipIpsecAPI.h>
+#endif
 
 
 #include<libmutil/dbg.h>
@@ -106,22 +108,39 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #endif			
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(
-						phoneconf->securityConfig );
+				mediaHandler->createSession(phoneconf->securityConfig );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
-			MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, phoneconf, mediaSession, pkt->getCallId());
+
+#ifdef IPSEC_SUPPORT
+			MRef<MsipIpsecAPI *> ipsecSession;
+			if (phoneconf->securityConfig.use_ipsec){
+				ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
+			}
+			else{
+				ipsecSession = NULL;
+			}
+			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
+			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession );
+			MRef<SipDialog*> voipCall( new SipDialogVoip(getDialogContainer(), callConf, 
+								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
+	
+#else	
+			
+			MRef<SipDialog*> voipCall( new SipDialogVoip(getDialogContainer(), callConf, 
+								phoneconf, mediaSession, pkt->getCallId()));
+#endif
 #ifdef MINISIP_MEMDEBUG
 			voipCall.setUser("DefaultDialogHandler");
 #endif
-			getDialogContainer()->addDialog(*voipCall);
+			getDialogContainer()->addDialog(voipCall);
 
 			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
 			cmd.setDispatchCount(dispatchCount);
 
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			mdbg << cmd << end;
 		}
-
 		return true;
 	}
 

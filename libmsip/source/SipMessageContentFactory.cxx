@@ -26,14 +26,21 @@
 #include<libmsip/SipMessageContentFactory.h>
 
 #include<config.h>
-
+#include <iostream>
 
 void SMCFCollection::addFactory(string contentType, SipMessageContentFactoryFuncPtr f){
 	factories[contentType] = f;
 }
 
 SipMessageContentFactoryFuncPtr SMCFCollection::getFactory(const string contentType){
-	return factories[contentType];
+	int index  = contentType.find("; ",0);
+	string str;
+	if (index != string::npos){
+		str = contentType.substr(0,index);
+	}
+	else
+		str = contentType;
+	return factories[str];
 }
 
 

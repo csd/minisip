@@ -72,6 +72,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 void Sip::init(){
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
+	SipMessage::contentFactories.addFactory("application/mikey", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("application/xpidf+xml", presenceSipMessageContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
@@ -173,7 +174,7 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession;
 	if (securityConfig.use_ipsec){
-		ipsecSession = new	MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
+		ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	}
 	else{
 		ipsecSession = NULL;

@@ -254,7 +254,6 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		if (h){	
 			MRef<SipMessageContent*> smcref;
 			string contentType = ((SipHeaderValueContentType*)*(h->getHeaderValue(0)))->getContentType();
-		//	cerr <<  "Content type parsed to "<< contentType<< endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
 			if (contentFactory){
 				MRef<SipMessageContent*> smcref = contentFactory(content, contentType);

@@ -24,6 +24,8 @@
 
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessage.h>
+#include<libmsip/SipMessageContentFactory.h>
+#include <iostream>
 
 MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const std::string & ContentType) {
 	return new SipMimeContent(buf, ContentType);
@@ -43,18 +45,17 @@ SipMimeContent::SipMimeContent(std::string ContentType, std::string Message, std
 	this->uniqueboundry = "_Minisip";
 }
 
-SipMimeContent::SipMimeContent(std::string content, std::string ContentTyp) {
+SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
 	int index2;
-	std::string boundry;
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
 	if(ContentType.substr(0,9) == "multipart"){
-		this->ContentType = ContentType.substr(0 , ContentType.find(";",0) - 1 );
+		this->ContentType = ContentType.substr(0 , ContentType.find("; ",0) );
 		index2 = ContentType.find("; boundary=",0);
 		assert(index2 != string::npos);
-		this->boundry = ContentType.substr(index2 + 11 , ContentType.find(";",index2 + 11) -1 );
+		this->boundry = ContentType.substr(index2 + 11 , ContentType.find(";",index2 + 11));
 		// Find first bodypart
-		index2 = content.find("--"+boundry, 0);
+		index2 = content.find("--"+this->boundry, 0);
 		assert(index2 != string::npos);
 		// Extract preamble if any
 		if(index2 > 0)
@@ -62,26 +63,31 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentTyp) {
 		else
 			this->Message = "";
 		// Extract the bodyparts
-		int boundrysize = 2 + boundry.length();
+		int boundrysize = 2 + this->boundry.length();
 		// Find end of body
-		int endindex = content.rfind("--"+boundry+"--", content.length());
+		int endindex = content.rfind("--"+this->boundry+"--", content.length());
 		int index1 = index2;
 		while (endindex != index1){
-			index1 = boundrysize + 2;
-			if (content.substr(index1,index1+1) == "\r\n"){
+			index1 = index1 + boundrysize + 2;
+			if (content.substr(index1,2) == "\r\n"){
 				cont = "text/plain; charset=us-ascii";
 				index1 = index1 + 2;
 			}
-			else
-				if (ContentType.substr(index1,14) == "Content-type: ")
-					cont = ContentType.substr(index1+14, content.find("\r\n\r\n", index1 + 14) - 1);
-				else 
+			else {
+				if (content.substr(index1,14) == "Content-type: ")
+					cont = content.substr(index1+14, content.find("\r\n\r\n", index1 + 14) - index1 - 14);
+				else{
 					cont = "";
+					cerr <<  "Absence of Content-type in MIMEContent.cxx" << endl;
+				}
+			}
 			// Find the end of the bodypart
-			index2 = content.find("--"+boundry, index1) - 5;			
+			
+			index2 = content.find("--"+this->boundry, index1) - 5;
+			index1 = content.find("\r\n\r\n", index1 + 14) + 4;		
 			SipMessageContentFactoryFuncPtr contentFactory = SipMessage::contentFactories.getFactory( cont);
 			if (contentFactory)
-				addPart(contentFactory(content.substr(index1,index2), cont));
+				addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
 			else //TODO: Better error handling
 				merr << "WARNING: No SipMessageContentFactory found for content type "<<cont <<end;
 			//End of one bodypart becomes beginning of the next
@@ -133,7 +139,7 @@ std::string SipMimeContent::getBoundry(){
 }
 	
 void SipMimeContent::addPart(MRef<SipMessageContent*> part){
-	if( (part->getContentType()).substr(0,8) == "multipart")
+	if( (part->getContentType()).substr(0,9) == "multipart")
 		if(((SipMimeContent*)*part)->getBoundry() == boundry){
 			((SipMimeContent*)*part)->setBoundry(boundry + uniqueboundry);
 			uniqueboundry = uniqueboundry + "_Rules";

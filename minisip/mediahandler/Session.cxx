@@ -136,7 +136,6 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 }
 
 bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
-	fprintf( stderr, "setSdpAnswer started\n" );
 	unsigned int i;
 	int j;
 	MRef<MediaStream *> receiver;
@@ -170,10 +169,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
                         }
                 }
 	}
-
 	remoteAddress = answer->getRemoteAddr( port );
-
-	fprintf( stderr, "Starting loop\n" );
 
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
@@ -190,7 +186,6 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			}
 		}
 	}
-	fprintf( stderr,"setSdpAnswer returns true\n" );
 	return true;
 }
 
