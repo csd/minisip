@@ -84,6 +84,19 @@ IP6Address::IP6Address(string addr){
 	memcpy(&sockaddress->sin6_addr,hp->h_addr, hp->h_length);
 }
 
+IP6Address::IP6Address(const IP6Address& other){
+	type = IP_ADDRESS_TYPE_V6;
+	setAddressFamily(AF_INET6);
+	setProtocolFamily(PF_INET6);
+	ipaddr = other.ipaddr;
+	memcpy( num_ip, other.num_ip, 8 );
+	sockaddress = new sockaddr_in6;
+	memcpy(sockaddress, other.sockaddress, sizeof(sockaddr_in6));
+}
+
+IP6Address::~IP6Address(){
+	delete sockaddress;
+}
 
 struct sockaddr *IP6Address::getSockaddrptr(int32_t port){
 	sockaddress->sin6_port = htons(port);
@@ -143,5 +156,28 @@ ostream& operator<<(ostream& out, IP6Address &a){
 	out << ")";
 	
 	return out;
+}
+
+bool IP6Address::operator ==(const IP6Address &i) const{
+	uint8_t j;
+
+	for(j=0; j<8; j++){
+		if(num_ip[j] != i.num_ip[j]){
+			return false;
+		}
+	}
+	return true;
+}
+
+bool IP6Address::operator ==(const IPAddress &i) const{
+
+        try{
+                const IP6Address &i6 = dynamic_cast<const IP6Address&>(i);
+                return (*this == i6);
+        }
+        catch(std::bad_cast &ex){
+                // Comparing IPv6 and IPv4 addresses
+                return false;
+        }
 }
 

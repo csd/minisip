@@ -67,13 +67,6 @@ uint32_t IP4Address::getBinaryIP(){
 	return numIp;
 }
 
-
-/*
-**
-** Alg:	1. Convert address to binary format
-**	2. 
-**	3.
-*/
 IP4Address::IP4Address(string addr){
         sockaddress = new sockaddr_in;
 	type = IP_ADDRESS_TYPE_V4;
@@ -117,7 +110,21 @@ IP4Address::IP4Address(string addr){
 	sockaddress->sin_port=0;
 }
 
- struct sockaddr * IP4Address::getSockaddrptr(int32_t port){
+IP4Address::IP4Address(const IP4Address& other){
+	type = IP_ADDRESS_TYPE_V4;
+	setAddressFamily(AF_INET);
+	setProtocolFamily(PF_INET);
+	ipaddr = other.ipaddr;
+	numIp = other.numIp;
+        sockaddress = new sockaddr_in;
+	memcpy(sockaddress, other.sockaddress, sizeof(struct sockaddr_in));
+}
+
+IP4Address::~IP4Address(){
+	delete sockaddress;
+}
+
+struct sockaddr * IP4Address::getSockaddrptr(int32_t port){
 	sockaddress->sin_port=hton16(port);
 	return (sockaddr *)sockaddress;
 }
@@ -188,7 +195,18 @@ std::ostream& operator<<(std::ostream& out, IP4Address &a){
 	return out;
 }
 
-bool IP4Address::operator ==(const IP4Address r) const{
-	return this->numIp == r.numIp;
+bool IP4Address::operator ==(const IP4Address &i4) const{
+	return this->numIp == i4.numIp;
 }
 
+bool IP4Address::operator ==(const IPAddress &i) const{
+
+	try{
+		const IP4Address &i4 = dynamic_cast<const IP4Address&>(i);
+		return (*this == i4);
+	}
+	catch(std::bad_cast &ex){
+		// Comparing IPv6 and IPv4 addresses
+		return false;
+	}
+}

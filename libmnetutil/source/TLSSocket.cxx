@@ -43,6 +43,8 @@
 TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
 		tcp_socket(tcp_socket){
 	type = SOCKET_TYPE_TLS;
+	peerPort = tcp_socket->getPeerPort();
+	peerAddress = tcp_socket->getPeerAddress()->clone();
 
 	int error;
 	// Copy the SSL parameters, since the server still needs them
@@ -72,6 +74,7 @@ TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	SSL_METHOD *meth = SSLv23_client_method();
 	this->ssl_ctx = (SSL_CTX *)ssl_ctx;
 	this->cert_db = cert_db;
+	peerPort = port;
 
 	if( this->ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT
@@ -106,6 +109,7 @@ TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	}
 	
 	tcp_socket = new TCPSocket( addr, port );
+	peerAddress = tcp_socket->getPeerAddress()->clone();
 
 	ssl = SSL_new( this->ssl_ctx );
 	
@@ -213,6 +217,7 @@ TLSSocket::~TLSSocket(){
 	SSL_free( ssl );
 	//SSL_CTX_free( ssl_ctx );
 	delete tcp_socket;
+	delete peerAddress;
 }
 
 int32_t TLSSocket::write( string data ){
@@ -242,6 +247,5 @@ int32_t TLSSocket::read( void *buf, int32_t count ){
 	else 
 		return ret;
 }
-
 
 #endif //NO_SECURITY

@@ -49,11 +49,11 @@
 using namespace std;
 
 TCPSocket::TCPSocket(string addr, int32_t port){
-//	this->ipaddr = &ipaddress;
 	type = SOCKET_TYPE_TCP;
-	IP4Address ipaddress(addr);
+	peerAddress = new IP4Address(addr);
+	port = port;
 	
-	if ((fd = ::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
+	if ((fd = ::socket(peerAddress->getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
 		throw new SocketFailed( errno );
 	}
 	int32_t on=1;
@@ -63,11 +63,14 @@ TCPSocket::TCPSocket(string addr, int32_t port){
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
 #endif
 
-	ipaddress.connect(*this, port);
+	peerAddress->connect(*this, port);
 }
 
 TCPSocket::TCPSocket(IPAddress &ipaddress, int32_t port){
 	
+	peerAddress = ipaddress.clone();
+	peerPort = port;
+
 	type = SOCKET_TYPE_TCP;
 	if ((fd = ::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
 		throw new SocketFailed( errno );
@@ -103,6 +106,7 @@ TCPSocket::~TCPSocket(){
 		close();
 		this->fd=-1; //for debugging purpose (make sure error if using deleted pointer)
 	}
+	delete peerAddress;
 	
 }
 

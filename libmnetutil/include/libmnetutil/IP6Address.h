@@ -32,6 +32,8 @@ struct sockaddr_in6;
 class IP6Address : public IPAddress{
 	public:
 		IP6Address(std::string addr);
+		IP6Address(const IP6Address&);
+		~IP6Address();
 		
 		virtual std::string getString();
 		virtual void connect(Socket &socket, int32_t port);
@@ -39,6 +41,11 @@ class IP6Address : public IPAddress{
 
 		virtual struct sockaddr *getSockaddrptr(int32_t port=0);
 		virtual int32_t getSockaddrLength();
+
+		virtual bool operator ==(const IP6Address &i6) const;
+		virtual bool operator ==(const IPAddress &i) const;
+
+		virtual IP6Address * clone() const{return new IP6Address(*this);};
 		
 	private:
 		std::string ipaddr;

@@ -36,6 +36,8 @@ class IP4Address : public IPAddress{
 	public:
 		IP4Address(std::string addr);
 		IP4Address(struct sockaddr_in *sin);
+		IP4Address(const IP4Address&);
+		~IP4Address();
 		
 		uint32_t getBinaryIP();
 		
@@ -46,7 +48,10 @@ class IP4Address : public IPAddress{
 		virtual struct sockaddr * getSockaddrptr(int32_t port=0);
 		virtual int32_t getSockaddrLength();
 		
-		virtual bool operator ==(const IP4Address r) const;
+		virtual bool operator ==(const IP4Address &i4) const;
+		virtual bool operator ==(const IPAddress &i) const;
+
+		virtual IP4Address * clone() const{ return new IP4Address(*this);};
 		
 	private:
 		std::string ipaddr;

@@ -28,6 +28,9 @@
 #include<string>
 using namespace std;
 
+class IPAddress;
+class IP4Address;
+
 class StreamSocket : public Socket{
 	public:
 		virtual ~StreamSocket(){}
@@ -37,6 +40,13 @@ class StreamSocket : public Socket{
 
 		// Buffer of the received data;
 		string received;
+
+		IPAddress * getPeerAddress(){return peerAddress;};
+		uint16_t getPeerPort(){return peerPort;};
+	protected:
+		IPAddress * peerAddress;
+		uint16_t peerPort;
+
 };
 
 #endif
