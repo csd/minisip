@@ -53,7 +53,7 @@ class LogEntry;
 
 class SipDialogVoip: public SipDialog{
 	public:
-		SipDialogVoip(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession);
+		SipDialogVoip(MRef<SipDialogContainer*> dContainer, const SipDialogConfig &callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
 		
 		virtual ~SipDialogVoip();
 
@@ -64,17 +64,22 @@ class SipDialogVoip: public SipDialog{
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		void setUpStateMachine();
-
-		void setCallId(string callid);
-
-		MRef<SipInvite*> getLastInvite();
-		
-		void setLastInvite(MRef<SipInvite*> i);
-		
+	
 		MRef<Session *> getMediaSession();
 
+		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
+		void handleSdp(MRef<SdpPacket*> );
+                
+		MRef<LogEntry *> getLogEntry();
+		void setLogEntry( MRef<LogEntry *> );
+	private:
+		
+		void setUpStateMachine();
+		
+		MRef<SipInvite*> getLastInvite();
+		void setLastInvite(MRef<SipInvite*> i);
+		
 		void sendInvite(const string &branch);
 		void sendAuthInvite(const string &branch);
 		void sendBye(const string &branch, int);
@@ -85,30 +90,15 @@ class SipDialogVoip: public SipDialog{
 		void sendRinging(const string &branch);
 		void sendNotAcceptable(const string &branch);
 
-		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
-
-		void handleSdp(MRef<SdpPacket*> );
-                
-		void setLocalCalled(bool lc){localCalled=lc;}
-		
-		void setNonce(const string &n){ nonce = n; }
-
-		void setRealm(const string &r){ realm = r; }
-
-		MRef<SipSoftPhoneConfiguration*> getPhoneConfig(){return phoneconf;}
-
-		MRef<LogEntry *> getLogEntry();
-		void setLogEntry( MRef<LogEntry *> );
-	private:
 
 		bool a0_start_callingnoauth_invite( const SipSMCommand &command);
 		bool a1_callingnoauth_callingnoauth_18X( const SipSMCommand &command);
 		bool a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &command);
 		bool a3_callingnoauth_incall_2xx( const SipSMCommand &command);
 		bool a5_incall_termwait_BYE( const SipSMCommand &command);
-		bool a6_incall_termwait_hangup(/*State<SipSMCommand, string> *fromState, State<SipSMCommand, string> *toState,*/ const SipSMCommand &command);
-		bool a7_callingnoauth_termwait_CANCEL(/*State<SipSMCommand, string> *fromState, State<SipSMCommand, string> *toState, */const SipSMCommand &command);
-		bool a8_callingnoauth_termwait_cancel(/*State<SipSMCommand, string> *fromState, State<SipSMCommand, string> *toState, */const SipSMCommand &command);
+		bool a6_incall_termwait_hangup( const SipSMCommand &command);
+		bool a7_callingnoauth_termwait_CANCEL(const SipSMCommand &command);
+		bool a8_callingnoauth_termwait_cancel(const SipSMCommand &command);
 		bool a9_callingnoauth_termwait_36( const SipSMCommand &command);
 		bool a10_start_ringing_INVITE( const SipSMCommand &command);
 		bool a11_ringing_incall_accept( const SipSMCommand &command);
@@ -119,7 +109,7 @@ class SipDialogVoip: public SipDialog{
 		bool a21_callingauth_callingauth_18X( const SipSMCommand &command);
 		bool a22_callingauth_callingauth_1xx( const SipSMCommand &command);
 		bool a23_callingauth_incall_2xx( const SipSMCommand &command);
-		bool a24_calling_termwait_2xx(/* State<SipSMCommand, string> *fromState, State<SipSMCommand, string> *toState, */const SipSMCommand &command);
+		bool a24_calling_termwait_2xx(const SipSMCommand &command);
 
 		bool a25_termwait_terminated_notransactions( const SipSMCommand &command);
 		bool a26_callingnoauth_termwait_transporterror( const SipSMCommand &command);
@@ -128,8 +118,6 @@ class SipDialogVoip: public SipDialog{
 		MRef<LogEntry *> logEntry;
 
 		MRef<SipInvite*> lastInvite;
-
-//		string callId;
 
 		bool localCalled;
 		string nonce;
