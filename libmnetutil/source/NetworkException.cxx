@@ -41,15 +41,17 @@ NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){}
 NetworkException::NetworkException():errorNumber(0){};
 
 string NetworkException::errorDescription(){
-	char buf[256];
 
 #ifdef LINUX
+	char buf[256];
+	buf[0]=0;
 	strerror_r( errorNumber, buf, 256 );
 	return string( (const char *)buf );
 #endif
 #ifdef WIN32
 	return string( strerror( errorNumber ));
 #endif
+	return "NOT_SET";
 }
 
 #ifndef NO_SECURITY
