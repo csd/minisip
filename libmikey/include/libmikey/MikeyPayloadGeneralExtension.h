@@ -26,6 +26,17 @@
 #ifndef MIKEYPAYLOADGENERALEXTENSIONS_H
 #define MIKEYPAYLOADGENERALEXTENSIONS_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE 21
@@ -35,7 +46,7 @@
     
 
 
-class MikeyPayloadGeneralExtensions : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadGeneralExtensions : public MikeyPayload{
 	public:
 		//Constructor when receiving Mikey message i.e. contruct MikeyPayloadGeneralExtensions from bytestream.
 		MikeyPayloadGeneralExtensions(byte_t *start_of_header, int lengthLimit);

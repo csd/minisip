@@ -26,13 +26,23 @@
 #ifndef MIKEYCSIDMAP_H
 #define MIKEYCSIDMAP_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #define HDR_CS_ID_MAP_TYPE_SRTP_ID 0
 #define HDR_CS_ID_MAP_TYPE_IPSEC4_ID 7
 #include<list>
 #include<libmutil/MemObject.h>
 
 // CS# info for srtp
-class MikeySrtpCs{
+class LIBMIKEY_API MikeySrtpCs{
         public:
                 MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc=0 );
                 uint8_t policyNo;
@@ -42,7 +52,7 @@ class MikeySrtpCs{
 
 // CS# info for ipv4 IPSEC
 // each CS# is related to an unique combination of spi and spiaddresses. 
-class MikeyIPSEC4Cs{
+class LIBMIKEY_API MikeyIPSEC4Cs{
         public:
                 MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr );
                 uint8_t policyNo;
@@ -51,7 +61,7 @@ class MikeyIPSEC4Cs{
 		uint32_t spiSrcaddr;
 };
 
-class MikeyCsIdMap : public MObject{
+class LIBMIKEY_API MikeyCsIdMap : public MObject{
         public:
                 virtual int length()=0;
                 virtual void writeData( byte_t * start,
@@ -60,7 +70,7 @@ class MikeyCsIdMap : public MObject{
 };
 
 // Srtp map
-class MikeyCsIdMapSrtp : public MikeyCsIdMap{
+class LIBMIKEY_API MikeyCsIdMapSrtp : public MikeyCsIdMap{
         public:
                 MikeyCsIdMapSrtp();
                 MikeyCsIdMapSrtp( byte_t * data, int length );
@@ -80,7 +90,7 @@ class MikeyCsIdMapSrtp : public MikeyCsIdMap{
 };
 
 // ipv4 IPSEC map
-class MikeyCsIdMapIPSEC4 : public MikeyCsIdMap{
+class LIBMIKEY_API MikeyCsIdMapIPSEC4 : public MikeyCsIdMap{
         public:
                 MikeyCsIdMapIPSEC4();
                 MikeyCsIdMapIPSEC4( byte_t * data, int length );

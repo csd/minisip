@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADHDR_H
 #define MIKEYPAYLOADHDR_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyCsIdMap.h>
 #include<list>
@@ -51,7 +61,7 @@
 */
 
 
-class MikeyPayloadHDR : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadHDR : public MikeyPayload{
 	public:
 		
 		MikeyPayloadHDR( byte_t *start_of_header, int lengthLimit );

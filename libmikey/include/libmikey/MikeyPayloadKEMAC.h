@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADKEMAC_H
 #define MIKEYPAYLOADKEMAC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<list>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadKeyData.h>
@@ -41,7 +51,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadKEMAC : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadKEMAC : public MikeyPayload{
 	public:
 		MikeyPayloadKEMAC( int encrAlg, 
 				   int encrDataLength, byte_t * encrData,

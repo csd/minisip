@@ -25,6 +25,8 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadSIGN.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
+#include<libmutil/print_hex.h>
 #include<assert.h>
 
 MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,

@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADCHASH_H
 #define MIKEYPAYLOADCHASH_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_CHASH_PAYLOAD_TYPE 8
@@ -32,7 +42,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadCHASH : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadCHASH : public MikeyPayload{
 	public:
 		
 		MikeyPayloadCHASH(byte_t *start_of_header, int lengthLimit);

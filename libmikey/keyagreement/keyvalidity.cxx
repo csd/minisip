@@ -27,6 +27,7 @@
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyDefs.h>
 #include<assert.h>
+#include<libmutil/print_hex.h>
 
 KeyValidity::KeyValidity(){ 
 	typeValue = KEYVALIDITY_NULL;

@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADRAND_H
 #define MIKEYPAYLOADRAND_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #define OPENSSL
 #include<libmikey/MikeyPayload.h>
 
@@ -34,7 +44,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadRAND : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadRAND : public MikeyPayload{
 	public:
 #ifdef OPENSSL
 		MikeyPayloadRAND(); // computes a 128 bits random value

@@ -25,10 +25,20 @@
 #ifndef MIKEYPAYLOAD_H
 #define MIKEYPAYLOAD_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 
 #define MIKEYPAYLOAD_LAST_PAYLOAD 0
 
-class MikeyPayload{
+class LIBMIKEY_API MikeyPayload{
 	public:
 		static const int LastPayload;
 

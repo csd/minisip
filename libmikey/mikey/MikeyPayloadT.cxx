@@ -25,8 +25,13 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadT.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
 #include<assert.h>
+
+#ifndef _MSC_VER
 #include<sys/time.h>
+#endif
+
 #include<time.h>
 
 
@@ -163,12 +168,12 @@ void MikeyPayloadT::writeData(byte_t *start, int expectedLength){
 		case T_TYPE_NTP_UTC:
 		case T_TYPE_NTP:
 			for( i = 0; i < 8; i++ ){
-				start[2+i] = (tsValue >> ((7-i)*8)) & 0xFF;
+				start[2+i] = (byte_t)((tsValue >> ((7-i)*8)) & 0xFF);
 			}
 			break;
 		case T_TYPE_COUNTER:
 			for( i = 0; i < 4; i++ ){
-				start[2+i] = (tsValue >> ((3-i)*8)) & 0xFF;
+				start[2+i] = (byte_t)((tsValue >> ((3-i)*8)) & 0xFF);
 			}
 	}
 }

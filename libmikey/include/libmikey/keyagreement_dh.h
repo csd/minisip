@@ -25,6 +25,16 @@
 #ifndef KEYAGREEMENT_DH_H
 #define KEYAGREEMENT_DH_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<openssl/dh.h>
 #include<libmikey/keyagreement.h>
 #include<libmikey/oakley_groups.h>
@@ -40,7 +50,7 @@ class certificate_chain;
 class certificate;
 class ca_db;
 
-class KeyAgreementDH : public KeyAgreement{
+class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 	public:
 		KeyAgreementDH( MRef<certificate_chain *> cert, 
 				MRef<ca_db *> ca_db );

@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADERR_H
 #define MIKEYPAYLOADERR_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_ERR_PAYLOAD_TYPE 12
@@ -46,7 +56,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadERR : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadERR : public MikeyPayload{
 	public:
 		
 		MikeyPayloadERR( int errType );

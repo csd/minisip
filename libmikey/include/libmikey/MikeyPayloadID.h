@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADID_H
 #define MIKEYPAYLOADID_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_ID_PAYLOAD_TYPE 6
@@ -35,7 +45,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadID : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadID : public MikeyPayload{
 	public:
 		
 		MikeyPayloadID( int type, int idLength, byte_t * idData );

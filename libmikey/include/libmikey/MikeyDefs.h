@@ -21,27 +21,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
-#include<stdint.h>
-
 #include<libmutil/cert.h>
-
 
 //typedef byte_t uint8_t;
 typedef uint8_t byte_t;
 
-/* HMAC-SHA1 MAC computation */
-void hmac_sha1( unsigned char * key, unsigned int key_length,
-		unsigned char * data, unsigned int data_length,
-		unsigned char * mac, unsigned int * mac_length );
-
-/* base64 encoding and decoding functions */
-std::string base64_encode( unsigned char *, int );
-unsigned char * base64_decode( std::string, int * );
-unsigned char * base64_decode( unsigned char *, int, int * );
-
-/* prints out a buffer in hexa */
-std::string print_hex( unsigned char * data, int length );
-
-/* Integer to string */
-std::string itoa(int i);

@@ -54,7 +54,7 @@ MikeyPayloadSP::MikeyPayloadSP(byte_t *start, int lengthLimit):MikeyPayload(star
 	this->prot_type = start[2];
 	int i = 5;
 	uint16_t j = ((uint16_t)start[3] << 8 | (uint16_t)start[4]) + 5;
-	byte_t *value;
+	//byte_t *value;
 	endPtr = startPtr + j;
 	//while(i < lengthLimit) {
 	while(i < j ) {
@@ -119,7 +119,7 @@ int MikeyPayloadSP::length(){
 }
 //Return number of policy param entries
 int MikeyPayloadSP::noOfPolicyParam(){
-	return param.size();
+	return (int)param.size();
 }
 //Delete the MikeyPolicyParam in list<MikeyPolicyParam *> param with type type
 void MikeyPayloadSP::deleteMikeyPolicyParam(uint8_t type){

@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADCERT_H
 #define MIKEYPAYLOADCERT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 //#include"../util/cert.h"
 
@@ -42,7 +52,7 @@
 class certificate;
 class certificate_db;
 
-class MikeyPayloadCERT : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadCERT : public MikeyPayload{
 	public:
 	
 		MikeyPayloadCERT( int type, MRef<certificate *> cert );

@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADDH_H
 #define MIKEYPAYLOADDH_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/keyvalidity.h>
 
@@ -38,7 +48,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadDH : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadDH : public MikeyPayload{
 	public:
 		
 		MikeyPayloadDH( int dhGroup, byte_t * dhKey, 

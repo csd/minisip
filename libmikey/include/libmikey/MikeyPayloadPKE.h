@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADPKE_H
 #define MIKEYPAYLOADPKE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_PKE_PAYLOAD_TYPE 2
@@ -32,7 +42,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadPKE : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadPKE : public MikeyPayload{
 	public:
 		MikeyPayloadPKE( int c, byte_t * data, int data_length );
 

@@ -26,6 +26,16 @@
 #ifndef MIKEYMESSAGE_H
 #define MIKEYMESSAGE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<list>
 #include<iostream>
 #include<assert.h>
@@ -65,7 +75,7 @@ class certificate;
 class certificate_db;
 
 
-class MikeyMessage{
+class LIBMIKEY_API MikeyMessage{
 	public:
 		MikeyMessage();
 		MikeyMessage( byte_t *message, int lengthLimit );

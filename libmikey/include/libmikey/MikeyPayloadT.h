@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADT_H
 #define MIKEYPAYLOADT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_T_PAYLOAD_TYPE 5
@@ -37,7 +47,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadT : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadT : public MikeyPayload{
 	public:
 		MikeyPayloadT(); // Will compute the timestamp	
 		MikeyPayloadT( int type, uint64_t value );

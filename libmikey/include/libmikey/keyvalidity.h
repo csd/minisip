@@ -25,6 +25,16 @@
 #ifndef KEYVALIDITY_H
 #define KEYVALIDITY_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #define KEYVALIDITY_NULL     0
 #define KEYVALIDITY_SPI      1
 #define KEYVALIDITY_INTERVAL 2
@@ -35,7 +45,7 @@
 #define KeyValidityNull KeyValidity
 using namespace std;
 
-class KeyValidity : public MObject{
+class LIBMIKEY_API KeyValidity : public MObject{
 	public:
 		KeyValidity();
 		KeyValidity( const KeyValidity& );
@@ -52,7 +62,7 @@ class KeyValidity : public MObject{
 		
 };
 
-class KeyValiditySPI : public KeyValidity{
+class LIBMIKEY_API KeyValiditySPI : public KeyValidity{
 	public:
 		KeyValiditySPI();
 		KeyValiditySPI( const KeyValiditySPI& );
@@ -69,7 +79,7 @@ class KeyValiditySPI : public KeyValidity{
 		byte_t *spiPtr;
 };
 
-class KeyValidityInterval : public KeyValidity{
+class LIBMIKEY_API KeyValidityInterval : public KeyValidity{
 	public:
 		KeyValidityInterval();
 		KeyValidityInterval( const KeyValidityInterval& );

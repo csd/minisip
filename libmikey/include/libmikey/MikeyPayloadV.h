@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADV_H
 #define MIKEYPAYLOADV_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_V_PAYLOAD_TYPE 9
@@ -34,7 +44,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadV : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadV : public MikeyPayload{
 	public:
 		MikeyPayloadV( int mac_alg, byte_t * verData );
 		MikeyPayloadV( byte_t * start, int lengthLimit );

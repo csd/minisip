@@ -25,6 +25,8 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadPKE.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
+#include<libmutil/print_hex.h>
 #include<assert.h>
 
 MikeyPayloadPKE::MikeyPayloadPKE( int c, byte_t * dataPtr, 

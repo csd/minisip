@@ -27,6 +27,16 @@
 #ifndef MIKEYPAYLOADSP_H
 #define MIKEYPAYLOADSP_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 #include<list>
 #include<libmutil/MemObject.h>
@@ -110,7 +120,7 @@
 */
 
 
-class MikeyPolicyParam{
+class LIBMIKEY_API MikeyPolicyParam{
         public:
                 MikeyPolicyParam( uint8_t type, uint8_t length, byte_t * value );
 		~MikeyPolicyParam();
@@ -119,7 +129,7 @@ class MikeyPolicyParam{
                 byte_t * value; // type value
 };
 
-class MikeyPayloadSP : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadSP : public MikeyPayload{
 	public:
 		//Constructor when constructing new MikeyPayloadSP message, policy type entries added later with MikeyPayloadSP::addMikeyPolicyParam
 		MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type);

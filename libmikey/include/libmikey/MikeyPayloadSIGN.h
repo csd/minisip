@@ -25,6 +25,16 @@
 #ifndef MIKEYPAYLOADSIGN_H
 #define MIKEYPAYLOADSIGN_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE 4
@@ -35,7 +45,7 @@
 /**
  * @author Erik Eliasson, Johan Bilien
 */
-class MikeyPayloadSIGN : public MikeyPayload{
+class LIBMIKEY_API MikeyPayloadSIGN : public MikeyPayload{
 	public:
 	
 		MikeyPayloadSIGN( int sigLength, byte_t * data, int type );

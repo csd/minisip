@@ -45,6 +45,8 @@
 #include<libmikey/MikeyException.h>
 
 #include<libmutil/aes.h>
+#include<libmutil/base64.h>
+#include<libmutil/hmac.h>
 
 MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
 
@@ -107,7 +109,7 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit ){
 						
 	addPayload( hdr = new MikeyPayloadHDR(message, limit) );
 	
-	limit -=  ( hdr->end() - msgpos );
+	limit -=  (int)( hdr->end() - msgpos );
 	msgpos = hdr->end();
 
 	int nextPayloadType = hdr->nextPayloadType();
@@ -170,7 +172,7 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit ){
 		payloads.push_back( payload );
 		
 		assert(( payload->end() - msgpos ) == ( payload->length() ));
-		limit -= ( payload->end() - msgpos );
+		limit -= (int)( payload->end() - msgpos );
 		msgpos = payload->end();
 	}
 
@@ -311,14 +313,14 @@ void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 
 			memcpy( hmacInput, messageData, messageLength-20 );
 
-			hmacInput[ messageLength - 20 ] = (t >> 56)&0xFF;
-			hmacInput[ messageLength - 19 ] = (t >> 48)&0xFF;
-			hmacInput[ messageLength - 18 ] = (t >> 40)&0xFF;
-			hmacInput[ messageLength - 17 ] = (t >> 32)&0xFF;
-			hmacInput[ messageLength - 16 ] = (t >> 24)&0xFF;
-			hmacInput[ messageLength - 15 ] = (t >> 16)&0xFF;
-			hmacInput[ messageLength - 14 ] = (t >>  8)&0xFF;
-			hmacInput[ messageLength - 13 ] = (t      )&0xFF;
+			hmacInput[ messageLength - 20 ] = (byte_t)((t >> 56)&0xFF);
+			hmacInput[ messageLength - 19 ] = (byte_t)((t >> 48)&0xFF);
+			hmacInput[ messageLength - 18 ] = (byte_t)((t >> 40)&0xFF);
+			hmacInput[ messageLength - 17 ] = (byte_t)((t >> 32)&0xFF);
+			hmacInput[ messageLength - 16 ] = (byte_t)((t >> 24)&0xFF);
+			hmacInput[ messageLength - 15 ] = (byte_t)((t >> 16)&0xFF);
+			hmacInput[ messageLength - 14 ] = (byte_t)((t >>  8)&0xFF);
+			hmacInput[ messageLength - 13 ] = (byte_t)((t      )&0xFF);
 			
 			hmac_sha1( authKey, authKeyLength,
 			   hmacInput, messageLength + 8 -20,

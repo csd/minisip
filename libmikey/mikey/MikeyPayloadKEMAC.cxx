@@ -27,6 +27,9 @@
 #include<libmikey/MikeyException.h>
 #include<assert.h>
 #include<libmutil/aes.h>
+#include<libmutil/itoa.h>
+#include<libmutil/print_hex.h>
+
 
 MikeyPayloadKEMAC::MikeyPayloadKEMAC( int encrAlgValue, 
 		int encrDataLengthValue, byte_t * encrDataPtr, 

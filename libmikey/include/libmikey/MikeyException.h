@@ -25,6 +25,17 @@
 #ifndef MIKEYEXCEPTION_H
 #define MIKEYEXCEPTION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
+
+
 /**
  * Base class for all exceptions that may occur in the MIKEY implementation.
  * @author Erik Eliasson, Johan Bilien
@@ -35,7 +46,7 @@
 
 
 
-class MikeyException{
+class LIBMIKEY_API MikeyException{
 	public:
 		/**
 		 * @param All exceptions MUST have a std::string describing the
@@ -55,7 +66,7 @@ class MikeyException{
 };
 
 
-class MikeyExceptionUninitialized: public MikeyException{
+class LIBMIKEY_API MikeyExceptionUninitialized: public MikeyException{
 	public:
 		MikeyExceptionUninitialized(std::string msg);
 		virtual ~MikeyExceptionUninitialized();
@@ -64,7 +75,7 @@ class MikeyExceptionUninitialized: public MikeyException{
 
 
 
-class MikeyExceptionMessageContent: public MikeyException{
+class LIBMIKEY_API MikeyExceptionMessageContent: public MikeyException{
 	public:
 		MikeyExceptionMessageContent(std::string msg);
 		MikeyExceptionMessageContent(MikeyMessage * errMsg, std::string msg="");
@@ -78,7 +89,7 @@ class MikeyExceptionMessageContent: public MikeyException{
 
 
 
-class MikeyExceptionMessageLengthException: public MikeyException{
+class LIBMIKEY_API MikeyExceptionMessageLengthException: public MikeyException{
 	public:
 		MikeyExceptionMessageLengthException(std::string msg);
 		virtual ~MikeyExceptionMessageLengthException();
@@ -86,7 +97,7 @@ class MikeyExceptionMessageLengthException: public MikeyException{
 };
 
 
-class MikeyExceptionNullPointerException : public MikeyException{
+class LIBMIKEY_API MikeyExceptionNullPointerException : public MikeyException{
 	public:
 		MikeyExceptionNullPointerException(std::string msg);
 		virtual ~MikeyExceptionNullPointerException();
@@ -94,21 +105,21 @@ class MikeyExceptionNullPointerException : public MikeyException{
 };
 
 
-class MikeyExceptionAuthentication : public MikeyException{
+class LIBMIKEY_API MikeyExceptionAuthentication : public MikeyException{
 	public:
 		MikeyExceptionAuthentication(std::string msg);
 		virtual ~MikeyExceptionAuthentication();
 
 };
 
-class MikeyExceptionUnacceptable : public MikeyException{
+class LIBMIKEY_API MikeyExceptionUnacceptable : public MikeyException{
 	public:
 		MikeyExceptionUnacceptable(std::string msg);
 		virtual ~MikeyExceptionUnacceptable();
 
 };
 
-class MikeyExceptionUnimplemented : public MikeyException{
+class LIBMIKEY_API MikeyExceptionUnimplemented : public MikeyException{
 	public:
 		MikeyExceptionUnimplemented(std::string msg);
 		virtual ~MikeyExceptionUnimplemented();

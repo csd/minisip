@@ -26,6 +26,8 @@
 #include<libmikey/MikeyDefs.h>
 #include<libmikey/MikeyPayloadCERT.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
+#include<libmutil/print_hex.h>
 #include<assert.h>
 
 MikeyPayloadCERT::MikeyPayloadCERT( int type, int length, byte_t * data ){

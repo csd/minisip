@@ -25,11 +25,17 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
+#include<libmutil/print_hex.h>
 #include<assert.h>
 #include<stdlib.h>
 #include<time.h>
 #include<sys/types.h>
+
+#ifndef _MSC_VER
 #include<unistd.h>
+#endif
+
 #include<openssl/rand.h>
 
 

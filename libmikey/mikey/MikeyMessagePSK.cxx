@@ -38,6 +38,7 @@
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
+#include<libmutil/hmac.h>
 
 #define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
                                                                                 
@@ -93,7 +94,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 			}
 
 			for( i = 6; i < 14; i++ ){
-				iv[i] = saltKey[i] ^ (t >> (13-i)) & 0xFF;
+				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)) & 0xFF);
 			}
 			iv[14] = 0x00;
 			iv[15] = 0x00;
@@ -153,10 +154,10 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	uint32_t csbId;
+	//uint32_t csbId;
 	MRef<MikeyCsIdMap *> csIdMap;
 	MikeyMessage * errorMessage = new MikeyMessage();
-	uint8_t nCs;
+	//uint8_t nCs;
 
 	if( i == NULL || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
@@ -267,7 +268,7 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 			}
 
 			for( j = 6; j < 14; j++ ){
-				iv[j] = saltKey[j] ^ (ka->t_received >> (13-j)) & 0xFF;
+				iv[j] = (byte_t)(saltKey[j] ^ (ka->t_received >> (13-j)) & 0xFF);
 			}
 			iv[14] = 0x00;
 			iv[15] = 0x00;
@@ -513,7 +514,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		
 		for( i = 0; i < 8; i++ ){
 			macInput[ macInputLength - i - 1 ] = 
-				(t_sent >> (i*8))&0xFF;
+				(byte_t)((t_sent >> (i*8))&0xFF);
 		}
 	}
 	else{

@@ -27,6 +27,7 @@
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyCsIdMap.h>
 #include<libmikey/MikeyException.h>
+#include<libmutil/itoa.h>
 #include<assert.h>
 
 
@@ -286,11 +287,11 @@ MikeyCsIdMapIPSEC4::~MikeyCsIdMapIPSEC4(){
 }
 
 int MikeyCsIdMapSrtp::length(){
-	return 9 * cs.size();
+	return 9 * (int)cs.size();
 }
 //added 041201 JOOR
 int MikeyCsIdMapIPSEC4::length(){
-	return 13 * cs.size();
+	return 13 * (int)cs.size();
 }
 
 void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
