@@ -33,6 +33,7 @@
 #include"MessageRouter.h"
 
 #include<libmsip/SipUtils.h>
+#include<exception>
 
 
 static void *tcp_server_thread(void *arg){
@@ -191,6 +192,7 @@ void Minisip::run(){
                         SipMessageTransport(
                                         localIpString,
                                         externalContactIP,
+					phoneConf->inherited.transport,
                                         phoneConf->inherited.externalContactUdpPort,
                                         phoneConf->inherited.localUdpPort,
                                         phoneConf->inherited.localTcpPort,
@@ -295,7 +297,15 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                 merr << "Error: The following element could not be parsed: "<<e->what()<< "(corrupt config file?)"<< end;
 #endif
-        }catch(...){
+	}
+        catch(exception &exc){
+                //FIXME: Display message in GUI
+#ifdef DEBUG_OUTPUT
+                merr << "Minisip caught an exception. Quitting."<< end;
+		merr << exc.what() << end;
+#endif
+        }
+        catch(...){
                 //FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
                 merr << "Minisip caught an unknown exception. Quitting."<< end;
