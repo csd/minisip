@@ -65,9 +65,8 @@ void Mutex::createMutex(){
 	//handle_ptr = malloc(sizeof(pthread_mutex_t));
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
-#endif
 
-#ifdef WIN32
+#elif defined WIN32
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(sizeof(HANDLE));
 	//    hMutex = CreateMutex(NULL, FALSE, NULL);
@@ -78,9 +77,8 @@ void Mutex::createMutex(){
 	}else{
 
 	}
-#endif
 
-#ifdef WINCE
+#elif defined WINCE
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(1, sizeof(HANDLE));
 	//    hMutex = CreateMutex(NULL, FALSE, NULL);
@@ -105,14 +103,12 @@ Mutex::~Mutex(){
 	pthread_mutex_destroy((pthread_mutex_t*)handle_ptr);
 	delete (pthread_mutex_t*)handle_ptr;
 //	free(handle_ptr);
-#endif
 
-#ifdef WIN32
+#elif defined WIN32
 #warning Mutex delete not implemented
-#endif
 
 
-#ifdef WINCE
+#elif defined WINCE
 #warning Mutex delete not implemented
 #endif
 
@@ -132,14 +128,12 @@ void Mutex::lock(){
 	    }
 	    
 //	    locked=true;
-#endif
-#ifdef WIN32
+#elif defined WIN32
 //	    WaitForSingleObject(hMutex,INFINITE);
 	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
 //	    locked=true;
-#endif
     
-#ifdef WINCE
+#elif defined WINCE
 	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
 //	    locked=true;
 #endif
@@ -161,16 +155,14 @@ void Mutex::unlock(){
 
 //	}
 
-#endif
-#ifdef WIN32
+#elif defined WIN32
 	if (locked){
 //	    ReleaseMutex(hMutex);
 	    ReleaseMutex( *( (HANDLE*)handle_ptr) );
 //	    locked=false;
 	}
-#endif
 
-#ifdef _WINCE_
+#elif defined _WINCE_
 	    ReleaseMutex(*((HANDLE*)handle_ptr));
 //	    locked=false;
 #endif
