@@ -48,10 +48,14 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/MemObject.h>
+#include<libmutil/mtime.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 
+#ifdef WIN32
+#include<winsock2.h>
+#endif
 
 #define TIMEOUT 600000
 #define NB_THREADS 5
@@ -181,15 +185,22 @@ StreamThreadData::StreamThreadData( MRef<SipMessageTransport *> transport){
 bool sipdebug_print_packets=false;
 #ifdef DEBUG_OUTPUT
 
-struct timeval startTime={0};
+//struct timeval startTime={0};
+uint64_t startTime = 0;
 
 void printMessage(string header, string packet){
-	if (startTime.tv_sec==0)
-		gettimeofday(&startTime,NULL);
-	struct timeval t;
-	gettimeofday(&t, NULL);
-	long sec = t.tv_sec - startTime.tv_sec;
-	int64_t msec = sec*1000 + (t.tv_usec - startTime.tv_usec)/1000;
+	//if (startTime.tv_sec==0)
+	//	gettimeofday(&startTime,NULL);
+	if (startTime==0)
+		startTime = mtime();
+//	struct timeval t;
+	uint64_t t;
+	t=mtime();
+//	gettimeofday(&t, NULL);
+	int64_t sec = t / 1000 - startTime / 1000;
+//	long sec = t.tv_sec - startTime.tv_sec;
+//	int64_t msec = sec*1000 + (t.tv_usec - startTime.tv_usec)/1000;
+	int64_t msec = t - startTime;
 	
 	header = (sec<100?string("0"):string("")) + (sec<10?"0":"") + itoa(msec/1000)+":"+(msec<10?"0":"")+ (msec<100?"0":"")+itoa(msec%1000)+ " " + header;
 	
