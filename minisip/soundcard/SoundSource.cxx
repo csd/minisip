@@ -173,7 +173,7 @@ void BasicSoundSource::getSound(short *dest,
 #endif
                 if (plcProvider){
                         cerr << "PLC!"<< endl;
-                        short *b = plcProvider->get_plc_sound((int32_t)oFrames);
+                        short *b = plcProvider->get_plc_sound(oFrames);
                         memcpy(dest, b, oFrames);
                 }else{
 
