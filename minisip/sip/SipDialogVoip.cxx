@@ -422,7 +422,14 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		
 		sendRinging(ir->getBranch());
+		
+		if( getDialogConfig()->inherited.autoAnswer ){
+			CommandString accept( callId, SipCommandString::accept_invite );
+			SipSMCommand sipcmd(accept, SipSMCommand::remote, SipSMCommand::TU);
+			getDialogContainer()->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		}
 		return true;
 	}else{
 		return false;

@@ -61,6 +61,7 @@ SipCommonConfig::SipCommonConfig(): /*MObject("SipCommonConfig"),*/
 	//proxyAddr(NULL),
 //	proxyPort(0),
 	transport(("")),
+	autoAnswer(false),
 	sipTransport(){
 //            merr << "running SipCommonConfig constructor"<< end;
 
@@ -88,6 +89,7 @@ void SipCommonConfig::save( XMLFileParser * parser ){
 #ifndef NO_SECURITY
 	parser->changeValue("local_tls_port", itoa(localTlsPort));
 #endif
+	parser->changeValue("auto_answer", autoAnswer?"yes":"no");
 
 	parser->changeValue("transport", transport);
 
@@ -119,6 +121,8 @@ void SipCommonConfig::load( XMLFileParser * parser ){
 
 	localTcpPort = parser->getIntValue("local_tcp_port",5060);
 	localTlsPort = parser->getIntValue("local_tls_port",5061);
+
+	autoAnswer = parser->getValue("auto_answer", "no") == "yes";
 
 }
 

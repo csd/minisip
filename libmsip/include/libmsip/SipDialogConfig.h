@@ -184,6 +184,8 @@ class SipCommonConfig : public MObject{
 		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
 		
 //		TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *timeoutProvider;
+//
+		bool autoAnswer;
 
 		void save( XMLFileParser * parser );
 		void load( XMLFileParser * parser );
