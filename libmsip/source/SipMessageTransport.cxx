@@ -321,6 +321,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 {
 	MRef<StreamSocket *> socket;
 
+				
 	try{
 		socket = findStreamSocket(ip_addr, port);
 
@@ -350,12 +351,18 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		if( socket ){
 			/* At this point if socket != we send on a 
 			 * streamsocket */
+#ifdef DEBUG_OUTPUT
+			printMessage("OUT (STREAM)", packetString);
+#endif
 			if( socket->write( packetString ) == -1 ){
 				throw new SendFailed( errno );
 			}
 		}
 		else{
 			/* otherwise use the UDP socket */
+#ifdef DEBUG_OUTPUT
+			printMessage("OUT (UDP)", packetString);
+#endif
 			if( udpsock.sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
