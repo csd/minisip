@@ -53,11 +53,14 @@ void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
 	list< MRef<PhoneBookPerson *> > persons = phonebook->getPersons();
 	list< MRef<PhoneBookPerson *> >::iterator iPerson;
 
+	/*
+
 	Gtk::TreeModel::iterator phonebookparent = append();
 	(*phonebookparent)[tree->name] = Glib::locale_to_utf8( phonebookName ); //FIXME: BUG: Throws exception that is not caught if there is a strange character in the string.
 	(*phonebookparent)[tree->phonebook] = phonebook;
 	(*phonebookparent)[tree->person] = NULL;
 	(*phonebookparent)[tree->contactEntry] = NULL;
+	*/
 	string contact;
 
 	for( iPerson = persons.begin(); iPerson != persons.end(); iPerson++ ){
@@ -68,7 +71,7 @@ void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
 			list< MRef<ContactEntry *> > entries = (*iPerson)->getEntries();
 			list< MRef<ContactEntry *> >::iterator  iEntry;
 
-			Gtk::TreeModel::iterator contactparent = append( (*phonebookparent).children());
+			Gtk::TreeModel::iterator contactparent = append( /*(*phonebookparent).*/children());
 			(*contactparent)[tree->name] = Glib::locale_to_utf8( contact );
 			(*contactparent)[tree->person] = *iPerson;
 			(*contactparent)[tree->phonebook] = phonebook;
@@ -257,3 +260,30 @@ void PhoneBookModel::editContact( Glib::RefPtr<Gtk::TreeSelection> selection ){
 	}
 
 }
+
+
+void PhoneBookModel::setFont( Gtk::CellRenderer * renderer, 
+		const Gtk::TreeModel::iterator & iter ){
+
+	Gtk::CellRendererText * textR = 
+		(Gtk::CellRendererText *)renderer;
+
+	if( !(*iter)->children().empty() ){
+		/* Not a leaf, make it bold */
+		textR->property_markup().set_value( "<b>" + 
+				(*iter)[tree->name] + "</b>" );
+
+		textR->property_is_expanded().set_value( 
+				(*iter)->children().size() >= 1 );
+
+	}
+	else{
+		MRef<ContactEntry *> entry = (*iter)[tree->contactEntry];
+		textR->property_markup().set_value( 
+			entry->getDesc() + ": " + 
+			"<small><span foreground=\"#0000FF\">" + 
+			entry->getUri() + "</span></small>" );
+	}
+}
+		
+	

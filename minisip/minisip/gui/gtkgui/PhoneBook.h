@@ -58,6 +58,8 @@ class PhoneBookModel : public Gtk::TreeStore{
 		void removeContact( Glib::RefPtr<Gtk::TreeSelection> selection );
 		void editContact( Glib::RefPtr<Gtk::TreeSelection> selection );
 		void addContact( Glib::RefPtr<Gtk::TreeSelection> selection );
+
+		void setFont( Gtk::CellRenderer * renderer, const Gtk::TreeModel::iterator & iter );
 		
 
 };

@@ -88,7 +88,7 @@ MainWindow::MainWindow( int32_t argc, char ** argv ):kit( argc, argv ){
 	phoneBookModel = new PhoneBookModel( phoneBookTree );
 
 	phoneBookTreeView->set_headers_visible( false );
-	phoneBookTreeView->set_rules_hint( true );
+	phoneBookTreeView->set_rules_hint( false );
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
 		SigC::slot( *this, &MainWindow::phoneTreeClicked ), false );
 
@@ -283,10 +283,20 @@ void MainWindow::updateConfig(){
 
         	phoneBookModel->setPhoneBook( *i );
         }
+	
+	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
 	phoneBookTreeView->set_model( modelPtr );
 	if( phonebooks.size() > 0 ){
-		  phoneBookTreeView->append_column( "Contact", phoneBookTree->name );
+//		  phoneBookTreeView->append_column( "Contact", phoneBookTree->name );
+		  phoneBookTreeView->insert_column_with_data_func( 0, 
+			"Contact", *renderer,
+			SigC::slot( *phoneBookModel, &PhoneBookModel::setFont )
+			);
 	}
+
+	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
+
+	phoneBookTreeView->expand_all();
 }
 
 void MainWindow::setContactDb( MRef<ContactDb *> contactDb ){
