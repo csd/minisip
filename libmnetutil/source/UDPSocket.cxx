@@ -45,6 +45,7 @@
 
 #include<unistd.h>
 #include<iostream>
+#include<errno.h>
 
 using namespace std;
 

@@ -42,6 +42,7 @@
 #endif
 
 #include<unistd.h>
+#include<errno.h>
 
 #include<iostream>
 using namespace std;

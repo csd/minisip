@@ -47,6 +47,7 @@
 #include<resolv.h>
 #endif
 
+#include<errno.h>
 #include<iostream>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/itoa.h>

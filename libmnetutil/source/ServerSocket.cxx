@@ -42,6 +42,7 @@
 #include<stdio.h>
 
 #include<iostream>
+#include<errno.h>
 
 
 ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
