@@ -242,7 +242,7 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 //---------------------------------------------------------------------------------------------------//
 //Handle responded MIKEY
 bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
-	cerr << "Aleast I'm here!" << endl;
+	cerr << "Atleast I'm here!" << endl;
 	if (MikeyM->getContentType() != "application/mikey")
 		return false;
 	if( !initiatorAuthenticate( MikeyM->getString() ) ){
@@ -320,7 +320,10 @@ bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 	if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
 		((KeyAgreementDH *)*ka)->computeTgk();
 	}
-	return initMSipIpsec();
+	if(initMSipIpsec())
+		if (start() == 0)
+			return true;
+	return false;
 }
 
 //---------------------------------------------------------------------------------------------------//
@@ -800,6 +803,7 @@ int MsipIpsecSA::set(){
 		m_sa = (struct sadb_sa *)next[SADB_EXT_SA];
 		spi = m_sa->sadb_sa_spi;
 		exist = true;
+		cerr << "I OFFER SPI: "<< ntohl(spi) << endl;
 		return (int)spi;
 	}
 	if(spi && !exist && valid) {
@@ -834,7 +838,7 @@ int MsipIpsecSA::set(){
 		cerr << "seq: "<< seq << endl;
 
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		result = pfkey_send_add(so, satype, mode, src, dst, ntohl(spi), reqid, wsize, 
+		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
 					flags, l_alloc, l_bytes, l_addtime, l_usetime, seq);
 		msg = pfkey_recv(so);
@@ -908,7 +912,7 @@ int MsipIpsecPolicy::set(){
 	// There might be a good idea to check the result & return values below!!!
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 	result = pfkey_send_spdadd(so, src, prefs, dst, prefd, proto, pol, len, seq); 
-	//msg = pfkey_recv(so);
+	msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 	exist = true;
 	return result;
