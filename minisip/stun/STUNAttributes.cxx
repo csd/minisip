@@ -294,7 +294,7 @@ STUNAttributeString::STUNAttributeString(int type,int length, unsigned char*data
 	assert(length%4==0);
 	this->length = length;
 	this->str = new char[length];
-	memcpy(this->str, str, length);
+	memcpy(this->str, data, length);
 }
 	
 	

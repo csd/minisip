@@ -93,7 +93,7 @@ class SipProxy{
 				
 		}
 
-		static string findProxy(string uri, int32_t &port){
+		static string findProxy(string uri, uint16_t &port){
 
 			if (uri.find("@")==string::npos){                 
 				return "unknown";

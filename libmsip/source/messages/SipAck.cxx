@@ -65,7 +65,7 @@ SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string p
 				break;
 		}
 	}
-};
+}
 
 string SipAck::getString(){
 	string ret;

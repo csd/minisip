@@ -428,7 +428,7 @@ void XMLElement::print(){
 */
 XMLAttribute::XMLAttribute(string name, string value):XMLNode(XML_NODE_TYPE_ATTRIBUTE,name,value){
 
-};
+}
 
 /*
 void XMLAttribute::print(){

@@ -32,7 +32,7 @@ class NetworkFunctions{
 	public:
 		static vector<string> getAllInterfaces();
 		static string getInterfaceIPStr(string iface);
-		static string getHostHandlingService(string service, string domain, int32_t &ret_port);
+		static string getHostHandlingService(string service, string domain, uint16_t &ret_port);
 
 	private:
 

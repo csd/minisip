@@ -116,7 +116,7 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 				identity->sipProxy = SipProxy( proxy );
 			}
 			else{
-				string foundProxy = SipProxy::findProxy( uri, (int32_t)port );
+				string foundProxy = SipProxy::findProxy( uri, port );
 				if( foundProxy != "unknown" ){
 					identity->sipProxy = SipProxy( foundProxy );
 				}

@@ -236,9 +236,9 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 	int macAlg  = kemac->macAlg();
 
 	// Derive the transport keys
-	byte_t * encrKey;
-	byte_t * authKey;
-	byte_t * saltKey;
+	byte_t * encrKey=NULL;
+	byte_t * authKey=NULL;
+	byte_t * saltKey=NULL;
 	byte_t iv[16];
 	unsigned int authKeyLength = 0;
 	unsigned int encrKeyLength = 0;

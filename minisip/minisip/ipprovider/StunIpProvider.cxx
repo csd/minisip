@@ -56,7 +56,7 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
                         string uridomain = useruri.substr(useruri.find("@")+1);
                         merr << "domain=<"<<uridomain<<">"<< end;
                         if (uridomain.length()>0){
-                                int32_t port;
+                                uint16_t port;
                                 string proxy = NetworkFunctions::getHostHandlingService("_stun._udp",uridomain, port);
                                 if (proxy.length()>0){
                                         phoneConf->stunServerIpString = proxy;
@@ -71,7 +71,7 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 	mout << "Try 2, checkig if configured to use domain"<< end;
 #endif
 	if (phoneConf->findStunServerFromDomain && phoneConf->stunDomain.length()>0){
-		 int32_t port;
+		 uint16_t port;
 		 string proxy = NetworkFunctions::getHostHandlingService(
 				 "_stun._udp",phoneConf->stunDomain, port);
 		 if (proxy.length()>0){

@@ -191,7 +191,7 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 				string proxy = parser->getValue(accountPath + "proxy_addr","");
 				
-				int proxyPort = parser->getIntValue(accountPath +"proxy_port", 5060);
+				uint16_t proxyPort = parser->getIntValue(accountPath +"proxy_port", 5060);
 				
 				ident->setDoRegister(parser->getValue(accountPath + "register","")=="yes");
 

@@ -72,6 +72,7 @@
 #include"Thread.h"
 
 #include<libmutil/minilist.h>
+#include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CondVar.h>
 #include<stdint.h>
@@ -91,15 +92,6 @@ class TPRequest{
 			when_ms += timeout_ms;
 			this->command=command;
 		}
-		
-		TPRequest( TOSubscriber si, uint64_t t_ms, const TOCommand &command) : 
-				subscriber(tsi), 
-				when_ms(t_ms), 
-				command(command)
-		{
-		
-		}
-		
 		
 		bool happens_before(uint64_t t){
 			if (when_ms < t)
