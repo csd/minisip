@@ -89,14 +89,6 @@ CallWidget::CallWidget( string callId, string remoteUri, MainWindow * mw, bool i
 CallWidget::~CallWidget(){
 }
 
-#ifdef IPAQ
-void CallWidget::update(){
-	mainWindow->hide();
-	mainWindow->show();
-}
-#endif
-
-
 void CallWidget::accept(){
 	if( state == CALL_WIDGET_STATE_INCOMING ){
 	
@@ -161,10 +153,8 @@ bool CallWidget::handleCommand( CommandString command ){
 					command.getParam2() + "</b>" );
 			rejectButton.set_label( "Hang up" );
 			hideAcceptButton();
+			stopRinging();
 			state = CALL_WIDGET_STATE_INCALL;
-#ifdef IPAQ
-			update();
-#endif
 
 		}
 
@@ -205,9 +195,6 @@ bool CallWidget::handleCommand( CommandString command ){
 			secStatus.set_text( "" );
 			rejectButton.set_label( "Close" );
 			state = CALL_WIDGET_STATE_TERMINATED;
-#ifdef IPAQ
-			update();
-#endif
 		}
 
 		if( command.getOp() == SipCommandString::remote_reject ){
@@ -215,9 +202,6 @@ bool CallWidget::handleCommand( CommandString command ){
 			secStatus.set_text( "" );
 			rejectButton.set_label( "Close" );
 			state = CALL_WIDGET_STATE_TERMINATED;
-#ifdef IPAQ
-			update();
-#endif
 		}
 
 		if( command.getOp() == SipCommandString::remote_cancelled_invite ){
@@ -229,9 +213,6 @@ bool CallWidget::handleCommand( CommandString command ){
 			state = CALL_WIDGET_STATE_TERMINATED;
 			secStatus.set_text( "" );
 			hideAcceptButton();
-#ifdef IPAQ
-			update();
-#endif
 		}
 
 		if( command.getOp() == SipCommandString::remote_ringing ){

@@ -46,7 +46,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 	int mode = O_WRONLY; 	
 	/* FIXME */
-	this->fragment_setting = 0x00030008;
+	this->fragment_setting = 0x00040008;
 	
 	fdPlayback = ::open( dev.c_str(), mode );
 	
@@ -143,7 +143,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 
 	int mode = O_RDONLY; /*duplex ? O_RDWR : O_WRONLY;*/
 	/* FIXME */
-	this->fragment_setting = 0x00140004;
+	this->fragment_setting = 0x00140008;
 	
 	fdRecord = ::open( dev.c_str(), mode );
 	
@@ -230,6 +230,7 @@ int OssSoundDevice::closePlayback(){
 }
 
 int OssSoundDevice::closeRecord(){
+	cerr << "Closing sound card for recording" << endl;
 	if( !openedRecord || fdRecord == -1 ){
 		cerr << "WARNING: doing close on already "
 			"closed sound card"<< endl;
@@ -265,7 +266,15 @@ int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 		nReadBytes = ::read( fdRecord, buffer, nBytesToRead - totalBytesRead );
 
 		if( nReadBytes < 0 ){
-			return -1;
+			if( ioctl( fdRecord, SNDCTL_DSP_SYNC ) == -1 ){
+				perror( "ioctl sync error on soundcard" );
+			}
+			nReadBytes = ::read( fdRecord, buffer, nBytesToRead - totalBytesRead );
+
+			if( nReadBytes < 0 ){
+				perror( "read" );
+				return -1;
+			}
 		}
 
 		totalBytesRead += nReadBytes;

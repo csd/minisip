@@ -438,9 +438,6 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 	callWidget->show();
 	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
 
-#ifdef IPAQ
-	callWidget->update();
-#endif
 
 	
 }

@@ -65,10 +65,6 @@ class CallWidget : public Gtk::VBox{
 
 		string getCallId();
 
-#ifdef IPAQ
-		void update();
-#endif
-
 	private:
 		void startRinging();
 		void stopRinging();
