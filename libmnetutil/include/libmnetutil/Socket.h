@@ -33,13 +33,15 @@
 #define SOCKET_TYPE_UDP		0x20
 
 #include<stdint.h>
+#include<libmutil/MemObject.h>
 
-class Socket{
+class Socket : public MObject{
 	public:
 		virtual int32_t getFd();
 		int32_t getType();
 
 		void close();
+		virtual std::string getMemObjectType(){return "Socket";};
 	
 	protected:
 		int32_t type;

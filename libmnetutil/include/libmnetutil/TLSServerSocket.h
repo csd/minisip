@@ -28,7 +28,7 @@
 ////#ifndef NO_SECURITY
 
 #include"TLSSocket.h"
-#include"ServerSocket.h"
+#include"IP4ServerSocket.h"
 #include<libmutil/cert.h>
 
 #include <openssl/rsa.h>
@@ -38,7 +38,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-class TLSServerSocket : public ServerSocket{
+class TLSServerSocket : public IP4ServerSocket{
 
 	public:
 		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert );
@@ -47,7 +47,7 @@ class TLSServerSocket : public ServerSocket{
 		virtual StreamSocket *accept();
 
 	private:
-		int32_t domain, listen_port;
+		int32_t listen_port;
 
 		SSL_CTX * ssl_ctx;
 		SSL * ssl;

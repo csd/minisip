@@ -44,7 +44,7 @@
 
 
 
-TLSServerSocket::TLSServerSocket(int32_t listen_port, MRef<certificate *> cert):ServerSocket(domain, listen_port){
+TLSServerSocket::TLSServerSocket(int32_t listen_port, MRef<certificate *> cert):IP4ServerSocket(listen_port){
 	SSL_METHOD * meth;
 
 	SSL_load_error_strings();
