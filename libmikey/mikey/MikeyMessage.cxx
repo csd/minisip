@@ -283,7 +283,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 }
 
 void MikeyMessage::addVPayload( int macAlg, uint64_t t,
-		byte_t * authKey, unsigned int authKeyLength ){
+		byte_t * authKey, uint32_t authKeyLength ){
 		MikeyPayloadV * payload;
 		unsigned int hmacOutputLength;
 		byte_t hmacOutput[20];
@@ -396,7 +396,7 @@ string MikeyMessage::b64Message(){
 	return base64_encode( rawMessageData(), rawMessageLength() );
 }
 
-unsigned int MikeyMessage::csbId(){
+uint32_t MikeyMessage::csbId(){
 	MikeyPayload * hdr = * firstPayload();
 	if( hdr->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		throw new MikeyExceptionMessageContent( 

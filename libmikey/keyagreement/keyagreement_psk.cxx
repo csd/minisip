@@ -40,7 +40,7 @@ KeyAgreementPSK::~KeyAgreementPSK(){
 
 }
 
-void KeyAgreementPSK::generateTgk( unsigned int tgkLength ){
+void KeyAgreementPSK::generateTgk( uint32_t tgkLength ){
 	typeValue = KEY_AGREEMENT_TYPE_PSK;
 	this->tgkLengthValue = tgkLength;
 	if( tgkPtr ){
