@@ -443,8 +443,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		
 		MikeyPayloadRAND * randPayload;
 		
-		((MikeyPayload *)randPayload) = 
-			extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
+		randPayload = (MikeyPayloadRAND*) extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 		
 		if( randPayload == NULL ){
 			ka->setAuthError(

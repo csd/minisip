@@ -399,7 +399,7 @@ bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
 	{
 		/* Try to find the certificate chain in the message */
 		MikeyPayloadCERT * certPayload;
-		while( ( ((MikeyPayload *)certPayload) = 
+		while( ( (certPayload) = (MikeyPayloadCERT*)
 				extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE)
 				) != NULL ){
 			ka->addPeerCertificate(
