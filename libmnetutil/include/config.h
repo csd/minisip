@@ -25,6 +25,9 @@
 
 #include<stdint.h>
 
+#ifdef __CYGWIN__
+#define WIN32
+#endif
 
 /* Compilation time configuration */
 #include"compilation_config.h"

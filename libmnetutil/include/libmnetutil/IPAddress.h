@@ -24,12 +24,11 @@
 #define IPADDRESS_H
 
 #include<libmnetutil/Socket.h>
-#include<sys/types.h>
-#include<string>
 
 #define IP_ADDRESS_TYPE_V4 	0
 #define IP_ADDRESS_TYPE_V6	1
 
+#include<string>
 class IPAddress{
 	public:
 		virtual ~IPAddress();

@@ -24,17 +24,7 @@
 #include<config.h>
 #endif
 
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/NetworkException.h>
 
-#include<iostream>
-
-#ifdef HAVE_NETINET_IN_H
-#include<netdb.h>
-#include<netinet/in.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#endif
 
 #ifdef WIN32
 #include"winsock2.h"
@@ -46,14 +36,22 @@ inet_aton(const char *cp, struct in_addr *addr)
   addr->s_addr = inet_addr(cp);
   return (addr->s_addr == INADDR_NONE) ? 0 : 1;
 }
+
+#elif defined HAVE_NETINET_IN_H
+#include<netdb.h>
+#include<netinet/in.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
 #endif
 
+#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/NetworkException.h>
 
 #include<stdio.h>
-#include<unistd.h>
 #include<assert.h>
 #include<libmutil/itoa.h>
 #include<strings.h>
+#include<iostream>
 
 IP4Address::IP4Address(struct sockaddr_in *sin){
         sockaddress = new sockaddr_in;

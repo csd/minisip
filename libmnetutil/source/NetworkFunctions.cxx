@@ -30,8 +30,11 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef HAVE_ARPA_INET_H
+#ifdef HAVE_LINUX_SOCKIOS_H
 #include <linux/sockios.h> /* for SIOCG* */
+#endif
+
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h> /* inet_ntoa */
 #include <sys/types.h> /* socket() */
 #include <net/if.h>

@@ -24,11 +24,6 @@
 #include<config.h>
 #endif
 
-
-
-#include<libmnetutil/IP4ServerSocket.h>
-#include<libmnetutil/ServerSocket.h>
-
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_NETDB_H
@@ -36,6 +31,12 @@
 #include<netinet/in.h>
 #include<netdb.h>
 #endif
+
+
+
+#include<libmnetutil/IP4ServerSocket.h>
+#include<libmnetutil/ServerSocket.h>
+
 
 
 #include<stdio.h>

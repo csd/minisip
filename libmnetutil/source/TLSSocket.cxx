@@ -23,16 +23,16 @@
 #include<config.h>
 #endif
 
-
-#include<libmnetutil/TLSSocket.h>
-
-#ifndef NO_SECURITY
-
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_SYS_SOCKET_H
 #include<sys/socket.h>
 #endif
+
+#include<libmnetutil/TLSSocket.h>
+
+#ifndef NO_SECURITY
+
 
 
 #include<iostream>

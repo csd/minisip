@@ -23,6 +23,10 @@
 #include<config.h>
 #include<libmnetutil/Socket.h>
 
+#ifdef WIN32
+#include<winsock2.h>
+#endif
+
 int32_t Socket::getFd(){
 	return fd;
 }
@@ -32,7 +36,11 @@ int32_t Socket::getType(){
 }
 
 void Socket::close(){
+#ifdef WIN32
+	closesocket(fd);
+#else
 	::close(fd);
+#endif
 	fd = -1;
 }
 

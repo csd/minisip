@@ -23,21 +23,20 @@
 #include<config.h>
 #endif
 
-
-#include<libmnetutil/ServerSocket.h>
-#include<libmnetutil/TCPSocket.h>
-#include<libmnetutil/NetworkException.h>
-
-#ifdef HAVE_ARPA_INET_H
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_ARPA_INET_H
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #endif
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
+#include<libmnetutil/ServerSocket.h>
+#include<libmnetutil/TCPSocket.h>
+#include<libmnetutil/NetworkException.h>
+
+
 
 #include<stdio.h>
 #include <errno.h>
@@ -110,8 +109,12 @@ StreamSocket *ServerSocket::accept(){
 
 int32_t ServerSocket::getPort(){
 		struct sockaddr_in addr;
-		int32_t sz = sizeof(addr);
+		int sz = sizeof(addr);
+#ifdef WIN32
+		if (getsockname(fd, (struct sockaddr *)&addr, &sz)){
+#else
 		if (getsockname(fd, (struct sockaddr *)&addr, (socklen_t*)&sz)){
+#endif
 			throw new GetSockNameFailed( errno );
 		}
 		

@@ -25,18 +25,19 @@
 #endif
 
 
-#include<libmnetutil/IP6Address.h>
-#include<libmnetutil/NetworkException.h>
-#ifdef HAVE_NETDB_H
-#include<sys/socket.h>
-#include<netdb.h>
-#endif
-
 #ifdef WIN32
 #include<winsock2.h>
 #include<ws2tcpip.h>
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+#elif defined HAVE_NETDB_H
+#include<sys/socket.h>
+#include<netdb.h>
 #endif
+
+#include<libmnetutil/IP6Address.h>
+#include<libmnetutil/NetworkException.h>
+
+
 #include<stdio.h>
 #include<errno.h>
 #include<unistd.h>

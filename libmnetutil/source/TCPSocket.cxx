@@ -23,6 +23,14 @@
 #include<config.h>
 #endif
 
+#ifdef WIN32
+#include<winsock2.h>
+#elif defined HAVE_NETINET_TCP_H
+#include<sys/socket.h>
+#include<netinet/tcp.h>
+#include<netinet/in.h>
+#endif
+
 
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/IPAddress.h>
@@ -32,13 +40,6 @@
 #include<stdio.h>
 #include<errno.h>
 
-#ifdef WIN32
-#include<winsock2.h>
-#elif defined HAVE_NETINET_TCP_H
-#include<sys/socket.h>
-#include<netinet/tcp.h>
-#include<netinet/in.h>
-#endif
 
 
 #include<unistd.h>

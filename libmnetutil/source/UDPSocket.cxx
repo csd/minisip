@@ -23,15 +23,6 @@
 #include<config.h>
 #endif
 
-
-#include<libmnetutil/UDPSocket.h>
-#include<libmnetutil/IPAddress.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/IP6Address.h>
-#include<libmnetutil/NetworkException.h>
-#include<stdlib.h>
-#include<errno.h>
-
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_NETINET_IN_H
@@ -41,6 +32,15 @@
 #include<netinet/in.h>
 //#include<netdb.h>
 #endif
+
+#include<libmnetutil/UDPSocket.h>
+#include<libmnetutil/IPAddress.h>
+#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IP6Address.h>
+#include<libmnetutil/NetworkException.h>
+#include<stdlib.h>
+#include<errno.h>
+
 
 
 #include<unistd.h>
@@ -63,6 +63,7 @@ UDPSocket::UDPSocket(bool use_ipv6, int32_t port){
 #else
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
 #endif
+#ifndef WIN32
 	if (use_ipv6){
 		struct sockaddr_in6 addr;
 		addr.sin6_family=PF_INET6;
@@ -73,7 +74,9 @@ UDPSocket::UDPSocket(bool use_ipv6, int32_t port){
 			throw new BindFailed( errno );
 		}
 
-	}else{
+	}else
+#endif
+	{
 		struct sockaddr_in addr;
 		addr.sin_family=PF_INET;
 		addr.sin_port=htons(port);
@@ -93,8 +96,12 @@ UDPSocket::~UDPSocket(){
 
 int32_t UDPSocket::getPort(){
 		struct sockaddr_in addr;
-		int32_t sz = sizeof(addr);
+		int sz = sizeof(addr);
+#ifdef WIN32
+		if (getsockname(fd, (struct sockaddr *)&addr, &sz)){
+#else
 		if (getsockname(fd, (struct sockaddr *)&addr, (socklen_t*)&sz)){
+#endif
 			throw new GetSockNameFailed( errno );
 		}
 		
@@ -122,17 +129,24 @@ int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, void *msg, int32_t l
 }
 
 int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from){
-	struct sockaddr_in6 from6;
 	struct sockaddr_in from4;
-	int32_t n, addr_len;
+	int n, addr_len;
+#ifndef WIN32
 	if (use_ipv6){
+		struct sockaddr_in6 from6;
 		addr_len=sizeof(struct sockaddr_in6);
 		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*) &from6, (socklen_t*)&addr_len);
 //		from = new IP6Address(from6);
 		from=NULL;
-	}else{
+	}else
+#endif
+	{
 		addr_len = sizeof(struct sockaddr_in);
+#ifdef WIN32
+		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, &addr_len);
+#else
 		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, (socklen_t*)&addr_len);
+#endif
 //		from = new IP4Address(from4);
 		from=NULL;
 	}

@@ -23,11 +23,6 @@
 #include<config.h>
 #endif
 
-
-#include<libmnetutil/TLSServerSocket.h>
-
-#ifndef NO_SECURITY
-
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_ARPA_INET_H
@@ -36,6 +31,11 @@
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #endif
+
+#include<libmnetutil/TLSServerSocket.h>
+
+#ifndef NO_SECURITY
+
 
 
 #ifdef DEBUG_OUTPUT

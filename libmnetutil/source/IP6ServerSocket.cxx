@@ -24,11 +24,6 @@
 #include<config.h>
 #endif
 
-
-#include<libmnetutil/IP6ServerSocket.h>
-#include<libmnetutil/ServerSocket.h>
-
-
 #ifdef WIN32
 #include<winsock2.h>
 #include<ws2tcpip.h>
@@ -37,6 +32,11 @@
 #include<netinet/in.h>
 #include<netdb.h>
 #endif
+
+#include<libmnetutil/IP6ServerSocket.h>
+#include<libmnetutil/ServerSocket.h>
+
+
 
 #include<stdio.h>
 #include<unistd.h>

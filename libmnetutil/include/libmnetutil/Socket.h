@@ -25,8 +25,6 @@
 
 //#include<config.h>
 
-#include<sys/types.h>
-#include<unistd.h>
 
 #define SOCKET_TYPE_STREAM	0x10
 #define SOCKET_TYPE_TCP		0x11
