@@ -51,6 +51,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory;
 
 class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 	public:

@@ -35,6 +35,14 @@
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmutil/vmd5.h>
 
+MRef<SipHeaderValue *> proxyauthorizationFactory(const string &build_from){
+	                return new SipHeaderValueProxyAuthorization(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderProxyAuthorizationFactory=proxyauthorizationFactory;
+
+
+
 const string sipHeaderValueProxyAuthorization = "Proxy-Authorization";
 
 SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization() : SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,sipHeaderValueProxyAuthorization){

@@ -124,7 +124,9 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 	}
 
 	mdbg << "SipDialog::handleCommand: sending command to state machine"<< end;
-	bool ret=StateMachine<SipSMCommand,string>::handleCommand(command);
+	bool ret;
+	ret=StateMachine<SipSMCommand,string>::handleCommand(command);
+	
 	mdbg << "SipDialog::handleCommand returning "<< ret << end;
 
 	return ret;

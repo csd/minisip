@@ -37,6 +37,14 @@
 
 #include<libmutil/itoa.h>
 
+MRef<SipHeaderValue *> useragentFactory(const string &build_from){
+	                return new SipHeaderValueUserAgent(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderUserAgentFactory=useragentFactory;
+
+
+
 const string sipHeaderValueTypeUserAgentTypeStr = "User-Agent";
 
 SipHeaderValueUserAgent::SipHeaderValueUserAgent(const string &build_from)

@@ -41,6 +41,14 @@
 
 // Ex: Route: <sip:vatn@213.100.38.57;ftag=2064763305;lr>,<...>
 
+MRef<SipHeaderValue *> routeFactory(const string &build_from){
+	                return new SipHeaderValueRoute(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderRouteFactory=routeFactory;
+
+
+
 const string sipHeaderValueRouteTypeStr = "Route";
 
 SipHeaderValueRoute::SipHeaderValueRoute(const string &build_from)

@@ -50,6 +50,9 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderFromFactory;
+
+
 class LIBMSIP_API SipHeaderValueFrom: public SipHeaderValue{
 	public:
 		SipHeaderValueFrom();
@@ -71,11 +74,11 @@ class LIBMSIP_API SipHeaderValueFrom: public SipHeaderValue{
 		SipURI &getUri();
 		void setUri(const SipURI &uri);
 		
-		void setTag(const string &tag);
-		string getTag();
+//		void setTag(const string &tag);
+//		string getTag();
 	private:
 		SipURI uri;
-		string tag;
+//		string tag;
 };
 
 #endif

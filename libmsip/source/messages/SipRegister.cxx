@@ -81,7 +81,7 @@ SipRegister::SipRegister(string branch,
 	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, 
 			localIp, 
 			sip_listen_port,
-			"phone",
+			"",
 			transport
 			); //EE: append ";expires=3600" ?!
 	
@@ -110,7 +110,7 @@ SipRegister::SipRegister(string branch,
 		string password
 		): SipMessage(branch, SipRegister::type), domain(domainarg)
 {
-	SipURI uri("", localIp,"phone", sip_listen_port);
+	SipURI uri("", localIp,"", sip_listen_port);
 	 
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
 	addHeader(new SipHeader(fromp));
@@ -130,7 +130,7 @@ SipRegister::SipRegister(string branch,
 	seqp->setCSeq(seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"phone",transport);
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport);
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();

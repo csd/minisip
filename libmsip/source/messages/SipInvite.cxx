@@ -134,11 +134,11 @@ void SipInvite::createHeadersAndContent(
 		const string &transport
 		)
 {
-	SipURI uri(tel_no,proxyAddr,"phone",proxyPort);
+	SipURI uri(tel_no,proxyAddr,"",proxyPort);
 	
 	this->username = tel_no;
 	this->ip=proxyAddr;
-	this->user_type="phone";
+	this->user_type="";
 	
 	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(from_tel_no, proxyAddr ) );
 	addHeader(fromp);
@@ -161,7 +161,7 @@ void SipInvite::createHeadersAndContent(
 	seqp->setCSeq(seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"phone",transport);
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"",transport);
 	addHeader(new SipHeader(contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
@@ -190,7 +190,7 @@ string SipInvite::getString(){
 	if (username.find("@")==string::npos)
 		ret = ret+"@"+ip;
 
-	ret += ";user="+user_type+" SIP/2.0\r\n" + getHeadersAndContent();
+	ret += /*";user="+user_type+*/" SIP/2.0\r\n" + getHeadersAndContent();
 
 	return  ret;
 }

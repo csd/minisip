@@ -49,6 +49,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderContentLengthFactory;
 
 class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 	public:

@@ -30,9 +30,32 @@
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
 
+#include<libmsip/SipHeaderAcceptContact.h>
+#include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipResponse.h>
 
-
-
+#include<libmsip/SipHeaderContentLength.h>
+#include<libmsip/SipHeaderUserAgent.h>
+#include<libmsip/SipHeaderContentType.h>         
+#include<libmsip/SipHeaderVia.h>
+#include<libmsip/SipHeaderCSeq.h>                
+#include<libmsip/SipHeaderWarning.h>
+#include<libmsip/SipHeaderEvent.h>            
+#include<libmsip/SipHeaderExpires.h>             
+#include<libmsip/SipHeaderFrom.h>            
+#include<libmsip/SipHeader.h>               
+#include<libmsip/SipHeaderMaxForwards.h>
+#include<libmsip/SipHeaderProxyAuthenticate.h>
+#include<libmsip/SipHeaderProxyAuthorization.h>
+#include<libmsip/SipHeaderAcceptContact.h>
+#include<libmsip/SipHeaderRecordRoute.h>
+#include<libmsip/SipHeaderAccept.h>
+#include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderAuthorization.h>
+#include<libmsip/SipHeaderSubject.h>
+#include<libmsip/SipHeaderCallID.h>
+#include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipCommandString.h>
 //#include"PresenceMessageContent.h"
 
@@ -55,6 +78,36 @@ SipStack::SipStack(MRef<SipDialog*> defaultDialog,
 #endif
 		)
 {
+	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptContactFactory);
+	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
+	SipHeader::headerFactories.addFactory("Authorization", sipHeaderAuthorizationFactory);
+	SipHeader::headerFactories.addFactory("Call-ID", sipHeaderCallIdFactory);
+	SipHeader::headerFactories.addFactory("i", sipHeaderCallIdFactory);
+	SipHeader::headerFactories.addFactory("Contact", sipHeaderContactFactory);
+	SipHeader::headerFactories.addFactory("m", sipHeaderContactFactory);
+	SipHeader::headerFactories.addFactory("Content-Length", sipHeaderContentLengthFactory);
+	SipHeader::headerFactories.addFactory("l", sipHeaderContentLengthFactory);
+	SipHeader::headerFactories.addFactory("Content-Type", sipHeaderContentTypeFactory);
+	SipHeader::headerFactories.addFactory("c", sipHeaderContentTypeFactory);
+	SipHeader::headerFactories.addFactory("CSeq", sipHeaderCSeqFactory);
+	SipHeader::headerFactories.addFactory("Event", sipHeaderEventFactory);
+	SipHeader::headerFactories.addFactory("Expires", sipHeaderEventFactory);
+	SipHeader::headerFactories.addFactory("From", sipHeaderFromFactory);
+	SipHeader::headerFactories.addFactory("f", sipHeaderFromFactory);
+	SipHeader::headerFactories.addFactory("Max-Forwards", sipHeaderMaxForwardsFactory);
+	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
+	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);
+	SipHeader::headerFactories.addFactory("Record-Route", sipHeaderRecordRouteFactory);
+	SipHeader::headerFactories.addFactory("Route", sipHeaderRouteFactory);
+	SipHeader::headerFactories.addFactory("Subject", sipHeaderSubjectFactory);
+	SipHeader::headerFactories.addFactory("s", sipHeaderSubjectFactory);
+	SipHeader::headerFactories.addFactory("To", sipHeaderToFactory);
+	SipHeader::headerFactories.addFactory("t", sipHeaderToFactory);
+	SipHeader::headerFactories.addFactory("User-Agent", sipHeaderUserAgentFactory);
+	SipHeader::headerFactories.addFactory("Via", sipHeaderViaFactory);
+	SipHeader::headerFactories.addFactory("v", sipHeaderViaFactory);
+	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
+	
 
 	 transportLayer = MRef<SipMessageTransport*>(new
 			 SipMessageTransport(

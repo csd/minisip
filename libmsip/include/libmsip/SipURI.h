@@ -57,7 +57,7 @@ using namespace std;
 class LIBMSIP_API SipURI : public MObject{
 	public:
 		SipURI(string build_from);
-		SipURI(string id, string ip, string type=/*"phone"*/ "",int32_t port=0);
+		SipURI(string id, string ip, string type="",int32_t port=0);
                 virtual std::string getMemObjectType(){return "SipURI";}
 
 		void setUserId(string id);

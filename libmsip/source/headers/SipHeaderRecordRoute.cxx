@@ -42,6 +42,13 @@
 #include<iostream>
 #endif
 
+MRef<SipHeaderValue *> recordrouteFactory(const string &build_from){
+	                return new SipHeaderValueRecordRoute(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderRecordRouteFactory=recordrouteFactory;
+
+
 // Ex: Record-Route: <sip:vatn@213.100.38.57;ftag=2064763305;lr>,<...>
 
 const string sipHeaderValueRecordRouteTypeStr = "Record-Route";

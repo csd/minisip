@@ -50,6 +50,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthorizationFactory;
 
 class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthorization{
 	public:

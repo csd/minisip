@@ -49,6 +49,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderAcceptFactory;
 
 // Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
 // 

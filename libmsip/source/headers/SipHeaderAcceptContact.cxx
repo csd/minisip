@@ -52,6 +52,13 @@
 
 #include<libmsip/SipHeaderAcceptContact.h>
 
+MRef<SipHeaderValue *> acceptContactFactory(const string &build_from){
+	return new SipHeaderValueAcceptContact(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderAcceptContactFactory=acceptContactFactory;
+
+
 const string sipHeaderValueValueTypeStr = "Accept-Contact";
 
 /**

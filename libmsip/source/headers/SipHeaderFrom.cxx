@@ -36,19 +36,25 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmutil/trim.h>
 
+MRef<SipHeaderValue *> fromFactory(const string &build_from){
+	                return new SipHeaderValueFrom(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderFromFactory=fromFactory;
+
 const string sipHeaderValueFrom = "From";
 		
 SipHeaderValueFrom::SipHeaderValueFrom()
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),
-		uri("Erik","0.0.0.0","phone",0)
+		uri("Erik","0.0.0.0","",0)
 {
-	tag="";
+	//tag="";
 }
 		
 
 SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom), 
-		uri("UNKNOWN","0.0.0.0","phone",0)
+		uri("UNKNOWN","0.0.0.0","",0)
 {
 	
 	string users_name;
@@ -68,19 +74,19 @@ SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from)
 	uri=SipURI(uri_str);
 	uri.setUsersName(trim(users_name));
 
-	tag="";
+	//tag="";
 
 	while (build_from[i]=='>' || build_from[i]==' ')
 		i++;
 	
-	if (build_from.length()>=i+5 && build_from.substr(i,5)==";tag="){
-		tag = build_from.substr(i+5, build_from.length()-5-1);	
-	}
+//	if (build_from.length()>=i+5 && build_from.substr(i,5)==";tag="){
+//		tag = build_from.substr(i+5, build_from.length()-5-1);	
+//	}
 }
 
 SipHeaderValueFrom::SipHeaderValueFrom(const string &username, const string &ip)
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),
-		uri(username,ip,"phone",0)
+		uri(username,ip,"",0)
 {
 }
 
@@ -92,8 +98,8 @@ string SipHeaderValueFrom::getString(){
 //	merr << "SipHeaderValueFrom: Runnign get_string"<< end;
 	string ret = /*"From: "+*/uri.getUsersName()+"<"+uri.getString()+">";
 //	merr << "SipHeaderValueFrom: Runnign get_string(2)"<< end;
-	if (tag.length()>0)
-		ret=ret+";tag="+tag;
+//	if (tag.length()>0)
+//		ret=ret+";tag="+tag;
 //	merr << "SipHeaderValueFrom: returning string: "<< ret<< end;
 	return ret;
 } 
@@ -106,6 +112,7 @@ void SipHeaderValueFrom::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 		
+/*
 void SipHeaderValueFrom::setTag(const string &tag){
 	this->tag = tag;
 }
@@ -113,3 +120,4 @@ void SipHeaderValueFrom::setTag(const string &tag){
 string SipHeaderValueFrom::getTag(){
 	return tag;
 }
+*/

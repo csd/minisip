@@ -50,6 +50,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderMaxForwardsFactory;
 
 class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 	public:

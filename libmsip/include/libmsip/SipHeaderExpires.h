@@ -49,6 +49,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderExpiresFactory;
 
 class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 	public:

@@ -37,6 +37,14 @@
 
 #include<libmutil/itoa.h>
 
+MRef<SipHeaderValue *> expiresFactory(const string &build_from){
+	                return new SipHeaderValueExpires(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderExpiresFactory=expiresFactory;
+
+
+
 const string sipHeaderValueExpiresTypeStr = "Expires";
 
 SipHeaderValueExpires::SipHeaderValueExpires(const string &/*build_from*/) //TODO: parse expires header

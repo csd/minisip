@@ -41,6 +41,13 @@
 #include<iostream>
 #endif
 
+MRef<SipHeaderValue *> callidFactory(const string &build_from){
+	                return new SipHeaderValueCallID(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderCallIdFactory=callidFactory;
+
+
 const string sipHeaderValueCallIdTypeStr = "Call-ID";
 
 SipHeaderValueCallID::SipHeaderValueCallID(const string &build_from)

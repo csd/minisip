@@ -49,6 +49,8 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderSubjectFactory;
+
 class LIBMSIP_API SipHeaderValueSubject: public SipHeaderValue{
 	public:
 		SipHeaderValueSubject();

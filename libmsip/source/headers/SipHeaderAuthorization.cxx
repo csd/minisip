@@ -36,30 +36,38 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmutil/vmd5.h>
 
+MRef<SipHeaderValue *> authorizationFactory(const string &build_from){
+	return new SipHeaderValueAuthorization(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderAuthorizationFactory=authorizationFactory;
+
+
+
 const string sipHeaderValueAuthorizationTypeString="Authorization";
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization() 
-	: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION,sipHeaderValueAuthorizationTypeString),uri("NONAME","0.0.0.0", "phone",0)
+	: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION,sipHeaderValueAuthorizationTypeString),uri("NONAME","0.0.0.0", "",0)
 {
 
 }
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &typeStr) 
-	: SipHeaderValue(type, typeStr),uri("NONAME","0.0.0.0", "phone",0)
+	: SipHeaderValue(type, typeStr),uri("NONAME","0.0.0.0", "",0)
 {
 	
 }	
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &/*build_from*/)	//TODO: parse authorization header 
 		: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString), 
-		uri("NONAME","0.0.0.0", "phone",0)
+		uri("NONAME","0.0.0.0", "",0)
 {
 	
 }
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &/*build_from*/, const string &typeStr) //TODO: parse authorization header
 		: SipHeaderValue(type,typeStr), 
-		uri("NONAME","0.0.0.0", "phone",0){
+		uri("NONAME","0.0.0.0", "",0){
 //	type = SIP_HEADER_TYPE_AUTHORIZATION;
 
 }

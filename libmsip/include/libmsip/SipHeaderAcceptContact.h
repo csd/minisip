@@ -61,6 +61,9 @@
 
 #include"SipHeader.h"
 
+
+extern SipHeaderFactoryFuncPtr sipHeaderAcceptContactFactory;
+
 /**
  * @author Florian Maurer
 */
@@ -107,5 +110,6 @@ class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 		bool set_explicit;
 
 };
+
 
 #endif

@@ -150,7 +150,9 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 #ifdef DEBUG_OUTPUT
 		mdbg<< "Dispatcher(2): trying all dialogs"<<end;
 #endif
-		for (int i=0; i<dialogs.size(); i++){
+		int i;
+		try{
+		for (i=0; i<dialogs.size(); i++){
 //#ifdef DEBUG_OUTPUT
 //			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
 //#endif
@@ -159,6 +161,9 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 				dialogListLock.unlock();
 				return true;
 			}
+		}
+		}catch(exception &exc){
+			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!1caught exception i="<< i << endl;
 		}
 
 

@@ -35,11 +35,18 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmutil/trim.h>
 
+MRef<SipHeaderValue *> toFactory(const string &build_from){
+	                return new SipHeaderValueTo(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderToFactory=toFactory;
+
+
 const string sipHeaderValueToTypeStr = "To";
 		
 SipHeaderValueTo::SipHeaderValueTo()
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri("Erik","0.0.0.0","phone",0)
+		uri("Erik","0.0.0.0","",0)
 {
 	
 }
@@ -47,11 +54,11 @@ SipHeaderValueTo::SipHeaderValueTo()
 
 SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri("UNKNOWN","0.0.0.0","phone",0)
+		uri("UNKNOWN","0.0.0.0","",0)
 {
 	string users_name;
 	int32_t i=0;
-	tag="";
+//	tag="";
 	while (build_from[i]!='<'){ 		//FIX not past eos
 		users_name+=build_from[i];
 		i++;
@@ -66,15 +73,16 @@ SipHeaderValueTo::SipHeaderValueTo(const string &build_from)
 	}
 	i++;
 	
-	if (build_from.length()-1>(unsigned)i){
+/*	if (build_from.length()-1>(unsigned)i){
 		if (build_from.substr(i,5)==string(";tag=")){
 			tag = build_from.substr(i+5, build_from.length()-i-5);
 			
 		}else{
 		
 		}
-			
+
 	}
+*/
 	uri=SipURI(uri_str);
 	uri.setUsersName(trim(users_name));
 }
@@ -82,7 +90,7 @@ SipHeaderValueTo::SipHeaderValueTo(const string &build_from)
 
 SipHeaderValueTo::SipHeaderValueTo(const string &username, const string &ip)
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri(username, ip,"phone",0)
+		uri(username, ip,"",0)
 {
 
 }
@@ -94,8 +102,8 @@ SipHeaderValueTo::~SipHeaderValueTo(){
 string SipHeaderValueTo::getString(){
 	//cerr << "To::get_string" << endl;
 	string ret = /*"To: "+*/ uri.getUsersName()+"<"+uri.getString()+">";
-	if (tag.length()>0)
-		ret=ret+";tag="+tag;
+//	if (tag.length()>0)
+//		ret=ret+";tag="+tag;
 	
 	return ret;
 } 
@@ -108,6 +116,7 @@ void SipHeaderValueTo::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 		
+/*
 void SipHeaderValueTo::setTag(const string &tag){
 	this->tag=tag;
 }
@@ -115,4 +124,5 @@ void SipHeaderValueTo::setTag(const string &tag){
 string SipHeaderValueTo::getTag(){
 	return tag;
 }
+*/
 

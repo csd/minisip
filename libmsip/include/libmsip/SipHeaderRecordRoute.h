@@ -49,6 +49,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderRecordRouteFactory;
 
 class LIBMSIP_API SipHeaderValueRecordRoute: public SipHeaderValue{
 	public:

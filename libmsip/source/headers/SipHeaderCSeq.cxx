@@ -38,6 +38,14 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
+MRef<SipHeaderValue *> cseqFactory(const string &build_from){
+	                return new SipHeaderValueCSeq(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderCSeqFactory=cseqFactory;
+
+
+
 const string sipHeaderValueCSeqTypeStr = "CSeq";
 
 SipHeaderValueCSeq::SipHeaderValueCSeq(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){

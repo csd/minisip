@@ -34,16 +34,24 @@
 
 #include<libmsip/SipHeaderContact.h>
 
+MRef<SipHeaderValue *> contactFactory(const string &build_from){
+	                return new SipHeaderValueContact(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderContactFactory=contactFactory;
+
+
+
 const string sipHeaderValueContactTypeStr = "Contact";
 		
 SipHeaderValueContact::SipHeaderValueContact()
-	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","phone",0)
+	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","",0)
 {
 	featuretag= "";	
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr), uri("UNKNOWN","0.0.0.0","phone",0)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr), uri("UNKNOWN","0.0.0.0","",0)
 {
 	unsigned i=0;
 	while (build_from[i]!='<')

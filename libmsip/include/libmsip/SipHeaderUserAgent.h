@@ -49,6 +49,8 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderUserAgentFactory;
+
 class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValue{
 	public:
 		SipHeaderValueUserAgent();

@@ -49,6 +49,8 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderCallIdFactory;
+
 
 class LIBMSIP_API SipHeaderValueCallID: public SipHeaderValue{
 

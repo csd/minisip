@@ -50,6 +50,8 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderRouteFactory;
+
 class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 	public:
 		SipHeaderValueRoute(list<string> &routeSet);

@@ -37,6 +37,14 @@
 
 #include<libmutil/itoa.h>
 
+MRef<SipHeaderValue *> contentlengthFactory(const string &build_from){
+	                return new SipHeaderValueContentLength(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderContentLengthFactory=contentlengthFactory;
+
+
+
 const string sipHeaderValueContentLengthTypeStr = "Content-Length";
 
 SipHeaderValueContentLength::SipHeaderValueContentLength(const string &build_from)

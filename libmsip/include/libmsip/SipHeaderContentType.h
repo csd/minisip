@@ -50,6 +50,9 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderContentTypeFactory; 
+
+
 class LIBMSIP_API SipHeaderValueContentType: public SipHeaderValue{
 	public:
 		SipHeaderValueContentType();

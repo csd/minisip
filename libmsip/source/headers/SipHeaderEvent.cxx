@@ -43,6 +43,13 @@
 #include<iostream>
 #endif
 
+MRef<SipHeaderValue *> eventFactory(const string &build_from){
+	                return new SipHeaderValueEvent(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderEventFactory=eventFactory;
+
+
 const string sipHeaderValueEventTypeStr = "Event";
 
 SipHeaderValueEvent::SipHeaderValueEvent(const string &build_from)

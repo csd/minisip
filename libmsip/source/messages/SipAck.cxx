@@ -82,7 +82,7 @@ string SipAck::getString(){
 		ret = ret + username;
 	}
 	
-	ret = ret + /*":" + itoa(port) +*/ ";user=phone SIP/2.0\r\n";
+	ret = ret + /*":" + itoa(port) +*/ " SIP/2.0\r\n";
 	ret = ret + getHeadersAndContent();
 	return ret;
 }

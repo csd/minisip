@@ -73,12 +73,15 @@ SipBye::SipBye(string branch, MRef<SipInvite*> inv,
 		bool add = false;
 		switch (headerType){
 			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setTag("");
+				//((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setTag("");
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->removeParameter("tag");
+				
 				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
 				add = true;
 				break;
 			case SIP_HEADER_TYPE_TO:
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag("");
+				//((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag("");
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->removeParameter("tag");
 				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
 				add = true;
 				break;

@@ -54,6 +54,8 @@ typedef unsigned short uint16_t;
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderWarningFactory;
+
 class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 	public:
 		SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning);

@@ -34,6 +34,13 @@
 
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 
+MRef<SipHeaderValue *> proxyauthFactory(const string &build_from){
+	                return new SipHeaderValueProxyAuthenticate(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory=proxyauthFactory;
+
+
 const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
 SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate()

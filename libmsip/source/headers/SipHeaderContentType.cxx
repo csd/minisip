@@ -41,6 +41,15 @@
 #include<iostream>
 using namespace std;
 
+
+MRef<SipHeaderValue *> contenttypeFactory(const string &build_from){
+	                return new SipHeaderValueContentType(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderContentTypeFactory=contenttypeFactory;
+
+
+
 const string sipHeaderValueContentTypeTypeStr = "Content-Type"; 
 
 SipHeaderValueContentType::SipHeaderValueContentType(const string &build_from)

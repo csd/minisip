@@ -43,6 +43,14 @@
 #include<iostream>
 #endif
 
+MRef<SipHeaderValue *> acceptFactory(const string &build_from){
+	        return new SipHeaderValueAccept(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderAcceptFactory=acceptFactory;
+
+
+
 const string sipHeaderValueAcceptTypeStr="Accept";
 
 SipHeaderValueAccept::SipHeaderValueAccept(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_ACCEPT, sipHeaderValueAcceptTypeStr){

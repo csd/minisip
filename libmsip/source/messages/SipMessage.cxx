@@ -217,6 +217,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	
 		int eoh = SipUtils::findEndOfHeader(buf, i);	// i will be adjusted to start of header
 		string header = buf.substr(i, eoh-i+1);
+
 		if (!addLine(header)){
 #ifdef DEBUG_OUTPUT
 			mdbg << "Info: Could not copy line to new Message: " << header << " (unknown)" << end;

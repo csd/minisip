@@ -37,6 +37,13 @@
 
 #include<libmutil/itoa.h>
 
+MRef<SipHeaderValue *> subjectFactory(const string &build_from){
+	                return new SipHeaderValueSubject(build_from);
+}
+
+SipHeaderFactoryFuncPtr sipHeaderSubjectFactory=subjectFactory;
+
+
 const string sipHeaderValueSubjectTypeStr = "Subject";
 
 SipHeaderValueSubject::SipHeaderValueSubject(const string &build_from)

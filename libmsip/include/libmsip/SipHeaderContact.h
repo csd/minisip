@@ -50,6 +50,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderContactFactory;
 
 class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 

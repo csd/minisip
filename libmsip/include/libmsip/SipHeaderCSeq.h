@@ -49,6 +49,7 @@
  * @author Erik Eliasson
 */
 
+extern SipHeaderFactoryFuncPtr sipHeaderCSeqFactory;
 
 class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 
