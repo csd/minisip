@@ -44,7 +44,7 @@ void SipMessageDispatcher::removeTransaction(MRef<SipTransaction*> t){
 			return;
 		}
 	}
-	merr << "WARNING: BUG? Cound not remove transaction from SipMessageDispatcher!!!!!"<< end;
+	mdbg << "WARNING: BUG? Cound not remove transaction from SipMessageDispatcher!!!!!"<< end;
 }
 
 
@@ -84,7 +84,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
-			merr << "SipMessageDispatcher: Error: did not understand command: "<< c << end;
+			mdbg << "SipMessageDispatcher: Error: did not understand command: "<< c << end;
 #endif
 			dialogListLock.unlock();
 			return false;
@@ -107,7 +107,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 				bool ret = transactions[i]->handleCommand(c);
 #ifdef DEBUG_OUTPUT
 				if (!ret && hasBranch)
-					merr << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
+					mdbg << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
 #endif
 				if (ret){
 					dialogListLock.unlock();
