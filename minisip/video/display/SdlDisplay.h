@@ -58,10 +58,17 @@ class SdlDisplay: public VideoDisplay{
 
 		virtual void handleEvents();
 
+		void initWm();
+
 		Window window;
 		Display * display;
 
+		bool fullscreen;
+
 		SDL_Surface * surface;
+
+		uint32_t flags;
+		int bpp;        
 
 };
 #endif

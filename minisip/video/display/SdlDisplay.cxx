@@ -32,6 +32,8 @@ using namespace std;
 SdlDisplay::SdlDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->width = width;
 	this->height = height;
+	baseWindowWidth = this->width;
+	baseWindowHeight = this->height;
 }
 
 void SdlDisplay::openDisplay(){
@@ -39,8 +41,8 @@ void SdlDisplay::openDisplay(){
 }
 		
 void SdlDisplay::init( uint32_t width, uint32_t height ){
-	this->width = width;
-	this->height = height;
+	baseWindowWidth = this->width = width;
+	baseWindowHeight = this->height = height;
 }
 
 void SdlDisplay::createWindow(){
@@ -51,35 +53,44 @@ void SdlDisplay::createWindow(){
 		exit( 1 );
 	}
 
-        uint32_t flags;
-        int bpp;
-        int ret;
-        SDL_SysWMinfo wmInfo;
-
-        SDL_VERSION( &wmInfo.version );
+//        uint32_t flags;
+//        int bpp;
 
         flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE |
                 SDL_DOUBLEBUF | SDL_RESIZABLE;
 
-        bpp = SDL_VideoModeOK( width, height, 16, flags );
+        bpp = SDL_VideoModeOK( baseWindowWidth, baseWindowHeight, 16, flags );
 
         if( bpp == 0 ){
                 fprintf( stderr, "Could not find an SDL video mode\n" );
                 exit( 1 );
         }
 
-        surface = SDL_SetVideoMode( width, height, bpp, flags );
+        surface = SDL_SetVideoMode( baseWindowWidth, baseWindowHeight, bpp, flags );
 
         if( surface == NULL ){
                 fprintf( stderr, "Could not set SDL video mode\n" );
                 exit( 1 );
         }
 
+	initWm();
 
+
+        SDL_WM_SetCaption( "minisip video", "minisip video" );
+
+
+        SDL_LockSurface( surface );
+}
+
+void SdlDisplay::initWm(){
 #ifdef IPAQ
+        int ret;
+        SDL_SysWMinfo wmInfo;
+
+        SDL_VERSION( &wmInfo.version );
         ret = SDL_GetWMInfo( &wmInfo );
 
-        if( ret > 0 ){
+        if( ret > 0 && !fullscreen ){
                 XClientMessageEvent event;
                 display = wmInfo.info.x11.display;
                 window = wmInfo.info.x11.wmwindow;
@@ -101,11 +112,6 @@ void SdlDisplay::createWindow(){
                                 SDL_GetError() );
         }
 #endif
-
-        SDL_WM_SetCaption( "minisip video", "minisip video" );
-
-
-        SDL_LockSurface( surface );
 }
 
 void SdlDisplay::destroyWindow(){
@@ -178,8 +184,8 @@ void SdlDisplay::displayImage( MImage * mimage ){
 
 	rect.x = 0;
 	rect.y = 0;
-	rect.w = width;
-	rect.h = height;
+	rect.w = baseWindowWidth;
+	rect.h = baseWindowHeight;
 
 	SDL_UnlockYUVOverlay( overlay );
 	SDL_DisplayYUVOverlay( overlay , &rect );
@@ -191,8 +197,35 @@ void SdlDisplay::handleEvents(){
 	SDL_Event event;
 
 	while( SDL_PollEvent( &event ) ){
-		if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f ){
-			SDL_WM_ToggleFullScreen( surface );
+		if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f || event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT ){
+			fullscreen = ! fullscreen;
+#ifdef IPAQ
+			if( fullscreen ){
+				baseWindowWidth = 240;
+				baseWindowHeight = 180;
+			}
+			else{
+				baseWindowWidth = width;
+				baseWindowHeight = height;
+			}
+
+                	//XResizeWindow( display, window, baseWindowWidth, baseWindowHeight );
+			//XSync( display, false );
+			SDL_UnlockSurface( surface );
+
+			SDL_FreeSurface( surface );
+			surface = SDL_SetVideoMode( baseWindowWidth, 
+				baseWindowHeight, bpp, flags);
+			initWm();
+			SDL_LockSurface( surface );	
+//			destroyWindow();
+//			createWindow();
+
+			
+#endif
+			if( fullscreen ){
+				SDL_WM_ToggleFullScreen( surface );
+			}
 		}
 	}
 }
