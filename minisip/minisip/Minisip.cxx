@@ -23,6 +23,7 @@
 #include<libmnetutil/TLSServerSocket.h>
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/NetUtil.h>
+#include<libmnetutil/NetworkException.h>
 #include<libmsip/SipMessageTransport.h>
 #include"ConsoleDebugger.h"
 #include"../sip/Sip.h"
@@ -36,19 +37,34 @@
 static void *tcp_server_thread(void *arg){
         assert( arg != NULL );
         MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
-        IP4ServerSocket server(transport->getLocalTCPPort());
-        while(true){
-                transport->addSocket(server.accept());
-        }
+	try{
+        	IP4ServerSocket server(transport->getLocalTCPPort());
+        	while(true){
+                	transport->addSocket(server.accept());
+        	}
+	}
+	catch( NetworkException * exc ){
+		cerr << "Exception caught when creating TCP server." << endl;
+		cerr << exc->errorDescription() << endl;
+		return NULL;
+	}
 }
 
 static void *tls_server_thread(void *arg){
         assert( arg != NULL );
         MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
-        TLSServerSocket server(transport->getLocalTCPPort(),transport->getCertificate());
-        while(true){
-                transport->addSocket(server.accept());
-        }
+	try{
+        	TLSServerSocket server(transport->getLocalTCPPort(),transport->getCertificate());
+        	while(true){
+                	transport->addSocket(server.accept());
+        	}
+	}
+	catch( NetworkException * exc ){
+		cerr << "Exception caught when creating TLS server." << endl;
+		cerr << exc->errorDescription() << endl;
+		return NULL;
+	}
+		
 }
 
 Minisip::Minisip( int32_t argc, char**argv ){
@@ -208,6 +224,7 @@ void Minisip::run(){
 
 //                Thread t(*sip);
 
+		try{
                 if (phoneConf->tcp_server){
 #ifdef DEBUG_OUTPUT
                         mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
@@ -224,9 +241,15 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                                 mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
 #endif
-                                Thread::createThread(tls_server_thread, *phoneConf->inherited.sipTransport);
+                                Thread::createThread(tls_server_thread, *(phoneConf->inherited.sipTransport));
                         }
                 }
+		}
+		catch( NetworkException * exc ){
+			cerr << "Exception thrown when creating TCP/TLS servers." << endl;
+			cerr << exc->errorDescription() << endl;
+			delete exc;
+		}
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 9/9: Initiating register to proxy commands (if any)" << PLAIN << end;
