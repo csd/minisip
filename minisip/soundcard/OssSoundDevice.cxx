@@ -38,7 +38,7 @@ OssSoundDevice::OssSoundDevice( string device ):SoundDevice( device ){
 	fdRecord = -1;
 }
 
-int OssSoundDevice::openPlayback( int samplingRate, int nChannels, int format ){
+int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int format ){
 
 	if( isOpenedPlayback() ){
 		return 0;
@@ -135,7 +135,7 @@ int OssSoundDevice::openPlayback( int samplingRate, int nChannels, int format ){
 
 }
 
-int OssSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
+int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format ){
 
 	if( isOpenedRecord() ){
 		return 0;

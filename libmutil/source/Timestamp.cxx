@@ -56,7 +56,7 @@ Timestamp::~Timestamp(){
 	delete [] ids;
 }
 
-void Timestamp::save( unsigned int id ){
+void Timestamp::save( uint32_t id ){
 	ids[index] = id;
 	gettimeofday( &values[index], tz );
 	index = ( index + 1 ) % MAX_TIMESTAMPS;

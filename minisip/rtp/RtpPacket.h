@@ -29,7 +29,7 @@
 
 #include<config.h>
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 
 #else
 #error RTP only works with little endian -- fix.

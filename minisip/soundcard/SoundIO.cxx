@@ -452,7 +452,7 @@ int SoundSource::getId(){
 int npush=1;
 void BasicSoundSource::pushSound(short * samples, 
                                 int32_t nMonoSamples, 
-                                int index, 
+                                int32_t index, 
                                 bool isStereo)
 {
 	index++; //dummy op

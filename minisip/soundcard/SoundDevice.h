@@ -44,8 +44,8 @@ class SoundDevice: public MObject{
 
 		virtual ~SoundDevice();
 
-		virtual int openRecord( int samplingRate, int nChannels, int format )=0;
-		virtual int openPlayback( int samplingRate, int nChannels, int format )=0;
+		virtual int openRecord( int32_t samplingRate, int nChannels, int format )=0;
+		virtual int openPlayback( int32_t samplingRate, int nChannels, int format )=0;
 		virtual int closeRecord()=0;
 		virtual int closePlayback()=0;
 

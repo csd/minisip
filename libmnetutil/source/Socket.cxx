@@ -25,7 +25,7 @@
 #include<config.h>
 #include<libmnetutil/Socket.h>
 
-#ifdef WIN32
+#if defined WIN32 && not defined __CYGWIN__
 #include<winsock2.h>
 #else
 #include<unistd.h>
@@ -40,7 +40,7 @@ int32_t Socket::getType(){
 }
 
 void Socket::close(){
-#ifdef WIN32
+#if defined WIN32 && not defined __CYGWIN__
 	closesocket(fd);
 #else
 	::close(fd);

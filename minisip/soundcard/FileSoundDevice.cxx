@@ -76,7 +76,7 @@ SoundDevice("!notused_filesounddevice!"),
 									
 }
 
-int FileSoundDevice::openRecord(int samplerate, int nChannels, int format){
+int FileSoundDevice::openRecord(int32_t samplerate, int nChannels, int format){
 	this->nChannelsRecord = nChannels;
 
 	in_fd=::open(in_file.c_str(), O_RDONLY);
@@ -89,7 +89,7 @@ int FileSoundDevice::openRecord(int samplerate, int nChannels, int format){
 	return 0;
 }
 
-int FileSoundDevice::openPlayback(int samplerate, int nChannels, int format){
+int FileSoundDevice::openPlayback(int32_t samplerate, int nChannels, int format){
 	this->nChannelsPlay = nChannels;
 
 	out_fd=::open(out_file.c_str(), O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);

@@ -33,13 +33,13 @@
 
 class FileSoundDevice: public SoundDevice{
 	public:
-		FileSoundDevice( string in_file, string out_file, int  nChannels, int speed );
+		FileSoundDevice( string in_file, string out_file, int  nChannels, int32_t speed );
 		
 		virtual int read( byte_t * buffer, uint32_t nSamples );
 		virtual int write( byte_t * buffer, uint32_t nSamples );
 
-		virtual int openPlayback( int samplingRate, int nChannels, int format );
-		virtual int openRecord( int samplingRate, int nChannels, int format );
+		virtual int openPlayback( int32_t samplingRate, int nChannels, int format );
+		virtual int openRecord( int32_t samplingRate, int nChannels, int format );
 		virtual int closePlayback();
 		virtual int closeRecord();
 

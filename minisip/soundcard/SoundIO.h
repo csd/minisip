@@ -125,14 +125,16 @@ class BasicSoundSource: public SoundSource{
 		 * 			to decode the audio data can provide a PLC mechanism.
 		 * @param buffersize	Number of samples in buffer (per channel)
 		 */
-		BasicSoundSource(int id, SoundIOPLCInterface *plc, int32_t buffernmonosamples=16000);
+		BasicSoundSource(int32_t id, SoundIOPLCInterface *plc, int32_t buffernmonosamples=16000);
                 
 		virtual ~BasicSoundSource();
 		
 		void pushSound(short *samples, 
 				int32_t nSamples, 
-				int index,
+				int32_t index,
 				bool isStereo=false);
+
+
 		
 		virtual void getSound(short *dest, int32_t nMono, bool stereo, bool dequeue=true);
 

@@ -56,7 +56,7 @@ GroupListServer::~GroupListServer(){
 void GroupListServer::run(){
 	
 #ifdef DEBUG_OUTPUT
-	mdbg << "GroupListServer:: Accepting connections at " << ip<<":"<<port<<end;
+	mdbg << "GroupListServer:: Accepting connections at " << ip<<":"<<(int)port<<end;
 #endif
 	
 	TCPSocket* socket;
@@ -145,7 +145,7 @@ void GroupListServer::stop(){
 	
 	
 #ifdef DEBUG_OUTPUT
-	mdbg << "GroupListServer:: "<< ip<<":"<<port<<" stopped!"<<end;
+	mdbg << "GroupListServer:: "<< ip<<":"<<(int)port<<" stopped!"<<end;
 #endif
 }
 
