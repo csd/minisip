@@ -20,3 +20,19 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+#include<libmnetutil/Socket.h>
+
+int32_t Socket::getFd(){
+	return fd;
+}
+
+int32_t Socket::getType(){
+	return type;
+}
+
+void Socket::close(){
+	::close(fd);
+	fd = -1;
+}
+

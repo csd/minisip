@@ -36,10 +36,10 @@
 
 class Socket{
 	public:
-		virtual int32_t getFd(){return fd;};
-		int32_t getType(){return type;};
+		virtual int32_t getFd();
+		int32_t getType();
 
-		void close(){::close(fd); fd=-1;}
+		void close();
 	
 	protected:
 		int32_t type;
