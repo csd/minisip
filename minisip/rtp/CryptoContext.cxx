@@ -19,6 +19,7 @@
  * Authors: Israel Abad <i_abad@terra.es>
  *          Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<iostream>
@@ -26,6 +27,7 @@
 #include<assert.h>
 #include"CryptoContext.h"
 #include<libmutil/print_hex.h>
+#include<libmikey/MikeyPayloadSP.h>
 
 #ifndef NO_SECURITY
 
@@ -38,24 +40,38 @@ master_key(NULL), master_key_length(0),
 master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
 master_salt(NULL), master_salt_length(0),
 n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
-encryption(no_encr),authentication(no_auth){
-
-}
+ealg(MIKEY_SRTP_EALG_NULL), aalg(MIKEY_SRTP_AALG_NULL),
+ekeyl(0), akeyl(0), skeyl(0), 
+encr(1), auth(1){}/*These should be set to 0, but for backward compatability they are set to 1  *///encryption(no_encr),authentication(no_auth)
 
 CryptoContext::CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
-				enum encr_method encryption, 
-				enum auth_method authentication,
+				//enum encr_method encryption, 
+				uint8_t ealg,
+				//enum auth_method authentication,
+				uint8_t aalg,
 				unsigned char * master_key,
 				unsigned int master_key_length,
 				unsigned char * master_salt,
-				unsigned int master_salt_length ):
+				unsigned int master_salt_length, 
+				uint8_t ekeyl, 
+				uint8_t akeyl,
+				uint8_t skeyl,
+				uint8_t encr, 
+				uint8_t auth):
 
 ssrc(ssrc),using_mki(false),mki_length(0),mki(NULL),
 roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
 replay_window(0),
-master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
-encryption(encryption),authentication(authentication){
-
+master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
+//encryption(encryption),authentication(authentication)
+{
+	this->ealg = ealg; 
+	this->aalg = aalg;
+	this->encr = encr;
+	this->auth = auth;
+	this->ekeyl = ekeyl;
+	this->akeyl = akeyl; 
+	this->skeyl = skeyl;
 	this->master_key_length = master_key_length;
 	this->master_key = new unsigned char[ master_key_length ];
 	memcpy( this->master_key, master_key, master_key_length );
@@ -64,29 +80,28 @@ encryption(encryption),authentication(authentication){
 	this->master_salt = new unsigned char[ master_salt_length ];
 	memcpy( this->master_salt, master_salt, master_salt_length );
 	
-	switch( encryption ){
-		case no_encr:
+	switch( ealg ){
+		case MIKEY_SRTP_EALG_NULL:
 			n_e = 0;
 			k_e = NULL;
 			n_a = 0;
 			k_a = NULL;
 			break;
-		case aes_cm:
-		case aes_f8:
-			n_e = 16;
+		case MIKEY_SRTP_EALG_AESCM:
+		case MIKEY_SRTP_EALG_AESF8:
+			n_e = ekeyl;
 			k_e = new unsigned char[ n_e ];
-			n_s = 14;
+			n_s = skeyl;
 			k_s = new unsigned char[ n_s ];
 			break;
 	}
-
-	switch( authentication ){
-		case no_auth:
+	switch( aalg ){
+		case MIKEY_SRTP_AALG_NULL:
 			n_a = 0;
 			k_a = NULL;
 			break;
-		case hmacsha1:
-			n_a = 94;
+		case MIKEY_SRTP_AALG_SHA1HMAC:
+			n_a = akeyl;
 			k_a = new unsigned char[ n_a ];
 			break;
 	}
@@ -115,7 +130,7 @@ CryptoContext::~CryptoContext(){
 void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 	
 	// FIXME: handle f8 mode
-	if( encryption == aes_cm )
+	if( ealg == MIKEY_SRTP_EALG_AESCM )
 	{
 		/* Compute the IV:
 		  k_s   XX XX XX XX XX XX XX XX XX XX XX XX XX XX
@@ -152,7 +167,7 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 void CryptoContext::rtp_authenticate( RtpPacket * rtp, unsigned char * tag ){
 	unsigned int tag_length;
 	
-	if( authentication == hmacsha1 )
+	if( aalg == MIKEY_SRTP_AALG_SHA1HMAC )
 	{
 		unsigned char temp[20];
 		
@@ -261,7 +276,7 @@ uint64_t CryptoContext::guess_index( unsigned short new_seq_nb ){
 }
 
 bool CryptoContext::check_replay( unsigned short new_seq_nb ){
-	if( authentication == no_auth && encryption == no_encr ){
+	if( aalg == MIKEY_SRTP_AALG_NULL && ealg == MIKEY_SRTP_EALG_NULL ){
 		/* No security policy, don't use the replay protection */
 		return true;
 	}
@@ -328,10 +343,10 @@ unsigned int CryptoContext::get_roc(){
 }
 
 int CryptoContext::get_tag_length(){
-	switch( authentication ){
-		case no_auth:
+	switch( aalg ){
+		case MIKEY_SRTP_AALG_NULL:
 			return 0;
-		case hmacsha1:
+		case MIKEY_SRTP_AALG_SHA1HMAC:
 			return 4;
 	}
 	return -1;

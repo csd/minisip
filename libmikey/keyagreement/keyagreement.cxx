@@ -18,10 +18,12 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
 #include<libmikey/keyagreement.h>
+#include<libmikey/MikeyPayloadSP.h>
 #include<string.h>
 #include<libmutil/hmac.h>
 
@@ -31,7 +33,7 @@ KeyAgreement::KeyAgreement():
 	csbIdValue(0), 
 	csIdMapPtr(NULL), nCsValue(0),
 	initiatorDataPtr(NULL), responderDataPtr(NULL){
-
+	//policy = list<Policy_type *>::list();
 	kvPtr = new KeyValidityNull();
 
 }
@@ -41,6 +43,10 @@ KeyAgreement::~KeyAgreement(){
 		delete [] tgkPtr;
 	if( randPtr )
 		delete [] randPtr;
+	list<Policy_type *>::iterator i;
+	for( i = policy.begin(); i != policy.end() ; i++ )
+		delete *i;
+	policy.clear();
 }
 
 unsigned int KeyAgreement::tgkLength(){
@@ -289,6 +295,10 @@ byte_t KeyAgreement::nCs(){
 	return nCsValue;
 }
 
+void KeyAgreement::setnCs(uint8_t value){
+	nCsValue = value;
+}
+
 byte_t KeyAgreement::getSrtpCsId( uint32_t ssrc ){
 	MikeyCsIdMapSrtp * csIdMap = 
 		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
@@ -307,7 +317,15 @@ uint32_t KeyAgreement::getSrtpRoc( uint32_t ssrc ){
 	if( csIdMap == NULL ){
 		return 0;
 	}
+	return csIdMap->findRoc( ssrc );
+}
 
+uint8_t KeyAgreement::findpolicyNo( uint32_t ssrc ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+	if( csIdMap == NULL ){
+		return 0;
+	}
 	return csIdMap->findRoc( ssrc );
 }
 
@@ -326,3 +344,106 @@ void KeyAgreement::addSrtpStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, 
 		nCsValue ++;
 	}
 }
+
+void KeyAgreement::setCsIdMapType(uint8_t type){
+	CsIdMapType = type;
+}
+uint8_t KeyAgreement::getCsIdMapType(){
+	return CsIdMapType;
+}
+
+/* Security Policy */
+		 	
+void KeyAgreement::setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+	Policy_type * pol;
+	if ( (pol = getPolicyParamType(policy_No, prot_type, policy_type) ) == NULL)
+		policy.push_back (new Policy_type(policy_No, prot_type, policy_type, length, value));
+	else {
+		policy.remove(pol);
+		delete pol;
+		policy.push_back (new Policy_type(policy_No, prot_type, policy_type, length, value));
+	}
+}
+
+uint8_t KeyAgreement::setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+	list<Policy_type *>::iterator i;
+	uint8_t policyNo = 0;
+	i = policy.begin();
+	while( i != policy.end() ){
+		if( (*i)->policy_No == policyNo ){
+			i = policy.begin();
+			policyNo++;
+		}
+		else
+			i++;
+	}
+	policy.push_back (new Policy_type(policyNo, prot_type, policy_type, length, value));
+	return policyNo;
+}
+
+uint8_t KeyAgreement::setdefaultPolicy(uint8_t prot_type){
+	list<Policy_type *>::iterator iter;
+	uint8_t policyNo = 0;
+	iter = policy.begin();
+	while( iter != policy.end() ){
+		if( (*iter)->policy_No == policyNo ){
+			iter = policy.begin();
+			policyNo++;
+		}
+		else
+			iter++;
+	}
+	byte_t ipsec4values[] = {MIKEY_IPSEC_SATYPE_ESP,MIKEY_IPSEC_MODE_TRANSPORT,MIKEY_IPSEC_SAFLAG_PSEQ,MIKEY_IPSEC_EALG_3DESCBC,24,MIKEY_IPSEC_AALG_SHA1HMAC,16};
+	byte_t srtpvalues[] ={MIKEY_SRTP_EALG_AESCM,16,MIKEY_SRTP_AALG_SHA1HMAC,94,14,MIKEY_SRTP_PRF_AESCM,0,1,1,MIKEY_FEC_ORDER_FEC_SRTP,1,4,0};
+	int i, arraysize;
+	switch (prot_type) {
+	case MIKEY_PROTO_SRTP:
+		arraysize = 13;
+		for(i=0; i< arraysize; i++)
+			policy.push_back (new Policy_type(policyNo, prot_type, i, 1, &srtpvalues[i]));
+		break;
+	case MIKEY_PROTO_IPSEC4:
+		arraysize = 7;
+		for(i=0; i< arraysize; i++)
+			policy.push_back (new Policy_type(policyNo, prot_type, i, 1, &srtpvalues[i]));
+		break;
+	}
+	return policyNo;
+}
+	
+Policy_type * KeyAgreement::getPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type){
+	list<Policy_type *>::iterator i;
+	for( i = policy.begin(); i != policy.end()  ; i++ )
+		if( (*i)->policy_No == policy_No && (*i)->prot_type == prot_type && (*i)->policy_type == policy_type )
+			return *i;
+	return NULL;
+}
+
+uint8_t KeyAgreement::getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type){
+	list<Policy_type *>::iterator i;
+	for( i = policy.begin(); i != policy.end()  ; i++ )
+		if( (*i)->policy_No == policy_No && (*i)->prot_type == prot_type && (*i)->policy_type == policy_type && (*i)->length == 1)
+			return (uint8_t)(*i)->value[0];
+	return 0;
+}
+
+Policy_type::Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value){
+	this->policy_No = policy_No;
+	this->prot_type = prot_type;
+	this->policy_type = policy_type;
+	this->length = length;
+	this->value = (byte_t*) calloc (length,sizeof(byte_t));
+	for(int i=0; i< length; i++)
+			this->value[i] = value[i];
+}
+
+Policy_type::~Policy_type(){
+	free(value);
+}
+
+
+
+
+
+
+

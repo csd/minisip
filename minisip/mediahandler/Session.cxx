@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
@@ -72,7 +73,7 @@ MRef<SdpPacket *> Session::emptySdp(){
 	return result;
 }
 
-MRef<SdpPacket *> Session::getSdpOffer(){
+MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating the first message
 	MRef<SdpPacket *> result;
 	list< MRef<MediaStream *> >::iterator i;
 	std::list<std::string>::iterator iAttribute;
@@ -89,7 +90,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){
 	if( securityConfig.secured ){
 		fprintf( stderr, "The call is secure, adding MIKEY header\n");
 		MRef<SdpHeaderA *> a;
-		keyMgmtMessage = initiatorCreate();
+		keyMgmtMessage = initiatorCreate();  //in KeyAgreement.cxx
 		if( ! securityConfig.secured ){
 			// something went wrong
 			return NULL;
@@ -231,7 +232,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 	return NULL;
 }
 
-bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){
+bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by the responder when receiving the first message
 	fprintf( stderr, "setSdpOffer started\n" );
 	unsigned int i;
 	int j;
@@ -256,13 +257,15 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){
 			}
 			return false;
 		}
+		else //Here we set the offer in ka
+			setMikeyOffer();
 	}
 	else{
 		securityConfig.secured = false;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 	}
 		
-	
+
 	remoteAddress = offer->getRemoteAddr( port );
 
 	sdpAnswer = emptySdp();

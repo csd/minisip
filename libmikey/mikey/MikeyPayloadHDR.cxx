@@ -348,6 +348,17 @@ byte_t MikeyCsIdMapIPSEC4::findCsId( uint32_t spi, uint32_t spiaddr ){
 	}
 	return 0;
 }
+//added 041214 JOOR
+byte_t MikeyCsIdMapSrtp::findpolicyNo( uint32_t ssrc ){
+	list<MikeySrtpCs *>::iterator i;
+	for( i = cs.begin(); i != cs.end()  ; i++ ){
+		if( (*i)->ssrc == ssrc ){
+			return (*i)->policyNo;
+		}
+	}
+	return 0;
+}
+
 //added 041201 JOOR
 byte_t MikeyCsIdMapIPSEC4::findpolicyNo( uint32_t spi, uint32_t spiaddr ){
 	list<MikeyIPSEC4Cs *>::iterator i;

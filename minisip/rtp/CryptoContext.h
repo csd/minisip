@@ -19,6 +19,7 @@
  * Authors: Israel Abad <i_abad@terra.es>
  *          Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 
@@ -39,16 +40,16 @@
 //#include"../keyagreement/keyagreement.h"
 #define REPLAY_WINDOW_SIZE 64
 
-enum encr_method{ 
-	no_encr,
-	aes_cm,
-	aes_f8
-};
+//enum encr_method{ 
+//	no_encr,
+//	aes_cm,
+//	aes_f8
+//};
 
-enum auth_method{
-	no_auth,
-	hmacsha1
-};
+//enum auth_method{
+//	no_auth,
+//	hmacsha1
+//};
 
 class CryptoContext : public MObject{
 	public:
@@ -60,12 +61,19 @@ class CryptoContext : public MObject{
 				KeyAgreement * key_agreement );
 #endif
 		CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
-				enum encr_method encryption, 
-				enum auth_method authentication,
+				//enum encr_method encryption, 
+				uint8_t ealg, 
+				//enum auth_method authentication,
+				uint8_t aalg,
 				unsigned char * master_key,
 				unsigned int master_key_length,
 				unsigned char * master_salt,
-				unsigned int master_salt_length );
+				unsigned int master_salt_length,
+				uint8_t ekeyl, 
+				uint8_t akeyl,
+				uint8_t skeyl,
+				uint8_t encr, 
+				uint8_t auth );
 		~CryptoContext();
 		
 		void set_roc( unsigned int roc );
@@ -115,8 +123,15 @@ class CryptoContext : public MObject{
 		int n_s;
 		unsigned char * k_s;
 		
-		enum encr_method encryption;
-		enum auth_method authentication;
+		//enum encr_method encryption;
+		//enum auth_method authentication;
+		uint8_t ealg;
+		uint8_t aalg;
+		uint8_t ekeyl;
+		uint8_t akeyl;
+		uint8_t skeyl;
+		uint8_t encr;
+		uint8_t auth;
 };
 
 #endif //NO_SECURITY

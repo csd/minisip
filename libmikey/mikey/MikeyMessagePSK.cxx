@@ -18,13 +18,14 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
-
-#include<libmikey/MikeyMessage.h>
+//#include<map>
+//#include<iostream>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyPayloadT.h>
@@ -33,8 +34,8 @@
 #include<libmikey/MikeyPayloadV.h>
 #include<libmikey/MikeyPayloadID.h>
 #include<libmikey/MikeyPayloadERR.h>
-#include<libmikey/MikeyException.h>
 #include<libmikey/keyagreement_psk.h>
+#include<libmikey/MikeyPayloadSP.h>
 
 #define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
                                                                                 
@@ -54,10 +55,12 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 	addPayload( 
 		new MikeyPayloadHDR( HDR_DATA_TYPE_PSK_INIT, 1, 
 			HDR_PRF_MIKEY_1, csbId,
-			ka->nCs(), HDR_CS_ID_MAP_TYPE_SRTP_ID, 
+			ka->nCs(), ka->getCsIdMapType(), 
 			ka->csIdMap() ) );
 
 	addPayload( tPayload = new MikeyPayloadT() );
+
+	addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 	// keep a copy of the time stamp
 	uint64_t t = tPayload->ts();
@@ -141,13 +144,14 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 	delete [] rawKeyData;
 }
 
-MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
+//-----------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------//
+
+void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	int v = false;
 	uint32_t csbId;
-	uint64_t t_received;
 	MRef<MikeyCsIdMap *> csIdMap;
 	MikeyMessage * errorMessage = new MikeyMessage();
 	uint8_t nCs;
@@ -164,27 +168,26 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 				"Expected PSK init message" );
 	}
 
+	ka->setnCs( hdr->nCs() );
+	ka->setCsbId( hdr->csbId() );
+	ka->setV(hdr->v());
 
-	v = hdr->v(); 
-	csbId = hdr->csbId();
-	ka->setCsbId( csbId );
-	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
-		csIdMap = hdr->csIdMap();
+	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
+		ka->setCsIdMap( hdr->csIdMap() );
+		ka->setCsIdMapType( hdr->csIdMapType() );
 	}
 	else{
 		throw new MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 	
-	ka->setCsIdMap( csIdMap );
-	nCs = hdr->nCs();
 
 #undef hdr
 	errorMessage->addPayload(
 			new MikeyPayloadHDR( HDR_DATA_TYPE_ERROR, 0,
-			HDR_PRF_MIKEY_1, csbId,
-			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID, 
-			csIdMap ) );
+			HDR_PRF_MIKEY_1, ka->csbId(),
+			ka->nCs(), ka->getCsIdMapType(), 
+			ka->csIdMap() ) );
 
 	//FIXME look at the other fields!
 
@@ -201,9 +204,12 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	t_received = ((MikeyPayloadT*)i)->ts();
+	ka->t_received = ((MikeyPayloadT*)i)->ts();
 	
 	remove( i );
+
+	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
+
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
 	if( i == NULL ){
@@ -234,6 +240,7 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 #define kemac ((MikeyPayloadKEMAC *)i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
+	ka->macAlg = macAlg;
 
 	// Derive the transport keys
 	byte_t * encrKey=NULL;
@@ -254,11 +261,11 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 			iv[0] = saltKey[0];
 			iv[1] = saltKey[1];
 			for( j = 2; j < 6; j++ ){
-				iv[j] = saltKey[j] ^ (csbId >> (5-j)*8) & 0xFF;
+				iv[j] = saltKey[j] ^ (ka->csbId() >> (5-j)*8) & 0xFF;
 			}
 
 			for( j = 6; j < 14; j++ ){
-				iv[j] = saltKey[j] ^ (t_received >> (13-j)) & 0xFF;
+				iv[j] = saltKey[j] ^ (ka->t_received >> (13-j)) & 0xFF;
 			}
 			iv[14] = 0x00;
 			iv[15] = 0x00;
@@ -280,9 +287,12 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 			authKeyLength = 20;
 			authKey = new byte_t[20];
 			ka->genTranspAuthKey( authKey, 20 );
+			ka->authKey = authKey;
+			ka->authKeyLength = authKeyLength;
 			break;
 		case MIKEY_MAC_NULL:
 			authKey = NULL;
+			ka->authKey = NULL;
 			break;
 		default:
 			error = true;
@@ -306,7 +316,7 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 		ka->genTranspAuthKey( authKey, 20 );
 		
 		errorMessage->addVPayload( MIKEY_MAC_HMAC_SHA1_160, 
-				t_received, authKey, authKeyLength  );
+				ka->t_received, authKey, authKeyLength  );
 		
 		delete [] authKey;
 		throw new MikeyExceptionMessageContent( errorMessage );
@@ -324,37 +334,41 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 	ka->setKeyValidity( (*iKeyData)->kv() );
 #undef kemac
 
+if( encrKey != NULL )
+	delete [] encrKey;
+if( saltKey != NULL )
+	delete [] saltKey;
+}
 
-	if( v ){
+//-----------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------//
+
+MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
+	
+	if( ka->getV() ){
 		// Build the response message
 		MikeyMessage * result = new MikeyMessage();
 		result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_PSK_RESP, 0, 
-			HDR_PRF_MIKEY_1, csbId,
-			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID, 
-			csIdMap ) );
+			HDR_PRF_MIKEY_1, ka->csbId(),
+			ka->nCs(), ka->getCsIdMapType(), 
+			ka->csIdMap() ) );
 
 		result->addPayload( new MikeyPayloadT() );
 
-		result->addVPayload( macAlg, t_received, 
-				authKey, authKeyLength );
+		addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
-		if( authKey != NULL )
-			delete [] authKey;
-		if( encrKey != NULL )
-			delete [] encrKey;
-		if( saltKey != NULL )
-			delete [] saltKey;
+		result->addVPayload( ka->macAlg, ka->t_received, 
+				ka->authKey, ka->authKeyLength );
+
+		if( ka->authKey != NULL )
+			delete [] ka->authKey;
 
 		return result;
 	}
 	
-	if( authKey != NULL )
-		delete [] authKey;
-	if( encrKey != NULL )
-		delete [] encrKey;
-	if( saltKey != NULL )
-		delete [] saltKey;
+	if( ka->authKey != NULL )
+		delete [] ka->authKey;
 	
 	return NULL;
 }
@@ -425,7 +439,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 
 		throw new MikeyExceptionMessageContent( errorMessage );
 	}
-
+	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 	return NULL;
 }
 

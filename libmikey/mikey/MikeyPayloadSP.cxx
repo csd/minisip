@@ -51,12 +51,16 @@ MikeyPayloadSP::MikeyPayloadSP(byte_t *start, int lengthLimit):MikeyPayload(star
 	this->nextPayloadTypeValue = start[0]; 
 	this->policy_no = start[1];
 	this->prot_type = start[2];
-	int i= 5,j;
+	int i = 5;
+	uint16_t j = ((uint16_t)start[3] << 8 | (uint16_t)start[4]) + 5;
 	byte_t *value;
-	while(i < lengthLimit) {
+	endPtr = startPtr + j;
+	//while(i < lengthLimit) {
+	while(i < j ) {
 		this->addMikeyPolicyParam(start[i], start[i+1], &start[i+2]);
 		i = i + 2 + start[i+1];
 	}
+	assert (endPtr - startPtr == length() );
 }
 //Constructor when constructing new Mikey message, policy type entries added later with MikeyPayloadSP::addMikeyPolicyParam
 MikeyPayloadSP::MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type){
@@ -65,32 +69,7 @@ MikeyPayloadSP::MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type){
 	this->policy_no = policy_no;
 	this->prot_type = prot_type;
 }
-//Constructing new Mikey message with default policy for some protocols
-MikeyPayloadSP::MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type, bool def){
-	this->payloadTypeValue = MIKEYPAYLOAD_SP_PAYLOAD_TYPE;
-	this->policy_param_length = 0;
-	this->policy_no = policy_no;
-	this->prot_type = prot_type;
-	int arraysize,i;
-	char * values;
-	//Default polict values for some protocol
-	byte_t ipsec4values[] = {MIKEY_IPSEC_SATYPE_ESP,MIKEY_IPSEC_MODE_TRANSPORT,MIKEY_IPSEC_SAFLAG_PSEQ,MIKEY_IPSEC_EALG_3DESCBC,24,MIKEY_IPSEC_AALG_SHA1HMAC,16};
-	byte_t srtpvalues[] ={MIKEY_SRTP_EALG_AESCM,16,MIKEY_SRTP_AALG_SHA1HMAC,94,14,MIKEY_SRTP_PRF_AESCM,0,1,1,MIKEY_FEC_ORDER_FEC_SRTP,1,4,0};
-	switch (prot_type) {
-	case MIKEY_PROTO_SRTP:
-		arraysize = 13;
-		for(i=0; i< arraysize; i++)
-			this->addMikeyPolicyParam(i, 1, &srtpvalues[i] );
-		break;
-	case MIKEY_PROTO_IPSEC4:
-		arraysize = 7;
-		for(i=0; i< arraysize; i++)
-			this->addMikeyPolicyParam(i, 1, &ipsec4values[i] );	
-		break;
-	default:
-		throw new MikeyException( "Not supported prot_type" );
-	}
-}	
+
 //Destructor
 MikeyPayloadSP::~MikeyPayloadSP(){
 	list<MikeyPolicyParam *>::iterator i;
@@ -108,9 +87,10 @@ void MikeyPayloadSP::addMikeyPolicyParam( uint8_t type, uint8_t length, byte_t *
 //Get the MikeyPolicyParam in list<MikeyPolicyParam *> param with type type
 MikeyPolicyParam * MikeyPayloadSP::getParameterType(uint8_t type){
 	list<MikeyPolicyParam *>::iterator i;
-	for( i = param.begin(); i != param.end()  ; i++ )
-		if( (*i)->type == type )
-			return *i;
+		for( i = param.begin(); i != param.end()  ; i++ ){
+			if( (*i)->type == type )
+				return *i;
+		}
 	return NULL;
 }
 //Generate bytestream

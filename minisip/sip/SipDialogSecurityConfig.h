@@ -22,6 +22,9 @@ class SipDialogSecurityConfig{
 		bool secured;
 		int ka_type;
 
+		bool use_srtp;		
+		bool use_ipsec;
+		
 		MRef<certificate_chain *> cert;
 		MRef<ca_db *> cert_db;
 		bool psk_enabled;

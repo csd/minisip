@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #ifndef KEYAGREEMENT_H
@@ -39,6 +40,20 @@
 #define KEY_AGREEMENT_TYPE_DH 	0
 #define KEY_AGREEMENT_TYPE_PSK 	1
 #define KEY_AGREEMENT_TYPE_PK 	2
+
+
+// Class to hold Security Policy (SP) info
+class Policy_type {
+	public:
+		Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		~Policy_type();
+		uint8_t policy_No;
+		uint8_t prot_type;
+		uint8_t policy_type;
+		uint16_t length;
+		byte_t * value;
+	private:
+};
 
 
 class KeyAgreement : public MObject{
@@ -66,11 +81,14 @@ class KeyAgreement : public MObject{
 		virtual void setCsbId( unsigned int );
 
 		/* CS ID map: matches crypto protocol id and CS-id */
+		void setCsIdMapType(uint8_t type);
+		uint8_t getCsIdMapType();
 		MRef<MikeyCsIdMap *> csIdMap();
 		void setCsIdMap( MRef<MikeyCsIdMap *> idMap );
 
-		/* Number of cryptostreams (updated when adding streams) */
+		/* Number of cryptosessions (updated when adding streams) */
 		byte_t nCs();
+		void setnCs(uint8_t value);
 
 		/* TGK */
 		void setTgk( byte_t * tgk, unsigned int tgkLength );
@@ -82,13 +100,32 @@ class KeyAgreement : public MObject{
 		MRef<KeyValidity *> keyValidity();
 		void setKeyValidity( MRef<KeyValidity *> kv );
 
+
 		/* Access the initiator and responder key agreement data
 		 * (MIKEY messages when using MIKEY) */
 		void * initiatorData();
 		void setInitiatorData( void * );
 		void * responderData();
 		void setResponderData( void * );
-		
+
+
+		/* Security Policy 
+		 */	
+		std::list <Policy_type *> policy; //Contains the security policy
+		//Set the first Parameter Type in a new security policy. Returns the new Policy number.
+		uint8_t setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		//Add or modify a parameter in an existing policy
+		void setPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint16_t length, byte_t * value);
+		//Create a default policy 
+		uint8_t setdefaultPolicy(uint8_t prot_type);
+		//Get a policy entry
+		Policy_type * getPolicyParamType(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type);
+		//For those common cases were the policy type value just is an uint8_t
+		//Only use this function if you know the policy type exist or it is not 0
+		uint8_t getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type);
+		list <Policy_type *> * getPolicy() { return &policy; }
+
+
 		std::string authError();
 		void setAuthError( std::string error );
 
@@ -99,12 +136,14 @@ class KeyAgreement : public MObject{
 		/* Get the CSID given the RTP SSRC */
 		byte_t getSrtpCsId( uint32_t ssrc );
 		uint32_t getSrtpRoc( uint32_t ssrc );
+		uint8_t findpolicyNo( uint32_t ssrc );
 
 		/* Add an SRTP stream to protect to the CSID map 
 		 * If csId == 0, add (initiator), else modify existing
 		 * (responder) */
 		void addSrtpStream( uint32_t ssrc, uint32_t roc=0, 
 				    byte_t policyNo=0, byte_t csId=0 );
+
 
 	protected:
 		void keyDeriv( byte_t cs_id, unsigned int csb_id,
@@ -121,12 +160,16 @@ class KeyAgreement : public MObject{
 
 		MRef<KeyValidity *> kvPtr;
 		MRef<MikeyCsIdMap *> csIdMapPtr;
-		uint32_t nCsValue;
+		uint8_t nCsValue;
+		uint8_t	CsIdMapType;
+
 
 		void * initiatorDataPtr;
 		void * responderDataPtr;
 
 		std::string authErrorValue;
 };
+
+
 
 #endif

@@ -18,12 +18,13 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
-
+#include<map>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyPayloadT.h>
@@ -33,7 +34,7 @@
 #include<libmikey/MikeyPayloadDH.h>
 #include<libmikey/MikeyPayloadSIGN.h>
 #include<libmikey/MikeyPayloadERR.h>
-
+#include<libmikey/MikeyPayloadSP.h>
 
 #define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
 
@@ -50,10 +51,12 @@ MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL)
 	addPayload( 
 		new MikeyPayloadHDR( HDR_DATA_TYPE_DH_INIT, 1, 
 			HDR_PRF_MIKEY_1, csbId,
-			ka->nCs(), HDR_CS_ID_MAP_TYPE_SRTP_ID, 
+			ka->nCs(), ka->getCsIdMapType(), 
 			ka->csIdMap() ) );
 
 	addPayload( new MikeyPayloadT() );
+
+	addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 	MikeyPayloadRAND * payload;
 	addPayload( payload = new MikeyPayloadRAND() );
@@ -84,18 +87,18 @@ MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL)
 	addSignaturePayload( ka->certificateChain()->get_first() );
 
 }
+//-----------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
+void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MRef<MikeyCsIdMap *> csIdMap;
 	MRef<certificate *> peerCert;
 	peerCert = NULL;
 	MikeyMessage * errorMessage = new MikeyMessage();
 	MRef<certificate *> cert;
 	MRef<certificate_chain *> certChain;
-	uint8_t nCs;
 
 	if( i == NULL ){
 		throw new MikeyExceptionMessageContent(
@@ -107,13 +110,13 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 		throw new MikeyExceptionMessageContent( 
 				"Expected DH init message" );
 
-	unsigned int csbId = hdr->csbId();
-	nCs = hdr->nCs();
-	ka->setCsbId( csbId );
+	ka->setnCs( hdr->nCs() );
+	ka->setCsbId( hdr->csbId() );
 	
 
-	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
-		csIdMap = hdr->csIdMap();
+	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){ 
+		ka->setCsIdMap( hdr->csIdMap() );
+		ka->setCsIdMapType( hdr->csIdMapType() );
 	}
 	else{
 		throw new MikeyExceptionMessageContent( 
@@ -122,13 +125,12 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 	payloads.remove( i );
 #undef hdr
 
-	ka->setCsIdMap( csIdMap );
 
 	errorMessage->addPayload(
 			new MikeyPayloadHDR( HDR_DATA_TYPE_ERROR, 0,
-			HDR_PRF_MIKEY_1, csbId,
-			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID, 
-			csIdMap ) );
+			HDR_PRF_MIKEY_1, ka->csbId(),
+			ka->nCs(), ka->getCsIdMapType(), 
+			ka->csIdMap() ) );
 	
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
@@ -145,6 +147,9 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 	}
 	
 	payloads.remove( i );
+
+	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
+
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
 	if( i == NULL ){
@@ -210,15 +215,25 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 	
 	payloads.remove( i );
 
+}
+//-----------------------------------------------------------------------------------------------//
+//
+//-----------------------------------------------------------------------------------------------//
+
+MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 	// Build the response message
+	MRef<certificate *> cert;
+	MRef<certificate_chain *> certChain;
 	MikeyMessage * result = new MikeyMessage();
 	result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_DH_RESP, 0, 
-			HDR_PRF_MIKEY_1, csbId,
-			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID, 
-			csIdMap ) );
+			HDR_PRF_MIKEY_1, ka->csbId(),
+			ka->nCs(), ka->getCsIdMapType(), 
+			ka->csIdMap() ) );
 
 	result->addPayload( new MikeyPayloadT() );
+
+	addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 	/* Include the list of certificates if available */
 	certChain = ka->certificateChain();
@@ -270,7 +285,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 				"Expected DH resp message" );
 	}
 
-	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID ){
+	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		csIdMap = hdr->csIdMap();
 	}
 	else{
@@ -284,7 +299,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	errorMessage->addPayload(
 			new MikeyPayloadHDR( HDR_DATA_TYPE_ERROR, 0,
 			HDR_PRF_MIKEY_1, ka->csbId(),
-			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID,
+			nCs, ka->getCsIdMapType(),
 			csIdMap ) );
 	
 	payloads.remove( i );
@@ -303,7 +318,9 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	}
 
 	payloads.remove( i );
-	
+
+	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
+
 	if( ka->peerCertificateChain()->get_first().isNull() ){
 		i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
 

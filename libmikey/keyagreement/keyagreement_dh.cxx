@@ -31,7 +31,7 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	peerKeyLengthValue( 0 ),
 	certChainPtr( certChainPtr ),
 	certDbPtr( certDbPtr ){
-	
+	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
 	opensslDhPtr = DH_new();
 	peerCertChainPtr = new certificate_chain();
@@ -52,7 +52,7 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certChainPtr( certChainPtr ),
 	peerCertChainPtr( NULL ),
 	certDbPtr( certDbPtr ){
-	
+	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
 	opensslDhPtr = DH_new();
 	if( opensslDhPtr == NULL )

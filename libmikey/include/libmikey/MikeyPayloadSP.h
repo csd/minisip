@@ -120,8 +120,6 @@ class MikeyPayloadSP : public MikeyPayload{
 	public:
 		//Constructor when constructing new MikeyPayloadSP message, policy type entries added later with MikeyPayloadSP::addMikeyPolicyParam
 		MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type);
-		//Constructing new Mikey message with default policy for some pre defined protocols
-		MikeyPayloadSP(uint8_t policy_no, uint8_t prot_type, bool def);
 		//Constructor when receiving Mikey message i.e. contruct MikeyPayloadSP from bytestream.
 		MikeyPayloadSP(byte_t *start_of_header, int lengthLimit);
 		//Destructor
@@ -136,12 +134,13 @@ class MikeyPayloadSP : public MikeyPayload{
 		virtual int length();
 		//Return number of policy param entries
 		int noOfPolicyParam();
+		uint8_t policy_no;
+		uint8_t prot_type;
 		
 	private:
 		//Delete the MikeyPolicyParam in list<MikeyPolicyParam *> param with type type
 		void deleteMikeyPolicyParam(uint8_t type);
-		uint8_t policy_no;
-		uint8_t prot_type;
+		
 		//Total length of all policy params in bytes
 		uint16_t policy_param_length;
 		//Container holding policy params

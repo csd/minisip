@@ -34,6 +34,8 @@ MikeyPayloadGeneralExtensions::MikeyPayloadGeneralExtensions(byte_t *start, int 
 	this->data  = (byte_t*) calloc (lengthLimit - 4 ,sizeof(byte_t));
 	for(int i=4; i< lengthLimit; i++)
 			this->data[i] = start[i];
+	endPtr = startPtr + this->leng + 4;
+	assert (endPtr - startPtr == length() );
 }
 //Constructor when constructing new MikeyPayloadGeneralExtension message
 MikeyPayloadGeneralExtensions::MikeyPayloadGeneralExtensions(uint8_t type, uint16_t length, byte_t * data){

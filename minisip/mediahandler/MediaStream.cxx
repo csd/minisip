@@ -18,9 +18,11 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
+#include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/keyagreement.h>
 #include"../sdp/SdpHeaderM.h"
 #include"../sdp/SdpHeaderA.h"
@@ -123,14 +125,28 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 		cryptoContext = new CryptoContext( ssrc );
 	}
 	else{
-		uint8_t csId;
-		uint32_t roc;
+		
 		unsigned char * masterKey = new unsigned char[16];
 		unsigned char * masterSalt = new unsigned char[14];
-
-		csId = ka->getSrtpCsId( ssrc );
-		roc = ka->getSrtpRoc( ssrc );
-
+	
+		uint8_t  csId = ka->getSrtpCsId( ssrc );
+		uint32_t roc = ka->getSrtpRoc( ssrc );
+		uint8_t  policyNo = ka->findpolicyNo( ssrc );
+		//Extract Srtp policy !!! Check the return value if type not available
+		uint8_t ealg  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_EALG);
+		uint8_t ekeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_EKEYL);
+		uint8_t aalg  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AALG);
+		uint8_t akeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AKEYL);
+		uint8_t skeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_SALTKEYL);
+		uint8_t prf   = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PRF);	 //Not used
+		uint8_t keydr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_KEY_DERRATE);
+		uint8_t encr  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_ENCR_ON_OFF); 
+		uint8_t cencr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTCP_ENCR_ON_OFF);//Not used
+		uint8_t fecor = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_FEC_ORDER);	 //Not used
+		uint8_t auth  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_ON_OFF); 
+		uint8_t autht = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_TAGL);	 //Not used
+		uint8_t prefi = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PREFIX);	 //Not used
+		
 		ka->genTek( csId,  masterKey,  16 );
 		ka->genSalt( csId, masterSalt, 14 );
 
@@ -138,10 +154,8 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 		cerr << "SSRC: "<< ssrc <<" - SALT: " << print_hex( masterSalt, 14 )<< endl;
 
 		if( csId != 0 ){
-			cryptoContext = new CryptoContext( ssrc, roc, 
-			0/*key_deriv_rate FIXME */, 
-			/* FIXME: get those from the MIKEY SP! */
-			aes_cm, hmacsha1, masterKey, 16, masterSalt, 14 );
+			cryptoContext = new CryptoContext( ssrc, roc, keydr, 
+			ealg, aalg, masterKey, 16, masterSalt, 14, ekeyl, akeyl, skeyl, encr, auth );
 
 			cryptoContext->derive_srtp_keys( 0 );
 		}

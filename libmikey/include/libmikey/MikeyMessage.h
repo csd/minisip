@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #ifndef MIKEYMESSAGE_H
@@ -101,6 +102,9 @@ class MikeyMessage{
 		MikeyMessage * parseResponse( KeyAgreementDH  * ka );
 		MikeyMessage * parseResponse( KeyAgreementPSK * ka );
 
+		void setOffer( KeyAgreementDH * ka );
+		void setOffer( KeyAgreementPSK * ka );
+
 		MikeyMessage * buildResponse( KeyAgreementDH  * ka );
 		MikeyMessage * buildResponse( KeyAgreementPSK * ka );
 
@@ -114,6 +118,8 @@ class MikeyMessage{
 	private:
 		void parse( byte_t *message, int lengthLimit );
 		void compile();
+		void addPolicyToPayload(KeyAgreement * ka);
+		void addPolicyTo_ka(KeyAgreement * ka);
 		bool compiled;
 		byte_t *rawData;
 		

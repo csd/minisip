@@ -18,9 +18,11 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
+#include<map>
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
@@ -162,9 +164,7 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit ){
 				throw new MikeyExceptionMessageContent(
 					"Payload of unrecognized type." );
 		}
-
 		nextPayloadType = payload->nextPayloadType();	
-
 		payloads.push_back( payload );
 		
 		assert(( payload->end() - msgpos ) == ( payload->length() ));
@@ -431,8 +431,54 @@ void MikeyMessage::remove( MikeyPayload * payload ){
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
 		if( *i == payload ){
-			payloads.erase( i );
+			payloads.erase( i ); 
 			return;
 		}
 	}
 }
+
+void MikeyMessage::addPolicyToPayload(KeyAgreement * ka){
+#define comp (uint16_t)((*iter)->policy_No) << 8 | (uint16_t)((*iter)->prot_type)
+	// Adding policy to payload
+	MikeyPayloadSP *PSP;
+	list <Policy_type *> * policy = ka->getPolicy();
+	list <Policy_type *>::iterator iter;
+	map <uint16_t, MikeyPayloadSP*> existingSPpayloads;
+	map <uint16_t, MikeyPayloadSP*>::iterator mapiter;
+	for( iter = (*policy).begin(); iter != (*policy).end()  ; iter++ ){
+		mapiter = existingSPpayloads.find(comp);
+		if (mapiter == existingSPpayloads.end()){
+			existingSPpayloads.insert( pair<int, MikeyPayloadSP*>(comp, PSP = new MikeyPayloadSP((*iter)->policy_No, (*iter)->prot_type)));
+			addPayload(PSP);
+			PSP->addMikeyPolicyParam((*iter)->policy_type, (*iter)->length, (*iter)->value);
+		}
+		else
+			(mapiter->second)->addMikeyPolicyParam((*iter)->policy_type, (*iter)->length, (*iter)->value);
+	}
+	existingSPpayloads.empty();
+#undef comp
+}
+
+void MikeyMessage::addPolicyTo_ka(KeyAgreement * ka){
+#define SP ((MikeyPayloadSP *)i)
+	// Adding policy to ka
+	int policy_i, policy_j;
+	MikeyPolicyParam * PParam;
+	MikeyPayload * i;
+	while ((i = extractPayload( MIKEYPAYLOAD_SP_PAYLOAD_TYPE )) != NULL){
+		policy_i = 0;
+		policy_j = 0;
+		while (policy_i < SP->noOfPolicyParam()){
+			if((PParam = SP->getParameterType(policy_j++)) != NULL ){
+				assert (policy_j-1 == PParam->type);
+				ka->setPolicyParamType( SP-> policy_no, SP-> prot_type, PParam->type, PParam->length, PParam->value);
+				policy_i++;
+			}	
+		}
+		payloads.remove( i );
+	}
+#undef SP
+}
+
+
+

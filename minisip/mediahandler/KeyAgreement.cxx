@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
 #include<config.h>
@@ -36,6 +37,9 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyException.h>
+
+#define MIKEY_PROTO_SRTP	0
+
 
 using namespace std;
 
@@ -304,8 +308,6 @@ string Session::initiatorCreate(){
 
 				ts.save( DH_PRECOMPUTE_START );
 
-
-
 				if( ka && ka->type() != KEY_AGREEMENT_TYPE_DH ){
 					ka = NULL;
 				}
@@ -314,7 +316,7 @@ string Session::initiatorCreate(){
 					ka = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 				}
 
-				addStreamsToKa();
+				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
 
 				ts.save( DH_PRECOMPUTE_END );
 				message = new MikeyMessage( ((KeyAgreementDH *)*ka) );
@@ -323,11 +325,14 @@ string Session::initiatorCreate(){
 			case KEY_MGMT_METHOD_MIKEY_PSK:
 				ts.save( DH_PRECOMPUTE_START );
 				ka = new KeyAgreementPSK( securityConfig.psk, securityConfig.psk_length );
-				addStreamsToKa();
+				
+				addStreamsToKa( ka->setdefaultPolicy(MIKEY_PROTO_SRTP) );
 				ts.save( DH_PRECOMPUTE_END );
 				((KeyAgreementPSK *)*ka)->generateTgk();
 				ts.save( MIKEY_CREATE_START );
+				fprintf( stderr, "Before new MikeyMessage\n"); // Debug
 				message = new MikeyMessage( ((KeyAgreementPSK *)*ka) );
+				fprintf( stderr, "After new MikeyMessage\n"); // Debug
 				ts.save( MIKEY_CREATE_END );
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
@@ -546,18 +551,37 @@ string Session::initiatorParse(){
 
 }
 
-void Session::addStreamsToKa(){
+void Session::addStreamsToKa(uint8_t policyNo){
 	list< MRef<MediaStream *> >::iterator iSender;
-
+	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_SRTP_ID);
 	for( iSender = mediaStreamSenders.begin(); 
 	     iSender != mediaStreamSenders.end();
 	     iSender ++ ){
 		ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/, 
-				0/*PolicyNo FIXME*/ );
+				policyNo );
 		/* Placeholder for the receiver to place his SSRC */
 		ka->addSrtpStream( 0, 0/*ROC*/, 
-				0/*PolicyNo FIXME*/ );
+				policyNo );
 	}
 }
+
+void Session::setMikeyOffer(){
+	MikeyMessage * initMessage = (MikeyMessage *)ka->initiatorData();
+	switch( securityConfig.ka_type ){
+		case KEY_MGMT_METHOD_MIKEY_DH:
+			initMessage->setOffer((KeyAgreementDH *)*ka);
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PSK:
+			initMessage->setOffer((KeyAgreementPSK *)*ka);
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PK:
+		/* Should not happen at that point */
+			throw new MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
+			break;
+		default:
+			throw new MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
+		}
+}
+
 
 #endif //NO_SECURITY

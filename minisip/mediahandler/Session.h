@@ -66,8 +66,8 @@ class Session : public MObject{
 		bool responderAuthenticate( std::string message );
 		std::string responderParse();
 
-		void addStreamsToKa();
-
+		void addStreamsToKa(uint8_t policyNo);
+		void setMikeyOffer();
 		std::string peerUri;
 		
 		MRef<SdpPacket *> emptySdp();

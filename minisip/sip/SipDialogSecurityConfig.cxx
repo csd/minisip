@@ -9,6 +9,8 @@
 SipDialogSecurityConfig::SipDialogSecurityConfig():
 	secured(false),
 	ka_type(0),
+	use_srtp(false),		
+	use_ipsec(false),
 	cert(NULL),
 	cert_db(NULL),
 	psk_enabled(false),
@@ -22,6 +24,10 @@ SipDialogSecurityConfig::SipDialogSecurityConfig():
 void SipDialogSecurityConfig::save( XMLFileParser * parser ){
 
         parser->changeValue("secured", secured?string("yes"): string("no"));
+
+	parser->changeValue("use_srtp", use_srtp?string("yes"): string("no"));
+	parser->changeValue("use_ipsec", use_ipsec?string("yes"): string("no"));
+
         parser->changeValue("psk_enabled", psk_enabled?string("yes"): string("no"));
         parser->changeValue("dh_enabled", dh_enabled?string("yes"): string("no"));
 
@@ -103,6 +109,8 @@ void SipDialogSecurityConfig::save( XMLFileParser * parser ){
 void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 
 	secured = parser->getValue("secured","no")=="yes";
+	use_srtp = parser->getValue("use_srtp","no")=="yes";		
+	use_ipsec = parser->getValue("use_srtp","no")=="yes";
 	
 	dh_enabled   = parser->getValue("dh_enabled","no")=="yes";
 	psk_enabled  = parser->getValue("psk_enabled","no")=="yes";

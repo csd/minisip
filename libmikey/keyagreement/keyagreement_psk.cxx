@@ -25,7 +25,7 @@
 
 KeyAgreementPSK::KeyAgreementPSK( unsigned char * pskPtr, int pskLengthValue )
 	:KeyAgreement(), tSentValue( 0 ){
-
+	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_PSK;
 	this->pskLengthValue = pskLengthValue;
 	this->pskPtr = new unsigned char[ pskLengthValue ];

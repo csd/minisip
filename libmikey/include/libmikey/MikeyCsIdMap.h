@@ -68,9 +68,9 @@ class MikeyCsIdMapSrtp : public MikeyCsIdMap{
                 virtual int length();
                 virtual void writeData( byte_t * start,
                                          int expectedLength );
-
 		byte_t findCsId( uint32_t ssrc );
 		uint32_t findRoc( uint32_t ssrc );
+		byte_t findpolicyNo( uint32_t ssrc );
 		void addStream( uint32_t ssrc, uint32_t roc=0,
 				byte_t policyNo=0, byte_t csId=0 );
 

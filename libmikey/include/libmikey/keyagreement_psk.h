@@ -52,10 +52,16 @@ class KeyAgreementPSK : public KeyAgreement{
 		uint64_t tSent();
 		void setTSent( uint64_t tSent );
 
+		uint64_t t_received;
+		byte_t * authKey;
+		unsigned int authKeyLength;
+		void setV(int value) {v=value;}
+		int getV() {return v;}
+		int macAlg;
 	private:
 		byte_t * pskPtr;
 		int pskLengthValue;
-
+		int v;
 		uint64_t tSentValue;
 };
 
