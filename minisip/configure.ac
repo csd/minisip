@@ -184,9 +184,11 @@ dnl look for xvideo
 	X_LIBS="$X_LIBS -lX11"
 	LDFLAGS="${LDFLAGS} ${X_EXTRA_LIBS} ${X_LIBS}"
 	AC_CHECK_LIB([Xv], [main])
-        AC_CHECK_HEADERS([X11/extensions/Xv.h X11/extensions/Xvlib.h],
-	  [VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
-	   XV_VIDEO_DISPLAY="yes" ])
+        AC_CHECK_HEADERS([X11/extensions/Xv.h],[
+          AC_CHECK_HEADERS([X11/extensions/Xvlib.h],
+	    [VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
+	     XV_VIDEO_DISPLAY="yes" ],[])
+	  ])
 dnl check for SDL
         AC_CHECK_HEADERS([SDL/SDL.h],
 	  [
