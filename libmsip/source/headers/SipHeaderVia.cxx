@@ -44,6 +44,10 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	port=0;
 	while (build_from[i]==' ')
 		i++;
+	
+	protocol = string("")+build_from[8]+build_from[9]+build_from[10];
+
+	i+=12;
 
 	while (!(build_from[i]==':' || i>=build_from.length())){
 		ip+=build_from[i];
@@ -72,7 +76,6 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 //			cerr << "branch parsed to: "<< branch<< endl;;
 		}
 	}
-	protocol = string("")+build_from[13]+build_from[14]+build_from[15];
 
 }
 
