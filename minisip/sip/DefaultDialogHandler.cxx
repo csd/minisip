@@ -546,8 +546,8 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	
 	//send accept_invite to all waiting SipDialogP2Tuser dialogs for this session
 	for(uint32_t l=0; l<grpList->getAllUser().size(); l++){
-		if(grpList->getAllUser().at(l)->getStatus()==P2T::STATUS_WAITACCEPT){
-			CommandString cmds(grpList->getAllUser().at(l)->getCallId(), SipCommandString::accept_invite);
+		if(grpList->getAllUser()[l]->getStatus()==P2T::STATUS_WAITACCEPT){
+			CommandString cmds(grpList->getAllUser()[l]->getCallId(), SipCommandString::accept_invite);
 			SipSMCommand scmd(cmds, SipSMCommand::remote, SipSMCommand::TU);
 			getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
@@ -558,7 +558,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	MRef<SipDialogConfig*> callConf;
 	string user="";
 	for(uint32_t k=0; k<grpList->getAllUser().size(); k++){
-		user=grpList->getAllUser().at(k)->getUri();
+		user=grpList->getAllUser()[k]->getUri();
 		
 		//filter out own username
 //		if(user==getDialogConfig().inherited.userUri)
@@ -567,7 +567,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 			
 		// filter out users that have already started
 		// a dialog resp. has a callId in the grpList.
-		if(grpList->getAllUser().at(k)->getCallId()!="")
+		if(grpList->getAllUser()[k]->getCallId()!="")
 			continue;
 		
 		//create callConfig
@@ -588,8 +588,8 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 		dialogContainer->addDialog(*p2tUserDialog);
 		
 		//set CallId and localStarted in GroupMemberList
-		grpList->getAllUser().at(k)->setCallId(p2tUserDialog->getCallId());
-		grpList->getAllUser().at(k)->setLocalStarted(true);
+		grpList->getAllUser()[k]->setCallId(p2tUserDialog->getCallId());
+		grpList->getAllUser()[k]->setLocalStarted(true);
 		
 		CommandString inv(p2tUserDialog->getCallId(), SipCommandString::invite, user);
         	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
@@ -632,7 +632,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 	//Start SipDialogP2Tuser for all participants in the Group Member List
 	string user="";
 	for(uint32_t k=0; k<grpList->getAllUser().size(); k++){
-		user=grpList->getAllUser().at(k)->getUri();
+		user=grpList->getAllUser()[k]->getUri();
 		
 		//filter out own username
 		//if(user==getDialogConfig().inherited.userUri)
@@ -656,8 +656,8 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		dialogContainer->addDialog(*p2tUserDialog);
 		
 		//set CallId and localStarted in GroupMemberList
-		grpList->getAllUser().at(k)->setCallId(p2tUserDialog->getCallId());
-		grpList->getAllUser().at(k)->setLocalStarted(true);
+		grpList->getAllUser()[k]->setCallId(p2tUserDialog->getCallId());
+		grpList->getAllUser()[k]->setLocalStarted(true);
 		
 		CommandString inv(p2tUserDialog->getCallId(), SipCommandString::invite, user);
         	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));

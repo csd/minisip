@@ -34,7 +34,7 @@
 MRef<Resampler *> Resampler::create( uint32_t inputFreq, uint32_t outputFreq,
 		                     uint32_t duration, uint32_t nChannels ){
 
-#if defined FLOAT_RESAMPLER && not defined IPAQ
+#if (defined FLOAT_RESAMPLER) && (!defined IPAQ)
 	return new FloatResampler( inputFreq, outputFreq, duration, nChannels );
 #else
 	return new SimpleResampler( inputFreq, outputFreq, duration, nChannels );
