@@ -1,0 +1,9 @@
+Index: libavcodec/mpegvideo.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mpegvideo.c,v
+retrieving revision 1.424
+diff -r1.424 mpegvideo.c
+4637c4637
+<         s->avctx->rtp_callback(s->avctx, s->ptr_lastgob, pdif, 0);
+---
+>         s->avctx->rtp_callback(s->avctx, s->ptr_lastgob, pdif, 1);

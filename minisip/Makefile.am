@@ -8,7 +8,7 @@ if VIDEO_SUPPORT
 endif
 
 dist_pkgdata_DATA = share/tray_icon.png share/minisip.glade
-EXTRA_DIST = test_cert/*.pem
+EXTRA_DIST = test_cert/*.pem Documentation/* minisip-libavcodec.patch
 SUBDIRS = codecs soundcard rtp sip stun p2t mediahandler $(video_dir) sdp minisip
 DIST_SUBDIRS = $(SUBDIRS) video debian
 

@@ -1,0 +1,44 @@
+--Video support in minisip--
+
+
+minisip implements some experimental video support. The codec used
+is H263, via ffmpeg's libavcodec.
+
+To compile video support:
+
+ . get ffmpeg's current CVS (see http://ffmpeg.sourceforge.net/download.php)
+
+ . you need to apply a small patch to libavcodec, included in minisip:
+        
+	in ffmpeg's root directory:
+	$ patch -p0 < minisip-libavcodec.patch
+	
+   This patch is used to detect when the end of a frame is contained in sent
+   to the RTP callback. A more advanced patch will hopefully be integrated
+   to ffmpeg.
+   
+ . compile it:
+        $ ./configure --enable-gpl --enable-pp
+	$ make
+ 
+ . configure minisip with video support:
+        $ ./configure --enable-video --with-ffmpeg=/path/to/ffmpeg/root
+ 
+   If libsdl is installed on your system, it will be compiled as one video
+   output. If your system has Xvideo, the xvideo video output
+   will be compiled. If libdc1394 (firewire cameras) is present, the
+   firewire camera input will be built.
+
+ . compile minisip
+       $ make
+ 
+ . After having launched minisip once to create it, edit ~/.minisip.conf:
+   <video_device> should be:
+         /dev/video0 for example, if using v4l;
+	 fw:0,0 if using the first camera on the first firewire bus.
+  
+   <frame_width> and <frame_height> are used to define the frame size you
+   would like to *receive*. It can be 352x288 (CIF) or 176x144 (QCIF).
+
+
+   
