@@ -1,0 +1,38 @@
+
+The user interface, sip logic and sound system usually communicates
+by passing messages to each other. The messages are of
+<i>CommandString</i> type.
+
+Units such as the SIP logic and the user interface are unaware of the
+how they are connected to the rest of the application. They accept
+messages via the handleCommand(CommandString&) method and sends messages
+to a handler set with the setCallback(...) method.
+
+In the minisip application the callback for all units are a MessageRouter
+object that knows of both the SIP logic, the user interface and the audio
+processing unit.
+
+
+
+
+
+ class Sip interface:
+
+  To callback, sipcb_handleCommand(...):
+    _Destination_	|	_operation_ 	|	_arguments_	|	_Precondition_
+    
+
+  To Sip unit, handleCommand(...):
+    _Destination_	|	_operation_ 	|	_arguments_	|	_Precondition_
+
+  
+
+
+ User interface:
+  To callback, guicb_handleCommand(...):
+    _Destination_	|	_operation_ 	|	_arguments_	|	_Precondition_
+  
+  To UI, handleCommand(...):
+    _Destination_	|	_operation_ 	|	_arguments_	|	_Precondition_
+
+

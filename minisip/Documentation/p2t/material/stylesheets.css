@@ -1,0 +1,20 @@
+/* stylesheets.css                                  */
+/* Stylesheets for the P2T Sourcecode Documentation */
+/* Florian Maurer, florian.maurer@floHweb.ch        */
+
+body {font-family:Verdana,Geneva,Arial,Helvetica;font-size:11pt;color:black}
+h1, h2, h3{font-size:16pt;}
+li {margin-bottom:4px}
+
+
+#headertext {font-size:11pt; color:white}
+#headertitle {font-size:16pt; color:white; font-weight:bold;}
+
+#footer {font-size:9pt;color:white; font-weight:bold}
+
+
+#headerlink {text-decoration:none; color:white;}
+#headerlink:hover {text-decoration:underline;}
+#headerlink:visited {color:white;}
+
+#headertable {background-color:#3366FF}

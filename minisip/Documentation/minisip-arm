@@ -1,0 +1,246 @@
+Howto build a cross-compilation to compile minisip for Familiar Linux.
+======================================================================
+
+
+This instructions assumes that you are using the toolchain provided
+by handhelds.org:
+
+http://handhelds.org/download/toolchain/arm-linux-gcc-3.3.2.tar.bz2
+
+You should also set up your environment as follows:
+
+export PATH=/usr/local/arm/3.3.2/bin:$PATH
+export PKG_CONFIG_PATH=/usr/local/arm/3.3.2/arm-linux/lib/pkgconfig
+export CC=arm-linux-gcc
+export CXX=arm-linux-g++
+export AS=arm-linux-as
+export AR=arm-linux-ar
+export NM=arm-linux-nm
+export LD=arm-linux-ld
+export RANLIB=arm-linux-ranlib
+export LDSHARED="arm-linux-gcc -shared"
+
+
+
+Cross-compiling gettext
+=======================
+
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux --disable-csharp
+  make
+  make install
+
+Cross-compiling glib-2.2.3
+=====================
+
+Configure uses a lot of test programs that cannot be used when
+cross-compiling. Therefore, the results of those tests must be
+given in a cache file.
+
+arm.cache:
+
+glib_cv_use_pid_surrogate=yes
+glib_cv_stack_grows=no
+glib_cv_long_long_format=ll
+glib_cv_uscore=yes
+
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux --cache-file=arm.cache
+
+There is also a bug as far as I can tell in this distribution: in 
+gobject/gmarshal.c g_value_take_string should be replaced with 
+g_value_set_string_take_ownership.
+
+  make
+  make install
+
+Cross-compile freetype-2.1.4
+============================
+
+No problem here:
+
+   ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+   make
+   make install
+
+Freetype installs a tool called freetype-config used to determine the
+compilation flags required to link with that library. Unfortunately
+it gets installed in /usr/local/arm/3.3.2/arm-linux/bin, which is the
+path for arm binaries. I created a link from 
+/usr/local/arm/3.3.2/bin/freetype-config to 
+/usr/local/arm/3.3.2/arm-linux/bin/freetype-config.
+
+Cross-compile expat-1.95.6
+==========================
+
+No problem here:
+
+   ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+   make
+   make install
+
+Cross-compile fontconfig-2.1.94
+===============================
+
+This one is a bit tricky, because it uses some binary tools that it tries
+to compile with the arm compiler.
+
+First you should be sure that configure uses the right freetype-config:
+  export PATH=/usr/local/arm/3.3.2/arm-linux/bin:$PATH
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+
+The main problem occurs now: it tries to compile fc-lang/fc-lang.c with the
+arm compiler, then run it. --target and --build seem to have no effect.
+I removed all the arm-linux- from the fc-lang/Makefile, then ran make
+in that directory with my normal $PATH. Then:
+
+  make
+  make install
+
+Cross-compile pango-1.2.0
+=========================
+
+This one is the worst by far: 
+
+I had to add a $PKG_CONFIG_PATH/xft.pc file with
+the following content:
+
+prefix=/usr/local/arm/3.3.2/arm-linux
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+freetypelibs=-lfreetype -lz
+freetypecflags=-I/usr/local/arm/3.3.2/arm-linux/freetype2
+xrenderlibs=-L/usr/local/arm/3.3.2/arm-linux/X11R6/lib -lXrender -lXext -lX11
+xrendercflags=-I/usr/X11R6/include
+
+Name: Xft
+Description: X FreeType library
+Version: 2.1.2
+Requires: fontconfig
+Libs: -L${libdir} -lXft -lX11 ${freetypelibs} ${xrenderlibs}
+Cflags: -I${includedir} ${freetypecflags} ${xrendercflags}
+
+
+Then:
+
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux --x-libraries=/usr/local/arm/3.3.2/arm-linux/X11R6/lib --x-includes=/usr/X11R6/include
+
+Then I had to edit libtool, and have sys_lib_search_path_spec="/usr/local/arm/3.3.2/arm-linux/lib" instead of "/lib /usr/lib /usr/local/lib"
+
+Then I had to edit the root Makefile, and remove the tests subdir, which only
+contains program that get compiled for arm, linked for arm, and run on
+the compiling machine ...
+
+Then:
+  make
+  make install
+
+For some reason the .pc files (pkg-config) generated do not output the
+X libraries, and this is a problem later. I change 
+$PKG_CONFIG_PATH/pangoxft.pc to add 
+
+Libs: -L${libdir} -L/usr/local/arm/3.3.2/arm-linux/X11R6/lib -lpangoxft-1.0  -lXft -lXrender -lXext -lX11
+
+
+Cross-compile atk-1.2.4
+=======================
+
+No major problem here:
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux --build=i386-linux
+  make
+  make install
+
+Cross-compile libjpeg6
+======================
+
+No major problem:
+   wget http://www.ijg.org/files/jpegsrc.v6b.tar.gz
+   ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+   ./ltconfig ltmain.sh arm-linux
+   make
+   make install
+
+Cross-compile libpng3
+=====================
+
+  wget ftp://swrinde.nde.swri.edu/pub/png/src/libpng-1.0.15.tar.bz2
+
+You need to use the Linux makefile in scripts:
+
+  cp scripts/makefile.linux ./Makefile
+
+Then edit the Makefile and set CC to arm-linux-gcc, RANLIB to arm-linux-ranlib
+and prefix to /usr/local/arm/3.3.2/arm-linux
+
+  make
+  make install
+
+
+
+Cross-compile gtk+-2.2.4
+========================
+
+ ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux --build=i386-linux --target=i386-linux --without-libtiff --with-x=yes --x-includes=/usr/X11R6/include --x-libraries=/usr/local/arm/3.3.2/arm-linux/X11R6/lib
+
+For some reason the Makefile in gdk/* don't use the output of
+freetype-config --cflags, so I had to look for freetype2 and replace
+with include/freetype2 in the GDK includes.
+
+I also had to edit libtool, and have 
+sys_lib_search_path_spec="/usr/local/arm/3.3.2/arm-linux/lib" 
+instead of "/lib /usr/lib /usr/local/lib"
+
+Then:
+  make
+  make install
+
+Cross-compile libsigc++-1.2.5
+=============================
+
+  wget http://ftp.gnome.org/pub/GNOME/sources/libsigc++/1.2/libsigc++-1.2.5.tar.gz
+
+No problem here:
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+  make
+  make install
+
+Cross-compile gtkmm-2.2.12
+==========================
+
+No problem here, provided you have made the previous fixes in libpango.
+
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+  make
+  make install
+
+Cross-compile libxml2-2.4.16
+============================
+
+  wget http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.4/libxml2-2.4.16.tar.gz
+
+No problem here:
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+  make
+  make install
+
+Cross-compile libglade-2.0.1
+==========================
+
+  wget http://ftp.gnome.org/pub/GNOME/sources/libglade/2.0/libglade-2.0.1.tar.gz
+
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+
+Here the usual libtool change is required.
+  make
+  make install
+
+Cross-compile libglademm-2.2.0
+==============================
+
+No problem here:
+  ./configure --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux
+  make
+  make install
+
+
+
+

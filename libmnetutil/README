@@ -1,0 +1,25 @@
+README for minisip
+==================
+
+Minisip is a SIP user agent. It implements both normal and secured
+(SRTP/MIKEY) VoIP calls.
+
+Requirements:
+   . OpenSSL libssl and libcrypto, version 0.9.6+
+   . QT libraries, version 3.0+
+
+Installation:
+   Please refer to the INSTALL file for installation instructions.
+
+   In most cases, this should be enough:
+     $ ./configure
+     $ make
+     # make install
+
+   ./configure --help will give you the available compilation time options.
+
+   For the security features, you will need a X509 certificate (in its pem
+   form) and the matching private key. You will find examples in test_cert/
+
+License:
+   Please refer to the COPYING file for license information.

@@ -1,0 +1,30 @@
+SUBDIRS = include
+DIST_SUBDIRS = $(SUBDIRS) debian
+
+lib_LTLIBRARIES = libmutil.la
+libmutil_la_CPPFLAGS = $(CPPFLAGS) -I../include
+
+libmutil_la_SOURCES = $(mutil_src)
+
+mutil_src =         source/aes.cxx \
+                    source/MemObject.cxx \
+                    source/rijndael-alg-fst.cxx \
+                    source/base64.cxx \
+                    source/dbg.cxx \
+                    source/cert.cxx \
+                    source/hmac.cxx \
+                    source/Thread.cxx \
+                    source/TextUI.cxx \
+                    source/Timestamp.cxx \
+                    source/mtime.cxx \
+                    source/itoa.cxx \
+                    source/print_hex.cxx \
+                    source/split_in_lines.cxx \
+                    source/trim.cxx \
+                    source/vmd5.cxx \
+                    source/Mutex.cxx \
+                    source/CondVar.cxx \
+                    source/Semaphore.cxx \
+                    source/CommandString.cxx \
+                    source/XMLParser.cxx
+

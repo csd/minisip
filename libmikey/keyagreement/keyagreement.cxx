@@ -1,0 +1,324 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+/* Copyright (C) 2004 
+ *
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+*/
+
+#include<config.h>
+#include<libmikey/keyagreement.h>
+#include<string.h>
+#include<libmutil/hmac.h>
+
+KeyAgreement::KeyAgreement():
+	tgkPtr(NULL), tgkLengthValue(0),
+	randPtr(NULL), randLengthValue(0),
+	csbIdValue(0), 
+	csIdMapPtr(NULL), nCsValue(0),
+	initiatorDataPtr(NULL), responderDataPtr(NULL){
+
+	kvPtr = new KeyValidityNull();
+
+}
+
+KeyAgreement::~KeyAgreement(){
+	if( tgkPtr )
+		delete [] tgkPtr;
+	if( randPtr )
+		delete [] randPtr;
+}
+
+unsigned int KeyAgreement::tgkLength(){
+	return tgkLengthValue;
+}
+
+unsigned char * KeyAgreement::tgk(){
+	return tgkPtr;
+}
+
+unsigned int KeyAgreement::randLength(){
+	return randLengthValue;
+}
+
+unsigned char * KeyAgreement::rand(){
+	return randPtr;
+}
+
+MRef<KeyValidity *> KeyAgreement::keyValidity(){
+	return kvPtr;
+}
+
+void KeyAgreement::setKeyValidity( MRef<KeyValidity *> kv ){
+	this->kvPtr = NULL;
+	
+	switch( kv->type() ){
+		case KEYVALIDITY_NULL:
+			this->kvPtr = new KeyValidityNull();
+			break;
+		case KEYVALIDITY_SPI:
+			this->kvPtr = 
+				new KeyValiditySPI( *(KeyValiditySPI *)(*kv) );
+			break;
+		case KEYVALIDITY_INTERVAL:
+			this->kvPtr = new KeyValidityInterval( 
+					*(KeyValidityInterval *)(*kv) );
+			break;
+		default:
+			return;
+	}
+}
+
+void KeyAgreement::setRand( unsigned char * rand, int randLengthValue ){
+	this->randLengthValue = randLengthValue;
+
+	if( this->randPtr )
+		delete [] this->randPtr;
+
+	this->randPtr = new unsigned char[ randLengthValue ];
+	memcpy( this->randPtr, rand, randLengthValue );
+}
+
+/* Described in draft-ietf-msec-mikey-07.txt Section 4.1.2 */
+void p( unsigned char * s, unsigned int sLength, 
+        unsigned char * label, unsigned int labelLength,
+	unsigned int m,
+	unsigned char * output )
+{
+	unsigned int i;
+	unsigned int hmac_output_length;
+	unsigned char hmac_input[ labelLength + 20 ];
+
+	/* initial step */
+	hmac_sha1( s, sLength,
+	      label, labelLength,
+	      hmac_input, &hmac_output_length );
+	assert( hmac_output_length == 20 );
+	memcpy( &hmac_input[20], label, labelLength );
+
+	hmac_sha1( s, sLength, 
+	      hmac_input, labelLength + 20,
+	      output, &hmac_output_length );
+	assert( hmac_output_length == 20 );
+
+	for( i = 2; i <= m ; i++ )
+	{
+		/* Update the first part of the hmac_input (A_i)
+		 * with the MAC of the previous one (A_(i-1)) */
+		hmac_sha1( s, sLength, 
+		      hmac_input, 20,
+		      hmac_input, &hmac_output_length );
+		assert( hmac_output_length == 20 );
+		
+		hmac_sha1( s, sLength, 
+	      	      hmac_input, labelLength + 20,
+	      	      &output[ 20 * (i-1) ], &hmac_output_length );
+		assert( hmac_output_length == 20 );
+	}
+}
+
+/* Described in draft-ietf-msec-mikey-07.txt Section 4.1.3 */
+void prf( unsigned char * inkey,  unsigned int inkeyLength,
+	  unsigned char * label,  unsigned int labelLength,
+	  unsigned char * outkey, unsigned int outkeyLength )
+{
+	unsigned int n;
+	unsigned int m;
+	unsigned int i;
+	unsigned int j;
+	unsigned char * p_output;
+
+	n = inkeyLength / 64 + 1;
+	m = outkeyLength / 20 + 1;
+
+	p_output = new unsigned char[ m * 20 ];
+
+	memset( outkey, 0, outkeyLength );
+	for( i = 1; i <= n-1; i++ )
+	{
+		p( &inkey[ (i-1)*64 ], 64, label, labelLength, m, p_output );
+		for( j = 0; j < outkeyLength; j++ )
+		{
+			outkey[j] ^= p_output[j];
+		}
+	}
+
+	/* Last step */
+	p( &inkey[ (n-1)*64 ], inkeyLength % 64, 
+			label, labelLength, m, p_output );
+	
+	for( j = 0; j < outkeyLength; j++ )
+	{
+		outkey[j] ^= p_output[j];
+	}
+	delete [] p_output;
+}
+
+void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
+			      unsigned char * inkey, unsigned int inkeyLength,
+			      unsigned char * key, unsigned int keyLength ,
+			      int type ){
+
+	unsigned char label[4+4+1+randLengthValue];
+
+	switch( type ){
+		case KEY_DERIV_TEK:
+			label[0] = 0x39;
+			label[1] = 0xA2;
+			label[2] = 0xC1;
+			label[3] = 0x4B;
+			break;
+		case KEY_DERIV_SALT:
+			label[0] = 0x2A;
+			label[1] = 0xD0;
+			label[2] = 0x1C;
+			label[3] = 0x64;
+			break;
+		case KEY_DERIV_TRANS_ENCR:
+			label[0] = 0x15;
+			label[1] = 0x05;
+			label[2] = 0x33;
+			label[3] = 0xE1;
+			break;
+		case KEY_DERIV_TRANS_SALT:
+			label[0] = 0x29;
+			label[1] = 0xB8;
+			label[2] = 0x89;
+			label[3] = 0x16;
+			break;
+		case KEY_DERIV_TRANS_AUTH:
+			label[0] = 0x2D;
+			label[1] = 0x22;
+			label[2] = 0xAC;
+			label[3] = 0x75;
+			break;
+
+	}
+	
+	label[4] = csId;
+	
+	label[5] = (unsigned char)((csbIdValue>>24) & 0xFF);
+	label[6] = (unsigned char)((csbIdValue>>16) & 0xFF);
+	label[7] = (unsigned char)((csbIdValue>>8) & 0xFF);
+	label[8] = (unsigned char)(csbIdValue & 0xFF);
+
+	memcpy( &label[9], randPtr, randLengthValue );
+
+	prf( inkey, inkeyLength, label, 9 + randLengthValue, key, keyLength );
+}
+
+void KeyAgreement::genTek( unsigned char csId,
+			    unsigned char * tek, unsigned int tekLength ){
+	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
+			tek, tekLength, KEY_DERIV_TEK );
+}
+
+void KeyAgreement::genSalt( unsigned char csId,
+			     unsigned char * salt, unsigned int saltLength ){
+	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
+			salt, saltLength, KEY_DERIV_SALT );
+}
+
+unsigned int KeyAgreement::csbId(){
+	return csbIdValue;
+}
+
+void KeyAgreement::setCsbId( unsigned int csbIdValue ){
+	this->csbIdValue = csbIdValue;
+}
+
+void KeyAgreement::setTgk( unsigned char * tgk, unsigned int tgkLengthValue ){
+	if( this->tgkPtr )
+		delete [] this->tgkPtr;
+	this->tgkLengthValue = tgkLengthValue;
+	this->tgkPtr = new unsigned char[ tgkLengthValue ];
+	memcpy( this->tgkPtr, tgk, tgkLengthValue );
+}
+
+void * KeyAgreement::initiatorData(){
+	return initiatorDataPtr;
+}
+
+void KeyAgreement::setInitiatorData( void * data ){
+	initiatorDataPtr = data;
+}
+
+void * KeyAgreement::responderData(){
+	return responderDataPtr;
+}
+
+void KeyAgreement::setResponderData( void * data ){
+	responderDataPtr = data;
+}
+
+string KeyAgreement::authError(){
+	return authErrorValue;
+}
+
+void KeyAgreement::setAuthError( string error ){
+	authErrorValue = error;
+}
+
+void KeyAgreement::setCsIdMap( MRef<MikeyCsIdMap *> idMap ){
+	csIdMapPtr = idMap;
+}
+
+MRef<MikeyCsIdMap *> KeyAgreement::csIdMap(){
+	return csIdMapPtr;
+}
+
+byte_t KeyAgreement::nCs(){
+	return nCsValue;
+}
+
+byte_t KeyAgreement::getSrtpCsId( uint32_t ssrc ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+
+	if( csIdMap == NULL ){
+		return 0;
+	}
+
+	return csIdMap->findCsId( ssrc );
+}
+
+uint32_t KeyAgreement::getSrtpRoc( uint32_t ssrc ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+
+	if( csIdMap == NULL ){
+		return 0;
+	}
+
+	return csIdMap->findRoc( ssrc );
+}
+
+void KeyAgreement::addSrtpStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, byte_t csId ){
+	MikeyCsIdMapSrtp * csIdMap = 
+		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+
+	if( csIdMap == NULL ){
+		csIdMapPtr = new MikeyCsIdMapSrtp();
+		csIdMap = (MikeyCsIdMapSrtp *)(*csIdMapPtr);
+	}
+	
+	csIdMap->addStream( ssrc, roc, policyNo, csId );
+
+	if( csId == 0 ){
+		nCsValue ++;
+	}
+}

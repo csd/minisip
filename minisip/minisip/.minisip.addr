@@ -1,0 +1,17 @@
+sub Minisip Phone Book
+	sub TSLab
+		sub Erik Eliasson
+			Cell phone; 0702358832
+			Laptop; sip:erik@ssvl.kth.se
+			Often at weekends; 090195373
+		end
+		sub Björn Pehrson
+			Cell phone; 0706256140
+			Laptop; sip:bjorn@ssvl.kth.se
+		end
+		sub Jon-Olov Vatn
+			Cell phone; 0707226828
+			Laptop; sip:vatn@ssvl.kth.se
+		end
+	end
+end

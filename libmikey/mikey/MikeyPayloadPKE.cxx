@@ -1,0 +1,101 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+/* Copyright (C) 2004 
+ *
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+*/
+
+#include<config.h>
+#include<libmikey/MikeyPayloadPKE.h>
+#include<libmikey/MikeyException.h>
+#include<assert.h>
+
+MikeyPayloadPKE::MikeyPayloadPKE( int c, byte_t * dataPtr, 
+		int dataLengthValue ){
+	this->payloadTypeValue = MIKEYPAYLOAD_PKE_PAYLOAD_TYPE;
+	this->cValue = c;
+	this->dataLengthValue = dataLengthValue;
+	this->dataPtr = new byte_t[ dataLengthValue ];
+	memcpy( this->dataPtr, dataPtr, dataLengthValue );
+}
+
+MikeyPayloadPKE::MikeyPayloadPKE( byte_t * start, int lengthLimit ):
+MikeyPayload(start){
+	if(  lengthLimit < 3 ){
+		throw new MikeyExceptionMessageLengthException(
+                        "Given dataPtr is too short to form a PKE Payload" );
+                return;
+        }
+	this->payloadTypeValue = MIKEYPAYLOAD_PKE_PAYLOAD_TYPE;
+	setNextPayloadType(start[0]);
+	cValue = ( start[1] >> 6 ) & 0x3;
+	dataLengthValue = (int)( start[1] & 0x3F ) |
+		      (int)( start[2] );
+	if( lengthLimit < 3 + dataLengthValue ){	
+		throw new MikeyExceptionMessageLengthException(
+                        "Given dataPtr is too short to form a PKE Payload" );
+                return;
+        }
+	dataPtr = new byte_t[ dataLengthValue ];
+	memcpy( dataPtr, &start[3], dataLengthValue );
+	endPtr = startPtr + 3 + dataLengthValue;
+
+	assert( endPtr - startPtr == length() );
+	
+		
+}
+
+MikeyPayloadPKE::~MikeyPayloadPKE(){
+	if( dataPtr ){
+		delete [] dataPtr;
+	}
+}
+
+int MikeyPayloadPKE::length(){
+	return 3 + dataLengthValue;
+}
+
+void MikeyPayloadPKE::writeData( byte_t * start, int expectedLength ){
+	assert( expectedLength == length() );
+	memset( start, expectedLength, 0 );
+	start[0] = (byte_t)nextPayloadType();
+	start[1] = (byte_t)
+		(( cValue & 0x3 ) << 6 | ( ( dataLengthValue >> 8 ) & 0x3F ));
+	start[2] = (byte_t)( dataLengthValue & 0xFF );
+	memcpy( &start[3], dataPtr, dataLengthValue );
+
+}
+
+int MikeyPayloadPKE::c(){
+	return cValue;
+}
+
+int MikeyPayloadPKE::dataLength(){
+	return dataLengthValue;
+}
+
+byte_t * MikeyPayloadPKE::data(){
+	return dataPtr;
+}
+
+string MikeyPayloadPKE::debugDump(){
+	return "MikeyPayloadPKE: c=<" + itoa( cValue ) + 
+		"> dataLengthValue=<" + itoa( cValue )+
+		"> dataPtr=<" + print_hex( dataPtr, dataLengthValue );
+}
+

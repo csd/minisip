@@ -1,0 +1,11 @@
+# The format of this file was inspired by the Linux kernel CREDITS file.
+# 
+# Authors and contributors are listed alphabetically (first name).
+# 
+# The fields are: name (N), email (E), web-address (W), CVS account login (C),
+# PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
+
+N: Erik Eliasson
+C: erik
+E: eliasson@imit.kth.se
+D: SIP stack

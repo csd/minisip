@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grouplist id="" description="A test P2T Session" owner="user1@ssvl.kth.se" type="1" membership="0" floortime="100" maxparticipants="99">
+<members size="4">
+<member uri="user1@ssvl.kth.se"/>
+<member uri="user2@ssvl.kth.se"/>
+<member uri="user3@ssvl.kth.se"/>
+<member uri="user4@ssvl.kth.se"/>
+</members>
+<participants size="3">
+<user uri="user1@ssvl.kth.se" prio="0"/>
+<user uri="user2@ssvl.kth.se" prio="0"/>
+<user uri="user4@ssvl.kth.se" prio="0"/>
+
+</participants>
+</grouplist>
+
+

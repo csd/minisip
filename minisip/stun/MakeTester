@@ -1,0 +1,15 @@
+all: tester
+tester: tester.o STUNMessage.o STUNAttributes.o STUNTest.o STUN.o
+	g++ -Wall -g -o tester -lpthread -lssl -lresolv tester.o STUNMessage.o STUNAttributes.o STUNTest.o STUN.o ../netutil/*.o ../util/*.o
+STUN.o: STUN.h STUN.cxx
+	g++ -Wall -g -I../include -c STUN.cxx
+STUNTest.o: STUNTest.h STUNTest.cxx
+	g++ -Wall -g -I../include -c STUNTest.cxx
+tester.o: tester.cxx
+	g++ -Wall -g -I../include -c tester.cxx
+STUNMessage.o: STUNMessage.h STUNMessage.cxx
+	g++ -Wall -g -I../include -c STUNMessage.cxx
+STUNAttributes.o: STUNAttributes.h STUNAttributes.cxx
+	g++ -Wall -g -I../include -c STUNAttributes.cxx
+clean:
+	rm -f *.o core.* tester

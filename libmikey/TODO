@@ -1,0 +1,6 @@
+* Implement PKE method
+* Implement rekeying
+* add a namespace
+* add a CallerInterface, to report errors
+* use MObject everywhere
+* remove all OpenSSL dependencies
