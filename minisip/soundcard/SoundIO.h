@@ -129,7 +129,7 @@ class SoundSource : public MObject{
 		virtual std::string getMemObjectType(){return "SoundSource";};
 
 		
-		virtual void resample (short *input,
+		void resample (short *input,
 				       short *output, 
 				       int32_t isize,
 				       int32_t osize); 
@@ -182,7 +182,7 @@ class BasicSoundSource: public SoundSource{
 		   int32_t position,
 		   int32_t nSources,
 		   double sRate,
-		   int32_t frameSize;
+		   int32_t frameSize,
 		   int32_t buffernmonosamples=16000);
                 
 		virtual ~BasicSoundSource();
@@ -200,10 +200,10 @@ class BasicSoundSource: public SoundSource{
 				      bool dequeue=true);
 
 
-		void resample (short *input,
+		/*void resample (short *input,
 			       short *output, 
 			       int32_t isize,
-			       int32_t osize); 
+			       int32_t osize); */
 
 
 		void initLookup(int32_t nSources);
