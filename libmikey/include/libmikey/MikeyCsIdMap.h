@@ -66,6 +66,7 @@ class LIBMIKEY_API MikeyCsIdMap : public MObject{
                 virtual int length()=0;
                 virtual void writeData( byte_t * start,
                                          int expectedLength )=0;
+		virtual std::string debugDump()=0;
 		virtual std::string getMemObjectType(){ return "MikeyCsIdMap";};
 };
 
@@ -79,6 +80,9 @@ class LIBMIKEY_API MikeyCsIdMapSrtp : public MikeyCsIdMap{
                 virtual int length();
                 virtual void writeData( byte_t * start,
                                          int expectedLength );
+
+		virtual std::string debugDump();
+
 		byte_t findCsId( uint32_t ssrc );
 		uint32_t findRoc( uint32_t ssrc );
 		byte_t findpolicyNo( uint32_t ssrc );
@@ -102,6 +106,8 @@ class LIBMIKEY_API MikeyCsIdMapIPSEC4 : public MikeyCsIdMap{
                 virtual int length();
                 virtual void writeData( byte_t * start,
                                          int expectedLength );
+		virtual std::string debugDump();
+		
 		MikeyIPSEC4Cs * getCsIdnumber(int number);
 		byte_t findCsId( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr );
 		byte_t findpolicyNo( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr);

@@ -7,6 +7,7 @@ libmikey_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmikey
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 
 mikey_src =          mikey/MikeyException.cxx \
+                     mikey/MikeyCsIdMap.cxx \
                      mikey/MikeyMessage.cxx \
                      mikey/MikeyMessageDH.cxx \
                      mikey/MikeyMessagePSK.cxx \
