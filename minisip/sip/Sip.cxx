@@ -26,6 +26,7 @@
 #include"../mediahandler/MediaHandler.h"
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipMessageContentIM.h>
+#include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
@@ -69,6 +70,9 @@ void Sip::init(){
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/xpidf+xml", presenceSipMessageContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
 	phoneconfig->inherited.sipTransport->setSipSMCommandReceiver(this);
 }
 

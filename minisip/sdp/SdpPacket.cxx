@@ -50,7 +50,7 @@
 #include<iostream>
 #include<sys/types.h>
 
-MRef<SipMessageContent*> sdpSipMessageContentFactory(const string &buf){
+MRef<SipMessageContent*> sdpSipMessageContentFactory(const string &buf, const string &ContentType){
 	return new SdpPacket(buf);
 }
 

@@ -1,7 +1,7 @@
 
 #include"PresenceMessageContent.h"
 
-MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &buf){
+MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &buf, const string &ContentType){
 	        return new PresenceMessageContent(buf);
 }
 

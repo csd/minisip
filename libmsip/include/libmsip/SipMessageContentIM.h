@@ -30,7 +30,7 @@
 #include<iostream>
 using namespace std;
 
-MRef<SipMessageContent*> sipIMMessageContentFactory(const string &);
+MRef<SipMessageContent*> sipIMMessageContentFactory(const string &, const string &ContentType);
 
 class SipMessageContentIM : public SipMessageContent{
 public:

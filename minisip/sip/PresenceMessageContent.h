@@ -7,7 +7,7 @@
 
 
 
-MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &);
+MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &, const string &ContentType);
 
 class PresenceMessageContent : public SipMessageContent{
 	public:

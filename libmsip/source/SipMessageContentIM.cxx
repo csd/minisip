@@ -27,7 +27,7 @@
 
 
 
-MRef<SipMessageContent*> sipIMMessageContentFactory(const string &buf){
+MRef<SipMessageContent*> sipIMMessageContentFactory(const string &buf, const string &ContentType){
         return new SipMessageContentIM(buf);
 }
 

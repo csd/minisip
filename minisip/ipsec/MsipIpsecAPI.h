@@ -25,8 +25,7 @@
 #include<libmikey/MikeyPayloadSP.h>
 #include"../sip/SipDialogSecurityConfig.h"
 #include<libmutil/MemObject.h>
-#include<libmsip/SipMessageContent.h>
-
+#include<libmsip/SipMIMEContent.h>
 
 
 class MsipIpsecRequest{

@@ -257,7 +257,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		//	cerr <<  "Content type parsed to "<< contentType<< endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
 			if (contentFactory){
-				MRef<SipMessageContent*> smcref = contentFactory(content);
+				MRef<SipMessageContent*> smcref = contentFactory(content, contentType);
 				//MRef<SipMessageContent*> smcref = contentFactory->createContent(content);
 				setContent(smcref);
 			}else{ //TODO: Better error handling

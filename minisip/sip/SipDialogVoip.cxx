@@ -46,6 +46,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
+#include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 #include"DefaultDialogHandler.h"
 #include<libmutil/itoa.h>
