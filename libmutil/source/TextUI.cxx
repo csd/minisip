@@ -146,7 +146,7 @@ void TextUI::guimain(){
                         displayMessage("data on STDIN");
 */
 		read(STDIN_FILENO, &c, 1);
-/*			keyPressed(c);
+/*
                 }else{
                         displayMessage("data on iSpace connection");
                         char buf[66000];
@@ -165,6 +165,7 @@ void TextUI::guimain(){
 		c= _getch();
 //		displayMessage(string("read: ")+c+"("+itoa((int)c)+")");
 #endif
+		keyPressed(c);
 
 
 		string command;
