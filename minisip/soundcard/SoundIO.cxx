@@ -193,6 +193,8 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		if( ! soundcard->recording ){
 			if( soundcard->soundDev->isOpenedRecord() ){
 				soundcard->closeRecord();
+				delete [] tempBuffer;
+				tempBuffer = NULL;
 			}
 
 			/* sleep until a recorder call back is added */
@@ -203,11 +205,6 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			}
 
 		}
-	
-		if( soundcard->soundDev->getNChannelsRecord() > 1 ){
-			tempBuffer = new short[soundcard->recorder_buffer_size];
-		}
-		
 		
 		soundcard->soundDev->lockRead();
                 nread = soundcard->soundDev->read( (byte_t *)buffers[i%2], 
@@ -219,6 +216,10 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		}
 
 		if( soundcard->soundDev->getNChannelsRecord() > 1 ){
+			if( !tempBuffer ){
+				tempBuffer = new short[soundcard->recorder_buffer_size];
+			}
+r:1106
 			for( int j = 0; j < soundcard->recorder_buffer_size; j++ ){
 				tempBuffer[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() ];
 			}
