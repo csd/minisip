@@ -138,7 +138,7 @@ string SipHeaderValueAuthorization::calcResponse(){
 	MD5Context context;
 	MD5Init(&context);
 	string u_r_p(auth_id+":"+realm+":"+password);
-	MD5Update(&context, (const unsigned char *)u_r_p.c_str(), u_r_p.length() );
+	MD5Update(&context, (const unsigned char *)u_r_p.c_str(), (unsigned int)u_r_p.length() );
 	MD5Final(digest,&context);
 	string md5_u_r_p = md5ToString(digest);
 
@@ -147,14 +147,14 @@ string SipHeaderValueAuthorization::calcResponse(){
 	MD5Init(&c2);
 	string uristr(sipMethod+":"+/*sip:"+username+"@"+uri.get_ip()*/ uri_part);
 	//cerr << "DEBUG: uri_part="<< uri_part<< " sip_method = "<<sip_method<< endl;
-	MD5Update(&c2, (const unsigned char *)uristr.c_str(), (uristr).length() );
+	MD5Update(&c2, (const unsigned char *)uristr.c_str(), (unsigned int)uristr.length() );
 	MD5Final(digest,&c2);
 	string md5_uri = md5ToString(digest);
 
 	MD5Context c3;
 	MD5Init(&c3);
 	string all(md5_u_r_p+":"+nonce+":"+md5_uri);
-	MD5Update(&c3,(const unsigned char *)all.c_str(), all.length() );
+	MD5Update(&c3,(const unsigned char *)all.c_str(), (unsigned int)all.length() );
 	MD5Final(digest,&c3);
 
 	string auth_string = md5ToString(digest);

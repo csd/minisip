@@ -43,7 +43,7 @@ bool transitionMatch(const SipSMCommand &command,
 	const string &respFilter="");
 
 bool transitionMatch(const SipSMCommand &command,
-	const string &command,
+	const string &cmd_str,
 	int source=IGN,
 	int destination=IGN);
 

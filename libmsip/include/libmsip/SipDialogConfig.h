@@ -45,7 +45,11 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkFunctions.h>
 
+#ifdef _MSC_VER
+
+#else
 #include<stdint.h>
+#endif
 
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10

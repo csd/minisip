@@ -1,6 +1,7 @@
 #include<libmsip/SipUtils.h>
 #include<ctype.h>
-#include<stdint.h>
+
+#include<config.h>
 
 #include<iostream>
 

@@ -32,8 +32,12 @@
 #define SIPHEADERWARNING_H
 
 #include<libmsip/SipHeader.h>
-#include<stdint.h>
 
+#ifdef _MSC_VER
+typedef unsigned short uint16_t;
+#else
+#include<stdint.h>
+#endif
 /**
  * @author Erik Eliasson
 */

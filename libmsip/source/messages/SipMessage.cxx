@@ -148,7 +148,7 @@ string SipMessage::getHeadersAndContent(){
 	}
 	if (clen<0){
 		if ( !content.isNull())
-			clen=content->getString().length();
+			clen=(int)content->getString().length();
 		else
 			clen=0;
 		SipHeader content_length(new SipHeaderValueContentLength(clen));
@@ -168,7 +168,7 @@ string SipMessage::getHeadersAndContent(){
  */
 int SipMessage::parseHeaders(const string &buf, int startIndex){
 	int i=startIndex;
-	int end = buf.size();
+	int end = (int)buf.size();
 	do{
 		if (i+2<=end && buf[i]=='\n' && buf[i+1]=='\n')	// i points to first after header
 			return i+2;				// return pointer to start of content
@@ -212,7 +212,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 	if (clen>0){
 		string content=buildFrom.substr(contentStart, clen);
 		if ((int)content.length() != clen){
-			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<content.length()<<")"<<endl;
+			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<(int)content.length()<<")"<<endl;
 		}
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
@@ -247,13 +247,13 @@ bool SipMessage::addLine(string line){
 	addHeader(hdr);
 	string ln = line;	//Hack to get realm an nonce... FIXME
 	if (getType()==SipResponse::type && (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){
-		unsigned r_pos = ln.find("realm=");
-		unsigned n_pos = ln.find("nonce=");
+		size_t r_pos = ln.find("realm=");
+		size_t n_pos = ln.find("nonce=");
 		if (r_pos == string::npos || n_pos ==string::npos){
 			merr << "ERROR: could not extract nonce and realm in line: " << ln << end;
 		}
-		int32_t r_end = ln.find("\"",r_pos+7);
-		int32_t n_end = ln.find("\"",n_pos+7);
+		size_t r_end = ln.find("\"",r_pos+7);
+		size_t n_end = ln.find("\"",n_pos+7);
 		string sub = ln.substr(n_pos+7, n_end-(n_pos+7));
 		setNonce(sub);
 		sub = ln.substr(r_pos+7, r_end-(r_pos+7));

@@ -66,8 +66,6 @@
 
 //#include<libmsip/dialogs/DefaultCallHandler.h>
 
-#include<stdint.h>
-
 #define TIMEOUT 600000
 #define NB_THREADS 5
 
@@ -231,7 +229,9 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			}
 			
 			packet_string = pack->getString();
+#ifndef WIN32
 			ts.save( PACKET_OUT );
+#endif
 #ifdef DEBUG_OUTPUT
 //			mout << "OUT (UDP), From localhost:"<<udpsock.get_port()
 //					<< " to "<<ip_addr.get_string()
@@ -252,7 +252,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #endif
 			if( udpsock.sendTo( ip_addr, port, 
 					(void*)packet_string.c_str(),
-					packet_string.length() ) == -1 ){
+					(int32_t)packet_string.length() ) == -1 ){
 			
 				throw new SendFailed( errno );
 			

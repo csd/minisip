@@ -56,7 +56,7 @@ void SipHeader::addHeaderValue(MRef<SipHeaderValue*> v){
 static string getHeader(const string &line,int &endi){
 	string ret;
 	int i;
-	for (i=0;   i<line.size() && line[i]!=' ' && line[i]!='\t' && line[i]!=':'   ;  i++){
+	for (i=0;   (i<(int)line.size()) && line[i]!=' ' && line[i]!='\t' && line[i]!=':'   ;  i++){
 		ret+=line[i];
 	}
 	while (line[i]==' ' || line[i]=='\t' || line[i]==':'){
@@ -78,7 +78,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	MRef<SipHeader*> h;
 	if (SipUtils::startsWith(hdr,"Via")){
 		 h= new SipHeader(new SipHeaderValueVia(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueVia(values[i]));
 		 }
 		 return h;
@@ -86,7 +86,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"From")){
 		 h= new SipHeader(new SipHeaderValueFrom(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueFrom(values[i]));
 		 }
 		 return h;
@@ -96,7 +96,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"To")){
 		 h= new SipHeader(new SipHeaderValueTo(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueTo(values[i]));
 		 }
 		 return h;
@@ -106,7 +106,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Call-ID")){
 		 h= new SipHeader(new SipHeaderValueCallID(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueCallID(values[i]));
 		 }
 		 return h;
@@ -116,7 +116,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"CSeq")){
 		 h= new SipHeader(new SipHeaderValueCSeq(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueCSeq(values[i]));
 		 }
 		 return h;
@@ -126,7 +126,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Contact")){
 		 h= new SipHeader(new SipHeaderValueContact(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueContact(values[i]));
 		 }
 		 return h;
@@ -136,7 +136,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"User-Agent")){
 		 h= new SipHeader(new SipHeaderValueUserAgent(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueUserAgent(values[i]));
 		 }
 		 return h;
@@ -146,7 +146,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Record-Route")){
 		 h= new SipHeader(new SipHeaderValueRecordRoute(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueRecordRoute(values[i]));
 		 }
 		 return h;
@@ -156,7 +156,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Route")){
 		 h= new SipHeader(new SipHeaderValueRoute(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueRoute(values[i]));
 		 }
 		 return h;
@@ -166,7 +166,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Content-Length")){
 		 h= new SipHeader(new SipHeaderValueContentLength(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueContentLength(values[i]));
 		 }
 		 return h;
@@ -176,7 +176,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr, "Event")){
 		 h= new SipHeader(new SipHeaderValueEvent(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueEvent(values[i]));
 		 }
 		 return h;
@@ -186,7 +186,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr, "Accept")){
 		 h= new SipHeader(new SipHeaderValueAccept(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueAccept(values[i]));
 		 }
 		 return h;
@@ -196,7 +196,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr, "Content-Type")){
 		 h= new SipHeader(new SipHeaderValueContentType(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueContentType(values[i]));
 		 }
 		 return h;
@@ -206,7 +206,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr, "Max-Forwards")){
 		 h= new SipHeader(new SipHeaderValueMaxForwards(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueMaxForwards(values[i]));
 		 }
 		 return h;
@@ -216,7 +216,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Accept-Contact")){
 		 h= new SipHeader(new SipHeaderValueAcceptContact(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueAcceptContact(values[i]));
 		 }
 		 return h;
@@ -226,7 +226,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	if (SipUtils::startsWith(hdr,"Warning")){
 		 h= new SipHeader(new SipHeaderValueWarning(values[0]));
-		 for (int i=1;i<values.size();i++){
+		 for (int i=1;i<(int)values.size();i++){
 		 	h->addHeaderValue(new SipHeaderValueWarning(values[i]));
 		 }
 		 return h;
@@ -239,7 +239,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	mdbg << "INFO: Unsupported header found and added using SipHeaderUnsupported ("<< line <<")"<< end;
 #endif
 	h= new SipHeader(new SipHeaderValueUnsupported(values[0]));
-	for (int i=1;i<values.size();i++){
+	for (int i=1;i<(int)values.size();i++){
 		h->addHeaderValue(new SipHeaderValueUnsupported(values[i]));
 	}
 	return h;

@@ -78,6 +78,8 @@ class SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,
 		 * Deconstructor.
 		 */
 		virtual ~SipDialog();
+		
+		virtual string getMemObjectType(){return "SipDialog";}
 
 		/**
 		 * The SipSMCommand handler.

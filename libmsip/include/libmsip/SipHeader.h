@@ -38,6 +38,13 @@
 #include<libmutil/minilist.h>
 
 #include<sys/types.h>
+
+#ifdef _MSC_VER
+typedef __int32 int32_t;
+#else
+#include<stdint.h>
+#endif
+
 /**
  * @author Erik Eliasson
 */
@@ -89,7 +96,7 @@ class SipHeader : public MObject{
 
                 virtual std::string getMemObjectType(){return "SipHeader";}
 
-		int32_t getType(){return type;};
+		int32_t getType(){return type;}
 		int getNoValues(){return headerValues.size();}
 		MRef<SipHeaderValue *> getHeaderValue(int i){
 			assert(i < headerValues.size() );
