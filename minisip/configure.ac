@@ -115,6 +115,17 @@ AC_ARG_WITH(ffmpeg,
         AVCODEC_LDFLAGS="-L${with_ffmpeg}/libavcodec"
       fi ])
 
+
+dnl Check for libsamplerate
+AC_CHECK_HEADER([samplerate.h], 
+	[
+		AC_CHECK_LIB([samplerate], [main],
+			[LIBS="-lsamplerate ${LIBS}"],
+			[AC_MSG_ERROR([Could not find the samplerate library. Please install the corresponding package.])])
+	], 
+	[AC_MSG_ERROR([Could not find samplerate.h. Please install the libsamplerate development package])]
+)
+
 dnl #############
 dnl IPSEC SUPPORT
 dnl #############
@@ -203,6 +214,7 @@ AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
+
 
 
       
@@ -314,6 +326,7 @@ dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
 dnl Checks for libraries.
+
 
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
@@ -435,6 +448,7 @@ AC_OUTPUT([codecs/Makefile
                  rtp/Makefile
                  sip/Makefile
                  soundcard/Makefile
+                 spaudio/Makefile
                  stun/Makefile
 		 ipsec/Makefile
                  sdp/Makefile

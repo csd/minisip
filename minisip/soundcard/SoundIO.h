@@ -184,7 +184,7 @@ class BasicSoundSource: public SoundSource{
 				      bool stereo, 
 				      bool dequeue=true);
 
-		short* getLeftBuf();
+/*		short* getLeftBuf();
 
 		short* getRightBuf();
 
@@ -195,7 +195,7 @@ class BasicSoundSource: public SoundSource{
 		int32_t getPointer();
 
 		void setPointer(int32_t wpointer);
-
+*/
 		void initLookup(int32_t nSources);
 
 		SRC_DATA getSrcData();

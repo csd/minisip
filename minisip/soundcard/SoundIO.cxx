@@ -64,6 +64,8 @@ float lchvol[POS]={1,0.8,1,0.6,0};
 float rchvol[POS]={0,0.6,1,0.8,1};
 
 
+SpAudio SoundIO::spAudio(5);
+
 SoundIO::SoundIO(
                 //string device, 
                 MRef<SoundDevice *> device,
@@ -81,7 +83,7 @@ SoundIO::SoundIO(
 		    //openCount(0)
 {
         soundDev = device;
-	spAudio = new SpAudio(5);
+//	spAudio = new SpAudio(5);
 
 	/* Create the SoundPlayerLoop */
 	start_sound_player();
@@ -501,36 +503,36 @@ void BasicSoundSource::initLookup(int32_t nSources){
    } 
 }
 
- short* BasicSoundSource::getLeftBuf(){
+ short* SoundSource::getLeftBuf(){
    return leftChannelBuffer;
  }
 
- short* BasicSoundSource::getRightBuf(){
+ short* SoundSource::getRightBuf(){
    return rightChannelBuffer;
  }
 
- short* BasicSoundSource::getLookupLeft(){
+ short* SoundSource::getLookupLeft(){
    return lookupleft;
  }
 
- short* BasicSoundSource::getLookupRight(){
+ short* SoundSource::getLookupRight(){
    return lookupright;
  }
 
- int32_t BasicSoundSource::getPointer(){
+ int32_t SoundSource::getPointer(){
    return pointer;
  }
 
- SRC_DATA BasicSoundSource::getSrcData(){
+ SRC_DATA SoundSource::getSrcData(){
    return src_data;
  }
 
- SRC_STATE* BasicSoundSource::getSrcState(){
+ SRC_STATE* SoundSource::getSrcState(){
    return src_state;
  }
 
 
- void BasicSoundSource::setPointer(int32_t wpointer){
+ void SoundSource::setPointer(int32_t wpointer){
    pointer=wpointer;
  }
 

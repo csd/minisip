@@ -162,7 +162,7 @@ void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, 
 		((AudioCodec *)*codec)->decode( data, length, output );
 	}
 
-#ifdef IPAQ
+/*#ifdef IPAQ
 	// The iPAQ doen't support 8kHz, we need to resample to 16kHz
 	short buffer1[1600];
 	short buffer2[1600];
@@ -182,11 +182,11 @@ void AudioMedia::playData( uint32_t receiverId, byte_t * data, uint32_t length, 
 	soundIo->pushSound( ssrc, buffer2, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 #else
-
+*/
 	soundIo->pushSound( ssrc, output, 
 		((AudioCodec*)*codec)->getInputNrSamples(), seqNo );
 		
-#endif
+//#endif
 }
 
 void AudioMedia::srcb_handleSound( void * data ){

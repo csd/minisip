@@ -27,6 +27,27 @@
 #include "SpAudio.h"
 #include<libmutil/MemObject.h>
 
+
+#define POS 5       //number of positions in the spatial audio scheme
+
+
+/**
+ * Definition of the delay and scaling values depending on the position.
+ * 30 samples is the maximum delay chosen, theoretical support for
+ * this elecion should be seen in
+ */
+
+int32_t SpAudio::lchdelay[POS]={0,0,0,30,0};
+int32_t SpAudio::rchdelay[POS]={0,30,0,0,0};
+
+/**
+ ** Definition of the matrix with the new position to be assigned depending
+ ** on the number of calls being maintained
+ **/
+
+int32_t SpAudio::assmatrix[POS][POS]={{3,1,3,2,3},{0,5,1,4,2},{0,0,5,1,4},{0,0,0,5,1},{0,0,0,0,5}};
+
+
 SpAudio::SpAudio(int32_t numPos){
 
   nPos=numPos;
