@@ -24,6 +24,7 @@
 #include"STUNMessage.h"
 #include"STUNTest.h"
 #include<libmutil/itoa.h>
+#include<libmnetutil/NetworkFunctions.h>
 
 
 #include<stdio.h>
@@ -108,6 +109,7 @@ static char *msgs[]={
  * Note: The IP is supposed to be host byte order. This normally 
  * not done. Beware when this function somewhere else.
 */
+/*
 static void binIp2String(uint32_t ip, char *strBufMin16){
 //	uint32_t nip = htonl(ip);
 //	inet_ntop(AF_INET, &nip, strBufMin16, 16);
@@ -116,7 +118,9 @@ static void binIp2String(uint32_t ip, char *strBufMin16){
                                          ( ip>> 8 )&0xFF,
                                          ( ip     )&0xFF );
 }
+*/
 
+/*
 static bool isLocalIP(uint32_t ip, vector<string> &localIPs){
     char sip[20];
     binIp2String(ip,sip);
@@ -128,6 +132,7 @@ static bool isLocalIP(uint32_t ip, vector<string> &localIPs){
     
     return false;
 }
+*/
 
 void STUN::getExternalMapping(IP4Address &stunAddr, 
 		uint16_t stunPort, 
@@ -152,7 +157,7 @@ void STUN::getExternalMapping(IP4Address &stunAddr,
 	mappedPort = mappedAddr->getPort();
 	
 	if (bufferMappedIP!=NULL)
-		binIp2String(firstTestIP, bufferMappedIP);
+		NetworkFunctions::binIp2String(firstTestIP, bufferMappedIP);
 }
 
 
@@ -200,11 +205,11 @@ int STUN::getNatType(IP4Address &stunAddr,
 	uint32_t firstTestChangedPort = changedAddr->getPort();
 
 	if (bufferMappedIP!=NULL)
-		binIp2String(firstTestIP, bufferMappedIP);
+		NetworkFunctions::binIp2String(firstTestIP, bufferMappedIP);
 	mappedPort = firstTestPort;
 	
 ///	if (firstTestIP==localIP.getBinaryIP() && firstTestPort==localPort){
-	if (isLocalIP(firstTestIP, localIPs)  &&  firstTestPort==localPort){
+	if (NetworkFunctions::isLocalIP(firstTestIP, localIPs)  &&  firstTestPort==localPort){
 //		cerr << "Same IP"<< endl;
 		message = STUNTest::test(&stunAddr, stunPort, socket, true, true);
 		if (message==NULL){
@@ -223,7 +228,7 @@ int STUN::getNatType(IP4Address &stunAddr,
 		}else{
 //			cerr << "testing restrictions (sym/restr/portrestr)"<< endl;
 			char tmp[16];
-			binIp2String(firstTestChangedIP, tmp);
+			NetworkFunctions::binIp2String(firstTestChangedIP, tmp);
 //			IP4Address changedAddr(binIp2String(firstTestChangedIP));
 			IP4Address changedAddr(tmp);
 
