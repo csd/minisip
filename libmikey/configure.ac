@@ -2,11 +2,11 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libmikey, 0.3, jobi@via.ecp.fr)
+AC_INIT(libmikey, 0.4, jobi@via.ecp.fr)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmikey, 0.3.2)
+AM_INIT_AUTOMAKE(libmikey, 0.4.0)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 

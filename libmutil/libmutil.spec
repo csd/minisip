@@ -82,6 +82,8 @@ rm -rf %buildroot
 
 
 %changelog
+* Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>
+- new upstream release
 * Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Wed Jun 9 2004 Johan Bilien <jobi@via.ecp.fr>

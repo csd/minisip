@@ -2,11 +2,11 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libmnetutil, 0.2, eliasson@imit.kth.se)
+AC_INIT(libmnetutil, 0.3, eliasson@imit.kth.se)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmnetutil, 0.2.2)
+AM_INIT_AUTOMAKE(libmnetutil, 0.3.0)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
