@@ -35,7 +35,7 @@
 #include"../../../sip/DefaultDialogHandler.h"
 
 
-extern TextUI *debugtextui;
+//extern TextUI *debugtextui;
 
 
 
@@ -47,10 +47,10 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     inCall=false;
     p2tmode=false;
 
-#ifdef DEBUG_OUTPUT
-    mdbg << "Setting global MinisipTextUI"<< end;
-    debugtextui=this;
-#endif
+//#ifdef DEBUG_OUTPUT
+//    mdbg << "Setting global MinisipTextUI"<< end;
+//    debugtextui=this;
+//#endif
 
     addCommand("answer");
     addCommand("disable autoanswer");
