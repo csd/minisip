@@ -93,7 +93,12 @@ IP6Address::IP6Address(struct sockaddr * addr){
 	sockaddress = new sockaddr_in6;
 	memcpy(sockaddress, addr, sizeof(sockaddr_in6));
 	for (int32_t i=0; i<8; i++)
+#ifdef WIN32
+		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr._S6_un._S6_u16[i];
+#else
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+#endif
+
 }
 
 

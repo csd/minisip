@@ -26,8 +26,12 @@
 #include<config.h>
 #endif
 
-#include<netinet/in.h>
+#ifdef WIN32
+#include<winsock2.h>
 
+#elif defined HAVE_NETINET_IN_H
+#include<netinet/in.h>
+#endif
 
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
