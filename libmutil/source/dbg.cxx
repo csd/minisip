@@ -80,7 +80,7 @@ Dbg &Dbg::operator<<(std::string s){
 	return *this;
 }
 
-Dbg &Dbg::operator<<(DbgEndl &endl){
+Dbg &Dbg::operator<<(DbgEndl &){
 
 	if (!enabled)
 		return *this;

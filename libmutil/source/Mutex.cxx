@@ -53,12 +53,12 @@ Mutex::Mutex(){
 }
 
 
-Mutex& Mutex::operator=(const Mutex &m){
+Mutex& Mutex::operator=(const Mutex &){
 	//Do not copy the Mutex reference - keep our own.
 	return *this;
 }
 
-Mutex::Mutex(const Mutex &m){
+Mutex::Mutex(const Mutex &){
 	createMutex();
 }
 
