@@ -260,10 +260,10 @@ class TimeoutProvider : public MObject{
 		 * @see request_timeout
 		 */
 		void cancel_request(TOSubscriber subscriber, const TOCommand &command){
-			typename std::list<TPRequest<TOCommand, TOSubscriber> >::iterator i;
+			//typename std::list<TPRequest<TOCommand, TOSubscriber> >::iterator i;
                         synch_lock.lock();
-			int size=requests.size();
-			unsigned loop_count=0;
+			//int size=requests.size();
+			int loop_count=0;
 			for (int i=0; loop_count<requests.size(); i++){
 				if (requests[i].get_subscriber()==subscriber && requests[i].get_command()==command){
 					requests.remove(i);

@@ -41,6 +41,6 @@ uint64_t mtime(){
 
 	gettimeofday( &tv, NULL );
 
-	return ((uint64_t)tv.tv_sec) * 1000LL + ((uint64_t)tv.tv_usec) / 1000LL;
+	return ((uint64_t)tv.tv_sec) * (uint64_t)1000 + ((uint64_t)tv.tv_usec) / (uint64_t)1000;
 #endif
 }
