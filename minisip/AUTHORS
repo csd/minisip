@@ -7,18 +7,20 @@
 
 N: Israel Abad
 C: mini-israel
-E: i_abad@terra.es
+E: abadi@mapfre.com
 D: SRTP stack
 
 N: Johan Bilien
-C: mini-johan
+C: jobi
 E: jobi@via.ecp.fr
 D: MIKEY stack
 D: SRTP stack
 D: TCP and TLS support
+D: Media session management
+D: Video support
 
 N: Erik Eliasson
-C: mini-erik
+C: erik
 E: eliasson@it.kth.se
 D: SIP stack and state machines
 D: RTP stack
@@ -26,3 +28,7 @@ D: SDP stack
 D: QT, JAVA and line GUIs
 D: Soundcard interface
 D: Network utilities
+
+N: Florian Mauer
+C: florian
+D: push-to-talk
