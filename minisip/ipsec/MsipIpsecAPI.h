@@ -105,6 +105,7 @@ class MsipIpsecPolicy : public MsipIpsecRequest{
 		virtual int remove(bool valid = true);
 
 		u_int prefs, prefd, proto;
+		int spid;
 		char * policy;
 		int policylen;
 };

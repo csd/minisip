@@ -340,11 +340,6 @@ int MsipIpsecAPI::stop(){
 			if((*iter)->remove(false) == -1)
 				notgood = -1;
 	}
-	// This is a work around due to unsoled issues when deleting IPSEC policys in the kernel. 
-	// It should not be needed, and can cause problems if more than one IPSEC call exist
-	if(notgood == -1){
-		int result = pfkey_send_spdflush(so);
-	}
 	return notgood;
 }
 
@@ -825,16 +820,18 @@ int MsipIpsecSA::set(){
 		for (i = 0; i < e_keylen; i++)
 			keymat[i] = e_key[i];
 		for (int j = 0; j < a_keylen ; j++){
-			i++;
 			keymat[i] = a_key[j];
+			i++;
 		}
 		
-		//cerr << "Adding SA SPI: " << ntohl(spi) << endl;
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
+		ts.save("pfkey_send_add");
 		result = pfkey_send_add(so, satype, mode, src, dst, spi, reqid, wsize, 
 					keymat, e_type, e_keylen, a_type, a_keylen, 
 					flags, l_alloc, l_bytes, l_addtime, l_usetime, seq);
+		ts.save("pfkey_send_add");
 		msg = pfkey_recv(so);
+		ts.save("pfkey_send_add");
 /* end---------------------------------------------------------------------------------**********************/
 		if (result == -1){
 			merr << "Problem with IPSEC pfkey_send_add: " << end;
@@ -880,6 +877,7 @@ MsipIpsecPolicy::MsipIpsecPolicy(int so, struct sockaddr * src, struct sockaddr 
 	this->prefs = prefs;
 	this->prefd = prefd;
 	this->proto = proto;
+	this->spid = 0;
 	this->policylen = policylen;
 	this->policy = (char *)calloc( policylen, sizeof(char) );
 	for(int i=0; i< policylen; i++){
@@ -905,9 +903,18 @@ int MsipIpsecPolicy::set(){
 	// There might be a good idea to check the result & return values below!!!
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
 	result = pfkey_send_spdadd(so, src, prefs, dst, prefd, proto, pol, len, seq); 
-	msg = pfkey_recv(so);
+
+	caddr_t mhp[SADB_EXT_MAX + 1];
+	if ((msg = pfkey_recv(so)) == NULL)
+		cerr << "ERROR: pfkey_recv failure!";
+	if (pfkey_align(msg, mhp) < 0)
+		cerr << "ERROR: pfkey_align failure!";
+
+	this->spid = ((struct sadb_x_policy *)mhp[SADB_X_EXT_POLICY])->sadb_x_policy_id;
+	
 /* end --------------------------------------------------------------------------------**********************/
 	exist = true;
+	free(pol);
 	return result;
 }
 
@@ -922,13 +929,15 @@ int MsipIpsecPolicy::remove(bool valid){
 	struct sadb_msg *msg;
 	if(exist){
 		caddr_t pol = ipsec_set_policy(policy, policylen);
-		int len = ipsec_get_policylen(pol);
+		int len = ipsec_get_policylen(pol);	
 /* Depending on IPSEC kernel-----------------------------------------------------------**********************/
-		result = pfkey_send_spddelete(so, src, prefs, dst, prefd, proto, pol, len, seq);
+		result = pfkey_send_spddelete2(so, spid);
+		//result = pfkey_send_spddelete(so, src, prefs, dst, prefd, proto, pol, len, seq);
 		//msg = pfkey_recv(so);
 /* end --------------------------------------------------------------------------------**********************/
 		exist = false;
 		this->valid = valid;
+		free(pol);
 		return result;
 	}
 	return 0;
