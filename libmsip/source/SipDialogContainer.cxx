@@ -89,10 +89,6 @@ SipCallback * SipDialogContainer::getCallback() const{
 	return callback;
 }
 
-void SipDialogContainer::registerMediaStream(MRef<SdpPacket*> sdppack){
-
-}
-
 void SipDialogContainer::enqueueCommand(const SipSMCommand &command, int queue,  int priority){
 	struct queue_type item;
 	item.type = TYPE_COMMAND;

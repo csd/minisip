@@ -153,8 +153,6 @@ class SipDialogContainer : public MObject{
 		
 		MRef<SipMessageDispatcher*> getDispatcher() const;
 
-		void registerMediaStream(MRef<SdpPacket*> sdppack);
-
 		void addDialog(MRef<SipDialog*> call);
 
 		void setCallback(SipCallback* callback);
