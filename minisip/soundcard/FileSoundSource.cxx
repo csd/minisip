@@ -22,6 +22,7 @@
 
 #include"FileSoundSource.h"
 #include<fstream>
+#include<libmutil/print_hex.h>
 
 using namespace std;
 
@@ -38,6 +39,7 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id, bool rep):
         m = file.tellg();
         nSamples = (m-l)/2;
         audio = new short[nSamples];
+        file.seekg (0, ios::beg);
         file.read( (char*)audio, nSamples*2);
 }
 
@@ -85,10 +87,13 @@ void FileSoundSource::getSound(short *dest,
         bool stereo,
         bool dequeue)
 {
-    if (index+nMono>=nSamples && repeat)
-        index=0;
-    else
-        index=nSamples;
+    if (index+nMono>=nSamples){
+	    if (repeat)
+		index = 0;
+	    else
+        	index=nSamples;
+    }
+    cerr << index << endl;
 
     int mul = stereo ? 2 : 1 ;
 
@@ -99,9 +104,10 @@ void FileSoundSource::getSound(short *dest,
     }else{
         for (int i=0; i<nMono; i++){
             if (stereo){
-                dest[i*2] = dest[i*2+1] = audio[i];
+		    //cerr << "stereo" << endl;
+                dest[i*2] = dest[i*2+1] = audio[i+index];
             }else{
-                dest[i] = audio[i];
+                dest[i] = audio[i+index];
             }
         }
         if (dequeue){
