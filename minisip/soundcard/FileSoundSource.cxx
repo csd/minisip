@@ -50,7 +50,7 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id,
         nSamples = (m-l)/(sizeof(short)*inputNChannels);
         cerr << "nSample: " << nSamples << endl;
 
-        nOutputFrames = ( outputDurationMs * outputFreq ) / 1000;
+        nOutputFrames = ( outputDurationMs * inputFreq ) / 1000;
         cerr << "nOutputFrames: " << nOutputFrames << endl;
         
         audio = new short[nSamples*outputNChannels];
@@ -92,6 +92,7 @@ FileSoundSource::FileSoundSource(string filename, uint32_t id,
 
         resampler = Resampler::create( inputFreq, outputFreq, outputDurationMs, outputNChannels );
 
+        cerr << "After constructor " << nOutputFrames << endl;
         delete [] input;
 }
 
@@ -140,6 +141,7 @@ void FileSoundSource::pushSound(short *samples,
 
 
 void FileSoundSource::getSound( short *dest, bool dequeue ){
+        cerr << "Calling getSound " << nOutputFrames << endl;
         if( index + nOutputFrames >= nSamples ){
                 if (repeat)
                         index = 0;
@@ -152,8 +154,8 @@ void FileSoundSource::getSound( short *dest, bool dequeue ){
         }
         else{
                 resampler->resample( audio + index, dest );
-                cerr << "audio + index: "  << print_hex( (unsigned char *)(audio + index), nOutputFrames*nChannels) << endl;
-                cerr << "dest: "  << print_hex( (unsigned char *)dest, nOutputFrames*nChannels) << endl;
+//                cerr << "audio + index: "  << print_hex( (unsigned char *)(audio + index), nOutputFrames*nChannels) << endl;
+//                cerr << "dest: "  << print_hex( (unsigned char *)dest, nOutputFrames*nChannels) << endl;
                 
                 if (dequeue){
                         index += nOutputFrames;
