@@ -265,7 +265,7 @@ void CallWidget::startRinging(){
 		bell = new Bell();
 	}
 	bell->start();
-	CommandString cmdstr = CommandString( 0, MediaCommandString::start_ringing );
+	CommandString cmdstr = CommandString( "", MediaCommandString::start_ringing );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 
 }
@@ -275,6 +275,6 @@ void CallWidget::stopRinging(){
 		bell->stop();
 		bell=NULL;
 	}
-	CommandString cmdstr = CommandString( 0, MediaCommandString::stop_ringing );
+	CommandString cmdstr = CommandString( "", MediaCommandString::stop_ringing );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 }
