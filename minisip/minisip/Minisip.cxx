@@ -42,7 +42,7 @@
 #include<libmutil/Timestamp.h>
 #include<libmutil/TextUI.h>
 
-extern TextUI *debugtextui;
+//extern TextUI *debugtextui;
 
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
@@ -162,11 +162,12 @@ Minisip::Minisip( int argc, char**argv ){
 #endif
 
 #ifdef TEXT_UI
-        /*gui = */debugtextui = new MinisipTextUI();
-	gui = dynamic_cast<Gui*>(debugtextui);
-	assert(gui);
+        ///*gui = */debugtextui = new MinisipTextUI();
+	gui = new MinisipTextUI();
+//	gui = dynamic_cast<Gui*>(debugtextui);
+//	assert(gui);
 	//debugtextui = gui;
-	merr.setExternalHandler( gui );
+	merr.setExternalHandler( dynamic_cast<MinisipTextUI*>(gui) );
         LogEntry::handler = NULL;
 #else //!TEXT_UI
 #ifdef GTK_GUI
@@ -349,10 +350,11 @@ void Minisip::run(){
 //		gui->handleCommand(pupd);
 
 #ifdef TEXT_UI
-		if (debugtextui){
-			debugtextui->displayMessage("");
-			debugtextui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
-			debugtextui->displayMessage("");
+		MinisipTextUI * textui = dynamic_cast<MinisipTextUI *>(gui);
+		if (textui){
+			textui->displayMessage("");
+			textui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
+		textui->displayMessage("");
 		}
 #endif
                 sip->run();
