@@ -30,6 +30,8 @@
 
 #define POS 5
 
+class SoundSource;
+
 class SpAudio{
 
  public:
@@ -50,12 +52,15 @@ class SpAudio{
   */
 
   int32_t spatialize (short *input,
+		  /*
 		      short *leftch,
 		      short *rightch,
 		      short *lookupleft,
 		      short *lookupright,
 		      int32_t position,
 		      int32_t pointer,
+		      */
+		      MRef<SoundSource *> src,
 		      short *outbuff);
 
 

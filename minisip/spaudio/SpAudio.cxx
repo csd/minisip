@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <iostream>
 #include "SpAudio.h"
+#include"../soundcard/SoundIO.h"
 #include<libmutil/MemObject.h>
 
 
@@ -74,40 +75,43 @@ SpAudio::SpAudio(int32_t numPos){
 */
 
 int32_t SpAudio::spatialize(short *input,
+		/*
 			    short *leftch,
 			    short *rightch,
 			    short *lookupleft,
 			    short *lookupright,
 			    int32_t position,
 			    int32_t pointer,
+			    */
+			    MRef<SoundSource *> src,
 			    short *outbuff)
 {
   
-  static int32_t j=0,k=0;
+//  static int32_t j=0,k=0;
 
   for(int32_t i=0;i<1764;i++){
     if(i%2 == 0){
-      leftch[(j+lchdelay[position])%950]=input[i];
-      j=(j+1)%950;
+      src->leftch[(src->j+lchdelay[src->position])%950]=input[i];
+      src->j=(src->j+1)%950;
     }
 
     else {
-      rightch[(k+rchdelay[position])%950]=input[i];
-      k=(k+1)%950;
+      src->rightch[(src->k+rchdelay[src->position])%950]=input[i];
+      src->k=(src->k+1)%950;
     }
   }
 
   for(int32_t i=0; i<882;i++){
-    outbuff[(2*i)]=lookupleft[leftch[pointer]+32768];
-    outbuff[(2*i)+1]=lookupright[rightch[pointer]+32768];
-    pointer=(pointer+1)%950;
+    outbuff[(2*i)]=src->lookupleft[src->leftch[src->pointer]+32768];
+    outbuff[(2*i)+1]=src->lookupright[src->rightch[src->pointer]+32768];
+    src->pointer=(src->pointer+1)%950;
   }
-  return pointer;
+  return src->pointer;
 }
 
 
 int32_t SpAudio::assignPos(int row,
 			   int col)
 {
-  return assmatrix[row][col];
+  return assmatrix[row-1][col-1];
 }

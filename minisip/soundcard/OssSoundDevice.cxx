@@ -46,7 +46,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 	int mode = O_WRONLY; 	
 	/* FIXME */
-	this->fragment_setting = 0x00080008;
+	this->fragment_setting = 0x00100008;
 	
 	fdPlayback = ::open( dev.c_str(), mode );
 	

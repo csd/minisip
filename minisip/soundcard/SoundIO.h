@@ -150,20 +150,25 @@ class SoundSource : public MObject{
 
 		SRC_STATE* getSrcState();
 		*/
+		void initLookup(int32_t nSources);
 	private:
 		int sourceId;
 		
         protected:
-		int32_t sourcePos;
+		int32_t position;
 		double sampRate;
-		short *leftChannelBuffer;
-		short *rightChannelBuffer;
+		short *leftch;
+		short *rightch;
 		short *lookupleft;
 		short *lookupright;
 		int32_t pointer;
 		int32_t numSources;
 		SRC_DATA *src_data;
 		SRC_STATE *src_state;
+		int32_t j;
+		int32_t k;
+
+		friend class SpAudio;
 
 };
 
@@ -206,7 +211,6 @@ class BasicSoundSource: public SoundSource{
 			       int32_t osize); */
 
 
-		void initLookup(int32_t nSources);
 
 
 //		void addLatest(short *dest, int32_t nMono, int factor=1);
