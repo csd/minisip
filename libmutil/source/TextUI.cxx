@@ -35,6 +35,7 @@
 #endif
 #include<unistd.h>
 #include<libmutil/trim.h>
+//#include<libmnetutil/UDPSocket.h>
 
 #include<iostream>
 
@@ -124,18 +125,47 @@ void TextUI::displayMessage(string msg, int style){
 }
 
 void TextUI::guimain(){
+//	fd_set set;
+//	UDPSocket ispaceSocket(false, 3300);
 	cout << promptText << "$ "<< flush;
 	while (1){
 		char c;
 #ifdef LINUX
-		/*int n =*/ read(STDIN_FILENO, &c, 1);
+/*		FD_ZERO(&set);
+		FD_SET(STDIN_FILENO, &set);
+		FD_SET(ispaceSocket.getFd(), &set);
+
+
+		int avail;
+		do{
+			avail = select(ispaceSocket.getFd()+1,&set,NULL,NULL,NULL );
+		} while( avail < 0 );
+		displayMessage("Awake!");
+		
+                if( FD_ISSET( STDIN_FILENO, &set )){
+                        displayMessage("data on STDIN");
+*/
+		read(STDIN_FILENO, &c, 1);
+/*			keyPressed(c);
+                }else{
+                        displayMessage("data on iSpace connection");
+                        char buf[66000];
+                        for (int i=0; i< 1600; i++)
+                                buf[i]=0;
+                        ispaceSocket.recv(buf, 66000);
+                        input = string(buf);
+			for (unsigned e=0; e< input.size(); e++)
+				keyPressed(input[e]);
+                        c='\n';
+			keyPressed(c);
+                }
+*/
 #endif
 #ifdef WIN32
 		c= _getch();
 //		displayMessage(string("read: ")+c+"("+itoa((int)c)+")");
 #endif
 
-		keyPressed(c);
 
 		string command;
 		string autocomplete;
