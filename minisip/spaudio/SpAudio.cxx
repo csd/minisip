@@ -30,7 +30,7 @@
 
 
 #define POS 5       //number of positions in the spatial audio scheme
-
+#define MAXSOURCES 10
 
 /**
  * Definition of the delay values depending on the position.
@@ -44,7 +44,16 @@ int32_t SpAudio::rchdelay[POS]={0,36,0,0,0};
  ** on the number of calls being maintained
  **/
 
-int32_t SpAudio::assmatrix[POS][POS]={{3,1,1,1,1},{0,5,5,5,5},{0,0,3,2,2},{0,0,0,4,4},{0,0,0,0,3}};
+int32_t SpAudio::assmatrix[MAXSOURCES][MAXSOURCES]={{3,1,1,1,1,1,1,1,1,1},
+						    {0,5,5,5,5,5,5,5,5,5},
+						    {0,0,3,2,2,2,2,2,2,2},
+						    {0,0,0,4,4,4,4,4,4,4},
+						    {0,0,0,0,3,3,3,3,3,3}
+						    {0,0,0,0,0,3,1,1,1,1}
+						    {0,0,0,0,0,0,5,5,5,5}
+						    {0,0,0,0,0,0,0,3,2,2}
+						    {0,0,0,0,0,0,0,0,4,4}
+						    {0,0,0,0,0,0,0,0,0,3}};
 
 
 SpAudio::SpAudio(int32_t numPos){
