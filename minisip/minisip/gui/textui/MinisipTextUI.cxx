@@ -323,7 +323,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	    if(inCall==true && p2tmode==true){
 	    	
 	    	int status=0;
-		for(int k=0;k<cmd.getParam2().size();k++) 
+		for(uint32_t k=0;k<cmd.getParam2().size();k++) 
 			status = (status*10) + (cmd.getParam2()[k]-'0');
 	    	
 		grpList->getUser(cmd.getParam())->setStatus(status);
@@ -392,6 +392,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 
 bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
 	cout << "ERROR: MinisipTextUI::configDialog is not implemented"<< endl;
+	return false;
 }
 
 void MinisipTextUI::showCalls(string command){
@@ -422,7 +423,7 @@ void MinisipTextUI::showTransactions(string command){
 	}else{
 		itno = atoi(tno.c_str());
 
-		if (calls.size()-1>=itno){
+		if (((int)calls.size())-1>=itno){
 			list<MRef<SipDialog*> >::iterator call = calls.begin();
 			for (int j=0; j < itno; j++)
 				call++;
@@ -471,7 +472,7 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 //	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-	for (int j=0; j< torequests.size(); j++,jj++){
+	for (uint32_t j=0; j< torequests.size(); j++,jj++){
 		if ( *d == *((*jj).get_subscriber()) ){
 			int ms= (*jj).get_ms_to_timeout();
 			displayMessage("            timeout: "+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
@@ -501,7 +502,7 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 
 			int ntimeouts=0;
 			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-			for (int j=0; j< torequests.size(); j++, jj++){
+			for (uint32_t j=0; j< torequests.size(); j++, jj++){
 				if ( *((*i)) == *((*jj).get_subscriber()) ){
 					int ms= (*jj).get_ms_to_timeout();
 					displayMessage(string("                        timeout: ")
@@ -636,13 +637,13 @@ void MinisipTextUI::showGroupList(){
 
     if(grpList->getAllMember().size()>0){
         displayMessage("Members:", bold);
-    	for(int k=0;k<grpList->getAllMember().size();k++)
+    	for(uint32_t k=0;k<grpList->getAllMember().size();k++)
         	displayMessage(grpList->getAllMember().at(k));
     }
 
     if(grpList->getAllUser().size()>0){
     	displayMessage("Participants:", bold);
-        for(int k=0;k<grpList->getAllUser().size();k++)
+        for(uint32_t k=0;k<grpList->getAllUser().size();k++)
         	displayMessage(grpList->getAllUser().at(k)->getUri() + " (" + 
 			itoa(grpList->getAllUser().at(k)->getPriority()) + ") " +
 			P2T::getStatus(grpList->getAllUser().at(k)->getStatus()));
@@ -770,7 +771,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		showCalls(command);
 
 		list<MRef<SipDialog*> > calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
-		for (int i=0; i<calls.size(); i++){
+		for (uint32_t i=0; i<calls.size(); i++){
 			showTransactions("show transactions "+itoa(i));
 		}
 		showTimeouts(command);
@@ -823,15 +824,15 @@ void MinisipTextUI::guiExecute(string cmd){
 
 			string s_cmd = "";
 			string s_param = "";
-			int x = 4;
-			for(x;x<command.size();x++) {
+			uint32_t x = 4;
+			for( ;x<command.size();x++) {
 				if (command[x]!=' ')
 					s_cmd+=command[x];
 				else
 					break;
 			}
 			x++;
-			for(x;x<command.size();x++)
+			for( ;x<command.size();x++)
 				s_param+=command[x];
 
 			CommandString command("",s_cmd, s_param);
@@ -1019,7 +1020,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		string server="";
 		string s_port = "";
 		int port=0;
-		int x=0;
+		uint32_t x=0;
 		
 		displayMessage(command.substr(9,7));
 		
@@ -1029,7 +1030,7 @@ void MinisipTextUI::guiExecute(string cmd){
 			x=9;
 		
 		//parse server
-		for(x;x<command.size();x++){
+		for( ;x<command.size();x++){
 			if(command[x]==':')
 				break;
 			else if(command[x]=='/') {
@@ -1054,7 +1055,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		}
 		
 		//parse file
-		for(x;x<command.size();x++){
+		for( ;x<command.size();x++){
 			file+=command[x];
 		}
 		
@@ -1062,7 +1063,7 @@ void MinisipTextUI::guiExecute(string cmd){
 			port=80;
 		}
 		else{
-			for(int k=0;k<s_port.size();k++) {
+			for(uint32_t k=0;k<s_port.size();k++) {
 				port = (port*10) + (s_port[k]-'0');
 			}
 		}
