@@ -173,12 +173,12 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 		try{
 			certificate * cert = new certificate( certFile );
 			this->cert->add_certificate( cert );
-			iCertFile ++;
-			certFile = parser->getValue("certificate_chain["+itoa(iCertFile)+"]","");
 		}
 		catch( certificate_exception * exc ){
 			merr << "Could not open the given certificate" << end;
 		}
+		iCertFile ++;
+		certFile = parser->getValue("certificate_chain["+itoa(iCertFile)+"]","");
 
 	}
 
@@ -189,12 +189,12 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 	while( certFile != ""){
 		try{
 			cert_db->add_file( certFile );
-			iCertFile ++;
-			certFile = parser->getValue("ca_file["+itoa(iCertFile)+"]","");
 		}
 		catch( certificate_exception *exc){
 			merr << "Could not open the CA certificate" << end;
 		}
+		iCertFile ++;
+		certFile = parser->getValue("ca_file["+itoa(iCertFile)+"]","");
 
 	}
 	iCertFile = 0;
@@ -204,12 +204,12 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 	while( certFile != ""){
 		try{
 			cert_db->add_directory( certFile );
-			iCertFile ++;
-			certFile = parser->getValue("ca_dir["+itoa(iCertFile)+"]","");
 		}
 		catch( certificate_exception *exc){
 			merr << "Could not open the CA certificate directory " << certFile << end;
 		}
+		iCertFile ++;
+		certFile = parser->getValue("ca_dir["+itoa(iCertFile)+"]","");
 	}
 }
 			
