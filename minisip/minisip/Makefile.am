@@ -15,6 +15,7 @@ AM_LDFLAGS = @LDFLAGS@ @AVCODEC_LDFLAGS@
 AM_CXXFLAGS = @CXXFLAGS@
 AM_CPPFLAGS = @CPPFLAGS@
 
+	
 
 if GTK_GUI
 AM_LDFLAGS +=  @GLADEMM_LIBS@
@@ -30,23 +31,30 @@ minisip_LDADD = gui/qtgui/libminisip_qtgui.a
 endif !TEXT_UI
 endif !GTK_GUI
 
+
+
 minisip_LDADD +=gui/libminisip_gui.a \
                 libminisip.a \
-                ../sip/libsip.a \
-                ../sdp/libsdp.a \
+                ../sip/libsip.a
+
+if IPSEC_SUPPORT
+minisip_LDADD +=../ipsec/libmsipipsecapi.a
+endif
+
+
+minisip_LDADD +=../sdp/libsdp.a \
 		contactdb/libcontactdb.a \
                 ../p2t/libp2t.a \
                 ../mediahandler/libmediahandler.a
+
+
 
 if VIDEO_SUPPORT
 minisip_LDADD += ../video/libvideo.a
 AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
 endif
 
-if IPSEC_SUPPORT
-minisip_LDADD += ../ipsec/libmsipipsecapi.a
-AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
-endif
+
                 
 minisip_LDADD +=../rtp/librtp.a \
                 ../minisip/gui/libminisip_gui.a \
@@ -57,7 +65,7 @@ minisip_LDADD +=../rtp/librtp.a \
 		ipprovider/libipprovider.a \
                 ../stun/libstun.a
 
-		
+	
 
 minisip_SOURCES = Minisip.cxx
 #main.cxx
@@ -68,3 +76,5 @@ noinst_HEADERS  = Bell.h \
                   ConsoleDebugger.h \
 		  LogEntry.h \
 		  Minisip.h
+
+

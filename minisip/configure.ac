@@ -122,9 +122,10 @@ ipsec_enable=no
 AC_ARG_ENABLE(ipsec-enable,
     [ --enable-ipsec-enable enables ipsec features (default disabled)],
     [	ipsec_enable=yes
+	AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
+	  [Could not locate libipsec, required for ipsec features.])])
 	AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])])
 AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
-
 
 
 

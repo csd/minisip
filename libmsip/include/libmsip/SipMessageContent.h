@@ -50,4 +50,21 @@ class SipMessageContent : public virtual MObject{
         virtual std::string getContentType()=0;
 };
 
+class SipMimeContent : public SipMessageContent{
+	public:
+		SipMimeContent(std::string ContentType, std::string Message="", std::string boundry= "boun=_dry");
+		virtual std::string getString();
+		virtual std::string getContentType();
+		virtual std::string getMemObjectType(){return "MSipMimeContent";}
+		void addPart(MRef<SipMessageContent*> part);
+		MRef<SipMessageContent*> popFirstPart();
+	private:
+		std::string Message;
+		std::string ContentType;
+		std::string boundry;
+		std::list <MRef<SipMessageContent*> > parts;
+};
+
+
+
 #endif

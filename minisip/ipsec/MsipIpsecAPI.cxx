@@ -21,7 +21,6 @@
 */
 
 #include <fcntl.h> 
-#include <libpfkey.h>
 #include <config.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -32,11 +31,12 @@
 #include <libmikey/MikeyCsIdMap.h>
 #include <libmikey/MikeyMessage.h>
 #include <libmikey/MikeyPayloadSP.h>
-#include<libmikey/MikeyException.h>
+#include <libmikey/MikeyException.h>
 #include <string.h>
 #include <unistd.h>
-
-
+extern "C" {
+#include <libpfkey.h>
+}
 //---------------------------------------------------------------------------------------------------//
 //---------------------------------------------------------------------------------------------------//
 //Minisip IpSec API
@@ -68,7 +68,7 @@ MsipIpsecAPI::~MsipIpsecAPI(){
 //-MsipIpsecAPI-PUBLIC-------------------------------------------------------------------------------//
 //---------------------------------------------------------------------------------------------------//
 // Construct offer MIKEY
-MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecOffer(){
+MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 	MikeyMessage * message;
 	
 	try{
@@ -101,7 +101,7 @@ MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecOffer(){
 		
 		string b64Message = message->b64Message();
 		delete message;
-		return new MikeyPacket(b64Message);
+		return new SipMimeContent("application/mikey", b64Message);
 	}
 	catch( certificate_exception * exc ){
 		// FIXME: tell the GUI
@@ -120,7 +120,7 @@ MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecOffer(){
 
 //---------------------------------------------------------------------------------------------------//
 // Handle offered MIKEY
-bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<MikeyPacket *> MikeyM){
+bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
 	if( MikeyM->getContentType() == "application/mikey" && securityConfig.use_ipsec){
 		if( !responderAuthenticate( MikeyM->getString() ) ){
 			string errorString =  "Incoming key management message could not be authenticated";
@@ -157,7 +157,7 @@ bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<MikeyPacket *> MikeyM){
 
 //---------------------------------------------------------------------------------------------------//
 // Construct responder MIKEY
-MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecAnswer(){
+MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 	if( securityConfig.use_ipsec && initMSipIpsec() ){
 		// string keyMgmtAnswer;
 		// Generate the key management answer message
@@ -227,7 +227,7 @@ MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecAnswer(){
                                 ((KeyAgreementDH *)*ka)->computeTgk();
 			if(start() == -1)
 				return NULL;
-			return new MikeyPacket(responseMessage->b64Message());
+			return new SipMimeContent("application/mikey", responseMessage->b64Message());
 		}
 	}
 	return NULL;
@@ -235,7 +235,7 @@ MRef<MikeyPacket *> MsipIpsecAPI::getMikeyIpsecAnswer(){
 
 //---------------------------------------------------------------------------------------------------//
 //Handle responded MIKEY
-bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<MikeyPacket *> MikeyM){
+bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 
 	if (MikeyM->getContentType() != "application/mikey")
 		return false;

@@ -46,6 +46,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
+#include<libmsip/SipMessageContent.h>
 #include"DefaultDialogHandler.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
@@ -57,6 +58,8 @@
 #include<libmsip/SipCommandString.h>
 #include"../mediahandler/MediaHandler.h"
 #include<libmutil/MemObject.h>
+
+
 
 /*
                                                              a13:reject/send40X
@@ -902,28 +905,47 @@ void SipDialogVoip::sendInvite(const string &branch){
 	/* Get the session description from the Session */
 		
 //      There might be so that there are no SDP. Check!
-	MRef<SdpPacket *> sdp = mediaSession->getSdpOffer();
-	
-	if( !sdp ){
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+		sdp = mediaSession->getSdpOffer();
+		if( !sdp ){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
 		merr << "Sdp was NULL in sendInvite" << end;
 		return; 
+		}
 	}
+	
 	/* Add the latter to the INVITE message */ // If it exists
-	inv->setContent( *sdp );
-//-------------------------------------------------------------------------------------------------------------//
-//-------------------------------------------------------------------------------------------------------------//
-	// Create a MIKEY message for IPSEC if stated in the config file.
 	
-//-------------------------------------------------------------------------------------------------------------//
 
+//-------------------------------------------------------------------------------------------------------------//
+#ifdef IPSEC_SUPPORT	
+	// Create a MIKEY message for IPSEC if stated in the config file.
+	MRef<SipMimeContent*> mikey;
+	if (ipsecSession){
+		mikey = ipsecSession->getMikeyIpsecOffer();
+		if (!mikey){
+			merr << "Mikey was NULL in sendInvite" << end;
+			return; 
+		}
+	}
+	MRef<SipMimeContent*> multi;
+	if (ipsecSession && mediaSession){
+		multi = new SipMimeContent("multipart/mixed");
+		multi->addPart(*mikey);
+		multi->addPart(*sdp);
+		inv->setContent( *multi);
+	}
+	if (ipsecSession && !mediaSession)
+		inv->setContent( *mikey);
+	if (!ipsecSession && mediaSession)
+		inv->setContent( *sdp );
+#else
 	
-//-------------------------------------------------------------------------------------------------------------//
-//-------------------------------------------------------------------------------------------------------------//
-	// If there exist a MIKEY message for IPSEC, add it.
-	// inv->addContent
+	inv->setContent( *sdp );
+#endif
 //-------------------------------------------------------------------------------------------------------------//
 	
 #ifdef MINISIP_MEMDEBUG

@@ -39,6 +39,9 @@
 /* Define to 1 if you have the `gdi32' library (-lgdi32). */
 #undef HAVE_LIBGDI32
 
+/* Define to 1 if you have the `ipsec' library (-lipsec). */
+#undef HAVE_LIBIPSEC
+
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 

@@ -27,23 +27,15 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>
 
-class MikeyPacket : public SipMessageContent{
-	public:
-		MikeyPacket(string b64Message) {this->b64Message = b64Message;}
-		virtual std::string getString() {return b64Message;}
-		virtual std::string getContentType() {return "application/mikey";}
-		virtual std::string getMemObjectType(){return "MikeyPacket";}
-	private:
-		string b64Message;
-};
+
 
 class MsipIpsecRequest{
 	public:
 		MsipIpsecRequest(struct sockaddr * src, struct sockaddr * dst, int so, u_int32_t seq, int otype);
 		~MsipIpsecRequest();
-		virtual int set();	// -1 = error, 0 = already exist
-		virtual int update();	// -1 = error, 0 = no change
-		virtual int remove();	// -1 = error, 0 = don't exist
+		virtual int set()=0;	// -1 = error, 0 = already exist
+		virtual int update()=0;	// -1 = error, 0 = no change
+		virtual int remove()=0;	// -1 = error, 0 = don't exist
 		bool exist;
 		int so;
 		u_int32_t seq;
@@ -124,13 +116,13 @@ class MsipIpsecAPI : public MObject{
 		virtual std::string getMemObjectType(){return "MsipIpsecAPI";}
 
 		// Get initial MIKEY offer
-		MRef<MikeyPacket *> getMikeyIpsecOffer();
+		MRef<SipMimeContent*> getMikeyIpsecOffer();
 		// Handle received offer
-		bool setMikeyIpsecOffer(MRef<MikeyPacket *> MikeyM);
+		bool setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM);
 		// Build answer
-		MRef<MikeyPacket *> getMikeyIpsecAnswer();
+		MRef<SipMimeContent*> getMikeyIpsecAnswer();
 		// Handle received answer
-                bool setMikeyIpsecAnswer(MRef<MikeyPacket *> MikeyM);
+                bool setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM);
 		//Remove SA and policy from kernel, -1 == error
 		int stop();
 		//Write SA and policy to kernel -1 == error

@@ -17,6 +17,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipTimers.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \
+		     source/SipMIMEContent.cxx \
                      source/transactions/SipTransactionUtils.cxx \
                      source/transactions/SipTransaction.cxx \
 		     source/transactions/SipTransactionClient.cxx \
