@@ -291,7 +291,6 @@ int OssSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 	int nWrittenBytes = 0;
 	int totalBytesWritten = 0;
 	int nBytesToWrite = nSamples * getSampleSizePlay();
-	cerr << getSampleSizePlay() << endl;
 
 	if( fdPlayback == -1 ){
 		return -1;
