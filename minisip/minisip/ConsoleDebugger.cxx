@@ -87,6 +87,24 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 	}else{
 		cerr << d->getName() << endl;
 	}
+	cerr << BOLD << "        SipDialogState: "<< PLAIN;
+	cerr <<         "            secure="<<d->dialogState.secure 
+			<<"; localTag="<<d->dialogState.localTag
+			<<"; remoteTag="<<d->dialogState.remoteTag 
+			<<"; seqNo="<< d->dialogState.seqNo
+			<<"; remoteSeqNo="<< d->dialogState.remoteSeqNo
+			<<"; remoteUri="<< d->dialogState.remoteUri
+			<<"; remoteTarget="<<d->dialogState.remoteTarget
+			<<"; isEarly="<<d->dialogState.isEarly
+			<< endl;
+	cerr <<         "            route_set: ";
+	list<string>::iterator i;
+	for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
+		if (i!=d->dialogState.routeSet.begin())
+			cerr << ",";
+		cerr << *i;
+	}
+	cerr <<endl;
 	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();

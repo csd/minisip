@@ -472,6 +472,28 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, st
 	}else{
 		displayMessage(header + d->getName());
 	}
+
+	displayMessage("        SipDialogState:",bold);
+       cerr << BOLD << "        SipDialogState: "<< PLAIN;
+        displayMessage(
+                       string("            secure=") + (d->dialogState.secure?string("true"):string("false"))
+                        +"; localTag=" + d->dialogState.localTag
+                        +"; remoteTag=" + d->dialogState.remoteTag
+                        +"; seqNo=" + itoa(d->dialogState.seqNo)
+                        +"; remoteSeqNo=" + itoa(d->dialogState.remoteSeqNo)
+                        +"; remoteUri=" + d->dialogState.remoteUri
+                        +"; remoteTarget=" + d->dialogState.remoteTarget
+                        +"; isEarly=" + (d->dialogState.isEarly?string("true"):string("false"))
+		      );
+	string routeset;
+        list<string>::iterator i;
+        for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
+                if (i!=d->dialogState.routeSet.begin())
+                        routeset+= ",";
+                routeset+= *i;
+        }
+        displayMessage( string("            route_set: ")+routeset);
+	
 //	displayMessage("        Timeouts:", bold);
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
