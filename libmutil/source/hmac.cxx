@@ -27,6 +27,8 @@
 #ifndef NO_SECURITY
 
 #include <openssl/hmac.h>
+#include <libmutil/hmac.h>
+
 
 void hmac_sha1( unsigned char * key, unsigned int key_length,
 		unsigned char * data, unsigned int data_length,

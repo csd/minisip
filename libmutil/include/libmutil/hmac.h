@@ -21,6 +21,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef HMAC_H
+#define HMAC_H
+
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
 #define LIBMUTIL_API __declspec(dllexport)
@@ -30,10 +33,6 @@
 #else
 #define LIBMUTIL_API
 #endif
-
-#ifndef HMAC_H
-#define HMAC_H
-
 
 LIBMUTIL_API void hmac_sha1( unsigned char * key, unsigned int key_length,
                 unsigned char * data, unsigned int data_length,
