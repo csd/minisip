@@ -30,6 +30,7 @@
 #include<stdio.h>
 #include<fcntl.h>
 #include<iostream>
+#include<libmutil/print_hex.h>
 
 using namespace std;
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
@@ -42,29 +43,42 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 
 //        fprintf( stderr, "RTP payload size: %i\n", size );
 	
+        /*
 	encoder->rtpPayload[1] |= 
 		( ( context->coded_frame->pict_type == FF_P_TYPE )?1:0 << 4 );
-
+*/
 	uint32_t ts = (uint32_t) ( 90.0 * context->coded_frame->pts ) / 1000;
 	
-	memcpy( encoder->rtpPayload + 4, data, size );
+//	memcpy( encoder->rtpPayload + 4, data, size );
 
         encoder->mbCounter += packetNumber;
         bool endOfFrame = ( encoder->mbCounter == 
                         ((context->width+15)/16)*((context->height+15)/16) );
-//        cerr << "NB_MACROBLOCK: " << packetNumber << endl;
-//        cerr << "MACROBLOCK_COUNTER: " << encoder->mbCounter << endl;
-//        cerr << "PACKET_SIZE: " << size << endl;
-//        cerr << "WIDTH: " << context->width << endl;
-//        cerr << "HEIGHT: " << context->height << endl;
+/*        cerr << "NB_MACROBLOCK: " << packetNumber << endl;
+        cerr << "MACROBLOCK_COUNTER: " << encoder->mbCounter << endl;
+        cerr << "PACKET_SIZE: " << size << endl;
+        cerr << "WIDTH: " << context->width << endl;
+        cerr << "HEIGHT: " << context->height << endl;
+*/
 
         if( endOfFrame ){
+        //        fprintf( stderr, "End of frame, length = %i\n", size );
                 encoder->mbCounter = 0;
         }
-
+        
+        /* RFC2429 payload header
+         * RR = 0
+         * P = 1
+         * V = 0
+         * PLEN = 0
+         * PEBIT = 0
+         */
+        ((unsigned char *)data)[0] = 4;
+        //data[1] = 0;
 
 	if( encoder->getCallback() ){
-		encoder->getCallback()->sendVideoData( encoder->rtpPayload, size + 4, ts, endOfFrame );	
+		//encoder->getCallback()->sendVideoData( encoder->rtpPayload, size + 4, ts, endOfFrame );	
+		encoder->getCallback()->sendVideoData( (unsigned char *)data, size, ts, endOfFrame );	
 	}
 }
 
@@ -74,28 +88,29 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	avcodec_init();
 	avcodec_register_all();
 
-	codec = avcodec_find_encoder( CODEC_ID_H263 );
+	codec = avcodec_find_encoder( CODEC_ID_H263P );
 
 	if( codec == NULL ){
-		fprintf( stderr, "libavcodec does not support H.263" );
+		fprintf( stderr, "libavcodec does not support H263" );
 		exit( 1 );
 	}
 
 	context = avcodec_alloc_context();
+        fprintf( stderr,"context->flags %i\n", context->flags );
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
 	context->bit_rate = 1000000;
 	context->bit_rate_tolerance = 2*1024*1024;
 
-	context->frame_rate = 1000; 
-//	context->frame_rate = 15;
+//	context->frame_rate = 1000; 
+	context->frame_rate = 25; 
 	context->frame_rate_base = 1;
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
-        context->rc_max_rate = 1000000;
+        context->rc_max_rate = 2000000;
         context->rc_min_rate = 1000000;
-        context->rc_buffer_size = 1;
+        context->rc_buffer_size = 5000000;
 
 
 	context->rtp_mode = 1;
@@ -113,12 +128,12 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
         //context->qmin = 0;
         //context->mb_qmin = 0;
-        //context->qmax = 4;
-        context->qmax = 2;
+        context->qmax = 3;
         //context->mb_qmax = 10;
 //        context->flags |= CODEC_FLAG_QP_RD;
+        context->flags |= CODEC_FLAG_H263P_SLICE_STRUCT;
 	
-	context->gop_size = 0;
+	context->gop_size = 2;
 
 	context->thread_count = 1;
 
