@@ -80,7 +80,7 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
         if( soundDev != "" ){
 
                 MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
-                MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 8000 );
+                MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 44100 );
                 // FIXME: go through the codecs and add all
                 MRef<AudioMedia *> media = new AudioMedia( soundIo, new G711CODEC() );
                 registerMedia( *media );
