@@ -63,7 +63,7 @@
 class MObject;
 
 template<class OPType>
-class LIBMUTIL_API MRef{
+class MRef{
 	public:
 		MRef(){
 			objp=NULL;
@@ -99,9 +99,11 @@ class LIBMUTIL_API MRef{
 				int rc = objp->decRefCount();
 				if (rc<=0){
 					if (rc<0){
+#ifndef _MSC_VER
 						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count (" 
 							<< rc
 							<< ") - created without reference?" << end;
+#endif
 					}       
 					delete objp;
 				}
@@ -116,7 +118,9 @@ class LIBMUTIL_API MRef{
 
 				if (rc<=0){
 					if (rc<0){
+#ifndef _MSC_VER
 						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count - created without reference?"<<end;
+#endif
 					}       
 
 					delete objp;
@@ -146,7 +150,9 @@ class LIBMUTIL_API MRef{
 				int rc = objp->decRefCount();
 				if (rc<=0){
 					if (rc<0){
+#ifndef _MSC_VER
 						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count - created without reference?"<<end;
+#endif
 					}       
 
 					delete objp;

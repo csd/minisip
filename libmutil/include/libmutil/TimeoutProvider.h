@@ -95,7 +95,7 @@
  * @author Erik Eliasson
 */
 template<class TOCommand, class TOSubscriber>
-class LIBMUTIL_API TPRequest{
+class TPRequest{
 	public:
 		TPRequest(){}
 		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){

@@ -58,6 +58,8 @@ struct completion_cb_item{
 	
 };
 
+
+
 class LIBMUTIL_API TextUI{
 public:
 	static const int plain;

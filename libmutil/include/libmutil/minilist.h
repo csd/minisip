@@ -45,7 +45,7 @@
 
 //Node for single linked list
 template<class T>
-class LIBMUTIL_API node{
+class node{
 	public:
 		node(T v, node *next=NULL):value(v), next(next){}
 		node *getNext(){return next;}
@@ -59,7 +59,7 @@ class LIBMUTIL_API node{
 };
 
 template<class T>
-class LIBMUTIL_API minilist{
+class minilist{
 	public:
 		
 		minilist():head(NULL),end(NULL),nelem(0)
