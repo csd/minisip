@@ -62,15 +62,13 @@ class SoundSource : public MObject{
                                 bool isStereo=false)=0;
 
  /**
-                 * @param dest          Buffer to which samples will be "dequeued".
-                 * @param nMono         Number of samples per channel to retrieve.
-                 * @param stereo        Indicates if one or two channels will be retrieved
-                 * @param dequeue       Indicates of the retrieved samples should be removed
+                 * @param dest          Buffer to which samples will be 
+                 *                      "dequeued".
+                 * @param dequeue       Indicates of the retrieved 
+                 *                      samples should be removed
                  *                      from the queue.
                  */
                 virtual void getSound(short *dest,
-                                      int32_t nMono,
-                                      bool stereo,
                                       bool dequeue=true)=0;
 
                 virtual std::string getMemObjectType(){return "SoundSource";};
@@ -86,13 +84,10 @@ class SoundSource : public MObject{
                 int32_t getPointer();
 
                 void setPointer(int32_t wpointer);
-
-		void resample( short * input, short * output );
         private:
                 int sourceId;
 
         protected:
-		MRef<Resampler *> resampler;
                 int32_t position;
                 double sampRate;
                 short *leftch;
@@ -114,19 +109,26 @@ class BasicSoundSource: public SoundSource{
         public:
                 /**
                  * Implementation of very simple queueing algorithm.
-                 * @param id            Identifier of sound source that is generating audio for
+                 * @param id            Identifier of sound source that
+                 *                      is generating audio for
                  *                      stream.
-                 * @param pcl           Packet loss concealment provider. The codec that is used
-                 *                      to decode the audio data can provide a PLC mechanism.
+                 * @param pcl           Packet loss concealment provider. 
+                 *                      The codec that is used
+                 *                      to decode the audio data can 
+                 *                      provide a PLC mechanism.
+		 * @param position      Position for spatial audio
+                 * @param oFreq         Output frquency
+                 * @param oDurationMs   Output duration (in ms)
+                 * @param oNChannels    Output number of channels
                  * @param buffersize    Number of samples in buffer (per channel)
                  */
   BasicSoundSource(int32_t id,
                    SoundIOPLCInterface *plc,
                    int32_t position,
-                   int32_t nSources,
-                   double sRate,
-                   int32_t frameSize,
-                   int32_t buffernmonosamples=16000);
+		   uint32_t oFreq,
+		   uint32_t oDurationMs,
+		   uint32_t oNChannels,
+                   int32_t buffersize=16000);
 
                 virtual ~BasicSoundSource();
 
@@ -138,8 +140,6 @@ class BasicSoundSource: public SoundSource{
 
 
                 virtual void getSound(short *dest,
-                                      int32_t nMono,
-                                      bool stereo,
                                       bool dequeue=true);
         private:
                 SoundIOPLCInterface *plcProvider;
@@ -147,7 +147,12 @@ class BasicSoundSource: public SoundSource{
                 int32_t bufferSizeInMonoSamples;
                 short *playoutPtr;
                 short *firstFreePtr;
+                short *temp;
                 int32_t lap_diff; //roll over counter
+		uint32_t oFrames;
+		uint32_t iFrames;
+		uint32_t oNChannels;
+		MRef<Resampler *> resampler;
 
 };
 

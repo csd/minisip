@@ -24,8 +24,13 @@
 #include<config.h>
 #include<iostream>
 #include"SoundSource.h"
+#include<libmutil/mtime.h>
 
 SoundSource::SoundSource(int id):sourceId(id){
+	leftch = NULL;
+	rightch = NULL;
+	lookupright = NULL;
+	lookupleft = NULL;
 }
 
 void SoundSource::setPointer(int32_t wpointer){
@@ -44,40 +49,38 @@ void SoundSource::setPos(int32_t position){
 	this->position=position;
 }
 
-void SoundSource::resample( short * input, short * output ){
-	resampler->resample( input, output );
-}
-
-
 BasicSoundSource::BasicSoundSource(int32_t id,
                                    SoundIOPLCInterface *plc,
                                    int32_t position,
-                                   int32_t nSources,
-                                   double sRate,
-                                   int32_t frameSize,
-                                   int32_t bufferNMonoSamples):
+                                   uint32_t oFreq,
+                                   uint32_t oDurationMs,
+				   uint32_t oNChannels,
+				   int32_t bufferSizeInMonoSamples):
+		bufferSizeInMonoSamples(bufferSizeInMonoSamples),
                 SoundSource(id),
                 plcProvider(plc),
-                bufferSizeInMonoSamples(bufferNMonoSamples),
                 playoutPtr(0),
                 firstFreePtr(0),
                 lap_diff(0)
 {
-        stereoBuffer = new short[bufferNMonoSamples*2];
+        stereoBuffer = new short[bufferSizeInMonoSamples*2];
         firstFreePtr = stereoBuffer;
         playoutPtr = stereoBuffer;
         this->position=position;
-        numSources=nSources;
-        sampRate=sRate;
+
+	oFrames = ( oDurationMs * oFreq ) / 1000;
+	iFrames = ( oDurationMs * 8000 ) / 1000;
+	this->oNChannels = oNChannels;
 	
-	resampler = Resampler::create( 8000, SOUND_CARD_FREQ, 20, 2 );
+	resampler = Resampler::create( 8000, oFreq, oDurationMs, oNChannels );
+
+	temp = new short[iFrames * oNChannels];
 
         /* spatial audio initialization */
         leftch = new short[1028];
         rightch = new short[1028];
         lookupleft = new short[65536];
         lookupright = new short[65536];
-//      initLookup(numSources);
         pointer = 0;
         j=0;
         k=0;
@@ -85,6 +88,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 }
 
 BasicSoundSource::~BasicSoundSource(){
+	delete [] temp;
         delete [] stereoBuffer;
         delete [] leftch;
         delete [] rightch;
@@ -142,8 +146,6 @@ void BasicSoundSource::pushSound(short * samples,
 
 int nget=1;
 void BasicSoundSource::getSound(short *dest,
-                int32_t nMono,
-                bool stereo,
                 bool dequeue)
 {
         nget++;
@@ -161,9 +163,9 @@ void BasicSoundSource::getSound(short *dest,
         }
         counter++;
 #endif
-        if ((!lap_diff && (firstFreePtr-playoutPtr< nMono*2)) ||
+        if ((!lap_diff && (firstFreePtr-playoutPtr< iFrames*oNChannels)) ||
                         (lap_diff && (firstFreePtr-stereoBuffer+
-                        endOfBufferPtr-playoutPtr<nMono*2))){
+                        endOfBufferPtr-playoutPtr<iFrames*oNChannels))){
 
                 /* Underflow */
 #ifdef DEBUG_OUTPUT
@@ -171,32 +173,39 @@ void BasicSoundSource::getSound(short *dest,
 #endif
                 if (plcProvider){
                         cerr << "PLC!"<< endl;
-                        short *b = plcProvider->get_plc_sound(nMono);
-                        memcpy(dest, b, nMono);
+                        short *b = plcProvider->get_plc_sound((int32_t)oFrames);
+                        memcpy(dest, b, oFrames);
                 }else{
 
-                        for (int32_t i=0; i < nMono * (stereo?2:1); i++){
+                        for (int32_t i=0; i < iFrames * oNChannels; i++){
                                 dest[i]=0;
                         }
                 }
                 return;
         }
 
-        if (stereo){
-                for (int32_t i=0; i<nMono*2; i++){
-                        dest[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
+//        if (stereo){
+                for (int32_t i=0; i<iFrames*oNChannels; i++){
+                        temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
                                         (bufferSizeInMonoSamples*2) ];
                 }
+#if 0
         }else{
                 for (int32_t i=0; i<nMono; i++){
-                        dest[i]=stereoBuffer[((playoutPtr-stereoBuffer)+i*2)%
-                                                (bufferSizeInMonoSamples*2) ]/2;                        dest[i]+=stereoBuffer[((playoutPtr-stereoBuffer)+i*2+1)%                                                (bufferSizeInMonoSamples*2) ]/2;                }
+                        temp[i]=stereoBuffer[((playoutPtr-stereoBuffer)+i*2)%
+                                                (bufferSizeInMonoSamples*2) ]/2;
+			temp[i]+=stereoBuffer[((playoutPtr-stereoBuffer)+i*2+1)%                                                (bufferSizeInMonoSamples*2) ]/2;
+		}
         }
-        if (playoutPtr+nMono*2>=endOfBufferPtr)
+#endif
+        if (playoutPtr+oFrames*oNChannels>=endOfBufferPtr)
                 lap_diff=0;
 
         if (dequeue){
-                playoutPtr = stereoBuffer + ((playoutPtr-stereoBuffer)+nMono*2)%                                                (bufferSizeInMonoSamples*2);
+                playoutPtr = stereoBuffer + ((playoutPtr-stereoBuffer)+
+			     oNChannels*iFrames ) % (bufferSizeInMonoSamples*2);
         }
+
+	resampler->resample( temp, dest );
 }
 

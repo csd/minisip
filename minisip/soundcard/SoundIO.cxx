@@ -306,7 +306,11 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
 //		(*i)->initLookup(nextSize);
 	}
-	sources.push_front(new BasicSoundSource(sourceId,plc,spAudio.assignPos(nextSize,nextSize),nextSize,8000,BS));
+	sources.push_front(
+		new BasicSoundSource( sourceId,plc,
+			spAudio.assignPos(nextSize,nextSize), 
+			/* Output parameters */
+			SOUND_CARD_FREQ, 20, 2 ));
 	queueLock.unlock();
 	sourceListCond.broadcast();
 }
@@ -431,16 +435,12 @@ void *SoundIO::playerLoop(void *arg){
 			buf = new short[nChannels * nFrames];
 		}
 
-		if( !tmpbuf ){
-			tmpbuf = new short[BS*nChannels];
-		}
-
 		if( !resbuf ){
-		  resbuf = new short[nChannels * nFrames];
+			resbuf = new short[nChannels * nFrames];
 		}
 		
 		if( !outbuf ){
-		  outbuf = new short[nChannels * nFrames];
+			outbuf = new short[nChannels * nFrames];
 		}
 		
 		memset( buf, '\0', nChannels * nFrames * sizeof( short ) );
@@ -448,10 +448,10 @@ void *SoundIO::playerLoop(void *arg){
 		for (list<MRef<SoundSource *> >::iterator 
 				i = active_soundcard->sources.begin(); 
 				i != active_soundcard->sources.end(); i++){
-			(*i)->getSound(tmpbuf, BS, nChannels - 1);
+
+			(*i)->getSound( resbuf );
 
 			/* spatial audio */
-			(*i)->resample( tmpbuf,resbuf );
 			(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
 
 			for (uint32_t j=0; j<nFrames*nChannels; j++){

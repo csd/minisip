@@ -26,22 +26,79 @@
 
 using namespace std;
 
-FileSoundSource::FileSoundSource(string filename, uint32_t id, bool rep):
+FileSoundSource::FileSoundSource(string filename, uint32_t id, 
+                uint32_t inputFreq,
+                uint32_t inputNChannels,
+                uint32_t outputFreq,
+                uint32_t outputDurationMs,
+                uint32_t outputNChannels,
+		bool rep):
                 SoundSource(id), 
                 enabled(false),
                 repeat(rep),
                 index(0)
 {
+        short * input;
         long l,m;
+        
         ifstream file (filename.c_str(), ios::in|ios::binary);
+        
         l = file.tellg();
         file.seekg (0, ios::end);
         m = file.tellg();
-        nSamples = (m-l)/2;
-        audio = new short[nSamples];
+        
+        nSamples = (m-l)/(sizeof(short)*inputNChannels);
+        cerr << "nSample: " << nSamples << endl;
+
+        nOutputFrames = ( outputDurationMs * outputFreq ) / 1000;
+        cerr << "nOutputFrames: " << nOutputFrames << endl;
+        
+        audio = new short[nSamples*outputNChannels];
+        input = new short[nSamples*inputNChannels];
+        
         file.seekg (0, ios::beg);
-        file.read( (char*)audio, nSamples*2);
+        file.read( (char*)input, nSamples*sizeof(short));
+
+        if( inputNChannels > outputNChannels ){
+                if( inputNChannels % outputNChannels == 0 ){
+                        /* do some mixing */
+                        for( uint32_t sample = 0; sample < nSamples; sample++ ){
+                                for( uint32_t oChannel = 0; oChannel < outputNChannels; oChannel++ ){
+                                        for( uint32_t i = 0; i < inputNChannels/outputNChannels; i++ ){
+                                                audio[sample*outputNChannels+oChannel] += input[sample*inputNChannels + oChannel + i*inputNChannels];
+                                        }
+                                        audio[sample*outputNChannels+oChannel] /= inputNChannels/outputNChannels;
+                                }
+                        }
+                }
+                else{
+                        /* Just take the first channels */
+                        for( uint32_t sample = 0; sample < nSamples; nSamples++ ){
+                                for( uint32_t oChannel = 0; oChannel < outputNChannels; oChannel++ ){
+                                        audio[sample*outputNChannels+oChannel] = input[sample*inputNChannels+oChannel];
+                                }
+                        }
+                }
+        }
+        else{
+                for( uint32_t sample = 0; sample < nSamples; nSamples++ ){
+                        for( uint32_t oChannel = 0; oChannel < outputNChannels; oChannel++ ){
+                                audio[sample*outputNChannels+oChannel] = input[sample*inputNChannels];
+                        }
+                }
+        }
+
+        nChannels = outputNChannels;
+
+        resampler = Resampler::create( inputFreq, outputFreq, outputDurationMs, outputNChannels );
+
+        delete [] input;
 }
+
+                
+                                        
+
+
 
 FileSoundSource::FileSoundSource(short *rawaudio, int samples, bool rep): 
                 SoundSource(0),
@@ -55,7 +112,7 @@ FileSoundSource::FileSoundSource(short *rawaudio, int samples, bool rep):
 }
 
 FileSoundSource::~FileSoundSource(){
-        delete audio;
+        delete [] audio;
         audio=NULL;
 }
 
@@ -82,37 +139,26 @@ void FileSoundSource::pushSound(short *samples,
 }
 
 
-void FileSoundSource::getSound(short *dest,
-        int32_t nMono,
-        bool stereo,
-        bool dequeue)
-{
-    if (index+nMono>=nSamples){
-	    if (repeat)
-		index = 0;
-	    else
-        	index=nSamples;
-    }
+void FileSoundSource::getSound( short *dest, bool dequeue ){
+        if( index + nOutputFrames >= nSamples ){
+                if (repeat)
+                        index = 0;
+                else
+                        index = nSamples;
+        }
 
-    int mul = stereo ? 2 : 1 ;
-
-    if (index==nSamples){
-        for (int i=0; i< nMono*mul; i++){
-            dest[i]=0;
+        if( index == nSamples ){
+                memset( dest, '\0', nOutputFrames*nChannels*sizeof(short) );
         }
-    }else{
-        for (int i=0; i<nMono; i++){
-            if (stereo){
-		    //cerr << "stereo" << endl;
-                dest[i*2] = dest[i*2+1] = audio[i+index];
-            }else{
-                dest[i] = audio[i+index];
-            }
+        else{
+                resampler->resample( audio + index, dest );
+                cerr << "audio + index: "  << print_hex( (unsigned char *)(audio + index), nOutputFrames*nChannels) << endl;
+                cerr << "dest: "  << print_hex( (unsigned char *)dest, nOutputFrames*nChannels) << endl;
+                
+                if (dequeue){
+                        index += nOutputFrames;
+                }
         }
-        if (dequeue){
-            index+=nMono;
-        }
-    }
 }
 
 

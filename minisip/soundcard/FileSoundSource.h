@@ -39,16 +39,25 @@ class FileSoundSource : public SoundSource{
     public:
         /**
          * 
-         * @arg filename        Name of a file containing raw audio
-         *                      samples (16 bit, mono).
-         * @arg repeat          If true the audio buffer will be played
-         *                      over and over again, if false only silence
-         *                      will be returned by the sound source after
-         *                      all samples have been played. The default
-         *                      is false.
-	 * @arg id              SoundSource id     
+         * @arg filename         Name of a file containing raw audio
+         *                       samples (16 bit, mono).
+	 * @arg outputFreq       Output frequency (in Hz)
+         * @arg outputDurationMs Output sample size (in ms)
+         * @arg outputNChannels  Output number of channels
+         * @arg repeat           If true the audio buffer will be played
+         *                       over and over again, if false only silence
+         *                       will be returned by the sound source after
+         *                       all samples have been played. The default
+         *                       is false.
+	 * @arg id               SoundSource id     
          */
-        FileSoundSource(string filename, uint32_t id, bool repeat=false);
+        FileSoundSource(string filename, uint32_t id, 
+			uint32_t inputFreq,
+			uint32_t inputNChannels, 
+			uint32_t outputFreq,
+			uint32_t outputDurationMs, 
+			uint32_t ouputNChannels, 
+			bool repeat=false);
 
 
         /**
@@ -106,8 +115,6 @@ class FileSoundSource : public SoundSource{
          * from the beginning if the <i>repeat</i> attribute is set.
          */
         virtual void getSound(short *dest,
-                                int32_t nMono,
-                                bool stereo,
                                 bool dequeue=true);
 
     private:
@@ -116,6 +123,10 @@ class FileSoundSource : public SoundSource{
         bool enabled;           /// true->playing, false->silence
         bool repeat;            /// Play the audio in a audio.
         int index;              /// Play out position
+        uint32_t nChannels;     /// number of channels to output
+        uint32_t nOutputFrames; /// number of frames to output
+
+        MRef<Resampler *> resampler;
 };
 
 
