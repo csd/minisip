@@ -30,6 +30,7 @@
 
 
 #include"../Gui.h"
+#include"DtmfWidget.h"
 #include<libmutil/Mutex.h>
 #include<libmutil/minilist.h>
 #include<libmutil/MemObject.h>
@@ -49,7 +50,7 @@ class LogEntry;
 class ImWidget;
 class ContactDb;
 
-class MainWindow : public Gui, public LogEntryHandler, public DbgHandler
+class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public DtmfHandler
 #ifdef OLDLIBGLADEMM
 		   ,public SigC::Object
 #endif
@@ -92,6 +93,8 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler
 		virtual void handle( MRef<LogEntry *> );
 		void removeCall( string callId );
 		void removeIm( string uri );
+
+                virtual void dtmfPressed( uint8_t symbol );
 
 	private:
 

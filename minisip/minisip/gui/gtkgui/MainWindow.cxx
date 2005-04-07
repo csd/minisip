@@ -29,6 +29,7 @@
 #include"PhoneBook.h"
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
+#include"DtmfWidget.h"
 #ifndef WIN32
 #include"TrayIcon.h"
 #endif
@@ -62,6 +63,9 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * callMenu;
 	Gtk::MenuItem * imMenu;
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
+#ifndef OLDLIBGLADEMM
+        Gtk::Expander * dtmfExpander;
+#endif
 
         registerIcons();
 
@@ -95,6 +99,14 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	refXml->get_widget( "callMenu", callMenu );
 	refXml->get_widget( "imMenu", imMenu );
+
+#ifndef OLDLIBGLADEMM
+        DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
+        dtmfWidget->setHandler( this );
+	refXml->get_widget( "dtmfExpander", dtmfExpander );
+        dtmfExpander->add( *dtmfWidget );
+#endif
+
 
 	treeSelection = phoneBookTreeView->get_selection();
 
@@ -632,4 +644,44 @@ void MainWindow::registerIcons(){
         factory->add_default();
         delete iconSet;
         delete iconSource;
+}
+
+void MainWindow::dtmfPressed( uint8_t symbol ){
+        Glib::ustring uri = uriEntry->get_text();
+        
+        switch( symbol ){
+                case 1:
+                        uri += "1";
+                        break;
+                case 2:
+                        uri += "2";
+                        break;
+                case 3:
+                        uri += "3";
+                        break;
+                case 4:
+                        uri += "4";
+                        break;
+                case 5:
+                        uri += "5";
+                        break;
+                case 6:
+                        uri += "6";
+                        break;
+                case 7:
+                        uri += "7";
+                        break;
+                case 8:
+                        uri += "8";
+                        break;
+                case 9:
+                        uri += "9";
+                        break;
+                case 0:
+                        uri += "0";
+                        break;
+        }
+
+        uriEntry->set_text( uri );
+                        
 }

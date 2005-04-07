@@ -35,7 +35,7 @@ noinst_HEADERS  = SoundIO.h \
 		  ${RESAMPLER_HDR}
 
 duplex: duplex.cxx libsoundcard.a
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -DDEBUG_OUTPUT -o duplex duplex.cxx libsoundcard.a $(LDFLAGS) $(LIBS) -lmutil
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o duplex duplex.cxx libsoundcard.a ../spaudio/libspaudio.a $(LDFLAGS) $(LIBS) -lmutil
 
 tone: tone.cxx libsoundcard.a
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -DDEBUG_OUTPUT -o tone tone.cxx libsoundcard.a $(LDFLAGS) $(LIBS) $(INCLUDES) -lmutil

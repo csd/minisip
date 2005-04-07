@@ -14,7 +14,8 @@ libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
 			      ImWidget.cxx \
 			      ContactDialog.cxx \
 			      AccountDialog.cxx \
-			      AccountsList.cxx
+			      AccountsList.cxx \
+			      DtmfWidget.cxx
 			  
 	
 
@@ -29,4 +30,5 @@ noinst_HEADERS  = MainWindow.h \
 		  ImWidget.h \
 		  ContactDialog.h \
 		  AccountDialog.h \
-		  AccountsList.h
+		  AccountsList.h \
+		  DtmfWidget.h

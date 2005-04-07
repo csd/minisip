@@ -154,13 +154,27 @@ dnl first check for libavcodec
 	CPPFLAGS="${CPPFLAGS} ${AVCODEC_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
 	
-	AC_CHECK_HEADER([avcodec.h], [], [AC_MSG_ERROR(
-	  [Could not locate avcodec header files. Please install libavcodec-devel.])])
-	AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
-	  [Could not locate libavcodec, required for video features.])])
+        AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no)
+        if test "${FFMPEG_CONFIG}" != "no"
+        then
+          CPPFLAGS="${CPPFLAGS} `ffmpeg-config --cflags`"
+          LIBS="`ffmpeg-config --libs avcodec` ${LIBS}"
+        else
+	  AC_CHECK_HEADER([avcodec.h], [],
+            [
+              AC_MSG_ERROR(
+	      [Could not locate avcodec header files. Please install 
+               the libavcodec-devel package.]
+              )
+            ]
+          )
+            
+	  AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
+	    [Could not locate libavcodec, required for video features.])])
 
-	AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
-	  [Could not find zlib, required by libavcodec.])])
+	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
+	    [Could not find zlib, required by libavcodec.])])
+        fi
 dnl	CPPFLAGS="${CPPFLAGS_SAVE}"
 dnl	LDFLAGS="${LDFLAGS_SAVE}"
         

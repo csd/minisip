@@ -61,7 +61,7 @@ int energy(short *buf, int n){
 
 class dummy: public SoundIOPLCInterface{
 	public:
-		virtual short *get_plc_sound(int &ret_size){
+		virtual short *get_plc_sound(uint32_t &ret_size){
 			cerr << "X"<< endl;
 			for (int i=0; i<SAMPLES_READ; i++)
 				sound[i]=0;
@@ -150,7 +150,7 @@ int main(int argc, char **argv){
 	cerr << "Starting player"<< endl;
 	sc.start_sound_player();
 	sleep( 1 );
-	sc.registerSource(34,NULL);
+	sc.registerSource(new BasicSoundSource( 34, NULL, 1, 8000, 20, 1));
 	cerr << "Starting recorder"<< endl;
 	sc.start_recorder();
 	

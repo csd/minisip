@@ -38,7 +38,7 @@ static vector<string> getLocalIPs(){
         vector<string> ifaces = NetworkFunctions::getAllInterfaces();
         for (unsigned i=0; i<ifaces.size(); i++){
 		string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-		merr << "Adding local ip: "<< ip <<  end;
+		mdbg << "Adding local ip: "<< ip <<  end;
 		ret.push_back(ip);
         }
         return ret;
@@ -47,14 +47,14 @@ static vector<string> getLocalIPs(){
 static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint16_t stunPort ){
 	
 #ifdef DEBUG_OUTPUT
-        merr << "Try 1, autodetect"<< end;
+        mdbg << "Try 1, autodetect"<< end;
 #endif
         if (phoneConf->findStunServerFromSipUri){
-                merr << "Using SIP uri: "<<phoneConf->inherited.sipIdentity->getSipUri()<< end;
+                mdbg << "Using SIP uri: "<<phoneConf->inherited.sipIdentity->getSipUri()<< end;
                 string useruri = phoneConf->inherited.sipIdentity->getSipUri();
                 if (useruri.find("@")!=string::npos){
                         string uridomain = useruri.substr(useruri.find("@")+1);
-                        merr << "domain=<"<<uridomain<<">"<< end;
+                        mdbg << "domain=<"<<uridomain<<">"<< end;
                         if (uridomain.length()>0){
                                 uint16_t port;
                                 string proxy = NetworkFunctions::getHostHandlingService("_stun._udp",uridomain, port);
@@ -88,11 +88,11 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 		uint16_t port=3478;
 		string addr = phoneConf->userDefinedStunServer;
 		if (addr.find(":")!=string::npos){
-			merr << "Found port"<< end;
+			mdbg << "Found port"<< end;
 			string portstr = addr.substr(addr.find(":")+1);
 			addr = addr.substr(0,addr.find(":")-1);
-			merr << "Port parsed to <"<< portstr<<">"<< end;
-			merr << "Addr is now <"<< addr<<">" <<end;;
+			mdbg << "Port parsed to <"<< portstr<<">"<< end;
+			mdbg << "Addr is now <"<< addr<<">" <<end;;
 			port = atoi(portstr.c_str());
 		}
 		phoneConf->stunServerIpString = addr;
