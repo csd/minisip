@@ -124,7 +124,7 @@ class LIBMSIP_API SipInvite : public SipMessage{
 		 * @returns IP+port where the remote ua accepts sound data.
 		 */
 //		MRef<SdpPacket*> getSdp();
-		
+		void checkAcceptContact();
 
 		string getRemoteTelNo();
 

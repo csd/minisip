@@ -1036,11 +1036,15 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 #ifdef MINISIP_MEMDEBUG
 	inv.setUser("SipDialogConfVoip");
 #endif
+	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
-	if(type=="join")
-		modifyConfJoinInvite(inv);
+	if(type=="join"){
+		cerr << "SDCV: modifyjoininvite"<< endl;
+		modifyConfJoinInvite(inv);}
 	else
 		modifyConfConnectInvite(inv);
+	if(inv->is_ConfJoin())
+		cerr << "SDCV: confjoin was set!!"<< endl;
 //	mdbg << "SipDialogVoip::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
         MRef<SipMessage*> pktr(*inv);
