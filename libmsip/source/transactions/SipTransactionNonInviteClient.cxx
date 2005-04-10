@@ -33,11 +33,12 @@
 #include<config.h>
 
 #include<assert.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipDialog.h>
+#include<libmsip/SipDialogConfig.h>
 
 #ifdef DEBUG_OUTPUT
 #include<libmutil/dbg.h>

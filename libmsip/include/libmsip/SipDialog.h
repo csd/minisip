@@ -158,11 +158,12 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		MRef<SipDialogConfig*> callConfig;
 };
 
+/*
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipStack.h>
-
+*/
 
 #endif
 

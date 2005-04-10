@@ -42,6 +42,7 @@
 
 #include<libmutil/minilist.h>
 #include<libmutil/Semaphore.h>
+#include<libmsip/SipTransaction.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipMessageDispatcher.h>
@@ -60,7 +61,6 @@ using namespace std;
 #define PRIO_LAST_IN_QUEUE 1
 #define PRIO_FIRST_IN_QUEUE 2
 
-class SipTransaction;
 class SipDialog;
 
 /**
@@ -189,7 +189,8 @@ class LIBMSIP_API SipDialogContainer : public MObject{
                 
 };
 
+/*
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
-
+*/
 #endif

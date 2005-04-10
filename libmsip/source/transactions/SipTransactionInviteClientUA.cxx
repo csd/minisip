@@ -83,12 +83,13 @@ resp. to TU |  1xx             V                     |   |
 #include<config.h>
 
 #include<assert.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipSMCommand.h>
+#include<libmsip/SipDialog.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/dbg.h>
 

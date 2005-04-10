@@ -79,7 +79,6 @@ resp. to TU |  1xx             V                     |
 
 
 #include<assert.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>
@@ -87,6 +86,8 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipDialog.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/dbg.h>

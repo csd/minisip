@@ -44,12 +44,12 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
-#include<libmsip/SipSMCommand.h>
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/IPAddress.h>
+#include<libmsip/SipMessage.h>
+#include<libmsip/SipSMCommand.h>
 
 class SipDialog;
 class SipMessageDispatcher;

@@ -41,11 +41,12 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
+#include<libmsip/SipDialog.h>
 
 using namespace std;
 
+//class SipTransaction;
 
 class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
 	public:

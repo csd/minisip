@@ -25,6 +25,9 @@
 #include<config.h>
 
 
+#include<libmsip/SipTransaction.h>
+#include<libmsip/SipStack.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipTransactionUtils.h>

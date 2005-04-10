@@ -70,12 +70,14 @@
 
 #include<libmutil/minilist.h>
 #include<libmsip/SipCallback.h>
+#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogContainer.h>
 
 #include<libmsip/SipMessageTransport.h>
 #include<libmutil/cert.h>
 
 class SipDialog;
+class SipTransaction;
 
 using namespace std;
 
@@ -129,6 +131,6 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 };
 
 
-#include<libmsip/SipDialog.h>
+//#include<libmsip/SipDialog.h>
 
 #endif

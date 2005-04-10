@@ -33,12 +33,13 @@
 #include<config.h>
 
 #include<assert.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipDialog.h>
+#include<libmsip/SipDialogConfig.h>
 
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)

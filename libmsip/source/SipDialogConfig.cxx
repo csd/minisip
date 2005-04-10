@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libmsip/SipDialogConfig.h>
+#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmutil/itoa.h>
