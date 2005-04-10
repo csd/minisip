@@ -32,8 +32,10 @@
 #include<ws2tcpip.h>
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #elif defined HAVE_NETDB_H
+#include<sys/types.h>
 #include<sys/socket.h>
 #include<netdb.h>
+#include<netinet/in.h>
 #endif
 
 #include<libmnetutil/IP6Address.h>
@@ -106,7 +108,11 @@ IP6Address::IP6Address(struct sockaddr * addr){
 #ifdef WIN32	// Should be __CYGWIN__?
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr._S6_un._S6_u16[i];
 #else
+#ifdef DARWIN
+		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.__u6_addr.__u6_addr16[i];
+#else
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+#endif
 #endif
 #endif
 

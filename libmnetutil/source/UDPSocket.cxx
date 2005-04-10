@@ -29,6 +29,7 @@
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_NETINET_IN_H
+#include<sys/types.h>
 #include<sys/socket.h>
 #include<stdio.h>
 //#include<netinet/tcp.h>

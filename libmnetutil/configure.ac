@@ -3,10 +3,12 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
 AC_INIT(libmnetutil, 0.3, eliasson@imit.kth.se)
+AC_CANONICAL_SYSTEM
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE(libmnetutil, 0.3.1)
+
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
@@ -49,7 +51,7 @@ AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h sys/types.h sys/socket.h netdb.h netinet/in.h arpa/inet.h netinet/tcp.h linux/sockios.h])
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h sys/types.h sys/socket.h netdb.h netinet/in.h arpa/inet.h netinet/tcp.h linux/sockios.h arpa/nameser_compat.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl AC_HEADER_STDBOOL

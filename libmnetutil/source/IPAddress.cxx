@@ -30,7 +30,9 @@
 #include<winsock2.h>
 
 #elif defined HAVE_NETINET_IN_H
+#include<sys/types.h>
 #include<netinet/in.h>
+#include<sys/socket.h>
 #endif
 
 #include<libmnetutil/IPAddress.h>

@@ -39,6 +39,7 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h> /* inet_ntoa */
 #include <sys/types.h> /* socket() */
+#include <sys/socket.h>
 #include <net/if.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -46,6 +47,10 @@
 #include<unistd.h>
 #include<arpa/nameser.h>
 #include<resolv.h>
+#endif
+
+#ifdef HAVE_ARPA_NAMESER_COMPAT_H
+#include<arpa/nameser_compat.h>
 #endif
 
 #include<errno.h>
@@ -96,11 +101,16 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 		ifrp = (struct ifreq *)ptr;
 		sockaddr_ptr = (struct sockaddr_in *)&ifrp->ifr_ifru.ifru_addr;
 
+#ifdef DARWIN
+		res.push_back(string(ifrp->ifr_name));
+		ptr += sizeof(ifrp->ifr_name) + len;
+#else
 		res.push_back(string(ifrp->ifr_ifrn.ifrn_name));
+		ptr += sizeof(ifrp->ifr_ifrn.ifrn_name) + len;
+#endif
 //		printf("%s: ",ifrp->ifr_ifrn.ifrn_name);
 //		printf("%s\n",inet_ntoa(sockaddr_ptr->sin_addr.s_addr));
 
-		ptr += sizeof(ifrp->ifr_ifrn.ifrn_name) + len;
 	} /* for */
 
 	/* release resources */
