@@ -85,6 +85,14 @@ static void *tcp_server_thread(void *arg){
 static void *tls_server_thread(void *arg){
         assert( arg != NULL );
         MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+	
+	if( transport->getMyCertificate().isNull() ){
+		merr << "You need a personal certificate to run "
+			"a TLS server. Please specify one in "
+			"the certificate settings. minisip will "
+			"now disable the TLS server." << end;
+		return NULL;
+	}
 	try{
         	TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate());
         	while(true){
