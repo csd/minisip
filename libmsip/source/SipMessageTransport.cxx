@@ -377,7 +377,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc->errorDescription();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		merr << "Transport error in SipMessageTransport: " << message << end;
+		mdbg << "Transport error in SipMessageTransport: " << message << end;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
@@ -392,7 +392,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		if (! commandReceiver.isNull())
 			commandReceiver->handleCommand( transportErrorCommand );
 		else
-			merr<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+			mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 	}
 	
 }
@@ -443,7 +443,7 @@ void SipMessageTransport::udpSocketRead(){
 			nread = udpsock.recv(buffer, 16384);
 			
 			if (nread == -1){
-				merr << "Some error occured while reading from UdpSocket"<<end;
+				mdbg << "Some error occured while reading from UdpSocket"<<end;
 				continue;
 			}
 
@@ -474,7 +474,7 @@ void SipMessageTransport::udpSocketRead(){
 				if (!commandReceiver.isNull())
 					commandReceiver->handleCommand( cmd );
 				else
-					merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+					mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 				pack=NULL;
 			}
 			
@@ -483,7 +483,7 @@ void SipMessageTransport::udpSocketRead(){
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
-				merr << "Invalid data on UDP socket, discarded" << end;
+				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
 				continue;
 			}
@@ -494,7 +494,7 @@ void SipMessageTransport::udpSocketRead(){
 				
 				delete exc;
 #ifdef DEBUG_OUTPUT
-				merr << "Invalid data on UDP socket, discarded" << end;
+				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
 				continue;
 			}
@@ -562,7 +562,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			nread = socket->read( buffer, 16384 );
 
 			if (nread == -1){
-				merr << "Some error occured while reading from StreamSocket" << end;
+				mdbg << "Some error occured while reading from StreamSocket" << end;
 				continue;
 			}
 
@@ -589,7 +589,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						if (!transport->commandReceiver.isNull())
 							transport->commandReceiver->handleCommand( cmd );
 						else
-							merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+							mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 					}
 
 				}
