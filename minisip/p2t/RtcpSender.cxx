@@ -23,6 +23,8 @@
 #include"RtcpSender.h"
 
 #include<config.h>
+#include<libmsip/SipTransaction.h>
+#include<libmsip/SipDialogConfig.h>
 
 #ifndef _MSC_VER
 #include<unistd.h>
