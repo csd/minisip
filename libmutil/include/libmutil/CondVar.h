@@ -40,18 +40,19 @@ typedef unsigned int uint32_t;
 #define LIBMUTIL_API
 #endif
 
+class Mutex;
+
 class LIBMUTIL_API CondVar{
 	public:
 		CondVar();
 		~CondVar();
 
-		void wait( uint32_t timeout_ms = 0);
+		void wait( Mutex * mutex, uint32_t timeout_ms = 0);
 		void broadcast();
 		void signal();
 
 	private:
 		void * internalStruct;
-		void * internalMutexStruct;
 		bool init;
 
 };

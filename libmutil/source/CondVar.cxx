@@ -26,6 +26,7 @@
 
 #include<config.h>
 
+#include<libmutil/Mutex.h>
 #ifdef HAVE_PTHREAD_H
 #include<pthread.h>
 #include<sys/time.h>
@@ -46,19 +47,12 @@ CondVar::CondVar(){
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_CONDVAR_IMPLEMENTED
 	internalStruct = new pthread_cond_t;
-	internalMutexStruct = new pthread_mutex_t;
 
 	pthread_cond_init( INTERNAL_COND_WAIT, NULL );
-	pthread_mutex_init( INTERNAL_MUTEX, NULL );
-	init = true;
 #elif defined _MSC_VER
 #define MINISIP_CONDVAR_IMPLEMENTED
 	internalStruct = new HANDLE;
-	internalMutexStruct = new HANDLE;
 	*INTERNAL_COND_WAIT = CreateEvent( NULL, FALSE, FALSE, NULL );
-	*INTERNAL_MUTEX = CreateMutex(NULL, FALSE, NULL);
-	WaitForSingleObject( *INTERNAL_MUTEX, INFINITE );
-	
 #endif
 
 
@@ -69,29 +63,19 @@ CondVar::CondVar(){
 
 CondVar::~CondVar(){
 #ifdef HAVE_PTHREAD_H
-	pthread_mutex_destroy( INTERNAL_MUTEX );
-	delete INTERNAL_MUTEX;
-
 	pthread_cond_destroy( INTERNAL_COND_WAIT );
 	delete INTERNAL_COND_WAIT;
 #elif defined _MSC_VER
 	CloseHandle( *INTERNAL_COND_WAIT );
-	CloseHandle( *INTERNAL_MUTEX );
 	delete internalStruct;
 	internalStruct=NULL;
-	delete internalMutexStruct;
-	internalMutexStruct=NULL;
 #endif
 }
 
-void CondVar::wait( uint32_t timeout ){
+void CondVar::wait( Mutex * mutex, uint32_t timeout ){
 #ifdef HAVE_PTHREAD_H
-	if( init ){
-		pthread_mutex_lock( INTERNAL_MUTEX );
-		init = false;
-	}
 	if( timeout == 0 ){
-		pthread_cond_wait( INTERNAL_COND_WAIT, INTERNAL_MUTEX );
+		pthread_cond_wait( INTERNAL_COND_WAIT, (pthread_mutex_t*)(mutex->handle_ptr) );
 	}
 	else{
 		struct timeval now;
@@ -109,7 +93,7 @@ void CondVar::wait( uint32_t timeout ){
 			ts.tv_nsec = ts.tv_nsec % 1000000000;
 		}
 		
-		pthread_cond_timedwait( INTERNAL_COND_WAIT, INTERNAL_MUTEX,
+		pthread_cond_timedwait( INTERNAL_COND_WAIT, (pthread_mutex_t*)mutex->handle_ptr,
 				&ts );
 	}
 				
@@ -117,14 +101,13 @@ void CondVar::wait( uint32_t timeout ){
 	if( timeout == 0 ){
 		SignalObjectAndWait(0,0,0,1);
 
-		SignalObjectAndWait( *INTERNAL_MUTEX, *INTERNAL_COND_WAIT, 
+		SignalObjectAndWait( *(mutex->handle_ptr), *INTERNAL_COND_WAIT, 
 			     INFINITE, FALSE );
 	}
 	else{
-		SignalObjectAndWait( *INTERNAL_MUTEX, *INTERNAL_COND_WAIT,
+		SignalObjectAndWait( *(mutex->handle_ptr), *INTERNAL_COND_WAIT,
 		timeout, FALSE );
 	}
-	WaitForSingleObject( *INTERNAL_MUTEX, INFINITE );
 #endif
 }
 

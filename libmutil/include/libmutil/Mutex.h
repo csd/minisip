@@ -37,6 +37,7 @@
 #endif
 
 class LIBMUTIL_API Mutex{
+        friend class CondVar; 
 public:
 	Mutex();
 	~Mutex();

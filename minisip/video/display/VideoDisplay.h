@@ -59,13 +59,16 @@ class VideoDisplay : public ImageHandler, public MObject, public Runnable{
 	private:
                 std::list<MImage *> filledImages;
                 CondVar filledImagesCond;
+                Mutex filledImagesCondLock;
                 Mutex filledImagesLock;
 
                 std::list<MImage *> emptyImages;
                 CondVar emptyImagesCond;
+                Mutex emptyImagesCondLock;
                 Mutex emptyImagesLock;
 
 		CondVar showCond;
+		Mutex showCondLock;
 		bool show;
 
 };

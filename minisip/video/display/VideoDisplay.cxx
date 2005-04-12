@@ -37,7 +37,9 @@ void VideoDisplay::start(){
 void VideoDisplay::stop(){
 	show = false;
 	//FIXME
+        filledImagesCondLock.lock();
 	filledImagesCond.broadcast();
+        filledImagesCondLock.unlock();
 }
 
 void VideoDisplay::showWindow(){
@@ -73,13 +75,18 @@ MImage * VideoDisplay::provideImage(){
 
         // The decoder is running, wake the display if
         // it was sleeping
+        showCondLock.lock();
         showCond.broadcast();
+        showCondLock.unlock();
 
         emptyImagesLock.lock();
         if( emptyImages.empty() ){
 
                 emptyImagesLock.unlock();
-                emptyImagesCond.wait();
+
+                emptyImagesCondLock.lock();
+                emptyImagesCond.wait( &emptyImagesCondLock );
+                emptyImagesCondLock.unlock();
 
                 emptyImagesLock.lock();
         }
@@ -99,7 +106,11 @@ void VideoDisplay::run(){
         while( true ){
 
 		fprintf( stderr, "starting display main loop\n");
-                showCond.wait();
+                
+                showCondLock.lock();
+                showCond.wait( &showCondLock );
+                showCondLock.unlock();
+
                 showWindow();
 
 
@@ -114,7 +125,10 @@ void VideoDisplay::run(){
                         if( filledImages.empty() ){
                                 filledImagesLock.unlock();
 
-                                filledImagesCond.wait();
+                                filledImagesCondLock.lock();
+                                filledImagesCond.wait( &filledImagesCondLock );
+                                filledImagesCondLock.unlock();
+
                                 if( !show ){
                                         break;
 
@@ -136,7 +150,9 @@ void VideoDisplay::run(){
                         emptyImages.push_back( imageToDisplay );
                         emptyImagesLock.unlock();
 
+                        emptyImagesCondLock.lock();
                         emptyImagesCond.broadcast();
+                        emptyImagesCondLock.unlock();
                 }
 
                 emptyImagesLock.lock();
@@ -167,7 +183,9 @@ void VideoDisplay::handle( MImage * mimage ){
         filledImages.push_back( mimage );
         filledImagesLock.unlock();
 
+        filledImagesCondLock.lock();
         filledImagesCond.broadcast();
+        filledImagesCondLock.unlock();
 
 }
 

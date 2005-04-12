@@ -211,10 +211,15 @@ class SoundIO : public MObject{
 
 
 		CondVar sourceListCond;
+		Mutex sourceListCondLock;
+                
 		list<MRef<SoundSource *> > sources;
 		list<RecorderReceiver *> recorder_callbacks;
+                
 		CondVar recorderCond;
-		volatile int32_t recorder_buffer_size;
+		Mutex recorderCondLock;
+		
+                volatile int32_t recorder_buffer_size;
 		
 		
 		//synchronization of pushing data to buffers vs sending 
