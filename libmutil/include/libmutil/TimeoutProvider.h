@@ -244,12 +244,17 @@ class TimeoutProvider : public MObject{
 	private:
 
                 void wake(){
+                        waitCondLock.lock();
 			waitCond.signal();
+                        waitCondLock.unlock();
                 }
 
 		void sleep(int ms){
-			if (ms > 0)
-				waitCond.wait(ms);
+			if (ms > 0){
+                                waitCondLock.lock();
+				waitCond.wait(&waitCondLock,ms);
+                                waitCondLock.unlock();
+                        }
 		}
                 
 		void loop(){
@@ -266,9 +271,6 @@ class TimeoutProvider : public MObject{
 					TOCommand command=req.get_command();
 					requests.remove(req);
                                         synch_lock.unlock();
-#ifdef DEBUG_OUTPUT
-					mdbg << "TIMEOUTPROVIDER: timeout:"<<command<< end;
-#endif
 					subs->timeout(command);
 				}else{
                                         synch_lock.unlock();
@@ -286,6 +288,7 @@ class TimeoutProvider : public MObject{
 		
 		minilist<TPRequest<TOCommand, TOSubscriber> > requests;
 		CondVar waitCond;
+		Mutex waitCondLock;
                 Mutex synch_lock;
 };
 
