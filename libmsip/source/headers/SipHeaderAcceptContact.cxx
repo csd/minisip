@@ -83,7 +83,7 @@ SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipH
 	set_require = false;
 	set_explicit = false;
 	unsigned i=0;
-	
+	cerr<<"SipHeaderValueAcceptContact"+build_from<<endl;
 	while (build_from[i]!=';')
 		i++;
 	

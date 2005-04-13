@@ -41,6 +41,11 @@ using namespace std;
  * The interface interacts with the user via the terminal, and with the <code>Sip</code> class
  * with <code>SipSMCommands</code> via the <code>MessageRouter</code>.
  */
+typedef struct CCList {
+    string uris[10];
+    string callids[10];
+    int numUser;
+} cclist;
 
 class ConferenceControl{
     public:
@@ -51,6 +56,10 @@ class ConferenceControl{
 	void handleSipCommand(CommandString &cmd);
         //virtual void handleGuiCommand(string);
 	void setCallback(ConfCallback *cb);
+	void setPendingList(string user);
+	//string[10] getPendingList();
+	void setConnectedList(string user);
+	//string[10] getConnectedList();
 	ConfCallback* getCallback();
         
         
@@ -64,9 +73,9 @@ class ConferenceControl{
 	ConfCallback *callback;
 	int numConnected;
 	int numPending;
-	string connectedList[10];
+	//string connectedList[10];
 	string pendingList[10];
-	
+	cclist connectedList;
 	
 	///a P2T Group Member List
 	//MRef<GroupList*>grpList;

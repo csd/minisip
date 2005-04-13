@@ -46,6 +46,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		
 		void setSip(MRef<Sip*> ssp);
 		void setGui(Gui *guiptr){gui = guiptr;};
+		virtual void setConferenceController(ConferenceControl *conf){confrout= conf;};
 		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
 		//void setConference(ConferenceControl *confptr){conf = confptr;};//bm
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
@@ -57,8 +58,8 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		//virtual void confcb_handleSipCommand(CommandString &command);
 		//void confcb_handleGuiCommand(CommandString &command);
 		virtual void guicb_handleCommand(CommandString &command);
-		virtual void guicb_handleConfCommand(ConferenceControl *conf,string &command);
-		virtual string guicb_confDoInvite(ConferenceControl *conf,string sip_url);
+		virtual void guicb_handleConfCommand(string &conferencename);
+		virtual string guicb_confDoInvite(string sip_url);
 		virtual void guicb_handleMediaCommand(CommandString &command);
 		
 		virtual string guicb_doInvite(string sip_url);

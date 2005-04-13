@@ -232,6 +232,23 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	    }
 	    
     }
+    if (cmd.getOp()=="conf_join_received"){
+	    if(!inCall){
+	    	state="JOIN?";
+	    	setPrompt(state);
+	    	callId=cmd.getDestinationId();
+	    	displayMessage("The incoming conference call from "+cmd.getParam(), blue);
+		displayMessage("The participants are"+cmd.getParam3(), blue);
+		
+	    }
+	    else{
+	    	displayMessage("You missed call from "+cmd.getParam(), red);
+	    	CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
+		callback->guicb_handleCommand(hup);
+	    
+	    }
+	    
+    }
     
     if (cmd.getOp()==SipCommandString::transfer_pending){
 	    if(inCall){
@@ -756,6 +773,23 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
                 inCall = true;
 	}
+	/*if (command == "join"){
+		CommandString command(callId, SipCommandString::accept_invite);
+		ConferenceControl *conf=new ConferenceControl();
+				//conf->setGui(this);
+		currentconf=conf;
+				//currentconf->setCallback(callback);
+				//state="CONF";
+				//displayMessage("	Conf. Name: "+currentconfname);
+		callback->guicb_handleConfCommand(cmd,currentconf);
+		addCommand("addc");
+		callback->guicb_handleCommand(command);
+		displayMessage("A call with the most recent callId will be accepted");
+		handled=true;
+                inCall = true;
+	}*/
+
+	
 	
 	if (command == "accept" && state == "TRANSFER?"){
 		CommandString command(callId, SipCommandString::user_transfer_accept);
@@ -824,10 +858,11 @@ void MinisipTextUI::guiExecute(string cmd){
 				ConferenceControl *conf=new ConferenceControl();
 				//conf->setGui(this);
 				currentconf=conf;
+				callback->setConferenceController(currentconf);
 				//currentconf->setCallback(callback);
 				//state="CONF";
 				displayMessage("	Conf. Name: "+currentconfname);
-				callback->guicb_handleConfCommand(currentconf,command);
+				callback->guicb_handleConfCommand(currentconfname);
 				addCommand("addc");
 			}
 		}else{
@@ -859,7 +894,7 @@ void MinisipTextUI::guiExecute(string cmd){
 			}else{
 				string uri = trim(command.substr(5));
 				displayMessage("Conf.Uri: "+uri);
-				callback->guicb_confDoInvite(currentconf,uri);
+				callback->guicb_confDoInvite(uri);
 				/*callId = callback->guicb_doInvite(uri);
 				if (callId=="malformed"){
 					state="IDLE";

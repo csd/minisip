@@ -62,7 +62,7 @@ SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from
 	P2T=false;
 	ConfJoin=false;
 	ConfConnect=false;
-	
+	cerr<<"SipInvite:  buildFrom"<<endl;
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
 			acp = MRef<SipHeaderValueAcceptContact*>((SipHeaderValueAcceptContact *)*(headers[i]->getHeaderValue(0)));
@@ -83,7 +83,7 @@ void SipInvite::checkAcceptContact(){
 	P2T=false;
 	ConfJoin=false;
 	ConfConnect=false;
-	
+	cerr<<"SipInvite:  balalalalalalaa"<<endl;
 	for (int32_t i=0; i< headers.size(); i++){
 		cerr<<headers[i]->getString()<<endl;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
@@ -232,12 +232,12 @@ string SipInvite::getString(){
  */
 void SipInvite::set_P2T() {
 	this->P2T=true;
-	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.p2t=\"TRUE\"",true,false);
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.p2t=\"TRUE\"",false,true);
 	addHeader(new SipHeader(*acp) );
 }
 void SipInvite::set_ConfJoin(){
 	this->ConfJoin=true;
-	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.confjoin=\"TRUE\"",true,false);
+	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.confjoin=\"TRUE\"",false,true);
 	addHeader(new SipHeader(*acp) );
 	checkAcceptContact();
 }

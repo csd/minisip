@@ -59,7 +59,7 @@ SipHeaderParameter::SipHeaderParameter(string parseFrom){
 		value = key_val[1];
 		hasEqual=true;
 	}
-	
+	cerr<<"key_val "+key_val[0]<<endl;
 }
 
 SipHeaderParameter::SipHeaderParameter(string k, string val, bool equalSign):key(k),value(val),hasEqual(equalSign){
@@ -148,6 +148,7 @@ string findHeaderType(string s){
 MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	int hdrstart=0;
 	string hdr = getHeader(line,hdrstart);
+	cerr<<"Sip Header: header"+hdr<<endl;
 	string valueline = line.substr(hdrstart);
 	
 //	cerr << "hdr parsed to <"<< hdr << ">"<< endl;
@@ -160,20 +161,26 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	MRef<SipHeader*> h;
 
 	for (int i=0; i< values.size(); i++){
-		vector<string> value_params = split(valueline,true,';');
-		//cerr << "Header type is <"<< headerType << ">"<< endl;
-		//cerr << "Creating value from string <"<< value_params[0]<<">"<<endl;
+		vector<string> value_params;
+		if(headerType=="Accept-Contact"){
+			value_params = split(valueline,true,'\n');
+			//cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
+		}
+		else
+			value_params = split(valueline,true,';');
+		cerr << "Header type is <"<< headerType << ">"<< endl;
+		cerr << "Creating value from string <"<< value_params[0]<<">"<<endl;
 		SipHeaderFactoryFuncPtr factory;
 		factory = SipHeader::headerFactories.getFactory(headerType);
 		MRef<SipHeaderValue *> hval;
 		if (factory){
 			hval = factory(value_params[0]);
-		}else{
+		}else{	cerr << "SipHeaderValueUnsupported"<<endl;
 			hval = new SipHeaderValueUnsupported(value_params[0]);
 		}	
 		
 		for(int j=1; j<value_params.size(); j++){
-			//cerr << "Adding parameter <"<< value_params[j]<< ">"<< endl;
+			cerr << "Adding parameter <"<< value_params[j]<< ">"<< endl;
 			hval->addParameter(new SipHeaderParameter(value_params[j]));
 		}
 		if (i==0){
@@ -181,6 +188,8 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 		}else{
 			h->addHeaderValue(hval);
 		}
+		cerr<<"hval->getString() "+hval->getString()<<endl;
+		cerr<<"h->getString: "+h->getString()<<endl;
 	}
 	return h;
 

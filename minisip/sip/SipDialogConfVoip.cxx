@@ -125,7 +125,7 @@ gui(failed)              |                                    |                |
  
  
 bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
-{
+{cerr<<"************************************invite received"<<endl;
 	if (transitionMatch(command, SipCommandString::invite)){
 #ifdef MINISIP_MEMDEBUG
 		vc.setUser("WARNING - transaction");
@@ -445,11 +445,19 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
-		CommandString cmdstr(dialogState.callId, 
+		string users;
+		for(int t=0;t<numConnected;t++)
+			users=users+connectedList[t];
+		/*CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
-				);
+				);*/
+		CommandString cmdstr(dialogState.callId, 
+				"conf_join_received", 
+				dialogState.remoteUri, 
+				(getMediaSession()->isSecure()?"secure":"unprotected"),users
+				);//bm
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		sendRinging(ir->getBranch());
@@ -886,7 +894,10 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	type="join";
 	for(int t=0;t<10;t++)
 	{
-		connectedList[t]=list[t];
+		if(t<=numConnected)
+			connectedList[t]=list[t];
+		else
+			connectedList[t]="";
 	}
 	cerr << "CONFDIALOG: "+list[0]<< endl;
 	cerr << "CONFDIALOG: "+list[1]<< endl;
@@ -1061,8 +1072,10 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 //	scmd.setDispatched(true); //What was I thinking about here?? --EE
 	
 //	handleCommand(scmd);
+	//cerr<<"SDCV: "+scmd.getCommandString().getString()<<endl;
 	getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	setLastInvite(inv);
+	inv->checkAcceptContact();
 
 }
 
@@ -1569,8 +1582,8 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 }
 void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	//Add Accept-Contact Header
-	inv->set_ConfJoin();
-		
+	//inv->set_ConfJoin();
+	inv->set_P2T();	
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();

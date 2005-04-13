@@ -87,8 +87,8 @@ SipRegister::SipRegister(string branch,
 	
 	//add P2T featuretag
 	MRef<SipHeaderValueContact*>contactp_casted = MRef<SipHeaderValueContact*>((SipHeaderValueContact*) *contactp);
-	contactp_casted->setFeatureTag("+sip.p2t=\"true\";+sip.confjoin=\"true\";+sip.confconnect=\"true\";");
-			
+	//contactp_casted->setFeatureTag("+sip.confjoin=\"TRUE\";");
+	contactp_casted->setFeatureTag("+sip.p2t=\"true\";");		
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();

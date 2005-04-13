@@ -47,13 +47,14 @@ ConferenceControl::ConferenceControl(){
     //displayMessage("CC created!!");
     for(int t=0;t<10;t++)
     {
-    	connectedList[t]="";
+    	connectedList.uris[t]="";
+	connectedList.callids[t]="";
 	pendingList[t]="";
     }
-    connectedList[0]="bilge;";
-    connectedList[1]="max;";
-    cerr << connectedList[0]<< endl;
-    numConnected=2;
+    connectedList.uris[0]="bilge;";
+    connectedList.uris[1]="max;";
+    cerr << connectedList.uris[0]<< endl;
+    connectedList.numUser=2;
     numPending=0;
     
 }
@@ -64,7 +65,24 @@ void ConferenceControl::setCallback(ConfCallback *cb){
 ConfCallback *ConferenceControl::getCallback(){
 	return callback;
 }
-
+void ConferenceControl::setPendingList(string user)
+{
+	pendingList[numPending]=user;
+	numPending++;
+}
+/*string[10] ConferenceControl::getPendingList()
+{
+	return pendingList;
+}*/
+void ConferenceControl::setConnectedList(string user)
+{	
+	connectedList.uris[connectedList.numUser]=user;
+	connectedList.numUser++;
+}
+/*string[10] ConferenceControl::getConnectedList()
+{
+	return connectedList.uris;
+}*/
 
 
 void ConferenceControl::handleGuiCommand(string cmd){
@@ -80,7 +98,7 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
     	cerr <<"conf "+sip_url<< endl;
 	pendingList[numPending]=sip_url;
 	numPending++;
-	callId = callback->confcb_doJoin(sip_url,connectedList, numConnected);
+	callId = callback->confcb_doJoin(sip_url,connectedList.uris, connectedList.numUser);
 	if (callId=="malformed"){
 		//state="IDLE";
 		//setPrompt(state);

@@ -364,6 +364,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (UDP)", packetString);
 #endif
+			cerr<<"SMT: "+packetString<<endl;
 			if( udpsock.sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){

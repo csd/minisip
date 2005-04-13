@@ -226,7 +226,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	
 		int eoh = SipUtils::findEndOfHeader(buf, i);	// i will be adjusted to start of header
 		string header = buf.substr(i, eoh-i+1);
-
+		cerr<<"header: "+header<<endl;
 		if (!addLine(header)){
 #ifdef DEBUG_OUTPUT
 			mdbg << "Info: Could not copy line to new Message: " << header << " (unknown)" << end;
@@ -240,6 +240,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 SipMessage::SipMessage(int type, string &buildFrom): type(type)
 {
 	uint32_t i;
+	cerr<<"SipMessage: "+buildFrom<<endl;
 	string header;
 	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
 		if(i==buildFrom.size()){
@@ -312,9 +313,10 @@ void SipMessage::setContent(MRef<SipMessageContent*> content){
 		content.setUser("SipMessage");
 #endif
 	this->content=content;
-
+	cerr<<"content: "+content<<endl;
 	if( content ){
 		string contentType = content->getContentType();
+		cerr<<"content type: "+contentType<<endl;
 		if( contentType != "" ){
 			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType();
 			contenttypep->setContentType( contentType );

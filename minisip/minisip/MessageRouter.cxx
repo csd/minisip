@@ -62,16 +62,16 @@ void MessageRouter::sipcb_handleConfCommand(CommandString &command){
 	gui->handleCommand(command);
 }//bm*/
 
-void MessageRouter::guicb_handleConfCommand(ConferenceControl *conf,string &command){
-	confrout=conf;
+void MessageRouter::guicb_handleConfCommand(string &conferencename){
+	//confrout=conf;
 	confrout->setCallback(this);
 	cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
-	confrout->handleGuiCommand(command);
+	confrout->handleGuiCommand(conferencename);
 	
 }//bm
 
-string MessageRouter::guicb_confDoInvite(ConferenceControl *conf,string sip_url){
-	confrout=conf;
+string MessageRouter::guicb_confDoInvite(string sip_url){
+	//confrout=conf;
 	cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
 	confrout->handleGuiDoInviteCommand(sip_url);
 	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
