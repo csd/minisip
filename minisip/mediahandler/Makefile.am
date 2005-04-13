@@ -7,7 +7,9 @@ libmediahandler_a_SOURCES = MediaHandler.cxx \
 			    RtpReceiver.cxx \
 			    KeyAgreement.cxx \
 			    MediaCommandString.cxx \
-			    AudioMedia.cxx
+			    AudioMedia.cxx \
+			    SessionRegistry.cxx \
+			    DtmfSender.cxx
 			    
 noinst_HEADERS = MediaHandler.h \
                  Session.h \
@@ -15,4 +17,6 @@ noinst_HEADERS = MediaHandler.h \
 		 Media.h \
 		 RtpReceiver.h \
 		 MediaCommandString.h \
-		 AudioMedia.h
+		 AudioMedia.h \
+		 SessionRegistry.h \
+		 DtmfSender.h

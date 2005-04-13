@@ -30,6 +30,8 @@
 #include<libmutil/TimeoutProvider.h>
 #include"../../Bell.h"
 
+#include"DtmfWidget.h"
+
 #define CALL_WIDGET_STATE_TERMINATED 	0
 #define CALL_WIDGET_STATE_INCALL 	1
 #define CALL_WIDGET_STATE_CONNECTING 	2
@@ -53,7 +55,11 @@ class StockButton : public Gtk::Button{
 		Gtk::Label label;
 };
 
-class CallWidget : public Gtk::VBox{
+class CallWidget : public Gtk::VBox
+#ifndef OLDLIBGLADEMM
+,public DtmfHandler 
+#endif
+{
 	public:
 		CallWidget( string callId, string remoteUri, MainWindow * mw, bool incoming, std::string secure="unprotected");
 
@@ -74,6 +80,7 @@ class CallWidget : public Gtk::VBox{
 
 #ifndef OLDLIBGLADEMM
                 void transfer();
+                virtual void dtmfPressed( uint8_t symbol );
 #endif
 
 		MainWindow * mainWindow;
@@ -84,6 +91,8 @@ class CallWidget : public Gtk::VBox{
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
 #ifndef OLDLIBGLADEMM
+                Gtk::Expander dtmfArrow;
+                
                 Gtk::Expander transferArrow;
                 Gtk::HBox transferHBox;
                 Gtk::HBox transferHBox2;

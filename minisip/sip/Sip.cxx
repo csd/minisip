@@ -218,6 +218,9 @@ MRef<Session *> mediaSession =
 	sipstack->handleCommand(cmd);
         cerr << "After handleCommand" << endl;
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+        //
+        mediaSession->setCallId( voipCall->getCallId() );
+
 	return voipCall->getCallId();
 }
 string Sip::confjoin(string &user, string list[10], int num){

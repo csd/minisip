@@ -24,17 +24,27 @@
 #define SESSION_H
 
 #include<libmutil/MemObject.h>
+#include<libmutil/TimeoutProvider.h>
 #include"../sip/SipDialogSecurityConfig.h"
+#include"SessionRegistry.h"
+#include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
 #include<../sdp/SdpPacket.h>
 class MediaStream;
 class SdpHeaderM;
 //class KeyAgreement;
 class IPAddress;
+class SessionRegistry;
 
 class Session : public MObject{
 	public:
+
+                static SessionRegistry * registry;
+
 		Session( std::string localIp, SipDialogSecurityConfig &config );
+
+                void unregister();
+
 		void start();
 		void stop();
 
@@ -55,6 +65,12 @@ class Session : public MObject{
 
 		virtual std::string getMemObjectType(){return "Session";}
 
+                std::string getCallId();
+                void setCallId( const string callId );
+
+                friend class DtmfSender;
+                void sendDtmf( uint8_t symbol );
+
 
 	private:
 		/* Key management handling */
@@ -74,6 +90,8 @@ class Session : public MObject{
 
 		std::list< MRef<MediaStream *> > mediaStreamReceivers;
 		std::list< MRef<MediaStream *> > mediaStreamSenders;
+                Mutex mediaStreamSendersLock;
+
 		MRef<KeyAgreement *> ka;
 		std::string localIpString;
 		MRef<SdpPacket *> sdpAnswer;
@@ -82,6 +100,11 @@ class Session : public MObject{
 		std::string errorString;
 		uint16_t errorCode;
 		SipDialogSecurityConfig securityConfig;
+
+                std::string callId;
+
+                DtmfSender dtmfSender;
+                TimeoutProvider<DtmfEvent *, DtmfSender *> dtmfTOProvider;
 
 };
 

@@ -38,11 +38,11 @@ class SipSoftPhoneConfiguration;
 class IpProvider;
 
 
-class MediaHandler : public MObject{
+class MediaHandler : public MObject, public SessionRegistry{
 
 	public:
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );
-		MRef<Session *>createSession( SipDialogSecurityConfig &config );
+		MRef<Session *>createSession( SipDialogSecurityConfig &config, string callId = "" );
 		
 		void registerMedia( MRef<Media *> media );
 

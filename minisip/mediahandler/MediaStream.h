@@ -110,13 +110,15 @@ class MediaStreamSender : public MediaStream{
 		virtual void setPort( uint16_t port );
 		virtual uint16_t getPort();
 		
-		void send( byte_t * data, uint32_t length, uint32_t ts, bool marker = false );
+		void send( byte_t * data, uint32_t length, uint32_t * ts, bool marker = false, bool dtmf = false );
 		void setRemoteAddress( IPAddress * remoteAddress );
 	private:
 		MRef<UDPSocket *> senderSock;
 		uint16_t remotePort;
 		uint16_t seqNo;
+                uint32_t lastTs;
 		IPAddress * remoteAddress;
+                Mutex senderLock;
 
 };
 

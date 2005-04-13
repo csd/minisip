@@ -119,12 +119,12 @@ void DtmfWidget::setHandler( DtmfHandler * handler ){
                   SLOT( *handler, &DtmfHandler::dtmfPressed ),
                   0 ));
         
-        sharpButton.signal_clicked().connect(
+        starButton.signal_clicked().connect(
               BIND<uint8_t>(
                   SLOT( *handler, &DtmfHandler::dtmfPressed ),
                   10 ));
         
-        starButton.signal_clicked().connect(
+        sharpButton.signal_clicked().connect(
               BIND<uint8_t>(
                   SLOT( *handler, &DtmfHandler::dtmfPressed ),
                   11 ));

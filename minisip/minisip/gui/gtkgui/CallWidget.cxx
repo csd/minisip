@@ -28,6 +28,8 @@
 #include<libmsip/SipCommandString.h>
 #include"../../Bell.h"
 #include"../../../mediahandler/MediaCommandString.h"
+#include"../../../mediahandler/Session.h"
+#include"../../../mediahandler/MediaStream.h"
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -47,6 +49,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		secStatus( "", Gtk::ALIGN_LEFT ),
                 buttonBox(/*homogenius*/ true ),
 #ifndef OLDLIBGLADEMM
+                dtmfArrow( "Dialpad" ),
                 transferArrow( "Call transfer" ),
                 transferHBox( false ),
                 transferButton( "Transfer" ),
@@ -109,6 +112,11 @@ CallWidget::CallWidget( string callId, string remoteUri,
         transferHBox2.pack_end( transferProgress, true, true );
 
         pack_start( transferArrow, false, false, 10 );
+
+        DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
+        dtmfWidget->setHandler( this );
+        dtmfArrow.add( *dtmfWidget ); 
+        pack_start( dtmfArrow, false, false, 10 );
 #endif
 
 	buttonBox.add( acceptButton );
@@ -228,6 +236,7 @@ bool CallWidget::handleCommand( CommandString command ){
 
 #ifndef OLDLIBGLADEMM
                         transferArrow.show_all();
+                        dtmfArrow.show_all();
 #endif
 
 			secStatus.set_markup( "The call is <b>" + 
@@ -405,6 +414,15 @@ void CallWidget::transfer(){
 
                 transferProgress.set_text( "Transfer requested..." );
 //                transferProgress.pulse();
+        }
+}
+
+void CallWidget::dtmfPressed( uint8_t symbol ){
+        MRef<Session *> session = Session::registry->getSession( mainCallId );
+
+        if( session ){
+                
+                session->sendDtmf( symbol );
         }
 }
 

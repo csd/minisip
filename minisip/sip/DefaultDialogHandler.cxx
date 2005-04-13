@@ -134,7 +134,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig );
+				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
@@ -190,7 +190,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig );
+				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
@@ -226,7 +226,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			cerr << "DDH: creating new SipDialogVoip"<< endl;
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig );
+				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 

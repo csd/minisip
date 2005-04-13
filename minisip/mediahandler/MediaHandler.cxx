@@ -27,10 +27,10 @@
 #include"../sip/SipSoftPhoneConfiguration.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include"../codecs/Codec.h"
+#include"Session.h"
 #include"MediaStream.h"
 #include"MediaHandler.h"
 #include"Media.h"
-#include"Session.h"
 #include"RtpReceiver.h"
 #include"MediaCommandString.h"
 #include<libmnetutil/UDPSocket.h>
@@ -92,7 +92,7 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 	ringtoneFile = config->ringtone;
 }
 
-MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityConfig ){
+MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityConfig, string callId ){
 
 	list< MRef<Media *> >::iterator i;
 	MRef<Session *> session;
@@ -103,6 +103,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	contactIp = ipProvider->getExternalIp();
 
 	session = new Session( contactIp, securityConfig );
+        session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
 		if( (*i)->receive ){

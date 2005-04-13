@@ -264,6 +264,7 @@ void Minisip::run(){
 #endif
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
+                Session::registry = *mediaHandler;
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;

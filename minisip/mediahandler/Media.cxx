@@ -86,7 +86,7 @@ void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker )
 
 	sendersLock.lock();
 	for( i = senders.begin(); i != senders.end(); i++ ){
-		(*i)->send( data, length, ts, marker );
+		(*i)->send( data, length, &ts, marker );
 	}
 	sendersLock.unlock();
 }

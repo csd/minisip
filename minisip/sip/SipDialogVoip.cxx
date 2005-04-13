@@ -1106,6 +1106,7 @@ SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callc
 }
 
 SipDialogVoip::~SipDialogVoip(){	
+        mediaSession->unregister();
 }
 
 /*

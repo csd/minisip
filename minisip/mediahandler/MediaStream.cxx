@@ -342,12 +342,28 @@ uint16_t MediaStreamSender::getPort(){
 	return remotePort;
 }
 
-void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
+void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	SRtpPacket * packet;
 	
-	packet = new SRtpPacket( data, length, seqNo++, ts, ssrc );
+        senderLock.lock();
+        if( !(*givenTs) ){
+                lastTs += 160; //FIXME! get it from the CODEC,
+                               // when we have one CODEC per sender
+                *givenTs = lastTs;
+        }
+        else{
+                lastTs = *givenTs;
+        }
+
+	packet = new SRtpPacket( data, length, seqNo++, lastTs, ssrc );
 	
-	packet->getHeader().setPayloadType( getRtpPayloadType() );
+        if( dtmf ){
+                packet->getHeader().setPayloadType( 101 );
+        }
+        else{
+                packet->getHeader().setPayloadType( getRtpPayloadType() );
+        }
+
 	if( marker ){
 		packet->getHeader().setMarker( marker );
 	}
@@ -356,6 +372,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t ts, bool 
 
 	packet->sendTo( **senderSock, *remoteAddress, remotePort );
 	delete packet;
+        senderLock.unlock();
 }
 
 void MediaStreamSender::setRemoteAddress( IPAddress * remoteAddress ){

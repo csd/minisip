@@ -26,6 +26,7 @@
 #include"MediaStream.h"
 #include"Media.h"
 #include"RtpReceiver.h"
+#include"DtmfSender.h"
 #include"../codecs/Codec.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include"../sdp/SdpPacket.h"
@@ -43,8 +44,20 @@
 
 #define SESSION_LINE "s=Minisip Session"
 
-Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp){
+SessionRegistry * Session::registry = NULL;
+
+Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp),dtmfSender( this ){
 	this->securityConfig = securityConfig; // hardcopy
+
+        if( registry ){
+                registry->registerSession( this );
+        }
+}
+
+void Session::unregister(){
+        if( registry ){
+                registry->unregisterSession( this );
+        }
 }
 
 MRef<SdpPacket *> Session::emptySdp(){
@@ -200,6 +213,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 	/* If we have a sender for this format, activate it */
 	mdbg << "Starting senders loop" << end;
 	uint8_t j = 1;
+        mediaStreamSendersLock.lock();
 	for( iStream =  mediaStreamSenders.begin();
 			iStream != mediaStreamSenders.end(); iStream++,j++ ){
 		mdbg << "Trying a sender"<< end;
@@ -219,6 +233,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 			((MediaStreamSender *)*(*iStream))->setRemoteAddress( remoteAddress );
 		}
 	}
+        mediaStreamSendersLock.unlock();
 	/* Look for a receiver */
 	mdbg << "Starting receivers loop"<< end;
 	for( iStream =  mediaStreamReceivers.begin();
@@ -339,12 +354,14 @@ void Session::start(){
 		}
 	}
 	
+        mediaStreamSendersLock.lock();
 	for( i = mediaStreamSenders.begin(); i != mediaStreamSenders.end(); i++ ){
 		if( (*i)->getPort() ){
 			(*i)->setKeyAgreement( ka );
 			(*i)->start();
 		}
 	}
+        mediaStreamSendersLock.unlock();
 }
 
 void Session::stop(){
@@ -356,11 +373,13 @@ void Session::stop(){
 		}
 	}
 	
+        mediaStreamSendersLock.lock();
 	for( i = mediaStreamSenders.begin(); i != mediaStreamSenders.end(); i++ ){
 		if( (*i)->getPort() ){
 			(*i)->stop();
 		}
 	}
+        mediaStreamSendersLock.unlock();
 
 	fprintf( stderr, "Session stopped\n" );
 }
@@ -371,7 +390,9 @@ void Session::addMediaStreamReceiver( MRef<MediaStream *> mediaStream ){
 }
 
 void Session::addMediaStreamSender( MRef<MediaStream *> mediaStream ){
+        mediaStreamSendersLock.lock();
 	mediaStreamSenders.push_back( *mediaStream );
+        mediaStreamSendersLock.unlock();
 }
 
 	
@@ -385,4 +406,25 @@ uint16_t Session::getErrorCode(){
 
 bool Session::isSecure(){
 	return securityConfig.secured;
+}
+
+string Session::getCallId(){
+        return callId;
+}
+
+void Session::setCallId( const string callId ){
+        this->callId = callId;
+}
+
+void Session::sendDtmf( uint8_t symbol ){
+        uint32_t * ts = new uint32_t;
+        *ts = 0;
+        dtmfTOProvider.request_timeout( 0, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
+        dtmfTOProvider.request_timeout( 5, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+        dtmfTOProvider.request_timeout( 10, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+        
+        dtmfTOProvider.request_timeout( 15, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+        dtmfTOProvider.request_timeout( 20, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+        dtmfTOProvider.request_timeout( 25, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
+        
 }
