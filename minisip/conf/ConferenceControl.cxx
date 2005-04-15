@@ -50,9 +50,10 @@ ConferenceControl::ConferenceControl(){
     	connectedList.uris[t]="";
 	connectedList.callids[t]="";
 	pendingList[t]="";
+	pendingListCallIds[t]="";
     }
-    connectedList.uris[0]="bilge;";
-    connectedList.uris[1]="max;";
+    connectedList.uris[0]="ali";
+    connectedList.uris[1]="mehmet";
     cerr << connectedList.uris[0]<< endl;
     connectedList.numUser=2;
     numPending=0;
@@ -89,6 +90,25 @@ void ConferenceControl::handleGuiCommand(string cmd){
 
 	
     	cerr << "CC: from MR -> CC: handleGuiCommand"<< endl;
+        //string uri = trim(cmd.substr(5));
+	//displayMessage(cmd);    
+}
+void ConferenceControl::handleGuiCommand(CommandString &command){
+
+	
+    	cerr << "CC: from MR -> CC: handleGuiCommand command"<< endl;
+	if(command.getOp()==SipCommandString::accept_invite)
+	{
+		pendingList[numPending]=command.getParam();
+		pendingListCallIds[numPending]=command.getDestinationId();
+		numPending++;
+		string users;
+		for(int t=0;t<connectedList.numUser;t++)
+			users=users+connectedList.uris[t]+";";
+		cerr<<"users "+users<<endl;
+		command.setParam2(users);
+		callback->confcb_handleSipCommand(command);
+	}
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    
 }
@@ -319,5 +339,17 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    displayMessage("Received: "+cmd.getOp(), blue);
     }*/
 }
-
-
+void ConferenceControl::updatePendingList(string users[10]){
+	
+	for(int t=0;t<10;t++)
+	{
+		for(int j=0;j<10;j++)
+		{
+			if(users[t]!=connectedList.uris[j]&&users[t]!=pendingList[j])
+			{
+				pendingList[numConnected]=users[t];
+				numPending++;
+			}
+		}
+	}
+}

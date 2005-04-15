@@ -59,6 +59,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		//void confcb_handleGuiCommand(CommandString &command);
 		virtual void guicb_handleCommand(CommandString &command);
 		virtual void guicb_handleConfCommand(string &conferencename);
+		virtual void guicb_handleConfCommand(CommandString &command);
 		virtual string guicb_confDoInvite(string sip_url);
 		virtual void guicb_handleMediaCommand(CommandString &command);
 		
@@ -68,6 +69,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		virtual string confcb_doConnect(string user);
 		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
 		virtual void confcb_handleSipCommand(string &command){}
+		virtual void confcb_handleSipCommand(CommandString &command);
 		virtual void confcb_handleGuiCommand(string &command){}	
 	private:
 		

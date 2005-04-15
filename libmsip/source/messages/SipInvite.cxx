@@ -239,7 +239,7 @@ void SipInvite::set_ConfJoin(){
 	this->ConfJoin=true;
 	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.confjoin=\"TRUE\"",false,true);
 	addHeader(new SipHeader(*acp) );
-	checkAcceptContact();
+	//checkAcceptContact();
 }
 void SipInvite::set_ConfConnect(){
 	this->ConfConnect=true;

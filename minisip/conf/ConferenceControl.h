@@ -52,6 +52,7 @@ class ConferenceControl{
         ConferenceControl();
 	//void setGui(Gui *guiptr){gui = guiptr;};
 	void handleGuiCommand(string cmd);
+	void handleGuiCommand(CommandString &command);
 	void handleGuiDoInviteCommand(string sip_url);
 	void handleSipCommand(CommandString &cmd);
         //virtual void handleGuiCommand(string);
@@ -61,6 +62,7 @@ class ConferenceControl{
 	void setConnectedList(string user);
 	//string[10] getConnectedList();
 	ConfCallback* getCallback();
+	void updatePendingList(string users[10]);
         
         
 	//virtual void run();
@@ -75,6 +77,7 @@ class ConferenceControl{
 	int numPending;
 	//string connectedList[10];
 	string pendingList[10];
+	string pendingListCallIds[10];
 	cclist connectedList;
 	
 	///a P2T Group Member List

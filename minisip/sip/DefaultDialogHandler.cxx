@@ -98,7 +98,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 		//type casting
 		MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pkt);
-		inv->checkAcceptContact();
+		//inv->checkAcceptContact();
 		//check if it's a regular INVITE or a P2T INVITE
 		if(inv->is_P2T()) {
 			inviteP2Treceived(SipSMCommand(pkt,source,destination));	

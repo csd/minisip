@@ -69,6 +69,13 @@ void MessageRouter::guicb_handleConfCommand(string &conferencename){
 	confrout->handleGuiCommand(conferencename);
 	
 }//bm
+void MessageRouter::guicb_handleConfCommand(CommandString &command){
+	//confrout=conf;
+	confrout->setCallback(this);
+	cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
+	confrout->handleGuiCommand(command);
+	
+}//bm
 
 string MessageRouter::guicb_confDoInvite(string sip_url){
 	//confrout=conf;
@@ -101,4 +108,11 @@ string MessageRouter::confcb_doConnect(string user){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confconnect(user);
+}
+void MessageRouter::confcb_handleSipCommand(CommandString &command){
+//	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
+	cerr << "MR: from CC -> MR: confcb_handleSipCommand"<< endl;
+	SipSMCommand sipcmd(command, SipSMCommand::remote, SipSMCommand::TU);
+	sip->getSipStack()->handleCommand(sipcmd);
+	
 }

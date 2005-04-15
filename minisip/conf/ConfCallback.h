@@ -35,6 +35,7 @@ class ConfCallback{
 	public:
 		//virtual void guicb_handleConfCommand(string &)=0;
 		virtual void confcb_handleSipCommand(string &)=0;
+		virtual void confcb_handleSipCommand(CommandString &)=0;
 		virtual void confcb_handleGuiCommand(string &)=0;
 		virtual string confcb_doJoin(string user,string list[10], int num)=0;
 		virtual string confcb_doConnect(string user)=0;

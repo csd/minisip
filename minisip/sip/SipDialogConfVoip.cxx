@@ -475,11 +475,31 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 {
+	
 	if (transitionMatch(command, SipCommandString::accept_invite)){
 #ifndef _MSC_VER
 		ts.save(USER_ACCEPT);
 #endif
-
+		//bm
+	numConnected=0;
+	string users=command.getCommandString().getParam2();
+	cerr<<"users=command.getCommandString().getParam2() "+users<<endl;
+	string line="";
+	int i=0;	
+		while (!(i>(users.length()-1))){
+			line+=users[i++];
+			if(users[i]==';')
+			{
+				connectedList[numConnected]=line;
+				cerr<<"line: "+line<<endl;
+				line="";
+				numConnected++;
+				i++;
+			}
+		}
+		for(int t=numConnected;t<10;t++)
+			connectedList[t]="";	
+	//bm
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::invite_ok,"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
@@ -1583,7 +1603,7 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	//Add Accept-Contact Header
 	//inv->set_ConfJoin();
-	inv->set_P2T();	
+	inv->set_ConfJoin();	
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();

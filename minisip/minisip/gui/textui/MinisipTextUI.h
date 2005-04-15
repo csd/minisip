@@ -65,6 +65,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	
 	ConferenceControl *currentconf;
 	string currentconfname;
+	string currentcaller;
         string input;
         string callId;
         string state;

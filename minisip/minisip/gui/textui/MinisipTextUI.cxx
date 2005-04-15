@@ -68,6 +68,7 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     addCommand("transfer");
     addCommand("refuse");
     addCommand("conf");
+    addCommand("join");
     addCommand("accept"); //accept incoming P2T Session
     addCommand("deny");   //deny incoming P2T Session
     addCommand("im");   //deny incoming P2T Session
@@ -234,12 +235,14 @@ void MinisipTextUI::handleCommand(CommandString cmd){
     }
     if (cmd.getOp()=="conf_join_received"){
 	    if(!inCall){
-	    	state="JOIN?";
+	    	state="ANSWER?";
 	    	setPrompt(state);
 	    	callId=cmd.getDestinationId();
+		//addCommand("addc");
+		
 	    	displayMessage("The incoming conference call from "+cmd.getParam(), blue);
 		displayMessage("The participants are"+cmd.getParam3(), blue);
-		
+		currentcaller=cmd.getParam();
 	    }
 	    else{
 	    	displayMessage("You missed call from "+cmd.getParam(), red);
@@ -773,21 +776,22 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
                 inCall = true;
 	}
-	/*if (command == "join"){
-		CommandString command(callId, SipCommandString::accept_invite);
+	if (command == "join"){
+		CommandString command(callId, SipCommandString::accept_invite, currentcaller);
 		ConferenceControl *conf=new ConferenceControl();
 				//conf->setGui(this);
 		currentconf=conf;
 				//currentconf->setCallback(callback);
 				//state="CONF";
 				//displayMessage("	Conf. Name: "+currentconfname);
-		callback->guicb_handleConfCommand(cmd,currentconf);
+		//callback->guicb_handleConfCommand(cmd);
+		callback->setConferenceController(currentconf);
 		addCommand("addc");
-		callback->guicb_handleCommand(command);
+		callback->guicb_handleConfCommand(command);
 		displayMessage("A call with the most recent callId will be accepted");
 		handled=true;
                 inCall = true;
-	}*/
+	}
 
 	
 	

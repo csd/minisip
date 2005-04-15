@@ -96,7 +96,7 @@ void SipDialog::signalIfNoTransactions(){
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
 	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
-	cerr<<"SD: "+command.getCommandString().getString()<<endl;
+	//cerr<<"SD: "+command.getCommandString().getString()<<endl;
 	if (command.getType()==SipSMCommand::COMMAND_STRING 
 			&& command.getCommandString().getOp()==SipCommandString::transaction_terminated){
 		
