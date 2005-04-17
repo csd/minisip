@@ -40,6 +40,7 @@ class Session : public MObject{
 	public:
 
                 static SessionRegistry * registry;
+                static MRef<KeyAgreement *> precomputedKa;
 
 		Session( std::string localIp, SipDialogSecurityConfig &config );
 
@@ -105,8 +106,6 @@ class Session : public MObject{
 
                 DtmfSender dtmfSender;
                 TimeoutProvider<DtmfEvent *, DtmfSender *> dtmfTOProvider;
-
-                static MRef<KeyAgreement *> precomputedKa;
 
 };
 
