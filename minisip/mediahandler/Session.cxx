@@ -45,9 +45,12 @@
 #define SESSION_LINE "s=Minisip Session"
 
 SessionRegistry * Session::registry = NULL;
+MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
 Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp),dtmfSender( this ){
 	this->securityConfig = securityConfig; // hardcopy
+        this->ka = Session::precomputedKa;
+        Session::precomputedKa = NULL;
 
         if( registry ){
                 registry->registerSession( this );
@@ -57,6 +60,10 @@ Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(N
 void Session::unregister(){
         if( registry ){
                 registry->unregisterSession( this );
+        }
+
+        if( Session::precomputedKa.isNull() ){
+                Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
         }
 }
 

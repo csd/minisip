@@ -106,6 +106,8 @@ class Session : public MObject{
                 DtmfSender dtmfSender;
                 TimeoutProvider<DtmfEvent *, DtmfSender *> dtmfTOProvider;
 
+                static MRef<KeyAgreement *> precomputedKa;
+
 };
 
 #endif

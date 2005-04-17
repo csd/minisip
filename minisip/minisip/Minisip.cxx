@@ -265,6 +265,8 @@ void Minisip::run(){
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
                 Session::registry = *mediaHandler;
+                /* Hack: precompute a KeyAgreementDH */
+                Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
