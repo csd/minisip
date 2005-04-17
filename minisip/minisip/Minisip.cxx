@@ -30,6 +30,7 @@
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmsip/SipMessageTransport.h>
+#include<libmikey/keyagreement_dh.h>
 #include"ConsoleDebugger.h"
 #include"../sip/Sip.h"
 #include"LogEntry.h"
@@ -266,7 +267,7 @@ void Minisip::run(){
 		ehandler->setMediaHandler( mediaHandler );
                 Session::registry = *mediaHandler;
                 /* Hack: precompute a KeyAgreementDH */
-                Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+                Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
