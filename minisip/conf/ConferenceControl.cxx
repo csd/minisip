@@ -160,6 +160,9 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    //gui->setPrompt(state);
 	    cerr << "CC: PROGRESS: remote participant accepted the call..."<< endl;
 	    //displayMessage("PROGRESS: remote participant accepted the call...", blue);
+	    
+	    printList(&connectedList);
+	    printList(&pendingList);
     }
     if (cmd.getOp()=="remote_ringing"){
 	    //state="REMOTE RINGING";
@@ -373,7 +376,7 @@ void ConferenceControl::handleOkAck(string from, minilist<ConfMember> *list) {
 */
 void ConferenceControl::printList(minilist<ConfMember> *list) {
 	for (int i = 0; i < list->size(); i++ ) {
-	//	cerr << list
+		cerr << "Member : " + ((*list)[i]).uri << endl;
 	} 
 }
         
