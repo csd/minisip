@@ -385,9 +385,63 @@ void ConferenceControl::printList(minilist<ConfMember> *list) {
 * Move a member from pending to connected status
 */
 void ConferenceControl::pendingToConnected(string member) {
+
+	//find member in the pending list and remove it
+	int i = 0;
+	bool done = false;
+	
+	while ((!done) && (i < pendingList.size() ) ) {
+		
+		if (pendingList[i].uri == member) {
+			connectedList.push_back(pendingList[i]);
+			pendingList.remove(i);
+			done = true;
+		}
+		
+		i++;
+	}
+	
+	assert(done==true);
+	
 }
 /**
 * Check for new members to connect to
 */
 void ConferenceControl::updateLists(minilist<ConfMember> *list) {
+	bool handled = false;
+	
+	
+	for (int i = 0; i < list->size(); i++) {
+		string current = (*list)[i].uri;
+		
+		//check against pending list
+		for (int j = 0; j < pendingList.size(); j++ ) {
+			if (current == pendingList[j].uri) {
+				handled = true;
+				break;
+			}
+		}	
+	
+		//check against connected list
+		if (!handled) {
+			for (int j = 0; j < connectedList.size(); j++ ) {
+				if (current == connectedList[j].uri) {
+					handled = true;
+					break;
+				}
+			}
+		
+		}
+		
+		//if not found in pending or connected list then add to pending list
+		if (!handled) {
+			pendingList.push_back(ConfMember(current, (*list)[i].callid  )  );
+		}
+	
+		//send a connect message to the newly discovered conference members
+		//TODO
+	}
 }
+	
+	
+	
