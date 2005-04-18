@@ -25,6 +25,8 @@
 
 #include<config.h>
 
+#include "ConfMember.h"
+
 #include<libmutil/CommandString.h>
 
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
@@ -37,7 +39,7 @@ class ConfCallback{
 		virtual void confcb_handleSipCommand(string &)=0;
 		virtual void confcb_handleSipCommand(CommandString &)=0;
 		virtual void confcb_handleGuiCommand(string &)=0;
-		virtual string confcb_doJoin(string user,string list[10], int num)=0;
+		virtual string confcb_doJoin(string user,minilist <ConfMember> *list)=0;
 		virtual string confcb_doConnect(string user)=0;
 };
 

@@ -65,7 +65,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		
 		virtual string guicb_doInvite(string sip_url);
 		
-		virtual string confcb_doJoin(string user,string list[10], int num);
+		virtual string confcb_doJoin(string user, minilist<ConfMember> *list);
 		virtual string confcb_doConnect(string user);
 		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
 		virtual void confcb_handleSipCommand(string &command){}

@@ -70,6 +70,8 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipStack.h>
 
+#include "../conf/ConfMember.h"
+
 
 class SipSoftPhoneConfiguration;
 class LogEntry;
@@ -106,7 +108,7 @@ class Sip: public MObject, public Runnable{
 		//void registerMediaStream(MRef<SdpPacket*> sdppack);
 
 		string invite(string &user);
-		string confjoin(string &user, string list[10], int num);
+		string confjoin(string &user, minilist<ConfMember> *list);
 		string confconnect(string &user);
 		MRef<SipStack*>	getSipStack(){return sipstack;}
 //		MRef<SipDialogContainer*> getDialogContainer();//{return dialogContainer;}

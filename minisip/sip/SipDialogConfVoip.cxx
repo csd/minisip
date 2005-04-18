@@ -447,7 +447,8 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		string users;
 		for(int t=0;t<numConnected;t++)
-			users=users+connectedList[t];
+			users=users+ (((*connectedList)[t]).uri);
+			
 		/*CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
 				dialogState.remoteUri, 
@@ -490,15 +491,22 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 			line+=users[i++];
 			if(users[i]==';')
 			{
-				connectedList[numConnected]=line;
-				cerr<<"line: "+line<<endl;
+				connectedList->push_back((ConfMember(line, "")));
+				//connectedList[numConnected]=line;
+				cerr<< "line: " + line << endl;
 				line="";
+				
 				numConnected++;
+				assert(numConnected==connectedList->size());
 				i++;
 			}
 		}
+		
+		/*
 		for(int t=numConnected;t<10;t++)
 			connectedList[t]="";	
+		*/
+		
 	//bm
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::invite_ok,"",
@@ -896,13 +904,13 @@ void SipDialogConfVoip::setUpStateMachine(){
 
 
 #ifdef IPSEC_SUPPORT
-SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string list[10], int num, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
                 SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
-SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string list[10], int num, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string cid) : 
                 SipDialog(stack,callconfig, pconf->timeoutProvider),
                 lastInvite(NULL), 
 		phoneconf(pconf),
@@ -910,8 +918,15 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 #endif
 
 {
-	numConnected= num;
+	numConnected= list->size();
 	type="join";
+	
+	cerr << "CONFDIALOG: Creating SipDialogConfVoip's connectedList" << endl;
+	
+	//???
+	connectedList = list;
+	
+	/*
 	for(int t=0;t<10;t++)
 	{
 		if(t<=numConnected)
@@ -919,9 +934,12 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 		else
 			connectedList[t]="";
 	}
-	cerr << "CONFDIALOG: "+list[0]<< endl;
-	cerr << "CONFDIALOG: "+list[1]<< endl;
-	cerr << "CONFDIALOG: "+itoa(num)<< endl;
+	*/
+	
+	cerr << "CONFDIALOG: "+ ((*list)[0]).uri << endl;
+	cerr << "CONFDIALOG: "+ ((*list)[1]).uri << endl;
+	cerr << "CONFDIALOG: "+itoa(numConnected)<< endl;
+	
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
 	else
@@ -1610,7 +1628,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
@@ -1623,7 +1641,7 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
@@ -1636,7 +1654,7 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), connectedList[t]);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){

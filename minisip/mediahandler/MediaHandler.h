@@ -38,7 +38,7 @@ class SipSoftPhoneConfiguration;
 class IpProvider;
 
 
-class MediaHandler : public MObject, public SessionRegistry{
+class MediaHandler : public MObject, public SessionRegistry {
 
 	public:
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );

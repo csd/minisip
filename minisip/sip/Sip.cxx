@@ -44,6 +44,8 @@
 #include"../p2t/GroupList.h"
 #include"PresenceMessageContent.h"
 
+
+
 #include<assert.h>
 
 #include<libmutil/dbg.h>
@@ -223,7 +225,7 @@ MRef<Session *> mediaSession =
 
 	return voipCall->getCallId();
 }
-string Sip::confjoin(string &user, string list[10], int num){
+string Sip::confjoin(string &user, minilist<ConfMember> *list){
 	SipDialogSecurityConfig securityConfig;
 #ifndef _MSC_VER
 	ts.save( INVITE_START );
@@ -302,10 +304,10 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession, list , num)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession, list)); 
 	
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list,num)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list)); 
 
 #endif
 

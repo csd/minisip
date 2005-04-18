@@ -32,8 +32,12 @@
 //#include"../p2t/GroupListUserElement.h"
 //#include"../p2t/P2T.h"
 //#include<libmutil/TextUI.h>
-//#include<libmutil/minilist.h>
+#include<libmutil/minilist.h>
 #include "ConfCallback.h"
+
+
+#include "ConfMember.h"
+
 
 using namespace std;
 /**
@@ -76,9 +80,14 @@ class ConferenceControl{
 	int numConnected;
 	int numPending;
 	//string connectedList[10];
-	string pendingList[10];
-	string pendingListCallIds[10];
-	cclist connectedList;
+
+	
+	//string pendingList[10];
+	//cclist connectedList;
+	
+	minilist<ConfMember> connectedList;
+	minilist<ConfMember> pendingList;
+	
 	
 	///a P2T Group Member List
 	//MRef<GroupList*>grpList;

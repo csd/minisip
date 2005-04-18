@@ -46,6 +46,8 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
+#include<libmutil/minilist.h>
+
 #include"SipSoftPhoneConfiguration.h"
 
 #ifdef IPSEC_SUPPORT
@@ -60,9 +62,9 @@ class LogEntry;
 class SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string list[10], int num, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string list[10], int num, string callId="");
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string callId="");
 #endif
 #ifdef IPSEC_SUPPORT
 		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
@@ -94,7 +96,10 @@ class SipDialogConfVoip: public SipDialog{
 	private:
 		
 		void setUpStateMachine();
-		string connectedList[10];
+		
+		//string connectedList[10]; //old static list
+		minilist<ConfMember> *connectedList;
+		
 		string type;
 		int numConnected;
 		MRef<SipInvite*> getLastInvite();
@@ -152,6 +157,7 @@ class SipDialogConfVoip: public SipDialog{
 #ifdef IPSEC_SUPPORT
 		MRef<MsipIpsecAPI *> ipsecSession;
 		string list;
+		
 #endif
 
 };

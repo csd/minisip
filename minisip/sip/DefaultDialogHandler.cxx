@@ -115,7 +115,11 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
-			string connectList[10];
+			
+			
+			//string connectList[10];
+			minilist<ConfMember> connectList;
+			
 			int num = 0;
 
    //--- Convert each digit char and add into result.
@@ -125,7 +129,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
       				t++;
    			}
 			for(t=0;t<num;t++)
-				connectList[t]=sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
+				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
+				connectList.push_back((ConfMember(sdp->getSessionLevelAttribute("participant_"+itoa(t+1)),"")));
 			cerr << "DDH: "+numToConnect[0]<< endl;
 			cerr << "DDH: "+numToConnect[1]<< endl;
 			cerr << "DDH: "+itoa(num)<< endl;
@@ -143,13 +148,14 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
+			//BM is it safe to pass the list like this?
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, connectList, num, pkt->getCallId(), ipsecSession )); 
+								phoneconf, mediaSession, &connectList, pkt->getCallId(), ipsecSession )); 
 	
 #else	
 			
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, connectList, num, pkt->getCallId()));
+								phoneconf, mediaSession, &connectList, pkt->getCallId()));
 #endif
 #ifdef MINISIP_MEMDEBUG
 			voipConfCall.setUser("DefaultDialogHandler");
@@ -168,7 +174,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #endif			
 			//MRef<SipMessage*> pack = command.getCommandPacket();
 			//MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
-	
+			
 			//get the GroupList from the remote GroupListServer
 			//MRef<GroupList*>grpList;
 			/*assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
@@ -224,6 +230,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			mdbg << "DefaultDialogHandler:: creating new SipDialogVoip" << end;
 #endif			
 			cerr << "DDH: creating new SipDialogVoip"<< endl;
+
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );

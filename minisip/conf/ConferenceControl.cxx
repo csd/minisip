@@ -45,6 +45,8 @@
 ConferenceControl::ConferenceControl(){
 
     //displayMessage("CC created!!");
+    
+    /*
     for(int t=0;t<10;t++)
     {
     	connectedList.uris[t]="";
@@ -57,7 +59,17 @@ ConferenceControl::ConferenceControl(){
     cerr << connectedList.uris[0]<< endl;
     connectedList.numUser=2;
     numPending=0;
+    */
+   
     
+   
+    
+    connectedList.push_back(ConfMember("max", "" ));
+    connectedList.push_back(ConfMember("bilge", ""));
+    
+    cerr << "Two members added to connectedList " << endl;
+    
+    numPending = 0;
 }
 void ConferenceControl::setCallback(ConfCallback *cb){
 	this->callback=cb;
@@ -68,7 +80,8 @@ ConfCallback *ConferenceControl::getCallback(){
 }
 void ConferenceControl::setPendingList(string user)
 {
-	pendingList[numPending]=user;
+	pendingList.push_back((ConfMember(user, "")));
+	//pendingList[numPending]=user;
 	numPending++;
 }
 /*string[10] ConferenceControl::getPendingList()
@@ -77,8 +90,11 @@ void ConferenceControl::setPendingList(string user)
 }*/
 void ConferenceControl::setConnectedList(string user)
 {	
+	connectedList.push_back((ConfMember(user, "")));
+	/*
 	connectedList.uris[connectedList.numUser]=user;
 	connectedList.numUser++;
+	*/
 }
 /*string[10] ConferenceControl::getConnectedList()
 {
@@ -99,12 +115,13 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
     	cerr << "CC: from MR -> CC: handleGuiCommand command"<< endl;
 	if(command.getOp()==SipCommandString::accept_invite)
 	{
-		pendingList[numPending]=command.getParam();
-		pendingListCallIds[numPending]=command.getDestinationId();
+		//pendingList[numPending]=command.getParam();
+		//pendingListCallIds[numPending]=command.getDestinationId();
+		pendingList.push_back((ConfMember(command.getParam(), command.getDestinationId())));
 		numPending++;
 		string users;
-		for(int t=0;t<connectedList.numUser;t++)
-			users=users+connectedList.uris[t]+";";
+		for(int t=0;t<connectedList.size();t++)
+			users=users+ ((connectedList[t]).uri);       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		command.setParam2(users);
 		callback->confcb_handleSipCommand(command);
@@ -116,9 +133,12 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 
 	cerr << "CC: from MR -> CC: handleGuiDoInviteCommand"<< endl;
     	cerr <<"conf "+sip_url<< endl;
-	pendingList[numPending]=sip_url;
+	
+	//BM pendingList[numPending]=sip_url;
+	pendingList.push_back((ConfMember(sip_url, "")));
+	
 	numPending++;
-	callId = callback->confcb_doJoin(sip_url,connectedList.uris, connectedList.numUser);
+	callId = callback->confcb_doJoin(sip_url, &connectedList);
 	if (callId=="malformed"){
 		//state="IDLE";
 		//setPrompt(state);
@@ -339,8 +359,9 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    displayMessage("Received: "+cmd.getOp(), blue);
     }*/
 }
-void ConferenceControl::updatePendingList(string users[10]){
+void ConferenceControl::updatePendingList(string users[10]){	
 	
+/*	
 	for(int t=0;t<10;t++)
 	{
 		for(int j=0;j<10;j++)
@@ -352,4 +373,5 @@ void ConferenceControl::updatePendingList(string users[10]){
 			}
 		}
 	}
+*/
 }
