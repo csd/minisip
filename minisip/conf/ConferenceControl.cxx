@@ -359,19 +359,32 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    displayMessage("Received: "+cmd.getOp(), blue);
     }*/
 }
-void ConferenceControl::updatePendingList(string users[10]){	
-	
-/*	
-	for(int t=0;t<10;t++)
-	{
-		for(int j=0;j<10;j++)
-		{
-			if(users[t]!=connectedList.uris[j]&&users[t]!=pendingList[j])
-			{
-				pendingList[numConnected]=users[t];
-				numPending++;
-			}
-		}
-	}
+
+/**
+* Moves a member from pending to connected and look for new members
 */
+void ConferenceControl::handleOkAck(string from, minilist<ConfMember> *list) {
+	pendingToConnected(from);
+	updateLists(list);
+}
+	
+/**
+* Print a list of conference members
+*/
+void ConferenceControl::printList(minilist<ConfMember> *list) {
+	for (int i = 0; i < list->size(); i++ ) {
+	//	cerr << list
+	} 
+}
+        
+	
+/**
+* Move a member from pending to connected status
+*/
+void ConferenceControl::pendingToConnected(string member) {
+}
+/**
+* Check for new members to connect to
+*/
+void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 }

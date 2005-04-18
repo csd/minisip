@@ -58,6 +58,7 @@ class ConferenceControl{
 	void handleGuiCommand(string cmd);
 	void handleGuiCommand(CommandString &command);
 	void handleGuiDoInviteCommand(string sip_url);
+	
 	void handleSipCommand(CommandString &cmd);
         //virtual void handleGuiCommand(string);
 	void setCallback(ConfCallback *cb);
@@ -66,12 +67,33 @@ class ConferenceControl{
 	void setConnectedList(string user);
 	//string[10] getConnectedList();
 	ConfCallback* getCallback();
-	void updatePendingList(string users[10]);
+	
+	
+	/**
+	* Moves a member from pending to connected and look for new members
+	*/
+	void handleOkAck(string from, minilist<ConfMember> *list);
+	
+	/**
+	* Print a list of conference members
+	*/
+	void printList(minilist<ConfMember> *list);
         
         
 	//virtual void run();
 
     private:
+	
+	/**
+	* Move a member from pending to connected status
+	*/
+	void pendingToConnected(string member);
+	/**
+	* Check for new members to connect to
+	*/
+	void updateLists(minilist<ConfMember> *list);
+	
+	
 	//Gui *gui;
         string input;
         string callId;
