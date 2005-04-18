@@ -924,7 +924,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	cerr << "CONFDIALOG: Creating SipDialogConfVoip's connectedList" << endl;
 	
 	//???
-	connectedList = list;
+	connectedList = new minilist<ConfMember>(*list);
 	
 	/*
 	for(int t=0;t<10;t++)
