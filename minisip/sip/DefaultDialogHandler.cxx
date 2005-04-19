@@ -215,12 +215,12 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
 			//BM is it safe to pass the list like this?
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, &connectList, pkt->getCallId(), ipsecSession )); 
+								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
 	
 #else	
 			
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, &connectList, pkt->getCallId()));
+								phoneconf, mediaSession, pkt->getCallId()));
 #endif
 #ifdef MINISIP_MEMDEBUG
 			voipConfCall.setUser("DefaultDialogHandler");
