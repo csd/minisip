@@ -98,7 +98,10 @@ class SipDialogConfVoip: public SipDialog{
 		void setUpStateMachine();
 		
 		//string connectedList[10]; //old static list
-		minilist<ConfMember> *connectedList;
+		minilist<ConfMember> *adviceList;
+		
+		//this is the list that will be sent in an Ok or Ack message.
+		minilist<ConfMember> connectedList;
 		
 		string type;
 		int numConnected;

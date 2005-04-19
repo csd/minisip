@@ -121,7 +121,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		numPending++;
 		string users;
 		for(int t=0;t<connectedList.size();t++)
-			users=users+ ((connectedList[t]).uri);       //was connectedList.uris[t]+";";
+			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		command.setParam2(users);
 		callback->confcb_handleSipCommand(command);

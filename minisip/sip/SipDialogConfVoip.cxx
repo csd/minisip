@@ -447,7 +447,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		string users;
 		for(int t=0;t<numConnected;t++)
-			users=users+ (((*connectedList)[t]).uri);
+			users=users+ (((*adviceList)[t]).uri);
 			
 		/*CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
@@ -491,13 +491,13 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 			line+=users[i++];
 			if(users[i]==';')
 			{
-				connectedList->push_back((ConfMember(line, "")));
+				connectedList.push_back((ConfMember(line, "")));
 				//connectedList[numConnected]=line;
 				cerr<< "line: " + line << endl;
 				line="";
 				
 				numConnected++;
-				assert(numConnected==connectedList->size());
+				assert(numConnected==connectedList.size());
 				i++;
 			}
 		}
@@ -921,10 +921,11 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	numConnected= list->size();
 	type="join";
 	
-	cerr << "CONFDIALOG: Creating SipDialogConfVoip's connectedList" << endl;
+	cerr << "CONFDIALOG: Creating SipDialogConfVoip's receivedList" << endl;
 	
-	//???
-	connectedList = new minilist<ConfMember>(*list);
+	//this is the list you get/send as advice of who is in the conference. It will go to the GUI to be displayed to
+	//the user to make a decision to join or not.
+	adviceList = new minilist<ConfMember>(*list);
 	
 	/*
 	for(int t=0;t<10;t++)
@@ -1628,7 +1629,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*adviceList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
@@ -1641,7 +1642,7 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
@@ -1654,7 +1655,7 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
 	for(int t=0;t<numConnected;t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*connectedList)[t]).uri);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
 	}
 }
 void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){
