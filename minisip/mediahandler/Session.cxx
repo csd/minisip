@@ -41,6 +41,7 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
+#include<libmutil/Timestamp.h>
 
 #define SESSION_LINE "s=Minisip Session"
 
@@ -183,11 +184,13 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			return false;
 		}
 
+                /*
                 else{
                         if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
                                 ((KeyAgreementDH *)*ka)->computeTgk();
                         }
                 }
+                */
 	}
 	remoteAddress = answer->getRemoteAddr( port );
 
@@ -337,11 +340,13 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 			fprintf(stderr, "responderParse failed\n" );
 			return NULL;
 		}
+                /*
                 else{
                         if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
                                 ((KeyAgreementDH *)*ka)->computeTgk();
                         }
                 }
+                */
 		
 		sdpAnswer->setSessionLevelAttribute( "key-mgmt", "mikey "+keyMgmtAnswer );
 	}
@@ -352,6 +357,12 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 
 void Session::start(){
 	list< MRef<MediaStream * > >::iterator i;
+        
+        if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+                ts.save( TGK_START );
+                ((KeyAgreementDH *)*ka)->computeTgk();
+                ts.save( TGK_END );
+        }
 
 
 	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
