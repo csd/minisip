@@ -206,6 +206,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 #ifndef _MSC_VER
 		ts.save("a3_callingnoauth_incall_2xx");
 #endif
+
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
 		string peerUri = resp->getFrom().getString();
@@ -214,11 +215,27 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 		getLogEntry()->peerSipUri = peerUri;
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
+		//parsing sdp part for conf:
+		assert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
+		MRef<SdpPacket*> sdp = (SdpPacket*)*resp->getContent();
+		string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
+		int num = 0;
 
-						
-                CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",(getMediaSession()->isSecure()?"secure":"unprotected"));
+   //--- Convert each digit char and add into result.
+   			int t=0;
+			while (numToConnect[t] >= '0' && numToConnect[t] <='9') {
+      				num = (num * 10) + (numToConnect[t] - '0');
+      				t++;
+   			}
+			string users="";
+			for(t=0;t<num;t++)
+				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
+				users=users+sdp->getSessionLevelAttribute("participant_"+itoa(t+1))+";";
+			//cerr<<"==============users: "+users<<endl;	
+                
+		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",(getMediaSession()->isSecure()?"secure":"unprotected"),users);
 		
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
@@ -509,7 +526,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		
 	//bm
 		CommandString cmdstr(dialogState.callId, 
-				SipCommandString::invite_ok,"",
+				SipCommandString::invite_ok,dialogState.remoteUri,
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );

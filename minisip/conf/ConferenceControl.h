@@ -72,7 +72,7 @@ class ConferenceControl{
 	/**
 	* Moves a member from pending to connected and look for new members
 	*/
-	void handleOkAck(string from, minilist<ConfMember> *list);
+	void handleOkAck(string callid, minilist<ConfMember> *list);
 	
 	/**
 	* Print a list of conference members
@@ -87,7 +87,7 @@ class ConferenceControl{
 	/**
 	* Move a member from pending to connected status
 	*/
-	void pendingToConnected(string member);
+	void pendingToConnected(string memberid);
 	/**
 	* Check for new members to connect to
 	*/

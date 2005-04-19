@@ -54,8 +54,8 @@ ConferenceControl::ConferenceControl(){
 	pendingList[t]="";
 	pendingListCallIds[t]="";
     }
-    connectedList.uris[0]="ali";
-    connectedList.uris[1]="mehmet";
+    connectedList.uris[0]="bilge";
+    connectedList.uris[1]="max";
     cerr << connectedList.uris[0]<< endl;
     connectedList.numUser=2;
     numPending=0;
@@ -64,8 +64,8 @@ ConferenceControl::ConferenceControl(){
     
    
     
-    connectedList.push_back(ConfMember("max", "" ));
-    connectedList.push_back(ConfMember("bilge", ""));
+    connectedList.push_back(ConfMember("ali", "" ));
+    connectedList.push_back(ConfMember("mehmet", ""));
     
     cerr << "Two members added to connectedList " << endl;
     
@@ -118,9 +118,12 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		//pendingList[numPending]=command.getParam();
 		//pendingListCallIds[numPending]=command.getDestinationId();
 		pendingList.push_back((ConfMember(command.getParam(), command.getDestinationId())));
+		cerr<<"call is accepted=>pending list: "<<endl;
+		printList(&pendingList);
 		numPending++;
 		string users;
 		for(int t=0;t<connectedList.size();t++)
+
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		command.setParam2(users);
@@ -135,10 +138,11 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
     	cerr <<"conf "+sip_url<< endl;
 	
 	//BM pendingList[numPending]=sip_url;
-	pendingList.push_back((ConfMember(sip_url, "")));
+	
 	
 	numPending++;
 	callId = callback->confcb_doJoin(sip_url, &connectedList);
+	pendingList.push_back((ConfMember(sip_url, callId)));
 	if (callId=="malformed"){
 		//state="IDLE";
 		//setPrompt(state);
@@ -159,9 +163,29 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    //state="INCALL";
 	    //gui->setPrompt(state);
 	    cerr << "CC: PROGRESS: remote participant accepted the call..."<< endl;
-	    //displayMessage("PROGRESS: remote participant accepted the call...", blue);
-	    
+	    cerr<<"print connected list-------------"<<endl;
 	    printList(&connectedList);
+		cerr<<"print pending list-------------"<<endl;
+	    printList(&pendingList);
+	int i=0;
+	string line="";
+	string users=cmd.getParam3();
+	minilist<ConfMember> receivedList;
+		while (!(i>(users.length()-1))){
+			line+=users[i++];
+			if(users[i]==';')
+			{
+				receivedList.push_back((ConfMember(line, "")));
+				//connectedList[numConnected]=line;
+				cerr<< "CC------line: " + line << endl;
+				line="";
+				i++;
+			}
+		}
+	    handleOkAck(cmd.getDestinationId() ,&receivedList);
+	    cerr<<"print connected list-------------"<<endl;
+	    printList(&connectedList);
+		cerr<<"print pending list-------------"<<endl;
 	    printList(&pendingList);
     }
     if (cmd.getOp()=="remote_ringing"){
@@ -221,7 +245,8 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    cerr << "CC: The remote user rejected the call."<< endl;
 	    //displayMessage("The remote user rejected the call.", red);
     }
-
+    
+    
     /*if (cmd.getOp()==SipCommandString::incoming_available){
 	    if(!inCall){
 	    	state="ANSWER?";
@@ -366,8 +391,8 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 /**
 * Moves a member from pending to connected and look for new members
 */
-void ConferenceControl::handleOkAck(string from, minilist<ConfMember> *list) {
-	pendingToConnected(from);
+void ConferenceControl::handleOkAck(string callid, minilist<ConfMember> *list) {
+	pendingToConnected(callid);
 	updateLists(list);
 }
 	
@@ -377,6 +402,7 @@ void ConferenceControl::handleOkAck(string from, minilist<ConfMember> *list) {
 void ConferenceControl::printList(minilist<ConfMember> *list) {
 	for (int i = 0; i < list->size(); i++ ) {
 		cerr << "Member : " + ((*list)[i]).uri << endl;
+		cerr << "CallId : " + ((*list)[i]).callid << endl;
 	} 
 }
         
@@ -384,7 +410,7 @@ void ConferenceControl::printList(minilist<ConfMember> *list) {
 /**
 * Move a member from pending to connected status
 */
-void ConferenceControl::pendingToConnected(string member) {
+void ConferenceControl::pendingToConnected(string memberid) {
 
 	//find member in the pending list and remove it
 	int i = 0;
@@ -392,7 +418,7 @@ void ConferenceControl::pendingToConnected(string member) {
 	
 	while ((!done) && (i < pendingList.size() ) ) {
 		
-		if (pendingList[i].uri == member) {
+		if (pendingList[i].callid == memberid) {
 			connectedList.push_back(pendingList[i]);
 			pendingList.remove(i);
 			done = true;
@@ -436,6 +462,7 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		//if not found in pending or connected list then add to pending list
 		if (!handled) {
 			pendingList.push_back(ConfMember(current, (*list)[i].callid  )  );
+			cerr<<"update pending list=> "+current<<endl;
 		}
 	
 		//send a connect message to the newly discovered conference members
