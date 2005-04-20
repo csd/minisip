@@ -106,12 +106,14 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
 
 	source->getDecoder()->setHandler( *mixer );
 
+        cerr << "Registering VideoMediaSource, sources.size = " << sources.size() << endl;
+
 	sourcesLock.lock();
 	if( sources.size() == 0 ){
 		sourcesLock.unlock();
 		/* start everything */
-		display->start();
 		mixer->selectMainSource( ssrc );
+		display->start();
 		sourcesLock.lock();
 	}
 	
