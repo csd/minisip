@@ -358,7 +358,7 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 void Session::start(){
 	list< MRef<MediaStream * > >::iterator i;
         
-        if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+        if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
                 ts.save( TGK_START );
                 ((KeyAgreementDH *)*ka)->computeTgk();
                 ts.save( TGK_END );
@@ -367,7 +367,9 @@ void Session::start(){
 
 	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
 		if( ! (*i)->disabled ){
-			(*i)->setKeyAgreement( ka );
+			if( securityConfig.secured ){
+				(*i)->setKeyAgreement( ka );
+			}
 			(*i)->start();
 		}
 	}
@@ -375,7 +377,9 @@ void Session::start(){
         mediaStreamSendersLock.lock();
 	for( i = mediaStreamSenders.begin(); i != mediaStreamSenders.end(); i++ ){
 		if( (*i)->getPort() ){
-			(*i)->setKeyAgreement( ka );
+			if( securityConfig.secured ){
+				(*i)->setKeyAgreement( ka );
+			}
 			(*i)->start();
 		}
 	}
