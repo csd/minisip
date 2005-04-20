@@ -112,7 +112,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
                         SLOT( *this, &CallWidget::transfer ) );
                 
         transferHBox.pack_end( transferButton, false, false ), 
-        transferHBox.pack_end( transferEntry, false, true ), 
+        transferHBox.pack_end( transferEntry, true, true ), 
         
         transferHBox2.pack_end( transferProgress, true, true );
 
