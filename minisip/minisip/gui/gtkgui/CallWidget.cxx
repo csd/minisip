@@ -98,6 +98,11 @@ CallWidget::CallWidget( string callId, string remoteUri,
 	secStatus.set_use_markup( true );
 
 #ifndef OLDLIBGLADEMM
+        DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
+        dtmfWidget->setHandler( this );
+        dtmfArrow.add( *dtmfWidget ); 
+        pack_start( dtmfArrow, false, false, 4 );
+        
         Gtk::VBox * vbox = manage( new Gtk::VBox );
         vbox->add( transferHBox );
         vbox->add( transferHBox2 );
@@ -111,12 +116,8 @@ CallWidget::CallWidget( string callId, string remoteUri,
         
         transferHBox2.pack_end( transferProgress, true, true );
 
-        pack_start( transferArrow, false, false, 10 );
+        pack_start( transferArrow, false, false, 4 );
 
-        DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
-        dtmfWidget->setHandler( this );
-        dtmfArrow.add( *dtmfWidget ); 
-        pack_start( dtmfArrow, false, false, 10 );
 #endif
 
 	buttonBox.add( acceptButton );

@@ -106,6 +106,7 @@ void AudioMedia::playData( RtpPacket * packet ){
 	if( source ){
 		source->playData( packet );
 	}
+        delete packet;
 
 }
 
