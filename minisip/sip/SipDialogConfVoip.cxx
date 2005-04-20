@@ -233,7 +233,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 				users=users+sdp->getSessionLevelAttribute("participant_"+itoa(t+1))+";";
 			//cerr<<"==============users: "+users<<endl;	
                 
-		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",(getMediaSession()->isSecure()?"secure":"unprotected"),users);
+		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, dialogState.remoteUri,(getMediaSession()->isSecure()?"secure":"unprotected"),users);
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
@@ -476,7 +476,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected"),users
 				);//bm
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		sendRinging(ir->getBranch());
 		
@@ -525,12 +525,13 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		*/
 		
 	//bm
+		cerr<<"dialogState.remoteUri----------------"+dialogState.remoteUri<<endl;
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::invite_ok,dialogState.remoteUri,
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );		
+		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );		
 
 		assert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );

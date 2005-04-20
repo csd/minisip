@@ -461,7 +461,9 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		
 		//if not found in pending or connected list then add to pending list
 		if (!handled) {
-			pendingList.push_back(ConfMember(current, (*list)[i].callid  )  );
+			callId = callback->confcb_doConnect(current);
+			pendingList.push_back(ConfMember(current, callId  )  );
+			
 			cerr<<"update pending list=> "+current<<endl;
 		}
 	
