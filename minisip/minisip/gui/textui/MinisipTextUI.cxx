@@ -195,6 +195,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	setPrompt(state);
         displayMessage("Remote user ended the call.",red);
         callId=""; //FIXME: should check the callId of cmd.
+	inCall=false;
     }
 
 
@@ -825,6 +826,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		setPrompt(state);
 		displayMessage("hangup");
 		handled=true;
+		inCall=false;
 	}
 
 	if ((command.size()>=4) && (command.substr(0,4) == "call")){
