@@ -107,7 +107,7 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-
+		cerr<<"****************1001************"<<endl;
 		sendAck(resp, getBranch()/*+"ACK"*/);
 		
 		return true;
@@ -127,7 +127,7 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-
+		cerr<<"****************1002************"<<endl;
 		sendAck(resp, getBranch()/*+"ACK"*/);
 
 		return true;
@@ -139,7 +139,7 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCommand &command) {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
-
+		cerr<<"****************1003************"<<endl;
 		sendAck(resp, getBranch()/*+"ACK"*/);
 
 		return true;

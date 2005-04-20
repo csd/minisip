@@ -208,7 +208,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 #endif
 
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-
+		lastResponse=resp;
 		string peerUri = resp->getFrom().getString();
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
@@ -237,7 +237,8 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
-
+		cerr<<"****************************sendack is called**********************"<<endl;
+		sendAck(getLastInvite()->getDestinationBranch() );
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
 #ifdef IPSEC_SUPPORT
@@ -1132,7 +1133,7 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	//cerr<<"SDCV: "+scmd.getCommandString().getString()<<endl;
 	getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	setLastInvite(inv);
-	inv->checkAcceptContact();
+	//inv->checkAcceptContact();
 
 }
 
@@ -1256,14 +1257,14 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 }
 
 
-#ifdef NEVERDEFINED_ERSADFS
-void SipDialogConfVoip::sendAck(string branch){
-	//	mdbg << "ERROR: SipDialogVoip::sendAck() UNIMPLEMENTED" << end;
+//#ifdef NEVERDEFINED_ERSADFS
+void SipDialogConfVoip::sendAck(const string &branch){
+/*	//	mdbg << "ERROR: SipDialogVoip::sendAck() UNIMPLEMENTED" << end;
 	assert( !lastResponse.isNull());
 	SipAck *ack = new SipAck(
 			branch, 
 			*lastResponse,
-			getDialogConfig()->uri_foreign,
+			dialogState.remoteUri,
 			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
 			getDialogConfig()->inherited.sipIdentity->sipDomain);
 	//TODO:
@@ -1282,27 +1283,15 @@ void SipDialogConfVoip::sendAck(string branch){
 	
 	
 	modifyConfAck(ack);
-	
-	if(getDialogConfig()->proxyConnection == NULL){
-		getDialogConfig()->inherited.sipTransport->sendMessage(ack,
-				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited.sipProxy.proxyPort, //port, 
-//				sock, //(Socket *)NULL, //socket, 
-				getDialogConfig()->proxyConnection,
-				"BUGBUGBUG",
-				getDialogConfig()->inherited.transport
-				);
-	}else{
-		
-		// A StreamSocket exists, try to use it
-		mdbg << "Sending packet using existing StreamSocket"<<end;
-		getDialogConfig()->inherited.sipTransport->sendMessage(
-				ack,
-				(StreamSocket *)getDialogConfig()->proxyConnection, "BUGBUGBUG");
-	}
+	MRef<SipMessage*> pref(*ack);
+        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+//	handleCommand(cmd);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
-	return;
-	//	}
+	
+
+	
+	//	}*/
 
 	/*	if(dynamic_cast<StreamSocket *>(socket) != NULL){
 	// A StreamSocket exists, try to use it
@@ -1311,8 +1300,81 @@ void SipDialogConfVoip::sendAck(string branch){
 	return;
 	}
 	 */
-}
+MRef<SipResponse*> ack= new SipResponse(branch, 0,"ACK", MRef<SipMessage*>(*getLastInvite()));	
+	ack->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+
+//      There might be so that there are no SDP. Check!
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+#ifndef _MSC_VER
+		ts.save("getSdpOffer");
 #endif
+		sdp = mediaSession->getSdpOffer();
+#ifndef _MSC_VER
+		ts.save("getSdpOffer");
+#endif
+		if( !sdp ){
+		// FIXME: this most probably means that the
+		// creation of the MIKEY message failed, it 
+		// should not happen
+		merr << "Sdp was NULL in sendInvite" << end;
+		return; 
+		}
+	}
+	
+	/* Add the latter to the INVITE message */ // If it exists
+	
+
+//-------------------------------------------------------------------------------------------------------------//
+#ifdef IPSEC_SUPPORT	
+	// Create a MIKEY message for IPSEC if stated in the config file.
+	MRef<SipMimeContent*> mikey;
+	if (getIpsecSession()->required()){
+		ts.save("getMikeyIpsecAnswer");
+		mikey = ipsecSession->getMikeyIpsecAnswer();
+		ts.save("getMikeyIpsecAnswer");
+		if (!mikey){
+			merr << "Mikey was NULL in sendInviteOk" << end;
+			merr << "Still some errors with IPSEC" << end;
+			//return; 
+		}
+	}
+	else
+		mikey = NULL;
+	MRef<SipMimeContent*> multi;
+	if (mikey && mediaSession){
+		multi = new SipMimeContent("multipart/mixed");
+		multi->addPart(*mikey);
+		multi->addPart(*sdp);
+		ack->setContent( *multi);
+	}
+	if (mikey && !mediaSession)
+		ack->setContent( *mikey);
+	if (!mikey && mediaSession)
+		ack->setContent( *sdp );
+#else
+	
+	ack->setContent( *sdp );
+#endif
+//-------------------------------------------------------------------------------------------------------------//
+//	/* Get the SDP Answer from the MediaSession */
+//	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();
+//
+//	if( sdpAnswer ){
+//		ok->setContent( *sdpAnswer );
+//	}
+//	/* if sdp is NULL, the offer was refused, send 606 */
+//	// FIXME
+//	else return; 
+	modifyConfOk(ack);
+//	setLastResponse(ok);
+        MRef<SipMessage*> pref(*ack);
+        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+//	handleCommand(cmd);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE);
+
+}
+//#endif
 
 void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 
@@ -1670,11 +1732,11 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
-	for(int t=0;t<numConnected;t++)
+	sdp->setSessionLevelAttribute("conf_#participants", "0");
+	/*for(int t=0;t<numConnected;t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
-	}
+	}*/
 }
 void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){
 	//Add Accept-Contact Header

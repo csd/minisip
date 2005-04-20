@@ -112,6 +112,7 @@ class SipDialogConfVoip: public SipDialog{
 		void sendAuthInvite(const string &branch);
 		void sendBye(const string &branch, int);
 		void sendCancel(const string &branch);
+		void sendAck(const string &branch);
 		void sendInviteOk(const string &branch);
 		void sendByeOk(MRef<SipBye*> bye, const string &branch);
 		void sendReject(const string &branch);
@@ -150,7 +151,7 @@ class SipDialogConfVoip: public SipDialog{
 		MRef<LogEntry *> logEntry;
 
 		MRef<SipInvite*> lastInvite;
-
+		MRef<SipResponse*> lastResponse;
 		bool localCalled;
 		string nonce;
 		string realm;
