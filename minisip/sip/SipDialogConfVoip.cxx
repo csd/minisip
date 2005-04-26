@@ -1414,7 +1414,6 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	
 //        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand(cmd);
-//	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE);
 
 }
 //#endif
