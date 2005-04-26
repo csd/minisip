@@ -1400,6 +1400,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 //	else return; 
 	///modifyConfOk(ack);
 //	setLastResponse(ok);
+	modifyConfAck(ack);
         MRef<SipMessage*> pref(*ack);
 	
 	IP4Address toaddr(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyAddressString);
@@ -1759,15 +1760,16 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add Accept-Contact Header
 	ack->set_Conf();
-		
+	cerr<<"modify ack 1111111111111111"<<endl;	
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
-	for(int t=0;t<numConnected;t++)
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(connectedList.size()));
+	for(int t=0;t<connectedList.size();t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
 	}
+	cerr<<"modify ack 22222222222222222"<<endl;
 }
 void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//Add Accept-Contact Header
