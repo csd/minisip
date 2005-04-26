@@ -231,7 +231,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 			for(t=0;t<num;t++)
 				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
 				users=users+sdp->getSessionLevelAttribute("participant_"+itoa(t+1))+";";
-			//cerr<<"==============users: "+users<<endl;	
+			cerr<<"==============users: "+users<<endl;	
                 
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",(getMediaSession()->isSecure()?"secure":"unprotected"),users);
@@ -710,7 +710,7 @@ bool SipDialogConfVoip::a23_callingauth_incall_2xx( const SipSMCommand &command)
 				"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
@@ -1776,11 +1776,11 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", "0");
-	/*for(int t=0;t<numConnected;t++)
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	for(int t=0;t<numConnected;t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
-	}*/
+	}
 }
 void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){
 	//Add Accept-Contact Header

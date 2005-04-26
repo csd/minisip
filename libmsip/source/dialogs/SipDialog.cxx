@@ -96,6 +96,7 @@ void SipDialog::signalIfNoTransactions(){
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
 	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
+	cerr << "SipDialog::handleCommand got command "+command.getCommandString().getString()<<end;
 	//cerr<<"SD: "+command.getCommandString().getString()<<endl;
 	if (command.getType()==SipSMCommand::COMMAND_STRING 
 			&& command.getCommandString().getOp()==SipCommandString::transaction_terminated){
@@ -118,19 +119,23 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 	
 	if (! (command.getDestination()==SipSMCommand::TU||command.getDestination()==SipSMCommand::ANY) ){
 		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< end;
+		cerr << "SipDialog::handleCommand: returning false based on command destination"<< end;
 		return false;
 	}
 
 	if (command.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId!="" && dialogState.callId != command.getCommandPacket()->getCallId()){
 		mdbg << "SipDialog: denying command based on destination id"<< end;
+		cerr << "SipDialog: denying command based on destination id"<< end;
 		return false;
 	}
 
 	mdbg << "SipDialog::handleCommand: sending command to state machine"<< end;
+	cerr << "SipDialog::handleCommand: sending command to state machine"<< end;
 	bool ret;
 	ret=StateMachine<SipSMCommand,string>::handleCommand(command);
 	
 	mdbg << "SipDialog::handleCommand returning "<< ret << end;
+	cerr << "SipDialog::handleCommand returning "<< ret << end;
 
 	return ret;
 }

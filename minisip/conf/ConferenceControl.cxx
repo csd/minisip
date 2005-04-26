@@ -167,8 +167,9 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	int i=0;
 	string line="";
 	string users=cmd.getParam3();
+	cerr<<"users-------------"+users<<endl;
 	minilist<ConfMember> receivedList;
-		while (!(i>(users.length()-1))){
+		while (users.length()!=0 &&!(i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{
