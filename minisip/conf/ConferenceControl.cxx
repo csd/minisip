@@ -61,11 +61,8 @@ ConferenceControl::ConferenceControl(){
     numPending=0;
     */
    
-    
-   
-    
-    connectedList.push_back(ConfMember("ali", "" ));
-    connectedList.push_back(ConfMember("mehmet", ""));
+    connectedList.push_back(ConfMember("hanningz@ssvl.kth.se", "" ));
+    connectedList.push_back(ConfMember("piet@ssvl.kth.se", ""));
     
     cerr << "Two members added to connectedList " << endl;
     
@@ -461,14 +458,13 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		
 		//if not found in pending or connected list then add to pending list
 		if (!handled) {
+			//send a connect message to the newly discovered conference members
 			callId = callback->confcb_doConnect(current);
 			pendingList.push_back(ConfMember(current, callId  )  );
 			
 			cerr<<"update pending list=> "+current<<endl;
 		}
 	
-		//send a connect message to the newly discovered conference members
-		//TODO
 	}
 }
 	

@@ -146,8 +146,12 @@ class SipDialogConfVoip: public SipDialog{
 		bool a26_callingnoauth_termwait_transporterror( const SipSMCommand &command);
 
 		bool a26_callingauth_termwait_cancel( const SipSMCommand &command);
+		bool a27_incall_incall_ACK( const SipSMCommand &command);
 		
 		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
+		
+		
+		
 		MRef<LogEntry *> logEntry;
 
 		MRef<SipInvite*> lastInvite;

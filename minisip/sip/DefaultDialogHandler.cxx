@@ -117,7 +117,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
 			
 			
-			//string connectList[10];
+			//this is a join packet and contains an advice list. The list is created from the
+			// packet here in order to send it to the GUI for display.
 			minilist<ConfMember> connectList;
 			
 			int num = 0;
