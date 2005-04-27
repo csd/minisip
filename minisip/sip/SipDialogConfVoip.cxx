@@ -1764,10 +1764,10 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa(connectedList.size()));
-	for(int t=0;t<connectedList.size();t++)
+	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
+	for(int t=0;t<(*adviceList).size();t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
+		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), (((*adviceList))[t]).uri);
 	}
 	cerr<<"modify ack 22222222222222222"<<endl;
 }

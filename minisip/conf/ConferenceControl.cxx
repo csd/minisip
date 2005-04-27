@@ -61,7 +61,7 @@ ConferenceControl::ConferenceControl(){
     numPending=0;
     */
    
-    connectedList.push_back(ConfMember("hanningz@ssvl.kth.se", "" ));
+    connectedList.push_back(ConfMember("zzzzzz@ssvl.kth.se", "" ));
     connectedList.push_back(ConfMember("piet@ssvl.kth.se", ""));
     
     cerr << "Two members added to connectedList " << endl;
@@ -124,6 +124,8 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		command.setParam2(users);
+		//command.setParam2((string) &connectedList);
+		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
 		callback->confcb_handleSipCommand(command);
 	}
         //string uri = trim(cmd.substr(5));
