@@ -906,9 +906,7 @@ void MinisipTextUI::guiExecute(string cmd){
         
 	if ((command.size()>=4) && (command.substr(0,4) == "addc")){
 		if (command.size()>=6){
-			if (state!="IDLE"){
-				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
-			}else{
+			
 				string uri = trim(command.substr(5));
 				displayMessage("Conf.Uri: "+uri);
 				callback->guicb_confDoInvite(uri);
@@ -924,7 +922,7 @@ void MinisipTextUI::guiExecute(string cmd){
 					setPrompt(state);
 					displayMessage(string("Created call with id=")+callId);    
 				}*/
-			}
+			
 		}else{
 			displayMessage("Usage: call <userid>");
 //			displayHelp("call");
