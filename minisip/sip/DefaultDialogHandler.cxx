@@ -119,7 +119,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			
 			//this is a join packet and contains an advice list. The list is created from the
 			// packet here in order to send it to the GUI for display.
-			minilist<ConfMember> connectList;
+			
 			
 			int num = 0;
 
@@ -132,8 +132,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			for(t=0;t<num;t++)
 				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
 				connectList.push_back((ConfMember(sdp->getSessionLevelAttribute("participant_"+itoa(t+1)),"")));
-			cerr << "DDH: "+numToConnect[0]<< endl;
-			cerr << "DDH: "+numToConnect[1]<< endl;
+			//cerr << "DDH: "+numToConnect[0]<< endl;
+			//cerr << "DDH: "+numToConnect[1]<< endl;
 			cerr << "DDH: "+itoa(num)<< endl;
 			//int num=atoi(numToConnect);
 			//string gID = sdp->getSessionLevelAttribute("p2tGroupIdentity");

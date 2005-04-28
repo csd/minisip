@@ -472,9 +472,10 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
 		string users;
-		for(int t=0;t<numConnected;t++)
-			users=users+ (((*adviceList)[t]).uri);
-			
+		cerr<<"*************users "+itoa((*adviceList).size())<<endl;
+		for(int t=0;t<(*adviceList).size();t++)
+			{users=users+ (((*adviceList)[t]).uri);
+		cerr<<"*************users "+users<<endl;}	
 		/*CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
 				dialogState.remoteUri, 
@@ -513,7 +514,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 	cerr<<"users=command.getCommandString().getParam2() "+users<<endl;
 	string line="";
 	int i=0;	
-		while (!(i>(users.length()-1))){
+		while (users.length()!=0 &&!(i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{
@@ -1014,9 +1015,9 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	}
 	*/
 	
-	cerr << "CONFDIALOG: "+ ((*list)[0]).uri << endl;
-	cerr << "CONFDIALOG: "+ ((*list)[1]).uri << endl;
-	cerr << "CONFDIALOG: "+itoa(numConnected)<< endl;
+	//cerr << "CONFDIALOG: "+ ((*list)[0]).uri << endl;
+	//cerr << "CONFDIALOG: "+ ((*list)[1]).uri << endl;
+	//cerr << "CONFDIALOG: "+itoa(numConnected)<< endl;
 	
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
@@ -1785,7 +1786,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
 	for(int t=0;t<numConnected;t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*adviceList)[t]).uri);
@@ -1812,7 +1813,7 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa(numConnected));
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(connectedList.size()));
 	for(int t=0;t<numConnected;t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);

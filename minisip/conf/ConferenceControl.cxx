@@ -61,8 +61,8 @@ ConferenceControl::ConferenceControl(){
     numPending=0;
     */
    
-    connectedList.push_back(ConfMember("zzzzzz@ssvl.kth.se", "" ));
-    connectedList.push_back(ConfMember("piet@ssvl.kth.se", ""));
+    //connectedList.push_back(ConfMember("zzzzzz@ssvl.kth.se", "" ));
+    //connectedList.push_back(ConfMember("piet@ssvl.kth.se", ""));
     
     cerr << "Two members added to connectedList " << endl;
     
@@ -253,7 +253,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     if (cmd.getOp()==SipCommandString::remote_user_not_found){
         //state="IDLE";
 	//setPrompt(state);
-	cerr << "CC: User "+cmd.getParam()+" not found."<< endl;
+	cerr << "CC: User "+cmd.getDestinationId()+" not found."<< endl;
 	removeMember(cmd.getDestinationId());
         //displayMessage("User "+cmd.getParam()+" not found.",red);
         callId=""; //FIXME: should check the callId of cmd.
@@ -481,15 +481,7 @@ void ConferenceControl::removeMember(string memberid) {
 	//find member in the pending list and remove it
 	int i = 0;
 	bool done = false;
-	while ((!done) && (i < connectedList.size() ) ) {
-		
-		if (connectedList[i].callid == memberid) {
-			connectedList.remove(i);
-			done = true;
-		}
-		
-		i++;
-	}
+	
 	while ((!done) && (i < pendingList.size() ) ) {
 		
 		if (pendingList[i].callid == memberid) {
@@ -499,7 +491,16 @@ void ConferenceControl::removeMember(string memberid) {
 		
 		i++;
 	}
-	
+	i=0;
+	while ((!done) && (i < connectedList.size() ) ) {
+		
+		if (connectedList[i].callid == memberid) {
+			connectedList.remove(i);
+			done = true;
+		}
+		
+		i++;
+	}
 	
 	assert(done==true);
 	
