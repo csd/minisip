@@ -146,6 +146,12 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 		cerr<<"sending invite3*************"<<endl;
 		registerTransaction(invtrans);
 		cerr<<"sending invite*************"<<endl;
+		CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
+		
+		
+		
+		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		sendInvite(invtrans->getBranch());
 
 		return true;
@@ -546,7 +552,12 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 
 		assert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
-
+		CommandString cmdstr2("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
+		
+		
+		
+		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr2 );
 		getMediaSession()->start();
 
 		MRef<LogEntry *> logEntry = new LogEntryIncomingCompletedCall();
@@ -1008,12 +1019,12 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	adviceList=list;
 
 	
-	CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
+	//CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
 		
 		
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 	/*
 	for(int t=0;t<10;t++)
 	{
