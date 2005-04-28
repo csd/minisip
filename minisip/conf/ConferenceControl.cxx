@@ -238,6 +238,11 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    cerr << "CC: PROGRESS: the remove UA is ringing..."<< endl;
 	    //displayMessage("PROGRESS: the remove UA is ringing...", blue);
     }
+	if (cmd.getOp()=="myuri"){
+	    myuri=cmd.getParam();
+	    cerr << "my URI is "+myuri<< endl;
+	    //displayMessage("PROGRESS: the remove UA is ringing...", blue);
+    }
 
 
 
@@ -535,7 +540,7 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		}
 		
 		//if not found in pending or connected list then add to pending list
-		if (!handled) {
+		if (!handled&&current!=myuri) {
 			//send a connect message to the newly discovered conference members
 			callId = callback->confcb_doConnect(current);
 			pendingList.push_back(ConfMember(current, callId  )  );

@@ -109,7 +109,7 @@ class ConferenceControl{
 	
 	minilist<ConfMember> connectedList;
 	minilist<ConfMember> pendingList;
-	
+	string myuri;
 	
 	///a P2T Group Member List
 	//MRef<GroupList*>grpList;

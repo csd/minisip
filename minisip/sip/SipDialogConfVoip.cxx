@@ -125,7 +125,7 @@ gui(failed)              |                                    |                |
  
  
 bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
-{cerr<<"************************************invite received"<<endl;
+{cerr<<"************************************invite receivedqwe"<<endl;
 	if (transitionMatch(command, SipCommandString::invite)){
 #ifdef MINISIP_MEMDEBUG
 		vc.setUser("WARNING - transaction");
@@ -133,18 +133,19 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 #ifndef _MSC_VER
 		ts.save("a0_start_callingnoauth_invite");
 #endif
+		cerr<<"sending invite1*************"<<endl;
 		//int seqNo = requestSeqNo();
 		++dialogState.seqNo;
 //		setLocalCalled(false);
 		localCalled=false;
 		dialogState.remoteUri= command.getCommandString().getParam();
-
+		cerr<<"sending invite2*************"<<endl;
 		MRef<SipTransaction*> invtrans = new SipTransactionInviteClient(MRef<SipDialog *>(this), dialogState.seqNo, dialogState.callId);
 		
 		invtrans->setSocket( phoneconf->proxyConnection );
-		
+		cerr<<"sending invite3*************"<<endl;
 		registerTransaction(invtrans);
-
+		cerr<<"sending invite*************"<<endl;
 		sendInvite(invtrans->getBranch());
 
 		return true;
@@ -1005,6 +1006,14 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	//the user to make a decision to join or not.
 	//adviceList = new minilist<ConfMember>(*list);
 	adviceList=list;
+
+	
+	CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
+		
+		
+		
+		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 	/*
 	for(int t=0;t<10;t++)
 	{
@@ -1784,6 +1793,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	//inv->set_ConfJoin();
 	inv->set_ConfJoin();	
 	//Add SDP Session Level Attributes
+	cerr<<"modify join 1111111111111111"<<endl;
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
@@ -1791,6 +1801,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*adviceList)[t]).uri);
 	}
+	cerr<<"modify join 22222222222222222"<<endl;
 }
 void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add Accept-Contact Header
