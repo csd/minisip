@@ -281,7 +281,7 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 		cmd.setDestination(SipSMCommand::transaction);
 		cmd.setSource(command.getSource());
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-
+		
 		sendByeOk(bye, byeresp->getBranch() );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
@@ -811,6 +811,40 @@ bool SipDialogConfVoip::a27_incall_incall_ACK( const SipSMCommand &command)
 	if (transitionMatch(command, SipAck::type, SipSMCommand::remote, IGN)){
 		//...
 		cerr << "Received ACK in SipDialogConfVoIP!!!!!!!!!!!!!!!!!!!!!!!"<< endl;
+		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
+		assert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
+		MRef<SdpPacket*> sdp = (SdpPacket*)*resp->getContent();
+		string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
+		int num = 0;
+
+   //--- Convert each digit char and add into result.
+   			int t=0;
+			while (numToConnect[t] >= '0' && numToConnect[t] <='9') {
+      				num = (num * 10) + (numToConnect[t] - '0');
+      				t++;
+   			}
+			string users="";
+			for(t=0;t<num;t++)
+				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
+				users=users+sdp->getSessionLevelAttribute("participant_"+itoa(t+1))+";";
+			cerr<<"==============users: "+users<<endl;	
+                
+		
+		CommandString cmdstr(dialogState.callId, "invite_ack", "",(getMediaSession()->isSecure()?"secure":"unprotected"),users);
+		
+		
+		
+		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		
+			
+			
+#ifdef IPSEC_SUPPORT
+		// Check if IPSEC was required
+		if (ipsecSession->required() && !ipsecSession->offered)
+			return false;
+#endif
+		
 		return true;
 	}else{
 		return false;
@@ -968,8 +1002,8 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	
 	//this is the list you get/send as advice of who is in the conference. It will go to the GUI to be displayed to
 	//the user to make a decision to join or not.
-	adviceList = new minilist<ConfMember>(*list);
-	
+	//adviceList = new minilist<ConfMember>(*list);
+	adviceList=list;
 	/*
 	for(int t=0;t<10;t++)
 	{

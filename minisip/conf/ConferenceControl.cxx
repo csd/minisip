@@ -128,6 +128,20 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
 		callback->confcb_handleSipCommand(command);
 	}
+	if(command.getOp()==SipCommandString::hang_up)
+	{
+		for(int t=0;t<connectedList.size();t++)
+		{
+			CommandString hup(connectedList[t].callid, SipCommandString::hang_up);
+			callback->confcb_handleSipCommand(hup);
+		}
+		for(int t=0;t<pendingList.size();t++)
+		{
+			CommandString hup(pendingList[t].callid, SipCommandString::hang_up);
+			callback->confcb_handleSipCommand(hup);
+		}
+	}
+		
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    
 }
@@ -188,6 +202,36 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 		cerr<<"print pending list-------------"<<endl;
 	    printList(&pendingList);
     }
+    if (cmd.getOp()=="invite_ack"){
+	    //state="INCALL";
+	    //gui->setPrompt(state);
+	    cerr << "CC: PROGRESS: ack received..."<< endl;
+	    cerr<<"print connected list-------------"<<endl;
+	    printList(&connectedList);
+		cerr<<"print pending list-------------"<<endl;
+	    printList(&pendingList);
+	int i=0;
+	string line="";
+	string users=cmd.getParam3();
+	cerr<<"users-------------"+users<<endl;
+	minilist<ConfMember> receivedList;
+		while (users.length()!=0 &&!(i>(users.length()-1))){
+			line+=users[i++];
+			if(users[i]==';')
+			{
+				receivedList.push_back((ConfMember(line, "")));
+				//connectedList[numConnected]=line;
+				cerr<< "CC------line: " + line << endl;
+				line="";
+				i++;
+			}
+		}
+	    handleOkAck(cmd.getDestinationId() ,&receivedList);
+	    cerr<<"print connected list-------------"<<endl;
+	    printList(&connectedList);
+		cerr<<"print pending list-------------"<<endl;
+	    printList(&pendingList);
+    }
     if (cmd.getOp()=="remote_ringing"){
 	    //state="REMOTE RINGING";
 	    //setPrompt(state);
@@ -210,6 +254,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
         //state="IDLE";
 	//setPrompt(state);
 	cerr << "CC: User "+cmd.getParam()+" not found."<< endl;
+	removeMember(cmd.getDestinationId());
         //displayMessage("User "+cmd.getParam()+" not found.",red);
         callId=""; //FIXME: should check the callId of cmd.
     }
@@ -217,6 +262,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     if (cmd.getOp()==SipCommandString::remote_hang_up){
         //state="IDLE";
 	//setPrompt(state);
+	removeMember(cmd.getDestinationId());
 	cerr << "CC: Remote user ended the call."<< endl;
         //displayMessage("Remote user ended the call.",red);
         callId=""; //FIXME: should check the callId of cmd.
@@ -426,6 +472,34 @@ void ConferenceControl::pendingToConnected(string memberid) {
 		
 		i++;
 	}
+	
+	assert(done==true);
+	
+}
+void ConferenceControl::removeMember(string memberid) {
+
+	//find member in the pending list and remove it
+	int i = 0;
+	bool done = false;
+	while ((!done) && (i < connectedList.size() ) ) {
+		
+		if (connectedList[i].callid == memberid) {
+			connectedList.remove(i);
+			done = true;
+		}
+		
+		i++;
+	}
+	while ((!done) && (i < pendingList.size() ) ) {
+		
+		if (pendingList[i].callid == memberid) {
+			pendingList.remove(i);
+			done = true;
+		}
+		
+		i++;
+	}
+	
 	
 	assert(done==true);
 	

@@ -92,7 +92,7 @@ class ConferenceControl{
 	* Check for new members to connect to
 	*/
 	void updateLists(minilist<ConfMember> *list);
-	
+	void removeMember(string memberid); 
 	
 	//Gui *gui;
         string input;

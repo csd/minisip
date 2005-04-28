@@ -788,6 +788,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		//callback->guicb_handleConfCommand(cmd);
 		callback->setConferenceController(currentconf);
 		addCommand("addc");
+		addCommand("hangupc");
 		callback->guicb_handleConfCommand(command);
 		displayMessage("A call with the most recent callId will be accepted");
 		handled=true;
@@ -825,6 +826,15 @@ void MinisipTextUI::guiExecute(string cmd){
 		state="IDLE";
 		setPrompt(state);
 		displayMessage("hangup");
+		handled=true;
+		inCall=false;
+	}
+	if (trim(command) == "hangupc"){
+		CommandString hup("", SipCommandString::hang_up);
+		callback->guicb_handleConfCommand(hup);
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("hangupc");
 		handled=true;
 		inCall=false;
 	}
@@ -870,6 +880,7 @@ void MinisipTextUI::guiExecute(string cmd){
 				displayMessage("	Conf. Name: "+currentconfname);
 				callback->guicb_handleConfCommand(currentconfname);
 				addCommand("addc");
+				addCommand("hangupc");
 			}
 		}else{
 			displayMessage("Usage: call <userid>");
