@@ -477,24 +477,36 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		cmd.setDestination(SipSMCommand::transaction);
 
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-
-		string users;
-		cerr<<"*************users "+itoa((*adviceList).size())<<endl;
-		for(int t=0;t<(*adviceList).size();t++)
-			{users=users+ (((*adviceList)[t]).uri);
-		cerr<<"*************users "+users<<endl;}	
-		/*CommandString cmdstr(dialogState.callId, 
-				SipCommandString::incoming_available, 
-				dialogState.remoteUri, 
-				(getMediaSession()->isSecure()?"secure":"unprotected")
-					);*/
-		CommandString cmdstr(dialogState.callId, 
+		if(type=="join")
+		{
+			string users;
+			cerr<<"*************users "+itoa((*adviceList).size())<<endl;
+			for(int t=0;t<(*adviceList).size();t++)
+				{users=users+ (((*adviceList)[t]).uri);
+			cerr<<"*************users "+users<<endl;}	
+			/*CommandString cmdstr(dialogState.callId, 
+					SipCommandString::incoming_available, 
+					dialogState.remoteUri, 
+					(getMediaSession()->isSecure()?"secure":"unprotected")
+						);*/
+			CommandString cmdstr(dialogState.callId, 
 				"conf_join_received", 
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected"),users
 				);//bm
+			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		}
+		else
+		{
+			CommandString cmdstr(dialogState.callId, 
+				"conf_connect_received", 
+				dialogState.remoteUri, 
+				(getMediaSession()->isSecure()?"secure":"unprotected")
+				);//bm
+			getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		}
 		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		
 		sendRinging(ir->getBranch());
 		
 		if( getDialogConfig()->inherited.autoAnswer ){

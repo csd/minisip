@@ -263,7 +263,24 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
         //displayMessage("User "+cmd.getParam()+" not found.",red);
         callId=""; //FIXME: should check the callId of cmd.
     }
+    if (cmd.getOp()=="conf_connect_received"){
+	    cerr << "CC: connect receieved: "+cmd.getParam()<< endl;
+		pendingList.push_back((ConfMember(command.getParam(), command.getDestinationId())));
+		//cerr<<"call is accepted=>pending list: "<<endl;
+		printList(&pendingList);
+		string users;
+		for(int t=0;t<connectedList.size();t++)
 
+			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
+		cerr<<"users "+users<<endl;
+		command.setParam2(users);
+		command.setOp(SipCommandString::accept_invite);
+		//command.setParam2((string) &connectedList);
+		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
+		callback->confcb_handleSipCommand(command);
+	    //displayMessage("ERROR: "+cmd.getParam(), red);
+    }
+	
     if (cmd.getOp()==SipCommandString::remote_hang_up){
         //state="IDLE";
 	//setPrompt(state);
