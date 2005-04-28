@@ -71,6 +71,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		virtual void confcb_handleSipCommand(string &command){}
 		virtual void confcb_handleSipCommand(CommandString &command);
 		virtual void confcb_handleGuiCommand(string &command){}	
+		virtual ConferenceControl* getConferenceController(){return confrout;};
 	private:
 		
 		Gui *gui;
