@@ -265,7 +265,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     }
     if (cmd.getOp()=="conf_connect_received"){
 	    cerr << "CC: connect receieved: "+cmd.getParam()<< endl;
-		pendingList.push_back((ConfMember(command.getParam(), command.getDestinationId())));
+		pendingList.push_back((ConfMember(cmd.getParam(), cmd.getDestinationId())));
 		//cerr<<"call is accepted=>pending list: "<<endl;
 		printList(&pendingList);
 		string users;
@@ -273,11 +273,11 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
-		command.setParam2(users);
-		command.setOp(SipCommandString::accept_invite);
+		cmd.setParam2(users);
+		cmd.setOp(SipCommandString::accept_invite);
 		//command.setParam2((string) &connectedList);
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
-		callback->confcb_handleSipCommand(command);
+		callback->confcb_handleSipCommand(cmd);
 	    //displayMessage("ERROR: "+cmd.getParam(), red);
     }
 	
