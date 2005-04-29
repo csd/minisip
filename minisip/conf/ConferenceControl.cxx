@@ -68,6 +68,10 @@ ConferenceControl::ConferenceControl(){
     
     numPending = 0;
 }
+minilist<ConfMember> * ConferenceControl::getConnectedList()
+{	
+	return &connectedList;
+}
 void ConferenceControl::setCallback(ConfCallback *cb){
 	this->callback=cb;
 }

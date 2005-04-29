@@ -78,7 +78,7 @@ class ConferenceControl{
 	* Print a list of conference members
 	*/
 	void printList(minilist<ConfMember> *list);
-        
+        minilist<ConfMember> * getConnectedList();
         
 	//virtual void run();
 

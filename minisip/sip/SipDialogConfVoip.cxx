@@ -50,6 +50,7 @@
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 #include"DefaultDialogHandler.h"
+#include"../minisip/MessageRouter.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -153,7 +154,8 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		sendInvite(invtrans->getBranch());
-
+		//MessageRouter * ptr=(MessageRouter *)(getDialogContainer()->getCallback());
+		//adviceList=(ptr->getConferenceController()->getConnectedList());
 		return true;
 	}else{
 		return false;
@@ -250,6 +252,8 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 		cerr<<"****************************sendack is called**********************"<<endl;
 		//sendAck(getLastInvite()->getDestinationBranch() );
 		//BM
+		MessageRouter * ptr=(MessageRouter *)(getDialogContainer()->getCallback());
+		adviceList=(ptr->getConferenceController()->getConnectedList());
 		sendAck(getLastInvite()->getDestinationBranch());
 		
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
