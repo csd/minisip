@@ -45,7 +45,6 @@
 #endif
 
 #include<libmutil/CommandString.h>
-#include"../../../minisip/conf/ConferenceControl.h"
 
 /**
  * Callback interface for the SipSoftPhoneCallback.
@@ -68,7 +67,7 @@ class LIBMSIP_API SipCallback{
 		virtual void sipcb_handleConfCommand(CommandString &command)=0;
 		//virtual string sipcb_joinReceived(string user,string list[10], int num)=0;
 		//virtual string sipcb_connectReceived(string user,string list[10], int num)=0;
-		virtual ConferenceControl* getConferenceController()=0;
+		//virtual ConferenceControl* getConferenceController()=0;
 };
 
 
