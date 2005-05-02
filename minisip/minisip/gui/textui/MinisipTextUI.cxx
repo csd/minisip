@@ -963,7 +963,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	/**
 	 * Commands for Push-2-Talk
 	 */
-	if ((command.size()>=3) && (command.substr(0,3) == "add") && inCall){
+	if ((command.size()>=3) && (command.substr(0,4) == "add ") && inCall){
 		if (command.size()>=5){
 			string uri = trim(command.substr(4));
 			grpList->addUser(uri);	

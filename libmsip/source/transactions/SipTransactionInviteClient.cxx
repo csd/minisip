@@ -408,9 +408,10 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipDialog*> call,
 		timerT1(500),
 		timerA(500)
 {
+	cerr<<"-----------111111------------ SipTransactionInviteClient::SipTransactionInviteClient"<< endl;
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
-	
+	cerr<<"-----------222222---------- SipTransactionInviteClient::SipTransactionInviteClient"<<endl;
 	setUpStateMachine();
 }
 
