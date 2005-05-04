@@ -68,6 +68,7 @@ DtmfWidget::DtmfWidget():
 }
 
 void DtmfWidget::setHandler( DtmfHandler * handler ){
+#ifndef OLDLIBGLADEMM
         
         oneButton.signal_clicked().connect(
               BIND<uint8_t>(
@@ -128,6 +129,7 @@ void DtmfWidget::setHandler( DtmfHandler * handler ){
               BIND<uint8_t>(
                   SLOT( *handler, &DtmfHandler::dtmfPressed ),
                   11 ));
+#endif
 }
 
 
