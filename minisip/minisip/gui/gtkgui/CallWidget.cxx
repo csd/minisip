@@ -349,6 +349,7 @@ bool CallWidget::handleCommand( CommandString command ){
 			secStatus.set_text( "" );
                         
                         acceptButton.show();
+                        acceptButton.set_sensitive( true );
                         acceptButton.set_label( "Accept" );
 			rejectButton.set_label( "Reject" );
 			state = CALL_WIDGET_STATE_INCOMING_TRANSFER;
@@ -363,15 +364,19 @@ bool CallWidget::handleCommand( CommandString command ){
                 }
                 
                 if( command.getOp() == SipCommandString::transfer_pending ){
+#ifndef OLDLIBGLADEMM
                         transferProgress.set_text( "Transfer accepted..." );
+#endif
                         //transferProgress.pulse();
 
                 }
                 
                 if( command.getOp() == SipCommandString::transfer_refused ){
+#ifndef OLDLIBGLADEMM
                         transferProgress.set_text( "Transfer rejected." );
                         transferEntry.set_sensitive( true );
                         transferButton.set_sensitive( true );
+#endif
 
                 }
 
