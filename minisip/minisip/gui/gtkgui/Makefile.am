@@ -5,6 +5,7 @@ AM_CPPFLAGS = @CPPFLAGS@ -DMINISIP_DATADIR="\"$(datadir)\""
 
 libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
                               CallWidget.cxx \
+			      ConferenceWidget.cxx \
 			      PhoneBook.cxx \
 			      SettingsDialog.cxx \
 			      CertificateDialog.cxx \
@@ -21,6 +22,7 @@ libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
 
 noinst_HEADERS  = MainWindow.h \
                   CallWidget.h \
+		  ConferenceWidget.h \
 		  PhoneBook.h \
 		  SettingsDialog.h \
 		  CertificateDialog.h \

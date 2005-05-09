@@ -23,9 +23,10 @@
 
 
 
-
+#include "../../../conf/ConferenceControl.h"
 #include"MainWindow.h"
 #include"CallWidget.h"
+#include"ConferenceWidget.h"
 #include"PhoneBook.h"
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
@@ -51,6 +52,7 @@
 MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	Gtk::Button * callButton;
+	Gtk::Button * conferenceButton;
 	Gtk::Button * imButton;
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
@@ -61,12 +63,13 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * removeContactMenu;
 	Gtk::MenuItem * editContactMenu;
 	Gtk::MenuItem * callMenu;
+	Gtk::MenuItem * conferenceMenu;
 	Gtk::MenuItem * imMenu;
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 #ifndef OLDLIBGLADEMM
         Gtk::Expander * dtmfExpander;
 #endif
-
+	nextConfId=0;
         registerIcons();
 
   	try{
@@ -98,6 +101,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "editContactMenu", editContactMenu );
 
 	refXml->get_widget( "callMenu", callMenu );
+	refXml->get_widget( "conferenceMenu", conferenceMenu );
 	refXml->get_widget( "imMenu", imMenu );
 
 #ifndef OLDLIBGLADEMM
@@ -173,6 +177,12 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	callButton->signal_clicked().connect( SLOT( *this, &MainWindow::invite ) );
 	
 	callMenu->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
+
+	refXml->get_widget( "conferenceButton", conferenceButton );
+
+	conferenceButton->signal_clicked().connect( SLOT( *this, &MainWindow::conference ) );
+	
+	conferenceMenu->signal_activate().connect( SLOT( *this, &MainWindow::conference ) );
 
 	phoneBookTreeView->signal_row_activated().connect( SLOT( *this, &MainWindow::inviteFromTreeview ) );
 
@@ -313,6 +323,14 @@ void MainWindow::gotCommand(){
 	if( command.getOp() == SipCommandString::incoming_available ){
 		addCall( command.getDestinationId(), command.getParam(), true,
 			 command.getParam2() );
+		return;
+	}
+	if( command.getOp()=="conf_join_received" ){
+		//string confid=itoa(rand());
+		ConferenceControl *conf=new ConferenceControl("",false);
+		callback->setConferenceController(conf);
+		addConference( conf, itoa(nextConfId), false );
+		nextConfId++;
 		return;
 	}
 	
@@ -458,13 +476,59 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 
 	
 }
+void MainWindow::addConference( ConferenceControl * confptr, string remoteUri, bool incoming ){
+	ContactEntry * entry;
+	Gtk::Image * icon;
+	Gtk::Label * label = new Gtk::Label;
+	Gtk::HBox * hbox = new Gtk::HBox;
+	Glib::ustring tabLabelText;
 
+
+	ConferenceWidget * conferenceWidget = new ConferenceWidget( confptr, remoteUri, this, incoming);
+
+	conferenceWidgets.push_back( conferenceWidget );
+
+	tabLabelText = "Conference "+remoteUri;
+	
+
+	label->set_text( tabLabelText );
+	
+	if( incoming ){
+		icon = new Gtk::Image( Gtk::Stock::GO_BACK, Gtk::ICON_SIZE_SMALL_TOOLBAR );
+	}
+	else{
+		icon = new Gtk::Image( Gtk::Stock::GO_FORWARD, Gtk::ICON_SIZE_SMALL_TOOLBAR );
+	}
+
+
+	hbox->add( *icon );
+	hbox->add( *label );
+	hbox->show_all();
+
+	
+	mainTabWidget->append_page( *conferenceWidget, *hbox ) ;
+	conferenceWidget->show();
+	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
+
+
+	
+}
 void MainWindow::removeCall( string callId ){
 	for( list<CallWidget *>::iterator i = callWidgets.begin();
 			i != callWidgets.end(); i++ ){
 		if( (*i)->getMainCallId() == callId ){
 			mainTabWidget->remove_page( *(*i) );
 			callWidgets.erase( i );
+			return;
+		}
+	}
+}
+void MainWindow::removeConference( string callId ){
+	for( list<ConferenceWidget *>::iterator i = conferenceWidgets.begin();
+			i != conferenceWidgets.end(); i++ ){
+		if( (*i)->getMainConfId() == callId ){
+			mainTabWidget->remove_page( *(*i) );
+			conferenceWidgets.erase( i );
 			return;
 		}
 	}
@@ -515,7 +579,17 @@ void MainWindow::invite(){
 		addCall( id, uri, false );
 	}
 }
-
+void MainWindow::conference(){
+	string confid=itoa(rand());
+	cerr<<"********--------------sadfasdfsda"<<endl;
+	ConferenceControl *conf=new ConferenceControl(confid, true);
+	callback->setConferenceController(conf);
+	//string id = callback->guicb_doInvite( uri );
+	addConference( conf, confid, false );
+	nextConfId++;
+	
+	
+}
 void MainWindow::im(){
 	string uri;
 

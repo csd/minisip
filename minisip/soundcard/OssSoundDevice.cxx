@@ -274,6 +274,7 @@ int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 	while( totalBytesRead < nBytesToRead ){
 
 		nReadBytes = ::read( fdRecord, buffer, nBytesToRead - totalBytesRead );
+			//cerr<< "Read from the card" << nReadBytes << endl;
 
 		if( nReadBytes < 0 ){
 			if( ioctl( fdRecord, SNDCTL_DSP_SYNC ) == -1 ){

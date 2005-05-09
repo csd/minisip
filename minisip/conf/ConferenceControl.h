@@ -54,6 +54,7 @@ typedef struct CCList {
 class ConferenceControl{
     public:
         ConferenceControl();
+	ConferenceControl(string cid, bool islocal);
 	//void setGui(Gui *guiptr){gui = guiptr;};
 	void handleGuiCommand(string cmd);
 	void handleGuiCommand(CommandString &command);
@@ -95,9 +96,11 @@ class ConferenceControl{
 	void removeMember(string memberid); 
 	
 	//Gui *gui;
+	bool incoming;
         string input;
         string callId;
         string state;
+	string confId;
 	ConfCallback *callback;
 	int numConnected;
 	int numPending;

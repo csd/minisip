@@ -62,14 +62,14 @@ class LogEntry;
 class SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string callId="");
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string callId="");
 #endif
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string confid, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string confid, string callId="");
 
 
 #endif		
@@ -94,7 +94,7 @@ class SipDialogConfVoip: public SipDialog{
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
 	private:
-		
+		string confId;
 		void setUpStateMachine();
 		
 		//string connectedList[10]; //old static list

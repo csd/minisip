@@ -31,6 +31,8 @@
 
 #include"../Gui.h"
 #include"DtmfWidget.h"
+#include "../../../conf/ConferenceControl.h"
+//#include"ConferenceWidget.h"
 #include<libmutil/Mutex.h>
 #include<libmutil/minilist.h>
 #include<libmutil/MemObject.h>
@@ -40,6 +42,7 @@
 
 
 class CallWidget;
+class ConferenceWidget;
 class PhoneBookModel;
 class PhoneBookTree;
 class SettingsDialog;
@@ -92,6 +95,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
 		virtual void handle( MRef<LogEntry *> );
 		void removeCall( string callId );
+		void removeConference( string callId );
 		void removeIm( string uri );
 
                 virtual void dtmfPressed( uint8_t symbol );
@@ -103,12 +107,14 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		void phoneTreeClicked( GdkEventButton * event );
 		void im();
 		void invite();
+		void conference();
 		void inviteFromTreeview( const Gtk::TreeModel::Path&,
 				         Gtk::TreeViewColumn * );
 		void gotCommand();
 		void gotLogEntry();
 		void addCall( string callId, string remoteUri, bool incoming,
 			      string securityStatus="unprotected" );
+		void addConference( ConferenceControl * confptr, string remoteUri, bool incoming );
 		void addIm( string uri );
 		void updateConfig();
 		void doDisplayErrorMessage( string s );
@@ -116,6 +122,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
 		MRef<ContactDb *> contactDb;
 
+		int nextConfId;
 
 		//Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 		Gtk::Window * mainWindowWidget;
@@ -140,6 +147,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		LogWidget * logWidget;
 
 		list<CallWidget *> callWidgets;
+		list<ConferenceWidget *> conferenceWidgets;
 		list<ImWidget *> imWidgets;
 
 		MRef<SipSoftPhoneConfiguration *> config;

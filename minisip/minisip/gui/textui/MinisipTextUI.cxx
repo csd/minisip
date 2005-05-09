@@ -871,7 +871,7 @@ void MinisipTextUI::guiExecute(string cmd){
 				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
 			}else{
 				currentconfname = trim(command.substr(5));
-				ConferenceControl *conf=new ConferenceControl();
+				ConferenceControl *conf=new ConferenceControl(currentconfname, true);
 				//conf->setGui(this);
 				currentconf=conf;
 				callback->setConferenceController(currentconf);

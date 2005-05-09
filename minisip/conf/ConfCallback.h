@@ -39,8 +39,8 @@ class ConfCallback{
 		virtual void confcb_handleSipCommand(string &)=0;
 		virtual void confcb_handleSipCommand(CommandString &)=0;
 		virtual void confcb_handleGuiCommand(string &)=0;
-		virtual string confcb_doJoin(string user,minilist <ConfMember> *list)=0;
-		virtual string confcb_doConnect(string user)=0;
+		virtual string confcb_doJoin(string user,minilist <ConfMember> *list, string confId)=0;
+		virtual string confcb_doConnect(string user, string confId)=0;
 };
 
 #endif

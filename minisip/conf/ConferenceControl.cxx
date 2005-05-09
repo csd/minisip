@@ -68,6 +68,14 @@ ConferenceControl::ConferenceControl(){
     
     numPending = 0;
 }
+ConferenceControl::ConferenceControl(string cid, bool islocal){
+
+    confId=cid;
+
+    incoming=islocal;
+    
+    numPending = 0;
+}
 minilist<ConfMember> * ConferenceControl::getConnectedList()
 {	
 	return &connectedList;
@@ -128,6 +136,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		command.setParam2(users);
+		command.setParam3(confId);
 		//command.setParam2((string) &connectedList);
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
 		callback->confcb_handleSipCommand(command);
@@ -153,12 +162,14 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 
 	cerr << "CC: from MR -> CC: handleGuiDoInviteCommand"<< endl;
     	cerr <<"conf "+sip_url<< endl;
-	
+	cerr <<"conf "+confId<< endl;
 	//BM pendingList[numPending]=sip_url;
+	printList(&connectedList);
 	
+	//numPending++;
+	//callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
 	
-	numPending++;
-	callId = callback->confcb_doJoin(sip_url, &connectedList);
+	cerr <<"conf "+callId<< endl;
 	pendingList.push_back((ConfMember(sip_url, callId)));
 	if (callId=="malformed"){
 		//state="IDLE";
@@ -279,6 +290,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		cerr<<"users "+users<<endl;
 		cmd.setParam2(users);
+		
 		cmd.setOp(SipCommandString::accept_invite);
 		//command.setParam2((string) &connectedList);
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
@@ -300,6 +312,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     if (cmd.getOp()==SipCommandString::transport_error){
 	    //state="IDLE";
 	    //setPrompt(state);
+	    removeMember(cmd.getDestinationId());
 	    cerr << "CC: The call could not be completed because of a network error."<< endl;
 	    //displayMessage("The call could not be completed because of a network error.", red);
 	    callId=""; //FIXME: should check the callId of cmd.
@@ -564,7 +577,7 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		//if not found in pending or connected list then add to pending list
 		if (!handled&&current!=myuri) {
 			//send a connect message to the newly discovered conference members
-			callId = callback->confcb_doConnect(current);
+			callId = callback->confcb_doConnect(current,confId);
 			pendingList.push_back(ConfMember(current, callId  )  );
 			
 			cerr<<"update pending list=> "+current<<endl;

@@ -225,7 +225,7 @@ MRef<Session *> mediaSession =
 
 	return voipCall->getCallId();
 }
-string Sip::confjoin(string &user, minilist<ConfMember> *list){
+string Sip::confjoin(string &user, minilist<ConfMember> *list, string confId){
 	SipDialogSecurityConfig securityConfig;
 #ifndef _MSC_VER
 	ts.save( INVITE_START );
@@ -304,10 +304,10 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession, list)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list, confId, callID, ipsecSession)); 
 	
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list, confId, "")); 
 
 #endif
 
@@ -324,7 +324,7 @@ MRef<Session *> mediaSession =
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipConfCall->getCallId();
 }
-string Sip::confconnect(string &user){
+string Sip::confconnect(string &user, string confId){
 	SipDialogSecurityConfig securityConfig;
 #ifndef _MSC_VER
 	ts.save( INVITE_START );
@@ -403,10 +403,10 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, confId, callID, ipsecSession)); 
 	
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, confId)); 
 
 #endif
 
