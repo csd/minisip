@@ -153,6 +153,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 			CommandString hup(pendingList[t].callid, SipCommandString::hang_up);
 			callback->confcb_handleSipCommand(hup);
 		}
+		callId = callback->confcb_doJoin("ali", &connectedList, confId);
 	}
 		
         //string uri = trim(cmd.substr(5));
@@ -161,15 +162,15 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 
 	cerr << "CC: from MR -> CC: handleGuiDoInviteCommand"<< endl;
-    	cerr <<"conf "+sip_url<< endl;
+    	/*cerr <<"conf "+sip_url<< endl;
 	cerr <<"conf "+confId<< endl;
 	//BM pendingList[numPending]=sip_url;
-	printList(&connectedList);
+	printList(&connectedList);*/
 	
 	//numPending++;
 	callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
 	
-	cerr <<"conf "+callId<< endl;
+	//cerr <<"conf "+callId<< endl;
 	pendingList.push_back((ConfMember(sip_url, callId)));
 	if (callId=="malformed"){
 		//state="IDLE";
@@ -179,7 +180,7 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 	}else{
 		//state="TRYING";
 		//setPrompt(state);
-		cerr <<"Created call with id="+callId<<endl;    
+		//cerr <<"Created call with id="+callId<<endl;    
 	}
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    

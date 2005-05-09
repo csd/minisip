@@ -103,6 +103,7 @@ string MessageRouter::confcb_doJoin(string user, minilist<ConfMember> *list, str
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confjoin(user, list, confId);
+	//return "12345";
 }
 string MessageRouter::confcb_doConnect(string user, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;

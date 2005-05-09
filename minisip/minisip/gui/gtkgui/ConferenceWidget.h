@@ -104,12 +104,13 @@ class ConferenceWidget : public Gtk::VBox
         //        Gtk::ProgressBar transferProgress;
                 Gtk::Label transferProgress;
 
-		Gtk::HBox conferenceHBox;
+		
+#endif
+                Gtk::HBox conferenceHBox;
                 Gtk::HBox conferenceHBox2;
 		Gtk::Entry conferenceEntry;
                 Gtk::Button conferenceButton;
-#endif
-                Gtk::Image secureImage;
+		Gtk::Image secureImage;
                 Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;

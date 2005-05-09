@@ -49,13 +49,8 @@ ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUr
 		status( "", Gtk::ALIGN_LEFT ),
 		secStatus( "", Gtk::ALIGN_LEFT ),
                 buttonBox(/*homogenius*/ true ),
-#ifndef OLDLIBGLADEMM
-                dtmfArrow( "Dialpad" ),
-                transferArrow( "Call transfer" ),
-                transferHBox( false ),
-                transferButton( "Transfer" ),
 		conferenceButton("Add Member"),
-#endif
+
                 secureImage(),// Gtk::StockID( "minisip_insecure" ), 
                           //   Gtk::ICON_SIZE_DIALOG ),
                 insecureImage( Gtk::StockID( "minisip_insecure" ), 
@@ -99,17 +94,18 @@ ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUr
 	status.set_use_markup( true );
 	secStatus.set_use_markup( true );
 
-#ifndef OLDLIBGLADEMM
+/*#ifndef OLDLIBGLADEMM
         
         
 
+	
+        
+
+#endif*/
 	conferenceHBox.pack_end( conferenceButton, false, false ); 
         conferenceHBox.pack_end( conferenceEntry, true, true ); 
 	pack_start( conferenceHBox, false, false, 4 );
 	conferenceHBox.show_all();
-        
-
-#endif
 
 	buttonBox.add( acceptButton );
 	buttonBox.add( rejectButton );
@@ -193,7 +189,7 @@ void ConferenceWidget::add(){
 void ConferenceWidget::reject(){
 	CommandString hup("", SipCommandString::hang_up);
 	mainWindow->getCallback()->guicb_handleConfCommand(hup);
-	mainWindow->removeCall( mainCallId );
+	//mainWindow->removeCall( mainCallId );
 }
 
 void ConferenceWidget::hideAcceptButton(){

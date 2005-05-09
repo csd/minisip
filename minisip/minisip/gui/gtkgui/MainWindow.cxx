@@ -584,6 +584,7 @@ void MainWindow::conference(){
 	cerr<<"********--------------sadfasdfsda"<<endl;
 	ConferenceControl *conf=new ConferenceControl(confid, true);
 	callback->setConferenceController(conf);
+	//callback->guicb_confDoInvite("ali");
 	//string id = callback->guicb_doInvite( uri );
 	addConference( conf, confid, false );
 	nextConfId++;
