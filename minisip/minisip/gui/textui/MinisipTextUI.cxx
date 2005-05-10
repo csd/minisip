@@ -39,7 +39,7 @@
 //extern TextUI *debugtextui;
 
 
-currentconf=new ConferenceControl();
+
 #ifdef DEBUG_OUTPUT
 extern bool sipdebug_print_packets;
 #endif
@@ -247,7 +247,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 		
 				//conf->setGui(this);
 		string confid="";
-		string users=command.getParam3();
+		string users=cmd.getParam3();
 		int i=0;	
 		while (users[i]!=';'&&users.length()!=0 &&!(i>(users.length()-1))){
 			confid=confid+users[i];
