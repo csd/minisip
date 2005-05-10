@@ -114,7 +114,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		void gotLogEntry();
 		void addCall( string callId, string remoteUri, bool incoming,
 			      string securityStatus="unprotected" );
-		void addConference( ConferenceControl * confptr, string remoteUri, bool incoming );
+		void addConference( string confId, string users, string remoteUri,string callId, bool incoming );
 		void addIm( string uri );
 		void updateConfig();
 		void doDisplayErrorMessage( string s );

@@ -43,8 +43,7 @@
 
 
 
-ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUri, 
-                        MainWindow * mw, bool incoming):
+ConferenceWidget::ConferenceWidget( string confId, string users, string remoteUri,string callId, MainWindow * mw, bool incoming):
 		mainWindow( mw ),
 		status( "", Gtk::ALIGN_LEFT ),
 		secStatus( "", Gtk::ALIGN_LEFT ),
@@ -58,12 +57,15 @@ ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUr
                 acceptButton( Gtk::Stock::OK, "Accept" ),
                 rejectButton( Gtk::Stock::CANCEL, "Reject" ),
 		bell(),
-                mainConfId( remoteUri )
+		mainCallId(callId),
+		initiatorUri(remoteUri)
 {
-	conf =confptr;
+	conf=new ConferenceControl(confId, !incoming);
+	mainWindow->getCallback()->setConferenceController(conf);
+	mainConfId=confId;
 	bell = NULL;
         //callIds.push_back( callId );
-
+	cerr<<"list of users in the current conference: "+remoteUri+" "+users<<endl;
 	
         Gtk::HBox * topBox = manage( new Gtk::HBox );
 
@@ -125,10 +127,11 @@ ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUr
 	if( incoming ){
 		state = CONFERENCE_WIDGET_STATE_INCOMING;
 //		acceptButton.show();
-		status.set_markup( "<big><b>Incoming call from \n" + remoteUri
+		rejectButton.set_label( "Reject" );
+		status.set_markup( "<big><b>Incoming conference call from \n" + remoteUri
 				+ "</b></big>");
-		/*secStatus.set_markup( "The call is <b>" + secure +"</b>." );
-                if( secure == "secure" ){
+		secStatus.set_markup( "list of users in the current conference: <b>" + remoteUri+" "+users+"</b>." );
+                /*if( secure == "secure" ){
                         secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
                 }
                 else{
@@ -143,7 +146,7 @@ ConferenceWidget::ConferenceWidget( ConferenceControl * confptr, string remoteUr
 		//status.set_markup( "<big><b>Connecting...</b></big>" );
 //                secStatus.set_markup( "Security requested" );
 		acceptButton.set_label( "Accept" );
-		rejectButton.set_label( "Leave" );
+		rejectButton.set_label( "Quit" );
 	}
 }
 
@@ -151,45 +154,33 @@ ConferenceWidget::~ConferenceWidget(){
 }
 
 void ConferenceWidget::accept(){
-        CommandString * cmd = NULL;
-        switch( state ){
-                
-	        case CONFERENCE_WIDGET_STATE_CREATED:
-	
-                        cmd = new CommandString( mainCallId, 
-                                        SipCommandString::accept_invite );
-                        mainWindow->getCallback()->guicb_handleCommand( *cmd );
-                        stopRinging();
-                        break;
-		case CONFERENCE_WIDGET_STATE_INCOMING:
-	
-                        cmd = new CommandString( mainCallId, 
-                                        SipCommandString::accept_invite );
-                        mainWindow->getCallback()->guicb_handleCommand( *cmd );
-                        stopRinging();
-                        break;
-                        
-                
-        }
-        if( cmd ){
-                delete cmd;
-        }
+        CommandString command(mainCallId, SipCommandString::accept_invite, initiatorUri);
+	command.setParam3(mainConfId);
+	mainWindow->getCallback()->guicb_handleConfCommand(command);
+	acceptButton.set_sensitive( false );
+	rejectButton.set_label( "Quit" );
 }
 void ConferenceWidget::add(){
         string uri = Glib::locale_from_utf8( conferenceEntry.get_text() );
         if( uri.size() > 0 ){
         
-                //conf->handleGuiDoInviteCommand("ali");
-		mainWindow->getCallback()->guicb_confDoInvite(uri);
+                CommandString cmd("", "join",uri);
+		cmd.setParam3(mainConfId);
+		mainWindow->getCallback()->guicb_handleConfCommand(cmd);
+
+		//conf->handleGuiDoInviteCommand("ali");
+		//mainWindow->getCallback()->guicb_confDoInvite(uri);
 		//transferProgress.pulse();
         }
 	//mainWindow->getCallback()->guicb_confDoInvite(uri);
 	
 }
 void ConferenceWidget::reject(){
-	CommandString hup("", SipCommandString::hang_up);
+	CommandString hup(mainCallId, SipCommandString::hang_up);
+	hup.setParam3(mainConfId);
 	mainWindow->getCallback()->guicb_handleConfCommand(hup);
-	//mainWindow->removeCall( mainCallId );
+	mainWindow->getCallback()->guicb_handleCommand( hup );
+	mainWindow->removeConference( mainConfId );
 }
 
 void ConferenceWidget::hideAcceptButton(){
@@ -197,12 +188,17 @@ void ConferenceWidget::hideAcceptButton(){
 }
 
 bool ConferenceWidget::handleCommand( CommandString command ){
-	if( handlesCallId( command.getDestinationId() ) ){
+	if( handlesConfId( command.getDestinationId() ) ){
 		if( command.getOp() == SipCommandString::remote_user_not_found ){
 			hideAcceptButton();
 			status.set_markup( "<b>User not found</b>" );
 			rejectButton.set_label( "Close" );
 			state = CONFERENCE_WIDGET_STATE_TERMINATED;
+		}
+		if( command.getOp() == "list updated" ){
+			cerr<<"command.getParam()::::::::::::"+command.getParam()<<endl;
+			status.set_markup( "<b>Connected: </b>"+command.getParam());
+			secStatus.set_markup( "<b>Pending: </b>"+command.getParam2() );
 		}
 
 		if( command.getOp() == SipCommandString::invite_ok ){
@@ -264,17 +260,7 @@ bool ConferenceWidget::handleCommand( CommandString command ){
 			state = CONFERENCE_WIDGET_STATE_TERMINATED;
 		}
 
-		if( command.getOp() == SipCommandString::remote_hang_up ){
-			stopRinging();
-
-                        callIds.remove( command.getDestinationId() );
-                        if( command.getDestinationId() == mainCallId ){
-                                status.set_markup( "<b><big>Call ended</big></b>" );
-                                secStatus.set_text( "" );
-                                rejectButton.set_label( "Close" );
-                                state = CONFERENCE_WIDGET_STATE_TERMINATED;
-                        }
-		}
+		
 
 		if( command.getOp() == SipCommandString::remote_reject ){
 			status.set_text( "Remote side rejected the call" );
@@ -383,13 +369,11 @@ string ConferenceWidget::getMainCallId(){
 string ConferenceWidget::getMainConfId(){
         return mainConfId;
 }
-bool ConferenceWidget::handlesCallId( string callId ){
-        list<string>::iterator iCallId;
+bool ConferenceWidget::handlesConfId( string confId ){
+        
 
-        for( iCallId = callIds.begin(); iCallId != callIds.end(); iCallId++ ){
-                if( *iCallId == callId ){
-                        return true;
-                }
+        if(confId==mainConfId){
+               return true;
         }
         return false;
 }

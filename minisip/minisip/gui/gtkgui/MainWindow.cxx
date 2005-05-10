@@ -39,6 +39,7 @@
 #include"../../../sip/SipSoftPhoneConfiguration.h"
 #include"../../contactdb/ContactDb.h"
 #include<libmsip/SipCommandString.h>
+#include<libmutil/trim.h>
 //#include<libmsip/SipSoftPhone.h>
 //
 #ifdef OLDLIBGLADEMM
@@ -274,6 +275,7 @@ void MainWindow::handleCommand( CommandString command ){
 void MainWindow::gotCommand(){
 
 	list<CallWidget *>::iterator i;
+	list<ConferenceWidget *>::iterator j;
 
 	commandsLock.lock();
 	CommandString command = commands.pop_back();
@@ -299,7 +301,11 @@ void MainWindow::gotCommand(){
 			return;
 		}
 	}
-
+	for( j = conferenceWidgets.begin(); j != conferenceWidgets.end(); j++ ){
+		if( (*j)->handleCommand( command ) ){
+			return;
+		}
+	}
 	if (command.getOp() == SipCommandString::incoming_im){
 
 		list<ImWidget *>::iterator i;
@@ -327,10 +333,16 @@ void MainWindow::gotCommand(){
 	}
 	if( command.getOp()=="conf_join_received" ){
 		//string confid=itoa(rand());
-		ConferenceControl *conf=new ConferenceControl("",false);
-		callback->setConferenceController(conf);
-		addConference( conf, itoa(nextConfId), false );
-		nextConfId++;
+		string confid="";
+		string users=command.getParam3();
+		int i=0;	
+		while (users[i]!=';'&&users.length()!=0 &&!(i>(users.length()-1))){
+			confid=confid+users[i];
+			i++;
+		}
+		users=trim(users.substr(i));
+		
+		addConference( confid, users,command.getParam(),command.getDestinationId(), true );
 		return;
 	}
 	
@@ -476,7 +488,7 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 
 	
 }
-void MainWindow::addConference( ConferenceControl * confptr, string remoteUri, bool incoming ){
+void MainWindow::addConference( string confId, string users,string remoteUri,string callId, bool incoming ){
 	ContactEntry * entry;
 	Gtk::Image * icon;
 	Gtk::Label * label = new Gtk::Label;
@@ -484,11 +496,11 @@ void MainWindow::addConference( ConferenceControl * confptr, string remoteUri, b
 	Glib::ustring tabLabelText;
 
 
-	ConferenceWidget * conferenceWidget = new ConferenceWidget( confptr, remoteUri, this, incoming);
+	ConferenceWidget * conferenceWidget = new ConferenceWidget( confId, users, remoteUri,callId, this, incoming);
 
 	conferenceWidgets.push_back( conferenceWidget );
 
-	tabLabelText = "Conference "+remoteUri;
+	tabLabelText = "Conference "+confId;
 	
 
 	label->set_text( tabLabelText );
@@ -582,12 +594,9 @@ void MainWindow::invite(){
 void MainWindow::conference(){
 	string confid=itoa(rand());
 	cerr<<"********--------------sadfasdfsda"<<endl;
-	ConferenceControl *conf=new ConferenceControl(confid, true);
-	callback->setConferenceController(conf);
 	//callback->guicb_confDoInvite("ali");
 	//string id = callback->guicb_doInvite( uri );
-	addConference( conf, confid, false );
-	nextConfId++;
+	addConference( confid, "","","",false );
 	
 	
 }

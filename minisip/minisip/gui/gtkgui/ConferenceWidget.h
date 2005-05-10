@@ -62,7 +62,7 @@ class ConferenceWidget : public Gtk::VBox
 #endif
 {
 	public:
-		ConferenceWidget( ConferenceControl * confptr, string remoteUri, MainWindow * mw, bool incoming);
+		ConferenceWidget( string confId, string users,string remoteUri,string callId, MainWindow * mw, bool incoming);
 
 		~ConferenceWidget();
 
@@ -75,7 +75,7 @@ class ConferenceWidget : public Gtk::VBox
 
 		string getMainCallId();
 		string getMainConfId();
-                bool handlesCallId( string callId );
+                bool handlesConfId( string confId );
 
 	private:
 		void startRinging();
@@ -118,9 +118,10 @@ class ConferenceWidget : public Gtk::VBox
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
 //		TimeoutProvider<string> *timeoutProvider;      
-                list<string> callIds;
+                list<string> confIds;
                 string mainCallId;
 		string mainConfId;
+		string initiatorUri;
 		ConferenceControl* conf;
 };
 

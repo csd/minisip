@@ -82,9 +82,9 @@ class ConferenceControl{
         minilist<ConfMember> * getConnectedList();
         
 	//virtual void run();
-
+	string confId;
     private:
-	
+	void sendUpdatesToGui();
 	/**
 	* Move a member from pending to connected status
 	*/
@@ -100,7 +100,6 @@ class ConferenceControl{
         string input;
         string callId;
         string state;
-	string confId;
 	ConfCallback *callback;
 	int numConnected;
 	int numPending;

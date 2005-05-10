@@ -25,6 +25,7 @@
 #include<stdio.h>
 #include<vector>
 #include"ConferenceControl.h"
+#include"../minisip/MessageRouter.h"
 #include"../minisip/gui/Gui.h"
 //#include"../minisip/gui/textui/MinisipTextUI.h"
 #include<libmutil/MemObject.h>
@@ -153,7 +154,16 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 			CommandString hup(pendingList[t].callid, SipCommandString::hang_up);
 			callback->confcb_handleSipCommand(hup);
 		}
-		callId = callback->confcb_doJoin("ali", &connectedList, confId);
+		((MessageRouter *)(callback))->removeConferenceController(this);
+	}
+	if(command.getOp()=="join")
+	{
+		string sip_url=command.getParam();	
+		callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
+	
+	//cerr <<"conf "+callId<< endl;
+		pendingList.push_back((ConfMember(sip_url, callId)));
+		sendUpdatesToGui();
 	}
 		
         //string uri = trim(cmd.substr(5));
@@ -172,6 +182,7 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 	
 	//cerr <<"conf "+callId<< endl;
 	pendingList.push_back((ConfMember(sip_url, callId)));
+	sendUpdatesToGui();
 	if (callId=="malformed"){
 		//state="IDLE";
 		//setPrompt(state);
@@ -199,7 +210,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	int i=0;
 	string line="";
 	
-	string users=cmd.getParam3();
+	string users=cmd.getParam();
 	minilist<ConfMember> receivedList;
 		
 		while (users.length()!=0 &&!(i>(users.length()-1))){
@@ -229,7 +240,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    printList(&pendingList);
 	int i=0;
 	string line="";
-	string users=cmd.getParam3();
+	string users=cmd.getParam();
 	cerr<<"users-------------"+users<<endl;
 	minilist<ConfMember> receivedList;
 		while (users.length()!=0 &&!(i>(users.length()-1))){
@@ -277,6 +288,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	//setPrompt(state);
 	cerr << "CC: User "+cmd.getDestinationId()+" not found."<< endl;
 	removeMember(cmd.getDestinationId());
+	sendUpdatesToGui();
         //displayMessage("User "+cmd.getParam()+" not found.",red);
         callId=""; //FIXME: should check the callId of cmd.
     }
@@ -285,6 +297,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 		pendingList.push_back((ConfMember(cmd.getParam(), cmd.getDestinationId())));
 		//cerr<<"call is accepted=>pending list: "<<endl;
 		printList(&pendingList);
+		sendUpdatesToGui();
 		string users;
 		for(int t=0;t<connectedList.size();t++)
 
@@ -303,6 +316,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
         //state="IDLE";
 	//setPrompt(state);
 	removeMember(cmd.getDestinationId());
+	sendUpdatesToGui();
 	cerr << "CC: Remote user ended the call."<< endl;
         //displayMessage("Remote user ended the call.",red);
         callId=""; //FIXME: should check the callId of cmd.
@@ -314,9 +328,10 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    //state="IDLE";
 	    //setPrompt(state);
 	    removeMember(cmd.getDestinationId());
+	    sendUpdatesToGui();
 	    cerr << "CC: The call could not be completed because of a network error."<< endl;
 	    //displayMessage("The call could not be completed because of a network error.", red);
-	    callId=""; //FIXME: should check the callId of cmd.
+	 
     }
 
 
@@ -326,9 +341,8 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     }
 
     if (cmd.getOp()=="remote_reject"){
-	    //state="IDLE";
-	    //setPrompt(state);
-	    callId="";
+	    removeMember(cmd.getDestinationId());
+	    sendUpdatesToGui();
 	    cerr << "CC: The remote user rejected the call."<< endl;
 	    //displayMessage("The remote user rejected the call.", red);
     }
@@ -478,9 +492,23 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 /**
 * Moves a member from pending to connected and look for new members
 */
+void ConferenceControl::sendUpdatesToGui()
+{
+	string connectedusers="";
+	for(int t=0;t<connectedList.size();t++)
+		connectedusers=connectedusers+ ((connectedList[t]).uri) + ", "; 
+	cerr<<"users "+connectedusers<<endl;
+	string pendingusers="";
+	for(int t=0;t<pendingList.size();t++)
+		pendingusers=pendingusers+ ((pendingList[t]).uri) + ", ";     
+	cerr<<"users "+pendingusers<<endl;
+	CommandString cmd(confId,"list updated",connectedusers,pendingusers);
+	callback->confcb_handleGuiCommand(cmd);
+}
 void ConferenceControl::handleOkAck(string callid, minilist<ConfMember> *list) {
 	pendingToConnected(callid);
 	updateLists(list);
+	sendUpdatesToGui();
 }
 	
 /**

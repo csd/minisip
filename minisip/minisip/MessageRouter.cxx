@@ -41,46 +41,110 @@ void MessageRouter::setSip(MRef<Sip*> s){
 	}
 	sip= s;
 }
-
+void MessageRouter::confcb_handleGuiCommand(CommandString &command){
+	gui->handleCommand(command);
+}	
 void MessageRouter::sipcb_handleCommand(CommandString &command){
 	gui->handleCommand(command);
 }
 void MessageRouter::sipcb_handleConfCommand(CommandString &command){
-	confrout->handleSipCommand(command);
+	bool done=false;
+	int i;
+	for (i=0;i < confrout.size();i++  ) {
+		cerr<<"From SCB=>MR with conf id: "+confrout[i]->confId<<endl;
+		if ((confrout[i]->confId) == command.getParam3()) 
+		{
+			confrout[i]->setCallback(this);
+			done=true;
+			break;
+		}
+	}
+	if(done)
+		confrout[i]->handleSipCommand(command);
+	else
+	{
+		CommandString cmd("","error_message","no such conference with id "+command.getParam3());
+		gui->handleCommand(cmd);
+		
+	}
 }
 
-/*
-void MessageRouter::sipcb_handleConfCommand(CommandString &command){
-	ConferenceControl->handleCommand(command);
-}//bm*/
+void MessageRouter::setConferenceController(ConferenceControl *conf)
+{
+	confrout.push_back(conf);
 
-/*void MessageRouter::confcb_handleSipCommand(CommandString &cmd){
-	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
-	sip->getSipStack()->handleCommand(sipcmd);
-}//bm*/
-/*void MessageRouter::confcb_handleGuiCommand(CommandString &command){
-	gui->handleCommand(command);
-}//bm*/
-
+}
+void MessageRouter::removeConferenceController(ConferenceControl *conf)
+{
+	int i=0;
+	while ((i < confrout.size() ) ) {
+		
+		if (confrout[i] == conf) 
+			confrout.remove(conf);
+		i++;
+	}
+	
+}
 void MessageRouter::guicb_handleConfCommand(string &conferencename){
 	//confrout=conf;
-	confrout->setCallback(this);
-	cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
-	confrout->handleGuiCommand(conferencename);
+	
+	//confrout->setCallback(this);
+	//cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
+	//confrout->handleGuiCommand(conferencename);
 	
 }//bm
 void MessageRouter::guicb_handleConfCommand(CommandString &command){
-	//confrout=conf;
-	confrout->setCallback(this);
-	cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
-	confrout->handleGuiCommand(command);
+	bool done=false;
+	int i;
+	
+	for (i=0;i < confrout.size();i++  ) {
+		cerr << "MR: from Gui -> CC: guicb_handleConfCommand with conf id"+confrout[i]->confId<< endl;
+		if (confrout[i]->confId == command.getParam3()) 
+		{
+			confrout[i]->setCallback(this);
+			done=true;
+			break;
+		}
+	}
+	if(done)
+	{
+		cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
+		confrout[i]->handleGuiCommand(command);
+	}
+	else
+	{
+		CommandString cmd("","error_message","no such conference with id "+command.getParam3());
+		gui->handleCommand(cmd);
+		
+	}
+	
 	
 }//bm
-
+ConferenceControl* MessageRouter::getConferenceController(string confid)
+{
+	bool done=false;
+	int i;
+	for (i=0;i < confrout.size();i++  ) {
+		
+		if (confrout[i]->confId == confid) 
+		{
+			done=true;
+			break;
+		}
+	}
+	if(done)
+		return confrout[i];
+	else
+	{
+		CommandString cmd("","error_message","no such conference with id "+confid);
+		gui->handleCommand(cmd);
+		return confrout[i]; //needs to be changed
+	}
+}
 string MessageRouter::guicb_confDoInvite(string sip_url){
 	//confrout=conf;
-	cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
-	confrout->handleGuiDoInviteCommand(sip_url);
+	//cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
+	//confrout->handleGuiDoInviteCommand(sip_url);
 	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
 }//bm
 void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){

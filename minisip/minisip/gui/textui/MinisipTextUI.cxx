@@ -35,10 +35,11 @@
 #include"../../../sip/DefaultDialogHandler.h"
 
 
+
 //extern TextUI *debugtextui;
 
 
-
+currentconf=new ConferenceControl();
 #ifdef DEBUG_OUTPUT
 extern bool sipdebug_print_packets;
 #endif
@@ -220,7 +221,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
     }
 
     if (cmd.getOp()==SipCommandString::incoming_available){
-	    if(!inCall){
+	    if(state=="IDLE"){
 	    	state="ANSWER?";
 	    	setPrompt(state);
 	    	callId=cmd.getDestinationId();
@@ -235,15 +236,27 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	    
     }
     if (cmd.getOp()=="conf_join_received"){
-	    if(!inCall){
+	    if(state=="IDLE"){
 	    	state="ANSWER?";
 	    	setPrompt(state);
 	    	callId=cmd.getDestinationId();
 		//addCommand("addc");
 		
-	    	displayMessage("The incoming conference call from "+cmd.getParam(), blue);
-		displayMessage("The participants are"+cmd.getParam3(), blue);
+	    	
 		currentcaller=cmd.getParam();
+		
+				//conf->setGui(this);
+		string confid="";
+		string users=command.getParam3();
+		int i=0;	
+		while (users[i]!=';'&&users.length()!=0 &&!(i>(users.length()-1))){
+			confid=confid+users[i];
+			i++;
+		}
+		users=trim(users.substr(i));
+		currentconf=new ConferenceControl(confid,false);
+		displayMessage("The incoming conference call from "+cmd.getParam(), blue);
+		displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
 	    }
 	    else{
 	    	displayMessage("You missed call from "+cmd.getParam(), red);
@@ -779,9 +792,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 	if (command == "join"){
 		CommandString command(callId, SipCommandString::accept_invite, currentcaller);
-		ConferenceControl *conf=new ConferenceControl();
-				//conf->setGui(this);
-		currentconf=conf;
+		
 				//currentconf->setCallback(callback);
 				//state="CONF";
 				//displayMessage("	Conf. Name: "+currentconfname);
@@ -837,6 +848,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		displayMessage("hangupc");
 		handled=true;
 		inCall=false;
+		delete currentconf;
 	}
 
 	if ((command.size()>=4) && (command.substr(0,4) == "call")){
@@ -865,26 +877,22 @@ void MinisipTextUI::guiExecute(string cmd){
 		}
 		handled=true;
 	}
-	if ((command.size()>=4) && (command.substr(0,4) == "conf")){
-		if (command.size()>=6){
-			if (state!="IDLE"){
-				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
-			}else{
-				currentconfname = trim(command.substr(5));
-				ConferenceControl *conf=new ConferenceControl(currentconfname, true);
-				//conf->setGui(this);
-				currentconf=conf;
-				callback->setConferenceController(currentconf);
-				//currentconf->setCallback(callback);
-				//state="CONF";
-				displayMessage("	Conf. Name: "+currentconfname);
-				callback->guicb_handleConfCommand(currentconfname);
-				addCommand("addc");
-				addCommand("hangupc");
-			}
+	if ((command == "conf")){
+		if (state!="IDLE"){
+			displayMessage("UNIMPLEMENTED - only one call/conference at the time with this UI.", red);
 		}else{
-			displayMessage("Usage: call <userid>");
-//			displayHelp("call");
+			currentconfname = itoa(rand());
+			currentconf=new ConferenceControl(currentconfname, true);
+			//conf->setGui(this);
+			callback->setConferenceController(currentconf);
+			//currentconf->setCallback(callback);
+			//state="CONF";
+			displayMessage("Conf. Name: "+currentconfname);
+			callback->guicb_handleConfCommand(currentconfname);
+			addCommand("addc");
+			addCommand("hangupc");
+			state="CONF";
+			setPrompt(state);
 		}
 		handled=true;
 	}

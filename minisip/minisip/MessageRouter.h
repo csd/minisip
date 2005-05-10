@@ -26,6 +26,7 @@
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
+#include<libmutil/minilist.h>
 //#include"SoundSender.h"
 //#include"SoundReceiver.h"
 #include"gui/GuiCallback.h"
@@ -46,7 +47,8 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		
 		void setSip(MRef<Sip*> ssp);
 		void setGui(Gui *guiptr){gui = guiptr;};
-		virtual void setConferenceController(ConferenceControl *conf){confrout= conf;};
+		virtual void setConferenceController(ConferenceControl *conf);
+		virtual void removeConferenceController(ConferenceControl *conf);
 		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
 		//void setConference(ConferenceControl *confptr){conf = confptr;};//bm
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
@@ -70,12 +72,12 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
 		virtual void confcb_handleSipCommand(string &command){}
 		virtual void confcb_handleSipCommand(CommandString &command);
-		virtual void confcb_handleGuiCommand(string &command){}	
-		virtual ConferenceControl* getConferenceController(){return confrout;};
+		virtual void confcb_handleGuiCommand(CommandString &command);	
+		virtual ConferenceControl* getConferenceController(string confid);
 	private:
 		
 		Gui *gui;
-		ConferenceControl *confrout;//bm
+		minilist<ConferenceControl *> confrout;//bm
 		MRef<Sip*> sip;
 		MRef<MediaHandler *> mediaHandler;
 };
