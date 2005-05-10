@@ -54,11 +54,10 @@ TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
 
 	int error;
 	// Copy the SSL parameters, since the server still needs them
-	this->ssl_ctx = new SSL_CTX;
-	*(this->ssl_ctx) = *ssl_ctx;
-
-	ssl = SSL_new( this->ssl_ctx );
-
+	
+	ssl = SSL_new( ssl_ctx );		// Following two lines is a bug fix from Cesc Santasusana - Thanks.
+	this->ssl_ctx = SSL_get_SSL_CTX( ssl );
+	
 	SSL_set_fd( ssl, tcp_socket->getFd() );
 	fd = tcp_socket->getFd();
 	
