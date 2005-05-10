@@ -509,11 +509,11 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		}
 		else
 		{
+			cerr<<"a10 confIdidididididi "+confId<<endl;
 			CommandString cmdstr(dialogState.callId, 
 				"conf_connect_received", 
 				dialogState.remoteUri, 
-				(getMediaSession()->isSecure()?"secure":"unprotected",confId)
-				);//bm
+				(getMediaSession()->isSecure()?"secure":"unprotected"),confId);//bm
 			getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		}
 		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
@@ -1095,6 +1095,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 
 {
 	confId=confid;
+	cerr<<"SDCVididididididididididdididi "+confId<<endl;
 	cerr << "CONFDIALOG: received"<< endl;
 	type="connect";
 	if (cid=="")

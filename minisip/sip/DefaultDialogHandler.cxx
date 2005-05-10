@@ -179,7 +179,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
-			
+			cerr<<"DDH confididididididiid "+confid<<endl;
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 

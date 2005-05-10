@@ -254,10 +254,12 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 			i++;
 		}
 		users=trim(users.substr(i));
+		cerr<<"confididididididididididididiidididid "+confid<<endl;
 		currentconf=new ConferenceControl(confid,false);
 		callback->setConferenceController(currentconf);
 		displayMessage("The incoming conference call from "+cmd.getParam(), blue);
 		displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
+	    	currentconfname=confid;
 	    }
 	    else{
 	    	displayMessage("You missed call from "+cmd.getParam(), red);
@@ -793,7 +795,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 	if (command == "join"){
 		CommandString command(callId, SipCommandString::accept_invite, currentcaller);
-		
+		command.setParam3(currentconfname);
 				//currentconf->setCallback(callback);
 				//state="CONF";
 				//displayMessage("	Conf. Name: "+currentconfname);

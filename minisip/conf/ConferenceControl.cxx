@@ -178,7 +178,11 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 	printList(&connectedList);*/
 	
 	//numPending++;
+
+
+
 	callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
+
 	
 	//cerr <<"conf "+callId<< endl;
 	pendingList.push_back((ConfMember(sip_url, callId)));

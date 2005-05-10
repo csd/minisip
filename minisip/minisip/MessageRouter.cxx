@@ -50,8 +50,10 @@ void MessageRouter::sipcb_handleCommand(CommandString &command){
 void MessageRouter::sipcb_handleConfCommand(CommandString &command){
 	bool done=false;
 	int i;
+	cerr<<"command.getParam3 "+command.getParam3()<<endl;
 	for (i=0;i < confrout.size();i++  ) {
 		cerr<<"From SCB=>MR with conf id: "+confrout[i]->confId<<endl;
+		cerr<<"confid "+confrout[i]->confId<<endl;
 		if ((confrout[i]->confId) == command.getParam3()) 
 		{
 			confrout[i]->setCallback(this);
@@ -96,9 +98,10 @@ void MessageRouter::guicb_handleConfCommand(string &conferencename){
 void MessageRouter::guicb_handleConfCommand(CommandString &command){
 	bool done=false;
 	int i;
-	
+	cerr<<"command.getParam3 "+command.getParam3()<<endl;
 	for (i=0;i < confrout.size();i++  ) {
 		cerr << "MR: from Gui -> CC: guicb_handleConfCommand with conf id"+confrout[i]->confId<< endl;
+		cerr<<"confrout[i]->confId "+confrout[i]->confId<<endl;
 		if (confrout[i]->confId == command.getParam3()) 
 		{
 			confrout[i]->setCallback(this);
