@@ -917,7 +917,9 @@ void MinisipTextUI::guiExecute(string cmd){
 			
 				string uri = trim(command.substr(5));
 				displayMessage("Conf.Uri: "+uri);
-				callback->guicb_confDoInvite(uri);
+				CommandString cmd("","join",uri);
+				cmd.setParam3(currentconfname);
+				callback->guicb_handleConfCommand(cmd);
 				/*callId = callback->guicb_doInvite(uri);
 				if (callId=="malformed"){
 					state="IDLE";
