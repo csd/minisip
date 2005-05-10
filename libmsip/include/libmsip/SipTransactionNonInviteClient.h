@@ -75,7 +75,7 @@ class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 		bool a9_completed_terminated_timerK(const SipSMCommand &command);
 
 		MRef<SipMessage*> lastRequest;
-		int timerT1;
+		//int timerT1;
 };
 
 #endif

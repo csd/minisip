@@ -316,8 +316,8 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
 			SipTransactionClient(d, seq_no, "", callid),
-			lastRequest(NULL),
-			timerT1(500)
+			lastRequest(NULL)//,
+			//timerT1(500)
 {
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;

@@ -38,21 +38,48 @@
 
 class LIBMSIP_API SipTimers{
 	public:
-		static const int T1;
-		static const int T2;
-		static const int T4;
-		static const int timerA;
-		static const int timerB;
-		static const int timerC;
-		static const int timerD;
-		static const int timerE;
-		static const int timerF;
-		static const int timerG;
-		static const int timerH;
-		static const int timerI;
-		static const int timerJ;
-		static const int timerK;
+		static void setT1(int t){A=E=G=T1=t; B=F=H=J=t*64; }
+		static void setT2(int t){T2 = t;}
+		static void setT4(int t){I=K=T4=t;}
+		static void setA(int t){A = t;}
+		static void setB(int t){B = t;}
+		static void setC(int t){C = t;}
+		static void setD(int t){D = t;}
+		static void setE(int t){E = t;}
+		static void setF(int t){F = t;}
+		static void setG(int t){G = t;}
+		static void setH(int t){H = t;}
+		static void setI(int t){I = t;}
+		static void setJ(int t){J = t;}	
+		static void setK(int t){K = t;}
+		static int getA(){return A;}
+		static int getB(){return B;}
+		static int getC(){return C;}
+		static int getD(){return D;}
+		static int getE(){return E;}
+		static int getF(){return F;}
+		static int getG(){return G;}
+		static int getH(){return H;}
+		static int getI(){return I;}
+		static int getJ(){return J;}
+		static int getK(){return K;}
+		
 	private:
+		static int T1;
+		static int T2;
+		static int T4;
+		static int A;
+		static int B;
+		static int C;
+		static int D;
+		static int E;
+		static int F;
+		static int G;
+		static int H;
+		static int I;
+		static int J;
+		static int K;
+
 		
 
 };

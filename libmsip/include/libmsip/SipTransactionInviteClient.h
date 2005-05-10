@@ -79,7 +79,7 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 		bool a11_completed_terminated_timerD( const SipSMCommand &command);
 		
 		MRef<SipInvite*> lastInvite;
-		int timerT1;
+//		int timerT1;
 		int timerA;
 };
 

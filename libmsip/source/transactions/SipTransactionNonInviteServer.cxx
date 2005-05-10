@@ -40,6 +40,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
+#include<libmsip/SipTimers.h>
 
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
@@ -78,7 +79,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		requestTimeout(64 * timerT1, "timerJ");
+		requestTimeout(/*64 * timerT1*/ SipTimers::getJ(), "timerJ");
 		return true;
 	}else{
 		return false;
@@ -91,7 +92,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(),false);
-		requestTimeout(64 * timerT1, "timerJ");
+		requestTimeout(/*64 * timerT1*/ SipTimers::getJ(), "timerJ");
 		return true;
 	}else{
 		return false;
@@ -291,8 +292,8 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 
 SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
 		SipTransactionServer(call, seq_no, branch, callid),
-		lastResponse(NULL),
-		timerT1(500)
+		lastResponse(NULL)//,
+		//timerT1(500)
 {
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;

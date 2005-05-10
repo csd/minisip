@@ -75,7 +75,8 @@ class LIBMSIP_API SipTransactionNonInviteServer: public SipTransactionServer{
 
 		MRef<SipResponse*> lastResponse;
 
-		int timerT1, timerJ;
+		//int timerT1;
+		int timerJ;
 };
 
 #endif

@@ -87,6 +87,7 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipTimers.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CommandString.h>
@@ -96,9 +97,9 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 
 	if (transitionMatch(command, SipInvite::type, SipSMCommand::TU, IGN)){
 		lastInvite = (SipInvite *) *command.getCommandPacket();
-		requestTimeout( timerT1, "timerA" );
+		requestTimeout( /*timerT1*/SipTimers::getA() , "timerA" );
 		
-		requestTimeout( timerT1*64, "timerB" );
+		requestTimeout( /*timerT1*/SipTimers::getB(), "timerB" );
 		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
@@ -404,10 +405,11 @@ void SipTransactionInviteClient::setUpStateMachine(){
 SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipDialog*> call, 
             int seq_no, string callid): 
 		SipTransactionClient(call, seq_no, "", callid),
-		lastInvite(NULL),
-		timerT1(500),
-		timerA(500)
+		lastInvite(NULL)//,
+		//timerT1(500),
+		//timerA(500)
 {
+	timerA=SipTimers::getA();
 	cerr<<"-----------111111------------ SipTransactionInviteClient::SipTransactionInviteClient"<< endl;
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
