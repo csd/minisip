@@ -255,6 +255,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 		}
 		users=trim(users.substr(i));
 		currentconf=new ConferenceControl(confid,false);
+		callback->setConferenceController(currentconf);
 		displayMessage("The incoming conference call from "+cmd.getParam(), blue);
 		displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
 	    }
