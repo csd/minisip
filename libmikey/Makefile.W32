@@ -1,0 +1,3 @@
+libmikey: mikey/*.cxx keyagreement/*.cxx include/libmikey/*.h
+	cl /Od /I "include" /I "../libmutil/include" /I "../openssl/inc32" /D "NO_SECURITY" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_USRDLL" /D "LIBMIKEY_EXPORTS" /D "HAVE_CONFIG_H" /D "_WINDLL" /D "_MBCS" /Gm /EHsc /RTC1 /MTd /GR /Fo"Debug/" /Fd"Debug/vc70.pdb" /W3 /nologo /c /Wp64 /ZI /TP mikey/*.cxx keyagreement/*.cxx
+	link /OUT:"libmikey.dll" /INCREMENTAL /NOLOGO /LIBPATH:"..\openssl\out32dll" /LIBPATH:"..\libmikey\Debug" /DLL /DEBUG /PDB:"Debug/libmikey.pdb" /SUBSYSTEM:WINDOWS /IMPLIB:"Debug/libmikey.lib" /MACHINE:X86   kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib libmutil.lib  Debug/*.obj
