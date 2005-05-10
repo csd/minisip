@@ -101,11 +101,11 @@ void CondVar::wait( Mutex * mutex, uint32_t timeout ){
 	if( timeout == 0 ){
 		SignalObjectAndWait(0,0,0,1);
 
-		SignalObjectAndWait( *(mutex->handle_ptr), *INTERNAL_COND_WAIT, 
+		SignalObjectAndWait( *((HANDLE*)(mutex->handle_ptr)), *INTERNAL_COND_WAIT, 
 			     INFINITE, FALSE );
 	}
 	else{
-		SignalObjectAndWait( *(mutex->handle_ptr), *INTERNAL_COND_WAIT,
+		SignalObjectAndWait( *((HANDLE*)(mutex->handle_ptr)), *INTERNAL_COND_WAIT,
 		timeout, FALSE );
 	}
 #endif
