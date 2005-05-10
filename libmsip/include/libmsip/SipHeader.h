@@ -93,7 +93,7 @@ class SipHeaderValue;
 
 typedef MRef<SipHeaderValue*>(*SipHeaderFactoryFuncPtr)(const string & buf);
 
-class SipHeaderFactories{
+class LIBMSIP_API SipHeaderFactories{
 	public:
 		void addFactory(string contentType, SipHeaderFactoryFuncPtr);
 		SipHeaderFactoryFuncPtr getFactory(const string contentType);
@@ -102,14 +102,14 @@ class SipHeaderFactories{
 		map<string, SipHeaderFactoryFuncPtr > factories;
 };
 
-class SipHeaderParameter:public MObject{
+class LIBMSIP_API SipHeaderParameter:public MObject{
 	public:
 		SipHeaderParameter(string parseFrom);
 		SipHeaderParameter(string key, string value, bool hasEqual);	//hasEqual is there to support ;lr
 		string getMemObjectType(){return "SipHeaderParameter";}
 		string getKey(){return key;}
 		string getValue(){return value;}
-		string setValue(string v){value=v;}
+		void setValue(string v){value=v;}
 		string getString();
 		
 	private:
