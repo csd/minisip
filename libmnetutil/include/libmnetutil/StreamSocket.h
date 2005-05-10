@@ -51,7 +51,7 @@ class LIBMNETUTIL_API StreamSocket : public Socket{
 		virtual ~StreamSocket();
 		virtual int32_t write(string)=0;
 		virtual int32_t write(void *buf, int32_t count)=0;
-		virtual int32_t read(void *buf, int32_t cound)=0;
+		virtual int32_t read(void *buf, int32_t count)=0;
 
 		// Buffer of the received data;
 		string received;
