@@ -845,6 +845,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 	if (trim(command) == "hangupc"){
 		CommandString hup("", SipCommandString::hang_up);
+		hup.setParam3(currentconfname);
 		callback->guicb_handleConfCommand(hup);
 		state="IDLE";
 		setPrompt(state);
