@@ -30,11 +30,14 @@
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmsip/SipMessageTransport.h>
+#include<libmikey/keyagreement_dh.h>
 #include"ConsoleDebugger.h"
 #include"../sip/Sip.h"
 #include"LogEntry.h"
 #include"contactdb/ContactDb.h"
 #include"../mediahandler/MediaHandler.h"
+#include"../conf/ConferenceControl.h"
+#include"../conf/ConfCallback.h"
 #include"MessageRouter.h"
 
 #include<libmsip/SipUtils.h>
@@ -65,13 +68,13 @@ static void signal_handler( int signal ){
 
 
 static void *tcp_server_thread(void *arg){
-	assert( arg != NULL );
-	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+        assert( arg != NULL );
+        MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
 	try{
-		IP4ServerSocket server(transport->getLocalTCPPort());
-		while(true){
-			transport->addSocket(server.accept());
-		}
+        	IP4ServerSocket server(transport->getLocalTCPPort());
+        	while(true){
+                	transport->addSocket(server.accept());
+        	}
 	}
 	catch( NetworkException * exc ){
 		cerr << "Exception caught when creating TCP server." << endl;
@@ -81,14 +84,21 @@ static void *tcp_server_thread(void *arg){
 }
 
 static void *tls_server_thread(void *arg){
-	assert( arg != NULL );
-	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
-	TLSSocket::sslCipherListIndex = 2; /* Set the default list of ciphers to be used*/	
+        assert( arg != NULL );
+        MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+	
+	if( transport->getMyCertificate().isNull() ){
+		merr << "You need a personal certificate to run "
+			"a TLS server. Please specify one in "
+			"the certificate settings. minisip will "
+			"now disable the TLS server." << end;
+		return NULL;
+	}
 	try{
-		TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate(), transport->getCA_db());
-		while(true){
-			transport->addSocket(server.accept());
-		}
+        TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate(), transport->getCA_db());
+        	while(true){
+                	transport->addSocket(server.accept());
+        	}
 	}
 	catch( NetworkException * exc ){
 		cerr << "Exception caught when creating TLS server." << endl;
@@ -255,6 +265,9 @@ void Minisip::run(){
 #endif
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
+                Session::registry = *mediaHandler;
+                /* Hack: precompute a KeyAgreementDH */
+                Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
@@ -377,7 +390,7 @@ void Minisip::run(){
         catch(...){
                 //FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
-                merr << "Minisip caught an unknown exception (default). Quitting."<< end;
+                merr << "Minisip caught an unknown exception. Quitting."<< end;
 #endif
         };
 
