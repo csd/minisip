@@ -53,17 +53,17 @@ class SipMessage;
 class LIBMSIP_API SipMessageTransport : public virtual MObject{
 	public:
 		SipMessageTransport(string local_ip, 
-                        string contactIP,
-			string preferredTransport="UDP",
-                        int32_t externalContactUdpPort=5060, 
-                        int32_t local_udp_port=5060, 
-                        int32_t local_tcp_port=5060 
+							string contactIP,
+							string preferredTransport="UDP",
+							int32_t externalContactUdpPort=5060, 
+							int32_t local_udp_port=5060, 
+							int32_t local_tcp_port=5060 
 #ifndef NO_SECURITY			
-                        ,int32_t local_tls_port=5061,
-			MRef<certificate_chain *> cchain=NULL, 
-                        MRef<ca_db *> cert_db = NULL
+							,int32_t local_tls_port=5061,
+							MRef<certificate_chain *> cchain=NULL, 
+							MRef<ca_db *> cert_db = NULL
 #endif
-			);
+		);
 		
 		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
 		
@@ -89,6 +89,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 #ifndef NO_SECURITY
 		MRef<certificate_chain *> getCertificateChain(){ return cert_chain; };
 		MRef<certificate*> getMyCertificate(){ return cert_chain->get_first(); };
+		MRef<ca_db *> getCA_db () { return cert_db; };
 #endif
 
 		void udpSocketRead();
@@ -99,9 +100,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		
 		UDPSocket udpsock;
                 
-                Mutex socksLock;
+		Mutex socksLock;
 		list<MRef<StreamSocket *> > socks;
-                Mutex socksPendingLock;
+		Mutex socksPendingLock;
 		list<MRef<StreamSocket *> > socksPending;
 
 		string localIP;
@@ -120,7 +121,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		MRef<SipSMCommandReceiver *> commandReceiver;
 
-                Semaphore semaphore;
+		Semaphore semaphore;
 
 		friend class StreamThreadData;
 

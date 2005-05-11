@@ -53,7 +53,8 @@
 class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
 
 	public:
-		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert );
+		//TLSServerSocket( int32_t listen_port, MRef<certificate *> cert );
+		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
 //		~TLSServerSocket();
 
 		virtual StreamSocket *accept();
@@ -63,6 +64,8 @@ class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
 
 		SSL_CTX * ssl_ctx;
 		SSL * ssl;
+		/* CA db */
+		MRef<ca_db *> cert_db;
 };
 
 //#endif //NO_SECURITY

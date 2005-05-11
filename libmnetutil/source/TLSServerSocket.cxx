@@ -47,15 +47,17 @@
 
 
 
-TLSServerSocket::TLSServerSocket(int32_t listen_port, MRef<certificate *> cert):IP4ServerSocket(listen_port){
+TLSServerSocket::TLSServerSocket(int32_t listen_port, 
+				MRef<certificate *> cert, MRef<ca_db *> cert_db):IP4ServerSocket(listen_port){
 	SSL_METHOD * meth;
-
+	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
+	
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
-  	
 	meth = SSLv23_server_method();
-	
-  	ssl_ctx = SSL_CTX_new( meth );
+	this->ssl_ctx = SSL_CTX_new( meth );
+	this->cert_db = cert_db;
+
 	if( ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not initialize SSL context" << endl;
@@ -64,6 +66,25 @@ TLSServerSocket::TLSServerSocket(int32_t listen_port, MRef<certificate *> cert):
 		exit( 1 );
 	}
 
+	if( TLSSocket::sslCipherListIndex != 0 ) 
+		TLSSocket::setSSLCTXCiphers ( this->ssl_ctx, TLSSocket::sslCipherListIndex );
+	/* Set options: do not accept SSLv2*/
+	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
+	
+	SSL_CTX_set_verify( ssl_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, 0);
+	//SSL_CTX_set_verify( ssl_ctx, SSL_VERIFY_NONE, 0);
+	SSL_CTX_set_verify_depth( ssl_ctx, 5);
+	
+	//SSL_CTX_set_session_cache_mode( ssl_ctx, SSL_SESS_CACHE_BOTH );
+	SSL_CTX_set_session_cache_mode( ssl_ctx, SSL_SESS_CACHE_SERVER );
+	SSL_CTX_set_session_id_context( ssl_ctx, sid_ctx, (unsigned int)strlen( (const char *)sid_ctx ) );
+
+	if( !cert_db.isNull() ){
+		/* Use this database for the certificates check */
+		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->get_db());
+	}
+	
+		
 	if( SSL_CTX_use_PrivateKey( ssl_ctx, cert->get_openssl_private_key() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given private key" << endl;

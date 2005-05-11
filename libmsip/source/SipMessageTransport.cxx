@@ -241,27 +241,27 @@ static void * udpThread( void * arg );
 static void * streamThread( void * arg );
 
 SipMessageTransport::SipMessageTransport(
-                        string local_ip, 
-                        string contactIP, 
-			string preferredTransport,
-                        int32_t externalContactUdpPort, 
-                        int32_t local_udp_port, 
-                        int32_t local_tcp_port,
-                        int32_t local_tls_port,
-			MRef<certificate_chain *> cchain, 
-                        MRef<ca_db *> cert_db
+						string local_ip, 
+						string contactIP, 
+						string preferredTransport,
+						int32_t externalContactUdpPort, 
+						int32_t local_udp_port, 
+						int32_t local_tcp_port,
+						int32_t local_tls_port,
+						MRef<certificate_chain *> cchain, 
+						MRef<ca_db *> cert_db
 			):
-                                        udpsock(false,local_udp_port),
-                                        localIP(local_ip),
-                                        contactIP(contactIP),
-					preferredTransport(preferredTransport),
-                                        externalContactUdpPort(externalContactUdpPort),
-                                        localUDPPort(local_udp_port),
-                                        localTCPPort(local_tcp_port),
-					localTLSPort(local_tls_port),
-                                        cert_chain(cchain), 
-                                        cert_db(cert_db),
-                                        tls_ctx(NULL)
+						udpsock(false,local_udp_port),
+						localIP(local_ip),
+						contactIP(contactIP),
+						preferredTransport(preferredTransport),
+						externalContactUdpPort(externalContactUdpPort),
+						localUDPPort(local_udp_port),
+						localTCPPort(local_tcp_port),
+						localTLSPort(local_tls_port),
+						cert_chain(cchain), 
+						cert_db(cert_db),
+						tls_ctx(NULL)
 							
 {
 	int i;
@@ -316,31 +316,26 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 				
 	try{
-		socket = findStreamSocket(ip_addr, port);
 
-		if( socket.isNull() && preferredTransport != "UDP" ){
-			/* No existing StreamSocket to that host,
-			 * create one */
-
-			if( preferredTransport == "TLS" ){
+		if( preferredTransport != "UDP" ){
+			
+			if( preferredTransport == "TLS" ) {
 				//FIXME have a different port per transport,
 				//to avoid this ...
-				socket = findStreamSocket(ip_addr, 5061);
-				if( socket.isNull() ){
+				port = 5061; 
+			}
+			socket = findStreamSocket(ip_addr, port);
+			if( socket.isNull() ) {
+				/* No existing StreamSocket to that host,
+				* create one */
+				if( preferredTransport == "TLS" )
 					socket = new TLSSocket( ip_addr, 
-		                        5061, tls_ctx, getMyCertificate(),
-					cert_db );
-				}
-
-				addSocket( socket );
-			}
-
-			else{ /* TCP */
-				socket = new TCPSocket( ip_addr, port );
-
-				addSocket( socket );
-			}
-			
+								5061, tls_ctx, getMyCertificate(),
+								cert_db );
+				else /* TCP */
+					socket = new TCPSocket( ip_addr, port );
+			} 
+			addSocket( socket );
 		}
 
 		if (addVia){
@@ -364,7 +359,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (UDP)", packetString);
 #endif
-			cerr<<"SMT: "+packetString<<endl;
 			if( udpsock.sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
@@ -378,7 +372,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc->errorDescription();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		mdbg << "Transport error in SipMessageTransport: " << message << end;
+		merr << "Transport error in SipMessageTransport: " << message << end;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
@@ -393,7 +387,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		if (! commandReceiver.isNull())
 			commandReceiver->handleCommand( transportErrorCommand );
 		else
-			mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+			merr<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 	}
 	
 }
@@ -444,7 +438,7 @@ void SipMessageTransport::udpSocketRead(){
 			nread = udpsock.recv(buffer, 16384);
 			
 			if (nread == -1){
-				mdbg << "Some error occured while reading from UdpSocket"<<end;
+				merr << "Some error occured while reading from UdpSocket"<<end;
 				continue;
 			}
 
@@ -475,7 +469,7 @@ void SipMessageTransport::udpSocketRead(){
 				if (!commandReceiver.isNull())
 					commandReceiver->handleCommand( cmd );
 				else
-					mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+					merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 				pack=NULL;
 			}
 			
@@ -484,7 +478,7 @@ void SipMessageTransport::udpSocketRead(){
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << end;
+				merr << "Invalid data on UDP socket, discarded" << end;
 #endif
 				continue;
 			}
@@ -495,7 +489,7 @@ void SipMessageTransport::udpSocketRead(){
 				
 				delete exc;
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << end;
+				merr << "Invalid data on UDP socket, discarded" << end;
 #endif
 				continue;
 			}
@@ -563,7 +557,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			nread = socket->read( buffer, 16384 );
 
 			if (nread == -1){
-				mdbg << "Some error occured while reading from StreamSocket" << end;
+				merr << "Some error occured while reading from StreamSocket" << end;
 				continue;
 			}
 
@@ -590,7 +584,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						if (!transport->commandReceiver.isNull())
 							transport->commandReceiver->handleCommand( cmd );
 						else
-							mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+							merr<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 					}
 
 				}
