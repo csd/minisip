@@ -139,6 +139,14 @@ AC_ARG_ENABLE(ipsec-enable,
 	AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])])
 AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
 
+dnl P2T support
+p2t_enabled=no
+AC_ARG_ENABLE(p2t,
+    [ --enable-ipsec-enable enables push-2-talk features (default enabled)],
+    [  p2t_enable=yes
+	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])])
+AM_CONDITIONAL(P2T_SUPPORT, test "${p2t_enabled}" = "yes")
+
 
 
 dnl #############
@@ -473,6 +481,7 @@ AC_OUTPUT([codecs/Makefile
 		 mediahandler/Makefile
                  video/Makefile
 		 conf/Makefile
+		 aec/Makefile
 		 debian/Makefile
 		 Makefile])
 

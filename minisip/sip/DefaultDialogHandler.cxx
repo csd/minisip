@@ -36,8 +36,12 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
+
+#ifdef P2T_SUPPORT
 #include"../p2t/SipDialogP2T.h"
 #include"../p2t/SipDialogP2Tuser.h"
+#endif
+
 #include"../mediahandler/MediaHandler.h"
 
 #ifdef IPSEC_SUPPORT
@@ -58,8 +62,10 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack,
 		mediaHandler(mediaHandler)
 {
 	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+#ifdef P2T_SUPPORT
 	//Initialize GroupListServer
 	grpListServer=NULL;
+#endif
 }
 
 string DefaultDialogHandler::getName(){
@@ -100,10 +106,13 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pkt);
 		//inv->checkAcceptContact();
 		//check if it's a regular INVITE or a P2T INVITE
+#ifdef P2T_SUPPORT
 		if(inv->is_P2T()) {
 			inviteP2Treceived(SipSMCommand(pkt,source,destination));	
 		}
-		else if(inv->is_ConfJoin()) {
+		else 
+#endif
+        if(inv->is_ConfJoin()) {
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
@@ -380,6 +389,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		return true;
 	}
 
+#ifdef P2T_SUPPORT
 
 	/*****
 	 * P2T commands:
@@ -449,6 +459,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 
 		return true;
 	}
+#endif
 
 	mdbg << "DefaultDialogHandler ignoring command " << cmdstr.getString() << end; 
 
@@ -469,7 +480,7 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 	}
 }
 
-
+#ifdef P2T_SUPPORT
 void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	//type casting
 	MRef<SipMessage*> pack = command.getCommandPacket();
@@ -796,6 +807,8 @@ bool DefaultDialogHandler::getP2TDialog(string GroupId, MRef<SipDialogP2T*>&p2tD
 	
 	return match;
 }
+#endif
+
 
 bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig *> dialogConfig){
 	int startAddr=0;

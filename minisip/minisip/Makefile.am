@@ -15,7 +15,7 @@ AM_LDFLAGS = @LDFLAGS@ @AVCODEC_LDFLAGS@
 AM_CXXFLAGS = @CXXFLAGS@
 AM_CPPFLAGS = @CPPFLAGS@
 
-	
+
 
 if GTK_GUI
 AM_LDFLAGS +=  @GLADEMM_LIBS@
@@ -43,10 +43,15 @@ endif
 
 
 minisip_LDADD +=../sdp/libsdp.a \
-		contactdb/libcontactdb.a \
-                ../p2t/libp2t.a \
-                ../mediahandler/libmediahandler.a \
-		../conf/libconf.a
+		contactdb/libcontactdb.a
+
+if P2T_SUPPORT
+minisip_LDADD +=../p2t/libp2t.a
+endif
+
+minisip_LDADD +=../mediahandler/libmediahandler.a \
+		        ../conf/libconf.a 
+
 
 
 
@@ -64,10 +69,11 @@ minisip_LDADD +=../rtp/librtp.a \
                 ../codecs/g711/libcodec_g711.a \
                 ../soundcard/libsoundcard.a \
 		../spaudio/libspaudio.a \
+		../aec/libaec.a \
 		ipprovider/libipprovider.a \
                 ../stun/libstun.a
 
-	
+
 
 minisip_SOURCES = Minisip.cxx
 #main.cxx
