@@ -69,7 +69,6 @@ minisip_LDADD +=../rtp/librtp.a \
                 ../codecs/g711/libcodec_g711.a \
                 ../soundcard/libsoundcard.a \
 		../spaudio/libspaudio.a \
-		../aec/libaec.a \
 		ipprovider/libipprovider.a \
                 ../stun/libstun.a
 
