@@ -481,7 +481,6 @@ AC_OUTPUT([codecs/Makefile
 		 mediahandler/Makefile
                  video/Makefile
 		 conf/Makefile
-		 aec/Makefile
 		 debian/Makefile
 		 Makefile])
 
