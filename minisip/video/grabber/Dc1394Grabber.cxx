@@ -94,8 +94,9 @@ void Dc1394Grabber::open(){
 
 	ret = dc1394_dma_setup_capture( cameraHandle, camera.node, cameraId+1, 
 			          FORMAT_VGA_NONCOMPRESSED, MODE_640x480_YUV422,
-				  SPEED_400, FRAMERATE_15, NUM_BUFFERS, 0,
-				  DROP_FRAMES, NULL, &camera );
+				  SPEED_400, FRAMERATE_15,
+                                  NUM_BUFFERS,/* 0,*/ DROP_FRAMES, NULL, 
+                                  &camera );
 	
 	if( ret != DC1394_SUCCESS ){
 		perror( "dc1394_dma_setup_capture" );
