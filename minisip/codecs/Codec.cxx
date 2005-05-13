@@ -32,8 +32,10 @@ MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
                         return new G711CODEC();
 		case 97:
 			return new ILBCCODEC();
+#ifdef HAVE_SPEEX
 		case 114: 
 			return new SPEEXCODEC();
+#endif
                 default:
                         return NULL;
         }
