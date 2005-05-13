@@ -72,7 +72,8 @@ int32_t SpAudio::spatialize(short *input,
   
 	int nSamples = (SOUND_CARD_FREQ * 20) / 1000;
 	if( src->leftch && src->rightch ){
-		for(int32_t i=0;i<nSamples*2;i++){
+		int32_t i;
+		for(i=0;i<nSamples*2;i++){
 			if(i%2 == 0){
 				src->leftch[(src->j+lchdelay[src->position-1])%1028]=input[i];
 				src->j=(src->j+1)%1028;
@@ -84,7 +85,7 @@ int32_t SpAudio::spatialize(short *input,
 			}
 		}
 
-		for(int32_t i=0; i<nSamples;i++){
+		for(i=0; i<nSamples;i++){
 			outbuff[(2*i)]=lookupleftGlobal[src->leftch[src->pointer]+32768][src->position-1];
 			outbuff[(2*i)+1]=lookuprightGlobal[src->rightch[src->pointer]+32768][src->position -1];
 			src->pointer=(src->pointer+1)%1028;
