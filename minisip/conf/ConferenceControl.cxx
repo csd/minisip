@@ -144,12 +144,13 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 	}
 	if(command.getOp()==SipCommandString::hang_up)
 	{
-		for(int t=0;t<connectedList.size();t++)
+		int t;
+		for(t=0;t<connectedList.size();t++)
 		{
 			CommandString hup(connectedList[t].callid, SipCommandString::hang_up);
 			callback->confcb_handleSipCommand(hup);
 		}
-		for(int t=0;t<pendingList.size();t++)
+		for(t=0;t<pendingList.size();t++)
 		{
 			CommandString hup(pendingList[t].callid, SipCommandString::hang_up);
 			callback->confcb_handleSipCommand(hup);
@@ -499,11 +500,12 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 void ConferenceControl::sendUpdatesToGui()
 {
 	string connectedusers="";
-	for(int t=0;t<connectedList.size();t++)
+	int t;
+	for(t=0;t<connectedList.size();t++)
 		connectedusers=connectedusers+ ((connectedList[t]).uri) + ", "; 
 	cerr<<"users "+connectedusers<<endl;
 	string pendingusers="";
-	for(int t=0;t<pendingList.size();t++)
+	for(t=0;t<pendingList.size();t++)
 		pendingusers=pendingusers+ ((pendingList[t]).uri) + ", ";     
 	cerr<<"users "+pendingusers<<endl;
 	CommandString cmd(confId,"list updated",connectedusers,pendingusers);

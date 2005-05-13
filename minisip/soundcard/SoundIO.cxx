@@ -201,7 +201,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	int32_t i;
 	short *buffers[2];	// Two sound buffers for "double buffering"
 	assert(soundcard!=NULL);
-	int32_t nread; /* IN SAMPLES */
+	int32_t nread=0; /* IN SAMPLES */
 	//FIXME
 	soundcard->recorder_buffer_size = SOUND_CARD_FREQ*20/1000;
 	
@@ -357,7 +357,8 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 void SoundIO::unRegisterSource(int sourceId){
 	int32_t j =1;
 	queueLock.lock();
-	for (list<MRef<SoundSource *> >::iterator i = sources.begin(); 
+	list<MRef<SoundSource *> >::iterator i;
+	for (i = sources.begin(); 
                         i!=sources.end(); 
                         i++){
 		if ((*i)->getId()==sourceId){
@@ -367,7 +368,7 @@ void SoundIO::unRegisterSource(int sourceId){
 			
         }
 	int32_t nextSize=sources.size();
-	for (list<MRef<SoundSource *> >::iterator i = sources.begin(); 
+	for (i = sources.begin(); 
                         i!=sources.end(); 
                         i++, j++){
 		(*i)->setPos(spAudio.assignPos(j,nextSize));
