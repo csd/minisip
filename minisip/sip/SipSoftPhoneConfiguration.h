@@ -150,6 +150,8 @@ class SipSoftPhoneConfiguration : public MObject{
 		 * used for P2T Sessions.
 		 */
 		int32_t p2tGroupListServerPort;
+		
+		string selectedCodec;
 };
 
 #endif

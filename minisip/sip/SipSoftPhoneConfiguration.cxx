@@ -309,6 +309,8 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		inherited.sipIdentity->securitySupport = securityConfig.secured;
 	}
 
+	selectedCodec =  parser->getValue("selected_codec","iLBC");
+	
 	delete parser;
 	return ret;
 
