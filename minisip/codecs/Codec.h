@@ -63,7 +63,7 @@ class AudioCodec : public Codec{
 		/**
 		 * @returns Number of bytes in output buffer
 		 */
-		virtual void encode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
+		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
 
 		/**
 		 * 
@@ -81,7 +81,7 @@ class AudioCodec : public Codec{
 		/**
 		 * size of the output of the codec in bytes.
 		 */
-		virtual int32_t getEncodedNrBytes()=0;
+		virtual int32_t getEncodedNrBytes()=0;//
 		
 		virtual int32_t getInputNrSamples()=0;
 	
