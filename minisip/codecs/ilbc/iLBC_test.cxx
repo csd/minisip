@@ -24,8 +24,8 @@
    /* Runtime statistics */ 
    #include <time.h> 
     
-   #define TIME_PER_FRAME  30   
-   #define ILBCNOOFWORDS   (NO_OF_BYTES/2) 
+   #define TIME_PER_FRAME  20   
+   #define ILBCNOOFWORDS_MAX   (NO_OF_BYTES/2) 
     
    /*----------------------------------------------------------------* 
     *  Encoder interface function  
@@ -37,7 +37,7 @@
        short *data /* (i) The signal block to encode */ 
    ){ 
      
-       float block[BLOCKL]; 
+       float block[BLOCKL_MAX]; 
        int k; 
     
        /* convert signal to float */ 
@@ -62,7 +62,7 @@
        short mode  /* (i) 0=PL, 1=Normal */ 
    ){ 
        int k; 
-       float decblock[BLOCKL], dtmp; 
+       float decblock[BLOCKL_MAX], dtmp; 
     
        /* check if mode is valid */ 
     
@@ -115,8 +115,8 @@
        float outtime; 
     
        FILE *ifileid,*efileid,*ofileid, *cfileid; 
-       short data[BLOCKL]; 
-       short encoded_data[ILBCNOOFWORDS], decoded_data[BLOCKL]; 
+       short data[BLOCKL_MAX]; 
+       short encoded_data[ILBCNOOFWORDS_MAX], decoded_data[BLOCKL_MAX]; 
        int len; 
        short pli; 
        int blockcount = 0; 
@@ -227,7 +227,7 @@
                    if (pli==0) { 
                        /* Packet loss -> remove info from frame */ 
                        memset(encoded_data, 0,  
-                           sizeof(short)*ILBCNOOFWORDS); 
+                           sizeof(short)*ILBCNOOFWORDS_MAX); 
                        packetlosscount++; 
                    } 
                } else { 

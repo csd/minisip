@@ -98,15 +98,15 @@
         
        /* subframe 1: Interpolation between old and first */ 
     
-       LSFinterpolate2a_dec(lp, (*iLBCdec_inst).lsfdeqold, lsfdeq,  
+    /*   LSFinterpolate2a_dec(lp, (*iLBCdec_inst).lsfdeqold, lsfdeq,  
            lsf_weightTbl[0], length); 
        memcpy(syntdenum,lp,lp_length*sizeof(float)); 
-       bwexpand(weightdenum, lp, LPC_CHIRP_WEIGHTDENUM, lp_length); 
+       bwexpand(weightdenum, lp, LPC_CHIRP_WEIGHTDENUM, lp_length); */
     
        /* subframes 2 to 6: interpolation between first and last  
        LSF */ 
         
-       pos = lp_length; 
+/*       pos = lp_length; 
        for (i = 1; i < 6; i++) { 
            LSFinterpolate2a_dec(lp, lsfdeq, lsfdeq2, lsf_weightTbl[i],  
                length); 
@@ -114,11 +114,23 @@
            bwexpand(weightdenum + pos, lp,  
                LPC_CHIRP_WEIGHTDENUM, lp_length); 
            pos += lp_length; 
-       } 
+       } */
+       
+       /* 20ms */
+	       pos = 0;
+       for (i = 0; i < NSUB; i++) {
+            LSFinterpolate2a_dec(lp,  (*iLBCdec_inst).lsfdeqold,
+                   lsfdeq, lsf_weightTbl[i], length);
+            memcpy(syntdenum+pos,lp,lp_length*sizeof(float));
+            bwexpand(weightdenum+pos, lp, LPC_CHIRP_WEIGHTDENUM,
+                   lp_length);
+            pos += lp_length;
+           }
+       
         
        /* update memory */ 
     
-       memcpy((*iLBCdec_inst).lsfdeqold, lsfdeq2, length*sizeof(float)); 
+       memcpy((*iLBCdec_inst).lsfdeqold, lsfdeq, length*sizeof(float)); 
     
    } 
     

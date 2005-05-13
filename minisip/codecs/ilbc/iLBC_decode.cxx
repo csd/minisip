@@ -49,8 +49,8 @@
            LPC_FILTERORDER*sizeof(float)); 
     
        memset((*iLBCdec_inst).old_syntdenum, 0,  
-           ((LPC_FILTERORDER + 1)*NSUB)*sizeof(float)); 
-       for (i=0; i<NSUB; i++) 
+           ((LPC_FILTERORDER + 1)*NSUB_MAX)*sizeof(float)); 
+       for (i=0; i<NSUB_MAX; i++) 
            (*iLBCdec_inst).old_syntdenum[i*(LPC_FILTERORDER+1)]=1.0; 
     
        (*iLBCdec_inst).last_lag = 20; 
@@ -62,7 +62,7 @@
        (*iLBCdec_inst).prevLpc[0] = 1.0; 
        memset((*iLBCdec_inst).prevLpc+1,0, 
            LPC_FILTERORDER*sizeof(float)); 
-       memset((*iLBCdec_inst).prevResidual, 0, BLOCKL*sizeof(float)); 
+       memset((*iLBCdec_inst).prevResidual, 0, BLOCKL_MAX*sizeof(float)); 
        (*iLBCdec_inst).seed=777; 
     
        memset((*iLBCdec_inst).hpomem, 0, 4*sizeof(float)); 
@@ -103,7 +103,7 @@
                                       state comes first 0 if that part  
                                       comes last */ 
    ){ 
-       float reverseDecresidual[BLOCKL], mem[CB_MEML]; 
+       float reverseDecresidual[BLOCKL_MAX], mem[CB_MEML]; 
        int k, meml_gotten, Nfor, Nback, i; 
        int diff, start_pos; 
        int subcount, subframe; 
@@ -273,24 +273,24 @@
        int mode                    /* (i) 0: bad packet, PLC,  
                                               1: normal */ 
    ){ 
-       float data[BLOCKL]; 
-       float lsfdeq[LPC_FILTERORDER*LPC_N]; 
-       float PLCresidual[BLOCKL], PLClpc[LPC_FILTERORDER + 1]; 
-       float zeros[BLOCKL], one[LPC_FILTERORDER + 1]; 
+       float data[BLOCKL_MAX]; 
+       float lsfdeq[LPC_FILTERORDER*LPC_N_MAX]; 
+       float PLCresidual[BLOCKL_MAX], PLClpc[LPC_FILTERORDER + 1]; 
+       float zeros[BLOCKL_MAX], one[LPC_FILTERORDER + 1]; 
        int k, i, start, idxForMax, pos, lastpart, ulp; 
        int lag, ilag; 
        float cc, maxcc; 
        int idxVec[STATE_LEN]; 
        int check; 
-       int gain_index[NASUB*CB_NSTAGES], extra_gain_index[CB_NSTAGES]; 
-       int cb_index[CB_NSTAGES*NASUB], extra_cb_index[CB_NSTAGES]; 
-       int lsf_i[LSF_NSPLIT*LPC_N]; 
+       int gain_index[NASUB_MAX*CB_NSTAGES], extra_gain_index[CB_NSTAGES]; 
+       int cb_index[CB_NSTAGES*NASUB_MAX], extra_cb_index[CB_NSTAGES]; 
+       int lsf_i[LSF_NSPLIT*LPC_N_MAX]; 
        int state_first; 
        unsigned char *pbytes; 
-       float weightdenum[(LPC_FILTERORDER + 1)*NSUB]; 
+       float weightdenum[(LPC_FILTERORDER + 1)*NSUB_MAX]; 
        int order_plus_one; 
-       float syntdenum[NSUB*(LPC_FILTERORDER+1)];  
-       float decresidual[BLOCKL]; 
+       float syntdenum[NSUB_MAX*(LPC_FILTERORDER+1)];  
+       float decresidual[BLOCKL_MAX]; 
         
        if (mode>0) { /* the data are good */ 
     
@@ -301,7 +301,7 @@
     
            /* Set everything to zero before decoding */ 
     
-           for (k=0;k<6;k++) { 
+           for (k=0;k<LSF_NSPLIT*LPC_N_MAX;k++) { 
                lsf_i[k]=0; 
            } 
            start=0; 
@@ -443,7 +443,7 @@
             
            /* packet loss conceal */ 
     
-           memset(zeros, 0, BLOCKL*sizeof(float)); 
+           memset(zeros, 0, BLOCKL_MAX*sizeof(float)); 
             
            one[0] = 1; 
            memset(one+1, 0, LPC_FILTERORDER*sizeof(float)); 
@@ -469,8 +469,22 @@
                enhancerInterface(data, decresidual, iLBCdec_inst); 
     
            /* synthesis filtering */ 
+          /* if (iLBCdec_inst->mode==20) {*/
+               /* Enhancer has 40 samples delay */
+               i=0;
+               syntFilter(data + i*SUBL,(*iLBCdec_inst).old_syntdenum
+                   + (i+NSUB-1)*(LPC_FILTERORDER+1),
+                   SUBL, (*iLBCdec_inst).syntMem);
+
+               for (i=1; i < NSUB; i++) {
+                   syntFilter(data + i*SUBL,
+                       syntdenum + (i-1)*(LPC_FILTERORDER+1),
+                       SUBL, (*iLBCdec_inst).syntMem);
+               }
+           
             
-           for (i=0; i < 2; i++) { 
+         /* 30ms 
+          for (i=0; i < 2; i++) { 
                syntFilter(data + i*SUBL,  
                    (*iLBCdec_inst).old_syntdenum +  
                    (i+4)*(LPC_FILTERORDER+1), SUBL,  
@@ -481,18 +495,18 @@
                syntFilter(data + i*SUBL,  
                    syntdenum + (i-2)*(LPC_FILTERORDER+1), SUBL,  
                    (*iLBCdec_inst).syntMem); 
-           } 
+           } */ 
     
        } else { 
     
            /* Find last lag */ 
            lag = 20; 
-           maxcc = xCorrCoef(&decresidual[BLOCKL-ENH_BLOCKL],  
-               &decresidual[BLOCKL-ENH_BLOCKL-lag], ENH_BLOCKL); 
+           maxcc = xCorrCoef(&decresidual[BLOCKL_MAX-ENH_BLOCKL],  
+               &decresidual[BLOCKL_MAX-ENH_BLOCKL-lag], ENH_BLOCKL); 
             
            for (ilag=21; ilag<120; ilag++) { 
-               cc = xCorrCoef(&decresidual[BLOCKL-ENH_BLOCKL],  
-                   &decresidual[BLOCKL-ENH_BLOCKL-ilag], ENH_BLOCKL); 
+               cc = xCorrCoef(&decresidual[BLOCKL_MAX-ENH_BLOCKL],  
+                   &decresidual[BLOCKL_MAX-ENH_BLOCKL-ilag], ENH_BLOCKL); 
             
                if (cc > maxcc) { 
                    maxcc = cc; 

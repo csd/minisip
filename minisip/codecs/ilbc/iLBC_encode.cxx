@@ -44,7 +44,7 @@
        memcpy((*iLBCenc_inst).lsfdeqold, lsfmeanTbl, 
            LPC_FILTERORDER*sizeof(float)); 
        memset((*iLBCenc_inst).lpc_buffer, 0,  
-           LPC_LOOKBACK*sizeof(float)); 
+           (LPC_LOOKBACK+BLOCKL_MAX)*sizeof(float)); 
        memset((*iLBCenc_inst).hpimem, 0, 4*sizeof(float)); 
     
        return (NO_OF_BYTES); 
@@ -66,24 +66,24 @@
                                               state */ 
    ){ 
         
-       float data[BLOCKL]; 
-       float residual[BLOCKL], reverseResidual[BLOCKL]; 
+       float data[BLOCKL_MAX]; 
+       float residual[BLOCKL_MAX], reverseResidual[BLOCKL_MAX]; 
     
        int start, idxForMax, idxVec[STATE_LEN]; 
-       float reverseDecresidual[BLOCKL], mem[CB_MEML]; 
+       float reverseDecresidual[BLOCKL_MAX], mem[CB_MEML]; 
        int n, k, meml_gotten, Nfor, Nback, i, pos; 
-       int gain_index[CB_NSTAGES*NASUB], extra_gain_index[CB_NSTAGES]; 
-       int cb_index[CB_NSTAGES*NASUB],extra_cb_index[CB_NSTAGES]; 
-       int lsf_i[LSF_NSPLIT*LPC_N]; 
+       int gain_index[CB_NSTAGES*NASUB_MAX], extra_gain_index[CB_NSTAGES]; 
+       int cb_index[CB_NSTAGES*NASUB_MAX],extra_cb_index[CB_NSTAGES]; 
+       int lsf_i[LSF_NSPLIT*LPC_N_MAX]; 
        unsigned char *pbytes; 
        int diff, start_pos, state_first; 
        float en1, en2; 
        int index, ulp, firstpart; 
        int subcount, subframe; 
        float weightState[LPC_FILTERORDER]; 
-       float syntdenum[NSUB*(LPC_FILTERORDER+1)];  
-       float weightdenum[NSUB*(LPC_FILTERORDER+1)];  
-       float decresidual[BLOCKL]; 
+       float syntdenum[NSUB_MAX*(LPC_FILTERORDER+1)];  
+       float weightdenum[NSUB_MAX*(LPC_FILTERORDER+1)];  
+       float decresidual[BLOCKL_MAX]; 
     
        /* high pass filtering of input signal if such is not done  
               prior to calling this function */ 

@@ -16,8 +16,20 @@
    #include "iLBC_define.h" 
     
    /* bit allocation */ 
-    
-   int lsf_bitsTbl[6]={6,7,7,6,7,7}; 
+   /*   20ms  */ 
+   int lsf_bitsTbl[6]={6,7,7,0,0,0}; 
+   int start_bitsTbl=3; 
+     
+   int scale_bitsTbl=6; 
+   int state_bitsTbl=3; 
+   int cb_bitsTbl[5][CB_NSTAGES]={{7,7,7},{8,7,7}, 
+               {8,8,8},{0,0,0},{0,0,0}}; 
+   int search_rangeTbl[5][CB_NSTAGES]={{58,58,58}, {108,44,44},  
+               {108,108,108}, {108,108,108}, {108,108,108}}; 
+   int gain_bitsTbl[3]={5,4,3};
+   
+   /* 30 ms  */
+  /* int lsf_bitsTbl[6]={6,7,7,6,7,7}; 
    int start_bitsTbl=3; 
      
    int scale_bitsTbl=6; 
@@ -26,33 +38,33 @@
                {8,8,8},{8,8,8},{8,8,8}}; 
    int search_rangeTbl[5][CB_NSTAGES]={{58,58,58}, {108,44,44},  
                {108,108,108}, {108,108,108}, {108,108,108}}; 
-   int gain_bitsTbl[3]={5,4,3}; 
+   int gain_bitsTbl[3]={5,4,3}; */
     
    /* ULP bit allocation */ 
     
    int ulp_lsf_bitsTbl[6][ULP_CLASSES+2]={ 
                    {6,0,0,0,0},{7,0,0,0,0}, 
-                   {7,0,0,0,0},{6,0,0,0,0}, 
-                   {7,0,0,0,0},{7,0,0,0,0}}; 
-   int ulp_start_bitsTbl[ULP_CLASSES+2]={3,0,0,0,0}; 
+                   {7,0,0,0,0},{0,0,0,0,0}, 
+                   {0,0,0,0,0},{0,0,0,0,0}}; 
+   int ulp_start_bitsTbl[ULP_CLASSES+2]={2,0,0,0,0}; 
    int ulp_startfirst_bitsTbl[ULP_CLASSES+2]={1,0,0,0,0}; 
    int ulp_scale_bitsTbl[ULP_CLASSES+2]={6,0,0,0,0}; 
    int ulp_state_bitsTbl[ULP_CLASSES+2]={0,1,2,0,0}; 
     
    int ulp_extra_cb_indexTbl[CB_NSTAGES][ULP_CLASSES+2]={ 
-       {4,2,1,0,0},{0,0,7,0,0},{0,0,7,0,0}}; 
+       {6,0,1,0,0},{0,0,7,0,0},{0,0,7,0,0}}; 
    int ulp_extra_cb_gainTbl[CB_NSTAGES][ULP_CLASSES+2]={ 
-       {1,1,3,0,0},{1,1,2,0,0},{0,0,3,0,0}}; 
-   int ulp_cb_indexTbl[NASUB][CB_NSTAGES][ULP_CLASSES+2]={ 
-       {{6,1,1,0,0},{0,0,7,0,0},{0,0,7,0,0}}, 
-       {{0,7,1,0,0},{0,0,8,0,0},{0,0,8,0,0}}, 
-       {{0,7,1,0,0},{0,0,8,0,0},{0,0,8,0,0}}, 
-       {{0,7,1,0,0},{0,0,8,0,0},{0,0,8,0,0}}}; 
-   int ulp_cb_gainTbl[NASUB][CB_NSTAGES][ULP_CLASSES+2]={ 
-       {{1,2,2,0,0},{1,2,1,0,0},{0,0,3,0,0}}, 
-       {{0,2,3,0,0},{0,2,2,0,0},{0,0,3,0,0}}, 
-       {{0,1,4,0,0},{0,1,3,0,0},{0,0,3,0,0}}, 
-       {{0,1,4,0,0},{0,1,3,0,0},{0,0,3,0,0}}}; 
+       {2,0,3,0,0},{1,1,2,0,0},{0,0,3,0,0}}; 
+   int ulp_cb_indexTbl[NASUB_MAX][CB_NSTAGES][ULP_CLASSES+2]={ 
+       {{7,0,1,0,0},{0,0,7,0,0},{0,0,7,0,0}}, 
+       {{0,0,8,0,0},{0,0,8,0,0},{0,0,8,0,0}},
+       {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}}, 
+       {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}}}; 
+   int ulp_cb_gainTbl[NASUB_MAX][CB_NSTAGES][ULP_CLASSES+2]={ 
+       {{1,2,2,0,0},{1,1,2,0,0},{0,0,3,0,0}}, 
+       {{1,1,3,0,0},{0,2,2,0,0},{0,0,3,0,0}},
+       {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}}, 
+       {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}}}; 
     
    /* HP Filters */ 
     
@@ -114,7 +126,7 @@
    /* CB tables */ 
     
    int stMemLTbl=85; 
-   int memLfTbl[NASUB]={147,147,147,147}; 
+   int memLfTbl[NASUB_MAX]={147,147,147,147}; 
     
    /* expansion filter(s) */ 
     
@@ -184,13 +196,12 @@
      
        (float)2.777344}; 
     
-   float lsf_weightTbl[6] = {(float)(1.0/2.0), (float)1.0, 
-   (float)(2.0/3.0),  
-       (float)(1.0/3.0), (float)0.0, (float)0.0}; 
+   float lsf_weightTbl[4] = {(float)(3.0/4.0), (float)(2.0/4.0), 
+       (float)(1.0/4.0), (float)(0.0)}; 
     
     
    /* Hanning LPC window */ 
-   float lpc_winTbl[BLOCKL]={ 
+   float lpc_winTbl[BLOCKL_MAX]={ 
        (float)0.000183, (float)0.000671, (float)0.001526, 
        (float)0.002716, (float)0.004242, (float)0.006104, 
        (float)0.008301, (float)0.010834, (float)0.013702, 
@@ -275,7 +286,7 @@
    }; 
     
    /* Asymmetric LPC window */ 
-   float lpc_asymwinTbl[BLOCKL]={ 
+   float lpc_asymwinTbl[BLOCKL_MAX]={ 
        (float)0.000061, (float)0.000214, (float)0.000458, 
        (float)0.000824, (float)0.001282, (float)0.001831, 
        (float)0.002472, (float)0.003235, (float)0.004120, 

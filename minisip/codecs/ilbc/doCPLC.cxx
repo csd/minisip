@@ -74,7 +74,7 @@
        float gain, maxcc; 
        float gain_comp, maxcc_comp; 
        int i, pick, offset; 
-       float ftmp, ftmp1, randvec[BLOCKL], pitchfact; 
+       float ftmp, ftmp1, randvec[BLOCKL_MAX], pitchfact; 
                 
        /* Packet Loss */ 
     

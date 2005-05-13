@@ -31,10 +31,11 @@
        float *lpc_buffer   /* (i) buffer containing old data */  
    ){ 
        int k, is; 
-       float temp[BLOCKL], lp[LPC_FILTERORDER + 1]; 
+       float temp[BLOCKL_MAX], lp[LPC_FILTERORDER + 1]; 
        float lp2[LPC_FILTERORDER + 1]; 
        float r[LPC_FILTERORDER + 1]; 
     
+       is=LPC_LOOKBACK+BLOCKL_MAX-BLOCKL;
        memcpy(lpc_buffer+LPC_LOOKBACK,data,BLOCKL*sizeof(float)); 
         
        /* No lookahead, last window is asymmetric */ 
@@ -45,12 +46,12 @@
     
            if (k < (LPC_N - 1)) { 
      
-               window(temp, lpc_winTbl, lpc_buffer, BLOCKL); 
+               window(temp, lpc_winTbl, lpc_buffer, BLOCKL_MAX); 
            } else { 
-               window(temp, lpc_asymwinTbl, lpc_buffer + is, BLOCKL); 
+               window(temp, lpc_asymwinTbl, lpc_buffer + is, BLOCKL_MAX); 
            } 
             
-           autocorr(r, temp, BLOCKL, LPC_FILTERORDER); 
+           autocorr(r, temp, BLOCKL_MAX, LPC_FILTERORDER); 
            window(r, r, lpc_lagwinTbl, LPC_FILTERORDER + 1); 
             
            levdurb(lp, temp, r, LPC_FILTERORDER); 
@@ -58,8 +59,9 @@
     
            a2lsf(lsf + k*LPC_FILTERORDER, lp2); 
        } 
-       memcpy(lpc_buffer, lpc_buffer+BLOCKL,  
-           LPC_LOOKBACK*sizeof(float)); 
+        is=LPC_LOOKBACK+BLOCKL_MAX-BLOCKL;
+       memmove(lpc_buffer, lpc_buffer+LPC_LOOKBACK+BLOCKL_MAX-is,  
+           is*sizeof(float)); 
    } 
     
    /*----------------------------------------------------------------* 
@@ -107,20 +109,20 @@
        lsf2 = lsf + length; 
        lsfdeq2 = lsfdeq + length; 
        lp_length = length + 1; 
-        
+        /*  30ms  */
        /* subframe 1: Interpolation between old and first set of  
        lsf coefficients */ 
-    
-       LSFinterpolate2a_enc(lp, lsfdeqold, lsfdeq,  
+     
+   /*    LSFinterpolate2a_enc(lp, lsfdeqold, lsfdeq,  
            lsf_weightTbl[0], length); 
        memcpy(syntdenum,lp,lp_length*sizeof(float)); 
        LSFinterpolate2a_enc(lp, lsfold, lsf, lsf_weightTbl[0], length); 
-       bwexpand(weightdenum, lp, LPC_CHIRP_WEIGHTDENUM, lp_length); 
+       bwexpand(weightdenum, lp, LPC_CHIRP_WEIGHTDENUM, lp_length); */
     
        /* subframe 2 to 6: Interpolation between first and second  
        set of lsf coefficients */ 
         
-       pos = lp_length; 
+/*       pos = lp_length; 
        for (i = 1; i < NSUB; i++) { 
            LSFinterpolate2a_enc(lp, lsfdeq, lsfdeq2,  
                lsf_weightTbl[i], length); 
@@ -131,12 +133,24 @@
            bwexpand(weightdenum + pos, lp,  
                LPC_CHIRP_WEIGHTDENUM, lp_length); 
            pos += lp_length; 
-       } 
-        
+       } */
+       
+       /*    20ms  */
+        pos = 0;
+           for (i = 0; i < NSUB; i++) {
+               LSFinterpolate2a_enc(lp, lsfdeqold, lsfdeq,
+                   lsf_weightTbl[i], length);
+               memcpy(syntdenum+pos,lp,lp_length*sizeof(float));
+               LSFinterpolate2a_enc(lp, lsfold, lsf,
+                   lsf_weightTbl[i], length);
+               bwexpand(weightdenum+pos, lp,
+                   LPC_CHIRP_WEIGHTDENUM, lp_length);
+               pos += lp_length;
+           }
        /* update memory */ 
     
-       memcpy(lsfold, lsf2, length*sizeof(float)); 
-       memcpy(lsfdeqold, lsfdeq2, length*sizeof(float)); 
+       memcpy(lsfold, lsf, length*sizeof(float)); 
+       memcpy(lsfdeqold, lsfdeq, length*sizeof(float)); 
    } 
     
    /*----------------------------------------------------------------* 
@@ -175,8 +189,8 @@
        iLBC_Enc_Inst_t *iLBCenc_inst  
                            /* (i/o) the encoder state structure */ 
    ){ 
-       float lsf[LPC_FILTERORDER * LPC_N]; 
-       float lsfdeq[LPC_FILTERORDER * LPC_N]; 
+       float lsf[LPC_FILTERORDER * LPC_N_MAX]; 
+       float lsfdeq[LPC_FILTERORDER * LPC_N_MAX]; 
        int change=0; 
         
        SimpleAnalysis(lsf, data, (*iLBCenc_inst).lpc_buffer);  

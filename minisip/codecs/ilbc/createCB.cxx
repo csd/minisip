@@ -12,12 +12,12 @@
        All rights reserved. 
     
    ******************************************************************/ 
-    
+   #include<config.h> 
    #include "iLBC_define.h" 
    #include "constants.h" 
    #include <string.h> 
    #include <math.h> 
-    
+   #include <iostream> 
    /*----------------------------------------------------------------* 
     *  Construct an additional codebook vector by filtering the 
     *  initial codebook buffer. This vector is then used to expand 
@@ -187,6 +187,7 @@
        /* copy the first noninterpolated part */ 
     
        pp = buffer-index; 
+    
        memcpy(cbVec,pp,sizeof(float)*index); 
     
      
@@ -206,8 +207,10 @@
     
        /* copy the second noninterpolated part */ 
     
-       pp = buffer - index; 
+       pp = buffer - index;
+    
        memcpy(cbVec+index,pp,sizeof(float)*(SUBL-index)); 
+  
    } 
     
     

@@ -23,9 +23,9 @@
      
        float *residual /* (i) lpc residual signal */ 
    ){ 
-       float max_ssqEn, fssqEn[NSUB], bssqEn[NSUB], *pp; 
+       float max_ssqEn, fssqEn[NSUB_MAX], bssqEn[NSUB_MAX], *pp; 
        int n, l, max_ssqEn_n; 
-       const float ssqEn_win[NSUB-1]={(float)0.8,(float)0.9, 
+       const float ssqEn_win[NSUB_MAX-1]={(float)0.8,(float)0.9, 
            (float)1.0,(float)0.9,(float)0.8}; 
        const float sampEn_win[5]={(float)1.0/(float)6.0,  
            (float)2.0/(float)6.0, (float)3.0/(float)6.0, 
@@ -33,8 +33,8 @@
         
        /* init the front and back energies to zero */ 
     
-       memset(fssqEn, 0, NSUB*sizeof(float)); 
-       memset(bssqEn, 0, NSUB*sizeof(float)); 
+       memset(fssqEn, 0, NSUB_MAX*sizeof(float)); 
+       memset(bssqEn, 0, NSUB_MAX*sizeof(float)); 
     
        /* Calculate front of first seqence */ 
     

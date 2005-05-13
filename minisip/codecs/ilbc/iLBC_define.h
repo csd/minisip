@@ -20,12 +20,15 @@
    /* general codec settings */ 
     
    #define FS (float)8000.0 
-   #define BLOCKL 240 
-   #define NSUB 6  
-   #define NASUB 4  
+   #define BLOCKL 160 
+   #define BLOCKL_MAX 240
+   #define NSUB 4  
+   #define NSUB_MAX 6
+   #define NASUB 2
+   #define NASUB_MAX 4
    #define SUBL 40 
    #define STATE_LEN 80 
-   #define STATE_SHORT_LEN 58 
+   #define STATE_SHORT_LEN 57
     
    /* LPC settings */ 
     
@@ -33,7 +36,8 @@
    #define LPC_CHIRP_SYNTDENUM (float)0.9025 
    #define LPC_CHIRP_WEIGHTDENUM (float)0.4222 
    #define LPC_LOOKBACK 60 
-   #define LPC_N 2 
+   #define LPC_N 1 
+   #define LPC_N_MAX 2
    #define LPC_ASYMDIFF 20 
    #define LPC_BW (float)60.0 
    #define LPC_WN (float)1.0001 
@@ -67,7 +71,7 @@
    #define ENH_FL0 3       /* 2*FLO+1 is the length of each filter */ 
    #define ENH_VECTL (ENH_BLOCKL+2*ENH_FL0) 
    #define ENH_CORRDIM (2*ENH_SLOP+1) 
-   #define ENH_NBLOCKS (BLOCKL/ENH_BLOCKL) 
+   #define ENH_NBLOCKS (BLOCKL_MAX/ENH_BLOCKL) 
    #define ENH_NBLOCKS_EXTRA 5 
    #define ENH_NBLOCKS_TOT 8 /* ENH_NBLOCKS+ENH_NBLOCKS_EXTRA */ 
    #define ENH_BUFL (ENH_NBLOCKS_TOT)*ENH_BLOCKL 
@@ -91,7 +95,7 @@
     
    /* bit stream defs */ 
     
-   #define NO_OF_BYTES 50 
+   #define NO_OF_BYTES 38 
    #define STATE_BITS 3 
    #define BYTE_LEN 8 
    #define ULP_CLASSES 3 
@@ -118,7 +122,7 @@
        float lsfdeqold[LPC_FILTERORDER]; 
     
        /* signal buffer for LP analysis */ 
-       float lpc_buffer[LPC_LOOKBACK + BLOCKL]; 
+       float lpc_buffer[LPC_LOOKBACK + BLOCKL_MAX]; 
     
        /* state of input HP filter */ 
        float hpimem[4]; 
@@ -139,12 +143,12 @@
        /* PLC state information */ 
        int prevLag, consPLICount, prevPLI, prev_enh_pl; 
        float prevGain, prevLpc[LPC_FILTERORDER+1]; 
-       float prevResidual[NSUB*SUBL]; 
+       float prevResidual[NSUB_MAX*SUBL]; 
        float energy; 
        unsigned long seed; 
     
        /* previous synthesis filter parameters */ 
-       float old_syntdenum[(LPC_FILTERORDER + 1)*NSUB]; 
+       float old_syntdenum[(LPC_FILTERORDER + 1)*NSUB_MAX]; 
     
        /* state of output HP filter */ 
        float hpomem[4]; 

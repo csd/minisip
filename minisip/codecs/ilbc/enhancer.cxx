@@ -254,7 +254,7 @@
    ){ 
        int i,k; 
        float w00,w10,w11,A,B,C,*psseq,err,errs; 
-       float surround[BLOCKL]; /* shape contributed by other than  
+       float surround[BLOCKL_MAX]; /* shape contributed by other than  
                                   current */ 
        float wt[2*ENH_HL+1]; /* waveform weighting to get surround  
                                 shape */ 
@@ -598,10 +598,10 @@
            enh_period[iblock+ENH_NBLOCKS_EXTRA] = (float)lag*2; 
        }    
     
-       for(iblock = 0; iblock<ENH_NBLOCKS; iblock++){ 
+       for(iblock = 0; iblock<2; iblock++){ 
             
            enhancer(out+iblock*ENH_BLOCKL, enh_buf,  
-               ENH_BUFL, (4+iblock)*ENH_BLOCKL, 
+               ENH_BUFL, (5+iblock)*ENH_BLOCKL+40, 
                ENH_ALPHA0, enh_period, enh_plocsTbl,  
                    ENH_NBLOCKS_TOT); 
             
