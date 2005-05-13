@@ -23,11 +23,17 @@
 #include<config.h>
 #include"Codec.h"
 #include"G711CODEC.h"
+#include"ILBCCODEC.h"
+#include"SPEEXCODEC.h"
 
 MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
         switch( payloadType ){
                 case 0:
                         return new G711CODEC();
+		case 97:
+			return new ILBCCODEC();
+		case 114: 
+			return new SPEEXCODEC();
                 default:
                         return NULL;
         }

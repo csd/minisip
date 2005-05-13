@@ -25,13 +25,15 @@
 
 #include"Codec.h"
 
+
 class G711CODEC : public AudioCodec{
 	public:
-		virtual ~G711CODEC(){}
+		G711CODEC();
+		virtual ~G711CODEC();
 		/**
 		 * @returns Number of bytes in output buffer
 		 */
-		virtual void encode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
 		/**
 		 * 
@@ -70,6 +72,9 @@ class G711CODEC : public AudioCodec{
 		virtual int32_t getSdpMediaType();
 
 		virtual string getSdpMediaAttributes();
+		
+		virtual std::string getMemObjectType(){return "G711CODEC";}		
+		
 		
 };
 

@@ -27,7 +27,16 @@
 #include<assert.h>
 #include<iostream>
 
-void G711CODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+G711CODEC::G711CODEC(){
+
+}
+
+G711CODEC::~G711CODEC(){
+
+}
+
+// pn430 return type changed from void to uint32_t
+uint32_t G711CODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	assert(in_buf_size==2*getInputNrSamples());
 	
 	short *in_data = (short*)in_buf;
@@ -35,6 +44,9 @@ void G711CODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 
 	for (int32_t i=0; i< getInputNrSamples(); i++)
 		out_data[i]=linear2ulaw(in_data[i]);
+	
+	// pn430 Added to account for change in return value
+	return getEncodedNrBytes();
 }
 
 uint32_t G711CODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
@@ -56,7 +68,6 @@ void G711CODEC::decode(void *out_buf){
 		((short*)out_buf)[i]=rand()%25;
 }
 
-
 int32_t G711CODEC::getSamplingSizeMs(){
 	return 20;
 }
@@ -69,7 +80,6 @@ int32_t G711CODEC::getEncodedNrBytes(){
 	return 160;
 }
 
-
 int32_t G711CODEC::getInputNrSamples(){
 	return 160;
 }
@@ -80,7 +90,6 @@ string G711CODEC::getCodecName(){
 
 string G711CODEC::getCodecDescription(){
 	return "G.711 8kHz, PCMu";
-
 }
 
 int32_t G711CODEC::getSdpMediaType(){
@@ -89,6 +98,4 @@ int32_t G711CODEC::getSdpMediaType(){
 
 string G711CODEC::getSdpMediaAttributes(){
 	return "PCMU/8000/1";
-
 }
-

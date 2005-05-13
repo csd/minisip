@@ -20,21 +20,21 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef ILBCCODEC_H
-#define ILBCCODEC_H
-
-#include<config.h>
+#ifndef SPEEXCODEC_H
+#define SPEEXCODEC_H
 
 #include"Codec.h"
 
-#include"ilbc/iLBC_define.h"
-#include"ilbc/iLBC_encode.h"
-#include"ilbc/iLBC_decode.h"
+#ifdef HAS_SPEEX
 
-class ILBCCODEC : public AudioCodec{
+#include<speex/speex.h> 
+
+#define     MAX_NB_BYTES  1024
+
+class SPEEXCODEC : public AudioCodec{
 	public:
-		ILBCCODEC();
-
+		SPEEXCODEC();
+		virtual ~SPEEXCODEC();
 		/**
 		 * @returns Number of bytes in output buffer
 		 */
@@ -42,7 +42,7 @@ class ILBCCODEC : public AudioCodec{
 
 		/**
 		 * 
-		 * @returns Number of frames in output buffer
+		 * @returns Number of samples in output buffer
 		 */
 		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
@@ -59,28 +59,37 @@ class ILBCCODEC : public AudioCodec{
 		virtual int32_t getSamplingFreq();
 
 		/**
-		 * Time in milliseconds to put in each frame/packet. This is 30ms for the ILBC codec.
+		 * Time in milliseconds to put in each frame/packet. This is 20ms for the SPEEX codec.
 		 */
 		virtual int32_t getSamplingSizeMs();
 
 		/**
-		 * size of the output of the codec in bytes. This is 50.
+		 * size of the output of the codec in bytes. This is 160.
 		 */
 		virtual int32_t getEncodedNrBytes();
 		
 		virtual int32_t getInputNrSamples();
-
+		
 		virtual string getCodecName();
 		
 		virtual string getCodecDescription();
-		
+
 		virtual int32_t getSdpMediaType();
 
 		virtual string getSdpMediaAttributes();
-		
 	private:
-		iLBC_Enc_Inst_t enc_inst; 
-		iLBC_Dec_Inst_t dec_inst; 
+		void         *enc_state; 
+		void         *dec_state; 
+		SpeexBits    bits;   	 
+		float 	     input_frame[160]; 
+		int	     nbBytes;		
+		char         bytes_ptr[MAX_NB_BYTES];  
+		char        *input_bytes;    
+		float       *output_frame;  
+		int          frame_size;
+		
 };
+
+#endif //HAS_SPEEX
 
 #endif
