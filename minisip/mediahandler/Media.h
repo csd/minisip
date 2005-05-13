@@ -51,17 +51,25 @@ class MediaStreamReceiver;
 class SdpHeaderM;
 class RtpPacket;
 
-
 typedef uint8_t byte_t;
-
 
 class Media : public MObject{
 	public:
 		int getType();
 
 		virtual std::string getSdpMediaType()=0;
-		virtual uint8_t getRtpPayloadType();
-		virtual std::string getRtpMap();
+		
+		// pn430 Following two lines rewritten for multicodec
+		//virtual uint8_t getRtpPayloadType();
+		//virtual std::string getRtpMap();
+		// pn430 The four new ones (incl. new multi-versions)
+//		virtual uint8_t getCurrentRtpPayloadType();
+		virtual std::list<uint8_t> getAllRtpPayloadTypes();
+//		virtual std::string getCurrentRtpMap();
+		virtual std::list<std::string> getAllRtpMaps();
+		//pn507 Added for changing the default codec
+//		virtual bool setCurrentCodec( uint8_t newCodecPayloadType );
+        virtual MRef<Codec*> getCodec( uint8_t payloadType );
 
 		virtual void playData( RtpPacket * rtpPacket )=0;
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
@@ -71,7 +79,6 @@ class Media : public MObject{
 		virtual void registerMediaSource( uint32_t ssrc );
 		virtual void unRegisterMediaSource( uint32_t ssrc );
 		
-		
 		bool receive;
 		bool send;
 		
@@ -79,15 +86,25 @@ class Media : public MObject{
 		void addSdpAttribute( std::string attribute );
 		
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
+		
 	protected:
 		Media( MRef<Codec *> codec );
-		MRef<Codec *> codec;
+
+		// pn430 Added for multicodec
+		Media( std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec );
+				
+		// pn Removed for multicodec
+		//MRef<Codec *> codec;
+		// pn430 Added for multicodec
+		std::list< MRef<Codec *> > codecList;
+		// pn430 Added for multicodec
+//		MRef<Codec *> preferredCodec;
+		
 		std::list< MRef<MediaStreamSender *> > senders;
 		Mutex sendersLock;
 		Mutex sourcesLock;
 		
 		std::list<std::string> sdpAttributes;
 };
-
 
 #endif

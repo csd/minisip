@@ -69,7 +69,7 @@ static int strcasecmp(const char *s1, const char *s2){
 
 MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
 	disabled = false;
-	
+    selectedCodec = NULL;
 }
 
 std::string MediaStream::getSdpMediaType(){
@@ -77,27 +77,30 @@ std::string MediaStream::getSdpMediaType(){
 		return media->getSdpMediaType();
 	}
 	return "";
-
 }
 
-uint8_t MediaStream::getRtpPayloadType(){
+// pn501 New function
+std::list<uint8_t> MediaStream::getAllRtpPayloadTypes(){
 	if( media ){
-		return media->getRtpPayloadType();
+		return media->getAllRtpPayloadTypes();
 	}
-	return 0;
+	std::list<uint8_t> list;
+	list.push_back(0);
+	return list;
 }
 
 list<string> MediaStream::getSdpAttributes(){
-		
 	return media->getSdpAttributes();
 }
 	
-
-string MediaStream::getRtpMap(){
+// pn501 New function
+std::list<std::string> MediaStream::getAllRtpMaps(){
 	if( media ){
-		return media->getRtpMap();
+		return media->getAllRtpMaps();
 	}
-	return "";
+	std::list<std::string> list;
+	list.push_back("");
+	return list;
 }
 
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
@@ -107,43 +110,41 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
 	media->handleMHeader( m );
 
+	// pn507 This checks for "Audio"
 	if( m->getMedia() != getSdpMediaType() ){
 		return false;
 	}
 	
-	/* If we have an rtpmap:, it should be the same */
 	rtpmap = m->getRtpMap( rtpPayloadType );
-	if( rtpmap != "" && getRtpMap() != "" ){
-		// FIXME
-		size_t s1 = getRtpMap().find("/");
+			std::list<uint8_t> listPLT = media->getAllRtpPayloadTypes();
+			std::list<uint8_t>::iterator iListPLT;
+			std::list<std::string> listM = media->getAllRtpMaps();
+			std::list<std::string>::iterator iListM;
+		size_t s1;// = getCurrentRtpMap().find("/");
 		size_t s2 = rtpmap.find("/");
-		bool rtpmapEqual = !strcasecmp( getRtpMap().substr(0, s1).c_str(), rtpmap.substr(0,s2).c_str() );
-		return rtpmapEqual;
-	}
-
-	/* else check that the RTP payload type matches */
-	return getRtpPayloadType() == rtpPayloadType;
-}
-
-void MediaStream::addToM( MRef<SdpPacket*> packet, MRef<SdpHeaderM *> m ){
-	if( m->getPort() == 0 ){
-		m->setPort( getPort() );
-	}
-	else if( m->getPort() != getPort() ){
-		/* We have already added a format on that m line
-		 * on another port! */
-		return;
-	}
-
-	m->addFormat( getRtpPayloadType() );
-
-	if( getRtpMap() != "" ){
-		MRef<SdpHeaderA *> a = new SdpHeaderA( "a=x" );
-		a->setAttributes( "rtpmap:" + itoa( getRtpPayloadType() ) + 
-				  " " + getRtpMap() );
-		packet->addHeader( *a );
-	}
-		
+				
+			for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
+                if( rtpmap != "" && (*iListM) != "" ){
+                    s1 = (*iListM).find("/");
+                    bool rtpmapEqual = !strcasecmp( (*iListM).substr(0, s1).c_str(), rtpmap.substr(0,s2).c_str() );
+                    if ( rtpmapEqual ) {
+                        if( !selectedCodec ){
+                            selectedCodec = media->getCodec( *iListPLT );
+                        }
+                        return true;
+                    }
+                    else continue;
+                }
+                else{
+                    if( rtpPayloadType == (*iListPLT) ){
+                        if( !selectedCodec ){
+                            selectedCodec = media->getCodec( *iListPLT );
+                        }
+                        return true;
+                    }
+                }
+			}
+			return false;
 }
 
 MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
@@ -231,8 +232,6 @@ void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
 	kaLock.unlock();
 }
 
-
-
 MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media, 
 		MRef<RtpReceiver *> rtpReceiver, MRef<IpProvider *> ipProvider ):
 			MediaStream( media ),
@@ -268,7 +267,6 @@ void MediaStreamReceiver::stop(){
 	
 	running = false;
 }
-
 
 void MediaStreamReceiver::setPort( uint16_t port ){
 }
@@ -361,7 +359,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
                 packet->getHeader().setPayloadType( 101 );
         }
         else{
-                packet->getHeader().setPayloadType( getRtpPayloadType() );
+            packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
         }
 
 	if( marker ){

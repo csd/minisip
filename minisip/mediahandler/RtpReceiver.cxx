@@ -139,15 +139,28 @@ void RtpReceiver::run(){
 		mediaStreamsLock.lock();
 		
 		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
-			if( (*i)->getRtpPayloadType() == 
-			    packet->getHeader().getPayloadType() ){
-				(*i)->handleRtpPacket( packet );
+				// pn501 Rewritten to account for multiple codecs
+			// pn501 Added "Current"
+			//if( (*i)->getCurrentRtpPayloadType() == packet->getHeader().getPayloadType() ){
+			//	(*i)->handleRtpPacket( packet );
+			//}
+			// pn501 New version:
+			std::list<uint8_t> list = (*i)->getAllRtpPayloadTypes();
+			std::list<uint8_t>::iterator iList;
+			for( iList = list.begin(); iList != list.end(); iList ++ ){
+				uint8_t n = packet->getHeader().getPayloadType();
+				cerr << n;
+				cerr << ((uint8_t)(*iList));
+				if ( (*iList) == packet->getHeader().getPayloadType() ) {
+					(*i)->handleRtpPacket( packet );
+					break;
+				}
 			}
 		}
 		
 		mediaStreamsLock.unlock();
-//		delete packet;
 
+//		delete packet;
 	}
 	threadRunningLock.unlock();
 }

@@ -29,10 +29,12 @@ class AudioMediaSource;
 class AudioMedia : public Media, public SoundRecorderCallback{
 
         public:
-                AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec );
-                virtual std::string getMemObjectType(){return "AudioMedia";}
+		// pn430 Next line changed for multicodec
+		//AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec );
+		AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec );
+                
+		virtual std::string getMemObjectType(){return "AudioMedia";}
                 virtual std::string getSdpMediaType();
-
 
                 virtual void playData( RtpPacket * rtpPacket );
 
@@ -42,7 +44,8 @@ class AudioMedia : public Media, public SoundRecorderCallback{
                 virtual void unRegisterMediaSource( uint32_t ssrc );
 
                 virtual void srcb_handleSound( void *samplearr );
-
+		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker );
+		
                 void startRinging( std::string ringtoneFile );
                 void stopRinging();         
 
@@ -57,6 +60,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 
 		std::list< MRef<AudioCodec *> > codecs;
 		std::list< MRef<AudioMediaSource *> > sources;
+		
 };
 
 class AudioMediaSource : public BasicSoundSource{
@@ -72,5 +76,4 @@ class AudioMediaSource : public BasicSoundSource{
 		MRef<Media *> media;
 		short codecOutput[16384];
 		uint32_t ssrc;
-
 };

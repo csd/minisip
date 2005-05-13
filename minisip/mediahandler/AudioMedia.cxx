@@ -20,7 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
 #include<config.h>
 
 #include"AudioMedia.h"
@@ -32,26 +31,32 @@
 
 class G711CODEC;
 
-AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
-                Media(codec),
+// pn430 Parameter list changed for multicodec
+//AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
+//                Media(codec),
+//                soundIo(soundIo){
+AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec ):
+                Media(codecList, defaultCodec),
                 soundIo(soundIo){
-        // for audio media, we assume that we can both send and receive
+        
+	// for audio media, we assume that we can both send and receive
         receive = true;
         send = true;
-        MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
-
-        soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ *  acodec->getSamplingSizeMs() / 1000, false );
+	// pn430 Changed for multicodec
+	//MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
+	
+	// NOTE Frame size FIXED to 20 ms
+        soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ * 20 / 1000, false );
 
         seqNo = 0;
-	resampler = Resampler::create( SOUND_CARD_FREQ, acodec->getSamplingFreq(), acodec->getSamplingSizeMs(), 1 /*Nb channels */);
+	
+	// NOTE Sampling frequency FIXED to 8000 Hz
+	resampler = Resampler::create( SOUND_CARD_FREQ, 8000, 20, 1 /*Nb channels */);
 }
-		
 
 string AudioMedia::getSdpMediaType(){
         return "audio";
 }
-
-
 
 void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
         sendersLock.lock();
@@ -72,8 +77,7 @@ void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
         emptyList = senders.empty();
         sendersLock.unlock();
 
-
-        if(  emptyList ){
+        if( emptyList ){
                 soundIo->stopRecord();
         }
 }
@@ -113,14 +117,26 @@ void AudioMedia::playData( RtpPacket * packet ){
 void AudioMedia::srcb_handleSound( void * data ){
 
         resampler->resample( (short *)data, resampledData );
-
-        ((AudioCodec *)*codec)->encode( resampledData, ((AudioCodec*)*codec)->getInputNrSamples()*sizeof(short), encoded );
-        uint32_t encodedLength = ((AudioCodec *)*codec)->getEncodedNrBytes();
-
-
-
-        sendData( encoded, encodedLength, seqNo * ((AudioCodec*)*codec)->getInputNrSamples() );
+        sendData( (byte_t*) &resampledData, 0, 0, false );
         seqNo ++;
+}
+
+void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
+
+    list< MRef<MediaStreamSender *> >::iterator i;
+    sendersLock.lock();
+    
+    
+    for( i = senders.begin(); i != senders.end(); i++ ){
+        MRef<AudioCodec *> selectedCodec = (AudioCodec*)(*(*i)->getSelectedCodec());
+        
+        uint32_t encodedLength = 
+            selectedCodec->encode( data, selectedCodec->getInputNrSamples()*sizeof(short), encoded );
+
+        (*i)->send( encoded, encodedLength, &ts, marker );
+    }
+    
+    sendersLock.unlock();
 }
 
 void AudioMedia::startRinging( string ringtoneFile ){
@@ -146,7 +162,6 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 	BasicSoundSource( ssrc, NULL, 0/*position*/, SOUND_CARD_FREQ, 20, 2 ),
 	media(media),ssrc(ssrc)
 {
-
 }
 
 void AudioMediaSource::playData( RtpPacket * rtpPacket ){

@@ -42,9 +42,11 @@ class MediaStream : public MObject{
 		virtual void stop() = 0;
 
 		/* SDP information */
-		std::string getSdpMediaType();/* audio, video, application... */
-		uint8_t getRtpPayloadType();
-		std::string getRtpMap();
+		std::string getSdpMediaType();/* audio, video, appli;ation... */
+		// pn501 New function for multiple codecs
+		std::list<uint8_t> getAllRtpPayloadTypes();
+		// pn501 New function for multiple codecs
+		std::list<std::string> getAllRtpMaps();
 		std::list<std::string> getSdpAttributes();
 
 		virtual std::string getMemObjectType(){return "MediaStream";}
@@ -60,12 +62,15 @@ class MediaStream : public MObject{
 
 		uint32_t getSsrc();
 
+        MRef<Codec *> getSelectedCodec(){return selectedCodec;};
+
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
 		MediaStream( MRef<Media *> );
 		MRef<Media *> media;
 		uint32_t csbId;
 		uint32_t ssrc;
+        MRef<Codec *> selectedCodec;
 
 	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );
@@ -85,6 +90,7 @@ class MediaStreamReceiver : public MediaStream{
 
 		void handleRtpPacket( SRtpPacket * packet );
 		uint32_t getId();
+		
 	private:
 		MRef<RtpReceiver *> rtpReceiver;
 		uint32_t id;
@@ -97,7 +103,6 @@ class MediaStreamReceiver : public MediaStream{
 		Mutex ssrcListLock;
 
 		bool running;
-
 };
 
 class MediaStreamSender : public MediaStream{ 
@@ -112,6 +117,7 @@ class MediaStreamSender : public MediaStream{
 		
 		void send( byte_t * data, uint32_t length, uint32_t * ts, bool marker = false, bool dtmf = false );
 		void setRemoteAddress( IPAddress * remoteAddress );
+		
 	private:
 		MRef<UDPSocket *> senderSock;
 		uint16_t remotePort;
@@ -119,7 +125,6 @@ class MediaStreamSender : public MediaStream{
                 uint32_t lastTs;
 		IPAddress * remoteAddress;
                 Mutex senderLock;
-
 };
 
 #endif
