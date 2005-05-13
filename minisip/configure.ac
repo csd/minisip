@@ -127,6 +127,21 @@ AC_CHECK_HEADER([samplerate.h],
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
 
+
+dnl Check for libspeex
+AC_CHECK_HEADER([speex/speex.h], 
+	[
+		AC_CHECK_LIB([speex], [main],
+			[LIBS="-lspeex ${LIBS}"
+			 AC_DEFINE(HAS_SPEEX, [], [Use the Speex CODEC])])
+			 HAS_SPEEX="yes"
+	]
+)
+AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
+
+
+
+
 dnl #############
 dnl IPSEC SUPPORT
 dnl #############
