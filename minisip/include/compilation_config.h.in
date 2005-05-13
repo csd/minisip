@@ -18,6 +18,9 @@
 /* Use the GTK GUI */
 #undef GTK_GUI
 
+/* Use the Speex CODEC */
+#undef HAS_SPEEX
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
