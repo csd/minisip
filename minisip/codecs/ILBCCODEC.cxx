@@ -20,6 +20,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+
+#include"ilbc/iLBC_define.h"
+#include"ilbc/iLBC_encode.h"
+#include"ilbc/iLBC_decode.h"
 #include"ILBCCODEC.h"
 #include<assert.h>
 
@@ -29,8 +33,8 @@ ILBCCODEC::ILBCCODEC(){
 	
 }
 
-void ILBCCODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
-	float block[240];
+uint32_t ILBCCODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+	float block[160];
 	int s = in_buf_size;
 	s;//dummy op 
 	
@@ -61,9 +65,9 @@ uint32_t ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 }
 
 void ILBCCODEC::decode(void *out_buf){
-	float decblock[240], dtmp;
+	float decblock[160], dtmp;
 	int32_t k;
-	unsigned char dummyencoded[50];
+	unsigned char dummyencoded[38];
 	for (k=0; k<50; k++)
 		dummyencoded[k]=0;
 
@@ -81,19 +85,19 @@ void ILBCCODEC::decode(void *out_buf){
 
 
 int32_t ILBCCODEC::getSamplingSizeMs(){
-	assert(BLOCKL==240);
-	return 30;
+	assert(BLOCKL==160);
+	return 20;
 }
 
 int32_t ILBCCODEC::getEncodedNrBytes(){
-	assert(BLOCKL==240);
-	assert(50==NO_OF_BYTES);
-	return 50;
+	assert(BLOCKL==160);
+	assert(38==NO_OF_BYTES);
+	return 38;
 }
 
 
 int32_t ILBCCODEC::getInputNrSamples(){
-	return 240;
+	return 160;
 }
 
 string ILBCCODEC::getCodecName(){
