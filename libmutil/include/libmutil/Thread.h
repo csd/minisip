@@ -63,6 +63,7 @@ public:
 	Thread(Runnable *runnable);
 	static int createThread( void f());
 	static int createThread( void* f(void*), void *arg);
+        void * join();
 private:
 	void *handle_ptr;
 };

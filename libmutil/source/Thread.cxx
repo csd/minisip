@@ -237,4 +237,20 @@ int Thread::createThread(void *f(void*), void *arg){
 
 }
 
+void * Thread::join(){
+#ifdef HAVE_PTHREAD_H
+        void * returnValue;
+
+        if( pthread_join( *((pthread_t *)handle_ptr), &returnValue ) ){
+                perror( "ERROR: pthread_join" );
+                return NULL;
+        }
+
+        return returnValue;
+        
+#elif defined WIN32
+        // FIXME
+        return NULL;
+#endif
+}
 
