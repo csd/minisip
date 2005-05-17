@@ -293,6 +293,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
             displayMessage("Call transferred ...");
             setPrompt(state);
     }
+#ifdef P2T_SUPPORT
 
     //P2T commands
     if (cmd.getOp()=="p2tFloorGranted"){
@@ -452,6 +453,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
     else if (cmd.getOp().substr(0,3)=="p2t"){
 	    displayMessage("Received: "+cmd.getOp(), blue);
     }
+#endif
 }
 
 bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
@@ -638,6 +640,8 @@ void MinisipTextUI::showMem(){
 //    displayMessage(memhandler.listObjs());
 }
 
+#ifdef P2T_SUPPORT
+
 void MinisipTextUI::showGroupList(){
     if (grpList->getDescription().substr(0,5)=="ERROR"){
     	displayMessage(grpList->getDescription(), red);
@@ -700,6 +704,7 @@ void MinisipTextUI::showP2TInfo(){
 	displayMessage("stop           release the floor",blue);
 	displayMessage("exit           leave P2T Mode",blue);
 }
+#endif
 
 void MinisipTextUI::keyPressed(int key){
 	switch(key){
@@ -974,6 +979,8 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
 	}
 
+#ifdef P2T_SUPPORT
+
 	/**
 	 * Commands for Push-2-Talk
 	 */
@@ -1209,6 +1216,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		client=NULL;
 		handled=true;
 	}
+#endif
 
 	if (!handled && command.substr(0,2) == "im"){
 		handled=true;

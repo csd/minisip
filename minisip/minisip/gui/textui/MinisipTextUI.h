@@ -77,6 +77,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	
 	///indicates that the TextUI is in the P2T Mode
 	bool p2tmode;
+#ifdef P2T_SUPPORT
 	
 	///the P2T Group Identity
 	string p2tGroupId;
@@ -95,6 +96,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	
 	///shows a P2T help
 	void showP2TInfo();
+#endif
 };
 
 #endif
