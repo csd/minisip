@@ -46,7 +46,7 @@ class RtpPacket;
 class VideoMedia : public Media, public VideoEncoderCallback{
 
         public:
-                VideoMedia( MRef<VideoCodec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
+                VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
                 virtual std::string getMemObjectType(){return "VideoMedia";}
 
                 virtual std::string getSdpMediaType();
@@ -73,6 +73,7 @@ class VideoMedia : public Media, public VideoEncoderCallback{
                 MRef<Grabber *> grabber; // NULL if receive only
 		MRef<VideoDisplay *> display;
 		MRef<ImageMixer *> mixer;
+                MRef<VideoCodec *> codec;
 
                 uint32_t receivingWidth;
                 uint32_t receivingHeight;
@@ -101,10 +102,13 @@ class VideoMediaSource : public MObject {
 		uint32_t ssrc;
 
 		virtual std::string getMemObjectType(){ return "VideoMediaSource"; };
+
+                friend class VideoMedia;
 	private:
 		void addPacketToFrame( RtpPacket * packet );
 
 		MRef<AVDecoder *> decoder;
+                MRef<VideoDisplay *> display;
 
                 uint32_t width;
                 uint32_t height;

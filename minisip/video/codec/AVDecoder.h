@@ -61,6 +61,8 @@ class AVDecoder : public MObject{
 
 		uint32_t ssrc;
 
+                bool needsConvert;
+
 };
 
 #endif

@@ -28,10 +28,17 @@
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
+#include<libmutil/Semaphore.h>
 
 class VideoDisplay : public ImageHandler, public MObject, public Runnable{
 	public:
+
+                static MRef<VideoDisplay *> create( uint32_t width, uint32_t height );
+                static uint32_t displayCounter;
+                static Mutex displayCounterLock;
+
 		virtual std::string getMemObjectType(){ return "VideoDisplay"; };
+                ~VideoDisplay();
 		virtual void start();
 		virtual void stop();
 
@@ -66,10 +73,17 @@ class VideoDisplay : public ImageHandler, public MObject, public Runnable{
                 CondVar emptyImagesCond;
                 Mutex emptyImagesCondLock;
                 Mutex emptyImagesLock;
+                
+                std::list<MImage *> allocatedImages;
+
+                Semaphore emptyImagesSem;
+                Semaphore filledImagesSem;
 
 		CondVar showCond;
 		Mutex showCondLock;
 		bool show;
+
+                Thread * thread;
 
 };
 

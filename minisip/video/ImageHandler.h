@@ -39,6 +39,7 @@
 #endif
 
 #define M_CHROMA_I420           FOURCC( 'I', '4', '2', '0' )
+#define M_CHROMA_RV16           FOURCC( 'R', 'V', '1', '6' )
 #define M_CHROMA_RV24           FOURCC( 'R', 'V', '2', '4' )
 #define M_CHROMA_RV32           FOURCC( 'R', 'V', '3', '2' )
 

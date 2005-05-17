@@ -104,47 +104,47 @@ std::list<std::string> MediaStream::getAllRtpMaps(){
 }
 
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
-	string rtpmap;
-//	int i;
-	uint8_t rtpPayloadType = m->getFormat(formatIndex);
+        string rtpmap;
+        //	int i;
+        uint8_t rtpPayloadType = m->getFormat(formatIndex);
 
-	media->handleMHeader( m );
+        media->handleMHeader( m );
 
-	// pn507 This checks for "Audio"
-	if( m->getMedia() != getSdpMediaType() ){
-		return false;
-	}
-	
-	rtpmap = m->getRtpMap( rtpPayloadType );
-			std::list<uint8_t> listPLT = media->getAllRtpPayloadTypes();
-			std::list<uint8_t>::iterator iListPLT;
-			std::list<std::string> listM = media->getAllRtpMaps();
-			std::list<std::string>::iterator iListM;
-		size_t s1;// = getCurrentRtpMap().find("/");
-		size_t s2 = rtpmap.find("/");
-				
-			for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
+        // pn507 This checks for "Audio"
+        if( m->getMedia() != getSdpMediaType() ){
+                return false;
+        }
+
+        rtpmap = m->getRtpMap( rtpPayloadType );
+        std::list<uint8_t> listPLT = media->getAllRtpPayloadTypes();
+        std::list<uint8_t>::iterator iListPLT;
+        std::list<std::string> listM = media->getAllRtpMaps();
+        std::list<std::string>::iterator iListM;
+        size_t s1;// = getCurrentRtpMap().find("/");
+        size_t s2 = rtpmap.find("/");
+
+        for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
                 if( rtpmap != "" && (*iListM) != "" ){
-                    s1 = (*iListM).find("/");
-                    bool rtpmapEqual = !strcasecmp( (*iListM).substr(0, s1).c_str(), rtpmap.substr(0,s2).c_str() );
-                    if ( rtpmapEqual ) {
-                        if( !selectedCodec ){
-                            selectedCodec = media->getCodec( *iListPLT );
+                        s1 = (*iListM).find("/");
+                        bool rtpmapEqual = !strcasecmp( (*iListM).substr(0, s1).c_str(), rtpmap.substr(0,s2).c_str() );
+                        if ( rtpmapEqual ) {
+                                if( !selectedCodec ){
+                                        selectedCodec = media->getCodec( *iListPLT );
+                                }
+                                return true;
                         }
-                        return true;
-                    }
-                    else continue;
+                        else continue;
                 }
                 else{
-                    if( rtpPayloadType == (*iListPLT) ){
-                        if( !selectedCodec ){
-                            selectedCodec = media->getCodec( *iListPLT );
+                        if( rtpPayloadType == (*iListPLT) ){
+                                if( !selectedCodec ){
+                                        selectedCodec = media->getCodec( *iListPLT );
+                                }
+                                return true;
                         }
-                        return true;
-                    }
                 }
-			}
-			return false;
+        }
+        return false;
 }
 
 MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
@@ -256,7 +256,9 @@ void MediaStreamReceiver::start(){
 
 void MediaStreamReceiver::stop(){
 	list<uint32_t>::iterator i;
+	cerr << "Stopping media receiver for " << getSdpMediaType() << endl;
 	rtpReceiver->unregisterMediaStream( this );
+	cerr << "Unregistered mediaStream from rtpReceiver for " << getSdpMediaType() << endl;
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){

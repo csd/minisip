@@ -70,16 +70,18 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 #ifdef VIDEO_SUPPORT
 	MRef<Grabber *> grabber = Grabber::create( config->videoDevice );
 	MRef<VideoCodec *> videoCodec = new VideoCodec();
-	MRef<ImageMixer *> mixer = new ImageMixer();
+	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
 	//FIXME
 #ifdef IPAQ
 	MRef<VideoDisplay *> display = new SdlDisplay( config->frameWidth, config->frameHeight);
 #else
-	MRef<VideoDisplay *> display = new XvDisplay( config->frameWidth, config->frameHeight);
+	MRef<VideoDisplay *> display = NULL;//new XvDisplay( config->frameWidth, config->frameHeight);
 #endif
 
-	MRef<VideoMedia *> videoMedia = new VideoMedia( videoCodec, display, mixer, grabber, config->frameWidth, config->frameHeight );
-	mixer->setMedia( videoMedia );
+	MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );
+        if( mixer ){
+                mixer->setMedia( videoMedia );
+        }
 	registerMedia( *videoMedia );
 #endif
 
@@ -104,7 +106,7 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 				
 		MRef<Codec *> selectedCodec;
 		
-		int n; 
+		int n = 0; 
 		
 		if ( config->selectedCodec == "0" )
 			n = 0;

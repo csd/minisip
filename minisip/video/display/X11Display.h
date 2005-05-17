@@ -20,6 +20,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef X11_DISPLAY_H
+#define X11_DISPLAY_H
+
 #include"../ImageHandler.h"
 
 #include <X11/Xlib.h>
@@ -31,14 +34,13 @@
 #include <X11/extensions/Xvlib.h>
 
 #include"VideoDisplay.h"
-#include"X11Display.h"
 
 
 
 
-class XvDisplay: public X11Display{
+class X11Display: public VideoDisplay{
 	public: 
-		XvDisplay( uint32_t width, uint32_t height );
+		X11Display( uint32_t width, uint32_t height );
 
 		/* From ImageHandler */
 		virtual void init( uint32_t height,  uint32_t width );
@@ -46,28 +48,41 @@ class XvDisplay: public X11Display{
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();
 
-	private:
+        protected:
+		uint32_t height;
+		uint32_t width;
+		uint32_t baseWindowWidth;
+		uint32_t baseWindowHeight;
 
 		virtual void openDisplay();
-//		virtual void createWindow();
+		virtual void createWindow();
 		virtual void destroyWindow();
-//		virtual void handleEvents();
+		virtual void handleEvents();
 
 		virtual MImage * allocateImage();
 		virtual void deallocateImage( MImage * image );
 
 		virtual void displayImage( MImage * image );
 
-//		void toggleFullscreen();
+		void toggleFullscreen();
 
-		int xvPort;
-//		Display * display;
-//		int screen;
-//		Window baseWindow;
-//		Window videoWindow;
+		Display * display;
+		int screen;
+                int screenDepth;
+		Window baseWindow;
+		Window videoWindow;
 
-//		GC gc;
+		GC gc;
 
 		bool fullscreen;
 
+	private:
+
+
+
+                uint32_t bytesPerPixel;
+                XVisualInfo * visualInfo;
+
 };
+
+#endif

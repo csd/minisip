@@ -24,6 +24,9 @@
 #include"AVDecoder.h"
 #include"../ImageHandler.h"
 
+#include<iostream>
+#include<libmutil/print_hex.h>
+
 
 
 /* used by ffmpeg to get a frame from the ImageHandler */
@@ -49,7 +52,9 @@ int AVDecoder::ffmpegGetBuffer( struct AVCodecContext * context, AVFrame * frame
 }
 
 void AVDecoder::ffmpegReleaseBuffer( struct AVCodecContext * context, AVFrame * frame ){
+	AVDecoder * decoder = (AVDecoder*)context->opaque;
 	memset( frame, '\0', sizeof( MImage ) );
+	//decoder->lastImage = NULL;
 }
 
 AVDecoder::AVDecoder():codec( NULL ), context( NULL ),handler(NULL){
@@ -77,21 +82,28 @@ AVDecoder::AVDecoder():codec( NULL ), context( NULL ),handler(NULL){
 	}
 	
 	context->opaque = this;
+	lastImage = NULL;
 
 }
 
 void AVDecoder::close(){
+	//if( lastImage ){
+	//	handler->handle( lastImage );
+	//}
 //	avcodec_close( context );
 }
 
 void AVDecoder::setHandler( ImageHandler * handler ){
 	this->handler = handler;
+        
+        needsConvert = ! handler->handlesChroma( M_CHROMA_I420 );
 
 	/* If the handler provides its own buffers, use them */
-	if( handler->providesImage() ){
+	if( !needsConvert && handler->providesImage() ){
 		context->get_buffer = &ffmpegGetBuffer;
 		context->release_buffer = &ffmpegReleaseBuffer;
 	}
+
 }
 
 
@@ -109,8 +121,43 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 	if( gotFrame ){
 		/* send to the handler */
 		if( handler ){
-	//		handler->handle( rgbPicture.data[0] );
-			handler->handle( lastImage );
+                        if( needsConvert ){
+                               int ffmpegFormat;
+
+                               MImage * converted;
+                               if( handler->providesImage() ){
+                                       converted = handler->provideImage();
+                               }
+
+                               //else ...
+                               //
+
+                               switch( converted->chroma ){
+                                       case M_CHROMA_RV16:
+                                               ffmpegFormat = PIX_FMT_RGB565;
+                                               break;
+                                       case M_CHROMA_RV24:
+                                       case M_CHROMA_RV32:
+                                       default:
+                                               ffmpegFormat = PIX_FMT_RGB24;
+                                               break;
+                               }
+
+                               img_convert( (AVPicture *)converted,
+                                            ffmpegFormat,
+                                            (AVPicture *)decodedFrame, 
+                                            PIX_FMT_YUV420P,
+                                            handler->getRequiredWidth(),
+                                            handler->getRequiredHeight() );
+
+                               handler->handle( converted );
+                        }
+                        
+                        else{
+                                fprintf( stderr, "Callong handle without convert\n");
+                                handler->handle( lastImage );
+                        }
+			lastImage = NULL;
 		}
 
 	}

@@ -23,6 +23,9 @@
 #include<config.h>
 #include"ImageMixer.h"
 #include"../VideoMedia.h"
+#include"../../codecs/Codec.h"
+#include"../codec/VideoCodec.h"
+#include"../codec/AVCoder.h"
 
 #define MAX_SOURCE 256
 
@@ -60,9 +63,12 @@ MImage * ImageMixer::provideImage( uint32_t ssrc ){
 		return image;
 	}
 
+	cerr << "Before getSource" << endl;
 	MRef<VideoMediaSource *> source = media->getSource( ssrc );
+	cerr << "After getSource" << endl;
 
 	if( source ){
+		cerr << "Returning source->provideEmptyImage" << endl;
 		return source->provideEmptyImage();
 	}
 	

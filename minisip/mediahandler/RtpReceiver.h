@@ -58,7 +58,8 @@ class RtpReceiver : public Runnable, public MObject{
 		std::list< MRef<MediaStreamReceiver *> > mediaStreams;
 
 		Mutex mediaStreamsLock;
-		Mutex threadRunningLock;
+
+                Thread * thread;
 };
 
 #endif

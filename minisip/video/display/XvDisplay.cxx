@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -22,18 +22,14 @@
 
 #include "XvDisplay.h"
 #include<sys/time.h>
+#include"../VideoException.h"
 
 using namespace std;
 
 #define NB_IMAGES 3
 
-XvDisplay::XvDisplay( uint32_t width, uint32_t height):VideoDisplay(){
-	this->width = width;
-	this->height = height;
+XvDisplay::XvDisplay( uint32_t width, uint32_t height):X11Display( width, height){
 	xvPort = -1;
-	fullscreen = false;
-
-	//openDisplay();
 }
 
 void XvDisplay::openDisplay(){
@@ -48,8 +44,7 @@ void XvDisplay::openDisplay(){
 	displayName = getenv( "DISPLAY" );
 
 	if( displayName == NULL ){
-		fprintf( stderr, "Could not open X11 display\n" );
-		exit( 1 );
+		throw VideoException( "Could not open X11 display" );
 	}
 	
 	/* Open the display */
@@ -57,8 +52,7 @@ void XvDisplay::openDisplay(){
 	display = XOpenDisplay( displayName );
 
 	if( display == NULL ){
-		fprintf( stderr, "Cound not open display: %s\n", display );
-		exit( 1 );
+		throw VideoException( "Could not open X11 display" );
 	}
 
 	screen = DefaultScreen( display );
@@ -66,16 +60,14 @@ void XvDisplay::openDisplay(){
 	/* Query the Xv extension */
 
 	if( XvQueryExtension( display, &i, &i, &i, &i, &i ) != Success ){
-		fprintf( stderr, "Could not find Xv extension\n" );
-		exit( 1 );
+		throw VideoException( "Could not find the Xv extension" );
 	}
 
 	/* Query the Xv adaptors */
 
 	if( XvQueryAdaptors( display, DefaultRootWindow( display ),
 			     &nAdaptors, &adaptors ) != Success ){
-		fprintf( stderr, "Could not find Xv adaptors\n" );
-		exit( 1 );
+		throw new VideoException( "Could not find Xv adaptors" );
 	}
 
 	for( i = 0; i < nAdaptors; i++ ){
@@ -122,105 +114,13 @@ void XvDisplay::openDisplay(){
 	}
 
 	if( xvPort == -1 ){
-		fprintf( stderr, "Could not find a suitable Xv Port\n" );
-		exit( 1 );
+		throw new VideoException( "Could not find a suitable Xv Port" );
 	}
 }
 
 void XvDisplay::init( uint32_t width, uint32_t height ){
 	this->width = width;
 	this->height = height;
-}
-
-void XvDisplay::createWindow(){
-	XSizeHints sizeHints;
-	XSetWindowAttributes windowAttributes;
-	XGCValues gcValues;
-	char * imageData = NULL;
-	bool exposeSent = false;
-	bool mapNotifySent = false;
-	bool configureNotifySent = false;
-	XEvent event;
-
-	this->height = this->baseWindowHeight = height;
-	this->width = this->baseWindowWidth = width;
-
-	openDisplay();
-
-	/* Create the window */
-
-	sizeHints.min_width = 2;
-	sizeHints.min_height = 1;
-
-	windowAttributes.backing_store = Always;
-	windowAttributes.background_pixel = BlackPixel( display, screen );
-
-	windowAttributes.event_mask = ExposureMask | StructureNotifyMask|
-		                      KeyPressMask;
-
-	sizeHints.base_width = width;
-	sizeHints.base_height = height;
-
-	baseWindow = XCreateWindow( display,
-                           DefaultRootWindow( display ),
-                           0, 0,
-                           width, height,
-                           0,
-                           0, InputOutput, 0,
-                           CWBackingStore | CWBackPixel | CWEventMask,
-                           &windowAttributes );
-
-	//XSetWMNormalHints( display, baseWindow, &sizeHints );
-
-	XStoreName( display, baseWindow, "Minisip XVideo" );
-
-	gcValues.graphics_exposures = False;
-	gc = XCreateGC( display, baseWindow, GCGraphicsExposures, &gcValues );
-	
-	XMapWindow( display, baseWindow );
-	do{
-		XNextEvent( display, &event );
-		if( ( event.type == Expose )
-			&& ( event.xexpose.window == baseWindow ) ){
-			exposeSent = true;
-		}
-		else if( ( event.type == MapNotify)
-			&& ( event.xmap.window == baseWindow ) ){
-			mapNotifySent = true;
-		}
-		else if( ( event.type == ConfigureNotify )
-			&& ( event.xconfigure.window == baseWindow ) ){
-			configureNotifySent = true;
-			baseWindowWidth = event.xconfigure.width;
-			baseWindowHeight = event.xconfigure.height;
-		}
-	} while( !( exposeSent && configureNotifySent && mapNotifySent ) );
-
-    	XSelectInput( display, baseWindow, StructureNotifyMask | KeyPressMask );
-//                  StructureNotifyMask | KeyPressMask |
-//                  ButtonPressMask | ButtonReleaseMask |
-//                  PointerMotionMask );
-
-
-
- 	videoWindow =  XCreateSimpleWindow(
-                                      display,
-                                      baseWindow, 0, 0,
-                                      width, height,
-                                      0,
-                                      BlackPixel( display, screen ),
-                                      WhitePixel( display, screen ) );
-
-
-	XSetWindowBackground( display, videoWindow, 
-				BlackPixel( display, screen ) );
-
-
-	XSelectInput( display, videoWindow, ExposureMask );
-	
-	XMapWindow( display, videoWindow );
-
-	XSync( display, False );
 }
 
 void XvDisplay::destroyWindow(){
@@ -289,62 +189,4 @@ uint32_t XvDisplay::getRequiredWidth(){
 
 uint32_t XvDisplay::getRequiredHeight(){
 	return height;
-}
-
-void XvDisplay::handleEvents(){
-	XEvent xEvent;
-	
-	while( XCheckWindowEvent( display, baseWindow, 
-			StructureNotifyMask | KeyPressMask, &xEvent ) == True ){
-
-		if( xEvent.type == ConfigureNotify ){
-			fprintf( stderr, "Got ConfigureNotify event\n");
-			if( (uint32_t)xEvent.xconfigure.width 
-					!= baseWindowWidth ||
-			    (uint32_t)xEvent.xconfigure.height
-			                != baseWindowHeight ){
-				baseWindowWidth  = xEvent.xconfigure.width;
-				baseWindowHeight = xEvent.xconfigure.height;
-				XMoveResizeWindow( display, videoWindow, 0, 0, 
-					baseWindowWidth, baseWindowHeight );
-			}
-		}
-
-		else if( xEvent.type == KeyPress ){
-			fprintf( stderr, "KeyPressed event\n");
-			KeySym xKeySymbol;
-
-			xKeySymbol = XKeycodeToKeysym( display, xEvent.xkey.keycode, 0 );
-			char keyVal;// = ConvertKey( (int)xKeySymbol );
-
-			XLookupString( &xEvent.xkey, &keyVal, 1, NULL, NULL );
-
-			if( keyVal == 'f' ){
-				fprintf( stderr, "f pressed\n" );
-				toggleFullscreen();
-			}
-		}
-	}
-
-}
-
-void XvDisplay::toggleFullscreen(){
-	XClientMessageEvent event;
-
-	memset( &event, '\0', sizeof( XClientMessageEvent ) );
-
-	event.type = ClientMessage;
-	event.message_type = XInternAtom( display, "_NET_WM_STATE", False ); 
-	event.display = display;
-	event.window = baseWindow;
-	event.format = 32;
-	event.data.l[ 0 ] = (fullscreen)?0:1;
-	event.data.l[ 1 ] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN",
-			False );
-
-	XSendEvent( display, DefaultRootWindow( display ), False, 
-			SubstructureRedirectMask, (XEvent*)&event );
-
-	fullscreen = !fullscreen;
-	 
 }

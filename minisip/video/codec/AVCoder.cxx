@@ -127,7 +127,7 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
         //context->qmin = 0;
         //context->mb_qmin = 0;
-        context->qmax = 3;
+        context->qmax = 5;
         //context->mb_qmax = 10;
 //        context->flags |= CODEC_FLAG_QP_RD;
         context->flags |= CODEC_FLAG_H263P_SLICE_STRUCT;

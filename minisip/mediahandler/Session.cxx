@@ -294,47 +294,49 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 	for( i = 0; i < offer->getHeaders().size(); i++ ){
 
-		if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
-			MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
-			
-			MRef<SdpHeaderM *> answerM = new SdpHeaderM(
-					offerM->getMedia(), 0, 0,
-					offerM->getTransport() );
+                if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
+                        MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
 
-			sdpAnswer->addHeader( *answerM );
+                        MRef<SdpHeaderM *> answerM = new SdpHeaderM(
+                                        offerM->getMedia(), 0, 0,
+                                        offerM->getTransport() );
 
-			for( j = 0; j < offerM->getNrFormats(); j++ ){
-				receiver = matchFormat( offerM, j, remoteAddress );
+                        sdpAnswer->addHeader( *answerM );
 
-				if( receiver ){
-                    if( answerM->getPort() == 0 ){
-                        answerM->setPort( receiver->getPort() );
-                    }
-                    else if( answerM->getPort() != receiver->getPort() ){
-                        /* We have already added a format on that m line
-                         * on another port! */
-                        continue;
-                    }
+                        for( j = 0; j < offerM->getNrFormats(); j++ ){
+                                receiver = matchFormat( offerM, j, remoteAddress );
 
-                    /* found a receiver, accept the offer */
-                    std::string rtpMapValues = "";
+                                if( receiver ){
+                                        if( answerM->getPort() == 0 ){
+                                                answerM->setPort( receiver->getPort() );
+                                        }
+                                        else{
+                                                /* This media has already been treated */
+                                                continue;
+                                        }
 
-                    std::list<uint8_t> listPLT = receiver->getAllRtpPayloadTypes();
-                    std::list<uint8_t>::iterator iListPLT;
-                    std::list<std::string> listM = receiver->getAllRtpMaps();
-                    std::list<std::string>::iterator iListM;
+                                        /* found a receiver, accept the offer */
+                                        std::string rtpMapValues = "";
 
-                    for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
-                        answerM->addFormat( (*iListPLT) );
-                        rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
-                        if( rtpMapValues != "" ){
-                            rtpMapValues = "rtpmap:" + rtpMapValues;
-                            MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
-                            a->setAttributes( rtpMapValues );
-                            answerM->addAttribute( *a );
-                        }
-                        //           rtpMapValues = "";
-                    }
+                                        std::list<uint8_t> listPLT = receiver->getAllRtpPayloadTypes();
+                                        std::list<uint8_t>::iterator iListPLT;
+                                        std::list<std::string> listM = receiver->getAllRtpMaps();
+                                        std::list<std::string>::iterator iListM;
+
+                                        cerr << "Header before loop" <<answerM->getString() << endl;
+
+                                        for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
+                                                answerM->addFormat( (*iListPLT) );
+                                                rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
+                                                if( rtpMapValues != "" ){
+                                                        rtpMapValues = "rtpmap:" + rtpMapValues;
+                                                        MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
+                                                        a->setAttributes( rtpMapValues );
+                                                        answerM->addAttribute( *a );
+                                                }
+                                                //           rtpMapValues = "";
+                                        }
+                                        cerr << "Header After loop" <<answerM->getString() << endl;
 					//receiver->addToM( sdpAnswer ,answerM, j );
 					
 					attributes = receiver->getSdpAttributes();

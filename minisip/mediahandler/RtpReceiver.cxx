@@ -63,13 +63,14 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 
 	kill = false;
 
-	Thread t(this);
+	thread = new Thread(this);
 }
 
 RtpReceiver::~RtpReceiver(){
 	kill = true;
-	threadRunningLock.lock();
-	threadRunningLock.unlock();
+        thread->join();
+
+        delete thread;
 
 	socket->close();
 }
@@ -81,7 +82,9 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 }
 
 void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
+			    cerr << "Before taking lock" << endl;
 	mediaStreamsLock.lock();
+			    cerr << "After taking lock" << endl;
 	mediaStreams.remove( mediaStream );
 	mediaStreamsLock.unlock();
 }
@@ -95,7 +98,6 @@ MRef<UDPSocket *> RtpReceiver::getSocket(){
 }
 			
 void RtpReceiver::run(){
-	threadRunningLock.lock();
 	SRtpPacket * packet;
 	
 	while( !kill ){
@@ -162,5 +164,4 @@ void RtpReceiver::run(){
 
 //		delete packet;
 	}
-	threadRunningLock.unlock();
 }

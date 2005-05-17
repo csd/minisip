@@ -43,6 +43,8 @@
 
 using namespace std;
 
+Media::Media(){
+}
 // pn430 Function rewritten for multicodec
 //Media::Media( MRef<Codec *> codec ):codec(codec){
 //}

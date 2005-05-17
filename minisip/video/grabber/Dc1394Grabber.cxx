@@ -23,6 +23,7 @@
 #include"Dc1394Grabber.h"
 #include"../ImageHandler.h"
 #include"../VideoMedia.h"
+#include"../VideoException.h"
 #include<stdio.h>
 #include<libmutil/mtime.h>
 
@@ -52,19 +53,19 @@ void Dc1394Grabber::open(){
 	rawHandle = raw1394_new_handle();
 	if( rawHandle == NULL ){
 		perror( "raw1394_new_handle" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	nbPorts = raw1394_get_port_info( rawHandle, ports, nbPorts );
 	
 	if( nbPorts < 0 ){
 		perror( "raw1394_get_port_info" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	if( portId >= nbPorts ){
-		fprintf( stderr, "Could not find raw1394 port id %i\n", portId );
-		exit( 1 );
+                throw VideoException(
+                          "Could not find raw1394 port id " + portId );
 	}
 
 	raw1394_set_port( rawHandle, portId );
@@ -72,22 +73,19 @@ void Dc1394Grabber::open(){
 	cameraNodes = dc1394_get_camera_nodes( rawHandle, &nbCameras, 0 );
 
 	if( cameraNodes == NULL ){
-		fprintf( stderr, "Could not get camera nodes\n" );
-		exit( 1 );
+                throw VideoException( "Could not get camera nodes"  );
 	}
 
 	raw1394_destroy_handle( rawHandle );
 
 	if( cameraId >= nbCameras ){
-		fprintf( stderr, "Could not find camera id %i\n", cameraId );
-		exit( 1 );
+                throw VideoException( "Could not find camera id"  );
 	}
 	
 	cameraHandle = dc1394_create_handle( portId );
 			
 	if( cameraHandle == NULL ){
-		perror( "dc1394_create_handle" );			
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	camera.node = cameraNodes[cameraId];
@@ -99,8 +97,7 @@ void Dc1394Grabber::open(){
                                   &camera );
 	
 	if( ret != DC1394_SUCCESS ){
-		perror( "dc1394_dma_setup_capture" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	dc1394_free_camera_nodes( cameraNodes );
@@ -171,7 +168,7 @@ void Dc1394Grabber::read( ImageHandler * handler ){
 	if( ret !=DC1394_SUCCESS ){
 		fprintf( stderr, "Error when starting iso transmission\n");
 		perror( "dc1394_start_iso_transmission" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	/* Reading loop */

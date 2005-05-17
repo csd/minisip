@@ -22,6 +22,7 @@
 
 #include"V4LGrabber.h"
 #include"../VideoMedia.h"
+#include"../VideoException.h"
 #include"../ImageHandler.h"
 #include<stdio.h>
 #include<fcntl.h>
@@ -50,7 +51,7 @@ void V4LGrabber::open(){
 
 	if( fd == -1 ){
 		perror( "open" );
-		exit( 1 );
+                throw VideoException( "Error opening " + device + " " + strerror( errno ) );
 	}
 
 	mapMemory();
@@ -62,7 +63,7 @@ void V4LGrabber::getCapabilities(){
 	
 	if( ioctl( fd, VIDIOCGCAP, v4lCapacity ) != 0 ){
 		perror( "getCapacities" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 }
 
@@ -108,7 +109,7 @@ void V4LGrabber::mapMemory(){
 
 	if( ioctl( fd, VIDIOCGMBUF, &mBuf ) != 0 ){
 		fprintf( stderr, "Could not allocate device memory\n" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 	
 	cout << "Got " << mBuf.frames << " device buffers" << endl;
@@ -124,7 +125,7 @@ void V4LGrabber::mapMemory(){
 	
 	if( buffers[0]->start == MAP_FAILED ){
 		perror( "mmap" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	for( i = 1 ; i < mBuf.frames ; i++ ){
@@ -142,7 +143,7 @@ void V4LGrabber::getImageFormat(){
 
 	if( ioctl( fd, VIDIOCGPICT, imageFormat ) != 0 ){
 		perror( "VIDIOCGPICT" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
         if( ! imageWindow ){
@@ -151,7 +152,7 @@ void V4LGrabber::getImageFormat(){
 
 	if( ioctl( fd, VIDIOCGWIN,  imageWindow ) != 0 ){
 		perror( "VIDIOCGWIN" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	height = imageWindow->height;
@@ -202,15 +203,14 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
                         imageFormat->depth = 32;
 			break;
 		default:
-			fprintf( stderr, "Unhandled image format\n" );
-			exit( 1 );
+                        throw VideoException( "Unhandled image format" );
 	}
 
         fprintf( stderr, "Depth: %i\n", imageFormat->depth );
 
 	if( ioctl( fd, VIDIOCSPICT,  imageFormat ) != 0 ){
 		perror( "VIDIOCSPICT" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	getImageFormat();
@@ -229,8 +229,7 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
                         return false;
 			break;
 		default:
-			fprintf( stderr, "Unhandled image format\n" );
-			exit( 1 );
+                        throw VideoException( "Unhandled image format" );
 	}
 	return true;
 }
@@ -365,7 +364,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 	/* start to capture the first frame */
 	if( ioctl( fd, VIDIOCMCAPTURE, &mMap ) != 0 ){
 		perror( "VIDIOCMCAPTURE" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 	fprintf( stderr, "before loop\n" );
 
@@ -394,7 +393,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 			
 			if( ioctl( fd, VIDIOCMCAPTURE, &mMap ) != 0 ){
 				perror( "VIDIOCMCAPTURE" );
-				exit( 1 );
+                                throw VideoException( strerror( errno ) );
 			}
 
 			/* read the current one */
@@ -402,7 +401,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 			mMap.frame = i;
 			if( ioctl( fd, VIDIOCSYNC, &mMap ) != 0 ){
 				perror( "VIDIOCSYNC" );
-				exit( 1 );
+                                throw VideoException( strerror( errno ) );
 			}
 	
 			if( handlerProvidesImage ){
@@ -451,7 +450,7 @@ void V4LGrabber::unmapMemory(){
 	
 	if( munmap( buffers[0]->start, buffers[0]->length ) < 0 ){
 		perror( "munmap" );
-		exit( 1 );
+                throw VideoException( strerror( errno ) );
 	}
 
 	delete buffers[0];

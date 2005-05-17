@@ -27,6 +27,9 @@
 #include"../../codecs/Codec.h"
 #include"../grabber/Grabber.h"
 #include"../display/VideoDisplay.h"
+#include"../VideoException.h"
+
+#include<libmutil/dbg.h>
 
 
 VideoCodec::VideoCodec(){
@@ -81,6 +84,7 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
 	coder->init( width, height );
 
 	if( grabber ){
+                try{
 		grabber->open();
 	
 		grabber->getCapabilities();
@@ -88,18 +92,26 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
                 grabber->setImageChroma( M_CHROMA_RV32 );
 
 		Thread t(*grabber);
+                }
+                catch( VideoException exc ){
+                        merr << "Could not open the video capture device: "
+                             << exc.error() << end;
+                        grabber = NULL;
+                }
 	}
 	
 }
 
 void VideoCodec::stopSend(){
-	fprintf( stderr, "stopSend called\n");
-
-	fprintf( stderr, "Closing grabber\n" );
 	if( grabber ){
+                try{
 		grabber->close();
+                }
+                catch( VideoException exc ){
+                        merr << "Could not close the video capture device: "
+                             << exc.error() << end;
+                }
 	}
-	fprintf( stderr, "Closing coder\n" );
 	coder->close();
 
 }

@@ -26,31 +26,38 @@
 #include"../codecs/Codec.h"
 #include"codec/VideoCodec.h"
 #include"codec/AVDecoder.h"
+#include"codec/AVCoder.h"
 #include"grabber/Grabber.h"
 #include"mixer/ImageMixer.h"
 #include"display/VideoDisplay.h"
+#include"display/SdlDisplay.h"
 #include"../sdp/SdpHeaderM.h"
 #include"../sdp/SdpHeaderA.h"
 #include<libmutil/itoa.h>
+#include<assert.h>
 
 #define SOURCE_QUEUE_SIZE 7
 
 
 using namespace std;
 
-VideoMedia::VideoMedia( MRef<VideoCodec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
-                Media( *codec ),display(display),grabber(grabber),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
+VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
+                Media( codec ),display(display),grabber(grabber),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
+        this->codec = dynamic_cast<VideoCodec *>(*codec);
+        assert( this->codec );
         receive = true;         
 	send = (!grabber.isNull());
-        codec->setDisplay( display );
-        codec->setGrabber( grabber );
-        codec->setEncoderCallback( this );
-	mixer->setOutput( *display );
+        this->codec->setDisplay( display );
+        this->codec->setGrabber( grabber );
+        this->codec->setEncoderCallback( this );
+        if( mixer ){
+                mixer->setOutput( *display );
+                mixer->init( receivingWidth, receivingHeight );
+        }
         sendingWidth = 176;
         sendingHeight = 144;
 
-	mixer->init( receivingWidth, receivingHeight );
 
         addSdpAttribute( "framesize:34 " + itoa( receivingWidth ) + "-" + itoa( receivingHeight ) );
 }
@@ -85,7 +92,9 @@ void VideoMedia::playData( RtpPacket * packet ){
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
+		cerr << "Before playData" << endl;
 		source->playData( packet );
+		cerr << "After playData" << endl;
 	}
 	else{
 		delete packet;
@@ -104,7 +113,18 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
 
 	source = new VideoMediaSource( ssrc, receivingWidth, receivingHeight );
 
-	source->getDecoder()->setHandler( *mixer );
+        if( mixer ){
+                source->getDecoder()->setHandler( *mixer );
+        }
+
+        else{
+                MRef<VideoDisplay *> newdisplay = VideoDisplay::create( receivingWidth, receivingHeight );
+                source->getDecoder()->setHandler( *newdisplay );
+                source->display = newdisplay;
+                cerr << "Starting DISPLAY" << endl;
+                newdisplay->start();
+        }
+
 
         cerr << "Registering VideoMediaSource, sources.size = " << sources.size() << endl;
 
@@ -112,8 +132,10 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
 	if( sources.size() == 0 ){
 		sourcesLock.unlock();
 		/* start everything */
-		mixer->selectMainSource( ssrc );
-		display->start();
+                if( mixer ){
+                        mixer->selectMainSource( ssrc );
+                        this->display->start();
+                }
 		sourcesLock.lock();
 	}
 	
@@ -123,17 +145,25 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
 }
 
 void VideoMedia::unRegisterMediaSource( uint32_t ssrc ){
+cerr << "Unregister source" << endl;
 	MRef<VideoMediaSource *> source = getSource( ssrc );
 
 	if( source ){
-		source->getDecoder()->close();
+		cerr << "found source" << endl;
 		sourcesLock.lock();
 		sources.remove( source );
 		if( sources.size() == 0 ){
-			display->stop();
+                        if( mixer ){
+                                display->stop();
+                        }
 		}
 		sourcesLock.unlock();
+                source->getDecoder()->close();
+                if( source->display ){
+                        source->display->stop();
+                }
 	}
+        cerr << "end unregister" << endl;
 }
 
 MRef<VideoMediaSource *> VideoMedia::getSource( uint32_t ssrc ){
@@ -155,7 +185,7 @@ void VideoMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
         sendersLock.lock();
         if( senders.size() == 0 ){
                 sendersLock.unlock();
-                ((VideoCodec *)*codec)->startSend( sendingWidth, sendingHeight );
+                codec->startSend( sendingWidth, sendingHeight );
                 sendersLock.lock();
         }
 
@@ -211,6 +241,7 @@ VideoMediaSource::VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t heig
 	packetLoss = false;
 	expectedSeqNo = 0;
 	savedPacket = NULL;
+        display = NULL;
 
         for( i = 0; i < SOURCE_QUEUE_SIZE ; i++ ){
                 image = new MImage();
@@ -321,6 +352,7 @@ void VideoMediaSource::playData( RtpPacket * packet ){
 }
 
 void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
+cerr << "Started addPacketToFrame" << endl;
         if( !packetLoss ){
 	 	packet->getContent()[0] = 0;
                 memcpy( frame + index, packet->getContent() , packet->getContentLength()  );
@@ -330,7 +362,9 @@ void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
         if( packet->getHeader().marker ){
                 if( ! packetLoss ){
                         /* We have a frame */
+			cerr << "Before decodeFrame" << endl;
                         decoder->decodeFrame( frame, index );
+			cerr << "After decodeFrame" << endl;
                 }
                 index = 0;
                 packetLoss = false;

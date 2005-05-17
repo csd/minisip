@@ -3,7 +3,7 @@ noinst_LIBRARIES = libvideo.a
 
 AM_CPPFLAGS = @CPPFLAGS@ @AVCODEC_CPPFLAGS@
 
-display_src = display/VideoDisplay.cxx
+display_src = display/VideoDisplay.cxx display/X11Display.cxx
 if XV_VIDEO_DISPLAY
   display_src += display/XvDisplay.cxx
 endif
@@ -12,7 +12,7 @@ if SDL_VIDEO_DISPLAY
   display_src += display/SdlDisplay.cxx
 endif
 
-display_hdr = display/SdlDisplay.h display/XvDisplay.h display/VideoDisplay.h
+display_hdr = display/SdlDisplay.h display/XvDisplay.h display/X11Display.h display/VideoDisplay.h
 
 
 grabber_src = grabber/Grabber.cxx
@@ -43,6 +43,7 @@ libvideo_a_SOURCES = $(display_src) \
 
 noinst_HEADERS =  ImageHandler.h \
                   VideoMedia.h \
+		  VideoException.h \
                   $(display_hdr) $(grabber_hdr) $(codec_hdr) $(mixer_hdr)
 
 

@@ -21,13 +21,72 @@
 */
 
 #include<config.h>
+#include<libmutil/dbg.h>
 #include"VideoDisplay.h"
+#include"../VideoException.h"
+#include"XvDisplay.h"
+#ifdef SDL_SUPPORT
+#include"SdlDisplay.h"
+#endif
+
+#include<iostream>
 #define NB_IMAGES 3
+
+uint32_t VideoDisplay::displayCounter;
+Mutex VideoDisplay::displayCounterLock;
+
+MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
+        MRef<VideoDisplay *> display = NULL;
+        
+        VideoDisplay::displayCounterLock.lock();
+
+        
+        if( VideoDisplay::displayCounter == 0 ){
+                try{
+#ifdef SDL_SUPPORT
+                display = new SdlDisplay( width, height );
+#else
+                display =  new XvDisplay( width, height );
+#endif
+                }
+                catch( VideoException exc ){
+                        mdbg << "Error opening the video display: "
+                             << exc.error() << end;
+                        goto X11;
+
+                }
+        }
+
+
+        else{
+X11:
+                try{
+                display = new X11Display( width, height );
+                }
+                catch( VideoException exc ){
+                        merr << "Error opening the video display: "
+                             << exc.error() << end;
+                }
+        }
+
+        displayCounter ++;
+        displayCounterLock.unlock();
+        return display;
+}
 
 VideoDisplay::VideoDisplay(){
 	show = false;
-	emptyImagesLock.lock();
-	Thread( this );
+//	emptyImagesLock.lock();
+	thread = new Thread( this );        
+        show = true;
+}
+
+VideoDisplay::~VideoDisplay(){
+        thread->join();
+        VideoDisplay::displayCounterLock.lock();
+        VideoDisplay::displayCounter --;
+        VideoDisplay::displayCounterLock.unlock();
+
 }
 
 void VideoDisplay::start(){
@@ -37,6 +96,7 @@ void VideoDisplay::start(){
 void VideoDisplay::stop(){
 	show = false;
 	//FIXME
+        filledImagesSem.inc();
         filledImagesCondLock.lock();
 	filledImagesCond.broadcast();
         filledImagesCondLock.unlock();
@@ -48,9 +108,15 @@ void VideoDisplay::showWindow(){
 
         createWindow();
 
-        for( i = 0; i < NB_IMAGES; i++ ){
-                mimage = allocateImage();
-                emptyImages.push_back( mimage );
+        if( providesImage() ){
+                for( i = 0; i < NB_IMAGES; i++ ){
+                        mimage = allocateImage();
+                        allocatedImages.push_back( mimage );
+                        emptyImagesLock.lock();
+                        emptyImages.push_back( mimage );
+                        emptyImagesLock.unlock();
+                        emptyImagesSem.inc();
+                }
         }
 }
 
@@ -59,10 +125,19 @@ void VideoDisplay::showWindow(){
 void VideoDisplay::hideWindow(){
         list<MImage *>::iterator i;
 
+        fprintf( stderr, "Started hideWindow()\n" );
+        
         while( ! emptyImages.empty() ){
-                deallocateImage( *emptyImages.begin() );
                 emptyImages.pop_front();
+                emptyImagesSem.dec();
         }
+        fprintf( stderr, "After emptyImages\n" );
+
+        while( ! allocatedImages.empty() ){
+                deallocateImage( *allocatedImages.begin() );
+                allocatedImages.pop_front();
+        }
+        fprintf( stderr, "After allocatedImages\n" );
 
         destroyWindow();
 
@@ -75,10 +150,16 @@ MImage * VideoDisplay::provideImage(){
 
         // The decoder is running, wake the display if
         // it was sleeping
+	cerr << "Before taking showCondLock" << endl;
         showCondLock.lock();
         showCond.broadcast();
         showCondLock.unlock();
+	cerr << "After releasing showCondLock" << endl;
 
+        emptyImagesSem.dec();
+	cerr << "Before taking emptyImagesLock" << endl;
+        emptyImagesLock.lock();
+        /*
         emptyImagesLock.lock();
         if( emptyImages.empty() ){
 
@@ -91,10 +172,13 @@ MImage * VideoDisplay::provideImage(){
                 emptyImagesLock.lock();
         }
 
+        */
+
         ret = *emptyImages.begin();
         emptyImages.pop_front();
 
         emptyImagesLock.unlock();
+	cerr << "After releasing emptyImagesLock" << endl;
 
         return ret;
 }
@@ -103,24 +187,24 @@ MImage * VideoDisplay::provideImage(){
 void VideoDisplay::run(){
         MImage * imageToDisplay;
 
-        while( true ){
+//        while( true ){
 
 		fprintf( stderr, "starting display main loop\n");
                 
-                showCondLock.lock();
-                showCond.wait( &showCondLock );
-                showCondLock.unlock();
+        //        showCondLock.lock();
+          //      showCond.wait( &showCondLock );
+            //    showCondLock.unlock();
 
                 showWindow();
 
 
-                emptyImagesLock.unlock();
+//                emptyImagesLock.unlock();
 
                 while( show ){
 
-			handleEvents();
+                    handleEvents();
 
-                        filledImagesLock.lock();
+                        /*
 
                         if( filledImages.empty() ){
                                 filledImagesLock.unlock();
@@ -136,23 +220,45 @@ void VideoDisplay::run(){
 
                                 filledImagesLock.lock();
                         }
+                        */
+                    if( !show ){
+                        cerr << "Exiting display loop" << endl;
+                        break;
 
-                        imageToDisplay = *filledImages.begin();
+                    }
+                    fprintf( stderr, "Before filledImagesSem\n" );
+                    filledImagesSem.dec();
+                    fprintf( stderr, "After filledImagesSem\n" );
+                    if( !show ){
+                        cerr << "Exiting display loop" << endl;
+                        break;
 
-                        filledImages.pop_front();
+                    }
 
-                        filledImagesLock.unlock();
+                    filledImagesLock.lock();
 
-                        displayImage( imageToDisplay );
+                    imageToDisplay = *filledImages.begin();
+
+                    filledImages.pop_front();
+
+                    filledImagesLock.unlock();
+
+                    displayImage( imageToDisplay );
 
 
-                        emptyImagesLock.lock();
-                        emptyImages.push_back( imageToDisplay );
-                        emptyImagesLock.unlock();
+                    if( providesImage() ){
+                            emptyImagesLock.lock();
 
-                        emptyImagesCondLock.lock();
-                        emptyImagesCond.broadcast();
-                        emptyImagesCondLock.unlock();
+                            emptyImagesSem.inc();
+                            emptyImages.push_back( imageToDisplay );
+
+                            emptyImagesLock.unlock();
+                            /*
+                               emptyImagesCondLock.lock();
+                               emptyImagesCond.broadcast();
+                               emptyImagesCondLock.unlock();
+                               */
+                    }
                 }
 
                 emptyImagesLock.lock();
@@ -160,13 +266,16 @@ void VideoDisplay::run(){
                 filledImagesLock.lock();
 
                 while( ! filledImages.empty() ){
-                        imageToDisplay = *filledImages.begin();
+                    //filledImagesSem.dec();
+                    imageToDisplay = *filledImages.begin();
 
-                        filledImages.pop_front();
+                    filledImages.pop_front();
 
-                        displayImage( imageToDisplay );
-                        
-			emptyImages.push_back( imageToDisplay );
+                    displayImage( imageToDisplay );
+
+                    
+                   //emptyImages.push_back( imageToDisplay );
+                   // emptyImagesSem.inc();
 
                 }
 
@@ -174,19 +283,23 @@ void VideoDisplay::run(){
 
                 hideWindow();
 
-	}
+//        }
 }
 
 void VideoDisplay::handle( MImage * mimage ){
 
+cerr << "Called VideoDisplay::handle" << endl;
         filledImagesLock.lock();
         filledImages.push_back( mimage );
+cerr << "before filledImagesSem.inc()" << endl;
+        filledImagesSem.inc();
         filledImagesLock.unlock();
-
+/*
         filledImagesCondLock.lock();
         filledImagesCond.broadcast();
         filledImagesCondLock.unlock();
-
+*/
+cerr << "ended VideoDisplay::handle" << endl;
 }
 
 bool VideoDisplay::providesImage(){

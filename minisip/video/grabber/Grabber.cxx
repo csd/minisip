@@ -21,7 +21,9 @@
 */
 
 #include<config.h>
+#include<libmutil/dbg.h>
 #include"../VideoMedia.h"
+#include"../VideoException.h"
 #include"../../codecs/Codec.h"
 #include"../display/VideoDisplay.h"
 #include"../codec/AVDecoder.h"
@@ -38,6 +40,7 @@ using namespace std;
 
 MRef<Grabber *> Grabber::create( string device ){
 	MRef<Grabber *> result;
+        try{
 
 #ifdef DC1394_SUPPORT
 	if( device.substr( 0, 3 ) == "fw:" ){
@@ -54,6 +57,11 @@ MRef<Grabber *> Grabber::create( string device ){
 		V4LGrabber * v4lGrabber = new V4LGrabber( device );
 		result = (Grabber*)v4lGrabber;
 	}
+        }
+        catch( VideoException exc ){
+                merr << exc.error() << end;
+                return NULL;
+        }
 
 	return result;
 }

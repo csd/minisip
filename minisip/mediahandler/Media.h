@@ -88,6 +88,7 @@ class Media : public MObject{
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
 		
 	protected:
+                Media();
 		Media( MRef<Codec *> codec );
 
 		// pn430 Added for multicodec
