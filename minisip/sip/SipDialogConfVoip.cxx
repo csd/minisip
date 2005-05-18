@@ -1853,10 +1853,10 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()-1));
+	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
 	for(int t=0;t<(*adviceList).size();t++)
 	{
-		if((((*adviceList))[t]).uri!=dialogState.remoteUri)
+		//if((((*adviceList))[t]).uri!=dialogState.remoteUri)
 			sdp->setSessionLevelAttribute("participant_"+itoa(t+1), (((*adviceList))[t]).uri);
 	}
 	cerr<<"modify ack 22222222222222222"<<endl;
