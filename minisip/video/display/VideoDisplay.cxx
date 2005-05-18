@@ -48,6 +48,7 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
 #else
                 display =  new XvDisplay( width, height );
 #endif
+                display->start();
                 }
                 catch( VideoException exc ){
                         mdbg << "Error opening the video display: "
@@ -62,6 +63,7 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
 X11:
                 try{
                 display = new X11Display( width, height );
+                display->start();
                 }
                 catch( VideoException exc ){
                         merr << "Error opening the video display: "
@@ -77,7 +79,6 @@ X11:
 VideoDisplay::VideoDisplay(){
 	show = false;
 //	emptyImagesLock.lock();
-	thread = new Thread( this );        
         show = true;
 }
 
@@ -90,7 +91,8 @@ VideoDisplay::~VideoDisplay(){
 }
 
 void VideoDisplay::start(){
-	show = true;
+        showWindow();
+	thread = new Thread( this );        
 }
 
 void VideoDisplay::stop(){
@@ -125,19 +127,16 @@ void VideoDisplay::showWindow(){
 void VideoDisplay::hideWindow(){
         list<MImage *>::iterator i;
 
-        fprintf( stderr, "Started hideWindow()\n" );
         
         while( ! emptyImages.empty() ){
                 emptyImages.pop_front();
                 emptyImagesSem.dec();
         }
-        fprintf( stderr, "After emptyImages\n" );
 
         while( ! allocatedImages.empty() ){
                 deallocateImage( *allocatedImages.begin() );
                 allocatedImages.pop_front();
         }
-        fprintf( stderr, "After allocatedImages\n" );
 
         destroyWindow();
 
@@ -150,14 +149,11 @@ MImage * VideoDisplay::provideImage(){
 
         // The decoder is running, wake the display if
         // it was sleeping
-	cerr << "Before taking showCondLock" << endl;
         showCondLock.lock();
         showCond.broadcast();
         showCondLock.unlock();
-	cerr << "After releasing showCondLock" << endl;
 
         emptyImagesSem.dec();
-	cerr << "Before taking emptyImagesLock" << endl;
         emptyImagesLock.lock();
         /*
         emptyImagesLock.lock();
@@ -178,7 +174,6 @@ MImage * VideoDisplay::provideImage(){
         emptyImages.pop_front();
 
         emptyImagesLock.unlock();
-	cerr << "After releasing emptyImagesLock" << endl;
 
         return ret;
 }
@@ -189,13 +184,12 @@ void VideoDisplay::run(){
 
 //        while( true ){
 
-		fprintf( stderr, "starting display main loop\n");
                 
         //        showCondLock.lock();
           //      showCond.wait( &showCondLock );
             //    showCondLock.unlock();
 
-                showWindow();
+                //showWindow();
 
 
 //                emptyImagesLock.unlock();
@@ -222,15 +216,11 @@ void VideoDisplay::run(){
                         }
                         */
                     if( !show ){
-                        cerr << "Exiting display loop" << endl;
                         break;
 
                     }
-                    fprintf( stderr, "Before filledImagesSem\n" );
                     filledImagesSem.dec();
-                    fprintf( stderr, "After filledImagesSem\n" );
                     if( !show ){
-                        cerr << "Exiting display loop" << endl;
                         break;
 
                     }
@@ -288,10 +278,8 @@ void VideoDisplay::run(){
 
 void VideoDisplay::handle( MImage * mimage ){
 
-cerr << "Called VideoDisplay::handle" << endl;
         filledImagesLock.lock();
         filledImages.push_back( mimage );
-cerr << "before filledImagesSem.inc()" << endl;
         filledImagesSem.inc();
         filledImagesLock.unlock();
 /*
@@ -299,7 +287,6 @@ cerr << "before filledImagesSem.inc()" << endl;
         filledImagesCond.broadcast();
         filledImagesCondLock.unlock();
 */
-cerr << "ended VideoDisplay::handle" << endl;
 }
 
 bool VideoDisplay::providesImage(){
