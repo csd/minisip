@@ -62,7 +62,7 @@ class ConferenceWidget : public Gtk::VBox
 #endif
 {
 	public:
-		ConferenceWidget( string confId, string users,string remoteUri,string callId, MainWindow * mw, bool incoming);
+		ConferenceWidget(string configUri, string confId, string users,string remoteUri,string callId, MainWindow * mw, bool incoming);
 
 		~ConferenceWidget();
 

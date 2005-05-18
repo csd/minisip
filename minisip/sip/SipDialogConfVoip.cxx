@@ -149,12 +149,12 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 		cerr<<"sending invite3*************"<<endl;
 		registerTransaction(invtrans);
 		cerr<<"sending invite*************"<<endl;
-		CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
+		/*CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
 		
 		cmdstr.setParam3(confId);
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );*/
 		sendInvite(invtrans->getBranch());
 		//MessageRouter * ptr=(MessageRouter *)(getDialogContainer()->getCallback());
 		//adviceList=(ptr->getConferenceController()->getConnectedList());
@@ -1853,10 +1853,11 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
+	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()-1));
 	for(int t=0;t<(*adviceList).size();t++)
 	{
-		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), (((*adviceList))[t]).uri);
+		if((((*adviceList))[t]).uri!=dialogState.remoteUri)
+			sdp->setSessionLevelAttribute("participant_"+itoa(t+1), (((*adviceList))[t]).uri);
 	}
 	cerr<<"modify ack 22222222222222222"<<endl;
 }

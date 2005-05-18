@@ -54,7 +54,7 @@ typedef struct CCList {
 class ConferenceControl{
     public:
         ConferenceControl();
-	ConferenceControl(string cid, bool islocal);
+	ConferenceControl(string configUri, string cid, bool islocal);
 	//void setGui(Gui *guiptr){gui = guiptr;};
 	void handleGuiCommand(string cmd);
 	void handleGuiCommand(CommandString &command);
@@ -94,7 +94,7 @@ class ConferenceControl{
 	*/
 	void updateLists(minilist<ConfMember> *list);
 	void removeMember(string memberid); 
-	
+	string addDomainToPrefix(string remoteUri);
 	//Gui *gui;
 	bool incoming;
         string input;
@@ -111,7 +111,8 @@ class ConferenceControl{
 	
 	minilist<ConfMember> connectedList;
 	minilist<ConfMember> pendingList;
-	string myuri;
+	string myUri;
+	string myDomain;
 	
 	///a P2T Group Member List
 	//MRef<GroupList*>grpList;

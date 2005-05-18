@@ -43,7 +43,7 @@
 
 
 
-ConferenceWidget::ConferenceWidget( string confId, string users, string remoteUri,string callId, MainWindow * mw, bool incoming):
+ConferenceWidget::ConferenceWidget(string configUri, string confId, string users, string remoteUri,string callId, MainWindow * mw, bool incoming):
 		mainWindow( mw ),
 		status( "", Gtk::ALIGN_LEFT ),
 		secStatus( "", Gtk::ALIGN_LEFT ),
@@ -60,7 +60,7 @@ ConferenceWidget::ConferenceWidget( string confId, string users, string remoteUr
 		mainCallId(callId),
 		initiatorUri(remoteUri)
 {
-	conf=new ConferenceControl(confId, !incoming);
+	conf=new ConferenceControl(configUri,confId, !incoming);
 	mainWindow->getCallback()->setConferenceController(conf);
 	mainConfId=confId;
 	bell = NULL;
@@ -127,10 +127,11 @@ ConferenceWidget::ConferenceWidget( string confId, string users, string remoteUr
 	if( incoming ){
 		state = CONFERENCE_WIDGET_STATE_INCOMING;
 //		acceptButton.show();
+		conferenceButton.set_sensitive(false);
 		rejectButton.set_label( "Reject" );
-		status.set_markup( "<big><b>Incoming conference call from \n" + remoteUri
-				+ "</b></big>");
-		secStatus.set_markup( "list of users in the current conference: <b>" + remoteUri+" "+users+"</b>." );
+		status.set_markup( "<b>Incoming conference call from \n" + remoteUri
+				+ "</b>");
+		secStatus.set_markup( "<b>participants: </b>" + remoteUri+" "+users );
                 /*if( secure == "secure" ){
                         secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
                 }
@@ -158,7 +159,9 @@ void ConferenceWidget::accept(){
 	command.setParam3(mainConfId);
 	mainWindow->getCallback()->guicb_handleConfCommand(command);
 	acceptButton.set_sensitive( false );
+	conferenceButton.set_sensitive(true);
 	rejectButton.set_label( "Quit" );
+	stopRinging();
 }
 void ConferenceWidget::add(){
         string uri = Glib::locale_from_utf8( conferenceEntry.get_text() );
@@ -181,6 +184,7 @@ void ConferenceWidget::reject(){
 	mainWindow->getCallback()->guicb_handleConfCommand(hup);
 	mainWindow->getCallback()->guicb_handleCommand( hup );
 	mainWindow->removeConference( mainConfId );
+	stopRinging();
 }
 
 void ConferenceWidget::hideAcceptButton(){

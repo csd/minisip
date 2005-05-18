@@ -45,34 +45,21 @@
 
 ConferenceControl::ConferenceControl(){
 
-    //displayMessage("CC created!!");
     
-    /*
-    for(int t=0;t<10;t++)
-    {
-    	connectedList.uris[t]="";
-	connectedList.callids[t]="";
-	pendingList[t]="";
-	pendingListCallIds[t]="";
-    }
-    connectedList.uris[0]="bilge";
-    connectedList.uris[1]="max";
-    cerr << connectedList.uris[0]<< endl;
-    connectedList.numUser=2;
-    numPending=0;
-    */
-   
-    //connectedList.push_back(ConfMember("zzzzzz@ssvl.kth.se", "" ));
-    //connectedList.push_back(ConfMember("piet@ssvl.kth.se", ""));
     
     cerr << "Two members added to connectedList " << endl;
     
     numPending = 0;
 }
-ConferenceControl::ConferenceControl(string cid, bool islocal){
+ConferenceControl::ConferenceControl(string configUri, string cid, bool islocal){
 
     confId=cid;
 
+    uint32_t i = configUri.find("@");
+    assert(i!=string::npos);
+    myUri=configUri.substr(0,i);
+    myDomain=trim(configUri.substr(i));
+    cerr<<"my Uri and domain: "+myUri+" "+myDomain<<endl;
     incoming=islocal;
     
     numPending = 0;
@@ -90,6 +77,7 @@ ConfCallback *ConferenceControl::getCallback(){
 }
 void ConferenceControl::setPendingList(string user)
 {
+	user=addDomainToPrefix(user);
 	pendingList.push_back((ConfMember(user, "")));
 	//pendingList[numPending]=user;
 	numPending++;
@@ -127,7 +115,8 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 	{
 		//pendingList[numPending]=command.getParam();
 		//pendingListCallIds[numPending]=command.getDestinationId();
-		pendingList.push_back((ConfMember(command.getParam(), command.getDestinationId())));
+		string remote=addDomainToPrefix(command.getParam());
+		pendingList.push_back((ConfMember(remote, command.getDestinationId())));
 		cerr<<"call is accepted=>pending list: "<<endl;
 		printList(&pendingList);
 		numPending++;
@@ -159,12 +148,33 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 	}
 	if(command.getOp()=="join")
 	{
-		string sip_url=command.getParam();	
-		callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
-	
+		bool done=false;
+		string sip_url=command.getParam();
+		for(int t=0;t<connectedList.size()&&!done;t++)
+			if(connectedList[t].uri==sip_url)
+			{
+				done=true;
+			}	
+		for(int t=0;t<pendingList.size()&&!done;t++)
+			if(pendingList[t].uri==sip_url)
+			{
+				done=true;
+			}
+		if(done)
+		{
+			CommandString cmd("","error_message","user already added ");
+			callback->confcb_handleGuiCommand(cmd);
+		}
+		else
+		{
+			callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
+			sip_url=addDomainToPrefix(sip_url);
+			pendingList.push_back((ConfMember(sip_url, callId)));
+			sendUpdatesToGui();
+		}
+
 	//cerr <<"conf "+callId<< endl;
-		pendingList.push_back((ConfMember(sip_url, callId)));
-		sendUpdatesToGui();
+		
 	}
 		
         //string uri = trim(cmd.substr(5));
@@ -186,6 +196,7 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 
 	
 	//cerr <<"conf "+callId<< endl;
+	sip_url=addDomainToPrefix(sip_url);
 	pendingList.push_back((ConfMember(sip_url, callId)));
 	sendUpdatesToGui();
 	if (callId=="malformed"){
@@ -272,8 +283,8 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	    //displayMessage("PROGRESS: the remove UA is ringing...", blue);
     }
 	if (cmd.getOp()=="myuri"){
-	    myuri=cmd.getParam();
-	    cerr << "my URI is "+myuri<< endl;
+	    myUri=cmd.getParam();
+	    cerr << "my URI is "+myUri<< endl;
 	    //displayMessage("PROGRESS: the remove UA is ringing...", blue);
     }
 
@@ -297,9 +308,41 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
         //displayMessage("User "+cmd.getParam()+" not found.",red);
         callId=""; //FIXME: should check the callId of cmd.
     }
+    
+    
+    if (cmd.getOp()==SipCommandString::security_failed){
+        //state="IDLE";
+	//setPrompt(state);
+	cerr << "CC: Security failed with user "+cmd.getDestinationId()<< endl;
+	removeMember(cmd.getDestinationId());
+	sendUpdatesToGui();
+        //displayMessage("User "+cmd.getParam()+" not found.",red);
+        callId=""; //FIXME: should check the callId of cmd.
+    }
+    if (cmd.getOp()==SipCommandString::remote_unacceptable){
+        //state="IDLE";
+	//setPrompt(state);
+	cerr << "CC: User "+cmd.getDestinationId()+" unacceptable."<< endl;
+	removeMember(cmd.getDestinationId());
+	sendUpdatesToGui();
+        //displayMessage("User "+cmd.getParam()+" not found.",red);
+        callId=""; //FIXME: should check the callId of cmd.
+    }
+
+    
+    if (cmd.getOp()==SipCommandString::remote_cancelled_invite){
+        //state="IDLE";
+	//setPrompt(state);
+	cerr << "CC: User "+cmd.getDestinationId()+" cancelled invite"<< endl;
+	removeMember(cmd.getDestinationId());
+	sendUpdatesToGui();
+        //displayMessage("User "+cmd.getParam()+" not found.",red);
+        callId=""; //FIXME: should check the callId of cmd.
+    }
     if (cmd.getOp()=="conf_connect_received"){
 	    cerr << "CC: connect receieved: "+cmd.getParam()<< endl;
-		pendingList.push_back((ConfMember(cmd.getParam(), cmd.getDestinationId())));
+		string remote=addDomainToPrefix(cmd.getParam());
+		pendingList.push_back((ConfMember(remote, cmd.getDestinationId())));
 		//cerr<<"call is accepted=>pending list: "<<endl;
 		printList(&pendingList);
 		sendUpdatesToGui();
@@ -610,9 +653,10 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		}
 		
 		//if not found in pending or connected list then add to pending list
-		if (!handled&&current!=myuri) {
+		if (!handled&&current!=myUri) {
 			//send a connect message to the newly discovered conference members
 			callId = callback->confcb_doConnect(current,confId);
+			current=addDomainToPrefix(current);
 			pendingList.push_back(ConfMember(current, callId  )  );
 			
 			cerr<<"update pending list=> "+current<<endl;
@@ -621,5 +665,18 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 	}
 }
 	
-	
+string ConferenceControl::addDomainToPrefix(string remoteUri)
+{
+	bool done=false;
+	string result=remoteUri;
+	for(int i=0;i<remoteUri.length();i++)
+	{
+		if(remoteUri[i]=='@'){
+			done=true;
+			break;	}		
+	}
+	if(!done)
+		result=remoteUri+myDomain;
+	return result;
+}	
 	

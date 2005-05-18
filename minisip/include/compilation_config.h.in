@@ -192,6 +192,9 @@
 /* Use OPIE library */
 #undef OPIE
 
+/* P2T support */
+#undef P2T_SUPPORT
+
 /* Name of package */
 #undef PACKAGE
 

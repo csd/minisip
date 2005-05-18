@@ -253,9 +253,10 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 			confid=confid+users[i];
 			i++;
 		}
+		string mysipuri = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
 		users=trim(users.substr(i));
 		cerr<<"confididididididididididididiidididid "+confid<<endl;
-		currentconf=new ConferenceControl(confid,false);
+		currentconf=new ConferenceControl(mysipuri,confid,false);
 		callback->setConferenceController(currentconf);
 		displayMessage("The incoming conference call from "+cmd.getParam(), blue);
 		displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
@@ -891,7 +892,8 @@ void MinisipTextUI::guiExecute(string cmd){
 			displayMessage("UNIMPLEMENTED - only one call/conference at the time with this UI.", red);
 		}else{
 			currentconfname = itoa(rand());
-			currentconf=new ConferenceControl(currentconfname, true);
+			string mysipuri = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+			currentconf=new ConferenceControl(mysipuri,currentconfname, true);
 			//conf->setGui(this);
 			callback->setConferenceController(currentconf);
 			//currentconf->setCallback(callback);
@@ -926,9 +928,15 @@ void MinisipTextUI::guiExecute(string cmd){
 			
 				string uri = trim(command.substr(5));
 				displayMessage("Conf.Uri: "+uri);
+<<<<<<< .mine
+				CommandString cmd("", "join",uri);
+				cmd.setParam3(mainConfId);
+				mainWindow->getCallback()->guicb_handleConfCommand(cmd);
+=======
 				CommandString cmd("","join",uri);
 				cmd.setParam3(currentconfname);
 				callback->guicb_handleConfCommand(cmd);
+>>>>>>> .r1231
 				/*callId = callback->guicb_doInvite(uri);
 				if (callId=="malformed"){
 					state="IDLE";

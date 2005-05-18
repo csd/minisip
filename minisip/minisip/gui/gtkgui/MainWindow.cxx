@@ -53,7 +53,7 @@
 MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	Gtk::Button * callButton;
-	Gtk::Button * conferenceButton;
+	//Gtk::Button * conferenceButton;
 	Gtk::Button * imButton;
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
@@ -179,9 +179,9 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	
 	callMenu->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
 
-	refXml->get_widget( "conferenceButton", conferenceButton );
+	//refXml->get_widget( "conferenceButton", conferenceButton );
 
-	conferenceButton->signal_clicked().connect( SLOT( *this, &MainWindow::conference ) );
+	//conferenceButton->signal_clicked().connect( SLOT( *this, &MainWindow::conference ) );
 	
 	conferenceMenu->signal_activate().connect( SLOT( *this, &MainWindow::conference ) );
 
@@ -495,8 +495,8 @@ void MainWindow::addConference( string confId, string users,string remoteUri,str
 	Gtk::HBox * hbox = new Gtk::HBox;
 	Glib::ustring tabLabelText;
 
-
-	ConferenceWidget * conferenceWidget = new ConferenceWidget( confId, users, remoteUri,callId, this, incoming);
+	string from = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+	ConferenceWidget * conferenceWidget = new ConferenceWidget(from, confId, users, remoteUri,callId, this, incoming);
 
 	conferenceWidgets.push_back( conferenceWidget );
 
