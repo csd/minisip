@@ -42,6 +42,7 @@ uint32_t ILBCCODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 		block[i]=(float)(((short*)in_buf)[i]);
 
 	iLBC_encode((unsigned char *)out_buf, block, &enc_inst);
+        return NO_OF_BYTES;
 }
 
 uint32_t ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
@@ -119,5 +120,5 @@ int32_t ILBCCODEC::getSdpMediaType(){
 }
 
 string ILBCCODEC::getSdpMediaAttributes(){
-	return "iLBC";
+	return "iLBC/8000";
 }
