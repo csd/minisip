@@ -45,6 +45,8 @@
 #include<stdlib.h>
 #include<errno.h>
 
+#include<netinet/ip.h>
+
 
 #ifndef _MSC_VER
 #include<unistd.h>
@@ -171,6 +173,14 @@ int32_t UDPSocket::recv(void *buf, int32_t len){
 	return ::recv(fd,(char *)buf,len,0);
 #endif
 
+}
+
+bool UDPSocket::setLowDelay(){
+	
+	int tos = IPTOS_LOWDELAY;
+	if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos))){
+		cerr << "WARNING: Could not set type of service to be time chritical"<< endl;
+	}
 }
 	
 /*
