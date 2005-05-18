@@ -53,11 +53,6 @@
 #include"../video/codec/AVCoder.h"
 #include"../video/codec/AVDecoder.h"
 #include"../video/mixer/ImageMixer.h"
-//#ifdef IPAQ
-#include"../video/display/SdlDisplay.h"
-//#else
-//#include"../video/display/XvDisplay.h"
-//#endif
 #endif
 
 

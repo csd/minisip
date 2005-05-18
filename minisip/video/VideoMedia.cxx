@@ -30,7 +30,6 @@
 #include"grabber/Grabber.h"
 #include"mixer/ImageMixer.h"
 #include"display/VideoDisplay.h"
-#include"display/SdlDisplay.h"
 #include"../sdp/SdpHeaderM.h"
 #include"../sdp/SdpHeaderA.h"
 #include<libmutil/itoa.h>
