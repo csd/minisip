@@ -34,8 +34,10 @@
 #include<libmsip/SipIMMessage.h>
 
 #include"SipSoftPhoneConfiguration.h"
+#ifdef P2T_SUPPORT
 #include"../p2t/GroupListServer.h"
 #include"../p2t/SipDialogP2T.h"
+#endif
 
 
 
@@ -76,6 +78,7 @@ class DefaultDialogHandler : public SipDialog{
 		
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<MediaHandler*> mediaHandler;
+#ifdef P2T_SUPPORT
 		
 		/**
 		 * Sets up a new P2T Session that is initiated from the local user.
@@ -121,6 +124,7 @@ class DefaultDialogHandler : public SipDialog{
 		 * return true if a dialog was found
 		 */
 		bool getP2TDialog(string GroupId, MRef<SipDialogP2T*> &p2tDialog);
+#endif
 		
 		/**
 		 * Sets the value in the DialogConfig before a SipDialogP2Tuser or
