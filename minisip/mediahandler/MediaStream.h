@@ -70,7 +70,9 @@ class MediaStream : public MObject{
 		MRef<Media *> media;
 		uint32_t csbId;
 		uint32_t ssrc;
-        MRef<Codec *> selectedCodec;
+                // FIXME used only in sender case
+                uint8_t payloadType;
+                MRef<Codec *> selectedCodec;
 
 	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );

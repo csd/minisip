@@ -130,6 +130,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                         if ( rtpmapEqual ) {
                                 if( !selectedCodec ){
                                         selectedCodec = media->getCodec( *iListPLT );
+                                        payloadType = rtpPayloadType;
                                 }
                                 return true;
                         }
@@ -256,9 +257,7 @@ void MediaStreamReceiver::start(){
 
 void MediaStreamReceiver::stop(){
 	list<uint32_t>::iterator i;
-	cerr << "Stopping media receiver for " << getSdpMediaType() << endl;
 	rtpReceiver->unregisterMediaStream( this );
-	cerr << "Unregistered mediaStream from rtpReceiver for " << getSdpMediaType() << endl;
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
@@ -306,7 +305,6 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
 			return;
 		}
 	}
-	fprintf( stderr, "Registering media stream %s\n", media->getSdpMediaType().c_str() );
 	
 	media->registerMediaSource( ssrc );
 	ssrcList.push_back( ssrc );
@@ -318,6 +316,7 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 	remotePort = 0; 
 	seqNo = 0;
 	ssrc = rand();
+        payloadType = 255;
 	if( senderSocket ){
 		this->senderSock = senderSocket;
 	}
@@ -356,12 +355,15 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
         }
 
 	packet = new SRtpPacket( data, length, seqNo++, lastTs, ssrc );
-	
+
         if( dtmf ){
                 packet->getHeader().setPayloadType( 101 );
         }
         else{
-            packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
+                if( payloadType != 255 )
+                        packet->getHeader().setPayloadType( payloadType );
+                else
+                        packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
         }
 
 	if( marker ){
