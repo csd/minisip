@@ -54,7 +54,6 @@ string NetworkException::errorDescription(){
 #endif
 }
 
-#ifndef NO_SECURITY
 
 TLSInitFailed::TLSInitFailed():NetworkException(){
 }
@@ -89,7 +88,6 @@ string TLSConnectFailed::errorDescription(){
 	}
 	return "";
 }
-#endif
 
 
 

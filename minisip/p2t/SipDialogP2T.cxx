@@ -357,9 +357,7 @@ bool SipDialogP2T::a5_listenreq_listen( const SipSMCommand &command){
 				
 		
 			//start SoundReceiver
-#ifndef NO_SECURITY
 			//vc->getSoundReceiver()->initCrypto();
-#endif
 			//vc->getSoundReceiver()->start();
 			//vc->getSoundReceiver()->flush();
 			//vc->getSoundReceiver()->registerSoundSource(-2); //FIXME: 
@@ -795,9 +793,7 @@ bool SipDialogP2T::a12_resent_talk( const SipSMCommand &command){
 		 Start SoundSender
 		 *******/
 
-#ifndef NO_SECURITY
 		//vc->getSoundSender()->initCrypto();
-#endif
 		//vc->getSoundSender()->start();
 		
 		

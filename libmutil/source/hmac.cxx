@@ -24,8 +24,6 @@
 
 #include<config.h>
 
-#ifndef NO_SECURITY
-
 #include <openssl/hmac.h>
 #include <libmutil/hmac.h>
 
@@ -36,4 +34,3 @@ void hmac_sha1( unsigned char * key, unsigned int key_length,
 	HMAC( EVP_sha1(), key, key_length, data, data_length, mac, mac_length );
 }
 
-#endif //NO_SECURITY

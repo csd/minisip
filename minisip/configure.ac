@@ -63,19 +63,6 @@ AC_ARG_ENABLE(memdebug,
         AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
       fi ])
 
-
-dnl no security flag
-AC_ARG_ENABLE(security,
-    [ --disable-security disables security features NOT RECOMMENDED (default enabled)],
-    [ if test "${enable_security}" = "yes"
-      then
-      	AC_DEFINE(USE_SECURITY, [], [Use MIKEY/SRTP])
-      else
-        AC_DEFINE(NO_SECURITY, [], [Disable MIKEY/SRTP - not recommended])
-      fi ])
-
-
-
 dnl debug flag
 AC_ARG_ENABLE(debug,
     [ --enable-debug enables debug output (default disabled)],
@@ -430,12 +417,8 @@ AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/l
 
 
 dnl libmikey headers check
-if test "${enable_security}" = "yes"
-then
-  AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey headers. Try installing the libmikey-devel package for your distribution."])])
-fi
+AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey headers. Try installing the libmikey-devel package for your distribution."])])
 
-AM_CONDITIONAL(NO_SECURITY, [test "${enable_security}" = "no"])
 
 dnl OPIE
 AC_ARG_ENABLE(opie,

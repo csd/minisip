@@ -29,7 +29,6 @@
 #include<stdio.h>
 #include<assert.h>
 
-#ifndef NO_SECURITY
 
 using namespace std;
 
@@ -557,5 +556,4 @@ void certificate_chain::clear(){
 
 }
 
-#endif //NO_SECURITY
 

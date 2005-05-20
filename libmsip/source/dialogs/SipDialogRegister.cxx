@@ -483,10 +483,8 @@ void SipDialogRegister::send_noauth(string branch){
 
 	if(getDialogConfig()->inherited.transport=="TCP")
 		localSipPort = getDialogConfig()->inherited.localTcpPort;
-#ifndef NO_SECURITY
 	else if(getDialogConfig()->inherited.transport=="TLS")
 		localSipPort = getDialogConfig()->inherited.localTlsPort;
-#endif
 	else{
 //		localSipPort = getDialogConfig()->inherited.localUdpPort;
 		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
@@ -511,10 +509,8 @@ void SipDialogRegister::send_auth(string branch){
 
 	if(getDialogConfig()->inherited.transport=="TCP")
 		localSipPort = getDialogConfig()->inherited.localTcpPort;
-#ifndef NO_SECURITY
 	else if(getDialogConfig()->inherited.transport=="TLS")
 		localSipPort = getDialogConfig()->inherited.localTlsPort;
-#endif
 	else{
 		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
         }

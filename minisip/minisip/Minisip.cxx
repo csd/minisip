@@ -279,12 +279,10 @@ void Minisip::run(){
 					phoneConf->inherited.localTcpPort,
 					phoneConf->inherited.externalContactUdpPort,
 					phoneConf->inherited.transport
-#ifndef NO_SECURITY
 					,phoneConf->inherited.localTlsPort,
 					phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
 					//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
 					phoneConf->securityConfig.cert_db
-#endif
 					);
 		//sip->init();
 

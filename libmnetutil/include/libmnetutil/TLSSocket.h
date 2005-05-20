@@ -35,10 +35,6 @@
 #define LIBMNETUTIL_API
 #endif
 
-//#include<config.h>
-
-//#ifndef NO_SECURITY
-
 #include"StreamSocket.h"
 #include"TCPSocket.h"
 #include"IPAddress.h"
@@ -120,7 +116,5 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket{
 };
 
 TLSSocket& operator<<(TLSSocket& sock, string str);
-
-//#endif //NO_SECURITY
 
 #endif

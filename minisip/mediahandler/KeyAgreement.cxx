@@ -27,7 +27,6 @@
 #include"Session.h"
 #include"MediaStream.h"
 
-#ifndef NO_SECURITY
 
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
@@ -649,5 +648,3 @@ void Session::setMikeyOffer(){
 		}
 }
 
-
-#endif //NO_SECURITY

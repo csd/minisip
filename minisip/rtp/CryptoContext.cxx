@@ -29,8 +29,6 @@
 #include<libmutil/print_hex.h>
 #include<libmikey/MikeyPayloadSP.h>
 
-#ifndef NO_SECURITY
-
 CryptoContext::CryptoContext( uint32_t ssrc ):
 ssrc(ssrc),
 using_mki(false),mki_length(0),mki(NULL),
@@ -360,4 +358,3 @@ uint32_t CryptoContext::getSsrc(){
 	return ssrc;
 }
 
-#endif //NO_SECURITY

@@ -155,10 +155,8 @@ class SipDialogP2Tuser: public SipDialog{
 		
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
-#ifndef NO_SECURITY
 		KeyAgreement *getKeyagreement();
 		string getKeyManagementMessage(){return key_mgmt;};
-#endif
 
 		void setKeyManagementMessage(const string &key_mgmt){this->key_mgmt = key_mgmt;};
 

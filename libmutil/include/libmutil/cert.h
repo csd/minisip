@@ -26,8 +26,6 @@
 #define CERT_H
 
 
-//#ifndef NO_SECURITY
-
 extern "C"{
 	#include<openssl/rsa.h>
 	#include<openssl/evp.h>
@@ -203,6 +201,5 @@ class LIBMUTIL_API certificate_exception_chain : public certificate_exception{
 	public:
 		certificate_exception_chain( std::string message ):certificate_exception(message){};
 };
-//#endif //NO_SECURITY
 
 #endif

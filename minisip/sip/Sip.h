@@ -91,12 +91,10 @@ class Sip: public MObject, public Runnable{
 				int32_t localTcpPort=5060,
 				int32_t externalContactUdpPort=5060,
 				string defaultTransportProtocol="UDP"
-#ifndef NO_SECURITY
 				,int32_t localTlsPort=5061,
 				MRef<certificate_chain *> cert=NULL,    //The certificate chain is used by TLS
 				//TODO: TLS should use the whole chain instead of only the f$
 				MRef<ca_db *> cert_db = NULL
-#endif
 		    );
 
 		virtual std::string getMemObjectType(){return "Sip";}

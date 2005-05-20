@@ -58,11 +58,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 							int32_t externalContactUdpPort=5060, 
 							int32_t local_udp_port=5060, 
 							int32_t local_tcp_port=5060 
-#ifndef NO_SECURITY			
 							,int32_t local_tls_port=5061,
 							MRef<certificate_chain *> cchain=NULL, 
 							MRef<ca_db *> cert_db = NULL
-#endif
 		);
 		
 		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
@@ -86,11 +84,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		int32_t getLocalTCPPort(){return localTCPPort;};
 		int32_t getLocalTLSPort(){return localTLSPort;};
 
-#ifndef NO_SECURITY
 		MRef<certificate_chain *> getCertificateChain(){ return cert_chain; };
 		MRef<certificate*> getMyCertificate(){ return cert_chain->get_first(); };
 		MRef<ca_db *> getCA_db () { return cert_db; };
-#endif
 
 		void udpSocketRead();
 
@@ -112,12 +108,10 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		int32_t localUDPPort;
 		int32_t localTCPPort;
 		int32_t localTLSPort;
-
-#ifndef NO_SECURITY
+		
 		MRef<certificate_chain *> cert_chain;
 		MRef<ca_db *> cert_db;
 		void * tls_ctx;
-#endif
 
 		MRef<SipSMCommandReceiver *> commandReceiver;
 

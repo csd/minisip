@@ -37,9 +37,6 @@
 
 #include<libmnetutil/TLSServerSocket.h>
 
-#ifndef NO_SECURITY
-
-
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>
@@ -131,4 +128,3 @@ StreamSocket *TLSServerSocket::accept(){
 	return new TLSSocket( new TCPSocket( cli, &sin ), ssl_ctx );
 }
 
-#endif //NO_SECURITY

@@ -275,10 +275,8 @@ bool SipDialogP2Tuser::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 			/*vc->*/handleSdp(MRef<SdpPacket*>((SdpPacket*)*resp->getContent()));
 			//vc->openSoundCard();
 
-#ifndef NO_SECURITY
 			//vc->getSoundSender()->initCrypto();
 			//vc->getSoundReceiver()->initCrypto();
-#endif
 			//vc->getSoundReceiver()->start();
 			//vc->getSoundSender()->start();
 
@@ -619,10 +617,8 @@ bool SipDialogP2Tuser::a11_ringing_incall_accept( const SipSMCommand &command)
 		if ( !/*vc->*/getLastInvite()->getContent().isNull() ){
 			/*vc->*/handleSdp(MRef<SdpPacket*>((SdpPacket*) * /*vc->*/getLastInvite()->getContent()));
 			//vc->openSoundCard();
-#ifndef NO_SECURITY
 			//vc->getSoundSender()->initCrypto();
 			//vc->getSoundReceiver()->initCrypto();
-#endif
 			//vc->getSoundReceiver()->start();
 			//vc->getSoundSender()->start();
 
@@ -858,10 +854,8 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 			/*vc->*/handleSdp(MRef<SdpPacket*>((SdpPacket*)*resp->getContent()));
 			//vc->openSoundCard();
 
-#ifndef NO_SECURITY
 			//vc->getSoundSender()->initCrypto();
 			//vc->getSoundReceiver()->initCrypto();
-#endif
 			//vc->getSoundReceiver()->start();
 			//vc->getSoundSender()->start();
 
@@ -880,7 +874,6 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 	}
 }
 
-#ifndef NO_SECURITY
 bool SipDialogP2Tuser::a24_calling_termwait_2xx(
 //		State<SipSMCommand, string> *fromState,
 //		State<SipSMCommand, string> *toState,
@@ -909,8 +902,6 @@ bool SipDialogP2Tuser::a24_calling_termwait_2xx(
 		return false;
 	}
 }
-#endif
-
 
 bool SipDialogP2Tuser::a25_termwait_terminated_notransactions(
 		const SipSMCommand &command){
@@ -1008,14 +999,12 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				s_callingnoauth, s_incall
 				);
 
-#ifndef NO_SECURITY
 //	StateTransition<SipSMCommand,string> *transition_callingnoauth_termwait_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_termwait_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogP2Tuser::a24_calling_termwait_2xx,
 				s_callingnoauth, s_termwait
 				);
-#endif
 
 //	StateTransition<SipSMCommand,string> *transition_incall_termwait_BYE=
 		new StateTransition<SipSMCommand,string>(this,
@@ -1117,14 +1106,12 @@ void SipDialogP2Tuser::setUpStateMachine(){
 				s_callingauth, s_incall
 				);
 	
-#ifndef NO_SECURITY
 //	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_2xx=
 		new StateTransition<SipSMCommand,string>(this,
 				"transition_callingauth_termwait_2xx",
 				(bool (StateMachine<SipSMCommand,string>::*)(/*State<SipSMCommand, string> *,State<SipSMCommand, string> *,*/const SipSMCommand&)) &SipDialogP2Tuser::a24_calling_termwait_2xx,
 				s_callingauth, s_termwait
 				);
-#endif
         
 //	StateTransition<SipSMCommand,string> *transition_callingauth_termwait_resp36=
 		new StateTransition<SipSMCommand,string>(this,
@@ -1179,11 +1166,9 @@ SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipStack*> stack, MRef<SipDialogConfig*>
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;
 
-//#ifndef NO_SECURITY
 //	setKeyAgreement( getDialogContainer()->getPrecomputedKa() );
 //
 //	getDialogContainer()->setPrecomputedKa( NULL );
-//#endif
 	
 	//set p2tDialog
 	this->p2tDialog=p2tDialog;
@@ -1240,10 +1225,8 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 
 	if(getDialogConfig()->inherited.transport=="TCP")
 		localSipPort = getDialogConfig()->inherited.localTcpPort;
-#ifndef NO_SECURITY
 	else if(getDialogConfig()->inherited.transport=="TLS")
 		localSipPort = getDialogConfig()->inherited.localTlsPort;
-#endif
 	else{ /* UDP, may use STUN */
             if( getPhoneConfig()->useSTUN ){
 		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
@@ -1313,10 +1296,8 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 
 	if(getDialogConfig()->inherited.transport=="TCP")
 		localSipPort = getDialogConfig()->inherited.localTcpPort;
-#ifndef NO_SECURITY
 	else if(getDialogConfig()->inherited.transport=="TLS")
 		localSipPort = getDialogConfig()->inherited.localTlsPort;
-#endif
 	else{ /* UDP, may use STUN */
             if( getPhoneConfig()->useSTUN ){
 		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
@@ -1487,7 +1468,6 @@ void SipDialogP2Tuser::sendInviteOk(const string &branch){
 	//getSoundSender()->setCodec(orderedcodecs[0]);
  	myCodec=orderedcodecs[0];
 	
-#ifndef NO_SECURITY 
 	if (getDialogConfig()->inherited.secured && (getDialogConfig()->inherited.ka_type & KEY_MGMT_METHOD_MIKEY))
 //		ok->setContent( new SdpPacket(getDialogConfig().inherited.localIpString, 
 		ok->setContent( new SdpPacket(getDialogConfig()->inherited.externalContactIP, 
@@ -1496,7 +1476,6 @@ void SipDialogP2Tuser::sendInviteOk(const string &branch){
 					orderedcodecs, 
 					key_mgmt) );
 	else
-#endif
 //		ok->setContent( new SdpPacket(getDialogConfig().inherited.localIpString, 
 		ok->setContent( new SdpPacket(getDialogConfig()->inherited.externalContactIP, 
 //					getSoundReceiver()->getSocket()->get_port(), 

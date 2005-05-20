@@ -35,13 +35,9 @@
 #define LIBMNETUTIL_API
 #endif
 
-//#include<config.h>
-
 #include<string.h>
 
-#ifndef NO_SECURITY
 #include<openssl/ssl.h>
-#endif
 
 #include<string>
 
@@ -105,7 +101,6 @@ class LIBMNETUTIL_API GetSockNameFailed : public NetworkException{
 		GetSockNameFailed( int errorNumber );
 };
 
-#ifndef NO_SECURITY
 class LIBMNETUTIL_API TLSConnectFailed : public ConnectFailed{
 	public:
 		TLSConnectFailed( int errorNumber, SSL * ssl  );
@@ -130,8 +125,5 @@ class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
 			"TLS context initialization failed.";
 		};
 };
-#endif //NO_SECURITY
 
-
-	
 #endif

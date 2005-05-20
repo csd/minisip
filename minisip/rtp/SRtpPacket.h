@@ -25,11 +25,7 @@
 
 #include<config.h>
 
-#ifndef NO_SECURITY
-
-// #include<srtp.h>
 #include "RtpPacket.h"
-//#include "SRtpHeader.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 #include "CryptoContext.h"
@@ -72,6 +68,5 @@ class SRtpPacket : public RtpPacket{
 		unsigned int mki_length;
 };
 
-#endif //NO_SECURITY
 
 #endif

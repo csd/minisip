@@ -37,8 +37,6 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/TLSSocket.h>
 
-#ifndef NO_SECURITY
-
 
 
 #include<iostream>
@@ -237,4 +235,3 @@ int32_t TLSSocket::setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx ) {
 	} else return 1;
 }
 
-#endif //NO_SECURITY

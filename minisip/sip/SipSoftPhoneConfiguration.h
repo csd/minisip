@@ -126,10 +126,7 @@ class SipSoftPhoneConfiguration : public MObject{
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
 		
 
-
-#ifndef NO_SECURITY
 		bool tls_server;
-#endif
 
 		list<MRef<PhoneBook *> > phonebooks;
 

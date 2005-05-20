@@ -57,9 +57,7 @@ void SipIdentity::setSipUri(string addr){
 SipCommonConfig::SipCommonConfig():
 	localUdpPort(0),
 	localTcpPort(0),
-#ifndef NO_SECURITY
 	localTlsPort(0),
-#endif
 	transport(("")),
 	autoAnswer(false){
 
@@ -75,9 +73,7 @@ void SipCommonConfig::save( XMLFileParser * parser ){
 	 ***********************************************************/
 	parser->changeValue("local_udp_port", itoa(localUdpPort));
 	parser->changeValue("local_tcp_port", itoa(localTcpPort));
-#ifndef NO_SECURITY
 	parser->changeValue("local_tls_port", itoa(localTlsPort));
-#endif
 	parser->changeValue("auto_answer", autoAnswer?"yes":"no");
 
 	parser->changeValue("transport", transport);

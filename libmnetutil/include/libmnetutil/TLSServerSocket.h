@@ -35,9 +35,6 @@
 #define LIBMNETUTIL_API
 #endif
 
-//#include<config.h>
-
-////#ifndef NO_SECURITY
 
 #include"TLSSocket.h"
 #include"IP4ServerSocket.h"
@@ -66,7 +63,5 @@ class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
 		/* CA db */
 		MRef<ca_db *> cert_db;
 };
-
-//#endif //NO_SECURITY
 
 #endif

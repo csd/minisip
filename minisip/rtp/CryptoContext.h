@@ -28,37 +28,17 @@
 
 #include<config.h>
 
-
-#ifndef NO_SECURITY
-
 #include"RtpPacket.h"
 #include<libmutil/aes.h>
 #include<libmutil/hmac.h>
 #include<libmutil/MemObject.h>
 
-//#include"../keyagreement/keyagreement.h"
 #define REPLAY_WINDOW_SIZE 64
-
-//enum encr_method{ 
-//	no_encr,
-//	aes_cm,
-//	aes_f8
-//};
-
-//enum auth_method{
-//	no_auth,
-//	hmacsha1
-//};
 
 class CryptoContext : public MObject{
 	public:
 		CryptoContext( uint32_t ssrc );
-#if 0
-		CryptoContext( int roc, int key_deriv_rate,
-				enum encr_method encryption, 
-				enum auth_method authentication,
-				KeyAgreement * key_agreement );
-#endif
+		
 		CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
 				//enum encr_method encryption, 
 				uint8_t ealg, 
@@ -132,8 +112,6 @@ class CryptoContext : public MObject{
 		uint8_t encr;
 		uint8_t auth;
 };
-
-#endif //NO_SECURITY
 
 #endif
 

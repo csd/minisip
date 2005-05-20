@@ -181,9 +181,7 @@ class LIBMSIP_API SipCommonConfig : public MObject{
                 
 		int32_t localUdpPort;	// Advanced -> ...Sip port...
 		int32_t localTcpPort;
-#ifndef NO_SECURITY
 		int32_t localTlsPort;
-#endif
 
 		
 		MRef<SipIdentity*> sipIdentity;

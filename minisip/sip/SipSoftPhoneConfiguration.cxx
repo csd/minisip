@@ -68,9 +68,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	dynamicSipPort(false),
 	usePSTNProxy(false),
 	tcp_server(false),
-#ifndef NO_SECURITY
 	tls_server(false),
-#endif
 	ringtone(""),
 	p2tGroupListServerPort(0)
 {
@@ -155,9 +153,7 @@ void SipSoftPhoneConfiguration::save(){
 	 * Advanced settings
 	 ************************************************************/
 	parser->changeValue("tcp_server", tcp_server? "yes":"no");
-#ifndef NO_SECURITY
 	parser->changeValue("tls_server", tls_server? "yes":"no");
-#endif
 
 	parser->changeValue("ringtone", ringtone);
 

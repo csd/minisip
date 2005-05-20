@@ -57,13 +57,9 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 		int32_t localTcpPort,
 		int32_t externalContactUdpPort,
 		string defaultTransportProtocol
-#ifndef NO_SECURITY
 		,int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
-#endif
-
-		
 		){
 //	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
 	

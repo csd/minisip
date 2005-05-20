@@ -180,9 +180,6 @@
 /* No debug output */
 #undef NDEBUG
 
-/* Disable MIKEY/SRTP - not recommended */
-#undef NO_SECURITY
-
 /* Use libglademm-2.0 */
 #undef OLDLIBGLADEMM
 

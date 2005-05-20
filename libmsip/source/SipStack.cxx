@@ -72,11 +72,9 @@ SipStack::SipStack(MRef<SipDialog*> defaultDialog,
 		int32_t localTcpPort,
 		int32_t externalContactUdpPort,
 		string defaultTransportProtocol
-#ifndef NO_SECURITY
 		,int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
-#endif
 		)
 {
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptContactFactory);
