@@ -1,0 +1,50 @@
+Generate a self-signed certificate to use as certificate authority (CA)
+=======================================================================
+
+
+First you need to generate a key for that certificate:
+
+$ openssl genrsa -out ca_key.pem 1024
+
+This creates a rsa private key of length 1024 bits in ca_key.pem.
+
+After that you need to generate the self-signed certificate, which
+will contain the public key associated with this private key.
+
+$ openssl req -x509 -new -key ca_key.pem -days 365 -out ca_cert.pem
+
+You will be asked to enter some information about the certificate subject.
+    -x509 tells openssl to generate a self-signed certificate (instead of
+          a certificate signing request)
+    -key  specifies which private key to use
+    -days specifies how many days the certificate will be valid
+    -out  specifies in which file to save the certificate
+
+
+
+Generate a user certificate signed by this certificate authority
+================================================================
+
+Similarly you first need to generate a private key:
+
+$ openssl genrsa -out alice_key.pem 1024
+
+After that you will need to generate a certificate signing request. This
+is then sent to the certificate authority for signing, and returned as
+a certificate. 
+
+$ openssl req -new -key alice_key.pem -days 365 -out alice_cert_req.pem
+
+This certificate signing request has to be signed by the certificate authority.
+
+$ openssl x509 -CA ca_cert.pem -CAkey ca_key.pem -CAcreateserial -in alice_cert_req.pem -out alice_cert.pem
+
+After that the certificate is signed, and the request file (alice_cert_req.pem)
+can be discarded.
+      -CA             specifies the certificate authority's filename
+      -CAkey          specifies the associated CA private key
+      -CAcreateserial is used the first time the CA is used, to generate
+                      a serial file. It shall not be used for the next
+                      certificates
+      -in             specifies the input certificate signing request
+      -out            specifies the output signed certificate
