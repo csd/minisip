@@ -28,14 +28,19 @@
 /* Name
  *	TimeoutProvider.h
  * Purpose
- * 	Provides a way to request timeouts after a number of milli seconds. To each a
- * 	command is associated.
+ * 	Provides a way to request timeouts after a number of milli seconds. A command
+ * 	is associated to each timeout.
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se, 2003
 */
 
 /*
- *TODO: Handle destruction ("join" threads)
+ *TODO:
+ * - Complexity should be: Insert new timeout: O(log n); "Pop" timeout: O(1). Now it is O(n/2) and O(1). 
+ *   This can be fixed with priority queues (heaps). It is not fixed since
+ *   the implementation also needs to be able to return a list of all
+ *   pending timeouts (for debugging purposes). This is not always the case
+ *   of a heap (investigate or implement our own).
 */ 
 
 #include<list>
@@ -63,13 +68,16 @@
 #include<libmutil/CondVar.h>
 
 /**
+ * Reprsents a request of a "timeout" (delivery of a command to a
+ * "timeout receiver" after at least a specified time period).
  * NOTE: This class is only used internaly.
  * @author Erik Eliasson
 */
 template<class TOCommand, class TOSubscriber>
 class TPRequest{
 	public:
-		TPRequest(){}
+//		TPRequest(){}
+
 		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){
 			
 			when_ms = mtime();
@@ -77,6 +85,9 @@ class TPRequest{
 			this->command=command;
 		}
 		
+		/**
+		 * @param t  ms since Epoch
+		 */
 		bool happens_before(uint64_t t){
 			if (when_ms < t)
 				return true;
@@ -110,6 +121,11 @@ class TPRequest{
 			return subscriber;
 		}
 
+		/**
+		 * Two timeout requests are considered equeal if they have
+		 * the same subscriber AND command AND time when they
+		 * occur.
+		 */
 		bool operator==(const TPRequest<TOCommand, TOSubscriber> &req){
 			if (req.subscriber==subscriber && 
 					req.command==command && 
@@ -121,8 +137,11 @@ class TPRequest{
 		
 	private:
 		TOSubscriber subscriber;
-		uint64_t when_ms;
-		TOCommand command;
+		uint64_t when_ms; 	 /// Time since Epoch in ms when the 
+					 /// timeout will happen
+					 
+		TOCommand command;	 /// Command that will be delivered to the
+					 /// receiver (subscriber) of the timeout.
 };
 
 
@@ -131,11 +150,18 @@ class TPRequest{
  * @author Erik Eliasson
  */
 template<class TOCommand, class TOSubscriber>
-class TimeoutProvider : public MObject{
+class TimeoutProvider : public MObject, Runnable{
 
 	public:
 		string getMemObjectType(){return "TimeoutProvider";}
-		string getTimeouts(){
+
+		/**
+		 * The purpose of this method is mainly
+		 * monitoring/debugging features in applications.
+		 * 
+		 * @return All timeouts waiting to occur.
+		 */
+/*		string getTimeouts(){
 			string ret;
 
 			synch_lock.lock();
@@ -152,7 +178,8 @@ class TimeoutProvider : public MObject{
 			synch_lock.unlock();
 			return ret;
 		}
-                
+*/  
+
 		std::list<TPRequest<TOCommand, TOSubscriber> > getTimeoutRequests(){
 			std::list<TPRequest<TOCommand, TOSubscriber> > retlist;
 			synch_lock.lock();
@@ -163,6 +190,7 @@ class TimeoutProvider : public MObject{
 			return retlist;   
 		}
 
+
 		/**
 		 * @param signal_no	The TimeoutProvider uses signals internally. Which 
 		 * 			signal being used is specified as argument to the 
@@ -170,12 +198,22 @@ class TimeoutProvider : public MObject{
 		 * 			internal thread (but it still has side effects such
 		 * 			as setting signal handler).
 		 */		
-		TimeoutProvider(): requests(),waitCond(),synch_lock(){
-			Thread::createThread(loop_starter, (void*)this);
+		TimeoutProvider(): requests(),waitCond(),synch_lock(),stop(false){
+			thread = new Thread(this);
 		}
 
+		/**
+		 * The destructor is not guaranteed to finnish since it 
+		 * waits for the thread delivering timeouts to return. That
+		 * thread will stop if it is either sleeping or after it
+		 * has finished delivering a timeout.
+		 */
 		~TimeoutProvider(){
-			cerr << "ERROR: BUG: Destructing timeout provider is not yet supported"<<endl;
+			stop=true;
+			wake();
+			thread->join();
+			delete thread;
+			thread=NULL;
 		}
 
 		/**
@@ -183,13 +221,13 @@ class TimeoutProvider : public MObject{
 		 * 			wanted. Note that a small additional period of time is
 		 * 			added that depends on execution speed.
 		 * @param subscriber	The receiver of the callback when the command has timed
-		 * 			out.
+		 * 			out. This argument must not be NULL.
 		 * @param command	Specifies the String command to be passed back in the
 		 * 			callback.
 		 */
 		void request_timeout(int32_t time_ms, TOSubscriber subscriber, const TOCommand &command){
+			assert(subscriber);
 			TPRequest<TOCommand, TOSubscriber> request(subscriber, time_ms, command);
-
 
                         synch_lock.lock();
 
@@ -240,6 +278,9 @@ class TimeoutProvider : public MObject{
 			}
                         synch_lock.unlock();
 		}
+		void run(){
+			loop();
+		}
 
 	private:
 
@@ -266,30 +307,54 @@ class TimeoutProvider : public MObject{
 				if ((size=requests.size())>0)
 					time = requests[0].get_ms_to_timeout();
 				if (time==0 && size > 0){
+					if (stop){		//This must be checked so that we will
+								//stop even if we have timeouts to deliver.
+						return;
+					}
 					TPRequest<TOCommand, TOSubscriber> req = requests[0];
 					TOSubscriber subs=req.get_subscriber();
 					TOCommand command=req.get_command();
 					requests.remove(req);
                                         synch_lock.unlock();
+					assert(subs);		
 					subs->timeout(command);
 				}else{
                                         synch_lock.unlock();
+					if (stop){		// If we were told to stop while delivering 
+								// a timeot we will exit here
+						return;
+					}
 					this->sleep(time);
+					if (stop){		// If we are told to exit while sleeping we
+								// will exit here return;
+						return;
+					}
 				}
-
 			}while(true);
 		}
 
-		static void *loop_starter(void *tp){
-			TimeoutProvider *t = (TimeoutProvider*)tp;
-			t->loop();
-			return NULL;
-		}
+		minilist<TPRequest<TOCommand, TOSubscriber> > requests; /// List of timeouts waiting to be delivered or canceled.
+									/// The timeouts are ordered in the order of which they 
+									/// will expire. Nearest in future is first in list.
+									///TODO: Change this functionality to a heap/priority queue 
+									/// to improve scalability
+
+		CondVar waitCond;	///Used to block until a signal from 
+					///another thread or a timeout.
+					
+		Mutex waitCondLock;	
 		
-		minilist<TPRequest<TOCommand, TOSubscriber> > requests;
-		CondVar waitCond;
-		Mutex waitCondLock;
-                Mutex synch_lock;
+                Mutex synch_lock;	/// Protects the internal data structures
+					/// from simultaneous modification
+					/// by worker thread (loop) and
+					/// external threads (request/cancel/...)
+
+		Thread *thread;		/// Worker thread running "loop".
+	
+		bool stop;		/// Flag to tell the worker thread
+					/// to terminate. Set to true and
+					/// wake the worker thread to
+					/// terminate it.
 };
 
 #endif
