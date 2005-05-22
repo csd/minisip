@@ -322,6 +322,7 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 	}
 	else{
 		senderSock = new UDPSocket;
+		senderSock->setLowDelay();
 	}
 }
 
