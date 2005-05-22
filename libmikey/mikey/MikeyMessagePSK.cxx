@@ -40,7 +40,8 @@
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmutil/hmac.h>
 
-#define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
+//#define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
+const int64_t MAX_TIME_OFFSET = 0xe100000<<16; //1 hour
                                                                                 
 
 
