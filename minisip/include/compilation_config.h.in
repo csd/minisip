@@ -225,9 +225,6 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Use MIKEY/SRTP */
-#undef USE_SECURITY
-
 /* STL enabled */
 #undef USE_STL
 
