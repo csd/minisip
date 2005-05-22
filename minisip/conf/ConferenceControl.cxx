@@ -150,12 +150,13 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 	{
 		bool done=false;
 		string sip_url=command.getParam();
-		for(int t=0;t<connectedList.size()&&!done;t++)
+		int t;
+		for(t=0;t<connectedList.size()&&!done;t++)
 			if(connectedList[t].uri==sip_url)
 			{
 				done=true;
 			}	
-		for(int t=0;t<pendingList.size()&&!done;t++)
+		for(t=0;t<pendingList.size()&&!done;t++)
 			if(pendingList[t].uri==sip_url)
 			{
 				done=true;
