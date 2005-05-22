@@ -64,14 +64,21 @@ template<class CommandType, class TimeoutType> class State;
  * 
  * Note:  State machines, states and transitions are using the MRef/MObject
  * classes to handle "garbage collection". The state machines and the
- * transitions reference each other. Therefore we must break the circel 
- * so that the it becomes a chain that none references (and therefore will
+ * transitions reference each other. Therefore we must break the circle 
+ * so that the it becomes a chain that is not referenced by anyone (and therefore will
  * be freed). For this purpose you have the freeStateMachine method which
  * you (unfortunately) must run on any object you want to be removed
  * from the heap.
 */
 template<class CommandType, class TimeoutType> class StateMachine : public virtual MObject{
 	public:
+		/**
+		 * Initializes the state machine to have no states and no
+		 * transitions.
+		 * 
+		 * @param tp	Timeoutprovider that the state machine will
+		 * 		use for timeouts.
+		 */
 		StateMachine( MRef<TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType, TimeoutType> *>  > *> tp): 
 				current_state(NULL), 
 				timeoutProvider(tp)
@@ -79,9 +86,6 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		}
 					
 		virtual ~StateMachine(){
-			freeStateMachine();	//Note: this is not needed and we should not 
-						//run the destructor if it
-						//has not already been run
 		}
 
 		void freeStateMachine(){
@@ -99,10 +103,21 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		
 		string getMemObjectType(){return "StateMachine";}
 		
+		/**
+		 * Adds a state that will have no transitions connected to
+		 * it to the state machine. If it is the first state added
+		 * to the machine it will be set as the current state.
+		 */
 		void addState(MRef<State<CommandType, TimeoutType> *> state){
+			if (!current_state)
+				current_state = state;
 			states.push_back(state);
 		}
 
+		/**
+		 * When a state is created it is given a name. This method
+		 * returns the first state with a matching name.
+		 */
 		MRef<State<CommandType, TimeoutType> *> getState(const string &name){
 			for (typename list<MRef<State<CommandType,TimeoutType> *> >::iterator i=states.begin(); i!=states.end(); i++)
 				if ((*i)->getName()==name)
@@ -110,15 +125,32 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 			return NULL;
 		}
 
-		
+		/**
+		 * A state machine has a current state that can only be
+		 * NULL if the state machine has no state. This method
+		 * sets which state is the current one (the state that
+		 * the machine is in).
+		 */
 		void setCurrentState(MRef<State<CommandType,TimeoutType> *> state){
 			current_state = state;
 		}
 		
+		/**
+		 * Each state is assigned a name (that is not required to be
+		 * unique) when it is created. This method returns the name
+		 * assigned to the state that the machine is in.
+		 */
 		string getCurrentStateName() const{
 			return current_state->getName();
 		}
 
+		/**
+		 * Handles input to the state machine. The machine can
+		 * react on the input depending on which state it is
+		 * in and which transitions that state has.
+		 * @return TRUE is returned if a transition/action was
+		 * 	   taken and FALSE if no transition was triggered.
+		 */
 		virtual bool handleCommand(const CommandType &command){
 			if (current_state){
 				return current_state->handleCommand(command);
@@ -127,9 +159,19 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 			}
 		}
 
+		/**
+		 * Requests a timeout that will be sent to this state
+		 * machine.
+		 */
 		void requestTimeout(int32_t ms, const TimeoutType &command){
 			timeoutProvider->request_timeout(ms, this, command);
 		}
+
+		/**
+		 * Cancels a previously requested timeout. If the timeout
+		 * does not exist (it might have expired/fired) this
+		 * call has no effect.
+		 */
 		void cancelTimeout(const TimeoutType &command){
 			timeoutProvider->cancel_request(this, command);
 		}
@@ -138,6 +180,10 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 
 		virtual void handleTimeout(const TimeoutType &){cerr <<"WARNING: UNIMPLEMENTED handleTimeout"<<endl;};
 
+		/**
+		 * This method should not be called by an application. It
+		 * is required by Timeoutprovider.
+		 */
 		void timeout(const TimeoutType &command){handleTimeout(command);};
 
 	private:
