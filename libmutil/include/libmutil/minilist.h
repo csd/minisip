@@ -42,6 +42,7 @@
 #define LIBMUTIL_API
 #endif
 
+//#define MINILIST_VALIDATE
 
 //Node for single linked list
 template<class T>
@@ -69,12 +70,21 @@ template<class T>
 class minilist{
 	public:
 		
+		/**
+		 * Creates an empty list
+		 */
 		minilist():head(NULL),end(NULL),nelem(0)
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			,last_index(-2)
 #endif
 			{}
 
+		/**
+		 * Copy constructor that initializes a list to be equeal
+		 * to another list.
+		 * Complexity: O(n) where n is the number of items in the
+		 * list.
+		 */
 		minilist(const minilist &l2)
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			:last_index(-2)
@@ -85,22 +95,29 @@ class minilist{
 			node<T> *last=NULL;
 			
 			for (int i=0; i< nelem; i++){
-				node<T> *tmp = new node<T>( l2cur->getValue(), l2cur->getNext() ) ;
+				node<T> *tmp = new node<T>( l2cur->getValue(), NULL ) ;
 				if (i==0)
 					head = tmp;
 				if (i==nelem-1)
 					end = tmp;
-				if (last!=NULL)
+				if (last!=NULL) // last==NULL on first itteration
 					last->setNext(tmp);
 				last = tmp;
 				l2cur = l2cur->getNext();
 			}
 		}
 		
+		/**
+		 * Frees all allocated space by calling the empty() method.
+		 */
 		~minilist(){
 			empty();
 		}
-
+		
+		/**
+		 * Complexity: O(n) where n is the number of elements in
+		 * the list.
+		 */
 		void empty(){
 			node<T> *cur = head;
 			while (cur){
@@ -110,6 +127,10 @@ class minilist{
 			}
 		}
 
+		/**
+		 * Inserts an element into the beginning of the list.
+		 * Complexity: O(1)
+		 */
 		void push_front(T item){
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			if (last_index>=0)
@@ -123,6 +144,10 @@ class minilist{
 				end=n;
 		}
 	
+		/**
+		 * Adds an element to the end of the list.
+		 * Complexity: O(1)
+		 */
 		void push_back(T item){
 			nelem++;
 			node<T> *n = new node<T>(item, NULL);
@@ -134,6 +159,11 @@ class minilist{
 			}
 		}
 
+		/**
+		 * Removes and returns the last element in the list.
+		 * Complexity: O(n)
+		 * TODO: Improve performance by using the "last_index".
+		 */
 		T pop_back(){
 			assert(size()>0);
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
@@ -156,6 +186,10 @@ class minilist{
 			return ret;
 		}
 
+		/**
+		 * Inserts an item at the i:th position.
+		 * Complexity: O(n)
+		 */
 		void insert(int i, T item){
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			last_index=-2;
@@ -166,7 +200,9 @@ class minilist{
 				nelem++;
 				node<T> *n = new node<T>(item, NULL);
 				head = end = n;
+#ifdef MINILIST_VALIDATE
 				validate();
+#endif
 				return;
 			}
 
@@ -175,7 +211,9 @@ class minilist{
 				node<T> *n = new node<T>(item, head);
 //				node<T> *old_first = head;
 				head = n;
+#ifdef MINILIST_VALIDATE
 				validate();
+#endif
 				return;
 			}
 
@@ -194,7 +232,9 @@ class minilist{
 				node<T> *n = new node<T>(item, cur->getNext() );
 				cur->setNext(n);
 			}
+#ifdef MINILIST_VALIDATE
 			validate();
+#endif
 		}
 
 		void remove(T val){
@@ -245,6 +285,7 @@ class minilist{
 			delete cur;
 		}
 
+#ifdef MINILIST_VALIDATE
 		void validate(){
 			node<T> *cur = head;
 			int i;
@@ -286,6 +327,7 @@ class minilist{
 			}
 
 		}
+#endif
 
 		minilist &operator=(const minilist &l2) {
 			nelem = l2.nelem;
