@@ -55,6 +55,9 @@
 #include<libmsip/SipMessageContentFactory.h>
 
 
+
+MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
+
 /**
  * Base class for the SIP packet classes.
  * Contains the fundamental fields for all SIP packets, methods
@@ -62,17 +65,47 @@
  * 
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-
-MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
-
 class LIBMSIP_API SipMessage : public SipMessageContent{
 
 	public:
 		virtual std::string getContentType(){ return "message/sipfrag"; };
+
+		/**
+		 * Registry of the registred SIP message content parsers.
+		 * Adding support for a new content type means adding
+		 * a factory to this collection.
+		 */
 		static SMCFCollection contentFactories;
 
+		/**
+		 * Parent of all SIP messages that only sets branch and
+		 * type. Headers and content must be added to the message
+		 * to make it a valid SIP message. This is typically done
+		 * in the constructor of the sub-class.
+		 * @param branch	All SIP messages have a branch
+		 * 			value (which transaction they
+		 * 			belong to). This argument may be an
+		 * 			empty string.
+		 * @param type		Each SIP message has a type. The
+		 * 			type can be accessed via the
+		 * 			getType method. Each SIP message
+		 * 			class has a static constant type
+		 * 			value that this can be checked
+		 * 			against. Example: if
+		 * 			(msg->getType()==SipInvite::type){...}
+		 * 			
+		 */
 		SipMessage(string branch, int type);
+
+
+	protected:
+		/**
+		 * Creates a SIP message from a buffer. This superclass
+		 * parses the buffer and creates headers and content.
+		 */
 		SipMessage(int type, string &build_from);
+	public:
+		
 		virtual ~SipMessage();
 
 		static MRef<SipMessage*> createMessage(string &buf); 
@@ -87,6 +120,13 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                  *     respective sub-classes, for example SipBye::type.
                  */
 		int getType();
+
+		/**
+		 * Returns a string representation of the type of the SIP
+		 * message IF it is implemented in libmsip and not extended
+		 * by the application using minisip. The purpose of this
+		 * method is mainly for debugging.
+		 */
 		string getTypeString(){
 			char *types[12]={"TYPE0","INVITE","REGISTER","BYE","CANCEL","ACK","NOTIFY","SUBSCRIBE","RESPONSE","MESSAGE","REFER","TYPE11"};
 			if (getType()>11)
@@ -98,7 +138,9 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		
                 /**
                  * Adds one header (specialization of SipHeader) to the SIP
-                 * message. 
+                 * message. The header added first to the SIP message will
+		 * also appear first in the string representation of the
+		 * message returned by getString().
                  * @param header        Header to add.
                  */
 		void addHeader(MRef<SipHeader*> header);
@@ -126,11 +168,14 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                 MRef<SipHeaderValueTo*> getHeaderValueTo();
 		
                 /**
+		 * Sets the content of the SIP message. A SIP message can
+		 * only contain one content. This single content can be a
+		 * multipart content (see SipMIMEContent).
+		 * 
                  * @param content       Content of the SIP message. This
                  *                      affects the ContentLength and any
                  *                      previous content will be removed.
                  */
-		//void setContent(MRef<SdpPacket*> content);
 		void setContent(MRef<SipMessageContent*> content);
 
                 /**
@@ -151,9 +196,15 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                 /**
                  * @return The branch parameter associated with the top
 		 * most via header, or an empty string if there is no via
-		 * header or if the branch is not set in the topmost via..
+		 * header or if the branch is not set in the topmost via
+		 * header.
                  */
 		string getFirstViaBranch();
+
+		/**
+		 * @return The branch parameter in the last via header in
+		 * the message.
+		 */
 		string getLastViaBranch();
 		
 
@@ -173,6 +224,9 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                 SipURI getTo();
                 
 
+		/**
+		 * Removes all via headers that may be in the message.
+		 */
 		void removeAllViaHeaders();
 		
                 /**
@@ -191,16 +245,17 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		string getWarningMessage();
 
+		
 		friend ostream & operator<<(ostream &out, SipMessage &);
                 std::string getDescription();
 		
-		MRef<SipHeaderValue*> getHeaderValueNo(int type, int i);
-
-		
-		
+		/**
+		 *
+		 * @return Branch parameter associated with this message.
+		 * If it is non empty string it identifies which
+		 * transaction it belongs to.
+		 */
 		string getDestinationBranch();
-
-
 
                 /**
                  * @returns Nonce in this repsonse if available.
@@ -212,10 +267,29 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                  */
                 string getRealm();
 
-		
-
+		/**
+		 * @return Number of headers in this message. Notice that
+		 * this is not the number of header values that can be
+		 * higher.
+		 */
 		int getNoHeaders();
+
+		/**
+		 * @return Returns the i:th header in the message. See
+		 * getHeaderValueNo() to get the i:th header value of a
+		 * certain type.
+		 */
 		MRef<SipHeader*> getHeaderNo(int i);
+		
+		/**
+		 * Returns the i:th header value of a specific type. Note
+		 * that the i:th header value of a type may be in header
+		 * [1..i] of that type since one header can have several
+		 * header values.
+		 */
+		MRef<SipHeaderValue*> getHeaderValueNo(int type, int i);
+
+
 
 	protected:
 		void setDestinationBranch(string b){branch = b;}
@@ -226,11 +300,21 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 
 		minilist<MRef<SipHeader*> > headers;
 		
+		/**
+		 * Parses one line of text to a SIP header and adds it to
+		 * the message. If the message can be parsed depends if a
+		 * "factory" is available for the header type (and if the
+		 * string is a valid header of that type)
+		 */
 		bool addLine(string line);
 		
 	private: 
 		MRef<SipMessageContent*> content;
 
+		/**
+		 * Gets the i:th header of a certain type. In most cases,
+		 * users are 
+		 */
 		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		
 		int parseHeaders(const string &buf, int startIndex);
