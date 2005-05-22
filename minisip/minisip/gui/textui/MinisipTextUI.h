@@ -57,10 +57,10 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
     private:
 	
         void showMem();
-        void showCalls(string);
-        void showStat(string);
+        void showCalls();
+        void showStat();
         void showTransactions(string);
-        void showTimeouts(string);
+        void showTimeouts();
 	void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header);
 	
 	ConferenceControl *currentconf;

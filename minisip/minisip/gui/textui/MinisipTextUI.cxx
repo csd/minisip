@@ -89,12 +89,19 @@ void MinisipTextUI::displayErrorMessage(string msg){
 	displayMessage(msg, red);
 }
 
-minilist<std::string> MinisipTextUI::textuiCompletionSuggestion(string match){
+
+/**
+ * Required by the TextUI superclass. This method enables "dynamic"
+ * auto-completion where the set of string that are being auto-completed
+ * are not fixed. An example is that this method has been used to implement
+ * auto-completion of all addresses in the phonebook.
+ */
+minilist<std::string> MinisipTextUI::textuiCompletionSuggestion(string /*match*/){
 	minilist<std::string> ret;
 
 //TODO: implement it with the new phonebook.
-
-/*	if (!config.isNull()){
+/*
+	if (!config.isNull()){
 		list<string> phonebooks = config->phonebooks;
 		for (list<string>::iterator i=phonebooks.begin(); i!=phonebooks.end(); i++){
 
@@ -457,12 +464,12 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 #endif
 }
 
-bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
+bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> /*conf*/ ){
 	cout << "ERROR: MinisipTextUI::configDialog is not implemented"<< endl;
 	return false;
 }
 
-void MinisipTextUI::showCalls(string command){
+void MinisipTextUI::showCalls(){
 	//list<MRef<SipDialog*> > *calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
 	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 	displayMessage(string("Calls:"));
@@ -523,7 +530,7 @@ void MinisipTextUI::showTransactions(string command){
 
 }
 
-void MinisipTextUI::showTimeouts(string command){
+void MinisipTextUI::showTimeouts(){
 	string to = config->timeoutProvider->getTimeouts();
 	displayMessage(string("Timeouts: \n")+to);
 }
@@ -615,7 +622,7 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, st
 
 }
 
-void MinisipTextUI::showStat(string command){
+void MinisipTextUI::showStat(){
 	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
 	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->timeoutProvider->getTimeoutRequests();
@@ -713,7 +720,7 @@ void MinisipTextUI::keyPressed(int key){
 		showMem();
 		break;
 	case '+':
-		showStat("");
+		showStat();
 		break;
 	}
 }
@@ -743,7 +750,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 
 	if (command == "show calls"){
-		showCalls(command);
+		showCalls();
 		handled=true;
 	}
 
@@ -769,7 +776,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 
 	if (command == "show timeouts"){
-		showTimeouts(command);
+		showTimeouts();
 		handled=true;
 	}
 
@@ -830,13 +837,13 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 
 	if (command == "show all"){
-		showCalls(command);
+		showCalls();
 
 		list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 		for (uint32_t i=0; i<calls.size(); i++){
 			showTransactions("show transactions "+itoa(i));
 		}
-		showTimeouts(command);
+		showTimeouts();
 		handled=true;
 	}
 
