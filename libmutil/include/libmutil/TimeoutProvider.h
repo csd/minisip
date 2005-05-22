@@ -161,7 +161,7 @@ class TimeoutProvider : public MObject, Runnable{
 		 * 
 		 * @return All timeouts waiting to occur.
 		 */
-/*		string getTimeouts(){
+		string getTimeouts(){
 			string ret;
 
 			synch_lock.lock();
@@ -178,7 +178,7 @@ class TimeoutProvider : public MObject, Runnable{
 			synch_lock.unlock();
 			return ret;
 		}
-*/  
+  
 
 		std::list<TPRequest<TOCommand, TOSubscriber> > getTimeoutRequests(){
 			std::list<TPRequest<TOCommand, TOSubscriber> > retlist;
