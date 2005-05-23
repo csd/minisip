@@ -362,9 +362,7 @@ string Session::initiatorCreate(){
 #ifndef _MSC_VER
 				ts.save( MIKEY_CREATE_START );
 #endif
-				fprintf( stderr, "Before new MikeyMessage\n"); // Debug
 				message = new MikeyMessage( ((KeyAgreementPSK *)*ka) );
-				fprintf( stderr, "After new MikeyMessage\n"); // Debug
 #ifndef _MSC_VER
 				ts.save( MIKEY_CREATE_END );
 #endif
