@@ -148,7 +148,8 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		string sip_url=command.getParam();
 
 		sip_url=addDomainToPrefix(sip_url);
-		for(int t=0;t<connectedList.size()&&!done;t++)
+		int t;
+		for(t=0;t<connectedList.size()&&!done;t++)
 
 			if(connectedList[t].uri==sip_url)
 			{
