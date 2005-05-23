@@ -126,7 +126,7 @@ gui(failed)              |                                    |                |
  
  
 bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
-{cerr<<"************************************invite receivedqwe"<<endl;
+{//cerr<<"************************************invite receivedqwe"<<endl;
 	if (transitionMatch(command, SipCommandString::invite)){
 #ifdef MINISIP_MEMDEBUG
 		vc.setUser("WARNING - transaction");
@@ -134,21 +134,21 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 #ifndef _MSC_VER
 		ts.save("a0_start_callingnoauth_invite");
 #endif
-		cerr<<"sending invite1*************"<<endl;
+		//cerr<<"sending invite1*************"<<endl;
 		//int seqNo = requestSeqNo();
-		cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
+		//cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
 		++dialogState.seqNo;
 //		setLocalCalled(false);
 		localCalled=false;
 		dialogState.remoteUri= command.getCommandString().getParam();
-		cerr<<"dialogState.callId*************"+dialogState.callId<<endl;
-		cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
+		//cerr<<"dialogState.callId*************"+dialogState.callId<<endl;
+		//cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
 		MRef<SipTransaction*> invtrans = new SipTransactionInviteClient(MRef<SipDialog *>(this), dialogState.seqNo, dialogState.callId);
 		
 		invtrans->setSocket( phoneconf->proxyConnection );
-		cerr<<"sending invite3*************"<<endl;
+		//cerr<<"sending invite3*************"<<endl;
 		registerTransaction(invtrans);
-		cerr<<"sending invite*************"<<endl;
+		//cerr<<"sending invite*************"<<endl;
 		/*CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
 		
 		cmdstr.setParam3(confId);
@@ -252,7 +252,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
-		cerr<<"****************************sendack is called**********************"<<endl;
+		//cerr<<"****************************sendack is called**********************"<<endl;
 		//sendAck(getLastInvite()->getDestinationBranch() );
 		//BM
 		MessageRouter * ptr=(MessageRouter *)(getDialogContainer()->getCallback());
@@ -491,10 +491,10 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		if(type=="join")
 		{
 			string users=confId+";";
-			cerr<<"*************users "+itoa((*adviceList).size())<<endl;
+			//cerr<<"*************users "+itoa((*adviceList).size())<<endl;
 			for(int t=0;t<(*adviceList).size();t++)
-				{users=users+ (((*adviceList)[t]).uri);
-			cerr<<"*************users "+users<<endl;}	
+				users=users+ (((*adviceList)[t]).uri);
+			//cerr<<"*************users "+users<<endl;}	
 			/*CommandString cmdstr(dialogState.callId, 
 					SipCommandString::incoming_available, 
 					dialogState.remoteUri, 
@@ -509,7 +509,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		}
 		else
 		{
-			cerr<<"a10 confIdidididididi "+confId<<endl;
+			//cerr<<"a10 confIdidididididi "+confId<<endl;
 			CommandString cmdstr(dialogState.callId, 
 				"conf_connect_received", 
 				dialogState.remoteUri, 
@@ -542,7 +542,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 	numConnected=0;
 	string users=command.getCommandString().getParam2();
 	confId=command.getCommandString().getParam3();
-	cerr<<"users=command.getCommandString().getParam2() "+users<<endl;
+	//cerr<<"users=command.getCommandString().getParam2() "+users<<endl;
 	string line="";
 	int i=0;	
 		while (users.length()!=0 &&!(i>(users.length()-1))){
@@ -551,7 +551,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 			{
 				connectedList.push_back((ConfMember(line, "")));
 				//connectedList[numConnected]=line;
-				cerr<< "line: " + line << endl;
+				//cerr<< "line: " + line << endl;
 				line="";
 				
 				numConnected++;
@@ -850,7 +850,7 @@ bool SipDialogConfVoip::a27_incall_incall_ACK( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipAck::type, SipSMCommand::remote, IGN)){
 		//...
-		cerr << "Received ACK in SipDialogConfVoIP!!!!!!!!!!!!!!!!!!!!!!!"<< endl;
+		//cerr << "Received ACK in SipDialogConfVoIP!!!!!!!!!!!!!!!!!!!!!!!"<< endl;
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		assert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
 		MRef<SdpPacket*> sdp = (SdpPacket*)*resp->getContent();
@@ -867,7 +867,7 @@ bool SipDialogConfVoip::a27_incall_incall_ACK( const SipSMCommand &command)
 			for(t=0;t<num;t++)
 				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
 				users=users+sdp->getSessionLevelAttribute("participant_"+itoa(t+1))+";";
-			cerr<<"==============users: "+users<<endl;	
+			//cerr<<"==============users: "+users<<endl;	
                 
 		
 		CommandString cmdstr(dialogState.callId, "invite_ack", users,(getMediaSession()->isSecure()?"secure":"unprotected"),confId);
@@ -1039,7 +1039,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	numConnected= list->size();
 	type="join";
 	
-	cerr << "CONFDIALOG: Creating SipDialogConfVoip's receivedList" << endl;
+	//cerr << "CONFDIALOG: Creating SipDialogConfVoip's receivedList" << endl;
 	
 	//this is the list you get/send as advice of who is in the conference. It will go to the GUI to be displayed to
 	//the user to make a decision to join or not.
@@ -1095,8 +1095,8 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 
 {
 	confId=confid;
-	cerr<<"SDCVididididididididididdididi "+confId<<endl;
-	cerr << "CONFDIALOG: received"<< endl;
+	//cerr<<"SDCVididididididididididdididi "+confId<<endl;
+	//cerr << "CONFDIALOG: received"<< endl;
 	type="connect";
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
@@ -1217,12 +1217,12 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
 	if(type=="join"){
-		cerr << "SDCV: modifyjoininvite"<< endl;
+		//cerr << "SDCV: modifyjoininvite"<< endl;
 		modifyConfJoinInvite(inv);}
 	else
 		modifyConfConnectInvite(inv);
-	if(inv->is_ConfJoin())
-		cerr << "SDCV: confjoin was set!!"<< endl;
+	//if(inv->is_ConfJoin())
+		//cerr << "SDCV: confjoin was set!!"<< endl;
 //	mdbg << "SipDialogVoip::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
         MRef<SipMessage*> pktr(*inv);
@@ -1835,7 +1835,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	//inv->set_ConfJoin();
 	inv->set_ConfJoin();	
 	//Add SDP Session Level Attributes
-	cerr<<"modify join 1111111111111111"<<endl;
+	//cerr<<"modify join 1111111111111111"<<endl;
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	sdp->setSessionLevelAttribute("confId", confId);
@@ -1844,22 +1844,27 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((*adviceList)[t]).uri);
 	}
-	cerr<<"modify join 22222222222222222"<<endl;
+	//cerr<<"modify join 22222222222222222"<<endl;
 }
 void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	//Add Accept-Contact Header
 	ack->set_Conf();
-	cerr<<"modify ack 1111111111111111"<<endl;	
+	//cerr<<"modify ack 1111111111111111"<<endl;	
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
-	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
+	int numParticipants=(*adviceList).size();
 	for(int t=0;t<(*adviceList).size();t++)
 	{
-		//if((((*adviceList))[t]).uri!=dialogState.remoteUri)
+		//cerr<<"*adviceList))[t]).uri: "+(((*adviceList))[t]).uri<<endl;
+		//cerr<<"dialogState.remoteUri "+dialogState.remoteUri<<endl;
+		if((((*adviceList))[t]).uri!=dialogState.remoteUri)
+		{
 			sdp->setSessionLevelAttribute("participant_"+itoa(t+1), (((*adviceList))[t]).uri);
+			numParticipants--;}
 	}
-	cerr<<"modify ack 22222222222222222"<<endl;
+	sdp->setSessionLevelAttribute("conf_#participants", itoa(numParticipants));
+	//cerr<<"modify ack 22222222222222222"<<endl;
 }
 void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//Add Accept-Contact Header
