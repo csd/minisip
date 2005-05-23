@@ -29,6 +29,7 @@
 #include"../sdp/SdpPacket.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmutil/itoa.h>
+#include<libmutil/Timestamp.h>
 #include<libmutil/print_hex.h>
 #include"MediaStream.h"
 #include"Media.h"
@@ -183,9 +184,11 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 		ka->genSalt( csId, masterSalt, 14 );
 
 #ifdef DEBUG_OUTPUT
+#if 0
 		fprintf( stderr, "csId: %i\n", csId );
 		cerr << "SSRC: "<< ssrc <<" - TEK: " << print_hex( masterKey, 16 ) << endl;
 		cerr << "SSRC: "<< ssrc <<" - SALT: " << print_hex( masterSalt, 14 )<< endl;
+#endif
 #endif
 
 		if( csId != 0 ){
@@ -342,9 +345,14 @@ uint16_t MediaStreamSender::getPort(){
 	return remotePort;
 }
 
+static bool first=true;
+
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	SRtpPacket * packet;
-	
+	if (first){
+		ts.save("rtp_send");
+		first=false;
+	}
         senderLock.lock();
         if( !(*givenTs) ){
                 lastTs += 160; //FIXME! get it from the CODEC,

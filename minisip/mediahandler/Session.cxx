@@ -164,8 +164,6 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	// Not used
 	int port;
 
-        cerr << "Called Session::setSdpAnswer with: " << answer->getString() << endl;
-        cerr << "peerUri = " << peerUri << endl;
 	this->peerUri = peerUri;
 	
 	if( securityConfig.secured ){
@@ -199,8 +197,6 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = ((SdpHeaderM*)*(answer->getHeaders()[i]));
-                        cerr << "m header: " << m->getString() << endl;
-                        cerr << "m NoFormats:  " << m->getNrFormats() << endl;
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
@@ -323,8 +319,6 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
                                         std::list<std::string> listM = receiver->getAllRtpMaps();
                                         std::list<std::string>::iterator iListM;
 
-                                        cerr << "Header before loop" <<answerM->getString() << endl;
-
                                         for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
                                                 answerM->addFormat( (*iListPLT) );
                                                 rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
@@ -336,7 +330,6 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
                                                 }
                                                 //           rtpMapValues = "";
                                         }
-                                        cerr << "Header After loop" <<answerM->getString() << endl;
 					//receiver->addToM( sdpAnswer ,answerM, j );
 					
 					attributes = receiver->getSdpAttributes();
@@ -429,7 +422,6 @@ void Session::stop(){
 	}
         mediaStreamSendersLock.unlock();
 
-	fprintf( stderr, "Session stopped\n" );
 }
 
 
