@@ -129,7 +129,7 @@ void SipDialogContainer::enqueueTimeout(MRef<SipTransaction*> receiver, const Si
 
         mlock.lock();
 	//high_prio_command_q.push_back(item);
-	low_prio_command_q.push_back(item);
+	low_prio_command_q.push_front(item);
         mlock.unlock();
         
         semaphore.inc();
@@ -148,7 +148,7 @@ void SipDialogContainer::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCo
         
         mlock.lock();
 	//high_prio_command_q.push_back(item);
-	low_prio_command_q.push_back(item);
+	low_prio_command_q.push_front(item);
         mlock.unlock();
 
         semaphore.inc();
