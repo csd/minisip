@@ -348,12 +348,13 @@ void Minisip::run(){
 		sip->handleCommand(sipcmdss);
 */
 
+/*
 		cerr << "Minisip: starting presence client for johan@bilien.org"<< endl;
 		
 		CommandString subscribe("", SipCommandString::start_presence_client,"johan@bilien.org");
 		SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
 		sip->getSipStack()->handleCommand(sipcmd2);
-
+*/
 		
                 gui->setCallback(ehandler);
 //		sleep(5);
