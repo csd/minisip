@@ -599,7 +599,7 @@ void ConferenceControl::removeMember(string memberid) {
 	//find member in the pending list and remove it
 	int i = 0;
 	bool done = false;
-	printList(pendingList);
+	printList(&pendingList);
 	cerr<<"callid  "+memberid<<endl;
 	while ((!done) && (i < pendingList.size() ) ) {
 		
@@ -621,7 +621,7 @@ void ConferenceControl::removeMember(string memberid) {
 		i++;
 	}
 	
-	assert(done==true);
+	//assert(done==true);
 	
 }
 /**
