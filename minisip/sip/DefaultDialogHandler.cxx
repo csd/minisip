@@ -224,7 +224,6 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogVoip" << end;
 #endif			
-			cerr << "DDH: creating new SipDialogVoip"<< endl;
 
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
