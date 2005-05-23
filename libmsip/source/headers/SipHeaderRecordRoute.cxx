@@ -57,9 +57,6 @@ SipHeaderValueRecordRoute::SipHeaderValueRecordRoute(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_RECORDROUTE,sipHeaderValueRecordRouteTypeStr)
 {
 	route = trim(build_from);
-#ifdef DEBUG_OUTPUT
-	cerr << "DEBUG: parsed route to: "<< route << endl;;
-#endif
 }
 
 SipHeaderValueRecordRoute::~SipHeaderValueRecordRoute(){
