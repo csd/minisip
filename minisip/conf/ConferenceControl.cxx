@@ -599,7 +599,8 @@ void ConferenceControl::removeMember(string memberid) {
 	//find member in the pending list and remove it
 	int i = 0;
 	bool done = false;
-	
+	printList(pendingList);
+	cerr<<"callid  "+memberid<<endl;
 	while ((!done) && (i < pendingList.size() ) ) {
 		
 		if (pendingList[i].callid == memberid) {
