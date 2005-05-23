@@ -74,6 +74,7 @@
 #include<libmutil/trim.h>
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
+#include<libmutil/Timestamp.h>
 #include<libmsip/SipResponse.h>
 
 #ifdef _MSC_VER
@@ -226,7 +227,6 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	
 		int eoh = SipUtils::findEndOfHeader(buf, i);	// i will be adjusted to start of header
 		string header = buf.substr(i, eoh-i+1);
-		//cerr<<"header: "+header<<endl;
 		if (!addLine(header)){
 #ifdef DEBUG_OUTPUT
 			mdbg << "Info: Could not copy line to new Message: " << header << " (unknown)" << end;
@@ -240,7 +240,6 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 SipMessage::SipMessage(int type, string &buildFrom): type(type)
 {
 	uint32_t i;
-	cerr<<"SipMessage: "+buildFrom<<endl;
 	string header;
 	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
 		if(i==buildFrom.size()){
@@ -263,10 +262,12 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
 			MRef<SipMessageContent*> smcref;
-			string contentType = ((SipHeaderValueContentType*)*(h->getHeaderValue(0)))->getContentType();
-			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType);
+			string contentType = ((SipHeaderValueContentType*)*(h->getHeaderValue(0) ))->getContentType();
+//			string b = (SipHeaderValueContentType*)*(h->getHeaderValue(0) )->getParameter("boundary");
+//cerr <<"boundary="<< b <<endl;
+			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
-				MRef<SipMessageContent*> smcref = contentFactory(content, contentType);
+				MRef<SipMessageContent*> smcref = contentFactory(content, contentType + "; boundary=boun=_dry");
 				setContent(smcref);
 			}else{ //TODO: Better error handling
 				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<end;
@@ -284,7 +285,9 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 
 
 bool SipMessage::addLine(string line){
+	//ts.save("SipMessage-creating header start");
 	MRef<SipHeader*> hdr = SipHeader::parseHeader(line);
+	//ts.save("SipMessage-creating header end");
 #ifdef MINISIP_MEMDEBUG
 	hdr.setUser("SipMessage");
 #endif
@@ -313,10 +316,8 @@ void SipMessage::setContent(MRef<SipMessageContent*> content){
 		content.setUser("SipMessage");
 #endif
 	this->content=content;
-	//cerr<<"content: "+content<<endl;
 	if( content ){
 		string contentType = content->getContentType();
-		//cerr<<"content type: "+contentType<<endl;
 		if( contentType != "" ){
 			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType();
 			contenttypep->setContentType( contentType );
