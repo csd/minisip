@@ -1,6 +1,7 @@
 pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/rijndael-alg-fst.h \
 			libmutil/MemObject.h \
+			libmutil/Library.h \
 			libmutil/dbg.h \
 			libmutil/base64.h \
 			libmutil/dbg.h \
