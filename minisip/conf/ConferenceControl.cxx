@@ -44,10 +44,6 @@
 
 
 ConferenceControl::ConferenceControl(){
-
-    
-    
-    cerr << "Two members added to connectedList " << endl;
     
     numPending = 0;
 }
@@ -59,7 +55,7 @@ ConferenceControl::ConferenceControl(string configUri, string cid, bool islocal)
     assert(i!=string::npos);
     myUri=configUri.substr(0,i);
     myDomain=trim(configUri.substr(i));
-    cerr<<"my Uri and domain: "+myUri+" "+myDomain<<endl;
+    //cerr<<"my Uri and domain: "+myUri+" "+myDomain<<endl;
     incoming=islocal;
     
     numPending = 0;
@@ -103,28 +99,28 @@ void ConferenceControl::setConnectedList(string user)
 void ConferenceControl::handleGuiCommand(string cmd){
 
 	
-    	cerr << "CC: from MR -> CC: handleGuiCommand"<< endl;
+    	//cerr << "CC: from MR -> CC: handleGuiCommand"<< endl;
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    
 }
 void ConferenceControl::handleGuiCommand(CommandString &command){
 
 	
-    	cerr << "CC: from MR -> CC: handleGuiCommand command"<< endl;
+    	//cerr << "CC: from MR -> CC: handleGuiCommand command"<< endl;
 	if(command.getOp()==SipCommandString::accept_invite)
 	{
 		//pendingList[numPending]=command.getParam();
 		//pendingListCallIds[numPending]=command.getDestinationId();
 		string remote=addDomainToPrefix(command.getParam());
 		pendingList.push_back((ConfMember(remote, command.getDestinationId())));
-		cerr<<"call is accepted=>pending list: "<<endl;
+		//cerr<<"call is accepted=>pending list: "<<endl;
 		printList(&pendingList);
 		numPending++;
 		string users;
 		for(int t=0;t<connectedList.size();t++)
 
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
-		cerr<<"users "+users<<endl;
+		//cerr<<"users "+users<<endl;
 		command.setParam2(users);
 		command.setParam3(confId);
 		//command.setParam2((string) &connectedList);
@@ -150,8 +146,10 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 	{
 		bool done=false;
 		string sip_url=command.getParam();
-		int t;
-		for(t=0;t<connectedList.size()&&!done;t++)
+
+		sip_url=addDomainToPrefix(sip_url);
+		for(int t=0;t<connectedList.size()&&!done;t++)
+
 			if(connectedList[t].uri==sip_url)
 			{
 				done=true;
@@ -169,7 +167,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		else
 		{
 			callId = callback->confcb_doJoin(sip_url, &connectedList, confId);	
-			sip_url=addDomainToPrefix(sip_url);
+			
 			pendingList.push_back((ConfMember(sip_url, callId)));
 			sendUpdatesToGui();
 		}
@@ -183,7 +181,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 }
 void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 
-	cerr << "CC: from MR -> CC: handleGuiDoInviteCommand"<< endl;
+	//cerr << "CC: from MR -> CC: handleGuiDoInviteCommand"<< endl;
     	/*cerr <<"conf "+sip_url<< endl;
 	cerr <<"conf "+confId<< endl;
 	//BM pendingList[numPending]=sip_url;
@@ -214,16 +212,16 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
 	//displayMessage(cmd);    
 }
 void ConferenceControl::handleSipCommand(CommandString &cmd){
-    cerr << "CC: from MR -> CC: handleSipCommand"<< endl;
+    //cerr << "CC: from MR -> CC: handleSipCommand"<< endl;
 	   
     if (cmd.getOp()=="invite_ok"){
 	    //state="INCALL";
 	    //gui->setPrompt(state);
-	    cerr << "CC: PROGRESS: remote participant accepted the call..."<< endl;
-	    cerr<<"print connected list-------------"<<endl;
-	    printList(&connectedList);
-		cerr<<"print pending list-------------"<<endl;
-	    printList(&pendingList);
+	    cerr << "CC: PROGRESS: remote participant accepted to join the conference..."<< endl;
+	    //cerr<<"print connected list-------------"<<endl;
+	    //printList(&connectedList);
+		//cerr<<"print pending list-------------"<<endl;
+	    //printList(&pendingList);
 	int i=0;
 	string line="";
 	
@@ -236,29 +234,29 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 			{
 				receivedList.push_back((ConfMember(line, "")));
 				//connectedList[numConnected]=line;
-				cerr<< "CC------line: " + line << endl;
+				//cerr<< "CC------line: " + line << endl;
 				line="";
 				i++;
 			}
 		}
 	    handleOkAck(cmd.getDestinationId() ,&receivedList);
-	    cerr<<"print connected list-------------"<<endl;
-	    printList(&connectedList);
-		cerr<<"print pending list-------------"<<endl;
-	    printList(&pendingList);
+	    //cerr<<"print connected list-------------"<<endl;
+	    //printList(&connectedList);
+		//cerr<<"print pending list-------------"<<endl;
+	    //printList(&pendingList);
     }
     if (cmd.getOp()=="invite_ack"){
 	    //state="INCALL";
 	    //gui->setPrompt(state);
-	    cerr << "CC: PROGRESS: ack received..."<< endl;
-	    cerr<<"print connected list-------------"<<endl;
-	    printList(&connectedList);
-		cerr<<"print pending list-------------"<<endl;
-	    printList(&pendingList);
+	    //cerr << "CC: PROGRESS: ack received..."<< endl;
+	    //cerr<<"print connected list-------------"<<endl;
+	    //printList(&connectedList);
+		//cerr<<"print pending list-------------"<<endl;
+	    //printList(&pendingList);
 	int i=0;
 	string line="";
 	string users=cmd.getParam();
-	cerr<<"users-------------"+users<<endl;
+	//cerr<<"users-------------"+users<<endl;
 	minilist<ConfMember> receivedList;
 		while (users.length()!=0 &&!(i>(users.length()-1))){
 			line+=users[i++];
@@ -266,16 +264,16 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 			{
 				receivedList.push_back((ConfMember(line, "")));
 				//connectedList[numConnected]=line;
-				cerr<< "CC------line: " + line << endl;
+				//cerr<< "CC------line: " + line << endl;
 				line="";
 				i++;
 			}
 		}
 	    handleOkAck(cmd.getDestinationId() ,&receivedList);
-	    cerr<<"print connected list-------------"<<endl;
-	    printList(&connectedList);
-		cerr<<"print pending list-------------"<<endl;
-	    printList(&pendingList);
+	    //cerr<<"print connected list-------------"<<endl;
+	    //printList(&connectedList);
+		//cerr<<"print pending list-------------"<<endl;
+	    //printList(&pendingList);
     }
     if (cmd.getOp()=="remote_ringing"){
 	    //state="REMOTE RINGING";
@@ -285,7 +283,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
     }
 	if (cmd.getOp()=="myuri"){
 	    myUri=cmd.getParam();
-	    cerr << "my URI is "+myUri<< endl;
+	    //cerr << "my URI is "+myUri<< endl;
 	    //displayMessage("PROGRESS: the remove UA is ringing...", blue);
     }
 
@@ -351,7 +349,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 		for(int t=0;t<connectedList.size();t++)
 
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
-		cerr<<"users "+users<<endl;
+		//cerr<<"users "+users<<endl;
 		cmd.setParam2(users);
 		
 		cmd.setOp(SipCommandString::accept_invite);
@@ -547,11 +545,11 @@ void ConferenceControl::sendUpdatesToGui()
 	int t;
 	for(t=0;t<connectedList.size();t++)
 		connectedusers=connectedusers+ ((connectedList[t]).uri) + ", "; 
-	cerr<<"users "+connectedusers<<endl;
+	//cerr<<"users "+connectedusers<<endl;
 	string pendingusers="";
 	for(t=0;t<pendingList.size();t++)
 		pendingusers=pendingusers+ ((pendingList[t]).uri) + ", ";     
-	cerr<<"users "+pendingusers<<endl;
+	//cerr<<"users "+pendingusers<<endl;
 	CommandString cmd(confId,"list updated",connectedusers,pendingusers);
 	callback->confcb_handleGuiCommand(cmd);
 }
@@ -654,13 +652,13 @@ void ConferenceControl::updateLists(minilist<ConfMember> *list) {
 		}
 		
 		//if not found in pending or connected list then add to pending list
-		if (!handled&&current!=myUri) {
+		if (!handled&&current!=(myUri+myDomain)) {
 			//send a connect message to the newly discovered conference members
 			callId = callback->confcb_doConnect(current,confId);
 			current=addDomainToPrefix(current);
 			pendingList.push_back(ConfMember(current, callId  )  );
 			
-			cerr<<"update pending list=> "+current<<endl;
+			//cerr<<"update pending list=> "+current<<endl;
 		}
 	
 	}
