@@ -146,9 +146,17 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				state = 2;
 				contentLength = findContentLength();
 				if( contentLength == 0 ){
+					char tmp[12];
+					tmp[11]=0;
+					memcpy(&tmp[0], buffer , 11);
 					string messageString( (char *)buffer, index );
 					init();
-					return SipMessage::createMessage( messageString );
+					ts.save(tmp);
+					MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
+					ts.save("createMessage end");
+					return msg;
+					
+					//return SipMessage::createMessage( messageString );
 				}
 				contentIndex = 0;
 			}
@@ -157,9 +165,16 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 			break;
 		case 2:
 			if( ++contentIndex == contentLength ){
+				char tmp[12];
+				tmp[11]=0;
+				memcpy(&tmp[0], buffer , 11);
 				string messageString( (char*)buffer, index );
 				init();
-				return SipMessage::createMessage( messageString );
+				ts.save(tmp);
+				MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
+				ts.save("createMessage end");
+				return msg;
+				//return SipMessage::createMessage( messageString );
 			}
 	}
 	return NULL;
@@ -355,6 +370,13 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (STREAM)", packetString);
 #endif
+#ifndef _MSC_VER
+			//ts.save( PACKET_OUT );
+			char tmp[12];
+			tmp[11]=0;
+			memcpy(&tmp[0], packetString.c_str() , 11);
+			ts.save( tmp );
+#endif
 			if( socket->write( packetString ) == -1 ){
 				throw new SendFailed( errno );
 			}
@@ -364,7 +386,14 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (UDP)", packetString);
 #endif
-			cerr<<"SMT: "+packetString<<endl;
+#ifndef _MSC_VER
+			//ts.save( PACKET_OUT );
+			char tmp[12];
+			tmp[11]=0;
+			memcpy(&tmp[0], packetString.c_str() , 11);
+			ts.save( tmp );
+
+#endif
 			if( udpsock.sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
@@ -459,7 +488,12 @@ void SipMessageTransport::udpSocketRead(){
 
 			try{
 #ifndef _MSC_VER
-				ts.save( PACKET_IN );
+				//ts.save( PACKET_IN );
+			char tmp[12];
+			tmp[11]=0;
+			memcpy(&tmp[0], buffer, 11); 
+			ts.save( tmp );
+
 #endif
 				string data = string(buffer, nread);
 #ifdef DEBUG_OUTPUT
@@ -572,9 +606,10 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				break;
 			}
 #ifndef _MSC_VER
-			ts.save( PACKET_IN );
+			//ts.save( PACKET_IN );
+
+
 #endif
-			socket->received += string( buffer, nread );
 
 			try{
 				uint32_t i;
