@@ -212,6 +212,7 @@ dnl look for xvideo
         AC_CHECK_HEADERS([X11/extensions/Xv.h],[
           AC_CHECK_HEADERS([X11/extensions/Xvlib.h],
 	    [VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
+	     AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
 	     XV_VIDEO_DISPLAY="yes" ],[])
 	  ])
 dnl check for SDL

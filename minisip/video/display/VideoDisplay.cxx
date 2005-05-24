@@ -24,10 +24,13 @@
 #include<libmutil/dbg.h>
 #include"VideoDisplay.h"
 #include"../VideoException.h"
+#ifdef XV_SUPPORT
 #include"XvDisplay.h"
+#endif
 #ifdef SDL_SUPPORT
 #include"SdlDisplay.h"
 #endif
+#include"X11Display.h"
 
 #include<iostream>
 #define NB_IMAGES 3
@@ -40,15 +43,15 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
         
         VideoDisplay::displayCounterLock.lock();
 
-        
         if( VideoDisplay::displayCounter == 0 ){
                 try{
 #ifdef SDL_SUPPORT
                 display = new SdlDisplay( width, height );
-#else
-                display =  new XvDisplay( width, height );
-#endif
                 display->start();
+#elif defined XV_SUPPORT
+                display =  new XvDisplay( width, height );
+                display->start();
+#endif
                 }
                 catch( VideoException exc ){
                         mdbg << "Error opening the video display: "
