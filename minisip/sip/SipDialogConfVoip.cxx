@@ -1874,7 +1874,7 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(connectedList.size()));
-	for(int t=0;t<numConnected;t++)
+	for(int t=0;t<connectedList.size();t++)
 	{
 		sdp->setSessionLevelAttribute("participant_"+itoa(t+1), ((connectedList)[t]).uri);
 	}
