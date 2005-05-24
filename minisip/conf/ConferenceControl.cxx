@@ -114,7 +114,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 		string remote=addDomainToPrefix(command.getParam());
 		pendingList.push_back((ConfMember(remote, command.getDestinationId())));
 		//cerr<<"call is accepted=>pending list: "<<endl;
-		printList(&pendingList);
+		//printList(&pendingList);
 		numPending++;
 		string users;
 		for(int t=0;t<connectedList.size();t++)
@@ -344,7 +344,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 		string remote=addDomainToPrefix(cmd.getParam());
 		pendingList.push_back((ConfMember(remote, cmd.getDestinationId())));
 		//cerr<<"call is accepted=>pending list: "<<endl;
-		printList(&pendingList);
+		//printList(&pendingList);
 		sendUpdatesToGui();
 		string users;
 		for(int t=0;t<connectedList.size();t++)
@@ -599,8 +599,8 @@ void ConferenceControl::removeMember(string memberid) {
 	//find member in the pending list and remove it
 	int i = 0;
 	bool done = false;
-	printList(&pendingList);
-	cerr<<"callid  "+memberid<<endl;
+	//printList(&pendingList);
+	//cerr<<"callid  "+memberid<<endl;
 	while ((!done) && (i < pendingList.size() ) ) {
 		
 		if (pendingList[i].callid == memberid) {

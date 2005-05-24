@@ -138,6 +138,7 @@ static void *LinuxStaticThreadStarter(void *obj, void *arg){
 
 
 Thread::Thread(Runnable *runnable){
+	assert(runnable);
 #ifdef WIN32
 	DWORD threadId;
 

@@ -57,13 +57,13 @@ const int SipInvite::type=1;
 
 SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from){
 
-	cout << "SIPINVITE: Creating SipInvite object";
+	
 	//check if it is a P2T Invite packet
 	MRef<SipHeaderValueAcceptContact*> acp;
 	P2T=false;
 	ConfJoin=false;
 	ConfConnect=false;
-	cerr<<"SipInvite:  buildFrom"<<endl;
+	//cerr<<"SipInvite:  buildFrom"<<endl;
 	for (int32_t i=0; i< headers.size(); i++){
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
 			acp = MRef<SipHeaderValueAcceptContact*>((SipHeaderValueAcceptContact *)*(headers[i]->getHeaderValue(0)));
@@ -86,12 +86,12 @@ void SipInvite::checkAcceptContact(){
 	P2T=false;
 	ConfJoin=false;
 	ConfConnect=false;
-	cerr<<"SipInvite:  balalalalalalaa"<<endl;
+	//cerr<<"SipInvite:  balalalalalalaa"<<endl;
 	for (int32_t i=0; i< headers.size(); i++){
-		cerr<<headers[i]->getString()<<endl;
+		//cerr<<headers[i]->getString()<<endl;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_ACCEPTCONTACT){
 			acp = MRef<SipHeaderValueAcceptContact*>((SipHeaderValueAcceptContact *)*(headers[i]->getHeaderValue(0)));
-			cerr<<"FeatureTag: "+acp->getFeaturetag()<<endl;
+			//cerr<<"FeatureTag: "+acp->getFeaturetag()<<endl;
 			if(acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
 				P2T=true;
 			else if(acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"")

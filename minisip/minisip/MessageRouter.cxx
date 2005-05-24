@@ -50,10 +50,10 @@ void MessageRouter::sipcb_handleCommand(CommandString &command){
 void MessageRouter::sipcb_handleConfCommand(CommandString &command){
 	bool done=false;
 	int i;
-	cerr<<"command.getParam3 "+command.getParam3()<<endl;
+	//cerr<<"command.getParam3 "+command.getParam3()<<endl;
 	for (i=0;i < confrout.size();i++  ) {
-		cerr<<"From SCB=>MR with conf id: "+confrout[i]->confId<<endl;
-		cerr<<"confid "+confrout[i]->confId<<endl;
+		//cerr<<"From SCB=>MR with conf id: "+confrout[i]->confId<<endl;
+		//cerr<<"confid "+confrout[i]->confId<<endl;
 		if ((confrout[i]->confId) == command.getParam3()) 
 		{
 			confrout[i]->setCallback(this);
@@ -98,10 +98,10 @@ void MessageRouter::guicb_handleConfCommand(string &conferencename){
 void MessageRouter::guicb_handleConfCommand(CommandString &command){
 	bool done=false;
 	int i;
-	cerr<<"command.getParam3 "+command.getParam3()<<endl;
+	//cerr<<"command.getParam3 "+command.getParam3()<<endl;
 	for (i=0;i < confrout.size();i++  ) {
-		cerr << "MR: from Gui -> CC: guicb_handleConfCommand with conf id"+confrout[i]->confId<< endl;
-		cerr<<"confrout[i]->confId "+confrout[i]->confId<<endl;
+		//cerr << "MR: from Gui -> CC: guicb_handleConfCommand with conf id"+confrout[i]->confId<< endl;
+		//cerr<<"confrout[i]->confId "+confrout[i]->confId<<endl;
 		if (confrout[i]->confId == command.getParam3()) 
 		{
 			confrout[i]->setCallback(this);
@@ -111,7 +111,7 @@ void MessageRouter::guicb_handleConfCommand(CommandString &command){
 	}
 	if(done)
 	{
-		cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
+		//cerr << "MR: from Gui -> CC: guicb_handleConfCommand"<< endl;
 		confrout[i]->handleGuiCommand(command);
 	}
 	else
@@ -168,18 +168,18 @@ void MessageRouter::guicb_handleCommand(CommandString &cmd){
 
 string MessageRouter::confcb_doJoin(string user, minilist<ConfMember> *list, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
-	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
+	//cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confjoin(user, list, confId);
 	//return "12345";
 }
 string MessageRouter::confcb_doConnect(string user, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
-	cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
+	//cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confconnect(user, confId);
 }
 void MessageRouter::confcb_handleSipCommand(CommandString &command){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
-	cerr << "MR: from CC -> MR: confcb_handleSipCommand"<< endl;
+	//cerr << "MR: from CC -> MR: confcb_handleSipCommand"<< endl;
 	SipSMCommand sipcmd(command, SipSMCommand::remote, SipSMCommand::TU);
 	sip->getSipStack()->handleCommand(sipcmd);
 	

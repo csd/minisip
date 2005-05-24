@@ -240,6 +240,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 SipMessage::SipMessage(int type, string &buildFrom): type(type)
 {
 	uint32_t i;
+
 	string header;
 	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
 		if(i==buildFrom.size()){

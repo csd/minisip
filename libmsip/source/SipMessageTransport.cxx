@@ -394,6 +394,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			ts.save( tmp );
 
 #endif
+
 			if( udpsock.sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
