@@ -373,7 +373,7 @@ void MainWindow::gotCommand(){
 		return;
 	}
 
-	merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
+	mdbg << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
 }	
 
 void MainWindow::gotPacket( int32_t /*i*/ ){
