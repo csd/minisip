@@ -51,6 +51,7 @@
 #include"../spaudio/SpAudio.h"
 
 #include"SoundSource.h"
+//#include "../aec/aec.h"
 
 
 #ifdef HAVE_LIBASOUND
@@ -238,6 +239,7 @@ class SoundIO : public MObject{
 		bool recording;
 
 		MRef<SoundDevice *> soundDev;
+		//AEC aec;
 
 };
 

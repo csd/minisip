@@ -149,7 +149,13 @@ AC_ARG_ENABLE(p2t,
 	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])])
 AM_CONDITIONAL(P2T_SUPPORT, test "${p2t_enabled}" = "yes")
 
-
+dnl AEC support
+aec_enabled=no
+AC_ARG_ENABLE(aec,
+    [ --enable-aec enables push-2-talk features (default enabled)],
+    [  aec_enable=yes
+	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])])
+AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
 
 dnl #############
 dnl VIDEO SUPPORT
@@ -480,6 +486,7 @@ AC_OUTPUT([codecs/Makefile
 		 mediahandler/Makefile
                  video/Makefile
 		 conf/Makefile
+		 aec/Makefile
 		 debian/Makefile
 		 Makefile])
 

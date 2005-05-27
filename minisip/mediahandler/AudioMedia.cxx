@@ -29,7 +29,25 @@
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
+#include "../../libmutil/include/libmutil/mtime.h"
+
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<errno.h>
+#include<iostream>
+#include<stdio.h>
+#ifdef _MSC_VER
+
+#else
+#include<sys/time.h>
+#include<unistd.h>
+#endif
+
 class G711CODEC;
+#ifdef AEC_SUPPORT
+AEC AudioMedia::aec;		//hanning
+#endif
 
 // pn430 Parameter list changed for multicodec
 //AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
@@ -120,6 +138,21 @@ void AudioMedia::srcb_handleSound( void * data ){
         sendData( (byte_t*) &resampledData, 0, 0, false );
         seqNo ++;
 }
+
+#ifdef AEC_SUPPORT
+void AudioMedia::srcb_handleSound( void * data, void * dataR){				//hanning
+	resampler->resample( (short *)data, resampledData );
+	resampler->resample( (short *)dataR, resampledDataR );
+
+	//cerr << mtime() <<  "S" <<endl;
+	for(int j=0; j<160; j++){
+		resampledData[j] = (short)aec.doAEC((int)resampledData[j], (int)resampledDataR[j]);
+	}
+	//cerr << mtime() <<endl;
+	sendData( (byte_t*) &resampledData, 0, 0, false );
+        seqNo ++;
+}
+#endif
 
 void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 

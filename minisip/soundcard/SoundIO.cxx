@@ -57,6 +57,10 @@
 #include<libmutil/mtime.h>
 #include<libmutil/print_hex.h>
 
+#ifdef AEC_SUPPORT
+#include "../aec/aec.h"
+#endif
+
 #ifdef _MSC_VER
 
 #else
@@ -211,6 +215,9 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	}
 		
 	short * tempBuffer=NULL;
+	#ifdef AEC_SUPPORT
+	short * tempBufferR=NULL;		//hanning
+	#endif
 	bool tempBufferAllocated = false;
 
 	while( true ){
@@ -220,6 +227,9 @@ void *SoundIO::recorderLoop(void *sc_arg){
 				soundcard->closeRecord();
 				if( tempBufferAllocated ){
 					delete [] tempBuffer;
+					#ifdef AEC_SUPPORT
+					delete [] tempBufferR;		//hanning
+					#endif
 				}
 				tempBuffer = NULL;
 			}
@@ -249,11 +259,17 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		if( soundcard->soundDev->getNChannelsRecord() > 1 ){
 			if( !tempBuffer ){
 				tempBuffer = new short[soundcard->recorder_buffer_size];
+				#ifdef AEC_SUPPORT
+				tempBufferR = new short[soundcard->recorder_buffer_size];	//hanning
+				#endif
 				tempBufferAllocated = true;
 			}
 
 			for( int j = 0; j < soundcard->recorder_buffer_size; j++ ){
 				tempBuffer[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() ];
+				#ifdef AEC_SUPPORT
+				tempBufferR[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() + 1];	//hanning
+				#endif
 			}
 		}
 		else{
@@ -276,8 +292,13 @@ void *SoundIO::recorderLoop(void *sc_arg){
                                     cb++){
 
 				if ((*cb)!=NULL && (*cb)->getCallback()!=NULL){
-					(*cb)->getCallback()->
-                                                srcb_handleSound(tempBuffer);
+					#ifdef AEC_SUPPORT
+					(*cb)->getCallback()->srcb_handleSound(tempBuffer, tempBufferR); //hanning
+					#else
+					(*cb)->getCallback()->srcb_handleSound(tempBuffer);
+					#endif
+					
+					
 				}else{
 					cerr << "Ignoring null callback"<< endl;
 				}

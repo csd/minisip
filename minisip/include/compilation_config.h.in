@@ -1,5 +1,8 @@
 /* include/compilation_config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* AEC support */
+#undef AEC_SUPPORT
+
 /* Color terminal support */
 #undef COLOR_TERMINAL
 
@@ -233,6 +236,9 @@
 
 /* Compile video features */
 #undef VIDEO_SUPPORT
+
+/* Compile Xvideo support */
+#undef XV_SUPPORT
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #undef X_DISPLAY_MISSING

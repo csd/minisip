@@ -41,6 +41,9 @@ class SoundRecorderCallback{
 	 * @see SoundCard
 	 */
 	virtual void srcb_handleSound(void *samplearr)=0;
+	#ifdef AEC_SUPPORT
+	virtual void srcb_handleSound(void *samplearr, void *samplearrR)=0;		//hanning
+	#endif
 //	virtual uint32_t srcb_getSSRC()=0;
 };
 
