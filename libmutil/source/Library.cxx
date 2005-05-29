@@ -6,6 +6,7 @@
 #else
 #include<dlfcn.h>
 #endif
+#include<iostream>
 
 using namespace std;
 
