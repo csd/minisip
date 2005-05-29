@@ -45,11 +45,9 @@
 #include<stdlib.h>
 #include<errno.h>
 
-#include<netinet/ip.h>
-
-
 #ifndef _MSC_VER
 #include<unistd.h>
+#include<netinet/ip.h>
 #endif
 
 #include<iostream>
@@ -176,11 +174,17 @@ int32_t UDPSocket::recv(void *buf, int32_t len){
 }
 
 bool UDPSocket::setLowDelay(){
-	
+#ifdef _MSC_VER
+	cerr << "Warning: setting IPTOS_LOWDELAY is not implemented for the Microsoft Visual compiler!"<< endl;
+	return false;
+#else
 	int tos = IPTOS_LOWDELAY;
 	if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos))){
 		cerr << "WARNING: Could not set type of service to be time chritical"<< endl;
+		return false;
 	}
+	return true;
+#endif
 }
 	
 /*

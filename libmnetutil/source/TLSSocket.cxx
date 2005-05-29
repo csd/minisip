@@ -26,6 +26,8 @@
 #include<config.h>
 #endif
 
+#include<libmnetutil/TLSSocket.h>
+
 #ifdef WIN32
 #include<winsock2.h>
 #elif defined HAVE_SYS_SOCKET_H
@@ -35,7 +37,7 @@
 
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
-#include<libmnetutil/TLSSocket.h>
+
 
 
 
@@ -45,6 +47,7 @@
 #include<libmutil/MemObject.h>
 
 int8_t TLSSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphers */
+
 
 // When created by a TLS Server
 TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):

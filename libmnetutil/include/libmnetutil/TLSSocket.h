@@ -35,6 +35,10 @@
 #define LIBMNETUTIL_API
 #endif
 
+#ifdef _MSC_VER
+#define int8_t char
+#endif
+
 #include"StreamSocket.h"
 #include"TCPSocket.h"
 #include"IPAddress.h"
