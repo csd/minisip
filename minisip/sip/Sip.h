@@ -72,9 +72,9 @@
 
 #include "../conf/ConfMember.h"
 
+#include"../minisip/LogEntry.h"
 
 class SipSoftPhoneConfiguration;
-class LogEntry;
 class MediaHandler;
 
 

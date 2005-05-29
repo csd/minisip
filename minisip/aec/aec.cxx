@@ -6,11 +6,16 @@
  * Version 1.1
  */
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include "aec.h"
+
 
 
 /* ================================================================ */
@@ -212,7 +217,7 @@ int AEC::doAEC(int d, int x)
   } else if (s0 < -MAXPCM) {
     return (int)-MAXPCM;
   } else {
-    return (int)roundf(s0);
+    return (int)floorf(s0+0.5);
   }
 }
 

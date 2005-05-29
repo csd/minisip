@@ -27,7 +27,11 @@
 #include"../sip/SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogContainer.h>
 #include"../sip/DefaultDialogHandler.h"
-//#include"../conf/ConferenceControl.h" 
+//#include"../conf/ConferenceControl.h"
+
+#include<iostream>
+
+using namespace std;
 
 
 MessageRouter::MessageRouter(){
@@ -149,6 +153,7 @@ string MessageRouter::guicb_confDoInvite(string sip_url){
 	//cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
 	//confrout->handleGuiDoInviteCommand(sip_url);
 	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
+	return ""; //FIXME: Should this method be deleted??? 
 }//bm
 void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
 	mediaHandler->handleCommand(cmd);

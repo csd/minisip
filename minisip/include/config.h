@@ -81,6 +81,7 @@ typedef unsigned long long  uint64_t;
 #endif
 
 
+
 #ifdef USE_STL
 #undef __NO_ISOCEXT
 using namespace std;
@@ -139,7 +140,9 @@ static inline uint64_t U64_AT( void const * _p )
 
 #define SOUND_CARD_FREQ 48000
 
-
+#ifdef WIN32
+#define TEXT_UI
+#endif
 
 
 #endif

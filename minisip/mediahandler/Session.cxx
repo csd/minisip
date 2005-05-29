@@ -378,9 +378,13 @@ void Session::start(){
 	list< MRef<MediaStream * > >::iterator i;
         
         if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+#ifndef _MSC_VER
                 ts.save( TGK_START );
+#endif
                 ((KeyAgreementDH *)*ka)->computeTgk();
+#ifndef _MSC_VER
                 ts.save( TGK_END );
+#endif
         }
 
 

@@ -26,6 +26,10 @@
 #include"SoundSource.h"
 #include<libmutil/mtime.h>
 
+#include<iostream>
+
+using namespace std;
+
 SoundSource::SoundSource(int id):sourceId(id){
 	leftch = NULL;
 	rightch = NULL;
