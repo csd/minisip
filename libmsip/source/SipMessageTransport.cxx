@@ -151,9 +151,13 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 					memcpy(&tmp[0], buffer , 11);
 					string messageString( (char *)buffer, index );
 					init();
+#ifndef _MSC_VER
 					ts.save(tmp);
+#endif
 					MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
+#ifndef _MSC_VER
 					ts.save("createMessage end");
+#endif
 					return msg;
 					
 					//return SipMessage::createMessage( messageString );
@@ -170,9 +174,13 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				memcpy(&tmp[0], buffer , 11);
 				string messageString( (char*)buffer, index );
 				init();
+#ifndef _MSC_VER
 				ts.save(tmp);
+#endif
 				MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
+#ifndef _MSC_VER
 				ts.save("createMessage end");
+#endif
 				return msg;
 				//return SipMessage::createMessage( messageString );
 			}
@@ -375,7 +383,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			char tmp[12];
 			tmp[11]=0;
 			memcpy(&tmp[0], packetString.c_str() , 11);
-			ts.save( tmp );
 #endif
 			if( socket->write( packetString ) == -1 ){
 				throw new SendFailed( errno );
