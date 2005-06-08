@@ -164,12 +164,10 @@ void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
 	mediaHandler->handleCommand(cmd);
 }
 
-/*
 string MessageRouter::guicb_doInvite(string user){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	return sip->invite(user);
 }
-*/
 
 void MessageRouter::guicb_handleCommand(CommandString &cmd){
 	//return sip_machine->enqueueCommand(cmd);
