@@ -302,6 +302,8 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 
 		textR->property_is_expanded().set_value( 
 				(*iter)->children().size() >= 1 );
+                renderer->property_cell_background().set_value(
+                                "#FFFFFF" );
 
 	}
 	else{
@@ -321,6 +323,9 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 				"<span size=\"x-small\"foreground=\"" + 
 				col +  "\">" + 
 				entry->getUri() + "</span>" );
+                        renderer->property_cell_background().set_value(
+                                entry->getPersonIndex()%2?"#EFEFEF":"#FFFFFF" );
+
 		}
 		/*
 		else{

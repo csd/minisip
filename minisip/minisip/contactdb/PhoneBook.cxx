@@ -105,16 +105,20 @@ string PhoneBookPerson::getName(){
 }
 
 void PhoneBookPerson::addEntry( MRef<ContactEntry *> entry ){
+        entry->personIndex = entries.size();
 	entries.push_back( entry );
 }
 
 void PhoneBookPerson::delEntry( MRef<ContactEntry *> entry ){
 	list< MRef< ContactEntry * > >::iterator i;
+        uint32_t index = 0;
 	
 	for( i = entries.begin(); i != entries.end(); i++ ){
 		if( *(*i) == *entry ){
 			i = entries.erase( i );
 		}
+                        (*i)->personIndex = index;
+                        index++;
 	}
 
 	if( entries.size() == 0 ){

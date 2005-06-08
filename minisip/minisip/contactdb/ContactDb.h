@@ -61,6 +61,8 @@ class ContactEntry : public MObject{
 		void setOnlineStatus(int s){onlineStatus=s;}
 		void setOnlineStatusDesc(string s){onlineStatusDesc=s;}
 
+                uint32_t getPersonIndex(){return personIndex;}
+
 		virtual std::string getMemObjectType(){return "ContactEntry";}
 	private:
 		static MRef<ContactDb *> db;
@@ -70,10 +72,13 @@ class ContactEntry : public MObject{
 		std::string desc;
 		uint32_t type;
 		MRef< PhoneBookPerson * > person;
+                uint32_t personIndex;
 
 		std::string location;
 		int onlineStatus;
 		std::string onlineStatusDesc;
+                friend class PhoneBookPerson;
+                friend class PhoneBook;
 };
 
 class ContactDb : public MObject{

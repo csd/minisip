@@ -32,6 +32,7 @@ ContactEntry::ContactEntry():person(NULL), onlineStatus(CONTACT_STATUS_UNKNOWN){
 	if( ! db.isNull() ){
 		db->addEntry( this );
 	}
+        personIndex = 0;
 	id = rand();
 
 }

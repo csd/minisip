@@ -422,10 +422,15 @@ void MainWindow::updateConfig(){
 			SLOT( *phoneBookModel, &PhoneBookModel::setFont )
 			);
 	}
+	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
+        int pos, width;
+        column->get_cell_position( *renderer, pos, width );
 
-//	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
+        cerr << "Pos: " << pos << endl;
+        cerr << "Width: " << width << endl;
 
-	phoneBookTreeView->expand_all();
+
+	//phoneBookTreeView->expand_all();
 }
 
 void MainWindow::setContactDb( MRef<ContactDb *> contactDb ){
@@ -636,7 +641,7 @@ void MainWindow::phoneSelected(){
 	Gtk::TreeModel::iterator iter = treeSelection2->get_selected();
 
 	if( iter ){
-		if( uriEntry ){
+                if( uriEntry ){
 			uriEntry->set_text( (*iter)[phoneBookModel->tree->uri] );
 		}
 
@@ -644,14 +649,29 @@ void MainWindow::phoneSelected(){
 }
 
 void MainWindow::phoneTreeClicked( GdkEventButton * event ){
-/*
-	if( event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS ){
-		phoneSelected();
-		invite();
-		return;
-	}
-*/	
-	if( event->button == 3 ){
+        Gtk::TreeModel::Path path;
+        Gtk::TreeViewColumn * column;
+        int cellx,celly;
+        bool gotPath;
+        
+        gotPath = phoneBookTreeView->get_path_at_pos( (int)event->x, (int)event->y, path, column, cellx, celly );
+
+        /* Collapse or expand the phonebook entries */
+        // FIXME: cellx >= 13 used to avoid the expander arrow, find
+        // some proper way
+        if( event->button == 1 && gotPath && path.get_depth() <= 1 && cellx >= 13){
+                if( phoneBookTreeView->row_expanded( path ) ){
+                        phoneBookTreeView->collapse_row( path );
+                }
+                else{
+
+                        phoneBookTreeView->collapse_all();
+                        phoneBookTreeView->expand_row( path, true );
+                }
+        }
+
+        /* right click: pop up the menu */
+        else if( event->button == 3 ){
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection2 = 
 			phoneBookTreeView->get_selection();
 		bool noSelect = (treeSelection2->count_selected_rows() == 0 );
