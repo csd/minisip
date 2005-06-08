@@ -160,6 +160,10 @@ AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
 dnl #############
 dnl VIDEO SUPPORT
 dnl #############
+
+AC_ARG_ENABLE(sdl,
+    [ --enable-sdl enables SDL video output if the required library is found])
+
 AC_ARG_ENABLE(video,
     [ --enable-video enables video features (default disabled)],
     [ if test "${enable_video}" = "yes"
@@ -225,12 +229,15 @@ dnl check for SDL
         AC_CHECK_HEADERS([SDL/SDL.h],
 	  [
 	   AC_CHECK_LIB([SDL],[main], [
-	       VIDEO_DISPLAY="${VIDEO_DISPLAY} sdl"
-	       SDL_VIDEO_DISPLAY="yes" 
-	       AC_DEFINE(SDL_SUPPORT, [], [Compile SDL support])
-	       LIBS="${LIBS} -lSDL ${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread"
-	       CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
-	       ], [], [${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread] )
+               if test "x${enable_sdl}" != "xno"
+               then
+	         VIDEO_DISPLAY="${VIDEO_DISPLAY} sdl"
+	         SDL_VIDEO_DISPLAY="yes" 
+	         AC_DEFINE(SDL_SUPPORT, [], [Compile SDL support])
+	         LIBS="${LIBS} -lSDL ${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread"
+	         CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
+               fi
+	     ], [], [${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread] )
 	  ])
 	
 	

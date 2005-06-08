@@ -35,14 +35,13 @@
 #include<iostream>
 #define NB_IMAGES 3
 
-uint32_t VideoDisplay::displayCounter;
-Mutex VideoDisplay::displayCounterLock;
 
 MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
         MRef<VideoDisplay *> display = NULL;
         
         VideoDisplay::displayCounterLock.lock();
 
+#ifdef SDL_SUPPORT || defined XV_SUPPORT
         if( VideoDisplay::displayCounter == 0 ){
                 try{
 #ifdef SDL_SUPPORT
@@ -52,26 +51,24 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
                 display =  new XvDisplay( width, height );
                 display->start();
 #endif
+                displayCounter ++;
+                displayCounterLock.unlock();
+                return display;
                 }
                 catch( VideoException exc ){
                         mdbg << "Error opening the video display: "
                              << exc.error() << end;
-                        goto X11;
-
                 }
         }
+#endif
 
-
-        else{
-X11:
-                try{
+        try{
                 display = new X11Display( width, height );
                 display->start();
-                }
-                catch( VideoException exc ){
-                        merr << "Error opening the video display: "
-                             << exc.error() << end;
-                }
+        }
+        catch( VideoException exc ){
+                merr << "Error opening the video display: "
+                        << exc.error() << end;
         }
 
         displayCounter ++;

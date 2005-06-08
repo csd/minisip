@@ -23,6 +23,7 @@
 #include "X11Display.h"
 #include<sys/time.h>
 #include"../VideoException.h"
+#include<X11/Xatom.h>
 
 using namespace std;
 
@@ -138,6 +139,15 @@ void X11Display::createWindow(){
 	gcValues.graphics_exposures = False;
 	gc = XCreateGC( display, baseWindow, GCGraphicsExposures, &gcValues );
 	
+//#ifdef IPAQ
+        Atom type = XInternAtom( display, "_NET_WM_WINDOW_TYPE", False );
+        Atom typeDialog = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False );
+
+        XChangeProperty( display, baseWindow, type,
+                        XA_ATOM, 32, PropModeReplace,
+                        (unsigned char *) &typeDialog, 1);
+//#endif
+        
 	XMapWindow( display, baseWindow );
 	do{
 		XNextEvent( display, &event );
@@ -230,7 +240,6 @@ MImage * X11Display::allocateImage(){
 }
 
 void X11Display::deallocateImage( MImage * mimage ){
-	char * imageData = ( char * )malloc( width * height * 3 );
 	XImage * image = (XImage *)mimage->privateData;
 
 	XFree( image );

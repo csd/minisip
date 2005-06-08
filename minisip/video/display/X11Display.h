@@ -30,9 +30,6 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include <X11/extensions/Xv.h>
-#include <X11/extensions/Xvlib.h>
-
 #include"VideoDisplay.h"
 
 

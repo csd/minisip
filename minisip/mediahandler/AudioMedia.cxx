@@ -26,10 +26,9 @@
 #include"../rtp/RtpHeader.h"
 #include"MediaStream.h"
 #include"../soundcard/FileSoundSource.h"
+#include"../soundcard/SilenceSensor.h"
 
 #define RINGTONE_SOURCE_ID 0x42124212
-
-#include "../../libmutil/include/libmutil/mtime.h"
 
 #include<sys/types.h>
 #include<sys/stat.h>
@@ -70,6 +69,8 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codec
 	
 	// NOTE Sampling frequency FIXED to 8000 Hz
 	resampler = Resampler::create( SOUND_CARD_FREQ, 8000, 20, 1 /*Nb channels */);
+
+        silenceSensor = new SimpleSilenceSensor();
 }
 
 string AudioMedia::getSdpMediaType(){
@@ -135,7 +136,7 @@ void AudioMedia::playData( RtpPacket * packet ){
 void AudioMedia::srcb_handleSound( void * data ){
 
         resampler->resample( (short *)data, resampledData );
-        sendData( (byte_t*) &resampledData, 0, 0, false );
+        sendData( (byte_t*) &resampledData, 160, 0, false );
         seqNo ++;
 }
 
@@ -144,11 +145,9 @@ void AudioMedia::srcb_handleSound( void * data, void * dataR){				//hanning
 	resampler->resample( (short *)data, resampledData );
 	resampler->resample( (short *)dataR, resampledDataR );
 
-	//cerr << mtime() <<  "S" <<endl;
 	for(int j=0; j<160; j++){
 		resampledData[j] = (short)aec.doAEC((int)resampledData[j], (int)resampledDataR[j]);
 	}
-	//cerr << mtime() <<endl;
 	sendData( (byte_t*) &resampledData, 0, 0, false );
         seqNo ++;
 }
@@ -158,15 +157,21 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 
     list< MRef<MediaStreamSender *> >::iterator i;
     sendersLock.lock();
+    bool silence = silenceSensor->silence( (int16_t*)data, length );
     
     
     for( i = senders.begin(); i != senders.end(); i++ ){
         MRef<AudioCodec *> selectedCodec = (AudioCodec*)(*(*i)->getSelectedCodec());
+
+//        if( !selectedCodec->silenceSuppression() ){
+        if( ! silence ){
         
         uint32_t encodedLength = 
             selectedCodec->encode( data, selectedCodec->getInputNrSamples()*sizeof(short), encoded );
 
         (*i)->send( encoded, encodedLength, &ts, marker );
+        }
+//        else
     }
     
     sendersLock.unlock();
