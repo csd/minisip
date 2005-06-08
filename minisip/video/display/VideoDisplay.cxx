@@ -35,6 +35,9 @@
 #include<iostream>
 #define NB_IMAGES 3
 
+Mutex VideoDisplay::displayCounterLock;
+uint32_t VideoDisplay::displayCounter = 0;
+
 
 MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
         MRef<VideoDisplay *> display = NULL;
