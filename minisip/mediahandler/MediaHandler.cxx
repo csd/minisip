@@ -96,11 +96,11 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 		
 		int n = 0; 
 		
-		if ( config->selectedCodec == "0" )
+		if ( config->selectedCodec == "G.711" )
 			n = 0;
-		if ( config->selectedCodec == "97" )
+		if ( config->selectedCodec == "iLBC" )
 			n = 97;
-		if ( config->selectedCodec == "114" )
+		if ( config->selectedCodec == "speex" )
 			n = 114;
 			
 		switch ( n ) {		
