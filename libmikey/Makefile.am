@@ -1,5 +1,6 @@
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
+EXTRA_DIST = libmikey.spec
 
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmikey

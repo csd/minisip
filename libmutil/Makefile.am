@@ -1,5 +1,6 @@
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
+EXTRA_DIST = libmutil.spec
 
 lib_LTLIBRARIES = libmutil.la
 libmutil_la_CPPFLAGS = $(CPPFLAGS) -I../include

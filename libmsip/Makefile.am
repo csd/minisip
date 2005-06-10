@@ -1,5 +1,6 @@
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
+EXTRA_DIST = libmsip.spec
 
 lib_LTLIBRARIES = libmsip.la
 libmsip_la_CPPFLAGS = $(CPPFLAGS) -I../../include/libmsip

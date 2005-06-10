@@ -1,5 +1,6 @@
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
+EXTRA_DIST = libmnetutil.spec
 
 lib_LTLIBRARIES = libmnetutil.la
 libmnetutil_la_CPPFLAGS = $(CPPFLAGS) -I../include
