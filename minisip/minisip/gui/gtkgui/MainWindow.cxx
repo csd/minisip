@@ -422,15 +422,6 @@ void MainWindow::updateConfig(){
 			SLOT( *phoneBookModel, &PhoneBookModel::setFont )
 			);
 	}
-	Gtk::TreeViewColumn * column = phoneBookTreeView->get_column( 0 );
-        int pos, width;
-        column->get_cell_position( *renderer, pos, width );
-
-        cerr << "Pos: " << pos << endl;
-        cerr << "Width: " << width << endl;
-
-
-	//phoneBookTreeView->expand_all();
 }
 
 void MainWindow::setContactDb( MRef<ContactDb *> contactDb ){
