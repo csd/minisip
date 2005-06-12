@@ -43,6 +43,8 @@ rm -rf %buildroot
 /usr/bin/minisip
 /usr/share/minisip/minisip.glade
 /usr/share/minisip/tray_icon.png
+/usr/share/minisip/secure.png
+/usr/share/minisip/insecure.png
 
 %changelog
 * Fri Mar 17 2005 Johan Bilien <jobi@via.ecp.fr>
