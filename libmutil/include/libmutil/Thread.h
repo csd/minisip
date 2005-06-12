@@ -47,6 +47,7 @@ private:
 	std::string desc;
 };
 
+
 class LIBMUTIL_API Runnable{
 public:
 	virtual void run()=0;
@@ -61,9 +62,37 @@ public:
 class LIBMUTIL_API Thread{
 public:
 	Thread(Runnable *runnable);
+
+	/**
+	 * Purpose: Create thread that executes a function and return handle 
+	 * that can be passed to the static join method
+         * @return Handle to the created thread.
+	 */
 	static int createThread( void f());
+
+	/**
+	 * Purpose: Create thread that executes a function that takes an
+	 * argument.
+	 * TODO: The return value of the function can not be retrieved.
+	 *       Change the API to let the join method return this value
+	 *       under both MSVC and pthread.
+	 */
 	static int createThread( void* f(void*), void *arg);
-        void * join();
+
+	
+	void * join();
+	
+	
+	static void join(int handle);
+
+	/**
+	 * Purpose: Implement a platform independent way of delaying 
+	 *		execution of a thread.
+	 * @arg msec	The thread will suspend sleep for at least the 
+	 *		requestex number of milliseconds.
+	*/
+	static void sleep(int msec);
+
 private:
 	void *handle_ptr;
 };

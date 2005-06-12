@@ -53,12 +53,16 @@ Mutex::Mutex(){
 }
 
 
+//FIXME: Verify and comment this method!
 Mutex& Mutex::operator=(const Mutex &){
 	//Do not copy the Mutex reference - keep our own.
 	return *this;
 }
 
 Mutex::Mutex(const Mutex &){
+#ifdef _MSC_VER
+	assert(sizeof(HANDLE)==sizeof(int));
+#endif
 	createMutex();
 }
 
@@ -82,7 +86,6 @@ void Mutex::createMutex(){
 #elif defined WINCE
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = malloc(1, sizeof(HANDLE));
-	//    hMutex = CreateMutex(NULL, FALSE, NULL);
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
 	if (hMutex==NULL){  //TODO: handle better
 		cerr << "could not create mutex!"<< endl;
@@ -105,8 +108,9 @@ Mutex::~Mutex(){
 	delete (pthread_mutex_t*)handle_ptr;
 
 #elif defined _MSC_VER
-	if (!ReleaseMutex( *((HANDLE*)handle_ptr) )){
-		assert(1==0 /*Could not release W32 mutex*/ );
+	if (!CloseHandle(*((HANDLE*)handle_ptr))){
+		cerr << "Could not free mutex"<<endl;
+		assert(1==0); //TODO: Handle better - exception
 	}
 	delete handle_ptr;
 
@@ -128,15 +132,10 @@ void Mutex::lock(){
 		exit(1);
 	    }
 	    
-//	    locked=true;
 #elif defined _MSC_VER
-//	    WaitForSingleObject(hMutex,INFINITE);
 	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
-//	    locked=true;
-    
 #elif defined WINCE
 	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
-//	    locked=true;
 #endif
 
 }
@@ -144,28 +143,19 @@ void Mutex::lock(){
 void Mutex::unlock(){
 #ifdef HAVE_PTHREAD_H
 	
-//	if (locked){
-
-//	    pthread_mutex_unlock(&mutexlock);
-	    int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
-//	    locked=false;
-	    if (ret!=0){
-	    	perror("pthread_mutex_unlock");
+	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
+	if (ret!=0){
+		perror("pthread_mutex_unlock");
 		exit(1);
-	    }
-
-//	}
+	}
 
 #elif defined _MSC_VER
-//	if (locked){
-//	    ReleaseMutex(hMutex);
-	    ReleaseMutex( *( (HANDLE*)handle_ptr) );
-//	    locked=false;
-//	}
+	if (!ReleaseMutex( *( (HANDLE*)handle_ptr) )){
+		assert(1==0); // Could not release mutex TODO: Handle better - exception
+	}
 
 #elif defined WINCE
 	    ReleaseMutex(*((HANDLE*)handle_ptr));
-//	    locked=false;
 #endif
 }
 

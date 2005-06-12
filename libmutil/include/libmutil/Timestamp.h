@@ -25,10 +25,15 @@
 #ifndef TIMESTAMP_H
 #define TIMESTAMP_H
 
-#ifndef _MSC_VER
 
+#ifdef _MSC_VER
+
+#else
 #include<stdint.h>
 #include<sys/time.h>
+#endif
+
+
 #include<time.h>
 #include<fstream>
 #include<string>
@@ -137,7 +142,5 @@ class LIBMUTIL_API Timestamp{
 };
 
 extern LIBMUTIL_API Timestamp ts;
-
-#endif
 
 #endif

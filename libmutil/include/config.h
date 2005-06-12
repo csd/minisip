@@ -28,6 +28,8 @@
 #ifdef _MSC_VER
 #define WIN32
 
+#pragma warning (disable: 4251)
+
 #ifndef LIBMUTIL_EXPORTS
 #error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMUTIL_EXPORTS not defined).
 #endif
@@ -74,11 +76,6 @@ typedef unsigned long long  uint64_t;
 
 
 typedef uint8_t byte_t;
-
-#ifdef DEBUG_OUTPUT
-#define SM_DEBUG
-#define SM_DEBUG_COMMAND
-#endif
 
 
 /*big/little endian conversion*/

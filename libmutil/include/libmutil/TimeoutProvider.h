@@ -110,7 +110,7 @@ class TPRequest{
 			if (happens_before(now))
 				return 0;
 			else
-				return when_ms - now;
+				return (int)(when_ms - now);
 		}
 		
 		TOCommand get_command(){

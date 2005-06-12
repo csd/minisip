@@ -33,8 +33,8 @@
 #include<windows.h>
 #endif
 
-#ifdef _MSC_VER
-#include<windows.h>
+#ifndef _MSC_VER
+#include <unistd.h>
 #endif
 
 
@@ -250,8 +250,22 @@ void * Thread::join(){
         return returnValue;
         
 #elif defined WIN32
-        // FIXME
+	HANDLE handle = *((HANDLE*)handle_ptr);
+        WaitForSingleObject( handle, INFINITE );
         return NULL;
+#endif
+}
+
+void Thread::join(int handle){
+	HANDLE h = (HANDLE)handle;
+	WaitForSingleObject( h, INFINITE );
+}
+
+void Thread::sleep(int ms){
+#ifdef _MSC_VER
+	Sleep(ms);
+#else
+	usleep(ms * 1000);
 #endif
 }
 
