@@ -28,6 +28,8 @@
 
 #ifdef _MSC_VER 
 
+#pragma warning (disable: 4251)
+
 #ifndef WIN32
 #define WIN32
 #endif
