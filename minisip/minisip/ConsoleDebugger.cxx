@@ -12,11 +12,6 @@
 #include<conio.h>
 #endif
 
-
-#ifdef DEBUG_OUTPUT
-extern bool sipdebug_print_packets;
-#endif
-
 using namespace std;
 
 void ConsoleDebugger::showMem(){
@@ -46,9 +41,9 @@ void ConsoleDebugger::run(){
 #ifdef DEBUG_OUTPUT
 			case 'P':
 			case 'p':
-				
-				sipdebug_print_packets= !sipdebug_print_packets;
-				if (sipdebug_print_packets)
+				set_debug_print_packets(!get_debug_print_packets());
+				//sipdebug_print_packets= !sipdebug_print_packets;
+				if (/*sipdebug_print_packets*/ get_debug_print_packets() )
 					cerr << "Packets will be displayed to the screen"<< endl;
 				else
 					cerr << "Packets will NOT be displayed to the screen"<< endl;

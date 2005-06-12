@@ -134,7 +134,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 	}
 
 	string pskString = parser->getValue("psk","Unspecified PSK");
-	psk_length = pskString.size();
+	psk_length = (int)pskString.size();
 	psk = new unsigned char[psk_length];
 
 	memcpy( psk, pskString.c_str(), psk_length );
@@ -155,7 +155,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 			cert = new certificate( certFile );
 			this->cert->add_certificate( cert );
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception * ){
 			merr << "Could not open the given certificate " << certFile <<end;
 		}
 
@@ -164,11 +164,11 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 			try{
 				cert->set_pk( privateKeyFile );
 			}
-			catch( certificate_exception_pkey * exc ){
+			catch( certificate_exception_pkey * ){
 				merr << "The given private key " << privateKeyFile << " does not match the certificate"<<end;
 			}
 
-			catch( certificate_exception * exc ){
+			catch( certificate_exception *){
 				merr << "Could not open the given private key "<< privateKeyFile << end;
 			}
 		}
@@ -182,7 +182,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 			certificate * cert = new certificate( certFile );
 			this->cert->add_certificate( cert );
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception *){
 			merr << "Could not open the given certificate" << end;
 		}
 		iCertFile ++;
@@ -198,7 +198,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 		try{
 			cert_db->add_file( certFile );
 		}
-		catch( certificate_exception *exc){
+		catch( certificate_exception *){
 			merr << "Could not open the CA certificate" << end;
 		}
 		iCertFile ++;
@@ -213,7 +213,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 		try{
 			cert_db->add_directory( certFile );
 		}
-		catch( certificate_exception *exc){
+		catch( certificate_exception *){
 			merr << "Could not open the CA certificate directory " << certFile << end;
 		}
 		iCertFile ++;

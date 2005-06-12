@@ -22,6 +22,7 @@
 */
 
 #include<config.h>
+
 #include"SimpleResampler.h"
 #include<iostream>
 #include<libmutil/print_hex.h>
@@ -68,9 +69,9 @@ void SimpleResampler::downSample( short * input, short * output ){
 	int sampleGroupSize;
 	int sample;
 
-	for( channel = 0; channel < nChannels; channel ++ ){
+	for( channel = 0; channel < (int)nChannels; channel ++ ){
 		inputOffset = channel;
-		for (i = 0; i < outputFrames; i++){
+		for (i = 0; i < (int)outputFrames; i++){
 			epsilon += sampleRatio;
 			sampleGroupSize = epsilon / 10000;
 			epsilon -= sampleGroupSize * 10000;
@@ -95,15 +96,15 @@ void SimpleResampler::upSample( short * input, short * output ){
 	int i, j, channel;
 //	int epsilon = 0;
 	int outputOffset = 0;
-	int sum;
+	//int sum;
 	int sampleGroupSize;
-	int sample;
+	//int sample;
 	int step;
 	int lastInputSample;
 	
 	if( inputFrames == 1 ){
-		for( channel = 0 ; channel < nChannels ; channel ++ ){
-			for( j = 0; j < outputFrames; j++ ){
+		for( channel = 0 ; channel < (int)nChannels ; channel ++ ){
+			for( j = 0; j < (int)outputFrames; j++ ){
 				output[j*nChannels + channel] = input[channel];
 			}
 
@@ -112,11 +113,11 @@ void SimpleResampler::upSample( short * input, short * output ){
 	}
 
 
-	for( channel = 0; channel < nChannels; channel ++ ){
+	for( channel = 0; channel < (int)nChannels; channel ++ ){
 		outputOffset = channel;
 		sampleGroupSize = outputFrames / inputFrames;
 		lastInputSample = previousFrame[ channel ];
-		for (i = 0; i < inputFrames - 1; i++){
+		for (i = 0; i < (int)inputFrames - 1; i++){
 
 			step = input[(i)*nChannels + channel] / sampleGroupSize  - lastInputSample / sampleGroupSize;  
 

@@ -33,6 +33,9 @@
 /* Compilation time configuration */
 
 #ifdef _MSC_VER
+
+#pragma warning (disable: 4251)
+
 #ifndef WIN32
 #define WIN32
 #endif
@@ -142,6 +145,9 @@ static inline uint64_t U64_AT( void const * _p )
 
 #ifdef WIN32
 #define TEXT_UI
+//#define DEBUG_OUTPUT
+#include<iostream>
+using namespace std;
 #endif
 
 

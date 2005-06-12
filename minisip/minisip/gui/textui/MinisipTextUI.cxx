@@ -36,14 +36,6 @@
 
 
 
-//extern TextUI *debugtextui;
-
-
-
-#ifdef DEBUG_OUTPUT
-extern bool sipdebug_print_packets;
-#endif
-
 MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     inCall=false;
     p2tmode=false;
@@ -782,13 +774,15 @@ void MinisipTextUI::guiExecute(string cmd){
 
 #ifdef DEBUG_OUTPUT
 	if (command == "show packets"){
-		sipdebug_print_packets=true;
+		set_debug_print_packets(true);
+		//sipdebug_print_packets=true;
 		displayMessage("SIP messages will be displayed on the screen", blue);
 		handled=true;
 	}
 
 	if (command == "hide packets"){
-		sipdebug_print_packets=false;
+		set_debug_print_packets(true);
+		//sipdebug_print_packets=false;
 		displayMessage("SIP messages will NOT be displayed on the screen", blue);
 		handled=true;
 	}

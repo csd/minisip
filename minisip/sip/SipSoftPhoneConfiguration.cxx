@@ -173,15 +173,19 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 	string ret = "";
 
+	cerr << "EEE: Creating parser"<< endl;
 	XMLFileParser * parser = new XMLFileParser( filename );
 	string account;
 	int ii = 0;
 
 	try{
 		do{
+			
+
 			string accountPath = string("account[")+itoa(ii)+"]/";
 			account = parser->getValue(accountPath+"account_name");
 			MRef<SipIdentity*> ident= new SipIdentity();
+
 			ident->setIdentityName(account);
 
 			if( ii == 0 ){
@@ -191,16 +195,13 @@ string SipSoftPhoneConfiguration::load( string filename ){
 			ii++;
 
 			try{
-
 				string uri = parser->getValue(accountPath + "sip_uri");
 				ident->setSipUri(uri);
-
 				string proxy = parser->getValue(accountPath + "proxy_addr","");
 				
 				uint16_t proxyPort = parser->getIntValue(accountPath +"proxy_port", 5060);
 				
 				ident->setDoRegister(parser->getValue(accountPath + "register","")=="yes");
-
 				try{
 					if (proxy!=""){
 						ident->sipProxy = SipProxy(proxy);
@@ -244,6 +245,7 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				identities.push_back(ident);
 
 			}
+
 			catch(XMLElementNotFound enf){
 				cerr << "WARNING: got <"<< enf.what()<<"> when parsing configuration for account "<<account <<endl;;
 			}
@@ -253,6 +255,8 @@ string SipSoftPhoneConfiguration::load( string filename ){
 	}catch(XMLElementNotFound enf){
 		;
 	}
+
+	cerr << "EEE: use tcp?"<< endl;
 
 	tcp_server = parser->getValue("tcp_server", "yes") == "yes";
 	tls_server = parser->getValue("tls_server", "no") == "yes";

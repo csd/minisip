@@ -24,6 +24,8 @@
 #ifndef FLOAT_RESAMPLER_H
 #define FLOAT_RESAMPLER_H
 
+#ifdef FLOAT_RESAMPLER
+
 #include"Resampler.h"
 #include<samplerate.h>
 
@@ -48,6 +50,8 @@ class FloatResampler : public Resampler {
 
 };
 
+
+#endif
 
 #endif
 

@@ -2,6 +2,8 @@
 
 #ifndef _MSC_VER
 #include<unistd.h>
+#include<iostream>
+using namespace std;
 #endif
 
 #include"Minisip.h"
@@ -144,8 +146,9 @@ Minisip::Minisip( int argc, char**argv ){
                 merr << "ERROR: Could not initialize NetUtil package"<<end;
                 exit();
         }
-
+	cerr << "Creating SipSoftPhoneConfiguration..."<< endl;
 	phoneConf =  new SipSoftPhoneConfiguration();
+
 
 	phoneConf->sip=NULL;
 
@@ -158,10 +161,10 @@ Minisip::Minisip( int argc, char**argv ){
 #ifdef DEBUG_OUTPUT
 	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
 #endif
-	
+	cerr << "Creating timeout provider"<< endl;	
 	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
-	
+	cerr << "Creating ContactDb"<< endl;
         /* Create the global contacts database */
         ContactDb *contactDb = new ContactDb();
         ContactEntry::setDb(contactDb);
@@ -174,6 +177,8 @@ Minisip::Minisip( int argc, char**argv ){
 
 #ifdef TEXT_UI
         ///*gui = */debugtextui = new MinisipTextUI();
+	cerr << "Creating TextUI"<< endl;
+
 	gui = new MinisipTextUI();
 //	gui = dynamic_cast<Gui*>(debugtextui);
 //	assert(gui);
@@ -201,6 +206,7 @@ Minisip::Minisip( int argc, char**argv ){
 #endif //GTK_GUI
 #endif //TEXT_UI
 
+	cerr << "Setting contact db"<< endl;
 	gui->setContactDb(contactDb);
 }
 
@@ -220,7 +226,9 @@ void Minisip::exit(){
 }
 
 void Minisip::run(){
+	cerr << "Thread 2 running - doing initParseConfig"<< endl;
 	initParseConfig();
+	cerr << "Creating MessageRouter"<< endl;
 
 	try{
 		MessageRouter *ehandler =  new MessageRouter();
@@ -370,7 +378,9 @@ void Minisip::run(){
 		textui->displayMessage("");
 		}
 #endif
+		cerr << "EEE: Doing sip->run()"<< endl;
                 sip->run();
+		cerr << "EEE: Done doing sip->run()"<< endl;
 
 
         }catch(XMLElementNotFound *e){
@@ -391,6 +401,7 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                 merr << "Minisip caught an unknown exception. Quitting."<< end;
 #endif
+
         };
 
 }
@@ -403,7 +414,9 @@ void Minisip::initParseConfig(){
 #ifdef DEBUG_OUTPUT
                         mout << BOLD << "init 3/9: Parsing configuration file ("<< conffile<<")" << PLAIN << end;
 #endif
+			cerr << "EEEE: Loading config"<< endl;
                         string ret = phoneConf->load( conffile );
+			cerr <<"EEEE: Done loading config"<< endl;
 
                         cerr << "Identities: "<<endl;
                         for (list<MRef<SipIdentity*> >::iterator i=phoneConf->identities.begin() ; i!=phoneConf->identities.end(); i++){
@@ -435,6 +448,7 @@ void Minisip::initParseConfig(){
 }
 
 void Minisip::startSip(){
+	cerr << "Creating thread"<< endl;
 	Thread( this );
 }
 

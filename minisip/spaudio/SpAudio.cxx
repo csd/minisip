@@ -94,6 +94,7 @@ int32_t SpAudio::spatialize(short *input,
 	}
 	else{
 		memcpy( outbuff, input, nSamples * 2 );
+		return NULL; //TODO: Is this the right value to return? 
 	}
 }
 

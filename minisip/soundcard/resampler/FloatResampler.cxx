@@ -21,6 +21,9 @@
  *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
+
+#ifdef FLOAT_RESAMPLER
+
 #include<config.h>
 #include"FloatResampler.h"
 #include<iostream>
@@ -67,5 +70,5 @@ void FloatResampler::resample( short * input, short * output ){
 }
 
         
-
+#endif
 
