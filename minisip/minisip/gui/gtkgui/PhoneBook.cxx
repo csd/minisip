@@ -20,6 +20,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 #include"PhoneBook.h"
 #include"ContactDialog.h"
 #include"../../contactdb/PhoneBook.h"
@@ -302,8 +303,10 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 
 		textR->property_is_expanded().set_value( 
 				(*iter)->children().size() >= 1 );
+#ifndef OLDLIBGLADEMM
                 renderer->property_cell_background().set_value(
                                 "#FFFFFF" );
+#endif
 
 	}
 	else{
@@ -323,8 +326,10 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 				"<span size=\"x-small\"foreground=\"" + 
 				col +  "\">" + 
 				entry->getUri() + "</span>" );
+#ifndef OLDLIBGLADEMM
                         renderer->property_cell_background().set_value(
                                 entry->getPersonIndex()%2?"#EFEFEF":"#FFFFFF" );
+#endif
 
 		}
 		/*
