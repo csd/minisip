@@ -257,8 +257,14 @@ void * Thread::join(){
 }
 
 void Thread::join(int handle){
+#ifdef _MSC_VER
 	HANDLE h = (HANDLE)handle;
 	WaitForSingleObject( h, INFINITE );
+#else
+        if( pthread_join( handle, NULL) ){
+                perror( "ERROR: pthread_join" );
+        }
+#endif
 }
 
 void Thread::sleep(int ms){
