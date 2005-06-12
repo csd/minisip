@@ -22,6 +22,8 @@
  *          
 */
 
+#include<config.h>
+
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentFactory.h>
@@ -46,7 +48,7 @@ SipMimeContent::SipMimeContent(std::string ContentType, std::string Message, std
 }
 
 SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
-	int index2;
+	size_t index2;
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
 	if(ContentType.substr(0,9) == "multipart"){
@@ -63,10 +65,10 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
 		else
 			this->Message = "";
 		// Extract the bodyparts
-		int boundrysize = 2 + this->boundry.length();
+		size_t boundrysize = 2 + this->boundry.length();
 		// Find end of body
-		int endindex = content.rfind("--"+this->boundry+"--", content.length());
-		int index1 = index2;
+		size_t endindex = content.rfind("--"+this->boundry+"--", content.length());
+		size_t index1 = index2;
 		while (endindex != index1){
 			index1 = index1 + boundrysize + 2;
 			if (content.substr(index1,2) == "\r\n"){

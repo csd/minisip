@@ -125,4 +125,8 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 #include<libmsip/SipDialogContainer.h>
 
 
+LIBMSIP_API void set_debug_print_packets(bool);
+LIBMSIP_API bool get_debug_print_packets();
+
+
 #endif

@@ -39,8 +39,6 @@
 #ifdef DEBUG_OUTPUT
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
-
-extern Timestamp ts;
 #endif
 
 /*               

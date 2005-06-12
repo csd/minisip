@@ -45,7 +45,7 @@ bool SipUtils::startsWith(std::string line, std::string part){
 int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
 	unsigned bufSize = (unsigned)buf.size();
 	int endi=bufSize;
-	int i;
+	unsigned i;
 	int parserState=0;  	// Parser states:
 				//	0: last char seen was part of
 				//         header

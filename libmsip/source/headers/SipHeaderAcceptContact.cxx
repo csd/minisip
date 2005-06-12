@@ -49,6 +49,7 @@
  *	2004-05-28
 */
 
+#include<config.h>
 
 #include<libmsip/SipHeaderAcceptContact.h>
 

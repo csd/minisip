@@ -69,6 +69,10 @@
 #define KEY_MGMT_METHOD_MIKEY_PSK       0x12
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
 
+#include<string>
+
+using namespace std;
+
 
 class LIBMSIP_API SipProxy{
 	public:
@@ -138,9 +142,9 @@ class LIBMSIP_API SipIdentity : public MObject{
 		SipIdentity(){/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ registerToProxy=false; securitySupport=false;}
                 SipIdentity(string sipuri);
 
-		void setIdentityName(string n){identityIdentifier = n;}
+		void setIdentityName(string n);//{identityIdentifier = n;}
 		
-		void setSipUri(string uri);
+		void setSipUri(string addr);
 		
 		string getSipUri(){return sipUsername +"@" + sipDomain;}
 

@@ -27,6 +27,8 @@
 #ifdef _MSC_VER
 #define W32			//FIXME: not correct for WCE env?
 
+#pragma warning (disable: 4251)
+
 #ifndef uint8_t
 typedef unsigned char  uint8_t;
 #endif

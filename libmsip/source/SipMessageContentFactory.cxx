@@ -22,10 +22,10 @@
 */
 
 
+#include<config.h>
 
 #include<libmsip/SipMessageContentFactory.h>
 
-#include<config.h>
 #include <iostream>
 
 void SMCFCollection::addFactory(string contentType, SipMessageContentFactoryFuncPtr f){
@@ -33,7 +33,7 @@ void SMCFCollection::addFactory(string contentType, SipMessageContentFactoryFunc
 }
 
 SipMessageContentFactoryFuncPtr SMCFCollection::getFactory(const string contentType){
-	int index  = contentType.find("; ",0);
+	size_t index  = contentType.find("; ",0);
 	string str;
 	if (index != string::npos){
 		str = contentType.substr(0,index);

@@ -52,7 +52,9 @@ void SipIdentity::setSipUri(string addr){
         sipDomain = addr.substr(addr.find("@")+1);
         //cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
 }
-
+void SipIdentity::setIdentityName(string n){
+	identityIdentifier = n;
+}
 
 SipCommonConfig::SipCommonConfig():
 	localUdpPort(0),

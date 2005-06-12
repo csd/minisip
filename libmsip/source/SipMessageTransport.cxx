@@ -61,6 +61,7 @@
 #define NB_THREADS 5
 #define BUFFER_UNIT 1024
 
+
 #ifdef _MSC_VER
 static int nocaseequal(char c1, char c2){
 	if ( ((c1>='A') && (c1<='Z')) ){
@@ -232,7 +233,17 @@ StreamThreadData::StreamThreadData( MRef<SipMessageTransport *> transport){
 	this->transport = transport;
 }
 
+
 bool sipdebug_print_packets=false;
+
+void set_debug_print_packets(bool f){
+	sipdebug_print_packets=f;
+}
+
+bool get_debug_print_packets(){
+	return sipdebug_print_packets;
+}
+
 #ifdef DEBUG_OUTPUT
 
 uint64_t startTime = 0;
@@ -245,12 +256,20 @@ void printMessage(string header, string packet){
 	int64_t sec = t / 1000 - startTime / 1000;
 	int64_t msec = t - startTime;
 	
-	header = (sec<100?string("0"):string("")) + (sec<10?"0":"") + itoa(msec/1000)+":"+(msec<10?"0":"")+ (msec<100?"0":"")+itoa(msec%1000)+ " " + header;
+	header = (sec<100?string("0"):string("")) + 
+		 (sec<10?"0":"") + 
+		 itoa((int)(msec/1000))+
+		 ":"+
+		 (msec<10?"0":"")+
+		 (msec<100?"0":"")+
+		 itoa((int)(msec%1000))+ 
+		 " " + 
+		 header;
 	
 	if (sipdebug_print_packets){
-		int strlen=packet.size();;
+		size_t strlen=packet.size();;
 		mout << header<<": ";
-		for (int i=0; i<strlen; i++){
+		for (size_t i=0; i<strlen; i++){
 			mout << packet[i];
 			if (packet[i]=='\n')
 				mout << header<<": ";

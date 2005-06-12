@@ -111,12 +111,12 @@ SipURI::SipURI(string build_from){
 	}
 
 	i=0; 
-	for (int32_t j=build_from.length()-2; j>0; j--){
+	for (int32_t j=(int32_t)build_from.length()-2; j>0; j--){
 		if (build_from[j]==';')
 			i=j;
 	}
 	
-	unsigned len=build_from.length();
+	unsigned len=(unsigned)build_from.length();
 	if (build_from.substr(i,6) == ";user="){
 		i+=6;
 		while (!(build_from[i]=='>' || 

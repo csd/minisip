@@ -102,7 +102,7 @@ SipMessage::~SipMessage(){
 
 MRef<SipMessage*> SipMessage::createMessage(string &data){
 	
-	int n = data.size();
+	size_t n = data.size();
 
 	if (n>3   &&    (data[0]=='S'||data[0]=='s') &&
 			(data[1]=='I'||data[1]=='i') &&

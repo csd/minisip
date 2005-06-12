@@ -166,8 +166,8 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			}
                         dialogListLock.lock();
 		}
-		}catch(exception &exc){
-			cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!1caught exception i="<< i << endl;
+		}catch(exception &){
+			cerr << "SipMessageDispatcher: caught exception i="<< i << endl;
 		}
 
 

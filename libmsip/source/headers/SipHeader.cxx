@@ -79,7 +79,7 @@ string SipHeaderParameter::getString(){
 
 void SipHeaderFactories::addFactory(string headerType, SipHeaderFactoryFuncPtr f){
 	string ht;
-	for (int i=0; i< headerType.size();i++){
+	for (unsigned i=0; i< headerType.size();i++){
 		ht+=toupper(headerType[i]);
 	}
 	
@@ -88,7 +88,7 @@ void SipHeaderFactories::addFactory(string headerType, SipHeaderFactoryFuncPtr f
 
 SipHeaderFactoryFuncPtr SipHeaderFactories::getFactory(const string headerType){
 	string ht;
-	for (int i=0; i< headerType.size();i++){
+	for (unsigned i=0; i< headerType.size();i++){
 		ht+=toupper(headerType[i]);
 	}
 	return factories[ht];
@@ -138,7 +138,7 @@ static string getHeader(const string &line,int &endi){
 
 string findHeaderType(string s){
 	string ht;
-	int ssize = s.size();
+	int ssize = (int)s.size();
 	for (int i=0; s[i]!=':' && i<ssize; i++){
 		ht+=s[i];
 	}
@@ -160,7 +160,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	
 	MRef<SipHeader*> h;
 
-	for (int i=0; i< values.size(); i++){
+	for (unsigned i=0; i< values.size(); i++){
 		vector<string> value_params;
 		if(headerType=="Accept-Contact"){
 			value_params = split(valueline,true,'\n');
@@ -179,7 +179,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			hval = new SipHeaderValueUnsupported(value_params[0]);
 		}	
 		
-		for(int j=1; j<value_params.size(); j++){
+		for(unsigned j=1; j<value_params.size(); j++){
 			//cerr << "Adding parameter <"<< value_params[j]<< ">"<< endl;
 			hval->addParameter(new SipHeaderParameter(value_params[j]));
 		}
