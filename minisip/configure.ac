@@ -108,8 +108,10 @@ AC_CHECK_HEADER([samplerate.h],
 	[
 		AC_CHECK_LIB([samplerate], [main],
 			[LIBS="-lsamplerate ${LIBS}"
-			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])])
+			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])
 			 FLOAT_RESAMPLER="yes"
+                        ]
+                )
 	]
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
@@ -390,10 +392,37 @@ AC_CHECK_LIB([resolv], [main])
 dnl FIXME: Replace `main' with a function in `-lssl':
 AC_CHECK_LIB([ssl], [main])
 
-AC_CHECK_LIB([mutil], [main])
-AC_CHECK_LIB([mnetutil], [main])
-AC_CHECK_LIB([msip], [main])
-AC_CHECK_LIB([mikey], [main])
+AC_CHECK_LIB([mutil], [main],
+    [
+        LIBS="-lmutil ${LIBS}"
+    ],[
+        AC_MSG_ERROR([Could not find libmutil. Please install the corresponding
+                      package.])
+    ])
+
+AC_CHECK_LIB([mnetutil], [main],
+    [
+        LIBS="-lmnetutil ${LIBS}"
+    ],[
+        AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding
+                      package.])
+    ])
+
+AC_CHECK_LIB([msip], [main],
+    [
+        LIBS="-lmsip ${LIBS}"
+    ],[
+        AC_MSG_ERROR([Could not find libmsip. Please install the corresponding
+                      package.])
+    ])
+
+AC_CHECK_LIB([mikey], [main],
+    [
+        LIBS="-lmikey ${LIBS}"
+    ],[
+        AC_MSG_ERROR([Could not find libmikey. Please install the corresponding
+                      package.])
+    ])
 
 
 dnl Check for QT libraries
