@@ -2,7 +2,6 @@ noinst_LIBRARIES = librtp.a
 
 librtp_a_SOURCES = RtpHeader.cxx \
                    RtpPacket.cxx \
-		   RtpMonitor.cxx \
 		   CryptoContext.cxx \
 		   SRtpPacket.cxx \
 		   SDESChunk.cxx \
@@ -37,7 +36,6 @@ noinst_HEADERS  = CryptoContext.h \
                   RtcpReportSR.h \
                   RtcpReportXR.h \
                   RtpHeader.h \
-                  RtpMonitor.h \
                   RtpPacket.h \
                   SDESChunk.h \
                   SDES_CNAME.h \
