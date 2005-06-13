@@ -14,20 +14,23 @@ bin_PROGRAMS = minisip
 AM_LDFLAGS = @LDFLAGS@ @AVCODEC_LDFLAGS@
 AM_CXXFLAGS = @CXXFLAGS@
 AM_CPPFLAGS = @CPPFLAGS@
+minisip_LDADD = 
 
 
 
 if GTK_GUI
 AM_LDFLAGS +=  @GLADEMM_LIBS@
 AM_CXXFLAGS += @GLADEMM_CFLAGS@
-minisip_LDADD = gui/gtkgui/libminisip_gtkgui.a
+minisip_LDADD += gui/gtkgui/libminisip_gtkgui.a
 else !GTK_GUI
 if TEXT_UI
-minisip_LDADD = gui/textui/libminisip_textui.a
-else
+minisip_LDADD += gui/textui/libminisip_textui.a
+else !TEXT_UI
+if QT_GUI
 AM_CPPFLAGS += -I@QT_INCLUDE@
 AM_LDFLAGS += -L@QT_LIB_LOCATION@
-minisip_LDADD = gui/qtgui/libminisip_qtgui.a
+minisip_LDADD += gui/qtgui/libminisip_qtgui.a
+endif QT_GUI
 endif !TEXT_UI
 endif !GTK_GUI
 

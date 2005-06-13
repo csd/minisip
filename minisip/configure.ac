@@ -293,6 +293,18 @@ AC_ARG_ENABLE(textui,
       fi ])
 AM_CONDITIONAL(TEXT_UI, [test "${enable_textui}" = "yes"])
 
+dnl Qt GUI
+AC_ARG_ENABLE(qtui,
+    [ --enable-qtui enables the Qt based user interface (default disabled)],
+    [ if test "${enable_qtui}" = "yes"
+      then
+	  AC_DEFINE(QT_GUI, [], [Use the Qt based user interface])
+          QTGUI="yes"
+	  enable_gtk="no"
+	  
+      fi ])
+AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
+
 
 dnl GTK GUI
 AC_ARG_ENABLE(gtk,
