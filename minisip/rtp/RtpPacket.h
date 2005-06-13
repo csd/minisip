@@ -29,29 +29,6 @@
 
 #include<config.h>
 
-#if BYTE_ORDER == LITTLE_ENDIAN
-
-#else
-#error RTP only works with little endian -- fix.
-#endif
-
-
-struct rtpheader{               // WARNING: ONLY FOR x86 arch...
-	unsigned cc:4;
-	unsigned x:1;
-	unsigned p:1;
-	unsigned v:2;
-
-	unsigned pt:7;
-	unsigned m:1;
-
-	unsigned seq_no:16;
-
-	unsigned timestamp:32;
-	unsigned ssrc:32;
-};
-
-
 class RtpPacket{
 	public:
 		RtpPacket();

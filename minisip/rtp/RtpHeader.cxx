@@ -102,20 +102,26 @@ int RtpHeader::size(){
 }
 
 char *RtpHeader::getBytes(){
-	char *ret = new char[size()/*+4*CSRC.size()*/];
-	struct rtpheader *hdrptr = (struct rtpheader *)ret;
-	hdrptr->v=version;
-	hdrptr->x=extension;
-	hdrptr->cc=CSRC_count;
-	hdrptr->m=marker;
-	hdrptr->pt=payload_type;
-	hdrptr->seq_no=hton16(sequence_number);
-	hdrptr->timestamp=hton32(timestamp);
-	hdrptr->ssrc=hton32(SSRC);
-	hdrptr->p=0;
+        uint8_t i;
+	char *ret = new char[size()];
+
+        ret[0] = ( ( version << 6 ) & 0xc0 ) |
+                 ( ( extension << 4 ) & 0x10 ) |
+                 ( ( CSRC_count & 0x0F ) );
+
+        ret[1] = ( ( marker << 7 ) & 0x80 ) |
+                 ( ( payload_type & 0x7F ) );
+
+        ret[2] = ( sequence_number >> 8 ) & 0xFF;
+        
+        ret[3] = ( sequence_number ) & 0xFF;
+        
+        ((uint32_t *)ret)[1] = hton32( timestamp );
+        ((uint32_t *)ret)[2] = hton32( SSRC );
 	
-	for (unsigned i=0; i<CSRC.size(); i++)
-		((int *)ret)[3+i]=hton32(CSRC[i]);
+        for( i = 0; i < CSRC.size(); i++ )
+		((uint32_t *)ret)[3+i]=hton32(CSRC[i]);
+        
 	return ret;
 }
 

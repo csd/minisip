@@ -185,37 +185,48 @@ SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, int timeout){
 #define UDP_SIZE 65536
         int i;
         char buf[UDP_SIZE];
+        uint8_t j;
+        uint8_t cc;
 	//memset( buf, '\0', UDP_SIZE );
 
         i = srtp_socket.recv( buf, UDP_SIZE );
 	
-        if( i<0 ){
+        if( i < 0 ){
 #ifdef DEBUG_OUTPUT
 		perror("recvfrom:");
 #endif
 		return NULL;
         }
 
-        // Creating SRTP packet...
+        if( i < 12 ){
+                /* too small to contain an RTP header */
+                return NULL;
+        }
 
-        rtpheader *hdrptr=(rtpheader *)&buf[0];
+        cc = buf[0] & 0x0F;
+        if( i < 12 + cc * 4 ){
+                /* too small to contain an RTP header with cc CCSRC */
+                return NULL;
+        }
+
         RtpHeader hdr;
-        hdr.setVersion(hdrptr->v);
-        hdr.setExtension(hdrptr->x);
-        hdr.setCSRCCount(hdrptr->cc);
-        hdr.setMarker(hdrptr->m);
-        hdr.setPayloadType(hdrptr->pt);
-        hdr.setSeqNo(ntohs(hdrptr->seq_no));
-        hdr.setTimestamp(ntohl(hdrptr->timestamp));
-        hdr.setSSRC(ntohl(hdrptr->ssrc));
-	
-        for (unsigned j=0; j<hdrptr->cc; j++)
-                hdr.addCSRC(ntohl( ((int *)&buf[12])[j] ));
-        
-	int datalen = i - 12 - hdrptr->cc*4;
-        int hdrctr = 12;
+        hdr.setVersion( ( buf[0] >> 6 ) & 0x03 );
+        hdr.setExtension(  ( buf[0] >> 4 ) & 0x01 );
+        hdr.setCSRCCount( cc );
+        hdr.setMarker( ( buf[1] >> 7 ) & 0x01  );
+        hdr.setPayloadType( buf[1] & 0x7F );
 
-	unsigned char *data = (unsigned char *)&buf[hdrctr+4*hdrptr->cc];
+        hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) & buf[3] );
+        hdr.setTimestamp( U32_AT( buf + 4 ) );
+        hdr.setSSRC( U32_AT( buf + 8 ) );
+
+
+        for( j = 0 ; j < cc ; j++ )
+                hdr.addCSRC( U32_AT( buf + 12 + j*4 ) );
+        
+	int datalen = i - 12 - cc*4;
+
+	unsigned char *data = (unsigned char *)&buf[ 12 + 4*cc ];
 
 	SRtpPacket *srtp = new SRtpPacket( hdr, data, datalen, NULL, 0, NULL, 0 );
         
