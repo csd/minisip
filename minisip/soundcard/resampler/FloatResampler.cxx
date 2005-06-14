@@ -22,9 +22,11 @@
 */
 
 
-#ifdef FLOAT_RESAMPLER
 
 #include<config.h>
+
+#ifdef FLOAT_RESAMPLER
+
 #include"FloatResampler.h"
 #include<iostream>
 
