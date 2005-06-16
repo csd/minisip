@@ -491,7 +491,7 @@ void MainWindow::addConference( string confId, string users,string remoteUri,str
 	Gtk::HBox * hbox = new Gtk::HBox;
 	Glib::ustring tabLabelText;
 
-	string from = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+	string from = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 	ConferenceWidget * conferenceWidget = new ConferenceWidget(from, confId, users, remoteUri,callId, this, incoming);
 
 	conferenceWidgets.push_back( conferenceWidget );
@@ -543,7 +543,7 @@ void MainWindow::removeConference( string callId ){
 }
 
 void MainWindow::addIm( string uri ){
-	string from = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+	string from = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 	ImWidget * imWidget = new ImWidget( this, uri, from );
 
 	imWidgets.push_back( imWidget );

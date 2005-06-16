@@ -372,8 +372,8 @@ string SecuritySettings::apply(){
         config->securityConfig.psk_length = psk_length;
 
 	config->securityConfig.secured = secureCheck->get_active();
-	if( config->inherited.sipIdentity ){
-		config->inherited.sipIdentity->securitySupport = secureCheck->get_active();
+	if( config->inherited->sipIdentity ){
+		config->inherited->sipIdentity->securitySupport = secureCheck->get_active();
 	}
 
 	if( config->securityConfig.secured ){
@@ -420,16 +420,16 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
 	this->config = config;
 
-	udpSpin->set_value( config->inherited.localUdpPort );
-	tcpSpin->set_value( config->inherited.localTcpPort );
-	tlsSpin->set_value( config->inherited.localTlsPort );
+	udpSpin->set_value( config->inherited->localUdpPort );
+	tcpSpin->set_value( config->inherited->localTcpPort );
+	tlsSpin->set_value( config->inherited->localTlsPort );
 
 	tcpCheck->set_active( config->tcp_server );
 	tlsCheck->set_active( config->tls_server );
 
 	transportChange();
 
-	transportEntry->set_text( config->inherited.transport );
+	transportEntry->set_text( config->inherited->transport );
 
 	stunCheck->set_active( config->useSTUN );
 	stunAutodetectCheck->set_active( config->useUserDefinedStunServer );
@@ -469,14 +469,14 @@ void AdvancedSettings::stunAutodetectChange(){
 }
 
 string AdvancedSettings::apply(){
-	config->inherited.localUdpPort = udpSpin->get_value_as_int();
-	config->inherited.localTcpPort = tcpSpin->get_value_as_int();
-	config->inherited.localTlsPort = tlsSpin->get_value_as_int();
+	config->inherited->localUdpPort = udpSpin->get_value_as_int();
+	config->inherited->localTcpPort = tcpSpin->get_value_as_int();
+	config->inherited->localTlsPort = tlsSpin->get_value_as_int();
 
 	config->tcp_server = tcpCheck->get_active();
 	config->tls_server = tlsCheck->get_active();
 
-	config->inherited.transport = transportEntry->get_text();
+	config->inherited->transport = transportEntry->get_text();
 
 	config->useSTUN = stunCheck->get_active();
 	config->useUserDefinedStunServer = stunAutodetectCheck->get_active()

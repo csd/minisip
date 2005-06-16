@@ -79,7 +79,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->username] = (*i)->sipProxy.sipProxyUsername;
 		(*iter)[columns->password] = (*i)->sipProxy.sipProxyPassword;
 		(*iter)[columns->doRegister] = (*i)->registerToProxy;
-		(*iter)[columns->defaultProxy] = ( (*i) == config->inherited.sipIdentity );
+		(*iter)[columns->defaultProxy] = ( (*i) == config->inherited->sipIdentity );
 		(*iter)[columns->pstnProxy] = ( (*i) == config->pstnIdentity );
 	}
 
@@ -87,7 +87,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	config->identities.clear();
-	config->inherited.sipIdentity = NULL;
+	config->inherited->sipIdentity = NULL;
 	config->pstnIdentity = NULL;
 	config->usePSTNProxy = false;
 	Gtk::TreeModel::iterator iter;
@@ -157,9 +157,9 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			config->pstnIdentity = identity;
 		}
 
-		if( !config->inherited.sipIdentity ||
+		if( !config->inherited->sipIdentity ||
 				(*iter)[columns->defaultProxy] ){
-			config->inherited.sipIdentity = identity;
+			config->inherited->sipIdentity = identity;
 		}
 
 		config->identities.push_back( identity );
