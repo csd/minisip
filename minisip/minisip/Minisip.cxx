@@ -247,27 +247,15 @@ void Minisip::run(){
 
                 // FIXME: This should be done more often
                 localIpString = externalContactIP = ipProvider->getExternalIp();                
-		UDPSocket udpSocket( false, phoneConf->inherited->localUdpPort );                
+		
+		MRef<UDPSocket*> udpSocket = new UDPSocket( false, phoneConf->inherited->localUdpPort );                
+		
 		phoneConf->inherited->localUdpPort =
-                        ipProvider->getExternalPort( &udpSocket );
+                        ipProvider->getExternalPort( udpSocket );
                 phoneConf->inherited->localIpString = externalContactIP;
                 phoneConf->inherited->externalContactIP = externalContactIP;
-                udpSocket.close();
-/*
-                phoneConf->inherited.sipTransport= MRef<SipMessageTransport*>(new
-                        SipMessageTransport(
-                                        localIpString,
-                                        externalContactIP,
-					phoneConf->inherited.transport,
-                                        phoneConf->inherited.externalContactUdpPort,
-                                        phoneConf->inherited.localUdpPort,
-                                        phoneConf->inherited.localTcpPort,
-                                        phoneConf->inherited.localTlsPort,
-                                        phoneConf->securityConfig.cert->get_first(),
-                                        phoneConf->securityConfig.cert_db
-                                )
-                        );
-*/
+                udpSocket=NULL;
+
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
@@ -313,7 +301,9 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                         mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
 #endif
-                        Thread::createThread(tcp_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer() ));
+			
+			sip->getSipStack()->getSipTransportLayer()->startTcpServer();
+//                        Thread::createThread(tcp_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer() ));
 
                 }
 
@@ -325,7 +315,8 @@ void Minisip::run(){
 #ifdef DEBUG_OUTPUT
                                 mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
 #endif
-                                Thread::createThread(tls_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer()));
+				sip->getSipStack()->getSipTransportLayer()->startTlsServer();
+//                                Thread::createThread(tls_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer()));
                         }
                 }
 		}
