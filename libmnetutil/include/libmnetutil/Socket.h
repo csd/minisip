@@ -53,11 +53,12 @@ typedef __int32  int32_t;
 class LIBMNETUTIL_API Socket : public MObject{
 	public:
 		Socket();
+		virtual ~Socket();
 		virtual int32_t getFd();
 		int32_t getType();
 
 		void close();
-		virtual std::string getMemObjectType(){return "Socket";};
+//		virtual std::string getMemObjectType(){return "Socket";};
 	
 	protected:
 		int32_t type;

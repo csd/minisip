@@ -31,9 +31,17 @@
 #include<unistd.h>
 #endif
 
+#include<iostream>
+using namespace std;
 
 Socket::Socket(){
 
+}
+
+Socket::~Socket(){
+	if (fd!=-1){
+		close();
+	}
 }
 
 int32_t Socket::getFd(){
