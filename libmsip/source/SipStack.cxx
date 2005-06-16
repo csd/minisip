@@ -72,6 +72,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
 		)
 {
+	timers = new SipTimers;
 	this->config = stackConfig;
 
 	if (tp){
@@ -131,8 +132,16 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 #ifdef MINISIP_MEMDEBUG 
 	phoneconfig.setUser("Sip/addr:phoneconfig");
 #endif
-}
 
+	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
+	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
+	transportLayer->setSipSMCommandReceiver(this);
+
+}
+/*
 void SipStack::init(){
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
@@ -141,6 +150,7 @@ void SipStack::init(){
 	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
 	transportLayer->setSipSMCommandReceiver(this);
 }
+*/
 
 void SipStack::setCallback(SipCallback *callback){
 	this->callback = callback;

@@ -103,7 +103,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		virtual std::string getMemObjectType(){return "SipStack";}
 		
-		void init();
+		//void init();
                 virtual void run();
 
 		string invite(string &user);
