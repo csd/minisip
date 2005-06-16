@@ -49,10 +49,10 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited.sipIdentity->sipDomain+"]";}
+		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 		
 //#ifdef DEBUG_OUTPUT	
-		virtual std::string getMemObjectType(){return "SipDialogRegister["+getDialogConfig()->inherited.sipIdentity->sipDomain+"]";}
+		virtual std::string getMemObjectType(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 //#endif
 
 

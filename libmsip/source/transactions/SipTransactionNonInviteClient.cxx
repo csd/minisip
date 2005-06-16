@@ -317,11 +317,17 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
 			SipTransactionClient(stack, d, seq_no, "", callid),
-			lastRequest(NULL)//,
-			//timerT1(500)
+			lastRequest(NULL)
 {
-	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+
+	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr;
+	port = conf->sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();
 }
 

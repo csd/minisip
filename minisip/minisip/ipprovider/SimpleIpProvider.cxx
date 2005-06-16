@@ -34,7 +34,7 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
         
 	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
 
-	localIp = config->inherited.localIpString;
+	localIp = config->inherited->localIpString;
 	
         if (localIp.length()>0){
                 bool ok=false;

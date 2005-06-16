@@ -50,8 +50,8 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
         mdbg << "Try 1, autodetect"<< end;
 #endif
         if (phoneConf->findStunServerFromSipUri){
-                mdbg << "Using SIP uri: "<<phoneConf->inherited.sipIdentity->getSipUri()<< end;
-                string useruri = phoneConf->inherited.sipIdentity->getSipUri();
+                mdbg << "Using SIP uri: "<<phoneConf->inherited->sipIdentity->getSipUri()<< end;
+                string useruri = phoneConf->inherited->sipIdentity->getSipUri();
                 if (useruri.find("@")!=string::npos){
                         string uridomain = useruri.substr(useruri.find("@")+1);
                         mdbg << "domain=<"<<uridomain<<">"<< end;

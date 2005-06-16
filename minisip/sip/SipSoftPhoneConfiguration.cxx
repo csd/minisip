@@ -45,7 +45,6 @@ static void installConfigFile( string filename );
 
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
-	inherited(),
 	securityConfig(),
 //	dialogContainer(NULL),
 	sip(NULL),
@@ -72,6 +71,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	ringtone(""),
 	p2tGroupListServerPort(0)
 {
+	inherited = new SipCommonConfig;
 #ifdef MINISIP_MEMDEBUG 
 	//dialogContainer.setUser("SipSoftPhoneConfiguration/sipphone");
 	sip.setUser("SipSoftPhoneConfiguration/sipphone");
@@ -82,7 +82,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 void SipSoftPhoneConfiguration::save(){
 	XMLFileParser * parser = new XMLFileParser( ""/*configFileName*/ );
 	
-	inherited.save( parser );
+	inherited->save( parser );
 	securityConfig.save( parser );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
@@ -109,7 +109,7 @@ void SipSoftPhoneConfiguration::save(){
 			parser->changeValue( accountPath + "pstn_account", "yes" );
 		}
 
-		if( (*iIdent) == inherited.sipIdentity ){
+		if( (*iIdent) == inherited->sipIdentity ){
 			parser->changeValue( accountPath + "default_account", "yes" );
 		}
 		
@@ -173,7 +173,6 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 	string ret = "";
 
-	cerr << "EEE: Creating parser"<< endl;
 	XMLFileParser * parser = new XMLFileParser( filename );
 	string account;
 	int ii = 0;
@@ -189,7 +188,7 @@ string SipSoftPhoneConfiguration::load( string filename ){
 			ident->setIdentityName(account);
 
 			if( ii == 0 ){
-				inherited.sipIdentity = ident;
+				inherited->sipIdentity = ident;
 			}
 
 			ii++;
@@ -239,7 +238,7 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 
 				if (parser->getValue(accountPath + "default_account","")=="yes"){
-					inherited.sipIdentity = ident;
+					inherited->sipIdentity = ident;
 				}
 
 				identities.push_back(ident);
@@ -301,12 +300,12 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 	ringtone = parser->getValue("ringtone","");
 
-	inherited.load( parser );
+	inherited->load( parser );
 	securityConfig.load( parser );
 
 	// FIXME: per identity security
-	if( inherited.sipIdentity){
-		inherited.sipIdentity->securitySupport = securityConfig.secured;
+	if( inherited->sipIdentity){
+		inherited->sipIdentity->securitySupport = securityConfig.secured;
 	}
 
 	selectedCodec =  parser->getValue("selected_codec","iLBC");

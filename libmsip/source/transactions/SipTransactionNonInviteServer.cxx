@@ -292,11 +292,17 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 
 SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
 		SipTransactionServer(stack, call, seq_no, branch, callid),
-		lastResponse(NULL)//,
-		//timerT1(500)
+		lastResponse(NULL)
 {
-	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+	
+	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr;
+	port = conf->sipIdentity->sipProxy.sipProxyPort;
 	
 	setUpStateMachine();
 }

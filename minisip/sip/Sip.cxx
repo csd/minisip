@@ -146,7 +146,7 @@ string Sip::invite(string &user){
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->inherited.sipIdentity);
+		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
 	}
 
 	
@@ -254,7 +254,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *list, string confId){
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->inherited.sipIdentity);
+		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
 	}
 
 	
@@ -353,7 +353,7 @@ string Sip::confconnect(string &user, string confId){
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->inherited.sipIdentity);
+		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
 	}
 
 	

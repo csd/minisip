@@ -204,11 +204,11 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 
 class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
-		SipDialogConfig(SipCommonConfig &phone_config);
+		SipDialogConfig(MRef<SipCommonConfig *> phone_config);
 
 		virtual std::string getMemObjectType(){return "SipDialogConfig";}
 		
-		SipCommonConfig inherited;
+		MRef<SipCommonConfig *> inherited;
 
 		Socket *proxyConnection; //TODO: verify that this is working ok - it has been moved here from SipSoftPhoneConfiguration
 

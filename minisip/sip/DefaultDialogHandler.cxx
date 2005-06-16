@@ -61,7 +61,7 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack,
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
-	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 #ifdef P2T_SUPPORT
 	//Initialize GroupListServer
 	grpListServer=NULL;
@@ -84,8 +84,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipMessage*> pref(*no_call);
 
 		sipStack->getSipTransportLayer()->sendMessage(pref,
-				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort, //port,
+				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort, //port,
 				string(""), //branch
 				true
 				);
@@ -682,7 +682,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 		
 		//filter out own username
 //		if(user==getDialogConfig().inherited.userUri)
-		if(user==getDialogConfig()->inherited.sipIdentity->getSipUri())
+		if(user==getDialogConfig()->inherited->sipIdentity->getSipUri())
 			continue;
 			
 		// filter out users that have already started
@@ -756,7 +756,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		
 		//filter out own username
 		//if(user==getDialogConfig().inherited.userUri)
-		if(user==getDialogConfig()->inherited.sipIdentity->getSipUri())
+		if(user==getDialogConfig()->inherited->sipIdentity->getSipUri())
 			continue;
 		
 		
@@ -854,8 +854,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			dialogConfig->inherited.sipIdentity->sipProxy.sipProxyIpAddr = new IP4Address(proxy);
-			dialogConfig->inherited.sipIdentity->sipProxy.sipProxyPort = iport;
+			dialogConfig->inherited->sipIdentity->sipProxy.sipProxyIpAddr = new IP4Address(proxy);
+			dialogConfig->inherited->sipIdentity->sipProxy.sipProxyPort = iport;
 		}catch(HostNotFound *exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc->errorDescription();
@@ -880,7 +880,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branc
 
 void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
 
-        string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
+        string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
         uint32_t i = tmp.find("@");
         assert(i!=string::npos);
         i++;
@@ -895,7 +895,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
                         std::string(branch),
 			std::string(dialogState.callId),
 			toId,
-			getDialogConfig()->inherited.sipIdentity,
+			getDialogConfig()->inherited->sipIdentity,
 			//getDialogConfig()->inherited.localUdpPort,
                         im_seq_no,
 			msg

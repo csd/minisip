@@ -252,7 +252,7 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 			confid=confid+users[i];
 			i++;
 		}
-		string mysipuri = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+		string mysipuri = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 		users=trim(users.substr(i));
 		cerr<<"confididididididididididididiidididid "+confid<<endl;
 		currentconf=new ConferenceControl(mysipuri,confid,false);
@@ -893,7 +893,7 @@ void MinisipTextUI::guiExecute(string cmd){
 			displayMessage("UNIMPLEMENTED - only one call/conference at the time with this UI.", red);
 		}else{
 			currentconfname = itoa(rand());
-			string mysipuri = config->inherited.sipIdentity->sipUsername + "@" + config->inherited.sipIdentity->sipDomain;
+			string mysipuri = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 			currentconf=new ConferenceControl(mysipuri,currentconfname, true);
 			//conf->setGui(this);
 			callback->setConferenceController(currentconf);
@@ -1073,7 +1073,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		//own username to it
 		grpList = MRef<GroupList*>(new GroupList());
 		//grpList->addUser(config->inherited.userUri);	
-		grpList->addUser(config->inherited.sipIdentity->getSipUri());	
+		grpList->addUser(config->inherited->sipIdentity->getSipUri());	
 		
 		//InfoScreen
 		showP2TInfo();

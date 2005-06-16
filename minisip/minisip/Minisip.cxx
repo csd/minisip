@@ -247,11 +247,11 @@ void Minisip::run(){
 
                 // FIXME: This should be done more often
                 localIpString = externalContactIP = ipProvider->getExternalIp();                
-		UDPSocket udpSocket( false, phoneConf->inherited.localUdpPort );                
-		phoneConf->inherited.localUdpPort =
+		UDPSocket udpSocket( false, phoneConf->inherited->localUdpPort );                
+		phoneConf->inherited->localUdpPort =
                         ipProvider->getExternalPort( &udpSocket );
-                phoneConf->inherited.localIpString = externalContactIP;
-                phoneConf->inherited.externalContactIP = externalContactIP;
+                phoneConf->inherited->localIpString = externalContactIP;
+                phoneConf->inherited->externalContactIP = externalContactIP;
                 udpSocket.close();
 /*
                 phoneConf->inherited.sipTransport= MRef<SipMessageTransport*>(new
@@ -283,11 +283,11 @@ void Minisip::run(){
 		MRef<Sip*> sip=new Sip(phoneConf,mediaHandler,
 					localIpString,
 					externalContactIP,
-					phoneConf->inherited.localUdpPort,
-					phoneConf->inherited.localTcpPort,
-					phoneConf->inherited.externalContactUdpPort,
-					phoneConf->inherited.transport
-					,phoneConf->inherited.localTlsPort,
+					phoneConf->inherited->localUdpPort,
+					phoneConf->inherited->localTcpPort,
+					phoneConf->inherited->externalContactUdpPort,
+					phoneConf->inherited->transport,
+					phoneConf->inherited->localTlsPort,
 					phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
 					//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
 					phoneConf->securityConfig.cert_db
@@ -378,10 +378,7 @@ void Minisip::run(){
 		textui->displayMessage("");
 		}
 #endif
-		cerr << "EEE: Doing sip->run()"<< endl;
                 sip->run();
-		cerr << "EEE: Done doing sip->run()"<< endl;
-
 
         }catch(XMLElementNotFound *e){
                 //FIXME: Display message in GUI
@@ -414,9 +411,7 @@ void Minisip::initParseConfig(){
 #ifdef DEBUG_OUTPUT
                         mout << BOLD << "init 3/9: Parsing configuration file ("<< conffile<<")" << PLAIN << end;
 #endif
-			cerr << "EEEE: Loading config"<< endl;
                         string ret = phoneConf->load( conffile );
-			cerr <<"EEEE: Done loading config"<< endl;
 
                         cerr << "Identities: "<<endl;
                         for (list<MRef<SipIdentity*> >::iterator i=phoneConf->identities.begin() ; i!=phoneConf->identities.end(); i++){

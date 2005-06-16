@@ -117,30 +117,20 @@ void SipCommonConfig::load( XMLFileParser * parser ){
 
 
 
-//SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig*> commonconf): MObject("SipDialogConfig") {
-SipDialogConfig::SipDialogConfig(SipCommonConfig &commonconf)/*: MObject("SipDialogConfig")*/ : proxyConnection(NULL) {
-//    merr << "SipDialogConfig::SipDialogCOnfig: copying inherited..."<< end;
-//    inherited = phoneconf->inherited;
-//	SipCommonConfig tmp(commonconf);
-//	inherited = tmp;
+SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig *> commonconf) : proxyConnection(NULL) {
+	inherited = new SipCommonConfig; /// We want do do a "deep copy" here. This is so that
+					 /// we have a local copy that we can modify and that 
+					 /// no one else modifies.
+	**inherited = **commonconf;
 
-//	inherited = **commonconf;
-	inherited = commonconf;
-	
-//    merr << "SipDialogConfig::SipDialogCOnfig: copying done"<< end;
 
-    last_invite=NULL;
-    
+	last_invite=NULL;
+
 #ifdef MINISIP_MEMDEBUG 
-    last_invite.setUser("SipDialogConfig/last_invite");
+	last_invite.setUser("SipDialogConfig/last_invite");
 #endif
 
-/////    seqNo=100;
-
-    //	callId = itoa(rand())+"@"+inherited.localIpString;
-//    callId = itoa(rand())+"@"+inherited.externalContactIP;
-    local_ssrc = rand();
-    
+	local_ssrc = rand();
 }
 
 void SipDialogConfig::useIdentity(
@@ -148,7 +138,7 @@ void SipDialogConfig::useIdentity(
 			bool useSecurity,
 			string transport)
 {
-	inherited.sipIdentity = identity;
-	inherited.transport = transport;
+	inherited->sipIdentity = identity;
+	inherited->transport = transport;
 }
 

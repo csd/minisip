@@ -280,7 +280,7 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack,
 {
 
 	//setCallId( itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP);
-	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 	
 	dialogState.localTag = itoa(rand());
 	
@@ -295,15 +295,15 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	MRef<SipSubscribe*> sub;
 	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
+	if(getDialogConfig()->inherited->transport=="TCP")
+		localSipPort = getDialogConfig()->inherited->localTcpPort;
+	else if(getDialogConfig()->inherited->transport=="TLS")
+		localSipPort = getDialogConfig()->inherited->localTlsPort;
 	else{ /* UDP, may use STUN */
             if( /*phoneconf->*/useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
+		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
             } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
+                localSipPort = getDialogConfig()->inherited->localUdpPort;
             }
         }
 	
@@ -311,7 +311,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 				branch,
 				dialogState.callId,
 				toUri,
-				getDialogConfig()->inherited.sipIdentity,
+				getDialogConfig()->inherited->sipIdentity,
 				///getDialogConfig()->inherited.localUdpPort,
 //				im_seq_no
 				dialogState.seqNo

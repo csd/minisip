@@ -401,8 +401,15 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MR
 		lastResponse(NULL),
 		timerG(500)
 {
-	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+	
+	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr;
+	port = conf->sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();
 }
 

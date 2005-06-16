@@ -407,9 +407,16 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MR
 		SipTransactionClient(stack, call, seq_no, "", callid),
 		lastInvite(NULL)
 {
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+	
 	timerA=sipStack->getTimers()->getA();
-	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
-	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
+	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr;
+	port = conf->sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();
 }
 
@@ -417,9 +424,17 @@ SipTransactionInviteClient::~SipTransactionInviteClient(){
 }
 
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
+
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+	
         MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri,
-			dialog->getDialogConfig()->inherited.sipIdentity->sipDomain
+	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri, //FIXME: uses dialog here, but it could be NULL
+			conf->sipIdentity->sipDomain
 			); 
 	//TODO:
 	//ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );

@@ -289,15 +289,15 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 	MRef<SipNotify*> notify;
 	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
+	if(getDialogConfig()->inherited->transport=="TCP")
+		localSipPort = getDialogConfig()->inherited->localTcpPort;
+	else if(getDialogConfig()->inherited->transport=="TLS")
+		localSipPort = getDialogConfig()->inherited->localTlsPort;
 	else{ /* UDP, may use STUN */
             if( /*phoneconf->*/useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
+		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
             } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
+                localSipPort = getDialogConfig()->inherited->localUdpPort;
             }
         }
 	
@@ -306,14 +306,14 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				branch,
 				cid,
 				toId,
-				getDialogConfig()->inherited.sipIdentity,
+				getDialogConfig()->inherited->sipIdentity,
 				//getDialogConfig()->inherited.localUdpPort,
 				dialogState.seqNo
 				));
 
 	notify->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
-	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited.sipIdentity->getSipUri(),
+	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				toId->getSipUri(),
 				onlineStatus,
 				onlineStatus

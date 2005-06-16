@@ -68,7 +68,7 @@ class SipSoftPhoneConfiguration : public MObject{
 
 		virtual std::string getMemObjectType(){return "SipSoftPhoneConfig";}
 
-		SipCommonConfig inherited;	//inherited.sipIdentity is the default sip identity.
+		MRef<SipCommonConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
 		
 		SipDialogSecurityConfig securityConfig;
 

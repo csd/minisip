@@ -455,7 +455,7 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
-		getDialogConfig()->inherited.sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
+		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
 
 		//We must maintain our dialog state. This is the first
 		//message we receive for this dialog and we copy the remote
@@ -506,7 +506,7 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		sendRinging(ir->getBranch());
 		
-		if( getDialogConfig()->inherited.autoAnswer ){
+		if( getDialogConfig()->inherited->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
 			SipSMCommand sipcmd(accept, SipSMCommand::remote, SipSMCommand::TU);
 			getDialogContainer()->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
@@ -1095,7 +1095,7 @@ SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callc
 
 {
 	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 	else
 		dialogState.callId = cid;
 	
@@ -1124,15 +1124,15 @@ void SipDialogVoip::sendInvite(const string &branch){
 	string keyAgreementMessage;
 	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
+	if(getDialogConfig()->inherited->transport=="TCP")
+		localSipPort = getDialogConfig()->inherited->localTcpPort;
+	else if(getDialogConfig()->inherited->transport=="TLS")
+		localSipPort = getDialogConfig()->inherited->localTlsPort;
 	else{ /* UDP, may use STUN */
             if( phoneconf->useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
+		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
             } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
+                localSipPort = getDialogConfig()->inherited->localUdpPort;
             }
         }
 	
@@ -1141,15 +1141,15 @@ void SipDialogVoip::sendInvite(const string &branch){
 				dialogState.callId,
 				dialogState.remoteUri,
 				//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-				getDialogConfig()->inherited.sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
+				getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
 //				getDialogConfig().inherited.localIpString,
-				getDialogConfig()->inherited.externalContactIP,
+				getDialogConfig()->inherited->externalContactIP,
 				localSipPort,
 				//getDialogConfig().inherited.userUri,
-				getDialogConfig()->inherited.sipIdentity->getSipUri(),
+				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
-				getDialogConfig()->inherited.transport));
+				getDialogConfig()->inherited->transport));
 
 	/* Get the session description from the Session */
 		
@@ -1242,15 +1242,15 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 	string keyAgreementMessage;
 	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
+	if(getDialogConfig()->inherited->transport=="TCP")
+		localSipPort = getDialogConfig()->inherited->localTcpPort;
+	else if(getDialogConfig()->inherited->transport=="TLS")
+		localSipPort = getDialogConfig()->inherited->localTlsPort;
 	else{ /* UDP, may use STUN */
             if( phoneconf->useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
+		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
             } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
+                localSipPort = getDialogConfig()->inherited->localUdpPort;
             }
         }
 
@@ -1260,20 +1260,20 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 				dialogState.callId,
 				dialogState.remoteUri,
 				//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-				getDialogConfig()->inherited.sipIdentity->sipDomain,
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
+				getDialogConfig()->inherited->sipIdentity->sipDomain,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
 //				getDialogConfig().inherited.localIpString,
-				getDialogConfig()->inherited.externalContactIP,
+				getDialogConfig()->inherited->externalContactIP,
 				localSipPort,
 				//getDialogConfig().inherited.userUri,
-				getDialogConfig()->inherited.sipIdentity->getSipUri(),
+				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
 //				requestSeqNo(),
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyUsername,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
 				nonce,
 				realm,
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword,
-				getDialogConfig()->inherited.transport);
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
+				getDialogConfig()->inherited->transport);
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	
@@ -1359,7 +1359,7 @@ void SipDialogVoip::sendAck(string branch){
 			*lastResponse,
 			getDialogConfig()->uri_foreign,
 			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
-			getDialogConfig()->inherited.sipIdentity->sipDomain);
+			getDialogConfig()->inherited->sipIdentity->sipDomain);
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
 //	mdbg << "SipDialogVoip:sendAck(): sending ACK directly to remote" << end;
@@ -1369,18 +1369,18 @@ void SipDialogVoip::sendAck(string branch){
 //	Socket *sock=NULL;
 	
 	if(getDialogConfig()->proxyConnection == NULL){
-		getDialogConfig()->inherited.sipTransport->sendMessage(ack,
-				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited.sipProxy.proxyPort, //port, 
+		getDialogConfig()->inherited->sipTransport->sendMessage(ack,
+				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited->sipProxy.proxyPort, //port, 
 //				sock, //(Socket *)NULL, //socket, 
 				getDialogConfig()->proxyConnection,
 				"BUGBUGBUG",
-				getDialogConfig()->inherited.transport
+				getDialogConfig()->inherited->transport
 				);
 	}else{
 		// A StreamSocket exists, try to use it
 		mdbg << "Sending packet using existing StreamSocket"<<end;
-		getDialogConfig()->inherited.sipTransport->sendMessage(
+		getDialogConfig()->inherited->sipTransport->sendMessage(
 				ack,
 				(StreamSocket *)getDialogConfig()->proxyConnection, "BUGBUGBUG");
 	}
@@ -1401,7 +1401,7 @@ void SipDialogVoip::sendAck(string branch){
 void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 
 	//string tmp = getDialogConfig().inherited.userUri;
-	string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
+	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
 	uint32_t i = tmp.find("@");
 	assert(i!=string::npos);
 	i++;
@@ -1415,7 +1415,7 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 			getLastInvite(),
 			dialogState.remoteUri,
 			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			domain,
 //			getDialogConfig().seqNo+1,
 			bye_seq_no///,
@@ -1445,8 +1445,8 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 			branch,
 			getLastInvite(),
 			dialogState.remoteUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
-			getDialogConfig()->inherited.sipIdentity->sipDomain,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->inherited->sipIdentity->sipDomain,
                         referredUri,
 			refer_seq_no
 			);
@@ -1466,9 +1466,9 @@ void SipDialogVoip::sendCancel(const string &branch){
 			lastInvite,
 			dialogState.remoteUri,
 			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-			getDialogConfig()->inherited.sipIdentity->sipDomain///,
+			getDialogConfig()->inherited->sipIdentity->sipDomain///,
 			///localCalled
 			);
 
@@ -1614,7 +1614,7 @@ void SipDialogVoip::sendNotAcceptable(const string &branch){
 #endif
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
-			new SipHeader(new SipHeaderValueWarning(getDialogConfig()->inherited.externalContactIP, 399, mediaSession->getErrorString() ) ));
+			new SipHeader(new SipHeaderValueWarning(getDialogConfig()->inherited->externalContactIP, 399, mediaSession->getErrorString() ) ));
 	}
 
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
