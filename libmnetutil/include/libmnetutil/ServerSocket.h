@@ -44,7 +44,7 @@ class LIBMNETUTIL_API ServerSocket : public Socket{
 
 	public:
 		ServerSocket(int32_t domain, int32_t listen_port);
-		virtual StreamSocket *accept();
+		virtual MRef<StreamSocket *> accept();
 
 		
 		/**

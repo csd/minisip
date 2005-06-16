@@ -110,7 +110,7 @@ TLSServerSocket::TLSServerSocket(int32_t listen_port,
 	}
 }
 
-StreamSocket *TLSServerSocket::accept(){
+MRef<StreamSocket *> TLSServerSocket::accept(){
 	int32_t cli;
 	struct sockaddr sin;
 	int32_t sinlen=sizeof(struct sockaddr);

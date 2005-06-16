@@ -93,7 +93,7 @@ void ServerSocket::listen(string local_ip, int32_t local_port, int32_t backlog){
 	}
 }
 
-StreamSocket *ServerSocket::accept(){
+MRef<StreamSocket *>ServerSocket::accept(){
 	int32_t cli;
 	struct sockaddr sin;
 	int32_t sinlen=sizeof(struct sockaddr);
@@ -106,6 +106,7 @@ StreamSocket *ServerSocket::accept(){
 #endif
 		perror("in ServerSocket::accept(): accept:");
 	}
+	
 	return new TCPSocket(cli,&sin);
 }
 
