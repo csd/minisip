@@ -28,19 +28,20 @@
 #define _T1 500
 #define _T4 5000
 
+SipTimers::SipTimers(){
+	T1 = _T1;
+	T2 = 4000;
+	T4 = _T4;
+	A = _T1; //=T1
+	B = 64 * _T1;
+	C = 4*60*1000; //4min (should be >3min)
+	D = 60000; // 60s (should be >32s)
+	E = _T1;
+	F = 64 * _T1;
+	G = _T1;
+	H = 64*_T1;
+	I = _T4;
+	J = 64*_T1;
+	K = _T4;
 
-int SipTimers::T1 = _T1;
-int SipTimers::T2 = 4000;
-int SipTimers::T4 = _T4;
-int SipTimers::A = _T1; //=T1
-int SipTimers::B = 64 * _T1;
-int SipTimers::C = 4*60*1000; //4min (should be >3min)
-int SipTimers::D = 60000; // 60s (should be >32s)
-int SipTimers::E = _T1;
-int SipTimers::F = 64 * _T1;
-int SipTimers::G = _T1;
-int SipTimers::H = 64*_T1;
-int SipTimers::I = _T4;
-int SipTimers::J = 64*_T1;
-int SipTimers::K = _T4;
-
+}

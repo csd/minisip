@@ -313,9 +313,10 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 
 
 SipTransactionNonInviteClient::SipTransactionNonInviteClient(
+		MRef<SipStack *> stack,
 		MRef<SipDialog*> d, 
 		int seq_no, string callid) : 
-			SipTransactionClient(d, seq_no, "", callid),
+			SipTransactionClient(stack, d, seq_no, "", callid),
 			lastRequest(NULL)//,
 			//timerT1(500)
 {

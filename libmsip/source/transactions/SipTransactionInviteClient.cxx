@@ -97,9 +97,9 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 
 	if (transitionMatch(command, SipInvite::type, SipSMCommand::TU, IGN)){
 		lastInvite = (SipInvite *) *command.getCommandPacket();
-		requestTimeout( /*timerT1*/SipTimers::getA() , "timerA" );
+		requestTimeout( /*timerT1*/sipStack->getTimers()->getA() , "timerA" );
 		
-		requestTimeout( /*timerT1*/SipTimers::getB(), "timerB" );
+		requestTimeout( /*timerT1*/sipStack->getTimers()->getB(), "timerB" );
 		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
@@ -402,14 +402,12 @@ void SipTransactionInviteClient::setUpStateMachine(){
 }
 
 
-SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipDialog*> call, 
+SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> call, 
             int seq_no, string callid): 
-		SipTransactionClient(call, seq_no, "", callid),
-		lastInvite(NULL)//,
-		//timerT1(500),
-		//timerA(500)
+		SipTransactionClient(stack, call, seq_no, "", callid),
+		lastInvite(NULL)
 {
-	timerA=SipTimers::getA();
+	timerA=sipStack->getTimers()->getA();
 	toaddr = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr;
 	port = dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();

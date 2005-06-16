@@ -52,7 +52,7 @@
 
 class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
-		SipTransactionInviteServerUA(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		
 		virtual ~SipTransactionInviteServerUA();
 

@@ -53,6 +53,7 @@
 
 class SipDialog;
 class SipMessageDispatcher;
+class SipStack;
 
 /**
  * SipTransaction
@@ -60,7 +61,7 @@ class SipMessageDispatcher;
 class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
-		SipTransaction(MRef<SipDialog*> d, int cseq, const string &branch, string callid);
+		SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &branch, string callid);
                 
 		virtual ~SipTransaction();
 		
@@ -91,6 +92,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		
 	protected:
 		void setCSeqNo(int n){cSeqNo=n;}
+		MRef<SipStack*> sipStack;
 		MRef<SipDialog*> dialog; 
 		Socket * socket;
 		IPAddress * toaddr;             //FIXME: This is leaked?
@@ -110,13 +112,13 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 
 class LIBMSIP_API SipTransactionClient: public SipTransaction{
         public:
-                SipTransactionClient(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
                 ~SipTransactionClient();
 };
 
 class LIBMSIP_API SipTransactionServer: public SipTransaction{
         public:
-                SipTransactionServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
                 ~SipTransactionServer();
 };
 
@@ -125,5 +127,6 @@ class LIBMSIP_API SipTransactionServer: public SipTransaction{
 
 #include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipStack.h>
 
 #endif

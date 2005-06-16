@@ -87,7 +87,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 			
 			++dialogState.seqNo;
 
-			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, /*seqNo*/ dialogState.seqNo, dialogState.callId);
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, this, /*seqNo*/ dialogState.seqNo, dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
                         CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
@@ -126,7 +126,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 	if ( hasPassword() && transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "401")){
 		++dialogState.seqNo;
 
-                MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, dialogState.seqNo, dialogState.callId));
+                MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, dialogState.callId));
                 registerTransaction(trans);
 
                 //extract authentication info from received response
@@ -189,7 +189,7 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 		
 		++dialogState.seqNo;
 
-		MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(this, dialogState.seqNo, dialogState.callId));
+		MRef<SipTransaction*> trans( new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, dialogState.callId));
 		registerTransaction(trans);
 
 		send_auth(trans->getBranch());
@@ -290,7 +290,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 			}
 			
 			++dialogState.seqNo;
-			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(this, dialogState.seqNo, dialogState.callId);
+			MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, dialogState.callId);
 			registerTransaction(trans);
 			send_noauth(trans->getBranch());
 			

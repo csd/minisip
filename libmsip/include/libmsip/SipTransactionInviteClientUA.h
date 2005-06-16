@@ -50,7 +50,7 @@
 
 class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClient{
 	public:
-		SipTransactionInviteClientUA(MRef<SipDialog*> d, int seq_no, string callid);
+		SipTransactionInviteClientUA(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, string callid);
 		
 		virtual ~SipTransactionInviteClientUA();
 

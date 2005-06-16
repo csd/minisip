@@ -180,9 +180,9 @@ void SipTransactionInviteClientUA::changeStateMachine(){
 }
 
 
-SipTransactionInviteClientUA::SipTransactionInviteClientUA(MRef<SipDialog*> call, 
+SipTransactionInviteClientUA::SipTransactionInviteClientUA(MRef<SipStack*> stack, MRef<SipDialog*> call, 
             int seq_no,string callid): 
-		SipTransactionInviteClient(call, seq_no, callid)
+		SipTransactionInviteClient(stack, call, seq_no, callid)
 {
 	changeStateMachine();
 }

@@ -52,7 +52,7 @@
 
 class LIBMSIP_API SipTransactionNonInviteServer: public SipTransactionServer{
 	public:
-		SipTransactionNonInviteServer(MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+		SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		
 		virtual ~SipTransactionNonInviteServer();
 

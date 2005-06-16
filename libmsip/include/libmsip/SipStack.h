@@ -72,6 +72,7 @@
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipTimers.h>
 
 #include<libmsip/SipMessageTransport.h>
 #include<libmutil/cert.h>
@@ -96,7 +97,6 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
 				MRef<ca_db *> cert_db = NULL,
 				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp= NULL
-//					MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *>; 
 			  );
 
 
@@ -123,9 +123,10 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> getTimeoutProvider();
 
 		//void setSipMessageTransport(...);
-	
+		MRef<SipTimers*> getTimers();
                 
 	private:
+		MRef<SipTimers*> timers;
 		SipCallback *callback;
 		MRef<SipDialogContainer*> dialogContainer;
 

@@ -236,7 +236,7 @@ void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ 
 	//int seqNo = requestSeqNo();
 	++dialogState.seqNo;
 	string cid = "FIXME"+itoa(rand());
-	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(MRef<SipDialog *>(this), dialogState.seqNo, /*callId*/cid);
+	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, /*callId*/cid);
 	registerTransaction(subscribetrans);
 	sendNotify(subscribetrans->getBranch(), user, cid);
 
@@ -251,7 +251,7 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 }
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
-	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(MRef<SipDialog*>(this),
+	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this),
 				sub->getCSeq(),
 				sub->getLastViaBranch(),
 				sub->getCallId()) );

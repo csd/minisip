@@ -36,49 +36,52 @@
 #define LIBMSIP_API
 #endif
 
-class LIBMSIP_API SipTimers{
+#include<libmutil/MemObject.h>
+
+class LIBMSIP_API SipTimers : public MObject{
 	public:
-		static void setT1(int t){A=E=G=T1=t; B=F=H=J=t*64; }
-		static void setT2(int t){T2 = t;}
-		static void setT4(int t){I=K=T4=t;}
-		static void setA(int t){A = t;}
-		static void setB(int t){B = t;}
-		static void setC(int t){C = t;}
-		static void setD(int t){D = t;}
-		static void setE(int t){E = t;}
-		static void setF(int t){F = t;}
-		static void setG(int t){G = t;}
-		static void setH(int t){H = t;}
-		static void setI(int t){I = t;}
-		static void setJ(int t){J = t;}	
-		static void setK(int t){K = t;}
-		static int getA(){return A;}
-		static int getB(){return B;}
-		static int getC(){return C;}
-		static int getD(){return D;}
-		static int getE(){return E;}
-		static int getF(){return F;}
-		static int getG(){return G;}
-		static int getH(){return H;}
-		static int getI(){return I;}
-		static int getJ(){return J;}
-		static int getK(){return K;}
+		SipTimers();
+		void setT1(int t){A=E=G=T1=t; B=F=H=J=t*64; }
+		void setT2(int t){T2 = t;}
+		void setT4(int t){I=K=T4=t;}
+		void setA(int t){A = t;}
+		void setB(int t){B = t;}
+		void setC(int t){C = t;}
+		void setD(int t){D = t;}
+		void setE(int t){E = t;}
+		void setF(int t){F = t;}
+		void setG(int t){G = t;}
+		void setH(int t){H = t;}
+		void setI(int t){I = t;}
+		void setJ(int t){J = t;}	
+		void setK(int t){K = t;}
+		int getA(){return A;}
+		int getB(){return B;}
+		int getC(){return C;}
+		int getD(){return D;}
+		int getE(){return E;}
+		int getF(){return F;}
+		int getG(){return G;}
+		int getH(){return H;}
+		int getI(){return I;}
+		int getJ(){return J;}
+		int getK(){return K;}
 		
 	private:
-		static int T1;
-		static int T2;
-		static int T4;
-		static int A;
-		static int B;
-		static int C;
-		static int D;
-		static int E;
-		static int F;
-		static int G;
-		static int H;
-		static int I;
-		static int J;
-		static int K;
+		int T1;
+		int T2;
+		int T4;
+		int A;
+		int B;
+		int C;
+		int D;
+		int E;
+		int F;
+		int G;
+		int H;
+		int I;
+		int J;
+		int K;
 
 		
 

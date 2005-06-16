@@ -79,7 +79,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		requestTimeout(/*64 * timerT1*/ SipTimers::getJ(), "timerJ");
+		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
 		return true;
 	}else{
 		return false;
@@ -92,7 +92,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(),false);
-		requestTimeout(/*64 * timerT1*/ SipTimers::getJ(), "timerJ");
+		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
 		return true;
 	}else{
 		return false;
@@ -290,8 +290,8 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 	setCurrentState(s_start);
 }
 
-SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
-		SipTransactionServer(call, seq_no, branch, callid),
+SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
+		SipTransactionServer(stack, call, seq_no, branch, callid),
 		lastResponse(NULL)//,
 		//timerT1(500)
 {

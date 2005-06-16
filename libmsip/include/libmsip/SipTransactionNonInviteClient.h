@@ -54,7 +54,7 @@
 
 class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionNonInviteClient(MRef<SipDialog*> d, int seq_no, string callid);
+		SipTransactionNonInviteClient(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, string callid);
                 ~SipTransactionNonInviteClient();
 
 		virtual string getName(){return "transaction_noninviteclient[branch="+getBranch()+",type="+getDebugTransType()+"]";}

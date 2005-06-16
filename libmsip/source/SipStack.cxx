@@ -294,3 +294,7 @@ void SipStack::addDialog(MRef<SipDialog*> d){
 MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipStack::getTimeoutProvider(){
 	return timeoutProvider;
 }
+
+MRef<SipTimers*> SipStack::getTimers(){
+	return timers;
+}
