@@ -67,9 +67,17 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
+
+	MRef<SipCommonConfig *> stackConfig = new SipCommonConfig;
+	stackConfig->localIpString = localIpString;
+	stackConfig->externalContactIP= externalContactIP;
+	stackConfig->localUdpPort=localUdpPort;
+	stackConfig->localTcpPort=localTcpPort;
+	stackConfig->externalContactUdpPort= externalContactUdpPort;
+	stackConfig->localTlsPort= localTlsPort;
 	
-	sipstack = new SipStack(/*defaultDialogHandler*/ NULL, localIpString, externalContactIP,localUdpPort,localTcpPort,
-			externalContactUdpPort,defaultTransportProtocol,localTlsPort,cert_chain,cert_db
+	sipstack = new SipStack(NULL, stackConfig,/* localIpString, externalContactIP,localUdpPort,localTcpPort,
+			externalContactUdpPort,*/defaultTransportProtocol,/*localTlsPort,*/cert_chain,cert_db
 			);
 
 	sipstack->init();

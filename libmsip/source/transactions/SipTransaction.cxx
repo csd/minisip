@@ -63,7 +63,14 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 		branch = "z9hG4bK" + itoa(rand());		//magic cookie plus random number
 	}
 
-	try{
+	try{	
+/*		MRef<SipCommonConfig *> conf;
+		if (dialog){
+			conf = dialog->getDialogConfig()->inherited;
+		}else{
+			conf = sipStack->getStackConfig();
+		}
+*/
 		toaddr = new IP4Address(dialog->getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyAddressString);
 	}
 	catch( HostNotFound * exc ){
