@@ -523,7 +523,7 @@ void MinisipTextUI::showTransactions(string command){
 }
 
 void MinisipTextUI::showTimeouts(){
-	string to = config->timeoutProvider->getTimeouts();
+	string to = config->sip->getSipStack()->getTimeoutProvider()->getTimeouts();
 	displayMessage(string("Timeouts: \n")+to);
 }
 
@@ -531,7 +531,7 @@ void MinisipTextUI::showTimeouts(){
 void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header){
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-			config->timeoutProvider->getTimeoutRequests();
+			config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
 	if (usesStateMachine){
 		displayMessage(header + d->getName() + "   State: " + d->getCurrentStateName());
@@ -617,7 +617,7 @@ void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, st
 void MinisipTextUI::showStat(){
 	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
-	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->timeoutProvider->getTimeoutRequests();
+	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
 //	displayMessage(" Default dialog handler:", bold);
 	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(), false, "  Default dialog handler: ");

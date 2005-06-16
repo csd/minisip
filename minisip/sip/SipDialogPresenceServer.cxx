@@ -215,9 +215,8 @@ void SipDialogPresenceServer::setUpStateMachine(){
 SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipStack*> stack, 
 		//const SipDialogConfig &callconfig, 
 		MRef<SipDialogConfig*> callconfig,
-		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, 
 		bool use_stun) : 
-                	SipDialog(stack,callconfig, tp),
+                	SipDialog(stack,callconfig),
 			useSTUN(use_stun),
 			onlineStatus("online")
 {

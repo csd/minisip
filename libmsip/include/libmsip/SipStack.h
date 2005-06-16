@@ -90,11 +90,13 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 				int32_t localUdpPort=5060,
 				int32_t localTcpPort=5060,
 				int32_t externalContactUdpPort=5060,
-				string defaultTransportProtocol="UDP"
-				,int32_t localTlsPort=5061,
+				string defaultTransportProtocol="UDP",
+				int32_t localTlsPort=5061,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
-				MRef<ca_db *> cert_db = NULL
+				MRef<ca_db *> cert_db = NULL,
+				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp= NULL
+//					MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *>; 
 			  );
 
 
@@ -118,6 +120,8 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		MRef<SipMessageTransport *> getSipTransportLayer(){return transportLayer;}
 
+		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> getTimeoutProvider();
+
 		//void setSipMessageTransport(...);
 	
                 
@@ -126,6 +130,8 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		MRef<SipDialogContainer*> dialogContainer;
 
 		MRef<SipMessageTransport *> transportLayer;
+		
+		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
 };
 
 

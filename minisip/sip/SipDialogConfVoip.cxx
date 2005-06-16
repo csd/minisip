@@ -1022,13 +1022,13 @@ void SipDialogConfVoip::setUpStateMachine(){
 
 #ifdef IPSEC_SUPPORT
 SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
 SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *list,string confid, string cid) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession)
@@ -1081,13 +1081,13 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 }
 #ifdef IPSEC_SUPPORT
 SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
 SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession)

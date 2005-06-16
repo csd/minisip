@@ -75,7 +75,7 @@ void ConsoleDebugger::run(){
 void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		config->timeoutProvider->getTimeoutRequests();
+		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
 	if (usesStateMachine){
 		cerr << (/*string("    (")+itoa(ii)+") " +*/ d->getName() + "   State: " + d->getCurrentStateName())<< endl;
@@ -158,7 +158,7 @@ void ConsoleDebugger::showStat(){
 	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		config->timeoutProvider->getTimeoutRequests();
+		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
 
 	cerr << "    (DefaultHandler) ";

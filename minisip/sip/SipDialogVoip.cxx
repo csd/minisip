@@ -1079,13 +1079,13 @@ void SipDialogVoip::setUpStateMachine(){
 
 #ifdef IPSEC_SUPPORT
 SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
 SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
 		mediaSession(mediaSession)

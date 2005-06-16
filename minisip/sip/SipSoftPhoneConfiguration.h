@@ -123,7 +123,7 @@ class SipSoftPhoneConfiguration : public MObject{
 
 		bool tcp_server;
 
-		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
+//		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
 		
 
 		bool tls_server;

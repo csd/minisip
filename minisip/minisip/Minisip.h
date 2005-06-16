@@ -5,7 +5,6 @@
 #include"../conf/ConferenceControl.h"
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
-#include<libmutil/TimeoutProvider.h>
 #include<libmutil/StateMachine.h>
 //#include"ConsoleDebugger.h"
 
@@ -36,7 +35,7 @@ class Minisip : public Runnable{
 		Gui * gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
-		TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > * timeoutprovider;
+		//TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > * timeoutprovider;
 #ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT
 		MRef<ConsoleDebugger *> consoleDbg;

@@ -43,7 +43,7 @@
 
 class LIBMSIP_API SipDialogRegister : public SipDialog{
 	public:
-		SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> conf,MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider);
+		SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> conf);
 		virtual ~SipDialogRegister();
 
 

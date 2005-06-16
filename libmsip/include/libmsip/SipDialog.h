@@ -88,8 +88,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * @param callconf   The Dialog Configuration
 		 */
 		SipDialog(MRef<SipStack*> stack, 
-				MRef<SipDialogConfig*> callconf,
-				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider );
+				MRef<SipDialogConfig*> callconf);
 		
 		/**
 		 * Deconstructor.

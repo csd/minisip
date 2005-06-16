@@ -28,7 +28,6 @@
 #include <gtkmm.h>
 #include<libmutil/CommandString.h>
 #include "../../../conf/ConferenceControl.h"
-#include<libmutil/TimeoutProvider.h>
 #include"../../Bell.h"
 #include"CallWidget.h"
 #include"DtmfWidget.h"

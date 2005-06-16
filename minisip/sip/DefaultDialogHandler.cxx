@@ -57,7 +57,7 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack,
 	    MRef<SipDialogConfig *> conf,
 	    MRef<SipSoftPhoneConfiguration*> pconf,
 	    MRef<MediaHandler *>mediaHandler): 
-                SipDialog(stack, conf, pconf->timeoutProvider),
+                SipDialog(stack, conf),
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
@@ -316,7 +316,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		
 		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 
-		MRef<SipDialogPresenceClient*> pres(new SipDialogPresenceClient(sipStack, conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
+		MRef<SipDialogPresenceClient*> pres(new SipDialogPresenceClient(sipStack, conf, phoneconf->useSTUN ));
 
 		sipStack->addDialog( MRef<SipDialog*>(*pres) );
 		
@@ -334,7 +334,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		
 		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 
-		MRef<SipDialogPresenceServer*> pres(new SipDialogPresenceServer(sipStack, conf, phoneconf->timeoutProvider, phoneconf->useSTUN ));
+		MRef<SipDialogPresenceServer*> pres(new SipDialogPresenceServer(sipStack, conf, phoneconf->useSTUN ));
 
 		sipStack->addDialog( MRef<SipDialog*>(*pres) );
 		
@@ -375,7 +375,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 			conf->useIdentity( phoneconf->pstnIdentity, false);
 
 		}
-		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf, phoneconf->timeoutProvider ));
+		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf));
 #ifdef MINISIP_MEMDEBUG
 		reg.setUser("DefaultDialogHandler");
 #endif

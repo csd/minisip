@@ -74,9 +74,17 @@ SipStack::SipStack(MRef<SipDialog*> defaultDialog,
 		string defaultTransportProtocol
 		,int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db
+		MRef<ca_db *> cert_db,
+		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
 		)
 {
+
+	if (tp){
+		timeoutProvider = tp;
+	}else{
+		timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
+	}
+	
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptContactFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
 	SipHeader::headerFactories.addFactory("Authorization", sipHeaderAuthorizationFactory);
@@ -282,3 +290,7 @@ void SipStack::addDialog(MRef<SipDialog*> d){
 	dialogContainer->addDialog(d);
 }
 
+
+MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipStack::getTimeoutProvider(){
+	return timeoutProvider;
+}

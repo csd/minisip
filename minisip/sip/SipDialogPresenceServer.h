@@ -55,7 +55,7 @@ class LogEntry;
 
 class SipDialogPresenceServer: public SipDialog{
 	public:
-		SipDialogPresenceServer(MRef<SipStack*> dContainer, MRef<SipDialogConfig*> callconfig, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp, bool use_stun);
+		SipDialogPresenceServer(MRef<SipStack*> dContainer, MRef<SipDialogConfig*> callconfig, bool use_stun);
 		
 		virtual ~SipDialogPresenceServer();
 

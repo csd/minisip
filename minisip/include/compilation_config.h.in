@@ -54,18 +54,6 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define to 1 if you have the `mikey' library (-lmikey). */
-#undef HAVE_LIBMIKEY
-
-/* Define to 1 if you have the `mnetutil' library (-lmnetutil). */
-#undef HAVE_LIBMNETUTIL
-
-/* Define to 1 if you have the `msip' library (-lmsip). */
-#undef HAVE_LIBMSIP
-
-/* Define to 1 if you have the `mutil' library (-lmutil). */
-#undef HAVE_LIBMUTIL
-
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
@@ -212,6 +200,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Use the Qt based user interface */
+#undef QT_GUI
 
 /* Use Qt Embedded windowing system */
 #undef QWS

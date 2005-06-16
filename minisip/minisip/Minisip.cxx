@@ -162,7 +162,7 @@ Minisip::Minisip( int argc, char**argv ){
 	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
 #endif
 	cerr << "Creating timeout provider"<< endl;	
-	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
+//	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
 	cerr << "Creating ContactDb"<< endl;
         /* Create the global contacts database */
@@ -201,7 +201,7 @@ Minisip::Minisip( int argc, char**argv ){
 #endif
 
 #else //!GTK_GUI
-        gui= guiFactory(argc, argv, timeoutprovider);
+        gui= guiFactory(argc, argv, timeoutProvider);
 	LogEntry::handler = NULL;
 #endif //GTK_GUI
 #endif //TEXT_UI
@@ -232,7 +232,7 @@ void Minisip::run(){
 
 	try{
 		MessageRouter *ehandler =  new MessageRouter();
-		phoneConf->timeoutProvider = timeoutprovider;
+//		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << end;

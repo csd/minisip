@@ -400,8 +400,8 @@ void SipDialogRegister::setUpStateMachine(){
 	setCurrentState(s0_start);
 }
 
-SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp)
-		: SipDialog(stack, callconf, tp),
+SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf)
+		: SipDialog(stack, callconf),
 			realm(""),
 			nonce(""),
 			failCount(0),

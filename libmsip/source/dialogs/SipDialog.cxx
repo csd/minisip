@@ -37,8 +37,8 @@
 #include<libmutil/CommandString.h>
 
 
-SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf, MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp):
-                StateMachine<SipSMCommand,string>(tp), 
+SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
+                StateMachine<SipSMCommand,string>(stack->getTimeoutProvider()), 
                 sipStack(stack), 
                 callConfig(callconf)
 {
