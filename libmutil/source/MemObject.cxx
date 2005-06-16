@@ -34,13 +34,12 @@ MObject::MObject() : refCount(0){
 }
 
 MObject::~MObject(){
-
 }
 
 int MObject::decRefCount(){
 	int ref;
 	refLock.lock();
-	ref=refCount--;
+	ref=--refCount;
 	refLock.unlock();
 	return ref;
 }
