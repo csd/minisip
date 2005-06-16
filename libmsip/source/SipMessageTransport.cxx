@@ -24,11 +24,7 @@
 
 #include<config.h>
 
-
-
 #include<assert.h>
-
-#include<config.h>
 
 #include<errno.h>
 #include<stdio.h>
@@ -45,6 +41,9 @@
 #include<libmsip/SipHeaderVia.h>
 
 #include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IP4ServerSocket.h>
+#include<libmnetutil/TLSServerSocket.h>
+#include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/MemObject.h>
@@ -89,6 +88,68 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 #endif
 
 
+SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r): ssock(sock), receiver(r),doStop(false){
+
+}
+
+void SocketServer::run(){
+	MRef<SocketServer*> myself(this); // This is used to make
+					// sure there is a reference to
+					// this object even if no one else
+					// is referencing it.
+
+	started_flag->inc();		// Tell the thread that started us
+					// that we have started (and have
+					// a reference to our selve so
+					// that we are not deleted by misstake)
+				
+	started_flag=NULL;		// We don't need it any longer and can let
+					// it be automatically freed
+	struct timeval timeout;
+	fd_set set;
+	int fd = ssock->getFd();
+	while (!doStop){
+
+		int avail;
+		do{
+			FD_ZERO(&set);
+			FD_SET(fd, &set);
+			timeout.tv_sec = 5;
+			timeout.tv_usec= 0;
+			avail = select(fd+1,&set,NULL,NULL,&timeout );
+			if (avail<0){
+				Thread::msleep(500);
+			}
+		} while( avail < 0 );
+		//if (avail==0){
+		//	cerr<< "SocketServer::run(): Timeout"<< endl;
+		//}
+		MRef<SipMessageTransport *> r = receiver;
+		if (avail && !doStop && r){
+			MRef<StreamSocket *> ss = ssock->accept();
+			if (ss){
+				r->addSocket(ss);
+			}else{
+				cerr << "Warning: Failed to accept client"<< endl;
+			}
+		}
+
+	}
+
+} // "myself" will be freed here and the object can be freed.
+
+void SocketServer::start(){
+	MRef<Semaphore *> sem = new Semaphore;
+	started_flag = sem;
+	Thread t(this);
+	sem->dec(); // Wait until thread has started
+}
+
+void SocketServer::stop(){
+	doStop=true;
+}
+
+
 class SipMessageParser{
 	public:
 		SipMessageParser();
@@ -109,6 +170,9 @@ class SipMessageParser{
 
 SipMessageParser::SipMessageParser(){
 	buffer = (uint8_t *)malloc( BUFFER_UNIT * sizeof( uint8_t ) );
+	for (int i=0; i< BUFFER_UNIT * sizeof( uint8_t ); i++)
+		buffer[i]=0;
+
 	length = BUFFER_UNIT;
 	index = 0;
 	contentIndex = 0;
@@ -293,7 +357,7 @@ SipMessageTransport::SipMessageTransport(
 			MRef<certificate_chain *> cchain, 
                         MRef<ca_db *> cert_db
 			):
-                                        udpsock(false,local_udp_port),
+                                        //udpsock(false,local_udp_port),
                                         localIP(local_ip),
                                         contactIP(contactIP),
 					preferredTransport(preferredTransport),
@@ -306,12 +370,58 @@ SipMessageTransport::SipMessageTransport(
                                         tls_ctx(NULL)
 							
 {
-	int i;
+	udpsock = new UDPSocket(false, local_udp_port);
+	
         Thread::createThread(udpThread, this);
 	
+	int i;
 	for( i=0; i < NB_THREADS ; i++ ){
             Thread::createThread(streamThread, new StreamThreadData(this));
 	}
+}
+
+//void SipMessageTransport::startUdpServer(){ }
+//void SipMessageTransport::stopUdpServer(){ }
+
+void SipMessageTransport::startTcpServer(){
+	try{
+		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
+		tcpSocketServer->start();
+	}catch( NetworkException * exc ){
+		cerr << exc->errorDescription() << endl;
+		return;
+	}
+}
+
+void SipMessageTransport::stopTcpServer(){
+	tcpSocketServer->stop();
+	tcpSocketServer=NULL;
+}
+
+void SipMessageTransport::startTlsServer(){
+	if( getMyCertificate().isNull() ){
+		merr << "You need a personal certificate to run "
+			"a TLS server. Please specify one in "
+			"the certificate settings. minisip will "
+			"now disable the TLS server." << end;
+		return;
+	}
+
+	try{
+		tlsSocketServer = new SocketServer(new TLSServerSocket(localTLSPort, getMyCertificate(), getCA_db() ),this);
+		tlsSocketServer->start();
+	}catch( NetworkException * exc ){
+		cerr << "Exception caught when creating TCP server." << endl;
+		cerr << exc->errorDescription() << endl;
+		return;
+	}
+
+
+}
+
+void SipMessageTransport::stopTlsServer(){
+	tlsSocketServer->stop();
+	tlsSocketServer=NULL;
 }
 
 void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
@@ -421,7 +531,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 #endif
 
-			if( udpsock.sendTo( ip_addr, port, 
+			if( udpsock->sendTo( ip_addr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
 			
@@ -478,8 +588,15 @@ MRef<StreamSocket *> SipMessageTransport::findStreamSocket( IPAddress & address,
 	return NULL;
 }
 
+#define UDP_MAX_SIZE 65536
+
 void SipMessageTransport::udpSocketRead(){
-	char buffer[16384];
+	char buffer[UDP_MAX_SIZE];
+
+	for (int i=0; i<UDP_MAX_SIZE; i++){
+		buffer[i]=0;
+	}
+	
 	int avail;
 	MRef<SipMessage*> pack;
 #ifdef MINISIP_MEMDEBUG
@@ -490,14 +607,14 @@ void SipMessageTransport::udpSocketRead(){
 	
 	while( true ){
 	        FD_ZERO(&set);
-        	FD_SET(udpsock.getFd(), &set);
+        	FD_SET(udpsock->getFd(), &set);
 
 		do{
-            		avail = select(udpsock.getFd()+1,&set,NULL,NULL,NULL );
+            		avail = select(udpsock->getFd()+1,&set,NULL,NULL,NULL );
 		} while( avail < 0 );
 
-		if( FD_ISSET( udpsock.getFd(), &set )){
-			nread = udpsock.recv(buffer, 16384);
+		if( FD_ISSET( udpsock->getFd(), &set )){
+			nread = udpsock->recv(buffer, UDP_MAX_SIZE);
 			
 			if (nread == -1){
 				mdbg << "Some error occured while reading from UdpSocket"<<end;
@@ -591,8 +708,13 @@ void StreamThreadData::run(){
 	}
 }
 
+#define STREAM_MAX_PKT_SIZE 65536
+
 void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
-	char buffer[16384];
+	char buffer[STREAM_MAX_PKT_SIZE+1];
+	for (int i=0; i< STREAM_MAX_PKT_SIZE+1; i++){
+		buffer[i]=0;
+	}
 	int avail;
 	MRef<SipMessage*> pack;
 #ifdef MINISIP_MEMDEBUG
@@ -621,7 +743,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 		}
 
 		if( FD_ISSET( socket->getFd(), &set )){
-			nread = socket->read( buffer, 16384 );
+			nread = socket->read( buffer, STREAM_MAX_PKT_SIZE);
 
 			if (nread == -1){
 				mdbg << "Some error occured while reading from StreamSocket" << end;
@@ -642,6 +764,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				uint32_t i;
 				for( i = 0; i < (uint32_t)nread; i++ ){
 					pack = parser.feed( buffer[i] );
+					
 					if( pack ){
 #ifdef DEBUG_OUTPUT
 						printMessage("IN (STREAM)", buffer);
@@ -649,10 +772,11 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						//					dialogContainer->enqueueMessage( pack );
 
 						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
-						if (!transport->commandReceiver.isNull())
+						if (!transport->commandReceiver.isNull()){
 							transport->commandReceiver->handleCommand( cmd );
-						else
+						}else
 							mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+						pack=NULL;
 					}
 
 				}

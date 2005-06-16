@@ -38,8 +38,10 @@
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/TLSSocket.h>
+#include<libmnetutil/ServerSocket.h>
 #include<libmutil/cert.h>
 #include<libmutil/Mutex.h>
+#include<libmutil/Thread.h>
 #include<libmutil/Semaphore.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
@@ -49,6 +51,29 @@
 class SipDialogContainer;
 
 class SipMessage;
+
+class SipMessageTransport;
+
+/**
+ * Purpose: Listens on a TCP or TLS server socket and reports
+ * when a client connects to it.
+ *
+ */
+class SocketServer : public MObject, public Runnable{
+	public:
+		SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r);
+		std::string getMemObjectType(){return "SocketServer";}
+		void run();
+		void start();
+		void stop();
+
+        private:
+                MRef<ServerSocket *> ssock;
+                MRef<SipMessageTransport *> receiver;
+                bool doStop;
+                MRef<Semaphore *> started_flag;
+};
+
 
 class LIBMSIP_API SipMessageTransport : public virtual MObject{
 	public:
@@ -62,6 +87,16 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 							MRef<certificate_chain *> cchain=NULL, 
 							MRef<ca_db *> cert_db = NULL
 		);
+
+//		void startUdpServer();
+//		void stopUdpServer();
+
+		void startTcpServer();
+		void stopTcpServer();
+
+		void startTlsServer();
+		void stopTlsServer();
+		
 		
 		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
 		
@@ -94,7 +129,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		void addViaHeader( MRef<SipMessage*> pack, MRef<StreamSocket *> socket, string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
 		
-		UDPSocket udpsock;
+		MRef<UDPSocket*> udpsock;
+		MRef<SocketServer*> tcpSocketServer;
+		MRef<SocketServer*> tlsSocketServer;
                 
 		Mutex socksLock;
 		list<MRef<StreamSocket *> > socks;
