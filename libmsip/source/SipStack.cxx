@@ -72,6 +72,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
 		)
 {
+	this->config = stackConfig;
 
 	if (tp){
 		timeoutProvider = tp;
