@@ -100,6 +100,9 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket{
 			  MRef<ca_db *> cert_db=NULL );
 		TLSSocket( TCPSocket * tcpSock, SSL_CTX * ssl_ctx );
 		virtual ~TLSSocket();
+
+		virtual std::string getMemObjectType(){return "TLSSocket";};
+		
 		virtual int32_t write(string);
 		virtual int32_t write(void *buf, int32_t count);
 		virtual int32_t read(void *buf, int32_t count);

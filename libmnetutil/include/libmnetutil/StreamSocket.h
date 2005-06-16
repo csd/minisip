@@ -35,6 +35,7 @@ typedef unsigned short  uint16_t;
 #define LIBMNETUTIL_API __declspec(dllimport)
 #endif
 #else
+#include<inttypes.h>
 #define LIBMNETUTIL_API
 #endif
 

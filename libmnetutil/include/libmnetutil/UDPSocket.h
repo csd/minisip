@@ -44,6 +44,8 @@ class LIBMNETUTIL_API UDPSocket : public Socket{
 	public:
 		UDPSocket(bool use_ipv6=false, int32_t port=0);
 		virtual ~UDPSocket();
+
+		virtual std::string getMemObjectType(){return "UDPSocket";}
 		
 		int32_t getPort();
 		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
