@@ -65,15 +65,8 @@
 #include<libmutil/dbg.h>
 #include<libmutil/cert.h>
 
-SipStack::SipStack(MRef<SipDialog*> defaultDialog, 
-		MRef<SipCommonConfig *> stackConfig,
-		//string localIpString, 
-		//string externalContactIP, 
-		//int32_t localUdpPort,
-		//int32_t localTcpPort,
-		//int32_t externalContactUdpPort,
+SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		string defaultTransportProtocol,
-		//int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
@@ -137,10 +130,6 @@ SipStack::SipStack(MRef<SipDialog*> defaultDialog,
 #ifdef MINISIP_MEMDEBUG 
 	phoneconfig.setUser("Sip/addr:phoneconfig");
 #endif
-
-	if (defaultDialog){
-		dialogContainer->setDefaultHandler(defaultDialog);
-	}
 }
 
 void SipStack::init(){

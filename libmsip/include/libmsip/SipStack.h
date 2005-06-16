@@ -86,8 +86,7 @@ using namespace std;
 class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 	public:
-		SipStack(MRef<SipDialog*> defaultDialog,
-				MRef<SipCommonConfig*> stackConfig,
+		SipStack( MRef<SipCommonConfig*> stackConfig,
 				//string localIpString,
 				//string externalContactIP,
 				//int32_t localUdpPort=5060,
