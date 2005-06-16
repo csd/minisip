@@ -78,7 +78,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	
 	sipstack = new SipStack(stackConfig, defaultTransportProtocol, cert_chain,cert_db);
 
-	sipstack->init();
+	//sipstack->init();
 	
 	MRef<SipDialogConfig*> callconf = new SipDialogConfig(phoneconfig->inherited);
 	MRef<DefaultDialogHandler*> defaultDialogHandler = new DefaultDialogHandler(sipstack,

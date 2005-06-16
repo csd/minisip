@@ -255,8 +255,6 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		;
 	}
 
-	cerr << "EEE: use tcp?"<< endl;
-
 	tcp_server = parser->getValue("tcp_server", "yes") == "yes";
 	tls_server = parser->getValue("tls_server", "no") == "yes";
 
