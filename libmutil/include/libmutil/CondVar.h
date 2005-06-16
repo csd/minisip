@@ -40,12 +40,17 @@ typedef unsigned int uint32_t;
 #define LIBMUTIL_API
 #endif
 
+#include<string>
+#include<libmutil/MemObject.h>
+
 class Mutex;
 
-class LIBMUTIL_API CondVar{
+class LIBMUTIL_API CondVar : public MObject{
 	public:
 		CondVar();
 		~CondVar();
+
+		std::string getMemObjectType(){return "CondVar";}
 
 		void wait( Mutex * mutex, uint32_t timeout_ms = 0);
 		void broadcast();

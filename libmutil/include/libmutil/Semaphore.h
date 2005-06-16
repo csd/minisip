@@ -43,11 +43,16 @@
 #define LIBMUTIL_API
 #endif
 
-class LIBMUTIL_API Semaphore{
+#include<string>
+#include<libmutil/MemObject.h>
+
+class LIBMUTIL_API Semaphore : public MObject{
     public:
         Semaphore();
         ~Semaphore();
         
+	std::string getMemObjectType(){return "Semaphore";}
+
         /**
          * Put one resource into the set of resources.
          */
