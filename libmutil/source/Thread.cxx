@@ -267,7 +267,7 @@ void Thread::join(int handle){
 #endif
 }
 
-void Thread::sleep(int ms){
+void Thread::msleep(int ms){
 #ifdef _MSC_VER
 	Sleep(ms);
 #else

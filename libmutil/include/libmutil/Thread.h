@@ -26,6 +26,7 @@
 #define EERUNNABLE_H
 
 #include<string>
+#include<libmutil/MemObject.h>
 
 using namespace std;
 
@@ -59,9 +60,11 @@ public:
  * TODO: Add join capability.
  *       Add support for interrupting system calls (easy on all platforms?)
  */
-class LIBMUTIL_API Thread{
+class LIBMUTIL_API Thread : public MObject{
 public:
 	Thread(Runnable *runnable);
+
+	std::string getMemObjectType(){return "Thread";}
 
 	/**
 	 * Purpose: Create thread that executes a function and return handle 
@@ -91,7 +94,7 @@ public:
 	 * @arg msec	The thread will suspend sleep for at least the 
 	 *		requestex number of milliseconds.
 	*/
-	static void sleep(int msec);
+	static void msleep(int msec);
 
 private:
 	void *handle_ptr;
