@@ -42,7 +42,6 @@ FloatResampler::FloatResampler( uint32_t inputFreq, uint32_t outputFreq,
         outputLength = src_data->output_frames * nChannels;
 
         src_data->src_ratio = (float)outputFreq / inputFreq;
-	cerr << "FloatResampler ratio set to " << src_data->src_ratio << endl;
 
         src_data->data_in  = new float[inputLength];
         src_data->data_out = new float[outputLength];
