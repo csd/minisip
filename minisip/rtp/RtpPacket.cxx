@@ -127,7 +127,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	hdr.setMarker( ( buf[1] >> 7 ) & 0x01  );
 	hdr.setPayloadType( buf[1] & 0x7F );
 	
-	hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) & buf[3] );
+	hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) | buf[3] );
 	hdr.setTimestamp( U32_AT( buf + 4 ) );
 	hdr.setSSRC( U32_AT( buf + 8 ) );
 

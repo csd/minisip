@@ -39,10 +39,10 @@ class RtpHeader{
 		bool getMarker();
 		void setPayloadType(int pt);
 		int getPayloadType();
-		void setSeqNo(int seq_no);
-		int getSeqNo();
-		void setTimestamp(int timestamp);
-		int getTimestamp();
+		void setSeqNo(uint16_t seq_no);
+		uint16_t getSeqNo();
+		void setTimestamp(uint32_t timestamp);
+		uint32_t getTimestamp();
 		void setSSRC(uint32_t ssrc);
 		uint32_t getSSRC();
 		void addCSRC(int csrc);
@@ -59,8 +59,8 @@ class RtpHeader{
 		int extension;
 		int marker;
 		int payload_type;
-		int sequence_number;
-		int timestamp;
+		uint16_t sequence_number;
+		uint32_t timestamp;
 		uint32_t SSRC;
 		vector<int> CSRC; 
 	private:

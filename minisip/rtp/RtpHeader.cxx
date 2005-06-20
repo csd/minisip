@@ -67,20 +67,20 @@ int RtpHeader::getPayloadType(){
 }
 
 
-void RtpHeader::setSeqNo(int seq_no){
+void RtpHeader::setSeqNo(uint16_t seq_no){
 	this->sequence_number=seq_no;
 }
 
-int RtpHeader::getSeqNo(){
+uint16_t RtpHeader::getSeqNo(){
 	return sequence_number;
 }
 
 
-void RtpHeader::setTimestamp(int timestamp){
+void RtpHeader::setTimestamp(uint32_t timestamp){
 	this->timestamp = timestamp;
 }
 
-int RtpHeader::getTimestamp(){
+uint32_t RtpHeader::getTimestamp(){
 	return timestamp;
 }
 
