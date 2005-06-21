@@ -55,8 +55,8 @@ string ThreadException::what(){
 #define MINISIP_THREAD_IMPLEMENTED
 static DWORD WINAPI ThreadStarter( LPVOID lpParam ) 
 { 
-        MRef<Runnable *> self = *(dynamic_cast<MRef <Runnable *> *>(arg));
-        delete (dynamic_cast<MRef <Runnable *> *>(arg));
+        MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(lpParam));
+        delete (static_cast<MRef <Runnable *> *>(lpParam));
 
 //	printf("ThreadStarter: thread created\n");
 	self->run();
