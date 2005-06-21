@@ -59,7 +59,7 @@
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class GroupListServer: public MObject, public Runnable{
+class GroupListServer: public Runnable{
 	public:
 		
 		/**
