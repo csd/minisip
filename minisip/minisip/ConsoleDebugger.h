@@ -6,7 +6,7 @@
 #include<libmutil/Thread.h>
 #include<string>
 
-class ConsoleDebugger : public MObject, public Runnable{
+class ConsoleDebugger : public Runnable{
 	public:
 		ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf):config(conf){};
 		std::string getMemObjectType(){return "ConsoleDebugger";}
