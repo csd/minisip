@@ -1,0 +1,558 @@
+/**
+\defgroup minisip MiniSIP Developer's Guide
+ Documentation for MiniSIP Developers
+\{
+*/
+
+/**
+
+\mainpage MiniSIP Overview
+\author Cesc Santasusana, Thales Communications Netherlands BV (TCNL)
+\author Javier Cardona, cozybit Inc.
+\date June 06 2006
+\version 0.1
+
+\attention This document is a work in progress.  Any statement expressed
+hereafter may be not only wrong, but also aesthetically and morally
+unpleasant.  Proceed at your own risk.
+
+\section Goal Goal
+
+As many other opensource projects, MiniSIP tends to lack documentation ? be
+it user friendly manuals on usage or developer's guide to minisip.  This
+intends to be the latter. It can be a good starting point for a newbie
+minisip developer, allowing for a smooth introduction to the source code,
+but it is not a complete description. Dive into the source code yourself to
+really get to know MiniSIP.
+
+\section Intro Intro
+
+MiniSIP is an opensource SIP softphone developed by KTH in Stocholm, Sweden
+(http://www.minisip.org).  The most attractive features are related to
+security. It implements TLS for securing the signalling, as well as MIKEY
+protocol and SRTP (for key management and voice encryption).  Other features
+are: video support, Push to talk (p2t), it runs on ARM platforms (IPaq),
+support for multiple sessions at the same time, full mesh conferencing, and
+more. 
+
+\section MiniSIP MiniSIP Project Files Structure
+
+MiniSIP builds on 4 libraries (libmutil, libmnetutil, libmikey, libmsip) and
+one application layer folder (minisip). By summer 2005, a new library
+(libminisip) should exhist, thus minisip being based on 5 libraries plus a
+rather slim top layer application, basically the graphical part.  Libraries
+are LGPL'd, whereas the minisip folder stays GPL'd.  In the minisip folder
+there is currently the media processing and handling part, as well as the
+message routing logic, the gui's, rtp and srtp support, etc.
+
+\section Main Main Entry Point
+
+The Minisip class (see Figure 5) is the main Thread, located in
+minisip/minisip/Minisip.cxx.  
+
+\code
+int main( int argc, char ** argv ){
+	Minisip minisip( argc, argv );
+	minisip.startSip();
+	minisip.runGui();
+	minisip.exit();
+}
+\endcode
+
+One single object is created, which in its turn creates a Gui object (either
+TextUI , GTK or QT) and initializes the SipSoftPhoneConfiguration object,
+timeouts, random number generator, contact database,  etc.  In the startSip
+function, a forking thread is created (running Minisip::run). In here, the
+config file is parsed and the relations between the main blocks of minisip
+are established (more later).  In here, the UDP, TCP and TLS servers are
+created (as independent threads).  The minisip.runGui() function call the
+run function implemented by the chosen UI, for example for GTK being
+MainWindow::run(). Here it is not forking, thus the minisip object's life is
+tied to the life of this Gui::run function.  The minisip.exit() is still to
+be implemented.
+
+\section GUI GUI, SIP and Audio engines
+
+Let's have an overview of the most important building blocks in MiniSIP. On
+later chapters, more in-depth descriptions can be found.  Minisip logic can
+be broken in three main blocks (see Figure 1) or engines: the gui, the sip
+logic and the audio engine. The blocks are clear as to their functions, but
+how do they relate to each other?  In Minisip::startSip() all this objects
+and relations are established. 
+
+The 3 blocks communicate via the messageRouter object:
+The gui and sip objects (and the conf object) use callback functions (in
+SipCallback, GuiCallback,  etc interfaces) to send commands to the message
+router.  The mediaHandler cannot send commands to the message router. It can
+only receive commands.  The message router routes the commands received to
+the appropriate destination, forwarding them via the ::handleCommand
+function in each object (gui, sip, media).  The Sip object also has a direct
+reference to the mediaHandler object, needed to directly control the audio.
+
+
+\todo -Figure 1  Minisip Control flow
+
+
+\todo -Figure 2  Commands inside minisip
+
+\section engine The SIP Engine
+
+The SIP engine classes is a complex mesh of objects, which exchange messages
+between them, causing actions to happen. We will try to describe the main
+classes involved and later describe how these actions are chained.
+
+\section Sip Sip Class
+
+The Sip (minisip/sip/Sip.h) class is a container for SIP related objects.
+This way it can control high level actions, like invite() or confjoin().  On
+creation of this object, it creates a SipStack object (where the SIP logic
+is contained) and the content factories (for sdp, mikey, etc). 
+When it is started (from Minisip::run()), Sip::run() is executed, which in
+turn executes  SipStack::run(), which in turn endlessly runs
+SipDialogContainer::run().  SipSoftPhoneConfiguration (minisip/sip). It
+contains configuration information, mostly parsed from the .minisip.conf
+file.  MediaHandler (minisip/mediahandler). Top level class for media
+related functionalities, similar to the Sip class for SIP logic.  SipStack.
+Object to which it sends messages, which are in turn sent to the message
+router.
+
+\section SipStack SipStack class
+
+The SipStack (libmsip/SipStack.h) contains:
+
+\li SipDialogContainer (libmsip/SipDialogContainer.h). It is a container for
+SipDialog objects (libmsip/SipDialog.h) and all the SipDialog subtypes (see
+Figure 8). Each SipDialog is a long-term relationship between to or more
+clients/servers. SipDialogs are also of StateMachine
+(libmutil/StateMachine.h) type (see Figure 9). Each SipDialog contains a set
+of SipTransaction (libmsip/SipTransaction.h) objects (see Figure 9 and
+Figure 10).  
+\li SipCallback. The callback function to send messages to the
+MessageRouter object.  SipMessageTransport. A container class through which
+messages are sent and read..  In Minisip::startSip 3 threads are created
+(UDP, TCP and TLS), whose task is to continuously accept() (or simply
+read(), for UDP) new sockets and place these in a list (in the
+SipMessageTransport object) as pending.  To process these pending sockets,
+one thread is created which continuously reads UDP data
+(SipMessageTransport::udpSocketRead() ), and NB_THREADS (5 default) which
+process the streaming (TCP and TLS) pending sockets (StreamThreadData::run,
+in libmsip/SipMessageTransport.cxx).  This threads, once a packet is read
+from the network, create a SipMessage which is sent to the
+SipMessageTransport object command receiver (ths SipStack object which
+created it).
+
+\section SipDialog SipDialog class
+
+SIP applications usually contains a number of SIP dialogs. In libmsip, a
+SipDialog is a state machine that represents the local application state and
+zero or more transactions that controls a message transfer between two
+SipDialogs in two different User Agents.  An application keeps all its
+dialogs in the dialog container and when a message is received it sends it
+to the container via the SipDialogContainer::enqueueCommand method.
+
+\section SipDialogContainer SipDialogContainer class
+
+The SipDialogContainer is a collection of SipDialogs and logic to deliver an
+incoming SIP message to the right dialog or transaction.  Commands (SIP
+messages, command strings and timeouts) can arrive before the processing of
+an earlier command is finished (the processing of a command can also
+generate new commands). The dialog container maintains a list (or two to be
+precise) of incoming commands to be processed. Commands can be enqueued with
+different priorities (in the front or end of the two queues), but an
+application using libmsip should always use the default values when a new
+message arrives or when a string command is sent to the SIP stack.  
+If no dialog handled in incoming command (command string or SIP message) it
+is sent to the SipDialogContainer::default handler that can be set by the
+application.  
+
+The SipDialogContainer has as attributes:
+
+defaultHanlder  (SipDialog). This is the default dialog where
+unknown/unresolved commands are sent (for example, INVITEs).
+SipMessageDispatcher. This object contains a list of exhisting dialogs and
+transactions, to where commands are sent if the appropriate match is found.
+SipCallback function, to the MessageRouter object.  As for functions, it
+contains: addDialog(), where a new dialog is added to the container (more
+precisely, added to the dispatcher's list of dialogs).  enqueueCommand() and
+enqueueTimeout(). This function receive commands (in the form of
+SipSMCommand objects) and store these into the queues (converted to
+queue_type struct objects).  run(). As mentioned, this function is run (from
+the Minisip::run() ) in blocking mode, thus it will never return. It waits
+for the enqueueXXX functions to add commands to the queues and process them.
+Timeouts have a well defined handler in the queue_type object. For commands
+the dispatcher is tried first (SipMessageDispatcher::handleCommand() ) and
+in case no dialog/transaction is found, they are sent to the defaultHandler
+diaolg.
+
+\section Commands Commands in SIP engine
+
+The structure of commands can be seen in Figure 3. Objects that can receive
+commands implement the SipSMCommandReceiver interface (handleCommand(?)).
+
+\todo -Figure 3  Structure of commands used to control MiniSIP
+
+SMCommand main attributes are:
+source
+destination
+type, an integer value, either COMMAND_PACKET or COMMAND_STRING. This
+defines what kind of attached body it carries, a SipMessage (if type==
+COMMAND_PACKET, in cmdpkt, with cmdstr=NULL); or a CommandString (if type==
+COMMAND_STRING, in cmdstr, with cmdpkt=NULL).  cmdstr or cmdpkt. The content
+of the command. If a cmdstr, these are defined strings carrying
+instructions. If a cmdpkt, then it carries a SipMessage, to be
+delivered/sent.  Source and destination are integer values, which can be:
+static const int remote; from or to the remote peer of the dialog/transaction.
+static const int TU; from or to the Transaction Unit.
+static const int transaction; related to an exhisting transcation.
+static const int ANY; to anyone who dares to deal with it.
+static const int DIALOGCONTAINER; to/from the dialog container. 
+
+At the dialogContainer::run(), commands are popped out of the queues as queue_item objects. These can be commands (TYPE_COMMAND) or timeouts (TYPE_TIMEOUT). 
+For commands, these are first sent to the dispatcher. 
+The dispatcher deals with all command with destination = DIALOGCONTAINER and of type COMMAND_STRING. Currently the only one understood is "call_terminated".
+Next the dispatcher tries, for messages with destination ANY or ::transaction, to find a matching transaction who handles the command correctly (or only the transaction matching the branch id, if it has it). 
+If the above fails for transactions, try with dialogs (::TU).
+If all the above fails, the dispatcher::handleCommand returns false. Thus, this command will be now processed by the defaultHandler (dialog). The defaultHandler separates the processing between the two types of commands.
+If  the type is COMMAND_PACKET:
+If it has been already processed without luck, sent a 481 to the peer.
+If the command is from remote and an INVITE (thus no dialog/trans exhist), create a dialog (SipDialogVoip, for example) and all required objects (media session, SipDialogConf, call id, ? ) and re-enqueue the command, now with destination=TU.
+If the command is from remote and an IM message, do the equivalent processing needed for IM messages.
+If non of the above, it returns false, thus the message is dropped.
+If the type is COMMAND_STRING:
+If it has already been processed, return true and log it.
+Then cmdstr.getOp() == SipCommandString::command (where command, for example, can be "proxy_register"). For each of these, implement the actions necessary: a dialog, a transaction, start process, etc.
+For timeouts, they have either a transaction or a dialog already associated in the queue_item.transaction/call_receiver pointer. 
+Timeouts are enqueued by default at the front of the low priority queue. Commands can be enqueued in either queue (high or low priority) and either at the front or the back of the list. For example, the first invite received from a remote peer is queued in as high priority but at the back of the queue.
+
+
+
+\todo -Figure 4  Initiating a call. The black numbered  arrows indicate actions.
+
+\section GUICore GUI Core
+
+The MiniSIP gui block comes in different flavours.  TextUI: the simplest one
+(it only supports one call at a time), but also the one with less
+requirements (memory, space, libraries, ? ).  GTK: the most updated one,
+based on the graphical library GTK.  Qt interface: deprecated, though with a
+little work it may work again.  A diagram of the classes in use can be seen
+in Figure 6 and Figure 7 (only TextUI and GTK). The gui is started from
+Minsip::runGui(), which blocks the Minisip object from returning. This
+function calls the Gui::run function, which is either implemented as a
+TextUI or GTK. When this Gui::run functions returns, the Minisip::exit()
+function is called (currently, at least for GTK, this never happens).  The
+purpose of the Gui is to interact with the user, done by translating the
+actions this one takes on the gui and tranlsating them to internal minisip
+commands, or taking the commands the gui receives from the message router
+and showing the status on the gui.  The gui receives receives CommandString
+commands with the handleCommand() function. 
+To send commands to the messageRouter, it uses the functions in
+Gui::callback (of type GuiCallback). This functions are implemented by the
+message router object.  For example, as can be seen in Figure 4 how the
+message router call the Sip::invite() function. This action is triggered
+when, from the gui, the user wants to initiate a call. In GTK, when the user
+presses the button "Call", the associated event is to call
+MainWindow::invite() function. This function in turn call the callback
+function MessageRouter::guicb_doInvite() and sets up the needed tabs and
+objects to nicely display the status of the call.
+MessageRouter::guicb_doInvite in turn calls Sip::invite(), and from then the
+whole process of how the call is setup is shown in Figure 4.
+For other actions, like hanging up or updating the status of a call, the
+callback function MessageRouter::guicb_handleCommand can be used. 
+
+\section MediaEngine Media Engine
+
+The media is controlled at the top level by the MediaHanlder class. It is
+connected to the message router (it can receive commands, but for now it
+does not send any), and also the Sip object has a direct reference to it,
+thus having direct access to it.
+
+\subsection MediaHandler Creating the MediaHandler object
+
+The MediaHandler object is created at startup by Minisip::run(). The
+constructor initializes the media part, taking the data from the
+SipSoftPhoneConfiguration object. It does: Create a SoundDevice
+(SoundDevice::create("type") ) of the appropriate type (OSS, Alsa, file, ?)
+Create a SoundIO object, in charge of processing the audio (it needs access
+to the sounddevice object, plus audio configuration parameters (sampling
+rate, number of channels).  Create the codecs (g711, speex, ilbc) Create an
+AudioMedia object (it needs the soundio object, plus the codecs list). This
+object is registered in the media list within the mediahandler.  If video
+support is compiled in, then this process is repeated but for the equivalent
+functions and objects for video classes. We are not going to discuss this
+part for now. 
+
+First, the mediahandler creates a sounddevice object, using the function
+SoundDevice::create(string). The string specifies the type of device we
+want: file://infile, /outfile (FileSoundDevice) alsa:devid (AlsaSoundDevice)
+dsound:devid (DirectSoundDevice) /dev/dsp (OssSoundDevice)
+
+See the constructor of each of these for details on creation.
+
+With the SoundDevice object created, we can create a SoundIO class (an
+interface to a soundcard). The SoundDevice is only accessible through the
+SoundIO object. The soundIO constructor creates two forking threads: the
+recorder loop (SoundIO::recorderLoop() ) and the player loop
+(SoundIO::playerLoop() ). We will come back to these important functions
+later.
+
+Afterwards, a list of available codecs is compiled and the default one
+selected.
+
+With all the above, we create an AudioMedia object, which will hold the
+reference to the SoundIO object (plus the codecs). This AudioMedia object is
+registered in a list of Media objects in MediaHandler::media (typically, it
+will contain one AudioMedia object).
+
+
+\section SoundDevice SoundDevice
+
+A SoundDevice class is the driver for any physical thing capable of
+producing and/or receiving sound. For example, a soundcard (OSS or Alsa) or
+a file. Subclasses of SoundDevice implement the particular needs to access
+that device. It provides: openRecord() and openPlayback (), to open the
+device for recording from it, or to play samples on it. We can specify the
+number of channels and the sampling rate.  closeRecord/Playback(), just
+opposite the one before.  read/write functions, as expected. 
+Only one reference to the sound device is kept, by SoundIO object (SoundIO::soundDev).
+
+\section Audio Audio playback
+
+Here is a brief description of how audio is read (from the network) in the
+form of RTP packets, decoded and later played (usually on the sound card).
+
+An RtpReceiver object is created as a forking thread, which continuously
+reads data from the network. RtpReceiver objects can have several
+MediaStreamReceiver objects registered, to which they forward each RTP
+packet read (MediaStreamReceiver::handleRtpPacket).  When the
+MediaStreamReceiver gets the RTP packet, it processes it and sends it up to
+its Media object (for example, the AudioMedia object), via the
+Media::playData() function.  In Media::playData, the Media looks for the
+appropriate source to which to forward the data samples. For an AudioMedia
+object, the list of sources are AudioMediaSource objects. Once the source is
+found, its AudioMediaSource::playData() function is called.  When the
+AudioMediaSource receives the packet, it decodes it appropriately and then
+forwards it to its own AudioMediaSource::pushSound() function. Actually, the
+pushSound function is declared in SoundSource root class and implemented in
+BasicSoundSource class, from wich AudioMediaSource inherits. 
+
+BasicMediaSource::pushSound() function stores the data samples in its
+internal buffer, awaiting for someone to read them.  SoundIO::playerLoop()
+is a forking thread which runs endlessly, looping, as long as there are
+available SoundSource objects from where to read data, process it and send
+to the sounddevice. If there are no sources, it blocks and waits for someone
+to add one.  Data samples are read from the playerLoop() thread from each
+registered SoundSource object (AudioMedia is a sub-class) using the
+SoundSource::getSound() function.  The samples collected from all the
+sources are mixed together.
+
+The resulting mixed audio is sent to the device, for playback (SoundDevice::send_to_card()).
+
+\section AudioRec Audio Recording 
+
+SoundIO::recorderLoop() is a forking thread which runs endlessly, looping,
+as long as there is a sounddevice opened for recording. If there is such
+device, it continuously reads blocks of samples from the device and sends it
+(after processing) to all registered RecorderReceiver objects. If no device
+for recording is opened, this thread blocks.  Data samples are read from the
+device (soundcard) using the SoundIO::soundDev->read() function.  Processing
+of the read samples takes place.  All registered RecorderReceiver objects
+get the samples via the RecorderReceiver:: srcb_handleSound() function.
+AudioMedia objects are RecorderReceivers, thus the samples are received by
+the AudioMedia object. The AudioMedia::srcb_handleSound function calls
+AudioMedia::sendData(), which goes through each of the MediaStreamSenders in
+the AudioMedia::senders list and calls MediaStreamSender::send(), which is
+the function actually sending the audio to the network.
+
+\section MediaHandlercreateSession MediaHandler::createSession
+
+Implements an RTP Session, as described in the RTP RFC. A very important
+function, as it establishes all the relationships within the media engine
+(rather complex, btw). Called first thing in the process of establishing a
+call (be incoming or outgoing).  It is static, thus once called it returns a
+Session object.  Sessions contain setup data (callid, security, sdp, ? ).
+They also contain all related MediaStream objects (senders and receivers)
+related to the Session. One MediaStream object is created per Media object
+(one sender, one receiver, sharing the same UDP socket) and registered to
+the corresponding object (usually one AudioMedia object and, optionally, one
+VideoMeida object). According to the RFC, each RTP session is identified by
+a pair of transport addresses (IP:port), thus for now minisip audio and
+video are actually different RTP sessions, though contained in the same
+Session class. 
+
+
+
+\section NetUtilLib Net Util Library
+
+\todo
+
+
+\section UtilLib Util Library 
+
+\todo
+
+
+\section CoreDetails Core Details
+
+
+
+\section SipDetails Sip Details
+
+\section StateMachine State Machine
+
+\section Dialogs Dialogs
+
+\section DefaultDialogHandler DefaultDialogHandler
+
+\section DialogVoip DialogVoip
+
+\section Transactions Transactions
+
+\section SipTransaction SipTransaction base class
+
+\section SipTransactionInvite SipTransactionInvite
+Client
+Server
+
+\section SipTransactionNonInvite SipTransactionNonInvite
+Client
+Server
+
+\section SipMessage SipMessage
+
+\section MessageTypes Message Types
+
+\section MessageBodies Message Bodies
+
+\section SipMessageHeader SipMessageHeader
+
+\section BuildingMessage Building a message
+
+
+
+
+
+
+
+\section MediaEngineDetails Media Engine Details
+
+\section MultimediaSess Multimedia Session
+
+\section MediaStream MediaStream
+
+\section Receiver Receiver
+
+\section Sender Sender
+
+\section Media Media
+
+\section Audio Audio
+
+\section Video Video
+
+\section SoundIO SoundIO and SoundDevices
+
+\section Audio Audio processing
+
+\section Spatial Spatial Audio
+
+
+\section Gui Gui
+
+\section Core Core
+
+\section TextUI TextUI
+
+\section GTK GTK
+
+\section Qt Qt
+
+
+\section Mikey Mikey Library
+
+
+
+\section More More
+
+
+
+
+
+
+\section Class Class Inheritance
+
+\section Core Core
+
+\image html 00a_runnable_processes.jpg "Core minisip processes and classes" width=10cm
+\image latex 00a_runnable_processes.eps "Core minisip processes and classes" width=10cm
+
+\todo -Figure 6 GTK core main classes
+
+\todo -Figure 7 General GUI class scheme (for GTK and textui)
+
+\section Sip Sip Stack (libmsip and minisip/sip)
+
+
+\todo -Figure 8 (libmsip) SipDialog
+
+
+\todo -Figure 9 (libmsip) SipTransaction and related classes
+
+\todo -Figure 10 (libmsip) SipTransaction detailed inheritance
+
+\todo -Figure 11 (libmsip) SipMessage related (message construction and transport)
+
+
+\todo -Figure 12 (libmsip) SipMessage types
+
+
+\todo -Figure 13 (libmsip) SipMessage possible headers
+
+\section Network Network Access (libmnetutil)
+
+\todo -Figure 14 (libmnetutil) Networking classes: UDP, TCP and TLS (client and servers)
+
+\section Libmutil Libmutil
+
+
+\todo -Figure 15 (libmutil) Mobject, Mref, Threads and Timestamp
+
+\section Media Media Engine
+
+\todo -Figure 16  RTP receiver
+
+
+\todo -Figure 17 RTP and RTCP packets
+
+
+\todo -Figure 18 Sound and Media related classes global diagram
+
+
+
+\todo -Figure 19 Media class
+
+
+\todo -Figure 20  MediaStream sender and receiver
+
+
+\todo -Figure 21 Configuration related classes 
+
+
+\todo -Figure 22 SoundDevices
+
+
+\todo -Figure 23 SoundIO class
+
+
+\todo -Figure 24 SoundSources and audio processing
+
+\section Misc Misc
+
+\todo -Figure 25 XML parsing
+
+
+
+
+\todo -Figure 26 Account and other classess
+*/
+
+/** \} */
