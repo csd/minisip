@@ -426,6 +426,8 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig
 #ifdef DEBUG_OUTPUT
 	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< callconf->inherited->sipIdentity->sipDomain << end;
 #endif
+
+	myDomain = getDialogConfig()->inherited->sipIdentity->sipDomain;
 }
 
 SipDialogRegister::~SipDialogRegister(){

@@ -52,7 +52,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 		
 //#ifdef DEBUG_OUTPUT	
-		virtual std::string getMemObjectType(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
+		virtual std::string getMemObjectType(){return "SipDialogRegister["+/*getDialogConfig()->inherited->sipIdentity->sipDomain+*/ myDomain+"]";}
 //#endif
 
 
@@ -93,6 +93,8 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		string nonce;
 		uint32_t failCount;
 		bool guiFeedback;
+
+		string myDomain; // Only used for debuggin - used in getMemObjectType();
 };
 
 
