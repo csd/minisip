@@ -26,6 +26,9 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
+#include<string>
+
+using namespace std;
 
 #ifdef MDEBUG
 #include<libmutil/itoa.h>
