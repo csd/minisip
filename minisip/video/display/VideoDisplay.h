@@ -65,13 +65,9 @@ class VideoDisplay : public ImageHandler, public Runnable{
 		virtual void deallocateImage( MImage * image )=0;
 	private:
                 std::list<MImage *> filledImages;
-                CondVar filledImagesCond;
-                Mutex filledImagesCondLock;
                 Mutex filledImagesLock;
 
                 std::list<MImage *> emptyImages;
-                CondVar emptyImagesCond;
-                Mutex emptyImagesCondLock;
                 Mutex emptyImagesLock;
                 
                 std::list<MImage *> allocatedImages;

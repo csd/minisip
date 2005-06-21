@@ -102,9 +102,6 @@ void VideoDisplay::stop(){
 	show = false;
 	//FIXME
         filledImagesSem.inc();
-        filledImagesCondLock.lock();
-	filledImagesCond.broadcast();
-        filledImagesCondLock.unlock();
 }
 
 void VideoDisplay::showWindow(){
@@ -128,7 +125,6 @@ void VideoDisplay::showWindow(){
 
 /* The lock on emptyImages should always have been taken */
 void VideoDisplay::hideWindow(){
-        fprintf( stderr, "started hidewindow\n" );
         list<MImage *>::iterator i;
 
         
@@ -137,31 +133,13 @@ void VideoDisplay::hideWindow(){
                 emptyImagesSem.dec();
         }
 
-        if( dynamic_cast<SdlDisplay *>( this ) != NULL ){
-                fprintf( stderr, "display is an SdlDisplay\n" );
-        }
-        if( dynamic_cast<X11Display *>( this ) != NULL ){
-                fprintf( stderr, "display is an X11Display\n" );
-        }
-        if( dynamic_cast<XvDisplay *>( this ) != NULL ){
-                fprintf( stderr, "display is an XvDisplay\n" );
-        }
-
         while( ! allocatedImages.empty() ){
-                fprintf( stderr, "this: %x\n", this);
-                fprintf( stderr, "before deallocate\n" );
                 deallocateImage( *allocatedImages.begin() );
-                fprintf( stderr, "size: %i\n", allocatedImages.size() );
                 allocatedImages.pop_front();
-                fprintf( stderr, "after deallocate\n" );
-                fprintf( stderr, "size: %i\n", allocatedImages.size() );
         }
 
-        fprintf( stderr, "Before destroy window\n" );
 
         destroyWindow();
-        fprintf( stderr, "After destroy window\n" );
-
 }
 
 
@@ -204,98 +182,59 @@ MImage * VideoDisplay::provideImage(){
 void VideoDisplay::run(){
         MImage * imageToDisplay;
 
-//        while( true ){
 
-                
-        //        showCondLock.lock();
-          //      showCond.wait( &showCondLock );
-            //    showCondLock.unlock();
+        while( show ){
 
-                //showWindow();
+                handleEvents();
 
-
-//                emptyImagesLock.unlock();
-
-                while( show ){
-
-                    handleEvents();
-
-                        /*
-
-                        if( filledImages.empty() ){
-                                filledImagesLock.unlock();
-
-                                filledImagesCondLock.lock();
-                                filledImagesCond.wait( &filledImagesCondLock );
-                                filledImagesCondLock.unlock();
-
-                                if( !show ){
-                                        break;
-
-                                }
-
-                                filledImagesLock.lock();
-                        }
-                        */
-                    if( !show ){
+                if( !show ){
                         break;
 
-                    }
-                    filledImagesSem.dec();
-                    if( !show ){
-                        break;
-
-                    }
-
-                    filledImagesLock.lock();
-
-                    imageToDisplay = *filledImages.begin();
-
-                    filledImages.pop_front();
-
-                    filledImagesLock.unlock();
-
-                    displayImage( imageToDisplay );
-
-
-                    if( providesImage() ){
-                            emptyImagesLock.lock();
-
-                            emptyImagesSem.inc();
-                            emptyImages.push_back( imageToDisplay );
-
-                            emptyImagesLock.unlock();
-                            /*
-                               emptyImagesCondLock.lock();
-                               emptyImagesCond.broadcast();
-                               emptyImagesCondLock.unlock();
-                               */
-                    }
                 }
+                filledImagesSem.dec();
+                if( !show ){
+                        break;
 
-                emptyImagesLock.lock();
+                }
 
                 filledImagesLock.lock();
 
-                while( ! filledImages.empty() ){
-                    //filledImagesSem.dec();
-                    imageToDisplay = *filledImages.begin();
+                imageToDisplay = *filledImages.begin();
 
-                    filledImages.pop_front();
-
-                    displayImage( imageToDisplay );
-
-                    
-                   //emptyImages.push_back( imageToDisplay );
-                   // emptyImagesSem.inc();
-
-                }
+                filledImages.pop_front();
 
                 filledImagesLock.unlock();
 
-                hideWindow();
+                displayImage( imageToDisplay );
 
-//        }
+
+                if( providesImage() ){
+                        emptyImagesLock.lock();
+
+                        emptyImagesSem.inc();
+                        emptyImages.push_back( imageToDisplay );
+
+                        emptyImagesLock.unlock();
+                }
+        }
+
+        emptyImagesLock.lock();
+
+        filledImagesLock.lock();
+
+        while( ! filledImages.empty() ){
+                imageToDisplay = *filledImages.begin();
+
+                filledImages.pop_front();
+
+                displayImage( imageToDisplay );
+
+        }
+
+        filledImagesLock.unlock();
+
+        hideWindow();
+
 }
 
 void VideoDisplay::handle( MImage * mimage ){
@@ -304,11 +243,6 @@ void VideoDisplay::handle( MImage * mimage ){
         filledImages.push_back( mimage );
         filledImagesSem.inc();
         filledImagesLock.unlock();
-/*
-        filledImagesCondLock.lock();
-        filledImagesCond.broadcast();
-        filledImagesCondLock.unlock();
-*/
 }
 
 bool VideoDisplay::providesImage(){
