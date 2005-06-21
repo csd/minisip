@@ -59,7 +59,7 @@ class SipMessageTransport;
  * when a client connects to it.
  *
  */
-class SocketServer : public MObject, public Runnable{
+class SocketServer : public Runnable{
 	public:
 		SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r);
 		std::string getMemObjectType(){return "SocketServer";}

@@ -91,7 +91,7 @@ SipSubscribe::SipSubscribe(string branch,
 	addHeader(new SipHeader(*ep));
 
 	MRef<SipHeaderValueAccept*> ap = new SipHeaderValueAccept();
-	ap->setAccept("application/pidf+xml");
+	ap->setAccept("application/xpidf+xml");
 	addHeader(new SipHeader(*ap));
 }
 
