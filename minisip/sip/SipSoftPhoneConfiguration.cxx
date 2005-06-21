@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -24,6 +24,7 @@
  * 	SipSoftPhoneConfiguration.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
+ * 	Johan Bilien, jobi@via.ecp.fr
  * Purpose
  * 
 */
@@ -123,7 +124,13 @@ void SipSoftPhoneConfiguration::save(){
 	parser->changeValue( "frame_width", itoa( frameWidth ) );
 	parser->changeValue( "frame_height", itoa( frameHeight ) );
 #endif
-		
+
+        list<string>::iterator iCodec;
+        uint8_t iC = 0;
+
+        for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
+                parser->changeValue( "codec[" + itoa( iC ) + "]", *iCodec );
+        }
 
 	/************************************************************
 	 * PhoneBooks
@@ -306,7 +313,14 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		inherited->sipIdentity->securitySupport = securityConfig.secured;
 	}
 
-	selectedCodec =  parser->getValue("selected_codec","iLBC");
+        audioCodecs.clear();
+        int iCodec = 0;
+        string codec = parser->getValue("codec["+ itoa( iCodec ) + "]","");
+
+        while( codec != "" && iCodec < 256 ){
+                audioCodecs.push_back( codec );
+                codec = parser->getValue("codec["+ itoa( ++iCodec ) +"]","");
+        }
 	
 	delete parser;
 	return ret;
@@ -361,8 +375,10 @@ static void installConfigFile(string filename){
                                 "<local_tcp_port> 5060 </local_tcp_port>\n"
                                 "<local_tls_port> 5061 </local_tls_port>\n"
                                 "<local_media_port> 10000 </local_media_port>\n"                                "<sound_device>/dev/dsp</sound_device>\n"
-                                "<codec_prio_1>PCMu</codec_prio_1>\n"
-                                "<codec_prio_2>iLBC</codec_prio_2>\n"
+#ifdef HAS_SPEEX
+                                "<codec>speex</codec>\n"
+#endif
+                                "<codec>G.711</codec>\n"
                                 "<phonebook>file://" + phonebookFileName +
                                 "</phonebook>\n";
 
