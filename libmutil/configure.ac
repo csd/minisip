@@ -48,12 +48,10 @@ AC_ARG_ENABLE(debug,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    [ --enable-memdebug enables memory debugging code. WARNING: This changes
-     the MemObject API that is used by both libraries and applications. Use
-     with care (default disabled)],
+    [ --enable-memdebug enables memory debugging code. (default disabled)],
     [ if test "${enable_memdebug}" = "yes"
       then
-        AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
+        AC_DEFINE(MDEBUG, [], [Debug memory])
       fi ])
 
 

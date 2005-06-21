@@ -25,28 +25,98 @@
 #include<config.h>
 
 #include<libmutil/MemObject.h>
-
-#include<libmutil/itoa.h>
-#include<assert.h>
 #include<libmutil/Mutex.h>
 
+#ifdef MDEBUG
+#include<libmutil/itoa.h>
+Mutex global;
+minilist<MObject *> objs;
+int ocount=0;
+bool outputOnDestructor=false;
+#endif
+
 MObject::MObject() : refCount(0){
+#ifdef MDEBUG
+	global.lock();
+	ocount++;
+	objs.push_back(this);
+	global.unlock();
+#endif
 }
 
 MObject::~MObject(){
+#ifdef MDEBUG	
+	global.lock();
+	ocount--;
+	for (int i=0; i<objs.size(); i++){
+		if (this == objs[i]){
+			objs.remove(i);
+			break;
+		}
+	}
+	global.unlock();
+#endif
 }
 
 int MObject::decRefCount(){
 	int ref;
+	global.lock();
 	refLock.lock();
 	ref=--refCount;
 	refLock.unlock();
+	global.unlock();
+#ifdef MDEBUG
+	if (ref==0){
+		string output = "~MO:"+getMemObjectType()+"\n";
+		cerr << output << endl;
+	}
+#endif
 	return ref;
 }
 
 void MObject::incRefCount(){
+	global.lock();
 	refLock.lock();
 	refCount++;
 	refLock.unlock();
+	global.unlock();
+}
+
+int MObject::getRefCount(){
+	return refCount;
+}
+
+minilist<string> getMemObjectNames(){
+#ifdef MDEBUG
+	minilist<string> ret;
+	global.lock();
+	for (int i=0; i< objs.size(); i++){
+		int count = objs[i]->getRefCount();
+		string countstr = count?itoa(count):"on stack"; 
+		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")");
+	}
+	global.unlock();
+	return ret;
+#else
+	minilist<string> ret;
+	return ret;
+#endif
+}
+
+int getMemObjectCount(){
+#ifdef MDEBUG
+	return ocount;
+#else
+	return -1;
+#endif
+}
+
+bool setDebugOutput(bool on){
+#ifdef MDEBUG
+	outputOnDestructor=on;
+	return true;
+#else
+	return false;
+#endif
 }
 

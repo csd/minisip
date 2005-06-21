@@ -65,6 +65,9 @@
 #define LIBMUTIL_API
 #endif
 
+#include<string>
+#include<libmutil/minilist.h>
+
 class MObject;
 
 template<class OPType>
@@ -208,6 +211,8 @@ class LIBMUTIL_API MObject{
 		int decRefCount();
 		
 		void incRefCount();
+
+		int getRefCount();
 		
 //		virtual std::string getMemObjectType(){return "(unknown)";}
 
@@ -217,6 +222,46 @@ class LIBMUTIL_API MObject{
 		int refCount;
 		Mutex refLock;
 };
+
+
+/**
+ * if MDEBUG was defined when compiling libmutil it is possible 
+ * to use following three debuging functions. "setDebugOutput"
+ * can be used to see if this feature was enabled when compiling
+ * libmutil. This functionality is only intended to be used
+ * for debugging purposes since destructing an object has 
+ * complexity O(n) where "n" is the number of MObject objects.
+ *
+ */
+
+
+/**
+ * @param on	If true, then a debug message will be printed
+ * 		to the screen when a MObject that is allocated
+ * 		on the heap will be removed. If false, no debug
+ * 		messages will be output.
+ * @return	True if debugging features was enabled when
+ * 		compiling libmutil and false if it was not.
+ */
+bool setDebugOutput(bool on);
+
+/**
+ *
+ * @return	Number of MObject objects currently allocated on
+ * 		the heap or on the stack.
+ */
+int getMemObjectCount();
+
+/**
+ * @return	A list of all allocated objects on the form
+ * 		"String(count)" where "String" is what is returned
+ * 		by "getMemObjectType" for the object and "count"
+ * 		is the number of references to it or "on stack" if
+ * 		there is no references to it (and it is most likely
+ * 		not dynamically).
+ */
+minilist<std::string> getMemObjectNames();
+
 
 
 #endif
