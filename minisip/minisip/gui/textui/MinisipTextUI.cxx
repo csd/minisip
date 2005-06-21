@@ -636,8 +636,12 @@ void MinisipTextUI::showStat(){
 
 
 void MinisipTextUI::showMem(){
-	displayMessage("(not implemented any more)");
-//    displayMessage(memhandler.listObjs());
+	string all;
+	minilist<string> names = getMemObjectNames();
+	for (int i=0; i<names.size();i++){
+		all = all+names[i]+"\n";
+	}
+	displayMessage(all+itoa(getMemObjectCount())+" objects");
 }
 
 #ifdef P2T_SUPPORT
