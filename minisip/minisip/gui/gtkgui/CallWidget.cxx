@@ -202,6 +202,7 @@ void CallWidget::reject(){
 			mainWindow->removeCall( mainCallId );
 			cmdstr = CommandString( mainCallId, SipCommandString::reject_invite);
 			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			break;
                 case CALL_WIDGET_STATE_INCOMING_TRANSFER:
 			cmdstr = CommandString( mainCallId, SipCommandString::user_transfer_refuse );
 			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
