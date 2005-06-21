@@ -15,8 +15,12 @@
 using namespace std;
 
 void ConsoleDebugger::showMem(){
-	cerr << "(disabled)"<< endl;
-//    cerr << memhandler.listObjs() << endl;;
+	string all;
+	minilist<string> names = getMemObjectNames();
+	for (int i=0; i<names.size();i++){
+		all = all+names[i]+"\n";
+	}
+	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
 }
 
 void ConsoleDebugger::run(){
