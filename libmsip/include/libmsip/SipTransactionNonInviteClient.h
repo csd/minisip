@@ -62,6 +62,7 @@ class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 		void setUpStateMachine();
 
 	private:
+		int timerE_ms;
 
 		bool a0_start_trying_request(const SipSMCommand &command);
 		bool a1_trying_proceeding_1xx( const SipSMCommand &command);

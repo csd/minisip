@@ -50,8 +50,8 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 		setDebugTransType(command.getCommandPacket()->getTypeString() );
 #endif
 		lastRequest = command.getCommandPacket();
-		requestTimeout(500, "timerE");
-		requestTimeout(64000, "timerF");
+		requestTimeout(timerE_ms, "timerE");
+		requestTimeout(sipStack->getTimers()->getF(), "timerF");
 		send(command.getCommandPacket(),true);
 		return true;
 	}else{
@@ -106,7 +106,8 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
-                requestTimeout(60000,"timerK");
+		cancelTimeout("timerE");
+                requestTimeout(sipStack->getTimers()->getK(), "timerK");
                 MRef<SipMessage*> pref(*pack);
 		
                 SipSMCommand cmd(pref, 
@@ -123,6 +124,11 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSMCommand &command){
 	
 	if (transitionMatch(command, "timerE")){
+		timerE_ms *=2;
+		if (timerE_ms>4000){
+			timerE_ms=4000;
+		}
+		requestTimeout(timerE_ms,"timerE");
 		assert(!lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
 		send( lastRequest,false);	//do not add via header when re-sending.	
@@ -140,6 +146,7 @@ bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCom
                 SipSMCommand cmd( pref, 
                         SipSMCommand::transaction, 
                         SipSMCommand::TU);
+		cancelTimeout("timerE");
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		return true;
@@ -184,7 +191,7 @@ bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMC
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
-		requestTimeout(5000, "timerK");
+		requestTimeout(sipStack->getTimers()->getK(), "timerK");
 		return true;
 	}else{
 		return false;
@@ -194,7 +201,13 @@ bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMC
 bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand &command) {
 		
 	if (transitionMatch(command, "timerE")){
-		requestTimeout(1000,"timerE");
+		timerE_ms *= 2;
+		if (timerE_ms>4000){
+			timerE_ms=4000;
+		}
+		
+		requestTimeout(timerE_ms, "timerE");
+		
 		assert( !lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
 		send( lastRequest, false);		// do not add via header when re-sending 
@@ -319,6 +332,8 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 			SipTransactionClient(stack, d, seq_no, "", callid),
 			lastRequest(NULL)
 {
+	timerE_ms = stack->getTimers()->getE();
+
 	MRef<SipCommonConfig *> conf;
 	if (dialog){
 		conf = dialog->getDialogConfig()->inherited;
