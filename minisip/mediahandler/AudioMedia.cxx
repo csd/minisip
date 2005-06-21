@@ -51,8 +51,8 @@ AEC AudioMedia::aec;		//hanning
 //AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 //                Media(codec),
 //                soundIo(soundIo){
-AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec ):
-                Media(codecList, defaultCodec),
+AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList ):
+                Media(codecList),
                 soundIo(soundIo){
         
 	// for audio media, we assume that we can both send and receive

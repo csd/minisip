@@ -54,25 +54,11 @@ Media::Media( MRef<Codec *> codec ){
 }
 
 // pn430 Function added for multicodec
-Media::Media( std::list<MRef<Codec *> > codecListing, MRef<Codec *> defaultCodec ){
+Media::Media( std::list<MRef<Codec *> > codecListing ){
 	codecList = codecListing;
 	//selectedCodec = defaultCodec;
 }
 
-#if 0
-// pn430 Renamed and rewritten for multicodec
-uint8_t Media::getCurrentRtpPayloadType(){
-	// pn430 Changed for multicodec
-	//if( codec ){
-	if( selectedCodec ){
-		// pn430 Changed for multicodec
-		//return codec->getSdpMediaType();
-		return selectedCodec->getSdpMediaType();
-	}
-	
-	return 0;
-}
-#endif
 // pn430 Added for multicodec
 std::list<uint8_t> Media::getAllRtpPayloadTypes(){
 	std::list<uint8_t> list;
@@ -149,9 +135,6 @@ void Media::unRegisterMediaSource( uint32_t ssrc ){
 
 void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 	list< MRef<MediaStreamSender *> >::iterator i;
-	// FIXME! This one should be flexible enough for video
-	//
-
 	sendersLock.lock();
 	for( i = senders.begin(); i != senders.end(); i++ ){
 		(*i)->send( data, length, &ts, marker );

@@ -54,12 +54,14 @@ void rtpCallback( struct AVCodecContext * context, void *data,
         encoder->mbCounter += packetNumber;
         bool endOfFrame = ( encoder->mbCounter == 
                         ((context->width+15)/16)*((context->height+15)/16) );
-/*        cerr << "NB_MACROBLOCK: " << packetNumber << endl;
+#if 0
+        cerr << "NB_MACROBLOCK: " << packetNumber << endl;
         cerr << "MACROBLOCK_COUNTER: " << encoder->mbCounter << endl;
         cerr << "PACKET_SIZE: " << size << endl;
         cerr << "WIDTH: " << context->width << endl;
         cerr << "HEIGHT: " << context->height << endl;
-*/
+#endif
+
 
         if( endOfFrame ){
         //        fprintf( stderr, "End of frame, length = %i\n", size );
@@ -103,7 +105,7 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	context->bit_rate_tolerance = 2*1024*1024;
 
 //	context->frame_rate = 1000; 
-	context->frame_rate = 25; 
+	context->frame_rate = 15; 
 	context->frame_rate_base = 1;
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
@@ -127,12 +129,12 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 
         //context->qmin = 0;
         //context->mb_qmin = 0;
-        context->qmax = 5;
+//        context->qmax = 5;
         //context->mb_qmax = 10;
 //        context->flags |= CODEC_FLAG_QP_RD;
         context->flags |= CODEC_FLAG_H263P_SLICE_STRUCT;
 	
-	context->gop_size = 2;
+	context->gop_size = 1;
 
 	context->thread_count = 1;
 

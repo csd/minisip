@@ -55,8 +55,11 @@ string ThreadException::what(){
 #define MINISIP_THREAD_IMPLEMENTED
 static DWORD WINAPI ThreadStarter( LPVOID lpParam ) 
 { 
+        MRef<Runnable *> self = *(dynamic_cast<MRef <Runnable *> *>(arg));
+        delete (dynamic_cast<MRef <Runnable *> *>(arg));
+
 //	printf("ThreadStarter: thread created\n");
-	((Runnable *) lpParam)->run();
+	self->run();
 //	printf("ThreadStarter: thread terminated\n");
     return 0; 
 } 
@@ -102,8 +105,11 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_THREAD_IMPLEMENTED
 static void *LinuxThreadStarter(void *arg){
+        /* Keep a reference to yourself as long as you run */
+        MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
+        delete (static_cast<MRef <Runnable *> *>(arg));
 //	cerr << "LinuxThreadStarter: thread created"<< endl;
-	((Runnable *)arg)->run();
+	self->run();
 //	cerr <<"LinuxThreadStarter: thread terminated"<< endl;
 	return NULL;
 }
@@ -137,8 +143,9 @@ static void *LinuxStaticThreadStarter(void *obj, void *arg){
 #endif
 
 
-Thread::Thread(Runnable *runnable){
+Thread::Thread(MRef<Runnable *> runnable){
 	assert(runnable);
+        MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
 #ifdef WIN32
 	DWORD threadId;
 
@@ -150,12 +157,14 @@ Thread::Thread(Runnable *runnable){
 			NULL,                        // default security attributes
 			0,                           // use default stack size
 			ThreadStarter,                  // thread function
-			(LPVOID) runnable,                // argument to thread function
+			(LPVOID) self,                // argument to thread function
 			0,                           // use default creation flags
 			&threadId);
 //	if (threadHandle==NULL)
-	if (*((HANDLE*)handle_ptr)==NULL)
+	if (*((HANDLE*)handle_ptr)==NULL){
+                delete self;
 		throw new ThreadException("Could not create thread.");
+        }
 //	printf("In Thread, windows part - thread created\n");
 
 #endif //WIN32
@@ -164,7 +173,8 @@ Thread::Thread(Runnable *runnable){
 	//handle_ptr = malloc(sizeof(pthread_t));
 	handle_ptr = new pthread_t;
 //	if (pthread_create(&threadHandle, NULL, LinuxThreadStarter, runnable)){
-	if (pthread_create((pthread_t*)handle_ptr, NULL, LinuxThreadStarter, runnable)){
+	if (pthread_create((pthread_t*)handle_ptr, NULL, LinuxThreadStarter, self)){
+                delete self;
 		throw new ThreadException("Could not create thread.");
 	}
 //	printf("In Thread, linux part - thread created\n");

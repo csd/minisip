@@ -100,6 +100,8 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
                 virtual void dtmfPressed( uint8_t symbol );
 
+                virtual std::string getMemObjectType(){return "MainWindow";};
+
 	private:
 
                 void registerIcons();

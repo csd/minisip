@@ -31,7 +31,7 @@
 class ImageMixer;
 
 
-class Grabber : public MObject, public Runnable{
+class Grabber : public Runnable{
 	public:
 		static MRef<Grabber *> create( std::string device );
 		virtual void open()=0;

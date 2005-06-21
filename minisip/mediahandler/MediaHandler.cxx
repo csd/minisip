@@ -39,12 +39,7 @@
 #include"../soundcard/SoundIO.h"
 #include"../soundcard/SoundDevice.h"
 #include"../codecs/Codec.h"
-#include"../codecs/G711CODEC.h"
-#include"../codecs/ILBCCODEC.h"
 
-#ifdef HAS_SPEEX
-#include"../codecs/SPEEXCODEC.h"
-#endif
 
 #ifdef VIDEO_SUPPORT
 #include"../video/grabber/Grabber.h"
@@ -78,58 +73,23 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 
                 MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
                 MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 48000 );
-		// pn430 Following two lines (incl. comment) changed for multicodec
-                // FIXME: go through the codecs and add all
-                //MRef<AudioMedia *> media = new AudioMedia( soundIo, new G711CODEC() );
-		// pn New version
 						
-		MRef<Codec *> codecG711 = new G711CODEC();
-		MRef<Codec *> codeciLBC = new ILBCCODEC();
-#ifdef HAS_SPEEX
-		MRef<Codec *> codecSPEEX = new SPEEXCODEC();
-#endif
-
 		std::list<MRef<Codec *> > codecList;
-
-				
+		std::list<std::string>::iterator iCodec;
 		MRef<Codec *> selectedCodec;
+
+                for( iCodec = config->audioCodecs.begin(); 
+                     iCodec != config->audioCodecs.end();
+                     iCodec ++ ){
+
+                        selectedCodec = (Codec*)*AudioCodec::create( *iCodec );
+                        if( selectedCodec ){
+                                codecList.push_back( selectedCodec );
+                        }
+
+                }
 		
-		int n = 0; 
-		
-		if ( config->selectedCodec == "G.711" )
-			n = 0;
-		if ( config->selectedCodec == "iLBC" )
-			n = 97;
-		if ( config->selectedCodec == "speex" )
-			n = 114;
-			
-		switch ( n ) {		
-#ifdef HAS_SPEEX		 	
-			case 114:
-				selectedCodec=codecSPEEX;
-				codecList.push_back(selectedCodec);
-				codecList.push_back(codecG711);
-				codecList.push_back(codeciLBC);
-				break;
-#endif
-			case 97:
-				selectedCodec=codeciLBC;
-				codecList.push_back(selectedCodec);
-				codecList.push_back(codecG711);
-#ifdef HAS_SPEEX
-				codecList.push_back(codecSPEEX);
-#endif
-				break;	
-			default:
-				selectedCodec=codecG711;
-				codecList.push_back(selectedCodec);
-				codecList.push_back(codeciLBC);
-#ifdef HAS_SPEEX
-				codecList.push_back(codecSPEEX);
-#endif
-		}	
-	
-		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList, selectedCodec);
+		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList );
 		
                 registerMedia( *media );
 		if( !audioMedia ){

@@ -80,7 +80,7 @@ class MediaHandler;
 
 using namespace std;
 
-class Sip: public MObject, public Runnable{
+class Sip: public Runnable{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,

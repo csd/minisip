@@ -150,7 +150,7 @@ class TPRequest{
  * @author Erik Eliasson
  */
 template<class TOCommand, class TOSubscriber>
-class TimeoutProvider : public MObject, Runnable{
+class TimeoutProvider : public Runnable{
 
 	public:
 		string getMemObjectType(){return "TimeoutProvider";}

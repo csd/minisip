@@ -69,7 +69,6 @@ string VideoMedia::getSdpMediaType(){
 
 void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
         string framesizeString = m->getAttribute( "framesize", 0 );
-        cerr << "FRAMESIZE" << framesizeString << endl;
         if( framesizeString != "" ){
                 size_t space = framesizeString.find( " " );
                 size_t coma = framesizeString.find( "-" );
@@ -91,9 +90,7 @@ void VideoMedia::playData( RtpPacket * packet ){
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
-		cerr << "Before playData" << endl;
 		source->playData( packet );
-		cerr << "After playData" << endl;
 	}
 	else{
 		delete packet;
@@ -120,12 +117,12 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
                 MRef<VideoDisplay *> newdisplay = VideoDisplay::create( receivingWidth, receivingHeight );
                 source->getDecoder()->setHandler( *newdisplay );
                 source->display = newdisplay;
-                cerr << "Starting DISPLAY" << endl;
-                newdisplay->start();
+                if( newdisplay ){
+                        //newdisplay->start();
+                }
         }
 
 
-        cerr << "Registering VideoMediaSource, sources.size = " << sources.size() << endl;
 
 	sourcesLock.lock();
 	if( sources.size() == 0 ){
@@ -144,11 +141,9 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
 }
 
 void VideoMedia::unRegisterMediaSource( uint32_t ssrc ){
-cerr << "Unregister source" << endl;
 	MRef<VideoMediaSource *> source = getSource( ssrc );
 
 	if( source ){
-		cerr << "found source" << endl;
 		sourcesLock.lock();
 		sources.remove( source );
 		if( sources.size() == 0 ){
@@ -162,7 +157,6 @@ cerr << "Unregister source" << endl;
                         source->display->stop();
                 }
 	}
-        cerr << "end unregister" << endl;
 }
 
 MRef<VideoMediaSource *> VideoMedia::getSource( uint32_t ssrc ){
@@ -332,7 +326,7 @@ void VideoMediaSource::playData( RtpPacket * packet ){
 			packetLoss = true;
 			//rr << "Packet lost in video stream, dropping one frame seqNo == expectedSeqNo + 1)" << end;
 #ifdef DEBUG_OUTPUT
-			cerr << "Packet lost in video stream, dropping one frame (seqNo == expectedSeqNo + 1)" << endl;
+			cerr << "Packet lost in video stream, dropping one frame (seqNo " + itoa( seqNo  ) + " == expectedSeqNo ("+itoa(expectedSeqNo)+") + 1)" << endl;
 #endif
 		}
         }
@@ -351,7 +345,6 @@ void VideoMediaSource::playData( RtpPacket * packet ){
 }
 
 void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
-cerr << "Started addPacketToFrame" << endl;
         if( !packetLoss ){
 	 	packet->getContent()[0] = 0;
                 memcpy( frame + index, packet->getContent() , packet->getContentLength()  );
@@ -361,9 +354,7 @@ cerr << "Started addPacketToFrame" << endl;
         if( packet->getHeader().marker ){
                 if( ! packetLoss ){
                         /* We have a frame */
-			cerr << "Before decodeFrame" << endl;
                         decoder->decodeFrame( frame, index );
-			cerr << "After decodeFrame" << endl;
                 }
                 index = 0;
                 packetLoss = false;

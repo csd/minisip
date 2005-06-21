@@ -148,7 +148,7 @@ class SipSoftPhoneConfiguration : public MObject{
 		 */
 		int32_t p2tGroupListServerPort;
 		
-		string selectedCodec;
+		list<string> audioCodecs;
 };
 
 #endif

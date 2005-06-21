@@ -83,6 +83,9 @@ bool Session::responderAuthenticate( string message ){
 						if( !ka ){
 							ka = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 						}
+                                                else{
+                                                        cerr << "Using pre-computed key agreement parameters" << endl;
+                                                }
 						ka->setInitiatorData( init_mes );
 
 #ifndef _MSC_VER

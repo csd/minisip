@@ -151,8 +151,6 @@ void RtpReceiver::run(){
 			std::list<uint8_t>::iterator iList;
 			for( iList = list.begin(); iList != list.end(); iList ++ ){
 				uint8_t n = packet->getHeader().getPayloadType();
-				cerr << n;
-				cerr << ((uint8_t)(*iList));
 				if ( (*iList) == packet->getHeader().getPayloadType() ) {
 					(*i)->handleRtpPacket( packet );
 					break;

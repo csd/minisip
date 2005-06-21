@@ -49,7 +49,7 @@ private:
 };
 
 
-class LIBMUTIL_API Runnable{
+class LIBMUTIL_API Runnable : public virtual MObject{
 public:
 	virtual void run()=0;
 };
@@ -62,7 +62,7 @@ public:
  */
 class LIBMUTIL_API Thread : public MObject{
 public:
-	Thread(Runnable *runnable);
+	Thread(MRef<Runnable *>runnable);
 
 	std::string getMemObjectType(){return "Thread";}
 

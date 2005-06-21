@@ -33,7 +33,7 @@ class MediaStreamReceiver;
 class CryptoContext;
 
 
-class RtpReceiver : public Runnable, public MObject{
+class RtpReceiver : public Runnable{
 	public:
 		RtpReceiver( MRef<IpProvider *> ipProvider );
 

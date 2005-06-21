@@ -89,10 +89,10 @@ class Media : public MObject{
 		
 	protected:
                 Media();
-		Media( MRef<Codec *> codec );
+                Media( MRef<Codec *> defaultCodec );
 
 		// pn430 Added for multicodec
-		Media( std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec );
+		Media( std::list<MRef<Codec *> > codecList );
 				
 		// pn Removed for multicodec
 		//MRef<Codec *> codec;

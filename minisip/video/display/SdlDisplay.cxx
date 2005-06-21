@@ -151,17 +151,6 @@ MImage * SdlDisplay::allocateImage(){
         mimage->linesize[2] = overlay->pitches[1];
 
         mimage->privateData = overlay;
-        mimage = new MImage;
-
-        mimage->data[0] = overlay->pixels[0];
-        mimage->data[1] = overlay->pixels[2];
-        mimage->data[2] = overlay->pixels[1];
-
-        mimage->linesize[0] = overlay->pitches[0];
-        mimage->linesize[1] = overlay->pitches[2];
-        mimage->linesize[2] = overlay->pitches[1];
-
-        mimage->privateData = overlay;
 
 	return mimage;
 	
@@ -176,7 +165,6 @@ void SdlDisplay::deallocateImage( MImage * mimage ){
 	SDL_FreeYUVOverlay( overlay );
 
 	delete mimage;
-	
 }
 
 bool SdlDisplay::handlesChroma( uint32_t chroma ){

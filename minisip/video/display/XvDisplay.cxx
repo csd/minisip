@@ -160,7 +160,6 @@ MImage * XvDisplay::allocateImage(){
 }
 
 void XvDisplay::deallocateImage( MImage * mimage ){
-	char * imageData = ( char * )malloc( width * height * 3 );
 	XvImage * image = (XvImage *)mimage->privateData;
 
 	XFree( image );

@@ -96,10 +96,10 @@ void AVDecoder::close(){
 void AVDecoder::setHandler( ImageHandler * handler ){
 	this->handler = handler;
         
-        needsConvert = ! handler->handlesChroma( M_CHROMA_I420 );
+        needsConvert = handler && ! handler->handlesChroma( M_CHROMA_I420 );
 
 	/* If the handler provides its own buffers, use them */
-	if( !needsConvert && handler->providesImage() ){
+	if( handler && !needsConvert && handler->providesImage() ){
 		context->get_buffer = &ffmpegGetBuffer;
 		context->release_buffer = &ffmpegReleaseBuffer;
 	}

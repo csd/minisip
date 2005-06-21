@@ -27,6 +27,7 @@
 #endif
 
 class AudioMediaSource;
+class SilenceSensor;
 
 
 class AudioMedia : public Media, public SoundRecorderCallback{
@@ -34,7 +35,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
         public:
 		// pn430 Next line changed for multicodec
 		//AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec );
-		AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList, MRef<Codec *> defaultCodec );
+		AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList );
                 
 		virtual std::string getMemObjectType(){return "AudioMedia";}
                 virtual std::string getSdpMediaType();
@@ -58,6 +59,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		MRef<AudioMediaSource *> getSource( uint32_t ssrc );
 
                 MRef<Resampler *> resampler;
+                SilenceSensor * silenceSensor;
                 MRef<SoundIO *> soundIo;                 
 		uint32_t seqNo;
                 byte_t encoded[1600];                 

@@ -26,6 +26,7 @@
 #include"../VideoException.h"
 #include<stdio.h>
 #include<libmutil/mtime.h>
+#include<libmutil/itoa.h>
 
 
 #define NUM_BUFFERS 2
@@ -79,7 +80,7 @@ void Dc1394Grabber::open(){
 	raw1394_destroy_handle( rawHandle );
 
 	if( cameraId >= nbCameras ){
-                throw VideoException( "Could not find camera id"  );
+                throw VideoException( (std::string)"Could not find camera id " + itoa( cameraId  )+ " on IEEE1394 bus " + itoa( portId )  );
 	}
 	
 	cameraHandle = dc1394_create_handle( portId );

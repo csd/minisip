@@ -30,7 +30,7 @@
 #include<libmutil/CondVar.h>
 #include<libmutil/Semaphore.h>
 
-class VideoDisplay : public ImageHandler, public MObject, public Runnable{
+class VideoDisplay : public ImageHandler, public Runnable{
 	public:
 
                 static MRef<VideoDisplay *> create( uint32_t width, uint32_t height );
@@ -84,6 +84,7 @@ class VideoDisplay : public ImageHandler, public MObject, public Runnable{
 		bool show;
 
                 Thread * thread;
+                MRef<Semaphore *> sem;
 
 };
 

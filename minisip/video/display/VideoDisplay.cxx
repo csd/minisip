@@ -44,7 +44,7 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
         
         VideoDisplay::displayCounterLock.lock();
 
-#ifdef SDL_SUPPORT || defined XV_SUPPORT
+#if defined SDL_SUPPORT || defined XV_SUPPORT
         if( VideoDisplay::displayCounter == 0 ){
                 try{
 #ifdef SDL_SUPPORT
@@ -86,7 +86,7 @@ VideoDisplay::VideoDisplay(){
 }
 
 VideoDisplay::~VideoDisplay(){
-        thread->join();
+//        thread->join();
         VideoDisplay::displayCounterLock.lock();
         VideoDisplay::displayCounter --;
         VideoDisplay::displayCounterLock.unlock();
@@ -128,6 +128,7 @@ void VideoDisplay::showWindow(){
 
 /* The lock on emptyImages should always have been taken */
 void VideoDisplay::hideWindow(){
+        fprintf( stderr, "started hidewindow\n" );
         list<MImage *>::iterator i;
 
         
@@ -136,12 +137,30 @@ void VideoDisplay::hideWindow(){
                 emptyImagesSem.dec();
         }
 
-        while( ! allocatedImages.empty() ){
-                deallocateImage( *allocatedImages.begin() );
-                allocatedImages.pop_front();
+        if( dynamic_cast<SdlDisplay *>( this ) != NULL ){
+                fprintf( stderr, "display is an SdlDisplay\n" );
+        }
+        if( dynamic_cast<X11Display *>( this ) != NULL ){
+                fprintf( stderr, "display is an X11Display\n" );
+        }
+        if( dynamic_cast<XvDisplay *>( this ) != NULL ){
+                fprintf( stderr, "display is an XvDisplay\n" );
         }
 
+        while( ! allocatedImages.empty() ){
+                fprintf( stderr, "this: %x\n", this);
+                fprintf( stderr, "before deallocate\n" );
+                deallocateImage( *allocatedImages.begin() );
+                fprintf( stderr, "size: %i\n", allocatedImages.size() );
+                allocatedImages.pop_front();
+                fprintf( stderr, "after deallocate\n" );
+                fprintf( stderr, "size: %i\n", allocatedImages.size() );
+        }
+
+        fprintf( stderr, "Before destroy window\n" );
+
         destroyWindow();
+        fprintf( stderr, "After destroy window\n" );
 
 }
 

@@ -47,19 +47,19 @@ void VideoCodec::decode( byte_t * inputData, uint32_t inputSize ){
 }
 
 std::string VideoCodec::getCodecName(){
-	return std::string( "H263" );
+	return std::string( "H.263" );
 }
 
 std::string VideoCodec::getCodecDescription(){
-	return std::string( "ITU-T H263 Video Encoder/Decoder" );
+	return std::string( "ITU-T H.263 Video Encoder/Decoder" );
 }
 
 int32_t VideoCodec::getSdpMediaType(){
-	return 34;
+	return 105;
 }
 
 std::string VideoCodec::getSdpMediaAttributes(){
-	return std::string("");
+	return std::string("h263-1998/90000");
 }
 
 void VideoCodec::setGrabber( MRef<Grabber *> grabber ){
