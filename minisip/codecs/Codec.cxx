@@ -40,3 +40,21 @@ MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
                         return NULL;
         }
 }
+
+MRef<AudioCodec *> AudioCodec::create( const std::string & description ){
+        if( description == "G.711" ){
+                return new G711CODEC();
+        }
+        
+        if( description == "iLBC" ){
+                return new ILBCCODEC();
+        }
+        
+#ifdef HAS_SPEEX
+        if( description == "speex" ){
+                return new SPEEXCODEC();
+        }
+#endif
+
+        return NULL;
+}

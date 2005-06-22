@@ -59,6 +59,12 @@ class AudioCodec : public Codec{
 		 * (NULL if not handled)
 		 */
 		static MRef<AudioCodec *> create( uint8_t payloadType );
+		
+                /**
+		 * @returns A CODEC instance for the given description string
+		 * (NULL if not handled)
+		 */
+		static MRef<AudioCodec *> create( const std::string& );
 
 		/**
 		 * @returns Number of bytes in output buffer

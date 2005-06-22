@@ -27,6 +27,7 @@ class Minisip : public Runnable{
 		void exit();
 		void startSip();
 		void runGui();
+                virtual std::string getMemObjectType(){ return "Minisip"; };
 	private:
 		
 		virtual void run();
