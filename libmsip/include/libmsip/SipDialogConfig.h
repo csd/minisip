@@ -57,6 +57,9 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkFunctions.h>
 
+
+
+
 #ifdef _MSC_VER
 
 #else
@@ -76,7 +79,7 @@ using namespace std;
 
 class LIBMSIP_API SipProxy{
 	public:
-		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0;}
+		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0; registerExpires=1000;}
 
 		SipProxy(string addr){
 			assert(addr.find("@")==string::npos);
@@ -91,10 +94,12 @@ class LIBMSIP_API SipProxy{
 			}
 
 			sipProxyIpAddr = new IP4Address(addr);
+			registerExpires=1000;
 		}
 		
 		SipProxy(string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
 			sipProxyIpAddr = new IP4Address(addr);
+			registerExpires=1000;
 		}
 
 		void setProxy(string proxy, int port){
@@ -109,8 +114,8 @@ class LIBMSIP_API SipProxy{
 				+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
 				+"; port="+itoa(sipProxyPort)
 				+"; user="+sipProxyUsername
-				+"; password="+sipProxyPassword;
-				
+				+"; password="+sipProxyPassword
+				+"; expires="+itoa(registerExpires);
 		}
 
 		static string findProxy(string uri, uint16_t &port){
@@ -128,19 +133,35 @@ class LIBMSIP_API SipProxy{
 			return proxy;
 		}
 
-                int sipProxyPort;
-                string sipProxyAddressString;
-		IPAddress * sipProxyIpAddr;
+		void setRegisterExpires( string _expires ) {
+			int r;
+			r = atoi( _expires.c_str() );
+			setRegisterExpires( r );
+		}
 		
-                string sipProxyUsername;
-                string sipProxyPassword;
-
+		void setRegisterExpires( int _expires ) {
+			if( _expires >= 0 && _expires < 100000 ) 
+				registerExpires = _expires;
+			else registerExpires = 1000;
+			//merr << "SipDialogConfig::SipProxy::setRegisterExpires : expires in " << registerExpires << end;
+		}
+		
+		int sipProxyPort;
+		string sipProxyAddressString;
+		IPAddress * sipProxyIpAddr;
+		string sipProxyUsername;
+		string sipProxyPassword;
+		
+		/* Value of the expires tag to be added for the contact in this proxy.
+		 *Use setRegisterExpires to set it to zero (de-register).
+		 */
+		int registerExpires; //in seconds
 };
 
 class LIBMSIP_API SipIdentity : public MObject{
         public:
 		SipIdentity(){/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ registerToProxy=false; securitySupport=false;}
-                SipIdentity(string sipuri);
+		SipIdentity(string sipuri);
 
 		void setIdentityName(string n);//{identityIdentifier = n;}
 		
@@ -158,8 +179,8 @@ class LIBMSIP_API SipIdentity : public MObject{
 		virtual std::string getMemObjectType(){return "SipIdentity";}
 		
 		
-                string sipUsername;
-                string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
+		string sipUsername;
+		string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
 
 		SipProxy sipProxy;
 
@@ -181,7 +202,7 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 //		string userUri; 	//General->Users SIP address
 		string localIpString; //GEneral->Network Interface
 		string externalContactIP;
-                int32_t externalContactUdpPort;
+		int32_t externalContactUdpPort;
                 
 		int32_t localUdpPort;	// Advanced -> ...Sip port...
 		int32_t localTcpPort;

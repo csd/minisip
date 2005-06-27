@@ -32,6 +32,8 @@
 
 #include<config.h>
 
+#include<libmutil/itoa.h>
+
 #include<libmsip/SipHeaderContact.h>
 
 MRef<SipHeaderValue *> contactFactory(const string &build_from){
@@ -47,7 +49,8 @@ const string sipHeaderValueContactTypeStr = "Contact";
 SipHeaderValueContact::SipHeaderValueContact()
 	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","",0)
 {
-	featuretag= "";	
+	featuretag= "";
+	expires=1000;
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
@@ -68,17 +71,20 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 	setUri(u);
 	
 	featuretag="";
+	expires=1000;
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &username, 
 		const string &ip, 
 		int32_t port, 
 		const string &user_type, 
-		const string &transport
+		const string &transport,
+		int expires
 		)
 			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),
 			 uri(username,ip,user_type,port)
 {
+	this->setExpires(expires);
 	if (transport!="")
 		uri.setTransport(transport);
 }
@@ -110,7 +116,7 @@ string SipHeaderValueContact::getString(){
 	}
 //	merr << "SipHeaderValueContact::getString: creating ret" <<end;
 	
-	string ret = /*"Contact: */"<"+user+">;" + featuretag + "expires=1000"; //TODO: XXX
+	string ret = /*"Contact: */"<"+user+">;" + featuretag + "expires=" + itoa(this->expires); //TODO: XXX
 //	merr << "SipHeaderValueContact::getString: ret="<< ret<<end;
 	return ret;
 } 
@@ -123,3 +129,14 @@ void SipHeaderValueContact::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 
+
+int SipHeaderValueContact::getExpires() {
+	return this->expires;
+}
+
+void SipHeaderValueContact::setExpires(int _expires){
+	if( _expires >= 0 && _expires < 100000 ) 
+		this->expires = _expires;
+	else this->expires = 1000;
+}
+ 

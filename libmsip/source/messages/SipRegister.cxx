@@ -57,7 +57,8 @@ SipRegister::SipRegister(string branch,
 		int32_t sip_listen_port, 
 		string from_tel_no, 
 		int32_t seq_no,
-		string transport
+		string transport,
+		int expires
 		) : SipMessage(branch, SipRegister::type), domain(domainarg)
 {
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
@@ -89,6 +90,7 @@ SipRegister::SipRegister(string branch,
 	MRef<SipHeaderValueContact*>contactp_casted = MRef<SipHeaderValueContact*>((SipHeaderValueContact*) *contactp);
 	//contactp_casted->setFeatureTag("+sip.confjoin=\"TRUE\";");
 	contactp_casted->setFeatureTag("+sip.p2t=\"true\";");		
+	contactp_casted->setExpires(expires);
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
@@ -107,7 +109,8 @@ SipRegister::SipRegister(string branch,
 		string auth_id, 
 		string realm, 
 		string nonce, 
-		string password
+		string password,
+		int expires
 		): SipMessage(branch, SipRegister::type), domain(domainarg)
 {
 	SipURI uri("", localIp,"", sip_listen_port);
@@ -130,7 +133,7 @@ SipRegister::SipRegister(string branch,
 	seqp->setCSeq(seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport);
+	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport, expires);
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();

@@ -62,11 +62,12 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 				const string &ip, 
 				int32_t port, 
 				const string &usertype="phone", 
-				const string &transport="");
+				const string &transport="",
+				int expires=1000);
 
 		virtual ~SipHeaderValueContact();
 
-                virtual std::string getMemObjectType(){return "SipHeaderContact";}
+		virtual std::string getMemObjectType(){return "SipHeaderContact";}
 		
 		/**
 		 * returns string representation of the header
@@ -86,9 +87,17 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		 */
 		 void setFeatureTag(string featuretag){this->featuretag=featuretag;}
 		
+		 /**
+		  * Used to get/set the expires for this contact in the registrar.
+		  * Using the SipCommands, it can be set to any value (param3),
+		  * for example, to zero for de-registration.
+		  */
+		 int getExpires();
+		 void setExpires(int _expires);
+		 
 	private:
 		SipURI uri;
-		
+		int expires;
 		///the featuretag
 		string featuretag;
 };

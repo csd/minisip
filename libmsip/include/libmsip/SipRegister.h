@@ -55,6 +55,7 @@ class LIBMSIP_API SipRegister : public SipMessage{
 		 * @param sip_listen_port Port on which we are accepting SIP packets.
 		 * @param from_tel_no The telephone number/username of the local user agent
 		 * @param seq_no Sequence mumber of this packet.
+		 * @param expires Number of seconds for the register to expire (0 to de-register)
 		 */
 		SipRegister(string branch,
 				string call_id, 
@@ -63,7 +64,8 @@ class LIBMSIP_API SipRegister : public SipMessage{
 				int32_t sip_listen_port, 
 				string from_tel_no, 
 				int32_t seq_no,
-				string transport
+				string transport,
+				int expires
 				);
 		
 		/**
@@ -77,6 +79,7 @@ class LIBMSIP_API SipRegister : public SipMessage{
 		 * @param realm Realm to use in authentication. Typically received in a 407 repsonse previously.
 		 * @param nonce Nonce to use in authentication. Typically received in a 407 response previously.
 		 * @param password Password to use in authentication.
+		 * @param expires Number of seconds for the register to expire (0 to de-register)
 		 */
 		SipRegister(string branch,
 				string call_id, 
@@ -89,7 +92,8 @@ class LIBMSIP_API SipRegister : public SipMessage{
 				string auth_id, 
 				string realm, 
 				string nonce, 
-				string password
+				string password,
+				int expires
 				);
 
 		virtual ~SipRegister();
