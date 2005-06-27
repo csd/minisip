@@ -347,28 +347,28 @@ static void * udpThread( void * arg );
 static void * streamThread( void * arg );
 
 SipMessageTransport::SipMessageTransport(
-                        string local_ip, 
-                        string contactIP, 
+			string local_ip, 
+			string contactIP, 
 			string preferredTransport,
-                        int32_t externalContactUdpPort, 
-                        int32_t local_udp_port, 
-                        int32_t local_tcp_port,
-                        int32_t local_tls_port,
+			int32_t externalContactUdpPort, 
+			int32_t local_udp_port, 
+			int32_t local_tcp_port,
+			int32_t local_tls_port,
 			MRef<certificate_chain *> cchain, 
-                        MRef<ca_db *> cert_db
+			MRef<ca_db *> cert_db
 			):
-                                        //udpsock(false,local_udp_port),
-                                        localIP(local_ip),
-                                        contactIP(contactIP),
-					preferredTransport(preferredTransport),
-                                        externalContactUdpPort(externalContactUdpPort),
-                                        localUDPPort(local_udp_port),
-                                        localTCPPort(local_tcp_port),
-					localTLSPort(local_tls_port),
-                                        cert_chain(cchain), 
-                                        cert_db(cert_db),
-                                        tls_ctx(NULL)
-							
+				//udpsock(false,local_udp_port),
+				localIP(local_ip),
+				contactIP(contactIP),
+				preferredTransport(preferredTransport),
+				externalContactUdpPort(externalContactUdpPort),
+				localUDPPort(local_udp_port),
+				localTCPPort(local_tcp_port),
+				localTLSPort(local_tls_port),
+				cert_chain(cchain), 
+				cert_db(cert_db),
+				tls_ctx(NULL)
+						
 {
 	udpsock = new UDPSocket(false, local_udp_port);
 	
@@ -376,7 +376,7 @@ SipMessageTransport::SipMessageTransport(
 	
 	int i;
 	for( i=0; i < NB_THREADS ; i++ ){
-            Thread::createThread(streamThread, new StreamThreadData(this));
+		Thread::createThread(streamThread, new StreamThreadData(this));
 	}
 }
 

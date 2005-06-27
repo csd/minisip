@@ -72,15 +72,17 @@ class CallWidget : public Gtk::VBox
 		void reject();
 
 		string getMainCallId();
-                bool handlesCallId( string callId );
+		bool handlesCallId( string callId );
+		
+		int32_t getState() {return state;}
 
 	private:
 		void startRinging();
 		void stopRinging();
 
 #ifndef OLDLIBGLADEMM
-                void transfer();
-                virtual void dtmfPressed( uint8_t symbol );
+		void transfer();
+		virtual void dtmfPressed( uint8_t symbol );
 #endif
 
 		MainWindow * mainWindow;
@@ -91,26 +93,25 @@ class CallWidget : public Gtk::VBox
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
 #ifndef OLDLIBGLADEMM
-                Gtk::Expander dtmfArrow;
-                
-                Gtk::Expander transferArrow;
-                Gtk::HBox transferHBox;
-                Gtk::HBox transferHBox2;
-                Gtk::Entry transferEntry;
-                Gtk::Button transferButton;
-        //        Gtk::ProgressBar transferProgress;
-                Gtk::Label transferProgress;
+		Gtk::Expander dtmfArrow;
+		Gtk::Expander transferArrow;
+		Gtk::HBox transferHBox;
+		Gtk::HBox transferHBox2;
+		Gtk::Entry transferEntry;
+		Gtk::Button transferButton;
+//		Gtk::ProgressBar transferProgress;
+		Gtk::Label transferProgress;
 #endif
-                Gtk::Image secureImage;
-                Gtk::Image insecureImage;
+		Gtk::Image secureImage;
+		Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
 //		TimeoutProvider<string> *timeoutProvider;      
-                list<string> callIds;
-                string mainCallId;
+		list<string> callIds;
+		string mainCallId;
 };
 
 #endif

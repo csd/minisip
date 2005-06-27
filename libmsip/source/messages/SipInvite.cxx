@@ -57,7 +57,6 @@ const int SipInvite::type=1;
 
 SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from){
 
-	
 	//check if it is a P2T Invite packet
 	MRef<SipHeaderValueAcceptContact*> acp;
 	P2T=false;
@@ -71,7 +70,7 @@ SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from
 			if(acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
 				P2T=true;
 			else if(acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"") {
-				cout << "SIPINVITE: Setting conjoin to true";
+				cout << "SIPINVITE: Setting conjoin to true" << endl;
 				ConfJoin=true;
 			}
 			else if(acp->getFeaturetag()=="+sip.confconnect=\"TRUE\"")

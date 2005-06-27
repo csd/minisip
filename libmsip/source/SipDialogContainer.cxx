@@ -194,9 +194,9 @@ void SipDialogContainer::run(){
 		// (and the defaultHandler if they are not handled).
 		// Timeouts have a known receiver set in the queue item.
 		if (item.type==TYPE_COMMAND){
-			mdbg << "SipDialogContainer::run delivering command"<< **item.command << end;
+			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << end;
 		}else{
-			mdbg << "SipDialogContainer::run delivering timeout"<< **item.command << end;
+			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << end;
 		}
 		if (item.type == TYPE_COMMAND){
 			if (!dispatcher->handleCommand(**(item.command)) /*&& !item.command->getDispatched() */){

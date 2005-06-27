@@ -283,19 +283,26 @@ class StateTransition : public MObject{
 
 		bool handleCommand(const CommandType &c){
 			bool handled;
-				assert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
-				if (handled= ((**stateMachine).*action)(c) ){
-			                stateMachine->setCurrentState(to_state);
+			assert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
+			if (handled= ((**stateMachine).*action)(c) ){
+				stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG
-					merr << "SM_DEBUG" << stateMachine->getId() << ": " << name << ": " << from_state->getName()
-						<<" -> "<<to_state->getName();
-#ifdef SM_DEBUG_COMMAND
-					merr << " ("<< c << ")";
+				merr << "SM_DEBUG:" << stateMachine->getMemObjectType() << ": Transition Success" << name << ": " << from_state->getName()
+					<<" -> "<<to_state->getName();
+	#ifdef SM_DEBUG_COMMAND
+				merr << " ("<< c << ")";
+	#endif
+				merr << end;
 #endif
-					merr << end;
+			}
+#ifdef SM_DEBUG
+			else {
+				merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Failed: " << name << ": " << from_state->getName()
+					<<" -> "<<to_state->getName() << end;
+			}
 #endif
-				}
-				return handled;
+
+			return handled;
 		}
 
 		string getName(){return name;}

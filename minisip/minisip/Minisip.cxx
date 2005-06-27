@@ -70,13 +70,13 @@ static void signal_handler( int signal ){
 
 
 static void *tcp_server_thread(void *arg){
-        assert( arg != NULL );
-        MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+	assert( arg != NULL );
+	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
 	try{
-        	IP4ServerSocket server(transport->getLocalTCPPort());
-        	while(true){
-                	transport->addSocket(server.accept());
-        	}
+		IP4ServerSocket server(transport->getLocalTCPPort());
+		while(true){
+			transport->addSocket(server.accept());
+		}
 	}
 	catch( NetworkException * exc ){
 		cerr << "Exception caught when creating TCP server." << endl;
@@ -86,8 +86,9 @@ static void *tcp_server_thread(void *arg){
 }
 
 static void *tls_server_thread(void *arg){
-        assert( arg != NULL );
-        MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+	assert( arg != NULL );
+	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
+	//TLSSocket::sslCipherListIndex = 2; /* Set the default list of ciphers to be used*/	
 	
 	if( transport->getMyCertificate().isNull() ){
 		merr << "You need a personal certificate to run "
@@ -97,10 +98,10 @@ static void *tls_server_thread(void *arg){
 		return NULL;
 	}
 	try{
-        TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate(), transport->getCA_db());
-        	while(true){
-                	transport->addSocket(server.accept());
-        	}
+		TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate(), transport->getCA_db());
+		while(true){
+			transport->addSocket(server.accept());
+		}
 	}
 	catch( NetworkException * exc ){
 		cerr << "Exception caught when creating TLS server." << endl;
@@ -193,7 +194,8 @@ Minisip::Minisip( int argc, char**argv ){
 	
 	DbgHandler * dbgHandler = dynamic_cast<MainWindow *>( gui );
 	fprintf( stderr, "dbgHandler: %x\n", dbgHandler );
-	merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) );
+	
+	
 
 #ifdef DEBUG_OUTPUT
 	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
@@ -216,6 +218,7 @@ Minisip::~Minisip(){
 
 void Minisip::exit(){
 	//TODO
+	mout << BOLD << "CESC: Minisip::exit()!!!" << PLAIN << end;
 	/* End on-going calls the best we can */
 
 	/* Unregister */
