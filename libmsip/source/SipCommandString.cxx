@@ -28,6 +28,7 @@
 
 const string SipCommandString::transaction_terminated="transaction_terminated";
 const string SipCommandString::call_terminated="call_terminated";
+const string SipCommandString::call_terminated_early="call_terminated_early";
 const string SipCommandString::no_transactions="no_transactions";
 
 const string SipCommandString::error_message="error_message";

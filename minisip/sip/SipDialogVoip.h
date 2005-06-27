@@ -100,7 +100,7 @@ class SipDialogVoip: public SipDialog{
 		void sendReferOk(const string &branch);
 		void sendByeOk(MRef<SipBye*> bye, const string &branch);
 		void sendReject(const string &branch);
-                void sendReferReject(const string &branch);
+		void sendReferReject(const string &branch);
 		void sendRefer(const string &branch, int, const string referredUri);
 		void sendRinging(const string &branch);
 		void sendNotAcceptable(const string &branch);
@@ -127,9 +127,11 @@ class SipDialogVoip: public SipDialog{
 		bool a24_calling_termwait_2xx(const SipSMCommand &command);
 
 		bool a25_termwait_terminated_notransactions( const SipSMCommand &command);
+		bool a25_termwait_termwait_early( const SipSMCommand &command);
+		
 		bool a26_callingnoauth_termwait_transporterror( const SipSMCommand &command);
-
 		bool a26_callingauth_termwait_cancel( const SipSMCommand &command);
+		
 		/* Call transfer */
 		bool a27_incall_transferrequested_transfer( const SipSMCommand &command);
 		bool a28_transferrequested_transferpending_202( const SipSMCommand &command);
@@ -137,7 +139,7 @@ class SipDialogVoip: public SipDialog{
 		
 		bool a33_incall_transferaskuser_REFER( const SipSMCommand &command);
 		bool a34_transferaskuser_transferstarted_accept( const SipSMCommand &command);
-                bool a35_transferaskuser_incall_refuse( const SipSMCommand &command);
+		bool a35_transferaskuser_incall_refuse( const SipSMCommand &command);
                 
 		
 		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
@@ -156,6 +158,7 @@ class SipDialogVoip: public SipDialog{
 		MRef<MsipIpsecAPI *> ipsecSession;
 #endif
 
+		bool guiNotifyEarly;
 };
 
 #endif

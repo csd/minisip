@@ -111,14 +111,15 @@ gui(failed)              |                                    |                |
   |              |               |
   +------------->+---------------+
                          |
-			 | a25: no_transactions
-			 V phone(call_terminated)
+                         | a25: no_transactions
+                         V phone(call_terminated)
                  +---------------+
-		 |               |
-		 |  terminated   |
-		 |               |
+                 |               |
+                 |  terminated   |
+                 |               |
                  +---------------+
-		 
+   
+   
    CANCEL
    a7:TrnsCnclRsp
 
@@ -195,6 +196,7 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 		++dialogState.seqNo;
 //		setLocalCalled(false);
 		localCalled=false;
+		guiNotifyEarly = false; //we still have not notified the gui of early termination
 		dialogState.remoteUri= command.getCommandString().getParam();
 
 		MRef<SipTransaction*> invtrans = new SipTransactionInviteClientUA(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, dialogState.callId);
@@ -732,14 +734,17 @@ bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
+		
 		return true;
-	} else{
+	}else{
+		
 		return false;
 	}
 }
 
 
 bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &command){
+	
 	if (transitionMatch(command, SipCommandString::no_transactions) ){
 		lastInvite=NULL;
                 
@@ -749,6 +754,9 @@ bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &
 				SipSMCommand::DIALOGCONTAINER);
 
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		/* Tell the GUI */
+		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 
 #ifdef IPSEC_SUPPORT
 		if(ipsecSession){
@@ -757,8 +765,29 @@ bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &
 				cerr << "Not all IPSEC parameters were confired cleared. Check and remove manually." << endl;
 		}
 #endif
+		
 		return true;
 	}else{
+		
+		return false;
+	}
+}
+
+//notify the gui that dialog is finished ... just some transactions need to 
+//finish absorbing messages
+bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
+	
+	
+	if (!guiNotifyEarly && transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+		lastInvite=NULL;                
+		/* Tell the GUI */
+		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		guiNotifyEarly = true;
+		
+		return true;
+	}else{
+		
 		return false;
 	}
 }
@@ -1023,6 +1052,10 @@ void SipDialogVoip::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a25_termwait_terminated_notransactions,
 			s_termwait, s_terminated);
 
+	new StateTransition<SipSMCommand,string>(this, "transition_termwait_termwait_earlynotify",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a25_termwait_termwait_early,
+			s_termwait, s_termwait);
+	
 	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_termwait_transporterror",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a26_callingnoauth_termwait_transporterror,
 			s_callingnoauth, s_termwait);
@@ -1031,7 +1064,7 @@ void SipDialogVoip::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a26_callingauth_termwait_cancel,
 			s_callingauth, s_termwait);
 	
-        new StateTransition<SipSMCommand,string>(this, "transition_incall_transferrequested_transfer",
+	new StateTransition<SipSMCommand,string>(this, "transition_incall_transferrequested_transfer",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a27_incall_transferrequested_transfer,
 			s_incall, s_transferrequested);
         
@@ -1039,7 +1072,7 @@ void SipDialogVoip::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a28_transferrequested_transferpending_202,
 			s_transferrequested, s_transferpending);
 	
-        new StateTransition<SipSMCommand,string>(this, "transition_transferrequested_incall_36",
+	new StateTransition<SipSMCommand,string>(this, "transition_transferrequested_incall_36",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a31_transferrequested_incall_36,
 			s_transferrequested, s_incall);
 	
@@ -1059,19 +1092,19 @@ void SipDialogVoip::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a34_transferaskuser_transferstarted_accept,
 			s_transferaskuser, s_transferstarted);
 	
-        new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_transferstarted_accept",
+	new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_transferstarted_accept",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a34_transferaskuser_transferstarted_accept,
 			s_transferaskuser, s_transferstarted);
         
-        new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_incall_refuse",
+	new StateTransition<SipSMCommand,string>(this, "transition_transferaskuser_incall_refuse",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a35_transferaskuser_incall_refuse,
 			s_transferaskuser, s_incall);
 	
-        new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_BYE",
+	new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_BYE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a6_incall_termwait_hangup,
 			s_transferstarted, s_termwait);
         
-        new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_bye",
+	new StateTransition<SipSMCommand,string>(this, "transition_transferstarted_termwait_bye",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a5_incall_termwait_BYE,
 			s_transferstarted, s_termwait);
 
@@ -1571,8 +1604,8 @@ void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 //	setLastResponse(ok);
-        MRef<SipMessage*> pref(*ok);
-        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+	MRef<SipMessage*> pref(*ok);
+	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }

@@ -47,6 +47,7 @@ class LIBMSIP_API SipCommandString{
 		 */
 		static const string transaction_terminated;
 		static const string call_terminated;
+		static const string call_terminated_early;
 		static const string no_transactions;
                 
 		static const string error_message;
