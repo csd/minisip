@@ -54,8 +54,10 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 		cmd.setDestination(SipSMCommand::TU);
 		
 		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -65,9 +67,13 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), false);
+		//FIXME: responses should have a via, shouldn't they?
+		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
+		send(command.getCommandPacket(), true); 		//Add via header to first responses
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -78,10 +84,14 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), false); 		//Do not add via header to responses
+		//FIXME: responses should have a via, shouldn't they?
+		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
+		send(command.getCommandPacket(), true); 		//Add via header to first responses
 		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -91,10 +101,17 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(),false);
-		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
+		//FIXME: responses should have a via, shouldn't they?
+		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
+		send(command.getCommandPacket(), true); 		//Add via header to first responses
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getJ(), "timerJ");
+		else 
+			requestTimeout( 0, "timerJ");
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -102,6 +119,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 		const SipSMCommand &command)
 {
+	merr << "CESC: SipTransNIS::a4 ... " << end;
 	if (command.getSource()!=SipSMCommand::remote)
 		return false;
 	
@@ -114,7 +132,9 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 	}
 	
 	assert( !lastResponse.isNull());
-	send(MRef<SipMessage*>(* lastResponse),false);		//We are re-sending last response, do not add via header
+	//We are re-sending last response, do not add via header	
+	send(MRef<SipMessage*>(* lastResponse),false);
+	
 	
 	return true;
 }
@@ -125,10 +145,17 @@ bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
-		send(MRef<SipMessage*>(*pack),false);		// do not add via header to responses
+		//FIXME: one more about adding or not vias
+		//we are not resending ... Add new via header
+		send(MRef<SipMessage*>(*pack), true);
+		merr << "ATTENTION: count the number of vias! : " << pack->getString() << end;
+		
+		
 		return true;
-	}else
+	}else{
+		
 		return false;
+	}
 }
 
 bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
@@ -136,10 +163,10 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 		
 	if (transitionMatch(command, SipCommandString::transport_error)){
 		//inform TU
-                SipSMCommand cmd(
-                        CommandString(callId,SipCommandString::transport_error), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd(
+				CommandString(callId,SipCommandString::transport_error), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
@@ -149,8 +176,10 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 			SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE);
 		
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -158,6 +187,7 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 
 bool SipTransactionNonInviteServer::a7_completed_completed_request(
 		const SipSMCommand &command){
+	
 	
 	if (command.getSource()!=SipSMCommand::remote)
 		return false;
@@ -171,6 +201,7 @@ bool SipTransactionNonInviteServer::a7_completed_completed_request(
 	}
 	assert( !lastResponse.isNull());
 	send(MRef<SipMessage*>(* lastResponse), false);		//We are re-sending response, do not add via header
+	
 	return true;
 }
 
@@ -178,10 +209,10 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 		const SipSMCommand &command){
 
 	if (transitionMatch(command, SipCommandString::transport_error)){
-                SipSMCommand cmd(
-                        CommandString(callId,SipCommandString::transport_error), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd(
+				CommandString(callId,SipCommandString::transport_error), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
@@ -191,8 +222,10 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 			SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
 
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 }
@@ -208,8 +241,10 @@ bool SipTransactionNonInviteServer::a9_completed_terminated_timerJ(
 			SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
 
+		
 		return true;
 	}else{
+		
 		return false;
 	}
 
@@ -234,6 +269,9 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 
 	
 	///Set up transitions to enable cancellation of this transaction
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_start, s_terminated);
 	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
 			s_trying, s_terminated);

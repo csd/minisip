@@ -50,17 +50,37 @@
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
 
+/**
+	Implement an INVITE Transaction Server UAC,
+	as defined in RFC 3261, section 17.2.1
+	
+	It is composed of the following states:
+		start, proceeding, completed, confirmed, terminated
+
+	Transition functions between the states are axxx_description().
+	
+	There is a transition from any state into TERMINATED, defined in 
+	the base class SipTransaction::a1000_xxxx()
+	
+	All transitions are the same as for the parent class, except for
+	a5, which is substituted by a1001.
+*/
 class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
 		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
 		
 		virtual ~SipTransactionInviteServerUA();
 
+		virtual string getMemObjectType(){return "SipTransactionInvServerUA";}
 		virtual string getName(){return "transaction_ua_invite_server[branch="+getBranch()+"]";}
 
 		void changeStateMachine();
 
 	private:
+		/**
+		Transiton from PROCEEDING to COMPLETED
+		(substitutes a5 from the parent class).
+		*/
 		bool a1001_proceeding_completed_2xx( const SipSMCommand &command);
 };
 

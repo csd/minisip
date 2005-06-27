@@ -101,7 +101,10 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 		
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
-		requestTimeout(64000, "timerD");
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+		else 
+			requestTimeout( 0,"timerD");
 
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction, 
@@ -121,7 +124,10 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
-		requestTimeout(64000, "timerD");
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+		else 
+			requestTimeout( 0,"timerD");
 		
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction, 

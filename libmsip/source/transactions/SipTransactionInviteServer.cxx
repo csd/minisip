@@ -94,7 +94,7 @@
 #endif
 
 /**
- * The first command a INVITE server transaction receives i a INVITE
+ * The first command a INVITE server transaction receives is an INVITE
  * packet. It forwards the packet to the TU/call. We send no 1xx since we
  * expect a response from the TU in less than 200 ms.
  */
@@ -116,8 +116,8 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
  * In that case we retransmit it. 
  * Note: We expected that the TU/Call would answer before the remote side
  * retransmitted. If this failed, and if DEBUG_OUTPUT then we display an
- * error message. TODO: Implement an option to send 100 trying in action
- * "a0".
+ * error message. 
+ * TODO: Implement an option to send 100 trying in action "a0".
  */
 bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCommand &command){
 	
@@ -143,7 +143,8 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		send(command.getCommandPacket(), false);
+		//FIXME: i set it to true ... i think it needs via headers (cesc)
+		send(command.getCommandPacket(), true);
 		return true;
 	}else{
 		return false;
@@ -154,17 +155,21 @@ bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMComman
 /**
  * If a response (non 2xx/1xx) is received from the TU/Call, we send it to
  * the remote side. We save it in case we need to retransmit it later.
- * We set "timerG" to time out unless we receive and acknowledgement (ACK).
- * We set "timerH" to indicate when we give up retransmitting.
+ * Set "timerH", wait time for an ACK.
+ * Set "timerG", response re-tx interval
  */
 bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "3**\n4**\n5**\n6**")){
-		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		timerG = 500;
-		requestTimeout(timerG, "timerG");
-		requestTimeout(32000,"timerH");
-		send(command.getCommandPacket(), false);
+		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());		
+		if( isUnreliable() ) {
+			timerG = sipStack->getTimers()->getG();
+			requestTimeout(timerG, "timerG");
+		}
+		requestTimeout(sipStack->getTimers()->getH(),"timerH");
+		
+		//FIXME: i set it to true ... i think it needs via headers (cesc)
+		send(command.getCommandPacket(), true);
 		return true;
 	}else
 		return false;
@@ -173,7 +178,7 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 /**
  * If we receive a "transport_error" indication, we inform the TU and go to
  * the terminated state.
- * NOTE: There is currently no one giving this command to the transaction
+ * FIXME: There is currently no one giving this command to the transaction
  * layer (EE, r241).
  */
 bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMCommand &command){
@@ -206,7 +211,8 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
-		send(command.getCommandPacket(), false);
+		//FIXME: i set it to true ... i think it needs via headers (cesc)
+		send(command.getCommandPacket(), true);
 
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transaction_terminated),
@@ -220,10 +226,8 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 }
 
 /**
- * When we are in the completed state a response (3xx-6xx) has been
- * received from the TU/Call and it has been sent to the remote side.
- * If we receive the INVITE again, the response was lost. We retransmit it
- * again without informing the TU.
+	If we receive the INVITE again from the TU, the response has been lost. 
+	We retransmit the response again without informing the TU.
  */
 bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMCommand &command){
 	
@@ -238,16 +242,20 @@ bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMComma
 }
 
 /**
- * If we receive an ACK, we go to the "confirmed" state
- * without informing the TU, and schedule for termination
- * in 64 seconds.
+	If we receive an ACK while in COMPLETED, we go to the "confirmed" state
+	without informing the TU.
+	Schedule for transaction termination using timer I.
+	All other timers are cancelled.
  */
 bool SipTransactionInviteServer::a7_completed_confirmed_ACK( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipAck::type, SipSMCommand::remote, SipSMCommand::transaction)){
-		cancelTimeout("timerG");
-		cancelTimeout("timerH");
-		requestTimeout(64000,"timerI");
+		cancelTimeout("timerG");//response re-tx 
+		cancelTimeout("timerH"); //wait for ACK reception
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getI(), "timerI");
+		else
+			requestTimeout( 0, "timerI");
 		return true;
 	}else{
 		return false;
@@ -255,15 +263,18 @@ bool SipTransactionInviteServer::a7_completed_confirmed_ACK( const SipSMCommand 
 }
 
 /**
- * If timer G fires when in the "completed" state, we have not reveived an
- * "ACK" to our response (3xx-6xx). We resend the response and hope for an
- * "ACK".
- */
+	If timer G fires when in the "completed" state, we have not received an
+	"ACK" to our response (3xx-6xx). 
+	Resend the response and hope for an "ACK" before a transaction
+	timeout (timer H).
+*/
 bool SipTransactionInviteServer::a8_completed_completed_timerG( const SipSMCommand &command){
 	
 	if (transitionMatch(command, "timerG")){
 		MRef<SipResponse*> resp = lastResponse;
 		timerG *= 2;
+		if( timerG > sipStack->getTimers()->getT2() )
+			timerG = sipStack->getTimers()->getT2();
 		requestTimeout( timerG, "timerG");
 		send(MRef<SipMessage*>(*resp), false);
 		return true;
@@ -301,7 +312,10 @@ bool SipTransactionInviteServer::a9_completed_terminated_errOrTimerH( const SipS
 	}
 }
 
-
+/**
+When timer I fires, we stop absorbing ACKs.
+Move to TERMINATED and inform TU.
+*/
 bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCommand &command){
 	
 	if (transitionMatch(command, "timerI")){

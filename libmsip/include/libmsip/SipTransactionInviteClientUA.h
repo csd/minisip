@@ -48,6 +48,22 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransactionInviteClient.h>
 
+/**
+	Implement an INVITE Transaction Client UAC,
+	as defined in RFC 3261, section 17.1.1
+	
+	It is composed of the following states:
+		start, calling, proceeding, completed, terminated
+	
+	Transition functions between the states are axxx_description().
+	
+	There is a transition from any state into TERMINATED, defined in 
+	the base class SipTransaction::a1000_xxxx()
+	
+	All transitions are the same as for the parent class, except for
+	a5 and a7, which are substituted by a1001 and 1002.
+	Transition a1003 is new.
+*/
 class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClient{
 	public:
 		SipTransactionInviteClientUA(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, string callid);
@@ -56,10 +72,36 @@ class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClien
 
 		void changeStateMachine();
 
+		virtual string getMemObjectType(){return "SipTransactionInviteClientUA";}
+
 		virtual string getName(){return "transaction_ua_invite_client[branch="+getBranch()+"]";}
 	private:
+		/**
+			Transition from CALLING to COMPLETED
+			It subsitutes the transition from CALLING to TERMINATED that 
+			   exhists in its parent class.
+			If a final 2xx response is received, we move to the COMPLETED
+			state. 
+			Timer A is cancelled (no more retx)
+			Timer B is also cancelled.
+			Set Timer D (wait time for response re-tx)
+			Forward the 2xx to the TU.
+			Send an ACK (transport layer) ... //FIXME:shouldn't it be the TU sending it?
+		*/
 		bool a1001_calling_completed_2xx( const SipSMCommand &command);
+		
+		/**
+			Transition from PROCEEDING to COMPLETED
+			Same as a1001, but from the PROCEEDING state.
+			Send an ACK (transport layer) ... //FIXME:shouldn't it be the TU sending it?		
+		*/
 		bool a1002_proceeding_completed_2xx( const SipSMCommand &command);
+
+		/**
+			Loop in COMPLETED state.
+			While in COMPLETED state, resend an ACK for each 2xx response 
+			that we receive. Do not notify the TU.
+		*/
 		bool a1003_completed_completed_2xx( const SipSMCommand &command);
 };
 

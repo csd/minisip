@@ -97,10 +97,11 @@ bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCo
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
-		timerG=500;
-		requestTimeout( timerG,"timerG");
-		
-		requestTimeout(32000,"timerH");
+		if( isUnreliable() ) {
+			timerG = sipStack->getTimers()->getG();
+			requestTimeout(timerG, "timerG");
+		}
+		requestTimeout(sipStack->getTimers()->getH(),"timerH");
 		
 		send(command.getCommandPacket(), false);
 

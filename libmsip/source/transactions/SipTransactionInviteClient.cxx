@@ -97,9 +97,13 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 
 	if (transitionMatch(command, SipInvite::type, SipSMCommand::TU, IGN)){
 		lastInvite = (SipInvite *) *command.getCommandPacket();
-		requestTimeout( /*timerT1*/sipStack->getTimers()->getA() , "timerA" );
+		if( isUnreliable() ) { // retx timer
+			timerA = sipStack->getTimers()->getA();
+			requestTimeout( timerA , "timerA" );
+		}
 		
-		requestTimeout( /*timerT1*/sipStack->getTimers()->getB(), "timerB" );
+		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
+		
 		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
@@ -110,7 +114,7 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 bool SipTransactionInviteClient::a1_calling_calling_timerA( const SipSMCommand &command){
 	
 	if (transitionMatch(command, "timerA")){
-		timerA *= 2; 
+		timerA *= 2; //no upper limit ... well ... timer B sets it
 		requestTimeout( timerA, "timerA" );
 		
 		send(MRef<SipMessage*>((SipMessage*)* lastInvite), false);
@@ -126,10 +130,10 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 	if (transitionMatch(command,SipResponse::type, SipSMCommand::remote, IGN, "1**")){
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
-                SipSMCommand cmd(
-                        command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd(
+				command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		return true;
 	}else{
@@ -145,12 +149,14 @@ bool SipTransactionInviteClient::a3_calling_completed_resp36( const SipSMCommand
 		
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
-		requestTimeout(64000,"timerD");
-                SipSMCommand cmd( command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+		else 
+			requestTimeout( 0,"timerD");
+		SipSMCommand cmd( command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-		
 		
 		sendAck(resp);
 		
@@ -167,14 +173,13 @@ bool SipTransactionInviteClient::a4_calling_terminated_ErrOrTimerB( const SipSMC
 		cancelTimeout("timerB");
 		
 		SipSMCommand cmd( 
-				
-				CommandString( 
-					callId, 
-					SipCommandString::transport_error
-					), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU 
-				);
+			CommandString( 
+				callId, 
+				SipCommandString::transport_error
+				), 
+			SipSMCommand::transaction, 
+			SipSMCommand::TU 
+			);
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
@@ -197,9 +202,9 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		
-                SipSMCommand cmd( command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd( command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
 		SipSMCommand cmdterminated(
@@ -217,9 +222,9 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
-                SipSMCommand cmd( command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd( command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		return true;
@@ -235,9 +240,9 @@ bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMComman
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		
-                SipSMCommand cmd( command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd( command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
 		SipSMCommand cmdterminated(
@@ -258,11 +263,14 @@ bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMComm
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
-		requestTimeout(64000, "timerD");
+		if( isUnreliable() )
+			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+		else 
+			requestTimeout( 0,"timerD");
                 
-                SipSMCommand cmd( command.getCommandPacket(), 
-                        SipSMCommand::transaction, 
-                        SipSMCommand::TU);
+		SipSMCommand cmd( command.getCommandPacket(), 
+				SipSMCommand::transaction, 
+				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
 		sendAck(resp);
@@ -313,8 +321,8 @@ bool SipTransactionInviteClient::a11_completed_terminated_timerD( const SipSMCom
 		    CommandString( callId, SipCommandString::transaction_terminated),
 		    SipSMCommand::transaction,
 		    SipSMCommand::TU);
-	    dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
-	    return true;
+		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+		return true;
 	}else{
 	    return false;
 	}
@@ -339,6 +347,9 @@ void SipTransactionInviteClient::setUpStateMachine(){
 	addState(s_terminated);
 
 	//Set up cancel transitions
+	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
+			s_start, s_terminated);
 	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
 			s_calling, s_terminated);
@@ -436,7 +447,7 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri, //FIXME: uses dialog here, but it could be NULL
 			conf->sipIdentity->sipDomain
 			); 
-	//TODO:
+	//TODO: use route headers!!
 	//ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
 	send(MRef<SipMessage*>(*ack), true, br);
 }

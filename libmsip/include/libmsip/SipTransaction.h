@@ -78,7 +78,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		void setSocket(Socket * sock){socket=sock;};
 		Socket * getSocket(){return socket;};
 
-                virtual std::string getMemObjectType(){return "SipTransaction";}
+		virtual string getMemObjectType(){return "SipTransaction";}
 		void setDebugTransType(string t){debugTransType = t;}
 		string getDebugTransType(){return debugTransType;}
 
@@ -88,6 +88,9 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		//The transition to cancel a transaction is common to all
 		//transactions and is defined in this class.
 		bool a1000_cancel_transaction(const SipSMCommand &command);
+
+		//FIXME: get the reliability correctly
+		bool isUnreliable();
 
 		
 	protected:

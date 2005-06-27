@@ -58,6 +58,9 @@ class LIBMSIP_API SipTimers : public MObject{
 		void setI(int t){I = t;}
 		void setJ(int t){J = t;}	
 		void setK(int t){K = t;}
+		int getT1(){return T1;}
+		int getT2(){return T2;}
+		int getT4(){return T4;}
 		int getA(){return A;}
 		int getB(){return B;}
 		int getC(){return C;}
@@ -85,8 +88,6 @@ class LIBMSIP_API SipTimers : public MObject{
 		int I;
 		int J;
 		int K;
-
-		
 
 };
 
