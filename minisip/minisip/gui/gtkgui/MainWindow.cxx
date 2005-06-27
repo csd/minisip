@@ -68,23 +68,23 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * imMenu;
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 #ifndef OLDLIBGLADEMM
-        Gtk::Expander * dtmfExpander;
+	Gtk::Expander * dtmfExpander;
 #endif
 	nextConfId=0;
-        registerIcons();
+	registerIcons();
 
-  	try{
-    		refXml = Gnome::Glade::Xml::create((string)MINISIP_DATADIR + "/minisip.glade");
-  	}
+	try{
+		refXml = Gnome::Glade::Xml::create((string)MINISIP_DATADIR + "/minisip.glade");
+	}
   
 	catch(const Gnome::Glade::XmlError& ex){
-    		std::cerr << ex.what() << std::endl;
-    		exit( 1 );
-  	}
+		std::cerr << ex.what() << std::endl;
+		exit( 1 );
+	}
 
-  	//Get the Glade-instantiated Dialog:
-  	//Gtk::Widget* mainWindow = 0;
-  	refXml->get_widget( "minisipMain", mainWindowWidget );
+	//Get the Glade-instantiated Dialog:
+	//Gtk::Widget* mainWindow = 0;
+	refXml->get_widget( "minisipMain", mainWindowWidget );
 
 	refXml->get_widget( "mainTabWidget", mainTabWidget );
 
@@ -106,10 +106,10 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "imMenu", imMenu );
 
 #ifndef OLDLIBGLADEMM
-        DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
-        dtmfWidget->setHandler( this );
+	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
+	dtmfWidget->setHandler( this );
 	refXml->get_widget( "dtmfExpander", dtmfExpander );
-        dtmfExpander->add( *dtmfWidget );
+	dtmfExpander->add( *dtmfWidget );
 #endif
 
 
@@ -206,7 +206,10 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	prefMenu->signal_activate().connect( SLOT( *settingsDialog, &SettingsDialog::show ) );
 	certMenu->signal_activate().connect( SLOT( *this, &MainWindow::runCertificateSettings ) );
+	
+	//This two signals are for closing minisip ... see MainWindow::quit
 	quitMenu->signal_activate().connect( SLOT( *this, &MainWindow::quit ) );
+	mainWindowWidget->signal_delete_event().connect( SLOT( *this, &MainWindow::on_window_close ) );
 	
 	viewCallListMenu->signal_activate().connect( SLOT( *this, &MainWindow::viewCallListToggle ) );
 
@@ -230,7 +233,14 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 MainWindow::~MainWindow(){
 }
 
+bool MainWindow::on_window_close (GdkEventAny* event  ) {
+	//enter quit mode ...
+	quit();
+	
+}
+
 void MainWindow::run(){
+	quitMode = false; //we are not quitting ... we just started
 #ifndef WIN32
 	if( trayIcon != NULL )
 		kit.run( *(trayIcon->getWindow()) );
@@ -240,7 +250,63 @@ void MainWindow::run(){
 }
 
 void MainWindow::quit(){
-	kit.quit();
+	
+	if( quitMode == false ) {
+		hide();
+		quitMode = true;
+		//Hang up all calls/conferences/IM
+		//Note that we are looping through the list and at the same 
+		//time removing (erase) from the list ... thus the iterator
+		//needs to be refreshed at each loop as it becomes invalid
+		list<CallWidget *>::iterator calls;
+		calls = callWidgets.begin();
+		while ( calls != callWidgets.end() ) {
+			string callid = (*calls)->getMainCallId();
+			cerr << "CESC: hanging up one call "  << callid << endl;
+			if( (*calls)->getState() == CALL_WIDGET_STATE_TERMINATED ) {
+				(*calls)->reject();
+			} else {
+				(*calls)->reject();
+				quittingCount++;
+			}
+			calls = callWidgets.begin();
+		} 
+		
+		list<ConferenceWidget *>::iterator confis;
+		confis = conferenceWidgets.begin();
+		while ( confis != conferenceWidgets.end() ) {
+			string callid = (*confis)->getMainCallId();
+			cerr << "CESC: hanging up one conference "  << callid << endl;
+			(*confis)->reject();
+			quittingCount++;
+			confis = conferenceWidgets.begin();
+		} 
+		
+		list<ImWidget *>::iterator ims;
+		ims = imWidgets.begin();
+		while ( ims != imWidgets.end() ) {
+			cerr << "CESC: hanging up one IM "  << (*ims)->getToUri() << endl;
+			removeIm( (*ims)->getToUri() );
+			ims = imWidgets.begin();
+		} 
+		
+		//De-register all identities ... send REGISTER with contact expires = 0
+		for (list<MRef<SipIdentity*> >::iterator i=config->identities.begin() ; i!=config->identities.end(); i++){
+				if ( (*i)->registerToProxy  ){
+						cerr << "De-Registering user "<< (*i)->getSipUri() << " to proxy " << (*i)->sipProxy.sipProxyAddressString<< ", requesting domain " << (*i)->sipDomain << endl;
+						CommandString dereg("",SipCommandString::proxy_register);
+						dereg["proxy_domain"] = (*i)->sipDomain;
+						dereg.setParam3("0"); //expires = 0 ==> de-register
+						getCallback()->guicb_handleCommand(dereg);
+						quittingCount++;
+				}
+		}
+		cout << "Number of tasks to shutdown = " << quittingCount << endl;
+	} 
+	cout << "Number of tasks still open = " << quittingCount << endl;
+	if( quittingCount == 0 ) {
+		kit.quit();
+	}
 }
 
 bool MainWindow::isVisible(){
@@ -267,7 +333,6 @@ void MainWindow::handleCommand( CommandString command ){
 	commandsLock.lock();
 	commands.push_front( command );
 	commandsLock.unlock();
-
 	dispatcher.emit();
 
 }
@@ -280,7 +345,7 @@ void MainWindow::gotCommand(){
 	commandsLock.lock();
 	CommandString command = commands.pop_back();
 	commandsLock.unlock();
-
+	
 	if( command.getOp() == "sip_ready" ){
 		mainWindowWidget->set_sensitive( true );
 		return;
@@ -367,12 +432,46 @@ void MainWindow::gotCommand(){
 		return;
 	}
 	
-	if( command.getOp() == SipCommandString::register_sent 
-			|| command.getOp() == SipCommandString::register_ok ){
-		//ignore these commands
+	if( command.getOp() == SipCommandString::register_sent ) {
+		
 		return;
 	}
-
+	if( command.getOp() == SipCommandString::register_ok ) {
+		
+		if( quitMode ) {
+			quittingCount--;
+			quit();
+		}
+		return;
+	}
+	if( command.getOp() == SipCommandString::register_failed ) {
+		
+		//if we are quitting ... but some error happens when de-registering ... bad luck, but dont stop
+		if( quitMode ) {
+			quittingCount--;
+			quit();
+		}
+		return;
+	}
+	//In quit mode, the call/conf widgets have already been destroyed, 
+	//thus the call_terminated commands reach here.
+	if( command.getOp() == SipCommandString::call_terminated ) {
+		//no need to decrease here ... as long as all dialogs sent a "terminated_early" command to the gui (now only voip dialog does)
+		//if( quitMode ) {
+		//	quittingCount--;
+		//	quit();
+		//}
+		return;
+	}
+	if( command.getOp() == SipCommandString::call_terminated_early ) {
+		
+		if( quitMode ) {
+			quittingCount--;
+			quit();
+		}
+		return;
+	}
+	
 	mdbg << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
 }	
 
@@ -409,9 +508,8 @@ void MainWindow::updateConfig(){
 	list< MRef<PhoneBook *> >::iterator i;
 
 	for( i = phonebooks.begin(); i != phonebooks.end(); i++ ){
-
-        	phoneBookModel->setPhoneBook( *i );
-        }
+		phoneBookModel->setPhoneBook( *i );
+	}
 	
 	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
 	phoneBookTreeView->set_model( modelPtr );
@@ -522,8 +620,10 @@ void MainWindow::addConference( string confId, string users,string remoteUri,str
 	
 }
 void MainWindow::removeCall( string callId ){
+	
+	
 	for( list<CallWidget *>::iterator i = callWidgets.begin();
-			i != callWidgets.end(); i++ ){
+			i != callWidgets.end(); i++){
 		if( (*i)->getMainCallId() == callId ){
 			mainTabWidget->remove_page( *(*i) );
 			callWidgets.erase( i );
@@ -713,70 +813,68 @@ void MainWindow::runCertificateSettings(){
 }
 
 void MainWindow::registerIcons(){
-        const Glib::RefPtr<Gtk::IconFactory> factory = 
-                Gtk::IconFactory::create();
-        
-        Gtk::IconSet * iconSet = new Gtk::IconSet;
-        Gtk::IconSource * iconSource = new Gtk::IconSource;
+	const Glib::RefPtr<Gtk::IconFactory> factory = 
+			Gtk::IconFactory::create();
+	
+	Gtk::IconSet * iconSet = new Gtk::IconSet;
+	Gtk::IconSource * iconSource = new Gtk::IconSource;
 
-        iconSource->set_filename( (string)MINISIP_DATADIR + "/secure.png" );
-        iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
-        iconSet->add_source( *iconSource );
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/secure.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
+	iconSet->add_source( *iconSource );
 
-        factory->add( Gtk::StockID( "minisip_secure" ), *iconSet );
+	factory->add( Gtk::StockID( "minisip_secure" ), *iconSet );
 
-        delete iconSource;
-        delete iconSet;
-        iconSource = new Gtk::IconSource;
-        iconSet = new Gtk::IconSet;
-        
-        iconSource->set_filename( (string)MINISIP_DATADIR + "/insecure.png" );
-        iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
-        iconSet->add_source( *iconSource );
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/insecure.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
+	iconSet->add_source( *iconSource );
 
-        factory->add( Gtk::StockID( "minisip_insecure" ), *iconSet );
+	factory->add( Gtk::StockID( "minisip_insecure" ), *iconSet );
 
-        factory->add_default();
-        delete iconSet;
-        delete iconSource;
+	factory->add_default();
+	delete iconSet;
+	delete iconSource;
 }
 
 void MainWindow::dtmfPressed( uint8_t symbol ){
-        Glib::ustring uri = uriEntry->get_text();
-        
-        switch( symbol ){
-                case 1:
-                        uri += "1";
-                        break;
-                case 2:
-                        uri += "2";
-                        break;
-                case 3:
-                        uri += "3";
-                        break;
-                case 4:
-                        uri += "4";
-                        break;
-                case 5:
-                        uri += "5";
-                        break;
-                case 6:
-                        uri += "6";
-                        break;
-                case 7:
-                        uri += "7";
-                        break;
-                case 8:
-                        uri += "8";
-                        break;
-                case 9:
-                        uri += "9";
-                        break;
-                case 0:
-                        uri += "0";
-                        break;
-        }
-
-        uriEntry->set_text( uri );
-                        
+	Glib::ustring uri = uriEntry->get_text();
+	
+	switch( symbol ){
+		case 1:
+			uri += "1";
+			break;
+		case 2:
+			uri += "2";
+			break;
+		case 3:
+			uri += "3";
+			break;
+		case 4:
+			uri += "4";
+			break;
+		case 5:
+			uri += "5";
+			break;
+		case 6:
+			uri += "6";
+			break;
+		case 7:
+			uri += "7";
+			break;
+		case 8:
+			uri += "8";
+			break;
+		case 9:
+			uri += "9";
+			break;
+		case 0:
+			uri += "0";
+			break;
+	}
+	uriEntry->set_text( uri );
 }

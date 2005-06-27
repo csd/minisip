@@ -143,6 +143,26 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
 		Gtk::CheckMenuItem * viewCallListMenu;
 
+		/**
+		* This function is connected to the window close icon
+		* (the cross on the top-right corner). 
+		* It hides the main window and enters quit mode.
+		*/
+		bool on_window_close (GdkEventAny* event  );
+		
+		/**
+		* Set to true when the GUI enters quit mode.
+		* This way, we can treat some commands differently.
+		*/
+		bool quitMode; 
+		
+		/**
+		* This variable is used in quit mode, to now when
+		* all de-regs and calls are done. When it reaches zero,
+		* the kit.quit() function is called, terminating the gui.
+		*/
+		int quittingCount;
+		
 		SettingsDialog * settingsDialog;
 		CertificateDialog * certificateDialog;
 		MTrayIcon * trayIcon;
