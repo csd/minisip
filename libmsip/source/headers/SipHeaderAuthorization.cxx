@@ -124,7 +124,7 @@ SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
 string SipHeaderValueAuthorization::getString(){
 	uri.setUserType("");
 	return /*"Authorization: "+*/ auth_method+
-		" algoritm=\"md5\""+", username=\""+auth_id+
+		" algorithm=\"md5\""+", username=\""+auth_id+
 		"\", realm=\""+realm+"\", nonce=\""+nonce+
 		"\", uri=\""+uri.getUserIpString()+"\", response=\""+
 		calcResponse()+"\"";
