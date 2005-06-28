@@ -42,6 +42,9 @@
 class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
     public:
         MinisipTextUI();
+
+	std::string getMemObjectType(){return "MinisipTextUI";}
+	
         virtual void handleCommand(CommandString);
         virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);
         virtual void setContactDb(MRef<ContactDb *>){};
