@@ -157,7 +157,7 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 bool SipTransaction::isUnreliable() { 
 	if( !socket ) {
 #ifdef DEBUG_OUTPUT
-		merr << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << end;
+		mdbg << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << end;
 #endif
 		return true;
 	}
