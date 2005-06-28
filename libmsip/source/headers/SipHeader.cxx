@@ -163,11 +163,11 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	for (unsigned i=0; i< values.size(); i++){
 		vector<string> value_params;
 		if(headerType=="Accept-Contact"){
-			value_params = split(valueline,true,'\n');
+			value_params = split(values[i],true,'\n');
 			//cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
 		}
 		else
-			value_params = split(valueline,true,';');
+			value_params = split(values[i],true,';');
 		//cerr << "Header type is <"<< headerType << ">"<< endl;
 		//cerr << "Creating value from string <"<< value_params[0]<<">"<<endl;
 		SipHeaderFactoryFuncPtr factory;
