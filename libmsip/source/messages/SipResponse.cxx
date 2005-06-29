@@ -73,7 +73,8 @@ SipResponse::SipResponse(string branch,
 			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:
 			case SIP_HEADER_TYPE_CSEQ:
-				addHeader(header);		//FIXME: Other headers should be copies as well XXX
+			case SIP_HEADER_TYPE_RECORDROUTE: //if it exhists in the request, it is copied to response
+				addHeader(header);	//FIXME: Other headers should be copies as well (?)
 				break;
 		}
 	}
