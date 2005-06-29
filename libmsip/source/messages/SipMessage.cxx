@@ -153,6 +153,8 @@ void SipMessage::addHeader(MRef<SipHeader*> header){
 #ifdef MINISIP_MEMDEBUG
 	header.setUser("SipMessage");
 #endif
+	if( header.isNull() )
+		return;
 	headers.push_back(header);
 }
 
@@ -292,6 +294,8 @@ bool SipMessage::addLine(string line){
 #ifdef MINISIP_MEMDEBUG
 	hdr.setUser("SipMessage");
 #endif
+	if( hdr.isNull() ) //do not add if null
+		return false;
 	addHeader(hdr);
 	string ln = line;	//Hack to get realm an nonce... FIXME
 	if (getType()==SipResponse::type && (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){

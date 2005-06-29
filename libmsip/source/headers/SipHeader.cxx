@@ -147,53 +147,65 @@ string findHeaderType(string s){
 
 MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	int hdrstart=0;
+	MRef<SipHeader*> h;
+	
 	string hdr = getHeader(line,hdrstart);
-	//cerr<<"Sip Header: header"+hdr<<endl;
+//	cerr<<"PARSEHDR: Sip Header: header"+hdr<<endl;
 	string valueline = line.substr(hdrstart);
 	
-//	cerr << "hdr parsed to <"<< hdr << ">"<< endl;
-//	cerr << "valueline parsed to <"<< valueline<<">"<< endl;
-	
-	vector<string> values = split(valueline,true, ',');
+//	cerr << endl << "PARSEHDR: hdr parsed to <"<< hdr << ">"<< endl;
+//	cerr << "PARSEHDR: valueline parsed to <"<< valueline<<">"<< endl;
 
-	string headerType = findHeaderType(line);
+	if( valueline.size() == 0 ) { //an empty header??? BUG!
+			cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header in Sip message!:: " << valueline << endl;
+	} else {	
+		vector<string> values = split(valueline,true, ',');
 	
-	MRef<SipHeader*> h;
-
-	for (unsigned i=0; i< values.size(); i++){
-		vector<string> value_params;
-		if(headerType=="Accept-Contact"){
-			value_params = split(values[i],true,'\n');
-			//cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
-		}
-		else
-			value_params = split(values[i],true,';');
-		//cerr << "Header type is <"<< headerType << ">"<< endl;
-		//cerr << "Creating value from string <"<< value_params[0]<<">"<<endl;
-		SipHeaderFactoryFuncPtr factory;
-		factory = SipHeader::headerFactories.getFactory(headerType);
-		MRef<SipHeaderValue *> hval;
-		if (factory){
-			hval = factory(value_params[0]);
-		}else{
-			cerr << "SipHeaderValueUnsupported :: "<< line << endl;
-			hval = new SipHeaderValueUnsupported(value_params[0]);
-		}	
+		string headerType = findHeaderType(line);
 		
-		for(unsigned j=1; j<value_params.size(); j++){
-			//cerr << "Adding parameter <"<< value_params[j]<< ">"<< endl;
-			hval->addParameter(new SipHeaderParameter(value_params[j]));
+		for (unsigned i=0; i< values.size(); i++){
+			vector<string> value_params;
+			if( values[i].size() == 0 ) { //an empty value??? BUG!
+				cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header value in Sip message!:: " << valueline << endl;
+				continue;
+			}
+//			cerr << "PARSER: First value+params line:  <"<< values[i]<<">"<<endl;
+			if(headerType=="Accept-Contact"){
+				value_params = split(values[i],true,'\n');
+				//cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
+			}
+			else
+				value_params = split(values[i],true,';');
+//			cerr << "PARSER: Header type is <"<< headerType << ">"<< endl;
+//			cerr << "PARSER: Creating value from string <"<< value_params[0]<<">"<<endl;
+			SipHeaderFactoryFuncPtr factory;
+			factory = SipHeader::headerFactories.getFactory(headerType);
+			MRef<SipHeaderValue *> hval;
+			if (factory){
+				hval = factory(value_params[0]);
+			}else{
+				cerr << "SipHeaderValueUnsupported :: "<< line << endl;
+				hval = new SipHeaderValueUnsupported(value_params[0]);
+			}	
+			
+			for(unsigned j=1; j<value_params.size(); j++){
+//				cerr << "PARSER: Adding parameter <"<< value_params[j]<< ">"<< endl;
+				hval->addParameter(new SipHeaderParameter(value_params[j]));
+			}
+			if (i==0){
+				h= new SipHeader(hval);
+			}else{
+				h->addHeaderValue(hval);
+			}
+//			cerr<<"PARSER: hval->getString() "+hval->getString()<<endl;
+//			cerr<<"PARSER: h->getString: "+h->getString()<<endl;
 		}
-		if (i==0){
-			h= new SipHeader(hval);
-		}else{
-			h->addHeaderValue(hval);
-		}
-		//cerr<<"hval->getString() "+hval->getString()<<endl;
-		//cerr<<"h->getString: "+h->getString()<<endl;
 	}
-	return h;
-
+	//It may happen that the header contains no values ... then, no point adding it
+	if( h.isNull() || h->getNoValues() == 0 )
+		return NULL;
+	else 
+		return h;
 }
 
 
