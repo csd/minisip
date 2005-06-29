@@ -143,8 +143,8 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		//FIXME: i set it to true ... i think it needs via headers (cesc)
-		send(command.getCommandPacket(), true);
+		//no need for via header, it is copied from the request msg
+		send(command.getCommandPacket(), false);
 		return true;
 	}else{
 		return false;
@@ -168,8 +168,8 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 		}
 		requestTimeout(sipStack->getTimers()->getH(),"timerH");
 		
-		//FIXME: i set it to true ... i think it needs via headers (cesc)
-		send(command.getCommandPacket(), true);
+		//no need for via header, it is copied from the request msg
+		send(command.getCommandPacket(), false);
 		return true;
 	}else
 		return false;
@@ -211,8 +211,8 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
-		//FIXME: i set it to true ... i think it needs via headers (cesc)
-		send(command.getCommandPacket(), true);
+		//no need for via header, it is copied from the request msg
+		send(command.getCommandPacket(), false);
 
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transaction_terminated),

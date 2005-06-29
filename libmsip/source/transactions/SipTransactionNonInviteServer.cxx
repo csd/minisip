@@ -67,10 +67,8 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		//FIXME: responses should have a via, shouldn't they?
-		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		send(command.getCommandPacket(), true); 		//Add via header to first responses
-		
+		send(command.getCommandPacket(), false); //Do not add via header to responses
+							//they are copied from the request
 		return true;
 	}else{
 		
@@ -84,9 +82,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		//FIXME: responses should have a via, shouldn't they?
-		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		send(command.getCommandPacket(), true); 		//Add via header to first responses
+		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
 		
 		return true;
@@ -101,9 +97,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
-		//FIXME: responses should have a via, shouldn't they?
-		//send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		send(command.getCommandPacket(), true); 		//Add via header to first responses
+		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		if( isUnreliable() )
 			requestTimeout(sipStack->getTimers()->getJ(), "timerJ");
 		else 
@@ -145,11 +139,7 @@ bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
-		//FIXME: one more about adding or not vias
-		//we are not resending ... Add new via header
-		send(MRef<SipMessage*>(*pack), true);
-		merr << "ATTENTION: count the number of vias! : " << pack->getString() << end;
-		
+		send(MRef<SipMessage*>(*pack), false);
 		
 		return true;
 	}else{
