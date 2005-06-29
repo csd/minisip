@@ -287,7 +287,7 @@ class StateTransition : public MObject{
 			if (handled= ((**stateMachine).*action)(c) ){
 				stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG
-				merr << "SM_DEBUG:" << stateMachine->getMemObjectType() << ": Transition Success" << name << ": " << from_state->getName()
+				merr << "SM_DEBUG:" << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
 					<<" -> "<<to_state->getName();
 	#ifdef SM_DEBUG_COMMAND
 				merr << " ("<< c << ")";
