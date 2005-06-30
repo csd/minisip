@@ -1221,21 +1221,7 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 //	string call_id = getDialogConfig().callId;
 	MRef<SipInvite*> inv;
 	string keyAgreementMessage;
-	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( getPhoneConfig()->useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
-            }
-        }
-
-	
 		inv= MRef<SipInvite*>(new SipInvite(
 				branch,
 				/*getDialogConfig().callId*/ dialogState.callId,
@@ -1244,7 +1230,7 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
 //				getDialogConfig().inherited.localIpString,
 				getDialogConfig()->inherited.externalContactIP,
-				localSipPort,
+				getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
 				//getDialogConfig().inherited.userUri,
 				getDialogConfig()->inherited.sipIdentity->getSipUri(),
 				dialogState.seqNo,
@@ -1292,21 +1278,7 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 	//SipInvite * inv;
 	MRef<SipInvite*> inv;
 	string keyAgreementMessage;
-	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited.transport=="TCP")
-		localSipPort = getDialogConfig()->inherited.localTcpPort;
-	else if(getDialogConfig()->inherited.transport=="TLS")
-		localSipPort = getDialogConfig()->inherited.localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( getPhoneConfig()->useSTUN ){
-		localSipPort = getDialogConfig()->inherited.externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited.localUdpPort;
-            }
-        }
-
-	
 	inv= new SipInvite(
 			branch,
 			/*getDialogConfig().callId*/ dialogState.callId,
@@ -1315,7 +1287,7 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
 			//				getDialogConfig().inherited.localIpString,
 			getDialogConfig()->inherited.externalContactIP,
-			localSipPort,
+			getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited.sipIdentity->getSipUri(),
 			dialogState.seqNo,

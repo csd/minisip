@@ -1127,20 +1127,7 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	
 	MRef<SipInvite*> inv;
 	string keyAgreementMessage;
-	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited->transport=="TCP")
-		localSipPort = getDialogConfig()->inherited->localTcpPort;
-	else if(getDialogConfig()->inherited->transport=="TLS")
-		localSipPort = getDialogConfig()->inherited->localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( phoneconf->useSTUN ){
-		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited->localUdpPort;
-            }
-        }
-	
 	inv= MRef<SipInvite*>(new SipInvite(
 				branch,
 				dialogState.callId,
@@ -1150,7 +1137,7 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
 //				getDialogConfig().inherited.localIpString,
 				getDialogConfig()->inherited->externalContactIP,
-				localSipPort,
+				getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 				//getDialogConfig().inherited.userUri,
 				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
@@ -1254,40 +1241,26 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 	//SipInvite * inv;
 	MRef<SipInvite*> inv;
 	string keyAgreementMessage;
-	int32_t localSipPort;
 
-	if(getDialogConfig()->inherited->transport=="TCP")
-		localSipPort = getDialogConfig()->inherited->localTcpPort;
-	else if(getDialogConfig()->inherited->transport=="TLS")
-		localSipPort = getDialogConfig()->inherited->localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( phoneconf->useSTUN ){
-		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited->localUdpPort;
-            }
-        }
-
-	
-		inv= new SipInvite(
-				branch,
-				dialogState.callId,
-				dialogState.remoteUri,
-				//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-				getDialogConfig()->inherited->sipIdentity->sipDomain,
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
-//				getDialogConfig().inherited.localIpString,
-				getDialogConfig()->inherited->externalContactIP,
-				localSipPort,
-				//getDialogConfig().inherited.userUri,
-				getDialogConfig()->inherited->sipIdentity->getSipUri(),
-				dialogState.seqNo,
-//				requestSeqNo(),
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
-				nonce,
-				realm,
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
-				getDialogConfig()->inherited->transport);
+	inv= new SipInvite(
+			branch,
+			dialogState.callId,
+			dialogState.remoteUri,
+			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			getDialogConfig()->inherited->sipIdentity->sipDomain,
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+//			getDialogConfig().inherited.localIpString,
+			getDialogConfig()->inherited->externalContactIP,
+			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
+			//getDialogConfig().inherited.userUri,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			dialogState.seqNo,
+//			requestSeqNo(),
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
+			nonce,
+			realm,
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
+			getDialogConfig()->inherited->transport);
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	if(type=="join")

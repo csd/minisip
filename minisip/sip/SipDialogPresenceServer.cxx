@@ -288,18 +288,8 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 	
 	MRef<SipNotify*> notify;
 	int32_t localSipPort;
-
-	if(getDialogConfig()->inherited->transport=="TCP")
-		localSipPort = getDialogConfig()->inherited->localTcpPort;
-	else if(getDialogConfig()->inherited->transport=="TLS")
-		localSipPort = getDialogConfig()->inherited->localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( /*phoneconf->*/useSTUN ){
-		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited->localUdpPort;
-            }
-        }
+	
+	localSipPort = getDialogConfig()->inherited->getLocalSipTransport( useSTUN );
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
 	notify = MRef<SipNotify*>(new SipNotify(

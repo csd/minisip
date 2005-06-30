@@ -293,19 +293,6 @@ SipDialogPresenceClient::~SipDialogPresenceClient(){
 void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	
 	MRef<SipSubscribe*> sub;
-	int32_t localSipPort;
-
-	if(getDialogConfig()->inherited->transport=="TCP")
-		localSipPort = getDialogConfig()->inherited->localTcpPort;
-	else if(getDialogConfig()->inherited->transport=="TLS")
-		localSipPort = getDialogConfig()->inherited->localTlsPort;
-	else{ /* UDP, may use STUN */
-            if( /*phoneconf->*/useSTUN ){
-		localSipPort = getDialogConfig()->inherited->externalContactUdpPort;
-            } else {
-                localSipPort = getDialogConfig()->inherited->localUdpPort;
-            }
-        }
 	
 	sub = MRef<SipSubscribe*>(new SipSubscribe(
 				branch,
