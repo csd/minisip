@@ -57,8 +57,7 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkFunctions.h>
 
-
-
+#include<libmutil/dbg.h>
 
 #ifdef _MSC_VER
 
@@ -128,7 +127,7 @@ class LIBMSIP_API SipProxy{
 
 			string proxy = NetworkFunctions::getHostHandlingService("_sip._udp",domain, port);
 			if (proxy.length()<=0){
-				return "unknown"; //              merr << "Error: Can not find proxy (from configuration file or auto detect using users sip address)"<< end;
+				return "unknown";
 			}
 			return proxy;
 		}
@@ -143,7 +142,6 @@ class LIBMSIP_API SipProxy{
 			if( _expires >= 0 && _expires < 100000 ) 
 				registerExpires = _expires;
 			else registerExpires = 1000;
-			//merr << "SipDialogConfig::SipProxy::setRegisterExpires : expires in " << registerExpires << end;
 		}
 		
 		int sipProxyPort;
@@ -159,7 +157,7 @@ class LIBMSIP_API SipProxy{
 };
 
 class LIBMSIP_API SipIdentity : public MObject{
-        public:
+	public:
 		SipIdentity(){/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ registerToProxy=false; securitySupport=false;}
 		SipIdentity(string sipuri);
 
@@ -207,11 +205,17 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		int32_t localUdpPort;	// Advanced -> ...Sip port...
 		int32_t localTcpPort;
 		int32_t localTlsPort;
-
-		
-		MRef<SipIdentity*> sipIdentity;
 		
 		string transport;
+		
+		/**
+			Return the port in use, depending on the transport.
+			Parameter: usesStun (default false), found in 
+					SipSoftPhoneConfiguration::useSTUN
+		*/
+		int32_t getLocalSipPort(bool usesStun=false);
+		
+		MRef<SipIdentity*> sipIdentity;
 	
 //		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
 		

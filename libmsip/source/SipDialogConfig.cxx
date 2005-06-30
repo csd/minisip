@@ -42,15 +42,15 @@ SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(f
 }
 
 void SipIdentity::setSipUri(string addr){
-        if (addr.substr(0,4)=="sip:")
-                addr = addr.substr(4);
-        if (addr.find("@")==string::npos){
-                cerr << "WARNING: malformed sip address: "<< addr<<endl;
-        }
+	if (addr.substr(0,4)=="sip:")
+			addr = addr.substr(4);
+	if (addr.find("@")==string::npos){
+			cerr << "WARNING: malformed sip address: "<< addr<<endl;
+	}
 
-        sipUsername = addr.substr(0, addr.find("@"));
-        sipDomain = addr.substr(addr.find("@")+1);
-        //cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
+	sipUsername = addr.substr(0, addr.find("@"));
+	sipDomain = addr.substr(addr.find("@")+1);
+	//cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
 }
 void SipIdentity::setIdentityName(string n){
 	identityIdentifier = n;
@@ -66,6 +66,23 @@ SipCommonConfig::SipCommonConfig():
 #ifdef MINISIP_MEMDEBUG
 	sipTransport.setUser("SipCommonConfig/messageTransport");
 #endif
+}
+
+int32_t SipCommonConfig::getLocalSipPort(bool usesStun) {
+	int32_t localSipPort;
+
+	if(transport=="TCP")
+		localSipPort = localTcpPort;
+	else if(transport=="TLS")
+		localSipPort = localTlsPort;
+	else{ /* UDP, may use STUN */
+		if( usesStun ){
+			localSipPort = externalContactUdpPort;
+		} else {
+			localSipPort = localUdpPort;
+		}
+	}
+	return localSipPort;
 }
 
 void SipCommonConfig::save( XMLFileParser * parser ){
