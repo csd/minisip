@@ -72,6 +72,7 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 	
 	featuretag="";
 	expires=1000;
+	//merr << "SipHeaderValueContact::getString: uri="<< uri <<end;
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &username, 
@@ -84,9 +85,12 @@ SipHeaderValueContact::SipHeaderValueContact(const string &username,
 			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),
 			 uri(username,ip,user_type,port)
 {
-	this->setExpires(expires);
+	if( expires != -1 )
+		this->setExpires(expires);
+	else this->expires = -1; //-1 indicates that the expires is not to be used
 	if (transport!="")
 		uri.setTransport(transport);
+	//merr << "SipHeaderValueContact::getString: username="<< username <<end;
 }
 
 SipHeaderValueContact::~SipHeaderValueContact(){
@@ -94,10 +98,6 @@ SipHeaderValueContact::~SipHeaderValueContact(){
 }
 		
 string SipHeaderValueContact::getString(){
-//	merr << "SipHeaderValueContact::getString"<<end;
-
-//	return "Contact: <+erik@debug.org>;expires=1000"; //TODO: XXX
-	
 	string user = uri.getString();
 //	merr << "SipHeaderValueContact::getString: "<< user <<end;
 	string name;
@@ -114,10 +114,12 @@ string SipHeaderValueContact::getString(){
 		
 		user = name+"@"+uri.getIp()+args;
 	}
-//	merr << "SipHeaderValueContact::getString: creating ret" <<end;
 	
-	string ret = /*"Contact: */"<"+user+">;" + featuretag + "expires=" + itoa(this->expires); //TODO: XXX
-//	merr << "SipHeaderValueContact::getString: ret="<< ret<<end;
+	string ret = /*"Contact: */"<"+user+">";
+	if( this->expires != -1 )
+		ret += ";" + featuretag + "expires=" + itoa(this->expires); //TODO: XXX
+		
+	//merr << "SipHeaderValueContact::getString: ret="<< ret<<end;
 	return ret;
 } 
 
@@ -129,7 +131,7 @@ void SipHeaderValueContact::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 
-
+//CESC
 int SipHeaderValueContact::getExpires() {
 	return this->expires;
 }
@@ -139,4 +141,4 @@ void SipHeaderValueContact::setExpires(int _expires){
 		this->expires = _expires;
 	else this->expires = 1000;
 }
- 
+
