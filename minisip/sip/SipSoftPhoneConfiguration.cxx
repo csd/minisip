@@ -125,12 +125,12 @@ void SipSoftPhoneConfiguration::save(){
 	parser->changeValue( "frame_height", itoa( frameHeight ) );
 #endif
 
-        list<string>::iterator iCodec;
-        uint8_t iC = 0;
+	list<string>::iterator iCodec;
+	uint8_t iC = 0;
 
-        for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
-                parser->changeValue( "codec[" + itoa( iC ) + "]", *iCodec );
-        }
+	for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
+		parser->changeValue( "codec[" + itoa( iC ) + "]", *iCodec );
+	}
 
 	/************************************************************
 	 * PhoneBooks
@@ -313,14 +313,24 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		inherited->sipIdentity->securitySupport = securityConfig.secured;
 	}
 
-        audioCodecs.clear();
-        int iCodec = 0;
-        string codec = parser->getValue("codec["+ itoa( iCodec ) + "]","");
+	audioCodecs.clear();
+	int iCodec = 0;
+	string codec = parser->getValue("codec["+ itoa( iCodec ) + "]","");
 
-        while( codec != "" && iCodec < 256 ){
-                audioCodecs.push_back( codec );
-                codec = parser->getValue("codec["+ itoa( ++iCodec ) +"]","");
-        }
+	while( codec != "" && iCodec < 256 ){
+		audioCodecs.push_back( codec );
+		codec = parser->getValue("codec["+ itoa( ++iCodec ) +"]","");
+	}
+	if( audioCodecs.size() == 0 ) { //MEEC!! Error!
+		//This is an error. It can happen, for example, if someone manually
+		//edited the .minisip.conf file, or if it is using an older version
+		mout << "ERROR! ********************************************" << end 
+			<< "***  No codec was found in the .minisip.conf configuration file" << end 
+			<< "***  Adding default G.711 ..." << end
+			<< "ERROR! ********************************************" << end;
+		audioCodecs.push_back( "G.711" );
+		save(); //save the changes ... 
+	}
 	
 	delete parser;
 	return ret;
@@ -330,89 +340,93 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 static void installConfigFile(string filename){
 
-        string phonebookFileName;
-        char *home = getenv("HOME");
-        if (home==NULL){
-                merr << "WARNING: Could not determine home directory"<<end;
+	string phonebookFileName;
+	char *home = getenv("HOME");
+	if (home==NULL){
+			merr << "WARNING: Could not determine home directory"<<end;
 #ifdef WIN32
-                phonebookFileName = string("c:\\minisip.addr");
+	phonebookFileName = string("c:\\minisip.addr");
 #else
-                phonebookFileName = string("/.minisip.addr");
+	phonebookFileName = string("/.minisip.addr");
 #endif
-        }else{
-                phonebookFileName = string(home)+ string("/.minisip.addr");
-        }
+	}else{
+			phonebookFileName = string(home)+ string("/.minisip.addr");
+	}
 
-        string defaultConfig =
-                                "<account>\n"
-                                "<account_name> My account </account_name>\n"
-                                "<sip_uri> username@domain.org </sip_uri>\n"
-                                "<proxy_addr> sip.domain.org </proxy_addr>\n"
-                                "<register> yes </register>\n"
-                                "<proxy_port> 5060 </proxy_port>\n"
-
-                                "<proxy_username> user </proxy_username>\n"
-                                "<proxy_password> password </proxy_password>\n"
-                                "<pstn_account> no </pstn_account>\n"
-                                "<default_account> yes </default_account>\n"
-                                "</account>\n"
-                                "<transport> UDP </transport>\n"
-//                              "<stun_server_ip> stun.ssvl.kth.se</stun>\n"
-                                "<tcp_server>yes</tcp_server>\n"
-                                "<tls_server>no</tls_server>\n"
-                                "<secured>no</secured>\n"
-                                "<ka_type>dh</ka_type>\n"
-                                "<psk>Unspecified PSK</psk>\n"
-                                "<certificate></certificate>\n"
-                                "<private_key></private_key>\n"
-                                "<ca_certificate></ca_certificate>\n"
-                                "<dh_enabled>no</dh_enabled>\n"
-                                "<psk_enabled>no</psk_enabled>\n"
-                                "<check_cert>no</check_cert>\n"
-//                              "<register>no</register>\n"
-//                              "<proxy_port>5060</proxy_port>\n"
-                                "<local_udp_port> 5060 </local_udp_port>\n"
-                                "<local_tcp_port> 5060 </local_tcp_port>\n"
-                                "<local_tls_port> 5061 </local_tls_port>\n"
-                                "<local_media_port> 10000 </local_media_port>\n"                                "<sound_device>/dev/dsp</sound_device>\n"
+	string defaultConfig =
+		"<account>\n"
+			"<account_name> My account </account_name>\n"
+			"<sip_uri> username@domain.org </sip_uri>\n"
+			"<proxy_addr> sip.domain.org </proxy_addr>\n"
+			"<register> yes </register>\n"
+			"<proxy_port> 5060 </proxy_port>\n"
+			"<proxy_username> user </proxy_username>\n"
+			"<proxy_password> password </proxy_password>\n"
+			"<pstn_account> no </pstn_account>\n"
+			"<default_account> yes </default_account>\n"
+		"</account>\n"
+		
+		"<transport> UDP </transport>\n"
+//		"<stun_server_ip> stun.ssvl.kth.se</stun>\n"
+		"<tcp_server>yes</tcp_server>\n"
+		"<tls_server>no</tls_server>\n"
+		
+		"<secured>no</secured>\n"
+		"<ka_type>dh</ka_type>\n"
+		"<psk>Unspecified PSK</psk>\n"
+		
+		"<certificate></certificate>\n"
+		"<private_key></private_key>\n"
+		"<ca_certificate></ca_certificate>\n"
+		
+		"<dh_enabled>no</dh_enabled>\n"
+		"<psk_enabled>no</psk_enabled>\n"
+		"<check_cert>no</check_cert>\n"
+//		"<register>no</register>\n"
+//		"<proxy_port>5060</proxy_port>\n"
+		"<local_udp_port> 5060 </local_udp_port>\n"
+		"<local_tcp_port> 5060 </local_tcp_port>\n"
+		"<local_tls_port> 5061 </local_tls_port>\n"
+		"<local_media_port> 10000 </local_media_port>\n"                                
+		"<sound_device>/dev/dsp</sound_device>\n"
 #ifdef HAS_SPEEX
-                                "<codec>speex</codec>\n"
+		"<codec>speex</codec>\n"
 #endif
-                                "<codec>G.711</codec>\n"
-                                "<phonebook>file://" + phonebookFileName +
-                                "</phonebook>\n";
+		"<codec>G.711</codec>\n"
+		"<phonebook>file://" + phonebookFileName +
+		"</phonebook>\n";
 
 	string defaultPhonebook =
-                                "<phonebook name=Example>\n"
-                                "<contact name=\"Contact\">\n"
-                                "<pop desc=\"Phone\" uri=\"0000000000\"></pop>\n"
-                                "<pop desc=\"Laptop\" uri=\"sip:contact@minisip.org\"></pop>\n"
-                                "</contact>\n"
-                                "</phonebook>\n";
+		"<phonebook name=Example>\n"
+		"<contact name=\"Contact\">\n"
+		"<pop desc=\"Phone\" uri=\"0000000000\"></pop>\n"
+		"<pop desc=\"Laptop\" uri=\"sip:contact@minisip.org\"></pop>\n"
+		"</contact>\n"
+		"</phonebook>\n";
 
-
-	
 	ifstream file(filename.c_str());
-        if (!file){
-                merr << "WARNING: Configuration file ("<< filename << ") was not found - creating it with default values."<< end;
-                file.close();
-                ofstream newfile(filename.c_str());
-                newfile<< defaultConfig;
-        }
+	if (!file){
+		merr << "WARNING: Configuration file ("<< filename << ") was not found - creating it with default values."<< end;
+		file.close();
+		ofstream newfile(filename.c_str());
+		newfile<< defaultConfig;
+	}
 	/*else{
 		merr << "Could not open " << filename << " to write the default configuration file." <<end;
 
-        }*/
+	}*/
 
-        ifstream phonebookFile( phonebookFileName.c_str() );
-        if (!phonebookFile){
-                phonebookFile.close();
-                ofstream newfile(phonebookFileName.c_str());
-                newfile<< defaultPhonebook;
-        }
-	/*else{
+	ifstream phonebookFile( phonebookFileName.c_str() );
+	if (!phonebookFile){
+		phonebookFile.close();
+		ofstream newfile(phonebookFileName.c_str());
+		newfile<< defaultPhonebook;
+	}
+/*	
+	else{
 		merr << "Could not open " << phonebookFileName << " to write the default phonebook file." <<end;
-        }*/
+	}
+*/
 
 }
 

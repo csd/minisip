@@ -289,7 +289,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 	MRef<SipNotify*> notify;
 	int32_t localSipPort;
 	
-	localSipPort = getDialogConfig()->inherited->getLocalSipTransport( useSTUN );
+	localSipPort = getDialogConfig()->inherited->getLocalSipPort( useSTUN );
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
 	notify = MRef<SipNotify*>(new SipNotify(
