@@ -23,6 +23,17 @@
 #ifndef RTCPREPORTXR_H
 #define RTCPREPORTXR_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<vector>
@@ -32,7 +43,7 @@
 using namespace std;
 
 
-class RtcpReportXR : public RtcpReport{
+class LIBMINISIP_API RtcpReportXR : public RtcpReport{
 	public:
 		RtcpReportXR(void *build_from, int max_length);
 		virtual ~RtcpReportXR(){}

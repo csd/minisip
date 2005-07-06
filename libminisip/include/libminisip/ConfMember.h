@@ -16,6 +16,17 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 
 
 //
@@ -32,7 +43,7 @@
 #ifndef _CONFMEMBER_H
 #define _CONFMEMBER_H
 
-class ConfMember {
+class LIBMINISIP_API ConfMember {
 	public:
 	
 		ConfMember(string the_uri, string the_callid ) {

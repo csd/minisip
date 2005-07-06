@@ -26,6 +26,17 @@
 #ifndef MEDIA_H
 #define MEDIA_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 
@@ -56,7 +67,7 @@ class RtpPacket;
 
 typedef uint8_t byte_t;
 
-class Media : public MObject{
+class LIBMINISIP_API Media : public MObject{
 	public:
 		int getType();
 

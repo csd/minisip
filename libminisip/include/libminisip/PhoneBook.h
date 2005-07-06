@@ -26,6 +26,17 @@
 #ifndef PHONEBOOK_H
 #define PHONEBOOK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<libmutil/MemObject.h>
@@ -38,7 +49,7 @@ class PhoneBookIo;
 class ContactEntry;
 
 
-class PhoneBook : public MObject{
+class LIBMINISIP_API PhoneBook : public MObject{
 	public:
 		static MRef<PhoneBook *> create( MRef< PhoneBookIo * > io );
 		
@@ -65,14 +76,14 @@ class PhoneBook : public MObject{
 
 };
 
-class PhoneBookIo : public MObject{
+class LIBMINISIP_API PhoneBookIo : public MObject{
 	public:
 		virtual void save( MRef< PhoneBook * > book )=0;
 		virtual MRef< PhoneBook * > load()=0;
 		virtual std::string getPhoneBookId()=0;
 };
 
-class PhoneBookPerson : public MObject{
+class LIBMINISIP_API PhoneBookPerson : public MObject{
 	public:
 		PhoneBookPerson( std::string name );
 		~PhoneBookPerson();

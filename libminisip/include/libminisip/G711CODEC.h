@@ -26,10 +26,21 @@
 #ifndef G711CODEC_H
 #define G711CODEC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"Codec.h"
 
 
-class G711CODEC : public AudioCodec{
+class LIBMINISIP_API G711CODEC : public AudioCodec{
 	public:
 		G711CODEC();
 		virtual ~G711CODEC();

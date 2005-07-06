@@ -27,6 +27,17 @@
 #define STUNTEST_H
 
 #ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
+#ifdef _MSC_VER
 typedef unsigned short uint16_t;
 #else
 #include<stdint.h>
@@ -41,7 +52,7 @@ typedef unsigned short uint16_t;
  * Declares the test used by the STUN client to determine the type of NAT.
  * @author Erik Eliasson
 */
-class STUNTest{
+class LIBMINISIP_API STUNTest{
 	public:
 		/**
 		 * Provides a reliable transport for sending a request to

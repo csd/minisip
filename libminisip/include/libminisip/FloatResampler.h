@@ -27,12 +27,23 @@
 #ifndef FLOAT_RESAMPLER_H
 #define FLOAT_RESAMPLER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #ifdef FLOAT_RESAMPLER
 
 #include"Resampler.h"
 #include<samplerate.h>
 
-class FloatResampler : public Resampler {
+class LIBMINISIP_API FloatResampler : public Resampler {
 	public: 
 
 		FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 

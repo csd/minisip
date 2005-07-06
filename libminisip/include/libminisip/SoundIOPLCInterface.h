@@ -35,10 +35,21 @@
 #ifndef SOUNDCARDPLCINTERFACE_H
 #define SOUNDCARDPLCINTERFACE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 /**
  * @author Erik Eliasson
  */
-class SoundIOPLCInterface{
+class LIBMINISIP_API SoundIOPLCInterface{
 
 	public:
 		virtual short *get_plc_sound(uint32_t &ret_size)=0;

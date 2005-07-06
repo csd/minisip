@@ -26,6 +26,17 @@
 #ifndef CONFCALLBACK_H
 #define CONFCALLBACK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include "ConfMember.h"
@@ -35,7 +46,7 @@
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
 
-class ConfCallback{
+class LIBMINISIP_API ConfCallback{
 	
 	public:
 		//virtual void guicb_handleConfCommand(string &)=0;

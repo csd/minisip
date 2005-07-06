@@ -26,6 +26,17 @@
 #ifndef SRTPPACKET_H
 #define SRTPPACKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include "RtpPacket.h"
@@ -36,7 +47,7 @@
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );
 
-class SRtpPacket : public RtpPacket{
+class LIBMINISIP_API SRtpPacket : public RtpPacket{
         public:
                 SRtpPacket();
                 SRtpPacket(CryptoContext *scontext, RtpPacket *rtppacket);

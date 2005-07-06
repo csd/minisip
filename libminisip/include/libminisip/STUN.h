@@ -26,6 +26,17 @@
 #ifndef STUN_H
 #define STUN_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #ifdef HAVE_CONFIG_H
 #include"config.h"
 #endif
@@ -45,7 +56,7 @@
  * external NAT address/port mapping and NAT type.
  * @author Erik Eliasson
 */
-class STUN{
+class LIBMINISIP_API STUN{
 	public:
 		/// Undefined error.
 		static const int STUN_ERROR;

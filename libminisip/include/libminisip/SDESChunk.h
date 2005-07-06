@@ -26,13 +26,24 @@
 #ifndef SDESCHUNK_H
 #define SDESCHUNK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<vector>
 #include"SDESItem.h"
 using namespace std;
 
-class SDESChunk{
+class LIBMINISIP_API SDESChunk{
 	public:
 		SDESChunk(void *buildfrom, int max_length);
 		int size();

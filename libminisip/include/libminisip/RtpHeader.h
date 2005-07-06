@@ -26,12 +26,23 @@
 #ifndef RTPHEADER_H
 #define RTPHEADER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<vector>
 #include<config.h>
 
 using namespace std;
 
-class RtpHeader{
+class LIBMINISIP_API RtpHeader{
 
 	public:
 		RtpHeader();

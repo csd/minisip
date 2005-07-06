@@ -26,6 +26,17 @@
 #ifndef RTCPREPORTSR_H
 #define RTCPREPORTSR_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"RtcpReport.h"
 #include"RtcpReportReceptionBlock.h"
 #include"RtcpReportSenderInfo.h"
@@ -34,7 +45,7 @@
 
 using namespace std;
 
-class RtcpReportSR : public RtcpReport{
+class LIBMINISIP_API RtcpReportSR : public RtcpReport{
 	public:
 		RtcpReportSR(unsigned ssrc);
 		

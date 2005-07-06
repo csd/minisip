@@ -26,6 +26,17 @@
 #ifndef SESSION_H
 #define SESSION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
 #include<libminisip/SipDialogSecurityConfig.h>
@@ -39,7 +50,7 @@ class SdpHeaderM;
 class IPAddress;
 class SessionRegistry;
 
-class Session : public MObject{
+class LIBMINISIP_API Session : public MObject{
 	public:
 
                 static SessionRegistry * registry;

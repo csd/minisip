@@ -21,6 +21,17 @@
 #ifndef SIP_DIALOG_SECURITY_CONFIG
 #define SIP_DIALOG_SECURITY_CONFIG
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10
 #define KEY_MGMT_METHOD_MIKEY_DH        0x11
@@ -33,7 +44,7 @@ class certificate_chain;
 class ca_db;
 class SipIdentity;
 
-class SipDialogSecurityConfig{
+class LIBMINISIP_API SipDialogSecurityConfig{
 	public:
 		SipDialogSecurityConfig();
 

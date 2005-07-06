@@ -22,6 +22,17 @@
 #ifndef MINISIP_H
 #define MINISIP_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 #include<libminisip/ConferenceControl.h>
 #include<libmutil/MemObject.h>
@@ -37,7 +48,7 @@ class ConsoleDebugger;
 class ConferenceControl;
 
 
-class Minisip : public Runnable{
+class LIBMINISIP_API Minisip : public Runnable{
 	public:
 		Minisip(MRef<Gui*> gui, int argc, char**argv );
 		virtual ~Minisip();

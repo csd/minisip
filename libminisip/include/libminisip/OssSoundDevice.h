@@ -26,6 +26,17 @@
 #ifndef OSSSOUNDDEVICE_H
 #define OSSSOUNDDEVICE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SoundDevice.h"
 
 #ifndef DISABLE_OSS
@@ -40,7 +51,7 @@
 #include<iostream>
 #include<errno.h>
 
-class OssSoundDevice: public SoundDevice{
+class LIBMINISIP_API OssSoundDevice: public SoundDevice{
 	public:
 		OssSoundDevice( std::string device );
 		

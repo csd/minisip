@@ -35,11 +35,22 @@
 #ifndef SDPHEADERC_H
 #define SDPHEADERC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libminisip/SdpHeader.h>
 
 #include<string>
 
-class SdpHeaderC : public SdpHeader{
+class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 	public:
 		SdpHeaderC(std::string buildFrom);
 		SdpHeaderC(std::string netType, std::string addrType, std::string addr);

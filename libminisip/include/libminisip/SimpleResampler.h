@@ -27,9 +27,20 @@
 #ifndef SIMPLE_RESAMPLER_H
 #define SIMPLE_RESAMPLER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"Resampler.h"
 
-class SimpleResampler : public Resampler {
+class LIBMINISIP_API SimpleResampler : public Resampler {
 	public: 
 		virtual void resample( short * input, short * output );
 		SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 

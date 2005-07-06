@@ -26,6 +26,17 @@
 #ifndef STUNATTRIBUTES_H
 #define STUNATTRIBUTES_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<libmutil/itoa.h>
@@ -46,7 +57,7 @@
  * Base class for  all STUN attributes.
  * @author Erik Eliasson
 */
-class STUNAttribute{
+class LIBMINISIP_API STUNAttribute{
 	public:
 		static const int MAPPED_ADDRESS;
 		static const int RESPONSE_ADDRESS;
@@ -136,7 +147,7 @@ class STUNAttribute{
  * Base class for all address attributes.
  * @author Erik Eliasson
 */
-class STUNAttributeAddress : public STUNAttribute{
+class LIBMINISIP_API STUNAttributeAddress : public STUNAttribute{
 	public:
 		/**
 		 * Creates a address attribute of a given type from
@@ -214,7 +225,7 @@ class STUNAttributeAddress : public STUNAttribute{
  * Defines the Mapped Address attribute.
  * @author Erik Eliasson
 */
-class STUNAttributeMappedAddress : public STUNAttributeAddress{
+class LIBMINISIP_API STUNAttributeMappedAddress : public STUNAttributeAddress{
 	public:
 		/**
 		 * Creates a Mapped Address attribute from an 
@@ -232,7 +243,7 @@ class STUNAttributeMappedAddress : public STUNAttributeAddress{
  * Defines the Response Address attribute
  * @author Erik Eliasson
 */
-class STUNAttributeResponseAddress : public STUNAttributeAddress{
+class LIBMINISIP_API STUNAttributeResponseAddress : public STUNAttributeAddress{
 	public:
 		/**
 		 * Creates a Response Address attribute from a
@@ -251,7 +262,7 @@ class STUNAttributeResponseAddress : public STUNAttributeAddress{
  * Defines the Changed Address attribute
  * @author Erik Eliasson
 */
-class STUNAttributeChangedAddress : public STUNAttributeAddress{
+class LIBMINISIP_API STUNAttributeChangedAddress : public STUNAttributeAddress{
 	public:
 		/**
 		 * Creates a Changed Address attribute from an
@@ -270,7 +281,7 @@ class STUNAttributeChangedAddress : public STUNAttributeAddress{
  * Defines the Source Address attribute
  * @author Erik Eliasson
 */
-class STUNAttributeSourceAddress : public STUNAttributeAddress{
+class LIBMINISIP_API STUNAttributeSourceAddress : public STUNAttributeAddress{
 	public:
 		/**
 		 * Creates a Source Address attribute from an
@@ -289,7 +300,7 @@ class STUNAttributeSourceAddress : public STUNAttributeAddress{
  * Defines the Change Request attribute
  * @author Erik Eliasson
 */
-class STUNAttributeChangeRequest : public STUNAttribute{
+class LIBMINISIP_API STUNAttributeChangeRequest : public STUNAttribute{
 	public:
 		/**
 		 * Creates a Change Request attribute
@@ -340,7 +351,7 @@ class STUNAttributeChangeRequest : public STUNAttribute{
  * Defines the superclass for the Username and Password attribute classes.
  * @author Erik Eliasson
 */
-class STUNAttributeString: public STUNAttribute{
+class LIBMINISIP_API STUNAttributeString: public STUNAttribute{
 	public:
 		/**
 		 * Creates a string attribute of type "type" given a string.
@@ -385,7 +396,7 @@ class STUNAttributeString: public STUNAttribute{
  *  Defines the USERNAME attribute
  *  @author Erik Eliasson
 */
-class STUNAttributeUsername: public STUNAttributeString{
+class LIBMINISIP_API STUNAttributeUsername: public STUNAttributeString{
 	public:
 		/**
 		 * Creates a USERNAME attribute from a given string.
@@ -411,7 +422,7 @@ class STUNAttributeUsername: public STUNAttributeString{
  * Defines the STUNAttributePassword attribute
  * @author Erik Eliasson
 */
-class STUNAttributePassword: public STUNAttributeString{
+class LIBMINISIP_API STUNAttributePassword: public STUNAttributeString{
 	public:
 		/**
 		 * Creates a PASSWORD attribute from a string.
@@ -437,7 +448,7 @@ class STUNAttributePassword: public STUNAttributeString{
  * Defines the Error Code attribute
  * @author Erik Eliasson
 */
-class STUNAttributeErrorCode: public STUNAttribute{
+class LIBMINISIP_API STUNAttributeErrorCode: public STUNAttribute{
 	public:
 		/**
 		 * Creates an Error Code attribute from
@@ -495,7 +506,7 @@ class STUNAttributeErrorCode: public STUNAttribute{
  * Defines the Reflected From attribute.
  * @author Erik Eliasson
 */
-class STUNAttributeReflectedFrom: public STUNAttributeAddress{
+class LIBMINISIP_API STUNAttributeReflectedFrom: public STUNAttributeAddress{
 	public:
 		/**
 		 * Creates a Reflected From attribute from an 
@@ -513,7 +524,7 @@ class STUNAttributeReflectedFrom: public STUNAttributeAddress{
  * Defines the Unknown Attributes attribute.
  * @author Erik Eliasson
 */
-class STUNAttributeUnknownAttributes: public STUNAttribute{
+class LIBMINISIP_API STUNAttributeUnknownAttributes: public STUNAttribute{
 	public:
 		/**
 		 * Creates a UnknownAttributes attribute from an 

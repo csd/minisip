@@ -26,6 +26,17 @@
 #ifndef MXML_PHONEBOOK_IO_H
 #define MXML_PHONEBOOK_IO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 #include"PhoneBook.h"
 #include<string>
@@ -36,7 +47,7 @@ using namespace std;
 
 
 
-class MXmlPhoneBookIo : public PhoneBookIo{
+class LIBMINISIP_API MXmlPhoneBookIo : public PhoneBookIo{
         public:
                 MXmlPhoneBookIo( string fileName );
 

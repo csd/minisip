@@ -29,6 +29,17 @@
 #ifndef CRYPTOCONTEXT_H
 #define CRYPTOCONTEXT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"RtpPacket.h"
@@ -38,7 +49,7 @@
 
 #define REPLAY_WINDOW_SIZE 64
 
-class CryptoContext : public MObject{
+class LIBMINISIP_API CryptoContext : public MObject{
 	public:
 		CryptoContext( uint32_t ssrc );
 		

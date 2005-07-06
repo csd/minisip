@@ -26,6 +26,17 @@
 #ifndef SDES_LOC_H
 #define SDES_LOC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
@@ -33,7 +44,7 @@
 
 
 
-class SDES_LOC : public SDESItem{
+class LIBMINISIP_API SDES_LOC : public SDESItem{
 	public:
 		SDES_LOC(void *buildfrom, int max_length);
 		virtual ~SDES_LOC(){};

@@ -26,6 +26,17 @@
 #ifndef BELL_H
 #define BELL_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 #include<sys/types.h>
 #include<signal.h>
@@ -34,7 +45,7 @@
 
 using namespace std;
 
-class Bell: public MObject{
+class LIBMINISIP_API Bell: public MObject{
 	public:
 		Bell();
 		~Bell();

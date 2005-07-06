@@ -26,13 +26,24 @@
 #ifndef SDES_PHONE_H
 #define SDES_PHONE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
 #include<string>
 
 
-class SDES_PHONE : public SDESItem{
+class LIBMINISIP_API SDES_PHONE : public SDESItem{
 	public:
 		SDES_PHONE(void *buildfrom, int max_length);
 		virtual ~SDES_PHONE(){};

@@ -26,9 +26,20 @@
 #ifndef RTCPREPORTSENDERINFO_H
 #define RTCPREPORTSENDERINFO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
-class RtcpReportSenderInfo{
+class LIBMINISIP_API RtcpReportSenderInfo{
 	public:
 		RtcpReportSenderInfo(){}
 		RtcpReportSenderInfo(void *buildfrom, int max_length);

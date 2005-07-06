@@ -26,6 +26,17 @@
 #ifndef SOUNDRECORDERCALLBACK_H
 #define SOUNDRECORDERCALLBACK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<sys/types.h>
 
 /**
@@ -34,7 +45,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class SoundRecorderCallback{
+class LIBMINISIP_API SoundRecorderCallback{
 	public:
 	/**
 	 * Function that will be called when sound data is available from

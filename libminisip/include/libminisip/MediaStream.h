@@ -26,6 +26,17 @@
 #ifndef MEDIA_STREAM_H
 #define MEDIA_STREAM_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 #include<libminisip/CryptoContext.h>
 #include<libminisip/Media.h>
@@ -39,7 +50,7 @@ class SdpHeaderM;
 class SRtpPacket;
 class IpProvider;
 
-class MediaStream : public MObject{
+class LIBMINISIP_API MediaStream : public MObject{
 	public:
 		virtual void start() = 0;
 		virtual void stop() = 0;
@@ -84,7 +95,7 @@ class MediaStream : public MObject{
 		std::list< MRef<CryptoContext *> > cryptoContexts;
 };
 
-class MediaStreamReceiver : public MediaStream{ 
+class LIBMINISIP_API MediaStreamReceiver : public MediaStream{ 
 	public:
 		MediaStreamReceiver( MRef<Media *> media, MRef<RtpReceiver *>, MRef<IpProvider *> ipProvider );
 		virtual void start();
@@ -110,7 +121,7 @@ class MediaStreamReceiver : public MediaStream{
 		bool running;
 };
 
-class MediaStreamSender : public MediaStream{ 
+class LIBMINISIP_API MediaStreamSender : public MediaStream{ 
 	public:
 		MediaStreamSender( MRef<Media *> media, 
 				   MRef<UDPSocket *> senderSock=NULL );

@@ -26,6 +26,17 @@
 #ifndef SDESITEM_H
 #define SDESITEM_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<vector>
@@ -39,7 +50,7 @@
 #define NOTE 7
 
 
-class SDESItem{
+class LIBMINISIP_API SDESItem{
 	public:
 //		virtual vector<unsigned char> get_bytes()=0;
 		virtual int size()=0;

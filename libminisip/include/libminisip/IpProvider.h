@@ -27,6 +27,17 @@
 #define IP_PROVIDER_H
 
 #ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
+#ifdef _MSC_VER
 #ifndef uint16_t
 typedef unsigned short  uint16_t;
 #endif
@@ -40,7 +51,7 @@ class UDPSocket;
 class SipSoftPhoneConfiguration;
 class Gui;
 
-class IpProvider: public MObject{
+class LIBMINISIP_API IpProvider: public MObject{
 	public:
 		virtual std::string getExternalIp()=0;
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock )=0;

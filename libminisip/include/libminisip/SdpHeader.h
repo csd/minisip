@@ -35,6 +35,17 @@
 #ifndef SDPHEADER_H
 #define SDPHEADER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 
 #define SDP_HEADER_TYPE_A	0
@@ -45,7 +56,7 @@
 #define SDP_HEADER_TYPE_T	5
 #define SDP_HEADER_TYPE_V	6
 
-class SdpHeader : public MObject{
+class LIBMINISIP_API SdpHeader : public MObject{
 	public:
                 SdpHeader(int type, int priority);
 		

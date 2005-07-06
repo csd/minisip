@@ -26,10 +26,21 @@
 #ifndef SIMPLE_IP_PROVIDER
 #define SIMPLE_IP_PROVIDER
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"IpProvider.h"
 
 
-class SimpleIpProvider: public IpProvider{
+class LIBMINISIP_API SimpleIpProvider: public IpProvider{
 	public:
 		SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config );
 		

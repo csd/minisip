@@ -26,6 +26,17 @@
 #ifndef DEFAULTDialogHANDLER_H
 #define DEFAULTDialogHANDLER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
@@ -54,7 +65,7 @@ class SipDialogContainer;
  * If even the DefaultDialogHandler cannot handle the command, it will be
  * discarded.
  */
-class DefaultDialogHandler : public SipDialog{
+class LIBMINISIP_API DefaultDialogHandler : public SipDialog{
 	public:
 		
 		/**

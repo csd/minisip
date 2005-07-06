@@ -59,6 +59,17 @@
 #ifndef MINISIP_SIP_H
 #define MINISIP_SIP_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<libmutil/minilist.h>
@@ -83,7 +94,7 @@ class MediaHandler;
 
 using namespace std;
 
-class Sip: public Runnable{
+class LIBMINISIP_API Sip: public Runnable{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,

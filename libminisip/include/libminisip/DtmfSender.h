@@ -26,11 +26,22 @@
 #ifndef DTMFSENDER_H
 #define DTMFSENDER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 
 class Session;
 
-class DtmfEvent{
+class LIBMINISIP_API DtmfEvent{
         public:
                 DtmfEvent( uint8_t symbol, uint8_t volume, uint16_t duration, bool endOfEvent, bool startOfEvent, uint32_t * ts, bool lastBlock = false ):
                         symbol(symbol),volume(volume),duration(duration),endOfEvent(endOfEvent),startOfEvent(startOfEvent),ts(ts),lastBlock(lastBlock){};
@@ -48,7 +59,7 @@ class DtmfEvent{
                 friend class DtmfSender;
 };
         
-class DtmfSender {
+class LIBMINISIP_API DtmfSender {
         public:
                 DtmfSender( MRef<Session *> session );
                 void timeout( DtmfEvent * event );

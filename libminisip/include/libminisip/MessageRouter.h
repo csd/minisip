@@ -26,6 +26,17 @@
 #ifndef MESSAGE_ROUTER_H
 #define MESSAGE_ROUTER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
@@ -40,7 +51,7 @@
 #include<config.h>
 
 
-class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback{
+class LIBMINISIP_API MessageRouter: public SipCallback, public GuiCallback, public ConfCallback{
 	public:
 		MessageRouter();
 		virtual ~MessageRouter(){}

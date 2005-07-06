@@ -35,6 +35,17 @@
 #ifndef SDPPACKET_H
 #define SDPPACKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmnetutil/IPAddress.h>
 #include<vector>
 #include<libminisip/SdpPacket.h>
@@ -44,9 +55,9 @@
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
 
-MRef<SipMessageContent*> sdpSipMessageContentFactory(const string & buf, const string & ContentType);
+MRef<SipMessageContent*> LIBMINISIP_API sdpSipMessageContentFactory(const string & buf, const string & ContentType);
 
-class SdpPacket : public SipMessageContent{
+class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	public:
 		SdpPacket();
 		SdpPacket(std::string build_from);

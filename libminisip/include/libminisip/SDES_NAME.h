@@ -26,6 +26,17 @@
 #ifndef SDES_NAME_H
 #define SDES_NAME_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
@@ -33,7 +44,7 @@
 using namespace std;
 
 
-class SDES_NAME : public SDESItem{
+class LIBMINISIP_API SDES_NAME : public SDESItem{
 	public:
 		SDES_NAME(void *buildfrom, int max_length);
 		virtual ~SDES_NAME(){};

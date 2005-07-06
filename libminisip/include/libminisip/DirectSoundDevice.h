@@ -26,6 +26,17 @@
 #ifndef DIRECT_SOUND_DEVICE_H
 #define DIRECT_SOUND_DEVICE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 
 #include"SoundDevice.h"
 
@@ -33,7 +44,7 @@
 
 //typedef uint8_t byte_t;
 
-class DirectSoundDevice : public SoundDevice{
+class LIBMINISIP_API DirectSoundDevice : public SoundDevice{
 	public:
 		DirectSoundDevice( std::string fileName );
 

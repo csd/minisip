@@ -27,6 +27,17 @@
 #define _SILENCESENSOR_H
 
 #ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
+#ifdef _MSC_VER
 #ifndef uint16_t
 typedef unsigned short  uint16_t;
 #endif
@@ -34,7 +45,7 @@ typedef unsigned short  uint16_t;
 #include<inttypes.h>
 #endif
 
-class SilenceSensor{
+class LIBMINISIP_API SilenceSensor{
     public:
         /**
          * 
@@ -48,7 +59,7 @@ class SilenceSensor{
 
 };
 
-class SimpleSilenceSensor : public SilenceSensor{
+class LIBMINISIP_API SimpleSilenceSensor : public SilenceSensor{
     public:
         SimpleSilenceSensor();
         virtual bool silence(uint16_t *buf, int n);

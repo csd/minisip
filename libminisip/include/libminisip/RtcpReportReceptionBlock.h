@@ -26,9 +26,20 @@
 #ifndef RTCPREPORTRECEPTIONBLOCK_H
 #define RTCPREPORTRECEPTIONBLOCK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
-class RtcpReportReceptionBlock{
+class LIBMINISIP_API RtcpReportReceptionBlock{
 	public:
 		RtcpReportReceptionBlock(unsigned ssrc);
 		

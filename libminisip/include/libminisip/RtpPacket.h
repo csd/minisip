@@ -26,13 +26,24 @@
 #ifndef RTPPACKET_H
 #define RTPPACKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"RtpHeader.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
 #include<config.h>
 
-class RtpPacket{
+class LIBMINISIP_API RtpPacket{
 	public:
 		RtpPacket();
 		RtpPacket(unsigned char *content, int content_length, int seq_no, unsigned timestamp, unsigned ssrc);

@@ -26,6 +26,17 @@
 #ifndef GUICALLBACK_H
 #define GUICALLBACK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 #include<libminisip/ConferenceControl.h>
 #include<libmutil/CommandString.h>
@@ -33,7 +44,7 @@
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
 
-class GuiCallback{
+class LIBMINISIP_API GuiCallback{
 	
 	public:
 		virtual string guicb_doInvite(string sip_url)=0;

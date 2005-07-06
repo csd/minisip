@@ -26,7 +26,16 @@
 #ifndef ALSA_CARD_H
 #define ALSA_CARD_H
 
-#include<config.h>
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
 
 extern "C"{
 	#include <alsa/asoundlib.h>
@@ -36,7 +45,7 @@ extern "C"{
 #include<iostream>
 
 
-class AlsaCard{
+class LIBMINISIP_EXPORTS AlsaCard{
 	public:
 		AlsaCard( string cardname, string devname );
 

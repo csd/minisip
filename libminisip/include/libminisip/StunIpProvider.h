@@ -26,13 +26,24 @@
 #ifndef STUN_IP_PROVIDER
 #define STUN_IP_PROVIDER
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"IpProvider.h"
 
 class IPAddress;
 class Gui;
 
 
-class StunIpProvider: public IpProvider{
+class LIBMINISIP_API StunIpProvider: public IpProvider{
 	public:
 		static MRef<StunIpProvider *> create( MRef<SipSoftPhoneConfiguration *> config, Gui * gui );
 		

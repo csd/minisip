@@ -35,11 +35,22 @@
 #ifndef SDPHEADERO_H
 #define SDPHEADERO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SdpHeader.h"
 
 using namespace std;
 
-class SdpHeaderO : public SdpHeader{
+class LIBMINISIP_API SdpHeaderO : public SdpHeader{
 	public:
 		SdpHeaderO(string buildFrom);
 		SdpHeaderO(string username, string session_id, string version, string net_type, string addr_type, string addr);

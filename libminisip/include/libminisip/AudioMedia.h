@@ -23,6 +23,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
 
 #include"Media.h"
 #ifdef AEC_SUPPORT
@@ -33,7 +43,7 @@ class AudioMediaSource;
 class SilenceSensor;
 
 
-class AudioMedia : public Media, public SoundRecorderCallback{
+class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 
         public:
 		// pn430 Next line changed for multicodec
@@ -76,7 +86,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		
 };
 
-class AudioMediaSource : public BasicSoundSource{
+class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 	public:
 		AudioMediaSource( uint32_t ssrc, MRef<Media *> media );
 
@@ -90,3 +100,4 @@ class AudioMediaSource : public BasicSoundSource{
 		short codecOutput[16384];
 		uint32_t ssrc;
 };
+

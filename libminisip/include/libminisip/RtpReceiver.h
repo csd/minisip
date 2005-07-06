@@ -26,6 +26,17 @@
 #ifndef RTPRECEIVER_H
 #define RTPRECEIVER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
@@ -36,7 +47,7 @@ class MediaStreamReceiver;
 class CryptoContext;
 
 
-class RtpReceiver : public Runnable{
+class LIBMINISIP_API RtpReceiver : public Runnable{
 	public:
 		RtpReceiver( MRef<IpProvider *> ipProvider );
 

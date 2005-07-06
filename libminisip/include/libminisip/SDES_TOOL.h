@@ -26,6 +26,17 @@
 #ifndef SDES_TOOL_H
 #define SDES_TOOL_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
@@ -33,7 +44,7 @@
 using namespace std;
 
 
-class SDES_TOOL : public SDESItem{
+class LIBMINISIP_API SDES_TOOL : public SDESItem{
 	public:
 		SDES_TOOL(void *buildfrom, int max_length);
 		virtual ~SDES_TOOL(){};

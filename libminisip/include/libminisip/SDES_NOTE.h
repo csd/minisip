@@ -26,6 +26,17 @@
 #ifndef SDES_NOTE_H
 #define SDES_NOTE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
@@ -33,7 +44,7 @@
 using namespace std;
 
 
-class SDES_NOTE : public SDESItem{
+class LIBMINISIP_API SDES_NOTE : public SDESItem{
 	public:
 		SDES_NOTE(void *buildfrom, int max_length);
 		virtual ~SDES_NOTE(){};

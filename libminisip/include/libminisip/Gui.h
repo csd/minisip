@@ -26,6 +26,17 @@
 #ifndef GUI_H
 #define GUI_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 //#include "../../conf/ConferenceControl.h"
 #include"GuiCallback.h"
@@ -39,7 +50,7 @@
 class SipSoftPhoneConfiguration;
 class ContactDb;
 
-class Gui : public virtual Runnable, public virtual MObject {
+class LIBMINISIP_API Gui : public virtual Runnable, public virtual MObject {
 	public:
 		virtual ~Gui();
 

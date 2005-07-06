@@ -26,6 +26,17 @@
 #ifndef SOUND_DEVICE_H
 #define SOUND_DEVICE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #ifdef _MSC_VER
@@ -53,7 +64,7 @@ typedef unsigned int  uint32_t;
 #define SOUND_U16LE	0xF2
 #define SOUND_U16BE	0xF3
 
-class SoundDevice: public MObject{
+class LIBMINISIP_API SoundDevice: public MObject{
 	public:
 		static MRef<SoundDevice *> create( std::string deviceId );
 		

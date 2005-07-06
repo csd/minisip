@@ -26,13 +26,24 @@
 #ifndef SDES_CNAME_H
 #define SDES_CNAME_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"SDESItem.h"
 #include<string>
 
 
-class SDES_CNAME : public SDESItem{
+class LIBMINISIP_API SDES_CNAME : public SDESItem{
 	public:
 		SDES_CNAME(void *buildfrom, int max_length);
 		virtual ~SDES_CNAME(){};

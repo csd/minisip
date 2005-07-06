@@ -26,6 +26,17 @@
 #ifndef MEDIA_HANDLER_H
 #define MEDIA_HANDLER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 
 #include<libminisip/Media.h>
@@ -41,7 +52,7 @@ class SipSoftPhoneConfiguration;
 class IpProvider;
 
 
-class MediaHandler : public MObject, public SessionRegistry {
+class LIBMINISIP_API MediaHandler : public MObject, public SessionRegistry {
 
 	public:
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );

@@ -26,12 +26,23 @@
 #ifndef SESSIONREGISTRY_H
 #define SESSIONREGISTRY_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 #include"Session.h"
 
 
-class SessionRegistry{
+class LIBMINISIP_API SessionRegistry{
         friend class Session;
         
         public:

@@ -28,11 +28,22 @@
 #ifndef SOUND_SOURCE_H
 #define SOUND_SOURCE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libminisip/SoundIOPLCInterface.h>
 #include<libminisip/Resampler.h>
 
 
-class SoundSource : public MObject{
+class LIBMINISIP_API SoundSource : public MObject{
         public:
                 SoundSource(int id);
                 virtual ~SoundSource(){};
@@ -108,7 +119,7 @@ class SoundSource : public MObject{
 
 
 
-class BasicSoundSource: public SoundSource{
+class LIBMINISIP_API BasicSoundSource: public SoundSource{
         public:
                 /**
                  * Implementation of very simple queueing algorithm.

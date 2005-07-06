@@ -35,6 +35,17 @@
 #ifndef SIPSOFTPHONECONFIGURATION_H
 #define SIPSOFTPHONECONFIGURATION_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include<vector>
@@ -65,7 +76,7 @@ class PhoneBook;
 /**
  * The phone configuration.
  */
-class SipSoftPhoneConfiguration : public MObject{
+class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 	public:
 		SipSoftPhoneConfiguration();
 

@@ -26,9 +26,20 @@
 #ifndef MEDIA_COMMAND_STRING_H
 #define MEDIA_COMMAND_STRING_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<string>
 
-class MediaCommandString{
+class LIBMINISIP_API MediaCommandString{
 	public:
 		static const std::string start_ringing;
 		static const std::string stop_ringing;

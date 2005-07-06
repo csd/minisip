@@ -22,6 +22,17 @@
 #ifndef _PRESENCEMESSAGECONTENT_H
 #define _PRESENCEMESSAGECONTENT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
@@ -30,7 +41,7 @@
 
 MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &, const string &ContentType);
 
-class PresenceMessageContent : public SipMessageContent{
+class LIBMINISIP_API PresenceMessageContent : public SipMessageContent{
 	public:
 		PresenceMessageContent(string from, string to, string onlineStatus, string onlineStatusDesc);
 		PresenceMessageContent(const string &buildFrom);

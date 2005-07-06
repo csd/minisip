@@ -27,6 +27,17 @@
 #ifndef SOUNDIO_H
 #define SOUNDIO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 //#define HAVE_LIBASOUND
 
 
@@ -89,7 +100,7 @@ using namespace std;
 */
 
 
-class RecorderReceiver{
+class LIBMINISIP_API RecorderReceiver{
 	public:
 		RecorderReceiver(SoundRecorderCallback *, bool stereo);
 		bool getStereo();
@@ -101,7 +112,7 @@ class RecorderReceiver{
 
 
 
-class SoundIO : public MObject{
+class LIBMINISIP_API SoundIO : public MObject{
 
 	public:
 		/**

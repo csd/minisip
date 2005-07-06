@@ -26,6 +26,17 @@
 #ifndef FILESOUNDDEVICE_H
 #define FILESOUNDDEVICE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SoundDevice.h"
 
 
@@ -36,7 +47,7 @@
 
 using namespace std;
 
-class FileSoundDevice: public SoundDevice{
+class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 	public:
 		FileSoundDevice( string in_file, string out_file, int  nChannels, int32_t speed );
 		

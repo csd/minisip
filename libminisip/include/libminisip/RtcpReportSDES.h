@@ -26,12 +26,23 @@
 #ifndef RTCPREPORTSDES_H
 #define RTCPREPORTSDES_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"RtcpReport.h"
 #include"SDESChunk.h"
 
 #include<config.h>
 
-class RtcpReportSDES : public RtcpReport{
+class LIBMINISIP_API RtcpReportSDES : public RtcpReport{
 	public:
 		RtcpReportSDES(void * build_from, int max_length);
 		virtual ~RtcpReportSDES();

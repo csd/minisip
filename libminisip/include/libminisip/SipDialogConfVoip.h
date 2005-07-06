@@ -37,6 +37,16 @@
 #ifndef SipDialogConfVoip_H
 #define SipDialogConfVoip_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
 
 #include<config.h>
 
@@ -62,7 +72,7 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogConfVoip: public SipDialog{
+class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
 		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);

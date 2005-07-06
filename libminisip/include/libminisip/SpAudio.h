@@ -27,6 +27,17 @@
 #ifndef SPATIAL_AUDIO_H
 #define SPATIAL_AUDIO_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 
 #ifdef _MSC_VER
@@ -42,7 +53,7 @@ typedef __int32  int32_t;
 
 class SoundSource;
 
-class SpAudio{
+class LIBMINISIP_API SpAudio{
 
  public:
 

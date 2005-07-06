@@ -36,6 +36,16 @@
 #ifndef SipDialogPresenceClient_H
 #define SipDialogPresenceClient_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
 
 #include<config.h>
 
@@ -54,7 +64,7 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogPresenceClient: public SipDialog{
+class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 	public:
 		SipDialogPresenceClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, bool use_stun);
 		

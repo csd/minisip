@@ -26,6 +26,17 @@
 #ifndef ALSASOUNDDEVICE_H
 #define ALSASOUNDDEVICE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SoundDevice.h"
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
@@ -35,7 +46,7 @@
 
 
 
-class AlsaSoundDevice: public SoundDevice{
+class LIBMINISIP_API AlsaSoundDevice: public SoundDevice{
 	public:
 		AlsaSoundDevice( std::string device );
 		virtual int read( byte_t * buffer, uint32_t nSamples );

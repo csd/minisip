@@ -27,9 +27,20 @@
 #ifndef RESAMPLER_H
 #define RESAMPLER_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libmutil/MemObject.h>
 
-class Resampler : public MObject{
+class LIBMINISIP_API Resampler : public MObject{
 	public: 
 		static MRef<Resampler *> create(
 				    uint32_t inputFreq, uint32_t outputFreq,

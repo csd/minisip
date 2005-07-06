@@ -26,6 +26,17 @@
 #ifndef XRREPORTBLOCK_H
 #define XRREPORTBLOCK_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #define LOSS_RLE_REPORT            1
 #define DUPLICATE_RLE_REPORT       2
 #define TIMESTAMP_REPORT           3
@@ -36,7 +47,7 @@
 
 #include<config.h>
 	
-class XRReportBlock{
+class LIBMINISIP_API XRReportBlock{
 	public:
 		virtual ~XRReportBlock(){}
 		static XRReportBlock *build_from(void *from, int max_length);

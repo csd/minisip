@@ -26,6 +26,17 @@
 #ifndef CODECINTERFACE_H
 #define CODECINTERFACE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<sys/types.h>
 
 #include<string>
@@ -39,7 +50,7 @@
 using namespace std;
 
 
-class Codec: public MObject{
+class LIBMINISIP_API Codec: public MObject{
 	public:
 
 		
@@ -55,7 +66,7 @@ class Codec: public MObject{
 
 };
 
-class AudioCodec : public Codec{
+class LIBMINISIP_API AudioCodec : public Codec{
 	public:
 		/**
 		 * @returns A CODEC instance for the given payloadType

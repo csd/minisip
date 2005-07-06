@@ -26,6 +26,17 @@
 #ifndef SPEEXCODEC_H
 #define SPEEXCODEC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"Codec.h"
 
 #ifdef HAS_SPEEX
@@ -34,7 +45,7 @@
 
 #define     MAX_NB_BYTES  1024
 
-class SPEEXCODEC : public AudioCodec{
+class LIBMINISIP_API SPEEXCODEC : public AudioCodec{
 	public:
 		SPEEXCODEC();
 		virtual ~SPEEXCODEC();

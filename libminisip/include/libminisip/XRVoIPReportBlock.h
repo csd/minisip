@@ -26,10 +26,21 @@
 #ifndef XRVOIPREPORTBLOCK_H 
 #define XRVOIPREPORTBLOCK_H 
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"XRReportBlock.h"
 #include<config.h>
 
-class XRVoIPReportBlock : public XRReportBlock{
+class LIBMINISIP_API XRVoIPReportBlock : public XRReportBlock{
 	public:
 		XRVoIPReportBlock(void *build_from, int max_length);
 		

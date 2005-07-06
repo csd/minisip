@@ -26,6 +26,17 @@
 #ifndef STUNMESSAGE_H
 #define STUNMESSAGE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<list>
 #include"STUNAttributes.h"
 
@@ -35,7 +46,7 @@ using namespace std;
  * Defines the message header that is common to all STUN messages.
  * @author Erik Eliasson
 */
-class MessageHeader{
+class LIBMINISIP_API MessageHeader{
 	public:
 		MessageHeader(int type);
 		
@@ -58,7 +69,7 @@ class MessageHeader{
  * Declares the super class of all STUN messages.
  * @author Erik Eliasson
 */
-class STUNMessage{
+class LIBMINISIP_API STUNMessage{
 	public:
 		static const int BINDING_REQUEST;
 		static const int BINDING_RESPONSE;

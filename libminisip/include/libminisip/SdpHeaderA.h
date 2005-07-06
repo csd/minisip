@@ -35,11 +35,22 @@
 #ifndef SDPHEADERA_H
 #define SDPHEADERA_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SdpHeader.h"
 
 using namespace std;
 
-class SdpHeaderA : public SdpHeader{
+class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 	public:
 		SdpHeaderA(string buildFrom);
 		virtual ~SdpHeaderA();

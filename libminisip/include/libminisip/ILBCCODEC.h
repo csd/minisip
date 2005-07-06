@@ -26,6 +26,17 @@
 #ifndef ILBCCODEC_H
 #define ILBCCODEC_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<config.h>
 
 #include"Codec.h"
@@ -34,7 +45,7 @@
 #include"ilbc/iLBC_encode.h"
 #include"ilbc/iLBC_decode.h"
 
-class ILBCCODEC : public AudioCodec{
+class LIBMINISIP_API ILBCCODEC : public AudioCodec{
 	public:
 		ILBCCODEC();
 

@@ -27,6 +27,17 @@
 #ifndef _FILESOUNDSOURCE_H
 #define _FILESOUNDSOURCE_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include"SoundIO.h"
 
 
@@ -38,7 +49,7 @@
  *
  * Note: The current implementation does not support stereo.
  */
-class FileSoundSource : public SoundSource{
+class LIBMINISIP_API FileSoundSource : public SoundSource{
     public:
         /**
          * 

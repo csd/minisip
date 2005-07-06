@@ -26,6 +26,17 @@
 #ifndef _CONFERENCECONTROL_H
 #define _CONFERENCECONTROL_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<string>
 #include<libmutil/CommandString.h>
 //#include"../sip/SipSoftPhoneConfiguration.h"
@@ -54,7 +65,7 @@ typedef struct CCList {
     int numUser;
 } cclist;
 
-class ConferenceControl{
+class LIBMINISIP_API ConferenceControl{
     public:
         ConferenceControl();
 	ConferenceControl(string configUri, string cid, bool islocal);

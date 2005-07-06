@@ -35,11 +35,22 @@
 #ifndef SDPHEADERT_H
 #define SDPHEADERT_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
+
 #include<libminisip/SdpHeader.h>
 
 using namespace std;
 
-class SdpHeaderT : public SdpHeader{
+class LIBMINISIP_API SdpHeaderT : public SdpHeader{
 	public:
 		SdpHeaderT(string buildFrom);
 		SdpHeaderT(int32_t start_time, int32_t stop_time);

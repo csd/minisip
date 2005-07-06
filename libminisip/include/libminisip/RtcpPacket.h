@@ -26,6 +26,16 @@
 #ifndef RTCPPACKET_H
 #define RTCPPACKET_H
 
+#ifdef _MSC_VER
+#ifdef LIBMINISIP_EXPORTS
+#define LIBMINISIP_API __declspec(dllexport)
+#else
+#define LIBMINISIP_API __declspec(dllimport)
+#endif
+#else
+#define LIBMINISIP_API
+#endif
+
 
 
 #include<vector>
@@ -41,7 +51,7 @@
 
 using namespace std;
 
-class RtcpPacket{
+class LIBMINISIP_API RtcpPacket{
 	public:
 		RtcpPacket();
 		RtcpPacket(void *buildfrom, int length);
