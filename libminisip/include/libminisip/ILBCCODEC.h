@@ -37,9 +37,7 @@
 #endif
 
 
-#include<config.h>
-
-#include"Codec.h"
+#include<libminisip/Codec.h>
 
 #include"ilbc/iLBC_define.h"
 #include"ilbc/iLBC_encode.h"

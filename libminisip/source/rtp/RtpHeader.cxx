@@ -24,11 +24,12 @@
 */
 
 #include<libminisip/RtpHeader.h>
+
+#include<config.h>
+
 #include<libminisip/RtpPacket.h>
 
-#ifdef DEBUG_OUTPUT
 #include<iostream>
-#endif
 
 RtpHeader::RtpHeader(){
 	version=0;
@@ -128,12 +129,10 @@ char *RtpHeader::getBytes(){
 	return ret;
 }
 
-#ifdef DEBUG_OUTPUT
 void RtpHeader::printDebug(){
 	cerr << "\tversion: "<< version<<"\n\textension: "<< extension <<"\n\tCSRC count: "<< CSRC_count << "\n\tmarker: "<< marker << "\n\tpayload type: "<<payload_type <<"\n\tsequence number: "<<sequence_number << "\n\ttimestamp: "<<timestamp <<"\n\tSSRC: "<< SSRC << "\n"<< endl;
 
 	for (int i=0; i< CSRC_count; i++)
 		cerr << "\tCSRC "<<i+1 << ": "<<CSRC[i]<< endl;
 }
-#endif
 

@@ -37,17 +37,15 @@
 #endif
 
 
-#include<config.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
-//#include<libmsip/SipMessage.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipIMMessage.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/SipSoftPhoneConfiguration.h>
 #ifdef P2T_SUPPORT
 #include"../p2t/GroupListServer.h"
 #include"../p2t/SipDialogP2T.h"

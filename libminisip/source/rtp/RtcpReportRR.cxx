@@ -23,9 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/RtcpReportRR.h>
 #include<config.h>
-//#include <netinet/in.h>
+
+#include<libminisip/RtcpReportRR.h>
 #include<iostream>
 
 RtcpReportRR::RtcpReportRR(unsigned sender_ssrc): RtcpReport(201),sender_ssrc(sender_ssrc){
@@ -60,7 +60,6 @@ RtcpReportRR::~RtcpReportRR(){
 }
 
 
-#ifdef DEBUG_OUTPUT
 void RtcpReportRR::debug_print(){
 	cerr<<"RTCP RR report:"<< endl;
 	cerr.setf( ios::dec, ios::basefield );
@@ -69,7 +68,6 @@ void RtcpReportRR::debug_print(){
 	for (unsigned i=0; i<reception_blocks.size(); i++)
 		reception_blocks[i].debug_print();
 }
-#endif
 
 int RtcpReportRR::size(){
 	int totsize=4;

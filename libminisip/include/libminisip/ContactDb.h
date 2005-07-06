@@ -36,8 +36,6 @@
 #define LIBMINISIP_API
 #endif
 
-
-#include<config.h>
 #include<libmutil/MemObject.h>
 #include<string>
 

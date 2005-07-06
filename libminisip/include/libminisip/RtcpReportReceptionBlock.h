@@ -37,17 +37,13 @@
 #endif
 
 
-#include<config.h>
-
 class LIBMINISIP_API RtcpReportReceptionBlock{
 	public:
 		RtcpReportReceptionBlock(unsigned ssrc);
 		
 		RtcpReportReceptionBlock(void *buildfrom, int max_length);
 		int size();
-#ifdef DEBUG_OUTPUT
 		void debug_print();
-#endif
 
 		void set_fraction_lost(unsigned n);
 		unsigned get_fraction_lost();

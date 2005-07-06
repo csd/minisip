@@ -24,9 +24,10 @@
 */
 
 #include<libminisip/XRVoIPReportBlock.h>
+
 #include<config.h>
+
 #include<assert.h>
-//#include<netinet/in.h>
 #include<iostream>
 
 using namespace std;
@@ -119,7 +120,6 @@ XRVoIPReportBlock::XRVoIPReportBlock(void *build_from, int max_length){
 	this->JB_abs_max = bytearray[27];
 }
 
-#ifdef DEBUG_OUTPUT
 void  XRVoIPReportBlock::debug_print(){
 	cerr.setf( ios::hex, ios::basefield );
 	cerr <<"\tblock_type=0x"<<this->block_type<<endl;
@@ -147,7 +147,6 @@ void  XRVoIPReportBlock::debug_print(){
 	
 	cerr.setf( ios::dec, ios::basefield );
 }
-#endif
 
 int XRVoIPReportBlock::size(){
 	return 28;

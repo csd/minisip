@@ -23,12 +23,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_LOC.h>
-#ifdef DEBUG_OUTPUT
+
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
 using namespace std;
-#endif
 
 SDES_LOC::SDES_LOC(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -58,10 +60,9 @@ int SDES_LOC::size(){
 	return 2+loc.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_LOC::debug_print(){
 	cerr << "SDES LOC:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< loc << endl;
 }
-#endif
+

@@ -37,7 +37,7 @@
 #endif
 
 
-#include"SoundDevice.h"
+#include<libminisip/SoundDevice.h>
 
 #ifndef DISABLE_OSS
 

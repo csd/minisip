@@ -46,29 +46,27 @@
 #endif
 
 
-#include"SdpHeader.h"
-
-using namespace std;
+#include<libminisip/SdpHeader.h>
 
 class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 	public:
-		SdpHeaderA(string buildFrom);
+		SdpHeaderA(std::string buildFrom);
 		virtual ~SdpHeaderA();
 
 		virtual std::string getMemObjectType(){return "SdpHeaderA";}
 
-		string getAttributes();
-		void setAttributes(string attr);
+		std::string getAttributes();
+		void setAttributes(std::string attr);
 
-		virtual string getString();
+		virtual std::string getString();
 
-		string getAttributeType();
-		string getAttributeValue();
+		std::string getAttributeType();
+		std::string getAttributeValue();
 
-		string getRtpMap(int format);
+		std::string getRtpMap(int format);
 
 	private:
-		string attributes;
+		std::string attributes;
 
 };
 

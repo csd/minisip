@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/RtpPacket.h>
+
 #include<config.h>
 
 
@@ -36,12 +38,9 @@
 
 
 #include<errno.h>
-#include<libminisip/RtpPacket.h>
 #include<libminisip/RtpHeader.h>
 
-#ifdef DEBUG_OUTPUT
 #include<iostream>
-#endif
 
 #include<libmnetutil/UDPSocket.h>
 
@@ -168,7 +167,6 @@ int RtpPacket::getContentLength(){
 	return content_length;
 }
 
-#ifdef DEBUG_OUTPUT
 void RtpPacket::printDebug(){
 	cerr << "_RTP_Header_"<< endl;
 	header.printDebug();
@@ -176,6 +174,5 @@ void RtpPacket::printDebug(){
 	cerr <<"\tContent length: "<< content_length<< endl;
 	
 }
-#endif
 
 

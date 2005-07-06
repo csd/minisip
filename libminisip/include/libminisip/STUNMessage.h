@@ -38,7 +38,7 @@
 
 
 #include<list>
-#include"STUNAttributes.h"
+#include<libminisip/STUNAttributes.h>
 
 using namespace std;
 
@@ -83,16 +83,12 @@ class LIBMINISIP_API STUNMessage{
 		virtual ~STUNMessage();
 
 		
-//		static STUNMessage *parseMessage(unsigned char *data, int length);
-
 		bool sameTransactionID(STUNMessage &mgs);
 
 		void addAttribute(STUNAttribute *a);
 
 		unsigned char* getMessageData(int &retLength); //the user is responsible for deleteing the data
 		void sendMessage(int sock);
-
-//		virtual string getDesc()=0;
 
 		STUNAttribute *getAttribute(int type);
 		

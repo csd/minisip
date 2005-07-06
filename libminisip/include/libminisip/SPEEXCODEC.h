@@ -37,12 +37,8 @@
 #endif
 
 
-#include"Codec.h"
-
 #ifdef HAS_SPEEX
-
 #include<speex/speex.h> 
-
 #define     MAX_NB_BYTES  1024
 
 class LIBMINISIP_API SPEEXCODEC : public AudioCodec{

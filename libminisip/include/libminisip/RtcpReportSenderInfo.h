@@ -37,8 +37,6 @@
 #endif
 
 
-#include<config.h>
-
 class LIBMINISIP_API RtcpReportSenderInfo{
 	public:
 		RtcpReportSenderInfo(){}
@@ -46,9 +44,7 @@ class LIBMINISIP_API RtcpReportSenderInfo{
 		
 		int size();
 		
-#ifdef DEBUG_OUTPUT
 		void debug_print();
-#endif
 
 		void set_ntp_timestamp_msw(unsigned t);
 		unsigned get_ntp_timestamp_msw();

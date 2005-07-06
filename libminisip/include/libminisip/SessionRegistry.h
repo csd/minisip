@@ -39,7 +39,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
-#include"Session.h"
+#include<libminisip/Session.h>
 
 
 class LIBMINISIP_API SessionRegistry{

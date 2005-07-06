@@ -37,11 +37,9 @@
 #endif
 
 
-#include<config.h>
+#include<libminisip/SDESItem.h>
 
-#include"SDESItem.h"
-
-using namespace std;
+#include<string>
 
 
 class LIBMINISIP_API SDES_NAME : public SDESItem{
@@ -52,12 +50,10 @@ class LIBMINISIP_API SDES_NAME : public SDESItem{
 //		vector<unsigned char> get_bytes();
 		int size();
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 
 	private:
-		string name;
+		std::string name;
 };
 
 #endif

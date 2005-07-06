@@ -37,11 +37,8 @@
 #endif
 
 
-#include<config.h>
-
 #include<libmutil/MemObject.h>
 #include<list>
-
 
 
 class PhoneBookPerson;

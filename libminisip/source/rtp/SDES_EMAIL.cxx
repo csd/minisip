@@ -23,12 +23,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_EMAIL.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
-#endif
+
+using namespace std;
 
 SDES_EMAIL::SDES_EMAIL(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -58,10 +61,8 @@ int SDES_EMAIL::size(){
 	return 2+email.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_EMAIL::debug_print(){
 	cerr << "SDES EMAIL:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< email << endl;
 }
-#endif

@@ -24,7 +24,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/SRtpPacket.h>
+
 #include<config.h>
+
 #include<iostream>
 
 #ifdef LINUX
@@ -49,7 +52,6 @@
 
 #include<errno.h>
 
-#include<libminisip/SRtpPacket.h>
 #include<libminisip/CryptoContext.h>
 
 #include<libmutil/print_hex.h>

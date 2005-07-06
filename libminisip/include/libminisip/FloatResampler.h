@@ -40,7 +40,7 @@
 
 #ifdef FLOAT_RESAMPLER
 
-#include"Resampler.h"
+#include<libminisip/Resampler.h>
 #include<samplerate.h>
 
 class LIBMINISIP_API FloatResampler : public Resampler {

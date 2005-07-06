@@ -24,6 +24,9 @@
 */
 
 #include<libminisip/RtcpReportSenderInfo.h>
+
+#include<config.h>
+
 #include<stdlib.h>
 //#include<netinet/in.h>
 #include<iostream>
@@ -61,7 +64,6 @@ int RtcpReportSenderInfo::size(){
 	return 20;
 }
 
-#ifdef DEBUG_OUTPUT
 void RtcpReportSenderInfo::debug_print(){
 	cerr << " sender info:"<< endl;
 	cerr.setf(ios::hex, ios::basefield);
@@ -72,7 +74,6 @@ void RtcpReportSenderInfo::debug_print(){
 	cerr << "\tsender_packet_count: "<< sender_packet_count<< endl;
 	cerr << "\tsender_octet_count: "<< sender_octet_count<< endl;
 }
-#endif
 
 
 void RtcpReportSenderInfo::set_ntp_timestamp_msw(unsigned t){

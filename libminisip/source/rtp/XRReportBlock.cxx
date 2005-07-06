@@ -24,10 +24,11 @@
 */
 
 #include<libminisip/XRReportBlock.h>
-#include<libminisip/XRVoIPReportBlock.h>
+
 #include<config.h>
+
+#include<libminisip/XRVoIPReportBlock.h>
 #include<stdlib.h>
-//#include<netinet/in.h>
 #include<iostream>
 
 using namespace std;

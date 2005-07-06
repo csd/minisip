@@ -37,10 +37,9 @@
 #endif
 
 
-#include"RtcpReport.h"
-#include"RtcpReportReceptionBlock.h"
+#include<libminisip/RtcpReport.h>
+#include<libminisip/RtcpReportReceptionBlock.h>
 #include<vector>
-#include<config.h>
 
 using namespace std;
 
@@ -57,9 +56,7 @@ class LIBMINISIP_API RtcpReportRR : public RtcpReport{
 
 		int size();
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 
 		int get_n_report_blocks();
 		RtcpReportReceptionBlock &get_reception_block(int i);

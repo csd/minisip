@@ -37,13 +37,10 @@
 #endif
 
 
-#include"RtcpReport.h"
-#include"RtcpReportReceptionBlock.h"
-#include"RtcpReportSenderInfo.h"
+#include<libminisip/RtcpReport.h>
+#include<libminisip/RtcpReportReceptionBlock.h>
+#include<libminisip/RtcpReportSenderInfo.h>
 #include<vector>
-#include<config.h>
-
-using namespace std;
 
 class LIBMINISIP_API RtcpReportSR : public RtcpReport{
 	public:
@@ -54,9 +51,7 @@ class LIBMINISIP_API RtcpReportSR : public RtcpReport{
 //		virtual vector<unsigned char> get_packet_bytes();
 		virtual int size();
 		
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 
 		RtcpReportSenderInfo &get_sender_info();
 
@@ -75,7 +70,7 @@ class LIBMINISIP_API RtcpReportSR : public RtcpReport{
 //		unsigned sender_packet_count;
 //		unsigned sender_octet_count;
 		RtcpReportSenderInfo sender_info;
-		vector<RtcpReportReceptionBlock>reception_blocks;
+		std::vector<RtcpReportReceptionBlock>reception_blocks;
 
 		
 };

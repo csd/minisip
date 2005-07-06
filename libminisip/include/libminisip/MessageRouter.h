@@ -48,8 +48,6 @@
 #include<libminisip/ConfCallback.h>
 #include<libminisip/SipSoftPhoneConfiguration.h>
 
-#include<config.h>
-
 
 class LIBMINISIP_API MessageRouter: public SipCallback, public GuiCallback, public ConfCallback{
 	public:
@@ -60,27 +58,20 @@ class LIBMINISIP_API MessageRouter: public SipCallback, public GuiCallback, publ
 		void setGui(MRef<Gui *>g){gui = g;}
 		virtual void setConferenceController(ConferenceControl *conf);
 		virtual void removeConferenceController(ConferenceControl *conf);
-		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
-		//void setConference(ConferenceControl *confptr){conf = confptr;};//bm
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
 			this->mediaHandler = mediaHandler;}
 
 		virtual void sipcb_handleCommand(CommandString &command);
 		virtual void sipcb_handleConfCommand(CommandString &command);
-		//virtual void sipcb_handleConfCommand(CommandString &command);
-		//virtual void confcb_handleSipCommand(CommandString &command);
-		//void confcb_handleGuiCommand(CommandString &command);
 		virtual void guicb_handleCommand(CommandString &command);
 		virtual void guicb_handleConfCommand(string &conferencename);
 		virtual void guicb_handleConfCommand(CommandString &command);
-//		virtual string guicb_confDoInvite(string sip_url);
 		virtual void guicb_handleMediaCommand(CommandString &command);
 		
 		virtual string guicb_doInvite(string sip_url);
 		
 		virtual string confcb_doJoin(string user, minilist<ConfMember> *list, string congId);
 		virtual string confcb_doConnect(string user, string confId);
-		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
 		virtual void confcb_handleSipCommand(string &command){}
 		virtual void confcb_handleSipCommand(CommandString &command);
 		virtual void confcb_handleGuiCommand(CommandString &command);	

@@ -23,12 +23,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_NOTE.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
-#endif
+
+#include<string>
+
+using namespace std;
 
 SDES_NOTE::SDES_NOTE(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -58,10 +63,9 @@ int SDES_NOTE::size(){
 	return 2+note.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_NOTE::debug_print(){
 	cerr << "SDES NOTE:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< note << endl;
 }
-#endif
+

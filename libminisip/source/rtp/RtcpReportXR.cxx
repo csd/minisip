@@ -24,9 +24,12 @@
 */
 
 #include<libminisip/RtcpReportXR.h>
-//#include<netinet/in.h>
+
+#include<config.h>
+
 #include<iostream>
 
+using namespace std;
 
 RtcpReportXR::RtcpReportXR(void *build_from, int max_length) : RtcpReport(0){
 	if (max_length<4){
@@ -53,7 +56,6 @@ RtcpReportXR::RtcpReportXR(void *build_from, int max_length) : RtcpReport(0){
 }
 
 
-#ifdef DEBUG_OUTPUT
 void RtcpReportXR::debug_print(){
 	cerr << "RtcpReportXR:"<< endl;
 	cerr.setf( ios::hex, ios::basefield );
@@ -62,7 +64,6 @@ void RtcpReportXR::debug_print(){
 	for (unsigned i=0; i<xr_blocks.size(); i++)
 		xr_blocks[i]->debug_print();
 }
-#endif
 
 int RtcpReportXR::size(){
 	int totsize = 8;

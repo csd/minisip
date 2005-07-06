@@ -45,16 +45,12 @@
 #define DLRR_REPORT                6
 #define VOIP_METRICS_REPORT        7
 
-#include<config.h>
-	
 class LIBMINISIP_API XRReportBlock{
 	public:
 		virtual ~XRReportBlock(){}
 		static XRReportBlock *build_from(void *from, int max_length);
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print()=0;
-#endif
 		virtual int size()=0;
 		
 	protected:

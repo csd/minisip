@@ -37,8 +37,6 @@
 #endif
 
 
-#include<config.h>
-
 #include<libmutil/itoa.h>
 
 #include <sys/types.h>
@@ -50,6 +48,12 @@
 
 #ifdef WIN32
 # include<winsock2.h>
+#endif
+
+#ifdef _MSC_VER
+typedef uint16_t unsigned short;
+#else
+#include<inttypes.h>
 #endif
 
 
@@ -175,14 +179,7 @@ class LIBMINISIP_API STUNAttributeAddress : public STUNAttribute{
 		 * superclass.
 		 * @return	A string describing the address attribute.
 		*/
-		virtual string getDesc(){
-			//char tmp[200];
-			uint32_t nip = htonl(address);
-			//inet_ntop(AF_INET,&nip,tmp,200);
-            string ip =string("")+itoa((nip >> 24)&0xFF)+"."+itoa((nip >>16)&0xFF)+"."+itoa((nip>>8)&0xFF)+"."+itoa(nip&0xFF);
-			//string ip(tmp);
-			return string("Type: ")+itoa(getType())+string("; Family: ")+itoa(family)+string("; port: ")+itoa(port)+"; address: "+ip;
-		}
+		virtual string getDesc();
 
 		/**
 		 * Accesses the binary representation of the IP4 address.

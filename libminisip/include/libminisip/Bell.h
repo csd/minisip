@@ -37,11 +37,9 @@
 #endif
 
 
-#include<config.h>
 #include<sys/types.h>
 #include<signal.h>
 #include<string>
-//#include<libmutil/TimeoutProvider.h>
 
 using namespace std;
 
@@ -56,7 +54,6 @@ class LIBMINISIP_API Bell: public MObject{
 		void timeout(const string &command);
 		virtual std::string getMemObjectType(){return "Bell";};
 	private:
-//		TimeoutProvider<string, MRef<Bell*> > timeout_provider;
 		volatile bool running;
 		int32_t delayindex;
 #ifdef IPAQ

@@ -41,17 +41,17 @@
 //#define HAVE_LIBASOUND
 
 
-#include"SoundDevice.h"
+#include<libminisip/SoundDevice.h>
 
 #ifndef WIN32
 
-#include"OssSoundDevice.h"
+#include<libminisip/OssSoundDevice.h>
 #ifdef HAVE_LIBASOUND
-#include"AlsaSoundDevice.h"
+#include<libminisip/AlsaSoundDevice.h>
 #endif
 
 #else
-#include"DirectSoundDevice.h"
+#include<libminisip/DirectSoundDevice.h>
 #endif
 
 #include<libminisip/SoundRecorderCallback.h>

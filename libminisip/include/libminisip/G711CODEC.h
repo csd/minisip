@@ -37,7 +37,7 @@
 #endif
 
 
-#include"Codec.h"
+#include<libminisip/Codec.h>
 
 
 class LIBMINISIP_API G711CODEC : public AudioCodec{

@@ -40,6 +40,8 @@
 
 #include<libmutil/MemObject.h>
 
+#include<string>
+
 class LIBMINISIP_API Resampler : public MObject{
 	public: 
 		static MRef<Resampler *> create(

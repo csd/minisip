@@ -23,12 +23,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_NAME.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
-#endif
+
+#include<string>
+
+using namespace std;
 
 SDES_NAME::SDES_NAME(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -58,10 +63,9 @@ int SDES_NAME::size(){
 	return 2+name.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_NAME::debug_print(){
 	cerr << "SDES NAME:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< name << endl;
 }
-#endif
+

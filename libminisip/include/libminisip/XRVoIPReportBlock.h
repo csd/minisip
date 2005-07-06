@@ -37,16 +37,14 @@
 #endif
 
 
-#include"XRReportBlock.h"
-#include<config.h>
+#include<libminisip/XRReportBlock.h>
 
 class LIBMINISIP_API XRVoIPReportBlock : public XRReportBlock{
 	public:
 		XRVoIPReportBlock(void *build_from, int max_length);
 		
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
+		
 		virtual int size();
 
 	private:	

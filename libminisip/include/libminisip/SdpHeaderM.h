@@ -46,16 +46,15 @@
 #endif
 
 
-#include"SdpHeader.h"
+#include<libminisip/SdpHeader.h>
 #include<vector>
 
-using namespace std;
 class SdpHeaderA;
 
 class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 	public:
-		SdpHeaderM(string buildFrom);
-		SdpHeaderM(string media, int32_t port, int32_t n_ports, string transport);
+		SdpHeaderM(std::string buildFrom);
+		SdpHeaderM(std::string media, int32_t port, int32_t n_ports, std::string transport);
 		virtual ~SdpHeaderM();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderM";}
@@ -64,8 +63,8 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		int32_t getNrFormats();
 		int32_t getFormat(int32_t i);
 
-		string getMedia();
-		void setMedia(string m);
+		std::string getMedia();
+		void setMedia(std::string m);
 
 		int32_t getPort();
 		void setPort(int32_t p);
@@ -73,24 +72,24 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		int32_t getNrPorts();
 		void setNrPorts(int32_t n);
 
-		string getTransport();
-		void setTransport(string t);
+		std::string getTransport();
+		void setTransport(std::string t);
 
-		virtual string getString();
+		virtual std::string getString();
 
 		void addAttribute(MRef<SdpHeaderA*>);
 		std::string getAttribute(std::string key, uint32_t index);
-		list<MRef<SdpHeaderA*> > getAttributes();
+		std::list<MRef<SdpHeaderA*> > getAttributes();
 
 		std::string getRtpMap(uint32_t format);
 
 	private:
-		string media;
+		std::string media;
 		int32_t port;
 		int32_t nPorts;
-		string transport;
-		vector<int32_t> formats;
-		list<MRef<SdpHeaderA*> >attributes;
+		std::string transport;
+		std::vector<int32_t> formats;
+		std::list<MRef<SdpHeaderA*> >attributes;
 };
 
 #endif

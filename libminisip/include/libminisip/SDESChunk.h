@@ -37,23 +37,18 @@
 #endif
 
 
-#include<config.h>
-
 #include<vector>
-#include"SDESItem.h"
-using namespace std;
+#include<libminisip/SDESItem.h>
 
 class LIBMINISIP_API SDESChunk{
 	public:
 		SDESChunk(void *buildfrom, int max_length);
 		int size();
-#ifdef DEBUG_OUTPUT
 		void debug_print();
-#endif
 
 	private:
 		unsigned ssrc_or_csrc;
-		vector<SDESItem *>sdes_items;
+		std::vector<SDESItem *>sdes_items;
 };
 
 #endif

@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/RtcpReportReceptionBlock.h>
 #include<config.h>
+
+#include<libminisip/RtcpReportReceptionBlock.h>
 #include<stdlib.h>
 #include<iostream>
 
@@ -90,7 +91,6 @@ int RtcpReportReceptionBlock::size(){
 	return 24;
 }
 
-#ifdef DEBUG_OUTPUT
 void RtcpReportReceptionBlock::debug_print(){
 	cerr << " rtcp report reception block: 0x"<< endl;
 	cerr.setf(ios::hex, ios::basefield);
@@ -103,7 +103,6 @@ void RtcpReportReceptionBlock::debug_print(){
 	cerr << "\tdlsr: 0x"<< dlsr<< endl;
 	cerr.setf(ios::dec, ios::basefield);
 }
-#endif
 
 
 void RtcpReportReceptionBlock::set_fraction_lost(unsigned n){

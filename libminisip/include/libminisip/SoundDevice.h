@@ -37,8 +37,6 @@
 #endif
 
 
-#include<config.h>
-
 #ifdef _MSC_VER
 #ifndef byte_t
 typedef unsigned char  byte_t;
@@ -49,9 +47,9 @@ typedef __int32  int32_t;
 #ifndef uint32_t
 typedef unsigned int  uint32_t;
 #endif
-
-#else
+#else // !_MSC_VER
 #include<stdint.h>
+#define byte_t uint8_t
 #endif
 
 #include<libmutil/Mutex.h>

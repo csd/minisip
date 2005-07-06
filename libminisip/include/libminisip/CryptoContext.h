@@ -40,8 +40,6 @@
 #endif
 
 
-#include<config.h>
-
 #include"RtpPacket.h"
 #include<libmutil/aes.h>
 #include<libmutil/hmac.h>

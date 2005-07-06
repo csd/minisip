@@ -47,9 +47,6 @@
 #endif
 
 
-#include<config.h>
-
-
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
@@ -59,7 +56,7 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/minilist.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/SipSoftPhoneConfiguration.h>
 
 class Session;
 class SipDialogContainer;

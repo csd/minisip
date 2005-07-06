@@ -37,7 +37,7 @@
 #endif
 
 
-#include"IpProvider.h"
+#include<libminisip/IpProvider.h>
 
 
 class LIBMINISIP_API SimpleIpProvider: public IpProvider{

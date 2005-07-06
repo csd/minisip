@@ -24,11 +24,12 @@
 */
 
 #include<libminisip/SDESChunk.h>
+
+#include<config.h>
+
 #include<libminisip/SDESItem.h>
 
-#ifdef DEBUG_OUTPUT
 #include<iostream>
-#endif
 
 using namespace std;
 
@@ -60,7 +61,6 @@ int SDESChunk::size(){
 	return ret+pad;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDESChunk::debug_print(){
 	cerr << "SDES chunk: "<< endl;
 	cerr << "\tssrc/csrc: "<< ssrc_or_csrc<< endl;
@@ -68,4 +68,4 @@ void SDESChunk::debug_print(){
 		sdes_items[i]->debug_print();
 
 }
-#endif
+

@@ -37,11 +37,8 @@
 #endif
 
 
-#include<config.h>
-#include"PhoneBook.h"
+#include<libminisip/PhoneBook.h>
 #include<string>
-
-using namespace std;
 
 /* Uses mutil/XMLParser to read and save a phonebook file */
 
@@ -49,7 +46,7 @@ using namespace std;
 
 class LIBMINISIP_API MXmlPhoneBookIo : public PhoneBookIo{
         public:
-                MXmlPhoneBookIo( string fileName );
+                MXmlPhoneBookIo( std::string fileName );
 
                 virtual void save( MRef< PhoneBook * > book );
                 virtual MRef< PhoneBook * > load();

@@ -37,10 +37,9 @@
 #endif
 
 
-#include"RtcpReport.h"
-#include"SDESChunk.h"
-
-#include<config.h>
+#include<libminisip/RtcpReport.h>
+#include<libminisip/SDESChunk.h>
+#include<vector>
 
 class LIBMINISIP_API RtcpReportSDES : public RtcpReport{
 	public:
@@ -49,11 +48,9 @@ class LIBMINISIP_API RtcpReportSDES : public RtcpReport{
 //		virtual vector<unsigned char> get_packet_bytes();
 		int size();
 		
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 	private:
-		vector<SDESChunk>chunks;
+		std::vector<SDESChunk>chunks;
 };
 
 #endif

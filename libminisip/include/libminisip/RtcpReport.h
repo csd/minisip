@@ -39,9 +39,6 @@
 
 #include<vector>
 
-#include<config.h>
-
-
 #define PACKET_TYPE_SR 200
 #define PACKET_TYPE_RR 201
 #define PACKET_TYPE_SDES 202
@@ -62,9 +59,7 @@ class LIBMINISIP_API RtcpReport{
 
 		virtual int size() = 0;
 		
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print()=0;
-#endif
 	protected:
 		void parse_header(void *build_from, int max_length);
 		

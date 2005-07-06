@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/RtcpPacket.h>
 #include<libminisip/RtcpReport.h>
 
@@ -59,7 +61,6 @@ void RtcpPacket::add_report(RtcpReport *report){
 	reports.push_back(report);
 }
 
-#ifdef DEBUG_OUTPUT
 void RtcpPacket::debug_print(){
 	cerr << "__RTCP_packet__";
 	for (unsigned i=0; i<reports.size(); i++){
@@ -68,4 +69,3 @@ void RtcpPacket::debug_print(){
 	}
 
 }
-#endif

@@ -37,11 +37,9 @@
 #endif
 
 
-#include"RtpHeader.h"
+#include<libminisip/RtpHeader.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
-
-#include<config.h>
 
 class LIBMINISIP_API RtpPacket{
 	public:
@@ -59,9 +57,7 @@ class LIBMINISIP_API RtpPacket{
 		unsigned char *getContent();
 		int getContentLength();
 
-#ifdef DEBUG_OUTPUT
 		void printDebug();
-#endif
 
 		virtual char *getBytes();
 		virtual int size();

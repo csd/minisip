@@ -38,7 +38,7 @@
 #endif
 
 
-#include"Resampler.h"
+#include<libminisip/Resampler.h>
 
 class LIBMINISIP_API SimpleResampler : public Resampler {
 	public: 

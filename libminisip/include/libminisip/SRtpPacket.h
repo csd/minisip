@@ -36,13 +36,10 @@
 #define LIBMINISIP_API
 #endif
 
-
-#include<config.h>
-
-#include "RtpPacket.h"
+#include<libminisip/RtpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
-#include "CryptoContext.h"
+#include<libminisip/CryptoContext.h>
 
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );

@@ -24,6 +24,9 @@
 */
 
 #include<libminisip/SDESItem.h>
+
+#include<config.h>
+
 #include<libminisip/SDES_CNAME.h>
 #include<libminisip/SDES_NAME.h>
 #include<libminisip/SDES_EMAIL.h>
@@ -32,9 +35,7 @@
 #include<libminisip/SDES_TOOL.h>
 #include<libminisip/SDES_NOTE.h>
 
-#ifdef DEBUG_OUTPUT
 #include<iostream>
-#endif
 
 using namespace std;
 

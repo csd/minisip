@@ -37,7 +37,6 @@
 #endif
 
 
-#include<config.h>
 #include<libminisip/ConferenceControl.h>
 #include<libmutil/CommandString.h>
 
@@ -52,10 +51,7 @@ class LIBMINISIP_API GuiCallback{
                 virtual void guicb_handleMediaCommand(CommandString &)=0;
 		virtual void guicb_handleConfCommand(string &conferencename)=0;
 		virtual void guicb_handleConfCommand(CommandString &)=0;
-//		virtual string guicb_confDoInvite(string sip_url)=0;
 		virtual void setConferenceController(ConferenceControl *conf)=0;
-		//virtual void confcb_handleSipCommand(string &)=0;
-		//virtual void confcb_handleGuiCommand(string &)=0;
 };
 
 #endif

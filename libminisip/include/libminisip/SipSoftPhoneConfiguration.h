@@ -46,8 +46,6 @@
 #endif
 
 
-#include<config.h>
-
 #include<vector>
 #include<list>
 #include<libminisip/Codec.h>
@@ -55,8 +53,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/cert.h>
-
-//#include<libmsip/SipMessageTransport.h>
 
 #include<libmsip/SipDialogConfig.h>
 #include<libminisip/SipDialogSecurityConfig.h>
@@ -90,23 +86,10 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		//Configuration only the phone has and not every call
 		MRef<Sip*> sip;
 	
-//		SipIdentity pstnIdentity;
 		MRef<SipIdentity *> pstnIdentity;
-//		MRef<SipIdentity *> defaultIdentity;
 
 		list< MRef<SipIdentity*> > identities;
 		
-		/*
-		IPAddress * pstnProxy;
-		string pstnProxyString;
-		string pstnSipDomain;
-		int32_t pstnProxyPort;
-		string pstnNumber;
-		string pstnProxyUsername;	// Advanced->PSTN proxy username
-		string pstnProxyPassword;  // Advanced->PSTN proxy password
-		*/
-		
-
 		bool useSTUN;
 		string stunServerIpString;
 		uint16_t stunServerPort;
@@ -120,9 +103,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		
 		Socket * proxyConnection;
 
-//		bool doRegister; 	//General->Register to proxy
-//		bool doRegisterPSTN; 	//Advanced...
-//		
 		string soundDevice;
 		string videoDevice;
 		uint32_t frameWidth;
@@ -136,10 +116,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		string configFileName;
 
 		bool tcp_server;
-
-//		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
-		
-
 		bool tls_server;
 
 		list<MRef<PhoneBook *> > phonebooks;

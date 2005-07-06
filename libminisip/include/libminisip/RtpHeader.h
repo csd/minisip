@@ -36,9 +36,14 @@
 #define LIBMINISIP_API
 #endif
 
+#ifdef _MSC_VER
+typedef uint16_t unsigned short;
+typedef uint32_t unsigned;
+#else
+#include<stdint.h>
+#endif
 
 #include<vector>
-#include<config.h>
 
 using namespace std;
 
@@ -61,9 +66,7 @@ class LIBMINISIP_API RtpHeader{
 		uint32_t getSSRC();
 		void addCSRC(int csrc);
 
-#ifdef DEBUG_OUTPUT
 		void printDebug();
-#endif
 
 		int size();
 		char *getBytes();
@@ -76,7 +79,7 @@ class LIBMINISIP_API RtpHeader{
 		uint16_t sequence_number;
 		uint32_t timestamp;
 		uint32_t SSRC;
-		vector<int> CSRC; 
+		std::vector<int> CSRC; 
 	private:
 };
 

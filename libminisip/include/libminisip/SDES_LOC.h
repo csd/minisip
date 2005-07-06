@@ -37,9 +37,7 @@
 #endif
 
 
-#include<config.h>
-
-#include"SDESItem.h"
+#include<libminisip/SDESItem.h>
 #include<string>
 
 
@@ -52,9 +50,7 @@ class LIBMINISIP_API SDES_LOC : public SDESItem{
 //		vector<unsigned char> get_bytes();
 		int size();
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 
 	private:
 		std::string loc;

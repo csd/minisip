@@ -62,9 +62,9 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 
                 virtual void srcb_handleSound( void *samplearr );
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker );
-		#ifdef AEC_SUPPORT 
+#ifdef AEC_SUPPORT 
 		virtual void srcb_handleSound( void *samplearr, void *samplearrR);	//hanning
-		#endif
+#endif
                 void startRinging( std::string ringtoneFile );
                 void stopRinging();         
 
@@ -77,10 +77,10 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 		uint32_t seqNo;
                 byte_t encoded[1600];                 
 		short resampledData[160];
-		#ifdef AEC_SUPPORT
+#ifdef AEC_SUPPORT
 		short resampledDataR[160];		//hanning
 		static AEC aec;				//hanning
-		#endif
+#endif
 		std::list< MRef<AudioCodec *> > codecs;
 		std::list< MRef<AudioMediaSource *> > sources;
 		

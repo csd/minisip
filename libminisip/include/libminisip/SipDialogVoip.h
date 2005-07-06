@@ -48,9 +48,6 @@
 #endif
 
 
-#include<config.h>
-
-
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
@@ -59,7 +56,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/SipSoftPhoneConfiguration.h>
 
 #ifdef IPSEC_SUPPORT
 #include<../ipsec/MsipIpsecAPI.h>

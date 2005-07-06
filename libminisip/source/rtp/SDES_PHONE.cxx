@@ -23,13 +23,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_PHONE.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
 using namespace std;
-#endif
 
 SDES_PHONE::SDES_PHONE(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -59,10 +60,9 @@ int SDES_PHONE::size(){
 	return 2+phone.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_PHONE::debug_print(){
 	cerr << "SDES PHONE:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< phone << endl;
 }
-#endif
+

@@ -24,11 +24,14 @@
 */
 
 #include<libminisip/RtcpReportSR.h>
+
+#include<config.h>
+
 #include<iostream>
 
 RtcpReportSR::RtcpReportSR(void *buildfrom, int max_length):RtcpReport(0){
 	if (max_length<4){
-		cerr <<"Too short RTCP SR report (in RtcpReportSR constructor) (size="<<max_length<<")"<< endl;
+		std::cerr <<"Too short RTCP SR report (in RtcpReportSR constructor) (size="<<max_length<<")"<< std::endl;
 		exit(1);
 	}
 	parse_header(buildfrom, max_length);
@@ -37,12 +40,12 @@ RtcpReportSR::RtcpReportSR(void *buildfrom, int max_length):RtcpReport(0){
 	//sender_ssrc = ntohl(*iptr);
 	sender_ssrc = U32_AT( iptr );
 	
-	cerr << "Found SR report with content length of "<< length;
+	std::cerr << "Found SR report with content length of "<< length<<std::endl;
 	sender_info = RtcpReportSenderInfo(& ((char*)buildfrom)[8], max_length-8);
 
 	int i=8+sender_info.size();
 	for (unsigned j=0; j<rc_sc; j++){
-		cerr << "Trying to parse reception block in RTCPReportSR"<< endl;
+		std::cerr << "Trying to parse reception block in RTCPReportSR"<< std::endl;
 		RtcpReportReceptionBlock block(& ((char*)buildfrom)[i], max_length-i);
 		reception_blocks.push_back(block);
 		i+=block.size();
@@ -55,25 +58,15 @@ RtcpReportSR::~RtcpReportSR(){
 }
 
 
-//vector<unsigned char> RtcpReportSR::get_packet_bytes(){
-//
-//	vector<unsigned char> ret;
-//	ret.push_back(33);
-//
-//	return ret;
-//}
-
-#ifdef DEBUG_OUTPUT
 void RtcpReportSR::debug_print(){
-	cerr<<"RTCP SR report:"<< endl;
-	cerr.setf( ios::hex, ios::basefield );
-	cerr<< "\tsender_ssrc: "<< sender_ssrc<< endl;
-	cerr.setf( ios::dec, ios::basefield );
+	std::cerr<<"RTCP SR report:"<< std::endl;
+	std::cerr.setf( std::ios::hex, std::ios::basefield );
+	std::cerr<< "\tsender_ssrc: "<< sender_ssrc<< std::endl;
+	std::cerr.setf( std::ios::dec, std::ios::basefield );
        	sender_info.debug_print();
 	for (unsigned i=0; i<reception_blocks.size(); i++)
 		reception_blocks[i].debug_print();
 }
-#endif
 
 int RtcpReportSR::size(){
 	int totsize=8;

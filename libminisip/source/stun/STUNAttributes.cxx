@@ -23,10 +23,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/STUNAttributes.h>
+
+#include<config.h>
 
 #include<assert.h>
 #include<iostream>
-#include<libminisip/STUNAttributes.h>
 
 #ifdef LINUX
 #include<netinet/in.h>
@@ -67,10 +69,13 @@ int STUNAttribute::getType(){
 	return type;
 }
 
+
+
 int STUNAttribute::getMessageDataTLV(unsigned char *buf){
 	uint16_t *ptr= (uint16_t *)buf;
-	ptr[0]=htons(type);
-	ptr[1]=htons(getValueLength());
+	ptr[0]=hton16(type);
+	unsigned short len = getValueLength();
+	ptr[1]=hton16(len);
 	getValue(&buf[4]);
 	return 2+2+getValueLength();
 }
@@ -171,6 +176,13 @@ uint32_t STUNAttributeAddress::getBinaryIP(){
 uint16_t STUNAttributeAddress::getPort(){
 	return port;
 }
+
+string STUNAttributeAddress::getDesc(){
+	uint32_t nip = htonl(address);
+	string ip =string("")+itoa((nip >> 24)&0xFF)+"."+itoa((nip >>16)&0xFF)+"."+itoa((nip>>8)&0xFF)+"."+itoa(nip&0xFF);
+	return string("Type: ")+itoa(getType())+string("; Family: ")+itoa(family)+string("; port: ")+itoa(port)+"; address: "+ip;
+}
+
 
 
 //////////////////////////////////

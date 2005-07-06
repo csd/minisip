@@ -36,11 +36,6 @@
 #define LIBMINISIP_API
 #endif
 
-
-#ifdef HAVE_CONFIG_H
-#include"config.h"
-#endif
-
 #ifndef _MSC_VER
 #include<stdint.h>
 #endif

@@ -5,7 +5,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+
 #include<libminisip/RtcpReportSDES.h>
+
+#include<config.h>
+
 #include<assert.h>
 #include<iostream>
 
@@ -36,13 +40,11 @@ RtcpReportSDES::~RtcpReportSDES(){
 }
 
 
-#ifdef DEBUG_OUTPUT
 void RtcpReportSDES::debug_print(){
 	cerr<<"RTCP SDES report:"<< endl;
 	for (unsigned i=0; i<chunks.size(); i++)
 		chunks[i].debug_print();
 }
-#endif
 
 int RtcpReportSDES::size(){
 //	int tot = 4;

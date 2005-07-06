@@ -37,19 +37,12 @@
 #endif
 
 
-#include<config.h>
-
-#include "ConfMember.h"
+#include<libminisip/ConfMember.h>
 
 #include<libmutil/CommandString.h>
 
-//TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
-//package move to the callback as much as possible --EE
-
 class LIBMINISIP_API ConfCallback{
-	
 	public:
-		//virtual void guicb_handleConfCommand(string &)=0;
 		virtual void confcb_handleSipCommand(string &)=0;
 		virtual void confcb_handleSipCommand(CommandString &)=0;
 		virtual void confcb_handleGuiCommand(CommandString &)=0;

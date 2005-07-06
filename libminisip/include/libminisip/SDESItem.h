@@ -36,11 +36,6 @@
 #define LIBMINISIP_API
 #endif
 
-
-#include<config.h>
-
-#include<vector>
-
 #define CNAME 1
 #define NAME 2
 #define EMAIL 3
@@ -56,9 +51,8 @@ class LIBMINISIP_API SDESItem{
 		virtual int size()=0;
 		static SDESItem *build_from(void *from,int max_length);
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print()=0;
-#endif
+		
 	protected:
 //		unsigned type;
 		unsigned length;

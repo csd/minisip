@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/RtcpReport.h>
 #include<libminisip/RtcpReportSR.h>
 #include<libminisip/RtcpReportRR.h>
@@ -87,11 +89,6 @@ RtcpReport *RtcpReport::build_from(void *buildfrom, int max_length){
 int RtcpReport::size(){
 	return 0;
 }
-
-//vector<unsigned char> RtcpReport::get_packet_bytes(){
-//	vector<unsigned char> ret;
-//	return ret;
-//}
 
 void RtcpReport::parse_header(void *build_from, int max_length){
 

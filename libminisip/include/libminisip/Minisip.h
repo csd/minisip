@@ -33,7 +33,6 @@
 #endif
 
 
-#include<config.h>
 #include<libminisip/ConferenceControl.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
@@ -59,7 +58,6 @@ class LIBMINISIP_API Minisip : public Runnable{
 		void startSip();
 		void runGui();
 
-		//void setGui(MRef<Gui *> gui);
 	private:
 		
 		virtual void run();
@@ -71,11 +69,7 @@ class LIBMINISIP_API Minisip : public Runnable{
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
-#ifdef GTK_GUI
-#ifdef DEBUG_OUTPUT
 		MRef<ConsoleDebugger *> consoleDbg;
-#endif
-#endif
 };
 
 #endif

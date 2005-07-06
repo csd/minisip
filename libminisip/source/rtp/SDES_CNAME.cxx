@@ -25,9 +25,9 @@
 
 #include<libminisip/SDES_CNAME.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
 #include<iostream>
-#endif
 
 #include<assert.h>
 using namespace std;
@@ -60,11 +60,9 @@ int SDES_CNAME::size(){
 	return 2+cname.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_CNAME::debug_print(){
 	cerr << "SDES CNAME:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tcname: "<< cname << endl;
 }
-#endif
 

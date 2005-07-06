@@ -34,13 +34,10 @@
 #endif
 
 
-#include<config.h>
-
 #include<vector>
-#include"XRReportBlock.h"
-#include"RtcpReport.h"
+#include<libminisip/XRReportBlock.h>
+#include<libminisip/RtcpReport.h>
 #include<vector>
-using namespace std;
 
 
 class LIBMINISIP_API RtcpReportXR : public RtcpReport{
@@ -48,14 +45,12 @@ class LIBMINISIP_API RtcpReportXR : public RtcpReport{
 		RtcpReportXR(void *build_from, int max_length);
 		virtual ~RtcpReportXR(){}
 //		virtual vector<unsigned char> get_bytes();
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 		virtual int size();
 		
 	private:
 		unsigned ssrc_or_csrc;
-		vector <XRReportBlock *> xr_blocks;
+		std::vector <XRReportBlock *> xr_blocks;
 };
 
 #endif

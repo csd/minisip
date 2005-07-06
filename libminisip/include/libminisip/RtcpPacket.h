@@ -39,9 +39,7 @@
 
 
 #include<vector>
-#include"RtcpReport.h"
-
-#include<config.h>
+#include<libminisip/RtcpReport.h>
 
 #define RTCP_TYPE_SR		0
 #define RTCP_TYPE_RR		1
@@ -59,9 +57,8 @@ class LIBMINISIP_API RtcpPacket{
 		vector<RtcpReport *> &get_reports();
 		void add_report(RtcpReport *report);
 
-#ifdef DEBUG_OUTPUT
 		void debug_print();
-#endif
+
 		int get_type();
 	private:
 		vector<RtcpReport *> reports;

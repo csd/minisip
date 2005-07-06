@@ -39,18 +39,9 @@
 
 #include<string>
 #include<libmutil/CommandString.h>
-//#include"../sip/SipSoftPhoneConfiguration.h"
-//#include"../minisip/gui/Gui.h"
-//#include"../../../p2t/GroupList.h"
-//#include"../../../p2t/GroupListClient.h"
-//#include"../p2t/GroupListUserElement.h"
-//#include"../p2t/P2T.h"
-//#include<libmutil/TextUI.h>
 #include<libmutil/minilist.h>
-#include "ConfCallback.h"
-
-
-#include "ConfMember.h"
+#include<libminisip/ConfCallback.h>
+#include<libminisip/ConfMember.h>
 
 
 using namespace std;
@@ -69,18 +60,14 @@ class LIBMINISIP_API ConferenceControl{
     public:
         ConferenceControl();
 	ConferenceControl(string configUri, string cid, bool islocal);
-	//void setGui(Gui *guiptr){gui = guiptr;};
 	void handleGuiCommand(string cmd);
 	void handleGuiCommand(CommandString &command);
 	void handleGuiDoInviteCommand(string sip_url);
 	
 	void handleSipCommand(CommandString &cmd);
-        //virtual void handleGuiCommand(string);
 	void setCallback(ConfCallback *cb);
 	void setPendingList(string user);
-	//string[10] getPendingList();
 	void setConnectedList(string user);
-	//string[10] getConnectedList();
 	ConfCallback* getCallback();
 	
 	
@@ -95,7 +82,6 @@ class LIBMINISIP_API ConferenceControl{
 	void printList(minilist<ConfMember> *list);
         minilist<ConfMember> * getConnectedList();
         
-	//virtual void run();
 	string confId;
     private:
 	void sendUpdatesToGui();
@@ -109,7 +95,6 @@ class LIBMINISIP_API ConferenceControl{
 	void updateLists(minilist<ConfMember> *list);
 	void removeMember(string memberid); 
 	string addDomainToPrefix(string remoteUri);
-	//Gui *gui;
 	bool incoming;
         string input;
         string callId;
@@ -117,23 +102,11 @@ class LIBMINISIP_API ConferenceControl{
 	ConfCallback *callback;
 	int numConnected;
 	int numPending;
-	//string connectedList[10];
-
-	
-	//string pendingList[10];
-	//cclist connectedList;
 	
 	minilist<ConfMember> connectedList;
 	minilist<ConfMember> pendingList;
 	string myUri;
 	string myDomain;
-	
-	///a P2T Group Member List
-	//MRef<GroupList*>grpList;
-	
-	//shows the GroupList
-	//void showGroupList();
-	
 	
 };
 

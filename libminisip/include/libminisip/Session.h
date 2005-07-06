@@ -46,7 +46,6 @@
 #include<libmikey/keyagreement.h>
 class MediaStream;
 class SdpHeaderM;
-//class KeyAgreement;
 class IPAddress;
 class SessionRegistry;
 

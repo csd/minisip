@@ -37,11 +37,8 @@
 #endif
 
 
-#include<config.h>
-
-#include"SDESItem.h"
-
-using namespace std;
+#include<libminisip/SDESItem.h>
+#include<string>
 
 
 class LIBMINISIP_API SDES_NOTE : public SDESItem{
@@ -49,15 +46,12 @@ class LIBMINISIP_API SDES_NOTE : public SDESItem{
 		SDES_NOTE(void *buildfrom, int max_length);
 		virtual ~SDES_NOTE(){};
 
-//		vector<unsigned char> get_bytes();
 		int size();
 
-#ifdef DEBUG_OUTPUT
 		virtual void debug_print();
-#endif
 
 	private:
-		string note;
+		std::string note;
 };
 
 #endif

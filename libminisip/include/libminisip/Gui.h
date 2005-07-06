@@ -37,16 +37,13 @@
 #endif
 
 
-#include<config.h>
-//#include "../../conf/ConferenceControl.h"
-#include"GuiCallback.h"
+#include<libminisip/GuiCallback.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
 #include<libminisip/LogEntry.h>
 #include<libmutil/MemObject.h>
 
 
-//class SipDialogContainer;
 class SipSoftPhoneConfiguration;
 class ContactDb;
 

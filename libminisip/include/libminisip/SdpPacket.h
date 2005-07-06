@@ -50,7 +50,6 @@
 #include<vector>
 #include<libminisip/SdpPacket.h>
 #include<libminisip/SdpHeader.h>
-//#include<libmsip/CODECInterface.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
@@ -61,8 +60,6 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	public:
 		SdpPacket();
 		SdpPacket(std::string build_from);
-	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs);
-	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs, string key_mgmt);
 	
 		virtual std::string getMemObjectType(){return "SdpPacket";}
 		
@@ -75,7 +72,6 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 
 		std::vector<MRef<SdpHeader*> > getHeaders();
 		int32_t getCodecMatch(SdpPacket &pack);
-//		int32_t getCodecMatch(vector<CODECInterface *> codecs);
 		int32_t getFirstMediaFormat();
 		bool mediaFormatAvailable(int32_t f);
 		

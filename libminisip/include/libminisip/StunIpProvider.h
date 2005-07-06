@@ -37,7 +37,7 @@
 #endif
 
 
-#include"IpProvider.h"
+#include<libminisip/IpProvider.h>
 
 class IPAddress;
 class Gui;

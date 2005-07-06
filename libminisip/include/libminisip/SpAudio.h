@@ -55,31 +55,31 @@ class SoundSource;
 
 class LIBMINISIP_API SpAudio{
 
- public:
+public:
 
-  SpAudio(int32_t numPos);
-  
-
-  int32_t getNumPos();
-
-  int32_t spatialize (short *input,
-
-		      MRef<SoundSource *> src,
-		      short *outbuff);
+	SpAudio(int32_t numPos);
 
 
-  int32_t assignPos(int row,
-		    int col);
+	int32_t getNumPos();
 
-  static int32_t lchdelay[POS];
-  static int32_t rchdelay[POS];
+	int32_t spatialize (short *input,
 
-  static int32_t assmatrix[MAXSOURCES][MAXSOURCES];
+			MRef<SoundSource *> src,
+			short *outbuff);
 
- private:
 
-  int32_t nPos;
- 
+	int32_t assignPos(int row,
+			int col);
+
+	static int32_t lchdelay[POS];
+	static int32_t rchdelay[POS];
+
+	static int32_t assmatrix[MAXSOURCES][MAXSOURCES];
+
+private:
+
+	int32_t nPos;
+
 };
 
 #endif

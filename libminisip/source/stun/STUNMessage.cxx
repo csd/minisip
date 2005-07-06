@@ -25,6 +25,8 @@
 
 #include<libminisip/STUNMessage.h>
 
+#include<config.h>
+
 #ifdef _MSC_VER
 #include<winsock2.h>
 #include<io.h>
@@ -44,8 +46,8 @@ MessageHeader::MessageHeader(int type): messageType(type), messageLength(0){
 
 int MessageHeader::getData(unsigned char *buf){
 	uint16_t *p = (uint16_t *)buf;
-	p[0]=htons(messageType);
-	p[1]=htons(messageLength);
+	p[0]=hton16(messageType);
+	p[1]=hton16(messageLength);
 	for (int i=0; i<16; i++)
 		buf[4+i]=transactionID[i];
 	
@@ -84,9 +86,9 @@ const int STUNMessage::SHARED_SECRET_ERROR_RESPONSE=0x0112;
 STUNMessage::STUNMessage(unsigned char *data, int length): header(0)
 {
 	uint16_t *sptr = (uint16_t*)data;
-	header.setPayloadLength(ntohs(sptr[1]));	
+	header.setPayloadLength(ntoh16(sptr[1]));	
 	header.setTransactionID(&data[4]);
-	uint16_t type = ntohs(*sptr);
+	uint16_t type = ntoh16(*sptr);
 	header.setType(type);
 	
 	parseAttributes(&data[20], header.getPayloadLength());

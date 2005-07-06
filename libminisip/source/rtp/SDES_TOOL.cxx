@@ -23,12 +23,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/SDES_TOOL.h>
 
-#ifdef DEBUG_OUTPUT
+#include<config.h>
+
+#include<assert.h>
+
 #include<iostream>
-#endif
+
+using namespace std;
 
 SDES_TOOL::SDES_TOOL(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
@@ -58,10 +61,9 @@ int SDES_TOOL::size(){
 	return 2+tool.length()/*+npad*/;
 }
 
-#ifdef DEBUG_OUTPUT
 void SDES_TOOL::debug_print(){
 	cerr << "SDES TOOL:"<< endl;
 	cerr << "\tlength: "<< length << endl;
 	cerr << "\tname: "<< tool << endl;
 }
-#endif
+
