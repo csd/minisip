@@ -71,6 +71,7 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     
     state="IDLE";
     setPrompt("IDLE");
+    semSipReady = new Semaphore();
 }
 
 void MinisipTextUI::run(){
@@ -1255,6 +1256,20 @@ void MinisipTextUI::guiExecute(string cmd){
 
 void MinisipTextUI::setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig){
 	config = sipphoneconfig;       
+}
+
+void MinisipTextUI::setCallback(GuiCallback *callback){
+	Gui::setCallback(callback);
+	MRef<Semaphore *> localSem = semSipReady;
+	if( localSem ){
+		localSem->inc();
+	}
+}
+
+void MinisipTextUI::guimain(){
+	semSipReady->dec();
+	semSipReady = NULL;
+	TextUI::guimain();
 }
 
 

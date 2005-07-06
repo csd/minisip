@@ -93,7 +93,7 @@ public:
 	/**
 	 * Blocks and runs the gui
 	 */
-	void guimain();
+	virtual void guimain();
 
 	/**
 	 * Set the prompt of the UI

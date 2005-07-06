@@ -87,7 +87,7 @@ static int nonblockin_stdin()
 TextUI::TextUI() : maxHints(2000){
     if ( nonblockin_stdin()!=0){
         cerr << "ERROR: Could not make stdin non-blocking"<< endl;
-        exit(1);
+//        exit(1);
     }
 }
 
@@ -138,57 +138,61 @@ void TextUI::guimain(){
 	cout << promptText << "$ "<< flush;
 	while (1){
 		char c = ' ';
+		int err;
 #if defined WIN32 || defined _MSC_VER
 		c= _getch();
 #else
-		read(STDIN_FILENO, &c, 1);
+		err = read(STDIN_FILENO, &c, 1);
 #endif
-		keyPressed(c);
+		if(err > 0){
+			keyPressed(c);
 
 
-		string command;
-		string autocomplete;
-		unsigned i;
+			string command;
+			string autocomplete;
+			unsigned i;
 
-		switch(c){
-		case 9: autocomplete=displaySuggestions(input);
-			if (autocomplete.size()>0){
-				input=autocomplete;
-			}
+			switch(c){
+				case 9: autocomplete=displaySuggestions(input);
+					if (autocomplete.size()>0){
+						input=autocomplete;
+					}
 
-			cout << (char)13<<promptText<<"$ "<< termCodes[bold]<< input <<termCodes[plain] << flush;
-			break;
-		case 10:
-		case 13:
-			command = trim(input);
-			if (command.size()>0)
-				cout <<endl;
-			input="";
+					cout << (char)13<<promptText<<"$ "<< termCodes[bold]<< input <<termCodes[plain] << flush;
+					break;
+				case 10:
+				case 13:
+					command = trim(input);
+					if (command.size()>0)
+						cout <<endl;
+					input="";
 
-			if (command.size()==0){
-				displayMessage("");
-			}else{
-				guiExecute(command);
-			}
-			
-		case 8:
-		case 127:
-			input = input.substr(0, input.size()-1);
-			cout << (char)13<<promptText<< "$ ";
+					if (command.size()==0){
+						displayMessage("");
+					}else{
+						guiExecute(command);
+					}
 
-			for (i=0; i< input.size()+1; i++)
-				cout << ' ';
-			cout << (char)13<<promptText<<"$ ";
-			cout << termCodes[bold]<< input << termCodes[plain] << flush;
-			break;
+				case 8:
+				case 127:
+					input = input.substr(0, input.size()-1);
+					cout << (char)13<<promptText<< "$ ";
 
-		default:
-			//     @A-Z               a-z                  . / 0-9 :           space     .
-			if ( (c>=64 && c<=90) || (c>=97 && c<=122) || (c>=46 && c<=58) || c==32  || c=='-' || c=='_' || c=='.' ){
-				input+=c;
-				cout << termCodes[bold]<< c << termCodes[plain] << flush;
+					for (i=0; i< input.size()+1; i++)
+						cout << ' ';
+					cout << (char)13<<promptText<<"$ ";
+					cout << termCodes[bold]<< input << termCodes[plain] << flush;
+					break;
+
+				default:
+					//     @A-Z               a-z                  . / 0-9 :           space     .
+					if ( (c>=64 && c<=90) || (c>=97 && c<=122) || (c>=46 && c<=58) || c==32  || c=='-' || c=='_' || c=='.' ){
+						input+=c;
+						cout << termCodes[bold]<< c << termCodes[plain] << flush;
+					}
 			}
 		}
+//		else sleep(1);
 
 	}
 }

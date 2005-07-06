@@ -33,6 +33,7 @@
 #include"../../../p2t/P2T.h"
 #include<libmutil/TextUI.h>
 #include<libmutil/minilist.h>
+#include<libmutil/Semaphore.h>
 
 /**
  * A text user interface. 
@@ -54,9 +55,13 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 
 	virtual void run();
 
+ 	virtual void guimain();
+	virtual void setCallback(GuiCallback *callback);
+
 	virtual void keyPressed(int key);
 	virtual void guiExecute(string cmd);
 	virtual minilist<std::string> textuiCompletionSuggestion(string match);
+	std::string getMemObjectType(){return "MinisipTextUI";};
     private:
 	
         void showMem();
@@ -74,6 +79,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
         string state;
         MRef<SipSoftPhoneConfiguration *> config;
 	bool autoanswer;
+	MRef<Semaphore *> semSipReady;
 	
 	///indicates that the user is in a call and cannot answer any other incoming calls
 	bool inCall;
@@ -99,6 +105,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	
 	///shows a P2T help
 	void showP2TInfo();
+
 #endif
 };
 
