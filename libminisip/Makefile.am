@@ -1,12 +1,114 @@
-SUBDIRS = include
+SUBDIRS = include 
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libminisip.spec
+
+if VIDEO_SUPPORT
+  video_dir = video
+endif
+if IPSEC_SUPPORT
+  ipsec_dir = ipsec
+endif
+if P2T_SUPPORT
+  p2t_dir = p2t
+endif
 
 lib_LTLIBRARIES = libminisip.la
 libminisip_la_CPPFLAGS = $(CPPFLAGS) -I../include/libminisip
 
 libminisip_la_SOURCES = $(minisip_src)
 
-minisip_src =          source/File.cxx \
-                     source/File2.cxx
+minisip_src =          source/stun/STUN.cxx \
+		       source/stun/STUNMessage.cxx \
+		       source/stun/STUNTest.cxx \
+		       source/stun/STUNAttributes.cxx \
+		       source/rtp/CryptoContext.cxx \
+		       source/rtp/RtcpPacket.cxx \
+		       source/rtp/RtcpReport.cxx \
+		       source/rtp/RtcpReportReceptionBlock.cxx \
+		       source/rtp/RtcpReportRR.cxx \
+		       source/rtp/RtcpReportSDES.cxx \
+		       source/rtp/RtcpReportSenderInfo.cxx \
+		       source/rtp/RtcpReportSR.cxx \
+		       source/rtp/RtcpReportXR.cxx \
+		       source/rtp/RtpHeader.cxx \
+		       source/rtp/RtpPacket.cxx \
+		       source/rtp/SDESChunk.cxx \
+		       source/rtp/SDES_CNAME.cxx \
+		       source/rtp/SDES_EMAIL.cxx \
+		       source/rtp/SDESItem.cxx \
+		       source/rtp/SDES_LOC.cxx \
+		       source/rtp/SDES_NAME.cxx \
+		       source/rtp/SDES_NOTE.cxx \
+		       source/rtp/SDES_PHONE.cxx \
+		       source/rtp/SDES_TOOL.cxx \
+		       source/rtp/SRtpPacket.cxx \
+		       source/rtp/XRReportBlock.cxx \
+		       source/rtp/XRVoIPReportBlock.cxx \
+		       source/sdp/SdpHeaderA.cxx \
+		       source/sdp/SdpHeaderC.cxx \
+		       source/sdp/SdpHeader.cxx \
+		       source/sdp/SdpHeaderM.cxx \
+		       source/sdp/SdpHeaderO.cxx \
+		       source/sdp/SdpHeaderS.cxx \
+		       source/sdp/SdpHeaderT.cxx \
+		       source/sdp/SdpHeaderV.cxx \
+		       source/sdp/SdpPacket.cxx \
+		       source/mediahandler/AudioMedia.cxx \
+		       source/mediahandler/DtmfSender.cxx \
+		       source/mediahandler/KeyAgreement.cxx \
+		       source/mediahandler/Media.cxx \
+		       source/mediahandler/MediaCommandString.cxx \
+		       source/mediahandler/MediaHandler.cxx \
+		       source/mediahandler/MediaStream.cxx \
+		       source/mediahandler/RtpReceiver.cxx \
+		       source/mediahandler/Session.cxx \
+		       source/mediahandler/SessionRegistry.cxx \
+		       source/soundcard/AlsaCard.cxx \
+		       source/soundcard/AlsaSoundDevice.cxx \
+		       source/soundcard/DirectSoundDevice.cxx \
+		       source/soundcard/FileSoundDevice.cxx \
+		       source/soundcard/FileSoundSource.cxx \
+		       source/soundcard/OssSoundDevice.cxx \
+		       source/soundcard/SilenceSensor.cxx \
+		       source/soundcard/SoundDevice.cxx \
+		       source/soundcard/SoundIO.cxx \
+		       source/soundcard/SoundSource.cxx \
+		       source/spaudio/SpAudio.cxx \
+		       source/soundcard/resampler/FloatResampler.cxx \
+		       source/soundcard/resampler/Resampler.cxx \
+		       source/soundcard/resampler/SimpleResampler.cxx \
+		       source/codecs/Codec.h \
+		       source/codecs/G711CODEC.h \
+		       source/codecs/ILBCCODEC.h \
+		       source/codecs/SPEEXCODEC.h \
+		       source/sip/DefaultDialogHandler.cxx \
+		       source/sip/PresenceMessageContent.cxx \
+		       source/sip/Sip.cxx \
+		       source/sip/SipDialogConfVoip.cxx \
+		       source/sip/SipDialogPresenceClient.cxx \
+		       source/sip/SipDialogPresenceServer.cxx \
+		       source/sip/SipDialogSecurityConfig.cxx \
+		       source/sip/SipDialogVoip.cxx \
+		       source/sip/SipSoftPhoneConfiguration.cxx \
+		       source/ipprovider/IpProvider.cxx \
+		       source/ipprovider/SimpleIpProvider.cxx \
+		       source/ipprovider/StunIpProvider.cxx \
+		       source/conference/ConferenceControl.cxx \
+		       source/conference/ConfCallback.cxx \
+		       source/Bell.cxx \
+		       source/ConsoleDebugger.cxx \
+		       source/LogEntry.cxx \
+		       source/MessageRouter.cxx \
+		       source/Minisip.cxx \
+		       source/contactdb/ContactDb.cxx \
+		       source/contactdb/MXmlPhoneBookIo.cxx \
+		       source/contactdb/PhoneBook.cxx \
+		       source/Gui.cxx \
+		       source/GuiCallback.cxx
+		       
+		       
+		       
+
+
+
 
