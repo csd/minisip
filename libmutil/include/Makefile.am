@@ -25,5 +25,6 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/CondVar.h \
 			libmutil/Semaphore.h \
 			libmutil/CommandString.h \
-			libmutil/XMLParser.h \
-			config.h
+			libmutil/XMLParser.h
+			
+noinst_HEADERS = 	config.h

@@ -58,7 +58,9 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipResponse.h \
 		     libmsip/SipSubscribe.h \
 		     libmsip/SipDialog.h \
-		     libmsip/SipDialogRegister.h \
-		     config.h
+		     libmsip/SipDialogRegister.h
+		     
+		  
+noinst_HEADERS = 	config.h
 
 
