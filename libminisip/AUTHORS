@@ -1,0 +1,22 @@
+# The format of this file was inspired by the Linux kernel CREDITS file.
+# 
+# Authors and contributors are listed alphabetically (first name).
+# 
+# The fields are: name (N), email (E), web-address (W), CVS account login (C),
+# PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
+
+N: Erik Eliasson
+C: erik
+E: eliasson@it.kth.se
+D: Initial design
+
+N: Joachim Orrblad
+C: joachim
+E: joachim@orrblad.com
+D: IPSEC extensions
+
+N: Johan Bilien
+C: jobi
+E: jobi@via.ecp.fr
+D: MIKEY implementation
+
