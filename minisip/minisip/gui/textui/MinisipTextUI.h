@@ -61,7 +61,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	virtual void keyPressed(int key);
 	virtual void guiExecute(string cmd);
 	virtual minilist<std::string> textuiCompletionSuggestion(string match);
-	std::string getMemObjectType(){return "MinisipTextUI";};
+
     private:
 	
         void showMem();
