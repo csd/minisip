@@ -24,6 +24,8 @@ AC_PROG_YACC
 dnl AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
+AC_C_BIGENDIAN
+
 
 dnl STL
 dnl For now STL is made mandatory

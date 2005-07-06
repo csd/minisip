@@ -22,6 +22,8 @@ AC_PROG_YACC
 AC_PROG_RANLIB
 dnl AC_PROG_LIBTOOL
 
+AC_C_BIGENDIAN
+
 AC_LANG(C++)
 
 dnl HACK: QT is compiled, unless GTK or textui is
