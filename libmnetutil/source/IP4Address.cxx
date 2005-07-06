@@ -185,11 +185,11 @@ std::ostream& operator<<(std::ostream& out, IP4Address &a){
 	out << a.ipaddr;
 	
 	unsigned char ip[4];
-	uint32_t beIp = hton32(a.numIp);
-	ip[3] = (unsigned char)(beIp >> 24);
-	ip[2] = (unsigned char)(beIp >> 16);
-	ip[1] = (unsigned char)(beIp >>  8);
-	ip[0] = (unsigned char)(beIp);
+	//uint32_t beIp = hton32(a.numIp);
+	ip[0] = (unsigned char)(a.numIp >> 24);
+	ip[1] = (unsigned char)(a.numIp >> 16);
+	ip[2] = (unsigned char)(a.numIp >>  8);
+	ip[3] = (unsigned char)(a.numIp);
 	cerr << " (";
 
 	for (int32_t i=0; i<4; i++){
