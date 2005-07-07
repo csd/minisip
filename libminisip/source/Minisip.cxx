@@ -22,42 +22,12 @@
 
 #include<config.h>
 
-#ifndef _MSC_VER
-#include<unistd.h>
-#include<iostream>
-using namespace std;
-#endif
-
-
-/*
-#ifdef TEXT_UI
-#include"gui/textui/MinisipTextUI.h"
-#include<libmutil/TextUI.h>
-#else //!TEXT_UI
-#ifdef GTK_GUI
-#include"gui/gtkgui/MainWindow.h"
-#else //!GTK_GUI
-#include"gui/qtgui/MinisipMainWindowWidget.h"
-#include"gui/qtgui/qtguistarter.h"
-#include<qmessagebox.h>
-#endif //GTK_GUI
-#endif //TEXT_UI
-*/
-
-
-#include<libmutil/termmanip.h>
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipCommandString.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/TLSServerSocket.h>
-#include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
-#include<libmsip/SipMessageTransport.h>
 #include<libmikey/keyagreement_dh.h>
-#include<libminisip/ConsoleDebugger.h>
 #include<libminisip/Sip.h>
 #include<libminisip/LogEntry.h>
 #include<libminisip/ContactDb.h>
@@ -69,9 +39,8 @@ using namespace std;
 #include<libmsip/SipUtils.h>
 #include<exception>
 #include<libmutil/Timestamp.h>
-#include<libmutil/TextUI.h>
-
-//extern TextUI *debugtextui;
+#include<libmutil/termmanip.h>
+#include<stdlib.h>
 
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
@@ -93,12 +62,16 @@ static void signal_handler( int signal ){
 #endif
 
 
-Minisip::Minisip(MRef<Gui*> g, int argc, char**argv )
+Minisip::Minisip(MRef<Gui*> g, string configFile )
 	: gui(g)
 {
+	if (!g){
+		cerr << "Minisip::Minisip: Invalid argument: Gui is NULL"<< endl;
+		::exit(1);
+	}
 
-	if( argc == 2){
-		conffile = argv[1];
+	if( configFile.size()>0){
+		conffile = configFile;
 	}
 	else{
 		char *home = getenv("HOME");
@@ -144,12 +117,9 @@ Minisip::Minisip(MRef<Gui*> g, int argc, char**argv )
 #endif
 
 #ifdef DEBUG_OUTPUT
-	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
+	mout << BOLD << "init 1/9: Creating ContactDb" << PLAIN << end;
 #endif
-	cerr << "Creating timeout provider"<< endl;	
-//	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
-	cerr << "Creating ContactDb"<< endl;
         /* Create the global contacts database */
         ContactDb *contactDb = new ContactDb();
         ContactEntry::setDb(contactDb);
@@ -157,43 +127,7 @@ Minisip::Minisip(MRef<Gui*> g, int argc, char**argv )
 	//FIXME: move all this in a Gui::create()
 
 #ifdef DEBUG_OUTPUT
-        mout << BOLD << "init 2/9: NOT Creating GUI" << PLAIN << end;
-#endif
-
-#if 0
-	
-#ifdef TEXT_UI
-        ///*gui = */debugtextui = new MinisipTextUI();
-	cerr << "Creating TextUI"<< endl;
-
-	gui = new MinisipTextUI();
-//	gui = dynamic_cast<Gui*>(debugtextui);
-//	assert(gui);
-	//debugtextui = gui;
-	merr.setExternalHandler( dynamic_cast<MinisipTextUI*>(gui) );
-        LogEntry::handler = NULL;
-#else //!TEXT_UI
-#ifdef GTK_GUI
-
-        gui = new MainWindow( argc, argv );
-        LogEntry::handler = dynamic_cast<LogEntryHandler *>(gui);
-	
-	DbgHandler * dbgHandler = dynamic_cast<MainWindow *>( gui );
-	fprintf( stderr, "dbgHandler: %x\n", dbgHandler );
-	
-	
-
-#ifdef DEBUG_OUTPUT
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-	consoleDbg->startThread();
-#endif
-
-#else //!GTK_GUI
-        gui= guiFactory(argc, argv, timeoutProvider);
-	LogEntry::handler = NULL;
-#endif //GTK_GUI
-#endif //TEXT_UI
-	
+        mout << BOLD << "init 2/9: Setting contact db" << PLAIN << end;
 #endif
 
 	if (gui){
@@ -230,7 +164,7 @@ void Minisip::run(){
 	cerr << "Creating MessageRouter"<< endl;
 
 	try{
-		MessageRouter *ehandler =  new MessageRouter();
+		MessageRouter *messageRouter=  new MessageRouter();
 //		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT
@@ -259,7 +193,7 @@ void Minisip::run(){
                 mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
                 MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
-		ehandler->setMediaHandler( mediaHandler );
+		messageRouter->setMediaHandler( mediaHandler );
                 Session::registry = *mediaHandler;
                 /* Hack: precompute a KeyAgreementDH */
                 Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
@@ -283,15 +217,15 @@ void Minisip::run(){
 
                 phoneConf->sip = sip;
 
-                sip->getSipStack()->setCallback(ehandler);
+                sip->getSipStack()->setCallback(messageRouter);
 
-                ehandler->setSip(sip);
+                messageRouter->setSip(sip);
 
 #ifdef DEBUG_OUTPUT
                 mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
 #endif
                 gui->setSipSoftPhoneConfiguration(phoneConf);
-                ehandler->setGui(gui);
+                messageRouter->setGui(gui);
 
 //                Thread t(*sip);
 
@@ -354,7 +288,7 @@ void Minisip::run(){
 		sip->getSipStack()->handleCommand(sipcmd2);
 */
 		
-                gui->setCallback(ehandler);
+                gui->setCallback(messageRouter);
 //		sleep(5);
 		
 //		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
@@ -433,20 +367,8 @@ void Minisip::initParseConfig(){
 }
 
 void Minisip::startSip(){
-	cerr << "Creating thread"<< endl;
+	//cerr << "Creating thread"<< endl;
 	Thread( this );
 }
 
-void Minisip::runGui(){
-	gui->run();
-}
-
-#if 0
-int main( int argc, char ** argv ){ //REMOVEME
-	Minisip minisip(NULL, argc, argv );
-	minisip.startSip();
-	minisip.runGui();
-	minisip.exit();
-}
-#endif
 

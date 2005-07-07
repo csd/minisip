@@ -49,15 +49,22 @@ class ConferenceControl;
 
 class LIBMINISIP_API Minisip : public Runnable{
 	public:
-		Minisip(MRef<Gui*> gui, int argc, char**argv );
+
+		/**
+		 *
+		 * @param	configFile	File to read the settings
+		 *				from. If this file argument
+		 *				is an empty string, the
+		 *				default location for the
+		 *				user will be used.
+		 */
+		Minisip(MRef<Gui*> gui, string configFile="" );
 		virtual ~Minisip();
 		
 		std::string getMemObjectType(){return "Minisip";}
 
 		void exit();
 		void startSip();
-		void runGui();
-
 	private:
 		
 		virtual void run();
@@ -71,5 +78,7 @@ class LIBMINISIP_API Minisip : public Runnable{
 		MRef<Sip *> sip;
 		MRef<ConsoleDebugger *> consoleDbg;
 };
+
+#include<libminisip/ConsoleDebugger.h>
 
 #endif
