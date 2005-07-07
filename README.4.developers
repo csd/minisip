@@ -1,0 +1,87 @@
+
+_Coding_style_ - draft
+
+Indentation
+  Indentation must be done with tabs (spaces are now allowed). 
+  Tab space is eight.
+
+
+Class and member declarations
+  Class names begin with a capital letter. Different words
+  in a class name are separated with capital letters.
+
+  Method and attribute names start with a lower case letter.
+  
+  Example:
+  class SomeClass : public Base {
+  	public:
+  		SomeClass();
+		void someMethod();
+	  private:
+  		int attribute;
+  };
+
+  [EE: We are not consistent if we should indent the access modifiers with
+  a tab or not - I usually do so to make them not look like any label]
+
+
+Control structures
+
+  Example:
+  if (expression) {
+	  statements;
+  } else {
+	  statements;
+  }
+
+  for (expression; expression; expression) {
+	statements;
+  }
+
+  do {
+	statements;
+  } while (expression);
+
+  while (expression) {
+	statements;
+  }
+
+  switch (expression) {
+  	case constant:
+		statements;
+		break;
+	default:
+		statements;
+		break;
+  }
+
+
+Header files
+  Header files that is part of the API of a library must not include
+  "config.h".
+
+  Headers should be protected from problems occuring when a file is included
+  multiple times.
+  
+  Example (SomeFile.h):
+  {license here}
+  #ifndef SOMEFILE_H
+  #define SOMEFILE_H
+  {header definition here}
+  #endif
+  
+  [EE: assuming that the file name is unique in the namespace!]
+  
+  
+File names
+  C++ source files must use the suffix .cxx and header files .h.
+
+  Files should be named with the most general desciption first and
+  the most specific last (e.g. the opposite to web urls). 
+  Example:
+    SipUtils.h (good) 
+    UtilsSip.h (bad)
+  
+
+
+
