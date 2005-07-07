@@ -89,6 +89,21 @@ void ConsoleDebugger::run(){
 			case '*':
 				showMem();
 				break;
+
+
+                        case '\'':
+                                if ( !setDebugOutput(!getDebugOutputEnabled()) ){
+                                        cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
+                                }
+
+                                if (getDebugOutputEnabled()){
+                                        cerr << "Message on MObject destructor ON"<< endl;
+                                }else{
+                                        cerr << "Message on MObject destructor OFF "<< endl;
+
+                                }
+                                break;
+
 			default:
 				cerr << "Unknown command: "<< c << endl;
 			}
