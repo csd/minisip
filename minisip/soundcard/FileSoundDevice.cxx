@@ -81,7 +81,10 @@ SoundDevice("!notused_filesounddevice!"),
 }
 
 int FileSoundDevice::openRecord(int32_t samplerate, int nChannels, int format){
-	this->nChannelsRecord = nChannels;
+	if( nChannels > 1 ){
+		mdbg << "FileSoundDevice only supports recording on one channel." << end;
+	}
+	this->nChannelsRecord = 1;
 
 	in_fd=::open(in_file.c_str(), O_RDONLY);
 	if (in_fd==-1){
@@ -131,6 +134,8 @@ int FileSoundDevice::read(byte_t *buf, uint32_t n){
 	if (last_time==0){
 		last_time = mtime();
 	}
+
+	fprintf( stderr, "n: %i\n", n );
 
 	::read(in_fd, buf, n*2);
 	
