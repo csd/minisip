@@ -1247,6 +1247,7 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Preferences</property>
 		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="prefMenu" last_modification_time="Thu, 05 May 2005 16:52:40 GMT"/>
 		    </widget>
 		  </child>
 
@@ -1255,7 +1256,6 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Certificates settings</property>
 		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="on_certMenu_activate" last_modification_time="Mon, 07 Jun 2004 08:52:31 GMT"/>
 		    </widget>
 		  </child>
 
@@ -1270,6 +1270,7 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Quit</property>
 		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="menuQuit" last_modification_time="Thu, 05 May 2005 16:40:12 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -1282,7 +1283,6 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">View</property>
 	      <property name="use_underline">True</property>
-	      <signal name="activate" handler="on_viewMenu_activate" last_modification_time="Fri, 11 Jun 2004 11:58:40 GMT"/>
 
 	      <child>
 		<widget class="GtkMenu" id="viewMenu_menu">
@@ -1293,7 +1293,6 @@
 		      <property name="label" translatable="yes">Call list</property>
 		      <property name="use_underline">True</property>
 		      <property name="active">False</property>
-		      <signal name="activate" handler="on_callListMenu_activate" last_modification_time="Fri, 11 Jun 2004 11:58:40 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -1317,7 +1316,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image12">
+			<widget class="GtkImage" id="image18">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -1337,7 +1336,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image13">
+			<widget class="GtkImage" id="image19">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -1357,7 +1356,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image14">
+			<widget class="GtkImage" id="image20">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -1604,7 +1603,7 @@
   <property name="title" translatable="yes">Certificate settings</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
-  <property name="modal">True</property>
+  <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="decorated">True</property>
@@ -2180,7 +2179,6 @@
       <property name="visible">True</property>
       <property name="label" translatable="yes">Preferences</property>
       <property name="use_underline">True</property>
-      <signal name="activate" handler="on_prefTrayMenu_activate" last_modification_time="Tue, 08 Jun 2004 14:45:12 GMT"/>
     </widget>
   </child>
 
@@ -2189,7 +2187,6 @@
       <property name="visible">True</property>
       <property name="label" translatable="yes">Quit</property>
       <property name="use_underline">True</property>
-      <signal name="activate" handler="on_quitTrayMenu_activate" last_modification_time="Tue, 08 Jun 2004 15:05:39 GMT"/>
     </widget>
   </child>
 </widget>
@@ -2203,7 +2200,7 @@
       <property name="use_underline">True</property>
 
       <child internal-child="image">
-	<widget class="GtkImage" id="image8">
+	<widget class="GtkImage" id="image21">
 	  <property name="visible">True</property>
 	  <property name="stock">gtk-add</property>
 	  <property name="icon_size">1</property>
@@ -2223,7 +2220,7 @@
       <property name="use_underline">True</property>
 
       <child internal-child="image">
-	<widget class="GtkImage" id="image9">
+	<widget class="GtkImage" id="image22">
 	  <property name="visible">True</property>
 	  <property name="stock">gtk-add</property>
 	  <property name="icon_size">1</property>
@@ -2241,7 +2238,6 @@
       <property name="visible">True</property>
       <property name="label">gtk-remove</property>
       <property name="use_stock">True</property>
-      <signal name="activate" handler="on_phoneRemoveMenu_activate" last_modification_time="Fri, 16 Jul 2004 09:13:35 GMT"/>
     </widget>
   </child>
 
@@ -2250,7 +2246,6 @@
       <property name="visible">True</property>
       <property name="label" translatable="yes">Edit</property>
       <property name="use_underline">True</property>
-      <signal name="activate" handler="on_phoneEditMenu_activate" last_modification_time="Fri, 16 Jul 2004 09:13:35 GMT"/>
     </widget>
   </child>
 </widget>

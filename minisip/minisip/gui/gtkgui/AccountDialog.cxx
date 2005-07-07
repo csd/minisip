@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -33,7 +33,7 @@
 #endif
 
 
-AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", true ){
+AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", false ){
 	this->list = list;
 	Gtk::VBox * vbox = get_vbox();
 	Gtk::Table * table = new Gtk::Table( 7, 2, false );

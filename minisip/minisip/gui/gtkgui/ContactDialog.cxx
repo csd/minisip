@@ -25,7 +25,7 @@
 #include"../../contactdb/PhoneBook.h"
 
 
-ContactDialog::ContactDialog():Gtk::Dialog( "Contact information", true ){
+ContactDialog::ContactDialog():Gtk::Dialog( "Contact information", false ){
 	Gtk::VBox * vbox = get_vbox();//= new Gtk::VBox;
 	Gtk::Table * table = new Gtk::Table( 3, 2, false );
 
