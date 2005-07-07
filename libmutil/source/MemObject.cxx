@@ -137,3 +137,11 @@ bool setDebugOutput(bool on){
 #endif
 }
 
+bool getDebugOutputEnabled(){
+#ifdef MDEBUG
+	return outputOnDestructor;
+#else
+	return false;
+#endif
+}
+

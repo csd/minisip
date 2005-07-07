@@ -245,6 +245,8 @@ class LIBMUTIL_API MObject{
  */
 bool setDebugOutput(bool on);
 
+bool getDebugOutputEnabled();
+
 /**
  *
  * @return	Number of MObject objects currently allocated on
