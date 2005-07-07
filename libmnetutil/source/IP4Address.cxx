@@ -85,7 +85,7 @@ IP4Address::IP4Address(string addr){
 	setProtocolFamily(PF_INET);
 	struct in_addr ip_data;
 	if (inet_aton(addr.c_str(),&ip_data)){
-		numIp = ntoh32(ip_data);
+		numIp = ntoh32(ip_data.s_addr);
 	}else{
 
 		//unsigned char *ip;
