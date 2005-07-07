@@ -31,10 +31,11 @@
  * 
 */
 
+#include<libminisip/SdpHeaderA.h>
+
 #include<config.h>
 
 #include<assert.h>
-#include<libminisip/SdpHeaderA.h>
 
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>

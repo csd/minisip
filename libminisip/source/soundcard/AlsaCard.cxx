@@ -23,10 +23,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/AlsaCard.h>
+
 #include<config.h>
+
 #ifdef HAVE_LIBASOUND
 
-#include"AlsaCard.h"
 
 AlsaCard::AlsaCard( string cardname, string devname ):
 		cardName(cardname),

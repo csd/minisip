@@ -23,26 +23,20 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/ConferenceControl.h>
+
 #include<config.h>
 #include<assert.h>
 #include<stdio.h>
 #include<vector>
-#include<libminisip/ConferenceControl.h>
 #include<libminisip/MessageRouter.h>
 #include<libminisip/Gui.h>
-//#include"../minisip/gui/textui/MinisipTextUI.h"
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/CommandString.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
-//#include"../sip/DefaultDialogHandler.h"
-
-
-//extern TextUI *debugtextui;
-
-
 
 
 

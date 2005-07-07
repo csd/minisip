@@ -32,10 +32,11 @@
  * 
 */
 
+#include<libminisip/SipDialogVoip.h>
+
 #include<config.h>
 
 #include<assert.h>
-#include<libminisip/SipDialogVoip.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipBye.h>

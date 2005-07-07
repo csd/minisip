@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/LogEntry.h>
+
 #include<config.h>
 #include<string>
-#include<libminisip/LogEntry.h>
 
 using namespace std;
 

@@ -31,9 +31,10 @@
  * 
 */
 
+#include<libminisip/SdpPacket.h>
+
 #include<config.h>
 
-#include<libminisip/SdpPacket.h>
 #include<libmnetutil/IP4Address.h>
 
 #include<libmutil/trim.h>

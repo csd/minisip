@@ -34,6 +34,9 @@
 
 
 #include<libminisip/SipSoftPhoneConfiguration.h>
+
+#include<config.h>
+
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipMessageTransport.h>

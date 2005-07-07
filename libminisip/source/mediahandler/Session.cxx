@@ -24,8 +24,9 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include<config.h>
 #include<libminisip/Session.h>
+
+#include<config.h>
 #include<libminisip/MediaStream.h>
 #include<libminisip/Media.h>
 #include<libminisip/RtpReceiver.h>

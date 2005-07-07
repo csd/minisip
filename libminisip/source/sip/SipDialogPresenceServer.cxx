@@ -31,9 +31,11 @@
  * 
 */
 
+#include<libminisip/SipDialogPresenceServer.h>
+
+#include<config.h>
 
 #include<assert.h>
-#include<libminisip/SipDialogPresenceServer.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipSubscribe.h>

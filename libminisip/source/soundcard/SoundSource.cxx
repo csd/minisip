@@ -24,9 +24,10 @@
  *          Ignacio Sanchez Pardo <isp@kth.se>
 */
 
+#include<libminisip/SoundSource.h>
+
 #include<config.h>
 #include<iostream>
-#include<libminisip/SoundSource.h>
 #include<libmutil/mtime.h>
 
 #include<iostream>

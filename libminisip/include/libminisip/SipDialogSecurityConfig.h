@@ -38,6 +38,7 @@
 #define KEY_MGMT_METHOD_MIKEY_PSK       0x12
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
 
+#include<libmutil/MemObject.h>
 
 class XMLFileParser;
 class certificate_chain;

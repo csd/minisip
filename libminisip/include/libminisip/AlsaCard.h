@@ -43,19 +43,20 @@ extern "C"{
 
 #include<list>
 #include<iostream>
+#include<string>
 
 
-class LIBMINISIP_EXPORTS AlsaCard{
+class LIBMINISIP_API AlsaCard{
 	public:
-		AlsaCard( string cardname, string devname );
+		AlsaCard( std::string cardname, std::string devname );
 
-		string getCardName();
-		string getDevName();
+		std::string getCardName();
+		std::string getDevName();
 
-		static list<AlsaCard *> getCardList();
+		static std::list<AlsaCard *> getCardList();
 	private:
-		string cardName;
-		string devName;
+		std::string cardName;
+		std::string devName;
 };
 
 #endif

@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/MediaHandler.h>
+
 #include<config.h>
 #include<string.h>
 #include<libminisip/SdpPacket.h>
@@ -33,7 +35,6 @@
 #include<libminisip/Codec.h>
 #include<libminisip/Session.h>
 #include<libminisip/MediaStream.h>
-#include<libminisip/MediaHandler.h>
 #include<libminisip/Media.h>
 #include<libminisip/RtpReceiver.h>
 #include<libminisip/MediaCommandString.h>

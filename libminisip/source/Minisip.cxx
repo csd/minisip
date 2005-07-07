@@ -18,6 +18,7 @@
 
 
 
+#include<libminisip/Minisip.h>
 
 #include<config.h>
 
@@ -27,7 +28,6 @@
 using namespace std;
 #endif
 
-#include<libminisip/Minisip.h>
 
 /*
 #ifdef TEXT_UI

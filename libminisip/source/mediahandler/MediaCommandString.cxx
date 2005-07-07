@@ -24,10 +24,9 @@
 */
 
 
+#include<libminisip/MediaCommandString.h>
 
 #include<config.h>
-
-#include<libminisip/MediaCommandString.h>
 
 using namespace std;
 

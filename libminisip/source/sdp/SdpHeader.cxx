@@ -31,9 +31,10 @@
  * 
 */
 
+#include<libminisip/SdpHeader.h>
+
 #include<config.h>
 
-#include<libminisip/SdpHeader.h>
 
 SdpHeader::SdpHeader(int type, int prio):type(type),priority(prio){
 

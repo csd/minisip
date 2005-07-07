@@ -25,6 +25,8 @@
 
 #include<libminisip/AlsaSoundDevice.h>
 
+#include<config.h>
+
 using namespace std;
 
 

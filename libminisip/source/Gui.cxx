@@ -25,6 +25,8 @@
 
 #include<libminisip/Gui.h>
 
+#include<config.h>
+
 Gui::~Gui(){
 
 }

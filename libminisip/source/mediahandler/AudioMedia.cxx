@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/AudioMedia.h>
+
 #include<config.h>
 
-#include<libminisip/AudioMedia.h>
 #include<libminisip/RtpHeader.h>
 #include<libminisip/MediaStream.h>
 #include<libminisip/FileSoundSource.h>

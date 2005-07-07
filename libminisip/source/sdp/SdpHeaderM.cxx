@@ -31,9 +31,10 @@
  * 
 */
 
+#include<libminisip/SdpHeaderM.h>
+
 #include<config.h>
 
-#include<libminisip/SdpHeaderM.h>
 #include<libmutil/itoa.h>
 
 #ifdef DEBUG_OUTPUT

@@ -24,6 +24,9 @@
 */
 
 #include<libminisip/STUN.h>
+
+#include<config.h>
+
 #include<libminisip/STUNMessage.h>
 #include<libminisip/STUNTest.h>
 #include<libmutil/itoa.h>

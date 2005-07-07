@@ -24,6 +24,8 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include<libminisip/MediaStream.h>
+
 #include<config.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/keyagreement.h>
@@ -34,7 +36,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/print_hex.h>
-#include<libminisip/MediaStream.h>
 #include<libminisip/Media.h>
 #include<libminisip/RtpReceiver.h>
 #include<libminisip/Codec.h>

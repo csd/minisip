@@ -25,8 +25,9 @@
 
 #include<libminisip/OssSoundDevice.h>
 
-#ifndef DISABLE_OSS
 #include<config.h>
+
+#ifndef DISABLE_OSS
 
 #include<unistd.h>
 #include<errno.h>

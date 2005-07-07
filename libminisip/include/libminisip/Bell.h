@@ -41,6 +41,8 @@
 #include<signal.h>
 #include<string>
 
+#include<libmutil/MemObject.h>
+
 using namespace std;
 
 class LIBMINISIP_API Bell: public MObject{

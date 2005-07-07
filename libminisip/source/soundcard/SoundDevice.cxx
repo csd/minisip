@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/SoundDevice.h>
+
 #include<config.h>
 
-#include<libminisip/SoundDevice.h>
 #include<libminisip/FileSoundDevice.h>
 #ifndef WIN32
 #include<libminisip/OssSoundDevice.h>

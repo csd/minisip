@@ -23,8 +23,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include<libminisip/MessageRouter.h>
+
+#include<config.h>
+
+#include<assert.h>
 #include<libminisip/SipSoftPhoneConfiguration.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libminisip/DefaultDialogHandler.h>

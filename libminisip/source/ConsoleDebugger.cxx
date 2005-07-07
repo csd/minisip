@@ -19,6 +19,9 @@
 
 
 #include<libminisip/ConsoleDebugger.h>
+
+#include<config.h>
+
 #include<libmutil/termmanip.h>
 #include<libmutil/Thread.h>
 #include<iostream>

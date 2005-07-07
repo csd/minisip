@@ -45,6 +45,11 @@
 #define LIBMINISIP_API
 #endif
 
+#ifdef _MSC_VER
+typedef uint32_t unsigned int;
+#else
+#include<inttypes.h>
+#endif
 
 /**
  * @author Erik Eliasson

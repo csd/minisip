@@ -17,9 +17,10 @@
 */
 
 
+#include<libminisip/SipDialogSecurityConfig.h>
 
 #include<config.h>
-#include<libminisip/SipDialogSecurityConfig.h>
+
 #include<libmutil/cert.h>
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>

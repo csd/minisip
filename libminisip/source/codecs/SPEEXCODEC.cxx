@@ -22,11 +22,11 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
-#include<config.h>
 
 #ifdef HAS_SPEEX
 
 #include"SPEEXCODEC.h"
+#include<config.h>
 #include<assert.h>
 #include<iostream>
 

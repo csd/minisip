@@ -49,6 +49,13 @@
 #include<libminisip/SdpHeader.h>
 #include<vector>
 
+#ifdef _MSC_VER
+typedef uint32_t unsigned int;
+#else
+#include<inttypes.h>
+#endif
+
+
 class SdpHeaderA;
 
 class LIBMINISIP_API SdpHeaderM : public SdpHeader{

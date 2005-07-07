@@ -33,14 +33,7 @@
  * --Erik Eliasson, eliasson@it.kth.se
  */
 
-
-/*
- * Sample=
- *
- *
- *
- *
-*/
+#include<libminisip/SoundIO.h>
 
 #include<config.h>
 
@@ -51,7 +44,6 @@
 #include<iostream>
 #include<stdio.h>
 
-#include<libminisip/SoundIO.h>
 #include<assert.h>
 #include<signal.h>
 #include<libmutil/itoa.h>

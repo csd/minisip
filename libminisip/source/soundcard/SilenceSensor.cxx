@@ -26,6 +26,8 @@
 
 #include<libminisip/SilenceSensor.h>
 
+#include<config.h>
+
 static int iabs(int i){
     if (i<0)
         return -i;

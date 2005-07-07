@@ -25,10 +25,11 @@
 	Max Loubser <loubser[at]kth.se>
 */
  
+#include<libminisip/SipDialogConfVoip.h>
+
 #include<config.h>
 
 #include<assert.h>
-#include<libminisip/SipDialogConfVoip.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipBye.h>

@@ -31,9 +31,10 @@
  * 
 */
 
+#include<libminisip/SdpHeaderC.h>
+
 #include<config.h>
 
-#include<libminisip/SdpHeaderC.h>
 #include<libmutil/itoa.h>
 #include<iostream>
 

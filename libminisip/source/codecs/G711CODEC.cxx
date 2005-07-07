@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/G711CODEC.h>
+
 #include<config.h>
 
-#include"G711CODEC.h"
 #include"g711/codec_g711.h"
 #include<assert.h>
 #include<iostream>

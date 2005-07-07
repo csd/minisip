@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/RtcpReportRR.h>
+
 #include<config.h>
 
-#include<libminisip/RtcpReportRR.h>
 #include<iostream>
 
 RtcpReportRR::RtcpReportRR(unsigned sender_ssrc): RtcpReport(201),sender_ssrc(sender_ssrc){

@@ -31,9 +31,10 @@
  * 
 */
 
+#include<libminisip/SdpHeaderV.h>
+
 #include<config.h>
 
-#include<libminisip/SdpHeaderV.h>
 #include<libmutil/itoa.h>
 
 using namespace std;

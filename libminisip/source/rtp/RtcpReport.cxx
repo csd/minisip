@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/RtcpReport.h>
+
 #include<config.h>
 
-#include<libminisip/RtcpReport.h>
 #include<libminisip/RtcpReportSR.h>
 #include<libminisip/RtcpReportRR.h>
 #include<libminisip/RtcpReportSDES.h>

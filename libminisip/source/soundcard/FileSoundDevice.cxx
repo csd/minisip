@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
+#include<libminisip/FileSoundDevice.h>
+
 #include<config.h>
 
 #include<sys/types.h>
@@ -45,7 +47,6 @@
 #endif
 
 #include<libminisip/SoundDevice.h>
-#include<libminisip/FileSoundDevice.h>
 
 #ifdef WIN32
 #include<winsock2.h>

@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/RtpReceiver.h>
+
 #include<config.h>
 
-#include<libminisip/RtpReceiver.h>
 #include<libminisip/MediaStream.h>
 #include<libminisip/IpProvider.h>
 #include<libmnetutil/NetworkException.h>

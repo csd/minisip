@@ -25,12 +25,13 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include<libminisip/CryptoContext.h>
+
 #include<config.h>
 
 #include<iostream>
 
 #include<assert.h>
-#include<libminisip/CryptoContext.h>
 #include<libmutil/print_hex.h>
 #include<libmikey/MikeyPayloadSP.h>
 

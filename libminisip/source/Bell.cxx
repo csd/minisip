@@ -23,9 +23,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 
 #include<libminisip/Bell.h>
+
+#include<config.h>
+
 #include<stdlib.h>
 #include<stdio.h>
 #include<signal.h>

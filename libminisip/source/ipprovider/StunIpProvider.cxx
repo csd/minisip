@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include<libminisip/StunIpProvider.h>
+
+#include<config.h>
 #include<libminisip/Gui.h>
 #include<libminisip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/IPAddress.h>

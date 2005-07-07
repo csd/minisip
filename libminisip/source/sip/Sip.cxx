@@ -26,6 +26,8 @@
 
 #include<libminisip/Sip.h>
 
+#include<config.h>
+
 #include<libminisip/DefaultDialogHandler.h>
 #include<libminisip/MediaHandler.h>
 #include<libmsip/SipMessageTransport.h>

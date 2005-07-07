@@ -25,6 +25,8 @@
 
 #include<libminisip/DirectSoundDevice.h>
 
+#include<config.h>
+
 using namespace std;
 
 DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){

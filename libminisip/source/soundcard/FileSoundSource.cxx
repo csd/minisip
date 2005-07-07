@@ -24,6 +24,9 @@
 */
 
 #include<libminisip/FileSoundSource.h>
+
+#include<config.h>
+
 #include<fstream>
 #include<libmutil/print_hex.h>
 

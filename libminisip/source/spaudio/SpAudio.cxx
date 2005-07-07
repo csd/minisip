@@ -23,11 +23,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/SpAudio.h>
 
 #include<config.h>
+
 #include<assert.h>
 #include<iostream>
-#include<libminisip/SpAudio.h>
 #include<libminisip/SoundIO.h>
 #include<libmutil/MemObject.h>
 

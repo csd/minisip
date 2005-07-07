@@ -39,6 +39,13 @@
 #include<libmutil/MemObject.h>
 #include<string>
 
+#ifdef _MSC_VER
+typedef uint32_t unsigned int;
+#else
+#include<inttypes.h>
+#endif
+
+
 using namespace std;
 
 class ContactDb;

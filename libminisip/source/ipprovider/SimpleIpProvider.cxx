@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include<libminisip/SimpleIpProvider.h>
+
+#include<config.h>
 #include<libminisip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/UDPSocket.h>

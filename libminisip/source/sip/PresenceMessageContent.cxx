@@ -19,6 +19,8 @@
 
 #include<libminisip/PresenceMessageContent.h>
 
+#include<config.h>
+
 MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &buf, const string &ContentType){
 	        return new PresenceMessageContent(buf);
 }

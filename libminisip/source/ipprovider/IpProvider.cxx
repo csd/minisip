@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include<libminisip/IpProvider.h>
+
+#include<config.h>
 #include<libminisip/SimpleIpProvider.h>
 #include<libminisip/StunIpProvider.h>
 #include<libminisip/Gui.h>

@@ -36,6 +36,11 @@
 #define LIBMINISIP_API
 #endif
 
+#ifdef _MSC_VER
+typedef uint8_t unsigned char;
+#else
+#include<inttypes.h>
+#endif
 
 #include<libmutil/MemObject.h>
 

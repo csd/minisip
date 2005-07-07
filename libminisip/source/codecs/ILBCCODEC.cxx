@@ -23,11 +23,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include"ILBCCODEC.h"
+
+#include<config.h>
 
 #include"ilbc/iLBC_define.h"
 #include"ilbc/iLBC_encode.h"
 #include"ilbc/iLBC_decode.h"
-#include"ILBCCODEC.h"
 #include<assert.h>
 
 ILBCCODEC::ILBCCODEC(){

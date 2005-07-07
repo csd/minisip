@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include<libminisip/SessionRegistry.h>
+
+#include<config.h>
 #include<libminisip/Session.h>
 #include<libminisip/MediaStream.h>
 

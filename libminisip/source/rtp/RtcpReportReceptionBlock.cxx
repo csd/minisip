@@ -23,9 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/RtcpReportReceptionBlock.h>
+
 #include<config.h>
 
-#include<libminisip/RtcpReportReceptionBlock.h>
 #include<stdlib.h>
 #include<iostream>
 

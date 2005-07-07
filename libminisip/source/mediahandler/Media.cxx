@@ -23,8 +23,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include<libminisip/Media.h>
+
+#include<config.h>
 #include<libminisip/Codec.h>
 #include<libminisip/SoundIO.h>
 #include<libminisip/IpProvider.h>

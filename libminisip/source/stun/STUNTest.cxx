@@ -26,6 +26,8 @@
 
 #include<libminisip/STUNTest.h>
 
+#include<config.h>
+
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
 //#include<sys/poll.h>

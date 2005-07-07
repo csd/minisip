@@ -23,11 +23,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libminisip/Codec.h>
+
 #include<config.h>
-#include"Codec.h"
-#include"G711CODEC.h"
-#include"ILBCCODEC.h"
-#include"SPEEXCODEC.h"
+#include<libminisip/G711CODEC.h>
+#include<libminisip/ILBCCODEC.h>
+#include<libminisip/SPEEXCODEC.h>
 
 MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
         switch( payloadType ){
