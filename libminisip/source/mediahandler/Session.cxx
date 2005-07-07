@@ -17,7 +17,7 @@
 */
 
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -201,12 +201,9 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = ((SdpHeaderM*)*(answer->getHeaders()[i]));
-                        cerr << "trying media line " << m->getString() << endl;
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
-                                if( receiver )
-                                        cerr << "Found receiver!" << endl;
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
 					receiver->disabled = true;

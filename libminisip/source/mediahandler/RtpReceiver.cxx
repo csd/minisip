@@ -86,9 +86,7 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 }
 
 void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
-			    cerr << "Before taking lock" << endl;
 	mediaStreamsLock.lock();
-			    cerr << "After taking lock" << endl;
 	mediaStreams.remove( mediaStream );
 	mediaStreamsLock.unlock();
 }
