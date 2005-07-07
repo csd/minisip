@@ -53,6 +53,8 @@ typedef int32_t int;
 #include<inttypes.h>
 #endif
 
+
+
 using namespace std;
 
 
@@ -78,7 +80,7 @@ class LIBMINISIP_API AudioCodec : public Codec{
 		 * @returns A CODEC instance for the given payloadType
 		 * (NULL if not handled)
 		 */
-		static MRef<AudioCodec *> create( unsigned char payloadType );
+		static MRef<AudioCodec *> create( uint8_t payloadType );
 		
                 /**
 		 * @returns A CODEC instance for the given description string

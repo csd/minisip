@@ -53,13 +53,15 @@ pkginclude_HEADERS =    libminisip/STUN.h \
 			libminisip/SoundDevice.h \
 			libminisip/SoundIO.h \
 			libminisip/SoundSource.h \
+			libminisip/SoundRecorderCallback.h \
+			libminisip/SoundIOPLCInterface.h \
 			libminisip/SpAudio.h \
 			libminisip/FloatResampler.h \
 			libminisip/Resampler.h \
 			libminisip/SimpleResampler.h \
 			libminisip/Codec.h \
 			libminisip/G711CODEC.h \
-			libminisip/ILBCCODEC.h \
+			libminisip/codec_g711.h \
 			libminisip/SPEEXCODEC.h \
 			libminisip/DefaultDialogHandler.h \
 			libminisip/PresenceMessageContent.h \

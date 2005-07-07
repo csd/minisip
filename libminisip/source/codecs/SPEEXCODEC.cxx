@@ -23,10 +23,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifdef HAS_SPEEX
 
-#include"SPEEXCODEC.h"
+#include<libminisip/SPEEXCODEC.h>
 #include<config.h>
+
+#ifdef HAS_SPEEX
 #include<assert.h>
 #include<iostream>
 

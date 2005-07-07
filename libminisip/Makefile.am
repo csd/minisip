@@ -15,7 +15,21 @@ endif
 lib_LTLIBRARIES = libminisip.la
 libminisip_la_CPPFLAGS = $(CPPFLAGS) -I../include/libminisip
 
-libminisip_la_SOURCES = $(minisip_src)
+libminisip_la_SOURCES = $(minisip_src) $(sound_src)
+
+
+
+if HAVE_LIBASOUND
+sound_src = source/soundcard/AlsaSoundDevice.cxx source/soundcard/OssSoundDevice.cxx
+else !HAVE_LIBASOUND
+if DIRECT_SOUND
+sound_src = source/soundcard/DirectSoundDevice.cxx
+else !DIRECT_SOUND
+sound_src = source/soundcard/OssSoundDevice.cxx
+endif !DIRECT_SOUND
+endif !HAVE_LIBASOUND
+
+
 
 minisip_src =          source/stun/STUN.cxx \
 		       source/stun/STUNMessage.cxx \
@@ -64,11 +78,8 @@ minisip_src =          source/stun/STUN.cxx \
 		       source/mediahandler/Session.cxx \
 		       source/mediahandler/SessionRegistry.cxx \
 		       source/soundcard/AlsaCard.cxx \
-		       source/soundcard/AlsaSoundDevice.cxx \
-		       source/soundcard/DirectSoundDevice.cxx \
 		       source/soundcard/FileSoundDevice.cxx \
 		       source/soundcard/FileSoundSource.cxx \
-		       source/soundcard/OssSoundDevice.cxx \
 		       source/soundcard/SilenceSensor.cxx \
 		       source/soundcard/SoundDevice.cxx \
 		       source/soundcard/SoundIO.cxx \
@@ -77,10 +88,10 @@ minisip_src =          source/stun/STUN.cxx \
 		       source/soundcard/resampler/FloatResampler.cxx \
 		       source/soundcard/resampler/Resampler.cxx \
 		       source/soundcard/resampler/SimpleResampler.cxx \
-		       source/codecs/Codec.h \
-		       source/codecs/G711CODEC.h \
-		       source/codecs/ILBCCODEC.h \
-		       source/codecs/SPEEXCODEC.h \
+		       source/codecs/Codec.cxx \
+		       source/codecs/G711CODEC.cxx \
+		       source/codecs/g711/codec_g711.cxx \
+		       source/codecs/SPEEXCODEC.cxx \
 		       source/sip/DefaultDialogHandler.cxx \
 		       source/sip/PresenceMessageContent.cxx \
 		       source/sip/Sip.cxx \

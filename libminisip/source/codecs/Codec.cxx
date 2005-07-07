@@ -27,15 +27,15 @@
 
 #include<config.h>
 #include<libminisip/G711CODEC.h>
-#include<libminisip/ILBCCODEC.h>
+//#include<libminisip/ILBCCODEC.h>
 #include<libminisip/SPEEXCODEC.h>
 
 MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
         switch( payloadType ){
                 case 0:
                         return new G711CODEC();
-		case 97:
-			return new ILBCCODEC();
+//		case 97:
+//			return new ILBCCODEC();
 #ifdef HAS_SPEEX
 		case 114: 
 			return new SPEEXCODEC();
@@ -50,9 +50,9 @@ MRef<AudioCodec *> AudioCodec::create( const std::string & description ){
                 return new G711CODEC();
         }
         
-        if( description == "iLBC" ){
-                return new ILBCCODEC();
-        }
+//        if( description == "iLBC" ){
+//                return new ILBCCODEC();
+//        }
         
 #ifdef HAS_SPEEX
         if( description == "speex" ){

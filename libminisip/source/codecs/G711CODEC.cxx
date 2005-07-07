@@ -27,7 +27,7 @@
 
 #include<config.h>
 
-#include"g711/codec_g711.h"
+#include<libminisip/codec_g711.h>
 #include<assert.h>
 #include<iostream>
 

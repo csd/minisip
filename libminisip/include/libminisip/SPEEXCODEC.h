@@ -36,14 +36,16 @@
 #define LIBMINISIP_API
 #endif
 
+#include<libminisip/Codec.h>
 
-#ifdef HAS_SPEEX
+//#ifdef HAS_SPEEX
 #include<speex/speex.h> 
 #define     MAX_NB_BYTES  1024
 
 class LIBMINISIP_API SPEEXCODEC : public AudioCodec{
 	public:
 		SPEEXCODEC();
+
 		virtual ~SPEEXCODEC();
 		/**
 		 * @returns Number of bytes in output buffer
@@ -100,6 +102,6 @@ class LIBMINISIP_API SPEEXCODEC : public AudioCodec{
 		
 };
 
-#endif //HAS_SPEEX
+//#endif //HAS_SPEEX
 
 #endif
