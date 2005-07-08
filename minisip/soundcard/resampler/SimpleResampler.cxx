@@ -39,6 +39,7 @@ SimpleResampler::SimpleResampler( uint32_t inputFreq, uint32_t outputFreq,
 	this->nChannels = nChannels;
 
 	previousFrame = new short[ nChannels ];
+	memset( previousFrame, '\0', nChannels * sizeof( short ) );
 
 }
 

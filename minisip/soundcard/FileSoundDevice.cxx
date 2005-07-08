@@ -135,8 +135,6 @@ int FileSoundDevice::read(byte_t *buf, uint32_t n){
 		last_time = mtime();
 	}
 
-	fprintf( stderr, "n: %i\n", n );
-
 	::read(in_fd, buf, n*2);
 	
 	uint64_t t = mtime();

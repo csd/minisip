@@ -271,101 +271,9 @@ AC_ARG_ENABLE(dsound,
 
 AM_CONDITIONAL(DIRECT_SOUND, [test "${enable_dsound}" = "yes"])
 
-dnl TEXT UI
-AC_ARG_ENABLE(textui,
-    [ --enable-textui enables the text based user interface (default disabled)],
-    [ if test "${enable_textui}" = "yes"
-      then
-	  AC_DEFINE(TEXT_UI, [], [Use the text based user interface])
-          QTGUI="no"
-	  enable_gtk="no"
-	  
-      fi ])
-AM_CONDITIONAL(TEXT_UI, [test "${enable_textui}" = "yes"])
-
-dnl Qt GUI
-AC_ARG_ENABLE(qtui,
-    [ --enable-qtui enables the Qt based user interface (default disabled)],
-    [ if test "${enable_qtui}" = "yes"
-      then
-	  AC_DEFINE(QT_GUI, [], [Use the Qt based user interface])
-          QTGUI="yes"
-	  enable_gtk="no"
-	  
-      fi ])
-AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
-
-
-dnl GTK GUI
-AC_ARG_ENABLE(gtk,
-    [ --disable-gtk disables the GTK interface (default enabled).])
-
-if test "x${enable_gtk}" != "xno"
-  then
-    PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
-      [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])],
-      [PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
-        [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
-	 AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])],
-        [AC_MSG_ERROR([Could not find the glademm-2.0 library])]
-      )]
-    )
-    QTGUI="no"
-fi
-
-AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
-
-
-
-
-
-QT="qt"
-
-dnl QT embedded
-AC_ARG_ENABLE(qte,
-    [ --enable-qte enables Qt Embedded support (default disabled)],
-    [ if test "${enable_qte}" = "yes"
-      then
-      	QT="qte"
-	CXXFLAGS="${CXXFLAGS} -fno-rtti"
-	AC_DEFINE(QWS, [], [Use Qt Embedded windowing system])
-	dnl For some reason the openssl libs I cross-compiled require this
-	LDFLAGS="${LDFLAGS} -ldl"
-	
-      fi ])
 
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-
-
-if test "${QTGUI}" = "yes"
-then
-
-dnl Set the QTDIR directory
-AC_ARG_WITH(qtdir,
-    [ --with-qtdir=DIR QT installation directory (default /usr)],
-    [ if test "${with_qtdir}" != "no"
-      then
-        QTDIR="${with_qtdir}"
-      fi ])
-
-if test -z "${QTDIR}"; then
-  QTDIR="/usr"
-fi
-
-CPPFLAGS="${CPPFLAGS} -I`pwd`/include -I${QTDIR}/include"
-
-
-dnl Look for the QT moc program
-
-MOC_PATH="${QTDIR}/bin:${PATH}"
-AC_PATH_PROG(MOC, moc, no, ${MOC_PATH} )
-if test "${MOC}" = "no"
-then
-  AC_MSG_ERROR([Could not find the moc program, required for the QT interface. You may supply the QT installation directory with --with-qtdir=])
-fi
-AC_SUBST(MOC)
-fi
 
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
@@ -394,62 +302,12 @@ AC_CHECK_LIB([resolv], [main])
 dnl FIXME: Replace `main' with a function in `-lssl':
 AC_CHECK_LIB([ssl], [main])
 
-
-dnl Check for QT libraries
-if test "${QTGUI}" = "yes"
-then
-AC_CHECK_LIB([${QT}-mt], [main], ,[
-  AC_CHECK_LIB([${QT}], [main], ,[
-    AC_MSG_ERROR([Could not find the QT libraries])
-  ],[-L${QTDIR}/lib -lstdc++])
-],[-L${QTDIR}/lib -lstdc++])
-
-QT_LIB_LOCATION="${QTDIR}/lib"
-AC_SUBST(QT_LIB_LOCATION)
-fi
-
-dnl Check for the QT headers
-if test "${QTGUI}" = "yes"
-then
-dnl Self installed case
-AC_CHECK_HEADER(qapplication.h,[QT_INCLUDE="${QTDIR}/include"],
-  [
-dnl "Usual" case I guess
-  AC_CHECK_HEADER(qt/qapplication.h,[QT_INCLUDE="${QTDIR}/include/qt"],
-   [ 
-dnl Debian case
-    AC_CHECK_HEADER(qt3/qapplication.h,[QT_INCLUDE="${QTDIR}/include/qt3"],AC_MSG_ERROR(["Could not find the QT headers. You may specify your QT installation directory with --with-qtdir="]))
-    ])
-  ])
-AC_SUBST(QT_INCLUDE)
-fi
-
-
 dnl libmutil headers check
 AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/library. Try installing the libmutil-devel package for your distribution."])])
 
 
 dnl libmikey headers check
 AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey headers. Try installing the libmikey-devel package for your distribution."])])
-
-
-dnl OPIE
-AC_ARG_ENABLE(opie,
-    [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
-    [ if test "${enable_opie}" = "yes"
-      then
-	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"
-        AC_CHECK_LIB([qpe], [main],,
-           [AC_MSG_ERROR([Could not find the QPE library])]
-	)
-        AC_CHECK_LIB([opie], [main],,
-           [AC_MSG_ERROR([Could not find the OPIE library])]
-	)
-        AC_DEFINE(OPIE, [], [Use OPIE library])
-	CPPFLAGS="${CPPFLAGS} -I${OPIEDIR}/include"
-      fi ])
-
-
 
 
 dnl Checks for header files.
