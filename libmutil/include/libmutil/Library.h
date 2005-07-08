@@ -31,14 +31,23 @@
  * Implements support for run-time linking of libraries on MS Windows and
  * systems having the dlopen/dlsym functions.
  * @author Erik Eliasson, eliasson@imit.kth.se
+ * @author Johan Bilien, jobi@via.ecp.fr
  */
 class Library : public MObject{
 public:
 	/**
 	 * Opens a library.
 	 * @param path	File name/path to a library that will be opened.
+	 * @returns a reference to the resulting Library object, or NULL
+	 *  if the opening failed.
 	 */
-	Library(std::string path);
+	static MRef<Library *> open(const std::string &path);
+
+	/**
+	 * Opens a library.
+	 * @param path	File name/path to a library that will be opened.
+	 */
+	Library(const std::string &path);
 
 	/**
 	 * Closes the library
@@ -53,6 +62,11 @@ public:
 	void *getFunctionPtr(std::string name);
 
 	/**
+	 * @returns the file name from which the library was loaded.
+	 */
+	const std::string &getPath();
+
+	/**
 	 * Defined in MObject. Used only for monitoring/debugging.
 	 */
 	std::string getMemObjectType(){ return "Library"; }
@@ -61,6 +75,7 @@ private:
 	void *handle;	///Pointer to internal data structure
 			///that is different on different 
 			///platforms.
+	const std::string &path; // file name from which the library was opened.
 	
 };
 

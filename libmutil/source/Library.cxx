@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Library::Library(string path){
+Library::Library(const string &path):path(path){
 #ifdef _MSC_VER
 	assert(sizeof(FARPROC)==sizeof(void*));
 	handle = new HMODULE;
@@ -46,4 +46,14 @@ void *Library::getFunctionPtr(string name){
 #endif
 }
 
+MRef<Library *> Library::open(const string &path){
+	MRef<Library *> ret = new Library(path);
+	if(ret->handle){
+		return ret;
+	}
+	return NULL;
+}
 
+const string &Library::getPath(){
+	return path;
+}

@@ -29,5 +29,6 @@ mutil_src =         source/aes.cxx \
                     source/CondVar.cxx \
                     source/Semaphore.cxx \
                     source/CommandString.cxx \
-                    source/XMLParser.cxx
+                    source/XMLParser.cxx \
+		    source/MPlugin.cxx
 
