@@ -62,7 +62,6 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 	//content = initstr;
 	MRef<SdpHeaderM *> lastM=NULL;
 	MRef<SdpHeaderA *> attr=NULL;
-	mdbg << build_from <<end;
 	vector<string> lines = split_in_lines(build_from); 
 	for (uint32_t i=0; i< lines.size(); i++){
 		switch (lines[i][0]){

@@ -36,6 +36,8 @@
 
 #include<libmsip/SipHeaderContact.h>
 
+#include<libmsip/SipDialogConfig.h> //needed for the DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS define ...
+
 MRef<SipHeaderValue *> contactFactory(const string &build_from){
 	                return new SipHeaderValueContact(build_from);
 }
@@ -50,7 +52,7 @@ SipHeaderValueContact::SipHeaderValueContact()
 	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","",0)
 {
 	featuretag= "";
-	expires=1000;
+	expires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
@@ -71,7 +73,7 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 	setUri(u);
 	
 	featuretag="";
-	expires=1000;
+	expires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	//merr << "SipHeaderValueContact::getString: uri="<< uri <<end;
 }
 
@@ -139,6 +141,6 @@ int SipHeaderValueContact::getExpires() {
 void SipHeaderValueContact::setExpires(int _expires){
 	if( _expires >= 0 && _expires < 100000 ) 
 		this->expires = _expires;
-	else this->expires = 1000;
+	else this->expires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 

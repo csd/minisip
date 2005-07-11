@@ -236,18 +236,24 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				string proxyPass = parser->getValue(accountPath +"proxy_password", "");
 				ident->sipProxy.sipProxyPassword = proxyPass;
 
+				string registerExpires = parser->getValue(accountPath +"register_expires", "");
+				if (registerExpires != ""){
+					ident->sipProxy.setRegisterExpires( registerExpires );
+					cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << registerExpires << endl;
+				} else {
+					cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
+				}
+				
 				if (parser->getValue(accountPath + "pstn_account","")=="yes"){
 					pstnIdentity = ident;
 					usePSTNProxy = true;
 					ident->securitySupport = false;
 				}
 
-
-
 				if (parser->getValue(accountPath + "default_account","")=="yes"){
 					inherited->sipIdentity = ident;
 				}
-
+				
 				identities.push_back(ident);
 
 			}
@@ -430,4 +436,16 @@ static void installConfigFile(string filename){
 
 }
 
+
+MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
+	list< MRef<SipIdentity*> >::iterator it;
+	merr << "SipSoftPhoneConfiguration::getIdentity : looking for an identity ... " << end;
+	for( it = identities.begin(); it!=identities.end(); it++ ) {
+		if( (*it)->getId() == id ) {
+			return (*it);
+		}
+	}
+	merr << "SipSoftPhoneConfiguration::getIdentity : identity not found!" << end;
+	return NULL;
+}
 

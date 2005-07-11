@@ -71,6 +71,8 @@
 #define KEY_MGMT_METHOD_MIKEY_PSK       0x12
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
 
+#define DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS 1000
+
 #include<string>
 
 using namespace std;
@@ -78,7 +80,7 @@ using namespace std;
 
 class LIBMSIP_API SipProxy{
 	public:
-		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0; registerExpires=1000;}
+		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0; registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;}
 
 		SipProxy(string addr){
 			assert(addr.find("@")==string::npos);
@@ -93,12 +95,12 @@ class LIBMSIP_API SipProxy{
 			}
 
 			sipProxyIpAddr = new IP4Address(addr);
-			registerExpires=1000;
+			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 		
 		SipProxy(string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
 			sipProxyIpAddr = new IP4Address(addr);
-			registerExpires=1000;
+			registerExpires=SipProxy::defaultExpires;
 		}
 
 		void setProxy(string proxy, int port){
@@ -139,9 +141,9 @@ class LIBMSIP_API SipProxy{
 		}
 		
 		void setRegisterExpires( int _expires ) {
-			if( _expires >= 0 && _expires < 100000 ) 
+			if( _expires >= 0 && _expires < 100000 ) //sanity check ...
 				registerExpires = _expires;
-			else registerExpires = 1000;
+			else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 		
 		int sipProxyPort;
@@ -150,15 +152,21 @@ class LIBMSIP_API SipProxy{
 		string sipProxyUsername;
 		string sipProxyPassword;
 		
-		/* Value of the expires tag to be added for the contact in this proxy.
+		/**
+		 Value of the expires tag to be added for the contact in this proxy.
 		 *Use setRegisterExpires to set it to zero (de-register).
 		 */
 		int registerExpires; //in seconds
+		
+		/**
+		Default expires value. 
+		*/
+		static int defaultExpires;
 };
 
 class LIBMSIP_API SipIdentity : public MObject{
 	public:
-		SipIdentity(){/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ registerToProxy=false; securitySupport=false;}
+		SipIdentity();
 		SipIdentity(string sipuri);
 
 		void setIdentityName(string n);//{identityIdentifier = n;}
@@ -171,11 +179,18 @@ class LIBMSIP_API SipIdentity : public MObject{
 		bool getDoRegister(){return registerToProxy;}
 		
 		string getDebugString(){
-			return "username="+sipUsername+ "; domain="+sipDomain + " proxy=["+sipProxy.getDebugString()+"]";
+			return "identity="+identityIdx+"; username="+
+				sipUsername+ "; domain="+sipDomain + 
+				" proxy=["+sipProxy.getDebugString()+
+				"]; isRegistered="+itoa(currentlyRegistered);
 		}
 
 		virtual std::string getMemObjectType(){return "SipIdentity";}
 		
+		/**
+		This identities index number. Useful to identify it across minisip.
+		*/
+		string getId() { return identityIdx; }
 		
 		string sipUsername;
 		string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
@@ -186,7 +201,36 @@ class LIBMSIP_API SipIdentity : public MObject{
 
 		bool securitySupport;
 
+		/**
+		Indicates whether this identity requires to be registered to a proxy.
+		*/
 		bool registerToProxy;
+		
+		/**
+		It sets the correct value for this::isRegistered.
+		Param registerOk indicates whether a register_ok command has been received.
+		If false, there was some error, thus we are not registered.
+		If true, we registered ok ... but if proxy::expires = 0, then we are 
+		unregistering (isRegistered = false, then).
+		*/
+		void setIsRegistered( bool registerOk );
+		
+		/**
+		True if this identity is currently registered, false otherwise.
+		*/
+		bool isRegistered() {return currentlyRegistered;}
+		
+	private: 
+		/**
+		We will use this index to be able to identify the identities
+		*/
+		static int globalIndex;
+		string identityIdx;
+		
+		/**
+		Indicates whether this identity is currently registered to a proxy.
+		*/
+		bool currentlyRegistered;
 };
 
 

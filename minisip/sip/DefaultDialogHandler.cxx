@@ -361,27 +361,32 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 	}
 
 	if (cmdstr.getOp() == SipCommandString::proxy_register){
-		//mdbg << "DefaultCallhandler: got proxy_register: "<< command << end;
+		merr << end << "CESC: DefaultDialogHandler: got proxy_register: "<< cmdstr.getString() << end << end;
+		
 		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
-		//cerr << "sipDomain="<< phoneconf -> inherited.sipIdentity->sipDomain<<endl;
-		//if (phoneconf->pstnIdentity){
-		//	cerr << "pstnSipDomain="<< phoneconf -> pstnIdentity->sipDomain<<endl;
-		//}
-
+		
+		MRef<SipIdentity *> identity;
+		identity = phoneconf->getIdentity( cmdstr["identityId"] );
+		
 		string proxyDomainArg = cmdstr["proxy_domain"];
-
-		if (phoneconf->pstnIdentity && (cmdstr.getDestinationId()=="pstn" 
+		
+		/* Use appropriate identity ... 
+		*/
+		if( ! identity.isNull() ) {
+			//FIXME: useSecurity is false ... useIdentity doesn't use it anyway ... 
+			conf->useIdentity( identity, false ); 
+		} else if (phoneconf->pstnIdentity && (cmdstr.getDestinationId()=="pstn" 
 					|| (proxyDomainArg!="" && proxyDomainArg==phoneconf->pstnIdentity->sipDomain))){
 			conf->useIdentity( phoneconf->pstnIdentity, false);
-
 		}
+		
 		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf));
+		
 #ifdef MINISIP_MEMDEBUG
 		reg.setUser("DefaultDialogHandler");
 #endif
-
+		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
-
 		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
 		cmd.setDispatchCount(dispatchCount);
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);

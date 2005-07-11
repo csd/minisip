@@ -80,7 +80,16 @@ class SipSoftPhoneConfiguration : public MObject{
 		MRef<SipIdentity *> pstnIdentity;
 //		MRef<SipIdentity *> defaultIdentity;
 
+		/**
+		List of identities we have extracted from the config file.
+		The default identity is in SipSoftPhoneConfiguration::inherited.sipIdentity
+		*/
 		list< MRef<SipIdentity*> > identities;
+		
+		/**
+		Return the identity with getId()==id (from the identities list
+		*/
+		MRef<SipIdentity*> getIdentity( string id );
 		
 		/*
 		IPAddress * pstnProxy;
