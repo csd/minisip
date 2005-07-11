@@ -3,6 +3,8 @@
 
 using namespace std;
 
+list< MRef<Library *> > MPlugin::libraries;
+
 MPlugin * MPlugin::loadFromLibrary( string file, string entryPoint ){
 	MRef<Library *> lib = NULL;
 	list< MRef<Library *> >::iterator iLib;
