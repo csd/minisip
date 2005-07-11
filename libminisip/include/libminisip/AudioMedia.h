@@ -94,8 +94,8 @@ class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 		uint32_t getSsrc();
 
 	private:
-		MRef<AudioCodec *> findCodec( uint8_t payloadType );
-		std::list< MRef<AudioCodec *> > codecs;
+		MRef<CodecState *> findCodec( uint8_t payloadType );
+		std::list< MRef<CodecState *> > codecs;
 		MRef<Media *> media;
 		short codecOutput[16384];
 		uint32_t ssrc;

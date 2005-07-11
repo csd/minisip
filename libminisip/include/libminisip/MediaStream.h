@@ -76,7 +76,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 		uint32_t getSsrc();
 
-        MRef<Codec *> getSelectedCodec(){return selectedCodec;};
+        MRef<CodecState *> getSelectedCodec(){return selectedCodec;};
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
@@ -86,7 +86,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		uint32_t ssrc;
                 // FIXME used only in sender case
                 uint8_t payloadType;
-                MRef<Codec *> selectedCodec;
+                MRef<CodecState *> selectedCodec;
 
 	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );

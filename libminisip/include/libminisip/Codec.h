@@ -57,20 +57,49 @@ typedef int32_t int;
 
 using namespace std;
 
+class Codec;
+class CodecState;
+
 
 class LIBMINISIP_API Codec: public MObject{
 	public:
 
+		virtual MRef<CodecState *> newInstance()=0;
 		
 		virtual std::string getCodecName()=0;
 		
 		virtual std::string getCodecDescription()=0;
 		
-		virtual int32_t getSdpMediaType()=0;
+		virtual uint8_t getSdpMediaType()=0;
 
 		virtual std::string getSdpMediaAttributes()=0;
 
 		virtual std::string getMemObjectType(){return "Codec";}
+
+};
+
+
+class LIBMINISIP_API CodecState: public MObject{
+        public:
+                /**
+                 * @returns Number of bytes in output buffer
+                 */
+                virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
+
+                /**
+                 *
+                 * @returns Number of frames in output buffer
+                 */
+                virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
+
+                virtual std::string getMemObjectType(){return "CodecState";};
+
+                uint8_t getSdpMediaType(){ return codec->getSdpMediaType(); };
+
+                void setCodec( MRef<Codec *> c ){ codec = c; };
+
+        private:
+                MRef<Codec *> codec;
 
 };
 
@@ -80,7 +109,7 @@ class LIBMINISIP_API AudioCodec : public Codec{
 		 * @returns A CODEC instance for the given payloadType
 		 * (NULL if not handled)
 		 */
-		static MRef<AudioCodec *> create( uint8_t payloadType );
+		static MRef<CodecState *> createState( uint8_t payloadType );
 		
                 /**
 		 * @returns A CODEC instance for the given description string
@@ -88,23 +117,6 @@ class LIBMINISIP_API AudioCodec : public Codec{
 		 */
 		static MRef<AudioCodec *> create( const std::string& );
 
-		/**
-		 * @returns Number of bytes in output buffer
-		 */
-		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
-
-		/**
-		 * 
-		 * @returns Number of frames in output buffer
-		 */
-		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
-
-		/**
-		 * Decodes a frame without having any input. Typically done when
-		 * packets are lost.
-		 * @return number of samples in putput buffer
-		 */
-		virtual void decode(void *out_buf)=0;
 		
 		/**
 		 * size of the output of the codec in bytes.

@@ -31,75 +31,73 @@
 #include<assert.h>
 #include<iostream>
 
-G711CODEC::G711CODEC(){
+G711Codec::G711Codec(){
 
 }
 
-G711CODEC::~G711CODEC(){
+G711Codec::~G711Codec(){
 
 }
 
-// pn430 return type changed from void to uint32_t
-uint32_t G711CODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
-	assert(in_buf_size==2*getInputNrSamples());
-	
-	short *in_data = (short*)in_buf;
-	unsigned char *out_data = (unsigned char*)out_buf;
+uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+        assert(in_buf_size==2*160);
 
-	for (int32_t i=0; i< getInputNrSamples(); i++)
-		out_data[i]=linear2ulaw(in_data[i]);
-	
-	// pn430 Added to account for change in return value
-	return getEncodedNrBytes();
+        short *in_data = (short*)in_buf;
+        unsigned char *out_data = (unsigned char*)out_buf;
+
+        for (int32_t i=0; i< 160; i++)
+                out_data[i]=linear2ulaw(in_data[i]);
+
+        // pn430 Added to account for change in return value
+        return 160;
 }
 
-uint32_t G711CODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
-//	assert(in_buf_size==getEncodedNrBytes());
-	
-	unsigned char *in_data = (unsigned char*)in_buf;
-	short *out_data = (short*)out_buf;
-	
-	for (int32_t i=0; i< in_buf_size; i++)
-		out_data[i]=ulaw2linear(in_data[i]);
+uint32_t G711CodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
+//      assert(in_buf_size==getEncodedNrBytes());
 
-	return in_buf_size;
+        unsigned char *in_data = (unsigned char*)in_buf;
+        short *out_data = (short*)out_buf;
+
+        for (int32_t i=0; i< in_buf_size; i++)
+                out_data[i]=ulaw2linear(in_data[i]);
+
+        return in_buf_size;
 }
 
-void G711CODEC::decode(void *out_buf){
-	//FIX: implement packet loss concealment
-//	cerr << "PLC"<< endl;
-	for (int32_t i=0; i< getInputNrSamples(); i++)
-		((short*)out_buf)[i]=rand()%25;
+int32_t G711Codec::getSamplingSizeMs(){
+        return 20;
 }
 
-int32_t G711CODEC::getSamplingSizeMs(){
-	return 20;
+int32_t G711Codec::getSamplingFreq(){
+        return 8000;
 }
 
-int32_t G711CODEC::getSamplingFreq(){
-	return 8000;
+int32_t G711Codec::getEncodedNrBytes(){
+        return 160;
 }
 
-int32_t G711CODEC::getEncodedNrBytes(){
-	return 160;
+int32_t G711Codec::getInputNrSamples(){
+        return 160;
 }
 
-int32_t G711CODEC::getInputNrSamples(){
-	return 160;
+string G711Codec::getCodecName(){
+        return "G.711";
 }
 
-string G711CODEC::getCodecName(){
-	return "G.711";
+string G711Codec::getCodecDescription(){
+        return "G.711 8kHz, PCMu";
 }
 
-string G711CODEC::getCodecDescription(){
-	return "G.711 8kHz, PCMu";
+uint8_t G711Codec::getSdpMediaType(){
+        return 0;
 }
 
-int32_t G711CODEC::getSdpMediaType(){
-	return 0;		
+string G711Codec::getSdpMediaAttributes(){
+        return "PCMU/8000/1";
 }
 
-string G711CODEC::getSdpMediaAttributes(){
-	return "PCMU/8000/1";
+MRef<CodecState *> G711Codec::newInstance(){
+        MRef<CodecState *> ret = new G711CodecState();
+        ret->setCodec( this );
+        return ret;
 }
