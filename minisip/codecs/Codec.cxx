@@ -26,15 +26,15 @@
 #include"ILBCCODEC.h"
 #include"SPEEXCODEC.h"
 
-MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
+MRef<CodecState *> AudioCodec::createState( uint8_t payloadType ){
         switch( payloadType ){
                 case 0:
-                        return new G711CODEC();
+                        return new G711CodecState();
 		case 97:
-			return new ILBCCODEC();
+			return new ILBCCodecState();
 #ifdef HAS_SPEEX
 		case 114: 
-			return new SPEEXCODEC();
+			return new SpeexCodecState();
 #endif
                 default:
                         return NULL;
@@ -43,16 +43,16 @@ MRef<AudioCodec *> AudioCodec::create( uint8_t payloadType ){
 
 MRef<AudioCodec *> AudioCodec::create( const std::string & description ){
         if( description == "G.711" ){
-                return new G711CODEC();
+                return new G711Codec();
         }
         
         if( description == "iLBC" ){
-                return new ILBCCODEC();
+                return new ILBCCodec();
         }
         
 #ifdef HAS_SPEEX
         if( description == "speex" ){
-                return new SPEEXCODEC();
+                return new SpeexCodec();
         }
 #endif
 

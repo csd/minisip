@@ -25,28 +25,27 @@
 
 #include"Codec.h"
 
-
-class G711CODEC : public AudioCodec{
+class G711CodecState : public CodecState{
 	public:
-		G711CODEC();
-		virtual ~G711CODEC();
-		/**
-		 * @returns Number of bytes in output buffer
-		 */
-		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
-		/**
-		 * 
-		 * @returns Number of samples in output buffer
-		 */
-		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+                /**
+                 * @returns Number of bytes in output buffer
+                 */
+                virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
-		/**
-		 * Decodes a frame without having any input. Typically done when
-		 * packets are lost.
-		 * @return number of samples in putput buffer
-		 */
-		virtual void decode(void *out_buf);
+                /**
+                 *
+                 * @returns Number of frames in output buffer
+                 */
+                virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+};
+
+class G711Codec : public AudioCodec{
+	public:
+		virtual MRef<CodecState *> newInstance();
+		
+		G711Codec();
+		virtual ~G711Codec();
 	
 		/**
 		 * @return Requested sampling freq for the CODEC
@@ -69,11 +68,11 @@ class G711CODEC : public AudioCodec{
 		
 		virtual string getCodecDescription();
 
-		virtual int32_t getSdpMediaType();
+		virtual uint8_t getSdpMediaType();
 
 		virtual string getSdpMediaAttributes();
 		
-		virtual std::string getMemObjectType(){return "G711CODEC";}		
+		virtual std::string getMemObjectType(){return "G711Codec";}		
 		
 		
 };

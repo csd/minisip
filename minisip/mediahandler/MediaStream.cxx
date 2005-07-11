@@ -130,7 +130,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                         bool rtpmapEqual = !strcasecmp( (*iListM).substr(0, s1).c_str(), rtpmap.substr(0,s2).c_str() );
                         if ( rtpmapEqual ) {
                                 if( !selectedCodec ){
-                                        selectedCodec = media->getCodec( *iListPLT );
+                                        selectedCodec = AudioCodec::createState( *iListPLT );
                                         payloadType = rtpPayloadType;
                                 }
                                 return true;
@@ -140,7 +140,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                 else{
                         if( rtpPayloadType == (*iListPLT) ){
                                 if( !selectedCodec ){
-                                        selectedCodec = media->getCodec( *iListPLT );
+                                        selectedCodec = AudioCodec::createState( *iListPLT );
                                 }
                                 return true;
                         }

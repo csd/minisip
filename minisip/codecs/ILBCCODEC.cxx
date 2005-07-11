@@ -27,25 +27,25 @@
 #include"ILBCCODEC.h"
 #include<assert.h>
 
-ILBCCODEC::ILBCCODEC(){
+ILBCCodecState::ILBCCodecState(){
 	initEncode(&enc_inst); 
 	initDecode(&dec_inst, 1);
 	
 }
 
-uint32_t ILBCCODEC::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+uint32_t ILBCCodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	float block[160];
 	int s = in_buf_size;
 	s;//dummy op 
 	
-	for (int32_t i=0; i<getInputNrSamples(); i++)
+	for (int32_t i=0; i<160; i++)
 		block[i]=(float)(((short*)in_buf)[i]);
 
 	iLBC_encode((unsigned char *)out_buf, block, &enc_inst);
         return NO_OF_BYTES;
 }
 
-uint32_t ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
+uint32_t ILBCCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	float decblock[BLOCKL], dtmp;
 	int32_t k;
 	int s = in_buf_size;
@@ -65,7 +65,8 @@ uint32_t ILBCCODEC::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	return BLOCKL;
 }
 
-void ILBCCODEC::decode(void *out_buf){
+#if 0
+void ILBCCodec::decode(void *out_buf){
 	float decblock[160], dtmp;
 	int32_t k;
 	unsigned char dummyencoded[38];
@@ -83,42 +84,49 @@ void ILBCCODEC::decode(void *out_buf){
 		((short*)out_buf)[k] = (short) dtmp; 
 	} 
 }
+#endif
 
 
-int32_t ILBCCODEC::getSamplingSizeMs(){
+int32_t ILBCCodec::getSamplingSizeMs(){
 	assert(BLOCKL==160);
 	return 20;
 }
 
-int32_t ILBCCODEC::getEncodedNrBytes(){
+int32_t ILBCCodec::getEncodedNrBytes(){
 	assert(BLOCKL==160);
 	assert(38==NO_OF_BYTES);
 	return 38;
 }
 
 
-int32_t ILBCCODEC::getInputNrSamples(){
+int32_t ILBCCodec::getInputNrSamples(){
 	return 160;
 }
 
-string ILBCCODEC::getCodecName(){
+string ILBCCodec::getCodecName(){
 	return "iLBC";
 }
 
-string ILBCCODEC::getCodecDescription(){
+string ILBCCodec::getCodecDescription(){
 	return "iLBC - Internet Low Bit rate Codec, 13.33kb/s, 30ms blocks";
 
 }
 
-int32_t ILBCCODEC::getSamplingFreq(){
+int32_t ILBCCodec::getSamplingFreq(){
 	return 8000;
 }
 
 
-int32_t ILBCCODEC::getSdpMediaType(){
+uint8_t ILBCCodec::getSdpMediaType(){
 	return 97;		
 }
 
-string ILBCCODEC::getSdpMediaAttributes(){
+string ILBCCodec::getSdpMediaAttributes(){
 	return "iLBC/8000";
+}
+
+MRef<CodecState *> ILBCCodec::newInstance(){
+	MRef<CodecState *> ret = new ILBCCodecState();
+	ret->setCodec( this );
+	return ret;
 }

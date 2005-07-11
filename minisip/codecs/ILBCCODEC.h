@@ -20,8 +20,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef ILBCCODEC_H
-#define ILBCCODEC_H
+#ifndef ILBCCodec_H
+#define ILBCCodec_H
 
 #include<config.h>
 
@@ -31,9 +31,10 @@
 #include"ilbc/iLBC_encode.h"
 #include"ilbc/iLBC_decode.h"
 
-class ILBCCODEC : public AudioCodec{
+
+class ILBCCodecState : public CodecState{
 	public:
-		ILBCCODEC();
+		ILBCCodecState();
 
 		/**
 		 * @returns Number of bytes in output buffer
@@ -45,13 +46,17 @@ class ILBCCODEC : public AudioCodec{
 		 * @returns Number of frames in output buffer
 		 */
 		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+	
 
-		/**
-		 * Decodes a frame without having any input. Typically done when
-		 * packets are lost.
-		 * @return number of samples in putput buffer
-		 */
-		virtual void decode(void *out_buf);
+	private:
+		iLBC_Enc_Inst_t enc_inst; 
+		iLBC_Dec_Inst_t dec_inst; 
+
+};
+
+class ILBCCodec : public AudioCodec{
+	public:
+		virtual MRef<CodecState *> newInstance();
 	
 		/**
 		 * @return Requested sampling freq for the CODEC
@@ -74,13 +79,9 @@ class ILBCCODEC : public AudioCodec{
 		
 		virtual string getCodecDescription();
 		
-		virtual int32_t getSdpMediaType();
+		virtual uint8_t getSdpMediaType();
 
 		virtual string getSdpMediaAttributes();
-		
-	private:
-		iLBC_Enc_Inst_t enc_inst; 
-		iLBC_Dec_Inst_t dec_inst; 
 };
 
 #endif

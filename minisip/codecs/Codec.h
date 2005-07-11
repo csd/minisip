@@ -29,22 +29,21 @@
 
 #include<libmutil/MemObject.h>
 
-/* Fixed size blocks (always results in the same output frame size)
- *
-*/
-
 using namespace std;
 
+class Codec;
+class CodecState;
 
 class Codec: public MObject{
 	public:
 
+		virtual MRef<CodecState *> newInstance()=0;
 		
 		virtual std::string getCodecName()=0;
 		
 		virtual std::string getCodecDescription()=0;
 		
-		virtual int32_t getSdpMediaType()=0;
+		virtual uint8_t getSdpMediaType()=0;
 
 		virtual std::string getSdpMediaAttributes()=0;
 
@@ -52,20 +51,8 @@ class Codec: public MObject{
 
 };
 
-class AudioCodec : public Codec{
+class CodecState: public MObject{
 	public:
-		/**
-		 * @returns A CODEC instance for the given payloadType
-		 * (NULL if not handled)
-		 */
-		static MRef<AudioCodec *> create( uint8_t payloadType );
-		
-                /**
-		 * @returns A CODEC instance for the given description string
-		 * (NULL if not handled)
-		 */
-		static MRef<AudioCodec *> create( const std::string& );
-
 		/**
 		 * @returns Number of bytes in output buffer
 		 */
@@ -77,12 +64,33 @@ class AudioCodec : public Codec{
 		 */
 		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
 
+		virtual std::string getMemObjectType(){return "CodecState";};
+	
+		uint8_t getSdpMediaType(){ return codec->getSdpMediaType(); };
+
+		void setCodec( MRef<Codec *> c ){ codec = c; };
+	
+	private:
+		MRef<Codec *> codec;
+		
+};
+
+
+class AudioCodec : public Codec{
+	public:
 		/**
-		 * Decodes a frame without having any input. Typically done when
-		 * packets are lost.
-		 * @return number of samples in putput buffer
+		 * @returns A CODEC state for the given payloadType
+		 * (NULL if not handled)
 		 */
-		virtual void decode(void *out_buf)=0;
+		static MRef<CodecState *> createState( uint8_t payloadType );
+		
+                /**
+		 * @returns A CODEC instance for the given description string
+		 * (NULL if not handled)
+		 */
+		static MRef<AudioCodec *> create( const std::string& );
+
+
 		
 		/**
 		 * size of the output of the codec in bytes.

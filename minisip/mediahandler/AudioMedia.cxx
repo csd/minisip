@@ -157,10 +157,10 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
     
     
     for( i = senders.begin(); i != senders.end(); i++ ){
-        MRef<AudioCodec *> selectedCodec = (AudioCodec*)(*(*i)->getSelectedCodec());
+        MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
         
         uint32_t encodedLength = 
-            selectedCodec->encode( data, selectedCodec->getInputNrSamples()*sizeof(short), encoded );
+            selectedCodec->encode( data, 160*sizeof(short), encoded );
 
         (*i)->send( encoded, encodedLength, &ts, marker );
     }
@@ -195,7 +195,7 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 
 void AudioMediaSource::playData( RtpPacket * rtpPacket ){
         RtpHeader hdr = rtpPacket->getHeader();
-	MRef<AudioCodec *> codec = findCodec( hdr.getPayloadType() );
+	MRef<CodecState *> codec = findCodec( hdr.getPayloadType() );
 
 	if( codec ){
                 uint32_t outputSize = codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
@@ -206,9 +206,9 @@ void AudioMediaSource::playData( RtpPacket * rtpPacket ){
         }
 }
 
-MRef<AudioCodec *> AudioMediaSource::findCodec( uint8_t payloadType ){
-	std::list< MRef<AudioCodec *> >::iterator iCodec;
-	MRef<AudioCodec *> newCodec;
+MRef<CodecState *> AudioMediaSource::findCodec( uint8_t payloadType ){
+	std::list< MRef<CodecState *> >::iterator iCodec;
+	MRef<CodecState *> newCodecInstance;
 
 	for( iCodec = codecs.begin(); iCodec != codecs.end(); iCodec ++ ){
 		if( (*iCodec)->getSdpMediaType() == payloadType ){
@@ -216,12 +216,12 @@ MRef<AudioCodec *> AudioMediaSource::findCodec( uint8_t payloadType ){
 		}
 	}
 	
-	newCodec = AudioCodec::create( payloadType );
-	if( newCodec ){
-		codecs.push_back( newCodec );
+	newCodecInstance = AudioCodec::createState( payloadType );
+	if( newCodecInstance ){
+		codecs.push_back( newCodecInstance );
 	}
 
-	return newCodec;
+	return newCodecInstance;
 }
 
 uint32_t AudioMediaSource::getSsrc(){
