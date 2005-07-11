@@ -24,13 +24,15 @@
 #include<libmutil/MemObject.h>
 
 class Library;
+class MPluginRegistry;
 
 /**
  * Implements a dynamically loadable plugins support.
  * @author Johan Bilien, jobi@via.ecp.fr
  */
 
-class MPlugin{
+class MPlugin : public virtual MObject{
+	friend class MPluginRegistry;
 	public:
 		/**
 		 * @returns a short name of the plugin.
@@ -49,30 +51,102 @@ class MPlugin{
 		virtual std::string getDescription();
 
 		/**
+		 * @returns the plugin type.
+		 **/
+		virtual std::string getPluginType();
+
+		/**
+		 * @param path Path to the directory where the plugins
+		 * to load are located
+		 * @returns the number of plugins loaded, or -1 if
+		 * an error occured.
+		 **/
+		static int32_t loadFromDirectory( const std::string &path );
+		
+		/**
 		 * @param file File name/path to a shared library
 		 * @param entryPoint Symbol name to a MPlugin::creator
 		 * function
 		 * @returns a reference to the plugin, or NULL if the
 		 * opening failed.
 		 */
-		static MPlugin * loadFromLibrary( 
-				std::string file, 
-				std::string entryPoint );
+		static MRef<MPlugin *> loadFromLibrary( 
+				const std::string &file, 
+				const std::string &entryPoint );
+		
+		/**
+		 * @param lib An previously dlopened shared library object
+		 * @param entryPoint Symbol name to a MPlugin::creator
+		 * function
+		 * @returns a reference to the plugin, or NULL if the
+		 * opening failed.
+		 */
+		static MRef<MPlugin *> loadFromLibrary( 
+				MRef<Library *> lib, 
+				const std::string &entryPoint );
 
+		/**
+		 * @param lib The library from which to get the list
+		 * of plugin entry points.
+		 * @returns a list of entry points to plugins in the
+		 * given library
+		 **/
+		static std::list< std::string > * getListFromLibrary(
+				MRef<Library *> lib );
 
+		/**
+		 * @param p A reference to the plugin to register.
+		 **/
+		static void registerPlugin( MRef<MPlugin *> p );
+		
+		/**
+		 * \typedef MPlugin (* lister)();
+		 * \brief Entry point in a library used to list
+		 * the available plugin entry points in the
+		 * library.
+		 **/
+		typedef std::list<std::string> * (* lister)();
+		
 		/**
 		 * \typedef MPlugin (* creator)();
 		 * \brief MPlugin object factory, entry point in the
 		 * shared library.
 		 **/
-		typedef MPlugin * (* creator)();
+		typedef MRef<MPlugin *> (* creator)();
+
+		/**
+		 * @returns the MemObject type.
+		 **/
+		virtual std::string getMemObjectType();
 		
 	private:
 		// List of the already opened libraries for plugins,
 		// to avoid loading them twice
 		static std::list< MRef<Library *> > libraries;
 
+		// List of the registered plugin registries
+		static std::list< MPluginRegistry * > registries;
+
+		// Plugin type, for matching with a MPluginRegistry
+		std::string pluginType;
 		
+};
+
+class MPluginRegistry {
+	public:
+		MPluginRegistry();
+		~MPluginRegistry();
+
+		/*
+		 * @returns the type of plugins that this registry holds.
+		 **/
+		virtual std::string getPluginType()=0;
+
+		void registerPlugin( MRef<MPlugin *> p );
+	private:
+		std::list< MRef<MPlugin *> > plugins;
+
+	
 };
 
 
