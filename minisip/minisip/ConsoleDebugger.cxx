@@ -73,17 +73,17 @@ void ConsoleDebugger::run(){
 				showMem();
 				break;
 			
--			case '\'':
--				if ( !setDebugOutput(!getDebugOutputEnabled()) ){
--					cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
--				}
--				
--				if (getDebugOutputEnabled()){
--					cerr << "Message on MObject destructor ON"<< endl;
--				}else{
--					cerr << "Message on MObject destructor OFF "<< endl;
--					
--				}
+			case '\'':
+				if ( !setDebugOutput(!getDebugOutputEnabled()) ){
+					cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
+				}
+				
+				if (getDebugOutputEnabled()){
+					cerr << "Message on MObject destructor ON"<< endl;
+				}else{
+					cerr << "Message on MObject destructor OFF "<< endl;
+					
+				}
 			
 			case '(': //turn on/off state machine debug
 				outputStateMachineDebug = !outputStateMachineDebug;

@@ -239,9 +239,9 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				string registerExpires = parser->getValue(accountPath +"register_expires", "");
 				if (registerExpires != ""){
 					ident->sipProxy.setRegisterExpires( registerExpires );
-					cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << registerExpires << endl;
+					//cerr << "CESC: SipSoftPhoneConf::load : identity expires every (seconds) " << registerExpires << endl;
 				} else {
-					cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
+					//cerr << "CESC: SipSoftPhoneConf::load : NO identity expires" << endl;
 				}
 				
 				if (parser->getValue(accountPath + "pstn_account","")=="yes"){

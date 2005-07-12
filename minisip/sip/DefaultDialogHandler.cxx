@@ -361,7 +361,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 	}
 
 	if (cmdstr.getOp() == SipCommandString::proxy_register){
-		merr << end << "CESC: DefaultDialogHandler: got proxy_register: "<< cmdstr.getString() << end << end;
+		//merr << end << "CESC: DefaultDialogHandler: got proxy_register: "<< cmdstr.getString() << end << end;
 		
 		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 		

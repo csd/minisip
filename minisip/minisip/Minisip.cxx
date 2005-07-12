@@ -218,7 +218,6 @@ Minisip::~Minisip(){
 
 void Minisip::exit(){
 	//TODO
-	mout << BOLD << "CESC: Minisip::exit()!!!" << PLAIN << end;
 	/* End on-going calls the best we can */
 
 	/* Unregister */

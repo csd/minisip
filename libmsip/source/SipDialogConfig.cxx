@@ -43,7 +43,7 @@ SipIdentity::SipIdentity(){
 	securitySupport=false;
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
-	cerr << "CESC: SipIdentity::SipIdentity : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity:: cretated identity id=" << identityIdx << endl;
 	setIsRegistered (false);
 }
 SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(false){
@@ -51,7 +51,7 @@ SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(f
 	securitySupport = false;
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
-	cerr << "CESC: SipIdentity::SipIdentity(str) : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity:: cretated identity id=" << identityIdx << endl;
 	setIsRegistered (false);
 }
 
