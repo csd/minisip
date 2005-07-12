@@ -48,13 +48,17 @@
 #include<libmutil/dbg.h>
 #include<libmutil/MemObject.h>
 
-//#define SM_DEBUG
-#undef SM_DEBUG
+#define SM_DEBUG
+//#undef SM_DEBUG
 //#define SM_DEBUG_COMMAND
 #undef SM_DEBUG_COMMAND
 
 
 using namespace std;
+
+#ifdef SM_DEBUG
+extern bool outputStateMachineDebug;
+#endif
 
 template<class CommandType, class TimeoutType> class StateTransition;
 template<class CommandType, class TimeoutType> class State;
@@ -258,7 +262,7 @@ class State : public MObject{
 template<class CommandType, class TimeoutType>
 class StateTransition : public MObject{
 	public:
-
+	
 		StateTransition(MRef<StateMachine<CommandType, TimeoutType> *> stateMachine, 
 				const string &name, 
 				bool (StateMachine<CommandType, TimeoutType>::*a)(const CommandType& ),
@@ -287,18 +291,22 @@ class StateTransition : public MObject{
 			if (handled= ((**stateMachine).*action)(c) ){
 				stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG
-				merr << "SM_DEBUG:" << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
-					<<" -> "<<to_state->getName();
-	#ifdef SM_DEBUG_COMMAND
-				merr << " ("<< c << ")";
-	#endif
-				merr << end;
+				if( outputStateMachineDebug ) {
+					merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
+						<<" -> "<<to_state->getName();
+		#ifdef SM_DEBUG_COMMAND
+					merr << " ("<< c << ")";
+		#endif
+					merr << end;
+				}
 #endif
 			}
 #ifdef SM_DEBUG
-			else {
-				merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Failed: " << name << ": " << from_state->getName()
-					<<" -> "<<to_state->getName() << end;
+			else if( outputStateMachineDebug ) {
+				
+				//Activate if needed ... it produces quite some extra debug ... 
+				//merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Failed: " << name << ": " << from_state->getName()
+				//	<<" -> "<<to_state->getName() << end;
 			}
 #endif
 

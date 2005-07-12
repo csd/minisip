@@ -2,6 +2,9 @@
 #include"ConsoleDebugger.h"
 #include<libmutil/termmanip.h>
 #include<libmutil/Thread.h>
+
+#include<libmutil/StateMachine.h> //CESC ... state machine output
+
 #include<iostream>
 
 
@@ -13,6 +16,8 @@
 #endif
 
 using namespace std;
+
+bool outputStateMachineDebug = false; //CESC ... state machine does not have a .cxx ... i didn't know where else to put this :)
 
 void ConsoleDebugger::showMem(){
 	string all;
@@ -67,20 +72,16 @@ void ConsoleDebugger::run(){
 			case '*':
 				showMem();
 				break;
-
-			case '\'':
-				if ( !setDebugOutput(!getDebugOutputEnabled()) ){
-					cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
-				}
-				
-				if (getDebugOutputEnabled()){
-					cerr << "Message on MObject destructor ON"<< endl;
-				}else{
-					cerr << "Message on MObject destructor OFF "<< endl;
-					
-				}
+			
+			case ';': //output message when object is destroyed
+				setDebugOutput(true);
+				cerr << "MemObject debug info turned ON/OFF"<< endl;
 				break;
-				
+			
+			case '(': //turn on/off state machine debug
+				outputStateMachineDebug = !outputStateMachineDebug;
+				cerr << "StateMachine debug info turned ON/OFF"<< endl;
+				break;
 			default:
 				cerr << "Unknown command: "<< c << endl;
 			}
@@ -100,7 +101,7 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 	}else{
 		cerr << d->getName() << endl;
 	}
-	cerr << BOLD << "        SipDialogState: "<< PLAIN;
+	cerr << BOLD << "        SipDialogState: "<< PLAIN << endl;
 	cerr <<         "            secure="<<d->dialogState.secure 
 			<<"; localTag="<<d->dialogState.localTag
 			<<"; remoteTag="<<d->dialogState.remoteTag 
@@ -111,6 +112,7 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 			<<"; isEarly="<<d->dialogState.isEarly
 			<< endl;
 	cerr <<         "            route_set: ";
+	
 	list<string>::iterator i;
 	for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
 		if (i!=d->dialogState.routeSet.begin())
@@ -118,6 +120,11 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 		cerr << *i;
 	}
 	cerr <<endl;
+	
+	cerr << BOLD << "        Identity: "<< PLAIN << endl;
+	cerr <<         "            "<< d->getDialogConfig()->inherited->sipIdentity->getDebugString();
+	cerr <<endl;
+	
 	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
