@@ -31,8 +31,10 @@ Library::~Library(){
 	delete handle;
 	handle=NULL;
 #else
-	dlclose(handle);
-	handle=NULL;
+	if(handle){
+		dlclose(handle);
+		handle=NULL;
+	}
 #endif
 }
 
@@ -51,7 +53,8 @@ MRef<Library *> Library::open(const string &path){
 	if(ret->handle){
 		return ret;
 	}
-	return NULL;
+	ret = NULL;
+	return ret;
 }
 
 const string &Library::getPath(){
