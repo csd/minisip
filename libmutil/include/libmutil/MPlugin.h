@@ -37,23 +37,23 @@ class MPlugin : public virtual MObject{
 		/**
 		 * @returns a short name of the plugin.
 		 */
-		virtual std::string getName();
+		virtual std::string getName()=0;
 
 		/**
 		 * @returns the version of the plugin.
 		 */
-		virtual uint32_t getVersion();
+		virtual uint32_t getVersion()=0;
 		
 		/**
 		 * @returns a more detailed description of the
 		 * plugin.
 		 */
-		virtual std::string getDescription();
+		virtual std::string getDescription()=0;
 
 		/**
 		 * @returns the plugin type.
 		 **/
-		virtual std::string getPluginType();
+		virtual std::string getPluginType()=0;
 
 		/**
 		 * @param path Path to the directory where the plugins
@@ -117,7 +117,7 @@ class MPlugin : public virtual MObject{
 		/**
 		 * @returns the MemObject type.
 		 **/
-		virtual std::string getMemObjectType();
+		virtual std::string getMemObjectType()=0;
 		
 	private:
 		// List of the already opened libraries for plugins,
