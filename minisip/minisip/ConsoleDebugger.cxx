@@ -73,14 +73,24 @@ void ConsoleDebugger::run(){
 				showMem();
 				break;
 			
-			case ';': //output message when object is destroyed
-				setDebugOutput(true);
-				cerr << "MemObject debug info turned ON/OFF"<< endl;
-				break;
+-			case '\'':
+-				if ( !setDebugOutput(!getDebugOutputEnabled()) ){
+-					cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
+-				}
+-				
+-				if (getDebugOutputEnabled()){
+-					cerr << "Message on MObject destructor ON"<< endl;
+-				}else{
+-					cerr << "Message on MObject destructor OFF "<< endl;
+-					
+-				}
 			
 			case '(': //turn on/off state machine debug
 				outputStateMachineDebug = !outputStateMachineDebug;
-				cerr << "StateMachine debug info turned ON/OFF"<< endl;
+				if( outputStateMachineDebug )
+					cerr << "StateMachine debug info turned ON"<< endl;
+				else
+					cerr << "StateMachine debug info turned OFF"<< endl;
 				break;
 			default:
 				cerr << "Unknown command: "<< c << endl;
