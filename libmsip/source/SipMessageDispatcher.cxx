@@ -76,6 +76,8 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 		if (c.getCommandString().getOp()==SipCommandString::call_terminated){
 			for (int i=0; i< dialogs.size(); i++){
 				if (dialogs[i]->getCurrentStateName()=="terminated"){
+					//merr << "CESC: SipMsgDispatcher::handleCommand: Dialog State Machine freed"<< end;
+					dialogs[i]->freeStateMachine();
 					dialogs.remove(i);
 					i=0;
 				}

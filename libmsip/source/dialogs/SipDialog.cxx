@@ -105,6 +105,8 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 		for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
 			if ((*i)->getCurrentStateName()=="terminated"){
 				sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
+				//merr << "CESC: SipDialog::handleCommand: Transaction state machine freed"<< end;
+				(*i)->freeStateMachine();
 				transactions.erase(i);
 				i=transactions.begin();
 				handled=true;
