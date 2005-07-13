@@ -184,7 +184,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			if (factory){
 				hval = factory(value_params[0]);
 			}else{
-				cerr << "SipHeaderValueUnsupported :: "<< line << endl;
+				//cerr << "SipHeaderValueUnsupported :: "<< line << endl;
 				hval = new SipHeaderValueUnsupported(value_params[0]);
 			}	
 			
