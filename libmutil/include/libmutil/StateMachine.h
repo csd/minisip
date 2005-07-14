@@ -48,12 +48,6 @@
 #include<libmutil/dbg.h>
 #include<libmutil/MemObject.h>
 
-#define SM_DEBUG
-//#undef SM_DEBUG
-//#define SM_DEBUG_COMMAND
-#undef SM_DEBUG_COMMAND
-
-
 using namespace std;
 
 #ifdef SM_DEBUG
