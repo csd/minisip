@@ -158,7 +158,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
     
     for( i = senders.begin(); i != senders.end(); i++ ){
         MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
-        
+
         uint32_t encodedLength = 
             selectedCodec->encode( data, 160*sizeof(short), encoded );
 
@@ -187,17 +187,6 @@ MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
         return NULL;
 }
 
-MRef<CodecState *> AudioMedia::createCodecInstance( uint8_t payloadType ){
-	std::list< MRef<AudioCodec *> >::iterator iC;
-
-	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-		if( (*iC)->getSdpMediaType() == payloadType ){
-			return (*iC)->newInstance();
-		}
-	}
-	return NULL;
-}
-	
 
 AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 	BasicSoundSource( ssrc, NULL, 0/*position*/, SOUND_CARD_FREQ, 20, 2 ),

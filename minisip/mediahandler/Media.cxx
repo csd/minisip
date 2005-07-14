@@ -153,3 +153,14 @@ void Media::addSdpAttribute( string attribute ){
 void Media::handleMHeader( MRef< SdpHeaderM * > m ){
 }
 
+MRef<CodecState *> Media::createCodecInstance( uint8_t payloadType ){
+	std::list< MRef<Codec *> >::iterator iC;
+
+	for( iC = codecList.begin(); iC != codecList.end(); iC ++ ){
+		if( (*iC)->getSdpMediaType() == payloadType ){
+			return (*iC)->newInstance();
+		}
+	}
+	return NULL;
+}
+

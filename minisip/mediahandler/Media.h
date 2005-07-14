@@ -86,6 +86,7 @@ class Media : public MObject{
 		void addSdpAttribute( std::string attribute );
 		
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
+		MRef<CodecState *> Media::createCodecInstance( uint8_t payloadType );
 		
 	protected:
                 Media();
