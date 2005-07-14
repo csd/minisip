@@ -183,7 +183,7 @@ void BasicSoundSource::getSound(short *dest,
                         memcpy(dest, b, oFrames);
                 }else{
 
-                        for (int32_t i=0; i < iFrames * oNChannels; i++){
+                        for (int32_t i=0; i < oFrames * oNChannels; i++){
                                 dest[i]=0;
                         }
                 }
