@@ -187,6 +187,18 @@ MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
         return NULL;
 }
 
+MRef<CodecState *> AudioMedia::createCodecInstance( uint8_t payloadType ){
+	std::list< MRef<AudioCodec *> >::iterator iC;
+
+	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+		if( (*iC)->getSdpMediaType() == payloadType ){
+			return (*iC)->newInstance();
+		}
+	}
+	return NULL;
+}
+	
+
 AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 	BasicSoundSource( ssrc, NULL, 0/*position*/, SOUND_CARD_FREQ, 20, 2 ),
 	media(media),ssrc(ssrc)
@@ -216,7 +228,7 @@ MRef<CodecState *> AudioMediaSource::findCodec( uint8_t payloadType ){
 		}
 	}
 	
-	newCodecInstance = AudioCodec::createState( payloadType );
+	newCodecInstance = ((AudioMedia *)(*media))->createCodecInstance( payloadType );
 	if( newCodecInstance ){
 		codecs.push_back( newCodecInstance );
 	}
