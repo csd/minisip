@@ -50,10 +50,10 @@ MObject::MObject() : refCount(0){
 MObject::~MObject(){
 #ifdef MDEBUG	
 	global.lock();
-	ocount--;
 	for (int i=0; i<objs.size(); i++){
 		if (this == objs[i]){
 			objs.remove(i);
+			ocount--;
 			break;
 		}
 	}
