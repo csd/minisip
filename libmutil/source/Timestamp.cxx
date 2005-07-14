@@ -63,10 +63,13 @@ void Timestamp::save( uint32_t id ){
 
 void Timestamp::save( string s){
 	ids[index] = auto_id--;
+	if( -(auto_id+1) > MAX_TIMESTAMPS )
+		auto_id = -1;
 //	cerr << "Placing string "<< s << " on index " << -(auto_id+1) << endl;
 	strings[-(auto_id+1)] = s;
 //	cerr << "strings[1]="<<strings[1]<< endl;
-	gettimeofday( &values[index++], tz );
+	index = ( index + 1 ) % MAX_TIMESTAMPS;
+	gettimeofday( &values[index], tz );
 	//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
 }
 void Timestamp::print(){
