@@ -82,13 +82,10 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
-			
 			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername = command.getCommandString().getParam();
 			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword = command.getCommandString().getParam2();
-		
-		
-		}
-		
+		} 
+
 		//Set expires param ... in seconds (in param3)
 		if (command.getCommandString().getParam3()!="" ) {
 			getDialogConfig()->inherited->sipIdentity->sipProxy.setRegisterExpires( command.getCommandString().getParam3() );
@@ -125,22 +122,25 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
 		
+		CommandString cmdstr( 
+			dialogState.callId, 
+			SipCommandString::register_ok, 
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
+		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			CommandString cmdstr( 
-				dialogState.callId, 
-				SipCommandString::register_ok, 
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
-			cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			setGuiFeedback(true);
+			setGuiFeedback(false);
 		}
 		
+		//this is for the shutdown dialog 
+		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
+		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
 		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
-			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->sipProxy.registerExpires * 1000,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 
@@ -250,23 +250,27 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
 		
+		CommandString cmdstr( 
+			dialogState.callId, 
+			SipCommandString::register_ok, 
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());   
+		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		//TODO: inform GUI
 		if (getGuiFeedback()){
-			CommandString cmdstr( 
-				dialogState.callId, 
-				SipCommandString::register_ok, 
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());   
-			cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			setGuiFeedback(true);
-		}
+			setGuiFeedback(false);
+		}		
+		//this is for the shutdown dialog 
+		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
+		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
 		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
 			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->sipProxy.registerExpires * 1000,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 		
@@ -304,22 +308,26 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
 	
 		//TODO: inform GUI
+		CommandString cmdstr( 
+			dialogState.callId, 
+			SipCommandString::register_ok, 
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());   
+		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			CommandString cmdstr( 
-				dialogState.callId, 
-				SipCommandString::register_ok, 
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
-			cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			//setGuiFeedback(false); //if we do not send all register_ok messages back to gui, we cannot properly un-register
+			setGuiFeedback(false);
 		}
+		//this is for the shutdown dialog 
+		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
+		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
 		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
 			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->sipProxy.registerExpires * 1000,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 		
@@ -337,7 +345,7 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( false );
 	
 #ifdef DEBUG_OUTPUT
-		merr << "WARNING: SipDialogRegister::a9: unimplemented section reached" << end;
+		mdbg << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<end;
 #endif
 		return true;
 	}else{
@@ -377,7 +385,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		if (command.getCommandString().getParam3()!="" ) {
 			getDialogConfig()->inherited->sipIdentity->sipProxy.setRegisterExpires( command.getCommandString().getParam3() );
 		}
-			
+		
 		++dialogState.seqNo;
 		MRef<SipTransaction*> trans = 
 			new SipTransactionNonInviteClient(
@@ -409,18 +417,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 				SipSMCommand::DIALOGCONTAINER);
 		
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-		
-		//inform the gui ... useful for de-registration ... 
-		if (getGuiFeedback()){
-			CommandString cmdstr( 
-				dialogState.callId, 
-				SipCommandString::register_failed, 
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
-			cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			//setGuiFeedback(false); //if we do not send all register_ok messages back to gui, we cannot properly un-register
-		}
-		
+
 		return true;
 	}else{
 		return false;
@@ -604,16 +601,14 @@ void SipDialogRegister::send_noauth(string branch){
 //	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
 	MRef<SipRegister*> reg= new SipRegister(
 		branch, 
-		/*getDialogConfig().callId*/ dialogState.callId,
+		dialogState.callId,
 		getDialogConfig()->inherited->sipIdentity->sipDomain, //proxy_domain,
-//		getDialogConfig()->inherited.localIpString,
 		getDialogConfig()->inherited->externalContactIP,
 		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
-//		getDialogConfig()->inherited.userUri,
 		getDialogConfig()->inherited->sipIdentity->getSipUri(),
 		dialogState.seqNo,
 		getDialogConfig()->inherited->transport,
-		getDialogConfig()->inherited->sipIdentity->sipProxy.registerExpires
+		getDialogConfig()->inherited->sipIdentity->sipProxy.getRegisterExpires_int()
 		);
 	
 	SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);
@@ -635,7 +630,7 @@ void SipDialogRegister::send_auth(string branch){
 		realm, 
 		nonce, 
 		getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
-		getDialogConfig()->inherited->sipIdentity->sipProxy.registerExpires
+		getDialogConfig()->inherited->sipIdentity->sipProxy.getRegisterExpires_int()
 	);
         
 	SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);

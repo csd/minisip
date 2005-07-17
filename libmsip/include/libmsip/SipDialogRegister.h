@@ -51,11 +51,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 		
-//#ifdef DEBUG_OUTPUT	
-		virtual std::string getMemObjectType(){return "SipDialogRegister["+/*getDialogConfig()->inherited->sipIdentity->sipDomain+*/ myDomain+"]";}
-//#endif
-
-
+		virtual std::string getMemObjectType(){return "SipDialogRegister";}
 		
 		string getRealm(){return realm;};
 		string getNonce(){return nonce;};
