@@ -77,6 +77,17 @@ class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 		virtual string getName(){return "transaction_INVITE_responder[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();
+		
+		/**
+			Update the parent dialog's route set. 
+			We are in a server transaction, thus the record-route headers
+			are taken in reverse order to form the route set.
+			FIXME: Actually the route set would be better set in the dialog state machine.
+				But it is not possible until the ACK for 2xx responses are handled/sent by
+				the dialog/TU and not by the transaction (in violation of the RFC).
+		*/
+		void setDialogRouteSet(MRef<SipInvite *> inv);
+
 
 		void sendTrying();
 		void sendOk();

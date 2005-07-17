@@ -105,6 +105,10 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
 		cmd.setDestination(SipSMCommand::TU);
 		cmd.setSource(SipSMCommand::transaction);
 		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		
+		//update dialogs route set ... needed to add route headers to the ACK we are going to send
+		setDialogRouteSet( (SipInvite *)*command.getCommandPacket() );
+		
 		return true;
 	}else{
 		return false;
@@ -429,5 +433,22 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MR
 
 SipTransactionInviteServer::~SipTransactionInviteServer(){
 }
+
 	
+void SipTransactionInviteServer::setDialogRouteSet(MRef<SipInvite *> inv) {
+	if( dialog->dialogState.routeSet.size() == 0 ) {
+		merr << "CESC: parent dialog has NO routeset" << end;
+		/*SipMessage::getRouteSet returns the top-to-bottom ordered 
+		Record-Route headers. 
+		As a server, we can use this directly as route set (no reversing).
+		*/
+		dialog->dialogState.routeSet = inv->getRouteSet();
+		for( list<string>::iterator iter = dialog->dialogState.routeSet.begin(); iter!=dialog->dialogState.routeSet.end(); iter++ ) {
+			merr << "CESC: SipTransINVCli:setrouteset:  " << (*iter) << end;
+		}
+	} else {
+		merr << "CESC: parent dialog already has a routeset" << end;
+	}
+	
+}
 

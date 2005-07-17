@@ -77,6 +77,16 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 		virtual string getName(){return "transaction_invite_client[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();
+		
+		/**
+			Update the parent dialog's route set. 
+			For now, only responses >= 200 update the route-set.
+			FIXME: PRACKs too
+			FIXME: Actually the route set would be better set in the dialog state machine.
+				But it is not possible until the ACK for 2xx responses are handled/sent by
+				the dialog/TU and not by the transaction (in violation of the RFC).
+		*/
+		void setDialogRouteSet(MRef<SipResponse *> resp);
 
 		void sendAck(MRef<SipResponse *>, string branch=""); //if no branch specified, use transaction branch attribute
 

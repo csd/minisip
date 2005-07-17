@@ -97,6 +97,7 @@ bool SipTransaction::a1000_cancel_transaction(const SipSMCommand &command){
 			SipSMCommand::transaction,
 			SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE);
+	
 		return true;
 	}else{
 		return false;
@@ -108,8 +109,8 @@ string SipTransaction::getBranch(){
 }
 
 void SipTransaction::handleTimeout(const string &c){
-	SipSMCommand cmd(CommandString(callId,c),SipSMCommand::transaction,SipSMCommand::transaction);
-	dialog->getDialogContainer()->enqueueTimeout( this, cmd);
+        SipSMCommand cmd(CommandString(callId,c),SipSMCommand::transaction,SipSMCommand::transaction);
+        dialog->getDialogContainer()->enqueueTimeout( this, cmd);
 }
 
 
@@ -132,39 +133,38 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 		return;
 }
 
-
-bool SipTransaction::handleCommand(const SipSMCommand &command){
-	if (! (command.getDestination()==SipSMCommand::transaction 
-				|| command.getDestination()==SipSMCommand::ANY)){
-                return false;
-	}
-
-	if (command.getType()==SipSMCommand::COMMAND_PACKET 
-				&& command.getCommandPacket()->getCSeq()!= getCSeqNo() 
-				&& getCSeqNo()!=-1){
-                return false;
-	}
-
-	if (command.getType()==SipSMCommand::COMMAND_PACKET &&
-			command.getCommandPacket()->getCallId()!= callId){
-		return false;
-	}
-	 
-	return StateMachine<SipSMCommand,string>::handleCommand(command);
-}
-
 //FIXME: set the reliability ...
 bool SipTransaction::isUnreliable() { 
 	if( !socket ) {
-#ifdef DEBUG_OUTPUT
 		mdbg << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << end;
-#endif
 		return true;
 	}
 	if( socket->getType() == SOCKET_TYPE_UDP )
 		return true;
 	else return false;
 }
+
+
+bool SipTransaction::handleCommand(const SipSMCommand &command){
+        if (! (command.getDestination()==SipSMCommand::transaction 
+				|| command.getDestination()==SipSMCommand::ANY)){
+                return false;
+	}
+
+        if (command.getType()==SipSMCommand::COMMAND_PACKET 
+				&& command.getCommandPacket()->getCSeq()!= getCSeqNo() 
+				&& getCSeqNo()!=-1){
+                return false;
+        }
+
+	if (command.getType()==SipSMCommand::COMMAND_PACKET &&
+			command.getCommandPacket()->getCallId()!= callId){
+		return false;
+	}
+
+	return StateMachine<SipSMCommand,string>::handleCommand(command);
+}
+
 
 SipTransactionClient::SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid):
 	SipTransaction(stack, d,seq_no,branch,callid)

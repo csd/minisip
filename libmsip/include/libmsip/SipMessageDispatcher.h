@@ -69,6 +69,12 @@ class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
 			return l;
 		}
 
+		/**
+		//CESC::
+		Needs to be moved to private and use set/get functions
+		*/
+		MRef<SipDialog*> managementHandler;
+		                
 	private:
 		minilist<MRef<SipTransaction*> > transactions;
 		minilist<MRef<SipDialog*> > dialogs;

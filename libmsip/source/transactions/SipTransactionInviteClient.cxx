@@ -33,7 +33,7 @@
 /*
 
                                ostart
-			       |
+                               |
                                |INVITE from TU
              Timer A fires     |a0.INVITE sent
              a1.Reset A,       V                      Timer B fires
@@ -65,7 +65,7 @@ resp. to TU |  1xx             V                     |
             |              ^   |                     |
             |              |   | Timer D fires       |
             +--------------+   | a11. -              |
-	                       V                     |
+                               V                     |
                          +-----------+               |
                          |           |               |
                          | Terminated|<--------------+
@@ -82,6 +82,7 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipTransactionInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>
+#include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipSMCommand.h>
@@ -135,6 +136,9 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		
 		return true;
 	}else{
 		return false;
@@ -157,6 +161,8 @@ bool SipTransactionInviteClient::a3_calling_completed_resp36( const SipSMCommand
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		
+		dialog->dialogState.updateState( resp );
 		
 		sendAck(resp);
 		
@@ -207,6 +213,10 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
+		//update dialogs route set ... needed to add route headers to the ACK we are going to send
+		//setDialogRouteSet( (SipResponse*)*command.getCommandPacket() ); 
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction,
@@ -227,6 +237,9 @@ bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMComman
 				SipSMCommand::TU);
 
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		
 		return true;
 	}else{
 		return false;
@@ -245,6 +258,10 @@ bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMComman
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
+		//update dialogs route set ... needed to add route headers to the ACK we are going to send
+		//setDialogRouteSet( (SipResponse*)*command.getCommandPacket() ); 
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction,
@@ -272,6 +289,8 @@ bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMComm
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		
+		dialog->dialogState.updateState( resp );
 		
 		sendAck(resp);
 		
@@ -361,7 +380,7 @@ void SipTransactionInviteClient::setUpStateMachine(){
 			s_completed, s_terminated);
 
 
-	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_INVITE",
+	new StateTransition<SipSMCommand,string>(this, "transition_start_calling_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClient::a0_start_calling_INVITE, 
 			s_start, s_calling);
 
@@ -434,6 +453,22 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MR
 SipTransactionInviteClient::~SipTransactionInviteClient(){
 }
 
+void SipTransactionInviteClient::setDialogRouteSet(MRef<SipResponse *> resp) {
+	if( dialog->dialogState.routeSet.size() == 0 ) {
+		//merr << "CESC: parent dialog has NO routeset" << end;
+		/*SipMessage::getRouteSet returns the uris in the record-route headers,
+		in the top to bottom order.
+		We need to reverse the order of those uris (as client).*/
+		dialog->dialogState.routeSet = resp->getRouteSet();
+		dialog->dialogState.routeSet.reverse();
+		//for( list<string>::iterator iter = dialog->dialogState.routeSet.begin(); iter!=dialog->dialogState.routeSet.end(); iter++ ) {
+		//	merr << "CESC: SipTransINVCli:setrouteset:  " << (*iter) << end;
+		//}
+	} else {
+		//merr << "CESC: parent dialog already has a routeset" << end;
+	}
+}
+
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 
 	MRef<SipCommonConfig *> conf;
@@ -442,13 +477,23 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	}else{
 		conf = sipStack->getStackConfig();
 	}
+
+	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
 	
-        MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), ref, dialog->dialogState.remoteUri, //FIXME: uses dialog here, but it could be NULL
+	MRef<SipMessage*> ref( *resp);
+	MRef<SipAck*> ack= new SipAck( getBranch(), 
+			ref, 
+			dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
 			conf->sipIdentity->sipDomain
 			); 
-	//TODO: use route headers!!
-	//ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
+	//add route headers, if needed
+	if( dialog->dialogState.routeSet.size() > 0 ) {
+		//merr << "CESC: SipTransInvCli:sendACK : adding header route! " << end;
+		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialog->dialogState.routeSet);
+		ack->addHeader(new SipHeader(*rset) );
+	} else {
+		//merr << "CESC: SipTransInvCli::sendACK : dialog route set is EMPTY!!! " << end;
+	}
 	send(MRef<SipMessage*>(*ack), true, br);
 }
 
