@@ -3,32 +3,53 @@
 #include<libmutil/termmanip.h>
 #include<libmutil/Thread.h>
 
+#ifdef SM_DEBUG
 #include<libmutil/StateMachine.h> //CESC ... state machine output
+#endif
+ 
+#include<libmsip/SipCommandString.h>
+#include<libmsip/SipSMCommand.h>
 
 #include<iostream>
-
 
 #ifdef HAVE_TERMIOS_H
 #include<termios.h>
 #endif
+
 #ifdef WIN32
 #include<conio.h>
 #endif
 
 using namespace std;
 
-bool outputStateMachineDebug = false; //CESC ... state machine does not have a .cxx ... i didn't know where else to put this :)
-
-void ConsoleDebugger::showMem(){
-	string all;
-	minilist<string> names = getMemObjectNames();
-	for (int i=0; i<names.size();i++){
-		all = all+names[i]+"\n";
-	}
-	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
+void ConsoleDebugger::showHelp() {
+	cerr << "Welcome to the Console Debugger!" << endl;
+	cerr << "   Available commands are:" << endl;
+	cerr << "        - h/H : display this help message" << endl;
+	cerr << endl;
+	cerr << "        - r/R : register all identities" << endl;
+	cerr << "        - u/U : de-register all identities" << endl;
+	cerr << "        - t/T : terminate all ongoing calls" << endl;
+	cerr << endl;
+	cerr << "        - d/D : Turn on of the mdbg output stream (less verbosity)" << endl;
+	cerr << "        - p/P : Print IN and OUT packets on the screen" << endl;
+	cerr << endl;
+	cerr << "        - * : List all MObjects in memory (needs libmutil to use be configured with --enable-memdebug)" << endl;
+	cerr << "        - ; : More memory related debug output (object created or destroyed)" << endl;
+	cerr << endl;
+	cerr << "        - ( : Output StateMachine related debug messages (see StateMachine.h)" << endl;
+	cerr << endl;
+	cerr << "        - ) : Print a list of timers waiting to be fired" << endl;
+	cerr << "        - - : Print a list of commands waiting to be processed in the SipDialogContainer" << endl;
+	cerr << "        - + : Print info on all currently registered SipDialogs" << endl;
+	cerr << endl;
+	cerr << "   Note: only h/+/u/r/t commands are always available. The rest, only if --enable-debug is configured" << endl;
+	cerr << endl;
+	
 }
 
 void ConsoleDebugger::run(){
+	bool tmpSet;
 	while(true){
 		char c;
 #ifdef _MSC_VER
@@ -43,11 +64,26 @@ void ConsoleDebugger::run(){
 			case '\n':
 				cerr << endl;
 				break;
-			case '+':
+			case '+'://show sip stack state
 				showStat();
 				break;
-
-#ifdef DEBUG_OUTPUT
+			case 'h':
+			case 'H': //list help
+				showHelp();
+				break;
+			case 't':
+			case 'T': //Terminate all ongoing calls
+				sendManagementCommand( SipCommandString::terminate_all_calls );
+				break;
+			case 'u':
+			case 'U': //Deregister all identities
+				sendManagementCommand( SipCommandString::unregister_all_identities );
+				break;
+			case 'r':
+			case 'R': //Deregister all identities
+				sendManagementCommand( SipCommandString::register_all_identities );
+				break;
+	#ifdef DEBUG_OUTPUT
 			case 'P':
 			case 'p':
 				set_debug_print_packets(!get_debug_print_packets());
@@ -57,7 +93,6 @@ void ConsoleDebugger::run(){
 				else
 					cerr << "Packets will NOT be displayed to the screen"<< endl;
 				break;
-#endif
 				
 			case 'd':
 			case 'D':
@@ -73,25 +108,31 @@ void ConsoleDebugger::run(){
 				showMem();
 				break;
 			
-			case '\'':
-				if ( !setDebugOutput(!getDebugOutputEnabled()) ){
-					cerr << "You must enable this feature by configuring libmutil with --enable-memdebug"<<endl;
-				}
-				
-				if (getDebugOutputEnabled()){
-					cerr << "Message on MObject destructor ON"<< endl;
-				}else{
-					cerr << "Message on MObject destructor OFF "<< endl;
-					
-				}
+			case ';': //output message when object is destroyed
+				tmpSet = setDebugOutput(true);
+				if( tmpSet )
+					cerr << "MemObject debug info turned ON"<< endl;
+				else 
+					cerr << "MemObject debug info turned OFF"<< endl;
+				break;
 			
 			case '(': //turn on/off state machine debug
+		#ifdef SM_DEBUG
 				outputStateMachineDebug = !outputStateMachineDebug;
 				if( outputStateMachineDebug )
 					cerr << "StateMachine debug info turned ON"<< endl;
-				else
+				else 
 					cerr << "StateMachine debug info turned OFF"<< endl;
+		#else
+				cerr << "StateMachine debug not usable: need to #define SM_DEBUG (see StateMachine.h)"<< endl;
+		#endif
 				break;
+			case ')': //print all timers ... 
+				cerr << "========= Timeouts still to fire : " << endl;
+				cerr << config->sip->getSipStack()->getTimeoutProvider()->getTimeouts() << endl;
+				cerr << "=========------------------ " << endl;
+				break;
+	#endif
 			default:
 				cerr << "Unknown command: "<< c << endl;
 			}
@@ -99,6 +140,23 @@ void ConsoleDebugger::run(){
 	
 	}
 	
+}
+
+void ConsoleDebugger::sendManagementCommand( string str ) {
+	CommandString cmdstr ( "", str );
+	SipSMCommand cmd( cmdstr, 
+			SipSMCommand::remote,
+			SipSMCommand::DIALOGCONTAINER);
+	config->sip->getSipStack()->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
+void ConsoleDebugger::showMem(){
+	string all;
+	minilist<string> names = getMemObjectNames();
+	for (int i=0; i<names.size();i++){
+		all = all+names[i]+"\n";
+	}
+	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
 }
 
 void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
@@ -271,7 +329,6 @@ void ConsoleDebugger::showStat(){
 	}
 }
 
-
 static int nonblockin_stdin()
 {
 #ifdef HAVE_TERMIOS_H
@@ -297,15 +354,10 @@ static int nonblockin_stdin()
     return 0;
 }
 
-
-
 void ConsoleDebugger::startThread(){
 	nonblockin_stdin();
-
 	
 	Thread t(this);
-	
-
 }
 
 

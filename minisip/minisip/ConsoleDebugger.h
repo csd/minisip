@@ -10,8 +10,12 @@ class ConsoleDebugger : public Runnable{
 	public:
 		ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf):config(conf){};
 		std::string getMemObjectType(){return "ConsoleDebugger";}
+		void showHelp();
 		void showMem();
 		void showStat();
+
+		void sendManagementCommand( string str );
+		
 		void startThread();
 
 		virtual void run();
