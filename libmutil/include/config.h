@@ -100,5 +100,9 @@ static inline uint64_t U64_AT( void const * _p )
               | ((uint64_t)p[6] << 8) | p[7] );
 }
 
+#ifdef DEBUG_OUTPUT
+#define SM_DEBUG
+#define SM_DEBUG_COMMAND
+#endif
 
 #endif
