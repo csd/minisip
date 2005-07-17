@@ -62,40 +62,42 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 	MRef<VideoCodec *> videoCodec = new VideoCodec();
 	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
 	MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );
-        if( mixer ){
-                mixer->setMedia( videoMedia );
-        }
+	if( mixer ){
+		mixer->setMedia( videoMedia );
+	}
 	registerMedia( *videoMedia );
 #endif
 
 	string soundDev = config->soundDevice;
-        if( soundDev != "" ){
+	if( soundDev != "" ){
 
-                MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
-                MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 48000 );
+		MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
+		MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 48000 );
 						
 		std::list<MRef<Codec *> > codecList;
 		std::list<std::string>::iterator iCodec;
 		MRef<Codec *> selectedCodec;
 
-                for( iCodec = config->audioCodecs.begin(); 
-                     iCodec != config->audioCodecs.end();
-                     iCodec ++ ){
+		for( iCodec = config->audioCodecs.begin(); 
+					iCodec != config->audioCodecs.end();
+					iCodec ++ ){
 
-                        selectedCodec = (Codec*)*AudioCodec::create( *iCodec );
-                        if( selectedCodec ){
-                                codecList.push_back( selectedCodec );
-                        }
-
-                }
+			selectedCodec = (Codec*)*AudioCodec::create( *iCodec );
+			if( selectedCodec ){
+#ifdef DEBUG_OUTPUT
+				cerr << "Adding audio codec: " << selectedCodec->getCodecName() << endl;
+#endif
+				codecList.push_back( selectedCodec );
+			}
+		}
 		
 		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList );
 		
-                registerMedia( *media );
+		registerMedia( *media );
 		if( !audioMedia ){
 			audioMedia = media;
 		}
-        }
+	}
 
 	ringtoneFile = config->ringtone;
 }
@@ -111,7 +113,8 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	contactIp = ipProvider->getExternalIp();
 
 	session = new Session( contactIp, securityConfig );
-        session->setCallId( callId );
+	//cerr << "CESC: MediaHandler::createSession: new session created ... " << endl;
+	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
 		if( (*i)->receive ){

@@ -114,8 +114,11 @@ SipInvite::SipInvite(const string &branch,
 {
 
 
-	createHeadersAndContent(call_id, tel_no, proxyAddr, proxyPort, localAddr,
-			localSipPort, from_tel_no, seq_no, "","","","",transport);
+	createHeadersAndContent(call_id, tel_no, 
+			proxyAddr, proxyPort, 
+			localAddr, localSipPort, 
+			from_tel_no, seq_no, 
+			"","","","",transport);
 	
 	
 }
@@ -138,7 +141,10 @@ SipInvite::SipInvite(const string &branch,
 		):SipMessage(branch, SipInvite::type)
 {
 	
-	createHeadersAndContent(call_id, tel_no, proxyAddr, proxyPort, localAddr, localSipPort, from_tel_no, seq_no, 
+	createHeadersAndContent(call_id, tel_no, 
+			proxyAddr, proxyPort, 
+			localAddr, localSipPort, 
+			from_tel_no, seq_no, 
 			username, nonce, realm, password, transport);
 
 }

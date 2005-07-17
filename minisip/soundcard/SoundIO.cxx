@@ -346,7 +346,9 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 #endif
 
 void SoundIO::registerSource( MRef<SoundSource *> source ){
+#ifdef DEBUG_OUTPUT
 	cerr << "Calling register source on created source " << source->getId() << endl;
+#endif
        int32_t j=1;
        int32_t nextSize=sources.size()+1; 
        queueLock.lock();
@@ -450,7 +452,9 @@ void *SoundIO::playerLoop(void *arg){
 	short *resbuf = NULL;
 	short *outbuf = NULL;
 	uint32_t nChannels = 0;
+#ifdef DEBUG_OUTPUT
 	uint32_t counter = 0;
+#endif
 	
 	while( true ){
 
@@ -508,9 +512,12 @@ void *SoundIO::playerLoop(void *arg){
 			}
 		}
 		active_soundcard->queueLock.unlock();
+
+#ifdef DEBUG_OUTPUT
 		if( !(counter++ % 100) ){
 			fprintf(stderr ,  ".\n" );
 		}
+#endif
 
 		if( active_soundcard->soundDev->isOpenedPlayback() ){
 			active_soundcard->send_to_card(buf, nFrames);

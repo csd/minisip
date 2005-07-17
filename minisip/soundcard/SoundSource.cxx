@@ -113,10 +113,11 @@ void BasicSoundSource::pushSound(short * samples,
 {
 //	cerr << "Calling pushSound for source " << getId() << endl;
         index++; //dummy op
-        npush++;
+#ifdef DEBUG_OUTPUT
+	npush++;
         if (nprint)
                 nprint=false,cerr << "npush="<< npush<< endl;;
-
+#endif
         short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
 
 
@@ -153,12 +154,13 @@ int nget=1;
 void BasicSoundSource::getSound(short *dest,
                 bool dequeue)
 {
-//	cerr << "Calling getSound for source " << getId() << endl;
-        nget++;
-        if (nget%1000==0)
-                nprint=true,cerr << "nget="<< nget<< endl;
         short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
 #ifdef DEBUG_OUTPUT
+//	cerr << "Calling getSound for source " << getId() << endl;
+        nget++;
+        if (nget%1000==0) {
+                nprint=true,cerr << "nget="<< nget<< endl;
+	}
         static int counter = 0;
         static bool do_print=false;
         if (counter%1000==0)

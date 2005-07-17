@@ -49,7 +49,11 @@ SipAck::SipAck(string &build_from):SipMessage(type, build_from){
 
 }
 
-SipAck::SipAck(string branch, MRef<SipMessage*> pack, string to_tel_no, string proxy): SipMessage(branch, type){
+SipAck::SipAck(string branch, 
+		MRef<SipMessage*> pack, 
+		string to_tel_no, 
+		string proxy): 
+			SipMessage(branch, type){
 	this->username = to_tel_no;
 	this->ipaddr = proxy;
 	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));

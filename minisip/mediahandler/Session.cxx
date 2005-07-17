@@ -133,7 +133,6 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 		std::list<uint8_t>::iterator iListPLT;
 		std::list<std::string> listM = (*i)->getAllRtpMaps();
 		std::list<std::string>::iterator iListM;
-
 		for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
 			m->addFormat( (*iListPLT) );
 			rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
@@ -153,6 +152,9 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			m->addAttribute( *a );
 		}
 	}
+#ifdef DEBUG_OUTPUT	
+	merr << "Session::getSdpOffer: " << end << result->getString() << end << end;
+#endif
 	return result;
 }
 
@@ -197,10 +199,16 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = ((SdpHeaderM*)*(answer->getHeaders()[i]));
+#ifdef DEBUG_OUTPUT
+                        cerr << "trying media line " << m->getString() << endl;
+#endif
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
+#ifdef DEBUG_OUTPUT
                                 if( receiver )
+                                        cerr << "Found receiver!" << endl;
+#endif
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
 					receiver->disabled = true;

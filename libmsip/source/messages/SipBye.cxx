@@ -50,7 +50,8 @@ SipBye::SipBye(string &resp):SipMessage(SipBye::type, resp){
 }
 
 
-SipBye::SipBye(string branch, MRef<SipInvite*> inv, 
+SipBye::SipBye(string branch, 
+		MRef<SipInvite*> inv, 
 		string to_uri, 
 		string from_uri, 
 		string domain, 

@@ -106,11 +106,17 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 		else 
 			requestTimeout( 0,"timerD");
 
+		//update dialogs route set ... needed to add route headers to the ACK we are going to send
+		//setDialogRouteSet( resp );
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+			
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+#ifdef DEBUG_OUTPUT
 		cerr<<"****************1001************"<<endl;
+#endif
 		sendAck(resp, getBranch()/*+"ACK"*/);
 		
 		return true;
@@ -129,11 +135,17 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 		else 
 			requestTimeout( 0,"timerD");
 		
+		//update dialogs route set ... needed to add route headers to the ACK we are going to send
+		//setDialogRouteSet( resp );
+		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+			
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+#ifdef DEBUG_OUTPUT
 		cerr<<"****************1002************"<<endl;
+#endif
 		sendAck(resp, getBranch()/*+"ACK"*/);
 
 		return true;
@@ -145,7 +157,9 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCommand &command) {
 	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
+#ifdef DEBUG_OUTPUT
 		cerr<<"****************1003************"<<endl;
+#endif
 		sendAck(resp, getBranch()/*+"ACK"*/);
 
 		return true;

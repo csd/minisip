@@ -39,12 +39,12 @@ class SessionRegistry;
 class Session : public MObject{
 	public:
 
-                static SessionRegistry * registry;
-                static MRef<KeyAgreement *> precomputedKa;
+		static SessionRegistry * registry;
+		static MRef<KeyAgreement *> precomputedKa;
 
 		Session( std::string localIp, SipDialogSecurityConfig &config );
 
-                void unregister();
+		void unregister();
 
 		void start();
 		void stop();
@@ -66,11 +66,11 @@ class Session : public MObject{
 
 		virtual std::string getMemObjectType(){return "Session";}
 
-                std::string getCallId();
-                void setCallId( const string callId );
+		std::string getCallId();
+		void setCallId( const string callId );
 
-                friend class DtmfSender;
-                void sendDtmf( uint8_t symbol );
+		friend class DtmfSender;
+		void sendDtmf( uint8_t symbol );
 
 
 	private:
@@ -91,7 +91,7 @@ class Session : public MObject{
 
 		std::list< MRef<MediaStream *> > mediaStreamReceivers;
 		std::list< MRef<MediaStream *> > mediaStreamSenders;
-                Mutex mediaStreamSendersLock;
+		Mutex mediaStreamSendersLock;
 
 		MRef<KeyAgreement *> ka;
 		std::string localIpString;
@@ -102,10 +102,10 @@ class Session : public MObject{
 		uint16_t errorCode;
 		SipDialogSecurityConfig securityConfig;
 
-                std::string callId;
+		std::string callId;
 
-                DtmfSender dtmfSender;
-                TimeoutProvider<DtmfEvent *, DtmfSender *> dtmfTOProvider;
+		DtmfSender dtmfSender;
+		TimeoutProvider<DtmfEvent *, DtmfSender *> dtmfTOProvider;
 
 };
 
