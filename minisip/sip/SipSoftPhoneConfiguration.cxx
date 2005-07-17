@@ -42,6 +42,8 @@
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/NetworkException.h>
 
+#include<libmutil/dbg.h>
+
 static void installConfigFile( string filename );
 
 
@@ -92,6 +94,7 @@ void SipSoftPhoneConfiguration::save(){
 	string accountPath;
 
 	for( iIdent = identities.begin(); iIdent != identities.end(); ii++, iIdent ++){
+		//cerr << "Saving identity: " << (*iIdent)->getDebugString() << endl;
 		accountPath = string("account[")+itoa(ii)+"]/";
 
 		parser->changeValue( accountPath + "account_name", (*iIdent)->identityIdentifier );
@@ -114,8 +117,13 @@ void SipSoftPhoneConfiguration::save(){
 			parser->changeValue( accountPath + "default_account", "yes" );
 		}
 		
-		parser->changeValue( accountPath + "register", 
-				(*iIdent)->registerToProxy?"yes":"no" );
+		if( (*iIdent)->registerToProxy ) {
+			parser->changeValue( accountPath + "register", "yes" );
+			parser->changeValue( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+		} else {
+			parser->changeValue( accountPath + "register", "no");
+			parser->changeValue( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+		}
 	}
 	
 	parser->changeValue( "sound_device", soundDevice );
@@ -167,7 +175,11 @@ void SipSoftPhoneConfiguration::save(){
 	parser->saveToFile( configFileName );
 	delete( parser );
 
-
+	//WARN about possible inconsistencies and the need to restart MiniSIP
+	string warn;
+	warn = "Attention!\n";
+	warn += "MiniSIP needs to be restarted for changes to take effect\n";
+	merr << warn << end;
 }
 
 string SipSoftPhoneConfiguration::load( string filename ){
@@ -239,10 +251,16 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				string registerExpires = parser->getValue(accountPath +"register_expires", "");
 				if (registerExpires != ""){
 					ident->sipProxy.setRegisterExpires( registerExpires );
-					//cerr << "CESC: SipSoftPhoneConf::load : identity expires every (seconds) " << registerExpires << endl;
-				} else {
-					//cerr << "CESC: SipSoftPhoneConf::load : NO identity expires" << endl;
+					//set the default value ... do not change this value anymore
+					ident->sipProxy.setDefaultExpires( registerExpires ); 
+				} 
+#ifdef DEBUG_OUTPUT
+				else {
+					//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
 				}
+				//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->sipProxy.getRegisterExpires() << endl;
+				//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->sipProxy.getDefaultExpires() << endl;
+#endif
 				
 				if (parser->getValue(accountPath + "pstn_account","")=="yes"){
 					pstnIdentity = ident;
@@ -365,6 +383,7 @@ static void installConfigFile(string filename){
 			"<sip_uri> username@domain.org </sip_uri>\n"
 			"<proxy_addr> sip.domain.org </proxy_addr>\n"
 			"<register> yes </register>\n"
+			"<register_expires> 1000 </register_expires>\n"
 			"<proxy_port> 5060 </proxy_port>\n"
 			"<proxy_username> user </proxy_username>\n"
 			"<proxy_password> password </proxy_password>\n"
@@ -439,13 +458,17 @@ static void installConfigFile(string filename){
 
 MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 	list< MRef<SipIdentity*> >::iterator it;
+#ifdef DEBUG_OUTPUT
 	merr << "SipSoftPhoneConfiguration::getIdentity : looking for an identity ... " << end;
+#endif
 	for( it = identities.begin(); it!=identities.end(); it++ ) {
 		if( (*it)->getId() == id ) {
 			return (*it);
 		}
 	}
+#ifdef DEBUG_OUTPUT
 	merr << "SipSoftPhoneConfiguration::getIdentity : identity not found!" << end;
+#endif
 	return NULL;
 }
 
