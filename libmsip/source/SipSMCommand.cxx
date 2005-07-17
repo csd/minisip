@@ -43,7 +43,7 @@ Dbg & operator<<(Dbg &o, const SipSMCommand &c){
                 
 		o <<"COMMAND_PACKET:"
                     << (**c.getCommandPacket()).getDescription() 
-                    <<",source="<< s[c.source-1]
+                    <<" source="<< s[c.source-1]
                     <<",dest="<<s[c.destination-1];
         }else{
 		o <<"COMMAND_STRING:"<<c.getCommandString().getString()
@@ -74,11 +74,27 @@ void SipSMCommand::setSource(int i){
 	source=i;
 }
 
-SipSMCommand::SipSMCommand(MRef<SipMessage*> p, int source, int destination): type(COMMAND_PACKET), cmdstr("",""), cmdpkt(p), source(source), destination(destination), dispatchCount(0){
+SipSMCommand::SipSMCommand(MRef<SipMessage*> p, 
+		int source, 
+		int destination): 
+			type(COMMAND_PACKET), 
+			cmdstr("",""), 
+			cmdpkt(p), 
+			source(source), 
+			destination(destination), 
+			dispatchCount(0){
 
 }
 
-SipSMCommand::SipSMCommand(const CommandString &s, int source, int destination): type(COMMAND_STRING), cmdstr(s),cmdpkt(NULL),source(source), destination(destination), dispatchCount(0){
+SipSMCommand::SipSMCommand(const CommandString &s, 
+		int source, 
+		int destination): 
+			type(COMMAND_STRING), 
+			cmdstr(s),
+			cmdpkt(NULL),
+			source(source), 
+			destination(destination), 
+			dispatchCount(0){
 
 }
 
