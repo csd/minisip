@@ -28,7 +28,7 @@
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipMessageTransport.h>
-#include<libmutil/itoa.h>
+//#include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipDialogContainer.h>
@@ -36,14 +36,47 @@
 
 
 int SipIdentity::globalIndex = 1; //give an initial value
-int SipProxy::defaultExpires = 1000;
+
+void SipProxy::setRegisterExpires( string _expires ) {
+	int r;
+	r = atoi( _expires.c_str() );
+	setRegisterExpires( r );
+}
+
+void SipProxy::setRegisterExpires( int _expires ) {
+	if( _expires >= 0 && _expires < 100000 ) //sanity check ...
+		registerExpires = _expires;
+	else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+}
+
+string SipProxy::getRegisterExpires( ) {
+	return itoa(registerExpires); 
+}
+
+void SipProxy::setDefaultExpires( string _expires ) {
+	int r;
+	r = atoi( _expires.c_str() );
+	setRegisterExpires( r );
+}
+void SipProxy::setDefaultExpires( int _expires ) {
+	if( _expires >= 0 && _expires < 100000 ) //sanity check ...
+		registerExpires = _expires;
+	else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+}
+string SipProxy::getDefaultExpires( ) {
+	return itoa(defaultExpires); 
+}
+
+
 SipIdentity::SipIdentity(){
 	/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ 
 	registerToProxy=false; 
 	securitySupport=false;
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
-	cerr << "SipIdentity:: cretated identity id=" << identityIdx << endl;
+#ifdef DEBUG_OUTPUT	
+	cerr << "CESC: SipIdentity::SipIdentity : cretated identity id=" << identityIdx << endl;
+#endif
 	setIsRegistered (false);
 }
 SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(false){
@@ -51,7 +84,9 @@ SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(f
 	securitySupport = false;
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
-	cerr << "SipIdentity:: cretated identity id=" << identityIdx << endl;
+#ifdef DEBUG_OUTPUT	
+	cerr << "CESC: SipIdentity::SipIdentity(str) : cretated identity id=" << identityIdx << endl;
+#endif	
 	setIsRegistered (false);
 }
 
@@ -71,7 +106,7 @@ void SipIdentity::setIdentityName(string n){
 }
 
 void SipIdentity::setIsRegistered( bool registerOk ) {
-	if( registerOk == true && sipProxy.registerExpires != 0 ) {
+	if( registerOk == true && sipProxy.getRegisterExpires_int() != 0 ) {
 		currentlyRegistered = true;
 	} else {
 		currentlyRegistered = false;

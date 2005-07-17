@@ -80,7 +80,12 @@ using namespace std;
 
 class LIBMSIP_API SipProxy{
 	public:
-		SipProxy(){sipProxyIpAddr = NULL;sipProxyPort = 0; registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;}
+		SipProxy(){
+			sipProxyIpAddr = NULL;
+			sipProxyPort = 0; 
+			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+		}
 
 		SipProxy(string addr){
 			assert(addr.find("@")==string::npos);
@@ -96,11 +101,13 @@ class LIBMSIP_API SipProxy{
 
 			sipProxyIpAddr = new IP4Address(addr);
 			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 		
 		SipProxy(string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
 			sipProxyIpAddr = new IP4Address(addr);
-			registerExpires=SipProxy::defaultExpires;
+			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 
 		void setProxy(string proxy, int port){
@@ -134,17 +141,6 @@ class LIBMSIP_API SipProxy{
 			return proxy;
 		}
 
-		void setRegisterExpires( string _expires ) {
-			int r;
-			r = atoi( _expires.c_str() );
-			setRegisterExpires( r );
-		}
-		
-		void setRegisterExpires( int _expires ) {
-			if( _expires >= 0 && _expires < 100000 ) //sanity check ...
-				registerExpires = _expires;
-			else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-		}
 		
 		int sipProxyPort;
 		string sipProxyAddressString;
@@ -152,16 +148,33 @@ class LIBMSIP_API SipProxy{
 		string sipProxyUsername;
 		string sipProxyPassword;
 		
+		void setRegisterExpires( string _expires );
+		void setRegisterExpires( int _expires );
+		string getRegisterExpires( );
+		int getRegisterExpires_int( ) {return registerExpires;}
+		
+		void setDefaultExpires( string _expires );
+		void setDefaultExpires( int _expires );
+		string getDefaultExpires( );
+		int getDefaultExpires_int( ) {return defaultExpires;}
+		
+	private:
+		/**
+		Default expires value. 
+		This is the one read from the config file ... do not change once set
+		*/
+		int defaultExpires; //in seconds
+		
 		/**
 		 Value of the expires tag to be added for the contact in this proxy.
-		 *Use setRegisterExpires to set it to zero (de-register).
+		 Use setRegisterExpires to set it to zero (de-register).
+		 Note that this value may change during time ... basically, it changes
+		 to zero if we are unregistered. 
+		 The register_expires value read from the config file is stored in 
+			defaultExpies member.
 		 */
 		int registerExpires; //in seconds
 		
-		/**
-		Default expires value. 
-		*/
-		static int defaultExpires;
 };
 
 class LIBMSIP_API SipIdentity : public MObject{
