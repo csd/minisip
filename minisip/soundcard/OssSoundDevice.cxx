@@ -44,12 +44,12 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	if( isOpenedPlayback() ){
 		return 0;
 	}
-
+	
 	int mode = O_WRONLY; 	
 	/* FIXME */
 	this->fragment_setting = 0x00100008;
 	
-	fdPlayback = ::open( dev.c_str(), mode );
+	fdPlayback = ::open( dev.c_str(), mode | O_NONBLOCK );
 	
 	if( fdPlayback == -1 ){
 		merr << "Could not open the sound device " << dev << 
@@ -57,6 +57,11 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 			<< strerror( errno ) << end;
 		return -1;
 	}
+
+	// Remove O_NONBLOCK
+	int flags = fcntl( fdPlayback, F_GETFL );
+	flags &= ~O_NONBLOCK;
+	fcntl( fdPlayback, F_SETFL, flags );
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
@@ -147,12 +152,12 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	if( isOpenedRecord() ){
 		return 0;
 	}
-
+	
 	int mode = O_RDONLY; /*duplex ? O_RDWR : O_WRONLY;*/
 	/* FIXME */
 	this->fragment_setting = 0x00140008;
 	
-	fdRecord = ::open( dev.c_str(), mode );
+	fdRecord = ::open( dev.c_str(), mode | O_NONBLOCK );
 	
 	if( fdRecord == -1 ){
 		merr << "Could not open the sound device " << dev << 
@@ -160,6 +165,11 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 			<< strerror( errno ) << end;
 		return -1;
 	}
+
+	// Remove O_NONBLOCK
+	int flags = fcntl( fdRecord, F_GETFL );
+	flags &= ~O_NONBLOCK;
+	fcntl( fdRecord, F_SETFL, flags );
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
