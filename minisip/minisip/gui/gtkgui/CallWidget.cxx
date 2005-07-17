@@ -292,6 +292,17 @@ bool CallWidget::handleCommand( CommandString command ){
 			}
 		}
 
+		if( command.getOp() == SipCommandString::call_terminated_early ){
+			stopRinging();
+			callIds.remove( command.getDestinationId() );
+			if( command.getDestinationId() == mainCallId ){
+					status.set_markup( "<b><big>Call Terminated</big></b>" );
+					secStatus.set_text( "" );
+					rejectButton.set_label( "Close" );
+					state = CALL_WIDGET_STATE_TERMINATED;
+			}
+		}
+		
 		if( command.getOp() == SipCommandString::remote_reject ){
 			status.set_text( "Remote side rejected the call" );
 			secStatus.set_text( "" );

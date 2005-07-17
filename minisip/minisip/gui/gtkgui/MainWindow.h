@@ -67,6 +67,11 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		void show();
 
 		virtual void run();
+		
+		/**
+		Last function to execute before quitting the GUI.
+		Do any clean up deemed necessary here.
+		*/
 		virtual void quit();
 		virtual void log( int type, string msg );
 
@@ -149,19 +154,6 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		* It hides the main window and enters quit mode.
 		*/
 		bool on_window_close (GdkEventAny* event  );
-		
-		/**
-		* Set to true when the GUI enters quit mode.
-		* This way, we can treat some commands differently.
-		*/
-		bool quitMode; 
-		
-		/**
-		* This variable is used in quit mode, to now when
-		* all de-regs and calls are done. When it reaches zero,
-		* the kit.quit() function is called, terminating the gui.
-		*/
-		int quittingCount;
 		
 		SettingsDialog * settingsDialog;
 		CertificateDialog * certificateDialog;

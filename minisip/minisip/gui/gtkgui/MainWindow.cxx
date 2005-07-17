@@ -240,7 +240,6 @@ bool MainWindow::on_window_close (GdkEventAny* event  ) {
 }
 
 void MainWindow::run(){
-	quitMode = false; //we are not quitting ... we just started
 #ifndef WIN32
 	if( trayIcon != NULL )
 		kit.run( *(trayIcon->getWindow()) );
@@ -250,63 +249,7 @@ void MainWindow::run(){
 }
 
 void MainWindow::quit(){
-	
-	if( quitMode == false ) {
-		hide();
-		quitMode = true;
-		//Hang up all calls/conferences/IM
-		//Note that we are looping through the list and at the same 
-		//time removing (erase) from the list ... thus the iterator
-		//needs to be refreshed at each loop as it becomes invalid
-		list<CallWidget *>::iterator calls;
-		calls = callWidgets.begin();
-		while ( calls != callWidgets.end() ) {
-			string callid = (*calls)->getMainCallId();
-			cerr << "CESC: hanging up one call "  << callid << endl;
-			if( (*calls)->getState() == CALL_WIDGET_STATE_TERMINATED ) {
-				(*calls)->reject();
-			} else {
-				(*calls)->reject();
-				quittingCount++;
-			}
-			calls = callWidgets.begin();
-		} 
-		
-		list<ConferenceWidget *>::iterator confis;
-		confis = conferenceWidgets.begin();
-		while ( confis != conferenceWidgets.end() ) {
-			string callid = (*confis)->getMainCallId();
-			cerr << "CESC: hanging up one conference "  << callid << endl;
-			(*confis)->reject();
-			quittingCount++;
-			confis = conferenceWidgets.begin();
-		} 
-		
-		list<ImWidget *>::iterator ims;
-		ims = imWidgets.begin();
-		while ( ims != imWidgets.end() ) {
-			cerr << "CESC: hanging up one IM "  << (*ims)->getToUri() << endl;
-			removeIm( (*ims)->getToUri() );
-			ims = imWidgets.begin();
-		} 
-		
-		//De-register all identities ... send REGISTER with contact expires = 0
-		for (list<MRef<SipIdentity*> >::iterator i=config->identities.begin() ; i!=config->identities.end(); i++){
-				if ( (*i)->registerToProxy  ){
-						cerr << "De-Registering user "<< (*i)->getSipUri() << " to proxy " << (*i)->sipProxy.sipProxyAddressString<< ", requesting domain " << (*i)->sipDomain << endl;
-						CommandString dereg("",SipCommandString::proxy_register);
-						dereg["proxy_domain"] = (*i)->sipDomain;
-						dereg.setParam3("0"); //expires = 0 ==> de-register
-						getCallback()->guicb_handleCommand(dereg);
-						quittingCount++;
-				}
-		}
-		cout << "Number of tasks to shutdown = " << quittingCount << endl;
-	} 
-	cout << "Number of tasks still open = " << quittingCount << endl;
-	if( quittingCount == 0 ) {
-		kit.quit();
-	}
+	kit.quit();
 }
 
 bool MainWindow::isVisible(){
@@ -345,7 +288,9 @@ void MainWindow::gotCommand(){
 	commandsLock.lock();
 	CommandString command = commands.pop_back();
 	commandsLock.unlock();
-	
+#ifdef OUTPUT_DEBUG
+	merr << "DEBUG: MainWindow::gotCmd :  " << command.getString() << end;
+#endif
 	if( command.getOp() == "sip_ready" ){
 		mainWindowWidget->set_sensitive( true );
 		return;
@@ -431,48 +376,9 @@ void MainWindow::gotCommand(){
 		}
 		return;
 	}
-	
-	if( command.getOp() == SipCommandString::register_sent ) {
-		
-		return;
-	}
-	if( command.getOp() == SipCommandString::register_ok ) {
-		
-		if( quitMode ) {
-			quittingCount--;
-			quit();
-		}
-		return;
-	}
-	if( command.getOp() == SipCommandString::register_failed ) {
-		
-		//if we are quitting ... but some error happens when de-registering ... bad luck, but dont stop
-		if( quitMode ) {
-			quittingCount--;
-			quit();
-		}
-		return;
-	}
-	//In quit mode, the call/conf widgets have already been destroyed, 
-	//thus the call_terminated commands reach here.
-	if( command.getOp() == SipCommandString::call_terminated ) {
-		//no need to decrease here ... as long as all dialogs sent a "terminated_early" command to the gui (now only voip dialog does)
-		//if( quitMode ) {
-		//	quittingCount--;
-		//	quit();
-		//}
-		return;
-	}
-	if( command.getOp() == SipCommandString::call_terminated_early ) {
-		
-		if( quitMode ) {
-			quittingCount--;
-			quit();
-		}
-		return;
-	}
-	
-	mdbg << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
+#ifdef OUTPUT_DEBUG
+	merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
+#endif
 }	
 
 void MainWindow::gotPacket( int32_t /*i*/ ){
@@ -620,8 +526,8 @@ void MainWindow::addConference( string confId, string users,string remoteUri,str
 	
 }
 void MainWindow::removeCall( string callId ){
-	
-	
+	//do not increase the iterator automatically ... 
+	//   we remove elements, thus we obtain the next element inside the loop
 	for( list<CallWidget *>::iterator i = callWidgets.begin();
 			i != callWidgets.end(); i++){
 		if( (*i)->getMainCallId() == callId ){
