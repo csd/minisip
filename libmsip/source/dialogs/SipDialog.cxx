@@ -24,6 +24,9 @@
 
 #include<config.h>
 
+#include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderFrom.h>
+#include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
@@ -102,13 +105,15 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 			&& command.getCommandString().getOp()==SipCommandString::transaction_terminated){
 		
 		bool handled =false;
+		MRef<SipTransaction*> trans;
 		for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
 			if ((*i)->getCurrentStateName()=="terminated"){
+				trans = (*i);
 				sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
-				//merr << "CESC: SipDialog::handleCommand: Transaction state machine freed"<< end;
-				(*i)->freeStateMachine();
 				transactions.erase(i);
 				i=transactions.begin();
+				trans->freeStateMachine(); //let's break the cyclic references ...
+				//merr << "CESC: SipDlg::hdlCmd : freeing sip transaction state machine ... breaking the vicious circle!" << end;
 				handled=true;
 			}
 		}
@@ -145,5 +150,129 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 
 MRef<SipStack*> SipDialog::getSipStack(){
 	return sipStack;
+}
+
+/*
+Establish a dialog acting as a UAS (receive a request)
+- routeSet = Record-Route header list, direct order
+- remote target = contact header from request
+- remote uri = From uri
+- local uri = To uri
+- remote tag = From tag
+- local tag = To tag
+- remote seq = CSEQ from request
+- local seq = empty
+- call-id = call-id value from request
+*/
+bool SipDialogState::updateState( MRef<SipInvite*> inv ) {
+	//merr << "SipDialogState: updating state ... " << end;
+	if( routeSet.size() == 0 ) {
+		//merr << "dialog state has NO routeset" << end;
+		/*SipMessage::getRouteSet returns the top-to-bottom ordered 
+		Record-Route headers. 
+		As a server, we can use this directly as route set (no reversing).
+		*/
+		routeSet = inv->getRouteSet();
+		for( list<string>::iterator iter = routeSet.begin(); 
+					iter!=routeSet.end(); 
+					iter++ ) {
+			//merr << "SipDialogState:inv:  " << (*iter) << end;
+		}
+	} else {
+		//merr << "CESC: dialog state has a routeset" << end;
+	}
+
+	isEarly = false;	
+	remoteTarget = inv->getHeaderValueContact()->getUri().getString();
+	remoteUri = inv->getHeaderValueFrom()->getUri().getString();
+	localUri = inv->getHeaderValueTo()->getUri().getString();
+	
+	remoteTag = inv->getHeaderValueFrom()->getParameter("tag");
+	//The local tag needs to be computed locally ... for voip dialog,
+	// done in the constructor
+	
+	remoteSeqNo = inv->getCSeq();
+	//the callid already has a value, given at the constructor of 
+	//the dialog ... we repeat, just in case
+	callId = inv->getCallId(); 
+	secure = false; //FIXME: check if secure call ...	
+	return true;
+}
+
+
+/*
+Establish a dialog acting as a UAC (send a request, create
+state from the response)
+- routeSet = Record-Route header list, inverse order
+- remote target = contact header from response
+- remote uri = To uri
+- local uri = From uri
+- remote tag = To tag
+- local tag = From tag
+- remote seq = empty
+- local seq = CSEQ of req
+- call-id = call-id value from request
+*/
+bool SipDialogState::updateState( MRef<SipResponse*> resp) {
+	//Not all responses update the dialog state, only 
+	// 101-199 (with a TO tag!) and 2xx
+	if( resp->getStatusCode() < 101 
+		|| resp->getStatusCode() >= 300 ) {
+		return false;
+	}
+		
+	remoteTag = resp->getHeaderValueTo()->getParameter("tag");
+	
+	if( resp->getStatusCode() < 200 ) {
+		if( remoteTag == "" ) {
+			return false;
+		}
+		isEarly = true;
+	} else {
+		isEarly = false;
+	}
+	
+	//from here on, only 101-199 with to tag and 2xx responses
+	//merr << "SipDialogState: updating state ... " << end;	
+	if( routeSet.size() == 0 ) {
+		//merr << "dialog state has NO routeset" << end;
+		/*SipMessage::getRouteSet returns the top-to-bottom ordered 
+		Record-Route headers. 
+		As a client, we must reverse this directly as route set
+		*/
+		routeSet = resp->getRouteSet();
+		routeSet.reverse();
+		for( list<string>::iterator iter = routeSet.begin(); 
+					iter!=routeSet.end(); 
+					iter++ ) {
+			//merr << "SipDialogState:resp:  " << (*iter) << end;
+		}
+	} else {
+		//merr << "dialog state has a routeset" << end;
+	}
+	
+	remoteTarget = resp->getHeaderValueContact()->getUri().getString();
+	remoteUri = resp->getHeaderValueTo()->getUri().getString();
+	localUri = resp->getHeaderValueFrom()->getUri().getString();
+	
+	//remote tag ... updated at the top of this function ... 
+	localTag = resp->getHeaderValueFrom()->getParameter("tag");
+	
+	seqNo = resp->getCSeq();
+	//the callid already has a value, given at the constructor of 
+	//the dialog ... we repeat, just in case
+	callId = resp->getCallId(); 
+	secure = false; //FIXME: check if secure call ... 
+	return true;
+}
+
+
+string SipDialogState::getRemoteTarget() {
+	if( remoteTarget != "" ) {
+		return remoteTarget;
+	} else {
+		//merr << "SipDialogSTate::getRemoteTarget : remote target empty! returning remote uri .." << end;
+		return remoteUri;
+	}
 }
 

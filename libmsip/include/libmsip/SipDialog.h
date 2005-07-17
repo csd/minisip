@@ -43,6 +43,8 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
+#include<libmsip/SipInvite.h>
+#include<libmsip/SipResponse.h>
 
 using namespace std;
 
@@ -52,15 +54,60 @@ class SipDialogConfig;
 class SipDialogContainer;
 
 
+/**
+The dialog's state information, as specified by the RFC.
+The values to store change depending on wheather we are acting
+as a UAC or UAS when the dialog is being established.
+Check RFC 3261, Section 12.1
+*/
 class LIBMSIP_API SipDialogState{
 	public:
+		
+		/**
+		Establish a dialog acting as a UAS (receive a request)
+		- routeSet = Record-Route header list, direct order
+		- remote target = contact header from request
+		- remote uri = From uri
+		- local uri = To uri
+		- remote tag = From tag
+		- local tag = To tag
+		- remote seq = CSEQ from request
+		- local seq = empty
+		- call-id = call-id value from request
+		*/
+		bool updateState( MRef<SipInvite*> inv );
+		
+		/**
+		Establish a dialog acting as a UAC (send a request, create
+		state from the response)
+		- routeSet = Record-Route header list, inverse order
+		- remote target = contact header from response
+		- remote uri = To uri
+		- local uri = From uri
+		- remote tag = To tag
+		- local tag = From tag
+		- remote seq = empty
+		- local seq = CSEQ of req
+		- call-id = call-id value from request
+		*/
+		bool updateState( MRef<SipResponse*> resp);
+		
 		string callId;
 		string localTag;
 		string remoteTag;
 		
 		int seqNo;
 		int remoteSeqNo;
-//		string localUri;	// not used yet
+		string localUri;	// not used yet
+
+		/**
+		When constructing the ACK or follow up in-dialog requests,
+		we place as request-uri the remoteTarget (that is, the contact
+		uri). But, if for whatever reason this is empty, we return the 
+		the remoteUri (either the To or From uri) and give an error
+		messge.
+		*/
+		string getRemoteTarget();
 		string remoteUri;
 		string remoteTarget;
 		bool secure;
