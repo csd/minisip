@@ -49,6 +49,7 @@
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
+#include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipURI.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
@@ -110,15 +111,15 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 
 		static MRef<SipMessage*> createMessage(string &buf); 
 
-                /**
-                 * There are two ways to determine what kind of SIP message
-                 * a SipMessage really is - dynamic_cast and getType.
-                 * getType is ~10 times faster and does not require to test
-                 * for each type individualy.
-                 * @return The type of SIP message as integer. The
-                 *     different types are defined (static const) in the 
-                 *     respective sub-classes, for example SipBye::type.
-                 */
+		/**
+			* There are two ways to determine what kind of SIP message
+			* a SipMessage really is - dynamic_cast and getType.
+			* getType is ~10 times faster and does not require to test
+			* for each type individualy.
+			* @return The type of SIP message as integer. The
+			*     different types are defined (static const) in the 
+			*     respective sub-classes, for example SipBye::type.
+			*/
 		int getType();
 
 		/**
@@ -135,143 +136,146 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		}
 		
 
-		
-                /**
-                 * Adds one header (specialization of SipHeader) to the SIP
-                 * message. The header added first to the SIP message will
-		 * also appear first in the string representation of the
-		 * message returned by getString().
-                 * @param header        Header to add.
-                 */
+		/**
+		* Adds one header (specialization of SipHeader) to the SIP
+		* message. The header added first to the SIP message will
+		* also appear first in the string representation of the
+		* message returned by getString().
+		* @param header        Header to add.
+		*/
 		void addHeader(MRef<SipHeader*> header);
 
-                /**
-                 * @return Size in bytes of the content of the SIP message.
-                 * This is the number in the "ContentLength" header.
-                 */
+		/**
+		* @return Size in bytes of the content of the SIP message.
+		* This is the number in the "ContentLength" header.
+		*/
 		int32_t getContentLength();
 		
                 
-                //----------------------------------------------------
-                // The following nine methods are used to simplify
-                // using SIP Messages by extracting commonly used
-                // parts.
+				//----------------------------------------------------
+				// The following nine methods are used to simplify
+				// using SIP Messages by extracting commonly used
+				// parts.
 		
-                /**
-                 * @return The "From:" header.
-                 */
+		/**
+		* @return The "From:" header.
+		*/
 		MRef<SipHeaderValueFrom*> getHeaderValueFrom();
 		
-                /**
-                 * @return The "To:" header.
-                 */
-                MRef<SipHeaderValueTo*> getHeaderValueTo();
+		/**
+		* @return The "To:" header.
+		*/
+		MRef<SipHeaderValueTo*> getHeaderValueTo();
 		
-                /**
-		 * Sets the content of the SIP message. A SIP message can
-		 * only contain one content. This single content can be a
-		 * multipart content (see SipMIMEContent).
-		 * 
-                 * @param content       Content of the SIP message. This
-                 *                      affects the ContentLength and any
-                 *                      previous content will be removed.
-                 */
+		/**
+		* @return The "Contact:" header.
+		*/		
+		MRef<SipHeaderValueContact*> getHeaderValueContact();
+		
+		/**
+		* Sets the content of the SIP message. A SIP message can
+		* only contain one content. This single content can be a
+		* multipart content (see SipMIMEContent).
+		* 
+		* @param content       Content of the SIP message. This
+		*                      affects the ContentLength and any
+		*                      previous content will be removed.
+		*/
 		void setContent(MRef<SipMessageContent*> content);
 
-                /**
-                 * @return Content of the SIP message
-                 */
+		/**
+		* @return Content of the SIP message
+		*/
 		MRef<SipMessageContent *> getContent();
 		
-                /**
-                 * @return The command sequence identifier (integer part).
-                 */
+		/**
+		* @return The command sequence identifier (integer part).
+		*/
 		int32_t getCSeq();
 
-                /**
-                 * @return The command sequence identifier (method part).
-                 */
+		/**
+		* @return The command sequence identifier (method part).
+		*/
 		string getCSeqMethod();
 		
-                /**
-                 * @return The branch parameter associated with the top
-		 * most via header, or an empty string if there is no via
-		 * header or if the branch is not set in the topmost via
-		 * header.
-                 */
+		/**
+		* @return The branch parameter associated with the top
+		* most via header, or an empty string if there is no via
+		* header or if the branch is not set in the topmost via
+		* header.
+		*/
 		string getFirstViaBranch();
 
 		/**
-		 * @return The branch parameter in the last via header in
-		 * the message.
-		 */
+		* @return The branch parameter in the last via header in
+		* the message.
+		*/
 		string getLastViaBranch();
 		
 
-                /**
-                 * @return Call ID in the SIP message.
-                 */
+		/**
+		* @return Call ID in the SIP message.
+		*/
 		string getCallId();
 
-                /**
-                 * @return The URI in the "From:" header.
-                 */
+		/**
+		* @return The URI in the "From:" header.
+		*/
 		SipURI getFrom();
 		
-                /**
-                 * @return The URI in the "To:" header.
-                 */
-                SipURI getTo();
+		/**
+		* @return The URI in the "To:" header.
+		*/
+		SipURI getTo();
                 
-
 		/**
 		 * Removes all via headers that may be in the message.
 		 */
 		void removeAllViaHeaders();
 		
-                /**
-                 * @return The complete message as a string.
-                 */
+		/**
+		* @return The complete message as a string.
+		*/
 		virtual string getString()=0;
 		
-                /**
-                 * @return The headers plus the content as a string. This
-                 * is the complete SIP package minus the first line.
-                 */
-                virtual string getHeadersAndContent();
+		/**
+		* @return The headers plus the content as a string. This
+		* is the complete SIP package minus the first line.
+		*/
+		virtual string getHeadersAndContent();
 
 		/**
-		 * @return The warning message contained in Warning: header
-		 */
+		* @return The warning message contained in Warning: header
+		*/
 		string getWarningMessage();
 
 		
 		friend ostream & operator<<(ostream &out, SipMessage &);
-                std::string getDescription();
+		std::string getDescription();
 		
 		/**
-		 *
-		 * @return Branch parameter associated with this message.
-		 * If it is non empty string it identifies which
-		 * transaction it belongs to.
-		 */
+		*
+		* @return Branch parameter associated with this message.
+		* If it is non empty string it identifies which
+		* transaction it belongs to.
+		*/
 		string getDestinationBranch();
 
-                /**
-                 * @returns Nonce in this repsonse if available.
-                 */
-                string getNonce();
-
-                /**
-                 * @returns Realm in this response if available.
-                 */
-                string getRealm();
+		/**
+		* @returns Nonce in this repsonse if available.
+		*/
+		string getNonce();
 
 		/**
-		 * @return Number of headers in this message. Notice that
-		 * this is not the number of header values that can be
-		 * higher.
-		 */
+		* @returns Realm in this response if available.
+		*/
+		string getRealm();
+
+		/**
+		* @return Number of headers in this message. Notice that
+		* this is not the number of header values that can be
+		* higher.
+		*/
 		int getNoHeaders();
 
 		/**
@@ -289,12 +293,19 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		MRef<SipHeaderValue*> getHeaderValueNo(int type, int i);
 
+		/**
+		* Return a list with the route set, extracted from the 
+		* Record-Route headers (in the same order as in the message,
+		* top Record-Route first).
+		* Return an empty list if no route-set or error.
+		*/
+		list<string> getRouteSet();
 
 
 	protected:
 		void setDestinationBranch(string b){branch = b;}
-                void setNonce(string n);
-                void setRealm(string r);
+		void setNonce(string n);
+		void setRealm(string r);
 
 		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
 

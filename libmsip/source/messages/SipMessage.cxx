@@ -153,8 +153,10 @@ void SipMessage::addHeader(MRef<SipHeader*> header){
 #ifdef MINISIP_MEMDEBUG
 	header.setUser("SipMessage");
 #endif
-	if( header.isNull() )
+	if( header.isNull() ) {
+		merr << "ERROR: trying to add null header to message!"<<end;
 		return;
+	}
 	headers.push_back(header);
 }
 
@@ -202,7 +204,6 @@ string SipMessage::getHeadersAndContent(){
 		req=req+content_length.getString()+"\r\n";
 	}
 	req=req+"\r\n";
-	
 	
 	if ( !content.isNull()){
 		req=req + content->getString();
@@ -446,6 +447,12 @@ MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 
 }
 
+MRef<SipHeaderValueContact*> SipMessage::getHeaderValueContact(){
+
+	return MRef<SipHeaderValueContact*>( (SipHeaderValueContact*)*(getHeaderOfType(SIP_HEADER_TYPE_CONTACT)->getHeaderValue(0)));
+
+}
+
 MRef<SipHeader *> SipMessage::getHeaderOfType(int t, int i){
 	
 	for (int32_t j=0; j< headers.size(); j++){
@@ -481,32 +488,6 @@ MRef<SipHeaderValue*> SipMessage::getHeaderValueNo(int type, int i){
 
 }
 
-
-
-/*
-list<string> SipMessage::getRouteSet(){
-	list<string> ret;
-	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
-		if ((headers[i])->getType() == SIP_HEADER_TYPE_RECORDROUTE){
-			string route = ((SipHeaderValueRecordRoute *)*(headers[i]->getHeaderValue(0)))->getRoute();
-			int i=0;
-			string part;
-			while (i<(int)route.size()){
-				if (route[i]==','){
-					ret.push_back(trim(part));
-					part="";
-				}else{
-					part = part + route[i];
-				}
-				
-			       	i++;
-			}
-			ret.push_back(trim(part));
-		}
-	return ret;
-}
-*/
-
 string SipMessage::getWarningMessage(){
 	for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_WARNING){
@@ -531,4 +512,21 @@ string SipMessage::getNonce(){
 
 void SipMessage::setNonce(string n){
         nonce=n;
+}
+
+list<string> SipMessage::getRouteSet() {
+	list<string> set;
+
+	//merr << "CESC: SipMessage::getRouteSet() " << end;
+	for( int i=0; i<headers.size(); i++ ) {
+		if( headers[i]->getType() == SIP_HEADER_TYPE_RECORDROUTE ) {
+			for( int j=0; j<headers[i]->getNoValues(); j++ ) {
+				MRef<SipHeaderValueRecordRoute *> rr = (MRef<SipHeaderValueRecordRoute *>) ((SipHeaderValueRecordRoute *)*headers[i]->getHeaderValue(j));
+				//merr << "CESC: SipMessage: Record-Route: (" << i << "," << j << ") : " << rr->getStringWithParameters() << end;
+				set.push_back( rr->getStringWithParameters() );	
+			}
+			//merr << "CESC: SipMessage: Record-Route: " << headers[i]->getString() << end;
+		} 
+	}
+	return set;
 }
