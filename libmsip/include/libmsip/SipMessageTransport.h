@@ -67,11 +67,11 @@ class SocketServer : public Runnable{
 		void start();
 		void stop();
 
-        private:
-                MRef<ServerSocket *> ssock;
-                MRef<SipMessageTransport *> receiver;
-                bool doStop;
-                MRef<Semaphore *> started_flag;
+	private:
+		MRef<ServerSocket *> ssock;
+		MRef<SipMessageTransport *> receiver;
+		bool doStop;
+		MRef<Semaphore *> started_flag;
 };
 
 
@@ -102,7 +102,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		
 		void setCommandReceiver(MRef<CommandStringReceiver* > rcvr);
 
-                virtual std::string getMemObjectType(){return "SipMessageTransport";}
+		virtual std::string getMemObjectType(){return "SipMessageTransport";}
 
 		void sendMessage(MRef<SipMessage*> pack, 
 				IPAddress &toaddr, 

@@ -347,36 +347,35 @@ static void * udpThread( void * arg );
 static void * streamThread( void * arg );
 
 SipMessageTransport::SipMessageTransport(
-			string local_ip, 
-			string contactIP, 
-			string preferredTransport,
-			int32_t externalContactUdpPort, 
-			int32_t local_udp_port, 
-			int32_t local_tcp_port,
-			int32_t local_tls_port,
-			MRef<certificate_chain *> cchain, 
-			MRef<ca_db *> cert_db
+						string local_ip, 
+						string contactIP, 
+						string preferredTransport,
+						int32_t externalContactUdpPort, 
+						int32_t local_udp_port, 
+						int32_t local_tcp_port,
+						int32_t local_tls_port,
+						MRef<certificate_chain *> cchain, 
+						MRef<ca_db *> cert_db
 			):
-				//udpsock(false,local_udp_port),
-				localIP(local_ip),
-				contactIP(contactIP),
-				preferredTransport(preferredTransport),
-				externalContactUdpPort(externalContactUdpPort),
-				localUDPPort(local_udp_port),
-				localTCPPort(local_tcp_port),
-				localTLSPort(local_tls_port),
-				cert_chain(cchain), 
-				cert_db(cert_db),
-				tls_ctx(NULL)
-						
+			//udpsock(false,local_udp_port),
+			localIP(local_ip),
+			contactIP(contactIP),
+			preferredTransport(preferredTransport),
+			externalContactUdpPort(externalContactUdpPort),
+			localUDPPort(local_udp_port),
+			localTCPPort(local_tcp_port),
+			localTLSPort(local_tls_port),
+			cert_chain(cchain), 
+			cert_db(cert_db),
+			tls_ctx(NULL)
 {
 	udpsock = new UDPSocket(false, local_udp_port);
 	
-        Thread::createThread(udpThread, this);
+	Thread::createThread(udpThread, this);
 	
 	int i;
 	for( i=0; i < NB_THREADS ; i++ ){
-		Thread::createThread(streamThread, new StreamThreadData(this));
+            Thread::createThread(streamThread, new StreamThreadData(this));
 	}
 }
 
@@ -429,8 +428,8 @@ void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> re
 }
 
 void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
-		                        MRef<StreamSocket *> socket,
-					string branch ){
+									MRef<StreamSocket *> socket,
+									string branch ){
 	string transport;
 	uint16_t port;
 
@@ -458,41 +457,38 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 }
 
 void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
-                                     IPAddress &ip_addr, 
-                                     int32_t port, 
-				     string branch,
-				     bool addVia
-				     )
+									IPAddress &ip_addr, 
+									int32_t port, 
+									string branch,
+									bool addVia
+									)
 {
 	MRef<StreamSocket *> socket;
 
 				
 	try{
-		socket = findStreamSocket(ip_addr, port);
 
-		if( socket.isNull() && preferredTransport != "UDP" ){
-			/* No existing StreamSocket to that host,
-			 * create one */
-
-			if( preferredTransport == "TLS" ){
+		if( preferredTransport != "UDP" ){
+			
+			if( preferredTransport == "TLS" ) {
 				//FIXME have a different port per transport,
 				//to avoid this ...
-				socket = findStreamSocket(ip_addr, 5061);
-				if( socket.isNull() ){
+				port = 5061; 
+			}
+			socket = findStreamSocket(ip_addr, port);
+			if( socket.isNull() ) {
+				/* No existing StreamSocket to that host,
+				* create one */
+				cerr << "CESC: SipMessageTransport: sendMessage: creating new socket" << endl;
+				if( preferredTransport == "TLS" )
 					socket = new TLSSocket( ip_addr, 
-		                        5061, tls_ctx, getMyCertificate(),
-					cert_db );
-				}
+								5061, tls_ctx, getMyCertificate(),
+								cert_db );
+				else /* TCP */
+					socket = new TCPSocket( ip_addr, port );
+			} else cerr << "CESC: SipMessageTransport: sendMessage: reusing old socket" << endl;
 
-				addSocket( socket );
-			}
-
-			else{ /* TCP */
-				socket = new TCPSocket( ip_addr, port );
-
-				addSocket( socket );
-			}
-			
+			addSocket( socket );
 		}
 
 		if (addVia){
@@ -545,6 +541,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
 		mdbg << "Transport error in SipMessageTransport: " << message << end;
+		cerr << "CESC: SipMessageTransport: sendMessage: exception thrown!" << endl;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
@@ -606,11 +603,11 @@ void SipMessageTransport::udpSocketRead(){
     	fd_set set;
 	
 	while( true ){
-	        FD_ZERO(&set);
-        	FD_SET(udpsock->getFd(), &set);
+		FD_ZERO(&set);
+		FD_SET(udpsock->getFd(), &set);
 
 		do{
-            		avail = select(udpsock->getFd()+1,&set,NULL,NULL,NULL );
+			avail = select(udpsock->getFd()+1,&set,NULL,NULL,NULL );
 		} while( avail < 0 );
 
 		if( FD_ISSET( udpsock->getFd(), &set )){
@@ -633,10 +630,10 @@ void SipMessageTransport::udpSocketRead(){
 			try{
 #ifndef _MSC_VER
 				//ts.save( PACKET_IN );
-			char tmp[12];
-			tmp[11]=0;
-			memcpy(&tmp[0], buffer, 11); 
-			ts.save( tmp );
+				char tmp[12];
+				tmp[11]=0;
+				memcpy(&tmp[0], buffer, 11); 
+				ts.save( tmp );
 
 #endif
 				string data = string(buffer, nread);
@@ -688,7 +685,7 @@ void StreamThreadData::run(){
                 transport->semaphore.dec();
                 
 		/* Take the last socket pending to be read */
-                transport->socksPendingLock.lock();
+		transport->socksPendingLock.lock();
 		socket = transport->socksPending.front();
 		transport->socksPending.pop_front();
 		transport->socksPendingLock.unlock();
