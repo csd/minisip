@@ -67,7 +67,8 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	}
 
 #ifdef DEBUG_OUTPUT
-	mdbg<< "Dispatcher got command: "<< c<< end;
+	merr<< end << 	"Dispatcher got command: "<< end << 
+			"'----> " << c << end;
 #endif
 
 	dialogListLock.lock();
@@ -76,12 +77,41 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 		if (c.getCommandString().getOp()==SipCommandString::call_terminated){
 			for (int i=0; i< dialogs.size(); i++){
 				if (dialogs[i]->getCurrentStateName()=="terminated"){
-					//merr << "CESC: SipMsgDispatcher::handleCommand: Dialog State Machine freed"<< end;
-					dialogs[i]->freeStateMachine();
+					MRef<SipDialog *> dlg = dialogs[i];
 					dialogs.remove(i);
+					//merr << "CESC: SipMsgDispatcher::hdleCmd : breaking the dialog vicious circle" << end;
+					dlg->freeStateMachine();
 					i=0;
 				}
 			}
+			dialogListLock.unlock();
+			return true;
+			
+		}else if ( 	c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||
+				c.getCommandString().getOp() == SipCommandString::register_all_identities ||
+				c.getCommandString().getOp() == SipCommandString::register_all_identities_done ||
+				c.getCommandString().getOp() == SipCommandString::unregister_all_identities ||
+				c.getCommandString().getOp() == SipCommandString::unregister_all_identities_done ||
+				c.getCommandString().getOp() == SipCommandString::terminate_all_calls ||
+				c.getCommandString().getOp() == SipCommandString::terminate_all_calls_done ||
+				c.getCommandString().getOp() == SipCommandString::call_terminated_early ||
+				c.getCommandString().getOp() == SipCommandString::register_ok) { 
+			//commands that are only interesting to the management dialog ...
+			dialogListLock.unlock(); //unlock the list ... it may be used in the SipDialogManagement
+			//Refurbish the command ... or the SipDialog::handleCmd won't let it through
+			SipSMCommand cmd( c.getCommandString(),
+					SipSMCommand::DIALOGCONTAINER,
+					SipSMCommand::TU);
+			managementHandler->handleCommand(cmd);
+			return true;
+			
+		}else if ( c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
+			dialogListLock.unlock(); //unlock the list ... it may be used in the SipDialogManagement
+			SipSMCommand cmd( c.getCommandString(),
+					SipSMCommand::DIALOGCONTAINER,
+					SipSMCommand::TU);
+// 			managementHandler->handleCommand(cmd); //process the command, so it moves to terminated state
+			managementHandler->getSipStack()->getDialogContainer()->stopRunning();
 			dialogListLock.unlock();
 			return true;
 		}else{

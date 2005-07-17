@@ -35,6 +35,7 @@
 
 
 #include"SipSoftPhoneConfiguration.h"
+#include<libmsip/SipDialogManagement.h>
 #include"SipDialogVoip.h"
 #include"SipDialogConfVoip.h"
 #include<libmsip/SipCommandString.h>
@@ -86,6 +87,9 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	
 	sipstack->setDefaultHandler(MRef<SipDialog*>(*defaultDialogHandler));
 
+	//CESC -- change to use set/get
+	MRef<SipDialogManagement *> shutdown = new SipDialogManagement(sipstack);	
+	sipstack->getDialogContainer()->getDispatcher()->managementHandler = MRef<SipDialog*>(*shutdown);
 
 	//Register content factories that are able to parse the content of
 	//sip messages. text/plain, multipart/mixed, multipart/alternative
@@ -191,12 +195,15 @@ string Sip::invite(string &user){
 		
 	}
 
-
+#ifdef DEBUG_OUTPUT
         cerr << "Before new mediaSession" << endl;
+#endif
 MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
+#ifdef DEBUG_OUTPUT
         cerr << "After new mediaSession" << endl;
-
+#endif
+	
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
@@ -207,10 +214,13 @@ MRef<Session *> mediaSession =
 
 #endif
 
+#ifdef DEBUG_OUTPUT
         cerr << "Before addDialog" << endl;
+#endif	
 	/*dialogContainer*/sipstack->addDialog(voipCall);
+#ifdef DEBUG_OUTPUT
         cerr << "After addDialog" << endl;
-	
+#endif
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifndef _MSC_VER
 	ts.save( TMP );
@@ -218,9 +228,13 @@ MRef<Session *> mediaSession =
 	
         SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
 	
+#ifdef DEBUG_OUTPUT
         cerr << "Before handleCommand" << endl;
+#endif
 	sipstack->handleCommand(cmd);
+#ifdef DEBUG_OUTPUT
         cerr << "After handleCommand" << endl;
+#endif
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
         //
         mediaSession->setCallId( voipCall->getCallId() );

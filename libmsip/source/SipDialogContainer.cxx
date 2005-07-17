@@ -73,6 +73,7 @@
 
 SipDialogContainer::SipDialogContainer() {
 	dispatcher = new SipMessageDispatcher;
+	keepRunning = true;
 }
 
 void SipDialogContainer::setDefaultHandler(MRef<SipDialog*> dflt){
@@ -154,11 +155,17 @@ void SipDialogContainer::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCo
         semaphore.inc();
 }
 
+void SipDialogContainer::stopRunning() {
+	//mdbg << "SipDialogContainer ... stopping!!!!!" << end;
+	keepRunning = false;
+}
+
 void SipDialogContainer::run(){
 #ifdef DEBUG_OUTPUT
 	static int runcount = 1;
 #endif
-	while (1){
+
+	while (keepRunning){
 #ifdef DEBUG_OUTPUT
 		runcount--;
 #endif

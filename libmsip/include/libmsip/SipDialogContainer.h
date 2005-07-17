@@ -168,13 +168,18 @@ class LIBMSIP_API SipDialogContainer : public MObject{
 		 */
                 virtual void run();
 		
+		/**
+		Stop the ::run() method
+		*/
+		void stopRunning();
+		
 		MRef<SipMessageDispatcher*> getDispatcher() const;
 
 		void addDialog(MRef<SipDialog*> call);
 
 		void setCallback(SipCallback* callback);
 		SipCallback* getCallback() const;
-                
+		
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
 		
@@ -182,11 +187,17 @@ class LIBMSIP_API SipDialogContainer : public MObject{
 		minilist<queue_type> low_prio_command_q;
 		
 		MRef<SipDialog*> defaultHandler;
+		
 		SipCallback* callback;
 
-                Semaphore semaphore;
-                Mutex mlock;
-                
+		Semaphore semaphore;
+		Mutex mlock;
+
+		/**
+		We will use this to stop the dialog container :: run()
+		on stack shutdown.
+		*/
+		bool keepRunning;                
 };
 
 /*
