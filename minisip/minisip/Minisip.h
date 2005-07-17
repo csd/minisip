@@ -38,6 +38,14 @@ class Minisip : public Runnable{
 		Gui * gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
+		
+		/**
+		This thread object contains the running sip thread ...
+		We need it to stop it when quitting minisip and waiting for
+		it to be finished with the sip stack shutdown.
+		*/
+		MRef<Thread*>  sipThread;
+		
 		//TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > * timeoutprovider;
 #ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT

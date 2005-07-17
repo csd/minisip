@@ -157,8 +157,11 @@ class SipDialogVoip: public SipDialog{
 #ifdef IPSEC_SUPPORT
 		MRef<MsipIpsecAPI *> ipsecSession;
 #endif
-
-		bool guiNotifyEarly;
+		/**
+		Used to notify once of the call_terminated_early command.
+		Useful for shutdown and management purposes.
+		*/
+		bool notifyEarlyTermination;
 };
 
 #endif
