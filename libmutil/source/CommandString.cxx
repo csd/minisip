@@ -82,7 +82,15 @@ void CommandString::setParam3(string p){
 }
 
 string CommandString::getString(){
-	return "op="+keys["op"]+"; param="+keys["param"]+" param2="+keys["param2"]+" param3="+keys["param3"]+" callid="+keys["destination_id"];
+	string ret;
+	map<string,string>::iterator it;
+	it = keys.begin();
+	ret = "op=" + keys["op"] + "; ";
+	for( it = keys.begin(); it!=keys.end(); it++ ) {
+		if( it->first != "op" && it->second!="" )
+			ret+= it->first + "=" + it->second + "; ";
+	}
+	return ret;
 }
 
 string &CommandString::operator[](string key){

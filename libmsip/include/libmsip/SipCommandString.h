@@ -45,11 +45,30 @@ class LIBMSIP_API SipCommandString{
 		/*
 		 * Predefined command strings
 		 */
+		 
+		/*
+		Stack management
+		*/
+		static const string sip_stack_shutdown;
+		static const string sip_stack_shutdown_done;
+		static const string register_all_identities;
+		static const string register_all_identities_done;
+		static const string unregister_all_identities;
+		static const string unregister_all_identities_done;
+		static const string terminate_all_calls;
+		static const string terminate_all_calls_done;
+		
+		/*
+		Transaction/Dialog related
+		*/
 		static const string transaction_terminated;
 		static const string call_terminated;
 		static const string call_terminated_early;
 		static const string no_transactions;
                 
+		/*
+		Action triggers or result information
+		*/
 		static const string error_message;
 		static const string transport_error;
 		static const string authentication_failed;
@@ -73,6 +92,9 @@ class LIBMSIP_API SipCommandString{
 		static const string security_failed;
 		static const string setpassword;
 		
+		/*
+		Registration Related
+		*/
 		static const string proxy_register;
 		static const string register_sent;
 		static const string register_no_reply;

@@ -26,6 +26,15 @@
 
 #include<libmsip/SipCommandString.h>
 
+const string SipCommandString::sip_stack_shutdown="sip_stack_shutdown";
+const string SipCommandString::sip_stack_shutdown_done="sip_stack_shutdown_done";
+const string SipCommandString::register_all_identities="register_all_identities";
+const string SipCommandString::register_all_identities_done="register_all_identities_done";
+const string SipCommandString::unregister_all_identities="unregister_all_identities";
+const string SipCommandString::unregister_all_identities_done="unregister_all_identities_done";
+const string SipCommandString::terminate_all_calls="terminate_all_calls";
+const string SipCommandString::terminate_all_calls_done="terminate_all_calls_done";
+		
 const string SipCommandString::transaction_terminated="transaction_terminated";
 const string SipCommandString::call_terminated="call_terminated";
 const string SipCommandString::call_terminated_early="call_terminated_early";
