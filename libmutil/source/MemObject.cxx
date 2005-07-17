@@ -42,13 +42,14 @@ MObject::MObject() : refCount(0){
 #ifdef MDEBUG
 	global.lock();
 	ocount++;
+	//cerr << "MObject:: SipSMCommand created; ptr=" << itoa((int)this) << endl;
 	objs.push_back(this);
 	global.unlock();
 #endif
 }
 
 MObject::~MObject(){
-#ifdef MDEBUG	
+#ifdef MDEBUG
 	global.lock();
 	for (int i=0; i<objs.size(); i++){
 		if (this == objs[i]){
@@ -74,7 +75,9 @@ int MObject::decRefCount(){
 #ifdef MDEBUG
 	global.unlock();
 	if (ref==0 && outputOnDestructor){
-		string output = "~MO:"+getMemObjectType()+"\n";
+	
+	
+		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(ref) + "; ptr=" + itoa((int)this);
 		cerr << output << endl;
 	}
 #else
@@ -94,6 +97,11 @@ void MObject::incRefCount(){
 	
 #ifdef MDEBUG
 	global.unlock();
+	//if (outputOnDestructor ){
+	if (refCount == 1 && outputOnDestructor ){
+		string output = "MO (++):"+getMemObjectType()+ "; count=" + itoa(refCount);
+		cerr << output << endl;
+	}
 #else
 	refLock.unlock();
 #endif
@@ -110,7 +118,7 @@ minilist<string> getMemObjectNames(){
 	for (int i=0; i< objs.size(); i++){
 		int count = objs[i]->getRefCount();
 		string countstr = count?itoa(count):"on stack"; 
-		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")");
+		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]));
 	}
 	global.unlock();
 	return ret;

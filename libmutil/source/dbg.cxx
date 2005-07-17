@@ -36,6 +36,10 @@ Dbg merr(false);
 Dbg mdbg(true, false);
 DbgEndl end;
 
+//#ifdef SM_DEBUG
+bool outputStateMachineDebug = false;
+//#endif
+
 Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), debugHandler(NULL){
 }
 

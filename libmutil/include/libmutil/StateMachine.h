@@ -45,13 +45,22 @@
 
 #include<list>
 #include<libmutil/TimeoutProvider.h>
-#include<libmutil/dbg.h>
 #include<libmutil/MemObject.h>
+
+//#define SM_DEBUG //dont! use libxxx/include/config.h instead
+//#undef SM_DEBUG
+//#define SM_DEBUG_COMMAND
+//#undef SM_DEBUG_COMMAND
+
 
 using namespace std;
 
 #ifdef SM_DEBUG
+
+#include<libmutil/dbg.h> 
+	//this external variable is initialized in dbg.cxx ...
 extern bool outputStateMachineDebug;
+
 #endif
 
 template<class CommandType, class TimeoutType> class StateTransition;
