@@ -203,17 +203,22 @@ class TimeoutProvider : public Runnable{
 		}
 
 		/**
-		 * The destructor is not guaranteed to finnish since it 
-		 * waits for the thread delivering timeouts to return. That
-		 * thread will stop if it is either sleeping or after it
-		 * has finished delivering a timeout.
+		 * This destructor should not be called manually, but be run
+		 * automatically when the reference counter reaches 0
+		 * (in which case the thread will have terminated).
 		 */
 		~TimeoutProvider(){
+			delete thread;
+			thread=NULL;
+		}
+
+		/**
+		 * Terminates the TO thread.
+		 */
+		void stopThread(){
 			stop=true;
 			wake();
 			thread->join();
-			delete thread;
-			thread=NULL;
 		}
 
 		/**
