@@ -124,6 +124,12 @@ protected:
 	 * implement the keyPressed method.
 	 */
 	virtual void keyPressed(int ){}; /// key pressed is the argument.
+
+	/**
+	 * Whether or not the main loop should continue on next iteration
+	 */
+	bool running;
+
 private:
 	void outputSuggestions(minilist<string> &l);
 	string displaySuggestions(string);

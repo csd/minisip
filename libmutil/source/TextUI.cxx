@@ -85,10 +85,11 @@ static int nonblockin_stdin()
 }
 
 TextUI::TextUI() : maxHints(2000){
-    if ( nonblockin_stdin()!=0){
-        cerr << "ERROR: Could not make stdin non-blocking"<< endl;
-//        exit(1);
-    }
+	if ( nonblockin_stdin()!=0){
+		cerr << "ERROR: Could not make stdin non-blocking"<< endl;
+		//        exit(1);
+	}
+	running = true;
 }
 
 void TextUI::addCommand(string cmd){
@@ -136,7 +137,7 @@ void TextUI::displayMessage(string msg, int style){
 
 void TextUI::guimain(){
 	cout << promptText << "$ "<< flush;
-	while (1){
+	while (running){
 		char c = ' ';
 		int err;
 #if defined WIN32 || defined _MSC_VER

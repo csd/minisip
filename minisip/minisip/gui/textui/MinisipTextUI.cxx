@@ -45,6 +45,7 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 //    debugtextui=this;
 //#endif
 
+    addCommand("quit");
     addCommand("answer");
     addCommand("disable autoanswer");
     addCommand("enable autoanswer");
@@ -743,6 +744,12 @@ void MinisipTextUI::guiExecute(string cmd){
 
 		command["proxy_domain"] = regproxy;
 		callback->guicb_handleCommand(command);
+		handled=true;
+	}
+	
+	if (command == "quit"){
+		running=false;
+		displayMessage("Minisip is exiting...");
 		handled=true;
 	}
 
