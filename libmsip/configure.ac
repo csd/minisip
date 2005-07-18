@@ -24,6 +24,8 @@ AC_PROG_LIBTOOL
 
 AC_C_BIGENDIAN
 
+AC_LANG(C++)
+
 
 dnl STL
 dnl For now STL is made mandatory
@@ -59,6 +61,20 @@ AC_ARG_ENABLE(memdebug,
 
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
+
+
+dnl
+dnl libmnetutil
+dnl
+AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
+        headers/library. Try installing the libmnetutil-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mnetutil], [main],
+        [
+                LIBS="-lmnetutil ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
+        ])
 
 
 

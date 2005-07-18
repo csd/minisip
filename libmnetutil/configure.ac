@@ -24,6 +24,8 @@ AC_PROG_YACC
 dnl AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
+AC_LANG(C++)
+
 AC_C_BIGENDIAN
 
 
@@ -47,9 +49,39 @@ AC_ARG_ENABLE(debug,
       	AC_DEFINE(NDEBUG, [], [No debug output])
       fi ])
 
-
+dnl
+dnl libssl
+dnl
+AC_CHECK_LIB([ssl], [SSL_library_init],
+	[
+		LIBS="-lssl ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libssl. Please install the corresponding package.])
+	])
+AC_CHECK_HEADER([openssl/ssl.h], [],
+	[
+		AC_MSG_ERROR([Could not find libssl header files. Please install the corresponding development package.])
+	])
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
+
+dnl
+dnl libmutil
+dnl
+AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
+	headers/library. Try installing the libmutil-devel package for your
+	distribution."])])
+AC_CHECK_LIB([mutil], [main],
+	[
+		LIBS="-lmutil ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
+	])
+		
+
+AC_CHECK_LIB([resolv], [main])
+
+
 
 dnl Checks for header files.
 AC_HEADER_STDC

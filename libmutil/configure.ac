@@ -10,9 +10,6 @@ AM_INIT_AUTOMAKE(libmutil, 0.3.1)
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-
 dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
@@ -57,12 +54,31 @@ AC_ARG_ENABLE(memdebug,
       fi ])
 
 
+
+dnl OpenSSL libcrypto
+dnl library check
+AC_CHECK_LIB([crypto], [SSLeay],
+	[
+		LIBS="-lcrypto ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
+	])
+dnl header check
+AC_CHECK_HEADER([openssl/crypto.h],[],
+	[
+		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
+	])
 dnl REDHAT fix
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
+dnl Check for AES support.
+AC_CHECK_HEADER([openssl/aes.h])
 
 
-dnl Check for libssl 0.9.7
-AC_CHECK_HEADERS([openssl/aes.h],[],[])
+dnl FIXME: Replace `main' with a function in `-lpthread':
+AC_CHECK_LIB([pthread], [pthread_attr_init])
+dnl FIXME: Replace `main' with a function in `-ldl':
+AC_CHECK_LIB([dl], [dlopen])
+
 
 
 dnl Checks for header files.

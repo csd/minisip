@@ -21,6 +21,7 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 dnl AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+AC_LANG(C++)
 
 
 dnl STL
@@ -47,33 +48,27 @@ AC_ARG_ENABLE(debug,
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
+AC_CHECK_LIB([mutil], [main],
+	[
+		LIBS="-lmutil ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
+	])
+
+dnl libmutil headers check
+AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/library. Try installing the libmutil-devel package for your distribution."])])
 
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
-
-dnl Checks for libraries.
-AC_CHECK_LIB([crypto], [main])
-
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
-dnl AC_C_VOLATILE
 
-dnl Checks for library functions.
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_TYPE_SIGNAL
-dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
-
-dnl AC_SUBST(CPPFLAGS)
-dnl AC_SUBST(LDFLAGS)
 
 AC_OUTPUT([Makefile include/Makefile debian/Makefile])
 

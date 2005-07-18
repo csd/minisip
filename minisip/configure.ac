@@ -12,15 +12,11 @@ AM_CONFIG_HEADER(include/compilation_config.h)
 
 dnl Checks for programs.
 AC_PROG_CXX
-dnl AC_PROG_CC
 AC_PROG_CPP
-dnl AC_PROG_LEX
-dnl AM_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_YACC
-AC_PROG_RANLIB
-dnl AC_PROG_LIBTOOL
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
 
 AC_C_BIGENDIAN
 
@@ -384,9 +380,33 @@ fi
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
+dnl
+dnl libmsip
+dnl
+AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
+        headers/library. Try installing the libmsip-devel package for your
+        distribution."])])
+AC_CHECK_LIB([msip], [main],
+        [
+                LIBS="-lmsip ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmsip. Please install the corresponding package.])
+        ])
+
+dnl
+dnl libmikey
+dnl
+AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
+        headers/library. Try installing the libmikey-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mikey], [main],
+        [
+                LIBS="-lmikey ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
+        ])
+
 dnl Checks for libraries.
-
-
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
 
@@ -394,52 +414,10 @@ dnl FIXME: Replace `main' with a function in `-lX11':
 AC_CHECK_LIB([X11], [main])
 dnl FIXME: Replace `main' with a function in `-lXext':
 AC_CHECK_LIB([Xext], [main])
-dnl FIXME: Replace `main' with a function in `-lcrypto':
-AC_CHECK_LIB([crypto], [main])
 dnl FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
 dnl FIXME: Replace `main' with a function in `-lnsl':
 AC_CHECK_LIB([nsl], [main])
-dnl FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB([pthread], [main])
-dnl FIXME: Replace `main' with a function in `-lqt':
-dnl FIXME: Replace `main' with a function in `-lresolv':
-AC_CHECK_LIB([resolv], [main])
-dnl FIXME: Replace `main' with a function in `-lssl':
-AC_CHECK_LIB([ssl], [main])
-
-AC_CHECK_LIB([mutil], [main],
-    [
-        LIBS="-lmutil ${LIBS}"
-    ],[
-        AC_MSG_ERROR([Could not find libmutil. Please install the corresponding
-                      package.])
-    ])
-
-AC_CHECK_LIB([mnetutil], [main],
-    [
-        LIBS="-lmnetutil ${LIBS}"
-    ],[
-        AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding
-                      package.])
-    ])
-
-AC_CHECK_LIB([msip], [main],
-    [
-        LIBS="-lmsip ${LIBS}"
-    ],[
-        AC_MSG_ERROR([Could not find libmsip. Please install the corresponding
-                      package.])
-    ])
-
-AC_CHECK_LIB([mikey], [main],
-    [
-        LIBS="-lmikey ${LIBS}"
-    ],[
-        AC_MSG_ERROR([Could not find libmikey. Please install the corresponding
-                      package.])
-    ])
-
 
 dnl Check for QT libraries
 if test "${QTGUI}" = "yes"
@@ -470,15 +448,6 @@ dnl Debian case
 AC_SUBST(QT_INCLUDE)
 fi
 
-
-dnl libmutil headers check
-AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/library. Try installing the libmutil-devel package for your distribution."])])
-
-
-dnl libmikey headers check
-AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey headers. Try installing the libmikey-devel package for your distribution."])])
-
-
 dnl OPIE
 AC_ARG_ENABLE(opie,
     [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
@@ -499,22 +468,9 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h syslog.h unistd.h])
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
-dnl AC_C_VOLATILE
-
-dnl Checks for library functions.
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_TYPE_SIGNAL
-dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
-
-dnl AC_SUBST(CPPFLAGS)
 AC_SUBST(AM_CPPFLAGS)
-dnl AC_SUBST(LDFLAGS)
 
 AC_SUBST(datadir)
 

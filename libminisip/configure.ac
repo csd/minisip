@@ -278,9 +278,33 @@ AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
-dnl Checks for libraries.
+dnl
+dnl libmsip
+dnl
+AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
+        headers/library. Try installing the libmsip-devel package for your
+        distribution."])])
+AC_CHECK_LIB([msip], [main],
+        [
+                LIBS="-lmsip ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmsip. Please install the corresponding package.])
+        ])
 
+dnl
+dnl libmikey
+dnl
+AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
+        headers/library. Try installing the libmikey-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mikey], [main],
+        [
+                LIBS="-lmikey ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
+        ])
 
+dnl Checks for other libraries.
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
 
@@ -288,47 +312,18 @@ dnl FIXME: Replace `main' with a function in `-lX11':
 AC_CHECK_LIB([X11], [main])
 dnl FIXME: Replace `main' with a function in `-lXext':
 AC_CHECK_LIB([Xext], [main])
-dnl FIXME: Replace `main' with a function in `-lcrypto':
-AC_CHECK_LIB([crypto], [main])
 dnl FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
 dnl FIXME: Replace `main' with a function in `-lnsl':
 AC_CHECK_LIB([nsl], [main])
-dnl FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB([pthread], [main])
-dnl FIXME: Replace `main' with a function in `-lqt':
-dnl FIXME: Replace `main' with a function in `-lresolv':
-AC_CHECK_LIB([resolv], [main])
-dnl FIXME: Replace `main' with a function in `-lssl':
-AC_CHECK_LIB([ssl], [main])
-
-dnl libmutil headers check
-AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/library. Try installing the libmutil-devel package for your distribution."])])
-
-
-dnl libmikey headers check
-AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey headers. Try installing the libmikey-devel package for your distribution."])])
-
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
-dnl AC_C_VOLATILE
-
-dnl Checks for library functions.
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_TYPE_SIGNAL
-dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
-
-dnl AC_SUBST(CPPFLAGS)
-dnl AC_SUBST(LDFLAGS)
 
 AC_OUTPUT([Makefile include/Makefile])
 
