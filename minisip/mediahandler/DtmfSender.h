@@ -45,10 +45,11 @@ class DtmfEvent{
                 friend class DtmfSender;
 };
         
-class DtmfSender {
+class DtmfSender : public MObject {
         public:
                 DtmfSender( MRef<Session *> session );
                 void timeout( DtmfEvent * event );
+		virtual std::string getMemObjectType(){ return "DtmfSender"; };
 
         private:
                 MRef<Session *> session;

@@ -67,17 +67,17 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 }
 
 RtpReceiver::~RtpReceiver(){
-	kill = true;
         thread->join();
-
         delete thread;
-
 	socket->close();
 }
 
 void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
 	mediaStreamsLock.lock();
-	mediaStreams.push_back( mediaStream );
+	/* Don't register new streams if the receiver is being closed */
+	if( !kill ){
+		mediaStreams.push_back( mediaStream );
+	}
 	mediaStreamsLock.unlock();
 }
 
@@ -87,6 +87,10 @@ void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream
 #endif	
 	mediaStreamsLock.lock();
 	mediaStreams.remove( mediaStream );
+	if( mediaStreams.size() == 0 ){
+		/* End the thread */
+		kill = true;
+	}
 	mediaStreamsLock.unlock();
 #ifdef DEBUG_OUTPUT
 	cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;

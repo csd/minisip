@@ -51,14 +51,16 @@ using namespace std;
 SessionRegistry * Session::registry = NULL;
 MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
-Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp),dtmfSender( this ){
+Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp){
 	this->securityConfig = securityConfig; // hardcopy
         this->ka = Session::precomputedKa;
+	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
         Session::precomputedKa = NULL;
 
         if( registry ){
                 registry->registerSession( this );
         }
+
 }
 
 void Session::unregister(){
@@ -69,6 +71,10 @@ void Session::unregister(){
         if( Session::precomputedKa.isNull() ){
                 Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
         }
+}
+
+Session::~Session(){
+	dtmfTOProvider->stopThread();
 }
 
 MRef<SdpPacket *> Session::emptySdp(){
@@ -470,14 +476,15 @@ void Session::setCallId( const string callId ){
 }
 
 void Session::sendDtmf( uint8_t symbol ){
+	MRef<DtmfSender *> dtmfSender = new DtmfSender( this );
         uint32_t * ts = new uint32_t;
         *ts = 0;
-        dtmfTOProvider.request_timeout( 0, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
-        dtmfTOProvider.request_timeout( 5, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
-        dtmfTOProvider.request_timeout( 10, &dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+        dtmfTOProvider->request_timeout( 0, dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
+        dtmfTOProvider->request_timeout( 5, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+        dtmfTOProvider->request_timeout( 10, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
         
-        dtmfTOProvider.request_timeout( 15, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-        dtmfTOProvider.request_timeout( 20, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-        dtmfTOProvider.request_timeout( 25, &dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
+        dtmfTOProvider->request_timeout( 15, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+        dtmfTOProvider->request_timeout( 20, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+        dtmfTOProvider->request_timeout( 25, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
         
 }
