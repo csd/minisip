@@ -1,9 +1,11 @@
+abs_top_srcdir = @abs_top_srcdir@
+
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmnetutil.spec
 
 lib_LTLIBRARIES = libmnetutil.la
-libmnetutil_la_CPPFLAGS = $(CPPFLAGS) -I../include
+libmnetutil_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
 

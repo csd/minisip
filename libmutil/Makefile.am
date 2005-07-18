@@ -1,9 +1,11 @@
+abs_top_srcdir = @abs_top_srcdir@
+
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmutil.spec
 
 lib_LTLIBRARIES = libmutil.la
-libmutil_la_CPPFLAGS = $(CPPFLAGS) -I../include
+libmutil_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include
 
 libmutil_la_SOURCES = $(mutil_src)
 

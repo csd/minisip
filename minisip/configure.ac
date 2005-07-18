@@ -26,6 +26,8 @@ AC_C_BIGENDIAN
 
 AC_LANG(C++)
 
+AM_CPPFLAGS="-I\$(top_srcdir)/include"
+
 dnl HACK: QT is compiled, unless GTK or textui is
 dnl Update: QT disabled for now
 QTGUI="no"
@@ -511,6 +513,7 @@ dnl AC_TYPE_SIGNAL
 dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
 
 dnl AC_SUBST(CPPFLAGS)
+AC_SUBST(AM_CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
 AC_SUBST(datadir)

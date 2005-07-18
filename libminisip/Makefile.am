@@ -1,3 +1,5 @@
+abs_top_srcdir = @abs_top_srcdir@
+
 SUBDIRS = include 
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
@@ -13,7 +15,7 @@ if P2T_SUPPORT
 endif
 
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(CPPFLAGS) -I../include/libminisip
+libminisip_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include
 
 libminisip_la_SOURCES = $(minisip_src) $(sound_src)
 

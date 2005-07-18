@@ -1,9 +1,11 @@
+abs_top_srcdir = @abs_top_srcdir@
+
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmikey.spec
 
 lib_LTLIBRARIES = libmikey.la
-libmikey_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmikey
+libmikey_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include/libmikey
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 
