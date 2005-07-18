@@ -1,5 +1,5 @@
 SUBDIRS = include 
-DIST_SUBDIRS = $(SUBDIRS) debian
+DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
 if VIDEO_SUPPORT
