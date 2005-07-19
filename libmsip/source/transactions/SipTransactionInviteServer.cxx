@@ -444,10 +444,10 @@ void SipTransactionInviteServer::setDialogRouteSet(MRef<SipInvite *> inv) {
 		*/
 		dialog->dialogState.routeSet = inv->getRouteSet();
 		for( list<string>::iterator iter = dialog->dialogState.routeSet.begin(); iter!=dialog->dialogState.routeSet.end(); iter++ ) {
-			merr << "CESC: SipTransINVCli:setrouteset:  " << (*iter) << end;
+			//merr << "CESC: SipTransINVCli:setrouteset:  " << (*iter) << end;
 		}
 	} else {
-		merr << "CESC: parent dialog already has a routeset" << end;
+		//merr << "CESC: parent dialog already has a routeset" << end;
 	}
 	
 }
