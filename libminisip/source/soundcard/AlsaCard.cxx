@@ -29,6 +29,7 @@
 
 #ifdef HAVE_LIBASOUND
 
+using namespace std;
 
 AlsaCard::AlsaCard( string cardname, string devname ):
 		cardName(cardname),
