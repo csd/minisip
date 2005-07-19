@@ -36,6 +36,8 @@
 #endif
 #include"LogWidget.h"
 #include"ImWidget.h"
+#include"AccountsList.h"
+#include"AccountsStatusWidget.h"
 #include"../../../sip/SipSoftPhoneConfiguration.h"
 #include"../../contactdb/ContactDb.h"
 #include<libmsip/SipCommandString.h>
@@ -224,6 +226,12 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	mainTabWidget->append_page( *logWidget, "Call list" );
 
+	accountsList = AccountsList::create( new AccountsListColumns() );
+
+	statusWidget = manage( new AccountsStatusWidget( accountsList) );
+	mainTabWidget->append_page( *statusWidget, "Accounts" );
+	statusWidget->show_all();
+
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
 	mainWindowWidget->set_sensitive( false );
@@ -404,6 +412,8 @@ void MainWindow::setSipSoftPhoneConfiguration(
 
 void MainWindow::updateConfig(){
 	
+	accountsList->loadFromConfig( config );
+	settingsDialog->setAccounts( accountsList );
 	settingsDialog->setConfig( config );
 	certificateDialog->setCertChain( config->securityConfig.cert );
 	certificateDialog->setRootCa( config->securityConfig.cert_db );

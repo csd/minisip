@@ -29,6 +29,7 @@
 using namespace std;
 
 AccountsListColumns::AccountsListColumns(){
+	add( identity );
 	add( name );
 	add( uri );
 	add( proxy );
@@ -37,8 +38,14 @@ AccountsListColumns::AccountsListColumns(){
 	add( username );
 	add( password );
 	add( doRegister );
+	add( status );
 }
 
+Glib::RefPtr<AccountsList> AccountsList::create( AccountsListColumns * columns ){
+	return Glib::RefPtr<AccountsList>::RefPtr<AccountsList>( 
+			new AccountsList( columns ) );
+}
+	
 AccountsList::AccountsList( AccountsListColumns * columns ):
 	Gtk::ListStore( *columns ),
 	columns( columns ){
@@ -73,6 +80,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 	for( i = identities.begin(); i != identities.end(); i++ ){
 		Gtk::TreeModel::iterator iter = append();
+		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
 		(*iter)[columns->uri] = (*i)->sipUsername + "@" + (*i)->sipDomain;
 		(*iter)[columns->proxy] = (*i)->sipProxy.sipProxyAddressString;

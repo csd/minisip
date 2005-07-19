@@ -29,10 +29,11 @@
 
 class AccountsListColumns;
 class SipSoftPhoneConfiguration;
+class SipIdentity;
 
 class AccountsList : public MObject, public Gtk::ListStore{
 	public:
-		AccountsList( AccountsListColumns * columns );
+		static Glib::RefPtr<AccountsList> create( AccountsListColumns * columns );
 
 		void setTreeView( Gtk::TreeView * treeView );
 
@@ -45,8 +46,10 @@ class AccountsList : public MObject, public Gtk::ListStore{
 		void setPstnAccount( Gtk::TreeModel::iterator iter );
 
 		virtual std::string getMemObjectType(){return "AccountsList";};
-		 AccountsListColumns *columns;
+		AccountsListColumns *columns;
 
+	private:
+		AccountsList( AccountsListColumns * columns );
 
 };
 
@@ -54,6 +57,7 @@ class AccountsList : public MObject, public Gtk::ListStore{
 class AccountsListColumns : public Gtk::TreeModel::ColumnRecord{
 	public:
 		AccountsListColumns();
+		Gtk::TreeModelColumn< MRef<SipIdentity *> > identity;
 		Gtk::TreeModelColumn<Glib::ustring> name;
 		Gtk::TreeModelColumn<Glib::ustring> uri;
 		Gtk::TreeModelColumn<Glib::ustring> proxy;
@@ -62,5 +66,6 @@ class AccountsListColumns : public Gtk::TreeModel::ColumnRecord{
 		Gtk::TreeModelColumn<Glib::ustring> username;
 		Gtk::TreeModelColumn<Glib::ustring> password;
 		Gtk::TreeModelColumn<bool> doRegister;
+		Gtk::TreeModelColumn<Glib::ustring> status;
 };
 #endif

@@ -54,6 +54,7 @@ class SettingsDialog
 		void show();
 
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+		void setAccounts( Glib::RefPtr<AccountsList> list );
 	
 	private:
 	
@@ -78,8 +79,10 @@ class GeneralSettings
 		string apply();
 		
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+		void setAccounts( Glib::RefPtr<AccountsList> list );
 
 	private:
+		void addAccount();
 		void editAccount();
 		void removeAccount();
 		void setDefaultAccount();
@@ -87,7 +90,7 @@ class GeneralSettings
 
 		Gtk::TreeView * accountsTreeView;
 		//const Glib::RefPtr<AccountsList> accountsList;
-		AccountsList * accountsList;
+		Glib::RefPtr<AccountsList> accountsList;
 		Gtk::Button * accountsAddButton;
 		Gtk::Button * accountsRemoveButton;
 		Gtk::Button * accountsEditButton;

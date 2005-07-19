@@ -73,6 +73,10 @@ SettingsDialog::~SettingsDialog(){
 	delete advancedSettings;
 }
 
+void SettingsDialog::setAccounts( Glib::RefPtr<AccountsList> list ){
+	generalSettings->setAccounts( list );
+}
+
 void SettingsDialog::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	this->config = config;
 	generalSettings->setConfig( config );
@@ -127,8 +131,7 @@ void SettingsDialog::reject(){
 	dialogWindow->hide();
 }
 
-GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ):
-		accountsList( new AccountsList( new AccountsListColumns ) ){
+GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	refXml->get_widget( "accountsTreeView", accountsTreeView );
 	if( accountsTreeView == NULL ){
@@ -168,17 +171,17 @@ GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ):
 
 	accountsTreeView->set_headers_visible( true );
 	accountsTreeView->set_rules_hint( true );
-	accountsList->setTreeView( accountsTreeView );
 
-	accountsAddButton->signal_clicked().connect( SLOT( *accountsList, &AccountsList::addAccount ) );
+	accountsAddButton->signal_clicked().connect( 
+			SLOT( *this, &GeneralSettings::addAccount ) );
 	accountsEditButton->signal_clicked().connect( 
-			SLOT( *this, &GeneralSettings::editAccount ));
+			SLOT( *this, &GeneralSettings::editAccount ) );
 	accountsRemoveButton->signal_clicked().connect( 
-			SLOT( *this, &GeneralSettings::removeAccount ));
+			SLOT( *this, &GeneralSettings::removeAccount ) );
 	defaultButton->signal_clicked().connect( 
-			SLOT( *this, &GeneralSettings::setDefaultAccount ));
+			SLOT( *this, &GeneralSettings::setDefaultAccount ) );
 	pstnButton->signal_clicked().connect( 
-			SLOT( *this, &GeneralSettings::setPstnAccount ));
+			SLOT( *this, &GeneralSettings::setPstnAccount ) );
 
 
 #ifdef IPAQ
@@ -186,6 +189,12 @@ GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ):
 	defaultButton->set_label( "Default" );
 	pstnButton->set_label( "PSTN" );
 #endif
+}
+
+void GeneralSettings::addAccount(){
+	if( accountsList ){
+		accountsList->addAccount();
+	}
 }
 
 void GeneralSettings::editAccount(){
@@ -228,11 +237,14 @@ void GeneralSettings::setPstnAccount(){
 	}
 }
 
+void GeneralSettings::setAccounts( Glib::RefPtr<AccountsList> list ){
+	list->setTreeView( accountsTreeView );
+	accountsList = list;
+}
 
 
 void GeneralSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	this->config = config;
-	accountsList->loadFromConfig( config );
 	soundEntry->set_text( config->soundDevice );
 }
 

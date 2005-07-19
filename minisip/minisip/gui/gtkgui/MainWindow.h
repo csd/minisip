@@ -52,6 +52,8 @@ class LogWidget;
 class LogEntry;
 class ImWidget;
 class ContactDb;
+class AccountsList;
+class AccountsStatusWidget;
 
 class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public DtmfHandler
 #ifdef OLDLIBGLADEMM
@@ -148,6 +150,8 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
 		Gtk::CheckMenuItem * viewCallListMenu;
 
+		Glib::RefPtr<AccountsList> accountsList;
+
 		/**
 		* This function is connected to the window close icon
 		* (the cross on the top-right corner). 
@@ -159,6 +163,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		CertificateDialog * certificateDialog;
 		MTrayIcon * trayIcon;
 		LogWidget * logWidget;
+		AccountsStatusWidget * statusWidget;
 
 		list<CallWidget *> callWidgets;
 		list<ConferenceWidget *> conferenceWidgets;
