@@ -35,12 +35,26 @@ if test "$amvers" = "no"; then
   exit 1
 fi
 
+# Check for libtool
+libtoolize="no"
+if libtoolize --version >/dev/null 2>&1; then
+  libtoolize="libtoolize"
+elif glibtoolize --version >/dev/null 2>&1; then
+  libtoolize="glibtoolize"
+fi
+
+if test "$libtoolize" = "no"; then
+  set +x
+  echo "$0: you need libtool"
+  exit 1
+fi
 
 # Remove old cruft
 rm -f aclocal.m4 configure config.guess config.log config.sub config.cache config.h.in config.h compile ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
 rm -Rf autom4te.cache
 
 aclocal${amvers}
+${libtoolize} --copy --force
 
 autoconf
 autoheader

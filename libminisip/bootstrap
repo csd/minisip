@@ -1,7 +1,8 @@
 #! /bin/sh
+#! /bin/sh
 
-##  bootstrap file 
-##  borrowed from libdvdplay (Sam Hocevar <sam@zoy.org>)
+##  bootstrap file - borrowed from VideoLAN's libdvdplay 
+##  original verion by Sam Hocevar <sam@zoy.org>
 
 set -x
 set -e
@@ -22,7 +23,7 @@ elif automake-1.7 --version >/dev/null 2>&1; then
   amvers="-1.7"
 elif automake --version > /dev/null 2>&1; then
   amvers="`automake --version | sed -e '1s/[^0-9]*//' -e q`"
-  if expr "$amvers" "<" "1.5" > /dev/null 2>&1; then
+  if expr "$amvers" "<" "1.7" > /dev/null 2>&1; then
     amvers="no"
   else
     amvers=""
@@ -31,7 +32,7 @@ fi
 
 if test "$amvers" = "no"; then
   set +x
-  echo "$0: you need automake version 1.5 or later"
+  echo "$0: you need automake version 1.7 or later"
   exit 1
 fi
 

@@ -30,7 +30,7 @@ do
 	LDFLAGS="$LDFLAGS -L$PWD/.libs"
 	CXXFLAGS="$CXXFLAGS -I$PWD/include"
 
-	make
+	make $1
 	
 	echo
 	echo
@@ -75,4 +75,4 @@ echo "LDFLAGS = $LDFLAGS"
 echo "CXXFLAGS = $CXXFLAGS"
 echo
 
-make
+make $1
