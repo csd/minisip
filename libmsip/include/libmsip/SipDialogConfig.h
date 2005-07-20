@@ -186,16 +186,38 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		void setSipUri(string addr);
 		
-		string getSipUri(){return sipUsername +"@" + sipDomain;}
+		string getSipUri(){
+			string ret;
+			lock();
+			ret = sipUsername + "@" + sipDomain;
+			unlock();
+			return ret;
+		}
 
-		void setDoRegister(bool f){registerToProxy=f;}
-		bool getDoRegister(){return registerToProxy;}
+		void setDoRegister(bool f){
+			lock();
+			registerToProxy=f;
+			unlock();
+		}
+
+		bool getDoRegister(){
+			lock();
+			bool ret = registerToProxy;
+			unlock();
+			return ret;
+		}
+
+		void lock(){mutex.lock();};
+		void unlock(){mutex.unlock();};
 		
 		string getDebugString(){
-			return "identity="+identityIdx+"; username="+
+			lock();
+			string ret = "identity="+identityIdx+"; username="+
 				sipUsername+ "; domain="+sipDomain + 
 				" proxy=["+sipProxy.getDebugString()+
 				"]; isRegistered="+itoa(currentlyRegistered);
+			unlock();
+			return ret;
 		}
 
 		virtual std::string getMemObjectType(){return "SipIdentity";}
@@ -203,7 +225,11 @@ class LIBMSIP_API SipIdentity : public MObject{
 		/**
 		This identities index number. Useful to identify it across minisip.
 		*/
-		string getId() { return identityIdx; }
+		string getId() { 
+			lock();
+			string ret = identityIdx; 
+			unlock();
+		}
 		
 		string sipUsername;
 		string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
@@ -231,7 +257,11 @@ class LIBMSIP_API SipIdentity : public MObject{
 		/**
 		True if this identity is currently registered, false otherwise.
 		*/
-		bool isRegistered() {return currentlyRegistered;}
+		bool isRegistered() {
+			lock();
+			bool ret = currentlyRegistered;
+			unlock();
+			return ret;}
 		
 	private: 
 		/**
@@ -244,6 +274,11 @@ class LIBMSIP_API SipIdentity : public MObject{
 		Indicates whether this identity is currently registered to a proxy.
 		*/
 		bool currentlyRegistered;
+
+		/**
+		Mutex for use in different threads
+		*/
+		Mutex mutex;
 };
 
 

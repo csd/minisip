@@ -129,10 +129,6 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	
 	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
 	
-#ifdef MINISIP_MEMDEBUG 
-	phoneconfig.setUser("Sip/addr:phoneconfig");
-#endif
-
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);

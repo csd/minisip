@@ -120,9 +120,6 @@ SipCommonConfig::SipCommonConfig():
 	transport(("")),
 	autoAnswer(false){
 
-#ifdef MINISIP_MEMDEBUG
-	sipTransport.setUser("SipCommonConfig/messageTransport");
-#endif
 }
 
 int32_t SipCommonConfig::getLocalSipPort(bool usesStun) {
@@ -200,9 +197,6 @@ SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig *> commonconf) : proxyConn
 
 	last_invite=NULL;
 
-#ifdef MINISIP_MEMDEBUG 
-	last_invite.setUser("SipDialogConfig/last_invite");
-#endif
 
 	local_ssrc = rand();
 }
