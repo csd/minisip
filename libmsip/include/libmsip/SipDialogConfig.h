@@ -229,6 +229,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 			lock();
 			string ret = identityIdx; 
 			unlock();
+			return ret;
 		}
 		
 		string sipUsername;
