@@ -54,17 +54,14 @@ do
 	echo "configure_params (${subdir})= $configure_params"
 	echo "=========================================================="
 	
-	
-#	LDFLAGS=$LOC_LDFLAGS CXXFLAGS=$LOC_CXXFLAGS ./configure $configure_params
-	
-	./configure $configure_params
-
-	make
-	
-	LOC_LDFLAGS="$LOC_LDFLAGS -L$PWD/.libs"
+	LOC_LDFLAGS="$LOC_LDFLAGS -L$PWD -L$PWD/.libs"
 	LOC_CXXFLAGS="$LOC_CXXFLAGS -I$PWD/include"
-	export LDFLAGS=$LOC_LDFLAGS
-	export CXXFLAGS=$LOC_CXXFLAGS 
+	
+	LDFLAGS=$LOC_LDFLAGS 					\
+		CXXFLAGS=$LOC_CXXFLAGS				\
+		./configure $configure_params
+	
+	make
 	
 	cd ..
 done
@@ -81,19 +78,18 @@ configure_params="--enable-color-terminal"
 #configure_params="$configure_params --enable-debug"
 #configure_params="$configure_params --disable-shared"
 
-export LDFLAGS=$LOC_LDFLAGS
-export CXXFLAGS=$LOC_CXXFLAGS 
-
 echo
 echo
-echo "LDFLAGS = $LDFLAGS" 
-echo "CXXFLAGS = $CXXFLAGS"
+echo "LDFLAGS = $LOC_LDFLAGS" 
+echo "CXXFLAGS = $LOC_LDFLAGS"
 echo
 echo "=========================================================="
 echo "configure_params (minisip)= $configure_params"
 echo "=========================================================="
 
-./configure $configure_params
+LDFLAGS=$LOC_LDFLAGS 					\
+	CXXFLAGS=$LOC_CXXFLAGS				\
+	./configure $configure_params
 
 make
 
