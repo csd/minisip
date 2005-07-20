@@ -128,6 +128,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		void updateConfig();
 		void doDisplayErrorMessage( string s );
 		void runCertificateSettings();
+		void onTabChange( GtkNotebookPage*, guint );
 
 		MRef<ContactDb *> contactDb;
 

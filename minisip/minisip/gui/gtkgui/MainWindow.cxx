@@ -236,6 +236,10 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	mainWindowWidget->set_sensitive( false );
 
+	mainTabWidget->signal_switch_page().connect(
+		SLOT( *this, &MainWindow::onTabChange ) );
+
+
 }
 
 MainWindow::~MainWindow(){
@@ -793,4 +797,14 @@ void MainWindow::dtmfPressed( uint8_t symbol ){
 			break;
 	}
 	uriEntry->set_text( uri );
+}
+
+void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
+	Gtk::Widget * currentPage = mainTabWidget->get_nth_page( index );
+	CallWidget * callWidget = dynamic_cast<CallWidget *>( currentPage );
+
+	if( callWidget ){
+		/* Do something on it here */
+		fprintf( stderr, "Selected called widget\n" );
+	}
 }
