@@ -58,7 +58,7 @@ do
 	LOC_CXXFLAGS="$LOC_CXXFLAGS -I$PWD/include"
 	
 	LDFLAGS=$LOC_LDFLAGS 					\
-		CXXFLAGS=$LOC_CXXFLAGS				\
+		CXXFLAGS="$LOC_CXXFLAGS -Wall"			\
 		./configure $configure_params
 	
 	make
@@ -88,7 +88,7 @@ echo "configure_params (minisip)= $configure_params"
 echo "=========================================================="
 
 LDFLAGS=$LOC_LDFLAGS 					\
-	CXXFLAGS=$LOC_CXXFLAGS				\
+	CXXFLAGS="$LOC_CXXFLAGS -Wall"			\
 	./configure $configure_params
 
 make
