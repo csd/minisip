@@ -98,7 +98,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 
 		void phoneSelected();
 		void runPref();
-		void viewCallListToggle();
+		void viewToggle( uint8_t );
 
 		virtual void handle( MRef<LogEntry *> );
 		void removeCall( string callId );
@@ -150,6 +150,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		Gtk::Main kit;
 
 		Gtk::CheckMenuItem * viewCallListMenu;
+		Gtk::CheckMenuItem * viewStatusMenu;
 
 		Glib::RefPtr<AccountsList> accountsList;
 

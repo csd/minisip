@@ -68,7 +68,7 @@ AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ):
 	registerMenu.signal_activate().connect( 
 		SLOT( *this, &AccountsStatusWidget::registerClicked ) );
 	
-	registerMenu.signal_activate().connect( 
+	unregisterMenu.signal_activate().connect( 
 		SLOT( *this, &AccountsStatusWidget::unregisterClicked ) );
 }
 
@@ -118,13 +118,31 @@ void AccountsStatusWidget::registerClicked(){
 	if( iter ){
 		id = (*iter)[columns->identity];
 		CommandString reg( "", SipCommandString::proxy_register );
-		reg["proxy_domain"] = id->sipDomain;
 		reg["identityId"] = id->getId();
+		id->lock();
+		reg["proxy_domain"] = id->sipDomain;
+		reg.setParam3( id->sipProxy.getDefaultExpires() );
+		id->unlock();
 		callback->guicb_handleCommand( reg );
 	}
 }
 
 void AccountsStatusWidget::unregisterClicked(){
+	Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+
+	Gtk::TreeModel::iterator iter = selection->get_selected();
+	MRef<SipIdentity *> id;
+
+	if( iter ){
+		id = (*iter)[columns->identity];
+		CommandString reg( "", SipCommandString::proxy_register );
+		reg["identityId"] = id->getId();
+		id->lock();
+		reg["proxy_domain"] = id->sipDomain;
+		id->unlock();
+		reg.setParam3( "0" );
+		callback->guicb_handleCommand( reg );
+	}
 }
 
 void AccountsStatusWidget::setCallback( GuiCallback * callback ){

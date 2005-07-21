@@ -205,6 +205,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "quitMenu", quitMenu );
 	
 	refXml->get_widget( "viewCallListMenu", viewCallListMenu );
+	refXml->get_widget( "viewStatusMenu", viewStatusMenu );
 
 	prefMenu->signal_activate().connect( SLOT( *settingsDialog, &SettingsDialog::show ) );
 	certMenu->signal_activate().connect( SLOT( *this, &MainWindow::runCertificateSettings ) );
@@ -213,7 +214,17 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	quitMenu->signal_activate().connect( SLOT( *this, &MainWindow::quit ) );
 	mainWindowWidget->signal_delete_event().connect( SLOT( *this, &MainWindow::on_window_close ) );
 	
-	viewCallListMenu->signal_activate().connect( SLOT( *this, &MainWindow::viewCallListToggle ) );
+	viewCallListMenu->signal_activate().connect( 
+		BIND<uint8_t>(
+			SLOT( *this, &MainWindow::viewToggle ),
+			0 
+			));
+	
+	viewStatusMenu->signal_activate().connect( 
+		BIND<uint8_t>(
+			SLOT( *this, &MainWindow::viewToggle ),
+			1 
+			));
 
 	dispatcher.connect( SLOT( *this, &MainWindow::gotCommand ) );
 
@@ -230,7 +241,6 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	statusWidget = manage( new AccountsStatusWidget( accountsList) );
 	mainTabWidget->append_page( *statusWidget, "Accounts" );
-	statusWidget->show_all();
 
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
@@ -713,12 +723,24 @@ void MainWindow::gotLogEntry(){
 
 }	
 
-void MainWindow::viewCallListToggle(){
-	if( logWidget->is_visible() ){
-		logWidget->hide();
+void MainWindow::viewToggle( uint8_t w ){
+	Gtk::Widget * widget;
+	switch( w ){
+		case 0:
+			widget = logWidget;
+			break;
+		case 1:
+			widget = statusWidget;
+			break;
+		default:
+			return;
+	}
+	
+	if( widget->is_visible() ){
+		widget->hide();
 	}
 	else{
-		logWidget->show();
+		widget->show();
 	}
 }
 
