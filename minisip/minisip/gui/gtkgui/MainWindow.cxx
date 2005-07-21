@@ -723,6 +723,7 @@ void MainWindow::viewCallListToggle(){
 }
 
 void MainWindow::setCallback( GuiCallback * callback ){
+	statusWidget->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );
 	Gui::setCallback( callback );
 }

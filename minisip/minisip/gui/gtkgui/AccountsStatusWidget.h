@@ -9,7 +9,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Library General Public License for more details.
  *
- *  You should have re!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!l,,,,,,,,;;ceived a copy of the GNU General Public License
+ *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
@@ -26,11 +26,21 @@
 #include<gtkmm.h>
 #include<AccountsList.h>
 
+class GuiCallback;
+
 
 class AccountsStatusWidget: public Gtk::TreeView{
 	public:
 		AccountsStatusWidget( Glib::RefPtr<AccountsList> list );
+		void setCallback( GuiCallback *callback );
 	private:
+
+		GuiCallback * callback;
+
+		// Popup menu
+		Gtk::Menu popupMenu;
+		Gtk::MenuItem registerMenu;
+		Gtk::MenuItem unregisterMenu;
 
 		Gtk::TreeModelColumn<Glib::ustring> nameColumn;
 		Gtk::TreeModelColumn<Glib::ustring> statusColumn;
@@ -41,6 +51,10 @@ class AccountsStatusWidget: public Gtk::TreeView{
 				const Gtk::TreeModel::iterator & iter );
 		void drawStatus( Gtk::CellRenderer * renderer,
 				const Gtk::TreeModel::iterator & iter );
+
+		void onClicked( GdkEventButton * event );
+		void registerClicked();
+		void unregisterClicked();
 
 };
 

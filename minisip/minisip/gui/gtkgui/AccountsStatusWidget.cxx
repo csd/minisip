@@ -24,6 +24,8 @@
 #include<AccountsStatusWidget.h>
 
 #include<libmsip/SipDialogConfig.h> // SipIdentity
+#include<libmsip/SipCommandString.h>
+#include"../GuiCallback.h"
 
 
 #ifdef OLDLIBGLADEMM
@@ -36,8 +38,10 @@
 
 using namespace std;
 
-AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ){
-	cerr << "Before set model" << endl;
+AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ):
+	registerMenu( "Register" ),
+	unregisterMenu( "Unregister" )
+{
 	set_model( list );
 	
 	Gtk::CellRendererText * rAccount = new Gtk::CellRendererText();
@@ -52,6 +56,20 @@ AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ){
 
 	set_headers_visible( false );
 	set_rules_hint( true );
+
+	signal_button_press_event().connect_notify(
+		SLOT( *this, &AccountsStatusWidget::onClicked ), false );
+
+	// Set up the menu
+	popupMenu.add( registerMenu );
+	popupMenu.add( unregisterMenu );
+	popupMenu.show_all();
+
+	registerMenu.signal_activate().connect( 
+		SLOT( *this, &AccountsStatusWidget::registerClicked ) );
+	
+	registerMenu.signal_activate().connect( 
+		SLOT( *this, &AccountsStatusWidget::unregisterClicked ) );
 }
 
 void AccountsStatusWidget::drawAccount( Gtk::CellRenderer * renderer,
@@ -83,4 +101,32 @@ void AccountsStatusWidget::drawStatus( Gtk::CellRenderer * renderer,
 
 	textR->property_markup().set_value( status );
 
+}
+
+void AccountsStatusWidget::onClicked( GdkEventButton * event ){
+	if( event->button == 3 ){
+		popupMenu.popup( event->button, gtk_get_current_event_time() );
+	}
+}
+
+void AccountsStatusWidget::registerClicked(){
+	Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+
+	Gtk::TreeModel::iterator iter = selection->get_selected();
+	MRef<SipIdentity *> id;
+
+	if( iter ){
+		id = (*iter)[columns->identity];
+		CommandString reg( "", SipCommandString::proxy_register );
+		reg["proxy_domain"] = id->sipDomain;
+		reg["identityId"] = id->getId();
+		callback->guicb_handleCommand( reg );
+	}
+}
+
+void AccountsStatusWidget::unregisterClicked(){
+}
+
+void AccountsStatusWidget::setCallback( GuiCallback * callback ){
+	this->callback = callback;
 }
