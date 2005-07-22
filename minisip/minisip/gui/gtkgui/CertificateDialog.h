@@ -86,7 +86,6 @@ class CertificateDialog
 		Gtk::Button * addFileCaButton;
 		Gtk::Button * removeCaButton;
 
-		Gtk::Frame * certChainFrame;
 		Gtk::Dialog * certDialog;
 		
 		Gtk::Button * closeButton;

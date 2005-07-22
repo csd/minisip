@@ -54,7 +54,6 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "addDirCaButton", addDirCaButton );
 	refXml->get_widget( "removeCaButton", removeCaButton );
 	
-	refXml->get_widget( "certChainFrame", certChainFrame );
 	refXml->get_widget( "certDialog", certDialog );
 	
 	refXml->get_widget( "closeButton", closeButton );
@@ -136,7 +135,9 @@ void CertificateDialog::chooseCert(){
 		pkeyLabel->set_text( "" );
 
 		pkeyButton->set_sensitive( true );
-		certChainFrame->show();
+		certTreeView->set_sensitive( true );
+		addCertButton->set_sensitive( true );
+		removeCertButton->set_sensitive( true );
 	}
 
 	delete dialog;
@@ -179,7 +180,9 @@ void CertificateDialog::choosePKey(){
 		}
 
 		pkeyLabel->set_text( result );
-		certChainFrame->set_sensitive( true );
+		certTreeView->set_sensitive( true );
+		addCertButton->set_sensitive( true );
+		removeCertButton->set_sensitive( true );
 	}
 
 	delete dialog;
@@ -246,11 +249,12 @@ void CertificateDialog::removeCert(){
 
 	/* update the GUI */
 	if( certChain->is_empty() ){
-		certLabel->set_text( "" );
-		pkeyLabel->set_text( "" );
 		pkeyButton->set_sensitive( false );
-		//certChainFrame->set_sensitive( false );
-		certChainFrame->hide();
+		certTreeView->set_sensitive( false );
+		addCertButton->set_sensitive( false );
+		removeCertButton->set_sensitive( false );
+		certLabel->set_text( "Choose a certificate..." );
+		pkeyLabel->set_text( "Choose a private key" );
 	}
 		
 	certTreeStore->removeLast();
@@ -371,7 +375,9 @@ void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
                 pkeyLabel->set_text( cert->get_pk_file() );
         }
 	else{
-		certChainFrame->hide();
+		certTreeView->set_sensitive( false );
+		addCertButton->set_sensitive( false );
+		removeCertButton->set_sensitive( false );
 		certLabel->set_text( "Choose a certificate..." );
 		pkeyLabel->set_text( "Choose a private key" );
 		pkeyButton->set_sensitive( false );
