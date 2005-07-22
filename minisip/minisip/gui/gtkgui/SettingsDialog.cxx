@@ -265,12 +265,16 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	refXml->get_widget( "secureCheck", secureCheck );
 	
-	refXml->get_widget( "secureTable", secureTable );
+//	refXml->get_widget( "secureTable", secureTable );
 	
-	refXml->get_widget( "kaEntry", kaEntry );
-	refXml->get_widget( "kaCombo", kaCombo );
+//	refXml->get_widget( "kaEntry", kaEntry );
+//	refXml->get_widget( "kaCombo", kaCombo );
 
-	refXml->get_widget( "pskBox", pskBox );
+//	refXml->get_widget( "pskBox", pskBox );
+	refXml->get_widget( "pskRadio", pskRadio );
+	refXml->get_widget( "dhRadio", dhRadio );
+	
+	refXml->get_widget( "kaTypeLabel", kaTypeLabel );
 
 	
 	dhCheck->signal_toggled().connect( SLOT( 
@@ -284,7 +288,7 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	
 	//kaCombo->set_value_in_list( true );
-	kaEntry->set_editable( false );
+//	kaEntry->set_editable( false );
 	
 }
 
@@ -299,11 +303,11 @@ void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 
 	if( config->securityConfig.ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
-		kaEntry->set_text( "Diffie-Hellman" );
+		dhRadio->set_active( true );
 	}
 
 	else if( config->securityConfig.ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
-		kaEntry->set_text( "Pre-shared key" );
+		pskRadio->set_active( true );
 	}
 
 	secureCheck->set_active( config->securityConfig.secured );
@@ -315,7 +319,7 @@ void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 void SecuritySettings::kaChange(){
 
-	pskBox->set_sensitive( pskCheck->get_active() );
+	pskEntry->set_sensitive( pskCheck->get_active() );
 	
 	secureCheck->set_sensitive( pskCheck->get_active() 
 			|| dhCheck->get_active() );
@@ -324,28 +328,27 @@ void SecuritySettings::kaChange(){
 		secureCheck->set_active( false );
 	}
 
-	kaCombo->set_sensitive( pskCheck->get_active()
-			     || dhCheck->get_active() );
-	
-	std::list<string> list;
+	pskRadio->set_sensitive( secureCheck->get_active() && 
+			         pskCheck->get_active() );
+	dhRadio->set_sensitive( secureCheck->get_active() && 
+			        dhCheck->get_active() );
 
-	if( dhCheck->get_active() ){
-		list.push_back( "Diffie-Hellman" );
+	if( dhCheck->get_active() && ! pskCheck->get_active() ){
+		dhRadio->set_active( true );
 	}
 
-	if( pskCheck->get_active() ){
-		list.push_back( "Pre-shared key" );
+	if( pskCheck->get_active() && ! dhCheck->get_active() ){
+		pskRadio->set_active( true );
 	}
-
-	if( list.size() > 0 ){
-		kaCombo->set_popdown_strings( list );
-	}
-
-
 }
 
 void SecuritySettings::secureChange(){
-	secureTable->set_sensitive( secureCheck->get_active() );
+//	secureTable->set_sensitive( secureCheck->get_active() );
+	kaTypeLabel->set_sensitive( secureCheck->get_active() );
+	pskRadio->set_sensitive( secureCheck->get_active() && 
+			         pskCheck->get_active() );
+	dhRadio->set_sensitive( secureCheck->get_active() && 
+			        dhCheck->get_active() );
 
 }
 
@@ -389,10 +392,10 @@ string SecuritySettings::apply(){
 	}
 
 	if( config->securityConfig.secured ){
-		if( kaEntry->get_text() == "Pre-shared key" ){
+		if( pskRadio->get_active() ){
 			config->securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 		}
-		else if( kaEntry->get_text() == "Diffie-Hellman" ){
+		else if( dhRadio->get_active() ){
 			config->securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 		}
 	}

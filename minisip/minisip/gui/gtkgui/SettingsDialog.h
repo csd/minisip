@@ -124,17 +124,15 @@ class SecuritySettings
 		Gtk::CheckButton * dhCheck;
 		Gtk::CheckButton * pskCheck;
 		
-		Gtk::HBox * pskBox;
-		
-		
 		Gtk::Entry * pskEntry;
 		
 		Gtk::CheckButton * secureCheck;
 
 		Gtk::Table * secureTable;
 
-		Gtk::Entry * kaEntry;
-		Gtk::Combo * kaCombo;
+		Gtk::Label * kaTypeLabel;
+		Gtk::RadioButton * pskRadio;
+		Gtk::RadioButton * dhRadio;
 
 
 		MRef<SipSoftPhoneConfiguration *> config;
