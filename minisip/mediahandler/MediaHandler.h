@@ -42,6 +42,8 @@ class MediaHandler : public MObject, public SessionRegistry {
 
 	public:
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );
+// 		~MediaHandler();
+		
 		MRef<Session *>createSession( SipDialogSecurityConfig &config, string callId = "" );
 		
 		void registerMedia( MRef<Media *> media );
@@ -52,6 +54,10 @@ class MediaHandler : public MObject, public SessionRegistry {
 
 		MRef<Codec *> createCodec( uint8_t payloadType );
 
+#ifdef DEBUG_OUTPUT	
+		virtual string getDebugString();
+#endif
+
 	private:
 		std::list< MRef<Media *> > media;
 
@@ -59,6 +65,9 @@ class MediaHandler : public MObject, public SessionRegistry {
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
+		
+		//cesc
+		void setActiveSource( std::string callid );
 
 };
 

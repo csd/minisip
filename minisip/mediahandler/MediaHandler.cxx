@@ -102,6 +102,14 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 	ringtoneFile = config->ringtone;
 }
 
+// MediaHandler::~MediaHandler() {
+// 	cerr << "~MediaHandler" << endl;
+// 	if( ! Session::registry ){
+// 		cerr << "deleting session::registry" << endl;
+// 	}
+// }
+
+
 MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityConfig, string callId ){
 
 	list< MRef<Media *> >::iterator i;
@@ -113,7 +121,6 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	contactIp = ipProvider->getExternalIp();
 
 	session = new Session( contactIp, securityConfig );
-	//cerr << "CESC: MediaHandler::createSession: new session created ... " << endl;
 	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
@@ -152,8 +159,50 @@ void MediaHandler::handleCommand( CommandString command ){
 		}
 		return;
 	}
+	
+	if( command.getOp() == MediaCommandString::session_debug ){
+		cerr << getDebugString() << endl;
+		return;
+	}
+	
+	if( command.getOp() == MediaCommandString::set_active_source ){
+		#ifdef DEBUG_OUTPUT
+		cerr << "MediaHandler::handleCmd: received set active source" 
+				<< endl << "     " << command.getString()  << endl;
+		#endif
+		setActiveSource( command.getDestinationId() );
+		return;
+	}
 }
 
 std::string MediaHandler::getExtIP(){
 	return ipProvider->getExternalIp();
 }
+
+void MediaHandler::setActiveSource( string callId ) {
+	
+        list<MRef<Session *> >::iterator iSession;
+	
+	sessionsLock.lock();
+	for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
+		if( (*iSession)->getCallId() == callId ){
+			(*iSession)->muteSenders( false );
+			
+		} else {
+			(*iSession)->muteSenders( true );
+		}
+	}
+	sessionsLock.unlock();
+}
+
+#ifdef DEBUG_OUTPUT	
+string MediaHandler::getDebugString() {
+	string ret;
+	ret = getMemObjectType() + ": Debug Info\n";
+	for( std::list<MRef<Session *> >::iterator it = sessions.begin();
+				it != sessions.end(); it++ ) {
+		ret += "** Session : \n" + (*it)->getDebugString() + "\n";
+	}
+	return ret;
+}
+#endif

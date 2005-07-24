@@ -29,6 +29,19 @@ class MediaCommandString{
 	public:
 		static const std::string start_ringing;
 		static const std::string stop_ringing;
+		
+		/**
+		Used from the console debugger to print debug info 
+		about the running media sessions ...
+		*/
+		static const std::string session_debug;
+		
+		/**
+		Activate the source indicated by "callid" param
+		*/
+		static const std::string set_active_source;
+		
+		
 	
 };
 
