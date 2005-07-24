@@ -24,9 +24,9 @@
 #include"MessageRouter.h"
 //#include<libmsip/CODECInterface.h>
 //#include"../util/ConfigFile.h"
-#include"../sip/SipSoftPhoneConfiguration.h"
-#include<libmsip/SipDialogContainer.h>
-#include"../sip/DefaultDialogHandler.h"
+//#include"../sip/SipSoftPhoneConfiguration.h"
+//#include<libmsip/SipDialogContainer.h>
+//#include"../sip/DefaultDialogHandler.h"
 //#include"../conf/ConferenceControl.h"
 
 #include<iostream>

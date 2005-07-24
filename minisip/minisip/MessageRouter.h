@@ -25,7 +25,7 @@
 
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipInvite.h>
-#include<libmsip/SipResponse.h>
+//#include<libmsip/SipResponse.h>
 #include<libmutil/minilist.h>
 //#include"SoundSender.h"
 //#include"SoundReceiver.h"
