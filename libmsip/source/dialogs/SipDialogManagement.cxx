@@ -64,7 +64,7 @@ bool SipDialogManagement::a0_start_startShutdown_startShutdown( const SipSMComma
 	if (transitionMatch(command, SipCommandString::sip_stack_shutdown)) {
 		pendingHangUps = pendingDeRegs = 0;
 		merr << end;
-		merr << "     MiniSIP's SipStack is shutting down ... " << end;
+		merr << "MiniSIP's SipStack is shutting down ... " << end;
 		merr << "     ... it won't take long to finish, be patient. Thanks!" << end;
 		SipSMCommand cmd( CommandString( "", SipCommandString::terminate_all_calls),
 			SipSMCommand::TU,
@@ -266,7 +266,7 @@ bool SipDialogManagement::b30_terminateCallsOps_start_terminateAllDone( const Si
 	return ret;
 }
 
-bool SipDialogManagement::c0_start_terminateCallsOps_terminateAll( const SipSMCommand &command){
+bool SipDialogManagement::c0_start_deRegAllOps_deRegAll( const SipSMCommand &command){
 	bool ret = false;
 	if (transitionMatch(command, SipCommandString::unregister_all_identities) ) {
 		pendingHangUps = pendingDeRegs = 0;
@@ -300,7 +300,7 @@ bool SipDialogManagement::c12_deRegAllOps_timeIsUp( const SipSMCommand &command)
 	return ret;
 }
 
-bool SipDialogManagement::c30_deRegAllOps_start_terminateAllDone( const SipSMCommand &command){
+bool SipDialogManagement::c30_deRegAllOps_start_deRegAllDone( const SipSMCommand &command){
 	bool ret = false;
 	if (transitionMatch(command, SipCommandString::unregister_all_identities_done) ) {
 		cancelTimeout( "timer_deRegisterAll" );
@@ -311,7 +311,7 @@ bool SipDialogManagement::c30_deRegAllOps_start_terminateAllDone( const SipSMCom
 	return ret;
 }
 
-bool SipDialogManagement::d0_start_regAllOps_terminateAll( const SipSMCommand &command){
+bool SipDialogManagement::d0_start_regAllOps_regAll( const SipSMCommand &command){
 	bool ret = false;
 	if (transitionMatch(command, SipCommandString::register_all_identities) ) {
 		pendingHangUps = pendingDeRegs = 0;
@@ -342,7 +342,7 @@ bool SipDialogManagement::d12_regAllOps_timeIsUp( const SipSMCommand &command){
 	}
 	return ret;
 }
-bool SipDialogManagement::d30_regAllOps_start_terminateAllDone( const SipSMCommand &command){
+bool SipDialogManagement::d30_regAllOps_start_regAllDone( const SipSMCommand &command){
 	bool ret = false;
 	if (transitionMatch(command, SipCommandString::register_all_identities_done) ) {
 		cancelTimeout( "timer_registerAll" );
@@ -535,7 +535,7 @@ void SipDialogManagement::setUpStateMachine_dialogops(State<SipSMCommand,string>
 		this, 
 		"transition_start_deRegAllOps_terminateAll",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) 
-			&SipDialogManagement::c0_start_terminateCallsOps_terminateAll, 
+			&SipDialogManagement::c0_start_deRegAllOps_deRegAll, 
 		s_start, 
 		s_deRegAll_ops);
 	
@@ -559,7 +559,7 @@ void SipDialogManagement::setUpStateMachine_dialogops(State<SipSMCommand,string>
 		this, 
 		"transition_deRegAllOps_start_terminateAllDone",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) 
-			&SipDialogManagement::c30_deRegAllOps_start_terminateAllDone, 
+			&SipDialogManagement::c30_deRegAllOps_start_deRegAllDone, 
 		s_deRegAll_ops,
 		s_start);
 	
@@ -572,7 +572,7 @@ void SipDialogManagement::setUpStateMachine_dialogops(State<SipSMCommand,string>
 		this, 
 		"transition_start_deRegAllOps_terminateAll",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) 
-			&SipDialogManagement::d0_start_regAllOps_terminateAll, 
+			&SipDialogManagement::d0_start_regAllOps_regAll, 
 		s_start, 
 		s_regAll_ops);
 	
@@ -596,7 +596,7 @@ void SipDialogManagement::setUpStateMachine_dialogops(State<SipSMCommand,string>
 		this, 
 		"transition_deRegAllOps_start_terminateAllDone",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) 
-			&SipDialogManagement::d30_regAllOps_start_terminateAllDone, 
+			&SipDialogManagement::d30_regAllOps_start_regAllDone, 
 		s_regAll_ops,
 		s_start);	
 }
@@ -643,6 +643,7 @@ bool SipDialogManagement::terminateAllCalls() {
 				SipSMCommand::DIALOGCONTAINER);
 		sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	}
+	return true;
 }
 
 bool SipDialogManagement::receivedCallTerminateEarly() {
@@ -654,6 +655,7 @@ bool SipDialogManagement::receivedCallTerminateEarly() {
 				SipSMCommand::DIALOGCONTAINER);
 		sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	}
+	return true;
 }
 
 bool SipDialogManagement::deRegisterAll() {
@@ -694,6 +696,7 @@ bool SipDialogManagement::deRegisterAll() {
 				SipSMCommand::DIALOGCONTAINER);
 		sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	}
+	return true;
 }
 
 bool SipDialogManagement::registerAll() {
@@ -735,6 +738,7 @@ bool SipDialogManagement::registerAll() {
 				SipSMCommand::DIALOGCONTAINER);
 		sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	}
+	return true;
 }
 
 bool SipDialogManagement::receivedRegisterOk(bool deregistering){
@@ -756,6 +760,7 @@ bool SipDialogManagement::receivedRegisterOk(bool deregistering){
 			sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
 	}
+	return true;
 }
 
 bool SipDialogManagement::shutdownDone( bool force ) {
@@ -766,7 +771,7 @@ bool SipDialogManagement::shutdownDone( bool force ) {
 			return false;
 		} 
 		//else ... shutdown ... nothing else to do ...
-		merr << end << "Shutdown process is completed."<< end;
+		merr << end << "SipStack Shutdown process is completed."<< end;
 	} else {
 		merr << "Shutdown process timed out (there was some problem): "<< end;
 		if( pendingHangUps > 0 ) {
