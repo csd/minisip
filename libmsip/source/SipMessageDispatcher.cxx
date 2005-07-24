@@ -67,7 +67,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	}
 
 #ifdef DEBUG_OUTPUT
-	merr<< end << 	"Dispatcher got command: "<< end << 
+	mdbg<< end << 	"Dispatcher got command: "<< end << 
 			"'----> " << c << end;
 #endif
 
@@ -177,7 +177,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	}
 */	
 	// 2. If not any branch parameter or the transaction was not found, try with each dialog
-	int j=0;
+	//int j=0; //unused??
         MRef<SipDialog *> dialog;
 	if (c.getDestination()==SipSMCommand::ANY || c.getDestination()==SipSMCommand::TU){
 #ifdef DEBUG_OUTPUT
