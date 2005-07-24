@@ -39,7 +39,8 @@
 
 
 #include<assert.h>
-#include<stdio.h>
+//#include<stdio.h>
+#include<libmutil/dbg.h>
 
 using namespace std;
 
@@ -105,36 +106,36 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_THREAD_IMPLEMENTED
 static void *LinuxThreadStarter(void *arg){
-        /* Keep a reference to yourself as long as you run */
-        MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
-        delete (static_cast<MRef <Runnable *> *>(arg));
-//	cerr << "LinuxThreadStarter: thread created"<< endl;
+	/* Keep a reference to yourself as long as you run */
+	MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
+	delete (static_cast<MRef <Runnable *> *>(arg));
+	#ifdef DEBUG_OUTPUT
+		mdbg << "LinuxThreadStarter: thread created"<< end;
+	#endif
+	
 	self->run();
-//	cerr <<"LinuxThreadStarter: thread terminated"<< endl;
+	
+	#ifdef DEBUG_OUTPUT
+		mdbg <<"LinuxThreadStarter: thread terminated"<< end;
+	#endif
 	return NULL;
+	//pthread_exit( (void *) 0 ); //cesc
 }
 
 static void *LinuxStaticThreadStarter(void *arg){
-//	printf("LinuxStaticThreadStarter: thread created");
+	#ifdef DEBUG_OUTPUT
+		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
+	#endif
 	void (*f)();
-	//f=(void())&lpParam;
 	f=(void (*)())arg;
 	(*f)();
-//	printf("LinuxStaticThreadStarter: thread terminated");
+	
+	#ifdef DEBUG_OUTPUT
+		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
+	#endif
 	return NULL;
 }
 
-/*
-static void *LinuxStaticThreadStarter(void *obj, void *arg){
-//	printf("LinuxStaticThreadStarter: thread created");
-	void* (*f)(void*);
-	//f=(void())&lpParam;
-	f=(void* (*)(void*))obj;
-	(*f)(arg);
-//	printf("LinuxStaticThreadStarter: thread terminated");
-	return NULL;
-}
-*/
 #endif
 
 
@@ -149,10 +150,8 @@ Thread::Thread(MRef<Runnable *> runnable){
 #ifdef WIN32
 	DWORD threadId;
 
-	//handle_ptr = malloc(sizeof(HANDLE));
 	handle_ptr = new HANDLE;
 
-//	threadHandle = CreateThread(
 	*((HANDLE*)handle_ptr) = CreateThread(
 			NULL,                        // default security attributes
 			0,                           // use default stack size
@@ -160,7 +159,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 			(LPVOID) self,                // argument to thread function
 			0,                           // use default creation flags
 			&threadId);
-//	if (threadHandle==NULL)
+	
 	if (*((HANDLE*)handle_ptr)==NULL){
                 delete self;
 		throw new ThreadException("Could not create thread.");
@@ -172,12 +171,35 @@ Thread::Thread(MRef<Runnable *> runnable){
 #ifdef HAVE_PTHREAD_H
 	//handle_ptr = malloc(sizeof(pthread_t));
 	handle_ptr = new pthread_t;
-//	if (pthread_create(&threadHandle, NULL, LinuxThreadStarter, runnable)){
-	if (pthread_create((pthread_t*)handle_ptr, NULL, LinuxThreadStarter, self)){
+	int ret;
+	
+	//set attribs for the threads ...
+/*	
+	pthread_attr_t attr;
+	pthread_attr_init( &attr);
+	pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_JOINABLE );
+	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL );
+	//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL );
+*/
+	
+	ret = pthread_create(
+			(pthread_t*)handle_ptr, 
+			NULL, // either NULL or &attr,
+			LinuxThreadStarter, 
+			self);
+	
+// 	pthread_attr_destroy( &attr );
+	
+	if ( ret != 0 ){
                 delete self;
+		#ifdef DEBUG_OUTPUT
+			merr << "In Thread, linux part - thread NOT created" << end;
+		#endif
 		throw new ThreadException("Could not create thread.");
 	}
-//	printf("In Thread, linux part - thread created\n");
+	#ifdef DEBUG_OUTPUT
+		mdbg << "In Thread, linux part - thread created" << end;
+	#endif
 	
 #endif
 
@@ -205,7 +227,9 @@ int Thread::createThread(void f()){
 	
 #ifdef HAVE_PTHREAD_H
 	pthread_t threadHandle;
-//	cerr << "Running createThread"<< endl;
+	#ifdef DEBUG_OUTPUT
+ 		mdbg << "Running createThread"<< end;
+	#endif
 	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarter, (void*)f);
 	return (int)threadHandle;
 #endif
@@ -216,15 +240,16 @@ int Thread::createThread(void *f(void*), void *arg){
 #ifdef WIN32
 //        assert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
 
-        //tmpstruct *argptr = (tmpstruct*)malloc(sizeof (tmpstruct));
-		tmpstruct *argptr = new struct tmpstruct;
+	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
         
 	HANDLE threadHandle;
 	DWORD id;
 	
-	//printf("createThread: Creating thread\n");
+	#ifdef DEBUG_OUTPUT
+		mdbg << "createThread: Creating thread" << end;
+	#endif
 	threadHandle = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size  
@@ -232,7 +257,9 @@ int Thread::createThread(void *f(void*), void *arg){
 			argptr,                // argument to thread function 
 			0,                           // use default creation flags 
 			&id);
-	//printf("createThread: done Creating thread\n");
+	#ifdef DEBUG_OUTPUT
+		mdbg << "createThread: done Creating thread" << end;
+	#endif
 
 	if (threadHandle==NULL)
 		throw new ThreadException("Could not create thread.");
@@ -241,7 +268,9 @@ int Thread::createThread(void *f(void*), void *arg){
 	
 #ifdef HAVE_PTHREAD_H
 	pthread_t threadHandle;
-//	cerr << "Running createThread"<< endl;
+	#ifdef DEBUG_OUTPUT
+		mdbg << "Running createThread" << end;
+	#endif
 	pthread_create(&threadHandle, NULL, f, arg);
 	return (int)threadHandle;
 #endif
@@ -250,14 +279,24 @@ int Thread::createThread(void *f(void*), void *arg){
 
 void * Thread::join(){
 #ifdef HAVE_PTHREAD_H
-        void * returnValue;
-
-        if( pthread_join( *((pthread_t *)handle_ptr), &returnValue ) ){
-                perror( "ERROR: pthread_join" );
-                return NULL;
-        }
-
-        return returnValue;
+	void * returnValue;
+	int ret;
+	
+	#ifdef DEBUG_OUTPUT
+		mdbg << "Thread::join(): before join" << end;
+	#endif
+	ret = pthread_join( 
+			*( (pthread_t *)handle_ptr ), 
+			&returnValue );
+	
+	if( ret != 0 ){
+		#ifdef DEBUG_OUTPUT
+			merr << "Thread::join(): ERROR" << end;
+		#endif
+		return NULL;
+	} 
+	
+	return returnValue;
         
 #elif defined WIN32
 	HANDLE handle = *((HANDLE*)handle_ptr);
@@ -271,9 +310,11 @@ void Thread::join(int handle){
 	HANDLE h = (HANDLE)handle;
 	WaitForSingleObject( h, INFINITE );
 #else
-        if( pthread_join( handle, NULL) ){
-                perror( "ERROR: pthread_join" );
-        }
+	if( pthread_join( handle, NULL) ){
+		#ifdef DEBUG_OUTPUT
+			mdbg << "Thread::join(): ERROR" << end;
+		#endif
+	}
 #endif
 }
 
@@ -284,4 +325,72 @@ void Thread::msleep(int ms){
 	usleep(ms * 1000);
 #endif
 }
+
+
+bool Thread::kill( ) {
+#ifdef HAVE_PTHREAD_H
+	int ret;
+	
+	#ifdef DEBUG_OUTPUT
+		mdbg << "Thread::kill(): before cancel" << end;
+	#endif
+	ret = pthread_cancel( *( (pthread_t *)handle_ptr ) );
+	
+	if( ret != 0 ){
+		#ifdef DEBUG_OUTPUT
+			merr << "Thread::kill(): ERROR" << end;
+		#endif
+		return false;
+	} 
+	
+	return true;
+        
+#elif defined WIN32
+	HANDLE handle = *((HANDLE*)handle_ptr);
+	BOOL ret;
+	
+	ret = TerminateTHread( handle, NULL );
+        if( ret == 0 ) {
+		#ifdef DEBUG_OUTPUT
+			merr << "Thread::kill(): ERROR" << end;
+		#endif
+		return false;
+	}
+	return true;
+#endif
+}
+
+bool Thread::kill( int handle) {
+#ifdef HAVE_PTHREAD_H
+	int ret;
+	
+	#ifdef DEBUG_OUTPUT
+		mdbg << "Thread::kill(): before cancel" << end;
+	#endif
+	ret = pthread_cancel( handle );
+	
+	if( ret != 0 ){
+		#ifdef DEBUG_OUTPUT
+			merr << "Thread::kill(): ERROR" << end;
+		#endif
+		return false;
+	} 
+	
+	return true;
+        
+#elif defined WIN32
+	HANDLE h = (HANDLE)handle;
+	BOOL ret;
+	
+	ret = TerminateTHread( h, NULL );
+        if( ret == 0 ) {
+		#ifdef DEBUG_OUTPUT
+			merr << "Thread::kill(): ERROR" << end;
+		#endif
+		return false;
+	}
+	return true;
+#endif
+}
+
 

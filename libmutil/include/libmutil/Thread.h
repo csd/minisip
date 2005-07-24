@@ -83,11 +83,36 @@ public:
 	static int createThread( void* f(void*), void *arg);
 
 	
+	/**
+	Block the calling thread, waiting for the called thread to 
+	be terminated.
+	*/
 	void * join();
 	
-	
+	/**
+	See non-static join
+	*/
 	static void join(int handle);
 
+	/**
+	Dangerous function
+	In linux (uses pthreads), it cancels the called thread
+	  (pthread_cancel), exiting the running function. Use with
+	  care.
+	Under windows, it uses the TerminateThread ... see the msdn lib
+	  reference and google for it ... everywhere it is described as
+	  a very baad function. Use at own risk. 
+	  //TODO: Test under windows ... i have not.
+	*/
+	bool kill( );
+	
+	/**
+	See non-static kill()
+	*/
+	static bool kill( int handle );
+
+	void * getHandle() {return handle_ptr;}
+	
 	/**
 	 * Purpose: Implement a platform independent way of delaying 
 	 *		execution of a thread.
