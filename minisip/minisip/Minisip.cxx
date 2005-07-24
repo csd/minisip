@@ -60,15 +60,17 @@ using namespace std;
 #ifdef DEBUG_OUTPUT
 static void signal_handler( int signal ){
 	if( signal == SIGUSR1 ){
-		merr << "ERROR: Minisip was stopped (signal caught)" << end;
+		merr << "ERROR: Minisip was stopped (signal SIGUSR1 caught)" << end;
 		ts.print();
+		exit( 1 );
+	} else {
+		merr << "ERROR: Minisip was stopped (some signal caught)" << end;
 	}
-	exit( 1 );
 }
 #endif
 #endif
 
-
+#if 0
 static void *tcp_server_thread(void *arg){
 	assert( arg != NULL );
 	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
@@ -110,6 +112,8 @@ static void *tls_server_thread(void *arg){
 	}
 		
 }
+
+#endif
 
 Minisip::Minisip( int argc, char**argv ){
 
@@ -196,15 +200,13 @@ Minisip::Minisip( int argc, char**argv ){
 	cerr << "Creating GTK GUI"<< endl;
 	gui = new MainWindow( argc, argv );
 	LogEntry::handler = dynamic_cast<LogEntryHandler *>(gui);
-	
-	DbgHandler * dbgHandler = dynamic_cast<MainWindow *>( gui );
-	//cesc - remove the annoying window pop ups
-	//merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) ); 
 
 #ifdef DEBUG_OUTPUT
-	fprintf( stderr, "dbgHandler: %x\n", dbgHandler );
 	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-	consoleDbg->startThread();
+	consoleDbg->start();
+#else
+	//in non-debug mode, send merr to the gui
+	merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) ); 
 #endif
 
 #else //!GTK_GUI
@@ -224,24 +226,31 @@ Minisip::~Minisip(){
 }
 
 void Minisip::exit(){
+	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
 	//Send a shutdown command to the sip stack ... 
 	//it will take care of de-registering and closing on-going calls
 	CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
 	SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
 	
-	sip->getSipStack()->handleCommand(sipcmd);
+	//sip->getSipStack()->handleCommand(sipcmd);
+	sip->stop();
 	
-	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
-	sipThread->join();
-	//FIXME: I made sipThread an MRef object ... do i need to delete it? (cesc)
-	
-	merr << end << end << "Minisip can't wait to see you again! Bye!" << end << end << end;
+#ifdef DEBUG_OUTPUT
+	mout << "Waiting for the SipStack to close ..." << end;
+#endif
+	sip->join();
 
+#ifdef DEBUG_OUTPUT
+	mout << end << "Stopping the Console Debugger thread" << end;
+	consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
+	consoleDbg->join();
+#endif	
+
+	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
 	
-	/* delete things */
 }
 
-void Minisip::run(){
+void Minisip::startSip() {
 
 #ifdef DEBUG_OUTPUT
 	cerr << "Thread 2 running - doing initParseConfig"<< endl;
@@ -280,6 +289,7 @@ void Minisip::run(){
 #endif
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
+		consoleDbg->setMediaHandler( mediaHandler );
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
 		Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
@@ -393,8 +403,9 @@ void Minisip::run(){
 		textui->displayMessage("");
 		}
 #endif
-		sip->run();
-
+		//sip->run();
+		sip->start(); //run as a thread ...
+		
 	}catch(XMLElementNotFound *e){
 		//FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
@@ -459,19 +470,13 @@ void Minisip::initParseConfig(){
 	}while(!done);
 }
 
-void Minisip::startSip(){
-#ifdef DEBUG_OUTPUT
-	cerr << "Creating sip thread"<< endl;
-#endif
-	sipThread = new Thread( this );
-}
-
 void Minisip::runGui(){
 	gui->run();
 }
 
 int main( int argc, char ** argv ){
 	cerr << endl << "Starting MiniSIP ... welcome!" << endl << endl;
+	
 	Minisip minisip( argc, argv );
 	minisip.startSip();
 	minisip.runGui();
