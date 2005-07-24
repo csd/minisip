@@ -42,6 +42,10 @@
 #include<unistd.h>
 #endif
 
+#ifdef DEBUG_OUTPUT
+#include <libmutil/itoa.h>
+#endif
+
 class G711CODEC;
 #ifdef AEC_SUPPORT
 AEC AudioMedia::aec;		//hanning
@@ -152,20 +156,24 @@ void AudioMedia::srcb_handleSound( void * data, void * dataR){				//hanning
 
 void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 
-    list< MRef<MediaStreamSender *> >::iterator i;
-    sendersLock.lock();
-    
-    
-    for( i = senders.begin(); i != senders.end(); i++ ){
-        MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
-
-        uint32_t encodedLength = 
-            selectedCodec->encode( data, 160*sizeof(short), encoded );
-
-        (*i)->send( encoded, encodedLength, &ts, marker );
-    }
-    
-    sendersLock.unlock();
+	list< MRef<MediaStreamSender *> >::iterator i;
+	sendersLock.lock();
+	
+	
+	for( i = senders.begin(); i != senders.end(); i++ ){
+		//This is quite radical ... mute by stop sending ... (see also MediaStream.cxx)
+		//if( (*i)->isMuted() ) //cesc
+		//	continue;
+		
+		MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
+			
+		uint32_t encodedLength = 
+			selectedCodec->encode( data, 160*sizeof(short), encoded );
+	
+		(*i)->send( encoded, encodedLength, &ts, marker );
+	}
+	
+	sendersLock.unlock();
 }
 
 void AudioMedia::startRinging( string ringtoneFile ){
@@ -175,6 +183,18 @@ void AudioMedia::startRinging( string ringtoneFile ){
 void AudioMedia::stopRinging(){
 	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
 }
+
+#ifdef DEBUG_OUTPUT
+string AudioMedia::getDebugString() {
+	string ret;
+	ret = getMemObjectType() + ": this=" + itoa((int)this);
+	for( std::list< MRef<MediaStreamSender *> >::iterator it = senders.begin();
+				it != senders.end(); it++ ) {
+		ret += (*it)->getDebugString() + ";";
+	}
+	return ret;
+}
+#endif
 
 MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
 	std::list<MRef<AudioMediaSource *> >::iterator i;

@@ -73,6 +73,12 @@ class Session : public MObject{
 		friend class DtmfSender;
 		void sendDtmf( uint8_t symbol );
 
+		void muteSenders (bool mute);
+		
+		
+#ifdef DEBUG_OUTPUT
+		virtual string getDebugString();
+#endif
 
 	private:
 		/* Key management handling */

@@ -53,24 +53,23 @@ MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
 Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp){
 	this->securityConfig = securityConfig; // hardcopy
-        this->ka = Session::precomputedKa;
+	this->ka = Session::precomputedKa;
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
-        Session::precomputedKa = NULL;
+	Session::precomputedKa = NULL;
 
-        if( registry ){
-                registry->registerSession( this );
-        }
-
+	if( registry ){
+		registry->registerSession( this );
+	}
 }
 
 void Session::unregister(){
-        if( registry ){
-                registry->unregisterSession( this );
-        }
+	if( registry ){
+		registry->unregisterSession( this );
+	}
 
-        if( Session::precomputedKa.isNull() ){
-                Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
-        }
+	if( Session::precomputedKa.isNull() ){
+		Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+	}
 }
 
 Session::~Session(){
@@ -111,7 +110,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 	std::list<std::string> attributes;
 	string type;
 	uint16_t localPort;
-	uint32_t rtpPayloadType;
+	//uint32_t rtpPayloadType;  //unused
 	string rtpMap;
 	MRef<SdpHeaderM *> m;
 	string keyMgmtMessage;
@@ -192,13 +191,13 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			return false;
 		}
 
-                /*
-                else{
-                        if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
-                                ((KeyAgreementDH *)*ka)->computeTgk();
-                        }
-                }
-                */
+		/*
+		else{
+			if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+				((KeyAgreementDH *)*ka)->computeTgk();
+			}
+		}
+		*/
 	}
 	remoteAddress = answer->getRemoteAddr( port );
 
@@ -206,14 +205,14 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = ((SdpHeaderM*)*(answer->getHeaders()[i]));
 #ifdef DEBUG_OUTPUT
-                        cerr << "trying media line " << m->getString() << endl;
+			cerr << "trying media line " << m->getString() << endl;
 #endif
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
 #ifdef DEBUG_OUTPUT
-                                if( receiver )
-                                        cerr << "Found receiver!" << endl;
+				if( receiver )
+					cerr << "Found receiver!" << endl;
 #endif
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
@@ -221,7 +220,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 				}
 				else if( receiver ){
 					/* Be ready to receive */
-                                        receiver->start();
+					receiver->start();
 				}
 			}
 		}
@@ -235,7 +234,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 	/* If we have a sender for this format, activate it */
 	mdbg << "Starting senders loop" << end;
 	uint8_t j = 1;
-        mediaStreamSendersLock.lock();
+	mediaStreamSendersLock.lock();
 	for( iStream =  mediaStreamSenders.begin(); iStream != mediaStreamSenders.end(); iStream++,j++ ){
 		mdbg << "Trying a sender"<< end;
 		if( (*iStream)->matches( m, iFormat ) ){
@@ -254,7 +253,7 @@ MRef<MediaStream *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat
 			((MediaStreamSender *)*(*iStream))->setRemoteAddress( remoteAddress );
 		}
 	}
-        mediaStreamSendersLock.unlock();
+	mediaStreamSendersLock.unlock();
 	/* Look for a receiver */
 	mdbg << "Starting receivers loop"<< end;
 	for( iStream =  mediaStreamReceivers.begin(); iStream != mediaStreamReceivers.end(); iStream ++ ){
@@ -305,46 +304,46 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 	for( i = 0; i < offer->getHeaders().size(); i++ ){
 
-                if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
-                        MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
+		if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
+			MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
 
-                        MRef<SdpHeaderM *> answerM = new SdpHeaderM(
-                                        offerM->getMedia(), 0, 0,
-                                        offerM->getTransport() );
+			MRef<SdpHeaderM *> answerM = new SdpHeaderM(
+					offerM->getMedia(), 0, 0,
+					offerM->getTransport() );
 
-                        sdpAnswer->addHeader( *answerM );
+			sdpAnswer->addHeader( *answerM );
 
-                        for( j = 0; j < offerM->getNrFormats(); j++ ){
-                                receiver = matchFormat( offerM, j, remoteAddress );
+			for( j = 0; j < offerM->getNrFormats(); j++ ){
+				receiver = matchFormat( offerM, j, remoteAddress );
 
-                                if( receiver ){
-                                        if( answerM->getPort() == 0 ){
-                                                answerM->setPort( receiver->getPort() );
-                                        }
-                                        else{
-                                                /* This media has already been treated */
-                                                continue;
-                                        }
+				if( receiver ){
+					if( answerM->getPort() == 0 ){
+						answerM->setPort( receiver->getPort() );
+					}
+					else{
+						/* This media has already been treated */
+						continue;
+					}
 
-                                        /* found a receiver, accept the offer */
-                                        std::string rtpMapValues = "";
+					/* found a receiver, accept the offer */
+					std::string rtpMapValues = "";
 
-                                        std::list<uint8_t> listPLT = receiver->getAllRtpPayloadTypes();
-                                        std::list<uint8_t>::iterator iListPLT;
-                                        std::list<std::string> listM = receiver->getAllRtpMaps();
-                                        std::list<std::string>::iterator iListM;
+					std::list<uint8_t> listPLT = receiver->getAllRtpPayloadTypes();
+					std::list<uint8_t>::iterator iListPLT;
+					std::list<std::string> listM = receiver->getAllRtpMaps();
+					std::list<std::string>::iterator iListM;
 
-                                        for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
-                                                answerM->addFormat( (*iListPLT) );
-                                                rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
-                                                if( rtpMapValues != "" ){
-                                                        rtpMapValues = "rtpmap:" + rtpMapValues;
-                                                        MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
-                                                        a->setAttributes( rtpMapValues );
-                                                        answerM->addAttribute( *a );
-                                                }
-                                                //           rtpMapValues = "";
-                                        }
+					for( iListPLT = listPLT.begin(), iListM = listM.begin(); iListPLT != listPLT.end(); iListPLT ++, iListM ++) {
+						answerM->addFormat( (*iListPLT) );
+						rtpMapValues =  itoa( (*iListPLT) ) + " " + (*iListM);
+						if( rtpMapValues != "" ){
+							rtpMapValues = "rtpmap:" + rtpMapValues;
+							MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
+							a->setAttributes( rtpMapValues );
+							answerM->addAttribute( *a );
+						}
+						//           rtpMapValues = "";
+					}
 					//receiver->addToM( sdpAnswer ,answerM, j );
 					
 					attributes = receiver->getSdpAttributes();
@@ -354,7 +353,6 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 						a->setAttributes( *iAttribute );
 						answerM->addAttribute( *a );
 					}
-
 				}
 			}
 		}
@@ -374,33 +372,32 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 			fprintf(stderr, "responderParse failed\n" );
 			return NULL;
 		}
-                /*
-                else{
-                        if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
-                                ((KeyAgreementDH *)*ka)->computeTgk();
-                        }
-                }
-                */
+		/*
+		else{
+			if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+				((KeyAgreementDH *)*ka)->computeTgk();
+			}
+		}
+		*/
 		
 		sdpAnswer->setSessionLevelAttribute( "key-mgmt", "mikey "+keyMgmtAnswer );
 	}
 	
 	return sdpAnswer;
 }
-			
 
 void Session::start(){
 	list< MRef<MediaStream * > >::iterator i;
         
-        if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+	if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
 #ifndef _MSC_VER
-                ts.save( TGK_START );
+	ts.save( TGK_START );
 #endif
-                ((KeyAgreementDH *)*ka)->computeTgk();
+	((KeyAgreementDH *)*ka)->computeTgk();
 #ifndef _MSC_VER
-                ts.save( TGK_END );
+	ts.save( TGK_END );
 #endif
-        }
+	}
 
 
 	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
@@ -412,7 +409,7 @@ void Session::start(){
 		}
 	}
 	
-        mediaStreamSendersLock.lock();
+	mediaStreamSendersLock.lock();
 	for( i = mediaStreamSenders.begin(); i != mediaStreamSenders.end(); i++ ){
 		if( (*i)->getPort() ){
 			if( securityConfig.secured ){
@@ -421,7 +418,7 @@ void Session::start(){
 			(*i)->start();
 		}
 	}
-        mediaStreamSendersLock.unlock();
+	mediaStreamSendersLock.unlock();
 }
 
 void Session::stop(){
@@ -433,13 +430,13 @@ void Session::stop(){
 		}
 	}
 	
-        mediaStreamSendersLock.lock();
+	mediaStreamSendersLock.lock();
 	for( i = mediaStreamSenders.begin(); i != mediaStreamSenders.end(); i++ ){
 		if( (*i)->getPort() ){
 			(*i)->stop();
 		}
 	}
-        mediaStreamSendersLock.unlock();
+	mediaStreamSendersLock.unlock();
 
 }
 
@@ -449,9 +446,9 @@ void Session::addMediaStreamReceiver( MRef<MediaStream *> mediaStream ){
 }
 
 void Session::addMediaStreamSender( MRef<MediaStream *> mediaStream ){
-        mediaStreamSendersLock.lock();
+	mediaStreamSendersLock.lock();
 	mediaStreamSenders.push_back( *mediaStream );
-        mediaStreamSendersLock.unlock();
+	mediaStreamSendersLock.unlock();
 }
 
 	
@@ -468,23 +465,50 @@ bool Session::isSecure(){
 }
 
 string Session::getCallId(){
-        return callId;
+	return callId;
 }
 
 void Session::setCallId( const string callId ){
-        this->callId = callId;
+	this->callId = callId;
 }
 
 void Session::sendDtmf( uint8_t symbol ){
 	MRef<DtmfSender *> dtmfSender = new DtmfSender( this );
-        uint32_t * ts = new uint32_t;
-        *ts = 0;
-        dtmfTOProvider->request_timeout( 0, dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
-        dtmfTOProvider->request_timeout( 5, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
-        dtmfTOProvider->request_timeout( 10, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
-        
-        dtmfTOProvider->request_timeout( 15, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-        dtmfTOProvider->request_timeout( 20, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-        dtmfTOProvider->request_timeout( 25, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
-        
+	uint32_t * ts = new uint32_t;
+	*ts = 0;
+	dtmfTOProvider->request_timeout( 0, dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
+	dtmfTOProvider->request_timeout( 5, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+	dtmfTOProvider->request_timeout( 10, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+	
+	dtmfTOProvider->request_timeout( 15, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+	dtmfTOProvider->request_timeout( 20, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+	dtmfTOProvider->request_timeout( 25, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
+	
 }
+
+
+void Session::muteSenders (bool mute) {
+	for( std::list< MRef<MediaStream *> >::iterator it =  mediaStreamSenders.begin();
+				it !=  mediaStreamSenders.end(); it++ ) {
+		(*it)->setMuted( mute );
+	}
+	
+}
+
+#ifdef DEBUG_OUTPUT
+string Session::getDebugString() {
+	string ret;
+	ret = getMemObjectType() + ": this=" + itoa((int)this) +
+		"; callid=" + getCallId() +
+		"; peerUri=" + peerUri;
+	for( std::list< MRef<MediaStream *> >::iterator it = mediaStreamReceivers.begin();
+				it != mediaStreamReceivers.end(); it++ ) {
+		ret += "\n" + (*it)->getDebugString();
+	}
+	for( std::list< MRef<MediaStream *> >::iterator it =  mediaStreamSenders.begin();
+				it !=  mediaStreamSenders.end(); it++ ) {
+		ret += "\n" + (*it)->getDebugString();
+	}
+	return ret;
+}
+#endif

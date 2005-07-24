@@ -41,6 +41,10 @@ class MediaStream : public MObject{
 		virtual void start() = 0;
 		virtual void stop() = 0;
 
+#ifdef DEBUG_OUTPUT
+		virtual string getDebugString();
+#endif
+		
 		/* SDP information */
 		std::string getSdpMediaType();/* audio, video, appli;ation... */
 		// pn501 New function for multiple codecs
@@ -63,6 +67,10 @@ class MediaStream : public MObject{
 		uint32_t getSsrc();
 
 		MRef<CodecState *> getSelectedCodec(){return selectedCodec;};
+		
+		//cesc
+		void setMuted( bool mute ) { muted = mute;}
+		bool isMuted() { return muted;}
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
@@ -79,11 +87,22 @@ class MediaStream : public MObject{
 		MRef<KeyAgreement *> ka;
 		Mutex kaLock;
 		std::list< MRef<CryptoContext *> > cryptoContexts;
+		
+		//Cesc -- does it conflict with bool disabled???
+		bool muted;
+		
 };
 
 class MediaStreamReceiver : public MediaStream{ 
 	public:
 		MediaStreamReceiver( MRef<Media *> media, MRef<RtpReceiver *>, MRef<IpProvider *> ipProvider );
+
+#ifdef DEBUG_OUTPUT
+		virtual string getDebugString();
+#endif
+
+		virtual std::string getMemObjectType(){return "MediaStreamReceiver";}
+	
 		virtual void start();
 		virtual void stop();
 		
@@ -92,7 +111,7 @@ class MediaStreamReceiver : public MediaStream{
 
 		void handleRtpPacket( SRtpPacket * packet );
 		uint32_t getId();
-		
+
 	private:
 		MRef<RtpReceiver *> rtpReceiver;
 		uint32_t id;
@@ -105,12 +124,20 @@ class MediaStreamReceiver : public MediaStream{
 		Mutex ssrcListLock;
 
 		bool running;
+		
 };
 
 class MediaStreamSender : public MediaStream{ 
 	public:
 		MediaStreamSender( MRef<Media *> media, 
 				   MRef<UDPSocket *> senderSock=NULL );
+
+#ifdef DEBUG_OUTPUT
+		virtual string getDebugString();
+#endif
+		
+		virtual std::string getMemObjectType(){return "MediaStreamSender";}
+		
 		virtual void start();
 		virtual void stop();
 
@@ -120,6 +147,7 @@ class MediaStreamSender : public MediaStream{
 		void send( byte_t * data, uint32_t length, uint32_t * ts, bool marker = false, bool dtmf = false );
 		void setRemoteAddress( IPAddress * remoteAddress );
 		
+		
 	private:
 		MRef<UDPSocket *> senderSock;
 		uint16_t remotePort;
@@ -127,6 +155,7 @@ class MediaStreamSender : public MediaStream{
                 uint32_t lastTs;
 		IPAddress * remoteAddress;
                 Mutex senderLock;
+		
 };
 
 #endif

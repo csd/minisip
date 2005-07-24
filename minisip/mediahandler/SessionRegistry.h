@@ -33,7 +33,7 @@ class SessionRegistry{
         
         public:
                 MRef<Session *> getSession( std::string callId );
-        private:
+        protected:
                 void registerSession( MRef<Session *> session );
                 void unregisterSession( MRef<Session *> session );
 

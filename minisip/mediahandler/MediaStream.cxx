@@ -39,6 +39,8 @@
 #include"../minisip/ipprovider/IpProvider.h"
 #include<iostream>
 
+#include<string.h> //for memset
+
 using namespace std;
 
 
@@ -70,7 +72,8 @@ static int strcasecmp(const char *s1, const char *s2){
 
 MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
 	disabled = false;
-    selectedCodec = NULL;
+	selectedCodec = NULL;
+	setMuted( true );
 }
 
 std::string MediaStream::getSdpMediaType(){
@@ -356,27 +359,33 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 #endif
 		first=false;
 	}
-        senderLock.lock();
-        if( !(*givenTs) ){
-                lastTs += 160; //FIXME! get it from the CODEC,
-                               // when we have one CODEC per sender
-                *givenTs = lastTs;
-        }
-        else{
-                lastTs = *givenTs;
-        }
+	
+	if( isMuted() ) {
+		//if muted, erase the data and for now, send only zeros ... (see also AudioMedia.cxx)
+		memset( data, 0, length );
+	}
+	
+	senderLock.lock();
+	if( !(*givenTs) ){
+		lastTs += 160; //FIXME! get it from the CODEC,
+			// when we have one CODEC per sender
+		*givenTs = lastTs;
+	}
+	else{
+		lastTs = *givenTs;
+	}
 
 	packet = new SRtpPacket( data, length, seqNo++, lastTs, ssrc );
 
-        if( dtmf ){
-                packet->getHeader().setPayloadType( 101 );
-        }
-        else{
-                if( payloadType != 255 )
-                        packet->getHeader().setPayloadType( payloadType );
-                else
-                        packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
-        }
+	if( dtmf ){
+		packet->getHeader().setPayloadType( 101 );
+	}
+	else{
+		if( payloadType != 255 )
+			packet->getHeader().setPayloadType( payloadType );
+		else
+			packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
+	}
 
 	if( marker ){
 		packet->getHeader().setMarker( marker );
@@ -386,9 +395,46 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 	packet->sendTo( **senderSock, *remoteAddress, remotePort );
 	delete packet;
-        senderLock.unlock();
+	senderLock.unlock();
 }
 
 void MediaStreamSender::setRemoteAddress( IPAddress * remoteAddress ){
 	this->remoteAddress = remoteAddress;
 }
+
+#ifdef DEBUG_OUTPUT
+string MediaStream::getDebugString() {
+	string ret;
+	ret = getMemObjectType() + " this=" + itoa((int)this) +
+		": port=" + itoa(getPort()) +
+		"; ssrc=" + itoa(getSsrc());
+
+	return ret;
+}
+string MediaStreamReceiver::getDebugString() {
+	string ret;
+	ret = getMemObjectType() + " this=" + itoa((int)this) +
+		": listening port=" + itoa(rtpReceiver->getPort());
+	for( std::list<uint32_t>::iterator it = ssrcList.begin();
+				it != ssrcList.end();
+				it++) {
+		"; ssrc=" + itoa((*it));
+	}
+	return ret;
+}
+string MediaStreamSender::getDebugString() {
+	string ret;
+	
+	ret = getMemObjectType() + " this=" + itoa((int)this) +
+		": port=" + itoa(getPort()) +
+		"; ssrc=" + itoa(getSsrc()) +
+		"; remotePort=" + itoa(remotePort);
+	
+	if( isMuted() == true )
+		ret += "; isMuted=true";
+	else ret += "; isMuted=false";
+	
+	return ret;
+}
+#endif
+

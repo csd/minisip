@@ -55,6 +55,9 @@ class AudioMedia : public Media, public SoundRecorderCallback{
                 void startRinging( std::string ringtoneFile );
                 void stopRinging();         
 
+#ifdef DEBUG_OUTPUT
+		virtual string getDebugString();
+#endif
 
 	private:
 		MRef<AudioMediaSource *> getSource( uint32_t ssrc );
