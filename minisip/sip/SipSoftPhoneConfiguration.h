@@ -36,7 +36,6 @@
 
 #include<vector>
 #include<list>
-#include"../codecs/Codec.h"
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
@@ -45,12 +44,15 @@
 //#include<libmsip/SipMessageTransport.h>
 
 #include<libmsip/SipDialogConfig.h>
+
 #include"SipDialogSecurityConfig.h"
 
 #include"Sip.h"
 #include"../minisip/contactdb/PhoneBook.h"
-#include"../minisip/contactdb/ContactDb.h"
-#include"../mediahandler/MediaHandler.h"
+//#include"../minisip/contactdb/ContactDb.h"
+#include"../codecs/Codec.h"
+
+//#include"../mediahandler/MediaHandler.h"
 
 class IPAddress;
 class Socket;
@@ -74,7 +76,7 @@ class SipSoftPhoneConfiguration : public MObject{
 
 		
 		//Configuration only the phone has and not every call
-		MRef<Sip*> sip;
+		MRef<Sip *> sip;
 	
 //		SipIdentity pstnIdentity;
 		MRef<SipIdentity *> pstnIdentity;
@@ -148,6 +150,8 @@ class SipSoftPhoneConfiguration : public MObject{
 		void save();
 		std::string load( std::string filename );
 		
+		list<string> audioCodecs;
+		
 		//P2T configurations:
 		//-------------------
 		
@@ -157,7 +161,6 @@ class SipSoftPhoneConfiguration : public MObject{
 		 */
 		int32_t p2tGroupListServerPort;
 		
-		list<string> audioCodecs;
 };
 
 #endif
