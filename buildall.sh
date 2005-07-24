@@ -21,7 +21,34 @@ SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
 SUBDIRS="${SUBDIRS} libminisip"
+SUBDIRS="${SUBDIRS} minisip"
 
+#Possible configure commands are shown in: ./configure --help
+#   check each folder for more details.
+
+#This are common params, usable in all folders
+base_configure_params=""
+#base_configure_params="$base_configure_params --enable-debug"
+#base_configure_params="$base_configure_params --disable-shared"
+
+#set special options for libmutil
+libmutil_configure_params=""
+#libmutil_configure_params="$libmutil_configure_params --enable-memdebug"
+
+#set special options for libminisip and minisip
+#   do a ./configure --help to see ALL available options ... here
+#              show just a sample
+minisip_configure_params=""
+minisip_configure_params="$minisip_configure_params --enable-color-terminal"
+#minisip_configure_params="$minisip_configure_params --enable-alsa"
+      #--enable-autocall enables automatic calling for debug purposes (default disabled)
+      #--enable-ipaq enables various fixes for the iPAQ (default disabled)
+      #--enable-ipsec-enable enables ipsec features (default disabled)
+      #--enable-aec enables push-2-talk features (default enabled)
+      #--enable-video enables video features (default disabled)
+      #--enable-textui enables the text based user interface (default disabled)
+
+      
 for subdir in ${SUBDIRS}
 do
 	echo "+++++++++++++++++++++++++++++++++++++"
@@ -36,20 +63,25 @@ do
 	cd ${subdir}
 	./bootstrap
 
-	#Possible configure commands are shown in: ./configure --help
-	#  Usefull: 
-	#     enable-debug (lot more output, helpfull with problems)
-	#     enble-shared (compile only static libs ... speeds up compilation)
 
-	configure_params=""
-#	configure_params="$configure_params --enable-debug "
-#	configure_params="$configure_params --disable-shared"
+	configure_params="$base_configure_params"
 	
 	if [ ${subdir} = "libmutil" ]; then 
 		echo libmutil can use special params
-		#here you can add the --enable-memdebug, only for libmutil
-#		configure_params="$configure_params --enable-memdebug"
+		configure_params="$configure_params $libmutil_configure_params"
 	fi 
+	
+	if [ ${subdir} = "libminisip" ] ; then 
+		echo libminisip can also have special config params
+		configure_params="$configure_params $minisip_configure_params"
+	fi 
+	
+	if [ ${subdir} = "minisip" ]; then 
+		echo minisip can also have special config params
+		configure_params="$configure_params $minisip_configure_params"
+	fi 
+	
+	
 	echo "=========================================================="
 	echo "configure_params (${subdir})= $configure_params"
 	echo "=========================================================="
@@ -59,38 +91,16 @@ do
 	
 	LDFLAGS=$LOC_LDFLAGS 					\
 		CXXFLAGS="$LOC_CXXFLAGS -Wall"			\
-		./configure $configure_params
+			./configure $configure_params
 	
 	make
 	
 	cd ..
 done
 
-echo "+++++++++++++++++++++++++++++++++++++"
-echo "Building MiniSIP application ... "
-echo "+++++++++++++++++++++++++++++++++++++"
-
-cd minisip
-./bootstrap
-
-configure_params="--enable-color-terminal"
-#configure_params="$configure_params --enable-alsa"
-#configure_params="$configure_params --enable-debug"
-#configure_params="$configure_params --disable-shared"
-
+echo "---------------------------------------------------------------------"
+echo "Warning:"
+echo "   You may need to manually copy the minisip/share/minisip.glade file"
+echo "   to the _pkgdatadir_ folder (in debian: /usr/local/share)."
+echo " --------------------------------------------------------------------"
 echo
-echo
-echo "LDFLAGS = $LOC_LDFLAGS" 
-echo "CXXFLAGS = $LOC_LDFLAGS"
-echo
-echo "=========================================================="
-echo "configure_params (minisip)= $configure_params"
-echo "=========================================================="
-
-LDFLAGS=$LOC_LDFLAGS 					\
-	CXXFLAGS="$LOC_CXXFLAGS -Wall"			\
-	./configure $configure_params
-
-make
-
-

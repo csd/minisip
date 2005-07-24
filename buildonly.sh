@@ -9,6 +9,11 @@
 # This script only runs a make into every folder. It needs buildall.sh to be
 #first. Note that libraries, at minimum, will be relinked, to ensure that all
 #changes are caught.
+#
+#Note that you can send a parameter to make ... for example "clean" or "distclean"
+#
+#The LD_LIBRARY_PATH you may want to use it to execute minisip/minisip/minisip
+#       script.
 
 SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmnetutil"
@@ -30,6 +35,8 @@ do
 	LDFLAGS="$LDFLAGS -L$PWD/.libs"
 	CXXFLAGS="$CXXFLAGS -I$PWD/include"
 
+	LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD/.libs:"
+	
 	make $1
 	
 	echo
@@ -69,10 +76,21 @@ rm -f minisip/minisip
 
 LDFLAGS="$LDFLAGS -L$PWD/.libs"
 CXXFLAGS="$CXXFLAGS -I$PWD/include"
+
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD"
+
 echo
 echo
 echo "LDFLAGS = $LDFLAGS" 
 echo "CXXFLAGS = $CXXFLAGS"
-echo
+echo "LD_PATH = $LD_LIBRARY_PATH"
 
 make $1
+
+cd ..
+
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+
+#LD_LIBRARY_PATH="$LD_LIBRARY_PATH" minisip/minisip/minisip
+
+
