@@ -24,8 +24,8 @@
 */
 
 
-#include<libminisip/SPEEXCODEC.h>
 #include<config.h>
+#include<libminisip/SPEEXCODEC.h>
 
 #ifdef HAS_SPEEX
 #include<assert.h>
