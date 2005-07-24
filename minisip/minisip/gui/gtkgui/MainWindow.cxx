@@ -41,6 +41,9 @@
 #include"../../../sip/SipSoftPhoneConfiguration.h"
 #include"../../contactdb/ContactDb.h"
 #include<libmsip/SipCommandString.h>
+
+#include"../../../mediahandler/MediaCommandString.h"
+
 #include<libmutil/trim.h>
 //#include<libmsip/SipSoftPhone.h>
 //
@@ -258,6 +261,7 @@ MainWindow::~MainWindow(){
 bool MainWindow::on_window_close (GdkEventAny* event  ) {
 	//enter quit mode ...
 	quit();
+	return true;
 	
 }
 
@@ -487,7 +491,7 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 		tabLabelText = Glib::locale_to_utf8( entry->getName() );
 	}
 	else{
-		tabLabelText = "Call";
+		tabLabelText = remoteUri;
 	}
 
 	label->set_text( tabLabelText );
@@ -824,10 +828,20 @@ void MainWindow::dtmfPressed( uint8_t symbol ){
 
 void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 	Gtk::Widget * currentPage = mainTabWidget->get_nth_page( index );
-	CallWidget * callWidget = dynamic_cast<CallWidget *>( currentPage );
-
-	if( callWidget ){
-		/* Do something on it here */
-		fprintf( stderr, "Selected called widget\n" );
+	CallWidget * callWidget = dynamic_cast< CallWidget *>( currentPage );
+	
+	if( callWidget ) {
+		#ifdef DEBUG_OUTPUT
+		fprintf( stderr, "Selected call widget!\n" );
+		#endif
+		if( callWidget->getState() == CALL_WIDGET_STATE_INCALL){
+			CommandString cmdstr( callWidget->getMainCallId(), MediaCommandString::set_active_source );
+			getCallback()->guicb_handleMediaCommand( cmdstr );
+		} else {
+			#ifdef DEBUG_OUTPUT
+			fprintf( stderr, "onTabChange ... doing nothing (call widget state)!\n" );
+			#endif
+		}
 	}
 }
+

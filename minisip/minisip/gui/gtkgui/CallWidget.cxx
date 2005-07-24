@@ -249,6 +249,9 @@ bool CallWidget::handleCommand( CommandString command ){
 			hideAcceptButton();
 			stopRinging();
 			state = CALL_WIDGET_STATE_INCALL;
+			//activate this source
+			CommandString cmdstr( getMainCallId(), MediaCommandString::set_active_source );
+			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 		}
 
 		if( command.getOp() == SipCommandString::authentication_failed ){
