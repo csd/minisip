@@ -1,14 +1,17 @@
 
 #include"ConsoleDebugger.h"
+
 #include<libmutil/termmanip.h>
-#include<libmutil/Thread.h>
+//#include<libmutil/Thread.h>
 
 #ifdef SM_DEBUG
-#include<libmutil/StateMachine.h> //CESC ... state machine output
+#include<libmutil/StateMachine.h>
 #endif
  
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipSMCommand.h>
+
+#include"../mediahandler/MediaCommandString.h"
 
 #include<iostream>
 
@@ -21,6 +24,18 @@
 #endif
 
 using namespace std;
+
+ConsoleDebugger::ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf): 
+			config(conf), 
+			mediaHandler(NULL),
+			thread( NULL ) {
+};
+
+ConsoleDebugger::~ConsoleDebugger() {
+#ifdef DEBUG_OUTPUT
+// 	cerr << "~ConsoleDebugger" << endl;
+#endif
+}
 
 void ConsoleDebugger::showHelp() {
 	cerr << "Welcome to the Console Debugger!" << endl;
@@ -43,6 +58,8 @@ void ConsoleDebugger::showHelp() {
 	cerr << "        - - : Print a list of commands waiting to be processed in the SipDialogContainer" << endl;
 	cerr << "        - + : Print info on all currently registered SipDialogs" << endl;
 	cerr << endl;
+	cerr << "        - m/M : Print info on MediaSessions currently running" << endl;
+	cerr << endl;
 	cerr << "   Note: only h/+/u/r/t commands are always available. The rest, only if --enable-debug is configured" << endl;
 	cerr << endl;
 	
@@ -50,7 +67,9 @@ void ConsoleDebugger::showHelp() {
 
 void ConsoleDebugger::run(){
 	bool tmpSet;
-	while(true){
+	
+	keepRunning = true;
+	while(keepRunning){
 		char c;
 #ifdef _MSC_VER
 		int n=1;
@@ -58,6 +77,10 @@ void ConsoleDebugger::run(){
 #else
 		int n = read(STDIN_FILENO, &c, 1);
 #endif
+		if( !keepRunning ) {
+			//cerr << "CDbg: run(): do not keep running" << endl;
+			break;
+		}
 		if (n==1){
 			switch (c){
 			case ' ':
@@ -132,6 +155,11 @@ void ConsoleDebugger::run(){
 				cerr << config->sip->getSipStack()->getTimeoutProvider()->getTimeouts() << endl;
 				cerr << "=========------------------ " << endl;
 				break;
+			
+			case 'm': //print mediahandler session info
+			case 'M':
+				sendCommandToMediaHandler(MediaCommandString::session_debug);
+				break;
 	#endif
 			default:
 				cerr << "Unknown command: "<< c << endl;
@@ -148,6 +176,13 @@ void ConsoleDebugger::sendManagementCommand( string str ) {
 			SipSMCommand::remote,
 			SipSMCommand::DIALOGCONTAINER);
 	config->sip->getSipStack()->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
+void ConsoleDebugger::sendCommandToMediaHandler( string str ) {
+	CommandString cmdstr ("", str);
+	cerr << "========= MediaHandler Debug info : " << endl;
+	mediaHandler->handleCommand( cmdstr );
+	cerr << "=========" << endl;
 }
 
 void ConsoleDebugger::showMem(){
@@ -354,10 +389,26 @@ static int nonblockin_stdin()
     return 0;
 }
 
-void ConsoleDebugger::startThread(){
+MRef<Thread *> ConsoleDebugger::start(){
 	nonblockin_stdin();
 	
-	Thread t(this);
+	thread = new Thread (this);
+	return thread;
 }
 
+void ConsoleDebugger::stop() { 
+	keepRunning = false; 
 
+	//We need to kill the thread, as it gets blocked in the
+	//read/getch operation. It is not a very nice thing to do,
+	//but at this moment, the whole minisip is shutting down.
+	thread->kill();
+	
+}
+
+void ConsoleDebugger::join() {
+	thread->join();
+	mediaHandler = NULL;
+	config = NULL;
+	thread = NULL;
+}
