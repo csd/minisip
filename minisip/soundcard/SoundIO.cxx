@@ -514,9 +514,10 @@ void *SoundIO::playerLoop(void *arg){
 		active_soundcard->queueLock.unlock();
 
 #ifdef DEBUG_OUTPUT
-		if( !(counter++ % 100) ){
-			fprintf(stderr ,  ".\n" );
-		}
+		//CESC ... got tired of it ... 
+		//if( !(counter++ % 100) ){
+			//fprintf(stderr ,  ".\n" );
+		//}
 #endif
 
 		if( active_soundcard->soundDev->isOpenedPlayback() ){
