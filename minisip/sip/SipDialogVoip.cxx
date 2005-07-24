@@ -45,14 +45,14 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipHeaderRoute.h>
-#include<libmsip/SipDialog.h>
+//#include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
-#include"DefaultDialogHandler.h"
+//#include"DefaultDialogHandler.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -60,9 +60,9 @@
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
 #include"../minisip/LogEntry.h"
-#include<libmsip/SipCommandString.h>
-#include"../mediahandler/MediaHandler.h"
-#include<libmutil/MemObject.h>
+
+//#include"../mediahandler/MediaHandler.h"
+
 #include <iostream>
 #include<time.h>
 
@@ -236,7 +236,8 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 		//We must maintain the dialog state. 
 		dialogState.updateState( resp );
 		
-		string peerUri = command.getCommandPacket()->getTo().getString();
+		//string peerUri = command.getCommandPacket()->getTo().getString();
+		string peerUri = dialogState.remoteUri; //use the dialog state ...
 	
 		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
 		if ( !sdp.isNull() ){
@@ -271,12 +272,15 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 #endif
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 
-		string peerUri = resp->getFrom().getString();
+		dialogState.updateState( resp );
+		
+		//string peerUri = resp->getFrom().getString();
+		string peerUri = dialogState.remoteUri;
+		
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
 
-		dialogState.updateState( resp );
 
 //FIXME: CESC: for now, route set is updated at the transaction layer		
 		
@@ -471,13 +475,15 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 		dialogState.updateState( getLastInvite() );
-
+		
+		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
+		string peerUri = dialogState.remoteUri.substr(4);
+		
 	//	setLocalCalled(true);
 		localCalled=true;
 		
 		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
 		
-		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
@@ -685,7 +691,9 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 
 		dialogState.updateState( resp );
 
-		string peerUri = resp->getFrom().getString();
+		//string peerUri = resp->getFrom().getString();
+		string peerUri = dialogState.remoteUri;
+		
 		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
 		if ( !sdp.isNull() ){
 			//Early media
@@ -712,14 +720,15 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
-		string peerUri = resp->getFrom().getString().substr(4);
+		dialogState.updateState( resp );
+//CESC: for now, route set is updated at the transaction layer		
+		
+		//string peerUri = resp->getFrom().getString().substr(4);
+		string peerUri = dialogState.remoteUri.substr(4);
+		
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
-
-
-		dialogState.updateState( resp );
-//CESC: for now, route set is updated at the transaction layer		
 		
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::invite_ok, 
@@ -802,18 +811,34 @@ bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &
 
 //notify the gui that dialog is finished ... just some transactions need to 
 //finish absorbing messages
+//also, reply to the dialog container when extra hang_up messages are received
+//  (this happens when you hang up a call from the gui and then exit minisip,
+//  the sipdialogmanagement would send a hang up and receive no call_term_early ...
+//  with this, it works).
 bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
-	if (notifyEarlyTermination && 
-			transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
-			
-		lastInvite=NULL;                
-		/* Tell the GUI */
+	if( transitionMatch(command, SipCommandString::hang_up) ) {
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
-		//Notify the GUI and the dialog container ... 
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		/* Tell the GUI, once only */
+		if( notifyEarlyTermination ) {
+			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			notifyEarlyTermination = false;
+		}
 		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); //this is for the shutdown dialog 
+		return true;
+	}
+	else if ( notifyEarlyTermination && transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+		lastInvite=NULL;                
+		//Notify the GUI and the dialog container ... 
+		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
+		
+		/* Tell the GUI, once only */
+		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		notifyEarlyTermination = false;
+		
+		//Tell the dialog container ... 
+		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
+		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); //this is for the shutdown dialog 
 		return true;
 	}else{
 		return false;
