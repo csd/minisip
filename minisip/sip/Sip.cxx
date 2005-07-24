@@ -24,7 +24,7 @@
 #include"Sip.h"
 
 #include"DefaultDialogHandler.h"
-#include"../mediahandler/MediaHandler.h"
+//#include"../mediahandler/MediaHandler.h"
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
@@ -439,6 +439,28 @@ MRef<Session *> mediaSession =
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipConfCall->getCallId();
 }
+
+bool Sip::start() {
+	thread = NULL;
+	thread = new Thread( this );
+	return !thread.isNull();
+}
+
+void Sip::stop() {
+	CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
+	SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
+	
+	getSipStack()->handleCommand(sipcmd);
+}
+
+void Sip::join() {
+	if( thread.isNull() ) { //not started as a thread ... return immediately
+		return ;
+	}
+	
+	thread->join();
+}
+
 
 void Sip::run(){
 

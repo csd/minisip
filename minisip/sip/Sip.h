@@ -74,6 +74,8 @@
 
 #include"../minisip/LogEntry.h"
 
+#include"../mediahandler/MediaHandler.h"
+
 class SipSoftPhoneConfiguration;
 class MediaHandler;
 
@@ -101,14 +103,39 @@ class Sip: public Runnable{
 		
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig();
 		
-                virtual void run();
+                
+		/**
+		Starts this Sip object as a Thread.
+		You can still run the Sip object in non-thread by directly calling
+		the run() function
+		*/
+		bool start();
+		
+		/**
+		It sends the sip_stack_shutdown command, to stop the sip stack in a 
+		controlled way.
+		While you wait, you can use the join function.
+		*/
+		void stop();
+		
+		/**
+		Join the sip thread (if this was started with start(), that is, as a 
+		Thread. It will block and not return until the run function returns.
+		*/
+		void join();
+		
+		/**
+		Main method. It can be run either directly with sip->run() or 
+		to be run in a Thread (use sip->start())
+		*/
+		virtual void run();
 
 		//void registerMediaStream(MRef<SdpPacket*> sdppack);
 
 		string invite(string &user);
 		string confjoin(string &user, minilist<ConfMember> *list, string confId);
 		string confconnect(string &user, string confId);
-		MRef<SipStack*>	getSipStack(){return sipstack;}
+		MRef<SipStack*> getSipStack(){return sipstack;}
 //		MRef<SipDialogContainer*> getDialogContainer();//{return dialogContainer;}
 
 		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
@@ -128,6 +155,8 @@ class Sip: public Runnable{
 
 //		MRef<SipDialogContainer*> dialogContainer;
                 
+		MRef<Thread *> thread;
+
 };
 
 
