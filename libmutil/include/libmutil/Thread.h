@@ -63,6 +63,7 @@ public:
 class LIBMUTIL_API Thread : public MObject{
 public:
 	Thread(MRef<Runnable *>runnable);
+	~Thread();
 
 	std::string getMemObjectType(){return "Thread";}
 
