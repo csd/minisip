@@ -46,7 +46,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		virtual ~MessageRouter(){}
 		
 		void setSip(MRef<Sip*> ssp);
-		void setGui(Gui *guiptr){gui = guiptr;};
+		void setGui(MRef<Gui *> guiptr){gui = guiptr;};
 		virtual void setConferenceController(ConferenceControl *conf);
 		virtual void removeConferenceController(ConferenceControl *conf);
 		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
@@ -76,7 +76,7 @@ class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback
 		virtual ConferenceControl* getConferenceController(string confid);
 	private:
 		
-		Gui *gui;
+		MRef<Gui *> gui;
 		minilist<ConferenceControl *> confrout;//bm
 		MRef<Sip*> sip;
 		MRef<MediaHandler *> mediaHandler;

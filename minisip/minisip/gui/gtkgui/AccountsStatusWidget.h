@@ -32,6 +32,7 @@ class GuiCallback;
 class AccountsStatusWidget: public Gtk::TreeView{
 	public:
 		AccountsStatusWidget( Glib::RefPtr<AccountsList> list );
+		~AccountsStatusWidget();
 		void setCallback( GuiCallback *callback );
 	private:
 
@@ -44,6 +45,9 @@ class AccountsStatusWidget: public Gtk::TreeView{
 
 		Gtk::TreeModelColumn<Glib::ustring> nameColumn;
 		Gtk::TreeModelColumn<Glib::ustring> statusColumn;
+
+		Gtk::CellRendererText * rAccount;
+		Gtk::CellRendererText * rStatus;
 
 		AccountsListColumns * columns;
 

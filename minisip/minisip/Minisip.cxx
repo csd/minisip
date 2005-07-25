@@ -56,6 +56,8 @@ using namespace std;
 #endif
 #endif
 
+extern Mutex global;
+
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
 static void signal_handler( int signal ){
@@ -70,52 +72,7 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
-#if 0
-static void *tcp_server_thread(void *arg){
-	assert( arg != NULL );
-	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
-	try{
-		IP4ServerSocket server(transport->getLocalTCPPort());
-		while(true){
-			transport->addSocket(server.accept());
-		}
-	}
-	catch( NetworkException * exc ){
-		cerr << "ERROR: Exception caught when creating TCP server." << endl;
-		cerr << exc->errorDescription() << endl;
-		return NULL;
-	}
-}
-
-static void *tls_server_thread(void *arg){
-	assert( arg != NULL );
-	MRef<SipMessageTransport*> transport((SipMessageTransport *)arg);
-	//TLSSocket::sslCipherListIndex = 2; /* Set the default list of ciphers to be  used*/
-	
-	if( transport->getMyCertificate().isNull() ){
-		merr << "You need a personal certificate to run "
-			"a TLS server. Please specify one in "
-			"the certificate settings. minisip will "
-			"now disable the TLS server." << end;
-		return NULL;
-	}
-	try{
-		TLSServerSocket server(transport->getLocalTLSPort(),transport->getMyCertificate(), transport->getCA_db());
-		while(true){
-			transport->addSocket(server.accept());
-		}
-	}
-	catch( NetworkException * exc ){
-		cerr << "ERROR: Exception caught when creating TLS server." << endl;
-		cerr << exc->errorDescription() << endl;
-		return NULL;
-	}
-		
-}
-
-#endif
-
-Minisip::Minisip( int argc, char**argv ){
+Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
 	if( argc == 2){
 		conffile = argv[1];
@@ -199,11 +156,11 @@ Minisip::Minisip( int argc, char**argv ){
 
 	cerr << "Creating GTK GUI"<< endl;
 	gui = new MainWindow( argc, argv );
-	LogEntry::handler = dynamic_cast<LogEntryHandler *>(gui);
+	LogEntry::handler = (MainWindow *)*gui;
 
 #ifdef DEBUG_OUTPUT
 	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-	consoleDbg->start();
+	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 #else
 	//in non-debug mode, send merr to the gui
 	merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) ); 
@@ -222,7 +179,6 @@ Minisip::Minisip( int argc, char**argv ){
 }
 
 Minisip::~Minisip(){
-
 }
 
 void Minisip::exit(){
@@ -240,11 +196,16 @@ void Minisip::exit(){
 #endif
 	sip->join();
 
+#ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT
 	mout << end << "Stopping the Console Debugger thread" << end;
 	consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
 	consoleDbg->join();
 #endif	
+#endif
+	if( ehandler ){
+		delete ehandler;
+	}
 
 	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
 	
@@ -261,13 +222,13 @@ void Minisip::startSip() {
 #endif
 
 	try{
-		MessageRouter *ehandler =  new MessageRouter();
+		ehandler =  new MessageRouter();
 //		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << end;
 #endif
-		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf, gui );
+		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf );
 //#ifdef DEBUG_OUTPUT
 //                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
 //#endif
@@ -289,7 +250,9 @@ void Minisip::startSip() {
 #endif
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
+#ifdef GTK_GUI
 		consoleDbg->setMediaHandler( mediaHandler );
+#endif
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
 		Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
@@ -317,6 +280,14 @@ void Minisip::startSip() {
 		sip->getSipStack()->setCallback(ehandler);
 
 		ehandler->setSip(sip);
+
+#if 0
+		/* Load the plugins at this stage */
+		fprintf( stderr, "global in app: %x\n", &global );
+		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
+
+		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
+#endif
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;

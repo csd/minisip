@@ -38,7 +38,7 @@ class LogEntry : public MObject{
 		int type;
 		string peerSipUri;
 		time_t start;
-		static LogEntryHandler * handler;
+		static MRef<LogEntryHandler *> handler;
 		void handle();
 };
 
@@ -73,9 +73,11 @@ class LogEntryIncomingCompletedCall : public LogEntryIncoming, public LogEntrySu
 class LogEntryOutgoingCompletedCall : public LogEntryOutgoing, public LogEntrySuccess{
 };
 
-class LogEntryHandler{
+class LogEntryHandler : public virtual MObject{
 	public:
 		virtual void handle( MRef<LogEntry *> )=0;
+
+		virtual std::string getMemObjectType(){ return "LogEntryHandler";};
 };
 
 

@@ -15,6 +15,7 @@ class Sip;
 class SipSMCommand;
 class ConsoleDebugger;
 class ConferenceControl;
+class MessageRouter;
 
 
 class Minisip : public MObject{
@@ -33,9 +34,10 @@ class Minisip : public MObject{
 
 		std::string conffile;
 		MRef<MediaHandler *> mediaHandler;
-		Gui * gui;
+		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
+		MessageRouter * ehandler;
 		
 #ifdef GTK_GUI
 	#ifdef DEBUG_OUTPUT

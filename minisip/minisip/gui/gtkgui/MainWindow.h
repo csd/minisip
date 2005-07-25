@@ -153,6 +153,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		Gtk::CheckMenuItem * viewStatusMenu;
 
 		Glib::RefPtr<AccountsList> accountsList;
+		Glib::RefPtr<Gtk::IconFactory> factory;
 
 		/**
 		* This function is connected to the window close icon

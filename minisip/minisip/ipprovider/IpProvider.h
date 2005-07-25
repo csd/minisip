@@ -35,14 +35,13 @@ typedef unsigned short  uint16_t;
 
 class UDPSocket;
 class SipSoftPhoneConfiguration;
-class Gui;
 
 class IpProvider: public MObject{
 	public:
 		virtual std::string getExternalIp()=0;
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock )=0;
 
-		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config, Gui * gui );
+		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config );
 		
 };
 #endif

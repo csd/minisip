@@ -70,6 +70,8 @@ MTrayIcon::MTrayIcon( MainWindow * mainWindow,
 }
 
 MTrayIcon::~MTrayIcon(){
+	delete trayMenu;
+	delete image;
 	
 
 }

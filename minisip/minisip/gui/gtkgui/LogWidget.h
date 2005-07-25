@@ -37,6 +37,7 @@ class ContactDb;
 class LogWidget: public Gtk::TreeView{
 	public:
 		LogWidget( MainWindow * mainWindow );
+		~LogWidget();
 
 		void addLogEntry( MRef<LogEntry *> );
 

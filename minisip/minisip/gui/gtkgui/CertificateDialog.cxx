@@ -88,6 +88,10 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 }
 
+CertificateDialog::~CertificateDialog(){
+	delete certDialog;
+}
+
 void CertificateDialog::run(){
 	certDialog->run();
 }

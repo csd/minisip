@@ -53,27 +53,6 @@ AccountsList::AccountsList( AccountsListColumns * columns ):
 
 }
 
-void AccountsList::setTreeView( Gtk::TreeView * treeView ){
-	const Glib::RefPtr<AccountsList> accountsList = 
-		(const Glib::RefPtr<AccountsList>)(this);
-	treeView->set_model( accountsList );
-#ifndef IPAQ
-	treeView->append_column_editable( "Register", columns->doRegister );
-#else
-	treeView->append_column_editable( "R", columns->doRegister );
-#endif
-	treeView->append_column( "Account", columns->name );
-#ifndef IPAQ
-	treeView->append_column( "Default", columns->defaultProxy );
-	treeView->append_column( "PSTN", columns->pstnProxy );
-#else
-	treeView->append_column( "D", columns->defaultProxy );
-	treeView->append_column( "P", columns->pstnProxy );
-#endif
-	treeView->columns_autosize();
-
-}
-
 void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	list< MRef<SipIdentity *> > identities = config->identities;
 	list< MRef<SipIdentity *> >::iterator i;
@@ -215,4 +194,8 @@ void AccountsList::setPstnAccount( Gtk::TreeModel::iterator defaultIter ){
 
 	(*defaultIter)[columns->pstnProxy] = true;
 	return;
+}
+
+AccountsListColumns * AccountsList::getColumns(){
+	return columns;
 }

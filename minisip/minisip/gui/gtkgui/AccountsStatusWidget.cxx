@@ -44,11 +44,11 @@ AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ):
 {
 	set_model( list );
 	
-	Gtk::CellRendererText * rAccount = new Gtk::CellRendererText();
+	rAccount = new Gtk::CellRendererText();
 	insert_column_with_data_func( 0, "Account", *rAccount,
 			SLOT( *this, &AccountsStatusWidget::drawAccount ) );
 	
-	Gtk::CellRendererText * rStatus = new Gtk::CellRendererText();
+	rStatus = new Gtk::CellRendererText();
 	insert_column_with_data_func( 1, "Status", *rStatus,
 			SLOT( *this, &AccountsStatusWidget::drawStatus ) );
 
@@ -70,6 +70,11 @@ AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ):
 	
 	unregisterMenu.signal_activate().connect( 
 		SLOT( *this, &AccountsStatusWidget::unregisterClicked ) );
+}
+
+AccountsStatusWidget::~AccountsStatusWidget(){
+	delete rStatus;
+	delete rAccount;
 }
 
 void AccountsStatusWidget::drawAccount( Gtk::CellRenderer * renderer,

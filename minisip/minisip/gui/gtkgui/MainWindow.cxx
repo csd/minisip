@@ -236,7 +236,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	mainWindowWidget->signal_hide().connect( SLOT( *this, &MainWindow::hideSlot ));
 #endif
-	logWidget = new LogWidget( this );
+	logWidget = manage( new LogWidget( this ) );
 
 	mainTabWidget->append_page( *logWidget, "Call list" );
 
@@ -256,6 +256,15 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 }
 
 MainWindow::~MainWindow(){
+	factory->remove_default();
+	delete settingsDialog;
+	delete certificateDialog;
+	delete phoneMenu;
+	if( trayIcon ){
+		delete trayIcon;
+	}
+	delete phoneBookTree;
+	delete mainWindowWidget;
 }
 
 bool MainWindow::on_window_close (GdkEventAny* event  ) {
@@ -267,8 +276,11 @@ bool MainWindow::on_window_close (GdkEventAny* event  ) {
 
 void MainWindow::run(){
 #ifndef WIN32
-	if( trayIcon != NULL )
-		kit.run( *(trayIcon->getWindow()) );
+	if( trayIcon != NULL ){
+		Gtk::Window * window = trayIcon->getWindow();
+		kit.run( *window );
+		delete window;
+	}
 	else
 #endif
 		kit.run( *mainWindowWidget );
@@ -445,14 +457,14 @@ void MainWindow::updateConfig(){
 		phoneBookModel->setPhoneBook( *i );
 	}
 	
-	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
+	Gtk::CellRendererText * renderer;
 	phoneBookTreeView->set_model( modelPtr );
 	if( phonebooks.size() > 0 ){
-//		  phoneBookTreeView->append_column( "Contact", phoneBookTree->name );
-		  phoneBookTreeView->insert_column_with_data_func( 0, 
-			"Contact", *renderer,
-			SLOT( *phoneBookModel, &PhoneBookModel::setFont )
-			);
+		renderer = manage( new Gtk::CellRendererText() );
+		phoneBookTreeView->insert_column_with_data_func( 0, 
+				"Contact", *renderer,
+				SLOT( *phoneBookModel, &PhoneBookModel::setFont )
+				);
 	}
 }
 
@@ -476,8 +488,8 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 		          string securityStatus ){
 	ContactEntry * entry;
 	Gtk::Image * icon;
-	Gtk::Label * label = new Gtk::Label;
-	Gtk::HBox * hbox = new Gtk::HBox;
+	Gtk::Label * label = manage( new Gtk::Label );
+	Gtk::HBox * hbox = manage( new Gtk::HBox );
 	Glib::ustring tabLabelText;
 
 
@@ -497,10 +509,10 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 	label->set_text( tabLabelText );
 	
 	if( incoming ){
-		icon = new Gtk::Image( Gtk::Stock::GO_BACK, Gtk::ICON_SIZE_SMALL_TOOLBAR );
+		icon = manage( new Gtk::Image( Gtk::Stock::GO_BACK, Gtk::ICON_SIZE_SMALL_TOOLBAR ) );
 	}
 	else{
-		icon = new Gtk::Image( Gtk::Stock::GO_FORWARD, Gtk::ICON_SIZE_SMALL_TOOLBAR );
+		icon = manage( new Gtk::Image( Gtk::Stock::GO_FORWARD, Gtk::ICON_SIZE_SMALL_TOOLBAR ) );
 	}
 
 
@@ -760,8 +772,7 @@ void MainWindow::runCertificateSettings(){
 }
 
 void MainWindow::registerIcons(){
-	const Glib::RefPtr<Gtk::IconFactory> factory = 
-			Gtk::IconFactory::create();
+	factory = Gtk::IconFactory::create();
 	
 	Gtk::IconSet * iconSet = new Gtk::IconSet;
 	Gtk::IconSource * iconSource = new Gtk::IconSource;

@@ -23,14 +23,15 @@
 #include<config.h>
 #include<string>
 #include"LogEntry.h"
+#include<libmutil/MemObject.h>
 
 using namespace std;
 
 
-LogEntryHandler * LogEntry::handler = NULL;
+MRef<LogEntryHandler *> LogEntry::handler;
 
 void LogEntry::handle(){
-	if( handler != NULL ){
+	if( handler ){
 		handler->handle( this );
 	}
 }

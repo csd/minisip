@@ -71,6 +71,7 @@ SettingsDialog::~SettingsDialog(){
 	delete generalSettings;
 	delete securitySettings;
 	delete advancedSettings;
+	delete dialogWindow;
 }
 
 void SettingsDialog::setAccounts( Glib::RefPtr<AccountsList> list ){
@@ -238,7 +239,22 @@ void GeneralSettings::setPstnAccount(){
 }
 
 void GeneralSettings::setAccounts( Glib::RefPtr<AccountsList> list ){
-	list->setTreeView( accountsTreeView );
+	AccountsListColumns * columns = list->getColumns();
+	accountsTreeView->set_model( list );
+
+#ifndef IPAQ
+        accountsTreeView->append_column_editable( "Register", columns->doRegister ); 
+#else
+        accountsTreeView->append_column_editable( "R", columns->doRegister );
+#endif
+        accountsTreeView->append_column( "Account", columns->name );
+#ifndef IPAQ
+        accountsTreeView->append_column( "Default", columns->defaultProxy );         accountsTreeView->append_column( "PSTN", columns->pstnProxy );
+#else
+        accountsTreeView->append_column( "D", columns->defaultProxy );
+        accountsTreeView->append_column( "P", columns->pstnProxy );
+#endif
+        accountsTreeView->columns_autosize();
 	accountsList = list;
 }
 

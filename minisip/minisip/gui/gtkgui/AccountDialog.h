@@ -30,6 +30,7 @@ class AccountsList;
 class AccountDialog: public Gtk::Dialog{
 	public:
 		AccountDialog( AccountsList * list );
+		~AccountDialog();
 
 		void addAccount();
 		void editAccount( Gtk::TreeModel::iterator iter );
@@ -48,6 +49,8 @@ class AccountDialog: public Gtk::Dialog{
 		Gtk::CheckButton * requiresAuthCheck;
 		Gtk::Entry * usernameEntry;
 		Gtk::Entry * passwordEntry;
+
+		Gtk::SpinButton * registerTimeSpin;
 		
 		AccountsList * list;
 

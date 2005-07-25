@@ -35,7 +35,7 @@ void SipDialogSecurityConfig::save( XMLFileParser * parser ){
         memcpy( pskString, psk, psk_length );
         pskString[psk_length] = '\0';
         parser->changeValue("psk", pskString);
-        delete pskString;
+        delete [] pskString;
 
         string kaTypeString;
         switch( ka_type ){
@@ -223,5 +223,7 @@ void SipDialogSecurityConfig::load( XMLFileParser * parser ){
 			
 
 void SipDialogSecurityConfig::useIdentity( MRef<SipIdentity *> identity ){
+	identity->lock();
 	secured = identity->securitySupport;
+	identity->unlock();
 }

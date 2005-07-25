@@ -40,6 +40,7 @@ class CertificateDialog
 {
 	public:
 		CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		~CertificateDialog();
 
 		void setCertChain( MRef<certificate_chain *> chain );
 		void setRootCa( MRef<ca_db *> caDb );

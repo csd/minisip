@@ -33,7 +33,7 @@ ConsoleDebugger::ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf):
 
 ConsoleDebugger::~ConsoleDebugger() {
 #ifdef DEBUG_OUTPUT
-// 	cerr << "~ConsoleDebugger" << endl;
+ 	cerr << "~ConsoleDebugger" << endl;
 #endif
 }
 

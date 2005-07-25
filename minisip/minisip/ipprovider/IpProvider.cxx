@@ -24,15 +24,14 @@
 #include"IpProvider.h"
 #include"SimpleIpProvider.h"
 #include"StunIpProvider.h"
-#include"../gui/Gui.h"
 #include"../sip/SipSoftPhoneConfiguration.h"
 
 
-MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config, Gui * gui ){
+MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config ){
 	MRef<IpProvider *> ret;
 
 	if( config->useSTUN ){
-		ret = *(StunIpProvider::create( config, gui ));
+		ret = *(StunIpProvider::create( config ));
 		if( ret ){
 			return ret;
 		}

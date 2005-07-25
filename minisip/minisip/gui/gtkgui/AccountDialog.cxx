@@ -36,37 +36,37 @@
 AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", false ){
 	this->list = list;
 	Gtk::VBox * vbox = get_vbox();
-	Gtk::Table * table = new Gtk::Table( 7, 2, false );
+	Gtk::Table * table = manage( new Gtk::Table( 8, 2, false ) );
 
 	vbox->pack_start( *table, false, false );
 
-	Gtk::Label * nameLabel = new Gtk::Label( "Account name:" );
+	Gtk::Label * nameLabel = manage(  new Gtk::Label( "Account name:" ) );
 	table->attach( *nameLabel, 0, 1, 0, 1 );
-	table->attach( *(nameEntry = new Gtk::Entry), 1, 2, 0, 1 );
+	table->attach( *(nameEntry = manage( new Gtk::Entry ) ), 1, 2, 0, 1 );
 
-	Gtk::Label * uriLabel = new Gtk::Label( "SIP URI:" );
+	Gtk::Label * uriLabel = manage( new Gtk::Label( "SIP URI:" ) );
 	table->attach( *uriLabel, 0, 1, 1, 2 );
-	table->attach( *(uriEntry = new Gtk::Entry), 1, 2, 1, 2 ); 
+	table->attach( *(uriEntry = manage( new Gtk::Entry ) ), 1, 2, 1, 2 ); 
 	
-	table->attach( *(autodetectProxyCheck = new Gtk::CheckButton( "Autodetect proxy" ) ),
+	table->attach( *(autodetectProxyCheck = manage( new Gtk::CheckButton( "Autodetect proxy" ) ) ),
 			0, 2, 2, 3 );
 
 	
-	Gtk::Label * proxyLabel = new Gtk::Label( "SIP proxy:" );
+	Gtk::Label * proxyLabel = manage( new Gtk::Label( "SIP proxy:" ) );
 	table->attach( *proxyLabel, 0, 1, 3, 4 );
-	table->attach( *(proxyEntry = new Gtk::Entry), 1, 2, 3, 4 ); 
+	table->attach( *(proxyEntry = manage( new Gtk::Entry )), 1, 2, 3, 4 ); 
 
 	table->attach( *(requiresAuthCheck = 
-			new Gtk::CheckButton( "Requires authentication" ) ),
+			manage( new Gtk::CheckButton( "Requires authentication" ) ) ),
 			0, 2, 5, 6 );
 	
-	Gtk::Label * usernameLabel = new Gtk::Label( "Username:" );
+	Gtk::Label * usernameLabel = manage( new Gtk::Label( "Username:" ) );
 	table->attach( *usernameLabel, 0, 1, 6, 7 );
-	table->attach( *(usernameEntry = new Gtk::Entry), 1, 2, 6, 7 );
+	table->attach( *(usernameEntry = manage( new Gtk::Entry )), 1, 2, 6, 7 );
 	
-	Gtk::Label * passwordLabel = new Gtk::Label( "Password:" );
+	Gtk::Label * passwordLabel = manage( new Gtk::Label( "Password:" ) );
 	table->attach( *passwordLabel, 0, 1, 7, 8 );
-	table->attach( *(passwordEntry = new Gtk::Entry), 1, 2, 7, 8 );
+	table->attach( *(passwordEntry = manage( new Gtk::Entry )), 1, 2, 7, 8 );
 
 	add_button( Gtk::Stock::OK, Gtk::RESPONSE_OK );
 	add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
@@ -78,10 +78,20 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	
 	autodetectProxyCheck->set_active( true );
 
+	registerTimeSpin = manage( new Gtk::SpinButton() );
+	Gtk::Label * registerTimeLabel = manage( new Gtk::Label( "Registration time:" ) );
+	table->attach( *registerTimeLabel, 0, 1, 8, 9 );
+	table->attach( *registerTimeSpin, 1, 2, 8, 9 );
+
+	table->set_row_spacing( 7, 5 );
+
 	requiresAuthCheckChanged();
 	autodetectProxyCheckChanged();
 
 	show_all();
+}
+
+AccountDialog::~AccountDialog(){
 }
 
 void AccountDialog::addAccount(){

@@ -49,7 +49,7 @@ LogWidget::LogWidget( MainWindow * mainWindow ){
 	append_column( "Start", startColumn );
 	append_column( "Type", typeColumn );
 	
-	Gtk::CellRendererText * renderer = new Gtk::CellRendererText();
+	Gtk::CellRendererText * renderer = manage( new Gtk::CellRendererText());
 	
 	insert_column_with_data_func( 2, "From", *renderer,
 		SLOT( *this, &LogWidget::setFont ) );
@@ -130,4 +130,8 @@ void LogWidget::setFont( Gtk::CellRenderer * renderer,
 
 void LogWidget::setContactDb( MRef<ContactDb *> contactDb ){
 	this->contactDb = contactDb;
+}
+
+LogWidget::~LogWidget(){
+	listStore.clear();
 }

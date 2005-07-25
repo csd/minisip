@@ -22,7 +22,6 @@
 
 #include<config.h>
 #include"StunIpProvider.h"
-#include"../gui/Gui.h"
 #include"../../sip/SipSoftPhoneConfiguration.h"
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
@@ -102,7 +101,7 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 	return "";
 }
 
-MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> phoneConf, Gui * gui ){
+MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> phoneConf ){
 
         vector<string> localips = getLocalIPs();
 
@@ -118,14 +117,6 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 			stunIp = new IP4Address(phoneConf->stunServerIpString);
 		}
 		catch(HostNotFound *hnf){
-			/*
-			merr <<  
-				"Error: could not resolve STUN ip: "
-				<< hnf->errorDescription() << end;
-			if( ! gui->configDialog( phoneConf ) ){
-				exit( 0 );
-			}
-			*/
 			merr << "Could not find your STUN server. "
 			        "STUN will be disabled." << end;
 			return NULL;
