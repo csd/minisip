@@ -70,6 +70,9 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 		conf = sipStack->getStackConfig();
 	}
 
+	toaddr = NULL;
+
+#if 0
 	try{	
 		toaddr = new IP4Address(conf->sipIdentity->sipProxy.sipProxyAddressString);
 	}
@@ -79,11 +82,15 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
         	dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		delete exc;
 	}
+#endif
 
 	port = conf->sipIdentity->sipProxy.sipProxyPort;
 }
 
 SipTransaction::~SipTransaction(){
+	if( toaddr ){
+		delete toaddr;
+	}
 
 }
 

@@ -445,7 +445,7 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MR
 	}
 	
 	timerA=sipStack->getTimers()->getA();
-	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr;
+	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr->clone();
 	port = conf->sipIdentity->sipProxy.sipProxyPort;
 	setUpStateMachine();
 }
