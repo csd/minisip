@@ -205,6 +205,18 @@ Thread::Thread(MRef<Runnable *> runnable){
 
 }
 
+Thread::~Thread(){
+	if( handle_ptr ){
+#ifdef WIN32
+		delete (HANDLE *)handle_ptr;
+#endif
+#ifdef HAVE_PTHREAD_H
+		delete (pthread_t *)handle_ptr;
+#endif
+	}
+	handle_ptr = NULL;
+}
+
 int Thread::createThread(void f()){
 #ifdef WIN32
 	HANDLE threadHandle;

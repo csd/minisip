@@ -214,6 +214,7 @@ XMLFileParser::XMLFileParser(string filename, XMLParserCallback *cb):XMLParser(c
 			file.read(buf,bufsize-1);
 			s = s+string(buf);
 		}while(!(!file));
+		free(buf);
 
 	}
 	parsestring(s);
