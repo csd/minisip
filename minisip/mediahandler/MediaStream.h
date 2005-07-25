@@ -71,6 +71,7 @@ class MediaStream : public MObject{
 		//cesc
 		void setMuted( bool mute ) { muted = mute;}
 		bool isMuted() { return muted;}
+		bool muteKeepAlive( int32_t max);
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
@@ -78,19 +79,20 @@ class MediaStream : public MObject{
 		MRef<Media *> media;
 		uint32_t csbId;
 		uint32_t ssrc;
-                // FIXME used only in sender case
-                uint8_t payloadType;
-                MRef<CodecState *> selectedCodec;
+		// FIXME used only in sender case
+		uint8_t payloadType;
+		MRef<CodecState *> selectedCodec;
+		
+		//Cesc -- does it conflict with bool disabled???
+		bool muted;
+		uint32_t muteCounter;
 
 	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );
 		MRef<KeyAgreement *> ka;
 		Mutex kaLock;
 		std::list< MRef<CryptoContext *> > cryptoContexts;
-		
-		//Cesc -- does it conflict with bool disabled???
-		bool muted;
-		
+
 };
 
 class MediaStreamReceiver : public MediaStream{ 
@@ -152,9 +154,9 @@ class MediaStreamSender : public MediaStream{
 		MRef<UDPSocket *> senderSock;
 		uint16_t remotePort;
 		uint16_t seqNo;
-                uint32_t lastTs;
+		uint32_t lastTs;
 		IPAddress * remoteAddress;
-                Mutex senderLock;
+		Mutex senderLock;
 		
 };
 

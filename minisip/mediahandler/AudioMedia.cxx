@@ -42,6 +42,8 @@
 #include<unistd.h>
 #endif
 
+#include<string.h> //for memset
+
 #ifdef DEBUG_OUTPUT
 #include <libmutil/itoa.h>
 #endif
@@ -161,9 +163,14 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 	
 	
 	for( i = senders.begin(); i != senders.end(); i++ ){
-		//This is quite radical ... mute by stop sending ... (see also MediaStream.cxx)
-		//if( (*i)->isMuted() ) //cesc
-		//	continue;
+		//only send if active sender, or if muted only if keep-alive
+		if( (*i)->isMuted () ) {
+			if( (*i)->muteKeepAlive( 50 ) ) {
+				memset( data, 0, length );
+			} else {
+				continue;
+			}
+		}
 		
 		MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
 			

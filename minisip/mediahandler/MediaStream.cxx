@@ -39,8 +39,6 @@
 #include"../minisip/ipprovider/IpProvider.h"
 #include<iostream>
 
-#include<string.h> //for memset
-
 using namespace std;
 
 
@@ -74,6 +72,7 @@ MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
 	disabled = false;
 	selectedCodec = NULL;
 	setMuted( true );
+	muteCounter = 0;
 }
 
 std::string MediaStream::getSdpMediaType(){
@@ -360,11 +359,6 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 		first=false;
 	}
 	
-	if( isMuted() ) {
-		//if muted, erase the data and for now, send only zeros ... (see also AudioMedia.cxx)
-		memset( data, 0, length );
-	}
-	
 	senderLock.lock();
 	if( !(*givenTs) ){
 		lastTs += 160; //FIXME! get it from the CODEC,
@@ -438,3 +432,23 @@ string MediaStreamSender::getDebugString() {
 }
 #endif
 
+//keep a counter, so we can send a keep alive
+//packet every now and then.
+//Max indicates every how many silenced packets we send one keep-alive
+//It returns true if the packet needs to be let through, false otherwise
+bool MediaStream::muteKeepAlive( int32_t max ) {
+	bool ret = false;
+	
+	//if muted, only return true if packet is keep alive
+	if( isMuted() ) {
+		muteCounter++;
+		if( muteCounter >= max ) {
+			ret = true;
+			muteCounter = 0;
+		}
+	} else {
+		//if active sender, let through
+		ret = true;
+	}
+	return ret;
+}

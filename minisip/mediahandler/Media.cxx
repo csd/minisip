@@ -63,13 +63,13 @@ Media::Media( std::list<MRef<Codec *> > codecListing ){
 std::list<uint8_t> Media::getAllRtpPayloadTypes(){
 	std::list<uint8_t> list;
 	
-    std::list< MRef<Codec *> >::iterator iCodec;
-
-    for( iCodec = codecList.begin(); iCodec != codecList.end(); iCodec ++ ){
-        list.push_back((*iCodec)->getSdpMediaType());
-    }
-
-    return list;
+	std::list< MRef<Codec *> >::iterator iCodec;
+	
+	for( iCodec = codecList.begin(); iCodec != codecList.end(); iCodec ++ ){
+		list.push_back((*iCodec)->getSdpMediaType());
+	}
+	
+	return list;
 }
 
 #if 0
@@ -90,13 +90,13 @@ string Media::getCurrentRtpMap(){
 std::list<std::string> Media::getAllRtpMaps(){
 	std::list<std::string> list;
 	
-    std::list< MRef<Codec *> >::iterator iCodec;
-
-    for( iCodec = codecList.begin(); iCodec != codecList.end(); iCodec ++ ){
-        list.push_back((*iCodec)->getSdpMediaAttributes());
-    }
-
-    return list;
+	std::list< MRef<Codec *> >::iterator iCodec;
+	
+	for( iCodec = codecList.begin(); iCodec != codecList.end(); iCodec ++ ){
+		list.push_back((*iCodec)->getSdpMediaAttributes());
+	}
+	
+	return list;
 
 }
 
@@ -137,6 +137,14 @@ void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker )
 	list< MRef<MediaStreamSender *> >::iterator i;
 	sendersLock.lock();
 	for( i = senders.begin(); i != senders.end(); i++ ){
+		//only send if active sender, or if muted only if keep-alive
+		if( (*i)->isMuted () ) {
+			if( (*i)->muteKeepAlive( 50 ) ) { //send one packet of every 50
+				memset( data, 0, length );
+			} else {
+				continue;
+			}
+		}
 		(*i)->send( data, length, &ts, marker );
 	}
 	sendersLock.unlock();
