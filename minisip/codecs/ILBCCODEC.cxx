@@ -35,8 +35,8 @@ ILBCCodecState::ILBCCodecState(){
 
 uint32_t ILBCCodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	float block[160];
-	int s = in_buf_size;
-	s;//dummy op 
+	//int s = in_buf_size;
+	//s;//dummy op 
 	
 	for (int32_t i=0; i<160; i++)
 		block[i]=(float)(((short*)in_buf)[i]);
@@ -48,8 +48,8 @@ uint32_t ILBCCodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf
 uint32_t ILBCCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 	float decblock[BLOCKL], dtmp;
 	int32_t k;
-	int s = in_buf_size;
-	s;//dummy op 
+	//int s = in_buf_size;
+	//s;//dummy op 
 
 	iLBC_decode(decblock, (unsigned char*)in_buf, &dec_inst, 1);
 	

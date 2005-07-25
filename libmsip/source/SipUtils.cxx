@@ -59,7 +59,7 @@ int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
 				//         return
 
 	i=startIndex;
-	while (i<(int)bufSize && (buf[i]=='\r' || buf[i]=='\n' || buf[i]==' '))
+	while (i<bufSize && (buf[i]=='\r' || buf[i]=='\n' || buf[i]==' '))
 		i++;
 	startIndex = i;
 	

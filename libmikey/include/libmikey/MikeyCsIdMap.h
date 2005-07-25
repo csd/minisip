@@ -57,8 +57,8 @@ class LIBMIKEY_API MikeyIPSEC4Cs{
                 MikeyIPSEC4Cs( uint8_t policyNo, uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr );
                 uint8_t policyNo;
                 uint32_t spi;
-                uint32_t spiDstaddr;
 		uint32_t spiSrcaddr;
+                uint32_t spiDstaddr;
 };
 
 class LIBMIKEY_API MikeyCsIdMap : public MObject{

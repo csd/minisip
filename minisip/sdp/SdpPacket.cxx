@@ -262,7 +262,7 @@ int32_t SdpPacket::getCodecMatch(SdpPacket &pack){
 	MRef<SdpHeaderM*> mym;
 	MRef<SdpHeaderM*> otherm;
 
-	unsigned i;
+	unsigned int i;
 	
 	for (i = 0 ; i< headers.size(); i++)
 		if ((headers[i])->getType() == SDP_HEADER_TYPE_M)
@@ -278,7 +278,7 @@ int32_t SdpPacket::getCodecMatch(SdpPacket &pack){
 	}
 
 
-	for (i=0; i< mym->getNrFormats(); i++)
+	for (i=0; (int)i< mym->getNrFormats(); i++)
 		for (int32_t j=0; j< otherm->getNrFormats(); j++)
 			if (mym->getFormat(i)==otherm->getFormat(j))
 				return mym->getFormat(i);
@@ -334,7 +334,7 @@ int32_t SdpPacket::getFirstMediaFormat(){
 bool SdpPacket::mediaFormatAvailable(int32_t f){
 	MRef<SdpHeaderM*> mym;
 
-	unsigned i;
+	unsigned int i;
 	for (i = 0 ; i< headers.size(); i++)
 		if ((headers[i])->getType() == SDP_HEADER_TYPE_M)
 			mym = MRef<SdpHeaderM*>((SdpHeaderM*)(*headers[i]));
@@ -344,7 +344,7 @@ bool SdpPacket::mediaFormatAvailable(int32_t f){
 		return 0;
 	}
 
-	for (i=0; i<mym->getNrFormats(); i++)
+	for (i=0;  (int)i<mym->getNrFormats(); i++)
 		if (mym->getFormat(i)==f)
 			return true;
 	return false;

@@ -63,7 +63,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
-	Gtk::MenuBar  * minisipMenubar;
+	//Gtk::MenuBar  * minisipMenubar;  //not used
 	Gtk::MenuItem * addContactMenu;
 	Gtk::MenuItem * addAddressContactMenu;
 	Gtk::MenuItem * removeContactMenu;
@@ -384,7 +384,7 @@ void MainWindow::gotCommand(){
 		string confid="";
 		string users=command.getParam3();
 		int i=0;	
-		while (users[i]!=';'&&users.length()!=0 &&!(i>(users.length()-1))){
+		while (users[i]!=';'&& users.length()!=0 &&!((uint)i>(users.length()-1))){
 			confid=confid+users[i];
 			i++;
 		}
@@ -529,7 +529,7 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 	
 }
 void MainWindow::addConference( string confId, string users,string remoteUri,string callId, bool incoming ){
-	ContactEntry * entry;
+	//ContactEntry * entry; //not used
 	Gtk::Image * icon;
 	Gtk::Label * label = new Gtk::Label;
 	Gtk::HBox * hbox = new Gtk::HBox;

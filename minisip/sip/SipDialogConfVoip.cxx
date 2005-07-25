@@ -17,9 +17,9 @@
 /* Copyright (C) 2004 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
- *          Johan Bilien <jobi@via.ecp.fr>
- *	    Joachim Orrblad <joachim[at]orrblad.com>
- 	    
+ *	Johan Bilien <jobi@via.ecp.fr>
+ *	Joachim Orrblad <joachim[at]orrblad.com>
+ */	    
 
 /* Name
  * 	SipDialogConfVoip.cxx
@@ -546,7 +546,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 	confId=command.getCommandString().getParam3();
 	//cerr<<"users=command.getCommandString().getParam2() "+users<<endl;
 	string line="";
-	int i=0;	
+	unsigned int i=0;
 		while (users.length()!=0 &&!(i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')

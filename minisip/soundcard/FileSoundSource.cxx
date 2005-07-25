@@ -153,7 +153,7 @@ void FileSoundSource::getSound( short *dest, bool dequeue ){
                         index = nSamples;
         }
 
-        if( index == nSamples ){
+        if( (uint32_t)index == nSamples ){
                 memset( dest, '\0', nOutputFrames*nChannels*sizeof(short) );
         }
         else{

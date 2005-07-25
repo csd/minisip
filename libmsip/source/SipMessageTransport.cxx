@@ -170,7 +170,7 @@ class SipMessageParser{
 
 SipMessageParser::SipMessageParser(){
 	buffer = (uint8_t *)malloc( BUFFER_UNIT * sizeof( uint8_t ) );
-	for (int i=0; i< BUFFER_UNIT * sizeof( uint8_t ); i++)
+	for (unsigned int i=0; i< BUFFER_UNIT * sizeof( uint8_t ); i++)
 		buffer[i]=0;
 
 	length = BUFFER_UNIT;

@@ -48,7 +48,7 @@ int AlsaSoundDevice::closePlayback(){
 	}
 
 	openedPlayback = false;
-
+	return 1;
 }
 
 int AlsaSoundDevice::closeRecord(){
@@ -64,7 +64,7 @@ int AlsaSoundDevice::closeRecord(){
 	}
 
 	openedRecord = false;
-
+	return 1;
 }
 
 
@@ -166,7 +166,7 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 		exit(-1);
 	}
 
-	if( samplingRate != wantedSamplingRate  ){
+	if( (unsigned int)samplingRate != wantedSamplingRate  ){
 		cerr << "Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
 	}
 
@@ -213,6 +213,7 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	}
 	
 	openedPlayback = true;
+	return 1;
 }
 	
 int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
@@ -304,7 +305,7 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 		exit(-1);
 	}
 
-	if( samplingRate != wantedSamplingRate ){
+	if( (unsigned int)samplingRate != wantedSamplingRate ){
 		cerr << "Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
 	}
 
@@ -359,7 +360,7 @@ int AlsaSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 		return -1;
 	}
 	
-	while( totalSamplesRead != nSamples ){
+	while( (uint32_t)totalSamplesRead != nSamples ){
 		nSamplesRead = snd_pcm_readi( readHandle, buffer, nSamples - totalSamplesRead );
 
 		if( nSamplesRead < 0 ){
@@ -394,7 +395,7 @@ int AlsaSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 		return -1;
 	}
 
-	while( totalSamplesWritten < nSamples ){
+	while( (uint32_t)totalSamplesWritten < nSamples ){
 		nSamplesWritten = snd_pcm_writei( writeHandle, buffer, nSamples - totalSamplesWritten );
 
 //		fprintf( stderr, "nSamplesWritten %d\n", nSamplesWritten );

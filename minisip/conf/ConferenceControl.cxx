@@ -229,7 +229,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	string users=cmd.getParam();
 	minilist<ConfMember> receivedList;
 		
-		while (users.length()!=0 &&!(i>(users.length()-1))){
+		while (users.length()!=0 &&!((uint)i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{
@@ -259,7 +259,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	string users=cmd.getParam();
 	//cerr<<"users-------------"+users<<endl;
 	minilist<ConfMember> receivedList;
-		while (users.length()!=0 &&!(i>(users.length()-1))){
+		while (users.length()!=0 &&!((uint)i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{
@@ -670,7 +670,7 @@ string ConferenceControl::addDomainToPrefix(string remoteUri)
 {
 	bool done=false;
 	string result=remoteUri;
-	for(int i=0;i<remoteUri.length();i++)
+	for(unsigned int i=0;i<remoteUri.length();i++)
 	{
 		if(remoteUri[i]=='@'){
 			done=true;

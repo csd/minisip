@@ -135,7 +135,7 @@ class MPlugin : public virtual MObject{
 class MPluginRegistry {
 	public:
 		MPluginRegistry();
-		~MPluginRegistry();
+		virtual ~MPluginRegistry();
 
 		/*
 		 * @returns the type of plugins that this registry holds.

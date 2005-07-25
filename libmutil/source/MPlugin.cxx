@@ -10,6 +10,7 @@
 using namespace std;
 
 list< MRef<Library *> > MPlugin::libraries;
+
 std::list< MPluginRegistry * > MPlugin::registries;
 
 string MPlugin::getMemObjectType(){

@@ -174,14 +174,14 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 		uint8_t aalg  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AALG);
 		uint8_t akeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AKEYL);
 		uint8_t skeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_SALTKEYL);
-		uint8_t prf   = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PRF);	 //Not used
+		//uint8_t prf   = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PRF);	 //Not used
 		uint8_t keydr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_KEY_DERRATE);
 		uint8_t encr  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_ENCR_ON_OFF); 
-		uint8_t cencr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTCP_ENCR_ON_OFF);//Not used
-		uint8_t fecor = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_FEC_ORDER);	 //Not used
+		//uint8_t cencr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTCP_ENCR_ON_OFF);//Not used
+		//uint8_t fecor = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_FEC_ORDER);	 //Not used
 		uint8_t auth  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_ON_OFF); 
-		uint8_t autht = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_TAGL);	 //Not used
-		uint8_t prefi = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PREFIX);	 //Not used
+		//uint8_t autht = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_TAGL);	 //Not used
+		//uint8_t prefi = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PREFIX);	 //Not used
 		
 		ka->genTek( csId,  masterKey,  16 );
 		ka->genSalt( csId, masterSalt, 14 );
@@ -290,11 +290,11 @@ void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
 		return;
 	}
 
-	uint16_t seqNo = packet->getHeader().getSeqNo();
-	byte_t * data = packet->getContent();
-	uint32_t size = packet->getContentLength();
-	bool marker = packet->getHeader().getMarker();
-	uint32_t ts = packet->getHeader().getTimestamp();
+	//uint16_t seqNo = packet->getHeader().getSeqNo(); //not used
+	//byte_t * data = packet->getContent(); //not used
+	//uint32_t size = packet->getContentLength(); //not used
+	//bool marker = packet->getHeader().getMarker(); //not used
+	//uint32_t ts = packet->getHeader().getTimestamp(); //not used
 
 	gotSsrc( packetSsrc );
 

@@ -60,12 +60,12 @@ BasicSoundSource::BasicSoundSource(int32_t id,
                                    uint32_t oDurationMs,
 				   uint32_t oNChannels,
 				   int32_t bufferSizeInMonoSamples):
-		bufferSizeInMonoSamples(bufferSizeInMonoSamples),
                 SoundSource(id),
                 plcProvider(plc),
+                bufferSizeInMonoSamples(bufferSizeInMonoSamples),
                 playoutPtr(0),
                 firstFreePtr(0),
-                lap_diff(0)
+		lap_diff(0)
 {
         stereoBuffer = new short[bufferSizeInMonoSamples*2];
         firstFreePtr = stereoBuffer;
@@ -171,9 +171,9 @@ void BasicSoundSource::getSound(short *dest,
         }
         counter++;
 #endif
-        if ((!lap_diff && (firstFreePtr-playoutPtr< iFrames*oNChannels)) ||
-                        (lap_diff && (firstFreePtr-stereoBuffer+
-                        endOfBufferPtr-playoutPtr<iFrames*oNChannels))){
+        if ((!lap_diff && ((uint)(firstFreePtr-playoutPtr)< iFrames*oNChannels)) ||
+		(lap_diff && 
+			((uint)(firstFreePtr-stereoBuffer+endOfBufferPtr-playoutPtr)<iFrames*oNChannels))){
 
                 /* Underflow */
 #ifdef DEBUG_OUTPUT
@@ -185,7 +185,7 @@ void BasicSoundSource::getSound(short *dest,
                         memcpy(dest, b, oFrames);
                 }else{
 
-                        for (int32_t i=0; i < oFrames * oNChannels; i++){
+                        for (uint32_t i=0; i < oFrames * oNChannels; i++){
                                 dest[i]=0;
                         }
                 }
@@ -193,7 +193,7 @@ void BasicSoundSource::getSound(short *dest,
         }
 
 //        if (stereo){
-                for (int32_t i=0; i<iFrames*oNChannels; i++){
+                for (uint32_t i=0; i<iFrames*oNChannels; i++){
                         temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
                                         (bufferSizeInMonoSamples*2) ];
                 }

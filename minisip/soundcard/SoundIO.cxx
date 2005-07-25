@@ -448,12 +448,12 @@ void *SoundIO::playerLoop(void *arg){
 	SoundIO *active_soundcard = (SoundIO *)arg;
 
 	short *buf = NULL;
-	short *tmpbuf = NULL;
+	//short *tmpbuf = NULL;
 	short *resbuf = NULL;
 	short *outbuf = NULL;
 	uint32_t nChannels = 0;
 #ifdef DEBUG_OUTPUT
-	uint32_t counter = 0;
+	//uint32_t counter = 0;
 #endif
 	
 	while( true ){
