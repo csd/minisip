@@ -79,7 +79,6 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 	public:
 		SipMessageTransport(string local_ip, 
 							string contactIP,
-							string preferredTransport="UDP",
 							int32_t externalContactUdpPort=5060, 
 							int32_t local_udp_port=5060, 
 							int32_t local_tcp_port=5060 
@@ -108,6 +107,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 				IPAddress &toaddr, 
 				int32_t port, 
 				string branch,
+				string preferredTransport,
 				bool addVia
 				);
 			
@@ -140,7 +140,6 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		string localIP;
 		string contactIP;
-		string preferredTransport;
 		int32_t externalContactUdpPort;
 		int32_t localUDPPort;
 		int32_t localTCPPort;

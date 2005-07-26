@@ -157,6 +157,9 @@ class LIBMSIP_API SipProxy{
 		void setDefaultExpires( int _expires );
 		string getDefaultExpires( );
 		int getDefaultExpires_int( ) {return defaultExpires;}
+
+		string getTransport(){ return transport; };
+		void setTransport( string transport ){this->transport = transport; };
 		
 	private:
 		/**
@@ -174,6 +177,8 @@ class LIBMSIP_API SipProxy{
 			defaultExpies member.
 		 */
 		int registerExpires; //in seconds
+
+		string transport;
 		
 };
 

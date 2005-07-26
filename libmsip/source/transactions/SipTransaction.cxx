@@ -85,6 +85,7 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 #endif
 
 	port = conf->sipIdentity->sipProxy.sipProxyPort;
+	transport = conf->sipIdentity->sipProxy.getTransport();
 }
 
 SipTransaction::~SipTransaction(){
@@ -131,6 +132,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 					*toaddr,
 					port, 
 					br,
+					transport,
 					addVia);
 		}
 #ifdef DEBUG_OUTPUT

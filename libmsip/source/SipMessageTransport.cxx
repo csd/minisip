@@ -349,7 +349,6 @@ static void * streamThread( void * arg );
 SipMessageTransport::SipMessageTransport(
 						string local_ip, 
 						string contactIP, 
-						string preferredTransport,
 						int32_t externalContactUdpPort, 
 						int32_t local_udp_port, 
 						int32_t local_tcp_port,
@@ -360,7 +359,6 @@ SipMessageTransport::SipMessageTransport(
 			//udpsock(false,local_udp_port),
 			localIP(local_ip),
 			contactIP(contactIP),
-			preferredTransport(preferredTransport),
 			externalContactUdpPort(externalContactUdpPort),
 			localUDPPort(local_udp_port),
 			localTCPPort(local_tcp_port),
@@ -460,6 +458,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 									IPAddress &ip_addr, 
 									int32_t port, 
 									string branch,
+									string preferredTransport,
 									bool addVia
 									)
 {
@@ -470,11 +469,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 		if( preferredTransport != "UDP" ){
 			
-			if( preferredTransport == "TLS" ) {
-				//FIXME have a different port per transport,
-				//to avoid this ...
-				port = 5061; 
-			}
 			socket = findStreamSocket(ip_addr, port);
 			if( socket.isNull() ) {
 				/* No existing StreamSocket to that host,

@@ -100,6 +100,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		Socket * socket;
 		IPAddress * toaddr;             //FIXME: This is leaked?
 		int32_t port;
+		string transport;
 		string callId;
 
 		

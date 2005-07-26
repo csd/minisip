@@ -92,7 +92,6 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 				//int32_t localUdpPort=5060,
 				//int32_t localTcpPort=5060,
 				//int32_t externalContactUdpPort=5060,
-				string defaultTransportProtocol="UDP",
 				//int32_t localTlsPort=5061,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE

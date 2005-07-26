@@ -66,7 +66,6 @@
 #include<libmutil/cert.h>
 
 SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
-		string defaultTransportProtocol,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db,
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
@@ -117,7 +116,6 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 			 SipMessageTransport(
 				 stackConfig->localIpString,
 				 stackConfig->externalContactIP,
-				 defaultTransportProtocol,
 				 stackConfig->externalContactUdpPort,
 				 stackConfig->localUdpPort,
 				 stackConfig->localTcpPort,
