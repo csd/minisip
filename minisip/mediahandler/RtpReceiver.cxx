@@ -83,7 +83,7 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 
 void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
 #ifdef DEBUG_OUTPUT
-	cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
+	//cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
 #endif	
 	mediaStreamsLock.lock();
 	mediaStreams.remove( mediaStream );
@@ -93,7 +93,7 @@ void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream
 	}
 	mediaStreamsLock.unlock();
 #ifdef DEBUG_OUTPUT
-	cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;
+	//cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;
 #endif
 }
 
