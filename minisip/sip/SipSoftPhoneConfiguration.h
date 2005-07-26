@@ -70,6 +70,20 @@ class SipSoftPhoneConfiguration : public MObject{
 
 		virtual std::string getMemObjectType(){return "SipSoftPhoneConfig";}
 
+		void save();
+		std::string load( std::string filename );
+		
+		string configFileName;
+		static string getDefaultConfigFilename();
+		static string getDefaultConfigFileString();
+		
+		static string getDefaultPhoneBookFilename();
+		static string getDefaultPhoneBookString();
+		
+		static void installConfigFile(string config, string address="", bool overwrite=false);
+		
+		bool checkVersion( uint32_t fileVersion, string fileVersion_str );
+		
 		MRef<SipCommonConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
 		
 		SipDialogSecurityConfig securityConfig;
@@ -130,7 +144,6 @@ class SipSoftPhoneConfiguration : public MObject{
 		bool dynamicSipPort;
 		bool usePSTNProxy;
 		
-		string configFileName;
 
 		bool tcp_server;
 
@@ -146,11 +159,10 @@ class SipSoftPhoneConfiguration : public MObject{
 #endif
 
 		string ringtone;
-
-		void save();
-		std::string load( std::string filename );
 		
 		list<string> audioCodecs;
+		
+		bool muteAllButOne;
 		
 		//P2T configurations:
 		//-------------------
@@ -160,7 +172,6 @@ class SipSoftPhoneConfiguration : public MObject{
 		 * used for P2T Sessions.
 		 */
 		int32_t p2tGroupListServerPort;
-		
 };
 
 #endif

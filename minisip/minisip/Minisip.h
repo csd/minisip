@@ -13,9 +13,13 @@ class Gui;
 class SipSoftPhoneConfiguration;
 class Sip;
 class SipSMCommand;
-class ConsoleDebugger;
-class ConferenceControl;
 class MessageRouter;
+class ConferenceControl;
+#ifdef GTK_GUI
+	#ifdef DEBUG_OUTPUT
+		class ConsoleDebugger;
+	#endif
+#endif
 
 
 class Minisip : public MObject{
@@ -25,12 +29,12 @@ class Minisip : public MObject{
 		
 		std::string getMemObjectType(){return "Minisip";}
 
-		void exit();
-		void startSip();
-		void runGui();
+		int exit();
+		int startSip();
+		int runGui();
 	private:
 		
-		void initParseConfig();
+		int initParseConfig();
 
 		std::string conffile;
 		MRef<MediaHandler *> mediaHandler;

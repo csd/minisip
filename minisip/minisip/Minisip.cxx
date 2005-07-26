@@ -78,18 +78,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 		conffile = argv[1];
 	}
 	else{
-		char *home = getenv("HOME");
-		if (home==NULL){
-			merr << "WARNING: Could not determine home directory"<<end;
-
-#ifdef WIN32
-			conffile=string("c:\\minisip.conf"); 
-#else
-			conffile = string("/.minisip.conf");
-#endif
-		}else{
-			conffile = string(home)+ string("/.minisip.conf");
-		}
+		conffile = SipSoftPhoneConfiguration::getDefaultConfigFilename();
 	}
 
 	srand(time(0));
@@ -181,26 +170,30 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 Minisip::~Minisip(){
 }
 
-void Minisip::exit(){
+int Minisip::exit(){
+	int ret = 1;
 	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
-	//Send a shutdown command to the sip stack ... 
-	//it will take care of de-registering and closing on-going calls
-	CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
-	SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
 	
-	//sip->getSipStack()->handleCommand(sipcmd);
-	sip->stop();
+	if( ! sip.isNull() ) { //it may not be initialized ... 
+		//Send a shutdown command to the sip stack ... 
+		//it will take care of de-registering and closing on-going calls
+		CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
+		SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
+		sip->stop();
 	
 #ifdef DEBUG_OUTPUT
-	mout << "Waiting for the SipStack to close ..." << end;
+		mout << "Waiting for the SipStack to close ..." << end;
 #endif
-	sip->join();
-
+		sip->join();
+	}
+	
 #ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT
 	mout << end << "Stopping the Console Debugger thread" << end;
-	consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
-	consoleDbg->join();
+	if( ! consoleDbg.isNull() ) {
+		consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
+		consoleDbg->join();
+	}
 #endif	
 #endif
 	if( ehandler ){
@@ -208,15 +201,24 @@ void Minisip::exit(){
 	}
 
 	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
-	
+	return ret;
 }
 
-void Minisip::startSip() {
+int Minisip::startSip() {
 
+	int ret = 1;
+	
 #ifdef DEBUG_OUTPUT
 	cerr << "Thread 2 running - doing initParseConfig"<< endl;
 #endif	
-	initParseConfig();
+	
+	if( initParseConfig() < 0 ){
+#ifdef DEBUG_OUTPUT
+		cerr << "Minisip::startSip::initParseConfig - fatal error" << endl;
+#endif
+		return -1;
+	}
+	
 #ifdef DEBUG_OUTPUT
 	cerr << "Creating MessageRouter"<< endl;
 #endif
@@ -382,6 +384,7 @@ void Minisip::startSip() {
 #ifdef DEBUG_OUTPUT
 		merr << "Error: The following element could not be parsed: "<<e->what()<< "(corrupt config file?)"<< end;
 #endif
+		ret = -1;
 	}
 	catch(exception &exc){
 		//FIXME: Display message in GUI
@@ -389,68 +392,75 @@ void Minisip::startSip() {
 		merr << "Minisip caught an exception. Quitting."<< end;
 		merr << exc.what() << end;
 #endif
+		ret = -1;
 	}
 	catch(...){
 		//FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
 		merr << "Minisip caught an unknown exception (default). Quitting."<< end;
 #endif
-
+		ret = -1;
 	};
-
+	return ret;
 }
 
-void Minisip::initParseConfig(){
+int Minisip::initParseConfig(){
 
 	bool done=false;
+	int retGlobal = -1;
 	do{
 		try{
 #ifdef DEBUG_OUTPUT
-			mout << BOLD << "init 3/9: Parsing configuration file ("<< conffile<<")" << PLAIN << end;
+			mout << BOLD << "init 3/9: Parsing configuration file ("
+					<< conffile<<")" << PLAIN << end;
 #endif
 			string ret = phoneConf->load( conffile );
 
+			done = true;
+			retGlobal = 1; //for now, we finished ok ... check the return string
+			if (ret.length()>0){
+				if( ret == "ERROR" ) { //severe error
+					retGlobal = -1;
+				} else { //error, but not severe
+					merr << ret << end;
+				}
+			}
 #ifdef DEBUG_OUTPUT
-			cerr << "Identities: "<<endl;
-			for (list<MRef<SipIdentity*> >::iterator i=phoneConf->identities.begin() ; i!=phoneConf->identities.end(); i++){
-				cerr<< "\t"<< (*i)->getDebugString()<< endl;
+			if( retGlobal > 0 ) {
+				cerr << "Identities: "<<endl;
+				for (list<MRef<SipIdentity*> >::iterator i=phoneConf->identities.begin(); 
+						i!=phoneConf->identities.end(); i++){
+					cerr<< "\t"<< (*i)->getDebugString()<< endl;
+				}
 			}
 #endif
 
-			if (ret.length()>0){
-				//bool ok;
-				merr << ret << end;
-				/*
-					ok = gui->configDialog( phoneConf );
-					if( !ok ){
-							exit();
-					}
-					done=false;
-				*/
-				done=true;
-			}else
-					done=true;
 		}catch(XMLElementNotFound *enf){
 #ifdef DEBUG_OUTPUT
-		merr << FG_ERROR << "Element not found: "<< enf->what()<< PLAIN << end;
+			merr << FG_ERROR << "Element not found: "<< enf->what()<< PLAIN << end;
 #endif
 			merr << "ERROR: Could not parse configuration item: "+enf->what() << end;
 			gui->configDialog( phoneConf );
 			done=false;
 		}
 	}while(!done);
+	return retGlobal;
 }
 
-void Minisip::runGui(){
+int Minisip::runGui(){
 	gui->run();
+	return 1;
 }
 
 int main( int argc, char ** argv ){
 	cerr << endl << "Starting MiniSIP ... welcome!" << endl << endl;
 	
 	Minisip minisip( argc, argv );
-	minisip.startSip();
-	minisip.runGui();
+	if( minisip.startSip() > 0 ) {
+		minisip.runGui();
+	} else {
+		cerr << endl << BOLD << "ERROR while starting SIP!" << PLAIN << endl << endl;
+	}
 	minisip.exit();
 }
 

@@ -99,6 +99,8 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 		}
 	}
 
+	muteAllButOne = config->muteAllButOne;
+	
 	ringtoneFile = config->ringtone;
 }
 
@@ -132,6 +134,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		
 		if( (*i)->send ){
 			stream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
+			stream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
 			session->addMediaStreamSender( stream );
 		}
 	}
@@ -182,7 +185,12 @@ std::string MediaHandler::getExtIP(){
 void MediaHandler::setActiveSource( string callId ) {
 	
         list<MRef<Session *> >::iterator iSession;
-	
+
+	//if the feature is deactivated, ignore the set_active_source command
+	if( ! muteAllButOne ) {
+		return;
+	}
+		
 	sessionsLock.lock();
 	for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
 		if( (*iSession)->getCallId() == callId ){

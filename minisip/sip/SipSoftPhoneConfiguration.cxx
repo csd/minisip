@@ -29,6 +29,11 @@
  * 
 */
 
+/****************************************************
+ * IF YOU MODIFY THE CONFIG FILE, UPDATE THE VERSION #define
+ * (see below)
+ *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
 
 #include"SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogContainer.h>
@@ -44,8 +49,9 @@
 
 #include<libmutil/dbg.h>
 
-static void installConfigFile( string filename );
-
+//update both!!!! the str define is to avoid including itoa.h
+#define CONFIG_FILE_VERSION_REQUIRED 1
+#define CONFIG_FILE_VERSION_REQUIRED_STR "1"
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
 	securityConfig(),
@@ -84,6 +90,9 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 
 void SipSoftPhoneConfiguration::save(){
 	XMLFileParser * parser = new XMLFileParser( ""/*configFileName*/ );
+	
+	//Set the version of the file ... 
+	parser->changeValue("version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	
 	inherited->save( parser );
 	securityConfig.save( parser );
@@ -143,6 +152,9 @@ void SipSoftPhoneConfiguration::save(){
 	}
 	
 	parser->changeValue( "sound_device", soundDevice );
+	
+	parser->changeValue( "mute_all_but_one", muteAllButOne? "yes":"no" );
+	
 #ifdef VIDEO_SUPPORT
 	parser->changeValue( "video_device", videoDevice );
 	parser->changeValue( "frame_width", itoa( frameWidth ) );
@@ -193,15 +205,15 @@ void SipSoftPhoneConfiguration::save(){
 
 	//WARN about possible inconsistencies and the need to restart MiniSIP
 	string warn;
-	warn = "Attention!\n";
-	warn += "MiniSIP needs to be restarted for changes to take effect\n";
+	warn = "\n\nAttention! *********************************************\n";
+	warn += "   MiniSIP needs to be restarted for changes to take effect\n\n";
 	merr << warn << end;
 }
 
 string SipSoftPhoneConfiguration::load( string filename ){
 	configFileName = filename;
 
-	installConfigFile( filename );
+	installConfigFile( this->configFileName );
 
 	proxyConnection = NULL;
 	usePSTNProxy = false;
@@ -212,6 +224,20 @@ string SipSoftPhoneConfiguration::load( string filename ){
 	string account;
 	int ii = 0;
 
+	/* Check version first of all! */
+	int32_t fileVersion;
+	string fileVersion_str;
+	fileVersion = parser->getIntValue("version", 0);
+		//get the string version also ... don't use the itoa.h
+	fileVersion_str = parser->getValue("version", "0");
+	if( !checkVersion( fileVersion, fileVersion_str ) ) {
+		//check version prints a message ... 
+		//here, deal with the error
+		ret = "ERROR";
+		delete parser;
+		return ret;
+	}
+	
 	try{
 		do{
 			
@@ -308,6 +334,8 @@ string SipSoftPhoneConfiguration::load( string filename ){
 	tls_server = parser->getValue("tls_server", "no") == "yes";
 
 	soundDevice =  parser->getValue("sound_device","");
+	
+	muteAllButOne = parser->getValue("mute_all_but_one", "yes") == "yes";
 
 #ifdef VIDEO_SUPPORT
 	videoDevice = parser->getValue( "video_device", "" );
@@ -380,22 +408,9 @@ string SipSoftPhoneConfiguration::load( string filename ){
 }
 
 
-static void installConfigFile(string filename){
-
-	string phonebookFileName;
-	char *home = getenv("HOME");
-	if (home==NULL){
-			merr << "WARNING: Could not determine home directory"<<end;
-#ifdef WIN32
-	phonebookFileName = string("c:\\minisip.addr");
-#else
-	phonebookFileName = string("/.minisip.addr");
-#endif
-	}else{
-			phonebookFileName = string(home)+ string("/.minisip.addr");
-	}
-
+string SipSoftPhoneConfiguration::getDefaultConfigFileString() {
 	string defaultConfig =
+		"<version>" CONFIG_FILE_VERSION_REQUIRED_STR "</version>"
 		"<account>\n"
 			"<account_name> My account </account_name>\n"
 			"<sip_uri> username@domain.org </sip_uri>\n"
@@ -432,52 +447,134 @@ static void installConfigFile(string filename){
 		"<local_tls_port> 5061 </local_tls_port>\n"
 		"<local_media_port> 10000 </local_media_port>\n"                                
 		"<sound_device>/dev/dsp</sound_device>\n"
+		"<mute_all_but_one>yes</mute_all_but_one>\n"
 #ifdef HAS_SPEEX
 		"<codec>speex</codec>\n"
 #endif
 		"<codec>G.711</codec>\n"
-		"<phonebook>file://" + phonebookFileName +
+		"<phonebook>file://" + SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() +
 		"</phonebook>\n";
+	return defaultConfig;
+}
 
+string SipSoftPhoneConfiguration::getDefaultPhoneBookString() {
 	string defaultPhonebook =
+		"<version>" CONFIG_FILE_VERSION_REQUIRED_STR "</version>"
 		"<phonebook name=Example>\n"
 		"<contact name=\"Contact\">\n"
 		"<pop desc=\"Phone\" uri=\"0000000000\"></pop>\n"
 		"<pop desc=\"Laptop\" uri=\"sip:contact@minisip.org\"></pop>\n"
 		"</contact>\n"
 		"</phonebook>\n";
+	return defaultPhonebook;
+}
+
+string SipSoftPhoneConfiguration::getDefaultConfigFilename() {
+	char *home = getenv("HOME");
+	string ret;
+	if (home==NULL){
+		merr << "WARNING: Could not determine home directory"<<end;
+
+#ifdef WIN32
+		ret=string("c:\\minisip.conf"); 
+#else
+		ret = string("/.minisip.conf");
+#endif
+	}else{
+		ret = string(home)+ string("/.minisip.conf");
+	}
+	return ret;
+}
+
+string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
+	string phonebookFileName;
+	char *home = getenv("HOME");
+	if (home==NULL){
+			merr << "WARNING: Could not determine home directory"<<end;
+#ifdef WIN32
+	phonebookFileName = string("c:\\minisip.addr");
+#else
+	phonebookFileName = string("/.minisip.addr");
+#endif
+	}else{
+			phonebookFileName = string(home)+ string("/.minisip.addr");
+	}
+	return phonebookFileName;
+}
+
+void SipSoftPhoneConfiguration::installConfigFile(string config, string address, bool overwrite){
+
+	string filename = config;
+	
+	string phonebookFileName;
+	if( address == "" ) 
+		phonebookFileName = SipSoftPhoneConfiguration::getDefaultPhoneBookFilename();
+	else 
+		phonebookFileName = address;
 
 	ifstream file(filename.c_str());
-	if (!file){
+	if (!file || overwrite){
+#ifdef DEBUG_OUTPUT
 		merr << "WARNING: Configuration file ("<< filename << ") was not found - creating it with default values."<< end;
-		file.close();
+#endif
+		if( file.is_open() ) file.close();
 		ofstream newfile(filename.c_str());
-		newfile<< defaultConfig;
+		newfile<< SipSoftPhoneConfiguration::getDefaultConfigFileString();
 	}
-	/*else{
-		merr << "Could not open " << filename << " to write the default configuration file." <<end;
-
-	}*/
-
-	ifstream phonebookFile( phonebookFileName.c_str() );
-	if (!phonebookFile){
-		phonebookFile.close();
-		ofstream newfile(phonebookFileName.c_str());
-		newfile<< defaultPhonebook;
-	}
-/*	
+#ifdef DEBUG_OUTPUT
 	else{
-		merr << "Could not open " << phonebookFileName << " to write the default phonebook file." <<end;
+		merr << "Config file " << filename << " already exhists and we don't want to overwrite it" <<end;
 	}
-*/
+#endif
+	
+	ifstream phonebookFile( phonebookFileName.c_str() );
+	if (!phonebookFile || overwrite){
+#ifdef DEBUG_OUTPUT
+		merr << "WARNING: Address Book ("<< filename << ") was not found - creating it with default values."<< end;
+#endif
+		if( phonebookFile.is_open() ) phonebookFile.close();
+		ofstream newfile(phonebookFileName.c_str());
+		newfile<< SipSoftPhoneConfiguration::getDefaultPhoneBookString();
+	}
+#ifdef DEBUG_OUTPUT
+	else{
+		merr << "Address Book " << filename << " already exhists and we don't want to overwrite it" <<end;
+	}
+#endif
 
 }
 
+bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion, string fileVersion_str ) {
+	string str="";
+	bool ret = false;
+	if( fileVersion != CONFIG_FILE_VERSION_REQUIRED ) {
+		str += 	"\n\n"
+			"ERROR: config file version conflict\n" 
+			"     file -> ";
+		str += configFileName + "\n";
+		str +=	"     your version = " + fileVersion_str + "\n" 
+			"     required version = " + CONFIG_FILE_VERSION_REQUIRED_STR + "\n" 
+			"     What to do: I have created a default config file at\n" 
+			"          " + configFileName + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR + "\n" 
+			"     Compare your config file with the default one and import the changes,\n" 
+			"        or overwrite your old one (you will loose your settings)\n\n\n";
+		cerr << str;
+		installConfigFile( configFileName + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR, 
+				getDefaultPhoneBookFilename() + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR,
+				true);  //overwrite files
+		ret = false;
+	} else {
+		str += "Config file version checked ok!\n";
+		cerr << str;
+		ret = true;
+	}
+	return ret;
+}
 
 MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 	list< MRef<SipIdentity*> >::iterator it;
 #ifdef DEBUG_OUTPUT
-	merr << "SipSoftPhoneConfiguration::getIdentity : looking for an identity ... " << end;
+	//merr << "SipSoftPhoneConfiguration::getIdentity : looking for an identity ... " << end;
 #endif
 	for( it = identities.begin(); it!=identities.end(); it++ ) {
 		if( (*it)->getId() == id ) {
@@ -485,8 +582,7 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 		}
 	}
 #ifdef DEBUG_OUTPUT
-	merr << "SipSoftPhoneConfiguration::getIdentity : identity not found!" << end;
+	//merr << "SipSoftPhoneConfiguration::getIdentity : identity not found!" << end;
 #endif
 	return NULL;
 }
-

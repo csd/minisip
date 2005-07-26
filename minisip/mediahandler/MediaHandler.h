@@ -58,6 +58,13 @@ class MediaHandler : public MObject, public SessionRegistry {
 		virtual string getDebugString();
 #endif
 
+		/**
+		True if all but one sender/media sessions are muted.
+		If turned off, all ongoing sessions receive the audio from our mic.
+		If turned on, only one source (the active one) will receive it.
+		*/
+		bool muteAllButOne;
+
 	private:
 		std::list< MRef<Media *> > media;
 
