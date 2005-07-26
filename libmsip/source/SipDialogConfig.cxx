@@ -56,12 +56,12 @@ string SipProxy::getRegisterExpires( ) {
 void SipProxy::setDefaultExpires( string _expires ) {
 	int r;
 	r = atoi( _expires.c_str() );
-	setRegisterExpires( r );
+	setDefaultExpires( r );
 }
 void SipProxy::setDefaultExpires( int _expires ) {
 	if( _expires >= 0 && _expires < 100000 ) //sanity check ...
-		registerExpires = _expires;
-	else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+		defaultExpires = _expires;
+	else defaultExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 string SipProxy::getDefaultExpires( ) {
 	return itoa(defaultExpires); 

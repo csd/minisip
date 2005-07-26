@@ -55,7 +55,6 @@ void ConsoleDebugger::showHelp() {
 	cerr << "        - ( : Output StateMachine related debug messages (see StateMachine.h)" << endl;
 	cerr << endl;
 	cerr << "        - ) : Print a list of timers waiting to be fired" << endl;
-	cerr << "        - - : Print a list of commands waiting to be processed in the SipDialogContainer" << endl;
 	cerr << "        - + : Print info on all currently registered SipDialogs" << endl;
 	cerr << endl;
 	cerr << "        - m/M : Print info on MediaSessions currently running" << endl;

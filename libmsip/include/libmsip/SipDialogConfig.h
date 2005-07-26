@@ -123,7 +123,7 @@ class LIBMSIP_API SipProxy{
 				+"; port="+itoa(sipProxyPort)
 				+"; user="+sipProxyUsername
 				+"; password="+sipProxyPassword
-				+"; expires="+itoa(registerExpires);
+				+"; expires="+itoa(defaultExpires);
 		}
 
 		static string findProxy(string uri, uint16_t &port){
