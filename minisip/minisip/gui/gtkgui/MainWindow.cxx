@@ -129,7 +129,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	phoneBookTree = new PhoneBookTree;
 	phoneBookModel = new PhoneBookModel( phoneBookTree );
 
-	phoneBookTreeView->set_headers_visible( false );
+	phoneBookTreeView->set_headers_visible( true );
 	phoneBookTreeView->set_rules_hint( false );
 	phoneBookTreeView->signal_button_press_event().connect_notify( 
 		SLOT( *this, &MainWindow::phoneTreeClicked ), false );

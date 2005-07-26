@@ -39,6 +39,9 @@ AccountsListColumns::AccountsListColumns(){
 	add( password );
 	add( doRegister );
 	add( status );
+	add( transport );
+	add( port );
+	add( registerExpires );
 }
 
 Glib::RefPtr<AccountsList> AccountsList::create( AccountsListColumns * columns ){
@@ -58,6 +61,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	list< MRef<SipIdentity *> >::iterator i;
 
 	for( i = identities.begin(); i != identities.end(); i++ ){
+		(*i)->lock();
 		Gtk::TreeModel::iterator iter = append();
 		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
@@ -68,6 +72,10 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->doRegister] = (*i)->registerToProxy;
 		(*iter)[columns->defaultProxy] = ( (*i) == config->inherited->sipIdentity );
 		(*iter)[columns->pstnProxy] = ( (*i) == config->pstnIdentity );
+		(*iter)[columns->port] = (*i)->sipProxy.sipProxyPort;
+		(*iter)[columns->transport] = (*i)->sipProxy.getTransport();
+		(*iter)[columns->registerExpires] = (*i)->sipProxy.getDefaultExpires_int();
+		(*i)->unlock();
 	}
 
 }
@@ -128,14 +136,16 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			identity->setDoRegister( false );
 		}
 
-		//FIXME
-		identity->sipProxy.sipProxyPort = port;
+		identity->sipProxy.sipProxyPort = (*iter)[columns->port];
 
 		identity->sipProxy.sipProxyUsername = 
 			Glib::locale_from_utf8( (*iter)[columns->username] );
 		
 		identity->sipProxy.sipProxyPassword = 
 			Glib::locale_from_utf8( (*iter)[columns->password] );
+
+		identity->sipProxy.setTransport(
+			Glib::locale_from_utf8( (*iter)[columns->transport] ) );
 
 
 		if( (*iter)[columns->pstnProxy] ){
@@ -148,6 +158,8 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 				(*iter)[columns->defaultProxy] ){
 			config->inherited->sipIdentity = identity;
 		}
+
+		identity->sipProxy.setDefaultExpires( (*iter)[columns->registerExpires] );
 
 		config->identities.push_back( identity );
 	}

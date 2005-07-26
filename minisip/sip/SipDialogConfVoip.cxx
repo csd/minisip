@@ -1467,6 +1467,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	getSipStack()->getSipTransportLayer()->sendMessage(pref,
 					toaddr,
 					getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort, 
+					getDialogConfig()->inherited->sipIdentity->sipProxy.getTransport(), 
 					string("ACK"),
 					true);
 

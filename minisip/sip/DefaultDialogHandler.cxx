@@ -86,6 +86,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		sipStack->getSipTransportLayer()->sendMessage(pref,
 				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
 				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort, //port,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.getTransport(), //port,
 				string(""), //branch
 				true
 				);

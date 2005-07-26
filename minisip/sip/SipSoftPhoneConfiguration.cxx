@@ -96,6 +96,8 @@ void SipSoftPhoneConfiguration::save(){
 	for( iIdent = identities.begin(); iIdent != identities.end(); ii++, iIdent ++){
 		//cerr << "Saving identity: " << (*iIdent)->getDebugString() << endl;
 		accountPath = string("account[")+itoa(ii)+"]/";
+		
+		(*iIdent)->lock();
 
 		parser->changeValue( accountPath + "account_name", (*iIdent)->identityIdentifier );
 		
@@ -124,6 +126,20 @@ void SipSoftPhoneConfiguration::save(){
 			parser->changeValue( accountPath + "register", "no");
 			parser->changeValue( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
 		}
+		string transport = (*iIdent)->sipProxy.getTransport();
+		
+		if( transport == "TCP" ){
+			parser->changeValue( accountPath + "transport", "TCP" );
+		}
+		else if( transport == "TLS" ){
+			parser->changeValue( accountPath + "transport", "TLS" );
+		}
+		else{
+			parser->changeValue( accountPath + "transport", "UDP" );
+		}
+
+		(*iIdent)->unlock();
+
 	}
 	
 	parser->changeValue( "sound_device", soundDevice );
@@ -247,6 +263,8 @@ string SipSoftPhoneConfiguration::load( string filename ){
 				ident->sipProxy.sipProxyUsername = proxyUser;
 				string proxyPass = parser->getValue(accountPath +"proxy_password", "");
 				ident->sipProxy.sipProxyPassword = proxyPass;
+
+				ident->sipProxy.setTransport( parser->getValue(accountPath +"transport", "UDP") );
 
 				string registerExpires = parser->getValue(accountPath +"register_expires", "");
 				if (registerExpires != ""){
@@ -389,9 +407,9 @@ static void installConfigFile(string filename){
 			"<proxy_password> password </proxy_password>\n"
 			"<pstn_account> no </pstn_account>\n"
 			"<default_account> yes </default_account>\n"
+			"<transport> UDP </transport>\n"
 		"</account>\n"
 		
-		"<transport> UDP </transport>\n"
 //		"<stun_server_ip> stun.ssvl.kth.se</stun>\n"
 		"<tcp_server>yes</tcp_server>\n"
 		"<tls_server>no</tls_server>\n"

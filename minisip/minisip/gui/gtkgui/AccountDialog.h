@@ -43,6 +43,10 @@ class AccountDialog: public Gtk::Dialog{
 		Gtk::Entry * uriEntry;
 		Gtk::Entry * proxyEntry;
 
+		Gtk::RadioButton * udpRadio;
+		Gtk::RadioButton * tcpRadio;
+		Gtk::RadioButton * tlsRadio;
+
 		Gtk::CheckButton * autodetectProxyCheck;
 		Gtk::CheckButton * registerCheck;
 		
@@ -51,6 +55,13 @@ class AccountDialog: public Gtk::Dialog{
 		Gtk::Entry * passwordEntry;
 
 		Gtk::SpinButton * registerTimeSpin;
+		Gtk::SpinButton * proxyPortSpin;
+
+		Gtk::Label * proxyLabel;
+		Gtk::Label * proxyPortLabel;
+
+		Gtk::Label * usernameLabel;
+		Gtk::Label * passwordLabel;
 		
 		AccountsList * list;
 
