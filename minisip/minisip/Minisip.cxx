@@ -152,7 +152,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 #else
 	//in non-debug mode, send merr to the gui
-	merr.setExternalHandler( dynamic_cast<MainWindow *>( gui ) ); 
+	merr.setExternalHandler( dynamic_cast<MainWindow *>( *gui ) ); 
 #endif
 
 #else //!GTK_GUI
@@ -253,7 +253,9 @@ int Minisip::startSip() {
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
 #ifdef GTK_GUI
+#ifdef DEBUG_OUTPUT
 		consoleDbg->setMediaHandler( mediaHandler );
+#endif
 #endif
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */

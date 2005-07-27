@@ -164,7 +164,9 @@ void MediaHandler::handleCommand( CommandString command ){
 	}
 	
 	if( command.getOp() == MediaCommandString::session_debug ){
+#ifdef DEBUG_OUTPUT
 		cerr << getDebugString() << endl;
+#endif
 		return;
 	}
 	
