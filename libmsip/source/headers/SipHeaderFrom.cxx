@@ -57,31 +57,19 @@ SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from)
 		uri("UNKNOWN","0.0.0.0","",0)
 {
 	
-	string users_name;
-	unsigned i=0;
-	while (build_from[i]!='<'){
-		users_name+=build_from[i];
-		i++;
-	}
+        size_t ltPos = build_from.find( '<' );
+        size_t gtPos = build_from.find( '>' );
 
-	i++; //go past '<'
-
-	string uri_str;
-	while (build_from[i]!='>'){
-		uri_str+=build_from[i];
-		i++;
-	}
-	uri=SipURI(uri_str);
-	uri.setUsersName(trim(users_name));
-
-	//tag="";
-
-	while (build_from[i]=='>' || build_from[i]==' ')
-		i++;
-	
-//	if (build_from.length()>=i+5 && build_from.substr(i,5)==";tag="){
-//		tag = build_from.substr(i+5, build_from.length()-5-1);	
-//	}
+        if( ltPos != string::npos && gtPos != string::npos && ltPos + 1 < gtPos ){
+                // Assume Username <uri> scheme
+                uri = SipURI( build_from.substr( ltPos + 1, gtPos - ltPos - 1 ) );
+                uri.setUsersName( trim( build_from.substr( 0, ltPos ) ) );
+        }
+        else{
+                // uri scheme (without Username)
+                uri = SipURI( build_from );
+                uri.setUsersName( "" );
+        }
 }
 
 SipHeaderValueFrom::SipHeaderValueFrom(const string &username, const string &ip)

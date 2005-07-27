@@ -58,20 +58,19 @@ SipHeaderValueContact::SipHeaderValueContact()
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr), uri("UNKNOWN","0.0.0.0","",0)
 {
-	unsigned i=0;
-	while (build_from[i]!='<')
-		i++;
 
-	i++;
-	string uri="";
-	while (!(build_from[i]=='>' || i>= build_from.length())){
-		uri+=build_from[i];
-		i++;
-	}
+        size_t ltPos = build_from.find( '<' );
+        size_t gtPos = build_from.find( '>' );
 
-	SipURI u(uri);
-	setUri(u);
-	
+        if( ltPos != string::npos && gtPos != string::npos && ltPos + 1 < gtPos ){
+                // Assume Username <uri> scheme
+                uri = SipURI( build_from.substr( ltPos + 1, gtPos - ltPos - 1 ) );
+        }
+        else{
+                // uri scheme (without Username)
+                uri = SipURI( build_from );
+        }
+
 	featuretag="";
 	expires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	//merr << "SipHeaderValueContact::getString: uri="<< uri <<end;

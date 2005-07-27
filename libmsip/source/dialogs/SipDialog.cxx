@@ -183,7 +183,10 @@ bool SipDialogState::updateState( MRef<SipInvite*> inv ) {
 	}
 
 	isEarly = false;	
-	remoteTarget = inv->getHeaderValueContact()->getUri().getString();
+	MRef<SipHeaderValueContact *> c = inv->getHeaderValueContact();
+	if( c ){
+		remoteTarget = c->getUri().getString();
+	}
 	remoteUri = inv->getHeaderValueFrom()->getUri().getString();
 	localUri = inv->getHeaderValueTo()->getUri().getString();
 	
@@ -251,7 +254,10 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 		//merr << "dialog state has a routeset" << end;
 	}
 	
-	remoteTarget = resp->getHeaderValueContact()->getUri().getString();
+	MRef<SipHeaderValueContact *> c = resp->getHeaderValueContact();
+	if( c ){
+		remoteTarget = c->getUri().getString();
+	}
 	remoteUri = resp->getHeaderValueTo()->getUri().getString();
 	localUri = resp->getHeaderValueFrom()->getUri().getString();
 	

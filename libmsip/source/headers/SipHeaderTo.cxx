@@ -56,35 +56,20 @@ SipHeaderValueTo::SipHeaderValueTo(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
 		uri("UNKNOWN","0.0.0.0","",0)
 {
-	string users_name;
-	int32_t i=0;
-//	tag="";
-	while (build_from[i]!='<'){ 		//FIX not past eos
-		users_name+=build_from[i];
-		i++;
-	}
+	size_t ltPos = build_from.find( '<' );
+	size_t gtPos = build_from.find( '>' );
 
-	i++; //go past '<'
 
-	string uri_str="";
-	while (build_from[i]!='>'){		//FIXME: do not go past eos
-		uri_str+=build_from[i];
-		i++;
+	if( ltPos != string::npos && gtPos != string::npos && ltPos + 1 < gtPos ){
+		// Assume Username <uri> scheme
+		uri = SipURI( build_from.substr( ltPos + 1, gtPos - ltPos - 1 ) );
+		uri.setUsersName( trim( build_from.substr( 0, ltPos ) ) );
 	}
-	i++;
-	
-/*	if (build_from.length()-1>(unsigned)i){
-		if (build_from.substr(i,5)==string(";tag=")){
-			tag = build_from.substr(i+5, build_from.length()-i-5);
-			
-		}else{
-		
-		}
-
+	else{
+		// uri scheme (without Username)
+		uri = SipURI( build_from );
+		uri.setUsersName( "" );
 	}
-*/
-	uri=SipURI(uri_str);
-	uri.setUsersName(trim(users_name));
 }
 
 

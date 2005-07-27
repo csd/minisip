@@ -448,9 +448,13 @@ MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
 }
 
 MRef<SipHeaderValueContact*> SipMessage::getHeaderValueContact(){
+	MRef<SipHeader *> h = getHeaderOfType( SIP_HEADER_TYPE_CONTACT );
 
-	return MRef<SipHeaderValueContact*>( (SipHeaderValueContact*)*(getHeaderOfType(SIP_HEADER_TYPE_CONTACT)->getHeaderValue(0)));
-
+	if( h ){
+		return MRef<SipHeaderValueContact*>( 
+			(SipHeaderValueContact*)*(h->getHeaderValue(0) ) );
+	}
+	return NULL;
 }
 
 MRef<SipHeader *> SipMessage::getHeaderOfType(int t, int i){
