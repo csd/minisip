@@ -428,9 +428,6 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "tcpCheck", tcpCheck );
 	refXml->get_widget( "tlsCheck", tlsCheck );
-
-	refXml->get_widget( "transportEntry", transportEntry );
-	refXml->get_widget( "transportCombo", transportCombo );
 	
 	refXml->get_widget( "stunCheck", stunCheck );
 	refXml->get_widget( "stunAutodetectCheck", stunAutodetectCheck );
@@ -443,8 +440,6 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	stunAutodetectCheck->signal_toggled().connect( SLOT( 
 		*this, &AdvancedSettings::stunAutodetectChange ) );
-
-	transportCombo->set_value_in_list( true );
 	
 }
 
@@ -460,8 +455,6 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 	transportChange();
 
-	transportEntry->set_text( config->inherited->transport );
-
 	stunCheck->set_active( config->useSTUN );
 	stunAutodetectCheck->set_active( config->useUserDefinedStunServer );
 	stunEntry->set_text( config->userDefinedStunServer );
@@ -474,21 +467,6 @@ void AdvancedSettings::transportChange(){
 	tlsSpin->set_sensitive( tlsCheck->get_active() );
 	tcpSpin->set_sensitive( tcpCheck->get_active() );
 	
-	std::list<string> list;
-
-	list.push_back( "UDP" );
-
-	if( tcpCheck->get_active() ){
-		list.push_back( "TCP" );
-	}
-
-	if( tlsCheck->get_active() ){
-		list.push_back( "TLS" );
-	}
-
-	transportCombo->set_popdown_strings( list );
-
-	transportCombo->set_sensitive( list.size() > 1 );
 	stunAutodetectChange();
 }
 
@@ -506,8 +484,6 @@ string AdvancedSettings::apply(){
 
 	config->tcp_server = tcpCheck->get_active();
 	config->tls_server = tlsCheck->get_active();
-
-	config->inherited->transport = transportEntry->get_text();
 
 	config->useSTUN = stunCheck->get_active();
 	config->useUserDefinedStunServer = stunAutodetectCheck->get_active()

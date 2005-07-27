@@ -164,9 +164,6 @@ class AdvancedSettings
 		Gtk::CheckButton * tcpCheck;
 		Gtk::CheckButton * tlsCheck;
 
-		Gtk::Entry * transportEntry;
-		Gtk::Combo * transportCombo;
-		
 		Gtk::CheckButton * stunCheck;
 		Gtk::CheckButton * stunAutodetectCheck;
 		Gtk::Entry * stunEntry;
