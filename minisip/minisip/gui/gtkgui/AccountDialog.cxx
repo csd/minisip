@@ -232,7 +232,7 @@ void AccountDialog::addAccount(){
 void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	nameEntry->set_text( (*iter)[list->columns->name] );
 	uriEntry->set_text( (*iter)[list->columns->uri] );
-	autodetectProxyCheck->set_active(  (*iter)[list->columns->proxy] == "" );
+	autodetectProxyCheck->set_active(  (*iter)[list->columns->proxy] != "" );
 	proxyEntry->set_text( (*iter)[list->columns->proxy] );
 	requiresAuthCheck->set_active( (*iter)[list->columns->username] != "" );
 	usernameEntry->set_text( (*iter)[list->columns->username] );
