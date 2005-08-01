@@ -138,7 +138,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 //	gui = dynamic_cast<Gui*>(debugtextui);
 //	assert(gui);
 	//debugtextui = gui;
-	merr.setExternalHandler( dynamic_cast<MinisipTextUI*>(gui) );
+	merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
 	LogEntry::handler = NULL;
 #else //!TEXT_UI
 #ifdef GTK_GUI
@@ -371,7 +371,7 @@ int Minisip::startSip() {
 //		gui->handleCommand(pupd);
 
 #ifdef TEXT_UI
-		MinisipTextUI * textui = dynamic_cast<MinisipTextUI *>(gui);
+		MRef<MinisipTextUI *> textui = dynamic_cast<MinisipTextUI *>(*gui);
 		if (textui){
 			textui->displayMessage("");
 			textui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
