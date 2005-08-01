@@ -231,6 +231,8 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	dispatcher.connect( SLOT( *this, &MainWindow::gotCommand ) );
 
+	uriEntry->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
+
 #ifndef WIN32
 	trayIcon = new MTrayIcon( this, refXml );
 
