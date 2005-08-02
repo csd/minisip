@@ -50,8 +50,8 @@
 #include<libmutil/dbg.h>
 
 //update both!!!! the str define is to avoid including itoa.h
-#define CONFIG_FILE_VERSION_REQUIRED 1
-#define CONFIG_FILE_VERSION_REQUIRED_STR "1"
+#define CONFIG_FILE_VERSION_REQUIRED 2
+#define CONFIG_FILE_VERSION_REQUIRED_STR "2"
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
 	securityConfig(),
@@ -154,6 +154,8 @@ void SipSoftPhoneConfiguration::save(){
 	parser->changeValue( "sound_device", soundDevice );
 	
 	parser->changeValue( "mute_all_but_one", muteAllButOne? "yes":"no" );
+	
+	parser->changeValue( "mixer_type", soundIOmixerType );
 	
 #ifdef VIDEO_SUPPORT
 	parser->changeValue( "video_device", videoDevice );
@@ -337,6 +339,9 @@ string SipSoftPhoneConfiguration::load( string filename ){
 	
 	muteAllButOne = parser->getValue("mute_all_but_one", "yes") == "yes";
 
+	soundIOmixerType = parser->getValue("mixer_type", "spatial");
+	cerr << "CESC: sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
+
 #ifdef VIDEO_SUPPORT
 	videoDevice = parser->getValue( "video_device", "" );
 	frameWidth = parser->getIntValue( "frame_width", 176 );
@@ -448,6 +453,7 @@ string SipSoftPhoneConfiguration::getDefaultConfigFileString() {
 		"<local_media_port> 10000 </local_media_port>\n"                                
 		"<sound_device>/dev/dsp</sound_device>\n"
 		"<mute_all_but_one>yes</mute_all_but_one>\n"
+		"<mixer_type>spatial</mixer_type>\n"
 #ifdef HAS_SPEEX
 		"<codec>speex</codec>\n"
 #endif

@@ -164,6 +164,8 @@ class SipSoftPhoneConfiguration : public MObject{
 		
 		bool muteAllButOne;
 		
+		string soundIOmixerType;
+		
 		//P2T configurations:
 		//-------------------
 		
