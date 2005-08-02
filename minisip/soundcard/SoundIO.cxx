@@ -49,13 +49,19 @@
 #include<stdio.h>
 
 #include"SoundIO.h"
+#include"SoundSource.h"
+
 #include<assert.h>
 #include<signal.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Thread.h>
-#include"../spaudio/SpAudio.h"
+
 #include<libmutil/mtime.h>
 #include<libmutil/print_hex.h>
+
+#include"AudioMixerSpatial.h"
+#include"AudioMixerSimple.h"
+#include"../spaudio/SpAudio.h"
 
 #ifdef AEC_SUPPORT
 #include "../aec/aec.h"
@@ -67,46 +73,48 @@
 #include<sys/time.h>
 #include<unistd.h>
 #endif
+#include"SoundDevice.h"
+
+#ifndef WIN32
+#include"OssSoundDevice.h"
+#ifdef HAVE_LIBASOUND
+#include"AlsaSoundDevice.h"
+#endif
+#else
+#include"DirectSoundDevice.h"
+#endif
 
 
 #define BS 160
 
 
-/* lookup tables without gain control */
-float lchvol[POS]={1,0.8,1,0.6,0};
-float rchvol[POS]={0,0.6,1,0.8,1};
-
-/* lookup tables for gain control
-float lchvol[POS][POS]={{1,0.8,1,0.6,0},{1,0,0,0,0},{0.5,0,0.5,0,0},{0.5,0.5,0,0.3,0},{0.5,0.5,0.5,0.3,0}};
-float rchvol[POS][POS]={{0,0.6,1,0.8,1},{0,0,0,0,1},{0,0,0.5,0,0.5},{0,0.3,0,0.5,0.5},{0,0.3,0.5,0.5,0.5}};
-*/
-
-SpAudio SoundIO::spAudio(5);
+// //This object is created always, for now, even we do not 
+// //use spatial audio ...
+// SpAudio SoundIO::spAudio(5);
 
 SoundIO::SoundIO(
-                //string device, 
-                MRef<SoundDevice *> device,
-                int nChannels, 
-                int32_t samplingRate, 
-                int format): 
-		    //nChannels(nChannels),
-            	    //useFileInterface(false),
-   		    //in_file(string("")),
-		    //out_file(string("")),
-		    nChannels(nChannels),
-		    samplingRate(samplingRate),
-		    format(format),
-		    recording(false)
-		    //openCount(0)
+		//string device, 
+		MRef<SoundDevice *> device,
+		string mixerType,
+		int nChannels, 
+		int32_t samplingRate, 
+		int format): 
+			//nChannels(nChannels),
+			//useFileInterface(false),
+			//in_file(string("")),
+			//out_file(string("")),
+			nChannels(nChannels),
+			samplingRate(samplingRate),
+			format(format),
+			recording(false)
+			//openCount(0)
 {
-        soundDev = device;
-//	spAudio = new SpAudio(5);
+	soundDev = device;
 
+	setMixer( mixerType );
 	/* Create the SoundPlayerLoop */
 	start_sound_player();
 	start_recorder();
-	initLookup();
-
 }
 
 
@@ -349,12 +357,12 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 #ifdef DEBUG_OUTPUT
 	cerr << "Calling register source on created source " << source->getId() << endl;
 #endif
-       int32_t j=1;
-       int32_t nextSize=sources.size()+1; 
-       queueLock.lock();
-       for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
-                        i!= sources.end(); 
-                        i++){
+//	int32_t j=1;
+//	int32_t nextSize=sources.size()+1; 
+	queueLock.lock();
+	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
+				i!= sources.end(); 
+				i++){
 		if (source->getId()==(*i)->getId()){
 			queueLock.unlock();
 
@@ -363,12 +371,14 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
                         sourceListCondLock.unlock();
 			return;
 		}
-		(*i)->setPos(spAudio.assignPos(j,nextSize));
+//		(*i)->setPos(spAudio.assignPos(j,nextSize));
 //		(*i)->initLookup(nextSize);
-		j++;
+//		j++;
 	}
-        source->setPos( spAudio.assignPos(j,nextSize) );
-	sources.push_front(source);
+//         source->setPos( spAudio.assignPos(j,nextSize) );
+	//sources.push_front(source);
+	sources.push_back(source);
+	mixer->setSourcesPosition( sources, true ); //added sources
 	queueLock.unlock();
 
         sourceListCondLock.lock();
@@ -378,7 +388,7 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 
 
 void SoundIO::unRegisterSource(int sourceId){
-	int32_t j =1;
+	
 	queueLock.lock();
 	list<MRef<SoundSource *> >::iterator i;
 	for (i = sources.begin(); 
@@ -390,13 +400,15 @@ void SoundIO::unRegisterSource(int sourceId){
 		}
 			
         }
-	int32_t nextSize=sources.size();
-	for (i = sources.begin(); 
-                        i!=sources.end(); 
-                        i++, j++){
-		(*i)->setPos(spAudio.assignPos(j,nextSize));
+// 	int32_t nextSize=sources.size();
+// 	int32_t j =1;
+// 	for (i = sources.begin(); 
+// 			i!=sources.end(); 
+// 			i++/*, j++*/){
+//		(*i)->setPos(spAudio.assignPos(j,nextSize));
 //		(*i)->initLookup(nextSize);
-        }
+//	}
+	mixer->setSourcesPosition( sources, false );//removed sources
 	queueLock.unlock();
 }
 
@@ -445,83 +457,46 @@ MRef<SoundSource *> SoundIO::getSoundSource(int32_t id){
 }
 
 void *SoundIO::playerLoop(void *arg){
-	SoundIO *active_soundcard = (SoundIO *)arg;
+	SoundIO *soundcard = (SoundIO *)arg;
 
-	short *buf = NULL;
-	//short *tmpbuf = NULL;
-	short *resbuf = NULL;
 	short *outbuf = NULL;
 	uint32_t nChannels = 0;
+
+	if( soundcard->getMixer().isNull() ) {
+		cerr << "Error: Sound I/O ... mixer is null ... stopping the thread!!!" << endl;
+		return NULL;
+	}
+	
 #ifdef DEBUG_OUTPUT
 	//uint32_t counter = 0;
 #endif
-	
 	while( true ){
 
-                active_soundcard->queueLock.lock();
-		if( active_soundcard->sources.size() == 0 ){
-			active_soundcard->queueLock.unlock();
+                soundcard->queueLock.lock();
+		if( soundcard->sources.size() == 0 ){
+			soundcard->queueLock.unlock();
 
-			if( active_soundcard->soundDev->isOpenedPlayback() ){
-				active_soundcard->closePlayback();
+			if( soundcard->soundDev->isOpenedPlayback() ){
+				soundcard->closePlayback();
 			}
 			
 			/* Wait for someone to add a source */
-                        active_soundcard->sourceListCondLock.lock();
-			active_soundcard->sourceListCond.wait( &active_soundcard->sourceListCondLock );
-                        active_soundcard->sourceListCondLock.unlock();
+                        soundcard->sourceListCondLock.lock();
+			soundcard->sourceListCond.wait( &soundcard->sourceListCondLock );
+                        soundcard->sourceListCondLock.unlock();
 
-			active_soundcard->openPlayback();
-			nChannels = active_soundcard->soundDev->getNChannelsPlay();
-			active_soundcard->queueLock.lock();
-		}
-		int nFrames = (SOUND_CARD_FREQ * 20) / 1000;
-
-                
-		if( !buf ){
-			buf = new short[nChannels * nFrames];
+			soundcard->openPlayback();
+			nChannels = soundcard->soundDev->getNChannelsPlay();
+			soundcard->mixer->init(nChannels);
+			soundcard->queueLock.lock();
 		}
 
-		if( !resbuf ){
-			resbuf = new short[nChannels * nFrames];
-		}
-		
-		if( !outbuf ){
-			outbuf = new short[nChannels * nFrames];
-		}
-		
-		memset( buf, '\0', nChannels * nFrames * sizeof( short ) );
-                
-		for (list<MRef<SoundSource *> >::iterator 
-				i = active_soundcard->sources.begin(); 
-				i != active_soundcard->sources.end(); i++){
+		outbuf = soundcard->mixer->mix( soundcard->sources );
+ 		
+		soundcard->queueLock.unlock();
 
-			(*i)->getSound( resbuf );
-
-			/* spatial audio */
-			(*i)->setPointer(spAudio.spatialize(resbuf, (*i),outbuf));
-
-			for (uint32_t j=0; j<nFrames*nChannels; j++){
-#ifdef IPAQ
-				/* iPAQ hack, to reduce the volume of the
-				 * output */
-				buf[j]+=(outbuf[j]/32);
-#else
-				buf[j]+=outbuf[j];
-#endif
-			}
-		}
-		active_soundcard->queueLock.unlock();
-
-#ifdef DEBUG_OUTPUT
-		//CESC ... got tired of it ... 
-		//if( !(counter++ % 100) ){
-			//fprintf(stderr ,  ".\n" );
-		//}
-#endif
-
-		if( active_soundcard->soundDev->isOpenedPlayback() ){
-			active_soundcard->send_to_card(buf, nFrames);
+		if( soundcard->soundDev->isOpenedPlayback() ){
+			soundcard->send_to_card(outbuf, soundcard->mixer->getFrameSize());
 		}
 		
 	}
@@ -532,23 +507,27 @@ void SoundIO::start_sound_player(){
         Thread::createThread(playerLoop, this);
 }
 
-short int lookupleftGlobal[65536][POS]; 
-short int lookuprightGlobal[65536][POS]; 
-
-void SoundIO::initLookup(){
-	for(int32_t j=0; j < POS; j++ ){
-		for(int32_t i=0;i<65536;i++){
-			/* without gain control */
-			lookupleftGlobal[i][j]=(short)((float)(i-32768)*lchvol[j]);
-			lookuprightGlobal[i][j]=(short)((float)(i-32768)*rchvol[j]);
-
-			/* with gain control 
-			   lookupleft[i]=(short)((float)(i-32768)*lchvol[nSources-1][position-1]);
-			   lookupright[i]=(short)((float)(i-32768)*rchvol[nSources-1][position-1]);
-			   */
-
-		} 
+bool SoundIO::setMixer( string type ) {
+	bool ret = true;
+	if( type == "simple" ) {
+#ifdef DEBUG_OUTPUT
+		cout << "Sound I/O: using Simple Mixer" << endl;
+#endif
+		mixer = new AudioMixerSimple();
+	} else if( type == "spatial" ) {
+#ifdef DEBUG_OUTPUT
+		cout << "Sound I/O: using Spatial Audio Mixer" << endl;
+#endif
+	 	MRef<SpAudio *> spatial = new SpAudio( 5 );
+	 	spatial->init();
+		mixer = new AudioMixerSpatial(spatial);
+	} else {
+		cerr << "ERROR: SoundIO could not create requested mixer! (type _" << type << "_ not understood)" << endl;
+		cerr << "ERROR:      Creating Spatial Audio mixer instead." << endl;
+		setMixer( "spatial" );
+		ret = false;
 	}
+	return ret;
 }
 
 RecorderReceiver::RecorderReceiver(SoundRecorderCallback *cb, 

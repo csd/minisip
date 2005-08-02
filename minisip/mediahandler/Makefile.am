@@ -11,6 +11,7 @@ libmediahandler_a_SOURCES = MediaHandler.cxx \
 			    SessionRegistry.cxx \
 			    DtmfSender.cxx
 			    
+			    
 noinst_HEADERS = MediaHandler.h \
                  Session.h \
 		 MediaStream.h \
@@ -19,4 +20,5 @@ noinst_HEADERS = MediaHandler.h \
 		 MediaCommandString.h \
 		 AudioMedia.h \
 		 SessionRegistry.h \
-		 DtmfSender.h
+		 DtmfSender.h 
+		 

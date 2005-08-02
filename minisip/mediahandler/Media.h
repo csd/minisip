@@ -23,19 +23,9 @@
 #ifndef MEDIA_H
 #define MEDIA_H
 
-#include<libmutil/MemObject.h>
-#include<libmutil/Mutex.h>
+#include"config.h"
 
-#ifndef _MSC_VER
-#include<stdint.h>
-#else
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
-#ifndef uint32_t
-typedef unsigned int  uint32_t;
-#endif
-#endif
+#include<libmutil/Mutex.h>
 
 #include"../soundcard/SoundRecorderCallback.h"
 #include"../soundcard/SoundIO.h"

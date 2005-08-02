@@ -26,33 +26,19 @@
 
 //#define HAVE_LIBASOUND
 
-
-#include"SoundDevice.h"
-
-#ifndef WIN32
-
-#include"OssSoundDevice.h"
-#ifdef HAVE_LIBASOUND
-#include"AlsaSoundDevice.h"
-#endif
-
-#else
-#include"DirectSoundDevice.h"
-#endif
+#include<config.h>
 
 #include"SoundRecorderCallback.h"
-#include"SoundIOPLCInterface.h"
+
+//#include"SoundIOPLCInterface.h"
+class SoundIOPLCInterface;
+
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
-#include<libmutil/MemObject.h>
 
-#include<iostream>
 #include<list>
-#include"../spaudio/SpAudio.h"
 
-#include"SoundSource.h"
-//#include "../aec/aec.h"
-
+//#include"../spaudio/SpAudio.h"
 
 #ifdef HAVE_LIBASOUND
 #define ALSA_PCM_NEW_HW_PARAMS_API
@@ -61,6 +47,25 @@
 #endif
 
 using namespace std;
+
+#include"AudioMixer.h" //this needs to be removed ... change in MRef
+class AudioMixer;
+
+class SoundSource;
+
+	//we need sounddevice.h for some defines
+#include"SoundDevice.h"
+class SoundDevice;
+
+#ifndef WIN32
+class OssSoundDevice;
+#ifdef HAVE_LIBASOUND
+class AlsaSoundDevice;
+#endif
+#else
+class DirectSoundDevice;
+#endif
+
 
 /**
  * Minimal API for recording and playing samples from/to a soundcard.
@@ -110,6 +115,7 @@ class SoundIO : public MObject{
 		 * 		Defaults to 8kHz.
 		 */
 		SoundIO(MRef<SoundDevice *>device, 
+			string mixerType,
                         int nChannels=2, 
                         int32_t speed=8000, 
                         int format=SOUND_S16LE);
@@ -191,10 +197,22 @@ class SoundIO : public MObject{
 		std::string getDevice(){return soundDev?soundDev->dev:"";};
 
 		virtual std::string getMemObjectType(){return "SoundIO";};
+		
+		/**
+		Access the mixer.
+		FIXME: this function needs to be made thread-safe is we intend
+		to be able to change the mixer on the fly ...
+		*/
+		MRef< AudioMixer *> getMixer() { return mixer;}
+		
+		/**
+		Given a string, create the mixer type requested.
+		If not understood, the Spatial Audio mixer is created.
+		*/
+		bool setMixer( string type );
+
 	private:
 
-		void initLookup();
-		
 		void send_to_card(short *buf, int32_t n_samples);
 
 		void cycle_sound_buffers();
@@ -207,9 +225,17 @@ class SoundIO : public MObject{
 
 		static void *playerLoop(void *);
 		
-
-		static SpAudio spAudio;
-
+		/**
+		An audio mixer object.
+		Use the config file to specify your desired mixer type
+		(see AudioMixerXXX in soundcard/ folder).
+		The playerLoop() function runs in a thread, which whenever
+		there is available audio from sources, calls the mixer to 
+		perform a mix with the audio from the sources. 
+		You can use minisip's standard mixers, or you can implement
+		your own one.
+		*/
+		MRef< AudioMixer *> mixer;
 
 		CondVar sourceListCond;
 		Mutex sourceListCondLock;
@@ -222,13 +248,11 @@ class SoundIO : public MObject{
 		
                 volatile int32_t recorder_buffer_size;
 		
-		
 		//synchronization of pushing data to buffers vs sending 
                 //from buffers to card
 		
                 //pthread_mutex_t queueLock;
                 Mutex queueLock;
-                
 		
 		//int openCount;
 		//bool duplex;

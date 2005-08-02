@@ -24,47 +24,90 @@
 #ifndef SPATIAL_AUDIO_H
 #define SPATIAL_AUDIO_H
 
+#include"config.h"
+
 #include<libmutil/MemObject.h>
 
-#ifdef _MSC_VER
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-#else
-#include<stdint.h>
-#endif
+// #ifdef _MSC_VER
+// #ifndef int32_t
+// typedef __int32  int32_t;
+// #endif
+// #else
+// #include<stdint.h>
+// #endif
 
-#define POS 5
-#define MAXSOURCES 10
+//number of positions in the spatial audio scheme
+#define SPATIAL_POS 5  
+
+//Max number of sources for spatial audio
+#define SPATIAL_MAXSOURCES 10
 
 class SoundSource;
 
-class SpAudio{
+class SpAudio: public MObject{
 
- public:
+	public:
 
-  SpAudio(int32_t numPos);
-  
+		/**
+		To use the SpAudio Object, you need to create it ... 
+		and call the init() function.
+		*/
+		SpAudio(int32_t numPos);
+		
+		void init();
 
-  int32_t getNumPos();
+		virtual std::string getMemObjectType() {return "SpAudio";}
+		int32_t getNumPos();
+		
+		int32_t spatialize (short *input,
+				MRef<SoundSource *> src,
+				short *outbuff);
+		
+		/**
+		Row is the position in the sources list: 1, 2, 3, 4 ...
+		Col is the new number of sources (thus, 0 <= row-1 <= col-1 )
+		It goes like: 
+		the size of the source list gives you the column to use. Then,
+		for each source in the list, its position in the list gives you
+		the row.
+		Currently, for five sources max, positions are like:
+			3 - center, front
+			1 - one ear, side
+			5 - one ear, the other side
+			2 - front side, between 1 and 3
+			4 - front other side, between 3 and 5
+		*/
+		int32_t assignPos(int row,
+				int col);
 
-  int32_t spatialize (short *input,
+		//All these 2D arrays should be dynamically created ...
+		//... this way, creating an SpAudio object would not 
+		//mean using up all this memory (until init() ).
+		/**
+		* Definition of the delay values depending on the position.
+		* Left channel
+		*/
+		int32_t lchdelay[SPATIAL_POS];
+		/**
+		* Definition of the delay values depending on the position.
+		* Right channel
+		*/
+		int32_t rchdelay[SPATIAL_POS];
+		
+		/**
+		* Definition of the matrix with the new position to be assigned depending
+		* on the number of calls being maintained
+		* FIXME: This needs a lot of improvement ... some kind of memory is needed,
+		* so sources dont move around like crazy.
+		*/
+		int32_t assmatrix[SPATIAL_MAXSOURCES][SPATIAL_MAXSOURCES];
 
-		      MRef<SoundSource *> src,
-		      short *outbuff);
+		short int lookupleftGlobal[65536][SPATIAL_POS]; 
+		short int lookuprightGlobal[65536][SPATIAL_POS]; 
 
+	private:
 
-  int32_t assignPos(int row,
-		    int col);
-
-  static int32_t lchdelay[POS];
-  static int32_t rchdelay[POS];
-
-  static int32_t assmatrix[MAXSOURCES][MAXSOURCES];
-
- private:
-
-  int32_t nPos;
+		int32_t nPos;
  
 };
 

@@ -24,9 +24,11 @@
 #ifndef _FILESOUNDSOURCE_H
 #define _FILESOUNDSOURCE_H
 
-#include"SoundIO.h"
+//#include"SoundIO.h"
 
+#include"SoundSource.h"
 
+class Resampler;
 
 
 /**

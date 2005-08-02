@@ -32,6 +32,8 @@
 #ifndef SOUNDCARDPLCINTERFACE_H
 #define SOUNDCARDPLCINTERFACE_H
 
+#include"config.h"
+
 /**
  * @author Erik Eliasson
  */

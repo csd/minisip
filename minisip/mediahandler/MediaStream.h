@@ -71,7 +71,7 @@ class MediaStream : public MObject{
 		//cesc
 		void setMuted( bool mute ) { muted = mute;}
 		bool isMuted() { return muted;}
-		bool muteKeepAlive( int32_t max);
+		bool muteKeepAlive( uint32_t max);
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );

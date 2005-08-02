@@ -20,12 +20,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #include"AudioMedia.h"
 #include"../rtp/RtpHeader.h"
 #include"MediaStream.h"
 #include"../soundcard/FileSoundSource.h"
+
+#include"../soundcard/resampler/Resampler.h"
+#include"../soundcard/SoundSource.h"
+
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
@@ -35,6 +37,7 @@
 #include<errno.h>
 #include<iostream>
 #include<stdio.h>
+
 #ifdef _MSC_VER
 
 #else

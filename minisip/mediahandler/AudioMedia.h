@@ -26,9 +26,11 @@
 #include "../aec/aec.h"		//hanning
 #endif
 
+#include"../soundcard/SoundSource.h"
+
 class AudioMediaSource;
 class SilenceSensor;
-
+class Resampler;
 
 class AudioMedia : public Media, public SoundRecorderCallback{
 

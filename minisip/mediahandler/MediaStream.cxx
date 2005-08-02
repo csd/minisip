@@ -436,7 +436,7 @@ string MediaStreamSender::getDebugString() {
 //packet every now and then.
 //Max indicates every how many silenced packets we send one keep-alive
 //It returns true if the packet needs to be let through, false otherwise
-bool MediaStream::muteKeepAlive( int32_t max ) {
+bool MediaStream::muteKeepAlive( uint32_t max ) {
 	bool ret = false;
 	
 	//if muted, only return true if packet is keep alive

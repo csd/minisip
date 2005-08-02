@@ -72,8 +72,8 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 	if( soundDev != "" ){
 
 		MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
-		MRef<SoundIO *> soundIo = new SoundIO( sounddev, 2, 48000 );
-						
+		MRef<SoundIO *> soundIo = new SoundIO( sounddev, config->soundIOmixerType, 2, 48000 );
+
 		std::list<MRef<Codec *> > codecList;
 		std::list<std::string>::iterator iCodec;
 		MRef<Codec *> selectedCodec;
