@@ -23,6 +23,17 @@ SUBDIRS="${SUBDIRS} libmsip"
 SUBDIRS="${SUBDIRS} libminisip"
 SUBDIRS="${SUBDIRS} minisip"
 
+#If you are debugging, you probably want to build with "g++ -g", to build
+#with all debug symbols, useful for coredumps with gdb.
+#Comment this line if you don't want to build with debug code
+compiler_debug="-ggdb"
+
+#Also useful, you may want to call make with some options ... supply them
+#here. 
+#For example, -k forces make to keep compiling even there are errors in the 
+#   sources. I like this one.
+make_options="-k"
+
 #Possible configure commands are shown in: ./configure --help
 #   check each folder for more details.
 
@@ -90,10 +101,10 @@ do
 	LOC_CXXFLAGS="$LOC_CXXFLAGS -I$PWD/include"
 	
 	LDFLAGS=$LOC_LDFLAGS 					\
-		CXXFLAGS="$LOC_CXXFLAGS -Wall"			\
+		CXXFLAGS="$LOC_CXXFLAGS -Wall $compiler_debug"	\
 			./configure $configure_params
 	
-	make
+	make $make_options
 	
 	cd ..
 done

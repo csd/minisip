@@ -21,6 +21,12 @@ SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
 SUBDIRS="${SUBDIRS} libminisip"
 
+#Also useful, you may want to call make with some options ... supply them
+#here. 
+#For example, -k forces make to keep compiling even there are errors in the 
+#   sources. I like this one.
+make_options="-k"
+
 for subdir in ${SUBDIRS}
 do
 	echo "+++++++++++++++++++++++++++++++++++++"
@@ -32,18 +38,9 @@ do
 	#force to relink ... 	
 	rm -f ${subdir}.la
 	
-	LDFLAGS="$LDFLAGS -L$PWD/.libs"
-	CXXFLAGS="$CXXFLAGS -I$PWD/include"
-
 	LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD/.libs:"
 	
-	make $1
-	
-	echo
-	echo
-	echo "LDFLAGS = $LDFLAGS" 
-	echo "CXXFLAGS = $CXXFLAGS"
-	echo
+	make $make_options $1
 	
 	cd ..
 done
@@ -74,23 +71,17 @@ rm -f ./codecs/libcodecs.a
 rm -f ./spaudio/libspaudio.a
 rm -f minisip/minisip
 
-LDFLAGS="$LDFLAGS -L$PWD/.libs"
-CXXFLAGS="$CXXFLAGS -I$PWD/include"
-
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD"
 
 echo
-echo
-echo "LDFLAGS = $LDFLAGS" 
-echo "CXXFLAGS = $CXXFLAGS"
 echo "LD_PATH = $LD_LIBRARY_PATH"
+echo
 
-make $1
+make $make_options $1
 
 cd ..
 
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
-#LD_LIBRARY_PATH="$LD_LIBRARY_PATH" minisip/minisip/minisip
 
 
