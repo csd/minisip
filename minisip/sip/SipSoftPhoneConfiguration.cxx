@@ -81,10 +81,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	p2tGroupListServerPort(0)
 {
 	inherited = new SipCommonConfig;
-#ifdef MINISIP_MEMDEBUG 
-	//dialogContainer.setUser("SipSoftPhoneConfiguration/sipphone");
-	sip.setUser("SipSoftPhoneConfiguration/sipphone");
-#endif
 }
 
 

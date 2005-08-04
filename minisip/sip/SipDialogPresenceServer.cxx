@@ -310,9 +310,6 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				));
 
         MRef<SipMessage*> pktr(*notify);
-#ifdef MINISIP_MEMDEBUG
-	pktr.setUser("SipDialogPresenceServer");
-#endif
 
         SipSMCommand scmd(
                 pktr, 

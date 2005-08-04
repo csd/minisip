@@ -128,9 +128,6 @@ gui(failed)              |                                    |                |
 bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 {//cerr<<"************************************invite receivedqwe"<<endl;
 	if (transitionMatch(command, SipCommandString::invite)){
-#ifdef MINISIP_MEMDEBUG
-		vc.setUser("WARNING - transaction");
-#endif
 #ifndef _MSC_VER
 		ts.save("a0_start_callingnoauth_invite");
 #endif
@@ -1200,10 +1197,6 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 #endif
 //-------------------------------------------------------------------------------------------------------------//
 	
-#ifdef MINISIP_MEMDEBUG
-	inv.setUser("SipDialogConfVoip");
-#endif
-	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
 	if(type=="join"){
 		//cerr << "SDCV: modifyjoininvite"<< endl;
@@ -1215,9 +1208,6 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 //	mdbg << "SipDialogVoip::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
         MRef<SipMessage*> pktr(*inv);
-#ifdef MINISIP_MEMDEBUG
-	pktr.setUser("SipDialogConfVoip");
-#endif
 
         SipSMCommand scmd(
                 pktr, 
@@ -1646,9 +1636,6 @@ void SipDialogConfVoip::sendRinging(const string &branch){
 
 void SipDialogConfVoip::sendNotAcceptable(const string &branch){
 	MRef<SipResponse*> not_acceptable = new SipResponse(branch,606,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
-#ifdef MINISIP_MEMDEBUG
-	not_acceptable.setUser("SipDialogConfVoip");
-#endif
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
 			new SipHeader(new SipHeaderValueWarning(getDialogConfig()->inherited->externalContactIP, 399, mediaSession->getErrorString() ) ));
@@ -1657,9 +1644,6 @@ void SipDialogConfVoip::sendNotAcceptable(const string &branch){
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(not_acceptable);
         MRef<SipMessage*> pref(*not_acceptable);
-#ifdef MINISIP_MEMDEBUG
-	pref.setUser("SipDialogConfVoip");
-#endif
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
@@ -1719,9 +1703,6 @@ MRef<SipInvite*> SipDialogConfVoip::getLastInvite(){
 
 void SipDialogConfVoip::setLastInvite(MRef<SipInvite*> i){ 
     lastInvite = i; 
-#ifdef MINISIP_MEMDEBUG
-    lastInvite.setUser("SipDialogConfVoip::lastInvite");
-#endif
 }
 
 MRef<LogEntry *> SipDialogConfVoip::getLogEntry(){

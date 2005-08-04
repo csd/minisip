@@ -169,9 +169,6 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
 								phoneconf, mediaSession, &connectList,confid, pkt->getCallId()));
 #endif
-#ifdef MINISIP_MEMDEBUG
-			voipConfCall.setUser("DefaultDialogHandler");
-#endif
 			sipStack->addDialog(voipConfCall);
 
 			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
@@ -209,9 +206,6 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
 								phoneconf, mediaSession, confid, pkt->getCallId()));
 #endif
-#ifdef MINISIP_MEMDEBUG
-			voipConfCall.setUser("DefaultDialogHandler");
-#endif
 			sipStack->addDialog(voipConfCall);
 
 			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
@@ -244,9 +238,6 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			
 			MRef<SipDialog*> voipCall( new SipDialogVoip(sipStack, callConf, 
 								phoneconf, mediaSession, pkt->getCallId()));
-#endif
-#ifdef MINISIP_MEMDEBUG
-			voipCall.setUser("DefaultDialogHandler");
 #endif
 			sipStack->addDialog(voipCall);
 
@@ -383,10 +374,6 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		
 		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf));
 		
-#ifdef MINISIP_MEMDEBUG
-		reg.setUser("DefaultDialogHandler");
-#endif
-		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
 		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
 		cmd.setDispatchCount(dispatchCount);
@@ -448,9 +435,6 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		}
 
 		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(sipStack, callConf, phoneconf, p2tDialog);
-#ifdef MINISIP_MEMDEBUG 
-		p2tUserDialog.setUser("DefaultDialogHandler");
-#endif
 		sipStack->addDialog(*p2tUserDialog);
 
 		//set CallId and localStarted in GroupMemberList
@@ -542,9 +526,6 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 		//start new SipDialogP2T
 		callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
 		p2tDialog = new SipDialogP2T(sipStack, callConf, phoneconf); 
-#ifdef MINISIP_MEMDEBUG 
-		p2tDialog.setUser("DefaultDialogHandler");
-#endif
 		p2tDialog->setGroupList(grpList);
 		//p2tDialog->getDialogConfig().callId = gID;
 		p2tDialog->setCallId(gID);
@@ -564,9 +545,6 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	//start SipDialogP2Tuser for inviting user
 	callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
 	MRef<SipDialogP2Tuser*> p2tDialogUser = new SipDialogP2Tuser(sipStack, callConf, phoneconf, p2tDialog);
-#ifdef MINISIP_MEMDEBUG
-	p2tDialogUser.setUser("DefaultDialogHandler");
-#endif
 	//p2tDialogUser->getDialogConfig().callId = command.getCommandPacket()->getCallId();
 	p2tDialogUser->setCallId( command.getCommandPacket()->getCallId() );
 	
@@ -708,9 +686,6 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 			
 				
 		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(sipStack, callConf, phoneconf, p2tDialog);
-#ifdef MINISIP_MEMDEBUG 
-		p2tUserDialog.setUser("DefaultDialogHandler");
-#endif
 		sipStack->addDialog(*p2tUserDialog);
 		
 		//set CallId and localStarted in GroupMemberList
@@ -737,9 +712,6 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 	//Start SipDialogP2T
 	MRef<SipDialogConfig*> callConf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconf->inherited) );
 	MRef<SipDialogP2T*> p2tDialog( new SipDialogP2T(sipStack, callConf, phoneconf)); 
-#ifdef MINISIP_MEMDEBUG 
-	p2tDialog.setUser("DefaultDialogHandler");
-#endif
 		
 	//Create Group Member List from the first parameter of the
 	//CommandString and set the correct Group Identity
@@ -776,9 +748,6 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		}
 		
 		MRef<SipDialogP2Tuser*> p2tUserDialog = new SipDialogP2Tuser(sipStack, callConf, phoneconf, p2tDialog);
-#ifdef MINISIP_MEMDEBUG 
-		p2tUserDialog.setUser("DefaultDialogHandler");
-#endif
 		sipStack->addDialog(*p2tUserDialog);
 		
 		//set CallId and localStarted in GroupMemberList

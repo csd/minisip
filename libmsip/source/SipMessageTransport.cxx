@@ -590,9 +590,6 @@ void SipMessageTransport::udpSocketRead(){
 	
 	int avail;
 	MRef<SipMessage*> pack;
-#ifdef MINISIP_MEMDEBUG
-	pack.setUser("SipMessageTransport::udpSocketRead:pack");
-#endif
 	int32_t nread;
     	fd_set set;
 	
@@ -708,9 +705,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	}
 	int avail;
 	MRef<SipMessage*> pack;
-#ifdef MINISIP_MEMDEBUG
-	pack.setUser("SipMessageTransport::streamSocketRead:pack");
-#endif
 	int32_t nread;
 	fd_set set;
 	struct timeval tv;

@@ -214,9 +214,18 @@ class LIBMUTIL_API MObject{
 
 		int getRefCount();
 		
-//		virtual std::string getMemObjectType(){return "(unknown)";}
-
-		virtual std::string getMemObjectType()=0;
+		/**
+		 * If mutil has been configured with --enable-memdebug
+		 * (MDEBUG defined) the unique type name (with the format
+		 * from typeinfo(...).name). An empty string will be
+		 * returned if memory debugging was not implemented.
+		 * Note that the format of the type name is compiler
+		 * dependent.
+		 *
+		 * The purpose of this method is to allow debugging
+		 * (such as showing which objects are allocated).
+		 */
+		virtual std::string getMemObjectType();
 
 	private:
 		int refCount;

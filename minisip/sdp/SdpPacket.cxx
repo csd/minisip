@@ -181,9 +181,6 @@ SdpPacket::SdpPacket(/*IPAddress &ipaddr*/ string ipAddr, int32_t local_media_po
 #endif
 
 void SdpPacket::addHeader(MRef<SdpHeader*> h){
-#ifdef MINISIP_MEMDEBUG
-	h.setUser("SdpPacket");
-#endif
 	headers.push_back(h);
 }
 

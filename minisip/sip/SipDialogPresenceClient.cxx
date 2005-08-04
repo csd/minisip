@@ -307,9 +307,6 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	sub->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pktr(*sub);
-#ifdef MINISIP_MEMDEBUG
-	pktr.setUser("SipDialogPresenceClient");
-#endif
 
         SipSMCommand scmd(
                 pktr, 

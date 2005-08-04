@@ -55,9 +55,6 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 		cSeqNo(cseq),
 		branch(b)
 {
-#ifdef MINISIP_MEMDEBUG 
-	dialog.setUser("SipTransaction");
-#endif
 	callId = callid;
 	if (b==""){
 		branch = "z9hG4bK" + itoa(rand());		//magic cookie plus random number

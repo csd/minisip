@@ -150,9 +150,6 @@ SipMessage::SipMessage(string b, int type):branch(b),type(type){
 }
 
 void SipMessage::addHeader(MRef<SipHeader*> header){
-#ifdef MINISIP_MEMDEBUG
-	header.setUser("SipMessage");
-#endif
 	if( header.isNull() ) {
 		merr << "ERROR: trying to add null header to message!"<<end;
 		return;
@@ -292,9 +289,6 @@ bool SipMessage::addLine(string line){
 	//ts.save("SipMessage-creating header start");
 	MRef<SipHeader*> hdr = SipHeader::parseHeader(line);
 	//ts.save("SipMessage-creating header end");
-#ifdef MINISIP_MEMDEBUG
-	hdr.setUser("SipMessage");
-#endif
 	if( hdr.isNull() ) //do not add if null
 		return false;
 	addHeader(hdr);
@@ -317,10 +311,6 @@ bool SipMessage::addLine(string line){
 
 
 void SipMessage::setContent(MRef<SipMessageContent*> content){
-#ifdef MINISIP_MEMDEBUG
-	if (content.getUser()=="")
-		content.setUser("SipMessage");
-#endif
 	this->content=content;
 	if( content ){
 		string contentType = content->getContentType();

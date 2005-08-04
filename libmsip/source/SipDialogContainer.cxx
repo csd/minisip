@@ -96,9 +96,6 @@ void SipDialogContainer::enqueueCommand(const SipSMCommand &command, int queue, 
 	struct queue_type item;
 	item.type = TYPE_COMMAND;
 	item.command = MRef<SipSMCommand*>(new SipSMCommand(command));
-#ifdef MINISIP_MEMDEBUG
-	item.command.setUser("SipDialogContainer::enqueCommand/item.command");
-#endif
 //	mdbg << "SipDialogContainer: enqueueing command "<< command << end;
        
         mlock.lock();
@@ -122,9 +119,6 @@ void SipDialogContainer::enqueueTimeout(MRef<SipTransaction*> receiver, const Si
 	struct queue_type item;
 	item.type = TYPE_TIMEOUT;
 	item.command = MRef<SipSMCommand*>( new SipSMCommand(command));
-#ifdef MINISIP_MEMDEBUG
-	item.command.setUser("SipDialogContainer::enqueueTimeout");
-#endif
 	item.transaction_receiver = receiver;
 	item.call_receiver = NULL;
 
@@ -140,10 +134,6 @@ void SipDialogContainer::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCo
 	struct queue_type item;
 	item.type = TYPE_TIMEOUT;
 	item.command = MRef<SipSMCommand*>( new SipSMCommand(command));
-	
-#ifdef MINISIP_MEMDEBUG
-	item.command.setUser("SipDialogContainer::enqueueTimeout");
-#endif
 	
 	item.call_receiver = receiver;
         
@@ -227,9 +217,6 @@ void SipDialogContainer::run(){
 }
 
 void SipDialogContainer::addDialog(MRef<SipDialog*> call){
-#ifdef MINISIP_MEMDEBUG
-	call.setUser("SipDialogContainer");
-#endif
 	dispatcher->addDialog(call);
 }
 

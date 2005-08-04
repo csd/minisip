@@ -28,6 +28,8 @@
 #include<libmutil/Mutex.h>
 #include<string>
 
+#include<typeinfo>
+
 using namespace std;
 
 #ifdef MDEBUG
@@ -75,9 +77,8 @@ int MObject::decRefCount(){
 #ifdef MDEBUG
 	global.unlock();
 	if (ref==0 && outputOnDestructor){
-	
-	
 		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(ref) + "; ptr=" + itoa((int)this);
+		
 		cerr << output << endl;
 	}
 #else
@@ -111,6 +112,14 @@ int MObject::getRefCount(){
 	return refCount;
 }
 
+string MObject::getMemObjectType(){
+#ifdef MDEBUG
+	return (typeid(*this)).name();
+#else
+	return "(unknown)";
+#endif
+}
+
 minilist<string> getMemObjectNames(){
 #ifdef MDEBUG
 	minilist<string> ret;
@@ -118,7 +127,7 @@ minilist<string> getMemObjectNames(){
 	for (int i=0; i< objs.size(); i++){
 		int count = objs[i]->getRefCount();
 		string countstr = count?itoa(count):"on stack"; 
-		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]));
+		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]) );
 	}
 	global.unlock();
 	return ret;
