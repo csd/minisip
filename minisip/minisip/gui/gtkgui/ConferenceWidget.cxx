@@ -49,11 +49,6 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 		secStatus( "", Gtk::ALIGN_LEFT ),
                 buttonBox(/*homogenius*/ true ),
 		conferenceButton("Add Member"),
-
-                secureImage(),// Gtk::StockID( "minisip_insecure" ), 
-                          //   Gtk::ICON_SIZE_DIALOG ),
-                insecureImage( Gtk::StockID( "minisip_insecure" ), 
-                             Gtk::ICON_SIZE_DIALOG ),
                 acceptButton( Gtk::Stock::OK, "Accept" ),
                 rejectButton( Gtk::Stock::CANCEL, "Reject" ),
 		bell(),
@@ -64,12 +59,8 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 	mainWindow->getCallback()->setConferenceController(conf);
 	mainConfId=confId;
 	bell = NULL;
-        //callIds.push_back( callId );
-	cerr<<"list of users in the current conference: "+remoteUri+" "+users<<endl;
 	
         Gtk::HBox * topBox = manage( new Gtk::HBox );
-
-        topBox->pack_start( secureImage, false, false, 5 );
 
         Gtk::VBox * rightTopBox = manage( new Gtk::VBox );
         topBox->pack_start( *rightTopBox, false, false, 5 );
@@ -95,26 +86,15 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 
 	status.set_use_markup( true );
 	secStatus.set_use_markup( true );
-
-/*#ifndef OLDLIBGLADEMM
-        
-        
-
-	
-        
-
-#endif*/
 	conferenceHBox.pack_end( conferenceButton, false, false ); 
         conferenceHBox.pack_end( conferenceEntry, true, true ); 
-	pack_start( conferenceHBox, false, false, 4 );
+	pack_end( conferenceHBox, false, false, 4 );
 	conferenceHBox.show_all();
 
 	buttonBox.add( acceptButton );
 	buttonBox.add( rejectButton );
 
 
-//	status.show();
-//	secStatus.show();
         topBox->show_all();
 	buttonBox.show_all();
 //	rejectButton.show();
@@ -132,20 +112,12 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 		status.set_markup( "<b>Incoming conference call from \n" + remoteUri
 				+ "</b>");
 		secStatus.set_markup( "<b>participants: </b>" + remoteUri+" "+users );
-                /*if( secure == "secure" ){
-                        secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
-                }
-                else{
-                        secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
-                }*/
 
 		startRinging();
 	}
 	else{
                 acceptButton.set_sensitive( false );
 		state = CONFERENCE_WIDGET_STATE_CREATED;
-		//status.set_markup( "<big><b>Connecting...</b></big>" );
-//                secStatus.set_markup( "Security requested" );
 		acceptButton.set_label( "Accept" );
 		rejectButton.set_label( "Quit" );
 	}
@@ -338,41 +310,14 @@ void ConferenceWidget::stopRinging(){
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 }
 
-#ifndef OLDLIBGLADEMM
-
-void ConferenceWidget::transfer(){
-        string uri = Glib::locale_from_utf8( transferEntry.get_text() );
-        if( uri.size() > 0 ){
-        
-                CommandString transfer( mainCallId, 
-                                SipCommandString::user_transfer, uri );
-                mainWindow->getCallback()->guicb_handleCommand( transfer );
-
-                transferEntry.set_sensitive( false );
-                transferButton.set_sensitive( false );
-
-                transferProgress.set_text( "Transfer requested..." );
-//                transferProgress.pulse();
-        }
-}
-
-void ConferenceWidget::dtmfPressed( uint8_t symbol ){
-        MRef<Session *> session = Session::registry->getSession( mainCallId );
-
-        if( session ){
-                
-                session->sendDtmf( symbol );
-        }
-}
-
-#endif
-
 string ConferenceWidget::getMainCallId(){
         return mainCallId;
 }
+
 string ConferenceWidget::getMainConfId(){
         return mainConfId;
 }
+
 bool ConferenceWidget::handlesConfId( string confId ){
         
 
@@ -381,15 +326,3 @@ bool ConferenceWidget::handlesConfId( string confId ){
         }
         return false;
 }
-
-/*StockButton::StockButton( Gtk::StockID stockId, Glib::ustring text ):
-	box( 2 ), image( stockId, Gtk::ICON_SIZE_SMALL_TOOLBAR ), label( text ){
-	box.pack_start( image, false, false );
-	box.pack_end( label, true, true );
-	add( box );
-	show_all();
-}
-
-void StockButton::set_label (const Glib::ustring& label){
-	this->label.set_text( label );
-}*/

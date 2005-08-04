@@ -56,6 +56,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	certificateButton->signal_clicked().connect( SLOT( *certificateDialog, &CertificateDialog::run ) );
 	
 	generalSettings = new GeneralSettings( refXml );
+	mediaSettings = new MediaSettings( refXml );
 	securitySettings = new SecuritySettings( refXml );
 	advancedSettings = new AdvancedSettings( refXml );
 
@@ -69,6 +70,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 
 SettingsDialog::~SettingsDialog(){
 	delete generalSettings;
+	delete mediaSettings;
 	delete securitySettings;
 	delete advancedSettings;
 	delete dialogWindow;
@@ -81,6 +83,7 @@ void SettingsDialog::setAccounts( Glib::RefPtr<AccountsList> list ){
 void SettingsDialog::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	this->config = config;
 	generalSettings->setConfig( config );
+	mediaSettings->setConfig( config );
 	securitySettings->setConfig( config );
 	advancedSettings->setConfig( config );
 	
@@ -103,6 +106,7 @@ void SettingsDialog::accept(){
 	string warning( "" );
 
 	warning += generalSettings->apply();
+	warning += mediaSettings->apply();
 	warning += securitySettings->apply();
 	warning += advancedSettings->apply();
 	
@@ -161,12 +165,6 @@ GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "pstnButton", pstnButton );
 	if( pstnButton == NULL ){
-		exit( 1 );
-	}
-	
-
-	refXml->get_widget( "soundEntry", soundEntry );
-	if( soundEntry == NULL ){
 		exit( 1 );
 	}
 
@@ -261,16 +259,134 @@ void GeneralSettings::setAccounts( Glib::RefPtr<AccountsList> list ){
 
 void GeneralSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	this->config = config;
-	soundEntry->set_text( config->soundDevice );
 }
 
 string GeneralSettings::apply(){
 	string err;
 	err += accountsList->saveToConfig( config );
-	config->soundDevice = soundEntry->get_text();
 	return err;
 
 }
+
+MediaSettings::MediaSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+
+	refXml->get_widget( "codecUpButton", codecUpButton );
+	refXml->get_widget( "codecDownButton", codecDownButton );
+
+	refXml->get_widget( "codecTreeView", codecTreeView );
+	
+	refXml->get_widget( "soundEntry", soundEntry );
+	refXml->get_widget( "videoEntry", videoEntry );
+	
+	refXml->get_widget( "videoLabel", videoLabel );
+	refXml->get_widget( "videoDeviceLabel", videoDeviceLabel );
+	
+	refXml->get_widget( "spaudioCheck", spaudioCheck );
+
+	/* Build the ListStore */
+	codecColumns = new Gtk::TreeModelColumnRecord();
+	codecColumns->add( codecEnabled );
+	codecColumns->add( codecName );
+
+	codecList = Gtk::ListStore::create( *codecColumns );
+
+	codecTreeView->set_model( codecList );
+//	codecTreeView->append_column( "Enabled", codecEnabled );
+	codecTreeView->append_column( "CODEC", codecName );
+
+	codecUpButton->signal_clicked().connect( BIND<int8_t>(
+		SLOT( *this, &MediaSettings::moveCodec ),
+		-1 ) );
+	
+	codecDownButton->signal_clicked().connect( BIND<int8_t>(
+		SLOT( *this, &MediaSettings::moveCodec ),
+		1 ) );
+#ifndef VIDEO_SUPPORT
+	videoEntry->hide();
+	videoLabel->hide();
+	videoDeviceLabel->hide();
+#endif
+
+
+}
+
+MediaSettings::~MediaSettings(){
+	delete codecColumns;
+}
+
+void MediaSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
+	list<string>::iterator iC;
+	Gtk::TreeModel::iterator listIterator;
+	this->config = config;
+	soundEntry->set_text( config->soundDevice );
+#ifdef VIDEO_SUPPORT
+	videoEntry->set_text( config->videoDevice );
+#endif
+
+	codecList->clear();
+
+	for( iC = config->audioCodecs.begin(); iC != config->audioCodecs.end();
+			iC ++ ){
+		listIterator = codecList->append();
+		(*listIterator)[codecName] = 
+			Glib::locale_to_utf8( *iC );
+		(*listIterator)[codecEnabled] = true;
+	}
+
+	if( config->soundIOmixerType == "spatial" ){
+		spaudioCheck->set_active( true );
+	}
+
+}
+
+void MediaSettings::moveCodec( int8_t upOrDown ){
+	Glib::RefPtr<Gtk::TreeSelection> treeSelection = 
+		codecTreeView->get_selection();
+
+	Gtk::TreeModel::iterator iter = treeSelection->get_selected();
+	Gtk::TreeModel::iterator iter2 = treeSelection->get_selected();
+
+	if( iter ){
+		if( upOrDown > 0 ){
+			iter2 ++;
+		}
+		else{
+			if( iter2 == codecList->children().begin() ){
+				// already on the top of the list
+				return;
+			}
+			iter2 --;
+		}
+
+		if( iter2 ){
+			codecList->iter_swap( iter, iter2 );
+		}
+	}
+}
+
+string MediaSettings::apply(){
+	Gtk::TreeModel::iterator iC;
+	config->soundDevice = soundEntry->get_text();
+	config->audioCodecs.clear();
+
+	for( iC = codecList->children().begin(); iC ; iC ++ ){
+		config->audioCodecs.push_back( 
+			Glib::locale_from_utf8( (*iC)[codecName] ) );
+	}
+
+	if( spaudioCheck->get_active() ){
+		config->soundIOmixerType = "spatial";
+	}
+	else{
+		config->soundIOmixerType = "simple";
+	}
+	
+#ifdef VIDEO_SUPPORT
+	config->videoDevice = videoEntry->get_text();
+#endif
+	return "";	
+}
+
 
 SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	

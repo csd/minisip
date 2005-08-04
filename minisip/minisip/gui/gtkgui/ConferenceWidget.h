@@ -56,9 +56,6 @@ class MainWindow;
 };*/
 
 class ConferenceWidget : public Gtk::VBox
-#ifndef OLDLIBGLADEMM
-,public DtmfHandler 
-#endif
 {
 	public:
 		ConferenceWidget(string configUri, string confId, string users,string remoteUri,string callId, MainWindow * mw, bool incoming);
@@ -80,11 +77,6 @@ class ConferenceWidget : public Gtk::VBox
 		void startRinging();
 		void stopRinging();
 
-#ifndef OLDLIBGLADEMM
-                void transfer();
-                virtual void dtmfPressed( uint8_t symbol );
-#endif
-
 		MainWindow * mainWindow;
 
 		int32_t state;
@@ -92,19 +84,6 @@ class ConferenceWidget : public Gtk::VBox
 		Gtk::Label status;
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
-#ifndef OLDLIBGLADEMM
-                Gtk::Expander dtmfArrow;
-                
-                Gtk::Expander transferArrow;
-                Gtk::HBox transferHBox;
-                Gtk::HBox transferHBox2;
-                Gtk::Entry transferEntry;
-                Gtk::Button transferButton;
-        //        Gtk::ProgressBar transferProgress;
-                Gtk::Label transferProgress;
-
-		
-#endif
                 Gtk::HBox conferenceHBox;
                 Gtk::HBox conferenceHBox2;
 		Gtk::Entry conferenceEntry;

@@ -32,6 +32,7 @@
 #include"AccountsList.h"
 
 class GeneralSettings;
+class MediaSettings;
 class SecuritySettings;
 class AdvancedSettings;
 class SipSoftPhoneConfiguration;
@@ -62,6 +63,7 @@ class SettingsDialog
 		Gtk::Button * certificateButton;
 		Gtk::Dialog * dialogWindow;
 		GeneralSettings * generalSettings;
+		MediaSettings * mediaSettings;
 		SecuritySettings * securitySettings;
 		AdvancedSettings * advancedSettings;
 		MRef<SipSoftPhoneConfiguration *> config;
@@ -97,7 +99,47 @@ class GeneralSettings
 		Gtk::Button * defaultButton;
 		Gtk::Button * pstnButton;
 
+		MRef<SipSoftPhoneConfiguration *> config;
+
+};
+
+class MediaSettings
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
+
+	public:
+		MediaSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		~MediaSettings();
+
+		string apply();
+		
+		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+
+	private:
+
+		void moveCodec( int8_t upOrDown );
+
+		Gtk::Button * codecUpButton;
+		Gtk::Button * codecDownButton;
+
+		Gtk::TreeView * codecTreeView;
+		
 		Gtk::Entry * soundEntry;
+		Gtk::Entry * videoEntry;
+
+		Glib::RefPtr<Gtk::ListStore> codecList;
+		
+		Gtk::TreeModelColumnRecord * codecColumns;
+		Gtk::TreeModelColumn<bool> codecEnabled;	
+		Gtk::TreeModelColumn<Glib::ustring> codecName;
+
+		Gtk::Label * videoLabel;
+		Gtk::Label * videoDeviceLabel;
+
+		Gtk::CheckButton * spaudioCheck;
+
 
 		MRef<SipSoftPhoneConfiguration *> config;
 
