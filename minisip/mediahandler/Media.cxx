@@ -115,6 +115,10 @@ MRef<Codec *> Media::getCodec( uint8_t payloadType ){
 	return NULL;
 }
 
+std::list< MRef<Codec *> >  Media::getAvailableCodecs(){
+	return codecList;
+}
+
 void Media::registerMediaSender( MRef<MediaStreamSender *> sender ){
 	sendersLock.lock();
 	senders.push_back( sender );

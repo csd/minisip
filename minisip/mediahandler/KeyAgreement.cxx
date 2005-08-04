@@ -602,7 +602,7 @@ string Session::initiatorParse(){
 }
 
 void Session::addStreamsToKa( bool initiating ){
-	list< MRef<MediaStream *> >::iterator iSender;
+	list< MRef<MediaStreamSender *> >::iterator iSender;
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_SRTP_ID);
 	uint8_t j = 1;
 	for( iSender = mediaStreamSenders.begin(); 

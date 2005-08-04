@@ -72,6 +72,8 @@ class Media : public MObject{
 		bool receive;
 		bool send;
 		
+		std::list< MRef<Codec *> >  Media::getAvailableCodecs();
+
 		std::list<std::string> getSdpAttributes();
 		void addSdpAttribute( std::string attribute );
 		

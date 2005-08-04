@@ -116,7 +116,8 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 
 	list< MRef<Media *> >::iterator i;
 	MRef<Session *> session;
-	MRef<MediaStream *> stream;
+	MRef<MediaStreamReceiver *> rStream;
+	MRef<MediaStreamSender *> sStream;
 	MRef<RtpReceiver *> rtpReceiver;
 	string contactIp;
 
@@ -128,14 +129,14 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	for( i = media.begin(); i != media.end(); i++ ){
 		if( (*i)->receive ){
 			rtpReceiver = new RtpReceiver( ipProvider );
-			stream = new MediaStreamReceiver( *i, rtpReceiver, ipProvider );
-			session->addMediaStreamReceiver( stream );
+			rStream = new MediaStreamReceiver( *i, rtpReceiver, ipProvider );
+			session->addMediaStreamReceiver( rStream );
 		}
 		
 		if( (*i)->send ){
-			stream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
-			stream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
-			session->addMediaStreamSender( stream );
+			sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
+			sStream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
+			session->addMediaStreamSender( sStream );
 		}
 	}
 

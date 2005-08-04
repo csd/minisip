@@ -47,10 +47,6 @@ class MediaStream : public MObject{
 		
 		/* SDP information */
 		std::string getSdpMediaType();/* audio, video, appli;ation... */
-		// pn501 New function for multiple codecs
-		std::list<uint8_t> getAllRtpPayloadTypes();
-		// pn501 New function for multiple codecs
-		std::list<std::string> getAllRtpMaps();
 		std::list<std::string> getSdpAttributes();
 
 		virtual std::string getMemObjectType(){return "MediaStream";}
@@ -113,6 +109,8 @@ class MediaStreamReceiver : public MediaStream{
 
 		void handleRtpPacket( SRtpPacket * packet );
 		uint32_t getId();
+
+		std::list<MRef<Codec *> > getAvailableCodecs();
 
 	private:
 		MRef<RtpReceiver *> rtpReceiver;

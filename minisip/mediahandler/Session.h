@@ -30,7 +30,8 @@
 #include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
 #include<../sdp/SdpPacket.h>
-class MediaStream;
+class MediaStreamReceiver;
+class MediaStreamSender;
 class SdpHeaderM;
 //class KeyAgreement;
 class IPAddress;
@@ -57,8 +58,8 @@ class Session : public MObject{
 		bool setSdpAnswer( MRef<SdpPacket *> answer, std::string peerUri );
 		bool setSdpOffer ( MRef<SdpPacket *> offer, std::string peerUri );
 
-		void addMediaStreamReceiver( MRef<MediaStream *> );
-		void addMediaStreamSender( MRef<MediaStream *> );
+		void addMediaStreamReceiver( MRef<MediaStreamReceiver *> );
+		void addMediaStreamSender( MRef<MediaStreamSender *> );
 
 		std::string getErrorString();
 		uint16_t getErrorCode();
@@ -94,10 +95,10 @@ class Session : public MObject{
 		std::string peerUri;
 		
 		MRef<SdpPacket *> emptySdp();
-		MRef<MediaStream *> matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, IPAddress * remoteAddress );
+		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, IPAddress * remoteAddress );
 
-		std::list< MRef<MediaStream *> > mediaStreamReceivers;
-		std::list< MRef<MediaStream *> > mediaStreamSenders;
+		std::list< MRef<MediaStreamReceiver *> > mediaStreamReceivers;
+		std::list< MRef<MediaStreamSender *> > mediaStreamSenders;
 		Mutex mediaStreamSendersLock;
 
 		MRef<KeyAgreement *> ka;

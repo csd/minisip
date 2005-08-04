@@ -149,17 +149,11 @@ void RtpReceiver::run(){
 		mediaStreamsLock.lock();
 		
 		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
-				// pn501 Rewritten to account for multiple codecs
-			// pn501 Added "Current"
-			//if( (*i)->getCurrentRtpPayloadType() == packet->getHeader().getPayloadType() ){
-			//	(*i)->handleRtpPacket( packet );
-			//}
-			// pn501 New version:
-			std::list<uint8_t> list = (*i)->getAllRtpPayloadTypes();
-			std::list<uint8_t>::iterator iList;
-			for( iList = list.begin(); iList != list.end(); iList ++ ){
-				//uint8_t n = packet->getHeader().getPayloadType();
-				if ( (*iList) == packet->getHeader().getPayloadType() ) {
+			std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
+			std::list<MRef<Codec *> >::iterator iC;
+			
+			for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+				if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
 					(*i)->handleRtpPacket( packet );
 					break;
 				}
