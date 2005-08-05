@@ -116,7 +116,11 @@ MRef<Codec *> Media::getCodec( uint8_t payloadType ){
 }
 
 std::list< MRef<Codec *> >  Media::getAvailableCodecs(){
-	return codecList;
+	list<MRef<Codec *> > copy;
+	codecListLock.lock();
+	copy = codecList;
+	codecListLock.unlock();
+	return copy;
 }
 
 void Media::registerMediaSender( MRef<MediaStreamSender *> sender ){

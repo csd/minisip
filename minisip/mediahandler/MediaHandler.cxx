@@ -56,6 +56,13 @@ using namespace std;
 MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider ){
 
 	this->ipProvider = ipProvider;
+	this->config = config;
+	init();
+}
+
+void MediaHandler::init(){
+
+	media.clear();
 
 #ifdef VIDEO_SUPPORT
 	MRef<Grabber *> grabber = Grabber::create( config->videoDevice );
@@ -94,9 +101,7 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList );
 		
 		registerMedia( *media );
-		if( !audioMedia ){
-			audioMedia = media;
-		}
+		audioMedia = media;
 	}
 
 	muteAllButOne = config->muteAllButOne;
@@ -172,11 +177,16 @@ void MediaHandler::handleCommand( CommandString command ){
 	}
 	
 	if( command.getOp() == MediaCommandString::set_active_source ){
-		#ifdef DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
 		cerr << "MediaHandler::handleCmd: received set active source" 
 				<< endl << "     " << command.getString()  << endl;
-		#endif
+#endif
 		setActiveSource( command.getDestinationId() );
+		return;
+	}
+
+	if( command.getOp() == MediaCommandString::reload ){
+		init();
 		return;
 	}
 }

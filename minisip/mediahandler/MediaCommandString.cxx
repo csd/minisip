@@ -34,3 +34,5 @@ const string MediaCommandString::stop_ringing="stop_ringing";
 const string MediaCommandString::session_debug="session_debug";
 
 const string MediaCommandString::set_active_source="set_active_source";
+
+const string MediaCommandString::reload="reload";

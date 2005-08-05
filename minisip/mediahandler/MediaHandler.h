@@ -66,12 +66,15 @@ class MediaHandler : public MObject, public SessionRegistry {
 		bool muteAllButOne;
 
 	private:
+		void init();
+
 		std::list< MRef<Media *> > media;
 
 		string ringtoneFile;
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
+		MRef<SipSoftPhoneConfiguration *> config;
 		
 		//cesc
 		void setActiveSource( std::string callid );

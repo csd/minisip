@@ -23,7 +23,9 @@
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
 #include"AccountsList.h"
+#include"../Gui.h"
 #include"../../../sip/SipSoftPhoneConfiguration.h"
+#include"../../../mediahandler/MediaCommandString.h"
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -76,6 +78,10 @@ SettingsDialog::~SettingsDialog(){
 	delete dialogWindow;
 }
 
+void SettingsDialog::setCallback( GuiCallback * callback ){
+	this->callback = callback;
+}
+
 void SettingsDialog::setAccounts( Glib::RefPtr<AccountsList> list ){
 	generalSettings->setAccounts( list );
 }
@@ -111,6 +117,10 @@ void SettingsDialog::accept(){
 	warning += advancedSettings->apply();
 	
 	config->save();
+	// FIXME: only reload the mediahandler when something actually
+	// changed in the media properties
+	CommandString cmdstr = CommandString( "", MediaCommandString::reload );
+	callback->guicb_handleMediaCommand( cmdstr );
 
 	if( warning != "" ){
 #ifdef OLDLIBGLADEMM

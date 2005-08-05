@@ -40,6 +40,12 @@ class MediaCommandString{
 		Activate the source indicated by "callid" param
 		*/
 		static const std::string set_active_source;
+
+		/**
+		Tell the media handler to rebuild itself from the new
+		configuration
+		*/
+		static const std::string reload;
 		
 		
 	

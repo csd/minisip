@@ -59,7 +59,7 @@ class Media : public MObject{
 		virtual std::list<std::string> getAllRtpMaps();
 		//pn507 Added for changing the default codec
 //		virtual bool setCurrentCodec( uint8_t newCodecPayloadType );
-        virtual MRef<Codec*> getCodec( uint8_t payloadType );
+		virtual MRef<Codec*> getCodec( uint8_t payloadType );
 
 		virtual void playData( RtpPacket * rtpPacket )=0;
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
@@ -84,15 +84,10 @@ class Media : public MObject{
                 Media();
                 Media( MRef<Codec *> defaultCodec );
 
-		// pn430 Added for multicodec
 		Media( std::list<MRef<Codec *> > codecList );
 				
-		// pn Removed for multicodec
-		//MRef<Codec *> codec;
-		// pn430 Added for multicodec
 		std::list< MRef<Codec *> > codecList;
-		// pn430 Added for multicodec
-//		MRef<Codec *> preferredCodec;
+		Mutex codecListLock;
 		
 		std::list< MRef<MediaStreamSender *> > senders;
 		Mutex sendersLock;

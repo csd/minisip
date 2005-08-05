@@ -113,6 +113,7 @@ class MediaStreamReceiver : public MediaStream{
 		std::list<MRef<Codec *> > getAvailableCodecs();
 
 	private:
+		std::list<MRef<Codec *> > codecList;
 		MRef<RtpReceiver *> rtpReceiver;
 		uint32_t id;
 		MRef<IpProvider *> ipProvider;

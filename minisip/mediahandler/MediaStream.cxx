@@ -232,6 +232,7 @@ MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 	externalPort = 0;
 	ssrc = 0;
 	running = false;
+	codecList = media->getAvailableCodecs();
 }
 
 uint32_t MediaStreamReceiver::getId(){
@@ -302,7 +303,7 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
 }
 
 std::list<MRef<Codec *> > MediaStreamReceiver::getAvailableCodecs(){
-	return media->getAvailableCodecs();
+	return codecList;
 }
 
 MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket ):
