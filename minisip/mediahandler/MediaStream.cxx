@@ -70,9 +70,6 @@ static int strcasecmp(const char *s1, const char *s2){
 
 MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
 	disabled = false;
-	selectedCodec = NULL;
-	setMuted( true );
-	muteCounter = 0;
 }
 
 std::string MediaStream::getSdpMediaType(){
@@ -116,19 +113,14 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                         s1 = codecRtpMap.find("/");
                         bool sdpRtpMapEqual = !strcasecmp( codecRtpMap.substr(0, s1).c_str(), sdpRtpMap.substr(0,s2).c_str() );
                         if ( sdpRtpMapEqual ) {
-                                if( !selectedCodec ){
-                                        selectedCodec = media->createCodecInstance( codecPayloadType  );
-                                        payloadType = sdpPayloadType;
-                                }
+				localPayloadType = codecPayloadType;
                                 return true;
                         }
                         else continue;
                 }
                 else{
                         if( sdpPayloadType == codecPayloadType ){
-                                if( !selectedCodec ){
-                                        selectedCodec = media->createCodecInstance( codecPayloadType );
-                                }
+				localPayloadType = codecPayloadType;
                                 return true;
                         }
                 }
@@ -209,10 +201,6 @@ MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc ){
 	return initCrypto( ssrc );
 }
 
-uint32_t MediaStream::getSsrc(){
-	return ssrc;
-}
-
 void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
 	kaLock.lock();
 	this->ka = ka;
@@ -230,7 +218,6 @@ MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 			ipProvider( ipProvider ){
 	id = rand();
 	externalPort = 0;
-	ssrc = 0;
 	running = false;
 	codecList = media->getAvailableCodecs();
 }
@@ -258,9 +245,6 @@ void MediaStreamReceiver::stop(){
 	ssrcListLock.unlock();
 	
 	running = false;
-}
-
-void MediaStreamReceiver::setPort( uint16_t port ){
 }
 
 uint16_t MediaStreamReceiver::getPort(){
@@ -308,11 +292,14 @@ std::list<MRef<Codec *> > MediaStreamReceiver::getAvailableCodecs(){
 
 MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket ):
 	MediaStream( media ){
+	selectedCodec = NULL;
 	remotePort = 0; 
 	seqNo = 0;
 	ssrc = rand();
 	lastTs = rand();
         payloadType = 255;
+	setMuted( true );
+	muteCounter = 0;
 	if( senderSocket ){
 		this->senderSock = senderSocket;
 	}
@@ -390,8 +377,7 @@ void MediaStreamSender::setRemoteAddress( IPAddress * remoteAddress ){
 string MediaStream::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + " this=" + itoa((int)this) +
-		": port=" + itoa(getPort()) +
-		"; ssrc=" + itoa(getSsrc());
+		": port=" + itoa(getPort());
 
 	return ret;
 }
@@ -411,7 +397,6 @@ string MediaStreamSender::getDebugString() {
 	
 	ret = getMemObjectType() + " this=" + itoa((int)this) +
 		": port=" + itoa(getPort()) +
-		"; ssrc=" + itoa(getSsrc()) +
 		"; remotePort=" + itoa(remotePort);
 	
 	if( isMuted() == true )
@@ -426,7 +411,7 @@ string MediaStreamSender::getDebugString() {
 //packet every now and then.
 //Max indicates every how many silenced packets we send one keep-alive
 //It returns true if the packet needs to be let through, false otherwise
-bool MediaStream::muteKeepAlive( uint32_t max ) {
+bool MediaStreamSender::muteKeepAlive( uint32_t max ) {
 	bool ret = false;
 	
 	//if muted, only return true if packet is keep alive
@@ -441,4 +426,18 @@ bool MediaStream::muteKeepAlive( uint32_t max ) {
 		ret = true;
 	}
 	return ret;
+}
+
+bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
+	bool result = MediaStream::matches( m, formatIndex );
+
+	if( result && !selectedCodec ){
+		selectedCodec = media->createCodecInstance( 
+				localPayloadType  );
+		payloadType = m->getFormat( formatIndex );
+	}
+}
+
+uint32_t MediaStreamSender::getSsrc(){
+	return ssrc;
 }

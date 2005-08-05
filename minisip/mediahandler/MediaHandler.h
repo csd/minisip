@@ -41,18 +41,45 @@ class IpProvider;
 class MediaHandler : public MObject, public SessionRegistry {
 
 	public:
+		/**
+		 * Constructor, created on startup
+		 * @param config reference to the softphone configuration
+		 * @param ipProvider reference to the public IP provider, used
+		 * for NAT traversal mechanisms
+		 */
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );
 // 		~MediaHandler();
 		
-		MRef<Session *>createSession( SipDialogSecurityConfig &config, string callId = "" );
+		/**
+		 * Creates a new media session, for use in a new VoIP call
+		 * @param config the call specific configuration
+		 * @param callId identifier shared with the SIP stack
+		 * @returns a reference to the session created
+		 */
+		MRef<Session *> createSession( SipDialogSecurityConfig &config, string callId = "" );
 		
+		/**
+		 * Registers a new media type (audio or video
+		 * @param media a reference to the representation of the
+		 * medium to add
+		 */
 		void registerMedia( MRef<Media *> media );
 
+		/**
+		 * Handles a command sent by the user interface
+		 * @param command the command to handle
+		 */
 		void handleCommand( CommandString command );
+		
+		/**
+		 * Provides the IP address given as contact to the external
+		 * peers
+		 * @returns a string containing the IP address
+		 */
 		std::string getExtIP();
+		
+		
 		virtual std::string getMemObjectType(){return "MediaHandler";}
-
-		MRef<Codec *> createCodec( uint8_t payloadType );
 
 #ifdef DEBUG_OUTPUT	
 		virtual string getDebugString();
