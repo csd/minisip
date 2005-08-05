@@ -119,6 +119,11 @@ class SoundIO : public MObject{
                         int nChannels=2, 
                         int32_t speed=8000, 
                         int format=SOUND_S16LE);
+
+		/**
+		 * Destructor
+		 */
+		~SoundIO();
 		
 		/**
 		 * Initializes the soundcard.

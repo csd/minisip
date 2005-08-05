@@ -117,6 +117,16 @@ SoundIO::SoundIO(
 	start_recorder();
 }
 
+SoundIO::~SoundIO(){
+	RecorderReceiver * rr;
+	
+	while( recorder_callbacks.size() ){
+		delete *( recorder_callbacks.begin() );
+		recorder_callbacks.pop_back();
+	}
+
+}
+
 
 
 void SoundIO::closeRecord(){
