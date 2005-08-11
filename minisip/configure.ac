@@ -322,8 +322,13 @@ if test "x${enable_gtk}" != "xno"
     )
     QTGUI="no"
 fi
-
 AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
+
+PKG_CHECK_MODULES(HILDON, [hildon-libs],
+	[
+	 	AC_DEFINE(HILDON_SUPPORT, [], [Support the Hildon extensions])
+	])
+
 
 
 

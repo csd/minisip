@@ -22,7 +22,7 @@
 
 
 
-
+#include<config.h>
 #include "../../../conf/ConferenceControl.h"
 #include"MainWindow.h"
 #include"CallWidget.h"
@@ -45,8 +45,11 @@
 #include"../../../mediahandler/MediaCommandString.h"
 
 #include<libmutil/trim.h>
-//#include<libmsip/SipSoftPhone.h>
-//
+
+#ifdef HILDON_SUPPORT
+#include<hildon-lgpl/hildon-widgets/hildon-app.h>
+#endif
+
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
 #define BIND SigC::bind 
@@ -58,12 +61,10 @@
 MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	Gtk::Button * callButton;
-	//Gtk::Button * conferenceButton;
 	Gtk::Button * imButton;
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
-	//Gtk::MenuBar  * minisipMenubar;  //not used
 	Gtk::MenuItem * addContactMenu;
 	Gtk::MenuItem * addAddressContactMenu;
 	Gtk::MenuItem * removeContactMenu;
@@ -87,11 +88,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 		exit( 1 );
 	}
 
-	//Get the Glade-instantiated Dialog:
-	//Gtk::Widget* mainWindow = 0;
 	refXml->get_widget( "minisipMain", mainWindowWidget );
-
-	refXml->get_widget( "mainTabWidget", mainTabWidget );
 
 	refXml->get_widget( "phoneBookTree", phoneBookTreeView );
 	
@@ -116,6 +113,49 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "dtmfExpander", dtmfExpander );
 	dtmfExpander->add( *dtmfWidget );
 #endif
+
+#ifdef HILDON_SUPPORT
+	/* Create the hildon app */
+	mainWindowWidget = dynamic_cast<Gtk::Window *>( 
+			manage( Glib::wrap( hildon_app_new() ) ) );
+	
+	/* Create a hildon app view */
+	Gtk::Container *appview = dynamic_cast<Gtk::Container *>( 
+		manage( Glib::wrap( hildon_appview_new( "Minisip" ) ) ) );
+
+	hildon_app_set_appview( HILDON_APP( mainWindowWidget->gobj() ), 
+			HILDON_APPVIEW( appview->gobj() ) );
+
+	hildon_app_set_title( HILDON_APP( mainWindowWidget->gobj() ), 
+			"Minisip" );
+
+	Gtk::Widget * w;
+	Gtk::HBox * mainHBox;
+
+	mainHBox = manage( new Gtk::HBox( true, 6 ) );
+
+	mainTabWidget = new Gtk::Notebook();
+	
+	refXml->get_widget( "dialVBox", w );
+
+	w->reparent( *mainHBox );
+	mainHBox->add( *mainTabWidget );
+
+	mainHBox->show_all();
+
+	appview->add( *mainHBox );
+
+	Gtk::Menu * mainMenu = dynamic_cast<Gtk::Menu *>( Glib::wrap( 
+	  hildon_appview_get_menu( HILDON_APPVIEW( appview->gobj() ) ) ) );
+
+	refXml->get_widget( "fileMenu", w );
+	w->reparent( *mainMenu );
+	refXml->get_widget( "viewMenu", w );
+	w->reparent( *mainMenu );
+	refXml->get_widget( "contactMenu", w );
+	w->reparent( *mainMenu );
+#endif
+
 
 
 	treeSelection = phoneBookTreeView->get_selection();
@@ -233,11 +273,12 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	uriEntry->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
 
-#ifndef WIN32
+#if not defined WIN32 && not defined HILDON_SUPPORT
 	trayIcon = new MTrayIcon( this, refXml );
 
 	mainWindowWidget->signal_hide().connect( SLOT( *this, &MainWindow::hideSlot ));
 #endif
+
 	logWidget = manage( new LogWidget( this ) );
 
 	mainTabWidget->append_page( *logWidget, "Call list" );
@@ -253,6 +294,9 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	mainTabWidget->signal_switch_page().connect(
 		SLOT( *this, &MainWindow::onTabChange ) );
+
+	mainWindowWidget->hide();
+	
 
 
 }

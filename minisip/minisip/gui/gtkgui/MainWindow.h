@@ -182,6 +182,8 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		
 		minilist< MRef<LogEntry *> > logEntries;
 		Mutex logEntriesLock;
+
 };
+
 
 #endif	

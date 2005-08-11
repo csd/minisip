@@ -19,8 +19,8 @@ minisip_LDADD =
 
 
 if GTK_GUI
-AM_LDFLAGS +=  @GLADEMM_LIBS@
-AM_CXXFLAGS += @GLADEMM_CFLAGS@
+AM_LDFLAGS +=  @HILDON_LIBS@ @GLADEMM_LIBS@
+AM_CXXFLAGS += @HILDON_CFLAGS@ @GLADEMM_CFLAGS@
 minisip_LDADD += gui/gtkgui/libminisip_gtkgui.a
 else !GTK_GUI
 if TEXT_UI
