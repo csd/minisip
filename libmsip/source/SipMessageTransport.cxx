@@ -268,7 +268,7 @@ uint32_t SipMessageParser::findContentLength(){
 			uint32_t j = 0;
 			string num;
 			
-			while( i + j < index && (buffer[i+j] == ' ' || buffer[i+j] == '\t') ){
+			while( i + j + 17 < index && (buffer[i+j+17] == ' ' || buffer[i+j+17] == '\t') ){
 				j++;
 			}
 			
