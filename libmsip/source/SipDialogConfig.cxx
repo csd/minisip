@@ -139,54 +139,6 @@ int32_t SipCommonConfig::getLocalSipPort(bool usesStun) {
 	return localSipPort;
 }
 
-void SipCommonConfig::save( XMLFileParser * parser ){
-
-	/***********************************************************
-	 * Advanced settings
-	 ***********************************************************/
-	parser->changeValue("local_udp_port", itoa(localUdpPort));
-	parser->changeValue("local_tcp_port", itoa(localTcpPort));
-	parser->changeValue("local_tls_port", itoa(localTlsPort));
-	parser->changeValue("auto_answer", autoAnswer?"yes":"no");
-
-	parser->changeValue("transport", transport);
-
-}
-
-void SipCommonConfig::load( XMLFileParser * parser ){
-	transport = parser->getValue("transport", "UDP");
-#ifdef OLD_MEDIA
-	if (parser->getValue("codec_prio_1","none")=="none"){
-		codecs.push_back(new G711CODEC());
-		codecs.push_back(new ILBCCODEC());
-	} else {
-		if (parser->getValue("codec_prio_1","none")=="PCMu")
-			codecs.push_back(new G711CODEC());
-
-		if (parser->getValue("codec_prio_1","none")=="iLBC")
-			codecs.push_back(new ILBCCODEC());
-
-		if (parser->getValue("codec_prio_2","none")=="PCMu")
-			codecs.push_back(new G711CODEC());
-
-		if (parser->getValue("codec_prio_2","none")=="iLBC")
-			codecs.push_back(new ILBCCODEC());
-	}
-#endif
-
-	localUdpPort = parser->getIntValue("local_udp_port",5060);
-	externalContactUdpPort = localUdpPort;
-
-	localTcpPort = parser->getIntValue("local_tcp_port",5060);
-	localTlsPort = parser->getIntValue("local_tls_port",5061);
-
-	autoAnswer = parser->getValue("auto_answer", "no") == "yes";
-
-}
-
-
-
-
 
 SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig *> commonconf) : proxyConnection(NULL) {
 	inherited = new SipCommonConfig; /// We want do do a "deep copy" here. This is so that

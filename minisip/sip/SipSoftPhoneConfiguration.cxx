@@ -90,7 +90,10 @@ void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ... 
 	parser->changeValue("version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	
-	inherited->save( parser );
+	parser->changeValue("local_udp_port", itoa(inherited->localUdpPort));
+	parser->changeValue("local_tcp_port", itoa(inherited->localTcpPort));
+	parser->changeValue("local_tls_port", itoa(inherited->localTlsPort));
+	parser->changeValue("auto_answer", inherited->autoAnswer?"yes":"no");
 	securityConfig.save( parser );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
@@ -376,7 +379,12 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 	ringtone = parser->getValue("ringtone","");
 
-	inherited->load( parser );
+	inherited->localUdpPort = parser->getIntValue("local_udp_port",5060);
+	inherited->externalContactUdpPort = inherited->localUdpPort; //?
+	inherited->localTcpPort = parser->getIntValue("local_tcp_port",5060);
+	inherited->localTlsPort = parser->getIntValue("local_tls_port",5061);
+	inherited->autoAnswer = parser->getValue("auto_answer", "no") == "yes";
+
 	securityConfig.load( parser );
 
 	// FIXME: per identity security

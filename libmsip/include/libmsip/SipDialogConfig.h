@@ -319,9 +319,6 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		
 		bool autoAnswer;
 
-		void save( XMLFileParser * parser );
-		void load( XMLFileParser * parser );
-
 };
 
 
