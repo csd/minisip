@@ -91,6 +91,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	refXml->get_widget( "minisipMain", mainWindowWidget );
 
 	refXml->get_widget( "phoneBookTree", phoneBookTreeView );
+	refXml->get_widget( "mainTabWidget", mainTabWidget );
 	
 	refXml->get_widget( "phoneMenu", phoneMenu );
 	refXml->get_widget( "phoneAddMenu", phoneAddMenu );
