@@ -12,6 +12,7 @@ class XMLFileParser;
 class certificate_chain;
 class ca_db;
 class SipIdentity;
+class ConfBackend;
 
 class SipDialogSecurityConfig{
 	public:
@@ -33,8 +34,8 @@ class SipDialogSecurityConfig{
 		bool dh_enabled;
 		bool check_cert;
 
-		void save( XMLFileParser * parser );
-		void load( XMLFileParser * parser );
+		void save( MRef<ConfBackend *> backend );
+		void load( MRef<ConfBackend *> backend );
 };
 
 

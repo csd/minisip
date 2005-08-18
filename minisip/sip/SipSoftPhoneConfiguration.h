@@ -51,6 +51,7 @@
 #include"../minisip/contactdb/PhoneBook.h"
 //#include"../minisip/contactdb/ContactDb.h"
 #include"../codecs/Codec.h"
+#include"../minisip/confbackend/ConfBackend.h"
 
 //#include"../mediahandler/MediaHandler.h"
 
@@ -71,11 +72,7 @@ class SipSoftPhoneConfiguration : public MObject{
 		virtual std::string getMemObjectType(){return "SipSoftPhoneConfig";}
 
 		void save();
-		std::string load( std::string filename );
-		
-		string configFileName;
-		static string getDefaultConfigFilename();
-		static string getDefaultConfigFileString();
+		std::string load( MRef<ConfBackend *> be );
 		
 		static string getDefaultPhoneBookFilename();
 		static string getDefaultPhoneBookString();
@@ -83,6 +80,14 @@ class SipSoftPhoneConfiguration : public MObject{
 		static void installConfigFile(string config, string address="", bool overwrite=false);
 		
 		bool checkVersion( uint32_t fileVersion, string fileVersion_str );
+
+
+		/**
+		 * Saves the default options to the ConfBackend.
+		 * @param backend a reference to the ConfBackend object
+		 * to use for saving the default values
+		 */
+		void saveDefault( MRef<ConfBackend *> backend );
 		
 		MRef<SipCommonConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
 		
@@ -174,6 +179,9 @@ class SipSoftPhoneConfiguration : public MObject{
 		 * used for P2T Sessions.
 		 */
 		int32_t p2tGroupListServerPort;
+
+	private:
+		MRef<ConfBackend *> backend;
 };
 
 #endif

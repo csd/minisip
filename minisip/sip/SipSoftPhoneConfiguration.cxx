@@ -43,6 +43,7 @@
 #include"../mediahandler/MediaHandler.h"
 #include"../minisip/contactdb/PhoneBook.h"
 #include"../minisip/contactdb/MXmlPhoneBookIo.h"
+#include"../minisip/confbackend/ConfBackend.h"
 #include<fstream>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/NetworkException.h>
@@ -85,16 +86,14 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 
 
 void SipSoftPhoneConfiguration::save(){
-	XMLFileParser * parser = new XMLFileParser( ""/*configFileName*/ );
-	
 	//Set the version of the file ... 
-	parser->changeValue("version", CONFIG_FILE_VERSION_REQUIRED_STR );
+	backend->save("version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	
-	parser->changeValue("local_udp_port", itoa(inherited->localUdpPort));
-	parser->changeValue("local_tcp_port", itoa(inherited->localTcpPort));
-	parser->changeValue("local_tls_port", itoa(inherited->localTlsPort));
-	parser->changeValue("auto_answer", inherited->autoAnswer?"yes":"no");
-	securityConfig.save( parser );
+	backend->save("local_udp_port", itoa(inherited->localUdpPort));
+	backend->save("local_tcp_port", itoa(inherited->localTcpPort));
+	backend->save("local_tls_port", itoa(inherited->localTlsPort));
+	backend->save("auto_answer", inherited->autoAnswer?"yes":"no");
+	securityConfig.save( backend );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
 	uint32_t ii = 0;
@@ -107,66 +106,66 @@ void SipSoftPhoneConfiguration::save(){
 		
 		(*iIdent)->lock();
 
-		parser->changeValue( accountPath + "account_name", (*iIdent)->identityIdentifier );
+		backend->save( accountPath + "account_name", (*iIdent)->identityIdentifier );
 		
-		parser->changeValue( accountPath + "sip_uri", (*iIdent)->sipUsername + "@" + (*iIdent)->sipDomain );
+		backend->save( accountPath + "sip_uri", (*iIdent)->sipUsername + "@" + (*iIdent)->sipDomain );
 		
-		parser->changeValue( accountPath + "proxy_addr", (*iIdent)->sipProxy.sipProxyAddressString );
+		backend->save( accountPath + "proxy_addr", (*iIdent)->sipProxy.sipProxyAddressString );
 
 		if( (*iIdent)->sipProxy.sipProxyUsername != "" ){
-			parser->changeValue( accountPath + "proxy_username", (*iIdent)->sipProxy.sipProxyUsername );
+			backend->save( accountPath + "proxy_username", (*iIdent)->sipProxy.sipProxyUsername );
 		
-			parser->changeValue( accountPath + "proxy_password", (*iIdent)->sipProxy.sipProxyPassword );
+			backend->save( accountPath + "proxy_password", (*iIdent)->sipProxy.sipProxyPassword );
 		}
 
 		if( (*iIdent) == pstnIdentity ){
-			parser->changeValue( accountPath + "pstn_account", "yes" );
+			backend->save( accountPath + "pstn_account", "yes" );
 		}
 
 		if( (*iIdent) == inherited->sipIdentity ){
-			parser->changeValue( accountPath + "default_account", "yes" );
+			backend->save( accountPath + "default_account", "yes" );
 		}
 		
 		if( (*iIdent)->registerToProxy ) {
-			parser->changeValue( accountPath + "register", "yes" );
-			parser->changeValue( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+			backend->save( accountPath + "register", "yes" );
+			backend->save( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
 		} else {
-			parser->changeValue( accountPath + "register", "no");
-			parser->changeValue( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+			backend->save( accountPath + "register", "no");
+			backend->save( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
 		}
 		string transport = (*iIdent)->sipProxy.getTransport();
 		
 		if( transport == "TCP" ){
-			parser->changeValue( accountPath + "transport", "TCP" );
+			backend->save( accountPath + "transport", "TCP" );
 		}
 		else if( transport == "TLS" ){
-			parser->changeValue( accountPath + "transport", "TLS" );
+			backend->save( accountPath + "transport", "TLS" );
 		}
 		else{
-			parser->changeValue( accountPath + "transport", "UDP" );
+			backend->save( accountPath + "transport", "UDP" );
 		}
 
 		(*iIdent)->unlock();
 
 	}
 	
-	parser->changeValue( "sound_device", soundDevice );
+	backend->save( "sound_device", soundDevice );
 	
-	parser->changeValue( "mute_all_but_one", muteAllButOne? "yes":"no" );
+	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" );
 	
-	parser->changeValue( "mixer_type", soundIOmixerType );
+	backend->save( "mixer_type", soundIOmixerType );
 	
 #ifdef VIDEO_SUPPORT
-	parser->changeValue( "video_device", videoDevice );
-	parser->changeValue( "frame_width", itoa( frameWidth ) );
-	parser->changeValue( "frame_height", itoa( frameHeight ) );
+	backend->save( "video_device", videoDevice );
+	backend->save( "frame_width", frameWidth );
+	backend->save( "frame_height", frameHeight );
 #endif
 
 	list<string>::iterator iCodec;
 	uint8_t iC = 0;
 
 	for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
-		parser->changeValue( "codec[" + itoa( iC ) + "]", *iCodec );
+		backend->save( "codec[" + itoa( iC ) + "]", *iCodec );
 	}
 
 	/************************************************************
@@ -175,34 +174,36 @@ void SipSoftPhoneConfiguration::save(){
 	ii = 0;
 	list< MRef<PhoneBook *> >::iterator iPb;
 	for( iPb = phonebooks.begin(); iPb != phonebooks.end(); ii++, iPb ++ ){
-		parser->changeValue( "phonebook[" + itoa(ii) + "]", 
+		backend->save( "phonebook[" + itoa(ii) + "]", 
 				     (*iPb)->getPhoneBookId() );
 	}
 
 	/************************************************************
 	 * STUN settings
 	 ************************************************************/
-	parser->changeValue("use_stun", (useSTUN ? "yes" : "no") );
-	parser->changeValue("stun_server_autodetect", findStunServerFromSipUri?"yes":"no");
+	backend->save("use_stun", (useSTUN ? "yes" : "no") );
+	backend->save("stun_server_autodetect", findStunServerFromSipUri?"yes":"no");
 	if (findStunServerFromDomain){
-		parser->changeValue("stun_server_domain", stunDomain );
+		backend->save("stun_server_domain", stunDomain );
 	}
 	else{
-		parser->changeValue("stun_server_domain", "");
+		backend->save("stun_server_domain", "");
 	}
 
-	parser->changeValue("stun_manual_server", userDefinedStunServer);
+	backend->save("stun_manual_server", userDefinedStunServer);
 	
 	/************************************************************
 	 * Advanced settings
 	 ************************************************************/
-	parser->changeValue("tcp_server", tcp_server? "yes":"no");
-	parser->changeValue("tls_server", tls_server? "yes":"no");
+	backend->save("tcp_server", tcp_server? "yes":"no");
+	backend->save("tls_server", tls_server? "yes":"no");
 
-	parser->changeValue("ringtone", ringtone);
+	backend->save("ringtone", ringtone);
 
-	parser->saveToFile( configFileName );
-	delete( parser );
+	backend->commit();
+
+//	parser->saveToFile( configFileName );
+	//delete( parser );
 
 	//WARN about possible inconsistencies and the need to restart MiniSIP
 	string warn;
@@ -211,156 +212,147 @@ void SipSoftPhoneConfiguration::save(){
 	merr << warn << end;
 }
 
-string SipSoftPhoneConfiguration::load( string filename ){
-	configFileName = filename;
+string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
+	backend = be;
 
-	installConfigFile( this->configFileName );
+	//installConfigFile( this->configFileName );
 
 	proxyConnection = NULL;
 	usePSTNProxy = false;
 
 	string ret = "";
 
-	XMLFileParser * parser = new XMLFileParser( filename );
 	string account;
 	int ii = 0;
 
 	/* Check version first of all! */
 	int32_t fileVersion;
 	string fileVersion_str;
-	fileVersion = parser->getIntValue("version", 0);
+	fileVersion = backend->loadInt("version", 0);
 		//get the string version also ... don't use the itoa.h
-	fileVersion_str = parser->getValue("version", "0");
+	fileVersion_str = backend->loadString("version", "0");
 	if( !checkVersion( fileVersion, fileVersion_str ) ) {
 		//check version prints a message ... 
 		//here, deal with the error
-		ret = "ERROR";
-		delete parser;
-		return ret;
+//		ret = "ERROR";
+		saveDefault( backend );
+//		return ret;
 	}
 	
-	try{
-		do{
-			
+	do{
 
-			string accountPath = string("account[")+itoa(ii)+"]/";
-			account = parser->getValue(accountPath+"account_name");
-			MRef<SipIdentity*> ident= new SipIdentity();
 
-			ident->setIdentityName(account);
+		string accountPath = string("account[")+itoa(ii)+"]/";
+		account = backend->loadString(accountPath+"account_name");
+		if( account == "" ){
+			break;
+		}
+		MRef<SipIdentity*> ident= new SipIdentity();
 
-			if( ii == 0 ){
-				inherited->sipIdentity = ident;
+		ident->setIdentityName(account);
+
+		if( ii == 0 ){
+			inherited->sipIdentity = ident;
+		}
+
+		ii++;
+
+		string uri = backend->loadString(accountPath + "sip_uri");
+		ident->setSipUri(uri);
+		string proxy = backend->loadString(accountPath + "proxy_addr","");
+
+		uint16_t proxyPort = backend->loadInt(accountPath +"proxy_port", 5060);
+
+		ident->setDoRegister(backend->loadString(accountPath + "register","")=="yes");
+		try{
+			if (proxy!=""){
+				ident->sipProxy = SipProxy(proxy);
 			}
-
-			ii++;
-
-			try{
-				string uri = parser->getValue(accountPath + "sip_uri");
-				ident->setSipUri(uri);
-				string proxy = parser->getValue(accountPath + "proxy_addr","");
-				
-				uint16_t proxyPort = parser->getIntValue(accountPath +"proxy_port", 5060);
-				
-				ident->setDoRegister(parser->getValue(accountPath + "register","")=="yes");
-				try{
-					if (proxy!=""){
-						ident->sipProxy = SipProxy(proxy);
-					}
-					else{
-						autodetectProxy = true;
-						proxy = SipProxy::findProxy(uri,proxyPort);
-						if (proxy == "unknown"){
-							ret += "Minisip could not guess your SIP proxy. Please check your settings and your network access.";
-						}
-						else{
-							ident->sipProxy = SipProxy(proxy);
-						}
-					}
+			else{
+				autodetectProxy = true;
+				proxy = SipProxy::findProxy(uri,proxyPort);
+				if (proxy == "unknown"){
+					ret += "Minisip could not guess your SIP proxy. Please check your settings and your network access.";
 				}
-				catch( NetworkException * exc ){
-					ret +="Minisip could not resolve "
-					      "the SIP proxy of the account "
-					      + ident->identityIdentifier + ".";
-					ident->setDoRegister( false );
+				else{
+					ident->sipProxy = SipProxy(proxy);
 				}
-				ident->sipProxy.sipProxyPort = proxyPort;
-				string proxyUser = parser->getValue(accountPath +"proxy_username", "");
+			}
+		}
+		catch( NetworkException * exc ){
+			ret +="Minisip could not resolve "
+				"the SIP proxy of the account "
+				+ ident->identityIdentifier + ".";
+			ident->setDoRegister( false );
+		}
+		ident->sipProxy.sipProxyPort = proxyPort;
+		string proxyUser = backend->loadString(accountPath +"proxy_username", "");
 
-				ident->sipProxy.sipProxyUsername = proxyUser;
-				string proxyPass = parser->getValue(accountPath +"proxy_password", "");
-				ident->sipProxy.sipProxyPassword = proxyPass;
+		ident->sipProxy.sipProxyUsername = proxyUser;
+		string proxyPass = backend->loadString(accountPath +"proxy_password", "");
+		ident->sipProxy.sipProxyPassword = proxyPass;
 
-				ident->sipProxy.setTransport( parser->getValue(accountPath +"transport", "UDP") );
+		ident->sipProxy.setTransport( backend->loadString(accountPath +"transport", "UDP") );
 
-				string registerExpires = parser->getValue(accountPath +"register_expires", "");
-				if (registerExpires != ""){
-					ident->sipProxy.setRegisterExpires( registerExpires );
-					//set the default value ... do not change this value anymore
-					ident->sipProxy.setDefaultExpires( registerExpires ); 
-				} 
+		string registerExpires = backend->loadString(accountPath +"register_expires", "");
+		if (registerExpires != ""){
+			ident->sipProxy.setRegisterExpires( registerExpires );
+			//set the default value ... do not change this value anymore
+			ident->sipProxy.setDefaultExpires( registerExpires ); 
+		} 
 #ifdef DEBUG_OUTPUT
-				else {
-					//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
-				}
-				//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->sipProxy.getRegisterExpires() << endl;
-				//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->sipProxy.getDefaultExpires() << endl;
+		else {
+			//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
+		}
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->sipProxy.getRegisterExpires() << endl;
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->sipProxy.getDefaultExpires() << endl;
 #endif
-				
-				if (parser->getValue(accountPath + "pstn_account","")=="yes"){
-					pstnIdentity = ident;
-					usePSTNProxy = true;
-					ident->securitySupport = false;
-				}
 
-				if (parser->getValue(accountPath + "default_account","")=="yes"){
-					inherited->sipIdentity = ident;
-				}
-				
-				identities.push_back(ident);
+		if (backend->loadString(accountPath + "pstn_account","")=="yes"){
+			pstnIdentity = ident;
+			usePSTNProxy = true;
+			ident->securitySupport = false;
+		}
 
-			}
+		if (backend->loadString(accountPath + "default_account","")=="yes"){
+			inherited->sipIdentity = ident;
+		}
 
-			catch(XMLElementNotFound enf){
-				cerr << "WARNING: got <"<< enf.what()<<"> when parsing configuration for account "<<account <<endl;;
-			}
+		identities.push_back(ident);
 
-		}while( true );
 
-	}catch(XMLElementNotFound enf){
-		;
-	}
+	}while( true );
 
-	tcp_server = parser->getValue("tcp_server", "yes") == "yes";
-	tls_server = parser->getValue("tls_server", "no") == "yes";
+	tcp_server = backend->loadString("tcp_server", "yes") == "yes";
+	tls_server = backend->loadString("tls_server", "no") == "yes";
 
-	soundDevice =  parser->getValue("sound_device","");
+	soundDevice =  backend->loadString("sound_device","");
 	
-	muteAllButOne = parser->getValue("mute_all_but_one", "yes") == "yes";
+	muteAllButOne = backend->loadString("mute_all_but_one", "yes") == "yes";
 
-	soundIOmixerType = parser->getValue("mixer_type", "spatial");
+	soundIOmixerType = backend->loadString("mixer_type", "spatial");
 	cerr << "CESC: sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
 #ifdef VIDEO_SUPPORT
-	videoDevice = parser->getValue( "video_device", "" );
-	frameWidth = parser->getIntValue( "frame_width", 176 );
-	frameHeight = parser->getIntValue( "frame_height", 144 );
+	videoDevice = backend->loadString( "video_device", "" );
+	frameWidth = backend->loadInt( "frame_width", 176 );
+	frameHeight = backend->loadInt( "frame_height", 144 );
 #endif
 
-	useSTUN = parser->getValue("use_stun","no")=="yes";
-	findStunServerFromSipUri = parser->getValue("stun_server_autodetect","no")==string("yes");
+	useSTUN = backend->loadString("use_stun","no")=="yes";
+	findStunServerFromSipUri = backend->loadString("stun_server_autodetect","no")==string("yes");
 
-	findStunServerFromDomain = parser->getValue("stun_server_domain","")!="";
-	stunDomain = parser->getValue("stun_server_domain","");
-	useUserDefinedStunServer = parser->getValue("stun_manual_server","")!="";
-	userDefinedStunServer = parser->getValue("stun_manual_server","");
+	findStunServerFromDomain = backend->loadString("stun_server_domain","")!="";
+	stunDomain = backend->loadString("stun_server_domain","");
+	useUserDefinedStunServer = backend->loadString("stun_manual_server","")!="";
+	userDefinedStunServer = backend->loadString("stun_manual_server","");
 	phonebooks.clear();
 
 
 	int i=0;
 	string s;
 	do{
-		s = parser->getValue("phonebook["+itoa(i)+"]","");
+		s = backend->loadString("phonebook["+itoa(i)+"]","");
 
 		if (s!=""){
 			MRef<PhoneBook *> pb;
@@ -377,15 +369,15 @@ string SipSoftPhoneConfiguration::load( string filename ){
 		i++;
 	}while(s!="");
 
-	ringtone = parser->getValue("ringtone","");
+	ringtone = backend->loadString("ringtone","");
 
-	inherited->localUdpPort = parser->getIntValue("local_udp_port",5060);
+	inherited->localUdpPort = backend->loadInt("local_udp_port",5060);
 	inherited->externalContactUdpPort = inherited->localUdpPort; //?
-	inherited->localTcpPort = parser->getIntValue("local_tcp_port",5060);
-	inherited->localTlsPort = parser->getIntValue("local_tls_port",5061);
-	inherited->autoAnswer = parser->getValue("auto_answer", "no") == "yes";
+	inherited->localTcpPort = backend->loadInt("local_tcp_port",5060);
+	inherited->localTlsPort = backend->loadInt("local_tls_port",5061);
+	inherited->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
 
-	securityConfig.load( parser );
+	securityConfig.load( backend );
 
 	// FIXME: per identity security
 	if( inherited->sipIdentity){
@@ -394,11 +386,11 @@ string SipSoftPhoneConfiguration::load( string filename ){
 
 	audioCodecs.clear();
 	int iCodec = 0;
-	string codec = parser->getValue("codec["+ itoa( iCodec ) + "]","");
+	string codec = backend->loadString("codec["+ itoa( iCodec ) + "]","");
 
 	while( codec != "" && iCodec < 256 ){
 		audioCodecs.push_back( codec );
-		codec = parser->getValue("codec["+ itoa( ++iCodec ) +"]","");
+		codec = backend->loadString("codec["+ itoa( ++iCodec ) +"]","");
 	}
 	if( audioCodecs.size() == 0 ) { //MEEC!! Error!
 		//This is an error. It can happen, for example, if someone manually
@@ -408,63 +400,56 @@ string SipSoftPhoneConfiguration::load( string filename ){
 			<< "***  Adding default G.711 ..." << end
 			<< "ERROR! ********************************************" << end;
 		audioCodecs.push_back( "G.711" );
-		save(); //save the changes ... 
+		be->save( "codec[0]", "G.711" ); //save the changes ... 
 	}
 	
-	delete parser;
 	return ret;
 
 }
 
+void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
+	be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
+	
+	be->save( "account[0]/account_name", "My account" );
+	be->save( "account[0]/sip_uri", "username@domain.org" );
+	be->save( "account[0]/proxy_addr", "sip.domain.org" );
+	be->save( "account[0]/register", "yes" );
+	be->save( "account[0]/proxy_port", 5060 );
+	be->save( "account[0]/proxy_username", "user" );
+	be->save( "account[0]/proxy_password", "password" );
+	be->save( "account[0]/pstn_account", "no" );
+	be->save( "account[0]/default_account", "yes" );
+	
+	be->save( "tcp_server", "yes" );
+	be->save( "tls_server", "no" );
 
-string SipSoftPhoneConfiguration::getDefaultConfigFileString() {
-	string defaultConfig =
-		"<version>" CONFIG_FILE_VERSION_REQUIRED_STR "</version>"
-		"<account>\n"
-			"<account_name> My account </account_name>\n"
-			"<sip_uri> username@domain.org </sip_uri>\n"
-			"<proxy_addr> sip.domain.org </proxy_addr>\n"
-			"<register> yes </register>\n"
-			"<register_expires> 1000 </register_expires>\n"
-			"<proxy_port> 5060 </proxy_port>\n"
-			"<proxy_username> user </proxy_username>\n"
-			"<proxy_password> password </proxy_password>\n"
-			"<pstn_account> no </pstn_account>\n"
-			"<default_account> yes </default_account>\n"
-			"<transport> UDP </transport>\n"
-		"</account>\n"
-		
-//		"<stun_server_ip> stun.ssvl.kth.se</stun>\n"
-		"<tcp_server>yes</tcp_server>\n"
-		"<tls_server>no</tls_server>\n"
-		
-		"<secured>no</secured>\n"
-		"<ka_type>dh</ka_type>\n"
-		"<psk>Unspecified PSK</psk>\n"
-		
-		"<certificate></certificate>\n"
-		"<private_key></private_key>\n"
-		"<ca_certificate></ca_certificate>\n"
-		
-		"<dh_enabled>no</dh_enabled>\n"
-		"<psk_enabled>no</psk_enabled>\n"
-		"<check_cert>no</check_cert>\n"
-//		"<register>no</register>\n"
-//		"<proxy_port>5060</proxy_port>\n"
-		"<local_udp_port> 5060 </local_udp_port>\n"
-		"<local_tcp_port> 5060 </local_tcp_port>\n"
-		"<local_tls_port> 5061 </local_tls_port>\n"
-		"<local_media_port> 10000 </local_media_port>\n"                                
-		"<sound_device>/dev/dsp</sound_device>\n"
-		"<mute_all_but_one>yes</mute_all_but_one>\n"
-		"<mixer_type>spatial</mixer_type>\n"
+	be->save( "secured", "no" );
+	be->save( "ka_type", "psk" );
+	be->save( "psk", "Unspecified PSK" );
+	be->save( "certificate", "" );
+	be->save( "private_key", "" );
+	be->save( "ca_certificate", "" );
+	be->save( "dh_enabled", "no" );
+	be->save( "psk_enabled", "no" );
+	be->save( "check_cert", "yes" );
+	be->save( "local_udp_port", 5060 );
+	be->save( "local_tcp_port", 5060 );
+	be->save( "local_tls_port", 5061 );
+
+	be->save( "sound_device", "/dev/dsp" );
+	be->save( "mute_all_but_one", "yes" );
+	be->save( "mixer_type", "spatial" );
 #ifdef HAS_SPEEX
-		"<codec>speex</codec>\n"
+	be->save( "codec[0]", "speex" );
+	be->save( "codec[1]", "G.711" );
+#else
+	be->save( "codec[0]", "G.711" );
 #endif
-		"<codec>G.711</codec>\n"
-		"<phonebook>file://" + SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() +
-		"</phonebook>\n";
-	return defaultConfig;
+
+	be->save( "phonebook", "file://" + getDefaultPhoneBookFilename() );
+
+	be->commit();
+	
 }
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookString() {
@@ -477,23 +462,6 @@ string SipSoftPhoneConfiguration::getDefaultPhoneBookString() {
 		"</contact>\n"
 		"</phonebook>\n";
 	return defaultPhonebook;
-}
-
-string SipSoftPhoneConfiguration::getDefaultConfigFilename() {
-	char *home = getenv("HOME");
-	string ret;
-	if (home==NULL){
-		merr << "WARNING: Could not determine home directory"<<end;
-
-#ifdef WIN32
-		ret=string("c:\\minisip.conf"); 
-#else
-		ret = string("/.minisip.conf");
-#endif
-	}else{
-		ret = string(home)+ string("/.minisip.conf");
-	}
-	return ret;
 }
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
@@ -512,6 +480,7 @@ string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	return phonebookFileName;
 }
 
+#if 0
 void SipSoftPhoneConfiguration::installConfigFile(string config, string address, bool overwrite){
 
 	string filename = config;
@@ -553,15 +522,17 @@ void SipSoftPhoneConfiguration::installConfigFile(string config, string address,
 #endif
 
 }
+#endif
 
 bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion, string fileVersion_str ) {
 	string str="";
 	bool ret = false;
 	if( fileVersion != CONFIG_FILE_VERSION_REQUIRED ) {
+#if 0
 		str += 	"\n\n"
 			"ERROR: config file version conflict\n" 
 			"     file -> ";
-		str += configFileName + "\n";
+		//str += configFileName + "\n";
 		str +=	"     your version = " + fileVersion_str + "\n" 
 			"     required version = " + CONFIG_FILE_VERSION_REQUIRED_STR + "\n" 
 			"     What to do: I have created a default config file at\n" 
@@ -569,9 +540,12 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion, string fileV
 			"     Compare your config file with the default one and import the changes,\n" 
 			"        or overwrite your old one (you will loose your settings)\n\n\n";
 		cerr << str;
+#if 0
 		installConfigFile( configFileName + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR, 
 				getDefaultPhoneBookFilename() + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR,
 				true);  //overwrite files
+#endif
+#endif
 		ret = false;
 	} else {
 		str += "Config file version checked ok!\n";
