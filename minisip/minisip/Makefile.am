@@ -1,4 +1,4 @@
-SUBDIRS = gui contactdb ipprovider
+SUBDIRS = gui contactdb ipprovider confbackend
 
 noinst_LIBRARIES = libminisip.a
 
@@ -15,6 +15,7 @@ AM_LDFLAGS = @LDFLAGS@ @AVCODEC_LDFLAGS@
 AM_CXXFLAGS = @CXXFLAGS@
 AM_CPPFLAGS = @CPPFLAGS@
 minisip_LDADD = 
+
 
 
 
@@ -74,6 +75,7 @@ minisip_LDADD +=../rtp/librtp.a \
 		../spaudio/libspaudio.a \
 		../aec/libaec.a \
 		ipprovider/libipprovider.a \
+		confbackend/libconfbackend.a \
                 ../stun/libstun.a
 
 
