@@ -40,6 +40,7 @@ using namespace std;
 #include"../mediahandler/MediaHandler.h"
 #include"../conf/ConferenceControl.h"
 #include"../conf/ConfCallback.h"
+#include"confbackend/ConfBackend.h"
 #include"MessageRouter.h"
 
 #include<libmsip/SipUtils.h>
@@ -74,12 +75,14 @@ static void signal_handler( int signal ){
 
 Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
+#if 0
 	if( argc == 2){
 		conffile = argv[1];
 	}
 	else{
 		conffile = SipSoftPhoneConfiguration::getDefaultConfigFilename();
 	}
+#endif
 
 	srand(time(0));
 
@@ -416,7 +419,14 @@ int Minisip::initParseConfig(){
 			mout << BOLD << "init 3/9: Parsing configuration file ("
 					<< conffile<<")" << PLAIN << end;
 #endif
-			string ret = phoneConf->load( conffile );
+			MRef<ConfBackend *> confBackend = ConfBackend::create();
+			if( !confBackend ){
+				merr << "Minisip could not load a configuration"
+					"back end. The application will now"
+					"exit." << end;
+			}
+			string ret = phoneConf->load( confBackend );
+
 
 			done = true;
 			retGlobal = 1; //for now, we finished ok ... check the return string
