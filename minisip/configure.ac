@@ -327,7 +327,17 @@ AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
 PKG_CHECK_MODULES(HILDON, [hildon-libs],
 	[
 	 	AC_DEFINE(HILDON_SUPPORT, [], [Support the Hildon extensions])
+	 	AC_DEFINE(MAEMO_SUPPORT, [], [Support the maemo platform])
 	],[echo 'No Hildon support.'])
+
+PKG_CHECK_MODULES(GCONF, [gconf-2.0],
+	[
+	 	AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
+		gconf_support="yes"
+	],[echo 'No gconf support.'])
+AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" != "xno"])
+
+
 
 
 
@@ -484,6 +494,7 @@ AC_OUTPUT([codecs/Makefile
 		 codecs/g711/Makefile
                  minisip/Makefile
                  minisip/contactdb/Makefile
+                 minisip/confbackend/Makefile
                  minisip/ipprovider/Makefile
                  minisip/gui/Makefile
                  minisip/gui/qtgui/Makefile
