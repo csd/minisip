@@ -64,7 +64,7 @@ static string parseWord(const char *s, int32_t &i){
 	
 }
 
-XMLParser::XMLParser(XMLParserCallback *cb):callback(cb){
+XMLParser::XMLParser(XMLParserCallback *cb):callback(cb),root(NULL){
 
 }
 
@@ -202,8 +202,9 @@ XMLFileParser::XMLFileParser(string filename, XMLParserCallback *cb):XMLParser(c
 	string s = "";
 	if (filename != ""){
 		ifstream file(filename.c_str());
-		if (!file)
-			cerr << "ERROR: could not open file"<< endl;
+		if (!file){
+			throw XMLFileNotFound( "Could not open file " + filename );
+		}
 
 
 		int32_t bufsize=20; 
@@ -341,6 +342,10 @@ void XMLFileParser::saveToFile(string fname){
 	if (fname=="")
 		fname = filename;
 	ofstream file(fname.c_str());
+	
+	if (!file){
+		throw XMLFileNotFound( "Could not open file " + fname );
+	}
 
 	file << xmlstring();
 }

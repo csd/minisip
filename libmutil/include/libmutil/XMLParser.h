@@ -74,13 +74,24 @@ In the following example "name" is a attribute and FILE is an element
  * TODO: Actually implement XML support ;) 
  */
 
-class LIBMUTIL_API XMLElementNotFound{
+class LIBMUTIL_API XMLException{
 	public:
-		XMLElementNotFound(string msg){this->msg=msg;};
+		XMLException(string msg){this->msg=msg;};
 		string what(){return msg;};
 	private:
 		string msg;
 };
+
+class LIBMUTIL_API XMLElementNotFound: public XMLException{
+	public:
+		XMLElementNotFound(string msg):XMLException(msg){};
+};
+
+class LIBMUTIL_API XMLFileNotFound: public XMLException{
+	public:
+		XMLFileNotFound(string msg):XMLException(msg){};
+};
+
 
 class LIBMUTIL_API XMLParserCallback{
 	public:
