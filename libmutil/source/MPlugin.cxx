@@ -13,6 +13,8 @@ list< MRef<Library *> > MPlugin::libraries;
 
 std::list< MPluginRegistry * > MPlugin::registries;
 
+MPlugin::~MPlugin(){
+}
 string MPlugin::getMemObjectType(){
 	return "MPlugin";
 }
@@ -57,27 +59,38 @@ int32_t MPlugin::loadFromDirectory( const string &path ){
 
 	while( dirEnt ){
 			
-		dirEnt = readdir( dirHandle );
-		lib = Library::open( dirEnt->d_name );
+		lib = Library::open( ( path + "/" + dirEnt->d_name ).c_str() );
 		if( lib ){
 			entryPoints = MPlugin::getListFromLibrary( lib );
 
-			for( iEP = entryPoints->begin(); 
-					iEP!= entryPoints->end();
-					iEP ++ ){
-				p = MPlugin::loadFromLibrary( lib, *iEP );
-				if( p ){
-					MPlugin::registerPlugin( p );
-					nPlugins ++;
+			if( entryPoints ){
+				for( iEP = entryPoints->begin(); 
+						iEP!= entryPoints->end();
+						iEP ++ ){
+					p = MPlugin::loadFromLibrary( lib, *iEP );
+					if( p ){
+						MPlugin::registerPlugin( p );
+						nPlugins ++;
+					}
 				}
 			}
 		}
+		
+		dirEnt = readdir( dirHandle );
+
 		
 	}
 
 	if( closedir( dirHandle ) ){
 		// Do something
 	}
+	
+	if( nPlugins > 0 ){
+		libraries.push_back( lib );
+	}
+	p = NULL;
+	lib = NULL;
+
 
 	return nPlugins;
 
@@ -87,6 +100,8 @@ MRef<MPlugin *> MPlugin::loadFromLibrary( const string &file,
 					  const string &entryPoint ){
 	MRef<Library *> lib = NULL;
 	list< MRef<Library *> >::iterator iLib;
+	MRef<MPlugin *> p;
+	bool newLib = false;
 
 	for( iLib = libraries.begin(); iLib != libraries.end(); iLib ++ ){
 		if( (*iLib)->getPath() == file ){
@@ -98,11 +113,17 @@ MRef<MPlugin *> MPlugin::loadFromLibrary( const string &file,
 	if( !lib ){
 		lib = Library::open( file );
 		if( lib ){
-			libraries.push_back( lib );
+			newLib = true;
 		}
 	}
 
-	return MPlugin::loadFromLibrary( lib, entryPoint );
+	p =  MPlugin::loadFromLibrary( lib, entryPoint );
+
+	if( p && newLib ){
+		libraries.push_back( lib );
+	}
+
+	return p;
 }
 
 
@@ -119,7 +140,11 @@ MRef<MPlugin *> MPlugin::loadFromLibrary( MRef<Library *> lib,
 				entryPoint ));
 
 	if( creatorFunction ){
-		return creatorFunction();
+		MRef<MPlugin *> * pp = creatorFunction();
+		fprintf( stderr, "pp: %x\n", pp );
+		fprintf( stderr, "getName: %s\n", (**pp)->getName().c_str() );
+		fprintf( stderr, "getDescription: %s\n", (**pp)->getDescription().c_str() );
+		return *pp;
 	}
 
 	return NULL;
@@ -128,8 +153,9 @@ MRef<MPlugin *> MPlugin::loadFromLibrary( MRef<Library *> lib,
 void MPlugin::registerPlugin( MRef<MPlugin *> p ){
 	std::list< MPluginRegistry * >::iterator iReg;
 
+
 	for( iReg = registries.begin(); iReg != registries.end(); iReg ++ ){
-		if( (*iReg)->getPluginType() == p->pluginType ){
+		if( (*iReg)->getPluginType() == p->getPluginType() ){
 			(*iReg)->registerPlugin( p );
 		}
 	}

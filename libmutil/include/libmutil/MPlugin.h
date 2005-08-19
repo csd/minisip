@@ -31,9 +31,10 @@ class MPluginRegistry;
  * @author Johan Bilien, jobi@via.ecp.fr
  */
 
-class MPlugin : public virtual MObject{
+class MPlugin : public MObject{
 	friend class MPluginRegistry;
-	public:
+	public:	
+		~MPlugin();
 		/**
 		 * @returns a short name of the plugin.
 		 */
@@ -112,7 +113,7 @@ class MPlugin : public virtual MObject{
 		 * \brief MPlugin object factory, entry point in the
 		 * shared library.
 		 **/
-		typedef MRef<MPlugin *> (* creator)();
+		typedef MRef<MPlugin *> * (* creator)();
 
 		/**
 		 * @returns the MemObject type.
@@ -143,7 +144,7 @@ class MPluginRegistry {
 		virtual std::string getPluginType()=0;
 
 		void registerPlugin( MRef<MPlugin *> p );
-	private:
+	protected:
 		std::list< MRef<MPlugin *> > plugins;
 
 	
