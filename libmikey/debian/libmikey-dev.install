@@ -1,5 +1,5 @@
-usr/include/*
-usr/lib/lib*.a
-usr/lib/lib*.so
-usr/lib/pkgconfig/*
-usr/lib/*.la
+tmp/debian/usr/include/*
+tmp/debian/usr/lib/lib*.a
+tmp/debian/usr/lib/lib*.so
+tmp/debian/usr/lib/pkgconfig/*
+tmp/debian/usr/lib/*.la

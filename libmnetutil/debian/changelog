@@ -1,6 +1,16 @@
+libmnetutil (0.3.1-2) unstable; urgency=low
+
+  * Create proper packages:
+   - Add builddeps.
+   - Link to all libraries.
+   - Create shlibs file.
+   - Use dh_install to move files around.
+
+ -- Filip Van Raemdonck <mechanix@debian.org>  Sun, 22 May 2005 17:01:08 +0200
+
 libmnetutil (0.3.1-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Johan Bilien <jobi@bilien.org>  Fri, 18 Mar 2005 10:14:48 +0100
 
@@ -12,7 +22,7 @@ libmnetutil (0.3.0-1) unstable; urgency=low
 
 libmnetutil (0.2.2-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:47:16 +0100
 

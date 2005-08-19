@@ -1,3 +1,14 @@
+libmikey (0.4.1-2) unstable; urgency=low
+
+  * Create proper packages, on kind suggestion from Filip Van Raemdonck
+    <mechanix@debian.org>:
+    - Add builddeps.
+    - Link to all libraries.
+    - Create shlibs file.
+    - Use dh_install to move files around.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Fri, 19 Aug 2005 11:46:32 +0200
+
 libmikey (0.4.1-1) unstable; urgency=low
 
   * New upstream release
@@ -12,7 +23,7 @@ libmikey (0.4.0-1) unstable; urgency=low
 
 libmikey (0.3.2-1) unstable; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:47:36 +0100
 
