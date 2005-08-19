@@ -20,42 +20,31 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
+#ifndef G_CONF_BACKEND_H
+#define G_CONF_BACKEND_H
 
 #include"ConfBackend.h"
-#ifdef GCONF_SUPPORT
-#include"GConfBackend.h"
+
+typedef struct _GConfClient GConfClient;
+
+class GConfBackend : public ConfBackend {
+	public:
+		virtual void save( std::string key, std::string value );
+		virtual void save( std::string key, int32_t value );
+
+		virtual std::string loadString( std::string key, std::string defaultValue="" );
+		virtual int32_t loadInt( std::string key, int32_t defaultValue=0 );
+
+		virtual void commit();
+
+		~GConfBackend();
+		GConfBackend();
+
+	private:
+		GConfClient * client;
+
+		void sanitizeKey( string &key );
+
+};
+
 #endif
-
-#include"MXmlConfBackend.h"
-
-
-MRef<ConfBackend *> ConfBackend::create(){
-	try{
-#ifdef GCONF_SUPPORT
-		return new GConfBackend();
-#else
-		return new MXmlConfBackend();
-#endif
-
-	}
-	catch( ConfBackendException & exc ){
-		return NULL;
-	}
-}
-
-int32_t ConfBackend::loadInt( const char * key, int32_t defaultValue ){
-	return loadInt( std::string( key ), defaultValue );
-}
-
-string ConfBackend::loadString( const char * key, string defaultValue ){
-	return loadString( std::string( key ), defaultValue );
-}
-
-void ConfBackend::save( const char * key, int32_t value ){
-	save( std::string( key ), value );
-}
-
-void ConfBackend::save( const char * key, string value ){
-	save( std::string( key ), value );
-}
