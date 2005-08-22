@@ -9,7 +9,6 @@
 #include<iostream>
 
 using namespace std;
-extern Mutex global;
 
 Library::Library(const string &path):path(path){
 #ifdef _MSC_VER
@@ -20,9 +19,11 @@ Library::Library(const string &path):path(path){
 	*ptr = LoadLibrary( path.c_str() );
 #else
 	handle = dlopen(path.c_str(), RTLD_LAZY);
+#ifdef DEBUG_OUTPUT
 	if( !handle ){
 		cerr << dlerror() << endl;
 	}
+#endif
 #endif
 }
 
@@ -36,13 +37,7 @@ Library::~Library(){
 	handle=NULL;
 #else
 	if(handle){
-		fprintf( stderr, "global: %x\n", &global );
-		global.lock();
-		global.unlock();
 		dlclose(handle);
-		fprintf( stderr, "global: %x\n", &global );
-		global.lock();
-		global.unlock();
 		handle=NULL;
 	}
 #endif
@@ -54,9 +49,7 @@ void *Library::getFunctionPtr(string name){
 	HMODULE *hptr =(HMODULE*)handle;
 	return GetProcAddress(*hptr, name.c_str());
 #else
-	cerr << "Looking for symbol " << name << endl;
 	void * ptr = dlsym(handle, name.c_str());
-	cerr << "ptr: " << ptr << endl;
 	return ptr;
 #endif
 }
