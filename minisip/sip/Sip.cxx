@@ -31,6 +31,7 @@
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
+#include<libmnetutil/NetworkException.h>
 
 
 
@@ -50,6 +51,7 @@
 #include<assert.h>
 
 #include<libmutil/dbg.h>
+#include<libmutil/termmanip.h>
 
 Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler,
 		string localIpString, 
@@ -464,7 +466,55 @@ void Sip::join() {
 
 void Sip::run(){
 
-	/*dialogContainer*/sipstack->run();
+	try{
+		if (phoneconfig->tcp_server){
+#ifdef DEBUG_OUTPUT
+			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
+#endif
+
+			sipstack->getSipTransportLayer()->startTcpServer();
+
+		}
+
+		if (phoneconfig->tls_server){
+			if( phoneconfig->securityConfig.cert.isNull() ){
+				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << end;
+			}
+			else{
+#ifdef DEBUG_OUTPUT
+				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
+#endif
+				sipstack->getSipTransportLayer()->startTlsServer();
+			}
+		}
+	}
+	catch( NetworkException * exc ){
+		cerr << "ERROR: Exception thrown when creating"
+			"TCP/TLS servers." << endl;
+		cerr << exc->errorDescription() << endl;
+		delete exc;
+	}
+
+#ifdef DEBUG_OUTPUT
+	mout << BOLD << "init 9/9: Registering Identities to registrar server" << PLAIN << end;
+#endif
+
+	//We would like to use the SipSMCommand::register_all_identities, which is managed by the
+	//SipDialogManagement. Unfortunately, this dialog only know about already exhisting dialogs ...
+	cerr << endl;
+	for (list<MRef<SipIdentity*> >::iterator i=phoneconfig->identities.begin() ; i!=phoneconfig->identities.end(); i++){
+		if ( (*i)->registerToProxy  ){
+			cerr << "Registering user "<< (*i)->getSipUri() << " to proxy " << (*i)->sipProxy.sipProxyAddressString<< ", requesting domain " << (*i)->sipDomain << endl;
+			CommandString reg("",SipCommandString::proxy_register);
+			reg["proxy_domain"] = (*i)->sipDomain;
+			reg["identityId"] = (*i)->getId();
+			SipSMCommand sipcmd(reg, SipSMCommand::remote, SipSMCommand::TU);
+			sipstack->handleCommand(sipcmd);
+		}
+	}
+	cerr << endl;
+
+	sipstack->run();
 }
 
 

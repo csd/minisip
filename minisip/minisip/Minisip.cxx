@@ -75,15 +75,6 @@ static void signal_handler( int signal ){
 
 Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
-#if 0
-	if( argc == 2){
-		conffile = argv[1];
-	}
-	else{
-		conffile = SipSoftPhoneConfiguration::getDefaultConfigFilename();
-	}
-#endif
-
 	srand(time(0));
 
 #ifndef WIN32
@@ -116,13 +107,9 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
 #ifdef DEBUG_OUTPUT
 	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
-	cerr << "Creating timeout provider"<< endl;	
 #endif
 //	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
-#ifdef DEBUG_OUTPUT
-	cerr << "Creating ContactDb"<< endl;
-#endif
 	/* Create the global contacts database */
 	ContactDb *contactDb = new ContactDb();
 	ContactEntry::setDb(contactDb);
@@ -138,9 +125,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	cerr << "Creating TextUI"<< endl;
 
 	gui = new MinisipTextUI();
-//	gui = dynamic_cast<Gui*>(debugtextui);
-//	assert(gui);
-	//debugtextui = gui;
+	
 	merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
 	LogEntry::handler = NULL;
 #else //!TEXT_UI
@@ -208,7 +193,6 @@ int Minisip::exit(){
 }
 
 int Minisip::startSip() {
-
 	int ret = 1;
 	
 #ifdef DEBUG_OUTPUT
@@ -221,10 +205,6 @@ int Minisip::startSip() {
 #endif
 		return -1;
 	}
-	
-#ifdef DEBUG_OUTPUT
-	cerr << "Creating MessageRouter"<< endl;
-#endif
 
 	try{
 		ehandler =  new MessageRouter();
@@ -262,24 +242,24 @@ int Minisip::startSip() {
 #endif
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
-		Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+	//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
 #endif
 		//save Sip object in Minisip::sip ...
 		this->sip=new Sip(phoneConf,mediaHandler,
-					localIpString,
-					externalContactIP,
-					phoneConf->inherited->localUdpPort,
-					phoneConf->inherited->localTcpPort,
-					phoneConf->inherited->externalContactUdpPort,
-					phoneConf->inherited->transport,
-					phoneConf->inherited->localTlsPort,
-					phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
-					//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
-					phoneConf->securityConfig.cert_db
-					);
+				localIpString,
+				externalContactIP,
+				phoneConf->inherited->localUdpPort,
+				phoneConf->inherited->localTcpPort,
+				phoneConf->inherited->externalContactUdpPort,
+				phoneConf->inherited->transport,
+				phoneConf->inherited->localTlsPort,
+				phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
+				//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
+				phoneConf->securityConfig.cert_db
+				);
 		//sip->init();
 
 		phoneConf->sip = sip;
@@ -288,13 +268,10 @@ int Minisip::startSip() {
 
 		ehandler->setSip(sip);
 
-#if 0
 		/* Load the plugins at this stage */
-		fprintf( stderr, "global in app: %x\n", &global );
-		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
+//		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
 
-		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
-#endif
+//		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
@@ -302,56 +279,7 @@ int Minisip::startSip() {
 		gui->setSipSoftPhoneConfiguration(phoneConf);
 		ehandler->setGui(gui);
 
-//                Thread t(*sip);
-
-		try{
-			if (phoneConf->tcp_server){
-#ifdef DEBUG_OUTPUT
-				mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
-#endif
-			
-				sip->getSipStack()->getSipTransportLayer()->startTcpServer();
-			//	Thread::createThread(tcp_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer() ));
-
-			}
-
-			if (phoneConf->tls_server){
-				if( phoneConf->securityConfig.cert.isNull() ){
-					merr << "ERROR: Certificate needed for TLS server" << end;
-				}
-				else{
-#ifdef DEBUG_OUTPUT
-					mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
-#endif
-					sip->getSipStack()->getSipTransportLayer()->startTlsServer();
-			//		Thread::createThread(tls_server_thread, *(/*phoneConf->inherited.sipTransport*/ sip->getSipStack()->getSipTransportLayer()));
-				}
-			}
-		}
-		catch( NetworkException * exc ){
-			cerr << "ERROR: Exception thrown when creating TCP/TLS servers." << endl;
-			cerr << exc->errorDescription() << endl;
-			delete exc;
-		}
-
-#ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 9/9: Registering Identities to registrar server" << PLAIN << end;
-#endif
-
-		//We would like to use the SipSMCommand::register_all_identities, which is managed by the
-		//SipDialogManagement. Unfortunately, this dialog only know about already exhisting dialogs ...
-		cerr << endl;
-		for (list<MRef<SipIdentity*> >::iterator i=phoneConf->identities.begin() ; i!=phoneConf->identities.end(); i++){
-			if ( (*i)->registerToProxy  ){
-				cerr << "Registering user "<< (*i)->getSipUri() << " to proxy " << (*i)->sipProxy.sipProxyAddressString<< ", requesting domain " << (*i)->sipDomain << endl;
-				CommandString reg("",SipCommandString::proxy_register);
-				reg["proxy_domain"] = (*i)->sipDomain;
-				reg["identityId"] = (*i)->getId();
-				SipSMCommand sipcmd(reg, SipSMCommand::remote, SipSMCommand::TU);
-				sip->getSipStack()->handleCommand(sipcmd);
-			}
-		}
-		cerr << endl;
+	
 /*
 		mdbg << "Starting presence server"<< end;
 		CommandString subscribeserver("", SipCommandString::start_presence_server);
@@ -367,6 +295,7 @@ int Minisip::startSip() {
 		sip->getSipStack()->handleCommand(sipcmd2);
 */
 		
+		sip->start(); //run as a thread ...
 		gui->setCallback(ehandler);
 //		sleep(5);
 		
@@ -382,15 +311,8 @@ int Minisip::startSip() {
 		}
 #endif
 		//sip->run();
-		sip->start(); //run as a thread ...
-		
-	}catch(XMLElementNotFound *e){
-		//FIXME: Display message in GUI
-#ifdef DEBUG_OUTPUT
-		merr << "Error: The following element could not be parsed: "<<e->what()<< "(corrupt config file?)"<< end;
-#endif
-		ret = -1;
 	}
+		
 	catch(exception &exc){
 		//FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
@@ -424,6 +346,7 @@ int Minisip::initParseConfig(){
 				merr << "Minisip could not load a configuration"
 					"back end. The application will now"
 					"exit." << end;
+				::exit( 1 );
 			}
 			string ret = phoneConf->load( confBackend );
 

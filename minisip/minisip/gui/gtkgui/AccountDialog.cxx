@@ -210,7 +210,12 @@ void AccountDialog::addAccount(){
 		Gtk::TreeModel::iterator iter = list->append();
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
-		(*iter)[list->columns->proxy] = proxyEntry->get_text();
+		if( !autodetectProxyCheck->get_active() ){
+			(*iter)[list->columns->proxy] = "";
+		}
+		else{
+			(*iter)[list->columns->proxy] = proxyEntry->get_text();
+		}
 		(*iter)[list->columns->defaultProxy] = false;
 		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();
@@ -252,7 +257,12 @@ void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	if( run() == Gtk::RESPONSE_OK ){
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
-		(*iter)[list->columns->proxy] = proxyEntry->get_text();
+		if( !autodetectProxyCheck->get_active() ){
+			(*iter)[list->columns->proxy] = "";
+		}
+		else{
+			(*iter)[list->columns->proxy] = proxyEntry->get_text();
+		}
 		(*iter)[list->columns->defaultProxy] = false;
 		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();

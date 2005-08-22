@@ -291,15 +291,14 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
-	mainWindowWidget->set_sensitive( false );
 
 	mainTabWidget->signal_switch_page().connect(
 		SLOT( *this, &MainWindow::onTabChange ) );
 
-	mainWindowWidget->hide();
-	
-
-
+	mainWindowWidget->show_all();
+	logWidget->hide();
+	statusWidget->hide();
+	mainWindowWidget->set_sensitive( false );
 }
 
 MainWindow::~MainWindow(){

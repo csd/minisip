@@ -87,7 +87,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 
 void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ... 
-	backend->save("version", CONFIG_FILE_VERSION_REQUIRED_STR );
+	backend->save("version", CONFIG_FILE_VERSION_REQUIRED );
 	
 	backend->save("local_udp_port", itoa(inherited->localUdpPort));
 	backend->save("local_tcp_port", itoa(inherited->localTcpPort));
@@ -213,6 +213,7 @@ void SipSoftPhoneConfiguration::save(){
 }
 
 string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
+	cerr << "Started load( be )" << endl;
 	backend = be;
 
 	//installConfigFile( this->configFileName );
@@ -230,8 +231,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	string fileVersion_str;
 	fileVersion = backend->loadInt("version", 0);
 		//get the string version also ... don't use the itoa.h
-	fileVersion_str = backend->loadString("version", "0");
-	if( !checkVersion( fileVersion, fileVersion_str ) ) {
+//	fileVersion_str = backend->loadString("version", "0");
+	if( !checkVersion( fileVersion /*, fileVersion_str*/ ) ) {
 		//check version prints a message ... 
 		//here, deal with the error
 //		ret = "ERROR";
@@ -244,6 +245,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		string accountPath = string("account[")+itoa(ii)+"]/";
 		account = backend->loadString(accountPath+"account_name");
+		cerr << "Loaded account " << account << endl;
 		if( account == "" ){
 			break;
 		}
@@ -408,7 +410,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 }
 
 void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
-	be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
+	//be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
+	be->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 	
 	be->save( "account[0]/account_name", "My account" );
 	be->save( "account[0]/sip_uri", "username@domain.org" );
@@ -524,10 +527,11 @@ void SipSoftPhoneConfiguration::installConfigFile(string config, string address,
 }
 #endif
 
-bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion, string fileVersion_str ) {
+bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fileVersion_str */) {
 	string str="";
 	bool ret = false;
 	if( fileVersion != CONFIG_FILE_VERSION_REQUIRED ) {
+		cerr << "OLD VERSION" << endl;
 #if 0
 		str += 	"\n\n"
 			"ERROR: config file version conflict\n" 
