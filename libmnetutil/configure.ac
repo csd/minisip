@@ -52,6 +52,8 @@ AC_ARG_ENABLE(debug,
 dnl
 dnl libssl
 dnl
+dnl Damn RedHat
+AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 AC_CHECK_LIB([ssl], [SSL_library_init],
 	[
 		LIBS="-lssl ${LIBS}"
@@ -62,8 +64,6 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 	[
 		AC_MSG_ERROR([Could not find libssl header files. Please install the corresponding development package.])
 	])
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
 dnl
 dnl libmutil
