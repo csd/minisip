@@ -79,7 +79,7 @@ class SipSoftPhoneConfiguration : public MObject{
 		
 		static void installConfigFile(string config, string address="", bool overwrite=false);
 		
-		bool checkVersion( uint32_t fileVersion, string fileVersion_str );
+		bool checkVersion( uint32_t fileVersion );
 
 
 		/**
