@@ -355,7 +355,6 @@ void MediaSettings::moveCodec( int8_t upOrDown ){
 
 	Gtk::TreeModel::iterator iter = treeSelection->get_selected();
 	Gtk::TreeModel::iterator iter2 = treeSelection->get_selected();
-#define OLDLIBGLADEMM
 #ifdef OLDLIBGLADEMM
 	Gtk::TreeModel::iterator i, savedIter;
 #endif
@@ -383,7 +382,6 @@ void MediaSettings::moveCodec( int8_t upOrDown ){
 			}
 
 #endif
-#undef OLDLIBGLADEMM
 		}
 
 		if( iter2 ){
