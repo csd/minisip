@@ -335,7 +335,7 @@ PKG_CHECK_MODULES(GCONF, [gconf-2.0],
 	 	AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
 		gconf_support="yes"
 	],[echo 'No gconf support.'])
-AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" != "xno"])
+AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
 
