@@ -14,6 +14,7 @@
 #include"../mediahandler/MediaCommandString.h"
 
 #include<iostream>
+#include<unistd.h>
 
 #ifdef HAVE_TERMIOS_H
 #include<termios.h>
