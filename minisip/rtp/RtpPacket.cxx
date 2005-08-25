@@ -95,12 +95,12 @@ void RtpPacket::sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port){
 RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 #define UDP_SIZE 65536
 	int i;
-	char buf[UDP_SIZE];
+	uint8_t buf[UDP_SIZE];
         uint8_t j;
         uint8_t cc;
 //	memset( buf, '\0', 2048 );
 	
-	i = rtp_socket.recv( buf, UDP_SIZE );
+	i = rtp_socket.recv( (char *)buf, UDP_SIZE );
 
 	if( i < 0 ){
 #ifdef DEBUG_OUTPUT
@@ -128,6 +128,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	hdr.setPayloadType( buf[1] & 0x7F );
 	
 	hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) | buf[3] );
+	cerr << "GOT SEQN" << hdr.getSeqNo() << endl;
 	hdr.setTimestamp( U32_AT( buf + 4 ) );
 	hdr.setSSRC( U32_AT( buf + 8 ) );
 

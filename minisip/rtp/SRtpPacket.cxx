@@ -184,12 +184,12 @@ SRtpPacket::~SRtpPacket(){
 SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, int timeout){
 #define UDP_SIZE 65536
         int i;
-        char buf[UDP_SIZE];
+        uint8_t buf[UDP_SIZE];
         uint8_t j;
         uint8_t cc;
 	//memset( buf, '\0', UDP_SIZE );
 
-        i = srtp_socket.recv( buf, UDP_SIZE );
+        i = srtp_socket.recv( (char*)buf, UDP_SIZE );
 	
         if( i < 0 ){
 #ifdef DEBUG_OUTPUT
