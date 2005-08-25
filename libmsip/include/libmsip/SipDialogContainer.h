@@ -49,8 +49,6 @@
 #include<libmsip/SipSMCommand.h>
 
 
-using namespace std;
-
 #define TYPE_COMMAND 2
 #define TYPE_TIMEOUT 3
 

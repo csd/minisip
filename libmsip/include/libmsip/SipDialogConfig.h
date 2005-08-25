@@ -56,14 +56,9 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkFunctions.h>
+#include<libmutil/mtypes.h>
 
 #include<libmutil/dbg.h>
-
-#ifdef _MSC_VER
-
-#else
-#include<stdint.h>
-#endif
 
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10
@@ -75,8 +70,6 @@
 
 #include<string>
 
-using namespace std;
-
 
 class LIBMSIP_API SipProxy{
 	public:
@@ -87,10 +80,10 @@ class LIBMSIP_API SipProxy{
 			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 
-		SipProxy(string addr){
-			assert(addr.find("@")==string::npos);
-			if (addr.find(":")!=string::npos){
-				string portstr = addr.substr(addr.find(":")+1);
+		SipProxy(std::string addr){
+			assert(addr.find("@")==std::string::npos);
+			if (addr.find(":")!=std::string::npos){
+				std::string portstr = addr.substr(addr.find(":")+1);
 				mdbg<< "parsed proxy port to <"<< portstr<<">"<<end;
 				sipProxyPort = atoi(portstr.c_str());
 				sipProxyAddressString =  addr.substr(0,addr.find(":"));
@@ -104,20 +97,20 @@ class LIBMSIP_API SipProxy{
 			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 		
-		SipProxy(string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
+		SipProxy(std::string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
 			sipProxyIpAddr = new IP4Address(addr);
 			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		}
 
-		void setProxy(string proxy, int port){
+		void setProxy(std::string proxy, int port){
 			if (port != -1)
 				sipProxyPort = port;
 			sipProxyAddressString= proxy;
 			sipProxyIpAddr = new IP4Address(proxy);
 		}
 
-		string getDebugString(){
+		std::string getDebugString(){
 			return "proxyString="+sipProxyAddressString
 				+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
 				+"; port="+itoa(sipProxyPort)
@@ -126,15 +119,15 @@ class LIBMSIP_API SipProxy{
 				+"; expires="+itoa(defaultExpires);
 		}
 
-		static string findProxy(string uri, uint16_t &port){
+		static std::string findProxy(std::string uri, uint16_t &port){
 
-			if (uri.find("@")==string::npos){                 
+			if (uri.find("@")==std::string::npos){                 
 				return "unknown";
 			}
-			string domain = uri.substr(uri.find("@"));
+			std::string domain = uri.substr(uri.find("@"));
 			domain=domain.substr(1);
 
-			string proxy = NetworkFunctions::getHostHandlingService("_sip._udp",domain, port);
+			std::string proxy = NetworkFunctions::getHostHandlingService("_sip._udp",domain, port);
 			if (proxy.length()<=0){
 				return "unknown";
 			}
@@ -143,10 +136,10 @@ class LIBMSIP_API SipProxy{
 
 		
 		int sipProxyPort;
-		string sipProxyAddressString;
+		std::string sipProxyAddressString;
 		IPAddress * sipProxyIpAddr;
-		string sipProxyUsername;
-		string sipProxyPassword;
+		std::string sipProxyUsername;
+		std::string sipProxyPassword;
 		
 		void setRegisterExpires( string _expires );
 		void setRegisterExpires( int _expires );

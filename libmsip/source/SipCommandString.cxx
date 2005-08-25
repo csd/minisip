@@ -21,10 +21,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<libmsip/SipCommandString.h>
 
 #include<config.h>
 
-#include<libmsip/SipCommandString.h>
+using namespace std;
 
 const string SipCommandString::sip_stack_shutdown="sip_stack_shutdown";
 const string SipCommandString::sip_stack_shutdown_done="sip_stack_shutdown_done";

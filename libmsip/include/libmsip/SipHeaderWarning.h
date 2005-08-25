@@ -45,11 +45,7 @@
 
 #include<libmsip/SipHeader.h>
 
-#ifdef _MSC_VER
-typedef unsigned short uint16_t;
-#else
-#include<stdint.h>
-#endif
+#include<libmutil/mtypes.h>
 /**
  * @author Erik Eliasson
 */

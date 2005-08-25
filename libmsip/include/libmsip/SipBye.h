@@ -44,7 +44,7 @@
 #define LIBMSIP_API
 #endif
 
-#include"SipMessage.h"
+#include<libmsip/SipMessage.h>
 #include<sys/types.h>
 
 class SipInvite;

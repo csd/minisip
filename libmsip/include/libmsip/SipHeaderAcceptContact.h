@@ -59,7 +59,7 @@
 #define LIBMSIP_API
 #endif
 
-#include"SipHeader.h"
+#include<libmsip/SipHeader.h>
 
 
 extern SipHeaderFactoryFuncPtr sipHeaderAcceptContactFactory;

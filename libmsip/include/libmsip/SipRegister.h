@@ -35,7 +35,7 @@
 #define LIBMSIP_API
 #endif
 
-#include"SipMessage.h"
+#include<libmsip/SipMessage.h>
 
 /**
  * Representation of a SIP REGISTER method.
