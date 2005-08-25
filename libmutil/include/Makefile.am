@@ -12,6 +12,7 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/TextUI.h \
 			libmutil/Timestamp.h \
 			libmutil/mtime.h \
+			libmutil/mtypes.h \
 			libmutil/itoa.h \
 			libmutil/print_hex.h \
 			libmutil/split_in_lines.h \

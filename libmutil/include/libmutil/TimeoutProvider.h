@@ -153,7 +153,7 @@ template<class TOCommand, class TOSubscriber>
 class TimeoutProvider : public Runnable{
 
 	public:
-		string getMemObjectType(){return "TimeoutProvider";}
+		std::string getMemObjectType(){return "TimeoutProvider";}
 
 		/**
 		 * The purpose of this method is mainly
@@ -161,8 +161,8 @@ class TimeoutProvider : public Runnable{
 		 * 
 		 * @return All timeouts waiting to occur.
 		 */
-		string getTimeouts(){
-			string ret;
+		std::string getTimeouts(){
+			std::string ret;
 
 			synch_lock.lock();
 			
@@ -170,7 +170,7 @@ class TimeoutProvider : public Runnable{
 				int ms= requests[i].get_ms_to_timeout();
 				TOSubscriber receiver = requests[i].get_subscriber();
 				ret = ret + "      " 
-					+ string("Command: ") + requests[i].get_command() 
+					+ std::string("Command: ") + requests[i].get_command() 
 					+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)
 					+ "  Receiver ObjectId: "+itoa((int)receiver)
 					+"\n";
