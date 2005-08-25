@@ -1,4 +1,5 @@
 
+#define OPENSSL_NO_KRB5
 
 #include<libmnetutil/IP4ServerSocket.h> 
 
