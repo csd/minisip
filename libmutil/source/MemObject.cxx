@@ -65,26 +65,26 @@ MObject::~MObject(){
 }
 
 int MObject::decRefCount(){
-	int ref;
+	int refRet;
 #ifdef MDEBUG
 	global.lock();
 #else
 	refLock.lock();
 #endif
 	
-	ref=--refCount;
+	refCount--;
+	refRet = refCount;
 	
 #ifdef MDEBUG
 	global.unlock();
-	if (ref==0 && outputOnDestructor){
-		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(ref) + "; ptr=" + itoa((int)this);
-		
+	if (refRet==0 && outputOnDestructor){
+		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(refRet) + "; ptr=" + itoa((int)this);
 		cerr << output << endl;
 	}
 #else
 	refLock.unlock();
 #endif
-	return ref;
+	return refRet;
 }
 
 void MObject::incRefCount(){

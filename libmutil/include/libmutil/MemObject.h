@@ -17,36 +17,16 @@
 */
 
 /*
- * Authors: Erik Eliasson <eliasson@it.kth.se>
- *          Johan Bilien <jobi@via.ecp.fr>
+ * Authors:	Erik Eliasson <eliasson@it.kth.se>
+ *		Johan Bilien <jobi@via.ecp.fr>
+ *		Cesc Santasusana <cesc dot santa at g mail dot com>
 */
+
 
 
 
 #ifndef _MEMOBJECT_H
 #define _MEMOBJECT_H
-
-/*
-  Pitfall 1: You MAY _NOT_ create references to local variables. When the
-  reference is deleted it will see that there is no other references
-  to the object and try to delete it.
-  Example of code with bug:
-       void f(MRef<T> ref){
-               ...
-       }
-       
-       ...
-       T obj;
-       f(MRef<T>(&obj));
- 
-  Pitfall 2: You MAY _NOT_ create a reference to "this" in a constructor.
-  
-  Pitfall 3: If objects reference each other in such a way that
-   	it forms a circle (for example A->B, B->A or A->B, B->C, C->A)
-	then the memory will not be freed automatically. Break the
-	circle by putting one of the refecences to NULL and the whole
-	list will be freed.
-*/
 
 #include<string>
 #include<list>
@@ -54,6 +34,8 @@
 #include<assert.h>
 #include<libmutil/dbg.h>
 #include<libmutil/Mutex.h>
+
+#include <typeinfo>
 
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
@@ -68,124 +50,9 @@
 #include<string>
 #include<libmutil/minilist.h>
 
-class MObject;
+#include<libmutil/itoa.h>
 
-template<class OPType>
-class MRef{
-	public:
-		MRef(){
-			objp=NULL;
-		}
-
-		MRef(OPType optr){ 
-			objp = optr; 
-			if (objp!=NULL){
-				assert(dynamic_cast<MObject*>(optr)!=NULL);
-				objp->incRefCount(); 
-			}
-		}
-		
-		MRef(const MRef<OPType> &r){
-			this->objp = r.objp;
-			if (objp!=NULL){
-				objp->incRefCount();
-			}
-		}
-
-		virtual ~MRef(){          
-			if (objp!=NULL){
-#ifndef _MSC_VER
-				assert(dynamic_cast<MObject*>(objp)!=NULL);
-#endif
-				int rc = objp->decRefCount();
-				if (rc<=0){
-					if (rc<0){
-#ifndef _MSC_VER
-						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count (" 
-							<< rc
-							<< ") - created without reference?" << end;
-#endif
-					}       
-					delete objp;
-				}
-			}
-			objp=NULL;
-		}
-		
-		void operator=(const MRef<OPType> &r){
-			if (this->objp!=NULL){
-				assert(dynamic_cast<MObject*>(objp)!=NULL);
-				int rc = objp->decRefCount();
-
-				if (rc<=0){
-					if (rc<0){
-#ifndef _MSC_VER
-						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count - created without reference?"<<end;
-#endif
-					}       
-
-					delete objp;
-				}
-			}
-
-			this->objp = r.objp;
-
-			if (objp!=NULL){
-				assert(dynamic_cast<MObject*>(objp)!=NULL);
-				objp->incRefCount();
-			}
-		}
-
-		bool operator ==(const MRef<OPType> r) const {
-			return this->objp == r.objp;
-		}
-
-		operator bool() const {
-			return !isNull();
-		}
-
-		void operator=(const OPType o){
-
-			if (this->objp!=NULL){
-				assert(dynamic_cast<MObject*>(objp)!=NULL);
-				int rc = objp->decRefCount();
-				if (rc<=0){
-					if (rc<0){
-#ifndef _MSC_VER
-						merr << "MRef::~MRef: WARNING: deleteing object with negative reference count - created without reference?"<<end;
-#endif
-					}       
-
-					delete objp;
-				}
-			}
-
-			this->objp = o;
-			if (objp!=NULL){
-				assert(dynamic_cast<MObject*>(objp)!=NULL);
-				objp->incRefCount();
-			}
-		}
-
-
-		OPType operator->() const {
-			return objp; 
-		}
-
-		OPType operator*(){
-			return objp;
-		}
-
-		bool isNull() const{
-			return objp==NULL;
-		}
-
-
-	private:
-		OPType objp;
-
-
-};
+using namespace std;
 
 /**
  * The MObject class contains a reference counter that is
@@ -208,10 +75,19 @@ class LIBMUTIL_API MObject{
 		 */
 		virtual ~MObject();
 
+		/**
+		Decrease the reference counter (thread-safe)
+		*/
 		int decRefCount();
 		
+		/**
+		Increase the reference counter (thread-safe)
+		*/
 		void incRefCount();
 
+		/**
+		Return the value of the reference counter
+		*/
 		int getRefCount();
 		
 		/**
@@ -228,9 +104,286 @@ class LIBMUTIL_API MObject{
 		virtual std::string getMemObjectType();
 
 	private:
+		/**
+		Reference counter ... 
+		*/
 		int refCount;
+		
+		/**
+		Mutex, provides thread safety. 
+		When MEMDEBUG is on, this is not used (instead a global mutex
+		is).
+		*/
 		Mutex refLock;
 };
+
+/**
+This is the minisip Smart Pointer implementation: MRef
+It is a template class, which uses reference counting for its "smartness".
+The reference counter is attached to the MObject, thus we can only 
+use MRef with MObjects. 
+
+Pitfall 0: We can only MRef MObjects! I (cesc) tried to change it into an
+	MObject-independent smart pointer class, but MObject is too widely
+	used all over minisip. Specially painful are MRef conversions from
+	one type to another ... i mean:
+	MRef<X> x;
+	MRef<Y> y;
+	//if X inherits from Y
+	y = new Y();
+	x = *y;
+	This works fine ... as the counter is attached to the MObject, thus
+	both MRefs share the same counter.
+	
+Pitfall 1: You MAY _NOT_ create references to local variables. When the
+	reference is deleted it will see that there is no other references
+	to the object and try to delete it.
+	Example of code with bug:
+	void f(MRef<T> ref){
+		...
+	}
+	
+	...
+	T obj;
+	f(MRef<T>(&obj));
+	
+Pitfall 2: You MAY _NOT_ create a reference to "this" in a constructor.
+	
+Pitfall 3: If objects reference each other in such a way that
+		it forms a circle (for example A->B, B->A or A->B, B->C, C->A)
+		then the memory will not be freed automatically. Break the
+		circle by putting one of the refecences to NULL and the whole
+		list will be freed.
+*/
+template<class OPType>
+class MRef{
+
+	private:
+		/**
+		The non-smart pointer
+		(it has to be a sub-class of MObject!)
+		*/
+		OPType objp;
+#if 0		
+		/**
+		Keep a pointer to (MObject *)objp ... 
+		(do not delete this one ... we will delete objp instead).
+		*/
+		MObject * mObj;
+#endif	
+	protected:
+	
+		/**
+		Initialize the MRef and its counter for the first time.
+		Call only when the objp we receive is freshly created with new
+		*/
+		inline bool init();
+		
+		/**
+		Increase the reference counter ...
+		*/
+		inline bool increase();
+		
+		/**
+		Decrease the reference counter ... and destroy if needed
+		*/
+		inline bool decrease();
+		
+		/**
+		Return the raw pointer ... 
+		*/
+		inline OPType getPointer() const;
+		
+		/**
+		Set the pointed object ... we perform a dynamic cast to check 
+		if the received object is an MObject ..
+		The boolean parameter (default true) tells wheather we want this
+		   check to be performed or not (dynamic cast)
+		*/
+		inline void setPointer(OPType o);
+
+	public:
+
+		/**
+		We receive the object freshly created with a new,
+		or if without params, create an empty MRef
+		*/
+		inline MRef(OPType optr = NULL );
+		
+		/**
+		We are copying an MRef object ... increase the counter
+		*/
+		inline MRef(const MRef<OPType> &r);
+
+		/**
+		Destructor.
+		We must decrease the counter, and if needed, destroy the 
+		allocated object and the counter.
+		*/
+		inline virtual ~MRef();
+		
+		/**
+		Assign operator overloaded (check if object received is
+		an MObject).
+		We have to first get rid of the previous referred object,
+		that is why first we decrease, then copy "o", then increase
+		the counter.
+		*/
+		inline void operator=(const OPType o);
+
+		/**
+		Assign operator overloaded (copying an exhisting MRef)
+		We have to first get rid of the previous referred object,
+		that is why first we decrease, then copy "o", then increase
+		the counter.
+		*/
+		inline void operator=(const MRef<OPType> &r);
+
+		/**
+		Overload the comparison operator (between MRefs).
+		True if the referred objects are equal (not the MRefs)
+		*/
+		inline bool operator ==(const MRef<OPType> r) const;
+		
+		/**
+		Return true if contained object is null
+		*/
+		inline bool isNull() const;
+		
+		/**
+		Overload the bool() operator
+		*/
+		inline operator bool() const;
+
+		/**
+		Overload the member access operator
+		(this actually turns MRef into a smarter pointer
+		*/
+		inline OPType operator->() const;
+
+		/**
+		Overload the de-ref operator
+		*/
+		inline OPType operator*();
+};
+
+
+template<class OPType>
+OPType MRef<OPType>::getPointer() const{
+	return objp;
+}
+
+template<class OPType>
+void MRef<OPType>::setPointer(const OPType o){
+	if (o!=NULL){
+		//check if the pointer is to an MObject ...
+		if( dynamic_cast<OPType>(o) != NULL ) {
+			objp = o;
+		} else {
+			cerr << "MRef: Trying to use an MRef for a non MObject class" << endl;
+		}	
+	} else { 
+		objp = NULL;
+	}
+}
+
+template<class OPType>
+bool MRef<OPType>::init() {
+	bool ret = false;
+	if ( objp!=NULL ) {
+		ret = increase();
+	}
+	return ret;
+}
+
+template<class OPType>
+bool MRef<OPType>::increase() {
+	bool ret = false;
+	if ( objp!=NULL ) {
+		objp->incRefCount();
+		ret = true;
+	}
+	return ret;
+}
+
+template<class OPType>
+bool MRef<OPType>::decrease() {
+	bool ret = false;
+
+	if ( objp!=NULL ) {
+		int rc = objp->decRefCount();
+		if (rc<=0){
+			if (rc<0){
+#ifndef _MSC_VER
+				merr << "MRef::~MRef: WARNING: deleteing object with negative reference count (" 
+					<< rc
+					<< ") - created without reference?" << end;
+#endif
+			}       
+			delete getPointer();
+			setPointer(NULL);
+			ret = true;
+		}
+	}
+	return ret;
+}
+
+template<class OPType>
+MRef<OPType>::MRef(OPType optr) { 
+	setPointer(optr);
+	init();
+}
+
+template<class OPType>
+MRef<OPType>::MRef(const MRef<OPType> &r) {
+	setPointer( r.getPointer() );
+	increase();
+}
+
+template<class OPType>
+MRef<OPType>::~MRef(){
+	decrease();
+	setPointer( NULL );
+}
+
+template<class OPType>
+void MRef<OPType>::operator=(const OPType o){
+	decrease();
+	setPointer( o );
+	increase();
+}
+
+template<class OPType>
+void MRef<OPType>::operator=(const MRef<OPType> &r){
+	decrease();
+	setPointer( r.getPointer() );
+	increase();
+}
+
+template<class OPType>
+bool MRef<OPType>::operator ==(const MRef<OPType> r) const {
+	return getPointer() == r.getPointer();
+}
+
+template<class OPType>
+bool MRef<OPType>::isNull() const{
+	return getPointer()==NULL;
+}
+
+template<class OPType>
+MRef<OPType>::operator bool() const {
+	return !isNull();
+}
+
+template<class OPType>
+OPType MRef<OPType>::operator->() const {
+	return getPointer(); 
+}
+
+template<class OPType>
+OPType MRef<OPType>::operator*(){
+	return getPointer();
+}
 
 
 /**
