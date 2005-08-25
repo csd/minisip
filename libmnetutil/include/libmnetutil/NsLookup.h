@@ -35,8 +35,6 @@
 #define LIBMNETUTIL_API
 #endif
 
-//#include<hash_map>
-
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/IPAddress.h>
 

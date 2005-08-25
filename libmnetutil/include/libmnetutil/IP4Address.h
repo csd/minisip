@@ -37,11 +37,8 @@
 
 #include <libmnetutil/IPAddress.h>
 
-#ifdef _MSC_VER
-typedef unsigned int uint32_t;
-#else
-#include<stdint.h>
-#endif
+#include<libmutil/mtypes.h>
+
 struct sockaddr_in;
 
 class LIBMNETUTIL_API IP4Address : public IPAddress{

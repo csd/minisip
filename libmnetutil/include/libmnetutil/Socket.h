@@ -42,13 +42,7 @@
 #define SOCKET_TYPE_UDP		0x20
 
 #include<libmutil/MemObject.h>
-
-#ifdef _MSC_VER
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-#endif
-
+#include<libmutil/mtypes.h>
 
 class LIBMNETUTIL_API Socket : public MObject{
 	public:

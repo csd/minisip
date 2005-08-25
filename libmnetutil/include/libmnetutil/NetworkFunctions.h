@@ -36,15 +36,8 @@
 #endif
 
 #include<vector>
-#include"IPAddress.h"
-
-#ifdef _MSC_VER
-typedef unsigned int uint32_t;
-typedef unsigned short uint16_t;
-#else
-#include<stdint.h>
-#endif
-
+#include<libmnetutil/IPAddress.h>
+#include<libmutil/mtypes.h>
 
 using namespace std;
 

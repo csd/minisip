@@ -35,13 +35,11 @@
 #define LIBMNETUTIL_API
 #endif
 
-#ifdef _MSC_VER
-#define int8_t char
-#endif
+#include<libmutil/mtypes.h>
 
-#include"StreamSocket.h"
-#include"TCPSocket.h"
-#include"IPAddress.h"
+#include<libmnetutil/StreamSocket.h>
+#include<libmnetutil/TCPSocket.h>
+#include<libmnetutil/IPAddress.h>
 #include<libmutil/cert.h>
 
 

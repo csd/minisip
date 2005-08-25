@@ -35,22 +35,21 @@
 #define LIBMNETUTIL_API
 #endif
 
-#include"StreamSocket.h"
-#include"IPAddress.h"
+#include<libmnetutil/StreamSocket.h>
+#include<libmnetutil/IPAddress.h>
 
-using namespace std;
 
 class LIBMNETUTIL_API TCPSocket : public StreamSocket{
 	public:
 		TCPSocket(int32_t fd, sockaddr * addr);
-		TCPSocket(string addr,int32_t port=0);
+		TCPSocket(std::string addr,int32_t port=0);
 		TCPSocket(IPAddress &addr,int32_t port=0);
 		TCPSocket(TCPSocket &sock);
 		virtual ~TCPSocket();
 
 		virtual std::string getMemObjectType(){return "TCPSocket";};
 		
-		virtual int32_t write(string);
+		virtual int32_t write(std::string);
 		virtual int32_t write(void *buf, int32_t count);
 		virtual int32_t read(void *buf, int32_t count);
 		//void flush();
@@ -63,6 +62,6 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket{
 //		IPAddress *ipaddr;
 };
 
-TCPSocket& operator<<(TCPSocket& sock, string str);
+TCPSocket& operator<<(TCPSocket& sock, std::string str);
 
 #endif

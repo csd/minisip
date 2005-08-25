@@ -35,8 +35,8 @@
 #define LIBMNETUTIL_API
 #endif
 
-#include"Socket.h"
-#include"IPAddress.h"
+#include<libmnetutil/Socket.h>
+#include<libmnetutil/IPAddress.h>
 
 using namespace std;
 

@@ -26,20 +26,16 @@
 #define STREAMSOCKET_H
 
 #ifdef _MSC_VER
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
 #ifdef LIBMNETUTIL_EXPORTS
 #define LIBMNETUTIL_API __declspec(dllexport)
 #else
 #define LIBMNETUTIL_API __declspec(dllimport)
 #endif
 #else
-#include<inttypes.h>
 #define LIBMNETUTIL_API
 #endif
 
-#include"Socket.h"
+#include<libmnetutil/Socket.h>
 
 #include<string>
 using namespace std;
@@ -50,7 +46,7 @@ class IP4Address;
 class LIBMNETUTIL_API StreamSocket : public Socket{
 	public:
 		virtual ~StreamSocket();
-		virtual int32_t write(string)=0;
+		virtual int32_t write(std::string)=0;
 		virtual int32_t write(void *buf, int32_t count)=0;
 		virtual int32_t read(void *buf, int32_t count)=0;
 
