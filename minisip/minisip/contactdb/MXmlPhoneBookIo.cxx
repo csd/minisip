@@ -38,13 +38,17 @@ MXmlPhoneBookIo::MXmlPhoneBookIo( string fileName ):fileName(fileName){
 MRef<PhoneBook *> MXmlPhoneBookIo::load(){
 	MRef<PhoneBook *> phonebook = new PhoneBook;
 	ContactEntry * entry;
+	XMLParser * parser;
 
-	// FIXME!!
-	//try{
-		XMLParser * parser = new XMLFileParser( fileName ); 
-	//}
+	try{
+		parser = new XMLFileParser( fileName ); 
+	}
 
-	//catch(
+	catch( XMLFileNotFound& exc ){
+		cerr << "Phonebook file not found." << endl;
+		return NULL;
+		
+	}
 	if( parser == NULL ){
 		return NULL;
 	}
