@@ -436,6 +436,8 @@ bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 				localPayloadType  );
 		payloadType = m->getFormat( formatIndex );
 	}
+
+	return result;
 }
 
 uint32_t MediaStreamSender::getSsrc(){
