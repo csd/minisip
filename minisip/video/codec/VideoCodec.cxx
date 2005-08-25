@@ -54,7 +54,7 @@ std::string VideoCodec::getCodecDescription(){
 	return std::string( "ITU-T H.263 Video Encoder/Decoder" );
 }
 
-int32_t VideoCodec::getSdpMediaType(){
+uint8_t VideoCodec::getSdpMediaType(){
 	return 105;
 }
 

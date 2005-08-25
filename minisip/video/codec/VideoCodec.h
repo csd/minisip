@@ -47,7 +47,7 @@ class VideoCodec : public Codec{
 
 		virtual std::string getCodecName();
 		virtual std::string getCodecDescription();
-		virtual int32_t getSdpMediaType();
+		virtual uint8_t getSdpMediaType();
 		virtual std::string getSdpMediaAttributes();
 
 		void setGrabber( MRef<Grabber *> grabber );
