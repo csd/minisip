@@ -330,11 +330,18 @@ PKG_CHECK_MODULES(HILDON, [hildon-libs],
 	 	AC_DEFINE(MAEMO_SUPPORT, [], [Support the maemo platform])
 	],[echo 'No Hildon support.'])
 
+
+AC_ARG_ENABLE(gconf,
+    [ --enable-gconf enables support for GConf (default enabled).])
+
 PKG_CHECK_MODULES(GCONF, [gconf-2.0],
 	[
-	 	AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
-		gconf_support="yes"
-	],[echo 'No gconf support.'])
+		if test "x${enable_gconf}" != "xno"
+		then
+			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
+			gconf_support="yes"
+		fi
+	],[echo 'GConf development libraries not found, GConf support is disabled.'])
 AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
