@@ -30,12 +30,14 @@
 
 
 #include"../Gui.h"
+//#include"../../LogEntry.h"
+#include<libmutil/MemObject.h>
 #include"DtmfWidget.h"
-#include "../../../conf/ConferenceControl.h"
+
+//#include "../../../conf/ConferenceControl.h"
 //#include"ConferenceWidget.h"
 #include<libmutil/Mutex.h>
 #include<libmutil/minilist.h>
-#include<libmutil/MemObject.h>
 #include <libglademm/xml.h>
 #include <gtkmm.h>
 #include <iostream>

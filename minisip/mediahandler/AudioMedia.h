@@ -20,6 +20,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef AUDIO_MEDIA_AND_AUDIOSOURCE_H
+#define AUDIO_MEDIA_AND_AUDIOSOURCE_H
+
 
 #include"Media.h"
 #ifdef AEC_SUPPORT
@@ -175,3 +178,8 @@ class AudioMediaSource : public BasicSoundSource{
 		short codecOutput[16384];
 		uint32_t ssrc;
 };
+
+
+#endif //#ifndef AUDIO_MEDIA_AND_AUDIOSOURCE_H
+
+

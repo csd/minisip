@@ -517,6 +517,10 @@ void SoundIO::start_sound_player(){
         Thread::createThread(playerLoop, this);
 }
 
+MRef<AudioMixer *> SoundIO::getMixer() { 
+	return mixer;
+}
+
 bool SoundIO::setMixer( string type ) {
 	bool ret = true;
 	if( type == "simple" ) {

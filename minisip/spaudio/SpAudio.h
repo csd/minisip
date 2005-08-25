@@ -72,8 +72,8 @@ class SpAudio: public MObject{
 		the row.
 		Currently, for five sources max, positions are like:
 			3 - center, front
-			1 - one ear, side
-			5 - one ear, the other side
+			1 - one ear, side (left)
+			5 - one ear, the other side (right)
 			2 - front side, between 1 and 3
 			4 - front other side, between 3 and 5
 		*/

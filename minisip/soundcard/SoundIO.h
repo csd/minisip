@@ -29,6 +29,7 @@
 #include<config.h>
 
 #include"SoundRecorderCallback.h"
+//class SoundRecorderCallback
 
 //#include"SoundIOPLCInterface.h"
 class SoundIOPLCInterface;
@@ -208,7 +209,7 @@ class SoundIO : public MObject{
 		FIXME: this function needs to be made thread-safe is we intend
 		to be able to change the mixer on the fly ...
 		*/
-		MRef< AudioMixer *> getMixer() { return mixer;}
+		MRef< AudioMixer *> getMixer();
 		
 		/**
 		Given a string, create the mixer type requested.

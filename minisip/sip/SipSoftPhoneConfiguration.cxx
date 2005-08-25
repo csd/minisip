@@ -16,17 +16,15 @@
 
 /* Copyright (C) 2004, 2005
  *
+ * Name
+ * 	SipSoftPhoneConfiguration.cxx
+ *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
-/* Name
- * 	SipSoftPhoneConfiguration.cxx
- * Author
- * 	Erik Eliasson, eliasson@it.kth.se
- * 	Johan Bilien, jobi@via.ecp.fr
+ *          Cesc Santasusana < cesc Dot santa at@ gmail dOT com>
  * Purpose
- * 
+ *          Read and write from the configuration file. 
+ *
 */
 
 /****************************************************
@@ -47,6 +45,8 @@
 #include<fstream>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/NetworkException.h>
+
+#include"../soundcard/AudioMixer.h"
 
 #include<libmutil/dbg.h>
 
