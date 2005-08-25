@@ -6,6 +6,8 @@
 #if defined _MSC_VER
 typedef unsigned int uint32_t;
 typedef int int32_t;
+typedef unsigned long long uint64_t
+
 #else
 #include<stdint.h>
 #endif 

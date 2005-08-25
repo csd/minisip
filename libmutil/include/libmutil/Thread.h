@@ -28,8 +28,6 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
-using namespace std;
-
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
 #define LIBMUTIL_API __declspec(dllexport)

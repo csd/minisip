@@ -47,11 +47,9 @@
 #endif
 
 
-using namespace std;
+LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
 
-LIBMUTIL_API std::vector<string> split(string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
-
-LIBMUTIL_API std::vector<string> split_in_lines(string s, bool do_trim = true);
+LIBMUTIL_API std::vector<std::string> split_in_lines(std::string s, bool do_trim = true);
 
 
 #endif

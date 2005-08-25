@@ -19,8 +19,13 @@
 #ifndef MPLUGIN_H
 #define MPLUGIN_H
 
+
+
+
+
+
 #include<string>
-#include<stdint.h>
+#include<libmutil/mtypes.h>
 #include<libmutil/MemObject.h>
 
 class Library;
@@ -28,7 +33,11 @@ class MPluginRegistry;
 
 /**
  * Implements a dynamically loadable plugins support.
+ *
+ *
+ * 
  * @author Johan Bilien, jobi@via.ecp.fr
+ * @author Erik Eliasson, eliasson@it.kth.se 
  */
 
 class MPlugin : public MObject{

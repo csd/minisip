@@ -35,7 +35,6 @@
 #define ITOA_H
 
 #include<string>
-using namespace std;
 
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
@@ -47,6 +46,7 @@ using namespace std;
 #define LIBMUTIL_API
 #endif
 
-LIBMUTIL_API string itoa(int i);
+LIBMUTIL_API std::string itoa(int i);
 
 #endif
+

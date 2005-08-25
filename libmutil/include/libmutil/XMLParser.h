@@ -25,11 +25,7 @@
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
-#ifdef _MSC_VER
-#define int32_t __int32
-#else
-#include<stdint.h>
-#endif
+#include<libmutil/mtypes.h>
 
 #include<list>
 

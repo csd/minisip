@@ -23,11 +23,7 @@
 
 #include<string>
 
-#ifdef _MSC_VER
-#define uint32_t unsigned
-#else
-#include<inttypes.h>
-#endif
+#include<libmutil/mtypes.h>
 
 /**
  * Describes a string as a pointer to the start of the string characters

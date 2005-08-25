@@ -24,11 +24,7 @@
 #ifndef COND_VAR_H
 #define COND_VAR_H
 
-#if defined _MSC_VER
-typedef unsigned int uint32_t;
-#else
-#include<stdint.h>
-#endif
+#include<libmutil/mtypes.h>
 
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
