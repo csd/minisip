@@ -152,12 +152,14 @@ AC_ARG_ENABLE(p2t,
 AM_CONDITIONAL(P2T_SUPPORT, test "${p2t_enabled}" = "yes")
 
 dnl AEC support
-aec_enabled=no
 AC_ARG_ENABLE(aec,
-    [ --enable-aec enables push-2-talk features (default enabled)],
-    [  aec_enable=yes
-	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])])
-AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
+    [ --enable-aec enables echo cancelling features (default enabled)],
+    [ if test "${enable_aec}" != "no"
+      then
+	   AC_DEFINE(AEC_SUPPORT, [], [AEC support]) 
+      fi])
+
+AM_CONDITIONAL(AEC_SUPPORT, test "${enable_aec}" != "no")
 
 dnl #############
 dnl VIDEO SUPPORT
