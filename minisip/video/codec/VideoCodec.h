@@ -38,6 +38,7 @@ typedef uint8_t byte_t;
 class VideoCodec : public Codec{
 	public:
 
+		MRef<CodecState *> newInstance(){/*TODO*/ return NULL;};
 		VideoCodec();
 
 		/* called by the Grabber directly */
