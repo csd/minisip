@@ -85,17 +85,13 @@ void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
 
 
 
-void VideoMedia::playData( RtpPacket * packet ){
+void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
 		source->playData( packet );
 	}
-	else{
-		delete packet;
-	}
-
 }
 
 
@@ -301,13 +297,12 @@ MRef<AVDecoder *> VideoMediaSource::getDecoder(){
 	return decoder;
 }
 
-void VideoMediaSource::playData( RtpPacket * packet ){
+void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 	int seqNo = packet->getHeader().getSeqNo();
 
 	if( savedPacket ){
 		if( seqNo != expectedSeqNo - 2 ){
 			packetLoss = true;
-			delete savedPacket;
 			savedPacket = NULL;
 			//merr << "Packet lost in video stream, dropping one frame(seqNo == expectedSeqNo - 2)" << end;
 #ifdef DEBUG_OUTPUT
@@ -344,7 +339,7 @@ void VideoMediaSource::playData( RtpPacket * packet ){
 	
 }
 
-void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
+void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet ){
         if( !packetLoss ){
 	 	packet->getContent()[0] = 0;
                 memcpy( frame + index, packet->getContent() , packet->getContentLength()  );
@@ -359,6 +354,4 @@ void VideoMediaSource::addPacketToFrame( RtpPacket * packet ){
                 index = 0;
                 packetLoss = false;
         }
-
-	delete packet;
 }

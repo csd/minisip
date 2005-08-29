@@ -28,6 +28,8 @@
 #include"../soundcard/resampler/Resampler.h"
 #include"../soundcard/SoundSource.h"
 
+#include"../rtp/RtpPacket.h"
+
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
@@ -129,13 +131,13 @@ void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
 	}
 }
 
-void AudioMedia::playData( RtpPacket * packet ){
+void AudioMedia::playData( MRef<RtpPacket *> packet ){
 	MRef<AudioMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
 		source->playData( packet );
 	}
-        delete packet;
+        //delete packet;
 
 }
 
@@ -224,7 +226,7 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 {
 }
 
-void AudioMediaSource::playData( RtpPacket * rtpPacket ){
+void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){
         RtpHeader hdr = rtpPacket->getHeader();
 	MRef<CodecState *> codec = findCodec( hdr.getPayloadType() );
 

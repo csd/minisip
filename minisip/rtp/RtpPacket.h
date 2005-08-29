@@ -23,13 +23,14 @@
 #ifndef RTPPACKET_H
 #define RTPPACKET_H
 
+#include<libmutil/MemObject.h>
 #include"RtpHeader.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
 #include<config.h>
 
-class RtpPacket{
+class RtpPacket: public MObject {
 	public:
 		RtpPacket();
 		RtpPacket(unsigned char *content, int content_length, int seq_no, unsigned timestamp, unsigned ssrc);

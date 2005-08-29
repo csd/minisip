@@ -35,7 +35,6 @@
 #include"Media.h"
 #include"RtpReceiver.h"
 #include"../codecs/Codec.h"
-#include"../rtp/SRtpPacket.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include<iostream>
 
@@ -251,7 +250,7 @@ uint16_t MediaStreamReceiver::getPort(){
 	return rtpReceiver->getPort();
 }
 
-void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
+void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
 	uint32_t packetSsrc = packet->getHeader().getSSRC();
 	
 	if( packet->unprotect( getCryptoContext( packetSsrc ) )){
@@ -267,7 +266,7 @@ void MediaStreamReceiver::handleRtpPacket( SRtpPacket * packet ){
 
 	gotSsrc( packetSsrc );
 
-	media->playData( packet );
+	media->playData( *packet );
 }
 
 void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){

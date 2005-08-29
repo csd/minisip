@@ -51,7 +51,7 @@ class VideoMedia : public Media, public VideoEncoderCallback{
 
                 virtual std::string getSdpMediaType();
 
-                virtual void playData( RtpPacket * rtpPacket );
+                virtual void playData( MRef<RtpPacket *> rtpPacket );
 
                 virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
@@ -95,7 +95,7 @@ class VideoMediaSource : public MObject {
                 void addEmptyImage( MImage * image );
                 void addFilledImage( MImage * image );
                 
-		virtual void playData( RtpPacket * packet ); 
+		virtual void playData( MRef<RtpPacket *> packet ); 
 
 		MRef<AVDecoder *> getDecoder();
 
@@ -105,7 +105,7 @@ class VideoMediaSource : public MObject {
 
                 friend class VideoMedia;
 	private:
-		void addPacketToFrame( RtpPacket * packet );
+		void addPacketToFrame( MRef<RtpPacket *> packet );
 
 		MRef<AVDecoder *> decoder;
                 MRef<VideoDisplay *> display;
@@ -125,7 +125,7 @@ class VideoMediaSource : public MObject {
                 std::list<MImage *> filledImages;
                 Mutex filledImagesLock;
 
-		RtpPacket * savedPacket;
+		MRef<RtpPacket *> savedPacket;
 };
 
 

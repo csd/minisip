@@ -35,11 +35,12 @@
 
 #include<../codecs/Codec.h>
 
+#include"../rtp/RtpPacket.h"
+
 class SoundIO;
 class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
-class RtpPacket;
 
 typedef uint8_t byte_t;
 
@@ -76,7 +77,7 @@ class Media : public MObject{
 		 * decoding if relevant.
 		 * @param rtpPacket the RTP packet to play
 		 */
-		virtual void playData( RtpPacket * rtpPacket )=0;
+		virtual void playData( MRef<RtpPacket *> rtpPacket )=0;
 		
 		/**
 		 * Send the data to all the registered MediaStreamSender.

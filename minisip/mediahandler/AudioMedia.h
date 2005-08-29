@@ -68,7 +68,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
                  * decoding if relevant.
                  * @param rtpPacket the RTP packet to play
                  */
-                virtual void playData( RtpPacket * rtpPacket );
+                virtual void playData( MRef<RtpPacket *> rtpPacket );
 
                 /**
                  * Used by the media sessions to register a MediaStreamSender.
@@ -168,7 +168,7 @@ class AudioMediaSource : public BasicSoundSource{
 	public:
 		AudioMediaSource( uint32_t ssrc, MRef<Media *> media );
 
-		void playData( RtpPacket * rtpPacket );
+		void playData( MRef<RtpPacket *> rtpPacket );
 		uint32_t getSsrc();
 
 	private:

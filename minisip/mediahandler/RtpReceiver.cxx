@@ -83,7 +83,7 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 
 void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
 #ifdef DEBUG_OUTPUT
-	//cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
+	// cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
 #endif	
 	mediaStreamsLock.lock();
 	mediaStreams.remove( mediaStream );
@@ -93,7 +93,7 @@ void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream
 	}
 	mediaStreamsLock.unlock();
 #ifdef DEBUG_OUTPUT
-	//cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;
+	// cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;
 #endif
 }
 
@@ -106,7 +106,7 @@ MRef<UDPSocket *> RtpReceiver::getSocket(){
 }
 			
 void RtpReceiver::run(){
-	SRtpPacket * packet;
+	MRef<SRtpPacket *> packet;
 	
 	while( !kill ){
 		list< MRef<MediaStreamReceiver *> >::iterator i;
@@ -142,7 +142,7 @@ void RtpReceiver::run(){
 			continue;
 		}
 
-		if( packet == NULL ){
+		if( !packet ){
 			continue;
 		}
 

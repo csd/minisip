@@ -26,14 +26,14 @@
 #include<libmutil/MemObject.h>
 #include"../rtp/CryptoContext.h"
 #include"Media.h"
-#include"MediaStream.h"
 #include"Session.h"
 #include"RtpReceiver.h"
+
+#include"../rtp/SRtpPacket.h"
 
 class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
-class SRtpPacket;
 class IpProvider;
 
 /**
@@ -113,7 +113,6 @@ class MediaStream : public MObject{
 		
 		uint8_t localPayloadType;
 
-	private:
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc );
 		MRef<KeyAgreement *> ka;
 		Mutex kaLock;
@@ -177,7 +176,7 @@ class MediaStreamReceiver : public MediaStream{
 		 * playback.
 		 * @param packet the (S)RTP packet to handle
 		 */
-		void handleRtpPacket( SRtpPacket * packet );
+		virtual void handleRtpPacket( MRef<SRtpPacket *> packet );
 
 		/**
 		 * Returns a unique identifier for this Receiver. Used
@@ -195,7 +194,7 @@ class MediaStreamReceiver : public MediaStream{
 		 */
 		std::list<MRef<Codec *> > getAvailableCodecs();
 
-	private:
+	protected:
 		std::list<MRef<Codec *> > codecList;
 		MRef<RtpReceiver *> rtpReceiver;
 		uint32_t id;
