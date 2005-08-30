@@ -95,9 +95,11 @@ void AccountsStatusWidget::drawStatus( Gtk::CellRenderer * renderer,
 
 	Gtk::CellRendererText * textR = (Gtk::CellRendererText *)renderer;
 	Glib::ustring status;
-	MRef<SipIdentity *> identity = (*iter)[columns->identity];
+	MRef<SipIdentity *> identity; 
 
-	if( identity->isRegistered() ){
+	identity = (*iter)[columns->identity];
+
+	if( identity && identity->isRegistered() ){
 		status = "<span foreground=\"#00FF00\">Registered</span>";
 	}
 	else{
@@ -122,13 +124,15 @@ void AccountsStatusWidget::registerClicked(){
 
 	if( iter ){
 		id = (*iter)[columns->identity];
-		CommandString reg( "", SipCommandString::proxy_register );
-		reg["identityId"] = id->getId();
-		id->lock();
-		reg["proxy_domain"] = id->sipDomain;
-		reg.setParam3( id->sipProxy.getDefaultExpires() );
-		id->unlock();
-		callback->guicb_handleCommand( reg );
+		if( id ){
+			CommandString reg( "", SipCommandString::proxy_register );
+			reg["identityId"] = id->getId();
+			id->lock();
+			reg["proxy_domain"] = id->sipDomain;
+			reg.setParam3( id->sipProxy.getDefaultExpires() );
+			id->unlock();
+			callback->guicb_handleCommand( reg );
+		}
 	}
 }
 
@@ -140,13 +144,15 @@ void AccountsStatusWidget::unregisterClicked(){
 
 	if( iter ){
 		id = (*iter)[columns->identity];
-		CommandString reg( "", SipCommandString::proxy_register );
-		reg["identityId"] = id->getId();
-		id->lock();
-		reg["proxy_domain"] = id->sipDomain;
-		id->unlock();
-		reg.setParam3( "0" );
-		callback->guicb_handleCommand( reg );
+		if( id ){
+			CommandString reg( "", SipCommandString::proxy_register );
+			reg["identityId"] = id->getId();
+			id->lock();
+			reg["proxy_domain"] = id->sipDomain;
+			id->unlock();
+			reg.setParam3( "0" );
+			callback->guicb_handleCommand( reg );
+		}
 	}
 }
 
