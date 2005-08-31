@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.minisip.minisip
+Exec=/var/lib/install/usr/bin/minisip
