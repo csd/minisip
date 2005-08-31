@@ -38,6 +38,10 @@
 
 
 AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", false ){
+#ifdef HILDON_SUPPORT
+	// FIXME
+	set_size_request( -1, 400 );
+#endif
 
 	// Create the active widgets
 	nameEntry = manage( new Gtk::Entry );
@@ -68,9 +72,14 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	uint8_t row = 0;
 	this->list = list;
 	Gtk::VBox * vbox = get_vbox();
-	Gtk::HBox * hbox = manage( new Gtk::HBox( false, 12 ) );
-	vbox->pack_start( *hbox, true, true );
+	Gtk::ScrolledWindow * scrolledWindow = 
+		manage( new Gtk::ScrolledWindow() );
+	scrolledWindow->set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
+	vbox->pack_start( *scrolledWindow, true, true );
 	vbox->set_spacing( 12 );
+	
+	Gtk::HBox * hbox = manage( new Gtk::HBox( false, 12 ) );
+	scrolledWindow->add( *hbox );
 	Gtk::Table * table = manage( new Gtk::Table( 10, 2, false ) );
 	table->set_col_spacings( 6 );
 	table->set_row_spacings( 6 );

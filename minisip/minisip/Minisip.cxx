@@ -57,6 +57,10 @@ using namespace std;
 #endif
 #endif
 
+#ifdef OSSO_SUPPORT
+#include<libosso.h>
+#endif
+
 extern Mutex global;
 
 #ifndef WIN32
@@ -148,6 +152,14 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	LogEntry::handler = NULL;
 #endif //GTK_GUI
 #endif //TEXT_UI
+
+#ifdef OSSO_SUPPORT
+	osso_context_t * ossoCtxt = NULL;
+	ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
+	if( !ossoCtxt ){
+		mdbg << "Could not initialize osso context" << end;
+	}
+#endif
 
 #ifdef DEBUG_OUTPUT
 	cerr << "Setting contact db"<< endl;

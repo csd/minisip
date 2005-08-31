@@ -4,7 +4,7 @@ libconfbackend_a_SOURCES = ConfBackend.cxx \
 			 MXmlConfBackend.cxx
 
 if GCONF_SUPPORT
-AM_CPPFLAGS += -DPROUT @GCONF_CFLAGS@
+AM_CPPFLAGS += @GCONF_CFLAGS@
 libconfbackend_a_SOURCES += GConfBackend.cxx
 endif
 

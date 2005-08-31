@@ -88,10 +88,11 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 		exit( 1 );
 	}
 
+#ifndef HILDON_SUPPORT
 	refXml->get_widget( "minisipMain", mainWindowWidget );
-
-	refXml->get_widget( "phoneBookTree", phoneBookTreeView );
 	refXml->get_widget( "mainTabWidget", mainTabWidget );
+#endif
+	refXml->get_widget( "phoneBookTree", phoneBookTreeView );
 	
 	refXml->get_widget( "phoneMenu", phoneMenu );
 	refXml->get_widget( "phoneAddMenu", phoneAddMenu );
@@ -135,12 +136,13 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	mainHBox = manage( new Gtk::HBox( true, 6 ) );
 
-	mainTabWidget = new Gtk::Notebook();
+	mainTabWidget = manage( new Gtk::Notebook() );
 	
 	refXml->get_widget( "dialVBox", w );
 
 	w->reparent( *mainHBox );
 	mainHBox->add( *mainTabWidget );
+	//mainHBox->pack_end( *mainTabWidget );
 
 	mainHBox->show_all();
 
@@ -280,24 +282,24 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	mainWindowWidget->signal_hide().connect( SLOT( *this, &MainWindow::hideSlot ));
 #endif
 
-	logWidget = manage( new LogWidget( this ) );
+	logWidget = new LogWidget( this );
 
-	mainTabWidget->append_page( *logWidget, "Call list" );
+	//mainTabWidget->append_page( *logWidget, "Call list" );
 
 	accountsList = AccountsList::create( new AccountsListColumns() );
 
-	statusWidget = manage( new AccountsStatusWidget( accountsList) );
-	mainTabWidget->append_page( *statusWidget, "Accounts" );
+	statusWidget = new AccountsStatusWidget( accountsList);
+	//mainTabWidget->append_page( *statusWidget, "Accounts" );
 
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
 
-	mainTabWidget->signal_switch_page().connect(
-		SLOT( *this, &MainWindow::onTabChange ) );
+//	mainTabWidget->signal_switch_page().connect(
+//		SLOT( *this, &MainWindow::onTabChange ) );
 
 	mainWindowWidget->show_all();
+//	statusWidget->hide();
 	logWidget->hide();
-	statusWidget->hide();
 	mainWindowWidget->set_sensitive( false );
 }
 
@@ -305,6 +307,8 @@ MainWindow::~MainWindow(){
 	factory->remove_default();
 	delete settingsDialog;
 	delete certificateDialog;
+	delete statusWidget;
+	delete logWidget;
 	delete phoneMenu;
 	if( trayIcon ){
 		delete trayIcon;
@@ -787,27 +791,32 @@ void MainWindow::gotLogEntry(){
 
 void MainWindow::viewToggle( uint8_t w ){
 	Gtk::Widget * widget;
+	Glib::ustring title;
 	switch( w ){
 		case 0:
 			widget = logWidget;
+			title = "Call list";
 			break;
 		case 1:
 			widget = statusWidget;
+			title = "Accounts";
 			break;
 		default:
 			return;
 	}
 	
 	if( widget->is_visible() ){
+		mainTabWidget->remove_page( *widget );
 		widget->hide();
 	}
 	else{
-		widget->show();
+		mainTabWidget->append_page( *widget, title );
+		mainTabWidget->show_all();
 	}
 }
 
 void MainWindow::setCallback( GuiCallback * callback ){
-	statusWidget->setCallback( callback );
+	//((AccountsStatusWidget*)statusWidget)->setCallback( callback );
 	settingsDialog->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );
 	Gui::setCallback( callback );

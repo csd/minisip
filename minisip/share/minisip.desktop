@@ -1,8 +1,9 @@
 [Desktop Entry]
+Encoding=UTF-8
 Name=Minisip
 Comment=Soft Telephone
 Exec=minisip
-Terminal=0
+Terminal=false
 Type=Application
 Icon=minisip.png
 Categories=PIM;GPE;Application;Network

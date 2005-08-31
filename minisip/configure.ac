@@ -134,22 +134,31 @@ AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
 dnl #############
 dnl IPSEC SUPPORT
 dnl #############
-ipsec_enable=no
-AC_ARG_ENABLE(ipsec-enable,
-    [ --enable-ipsec-enable enables ipsec features (default disabled)],
-    [	ipsec_enable=yes
-	AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
-	  [Could not locate libipsec, required for ipsec features.])])
-	AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])])
-AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
+AC_ARG_ENABLE(ipsec,
+    [ --enable-ipsec enables ipsec features (default disabled)],
+    [	if test "${enable_ipsec}" = "yes"
+        then
+	  AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
+	    [Could not locate libipsec, required for ipsec features.])])
+	  AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])
+        fi
+    ]
+)
+
+AM_CONDITIONAL(IPSEC_SUPPORT, test "${enable_ipsec}" = "yes")
 
 dnl P2T support
-p2t_enabled=no
 AC_ARG_ENABLE(p2t,
-    [ --enable-ipsec-enable enables push-2-talk features (default enabled)],
-    [  p2t_enable=yes
-	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])])
-AM_CONDITIONAL(P2T_SUPPORT, test "${p2t_enabled}" = "yes")
+    [ --enable-p2t enables push-2-talk features (default disabled)],
+    [  
+      if test "${enable_p2t}" = "yes"
+      then
+	AC_DEFINE(P2T_SUPPORT, [], [Push-to-talk support])
+      fi
+    ]
+)
+
+AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
 
 dnl AEC support
 AC_ARG_ENABLE(aec,
@@ -329,9 +338,18 @@ AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
 PKG_CHECK_MODULES(HILDON, [hildon-libs],
 	[
 	 	AC_DEFINE(HILDON_SUPPORT, [], [Support the Hildon extensions])
-	 	AC_DEFINE(MAEMO_SUPPORT, [], [Support the maemo platform])
+		hildon_support="yes"
 	],[echo 'No Hildon support.'])
 
+AM_CONDITIONAL(HILDON_SUPPORT, [test "${hildon_support}" = "yes"])
+
+PKG_CHECK_MODULES(OSSO, [libosso],
+	[
+	 	AC_DEFINE(OSSO_SUPPORT, [], [Support the libosso library])
+		osso_support="yes"
+	],[echo 'No libosso support.'])
+
+AM_CONDITIONAL(OSSO_SUPPORT, [test "${osso_support}" = "yes"])
 
 AC_ARG_ENABLE(gconf,
     [ --enable-gconf enables support for GConf (default enabled).])
