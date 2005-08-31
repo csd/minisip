@@ -93,7 +93,7 @@ std::string GConfBackend::loadString( std::string key, std::string defaultValue 
 			g_clear_error( &err );
 			throw ConfBackendException();
 		}
-		ret = "";
+		ret = defaultValue;
 
 	}
 	else{
@@ -109,11 +109,19 @@ int32_t GConfBackend::loadInt( std::string key, int32_t defaultValue ){
 	GError * err = NULL;
 	sanitizeKey( key );
 	const gchar * gkey = (const gchar *)(KEY_ROOT + key).c_str();
-	gint gvalue;
+	GConfValue * gvalue;
 	
-	gvalue = gconf_client_get_int( client, gkey, &err );
+	gvalue = gconf_client_get_without_default( client, gkey, &err );
 
-	return (int32_t)gvalue;
+	if( ! gvalue ){
+		return defaultValue;
+	}
+
+	if( gvalue->type != GCONF_VALUE_INT ){
+		throw ConfBackendException();
+	}
+
+	return (int32_t)( gconf_value_get_int( gvalue ) );
 
 }
 

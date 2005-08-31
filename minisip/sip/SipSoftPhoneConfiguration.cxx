@@ -87,12 +87,12 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 
 void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ... 
-	backend->save("version", CONFIG_FILE_VERSION_REQUIRED );
+	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 	
-	backend->save("local_udp_port", itoa(inherited->localUdpPort));
-	backend->save("local_tcp_port", itoa(inherited->localTcpPort));
-	backend->save("local_tls_port", itoa(inherited->localTlsPort));
-	backend->save("auto_answer", inherited->autoAnswer?"yes":"no");
+	backend->save( "local_udp_port", inherited->localUdpPort );
+	backend->save( "local_tcp_port", inherited->localTcpPort );
+	backend->save( "local_tls_port", inherited->localTlsPort );
+	backend->save( "auto_answer", inherited->autoAnswer?"yes":"no");
 	securityConfig.save( backend );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
@@ -213,7 +213,6 @@ void SipSoftPhoneConfiguration::save(){
 }
 
 string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
-	cerr << "Started load( be )" << endl;
 	backend = be;
 
 	//installConfigFile( this->configFileName );
@@ -245,7 +244,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		string accountPath = string("account[")+itoa(ii)+"]/";
 		account = backend->loadString(accountPath+"account_name");
-		cerr << "Loaded account " << account << endl;
 		if( account == "" ){
 			break;
 		}
