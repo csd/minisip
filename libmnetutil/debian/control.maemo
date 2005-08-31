@@ -1,0 +1,26 @@
+Source: libmnetutil
+Priority: optional
+Maintainer: Johan Bilien <jobi@via.ecp.fr>
+Build-Depends: debhelper (>= 4.0.0), libmutil-dev (>= 0.3.0)
+Standards-Version: 3.6.1
+
+Package: libmnetutil0
+Section: libs
+Architecture: any
+Depends: libmutil0 (>=0.3.1)
+Description: different utilities classes for portable networking C++ development
+ libmnetutil contains different classes useful to write portable networking
+ applications in C++. It includes UDP, TCP and TLS sockets, DNS resolving...
+ .
+ This package contains the libmnetutil0 runtime library.
+
+Package: libmnetutil-dev
+Section: devel
+Architecture: any
+Depends: libmnetutil0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Description: different utilities classes for portable networking C++ development
+ libmnetutil contains different classes useful to write portable networking
+ applications in C++. It includes UDP, TCP and TLS sockets, DNS resolving...
+ .
+ This package contains the header files and static library needed to
+ compile applications that use libmnetutil0.
