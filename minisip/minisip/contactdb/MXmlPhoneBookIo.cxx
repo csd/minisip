@@ -28,6 +28,7 @@
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 #include<string>
+#include<fstream>
 
 using namespace std;
 
@@ -45,8 +46,14 @@ MRef<PhoneBook *> MXmlPhoneBookIo::load(){
 	}
 
 	catch( XMLFileNotFound& exc ){
-		cerr << "Phonebook file not found." << endl;
-		return NULL;
+		cerr << "Phonebook file not found. Creating default one." << endl;
+		createDefault();
+		try{
+			 parser = new XMLFileParser( fileName );
+		}
+		catch( XMLException &exc ){
+			return NULL;
+		}
 		
 	}
 	if( parser == NULL ){
@@ -135,3 +142,22 @@ string MXmlPhoneBookIo::getPhoneBookId(){
 	return "file://" + fileName;
 }
 
+void MXmlPhoneBookIo::createDefault(){
+	ofstream phonebookFile( fileName.c_str() );
+
+	phonebookFile << getDefaultPhoneBookString() << endl;
+
+}
+
+
+string MXmlPhoneBookIo::getDefaultPhoneBookString(){
+        string defaultPhonebook =
+//                "<version>" CONFIG_FILE_VERSION_REQUIRED_STR "</version>"
+                "<phonebook name=Example>\n"
+                "<contact name=\"Contact\">\n"
+                "<pop desc=\"Phone\" uri=\"0000000000\"></pop>\n"
+                "<pop desc=\"Laptop\" uri=\"sip:contact@minisip.org\"></pop>\n"
+                "</contact>\n"
+                "</phonebook>\n";
+        return defaultPhonebook;
+}

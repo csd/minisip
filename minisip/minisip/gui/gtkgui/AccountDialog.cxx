@@ -41,6 +41,8 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 #ifdef HILDON_SUPPORT
 	// FIXME
 	set_size_request( -1, 400 );
+#else
+	set_size_request( -1, 600 );
 #endif
 
 	// Create the active widgets
@@ -75,11 +77,17 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	Gtk::ScrolledWindow * scrolledWindow = 
 		manage( new Gtk::ScrolledWindow() );
 	scrolledWindow->set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
+	scrolledWindow->set_shadow_type( Gtk::SHADOW_NONE );
 	vbox->pack_start( *scrolledWindow, true, true );
 	vbox->set_spacing( 12 );
 	
 	Gtk::HBox * hbox = manage( new Gtk::HBox( false, 12 ) );
 	scrolledWindow->add( *hbox );
+
+	// Access the viewport
+	dynamic_cast<Gtk::Viewport *>( hbox->get_parent() )
+		->set_shadow_type( Gtk::SHADOW_NONE );
+	
 	Gtk::Table * table = manage( new Gtk::Table( 10, 2, false ) );
 	table->set_col_spacings( 6 );
 	table->set_row_spacings( 6 );
@@ -90,7 +98,7 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	hbox->pack_start( *label, false, false );
 
 	vbox = manage( new Gtk::VBox( false, 6 ) );
-	hbox->pack_start( *vbox, false, false );
+	hbox->pack_start( *vbox, true, true );
 	
 	label = manage( new Gtk::Label( "" ) );
 	hbox->pack_start( *label, false, false );
@@ -101,7 +109,7 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 
 //	vbox->pack_start( *label, false, false, 12 );
 
-	vbox->pack_start( *table, false, false, 12 );
+	vbox->pack_start( *table, true, true, 12 );
 
 	ADD( label )
 

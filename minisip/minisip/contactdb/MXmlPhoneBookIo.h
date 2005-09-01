@@ -44,6 +44,8 @@ class MXmlPhoneBookIo : public PhoneBookIo{
 		virtual std::string getPhoneBookId();
 
         private:
+		std::string getDefaultPhoneBookString();
+		void createDefault();
                 std::string fileName;
 };
 

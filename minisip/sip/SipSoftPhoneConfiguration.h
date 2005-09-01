@@ -75,7 +75,6 @@ class SipSoftPhoneConfiguration : public MObject{
 		std::string load( MRef<ConfBackend *> be );
 		
 		static string getDefaultPhoneBookFilename();
-		static string getDefaultPhoneBookString();
 		
 		static void installConfigFile(string config, string address="", bool overwrite=false);
 		

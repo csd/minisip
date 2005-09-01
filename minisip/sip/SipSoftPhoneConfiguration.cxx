@@ -447,23 +447,12 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "codec[0]", "G.711" );
 #endif
 
-	be->save( "phonebook", "file://" + getDefaultPhoneBookFilename() );
+	be->save( "phonebook[0]", "file://" + getDefaultPhoneBookFilename() );
 
 	be->commit();
 	
 }
 
-string SipSoftPhoneConfiguration::getDefaultPhoneBookString() {
-	string defaultPhonebook =
-		"<version>" CONFIG_FILE_VERSION_REQUIRED_STR "</version>"
-		"<phonebook name=Example>\n"
-		"<contact name=\"Contact\">\n"
-		"<pop desc=\"Phone\" uri=\"0000000000\"></pop>\n"
-		"<pop desc=\"Laptop\" uri=\"sip:contact@minisip.org\"></pop>\n"
-		"</contact>\n"
-		"</phonebook>\n";
-	return defaultPhonebook;
-}
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	string phonebookFileName;
