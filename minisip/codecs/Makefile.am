@@ -8,7 +8,7 @@ libcodecs_a_SOURCES = ILBCCODEC.cxx \
 
 if HAS_SPEEX
 libcodecs_a_SOURCES += SPEEXCODEC.cxx
-#endif
+endif
 
 if HAS_GSM
 libcodecs_a_SOURCES += GsmCodec.cxx
