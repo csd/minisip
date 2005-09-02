@@ -128,6 +128,18 @@ AC_CHECK_HEADER([speex/speex.h],
 )
 AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
 
+dnl Check for libgsm
+AC_CHECK_HEADER([gsm.h], 
+	[
+		AC_CHECK_LIB([gsm], [main],
+			[LIBS="-lgsm ${LIBS}"
+			 AC_DEFINE(HAS_GSM, [], [Use the GSM CODEC])])
+			 HAS_GSM="yes"
+	]
+)
+AM_CONDITIONAL(HAS_GSM, test "${HAS_GSM}" = "yes")
+
+
 
 
 

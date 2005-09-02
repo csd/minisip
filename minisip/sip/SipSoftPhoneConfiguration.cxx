@@ -440,9 +440,16 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "sound_device", "/dev/dsp" );
 	be->save( "mute_all_but_one", "yes" );
 	be->save( "mixer_type", "spatial" );
-#ifdef HAS_SPEEX
+#if defined HAS_SPEEX && defined HAS_GSM
 	be->save( "codec[0]", "speex" );
 	be->save( "codec[1]", "G.711" );
+	be->save( "codec[2]", "GSM" );
+#elif defined HAS_SPEEX
+	be->save( "codec[0]", "speex" );
+	be->save( "codec[1]", "G.711" );
+#elif defined HAS_GSM
+	be->save( "codec[0]", "G.711" );
+	be->save( "codec[1]", "GSM" );
 #else
 	be->save( "codec[0]", "G.711" );
 #endif

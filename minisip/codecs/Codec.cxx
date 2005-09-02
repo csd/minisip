@@ -25,11 +25,16 @@
 #include"G711CODEC.h"
 #include"ILBCCODEC.h"
 #include"SPEEXCODEC.h"
+#include"GsmCodec.h"
 
 MRef<CodecState *> AudioCodec::createState( uint8_t payloadType ){
         switch( payloadType ){
                 case 0:
                         return new G711CodecState();
+#ifdef HAS_GSM
+		case 3:
+			return new GsmCodecState();
+#endif
 		case 97:
 			return new ILBCCodecState();
 #ifdef HAS_SPEEX
@@ -53,6 +58,11 @@ MRef<AudioCodec *> AudioCodec::create( const std::string & description ){
 #ifdef HAS_SPEEX
         if( description == "speex" ){
                 return new SpeexCodec();
+        }
+#endif
+#ifdef HAS_GSM
+        if( description == "GSM" ){
+                return new GsmCodec();
         }
 #endif
 
