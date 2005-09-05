@@ -99,8 +99,15 @@ void CertificateDialog::run(){
 void CertificateDialog::chooseCert(){
 	string result;
 	MRef<certificate *> chosenCert;
+#ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose your certificate file" );
+#else
+	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
+			"Choose your certificate file" );
+	dialog->add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	dialog->add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+#endif
 
 	int retVal = dialog->run();
 
@@ -150,8 +157,15 @@ void CertificateDialog::chooseCert(){
 
 void CertificateDialog::choosePKey(){
 	string result;
+#ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose your private key file" );
+#else
+	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
+			"Choose your private key file" );
+	dialog->add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	dialog->add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+#endif
 
 	int retVal = dialog->run();
 
@@ -197,8 +211,15 @@ void CertificateDialog::addCert(){
 	string result;
 	MRef<certificate *> chosenCert;
 
+#ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose a certificate file" );
+#else
+	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
+			"Choose your certificate file" );
+	dialog->add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	dialog->add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+#endif
 
 	int retVal = dialog->run();
 
@@ -269,8 +290,15 @@ void CertificateDialog::addFileCa(){
 	string result;
 	MRef<certificate *> chosenCert;
 
+#ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose a CA file" );
+#else
+	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
+			"Choose a CA file" );
+	dialog->add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	dialog->add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+#endif
 
 	int retVal = dialog->run();
 
@@ -310,15 +338,22 @@ void CertificateDialog::addDirCa(){
 	string result;
 	MRef<certificate *> chosenCert;
 
+#ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose a CA directory" );
-
 	if( dialog->get_file_list() ){
 		dialog->get_file_list()->get_parent()->hide();
 	}
 	if( dialog->get_selection_entry() ){
 		dialog->get_selection_entry()->hide();
 	}
+#else
+	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
+			"Choose your CA directory", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER );
+	dialog->add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	dialog->add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+#endif
+
 	int retVal = dialog->run();
 
 	if( retVal == Gtk::RESPONSE_OK ){
