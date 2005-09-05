@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef _NSLOOKUP_H
 #define _NSLOOKUP_H
@@ -38,27 +37,25 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/IPAddress.h>
 
-
 class LIBMNETUTIL_API NsLookup{
-    public:
-//        NsLookup(int maxCacheTimeout=900);
-//        IPAddress *lookup(string addr);
-//        string lookup_str(string addr);
-        
-        static IPAddress *staticLookup(std::string addr);
-        static std::string staticLookup_str(std::string addr);
-//        void clearCache();
-    private:
-//        hash_map<string, string> cache;
+	public:
+		//NsLookup(int maxCacheTimeout=900);
+		//IPAddress *lookup(string addr);
+		//string lookup_str(string addr);
+
+		static IPAddress *staticLookup(std::string addr);
+		static std::string staticLookup_str(std::string addr);
+		//void clearCache();
+	private:
+		//hash_map<string, string> cache;
 };
 
-class LIBMNETUTIL_API NsLookupHostNotFound : public NetworkException{
-    public:
-        NsLookupHostNotFound(std::string host);
-        
-        virtual std::string errorDescription();
-    private:
-	std::string host;
-};
+class LIBMNETUTIL_API NsLookupHostNotFound : public NetworkException {
+	public:
+		NsLookupHostNotFound(std::string host);
 
+		virtual std::string errorDescription();
+	private:
+		std::string host;
+};
 #endif

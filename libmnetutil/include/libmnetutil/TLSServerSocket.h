@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef TLSSERVERSOCKET_H
 #define TLSSERVERSOCKET_H
@@ -35,7 +34,6 @@
 #define LIBMNETUTIL_API
 #endif
 
-
 #include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmutil/cert.h>
@@ -47,7 +45,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
+class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket {
 
 	public:
 		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
@@ -61,8 +59,10 @@ class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket{
 
 		SSL_CTX * ssl_ctx;
 		SSL * ssl;
-		/* CA db */
+		
+		/**
+		 CA db 
+		 */
 		MRef<ca_db *> cert_db;
 };
-
 #endif

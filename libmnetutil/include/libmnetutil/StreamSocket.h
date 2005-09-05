@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef STREAMSOCKET_H
 #define STREAMSOCKET_H
@@ -43,7 +42,7 @@ using namespace std;
 class IPAddress;
 class IP4Address;
 
-class LIBMNETUTIL_API StreamSocket : public Socket{
+class LIBMNETUTIL_API StreamSocket : public Socket {
 	public:
 		virtual ~StreamSocket();
 		virtual int32_t write(std::string)=0;
@@ -62,5 +61,4 @@ class LIBMNETUTIL_API StreamSocket : public Socket{
 		uint16_t peerPort;
 
 };
-
 #endif

@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef NETWORK_EXCEPTION_H
 #define NETWORK_EXCEPTION_H
@@ -54,8 +53,8 @@ class LIBMNETUTIL_API NetworkException{
 class LIBMNETUTIL_API HostNotFound : public NetworkException{
 	public:
 		HostNotFound( std::string host ):host(host){};
-		virtual std::string errorDescription(){ return
-			"Host "+host+" not found.";
+		virtual std::string errorDescription() {
+			return "Host "+host+" not found.";
 		}
 	private:
 		std::string host;
@@ -113,17 +112,16 @@ class LIBMNETUTIL_API TLSConnectFailed : public ConnectFailed{
 class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
 	public:
 		TLSInitFailed();
-		virtual std::string errorDescription(){return
-			"TLS initialization failed.";
+		virtual std::string errorDescription() {
+			return "TLS initialization failed.";
 		};
 };
 
 class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
 	public:
 		TLSContextInitFailed();
-		virtual std::string errorDescription(){return
-			"TLS context initialization failed.";
+		virtual std::string errorDescription() {
+			return "TLS context initialization failed.";
 		};
 };
-
 #endif

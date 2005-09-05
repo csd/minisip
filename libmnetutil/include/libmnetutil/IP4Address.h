@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef IP4ADDRESS_H
 #define IP4ADDRESS_H
@@ -41,31 +40,30 @@
 
 struct sockaddr_in;
 
-class LIBMNETUTIL_API IP4Address : public IPAddress{
+class LIBMNETUTIL_API IP4Address : public IPAddress {
 	public:
 		IP4Address(std::string addr);
 		IP4Address(struct sockaddr_in *sin);
 		IP4Address(const IP4Address&);
 		~IP4Address();
-		
+
 		uint32_t getBinaryIP();
-		
+
 		virtual std::string getString();
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP4Address &a);
-	
+
 		virtual struct sockaddr * getSockaddrptr(int32_t port=0);
 		virtual int32_t getSockaddrLength();
-		
+
 		virtual bool operator ==(const IP4Address &i4) const;
 		virtual bool operator ==(const IPAddress &i) const;
 
 		virtual IP4Address * clone() const{ return new IP4Address(*this);};
-		
+
 	private:
 		std::string ipaddr;
 		struct sockaddr_in * sockaddress;
 		uint32_t numIp;
 };
-
 #endif

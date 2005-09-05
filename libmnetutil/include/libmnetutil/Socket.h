@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef SOCKET_H
 #define SOCKET_H
@@ -35,16 +34,16 @@
 #define LIBMNETUTIL_API
 #endif
 
-#define SOCKET_TYPE_STREAM	0x10
-#define SOCKET_TYPE_TCP		0x11
-#define SOCKET_TYPE_TLS		0x12
+#define SOCKET_TYPE_STREAM      0x10
+#define SOCKET_TYPE_TCP         0x11
+#define SOCKET_TYPE_TLS         0x12
 
-#define SOCKET_TYPE_UDP		0x20
+#define SOCKET_TYPE_UDP         0x20
 
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
 
-class LIBMNETUTIL_API Socket : public MObject{
+class LIBMNETUTIL_API Socket : public MObject {
 	public:
 		Socket();
 		virtual ~Socket();
@@ -53,10 +52,9 @@ class LIBMNETUTIL_API Socket : public MObject{
 
 		void close();
 //		virtual std::string getMemObjectType(){return "Socket";};
-	
+
 	protected:
 		int32_t type;
 		int32_t fd;
 };
-
 #endif

@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef SERVERSOCKET_H
 #define SERVERSOCKET_H
@@ -40,27 +39,24 @@
 
 using namespace std;
 
-class LIBMNETUTIL_API ServerSocket : public Socket{
+class LIBMNETUTIL_API ServerSocket : public Socket {
 
 	public:
 		ServerSocket(int32_t domain, int32_t listen_port);
 		virtual MRef<StreamSocket *> accept();
 
-		
 		/**
-		 * get the port where the socket is listening to incoming
-		 * connections.
-		 * @return the port number
-		 */
+		* get the port where the socket is listening to incoming
+		* connections.
+		* @return the port number
+		*/
 		int32_t getPort();
 
 	protected:
 		void listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog);
 		void listen(string local_ip, int32_t local_port, int32_t backlog);
-		
+
 	private:
 		int32_t domain, listen_port;
 };
-
-
 #endif

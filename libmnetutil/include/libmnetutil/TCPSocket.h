@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef TCPSOCKET_H
 #define TCPSOCKET_H
@@ -38,8 +37,7 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmnetutil/IPAddress.h>
 
-
-class LIBMNETUTIL_API TCPSocket : public StreamSocket{
+class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 	public:
 		TCPSocket(int32_t fd, sockaddr * addr);
 		TCPSocket(std::string addr,int32_t port=0);
@@ -48,20 +46,19 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket{
 		virtual ~TCPSocket();
 
 		virtual std::string getMemObjectType(){return "TCPSocket";};
-		
+
 		virtual int32_t write(std::string);
 		virtual int32_t write(void *buf, int32_t count);
 		virtual int32_t read(void *buf, int32_t count);
-		//void flush();
+//		void flush();
 
 		void useNoDelay(bool noDelay);
 
 		friend std::ostream& operator<<(std::ostream&, TCPSocket&);
-		
+
 	private:
 //		IPAddress *ipaddr;
 };
 
 TCPSocket& operator<<(TCPSocket& sock, std::string str);
-
 #endif

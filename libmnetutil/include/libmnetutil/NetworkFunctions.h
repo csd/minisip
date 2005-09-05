@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef NETWORKFUNCTIONS_H
 #define NETWORKFUNCTIONS_H
@@ -48,11 +47,10 @@ class LIBMNETUTIL_API NetworkFunctions{
 		static string getHostHandlingService(string service, string domain, uint16_t &ret_port);
 		static bool isLocalIP(uint32_t ip, vector<string> &localIPs);
 
-		static void binIp2String(uint32_t ip, char *strBufMin16); //OBS: ip is host byte order 
+		//OBS: ip is host byte order
+		static void binIp2String(uint32_t ip, char *strBufMin16);
 
 	private:
 
 };
-
-
 #endif

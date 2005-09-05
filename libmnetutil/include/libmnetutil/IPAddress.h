@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef IPADDRESS_H
 #define IPADDRESS_H
@@ -37,17 +36,17 @@
 
 #include<libmnetutil/Socket.h>
 
-#define IP_ADDRESS_TYPE_V4 	0
-#define IP_ADDRESS_TYPE_V6	1
+#define IP_ADDRESS_TYPE_V4      0
+#define IP_ADDRESS_TYPE_V6      1
 
 #include<string>
 
-class LIBMNETUTIL_API IPAddress{
+class LIBMNETUTIL_API IPAddress {
 	public:
 		virtual ~IPAddress();
 
-		int32_t getType(){return type;};
-		
+		int32_t getType() { return type; };
+
 		int getAddressFamily();
 		int getProtocolFamily();
 		virtual std::string getString()=0;
@@ -61,16 +60,14 @@ class LIBMNETUTIL_API IPAddress{
 		virtual IPAddress * clone() const =0;
 
 		static IPAddress * create(sockaddr * addr);
-		
+
 	protected:
 		void setAddressFamily(int af);
 		void setProtocolFamily(int pf);
 		int32_t type;
-		
+
 	private:
 		int protocol_family;
 		int address_family;
 };
-
-
 #endif

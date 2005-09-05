@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef IP6ADDRESS_H
 #define IP6ADDRESS_H
@@ -41,13 +40,13 @@
 
 struct sockaddr_in6;
 
-class LIBMNETUTIL_API IP6Address : public IPAddress{
+class LIBMNETUTIL_API IP6Address : public IPAddress {
 	public:
 		IP6Address(std::string addr);
 		IP6Address(const IP6Address&);
 		IP6Address(struct sockaddr *);
 		~IP6Address();
-		
+
 		virtual std::string getString();
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP6Address &a);
@@ -59,11 +58,10 @@ class LIBMNETUTIL_API IP6Address : public IPAddress{
 		virtual bool operator ==(const IPAddress &i) const;
 
 		virtual IP6Address * clone() const{return new IP6Address(*this);};
-		
+
 	private:
 		std::string ipaddr;
 		unsigned short num_ip[8];
 		struct sockaddr_in6 * sockaddress;
 };
-
 #endif

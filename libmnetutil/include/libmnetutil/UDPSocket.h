@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,8 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
+ */
 
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
@@ -40,22 +39,25 @@
 
 using namespace std;
 
-class LIBMNETUTIL_API UDPSocket : public Socket{
+class LIBMNETUTIL_API UDPSocket : public Socket {
 	public:
 		UDPSocket(bool use_ipv6=false, int32_t port=0);
+		
 		virtual ~UDPSocket();
 
 		virtual std::string getMemObjectType(){return "UDPSocket";}
-		
+
 		int32_t getPort();
+		
 		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
+		
 		int32_t recvFrom(void *buf, int32_t len, IPAddress *& from);
+		
 		int32_t recv(void *buf, int32_t len);
 
 		bool setLowDelay();
-		
+
 	private:
 		bool use_ipv6;
 };
-
 #endif

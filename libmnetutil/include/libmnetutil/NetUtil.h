@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,9 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
-
+ */
 
 #ifndef _NETUTIL_H
 #define _NETUTIL_H
@@ -38,10 +36,8 @@
 
 //#include<config.h>
 
-class LIBMNETUTIL_API NetUtil{
+class LIBMNETUTIL_API NetUtil {
 	public:
 		static bool init();
 };
-
-
 #endif
