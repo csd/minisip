@@ -28,13 +28,17 @@
 
 #include<iostream>
 
+#include<libmutil/itoa.h> //for debug ... remove
+
 using namespace std;
 
 SoundSource::SoundSource(int id):sourceId(id){
-	leftch = NULL;
-	rightch = NULL;
-	lookupright = NULL;
-	lookupleft = NULL;
+// 	leftch = NULL;
+// 	rightch = NULL;
+// 	lookupright = NULL;
+// 	lookupleft = NULL;
+	setSilenced( false );
+	position = 0;
 }
 
 void SoundSource::setPointer(int32_t wpointer){
@@ -83,21 +87,21 @@ BasicSoundSource::BasicSoundSource(int32_t id,
         /* spatial audio initialization */
         leftch = new short[1028];
         rightch = new short[1028];
-        lookupleft = new short[65536];
-        lookupright = new short[65536];
+//         lookupleft = new short[65536];
+//         lookupright = new short[65536];
         pointer = 0;
         j=0;
         k=0;
-
+	cerr << "BasicSoundSource::  - new with id(ssrc) = " << itoa(id) << endl;
 }
 
 BasicSoundSource::~BasicSoundSource(){
 	delete [] temp;
         delete [] stereoBuffer;
-        delete [] leftch;
-        delete [] rightch;
-        delete [] lookupleft;
-        delete [] lookupright;
+//         delete [] leftch;
+//         delete [] rightch;
+//         delete [] lookupleft;
+//         delete [] lookupright;
 }
 
 // Two cases - might have to "wrap around"
@@ -111,12 +115,13 @@ void BasicSoundSource::pushSound(short * samples,
                                 int32_t index,
                                 bool isStereo)
 {
-//	cerr << "Calling pushSound for source " << getId() << endl;
         index++; //dummy op
 #ifdef DEBUG_OUTPUT
 	npush++;
-        if (nprint)
+        if (nprint) {
                 nprint=false,cerr << "npush="<< npush<< endl;;
+		//cerr << "Calling pushSound for source " << getId() << endl;
+	}
 #endif
         short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
 
@@ -156,10 +161,10 @@ void BasicSoundSource::getSound(short *dest,
 {
         short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
 #ifdef DEBUG_OUTPUT
-//	cerr << "Calling getSound for source " << getId() << endl;
         nget++;
         if (nget%1000==0) {
                 nprint=true,cerr << "nget="<< nget<< endl;
+		//cerr << "Calling getSound for source " << getId() << endl;
 	}
         static int counter = 0;
         static bool do_print=false;
@@ -177,7 +182,7 @@ void BasicSoundSource::getSound(short *dest,
 
                 /* Underflow */
 #ifdef DEBUG_OUTPUT
-                cerr << "u"<< flush;
+                //cerr << "u"<< flush;
 #endif
                 if (plcProvider){
                         cerr << "PLC!"<< endl;
@@ -193,10 +198,18 @@ void BasicSoundSource::getSound(short *dest,
         }
 
 //        if (stereo){
-                for (uint32_t i=0; i<iFrames*oNChannels; i++){
-                        temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
-                                        (bufferSizeInMonoSamples*2) ];
-                }
+		if( isSilenced() ) {
+			//cerr << "SoundSource::getSound - silenced source, sorry" << endl;
+			printf("S");
+		}
+		for (uint32_t i=0; i<iFrames*oNChannels; i++){
+			if( isSilenced() ) { 
+				temp[i] = 0;
+			} else {
+				temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
+					(bufferSizeInMonoSamples*2) ];
+			}
+		}
 #if 0
         }else{
                 for (int32_t i=0; i<nMono; i++){

@@ -28,6 +28,9 @@
 #include"SoundIOPLCInterface.h"
 #include"resampler/Resampler.h"
 
+#define LEFT 1
+#define RIGHT 5
+#define CENTER 3
 
 class SoundSource : public MObject{
         public:
@@ -61,7 +64,7 @@ class SoundSource : public MObject{
                                 int32_t index,
                                 bool isStereo=false)=0;
 
- /**
+                /**
                  * @param dest          Buffer to which samples will be 
                  *                      "dequeued".
                  * @param dequeue       Indicates of the retrieved 
@@ -73,31 +76,33 @@ class SoundSource : public MObject{
 
                 virtual std::string getMemObjectType(){return "SoundSource";};
 
-                short* getLeftBuf();
-
-                short* getRightBuf();
-
-                short* getLookupLeft();
-
-                short* getLookupRight();
-
                 int32_t getPointer();
 
                 void setPointer(int32_t wpointer);
+		
+		bool isSilenced() { return silenced; }
+		void setSilenced( bool s ) { silenced = s; }
+		
         private:
                 int sourceId;
 
         protected:
+		/**
+		Whether this source is silenced, that is, on read of the buffer,
+		it will provide silence samples (all zeros)
+		*/
+		volatile bool silenced;
+		
                 int32_t position;
                 double sampRate;
-                short *leftch;
-                short *rightch;
-                short *lookupleft;
-                short *lookupright;
-                int32_t pointer;
-                int32_t numSources;
-                int32_t j;
-                int32_t k;
+               short *leftch; //spaudio
+               short *rightch; //spaudio
+//                short *lookupleft; //spaudio
+//                 short *lookupright; //spaudio
+                int32_t pointer; //spaudio
+//                 int32_t numSources; //spaudio
+                int32_t j; //spaudio
+                int32_t k; //spaudio
 
                 friend class SpAudio;
 
