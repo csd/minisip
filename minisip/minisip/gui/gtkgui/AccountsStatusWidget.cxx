@@ -70,6 +70,8 @@ AccountsStatusWidget::AccountsStatusWidget( Glib::RefPtr<AccountsList> list ):
 	
 	unregisterMenu.signal_activate().connect( 
 		SLOT( *this, &AccountsStatusWidget::unregisterClicked ) );
+
+	callback = NULL;
 }
 
 AccountsStatusWidget::~AccountsStatusWidget(){

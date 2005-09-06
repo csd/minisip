@@ -816,7 +816,7 @@ void MainWindow::viewToggle( uint8_t w ){
 }
 
 void MainWindow::setCallback( GuiCallback * callback ){
-	//((AccountsStatusWidget*)statusWidget)->setCallback( callback );
+	statusWidget->setCallback( callback );
 	settingsDialog->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );
 	Gui::setCallback( callback );

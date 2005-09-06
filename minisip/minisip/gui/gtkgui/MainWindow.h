@@ -168,7 +168,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		CertificateDialog * certificateDialog;
 		MTrayIcon * trayIcon;
 		LogWidget * logWidget;
-		Gtk::Widget * statusWidget;
+		AccountsStatusWidget * statusWidget;
 
 		list<CallWidget *> callWidgets;
 		list<ConferenceWidget *> conferenceWidgets;
