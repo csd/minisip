@@ -91,9 +91,9 @@ PhoneBookPerson::~PhoneBookPerson(){
 		}
 	}
 
-	if( !phoneBook.isNull() ){
+/*	if( !phoneBook.isNull() ){
 		phoneBook->delPerson( this );
-	}
+	}*/
 }
 
 void PhoneBookPerson::setName( string name ){
@@ -116,9 +116,12 @@ void PhoneBookPerson::delEntry( MRef<ContactEntry *> entry ){
 	for( i = entries.begin(); i != entries.end(); i++ ){
 		if( *(*i) == *entry ){
 			i = entries.erase( i );
+			if( i == entries.end() ){
+				break;
+			}
 		}
-                        (*i)->personIndex = index;
-                        index++;
+		(*i)->personIndex = index;
+		index++;
 	}
 
 	if( entries.size() == 0 ){
