@@ -32,6 +32,8 @@
 #include"../codecs/Codec.h"
 #include<iostream>
 
+#include<libmutil/itoa.h> //for debug ... remove ... cesc
+
 #include<stdio.h>
 #include<sys/types.h>
 
@@ -44,6 +46,7 @@
 #else
 #include<sys/time.h>
 #include<unistd.h>
+#include<errno.h>
 #endif
 
 using namespace std;
@@ -72,11 +75,32 @@ RtpReceiver::~RtpReceiver(){
 	socket->close();
 }
 
+/**
+	register a mediaStreamReceiver ... if the receiver is already registered,
+	update the exhisting one to point to the new receiver.
+*/
 void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
+	list< MRef<MediaStreamReceiver *> >::iterator iter;
 	mediaStreamsLock.lock();
 	/* Don't register new streams if the receiver is being closed */
 	if( !kill ){
-		mediaStreams.push_back( mediaStream );
+		bool found = false;
+		//cerr << "RtpReceiver::registerMediaStream: register done!" << endl;
+		for( iter = mediaStreams.begin();
+				iter != mediaStreams.end();
+				iter++ ) {
+			if( (*iter)->getId() == mediaStream->getId() ) {
+				found = true;
+			#ifdef DEBUG_OUTPUT
+				cerr << "RtpRcvr::registerMediaStream: media stream already registered. Updating MRef." << endl;
+			#endif				
+				(*iter) = mediaStream;
+				break;
+			}
+		}
+		if( !found ) {
+			mediaStreams.push_back( mediaStream );
+		}
 	}
 	mediaStreamsLock.unlock();
 }
@@ -119,17 +143,32 @@ void RtpReceiver::run(){
 
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;
-
 		
 		while( ret < 0 ){
 			ret = select( socket->getFd() + 1, &rfds, NULL, NULL, &tv );
-			/*if( ret < 0 ){
-				FIXME: do something
-			}*/
-
+			if( ret < 0 ){
+#ifdef DEBUG_OUTPUT
+				//FIXME: do something better
+				cerr << "RtpReceiver::run() - select returned -1" << endl;
+#endif
+				if( errno == EINTR ) { continue; }
+				else {
+					kill = true;
+					break;
+				}
+			}
 		}
 
+		if( kill ) {
+			break;
+		}
+		
 		if( ret == 0 /* timeout */ ){
+			//notify the mediaStreams of the timeout
+			for( i = mediaStreams.begin(); 
+					i != mediaStreams.end(); i++ ){
+				(*i)->handleRtpPacket( NULL );
+			}
 			continue;
 		}
 
@@ -147,21 +186,21 @@ void RtpReceiver::run(){
 		}
 
 		mediaStreamsLock.lock();
-		
 		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
 			std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
 			std::list<MRef<Codec *> >::iterator iC;
-			
+			//printf( "|" );
 			for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 				if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
 					(*i)->handleRtpPacket( packet );
+					//printf( "~" );
 					break;
 				}
 			}
 		}
 		
 		mediaStreamsLock.unlock();
-
-//		delete packet;
+		
+		packet = NULL;
 	}
 }

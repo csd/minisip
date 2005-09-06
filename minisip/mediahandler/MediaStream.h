@@ -28,6 +28,7 @@
 #include"Media.h"
 #include"Session.h"
 #include"RtpReceiver.h"
+#include"../rtp/SRtpPacket.h"
 
 #include"../rtp/SRtpPacket.h"
 
@@ -105,6 +106,12 @@ class MediaStream : public MObject{
 		 */
 		void setKeyAgreement( MRef<KeyAgreement *> ka );
 
+		/**
+		Returns an MRef to the Media object used by this media stream.
+		Use with care.
+		*/
+		MRef<Media *> getMedia() { return media; }
+		
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
 		MediaStream( MRef<Media *> );
@@ -193,6 +200,10 @@ class MediaStreamReceiver : public MediaStream{
 		 * according to the user's preference, first being preferred
 		 */
 		std::list<MRef<Codec *> > getAvailableCodecs();
+		
+		std::list<uint32_t> getSsrcList() {
+			return ssrcList;
+		}
 
 	protected:
 		std::list<MRef<Codec *> > codecList;

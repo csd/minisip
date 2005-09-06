@@ -22,6 +22,7 @@
 */
 
 #include<config.h>
+#include"MediaStream.h"
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/keyagreement.h>
 #include"../sdp/SdpHeaderM.h"
@@ -31,7 +32,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/print_hex.h>
-#include"MediaStream.h"
 #include"Media.h"
 #include"RtpReceiver.h"
 #include"../codecs/Codec.h"
@@ -219,6 +219,7 @@ MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 	externalPort = 0;
 	running = false;
 	codecList = media->getAvailableCodecs();
+	cerr << "MSR: new media stream receiver!" << endl;
 }
 
 uint32_t MediaStreamReceiver::getId(){
@@ -251,7 +252,15 @@ uint16_t MediaStreamReceiver::getPort(){
 }
 
 void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
-	uint32_t packetSsrc = packet->getHeader().getSSRC();
+	uint32_t packetSsrc;
+	
+	//if packet is null, we had a read timeout from the rtpReceiver
+	if( !packet ) {
+		return;
+	}
+	
+	packetSsrc = packet->getHeader().getSSRC();
+	
 	
 	if( packet->unprotect( getCryptoContext( packetSsrc ) )){
 		// Authentication or replay protection failed

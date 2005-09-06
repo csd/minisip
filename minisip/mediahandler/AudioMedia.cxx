@@ -113,13 +113,14 @@ void AudioMedia::registerMediaSource( uint32_t ssrc ){
 	MRef<AudioMediaSource *> source;
 
 	source = new AudioMediaSource( ssrc, this );
-
+	//cerr << "AudioMedia::registerMediaSource" << endl;
 	soundIo->registerSource( *source );
 	sources.push_back( source );
 }
 
 void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
 	std::list< MRef<AudioMediaSource *> >::iterator iSource;
+	//cerr << "AudioMedia::unRegisterMediaSource" << endl;
 
 	soundIo->unRegisterSource( ssrc );
 
@@ -141,37 +142,54 @@ void AudioMedia::playData( MRef<RtpPacket *> packet ){
 
 }
 
-void AudioMedia::srcb_handleSound( void * data ){
+//this function is called from SoundIO::recorderLoop
+//the void *data is originally a short *
+void AudioMedia::srcb_handleSound( void * data, int length){
 
         resampler->resample( (short *)data, resampledData );
-        sendData( (byte_t*) &resampledData, 0, 0, false );
+        sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
         seqNo ++;
 }
 
 #ifdef AEC_SUPPORT
-void AudioMedia::srcb_handleSound( void * data, void * dataR){				//hanning
+void AudioMedia::srcb_handleSound( void * data, int length, void * dataR){				//hanning
 	resampler->resample( (short *)data, resampledData );
 	resampler->resample( (short *)dataR, resampledDataR );
 
 	for(int j=0; j<160; j++){
 		resampledData[j] = (short)aec.doAEC((int)resampledData[j], (int)resampledDataR[j]);
 	}
-	sendData( (byte_t*) &resampledData, 0, 0, false );
+	sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
         seqNo ++;
 }
 #endif
 
 void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 
+	//all these zerodata vars are used to send silence to muted senders
+	//we need a silence data vector, as we cannot simply erase the data vector, 
+	//as it is shared by all media stream senders ... 
+	static byte_t zeroData[160*sizeof(short)]; //this needs to be of _length_ length
+	static bool zeroDataInit = false;
+	bool encodeZeroData;
+	
+	uint32_t encodedLength;
+	
+	if( ! zeroDataInit ) {
+		zeroDataInit = true;
+		for( uint i = 0; i<length; i++ ) zeroData[i] = 0; 
+	}
+	
 	list< MRef<MediaStreamSender *> >::iterator i;
 	sendersLock.lock();
-	
-	
+
 	for( i = senders.begin(); i != senders.end(); i++ ){
+		encodeZeroData = false;
 		//only send if active sender, or if muted only if keep-alive
 		if( (*i)->isMuted () ) {
 			if( (*i)->muteKeepAlive( 50 ) ) {
-				memset( data, 0, length );
+				encodeZeroData = true;
+				//cerr << endl << "AudioMedia::sendData - sending silence sample!" << endl;
 			} else {
 				continue;
 			}
@@ -179,8 +197,12 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 		
 		MRef<CodecState *> selectedCodec = (*(*i)->getSelectedCodec());
 			
-		uint32_t encodedLength = 
-			selectedCodec->encode( data, 160*sizeof(short), encoded );
+		//if we must send silence (zeroData), encode it ... 
+		if( encodeZeroData ) {
+			encodedLength = selectedCodec->encode( &zeroData, length, encoded );
+		} else {
+			encodedLength = selectedCodec->encode( data, length, encoded );
+		}
 	
 		(*i)->send( encoded, encodedLength, &ts, marker );
 	}

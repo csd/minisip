@@ -109,8 +109,12 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		 * encoding them and sending them to all the registered
 		 * MediaStreamSender objects.
 		 * @param samplearr pointer to the audio samples
+		 * @param length length of samplearr
 		 */
-                virtual void srcb_handleSound( void *samplearr );
+		virtual void srcb_handleSound( void *samplearr, int length );
+		#ifdef AEC_SUPPORT 
+		virtual void srcb_handleSound( void *samplearr, int length, void *samplearrR);	//hanning
+		#endif
 
 
                 /**
@@ -124,9 +128,6 @@ class AudioMedia : public Media, public SoundRecorderCallback{
                  * in the RTP header
                  */
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker );
-		#ifdef AEC_SUPPORT 
-		virtual void srcb_handleSound( void *samplearr, void *samplearrR);	//hanning
-		#endif
 
 		/**
 		 * Used to start the playout of a ringtone, contained
@@ -145,10 +146,10 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 #ifdef DEBUG_OUTPUT
 		virtual string getDebugString();
 #endif
-
-	private:
+		
 		MRef<AudioMediaSource *> getSource( uint32_t ssrc );
 
+	private:
                 MRef<Resampler *> resampler;
                 SilenceSensor * silenceSensor;
                 MRef<SoundIO *> soundIo;                 
@@ -177,6 +178,7 @@ class AudioMediaSource : public BasicSoundSource{
 		MRef<Media *> media;
 		short codecOutput[16384];
 		uint32_t ssrc;
+
 };
 
 
