@@ -118,8 +118,6 @@ SoundIO::SoundIO(
 }
 
 SoundIO::~SoundIO(){
-	RecorderReceiver * rr;
-	
 	while( recorder_callbacks.size() ){
 		delete *( recorder_callbacks.begin() );
 		recorder_callbacks.pop_back();
@@ -201,7 +199,7 @@ void SoundIO::stopRecord(){
 }
 
 void SoundIO::register_recorder_receiver(SoundRecorderCallback *callback, 
-                                        int32_t nrsamples, 
+                                        int32_t nrsamples,
                                         bool stereo )
 {
 	recorder_callbacks.push_back(new RecorderReceiver(callback, stereo));
@@ -265,7 +263,11 @@ void *SoundIO::recorderLoop(void *sc_arg){
 		
 		soundcard->soundDev->lockRead();
 		if( soundcard->soundDev->isOpenedRecord() ){
-				nread = soundcard->soundDev->read( (byte_t *)buffers[i%2], soundcard->recorder_buffer_size );
+				//soundcard->recorder_buffer_size is, for now, fixed to 960
+				//		(SNDCARD_FREQ * 20 / 1000 )
+				nread = soundcard->soundDev->read( 
+						(byte_t *)buffers[i%2], 
+						soundcard->recorder_buffer_size );
 		}
 				
 		soundcard->soundDev->unlockRead();
@@ -303,7 +305,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
                                     <<" samples in partial buffer"<< endl;
 #endif
 		}else{
-			
+			//AudioMedia iimplements the callback ...
 			for (list<RecorderReceiver *>::iterator 
                                     cb=soundcard->recorder_callbacks.begin(); 
                                     cb!= soundcard->recorder_callbacks.end(); 
@@ -311,9 +313,14 @@ void *SoundIO::recorderLoop(void *sc_arg){
 
 				if ((*cb)!=NULL && (*cb)->getCallback()!=NULL){
 					#ifdef AEC_SUPPORT
-					(*cb)->getCallback()->srcb_handleSound(tempBuffer, tempBufferR); //hanning
+					(*cb)->getCallback()->srcb_handleSound(
+							tempBuffer, 
+							soundcard->recorder_buffer_size,
+							tempBufferR); //hanning
 					#else
-					(*cb)->getCallback()->srcb_handleSound(tempBuffer);
+					(*cb)->getCallback()->srcb_handleSound(
+							tempBuffer, 
+							soundcard->recorder_buffer_size);
 					#endif
 					
 					
@@ -365,7 +372,7 @@ void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){
 
 void SoundIO::registerSource( MRef<SoundSource *> source ){
 #ifdef DEBUG_OUTPUT
-	cerr << "Calling register source on created source " << source->getId() << endl;
+	cerr << "SoundIO::registerSource - Calling register source on created source " << source->getId() << endl;
 #endif
 //	int32_t j=1;
 //	int32_t nextSize=sources.size()+1; 
@@ -399,6 +406,9 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 
 void SoundIO::unRegisterSource(int sourceId){
 	
+#ifdef DEBUG_OUTPUT
+	cerr << "SoundIO::unRegisterSource - Calling unRegister source on source " << sourceId << endl;
+#endif
 	queueLock.lock();
 	list<MRef<SoundSource *> >::iterator i;
 	for (i = sources.begin(); 
@@ -535,7 +545,7 @@ bool SoundIO::setMixer( string type ) {
 	 	MRef<SpAudio *> spatial = new SpAudio( 5 );
 	 	spatial->init();
 		mixer = new AudioMixerSpatial(spatial);
-	} else {
+	}  else {
 		cerr << "ERROR: SoundIO could not create requested mixer! (type _" << type << "_ not understood)" << endl;
 		cerr << "ERROR:      Creating Spatial Audio mixer instead." << endl;
 		setMixer( "spatial" );

@@ -38,9 +38,10 @@ class SoundRecorderCallback{
 	 * the soundcard.
 	 * @param samplearr Array of raw sound data. Typically 160 
 	 * samples, 16 bit, but it can be specified in SoundCard.
+	 * @param length length of samplearr
 	 * @see SoundCard
 	 */
-	virtual void srcb_handleSound(void *samplearr)=0;
+	virtual void srcb_handleSound(void *samplearr, int length)=0;
 	#ifdef AEC_SUPPORT
 	virtual void srcb_handleSound(void *samplearr, void *samplearrR)=0;		//hanning
 	#endif
