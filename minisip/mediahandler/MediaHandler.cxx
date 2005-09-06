@@ -104,7 +104,7 @@ void MediaHandler::init(){
 		audioMedia = media;
 	}
 
-	muteAllButOne = config->muteAllButOne;
+//	muteAllButOne = config->muteAllButOne;
 	
 	ringtoneFile = config->ringtone;
 }
@@ -140,11 +140,15 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		
 		if( (*i)->send ){
 			sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
-			sStream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
+			//sStream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
 			session->addMediaStreamSender( sStream );
 		}
 	}
-
+	
+	//set the audio settings for this session ...
+	session->muteSenders( true ); //muteAllButOne );
+	session->silenceSources( false );
+	
 	return session;
 
 }
@@ -156,6 +160,7 @@ void MediaHandler::registerMedia( MRef<Media*> media ){
 
 void MediaHandler::handleCommand( CommandString command ){
 	if( command.getOp() == MediaCommandString::start_ringing ){
+		cerr << "MediaHandler::handleCmd - start ringing" << endl;
 		if( audioMedia && ringtoneFile != "" ){
 			audioMedia->startRinging( ringtoneFile );
 		}
@@ -163,6 +168,7 @@ void MediaHandler::handleCommand( CommandString command ){
 	}
 
 	if( command.getOp() == MediaCommandString::stop_ringing ){
+		cerr << "MediaHandler::handleCmd - stop ringing" << endl;
 		if( audioMedia ){
 			audioMedia->stopRinging();
 		}
@@ -176,12 +182,17 @@ void MediaHandler::handleCommand( CommandString command ){
 		return;
 	}
 	
-	if( command.getOp() == MediaCommandString::set_active_source ){
+	if( command.getOp() == MediaCommandString::set_session_sound_settings ){
+		bool turnOn;
 #ifdef DEBUG_OUTPUT
-		cerr << "MediaHandler::handleCmd: received set active source" 
+		cerr << "MediaHandler::handleCmd: received set session sound settings" 
 				<< endl << "     " << command.getString()  << endl;
 #endif
-		setActiveSource( command.getDestinationId() );
+		if( command.getParam2() == "ON" ) turnOn = true;
+		else turnOn = false;
+		setSessionSoundSettings( command.getDestinationId(), 
+					command.getParam(), 
+					turnOn );
 		return;
 	}
 
@@ -195,25 +206,41 @@ std::string MediaHandler::getExtIP(){
 	return ipProvider->getExternalIp();
 }
 
-void MediaHandler::setActiveSource( string callId ) {
-	
+void MediaHandler::setSessionSoundSettings( std::string callid, std::string side, bool turnOn ) {
         list<MRef<Session *> >::iterator iSession;
 
-	//if the feature is deactivated, ignore the set_active_source command
-	if( ! muteAllButOne ) {
+	//what to do with received audio
+	if( side == "receivers" ) {
+		sessionsLock.lock();
+		for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
+			if( (*iSession)->getCallId() == callid ){
+				//the meaning of turnOn is the opposite of the Session:: functions ... silence/mute
+				(*iSession)->silenceSources( ! turnOn );
+			} 
+		}
+		sessionsLock.unlock();
+	} else if ( side == "senders" ) { //what to do with audio to be sent over the net
+		//set the sender ON as requested ... only mute all the rest if muteAllButOne is true
+		sessionsLock.lock();
+		for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
+			if( (*iSession)->getCallId() == callid ){
+				//the meaning of turnOn is the opposite of the Session:: functions ... silence/mute
+				(*iSession)->muteSenders( !turnOn );
+				
+			} else {
+				//if the feature is deactivated, ignore the set_active_source command
+/*				if( muteAllButOne && !turnOn) {
+					(*iSession)->muteSenders( true );
+				}*/
+			}
+		}
+		sessionsLock.unlock();
+	
+	} else {
+		cerr << "MediaHandler::setSessionSoundSettings - not understood" << endl;
 		return;
 	}
-		
-	sessionsLock.lock();
-	for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
-		if( (*iSession)->getCallId() == callId ){
-			(*iSession)->muteSenders( false );
-			
-		} else {
-			(*iSession)->muteSenders( true );
-		}
-	}
-	sessionsLock.unlock();
+	
 }
 
 #ifdef DEBUG_OUTPUT	

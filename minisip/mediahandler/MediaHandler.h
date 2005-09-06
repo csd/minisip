@@ -85,12 +85,14 @@ class MediaHandler : public MObject, public SessionRegistry {
 		virtual string getDebugString();
 #endif
 
+#if 0
 		/**
 		True if all but one sender/media sessions are muted.
 		If turned off, all ongoing sessions receive the audio from our mic.
 		If turned on, only one source (the active one) will receive it.
 		*/
 		bool muteAllButOne;
+#endif
 
 	private:
 		void init();
@@ -103,8 +105,19 @@ class MediaHandler : public MObject, public SessionRegistry {
 		MRef<IpProvider *> ipProvider;
 		MRef<SipSoftPhoneConfiguration *> config;
 		
-		//cesc
-		void setActiveSource( std::string callid );
+		/**
+		Looks for a Session with callid. If found, set the audio settings
+		of that Session (side = "receivers" or "senders") to either be on
+		or off.
+		@param callid callid of the Session whose settings we want to deal with
+		@param side either "receivers" (audio received from the network and heard
+			on the headsets) or "senders" (audio read from the mic/soundcard and
+			sent over the net).
+		@param turnOn whether to turn on or off the setting of the specified session.
+			If turnOn = true -> the receivers are actived (un-silenced) or the
+			are activated (un-muted).
+		*/
+		void setSessionSoundSettings( std::string callid, std::string side, bool turnOn );
 
 };
 

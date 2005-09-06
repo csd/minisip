@@ -151,10 +151,26 @@ void SipSoftPhoneConfiguration::save(){
 	
 	backend->save( "sound_device", soundDevice );
 	
-	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" );
+// 	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" ); //not used anymore
 	
 	backend->save( "mixer_type", soundIOmixerType );
-	
+
+	//Save the startup commands
+	list<string>::iterator iter; 
+	int idx;
+	for( idx=0,  iter = startupActions.begin();
+			iter != startupActions.end();
+			iter++, idx++ ) {
+		int pos; 
+		string cmdActionsPath = string("startup_cmd[")+itoa(idx)+"]/";
+		pos = (*iter).find(' ');
+		string cmd = (*iter).substr( 0, pos );
+		backend->save( cmdActionsPath + "command", cmd );
+		pos ++; //advance to the start of the params ...
+		string params = (*iter).substr( pos, (*iter).size() - pos );
+		backend->save( cmdActionsPath + "params", params );
+	}
+		
 #ifdef VIDEO_SUPPORT
 	backend->save( "video_device", videoDevice );
 	backend->save( "frame_width", frameWidth );
@@ -328,11 +344,32 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	soundDevice =  backend->loadString("sound_device","");
 	
-	muteAllButOne = backend->loadString("mute_all_but_one", "yes") == "yes";
+	//not used anymore
+// 	muteAllButOne = backend->loadString("mute_all_but_one", "yes") == "yes";
 
 	soundIOmixerType = backend->loadString("mixer_type", "spatial");
 	cerr << "CESC: sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
+	//Load the startup commands ... there may be more than one
+	//cmd entry may not contain white spaces (anything after the space is considered
+	// 	as a param
+	//params list is a white space separated list of parameters:
+	//Ex.
+	//	call user@domain
+	//	im user@domain message (the message is the last param, and may contain spaces)
+	ii = 0;
+	do{
+		string cmdActionsPath = string("startup_cmd[")+itoa(ii)+"]/";
+		string cmd = backend->loadString(cmdActionsPath + "command");
+		if( cmd == "" ) {
+			break;
+		}
+		string params = backend->loadString(cmdActionsPath + "params");
+		startupActions.push_back( cmd + " " + params );
+		cerr << "CONFIG: startup command: " << cmd << " " << params << endl;
+		ii++;
+	}while( true );
+	
 #ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
 	frameWidth = backend->loadInt( "frame_width", 176 );
@@ -438,7 +475,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "local_tls_port", 5061 );
 
 	be->save( "sound_device", "/dev/dsp" );
-	be->save( "mute_all_but_one", "yes" );
+// 	be->save( "mute_all_but_one", "yes" ); //not used
 	be->save( "mixer_type", "spatial" );
 #if defined HAS_SPEEX && defined HAS_GSM
 	be->save( "codec[0]", "speex" );
@@ -456,6 +493,9 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 	be->save( "phonebook[0]", "file://" + getDefaultPhoneBookFilename() );
 
+//we can save startup commands ... but do nothing by default ...
+//<startup_cmd><command>call</command><params>uri</params></startup_cmd>
+	
 	be->commit();
 	
 }

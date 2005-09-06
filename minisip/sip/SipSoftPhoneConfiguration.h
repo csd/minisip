@@ -166,9 +166,32 @@ class SipSoftPhoneConfiguration : public MObject{
 		
 		list<string> audioCodecs;
 		
-		bool muteAllButOne;
+		//not used anymore ... it was used in mediahandler ... 
+// 		bool muteAllButOne;
 		
 		string soundIOmixerType;
+		
+		/**
+		Start up commands, specified in the config file.
+		Example:
+		<startup_cmd>
+			<command>
+				call
+			</command>
+			<params>
+				user@domain
+			</params>
+		</startup_cmd>
+		<startup_cmd>
+			<command>
+				im
+			</command>
+			<params>
+				user@domain this is the message to be sent
+			</params>
+		</startup_cmd>
+		*/
+		list<string> startupActions;
 		
 		//P2T configurations:
 		//-------------------
