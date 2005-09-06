@@ -33,6 +33,8 @@ class SessionRegistry{
         
         public:
                 MRef<Session *> getSession( std::string callId );
+		std::list<MRef<Session *> > getAllSessions(); 
+		
         protected:
                 void registerSession( MRef<Session *> session );
                 void unregisterSession( MRef<Session *> session );
