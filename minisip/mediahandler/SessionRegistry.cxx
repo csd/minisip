@@ -41,6 +41,13 @@ MRef<Session *> SessionRegistry::getSession( std::string callId ){
         sessionsLock.unlock();
         return NULL;
 }
+std::list<MRef<Session *> > SessionRegistry::getAllSessions() { 
+	std::list<MRef<Session *> > sessionsRet;
+	sessionsLock.lock();
+	sessionsRet = sessions;
+	sessionsLock.unlock();
+	return sessionsRet; 
+}
 
 void SessionRegistry::registerSession( MRef<Session *> session ){
         sessionsLock.lock();

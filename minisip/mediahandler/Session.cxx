@@ -25,6 +25,7 @@
 #include"Session.h"
 #include"MediaStream.h"
 #include"Media.h"
+#include"AudioMedia.h"
 #include"RtpReceiver.h"
 #include"DtmfSender.h"
 #include"../codecs/Codec.h"
@@ -57,6 +58,9 @@ Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(N
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
 	Session::precomputedKa = NULL;
 
+	mutedSenders = true;
+	silencedSources = false;
+	
 	if( registry ){
 		registry->registerSession( this );
 	}
@@ -388,7 +392,7 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 void Session::start(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
-        
+        cerr << "Session::start" << endl;
 	if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
 #ifndef _MSC_VER
 	ts.save( TGK_START );
@@ -423,7 +427,7 @@ void Session::start(){
 void Session::stop(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
-
+        cerr << "Session::stop" << endl;
 	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
 			(*iR)->stop();
@@ -443,15 +447,16 @@ void Session::stop(){
 
 void Session::addMediaStreamReceiver( MRef<MediaStreamReceiver *> mediaStream ){
 	mediaStreamReceivers.push_back( *mediaStream );
+	silenceSources( silencedSources );
 }
 
 void Session::addMediaStreamSender( MRef<MediaStreamSender *> mediaStream ){
 	mediaStreamSendersLock.lock();
+	mediaStream->setMuted( mutedSenders );
 	mediaStreamSenders.push_back( *mediaStream );
 	mediaStreamSendersLock.unlock();
 }
 
-	
 string Session::getErrorString(){
 	return errorString;
 }
@@ -486,21 +491,74 @@ void Session::sendDtmf( uint8_t symbol ){
 	
 }
 
-
 void Session::muteSenders (bool mute) {
+	mutedSenders = mute;
+	mediaStreamSendersLock.lock();
 	for( std::list< MRef<MediaStreamSender *> >::iterator it =  mediaStreamSenders.begin();
 				it !=  mediaStreamSenders.end(); it++ ) {
 		(*it)->setMuted( mute );
 	}
+	mediaStreamSendersLock.unlock();
 	
+}
+
+void Session::silenceSources ( bool silence ) {
+	if( silence )
+		cerr << "Session::SilenceSources - true" << endl;
+	else 
+		cerr << "Session::SilenceSources - false" << endl;
+		
+	silencedSources = silence;
+	for( std::list< MRef<MediaStreamReceiver *> >::iterator it =  mediaStreamReceivers.begin();
+				it !=  mediaStreamReceivers.end(); it++ ) {
+		list<uint32_t> ssrcList;
+		list<uint32_t>::iterator ssrcIt;
+		MRef<AudioMedia *> audioMedia;
+		MRef<AudioMediaSource *> audioSource;
+		
+		//obtain the media object used by the media stream, and try to cast it to
+		//an audiomedia ... 
+		audioMedia = dynamic_cast<AudioMedia *>( *( (*it)->getMedia() ) );
+		//if it is not audiomedia, we are not interested
+		if( !audioMedia ) {
+			continue;
+		}
+		
+		ssrcList = (*it)->getSsrcList();
+		
+		cerr << "Session::SilenceSources - new media stream with audiomedia" << endl;
+		for( ssrcIt = ssrcList.begin(); ssrcIt != ssrcList.end(); ssrcIt++ ) {
+			audioSource = audioMedia->getSource( *ssrcIt );
+			if( !audioSource ) {
+				cerr << "Session::SilenceSources - skipping ssrc ... no source found" << endl;
+				continue;
+			} else {
+				audioSource->setSilenced( silence );
+				cerr << "Session::SilenceSources - silencing source " << itoa(*ssrcIt) << endl;
+			}
+		}
+	}
 }
 
 #ifdef DEBUG_OUTPUT
 string Session::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + ": this=" + itoa((int)this) +
-		"; callid=" + getCallId() +
+		"\n;          callid=" + getCallId() +
 		"; peerUri=" + peerUri;
+		
+	ret += "\n          ";
+	if( mutedSenders )
+		ret += "; mutedSenders = true";
+	else 
+		ret += "; mutedSenders = false";	
+	
+	ret += "\n          ";
+	if( silencedSources )
+		ret += "; silencedSources = true";
+	else 
+		ret += "; silencedSources = false";	
+	
 	for( std::list< MRef<MediaStreamReceiver *> >::iterator it = mediaStreamReceivers.begin();
 				it != mediaStreamReceivers.end(); it++ ) {
 		ret += "\n" + (*it)->getDebugString();
@@ -512,3 +570,8 @@ string Session::getDebugString() {
 	return ret;
 }
 #endif
+
+void Session::clearMediaStreamReceivers() {
+	mediaStreamReceivers.clear();
+}
+

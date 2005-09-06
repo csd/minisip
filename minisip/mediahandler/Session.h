@@ -30,6 +30,7 @@
 #include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
 #include<../sdp/SdpPacket.h>
+
 class MediaStreamReceiver;
 class MediaStreamSender;
 class SdpHeaderM;
@@ -44,7 +45,6 @@ class SessionRegistry;
  * used by the SIP stack to send and receive session descriptions (SDP)
  * and to start or stop the media transmission
  */
-
 class Session : public MObject{
 	public:
 
@@ -186,11 +186,57 @@ class Session : public MObject{
 		 */
 		void muteSenders (bool mute);
 		
+		/**
+		Indicates whether the media stream senders are in muted 
+		state or not. 
+		IMPORTANT: it is not 100% reliable, as the senders may have
+			been modified somewhere else (not via this Session)
+		*/
+		bool mutedSenders;
+		
+		/**
+		Used to silence all the sources associated to this 
+		Session. SoundSources receive the audio from the
+		MediaStreamReceiver and act as a buffer. They are identified
+		by the ssrc (SoundSource::getId)
+		@param silence whether or not we want the sources silenced
+		*/
+		void silenceSources ( bool silence );
+		
+		/**
+		Indicates whether the audio media sources are in silenced
+		state or not. 
+		IMPORTANT: it is not 100% reliable, as the sources may have
+			been modified somewhere else (not via this Session)
+		*/
+		bool silencedSources;
 		
 #ifdef DEBUG_OUTPUT
+		/**
+		Return a debug string containing info about this Session
+		*/
 		virtual string getDebugString();
 #endif
+		
+		/**
+		Empty the media stream receivers list.
+		*/
+		void clearMediaStreamReceivers();
+		
+		/**
+		Return a copy of the list to the media stream receivers
+		*/
+		std::list< MRef<MediaStreamReceiver *> > getMediaStreamReceivers() {
+			return mediaStreamReceivers;
+		}
 
+		/**
+		Return a copy of the list to the media stream senders
+		*/
+		std::list< MRef<MediaStreamSender *> > getMediaStreamSenders() {
+			return mediaStreamSenders;
+		}
+		
 	private:
 		/* Key management handling */
 		std::string initiatorCreate();
