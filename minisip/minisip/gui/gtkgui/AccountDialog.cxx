@@ -54,7 +54,7 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	usernameEntry = manage( new Gtk::Entry );
 	passwordEntry = manage( new Gtk::Entry );
 	udpRadio = manage( new Gtk::RadioButton( "UDP" ) );
-	Gtk::RadioButtonGroup group = udpRadio->get_group();
+	Gtk::RadioButton::Group group = udpRadio->get_group();
 	tcpRadio = manage( new Gtk::RadioButton( group, "TCP" ) );
 	tlsRadio = manage( new Gtk::RadioButton( group, "TLS" ) );
 	
