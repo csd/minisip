@@ -42,7 +42,6 @@
 #include <gtkmm.h>
 #include <iostream>
 
-
 class CallWidget;
 class ConferenceWidget;
 class PhoneBookModel;
@@ -56,6 +55,7 @@ class ImWidget;
 class ContactDb;
 class AccountsList;
 class AccountsStatusWidget;
+
 
 class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public DtmfHandler
 #ifdef OLDLIBGLADEMM
@@ -107,29 +107,62 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		void removeConference( string callId );
 		void removeIm( string uri );
 
-                virtual void dtmfPressed( uint8_t symbol );
+		/**
+		Use this functions to set the active tab in the notebook from
+		outside the main gtk loop. This functions send a command to the 
+		dispatcher, the command (inside the main loop) sets the active
+		tab. All this because otherwise the Gtk::Notebook object won't 
+		visually refresh.
+		*/
+		void setActiveTabWidget( Gtk::Widget * widget );
+		void setActiveTabWidget( int pageIdx );
+		
+		virtual void dtmfPressed( uint8_t symbol );
 
-                virtual std::string getMemObjectType(){return "MainWindow";};
+		virtual std::string getMemObjectType(){return "MainWindow";};
 
+		
 	private:
 
-                void registerIcons();
+		void registerIcons();
 		void hideSlot();
 		void phoneTreeClicked( GdkEventButton * event );
-		void im();
-		void invite();
+		
+		void inviteClick();
+		void invite( string uri="" );
+		
 		void conference();
+		
+		void imClick( );
+		void im( string uri="", string message="" );
+		
 		void inviteFromTreeview( const Gtk::TreeModel::Path&,
 				         Gtk::TreeViewColumn * );
 		void gotCommand();
 		void gotLogEntry();
-		void addCall( string callId, string remoteUri, bool incoming,
-			      string securityStatus="unprotected" );
-		void addConference( string confId, string users, string remoteUri,string callId, bool incoming );
-		void addIm( string uri );
+		
+		CallWidget * addCall( string callId, 
+					string remoteUri, 
+					bool incoming,
+			      		string securityStatus="unprotected" );
+		ImWidget * addIm( string uri );
+		void addConference( string confId, 
+					string users, 
+					string remoteUri,
+					string callId, 
+					bool incoming );
+		
 		void updateConfig();
 		void doDisplayErrorMessage( string s );
 		void runCertificateSettings();
+		
+		/**
+		Event handler for the notebook on_switch_page.
+		We notify all the widgets of the page change (via their
+		activeWidgetChanged( bool, int ), telling them whether
+		they just have become active/inactive, and the tab index
+		of the currently active page.
+		*/
 		void onTabChange( GtkNotebookPage*, guint );
 
 		MRef<ContactDb *> contactDb;

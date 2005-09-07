@@ -22,7 +22,7 @@
 
 
 
-#include<config.h>
+
 #include "../../../conf/ConferenceControl.h"
 #include"MainWindow.h"
 #include"CallWidget.h"
@@ -45,11 +45,10 @@
 #include"../../../mediahandler/MediaCommandString.h"
 
 #include<libmutil/trim.h>
+#include<libmutil/itoa.h>
 
-#ifdef HILDON_SUPPORT
-#include<hildon-lgpl/hildon-widgets/hildon-app.h>
-#endif
-
+//#include<libmsip/SipSoftPhone.h>
+//
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
 #define BIND SigC::bind 
@@ -223,9 +222,9 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	
 	refXml->get_widget( "callButton", callButton );
 
-	callButton->signal_clicked().connect( SLOT( *this, &MainWindow::invite ) );
+	callButton->signal_clicked().connect( SLOT( *this, &MainWindow::inviteClick ) );
 	
-	callMenu->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
+	callMenu->signal_activate().connect( SLOT( *this, &MainWindow::inviteClick ) );
 
 	//refXml->get_widget( "conferenceButton", conferenceButton );
 
@@ -237,9 +236,9 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	refXml->get_widget( "imButton", imButton );
 
-	imButton->signal_clicked().connect( SLOT( *this, &MainWindow::im ) );
+	imButton->signal_clicked().connect( SLOT( *this, &MainWindow::imClick ) );
 	
-	imMenu->signal_activate().connect( SLOT( *this, &MainWindow::im ) );
+	imMenu->signal_activate().connect( SLOT( *this, &MainWindow::imClick ) );
 	
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, certificateDialog );
@@ -274,7 +273,7 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 
 	dispatcher.connect( SLOT( *this, &MainWindow::gotCommand ) );
 
-	uriEntry->signal_activate().connect( SLOT( *this, &MainWindow::invite ) );
+	uriEntry->signal_activate().connect( SLOT( *this, &MainWindow::inviteClick ) );
 
 #if not defined WIN32 && not defined HILDON_SUPPORT
 	trayIcon = new MTrayIcon( this, refXml );
@@ -325,6 +324,20 @@ bool MainWindow::on_window_close (GdkEventAny* event  ) {
 }
 
 void MainWindow::run(){
+
+	//add to the command dispatcher queue the startup commands
+	list<string>::iterator iter;
+	iter = getSipSoftPhoneConfiguration()->startupActions.begin();
+	for( ; iter != getSipSoftPhoneConfiguration()->startupActions.end(); iter++ ) {
+		int pos; 
+		pos = (*iter).find(' ');
+		string cmd = (*iter).substr( 0, pos );
+		pos ++; //advance to the start of the params ...
+		string params = (*iter).substr( pos, (*iter).size() - pos );
+		handleCommand( CommandString( "", "startup_" + cmd, params ) ); 
+		cerr << "wew ... new startup command!" << endl;
+	}
+
 #ifndef WIN32
 	if( trayIcon != NULL ){
 		Gtk::Window * window = trayIcon->getWindow();
@@ -464,8 +477,41 @@ void MainWindow::gotCommand(){
 		}
 		return;
 	}
+	
+	if( command.getOp() == "startup_call"){ 
+		string uri;
+		string params;
+		params = command.getParam();
+		uri = params.substr( 0, params.find(' ') ); 
+		invite( uri );
+		return;
+	} else if ( command.getOp() == "startup_im") {
+		string uri;
+		string params, mesg;
+		int pos;
+		params = command.getParam();
+		pos = params.find( ' ' );
+		uri = params.substr( 0, pos ); //get uri
+		pos++;
+		mesg = params.substr( pos, params.size() - pos ); //get message
+		im( uri, mesg );
+		return;
+	} 
+	
+	if( command.getOp() == "set_active_tab" ) {
+		int pageIdx;
+		string param;
+		param = command.getParam();
+		if( param == "" ) 
+			pageIdx = 0;
+		else 	
+			pageIdx = atoi( param.c_str() );
+		mainTabWidget->set_current_page( pageIdx );
+	}
+	
+	
 #ifdef OUTPUT_DEBUG
-	merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
+	//merr << "MainWindow::gotCommand: Warning: did not handle command: "<< command.getOp()<< end;
 #endif
 }	
 
@@ -490,6 +536,10 @@ void MainWindow::setSipSoftPhoneConfiguration(
 	handleCommand( CommandString( "", "config_updated" ) );
 }
 
+MRef<SipSoftPhoneConfiguration *> MainWindow::getSipSoftPhoneConfiguration() {
+	return this->config;
+}
+		
 void MainWindow::updateConfig(){
 	
 	accountsList->loadFromConfig( config );
@@ -534,14 +584,13 @@ bool MainWindow::configDialog( MRef<SipSoftPhoneConfiguration *> conf ){
 void MainWindow::log( int /*type*/, string /*msg*/ ){
 }
 
-void MainWindow::addCall( string callId, string remoteUri, bool incoming,
+CallWidget * MainWindow::addCall( string callId, string remoteUri, bool incoming,
 		          string securityStatus ){
 	ContactEntry * entry;
 	Gtk::Image * icon;
 	Gtk::Label * label = manage( new Gtk::Label );
 	Gtk::HBox * hbox = manage( new Gtk::HBox );
 	Glib::ustring tabLabelText;
-
 
 	CallWidget * callWidget = new CallWidget( callId, remoteUri, this, incoming, securityStatus );
 
@@ -565,19 +614,30 @@ void MainWindow::addCall( string callId, string remoteUri, bool incoming,
 		icon = manage( new Gtk::Image( Gtk::Stock::GO_FORWARD, Gtk::ICON_SIZE_SMALL_TOOLBAR ) );
 	}
 
-
 	hbox->add( *icon );
 	hbox->add( *label );
 	hbox->show_all();
-
 	
 	mainTabWidget->append_page( *callWidget, *hbox ) ;
 	callWidget->show();
 	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
 
-
-	
+	return callWidget;
 }
+
+void MainWindow::removeCall( string callId ){
+	//do not increase the iterator automatically ... 
+	//   we remove elements, thus we obtain the next element inside the loop
+	for( list<CallWidget *>::iterator i = callWidgets.begin();
+			i != callWidgets.end(); i++){
+		if( (*i)->getMainCallId() == callId ){
+			mainTabWidget->remove_page( *(*i) );
+			callWidgets.erase( i );
+			return;
+		}
+	}
+}
+
 void MainWindow::addConference( string confId, string users,string remoteUri,string callId, bool incoming ){
 	//ContactEntry * entry; //not used
 	Gtk::Image * icon;
@@ -611,22 +671,8 @@ void MainWindow::addConference( string confId, string users,string remoteUri,str
 	mainTabWidget->append_page( *conferenceWidget, *hbox ) ;
 	conferenceWidget->show();
 	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
-
-
-	
 }
-void MainWindow::removeCall( string callId ){
-	//do not increase the iterator automatically ... 
-	//   we remove elements, thus we obtain the next element inside the loop
-	for( list<CallWidget *>::iterator i = callWidgets.begin();
-			i != callWidgets.end(); i++){
-		if( (*i)->getMainCallId() == callId ){
-			mainTabWidget->remove_page( *(*i) );
-			callWidgets.erase( i );
-			return;
-		}
-	}
-}
+
 void MainWindow::removeConference( string callId ){
 	for( list<ConferenceWidget *>::iterator i = conferenceWidgets.begin();
 			i != conferenceWidgets.end(); i++ ){
@@ -638,16 +684,16 @@ void MainWindow::removeConference( string callId ){
 	}
 }
 
-void MainWindow::addIm( string uri ){
+ImWidget * MainWindow::addIm( string uri ){
 	string from = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 	ImWidget * imWidget = new ImWidget( this, uri, from );
 
 	imWidgets.push_back( imWidget );
 
-
-	mainTabWidget->append_page( *imWidget, "Im" ) ;
+	mainTabWidget->append_page( *imWidget, "Im " + uri ) ;
 	imWidget->show();
 	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
+	return imWidget;
 }
 
 void MainWindow::removeIm( string uri ){
@@ -661,16 +707,56 @@ void MainWindow::removeIm( string uri ){
 	}
 }
 
+void MainWindow::setActiveTabWidget( Gtk::Widget * widget ) {
+	//mainTabWidget->set_focus_child( *widget );
+	Gtk::Widget * currentWidget;
+	currentWidget = mainTabWidget->get_nth_page( mainTabWidget->get_current_page() );
+	for( int idx = 0; idx<mainTabWidget->get_n_pages(); idx++ ) {
+		if( mainTabWidget->get_nth_page( idx ) == widget ) {
+			handleCommand( CommandString( "", "set_active_tab", itoa(idx ) ) );
+			//widget->hide();
+			//widget->show();
+			//widget->queue_draw();
+			//currentWidget->queue_draw();
+			//mainWindowWidget->queue_draw();
+			
+ 			//mainTabWidget->set_current_page( idx );
+			//mainWindowWidget->show_all_children();
+//			cerr << "MainWindow::setActiveWidget - tab set!!" << endl;
+/*			while( Gtk::Main::events_pending() ) {
+				Gtk::Main::iteration();
+			}
+*/
+		}
+	}
+}
+
+void MainWindow::setActiveTabWidget( int pageIdx ) {
+	if( pageIdx >= 0 && pageIdx < mainTabWidget->get_n_pages() ) {
+		//mainWindowWidget->queue_draw();
+//		cerr << "MainWindow::setActiveWidget2 - tab set!! using dispatcher ..." << endl;
+		handleCommand( CommandString( "", "set_active_tab", itoa( pageIdx ) ) );
+/*		mainTabWidget->set_current_page( pageIdx );
+		while( Gtk::Main::events_pending() ) {
+			Gtk::Main::iteration();
+		}
+*/
+	} else {
+		cerr << "MainWindow::setActiveTabWidget(int) - ignoring order!" << endl;
+	}
+}
+
 void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
 		                     Gtk::TreeViewColumn * ){
 	phoneSelected();
 	invite();
 }
 
-void MainWindow::invite(){
-	string uri;
+void MainWindow::inviteClick() {
+	invite( uriEntry->get_text() );
+}
 
-	uri = uriEntry->get_text();
+void MainWindow::invite( string uri ){
 
 	if( uri.length() > 0 ){
 		string id = callback->guicb_doInvite( uri );
@@ -683,35 +769,42 @@ void MainWindow::invite(){
 		addCall( id, uri, false );
 	}
 }
+
 void MainWindow::conference(){
 	string confid=itoa(rand());
 	cerr<<"********--------------sadfasdfsda"<<endl;
 	//callback->guicb_confDoInvite("ali");
 	//string id = callback->guicb_doInvite( uri );
 	addConference( confid, "","","",false );
-	
-	
 }
-void MainWindow::im(){
-	string uri;
 
-	uri = uriEntry->get_text();
+void MainWindow::imClick( ) {
+	im( uriEntry->get_text() );
+}
 
+void MainWindow::im( string uri, string message ){
+	
 	if( uri.length() > 0 ){
+		bool found = false;
+		ImWidget * imW;
 		for( list<ImWidget *>::iterator i = imWidgets.begin();
 				i != imWidgets.end(); i++ ){
 			if( (*i)->getToUri() == uri ){
 				mainTabWidget->set_current_page( 
 					mainTabWidget->page_num( **i ) );
-				return;
+				imW = (*i);
+				found = true;
+				break;
 			}
 		}
-		addIm( uri );
+		if( !found ) {
+			imW = addIm( uri );
+		}
+		if( message != "" && imW ) {
+			imW->send( message );
+		}
 	}
 }
-
-
-	
 
 bool MainWindow::phoneSelect( const Glib::RefPtr<Gtk::TreeModel>& model,
                   const Gtk::TreeModel::Path& path, bool ){
@@ -817,7 +910,6 @@ void MainWindow::viewToggle( uint8_t w ){
 
 void MainWindow::setCallback( GuiCallback * callback ){
 	statusWidget->setCallback( callback );
-	settingsDialog->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );
 	Gui::setCallback( callback );
 }
@@ -895,9 +987,48 @@ void MainWindow::dtmfPressed( uint8_t symbol ){
 
 void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 	Gtk::Widget * currentPage = mainTabWidget->get_nth_page( index );
-	CallWidget * callWidget = dynamic_cast< CallWidget *>( currentPage );
+	CallWidget * callWidget = NULL;
+	ConferenceWidget *confWidget = NULL;
+	ImWidget * imWidget = NULL;
 	
+	//cast the current page to the possible media widgets ...
+	callWidget = dynamic_cast< CallWidget *>( currentPage );
+	if( callWidget == NULL )
+		confWidget = dynamic_cast< ConferenceWidget *>( currentPage );
+	if( confWidget == NULL ) 
+		imWidget = dynamic_cast< ImWidget *>( currentPage );
+	
+	//go through all the widgets, notifying them of the change
+	list<CallWidget *>::iterator iterCall;
+	for( iterCall = callWidgets.begin();
+			iterCall != callWidgets.end();
+			iterCall++ ) {
+		bool equal = false;
+		if( callWidget ) equal = (callWidget == (*iterCall) );
+		(*iterCall)->activeWidgetChanged( equal, index );
+	}
+
+	list<ConferenceWidget *>::iterator iterConf;
+	for( iterConf = conferenceWidgets.begin();
+			iterConf != conferenceWidgets.end();
+			iterConf++ ) {
+		bool equal = false;
+		if( confWidget ) equal = (confWidget == (*iterConf) );
+		(*iterConf)->activeWidgetChanged( equal, index );
+	}
+	
+	list<ImWidget *>::iterator iterIm;
+	for( iterIm = imWidgets.begin();
+			iterIm != imWidgets.end();
+			iterIm++ ) {
+		bool equal = false;
+		if( imWidget ) equal = (imWidget == (*iterIm) );
+		(*iterIm)->activeWidgetChanged( equal, index );
+	}
+	
+#if 0
 	if( callWidget ) {
+		
 		#ifdef DEBUG_OUTPUT
 		fprintf( stderr, "Selected call widget!\n" );
 		#endif
@@ -910,5 +1041,6 @@ void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 			#endif
 		}
 	}
+#endif
 }
 
