@@ -293,8 +293,8 @@ MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
 
 
-//	mainTabWidget->signal_switch_page().connect(
-//		SLOT( *this, &MainWindow::onTabChange ) );
+	mainTabWidget->signal_switch_page().connect(
+		SLOT( *this, &MainWindow::onTabChange ) );
 
 	mainWindowWidget->show_all();
 //	statusWidget->hide();
@@ -1008,21 +1008,5 @@ void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 		(*iterIm)->activeWidgetChanged( equal, index );
 	}
 	
-#if 0
-	if( callWidget ) {
-		
-		#ifdef DEBUG_OUTPUT
-		fprintf( stderr, "Selected call widget!\n" );
-		#endif
-		if( callWidget->getState() == CALL_WIDGET_STATE_INCALL){
-			CommandString cmdstr( callWidget->getMainCallId(), MediaCommandString::set_active_source );
-			getCallback()->guicb_handleMediaCommand( cmdstr );
-		} else {
-			#ifdef DEBUG_OUTPUT
-			fprintf( stderr, "onTabChange ... doing nothing (call widget state)!\n" );
-			#endif
-		}
-	}
-#endif
 }
 
