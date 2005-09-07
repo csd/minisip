@@ -66,7 +66,7 @@ class CallWidget : public Gtk::VBox
 		~CallWidget();
 
 		void hideAcceptButton();
-		bool handleCommand( CommandString command );
+		virtual bool handleCommand( CommandString command );
 
 		void accept();
 		void reject();
@@ -75,8 +75,28 @@ class CallWidget : public Gtk::VBox
 		bool handlesCallId( string callId );
 		
 		int32_t getState() {return state;}
+		
+		/**
+		This function should be called (from MainWindow::onTabChange) 
+		whenever there is a focus change (gained or lost focus). This
+		way, the widget is aware of whether it is active or not.
+		@param isActive indicates whether this widget got activated
+		@param currentActive index of the page/widget being activated
+		*/
+		virtual void activeWidgetChanged( bool isActive = false, int currentActive = 0 );
 
-	private:
+		/**
+		Event handler for monitoring button ... on toggle()
+		*/
+		void monitorButtonToggled ();
+
+		/**
+		Event handler for audioOutSilence button ... on toggle()
+		*/
+		void audioOutSilenceButtonToggled ();
+
+		
+	protected:
 		void startRinging();
 		void stopRinging();
 
@@ -101,17 +121,27 @@ class CallWidget : public Gtk::VBox
 		Gtk::Button transferButton;
 //		Gtk::ProgressBar transferProgress;
 		Gtk::Label transferProgress;
+		Gtk::CheckButton monitoringButton;
+		Gtk::CheckButton audioOutSilenceButton;
+
 #endif
 		Gtk::Image secureImage;
 		Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;
+		
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
 //		TimeoutProvider<string> *timeoutProvider;      
 		list<string> callIds;
 		string mainCallId;
+		
+		/**
+		Indicates whether this callWidget is the one currently
+		active (tab selected) or not.
+		*/
+		bool activeCallWidget;
 };
 
 #endif

@@ -53,6 +53,8 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		transferArrow( "Call transfer" ),
 		transferHBox( false ),
 		transferButton( "Transfer" ),
+		monitoringButton( "Mute microphone" ),
+		audioOutSilenceButton( "Silence for my ears"),
 #endif
 		secureImage(),// Gtk::StockID( "minisip_insecure" ), 
 					//   Gtk::ICON_SIZE_DIALOG ),
@@ -63,6 +65,8 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		bell(),
 		mainCallId( callId )
 {
+
+	activeCallWidget = false;
 
 	bell = NULL;
 	callIds.push_back( callId );
@@ -98,6 +102,16 @@ CallWidget::CallWidget( string callId, string remoteUri,
 	secStatus.set_use_markup( true );
 
 #ifndef OLDLIBGLADEMM
+	pack_start( monitoringButton, false, false, 4 );
+	monitoringButton.signal_toggled().connect( 
+		SLOT( *this, 
+			&CallWidget::monitorButtonToggled ) );
+			
+	pack_start( audioOutSilenceButton, false, false, 4 );
+	audioOutSilenceButton.signal_toggled().connect( 
+		SLOT( *this, 
+			&CallWidget::audioOutSilenceButtonToggled ) );
+	
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
 	dtmfWidget->setHandler( this );
 	dtmfArrow.add( *dtmfWidget ); 
@@ -209,6 +223,36 @@ void CallWidget::reject(){
 	}
 }
 
+void CallWidget::monitorButtonToggled () {
+	string param2;
+	if( monitoringButton.get_active() ) {
+		cerr << "CallWidget::monitorBtn ... toggled to TRUE" << endl;
+		param2 = "OFF";
+	} else {
+		cerr << "CallWidget::monitorBtn ... toggled to FALSE" << endl;
+		param2 = "ON";
+	}
+	CommandString cmdstr( getMainCallId(), 
+			MediaCommandString::set_session_sound_settings,
+			"senders", param2 );
+	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+}
+
+void CallWidget::audioOutSilenceButtonToggled () {
+	string param2;
+	if( audioOutSilenceButton.get_active() ) {
+		cerr << "CallWidget::audioOutBtn ... toggled to TRUE" << endl;
+		param2 = "OFF";
+	} else {
+		cerr << "CallWidget::audioOutBtn ... toggled to FALSE" << endl;
+		param2 = "ON";
+	}
+	CommandString cmdstr( getMainCallId(), 
+			MediaCommandString::set_session_sound_settings,
+			"receivers", param2 );
+	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+}
+
 void CallWidget::hideAcceptButton(){
 	acceptButton.set_sensitive( false );
 }
@@ -231,6 +275,8 @@ bool CallWidget::handleCommand( CommandString command ){
 			status.set_markup( "<big><b>In call" + who + "</b></big>" );
 
 #ifndef OLDLIBGLADEMM
+			monitoringButton.show();
+			audioOutSilenceButton.show();
 			transferArrow.show_all();
 			dtmfArrow.show_all();
 #endif
@@ -250,7 +296,9 @@ bool CallWidget::handleCommand( CommandString command ){
 			stopRinging();
 			state = CALL_WIDGET_STATE_INCALL;
 			//activate this source
-			CommandString cmdstr( getMainCallId(), MediaCommandString::set_active_source );
+			CommandString cmdstr( getMainCallId(), 
+					MediaCommandString::set_session_sound_settings,
+					"senders", "ON" );
 			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
 		}
 
@@ -458,3 +506,39 @@ StockButton::StockButton( Gtk::StockID stockId, Glib::ustring text ):
 void StockButton::set_label (const Glib::ustring& label){
 	this->label.set_text( label );
 }
+
+void CallWidget::activeWidgetChanged( bool isActive, int currentActive ) {
+
+	if( isActive == activeCallWidget ) {
+		cerr << "CallWidget::activeCall - nothing to do here (no active state change)" << endl;
+		return;
+	} else {
+		activeCallWidget = isActive;
+	}
+
+	//our status has changed ... do something?
+	if( !isActive ) {
+		cerr << "CallWidget::activeCall - We were active ... not anymore" << endl;
+		CommandString cmdstr( getMainCallId(), 
+				MediaCommandString::set_session_sound_settings,
+				"senders", "OFF" );
+		mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		return;
+	} else {
+		#ifdef DEBUG_OUTPUT
+		cerr << "CallWidget::activeCall - We active!" << endl;
+		#endif
+		if( getState() == CALL_WIDGET_STATE_INCALL &&
+			! monitoringButton.get_active() ){
+			CommandString cmdstr( getMainCallId(), 
+					MediaCommandString::set_session_sound_settings,
+					"senders", "ON" );
+			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		} else {
+			#ifdef DEBUG_OUTPUT
+			fprintf( stderr, "CallWidget::onTabChange ... doing nothing (call widget state)!\n" );
+			#endif
+		}
+	}
+}
+
