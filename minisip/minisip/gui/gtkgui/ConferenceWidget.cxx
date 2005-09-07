@@ -59,7 +59,9 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 	mainWindow->getCallback()->setConferenceController(conf);
 	mainConfId=confId;
 	bell = NULL;
-	
+
+	activeCallWidget = false;
+
         Gtk::HBox * topBox = manage( new Gtk::HBox );
 
         Gtk::VBox * rightTopBox = manage( new Gtk::VBox );
@@ -325,4 +327,38 @@ bool ConferenceWidget::handlesConfId( string confId ){
                return true;
         }
         return false;
+}
+
+void ConferenceWidget::activeWidgetChanged( bool isActive, int currentActive ) {
+
+	if( isActive == activeCallWidget ) {
+		cerr << "ConferenceWidget::activeCall - nothing to do here (no active state change)" << endl;
+		return;
+	} else {
+		activeCallWidget = isActive;
+	}
+
+	//our status has changed ... do something?
+	if( !isActive ) {
+		cerr << "ConferenceWidget::activeCall - We were active ... not anymore" << endl;
+		CommandString cmdstr( getMainCallId(), 
+				MediaCommandString::set_session_sound_settings,
+				"senders", "OFF" );
+		mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		return;
+	} else {
+		#ifdef DEBUG_OUTPUT
+		cerr << "ConferenceWidget::activeCall - We active!" << endl;
+		#endif
+		if( getState() == CALL_WIDGET_STATE_INCALL){
+			CommandString cmdstr( getMainCallId(), 
+					MediaCommandString::set_session_sound_settings,
+					"senders", "ON" );
+			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		} else {
+			#ifdef DEBUG_OUTPUT
+			fprintf( stderr, "ConferenceWidget::onTabChange ... doing nothing (call widget state)!\n" );
+			#endif
+		}
+	}
 }

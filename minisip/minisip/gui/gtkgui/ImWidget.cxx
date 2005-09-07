@@ -36,6 +36,9 @@ ImWidget::ImWidget( MainWindow * mainWindow, string toUri, string fromUri ){
 	this->mainWindow = mainWindow;
 	this->toUri = toUri;
 	this->fromUri = fromUri;
+	
+	this->activeCallWidget = false;
+	
 	historyWindow = new Gtk::ScrolledWindow();
 	messageWindow = new Gtk::ScrolledWindow();
 	historyView = new Gtk::TextView();
@@ -125,6 +128,26 @@ void ImWidget::send( string message ){
 	
 }
 
+void ImWidget::activeWidgetChanged( bool isActive, int currentActive ) {
+
+	if( isActive == activeCallWidget ) {
+		cerr << "ImWidget::activeCall - nothing to do here (no active state change)" << endl;
+		return;
+	} else {
+		activeCallWidget = isActive;
+	}
+
+	//our status has changed ... do something?
+	if( !isActive ) {
+		cerr << "ImWidget::activeCall - We were active ... not anymore" << endl;
+		return;
+	} else {
+		#ifdef DEBUG_OUTPUT
+		cerr << "ImWidget::activeCall - We active!" << endl;
+		#endif
+	}
+}
+
 ImMessageTextView::ImMessageTextView( ImWidget * imWidget ){
 	this->imWidget = imWidget;
 }
@@ -137,4 +160,3 @@ bool ImMessageTextView::on_key_press_event( GdkEventKey * event ){
 	}
 	return Gtk::TextView::on_key_press_event( event );
 }
-

@@ -39,6 +39,15 @@ class ImWidget : public Gtk::VBox{
 
 		string getToUri(){ return toUri; };
 
+		/**
+		This function should be called (from MainWindow::onTabChange) 
+		whenever there is a focus change (gained or lost focus). This
+		way, the widget is aware of whether it is active or not.
+		@param isActive indicates whether this widget got activated
+		@param currentActive index of the page/widget being activated
+		*/
+		virtual void activeWidgetChanged( bool isActive = false, int currentActive = 0 );
+	
 	private:
 
 
@@ -57,6 +66,12 @@ class ImWidget : public Gtk::VBox{
 		string toUri;
 		string fromUri;
 		MainWindow * mainWindow;
+
+		/**
+		Indicates whether this callWidget is the one currently
+		active (tab selected) or not.
+		*/
+		bool activeCallWidget;
 
 };
 
@@ -77,9 +92,5 @@ class ImEntry {
 		Gtk::TextBuffer::iterator startIter;
 		Gtk::TextBuffer::iterator endIter;
 };
-
-
-
-
 
 #endif
