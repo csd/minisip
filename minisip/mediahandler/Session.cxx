@@ -207,14 +207,14 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> m = ((SdpHeaderM*)*(answer->getHeaders()[i]));
 #ifdef DEBUG_OUTPUT
-			cerr << "trying media line " << m->getString() << endl;
+			cerr << "Session::setSdpAnswer - trying media line " << m->getString() << endl;
 #endif
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
 #ifdef DEBUG_OUTPUT
 				if( receiver )
-					cerr << "Found receiver!" << endl;
+					cerr << "Session::setSdpAnswer - Found receiver!" << endl;
 #endif
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
@@ -392,7 +392,7 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 void Session::start(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
-        cerr << "Session::start" << endl;
+
 	if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
 #ifndef _MSC_VER
 	ts.save( TGK_START );
@@ -427,7 +427,7 @@ void Session::start(){
 void Session::stop(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
-        cerr << "Session::stop" << endl;
+
 	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
 			(*iR)->stop();
@@ -503,11 +503,13 @@ void Session::muteSenders (bool mute) {
 }
 
 void Session::silenceSources ( bool silence ) {
-	if( silence )
+#ifdef DEBUG_OUTPUT
+/*	if( silence )
 		cerr << "Session::SilenceSources - true" << endl;
 	else 
 		cerr << "Session::SilenceSources - false" << endl;
-		
+*/
+#endif
 	silencedSources = silence;
 	for( std::list< MRef<MediaStreamReceiver *> >::iterator it =  mediaStreamReceivers.begin();
 				it !=  mediaStreamReceivers.end(); it++ ) {
@@ -526,15 +528,14 @@ void Session::silenceSources ( bool silence ) {
 		
 		ssrcList = (*it)->getSsrcList();
 		
-		cerr << "Session::SilenceSources - new media stream with audiomedia" << endl;
 		for( ssrcIt = ssrcList.begin(); ssrcIt != ssrcList.end(); ssrcIt++ ) {
 			audioSource = audioMedia->getSource( *ssrcIt );
 			if( !audioSource ) {
-				cerr << "Session::SilenceSources - skipping ssrc ... no source found" << endl;
+// 				cerr << "Session::SilenceSources - skipping ssrc ... no source found" << endl;
 				continue;
 			} else {
 				audioSource->setSilenced( silence );
-				cerr << "Session::SilenceSources - silencing source " << itoa(*ssrcIt) << endl;
+// 				cerr << "Session::SilenceSources - silencing source " << itoa(*ssrcIt) << endl;
 			}
 		}
 	}

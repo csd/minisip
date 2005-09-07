@@ -226,10 +226,8 @@ void CallWidget::reject(){
 void CallWidget::monitorButtonToggled () {
 	string param2;
 	if( monitoringButton.get_active() ) {
-		cerr << "CallWidget::monitorBtn ... toggled to TRUE" << endl;
 		param2 = "OFF";
 	} else {
-		cerr << "CallWidget::monitorBtn ... toggled to FALSE" << endl;
 		param2 = "ON";
 	}
 	CommandString cmdstr( getMainCallId(), 
@@ -241,10 +239,8 @@ void CallWidget::monitorButtonToggled () {
 void CallWidget::audioOutSilenceButtonToggled () {
 	string param2;
 	if( audioOutSilenceButton.get_active() ) {
-		cerr << "CallWidget::audioOutBtn ... toggled to TRUE" << endl;
 		param2 = "OFF";
 	} else {
-		cerr << "CallWidget::audioOutBtn ... toggled to FALSE" << endl;
 		param2 = "ON";
 	}
 	CommandString cmdstr( getMainCallId(), 

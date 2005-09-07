@@ -348,7 +348,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 // 	muteAllButOne = backend->loadString("mute_all_but_one", "yes") == "yes";
 
 	soundIOmixerType = backend->loadString("mixer_type", "spatial");
-	cerr << "CESC: sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
+// 	cerr << "sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
 	//Load the startup commands ... there may be more than one
 	//cmd entry may not contain white spaces (anything after the space is considered
@@ -366,7 +366,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 		string params = backend->loadString(cmdActionsPath + "params");
 		startupActions.push_back( cmd + " " + params );
-		cerr << "CONFIG: startup command: " << cmd << " " << params << endl;
+// 		cerr << "CONFIG: startup command: " << cmd << " " << params << endl;
 		ii++;
 	}while( true );
 	
@@ -565,7 +565,9 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fi
 	string str="";
 	bool ret = false;
 	if( fileVersion != CONFIG_FILE_VERSION_REQUIRED ) {
-		cerr << "OLD VERSION" << endl;
+		cerr << "ERROR? Your config file is an old version (some things may not work)" << endl
+			<< "    If you delete it (or rename it), next time you open minisip" << endl
+			<< "    a valid one will be created" << endl;
 #if 0
 		str += 	"\n\n"
 			"ERROR: config file version conflict\n" 
@@ -586,7 +588,9 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fi
 #endif
 		ret = false;
 	} else {
+#ifdef DEBUG_OUTPUT
 		str += "Config file version checked ok!\n";
+#endif
 		cerr << str;
 		ret = true;
 	}

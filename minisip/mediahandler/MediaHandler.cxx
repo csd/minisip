@@ -160,7 +160,7 @@ void MediaHandler::registerMedia( MRef<Media*> media ){
 
 void MediaHandler::handleCommand( CommandString command ){
 	if( command.getOp() == MediaCommandString::start_ringing ){
-		cerr << "MediaHandler::handleCmd - start ringing" << endl;
+// 		cerr << "MediaHandler::handleCmd - start ringing" << endl;
 		if( audioMedia && ringtoneFile != "" ){
 			audioMedia->startRinging( ringtoneFile );
 		}
@@ -168,7 +168,7 @@ void MediaHandler::handleCommand( CommandString command ){
 	}
 
 	if( command.getOp() == MediaCommandString::stop_ringing ){
-		cerr << "MediaHandler::handleCmd - stop ringing" << endl;
+// 		cerr << "MediaHandler::handleCmd - stop ringing" << endl;
 		if( audioMedia ){
 			audioMedia->stopRinging();
 		}

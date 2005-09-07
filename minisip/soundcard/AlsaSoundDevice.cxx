@@ -37,7 +37,7 @@ int AlsaSoundDevice::closePlayback(){
 	if( !openedPlayback ){
 #ifdef DEBUG_OUTPUT
 		cerr << "WARNING: doing close on already "
-			"closed sound card"<< endl;
+			"closed sound card (ALSA)"<< endl;
 #endif
 		return -1;
 	}
@@ -54,7 +54,7 @@ int AlsaSoundDevice::closePlayback(){
 int AlsaSoundDevice::closeRecord(){
 	if( !openedRecord ){
 		cerr << "WARNING: doing close on already "
-			"closed sound card"<< endl;
+			"closed sound card (ALSA)"<< endl;
 		return -1;
 	}
 
@@ -78,17 +78,17 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	// Play ...
 	
 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  0/*SND_PCM_NONBLOCK*/)<0){
-		cerr << "Could not open Alsa sound card" << endl;
+		cerr << "Could not open ALSA sound card" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_hw_params_any(writeHandle, hwparams) < 0) {
-		cerr << "Could not get Alsa sound card parameters" << endl;
+		cerr << "Could not get ALSA sound card parameters" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_hw_params_set_access(writeHandle, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
-		cerr << "Could not set Alsa mode" << endl;
+		cerr << "Could not set ALSA mode" << endl;
 		exit(-1);
 	}
 	
@@ -115,7 +115,7 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 			alsaFormat = SND_PCM_FORMAT_U16_BE;
 			break;
 		default:
-			cerr << "Unhandled sound format" << endl;
+			cerr << "Unhandled sound format (ALSA)" << endl;
 			exit( -1 );
 	}
 
@@ -125,13 +125,13 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 
 	if (snd_pcm_hw_params_set_format(writeHandle, hwparams, 
 				alsaFormat) < 0) {
-		cerr << "Could not set Alsa format" << endl;
+		cerr << "Could not set ALSA format" << endl;
 		exit(-1);
 	}
 /*
 	if (snd_pcm_hw_params_set_period_size(readHandle, hwparams, 
 				PERIOD_SIZE, 0) < 0) {
-		cerr << "Could not set Alsa period size" << endl;
+		cerr << "Could not set ALSA period size" << endl;
 		exit(-1);
 	}
 */	
@@ -140,7 +140,9 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 
 	if (snd_pcm_hw_params_get_buffer_time_min(hwparams,
 				&min_buffer_size, &dir) < 0){
-		cerr << "Could not get Alsa min buffer time" << endl;
+#ifdef DEBUG_OUTPUT
+		cerr << "Could not get ALSA min buffer time" << endl;
+#endif
 	}
 
 	/* Some soundcards seems to be a bit optimistic */
@@ -150,65 +152,67 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	}
 
 #ifdef DEBUG_OUTPUT
-	cerr << "Hardware playout buffer size: " << min_buffer_size << endl;
+	cerr << "ALSA Hardware playout buffer size: " << min_buffer_size << endl;
 #endif
 
 	if (snd_pcm_hw_params_set_buffer_time(writeHandle, hwparams, 
 				min_buffer_size, dir) < 0) {
-		cerr << "Could not set Alsa buffer time" << endl;
+		cerr << "Could not set ALSA buffer time" << endl;
 		exit(-1);
 	}
 	
 	unsigned int wantedSamplingRate = (unsigned int)samplingRate; 
 
 	if( snd_pcm_hw_params_set_rate_near(writeHandle, hwparams, (unsigned int *)&samplingRate, NULL) < 0){
-		cerr << "Could not set Alsa rate" << endl;
+		cerr << "Could not set ALSA rate" << endl;
 		exit(-1);
 	}
 
 	if( (unsigned int)samplingRate != wantedSamplingRate  ){
-		cerr << "Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
+#ifdef DEBUG_OUTPUT
+		cerr << "ALSA: Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
+#endif
 	}
 
 	this->samplingRate = samplingRate;
 /*
 	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200000, 0 
 				) < 0) {
-		cerr << "Could not set Alsa period_time" << endl;
+		cerr << "Could not set ALSA period_time" << endl;
 		exit(-1);
 	}
 */
 	
 
 	if (snd_pcm_hw_params(writeHandle, hwparams) < 0) {
-		cerr << "Could not apply parameters to Alsa sound card for playout" << endl;
+		cerr << "Could not apply parameters to ALSA sound card for playout" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_sw_params_current(writeHandle, swparams) < 0) {
-		cerr << "Could not get Alsa software parameters" << endl;
+		cerr << "Could not get ALSA software parameters" << endl;
 		exit(-1);
 	}
 
 
 	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, 32)){
-		cerr << "Could not set Alsa start threshold" << endl;
+		cerr << "Could not set ALSA start threshold" << endl;
 		exit(-1);
 	}
 	
 	/* Disable the XRUN detection */
 	if (snd_pcm_sw_params_set_stop_threshold(writeHandle, swparams, 0x7FFFFFFF)){
-		cerr << "Could not set Alsa stop threshold" << endl;
+		cerr << "Could not set ALSA stop threshold" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams,16)){
-		cerr << "Could not set Alsa avail_min" << endl;
+		cerr << "Could not set ALSA avail_min" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params(writeHandle, swparams) < 0) {
-		cerr << "Could not apply sw parameters to Alsa sound card" << endl;
+		cerr << "Could not apply sw parameters to ALSA sound card" << endl;
 		exit(-1);
 	}
 	
@@ -225,17 +229,17 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	
 
 	if (snd_pcm_open(&readHandle, dev.c_str(), SND_PCM_STREAM_CAPTURE, 0)<0){
-		cerr << "Could not open Alsa sound card for recording" << endl;
+		cerr << "Could not open ALSA sound card for recording" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_hw_params_any(readHandle, hwparams2) < 0) {
-		cerr << "Could not get Alsa sound card parameters" << endl;
+		cerr << "Could not get ALSA sound card parameters" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_hw_params_set_access(readHandle, hwparams2, SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
-		cerr << "Could not set Alsa mode" << endl;
+		cerr << "Could not set ALSA mode" << endl;
 		exit(-1);
 	}
 	
@@ -282,26 +286,26 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 			alsaFormat = SND_PCM_FORMAT_U16_BE;
 			break;
 		default:
-			cerr << "Unhandled sound format" << endl;
+			cerr << "ALSA: Unhandled sound format" << endl;
 			exit( -1 );
 	}
 
 	if (snd_pcm_hw_params_set_format(readHandle, hwparams2, 
 				alsaFormat) < 0) {
-		cerr << "Could not set Alsa format" << endl;
+		cerr << "Could not set ALSA format" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_hw_params_set_buffer_time(readHandle, hwparams2, 
 				40000, 0) < 0) {
-		cerr << "Could not set Alsa buffer time" << endl;
+		cerr << "Could not set ALSA buffer time" << endl;
 		exit(-1);
 	}
 	
 	unsigned int wantedSamplingRate = (unsigned int)samplingRate; 
 	
 	if( snd_pcm_hw_params_set_rate_near(readHandle, hwparams2, (unsigned int *)&samplingRate, NULL) < 0){
-		cerr << "Could not set Alsa rate" << endl;
+		cerr << "Could not set ALSA rate" << endl;
 		exit(-1);
 	}
 
@@ -311,31 +315,31 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 
 /*	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200, 0 
 				) < 0) {
-		cerr << "Could not set Alsa period_time" << endl;
+		cerr << "Could not set ALSA period_time" << endl;
 		exit(-1);
 	}
 
 */	
 
 	if (snd_pcm_hw_params(readHandle, hwparams2) < 0) {
-		cerr << "Could not apply parameters to Alsa sound card for recording" << endl;
+		cerr << "Could not apply parameters to ALSA sound card for recording" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_sw_params_current(readHandle, swparams2) < 0) {
-		cerr << "Could not get Alsa software parameters" << endl;
+		cerr << "Could not get ALSA software parameters" << endl;
 		exit(-1);
 	}
 
 
 	/* Disable the XRUN detection */
 	if (snd_pcm_sw_params_set_stop_threshold(readHandle, swparams2, 0x7FFFFFFF)){
-		cerr << "Could not set Alsa stop threshold" << endl;
+		cerr << "Could not set ALSA stop threshold" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params(readHandle, swparams2) < 0) {
-		cerr << "Could not apply sw parameters to Alsa sound card" << endl;
+		cerr << "Could not apply sw parameters to ALSA sound card" << endl;
 		exit(-1);
 	}
 
@@ -364,7 +368,9 @@ int AlsaSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 		nSamplesRead = snd_pcm_readi( readHandle, buffer, nSamples - totalSamplesRead );
 
 		if( nSamplesRead < 0 ){
-			cerr << "An error occured when reading from sound card" << endl;
+#ifdef DEBUG_OUTPUT
+			cerr << "An error occured when reading from sound card (ALSA)" << endl;
+#endif
 			switch( nSamplesRead ){
 				case -EAGAIN:
 					break;
@@ -429,7 +435,9 @@ int AlsaSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 
 void AlsaSoundDevice::sync(){
 	if( snd_pcm_drain( writeHandle ) < 0 ){
-		cerr << "Alsa: Error on pcm_drain" << endl;
+#ifdef DEBUG_OUTPUT
+		cerr << "ALSA: Error on pcm_drain" << endl;
+#endif
 		//exit(-1);
 	}
 }

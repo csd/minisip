@@ -335,7 +335,6 @@ void MainWindow::run(){
 		pos ++; //advance to the start of the params ...
 		string params = (*iter).substr( pos, (*iter).size() - pos );
 		handleCommand( CommandString( "", "startup_" + cmd, params ) ); 
-		cerr << "wew ... new startup command!" << endl;
 	}
 
 #ifndef WIN32
@@ -714,36 +713,19 @@ void MainWindow::setActiveTabWidget( Gtk::Widget * widget ) {
 	for( int idx = 0; idx<mainTabWidget->get_n_pages(); idx++ ) {
 		if( mainTabWidget->get_nth_page( idx ) == widget ) {
 			handleCommand( CommandString( "", "set_active_tab", itoa(idx ) ) );
-			//widget->hide();
-			//widget->show();
-			//widget->queue_draw();
-			//currentWidget->queue_draw();
-			//mainWindowWidget->queue_draw();
-			
- 			//mainTabWidget->set_current_page( idx );
-			//mainWindowWidget->show_all_children();
-//			cerr << "MainWindow::setActiveWidget - tab set!!" << endl;
-/*			while( Gtk::Main::events_pending() ) {
-				Gtk::Main::iteration();
-			}
-*/
 		}
 	}
 }
 
 void MainWindow::setActiveTabWidget( int pageIdx ) {
 	if( pageIdx >= 0 && pageIdx < mainTabWidget->get_n_pages() ) {
-		//mainWindowWidget->queue_draw();
-//		cerr << "MainWindow::setActiveWidget2 - tab set!! using dispatcher ..." << endl;
 		handleCommand( CommandString( "", "set_active_tab", itoa( pageIdx ) ) );
-/*		mainTabWidget->set_current_page( pageIdx );
-		while( Gtk::Main::events_pending() ) {
-			Gtk::Main::iteration();
-		}
-*/
-	} else {
-		cerr << "MainWindow::setActiveTabWidget(int) - ignoring order!" << endl;
+	} 
+#ifdef DEBUG_OUTPUT
+	else {
+		cerr << "MainWindow::setActiveTabWidget(int) - ignoring order (bad index)!" << endl;
 	}
+#endif
 }
 
 void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,

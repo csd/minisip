@@ -219,7 +219,6 @@ MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 	externalPort = 0;
 	running = false;
 	codecList = media->getAvailableCodecs();
-	cerr << "MSR: new media stream receiver!" << endl;
 }
 
 uint32_t MediaStreamReceiver::getId(){

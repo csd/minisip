@@ -92,7 +92,9 @@ BasicSoundSource::BasicSoundSource(int32_t id,
         pointer = 0;
         j=0;
         k=0;
+#ifdef DEBUG_OUTPUT
 	cerr << "BasicSoundSource::  - new with id(ssrc) = " << itoa(id) << endl;
+#endif
 }
 
 BasicSoundSource::~BasicSoundSource(){
@@ -132,7 +134,7 @@ void BasicSoundSource::pushSound(short * samples,
                             (((firstFreePtr-stereoBuffer)+
                             nMonoSamples*2)%(bufferSizeInMonoSamples*2))
                             > playoutPtr  ){
-                        cerr << "Buffer overflow - dropping packet"<<endl;
+                        cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
                         return;
                 }
                 lap_diff=1;
@@ -198,10 +200,10 @@ void BasicSoundSource::getSound(short *dest,
         }
 
 //        if (stereo){
-		if( isSilenced() ) {
-			//cerr << "SoundSource::getSound - silenced source, sorry" << endl;
+/*		if( isSilenced() ) {
 			printf("S");
 		}
+*/
 		for (uint32_t i=0; i<iFrames*oNChannels; i++){
 			if( isSilenced() ) { 
 				temp[i] = 0;
