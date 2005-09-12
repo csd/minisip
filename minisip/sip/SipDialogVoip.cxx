@@ -76,9 +76,9 @@ using namespace std;
                  +---------------+   INVITE           +--------------+CANCEL   |
                  |               |   a10:transIR; 180 |              |a12:tCncl|
                  |     start     |------------------->|    ringing   |---------+
-                 |               |                    |              |         |
-a26transport_err +---------------+                    +--------------+         |
-gui(failed)              |                                    |                |
+                 |               |                    |              |---------+
+a26transport_err +---------------+                    +--------------+BYE      |
+gui(failed)              |                                    |  a5:new ByeResp|
   +----------------+     | invite                             |                |
   |                |     V a0: new TransInvite                |                |
   |              +---------------+                            |                |
@@ -302,7 +302,8 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 bool SipDialogVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 {
 	
-	if (transitionMatch(command, SipBye::type, SipSMCommand::remote, IGN)){
+	if (transitionMatch(command, SipBye::type, SipSMCommand::remote, IGN) &&
+	    dialogState.remoteTag != ""){
 		MRef<SipBye*> bye = (SipBye*) *command.getCommandPacket();
 
 		//mdbg << "log stuff"<< end;
@@ -1083,6 +1084,10 @@ void SipDialogVoip::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_ringing_termwait_reject",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a13_ringing_termwait_reject,
 			s_ringing, s_termwait);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_incall_termwait_BYE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a5_incall_termwait_BYE,
+			s_ringing, s_termwait); 
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_termwait_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a16_start_termwait_INVITE,
