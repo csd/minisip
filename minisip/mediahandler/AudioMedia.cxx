@@ -184,6 +184,8 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 	sendersLock.lock();
 
 	for( i = senders.begin(); i != senders.end(); i++ ){
+		uint32_t givenTs;
+		givenTs = ts;
 		encodeZeroData = false;
 		//only send if active sender, or if muted only if keep-alive
 		if( (*i)->isMuted () ) {
@@ -204,7 +206,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 			encodedLength = selectedCodec->encode( data, length, encoded );
 		}
 	
-		(*i)->send( encoded, encodedLength, &ts, marker );
+		(*i)->send( encoded, encodedLength, &givenTs, marker );
 	}
 	
 	sendersLock.unlock();
