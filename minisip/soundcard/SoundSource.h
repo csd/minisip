@@ -127,36 +127,75 @@ class BasicSoundSource: public SoundSource{
                  * @param oNChannels    Output number of channels
                  * @param buffersize    Number of samples in buffer (per channel)
                  */
-  BasicSoundSource(int32_t id,
-                   SoundIOPLCInterface *plc,
-                   int32_t position,
-		   uint32_t oFreq,
-		   uint32_t oDurationMs,
-		   uint32_t oNChannels,
-                   int32_t buffersize=16000);
+		BasicSoundSource(int32_t id,
+			SoundIOPLCInterface *plc,
+			int32_t position,
+			uint32_t oFreq,
+			uint32_t oDurationMs,
+			uint32_t oNChannels,
+			int32_t buffersize=16000);
 
                 virtual ~BasicSoundSource();
 
+		/**
+		Add audio samples to the buffer.
+		At the same time, the iNChannels and oNChannels
+		conversion is applied (usually, turn a mono
+		stream into a stereo stream).
+		*/
                 void pushSound(short *samples,
                                 int32_t nSamples,
                                 int32_t index,
                                 bool isStereo=false);
 
 
-
+		/**
+		Read (and deque) audio samples from the buffer.
+		It reads from stereoBuffer (so the nChannels
+		is already with the right number). It performs
+		the resampling of the frames, to adapt it to 
+		the output sample freq.
+		*/
                 virtual void getSound(short *dest,
                                       bool dequeue=true);
         private:
                 SoundIOPLCInterface *plcProvider;
-                short *stereoBuffer;
-                int32_t bufferSizeInMonoSamples;
+		
+                /**
+		Output buffer.
+		Its size is oFrames * oNChannels samples.
+		Whatever is stored here already has been:
+		- converted to the output format (at least the 
+		oNumberOfChannels, done in pushSound() ).
+		- The sampling freq is the inputFreq (8000Hz).
+		*/
+		short *stereoBuffer;
+                
+		int32_t bufferSizeInMonoSamples;
                 short *playoutPtr;
                 short *firstFreePtr;
                 short *temp;
                 int32_t lap_diff; //roll over counter
+		
+		/**
+		Output frame size ... that is, how many samples
+		are we to return per call to getSound()
+		*/
 		uint32_t oFrames;
+		
+		/**
+		Input frame size, that is, how many samples
+		do we get each time we are pushSound()'d
+		It is calculated with 8000Hz sampling rate, thus
+		the only variable is oDurationMs (usually 20ms).
+		*/
 		uint32_t iFrames;
+		
+		/**
+		Number of channels the output has.
+		*/
 		uint32_t oNChannels;
+		
 		MRef<Resampler *> resampler;
 
 };

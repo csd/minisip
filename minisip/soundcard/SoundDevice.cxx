@@ -56,7 +56,7 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 		return new FileSoundDevice( 
 				devideId.substr( 5, comaPos-5 ),
 				devideId.substr( comaPos + 1, string::npos ),
-				2, 8000 );
+				FILESOUND_TYPE_RAW );
 	}
 
 #ifdef HAVE_LIBASOUND
@@ -79,14 +79,7 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 }
 
 SoundDevice::SoundDevice( string device ):openedRecord(false),openedPlayback(false){
-
-	
-//	pthread_mutex_init( &mLockRead, NULL );
-//	pthread_mutex_init( &mLockWrite, NULL );
-
 	dev = device;
-
-	
 }
 
 SoundDevice::~SoundDevice()
@@ -95,46 +88,62 @@ SoundDevice::~SoundDevice()
 }
 
 void SoundDevice::lockRead(){
-	//pthread_mutex_lock( &mLockRead );
-        mLockRead.lock();
+	mLockRead.lock();
 }
 
 
 void SoundDevice::lockWrite(){
-	//pthread_mutex_lock( &mLockWrite );
-        mLockWrite.lock();
+	mLockWrite.lock();
 }
 
 void SoundDevice::unlockRead(){
-	//pthread_mutex_unlock( &mLockRead );
-        mLockRead.unlock();
+	mLockRead.unlock();
 }
 
 void SoundDevice::unlockWrite(){
-	//pthread_mutex_unlock( &mLockWrite );
-        mLockWrite.unlock();
+	mLockWrite.unlock();
 }
 
+void SoundDevice::setFormat( int format_ ) {
+	switch( format_ ) {
+		case SOUND_S16LE: 
+		case SOUND_S16BE: 
+		case SOUND_U16LE: 
+		case SOUND_U16BE: 
+			sampleSize = 2;
+			this->format = format_;
+			break;
+		case SOUND_S8LE: 
+		case SOUND_U8LE: 
+			sampleSize = 1;
+			this->format = format_;
+			break;
+		case SOUND_S32LE: 
+		case SOUND_U32LE: 
+			sampleSize = 4;
+			this->format = format_;
+			break;
+		default: 
+			cerr << "SoundDevice::setFormat - format not understood!" << endl;
+			break;
+	}
+}
+
+#if 0
 int SoundDevice::getSampleSizePlay(){
-//	fprintf( stderr, "format: %x\n",format );
-//	fprintf( stderr, "nChannels: %d\n", nChannels );
 	if( ( format & 0xF0 ) == 0xF0 ){
 		return 2 * nChannelsPlay;
-	}
-
-	else{
+	} else {
 		return 0;
 	}
 }
 
 int SoundDevice::getSampleSizeRecord(){
-//	fprintf( stderr, "format: %x\n",format );
-//	fprintf( stderr, "nChannels: %d\n", nChannels );
 	if( ( format & 0xF0 ) == 0xF0 ){
 		return 2 * nChannelsRecord;
-	}
-
-	else{
+	} else {
 		return 0;
 	}
 }
+#endif
+

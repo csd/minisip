@@ -100,6 +100,7 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	this->nChannelsPlay = nChannels;
 
 	_snd_pcm_format alsaFormat;
+	setFormat( format );
 	
 	switch( format ){
 		case SOUND_S16LE:
@@ -118,10 +119,6 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 			cerr << "Unhandled sound format (ALSA)" << endl;
 			exit( -1 );
 	}
-
-	this->format = format;
-
-
 
 	if (snd_pcm_hw_params_set_format(writeHandle, hwparams, 
 				alsaFormat) < 0) {
@@ -270,6 +267,7 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 		this->nChannelsRecord = nChannels;
 	}
 	
+	setFormat( format );
 	_snd_pcm_format alsaFormat;
 	
 	switch( format ){
@@ -310,7 +308,9 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	}
 
 	if( (unsigned int)samplingRate != wantedSamplingRate ){
+#ifdef DEBUG_OUTPUT		
 		cerr << "Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
+#endif
 	}
 
 /*	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200, 0 

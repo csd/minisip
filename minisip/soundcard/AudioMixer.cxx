@@ -72,6 +72,7 @@ bool AudioMixer::init( uint32_t numChannels_ ) {
 	}
 #ifdef DEBUG_OUTPUT	
 	cerr << "AudioMixer::init() ... initializing audio mixer" << endl;
+	printf( "AudioMixer::init - frameSize = %d, numChannels = %d\n", frameSize, numChannels );
 #endif
 	return true;
 }

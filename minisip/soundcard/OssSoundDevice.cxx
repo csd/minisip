@@ -80,7 +80,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 */
 
 
-	this->format = format;
+	setFormat( format );
 	int ossFormat = format;
 	
 	switch( format ){
@@ -139,7 +139,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 
 	this->samplingRate = setSpeed;
 	
-	cerr << "DSP speed set to "<< this->samplingRate << endl;
+	cerr << "OSSDevice: DSP speed set to "<< this->samplingRate << endl;
 
 	openedPlayback = true;
 	return 0;
@@ -187,9 +187,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 
 	this->nChannelsRecord = channels;
 
-
-
-	this->format = format;
+	setFormat( format );
 	int ossFormat = format;
 	
 	switch( format ){
@@ -269,13 +267,8 @@ int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 	int totalBytesRead = 0;
 //	struct timeval tv, tv2;
 //	struct timezone tz;
-
-        //FIXME: Hack to make sampleSize correct - I don't understand the
-        //getSampleSize method... -Erik
-        sampleSize=2;               
         
-        
-	int nBytesToRead = nSamples * sampleSize * nChannelsRecord;
+	int nBytesToRead = nSamples * getSampleSize() * getNChannelsRecord();
 	
 	if( fdRecord == -1 ){
 		return -1;
@@ -300,6 +293,9 @@ int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 
 		totalBytesRead += nReadBytes;
 	}
+	
+// 	printf( "OSS: read %d samples, %d bytes\n", nSamples, totalBytesRead );
+	
 	return totalBytesRead;
 }
 
@@ -307,7 +303,7 @@ int OssSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 
 	int nWrittenBytes = 0;
 	int totalBytesWritten = 0;
-	int nBytesToWrite = nSamples * getSampleSizePlay();
+	int nBytesToWrite = nSamples * getSampleSize() * getNChannelsPlay();
 
 	if( fdPlayback == -1 ){
 		return -1;

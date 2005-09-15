@@ -71,14 +71,16 @@ BasicSoundSource::BasicSoundSource(int32_t id,
                 firstFreePtr(0),
 		lap_diff(0)
 {
-        stereoBuffer = new short[bufferSizeInMonoSamples*2];
+	this->oNChannels = oNChannels;
+        
+	stereoBuffer = new short[bufferSizeInMonoSamples*oNChannels];
+	
         firstFreePtr = stereoBuffer;
         playoutPtr = stereoBuffer;
         this->position=position;
 
 	oFrames = ( oDurationMs * oFreq ) / 1000;
 	iFrames = ( oDurationMs * 8000 ) / 1000;
-	this->oNChannels = oNChannels;
 	
 	resampler = Resampler::create( 8000, oFreq, oDurationMs, oNChannels );
 
@@ -94,6 +96,8 @@ BasicSoundSource::BasicSoundSource(int32_t id,
         k=0;
 #ifdef DEBUG_OUTPUT
 	cerr << "BasicSoundSource::  - new with id(ssrc) = " << itoa(id) << endl;
+/*	printf( "BasicSoundSource:: buffer size = %d, bufferSizeMonoSamples = %d, oFrames = %d, iFrames = %d, oDurationMs = %d, oNChannels = %d\n",
+		bufferSizeInMonoSamples*oNChannels, bufferSizeInMonoSamples, oFrames, iFrames, oDurationMs, this->oNChannels );*/
 #endif
 }
 
@@ -125,10 +129,10 @@ void BasicSoundSource::pushSound(short * samples,
 		//cerr << "Calling pushSound for source " << getId() << endl;
 	}
 #endif
-        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
+        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*oNChannels;
 
 
-        if (firstFreePtr+nMonoSamples*2 >= endOfBufferPtr){
+        if (firstFreePtr+nMonoSamples*oNChannels >= endOfBufferPtr){
                 if (lap_diff==0 &&
                             stereoBuffer+
                             (((firstFreePtr-stereoBuffer)+
@@ -141,7 +145,7 @@ void BasicSoundSource::pushSound(short * samples,
         }
 
         if (isStereo){
-                for (int32_t i=0; i< nMonoSamples*2; i++)
+                for (uint32_t i=0; i< nMonoSamples*oNChannels; i++)
                         stereoBuffer[((firstFreePtr-stereoBuffer)+i)%
                                 (bufferSizeInMonoSamples*2)] = samples[i];
         }else{
@@ -161,7 +165,7 @@ int nget=1;
 void BasicSoundSource::getSound(short *dest,
                 bool dequeue)
 {
-        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*2;
+        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*oNChannels;
 #ifdef DEBUG_OUTPUT
         nget++;
         if (nget%1000==0) {
@@ -178,7 +182,9 @@ void BasicSoundSource::getSound(short *dest,
         }
         counter++;
 #endif
-        if ((!lap_diff && ((uint)(firstFreePtr-playoutPtr)< iFrames*oNChannels)) ||
+        //check for underflow ... 
+	//FIXME: if this happens, the audio goes crazy (Cesc). Test it!
+	if ((!lap_diff && ((uint)(firstFreePtr-playoutPtr)< iFrames*oNChannels)) ||
 		(lap_diff && 
 			((uint)(firstFreePtr-stereoBuffer+endOfBufferPtr-playoutPtr)<iFrames*oNChannels))){
 
@@ -199,29 +205,19 @@ void BasicSoundSource::getSound(short *dest,
                 return;
         }
 
-//        if (stereo){
-/*		if( isSilenced() ) {
-			printf("S");
+	//If there is no underflow, take the data from the stereo buffer and 
+	//put it in the temp buffer, where it will be resampled
+	for (uint32_t i=0; i<iFrames*oNChannels; i++){
+		if( isSilenced() ) { 
+			temp[i] = 0;
+		} else {
+			temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
+				(bufferSizeInMonoSamples*2) ];
 		}
-*/
-		for (uint32_t i=0; i<iFrames*oNChannels; i++){
-			if( isSilenced() ) { 
-				temp[i] = 0;
-			} else {
-				temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
-					(bufferSizeInMonoSamples*2) ];
-			}
-		}
-#if 0
-        }else{
-                for (int32_t i=0; i<nMono; i++){
-                        temp[i]=stereoBuffer[((playoutPtr-stereoBuffer)+i*2)%
-                                                (bufferSizeInMonoSamples*2) ]/2;
-			temp[i]+=stereoBuffer[((playoutPtr-stereoBuffer)+i*2+1)%                                                (bufferSizeInMonoSamples*2) ]/2;
-		}
-        }
-#endif
-        if (playoutPtr+oFrames*oNChannels>=endOfBufferPtr)
+	}
+        
+	//update state variables 
+	if (playoutPtr+oFrames*oNChannels>=endOfBufferPtr)
                 lap_diff=0;
 
         if (dequeue){

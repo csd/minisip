@@ -245,8 +245,16 @@ MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
 
 
 AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
-	BasicSoundSource( ssrc, NULL, 0/*position*/, SOUND_CARD_FREQ, 20, 2 ),
-	media(media),ssrc(ssrc)
+	BasicSoundSource( ssrc, 
+			NULL, //plc
+			0/*position*/, 
+			SOUND_CARD_FREQ, 
+			20, //duration in ms
+			2 //number of channels (numChannels)
+			//buffer size defaults to 16000 * numChannels
+			),
+	media(media),
+	ssrc(ssrc)
 {
 }
 

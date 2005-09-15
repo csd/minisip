@@ -99,15 +99,10 @@ SoundIO::SoundIO(
 		int nChannels, 
 		int32_t samplingRate, 
 		int format): 
-			//nChannels(nChannels),
-			//useFileInterface(false),
-			//in_file(string("")),
-			//out_file(string("")),
 			nChannels(nChannels),
 			samplingRate(samplingRate),
 			format(format),
 			recording(false)
-			//openCount(0)
 {
 	soundDev = device;
 
@@ -152,7 +147,7 @@ void SoundIO::sync(){
 void SoundIO::play_testtone( int secs ){
 	
 	int nSamples = secs * soundDev->getSamplingRate();
-	short *data = (short*)malloc( nSamples * soundDev->getSampleSizePlay() );
+	short *data = (short*)malloc( nSamples * soundDev->getSampleSize() * soundDev->getNChannelsPlay() );
 	for (int32_t i=0; i< nSamples; i++){
 		if (i%4==0)data[i]=0;
 		if (i%4==1)data[i]=10000;
@@ -209,6 +204,18 @@ void SoundIO::register_recorder_receiver(SoundRecorderCallback *callback,
                                             // for G711+ilbc.
 }
 
+void SoundIO::unRegisterRecorderReceiver( SoundRecorderCallback *callback ) {
+	list<RecorderReceiver *>::iterator iter;
+	for( iter = recorder_callbacks.begin();
+		iter != recorder_callbacks.end();
+		iter++ ) {
+		if( (*iter)->getCallback() == callback ) {
+			recorder_callbacks.erase( iter );
+			return;
+		}
+	}
+}
+
 void SoundIO::set_recorder_buffer_size(int32_t bs){
 	recorder_buffer_size=bs;
 }
@@ -224,6 +231,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	int32_t nread=0; /* IN SAMPLES */
 	//FIXME
 	soundcard->recorder_buffer_size = SOUND_CARD_FREQ*20/1000;
+// 	printf( "SoundIO::recLoop - recorder_buff_size = %d\n", soundcard->recorder_buffer_size );
 	
 	for (i=0; i<2; i++){
 		//buffers[i] = (short *)malloc(soundcard->recorder_buffer_size*sizeof(short)*2);
@@ -257,6 +265,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			
 			if( ! soundcard->soundDev->isOpenedRecord() ){
 				soundcard->openRecord();
+// 				printf( "SoundIO::recLoop: openrecord channels = %d\n", soundcard->soundDev->getNChannelsRecord() );
 			}
 
 		}
@@ -503,7 +512,7 @@ void *SoundIO::playerLoop(void *arg){
 			/* Wait for someone to add a source */
                         soundcard->sourceListCondLock.lock();
 			soundcard->sourceListCond.wait( &soundcard->sourceListCondLock );
-                        soundcard->sourceListCondLock.unlock();
+			soundcard->sourceListCondLock.unlock();
 
 			soundcard->openPlayback();
 			nChannels = soundcard->soundDev->getNChannelsPlay();
@@ -545,7 +554,7 @@ bool SoundIO::setMixer( string type ) {
 	 	MRef<SpAudio *> spatial = new SpAudio( 5 );
 	 	spatial->init();
 		mixer = new AudioMixerSpatial(spatial);
-	}  else {
+	} else {
 		cerr << "ERROR: SoundIO could not create requested mixer! (type _" << type << "_ not understood)" << endl;
 		cerr << "ERROR:      Creating Spatial Audio mixer instead." << endl;
 		setMixer( "spatial" );

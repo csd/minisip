@@ -68,19 +68,6 @@ class DirectSoundDevice;
 #endif
 
 
-/**
- * Minimal API for recording and playing samples from/to a soundcard.
- * The SoundCard class is a interface to a sound card device
- * in the "/dev" directory (typically "/dev/dsp"). It uses a
- * small output buffer and can therefore be used in VoIP
- * applications.
- * If recording is wanted a function can be registred as callback
- * when data is ready.
- * WARNING: The classes have only been tested with 160 samples/buffer, 16bit
- * @author Erik Eliasson eliasson@it.kth.se
- * @version 0.01
-*/
-
 /*             v                               <--- Play out point
  *   ........................................  <--- Audio buffer for one ssrc
  *             xxxxxxxxxxxxxxxxxxxxx           <--- Audio data in buffer
@@ -103,7 +90,18 @@ class RecorderReceiver{
 };
 
 
-
+/**
+ * Minimal API for recording and playing samples from/to a soundcard.
+ * The SoundCard class is a interface to a sound card device
+ * in the "/dev" directory (typically "/dev/dsp"). It uses a
+ * small output buffer and can therefore be used in VoIP
+ * applications.
+ * If recording is wanted a function can be registred as callback
+ * when data is ready.
+ * WARNING: The classes have only been tested with 160 samples/buffer, 16bit
+ * @author Erik Eliasson eliasson@it.kth.se
+ * @version 0.01
+*/
 class SoundIO : public MObject{
 
 	public:
@@ -112,8 +110,13 @@ class SoundIO : public MObject{
                  * to a soundcard.
 		 * @param device Device to use - for example
                  * AlsaSoundDevice or OSSSoundDevice
+		 * @param mixerType string identifying the type of mixer we want
+		 * 	(spatial or simple).
 		 * @param speed Frequency to use for both recording and playing.
 		 * 		Defaults to 8kHz.
+		 * @param format format of the audio samples (signed/unsigned, 
+		 * 		bytes per sample, endiannes). See SoundDevice.h
+		 * 		for a definition of valid types.
 		 */
 		SoundIO(MRef<SoundDevice *>device, 
 			string mixerType,
@@ -165,7 +168,9 @@ class SoundIO : public MObject{
 		void register_recorder_receiver(SoundRecorderCallback *callback,
                                                 int32_t nrsamples, 
                                                 bool stereo);
-		
+						
+		void unRegisterRecorderReceiver( SoundRecorderCallback *callback );
+						
 		/**
 		 * Starts the thread that "polls" the soundcard for data
 		 * and executes the registred receiver function

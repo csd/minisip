@@ -82,7 +82,8 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 
 
                 /**
-                 * Used by the media sessions to unregister a MediaStreamSender,                 * when a media session ends.
+                 * Used by the media sessions to unregister a MediaStreamSender,
+                 * when a media session ends.
                  * @param sender a reference to the MediaStreamSender object to
                  * unregister
                  */
@@ -148,8 +149,12 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 #endif
 		
 		MRef<AudioMediaSource *> getSource( uint32_t ssrc );
+		
+		MRef<Resampler *> getResampler() { return resampler; };
+		
+		MRef<SoundIO *> getSoundIO() { return soundIo; };
 
-	private:
+	protected:
                 MRef<Resampler *> resampler;
                 SilenceSensor * silenceSensor;
                 MRef<SoundIO *> soundIo;                 
@@ -171,9 +176,14 @@ class AudioMediaSource : public BasicSoundSource{
 
 		void playData( MRef<RtpPacket *> rtpPacket );
 		uint32_t getSsrc();
+		
+		MRef<Media *> getMedia() { return media; };
 
-	private:
 		MRef<CodecState *> findCodec( uint8_t payloadType );
+		
+		short * getCodecOutputBuffer() { return codecOutput; }
+
+	protected:
 		std::list< MRef<CodecState *> > codecs;
 		MRef<Media *> media;
 		short codecOutput[16384];

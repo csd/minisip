@@ -30,9 +30,7 @@ DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 
 	samplingRate = 8000;
 
-	sampleSize = 2;
-
-
+	setFormat( SOUND_S16LE );
 	
 }
 
