@@ -1,20 +1,23 @@
- 
- /*
-Copyright (C) 2004,2005  Anders Hedstrom
+/*
+  Copyright (C) 2004,2005  Cesc Santasuana
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-00011 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/**
+See Note in the header file about the source.
 */
 
 #include <libmutil/CircularBuffer.h>
@@ -34,14 +37,12 @@ CircularBuffer::CircularBuffer(int size):
 	buf = new short[size];
 }
 
-
 CircularBuffer::~CircularBuffer()
 {
 	if( buf != NULL ) {
 		delete[] buf;
 	}
 }
-
 
 bool CircularBuffer::write(const short *s, int len) {
 	
@@ -67,7 +68,6 @@ bool CircularBuffer::write(const short *s, int len) {
 	size += len;
 	return true;
 }
-
 
 bool CircularBuffer::read(short *s, int len)
 {
@@ -98,7 +98,6 @@ bool CircularBuffer::read(short *s, int len)
 	}
 	return true;
 }
-
 
 bool CircularBuffer::remove(int len)
 {

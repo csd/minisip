@@ -1,20 +1,33 @@
 /*
-Copyright (C) 2004,2005  Anders Hedstrom
+  Copyright (C) 2004,2005  Cesc Santasuana
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
+/**
+The original code of the Circular buffer was by Anders Hedstrom. 
+It has been modified and simplified. 
+Variable names where changed to make it more clear as to what was its functionality.
+New functions providing different status over the buffer where added, some others 
+were removed from the original code.
+Also, the original code was for a circular buffer of chars ... this is for shorts :D
+But as there are not many different ways to 
+implement a circular buffer, the core lines for read and write stay practically the
+same (i mean, even writting from scratch, it would look pretty much the same).
+*/
+
 
 #ifndef _CIRCULARBUFFER_H
 #define _CIRCULARBUFFER_H
@@ -56,7 +69,7 @@ class LIBMUTIL_API CircularBuffer {
 		@return true if read correctly, else false (indicates
 			either an error or that there were not enough elements).
 		*/
-		virtual bool read( short *dest, int len);
+		virtual bool read( short *s, int len);
 		
 		/**
 		Simulate a read of len elements, but do not care what is read.
@@ -95,7 +108,6 @@ class LIBMUTIL_API CircularBuffer {
 		unsigned long getByteCounter() { return byteCounter; };
 		
 	private:
-		CircularBuffer(const CircularBuffer& s)  {}
 		CircularBuffer& operator=(const CircularBuffer& ) { return *this; }
 		
 		/**
