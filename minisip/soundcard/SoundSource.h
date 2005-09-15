@@ -25,6 +25,8 @@
 #ifndef SOUND_SOURCE_H
 #define SOUND_SOURCE_H
 
+#include<libmutil/Mutex.h>
+
 #include"SoundIOPLCInterface.h"
 #include"resampler/Resampler.h"
 
@@ -32,110 +34,124 @@
 #define RIGHT 5
 #define CENTER 3
 
+class CircularBuffer;
+
 class SoundSource : public MObject{
-        public:
-                SoundSource(int id);
-                virtual ~SoundSource(){};
+	public:
+		SoundSource(int id);
+		virtual ~SoundSource(){};
 
-                /**
-                 * @return              Identifier of source that generated the audio.
-                 */
-                int getId();
+		/**
+		* @return Identifier of source that generated the audio.
+		*/
+		int getId();
 
-                /**
-                 * @return              Spatial position of the source.
-                 */
-                int32_t getPos();
-
-
-                /**
-                 * @set                 Spatial position of the source.
-                 */
-                void setPos(int32_t position);
+		/**
+		* @return Spatial position of the source.
+		*/
+		int32_t getPos();
 
 
-                /**
-                 * @param samples       Buffer with samples that will be enqueued.
-                 * @param nSamples      Number of samples (per channel) in buffer.
-                 * @isStereo            Indicates if one or two channels are used.
-                 */
-                virtual void pushSound(short *samples,
-                                int32_t nSamples,
-                                int32_t index,
-                                bool isStereo=false)=0;
+		/**
+		* @param position Spatial position of the source.
+		*/
+		void setPos(int32_t position);
 
-                /**
-                 * @param dest          Buffer to which samples will be 
-                 *                      "dequeued".
-                 * @param dequeue       Indicates of the retrieved 
-                 *                      samples should be removed
-                 *                      from the queue.
-                 */
-                virtual void getSound(short *dest,
-                                      bool dequeue=true)=0;
 
-                virtual std::string getMemObjectType(){return "SoundSource";};
+		/**
+		Add samples to the SoundSource
+		@param samples Buffer with samples that will be enqueued.
+		@param nSamples Number of samples (per channel) in buffer.
+		@param isStereo Indicates whether the provided samples are in 
+			mono or stereo mode (1 or 2 channels).
+		*/
+		virtual void pushSound(short *samples,
+				int32_t nSamples,
+				int32_t index,
+				bool isStereo = false)=0;
 
-                int32_t getPointer();
+		/**
+		Read Samples from the SoundSource
+		@param dest Buffer to which samples will be 
+				"dequeued".
+		@param dequeue Indicates of the retrieved 
+				samples should be removed
+				from the queue.
+		*/
+		virtual void getSound(short *dest,
+				bool dequeue=true)=0;
 
-                void setPointer(int32_t wpointer);
+		virtual std::string getMemObjectType(){return "SoundSource";};
+
+		int32_t getPointer();
+
+		void setPointer(int32_t wpointer);
 		
+		/**
+		Set and get for the silencing of this sources (meaning
+		that when read, even if it has data, it will return "silence"
+		samples only.
+		*/
 		bool isSilenced() { return silenced; }
 		void setSilenced( bool s ) { silenced = s; }
 		
-        private:
-                int sourceId;
+	private:
+		int sourceId;
 
-        protected:
+	protected:
 		/**
 		Whether this source is silenced, that is, on read of the buffer,
 		it will provide silence samples (all zeros)
 		*/
 		volatile bool silenced;
 		
-                int32_t position;
-                double sampRate;
-               short *leftch; //spaudio
-               short *rightch; //spaudio
-//                short *lookupleft; //spaudio
-//                 short *lookupright; //spaudio
-                int32_t pointer; //spaudio
-//                 int32_t numSources; //spaudio
-                int32_t j; //spaudio
-                int32_t k; //spaudio
+		int32_t position;
+		double sampRate;
+		short *leftch; //spaudio
+		short *rightch; //spaudio
+		int32_t pointer; //spaudio
+		int32_t j; //spaudio
+		int32_t k; //spaudio
+//		short *lookupleft; //spaudio
+//		short *lookupright; //spaudio
+//		int32_t numSources; //spaudio
 
-                friend class SpAudio;
+		friend class SpAudio;
 
 };
 
 
-
+/**
+Simple implementation of an audio sound source. 
+It has a circular buffer object, where we keep the audio samples.
+The mutation from mono input to stereo output, and from
+input frequency to output frequency is done in push/getSound().
+*/
 class BasicSoundSource: public SoundSource{
         public:
-                /**
-                 * Implementation of very simple queueing algorithm.
-                 * @param id            Identifier of sound source that
-                 *                      is generating audio for
-                 *                      stream.
-                 * @param pcl           Packet loss concealment provider. 
-                 *                      The codec that is used
-                 *                      to decode the audio data can 
-                 *                      provide a PLC mechanism.
-		 * @param position      Position for spatial audio
-                 * @param oFreq         Output frquency
-                 * @param oDurationMs   Output duration (in ms)
-                 * @param oNChannels    Output number of channels
-                 * @param buffersize    Number of samples in buffer (per channel)
-                 */
+		/**
+		* Implementation of very simple queueing algorithm.
+		* @param id            Identifier of sound source that
+		*                      is generating audio for
+		*                      stream.
+		* @param pcl           Packet loss concealment provider. 
+		*                      The codec that is used
+		*                      to decode the audio data can 
+		*                      provide a PLC mechanism.
+		* @param position      Position for spatial audio
+		* @param oFreq         Output frquency
+		* @param oDurationMs   Output duration (in ms)
+		* @param oNChannels    Output number of channels
+		* @param buffersize    Number of samples in buffer (per channel)
+		*/
 		BasicSoundSource(int32_t id,
 			SoundIOPLCInterface *plc,
 			int32_t position,
 			uint32_t oFreq,
 			uint32_t oDurationMs,
-			uint32_t oNChannels,
-			int32_t buffersize=16000);
+			uint32_t oNChannels);
 
-                virtual ~BasicSoundSource();
+		virtual ~BasicSoundSource();
 
 		/**
 		Add audio samples to the buffer.
@@ -143,10 +159,10 @@ class BasicSoundSource: public SoundSource{
 		conversion is applied (usually, turn a mono
 		stream into a stereo stream).
 		*/
-                void pushSound(short *samples,
-                                int32_t nSamples,
-                                int32_t index,
-                                bool isStereo=false);
+		void pushSound(short *samples,
+				int32_t nSamples,
+				int32_t index,
+				bool isStereo = false);
 
 
 		/**
@@ -156,11 +172,13 @@ class BasicSoundSource: public SoundSource{
 		the resampling of the frames, to adapt it to 
 		the output sample freq.
 		*/
-                virtual void getSound(short *dest,
-                                      bool dequeue=true);
-        private:
-                SoundIOPLCInterface *plcProvider;
+		virtual void getSound(short *dest,
+				bool dequeue=true);
+        
+	private:
+		SoundIOPLCInterface *plcProvider;
 		
+
                 /**
 		Output buffer.
 		Its size is oFrames * oNChannels samples.
@@ -168,14 +186,35 @@ class BasicSoundSource: public SoundSource{
 		- converted to the output format (at least the 
 		oNumberOfChannels, done in pushSound() ).
 		- The sampling freq is the inputFreq (8000Hz).
+		
+		FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+		With this implementation, we keep losing audio ... the whole 
+		audio system thing ... not this particular soundsource or the
+		circular buffer.
+		
+		For every 1000 round of getSound(), pushSound() only does 999, 
+		causing a delay for the audio on the headphones from which we never
+		recover. 
+		
+		HACK Set a small buffer size ... kind of limiting the max delay.
+			This limits the delay, but we loose audio frames all along ...
+			For now, we do 20ms * 5 = 100ms
+			We can set this even smaller ... but then we may have problems
+			if rtp packets come in burst  ... 
 		*/
-		short *stereoBuffer;
-                
-		int32_t bufferSizeInMonoSamples;
-                short *playoutPtr;
-                short *firstFreePtr;
-                short *temp;
-                int32_t lap_diff; //roll over counter
+		CircularBuffer * cbuff;
+		
+		/**
+		Auxiliary buffer .. used both in pushSound() and getSound().
+		We need the mutex
+		*/
+		short *temp;
+		
+		/**
+		We lock access to the CircularBuffer object, as well as to the 
+		"temp" buffer
+		*/		
+		Mutex bufferLock;
 		
 		/**
 		Output frame size ... that is, how many samples
@@ -196,6 +235,11 @@ class BasicSoundSource: public SoundSource{
 		*/
 		uint32_t oNChannels;
 		
+		/**
+		Used to resample the samples stored in the
+		circular buffer to be used at the soundcard
+		(done in getSound() ).
+		*/
 		MRef<Resampler *> resampler;
 
 };

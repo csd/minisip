@@ -47,7 +47,6 @@
 #define LIBMUTIL_API
 #endif
 
-#include<string>
 #include<libmutil/minilist.h>
 
 #include<libmutil/itoa.h>

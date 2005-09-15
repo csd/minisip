@@ -30,6 +30,8 @@
 
 #include<libmutil/itoa.h> //for debug ... remove
 
+#include<libmutil/CircularBuffer.h>
+
 using namespace std;
 
 SoundSource::SoundSource(int id):sourceId(id){
@@ -58,26 +60,16 @@ void SoundSource::setPos(int32_t position){
 }
 
 BasicSoundSource::BasicSoundSource(int32_t id,
-                                   SoundIOPLCInterface *plc,
-                                   int32_t position,
-                                   uint32_t oFreq,
-                                   uint32_t oDurationMs,
-				   uint32_t oNChannels,
-				   int32_t bufferSizeInMonoSamples):
-                SoundSource(id),
-                plcProvider(plc),
-                bufferSizeInMonoSamples(bufferSizeInMonoSamples),
-                playoutPtr(0),
-                firstFreePtr(0),
-		lap_diff(0)
-{
+				SoundIOPLCInterface *plc,
+				int32_t position,
+				uint32_t oFreq,
+				uint32_t oDurationMs,
+				uint32_t oNChannels):
+		SoundSource(id),
+		plcProvider(plc)   {
 	this->oNChannels = oNChannels;
         
-	stereoBuffer = new short[bufferSizeInMonoSamples*oNChannels];
-	
-        firstFreePtr = stereoBuffer;
-        playoutPtr = stereoBuffer;
-        this->position=position;
+	this->position=position;
 
 	oFrames = ( oDurationMs * oFreq ) / 1000;
 	iFrames = ( oDurationMs * 8000 ) / 1000;
@@ -85,15 +77,28 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	resampler = Resampler::create( 8000, oFreq, oDurationMs, oNChannels );
 
 	temp = new short[iFrames * oNChannels];
+	
+	//FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+	//With this implementation, we keep losing audio ... 
+	//  For every 1000 round of getSound(), pushSound() only does 999, 
+	//  causing a delay for the audio on the headphones from which we never
+	//  recover. 
+	//HACK Set a small buffer size ... kind of limiting the max delay.
+	//	This limits the delay, but we loose audio frames all along ...
+	//         For now, we do 20ms * 5 = 100ms
+	//	We can set this even smaller ... but then we may have problems
+	//	if rtp packets come in burst  ... 
+	cbuff = new CircularBuffer( iFrames * oNChannels * 5 );
 
-        /* spatial audio initialization */
-        leftch = new short[1028];
-        rightch = new short[1028];
-//         lookupleft = new short[65536];
-//         lookupright = new short[65536];
-        pointer = 0;
-        j=0;
-        k=0;
+	/* spatial audio initialization */
+	leftch = new short[1028];
+	rightch = new short[1028];
+	pointer = 0;
+	j=0;
+	k=0;
+//	lookupleft = new short[65536];
+//	lookupright = new short[65536];
+
 #ifdef DEBUG_OUTPUT
 	cerr << "BasicSoundSource::  - new with id(ssrc) = " << itoa(id) << endl;
 /*	printf( "BasicSoundSource:: buffer size = %d, bufferSizeMonoSamples = %d, oFrames = %d, iFrames = %d, oDurationMs = %d, oNChannels = %d\n",
@@ -103,128 +108,125 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 
 BasicSoundSource::~BasicSoundSource(){
 	delete [] temp;
-        delete [] stereoBuffer;
-//         delete [] leftch;
-//         delete [] rightch;
-//         delete [] lookupleft;
-//         delete [] lookupright;
+// 	delete [] stereoBuffer;
+	delete cbuff;
 }
 
-// Two cases - might have to "wrap around"
-//            v-firstFree
-// 1:  ...xxxx..........
-// 2:  ............xxxx.
+#ifdef DEBUG_OUTPUT
 bool nprint=false;
 int npush=1;
+int nget=1;
+#endif
+
 void BasicSoundSource::pushSound(short * samples,
-                                int32_t nMonoSamples,
-                                int32_t index,
-                                bool isStereo)
+				int32_t nMonoSamples,
+				int32_t index,
+				bool isStereo)
 {
-        index++; //dummy op
 #ifdef DEBUG_OUTPUT
 	npush++;
-        if (nprint) {
-                nprint=false,cerr << "npush="<< npush<< endl;;
+	if (npush%1000 == 0) {
+		printf( "pushSound: nget=%d; npush=%d; diff=%d\n", nget, npush, nget - npush) ;
+// 		printf( "CircBuff_push: maxSize = %d; size=%d; free=%d\n", cbuff->getMaxSize(), cbuff->getSize(), cbuff->getFree() );
 		//cerr << "Calling pushSound for source " << getId() << endl;
 	}
 #endif
-        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*oNChannels;
+        
+	bufferLock.lock();
+	//Check for OverFlow ... this happens if we receive big burst of packets ...
+	//or we are not emptying the buffer quick enough ...
+	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
+	#ifdef DEBUG_OUTPUT
+		printf("OF");
+// 		cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
+	#endif
+		bufferLock.unlock();
+		return;
+	}
 
-
-        if (firstFreePtr+nMonoSamples*oNChannels >= endOfBufferPtr){
-                if (lap_diff==0 &&
-                            stereoBuffer+
-                            (((firstFreePtr-stereoBuffer)+
-                            nMonoSamples*2)%(bufferSizeInMonoSamples*2))
-                            > playoutPtr  ){
-                        cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
-                        return;
-                }
-                lap_diff=1;
-        }
-
-        if (isStereo){
-                for (uint32_t i=0; i< nMonoSamples*oNChannels; i++)
-                        stereoBuffer[((firstFreePtr-stereoBuffer)+i)%
-                                (bufferSizeInMonoSamples*2)] = samples[i];
-        }else{
-                for (int32_t i=0; i< nMonoSamples; i++){
-                        stereoBuffer[((( (firstFreePtr-stereoBuffer)/2)+i)*2)%
-                                    (bufferSizeInMonoSamples*2)] = samples[i];
-                        stereoBuffer[((( (firstFreePtr-stereoBuffer)/2)+i)*2)%
-                                    (bufferSizeInMonoSamples*2)+1] = samples[i];                }
-        }
-        firstFreePtr = stereoBuffer + ((firstFreePtr-stereoBuffer)+
-                        nMonoSamples*2)%(bufferSizeInMonoSamples*2);
+	//If the incoming samples are already stereo, as is our circular buffer,
+	//just copy them to the buffer.
+	//Otherwise, transform them from mono to stereo (copy them twice ... ).
+	int writeRet;
+	if( isStereo ) {
+		writeRet = cbuff->write( samples, nMonoSamples * 2 );
+	} else {
+		int tempVal;
+		memset( temp, 0, iFrames * oNChannels ); 
+		for( int32_t i = 0; i<nMonoSamples; i++ ) {
+			tempVal = i*oNChannels;
+			temp[ tempVal ] = samples[i];
+			tempVal ++;
+			temp[ tempVal ] = samples[i];
+		}
+		writeRet = cbuff->write( temp, nMonoSamples * 2 );
+	}
+	bufferLock.unlock();
+#ifdef DEBUG_OUTPUT
+	if( writeRet == false ) {
+		cerr << "BasicSoundSource::pushSound - Buffer write error"<<endl;
+	}
+#endif	
 
 }
 
 
-int nget=1;
 void BasicSoundSource::getSound(short *dest,
                 bool dequeue)
 {
-        short *endOfBufferPtr = stereoBuffer + bufferSizeInMonoSamples*oNChannels;
 #ifdef DEBUG_OUTPUT
-        nget++;
-        if (nget%1000==0) {
-                nprint=true,cerr << "nget="<< nget<< endl;
+	nget++;
+	if (nget%1000==0) {
+		printf( "getSound: nget=%d; npush=%d; diff=%d\n", nget, npush, nget - npush) ;
+// 		printf( "CircBuff_get: maxSize = %d; size=%d; free=%d\n", cbuff->getMaxSize(), cbuff->getSize(), cbuff->getFree() );
+		//cerr << "nget="<< nget<< endl;
 		//cerr << "Calling getSound for source " << getId() << endl;
 	}
-        static int counter = 0;
-        static bool do_print=false;
-        if (counter%1000==0)
-                do_print=true;
-
-        if (do_print && !lap_diff){
-                do_print=false;
-        }
-        counter++;
 #endif
-        //check for underflow ... 
-	//FIXME: if this happens, the audio goes crazy (Cesc). Test it!
-	if ((!lap_diff && ((uint)(firstFreePtr-playoutPtr)< iFrames*oNChannels)) ||
-		(lap_diff && 
-			((uint)(firstFreePtr-stereoBuffer+endOfBufferPtr-playoutPtr)<iFrames*oNChannels))){
-
-                /* Underflow */
-#ifdef DEBUG_OUTPUT
-                //cerr << "u"<< flush;
-#endif
-                if (plcProvider){
-                        cerr << "PLC!"<< endl;
-                        short *b = plcProvider->get_plc_sound(oFrames);
-                        memcpy(dest, b, oFrames);
-                }else{
-
-                        for (uint32_t i=0; i < oFrames * oNChannels; i++){
-                                dest[i]=0;
-                        }
-                }
-                return;
-        }
-
-	//If there is no underflow, take the data from the stereo buffer and 
-	//put it in the temp buffer, where it will be resampled
-	for (uint32_t i=0; i<iFrames*oNChannels; i++){
-		if( isSilenced() ) { 
-			temp[i] = 0;
-		} else {
-			temp[i] = stereoBuffer[ ((playoutPtr-stereoBuffer)+i)%
-				(bufferSizeInMonoSamples*2) ];
-		}
-	}
+	
+	bufferLock.lock();
         
-	//update state variables 
-	if (playoutPtr+oFrames*oNChannels>=endOfBufferPtr)
-                lap_diff=0;
-
-        if (dequeue){
-                playoutPtr = stereoBuffer + ((playoutPtr-stereoBuffer)+
-			     oNChannels*iFrames ) % (bufferSizeInMonoSamples*2);
-        }
-
+	//Check for underflow ...
+	//	if it is so, use the PLC to fill in the missing audio, or produce silence
+	//NOTE Underflow is not so bad ... for example, if using a peer like minisip, it will
+	//	only send 1 packet/second when we are not the main call ... as long as we keep
+	//	receiving 1 pack/set instead of 1pack/20ms ... we get underflow.
+	if( cbuff->getSize() < (int) (iFrames*oNChannels) ) {
+	#ifdef DEBUG_OUTPUT
+		printf("UF");
+	#endif
+		if (plcProvider){
+		#ifdef DEBUG_OUTPUT
+			cerr << "PLC!"<< endl;
+		#endif			
+			short *b = plcProvider->get_plc_sound(oFrames);
+			memcpy(dest, b, oFrames);
+		}else{
+			for (uint32_t i=0; i < oFrames * oNChannels; i++){
+				dest[i]=0;
+			}
+		}
+		bufferLock.unlock();
+                return;
+	}
+	
+	//If there is no underflow, take the data from the circular buffer and 
+	//put it in the temp buffer, where it will be resampled
+	memset( temp, 0, iFrames * oNChannels ); 
+	bool retRead;
+	if( ! isSilenced() ) {
+		retRead = cbuff->read( temp, iFrames*oNChannels );
+	} else {
+		retRead = cbuff->remove( iFrames*oNChannels );
+	}
+#ifdef DEBUG_OUTPUT
+	if( !retRead ) {
+		cerr << "BasicSoundSource::pushSound - Buffer read error"<<endl;
+	}
+#endif
 	resampler->resample( temp, dest );
+	
+	bufferLock.unlock();
+	
 }
 

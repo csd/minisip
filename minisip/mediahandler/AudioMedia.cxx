@@ -263,10 +263,10 @@ void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){
 	MRef<CodecState *> codec = findCodec( hdr.getPayloadType() );
 
 	if( codec ){
-                uint32_t outputSize = codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
+		uint32_t outputSize = codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
 
-        	pushSound( codecOutput,
-                 	outputSize, hdr.getSeqNo() );
+		pushSound( codecOutput,
+			outputSize, hdr.getSeqNo() );
 		
         }
 }
