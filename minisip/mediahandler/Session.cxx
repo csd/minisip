@@ -150,6 +150,15 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 				m->addAttribute( *a );
 			}
 		}
+		//added static DTMF SDP headers in INVITE
+		m->addFormat(101);
+		MRef<SdpHeaderA*> dtmf = new SdpHeaderA("a=X");
+		dtmf->setAttributes("rtpmap: 101 telephone-event/8000");
+		m->addAttribute(*dtmf);
+		MRef<SdpHeaderA*> dtmf_fmtp = new SdpHeaderA("a=X");
+		dtmf_fmtp->setAttributes("fmtp:101 0-15");
+		m->addAttribute(*dtmf_fmtp);
+		
 		result->addHeader( *m );
 
 		attributes = (*i)->getSdpAttributes();
