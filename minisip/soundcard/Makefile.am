@@ -59,8 +59,8 @@ noinst_HEADERS  = SoundIO.h \
 		  SoundRecorderCallback.h \
 		  FileSoundSource.h \
 		  AlsaCard.h \
-		  ${RESAMPLER_HDR}
-		  ${AUDIOMIXER_SRC}
+		  ${RESAMPLER_HDR} \
+		  ${AUDIOMIXER_HDR}
 
 
 duplex: duplex.cxx libsoundcard.a
