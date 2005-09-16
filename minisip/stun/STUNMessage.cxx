@@ -117,7 +117,7 @@ void STUNMessage::parseAttributes(unsigned char *data, int length){
 		int attrLen=0;
 		STUNAttribute *attr = STUNAttribute::parseAttribute(&data[index], nleft, attrLen);
 //		cerr << "Parsed Attribute: "<<attr->getDesc()<<endl;
-		addAttribute(attr);
+		if (attr != NULL) addAttribute(attr);
 		nleft-=attrLen;
 		index+=attrLen;
 //		cerr << "nleft="<<nleft << endl;

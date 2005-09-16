@@ -48,6 +48,7 @@ const int STUNAttribute::ERROR_CODE=0x0009;
 const int STUNAttribute::UNKNOWN_ATTRIBUTES=0x000a;
 const int STUNAttribute::REFLECTED_FROM=0x000b;
 
+
 #define CHANGE_IP_MASK 0x04
 #define CHANGE_PORT_MASK 0x02
 
@@ -73,43 +74,51 @@ int STUNAttribute::getMessageDataTLV(unsigned char *buf){
 }
 
 STUNAttribute *STUNAttribute::parseAttribute(unsigned char *data, int /*maxLength*/, int &retParsedLength){//TODO: use maxLength
-	uint16_t *shortptr = (uint16_t *)data;
-	int type   = ntohs(shortptr[0]);
-	int length = ntohs(shortptr[1]);
-	STUNAttribute *ret=NULL;
-	switch (type){
-		case STUNAttribute::MAPPED_ADDRESS:
-			ret = new STUNAttributeMappedAddress(length,&data[4]);
-			break;
-		case STUNAttribute::SOURCE_ADDRESS:
-			ret = new STUNAttributeSourceAddress(length, &data[4]);
-			break;
-		case STUNAttribute::RESPONSE_ADDRESS:
-			ret = new STUNAttributeResponseAddress(length,&data[4]);
-			break;
-		case STUNAttribute::CHANGED_ADDRESS:
-			ret = new STUNAttributeChangedAddress(length,&data[4]);
-			break;
-		case STUNAttribute::CHANGE_REQUEST:
-			ret = new STUNAttributeChangeRequest(length,&data[4]);
-			break;
-		case STUNAttribute::USERNAME:
-			ret = new STUNAttributeUsername(length,&data[4]);
-			break;
-		case STUNAttribute::PASSWORD:
-			ret = new STUNAttributePassword(length,&data[4]);
-			break;
-		case STUNAttribute::ERROR_CODE:
-			ret = new STUNAttributeErrorCode(length,&data[4]);
-			break;
-		default:
-			cerr << "UNKNOWN ATTRIBUTE: "<< type<< endl;
-			assert(1==0 /*UNKNOWN ATTRIBUTE*/);
-			break;
-	}
-	assert(ret!=NULL);
-	retParsedLength = 2+2+ret->getValueLength();
-	return ret;
+  
+  uint16_t *shortptr = (uint16_t *)data;
+  int type   = ntohs(shortptr[0]);
+  int length = ntohs(shortptr[1]);
+  STUNAttribute *ret=NULL;
+  switch (type){
+  case STUNAttribute::MAPPED_ADDRESS:
+    ret = new STUNAttributeMappedAddress(length,&data[4]);
+    break;
+  case STUNAttribute::SOURCE_ADDRESS:
+    ret = new STUNAttributeSourceAddress(length, &data[4]);
+    break;
+  case STUNAttribute::RESPONSE_ADDRESS:
+    ret = new STUNAttributeResponseAddress(length,&data[4]);
+    break;
+  case STUNAttribute::CHANGED_ADDRESS:
+    ret = new STUNAttributeChangedAddress(length,&data[4]);
+    break;
+  case STUNAttribute::CHANGE_REQUEST:
+    ret = new STUNAttributeChangeRequest(length,&data[4]);
+    break;
+  case STUNAttribute::USERNAME:
+    ret = new STUNAttributeUsername(length,&data[4]);
+    break;
+  case STUNAttribute::PASSWORD:
+    ret = new STUNAttributePassword(length,&data[4]);
+    break;
+  case STUNAttribute::ERROR_CODE:
+    ret = new STUNAttributeErrorCode(length,&data[4]);
+    break;
+  default:
+    cerr << "UNKNOWN ATTRIBUTE: "<< type << endl;
+    
+    if (type < 0x7fff) { // attribute is mandatory to understand
+      assert(1==0 /*UNKNOWN ATTRIBUTE*/);
+    } else {             // attribute is not mandatory to understand, ignore
+      retParsedLength = 2+2+length; // TODO: check that there is length to parse 
+      return NULL;
+    }
+    break;
+  }
+  assert(ret!=NULL);
+  retParsedLength = 2+2+ret->getValueLength();
+  //  cerr << retParsedLength<<endl;
+  return ret;
 }
 
 ////////////////////////////////////

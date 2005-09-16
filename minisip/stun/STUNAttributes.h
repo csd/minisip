@@ -104,7 +104,10 @@ class STUNAttribute{
 		 * 		that was found to belong to the
 		 * 		parsed attribute.
 		 * @return 	A new STUNAttribute parsed from the
-		 * 		raw data in the data buffer.
+		 * 		raw data in the data buffer or NULL
+		 *              if recieved an attribute that is
+		 *              not understood and is not mandatory 
+		 *              to understand
 		*/
 		static STUNAttribute *parseAttribute(
 				unsigned char *data, 
