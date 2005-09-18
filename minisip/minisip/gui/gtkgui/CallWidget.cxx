@@ -224,6 +224,7 @@ void CallWidget::reject(){
 }
 
 void CallWidget::monitorButtonToggled () {
+#ifndef OLDLIBGLADEMM
 	string param2;
 	if( monitoringButton.get_active() ) {
 		param2 = "OFF";
@@ -234,9 +235,11 @@ void CallWidget::monitorButtonToggled () {
 			MediaCommandString::set_session_sound_settings,
 			"senders", param2 );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+#endif
 }
 
 void CallWidget::audioOutSilenceButtonToggled () {
+#ifndef OLDLIBGLADEMM
 	string param2;
 	if( audioOutSilenceButton.get_active() ) {
 		param2 = "OFF";
@@ -247,6 +250,7 @@ void CallWidget::audioOutSilenceButtonToggled () {
 			MediaCommandString::set_session_sound_settings,
 			"receivers", param2 );
 	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+#endif
 }
 
 void CallWidget::hideAcceptButton(){
@@ -524,8 +528,11 @@ void CallWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "CallWidget::activeCall - We active!" << endl;
 		#endif
-		if( getState() == CALL_WIDGET_STATE_INCALL &&
-			! monitoringButton.get_active() ){
+		if( getState() == CALL_WIDGET_STATE_INCALL 
+#ifndef OLDLIBGLADEMM
+			&& ! monitoringButton.get_active() 
+#endif
+			){
 			CommandString cmdstr( getMainCallId(), 
 					MediaCommandString::set_session_sound_settings,
 					"senders", "ON" );
