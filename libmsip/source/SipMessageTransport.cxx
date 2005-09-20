@@ -93,18 +93,6 @@ SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> 
 }
 
 void SocketServer::run(){
-	MRef<SocketServer*> myself(this); // This is used to make
-					// sure there is a reference to
-					// this object even if no one else
-					// is referencing it.
-
-	started_flag->inc();		// Tell the thread that started us
-					// that we have started (and have
-					// a reference to our selve so
-					// that we are not deleted by misstake)
-				
-	started_flag=NULL;		// We don't need it any longer and can let
-					// it be automatically freed
 	struct timeval timeout;
 	fd_set set;
 	int fd = ssock->getFd();
@@ -139,10 +127,7 @@ void SocketServer::run(){
 } // "myself" will be freed here and the object can be freed.
 
 void SocketServer::start(){
-	MRef<Semaphore *> sem = new Semaphore;
-	started_flag = sem;
 	Thread t(this);
-	sem->dec(); // Wait until thread has started
 }
 
 void SocketServer::stop(){

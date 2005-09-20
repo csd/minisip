@@ -71,7 +71,6 @@ class SocketServer : public Runnable{
 		MRef<ServerSocket *> ssock;
 		MRef<SipMessageTransport *> receiver;
 		bool doStop;
-		MRef<Semaphore *> started_flag;
 };
 
 
