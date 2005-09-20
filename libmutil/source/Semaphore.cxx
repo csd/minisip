@@ -50,12 +50,12 @@ Semaphore::Semaphore(){
 	handlePtr = (void*) new HANDLE;
 	SEMHANDLE = CreateSemaphore(NULL, 0, 1000, NULL);
 	if (SEMHANDLE == NULL){
-		merr << "ERROR: could not create semaphore"<<end;
+		throw SemaphoreException();
 	}
 #else
 	handlePtr = (void*) new sem_t;
 	if (sem_init( SEMHANDLE, 0, 0)){
-		merr << "ERROR: could not create semaphore"<<end; //TODO: Handle better...
+		throw SemaphoreException();
 	}
 	
 #endif
@@ -75,19 +75,18 @@ void Semaphore::inc(){
 #ifdef WIN32
 
 	if (!ReleaseSemaphore(SEMHANDLE, 1, NULL)){
-		merr <<"ERROR: could not inc semaphore"<<end;
+		throw SemaphoreException();
 	}
 	
 #else
-	sem_post(SEMHANDLE);
+	if( sem_post( SEMHANDLE ) ){
+		throw SemaphoreException();
+	}
 #endif
 }
 
 void Semaphore::dec(){
 #ifdef WIN32
-	
-
-
 	int dwWaitResult = WaitForSingleObject( 
 			SEMHANDLE,   // handle to semaphore
 			INFINITE);          // zero-second time-out interval
@@ -99,11 +98,19 @@ void Semaphore::dec(){
 		break; 
 
 	case WAIT_TIMEOUT: 
-		merr <<"Could not wait for semaphore"<<end;
+		throw SemaphoreException();
 		break; 
 	}
 
 #else
-	sem_wait(SEMHANDLE);
+	while( sem_wait( SEMHANDLE ) ){
+		switch( errno ){
+			case EINTR:
+				break;
+			default:
+				throw SemaphoreException();
+		}
+	}
+	
 #endif
 }

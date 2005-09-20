@@ -46,6 +46,8 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
+class LIBMUTIL_API SemaphoreException{};
+
 class LIBMUTIL_API Semaphore : public MObject{
     public:
         Semaphore();
