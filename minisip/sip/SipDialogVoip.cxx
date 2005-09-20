@@ -268,11 +268,14 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		ts.save("a3_callingnoauth_incall_2xx");
 #endif
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
+		
+		string peerUri = dialogState.remoteUri;
+		if(!sortMIME(*resp->getContent(), peerUri, 3))
+			return false;
 
 		dialogState.updateState( resp );
 		
 		//string peerUri = resp->getFrom().getString();
-		string peerUri = dialogState.remoteUri;
 		
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
@@ -286,8 +289,6 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		
-		if(!sortMIME(*resp->getContent(), peerUri, 3))
-			return false;
 #ifdef IPSEC_SUPPORT
 		// Check if IPSEC was required
 		if (ipsecSession->required() && !ipsecSession->offered)
@@ -1040,10 +1041,15 @@ void SipDialogVoip::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_incall_2xx",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a3_callingnoauth_incall_2xx, 
 			s_callingnoauth, s_incall);
+
 //this transition conflicts with a3 ... actually, they need the same messages, thus a3 prevails ... useless???  //CESC
-//	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
-//			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a24_calling_termwait_2xx,
-//			s_callingnoauth, s_termwait);
+
+//no it's used when a3 returns false, for instance when the SDP answer isn't
+//accepted for security reasons. Sends a BYE. // Johan
+
+	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a24_calling_termwait_2xx,
+			s_callingnoauth, s_termwait);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_incall_termwait_BYE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a5_incall_termwait_BYE,
@@ -1104,10 +1110,9 @@ void SipDialogVoip::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_incall_2xx",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a23_callingauth_incall_2xx, 
 			s_callingauth, s_incall);
-//this transition conflicts with a3 ... actually, they need the same messages, thus a3 prevails ... useless???  //CESC
-//	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
-//			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a24_calling_termwait_2xx,
-//			s_callingauth, s_termwait);
+	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a24_calling_termwait_2xx,
+			s_callingauth, s_termwait);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_resp36",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a9_callingnoauth_termwait_36,
@@ -1853,8 +1858,10 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 #ifndef _MSC_VER
 					ts.save("setSdpAnswer");
 #endif
-					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
+					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) ){
+						cerr << "SDP answer rejected" << endl;
 						return false;
+					}
 					getMediaSession()->start();
 #ifndef _MSC_VER
 					ts.save("setSdpAnswer");
