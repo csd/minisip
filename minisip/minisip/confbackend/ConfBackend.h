@@ -29,19 +29,22 @@ class ConfBackend : public MObject{
 	public:
 		static MRef<ConfBackend *> create();
 
-		virtual void save( std::string key, std::string value )=0;
-		virtual void save( std::string key, int32_t value )=0;
+		virtual void save( const std::string &key, 
+				const std::string &value )=0;
+		virtual void save( const std::string &key, const int32_t value )=0;
 
-		virtual std::string loadString( std::string key, std::string defaultValue="" )=0;
-		virtual int32_t loadInt( std::string key, int32_t defaultValue=0 )=0;
+		virtual std::string loadString( const std::string &key, const std::string &defaultValue="" )=0;
+		virtual int32_t loadInt( const std::string &key, const int32_t defaultValue=0 )=0;
+
+		virtual void reset( const std::string &key ){};
 
 		virtual void commit()=0;
 
-		void save( const char * key, std::string value );
-		void save( const char * key, int32_t value );
+		void save( const char * key, const std::string &value );
+		void save( const char * key, const int32_t value );
 		
-		std::string loadString( const char * key, std::string defaultValue="" );
-		int32_t loadInt( const char * key, int32_t defaultValue=0 );
+		std::string loadString( const char * key, const std::string &defaultValue="" );
+		int32_t loadInt( const char * key, const int32_t defaultValue=0 );
 };
 
 class ConfBackendException{};

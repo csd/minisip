@@ -9,4 +9,5 @@ libconfbackend_a_SOURCES += GConfBackend.cxx
 endif
 
 noinst_HEADERS  = ConfBackend.h \
-		  MXmlConfBackend.h
+		  MXmlConfBackend.h \
+		  GConfBackend.h

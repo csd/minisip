@@ -149,6 +149,22 @@ void SipSoftPhoneConfiguration::save(){
 
 	}
 	
+	accountPath = "account[" + itoa( ii ) + "]/";
+	/* Remove old identities remaining */
+	while( backend->loadString( accountPath + "account_name" ) != "" ){
+		backend->reset( accountPath + "account_name" );
+		backend->reset( accountPath + "sip_uri" );
+		backend->reset( accountPath + "proxy_addr" );
+		backend->reset( accountPath + "proxy_username" );
+		backend->reset( accountPath + "proxy_password" );
+		backend->reset( accountPath + "pstn_account" );
+		backend->reset( accountPath + "default_account" );
+		backend->reset( accountPath + "register" );
+		backend->reset( accountPath + "register_expires" );
+		backend->reset( accountPath + "transport" );
+		accountPath = "account[" + itoa( ++ii ) + "]/";
+	}
+	
 	backend->save( "sound_device", soundDevice );
 	
 // 	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" ); //not used anymore

@@ -44,18 +44,18 @@ MRef<ConfBackend *> ConfBackend::create(){
 	}
 }
 
-int32_t ConfBackend::loadInt( const char * key, int32_t defaultValue ){
+int32_t ConfBackend::loadInt( const char * key, const int32_t defaultValue ){
 	return loadInt( std::string( key ), defaultValue );
 }
 
-string ConfBackend::loadString( const char * key, string defaultValue ){
+string ConfBackend::loadString( const char * key, const string &defaultValue ){
 	return loadString( std::string( key ), defaultValue );
 }
 
-void ConfBackend::save( const char * key, int32_t value ){
+void ConfBackend::save( const char * key, const int32_t value ){
 	save( std::string( key ), value );
 }
 
-void ConfBackend::save( const char * key, string value ){
+void ConfBackend::save( const char * key, const string &value ){
 	save( std::string( key ), value );
 }

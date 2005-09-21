@@ -29,11 +29,17 @@ typedef struct _GConfClient GConfClient;
 
 class GConfBackend : public ConfBackend {
 	public:
-		virtual void save( std::string key, std::string value );
-		virtual void save( std::string key, int32_t value );
+		virtual void save( const std::string &key, 
+				const std::string &value );
+		virtual void save( const std::string &key, 
+				const int32_t value );
 
-		virtual std::string loadString( std::string key, std::string defaultValue="" );
-		virtual int32_t loadInt( std::string key, int32_t defaultValue=0 );
+		virtual std::string loadString( const std::string &key, 
+				const std::string &defaultValue="" );
+		virtual int32_t loadInt( const std::string &key, 
+				const int32_t defaultValue=0 );
+
+		void reset( const std::string &key );
 
 		virtual void commit();
 

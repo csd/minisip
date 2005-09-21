@@ -51,7 +51,7 @@ void MXmlConfBackend::commit(){
 	parser->saveToFile( fileName );
 }
 
-void MXmlConfBackend::save( std::string key, std::string value ){
+void MXmlConfBackend::save( const std::string &key, const std::string &value ){
 	try{
 		parser->changeValue( key, value );
 	}
@@ -62,7 +62,7 @@ void MXmlConfBackend::save( std::string key, std::string value ){
 	
 }
 
-void MXmlConfBackend::save( std::string key, int32_t value ){
+void MXmlConfBackend::save( const std::string &key, const int32_t value ){
 	try{
 		parser->changeValue( key, itoa( value ) );
 	}
@@ -73,7 +73,7 @@ void MXmlConfBackend::save( std::string key, int32_t value ){
 }
 
 
-std::string MXmlConfBackend::loadString( std::string key, std::string defaultValue ){
+std::string MXmlConfBackend::loadString( const std::string &key, const std::string &defaultValue ){
 	std::string ret = "";
 	
 	try{
@@ -88,7 +88,8 @@ std::string MXmlConfBackend::loadString( std::string key, std::string defaultVal
 
 }
 
-int32_t MXmlConfBackend::loadInt( std::string key, int32_t defaultValue ){
+int32_t MXmlConfBackend::loadInt( const std::string &key,
+		                  const int32_t defaultValue ){
 	int32_t ret = -1;
 	
 	try{
