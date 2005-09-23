@@ -52,6 +52,9 @@
 
 #include<iostream>
 #include<errno.h>
+#include<arpa/inet.h>
+
+
 
 using namespace std;
 
@@ -157,8 +160,7 @@ int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from){
 #else
 		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, (socklen_t*)&addr_len);
 #endif
-//		from = new IP4Address(from4);
-		from=NULL;
+		from = new IP4Address(inet_ntoa(in_addr(from4.sin_addr)));
 	}
 	return n;
 }
