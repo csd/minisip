@@ -144,13 +144,12 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		
 		if( (*i)->send ){
 			sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
-			//sStream->setMuted( muteAllButOne ); //if muteAll, then mute the stream by default
 			session->addMediaStreamSender( sStream );
 		}
 	}
 	
 	//set the audio settings for this session ...
-	session->muteSenders( true ); //muteAllButOne );
+	session->muteSenders( true );
 	session->silenceSources( false );
 	
 	return session;
@@ -224,22 +223,16 @@ void MediaHandler::setSessionSoundSettings( std::string callid, std::string side
 		}
 		sessionsLock.unlock();
 	} else if ( side == "senders" ) { //what to do with audio to be sent over the net
-		//set the sender ON as requested ... only mute all the rest if muteAllButOne is true
+		//set the sender ON as requested ... 
 		sessionsLock.lock();
 		for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
 			if( (*iSession)->getCallId() == callid ){
 				//the meaning of turnOn is the opposite of the Session:: functions ... silence/mute
 				(*iSession)->muteSenders( !turnOn );
 				
-			} else {
-				//if the feature is deactivated, ignore the set_active_source command
-/*				if( muteAllButOne && !turnOn) {
-					(*iSession)->muteSenders( true );
-				}*/
-			}
+			} 
 		}
 		sessionsLock.unlock();
-	
 	} else {
 		cerr << "MediaHandler::setSessionSoundSettings - not understood" << endl;
 		return;
