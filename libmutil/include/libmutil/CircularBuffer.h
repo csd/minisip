@@ -82,6 +82,11 @@ class LIBMUTIL_API CircularBuffer {
 		bool remove(int len);
 	
 		/**
+		Empty the buffer
+		*/
+		void clear();
+		
+		/**
 		Return the currently used slots.
 		For the total size of the buffer, use 
 		getMaxSize()

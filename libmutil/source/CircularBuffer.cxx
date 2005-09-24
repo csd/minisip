@@ -104,4 +104,6 @@ bool CircularBuffer::remove(int len)
 	return read(NULL, len);
 }
 
-
+void CircularBuffer::clear() {
+	read( NULL, getSize() ); //remove all current elements ... = clear
+}

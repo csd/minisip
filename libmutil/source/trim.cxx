@@ -26,6 +26,7 @@
  * 	trim.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se, 2003
+ *	Cesc Santasusana c e s c DOT sa n ta [AT] g ma i l dot c o m;  2005
  * Purpose
  * 	Removes whitespace in the start and end of a String.
 */
@@ -38,10 +39,20 @@
 using namespace std;
 
 LIBMUTIL_API string trim(string line){
-	while (line.length()>0 && isspace(line[0]))
-		line = line.substr(1, line.length()-1);
-	while (line.length()>0 && isspace(line[line.length()-1]))
-		line = line.substr(0, line.length()-1);
+	size_t spacesFront = 0, spacesEnd = 0, idx;
+
+	idx = 0;
+	while( idx < line.size() && isspace(line[idx]) ) {
+		spacesFront++;
+		idx++;
+	}
+	
+	idx = line.size() - 1 ;
+	while( idx >= 0 && isspace(line[idx]) ) {
+		spacesEnd++;
+		idx--;
+	}
+	line = line.substr( spacesFront, line.size() - ( spacesFront + spacesEnd ) );
 	return line;
 }
 
