@@ -26,6 +26,7 @@
  * 	SipHeaderValueContact.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
+ *	Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
  * Purpose
  * 
 */
@@ -49,31 +50,29 @@ SipHeaderFactoryFuncPtr sipHeaderContactFactory=contactFactory;
 const string sipHeaderValueContactTypeStr = "Contact";
 		
 SipHeaderValueContact::SipHeaderValueContact()
-	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri("Erik","0.0.0.0","",0)
+	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
 {
 	featuretag= "";
-	expires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+	setExpires( DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS ); //always set a default value for contact expiration
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr), uri("UNKNOWN","0.0.0.0","",0)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
 {
 
-        size_t ltPos = build_from.find( '<' );
-        size_t gtPos = build_from.find( '>' );
-
-        if( ltPos != string::npos && gtPos != string::npos && ltPos + 1 < gtPos ){
-                // Assume Username <uri> scheme
-                uri = SipURI( build_from.substr( ltPos + 1, gtPos - ltPos - 1 ) );
-        }
-        else{
-                // uri scheme (without Username)
-                uri = SipURI( build_from );
-        }
+	uri = SipURI( build_from );
+	if( !uri.isValid() ) {
+		cerr << "SipHeaderValueContact::constructor - invalid contact uri" << endl;
+	}
 
 	featuretag="";
-	expires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-	//merr << "SipHeaderValueContact::getString: uri="<< uri <<end;
+	string tmp;
+	tmp = getParameter("expires");
+	if( tmp == "" ) {
+		setExpires(DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS);
+	}
+	
+	cerr << "SipHeaderValueContact::getString: uri="<< uri.getString() <<endl;
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &username, 
@@ -83,12 +82,15 @@ SipHeaderValueContact::SipHeaderValueContact(const string &username,
 		const string &transport,
 		int expires
 		)
-			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),
-			 uri(username,ip,user_type,port)
+			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
 {
+	uri.setParams(username,ip,user_type,port);
+	uri.setIp( ip ); //fix the domain part to be the ip address ... not the domain name
+	
 	if( expires != -1 )
 		this->setExpires(expires);
-	else this->expires = -1; //-1 indicates that the expires is not to be used
+	else this->removeParameter("expires" ); //-1 indicates that the expires is not to be used
+	
 	if (transport!="")
 		uri.setTransport(transport);
 	//merr << "SipHeaderValueContact::getString: username="<< username <<end;
@@ -101,6 +103,7 @@ SipHeaderValueContact::~SipHeaderValueContact(){
 string SipHeaderValueContact::getString(){
 	string user = uri.getString();
 //	merr << "SipHeaderValueContact::getString: "<< user <<end;
+#if 0
 	string name;
 	if (user.find("@")!=string::npos){
 		name = "";
@@ -115,10 +118,21 @@ string SipHeaderValueContact::getString(){
 		
 		user = name+"@"+uri.getIp()+args;
 	}
-	
-	string ret = /*"Contact: */"<"+user+">";
-	if( this->expires != -1 )
-		ret += ";" + featuretag + "expires=" + itoa(this->expires); //TODO: XXX
+#endif	
+	string ret = /*"Contact: */ user;
+	if( featuretag != "" )
+		ret += ";" + featuretag;
+		
+/*
+	string tmp;
+	tmp = getParameter("expires");
+	if( tmp != "" )
+		ret += ";expires=" + tmp;
+
+	tmp = getParameter("transport");
+	if( tmp != "" )
+		ret += ";transport=" + tmp;
+*/
 		
 	//merr << "SipHeaderValueContact::getString: ret="<< ret<<end;
 	return ret;
@@ -134,12 +148,12 @@ void SipHeaderValueContact::setUri(const SipURI &uri){
 
 //CESC
 int SipHeaderValueContact::getExpires() {
-	return this->expires;
+	return atoi( getParameter("expires").c_str() );
 }
 
-void SipHeaderValueContact::setExpires(int _expires){
-	if( _expires >= 0 && _expires < 100000 ) 
-		this->expires = _expires;
-	else this->expires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+void SipHeaderValueContact::setExpires(int expires){
+	if( ! (expires >= 0 && expires < 100000) )
+		expires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+	this->setParameter( "expires", itoa(expires) );
 }
 

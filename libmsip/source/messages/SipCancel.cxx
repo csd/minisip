@@ -71,12 +71,12 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 		switch (type){
 			case SIP_HEADER_TYPE_FROM:
 			//	((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getParameter("tag"));
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
+				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUser(from_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_TO:
 			//	((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getParameter("tag") );
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
+				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUser(to_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CSEQ:
@@ -95,8 +95,20 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 }
 
 string SipCancel::getString(){
-
 	string ret;
+	
+	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
+	string username; //hide the class::username ... carefull
+	size_t pos;
+	username = this->username;
+	
+	pos = username.find('<');
+	if( pos != string::npos ) {
+		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
+		pos = username.find('>');
+		username.erase( pos );
+	}
+
 	if (username.find("sip:")==string::npos){
 		ret = "CANCEL sip:";
 	}else{

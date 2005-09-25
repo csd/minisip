@@ -169,7 +169,8 @@ void SipInvite::createHeadersAndContent(
 		const string &transport
 		)
 {
-	SipURI uri(tel_no,proxyAddr,"",proxyPort);
+	SipURI uri;
+	uri.setParams(tel_no,proxyAddr,"",proxyPort);
 	
 	this->username = tel_no;
 	this->ip=proxyAddr;
@@ -210,7 +211,7 @@ string SipInvite::getRemoteTelNo(){
 	for (int32_t i=0; i< headers.size(); i++)
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_FROM){
 			fromp = MRef<SipHeaderValueFrom*>((SipHeaderValueFrom *)*(headers[i]->getHeaderValue(0)));
-			return fromp->getUri().getUserId();
+			return fromp->getUri().getUserName();
 		}
 	merr << "ERROR: Could not find user_id (tel. no.) in SipInvite"<< end;
 	return "";
@@ -218,6 +219,19 @@ string SipInvite::getRemoteTelNo(){
 
 string SipInvite::getString(){
 	string ret ="";
+	
+	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
+	string username; //hide the class::username ... carefull
+	size_t pos;
+	username = this->username;
+	
+	pos = username.find('<');
+	if( pos != string::npos ) {
+		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
+		pos = username.find('>');
+		username.erase( pos );
+	}
+
 	if (username.length()>4 && username.substr(0,4)=="sip:")
 		ret = "INVITE "+username;
 	else

@@ -99,8 +99,30 @@ SipIMMessage::~SipIMMessage(){
 }
 
 string SipIMMessage::getString(){
-	return  "MESSAGE sip:"+toUser+"@"+toDomain+" SIP/2.0\r\n" + getHeadersAndContent();
+	string ret ="";
+	
+	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
+	string username; //hide the class::username ... carefull
+	size_t pos;
+	username = this->toUser;
+	
+	pos = username.find('<');
+	if( pos != string::npos ) {
+		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
+		pos = username.find('>');
+		username.erase( pos );
+	}
 
+	if (username.length()>4 && username.substr(0,4)=="sip:")
+		ret = "MESSAGE "+username;
+	else
+		ret = "MESSAGE sip:"+username;
+	if (username.find("@")==string::npos)
+		ret = ret+"@"+toDomain;
+
+	ret += " SIP/2.0\r\n" + getHeadersAndContent();
+
+	return  ret;
 }
 
 int SipIMMessage::getExpiresTimeout(){

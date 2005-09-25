@@ -25,6 +25,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
 */
 
 #ifndef SIPDIALOG_H

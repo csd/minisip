@@ -76,14 +76,13 @@ SipBye::SipBye(string branch,
 			case SIP_HEADER_TYPE_FROM:
 				//((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setTag("");
 				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->removeParameter("tag");
-				
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUserId(from_uri);
+// 				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setParams(from_uri, "", "", 0);
 				add = true;
 				break;
 			case SIP_HEADER_TYPE_TO:
 				//((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setTag("");
 				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->removeParameter("tag");
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUserId(to_uri);
+// 				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setParams(to_uri, "", "", 0);
 				add = true;
 				break;
 	
@@ -105,6 +104,19 @@ SipBye::SipBye(string branch,
 
 string SipBye::getString(){
 	string ret;
+	
+	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
+	string username; //hide the class::username ... carefull
+	size_t pos;
+	username = this->username;
+	
+	pos = username.find('<');
+	if( pos != string::npos ) {
+		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
+		pos = username.find('>');
+		username.erase( pos );
+	}
+		
 	if (username.find("sip:")==string::npos){
 		ret = "BYE sip:";
 	}else{

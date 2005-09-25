@@ -278,9 +278,9 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 		MRef<SipMessageContentIM*> imref = (SipMessageContentIM*)*im->getContent();
 
-		string from =  im->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
+		string from =  im->getHeaderValueFrom()->getUri().getUserName()+"@"+ 
 			im->getHeaderValueFrom()->getUri().getIp();
-		string to =  im->getHeaderValueTo()->getUri().getUserId()+"@"+ 
+		string to =  im->getHeaderValueTo()->getUri().getUserName()+"@"+ 
 			im->getHeaderValueTo()->getUri().getIp();
 
 		CommandString cmdstr("", SipCommandString::incoming_im, imref->getString(), from, to );

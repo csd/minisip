@@ -389,7 +389,7 @@ string SipMessage::getCSeqMethod(){
 }
 
 SipURI SipMessage::getFrom(){
-	SipURI ret("","");
+	SipURI ret;
 	MRef<SipHeaderValueFrom*> hfrom = getHeaderValueFrom();
 	if (hfrom)
 		ret = hfrom->getUri();
@@ -398,7 +398,7 @@ SipURI SipMessage::getFrom(){
 }
 
 SipURI SipMessage::getTo(){
-	SipURI ret("","");
+	SipURI ret;
 	MRef<SipHeaderValueTo*> hto = getHeaderValueTo();
 	if (hto)
 		ret = hto->getUri();

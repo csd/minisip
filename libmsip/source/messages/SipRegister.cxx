@@ -113,7 +113,8 @@ SipRegister::SipRegister(string branch,
 		int expires
 		): SipMessage(branch, SipRegister::type), domain(domainarg)
 {
-	SipURI uri("", localIp,"", sip_listen_port);
+	SipURI uri;
+	uri.setParams("", localIp,"", sip_listen_port);
 	 
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
 	addHeader(new SipHeader(fromp));

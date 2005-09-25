@@ -45,39 +45,22 @@ SipHeaderFactoryFuncPtr sipHeaderToFactory=toFactory;
 const string sipHeaderValueToTypeStr = "To";
 		
 SipHeaderValueTo::SipHeaderValueTo()
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri("Erik","0.0.0.0","",0)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
-	
 }
 		
 
 SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri("UNKNOWN","0.0.0.0","",0)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
-	size_t ltPos = build_from.find( '<' );
-	size_t gtPos = build_from.find( '>' );
-
-
-	if( ltPos != string::npos && gtPos != string::npos && ltPos + 1 < gtPos ){
-		// Assume Username <uri> scheme
-		uri = SipURI( build_from.substr( ltPos + 1, gtPos - ltPos - 1 ) );
-		uri.setUsersName( trim( build_from.substr( 0, ltPos ) ) );
-	}
-	else{
-		// uri scheme (without Username)
-		uri = SipURI( build_from );
-		uri.setUsersName( "" );
-	}
+	uri = SipURI( build_from );
 }
 
 
 SipHeaderValueTo::SipHeaderValueTo(const string &username, const string &ip)
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),
-		uri(username, ip,"",0)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
-
+	uri.setParams(username, ip,"",0);
 }
 
 SipHeaderValueTo::~SipHeaderValueTo(){
@@ -86,7 +69,7 @@ SipHeaderValueTo::~SipHeaderValueTo(){
 
 string SipHeaderValueTo::getString(){
 	//cerr << "To::get_string" << endl;
-	string ret = /*"To: "+*/ uri.getUsersName()+"<"+uri.getString()+">";
+	string ret = /*"To: "+*/ uri.getString();
 //	if (tag.length()>0)
 //		ret=ret+";tag="+tag;
 	

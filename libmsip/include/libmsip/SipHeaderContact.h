@@ -26,6 +26,7 @@
  * 	SipHeaderContact.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
+ *	    Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
  * Purpose
  * 
 */
@@ -97,7 +98,9 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		 
 	private:
 		SipURI uri;
-		int expires;
+		
+		//int expires; //now we only store in the params map ... see SipHeader.h
+		
 		///the featuretag
 		string featuretag;
 };

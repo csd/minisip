@@ -76,6 +76,19 @@ SipAck::SipAck(string branch,
 
 string SipAck::getString(){
 	string ret;
+	
+	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
+	string username; //hide the class::username ... carefull
+	size_t pos;
+	username = this->username;
+	
+	pos = username.find('<');
+	if( pos != string::npos ) {
+		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
+		pos = username.find('>');
+		username.erase( pos );
+	}
+
 	if (username.find("sip:")==string::npos)
 		ret = "ACK sip:";
 	else

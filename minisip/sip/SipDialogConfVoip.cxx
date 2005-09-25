@@ -443,9 +443,10 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 	fprintf( stderr, "SipDialogConfVoip::a10_start_ringing_INVITE\n" );
 	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::TU)){
 
-		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
+		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserName()+"@"+ 
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
-		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
+		getDialogConfig()->inherited->sipIdentity->setSipUri( 
+			command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString() );
 
 		//We must maintain our dialog state. This is the first
 		//message we receive for this dialog and we copy the remote
