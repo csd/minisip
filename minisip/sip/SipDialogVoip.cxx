@@ -476,12 +476,12 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		dialogState.updateState( getLastInvite() );
 		
 		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
-		string peerUri = dialogState.remoteUri.substr(4);
+		string peerUri = dialogState.remoteUri;
 		
 	//	setLocalCalled(true);
 		localCalled=true;
 		
-		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4));
+		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
 		
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
@@ -723,7 +723,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 //CESC: for now, route set is updated at the transaction layer		
 		
 		//string peerUri = resp->getFrom().getString().substr(4);
-		string peerUri = dialogState.remoteUri.substr(4);
+		string peerUri = dialogState.remoteUri;
 		
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );

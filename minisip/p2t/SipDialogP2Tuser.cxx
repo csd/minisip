@@ -506,7 +506,7 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
 
 		//vc->getDialogConfig().inherited.userUri = command.getCommandPacket()->getHeaderTo()->getUri().getUserIpString().substr(4);
-		/*vc->*/getDialogConfig()->inherited.sipIdentity->setSipUri(  command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString().substr(4)  );
+		/*vc->*/getDialogConfig()->inherited.sipIdentity->setSipUri(  command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString() );
 
 		/*vc->*/ /*setSeqNo(command.getCommandPacket()->getCSeq() );*/
 		dialogState.seqNo = command.getCommandPacket()->getCSeq();

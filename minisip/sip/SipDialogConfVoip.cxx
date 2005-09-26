@@ -459,7 +459,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
-		string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
+		string peerUri = command.getCommandPacket()->getFrom().getString();
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
@@ -736,7 +736,7 @@ bool SipDialogConfVoip::a23_callingauth_incall_2xx( const SipSMCommand &command)
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
-		string peerUri = resp->getFrom().getString().substr(4);
+		string peerUri = resp->getFrom().getString();
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
 		getLogEntry()->peerSipUri = peerUri;
