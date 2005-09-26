@@ -150,11 +150,11 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	MRef<SipHeader*> h;
 	
 	string hdr = getHeader(line,hdrstart);
-	cerr<< endl << "PARSEHDR: Sip Header: header"+hdr<<endl;
+// 	cerr<< endl << "PARSEHDR: Sip Header: header"+hdr<<endl;
 	string valueline = line.substr(hdrstart);
 	
-	cerr << "PARSEHDR: hdr parsed to "<< hdr << endl;
-	cerr << "PARSEHDR: valueline parsed to "<< valueline<< endl;
+// 	cerr << "PARSEHDR: hdr parsed to "<< hdr << endl;
+// 	cerr << "PARSEHDR: valueline parsed to "<< valueline<< endl;
 
 	if( valueline.size() == 0 ) { //an empty header??? BUG!
 			cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header in Sip message!:: " << valueline << endl;
@@ -167,7 +167,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			vector<string> value_params;
 			string value_zero; //value zero is the non-parameter part of the header
 			if( values[i].size() == 0 ) { //an empty value??? BUG!
-				cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header value in Sip message!:: " << valueline << endl;
+// 				cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header value in Sip message!:: " << valueline << endl;
 				continue;
 			}
 // 			cerr << "PARSER: First value+params line: "<< values[i]<<""<<endl;
@@ -175,7 +175,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			if( headerType == "Accept-Contact" ) {
 				value_params = split(values[i],true,'\n');
 				value_zero = value_params[0];
-				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
+// 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
 			} else if( headerType == "Contact" ) {
 				uint ltPos = values[i].find( '<' );
 				uint gtPos = values[i].find( '>' );
@@ -207,7 +207,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			if (factory){
 				hval = factory(value_zero);
 			}else{
-				cerr << "SipHeaderValueUnsupported: "<< line << endl;
+// 				cerr << "SipHeaderValueUnsupported: "<< line << endl;
 				hval = new SipHeaderValueUnsupported(value_zero);
 			}	
 			

@@ -71,8 +71,9 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 	if( tmp == "" ) {
 		setExpires(DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS);
 	}
-	
-	cerr << "SipHeaderValueContact::getString: uri="<< uri.getString() <<endl;
+#ifdef DEBUG_OUTPUT	
+// 	cerr << "SipHeaderValueContact::getString: uri="<< uri.getString() <<endl;
+#endif
 }
 
 SipHeaderValueContact::SipHeaderValueContact(const string &username, 

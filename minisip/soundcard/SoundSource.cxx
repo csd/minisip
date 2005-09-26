@@ -137,7 +137,7 @@ void BasicSoundSource::pushSound(short * samples,
 	//or we are not emptying the buffer quick enough ...
 	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
 	#ifdef DEBUG_OUTPUT
-		printf("OF");
+// 		printf("OF");
 // 		cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
 	#endif
 		bufferLock.unlock();
@@ -193,7 +193,7 @@ void BasicSoundSource::getSound(short *dest,
 	//	receiving 1 pack/set instead of 1pack/20ms ... we get underflow.
 	if( cbuff->getSize() < (int) (iFrames*oNChannels) ) {
 	#ifdef DEBUG_OUTPUT
-		printf("UF");
+// 		printf("UF");
 	#endif
 		if (plcProvider){
 		#ifdef DEBUG_OUTPUT

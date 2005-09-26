@@ -56,7 +56,9 @@ void SipURI::setUri( string buildFrom ) {
 	
 	clear();
 	
-	cerr << "SipURI::fromString = " << buildFrom << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI::fromString = " << buildFrom << endl;
+#endif
 
 	//look for the full name ... 	
 	pos = buildFrom.find( '<' );
@@ -65,7 +67,7 @@ void SipURI::setUri( string buildFrom ) {
 		pos2 = buildFrom.find( '>' );
 		if( pos2 == string::npos ) {
 #ifdef DEBUG_OUTPUT
-			cerr << "SipURI::constructor - bogus uri ... " << endl;
+			cerr << "SipURI::constructor - bogus uri ... " << buildFrom << endl;
 #endif
 			return;
 		}
@@ -124,7 +126,7 @@ void SipURI::setUri( string buildFrom ) {
 				setUserType( params[idx] );
 			} else {
 		#ifdef DEBUG_OUTPUT
-				cerr << "SipURI:: param not understood ... ignore: " << paramName << endl;
+// 				cerr << "SipURI:: param not understood ... ignore: " << paramName << endl;
 		#endif
 			}
 		}
@@ -132,16 +134,14 @@ void SipURI::setUri( string buildFrom ) {
 	
 	validUri = true;
 	
-// 	cerr << "SipURI::fromString - result = " << getString() << endl;
-
 }
 
 void SipURI::setParams(string userName, string ip, string type, int32_t port){
 	clear();
 	
-	cerr << "SipURI::setParams " << endl;
-	
-// 	setUser( userName );
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI::setParams " << endl;
+#endif	
 	parseUserInfo( userName );
 	if( getUserName() == "" && getIp() != "" ) {
 		setUser( getIp() );
@@ -162,7 +162,9 @@ void SipURI::setParams(string userName, string ip, string type, int32_t port){
 void SipURI::parseUserInfo( string uriData ) {
 	//Lets piece the uri (without params first ) ... in uriData string
 	size_t pos;
-	cerr << "SipUri::parseUserInfo - " << uriData << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipUri::parseUserInfo - " << uriData << endl;
+#endif
 	//first identify the protocol ...
 	if( uriData.substr(0,4) == "sip:" ) {
 		setProtocolId( "sip" );
@@ -233,7 +235,9 @@ string SipURI::getString(){
 	if( getUserType() != "" ) uri += ";user=" + getUserType();
 	uri += ">";
 	
-	cerr << "##############" << "SipUri::getString() - " << uri << endl << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipUri::getString() - " << uri << endl << endl;
+#endif
 	return uri;
 }
 
@@ -250,7 +254,9 @@ string SipURI::getUserIpString(){
 	if( getUserName() != "" ) uri += getUserName() + "@";
 	uri += getIp();
 	
-	cerr << "##############" << "SipUri::getUserIpString() - " << uri << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipUri::getUserIpString() - " << uri << endl;
+#endif
 	return uri;
 }
 
@@ -272,13 +278,17 @@ string SipURI::getRequestUriString() {
 		uri += ":" + itoa( port );
 	}
 	
-	cerr << "##############" << "SipUri::getRequestUristring() - " << uri << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipUri::getRequestUristring() - " << uri << endl;
+#endif
 	return uri;
 }
 
 void SipURI::setDisplayName(string dispName) {
 	displayName = dispName;
-	cerr << "SipURI: display name = ###" << displayName << "###" << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: display name = ###" << displayName << "###" << endl;
+#endif
 }
 
 string SipURI::getDisplayName(){
@@ -287,7 +297,9 @@ string SipURI::getDisplayName(){
 
 void SipURI::setProtocolId(string id){
 	protocolId=id;
-	cerr << "SipURI: protocol id = " << protocolId << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: protocol id = " << protocolId << endl;
+#endif
 }
 
 string SipURI::getProtocolId(){
@@ -297,18 +309,10 @@ string SipURI::getProtocolId(){
 //scan the given name ... just in case someone is misusing this function,
 // (it should use setUri() ).
 void SipURI::setUser(string name){
-	//some objects use this function and give as username the whole
-	//protocol:user@ip:port ... deal with it.
-// 	cerr << "SipURI: user name (1) = " << name << endl;
-// 	if( name.find(':')!=string::npos ||
-// 			name.find('@')!=string::npos ||
-// 			name.find('<')!=string::npos ||
-// 			name.find('"')!=string::npos ) {
-// 		setUri( name );
-// 	} else {
 		this->userName = name;
-// 	}
-	cerr << "SipURI: user name (2) = " << userName << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: user name = " << userName << endl;
+#endif
 }
 
 string SipURI::getUserName(){
@@ -317,7 +321,9 @@ string SipURI::getUserName(){
 
 void SipURI::setIp(string ip){
 	this->ip=ip;
-	cerr << "SipURI: ip = " << this->ip << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: ip = " << this->ip << endl;
+#endif
 }
 
 string SipURI::getIp(){
@@ -326,7 +332,9 @@ string SipURI::getIp(){
 
 void SipURI::setPort(int32_t port){
 	this->port=port;
-	cerr << "SipURI: port = " << itoa( this->port ) << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: port = " << itoa( this->port ) << endl;
+#endif
 }
 
 int32_t SipURI::getPort(){
@@ -335,7 +343,9 @@ int32_t SipURI::getPort(){
 
 void SipURI::setUserType(string type){
 	this->userType=type;
-	cerr << "SipURI: user type = " << this->userType << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: user type = " << this->userType << endl;
+#endif
 }
 
 string SipURI::getUserType(){
@@ -344,7 +354,9 @@ string SipURI::getUserType(){
 
 void SipURI::setTransport(string transp){
 	transport = transp;
-	cerr << "SipURI: transport = " << this->transport << endl;
+#ifdef DEBUG_OUTPUT
+// 	cerr << "SipURI: transport = " << this->transport << endl;
+#endif
 }
 
 string SipURI::getTransport(){
