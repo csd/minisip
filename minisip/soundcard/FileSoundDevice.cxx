@@ -62,7 +62,7 @@ int filesleep( unsigned long usec ){
 
 	return select (0, NULL, NULL, NULL, &tv);
 #else
-	struct timespec request, remain;
+	struct timespec request;
 	request.tv_sec = 0;
 	request.tv_nsec = (long) usec * 1000;
 

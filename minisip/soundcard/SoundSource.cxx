@@ -212,7 +212,7 @@ void BasicSoundSource::getSound(short *dest,
 	
 	//If there is no underflow, take the data from the circular buffer and 
 	//put it in the temp buffer, where it will be resampled
-	memset( temp, 0, iFrames * oNChannels ); 
+	memset( temp, 0, iFrames * oNChannels * sizeof( short ) ); 
 	bool retRead;
 	if( ! isSilenced() ) {
 		retRead = cbuff->read( temp, iFrames*oNChannels );

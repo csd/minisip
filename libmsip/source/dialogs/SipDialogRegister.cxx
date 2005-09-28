@@ -76,10 +76,12 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
                                                                    +----------+
 */  
 
+
+//a12 also deals with proxy_register ... but once it is already registered ...
 bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
 
 	if (transitionMatch(command, SipCommandString::proxy_register)){
-
+		cerr << "SipDlgReg::a0 - " << command.getCommandString().getString() << endl;
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
 			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername = command.getCommandString().getParam();
@@ -89,6 +91,16 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		//Set expires param ... in seconds (in param3)
 		if (command.getCommandString().getParam3()!="" ) {
 			getDialogConfig()->inherited->sipIdentity->sipProxy.setRegisterExpires( command.getCommandString().getParam3() );
+		}
+		
+		//if it comes with an identity ... use it to filter out commands not for this dialog ...
+		if (command.getCommandString()["identityId"]!="" ) {
+			string identity;
+			identity = command.getCommandString()["identityId"];
+			if( identity != getDialogConfig()->inherited->sipIdentity->getId() ) {
+				//we got a proxy_register not for our identity ... 
+				return false;
+			}
 		}
 			
 		++dialogState.seqNo;
@@ -385,6 +397,16 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		if (command.getCommandString().getParam3()!="" ) {
 			getDialogConfig()->inherited->sipIdentity->sipProxy.setRegisterExpires( command.getCommandString().getParam3() );
 		}
+		
+		//if it comes with an identity ... use it to filter out commands not for this dialog ...
+		if (command.getCommandString()["identityId"]!="" ) {
+			string identity;
+			identity = command.getCommandString()["identityId"];
+			if( identity != getDialogConfig()->inherited->sipIdentity->getId() ) {
+				//we got a proxy_register not for our identity ... 
+				return false;
+			}
+		}		
 		
 		++dialogState.seqNo;
 		MRef<SipTransaction*> trans = 
