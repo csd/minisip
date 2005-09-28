@@ -81,7 +81,7 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
 bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
 
 	if (transitionMatch(command, SipCommandString::proxy_register)){
-		cerr << "SipDlgReg::a0 - " << command.getCommandString().getString() << endl;
+
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
 			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername = command.getCommandString().getParam();
