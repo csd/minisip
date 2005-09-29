@@ -141,7 +141,7 @@ int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int
 #endif
 }
 
-int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from){
+int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from, int &port){
 	struct sockaddr_in from4;
 	int n, addr_len;
 #ifndef WIN32
@@ -160,7 +160,9 @@ int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from){
 #else
 		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, (socklen_t*)&addr_len);
 #endif
+		port = ntohs(from4.sin_port);
 		from = new IP4Address(inet_ntoa(in_addr(from4.sin_addr)));
+
 	}
 	return n;
 }
