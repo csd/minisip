@@ -20,7 +20,7 @@ SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
-SUBDIRS="${SUBDIRS} libminisip"
+#SUBDIRS="${SUBDIRS} libminisip"
 SUBDIRS="${SUBDIRS} minisip"
 
 #If you are debugging, you probably want to build with "g++ -g", to build
