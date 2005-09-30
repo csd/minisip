@@ -339,9 +339,10 @@ void MainWindow::run(){
 
 #ifndef WIN32
 	if( trayIcon != NULL ){
-		Gtk::Window * window = trayIcon->getWindow();
+		Gtk::Window * window = NULL;
+		window = trayIcon->getWindow();
 		kit.run( *window );
-		delete window;
+		if( window != NULL )	delete window;
 	}
 	else
 #endif
