@@ -139,8 +139,14 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 			sock, localips, localPort, mappedip, mappedport );
 
 	if( natType == STUN::STUN_ERROR ){
-		merr << "An error occured while minisip tried to"
-			"discover the NAT type with STUN."
+		merr << "An error occured while minisip tried to "
+			"discover the NAT type with STUN. "
+			"STUN support will be disabled." << end;
+		return NULL;
+	}
+
+	if( natType == STUN::STUNTYPE_BLOCKED ){
+		merr << "minisip could not contact your STUN server. "
 			"STUN support will be disabled." << end;
 		return NULL;
 	}
