@@ -330,11 +330,15 @@ void Thread::join(int handle){
 #endif
 }
 
-void Thread::msleep(int ms){
+int Thread::msleep(int ms){
 #ifdef _MSC_VER
-	Sleep(ms);
+	Sleep(ms); //Fixme: what does this function return?
+	return 0;
 #else
-	usleep(ms * 1000);
+	struct timespec request;
+	request.tv_sec = 0;
+	request.tv_nsec = (long) sleep * 1000 * 1000;
+	return nanosleep( &request, NULL );
 #endif
 }
 

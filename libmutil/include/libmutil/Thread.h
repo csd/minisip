@@ -117,8 +117,9 @@ public:
 	 *		execution of a thread.
 	 * @arg msec	The thread will suspend sleep for at least the 
 	 *		requestex number of milliseconds.
+	 * @return -1 if error, else otherwise
 	*/
-	static void msleep(int msec);
+	static int msleep(int msec);
 
 private:
 	void *handle_ptr;
