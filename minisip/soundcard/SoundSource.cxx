@@ -88,7 +88,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	//         For now, we do 20ms * 5 = 100ms
 	//	We can set this even smaller ... but then we may have problems
 	//	if rtp packets come in burst  ... 
-	cbuff = new CircularBuffer( iFrames * oNChannels * 5 );
+	cbuff = new CircularBuffer( iFrames * oNChannels * 3 );
 
 	/* spatial audio initialization */
 	leftch = new short[1028];

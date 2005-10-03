@@ -248,7 +248,7 @@ int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 					buf, 
 					nSamples * getSampleSize() * getNChannelsRecord() );
 			if( retValue == -1 ) {
-				retValue = errno;
+				retValue = -errno;
 				printError( "readFromDevice" );
 			} else {
 				retValue = retValue / ( getSampleSize() * getNChannelsRecord() );
@@ -259,6 +259,7 @@ int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 			cerr << "FileSoundDevice::readFromDevice - filetype not implemented" << endl;
 			break;
 	}
+	return retValue;
 }
 
 void FileSoundDevice::readSleep( ) {
@@ -295,7 +296,7 @@ int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
 					buf, 
 					nSamples * getSampleSize() * getNChannelsPlay() );
 			if( retValue == -1 ) {
-				retValue = errno;
+				retValue = -errno;
 				printError( "write" );
 			} else {
 				retValue = retValue / ( getSampleSize() * getNChannelsPlay() );
@@ -309,6 +310,37 @@ int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
 
 	return retValue;
 }
+
+int FileSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	bool mustReturn = true;
+	switch( errcode ) {
+		case -EAGAIN:
+		case -EINTR:
+			mustReturn = false;
+			break;
+		default:
+			mustReturn = true;
+			break;
+	}
+	if( mustReturn ) { return -1; }
+	else { return 0; } 
+}
+
+int FileSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	bool mustReturn = true;
+	switch( errcode ) {
+		case -EAGAIN:
+		case -EINTR:
+			mustReturn = false;
+			break;
+		default:
+			mustReturn = true;
+			break;
+	}
+	if( mustReturn ) { return -1; }
+	else { return 0; } 
+}
+
 
 #if 0
 //not used ...

@@ -152,11 +152,13 @@ class SoundDevice: public MObject{
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples ) = 0;
 		
 		/**
-		If after reading from the device we have an error due to synchronism, we call this function.
-		If the readFromDevice function detects such an error, it will return -EPIPE.
-		@return -1 if something went wrong; 0 otherwise
+		If after reading from the device (readFromDevice) we have an error (errcode < 0 ), call this function. 
+		Error handling is device dependant, so SoundDevice does not implement it.
+		
+		@return -1 if something went wrong (read function will exit); 
+			0 otherwise (the read will keep trying to read)
 		*/
-		virtual int readSyncError( byte_t * buffer, uint32_t nSamples ) { return 0; };
+		virtual int readError( int errcode, byte_t * buffer, uint32_t nSamples ) = 0;
 		
 		/**
 		Write to the device.
@@ -182,11 +184,13 @@ class SoundDevice: public MObject{
 		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples ) = 0;
 
 		/**
-		If after writing to the device we have an error due to synchronism, we call this function.
-		If the writeToDevice function detects such an error, it will return -EPIPE.
-		@return -1 if something went wrong; 0 otherwise
+		If after writing to the device we have an error (errcode < 0 ), call this function. 
+		Error handling is device dependant, so SoundDevice does not implement it.
+		
+		@return -1 if something went wrong (write function will exit); 
+			0 otherwise (the write will keep trying to write)
 		*/
-		virtual int writeSyncError( byte_t * buffer, uint32_t nSamples ) { return 0; };
+		virtual int writeError( int errcode, byte_t * buffer, uint32_t nSamples ) = 0;
 		
 		/**
 		Wait till the devices buffers are empty.

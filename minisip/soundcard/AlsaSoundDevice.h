@@ -37,10 +37,10 @@ class AlsaSoundDevice: public SoundDevice{
 	public:
 		AlsaSoundDevice( std::string device );
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
-		virtual int readSyncError( byte_t * buffer, uint32_t nSamples );
+		virtual int readError( int errcode, byte_t * buffer, uint32_t nSamples );
 		
 		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
-		virtual int writeSyncError( byte_t * buffer, uint32_t nSamples );
+		virtual int writeError( int errcode, byte_t * buffer, uint32_t nSamples );
 		
 		virtual int openRecord( int samplingRate, int nChannels, int format );
 		virtual int closeRecord();

@@ -324,6 +324,36 @@ int OssSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 	return totalSamplesWritten;
 }
 
+int OssSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	bool mustReturn = true;
+	switch( errcode ) {
+		case -EAGAIN:
+		case -EINTR:
+			mustReturn = false;
+			break;
+		default:
+			mustReturn = true;
+			break;
+	}
+	if( mustReturn ) { return -1; }
+	else { return 0; } 
+}
+
+int OssSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	bool mustReturn = true;
+	switch( errcode ) {
+		case -EAGAIN:
+		case -EINTR:
+			mustReturn = false;
+			break;
+		default:
+			mustReturn = true;
+			break;
+	}
+	if( mustReturn ) { return -1; }
+	else { return 0; } 
+}
+
 void OssSoundDevice::sync(){
 	bool interrupted = false;
 	do{

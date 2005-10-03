@@ -95,6 +95,9 @@ class FileSoundDevice: public SoundDevice{
 		*/
 		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
 
+		virtual int readError( int errcode, byte_t * buffer, uint32_t nSamples );
+		virtual int writeError( int errcode, byte_t * buffer, uint32_t nSamples );
+		
 		virtual int openPlayback( int32_t samplingRate, int nChannels, int format=SOUND_S16LE );
 		virtual int openRecord( int32_t samplingRate, int nChannels, int format=SOUND_S16LE );
 		

@@ -139,6 +139,10 @@ int SoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 	int nSamplesRead = 0;
 	int totalSamplesRead = 0;
 	
+	if( !openedRecord ) {
+		return -1;
+	}
+	
 	byte_t * byteBuffer = buffer;
 
 	while( (uint32_t)totalSamplesRead < nSamples ){
@@ -149,24 +153,10 @@ int SoundDevice::read( byte_t * buffer, uint32_t nSamples ){
 			byteBuffer += nSamplesRead * getSampleSize() * getNChannelsPlay();
 			totalSamplesRead += nSamplesRead;
 		} else {
-			string msg = "";
-			bool mustReturn = true;
-			switch( nSamplesRead ){
-				case -EAGAIN:
-				case -EINTR:
-					msg = "REAGAIN";
-					mustReturn = false;
-					break;
-				case -EPIPE:
-					msg = "REPIPE";
-					if( readSyncError( byteBuffer, nSamples - totalSamplesRead )== -1 ) { mustReturn = true;}
-					else { mustReturn = false; }
-					break;
-			}
-#ifdef DEBUG_OUTPUT
-			fprintf( stderr, msg.c_str() );
-#endif
-			if( mustReturn ) { return -1; }
+			nSamplesRead = readError( nSamplesRead,
+						byteBuffer, 
+						nSamples - totalSamplesRead );
+			if( nSamplesRead < 0 ) { return -1; }
 			else { continue; }
 		}
 	}
@@ -178,6 +168,10 @@ int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 
 	byte_t * byteBuffer = buffer;
 
+	if( !openedPlayback ) {
+		return -1;
+	}
+	
 	int nSamplesWritten = 0;
 	int totalSamplesWritten = 0;
 
@@ -220,24 +214,10 @@ int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 			byteBuffer += nSamplesWritten * getSampleSize() * getNChannelsPlay();
 			totalSamplesWritten += nSamplesWritten;
 		} else {
-			string msg = "";
-			bool mustReturn = true;
-			switch( nSamplesWritten ){
-				case -EAGAIN:
-				case -EINTR:
-					msg = "WEAGAIN";
-					mustReturn = false;
-					break;
-				case -EPIPE:
-					msg = "WEPIPE";
-					if( writeSyncError( byteBuffer, nSamples - totalSamplesWritten) == -1 ) { mustReturn = true;}
-					else { mustReturn = false; }
-					break;
-			}
-#ifdef DEBUG_OUTPUT
-			fprintf( stderr, msg.c_str() );
-#endif
-			if( mustReturn ) { return -1; }
+			nSamplesWritten = writeError( nSamplesWritten,
+						byteBuffer, 
+						nSamples - totalSamplesWritten );
+			if( nSamplesWritten < 0 ) { return -1; }
 			else { continue; }
 		}
 	}

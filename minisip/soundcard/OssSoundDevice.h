@@ -45,6 +45,9 @@ class OssSoundDevice: public SoundDevice{
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
 		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
 				
+		virtual int readError( int errcode, byte_t * buffer, uint32_t nSamples );
+		virtual int writeError( int errcode, byte_t * buffer, uint32_t nSamples );
+		
 		virtual int openPlayback( int32_t samplingRate, int nChannels, int format );
 		virtual int openRecord( int32_t samplingRate, int nChannels, int format );
 		

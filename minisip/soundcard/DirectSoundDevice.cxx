@@ -68,6 +68,14 @@ int DirectSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 
 	return nSamples;
 }
+		
+int DirectSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	return -1;
+}
+
+int DirectSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	return -1;
+}
 	
 void DirectSoundDevice::sync(){
 }

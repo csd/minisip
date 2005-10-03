@@ -387,7 +387,7 @@ int AlsaSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	int nSamplesRead = 0;
 
 	if( readHandle == NULL ){
-		return -1;
+		return -EBADF;
 	}
 	
 	//it reads nSamples and returns the number of samples read ... 
@@ -399,8 +399,29 @@ int AlsaSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	return nSamplesRead;
 }
 
-int AlsaSoundDevice::readSyncError( byte_t * buffer, uint32_t nSamples ) { 
-	return snd_pcm_prepare( readHandle );
+int AlsaSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) { 
+	string msg = "";
+	bool mustReturn = true;
+	switch( errcode ){
+		case -EAGAIN:
+		case -EINTR:
+			msg = "REAGAIN";
+			mustReturn = false;
+			break;
+		case -EPIPE:
+			msg = "REPIPE";
+			if( snd_pcm_prepare( readHandle ) == -1 ) { mustReturn = true;}
+			else { mustReturn = false; }
+			break;
+		default:
+			msg = "RERROR";
+			break;
+	}
+#ifdef DEBUG_OUTPUT
+	fprintf( stderr, msg.c_str() );
+#endif
+	if( mustReturn ) { return -1; }
+	else { return 0; }
 }
 
 int AlsaSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
@@ -408,18 +429,39 @@ int AlsaSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 	int nSamplesWritten = 0;
 
 	if( writeHandle == NULL ){
-		return -1;
+		return -EBADF;
 	}
 
 	nSamplesWritten = snd_pcm_writei( writeHandle, 
 					buffer, 
 					nSamples );
 
-	return nSamplesWritten;
+	return nSamplesWritten; //the return is already the samples written or a negative value
 }
 
-int AlsaSoundDevice::writeSyncError( byte_t * buffer, uint32_t nSamples ) { 
-	return snd_pcm_prepare( writeHandle );
+int AlsaSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples ) { 
+	string msg = "";
+	bool mustReturn = true;
+	switch( errcode ){
+		case -EAGAIN:
+		case -EINTR:
+			msg = "WEAGAIN";
+			mustReturn = false;
+			break;
+		case -EPIPE:
+			msg = "WEPIPE";
+			if( snd_pcm_prepare( writeHandle ) == -1 ) { mustReturn = true;}
+			else { mustReturn = false; }
+			break;
+		default:
+			msg = "WERROR";
+			break;
+	}
+#ifdef DEBUG_OUTPUT
+	fprintf( stderr, msg.c_str() );
+#endif
+	if( mustReturn ) { return -1; }
+	else { return 0; }
 }
 
 void AlsaSoundDevice::sync(){

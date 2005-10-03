@@ -46,6 +46,9 @@ class DirectSoundDevice : public SoundDevice{
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
 		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
 
+		virtual int readError( int errcode, byte_t * buffer, uint32_t nSamples );
+		virtual int writeError( int errcode, byte_t * buffer, uint32_t nSamples );
+		
 		virtual void sync();
 
 	private:
