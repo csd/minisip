@@ -40,7 +40,7 @@ GroupListServer::GroupListServer(MRef<SipSoftPhoneConfiguration*>config,  int32_
 	
 	//set local variables
 	this->port = srv_socket->getPort();
-	this->ip = config->inherited.externalContactIP;
+	this->ip = config->inherited->externalContactIP;
 	
 	//enter port in SipSoftPhoneConfiguration
 	phoneconfig=config;
@@ -59,7 +59,7 @@ void GroupListServer::run(){
 	mdbg << "GroupListServer:: Accepting connections at " << ip<<":"<<(int)port<<end;
 #endif
 	
-	TCPSocket* socket;
+	MRef<StreamSocket*> socket;
 	char buffer[16384];
 //	int avail;
 	int32_t nread=1;
@@ -74,7 +74,7 @@ void GroupListServer::run(){
 		uri = "";
 		
 		//wait for incoming connection
-		socket = (TCPSocket *)srv_socket->accept();	
+		socket = srv_socket->accept();	
 		
 		//read input
 		nread = socket->read(buffer, sizeof(buffer));
@@ -123,7 +123,7 @@ void GroupListServer::run(){
 		}
 		
 		//close Socket
-		delete socket;
+		//		delete socket;
 
 	} 
 	

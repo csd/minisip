@@ -127,7 +127,7 @@ void RtcpTransactionIdleFloor::setUpStateMachine(){
 
 
 RtcpTransactionIdleFloor::RtcpTransactionIdleFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port, string callid, unsigned remoteSSRC) : 
-		SipTransaction(/*"RtcpTransactionIdleFloor",*/call,seqNo,"", callid),
+		SipTransaction(/*"RtcpTransactionIdleFloor",*/call->getSipStack(), call,seqNo,"", callid),
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {

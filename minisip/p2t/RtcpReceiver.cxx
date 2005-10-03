@@ -79,13 +79,13 @@ RtcpReceiver::RtcpReceiver(MRef<SipSoftPhoneConfiguration*> config, int RTPport)
 	rtcp_sock = new UDPSocket(false,++RTPport);
 
 	//set contact ip and port without STUN
-        contactMediaIP = config->inherited.localIpString;
+        contactMediaIP = config->inherited->localIpString;
         contactMediaPort = rtcp_sock->getPort();
  
 	//set contact ip and port with STUN    
 	if (config->useSTUN){
             uint16_t stunPort = config->stunServerPort;
-            IP4Address localAddr(config->inherited.localIpString);
+            IP4Address localAddr(config->inherited->localIpString);
             IP4Address stunAddr(config->stunServerIpString);
 ///            cerr << "local ip="<<phoneConf->inherited.localIpString<< endl;
 //            uint16_t localPort = rtcp_sock->getPort();

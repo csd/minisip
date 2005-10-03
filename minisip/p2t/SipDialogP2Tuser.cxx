@@ -149,7 +149,7 @@ bool SipDialogP2Tuser::a0_start_callingnoauth_invite( const SipSMCommand &comman
 		/*vc->*/setLocalCalled(false);
 		/*vc->*/dialogState.remoteUri = command.getCommandString().getParam();
 
-		MRef<SipTransaction*> invtrans = new SipTransactionInviteClientUA(MRef<SipDialog *>(/* *vc */ this), dialogState.seqNo, dialogState.callId);
+		MRef<SipTransaction*> invtrans = new SipTransactionInviteClientUA(getSipStack(), MRef<SipDialog *>(/* *vc */ this), dialogState.seqNo, dialogState.callId);
 		
 		invtrans->setSocket( /*vc->*/getPhoneConfig()->proxyConnection );
 		
@@ -309,7 +309,7 @@ bool SipDialogP2Tuser::a5_incall_termwait_BYE( const SipSMCommand &command)
 */
 		/*vc->*/getLogEntry()->handle();
 
-		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(MRef<SipDialog*>(/* *vc */ this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
+		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(getSipStack(), MRef<SipDialog*>(/* *vc */ this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
 
 		/*vc->*/registerTransaction(byeresp);
 		SipSMCommand cmd(command);
@@ -359,7 +359,7 @@ bool SipDialogP2Tuser::a6_incall_termwait_hangup(
 		++dialogState.seqNo;
 		
 		
-		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(getSipStack(), MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId)); 
 
 		/*vc->*/registerTransaction(byetrans);
 		/*vc->*/sendBye(byetrans->getBranch(), dialogState.seqNo);
@@ -409,6 +409,7 @@ bool SipDialogP2Tuser::a7_callingnoauth_termwait_CANCEL(
 
 		MRef<SipTransaction*> cancelresp( 
 				new SipTransactionNonInviteServer(
+					getSipStack(),
 					MRef<SipDialog*>(/* *vc */ this), 
 					command.getCommandPacket()->getCSeq(), 
 					command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
@@ -438,7 +439,7 @@ bool SipDialogP2Tuser::a8_callingnoauth_termwait_cancel(
 		//MRef<SipDialogP2Tuser *> vc = (SipDialogP2Tuser *)sipStateMachine;
 //		/*vc->*/setCurrentState(toState);
 
-		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */ this), /*vc->*/dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(getSipStack(), MRef<SipDialog*>(/* *vc */ this), /*vc->*/dialogState.seqNo, dialogState.callId)); 
 
 		/*vc->*/registerTransaction(canceltrans);
 		/*vc->*/sendCancel(canceltrans->getBranch());
@@ -502,11 +503,11 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::TU)){
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
 
-		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserId()+"@"+ 
+		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserName()+"@"+ 
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
 
-		//vc->getDialogConfig().inherited.userUri = command.getCommandPacket()->getHeaderTo()->getUri().getUserIpString().substr(4);
-		/*vc->*/getDialogConfig()->inherited.sipIdentity->setSipUri(  command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString() );
+		//vc->getDialogConfig().inherited->userUri = command.getCommandPacket()->getHeaderTo()->getUri().getUserIpString().substr(4);
+		/*vc->*/getDialogConfig()->inherited->sipIdentity->setSipUri(  command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString() );
 
 		/*vc->*/ /*setSeqNo(command.getCommandPacket()->getCSeq() );*/
 		dialogState.seqNo = command.getCommandPacket()->getCSeq();
@@ -532,6 +533,7 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 
 		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
+						getSipStack(),
 						MRef<SipDialog*>(/* *vc */), 
 						command.getCommandPacket()->getCSeq(),
 						command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
@@ -552,7 +554,7 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 				"p2tAddUser", 
 				/*vc->*/dialogState.remoteUri, 
 #if 0
-				(/*vc->*/getDialogConfig()->inherited.secured?"secure":"unprotected")
+				(/*vc->*/getDialogConfig()->inherited->secured?"secure":"unprotected")
 #else
 				"unprotected"
 #endif
@@ -574,19 +576,19 @@ bool SipDialogP2Tuser::a11_ringing_incall_accept( const SipSMCommand &command)
 		//MRef<SipDialogP2Tuser *>vc= (SipDialogP2Tuser *)sipStateMachine;
 
 #if 0
-		if( vc->getDialogConfig().inherited.secured ){
+		if( vc->getDialogConfig().inherited->secured ){
 			KeyAgreement * ka = vc->getKeyAgreement();
-			int32_t kam = vc->getDialogConfig().inherited.ka_type;
+			int32_t kam = vc->getDialogConfig().inherited->ka_type;
 
 			string responseMessage = ResponderParse( 
 					((SdpPacket*)*vc->getLastInvite()->getContent())->getKeyMgmt(), 
 					ka,
-					vc->getDialogConfig().inherited.secured,
+					vc->getDialogConfig().inherited->secured,
 					kam );
 
 			vc->setKeyManagementMessage( "mikey " + responseMessage );
 
-			if( !vc->getDialogConfig().inherited.secured ){
+			if( !vc->getDialogConfig().inherited->secured ){
 				/* An error occured when parsing the key agreement message */
 				return false;
 			}
@@ -596,7 +598,7 @@ bool SipDialogP2Tuser::a11_ringing_incall_accept( const SipSMCommand &command)
 		CommandString cmdstr(/*vc->*/getCallId(), 
 				SipCommandString::invite_ok,"",
 #if 0
-				(/*vc->*/getDialogConfig()->inherited.secured?"secure":"unprotected")
+				(/*vc->*/getDialogConfig()->inherited->secured?"secure":"unprotected")
 #else
 				"unprotected"
 #endif
@@ -607,7 +609,7 @@ bool SipDialogP2Tuser::a11_ringing_incall_accept( const SipSMCommand &command)
 		/*vc->*/sendInviteOk(/*vc->*/getLastInvite()->getDestinationBranch() );
 
 #if 0
-		if( vc->getDialogConfig().inherited.secured && vc->getDialogConfig().inherited.ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
+		if( vc->getDialogConfig().inherited->secured && vc->getDialogConfig().inherited->ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
 			ts.save( TGK_START );
 			((KeyAgreementDH *)vc->getKeyAgreement())->computeTgk();
 			ts.save( TGK_END );
@@ -645,7 +647,7 @@ bool SipDialogP2Tuser::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 
 		//FIXME: is this correct - this should probably be handled
 		//in the already existing transaction.
-		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(MRef<SipDialog*>(/* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(getSipStack(), MRef<SipDialog*>(/* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
 		/*vc->*/registerTransaction(cr);
 
 		SipSMCommand cmd(command);
@@ -697,7 +699,7 @@ bool SipDialogP2Tuser::a16_start_termwait_INVITE( const SipSMCommand &command)
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
 		/*vc->*/setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
-		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(MRef<SipDialog*>( /* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
+		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(getSipStack(), MRef<SipDialog*>( /* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
 
 		/*vc->*/registerTransaction(ir);
 
@@ -727,7 +729,7 @@ bool SipDialogP2Tuser::a20_callingnoauth_callingauth_40X( const SipSMCommand &co
 
 		//int seqNo = /*vc->*/requestSeqNo();
 		++dialogState.seqNo;
-		MRef<SipTransaction*> trans( new SipTransactionInviteClientUA(MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId));
+		MRef<SipTransaction*> trans( new SipTransactionInviteClientUA(getSipStack(), MRef<SipDialog*>(/* *vc */ this), dialogState.seqNo, dialogState.callId));
 		/*vc->*/registerTransaction(trans);
 		
 		/*vc->*/setRealm( resp->getRealm() );
@@ -798,10 +800,10 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 		
 #if 0
 		/* Key Agreement response message treatment */
-		if( vc->getDialogConfig().inherited.secured ){
+		if( vc->getDialogConfig().inherited->secured ){
 
 			KeyAgreement * ka = vc->getKeyAgreement();
-			int32_t kam = vc->getDialogConfig().inherited.ka_type;
+			int32_t kam = vc->getDialogConfig().inherited->ka_type;
 
 			if( !InitiatorAuthenticate( 
 						((SdpPacket*)*command.getCommandPacket()->getContent())->getKeyMgmt(),
@@ -815,12 +817,12 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 			string error_message = InitiatorParse( 
 					((SdpPacket*)*command.getCommandPacket()->getContent())->getKeyMgmt(),
 					ka,
-					vc->getDialogConfig().inherited.secured,
+					vc->getDialogConfig().inherited->secured,
 					kam );
 
-			vc->getDialogConfig().inherited.ka_type = kam;
+			vc->getDialogConfig().inherited->ka_type = kam;
 
-			if( !vc->getDialogConfig().inherited.secured ){
+			if( !vc->getDialogConfig().inherited->secured ){
 				// Some error occured in the key agreement parsing
 				return false;
 			}
@@ -835,7 +837,7 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 				SipCommandString::invite_ok, 
 				"",
 #if 0
-				(/*vc->*/getDialogConfig()->inherited.secured?"secure":"unprotected")
+				(/*vc->*/getDialogConfig()->inherited->secured?"secure":"unprotected")
 #else
 				"unprotected"
 #endif
@@ -843,7 +845,7 @@ bool SipDialogP2Tuser::a23_callingauth_incall_2xx(
 		/*vc->*/getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 
 #if 0
-		if( vc->getDialogConfig().inherited.secured && vc->getDialogConfig().inherited.ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
+		if( vc->getDialogConfig().inherited->secured && vc->getDialogConfig().inherited->ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
 			ts.save( TGK_START );
 			((KeyAgreementDH *)vc->getKeyAgreement())->computeTgk();
 			ts.save( TGK_END );
@@ -886,7 +888,7 @@ bool SipDialogP2Tuser::a24_calling_termwait_2xx(
 		++dialogState.seqNo;
 //		/*vc->*/setCurrentState(toState);
 
-		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(MRef<SipDialog*>(/* *vc */), /*vc->*/dialogState.seqNo, dialogState.callId); 
+		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(getSipStack(), MRef<SipDialog*>(/* *vc */), /*vc->*/dialogState.seqNo, dialogState.callId); 
 
 
 		/*vc->*/registerTransaction(byetrans);
@@ -1142,7 +1144,7 @@ void SipDialogP2Tuser::setUpStateMachine(){
 
 SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, 
 	MRef<SipSoftPhoneConfiguration*> pconf, MRef<SipDialogP2T*>p2tDialog) : 
-                SipDialog(stack,callconfig, pconf->timeoutProvider),
+                SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf)
 {
@@ -1151,15 +1153,15 @@ SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipStack*> stack, MRef<SipDialogConfig*>
 	soundReceiver = new SoundReceiver(getPhoneConfig()->soundcard, NULL, getPhoneConfig());
 	soundSender = new SoundSender(soundReceiver->getSocket(), 
 			getPhoneConfig()->soundcard, 
-			getPhoneConfig()->inherited.codecs[0], //FIXME
+			getPhoneConfig()->inherited->codecs[0], //FIXME
 			NULL);
 	soundSender->setDialog(this);
 	soundReceiver->setDialog(this);
 	*/
 
 	
-//	getDialogConfig().callId = itoa(rand())+"@"+getDialogConfig().inherited.localIpString;
-	/*getDialogConfig().callId*/ dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
+//	getDialogConfig().callId = itoa(rand())+"@"+getDialogConfig().inherited->localIpString;
+	/*getDialogConfig().callId*/ dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 	
 	dialogState.localTag=itoa(rand());
 	
@@ -1190,12 +1192,12 @@ void SipDialogP2Tuser::handleSdp(MRef<SdpPacket*> /*sdp*/){
 #ifdef OLD_MEDIA
 	int codec=0;
 	Codec *c=NULL;
-//	for (unsigned i=0; i< getDialogContainer()->getPhoneConfig()->inherited.codecs.size(); i++)
-	for (unsigned i=0; i< getPhoneConfig()->inherited.codecs.size(); i++)
-//		if (getDialogContainer()->getPhoneConfig()->inherited.codecs[i]->get_sdp_media_type()==codec)
-		if (getPhoneConfig()->inherited.codecs[i]->getSdpMediaType()==codec)
-//			c = getDialogContainer()->getPhoneConfig()->inherited.codecs[i];
-			c = getPhoneConfig()->inherited.codecs[i];
+//	for (unsigned i=0; i< getDialogContainer()->getPhoneConfig()->inherited->codecs.size(); i++)
+	for (unsigned i=0; i< getPhoneConfig()->inherited->codecs.size(); i++)
+//		if (getDialogContainer()->getPhoneConfig()->inherited->codecs[i]->get_sdp_media_type()==codec)
+		if (getPhoneConfig()->inherited->codecs[i]->getSdpMediaType()==codec)
+//			c = getDialogContainer()->getPhoneConfig()->inherited->codecs[i];
+			c = getPhoneConfig()->inherited->codecs[i];
 	assert(c!=NULL);
         int port;
         
@@ -1226,20 +1228,20 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 				branch,
 				/*getDialogConfig().callId*/ dialogState.callId,
 				dialogState.remoteUri,
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-				getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
-//				getDialogConfig().inherited.localIpString,
-				getDialogConfig()->inherited.externalContactIP,
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+//				getDialogConfig().inherited->localIpString,
+				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
-				//getDialogConfig().inherited.userUri,
-				getDialogConfig()->inherited.sipIdentity->getSipUri(),
+				//getDialogConfig().inherited->userUri,
+				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
 //				requestSeqNo(),
 //				getSoundReceiver()->getSocket()->get_port(),
 //				getP2TDialog()->getRTPPort(),
 				//                              getDialog()->getDialogConfig().localMediaPort, 
-				/*getDialogConfig().inherited.codecs,*/
-				getDialogConfig()->inherited.transport) );
+				/*getDialogConfig().inherited->codecs,*/
+				getDialogConfig()->inherited->transport) );
 	
 #ifdef MINISIP_MEMDEBUG
 	inv.setUser("SipDialogP2Tuser");
@@ -1283,24 +1285,24 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 			branch,
 			/*getDialogConfig().callId*/ dialogState.callId,
 			dialogState.remoteUri,
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPort,
-			//				getDialogConfig().inherited.localIpString,
-			getDialogConfig()->inherited.externalContactIP,
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+			//				getDialogConfig().inherited->localIpString,
+			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
-			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
+			//getDialogConfig().inherited->userUri,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
 			//				requestSeqNo(),
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyUsername,
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
 			nonce,
 			realm,
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyPassword,
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
 			//				getSoundReceiver()->getSocket()->get_port(),
 			//getP2TDialog()->getRTPPort(),
 			//                              getDialog()->getDialogConfig().localMediaPort, 
-			/*getDialogConfig().inherited.codecs,*/
-			getDialogConfig()->inherited.transport);
+			/*getDialogConfig().inherited->codecs,*/
+			getDialogConfig()->inherited->transport);
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
@@ -1328,7 +1330,7 @@ void SipDialogP2Tuser::sendAck(string branch){
 			branch, 
 			*lastResponse,
 			getDialogConfig()->uri_foreign,
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
 //	mdbg << "SipDialogP2Tuser:sendAck(): sending ACK directly to remote" << end;
@@ -1338,18 +1340,18 @@ void SipDialogP2Tuser::sendAck(string branch){
 //	Socket *sock=NULL;
 	
 	if(getDialogConfig()->proxyConnection == NULL){
-		getDialogConfig()->inherited.sipTransport->sendMessage(ack,
-				*(getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited.proxyPort, //port, 
+		getDialogConfig()->inherited->sipTransport->sendMessage(ack,
+				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited->proxyPort, //port, 
 //				sock, //(Socket *)NULL, //socket, 
 				getDialogConfig()->proxyConnection,
 				"BUGBUGBUG",
-				getDialogConfig()->inherited.transport
+				getDialogConfig()->inherited->transport
 				);
 	}else{
 		// A StreamSocket exists, try to use it
 		mdbg << "Sending packet using existing StreamSocket"<<end;
-		getDialogConfig()->inherited.sipTransport->sendMessage(
+		getDialogConfig()->inherited->sipTransport->sendMessage(
 				ack,
 				(StreamSocket *)getDialogConfig()->proxyConnection, "BUGBUGBUG");
 	}
@@ -1369,8 +1371,8 @@ void SipDialogP2Tuser::sendAck(string branch){
 
 void SipDialogP2Tuser::sendBye(const string &branch, int bye_seq_no){
 
-	//string tmp = getDialogConfig().inherited.userUri;
-	string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
+	//string tmp = getDialogConfig().inherited->userUri;
+	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
 	uint32_t i = tmp.find("@");
 	assert(i!=string::npos);
 	i++;
@@ -1383,8 +1385,8 @@ void SipDialogP2Tuser::sendBye(const string &branch, int bye_seq_no){
 			branch,
 			getLastInvite(),
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
+			//getDialogConfig().inherited->userUri,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			domain,
 //			getDialogConfig().seqNo+1,
 			bye_seq_no///,
@@ -1406,9 +1408,9 @@ void SipDialogP2Tuser::sendCancel(const string &branch){
 			branch,
 			lastInvite,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited.sipIdentity->getSipUri(),
-			getDialogConfig()->inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString()///,
+			//getDialogConfig().inherited->userUri,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString()///,
 			///localCalled
 			);
 
@@ -1428,8 +1430,8 @@ void SipDialogP2Tuser::sendInviteOk(const string &branch){
 
 
 #ifdef OLD_MEDIA
-	int32_t codecmatch = ((SdpPacket*)*getLastInvite()->getContent())->getCodecMatch(getDialogConfig()->inherited.codecs);
-	vector<Codec *> orderedcodecs = getDialogConfig()->inherited.codecs;
+	int32_t codecmatch = ((SdpPacket*)*getLastInvite()->getContent())->getCodecMatch(getDialogConfig()->inherited->codecs);
+	vector<Codec *> orderedcodecs = getDialogConfig()->inherited->codecs;
 	for (unsigned i=0; i<orderedcodecs.size(); i++)
 		if (orderedcodecs[i]->getSdpMediaType()==codecmatch){
 			Codec *tmp = orderedcodecs[0];
@@ -1440,16 +1442,16 @@ void SipDialogP2Tuser::sendInviteOk(const string &branch){
 	//getSoundSender()->setCodec(orderedcodecs[0]);
  	myCodec=orderedcodecs[0];
 	
-	if (getDialogConfig()->inherited.secured && (getDialogConfig()->inherited.ka_type & KEY_MGMT_METHOD_MIKEY))
-//		ok->setContent( new SdpPacket(getDialogConfig().inherited.localIpString, 
-		ok->setContent( new SdpPacket(getDialogConfig()->inherited.externalContactIP, 
+	if (getDialogConfig()->inherited->secured && (getDialogConfig()->inherited->ka_type & KEY_MGMT_METHOD_MIKEY))
+//		ok->setContent( new SdpPacket(getDialogConfig().inherited->localIpString, 
+		ok->setContent( new SdpPacket(getDialogConfig()->inherited->externalContactIP, 
 //					getSoundReceiver()->getSocket()->get_port(), 
 					getP2TDialog()->getRTPPort(), 
 					orderedcodecs, 
 					key_mgmt) );
 	else
-//		ok->setContent( new SdpPacket(getDialogConfig().inherited.localIpString, 
-		ok->setContent( new SdpPacket(getDialogConfig()->inherited.externalContactIP, 
+//		ok->setContent( new SdpPacket(getDialogConfig().inherited->localIpString, 
+		ok->setContent( new SdpPacket(getDialogConfig()->inherited->externalContactIP, 
 //					getSoundReceiver()->getSocket()->get_port(), 
 					getP2TDialog()->getRTPPort(),
 					orderedcodecs) );
@@ -1564,7 +1566,7 @@ void SipDialogP2Tuser::modifyP2TInvite(MRef<SipInvite*>inv){
 	//Add SDP Session Level Attributes
 	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
-	sdp->setSessionLevelAttribute("p2tGroupListServer", getDialogConfig()->inherited.externalContactIP + ":" + itoa(getPhoneConfig()->p2tGroupListServerPort));
+	sdp->setSessionLevelAttribute("p2tGroupListServer", getDialogConfig()->inherited->externalContactIP + ":" + itoa(getPhoneConfig()->p2tGroupListServerPort));
 	sdp->setSessionLevelAttribute("p2tGroupIdentity", getP2TDialog()->getGroupList()->getGroupIdentity());
 	sdp->setSessionLevelAttribute("p2tGroupListProt","http/xml");	
 }
