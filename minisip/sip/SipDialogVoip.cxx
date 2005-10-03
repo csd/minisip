@@ -404,14 +404,16 @@ bool SipDialogVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &comman
 			transitionMatch(command, SipCommandString::hang_up)){
 //		setCurrentState(toState);
 
+		string inv_branch = getLastInvite()->getFirstViaBranch();
 		MRef<SipTransaction*> canceltrans( 
 				new SipTransactionNonInviteClient(sipStack, 
 					MRef<SipDialog*>( this ), 
 					dialogState.seqNo, 
 					dialogState.callId)); 
 
+		canceltrans->setBranch(inv_branch);
 		registerTransaction(canceltrans);
-		sendCancel(canceltrans->getBranch());
+ 		sendCancel(inv_branch);
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -1555,7 +1557,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 			);
 
 	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-	cancel->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+	// Don't include to-tag, allowing it to be forked by proxies.
 
 	MRef<SipMessage*> pref(*cancel);
 	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);

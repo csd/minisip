@@ -72,7 +72,8 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		virtual void handleTimeout(const string &c);
 		
 		string getBranch();
-		
+		void setBranch(string branch);
+				
 		void setDialog(MRef<SipDialog*> );
 		void send(MRef<SipMessage*>  pack, bool addVia, string branch=""); // if not specified branch, use the attribute one - ok in most cases.
 		void setSocket(Socket * sock){socket=sock;};

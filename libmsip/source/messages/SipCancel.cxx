@@ -71,12 +71,12 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 		switch (type){
 			case SIP_HEADER_TYPE_FROM:
 			//	((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getParameter("tag"));
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUser(from_uri);
+			//	((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUser(from_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_TO:
 			//	((SipHeaderValueTo*)*(header->getHeaderValue(0)))->setParameter("tag", ((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getParameter("tag") );
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUser(to_uri);
+			//	((SipHeaderValueTo*)*(header->getHeaderValue(0)))->getUri().setUser(to_uri);
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CSEQ:

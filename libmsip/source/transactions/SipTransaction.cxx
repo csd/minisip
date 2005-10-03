@@ -113,6 +113,10 @@ string SipTransaction::getBranch(){
 	return branch;
 }
 
+void SipTransaction::setBranch(string b) {
+	branch = b;
+}
+
 void SipTransaction::handleTimeout(const string &c){
         SipSMCommand cmd(CommandString(callId,c),SipSMCommand::transaction,SipSMCommand::transaction);
         dialog->getDialogContainer()->enqueueTimeout( this, cmd);
