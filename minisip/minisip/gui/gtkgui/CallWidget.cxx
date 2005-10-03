@@ -340,10 +340,12 @@ bool CallWidget::handleCommand( CommandString command ){
 					secStatus.set_text( "" );
 					rejectButton.set_label( "Close" );
 					state = CALL_WIDGET_STATE_TERMINATED;
+#ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
 					transferArrow.hide();
 					dtmfArrow.hide();
+#endif
 			}
 		}
 
@@ -355,10 +357,12 @@ bool CallWidget::handleCommand( CommandString command ){
 					secStatus.set_text( "" );
 					rejectButton.set_label( "Close" );
 					state = CALL_WIDGET_STATE_TERMINATED;
+#ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
 					transferArrow.hide();
 					dtmfArrow.hide();
+#endif
 			}
 		}
 		
