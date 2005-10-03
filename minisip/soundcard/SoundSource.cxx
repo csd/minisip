@@ -126,7 +126,15 @@ void BasicSoundSource::pushSound(short * samples,
 #ifdef DEBUG_OUTPUT
 	npush++;
 	if (npush%1000 == 0) {
-		printf( "pushSound: nget=%d; npush=%d; diff=%d\n", nget, npush, nget - npush) ;
+		static uint64_t lastTimePush = 0;
+		uint64_t currentPush;
+		if( lastTimePush == 0 )
+			lastTimePush = mtime();
+		currentPush = mtime();
+		printf( "pushSound: nget=%d; npush=%d; diff=%d, cbuff_size=%d, time_diff=%d\n", 
+			nget, npush, nget - npush,
+			cbuff->getSize(), (int) (currentPush - lastTimePush) ) ;
+		lastTimePush = currentPush;
 // 		printf( "CircBuff_push: maxSize = %d; size=%d; free=%d\n", cbuff->getMaxSize(), cbuff->getSize(), cbuff->getFree() );
 		//cerr << "Calling pushSound for source " << getId() << endl;
 	}
@@ -137,7 +145,7 @@ void BasicSoundSource::pushSound(short * samples,
 	//or we are not emptying the buffer quick enough ...
 	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
 	#ifdef DEBUG_OUTPUT
-// 		printf("OF");
+		printf("OF");
 // 		cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
 	#endif
 		bufferLock.unlock();
@@ -177,7 +185,15 @@ void BasicSoundSource::getSound(short *dest,
 #ifdef DEBUG_OUTPUT
 	nget++;
 	if (nget%1000==0) {
-		printf( "getSound: nget=%d; npush=%d; diff=%d\n", nget, npush, nget - npush) ;
+		static uint64_t lastTimeGet = 0;
+		uint64_t currentGet;
+		if( lastTimeGet == 0 )
+			lastTimeGet = mtime();
+		currentGet = mtime();
+		printf( "getSound: nget=%d; npush=%d; diff=%d, cbuff_size=%d, time_diff=%d\n", 
+				nget, npush, nget - npush, 
+				cbuff->getSize(), (int) (currentGet - lastTimeGet) ) ;
+		lastTimeGet = currentGet;
 // 		printf( "CircBuff_get: maxSize = %d; size=%d; free=%d\n", cbuff->getMaxSize(), cbuff->getSize(), cbuff->getFree() );
 		//cerr << "nget="<< nget<< endl;
 		//cerr << "Calling getSound for source " << getId() << endl;
@@ -185,7 +201,7 @@ void BasicSoundSource::getSound(short *dest,
 #endif
 	
 	bufferLock.lock();
-        
+        	
 	//Check for underflow ...
 	//	if it is so, use the PLC to fill in the missing audio, or produce silence
 	//NOTE Underflow is not so bad ... for example, if using a peer like minisip, it will
@@ -193,7 +209,7 @@ void BasicSoundSource::getSound(short *dest,
 	//	receiving 1 pack/set instead of 1pack/20ms ... we get underflow.
 	if( cbuff->getSize() < (int) (iFrames*oNChannels) ) {
 	#ifdef DEBUG_OUTPUT
-// 		printf("UF");
+		printf("UF");
 	#endif
 		if (plcProvider){
 		#ifdef DEBUG_OUTPUT
@@ -225,7 +241,7 @@ void BasicSoundSource::getSound(short *dest,
 	}
 #endif
 	resampler->resample( temp, dest );
-	
+// 	memset( dest, 0, oFrames * oNChannels * sizeof( short ) ); 
 	bufferLock.unlock();
 	
 }

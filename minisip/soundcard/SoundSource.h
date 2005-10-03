@@ -36,10 +36,17 @@
 
 class CircularBuffer;
 
+/**
+Definition of a SoundSource.
+A SoundSource object is capable of acting as a buffer for 
+audio samples (read from the network) before they are 
+"get" by the SoundDevice and played. 
+*/
 class SoundSource : public MObject{
 	public:
 		SoundSource(int id);
 		virtual ~SoundSource(){};
+		virtual std::string getMemObjectType(){return "SoundSource";};
 
 		/**
 		* @return Identifier of source that generated the audio.
@@ -56,7 +63,6 @@ class SoundSource : public MObject{
 		* @param position Spatial position of the source.
 		*/
 		void setPos(int32_t position);
-
 
 		/**
 		Add samples to the SoundSource
@@ -81,12 +87,6 @@ class SoundSource : public MObject{
 		virtual void getSound(short *dest,
 				bool dequeue=true)=0;
 
-		virtual std::string getMemObjectType(){return "SoundSource";};
-
-		int32_t getPointer();
-
-		void setPointer(int32_t wpointer);
-		
 		/**
 		Set and get for the silencing of this sources (meaning
 		that when read, even if it has data, it will return "silence"
@@ -95,31 +95,72 @@ class SoundSource : public MObject{
 		bool isSilenced() { return silenced; }
 		void setSilenced( bool s ) { silenced = s; }
 		
-	private:
-		int sourceId;
-
+		/**
+		Used in spatial audio mixing.
+		*/
+		int32_t getPointer();
+		void setPointer(int32_t wpointer);
+		
+	
 	protected:
+		/**
+		Holds the id of the source ... for example, the SSRC of the RTP stream 
+		that is being processed.
+		*/		
+		int sourceId;
+		
 		/**
 		Whether this source is silenced, that is, on read of the buffer,
 		it will provide silence samples (all zeros)
 		*/
 		volatile bool silenced;
 		
+		/**
+		Spatial Position.
+		In general:
+		3 - CENTER
+		1 - LEFT
+		5 - RIGHT
+		2 - FRONT LEFT
+		4 - FRONT RIGHT
+		*/
 		int32_t position;
+		
+#if 0
+		/**
+		Sample rate of the audio in this source
+		*/
 		double sampRate;
+#endif
+	
+		/**
+		Spatial Audio related
+		FIXME: is it needed? can someone add some doc comments on it?
+		*/
 		short *leftch; //spaudio
+		/**
+		Spatial Audio related
+		FIXME: is it needed? can someone add some doc comments on it?
+		*/
 		short *rightch; //spaudio
+		/**
+		Spatial Audio related
+		FIXME: is it needed? can someone add some doc comments on it?
+		*/
 		int32_t pointer; //spaudio
+		/**
+		Spatial Audio related
+		FIXME: is it needed? can someone add some doc comments on it?
+		*/
 		int32_t j; //spaudio
+		/**
+		Spatial Audio related
+		FIXME: is it needed? can someone add some doc comments on it?
+		*/
 		int32_t k; //spaudio
-//		short *lookupleft; //spaudio
-//		short *lookupright; //spaudio
-//		int32_t numSources; //spaudio
-
+		
 		friend class SpAudio;
-
 };
-
 
 /**
 Simple implementation of an audio sound source. 
