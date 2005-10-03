@@ -18,9 +18,13 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #include"AlsaSoundDevice.h"
+
+#include<libmutil/Thread.h>
+#include<libmutil/mtime.h>
 
 using namespace std;
 
@@ -77,6 +81,7 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	
 	// Play ...
 	
+// 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  SND_PCM_NONBLOCK)<0){
 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  0/*SND_PCM_NONBLOCK*/)<0){
 		cerr << "Could not open ALSA sound card" << endl;
 		exit(-1);
@@ -125,38 +130,6 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 		cerr << "Could not set ALSA format" << endl;
 		exit(-1);
 	}
-/*
-	if (snd_pcm_hw_params_set_period_size(readHandle, hwparams, 
-				PERIOD_SIZE, 0) < 0) {
-		cerr << "Could not set ALSA period size" << endl;
-		exit(-1);
-	}
-*/	
-	uint32_t min_buffer_size;
-	int32_t dir;
-
-	if (snd_pcm_hw_params_get_buffer_time_min(hwparams,
-				&min_buffer_size, &dir) < 0){
-#ifdef DEBUG_OUTPUT
-		cerr << "Could not get ALSA min buffer time" << endl;
-#endif
-	}
-
-	/* Some soundcards seems to be a bit optimistic */
-
-	if (min_buffer_size < MIN_HW_PO_BUFFER){
-		min_buffer_size = MIN_HW_PO_BUFFER;
-	}
-
-#ifdef DEBUG_OUTPUT
-	cerr << "ALSA Hardware playout buffer size: " << min_buffer_size << endl;
-#endif
-
-	if (snd_pcm_hw_params_set_buffer_time(writeHandle, hwparams, 
-				min_buffer_size, dir) < 0) {
-		cerr << "Could not set ALSA buffer time" << endl;
-		exit(-1);
-	}
 	
 	unsigned int wantedSamplingRate = (unsigned int)samplingRate; 
 
@@ -170,8 +143,60 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 		cerr << "ALSA: Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
 #endif
 	}
-
 	this->samplingRate = samplingRate;
+	
+	unsigned long periodSize = 0;
+	int32_t dirPeriod;
+	if( snd_pcm_hw_params_get_period_size_min (hwparams, &periodSize, &dirPeriod) < 0 ) {
+		cerr << "Could not get ALSA period size" << endl;
+	} else {
+		cerr << "AlsaPlayback min period size is (alsaFrames) =  " << periodSize << endl;
+	}
+	printf( "alsa playback dir = %d\n", dirPeriod );
+	uint32_t numPeriods;
+	numPeriods =  snd_pcm_hw_params_set_periods (writeHandle, hwparams, 1, 0);
+	if( numPeriods < 0 ) {
+		cerr << "Could not get ALSA periods" << endl;
+	} else {
+		cerr << "AlsaPlayback periods set to (numPeriodsPerBuffer) =  1" << numPeriods << endl;
+	}
+	
+	periodSize = snd_pcm_hw_params_set_period_size(writeHandle, hwparams, 960 *2, 0);
+	if( periodSize < 0) {
+		cerr << "Could not set ALSA period size" << endl;
+	} else {
+		cerr << "AlsaPlayback period size is (alsaFrames) = 64 " << periodSize << endl;
+	}
+
+	uint32_t min_buffer_size;
+	int32_t dir;
+
+	if (snd_pcm_hw_params_get_buffer_time_min(hwparams,
+				&min_buffer_size, &dir) < 0){
+#ifdef DEBUG_OUTPUT
+		cerr << "Could not get ALSA min buffer time" << endl;
+#endif
+	}
+
+	/* Some soundcards seems to be a bit optimistic */
+
+#ifdef DEBUG_OUTPUT
+	cerr << "ALSA Hardware playout buffer size: (microsecs) " << min_buffer_size << endl;
+#endif
+	if (min_buffer_size < MIN_HW_PO_BUFFER){
+		min_buffer_size = MIN_HW_PO_BUFFER;
+	}
+
+#ifdef DEBUG_OUTPUT
+	cerr << "ALSA Hardware playout buffer size: (microsecs) " << min_buffer_size << endl;
+#endif
+
+	if (snd_pcm_hw_params_set_buffer_time(writeHandle, hwparams, 
+				min_buffer_size, dir) < 0) {
+		cerr << "Could not set ALSA buffer time" << endl;
+// 		exit(-1);
+	}
+	
 /*
 	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200000, 0 
 				) < 0) {
@@ -192,26 +217,28 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	}
 
 
-	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, 32)){
+	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, 16)){
 		cerr << "Could not set ALSA start threshold" << endl;
-		exit(-1);
+// 		exit(-1);
 	}
 	
 	/* Disable the XRUN detection */
-	if (snd_pcm_sw_params_set_stop_threshold(writeHandle, swparams, 0x7FFFFFFF)){
+/*	if (snd_pcm_sw_params_set_stop_threshold(writeHandle, swparams, 0x7FFFFFFF)){
 		cerr << "Could not set ALSA stop threshold" << endl;
 		exit(-1);
-	}
+	}*/
 	
-	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams,16)){
+	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams, 32)){
 		cerr << "Could not set ALSA avail_min" << endl;
-		exit(-1);
+// 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params(writeHandle, swparams) < 0) {
 		cerr << "Could not apply sw parameters to ALSA sound card" << endl;
 		exit(-1);
 	}
+	
+	snd_pcm_prepare( writeHandle );
 	
 	openedPlayback = true;
 	return 1;
@@ -345,92 +372,54 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 
 	
 	//snd_pcm_prepare(writeHandle);
-	//snd_pcm_prepare(readHandle);
+	snd_pcm_prepare(readHandle);
 	//snd_pcm_start(readHandle);
 	
 	openedRecord = true;
 
 	return 0;
-
 }
 
-int AlsaSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
+//Note: in alsa jargon, nSamples would be named nFrames. An AlsaFrame is made of 
+//   N samples per each channel, and each sample is X bytes long.
+int AlsaSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 
-	
 	int nSamplesRead = 0;
-	int totalSamplesRead = 0;
 
 	if( readHandle == NULL ){
 		return -1;
 	}
 	
-	while( (uint32_t)totalSamplesRead != nSamples ){
-		nSamplesRead = snd_pcm_readi( readHandle, buffer, nSamples - totalSamplesRead );
+	//it reads nSamples and returns the number of samples read ... 
+	// or directly the negative error code if an error
+	nSamplesRead = snd_pcm_readi( readHandle, 
+					buffer, 
+					nSamples );
 
-		if( nSamplesRead < 0 ){
-#ifdef DEBUG_OUTPUT
-			cerr << "An error occured when reading from sound card (ALSA)" << endl;
-#endif
-			switch( nSamplesRead ){
-				case -EAGAIN:
-					break;
-				case -EPIPE:
-					snd_pcm_prepare( readHandle );
-					break;
-				case -ESTRPIPE:
-					return -1;
-			}
-			continue;
-		}
-
-		else{
-			totalSamplesRead += nSamplesRead;
-		}
-	}
-
-	return totalSamplesRead;
-
+	return nSamplesRead;
 }
 
-int AlsaSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
+int AlsaSoundDevice::readSyncError( byte_t * buffer, uint32_t nSamples ) { 
+	return snd_pcm_prepare( readHandle );
+}
+
+int AlsaSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 
 	int nSamplesWritten = 0;
-	int totalSamplesWritten = 0;
 
 	if( writeHandle == NULL ){
 		return -1;
 	}
 
-	while( (uint32_t)totalSamplesWritten < nSamples ){
-		nSamplesWritten = snd_pcm_writei( writeHandle, buffer, nSamples - totalSamplesWritten );
+	nSamplesWritten = snd_pcm_writei( writeHandle, 
+					buffer, 
+					nSamples );
 
-//		fprintf( stderr, "nSamplesWritten %d\n", nSamplesWritten );
+	return nSamplesWritten;
+}
 
-		if( nSamplesWritten < 0 ){
-			switch( nSamplesWritten ){
-				case -EAGAIN:
-					fprintf( stderr,"EAGAIN" );
-					break;
-				case -EPIPE:
-					fprintf( stderr,"EPIPE" );
-					snd_pcm_prepare( writeHandle );
-					break;
-				case -ESTRPIPE:
-					fprintf( stderr,"ESTRIPE" );
-					return -1;
-				case -EBADFD:
-					fprintf( stderr,"EBADFD" );
-					return -1;
-			}
-		}
-
-		else{
-			totalSamplesWritten += nSamplesWritten;
-		}
-
-	}
-
-	return totalSamplesWritten;
+int AlsaSoundDevice::writeSyncError( byte_t * buffer, uint32_t nSamples ) { 
+	return snd_pcm_prepare( writeHandle );
 }
 
 void AlsaSoundDevice::sync(){

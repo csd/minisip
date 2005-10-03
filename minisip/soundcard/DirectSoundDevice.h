@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #ifndef DIRECT_SOUND_DEVICE_H
@@ -38,11 +39,12 @@ class DirectSoundDevice : public SoundDevice{
 
 		virtual int openRecord( int samplingRate, int nChannels, int format );
 		virtual int openPlayback( int samplingRate, int nChannels, int format );
+		
 		virtual int closeRecord();
 		virtual int closePlayback();
 
-		virtual int read( byte_t * buffer, uint32_t nSamples );
-		virtual int write( byte_t * buffer, uint32_t nSamples );
+		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
+		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
 
 		virtual void sync();
 

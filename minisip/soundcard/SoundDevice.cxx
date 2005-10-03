@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #include<config.h>
@@ -37,6 +38,9 @@
 #endif
 
 #include<stdio.h>
+
+#include<libmutil/Thread.h>
+#include<libmutil/mtime.h>
 
 using namespace std;
 
@@ -80,6 +84,7 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 
 SoundDevice::SoundDevice( string device ):openedRecord(false),openedPlayback(false){
 	dev = device;
+	setSleepTime( 20 );
 }
 
 SoundDevice::~SoundDevice()
@@ -129,21 +134,113 @@ void SoundDevice::setFormat( int format_ ) {
 	}
 }
 
-#if 0
-int SoundDevice::getSampleSizePlay(){
-	if( ( format & 0xF0 ) == 0xF0 ){
-		return 2 * nChannelsPlay;
-	} else {
-		return 0;
+int SoundDevice::read( byte_t * buffer, uint32_t nSamples ){
+
+	int nSamplesRead = 0;
+	int totalSamplesRead = 0;
+	
+	byte_t * byteBuffer = buffer;
+
+	while( (uint32_t)totalSamplesRead < nSamples ){
+		nSamplesRead = readFromDevice( byteBuffer, 
+						nSamples - totalSamplesRead );
+		if( nSamplesRead >= 0 ) {
+// 			fprintf( stderr, "nSamplesRead %d\n", nSamplesWritten );
+			byteBuffer += nSamplesRead * getSampleSize() * getNChannelsPlay();
+			totalSamplesRead += nSamplesRead;
+		} else {
+			string msg = "";
+			bool mustReturn = true;
+			switch( nSamplesRead ){
+				case -EAGAIN:
+				case -EINTR:
+					msg = "REAGAIN";
+					mustReturn = false;
+					break;
+				case -EPIPE:
+					msg = "REPIPE";
+					if( readSyncError( byteBuffer, nSamples - totalSamplesRead )== -1 ) { mustReturn = true;}
+					else { mustReturn = false; }
+					break;
+			}
+#ifdef DEBUG_OUTPUT
+			fprintf( stderr, msg.c_str() );
+#endif
+			if( mustReturn ) { return -1; }
+			else { continue; }
+		}
 	}
+	return totalSamplesRead;
 }
 
-int SoundDevice::getSampleSizeRecord(){
-	if( ( format & 0xF0 ) == 0xF0 ){
-		return 2 * nChannelsRecord;
-	} else {
-		return 0;
-	}
-}
+
+int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
+
+	byte_t * byteBuffer = buffer;
+
+	int nSamplesWritten = 0;
+	int totalSamplesWritten = 0;
+
+	//timed access ..
+	uint64_t currentTime;
+	static uint64_t lastTimeWrite = 0;
+	
+	currentTime = mtime();
+	if( lastTimeWrite == 0 ) {
+		lastTimeWrite = currentTime - sleepTime; //init last time we wrote ... 
+		
+#ifdef DEBUG_OUTPUT
+		printf( "nsamples = %d\n\n", nSamples );
 #endif
+
+	} else if( (currentTime - lastTimeWrite) > sleepTime*10 ) {
+
+#ifdef DEBUG_OUTPUT
+		printf( "SoundDevice: resetting lastTimeWrite! +++++++++++++++++++++++++++++ \n\n");
+#endif
+		
+		lastTimeWrite = currentTime - sleepTime;
+	}
+	
+	int sleep = sleepTime - (currentTime-lastTimeWrite);
+// 	printf( "\n\nsleep = %d\n", sleep );
+	while ( sleep > 0 ){
+		Thread::msleep( sleep );
+		currentTime = mtime();
+		sleep = sleepTime - (currentTime-lastTimeWrite);
+	}
+	lastTimeWrite += sleepTime;
+	
+	while( (uint32_t)totalSamplesWritten < nSamples ){
+		nSamplesWritten = writeToDevice( byteBuffer, 
+						nSamples - totalSamplesWritten );
+
+		if( nSamplesWritten >= 0 ) {
+// 			fprintf( stderr, "nSamplesWritten %d\n", nSamplesWritten );
+			byteBuffer += nSamplesWritten * getSampleSize() * getNChannelsPlay();
+			totalSamplesWritten += nSamplesWritten;
+		} else {
+			string msg = "";
+			bool mustReturn = true;
+			switch( nSamplesWritten ){
+				case -EAGAIN:
+				case -EINTR:
+					msg = "WEAGAIN";
+					mustReturn = false;
+					break;
+				case -EPIPE:
+					msg = "WEPIPE";
+					if( writeSyncError( byteBuffer, nSamples - totalSamplesWritten) == -1 ) { mustReturn = true;}
+					else { mustReturn = false; }
+					break;
+			}
+#ifdef DEBUG_OUTPUT
+			fprintf( stderr, msg.c_str() );
+#endif
+			if( mustReturn ) { return -1; }
+			else { continue; }
+		}
+	}
+	return totalSamplesWritten;
+}
 

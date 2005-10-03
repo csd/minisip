@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #include"OssSoundDevice.h"
@@ -25,10 +26,12 @@
 #ifndef DISABLE_OSS
 #include<config.h>
 
+// #include<libmutil/mtime.h>
+
 #include<unistd.h>
 #include<errno.h>
-#include <sys/time.h>
-#include <time.h>
+// #include <sys/time.h>
+// #include <time.h>
 
 using namespace std;
 
@@ -59,9 +62,11 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	}
 
 	// Remove O_NONBLOCK
-	int flags = fcntl( fdPlayback, F_GETFL );
+/*	int flags = fcntl( fdPlayback, F_GETFL );
 	flags &= ~O_NONBLOCK;
 	fcntl( fdPlayback, F_SETFL, flags );
+	
+*/
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
@@ -261,74 +266,64 @@ int OssSoundDevice::closeRecord(){
 	return 0;
 }
 
-int OssSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
+int OssSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 
 	int nReadBytes = 0;
-	int totalBytesRead = 0;
-//	struct timeval tv, tv2;
-//	struct timezone tz;
-        
 	int nBytesToRead = nSamples * getSampleSize() * getNChannelsRecord();
+	int totalSamplesRead = 0;
 	
 	if( fdRecord == -1 ){
 		return -1;
 	}
 
-	while( totalBytesRead < nBytesToRead ){
+	nReadBytes = ::read( fdRecord, 
+				buffer, 
+				nBytesToRead );
 
-		nReadBytes = ::read( fdRecord, buffer, nBytesToRead - totalBytesRead );
-			//cerr<< "Read from the card" << nReadBytes << endl;
-
-		if( nReadBytes < 0 ){
-			if( ioctl( fdRecord, SNDCTL_DSP_SYNC ) == -1 ){
-				perror( "ioctl sync error on soundcard" );
-			}
-			nReadBytes = ::read( fdRecord, buffer, nBytesToRead - totalBytesRead );
-
-			if( nReadBytes < 0 ){
-				perror( "read" );
-				return -1;
-			}
-		}
-
-		totalBytesRead += nReadBytes;
+	if( nReadBytes >= 0 ){
+		totalSamplesRead = nReadBytes / ( getSampleSize() * getNChannelsRecord() );
+	} else {
+		totalSamplesRead == errno;
+//this call to dsp_sync was here ... i don't think it is needed ...
+// 		if( ioctl( fdRecord, SNDCTL_DSP_SYNC ) == -1 ){
+//			perror( "ioctl sync error on soundcard" );
+// 			totalSamplesRead = -EPIPE;
+// 		} else {
+// 			totalSamplesRead == errno;
+// 		}
 	}
-	
-// 	printf( "OSS: read %d samples, %d bytes\n", nSamples, totalBytesRead );
-	
-	return totalBytesRead;
+	return totalSamplesRead;
 }
 
-int OssSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
+int OssSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 
 	int nWrittenBytes = 0;
-	int totalBytesWritten = 0;
 	int nBytesToWrite = nSamples * getSampleSize() * getNChannelsPlay();
+	int totalSamplesWritten = 0;
 
 	if( fdPlayback == -1 ){
 		return -1;
 	}
 
-	while( totalBytesWritten < nBytesToWrite ){
-		nWrittenBytes = ::write( fdPlayback, buffer, nBytesToWrite - totalBytesWritten );
-
-		if( nWrittenBytes < 0 ){
-			/* FIXME */
-			cerr << "Error while writing to soundcard" << endl;
-			return -1;
-		}
-
-		if( nWrittenBytes != nBytesToWrite - totalBytesWritten ){
-			cerr << "Soundcard did not write all the samples" << endl;
-			cerr << "nWrittenBytes" << nWrittenBytes << endl;
-		}
-
-		totalBytesWritten += nWrittenBytes;
-	}
-
-	return totalBytesWritten;
-}
+	nWrittenBytes = ::write( fdPlayback, 
+				buffer, 
+				nBytesToWrite );
 	
+	if( nWrittenBytes >= 0 ) {
+		//convert back to samples ... 
+		totalSamplesWritten = nWrittenBytes / ( getSampleSize() * getNChannelsPlay() );
+	} else {
+		totalSamplesWritten = errno;
+		if( errno == EAGAIN || errno == EINTR ) {
+			totalSamplesWritten = errno;
+		} else { //if some weird error ... resync and continue ... 
+			sync();
+			totalSamplesWritten = 0;
+		}
+	}
+	return totalSamplesWritten;
+}
+
 void OssSoundDevice::sync(){
 	bool interrupted = false;
 	do{

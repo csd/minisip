@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #include"DirectSoundDevice.h"
@@ -57,12 +58,12 @@ int DirectSoundDevice::closePlayback(){
 	return 0;
 }
 
-int DirectSoundDevice::read( byte_t * buffer, uint32_t nSamples ){
+int DirectSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	
 	return nSamples;
 }
 
-int DirectSoundDevice::write( byte_t * buffer, uint32_t nSamples ){
+int DirectSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 
 
 	return nSamples;

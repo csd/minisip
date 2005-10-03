@@ -18,7 +18,8 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- */
+  *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
+*/
 
 #include<config.h>
 
@@ -92,7 +93,7 @@ FileSoundDevice::FileSoundDevice(string in_file,
 
 	sleepTime = 20; //default value 
 	lastTimeRead = 0;
-	lastTimeWrite = 0;
+// 	lastTimeWrite = 0;
 
 	isFirstTimeOpenWrite = true;
 	loopRecord = true;
@@ -204,17 +205,12 @@ int FileSoundDevice::closePlayback(){
 	if( ret == -1 ) {
 		printError("openPlayback");
 	}
-	lastTimeWrite = 0;
+// 	lastTimeWrite = 0;
 	return ret;
 }
 
-
-void FileSoundDevice::sync(){
-	cerr << "ERROR: sync unimplemented for file sound device"<< endl;
-}
-
 //n is in samples! not in bytes
-int FileSoundDevice::read(byte_t *buf, uint32_t n){
+int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
 	int retValue;
 	
 	if (lastTimeRead==0){
@@ -234,21 +230,7 @@ int FileSoundDevice::read(byte_t *buf, uint32_t n){
 		}
 	}
 	
-	//select the appropriate way to write to the file ...
-	switch( fileType ) {
-		case FILESOUND_TYPE_RAW: 
-			retValue = ::read(in_fd, 
-					buf, 
-					n * getSampleSize() * getNChannelsRecord() );
-			if( retValue == -1 ) {
-				printError( "read" );
-			}
-			break;
-		case FILESOUND_TYPE_WAV:
-		case FILESOUND_TYPE_MP3:
-			cerr << "FileSoundDevice::read - filetype not implemented" << endl;
-			break;
-	}
+	SoundDevice::read( buffer, nSamples );
 	
 	if( sleepTime != 0 )
 		readSleep();
@@ -256,36 +238,28 @@ int FileSoundDevice::read(byte_t *buf, uint32_t n){
 	return retValue;
 }
 
-//n is in samples!! not in bytes
-int FileSoundDevice::write(byte_t *buf, uint32_t n){
+int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 	int retValue;
-	
-	if (lastTimeWrite==0)
-		lastTimeWrite=mtime();
-	
+
 	//select the appropriate way to write to the file ...
 	switch( fileType ) {
 		case FILESOUND_TYPE_RAW: 
-			//write n samples to the file ... 
-			retValue = ::write(out_fd, 
+			retValue = ::read(in_fd, 
 					buf, 
-					n * getSampleSize() * getNChannelsPlay() );
+					nSamples * getSampleSize() * getNChannelsRecord() );
 			if( retValue == -1 ) {
-				printError( "write" );
+				retValue = errno;
+				printError( "readFromDevice" );
+			} else {
+				retValue = retValue / ( getSampleSize() * getNChannelsRecord() );
 			}
 			break;
 		case FILESOUND_TYPE_WAV:
 		case FILESOUND_TYPE_MP3:
-			cerr << "FileSoundDevice::write - filetype not implemented" << endl;
+			cerr << "FileSoundDevice::readFromDevice - filetype not implemented" << endl;
 			break;
 	}
-
-	if( sleepTime != 0 )
-		writeSleep();
-	
-	return retValue;
 }
-
 
 void FileSoundDevice::readSleep( ) {
 	uint64_t currentTime;
@@ -309,6 +283,35 @@ void FileSoundDevice::readSleep( ) {
 	lastTimeRead+=sleepTime;
 }
 
+//n is in samples!! not in bytes
+int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
+	int retValue = -1;
+	
+	//select the appropriate way to write to the file ...
+	switch( fileType ) {
+		case FILESOUND_TYPE_RAW: 
+			//write n samples to the file ... 
+			retValue = ::write(out_fd, 
+					buf, 
+					nSamples * getSampleSize() * getNChannelsPlay() );
+			if( retValue == -1 ) {
+				retValue = errno;
+				printError( "write" );
+			} else {
+				retValue = retValue / ( getSampleSize() * getNChannelsPlay() );
+			}
+			break;
+		case FILESOUND_TYPE_WAV:
+		case FILESOUND_TYPE_MP3:
+			cerr << "FileSoundDevice::write - filetype not implemented" << endl;
+			break;
+	}
+
+	return retValue;
+}
+
+#if 0
+//not used ...
 void FileSoundDevice::writeSleep( ) {
 	uint64_t currentTime;
 	
@@ -330,6 +333,11 @@ void FileSoundDevice::writeSleep( ) {
 	
 	//lastTimeWrite = currentTime;
 	lastTimeWrite += sleepTime;
+}
+#endif
+
+void FileSoundDevice::sync(){
+	cerr << "ERROR: sync unimplemented for file sound device"<< endl;
 }
 
 int FileSoundDevice::getFileSize( int fd ) {
@@ -362,7 +370,7 @@ int FileSoundDevice::getFileSize( int fd ) {
 }
 
 void FileSoundDevice::printError( string func ) {
-	string errStr;
+	string errStr;	
 	errStr = "FileSoundDevice::" + func + " - errno = ";
 	switch( errno ) {
 		case EACCES: errStr + "eaccess"; break;

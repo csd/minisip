@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #ifndef SOUND_DEVICE_H
@@ -73,6 +74,15 @@ Playback refers to the action of sending audio samples to the
 Record refers to the action of reading from the device in order
 	to process and send them to the network.
 		Ex - read from soundcard/mic, to capture the sound
+		
+The key functions are not implemented, as they are device dependant
+(open, close, read, write, ... )
+
+VERY IMPORTANT: 
+The device is opened in blocking mode for recording, 
+but it is opened in NON-BLOCKING mode for playback (it has to be like
+this, otherwise the playback thread cannot catch up with the producers
+on the network side).
 */
 class SoundDevice: public MObject{
 	public:
@@ -101,10 +111,18 @@ class SoundDevice: public MObject{
 		/**
 		Open the "playback" side of the SoundDevice, that is, the one 
 		in charge of writing to the device.
+		OPENS IN NON-BLOCKING mode.
 		*/
 		virtual int openPlayback( int32_t samplingRate, int nChannels, int format )=0;
 		
+		/**
+		Close the device for recording only (no more recording possible, till it is opened again)
+		*/
 		virtual int closeRecord()=0;
+		
+		/**
+		Close the device for playback only (no more playback possible, till it is opened again).
+		*/
 		virtual int closePlayback()=0;
 		
 		bool isOpenedPlayback(){return openedPlayback;};
@@ -117,9 +135,28 @@ class SoundDevice: public MObject{
 		@param buffer byte pointer to a memory block where the audio samples
 			are to be stored. 
 		@param nSamples number of samples in the buffer. To obtain the actual byte
-			length of the buffer, use nSamples * getSampleSize() * getNChannelsXX()
+			length of the buffer in bytes, use 
+			nSamples * getSampleSize() * getNChannelsXX()
+		
+		@return It returns the number of samples read (not bytes! samples), or -1 if error
 		*/
-		virtual int read( byte_t * buffer, uint32_t nSamples )=0;
+		virtual int read( byte_t * buffer, uint32_t nSamples );
+
+		/**
+		This is the actual call to the device read ... it is done automatically by the "read" function.
+		Do not loop or anything. Just attempt to write once and return the result. No more.
+		@param The same as "read"
+		@return number of samples read, like "read". If error, it returns a negative error code (-EAGAIN,
+			-EBADF, etc ...; it is important). If a sync error is detected, return -EPIPE!
+		*/
+		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples ) = 0;
+		
+		/**
+		If after reading from the device we have an error due to synchronism, we call this function.
+		If the readFromDevice function detects such an error, it will return -EPIPE.
+		@return -1 if something went wrong; 0 otherwise
+		*/
+		virtual int readSyncError( byte_t * buffer, uint32_t nSamples ) { return 0; };
 		
 		/**
 		Write to the device.
@@ -128,10 +165,29 @@ class SoundDevice: public MObject{
 		@param buffer byte pointer to a memory block where the audio samples
 			are stored. 
 		@param nSamples number of samples in the buffer. To obtain the actual byte
-			length of the buffer, use nSamples * getSampleSize() * getNChannelsXX()
+			length of the buffer in bytes, use
+			nSamples * getSampleSize() * getNChannelsXX()
+		
+		@return It will return the number of samples written (not bytes! samples), or -1 if error
 		*/
-		virtual int write( byte_t * buffer, uint32_t nSamples )=0;
+		virtual int write( byte_t * buffer, uint32_t nSamples );
 
+		/**
+		Actual write function to the device. It is used by "write" automatically.
+		Do not loop or anything. Just attempt to write once and return the result. No more.
+		@param The same as "read"
+		@return number of samples written, like "write". If error, it returns a negative error code (-EAGAIN,
+			-EBADF, etc ...; it is important). If a sync error is detected, return -EPIPE!
+		*/
+		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples ) = 0;
+
+		/**
+		If after writing to the device we have an error due to synchronism, we call this function.
+		If the writeToDevice function detects such an error, it will return -EPIPE.
+		@return -1 if something went wrong; 0 otherwise
+		*/
+		virtual int writeSyncError( byte_t * buffer, uint32_t nSamples ) { return 0; };
+		
 		/**
 		Wait till the devices buffers are empty.
 		*/
@@ -165,6 +221,17 @@ class SoundDevice: public MObject{
 		Return the number of bytes per sample.
 		*/
 		int getSampleSize() { return sampleSize; }
+		
+		/**
+		Controlls the sleep time for the read/write operations
+		This allows to simulate a synchronous source/sink of data, like a 
+		soundcard would do. Otherwise, when reading from a file, for example, 
+		would produce data continuously.
+		@param sleep set the sleep timeout for read/write, in miliseconds. -1 deactivates
+			the sleep. 
+		*/
+		void setSleepTime( int sleep ) { sleepTime = sleep; };
+		int getSleepTime( ) { return sleepTime; };
 
 	protected:
 		SoundDevice( std::string fileName );
@@ -195,6 +262,13 @@ class SoundDevice: public MObject{
 		Bytes per audio sample.
 		*/
 		int sampleSize;
+		
+		/**
+		See setSleepTimer function.
+		Timeout, in miliseconds.
+		Default value is 20 milisecons
+		*/
+		uint sleepTime;
 		
 		bool openedRecord;
 		bool openedPlayback;

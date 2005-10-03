@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #ifndef FILESOUNDDEVICE_H
@@ -75,34 +76,31 @@ class FileSoundDevice: public SoundDevice{
 				int32_t filetype=FILESOUND_TYPE_RAW );
 		
 		/**
+		We need to add a blocking behavior to the reading of the file, 
+		plus looping.
+		Thus, we some specific code, but still call the SoundDevice::read function
+		*/
+		virtual int read( byte_t * buffer, uint32_t nSamples );
+		
+		/**
 		Read from the "record" file, that is, this file is read
 		and the audio samples are to be processed (i.e, to send to
 		the network).
 		*/
-		virtual int read( byte_t * buffer, uint32_t nSamples );
+		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
 		
 		/**
 		Write to the "playback" file, that is, the file where the
 		"received" audio is stored for later playback.
 		*/
-		virtual int write( byte_t * buffer, uint32_t nSamples );
+		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
 
 		virtual int openPlayback( int32_t samplingRate, int nChannels, int format=SOUND_S16LE );
 		virtual int openRecord( int32_t samplingRate, int nChannels, int format=SOUND_S16LE );
+		
 		virtual int closePlayback();
 		virtual int closeRecord();
 		
-		/**
-		Controlls the sleep time for the read/write operations
-		This allows to simulate a synchronous source/sink of data, like a 
-		soundcard would do. Otherwise, when reading from a file, for example, 
-		would produce data continuously.
-		@param sleep set the sleep timeout for read/write, in miliseconds. -1 deactivates
-			the sleep. 
-		*/
-		void setSleepTime( int sleep ) { sleepTime = sleep; };
-		int getSleepTime( ) { return sleepTime; };
-
 		/**
 		Set/get functions for the looping of the record file (the one played to the
 		other peer). 
@@ -161,22 +159,16 @@ class FileSoundDevice: public SoundDevice{
 		*/
 		void printError( string func );
 		
-		/**
-		See setSleepTimer function.
-		Timeout, in miliseconds.
-		*/
-		uint sleepTime;
-
-		/**
-		Implements a sleep function, used to synchronize the writing of
-		audio samples. It sleeps for sleepTime miliseconds.
-		*/		
-		void writeSleep( );
+//		/**
+//		Implements a sleep function, used to synchronize the writing of
+//		audio samples. It sleeps for sleepTime miliseconds.
+//		*/		
+// 		void writeSleep( );
 		
-		/**
-		State variable, used in writeSleep()
-		*/
-		uint64_t lastTimeWrite;
+//		/**
+//		State variable, used in writeSleep()
+//		*/
+//		uint64_t lastTimeWrite;
 		
 		/**
 		Implements a sleep function, used to synchronize the reading of

@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
 #ifndef OSSSOUNDDEVICE_H
@@ -41,18 +42,18 @@ class OssSoundDevice: public SoundDevice{
 	public:
 		OssSoundDevice( std::string device );
 		
-		virtual int read( byte_t * buffer, uint32_t nSamples );
-		virtual int write( byte_t * buffer, uint32_t nSamples );
-
+		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
+		virtual int writeToDevice( byte_t * buffer, uint32_t nSamples );
+				
 		virtual int openPlayback( int32_t samplingRate, int nChannels, int format );
 		virtual int openRecord( int32_t samplingRate, int nChannels, int format );
+		
 		virtual int closePlayback();
 		virtual int closeRecord();
 
 		virtual void sync();
 
 		virtual std::string getMemObjectType(){ return "OssSoundDevice";};
-
 
 	private:
 		int fdPlayback;
