@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2005 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -53,8 +53,10 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		transferArrow( "Call transfer" ),
 		transferHBox( false ),
 		transferButton( "Transfer" ),
-		monitoringButton( "Mute microphone" ),
-		audioOutSilenceButton( "Silence for my ears"),
+//		monitoringButton( "Mute microphone" ),
+//		audioOutSilenceButton( "Silence for my ears"),
+		monitoringButton( Gtk::StockID( "minisip_play" ), Gtk::StockID( "minisip_noplay" ) ),
+		audioOutSilenceButton( Gtk::StockID( "minisip_record" ), Gtk::StockID( "minisip_norecord" ) ),
 #endif
 		secureImage(),// Gtk::StockID( "minisip_insecure" ), 
 					//   Gtk::ICON_SIZE_DIALOG ),
@@ -100,17 +102,21 @@ CallWidget::CallWidget( string callId, string remoteUri,
 
 	status.set_use_markup( true );
 	secStatus.set_use_markup( true );
+	topBox->show_all();
 
 #ifndef OLDLIBGLADEMM
-	pack_start( monitoringButton, false, false, 4 );
+	topBox = manage( new Gtk::HBox );
+	topBox->pack_start( monitoringButton, false, false );
 	monitoringButton.signal_toggled().connect( 
 		SLOT( *this, 
 			&CallWidget::monitorButtonToggled ) );
 			
-	pack_start( audioOutSilenceButton, false, false, 4 );
+	topBox->pack_start( audioOutSilenceButton, false, false );
 	audioOutSilenceButton.signal_toggled().connect( 
 		SLOT( *this, 
 			&CallWidget::audioOutSilenceButtonToggled ) );
+	
+	pack_start( *topBox, false, false, 4 );
 	
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
 	dtmfWidget->setHandler( this );
@@ -354,7 +360,7 @@ bool CallWidget::handleCommand( CommandString command ){
 			callIds.remove( command.getDestinationId() );
 			if( command.getDestinationId() == mainCallId ){
 					status.set_markup( "<b><big>Call Terminated</big></b>" );
-					secStatus.set_text( "" );
+//					secStatus.set_text( "" );
 					rejectButton.set_label( "Close" );
 					state = CALL_WIDGET_STATE_TERMINATED;
 #ifndef OLDLIBGLADEMM
@@ -403,8 +409,8 @@ bool CallWidget::handleCommand( CommandString command ){
 		if( command.getOp() == SipCommandString::security_failed ){
 			stopRinging();
 
-			status.set_text( "Security is not handled by the receiver" );
-			secStatus.set_text( "" );
+			secStatus.set_text( "Security is not handled by the receiver" );
+//			secStatus.set_text( "" );
 			rejectButton.set_label( "Close" );
 			state = CALL_WIDGET_STATE_TERMINATED;
 		}
@@ -557,3 +563,25 @@ void CallWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 	}
 }
 
+
+IconToggleButton::IconToggleButton( Gtk::StockID id1, Gtk::StockID id2 ):
+	image1( id1, Gtk::ICON_SIZE_BUTTON ),image2( id2, Gtk::ICON_SIZE_BUTTON ){
+	set_relief( Gtk::RELIEF_NONE );
+	add( image1 );
+	image1.show_all();
+	image2.show_all();
+}
+
+void IconToggleButton::on_toggled(){
+	if( get_active() ){
+		remove();
+		add( image2 );
+//		image1.show_all();
+	}
+	else{
+		remove();
+		add( image1 );
+//		image2.show_all();
+	}
+	Gtk::ToggleButton::on_toggled();
+}

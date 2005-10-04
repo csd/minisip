@@ -925,6 +925,50 @@ void MainWindow::registerIcons(){
 	iconSet->add_source( *iconSource );
 
 	factory->add( Gtk::StockID( "minisip_insecure" ), *iconSet );
+	
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/play.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
+	iconSet->add_source( *iconSource );
+
+	factory->add( Gtk::StockID( "minisip_play" ), *iconSet );
+	
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/noplay.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
+	iconSet->add_source( *iconSource );
+
+	factory->add( Gtk::StockID( "minisip_noplay" ), *iconSet );
+	
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/record.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
+	iconSet->add_source( *iconSource );
+
+	factory->add( Gtk::StockID( "minisip_record" ), *iconSet );
+	
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( (string)MINISIP_DATADIR + "/norecord.png" );
+	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
+	iconSet->add_source( *iconSource );
+
+	factory->add( Gtk::StockID( "minisip_norecord" ), *iconSet );
 
 	factory->add_default();
 	delete iconSet;

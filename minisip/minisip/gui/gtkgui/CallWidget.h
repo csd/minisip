@@ -42,6 +42,16 @@
 
 class MainWindow;
 
+/* ToggleButton which toggles its icon as well */
+class IconToggleButton : public Gtk::ToggleButton{
+	public:
+		IconToggleButton( Gtk::StockID, Gtk::StockID );
+	private:
+		Gtk::Image image1;
+		Gtk::Image image2;
+		virtual void on_toggled();
+};
+
 /* Button that contains a stock icon, but not the associated label */
 class StockButton : public Gtk::Button{
 	public:
@@ -121,8 +131,10 @@ class CallWidget : public Gtk::VBox
 		Gtk::Button transferButton;
 //		Gtk::ProgressBar transferProgress;
 		Gtk::Label transferProgress;
-		Gtk::CheckButton monitoringButton;
-		Gtk::CheckButton audioOutSilenceButton;
+//		Gtk::CheckButton monitoringButton;
+//		Gtk::CheckButton audioOutSilenceButton;
+		IconToggleButton monitoringButton;
+		IconToggleButton audioOutSilenceButton;
 
 #endif
 		Gtk::Image secureImage;

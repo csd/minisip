@@ -1,5 +1,6 @@
-CPPFLAGS = @CPPFLAGS@ -DDATADIR="$(datadir)"
+CPPFLAGS = @CPPFLAGS@ -DDATADIR="$(datadir)" -DPLUGIN_PATH="$(pkglibdir)"
 LDFLAGS = @LDFLAGS@
+
 
 noinst_HEADERS = include/*.h 
 
@@ -13,7 +14,7 @@ if P2T_SUPPORT
   p2t_dir = p2t
 endif
 
-dist_pkgdata_DATA = share/tray_icon.png share/secure.png share/insecure.png share/minisip.glade
+dist_pkgdata_DATA = share/tray_icon.png share/secure.png share/insecure.png share/record.png share/norecord.png share/play.png share/noplay.png share/minisip.glade
 EXTRA_DIST = test_cert/*.pem Documentation/* minisip-libavcodec.patch share/minisip.png share/minisip.desktop minisip.spec
 
 if HILDON_SUPPORT
