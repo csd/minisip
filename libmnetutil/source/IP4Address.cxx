@@ -72,6 +72,7 @@ IP4Address::IP4Address(struct sockaddr_in *sin){
 	
 	memcpy(sockaddress, sin, sizeof(struct sockaddr_in));
 	numIp = ntoh32(sin->sin_addr.s_addr);
+	ipaddr = string(inet_ntoa(in_addr((sin->sin_addr))));
 } 
 
 uint32_t IP4Address::getBinaryIP(){

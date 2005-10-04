@@ -40,8 +40,9 @@
 #define IP_ADDRESS_TYPE_V6      1
 
 #include<string>
+#include<libmutil/MemObject.h>
 
-class LIBMNETUTIL_API IPAddress {
+class LIBMNETUTIL_API IPAddress : public MObject{
 	public:
 		virtual ~IPAddress();
 
