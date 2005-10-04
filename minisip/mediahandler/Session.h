@@ -26,7 +26,6 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
 #include"../sip/SipDialogSecurityConfig.h"
-#include "SessionRegistry.h"
 #include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
 #include<../sdp/SdpPacket.h>
@@ -271,5 +270,8 @@ class Session : public MObject{
                 //DtmfSender dtmfSender;
                 MRef<TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> > *> dtmfTOProvider;
 };
+
+
+#include "SessionRegistry.h"
 
 #endif
