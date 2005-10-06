@@ -88,7 +88,7 @@ SipNotify::SipNotify(string branch,
 	addHeader(new SipHeader(*seqp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent("Minisip");
+	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
 	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent();

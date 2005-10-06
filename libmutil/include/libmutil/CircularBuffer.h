@@ -56,10 +56,14 @@ class LIBMUTIL_API CircularBuffer {
 		If there is not enough space, nothing will be written.
 		@param s data buffer
 		@param len length of the data buffer
+		@param forcedWrite force writting, even if this means overwritting 
+			part of the contents. Use with caution.
 		@return true if written correctly, else false (indicates
 			either an error or that there was not enough space).
+			If forcedWrite is true and we managed to write (the buff max capacity
+			is big enough), we return true.
 		*/
-		virtual bool write( const short *s, int len);
+		virtual bool write( const short *s, int len, bool forcedWrite = false);
 		
 		/**
 		Read len elements from circular buffer to s buffer.

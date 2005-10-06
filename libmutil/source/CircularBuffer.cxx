@@ -24,6 +24,8 @@ See Note in the header file about the source.
 
 #include <config.h>
 
+// #include<stdio.h>
+
 #include <string.h> //for memcpy
 
 CircularBuffer::CircularBuffer(int size):
@@ -44,12 +46,28 @@ CircularBuffer::~CircularBuffer()
 	}
 }
 
-bool CircularBuffer::write(const short *s, int len) {
+bool CircularBuffer::write(const short *s, int len, bool forcedWrite ) {
 	
 	if( len > getFree() )
 	{
-		return false; // overflow
+		if( !forcedWrite ) {
+			return false; // overflow
+		} else {
+			if( len > getMaxSize() ) {
+				return false; //force write but not enough capacity
+			} else { //remove enough stuff to fit this forces write
+				int removeNum;
+				removeNum = len - getFree(); 
+// 				printf("CBRM\n");
+				if( ! remove( removeNum )  ) {
+					return false; //strange error ...
+				}
+			}
+		}
 	}
+	
+	//from here, just write ... 
+	//if the write is forced, we already made space for it to fit ...
 	
 	byteCounter += (unsigned long)len;
 	

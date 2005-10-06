@@ -94,7 +94,7 @@ SipRegister::SipRegister(string branch,
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent("Minisip");
+	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 }
 
@@ -138,7 +138,7 @@ SipRegister::SipRegister(string branch,
 	addHeader(new SipHeader(*contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent("Minisip");
+	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 	
         MRef<SipHeaderValue*> authp = 

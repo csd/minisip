@@ -88,7 +88,7 @@ SipIMMessage::SipIMMessage(string branch,
 	
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent("Minisip");
+	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
 	setContent(new SipMessageContentIM(msg));

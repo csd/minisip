@@ -201,7 +201,7 @@ void SipInvite::createHeadersAndContent(
 	addHeader(new SipHeader(contactp));
 	
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent("Minisip");
+	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 }
 

@@ -45,6 +45,8 @@
 
 #include<libmsip/SipHeader.h>
 
+#define HEADER_USER_AGENT_DEFAULT	"Minisip"
+
 /**
  * @author Erik Eliasson
 */
