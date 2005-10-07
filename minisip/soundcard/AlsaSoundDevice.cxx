@@ -81,8 +81,8 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	
 	// Play ...
 	
-// 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  SND_PCM_NONBLOCK)<0){
-	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  0/*SND_PCM_NONBLOCK*/)<0){
+ 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  SND_PCM_NONBLOCK)<0){
+//	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  0/*SND_PCM_NONBLOCK*/)<0){
 		cerr << "Could not open ALSA sound card" << endl;
 		exit(-1);
 	}
