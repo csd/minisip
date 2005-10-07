@@ -70,7 +70,7 @@ GsmCodecState::~GsmCodecState(){
 }
 
 uint32_t GsmCodecState::encode( void *inBuf, int32_t inSize, void *outBuf ){
-	if( inSize != GSM_EXEPECTED_INPUT ){
+	if( inSize != GSM_EXEPECTED_INPUT * sizeof( short ) ){
 		return 0;
 	}
 
