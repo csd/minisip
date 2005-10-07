@@ -33,6 +33,9 @@
 // #include <sys/time.h>
 // #include <time.h>
 
+#define PLAYOUT_FRAGMENT_SETTINGS 0x0002000C
+#define RECORD_FRAGMENT_SETTINGS  0x0014000C
+
 using namespace std;
 
 OssSoundDevice::OssSoundDevice( string device ):SoundDevice( device ){
@@ -50,7 +53,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	
 	int mode = O_WRONLY; 	
 	/* FIXME */
-	this->fragment_setting = 0x00100008;
+	this->fragment_setting = PLAYOUT_FRAGMENT_SETTINGS;
 	
 	fdPlayback = ::open( dev.c_str(), mode | O_NONBLOCK );
 	
@@ -160,7 +163,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	
 	int mode = O_RDONLY; /*duplex ? O_RDWR : O_WRONLY;*/
 	/* FIXME */
-	this->fragment_setting = 0x00140008;
+	this->fragment_setting = RECORD_FRAGMENT_SETTINGS;
 	
 	fdRecord = ::open( dev.c_str(), mode | O_NONBLOCK );
 	
