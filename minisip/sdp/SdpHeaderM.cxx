@@ -210,6 +210,20 @@ string SdpHeaderM::getRtpMap(uint32_t format){
 	return "";
 }
 
+string SdpHeaderM::getFmtpParam(uint32_t format){
+	int i=0;
+	string rtpmap;
+
+	while((rtpmap = getAttribute("fmtp",i)) != ""){
+		size_t firstSpace = rtpmap.find(" ");
+		if( rtpmap.substr(0, firstSpace) == itoa(format) ){
+			return rtpmap.substr(firstSpace+1, rtpmap.size());
+		}
+		i++;
+	}
+	return "";
+}
+
 list<MRef<SdpHeaderA *> > SdpHeaderM::getAttributes(){
 	return attributes;
 }

@@ -149,6 +149,11 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 				a->setAttributes( "rtpmap: " + itoa( payloadType) + " " + rtpmap );
 				m->addAttribute( *a );
 			}
+			if( (*iC)->getCodecName() == "iLBC" ) { //for now, iLBC codec only supports 20ms frames
+				MRef<SdpHeaderA*> ilbc_fmtp = new SdpHeaderA("a=X");
+				ilbc_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " mode=20" );
+				m->addAttribute(*ilbc_fmtp);
+			}
 		}
 		//added static DTMF SDP headers in INVITE
 		m->addFormat(101);

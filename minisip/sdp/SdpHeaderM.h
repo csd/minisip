@@ -69,7 +69,9 @@ class SdpHeaderM : public SdpHeader{
 		list<MRef<SdpHeaderA*> > getAttributes();
 
 		std::string getRtpMap(uint32_t format);
-
+		
+		std::string getFmtpParam(uint32_t format);
+		
 	private:
 		string media;
 		int32_t port;

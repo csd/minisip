@@ -84,6 +84,8 @@ list<string> MediaStream::getSdpAttributes(){
 
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         string sdpRtpMap;
+	string sdpFmtpParam;
+	
         //	int i;
         uint8_t sdpPayloadType = m->getFormat(formatIndex);
 
@@ -95,6 +97,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         }
 
         sdpRtpMap = m->getRtpMap( sdpPayloadType );
+	sdpFmtpParam = m->getFmtpParam( sdpPayloadType );
 	
 	std::list<MRef<Codec *> > codecs = media->getAvailableCodecs();
 	std::list<MRef<Codec *> >::iterator iC;
@@ -108,6 +111,9 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
+		if( (*iC)->getCodecName() == "iLBC" && sdpFmtpParam != "mode=20" ) { //iLBC only supports 20ms frames (in minisip)
+			continue;
+		}
                 if( sdpRtpMap != "" && codecRtpMap != "" ){
                         s1 = codecRtpMap.find("/");
                         bool sdpRtpMapEqual = !strcasecmp( codecRtpMap.substr(0, s1).c_str(), sdpRtpMap.substr(0,s2).c_str() );
