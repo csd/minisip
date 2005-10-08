@@ -390,7 +390,7 @@ void MainWindow::gotCommand(){
 	CommandString command = commands.pop_back();
 	commandsLock.unlock();
 #ifdef OUTPUT_DEBUG
-	merr << "DEBUG: MainWindow::gotCmd :  " << command.getString() << end;
+// 	merr << "DEBUG: MainWindow::gotCmd :  " << command.getString() << end;
 #endif
 	if( command.getOp() == "sip_ready" ){
 		mainWindowWidget->set_sensitive( true );
@@ -461,9 +461,9 @@ void MainWindow::gotCommand(){
 		MRef<ContactEntry*> ce = contactDb->lookUp(command.getParam());
 		if (ce){
 			string state = command.getParam2();
-			cerr << "State is: "<< state << endl;
+// 			cerr << "State is: "<< state << endl;
 			if (state =="online"){
-				cerr << "Changed status to online "<< endl;
+// 				cerr << "Changed status to online "<< endl;
 				ce->setOnlineStatus(CONTACT_STATUS_ONLINE);
 			}else if (state=="offline")
 				ce->setOnlineStatus(CONTACT_STATUS_OFFLINE);
@@ -473,7 +473,7 @@ void MainWindow::gotCommand(){
 			phoneBookTreeView->queue_draw();
 			
 		}else{
-			cerr << "MainWindow::gotCommand: WARNING: did not find uri <"<< command.getParam()<< "> to change presence info"<< endl;
+// 			cerr << "MainWindow::gotCommand: WARNING: did not find uri <"<< command.getParam()<< "> to change presence info"<< endl;
 		}
 		return;
 	}
