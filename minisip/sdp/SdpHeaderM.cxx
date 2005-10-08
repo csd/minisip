@@ -198,12 +198,14 @@ string SdpHeaderM::getAttribute(string key, uint32_t n){
 
 string SdpHeaderM::getRtpMap(uint32_t format){
 	int i=0;
-	string rtpmap;
+	string attrib;
+	string value = "rtpmap";
 
-	while((rtpmap = getAttribute("rtpmap",i)) != ""){
-		size_t firstSpace = rtpmap.find(" ");
-		if( rtpmap.substr(0, firstSpace) == itoa(format) ){
-			return rtpmap.substr(firstSpace+1, rtpmap.size());
+	while((attrib = getAttribute(value, i)) != ""){
+		size_t firstSpace = attrib.find(" ");
+// 		cerr << "SdpHeaderM::getRtpMap - value retrieved = " << attrib << "; substr = " << attrib.substr(0, firstSpace) << endl;
+		if( attrib.substr(0, firstSpace) == itoa(format) ){
+			return attrib.substr(firstSpace+1, attrib.size());
 		}
 		i++;
 	}
@@ -212,12 +214,14 @@ string SdpHeaderM::getRtpMap(uint32_t format){
 
 string SdpHeaderM::getFmtpParam(uint32_t format){
 	int i=0;
-	string rtpmap;
+	string attrib;
+	string value = "fmtp";
 
-	while((rtpmap = getAttribute("fmtp",i)) != ""){
-		size_t firstSpace = rtpmap.find(" ");
-		if( rtpmap.substr(0, firstSpace) == itoa(format) ){
-			return rtpmap.substr(firstSpace+1, rtpmap.size());
+	while((attrib = getAttribute(value, i)) != ""){
+		size_t firstSpace = attrib.find(" ");
+// 		cerr << "SdpHeaderM::getFmtpParam - value retrieved = " << attrib << "; substr = " << attrib.substr(0, firstSpace) << endl;
+		if( attrib.substr(0, firstSpace) == itoa(format) ){
+			return attrib.substr(firstSpace+1, attrib.size());
 		}
 		i++;
 	}

@@ -107,12 +107,16 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         size_t s1;
         size_t s2 = sdpRtpMap.find("/");
 	
-
+// 	cerr << "MediaStream::match - start - sdpRtpMap = " << sdpRtpMap << endl;
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
-		if( (*iC)->getCodecName() == "iLBC" && sdpFmtpParam != "mode=20" ) { //iLBC only supports 20ms frames (in minisip)
-			continue;
+// 		cerr << "MediaStream::match - codecPayloadType = " << codecPayloadType << endl;
+		if( (*iC)->getCodecName() == "iLBC" ) {
+// 			cerr << "MediaStream::match - ilbc ... mode = " << sdpFmtpParam << endl;
+			if( sdpFmtpParam != "mode=20" ) { //iLBC only supports 20ms frames (in minisip)
+				continue;
+			} //else ... does not mean we accept it, it still goes through the normal checks ...
 		}
                 if( sdpRtpMap != "" && codecRtpMap != "" ){
                         s1 = codecRtpMap.find("/");
@@ -130,6 +134,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                         }
                 }
         }
+// 	cerr << "MediaStream::match - end - return false" << endl;
         return false;
 }
 

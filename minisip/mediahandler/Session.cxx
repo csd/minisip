@@ -113,14 +113,14 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 	std::list<std::string>::iterator iAttribute;
 	std::list<std::string> attributes;
 	string type;
-	uint16_t localPort;
+	uint16_t localPort;	
 	MRef<SdpHeaderM *> m;
 	string keyMgmtMessage;
 	std::list<MRef<Codec *> > codecs;
 	std::list<MRef<Codec *> >::iterator iC;
 	uint8_t payloadType;
 	string rtpmap;
-
+// 	cerr << "Session::getSdpOffer" << endl;
 	result = emptySdp();
 	if( securityConfig.secured ){
 		MRef<SdpHeaderA *> a;
@@ -146,7 +146,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			m->addFormat( payloadType );
 			if( rtpmap != "" ){
 				MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
-				a->setAttributes( "rtpmap: " + itoa( payloadType) + " " + rtpmap );
+				a->setAttributes( "rtpmap:" + itoa( payloadType) + " " + rtpmap );
 				m->addAttribute( *a );
 			}
 			if( (*iC)->getCodecName() == "iLBC" ) { //for now, iLBC codec only supports 20ms frames
@@ -158,7 +158,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 		//added static DTMF SDP headers in INVITE
 		m->addFormat(101);
 		MRef<SdpHeaderA*> dtmf = new SdpHeaderA("a=X");
-		dtmf->setAttributes("rtpmap: 101 telephone-event/8000");
+		dtmf->setAttributes("rtpmap:101 telephone-event/8000");
 		m->addAttribute(*dtmf);
 		MRef<SdpHeaderA*> dtmf_fmtp = new SdpHeaderA("a=X");
 		dtmf_fmtp->setAttributes("fmtp:101 0-15");
@@ -174,7 +174,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 		}
 	}
 #ifdef DEBUG_OUTPUT	
-	merr << "Session::getSdpOffer: " << end << result->getString() << end << end;
+	cerr << "Session::getSdpOffer: " << endl << result->getString() << endl << endl;
 #endif
 	return result;
 }
@@ -188,7 +188,9 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	int port;
 
 	this->peerUri = peerUri;
-	
+#ifdef DEBUG_OUTPUT
+// 	cerr << "Session::setSdpAnswer" << endl;
+#endif
 	if( securityConfig.secured ){
 		/* get the keymgt: attribute */
 		string keyMgmtMessage = 
@@ -249,13 +251,20 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 	list< MRef<MediaStreamReceiver *> >::iterator iRStream;
 
 	/* If we have a sender for this format, activate it */
-	mdbg << "Starting senders loop" << end;
+#ifdef DEBUG_OUTPUT
+	mdbg << "Session::matchFormat: Starting senders loop" << end;
+#endif
 	uint8_t j = 1;
 	mediaStreamSendersLock.lock();
 	for( iSStream =  mediaStreamSenders.begin(); iSStream != mediaStreamSenders.end(); iSStream++,j++ ){
+#ifdef DEBUG_OUTPUT
 		mdbg << "Trying a sender"<< end;
+#endif
 		if( (*iSStream)->matches( m, iFormat ) ){
-			mdbg << "Found sender for " << (*iSStream)->getSdpMediaType().c_str()<< end;
+#ifdef DEBUG_OUTPUT
+			mdbg << "Found sender for " << (*iSStream)->getSdpMediaType()<< end;
+#endif
+
 #if 0
 			if( ka ){
 				ka->addSrtpStream( (*iStream)->getSsrc(),
@@ -272,9 +281,14 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 	}
 	mediaStreamSendersLock.unlock();
 	/* Look for a receiver */
+#ifdef DEBUG_OUTPUT
 	mdbg << "Starting receivers loop"<< end;
+#endif
 	for( iRStream =  mediaStreamReceivers.begin(); iRStream != mediaStreamReceivers.end(); iRStream ++ ){
 		if( (*iRStream)->matches( m, iFormat ) ){
+#ifdef DEBUG_OUTPUT
+			mdbg << "Found receiver for " << (*iRStream)->getSdpMediaType()<< end;
+#endif
 			return (*iRStream);
 		}
 	}
@@ -295,10 +309,11 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	std::list<std::string> attributes;
 	std::list<MRef<Codec *> > codecs;
 	std::list<MRef<Codec *> >::iterator iC;
-	uint8_t payloadType;
+// 	uint8_t payloadType;
 	string rtpmap;
 
 	this->peerUri = peerUri;
+// 	cerr << "Session::setSdpOffer" << endl;
 
 	keyMgmtMessage = offer->getSessionLevelAttribute( "key-mgmt" );
 
@@ -347,24 +362,23 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					}
 					
 					/* found a receiver, accept the offer */
-					codecs = receiver->getAvailableCodecs();
-
-					for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-						payloadType = (*iC)->getSdpMediaType();
-						rtpmap = (*iC)->getSdpMediaAttributes();
-
-						answerM->addFormat( payloadType );
-						if( rtpmap != "" ){
-							MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
-							a->setAttributes( "rtpmap: " + itoa( payloadType) + " " + rtpmap );
-							answerM->addAttribute( *a );
-						}
-					}
-
-					/* Additional attributes (framesize, ...) */
+					//add the payload type to the offer, as accepted ...
+					int payloadTypeAccepted = offerM->getFormat( j );
+					string payloadStr = itoa( payloadTypeAccepted );
+					answerM->addFormat( payloadTypeAccepted );
+					MRef<SdpHeaderA*> rtpmap = new SdpHeaderA("a=X");
+					MRef<SdpHeaderA*> fmtp = new SdpHeaderA("a=X");
+					       
+					rtpmap->setAttributes( "fmtp:" + payloadStr
+								 + " " + offerM->getRtpMap( payloadTypeAccepted ) );
+					fmtp->setAttributes(   "rtpmap:" + payloadStr
+								+ " " + offerM->getRtpMap( payloadTypeAccepted ) );
 					
+					answerM->addAttribute( *rtpmap );
+					answerM->addAttribute( *fmtp );
+					
+					/* Additional attributes (framesize, ...) */
 					attributes = receiver->getSdpAttributes();
-
 					for( iAttribute = attributes.begin(); iAttribute != attributes.end(); iAttribute ++ ){
 						MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
 						a->setAttributes( *iAttribute );
@@ -378,6 +392,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 }
 
 MRef<SdpPacket *> Session::getSdpAnswer(){
+// 	cerr << "Session::getSdpAnswer" << endl;
 	if( securityConfig.secured ){
 		string keyMgmtAnswer;
 		// Generate the key management answer message
