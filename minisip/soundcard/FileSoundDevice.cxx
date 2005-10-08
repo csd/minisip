@@ -222,11 +222,9 @@ int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
 		int currPos;
 		int fileSize;
 		//Check if we are at the end of the file ...
-		printf( "\nhey\n");
 		currPos = lseek( in_fd, 0, SEEK_CUR );
 		fileSize = getFileSize( in_fd );
 		
-		printf( "currPos %d\n", currPos );
 		if( currPos == -1 ) { 
 			printError("read-loop"); 
 			return -1; }
@@ -409,7 +407,7 @@ int FileSoundDevice::getFileSize( int fd ) {
 	currentPos = lseek( fd, 0, SEEK_CUR );
 	if( ret == -1 ) {
 #ifdef DEBUG_OUTPUT
-		printError("getFileSize (1)");
+//		printError("getFileSize (1)");
 #endif
 		return -1;
 	}
@@ -417,7 +415,7 @@ int FileSoundDevice::getFileSize( int fd ) {
 	filesize = lseek( fd, 0, SEEK_END );
 	if( filesize == -1 ) {
 #ifdef DEBUG_OUTPUT
-		printError("getFileSize(2)");
+//		printError("getFileSize(2)");
 #endif
 		return -1;
 	}
@@ -425,11 +423,10 @@ int FileSoundDevice::getFileSize( int fd ) {
 	ret = lseek( fd, currentPos, SEEK_SET);
 	if( ret == (currentPos-1) ) {
 #ifdef DEBUG_OUTPUT
-		printError("getFileSize(3)");
+//		printError("getFileSize(3)");
 #endif
 		return -1;
 	}
-	printf( "filesize %d\n", filesize);
 	return filesize;
 }
 
