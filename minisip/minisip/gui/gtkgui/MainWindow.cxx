@@ -755,7 +755,6 @@ void MainWindow::invite( string uri ){
 
 void MainWindow::conference(){
 	string confid=itoa(rand());
-	cerr<<"********--------------sadfasdfsda"<<endl;
 	//callback->guicb_confDoInvite("ali");
 	//string id = callback->guicb_doInvite( uri );
 	addConference( confid, "","","",false );

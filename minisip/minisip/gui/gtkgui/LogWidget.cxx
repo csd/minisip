@@ -111,7 +111,12 @@ void LogWidget::setFont( Gtk::CellRenderer * renderer,
 		callDetail = contactEntry->getName();
 	}
 	else{
-		callDetail = "<u><span foreground=\"#0000FF\">" + logEntry->peerSipUri + "</span></u>";
+		string sanitizedUri = logEntry->peerSipUri;
+		sanitizedUri.replace( sanitizedUri.find('<'), 1, " " );
+		sanitizedUri.replace( sanitizedUri.find('>'), 1, " " );
+		
+// 		callDetail = "<u><span foreground=\"#0000FF\">" + logEntry->peerSipUri + "</span></u>";
+		callDetail = "<u><span foreground=\"#0000FF\">" + sanitizedUri + "</span></u>";
 	}
 	
 	MRef<LogEntryFailure *> failureEntry;
