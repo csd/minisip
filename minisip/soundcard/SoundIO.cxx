@@ -154,10 +154,10 @@ void SoundIO::play_testtone( int secs ){
 		if (i%4==2)data[i]=0;
 		if (i%4==3)data[i]=-10000;
 	}
-	byte_t *ptr = (byte_t *)data;
+// 	byte_t *ptr = (byte_t *)data;
 //	int32_t i=0;
 
-	soundDev->write( ptr, nSamples );
+	send_to_card( data, nSamples );
 }
 
 void SoundIO::openPlayback(){
