@@ -143,21 +143,21 @@ void BasicSoundSource::pushSound(short * samples,
 	bufferLock.lock();
 	//Check for OverFlow ... this happens if we receive big burst of packets ...
 	//or we are not emptying the buffer quick enough ...
-	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
-	#ifdef DEBUG_OUTPUT
-		printf("OF");
+ 	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
+// 	#ifdef DEBUG_OUTPUT
+ 		printf("OF");
 // 		cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
-	#endif
-		bufferLock.unlock();
-		return;
-	}
+// 	#endif
+// 		bufferLock.unlock();
+// 		return;
+ 	}
 
 	//If the incoming samples are already stereo, as is our circular buffer,
 	//just copy them to the buffer.
 	//Otherwise, transform them from mono to stereo (copy them twice ... ).
 	int writeRet;
 	if( isStereo ) {
-		writeRet = cbuff->write( samples, nMonoSamples * 2 );
+		writeRet = cbuff->write( samples, nMonoSamples * 2, true );
 	} else {
 		int tempVal;
 		memset( temp, 0, iFrames * oNChannels ); 
@@ -167,7 +167,7 @@ void BasicSoundSource::pushSound(short * samples,
 			tempVal ++;
 			temp[ tempVal ] = samples[i];
 		}
-		writeRet = cbuff->write( temp, nMonoSamples * 2 );
+		writeRet = cbuff->write( temp, nMonoSamples * 2, true );
 	}
 	bufferLock.unlock();
 #ifdef DEBUG_OUTPUT

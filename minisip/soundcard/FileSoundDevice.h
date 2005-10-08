@@ -90,6 +90,13 @@ class FileSoundDevice: public SoundDevice{
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
 		
 		/**
+		We need to add a blocking behavior to the writing of the file
+		(only if SoundDevice::sleepTime == 0 --> device playback open in blocking mode).
+		Thus, we some specific code, but still call the SoundDevice::write function
+		*/
+		virtual int write( byte_t * buffer, uint32_t nSamples );
+		
+		/**
 		Write to the "playback" file, that is, the file where the
 		"received" audio is stored for later playback.
 		*/
@@ -162,17 +169,24 @@ class FileSoundDevice: public SoundDevice{
 		*/
 		void printError( string func );
 		
-//		/**
-//		Implements a sleep function, used to synchronize the writing of
-//		audio samples. It sleeps for sleepTime miliseconds.
-//		*/		
-// 		void writeSleep( );
 		
-//		/**
-//		State variable, used in writeSleep()
-//		*/
-//		uint64_t lastTimeWrite;
+		/**
+		Do not reuse the sleepTime variable in SoundDevice ... for now 
+		(as long as the audio playback is still blocking).
+		*/
+		uint fileSoundBlockSleep;
 		
+		/**
+		Implements a sleep function, used to synchronize the writing of
+		audio samples. It sleeps for sleepTime miliseconds.
+		*/		
+		void writeSleep( );
+		
+		/**
+		State variable, used in writeSleep()
+		*/
+		uint64_t lastTimeWrite;
+
 		/**
 		Implements a sleep function, used to synchronize the reading of
 		audio samples. It sleeps for sleepTime miliseconds.

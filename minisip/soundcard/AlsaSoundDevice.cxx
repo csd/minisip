@@ -26,6 +26,16 @@
 #include<libmutil/Thread.h>
 #include<libmutil/mtime.h>
 
+/**
+Note (Cesc)
+I have tried and getting alsa to work in non-blocking for a wide range of soundcards
+is difficult, very. 
+When it seems to work, you may start getting errors, or clicks on the audio ...
+Only turn non-blocking to true (and play with the settings (buffer size - see the header, 
+and number of periods and periodsize) if sound using alsa is bad. Godd luck!
+*/
+#define OPEN_ALSA_IN_NON_BLOCKING_MODE false;
+
 using namespace std;
 
 
@@ -33,6 +43,9 @@ AlsaSoundDevice::AlsaSoundDevice( string device ):SoundDevice( device ){
 
 	readHandle = NULL;
 	writeHandle = NULL;
+	periodSize = 0;
+	numPeriods = 0;
+
 }
 
 
@@ -71,6 +84,71 @@ int AlsaSoundDevice::closeRecord(){
 	return 1;
 }
 
+int AlsaSoundDevice::calculateAlsaParams( unsigned long &periodSizeMin, 
+					unsigned long &periodSizeMax, 
+					uint32_t &periodsMin, 
+					uint32_t &periodsMax,
+					unsigned long &bufferMax ) {
+	unsigned long buffer;
+	
+	//if it has already been opened ... return old values ...
+	if( this->periodSize != 0 && this->numPeriods != 0 ) {
+		periodSizeMin = this->periodSize;
+		periodsMin = this->numPeriods;
+		return 0;
+	}
+	
+	unsigned long bufferMin = (unsigned long) periodsMin * periodSizeMin;
+	if( periodsMin == 1 ) periodsMin = 2; //we want at least two periods ... 
+
+	//set the goal for the buffer size between the limits ...
+	buffer = (MIN_HW_PO_BUFFER/1000) * (this->samplingRate/1000); //size in alsa Frames
+	if( buffer < bufferMin ) buffer = bufferMin;
+	else if( buffer > bufferMax ) buffer = bufferMax;
+
+#ifdef DEBUG_OUTPUT	
+	printf( "Alsa Calc Values: sampling = %d, period size [%d,%d],\n"
+	        "                  num periods = [%d, %d], buffer size = [%d, %d]\n", (int)this->samplingRate/1000, 
+							(int)periodSizeMin, 
+							(int)periodSizeMax, 
+							(int)periodsMin, 
+							(int)periodsMax, 
+							(int)bufferMin, 
+							(int)bufferMax );
+	printf( "Alsa Calc: buffer we want is = %d [alsaframes]\n", (int)buffer );
+#endif
+	//Now ... iteratively calculate the best possible values ... we 
+	//prefer having biffer period size and the smaller possible period size ..
+	
+	//the first time we obtain a buffer size >= our goal, we break;
+	bool found = false;
+	unsigned long tmp;
+	uint32_t per;
+	unsigned long siz; 
+	for(  per = periodsMin; per<periodsMax; per++ ) {
+		for(  siz = periodSizeMin; siz < periodSizeMax; siz+=4 ) {
+			tmp = per * siz;
+			if( tmp >= buffer ) {
+				if(  tmp > bufferMax ) { tmp = bufferMax; }
+				found = true;
+				buffer = tmp;
+				break;
+			}
+		}//inner loop
+		if( found ) break;
+	} // outer loop
+
+#ifdef DEBUG_OUTPUT
+	cerr << "Alsa - CalculatedParams: periodSize = " << siz << "; numPeriods = " << per << "; bufferSize = " << buffer << flush << endl;
+#endif
+	if( !found ) {
+		return -1;
+	}
+	this->periodSize = siz ;
+	this->numPeriods = per;
+	bufferMin = buffer;
+	return 0;
+}
 
 int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format ){
 
@@ -79,26 +157,43 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	snd_pcm_hw_params_alloca(&hwparams);
 	snd_pcm_sw_params_alloca(&swparams);
 	
+	lockOpen.lock();
 	// Play ...
+
+	int openMode = 0;
+	bool openNonBlocking = OPEN_ALSA_IN_NON_BLOCKING_MODE;
 	
- 	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  SND_PCM_NONBLOCK)<0){
-//	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  0/*SND_PCM_NONBLOCK*/)<0){
-		cerr << "Could not open ALSA sound card" << endl;
+	if( openNonBlocking ) {
+		sleepTime = 20; //min time between calls ... simulated
+		openMode = SND_PCM_NONBLOCK;
+#ifdef DEBUG_OUTPUT
+		cerr << "ALSA: opening playback in non-blocking mode" << endl;
+#endif
+	} else {
+		openMode = 0;
+		sleepTime = 0;
+#ifdef DEBUG_OUTPUT
+		cerr << "ALSA: opening playback in non-blocking mode" << endl;
+#endif
+	}
+	
+	if (snd_pcm_open(&writeHandle, dev.c_str(), SND_PCM_STREAM_PLAYBACK,  openMode ) < 0 ) {
+		cerr << "Could not open ALSA sound card (playback)" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_hw_params_any(writeHandle, hwparams) < 0) {
-		cerr << "Could not get ALSA sound card parameters" << endl;
+		cerr << "Could not get ALSA sound card parameters (playback)" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_hw_params_set_access(writeHandle, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
-		cerr << "Could not set ALSA mode" << endl;
+		cerr << "Could not set ALSA mode (playback)" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_hw_params_set_channels(writeHandle, hwparams, nChannels)<0){
-		cerr << "Cound not configure ALSA for playout on "<<  nChannels<< endl;
+		cerr << "Cound not configure ALSA (playback) for playout on "<<  nChannels<< endl;
 		exit(-1);
 	}
 
@@ -121,133 +216,134 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 			alsaFormat = SND_PCM_FORMAT_U16_BE;
 			break;
 		default:
-			cerr << "Unhandled sound format (ALSA)" << endl;
+			cerr << "Unhandled sound format (ALSA) (playback)" << endl;
 			exit( -1 );
 	}
 
 	if (snd_pcm_hw_params_set_format(writeHandle, hwparams, 
 				alsaFormat) < 0) {
-		cerr << "Could not set ALSA format" << endl;
+		cerr << "Could not set ALSA format (playback)" << endl;
 		exit(-1);
 	}
 	
 	unsigned int wantedSamplingRate = (unsigned int)samplingRate; 
 
 	if( snd_pcm_hw_params_set_rate_near(writeHandle, hwparams, (unsigned int *)&samplingRate, NULL) < 0){
-		cerr << "Could not set ALSA rate" << endl;
+		cerr << "Could not set ALSA rate (playback)" << endl;
 		exit(-1);
 	}
 
 	if( (unsigned int)samplingRate != wantedSamplingRate  ){
 #ifdef DEBUG_OUTPUT
-		cerr << "ALSA: Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
+		cerr << "ALSA (playback): Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
 #endif
 	}
 	this->samplingRate = samplingRate;
 	
-	unsigned long periodSize = 0;
-	int32_t dirPeriod;
-	if( snd_pcm_hw_params_get_period_size_min (hwparams, &periodSize, &dirPeriod) < 0 ) {
-		cerr << "Could not get ALSA period size" << endl;
-	} else {
-		cerr << "AlsaPlayback min period size is (alsaFrames) =  " << periodSize << endl;
-	}
-	printf( "alsa playback dir = %d\n", dirPeriod );
-	uint32_t numPeriods;
-	numPeriods =  snd_pcm_hw_params_set_periods (writeHandle, hwparams, 1, 0);
-	if( numPeriods < 0 ) {
-		cerr << "Could not get ALSA periods" << endl;
-	} else {
-		cerr << "AlsaPlayback periods set to (numPeriodsPerBuffer) =  1" << numPeriods << endl;
-	}
+	unsigned long periodSizeMin = 960; //desired size of one period ... in number of frames
+	unsigned long periodSizeMax; //size of one period ... in number of frames
+	uint32_t numPeriodsMin;  //desired buffer length in number of periods
+	uint32_t numPeriodsMax;  //desired buffer length in number of periods
+	unsigned long max_buffer_size; //max buffer size allowd
 	
-	periodSize = snd_pcm_hw_params_set_period_size(writeHandle, hwparams, 960 *2, 0);
-	if( periodSize < 0) {
-		cerr << "Could not set ALSA period size" << endl;
-	} else {
-		cerr << "AlsaPlayback period size is (alsaFrames) = 64 " << periodSize << endl;
-	}
-
-	uint32_t min_buffer_size;
+	uint32_t startThreshold = 16;  //number of frames in the buffer so the hw will start processing
+	uint32_t minAvailable = 32;   //number of available frames so we can read/write
+	
 	int32_t dir;
 
-	if (snd_pcm_hw_params_get_buffer_time_min(hwparams,
-				&min_buffer_size, &dir) < 0){
+	//fetch the params ... exit if not able ...	
+	if( snd_pcm_hw_params_get_period_size_min (hwparams, &periodSizeMin, &dir) < 0 ) {
+		cerr << "Playback: Could not get ALSA period min size" << endl;
+		exit( -1 );
+	}
+	if( snd_pcm_hw_params_get_period_size_max (hwparams, &periodSizeMax, &dir) < 0 ) {
+		cerr << "Playback: Could not get ALSA period max size" << endl;
+		exit( -1 );
+	}
+	if( snd_pcm_hw_params_get_periods_min (hwparams, &numPeriodsMin, &dir) < 0 ) {
+		cerr << "Playback: Could not get ALSA periods min " << endl;
+		exit( -1 );
+	}	
+	if( snd_pcm_hw_params_get_periods_max (hwparams, &numPeriodsMax, &dir) < 0 ) {
+		cerr << "Playback: Could not get ALSA periods max " << endl;
+		exit( -1 );
+	}	
+	if( snd_pcm_hw_params_get_buffer_size_max (hwparams, &max_buffer_size) < 0 ) {
+		cerr << "Playback: Could not get ALSA max buffer size " << endl;
+		exit( -1 );
+	}	
+
+	if( calculateAlsaParams( periodSizeMin, 
+				periodSizeMax, 
+				numPeriodsMin, 
+				numPeriodsMax,
+				max_buffer_size)  < 0 ) {
+		cerr << "Playback: Could Not calculate Alsa Params" << endl;
+		exit( -1 );
+	}
+
 #ifdef DEBUG_OUTPUT
-		cerr << "Could not get ALSA min buffer time" << endl;
+	printf( "ALSA playback: setting values numperiods %d, period Size %d\n", (int)this->numPeriods, (int)this->periodSize );
 #endif
+	//Set the calculated params ... they should not give an eror ... still, check ...	
+	if( snd_pcm_hw_params_set_periods (writeHandle, hwparams, this->numPeriods, 0) < 0 ) {
+		cerr << "Could not set ALSA (playback) periods" << endl;
+		exit( -1 );
 	}
-
-	/* Some soundcards seems to be a bit optimistic */
-
-#ifdef DEBUG_OUTPUT
-	cerr << "ALSA Hardware playout buffer size: (microsecs) " << min_buffer_size << endl;
-#endif
-	if (min_buffer_size < MIN_HW_PO_BUFFER){
-		min_buffer_size = MIN_HW_PO_BUFFER;
+	if( snd_pcm_hw_params_set_period_size_near (writeHandle, hwparams, &this->periodSize, 0) < 0 ) {
+		cerr << "Could not set ALSA (playback) period size" << endl;
+		exit( -1 );
+	} else {
+		cerr << "Record: alsa period size set to " << this->periodSize << endl;
 	}
-
-#ifdef DEBUG_OUTPUT
-	cerr << "ALSA Hardware playout buffer size: (microsecs) " << min_buffer_size << endl;
-#endif
-
-	if (snd_pcm_hw_params_set_buffer_time(writeHandle, hwparams, 
-				min_buffer_size, dir) < 0) {
-		cerr << "Could not set ALSA buffer time" << endl;
-// 		exit(-1);
-	}
-	
-/*
-	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200000, 0 
-				) < 0) {
-		cerr << "Could not set ALSA period_time" << endl;
-		exit(-1);
-	}
-*/
-	
-
 	if (snd_pcm_hw_params(writeHandle, hwparams) < 0) {
-		cerr << "Could not apply parameters to ALSA sound card for playout" << endl;
+		cerr << "Could not apply parameters to ALSA (playback) sound card for playout" << endl;
 		exit(-1);
 	}
 
+	
 	if (snd_pcm_sw_params_current(writeHandle, swparams) < 0) {
-		cerr << "Could not get ALSA software parameters" << endl;
+		cerr << "Could not get ALSA software parameters (playback)" << endl;
 		exit(-1);
 	}
 
-
-	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, 16)){
-		cerr << "Could not set ALSA start threshold" << endl;
+	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, startThreshold)){
+		cerr << "Could not set ALSA start threshold (playback)" << endl;
 // 		exit(-1);
 	}
 	
 	/* Disable the XRUN detection */
-/*	if (snd_pcm_sw_params_set_stop_threshold(writeHandle, swparams, 0x7FFFFFFF)){
-		cerr << "Could not set ALSA stop threshold" << endl;
+	if (snd_pcm_sw_params_set_stop_threshold(writeHandle, swparams, 0x7FFFFFFF)){
+		cerr << "Could not set ALSA stop threshold (playback)" << endl;
 		exit(-1);
-	}*/
+	}
 	
-	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams, 32)){
-		cerr << "Could not set ALSA avail_min" << endl;
+	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams, minAvailable)){
+		cerr << "Could not set ALSA avail_min (playback)" << endl;
 // 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params(writeHandle, swparams) < 0) {
-		cerr << "Could not apply sw parameters to ALSA sound card" << endl;
+		cerr << "Could not apply sw parameters to ALSA sound card (playback)" << endl;
 		exit(-1);
 	}
 	
-	snd_pcm_prepare( writeHandle );
-	
+// 	snd_pcm_prepare( writeHandle );
+#ifdef DEBUG_OUTPUT
+	cerr << "ALSA OPENED playback!!" << endl << flush;
+#endif
 	openedPlayback = true;
+	lockOpen.unlock();
 	return 1;
 }
 	
 int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
+
 	snd_pcm_hw_params_t *hwparams2;
 	snd_pcm_sw_params_t *swparams2;
 
+	lockOpen.lock();
+	
 	snd_pcm_hw_params_alloca(&hwparams2);
 	snd_pcm_sw_params_alloca(&swparams2);
 	
@@ -258,16 +354,17 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	}
 	
 	if (snd_pcm_hw_params_any(readHandle, hwparams2) < 0) {
-		cerr << "Could not get ALSA sound card parameters" << endl;
+		cerr << "Could not get ALSA sound card parameters (record) " << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_hw_params_set_access(readHandle, hwparams2, SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
-		cerr << "Could not set ALSA mode" << endl;
+		cerr << "Could not set ALSA mode (record) " << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_hw_params_set_channels(readHandle, hwparams2, nChannels)<0){
+		//if desired num of channels fails, try setting to 1 channel
 		cerr << "Cound not configure ALSA for recording on "<<  nChannels<< "channels." << endl;
 		if( nChannels != 1 ){
 			if (snd_pcm_hw_params_set_channels(
@@ -311,62 +408,111 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 			alsaFormat = SND_PCM_FORMAT_U16_BE;
 			break;
 		default:
-			cerr << "ALSA: Unhandled sound format" << endl;
+			cerr << "ALSA: Unhandled sound format (record) " << endl;
 			exit( -1 );
 	}
 
 	if (snd_pcm_hw_params_set_format(readHandle, hwparams2, 
 				alsaFormat) < 0) {
-		cerr << "Could not set ALSA format" << endl;
+		cerr << "Could not set ALSA format (record) " << endl;
 		exit(-1);
 	}
 
-	if (snd_pcm_hw_params_set_buffer_time(readHandle, hwparams2, 
+/*	if (snd_pcm_hw_params_set_buffer_time(readHandle, hwparams2, 
 				40000, 0) < 0) {
 		cerr << "Could not set ALSA buffer time" << endl;
 		exit(-1);
 	}
-	
+	*/
 	unsigned int wantedSamplingRate = (unsigned int)samplingRate; 
 	
 	if( snd_pcm_hw_params_set_rate_near(readHandle, hwparams2, (unsigned int *)&samplingRate, NULL) < 0){
-		cerr << "Could not set ALSA rate" << endl;
+		cerr << "Could not set ALSA rate (record) " << endl;
 		exit(-1);
 	}
 
 	if( (unsigned int)samplingRate != wantedSamplingRate ){
 #ifdef DEBUG_OUTPUT		
-		cerr << "Could not set chosen rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
+		cerr << "Could not set chosen (record) rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
 #endif
 	}
+	this->samplingRate = samplingRate;
 
-/*	if (snd_pcm_hw_params_set_period_time(readHandle, hwparams, 200, 0 
-				) < 0) {
-		cerr << "Could not set ALSA period_time" << endl;
-		exit(-1);
+	unsigned long periodSizeMin = 960; //desired size of one period ... in number of frames
+	unsigned long periodSizeMax; //size of one period ... in number of frames
+	uint32_t numPeriodsMin;  //desired buffer length in number of periods
+	uint32_t numPeriodsMax;  //desired buffer length in number of periods
+	unsigned long max_buffer_size; //max buffer size allowd
+	
+// 	uint32_t startThreshold = 16;  //number of frames in the buffer so the hw will start processing
+// 	uint32_t minAvailable = 32;   //number of available frames so we can read/write
+	
+	int32_t dir;
+
+	//fetch the params ... exit if not able ...	
+	if( snd_pcm_hw_params_get_period_size_min (hwparams2, &periodSizeMin, &dir) < 0 ) {
+		cerr << "Record: Could not get ALSA period min size" << endl;
+		exit( -1 );
+	}
+	if( snd_pcm_hw_params_get_period_size_max (hwparams2, &periodSizeMax, &dir) < 0 ) {
+		cerr << "Record: Could not get ALSA period max size" << endl;
+		exit( -1 );
+	}
+	if( snd_pcm_hw_params_get_periods_min (hwparams2, &numPeriodsMin, &dir) < 0 ) {
+		cerr << "Record: Could not get ALSA periods min " << endl;
+		exit( -1 );
+	}	
+	if( snd_pcm_hw_params_get_periods_max (hwparams2, &numPeriodsMax, &dir) < 0 ) {
+		cerr << "Record: Could not get ALSA periods max " << endl;
+		exit( -1 );
+	}	
+	if( snd_pcm_hw_params_get_buffer_size_max (hwparams2, &max_buffer_size) < 0 ) {
+		cerr << "Record: Could not get ALSA max buffer size " << endl;
+		exit( -1 );
+	}	
+
+	if( calculateAlsaParams( periodSizeMin, 
+				periodSizeMax, 
+				numPeriodsMin, 
+				numPeriodsMax,
+				max_buffer_size)  < 0 ) {
+		cerr << "Record: Could Not calculate Alsa Params" << endl;
+		exit( -1 );
 	}
 
-*/	
-
+#ifdef DEBUG_OUTPUT
+	printf( "ALSA Record: setting values %d, %d\n", (int)this->numPeriods, (int)this->periodSize );
+#endif
+	//Set the calculated params ... they should not give an eror ... still, check ...	
+	if( snd_pcm_hw_params_set_periods (readHandle, hwparams2, this->numPeriods, 0) < 0 ) {
+		cerr << "Record Could not set ALSA periods" << endl;
+		exit( -1 );
+	}
+	if( snd_pcm_hw_params_set_period_size_near (readHandle, hwparams2, &this->periodSize, 0) < 0 ) {
+		cerr << "Record Could not set ALSA period size" << endl;
+		exit( -1 );
+	} else {
+		cerr << "Record: alsa period size set to " << this->periodSize << endl;
+	}
 	if (snd_pcm_hw_params(readHandle, hwparams2) < 0) {
-		cerr << "Could not apply parameters to ALSA sound card for recording" << endl;
+		cerr << "Record Could not apply parameters to ALSA sound card for playout" << endl;
 		exit(-1);
 	}
 
 	if (snd_pcm_sw_params_current(readHandle, swparams2) < 0) {
-		cerr << "Could not get ALSA software parameters" << endl;
+		cerr << "Record Could not get ALSA software parameters" << endl;
 		exit(-1);
 	}
 
 
 	/* Disable the XRUN detection */
 	if (snd_pcm_sw_params_set_stop_threshold(readHandle, swparams2, 0x7FFFFFFF)){
-		cerr << "Could not set ALSA stop threshold" << endl;
+		cerr << "Record Could not set ALSA stop threshold" << endl;
 		exit(-1);
 	}
 	
 	if (snd_pcm_sw_params(readHandle, swparams2) < 0) {
-		cerr << "Could not apply sw parameters to ALSA sound card" << endl;
+		cerr << "Record Could not apply sw parameters to ALSA sound card" << endl;
 		exit(-1);
 	}
 
@@ -375,8 +521,11 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	snd_pcm_prepare(readHandle);
 	//snd_pcm_start(readHandle);
 	
+#ifdef DEBUG_OUTPUT
+	cerr << "ALSA OPENED record!!" << endl << flush;
+#endif
 	openedRecord = true;
-
+	lockOpen.unlock();
 	return 0;
 }
 

@@ -36,6 +36,8 @@
 #define PLAYOUT_FRAGMENT_SETTINGS 0x0002000C
 #define RECORD_FRAGMENT_SETTINGS  0x0014000C
 
+#define OPEN_OSS_IN_NON_BLOCKING_MODE true
+
 using namespace std;
 
 OssSoundDevice::OssSoundDevice( string device ):SoundDevice( device ){
@@ -64,12 +66,23 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 		return -1;
 	}
 
-	// Remove O_NONBLOCK
-/*	int flags = fcntl( fdPlayback, F_GETFL );
-	flags &= ~O_NONBLOCK;
-	fcntl( fdPlayback, F_SETFL, flags );
+	bool openNonBlocking = OPEN_OSS_IN_NON_BLOCKING_MODE;
 	
-*/
+	if( openNonBlocking ) {
+		sleepTime = 20; //min time between calls ... simulated
+#ifdef DEBUG_OUTPUT
+		cerr << "OSS: opening playback in non-blocking mode" << endl;
+#endif
+	} else {
+		int flags = fcntl( fdPlayback, F_GETFL );
+		sleepTime = 0;
+		// Remove O_NONBLOCK
+		flags &= ~O_NONBLOCK;
+		fcntl( fdPlayback, F_SETFL, flags );
+#ifdef DEBUG_OUTPUT
+		cerr << "OSS: opening playback in blocking mode" << endl;
+#endif
+	}
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
@@ -286,14 +299,7 @@ int OssSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	if( nReadBytes >= 0 ){
 		totalSamplesRead = nReadBytes / ( getSampleSize() * getNChannelsRecord() );
 	} else {
-		totalSamplesRead == errno;
-//this call to dsp_sync was here ... i don't think it is needed ...
-// 		if( ioctl( fdRecord, SNDCTL_DSP_SYNC ) == -1 ){
-//			perror( "ioctl sync error on soundcard" );
-// 			totalSamplesRead = -EPIPE;
-// 		} else {
-// 			totalSamplesRead == errno;
-// 		}
+		totalSamplesRead == -errno;
 	}
 	return totalSamplesRead;
 }
@@ -316,13 +322,7 @@ int OssSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 		//convert back to samples ... 
 		totalSamplesWritten = nWrittenBytes / ( getSampleSize() * getNChannelsPlay() );
 	} else {
-		totalSamplesWritten = errno;
-		if( errno == EAGAIN || errno == EINTR ) {
-			totalSamplesWritten = errno;
-		} else { //if some weird error ... resync and continue ... 
-			sync();
-			totalSamplesWritten = 0;
-		}
+		totalSamplesWritten = -errno;
 	}
 	return totalSamplesWritten;
 }

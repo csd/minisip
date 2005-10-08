@@ -91,12 +91,12 @@ FileSoundDevice::FileSoundDevice(string in_file,
 	samplingRate = 0;
 	sampleSize = 0;
 
-	sleepTime = 20; //default value 
+	fileSoundBlockSleep = 20; //default value 
 	lastTimeRead = 0;
-// 	lastTimeWrite = 0;
+	lastTimeWrite = 0;
 
 	isFirstTimeOpenWrite = true;
-	loopRecord = true;
+	this->loopRecord = true;
 }
 
 void FileSoundDevice::setAudioParams( int samplingRate_, int nChannels_ ) {
@@ -124,7 +124,7 @@ int FileSoundDevice::openRecord(int32_t samplerate_, int nChannels_, int format_
 	}
 	
 #ifdef DEBUG_OUTPUT
-	printf( "FSD:record - samplerate = %d, nChannels = %d, sampleSize = %d\n", samplingRate, nChannelsRecord, sampleSize );
+	printf( "FileSoundDev:record - samplerate = %d, nChannels = %d, sampleSize = %d\n", samplingRate, nChannelsRecord, sampleSize );
 #endif
 	in_fd=::open(inFilename.c_str(), O_RDONLY);
 	if (in_fd==-1){
@@ -220,19 +220,32 @@ int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
 	//loop if needed
 	if( loopRecord ) {
 		int currPos;
+		int fileSize;
 		//Check if we are at the end of the file ...
+		printf( "\nhey\n");
 		currPos = lseek( in_fd, 0, SEEK_CUR );
-		if( currPos == -1 ) { printError("read-loop"); return -1; }
-		if( currPos == getFileSize( in_fd ) ) {
-			if( currPos == -1 ) { printError("read-loop2"); return -1; }
+		fileSize = getFileSize( in_fd );
+		
+		printf( "currPos %d\n", currPos );
+		if( currPos == -1 ) { 
+			printError("read-loop"); 
+			return -1; }
+		//Check not for the exact end of file, but for when there are not enough 
+		//samples to read ... skip the few left and loop ...
+		if( (fileSize - currPos ) < ((int)nSamples * getSampleSize() * getNChannelsRecord() ) ) {
+			if( currPos == -1 ) { 
+				printError("read-loop2"); 
+				return -1; }
 			currPos = lseek( in_fd, 0, SEEK_SET );
-			if( currPos == -1 ) { printError("read-loop3"); return -1; }
+			if( currPos == -1 ) { 
+				printError("read-loop3"); 
+				return -1; }
 		}
 	}
 	
 	SoundDevice::read( buffer, nSamples );
 	
-	if( sleepTime != 0 )
+	if( fileSoundBlockSleep != 0 )
 		readSleep();
 
 	return retValue;
@@ -262,6 +275,21 @@ int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 	return retValue;
 }
 
+int FileSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) {
+	bool mustReturn = true;
+	switch( errcode ) {
+		case -EAGAIN:
+		case -EINTR:
+			mustReturn = false;
+			break;
+		default:
+			mustReturn = true;
+			break;
+	}
+	if( mustReturn ) { return -1; }
+	else { return 0; } 
+}
+
 void FileSoundDevice::readSleep( ) {
 	uint64_t currentTime;
 	
@@ -270,9 +298,9 @@ void FileSoundDevice::readSleep( ) {
 	//the sleep thingy is deactivated if sleeptime < 0
 	// (the time in the computer should not go backward, right?!
 // 	printf("R: %d ", currentTime - lastTimeRead );
-	while (currentTime - lastTimeRead < sleepTime){
+	while (currentTime - lastTimeRead < fileSoundBlockSleep){
 		int ret;
-		int sleep = sleepTime - (currentTime-lastTimeRead);
+		int sleep = fileSoundBlockSleep - (currentTime-lastTimeRead);
 		if( sleep < 0 ) sleep = 0;
 // 		printf(" [%d] ", sleep);
 		ret = filesleep( sleep * 1000);
@@ -281,8 +309,27 @@ void FileSoundDevice::readSleep( ) {
 	}
 // 	printf("\n");
 	
-	lastTimeRead+=sleepTime;
+	lastTimeRead+=fileSoundBlockSleep;
 }
+
+int FileSoundDevice::write( byte_t * buffer, uint32_t nSamples ) {
+	int retValue;
+	
+	if (lastTimeWrite==0){
+		lastTimeWrite = mtime();
+	}
+
+	SoundDevice::write( buffer, nSamples );
+	
+	//if SoundDevice::sleepTime is >0, then the device has been opened for 
+	//playback in non-blocking mode, thus SoundDevice::write will do the sleeping between
+	//calls (no need for FileSoundDevice::write to block for fileSoundBlockSleep miliseconds).
+	if( fileSoundBlockSleep > 0  && sleepTime == 0)
+		writeSleep();
+
+	return retValue;
+}
+
 
 //n is in samples!! not in bytes
 int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
@@ -311,21 +358,6 @@ int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
 	return retValue;
 }
 
-int FileSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples ) {
-	bool mustReturn = true;
-	switch( errcode ) {
-		case -EAGAIN:
-		case -EINTR:
-			mustReturn = false;
-			break;
-		default:
-			mustReturn = true;
-			break;
-	}
-	if( mustReturn ) { return -1; }
-	else { return 0; } 
-}
-
 int FileSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples ) {
 	bool mustReturn = true;
 	switch( errcode ) {
@@ -342,8 +374,6 @@ int FileSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples
 }
 
 
-#if 0
-//not used ...
 void FileSoundDevice::writeSleep( ) {
 	uint64_t currentTime;
 	
@@ -352,9 +382,9 @@ void FileSoundDevice::writeSleep( ) {
 	//the sleep thingy is deactivated if sleeptime < 0
 	// (the time in the computer should not go backward, right?!
 // 	printf("W: %d ", currentTime - lastTimeWrite );
-	while (currentTime - lastTimeWrite < sleepTime ){
+	while (currentTime - lastTimeWrite < fileSoundBlockSleep ){
 		int ret;
-		int sleep = sleepTime - (currentTime-lastTimeWrite);
+		int sleep = fileSoundBlockSleep - (currentTime-lastTimeWrite);
 		if( sleep < 0 ) sleep = 0;
 // 		printf(" [%d] ", sleep);
 		ret = filesleep( sleep * 1000);
@@ -364,9 +394,8 @@ void FileSoundDevice::writeSleep( ) {
 // 	printf("\n");
 	
 	//lastTimeWrite = currentTime;
-	lastTimeWrite += sleepTime;
+	lastTimeWrite += fileSoundBlockSleep;
 }
-#endif
 
 void FileSoundDevice::sync(){
 	cerr << "ERROR: sync unimplemented for file sound device"<< endl;
@@ -382,6 +411,7 @@ int FileSoundDevice::getFileSize( int fd ) {
 #ifdef DEBUG_OUTPUT
 		printError("getFileSize (1)");
 #endif
+		return -1;
 	}
 	
 	filesize = lseek( fd, 0, SEEK_END );
@@ -389,15 +419,17 @@ int FileSoundDevice::getFileSize( int fd ) {
 #ifdef DEBUG_OUTPUT
 		printError("getFileSize(2)");
 #endif
+		return -1;
 	}
 	
 	ret = lseek( fd, currentPos, SEEK_SET);
-	if( ret == -1 ) {
+	if( ret == (currentPos-1) ) {
 #ifdef DEBUG_OUTPUT
 		printError("getFileSize(3)");
 #endif
+		return -1;
 	}
-	
+	printf( "filesize %d\n", filesize);
 	return filesize;
 }
 

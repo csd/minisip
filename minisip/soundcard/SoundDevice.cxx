@@ -179,31 +179,33 @@ int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 	uint64_t currentTime;
 	static uint64_t lastTimeWrite = 0;
 	
-	currentTime = mtime();
-	if( lastTimeWrite == 0 ) {
-		lastTimeWrite = currentTime - sleepTime; //init last time we wrote ... 
-		
-#ifdef DEBUG_OUTPUT
-		printf( "nsamples = %d\n\n", nSamples );
-#endif
-
-	} else if( (currentTime - lastTimeWrite) > sleepTime*10 ) {
-
-#ifdef DEBUG_OUTPUT
-		printf( "SoundDevice: resetting lastTimeWrite! +++++++++++++++++++++++++++++ \n\n");
-#endif
-		
-		lastTimeWrite = currentTime - sleepTime;
-	}
-	
-	int sleep = sleepTime - (currentTime-lastTimeWrite);
-// 	printf( "\n\nsleep = %d\n", sleep );
-	while ( sleep > 0 ){
-		Thread::msleep( sleep );
+	if( sleepTime > 0 ) {
 		currentTime = mtime();
-		sleep = sleepTime - (currentTime-lastTimeWrite);
+		if( lastTimeWrite == 0 ) {
+			lastTimeWrite = currentTime - sleepTime; //init last time we wrote ... 
+			
+	#ifdef DEBUG_OUTPUT
+			printf( "nsamples = %d\n\n", nSamples );
+	#endif
+	
+		} else if( (currentTime - lastTimeWrite) > sleepTime*10 ) {
+	
+	#ifdef DEBUG_OUTPUT
+			printf( "SoundDevice: resetting lastTimeWrite! +++++++++++++++++++++++++++++ \n\n");
+	#endif
+			
+			lastTimeWrite = currentTime - sleepTime;
+		}
+		
+		int sleep = sleepTime - (currentTime-lastTimeWrite);
+	// 	printf( "\n\nsleep = %d\n", sleep );
+		while ( sleep > 0 ){
+			Thread::msleep( sleep );
+			currentTime = mtime();
+			sleep = sleepTime - (currentTime-lastTimeWrite);
+		}
+		lastTimeWrite += sleepTime;
 	}
-	lastTimeWrite += sleepTime;
 	
 	while( (uint32_t)totalSamplesWritten < nSamples ){
 		nSamplesWritten = writeToDevice( byteBuffer, 
