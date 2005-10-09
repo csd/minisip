@@ -1,7 +1,7 @@
 noinst_LIBRARIES = libminisip_gtkgui.a
 datadir = @datadir@/minisip
 AM_CXXFLAGS = @CXXFLAGS@ @GLADEMM_CFLAGS@
-AM_CPPFLAGS = @CPPFLAGS@ -DMINISIP_DATADIR="\"$(datadir)\""
+AM_CPPFLAGS = @CPPFLAGS@ -DMINISIP_DATADIR="\"$(datadir)\"" -I$(top_srcdir)/include
 
 libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
                               CallWidget.cxx \
