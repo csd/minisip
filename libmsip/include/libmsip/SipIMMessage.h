@@ -58,7 +58,8 @@ class LIBMSIP_API SipIMMessage : public SipMessage{
 
 		SipIMMessage(string branch,
 				string call_id, 
-				MRef<SipIdentity*> toIdentity,
+				std::string toUri,
+/*				MRef<SipIdentity*> toIdentity,*/
 				MRef<SipIdentity*> fromIdentity,
                                 //int local_port,
 				int32_t seq_no,

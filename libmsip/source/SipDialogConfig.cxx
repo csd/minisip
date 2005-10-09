@@ -75,7 +75,7 @@ SipIdentity::SipIdentity(){
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
-	cerr << "CESC: SipIdentity::SipIdentity : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity::SipIdentity : cretated identity id=" << identityIdx << endl;
 #endif
 	setIsRegistered (false);
 }
@@ -85,7 +85,7 @@ SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(f
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
-	cerr << "CESC: SipIdentity::SipIdentity(str) : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity::SipIdentity(str) : cretated identity id=" << identityIdx << endl;
 #endif	
 	setIsRegistered (false);
 }
@@ -94,13 +94,30 @@ void SipIdentity::setSipUri(string addr){
 	if (addr.substr(0,4)=="sip:")
 			addr = addr.substr(4);
 	if (addr.find("@")==string::npos){
-			cerr << "WARNING: malformed sip address: "<< addr<<endl;
+			cerr << "WARNING: Incomplete sip address: "<< addr<<endl;
+		sipUsername = addr.substr(0, addr.find("@"));
+		sipDomain = "";
+	} else {
+		sipUsername = addr.substr(0, addr.find("@"));
+		sipDomain = addr.substr(addr.find("@")+1);
 	}
 
-	sipUsername = addr.substr(0, addr.find("@"));
-	sipDomain = addr.substr(addr.find("@")+1);
-	//cerr << "sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
+	cerr << "SipIdentity::setSipUri: sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
 }
+
+string SipIdentity::getSipUri() {
+	string ret;
+	lock();
+	if( sipUsername != "" && sipDomain !="" ) {
+		ret = sipUsername + "@" + sipDomain;
+	} else {
+		//one of the two is empty, so do not add the @ ... 
+		ret = sipUsername + sipDomain;
+	}
+	unlock();
+	return ret;
+}
+
 void SipIdentity::setIdentityName(string n){
 	identityIdentifier = n;
 }

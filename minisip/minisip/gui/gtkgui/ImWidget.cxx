@@ -131,7 +131,9 @@ void ImWidget::send( string message ){
 void ImWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 
 	if( isActive == activeCallWidget ) {
-		cerr << "ImWidget::activeCall - nothing to do here (no active state change)" << endl;
+		#ifdef DEBUG_OUTPUT
+// 		cerr << "ImWidget::activeCall - nothing to do here (no active state change)" << endl;
+		#endif
 		return;
 	} else {
 		activeCallWidget = isActive;
@@ -139,11 +141,13 @@ void ImWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 
 	//our status has changed ... do something?
 	if( !isActive ) {
-		cerr << "ImWidget::activeCall - We were active ... not anymore" << endl;
+		#ifdef DEBUG_OUTPUT
+// 		cerr << "ImWidget::activeCall - We were active ... not anymore" << endl;
+		#endif
 		return;
 	} else {
 		#ifdef DEBUG_OUTPUT
-		cerr << "ImWidget::activeCall - We active!" << endl;
+// 		cerr << "ImWidget::activeCall - We active!" << endl;
 		#endif
 	}
 }

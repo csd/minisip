@@ -58,15 +58,19 @@ SipIMMessage::SipIMMessage(string &build_from): SipMessage(SipIMMessage::type, b
 
 SipIMMessage::SipIMMessage(string branch, 
 		    string call_id, 
-		    MRef<SipIdentity*> toIdentity,
+		    std::string toUri,
+// 		    MRef<SipIdentity*> toIdentity,
 		    MRef<SipIdentity*> fromIdentity,
                     int32_t seq_no, string msg): 
                             SipMessage(branch, SipIMMessage::type),
 			    fromIdentity(fromIdentity)
 {
-	
-	toUser = toIdentity->sipUsername;
-	toDomain = toIdentity->sipDomain;
+
+	int posAt = toUri.find("@");
+	toUser = toUri.substr( 0, posAt );
+	if( posAt != string::npos ) 
+		toDomain = toUri.substr( posAt + 1 );
+	else 	toDomain = "";
 	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(new SipHeader(*fromp));

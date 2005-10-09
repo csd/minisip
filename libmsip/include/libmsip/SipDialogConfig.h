@@ -184,13 +184,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		void setSipUri(string addr);
 		
-		string getSipUri(){
-			string ret;
-			lock();
-			ret = sipUsername + "@" + sipDomain;
-			unlock();
-			return ret;
-		}
+		string getSipUri();
 
 		void setDoRegister(bool f){
 			lock();

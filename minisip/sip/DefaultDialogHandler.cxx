@@ -854,22 +854,29 @@ void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branc
 
 
 void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
-
-        string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
-        uint32_t i = tmp.find("@");
-        assert(i!=string::npos);
-        i++;
-        string domain;
-        for ( ; i < tmp.length() ; i++)
-                domain = domain+tmp[i];
-
-	MRef<SipIdentity *> toId = new SipIdentity(toUri);
 	
-//      mdbg << "///////////Creating bye with uri_foreign="<<getDialogConfig().uri_foreign << " and doman="<< domain<< end;
+	uint32_t posAt;
+	
+	posAt = toUri.find("@");
+	if( posAt == string::npos ) { //toUri does not have a domain ...
+		//get one, from the default identity
+		if( getDialogConfig()->inherited->sipIdentity->sipDomain != "" ) {
+			toUri += "@" + getDialogConfig()->inherited->sipIdentity->sipDomain;
+		} else {
+			#ifdef DEBUG_OUTPUT
+			cerr << "DefaultDialogHandler::sendIM - toUri without domain" << endl;
+			#endif
+		}
+	}
+	#ifdef DEBUG_OUTPUT
+	cerr << "DefaultDialogHandler::sendIM - toUri = " << toUri <<  endl;
+	#endif
+	
         MRef<SipIMMessage*> im = new SipIMMessage(
                         std::string(branch),
 			std::string(dialogState.callId),
-			toId,
+// 			toId,
+			toUri, 	
 			getDialogConfig()->inherited->sipIdentity,
 			//getDialogConfig()->inherited.localUdpPort,
                         im_seq_no,
