@@ -110,6 +110,11 @@ class SipSoftPhoneConfiguration : public MObject{
 		Return the identity with getId()==id (from the identities list
 		*/
 		MRef<SipIdentity*> getIdentity( string id );
+
+		/**
+		 * Returns the identity when getUri() == uri
+		 */
+		MRef<SipIdentity *> getIdentity( SipURI &uri );
 		
 		/*
 		IPAddress * pstnProxy;

@@ -533,50 +533,6 @@ string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	return phonebookFileName;
 }
 
-#if 0
-void SipSoftPhoneConfiguration::installConfigFile(string config, string address, bool overwrite){
-
-	string filename = config;
-	
-	string phonebookFileName;
-	if( address == "" ) 
-		phonebookFileName = SipSoftPhoneConfiguration::getDefaultPhoneBookFilename();
-	else 
-		phonebookFileName = address;
-
-	ifstream file(filename.c_str());
-	if (!file || overwrite){
-#ifdef DEBUG_OUTPUT
-		merr << "WARNING: Configuration file ("<< filename << ") was not found - creating it with default values."<< end;
-#endif
-		if( file.is_open() ) file.close();
-		ofstream newfile(filename.c_str());
-		newfile<< SipSoftPhoneConfiguration::getDefaultConfigFileString();
-	}
-#ifdef DEBUG_OUTPUT
-	else{
-		merr << "Config file " << filename << " already exhists and we don't want to overwrite it" <<end;
-	}
-#endif
-	
-	ifstream phonebookFile( phonebookFileName.c_str() );
-	if (!phonebookFile || overwrite){
-#ifdef DEBUG_OUTPUT
-		merr << "WARNING: Address Book ("<< filename << ") was not found - creating it with default values."<< end;
-#endif
-		if( phonebookFile.is_open() ) phonebookFile.close();
-		ofstream newfile(phonebookFileName.c_str());
-		newfile<< SipSoftPhoneConfiguration::getDefaultPhoneBookString();
-	}
-#ifdef DEBUG_OUTPUT
-	else{
-		merr << "Address Book " << filename << " already exhists and we don't want to overwrite it" <<end;
-	}
-#endif
-
-}
-#endif
-
 bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fileVersion_str */) {
 	string str="";
 	bool ret = false;
@@ -584,24 +540,6 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fi
 		cerr << "ERROR? Your config file is an old version (some things may not work)" << endl
 			<< "    If you delete it (or rename it), next time you open minisip" << endl
 			<< "    a valid one will be created" << endl;
-#if 0
-		str += 	"\n\n"
-			"ERROR: config file version conflict\n" 
-			"     file -> ";
-		//str += configFileName + "\n";
-		str +=	"     your version = " + fileVersion_str + "\n" 
-			"     required version = " + CONFIG_FILE_VERSION_REQUIRED_STR + "\n" 
-			"     What to do: I have created a default config file at\n" 
-			"          " + configFileName + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR + "\n" 
-			"     Compare your config file with the default one and import the changes,\n" 
-			"        or overwrite your old one (you will loose your settings)\n\n\n";
-		cerr << str;
-#if 0
-		installConfigFile( configFileName + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR, 
-				getDefaultPhoneBookFilename() + ".version." + CONFIG_FILE_VERSION_REQUIRED_STR,
-				true);  //overwrite files
-#endif
-#endif
 		ret = false;
 	} else {
 #ifdef DEBUG_OUTPUT
@@ -615,16 +553,28 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fi
 
 MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 	list< MRef<SipIdentity*> >::iterator it;
-#ifdef DEBUG_OUTPUT
-	//merr << "SipSoftPhoneConfiguration::getIdentity : looking for an identity ... " << end;
-#endif
+
 	for( it = identities.begin(); it!=identities.end(); it++ ) {
 		if( (*it)->getId() == id ) {
 			return (*it);
 		}
 	}
-#ifdef DEBUG_OUTPUT
-	//merr << "SipSoftPhoneConfiguration::getIdentity : identity not found!" << end;
-#endif
+
+	return NULL;
+}
+
+MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipURI &uri ) {
+	list< MRef<SipIdentity*> >::iterator it;
+	
+	for( it = identities.begin(); it!=identities.end(); it++ ) {
+		(*it)->lock();
+		if( (*it)->sipUsername == uri.getUserName() && 
+				(*it)->sipDomain == uri.getIp() ) {
+			(*it)->unlock();
+			return (*it);
+		}
+		(*it)->unlock();
+	}
+
 	return NULL;
 }

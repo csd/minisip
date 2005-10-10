@@ -114,6 +114,13 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		else 
 #endif
         if(inv->is_ConfJoin()) {
+			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
+			string uri;
+			MRef<SipIdentity *> id = NULL;
+
+			if( to ){
+				id = phoneconf->getIdentity( to->getUri() );
+			}
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
@@ -154,6 +161,10 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+			if( id ){
+				cerr << "Got a call from Id " << id->getSipUri() << endl;
+				callConf->useIdentity( id, false );
+			}
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
@@ -178,6 +189,13 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			mdbg << cmd << end;
 		}
 		else if(inv->is_ConfConnect()) {
+			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
+			string uri;
+			MRef<SipIdentity *> id = NULL;
+
+			if( to ){
+				id = phoneconf->getIdentity( to->getUri() );
+			}
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
@@ -186,11 +204,15 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
-			cerr<<"DDH confididididididiid "+confid<<endl;
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+
+			if( id ){
+				cerr << "Got a call from Id " << id->getSipUri() << endl;
+				callConf->useIdentity( id, false );
+			}
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
@@ -216,15 +238,24 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		}
 		//start SipDialogVoIP
 		else{
-#ifdef DEBUG_OUTPUT			
-			mdbg << "DefaultDialogHandler:: creating new SipDialogVoip" << end;
-#endif			
+			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
+			string uri;
+			MRef<SipIdentity *> id = NULL;
+
+			if( to ){
+				id = phoneconf->getIdentity( to->getUri() );
+			}
 
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
 			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+
+			if( id ){
+				cerr << "Got a call from Id " << id->getSipUri() << endl;
+				callConf->useIdentity( id, false );
+			}
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
