@@ -92,7 +92,7 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	file = cert_filename;
 }
 
-certificate::certificate( unsigned char * der_cert, int length ):private_key(NULL){
+certificate::certificate( const unsigned char * der_cert, int length ):private_key(NULL){
 	cert = X509_new();
 
 	if( cert == NULL )
@@ -134,7 +134,9 @@ int certificate::sign_data( unsigned char * data, int data_length,
 	// FIXME
 	EVP_SignInit( &ctx, EVP_sha1() );
 	EVP_SignUpdate( &ctx, data, data_length );
-	err = EVP_SignFinal( &ctx, sign, (unsigned int*)sign_length, private_key );
+	err = EVP_SignFinal( &ctx, sign, 
+			(unsigned int*)sign_length, 
+			private_key );
 
 	//EVP_MD_CTX_cleanup( &ctx );
 

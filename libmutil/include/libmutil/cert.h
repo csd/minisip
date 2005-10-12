@@ -107,7 +107,7 @@ class LIBMUTIL_API certificate: public MObject{
 		certificate( const std::string cert_filename );
 		certificate( const std::string cert_filename,
 			     const std::string private_key_filename );
-		certificate( unsigned char * der_cert, int length );
+		certificate( const unsigned char * der_cert, int length );
 		~certificate();
 		virtual std::string getMemObjectType(){return "certificate";}
 		
