@@ -66,6 +66,7 @@ SipIMMessage::SipIMMessage(string branch,
 			    fromIdentity(fromIdentity)
 {
 
+	this->toUri = toUri;
 	int posAt = toUri.find("@");
 	toUser = toUri.substr( 0, posAt );
 	if( posAt != string::npos ) 
@@ -108,7 +109,7 @@ string SipIMMessage::getString(){
 	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
 	string username; //hide the class::username ... carefull
 	size_t pos;
-	username = this->toUser;
+	username = this->toUri;
 	
 	pos = username.find('<');
 	if( pos != string::npos ) {

@@ -79,6 +79,7 @@ class LIBMSIP_API SipIMMessage : public SipMessage{
 		MRef<SipIdentity *> fromIdentity;
 		string toUser; //telephone number for example
 		string toDomain;
+		string toUri;
 
 };
 
