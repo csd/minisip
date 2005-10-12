@@ -126,6 +126,7 @@ void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
 
 //returns a the call id
 string Sip::invite(string &user){
+	bool gotAtSign;
 	SipDialogSecurityConfig securityConfig;
 #ifndef _MSC_VER
 	ts.save( INVITE_START );
@@ -142,25 +143,26 @@ string Sip::invite(string &user){
 		startAddr = 5;
 
 	bool onlydigits=true;
+	MRef<SipIdentity *> id;
+	
 	for (unsigned i=0; i<user.length(); i++)
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
-	if (onlydigits && phoneconfig->usePSTNProxy){
-		callconf->useIdentity( phoneconfig->pstnIdentity, false);
-		securityConfig.useIdentity( phoneconfig->pstnIdentity );
-	}
-	else{
-		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
+
+	id = ( onlydigits && phoneconfig->usePSTNProxy )?
+			phoneconfig->pstnIdentity:
+			phoneconfig->inherited->sipIdentity;
+
+	if( !id ){
+		cerr << "id is null" << endl;
 	}
 
-	
-	
+	callconf->useIdentity( id, false);
+	securityConfig.useIdentity( id );
+
+	gotAtSign = ( user.find("@", startAddr) != string::npos );
 	
 	if (user.find(":", startAddr)!=string::npos){
-		if (user.find("@", startAddr)==string::npos){
-			return "malformed";
-		}
-		
 		string proxy;
 		string port;
 		uint32_t i=startAddr;
@@ -179,28 +181,19 @@ string Sip::invite(string &user){
 			else
 				port = port + user[i++];
 		
-		//int iport = atoi(port.c_str());
-				
-//		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
-/*
-		try{
-			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
-//			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
-//			callconf->inherited.sipIdentity->sipProxyPort = iport;
-		}catch(IPAddressHostNotFoundException *exc){
-			merr << "Could not resolve PSTN proxy address:" << end;
-			merr << exc->what();
-			merr << "Will use default proxy instead" << end;
-		}
-*/
-		
+	}
+
+	if( !gotAtSign && id ){
+		id->lock();
+		user += "@" + id->sipDomain;
+		id->unlock();
 	}
 
 #ifdef DEBUG_OUTPUT
         cerr << "Before new mediaSession" << endl;
 #endif
-MRef<Session *> mediaSession = 
+	MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 #ifdef DEBUG_OUTPUT
         cerr << "After new mediaSession" << endl;

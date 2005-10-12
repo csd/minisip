@@ -236,8 +236,11 @@ string SipInvite::getString(){
 		ret = "INVITE "+username;
 	else
 		ret = "INVITE sip:"+username;
+
+#if 0
 	if (username.find("@")==string::npos)
 		ret = ret+"@"+ip;
+#endif
 
 	ret += /*";user="+user_type+*/" SIP/2.0\r\n" + getHeadersAndContent();
 

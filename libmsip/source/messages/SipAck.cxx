@@ -93,12 +93,14 @@ string SipAck::getString(){
 		ret = "ACK sip:";
 	else
 		ret = "ACK ";
-
+#if 0
 	if (username.find("@")==string::npos){
 		ret = ret + username + "@"+ipaddr;
 	}else{
 		ret = ret + username;
 	}
+#endif
+	ret += username;
 	
 	ret = ret + /*":" + itoa(port) +*/ " SIP/2.0\r\n";
 	ret = ret + getHeadersAndContent();

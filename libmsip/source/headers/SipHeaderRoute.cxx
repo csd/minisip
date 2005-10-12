@@ -61,6 +61,7 @@ SipHeaderValueRoute::SipHeaderValueRoute(list<string> &routeSet)
 		: SipHeaderValue(SIP_HEADER_TYPE_ROUTE,sipHeaderValueRouteTypeStr)
 {
 	for (list<string>::iterator i=routeSet.begin(); i!=routeSet.end(); i++){
+		cerr << "route " << *i << endl;
 		if (i!=routeSet.begin())
 			route = route+',';
 		route = route + (*i);

@@ -132,9 +132,11 @@ string SipRefer::getString(){
 		ret = "REFER ";
 	}
 	ret = ret + username;
+#if 0
 	if (username.find("@")==string::npos){
 		ret = ret +"@"+ipaddr;
 	}
+#endif
 	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }
 

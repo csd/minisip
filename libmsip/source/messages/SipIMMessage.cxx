@@ -121,8 +121,10 @@ string SipIMMessage::getString(){
 		ret = "MESSAGE "+username;
 	else
 		ret = "MESSAGE sip:"+username;
+#if 0
 	if (username.find("@")==string::npos)
 		ret = ret+"@"+toDomain;
+#endif
 
 	ret += " SIP/2.0\r\n" + getHeadersAndContent();
 

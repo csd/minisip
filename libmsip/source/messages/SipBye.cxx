@@ -123,9 +123,11 @@ string SipBye::getString(){
 		ret = "BYE ";
 	}
 	ret = ret + username;
+#if 0
 	if (username.find("@")==string::npos){
 		ret = ret +"@"+domain;
 	}
+#endif
 	
 	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }

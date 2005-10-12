@@ -115,9 +115,11 @@ string SipCancel::getString(){
 		ret = "CANCEL ";
 	}
 	ret = ret + username;
+#if 0
 	if (username.find("@")==string::npos){
 		ret = ret +"@"+ipaddr;
 	}
+#endif
 	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }
 
