@@ -157,10 +157,14 @@ ImMessageTextView::ImMessageTextView( ImWidget * imWidget ){
 }
 
 bool ImMessageTextView::on_key_press_event( GdkEventKey * event ){
-	if( ( event->keyval == GDK_Return ) && (! (event->state >> 2) & 0x1 )){
-		imWidget->send( get_buffer()->get_text() );
-		get_buffer()->erase( get_buffer()->begin(), get_buffer()->end() );
-		return true;
+	if( event->keyval == GDK_Return ) {
+		//if the CTRL_key is pressed, then we do not send, just make a return on the text,
+		//like other IM programs allow.
+		if( ( (event->state >> 2) & 0x1 ) == 0){ 
+			imWidget->send( get_buffer()->get_text() );
+			get_buffer()->erase( get_buffer()->begin(), get_buffer()->end() );
+			return true;
+		}
 	}
 	return Gtk::TextView::on_key_press_event( event );
 }

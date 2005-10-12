@@ -903,24 +903,28 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	cerr << "DefaultDialogHandler::sendIM - toUri = " << toUri <<  endl;
 	#endif
 	
-        MRef<SipIMMessage*> im = new SipIMMessage(
-                        std::string(branch),
+	MRef<SipIMMessage*> im = new SipIMMessage(
+			std::string(branch),
 			std::string(dialogState.callId),
 // 			toId,
 			toUri, 	
 			getDialogConfig()->inherited->sipIdentity,
 			//getDialogConfig()->inherited.localUdpPort,
-                        im_seq_no,
+			im_seq_no,
 			msg
-                        );
+			);
 
-        im->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-        im->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+	//FIXME: there should be a SipIMDialog, just like for register messages ...
+	// 	otherwise, we cannot keep track of local/remote tags, callids, etc ... 
+	//	very useful for matching incoming and outgoing IMs ...
+// 	im->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	im->getHeaderValueFrom()->setParameter("tag","12345678"); //we need a from tag ... anything ... 
+// 	im->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
-        MRef<SipMessage*> pref(*im);
-        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+	MRef<SipMessage*> pref(*im);
+	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //      handleCommand(cmd);
-        getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
 
