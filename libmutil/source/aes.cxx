@@ -79,6 +79,7 @@ void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 	temp = (unsigned char *)malloc( AES_BLOCK_SIZE );
 
 	memcpy( aes_input, iv, 12 );
+	iv += 12;
 
 	for( ctr = 0; ctr < length/AES_BLOCK_SIZE; ctr++ ){
 		input = ctr + U32_AT(iv);
