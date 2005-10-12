@@ -356,8 +356,10 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 	
 	senderLock.lock();
 	if( !(*givenTs) ){
-		lastTs += 160; //FIXME! get it from the CODEC,
-			// when we have one CODEC per sender
+		//FIXME! get it from the CODEC,
+		// when we have one CODEC per sender
+		increaseLastTs(); //increase lastTs ... 
+				//lastTs += 160; 
 		*givenTs = lastTs;
 	}
 	else{

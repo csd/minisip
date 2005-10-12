@@ -354,6 +354,8 @@ class MediaStreamSender : public MediaStream{
 		 */
 		uint32_t getSsrc();
 		
+		void increaseLastTs( ) { lastTs += 160; };
+		uint32_t getLastTs() { return lastTs; };
 		
 	private:
 		uint32_t ssrc;

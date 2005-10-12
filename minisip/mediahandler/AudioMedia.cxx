@@ -193,6 +193,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 				encodeZeroData = true;
 				//cerr << endl << "AudioMedia::sendData - sending silence sample!" << endl;
 			} else {
+				(*i)->increaseLastTs(); //update the lastTimeStamp ... even we don't send, we must ...
 				continue;
 			}
 		}
