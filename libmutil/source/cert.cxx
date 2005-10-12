@@ -92,14 +92,14 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	file = cert_filename;
 }
 
-certificate::certificate( const unsigned char * der_cert, int length ):private_key(NULL){
+certificate::certificate( unsigned char * der_cert, int length ):private_key(NULL){
 	cert = X509_new();
 
 	if( cert == NULL )
 		throw new certificate_exception_init(
 				"Could not create the certificate" );
 
-	d2i_X509( &cert, &der_cert, length );
+	d2i_X509( &cert, (const unsigned char**)&der_cert, length );
 }
 	
 certificate::~certificate(){
