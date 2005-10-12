@@ -77,6 +77,8 @@ class LIBMUTIL_API CommandString : public MObject{
 
 class LIBMUTIL_API CommandStringReceiver{
 	public:
+		virtual ~CommandStringReceiver(){}
+		
 		virtual void handleCommand(const CommandString &)=0;
 };
 

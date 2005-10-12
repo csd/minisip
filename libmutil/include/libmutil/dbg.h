@@ -48,6 +48,8 @@ class LIBMUTIL_API DbgEndl{
 };
 
 class LIBMUTIL_API DbgHandler{
+	public:
+		virtual ~DbgHandler(){}
 	private:
 		virtual void displayMessage(std::string output,int style=-1)=0;
 		friend class Dbg;
