@@ -99,7 +99,11 @@ certificate::certificate( unsigned char * der_cert, int length ):private_key(NUL
 		throw new certificate_exception_init(
 				"Could not create the certificate" );
 
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L 
 	d2i_X509( &cert, (const unsigned char**)&der_cert, length );
+#else
+	d2i_X509( &cert, (unsigned char**)&der_cert, length );
+#endif
 }
 	
 certificate::~certificate(){
