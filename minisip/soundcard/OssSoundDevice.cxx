@@ -85,7 +85,9 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	}
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
+		#ifdef DEBUG_OUTPUT	
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
+		#endif
 	}
 
 /*
@@ -119,7 +121,9 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	}
 			
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFMT, &ossFormat ) == -1 ){
+		#ifdef DEBUG_OUTPUT	
 		perror( "ioctl, SNDCTL_DSP_SETFMT (failed to set format to AFMT_S16_LE)" );
+		#endif
 	}
 
 #ifdef DEBUG_OUTPUT
@@ -130,7 +134,9 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	this->nChannelsPlay = nChannels;
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_CHANNELS, &channels ) == -1 ){
+		#ifdef DEBUG_OUTPUT	
 		perror("ioctl, SNDCTL_DSP_CHANNELS (tried to set channels number)");
+		#endif
 	}
 	
 #ifdef DEBUG_OUTPUT
@@ -156,7 +162,9 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	setSpeed = samplingRate;
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
+		#ifdef DEBUG_OUTPUT	
 		perror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
+		#endif
 	}
 
 	this->samplingRate = setSpeed;
@@ -184,9 +192,11 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	fdRecord = ::open( dev.c_str(), mode | O_NONBLOCK );
 	
 	if( fdRecord == -1 ){
+		#ifdef DEBUG_OUTPUT
 		merr << "Could not open the sound device " << dev << 
 			" for recording: "
 			<< strerror( errno ) << end;
+		#endif
 		return -1;
 	}
 
@@ -196,7 +206,9 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	fcntl( fdRecord, F_SETFL, flags );
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
+		#ifdef DEBUG_OUTPUT
 		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
+		#endif
 	}
 	
 	//int channels = 1;
@@ -204,12 +216,14 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	//this->nChannels = nChannels;
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_CHANNELS, &channels ) == -1 ){
+		#ifdef DEBUG_OUTPUT
 		perror("ioctl, SNDCTL_DSP_CHANNELS");
+		#endif
 	}
 	
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 	cerr << "OssSoundDevice: number of channels set to "<< channels << endl;
-#endif
+	#endif
 
 	this->nChannelsRecord = channels;
 
@@ -248,7 +262,9 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	setSpeed = samplingRate;
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
+		#ifdef DEBUG_OUTPUT
 		perror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
+		#endif
 	}
 
 	this->samplingRate = setSpeed;
@@ -264,8 +280,10 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 
 int OssSoundDevice::closePlayback(){
 	if( !openedPlayback || fdPlayback == -1 ){
+		#ifdef DEBUG_OUTPUT
 		cerr << "WARNING: doing close on already "
 			"closed sound card"<< endl;
+		#endif
 		return -1;
 	}
 
@@ -280,8 +298,10 @@ int OssSoundDevice::closeRecord(){
 	cerr << "OSS: Closing sound card for recording" << endl;
 #endif
 	if( !openedRecord || fdRecord == -1 ){
+		#ifdef DEBUG_OUTPUT
 		cerr << "WARNING: doing close on already "
 			"closed sound card"<< endl;
+		#endif
 		return -1;
 	}
 
@@ -371,7 +391,9 @@ void OssSoundDevice::sync(){
 	do{
 		interrupted = false;
 		if( ioctl( fdPlayback, SNDCTL_DSP_SYNC ) == -1 ){
+			#ifdef DEBUG_OUTPUT
 			perror( "ioctl sync error on soundcard" );
+			#endif
 			interrupted=true;
 		}
 	}while( interrupted && errno==EINTR );

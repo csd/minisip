@@ -308,7 +308,9 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	}
 
 	if (snd_pcm_sw_params_set_start_threshold(writeHandle, swparams, startThreshold)){
+		#ifdef DEBUG_OUTPUT	
 		cerr << "Could not set ALSA start threshold (playback)" << endl;
+		#endif
 // 		exit(-1);
 	}
 	
@@ -319,7 +321,9 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 	}
 	
 	if (snd_pcm_sw_params_set_avail_min(writeHandle, swparams, minAvailable)){
+		#ifdef DEBUG_OUTPUT	
 		cerr << "Could not set ALSA avail_min (playback)" << endl;
+		#endif
 // 		exit(-1);
 	}
 	
@@ -491,9 +495,13 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	if( snd_pcm_hw_params_set_period_size_near (readHandle, hwparams2, &this->periodSize, 0) < 0 ) {
 		cerr << "Record Could not set ALSA period size" << endl;
 		exit( -1 );
-	} else {
+	} 
+#ifdef DEBUG_OUTPUT	
+	else {
 		cerr << "Record: alsa period size set to " << this->periodSize << endl;
+		
 	}
+#endif
 	if (snd_pcm_hw_params(readHandle, hwparams2) < 0) {
 		cerr << "Record Could not apply parameters to ALSA sound card for playout" << endl;
 		exit(-1);

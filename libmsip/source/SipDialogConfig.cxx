@@ -102,7 +102,9 @@ void SipIdentity::setSipUri(string addr){
 		sipDomain = addr.substr(addr.find("@")+1);
 	}
 
+#ifdef DEBUG_OUTPUT	
 	cerr << "SipIdentity::setSipUri: sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
+#endif
 }
 
 string SipIdentity::getSipUri() {
