@@ -72,7 +72,7 @@ void SRtpPacket::protect( MRef<CryptoContext *> scontext ){
 	tag_length = scontext->get_tag_length();
 	tag = new unsigned char[ tag_length ];
 	
-	scontext->rtp_authenticate( this, tag );
+	scontext->rtp_authenticate( this, scontext->get_roc(), tag );
 
 	/* Update the ROC if necessary */
 	if( getHeader().getSeqNo() == 0xFFFF )
@@ -112,7 +112,7 @@ int SRtpPacket::unprotect( MRef<CryptoContext *> scontext ){
 	int length = get_tag_length();
 	
 	unsigned char * mac = new unsigned char[length];
-	scontext->rtp_authenticate( this, mac );
+	scontext->rtp_authenticate( this, ( guessed_index >> 16 ), mac );
 	//cerr << "MAC computed: " << print_hex( mac, 4 )<< endl;
 	for( int i = 0; i < length; i++ ){
 		if( tag[i] != mac[i] )

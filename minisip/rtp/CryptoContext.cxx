@@ -162,7 +162,7 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 }
 
 /* Warning: tag must have been initialized */
-void CryptoContext::rtp_authenticate( RtpPacket * rtp, unsigned char * tag ){
+void CryptoContext::rtp_authenticate( RtpPacket * rtp, uint32_t roc, unsigned char * tag ){
 	unsigned int tag_length;
 	
 	if( aalg == MIKEY_SRTP_AALG_SHA1HMAC )

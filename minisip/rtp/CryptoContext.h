@@ -59,7 +59,8 @@ class CryptoContext : public MObject{
 		unsigned int get_roc();
 
 		void rtp_encrypt( RtpPacket * rtp, uint64_t index );
-		void rtp_authenticate( RtpPacket * rtp, unsigned char * tag );
+		void rtp_authenticate( RtpPacket * rtp, uint32_t roc, 
+				unsigned char * tag );
 		void derive_srtp_keys( uint64_t index );
 		uint64_t guess_index( unsigned short new_seq_nb );
 		bool check_replay( unsigned short new_seq_nb );
