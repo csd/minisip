@@ -168,17 +168,27 @@ void CryptoContext::rtp_authenticate( RtpPacket * rtp, unsigned char * tag ){
 	if( aalg == MIKEY_SRTP_AALG_SHA1HMAC )
 	{
 		unsigned char temp[20];
+		unsigned char * chunks[3];
+		unsigned int chunkLength[3];
+		uint32_t beRoc = hton32( roc );
 		
 		char * bytes = rtp->getBytes();
 		unsigned int header_size = rtp->getHeader().size() ;
 		unsigned int content_size = rtp->getContentLength() ;
+		
+		chunks[0] = (unsigned char *)bytes;
+		chunkLength[0] = header_size + content_size;
+		chunks[1] = (unsigned char *)&beRoc;
+		chunkLength[1] = 4;
+		chunks[2] = NULL;
+
 //		cerr << "packet no: " << rtp->getHeader().getSeqNo() << endl;
 //		cerr << "HMAC input size: " << header_size + content_size << endl;
 //		cerr << "HMAC input: " << print_hex( (unsigned char *)bytes, header_size + content_size ) << endl;
 		hmac_sha1( k_a, n_a,
-		    /* data */ (unsigned char *)bytes, 
+		    /* data */ chunks, 
 		    /*authenticated part length */	
-		    	header_size + content_size,
+		    	chunkLength,
 		    /* tag */  temp, &tag_length );
 		assert( tag_length == 20 );
 		/* truncate the result */
