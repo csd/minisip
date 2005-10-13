@@ -33,6 +33,7 @@
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
+#include<config.h>
 #include"SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialog.h>
@@ -237,11 +238,6 @@ void SipSoftPhoneConfiguration::save(){
 //	parser->saveToFile( configFileName );
 	//delete( parser );
 
-	//WARN about possible inconsistencies and the need to restart MiniSIP
-	string warn;
-	warn = "\n\nAttention! *********************************************\n";
-	warn += "   MiniSIP needs to be restarted for changes to take effect\n\n";
-	merr << warn << end;
 }
 
 string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
@@ -388,6 +384,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	
 #ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
+	cerr << "Loaded video_device" << videoDevice << endl;
 	frameWidth = backend->loadInt( "frame_width", 176 );
 	frameHeight = backend->loadInt( "frame_height", 144 );
 #endif
