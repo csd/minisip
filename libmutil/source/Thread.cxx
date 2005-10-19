@@ -336,8 +336,8 @@ int Thread::msleep(int ms){
 	return 0;
 #else
 	struct timespec request;
-	request.tv_sec = 0;
-	request.tv_nsec = (long) ms * 1000 * 1000;
+	request.tv_sec = ms/1000;
+	request.tv_nsec = (long) (ms%1000) * 1000 * 1000;
 	return nanosleep( &request, NULL );
 #endif
 }
