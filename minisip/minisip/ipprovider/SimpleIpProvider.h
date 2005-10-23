@@ -37,6 +37,11 @@ class SimpleIpProvider: public IpProvider{
 		virtual std::string getMemObjectType(){return "SimpleIpProvider";};
 
 	private:
+		/**
+		Helper function ... 
+		@return true if ip is in the private range defined by IETF
+		*/
+		bool isInPrivateIpRange( string ip );
 		std::string localIp;
 
 };
