@@ -54,12 +54,9 @@
 #include<errno.h>
 #include<arpa/inet.h>
 
-
-
 using namespace std;
 
-UDPSocket::UDPSocket(bool use_ipv6, int32_t port){
-
+bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 	type = SOCKET_TYPE_UDP;
 	this->use_ipv6 = use_ipv6;
 	
@@ -98,9 +95,16 @@ UDPSocket::UDPSocket(bool use_ipv6, int32_t port){
 		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))!=0){
 			throw new BindFailed( errno );
 		}
-
-
 	}
+	return true;
+}
+
+UDPSocket::UDPSocket( int32_t port ) {
+	initUdpSocket( false, port );
+}
+
+UDPSocket::UDPSocket( bool use_ipv6, int32_t port ){
+	initUdpSocket( use_ipv6, port );
 }
 	
 UDPSocket::~UDPSocket(){

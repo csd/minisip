@@ -312,7 +312,7 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 	MediaStream( media ){
 	selectedCodec = NULL;
 	remotePort = 0; 
-	seqNo = 0;
+	seqNo = (uint16_t)rand();
 	ssrc = rand();
 	lastTs = rand();
         payloadType = 255;

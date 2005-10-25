@@ -36,6 +36,7 @@
 
 #include<stdio.h>
 #include<sys/types.h>
+#include<stdlib.h> //for rand
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -49,20 +50,52 @@
 #include<errno.h>
 #endif
 
+//Set the range of rtp usable ports ... starting at min and spanning a range, up to max
+#define RTP_LOCAL_PORT_RANGE_MIN 30000
+#define RTP_LOCAL_PORT_RANGE 5000
+#define RTP_LOCAL_PORT_RANGE_MAX RTP_LOCAL_PORT_RANGE_MIN + RTP_LOCAL_PORT_RANGE
+#define RTP_RECEIVER_MAX_RETRIES 5
+
+
 using namespace std;
 
 RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
-	try{
-		socket = new UDPSocket();
+
+	socket = NULL;
+	
+	int portretry = 0;
+	for (; portretry<RTP_RECEIVER_MAX_RETRIES; portretry++ ) {
+		//generate a random port, even number, in the given range
+		float randPartial =  (float)rand()  /  RAND_MAX;
+		int port = (int) (RTP_LOCAL_PORT_RANGE * randPartial );
+		port = 2 * (int)( port/2  ); //turn this into an even number
+		port += RTP_LOCAL_PORT_RANGE_MIN; //add the min port to set it within the range
+		#ifdef DEBUG_OUTPUT
+		printf( "RtpReceiver:: final trying port = %d\n", port );
+		#endif
+		try{
+			socket = new UDPSocket( port );
+			if( socket ) {
+				break;
+			}
+		}
+		catch( NetworkException * exc ){
+			// FIXME: do something nice
+// 			merr << "Minisip could not create a UDP socket!" << end;
+// 			merr << "Check your network settings." << end;
+// 			exit( 1 );
+			#ifdef DEBUG_OUTPUT
+			cerr << "RtpReceiver: Could not create UDP socket" << endl;
+			#endif
+		}
 	}
-	catch( NetworkException * exc ){
-		// FIXME: do something nice
-		merr << "Minisip could not create a UDP socket!" << end;
-		merr << "Check your network settings." << end;
-		exit( 1 );
+	if( portretry == RTP_RECEIVER_MAX_RETRIES && !socket ) {
+			merr << "Minisip could not create a UDP socket!" << end;
+			merr << "Check your network settings." << end << "Quitting badly" << end;
+			exit( 1 );
 	}
-                
-        externalPort = ipProvider->getExternalPort( socket );
+	
+	externalPort = ipProvider->getExternalPort( socket );
 
 	kill = false;
 

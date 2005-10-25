@@ -41,7 +41,9 @@ using namespace std;
 
 class LIBMNETUTIL_API UDPSocket : public Socket {
 	public:
-		UDPSocket(bool use_ipv6=false, int32_t port=0);
+	
+		UDPSocket( bool use_ipv6=false, int32_t port=0 );
+		UDPSocket( int32_t port );
 		
 		virtual ~UDPSocket();
 
@@ -58,6 +60,7 @@ class LIBMNETUTIL_API UDPSocket : public Socket {
 		bool setLowDelay();
 
 	private:
+		bool initUdpSocket( bool use_ipv6, int32_t port );
 		bool use_ipv6;
 };
 #endif
