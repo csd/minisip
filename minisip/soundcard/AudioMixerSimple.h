@@ -210,7 +210,9 @@ bool AudioMixerSimple::normalizeStereo( int32_t length ) {
 				sample[1] = -NORMALIZE_MAX_RANGE;
 			else 
 				sample[1] = NORMALIZE_MAX_RANGE;
+			#ifdef DEBUG_OUTPUT
 			cerr << "n";
+			#endif
 		}
 		
 		*(outbuff++) = short(sample[0]);
