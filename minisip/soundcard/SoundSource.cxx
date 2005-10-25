@@ -144,10 +144,9 @@ void BasicSoundSource::pushSound(short * samples,
 	//Check for OverFlow ... this happens if we receive big burst of packets ...
 	//or we are not emptying the buffer quick enough ...
  	if( cbuff->getFree() < nMonoSamples * (int)oNChannels ) {
-// 	#ifdef DEBUG_OUTPUT
+		#ifdef DEBUG_OUTPUT
  		printf("OF");
-// 		cerr << "BasicSoundSource::pushSound - Buffer overflow - dropping packet"<<endl;
-// 	#endif
+		#endif
 // 		bufferLock.unlock();
 // 		return;
  	}

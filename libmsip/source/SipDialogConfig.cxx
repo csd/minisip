@@ -94,7 +94,9 @@ void SipIdentity::setSipUri(string addr){
 	if (addr.substr(0,4)=="sip:")
 			addr = addr.substr(4);
 	if (addr.find("@")==string::npos){
+			#ifdef DEBUG_OUTPUT	
 			cerr << "WARNING: Incomplete sip address: "<< addr<<endl;
+			#endif
 		sipUsername = addr.substr(0, addr.find("@"));
 		sipDomain = "";
 	} else {

@@ -294,7 +294,9 @@ int AlsaSoundDevice::openPlayback( int samplingRate, int nChannels, int format )
 		cerr << "Could not set ALSA (playback) period size" << endl;
 		exit( -1 );
 	} else {
+		#ifdef DEBUG_OUTPUT
 		cerr << "Record: alsa period size set to " << this->periodSize << endl;
+		#endif
 	}
 	if (snd_pcm_hw_params(writeHandle, hwparams) < 0) {
 		cerr << "Could not apply parameters to ALSA (playback) sound card for playout" << endl;
@@ -436,9 +438,9 @@ int AlsaSoundDevice::openRecord( int samplingRate, int nChannels, int format ){
 	}
 
 	if( (unsigned int)samplingRate != wantedSamplingRate ){
-#ifdef DEBUG_OUTPUT		
+		#ifdef DEBUG_OUTPUT		
 		cerr << "Could not set chosen (record) rate of " << wantedSamplingRate << ", set to "<< samplingRate <<endl;
-#endif
+		#endif
 	}
 	this->samplingRate = samplingRate;
 
