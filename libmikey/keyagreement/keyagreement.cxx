@@ -432,6 +432,9 @@ uint8_t KeyAgreement::setPolicyParamType(uint8_t prot_type, uint8_t policy_type,
 	return policyNo;
 }
 
+static byte_t ipsec4values[] = {MIKEY_IPSEC_SATYPE_ESP,MIKEY_IPSEC_MODE_TRANSPORT,MIKEY_IPSEC_SAFLAG_PSEQ,MIKEY_IPSEC_EALG_3DESCBC,24,MIKEY_IPSEC_AALG_SHA1HMAC,16};
+static byte_t srtpvalues[] ={MIKEY_SRTP_EALG_AESCM,16,MIKEY_SRTP_AALG_SHA1HMAC,20,14,MIKEY_SRTP_PRF_AESCM,0,1,1,MIKEY_FEC_ORDER_FEC_SRTP,1,10,0};
+
 uint8_t KeyAgreement::setdefaultPolicy(uint8_t prot_type){
 	list<Policy_type *>::iterator iter;
 	uint8_t policyNo = 0;
@@ -444,8 +447,6 @@ uint8_t KeyAgreement::setdefaultPolicy(uint8_t prot_type){
 		else
 			iter++;
 	}
-	byte_t ipsec4values[] = {MIKEY_IPSEC_SATYPE_ESP,MIKEY_IPSEC_MODE_TRANSPORT,MIKEY_IPSEC_SAFLAG_PSEQ,MIKEY_IPSEC_EALG_3DESCBC,24,MIKEY_IPSEC_AALG_SHA1HMAC,16};
-	byte_t srtpvalues[] ={MIKEY_SRTP_EALG_AESCM,16,MIKEY_SRTP_AALG_SHA1HMAC,20,14,MIKEY_SRTP_PRF_AESCM,0,1,1,MIKEY_FEC_ORDER_FEC_SRTP,1,4,0};
 	int i, arraysize;
 	switch (prot_type) {
 	case MIKEY_PROTO_SRTP:
@@ -475,6 +476,21 @@ uint8_t KeyAgreement::getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_ty
 	for( i = policy.begin(); i != policy.end()  ; i++ )
 		if( (*i)->policy_No == policy_No && (*i)->prot_type == prot_type && (*i)->policy_type == policy_type && (*i)->length == 1)
 			return (uint8_t)(*i)->value[0];
+	
+	switch(prot_type) {
+	case MIKEY_PROTO_SRTP:
+		if (policy_type < sizeof(srtpvalues)/sizeof(srtpvalues[0]))
+			return srtpvalues[policy_type];
+		printf("MIKEY_PROTO_SRTP type out of range %d", policy_type);
+		break;
+	case MIKEY_PROTO_IPSEC4:
+		if (policy_type < sizeof(ipsec4values)/sizeof(ipsec4values[0]))
+			return ipsec4values[policy_type];
+		printf("MIKEY_PROTO_IPSEC4 type out of range %d", policy_type);
+		break;
+	default:
+		break;
+	}
 	return 0;
 }
 

@@ -73,6 +73,12 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		MRef<certificate_chain *> peerCertificateChain();
 		void addPeerCertificate( MRef<certificate *> cert );
 		int controlPeerCertificate();
+
+		MikeyMessage * parseResponse( MikeyMessage * response);
+		void setOffer( MikeyMessage * offer );
+		MikeyMessage * buildResponse( MikeyMessage * offer);
+		bool authenticate( MikeyMessage * msg);
+
 	private:
 		int groupValue;
 		DH * opensslDhPtr;

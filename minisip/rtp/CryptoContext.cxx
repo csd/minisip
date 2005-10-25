@@ -55,7 +55,8 @@ CryptoContext::CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
 				uint8_t akeyl,
 				uint8_t skeyl,
 				uint8_t encr, 
-				uint8_t auth):
+				uint8_t auth,
+				uint8_t tag_length):
 
 ssrc(ssrc),using_mki(false),mki_length(0),mki(NULL),
 roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
@@ -93,14 +94,17 @@ master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
 			k_s = new unsigned char[ n_s ];
 			break;
 	}
+
 	switch( aalg ){
 		case MIKEY_SRTP_AALG_NULL:
 			n_a = 0;
 			k_a = NULL;
+			this->tag_length = 0;
 			break;
 		case MIKEY_SRTP_AALG_SHA1HMAC:
 			n_a = akeyl;
 			k_a = new unsigned char[ n_a ];
+			this->tag_length = tag_length;
 			break;
 	}
 }
@@ -355,7 +359,7 @@ int CryptoContext::get_tag_length(){
 		case MIKEY_SRTP_AALG_NULL:
 			return 0;
 		case MIKEY_SRTP_AALG_SHA1HMAC:
-			return 4;
+			return tag_length;
 	}
 	return -1;
 }

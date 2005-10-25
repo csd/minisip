@@ -52,7 +52,8 @@ class CryptoContext : public MObject{
 				uint8_t akeyl,
 				uint8_t skeyl,
 				uint8_t encr, 
-				uint8_t auth );
+				uint8_t auth,
+				uint8_t tag_length );
 		~CryptoContext();
 		
 		void set_roc( unsigned int roc );
@@ -112,6 +113,7 @@ class CryptoContext : public MObject{
 		uint8_t skeyl;
 		uint8_t encr;
 		uint8_t auth;
+		uint8_t tag_length;
 };
 
 #endif
