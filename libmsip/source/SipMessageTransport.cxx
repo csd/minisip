@@ -458,14 +458,14 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			if( socket.isNull() ) {
 				/* No existing StreamSocket to that host,
 				* create one */
-				cerr << "CESC: SipMessageTransport: sendMessage: creating new socket" << endl;
+				cerr << "SipMessageTransport: sendMessage: creating new socket" << endl;
 				if( preferredTransport == "TLS" )
 					socket = new TLSSocket( ip_addr, 
 								5061, tls_ctx, getMyCertificate(),
 								cert_db );
 				else /* TCP */
 					socket = new TCPSocket( ip_addr, port );
-			} else cerr << "CESC: SipMessageTransport: sendMessage: reusing old socket" << endl;
+			} else cerr << "SipMessageTransport: sendMessage: reusing old socket" << endl;
 
 			addSocket( socket );
 		}
@@ -520,7 +520,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
 		mdbg << "Transport error in SipMessageTransport: " << message << end;
-		cerr << "CESC: SipMessageTransport: sendMessage: exception thrown!" << endl;
+		cerr << "SipMessageTransport: sendMessage: exception thrown!" << endl;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
