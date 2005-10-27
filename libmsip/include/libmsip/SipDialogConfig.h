@@ -327,9 +327,15 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 
 		MRef<SipInvite*> last_invite;
 
+		/**
+		Set the identity to be used as default.
+		@param identity identity to be used
+		@param useSecurity 
+		@param transport it is ignored ... transport is set according to the identity->sipProxy->getTransport() value
+		*/
 		void useIdentity( MRef<SipIdentity*> identity,
 				bool useSecurity,
-				string transport="UDP");
+				string transport="UDP_X");
 
 };
 

@@ -180,7 +180,8 @@ void SipDialogConfig::useIdentity(
 			string transport)
 {
 	inherited->sipIdentity = identity;
-	inherited->transport = transport;
+// 	inherited->transport = transport;
+	inherited->transport = inherited->sipIdentity->sipProxy.getTransport();
 }
 
 
