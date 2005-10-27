@@ -132,5 +132,5 @@ void AES::ctr_encrypt( unsigned char * data, unsigned int data_length,
 	for( unsigned int i = 0; i < data_length; i++ ){
 		data[i] ^= cipher_stream[i];
 	}
-	delete cipher_stream;
+	delete[] cipher_stream;
 }

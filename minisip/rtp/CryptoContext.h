@@ -39,7 +39,8 @@ class CryptoContext : public MObject{
 	public:
 		CryptoContext( uint32_t ssrc );
 		
-		CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
+		CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
+			        int key_deriv_rate,
 				//enum encr_method encryption, 
 				uint8_t ealg, 
 				//enum auth_method authentication,

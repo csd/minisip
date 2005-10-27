@@ -138,7 +138,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         return false;
 }
 
-MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
+MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 	MRef<CryptoContext *> cryptoContext;
 	
 	kaLock.lock();
@@ -181,7 +181,7 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 #endif
 
 		if( csId != 0 ){
-			cryptoContext = new CryptoContext( ssrc, roc, keydr, 
+			cryptoContext = new CryptoContext( ssrc, roc, seq_no, keydr, 
 			ealg, aalg, masterKey, 16, masterSalt, 14, ekeyl, akeyl, skeyl, encr, auth, autht );
 
 			cryptoContext->derive_srtp_keys( 0 );
@@ -196,7 +196,7 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc ){
 	return cryptoContext;
 }
 
-MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc ){
+MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc, uint16_t seq_no ){
 	kaLock.lock();
 	list< MRef<CryptoContext *> >::iterator i;
 
@@ -208,7 +208,7 @@ MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc ){
 	}
 
 	kaLock.unlock();
-	return initCrypto( ssrc );
+	return initCrypto( ssrc, seq_no );
 }
 
 void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
@@ -263,6 +263,7 @@ uint16_t MediaStreamReceiver::getPort(){
 
 void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
 	uint32_t packetSsrc;
+	uint16_t seq_no;
 	
 	//if packet is null, we had a read timeout from the rtpReceiver
 	if( !packet ) {
@@ -270,9 +271,10 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
 	}
 	
 	packetSsrc = packet->getHeader().getSSRC();
+	seq_no = packet->getHeader().getSeqNo();
 	
 	
-	if( packet->unprotect( getCryptoContext( packetSsrc ) )){
+	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
 		// Authentication or replay protection failed
 		return;
 	}
@@ -382,7 +384,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 		packet->getHeader().setMarker( marker );
 	}
 
-	packet->protect( getCryptoContext( ssrc ) );
+	packet->protect( getCryptoContext( ssrc, seqNo - 1 ) );
 
 	packet->sendTo( **senderSock, *remoteAddress, remotePort );
 	delete packet;

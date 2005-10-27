@@ -42,7 +42,8 @@ ealg(MIKEY_SRTP_EALG_NULL), aalg(MIKEY_SRTP_AALG_NULL),
 ekeyl(0), akeyl(0), skeyl(0), 
 encr(1), auth(1){}/*These should be set to 0, but for backward compatability they are set to 1  *///encryption(no_encr),authentication(no_auth)
 
-CryptoContext::CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
+CryptoContext::CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
+			        int key_deriv_rate,
 				//enum encr_method encryption, 
 				uint8_t ealg,
 				//enum auth_method authentication,
@@ -59,7 +60,7 @@ CryptoContext::CryptoContext( uint32_t ssrc, int roc, int key_deriv_rate,
 				uint8_t tag_length):
 
 ssrc(ssrc),using_mki(false),mki_length(0),mki(NULL),
-roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
+roc(roc),guessed_roc(0),s_l(seq_no),key_deriv_rate(key_deriv_rate),
 replay_window(0),
 master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
 //encryption(encryption),authentication(authentication)
@@ -83,8 +84,8 @@ master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
 		case MIKEY_SRTP_EALG_NULL:
 			n_e = 0;
 			k_e = NULL;
-			n_a = 0;
-			k_a = NULL;
+			n_s = 0;
+			k_s = NULL;
 			break;
 		case MIKEY_SRTP_EALG_AESCM:
 		case MIKEY_SRTP_EALG_AESF8:
@@ -172,19 +173,22 @@ void CryptoContext::rtp_authenticate( RtpPacket * rtp, uint32_t roc, unsigned ch
 	if( aalg == MIKEY_SRTP_AALG_SHA1HMAC )
 	{
 		unsigned char temp[20];
-		unsigned char * chunks[3];
-		unsigned int chunkLength[3];
+		unsigned char * chunks[4];
+		unsigned int chunkLength[4];
 		uint32_t beRoc = hton32( roc );
 		
-		char * bytes = rtp->getBytes();
+		char * bytes = rtp->getHeader().getBytes();
+		unsigned char * content = rtp->getContent();
 		unsigned int header_size = rtp->getHeader().size() ;
 		unsigned int content_size = rtp->getContentLength() ;
 		
 		chunks[0] = (unsigned char *)bytes;
-		chunkLength[0] = header_size + content_size;
-		chunks[1] = (unsigned char *)&beRoc;
-		chunkLength[1] = 4;
-		chunks[2] = NULL;
+		chunkLength[0] = header_size;
+		chunks[1] = (unsigned char *)content;
+		chunkLength[1] = content_size;
+		chunks[2] = (unsigned char *)&beRoc;
+		chunkLength[2] = 4;
+		chunks[3] = NULL;
 
 //		cerr << "packet no: " << rtp->getHeader().getSeqNo() << endl;
 //		cerr << "HMAC input size: " << header_size + content_size << endl;

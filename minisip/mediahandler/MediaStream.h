@@ -113,14 +113,14 @@ class MediaStream : public MObject{
 		MRef<Media *> getMedia() { return media; }
 		
 	protected:
-		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc );
+		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
 		MediaStream( MRef<Media *> );
 		MRef<Media *> media;
 		uint32_t csbId;
 		
 		uint8_t localPayloadType;
 
-		MRef<CryptoContext *> initCrypto( uint32_t ssrc );
+		MRef<CryptoContext *> initCrypto( uint32_t ssrc, uint16_t seq_no );
 		MRef<KeyAgreement *> ka;
 		Mutex kaLock;
 		std::list< MRef<CryptoContext *> > cryptoContexts;
