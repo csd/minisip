@@ -51,6 +51,10 @@
 
 #include<libmutil/itoa.h>
 
+#ifdef DEBUG_OUTPUT
+#include <typeinfo>  //remove, for debug in ipaq
+#endif
+
 using namespace std;
 
 /**
@@ -376,11 +380,26 @@ MRef<OPType>::operator bool() const {
 
 template<class OPType>
 OPType MRef<OPType>::operator->() const {
+	OPType ret;
+	ret = getPointer();
+	if( ret == NULL ) {
+		#ifdef DEBUG_OUTPUT
+		cerr << "MRef::operator-> : ERROR: trying to access null pointer (" << typeid(OPType).name() << ")." << endl;
+		#endif
+		assert( ret != NULL );
+	}
 	return getPointer(); 
 }
 
 template<class OPType>
 OPType MRef<OPType>::operator*(){
+	OPType ret;
+	ret = getPointer();
+	if( ret == NULL ) {
+		#ifdef DEBUG_OUTPUT
+		cerr << "MRef::operator* : Warning: accessing a null pointer (" << typeid(OPType).name() << ")." << endl;
+		#endif
+	}
 	return getPointer();
 }
 

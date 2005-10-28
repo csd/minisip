@@ -30,7 +30,6 @@
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>
 
-#include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipResponse.h>
@@ -80,7 +79,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
 	}
 	
-	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptContactFactory);
+	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
 	SipHeader::headerFactories.addFactory("Authorization", sipHeaderAuthorizationFactory);
 	SipHeader::headerFactories.addFactory("Call-ID", sipHeaderCallIdFactory);

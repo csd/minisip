@@ -76,6 +76,7 @@ SipHeaderValueAcceptContact::SipHeaderValueAcceptContact():SipHeaderValue(SIP_HE
  *			Expected form:
  *			  Accept-Contact: *;featuretag;require;explicit
  *			  'request' and 'explicit' are optional
+ * FIXME ... this parsing can be improved ... 
  */
 SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT,sipHeaderValueValueTypeStr) {
 	
@@ -85,27 +86,26 @@ SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipH
 	set_explicit = false;
 	unsigned i=0;
 	//cerr<<"SipHeaderValueAcceptContact"+build_from<<endl;
-	while (build_from[i]!=';')
+	while ( build_from[i]!=';' && i<build_from.length() ) {
 		i++;
+	}
 	
 	//Parse featuretag
 	i++;
 	string value="";
-	while (!(build_from[i]==';' || i>=build_from.length())) {
+	while ( build_from[i]!=';' && i<build_from.length() ) {
 		value+=build_from[i];
 		i++;
 	}
 	featuretag = value;
-	
+
 	//Parse request, explicit
 	i++;
 	value="";
-	while (!(build_from[i]==';' || i>=build_from.length())) {
+	while ( build_from[i]!=';' && i<build_from.length() ) {
 		value+=build_from[i];
 		i++;
 	}	
-	
-	
 	
 	if(value=="request")
 		set_require = true;
@@ -113,7 +113,7 @@ SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipH
 		set_explicit = true;
 	
 	value="";
-	while (!(build_from[i]==';' || i>=build_from.length())) {
+	while ( build_from[i]!=';' && i<build_from.length() ) {
 		i++;
 		value+=build_from[i];
 	}
