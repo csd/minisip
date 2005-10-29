@@ -461,13 +461,13 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				cerr << "SipMessageTransport: sendMessage: creating new socket" << endl;
 				if( preferredTransport == "TLS" )
 					socket = new TLSSocket( ip_addr, 
-								5061, tls_ctx, getMyCertificate(),
+								port, tls_ctx, getMyCertificate(),
 								cert_db );
 				else /* TCP */
 					socket = new TCPSocket( ip_addr, port );
+				addSocket( socket );
 			} else cerr << "SipMessageTransport: sendMessage: reusing old socket" << endl;
 
-			addSocket( socket );
 		}
 
 		if (addVia){

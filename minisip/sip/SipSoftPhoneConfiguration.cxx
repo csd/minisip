@@ -113,6 +113,9 @@ void SipSoftPhoneConfiguration::save(){
 		
 		backend->save( accountPath + "proxy_addr", (*iIdent)->sipProxy.sipProxyAddressString );
 
+		backend->save( accountPath + "proxy_port",
+			       (*iIdent)->sipProxy.sipProxyPort );
+
 		if( (*iIdent)->sipProxy.sipProxyUsername != "" ){
 			backend->save( accountPath + "proxy_username", (*iIdent)->sipProxy.sipProxyUsername );
 		
