@@ -92,12 +92,13 @@ int32_t ILBCCodec::getSamplingSizeMs(){
 	return 20;
 }
 
+/*
 int32_t ILBCCodec::getEncodedNrBytes(){
 	assert(BLOCKL==160);
 	assert(38==NO_OF_BYTES);
 	return 38;
 }
-
+*/
 
 int32_t ILBCCodec::getInputNrSamples(){
 	return 160;

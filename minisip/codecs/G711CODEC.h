@@ -60,7 +60,7 @@ class G711Codec : public AudioCodec{
 		/**
 		 * size of the output of the codec in bytes. This is 160.
 		 */
-		virtual int32_t getEncodedNrBytes();
+//		virtual int32_t getEncodedNrBytes();
 		
 		virtual int32_t getInputNrSamples();
 		

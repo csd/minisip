@@ -68,9 +68,11 @@ int32_t G711Codec::getSamplingFreq(){
 	return 8000;
 }
 
+/*
 int32_t G711Codec::getEncodedNrBytes(){
 	return 160;
 }
+*/
 
 int32_t G711Codec::getInputNrSamples(){
 	return 160;

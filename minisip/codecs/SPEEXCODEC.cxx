@@ -117,9 +117,11 @@ int32_t SpeexCodec::getSamplingFreq(){
 }
 
 
+/*
 int32_t SpeexCodec::getEncodedNrBytes(){
 	return 160;
 }
+*/
 
 
 int32_t SpeexCodec::getInputNrSamples(){

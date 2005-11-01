@@ -45,9 +45,11 @@ std::string GsmCodec::getSdpMediaAttributes(){
 	return "GSM/8000";
 }
 
+/*
 int32_t GsmCodec::getEncodedNrBytes(){
 	return GSM_FRAME_SIZE;
 }
+*/
 
 int32_t GsmCodec::getInputNrSamples(){
 	return GSM_EXEPECTED_INPUT;

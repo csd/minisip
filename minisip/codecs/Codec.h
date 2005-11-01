@@ -70,6 +70,8 @@ class CodecState: public MObject{
 
 		void setCodec( MRef<Codec *> c ){ codec = c; };
 	
+		MRef<Codec*> getCodec(){return codec;}
+		
 	private:
 		MRef<Codec *> codec;
 		
@@ -94,8 +96,9 @@ class AudioCodec : public Codec{
 		
 		/**
 		 * size of the output of the codec in bytes.
+		 * Returns -1 if output size may vary.
 		 */
-		virtual int32_t getEncodedNrBytes()=0;//
+//		virtual int32_t getEncodedNrBytes()=0;//
 		
 		virtual int32_t getInputNrSamples()=0;
 	
@@ -109,7 +112,7 @@ class AudioCodec : public Codec{
 		 */
 		virtual int32_t getSamplingSizeMs()=0;
 		
-		virtual std::string getMemObjectType(){return "AudioCodec";}
+		//virtual std::string getMemObjectType(){return "AudioCodec";}
 		
 };
 

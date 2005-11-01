@@ -14,8 +14,13 @@ if HAS_GSM
 libcodecs_a_SOURCES += GsmCodec.cxx
 endif
 
+if TCP_FRIENDLY
+libcodecs_a_SOURCES += VBWCODEC.cxx
+endif
+
 noinst_HEADERS =  G711CODEC.h \
                   ILBCCODEC.h \
 		  SPEEXCODEC.h \
 		  GsmCodec.h \
+		  VBWCODEC.h \
 		  Codec.h

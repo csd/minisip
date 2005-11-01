@@ -71,7 +71,7 @@ class ILBCCodec : public AudioCodec{
 		/**
 		 * size of the output of the codec in bytes. This is 50.
 		 */
-		virtual int32_t getEncodedNrBytes();
+//		virtual int32_t getEncodedNrBytes();
 		
 		virtual int32_t getInputNrSamples();
 

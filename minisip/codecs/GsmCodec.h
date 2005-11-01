@@ -36,7 +36,7 @@ class GsmCodec: public AudioCodec{
 		std::string getSdpMediaAttributes();
 		std::string getMemObjectType(){return "GsmCodec";};
 
-		int32_t getEncodedNrBytes();
+//		int32_t getEncodedNrBytes();
 		int32_t getInputNrSamples();
 		int32_t getSamplingFreq();
 		int32_t getSamplingSizeMs();
