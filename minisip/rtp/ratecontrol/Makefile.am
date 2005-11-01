@@ -1,7 +1,7 @@
 
 noinst_LIBRARIES = libratecontrol.a
 
-librtp_a_SOURCES = RecvBwMngr.cxx \
+libratecontrol_a_SOURCES = RecvBwMngr.cxx \
 		   SendBwMngr.cxx \
 		   TFRC_NET/cdn.cxx \
 		   TFRC_NET/nrecv.cxx \
