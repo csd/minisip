@@ -155,7 +155,7 @@ char *RtpPacket::getBytes(){
 }
 
 int RtpPacket::size(){
-	return hdr.size()+content_length;
+	return header.size()+content_length;
 }
 
 unsigned char *RtpPacket::getContent(){
