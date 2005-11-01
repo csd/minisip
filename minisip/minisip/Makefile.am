@@ -80,6 +80,9 @@ minisip_LDADD +=../rtp/librtp.a \
 		confbackend/libconfbackend.a \
                 ../stun/libstun.a
 
+if TCP_FRIENDLY
+minisip_LDADD += ../rtp/ratecontrol/libratecontrol.a
+endif
 
 
 minisip_SOURCES = Minisip.cxx
