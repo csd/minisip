@@ -4,14 +4,14 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdio.h>
-#include "fbcontainer.h"
-#include "tfrctime.h"
-#include "rcalc.h"
-#include "../TFRC_NET/nsend.h"
-#include "../TFRC_NET/nrecv.h"
-#include "../TFRC_NET/cdn.h"
-#include "setimer.h"
-#include "../TFRC_UTIL/tutil.h"
+#include "TFRC_SENDER/fbcontainer.h"
+#include "TFRC_SENDER/tfrctime.h"
+#include "TFRC_SENDER/rcalc.h"
+#include "TFRC_NET/nsend.h"
+#include "TFRC_NET/nrecv.h"
+#include "TFRC_NET/cdn.h"
+#include "TFRC_SENDER/setimer.h"
+#include "TFRC_UTIL/tutil.h"
 
 
 class SendBwMngr {
