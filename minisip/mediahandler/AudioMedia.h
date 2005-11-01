@@ -156,6 +156,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 
 	protected:
                 MRef<Resampler *> resampler;
+                MRef<Resampler *> vbrresampler;
                 SilenceSensor * silenceSensor;
                 MRef<SoundIO *> soundIo;                 
 		uint32_t seqNo;

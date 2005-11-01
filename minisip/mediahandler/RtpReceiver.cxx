@@ -205,8 +205,11 @@ void RtpReceiver::run(){
 			continue;
 		}
 
+		IPAddress * fromIp=0;
+		int fromPort;
+
 		try{
-			packet = SRtpPacket::readPacket( **socket );
+			packet = SRtpPacket::readPacketFrom( **socket, fromIp, fromPort );
 		}
 
 		catch (NetworkException * exc ){
@@ -217,6 +220,10 @@ void RtpReceiver::run(){
 		if( !packet ){
 			continue;
 		}
+#ifdef TCP_FRIENDLY
+		assert(fromIp);
+		recvBwMngr.rtpReceived(*packet, fromIp->getString(), fromPort );
+#endif
 
 		mediaStreamsLock.lock();
 		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){

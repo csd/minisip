@@ -32,6 +32,7 @@
 
 #include"../rtp/SRtpPacket.h"
 
+
 class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
@@ -218,8 +219,11 @@ class MediaStreamReceiver : public MediaStream{
 		Mutex ssrcListLock;
 
 		bool running;
-		
+
 };
+
+
+#include"../rtp/ratecontrol/SendBwMngr.h"
 
 /**
  * The MediaStreamSender is used to send media to a specific peer, during
@@ -357,6 +361,11 @@ class MediaStreamSender : public MediaStream{
 		void increaseLastTs( ) { lastTs += 160; };
 		uint32_t getLastTs() { return lastTs; };
 		
+
+#ifdef TCP_FRIENDLY
+		void setFriendlyBandwidth(int kbps){ friendlyBwKbps = kbps; }
+#endif
+		
 	private:
 		uint32_t ssrc;
 		MRef<UDPSocket *> senderSock;
@@ -373,6 +382,11 @@ class MediaStreamSender : public MediaStream{
 		bool muted;
 		uint32_t muteCounter;
 		
+#ifdef TCP_FRIENDLY
+		SendBwMngr sendBwMngr;
+		int friendlyBwKbps;
+#endif
+	
 };
 
 #endif
