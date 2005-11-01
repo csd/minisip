@@ -74,6 +74,23 @@ AC_ARG_ENABLE(debug,
       fi ])
 
 dnl debug flag
+AC_ARG_ENABLE(tcpfriendly,
+    [ --enable-tcpfriendly enables tcp friendly experiment code by David
+     Tlahuetl and Erik Eliasson (default disabled)],
+    [ if test "${enable_debug}" = "yes"
+      then
+        AC_DEFINE(TCP_FRIENDLY, [], [TCP Friendly])
+	TCP_FRIENDLY="yes"
+      else
+      	AC_DEFINE(NTCP_FRIENDLY, [], [No TCP Friendly support])
+	TCP_FRIENDLY="no"
+      fi ])
+
+AM_CONDITIONAL(TCP_FRIENDLY, test "${TCP_FRIENDLY}" = "yes")
+
+
+
+dnl debug flag
 AC_ARG_ENABLE(color-terminal,
     [ --enable-color-terminal enables color coding of some debug messages (default disabled)],
     [ if test "${enable_color_terminal}" = "yes"
@@ -540,6 +557,7 @@ AC_OUTPUT([codecs/Makefile
                  minisip/gui/gtkgui/Makefile
                  minisip/gui/textui/Makefile
                  rtp/Makefile
+                 rtp/ratecontrol/Makefile
                  sip/Makefile
                  soundcard/Makefile
                  spaudio/Makefile
