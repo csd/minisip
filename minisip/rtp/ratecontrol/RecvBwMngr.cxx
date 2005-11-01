@@ -1,7 +1,7 @@
 #include "RecvBwMngr.h"
 
-RecvBwMngr::RecvBwMngr(char *remoteipp) : fbt(&ph), recrat(&lpi, &ph), fbi(&ph, &pc, &recrat), rxs(&fbi) {
-  remoteip=remoteipp; 
+RecvBwMngr::RecvBwMngr(/*char *remoteipp*/) : fbt(&ph), recrat(&lpi, &ph), fbi(&ph, &pc, &recrat), rxs(&fbi) {
+//  remoteip=remoteipp; 
   pc.set_packhist(&ph);
   pc.set_rxrate(&recrat);
   firstpack=1;
@@ -22,9 +22,11 @@ int RecvBwMngr::set_tfrc_vals(short seqnumb,unsigned long senderts, float rttv){
   int esp,au3;
   unsigned long sendtsf;
 
-      
+  //Error check - make sure that the IP address is set.
+  assert(remoteip.size()>0);
+  
   //// Network variables
-  nsend s2s(remoteip, 27001);
+  nsend s2s((char*)remoteip.c_str(), 27001);
   
   sic.set_values(seqnumb, senderts, rttv, arrtif);
 
@@ -85,6 +87,17 @@ int RecvBwMngr::set_tfrc_vals(short seqnumb,unsigned long senderts, float rttv){
     }
   } 
   return (0);
+}
+
+void RecvBwMngr::rtpReceived(MRef<RtpPacket*> rtp, string fromIp, int fromPort){
+	int seqno = rtp->getHeader().getSeqNo();
+	uint32_t rtt_ms = rtp->getHeader().getRttEstimate();
+	int sts = rtp->getHeader().getSendingTimestamp();
+	
+	remoteip = fromIp;
+	
+	set_tfrc_vals(seqno, sts, float(rtt_ms));
+	
 }
 
 

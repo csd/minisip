@@ -1,6 +1,8 @@
 #include "SendBwMngr.h"
 
+
 SendBwMngr::SendBwMngr () {
+  t=NULL;
   ut.genrandn(ranum);
   ut.gentimebase(basetime);
 
@@ -10,15 +12,26 @@ SendBwMngr::~SendBwMngr () {
 }
 
 
-void SendBwMngr::set_rtp_header_v() {
+
+void SendBwMngr::set_rtp_header_v(MRef<RtpPacket*> rtp) {
+
+	
   stsgen stsa(ranum,basetime);
   psts=stsa.get_sts();
+
+  rtp->getHeader().setSendingTimestamp( psts );
+  rtp->getHeader().setRttEstimate( (int)(rttv*1000) );
+  
 }
 
 
+void SendBwMngr::setBwListener(MediaStreamSender* l){
+	listener = l;
+}
+	
 
 
-void SendBwMngr::runcli() {
+void SendBwMngr::run() {
 
 	//Basic vairabales with inital values
 	int se, sspace=10, szise=1460;
@@ -70,7 +83,10 @@ void SendBwMngr::runcli() {
 	  
 	  rcal.Ceffx(); //calculates the efficient rate for voip
 	  ex=rcal.effx;
-	  //codec.set_target_bw(ex);
+
+	  //Inform the listener of the new target bandwith
+	  listener->setFriendlyBandwidth((int)ex);
+	  
 	  
 	}
 }
