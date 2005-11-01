@@ -132,12 +132,21 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	hdr.setTimestamp( U32_AT( buf + 4 ) );
 	hdr.setSSRC( U32_AT( buf + 8 ) );
 
-	for( j = 0 ; j < cc ; j++ )
-		hdr.addCSRC( U32_AT( buf + 12 + j*4 ) );
-                
-	int datalen = i - 12 - cc*4;
+	int extraHeaders=0;
+#ifdef TCP_FRIENDLY
+	if (hdr.extension){
+		hdr.setSendingTimestamp(U32_AT(buf+12));
+		hdr.setSendingTimestamp(U32_AT(buf+16));
+		extraHeaders=8;
+	}
 	
-	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+4*cc], datalen);
+#endif
+	for( j = 0 ; j < cc ; j++ )
+		hdr.addCSRC( U32_AT( buf + 12 + extraHeaders + j*4 ) );
+                
+	int datalen = i - 12 - extraHeaders - cc*4 ;
+	
+	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+extraHeaders+4*cc], datalen);
 	
 	return rtp;
 }

@@ -36,6 +36,13 @@ RtpHeader::RtpHeader(){
 	sequence_number=0;
 	timestamp=0;
 	SSRC=0;
+
+#ifdef TCP_FRIENDLY
+	tcpFriendlyMode=false;
+	sending_timestamp=0;
+	rttestimate=0;
+#endif
+
 }
 
 void RtpHeader::setVersion(int v){
@@ -98,7 +105,12 @@ void RtpHeader::addCSRC(int c){
 
 
 int RtpHeader::size(){
-	return 12+4*CSRC.size();
+	int s = 12+4*CSRC.size();
+	
+#ifdef TCP_FRIENDLY
+	s+=8; // 4(rtt)+4(sendts)
+#endif
+	return s;
 }
 
 char *RtpHeader::getBytes(){
@@ -119,8 +131,19 @@ char *RtpHeader::getBytes(){
         ((uint32_t *)ret)[1] = hton32( timestamp );
         ((uint32_t *)ret)[2] = hton32( SSRC );
 	
+	int i32=3; //index in the packet where we are adding headers. If
+	  	   //we are using tcp friendly mode we insert two extra 
+		   //32 bit headers and the CSRCs will not be in their
+		   //usual place.
+#ifdef TCP_FRIENDLY
+	if (tcpFriendlyMode){
+		((uint32_t *)ret)[i32++] = hton32(sending_timestamp);
+		((uint32_t *)ret)[i32++] = hton32(rttestimate);
+	}
+#endif
+	
         for( i = 0; i < CSRC.size(); i++ )
-		((uint32_t *)ret)[3+i]=hton32(CSRC[i]);
+		((uint32_t *)ret)[i32+i]=hton32(CSRC[i]);
         
 	return ret;
 }

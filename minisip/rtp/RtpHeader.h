@@ -47,6 +47,11 @@ class RtpHeader{
 		uint32_t getSSRC();
 		void addCSRC(int csrc);
 
+#ifdef TCP_FRIENDLY
+		void setRttEstimate(uint32_t rtt){tcpFriendlyMode=true; rttestimate=rtt;}
+		void setSendingTimestamp(uint32_t ts){tcpFriendlyMode=true; sending_timestamp=ts;}
+#endif
+
 #ifdef DEBUG_OUTPUT
 		void printDebug();
 #endif
@@ -63,7 +68,16 @@ class RtpHeader{
 		uint32_t timestamp;
 		uint32_t SSRC;
 		vector<int> CSRC; 
+		
 	private:
+#ifdef TCP_FRIENDLY 
+		//code to support the variable bandwidth experiments in the
+		//thesis by David Tlahuetl
+		bool tcpFriendlyMode;
+		uint32_t sending_timestamp;
+		uint32_t rttestimate;
+#endif
+
 };
 
 #endif
