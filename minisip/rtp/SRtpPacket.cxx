@@ -181,56 +181,31 @@ SRtpPacket::~SRtpPacket(){
 }
 
 
-SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, int timeout){
+SRtpPacket *SRtpPacket::readPacketFrom(UDPSocket &srtp_socket, IPAddress *&fromIp, int& fromPort, int timeout){
 #define UDP_SIZE 65536
-        int i;
         uint8_t buf[UDP_SIZE];
-        uint8_t j;
-        uint8_t cc;
-	//memset( buf, '\0', UDP_SIZE );
 
-        i = srtp_socket.recv( (char*)buf, UDP_SIZE );
-	
-        if( i < 0 ){
-#ifdef DEBUG_OUTPUT
-		perror("recvfrom:");
-#endif
+	RtpHeader hdr;
+	int hdrlen;
+	int pktlen = internalReadPacket(srtp_socket, buf, UDP_SIZE, hdr, hdrlen, fromIp,fromPort);
+
+	if (pktlen<=0)
 		return NULL;
-        }
 
-        if( i < 12 ){
-                /* too small to contain an RTP header */
-                return NULL;
-        }
-
-        cc = buf[0] & 0x0F;
-        if( i < 12 + cc * 4 ){
-                /* too small to contain an RTP header with cc CCSRC */
-                return NULL;
-        }
-
-        RtpHeader hdr;
-        hdr.setVersion( ( buf[0] >> 6 ) & 0x03 );
-        hdr.setExtension(  ( buf[0] >> 4 ) & 0x01 );
-        hdr.setCSRCCount( cc );
-        hdr.setMarker( ( buf[1] >> 7 ) & 0x01  );
-        hdr.setPayloadType( buf[1] & 0x7F );
-
-        hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) | buf[3] );
-        hdr.setTimestamp( U32_AT( buf + 4 ) );
-        hdr.setSSRC( U32_AT( buf + 8 ) );
-
-        for( j = 0 ; j < cc ; j++ )
-                hdr.addCSRC( U32_AT( buf + 12 + j*4 ) );
-        
-	int datalen = i - 12 - cc*4;
-
-	unsigned char *data = (unsigned char *)&buf[ 12 + 4*cc ];
-
-	SRtpPacket *srtp = new SRtpPacket( hdr, data, datalen, NULL, 0, NULL, 0 );
+	SRtpPacket *srtp = new SRtpPacket( hdr, (unsigned char *)&buf[12+hdrlen], pktlen-hdrlen, NULL, 0, NULL, 0 );
         
 	return srtp;
 }
+
+
+SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, int timeout){
+        IPAddress *fromIp;
+        int fromPort;
+        SRtpPacket *rtp = readPacketFrom(srtp_socket, fromIp, fromPort, timeout);
+        delete fromIp;
+        return rtp;
+}
+
 
 char *SRtpPacket::getBytes(){
 	char * ret;

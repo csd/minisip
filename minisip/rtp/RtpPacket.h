@@ -38,6 +38,7 @@ class RtpPacket: public MObject {
 		virtual ~RtpPacket();
 		
 		static RtpPacket *readPacket(UDPSocket &udp_sock, int timeout=-1);
+		static RtpPacket *readPacketFrom(UDPSocket &udp_sock, IPAddress *&fromIp, int &fromPort, int timeout=-1);
 
 		void sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port);
 		
@@ -54,6 +55,8 @@ class RtpPacket: public MObject {
 		virtual int size();
 	
 	protected:
+
+		static int internalReadPacket(UDPSocket &rtp_socket, uint8_t *buf, int maxsize, RtpHeader &hdr, int &headerLength, IPAddress *& fromIp, int &fromPort);
 
 		RtpHeader header;
 		int content_length;

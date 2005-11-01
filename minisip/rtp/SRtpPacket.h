@@ -46,7 +46,8 @@ class SRtpPacket : public RtpPacket{
 			unsigned ssrc);
                 virtual ~SRtpPacket();
 
-                static SRtpPacket *readPacket( UDPSocket &udp_sock, int timeout=-1 ); // static????
+                static SRtpPacket *readPacket( UDPSocket &udp_sock, int timeout=-1 );
+                static SRtpPacket *readPacketFrom( UDPSocket &udp_sock, IPAddress *&fromIp, int &fromPort, int timeout=-1 );
 
                 void protect( MRef<CryptoContext *> scontext );
                 int unprotect( MRef<CryptoContext *> scontext );

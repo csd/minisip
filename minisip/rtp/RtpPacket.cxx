@@ -92,35 +92,38 @@ void RtpPacket::sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port){
 	delete [] bytes;
 }
 
-RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
-#define UDP_SIZE 65536
-	int i;
-	uint8_t buf[UDP_SIZE];
+
+/**
+ * Returns the length of the whole RTP packet
+ *
+ */
+int RtpPacket::internalReadPacket(UDPSocket &rtp_socket, uint8_t *buf, int maxsize, RtpHeader &hdr, int &headerLength, IPAddress *& fromIp, int &fromPort){
+	int nread;
         uint8_t j;
         uint8_t cc;
-//	memset( buf, '\0', 2048 );
 	
-	i = rtp_socket.recv( (char *)buf, UDP_SIZE );
+	nread = rtp_socket.recvFrom((char *)buf, maxsize, fromIp, fromPort);
+	
 
-	if( i < 0 ){
+	if( nread < 0 ){
 #ifdef DEBUG_OUTPUT
 		perror("recvfrom:");
 #endif
-		return NULL;
+		return -1;
 	}
 
-        if( i < 12 ){
+        if( nread < 12 ){
                 /* too small to contain an RTP header */
-                return NULL;
+                return -1;
         }
 
         cc = buf[0] & 0x0F;
-        if( i < 12 + cc * 4 ){
+        if( nread < 12 + cc * 4 ){
                 /* too small to contain an RTP header with cc CCSRC */
-                return NULL;
+                return -1;
         }
 	
-	RtpHeader hdr;
+//	RtpHeader hdr;
 	hdr.setVersion( ( buf[0] >> 6 ) & 0x03 );
 	hdr.setExtension(  ( buf[0] >> 4 ) & 0x01 );
 	hdr.setCSRCCount( cc );
@@ -128,7 +131,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	hdr.setPayloadType( buf[1] & 0x7F );
 	
 	hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) | buf[3] );
-	cerr << "GOT SEQN" << hdr.getSeqNo() << endl;
+//	cerr << "GOT SEQN" << hdr.getSeqNo() << endl;
 	hdr.setTimestamp( U32_AT( buf + 4 ) );
 	hdr.setSSRC( U32_AT( buf + 8 ) );
 
@@ -136,7 +139,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 #ifdef TCP_FRIENDLY
 	if (hdr.extension){
 		hdr.setSendingTimestamp(U32_AT(buf+12));
-		hdr.setSendingTimestamp(U32_AT(buf+16));
+		hdr.setRttEstimate(U32_AT(buf+16));
 		extraHeaders=8;
 	}
 	
@@ -144,10 +147,32 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	for( j = 0 ; j < cc ; j++ )
 		hdr.addCSRC( U32_AT( buf + 12 + extraHeaders + j*4 ) );
                 
-	int datalen = i - 12 - extraHeaders - cc*4 ;
+	headerLength = 12+extraHeaders+cc*4;
+	int datalen = nread - headerLength;
 	
-	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+extraHeaders+4*cc], datalen);
+
+}
+
+RtpPacket *RtpPacket::readPacketFrom(UDPSocket &rtp_socket, IPAddress *&fromIp, int &fromPort, int timeout){
+#define UDP_SIZE 65536
+	uint8_t buf[UDP_SIZE];
+	RtpHeader hdr;
+	int hdrlen;
+	int pktlen = internalReadPacket(rtp_socket, buf, UDP_SIZE, hdr, hdrlen, fromIp, fromPort);
+
+	if (pktlen<=0)
+		return NULL;
+
+	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+hdrlen], pktlen-hdrlen);
 	
+	return rtp;
+}
+
+RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
+	IPAddress *fromIp;
+	int fromPort;
+	RtpPacket *rtp = readPacketFrom(rtp_socket, fromIp, fromPort, timeout);
+	delete fromIp;
 	return rtp;
 }
 

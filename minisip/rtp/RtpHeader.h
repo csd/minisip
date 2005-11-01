@@ -49,7 +49,10 @@ class RtpHeader{
 
 #ifdef TCP_FRIENDLY
 		void setRttEstimate(uint32_t rtt){tcpFriendlyMode=true; rttestimate=rtt;}
+		uint32_t getRttEstimate(){return rttestimate;}
+		
 		void setSendingTimestamp(uint32_t ts){tcpFriendlyMode=true; sending_timestamp=ts;}
+		uint32_t getSendingTimestamp(){return sending_timestamp;}
 #endif
 
 #ifdef DEBUG_OUTPUT
