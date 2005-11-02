@@ -192,7 +192,7 @@ SRtpPacket *SRtpPacket::readPacketFrom(UDPSocket &srtp_socket, IPAddress *&fromI
 	if (pktlen<=0)
 		return NULL;
 
-	SRtpPacket *srtp = new SRtpPacket( hdr, (unsigned char *)&buf[12+hdrlen], pktlen-hdrlen, NULL, 0, NULL, 0 );
+	SRtpPacket *srtp = new SRtpPacket( hdr, (unsigned char *)&buf[hdrlen], pktlen-hdrlen, NULL, 0, NULL, 0 );
         
 	return srtp;
 }

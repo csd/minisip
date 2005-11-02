@@ -58,13 +58,13 @@ SipProxy::SipProxy(std::string addr, int port){
 
 SipProxy::SipProxy(std::string userUri, string transport) {
 	string addr;
-	int port;
+	uint16_t port;
 	autodetectSettings = true;
 	
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	try {
-		addr = SipProxy::findProxy( userUri, (uint16_t)port, transport );
+		addr = SipProxy::findProxy( userUri, port, transport );
 	}catch( NetworkException * exc ) {
 		if( transport == "TCP" ) { 
 			//if tcp doesn't work, try find UDP
@@ -77,7 +77,7 @@ SipProxy::SipProxy(std::string userUri, string transport) {
 		try {
 			cerr << "Autodetect Sip proxy for [" << userUri << "] for transport TCP failed. Retrying with transport UDP." << endl;
 			transport = "UDP";
-			addr = SipProxy::findProxy( userUri, (uint16_t)port, transport );
+			addr = SipProxy::findProxy( userUri, port, transport );
 		}catch( NetworkException * exc2 ) {
 				addr = "unknown";
 		}

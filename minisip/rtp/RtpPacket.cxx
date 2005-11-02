@@ -148,9 +148,8 @@ int RtpPacket::internalReadPacket(UDPSocket &rtp_socket, uint8_t *buf, int maxsi
 		hdr.addCSRC( U32_AT( buf + 12 + extraHeaders + j*4 ) );
                 
 	headerLength = 12+extraHeaders+cc*4;
-	int datalen = nread - headerLength;
 	
-
+	return nread;
 }
 
 RtpPacket *RtpPacket::readPacketFrom(UDPSocket &rtp_socket, IPAddress *&fromIp, int &fromPort, int timeout){
@@ -163,7 +162,7 @@ RtpPacket *RtpPacket::readPacketFrom(UDPSocket &rtp_socket, IPAddress *&fromIp, 
 	if (pktlen<=0)
 		return NULL;
 
-	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+hdrlen], pktlen-hdrlen);
+	RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[hdrlen], pktlen-hdrlen);
 	
 	return rtp;
 }
