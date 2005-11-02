@@ -16,8 +16,8 @@ Class and member declarations
   class SomeClass : public Base {
   	public:
   		SomeClass();
-		void someMethod();
-	  private:
+  		void someMethod();
+  	private:
   		int attribute;
   };
 
@@ -29,30 +29,30 @@ Control structures
 
   Example:
   if (expression) {
-	  statements;
+  	statements;
   } else {
-	  statements;
+    	statements;
   }
 
   for (expression; expression; expression) {
-	statements;
+    	statements;
   }
 
   do {
-	statements;
+    	statements;
   } while (expression);
 
   while (expression) {
-	statements;
+    	statements;
   }
 
   switch (expression) {
   	case constant:
-		statements;
-		break;
-	default:
-		statements;
-		break;
+  		statements;
+  		break;
+  	default:
+  		statements;
+  		break;
   }
 
 
