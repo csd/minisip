@@ -48,7 +48,7 @@ AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account se
 	// Create the active widgets
 	nameEntry = manage( new Gtk::Entry );
 	uriEntry = manage( new Gtk::Entry );
-	autodetectProxyCheck = manage( new Gtk::CheckButton( "Manually specify SIP proxy:" ) );
+	autodetectProxyCheck = manage( new Gtk::CheckButton( "Autodetect SIP proxy" ) );
 	proxyEntry = manage( new Gtk::Entry );
 	requiresAuthCheck = manage( new Gtk::CheckButton( "Requires authentication" ) );
 	usernameEntry = manage( new Gtk::Entry );
@@ -227,25 +227,27 @@ void AccountDialog::addAccount(){
 		Gtk::TreeModel::iterator iter = list->append();
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
-		if( !autodetectProxyCheck->get_active() ){
+		
+		if( autodetectProxyCheck->get_active() ){
+			(*iter)[list->columns->autodetectSettings] = true;
 			(*iter)[list->columns->proxy] = "";
-		}
-		else{
+			(*iter)[list->columns->port] = 5060;
+		} else{
+			(*iter)[list->columns->autodetectSettings] = false;
 			(*iter)[list->columns->proxy] = proxyEntry->get_text();
+			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
+		
 		(*iter)[list->columns->defaultProxy] = false;
 		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();
 		(*iter)[list->columns->password] = passwordEntry->get_text();
-		(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		(*iter)[list->columns->registerExpires] = registerTimeSpin->get_value_as_int();
 		if( tcpRadio->get_active() ){
 			(*iter)[list->columns->transport] = "TCP";
-		}
-		else if( tlsRadio->get_active() ){
+		} else if( tlsRadio->get_active() ){
 			(*iter)[list->columns->transport] = "TLS";
-		}
-		else{
+		} else{
 			(*iter)[list->columns->transport] = "UDP";
 		}
 	}
@@ -254,67 +256,69 @@ void AccountDialog::addAccount(){
 void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	nameEntry->set_text( (*iter)[list->columns->name] );
 	uriEntry->set_text( (*iter)[list->columns->uri] );
-	autodetectProxyCheck->set_active(  (*iter)[list->columns->proxy] != "" );
+	
+	autodetectProxyCheck->set_active(  (*iter)[list->columns->autodetectSettings] ); //(*iter)[list->columns->proxy] != "" );
+	//note ... the values for proxy and port will show whatever we found ... even in autodetect mode
 	proxyEntry->set_text( (*iter)[list->columns->proxy] );
+	proxyPortSpin->set_value( (double)((*iter)[list->columns->port]) );
+	
 	requiresAuthCheck->set_active( (*iter)[list->columns->username] != "" );
 	usernameEntry->set_text( (*iter)[list->columns->username] );
 	passwordEntry->set_text( (*iter)[list->columns->password] );
-	proxyPortSpin->set_value( (double)((*iter)[list->columns->port]) );
 	registerTimeSpin->set_value( (*iter)[list->columns->registerExpires] );
+	
 	if( (*iter)[list->columns->transport] == "TCP" ){
 		tcpRadio->set_active( true );
-	}
-	else if( (*iter)[list->columns->transport] == "TLS" ){
+	} else if( (*iter)[list->columns->transport] == "TLS" ){
 		tlsRadio->set_active( true );
-	}
-	else{
+	} else{
 		udpRadio->set_active( true );
 	}
-	
 	if( run() == Gtk::RESPONSE_OK ){
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
-		if( !autodetectProxyCheck->get_active() ){
+		
+		(*iter)[list->columns->autodetectSettings] = autodetectProxyCheck->get_active();
+		if( autodetectProxyCheck->get_active() ){
 			(*iter)[list->columns->proxy] = "";
-		}
-		else{
+			(*iter)[list->columns->port] = 5060;
+		} else{
 			(*iter)[list->columns->proxy] = proxyEntry->get_text();
+			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
+		
 		(*iter)[list->columns->defaultProxy] = false;
 		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();
 		(*iter)[list->columns->password] = passwordEntry->get_text();
-		(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		(*iter)[list->columns->registerExpires] = registerTimeSpin->get_value_as_int();
+		
 		if( tcpRadio->get_active() ){
 			(*iter)[list->columns->transport] = "TCP";
-		}
-		else if( tlsRadio->get_active() ){
+		} else if( tlsRadio->get_active() ){
 			(*iter)[list->columns->transport] = "TLS";
-		}
-		else{
+		}else{
 			(*iter)[list->columns->transport] = "UDP";
 		}
-
-
 	}
 }
-		
 
 void AccountDialog::requiresAuthCheckChanged(){
-	usernameEntry->set_sensitive( requiresAuthCheck->get_active() );
-	usernameLabel->set_sensitive( requiresAuthCheck->get_active() );
-	passwordEntry->set_sensitive( requiresAuthCheck->get_active() );
-	passwordLabel->set_sensitive( requiresAuthCheck->get_active() );
-	if( !requiresAuthCheck->get_active() ){
+	bool setTo = requiresAuthCheck->get_active();
+	usernameEntry->set_sensitive( setTo );
+	usernameLabel->set_sensitive( setTo );
+	passwordEntry->set_sensitive( setTo );
+	passwordLabel->set_sensitive( setTo );
+	if( !setTo ) {
 		usernameEntry->set_text( "" );
 		passwordEntry->set_text( "" );
 	}
 }
 		
 void AccountDialog::autodetectProxyCheckChanged(){
-	proxyEntry->set_sensitive( autodetectProxyCheck->get_active() );
-	proxyLabel->set_sensitive( autodetectProxyCheck->get_active() );
-	proxyPortSpin->set_sensitive( autodetectProxyCheck->get_active() );
-	proxyPortLabel->set_sensitive( autodetectProxyCheck->get_active() );
+	bool setTo = autodetectProxyCheck->get_active();
+	proxyEntry->set_sensitive( ! setTo  );
+	proxyLabel->set_sensitive( ! setTo  );
+	proxyPortSpin->set_sensitive( ! setTo  );
+	proxyPortLabel->set_sensitive( ! setTo  );
 }

@@ -24,7 +24,7 @@
 #include"AccountsList.h"
 #include"AccountDialog.h"
 #include"../../../sip/SipSoftPhoneConfiguration.h"
-#include<libmnetutil/NetworkException.h>
+// #include<libmnetutil/NetworkException.h>
 
 using namespace std;
 
@@ -32,16 +32,17 @@ AccountsListColumns::AccountsListColumns(){
 	add( identity );
 	add( name );
 	add( uri );
+	add( autodetectSettings );
 	add( proxy );
-	add( defaultProxy );
-	add( pstnProxy );
-	add( username );
-	add( password );
+	add( port );
+	add( transport );
 	add( doRegister );
 	add( status );
-	add( transport );
-	add( port );
+	add( username );
+	add( password );
 	add( registerExpires );
+	add( defaultProxy );
+	add( pstnProxy );
 }
 
 Glib::RefPtr<AccountsList> AccountsList::create( AccountsListColumns * columns ){
@@ -66,15 +67,16 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
 		(*iter)[columns->uri] = (*i)->sipUsername + "@" + (*i)->sipDomain;
-		(*iter)[columns->proxy] = (*i)->sipProxy.sipProxyAddressString;
-		(*iter)[columns->username] = (*i)->sipProxy.sipProxyUsername;
-		(*iter)[columns->password] = (*i)->sipProxy.sipProxyPassword;
+		(*iter)[columns->autodetectSettings] = (*i)->getSipProxy()->autodetectSettings;
+		(*iter)[columns->proxy] = (*i)->getSipProxy()->sipProxyAddressString;
+		(*iter)[columns->port] = (*i)->getSipProxy()->sipProxyPort;
+		(*iter)[columns->transport] = (*i)->getSipProxy()->getTransport();
 		(*iter)[columns->doRegister] = (*i)->registerToProxy;
+		(*iter)[columns->username] = (*i)->getSipProxy()->sipProxyUsername;
+		(*iter)[columns->password] = (*i)->getSipProxy()->sipProxyPassword;
+		(*iter)[columns->registerExpires] = (*i)->getSipProxy()->getDefaultExpires_int();
 		(*iter)[columns->defaultProxy] = ( (*i) == config->inherited->sipIdentity );
 		(*iter)[columns->pstnProxy] = ( (*i) == config->pstnIdentity );
-		(*iter)[columns->port] = (*i)->sipProxy.sipProxyPort;
-		(*iter)[columns->transport] = (*i)->sipProxy.getTransport();
-		(*iter)[columns->registerExpires] = (*i)->sipProxy.getDefaultExpires_int();
 		(*i)->unlock();
 	}
 
@@ -98,55 +100,28 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		string uri = Glib::locale_from_utf8( (*iter)[columns->uri] );
 		identity->setSipUri( uri );
 		
-		
 		string proxy = Glib::locale_from_utf8( (*iter)[columns->proxy] );
 		
 		identity->setDoRegister( (*iter)[columns->doRegister] );
 
-		uint16_t port = 5060;
-
-		try{
-		
-			if( proxy != "" ){
-				identity->sipProxy = SipProxy( proxy );
-			}
-			else{
-				string foundProxy = SipProxy::findProxy( uri, port );
-				if( foundProxy != "unknown" ){
-					identity->sipProxy = SipProxy( foundProxy );
-				}
-
-				else{
-					err += "Could not autodetect the proxy "
-						"for the SIP account " + name + ". "
-						"Minisip will not register to "
-						"that account.";
-					identity->setDoRegister( false );
-				}
-			}
-
-		}
-		catch( NetworkException * exc ){
-			err += "Minisip encountered the following network "
-				"error when resolving the proxy address of "
-				"the SIP account " + name + ": " +
-				exc->errorDescription() +". " +
-				"Minisip will not register to "
-				"that account.";
-			identity->setDoRegister( false );
+		string retProxy = identity->setSipProxy( 
+					(*iter)[columns->autodetectSettings], 
+					uri,  
+					Glib::locale_from_utf8( (*iter)[columns->transport] ), 
+					proxy, 
+					(*iter)[columns->port] );
+		if( retProxy != "" ) {
+			#ifdef DEBUG_OUTPUT
+			cerr << "AccountList::saveToConfig:: Account <" << name << "> warning: " << retProxy << endl; 
+			#endif
+			merr << retProxy << end; 
 		}
 
-		identity->sipProxy.sipProxyPort = (*iter)[columns->port];
-
-		identity->sipProxy.sipProxyUsername = 
+		identity->getSipProxy()->sipProxyUsername = 
 			Glib::locale_from_utf8( (*iter)[columns->username] );
 		
-		identity->sipProxy.sipProxyPassword = 
+		identity->getSipProxy()->sipProxyPassword = 
 			Glib::locale_from_utf8( (*iter)[columns->password] );
-
-		identity->sipProxy.setTransport(
-			Glib::locale_from_utf8( (*iter)[columns->transport] ) );
-
 
 		if( (*iter)[columns->pstnProxy] ){
 			identity->securitySupport = false;
@@ -159,7 +134,7 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			config->inherited->sipIdentity = identity;
 		}
 
-		identity->sipProxy.setDefaultExpires( (*iter)[columns->registerExpires] );
+		identity->getSipProxy()->setDefaultExpires( (*iter)[columns->registerExpires] );
 
 		config->identities.push_back( identity );
 	}

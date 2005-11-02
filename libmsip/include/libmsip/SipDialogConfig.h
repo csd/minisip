@@ -19,6 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Cesc Santasusana < cesc Dot santa at@ gmail dOT com>
 */
 
 
@@ -44,21 +45,9 @@
 #define LIBMSIP_API
 #endif
 
-#include<vector>
 #include<libmsip/SipInvite.h>
-#include<libmutil/TimeoutProvider.h>
-#include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
-#include<libmutil/XMLParser.h>
-#include<libmutil/cert.h>
-#include<libmutil/itoa.h>
-//#include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipSMCommand.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/mtypes.h>
-
-#include<libmutil/dbg.h>
 
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10
@@ -70,74 +59,50 @@
 
 #include<string>
 
+class Socket;
+class IPAddress;
 
-class LIBMSIP_API SipProxy{
+class LIBMSIP_API SipProxy : public MObject{
 	public:
-		SipProxy(){
-			sipProxyIpAddr = NULL;
-			sipProxyPort = 0; 
-			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-		}
+		/**
+		Initialize an empty proxy ... invalid
+		*/
+		SipProxy();
 
-		SipProxy(std::string addr){
-			assert(addr.find("@")==std::string::npos);
-			if (addr.find(":")!=std::string::npos){
-				std::string portstr = addr.substr(addr.find(":")+1);
-				mdbg<< "parsed proxy port to <"<< portstr<<">"<<end;
-				sipProxyPort = atoi(portstr.c_str());
-				sipProxyAddressString =  addr.substr(0,addr.find(":"));
-				
-			}else{
-				sipProxyAddressString = addr;
-			}
-
-			sipProxyIpAddr = new IP4Address(addr);
-			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-		}
+		/**
+		Initialize a proxy with manual settings
+		@param addr proxy string, it can be a name or an IP, with and without the :port
+		@param port port the proxy addr is set to, it has precedence over the :port in the addr param
+		*/
+		SipProxy(std::string addr, int port = -1);
 		
-		SipProxy(std::string addr, int port):sipProxyPort(port),sipProxyAddressString(addr){
-			sipProxyIpAddr = new IP4Address(addr);
-			registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-			defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-		}
-
-		void setProxy(std::string proxy, int port){
-			if (port != -1)
-				sipProxyPort = port;
-			sipProxyAddressString= proxy;
-			sipProxyIpAddr = new IP4Address(proxy);
-		}
-
-		std::string getDebugString(){
-			return "proxyString="+sipProxyAddressString
-				+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
-				+"; port="+itoa(sipProxyPort)
-				+"; user="+sipProxyUsername
-				+"; password="+sipProxyPassword
-				+"; expires="+itoa(defaultExpires);
-		}
-
-		static std::string findProxy(std::string uri, uint16_t &port){
-
-			if (uri.find("@")==std::string::npos){                 
-				return "unknown";
-			}
-			std::string domain = uri.substr(uri.find("@"));
-			domain=domain.substr(1);
-
-			std::string proxy = NetworkFunctions::getHostHandlingService("_sip._udp",domain, port);
-			if (proxy.length()<=0){
-				return "unknown";
-			}
-			return proxy;
-		}
-
+		/**
+		Initialize a proxy with automatic discovery of settings via DNS NAPTR and SRV
+		@param userUri user's AOR, from where we extract the hostpart to check for NAPTR and SRV
+		@param transport transport to check for (_sip._udp, ... ). If TCP and fails, we will retry 
+		with UDP. If TLS, there is no fallback (they are all unsecured).
+		*/
+		SipProxy(std::string userUri, string transport);
 		
-		int sipProxyPort;
+		void setProxy(std::string addr, int port);
+
+		std::string getDebugString();
+
+		/**
+		Find the proxy settings for the given uri
+		@param uri user's AOR, from where we extract the hostpart to check for NAPTR and SRV
+		@param port return parameter, where the port used by the service is obtained (the hostname is
+		returned as the return param
+		@param transport transport protocol to find the host:port settings for
+		@return the proxy hostname (the port is returned by reference)
+		*/
+		static std::string findProxy(std::string uri, uint16_t &port, string transport="UDP");
+
 		std::string sipProxyAddressString;
 		IPAddress * sipProxyIpAddr;
+		
+		int sipProxyPort;
+		
 		std::string sipProxyUsername;
 		std::string sipProxyPassword;
 		
@@ -153,6 +118,19 @@ class LIBMSIP_API SipProxy{
 
 		string getTransport(){ return transport; };
 		void setTransport( string transport ){this->transport = transport; };
+		
+		/**
+		True to indicate that the proxy settings are to be looked up using DNS NAPTR and SRV
+		It corresponds to <auto_detect_proxy> tag in the config file.
+		True if the proxy settings, using NAPTR and SRV lookups from DNS
+		False if the settings are specified in the config file
+		 <proxy_addr>, <proxy_port>, <transport>
+		
+		If autodetectProxy is true, the preferred transport is checked first. 
+		If that protocol is not supported, it will fall back to use UDP 
+		(except for TLS, which will just not connect ... we want security).
+		*/
+		bool autodetectSettings;
 		
 	private:
 		/**
@@ -171,6 +149,10 @@ class LIBMSIP_API SipProxy{
 		 */
 		int registerExpires; //in seconds
 
+		/**
+		Transport to use: (if TCP, we can fallback to UDP)
+		- UDP, TCP or TLS
+		*/
 		string transport;
 		
 };
@@ -186,6 +168,28 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		string getSipUri();
 
+		/**
+		@returns the sip proxy used by this identity
+		*/
+		MRef<SipProxy *> getSipProxy();
+		
+		/**
+		@param proxy sip proxy to be used by this identity
+		@returns true if it was ok, false otherwise
+		*/
+		bool setSipProxy( MRef<SipProxy *> proxy );
+		
+		/**
+		Set the proxy to be used by this identity, given the following params
+		@param autodetect use the userUri to detect the proxy name and ip (use NAPTR and SRV in DNS)
+		@param userUri used when autodetect = true (we need the domain part to obtain the proxy name and port)
+		@param transport transport to be used (if autodetect = true, it is used to fetch addequate SRV)
+		@param proxyAddr used if autodetect = false ... resolve this name/ip into an ip
+		@param port used if autodetect = false ... port number to use for the proxy
+		@return string error message return string ... empty string if everything was ok.
+		*/
+		string setSipProxy( bool autodetect, string userUri, string transport, string proxyAddr, int port );
+		
 		void setDoRegister(bool f){
 			lock();
 			registerToProxy=f;
@@ -202,15 +206,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		void lock(){mutex.lock();};
 		void unlock(){mutex.unlock();};
 		
-		string getDebugString(){
-			lock();
-			string ret = "identity="+identityIdx+"; username="+
-				sipUsername+ "; domain="+sipDomain + 
-				" proxy=["+sipProxy.getDebugString()+
-				"]; isRegistered="+itoa(currentlyRegistered);
-			unlock();
-			return ret;
-		}
+		string getDebugString();
 
 		virtual std::string getMemObjectType(){return "SipIdentity";}
 		
@@ -226,8 +222,6 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		string sipUsername;
 		string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
-
-		SipProxy sipProxy;
 
 		string identityIdentifier;
 
@@ -257,6 +251,8 @@ class LIBMSIP_API SipIdentity : public MObject{
 			return ret;}
 		
 	private: 
+		MRef<SipProxy *> sipProxy;
+
 		/**
 		We will use this index to be able to identify the identities
 		*/
@@ -291,12 +287,15 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		int32_t localTcpPort;
 		int32_t localTlsPort;
 		
-		string transport;
+// 		string transport;
+		/**
+		@return the transport set in the SipProxy (means preferred ... )
+		*/
+		string getTransport();
 		
 		/**
-			Return the port in use, depending on the transport.
-			Parameter: usesStun (default false), found in 
-					SipSoftPhoneConfiguration::useSTUN
+		@return the port in use, depending on the transport.
+		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
 		*/
 		int32_t getLocalSipPort(bool usesStun=false);
 		

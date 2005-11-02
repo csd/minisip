@@ -35,18 +35,12 @@
 
 #include<config.h>
 #include"SipSoftPhoneConfiguration.h"
-#include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipDialog.h>
-#include<libmsip/SipMessageTransport.h>
 #include"../soundcard/SoundIO.h"
 #include"../mediahandler/MediaHandler.h"
 #include"../minisip/contactdb/PhoneBook.h"
 #include"../minisip/contactdb/MXmlPhoneBookIo.h"
 #include"../minisip/confbackend/ConfBackend.h"
 #include<fstream>
-#include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/NetworkException.h>
-
 #include"../soundcard/AudioMixer.h"
 
 #include<libmutil/dbg.h>
@@ -74,8 +68,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 //	doRegisterPSTN(false),
 	soundDevice(""),
 	videoDevice(""),
-	autodetectProxy(false),
-	dynamicSipPort(false),
 	usePSTNProxy(false),
 	tcp_server(false),
 	tls_server(false),
@@ -111,15 +103,18 @@ void SipSoftPhoneConfiguration::save(){
 		
 		backend->save( accountPath + "sip_uri", (*iIdent)->sipUsername + "@" + (*iIdent)->sipDomain );
 		
-		backend->save( accountPath + "proxy_addr", (*iIdent)->sipProxy.sipProxyAddressString );
+		if( (*iIdent)->getSipProxy()->autodetectSettings ) {
+			backend->save( accountPath + "auto_detect_proxy", "yes" );
+		} else {
+			backend->save( accountPath + "auto_detect_proxy", "no");		
+			backend->save( accountPath + "proxy_addr", (*iIdent)->getSipProxy()->sipProxyAddressString );
+			backend->save( accountPath + "proxy_port", (*iIdent)->getSipProxy()->sipProxyPort );
+		}
 
-		backend->save( accountPath + "proxy_port",
-			       (*iIdent)->sipProxy.sipProxyPort );
-
-		if( (*iIdent)->sipProxy.sipProxyUsername != "" ){
-			backend->save( accountPath + "proxy_username", (*iIdent)->sipProxy.sipProxyUsername );
+		if( (*iIdent)->getSipProxy()->sipProxyUsername != "" ){
+			backend->save( accountPath + "proxy_username", (*iIdent)->getSipProxy()->sipProxyUsername );
 		
-			backend->save( accountPath + "proxy_password", (*iIdent)->sipProxy.sipProxyPassword );
+			backend->save( accountPath + "proxy_password", (*iIdent)->getSipProxy()->sipProxyPassword );
 		}
 
 		if( (*iIdent) == pstnIdentity ){
@@ -132,12 +127,12 @@ void SipSoftPhoneConfiguration::save(){
 		
 		if( (*iIdent)->registerToProxy ) {
 			backend->save( accountPath + "register", "yes" );
-			backend->save( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+			backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
 		} else {
 			backend->save( accountPath + "register", "no");
-			backend->save( accountPath + "register_expires", (*iIdent)->sipProxy.getDefaultExpires() );
+			backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
 		}
-		string transport = (*iIdent)->sipProxy.getTransport();
+		string transport = (*iIdent)->getSipProxy()->getTransport();
 		
 		if( transport == "TCP" ){
 			backend->save( accountPath + "transport", "TCP" );
@@ -159,6 +154,7 @@ void SipSoftPhoneConfiguration::save(){
 		backend->reset( accountPath + "account_name" );
 		backend->reset( accountPath + "sip_uri" );
 		backend->reset( accountPath + "proxy_addr" );
+		backend->reset( accountPath + "auto_detect_proxy" );
 		backend->reset( accountPath + "proxy_username" );
 		backend->reset( accountPath + "proxy_password" );
 		backend->reset( accountPath + "pstn_account" );
@@ -290,53 +286,50 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		string uri = backend->loadString(accountPath + "sip_uri");
 		ident->setSipUri(uri);
+		
+		bool autodetect = ( backend->loadString(accountPath + "auto_detect_proxy","no") == "yes" );
+		
+		//these two values we collect them, but if autodetect is true, they are not used
 		string proxy = backend->loadString(accountPath + "proxy_addr","");
-
+		if( proxy == "" ) {
+			#ifdef DEBUG_OUTPUT
+			cerr << "SipSoftPhoneConfig::load - empty proxy address ... setting autodetect = true " << endl;
+			#endif
+			autodetect = true; //empty proxy .. then autodetect ... just doing some checks ...
+		}
 		uint16_t proxyPort = backend->loadInt(accountPath +"proxy_port", 5060);
 
 		ident->setDoRegister(backend->loadString(accountPath + "register","")=="yes");
-		try{
-			if (proxy!=""){
-				ident->sipProxy = SipProxy(proxy);
-			}
-			else{
-				autodetectProxy = true;
-				proxy = SipProxy::findProxy(uri,proxyPort);
-				if (proxy == "unknown"){
-					ret += "Minisip could not guess your SIP proxy. Please check your settings and your network access.";
-				}
-				else{
-					ident->sipProxy = SipProxy(proxy);
-				}
-			}
+		
+		string preferredTransport = backend->loadString(accountPath +"transport", "UDP");
+		
+		string proxret = ident->setSipProxy( autodetect, uri,  preferredTransport, proxy, proxyPort );
+		
+		if( proxret != "" ) {
+			ret += "\n" + proxret ;
+			#ifdef DEBUG_OUTPUT
+			cerr << "SipSoftConfig::load - Identity::setSipProxy return = " << proxret << endl;
+			#endif
 		}
-		catch( NetworkException * exc ){
-			ret +="Minisip could not resolve "
-				"the SIP proxy of the account "
-				+ ident->identityIdentifier + ".";
-			ident->setDoRegister( false );
-		}
-		ident->sipProxy.sipProxyPort = proxyPort;
+		
 		string proxyUser = backend->loadString(accountPath +"proxy_username", "");
 
-		ident->sipProxy.sipProxyUsername = proxyUser;
+		ident->getSipProxy()->sipProxyUsername = proxyUser;
 		string proxyPass = backend->loadString(accountPath +"proxy_password", "");
-		ident->sipProxy.sipProxyPassword = proxyPass;
-
-		ident->sipProxy.setTransport( backend->loadString(accountPath +"transport", "UDP") );
+		ident->getSipProxy()->sipProxyPassword = proxyPass;
 
 		string registerExpires = backend->loadString(accountPath +"register_expires", "");
 		if (registerExpires != ""){
-			ident->sipProxy.setRegisterExpires( registerExpires );
+			ident->getSipProxy()->setRegisterExpires( registerExpires );
 			//set the default value ... do not change this value anymore
-			ident->sipProxy.setDefaultExpires( registerExpires ); 
+			ident->getSipProxy()->setDefaultExpires( registerExpires ); 
 		} 
 #ifdef DEBUG_OUTPUT
 		else {
 			//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
 		}
-		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->sipProxy.getRegisterExpires() << endl;
-		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->sipProxy.getDefaultExpires() << endl;
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->getSipProxy()->getRegisterExpires() << endl;
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->getSipProxy()->getDefaultExpires() << endl;
 #endif
 
 		if (backend->loadString(accountPath + "pstn_account","")=="yes"){
@@ -539,7 +532,7 @@ bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fi
 	if( fileVersion != CONFIG_FILE_VERSION_REQUIRED ) {
 		cerr << "ERROR? Your config file is an old version (some things may not work)" << endl
 			<< "    If you delete it (or rename it), next time you open minisip" << endl
-			<< "    a valid one will be created" << endl;
+			<< "    a valid one will be created (you will have to reenter your settings" << endl;
 		ret = false;
 	} else {
 #ifdef DEBUG_OUTPUT
