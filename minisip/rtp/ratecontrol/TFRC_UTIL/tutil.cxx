@@ -2,17 +2,17 @@
 
 
 tutil::tutil () {
-  basetimeptr=new timeval;
+  //basetimeptr=new timeval;
 }
 
 tutil::~tutil () {
-  delete basetimeptr;
+  //delete basetimeptr;
 }
 
 int tutil::gentimebase (double& a){ //function to store the time in milliseconds inside a
 	// this function is used to generate the base time for the sending timestamp generation
-	gettimeofday(basetimeptr, NULL);
-	a=(double)(((double)(basetimeptr->tv_sec)*1000.0)+((double)(basetimeptr->tv_usec)/1000.0));
+	//gettimeofday(basetimeptr, NULL);
+	a=((double) mtime());
 	return (0);
 }
 
@@ -24,8 +24,10 @@ int tutil::genrandn (int& d) { //function to generate a random number up to 3276
 	return(0);
 }
 
+
 void tutil::Sleep (int ms) { //funtion to sleep for ms milliseconds
   clock_t endwait;
   endwait = clock () + ms;
   while (clock() < endwait);
 }
+

@@ -3,12 +3,13 @@
 
 #ifndef RXCLOCK_H
 #define RXCLOCK_H
-#include <sys/time.h>
+//#include <sys/time.h>
 #include "packethist.h"
+#include <libmutil/mtime.h>
 
 class rxclock {
 public:
-	timeval * stimeptr;
+	//timeval * stimeptr;
 	rxclock ();
 	~rxclock ();
 	double get_timems (void);

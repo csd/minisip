@@ -4,28 +4,29 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include "tfrctime.h"
 using namespace std;
 
 timep::timep (int randp, double starttmp) {
 	alrand=randp;
 	starttm=starttmp;
-	stimeptr=new timeval;
+	//stimeptr=new timeval;
 }
 
 
 timep::timep() {
-  stimeptr=new timeval;
+  //stimeptr=new timeval;
 }
 
 timep::~timep () {
-	delete stimeptr;
+	//delete stimeptr;
 }
 
 double timep::gentimems () {
- 	gettimeofday(stimeptr, NULL);
-	return ((double) ((((double)(stimeptr->tv_sec))*1000.0)+(((double)(stimeptr->tv_usec))/1000.0)));
+ 	//gettimeofday(stimeptr, NULL);
+	//return ((double) ((((double)(stimeptr->tv_sec))*1000.0)+(((double)(stimeptr->tv_usec))/1000.0)));
+	return((double) mtime());
 }
 
 rttcalc::rttcalc (int randp, double startmp) : timep (randp, startmp) {

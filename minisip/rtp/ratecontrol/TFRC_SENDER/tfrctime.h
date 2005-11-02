@@ -5,14 +5,15 @@
 #ifndef TFRCTIME_H
 #define TFRCTIME_H
 
-#include <sys/time.h>
+//#include <sys/time.h>
 #include "fbcontainer.h"
+#include <libmutil/mtime.h>
 
 class timep {
 public:
 	int alrand;
 	double starttm;
-	timeval *stimeptr;
+	//timeval *stimeptr;
 	timep (int randp, double starttmp);
 	timep();
 	~timep();

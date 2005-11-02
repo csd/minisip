@@ -4,12 +4,13 @@
 #define TUTIL_H
 
 #include <cstdlib>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <time.h>
+#include <libmutil/mtime.h>
 
 class tutil {
  public:
-  timeval * basetimeptr;
+  //timeval * basetimeptr;
   tutil();
   ~tutil();
   int gentimebase (double& a);

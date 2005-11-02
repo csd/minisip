@@ -2,21 +2,21 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include "rxclock.h"
 using namespace std;
 
 rxclock::rxclock() {
-	stimeptr=new timeval;
+	//stimeptr=new timeval;
 }
 
 rxclock::~rxclock () {
-	delete stimeptr;
+	//delete stimeptr;
 }
 
 double rxclock::get_timems (void) {
-	gettimeofday(stimeptr, NULL);
-	return ((double) ((((double)(stimeptr->tv_sec))*1000.0)+(((double)(stimeptr->tv_usec))/1000.0)));
+	//gettimeofday(stimeptr, NULL);
+	return ((double) mtime()); 
 }
 
 int fbtimer::set_to (double top) {
