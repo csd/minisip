@@ -1228,8 +1228,8 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 				branch,
 				/*getDialogConfig().callId*/ dialogState.callId,
 				dialogState.remoteUri,
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
+				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 //				getDialogConfig().inherited->localIpString,
 				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
@@ -1285,8 +1285,8 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 			branch,
 			/*getDialogConfig().callId*/ dialogState.callId,
 			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString(),
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 			//				getDialogConfig().inherited->localIpString,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(getPhoneConfig()->useSTUN),
@@ -1294,10 +1294,10 @@ void SipDialogP2Tuser::sendAuthInvite(const string &branch){
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
 			//				requestSeqNo(),
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
 			nonce,
 			realm,
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
 			//				getSoundReceiver()->getSocket()->get_port(),
 			//getP2TDialog()->getRTPPort(),
 			//                              getDialog()->getDialogConfig().localMediaPort, 
@@ -1330,7 +1330,7 @@ void SipDialogP2Tuser::sendAck(string branch){
 			branch, 
 			*lastResponse,
 			getDialogConfig()->uri_foreign,
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString());
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr->getString());
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
 //	mdbg << "SipDialogP2Tuser:sendAck(): sending ACK directly to remote" << end;
@@ -1341,7 +1341,7 @@ void SipDialogP2Tuser::sendAck(string branch){
 	
 	if(getDialogConfig()->proxyConnection == NULL){
 		getDialogConfig()->inherited->sipTransport->sendMessage(ack,
-				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
+				*(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr), //*toaddr,
 				getDialogConfig()->inherited->proxyPort, //port, 
 //				sock, //(Socket *)NULL, //socket, 
 				getDialogConfig()->proxyConnection,
@@ -1410,7 +1410,7 @@ void SipDialogP2Tuser::sendCancel(const string &branch){
 			dialogState.remoteUri,
 			//getDialogConfig().inherited->userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr->getString()///,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr->getString()///,
 			///localCalled
 			);
 

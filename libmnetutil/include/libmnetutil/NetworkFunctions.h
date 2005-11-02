@@ -35,7 +35,6 @@
 #endif
 
 #include<vector>
-#include<libmnetutil/IPAddress.h>
 #include<libmutil/mtypes.h>
 
 using namespace std;

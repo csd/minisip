@@ -355,8 +355,11 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		conf = sipStack->getStackConfig();
 	}
 
-	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr->clone();
-	port = conf->sipIdentity->sipProxy.sipProxyPort;
+	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; assert (0);}
+	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; assert (0);}
+	if( !conf->sipIdentity->getSipProxy()->sipProxyIpAddr ) { cerr << "SipTranNonInvCli: ipaddr null" << endl; assert (0);}
+	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
 

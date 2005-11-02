@@ -131,7 +131,7 @@ void AccountsStatusWidget::registerClicked(){
 			reg["identityId"] = id->getId();
 			id->lock();
 			reg["proxy_domain"] = id->sipDomain;
-			reg.setParam3( id->sipProxy.getDefaultExpires() );
+			reg.setParam3( id->getSipProxy()->getDefaultExpires() );
 			id->unlock();
 			callback->guicb_handleCommand( reg );
 		}

@@ -1232,16 +1232,16 @@ void SipDialogVoip::sendInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 	//		getDialogConfig().inherited.localIpString,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
-			getDialogConfig()->inherited->transport));
+			getDialogConfig()->inherited->getTransport() ) );
 
 	/* Get the session description from the Session */
 		
@@ -1332,9 +1332,9 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 		branch,
 		dialogState.callId,
 		dialogState.remoteUri,
-		//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+		//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 		getDialogConfig()->inherited->sipIdentity->sipDomain,
-		getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 //		getDialogConfig().inherited.localIpString,
 		getDialogConfig()->inherited->externalContactIP,
 		getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
@@ -1342,11 +1342,11 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 		getDialogConfig()->inherited->sipIdentity->getSipUri(),
 		dialogState.seqNo,
 //		requestSeqNo(),
-		getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
+		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
 		nonce,
 		realm,
-		getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
-		getDialogConfig()->inherited->transport);
+		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
+		getDialogConfig()->inherited->getTransport() );
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	
@@ -1428,7 +1428,7 @@ void SipDialogVoip::sendAck(string branch){
 			*lastResponse,
 			//getDialogConfig()->uri_foreign,
 			dialogState.getRemoteTarget(),
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString());
 			getDialogConfig()->inherited->sipIdentity->sipDomain);
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
@@ -1440,8 +1440,8 @@ void SipDialogVoip::sendAck(string branch){
 	
 	if(getDialogConfig()->proxyConnection == NULL){
 		getDialogConfig()->inherited->sipTransport->sendMessage(ack,
-				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited->sipProxy.proxyPort, //port, 
+				*(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited->getSipProxy()->proxyPort, //port, 
 //				sock, //(Socket *)NULL, //socket, 
 				getDialogConfig()->proxyConnection,
 				"BUGBUGBUG",
@@ -1551,7 +1551,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 			dialogState.remoteUri,
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain///,
 			///localCalled
 			);
@@ -1574,7 +1574,7 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->transport,
+			"", getDialogConfig()->inherited->getTransport(),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 	
@@ -1657,7 +1657,7 @@ void SipDialogVoip::sendReferOk(const string &branch){
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->transport,
+			"", getDialogConfig()->inherited->getTransport(),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 
@@ -1707,7 +1707,7 @@ void SipDialogVoip::sendRinging(const string &branch){
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->transport,
+			"", getDialogConfig()->inherited->getTransport(),
 			-1); //set expires to -1, we do not use it (only in register)
 	ringing->addHeader( new SipHeader(*contact) );
 

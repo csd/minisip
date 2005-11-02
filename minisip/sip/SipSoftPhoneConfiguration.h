@@ -39,21 +39,11 @@
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
-#include<libmutil/cert.h>
-
-//#include<libmsip/SipMessageTransport.h>
-
 #include<libmsip/SipDialogConfig.h>
-
 #include"SipDialogSecurityConfig.h"
-
 #include"Sip.h"
 #include"../minisip/contactdb/PhoneBook.h"
-//#include"../minisip/contactdb/ContactDb.h"
-#include"../codecs/Codec.h"
 #include"../minisip/confbackend/ConfBackend.h"
-
-//#include"../mediahandler/MediaHandler.h"
 
 class IPAddress;
 class Socket;
@@ -137,7 +127,6 @@ class SipSoftPhoneConfiguration : public MObject{
 		bool useUserDefinedStunServer;
 		string userDefinedStunServer;
 		
-		
 		Socket * proxyConnection;
 
 //		bool doRegister; 	//General->Register to proxy
@@ -148,16 +137,15 @@ class SipSoftPhoneConfiguration : public MObject{
 		uint32_t frameWidth;
 		uint32_t frameHeight;
 
-		string manualProxy;
-		bool autodetectProxy;
-		bool dynamicSipPort;
-		bool usePSTNProxy;
+// 		bool autodetectProxy; //it is in SipProxy::
 		
+		bool usePSTNProxy;
+// 		string manualProxy; //was used in qt interface ... change the qt to be like gtk
+// 		bool dynamicSipPort; //was used in qt interface ... change the qt to be like gtk
 
 		bool tcp_server;
 
 //		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
-		
 
 		bool tls_server;
 

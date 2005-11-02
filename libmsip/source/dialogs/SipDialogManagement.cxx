@@ -720,7 +720,7 @@ bool SipDialogManagement::registerAll() {
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
 		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->inherited->sipIdentity->sipDomain;
 		//expires = defaultExpires, read from the config file
-		cmdstr.setParam3((*it)->getDialogConfig()->inherited->sipIdentity->sipProxy.getDefaultExpires()); 
+		cmdstr.setParam3((*it)->getDialogConfig()->inherited->sipIdentity->getSipProxy()->getDefaultExpires()); 
 		
 		SipSMCommand cmd( cmdstr,
 				SipSMCommand::remote,

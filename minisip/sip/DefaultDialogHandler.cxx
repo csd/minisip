@@ -84,9 +84,9 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipMessage*> pref(*no_call);
 
 		sipStack->getSipTransportLayer()->sendMessage(pref,
-				*(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort, //port,
-				getDialogConfig()->inherited->sipIdentity->sipProxy.getTransport(), //port,
+				*(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr), //*toaddr,
+				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort, //port,
+				getDialogConfig()->inherited->sipIdentity->getSipProxy()->getTransport(), //port,
 				string(""), //branch
 				true
 				);
@@ -860,8 +860,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			dialogConfig->inherited->sipIdentity->sipProxy.sipProxyIpAddr = new IP4Address(proxy);
-			dialogConfig->inherited->sipIdentity->sipProxy.sipProxyPort = iport;
+			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr = new IP4Address(proxy);
+			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyPort = iport;
 		}catch(HostNotFound *exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc->errorDescription();

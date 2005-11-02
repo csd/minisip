@@ -31,6 +31,10 @@ StreamSocket::~StreamSocket(){
 }
 
 bool StreamSocket::matchesPeer(IPAddress& address, uint16_t port){
+	#ifdef DEBUG_OUTPUT
+// 	cerr << "StreamSocket:matchesPeer: 1 - " << address.getString() << ":" << port << endl;
+// 	cerr << "StreamSocket:matchesPeer: 2 - " << getPeerAddress()->getString() << ":" << getPeerPort() << endl;
+	#endif
 	return *peerAddress == address && port == peerPort;
 }
 

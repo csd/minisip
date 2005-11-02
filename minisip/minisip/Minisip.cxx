@@ -81,37 +81,37 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
 	srand(time(0));
 
-#ifndef WIN32
-#ifdef DEBUG_OUTPUT
-	signal( SIGUSR1, signal_handler );
-#endif
-#endif
+	#ifndef WIN32
+		#ifdef DEBUG_OUTPUT
+		signal( SIGUSR1, signal_handler );
+	#endif
+	#endif
 	
 
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;
-#endif
+	#endif
 
 	if ( ! NetUtil::init()){
 		//printf("ERROR: Could not initialize Netutil package\n");
 		merr << "ERROR: Could not initialize NetUtil package"<<end;
 		exit();
 	}
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 	cerr << "Creating SipSoftPhoneConfiguration"<< endl;
-#endif
+	#endif
 	phoneConf =  new SipSoftPhoneConfiguration();
 	phoneConf->sip=NULL;
 
-#ifdef MINISIP_AUTOCALL
+	#ifdef MINISIP_AUTOCALL
 	if (argc==3){
 		phoneConf->autoCall = string(argv[2]);
 	}
-#endif
+	#endif
 
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
-#endif
+	#endif
 //	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
 	/* Create the global contacts database */
@@ -120,50 +120,49 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	
 	//FIXME: move all this in a Gui::create()
 
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 	mout << BOLD << "init 2/9: Creating GUI" << PLAIN << end;
-#endif
+	#endif
 
-#ifdef TEXT_UI
-	///*gui = */debugtextui = new MinisipTextUI();
-	cerr << "Creating TextUI"<< endl;
-
-	gui = new MinisipTextUI();
+	#ifdef TEXT_UI
+		///*gui = */debugtextui = new MinisipTextUI();
+		cerr << "Creating TextUI"<< endl;
 	
-	merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-	LogEntry::handler = NULL;
-#else //!TEXT_UI
-#ifdef GTK_GUI
+		gui = new MinisipTextUI();
+		
+		merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		LogEntry::handler = NULL;
+	#else //!TEXT_UI
+		#ifdef GTK_GUI
+			cerr << "Creating GTK GUI"<< endl;
+			gui = new MainWindow( argc, argv );
+			cerr << "Minisip: gtk 1" << endl;
+			LogEntry::handler = (MainWindow *)*gui;
+			cerr << "Minisip: gtk 2" << endl;
+			#ifdef DEBUG_OUTPUT
+				consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+				MRef<Thread *> consoleDbgThread = consoleDbg->start();
+			#else
+				//in non-debug mode, send merr to the gui
+				merr.setExternalHandler( dynamic_cast<MainWindow *>( *gui ) ); 
+			#endif
+		#else //!GTK_GUI
+			gui= guiFactory(argc, argv, timeoutProvider);
+			LogEntry::handler = NULL;
+		#endif //GTK_GUI
+	#endif //TEXT_UI
 
-	cerr << "Creating GTK GUI"<< endl;
-	gui = new MainWindow( argc, argv );
-	LogEntry::handler = (MainWindow *)*gui;
+	#ifdef OSSO_SUPPORT
+		osso_context_t * ossoCtxt = NULL;
+		ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
+		if( !ossoCtxt ){
+			mdbg << "Could not initialize osso context" << end;
+		}
+	#endif
 
-#ifdef DEBUG_OUTPUT
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-	MRef<Thread *> consoleDbgThread = consoleDbg->start();
-#else
-	//in non-debug mode, send merr to the gui
-	merr.setExternalHandler( dynamic_cast<MainWindow *>( *gui ) ); 
-#endif
-
-#else //!GTK_GUI
-	gui= guiFactory(argc, argv, timeoutProvider);
-	LogEntry::handler = NULL;
-#endif //GTK_GUI
-#endif //TEXT_UI
-
-#ifdef OSSO_SUPPORT
-	osso_context_t * ossoCtxt = NULL;
-	ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
-	if( !ossoCtxt ){
-		mdbg << "Could not initialize osso context" << end;
-	}
-#endif
-
-#ifdef DEBUG_OUTPUT
-	cerr << "Setting contact db"<< endl;
-#endif
+	#ifdef DEBUG_OUTPUT
+		cerr << "Setting contact db"<< endl;
+	#endif
 	gui->setContactDb(contactDb);
 }
 
@@ -266,7 +265,7 @@ int Minisip::startSip() {
 				phoneConf->inherited->localUdpPort,
 				phoneConf->inherited->localTcpPort,
 				phoneConf->inherited->externalContactUdpPort,
-				phoneConf->inherited->transport,
+				phoneConf->inherited->getTransport(),
 				phoneConf->inherited->localTlsPort,
 				phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
 				//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL

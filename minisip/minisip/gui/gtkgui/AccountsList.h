@@ -59,15 +59,16 @@ class AccountsListColumns : public Gtk::TreeModel::ColumnRecord{
 		Gtk::TreeModelColumn< MRef<SipIdentity *> > identity;
 		Gtk::TreeModelColumn<Glib::ustring> name;
 		Gtk::TreeModelColumn<Glib::ustring> uri;
+		Gtk::TreeModelColumn<bool> autodetectSettings;
 		Gtk::TreeModelColumn<Glib::ustring> proxy;
 		Gtk::TreeModelColumn<uint16_t> port;
-		Gtk::TreeModelColumn<uint32_t> registerExpires;
-		Gtk::TreeModelColumn<bool> defaultProxy;
-		Gtk::TreeModelColumn<bool> pstnProxy;
+		Gtk::TreeModelColumn<Glib::ustring> transport;
 		Gtk::TreeModelColumn<Glib::ustring> username;
 		Gtk::TreeModelColumn<Glib::ustring> password;
-		Gtk::TreeModelColumn<Glib::ustring> transport;
+		Gtk::TreeModelColumn<uint32_t> registerExpires;
 		Gtk::TreeModelColumn<bool> doRegister;
 		Gtk::TreeModelColumn<Glib::ustring> status;
+		Gtk::TreeModelColumn<bool> defaultProxy;
+		Gtk::TreeModelColumn<bool> pstnProxy;
 };
 #endif

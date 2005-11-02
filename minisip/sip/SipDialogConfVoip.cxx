@@ -63,6 +63,7 @@
 #include<libmutil/MemObject.h>
 #include <iostream>
 #include<time.h>
+#include<libmnetutil/IP4Address.h>
 
 using namespace std;
 
@@ -1130,16 +1131,16 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 				branch,
 				dialogState.callId,
 				dialogState.remoteUri,
-				//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+				//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 				getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-				getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 //				getDialogConfig().inherited.localIpString,
 				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 				//getDialogConfig().inherited.userUri,
 				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
-				getDialogConfig()->inherited->transport));
+				getDialogConfig()->inherited->getTransport() ) );
 
 	/* Get the session description from the Session */
 		
@@ -1237,9 +1238,9 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain,
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
 //			getDialogConfig().inherited.localIpString,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
@@ -1247,11 +1248,11 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
 //			requestSeqNo(),
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyUsername,
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
 			nonce,
 			realm,
-			getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPassword,
-			getDialogConfig()->inherited->transport);
+			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
+			getDialogConfig()->inherited->getTransport() );
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	if(type=="join")
@@ -1343,7 +1344,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 			branch, 
 			*lastResponse,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString());
 			getDialogConfig()->inherited.sipIdentity->sipDomain);
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
@@ -1383,7 +1384,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 		branch, 
 		*lastResponse,
 		dialogState.remoteUri,
-		//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString());
+		//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString());
 		getDialogConfig()->inherited->sipIdentity->sipDomain);
 
 //      There might be so that there are no SDP. Check!
@@ -1454,11 +1455,11 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	modifyConfAck(ack);
         MRef<SipMessage*> pref(*ack);
 	
-	IP4Address toaddr(getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyAddressString);
+	IP4Address toaddr(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 	getSipStack()->getSipTransportLayer()->sendMessage(pref,
 					toaddr,
-					getDialogConfig()->inherited->sipIdentity->sipProxy.sipProxyPort, 
-					getDialogConfig()->inherited->sipIdentity->sipProxy.getTransport(), 
+					getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort, 
+					getDialogConfig()->inherited->sipIdentity->getSipProxy()->getTransport(), 
 					string("ACK"),
 					true);
 
@@ -1513,7 +1514,7 @@ void SipDialogConfVoip::sendCancel(const string &branch){
 			dialogState.remoteUri,
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			//getDialogConfig().inherited.sipIdentity->sipProxy.sipProxyIpAddr->getString(),
+			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain///,
 			///localCalled
 			);

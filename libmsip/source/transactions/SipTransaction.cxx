@@ -81,8 +81,9 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 	}
 #endif
 
-	port = conf->sipIdentity->sipProxy.sipProxyPort;
-	transport = conf->sipIdentity->sipProxy.getTransport();
+	MRef<SipProxy *> sipproxy = conf->sipIdentity->getSipProxy();
+	port = sipproxy->sipProxyPort;
+	transport = sipproxy->getTransport();
 }
 
 SipTransaction::~SipTransaction(){

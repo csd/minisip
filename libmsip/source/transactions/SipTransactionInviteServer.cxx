@@ -426,8 +426,8 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MR
 		conf = sipStack->getStackConfig();
 	}
 	
-	toaddr = conf->sipIdentity->sipProxy.sipProxyIpAddr->clone();
-	port = conf->sipIdentity->sipProxy.sipProxyPort;
+	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
 
