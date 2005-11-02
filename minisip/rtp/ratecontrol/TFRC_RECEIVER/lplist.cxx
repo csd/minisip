@@ -19,7 +19,6 @@ lplist::~lplist () {
 }
 
 int lplist::set_lsn (short lsnp, int indexp) {
-	//*(lstptr+indexp)=lsnp;
 	lstptr[indexp]=lsnp;
 	return (0);
 }

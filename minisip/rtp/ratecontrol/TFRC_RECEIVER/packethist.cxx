@@ -6,14 +6,6 @@
 
 using namespace std;
 
-/*
-packhist::packhist (secont ppackp) {
-	shift();
-	set_pack(ppackp);
-	//ppack=ppackp;
-}
-*/
-
 packhist::packhist() {
 	initial();
 }
@@ -47,11 +39,3 @@ int packhist::initial (void) {
 	return(0);
 }
 
-/*
-secont get_prevp(short seqnump) {
-}
-
-
-secont get_postp(short seqnump) {
-}
-*/
