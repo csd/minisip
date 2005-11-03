@@ -327,22 +327,13 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 		senderSock = new UDPSocket;
 		senderSock->setLowDelay();
 	}
-#ifdef TCP_FRIENDLY
-	sendBwMngr.setBwListener(this);
-#endif
 }
 
 void MediaStreamSender::start(){
-#ifdef TCP_FRIENDLY
-	sendBwMngr.start();
-#endif
 	media->registerMediaSender( this );
 }
 
 void MediaStreamSender::stop(){
-#ifdef TCP_FRIENDLY
-	sendBwMngr.stop();
-#endif
 	media->unRegisterMediaSender( this );
 }
 
@@ -395,10 +386,6 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 	packet->protect( getCryptoContext( ssrc, seqNo - 1 ) );
 
-#ifdef TCP_FRIENDLY
-	sendBwMngr.set_rtp_header_v(packet);
-#endif
-	
 	packet->sendTo( **senderSock, *remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();

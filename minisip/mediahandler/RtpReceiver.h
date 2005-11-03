@@ -26,7 +26,6 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
-#include"../rtp/ratecontrol/RecvBwMngr.h"
 #include"../minisip/ipprovider/IpProvider.h"
 
 class UDPSocket;
@@ -109,10 +108,6 @@ class RtpReceiver : public Runnable{
 		Mutex mediaStreamsLock;
 
                 Thread * thread;
-
-#ifdef TCP_FRIENDLY
-		RecvBwMngr recvBwMngr;
-#endif
 };
 
 #endif

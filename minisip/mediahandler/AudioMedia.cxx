@@ -30,8 +30,6 @@
 
 #include"../rtp/RtpPacket.h"
 
-#include"../codecs/Codec.h"
-
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
@@ -148,11 +146,8 @@ void AudioMedia::playData( MRef<RtpPacket *> packet ){
 //the void *data is originally a short *
 void AudioMedia::srcb_handleSound( void * data, int length){
 
-        //resampler->resample( (short *)data, resampledData );
-        //sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
-
-        sendData( (byte_t*) data, length, 0, false );
-	
+        resampler->resample( (short *)data, resampledData );
+        sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
         seqNo ++;
 }
 
@@ -169,12 +164,7 @@ void AudioMedia::srcb_handleSound( void * data, int length, void * dataR){				//
 }
 #endif
 
-void AudioMedia::sendData( byte_t * rawdata, uint32_t rawlength, uint32_t ts, bool marker ){
-
-        resampler->resample( (short *)rawdata, resampledData );
-	int length160=160*sizeof(short);
-
-	byte_t* data = (byte_t*)&resampledData[0];
+void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 
 	//all these zerodata vars are used to send silence to muted senders
 	//we need a silence data vector, as we cannot simply erase the data vector, 
@@ -187,7 +177,7 @@ void AudioMedia::sendData( byte_t * rawdata, uint32_t rawlength, uint32_t ts, bo
 	
 	if( ! zeroDataInit ) {
 		zeroDataInit = true;
-		for( uint i = 0; i<length160; i++ ) zeroData[i] = 0; 
+		for( uint i = 0; i<length; i++ ) zeroData[i] = 0; 
 	}
 	
 	list< MRef<MediaStreamSender *> >::iterator i;
@@ -212,37 +202,9 @@ void AudioMedia::sendData( byte_t * rawdata, uint32_t rawlength, uint32_t ts, bo
 			
 		//if we must send silence (zeroData), encode it ... 
 		if( encodeZeroData ) {
-			encodedLength = selectedCodec->encode( &zeroData, length160, encoded );
+			encodedLength = selectedCodec->encode( &zeroData, length, encoded );
 		} else {
-
-			//Now we send the audio data to the codec. The
-			//codecs can require different sampling frequency. 
-			//Most codecs use 8khz. Being in two calls at the
-			//same time that both have want a sampling
-			//frequency different from 8 or 48khz is a problem
-			//that should be fixed.
-			MRef<AudioCodec*> audiocodec = 
-				dynamic_cast<AudioCodec*> (*(selectedCodec->getCodec()));
-			assert(audiocodec);
-			switch (audiocodec->getSamplingFreq()){
-				case 8000:
-					encodedLength = selectedCodec->encode( data, length160, encoded );
-					break;
-				case SOUND_CARD_FREQ:
-					encodedLength = selectedCodec->encode( rawdata, rawlength, encoded );
-					break;
-				default:
-					if (!vbrresampler || vbrresampler!=audiocodec->getSamplingFreq()){
-						vbrresampler = Resampler::create(SOUND_CARD_FREQ, audiocodec->getSamplingFreq(), 20, 1 /*Nb channels */);
-					}
-					
-					{
-						short tmp[65536];
-						vbrresampler->resample( (short *)rawdata, tmp);
-						encodedLength = selectedCodec->encode( tmp, SOUND_CARD_FREQ/50*sizeof(short), encoded );
-					}
-					break;
-			}
+			encodedLength = selectedCodec->encode( data, length, encoded );
 		}
 	
 		(*i)->send( encoded, encodedLength, &givenTs, marker );
