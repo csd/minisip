@@ -365,7 +365,7 @@ bool Thread::kill( ) {
 	HANDLE handle = *((HANDLE*)handle_ptr);
 	BOOL ret;
 	
-	ret = TerminateTHread( handle, NULL );
+	ret = TerminateThread( handle, NULL );
         if( ret == 0 ) {
 		#ifdef DEBUG_OUTPUT
 			merr << "Thread::kill(): ERROR" << end;
@@ -398,7 +398,7 @@ bool Thread::kill( int handle) {
 	HANDLE h = (HANDLE)handle;
 	BOOL ret;
 	
-	ret = TerminateTHread( h, NULL );
+	ret = TerminateThread( h, NULL );
         if( ret == 0 ) {
 		#ifdef DEBUG_OUTPUT
 			merr << "Thread::kill(): ERROR" << end;
