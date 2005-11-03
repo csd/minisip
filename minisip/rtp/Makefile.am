@@ -1,10 +1,3 @@
-
-
-if TCP_FRIENDLY
-SUBDIRS = ratecontrol
-endif
-
-
 noinst_LIBRARIES = librtp.a
 
 librtp_a_SOURCES = RtpHeader.cxx \
@@ -56,4 +49,3 @@ noinst_HEADERS  = CryptoContext.h \
                   SRtpPacket.h \
                   XRReportBlock.h \
                   XRVoIPReportBlock.h
-
