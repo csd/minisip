@@ -48,11 +48,11 @@
 #ifndef _MSC_VER
 #include<unistd.h>
 #include<netinet/ip.h>
+#include<arpa/inet.h>
 #endif
 
 #include<iostream>
 #include<errno.h>
-#include<arpa/inet.h>
 
 using namespace std;
 
