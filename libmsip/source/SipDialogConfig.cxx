@@ -56,28 +56,33 @@ SipProxy::SipProxy(std::string addr, int port){
 	}
 }
 
-SipProxy::SipProxy(std::string userUri, string transport) {
+SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->transport is an class member, do not rename transportParam
 	string addr;
 	uint16_t port;
 	autodetectSettings = true;
 	
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
+	
+	if( getTransport() == "" ) {
+		setTransport( transportParam );
+	}
+	
 	try {
-		addr = SipProxy::findProxy( userUri, port, transport );
+		addr = SipProxy::findProxy( userUri, port, transportParam );
 	}catch( NetworkException * exc ) {
-		if( transport == "TCP" ) { 
+		if( transportParam == "TCP" ) { 
 			//if tcp doesn't work, try find UDP
 			addr = "unknown";
 		}
 	}
 	
 	//if tcp failed, retry with udp ...
-	if( addr == "unknown" && transport == "TCP" ) {
+	if( addr == "unknown" && transportParam == "TCP" ) {
 		try {
 			cerr << "Autodetect Sip proxy for [" << userUri << "] for transport TCP failed. Retrying with transport UDP." << endl;
-			transport = "UDP";
-			addr = SipProxy::findProxy( userUri, port, transport );
+			transportParam = "UDP";
+			addr = SipProxy::findProxy( userUri, port, transportParam );
 		}catch( NetworkException * exc2 ) {
 				addr = "unknown";
 		}
@@ -90,10 +95,11 @@ SipProxy::SipProxy(std::string userUri, string transport) {
 		throw HostNotFound( "[SipProxy for <" + userUri + ">]" );
 	}
 	
-// 	addr = SipProxy::findProxy( userUri, (uint16_t)port, transport );
+// 	addr = SipProxy::findProxy( userUri, (uint16_t)port, transportParam );
 	
 	try {
 		setProxy( addr, port );
+		setTransport( transportParam );
 	} catch (NetworkException * exc ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, str) throwing (2)... " << endl;
