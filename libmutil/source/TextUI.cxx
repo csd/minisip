@@ -142,6 +142,7 @@ void TextUI::guimain(){
 		int err;
 #if defined WIN32 || defined _MSC_VER
 		c= _getch();
+		err=1;
 #else
 		err = read(STDIN_FILENO, &c, 1);
 #endif
