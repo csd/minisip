@@ -177,7 +177,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 	
 	if( ! zeroDataInit ) {
 		zeroDataInit = true;
-		for( uint i = 0; i<length; i++ ) zeroData[i] = 0; 
+		for( uint32_t i = 0; i<length; i++ ) zeroData[i] = 0; 
 	}
 	
 	list< MRef<MediaStreamSender *> >::iterator i;
