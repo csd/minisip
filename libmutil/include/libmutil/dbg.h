@@ -79,6 +79,7 @@ extern LIBMUTIL_API Dbg merr;
 extern LIBMUTIL_API Dbg mdbg;
 extern LIBMUTIL_API DbgEndl end;
 
+extern LIBMUTIL_API bool outputStateMachineDebug;
 
 #endif
 

@@ -56,11 +56,7 @@
 using namespace std;
 
 #ifdef SM_DEBUG
-
 #include<libmutil/dbg.h> 
-	//this external variable is initialized in dbg.cxx ...
-extern bool outputStateMachineDebug;
-
 #endif
 
 template<class CommandType, class TimeoutType> class StateTransition;
