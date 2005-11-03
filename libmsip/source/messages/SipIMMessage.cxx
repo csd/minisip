@@ -67,7 +67,7 @@ SipIMMessage::SipIMMessage(string branch,
 {
 
 	this->toUri = toUri;
-	int posAt = toUri.find("@");
+	int posAt = (int)toUri.find("@");
 	toUser = toUri.substr( 0, posAt );
 	if( posAt != (int)string::npos ) 
 		toDomain = toUri.substr( posAt + 1 );

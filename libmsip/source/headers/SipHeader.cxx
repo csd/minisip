@@ -177,8 +177,8 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 				value_zero = value_params[0];
 // 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
 			} else if( headerType == "Contact" ) {
-				uint ltPos = values[i].find( '<' );
-				uint gtPos = values[i].find( '>' );
+				uint32_t ltPos = (uint32_t) values[i].find( '<' );
+				uint32_t gtPos = (uint32_t) values[i].find( '>' );
 				if( ltPos!=string::npos && gtPos!=string::npos ) {
 					//if the string contains '<' and '>' ...
 					//remove them
