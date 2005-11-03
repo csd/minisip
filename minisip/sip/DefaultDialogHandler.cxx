@@ -291,7 +291,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #endif			
 		string branch = im->getDestinationBranch();
 
-		MRef<SipTransaction*> trans = new SipTransactionNonInviteServer(sipStack, this, im->getCSeq(), branch, im->getCallId());
+		MRef<SipTransaction*> trans = new SipTransactionNonInviteServer(sipStack, this, im->getCSeq(), im->getCSeqMethod(), branch, im->getCallId());
 		registerTransaction(trans);
 
 		SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::transaction);
@@ -375,7 +375,7 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
 		//int im_seq_no= requestSeqNo();
 		++dialogState.seqNo;
-		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, dialogState.callId);
+		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, "MESSAGE", dialogState.callId);
 		mdbg << "WWWWWWW: transaction created, branch id is <"<<trans->getBranch()<<">."<< end; 
 		//cerr << "command standard arguments is <"<< command.getCommandString().getString() <<">"<< endl;
 		registerTransaction(trans);

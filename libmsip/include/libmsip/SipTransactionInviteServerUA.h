@@ -47,8 +47,9 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransactionInviteServer.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipResponse.h>
+
+class SipInvite;
+class SipResponse;
 
 /**
 	Implement an INVITE Transaction Server UAC,
@@ -67,7 +68,7 @@
 */
 class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
-		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
 		
 		virtual ~SipTransactionInviteServerUA();
 

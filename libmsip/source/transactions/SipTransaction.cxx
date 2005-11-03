@@ -47,12 +47,13 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &b, string callid): 
+SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &cSeqMethod, const string &b, string callid): 
 		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		sipStack(stack),
 		dialog(d), 
 		socket(NULL),
 		cSeqNo(cseq),
+		cSeqMethod(cSeqMethod),
 		branch(b)
 {
 	callId = callid;
@@ -177,8 +178,8 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 }
 
 
-SipTransactionClient::SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid):
-	SipTransaction(stack, d,seq_no,branch,callid)
+SipTransactionClient::SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid):
+		SipTransaction(stack, d,seq_no,cSeqMethod,branch,callid)
 {
 	
 }
@@ -187,8 +188,8 @@ SipTransactionClient::~SipTransactionClient(){
 
 }
 
-SipTransactionServer::SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid):
-	SipTransaction(stack,d,seq_no,branch,callid)
+SipTransactionServer::SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid):
+		SipTransaction(stack,d,seq_no,cSeqMethod,branch,callid)
 {
 	
 }

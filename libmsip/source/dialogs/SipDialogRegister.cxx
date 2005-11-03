@@ -110,6 +110,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 				sipStack, 
 				this, 
 				/*seqNo*/ dialogState.seqNo, 
+				"REGISTER",
 				dialogState.callId);
 		registerTransaction(trans);
 		send_noauth(trans->getBranch());
@@ -171,6 +172,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 				sipStack, 
 				this, 
 				dialogState.seqNo, 
+				"REGISTER",
 				dialogState.callId));
 		registerTransaction(trans);
 
@@ -245,6 +247,7 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 				sipStack, 
 				this, 
 				dialogState.seqNo, 
+				"REGISTER",
 				dialogState.callId));
 		registerTransaction(trans);
 
@@ -414,6 +417,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 				sipStack, 
 				this, 
 				dialogState.seqNo, 
+				"REGISTER",
 				dialogState.callId);
 		registerTransaction(trans);
 		send_noauth(trans->getBranch());

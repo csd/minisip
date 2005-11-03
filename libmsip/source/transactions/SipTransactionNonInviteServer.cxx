@@ -318,8 +318,8 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 	setCurrentState(s_start);
 }
 
-SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> call, int seq_no, const string &branch,string callid) : 
-		SipTransactionServer(stack, call, seq_no, branch, callid),
+SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> call, int seq_no, const string &cSeqMethod, const string &branch,string callid) : 
+		SipTransactionServer(stack, call, seq_no, cSeqMethod, branch, callid),
 		lastResponse(NULL)
 {
 	MRef<SipCommonConfig *> conf;

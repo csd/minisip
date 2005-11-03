@@ -47,9 +47,8 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipResponse.h>
-#include<libmsip/SipDialogContainer.h>
+
+class SipDialog;
 
 /**
 	Implement a Non-INVITE Transaction Client,
@@ -65,7 +64,7 @@
 */
 class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionNonInviteClient(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, string callid);
+		SipTransactionNonInviteClient(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, string callid);
                 ~SipTransactionNonInviteClient();
 		
 		virtual string getMemObjectType(){return "SipTransactionNonInvCli";}

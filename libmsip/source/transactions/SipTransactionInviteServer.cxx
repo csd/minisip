@@ -414,8 +414,8 @@ void SipTransactionInviteServer::setUpStateMachine(){
 }
 
 
-SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch,string callid) : 
-		SipTransactionServer(stack, d, seq_no, branch,callid),
+SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch,string callid) : 
+		SipTransactionServer(stack, d, seq_no, cSeqMethod, branch,callid),
 		lastResponse(NULL),
 		timerG(500)
 {

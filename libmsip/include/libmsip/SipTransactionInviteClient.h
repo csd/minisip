@@ -47,9 +47,8 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipResponse.h>
 
+class SipInvite;
 class SipResponse;
 
 /**
@@ -69,7 +68,7 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, string callid);
+		SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, string callid);
 		
 		virtual ~SipTransactionInviteClient();
 

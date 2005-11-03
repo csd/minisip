@@ -46,14 +46,14 @@
 
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
-#include<libmnetutil/Socket.h>
-#include<libmnetutil/IPAddress.h>
-#include<libmsip/SipMessage.h>
 #include<libmsip/SipSMCommand.h>
 
+class IPAddress;
 class SipDialog;
+class SipMessage;
 class SipMessageDispatcher;
 class SipStack;
+class Socket;
 
 /**
  * SipTransaction
@@ -61,7 +61,7 @@ class SipStack;
 class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 	public:
 		
-		SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &branch, string callid);
+		SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &cseqMethod, const string &branch, string callid);
                 
 		virtual ~SipTransaction();
 		
@@ -84,6 +84,8 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		string getDebugTransType(){return debugTransType;}
 
 		int getCSeqNo(){return cSeqNo;}
+
+		string getCSeqMethod(){return cSeqMethod;}
                 
 
 		//The transition to cancel a transaction is common to all
@@ -109,6 +111,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		MRef<SipMessageDispatcher*> dispatcher;
 		string command;
 		int cSeqNo;
+		string cSeqMethod;
 		string branch;
 
 		string debugTransType;
@@ -117,21 +120,14 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 
 class LIBMSIP_API SipTransactionClient: public SipTransaction{
         public:
-                SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
                 ~SipTransactionClient();
 };
 
 class LIBMSIP_API SipTransactionServer: public SipTransaction{
         public:
-                SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &branch, string callid);
+                SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
                 ~SipTransactionServer();
 };
-
-
-
-
-#include<libmsip/SipMessageDispatcher.h>
-#include<libmsip/SipDialog.h>
-#include<libmsip/SipStack.h>
 
 #endif

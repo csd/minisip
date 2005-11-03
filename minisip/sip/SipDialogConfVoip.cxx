@@ -141,7 +141,7 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 		dialogState.remoteUri= command.getCommandString().getParam();
 		//cerr<<"dialogState.callId*************"+dialogState.callId<<endl;
 		//cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
-		MRef<SipTransaction*> invtrans = new SipTransactionInviteClient(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, dialogState.callId);
+		MRef<SipTransaction*> invtrans = new SipTransactionInviteClient(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, "INVITE", dialogState.callId);
 		
 		invtrans->setSocket( phoneconf->proxyConnection );
 		//cerr<<"sending invite3*************"<<endl;
@@ -286,7 +286,7 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 			getLogEntry()->handle();
 		}
 
-		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
+		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this), bye->getCSeq(),bye->getLastViaBranch(), bye->getCSeqMethod(), dialogState.callId); //TODO: remove second argument
 
 		registerTransaction(byeresp);
 		SipSMCommand cmd(command);
@@ -321,7 +321,7 @@ bool SipDialogConfVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 //		setCurrentState(toState);
 		//int bye_seq_no= requestSeqNo();
 		++dialogState.seqNo;
-		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, "BYE", dialogState.callId)); 
 
 		registerTransaction(byetrans);
 		sendBye(byetrans->getBranch(), dialogState.seqNo);
@@ -351,6 +351,7 @@ bool SipDialogConfVoip::a7_callingnoauth_termwait_CANCEL( const SipSMCommand &co
 					sipStack,
 					MRef<SipDialog*>(this), 
 					command.getCommandPacket()->getCSeq(), 
+					command.getCommandPacket()->getCSeqMethod(), 
 					command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
 
 		registerTransaction(cancelresp);
@@ -373,7 +374,7 @@ bool SipDialogConfVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &co
 	if (transitionMatch(command, SipCommandString::cancel) || transitionMatch(command, SipCommandString::hang_up)){
 //		setCurrentState(toState);
 
-		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>( this ), dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>( this ), dialogState.seqNo, "CANCEL", dialogState.callId)); 
 
 		registerTransaction(canceltrans);
 		sendCancel(canceltrans->getBranch());
@@ -477,6 +478,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 						sipStack,
 						MRef<SipDialog*>( this ), 
 						command.getCommandPacket()->getCSeq(),
+						command.getCommandPacket()->getCSeqMethod(),
 						command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
 
 		registerTransaction(ir);
@@ -605,7 +607,7 @@ bool SipDialogConfVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command
 
 		//FIXME: is this correct - this should probably be handled
 		//in the already existing transaction.
-		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getCSeqMethod(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
 		registerTransaction(cr);
 
 		SipSMCommand cmd(command);
@@ -654,7 +656,7 @@ bool SipDialogConfVoip::a16_start_termwait_INVITE( const SipSMCommand &command){
 
 		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
-		MRef<SipTransaction*> ir( new SipTransactionInviteServer(sipStack, MRef<SipDialog*>(this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
+		MRef<SipTransaction*> ir( new SipTransactionInviteServer(sipStack, MRef<SipDialog*>(this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getCSeqMethod(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
 
 		registerTransaction(ir);
 
@@ -682,7 +684,7 @@ bool SipDialogConfVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &c
 
 		//int seqNo = requestSeqNo();
 		++dialogState.seqNo;
-		MRef<SipTransaction*> trans( new SipTransactionInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId));
+		MRef<SipTransaction*> trans( new SipTransactionInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, "INVITE", dialogState.callId));
 		registerTransaction(trans);
 		
 		realm = resp->getRealm();
@@ -773,7 +775,7 @@ bool SipDialogConfVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 		++dialogState.seqNo;
 //		setCurrentState(toState);
 
-		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId); 
+		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, "BYE", dialogState.callId); 
 
 
 		registerTransaction(byetrans);
@@ -834,7 +836,7 @@ bool SipDialogConfVoip::a26_callingauth_termwait_cancel( const SipSMCommand &com
 {
 	if (transitionMatch(command, SipCommandString::cancel) || transitionMatch(command, SipCommandString::hang_up)){
 //		setCurrentState(toState);
-		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, dialogState.callId)); 
+		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, MRef<SipDialog*>(this), dialogState.seqNo, "CANCEL", dialogState.callId)); 
 		registerTransaction(canceltrans);
 		sendCancel(canceltrans->getBranch());
 

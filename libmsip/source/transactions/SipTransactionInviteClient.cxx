@@ -433,8 +433,8 @@ void SipTransactionInviteClient::setUpStateMachine(){
 
 
 SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> call, 
-            int seq_no, string callid): 
-		SipTransactionClient(stack, call, seq_no, "", callid),
+            int seq_no, const string &cSeqMethod, string callid): 
+		SipTransactionClient(stack, call, seq_no, cSeqMethod, "", callid),
 		lastInvite(NULL)
 {
 	MRef<SipCommonConfig *> conf;

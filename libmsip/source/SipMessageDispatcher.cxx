@@ -62,8 +62,10 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	// 
 	
 	string branch;
+	string seqMethod;
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
 		branch = c.getCommandPacket()->getDestinationBranch();
+		seqMethod = c.getCommandPacket()->getCSeqMethod();
 	}
 
 #ifdef DEBUG_OUTPUT
@@ -130,12 +132,16 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 #endif
 
 		bool hasBranch = (branch!="");
+		bool hasSeqMethod = (seqMethod!="");
 		if (!hasBranch){
 			mdbg <<  "WARNING: SipMessageDispatcher::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
 		}
 		
 		for (int i=0; i< transactions.size(); i++){
-			if ( !hasBranch || transactions[i]->getBranch()== branch ){
+			if ( (!hasBranch || transactions[i]->getBranch()== branch) &&
+			     (!hasSeqMethod || transactions[i]->getCSeqMethod()==seqMethod || 
+			      (seqMethod == "ACK" &&
+			       transactions[i]->getCSeqMethod() == "INVITE")) ){
 				bool ret = transactions[i]->handleCommand(c);
 #ifdef DEBUG_OUTPUT
 				if (!ret && hasBranch)
