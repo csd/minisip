@@ -1,11 +1,16 @@
 #include<libmutil/MPlugin.h>
+
+#include<config.h>
 #include<libmutil/Library.h>
 
 #include<sys/types.h>
 #include<sys/stat.h>
-#include <unistd.h>
 
+#ifndef _MSC_VER
+#include <unistd.h>
 #include<dirent.h>
+#endif
+
 
 using namespace std;
 
@@ -32,6 +37,11 @@ list<string> * MPlugin::getListFromLibrary( MRef<Library *> lib ){
 }
 
 int32_t MPlugin::loadFromDirectory( const string &path ){
+#ifdef _MSC_VER
+	cerr << "\nUNIMPLEMENTED: MPlugin::loadFromDirectory (not implemented for W32 yet)"<<endl;
+	assert(false);
+	return -1;
+#else
 	struct stat dirStat;
 	DIR * dirHandle;
 	struct dirent * dirEnt;
@@ -93,7 +103,8 @@ int32_t MPlugin::loadFromDirectory( const string &path ){
 
 
 	return nPlugins;
-
+#endif
+	
 }
 
 MRef<MPlugin *> MPlugin::loadFromLibrary( const string &file, 
