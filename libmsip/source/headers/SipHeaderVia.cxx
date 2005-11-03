@@ -33,6 +33,7 @@
 #include<config.h>
 
 #include<libmsip/SipHeaderVia.h>
+#include<libmsip/SipException.h>
 
 #include<libmutil/itoa.h>
 
@@ -49,14 +50,39 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	unsigned i=0;
+	unsigned pos=0;
+
 	ip="";
 	port=0;
 	while (build_from[i]==' ')
 		i++;
-	
-	protocol = string("")+build_from[8]+build_from[9]+build_from[10];
 
-	i+=12;
+	// Parse Via protocol (name and version)
+	pos = build_from.find( '/', i );
+	if( pos == string::npos ){
+		throw new SipExceptionInvalidMessage();
+	}
+
+	pos = build_from.find( '/', pos + 1);
+	if( pos == string::npos ){
+		throw new SipExceptionInvalidMessage();
+	}
+
+	const string proto = build_from.substr( i, pos - i );
+	if (proto != "SIP/2.0") {
+		throw new SipExceptionInvalidMessage();
+	}
+	i = pos + 1;
+
+
+	// Parse Via transport
+	pos = build_from.find( ' ', i );
+	if( pos == string::npos ){
+		throw new SipExceptionInvalidMessage();
+	}
+	protocol = build_from.substr( i, pos - i );
+	i = pos + 1;
+
 
 	while (!(build_from[i]==':' || i>=build_from.length())){
 		ip+=build_from[i];
