@@ -76,7 +76,7 @@ public:
 
 
 	TextUI();
-	virtual ~TextUI(){};
+	virtual ~TextUI();
 
 	/**
 	 * Method to be implemented by a sub-class.
@@ -131,6 +131,20 @@ protected:
 	bool running;
 
 private:
+
+	/**
+	 * Store the current state of the console to "terminalSavedState"
+	 * and make it non-blocking.
+	 */
+	int makeStdinNonblocking();
+
+	/**
+	 * Restores state saved by makeStdinNonblocking.
+	 */
+	void restoreStdinBlocking();
+	void *terminalSavedState; //Linux: stores state of console before
+				  //making it non-blocking.
+	
 	void outputSuggestions(minilist<string> &l);
 	string displaySuggestions(string);
 

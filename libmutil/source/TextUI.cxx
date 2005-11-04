@@ -59,37 +59,85 @@ const int TextUI::green=4;
 
 char *termCodes[]= { "\033[m", "\033[2m\033[1m", "\033[31m", "\033[34m", "\033[42m" };
 
-static int nonblockin_stdin() 
-{
+/**
+ * Purpose: Tries to make STDIN non-blocking.
+ * 
+ * This method stores the current state of the terminal to an internal
+ * structure that is used to restore the state when restoreStdinBlocking()
+ * is called.
+ *
+ * This method is not implementedMicrosoft Windows.
+ * 
+ * @return 	0 	If successful
+ * 		!=0	If the terminal/stdin could not be set to
+ * 			nonblocking.
+ */
+int TextUI::makeStdinNonblocking(){
 #ifdef HAVE_TERMIOS_H
-    struct termios termattr;
-    int ret=tcgetattr(STDIN_FILENO, &termattr);
-    if (ret < 0) {
-        perror("tcgetattr:");
-        return -1;
-    }
-    termattr.c_cc[VMIN]=1;
-    termattr.c_cc[VTIME]=0;
-    termattr.c_lflag &= ~(ICANON | ECHO | ECHONL);
+	assert(terminalSavedState);
+	tcgetattr(STDIN_FILENO, (struct termios*)terminalSavedState);
+	
+	struct termios termattr;
+	int ret=tcgetattr(STDIN_FILENO, &termattr );
+	if (ret < 0) {
+		delete (struct termios*)terminalSavedState;
+		terminalSavedState=NULL;
+		perror("tcgetattr:");
+		return -1;
+	}
+	termattr.c_cc[VMIN]=1;
+	termattr.c_cc[VTIME]=0;
+	termattr.c_lflag &= ~(ICANON | ECHO | ECHONL);
 
-    ret = tcsetattr (STDIN_FILENO, TCSANOW, &termattr);
-    if (ret < 0) {
-        perror("tcsetattr");
-        return -1;
-    }
+	ret = tcsetattr (STDIN_FILENO, TCSANOW, &termattr);
+	if (ret < 0) {
+		perror("tcsetattr");
+		return -1;
+	}
+	return 0;
+#else
+	//#ifdef WIN32
+	//#warning nonblockin_stdin unimplemented on Win32
+	//#endif
+	return -1;
 #endif
-//#ifdef WIN32
-//#warning nonblockin_stdin unimplemented on Win32
-//#endif
-    return 0;
+}
+
+/**
+ * Restores the terminal state to the one previous to running 
+ * makeStdinNonblocking.
+ * Precondition: makeStdinNonblocking has been run.
+ */
+void TextUI::restoreStdinBlocking(){
+#ifdef HAVE_TERMIOS_H
+	if (terminalSavedState){
+		int ret = tcsetattr (STDIN_FILENO, TCSANOW, (struct termios*)terminalSavedState);
+		if (ret < 0) {
+			perror("tcsetattr");
+		}
+	}
+#endif	
 }
 
 TextUI::TextUI() : maxHints(2000){
-	if ( nonblockin_stdin()!=0){
+#ifdef HAVE_TERMIOS_H
+	terminalSavedState = new struct termios;
+#else
+	terminalSavedState = NULL;
+#endif
+	
+	if ( makeStdinNonblocking()!=0){
 		cerr << "ERROR: Could not make stdin non-blocking"<< endl;
 		//        exit(1);
 	}
 	running = true;
+}
+
+TextUI::~TextUI(){
+	restoreStdinBlocking();
+	if (terminalSavedState){
+		delete (struct termios*)terminalSavedState;
+	}
 }
 
 void TextUI::addCommand(string cmd){
