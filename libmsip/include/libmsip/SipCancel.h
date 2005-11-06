@@ -46,7 +46,7 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
+#include<libmsip/SipRequest.h>
 
 class SipInvite;
 
@@ -55,7 +55,7 @@ class SipInvite;
  * with a user agent
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class LIBMSIP_API SipCancel : public SipMessage{
+class LIBMSIP_API SipCancel : public SipRequest{
 	public:
 		static const int type;
                 
@@ -79,8 +79,6 @@ class LIBMSIP_API SipCancel : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipCancel";}
 
-		string getString();
-		
 	private:
 		string username;
 		string ipaddr;

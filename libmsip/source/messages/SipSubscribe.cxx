@@ -53,7 +53,7 @@
 
 const int SipSubscribe::type=7;
 
-SipSubscribe::SipSubscribe(string &build_from): SipMessage(SipSubscribe::type, build_from){
+SipSubscribe::SipSubscribe(string &build_from): SipRequest(SipSubscribe::type, build_from){
 	
 }
 
@@ -62,10 +62,12 @@ SipSubscribe::SipSubscribe(string branch,
 		MRef<SipIdentity*> toIdentity,
 		MRef<SipIdentity*> fromIdentity,
 		int32_t seq_no)
-		: SipMessage(branch, SipSubscribe::type), fromIdentity(fromIdentity)
+		: SipRequest(branch, SipSubscribe::type, "SUBSCRIBE"), fromIdentity(fromIdentity)
 {
 	toUser = toIdentity->sipUsername;
 	toDomain = toIdentity->sipDomain;
+
+	setUri(toUser + '@' + toDomain);
 
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(new SipHeader(*fromp));
@@ -97,32 +99,5 @@ SipSubscribe::SipSubscribe(string branch,
 
 SipSubscribe::~SipSubscribe(){
 
-}
-
-string SipSubscribe::getString(){
-	string ret ="";
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->toUser;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.length()>4 && username.substr(0,4)=="sip:")
-		ret = "SUBSCRIBE "+username;
-	else
-		ret = "SUBSCRIBE sip:"+username;
-	if (username.find("@")==string::npos)
-		ret = ret+"@"+toDomain;
-
-	ret += " SIP/2.0\r\n" + getHeadersAndContent();
-
-	return  ret;
 }
 

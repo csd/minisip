@@ -46,7 +46,7 @@
 
 const int SipBye::type=3;
 
-SipBye::SipBye(string &resp):SipMessage(SipBye::type, resp){
+SipBye::SipBye(string &resp):SipRequest(SipBye::type, resp){
 }
 
 
@@ -56,10 +56,12 @@ SipBye::SipBye(string branch,
 		string from_uri, 
 		string domain, 
 		int32_t seq_no
-		):SipMessage(branch, SipBye::type)
+	):SipRequest(branch, SipBye::type, "BYE")
 {
 	this->username = to_uri;
 	this->domain= domain;
+
+	setUri(to_uri);
 	
 	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
         addHeader(mf);
@@ -100,35 +102,5 @@ SipBye::SipBye(string branch,
 			addHeader(header);
 		}
 	}	
-}
-
-string SipBye::getString(){
-	string ret;
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->username;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-		
-	if (username.find("sip:")==string::npos){
-		ret = "BYE sip:";
-	}else{
-		ret = "BYE ";
-	}
-	ret = ret + username;
-#if 0
-	if (username.find("@")==string::npos){
-		ret = ret +"@"+domain;
-	}
-#endif
-	
-	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }
 

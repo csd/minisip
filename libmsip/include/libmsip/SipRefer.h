@@ -47,7 +47,7 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
+#include<libmsip/SipRequest.h>
 
 class SipInvite;
 
@@ -57,7 +57,7 @@ class SipInvite;
  * @author Erik Eliasson, eliasson@it.kth.se
  * @author Johan Bilien, jobi@via.ecp.fr
  */
-class LIBMSIP_API SipRefer : public SipMessage{
+class LIBMSIP_API SipRefer : public SipRequest{
 	public:
 		static const int type;
                 
@@ -89,8 +89,6 @@ class LIBMSIP_API SipRefer : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipRefer";}
 
-		string getString();
-		
 	private:
 		string referredUri;
 		string ipaddr;

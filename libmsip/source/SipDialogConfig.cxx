@@ -169,15 +169,15 @@ std::string SipProxy::findProxy(std::string uri, uint16_t &port, string transpor
 		#endif
 	}
 	
-	//Do a NAPTR lookup according to the transport ...
-	string naptr;
-	if( transport == "TLS" || transport == "tls") { naptr = "_sips._tcp"; }
-	else if( transport == "TCP" || transport == "tls") { naptr = "_sip._tcp"; }
+	//Do a SRV lookup according to the transport ...
+	string srv;
+	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
+	else if( transport == "TCP" || transport == "tls") { srv = "_sip._tcp"; }
 	else { //if( trans == "UDP" || trans == "udp") { 
-		naptr = "_sip._udp"; 
+		srv = "_sip._udp"; 
 	}
 
-	std::string proxy = NetworkFunctions::getHostHandlingService(naptr, domain, port);
+	std::string proxy = NetworkFunctions::getHostHandlingService(srv, domain, port);
 	if (proxy.length()<=0){
 		return "unknown";
 	}

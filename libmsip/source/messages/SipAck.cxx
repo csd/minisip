@@ -45,7 +45,7 @@
 
 const int SipAck::type=5;
 
-SipAck::SipAck(string &build_from):SipMessage(type, build_from){
+SipAck::SipAck(string &build_from):SipRequest(type, build_from){
 
 }
 
@@ -53,9 +53,12 @@ SipAck::SipAck(string branch,
 		MRef<SipMessage*> pack, 
 		string to_tel_no, 
 		string proxy): 
-			SipMessage(branch, type){
+		SipRequest(branch, type, "ACK"){
 	this->username = to_tel_no;
 	this->ipaddr = proxy;
+
+	setUri(to_tel_no);
+
 	MRef<SipHeader*> mf = new SipHeader(new SipHeaderValueMaxForwards(70));
 	addHeader(mf);
 	int noHeaders = pack->getNoHeaders();
@@ -74,38 +77,6 @@ SipAck::SipAck(string branch,
 	}
 }
 
-string SipAck::getString(){
-	string ret;
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->username;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.find("sip:")==string::npos)
-		ret = "ACK sip:";
-	else
-		ret = "ACK ";
-#if 0
-	if (username.find("@")==string::npos){
-		ret = ret + username + "@"+ipaddr;
-	}else{
-		ret = ret + username;
-	}
-#endif
-	ret += username;
-	
-	ret = ret + /*":" + itoa(port) +*/ " SIP/2.0\r\n";
-	ret = ret + getHeadersAndContent();
-	return ret;
-}
 void SipAck::set_Conf() {
 	this->Conf=true;
 	MRef<SipHeaderValueAcceptContact*> acp = new SipHeaderValueAcceptContact("+sip.conf=\"TRUE\"",true,false);

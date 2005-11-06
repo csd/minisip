@@ -44,8 +44,7 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
-#include<sys/types.h>
+#include<libmsip/SipRequest.h>
 
 class SipInvite;
 
@@ -53,7 +52,7 @@ class SipInvite;
  * Implementation of the BYE method in sip only for a user agent.
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class LIBMSIP_API SipBye : public SipMessage{
+class LIBMSIP_API SipBye : public SipRequest{
 	public:
 		static const int type;
 
@@ -76,9 +75,6 @@ class LIBMSIP_API SipBye : public SipMessage{
                 
 
 		virtual std::string getMemObjectType(){return "SipBye";}
-		
-		string getString();
-
 		
 	private:
 		bool made_call;

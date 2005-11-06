@@ -29,6 +29,10 @@
 #include<errno.h>
 #include<stdio.h>
 
+#include<cctype>
+#include<string>
+#include<algorithm>
+
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>
@@ -39,6 +43,7 @@
 #include<libmsip/SipIMMessage.h>
 #include<libmsip/SipException.h>
 #include<libmsip/SipHeaderVia.h>
+#include<libmsip/SipHeaderRoute.h>
 
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP4ServerSocket.h>
@@ -411,7 +416,7 @@ void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> re
 }
 
 void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
-									MRef<StreamSocket *> socket,
+									MRef<Socket *> socket,
 									string branch ){
 	string transport;
 	uint16_t port;
@@ -439,35 +444,150 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 	pack->addHeader( hdr );
 }
 
-void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
-									IPAddress &ip_addr, 
-									int32_t port, 
-									string branch,
-									string preferredTransport,
-									bool addVia
-									)
+
+static bool getDestination(MRef<SipMessage*> pack, MRef<IPAddress*> &destAddr,
+			   int32_t &destPort, string &destTransport)
 {
-	MRef<StreamSocket *> socket;
+	if( pack->getType() == SipResponse::type ){
+		// Send responses to sent by address in top via.
+
+		MRef<SipHeaderValueVia*> via = pack->getFirstVia();
+
+		if ( via ){
+			string peer = via->getParameter( "received" );
+			if( peer == "" ){
+				peer = via->getIp();
+			}
+
+			destAddr = IPAddress::create( via->getIp() );
+			if( destAddr ){
+				string rport = via->getParameter( "rport" );
+				if( rport != "" ){
+					destPort = atoi( rport.c_str() );
+				}
+				else{
+					destPort = via->getPort();
+				}
+				if( !destPort ){
+					destPort = 5060;
+				}
+				destTransport = via->getProtocol();
+				return true;
+			}
+		}
+	}
+	else{
+		// Send requests to address in first route if the route set
+		// is non-empty, or directly to the reqeuest uri if the 
+		// route set is empty.
+
+		MRef<SipRequest*> req = (SipRequest*)*pack;
+		MRef<SipHeaderValueRoute*> route = (SipHeaderValueRoute*)*pack->getHeaderValueNo(SIP_HEADER_TYPE_ROUTE, 0);
+		SipURI uri;
+
+		if( route ){
+			string str = route->getString();
+			uri.setUri( str );
+		}
+		else {
+			uri.setUri(req->getUri());
+		}
+
+		if( uri.isValid() ){
+			destAddr = IPAddress::create( uri.getIp() );
+			if( destAddr ){
+				destPort = uri.getPort();
+				if( !destPort ){
+					if( uri.getProtocolId() == "sips" ){
+						destPort = 5061;
+					}
+					else{
+						destPort = 5060;
+					}
+				}
+				destTransport = uri.getTransport();
+				if( destTransport.length() == 0 ){
+					destTransport = "UDP";
+				}
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
+				      const string &branch,
+				      bool addVia)
+{
+	MRef<IPAddress*> destAddr;
+	int32_t destPort = 0;
+	string destTransport;
+
+	if( !getDestination( pack, destAddr, destPort, destTransport) ){
+		return;
+	}
+
+	transform( destTransport.begin(), destTransport.end(),
+		   destTransport.begin(), (int(*)(int))toupper );
+
+	sendMessage( pack, **destAddr, destPort,
+		     branch, destTransport, addVia );
+}
+
+
+MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
+					      IPAddress &destAddr,
+					      uint16_t port)
+{
+	MRef<Socket*> socket;
+
+	if( transport == "UDP" ){
+		socket = (Socket*)*udpsock;
+	}
+	else{
+		MRef<StreamSocket*> ssocket = findStreamSocket(destAddr, port);
+		if( ssocket.isNull() ) {
+			/* No existing StreamSocket to that host,
+			 * create one */
+			cerr << "SipMessageTransport: sendMessage: creating new socket" << endl;
+			if( transport == "TLS" ){
+				ssocket = new TLSSocket( destAddr, 
+							port, tls_ctx, getMyCertificate(),
+							cert_db );
+			}
+			else{ /* TCP */
+				ssocket = new TCPSocket( destAddr, port );
+			}
+
+			addSocket( ssocket );
+		} else cerr << "SipMessageTransport: sendMessage: reusing old socket" << endl;
+		socket = *ssocket;
+	}
+
+	return socket;
+}
+
+
+void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
+				      IPAddress &ip_addr, 
+				      int32_t port, 
+				      string branch,
+				      string preferredTransport,
+				      bool addVia)
+{
+	MRef<Socket *> socket;
+	MRef<IPAddress *> tempAddr;
+	IPAddress *destAddr = &ip_addr;
 
 				
 	try{
+		socket = pack->getSocket();
 
-		if( preferredTransport != "UDP" ){
-			
-			socket = findStreamSocket(ip_addr, port);
-			if( socket.isNull() ) {
-				/* No existing StreamSocket to that host,
-				* create one */
-				cerr << "SipMessageTransport: sendMessage: creating new socket" << endl;
-				if( preferredTransport == "TLS" )
-					socket = new TLSSocket( ip_addr, 
-								port, tls_ctx, getMyCertificate(),
-								cert_db );
-				else /* TCP */
-					socket = new TCPSocket( ip_addr, port );
-				addSocket( socket );
-			} else cerr << "SipMessageTransport: sendMessage: reusing old socket" << endl;
-
+		if( !socket ){
+			socket = findSocket(preferredTransport, ip_addr, port);
+			pack->setSocket( socket );
 		}
 
 		if (addVia){
@@ -475,8 +595,11 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		}
 
 		string packetString = pack->getString();
+
+		UDPSocket *dsocket = dynamic_cast<UDPSocket*>(*socket);
+		StreamSocket *ssocket = dynamic_cast<StreamSocket*>(*socket);
 		
-		if( socket ){
+		if( ssocket ){
 			/* At this point if socket != we send on a 
 			 * streamsocket */
 #ifdef DEBUG_OUTPUT
@@ -488,11 +611,11 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			tmp[11]=0;
 			memcpy(&tmp[0], packetString.c_str() , 11);
 #endif
-			if( socket->write( packetString ) == -1 ){
+			if( ssocket->write( packetString ) == -1 ){
 				throw new SendFailed( errno );
 			}
 		}
-		else{
+		else if( dsocket ){
 			/* otherwise use the UDP socket */
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (UDP)", packetString);
@@ -506,13 +629,16 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 #endif
 
-			if( udpsock->sendTo( ip_addr, port, 
+			if( dsocket->sendTo( *destAddr, port, 
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
 			
 				throw new SendFailed( errno );
 			
-			}; 
+			}
+		}
+		else{
+			cerr << "No valid socket!" << endl;
 		}
 	}
 	catch( NetworkException * exc ){
@@ -564,6 +690,25 @@ MRef<StreamSocket *> SipMessageTransport::findStreamSocket( IPAddress & address,
 	return NULL;
 }
 
+static void updateVia(MRef<SipMessage*> pack, IPAddress *from,
+		      uint16_t port)
+{
+	MRef<SipHeaderValueVia*> via = pack->getFirstVia();
+	string peerAddr = from->getString();
+
+	if( via->hasParameter( "rport" ) ){
+		char buf[20] = "";
+		snprintf(buf, sizeof(buf), "%d", port);
+		via->setParameter( "rport", buf);
+	}
+	
+	string addr = via->getIp();
+	if( addr != peerAddr ){
+		via->setParameter( "received", peerAddr );
+	}
+}
+
+
 #define UDP_MAX_SIZE 65536
 
 void SipMessageTransport::udpSocketRead(){
@@ -587,7 +732,10 @@ void SipMessageTransport::udpSocketRead(){
 		} while( avail < 0 );
 
 		if( FD_ISSET( udpsock->getFd(), &set )){
-			nread = udpsock->recv(buffer, UDP_MAX_SIZE);
+			IPAddress *from = NULL;
+			int port = 0;
+
+			nread = udpsock->recvFrom(buffer, UDP_MAX_SIZE, from, port);
 			
 			if (nread == -1){
 				mdbg << "Some error occured while reading from UdpSocket"<<end;
@@ -618,8 +766,8 @@ void SipMessageTransport::udpSocketRead(){
 #endif
 				pack = SipMessage::createMessage( data );
 				
-///				pack->setSocket( NULL );
-
+				pack->setSocket( *udpsock );
+				updateVia(pack, from, port);
 				
 				SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
 				
@@ -740,6 +888,10 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						printMessage("IN (STREAM)", buffer);
 #endif
 						//					dialogContainer->enqueueMessage( pack );
+
+						IPAddress *peer = socket->getPeerAddress();
+						pack->setSocket( *socket );
+						updateVia( pack, peer, socket->getPeerPort() );
 
 						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
 						if (!transport->commandReceiver.isNull()){

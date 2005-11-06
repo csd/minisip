@@ -41,6 +41,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/messages/SipRegister.cxx \
                      source/messages/SipResponse.cxx \
                      source/messages/SipSubscribe.cxx \
+                     source/messages/SipRequest.cxx \
 		     source/dialogs/SipDialog.cxx \
 		     source/dialogs/SipDialogRegister.cxx \
 		     source/dialogs/SipDialogManagement.cxx \

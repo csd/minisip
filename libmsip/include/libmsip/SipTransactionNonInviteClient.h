@@ -49,6 +49,7 @@
 #include<libmsip/SipTransaction.h>
 
 class SipDialog;
+class SipRequest;
 
 /**
 	Implement a Non-INVITE Transaction Client,
@@ -158,7 +159,7 @@ class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 		*/
 		bool a9_completed_terminated_timerK(const SipSMCommand &command);
 
-		MRef<SipMessage*> lastRequest;
+		MRef<SipRequest*> lastRequest;
 		
 		int timerE; //retransmission of the initial request
 };

@@ -47,7 +47,7 @@
 
 const int SipRefer::type=10;
 
-SipRefer::SipRefer(string &resp):SipMessage(SipRefer::type, resp){
+SipRefer::SipRefer(string &resp):SipRequest(SipRefer::type, resp){
 }
 
 SipRefer::SipRefer(string branch, MRef<SipInvite*> inv, 
@@ -56,11 +56,12 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 		string proxy,
 		string referredUri,
 		int cSeqNo
-		):SipMessage(branch, type)
+	):SipRequest(branch, type, "REFER")
 {
 	this->ipaddr=proxy;
 	this->referredUri=referredUri;
 	username = to_uri;
+	setUri(to_uri);
 
 	MRef<SipHeaderValueFrom*> from;
 	MRef<SipHeaderValueTo*> to;
@@ -109,37 +110,6 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 	header = new SipHeader( *rtVal );
 	addHeader(header);
 }
-
-string SipRefer::getString(){
-
-	string ret;
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->username;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.find("sip:")==string::npos){
-		ret = "REFER sip:";
-	}else{
-		ret = "REFER ";
-	}
-	ret = ret + username;
-#if 0
-	if (username.find("@")==string::npos){
-		ret = ret +"@"+ipaddr;
-	}
-#endif
-	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
-}
-
 
 string SipRefer::getReferredUri(){
         for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)

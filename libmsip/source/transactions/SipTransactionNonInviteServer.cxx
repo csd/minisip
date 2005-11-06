@@ -46,6 +46,8 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {
 	if (transitionMatch(command, IGN, SipSMCommand::remote, IGN)){
+		setSocket( *(command.getCommandPacket()->getSocket()) );
+
 		SipSMCommand cmd(command);
 #ifdef DEBUG_OUTPUT
 		/*server->*/setDebugTransType(command.getCommandPacket()->getTypeString() );

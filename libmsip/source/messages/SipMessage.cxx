@@ -38,6 +38,7 @@
 #include<errno.h>
 #include<ctype.h>
 
+#include<libmnetutil/Socket.h>
 #include<libmsip/SipMessageContentFactory.h>
 #include<libmsip/SipHeaderContentLength.h>
 #include<libmsip/SipHeaderVia.h>
@@ -134,7 +135,7 @@ MRef<SipMessage*> SipMessage::createMessage(string &data){
 			return MRef<SipMessage*>(new SipRefer(data));
 		}
 
-		throw new SipExceptionInvalidStart;
+		return MRef<SipMessage*>( new SipRequest( data ));
 	}
 	return NULL;
 }
@@ -351,16 +352,35 @@ int32_t  SipMessage::getCSeq(){
 
 string SipMessage::getViaHeaderBranch(bool first){
 	string b;
+	MRef<SipHeaderValueVia*> via = getViaHeader(first);
+
+	if( !via.isNull() ){
+		b = via->getBranch();
+	}
+
+	return b;
+}
+
+MRef<SipHeaderValueVia*> SipMessage::getViaHeader(bool first){
+	MRef<SipHeaderValueVia*> via;
+	
 	for (int32_t i=0; i< headers.size(); i++){
-		MRef<SipHeaderValueVia*> via;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_VIA){
 			via = MRef<SipHeaderValueVia*>((SipHeaderValueVia*)*(headers[i]->getHeaderValue(0)));
-			b = via->getBranch();
 			if (first)
-				return b;
+				return via;
 		}
 	}
-	return b;
+	return via;
+}
+
+
+MRef<SipHeaderValueVia*> SipMessage::getFirstVia(){
+	return getViaHeader(true);
+}
+
+MRef<SipHeaderValueVia*> SipMessage::getLastVia(){
+	return getViaHeader(false);
 }
 
 string SipMessage::getFirstViaBranch(){
@@ -524,3 +544,15 @@ list<string> SipMessage::getRouteSet() {
 	}
 	return set;
 }
+
+
+void SipMessage::setSocket(MRef<Socket*> sock)
+{
+	this->sock = sock;
+}
+
+MRef<Socket*> SipMessage::getSocket()
+{
+	return sock;
+}
+

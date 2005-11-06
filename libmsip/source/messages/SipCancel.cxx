@@ -45,17 +45,19 @@
 
 const int SipCancel::type=4;
 
-SipCancel::SipCancel(string &resp):SipMessage(SipCancel::type, resp){
+SipCancel::SipCancel(string &resp):SipRequest(SipCancel::type, resp){
 }
 
 SipCancel::SipCancel(string branch, MRef<SipInvite*> inv, 
 		string to_uri, 
 		string from_uri, 
 		string proxy
-		):SipMessage(branch, type)
+	):SipRequest(branch, type, "CANCEL")
 {
 	this->ipaddr=proxy;
 	username = to_uri;
+
+	setUri(to_uri);
 
 	MRef<SipHeaderValueFrom*> from;
 	MRef<SipHeaderValueTo*> to;
@@ -92,34 +94,5 @@ SipCancel::SipCancel(string branch, MRef<SipInvite*> inv,
 			addHeader(header);
 		}
 	}
-}
-
-string SipCancel::getString(){
-	string ret;
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->username;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.find("sip:")==string::npos){
-		ret = "CANCEL sip:";
-	}else{
-		ret = "CANCEL ";
-	}
-	ret = ret + username;
-#if 0
-	if (username.find("@")==string::npos){
-		ret = ret +"@"+ipaddr;
-	}
-#endif
-	return ret + " SIP/2.0\r\n"+getHeadersAndContent();
 }
 

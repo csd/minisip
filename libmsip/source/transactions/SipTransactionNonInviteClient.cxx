@@ -50,13 +50,19 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 #ifdef DEBUG_OUTPUT
 		setDebugTransType(command.getCommandPacket()->getTypeString() );
 #endif
-		lastRequest = command.getCommandPacket();
+		lastRequest = dynamic_cast<SipRequest*>(*command.getCommandPacket());
 		if( isUnreliable() ) {
 			timerE = sipStack->getTimers()->getE();
 			requestTimeout(timerE, "timerE");
 		}
 		requestTimeout(sipStack->getTimers()->getF(), "timerF");
-		send(command.getCommandPacket(),true);
+
+		if( toaddr ){
+			lastRequest->addRoute( toaddr->getString(), port,
+					       transport );
+		}
+
+		send(*lastRequest,true);
 		
 		return true;
 	}else{
@@ -147,7 +153,7 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 		timerE = sipStack->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		lastRequest->removeAllViaHeaders();
-		send( lastRequest, true);	//add via, we have removed all from previous request
+		send( *lastRequest, true);	//add via, we have removed all from previous request
 		
 		return true;
 	}else{
@@ -238,7 +244,7 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 		
 		assert( !lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
-		send( lastRequest, true);	// add via header because we have removed all previous ones
+		send( *lastRequest, true);	// add via header because we have removed all previous ones
 		
 		return true;
 	}else{

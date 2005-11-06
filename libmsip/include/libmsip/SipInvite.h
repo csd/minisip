@@ -45,15 +45,13 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
-#include<vector>
-#include<sys/types.h>
+#include<libmsip/SipRequest.h>
 
 /**
  * Representation of a SIP INVITE method.
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class LIBMSIP_API SipInvite : public SipMessage{
+class LIBMSIP_API SipInvite : public SipRequest{
 
 	public:
 		const static int type;
@@ -128,8 +126,6 @@ class LIBMSIP_API SipInvite : public SipMessage{
 
 		string getRemoteTelNo();
 
-		string getString();
-		
 		/**
 		 * set the P2T flag
 		 */

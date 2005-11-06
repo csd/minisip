@@ -45,17 +45,14 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
+#include<libmsip/SipRequest.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmnetutil/IPAddress.h>
-#include<vector>
-#include<sys/types.h>
 
 /**
  * Representation of a SIP NOTIFY method.
  * @author Erik Eliasson, eliasson@it.kth.se
  */
-class LIBMSIP_API SipNotify : public SipMessage{
+class LIBMSIP_API SipNotify : public SipRequest{
 
 	public:
 		static const int type;
@@ -85,8 +82,6 @@ class LIBMSIP_API SipNotify : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipNotify";}
 
-		virtual string getString();
-		
 	private:
 		MRef<SipIdentity *> fromIdentity;
 		string toUser; //telephone number for example

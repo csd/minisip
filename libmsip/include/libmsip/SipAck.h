@@ -44,14 +44,13 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
-#include<sys/types.h>
+#include<libmsip/SipRequest.h>
 
 /**
  * Implementation of the ACK method in SIP for (only a user agent).
  * @author Erik Eliasson
  */
-class LIBMSIP_API SipAck : public SipMessage{
+class LIBMSIP_API SipAck : public SipRequest{
 
 	public:
 		static const int type;
@@ -82,10 +81,6 @@ class LIBMSIP_API SipAck : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipAck";}
 		
-                /**
-                 * @return The complete ACK message as a string.
-                 */
-		string getString();
 		void set_Conf();
 		bool is_Conf();
 

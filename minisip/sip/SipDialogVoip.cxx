@@ -49,7 +49,9 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 //#include"DefaultDialogHandler.h"
@@ -890,14 +892,16 @@ bool SipDialogVoip::a26_callingauth_termwait_cancel( const SipSMCommand &command
 {
 	if (transitionMatch(command, SipCommandString::cancel) || transitionMatch(command, SipCommandString::hang_up)){
 //		setCurrentState(toState);
+		string inv_branch = getLastInvite()->getFirstViaBranch();
 		MRef<SipTransaction*> canceltrans( 
 			new SipTransactionNonInviteClient(sipStack, 
 				MRef<SipDialog*>(this), 
 				dialogState.seqNo, 
 				"CANCEL", 
 				dialogState.callId)); 
+		canceltrans->setBranch(inv_branch);
 		registerTransaction(canceltrans);
-		sendCancel(canceltrans->getBranch());
+		sendCancel(inv_branch);
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();

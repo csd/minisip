@@ -77,8 +77,8 @@ class LIBMSIP_API SipProxy : public MObject{
 		SipProxy(std::string addr, int port = -1);
 		
 		/**
-		Initialize a proxy with automatic discovery of settings via DNS NAPTR and SRV
-		@param userUri user's AOR, from where we extract the hostpart to check for NAPTR and SRV
+		Initialize a proxy with automatic discovery of settings via DNS SRV
+		@param userUri user's AOR, from where we extract the hostpart to check for SRV
 		@param transport transport to check for (_sip._udp, ... ). If TCP and fails, we will retry 
 		with UDP. If TLS, there is no fallback (they are all unsecured).
 		*/
@@ -90,7 +90,7 @@ class LIBMSIP_API SipProxy : public MObject{
 
 		/**
 		Find the proxy settings for the given uri
-		@param uri user's AOR, from where we extract the hostpart to check for NAPTR and SRV
+		@param uri user's AOR, from where we extract the hostpart to check for SRV
 		@param port return parameter, where the port used by the service is obtained (the hostname is
 		returned as the return param
 		@param transport transport protocol to find the host:port settings for
@@ -120,9 +120,9 @@ class LIBMSIP_API SipProxy : public MObject{
 		void setTransport( string transport ){this->transport = transport; };
 		
 		/**
-		True to indicate that the proxy settings are to be looked up using DNS NAPTR and SRV
+		True to indicate that the proxy settings are to be looked up using DNS SRV
 		It corresponds to <auto_detect_proxy> tag in the config file.
-		True if the proxy settings, using NAPTR and SRV lookups from DNS
+		True if the proxy settings, using SRV lookups from DNS
 		False if the settings are specified in the config file
 		 <proxy_addr>, <proxy_port>, <transport>
 		
@@ -181,7 +181,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		/**
 		Set the proxy to be used by this identity, given the following params
-		@param autodetect use the userUri to detect the proxy name and ip (use NAPTR and SRV in DNS)
+		@param autodetect use the userUri to detect the proxy name and ip (use SRV in DNS)
 		@param userUri used when autodetect = true (we need the domain part to obtain the proxy name and port)
 		@param transport transport to be used (if autodetect = true, it is used to fetch addequate SRV)
 		@param proxyAddr used if autodetect = false ... resolve this name/ip into an ip

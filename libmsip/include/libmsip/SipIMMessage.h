@@ -49,7 +49,7 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 
-class LIBMSIP_API SipIMMessage : public SipMessage{
+class LIBMSIP_API SipIMMessage : public SipRequest{
 
 	public:
 		static const int type;
@@ -69,8 +69,6 @@ class LIBMSIP_API SipIMMessage : public SipMessage{
 		virtual ~SipIMMessage();
 
 		virtual std::string getMemObjectType(){return "SipIMMessage";}
-
-		virtual string getString();
 
 		int getExpiresTimeout();
 		

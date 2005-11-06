@@ -46,6 +46,8 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipHeaderTo.h>
+#include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
@@ -1455,17 +1457,15 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	///modifyConfOk(ack);
 //	setLastResponse(ok);
 	modifyConfAck(ack);
-        MRef<SipMessage*> pref(*ack);
-	
-	IP4Address toaddr(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
-	getSipStack()->getSipTransportLayer()->sendMessage(pref,
-					toaddr,
-					getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort, 
-					getDialogConfig()->inherited->sipIdentity->getSipProxy()->getTransport(), 
-					string("ACK"),
-					true);
+	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
 
-	
+	ack->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort,
+		       proxy->getTransport() );
+
+        MRef<SipMessage*> pref(*ack);
+	getSipStack()->getSipTransportLayer()->sendMessage(pref,
+							   string("ACK"),
+							   true);
 	
 	
 //        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);

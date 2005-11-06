@@ -59,7 +59,7 @@ SipRegister::SipRegister(string branch,
 		int32_t seq_no,
 		string transport,
 		int expires
-		) : SipMessage(branch, SipRegister::type), domain(domainarg)
+	) : SipRequest(branch, SipRegister::type, "REGISTER"), domain(domainarg)
 {
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
 	addHeader(new SipHeader(*fromp));
@@ -96,6 +96,8 @@ SipRegister::SipRegister(string branch,
 	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
 	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
+
+	setUri("sip:" + domain);
 }
 
 SipRegister::SipRegister(string branch,
@@ -111,7 +113,7 @@ SipRegister::SipRegister(string branch,
 		string nonce, 
 		string password,
 		int expires
-		): SipMessage(branch, SipRegister::type), domain(domainarg)
+	): SipRequest(branch, SipRegister::type, "REGISTER"), domain(domainarg)
 {
 	SipURI uri;
 	uri.setParams("", localIp,"", sip_listen_port);
@@ -154,13 +156,11 @@ SipRegister::SipRegister(string branch,
 	addHeader(new SipHeader(*authp));
 	
 	setContent(NULL);
+
+	setUri("sip:" + domain);
 }
 
 SipRegister::~SipRegister(){
 
-}
-
-string SipRegister::getString(){
-	return "REGISTER sip:"+domain+" SIP/2.0\r\n"+getHeadersAndContent();
 }
 

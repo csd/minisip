@@ -29,13 +29,17 @@
 #include"SipDialogConfVoip.h"
 #include"SipDialogPresenceClient.h"
 #include"SipDialogPresenceServer.h"
+#include<libmsip/SipHeaderFrom.h>
+#include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipIMMessage.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
+#include<libmsip/SipCancel.h>
 
 #ifdef P2T_SUPPORT
 #include"../p2t/SipDialogP2T.h"
@@ -84,11 +88,8 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 		MRef<SipMessage*> pref(*no_call);
 
 		sipStack->getSipTransportLayer()->sendMessage(pref,
-				*(getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr), //*toaddr,
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort, //port,
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->getTransport(), //port,
 				string(""), //branch
-				true
+				false
 				);
 
 		return true;

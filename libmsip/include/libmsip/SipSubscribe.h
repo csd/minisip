@@ -45,16 +45,15 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
+#include<libmsip/SipRequest.h>
 #include<libmsip/SipDialogConfig.h>
-#include<vector>
 
 /**
  * Representation of a SIP SUBSCRIBE method.
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class LIBMSIP_API SipSubscribe : public SipMessage{
+class LIBMSIP_API SipSubscribe : public SipRequest{
 
 	public:
 		static const int type;
@@ -82,8 +81,6 @@ class LIBMSIP_API SipSubscribe : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipSubscribe";}
 
-		virtual string getString();
-		
 	private:
 		MRef<SipIdentity *> fromIdentity;
 		string toUser; //telephone number for example

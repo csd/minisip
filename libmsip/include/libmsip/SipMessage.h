@@ -47,14 +47,16 @@
 
 #include<libmutil/minilist.h>
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipHeaderFrom.h>
-#include<libmsip/SipHeaderTo.h>
-#include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipURI.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContentFactory.h>
 
+class SipHeaderValueContact;
+class SipHeaderValueFrom;
+class SipHeaderValueTo;
+class SipHeaderValueVia;
+class Socket;
 
 
 MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
@@ -207,11 +209,22 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		string getFirstViaBranch();
 
 		/**
+		* @return The top most via header, or a null reference
+		* if there is no via header in the message.
+		*/
+		MRef<SipHeaderValueVia*> getFirstVia();
+
+		/**
 		* @return The branch parameter in the last via header in
 		* the message.
 		*/
 		string getLastViaBranch();
 		
+		/**
+		* @return The last via header or a null reference
+		* if there is no via header in the message.
+		*/
+		MRef<SipHeaderValueVia*> getLastVia();
 
 		/**
 		* @return Call ID in the SIP message.
@@ -301,6 +314,16 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		*/
 		list<string> getRouteSet();
 
+		/**
+		 * Set the socket used by SipMessageTransport to send
+		 * the message.
+		 */
+		void setSocket(MRef<Socket*> sock);
+
+		/**
+		 * Get the socket this message was sent to or received from.
+		 */
+		MRef<Socket*> getSocket();
 
 	protected:
 		void setDestinationBranch(string b){branch = b;}
@@ -329,12 +352,14 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		
 		int parseHeaders(const string &buf, int startIndex);
+		MRef<SipHeaderValueVia*> getViaHeader(bool first);
 		string getViaHeaderBranch(bool first);
 		string branch;
 		int type;
 		string realm;
 		string nonce;
 
+		MRef<Socket*> sock;
 };
 
 #endif

@@ -61,6 +61,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		virtual IPAddress * clone() const =0;
 
 		static IPAddress * create(sockaddr * addr);
+		static IPAddress * create(const string &addr);
 
 	protected:
 		void setAddressFamily(int af);

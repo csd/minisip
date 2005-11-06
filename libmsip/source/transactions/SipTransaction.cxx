@@ -38,6 +38,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmutil/dbg.h>
@@ -129,15 +130,14 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 		if (br=="")
 			br = branch;
 
-		if(toaddr){
-		
-			dialog->getSipStack()->getSipTransportLayer()->sendMessage(pack,
-					*toaddr,
-					port, 
-					br,
-					transport,
-					addVia);
-		}
+		if( pack->getType() == SipResponse::type )
+			pack->setSocket( getSocket() );
+
+		dialog->getSipStack()->getSipTransportLayer()->sendMessage(pack, branch, addVia);
+
+		if( pack->getType() != SipResponse::type )
+			setSocket( *pack->getSocket() );
+
 #ifdef DEBUG_OUTPUT
 		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<end;
 #endif

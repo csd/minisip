@@ -32,6 +32,8 @@
 #include<assert.h>
 #include"SipDialogPresenceServer.h"
 #include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipHeaderFrom.h>
+#include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipSubscribe.h>
 #include<libmsip/SipNotify.h>

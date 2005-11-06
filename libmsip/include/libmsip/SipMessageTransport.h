@@ -102,14 +102,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		virtual std::string getMemObjectType(){return "SipMessageTransport";}
 
-		void sendMessage(MRef<SipMessage*> pack, 
-				IPAddress &toaddr, 
-				int32_t port, 
-				string branch,
-				string preferredTransport,
-				bool addVia
-				);
-			
+		void sendMessage(MRef<SipMessage*> pack, const string &branch,
+				 bool addVia);
+
 		void addSocket(MRef<StreamSocket *> sock);
 
 		string getLocalIP(){return localIP;};
@@ -124,9 +119,21 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		void udpSocketRead();
 
+	protected:
+		void sendMessage(MRef<SipMessage*> pack, 
+				IPAddress &toaddr, 
+				int32_t port, 
+				string branch,
+				string preferredTransport,
+				bool addVia
+				);
+			
 	private:
-		void addViaHeader( MRef<SipMessage*> pack, MRef<StreamSocket *> socket, string branch );
+		void addViaHeader( MRef<SipMessage*> pack, MRef<Socket *> socket, string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
+		MRef<Socket*> findSocket(const string &transport,
+					 IPAddress &addr,
+					 uint16_t port);
 		
 		MRef<UDPSocket*> udpsock;
 		MRef<SocketServer*> tcpSocketServer;

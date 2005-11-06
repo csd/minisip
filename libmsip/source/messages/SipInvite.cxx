@@ -55,7 +55,8 @@
 
 const int SipInvite::type=1;
 
-SipInvite::SipInvite(string &build_from): SipMessage(SipInvite::type, build_from){
+
+SipInvite::SipInvite(string &build_from): SipRequest(SipInvite::type, build_from){
 
 	//check if it is a P2T Invite packet
 	MRef<SipHeaderValueAcceptContact*> acp;
@@ -110,7 +111,7 @@ SipInvite::SipInvite(const string &branch,
 		const string &from_tel_no, 
 		int32_t seq_no, 
 		const string &transport
-		):SipMessage(branch, SipInvite::type)
+		     ):SipRequest(branch, SipInvite::type, "INVITE")
 {
 
 
@@ -138,7 +139,7 @@ SipInvite::SipInvite(const string &branch,
 		const string &realm, 
 		const string &password,
 		const string &transport
-		):SipMessage(branch, SipInvite::type)
+		     ):SipRequest(branch, SipInvite::type, "INVITE")
 {
 	
 	createHeadersAndContent(call_id, tel_no, 
@@ -171,10 +172,12 @@ void SipInvite::createHeadersAndContent(
 {
 	SipURI uri;
 	uri.setParams(tel_no,proxyAddr,"",proxyPort);
-	
+
 	this->username = tel_no;
 	this->ip=proxyAddr;
 	this->user_type="";
+
+	setUri(tel_no);
 	
 	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(from_tel_no, proxyAddr ) );
 	addHeader(fromp);
@@ -215,36 +218,6 @@ string SipInvite::getRemoteTelNo(){
 		}
 	merr << "ERROR: Could not find user_id (tel. no.) in SipInvite"<< end;
 	return "";
-}
-
-string SipInvite::getString(){
-	string ret ="";
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->username;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.length()>4 && username.substr(0,4)=="sip:")
-		ret = "INVITE "+username;
-	else
-		ret = "INVITE sip:"+username;
-
-#if 0
-	if (username.find("@")==string::npos)
-		ret = ret+"@"+ip;
-#endif
-
-	ret += /*";user="+user_type+*/" SIP/2.0\r\n" + getHeadersAndContent();
-
-	return  ret;
 }
 
 /**

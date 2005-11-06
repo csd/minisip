@@ -38,6 +38,7 @@
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP6Address.h>
+#include<libmnetutil/NetworkException.h>
 
 IPAddress::~IPAddress(){
 
@@ -68,4 +69,18 @@ IPAddress * IPAddress::create( sockaddr * addr ){
 	}
 	// FIXME exception
 	else return NULL;
+}
+
+IPAddress * IPAddress::create(const string &addr){
+	try {
+		return new IP4Address( addr );
+	} catch( HostNotFound *e ){
+	}
+
+	try {
+		return new IP6Address( addr );
+	} catch( HostNotFound *e ){
+	}
+
+	return NULL;
 }

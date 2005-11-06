@@ -35,7 +35,7 @@
 #define LIBMSIP_API
 #endif
 
-#include<libmsip/SipMessage.h>
+#include<libmsip/SipRequest.h>
 
 /**
  * Representation of a SIP REGISTER method.
@@ -43,7 +43,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class LIBMSIP_API SipRegister : public SipMessage{
+class LIBMSIP_API SipRegister : public SipRequest{
 
 	public:
 		static const int type;
@@ -100,8 +100,6 @@ class LIBMSIP_API SipRegister : public SipMessage{
 
 		virtual std::string getMemObjectType(){return "SipRegister";}
 		
-		virtual string getString();
-
 	private:
 		string domain;
 };

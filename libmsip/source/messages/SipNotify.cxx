@@ -54,7 +54,7 @@
 
 const int SipNotify::type=6;
 
-SipNotify::SipNotify(string &build_from): SipMessage(SipNotify::type, build_from){
+SipNotify::SipNotify(string &build_from): SipRequest(SipNotify::type, build_from){
 	
 }
 
@@ -64,10 +64,12 @@ SipNotify::SipNotify(string branch,
 		    MRef<SipIdentity*> fromId,
                     int32_t seq_no 
                     ): 
-                            SipMessage(branch, SipNotify::type), fromIdentity(fromId)
+		SipRequest(branch, SipNotify::type, "NOTIFY"), fromIdentity(fromId)
 {
 	toUser = toIdentity->sipUsername;
 	toDomain = toIdentity->sipDomain;
+
+	setUri(toUser + '@' + toDomain);
 	
 	MRef<SipHeader*> fromp = new SipHeader(new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain ));
 	addHeader(fromp);
@@ -98,32 +100,5 @@ SipNotify::SipNotify(string branch,
 
 SipNotify::~SipNotify(){
 
-}
-
-string SipNotify::getString(){
-	string ret ="";
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->toUser;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.length()>4 && username.substr(0,4)=="sip:")
-		ret = "NOTIFY "+username;
-	else
-		ret = "NOTIFY sip:"+username;
-	if (username.find("@")==string::npos)
-		ret = ret+"@"+toDomain;
-
-	ret += " SIP/2.0\r\n" + getHeadersAndContent();
-
-	return  ret;
 }
 

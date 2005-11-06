@@ -138,6 +138,15 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			parameters.push_back(p);
 		}
 
+		bool hasParameter(const string &key){
+			for (int i=0; i< parameters.size();i++){
+				if (parameters[i]->getKey()==key){
+					return true;
+				}
+			}
+			return false;
+		}
+
 		string getParameter(string key){
 			for (int i=0; i< parameters.size();i++){
 				if (parameters[i]->getKey()==key){

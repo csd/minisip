@@ -104,6 +104,11 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		}
 		
 		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
+
+		if( toaddr ){
+			lastInvite->addRoute( toaddr->getString(), port,
+					      transport );
+		}
 		
 		send( command.getCommandPacket(), true ); // add via header
 		return true;

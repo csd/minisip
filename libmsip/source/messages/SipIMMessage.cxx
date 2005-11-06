@@ -52,7 +52,7 @@
 
 const int SipIMMessage::type=9;
 
-SipIMMessage::SipIMMessage(string &build_from): SipMessage(SipIMMessage::type, build_from){
+SipIMMessage::SipIMMessage(string &build_from): SipRequest(SipIMMessage::type, build_from){
 	
 }
 
@@ -62,7 +62,7 @@ SipIMMessage::SipIMMessage(string branch,
 // 		    MRef<SipIdentity*> toIdentity,
 		    MRef<SipIdentity*> fromIdentity,
                     int32_t seq_no, string msg): 
-                            SipMessage(branch, SipIMMessage::type),
+		SipRequest(branch, SipIMMessage::type, "MESSAGE"),
 			    fromIdentity(fromIdentity)
 {
 
@@ -72,6 +72,8 @@ SipIMMessage::SipIMMessage(string branch,
 	if( posAt != (int)string::npos ) 
 		toDomain = toUri.substr( posAt + 1 );
 	else 	toDomain = "";
+
+	setUri(toUri);
 	
 	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromIdentity->sipUsername, fromIdentity->sipDomain );
 	addHeader(new SipHeader(*fromp));
@@ -101,35 +103,6 @@ SipIMMessage::SipIMMessage(string branch,
 
 SipIMMessage::~SipIMMessage(){
 
-}
-
-string SipIMMessage::getString(){
-	string ret ="";
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = this->toUri;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.length()>4 && username.substr(0,4)=="sip:")
-		ret = "MESSAGE "+username;
-	else
-		ret = "MESSAGE sip:"+username;
-#if 0
-	if (username.find("@")==string::npos)
-		ret = ret+"@"+toDomain;
-#endif
-
-	ret += " SIP/2.0\r\n" + getHeadersAndContent();
-
-	return  ret;
 }
 
 int SipIMMessage::getExpiresTimeout(){
