@@ -446,15 +446,23 @@ void SipMessage::removeAllViaHeaders(){
 }
 
 MRef<SipHeaderValueFrom*> SipMessage::getHeaderValueFrom(){
+	MRef<SipHeader*> from = getHeaderOfType( SIP_HEADER_TYPE_FROM );
 
-	return MRef<SipHeaderValueFrom*> ( (SipHeaderValueFrom*)*( getHeaderOfType(SIP_HEADER_TYPE_FROM)->getHeaderValue(0)) );
+	if( from ){
+		return MRef<SipHeaderValueFrom*>( (SipHeaderValueFrom*)*(from->getHeaderValue(0)) );
+	}
 
+	return NULL;
 }
 
 MRef<SipHeaderValueTo*> SipMessage::getHeaderValueTo(){
+	MRef<SipHeader*> to = getHeaderOfType( SIP_HEADER_TYPE_TO );
 
-	return MRef<SipHeaderValueTo*>( (SipHeaderValueTo*)*(getHeaderOfType(SIP_HEADER_TYPE_TO)->getHeaderValue(0)));
+	if( to ){
+		return MRef<SipHeaderValueTo*>( (SipHeaderValueTo*)*(to->getHeaderValue(0)) );
+	}
 
+	return NULL;
 }
 
 MRef<SipHeaderValueContact*> SipMessage::getHeaderValueContact(){

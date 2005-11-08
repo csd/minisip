@@ -106,10 +106,15 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
 
 		if( toaddr ){
-			lastInvite->addRoute( toaddr->getString(), port,
-					      transport );
+			MRef<SipHeaderValue*> hdr;
+			hdr = lastInvite->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
+
+			if( !hdr ){
+				lastInvite->addRoute( toaddr->getString(),
+						      port, transport );
+			}
 		}
-		
+
 		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{

@@ -103,13 +103,21 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 		this->ssl_ctx = SSL_CTX_new( meth );
 		
 		if( this->ssl_ctx == NULL ){
+			cerr << "Could not create SSL session" << endl;
+			ERR_print_errors_fp(stderr);
 			throw new TLSInitFailed();
 		}
 		
 		if( sslCipherListIndex != 0 ) 
 			setSSLCTXCiphers ( this->ssl_ctx, sslCipherListIndex );
 		/* Set options: do not accept SSLv2*/
-		SSL_CTX_set_options(this->ssl_ctx, SSL_OP_ALL | SSL_OP_NO_SSLv2);
+		long options = SSL_OP_NO_SSLv2 | SSL_OP_ALL;
+		
+#if OPENSSL_VERSION_NUMBER >= 0x00908000
+		// Disable SSL_OP_TLS_BLOCK_PADDING_BUG in 0.9.8, buggy
+		options &= ~SSL_OP_TLS_BLOCK_PADDING_BUG;
+#endif
+		SSL_CTX_set_options(this->ssl_ctx, options);
 		
 		SSL_CTX_set_verify( this->ssl_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, 0);
 		SSL_CTX_set_verify_depth( this->ssl_ctx, 5);
@@ -118,10 +126,14 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 			/* Add a client certificate */
 			if( SSL_CTX_use_PrivateKey( this->ssl_ctx, 
 			cert->get_openssl_private_key() ) <= 0 ){
+				cerr << "SSL: Could not use private key" << endl;
+				ERR_print_errors_fp(stderr);
 				throw new TLSContextInitFailed(); 
 			}
 			if( SSL_CTX_use_certificate( this->ssl_ctx,
 			cert->get_openssl_certificate() ) <= 0 ){
+				cerr << "SSL: Could not use certificate" << endl;
+				ERR_print_errors_fp(stderr);
 				throw new TLSContextInitFailed(); 
 			}
 		}
@@ -157,6 +169,8 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	int32_t err = SSL_connect( ssl );
 
 	if( err <= 0 ){
+		cerr << "SSL: connect failed" << endl;
+		ERR_print_errors_fp(stderr);
 		throw new TLSConnectFailed( err, this->ssl );
 	}
 

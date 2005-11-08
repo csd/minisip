@@ -58,8 +58,14 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 		requestTimeout(sipStack->getTimers()->getF(), "timerF");
 
 		if( toaddr ){
-			lastRequest->addRoute( toaddr->getString(), port,
-					       transport );
+			MRef<SipHeaderValue*> hdr;
+
+			hdr = lastRequest->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
+
+			if( !hdr ){
+				lastRequest->addRoute( toaddr->getString(),
+						       port, transport );
+			}
 		}
 
 		send(*lastRequest,true);

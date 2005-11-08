@@ -119,7 +119,13 @@ void SocketServer::run(){
 		//}
 		MRef<SipMessageTransport *> r = receiver;
 		if (avail && !doStop && r){
-			MRef<StreamSocket *> ss = ssock->accept();
+			MRef<StreamSocket *> ss;
+
+			try{
+				ss = ssock->accept();
+			} catch( NetworkException *e ){
+			}
+
 			if (ss){
 				r->addSocket(ss);
 			}else{
@@ -695,6 +701,11 @@ static void updateVia(MRef<SipMessage*> pack, IPAddress *from,
 {
 	MRef<SipHeaderValueVia*> via = pack->getFirstVia();
 	string peerAddr = from->getString();
+
+	if( !via ){
+		merr << "No Via header in incoming message!" << end;
+		return;
+	}
 
 	if( via->hasParameter( "rport" ) ){
 		char buf[20] = "";

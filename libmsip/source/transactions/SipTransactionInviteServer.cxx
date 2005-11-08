@@ -101,7 +101,12 @@
 bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand &command){
 	
 	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::transaction)){
-		setSocket( *(command.getCommandPacket()->getSocket()) );
+		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
+
+		if( sock )
+			setSocket( *sock );
+		else
+			setSocket( NULL );
 
 		SipSMCommand cmd(command);
 		cmd.setDestination(SipSMCommand::TU);

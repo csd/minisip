@@ -135,7 +135,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 
 		dialog->getSipStack()->getSipTransportLayer()->sendMessage(pack, branch, addVia);
 
-		if( pack->getType() != SipResponse::type )
+		if( pack->getType() != SipResponse::type && pack->getSocket() )
 			setSocket( *pack->getSocket() );
 
 #ifdef DEBUG_OUTPUT
