@@ -113,7 +113,9 @@ IP4Address::IP4Address(string addr){
 		numIp = ntoh32(*((uint32_t*)(hp->h_addr)));
 
 		assert(hp->h_length==4);
-		cerr << *this << endl;
+		#ifdef DEBUG_OUTPUT
+		cerr << "IP4Address(string): " << *this << endl;
+		#endif
 	}
 
 	memset(sockaddress, '\0', sizeof(sockaddress));
