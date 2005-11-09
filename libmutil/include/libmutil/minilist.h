@@ -90,6 +90,7 @@ class minilist{
 			:last_index(-2)
 #endif
 		{
+			head=end=NULL;
 			nelem = l2.nelem;
 			node<T> *l2cur=l2.head;
 			node<T> *last=NULL;
