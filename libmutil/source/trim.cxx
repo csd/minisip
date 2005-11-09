@@ -32,6 +32,7 @@
 */
 
 #include<libmutil/trim.h>
+#include<libmutil/mtypes.h>
 #include<ctype.h>
 
 #include<string>
@@ -43,12 +44,12 @@ LIBMUTIL_API string trim(string line){
 	int32_t idx;
 
 	idx = 0;
-	while( idx < line.size() && isspace(line[idx]) ) {
+	while( idx < (int)line.size() && isspace(line[idx]) ) {
 		spacesFront++;
 		idx++;
 	}
 	
-	idx = line.size() - 1 ;
+	idx = (int)line.size() - 1 ;
 	while( idx >= 0 && isspace(line[idx]) ) {
 		spacesEnd++;
 		idx--;
