@@ -59,25 +59,15 @@
 using namespace std;
 
 TCPSocket::TCPSocket(string addr, int32_t port){
-	type = SOCKET_TYPE_TCP;
-	peerAddress = new IP4Address(addr);
-	port = port;
-	
-	if ((fd = (int32_t)::socket(peerAddress->getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
-		throw new SocketFailed( errno );
-	}
-	int32_t on=1;
-#ifndef WIN32
-	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
-#else
-	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
-#endif
-
-	peerAddress->connect(*this, port);
+	MRef<IP4Address *> tmp = new IP4Address(addr);
+	initTCPSocket( **tmp, port );
 }
 
 TCPSocket::TCPSocket(IPAddress &ipaddress, int32_t port){
-	
+	initTCPSocket( ipaddress, port );
+}
+
+void TCPSocket::initTCPSocket(IPAddress &ipaddress, int32_t port){
 	peerAddress = ipaddress.clone();
 	peerPort = port;
 
@@ -133,7 +123,6 @@ int32_t TCPSocket::write(string data){
 #else
 	return ::write(fd, data.c_str(), data.length());
 #endif
-	
 }
 
 int32_t TCPSocket::write(void *buf, int32_t count){
