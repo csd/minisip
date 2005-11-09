@@ -39,7 +39,8 @@
 using namespace std;
 
 LIBMUTIL_API string trim(string line){
-	size_t spacesFront = 0, spacesEnd = 0, idx;
+	size_t spacesFront = 0, spacesEnd = 0;
+	int32_t idx;
 
 	idx = 0;
 	while( idx < line.size() && isspace(line[idx]) ) {
