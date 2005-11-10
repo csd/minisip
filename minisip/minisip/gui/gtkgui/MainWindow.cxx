@@ -47,6 +47,11 @@
 #include<libmutil/trim.h>
 #include<libmutil/itoa.h>
 
+#ifdef HILDON_SUPPORT
+#include<hildon-lgpl/hildon-widgets/hildon-app.h>
+#include<hildon-lgpl/hildon-widgets/hildon-appview.h>
+#endif
+
 //#include<libmsip/SipSoftPhone.h>
 //
 #ifdef OLDLIBGLADEMM
