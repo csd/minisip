@@ -56,6 +56,7 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
+#include <stdio.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -123,7 +124,7 @@ void SocketServer::run(){
 
 			try{
 				ss = ssock->accept();
-			} catch( NetworkException *e ){
+			} catch( NetworkException *){
 			}
 
 			if (ss){
@@ -709,7 +710,7 @@ static void updateVia(MRef<SipMessage*> pack, IPAddress *from,
 
 	if( via->hasParameter( "rport" ) ){
 		char buf[20] = "";
-		snprintf(buf, sizeof(buf), "%d", port);
+		sprintf(buf, "%d", port);
 		via->setParameter( "rport", buf);
 	}
 	
