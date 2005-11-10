@@ -51,12 +51,12 @@
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContentFactory.h>
+#include<libmnetutil/Socket.h>
 
 class SipHeaderValueContact;
 class SipHeaderValueFrom;
 class SipHeaderValueTo;
 class SipHeaderValueVia;
-class Socket;
 
 
 MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
