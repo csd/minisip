@@ -180,7 +180,7 @@ void SipRequest::addRoute(const string &addr, int32_t port,
 
 	if( port ){
 		char buf[20];
-		snprintf(buf, sizeof(buf), "%d", port);
+		sprintf(buf, "%d", port);
 		uri = uri + ":" + buf;
 	}
 
