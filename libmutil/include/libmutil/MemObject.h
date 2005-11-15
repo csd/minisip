@@ -267,7 +267,7 @@ class MRef{
 		/**
 		Overload the de-ref operator
 		*/
-		inline OPType operator*();
+		inline OPType operator*() const;
 };
 
 
@@ -392,7 +392,7 @@ OPType MRef<OPType>::operator->() const {
 }
 
 template<class OPType>
-OPType MRef<OPType>::operator*(){
+OPType MRef<OPType>::operator*() const{
 	OPType ret;
 	ret = getPointer();
 	if( ret == NULL ) {
