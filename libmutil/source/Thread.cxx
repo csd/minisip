@@ -51,29 +51,9 @@
 
 using namespace std;
 
-ThreadException::ThreadException(string d):desc(d){
+ThreadException::ThreadException(char *desc):Exception(desc){
 
 }
-
-string ThreadException::what(){
-	try{
-		return desc;
-	}catch(Exception &e){
-		cerr << "Thread: caught exception "<< flush << e.what()<<endl;
-		cerr << "Thread: Stack trace:\n"+e.stackTrace()<<flush;
-	}catch(Exception *e){
-		cerr << "Thread: caught exception "<< flush << e->what()<<endl;
-		cerr << "Thread: Stack trace:\n"+e->stackTrace()<<flush;
-	}catch(exception &e){
-		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
-	}catch(exception *e){
-		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
-	}catch(...){
-		cerr << "Thread: caught unknown exception"<<endl;
-	}
-
-}
-
 
 void startFunction( void* (*f)() ){
 	try{
@@ -214,6 +194,7 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
     void **bp = 0;
     void *ip = 0;
 
+    fprintf(stderr, "EXCEPTION CAUGHT:\n");
     fprintf(stderr, "info.si_signo = %d\n", signum);
     fprintf(stderr, "info.si_errno = %d\n", info->si_errno);
     fprintf(stderr, "info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
@@ -391,7 +372,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 	
 	if (*((HANDLE*)handle_ptr)==NULL){
                 delete self;
-		throw new ThreadException("Could not create thread.");
+		throw ThreadException("Could not create thread.");
         }
 //	printf("In Thread, windows part - thread created\n");
 
@@ -424,7 +405,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 		#ifdef DEBUG_OUTPUT
 			merr << "In Thread, linux part - thread NOT created" << end;
 		#endif
-		throw new ThreadException("Could not create thread.");
+		throw ThreadException("Could not create thread.");
 	}
 	#ifdef DEBUG_OUTPUT
 		mdbg << "In Thread, linux part - thread created" << end;
@@ -462,7 +443,7 @@ int Thread::createThread(void f()){
 			&id);
 
 	if (threadHandle==NULL)
-		throw new ThreadException("Could not create thread.");
+		throw ThreadException("Could not create thread.");
 	return (int)threadHandle;
 #endif
 	
@@ -503,7 +484,7 @@ int Thread::createThread(void *f(void*), void *arg){
 	#endif
 
 	if (threadHandle==NULL)
-		throw new ThreadException("Could not create thread.");
+		throw ThreadException("Could not create thread.");
 	return (int)threadHandle;
 #endif
 	

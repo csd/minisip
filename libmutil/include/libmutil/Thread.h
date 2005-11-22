@@ -27,6 +27,7 @@
 
 #include<string>
 #include<libmutil/MemObject.h>
+#include<libmutil/Exception.h>
 
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
@@ -38,12 +39,9 @@
 #define LIBMUTIL_API
 #endif
 
-class LIBMUTIL_API ThreadException{
+class LIBMUTIL_API ThreadException : public Exception{
 public:
-	ThreadException(std::string description);
-	std::string what();
-private:
-	std::string desc;
+	ThreadException(char* description);
 };
 
 
