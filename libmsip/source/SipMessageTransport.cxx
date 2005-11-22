@@ -428,19 +428,28 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 	string transport;
 	uint16_t port;
 
-	if( socket ){
-		if( socket->getType() == SOCKET_TYPE_TLS ){
+	if( !socket )
+		return;
+	
+	switch( socket->getType() ){
+		case SOCKET_TYPE_TLS:
 			transport = "TLS";
 			port = localTLSPort;
-		}
-		else{
+			break;
+			
+		case SOCKET_TYPE_TCP:
 			transport = "TCP";
 			port = localTCPPort;
-		}
-	}
-	else{
-		transport = "UDP";
-		port = localUDPPort;
+			break;
+			
+		case SOCKET_TYPE_UDP:
+			transport = "UDP";
+			port = localUDPPort;
+			break;
+
+		default:
+			mdbg<< "SipMessageTransport: Unknown transport protocol " + socket->getType() <<end;
+			return;
 	}
 	
 	MRef<SipHeaderValue*> hdrVal = 
