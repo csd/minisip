@@ -17,6 +17,7 @@
 */
 
 #include<libmutil/IString.h>
+#include<libmutil/massert.h>
 
 #include<iostream>
 
@@ -32,7 +33,7 @@ StringAtom::StringAtom(std::string s){
 }
 
 StringAtom::~StringAtom(){
-	assert(buf);
+	massert(buf);
 	delete []buf;
 	buf=NULL;
 	n=0;
@@ -51,7 +52,7 @@ IString::IString(MRef<StringAtom*> a) : atom(a), start(0){
 }
 
 IString::IString(MRef<StringAtom*> a, int startIndex, int length) : atom(a), start(startIndex), n(length){
-	assert( startIndex+length <= a->getLength() );
+	massert( startIndex+length <= a->getLength() );
 }
 
 IString::IString(const IString &s){
@@ -88,7 +89,7 @@ MRef<IString*> IString::trim(){
 }
 
 MRef<IString*> IString::substr(int i){
-	assert(i<=n); //if i==n the result will be an empty string
+	massert(i<=n); //if i==n the result will be an empty string
 	MRef<IString*> ret = new IString(atom, start+i,n-i);
 	return ret;
 }

@@ -25,7 +25,7 @@
 #ifndef MINILIST_H
 #define MINILIST_H
 
-#include<assert.h>
+#include<libmutil/massert.h>
 
 #include<iostream>
 
@@ -166,7 +166,7 @@ class minilist{
 		 * TODO: Improve performance by using the "last_index".
 		 */
 		T pop_back(){
-			assert(size()>0);
+			massert(size()>0);
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			if (last_index>= size()-1)
 				last_index=-2;
@@ -195,7 +195,7 @@ class minilist{
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			last_index=-2;
 #endif
-			assert(i<=size());
+			massert(i<=size());
 			
 			if (size()==0 && i==0){ // only item
 				nelem++;
@@ -249,7 +249,7 @@ class minilist{
 		}
 			
 		void remove(int index){
-			assert(size()>0 && index>=0 && index<size());
+			massert(size()>0 && index>=0 && index<size());
 			
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 			last_index=-2;
@@ -293,7 +293,7 @@ class minilist{
 			
 			for (i=0; i<nelem; i++){
 				if (i==nelem-1){
-					assert(cur->getNext()==NULL);
+					massert(cur->getNext()==NULL);
 				}
 				cur= cur->getNext();
 			}
@@ -311,9 +311,9 @@ class minilist{
 					n++;
 					cur= cur->getNext();
 				};
-				assert(n==nelem-1);
+				massert(n==nelem-1);
 			}else{
-				assert(head==NULL && end==NULL);
+				massert(head==NULL && end==NULL);
 			}
 			cur = head;
 			n=0;
@@ -322,9 +322,9 @@ class minilist{
 					n++;
 					cur= cur->getNext();
 				};
-				assert(n==nelem);
+				massert(n==nelem);
 			}else{
-				assert(head==NULL && end==NULL);
+				massert(head==NULL && end==NULL);
 			}
 
 		}
@@ -352,7 +352,7 @@ class minilist{
 		
 		T operator[](int i){
 			node<T> *cur = head;
-			assert(i>=0 && i<size());
+			massert(i>=0 && i<size());
 			
 			int j=0;
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE

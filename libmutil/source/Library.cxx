@@ -1,5 +1,6 @@
 
 #include<libmutil/Library.h>
+#include<libmutil/massert.h>
 
 #ifdef _MSC_VER
 #include<Windows.h>
@@ -12,7 +13,7 @@ using namespace std;
 
 Library::Library(const string &path):path(path){
 #ifdef _MSC_VER
-	assert(sizeof(FARPROC)==sizeof(void*));
+	massert(sizeof(FARPROC)==sizeof(void*));
 	handle = new HMODULE;
 	
 	HMODULE *ptr =(HMODULE*)handle;
@@ -45,7 +46,7 @@ Library::~Library(){
 
 void *Library::getFunctionPtr(string name){
 #ifdef _MSC_VER
-	assert(sizeof(FARPROC)==sizeof(void*));
+	massert(sizeof(FARPROC)==sizeof(void*));
 	HMODULE *hptr =(HMODULE*)handle;
 	return GetProcAddress(*hptr, name.c_str());
 #else

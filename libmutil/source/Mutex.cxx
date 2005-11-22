@@ -28,7 +28,7 @@
 #include<config.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 
 // BSD 5.x: malloc.h has been replaced by stdlib.h
 // #include<malloc.h>
@@ -61,7 +61,7 @@ Mutex& Mutex::operator=(const Mutex &){
 
 Mutex::Mutex(const Mutex &){
 #ifdef _MSC_VER
-	assert(sizeof(HANDLE)==sizeof(int));
+	massert(sizeof(HANDLE)==sizeof(int));
 #endif
 	createMutex();
 }
@@ -110,7 +110,7 @@ Mutex::~Mutex(){
 #elif defined _MSC_VER
 	if (!CloseHandle(*((HANDLE*)handle_ptr))){
 		cerr << "Could not free mutex"<<endl;
-		assert(1==0); //TODO: Handle better - exception
+		massert(1==0); //TODO: Handle better - exception
 	}
 	delete handle_ptr;
 
@@ -151,7 +151,7 @@ void Mutex::unlock(){
 
 #elif defined _MSC_VER
 	if (!ReleaseMutex( *( (HANDLE*)handle_ptr) )){
-		assert(1==0); // Could not release mutex TODO: Handle better - exception
+		massert(1==0); // Could not release mutex TODO: Handle better - exception
 	}
 
 #elif defined WINCE

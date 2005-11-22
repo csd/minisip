@@ -38,7 +38,7 @@ certificate::certificate():private_key(NULL),cert(NULL){
 
 certificate::certificate( X509 * openssl_cert ):private_key(NULL){
 	if( openssl_cert == NULL ){
-		throw new certificate_exception;
+		throw certificate_exception("X509 certificate is NULL");
 	}
 	
 	cert = openssl_cert;
@@ -50,7 +50,7 @@ certificate::certificate( const string cert_filename ):private_key(NULL){
 	fp = fopen( cert_filename.c_str(), "r" );
 	if( fp == NULL ){
 		cerr << "Could not open the certificate file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Could not open the certificate file" );
 	}
 
@@ -60,7 +60,7 @@ certificate::certificate( const string cert_filename ):private_key(NULL){
 	
 	if( cert == NULL ){
 		cerr << "Invalid certificate file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Invalid certificate file" );
 	}
 
@@ -73,7 +73,7 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	fp = fopen( cert_filename.c_str(), "r" );
 	if( fp == NULL ){
 		cerr << "Could not open the certificate file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Could not open the certificate file" );
 	}
 
@@ -83,7 +83,7 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	
 	if( cert == NULL ){
 		cerr << "Invalid certificate file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Invalid certificate file" );
 	}
 
@@ -96,7 +96,7 @@ certificate::certificate( unsigned char * der_cert, int length ):private_key(NUL
 	cert = X509_new();
 
 	if( cert == NULL )
-		throw new certificate_exception_init(
+		throw certificate_exception_init(
 				"Could not create the certificate" );
 
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L 
@@ -272,7 +272,7 @@ void certificate::set_pk( string file ){
 	fp = fopen( file.c_str(), "r" );
 	if( fp == NULL ){
 		cerr << "Could not open the private key file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Could not open the private key file" );
 	}
 
@@ -281,7 +281,7 @@ void certificate::set_pk( string file ){
 	
 	if( private_key == NULL ){
 		cerr << "Invalid private key file" << endl;
-		throw new certificate_exception_file(
+		throw certificate_exception_file(
 				"Invalid private key file" );
 	}
 
@@ -289,7 +289,7 @@ void certificate::set_pk( string file ){
 
 	if( X509_check_private_key( cert, private_key ) != 1 ){
 		cerr << "Private key does not match the certificate" << endl;
-		throw new certificate_exception_pkey(
+		throw certificate_exception_pkey(
 			"The private key does not match the certificate" );
 	}
 
@@ -328,7 +328,7 @@ ca_db::ca_db(){
 	cert_db = X509_STORE_new();
 
 	if( cert_db == NULL ){
-		throw new certificate_exception_init(
+		throw certificate_exception_init(
 				"Could not create the certificate db" );
 	}
 	items_index = items.begin();
@@ -357,12 +357,12 @@ void ca_db::add_directory( string dir ){
 	lookup = X509_STORE_add_lookup( 
 			cert_db, X509_LOOKUP_hash_dir() );
 	if( lookup == NULL )
-		throw new certificate_exception_init(
-			string("Could not create a directory lookup") );
+		throw certificate_exception_init(
+			"Could not create a directory lookup");
 	
 	if( !X509_LOOKUP_add_dir( lookup, dir.c_str(), X509_FILETYPE_PEM ) )
-		throw new certificate_exception_file(
-			"Could not open the directory "+dir );
+		throw certificate_exception_file(
+			(string("Could not open the directory ")+dir).c_str() );
 
 	item->item = dir;
 	item->type = CERT_DB_ITEM_TYPE_DIR;
@@ -378,12 +378,12 @@ void ca_db::add_file( string file ){
 	lookup = X509_STORE_add_lookup( 
 			cert_db, X509_LOOKUP_file() );
 	if( lookup == NULL )
-		throw new certificate_exception_init(
+		throw certificate_exception_init(
 			"Could not create a file lookup" );
 	
 	if( !X509_LOOKUP_load_file( lookup, file.c_str(), X509_FILETYPE_PEM ) )
-		throw new certificate_exception_file(
-			"Could not open the file "+file );
+		throw certificate_exception_file(
+			("Could not open the file "+file).c_str() );
 	
 	item->item = file;
 	item->type = CERT_DB_ITEM_TYPE_FILE;
@@ -472,7 +472,7 @@ void certificate_chain::add_certificate( MRef<certificate *> cert ){
 		MRef<certificate *> lastCert = *(--cert_list.end());
 
 		if( lastCert->get_issuer() != cert->get_name() ){
-			throw new certificate_exception_chain(
+			throw certificate_exception_chain(
 			 	"The previous certificate in the chain is not"
 				"issued by the given one" );
 		}

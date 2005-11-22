@@ -46,6 +46,7 @@
 #include<unistd.h>
 #endif
 #include<libmutil/trim.h>
+#include<libmutil/massert.h>
 
 #include<iostream>
 
@@ -74,7 +75,7 @@ char *termCodes[]= { "\033[m", "\033[2m\033[1m", "\033[31m", "\033[34m", "\033[4
  */
 int TextUI::makeStdinNonblocking(){
 #ifdef HAVE_TERMIOS_H
-	assert(terminalSavedState);
+	massert(terminalSavedState);
 	tcgetattr(STDIN_FILENO, (struct termios*)terminalSavedState);
 	
 	struct termios termattr;

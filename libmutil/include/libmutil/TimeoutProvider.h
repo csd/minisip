@@ -55,7 +55,7 @@
 #define LIBMUTIL_API
 #endif
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"Mutex.h"
 
 #include<libmutil/mtime.h>
@@ -231,12 +231,12 @@ class TimeoutProvider : public Runnable{
 		 * 			callback.
 		 */
 		void request_timeout(int32_t time_ms, TOSubscriber subscriber, const TOCommand &command){
-			assert(subscriber);
+			massert(subscriber);
 			TPRequest<TOCommand, TOSubscriber> request(subscriber, time_ms, command);
 
                         synch_lock.lock();
 
-			assert(subscriber);
+			massert(subscriber);
 			if (requests.size()==0){
 				requests.push_front(request);
                                 synch_lock.unlock();
@@ -321,7 +321,7 @@ class TimeoutProvider : public Runnable{
 					TOCommand command=req.get_command();
 					requests.remove(req);
                                         synch_lock.unlock();
-					assert(subs);		
+					massert(subs);		
 					subs->timeout(command);
 				}else{
                                         synch_lock.unlock();

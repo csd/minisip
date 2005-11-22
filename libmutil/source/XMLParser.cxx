@@ -29,7 +29,6 @@
 #include<iostream>
 #include<sys/types.h>
 #include<config.h>
-#include<assert.h>
 
 
 static bool is_blank(char c){

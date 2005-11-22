@@ -46,6 +46,7 @@
 #include<list>
 #include<libmutil/TimeoutProvider.h>
 #include<libmutil/MemObject.h>
+#include<libmutil/massert.h>
 
 //#define SM_DEBUG //dont! use libxxx/include/config.h instead
 //#undef SM_DEBUG
@@ -286,7 +287,7 @@ class StateTransition : public MObject{
 
 		bool handleCommand(const CommandType &c){
 			bool handled;
-			assert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
+			massert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
 			if (handled= ((**stateMachine).*action)(c) ){
 				stateMachine->setCurrentState(to_state);
 #ifdef SM_DEBUG

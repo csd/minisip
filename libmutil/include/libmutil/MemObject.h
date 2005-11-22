@@ -50,6 +50,7 @@
 #include<libmutil/minilist.h>
 
 #include<libmutil/itoa.h>
+#include<libmutil/Exception.h>
 
 #ifdef DEBUG_OUTPUT
 #include <typeinfo>  //remove, for debug in ipaq
@@ -284,6 +285,7 @@ void MRef<OPType>::setPointer(const OPType o){
 			objp = o;
 		} else {
 			cerr << "MRef: Trying to use an MRef for a non MObject class" << endl;
+			cerr << "Stack trace: "<< getStackTraceString()<<endl;
 		}	
 	} else { 
 		objp = NULL;
@@ -385,6 +387,7 @@ OPType MRef<OPType>::operator->() const {
 	if( ret == NULL ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "MRef::operator-> : ERROR: trying to access null pointer (" << typeid(OPType).name() << ")." << endl;
+		cerr << "Stack trace: "<< getStackTraceString()<<endl;
 		#endif
 		assert( ret != NULL );
 	}
@@ -398,6 +401,7 @@ OPType MRef<OPType>::operator*() const{
 	if( ret == NULL ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "MRef::operator* : Warning: accessing a null pointer (" << typeid(OPType).name() << ")." << endl;
+		cerr << "Stack trace: "<< getStackTraceString()<<endl;
 		#endif
 	}
 	return getPointer();

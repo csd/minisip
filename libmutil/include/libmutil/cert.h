@@ -40,6 +40,7 @@ extern "C"{
 #include<list>
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
+#include<libmutil/Exception.h>
 
 #ifdef _MSC_VER
 #ifdef LIBMUTIL_EXPORTS
@@ -172,34 +173,29 @@ class LIBMUTIL_API certificate_chain: public MObject{
                 Mutex mLock;
 };
 
-class LIBMUTIL_API certificate_exception{
+class LIBMUTIL_API certificate_exception : public Exception{
 	public:
-		certificate_exception(){};
-		certificate_exception( std::string message ):message(message){};
-
-		std::string get_message(){ return message; };
-	protected:
-		std::string message;
+		certificate_exception( const char *desc):Exception(desc){};
 };
 
 class LIBMUTIL_API certificate_exception_file : public certificate_exception{
 	public:
-		certificate_exception_file( std::string message ):certificate_exception(message){};
+		certificate_exception_file( const char *message ):certificate_exception(message){};
 };
 
 class LIBMUTIL_API certificate_exception_init : public certificate_exception{
 	public:
-		certificate_exception_init( std::string message ):certificate_exception(message){};
+		certificate_exception_init( const char *message ):certificate_exception(message){};
 };
 
 class LIBMUTIL_API certificate_exception_pkey : public certificate_exception{
 	public:
-		certificate_exception_pkey( std::string message ):certificate_exception(message){};
+		certificate_exception_pkey( const char *message ):certificate_exception(message){};
 };
 
 class LIBMUTIL_API certificate_exception_chain : public certificate_exception{
 	public:
-		certificate_exception_chain( std::string message ):certificate_exception(message){};
+		certificate_exception_chain( const char *message ):certificate_exception(message){};
 };
 
 #endif
