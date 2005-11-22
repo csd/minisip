@@ -12,6 +12,8 @@ libmutil_la_SOURCES = $(mutil_src)
 mutil_src =  	source/aes.cxx \
 		source/MemObject.cxx \
 		source/Library.cxx \
+		source/Exception.cxx \
+		source/massert.cxx \
 		source/IString.cxx \
 		source/rijndael-alg-fst.cxx \
 		source/base64.cxx \

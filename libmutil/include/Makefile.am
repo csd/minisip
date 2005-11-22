@@ -1,5 +1,7 @@
 pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/rijndael-alg-fst.h \
+			libmutil/Exception.h \
+			libmutil/massert.h \
 			libmutil/MemObject.h \
 			libmutil/Library.h \
 			libmutil/IString.h \
