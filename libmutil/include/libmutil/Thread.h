@@ -125,4 +125,6 @@ private:
 	void *handle_ptr;
 };
 
+LIBMUTIL_API void setupDefaultSignalHandling();
+
 #endif

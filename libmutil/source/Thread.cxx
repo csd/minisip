@@ -37,10 +37,17 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_PTHREAD_H
+#include<signal.h>
+#endif
 
-#include<assert.h>
-//#include<stdio.h>
+#ifdef HAVE_EXECINFO_H
+#include<execinfo.h>
+#endif
+
 #include<libmutil/dbg.h>
+#include<libmutil/Exception.h>
+#include<libmutil/massert.h>
 
 using namespace std;
 
@@ -49,8 +56,86 @@ ThreadException::ThreadException(string d):desc(d){
 }
 
 string ThreadException::what(){
-	return desc;
+	try{
+		return desc;
+	}catch(Exception &e){
+		cerr << "Thread: caught exception "<< flush << e.what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e.stackTrace()<<flush;
+	}catch(Exception *e){
+		cerr << "Thread: caught exception "<< flush << e->what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e->stackTrace()<<flush;
+	}catch(exception &e){
+		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
+	}catch(exception *e){
+		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
+	}catch(...){
+		cerr << "Thread: caught unknown exception"<<endl;
+	}
+
 }
+
+
+void startFunction( void* (*f)() ){
+	try{
+		(*f)();
+	}catch(Exception &e){
+		cerr << "Thread: caught exception "<< flush << e.what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e.stackTrace()<<flush;
+	}catch(Exception *e){
+		cerr << "Thread: caught exception "<< flush << e->what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e->stackTrace()<<flush;
+	}catch(exception &e){
+		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
+	}catch(exception *e){
+		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
+	}catch(...){
+		cerr << "Thread: caught unknown exception"<<endl;
+	}
+
+}
+
+void *startFunctionArg( void* (*f)(void*), void* arg){
+	try{
+		(*f)(arg);
+	}catch(Exception &e){
+		cerr << "Thread: caught exception "<< flush << e.what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e.stackTrace()<<flush;
+	}catch(Exception *e){
+		cerr << "Thread: caught exception "<< flush << e->what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e->stackTrace()<<flush;
+	}catch(exception &e){
+		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
+	}catch(exception *e){
+		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
+	}catch(...){
+		cerr << "Thread: caught unknown exception"<<endl;
+	}
+
+}
+
+
+void startRunnable(MRef<Runnable*> r){
+	try{
+		r->run();
+	}catch(Exception &e){
+		cerr << "Thread: caught exception "<< flush << e.what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e.stackTrace()<<flush;
+	}catch(Exception *e){
+		cerr << "Thread: caught exception "<< flush << e->what()<<endl;
+		cerr << "Thread: Stack trace:\n"+e->stackTrace()<<flush;
+	}catch(exception &e){
+		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
+	}catch(exception *e){
+		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
+	}catch(...){
+		cerr << "Thread: caught unknown exception"<<endl;
+	}
+}
+
+typedef struct tmpstruct{
+    void *fun;
+    void *arg;
+} tmpstruct;
 
 #ifdef WIN32
 #define MINISIP_THREAD_IMPLEMENTED
@@ -60,15 +145,11 @@ static DWORD WINAPI ThreadStarter( LPVOID lpParam )
         delete (static_cast<MRef <Runnable *> *>(lpParam));
 
 //	printf("ThreadStarter: thread created\n");
-	self->run();
+	startRunnable(self);
+	//self->run();
 //	printf("ThreadStarter: thread terminated\n");
     return 0; 
 } 
-
-typedef struct tmpstruct{
-    void *fun;
-    void *arg;
-} tmpstruct;
 
 static DWORD WINAPI StaticThreadStarter(LPVOID lpParam)
 {
@@ -76,23 +157,26 @@ static DWORD WINAPI StaticThreadStarter(LPVOID lpParam)
 	void (*f)();
 	//f=(void())&lpParam;
 	f=(void (*)())lpParam;
-	(*f)();
+	startFunction(f);
+	//(*f)();
 //	((void (void)) lpParam)();
 //	printf("StaticThreadStarter: thread terminated\n");
     return 0;
 }
 
-
 static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 {
-	
 	//printf("StaticThreadStarter: ALIVE - thread created\n");
         tmpstruct *tmp = (tmpstruct*)lpParam;
 	void* (*f)(void*);
 	//f=(void())&lpParam;
 	//printf("StaticThreadStarter: running function");
 	f=(void* (*)(void*)) tmp->fun;
-	(*f)(tmp->arg);
+	void *arg = tmp->arg;
+	delete tmp;
+	//(*f)(tmp->arg);
+	startFunctionArg(f, arg);
+	
 //	((void (void)) lpParam)();
 //	printf("StaticThreadStarter: thread terminated\n");
     return 0;
@@ -105,36 +189,181 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 
 #ifdef HAVE_PTHREAD_H
 #define MINISIP_THREAD_IMPLEMENTED
+
+#ifdef HAVE_PTHREAD_H
+#ifdef HAVE_EXECINFO_H
+#include <ucontext.h>
+#include <dlfcn.h>
+
+#if defined(REG_RIP)
+#define REGFORMAT "%016lx"
+#elif defined(REG_EIP)
+#define REGFORMAT "%08x"
+#else
+#define REGFORMAT "%x"
+#endif
+
+//Thanks to Jaco Kroon for this function
+//http://tlug.up.ac.za/wiki/index.php/Obtaining_a_stack_trace_in_C_upon_SIGSEGV
+static void signalHandler(int signum, siginfo_t* info, void*ptr) {
+    static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+
+    int i, f = 0;
+    ucontext_t *ucontext = (ucontext_t*)ptr;
+    Dl_info dlinfo;
+    void **bp = 0;
+    void *ip = 0;
+
+    fprintf(stderr, "info.si_signo = %d\n", signum);
+    fprintf(stderr, "info.si_errno = %d\n", info->si_errno);
+    fprintf(stderr, "info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
+    fprintf(stderr, "info.si_addr  = %p\n", info->si_addr);
+    
+/* For register content, enable the following two lines: 
+    for(i = 0; i < NGREG; i++)
+        fprintf(stderr, "reg[%02d]       = 0x" REGFORMAT "\n", i, ucontext->uc_mcontext.gregs[i]);
+*/
+#if defined(REG_RIP)
+    ip = (void*)ucontext->uc_mcontext.gregs[REG_RIP];
+    bp = (void**)ucontext->uc_mcontext.gregs[REG_RBP];
+#elif defined(REG_EIP)
+    ip = (void*)ucontext->uc_mcontext.gregs[REG_EIP];
+    bp = (void**)ucontext->uc_mcontext.gregs[REG_EBP];
+#else
+    fprintf(stderr, "Unable to retrieve Instruction Pointer (not printing stack trace).\n");
+#define SIGSEGV_NOSTACK
+#endif
+
+#ifndef SIGSEGV_NOSTACK
+    fprintf(stderr, "Stack trace:\n");
+    while(bp && ip) {
+        if(!dladdr(ip, &dlinfo))
+            break;
+
+        fprintf(stderr, "% 2d: %p <%s+%u> (%s)\n",
+                ++f,
+                ip,
+                dlinfo.dli_sname,
+                (unsigned)((unsigned)ip - (unsigned)dlinfo.dli_saddr),
+                dlinfo.dli_fname);
+
+        if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
+            break;
+
+        ip = bp[1];
+        bp = (void**)bp[0];
+    }
+    fprintf(stderr, "End of stack trace\n");
+#endif
+}
+
+
+static bool handleSignal(int sig){
+	struct sigaction sa;
+	sa.sa_handler = NULL;
+	sa.sa_sigaction =  signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_ONESHOT | SA_SIGINFO;
+	return sigaction(sig, &sa, NULL) == 0;
+}
+
+#endif
+#endif
+
+
+
+#ifdef HAVE_EXECINFO_H
+/**
+ * 
+ *
+ */
+void setupDefaultSignalHandling(){	
+	if (!handleSignal(SIGSEGV)){
+		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
+	}
+	if (!handleSignal(SIGBUS)){
+		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
+	}
+	if (!handleSignal(SIGFPE)){
+		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
+	}
+	if (!handleSignal(SIGILL)){
+		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
+	}
+	if (!handleSignal(SIGSYS)){
+		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
+	}
+}
+
+
+#else
+void setupDefaultSignalHandling(){
+#ifdef DEBUG_OUTPUT
+	cerr << "libmutil: setupDefaultSignalHandling: No stack trace signal handler available"<<endl;
+#endif
+}
+
+#endif
+
 static void *LinuxThreadStarter(void *arg){
+#ifdef HAVE_EXECINFO_H
+	setupDefaultSignalHandling();
+#endif
 	/* Keep a reference to yourself as long as you run */
 	MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
 	delete (static_cast<MRef <Runnable *> *>(arg));
-	#ifdef DEBUG_OUTPUT
-		mdbg << "LinuxThreadStarter: thread created"<< end;
-	#endif
-	
-	self->run();
-	
-	#ifdef DEBUG_OUTPUT
-		mdbg <<"LinuxThreadStarter: thread terminated"<< end;
-	#endif
+#ifdef DEBUG_OUTPUT
+	mdbg << "LinuxThreadStarter: thread created"<< end;
+#endif
+
+	startRunnable(self);
+	//self->run();
+
+#ifdef DEBUG_OUTPUT
+	mdbg <<"LinuxThreadStarter: thread terminated"<< end;
+#endif
 	return NULL;
 	//pthread_exit( (void *) 0 ); //cesc
 }
 
 static void *LinuxStaticThreadStarter(void *arg){
+#ifdef HAVE_EXECINFO_H
+	setupDefaultSignalHandling();
+#endif
 	#ifdef DEBUG_OUTPUT
 		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
 	#endif
-	void (*f)();
-	f=(void (*)())arg;
-	(*f)();
-	
+	void* (*f)();
+	f=(void* (*)())arg;
+	//(*f)();
+	startFunction(f);
 	#ifdef DEBUG_OUTPUT
 		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
 	#endif
 	return NULL;
 }
+
+static void *LinuxStaticThreadStarterArg(void *arg){
+#ifdef HAVE_EXECINFO_H
+	setupDefaultSignalHandling();
+#endif
+	#ifdef DEBUG_OUTPUT
+		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
+	#endif
+        tmpstruct *tmp = (tmpstruct*)arg;
+        void* (*f)(void*);
+        f=(void* (*)(void*)) tmp->fun;
+        void *argptr = tmp->arg;
+        delete tmp;
+        startFunctionArg(f, argptr);
+
+	#ifdef DEBUG_OUTPUT
+		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
+	#endif
+	return NULL;
+}
+
+
 
 #endif
 
@@ -145,7 +374,7 @@ static void *LinuxStaticThreadStarter(void *arg){
 
 
 Thread::Thread(MRef<Runnable *> runnable){
-	assert(runnable);
+	massert(runnable);
         MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
 #ifdef WIN32
 	DWORD threadId;
@@ -220,7 +449,7 @@ Thread::~Thread(){
 int Thread::createThread(void f()){
 #ifdef WIN32
 	HANDLE threadHandle;
-	assert(sizeof(threadHandle)==4);
+	massert(sizeof(threadHandle)==4);
 	DWORD id;
 	LPVOID fptr;
 	fptr = (void*)f;
@@ -250,7 +479,7 @@ int Thread::createThread(void f()){
 
 int Thread::createThread(void *f(void*), void *arg){
 #ifdef WIN32
-//        assert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
+//        massert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
 
 	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
@@ -279,11 +508,15 @@ int Thread::createThread(void *f(void*), void *arg){
 #endif
 	
 #ifdef HAVE_PTHREAD_H
+	tmpstruct *argptr = new struct tmpstruct;
+        argptr->fun = (void*)f;
+        argptr->arg = arg;
+ 
 	pthread_t threadHandle;
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Running createThread" << end;
 	#endif
-	pthread_create(&threadHandle, NULL, f, arg);
+	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarterArg, argptr);
 	return (int)threadHandle;
 #endif
 
