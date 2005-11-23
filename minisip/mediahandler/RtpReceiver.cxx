@@ -79,7 +79,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 				break;
 			}
 		}
-		catch( NetworkException * exc ){
+		catch( NetworkException & exc ){
 			// FIXME: do something nice
 // 			merr << "Minisip could not create a UDP socket!" << end;
 // 			merr << "Check your network settings." << end;
@@ -209,7 +209,7 @@ void RtpReceiver::run(){
 			packet = SRtpPacket::readPacket( **socket );
 		}
 
-		catch (NetworkException * exc ){
+		catch (NetworkException & exc ){
 			delete exc;
 			continue;
 		}

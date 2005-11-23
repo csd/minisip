@@ -63,7 +63,7 @@ bool Session::responderAuthenticate( string message ){
 
 						if( securityConfig.cert.isNull() ){
 							merr << "No certificate available" << end;
-						//	throw new MikeyExceptionUnacceptable(
+						//	throw MikeyExceptionUnacceptable(
 						//			"Cannot handle DH key agreement, no certificate" );
 							securityConfig.secured = false;
 							securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -73,7 +73,7 @@ bool Session::responderAuthenticate( string message ){
 
 						if( !securityConfig.dh_enabled ){
 							merr << "Cannot handle DH key agreement" << end;
-							//throw new MikeyExceptionUnacceptable(
+							//throw MikeyExceptionUnacceptable(
 							//		"Cannot handle DH key agreement" );
 							securityConfig.secured = false;
 							securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -90,7 +90,7 @@ bool Session::responderAuthenticate( string message ){
 #endif
 						if( init_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
 							merr << "Authentication of the DH init message failed" << end;
-//							throw new MikeyExceptionAuthentication(
+//							throw MikeyExceptionAuthentication(
 //								"Authentication of the DH init message failed" );
 							merr << ka->authError() << end;
 							securityConfig.secured = false;
@@ -122,7 +122,7 @@ bool Session::responderAuthenticate( string message ){
 						break;
 					case MIKEY_TYPE_PSK_INIT:
 						if( !securityConfig.psk_enabled ){
-							//throw new MikeyExceptionUnacceptable(
+							//throw MikeyExceptionUnacceptable(
 							//		"Cannot handle PSK key agreement" );
 
 							securityConfig.secured = false;
@@ -138,7 +138,7 @@ bool Session::responderAuthenticate( string message ){
 #endif
 
 						if( init_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
-//							throw new MikeyExceptionAuthentication(
+//							throw MikeyExceptionAuthentication(
 //								"Authentication of the PSK init message failed" );
 							securityConfig.secured = false;
 							securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -152,7 +152,7 @@ bool Session::responderAuthenticate( string message ){
 						securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 						break;
 					case MIKEY_TYPE_PK_INIT:
-						//throw new MikeyExceptionUnimplemented(
+						//throw MikeyExceptionUnimplemented(
 						//	"Public Key key agreement not implemented" );
 						securityConfig.secured = false;
 						securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -167,7 +167,7 @@ bool Session::responderAuthenticate( string message ){
 				securityConfig.secured = true;
 				authenticated = true;
 			}
-			catch( certificate_exception *exc ){
+			catch( certificate_exception &exc ){
 				// TODO: Tell the GUI
 				merr << "Could not open certificate" <<end;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -175,8 +175,8 @@ bool Session::responderAuthenticate( string message ){
 				authenticated = false;
 				delete exc;
 			}
-			catch( MikeyExceptionUnacceptable *exc ){
-				merr << "MikeyException caught: "<<exc->message()<<end;
+			catch( MikeyExceptionUnacceptable &exc ){
+				merr << "MikeyException caught: "<<exc.what()<<end;
 				//FIXME! send SIP Unacceptable with Mikey Error message
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
@@ -184,8 +184,8 @@ bool Session::responderAuthenticate( string message ){
 				delete exc;
 			}
 			// Authentication failed
-			catch( MikeyExceptionAuthentication *exc ){
-				merr << "MikeyExceptionAuthentication caught: "<<exc->message()<<end;
+			catch( MikeyExceptionAuthentication &exc ){
+				merr << "MikeyExceptionAuthentication caught: "<<exc.what()<<end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
@@ -193,7 +193,7 @@ bool Session::responderAuthenticate( string message ){
 				delete exc;
 			}
 			// Message was invalid
-			catch( MikeyExceptionMessageContent *exc ){
+			catch( MikeyExceptionMessageContent &exc ){
 				MikeyMessage * error_mes;
 				merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
 				if( ( error_mes = exc->errorMessage() ) != NULL ){
@@ -204,8 +204,8 @@ bool Session::responderAuthenticate( string message ){
 				authenticated = false;
 				delete exc;
 			}
-			catch( MikeyException * exc ){
-				merr << "MikeyException caught: " << exc->message() << end;
+			catch( MikeyException & exc ){
+				merr << "MikeyException caught: " << exc.what() << end;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
@@ -267,32 +267,32 @@ string Session::responderParse(){
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
 				/* Should not happen at that point */
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 						"Public Key key agreement not implemented" );
 				break;
 			default:
-				throw new MikeyExceptionMessageContent(
+				throw MikeyExceptionMessageContent(
 						"Unexpected type of message in INVITE" );
 		}
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception & exc ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
 	}
-	catch( MikeyExceptionUnacceptable *exc ){
-		merr << "MikeyException caught: "<<exc->message()<<end;
+	catch( MikeyExceptionUnacceptable & exc ){
+		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
 	}
 	// Message was invalid
-	catch( MikeyExceptionMessageContent *exc ){
+	catch( MikeyExceptionMessageContent & exc ){
 		MikeyMessage * error_mes;
-		merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
+		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
 		if( ( error_mes = exc->errorMessage() ) != NULL ){
 			responseMessage = error_mes;
 		}
@@ -300,8 +300,8 @@ string Session::responderParse(){
 		securityConfig.secured = false;
 		delete exc;
 	}
-	catch( MikeyException * exc ){
-		merr << "MikeyException caught: " << exc->message() << end;
+	catch( MikeyException & exc ){
+		merr << "MikeyException caught: " << exc.what() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
@@ -328,7 +328,7 @@ string Session::initiatorCreate(){
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
 				if( !securityConfig.cert || securityConfig.cert->is_empty() ){
-					throw new MikeyException( "No certificate provided for DH key agreement" );
+					throw MikeyException( "No certificate provided for DH key agreement" );
 				}
 #ifndef _MSC_VER
 				ts.save( DH_PRECOMPUTE_START );
@@ -368,25 +368,25 @@ string Session::initiatorCreate(){
 #endif
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 						"PK KA type not implemented" );
 			default:
-				throw new MikeyException( "Invalid type of KA" );
+				throw MikeyException( "Invalid type of KA" );
 		}
 		
 		string b64Message = message->b64Message();
 		delete message;
 		return "mikey "+b64Message;
 	}
-	catch( certificate_exception * exc ){
+	catch( certificate_exception & exc ){
 		// FIXME: tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		return "";
 	}
-	catch( MikeyException * exc ){
-		merr << "MikeyException caught: " << exc->message() << end;
+	catch( MikeyException & exc ){
+		merr << "MikeyException caught: " << exc.what() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured=false;
 		return "";
@@ -417,7 +417,7 @@ bool Session::initiatorAuthenticate( string message ){
 						ts.save( AUTH_START );
 #endif
 						if( resp_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
-							throw new MikeyExceptionAuthentication(
+							throw MikeyExceptionAuthentication(
 							  "Authentication of the DH response message failed" );
 						}
 						
@@ -426,7 +426,7 @@ bool Session::initiatorAuthenticate( string message ){
 #endif
 						if( securityConfig.check_cert ){
 							if( ((KeyAgreementDH *)*ka)->controlPeerCertificate() == 0)
-								throw new MikeyExceptionAuthentication(
+								throw MikeyExceptionAuthentication(
 									"Certificate control failed" );
 						}
 #ifndef _MSC_VER
@@ -439,7 +439,7 @@ bool Session::initiatorAuthenticate( string message ){
 						if( resp_mes->get_type() == MIKEY_TYPE_DH_RESP )
 							((MikeyMessageDH*)resp_mes)->parse_response((KeyAgreementDH *)(key_agreement));
 						else
-							throw new MikeyExceptionMessageContent(
+							throw MikeyExceptionMessageContent(
 								"Unexpected MIKEY Message type" );
 						
 						((KeyAgreementDH *)key_agreement)->compute_tgk();*/
@@ -450,7 +450,7 @@ bool Session::initiatorAuthenticate( string message ){
 						ts.save( AUTH_START );
 #endif
 						if( resp_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
-							throw new MikeyExceptionAuthentication(
+							throw MikeyExceptionAuthentication(
 							"Authentication of the PSK verification message failed" );
 						}
 #ifndef _MSC_VER
@@ -460,7 +460,7 @@ bool Session::initiatorAuthenticate( string message ){
 						if( resp_mes->get_type() == MIKEY_TYPE_PSK_RESP )
 							((MikeyMessagePSK*)resp_mes)->parse_response((KeyAgreementPSK *)(key_agreement));
 						else
-							throw new MikeyExceptionMessageContent(
+							throw MikeyExceptionMessageContent(
 								"Unexpected MIKEY Message type" );
 						
 						break;*/
@@ -468,25 +468,25 @@ bool Session::initiatorAuthenticate( string message ){
 						return true;
 
 					case KEY_MGMT_METHOD_MIKEY_PK:
-						throw new MikeyExceptionUnimplemented(
+						throw MikeyExceptionUnimplemented(
 								"PK type of KA unimplemented" );
 					default:
-						throw new MikeyException(
+						throw MikeyException(
 								"Invalid type of KA" );
 				}
 
 				//transii->getDialog()->getPhone()->log(LOG_INFO, "Negociated the TGK: " + print_hex( key_agreement->get_tgk(), key_agreement->get_tgk_length() ) );
 			}
-			catch(MikeyExceptionAuthentication *exc){
-				merr << "MikeyException caught: " << exc->message() << end;
+			catch(MikeyExceptionAuthentication &exc){
+				merr << "MikeyException caught: " << exc.what() << end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured=false;
 				return false;
 			}
-			catch(MikeyExceptionMessageContent *exc){
+			catch(MikeyExceptionMessageContent &exc){
 				MikeyMessage * error_mes;
-				merr << "MikeyExceptionMessageContent caught: " << exc->message() << end;
+				merr << "MikeyExceptionMessageContent caught: " << exc.what() << end;
 				if( ( error_mes = exc->errorMessage() ) != NULL ){
 					//FIXME: send the error message!
 				}
@@ -495,8 +495,8 @@ bool Session::initiatorAuthenticate( string message ){
 				return false;
 			}
 				
-			catch(MikeyException *exc){
-				merr << "MikeyException caught: " << exc->message() << end;
+			catch(MikeyException &exc){
+				merr << "MikeyException caught: " << exc.what() << end;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured=false;
 				return false;
@@ -554,32 +554,32 @@ string Session::initiatorParse(){
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
 				/* Should not happen at that point */
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 						"Public Key key agreement not implemented" );
 				break;
 			default:
-				throw new MikeyExceptionMessageContent(
+				throw MikeyExceptionMessageContent(
 						"Unexpected type of message in INVITE" );
 		}
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception &exc ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
 	}
-	catch( MikeyExceptionUnacceptable *exc ){
-		merr << "MikeyException caught: "<<exc->message()<<end;
+	catch( MikeyExceptionUnacceptable &exc ){
+		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
 	}
 	// Message was invalid
-	catch( MikeyExceptionMessageContent *exc ){
+	catch( MikeyExceptionMessageContent &exc ){
 		MikeyMessage * error_mes;
-		merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
+		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
 		if( ( error_mes = exc->errorMessage() ) != NULL ){
 			responseMessage = error_mes;
 		}
@@ -587,8 +587,8 @@ string Session::initiatorParse(){
 		securityConfig.secured = false;
 		delete exc;
 	}
-	catch( MikeyException * exc ){
-		merr << "MikeyException caught: " << exc->message() << end;
+	catch( MikeyException & exc ){
+		merr << "MikeyException caught: " << exc.what() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
 		delete exc;
@@ -636,10 +636,10 @@ void Session::setMikeyOffer(){
 			break;
 		case KEY_MGMT_METHOD_MIKEY_PK:
 		/* Should not happen at that point */
-			throw new MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
+			throw MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
 			break;
 		default:
-			throw new MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
+			throw MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
 		}
 }
 
