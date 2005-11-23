@@ -116,7 +116,7 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 		try{
 			stunIp = new IP4Address(phoneConf->stunServerIpString);
 		}
-		catch(HostNotFound *hnf){
+		catch(HostNotFound & hnf){
 			merr << "Could not find your STUN server. "
 			        "STUN will be disabled." << end;
 			return NULL;

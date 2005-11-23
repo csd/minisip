@@ -67,7 +67,7 @@ void XvDisplay::openDisplay(){
 
 	if( XvQueryAdaptors( display, DefaultRootWindow( display ),
 			     &nAdaptors, &adaptors ) != Success ){
-		throw new VideoException( "Could not find Xv adaptors" );
+		throw VideoException( "Could not find Xv adaptors" );
 	}
 
 	for( i = 0; i < nAdaptors; i++ ){
@@ -114,7 +114,7 @@ void XvDisplay::openDisplay(){
 	}
 
 	if( xvPort == -1 ){
-		throw new VideoException( "Could not find a suitable Xv Port" );
+		throw VideoException( "Could not find a suitable Xv Port" );
 	}
 }
 

@@ -81,7 +81,7 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
 				if( !securityConfig.cert || securityConfig.cert->is_empty() ){
-					throw new MikeyException( "No certificate provided for DH key agreement" );
+					throw MikeyException( "No certificate provided for DH key agreement" );
 				}
 				if( ka && ka->type() != KEY_AGREEMENT_TYPE_DH ){
 					ka = NULL;
@@ -99,24 +99,24 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecOffer(){
 				message = new MikeyMessage( ((KeyAgreementPSK *)*ka) );
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 						"PK KA type not implemented" );
 			default:
-				throw new MikeyException( "Invalid type of KA" );
+				throw MikeyException( "Invalid type of KA" );
 		}
 		
 		string b64Message = message->b64Message();
 		delete message;
 		return new SipMimeContent("application/mikey", b64Message, "");
 	}
-	catch( certificate_exception * exc ){
+	catch( certificate_exception & exc ){
 		// FIXME: tell the GUI
 		merr << "Could not open certificate" << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		return NULL;
 	}
-	catch( MikeyException * exc ){
+	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc->message() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec=false;
@@ -147,10 +147,10 @@ bool MsipIpsecAPI::setMikeyIpsecOffer(MRef<SipMimeContent*> MikeyM){
 					break;
 				case KEY_MGMT_METHOD_MIKEY_PK:
 					/* Should not happen at this point */
-					throw new MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
+					throw MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
 					break;
 				default:
-					throw new MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
+					throw MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
 			}
 		}
 	}
@@ -191,43 +191,39 @@ MRef<SipMimeContent*> MsipIpsecAPI::getMikeyIpsecAnswer(){
 					break;
 				case KEY_MGMT_METHOD_MIKEY_PK:
 					/* Should not happen at that point */
-					throw new MikeyExceptionUnimplemented(
+					throw MikeyExceptionUnimplemented(
 							"Public Key key agreement not implemented" );
 					break;
 				default:
-					throw new MikeyExceptionMessageContent(
+					throw MikeyExceptionMessageContent(
 							"Unexpected type of message in INVITE" );
 			}
 		}
-		catch( certificate_exception *exc ){
+		catch( certificate_exception & exc ){
 			// TODO: Tell the GUI
 			merr << "Could not open certificate" <<end;
 			securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 			securityConfig.use_ipsec = false;
-			delete exc;
 		}
-		catch( MikeyExceptionUnacceptable *exc ){
+		catch( MikeyExceptionUnacceptable & exc ){
 			merr << "MikeyException caught: "<<exc->message()<<end;
 			//FIXME! send SIP Unacceptable with Mikey Error message
 			securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 			securityConfig.use_ipsec = false;
-			delete exc;
 		}
 		// Message was invalid
-		catch( MikeyExceptionMessageContent *exc ){
+		catch( MikeyExceptionMessageContent & exc ){
 			MikeyMessage * error_mes;
 			merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
 			if( ( error_mes = exc->errorMessage() ) != NULL )
 				responseMessage = error_mes;
 			securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 			securityConfig.use_ipsec = false;
-			delete exc;
 		}
-		catch( MikeyException * exc ){
+		catch( MikeyException & exc ){
 			merr << "MikeyException caught: " << exc->message() << end;
 			securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 			securityConfig.use_ipsec = false;
-			delete exc;
 		}
 
 		if( responseMessage != NULL && securityConfig.use_ipsec){
@@ -277,32 +273,30 @@ bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PK:
 				/* Should not happen at that point */
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 						"Public Key key agreement not implemented" );
 				break;
 			default:
-				throw new MikeyExceptionMessageContent(
+				throw MikeyExceptionMessageContent(
 						"Unexpected type of message in INVITE" );
 		}
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception & exc ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
-		delete exc;
 		return false;
 	}
-	catch( MikeyExceptionUnacceptable *exc ){
+	catch( MikeyExceptionUnacceptable & exc ){
 		merr << "MikeyException caught: "<<exc->message()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
-		delete exc;
 		return false;
 	}
 	// Message was invalid
-	catch( MikeyExceptionMessageContent *exc ){
+	catch( MikeyExceptionMessageContent & exc ){
 		MikeyMessage * error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
 		if( ( error_mes = exc->errorMessage() ) != NULL ){
@@ -310,14 +304,12 @@ bool MsipIpsecAPI::setMikeyIpsecAnswer(MRef<SipMimeContent*> MikeyM){
 		}
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
-		delete exc;
 		return false;
 	}
-	catch( MikeyException * exc ){
+	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc->message() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
-		delete exc;
 		return false;
 	}
 	//if( ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
@@ -595,33 +587,30 @@ bool MsipIpsecAPI::responderAuthenticate( string b64Message ){
 		securityConfig.use_ipsec = true;
 		authenticated = true;
 	}
-	catch( certificate_exception *exc ){
+	catch( certificate_exception & exc ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		authenticated = false;
-		delete exc;
 	}
-	catch( MikeyExceptionUnacceptable *exc ){
+	catch( MikeyExceptionUnacceptable & exc ){
 		merr << "MikeyException caught: "<<exc->message()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		authenticated = false;
-		delete exc;
 	}
 	// Authentication failed
-	catch( MikeyExceptionAuthentication *exc ){
+	catch( MikeyExceptionAuthentication & exc ){
 		merr << "MikeyExceptionAuthentication caught: "<<exc->message()<<end;
 		//FIXME! send SIP Authorization failed with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		authenticated = false;
-		delete exc;
 	}
 	// Message was invalid
-	catch( MikeyExceptionMessageContent *exc ){
+	catch( MikeyExceptionMessageContent & exc ){
 		MikeyMessage * error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
 		if( ( error_mes = exc->errorMessage() ) != NULL ){
@@ -630,14 +619,12 @@ bool MsipIpsecAPI::responderAuthenticate( string b64Message ){
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		authenticated = false;
-		delete exc;
 	}
-	catch( MikeyException * exc ){
+	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc->message() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec = false;
 		authenticated = false;
-		delete exc;
 	}
 	return authenticated;
 }
@@ -655,39 +642,39 @@ bool MsipIpsecAPI::initiatorAuthenticate( string message ){
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:	
 				if( resp_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
-					throw new MikeyExceptionAuthentication(
+					throw MikeyExceptionAuthentication(
 						  "Authentication of the DH response message failed" );
 					}
 				if( securityConfig.check_cert ){
 					if( ((KeyAgreementDH *)*ka)->controlPeerCertificate() == 0)
-						throw new MikeyExceptionAuthentication(
+						throw MikeyExceptionAuthentication(
 									"Certificate control failed" );
 				}
 				securityConfig.use_ipsec = true;
 				return true;
 			case KEY_MGMT_METHOD_MIKEY_PSK:
 				if( resp_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
-					throw new MikeyExceptionAuthentication(
+					throw MikeyExceptionAuthentication(
 						"Authentication of the PSK verification message failed" );
 				}
 				securityConfig.use_ipsec = true;
 				return true;
 			case KEY_MGMT_METHOD_MIKEY_PK:
-				throw new MikeyExceptionUnimplemented(
+				throw MikeyExceptionUnimplemented(
 					"PK type of KA unimplemented" );
 			default:
-				throw new MikeyException(
+				throw MikeyException(
 					"Invalid type of KA" );
 		}
 	}
-	catch(MikeyExceptionAuthentication *exc){
+	catch(MikeyExceptionAuthentication & exc){
 		merr << "MikeyException caught: " << exc->message() << end;
 		//FIXME! send SIP Authorization failed with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec=false;
 		return false;
 	}
-	catch(MikeyExceptionMessageContent *exc){
+	catch(MikeyExceptionMessageContent & exc){
 		MikeyMessage * error_mes;
 		merr << "MikeyExceptionMessageContent caught: " << exc->message() << end;
 		if( ( error_mes = exc->errorMessage() ) != NULL ){
@@ -697,7 +684,7 @@ bool MsipIpsecAPI::initiatorAuthenticate( string message ){
 		securityConfig.use_ipsec=false;
 		return false;
 	}		
-	catch(MikeyException *exc){
+	catch(MikeyException & exc){
 		merr << "MikeyException caught: " << exc->message() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.use_ipsec=false;

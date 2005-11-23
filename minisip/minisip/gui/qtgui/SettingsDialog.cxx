@@ -257,7 +257,7 @@ string GeneralTabWidget::apply(){
 			if( config->inherited.proxyAddr != NULL )
 				delete config->inherited.proxyAddr;
 			config->inherited.proxyAddr = ip;
-		} catch (IPAddressHostNotFoundException * exc){
+		} catch (IPAddressHostNotFoundException & exc){
 			cerr << "Could not resolve proxy address:";
 			cerr << exc->what() << endl;
 		}

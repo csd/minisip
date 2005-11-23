@@ -227,7 +227,7 @@ void CertificateDialog::addCaFile(){
         	//editCertificate.setText( fileCertificate->selectedFile() );
 		try{
 			certDb->add_file( result.ascii() );
-		} catch( certificate_exception * exc ){
+		} catch( certificate_exception & exc ){
 			QMessageBox::critical( this, "Minisip",
   		  	"Minisip could not open that certificate file.\n"
     			"Please check that the file is a correct\n"
@@ -300,7 +300,7 @@ void CertificateDialog::addCertChain(){
 			certChain->add_certificate( cert );
 			certChain->unlock();
 
-		} catch( certificate_exception * exc ){
+		} catch( certificate_exception & exc ){
 			QMessageBox::critical( this, "Minisip",
   		  	"Minisip could not open that certificate file.\n"
     			"Please check that the file is a correct\n"
@@ -374,7 +374,7 @@ void CertificateDialog::chooseCert(){
 		try{
 			chosenCert = new certificate( result.ascii() );
 			
-		} catch( certificate_exception * exc ){
+		} catch( certificate_exception & exc ){
 			QMessageBox::critical( this, "Minisip",
   		  	"Minisip could not open that certificate file.\n"
     			"Please check that the file is a correct\n"
@@ -420,7 +420,7 @@ void CertificateDialog::choosePk(){
 		try{
 			cert->set_pk( result.ascii() );
 		} 
-		catch( certificate_exception_pkey * exc ){
+		catch( certificate_exception_pkey & exc ){
 			QMessageBox::critical( this, "Minisip",
   		  	"The private key file you selected does not.\n"
     			"match the selected certificate." );
@@ -428,7 +428,7 @@ void CertificateDialog::choosePk(){
 			return;
 		}
 
-		catch( certificate_exception * exc ){
+		catch( certificate_exception & exc ){
 			QMessageBox::critical( this, "Minisip",
   		  	"Minisip could not open that file.\n"
     			"Please check that the file is a correct\n"

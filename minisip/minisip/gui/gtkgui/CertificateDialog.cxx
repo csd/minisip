@@ -117,7 +117,7 @@ void CertificateDialog::chooseCert(){
 		try{
 			chosenCert = new certificate( result );
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that certificate file. "
 			"Please check that the file is a correct "
@@ -175,7 +175,7 @@ void CertificateDialog::choosePKey(){
 		try{
 			cert->set_pk( result );
 		}
-		catch( certificate_exception_pkey * exc ){
+		catch( certificate_exception_pkey & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"The private key file you selected does not. "
 			"match the selected certificate ",
@@ -185,7 +185,7 @@ void CertificateDialog::choosePKey(){
 			delete dialog;
 			return;
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
@@ -233,7 +233,7 @@ void CertificateDialog::addCert(){
 			certChain->add_certificate( chosenCert );
 			certChain->unlock();
 		}
-		catch( certificate_exception_chain * exc ){
+		catch( certificate_exception_chain & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"The selected certificate is not "
 			"assigned to the issuer of the previous "
@@ -245,7 +245,7 @@ void CertificateDialog::addCert(){
 			delete dialog;
 			return;
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
@@ -311,7 +311,7 @@ void CertificateDialog::addFileCa(){
 			caDb->add_file( result );
 			caDb->unlock();
 		}
-		catch( certificate_exception * exc ){
+		catch( certificate_exception & exc ){
 			caDb->unlock();
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
