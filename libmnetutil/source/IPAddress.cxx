@@ -74,12 +74,12 @@ IPAddress * IPAddress::create( sockaddr * addr ){
 IPAddress * IPAddress::create(const string &addr){
 	try {
 		return new IP4Address( addr );
-	} catch( HostNotFound *e ){
+	} catch( HostNotFound &e ){
 	}
 
 	try {
 		return new IP6Address( addr );
-	} catch( HostNotFound *e ){
+	} catch( HostNotFound &e ){
 	}
 
 	return NULL;

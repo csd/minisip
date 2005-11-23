@@ -177,7 +177,7 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	try{
 		peer_cert = new certificate( SSL_get_peer_certificate (ssl) );
 	}
-	catch( certificate_exception *){
+	catch( certificate_exception &){
 		//FIXME
 		cerr << "Could not get server certificate" << endl;
 		peer_cert = NULL;

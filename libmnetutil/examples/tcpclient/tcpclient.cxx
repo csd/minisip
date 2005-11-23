@@ -20,11 +20,11 @@ int main(int argc, char **argv){
 		//Create a TCP connection to the server (address and port given
 		//as arguments to the application).
 		sock = new TCPSocket(argv[1], atoi(argv[2]));
-	}catch(ConnectFailed *){
+	}catch(ConnectFailed &){
 		cerr << "Sorry, I could not connect to port "<< argv[2] << " on the server." << endl;
 		return -3;
 	
-	}catch(HostNotFound *){
+	}catch(HostNotFound &){
 		cerr << "Sorry, the server <"<< argv[1]<<"> could not be found"<< endl;
 		return -3;
 	}
