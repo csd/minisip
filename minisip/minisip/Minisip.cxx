@@ -47,6 +47,7 @@ using namespace std;
 #include<exception>
 #include<libmutil/Timestamp.h>
 #include<libmutil/TextUI.h>
+#include<libmutil/Thread.h>
 
 //extern TextUI *debugtextui;
 
@@ -400,6 +401,10 @@ int Minisip::runGui(){
 
 int main( int argc, char ** argv ){
 	cerr << endl << "Starting MiniSIP ... welcome!" << endl << endl;
+	setupDefaultSignalHandling(); //Signal handlers are created for all 
+				      //threads created with libmutil/Thread.h
+				      //For the main thread we have to
+				      //install them
 	
 	Minisip minisip( argc, argv );
 	if( minisip.startSip() > 0 ) {
