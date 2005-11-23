@@ -156,7 +156,7 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 			cert = new certificate( certFile );
 			this->cert->add_certificate( cert );
 		}
-		catch( certificate_exception * ){
+		catch( certificate_exception & ){
 			merr << "Could not open the given certificate " << certFile <<end;
 		}
 
@@ -165,11 +165,11 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 			try{
 				cert->set_pk( privateKeyFile );
 			}
-			catch( certificate_exception_pkey * ){
+			catch( certificate_exception_pkey & ){
 				merr << "The given private key " << privateKeyFile << " does not match the certificate"<<end;
 			}
 
-			catch( certificate_exception *){
+			catch( certificate_exception &){
 				merr << "Could not open the given private key "<< privateKeyFile << end;
 			}
 		}
@@ -183,7 +183,7 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 			certificate * cert = new certificate( certFile );
 			this->cert->add_certificate( cert );
 		}
-		catch( certificate_exception *){
+		catch( certificate_exception &){
 			merr << "Could not open the given certificate" << end;
 		}
 		iCertFile ++;
@@ -199,7 +199,7 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 		try{
 			cert_db->add_file( certFile );
 		}
-		catch( certificate_exception *){
+		catch( certificate_exception &){
 			merr << "Could not open the CA certificate" << end;
 		}
 		iCertFile ++;
@@ -214,7 +214,7 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 		try{
 			cert_db->add_directory( certFile );
 		}
-		catch( certificate_exception *){
+		catch( certificate_exception &){
 			merr << "Could not open the CA certificate directory " << certFile << end;
 		}
 		iCertFile ++;

@@ -173,7 +173,6 @@ bool Session::responderAuthenticate( string message ){
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
-				delete exc;
 			}
 			catch( MikeyExceptionUnacceptable &exc ){
 				merr << "MikeyException caught: "<<exc.what()<<end;
@@ -181,7 +180,6 @@ bool Session::responderAuthenticate( string message ){
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
-				delete exc;
 			}
 			// Authentication failed
 			catch( MikeyExceptionAuthentication &exc ){
@@ -190,26 +188,23 @@ bool Session::responderAuthenticate( string message ){
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
-				delete exc;
 			}
 			// Message was invalid
 			catch( MikeyExceptionMessageContent &exc ){
 				MikeyMessage * error_mes;
-				merr << "MikeyExceptionMesageContent caught: " << exc->message() << end;
-				if( ( error_mes = exc->errorMessage() ) != NULL ){
+				merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
+				if( ( error_mes = exc.errorMessage() ) != NULL ){
 					//FIXME: send the error message!
 				}
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
-				delete exc;
 			}
 			catch( MikeyException & exc ){
 				merr << "MikeyException caught: " << exc.what() << end;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 				securityConfig.secured = false;
 				authenticated = false;
-				delete exc;
 			}
 		
 		}
@@ -280,31 +275,27 @@ string Session::responderParse(){
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	catch( MikeyExceptionUnacceptable & exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent & exc ){
 		MikeyMessage * error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
-		if( ( error_mes = exc->errorMessage() ) != NULL ){
+		if( ( error_mes = exc.errorMessage() ) != NULL ){
 			responseMessage = error_mes;
 		}
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 
 	if( responseMessage != NULL ){
@@ -487,7 +478,7 @@ bool Session::initiatorAuthenticate( string message ){
 			catch(MikeyExceptionMessageContent &exc){
 				MikeyMessage * error_mes;
 				merr << "MikeyExceptionMessageContent caught: " << exc.what() << end;
-				if( ( error_mes = exc->errorMessage() ) != NULL ){
+				if( ( error_mes = exc.errorMessage() ) != NULL ){
 					//FIXME: send the error message!
 				}
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -567,31 +558,27 @@ string Session::initiatorParse(){
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	catch( MikeyExceptionUnacceptable &exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent &exc ){
 		MikeyMessage * error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
-		if( ( error_mes = exc->errorMessage() ) != NULL ){
+		if( ( error_mes = exc.errorMessage() ) != NULL ){
 			responseMessage = error_mes;
 		}
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
 		securityConfig.secured = false;
-		delete exc;
 	}
 
 	if( responseMessage != NULL )

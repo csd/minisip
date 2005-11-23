@@ -93,7 +93,7 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
 
 		Thread t(*grabber);
                 }
-                catch( VideoException exc ){
+                catch( VideoException & exc ){
                         merr << "Could not open the video capture device: "
                              << exc.error() << end;
                         grabber = NULL;
@@ -107,7 +107,7 @@ void VideoCodec::stopSend(){
                 try{
 		grabber->close();
                 }
-                catch( VideoException exc ){
+                catch( VideoException & exc ){
                         merr << "Could not close the video capture device: "
                              << exc.error() << end;
                 }

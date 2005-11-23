@@ -296,9 +296,9 @@ string Sip::confjoin(string &user, minilist<ConfMember> *list, string confId){
 			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
 //			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
 //			callconf->inherited.sipIdentity->sipProxyPort = iport;
-		}catch(IPAddressHostNotFoundException *exc){
+		}catch(IPAddressHostNotFoundException & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
-			merr << exc->what();
+			merr << exc.what();
 			merr << "Will use default proxy instead" << end;
 		}
 */
@@ -395,7 +395,7 @@ string Sip::confconnect(string &user, string confId){
 			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
 //			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
 //			callconf->inherited.sipIdentity->sipProxyPort = iport;
-		}catch(IPAddressHostNotFoundException *exc){
+		}catch(IPAddressHostNotFoundException & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc->what();
 			merr << "Will use default proxy instead" << end;
@@ -478,11 +478,10 @@ void Sip::run(){
 			}
 		}
 	}
-	catch( NetworkException * exc ){
+	catch( NetworkException & exc ){
 		cerr << "ERROR: Exception thrown when creating"
 			"TCP/TLS servers." << endl;
-		cerr << exc->errorDescription() << endl;
-		delete exc;
+		cerr << exc.what() << endl;
 	}
 
 #ifdef DEBUG_OUTPUT

@@ -210,7 +210,6 @@ void RtpReceiver::run(){
 		}
 
 		catch (NetworkException & exc ){
-			delete exc;
 			continue;
 		}
 

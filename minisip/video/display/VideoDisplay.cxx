@@ -58,7 +58,7 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
                 displayCounterLock.unlock();
                 return display;
                 }
-                catch( VideoException exc ){
+                catch( VideoException & exc ){
                         mdbg << "Error opening the video display: "
                              << exc.error() << end;
                 }
@@ -69,7 +69,7 @@ MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
                 display = new X11Display( width, height );
                 display->start();
         }
-        catch( VideoException exc ){
+        catch( VideoException & exc ){
                 merr << "Error opening the video display: "
                         << exc.error() << end;
         }

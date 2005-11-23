@@ -864,9 +864,9 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 		try{
 			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr = new IP4Address(proxy);
 			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyPort = iport;
-		}catch(HostNotFound *exc){
+		}catch(HostNotFound & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
-			merr << exc->errorDescription();
+			merr << exc.what();
 			merr << "Will use default proxy instead" << end;
 		}
 	

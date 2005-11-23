@@ -381,11 +381,11 @@ int Minisip::initParseConfig(){
 			}
 #endif
 
-		}catch(XMLElementNotFound *enf){
+		}catch(XMLElementNotFound & enf){
 #ifdef DEBUG_OUTPUT
-			merr << FG_ERROR << "Element not found: "<< enf->what()<< PLAIN << end;
+			merr << FG_ERROR << "Element not found: "<< enf.what()<< PLAIN << end;
 #endif
-			merr << "ERROR: Could not parse configuration item: "+enf->what() << end;
+			merr << "ERROR: Could not parse configuration item: "+enf.what() << end;
 			gui->configDialog( phoneConf );
 			done=false;
 		}

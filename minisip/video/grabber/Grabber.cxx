@@ -58,7 +58,7 @@ MRef<Grabber *> Grabber::create( string device ){
 		result = (Grabber*)v4lGrabber;
 	}
         }
-        catch( VideoException exc ){
+        catch( VideoException & exc ){
                 merr << exc.error() << end;
                 return NULL;
         }
