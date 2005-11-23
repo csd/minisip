@@ -75,7 +75,7 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 	try{	
 		toaddr = new IP4Address(conf->sipIdentity->sipProxy.sipProxyAddressString);
 	}
-	catch( HostNotFound * exc ){
+	catch( HostNotFound & exc ){
 		toaddr = NULL;
 		SipSMCommand cmd( CommandString( callId, SipCommandString::transport_error, exc->errorDescription() ), SipSMCommand::transaction, SipSMCommand::TU );
         	dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);

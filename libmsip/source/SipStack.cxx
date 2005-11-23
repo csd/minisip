@@ -56,6 +56,8 @@
 #include<libmsip/SipHeaderSubject.h>
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderTo.h>
+#include<libmsip/SipHeaderIdentity.h>
+#include<libmsip/SipHeaderIdentityInfo.h>
 #include<libmsip/SipCommandString.h>
 //#include"PresenceMessageContent.h"
 
@@ -95,6 +97,8 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Expires", sipHeaderEventFactory);
 	SipHeader::headerFactories.addFactory("From", sipHeaderFromFactory);
 	SipHeader::headerFactories.addFactory("f", sipHeaderFromFactory);
+	SipHeader::headerFactories.addFactory("Identity", sipHeaderIdentityFactory);
+	SipHeader::headerFactories.addFactory("Identity-Info", sipHeaderIdentityInfoFactory);
 	SipHeader::headerFactories.addFactory("Max-Forwards", sipHeaderMaxForwardsFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);
@@ -223,7 +227,7 @@ string SipStack::invite(string &user){
 			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
 //			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
 //			callconf->inherited.sipIdentity->sipProxyPort = iport;
-		}catch(IPAddressHostNotFoundException *exc){
+		}catch(IPAddressHostNotFoundException &exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc->what();
 			merr << "Will use default proxy instead" << end;

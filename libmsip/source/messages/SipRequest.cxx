@@ -67,12 +67,12 @@ void SipRequest::init(string &build_from){
 	// Skip white space
 	start = build_from.find_first_not_of( ' ', start );
 	if( start == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipRequest malformed - first line did not contain any non whitespace character");
 	}
 
 	end = build_from.find_first_of( "\r\n", start );
 	if( end == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipRequest malformed - only one line");
 	}
 
 	requestLine = build_from.substr( start, end - start );
@@ -82,7 +82,7 @@ void SipRequest::init(string &build_from){
 	// Parse method
 	pos = requestLine.find( ' ', start );
 	if( pos == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipRequest malformed - could not find method");
 	}
 
 	method = build_from.substr( start, pos - start );
@@ -90,13 +90,13 @@ void SipRequest::init(string &build_from){
 	// Parse version
 	pos2 = requestLine.rfind( ' ', end - 1 );
 	if( pos2 == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipRequest malformed - request line did not contain space between method and version");
 	}
 
 	string version = requestLine.substr( pos2 + 1, end - pos2 );
 
 	if( version != "SIP/2.0" ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipRequest malformed - unknown version");
 	}	  
 
 	uri = requestLine.substr( pos + 1, pos2 - pos );

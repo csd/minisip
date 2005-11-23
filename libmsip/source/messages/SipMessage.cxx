@@ -247,7 +247,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 #ifdef DEBUG_OUTPUT
 			cerr << "SipMessage::SipMessage: Size is too short - throwing exception"<< endl;
 #endif
-			throw new SipExceptionInvalidMessage();
+			throw SipExceptionInvalidMessage("SIP Message too short");
 		}
 		header = header + buildFrom[i];
 

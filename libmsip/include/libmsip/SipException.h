@@ -24,6 +24,8 @@
 #ifndef SIPEXCEPTION_H
 #define SIPEXCEPTION_H
 
+#include<libmutil/Exception.h>
+
 #ifdef _MSC_VER
 #ifdef LIBMSIP_EXPORTS
 #define LIBMSIP_API __declspec(dllexport)
@@ -34,13 +36,25 @@
 #define LIBMSIP_API
 #endif
 
-class LIBMSIP_API SipException{};
+class LIBMSIP_API SipException : public Exception{
+	public:
+		SipException(const char *desc):Exception(what){}
+};
 
-class LIBMSIP_API SipExceptionInvalidMessage : public SipException {};
+class LIBMSIP_API SipExceptionInvalidMessage : public SipException {
+	public:
+		SipExceptionInvalidMessage(const char *desc):SipException(desc){}
+};
 
-class LIBMSIP_API SipExceptionInvalidStart : public SipException {};
+class LIBMSIP_API SipExceptionInvalidStart : public SipException {
+	public:
+		SipExceptionInvalidStart(const char *desc): SipException(desc){}
+};
 
-class LIBMSIP_API SipExceptionInvalidURI : public SipExceptionInvalidMessage {};
+class LIBMSIP_API SipExceptionInvalidURI : public SipExceptionInvalidMessage {
+	public:
+		SipExceptionInvalidURI(const char *desc) : SipException(desc){}
+};
 
 #endif
 

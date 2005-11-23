@@ -60,17 +60,17 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	// Parse Via protocol (name and version)
 	pos = build_from.find( '/', i );
 	if( pos == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - via value did not contain version");
 	}
 
 	pos = build_from.find( '/', pos + 1);
 	if( pos == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - via value did not contain version");
 	}
 
 	const string proto = build_from.substr( i, pos - i );
 	if (proto != "SIP/2.0") {
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - version unknown");
 	}
 	i = pos + 1;
 
@@ -78,7 +78,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	// Parse Via transport
 	pos = build_from.find( ' ', i );
 	if( pos == string::npos ){
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine transport protocol");
 	}
 	protocol = build_from.substr( i, pos - i );
 	i = pos + 1;
@@ -89,6 +89,9 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		i++;
 	}
 
+	//FIXME: The following code considers parameters -  they are not
+	//part of the header value and should not be parsed here (they
+	//should not be in the string passed to this method)!!
 	string portstr="";
 	if (build_from[i]==':'){
 		i++;
@@ -137,18 +140,19 @@ SipHeaderValueVia::~SipHeaderValueVia(){
 string SipHeaderValueVia::getString(){
 //	if (!(protocol=="TCP" || protocol=="UDP")){
 //		cerr << "Protocol not set"<< endl;
-//		throw new string("Protocol not set in Via header");
+//		throw string("Protocol not set in Via header");
 //	}
 ///	if (port==0){
 ///		cerr << "ERROR: In SipHeaderValueVia: port not set"<< endl;
-///		throw new string("Port not set in Via header");
+///		throw string("Port not set in Via header");
 ///	}
 	string via;
 	via = /*"Via: */ "SIP/2.0/"+protocol+" "+ip;
 	if (port>0)
 		via=via+":"+itoa(port);
-	if (branch.length()>0)
-		via=via+";branch="+branch;
+	if (branch.length()>0)	
+		via=via+";branch="+branch;	//FIXME: Parameters should not be added here - they 
+	 					//shoud be set using the parameter functionality.
 	return via;
 }
 

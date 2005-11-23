@@ -122,7 +122,7 @@ void SocketServer::run(){
 
 			try{
 				ss = ssock->accept();
-			} catch( NetworkException *){
+			} catch( NetworkException &){
 			}
 
 			if (ss){
@@ -379,7 +379,7 @@ void SipMessageTransport::startTcpServer(){
 	try{
 		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
 		tcpSocketServer->start();
-	}catch( NetworkException * exc ){
+	}catch( NetworkException & exc ){
 		cerr << exc->errorDescription() << endl;
 		return;
 	}
@@ -402,7 +402,7 @@ void SipMessageTransport::startTlsServer(){
 	try{
 		tlsSocketServer = new SocketServer(new TLSServerSocket(localTLSPort, getMyCertificate(), getCA_db() ),this);
 		tlsSocketServer->start();
-	}catch( NetworkException * exc ){
+	}catch( NetworkException & exc ){
 		cerr << "Exception caught when creating TCP server." << endl;
 		cerr << exc->errorDescription() << endl;
 		return;
@@ -626,7 +626,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			memcpy(&tmp[0], packetString.c_str() , 11);
 #endif
 			if( ssocket->write( packetString ) == -1 ){
-				throw new SendFailed( errno );
+				throw SendFailed( errno );
 			}
 		}
 		else if( dsocket ){
@@ -647,7 +647,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 					(const void*)packetString.c_str(),
 					(int32_t)packetString.length() ) == -1 ){
 			
-				throw new SendFailed( errno );
+				throw SendFailed( errno );
 			
 			}
 		}
@@ -655,7 +655,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			cerr << "No valid socket!" << endl;
 		}
 	}
-	catch( NetworkException * exc ){
+	catch( NetworkException & exc ){
 		string message = exc->errorDescription();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
@@ -797,7 +797,7 @@ void SipMessageTransport::udpSocketRead(){
 				pack=NULL;
 			}
 			
-			catch(SipExceptionInvalidMessage * exc){
+			catch(SipExceptionInvalidMessage & exc){
 				delete exc;
 				/* Probably we don't have enough data
 				 * so go back to reading */
@@ -807,7 +807,7 @@ void SipMessageTransport::udpSocketRead(){
 				continue;
 			}
 			
-			catch(SipExceptionInvalidStart * exc){
+			catch(SipExceptionInvalidStart & exc){
 				// This does not look like a SIP
 				// packet, close the connection
 				
@@ -923,7 +923,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				}
 			}
 			
-			catch(SipExceptionInvalidMessage * exc){
+			catch(SipExceptionInvalidMessage & exc){
 #if 0
 				// Check that we received data
 				// is not too big, in which case close
@@ -938,7 +938,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				continue;
 			}
 			
-			catch(SipExceptionInvalidStart * exc){
+			catch(SipExceptionInvalidStart & exc){
 				// This does not look like a SIP
 				// packet, close the connection
 				

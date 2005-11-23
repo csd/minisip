@@ -49,7 +49,7 @@ SipProxy::SipProxy(std::string addr, int port){
 		registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		setProxy( addr, port );
-	} catch (NetworkException * exc ) {
+	} catch (NetworkException & exc ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, int) throwing ... " << endl;
 		#endif
@@ -71,7 +71,7 @@ SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->t
 	
 	try {
 		addr = SipProxy::findProxy( userUri, port, transportParam );
-	}catch( NetworkException * exc ) {
+	}catch( NetworkException & exc ) {
 		if( transportParam == "TCP" ) { 
 			//if tcp doesn't work, try find UDP
 			addr = "unknown";
@@ -84,7 +84,7 @@ SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->t
 			cerr << "Autodetect Sip proxy for [" << userUri << "] for transport TCP failed. Retrying with transport UDP." << endl;
 			transportParam = "UDP";
 			addr = SipProxy::findProxy( userUri, port, transportParam );
-		}catch( NetworkException * exc2 ) {
+		}catch( NetworkException & exc2 ) {
 				addr = "unknown";
 		}
 	}	
@@ -101,7 +101,7 @@ SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->t
 	try {
 		setProxy( addr, port );
 		setTransport( transportParam );
-	} catch (NetworkException * exc ) {
+	} catch (NetworkException & exc ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, str) throwing (2)... " << endl;
 		#endif

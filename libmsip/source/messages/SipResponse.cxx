@@ -88,7 +88,7 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 #ifdef DEBUG_OUTPUT
 		cerr << "SipResponse::SipResponse: message too short - throwing exception"<< endl;
 #endif
-		throw new SipExceptionInvalidMessage();
+		throw SipExceptionInvalidMessage("SipResponse too short");
 	}
 		//strlen(SIP/2.0)==7
 	int afterws=7;
@@ -108,7 +108,7 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 		cerr << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
 #endif
 
-			throw new SipExceptionInvalidMessage();
+			throw SipExceptionInvalidMessage("SipResponse malformed - could not find end of response description");
 		}
 		status_desc=status_desc+resp[i];
 	}
