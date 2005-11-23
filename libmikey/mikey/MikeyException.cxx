@@ -26,81 +26,77 @@
 #include<libmikey/MikeyDefs.h>
 #include<libmikey/MikeyException.h>
 
-MikeyException::MikeyException(string message){
-	this->messageValue=message;
-}
-
-string MikeyException::message(){
-	return messageValue;
+MikeyException::MikeyException(const char *message): Exception(message) {
 }
 
 
-MikeyExceptionUninitialized::MikeyExceptionUninitialized(string msg): MikeyException(msg){
+MikeyExceptionUninitialized::MikeyExceptionUninitialized(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionUninitialized::~MikeyExceptionUninitialized(){
+MikeyExceptionUninitialized::~MikeyExceptionUninitialized()throw(){
 
 }
 
 
-MikeyExceptionNullPointerException::MikeyExceptionNullPointerException(string msg): MikeyException(msg){
+MikeyExceptionNullPointerException::MikeyExceptionNullPointerException(const char *msg): MikeyException(msg){
 
 }
 
 
-MikeyExceptionNullPointerException::~MikeyExceptionNullPointerException(){
+MikeyExceptionNullPointerException::~MikeyExceptionNullPointerException()throw(){
 
 }
 
 
 
-MikeyExceptionMessageContent::MikeyExceptionMessageContent(string msg): MikeyException(msg){
+MikeyExceptionMessageContent::MikeyExceptionMessageContent(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionMessageContent::MikeyExceptionMessageContent(MikeyMessage * errMsg, string msg):MikeyException(msg),errorMessageValue(errMsg){
+MikeyExceptionMessageContent::MikeyExceptionMessageContent(MikeyMessage * errMsg, const char* msg):MikeyException(msg),errorMessageValue(errMsg){
 
 }
 
-MikeyExceptionMessageContent::~MikeyExceptionMessageContent(){
+MikeyExceptionMessageContent::~MikeyExceptionMessageContent() throw(){
 
 }
+
 
 MikeyMessage * MikeyExceptionMessageContent::errorMessage(){
-	return errorMessageValue;
+        return errorMessageValue;
 }
 
 
-MikeyExceptionMessageLengthException::MikeyExceptionMessageLengthException(string msg): MikeyException(msg){
+MikeyExceptionMessageLengthException::MikeyExceptionMessageLengthException(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionMessageLengthException::~MikeyExceptionMessageLengthException(){
+MikeyExceptionMessageLengthException::~MikeyExceptionMessageLengthException() throw() {
 
 }
 
-MikeyExceptionAuthentication::MikeyExceptionAuthentication(string msg): MikeyException(msg){
+MikeyExceptionAuthentication::MikeyExceptionAuthentication(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionAuthentication::~MikeyExceptionAuthentication(){
+MikeyExceptionAuthentication::~MikeyExceptionAuthentication() throw() {
 
 }
 
-MikeyExceptionUnacceptable::MikeyExceptionUnacceptable(string msg): MikeyException(msg){
+MikeyExceptionUnacceptable::MikeyExceptionUnacceptable(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionUnacceptable::~MikeyExceptionUnacceptable(){
+MikeyExceptionUnacceptable::~MikeyExceptionUnacceptable() throw (){
 
 }
 
-MikeyExceptionUnimplemented::MikeyExceptionUnimplemented(string msg): MikeyException(msg){
+MikeyExceptionUnimplemented::MikeyExceptionUnimplemented(const char* msg): MikeyException(msg){
 
 }
 
-MikeyExceptionUnimplemented::~MikeyExceptionUnimplemented(){
+MikeyExceptionUnimplemented::~MikeyExceptionUnimplemented() throw(){
 
 }
 
