@@ -11,6 +11,24 @@
 	
 #define MAX_STACK_TRACE_DEPTH 30
 
+//The code for getting the stack trace 
+//is the same as in the second constructor.
+//It could be in a private method, but
+//then that will be in the trace as well...
+Exception::Exception():exception(){
+#ifdef HAVE_EXECINFO_H
+	stack = new void*[MAX_STACK_TRACE_DEPTH];
+	if (stack){
+		stackDepth = backtrace(stack, MAX_STACK_TRACE_DEPTH);
+	}else{
+		stackDepth=0;
+	}
+#else
+	stackDepth=-1;
+	stack=NULL;
+#endif
+}
+
 /**
  * We use "backtrace" in libc to get find out what the 
  * stack looks like.

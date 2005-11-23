@@ -80,6 +80,15 @@ dnl FIXME: Replace `main' with a function in `-ldl':
 AC_CHECK_LIB([dl], [dlopen])
 
 
+dnl Check for stack trace support
+AC_CHECK_HEADER([execinfo.h],
+	[
+		AC_DEFINE(HAVE_EXECINFO_H, [], [Stack trace functionality found])
+		HAVE_EXECINFO_H="yes"
+	]
+)
+AM_CONDITIONAL(HAVE_EXECINFO_H, test "${HAVE_EXECINFO}" = "yes")
+
 
 dnl Checks for header files.
 AC_HEADER_STDC

@@ -57,6 +57,13 @@
 class LIBMUTIL_API Exception : public std::exception {
 public:
 	/**
+	 * Creates an exception without any description. Sub-classes
+	 * can set the description text by accessing the protected
+	 * "msg" string.
+	 */
+	Exception();
+	
+	/**
 	 * @param what	Description of the exception. Can be retrieved
 	 * using the "what()" method.
 	 */
@@ -76,8 +83,11 @@ public:
 	 * the stack. If not supported, an empty string is returned.
 	 */
 	std::string stackTrace() const;
-private:
+
+protected:
 	std::string msg;
+	
+private:
 	void **stack;   // Internal stack trace storage.
 	int stackDepth;	// We need to know how many levels - only 
 	                // used internally.
