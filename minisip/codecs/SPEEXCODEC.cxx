@@ -24,7 +24,6 @@
 #ifdef HAS_SPEEX
 
 #include"SPEEXCODEC.h"
-#include<assert.h>
 #include<iostream>
 
 #include<speex/speex.h>

@@ -29,7 +29,7 @@
 */
 
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"SipDialogPresenceClient.h"
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipHeaderFrom.h>
@@ -133,7 +133,7 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 
 		//MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)
 		//	*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
-		assert(dynamic_cast<SipHeaderValueExpires*>(*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0)));		
+		massert(dynamic_cast<SipHeaderValueExpires*>(*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0)));		
 		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0);
 		int timeout;
 		if (expireshdr){

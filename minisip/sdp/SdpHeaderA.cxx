@@ -30,7 +30,7 @@
 
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"SdpHeaderA.h"
 
 #include<libmutil/itoa.h>
@@ -39,7 +39,7 @@
 
 
 SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 9){
-	assert(buildFrom.substr(0,2)=="a=");
+	massert(buildFrom.substr(0,2)=="a=");
 	attributes= trim(buildFrom.substr(2, buildFrom.length()-2));
 }
 

@@ -31,7 +31,7 @@
 
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"SipDialogVoip.h"
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
@@ -556,7 +556,7 @@ bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 
-		assert( !getLastInvite().isNull() );
+		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
 
 		getMediaSession()->start();
@@ -1457,7 +1457,7 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 #ifdef NEVERDEFINED_ERSADFS
 void SipDialogVoip::sendAck(string branch){
 	//	mdbg << "ERROR: SipDialogVoip::sendAck() UNIMPLEMENTED" << end;
-	assert( !lastResponse.isNull());
+	massert( !lastResponse.isNull());
 	SipAck *ack = new SipAck(
 			branch, 
 			*lastResponse,
@@ -1508,7 +1508,7 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 	//string tmp = getDialogConfig().inherited.userUri;
 	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
 	uint32_t i = tmp.find("@");
-	assert(i!=string::npos);
+	massert(i!=string::npos);
 	i++;
 	string domain;
 	for ( ; i < tmp.length() ; i++)
@@ -1551,7 +1551,7 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 /*
 	string tmp = getDialogConfig()->inherited.sipIdentity->getSipUri();
 	uint32_t i = tmp.find("@");
-	assert(i!=string::npos);
+	massert(i!=string::npos);
 	i++;
 	string domain;
 	for ( ; i < tmp.length() ; i++)
@@ -1576,7 +1576,7 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 }
 
 void SipDialogVoip::sendCancel(const string &branch){
-	assert( !lastInvite.isNull());
+	massert( !lastInvite.isNull());
 	
 	//merr << "SipDialogVoip::sendCancel : dialogstate.remoteUri=" << dialogState.remoteUri << end;
 	

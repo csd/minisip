@@ -29,7 +29,6 @@
 #include<errno.h>
 #include<iostream>
 #include<stdio.h>
-#include<assert.h>
 #include<signal.h>
 #include<time.h>
 #include<libmutil/itoa.h>

@@ -22,7 +22,7 @@
 
 #include"XRVoIPReportBlock.h"
 #include<config.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 //#include<netinet/in.h>
 #include<iostream>
 
@@ -65,15 +65,15 @@ struct voip_metrics_report{
 XRVoIPReportBlock::XRVoIPReportBlock(void *build_from, int max_length){
 	//struct voip_metrics_report *vmrp = (struct voip_metrics_report *)build_from;
 	uint8_t * bytearray = (uint8_t *)build_from;
-	assert(bytearray[1]==0);
-	assert(max_length>=7);
+	massert(bytearray[1]==0);
+	massert(max_length>=7);
 		
 	//this->block_type = vmrp->block_type;
 	this->block_type = bytearray[0];
-	assert(this->block_type==VOIP_METRICS_REPORT);
+	massert(this->block_type==VOIP_METRICS_REPORT);
 	//this->block_length = ntohs(vmrp->block_length);
 	this->block_length = U16_AT( bytearray + 2 );
-	assert(this->block_length==6);
+	massert(this->block_length==6);
 	//this->loss_rate = vmrp->loss_rate;
 	this->loss_rate = bytearray[4];
 	//this->discard_rate = vmrp->discard_rate;

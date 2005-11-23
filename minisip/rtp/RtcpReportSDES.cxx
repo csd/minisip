@@ -21,7 +21,7 @@
 */
 
 #include"RtcpReportSDES.h"
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<iostream>
 
 using namespace std;
@@ -35,7 +35,7 @@ RtcpReportSDES::RtcpReportSDES(void *buildfrom, int max_length):RtcpReport(0){
 	parse_header(buildfrom,max_length);
 	cerr << "Found SR report with content length of "<< length << " and will try to parse "<< rc_sc<< " chunks" << endl;
 	
-	assert(packet_type=PACKET_TYPE_SDES);
+	massert(packet_type=PACKET_TYPE_SDES);
 
 	max_length=length*4;
 	int i=4;

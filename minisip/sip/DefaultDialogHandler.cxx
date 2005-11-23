@@ -40,6 +40,7 @@
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipCancel.h>
+#include<libmutil/massert.h>
 
 #ifdef P2T_SUPPORT
 #include"../p2t/SipDialogP2T.h"
@@ -130,7 +131,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 	
 			//get the GroupList from the remote GroupListServer
 			//MRef<GroupList*>grpList;
-			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+			massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
 			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
@@ -202,7 +203,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 #endif			
 			
 
-			assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+			massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
 			MRef<Session *> mediaSession = 
@@ -306,7 +307,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 		sendIMOk(im, trans->getBranch() );
 
-		assert(dynamic_cast<SipMessageContentIM*>(*im->getContent())!=NULL);
+		massert(dynamic_cast<SipMessageContentIM*>(*im->getContent())!=NULL);
 
 		MRef<SipMessageContentIM*> imref = (SipMessageContentIM*)*im->getContent();
 
@@ -495,7 +496,7 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 	if (command.getType()==SipSMCommand::COMMAND_PACKET){
 		return handleCommandPacket( command.getSource(), command.getDestination(), command.getCommandPacket(), dispatchCount );
 	}else{
-		assert(command.getType()==SipSMCommand::COMMAND_STRING);
+		massert(command.getType()==SipSMCommand::COMMAND_STRING);
 		CommandString cmdstr = command.getCommandString();
 		return handleCommandString( command.getSource(), command.getDestination(), cmdstr ,dispatchCount );
 	}
@@ -509,7 +510,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	
 	//get the GroupList from the remote GroupListServer
 	MRef<GroupList*>grpList;
-	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	string gServer = sdp->getSessionLevelAttribute("p2tGroupListServer");
 	string gID = sdp->getSessionLevelAttribute("p2tGroupIdentity");

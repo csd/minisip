@@ -20,7 +20,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"SDES_NAME.h"
 
 #ifdef DEBUG_OUTPUT
@@ -33,7 +33,7 @@ SDES_NAME::SDES_NAME(void *buildfrom, int max_length){
 	length=*lengthptr;
 	
 	char *cptr = (char *)buildfrom;
-	assert(*cptr == NAME);
+	massert(*cptr == NAME);
 //	type=*cptr;
 	name="";
 	

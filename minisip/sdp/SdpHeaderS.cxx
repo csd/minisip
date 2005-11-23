@@ -34,12 +34,12 @@
 #include"SdpHeaderS.h"
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 
 using namespace std;
 
 SdpHeaderS::SdpHeaderS(string buildFrom):SdpHeader(SDP_HEADER_TYPE_S, 3){
-	assert(buildFrom.substr(0,2)=="s=");
+	massert(buildFrom.substr(0,2)=="s=");
 	session_name = trim(buildFrom.substr(2, buildFrom.length()-2));
 }
 

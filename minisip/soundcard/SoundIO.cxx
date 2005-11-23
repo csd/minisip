@@ -51,7 +51,7 @@
 #include"SoundIO.h"
 #include"SoundSource.h"
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<signal.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Thread.h>
@@ -227,7 +227,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	SoundIO *soundcard = (SoundIO *)sc_arg;
 	int32_t i;
 	short *buffers[2];	// Two sound buffers for "double buffering"
-	assert(soundcard!=NULL);
+	massert(soundcard!=NULL);
 	int32_t nread=0; /* IN SAMPLES */
 	//FIXME
 	soundcard->recorder_buffer_size = SOUND_CARD_FREQ*20/1000;

@@ -32,6 +32,7 @@
 #include <libmikey/MikeyMessage.h>
 #include <libmikey/MikeyPayloadSP.h>
 #include <libmikey/MikeyException.h>
+#include <libmutil/massert.h>
 #include <string.h>
 #include <unistd.h>
 #include <iostream>
@@ -48,7 +49,7 @@ extern "C" {
 //Constructor
 MsipIpsecAPI::MsipIpsecAPI(string localIpString, SipDialogSecurityConfig &securityConf) {	
 	so = pfkey_open();
-	assert(so >= 0);
+	massert(so >= 0);
 	reqid = 0;
 	//reqid = (u_int32_t)getpid();
 	seq = 3;
@@ -389,7 +390,7 @@ uint32_t MsipIpsecAPI::getOfferSPI(){
 void MsipIpsecAPI::addSAToKa(uint8_t policyNo){
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_IPSEC4_ID);
 	uint32_t offerspi = getOfferSPI();
-	assert(offerspi);
+	massert(offerspi);
 	ka->addIpsecSA( offerspi, 0, localIp, policyNo);
 	/* Placeholder for the receiver to place his SPI */
 	ka->addIpsecSA( htonl(0), localIp, 0, policyNo);

@@ -31,7 +31,7 @@
  
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"SipDialogConfVoip.h"
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
@@ -228,7 +228,7 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 		//parsing sdp part for conf:
-		assert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
+		massert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
 		MRef<SdpPacket*> sdp = (SdpPacket*)*resp->getContent();
 		string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
 		int num = 0;
@@ -560,7 +560,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 				line="";
 				
 				numConnected++;
-				assert(numConnected==connectedList.size());
+				massert(numConnected==connectedList.size());
 				i++;
 			}
 		}
@@ -579,7 +579,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );		
 
-		assert( !getLastInvite().isNull() );
+		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
 		CommandString cmdstr2("", "myuri", getDialogConfig()->inherited->sipIdentity->getSipUri());
 		
@@ -857,7 +857,7 @@ bool SipDialogConfVoip::a27_incall_incall_ACK( const SipSMCommand &command)
 		//...
 		//cerr << "Received ACK in SipDialogConfVoIP!!!!!!!!!!!!!!!!!!!!!!!"<< endl;
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
-		assert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
+		massert(dynamic_cast<SdpPacket*>(*resp->getContent())!=NULL);
 		MRef<SdpPacket*> sdp = (SdpPacket*)*resp->getContent();
 		string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
 		int num = 0;
@@ -1342,7 +1342,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 /*	//	mdbg << "ERROR: SipDialogVoip::sendAck() UNIMPLEMENTED" << end;
 
 	
-	assert( !lastResponse.isNull());
+	massert( !lastResponse.isNull());
 	
 	SipAck *ack = new SipAck(
 			branch, 
@@ -1480,7 +1480,7 @@ void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 	//string tmp = getDialogConfig().inherited.userUri;
 	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
 	uint32_t i = tmp.find("@");
-	assert(i!=string::npos);
+	massert(i!=string::npos);
 	i++;
 	string domain;
 	for ( ; i < tmp.length() ; i++)
@@ -1509,7 +1509,7 @@ void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 }
 
 void SipDialogConfVoip::sendCancel(const string &branch){
-	assert( !lastInvite.isNull());
+	massert( !lastInvite.isNull());
 	MRef<SipCancel*> cancel = new SipCancel(
 			branch,
 			lastInvite,
@@ -1797,7 +1797,7 @@ void SipDialogConfVoip::modifyConfJoinInvite(MRef<SipInvite*>inv){
 	inv->set_ConfJoin();	
 	//Add SDP Session Level Attributes
 	//cerr<<"modify join 1111111111111111"<<endl;
-	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	sdp->setSessionLevelAttribute("confId", confId);
 	sdp->setSessionLevelAttribute("conf_#participants", itoa((*adviceList).size()));
@@ -1812,7 +1812,7 @@ void SipDialogConfVoip::modifyConfAck(MRef<SipAck*>ack){
 	ack->set_Conf();
 	//cerr<<"modify ack 1111111111111111"<<endl;	
 	//Add SDP Session Level Attributes
-	assert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
+	massert(dynamic_cast<SdpPacket*>(*ack->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ack->getContent();
 	int numParticipants=(*adviceList).size();
 	for(int t=0;t<(*adviceList).size();t++)
@@ -1832,7 +1832,7 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 	//ack->set_Conf();
 		
 	//Add SDP Session Level Attributes
-	assert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
+	massert(dynamic_cast<SdpPacket*>(*ok->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*ok->getContent();
 	sdp->setSessionLevelAttribute("conf_#participants", itoa(connectedList.size()));
 	for(int t=0;t<connectedList.size();t++)
@@ -1843,11 +1843,11 @@ void SipDialogConfVoip::modifyConfOk(MRef<SipResponse*> ok){
 void SipDialogConfVoip::modifyConfConnectInvite(MRef<SipInvite*>inv){
 	//Add Accept-Contact Header
 	inv->set_ConfConnect();
-	assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	sdp->setSessionLevelAttribute("confId", confId);	
 	//Add SDP Session Level Attributes
-	//assert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
+	//massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 	//MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 	/*sdp->setSessionLevelAttribute("p2tGroupListServer", getDialogConfig()->inherited.externalContactIP + ":" + itoa(getPhoneConfig()->p2tGroupListServerPort));
 	sdp->setSessionLevelAttribute("p2tGroupIdentity", getP2TDialog()->getGroupList()->getGroupIdentity());

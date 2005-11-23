@@ -20,7 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<assert.h>
 #include"MessageRouter.h"
 //#include<libmsip/CODECInterface.h>
 //#include"../util/ConfigFile.h"

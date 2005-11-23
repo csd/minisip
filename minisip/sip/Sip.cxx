@@ -47,9 +47,6 @@
 #include"PresenceMessageContent.h"
 
 
-
-#include<assert.h>
-
 #include<libmutil/dbg.h>
 #include<libmutil/termmanip.h>
 

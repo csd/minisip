@@ -33,7 +33,7 @@
 #include"../sdp/SdpHeaderM.h"
 #include"../sdp/SdpHeaderA.h"
 #include<libmutil/itoa.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 
 #define SOURCE_QUEUE_SIZE 7
 
@@ -44,7 +44,7 @@ VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<
                 Media( codec ),display(display),grabber(grabber),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
         this->codec = dynamic_cast<VideoCodec *>(*codec);
-        assert( this->codec );
+        massert( this->codec );
         receive = true;         
 	send = (!grabber.isNull());
         this->codec->setDisplay( display );

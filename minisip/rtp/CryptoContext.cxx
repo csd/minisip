@@ -24,7 +24,7 @@
 
 #include<iostream>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include"CryptoContext.h"
 #include<libmutil/print_hex.h>
 #include<libmikey/MikeyPayloadSP.h>
@@ -198,7 +198,7 @@ void CryptoContext::rtp_authenticate( RtpPacket * rtp, uint32_t roc, unsigned ch
 		    /*authenticated part length */	
 		    	chunkLength,
 		    /* tag */  temp, &tag_length );
-		assert( tag_length == 20 );
+		massert( tag_length == 20 );
 		/* truncate the result */
 		memcpy( tag, temp, get_tag_length() );
 		delete [] bytes;

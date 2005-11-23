@@ -24,7 +24,7 @@
 
 #include"G711CODEC.h"
 #include"g711/codec_g711.h"
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<iostream>
 
 G711Codec::G711Codec(){
@@ -36,7 +36,7 @@ G711Codec::~G711Codec(){
 }
 
 uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
-	assert(in_buf_size==2*160);
+	massert(in_buf_size==2*160);
 	
 	short *in_data = (short*)in_buf;
 	unsigned char *out_data = (unsigned char*)out_buf;
@@ -49,7 +49,7 @@ uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf
 }
 
 uint32_t G711CodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
-//	assert(in_buf_size==getEncodedNrBytes());
+//	massert(in_buf_size==getEncodedNrBytes());
 	
 	unsigned char *in_data = (unsigned char*)in_buf;
 	short *out_data = (short*)out_buf;

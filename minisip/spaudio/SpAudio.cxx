@@ -23,8 +23,6 @@
 
 #include "SpAudio.h"
 
-#include <assert.h>
-
 #include<string.h> //for memset
 
 #include"../soundcard/SoundSource.h"

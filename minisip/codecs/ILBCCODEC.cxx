@@ -25,7 +25,7 @@
 #include"ilbc/iLBC_encode.h"
 #include"ilbc/iLBC_decode.h"
 #include"ILBCCODEC.h"
-#include<assert.h>
+#include<libmutil/massert.h>
 
 ILBCCodecState::ILBCCodecState(){
 	initEncode(&enc_inst); 
@@ -88,14 +88,14 @@ void ILBCCodec::decode(void *out_buf){
 
 
 int32_t ILBCCodec::getSamplingSizeMs(){
-	assert(BLOCKL==160);
+	massert(BLOCKL==160);
 	return 20;
 }
 
 /*
 int32_t ILBCCodec::getEncodedNrBytes(){
-	assert(BLOCKL==160);
-	assert(38==NO_OF_BYTES);
+	massert(BLOCKL==160);
+	massert(38==NO_OF_BYTES);
 	return 38;
 }
 */

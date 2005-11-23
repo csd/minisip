@@ -116,6 +116,15 @@ AC_CHECK_HEADER([samplerate.h],
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
 
+dnl Check for stack trace support
+AC_CHECK_HEADER([execinfo.h], 
+	[
+		AC_DEFINE(HAS_EXECINFO, [], [Stack trace functionality found])
+			HAS_EXECINFO="yes"
+	]
+)
+AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
+
 
 dnl Check for libspeex
 AC_CHECK_HEADER([speex/speex.h], 

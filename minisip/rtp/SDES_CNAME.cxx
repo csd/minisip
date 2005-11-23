@@ -26,7 +26,7 @@
 #include<iostream>
 #endif
 
-#include<assert.h>
+#include<libmutil/massert.h>
 using namespace std;
 
 SDES_CNAME::SDES_CNAME(void *buildfrom, int max_length){
@@ -35,7 +35,7 @@ SDES_CNAME::SDES_CNAME(void *buildfrom, int max_length){
 	length=*lengthptr;
 	
 	char *cptr = (char *)buildfrom;
-	assert(*cptr == CNAME);
+	massert(*cptr == CNAME);
 //	type=*cptr;
 	cname="";
 	
