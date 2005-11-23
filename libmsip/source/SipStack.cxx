@@ -56,8 +56,6 @@
 #include<libmsip/SipHeaderSubject.h>
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderTo.h>
-#include<libmsip/SipHeaderIdentity.h>
-#include<libmsip/SipHeaderIdentityInfo.h>
 #include<libmsip/SipCommandString.h>
 //#include"PresenceMessageContent.h"
 
@@ -97,8 +95,6 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Expires", sipHeaderEventFactory);
 	SipHeader::headerFactories.addFactory("From", sipHeaderFromFactory);
 	SipHeader::headerFactories.addFactory("f", sipHeaderFromFactory);
-	SipHeader::headerFactories.addFactory("Identity", sipHeaderIdentityFactory);
-	SipHeader::headerFactories.addFactory("Identity-Info", sipHeaderIdentityInfoFactory);
 	SipHeader::headerFactories.addFactory("Max-Forwards", sipHeaderMaxForwardsFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);

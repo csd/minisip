@@ -38,7 +38,7 @@
 
 class LIBMSIP_API SipException : public Exception{
 	public:
-		SipException(const char *desc):Exception(what){}
+		SipException(const char *desc):Exception(desc){}
 };
 
 class LIBMSIP_API SipExceptionInvalidMessage : public SipException {
@@ -53,7 +53,7 @@ class LIBMSIP_API SipExceptionInvalidStart : public SipException {
 
 class LIBMSIP_API SipExceptionInvalidURI : public SipExceptionInvalidMessage {
 	public:
-		SipExceptionInvalidURI(const char *desc) : SipException(desc){}
+		SipExceptionInvalidURI(const char *desc) : SipExceptionInvalidMessage(desc){}
 };
 
 #endif
