@@ -302,7 +302,7 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 		} catch ( NetworkException & exc ){
 			#ifdef DEBUG_OUTPUT
 			cerr << "SipIdentity::setProxy: manual settings for SIP proxy are wrong ... trying autodetect" << endl;
-			cerr << "SipIdentity::setProxy: error = " << exc.errorDescription() << endl;
+			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
 			#endif
 		}
 	}
@@ -318,7 +318,7 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 		} catch( NetworkException & exc ){
 			#ifdef DEBUG_OUTPUT
 			cerr << "SipIdentity::setProxy: autodetect failed to fetch proxy settings ..." << endl;
-			cerr << "SipIdentity::setProxy: error = " << exc.errorDescription() << endl;
+			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
 			#endif
 			ret +="The SIP proxy for the account ["
 				+ this->identityIdentifier + "] could no be resolved.";

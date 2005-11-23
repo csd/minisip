@@ -49,7 +49,7 @@ class LIBMNETUTIL_API NetworkException : public Exception{
 		virtual const char *what() const throw();
 	protected:
 		int errorNumber;
-		string msg;
+		std::string msg;
 };
 
 class LIBMNETUTIL_API HostNotFound : public NetworkException{
@@ -125,7 +125,7 @@ class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
 			return msg.c_str();
 		};
 	private:
-		string msg;
+		std::string msg;
 };
 
 class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{

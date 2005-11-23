@@ -380,7 +380,7 @@ void SipMessageTransport::startTcpServer(){
 		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
 		tcpSocketServer->start();
 	}catch( NetworkException & exc ){
-		cerr << exc->errorDescription() << endl;
+		cerr << exc.what() << endl;
 		return;
 	}
 }
@@ -404,7 +404,7 @@ void SipMessageTransport::startTlsServer(){
 		tlsSocketServer->start();
 	}catch( NetworkException & exc ){
 		cerr << "Exception caught when creating TCP server." << endl;
-		cerr << exc->errorDescription() << endl;
+		cerr << exc.what() << endl;
 		return;
 	}
 
@@ -656,7 +656,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		}
 	}
 	catch( NetworkException & exc ){
-		string message = exc->errorDescription();
+		string message = exc.what();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
 		mdbg << "Transport error in SipMessageTransport: " << message << end;
@@ -669,8 +669,6 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				transportError, 
 				SipSMCommand::remote, 
 				SipSMCommand::transaction);
-
-		delete exc;
 
 		if (! commandReceiver.isNull())
 			commandReceiver->handleCommand( transportErrorCommand );
@@ -798,7 +796,6 @@ void SipMessageTransport::udpSocketRead(){
 			}
 			
 			catch(SipExceptionInvalidMessage & exc){
-				delete exc;
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
@@ -811,7 +808,6 @@ void SipMessageTransport::udpSocketRead(){
 				// This does not look like a SIP
 				// packet, close the connection
 				
-				delete exc;
 #ifdef DEBUG_OUTPUT
 				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
@@ -932,7 +928,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 					break;
 				}
 #endif
-				delete exc;
 				/* Probably we don't have enough data
 				 * so go back to reading */
 				continue;
@@ -942,7 +937,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// This does not look like a SIP
 				// packet, close the connection
 				
-				delete exc;
 				break;
 			}
 		} // if event
