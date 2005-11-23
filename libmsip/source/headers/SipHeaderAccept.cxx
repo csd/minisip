@@ -33,7 +33,6 @@
 #include<config.h>
 
 
-#include<assert.h>
 #include<libmsip/SipHeaderAccept.h>
 
 #include<libmutil/itoa.h>

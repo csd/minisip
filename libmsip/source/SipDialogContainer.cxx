@@ -67,7 +67,7 @@
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipCommandString.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 
 #include<libmutil/dbg.h>
 
@@ -166,7 +166,7 @@ void SipDialogContainer::run(){
 
 #ifdef DEBUG_OUTPUT
 		runcount++;
-		assert(runcount==1);
+		massert(runcount==1);
 #endif
 		
 		struct queue_type item;
@@ -175,7 +175,7 @@ void SipDialogContainer::run(){
 		if (high_prio_command_q.size()>0)
 			item = high_prio_command_q.pop_back();	
 		else{
-			assert(low_prio_command_q.size()>0);
+			massert(low_prio_command_q.size()>0);
 			item = low_prio_command_q.pop_back();	
 		}
                 mlock.unlock();

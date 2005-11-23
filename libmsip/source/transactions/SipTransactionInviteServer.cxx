@@ -79,7 +79,6 @@
 
 #include<config.h>
 
-#include<assert.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>

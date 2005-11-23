@@ -35,7 +35,6 @@
 
 #include<libmsip/SipRefer.h>
 #include<libmsip/SipInvite.h>
-#include<assert.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>

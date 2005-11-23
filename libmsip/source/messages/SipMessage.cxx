@@ -34,7 +34,6 @@
 
 #include<stdio.h>
 #include<libmsip/SipMessage.h>
-#include<assert.h>
 #include<errno.h>
 #include<ctype.h>
 

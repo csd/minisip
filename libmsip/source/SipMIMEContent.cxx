@@ -27,6 +27,7 @@
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentFactory.h>
+#include<libmutil/massert.h>
 #include <iostream>
 
 MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const std::string & ContentType) {
@@ -54,11 +55,11 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
 	if(ContentType.substr(0,9) == "multipart"){
 		this->ContentType = ContentType.substr(0 , ContentType.find("; ",0) );
 		index2 = ContentType.find("; boundary=",0);
-		assert(index2 != string::npos);
+		massert(index2 != string::npos);
 		this->boundry = ContentType.substr(index2 + 11 , ContentType.find(";",index2 + 11));
 		// Find first bodypart
 		index2 = content.find("--"+this->boundry, 0);
-		assert(index2 != string::npos);
+		massert(index2 != string::npos);
 		// Extract preamble if any
 		if(index2 > 0)
 			this->Message = content.substr(0, index2 - 5);

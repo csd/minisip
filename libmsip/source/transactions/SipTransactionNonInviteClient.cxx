@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
@@ -155,7 +155,7 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 		if( timerE > sipStack->getTimers()->getT2() ) 
 			timerE = sipStack->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
-		assert(!lastRequest.isNull());
+		massert(!lastRequest.isNull());
 		timerE = sipStack->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		lastRequest->removeAllViaHeaders();
@@ -248,7 +248,7 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 			timerE = sipStack->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		
-		assert( !lastRequest.isNull());
+		massert( !lastRequest.isNull());
 		lastRequest->removeAllViaHeaders();
 		send( *lastRequest, true);	// add via header because we have removed all previous ones
 		
@@ -367,9 +367,9 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		conf = sipStack->getStackConfig();
 	}
 
-	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; assert (0);}
-	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; assert (0);}
-	if( !conf->sipIdentity->getSipProxy()->sipProxyIpAddr ) { cerr << "SipTranNonInvCli: ipaddr null" << endl; assert (0);}
+	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; massert (0);}
+	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; massert (0);}
+	if( !conf->sipIdentity->getSipProxy()->sipProxyIpAddr ) { cerr << "SipTranNonInvCli: ipaddr null" << endl; massert (0);}
 	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();

@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
@@ -132,7 +132,7 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 		return false;
 	}
 	
-	assert( !lastResponse.isNull());
+	massert( !lastResponse.isNull());
 	//We are re-sending last response, do not add via header	
 	send(MRef<SipMessage*>(* lastResponse),false);
 	
@@ -196,7 +196,7 @@ bool SipTransactionNonInviteServer::a7_completed_completed_request(
 			command.getCommandPacket()->getType()==SipResponse::type){
 		return false;
 	}
-	assert( !lastResponse.isNull());
+	massert( !lastResponse.isNull());
 	send(MRef<SipMessage*>(* lastResponse), false);		//We are re-sending response, do not add via header
 	
 	return true;

@@ -33,7 +33,6 @@
 #include<config.h>
 
 #include<libmsip/SipAck.h>
-#include<assert.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipHeaderFrom.h>

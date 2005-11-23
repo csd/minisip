@@ -29,6 +29,7 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
+#include<libmutil/massert.h>
 
 
 int SipIdentity::globalIndex = 1; //give an initial value
@@ -110,7 +111,7 @@ SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->t
 
 //addr could be "IP:port" ... but the port param passed to the function has precedence ...
 void SipProxy::setProxy(std::string addr, int port){
-	assert(addr.find("@")==std::string::npos);
+	massert(addr.find("@")==std::string::npos);
 	if( port > 65535 || port < 0 ) port = -1; //check the port
 	
 	#ifdef DEBUG_OUTPUT

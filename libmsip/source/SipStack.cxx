@@ -59,7 +59,7 @@
 #include<libmsip/SipCommandString.h>
 //#include"PresenceMessageContent.h"
 
-#include<assert.h>
+#include<libmutil/massert.h>
 
 #include<libmutil/dbg.h>
 #include<libmutil/cert.h>
@@ -280,7 +280,7 @@ void SipStack::setDefaultHandler(MRef<SipDialog*> d){
 }
 
 void SipStack::addDialog(MRef<SipDialog*> d){
-	assert(dialogContainer);
+	massert(dialogContainer);
 	dialogContainer->addDialog(d);
 }
 

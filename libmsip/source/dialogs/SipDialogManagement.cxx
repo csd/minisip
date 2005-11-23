@@ -35,7 +35,6 @@
 #include<libmutil/dbg.h>
 #endif
 
-//#include<assert.h>
 
 //#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>

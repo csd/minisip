@@ -35,6 +35,7 @@
 #include<libmsip/SipRegister.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipCommandString.h>
+#include<libmutil/massert.h>
 
 #ifdef DEBUG_OUTPUT
 #include<libmutil/Timestamp.h>
@@ -120,7 +121,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 
 		return true;
 	}else{
-		assert(1==0); // this should never happen - the first transaction MUST be register command
+		massert(1==0); // this should never happen - the first transaction MUST be register command
 		return false;
 	}
 }
@@ -556,7 +557,7 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig
 
 		for ( ; uri[i]!='@' && i<uri.length(); i++)
 			;
-		assert(uri[i]=='@');
+		massert(uri[i]=='@');
 		i++;
 
 		for ( ; i<uri.length(); i++) { //FIXME: Is this correct? (line below)

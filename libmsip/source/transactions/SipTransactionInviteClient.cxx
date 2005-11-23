@@ -78,7 +78,6 @@ resp. to TU |  1xx             V                     |
 #include<config.h>
 
 
-#include<assert.h>
 #include<libmsip/SipTransactionInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipAck.h>

@@ -49,6 +49,7 @@
 #include<libmsip/SipHeaderEvent.h>
 #include<libmsip/SipHeaderExpires.h>
 #include<libmsip/SipHeaderAccept.h>
+#include<libmutil/massert.h>
 
 const int SipIMMessage::type=9;
 
@@ -106,7 +107,7 @@ SipIMMessage::~SipIMMessage(){
 }
 
 int SipIMMessage::getExpiresTimeout(){
-	assert(dynamic_cast<SipHeaderValueExpires*>( *getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 ) ));
+	massert(dynamic_cast<SipHeaderValueExpires*>( *getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 ) ));
 	
 	MRef<SipHeaderValueExpires*> exp = (SipHeaderValueExpires*)*getHeaderValueNo( SIP_HEADER_TYPE_EXPIRES, 0 );
 	

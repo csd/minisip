@@ -79,7 +79,7 @@
 
 #include<config.h>
 
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
@@ -116,17 +116,17 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 
 
 	MRef<State<SipSMCommand, string> *> s_proceeding = getState("proceeding");
-	assert(s_proceeding);
+	massert(s_proceeding);
 	
 	bool success = s_proceeding->removeTransition("transition_proceeding_terminated_2xx");
 	if (!success){
 		merr << "ERROR: Could not remove transition from state machine in SipTransactionInviteServerUA (BUGBUG!!)"<<end;
-		assert(0==1);
+		massert(0==1);
 	}
 	
 
 	MRef<State<SipSMCommand, string> *>s_completed = getState("completed");
-	assert(s_completed);
+	massert(s_completed);
 		
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_completed_2xx",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServerUA::a1001_proceeding_completed_2xx,

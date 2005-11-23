@@ -32,7 +32,6 @@
 
 #include<config.h>
 
-#include<assert.h>
 #include<libmsip/SipHeaderRecordRoute.h>
 
 #include<libmutil/itoa.h>

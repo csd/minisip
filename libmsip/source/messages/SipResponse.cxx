@@ -33,7 +33,7 @@
 #include<config.h>
 
 #include<libmsip/SipResponse.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
 
@@ -94,9 +94,9 @@ SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
 	int afterws=7;
 	while (resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
 		afterws++;
-	assert(resp[afterws+0]>='0' && resp[afterws+0]<='9');
-	assert(resp[afterws+1]>='0' && resp[afterws+1]<='9');
-	assert(resp[afterws+2]>='0' && resp[afterws+2]<='9');
+	massert(resp[afterws+0]>='0' && resp[afterws+0]<='9');
+	massert(resp[afterws+1]>='0' && resp[afterws+1]<='9');
+	massert(resp[afterws+2]>='0' && resp[afterws+2]<='9');
 	
 	status_code = (resp[afterws+0]-'0')*100 + (resp[afterws+1]-'0')*10 + resp[afterws+2]-'0';
 
