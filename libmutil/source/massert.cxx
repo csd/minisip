@@ -4,6 +4,7 @@
 #include<config.h>
 
 #include<string.h>
+#include<iostream>
 #include<stdio.h>
 #include<libmutil/Exception.h>
 
@@ -15,10 +16,10 @@ void massertFailed(char *expr, char *file, char *baseFile, int line) {
 		fprintf(stderr,"massert(%s) failed in file %s (included from %s), line %d\n", 
 				expr, file, baseFile, line);
 	}
-	string stackTrace = getStackTraceString();
+	std::string stackTrace = getStackTraceString();
 	if (stackTrace.size()>0){
-		cerr << "massert stack trace:"<<endl;
-		cerr << stackTrace<<endl;
+		std::cerr << "massert stack trace:"<<std::endl;
+		std::cerr << stackTrace<<std::endl;
 	}
 	exit(1);
 }

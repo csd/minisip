@@ -8,6 +8,8 @@
 #include <signal.h>
 #include <stdio.h>
 #endif
+
+using namespace std;
 	
 #define MAX_STACK_TRACE_DEPTH 30
 

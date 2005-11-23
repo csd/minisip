@@ -277,6 +277,7 @@ OPType MRef<OPType>::getPointer() const{
 	return objp;
 }
 
+
 template<class OPType>
 void MRef<OPType>::setPointer(const OPType o){
 	if (o!=NULL){

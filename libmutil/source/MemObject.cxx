@@ -45,7 +45,7 @@ MObject::MObject() : refCount(0){
 	global.lock();
 	ocount++;
 	//cerr << "MObject:: SipSMCommand created; ptr=" << itoa((int)this) << endl;
-	objs.push_back(this);
+	objs.push_front(this);
 	global.unlock();
 #endif
 }

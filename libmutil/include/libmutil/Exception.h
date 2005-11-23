@@ -19,8 +19,6 @@
 #ifndef _MEXCEPTION_H
 #define _MEXCEPTION_H
 
-#include<libmutil/MemObject.h>
-
 #include<string>
 
 #include<libmutil/mtypes.h>
