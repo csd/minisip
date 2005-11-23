@@ -793,7 +793,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	}
 
 	if (command == "hide packets"){
-		set_debug_print_packets(true);
+		set_debug_print_packets(false);
 		//sipdebug_print_packets=false;
 		displayMessage("SIP messages will NOT be displayed on the screen", blue);
 		handled=true;
