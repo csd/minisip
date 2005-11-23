@@ -39,7 +39,7 @@ MikeyPayloadERR::MikeyPayloadERR( byte_t * start, int lengthLimit ):
 	
 	this->payloadTypeValue = MIKEYPAYLOAD_ERR_PAYLOAD_TYPE;
 	if( lengthLimit < 4 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a ERR Payload" );
 	}
 

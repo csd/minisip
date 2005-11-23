@@ -45,7 +45,7 @@ MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,
 MikeyPayloadSIGN::MikeyPayloadSIGN( byte_t * start, int lengthLimit ):
 MikeyPayload( start ){
 	if( lengthLimit < 2 ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a SIGN Payload" );
                 return;
         }
@@ -54,7 +54,7 @@ MikeyPayload( start ){
 	sigTypeValue = (start[0] >> 4 )&0x0F;
 	sigLengthValue = ((int)(start[0]&0x0F)) << 8 | start[1];
 	if( lengthLimit < 2 + sigLengthValue ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a SIGN Payload" );
                 return;
         }

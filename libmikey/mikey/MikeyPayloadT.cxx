@@ -98,7 +98,7 @@ MikeyPayload( start ){
 	
 	this->payloadTypeValue = MIKEYPAYLOAD_T_PAYLOAD_TYPE;
 	if( lengthLimit < 2 ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a T Payload" );
                 return;
 	}
@@ -117,13 +117,13 @@ MikeyPayload( start ){
 			tsLength = 4;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown type of time stamp" );
 			break;
 	
 	}
 	if( lengthLimit < 2 + tsLength ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a T Payload" );
                 return;
 	}
@@ -229,10 +229,10 @@ bool MikeyPayloadT::checkOffset( uint64_t max ){
 			}*/
 			return false;
 		case T_TYPE_COUNTER:
-			throw new MikeyException( 
+			throw MikeyException( 
 			"Cannot compute a time offset with a counter ts" );
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 				"Unknown type of time stamp in T payload" );
 	}
 }

@@ -43,7 +43,7 @@ MikeyPayloadID::MikeyPayloadID( byte_t * start, int lengthLimit ):
 MikeyPayload(start){
 	
 	if( lengthLimit < 4 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a ID Payload" );
                 return;
         }
@@ -52,7 +52,7 @@ MikeyPayload(start){
 	idTypeValue = start[1];
 	idLengthValue = (int)( start[ 2 ] ) << 8 | start[ 3 ];
 	if( lengthLimit < 4 + idLengthValue ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a ID Payload" );
                 return;
         }

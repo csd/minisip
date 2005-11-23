@@ -104,13 +104,13 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 	MRef<certificate_chain *> certChain;
 
 	if( i == NULL ){
-		throw new MikeyExceptionMessageContent(
+		throw MikeyExceptionMessageContent(
 				"DH init message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)i)
 	if( hdr->dataType() != HDR_DATA_TYPE_DH_INIT )
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected DH init message" );
 
 	ka->setnCs( hdr->nCs() );
@@ -122,7 +122,7 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 		ka->setCsIdMapType( hdr->csIdMapType() );
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 	payloads.remove( i );
@@ -278,13 +278,13 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	uint8_t nCs;
 	
 	if( i == NULL ){
-		throw new MikeyExceptionMessageContent(
+		throw MikeyExceptionMessageContent(
 				"DH resp message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)(i))
 	if( hdr->dataType() != HDR_DATA_TYPE_DH_RESP ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected DH resp message" );
 	}
 
@@ -292,7 +292,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 		csIdMap = hdr->csIdMap();
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 	nCs = hdr->nCs();
@@ -402,7 +402,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	if( error ){
 		errorMessage->addSignaturePayload( 
 				ka->certificateChain()->get_first() );
-		throw new MikeyExceptionMessageContent( errorMessage );
+		throw MikeyExceptionMessageContent( errorMessage );
 	}
 
 	delete errorMessage;

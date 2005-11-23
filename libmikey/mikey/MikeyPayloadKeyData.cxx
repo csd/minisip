@@ -35,7 +35,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData( int type, byte_t * keyDataPtr,
 
 	this->payloadTypeValue = MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE;
 	if((type == KEYDATA_TYPE_TGK_SALT) || (type == KEYDATA_TYPE_TEK_SALT))
-		throw new MikeyException( 
+		throw MikeyException( 
 			"This type of KeyData Payload requires a salt" );
 	this->typeValue = type;
 	this->keyDataPtr = new byte_t[keyDataLengthValue];
@@ -65,7 +65,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData(byte_t *start, int lengthLimit):MikeyPa
 	int lengthWoKvPtr;
 	this->payloadTypeValue = MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE;
 	if( lengthLimit < 4 )
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a KeyData Payload" );
 		
 	setNextPayloadType( start[0] );
@@ -77,7 +77,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData(byte_t *start, int lengthLimit):MikeyPa
 			(typeValue == KEYDATA_TYPE_TEK_SALT)){
 		
 		if( lengthLimit < 6 + keyDataLengthValue )
-			throw new MikeyExceptionMessageLengthException(
+			throw MikeyExceptionMessageLengthException(
 			  "Given data is too short to form a KeyData Payload" );
 		keyDataPtr = new byte_t[ keyDataLengthValue ];
 		memcpy( keyDataPtr, &start[4], keyDataLengthValue );
@@ -85,7 +85,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData(byte_t *start, int lengthLimit):MikeyPa
 			( (int)start[2+keyDataLengthValue] ) << 8 |
 		        ( (int)start[3+keyDataLengthValue] );
 		if( lengthLimit < 6 + keyDataLengthValue + saltDataLengthValue )
-			throw new MikeyExceptionMessageLengthException(
+			throw MikeyExceptionMessageLengthException(
 			  "Given data is too short to form a KeyData Payload" );
 		saltDataPtr = new byte_t[ saltDataLengthValue ];
 		memcpy( saltDataPtr, &start[4+keyDataLengthValue],
@@ -94,7 +94,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData(byte_t *start, int lengthLimit):MikeyPa
 	}
 	else{
 		if( lengthLimit < 4 + keyDataLengthValue )
-			throw new MikeyExceptionMessageLengthException(
+			throw MikeyExceptionMessageLengthException(
 			  "Given data is too short to form a KeyData Payload" );
 		keyDataPtr = new byte_t[ keyDataLengthValue ];
 		memcpy( keyDataPtr, &start[4], keyDataLengthValue );
@@ -119,7 +119,7 @@ MikeyPayloadKeyData::MikeyPayloadKeyData(byte_t *start, int lengthLimit):MikeyPa
 			  	lengthLimit - lengthWoKvPtr ); 
                         break;
                 default:
-                        throw new MikeyExceptionMessageContent(
+                        throw MikeyExceptionMessageContent(
 					"Unknown key validity" 
                                         "type");
                         break;

@@ -76,14 +76,14 @@ KeyValiditySPI::KeyValiditySPI( const KeyValiditySPI& source ){
 KeyValiditySPI::KeyValiditySPI( byte_t * rawData, int lengthLimit ){
 
 	if( lengthLimit < 1 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a KeyValiditySPI" );
 	}
 
 	spiLength = rawData[0];
 	
 	if( lengthLimit < 1 + spiLength ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a KeyValiditySPI" );
 	}
 	
@@ -147,17 +147,17 @@ KeyValidityInterval::KeyValidityInterval( const KeyValidityInterval& source ){
 
 KeyValidityInterval::KeyValidityInterval(byte_t * raw_data, int length_limit){
 	if( length_limit < 2 )
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a KeyValidityInterval" );
 	vfLength = raw_data[0];
 	if( length_limit < 2 + vfLength )
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a KeyValidityInterval" );
 	vf = new byte_t[ vfLength ];
 	memcpy( vf, &raw_data[1], vfLength );
 	vtLength = raw_data[vfLength + 1];
 	if( length_limit < 2 + vfLength + vtLength )
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a KeyValidityInterval" );
 	vt = new byte_t[ vtLength ];
 	memcpy( vt, &raw_data[vfLength + 2], vfLength );

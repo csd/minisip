@@ -52,7 +52,7 @@ MikeyPayloadCERT::MikeyPayloadCERT( byte_t *start, int lengthLimit ):
 	
 	this->payloadTypeValue = MIKEYPAYLOAD_CERT_PAYLOAD_TYPE;
 	if( lengthLimit < 4 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a CERT Payload" );
 		return;
 	}
@@ -61,7 +61,7 @@ MikeyPayloadCERT::MikeyPayloadCERT( byte_t *start, int lengthLimit ):
 	type = start[1];
 	certLengthValue = (int)(start[2]) <<8 | start[3];
 	if( lengthLimit < 4 + certLengthValue ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a CERT Payload" );
 		return;
 	}

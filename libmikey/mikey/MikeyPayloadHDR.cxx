@@ -46,7 +46,7 @@ MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, int csbId,
 		this->csIdMapPtr = map;
 	}
 	else{
-		throw new MikeyExceptionMessageContent(
+		throw MikeyExceptionMessageContent(
 				"Unknown CS ID map type" );
 	}
 	
@@ -57,7 +57,7 @@ MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):
 
 	this->payloadTypeValue = MIKEYPAYLOAD_HDR_PAYLOAD_TYPE;
 	if( lengthLimit < 10 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form a HDR Payload" );
 		return;
 	}
@@ -76,7 +76,7 @@ MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):
 	if( csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_SRTP_ID || 
 		csIdMapTypeValue == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		if( lengthLimit < 10 + nCsValue * 9 ){
-			throw new MikeyExceptionMessageLengthException(
+			throw MikeyExceptionMessageLengthException(
 			"Given data is too short to form any HDR Payload" );
 			return;
 		}
@@ -93,7 +93,7 @@ MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):
 		
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS_ID_map" );
 		this->csIdMapPtr = NULL;
 	}

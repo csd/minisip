@@ -74,7 +74,7 @@ MikeyMessage::MikeyMessage( string b64Message ){
 	messageData = base64_decode( b64Message, &messageLength );
 
 	if( messageData == NULL ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Invalid B64 input message" );
 	}
 
@@ -165,7 +165,7 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit ){
 			case MIKEYPAYLOAD_LAST_PAYLOAD:
 				break;
 			default:
-				throw new MikeyExceptionMessageContent(
+				throw MikeyExceptionMessageContent(
 					"Payload of unrecognized type." );
 		}
 		nextPayloadType = payload->nextPayloadType();	
@@ -178,7 +178,7 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit ){
 
 	if(! (msgpos == message + lengthLimit && 
 			nextPayloadType==MIKEYPAYLOAD_LAST_PAYLOAD ) )
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
 			"The length of the message did not match"
 			"the total length of payloads." );
 }
@@ -212,7 +212,7 @@ void MikeyMessage::addSignaturePayload( MRef<certificate *> cert ){
 
 	if( cert->sign_data( rawMessageData(), rawMessageLength(),
 			 signature, &signatureLength ) ){
-		throw new MikeyException( "Could not perform digital signature of the message" );
+		throw MikeyException( "Could not perform digital signature of the message" );
 	}
 
 	addPayload( ( sign = new MikeyPayloadSIGN( signatureLength, signature,
@@ -251,7 +251,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 			//TODO
 		default:
 			delete [] encrData;
-			throw new MikeyException( "Unknown encryption algorithm" );
+			throw MikeyException( "Unknown encryption algorithm" );
 	}
 	
 	MikeyPayloadKEMAC * payload;
@@ -280,7 +280,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 			break;
 		default:
 			delete [] encrData;
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	compiled = false;
 	delete [] encrData;
@@ -335,7 +335,7 @@ void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 						macAlg, NULL ) );
 			break;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	compiled = false;
 }
@@ -343,7 +343,7 @@ void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 
 void MikeyMessage::compile(){
 	if (compiled){
-		throw new MikeyExceptionMessageContent("BUG: trying to compile already compiled message.");
+		throw MikeyExceptionMessageContent("BUG: trying to compile already compiled message.");
 	}
 	if( rawData )
 		delete [] rawData;
@@ -403,7 +403,7 @@ string MikeyMessage::b64Message(){
 uint32_t MikeyMessage::csbId(){
 	MikeyPayload * hdr = * firstPayload();
 	if( hdr->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"First payload was not a header" );
 	}
 	return ((MikeyPayloadHDR *)hdr)->csbId();
@@ -412,7 +412,7 @@ uint32_t MikeyMessage::csbId(){
 int MikeyMessage::type(){
 	MikeyPayload * hdr = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	if( hdr == NULL ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 			"No header in the payload" );
 	}
 

@@ -107,7 +107,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 		case MIKEY_ENCR_AES_KW_128:
 			//TODO
 		default:
-			throw new MikeyException( "Unknown encryption algorithm" );
+			throw MikeyException( "Unknown encryption algorithm" );
 	}
 	switch( macAlg ){
 		case MIKEY_MAC_HMAC_SHA1_160:
@@ -118,7 +118,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 			authKey = NULL;
 			break;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	
 	MikeyPayloadKeyData * keydata = 
@@ -162,13 +162,13 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 
 	if( i == NULL || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PSK init message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)(i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PSK_INIT ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected PSK init message" );
 	}
 
@@ -181,7 +181,7 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 		ka->setCsIdMapType( hdr->csIdMapType() );
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 	
@@ -199,7 +199,7 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
 	if( i == NULL )
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PSK init message had no T payload" );
 
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
@@ -323,7 +323,7 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 				ka->t_received, authKey, authKeyLength  );
 		
 		delete [] authKey;
-		throw new MikeyExceptionMessageContent( errorMessage );
+		throw MikeyExceptionMessageContent( errorMessage );
 	}
 
 	// decrypt the TGK
@@ -387,20 +387,20 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 	if( i == NULL ||
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PSK response message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)(i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PSK_RESP )
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected PSK response message" );
 
 	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		csIdMap = hdr->csIdMap();
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 
@@ -441,7 +441,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 		errorMessage->addVPayload( MIKEY_MAC_HMAC_SHA1_160, 
 				t_received, authKey, authKeyLength  );
 
-		throw new MikeyExceptionMessageContent( errorMessage );
+		throw MikeyExceptionMessageContent( errorMessage );
 	}
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 	return NULL;
@@ -480,7 +480,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 	{
 		MikeyPayloadKEMAC * kemac;
 		if( payload->payloadType() != MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE){
-			throw new MikeyException( 
+			throw MikeyException( 
 			   "PSK init did not end with a KEMAC payload" );
 		}
 		
@@ -501,7 +501,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		MikeyPayloadV * v;
 		uint64_t t_sent = ka->tSent();
 		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
-			throw new MikeyException( 
+			throw MikeyException( 
 			   "PSK response did not end with a V payload" );
 		}
 
@@ -519,7 +519,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		}
 	}
 	else{
-		throw new MikeyException( "Invalide type for a PSK message" );
+		throw MikeyException( "Invalide type for a PSK message" );
 	}
 
 	byte_t authKey[20];
@@ -548,7 +548,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		case MIKEY_MAC_NULL:
 			return false;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 
 }

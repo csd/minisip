@@ -52,7 +52,7 @@ MikeyPayload( start ){
 
 	this->payloadTypeValue = MIKEYPAYLOAD_RAND_PAYLOAD_TYPE;
 	if( lengthLimit < 2 ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a RAND Payload" );
                 return;
         }
@@ -60,7 +60,7 @@ MikeyPayload( start ){
 	setNextPayloadType( start[0] );
 	randLengthValue = start[1];
 	if( lengthLimit < 2 + randLengthValue ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a RAND Payload" );
                 return;
         }

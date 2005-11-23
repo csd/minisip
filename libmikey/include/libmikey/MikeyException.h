@@ -58,7 +58,7 @@ class LIBMIKEY_API MikeyException{
 		/**
 		 * @returns std::string describing the exception.
 		 */
-		virtual std::string message();
+		virtual const char* what();
 		
 	private:
 		std::string messageValue;

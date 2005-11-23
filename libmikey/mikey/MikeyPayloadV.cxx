@@ -39,7 +39,7 @@ MikeyPayloadV::MikeyPayloadV( int macAlgValue, byte_t * verDataPtr ){
 			this->verDataPtr = NULL;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown MAC algorithm in V payload" );
 			return;
 	}
@@ -50,7 +50,7 @@ MikeyPayload( start ){
 	
 	this->payloadTypeValue = MIKEYPAYLOAD_V_PAYLOAD_TYPE;
 	if( lengthLimit < 2 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a V Payload" );
                 return;
         }
@@ -60,7 +60,7 @@ MikeyPayload( start ){
 	switch( macAlgValue ){
 		case MIKEY_PAYLOAD_V_MAC_HMAC_SHA1_160:
 			if( lengthLimit < 22 ){
-				throw new MikeyExceptionMessageLengthException(
+				throw MikeyExceptionMessageLengthException(
                         		"Given data is too short to"
 					"form a V Payload" );
                 	return;
@@ -74,7 +74,7 @@ MikeyPayload( start ){
 			endPtr = startPtr + 2;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown MAC algorithm in V payload" );
 			return;
 	}	
@@ -115,7 +115,7 @@ void MikeyPayloadV::setMac( byte_t * data ){
 			verDataPtr = NULL;
 			break;
 		default:
-			throw new MikeyException( 
+			throw MikeyException( 
 				"Unknown MAC algorithm" );
 	}
 }

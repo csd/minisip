@@ -45,7 +45,7 @@ MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4(){
 
 MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
         if( length % 9 ){
-                throw new MikeyException(
+                throw MikeyException(
                                 "Invalid length of SRTP_ID map info" );
         }
 
@@ -71,7 +71,7 @@ MikeyCsIdMapSrtp::MikeyCsIdMapSrtp( byte_t * data, int length ){
 
 MikeyCsIdMapIPSEC4::MikeyCsIdMapIPSEC4( byte_t * data, int length ){
         if( length % 13 ){
-                throw new MikeyException(
+                throw MikeyException(
                                 "Invalid length of IPSEC4_ID map info" );
         }
 
@@ -123,7 +123,7 @@ int MikeyCsIdMapIPSEC4::length(){
 
 void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
         if( expectedLength < length() ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                                 "CsSrtpId is too long" );
         }
 
@@ -144,7 +144,7 @@ void MikeyCsIdMapSrtp::writeData( byte_t * start, int expectedLength ){
 //added 041202 JOOR
 void MikeyCsIdMapIPSEC4::writeData( byte_t * start, int expectedLength ){
         if( expectedLength < length() ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                                 "CsIPSEC4Id is too long" );
         }
 

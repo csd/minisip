@@ -53,7 +53,7 @@ byte_t * MikeyPayload::end(){
 
 int MikeyPayload::nextPayloadType(){
 	if( nextPayloadTypeValue == -1 )
-		throw new MikeyExceptionUninitialized(
+		throw MikeyExceptionUninitialized(
 			"Next payload attribute in payload"
 			"was not initialized. (this is probably a BUG!)" );
 	return nextPayloadTypeValue;

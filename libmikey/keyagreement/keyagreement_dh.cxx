@@ -59,12 +59,12 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	opensslDhPtr = DH_new();
 	if( opensslDhPtr == NULL )
 	{
-		throw new MikeyException( "Could not create openssl "
+		throw MikeyException( "Could not create openssl "
 				          "DH parameters." );
 	}
 
 	if( setGroup( groupValue ) ){
-		throw new MikeyException( "Could not set the  "
+		throw MikeyException( "Could not set the  "
 				          "DH group." );
 	}
 	peerCertChainPtr = new certificate_chain();
@@ -131,7 +131,7 @@ int KeyAgreementDH::computeTgk(){
 	if( DH_compute_key( tgkPtr, bn_peerKeyPtr, opensslDhPtr ) < 0 )
 	{
 		BN_clear_free( bn_peerKeyPtr );
-		throw new MikeyException( "Could not create the TGK." );
+		throw MikeyException( "Could not create the TGK." );
 	}
 	return 0;
 

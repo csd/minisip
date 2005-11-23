@@ -35,7 +35,7 @@ MikeyPayloadDH::MikeyPayloadDH( byte_t * start, int lengthLimit):
 	
 	this->payloadTypeValue = MIKEYPAYLOAD_DH_PAYLOAD_TYPE;
 	if( lengthLimit < 3 ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a DH Payload" );
                 return;
         }
@@ -53,13 +53,13 @@ MikeyPayloadDH::MikeyPayloadDH( byte_t * start, int lengthLimit):
 			dhKeyLengthValue = 128;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown DH group" );
 			break;
 	}
 
 	if( lengthLimit < 3 + dhKeyLengthValue ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a DH Payload" );
                 return;
         }
@@ -83,13 +83,13 @@ MikeyPayloadDH::MikeyPayloadDH( byte_t * start, int lengthLimit):
 					lengthLimit - 3 - dhKeyLengthValue );
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown DH key validity " 
 					"type");
 			break;
 	}
 	if( lengthLimit < 3 + dhKeyLengthValue + kvPtr->length() ){
-                throw new MikeyExceptionMessageLengthException(
+                throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a DH Payload" );
                 return;
         }
@@ -118,7 +118,7 @@ MikeyPayloadDH::MikeyPayloadDH( int dhGroup, byte_t *dhKeyPtr,
 			dhKeyLengthValue = 128;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent("Unknown DH group");
+			throw MikeyExceptionMessageContent("Unknown DH group");
 			break;
 	}
 

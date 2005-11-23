@@ -48,14 +48,14 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC( int encrAlgValue,
 		case MIKEY_PAYLOAD_KEMAC_MAC_NULL:
 			this->macDataPtr = NULL;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 					"Unknown MAC algorithm" );
 	}
 }
 
 MikeyPayloadKEMAC::MikeyPayloadKEMAC(byte_t *start, int lengthLimit):MikeyPayload(start){
 	if(  lengthLimit < 5 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a KEMAC Payload" );
                 return;
         }
@@ -65,7 +65,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC(byte_t *start, int lengthLimit):MikeyPayloa
 	encrDataLengthValue = ( (int)start[2] << 8) |
 		             (int)start[3];
 	if( lengthLimit < 5 + encrDataLengthValue ){	
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given data is too short to form a KEMAC Payload" );
                 return;
         }
@@ -73,7 +73,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC(byte_t *start, int lengthLimit):MikeyPayloa
 	switch( macAlgValue ){
 		case MIKEY_PAYLOAD_KEMAC_MAC_HMAC_SHA1_160:
 			if( lengthLimit < 25 + encrDataLengthValue ){	
-				throw new MikeyExceptionMessageLengthException(
+				throw MikeyExceptionMessageLengthException(
                         	"Given data is too short to form" 
 				"a KEMAC Payload" );
               			return;
@@ -89,7 +89,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC(byte_t *start, int lengthLimit):MikeyPayloa
 			endPtr = startPtr + 5 + encrDataLengthValue;
 			break;
 		default:
-			throw new MikeyExceptionMessageContent(
+			throw MikeyExceptionMessageContent(
 				"Unknown MAC algorithm in KEYMAC Payload" );
 			return;
 	}
@@ -169,7 +169,7 @@ list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData(
 			//TODO
 		default:
 			delete [] decrData;
-			throw new MikeyException( 
+			throw MikeyException( 
 					"Unknown encryption algorithm" );
 			break;
 	}
@@ -209,7 +209,7 @@ void MikeyPayloadKEMAC::setMac( byte_t * data ){
 			macDataPtr = NULL;
 			break;
 		default:
-			throw new MikeyException( 
+			throw MikeyException( 
 				"Unknown MAC algorithm" );
 	}
 }

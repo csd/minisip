@@ -41,7 +41,7 @@ MikeyPayloadPKE::MikeyPayloadPKE( int c, byte_t * dataPtr,
 MikeyPayloadPKE::MikeyPayloadPKE( byte_t * start, int lengthLimit ):
 MikeyPayload(start){
 	if(  lengthLimit < 3 ){
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given dataPtr is too short to form a PKE Payload" );
                 return;
         }
@@ -51,7 +51,7 @@ MikeyPayload(start){
 	dataLengthValue = (int)( start[1] & 0x3F ) |
 		      (int)( start[2] );
 	if( lengthLimit < 3 + dataLengthValue ){	
-		throw new MikeyExceptionMessageLengthException(
+		throw MikeyExceptionMessageLengthException(
                         "Given dataPtr is too short to form a PKE Payload" );
                 return;
         }
