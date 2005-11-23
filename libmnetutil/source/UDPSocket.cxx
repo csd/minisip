@@ -42,6 +42,7 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
+#include<libmutil/massert.h>
 #include<stdlib.h>
 #include<errno.h>
 
@@ -61,7 +62,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 	this->use_ipv6 = use_ipv6;
 	
 #ifdef _MSC_VER
-	assert(sizeof(SOCKET)==4);
+	massert(sizeof(SOCKET)==4);
 #endif
 
 	if ((fd = (int32_t)socket(use_ipv6? PF_INET6:PF_INET, SOCK_DGRAM, IPPROTO_UDP ))<0){

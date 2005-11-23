@@ -50,7 +50,7 @@ inet_aton(const char *cp, struct in_addr *addr)
 #include<libmnetutil/NetworkException.h>
 
 #include<stdio.h>
-#include<assert.h>
+#include<libmutil/massert.h>
 #include<libmutil/itoa.h>
 
 #ifndef _MSC_VER
@@ -112,7 +112,7 @@ IP4Address::IP4Address(string addr){
 		
 		numIp = ntoh32(*((uint32_t*)(hp->h_addr)));
 
-		assert(hp->h_length==4);
+		massert(hp->h_length==4);
 		#ifdef DEBUG_OUTPUT
 		cerr << "IP4Address(string): " << *this << endl;
 		#endif
@@ -168,7 +168,7 @@ void IP4Address::connect(Socket &socket, int32_t port){
 			throw new HostNotFound( ipaddr );
 		}
 		ip = (unsigned char *)hp->h_addr;
-		assert(hp->h_length==4);
+		massert(hp->h_length==4);
 	}
 	
 	struct sockaddr_in sin;

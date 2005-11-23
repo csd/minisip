@@ -133,7 +133,7 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if ( fd == -1 ) {
-		throw new SocketFailed( errno );
+		throw SocketFailed( errno );
 	}
 
 	memset(&ifr, 0, sizeof(struct ifreq));
@@ -163,7 +163,7 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 #ifndef WIN32
 	int32_t port=-1;
 	if (res_init()){
-		throw new ResolvError( errno );
+		throw ResolvError( errno );
 	}
 //	unsigned char answerbuffer[2048]={};
 	unsigned char *answerbuffer=(unsigned char*)calloc(1,2048);

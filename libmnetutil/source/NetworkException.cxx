@@ -39,19 +39,23 @@ ListenFailed::ListenFailed( int errorNumber ):NetworkException(errorNumber){};
 BindFailed::BindFailed( int errorNumber ):NetworkException(errorNumber){};
 GetSockNameFailed::GetSockNameFailed( int errorNumber ):NetworkException(errorNumber){};
 SetSockOptFailed::SetSockOptFailed( int errorNumber ):NetworkException(errorNumber){};
-NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){};
-NetworkException::NetworkException():errorNumber(0){};
-
-string NetworkException::errorDescription(){
-
+NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){
 #ifdef WIN32
-	return string( strerror( errorNumber ));
+	msg = string( strerror( errorNumber ));
 #else
 	char buf[256];
 	buf[0]=0;
 	strerror_r( errorNumber, buf, 256 );
-	return string( (const char *)buf );
+	msg = string((const char *)buf);
 #endif
+
+};
+NetworkException::NetworkException():errorNumber(0){
+	msg="NetworkException";
+};
+
+const char* NetworkException::what()const throw(){
+	return msg.c_str();
 }
 
 
@@ -63,30 +67,31 @@ TLSContextInitFailed::TLSContextInitFailed():NetworkException(){
 
 TLSConnectFailed::TLSConnectFailed( int errorNumber, SSL * ssl ):ConnectFailed(errorNumber),ssl(ssl){};
 
-string TLSConnectFailed::errorDescription(){
+const char *TLSConnectFailed::what(){
+	
 	switch( SSL_get_error( ssl, errorNumber ) ){
 		case SSL_ERROR_NONE:
-			return string( "SSL Error: No error" );
+			msg = "SSL Error: No error"; break;
 		case SSL_ERROR_ZERO_RETURN:
-			return string( "SSL Error: Connection was closed" );
+			msg = "SSL Error: Connection was closed"; break;
 		case SSL_ERROR_WANT_READ:
-			return string( "SSL Error: Could not perform the read opearation on the underlying TCP connection" );
+			msg = "SSL Error: Could not perform the read opearation on the underlying TCP connection" ; break;
 		case SSL_ERROR_WANT_WRITE:
-			return string( "SSL Error: Could not perform the write opearation on the underlying TCP connection" );
+			msg = "SSL Error: Could not perform the write opearation on the underlying TCP connection"; break;
 		case SSL_ERROR_WANT_CONNECT:
-			return string( "SSL Error: The underlying TCP connection is not connected" );
+			msg = "SSL Error: The underlying TCP connection is not connected" ; break;
 #ifdef SSL_ERROR_WANT_ACCEPT
 		case SSL_ERROR_WANT_ACCEPT:
-			return string( "SSL Error: The underlying TCP connection is not accepted" );
+			msg = "SSL Error: The underlying TCP connection is not accepted" ; break;
 #endif
 		case SSL_ERROR_WANT_X509_LOOKUP:
-			return string( "SSL Error: Error in the X509 lookup" );
+			msg = "SSL Error: Error in the X509 lookup" ; break;
 		case SSL_ERROR_SYSCALL:
-			return string( "SSL Error: I/O error" );
+			msg = "SSL Error: I/O error" ; break;
 		case SSL_ERROR_SSL:
-			return string( "SSL Error: Error in the SSL protocol" );
+			msg = "SSL Error: Error in the SSL protocol" ; break;
 	}
-	return "";
+	return msg.c_str();
 }
 
 

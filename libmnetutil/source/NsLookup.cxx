@@ -75,11 +75,7 @@ string NsLookup::staticLookup_str(string addr){
 }
 
 
-NsLookupHostNotFound::NsLookupHostNotFound(string h):host(h){
-
-}
-
-string NsLookupHostNotFound::errorDescription(){
-    return host;
+NsLookupHostNotFound::NsLookupHostNotFound(string h){
+	msg = "Host "+h+" not found.";
 }
 

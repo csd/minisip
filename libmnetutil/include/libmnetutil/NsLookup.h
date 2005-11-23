@@ -53,9 +53,5 @@ class LIBMNETUTIL_API NsLookup{
 class LIBMNETUTIL_API NsLookupHostNotFound : public NetworkException {
 	public:
 		NsLookupHostNotFound(std::string host);
-
-		virtual std::string errorDescription();
-	private:
-		std::string host;
 };
 #endif

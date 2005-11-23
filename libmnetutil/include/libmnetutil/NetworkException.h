@@ -39,25 +39,30 @@
 #include<openssl/ssl.h>
 
 #include<string>
+#include<libmutil/Exception.h>
 
-class LIBMNETUTIL_API NetworkException{
+class LIBMNETUTIL_API NetworkException : public Exception{
 	public:
-		virtual ~NetworkException(){}
-		virtual std::string errorDescription();
-	protected:
-		NetworkException();
+		NetworkException( );
 		NetworkException( int errorNumber );
+		virtual ~NetworkException() throw() {};
+		virtual const char *what() const throw();
+	protected:
 		int errorNumber;
+		string msg;
 };
 
 class LIBMNETUTIL_API HostNotFound : public NetworkException{
 	public:
-		HostNotFound( std::string host ):host(host){};
-		virtual std::string errorDescription() {
-			return "Host "+host+" not found.";
+		HostNotFound( std::string host ):NetworkException(-1),host(host){};
+		virtual ~HostNotFound()throw() {}
+		virtual const char*what() {
+			msg = "Host "+host+" not found.";
+			return msg.c_str();
 		}
 	private:
 		std::string host;
+		std::string msg;
 };
 
 class LIBMNETUTIL_API ResolvError : public NetworkException{
@@ -103,25 +108,35 @@ class LIBMNETUTIL_API GetSockNameFailed : public NetworkException{
 class LIBMNETUTIL_API TLSConnectFailed : public ConnectFailed{
 	public:
 		TLSConnectFailed( int errorNumber, SSL * ssl  );
-		virtual std::string errorDescription();
+		virtual ~TLSConnectFailed() throw(){}
+		virtual const char* what();
 
 	private:
 		SSL * ssl;
+		std::string msg;
 };
 
 class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
 	public:
 		TLSInitFailed();
-		virtual std::string errorDescription() {
-			return "TLS initialization failed.";
+		virtual ~TLSInitFailed() throw(){}
+		virtual const char *what() {
+			msg = "TLS initialization failed.";
+			return msg.c_str();
 		};
+	private:
+		string msg;
 };
 
 class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
 	public:
 		TLSContextInitFailed();
-		virtual std::string errorDescription() {
-			return "TLS context initialization failed.";
+		virtual ~TLSContextInitFailed() throw(){}
+		virtual const char*what() {
+			msg = "TLS context initialization failed.";
+			return msg.c_str();
 		};
+	private:
+		std::string msg;
 };
 #endif
