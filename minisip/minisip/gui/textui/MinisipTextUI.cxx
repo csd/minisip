@@ -26,6 +26,7 @@
 #include<vector>
 #include"MinisipTextUI.h"
 #include"../../../conf/ConferenceControl.h"
+#include"../../../mediahandler/MediaCommandString.h"
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
 #include<libmutil/termmanip.h>
@@ -166,6 +167,14 @@ void MinisipTextUI::handleCommand(CommandString cmd){
             inCall = true;
 	    setPrompt(state);
 	    displayMessage("PROGRESS: remote participant accepted the call...", blue);
+
+	    
+	    displayMessage("PROGRESS: Unmuting sending of sound.", blue);
+	    CommandString cmdstr( callId,
+			    MediaCommandString::set_session_sound_settings,
+			    "senders", "ON");
+	    callback->guicb_handleMediaCommand(cmdstr);
+
     }
 
     if (cmd.getOp()=="remote_ringing"){
@@ -182,6 +191,12 @@ void MinisipTextUI::handleCommand(CommandString cmd){
 	    state="INCALL";
 	    setPrompt(state);
 	    displayMessage("Autoanswered call from "+ cmd.getParam());
+	    displayMessage("Unmuting sending of sound.", blue);
+	    CommandString cmdstr( callId,
+			    MediaCommandString::set_session_sound_settings,
+			    "senders", "ON");
+	    callback->guicb_handleMediaCommand(cmdstr);
+
 	    return;
     }
 
@@ -811,6 +826,12 @@ void MinisipTextUI::guiExecute(string cmd){
 		displayMessage("A call with the most recent callId will be accepted");
 		handled=true;
                 inCall = true;
+		displayMessage("Unmuting sending of sound.", blue);
+		CommandString cmdstr( callId,
+				MediaCommandString::set_session_sound_settings,
+				"senders", "ON");
+		callback->guicb_handleMediaCommand(cmdstr);
+
 	}
 	if (command == "join"){
 		CommandString command(callId, SipCommandString::accept_invite, currentcaller);
