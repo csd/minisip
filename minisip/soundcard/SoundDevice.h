@@ -272,7 +272,7 @@ class SoundDevice: public MObject{
 		Timeout, in miliseconds.
 		Default value is 20 milisecons
 		*/
-		uint sleepTime;
+		uint32_t sleepTime;
 		
 		bool openedRecord;
 		bool openedPlayback;

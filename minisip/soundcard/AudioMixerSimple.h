@@ -229,7 +229,7 @@ bool AudioMixerSimple::normalizeMulti( int32_t length ) {
 	//we need running pointers ...
 	short * outbuff = outputBuffer;
 	int32_t * inbuff = mixBuffer;
-	uint i;
+	uint32_t i;
 	int32_t * sample = new int32_t[numChannels];
 	int32_t originalSample;
 	

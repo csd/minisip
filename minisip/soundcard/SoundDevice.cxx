@@ -78,6 +78,7 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 #ifndef WIN32
 	return new OssSoundDevice( devideId );
 #else
+	cerr << "WARNING: No sound device is created! (BUG?)"<<endl;
 	return NULL;
 #endif
 }

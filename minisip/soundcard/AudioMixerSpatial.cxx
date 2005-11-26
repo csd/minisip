@@ -75,7 +75,7 @@ short * AudioMixerSpatial::mix (list<MRef<SoundSource *> > sources) {
 	//mix buffer is 32 bit to prevent saturation ... 
 	// some kind of normalization/scaling should be performed here
 	//TODO: for now, simply copy the mix to the output buffer
-	for( uint k = 0; k < size; k++ )
+	for( uint32_t k = 0; k < size; k++ )
 		outputBuffer[k] = (short)mixBuffer[k];
 		
 	return outputBuffer;
@@ -88,7 +88,7 @@ bool AudioMixerSpatial::setSourcesPosition(
 	int sourceIdx;
 	
 	if( addingSource ) {
-		int size = sources.size();
+		int size = (int)sources.size();
 		int newPosition;
 		//if we have 5 sources, optimize the result with this 
 		//previous knowledge we have
