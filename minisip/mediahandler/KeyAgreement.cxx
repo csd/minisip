@@ -369,7 +369,7 @@ string Session::initiatorCreate(){
 		delete message;
 		return "mikey "+b64Message;
 	}
-	catch( certificate_exception & exc ){
+	catch( certificate_exception & ){
 		// FIXME: tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;

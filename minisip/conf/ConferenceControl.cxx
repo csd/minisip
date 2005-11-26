@@ -51,7 +51,7 @@ ConferenceControl::ConferenceControl(string configUri, string cid, bool islocal)
 
     confId=cid;
 
-    uint32_t i = configUri.find("@");
+    uint32_t i = (uint32_t)configUri.find("@");
     assert(i!=string::npos);
     myUri=configUri.substr(0,i);
     myDomain=trim(configUri.substr(i));
@@ -229,7 +229,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	string users=cmd.getParam();
 	minilist<ConfMember> receivedList;
 		
-		while (users.length()!=0 &&!((uint)i>(users.length()-1))){
+		while (users.length()!=0 &&!((uint32_t)i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{
@@ -259,7 +259,7 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 	string users=cmd.getParam();
 	//cerr<<"users-------------"+users<<endl;
 	minilist<ConfMember> receivedList;
-		while (users.length()!=0 &&!((uint)i>(users.length()-1))){
+		while (users.length()!=0 &&!((uint32_t)i>(users.length()-1))){
 			line+=users[i++];
 			if(users[i]==';')
 			{

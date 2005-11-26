@@ -80,7 +80,7 @@ static void signal_handler( int signal ){
 
 Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 
-	srand(time(0));
+	srand((unsigned int)time(0));
 
 	#ifndef WIN32
 		#ifdef DEBUG_OUTPUT
