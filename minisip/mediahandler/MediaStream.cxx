@@ -42,27 +42,31 @@ using namespace std;
 
 
 #ifdef _MSC_VER
+
+static int upcase(char c){
+	if ((c>='a') && (c<='z'))
+		return c - ('a'-'A');
+	else
+		return c;
+}
+
 static int nocaseequal(char c1, char c2){
-	if ( ((c1>='A') && (c1<='Z')) ){
-		return (c1==c2) || (c1 == (c2 - ('a'-'A')));
-	}
-	if ( (c1>='a') && (c1<='z') ){
-		return (c1==c2) || (c1 == (c2 + ('a'-'A')));
-	}
-	return c1==c2;
+	return upcase(c1)==upcase(c2);
 }
 
 static int strcasecmp(const char *s1, const char *s2){
 	for (int i=0; s1[i]!=0 && s2[i]!=0; i++){
-		if ( nocaseequal(s1[i],s2[i]) ){
-			if (s1[i]<s2[i])
+		if ( !nocaseequal(s1[i],s2[i]) ){
+			if (s1[i]<s2[i]){
 				return -1;
-			else
+			}else{
 				return 1;
+			}
 		}
 	}
-	if (s2[i]!=0)
+	if (s2[i]!=0){
 		return -1;
+	}
 	return 0;
 }
 #endif
@@ -107,13 +111,10 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         size_t s1;
         size_t s2 = sdpRtpMap.find("/");
 	
-// 	cerr << "MediaStream::match - start - sdpRtpMap = " << sdpRtpMap << endl;
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
-// 		cerr << "MediaStream::match - codecPayloadType = " << codecPayloadType << endl;
 		if( (*iC)->getCodecName() == "iLBC" ) {
-// 			cerr << "MediaStream::match - ilbc ... mode = " << sdpFmtpParam << endl;
 			if( sdpFmtpParam != "mode=20" ) { //iLBC only supports 20ms frames (in minisip)
 				continue;
 			} //else ... does not mean we accept it, it still goes through the normal checks ...
@@ -125,16 +126,19 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 				localPayloadType = codecPayloadType;
                                 return true;
                         }
-                        else continue;
+                        else {
+				continue;
+			}
+				
                 }
                 else{
                         if( sdpPayloadType == codecPayloadType ){
 				localPayloadType = codecPayloadType;
                                 return true;
-                        }
+                        }else{
+			}
                 }
         }
-// 	cerr << "MediaStream::match - end - return false" << endl;
         return false;
 }
 
