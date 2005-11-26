@@ -184,9 +184,7 @@ void SoundIO::openRecord(){
 
 void SoundIO::startRecord(){
 	recording = true;
-        recorderCondLock.lock();
 	recorderCond.broadcast();
-        recorderCondLock.unlock();
 }
 
 void SoundIO::stopRecord(){
@@ -259,9 +257,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			}
 
 			/* sleep until a recorder call back is added */
-                        soundcard->recorderCondLock.lock();
-			soundcard->recorderCond.wait( &(soundcard->recorderCondLock) );
-                        soundcard->recorderCondLock.unlock();
+			soundcard->recorderCond.wait();
 			
 			if( ! soundcard->soundDev->isOpenedRecord() ){
 				soundcard->openRecord();
@@ -392,9 +388,7 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 		if (source->getId()==(*i)->getId()){
 			queueLock.unlock();
 
-                        sourceListCondLock.lock();
 			sourceListCond.broadcast();
-                        sourceListCondLock.unlock();
 			return;
 		}
 //		(*i)->setPos(spAudio.assignPos(j,nextSize));
@@ -407,9 +401,7 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 	mixer->setSourcesPosition( sources, true ); //added sources
 	queueLock.unlock();
 
-        sourceListCondLock.lock();
 	sourceListCond.broadcast();
-        sourceListCondLock.unlock();
 }
 
 
@@ -510,9 +502,7 @@ void *SoundIO::playerLoop(void *arg){
 			}
 			
 			/* Wait for someone to add a source */
-                        soundcard->sourceListCondLock.lock();
-			soundcard->sourceListCond.wait( &soundcard->sourceListCondLock );
-			soundcard->sourceListCondLock.unlock();
+			soundcard->sourceListCond.wait();
 
 			soundcard->openPlayback();
 			nChannels = soundcard->soundDev->getNChannelsPlay();
