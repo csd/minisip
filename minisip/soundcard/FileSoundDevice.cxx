@@ -210,7 +210,6 @@ int FileSoundDevice::closePlayback(){
 
 //n is in samples! not in bytes
 int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
-	int retValue;
 	
 	if (lastTimeRead==0){
 		lastTimeRead = mtime();
@@ -245,7 +244,7 @@ int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
 	if( fileSoundBlockSleep != 0 )
 		readSleep();
 
-	return retValue;
+	return nSamples;
 }
 
 int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
@@ -310,7 +309,6 @@ void FileSoundDevice::readSleep( ) {
 }
 
 int FileSoundDevice::write( byte_t * buffer, uint32_t nSamples ) {
-	int retValue;
 	
 	if (lastTimeWrite==0){
 		lastTimeWrite = mtime();
@@ -324,7 +322,7 @@ int FileSoundDevice::write( byte_t * buffer, uint32_t nSamples ) {
 	if( fileSoundBlockSleep > 0  && sleepTime == 0)
 		writeSleep();
 
-	return retValue;
+	return nSamples;
 }
 
 
@@ -404,7 +402,7 @@ int FileSoundDevice::getFileSize( int fd ) {
 	int currentPos;
 	
 	currentPos = lseek( fd, 0, SEEK_CUR );
-	if( ret == -1 ) {
+	if( currentPos == -1 ) {
 #ifdef DEBUG_OUTPUT
 //		printError("getFileSize (1)");
 #endif
@@ -437,7 +435,9 @@ void FileSoundDevice::printError( string func ) {
 		case EEXIST: errStr + "eexist"; break;
 		case EFAULT: errStr + "efault"; break;
 		case EISDIR: errStr + "eisdir"; break;
+#ifndef _MSC_VER
 		case ELOOP: errStr + "eloop"; break;
+#endif
 		case EMFILE: errStr + "emfile"; break;
 		case ENAMETOOLONG: errStr + "toolong"; break;
 		case ENFILE: errStr + "enfile"; break;
@@ -447,9 +447,13 @@ void FileSoundDevice::printError( string func ) {
 		case ENOSPC: errStr + "enospc"; break;
 		case ENOTDIR: errStr + "enotdir"; break;
 		case ENXIO: errStr + "enxio"; break;
+#ifndef _MSC_VER
 		case EOVERFLOW: errStr + "eoverflow"; break;
+#endif
 		case EROFS: errStr + "erofs"; break;
+#ifndef _MSC_VER
 		case ETXTBSY: errStr + "etxtbsy"; break;
+#endif
 		default: errStr + "unknown";
 	}
 	cerr << errStr << " (check man page for explanation)" << endl;

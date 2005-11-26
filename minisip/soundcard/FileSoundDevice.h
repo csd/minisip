@@ -174,7 +174,7 @@ class FileSoundDevice: public SoundDevice{
 		Do not reuse the sleepTime variable in SoundDevice ... for now 
 		(as long as the audio playback is still blocking).
 		*/
-		uint fileSoundBlockSleep;
+		uint32_t fileSoundBlockSleep;
 		
 		/**
 		Implements a sleep function, used to synchronize the writing of
