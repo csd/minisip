@@ -33,7 +33,6 @@
 
 #include<assert.h>
 #include<libmutil/dbg.h>
-#include<libmutil/Mutex.h>
 
 #include <typeinfo>
 
@@ -48,6 +47,7 @@
 #endif
 
 #include<libmutil/minilist.h>
+#include<libmutil/Mutex.h>
 
 #include<libmutil/itoa.h>
 #include<libmutil/Exception.h>
@@ -57,6 +57,7 @@
 #endif
 
 using namespace std;
+
 
 /**
  * The MObject class contains a reference counter that is
@@ -120,6 +121,7 @@ class LIBMUTIL_API MObject{
 		*/
 		Mutex refLock;
 };
+
 
 /**
 This is the minisip Smart Pointer implementation: MRef
@@ -207,12 +209,11 @@ class MRef{
 		inline void setPointer(OPType o);
 
 	public:
-
 		/**
 		We receive the object freshly created with a new,
 		or if without params, create an empty MRef
 		*/
-		inline MRef(OPType optr = NULL );
+		inline MRef(OPType optr = NULL);
 		
 		/**
 		We are copying an MRef object ... increase the counter
@@ -387,7 +388,7 @@ OPType MRef<OPType>::operator->() const {
 	ret = getPointer();
 	if( ret == NULL ) {
 		#ifdef DEBUG_OUTPUT
-		cerr << "MRef::operator-> : ERROR: trying to access null pointer (" << typeid(OPType).name() << ")." << endl;
+		cerr << "MRef::operator-> : ERROR: trying to access a null pointer (" << typeid(OPType).name() << ")." << endl;
 		cerr << "Stack trace: "<< getStackTraceString()<<endl;
 		#endif
 		assert( ret != NULL );
@@ -428,16 +429,16 @@ OPType MRef<OPType>::operator*() const{
  * @return	True if debugging features was enabled when
  * 		compiling libmutil and false if it was not.
  */
-bool setDebugOutput(bool on);
+LIBMUTIL_API bool setDebugOutput(bool on);
 
-bool getDebugOutputEnabled();
+LIBMUTIL_API bool getDebugOutputEnabled();
 
 /**
  *
  * @return	Number of MObject objects currently allocated on
  * 		the heap or on the stack.
  */
-int getMemObjectCount();
+LIBMUTIL_API int getMemObjectCount();
 
 /**
  * @return	A list of all allocated objects on the form
@@ -447,7 +448,7 @@ int getMemObjectCount();
  * 		there is no references to it (and it is most likely
  * 		not dynamically).
  */
-minilist<std::string> getMemObjectNames();
+LIBMUTIL_API minilist<std::string> getMemObjectNames();
 
 
 
