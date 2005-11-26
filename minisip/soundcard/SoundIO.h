@@ -249,13 +249,11 @@ class SoundIO : public MObject{
 		MRef< AudioMixer *> mixer;
 
 		CondVar sourceListCond;
-		Mutex sourceListCondLock;
                 
 		list<MRef<SoundSource *> > sources;
 		list<RecorderReceiver *> recorder_callbacks;
                 
 		CondVar recorderCond;
-		Mutex recorderCondLock;
 		
                 volatile int32_t recorder_buffer_size;
 		
