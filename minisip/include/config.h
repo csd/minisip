@@ -34,6 +34,12 @@
 
 #ifdef _MSC_VER
 
+#define DSOUND
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
 #pragma warning (disable: 4251)
 
 #ifndef WIN32
@@ -137,8 +143,8 @@ static inline uint64_t U64_AT( void const * _p )
 
 
 #ifdef DEBUG_OUTPUT
-#define SM_DEBUG
-#define SM_DEBUG_COMMAND
+#define MSM_DEBUG
+#define MSM_DEBUG_COMMAND
 #endif
 
 #define SOUND_CARD_FREQ 48000
