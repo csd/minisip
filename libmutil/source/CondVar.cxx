@@ -86,7 +86,7 @@ void CondVar::wait( uint32_t timeout ){
 #ifdef HAVE_PTHREAD_H
 	condvarMutex->lock();
 	if( timeout == 0 ){
-		pthread_cond_wait( INTERNAL_COND_WAIT, (pthread_mutex_t*)(mutex->handle_ptr) );
+		pthread_cond_wait( INTERNAL_COND_WAIT, (pthread_mutex_t*)(condvarMutex->handle_ptr) );
 	}
 	else{
 		struct timeval now;
@@ -104,7 +104,7 @@ void CondVar::wait( uint32_t timeout ){
 			ts.tv_nsec = ts.tv_nsec % 1000000000;
 		}
 		
-		pthread_cond_timedwait( INTERNAL_COND_WAIT, (pthread_mutex_t*)mutex->handle_ptr,
+		pthread_cond_timedwait( INTERNAL_COND_WAIT, (pthread_mutex_t*)condvarMutex->handle_ptr,
 				&ts );
 	}
 	condvarMutex->unlock();
