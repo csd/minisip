@@ -46,15 +46,20 @@ class LIBMUTIL_API CondVar : public MObject{
 		CondVar();
 		~CondVar();
 
-		std::string getMemObjectType(){return "CondVar";}
 
-		void wait( Mutex * mutex, uint32_t timeout_ms = 0);
+		void wait( uint32_t timeout_ms = 0);
 		void broadcast();
-		void signal();
+		
+		//void signal(); //Deprecated - use semaphore instead to
+		//get this functionality (this method was deprecated
+		//because of difficulties of supporting it on Windows)
+
+		std::string getMemObjectType(){return "CondVar";}
 
 	private:
 		void * internalStruct;
-		bool init;
+		Mutex * condvarMutex; //Note: This mutex will not be used when
+				      //compiling using the microsoft compiler.
 
 };
 
