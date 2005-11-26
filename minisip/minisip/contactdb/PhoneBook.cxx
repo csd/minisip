@@ -105,7 +105,7 @@ string PhoneBookPerson::getName(){
 }
 
 void PhoneBookPerson::addEntry( MRef<ContactEntry *> entry ){
-        entry->personIndex = entries.size();
+        entry->personIndex = (uint32_t)entries.size();
 	entries.push_back( entry );
 }
 

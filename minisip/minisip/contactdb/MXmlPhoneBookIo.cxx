@@ -45,13 +45,13 @@ MRef<PhoneBook *> MXmlPhoneBookIo::load(){
 		parser = new XMLFileParser( fileName ); 
 	}
 
-	catch( XMLFileNotFound& exc ){
+	catch( XMLFileNotFound& ){
 		cerr << "Phonebook file not found. Creating default one." << endl;
 		createDefault();
 		try{
 			 parser = new XMLFileParser( fileName );
 		}
-		catch( XMLException &exc ){
+		catch( XMLException & ){
 			return NULL;
 		}
 		

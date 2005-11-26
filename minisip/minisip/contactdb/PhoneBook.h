@@ -27,12 +27,13 @@
 
 #include<libmutil/MemObject.h>
 #include<list>
+#include"ContactDb.h"
 
 
 
 class PhoneBookPerson;
 class PhoneBookIo;
-class ContactEntry;
+//class ContactEntry;
 
 
 class PhoneBook : public MObject{
