@@ -29,7 +29,7 @@ StringAtom::StringAtom(char *b, int len):buf(b),n(len){
 
 StringAtom::StringAtom(std::string s){
 	buf = strdup(s.c_str());
-	n = s.length();
+	n = (int)s.length();
 }
 
 StringAtom::~StringAtom(){

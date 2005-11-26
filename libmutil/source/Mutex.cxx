@@ -24,6 +24,7 @@
 
 
 #include<libmutil/Mutex.h>
+#include<libmutil/merror.h>
 
 #include<config.h>
 #include<stdio.h>
@@ -77,7 +78,7 @@ void Mutex::createMutex(){
 	handle_ptr = new HANDLE;
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
 	if (handle_ptr==NULL){  //TODO: handle better
-		cerr << "could not create mutex!" << endl;
+		merror("Mutex::createMutex: CreateMutex");
 		exit(1);
 	}else{
 
@@ -88,7 +89,7 @@ void Mutex::createMutex(){
 	handle_ptr = malloc(1, sizeof(HANDLE));
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
 	if (hMutex==NULL){  //TODO: handle better
-		cerr << "could not create mutex!"<< endl;
+		merror("Mutex::createMutex: CreateMutex");
 		exit(1);
 	}else{
 
@@ -109,7 +110,7 @@ Mutex::~Mutex(){
 
 #elif defined _MSC_VER
 	if (!CloseHandle(*((HANDLE*)handle_ptr))){
-		cerr << "Could not free mutex"<<endl;
+		merror("Mutex::~Mutex: CloseHandle");
 		massert(1==0); //TODO: Handle better - exception
 	}
 	delete handle_ptr;
@@ -117,8 +118,6 @@ Mutex::~Mutex(){
 #elif defined WINCE
 #error Mutex delete not implemented
 #endif
-
-
 	
 }
 
@@ -133,9 +132,13 @@ void Mutex::lock(){
 	    }
 	    
 #elif defined _MSC_VER
-	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
+	    if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
+	    	merror("Mutex::lock: WaitForSingleObject");
+	    }
 #elif defined WINCE
-	    WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE);
+	    if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
+	    	merror("Mutex::lock: WaitForSingleObject");
+	    }
 #endif
 
 }
@@ -151,6 +154,7 @@ void Mutex::unlock(){
 
 #elif defined _MSC_VER
 	if (!ReleaseMutex( *( (HANDLE*)handle_ptr) )){
+		merror("Mutex::unlock: ReleaseMutex:");
 		massert(1==0); // Could not release mutex TODO: Handle better - exception
 	}
 

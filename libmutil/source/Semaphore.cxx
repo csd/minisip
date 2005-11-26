@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libmutil/Semaphore.h>
+#include<libmutil/merror.h>
 #include<stdlib.h>
 #include<stdio.h>
 #include<errno.h>
@@ -50,11 +51,13 @@ Semaphore::Semaphore(){
 	handlePtr = (void*) new HANDLE;
 	SEMHANDLE = CreateSemaphore(NULL, 0, 1000, NULL);
 	if (SEMHANDLE == NULL){
+		merror("Semaphore::Semaphore: CreateSemaphore");
 		throw SemaphoreException();
 	}
 #else
 	handlePtr = (void*) new sem_t;
 	if (sem_init( SEMHANDLE, 0, 0)){
+		merror("Semaphore::Semaphore: CreateSemaphore");
 		throw SemaphoreException();
 	}
 	
@@ -63,10 +66,14 @@ Semaphore::Semaphore(){
  
 Semaphore::~Semaphore(){
 #ifdef WIN32
-	CloseHandle(SEMHANDLE);
+	if (!CloseHandle(SEMHANDLE)){
+		merror("Semaphore::~Semaphore: CloseHandle");
+	}
 	delete (HANDLE*)handlePtr;
 #else
-	sem_destroy(SEMHANDLE);
+	if (sem_destroy(SEMHANDLE)){
+		perror("Semaphore::~Semaphore: sem_destroy");
+	}
 	delete (sem_t*)handlePtr;
 #endif
 }
@@ -75,11 +82,13 @@ void Semaphore::inc(){
 #ifdef WIN32
 
 	if (!ReleaseSemaphore(SEMHANDLE, 1, NULL)){
+		merror("Semaphore::inc: ReleaseSemaphore");
 		throw SemaphoreException();
 	}
 	
 #else
 	if( sem_post( SEMHANDLE ) ){
+		merror("Semaphore::inc: sem_post");
 		throw SemaphoreException();
 	}
 #endif
@@ -98,6 +107,7 @@ void Semaphore::dec(){
 		break; 
 
 	case WAIT_TIMEOUT: 
+		merror("Semaphore::dec: WaitForSingleObject");
 		throw SemaphoreException();
 		break; 
 	}
@@ -108,6 +118,7 @@ void Semaphore::dec(){
 			case EINTR:
 				break;
 			default:
+				merror("Semaphore::dec: sem_wait");
 				throw SemaphoreException();
 		}
 	}
