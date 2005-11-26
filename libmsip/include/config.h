@@ -78,8 +78,8 @@ typedef unsigned long long  uint64_t;
 #endif
 
 #ifdef DEBUG_OUTPUT
-#define SM_DEBUG
-#define SM_DEBUG_COMMAND
+#define MSM_DEBUG
+#define MSM_DEBUG_COMMAND
 #endif
 
 #ifndef DEBUG_OUTPUT

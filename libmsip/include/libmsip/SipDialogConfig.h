@@ -118,6 +118,8 @@ class LIBMSIP_API SipProxy : public MObject{
 
 		string getTransport(){ return transport; };
 		void setTransport( string transport ){this->transport = transport; };
+
+		string getMemObjectType(){return "SipProxy";}
 		
 		/**
 		True to indicate that the proxy settings are to be looked up using DNS SRV

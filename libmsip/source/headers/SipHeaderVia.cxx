@@ -50,7 +50,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	unsigned i=0;
-	unsigned pos=0;
+	size_t pos=0;
 
 	ip="";
 	port=0;
