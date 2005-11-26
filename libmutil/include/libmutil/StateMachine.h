@@ -48,15 +48,9 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/massert.h>
 
-//#define SM_DEBUG //dont! use libxxx/include/config.h instead
-//#undef SM_DEBUG
-//#define SM_DEBUG_COMMAND
-//#undef SM_DEBUG_COMMAND
-
-
 using namespace std;
 
-#ifdef SM_DEBUG
+#ifdef MSM_DEBUG
 #include<libmutil/dbg.h> 
 #endif
 
@@ -290,22 +284,22 @@ class StateTransition : public MObject{
 			massert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
 			if (handled= ((**stateMachine).*action)(c) ){
 				stateMachine->setCurrentState(to_state);
-#ifdef SM_DEBUG
+#ifdef MSM_DEBUG
 				if( outputStateMachineDebug ) {
-					merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
+					merr << "MSM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
 						<<" -> "<<to_state->getName();
-		#ifdef SM_DEBUG_COMMAND
+		#ifdef MSM_DEBUG_COMMAND
 					merr << " ("<< c << ")";
 		#endif
 					merr << end;
 				}
 #endif
 			}
-#ifdef SM_DEBUG
+#ifdef MSM_DEBUG
 			else if( outputStateMachineDebug ) {
 				
 				//Activate if needed ... it produces quite some extra debug ... 
-				//merr << "SM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Failed: " << name << ": " << from_state->getName()
+				//merr << "MSM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Failed: " << name << ": " << from_state->getName()
 				//	<<" -> "<<to_state->getName() << end;
 			}
 #endif

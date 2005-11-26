@@ -101,8 +101,8 @@ static inline uint64_t U64_AT( void const * _p )
 }
 
 #ifdef DEBUG_OUTPUT
-#define SM_DEBUG
-#define SM_DEBUG_COMMAND
+#define MSM_DEBUG
+#define MSM_DEBUG_COMMAND
 #endif
 
 #endif
