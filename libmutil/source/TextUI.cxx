@@ -58,7 +58,12 @@ const int TextUI::red=2;
 const int TextUI::blue=3;
 const int TextUI::green=4;
 
+
+#ifdef _MSC_VER
+char *termCodes[]= { "", "", "", "", "" };
+#else
 char *termCodes[]= { "\033[m", "\033[2m\033[1m", "\033[31m", "\033[34m", "\033[42m" };
+#endif
 
 /**
  * Purpose: Tries to make STDIN non-blocking.
@@ -136,9 +141,11 @@ TextUI::TextUI() : maxHints(2000){
 
 TextUI::~TextUI(){
 	restoreStdinBlocking();
+#ifdef HAVE_TERMIOS_H
 	if (terminalSavedState){
 		delete (struct termios*)terminalSavedState;
 	}
+#endif
 }
 
 void TextUI::addCommand(string cmd){
@@ -190,7 +197,7 @@ void TextUI::guimain(){
 		char c = ' ';
 		int err;
 #if defined WIN32 || defined _MSC_VER
-		c= _getch();
+		c= getchar();
 		err=1;
 #else
 		err = read(STDIN_FILENO, &c, 1);
@@ -204,7 +211,8 @@ void TextUI::guimain(){
 			unsigned i;
 
 			switch(c){
-				case 9: autocomplete=displaySuggestions(input);
+				case 9: 
+					autocomplete=displaySuggestions(input);
 					if (autocomplete.size()>0){
 						input=autocomplete;
 					}
@@ -275,6 +283,7 @@ string TextUI::displaySuggestions(string hint){
 		}
 			
 	}
+	
 	int ncmds = commands.size();
 	if (ncmds+cbSuggest.size()<=0)
 		return "";
