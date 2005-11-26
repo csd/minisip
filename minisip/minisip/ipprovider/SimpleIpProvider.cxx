@@ -63,9 +63,10 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 		if (ip.length()>0){
 			if (ifaces[i]==string("lo")){
 				if (localIp.length()<=0)
-					localIp = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+					localIp = ip;//NetworkFunctions::getInterfaceIPStr(ifaces[i]);
 			}else{
-				string ipstr = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+				string ipstr = ip;//NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+				
 				//only update the local ip if it is the first interface with a private
 				//ip different from localhost or a public ip
 				if ( isInPrivateIpRange( ipstr )){
@@ -74,8 +75,8 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 				}else{ 
 					//use first public ip we find ... overwritting the private one
 					if( localIp.length() <= 0 || 
-						localIp=="127.0.0.1" ||
-						isInPrivateIpRange( localIp) )
+							localIp=="127.0.0.1" ||
+							isInPrivateIpRange( localIp) )
 						localIp = ipstr;
 				}
 			}
@@ -88,7 +89,10 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 
 bool SimpleIpProvider::isInPrivateIpRange( string ipstr ) {
 	//check the easy ones first ... 10.x.x.x and 192.168.x.x
-	if (ipstr.substr(0,3)=="10." || ipstr.substr(0,7)=="192.168" ) {
+	if (ipstr.substr(0,3)=="10." 
+			|| ipstr.substr(0,7)=="192.168" 
+			|| ipstr.substr(0,2)=="0.") {	//Found local interfaces in Windows XP used to communicate only
+							//internally with a web camera that started with "0."
 		return true;
 	}
 	//this range goes from 172.16.x.x to 172.31.x.x
