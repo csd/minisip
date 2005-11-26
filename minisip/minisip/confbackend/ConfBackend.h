@@ -24,6 +24,8 @@
 #define CONF_BACKEND_H
 
 #include<libmutil/MemObject.h>
+#include<libmutil/mtypes.h>
+#include<string>
 
 class ConfBackend : public MObject{
 	public:

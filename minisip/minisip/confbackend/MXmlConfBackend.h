@@ -21,12 +21,14 @@
 */
 
 
-#include<ConfBackend.h>
+#include"ConfBackend.h"
 
 class XMLFileParser;
 
 class MXmlConfBackend : public ConfBackend {
 	public:
+		MXmlConfBackend();
+		~MXmlConfBackend();
 		virtual void save( const std::string &key, 
 				const std::string &value );
 		virtual void save( const std::string &key, 
@@ -39,11 +41,11 @@ class MXmlConfBackend : public ConfBackend {
 
 		virtual void commit();
 
-		~MXmlConfBackend();
-		MXmlConfBackend();
 
+		string getMemObjectType(){return "MXmlConfBackend";}
 	private:
 		std::string getDefaultConfigFilename();
 		std::string fileName;
 		XMLFileParser * parser;
 };
+
