@@ -6,6 +6,7 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/Library.h \
 			libmutil/IString.h \
 			libmutil/dbg.h \
+			libmutil/merror.h \
 			libmutil/base64.h \
 			libmutil/dbg.h \
 			libmutil/cert.h \

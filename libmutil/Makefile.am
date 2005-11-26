@@ -18,6 +18,7 @@ mutil_src =  	source/aes.cxx \
 		source/rijndael-alg-fst.cxx \
 		source/base64.cxx \
 		source/dbg.cxx \
+		source/merror.cxx \
 		source/cert.cxx \
 		source/hmac.cxx \
 		source/Thread.cxx \
