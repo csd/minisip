@@ -290,16 +290,12 @@ class TimeoutProvider : public Runnable{
 	private:
 
                 void wake(){
-                        waitCondLock.lock();
-			waitCond.signal();
-                        waitCondLock.unlock();
+			waitCond.broadcast();
                 }
 
 		void sleep(int ms){
 			if (ms > 0){
-                                waitCondLock.lock();
-				waitCond.wait(&waitCondLock,ms);
-                                waitCondLock.unlock();
+				waitCond.wait(ms);
                         }
 		}
                 
@@ -347,7 +343,6 @@ class TimeoutProvider : public Runnable{
 		CondVar waitCond;	///Used to block until a signal from 
 					///another thread or a timeout.
 					
-		Mutex waitCondLock;	
 		
                 Mutex synch_lock;	/// Protects the internal data structures
 					/// from simultaneous modification
