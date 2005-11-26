@@ -49,6 +49,12 @@
 #include<resolv.h>
 #endif
 
+#ifdef _MSC_VER
+#include <stdio.h>
+#include <windows.h>
+#include "iphlpapi.h"
+#endif
+
 #ifdef HAVE_ARPA_NAMESER_COMPAT_H
 #include<arpa/nameser_compat.h>
 #endif
@@ -61,14 +67,46 @@
 
 #define BUFFER_SIZE 1024 /* bytes */
 
-//Thanks to linuxgazette tips, http://www.linuxgazette.com/issue84/misc/tips/interfaces.c.txt,
+
+//Linux: Thanks to linuxgazette tips, http://www.linuxgazette.com/issue84/misc/tips/interfaces.c.txt,
 //seems to be public domain.
+//W32: Thanks to MSDN documentation:
+//http://msdn.microsoft.com/library/default.asp?url=/library/en-us/iphlp/iphlp/managing_interfaces_using_getinterfaceinfo.asp
 
 //TODO: FIXME: change from ioctl to getifaddrs to support IPv6 -EE
 
 vector<string> NetworkFunctions::getAllInterfaces(){
 	vector<string >res;
-#ifndef WIN32
+
+#ifdef _MSC_VER
+	ULONG           ulOutBufLen;
+	DWORD           dwRetVal;
+
+	IP_ADAPTER_INFO         *pAdapterInfo;
+	IP_ADAPTER_INFO         *pAdapter;
+
+	pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+	if ((dwRetVal=GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != ERROR_SUCCESS) {
+		GlobalFree (pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+	}
+
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
+		printf("Call to GetAdaptersInfo failed.\n");
+	}
+	pAdapter = pAdapterInfo;
+
+
+	while (pAdapter) {
+		res.push_back(pAdapter->AdapterName);
+		printf("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
+		pAdapter = pAdapter->Next;
+	}
+	free(pAdapterInfo);
+
+#else
 	int32_t sockfd, len;
 	char *buf, *ptr;
 	struct ifconf ifc;
@@ -116,7 +154,8 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	/* release resources */
 	free(buf);
         close(sockfd);
-#endif
+#endif //!_MSC_VER
+
 	return res;
 }
 
@@ -126,7 +165,38 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 
 string NetworkFunctions::getInterfaceIPStr(string iface){
     string ret;
-#ifndef WIN32
+
+#ifdef _MSC_VER
+	ULONG           ulOutBufLen;
+	DWORD           dwRetVal;
+	
+        IP_ADAPTER_INFO         *pAdapterInfo;
+        IP_ADAPTER_INFO         *pAdapter;
+
+        pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+        ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+        if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) != ERROR_SUCCESS) {	//We fail once to find out the buffer size
+                GlobalFree (pAdapterInfo);
+                pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+        }
+
+        if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
+                printf("Call to GetAdaptersInfo failed.\n");
+        }
+        pAdapter = pAdapterInfo;
+
+        while (pAdapter) {
+		if (pAdapter->AdapterName==iface){
+			ret = pAdapter->IpAddressList.IpAddress.String;
+		}
+                pAdapter = pAdapter->Next;
+        }
+
+	free(pAdapterInfo);
+
+#else
+	
 	struct ifreq ifr;
 	struct sockaddr_in *ifaddr;
 	int32_t fd;
