@@ -76,6 +76,7 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 					//use first public ip we find ... overwritting the private one
 					if( localIp.length() <= 0 || 
 							localIp=="127.0.0.1" ||
+							localIp.substr(0,2)=="0." ||
 							isInPrivateIpRange( localIp) )
 						localIp = ipstr;
 				}
