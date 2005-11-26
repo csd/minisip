@@ -27,9 +27,9 @@
 
 #include"SoundDevice.h"
 
+#include"Dsound.h"
 
-
-//typedef uint8_t byte_t;
+//#define NUM_PLAY_NOTIFICATIONS  16
 
 class DirectSoundDevice : public SoundDevice{
 	public:
@@ -52,6 +52,17 @@ class DirectSoundDevice : public SoundDevice{
 		virtual void sync();
 
 	private:
+
+		HRESULT setCaptureNotificationPoints(LPDIRECTSOUNDCAPTUREBUFFER8 pDSCB);
+
+		LPDIRECTSOUNDFULLDUPLEX dsDuplexInterfaceHandle;
+			
+		LPDIRECTSOUNDBUFFER8        outputBufferHandle; //secondary directsound buffer
+		LPDIRECTSOUNDCAPTUREBUFFER8        inputBufferHandle; 
+		
+#define cEvents  2
+		HANDLE     inputSoundEvent[cEvents];
+	
 		
 };
 
