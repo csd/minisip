@@ -58,7 +58,8 @@ void GConfBackend::save( const std::string &key, const std::string &value ){
 	string skey = key;
 	sanitizeKey( skey );
 
-	const gchar * gkey = (const gchar *)(KEY_ROOT + skey).c_str();
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
 	const gchar * gvalue = (const gchar *)(value).c_str();
 
 	if( !gconf_client_set_string( client, gkey, gvalue, &err ) ){
@@ -71,7 +72,9 @@ void GConfBackend::save( const std::string &key, const int32_t value ){
 	GError * err = NULL;
 	string skey = key;
 	sanitizeKey( skey );
-	const gchar * gkey = (const gchar *)(KEY_ROOT + skey).c_str();
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
 	gint gvalue = (gint)value;
 
 	if( !gconf_client_set_int( client, gkey, gvalue, &err ) ){
@@ -86,7 +89,9 @@ std::string GConfBackend::loadString( const std::string &key,
 	GError * err = NULL;
 	string skey = key;
 	sanitizeKey( skey );
-	const gchar * gkey = (const gchar *)(KEY_ROOT + skey).c_str();
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
 	gchar * gvalue;
 	string ret;
 	
@@ -114,7 +119,9 @@ int32_t GConfBackend::loadInt( const std::string &key,
 	GError * err = NULL;
 	string skey = key;
 	sanitizeKey( skey );
-	const gchar * gkey = (const gchar *)(KEY_ROOT + skey).c_str();
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
 	GConfValue * gvalue;
 	
 	gvalue = gconf_client_get_without_default( client, gkey, &err );
@@ -135,7 +142,9 @@ void GConfBackend::reset( const string &key ){
 	GError * err = NULL;
 	string skey = key;
 	sanitizeKey( skey );
-	const gchar * gkey = (const gchar *)(KEY_ROOT + skey).c_str();
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
 
 	if( ! gconf_client_unset( client, gkey, &err ) ){
 		// Unset failed, not sure what to do
