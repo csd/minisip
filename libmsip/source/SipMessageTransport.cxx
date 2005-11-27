@@ -495,15 +495,19 @@ static bool getDestination(MRef<SipMessage*> pack, MRef<IPAddress*> &destAddr,
 		// is non-empty, or directly to the reqeuest uri if the 
 		// route set is empty.
 
-		MRef<SipRequest*> req = (SipRequest*)*pack;
-		MRef<SipHeaderValueRoute*> route = (SipHeaderValueRoute*)*pack->getHeaderValueNo(SIP_HEADER_TYPE_ROUTE, 0);
+		MRef<SipHeaderValue*> routeHeader =
+			pack->getHeaderValueNo(SIP_HEADER_TYPE_ROUTE, 0);
+
 		SipURI uri;
 
-		if( route ){
+		if( routeHeader ){
+			MRef<SipHeaderValueRoute*> route =
+				(SipHeaderValueRoute*)*routeHeader;
 			string str = route->getString();
 			uri.setUri( str );
 		}
 		else {
+			MRef<SipRequest*> req = (SipRequest*)*pack;
 			uri.setUri(req->getUri());
 		}
 
