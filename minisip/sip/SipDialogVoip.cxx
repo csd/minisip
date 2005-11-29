@@ -34,8 +34,6 @@
 #include<libmutil/massert.h>
 #include"SipDialogVoip.h"
 #include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipResponse.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipCancel.h>
 #include<libmsip/SipRefer.h>
 #include<libmsip/SipAck.h>
@@ -45,7 +43,6 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
-//#include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipHeaderContact.h>
@@ -54,7 +51,6 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
-//#include"DefaultDialogHandler.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -62,8 +58,6 @@
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
 #include"../minisip/LogEntry.h"
-
-//#include"../mediahandler/MediaHandler.h"
 
 #include <iostream>
 #include<time.h>
@@ -941,6 +935,12 @@ bool SipDialogVoip::a28_transferrequested_transferpending_202( const SipSMComman
 				SipCommandString::transfer_pending
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		
+		/* Minisip does not actually keep track of the transfer ... 
+		if the REFER is accepted by the far end, then shutdown the media
+		*/
+		getMediaSession()->stop();
+		signalIfNoTransactions();
 
 		return true;
 	}else{
@@ -960,6 +960,37 @@ bool SipDialogVoip::a31_transferrequested_incall_36( const SipSMCommand &command
 	}else{
 		return false;
 	}
+}
+
+bool SipDialogVoip::a32_transferpending_transferpending_notify( const SipSMCommand &command) {
+	bool ret = false;
+	
+	if (transitionMatch(command, SipNotify::type, SipSMCommand::transaction, SipSMCommand::TU)){
+		//this is just the same notify, lifted from the transaction up to the dialog ... 
+		//we can safely absorb it ...
+		return true;
+	} else if (transitionMatch(command, SipNotify::type, SipSMCommand::remote, SipSMCommand::TU)){
+		MRef<SipNotify*> notif;
+		notif = (SipNotify*)*command.getCommandPacket();
+		
+		MRef<SipTransaction*> notifyResp = new SipTransactionNonInviteServer(
+				sipStack, 
+				MRef<SipDialog*>(this), 
+				notif->getCSeq(),
+				notif->getCSeqMethod(),
+				notif->getLastViaBranch(), 
+				dialogState.callId); //TODO: remove second argument
+		registerTransaction(notifyResp);
+		SipSMCommand cmd(command);
+		cmd.setDestination(SipSMCommand::transaction);
+		cmd.setSource(command.getSource());
+		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		
+		sendNotifyOk(notif, notifyResp->getBranch() );
+		
+		ret = true;
+	}
+	return ret;
 }
 
 bool SipDialogVoip::a33_incall_transferaskuser_REFER( const SipSMCommand &command)
@@ -1182,6 +1213,10 @@ void SipDialogVoip::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_transferrequested_incall_36",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a31_transferrequested_incall_36,
 			s_transferrequested, s_incall);
+	
+	new StateTransition<SipSMCommand,string>(this, "transition_transferpending_transferpending_notify",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a32_transferpending_transferpending_notify,
+			s_transferpending, s_transferpending);
 	
 	new StateTransition<SipSMCommand,string>(this, "transition_transferpending_termwait_BYE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a6_incall_termwait_hangup,
@@ -1713,6 +1748,17 @@ void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
+void SipDialogVoip::sendNotifyOk(MRef<SipNotify*> notif, const string &branch){
+	MRef<SipResponse*> ok= new SipResponse( branch, 200, "OK", MRef<SipMessage*>(*notif) );
+	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+
+//	setLastResponse(ok);
+	MRef<SipMessage*> pref(*ok);
+	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
+//	handleCommand(cmd);
+	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+}
+
 void SipDialogVoip::sendReject(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
@@ -1804,18 +1850,17 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	}
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
-		if (c.getCommandString().getDestinationId() == dialogState.callId ){
+		if (!handled && c.getCommandString().getDestinationId() == dialogState.callId ){
 			mdbg << "Warning: SipDialogVoIP ignoring command with matching call id"<< end;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
-		if (c.getCommandPacket()->getCallId() == dialogState.callId){
+		if (!handled && c.getCommandPacket()->getCallId() == dialogState.callId){
 			mdbg << "Warning: SipDialogVoIP ignoring packet with matching call id"<< end;
 			return true;
 		}
 	}
-
 	
 	return handled;
 }

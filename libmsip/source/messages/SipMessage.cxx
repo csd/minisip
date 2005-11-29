@@ -213,27 +213,44 @@ string SipMessage::getHeadersAndContent(){
  */
 int SipMessage::parseHeaders(const string &buf, int startIndex){
 	int i=startIndex;
-	int end = (int)buf.size();
+	int endBuf = (int)buf.size();
+	//This filters the sipfrag messages we receive ... like in NOTIFY ... which most of the times come without any header
+	if( startIndex + 4 >= endBuf ) {
+		#ifdef DEBUG_OUTPUT
+		mdbg << "SipMessage::parseHeaders: Info: SipMessage without headers ... only request line" << end;
+		#endif
+		return i;
+	}
 	do{
-		if (i+2<=end && buf[i]=='\n' && buf[i+1]=='\n')	// i points to first after header
+		if (i+2<=endBuf && buf[i]=='\n' && buf[i+1]=='\n') {	// i points to first after header
 			return i+2;				// return pointer to start of content
-
-		if (i+4<=end && buf[i]=='\r' && buf[i+1]=='\n' 
-				&& buf[i+2]=='\r' && buf[i+3]=='\n' )	// i points to first after header
+		}
+		if (i+4<=endBuf && buf[i]=='\r' && buf[i+1]=='\n' 
+				&& buf[i+2]=='\r' && buf[i+3]=='\n' ){	// i points to first after header
 			return i+4;				// return pointer to start of content
-		if (i+4<=end && buf[i]=='\n' && buf[i+1]=='\r' 
-				&& buf[i+2]=='\n' && buf[i+3]=='\r' )	// i points to first after header
+		}
+		if (i+4<=endBuf && buf[i]=='\n' && buf[i+1]=='\r' 
+				&& buf[i+2]=='\n' && buf[i+3]=='\r' ){	// i points to first after header
 			return i+4;				// return pointer to start of content
-	
+		}
 		int eoh = SipUtils::findEndOfHeader(buf, i);	// i will be adjusted to start of header
 		string header = buf.substr(i, eoh-i+1);
-		if (!addLine(header)){
-#ifdef DEBUG_OUTPUT
-			mdbg << "Info: Could not copy line to new Message: " << header << " (unknown)" << end;
-#endif
+// 		merr << "SipMessage::parseHeaders: parsing line = ##" << header 
+// 			<< "## [end=" << endBuf << "; i="<< i 
+// 			<< "; eoh=" << eoh << "; length=" 
+// 			<< eoh-i+1 << "]" << end;
+		if( header == "" ) {
+			#ifdef DEBUG_OUTPUT
+			mdbg << "SipMessage::parseHeaders: Info: Could not copy line to new Message: (empty line)" << end;
+			#endif
+		} else if (!addLine(header)){
+			#ifdef DEBUG_OUTPUT
+			mdbg << "SipMessage::parseHeaders: Info: Could not copy line to new Message: " << header << " (unknown)" << end;
+			#endif
 		}
 		i=eoh+1;
-	}while (i<end);
+	}while (i<endBuf);
+	
 	return i;
 }
 

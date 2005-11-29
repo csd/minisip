@@ -42,6 +42,7 @@
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipRefer.h>
+#include<libmsip/SipNotify.h>
 #include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
@@ -99,6 +100,7 @@ class SipDialogVoip: public SipDialog{
 		void sendInviteOk(const string &branch);
 		void sendReferOk(const string &branch);
 		void sendByeOk(MRef<SipBye*> bye, const string &branch);
+		void sendNotifyOk(MRef<SipNotify*> notif, const string &branch);
 		void sendReject(const string &branch);
 		void sendReferReject(const string &branch);
 		void sendRefer(const string &branch, int, const string referredUri);
@@ -136,6 +138,7 @@ class SipDialogVoip: public SipDialog{
 		bool a27_incall_transferrequested_transfer( const SipSMCommand &command);
 		bool a28_transferrequested_transferpending_202( const SipSMCommand &command);
 		bool a31_transferrequested_incall_36( const SipSMCommand &command);
+		bool a32_transferpending_transferpending_notify( const SipSMCommand &command);
 		
 		bool a33_incall_transferaskuser_REFER( const SipSMCommand &command);
 		bool a34_transferaskuser_transferstarted_accept( const SipSMCommand &command);
