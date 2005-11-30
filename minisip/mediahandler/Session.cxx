@@ -120,6 +120,8 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 	std::list<MRef<Codec *> >::iterator iC;
 	uint8_t payloadType;
 	string rtpmap;
+	const char *transport = NULL;
+
 // 	cerr << "Session::getSdpOffer" << endl;
 	result = emptySdp();
 	if( securityConfig.secured ){
@@ -130,6 +132,10 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			return NULL;
 		}
 		result->setSessionLevelAttribute( "key-mgmt", keyMgmtMessage );
+		transport = "RTP/SAVP";
+	}
+	else{
+		transport = "RTP/AVP";
 	}
 
 	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
@@ -137,7 +143,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 
 		type = (*i)->getSdpMediaType();
 		localPort = (*i)->getPort();
-		m = new SdpHeaderM( type, localPort, 1, "RTP/AVP" );
+		m = new SdpHeaderM( type, localPort, 1, transport );
 		
 		for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 			payloadType = (*iC)->getSdpMediaType();
@@ -342,6 +348,16 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 		if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
+
+			const string &transport = offerM->getTransport();
+
+			if (transport != "RTP/AVP" &&
+			    !securityConfig.secured &&
+			    transport == "RTP/SAVP") {
+				errorString += "No supported SRTP key exchange method";
+				return false;
+			}
+
 
 			MRef<SdpHeaderM *> answerM = new SdpHeaderM(
 					offerM->getMedia(), 0, 0,
