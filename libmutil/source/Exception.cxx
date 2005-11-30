@@ -59,7 +59,7 @@ Exception::Exception(char const* what):exception(){
 
 Exception::~Exception() throw() {
 	if (stack)
-		delete stack;
+		delete[] stack;
 	stack=NULL;
 }
 
