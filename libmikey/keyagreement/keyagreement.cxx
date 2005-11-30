@@ -371,12 +371,14 @@ void KeyAgreement::setSrtpStreamRoc( uint32_t roc, uint8_t csId ){
 
 
 void KeyAgreement::addSrtpStream( uint32_t ssrc, uint32_t roc, byte_t policyNo, byte_t csId ){
-	MikeyCsIdMapSrtp * csIdMap = 
-		dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
+	MikeyCsIdMapSrtp * csIdMap;
 
-	if( csIdMap == NULL ){
+	if( !csIdMapPtr ){
 		csIdMapPtr = new MikeyCsIdMapSrtp();
 		csIdMap = (MikeyCsIdMapSrtp *)(*csIdMapPtr);
+	}
+	else{
+		csIdMap = dynamic_cast<MikeyCsIdMapSrtp *>( *csIdMapPtr );
 	}
 	
 	csIdMap->addStream( ssrc, roc, policyNo, csId );
