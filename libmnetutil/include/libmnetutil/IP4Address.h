@@ -49,6 +49,7 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 
 		uint32_t getBinaryIP();
 
+		virtual int32_t getPort();
 		virtual std::string getString();
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP4Address &a);

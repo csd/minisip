@@ -55,6 +55,10 @@
 #include<iostream>
 #include<errno.h>
 
+#ifdef WIN32
+typedef int socklen_t
+#endif
+
 using namespace std;
 
 bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
@@ -113,69 +117,47 @@ UDPSocket::~UDPSocket(){
 }
 
 int32_t UDPSocket::getPort(){
-		struct sockaddr_in addr;
-		int sz = sizeof(addr);
-#ifdef WIN32
+		struct sockaddr_storage addr;
+		socklen_t sz = sizeof(addr);
 		if (getsockname(fd, (struct sockaddr *)&addr, &sz)){
-#else
-		if (getsockname(fd, (struct sockaddr *)&addr, (socklen_t*)&sz)){
-#endif
-			throw new GetSockNameFailed( errno );
+			throw GetSockNameFailed( errno );
 		}
-		
-		int32_t port2 = ntohs(addr.sin_port);
+
+		MRef<IPAddress *>ip = IPAddress::create((struct sockaddr*)&addr, sz);
+		int32_t port2 = ip->getPort();
 		return port2;
 }
 
 int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len){
 	if (use_ipv6 && ( to_addr.getType() != IP_ADDRESS_TYPE_V6)){
-		cerr << "Error: trying to send to IPv6 address using IPv4 socket" << endl;
+		cerr << "Error: trying to send to IPv4 address using IPv6 socket" << endl;
 		throw new SendFailed( errno );
 	}
 	if (!use_ipv6 && (to_addr.getType() != IP_ADDRESS_TYPE_V4)){
-		cerr << "Error: trying to send to IPv4 address using IPv6 socket" << endl;
+		cerr << "Error: trying to send to IPv6 address using IPv4 socket" << endl;
 		throw new SendFailed( errno );
 	}
 	
 //	cerr << "DEBUG: sending UDP message of length "<< len <<" use_ipv6 is "<<use_ipv6<< endl; 
 
-#ifndef WIN32
-	return sendto(fd, msg, len, 0, to_addr.getSockaddrptr(port), to_addr.getSockaddrLength());
-#else
 	return sendto(fd, (const char*)msg, len, 0, to_addr.getSockaddrptr(port), to_addr.getSockaddrLength());
-#endif
 }
 
 int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from, int &port){
-	struct sockaddr_in from4;
-	int n, addr_len;
-#ifndef WIN32
-	if (use_ipv6){
-		struct sockaddr_in6 from6;
-		addr_len=sizeof(struct sockaddr_in6);
-		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*) &from6, (socklen_t*)&addr_len);
-//		from = new IP6Address(from6);
-		from=NULL;
-	}else
-#endif
-	{
-		addr_len = sizeof(struct sockaddr_in);
-#ifdef WIN32
-		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, &addr_len);
-#else
-		n=recvfrom(fd, (char*)buf,len, 0, (struct sockaddr*)&from4, (socklen_t*)&addr_len);
-#endif
-		port = ntohs(from4.sin_port);
-		from = new IP4Address(inet_ntoa(in_addr(from4.sin_addr)));
+	struct sockaddr_storage sa;
+	socklen_t sa_len = sizeof(sa);
+	int n;
 
-	}
+	n=recvfrom(fd, (char *)buf,len, 0, (struct sockaddr*)&sa, &sa_len);
+	from = IPAddress::create((struct sockaddr*)&sa, sa_len);
+	port = from->getPort();
 	return n;
 }
 
 int32_t UDPSocket::recv(void *buf, int32_t len){
 #ifndef WIN32
-	int32_t dummy=0;
-	return recvfrom(fd,buf,len,0,NULL,(socklen_t*)&dummy);
+	socklen_t dummy=0;
+	return recvfrom(fd,buf,len,0,NULL,&dummy);
 #else
 	return ::recv(fd,(char *)buf,len,0);
 #endif

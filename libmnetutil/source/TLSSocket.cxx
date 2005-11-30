@@ -36,7 +36,6 @@
 #endif
 
 #include<libmnetutil/IPAddress.h>
-#include<libmnetutil/IP4Address.h>
 
 
 
@@ -82,7 +81,8 @@ TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx, 
 		MRef<certificate *> cert, 
 		MRef<ca_db *> cert_db ){
-	TLSSocket::TLSSocket_init( *(new IP4Address(addr)), port, ssl_ctx, cert, cert_db);
+	MRef<IPAddress *> ip_addr = IPAddress::create( addr );
+	TLSSocket::TLSSocket_init( **ip_addr, port, ssl_ctx, cert, cert_db);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */

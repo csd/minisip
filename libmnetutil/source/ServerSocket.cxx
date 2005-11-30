@@ -48,12 +48,16 @@
 #include<errno.h>
 
 
+#ifdef WIN32
+typedef int socklen_t
+#endif
+
 ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 	this->domain=domain;
 	this->listen_port=listenport;
 	fd = (int32_t)::socket(domain, SOCK_STREAM, IPPROTO_TCP);
 	if (fd<0){
-		throw new SocketFailed( errno );
+		throw SocketFailed( errno );
 	}
 	int32_t on=1;
 #ifdef WIN32
@@ -68,60 +72,51 @@ ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 void ServerSocket::listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog){
 	
 	if (bind(fd,saddr, sockaddr_length )!=0){
-		throw new BindFailed( errno );
+		throw BindFailed( errno );
 	}
 
 	if (::listen(fd, backlog)!=0){
-		throw new ListenFailed( errno );
+		throw ListenFailed( errno );
 	}
 }
 
 void ServerSocket::listen(string local_ip, int32_t local_port, int32_t backlog){
-	struct sockaddr_in local_addr;
+	MRef<IPAddress *> addr = IPAddress::create(local_ip);
+	struct sockaddr *sa = NULL;
+	socklen_t salen = addr->getSockaddrLength();
 
-	local_addr.sin_family = AF_INET;
-	local_addr.sin_port = htons((int16_t)local_port);
-	local_addr.sin_addr.s_addr = inet_addr(local_ip.c_str());
-	memset(&(local_addr.sin_zero), '\0', 8);
+	sa = addr->getSockaddrptr(local_port);
 
-	if (bind(fd,(struct sockaddr*)&local_addr, sizeof(struct sockaddr))!=0){
-		throw new BindFailed( errno );
+	if (bind(fd, sa, salen)!=0){
+		throw BindFailed( errno );
 	}
 
 	if (::listen(fd, backlog)!=0){
-		throw new ListenFailed( errno );
+		throw ListenFailed( errno );
 	}
 }
 
 MRef<StreamSocket *>ServerSocket::accept(){
 	int32_t cli;
-	struct sockaddr sin;
-	int32_t sinlen=sizeof(struct sockaddr);
+	struct sockaddr_storage sin;
+	socklen_t sinlen=sizeof(sin);
 	//sin = get_sockaddr_struct(sinlen);
 	
-#ifndef WIN32
-	if ((cli=::accept(fd, &sin, (socklen_t*)&sinlen))<0){
-#else
-	if ((cli=(int32_t)::accept(fd, &sin, (int*)&sinlen))<0){
-#endif
+	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
 		perror("in ServerSocket::accept(): accept:");
 	}
 	
-	return new TCPSocket(cli,&sin);
+	return new TCPSocket(cli,(struct sockaddr*)&sin,sinlen);
 }
 
 int32_t ServerSocket::getPort(){
-		struct sockaddr_in addr;
-		int sz = sizeof(addr);
-#ifdef WIN32
-		if (getsockname(fd, (struct sockaddr *)&addr, &sz)){
-#else
-		if (getsockname(fd, (struct sockaddr *)&addr, (socklen_t*)&sz)){
-#endif
-			throw new GetSockNameFailed( errno );
-		}
-		
-		int32_t port2 = ntohs(addr.sin_port);
-		return port2;
-}
+	struct sockaddr_storage sa;
+	socklen_t sz = sizeof(sa);
+	if (getsockname(fd, (struct sockaddr *)&sa, &sz)){
+		throw GetSockNameFailed( errno );
+	}
 
+	MRef<IPAddress *> addr = IPAddress::create((struct sockaddr*)&sa, sz);
+	int32_t port2 = addr->getPort();
+	return port2;
+}

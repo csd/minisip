@@ -64,7 +64,7 @@ struct sockaddr *IP6ServerSocket::getSockaddrStruct(int32_t &ret_length){
 	return (struct sockaddr *)sin;
 }
 
-TCPSocket * IP6ServerSocket::createSocket(int32_t fd, struct sockaddr *saddr){
-	return new TCPSocket(fd,saddr);
+TCPSocket * IP6ServerSocket::createSocket(int32_t fd, struct sockaddr_in6 *saddr){
+	return new TCPSocket(fd,(struct sockaddr*)saddr, sizeof(struct sockaddr_in6));
 }
 

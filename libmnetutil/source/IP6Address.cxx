@@ -94,7 +94,7 @@ IP6Address::IP6Address(string addr){
 	memcpy(&sockaddress->sin6_addr,hp->h_addr, hp->h_length);
 }
 
-IP6Address::IP6Address(struct sockaddr * addr){
+IP6Address::IP6Address(struct sockaddr_in6 * addr){
 	type = IP_ADDRESS_TYPE_V6;
 	setAddressFamily(AF_INET6);
 	setProtocolFamily(PF_INET6);
@@ -144,7 +144,12 @@ int32_t IP6Address::getSockaddrLength(){
 }
 
 string IP6Address::getString(){
-	return "not_implemented";
+	return ipaddr;
+}
+
+int32_t IP6Address::getPort()
+{
+	return ntoh16(sockaddress->sin6_port);
 }
 
 void IP6Address::connect(Socket &socket, int32_t port){

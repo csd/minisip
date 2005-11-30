@@ -60,12 +60,14 @@ void IPAddress::setProtocolFamily(int pf){
 	protocol_family=pf;
 }
 
-IPAddress * IPAddress::create( sockaddr * addr ){
-	if( ((sockaddr_in*)addr)->sin_family == AF_INET ){
+IPAddress * IPAddress::create( sockaddr * addr, int32_t addr_len ){
+	if( addr->sa_family == AF_INET &&
+	    addr_len >= sizeof(struct sockaddr_in)){
 		return new IP4Address( (sockaddr_in *)addr );
 	}
-	else if( ((sockaddr_in*)addr)->sin_family == AF_INET6 ){
-		return new IP6Address( addr );
+	else if( addr->sa_family == AF_INET6 &&
+		 addr_len >= sizeof(struct sockaddr_in6)){
+		return new IP6Address( (sockaddr_in6 *)addr );
 	}
 	// FIXME exception
 	else return NULL;

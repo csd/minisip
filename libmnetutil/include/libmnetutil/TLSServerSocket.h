@@ -45,14 +45,20 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket {
+class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 
 	public:
+		TLSServerSocket( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
 		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
 //		~TLSServerSocket();
 		virtual std::string getMemObjectType(){return "TLSServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
+
+	protected:
+		virtual void init( bool use_ipv6, int32_t listen_port, 
+				   MRef<certificate *> cert,
+				   MRef<ca_db *> cert_db);
 
 	private:
 		int32_t listen_port;
@@ -64,5 +70,6 @@ class LIBMNETUTIL_API TLSServerSocket : public IP4ServerSocket {
 		 CA db 
 		 */
 		MRef<ca_db *> cert_db;
+		ServerSocket * tcp_socket;
 };
 #endif

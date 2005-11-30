@@ -58,8 +58,12 @@
 #include<iostream>
 using namespace std;
 
+#ifdef _MSC_VER
+#define dup ::_dup
+#endif
+
 TCPSocket::TCPSocket(string addr, int32_t port){
-	MRef<IP4Address *> tmp = new IP4Address(addr);
+	MRef<IPAddress *> tmp = IPAddress::create(addr);
 	initTCPSocket( **tmp, port );
 }
 
@@ -85,21 +89,17 @@ void TCPSocket::initTCPSocket(IPAddress &ipaddress, int32_t port){
 	ipaddress.connect(*this, port);
 }
 
-TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr){
+TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr, int32_t addr_len){
 	type = SOCKET_TYPE_TCP;
 	this->fd=fd;
-	this->peerAddress = IPAddress::create( addr );
-	this->peerPort = ntohs( ((sockaddr_in *)addr)->sin_port );
+	peerAddress = IPAddress::create( addr, addr_len );
+	peerPort = peerAddress->getPort();
 }
 
 TCPSocket::TCPSocket(TCPSocket &sock){
 	type = SOCKET_TYPE_TCP;
 
-#ifdef _MSC_VER
-	this->fd = ::_dup(sock.fd);
-#else
 	this->fd = dup(sock.fd);
-#endif
 
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: In TCPSocket copy constructor: First free descriptor number is " << this->fd << endl;

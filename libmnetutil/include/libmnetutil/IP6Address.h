@@ -44,9 +44,10 @@ class LIBMNETUTIL_API IP6Address : public IPAddress {
 	public:
 		IP6Address(std::string addr);
 		IP6Address(const IP6Address&);
-		IP6Address(struct sockaddr *);
+		IP6Address(struct sockaddr_in6 *);
 		~IP6Address();
 
+		virtual int32_t getPort();
 		virtual std::string getString();
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP6Address &a);

@@ -101,13 +101,13 @@ IP4Address::IP4Address(string addr){
 
 		if (WSAGetLastError() != 0) {
 			if (WSAGetLastError() == 11001)
-				throw new HostNotFound( addr );
+				throw HostNotFound( addr );
 		}
 #endif
 
 		
 		if (!hp){
-			throw new HostNotFound( addr );
+			throw HostNotFound( addr );
 		}
 		
 		numIp = ntoh32(*((uint32_t*)(hp->h_addr)));
@@ -151,6 +151,11 @@ string IP4Address::getString(){
 	return ipaddr;
 }
 
+int32_t IP4Address::getPort()
+{
+	return ntoh16(sockaddress->sin_port);
+}
+
 void IP4Address::connect(Socket &socket, int32_t port){
 
 	unsigned char *ip;
@@ -165,7 +170,7 @@ void IP4Address::connect(Socket &socket, int32_t port){
 		struct hostent *hp= gethostbyname(ipaddr.c_str());	
 #endif
 		if (!hp){ //throw host not found exception here
-			throw new HostNotFound( ipaddr );
+			throw HostNotFound( ipaddr );
 		}
 		ip = (unsigned char *)hp->h_addr;
 		massert(hp->h_length==4);
@@ -181,7 +186,7 @@ void IP4Address::connect(Socket &socket, int32_t port){
 	if (error < 0){
 		perror("connect");
 		socket.close();
-		throw new ConnectFailed( error );
+		throw ConnectFailed( error );
 	}
 
 }

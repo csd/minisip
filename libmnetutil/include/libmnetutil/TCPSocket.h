@@ -39,7 +39,7 @@
 
 class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 	public:
-		TCPSocket(int32_t fd, sockaddr * addr);
+		TCPSocket(int32_t fd, sockaddr * addr, int32_t addr_len);
 		
 		TCPSocket(std::string addr,int32_t port=0);
 		TCPSocket(IPAddress &addr,int32_t port=0);

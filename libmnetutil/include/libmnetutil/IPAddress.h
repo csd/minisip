@@ -50,6 +50,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 
 		int getAddressFamily();
 		int getProtocolFamily();
+		virtual int32_t getPort()=0;
 		virtual std::string getString()=0;
 
 		virtual void connect(Socket &s, int32_t port)=0;
@@ -60,7 +61,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		virtual bool operator ==(const IPAddress &i) const =0;
 		virtual IPAddress * clone() const =0;
 
-		static IPAddress * create(sockaddr * addr);
+		static IPAddress * create(sockaddr * addr, int32_t addr_len);
 		static IPAddress * create(const string &addr);
 
 	protected:

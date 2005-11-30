@@ -43,13 +43,36 @@
 #include<iostream>
 #endif
 
+#ifdef WIN32
+typedef int socklen_t
+#endif
 
 
-TLSServerSocket::TLSServerSocket(int32_t listen_port, 
-				MRef<certificate *> cert, MRef<ca_db *> cert_db):IP4ServerSocket(listen_port){
+TLSServerSocket::TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db):ServerSocket(AF_INET, listen_port)
+{
+	init(false, listen_port, cert, cert_db);
+}
+
+TLSServerSocket::TLSServerSocket( bool use_ipv6, int32_t listen_port, 
+				 MRef<certificate *> cert,
+				  MRef<ca_db *> cert_db):ServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+{
+	init(use_ipv6, listen_port, cert, cert_db);
+}
+
+void TLSServerSocket::init( bool use_ipv6, int32_t listen_port, 
+			    MRef<certificate *> cert,
+			    MRef<ca_db *> cert_db)
+{
+	int32_t backlog = 25;
 	SSL_METHOD * meth;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	
+	if( use_ipv6 )
+		listen("::", listen_port, backlog);
+	else
+		listen("0.0.0.0", listen_port, backlog);
+
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
 	meth = SSLv23_server_method();
@@ -113,19 +136,17 @@ TLSServerSocket::TLSServerSocket(int32_t listen_port,
 
 MRef<StreamSocket *> TLSServerSocket::accept(){
 	int32_t cli;
-	struct sockaddr sin;
-	int32_t sinlen=sizeof(struct sockaddr);
+	struct sockaddr_storage sin;
+	socklen_t sinlen=sizeof(sin);
 	//sin = get_sockaddr_struct(sinlen);
 	
-#ifndef WIN32
-	if ((cli=::accept(fd, &sin, (socklen_t*)&sinlen))<0){
-#else
+#ifdef WIN32
 	massert(sizeof(SOCKET)==4);
-	if ((cli=(int32_t)::accept(fd, &sin, (int*)&sinlen))<0){
 #endif
+	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
 		perror("in ServerSocket::accept(): accept:");
 	}
 
-	return new TLSSocket( new TCPSocket( cli, &sin ), ssl_ctx );
+	return new TLSSocket( new TCPSocket( cli, (struct sockaddr*)&sin, sinlen), ssl_ctx );
 }
 
