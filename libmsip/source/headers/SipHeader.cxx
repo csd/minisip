@@ -194,6 +194,23 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 					value_params = split(values[i],true,';');
 					value_zero = value_params[0];
 				}
+			} else if( headerType == "From" ||
+				   headerType == "To" ) {
+				uint32_t ltPos = (uint32_t) values[i].find( '<' );
+				uint32_t gtPos = (uint32_t) values[i].find( '>' );
+				if( ltPos!=string::npos && gtPos!=string::npos ) {
+					value_zero = values[i].substr( 0, gtPos + 1 );
+					//now split the outside parameters ...
+					value_params = split( 
+						//note that it should be gtPos -1, but we need value_params[0] to be 
+						//not a param ...so we take some junk from the uri previous to the first ;
+						values[i].substr( gtPos - 1, values[i].size() - (gtPos - 1) ),
+						true,
+						';' );
+				} else { //if there is no < or >, then just split into parameters ...
+					value_params = split(values[i],true,';');
+					value_zero = value_params[0];
+				}
 			} else {
 				value_params = split(values[i],true,';');
 				value_zero = value_params[0];
