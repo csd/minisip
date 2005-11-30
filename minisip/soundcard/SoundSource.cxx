@@ -159,14 +159,22 @@ void BasicSoundSource::pushSound(short * samples,
 		writeRet = cbuff->write( samples, nMonoSamples * 2, true );
 	} else {
 		int tempVal;
-		memset( temp, 0, iFrames * oNChannels ); 
-		for( int32_t i = 0; i<nMonoSamples; i++ ) {
-			tempVal = i*oNChannels;
-			temp[ tempVal ] = samples[i];
-			tempVal ++;
-			temp[ tempVal ] = samples[i];
+
+		for( int32_t nSamples = nMonoSamples; nSamples > 0; ){
+			int32_t cur = nSamples;
+
+			if( cur > iFrames )
+				cur = iFrames;
+			memset( temp, 0, iFrames * oNChannels ); 
+			for( int32_t i = 0; i<cur; i++ ) {
+				tempVal = i*oNChannels;
+				temp[ tempVal ] = samples[i];
+				tempVal ++;
+				temp[ tempVal ] = samples[i];
+			}
+			writeRet = cbuff->write( temp, cur * 2, true );
+			nSamples -= cur;
 		}
-		writeRet = cbuff->write( temp, nMonoSamples * 2, true );
 	}
 	bufferLock.unlock();
 #ifdef DEBUG_OUTPUT
