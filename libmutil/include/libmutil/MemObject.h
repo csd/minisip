@@ -47,7 +47,6 @@
 #endif
 
 #include<libmutil/minilist.h>
-#include<libmutil/Mutex.h>
 
 #include<libmutil/itoa.h>
 #include<libmutil/Exception.h>
@@ -58,6 +57,7 @@
 
 using namespace std;
 
+class Mutex;
 
 /**
  * The MObject class contains a reference counter that is
@@ -74,11 +74,28 @@ class LIBMUTIL_API MObject{
 		 * Constructor.
 		 */
 		MObject();
+		
+		/**
+		 * Copy constructor
+		 *
+		 * Needed so that we don't get
+		 * the reference count and mutex from the
+		 * one we duplicate.
+		 */
+		MObject(const MObject &);
+
 
 		/**
 		 * Deconstructor.
 		 */
 		virtual ~MObject();
+
+		/**
+		 * Needed since reference count and the
+		 * mutex that protects it should not be
+		 * copied when MObjects are.
+		 */
+		void operator=(const MObject &);
 
 		/**
 		Decrease the reference counter (thread-safe)
@@ -119,7 +136,7 @@ class LIBMUTIL_API MObject{
 		When MEMDEBUG is on, this is not used (instead a global mutex
 		is).
 		*/
-		Mutex refLock;
+		Mutex *refLock;
 };
 
 

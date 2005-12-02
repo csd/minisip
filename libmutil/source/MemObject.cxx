@@ -41,10 +41,24 @@ bool outputOnDestructor=false;
 #endif
 
 MObject::MObject() : refCount(0){
+	refLock = new Mutex();
 #ifdef MDEBUG
 	global.lock();
 	ocount++;
-	//cerr << "MObject:: SipSMCommand created; ptr=" << itoa((int)this) << endl;
+	objs.push_front(this);
+	global.unlock();
+#endif
+}
+
+
+// The reference count should be zero since
+// any references to the argument object
+// are not referencing us.
+MObject::MObject(const MObject &o):refCount(0){
+	refLock = new Mutex();	//We don't want to share the mutex
+#ifdef MDEBUG
+	global.lock();
+	ocount++;
 	objs.push_front(this);
 	global.unlock();
 #endif
@@ -62,14 +76,26 @@ MObject::~MObject(){
 	}
 	global.unlock();
 #endif
+	delete refLock;
+	refLock=NULL;
 }
+
+void MObject::operator=(const MObject &o){
+	// we don't copy the mutex handle - whe one we already
+	// have protects the reference counter we in this object.
+	// We also don't copy the reference counter. The value
+	// we already have is the correct number of references.
+	//
+	// Don't delete this method even if it is empty.
+}
+	
 
 int MObject::decRefCount(){
 	int refRet;
 #ifdef MDEBUG
 	global.lock();
 #else
-	refLock.lock();
+	refLock->lock();
 #endif
 	
 	refCount--;
@@ -82,7 +108,7 @@ int MObject::decRefCount(){
 		cerr << output << endl;
 	}
 #else
-	refLock.unlock();
+	refLock->unlock();
 #endif
 	return refRet;
 }
@@ -91,7 +117,7 @@ void MObject::incRefCount(){
 #ifdef MDEBUG
 	global.lock();
 #else
-	refLock.lock();
+	refLock->lock();
 #endif
 	
 	refCount++;
@@ -104,7 +130,7 @@ void MObject::incRefCount(){
 		cerr << output << endl;
 	}
 #else
-	refLock.unlock();
+	refLock->unlock();
 #endif
 }
 
