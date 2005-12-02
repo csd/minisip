@@ -210,7 +210,6 @@ int FileSoundDevice::closePlayback(){
 
 //n is in samples! not in bytes
 int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
-	
 	if (lastTimeRead==0){
 		lastTimeRead = mtime();
 	}
@@ -309,7 +308,6 @@ void FileSoundDevice::readSleep( ) {
 }
 
 int FileSoundDevice::write( byte_t * buffer, uint32_t nSamples ) {
-	
 	if (lastTimeWrite==0){
 		lastTimeWrite = mtime();
 	}
