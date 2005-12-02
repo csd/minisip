@@ -50,27 +50,29 @@ IPAddress *staticLookup(std::string addr){
 string NsLookup::staticLookup_str(string addr){
 
 #if defined WIN32
-    cerr << "ERROR: NsLookup::staticLookup_str: UNIMPLEMENTED"<< endl;
-    exit(1);
+	cerr << "ERROR: NsLookup::staticLookup_str: UNIMPLEMENTED"<< endl;
+	exit(1);
 
 
 #elif defined HAVE_NETDB_H
 
-        hostent* ret = gethostbyname2(addr.c_str(), AF_INET); //FIXME: Only IPv4 - BUG - do getaddrinfo + change API of netutil
-        return string((ret->h_addr_list[0]));
+	hostent* ret = gethostbyname2(addr.c_str(), AF_INET);
+	//FIXME: Only IPv4 - BUG - do getaddrinfo + change API of netutil
+	return string((ret->h_addr_list[0]));
 /*
-        struct addrinfo *res;
-        err = getaddrinfo(addr.c_str(), NULL, NULL, &res);
-        
-        if (err) {
-            cerr << "staticlookup_str: error when doing getaddrinfo: "<< gai_streror(err)<< endl;
-//            fprintf(stderr, "error : %s", gai_strerror(err));
-            freeaddrinfo(res);
-            throw new NsLookupHostNotFound(addr);
-            exit(1);
-        }
+	struct addrinfo *res;
+	err = getaddrinfo(addr.c_str(), NULL, NULL, &res);
+
+	if (err) {
+		cerr << "staticlookup_str: error when doing getaddrinfo: "
+		     << gai_streror(err)<< endl;
+//		fprintf(stderr, "error : %s", gai_strerror(err));
+		freeaddrinfo(res);
+		throw new NsLookupHostNotFound(addr);
+		exit(1);
+	}
 */        
-    
+
 #endif
 }
 

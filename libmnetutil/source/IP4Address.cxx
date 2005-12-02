@@ -65,7 +65,7 @@ inet_aton(const char *cp, struct in_addr *addr)
 using namespace std;
 
 IP4Address::IP4Address(struct sockaddr_in *sin){
-        sockaddress = new sockaddr_in;
+	sockaddress = new sockaddr_in;
 	type = IP_ADDRESS_TYPE_V4;
 	setAddressFamily(AF_INET);
 	setProtocolFamily(PF_INET);
@@ -80,7 +80,7 @@ uint32_t IP4Address::getBinaryIP(){
 }
 
 IP4Address::IP4Address(string addr){
-        sockaddress = new sockaddr_in;
+	sockaddress = new sockaddr_in;
 	type = IP_ADDRESS_TYPE_V4;
 	ipaddr = addr;
 
@@ -130,7 +130,7 @@ IP4Address::IP4Address(const IP4Address& other){
 	setProtocolFamily(PF_INET);
 	ipaddr = other.ipaddr;
 	numIp = other.numIp;
-        sockaddress = new sockaddr_in;
+	sockaddress = new sockaddr_in;
 	memcpy(sockaddress, other.sockaddress, sizeof(struct sockaddr_in));
 }
 

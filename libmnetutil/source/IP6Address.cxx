@@ -64,7 +64,7 @@ using namespace std;
 **	3.
 */
 IP6Address::IP6Address(string addr){
-        sockaddress = new sockaddr_in6;
+	sockaddress = new sockaddr_in6;
 	type = IP_ADDRESS_TYPE_V6;
 	ipaddr = addr;
 
@@ -212,13 +212,13 @@ bool IP6Address::operator ==(const IP6Address &i) const{
 
 bool IP6Address::operator ==(const IPAddress &i) const{
 
-        try{
-                const IP6Address &i6 = dynamic_cast<const IP6Address&>(i);
-                return (*this == i6);
-        }
-        catch(std::bad_cast &){
-                // Comparing IPv6 and IPv4 addresses
-                return false;
-        }
+	try{
+		const IP6Address &i6 = dynamic_cast<const IP6Address&>(i);
+		return (*this == i6);
+	}
+	catch(std::bad_cast &){
+		// Comparing IPv6 and IPv4 addresses
+		return false;
+	}
 }
 

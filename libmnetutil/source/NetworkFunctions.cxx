@@ -153,7 +153,7 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 
 	/* release resources */
 	free(buf);
-        close(sockfd);
+	close(sockfd);
 #endif //!_MSC_VER
 
 	return res;
@@ -164,34 +164,35 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 #endif
 
 string NetworkFunctions::getInterfaceIPStr(string iface){
-    string ret;
+	string ret;
 
 #ifdef _MSC_VER
 	ULONG           ulOutBufLen;
 	DWORD           dwRetVal;
 	
-        IP_ADAPTER_INFO         *pAdapterInfo;
-        IP_ADAPTER_INFO         *pAdapter;
+	IP_ADAPTER_INFO         *pAdapterInfo;
+	IP_ADAPTER_INFO         *pAdapter;
 
-        pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
-        ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+	pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-        if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) != ERROR_SUCCESS) {	//We fail once to find out the buffer size
-                GlobalFree (pAdapterInfo);
-                pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
-        }
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) != ERROR_SUCCESS) {
+		//We fail once to find out the buffer size
+		GlobalFree (pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+	}
 
-        if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
-                printf("Call to GetAdaptersInfo failed.\n");
-        }
-        pAdapter = pAdapterInfo;
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
+		printf("Call to GetAdaptersInfo failed.\n");
+	}
+	pAdapter = pAdapterInfo;
 
-        while (pAdapter) {
+	while (pAdapter) {
 		if (pAdapter->AdapterName==iface){
 			ret = pAdapter->IpAddressList.IpAddress.String;
 		}
-                pAdapter = pAdapter->Next;
-        }
+		pAdapter = pAdapter->Next;
+	}
 
 	free(pAdapterInfo);
 
@@ -229,7 +230,7 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 
 string NetworkFunctions::getHostHandlingService(string service, string domain, uint16_t &ret_port){
-    string ret;
+	string ret;
 #ifndef WIN32
 	int32_t port=-1;
 	if (res_init()){
@@ -321,7 +322,7 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	cerr << "NetworkFunc:getHostHandlingServ = " << ret << ":" << ret_port << endl;
 	#endif
 #endif
-    return ret;
+	return ret;
 }
 
 
