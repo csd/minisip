@@ -6,6 +6,7 @@ EXTRA_DIST = libmutil.spec
 
 lib_LTLIBRARIES = libmutil.la
 libmutil_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include
+libmutil_la_LDFLAGS = -no-undefined
 
 libmutil_la_SOURCES = $(mutil_src)
 

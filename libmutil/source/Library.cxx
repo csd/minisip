@@ -2,17 +2,19 @@
 #include<libmutil/Library.h>
 #include<libmutil/massert.h>
 
-#ifdef _MSC_VER
-#include<Windows.h>
+#if defined _MSC_VER || __MINGW32__
+#include<windows.h>
+# define USE_WIN32_LIBS
 #else
 #include<dlfcn.h>
+# define USE_POSIX_LIBS
 #endif
 #include<iostream>
 
 using namespace std;
 
 Library::Library(const string &path):path(path){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_LIBS
 	massert(sizeof(FARPROC)==sizeof(void*));
 	handle = new HMODULE;
 	
@@ -29,7 +31,7 @@ Library::Library(const string &path):path(path){
 }
 
 Library::~Library(){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_LIBS
 	if (!FreeLibrary(*((HMODULE*)handle)) ){
 		cerr << "Library: ERROR: Could not close library."<< endl;
 		
@@ -45,10 +47,10 @@ Library::~Library(){
 }
 
 void *Library::getFunctionPtr(string name){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_LIBS
 	massert(sizeof(FARPROC)==sizeof(void*));
 	HMODULE *hptr =(HMODULE*)handle;
-	return GetProcAddress(*hptr, name.c_str());
+	return (void*)GetProcAddress(*hptr, name.c_str());
 #else
 	void * ptr = dlsym(handle, name.c_str());
 	return ptr;

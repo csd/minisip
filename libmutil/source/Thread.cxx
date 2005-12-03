@@ -50,6 +50,14 @@
 #include<libmutil/Exception.h>
 #include<libmutil/massert.h>
 
+#if defined _MSC_VER || __MINGW32__
+# define USE_WIN32_THREADS
+#else
+# ifdef HAVE_PTHREAD_H
+#  define USE_POSIX_THREADS
+# endif
+#endif
+
 using namespace std;
 
 ThreadException::ThreadException(char *desc):Exception(desc){
@@ -156,10 +164,10 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 
 #endif //WIN32
 
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 #define MINISIP_THREAD_IMPLEMENTED
 
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 #ifdef HAVE_EXECINFO_H
 #include <ucontext.h>
 #include <dlfcn.h>
@@ -368,7 +376,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 
 #endif //WIN32
 
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	//handle_ptr = malloc(sizeof(pthread_t));
 	handle_ptr = new pthread_t;
 	int ret;
@@ -411,7 +419,7 @@ Thread::~Thread(){
 #ifdef WIN32
 		delete (HANDLE *)handle_ptr;
 #endif
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 		delete (pthread_t *)handle_ptr;
 #endif
 	}
@@ -440,7 +448,7 @@ int Thread::createThread(void f()){
 	return (int)threadHandle;
 #endif
 	
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	pthread_t threadHandle;
 	#ifdef DEBUG_OUTPUT
  		mdbg << "Running createThread"<< end;
@@ -483,7 +491,7 @@ int Thread::createThread(void *f(void*), void *arg){
 	return (int)threadHandle;
 #endif
 	
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
@@ -499,7 +507,7 @@ int Thread::createThread(void *f(void*), void *arg){
 }
 
 void * Thread::join(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	void * returnValue;
 	int ret;
 	
@@ -530,12 +538,12 @@ void * Thread::join(){
 }
 
 void Thread::join(int handle){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_THREADS
 	HANDLE h = (HANDLE)handle;
 	if (WaitForSingleObject( h, INFINITE )==WAIT_FAILED){
 		merror("Thread::join:WaitForSingleObject");
 	}
-#else
+#elif defined USE_POSIX_THREADS
 	if( pthread_join( handle, NULL) ){
 		#ifdef DEBUG_OUTPUT
 			merror("Thread::join: pthread_join");
@@ -545,10 +553,10 @@ void Thread::join(int handle){
 }
 
 int Thread::msleep(int ms){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_THREADS
 	Sleep(ms); //function returns void
 	return 0;
-#else
+#elif defined USE_POSIX_THREADS
 	struct timespec request;
 	request.tv_sec = ms/1000;
 	request.tv_nsec = (long) (ms%1000) * 1000 * 1000;
@@ -558,7 +566,7 @@ int Thread::msleep(int ms){
 
 
 bool Thread::kill( ) {
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
@@ -592,7 +600,7 @@ bool Thread::kill( ) {
 }
 
 bool Thread::kill( int handle) {
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT

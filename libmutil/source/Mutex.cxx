@@ -34,13 +34,12 @@
 // BSD 5.x: malloc.h has been replaced by stdlib.h
 // #include<malloc.h>
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || __MINGW32__
 #include<windows.h>
-#endif
-
-
-#ifdef HAVE_PTHREAD_H
+# define USE_WIN32_THREADS
+#elif HAVE_PTHREAD_H
 #include<pthread.h>
+# define USE_POSIX_THREADS
 #endif
 
 #include<iostream>
@@ -68,12 +67,12 @@ Mutex::Mutex(const Mutex &){
 }
 
 void Mutex::createMutex(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
 
-#elif defined _MSC_VER
+#elif defined USE_WIN32_THREADS
 #define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = new HANDLE;
 	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
@@ -104,11 +103,11 @@ void Mutex::createMutex(){
 
 Mutex::~Mutex(){
 
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	pthread_mutex_destroy((pthread_mutex_t*)handle_ptr);
 	delete (pthread_mutex_t*)handle_ptr;
 
-#elif defined _MSC_VER
+#elif defined USE_WIN32_THREADS
 	if (!CloseHandle(*((HANDLE*)handle_ptr))){
 		merror("Mutex::~Mutex: CloseHandle");
 		massert(1==0); //TODO: Handle better - exception
@@ -123,7 +122,7 @@ Mutex::~Mutex(){
 
 
 void Mutex::lock(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	    
 	    int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
 	    if (ret!=0){
@@ -131,7 +130,7 @@ void Mutex::lock(){
 		exit(1);
 	    }
 	    
-#elif defined _MSC_VER
+#elif defined USE_WIN32_THREADS
 	    if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
 	    	merror("Mutex::lock: WaitForSingleObject");
 	    }
@@ -144,7 +143,7 @@ void Mutex::lock(){
 }
 
 void Mutex::unlock(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	
 	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
 	if (ret!=0){
@@ -152,7 +151,7 @@ void Mutex::unlock(){
 		exit(1);
 	}
 
-#elif defined _MSC_VER
+#elif defined USE_WIN32_THREADS
 	if (!ReleaseMutex( *( (HANDLE*)handle_ptr) )){
 		merror("Mutex::unlock: ReleaseMutex:");
 		massert(1==0); // Could not release mutex TODO: Handle better - exception

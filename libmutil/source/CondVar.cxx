@@ -28,32 +28,36 @@
 
 #include<libmutil/Mutex.h>
 #include<libmutil/merror.h>
-#ifdef HAVE_PTHREAD_H
+#if defined WIN32
+
+#include<windows.h>
+
+#define INTERNAL_COND_WAIT ((HANDLE *)internalStruct)
+#define INTERNAL_MUTEX ((HANDLE *)internalMutexStruct)
+#if defined _MSC_VER || __MINGW32__
+# define USE_WIN32_THREADS
+#endif
+
+#elif defined HAVE_PTHREAD_H
 #include<pthread.h>
 #include<sys/time.h>
 #include<time.h>
 
 #define INTERNAL_COND_WAIT ((pthread_cond_t *)internalStruct)
 #define INTERNAL_MUTEX ((pthread_mutex_t *)internalMutexStruct)
-
-#elif defined WIN32
-
-#include<windows.h>
-
-#define INTERNAL_COND_WAIT ((HANDLE *)internalStruct)
-#define INTERNAL_MUTEX ((HANDLE *)internalMutexStruct)
+#define USE_POSIX_THREADS
 
 #endif
 
 
 CondVar::CondVar(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 #define MINISIP_CONDVAR_IMPLEMENTED
 	condvarMutex = new Mutex;
 	internalStruct = new pthread_cond_t;
 
 	pthread_cond_init( INTERNAL_COND_WAIT, NULL );
-#elif defined _MSC_VER
+#elif defined WIN32
 #define MINISIP_CONDVAR_IMPLEMENTED
 	internalStruct = new HANDLE;
 	if ( (*INTERNAL_COND_WAIT = CreateEvent( NULL, TRUE, FALSE, NULL ))==NULL){
@@ -68,12 +72,12 @@ CondVar::CondVar(){
 }
 
 CondVar::~CondVar(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	delete condvarMutex;
 	condvarMutex=NULL;
 	pthread_cond_destroy( INTERNAL_COND_WAIT );
 	delete INTERNAL_COND_WAIT;
-#elif defined _MSC_VER
+#elif defined WIN32
 	if (!CloseHandle( *INTERNAL_COND_WAIT )){
 		merror("CondVar::~CondVar: CloseHandle");
 	}
@@ -83,7 +87,7 @@ CondVar::~CondVar(){
 }
 
 void CondVar::wait( uint32_t timeout ){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	condvarMutex->lock();
 	if( timeout == 0 ){
 		pthread_cond_wait( INTERNAL_COND_WAIT, (pthread_mutex_t*)(condvarMutex->handle_ptr) );
@@ -124,7 +128,7 @@ void CondVar::wait( uint32_t timeout ){
 }
 
 void CondVar::broadcast(){
-#ifdef HAVE_PTHREAD_H
+#ifdef USE_POSIX_THREADS
 	condvarMutex->lock();
 	pthread_cond_broadcast( INTERNAL_COND_WAIT );
 	condvarMutex->unlock();
