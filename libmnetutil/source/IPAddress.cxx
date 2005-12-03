@@ -28,6 +28,9 @@
 
 #ifdef WIN32
 #include<winsock2.h>
+#ifdef HAVE_WS2TCPIP_H
+# include<ws2tcpip.h>
+#endif
 
 #elif defined HAVE_NETINET_IN_H
 #include<sys/types.h>

@@ -44,7 +44,7 @@
 #endif
 
 #ifdef WIN32
-typedef int socklen_t
+typedef int socklen_t;
 #endif
 
 

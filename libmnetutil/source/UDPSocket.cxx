@@ -26,8 +26,9 @@
 #include<config.h>
 #endif
 
-#ifdef WIN32
+#if defined _MSC_VER || __MINGW32__
 #include<winsock2.h>
+# define USE_WIN32_API
 #elif defined HAVE_NETINET_IN_H
 #include<sys/types.h>
 #include<sys/socket.h>
@@ -46,17 +47,21 @@
 #include<stdlib.h>
 #include<errno.h>
 
-#ifndef _MSC_VER
+#ifndef WIN32
 #include<unistd.h>
 #include<netinet/ip.h>
 #include<arpa/inet.h>
 #endif
 
+#ifdef HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
+
 #include<iostream>
 #include<errno.h>
 
-#ifdef WIN32
-typedef int socklen_t
+#ifdef USE_WIN32_API
+typedef int socklen_t;
 #endif
 
 using namespace std;
@@ -78,9 +83,10 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 #else
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
 #endif
-#ifndef WIN32
+#ifdef HAVE_STRUCT_SOCKADDR_IN6
 	if (use_ipv6){
 		struct sockaddr_in6 addr;
+		memset(&addr, 0, sizeof(addr));
 		addr.sin6_family=PF_INET6;
 		addr.sin6_port=htons(port);
 		addr.sin6_addr=in6addr_any;
@@ -165,7 +171,7 @@ int32_t UDPSocket::recv(void *buf, int32_t len){
 }
 
 bool UDPSocket::setLowDelay(){
-#ifdef _MSC_VER
+#ifdef USE_WIN32_API
 	cerr << "Warning: setting IPTOS_LOWDELAY is not implemented for the Microsoft Visual compiler!"<< endl;
 	return false;
 #else

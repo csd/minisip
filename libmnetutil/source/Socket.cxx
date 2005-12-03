@@ -25,14 +25,20 @@
 #include<config.h>
 #include<libmnetutil/Socket.h>
 
-#ifdef _MSC_VER		// was: if defined WIN32 && not defined __CYGWIN__
+#if defined _MSC_VER || __MINGW32__	// was: if defined WIN32 && not defined __CYGWIN__
 #include<winsock2.h>
+# define USE_WIN32_API
 #else
 #include<unistd.h>
+#include <sys/socket.h>
 #endif
 
 #include<iostream>
 using namespace std;
+
+#ifdef USE_WIN32_API
+typedef int socklen_t;
+#endif
 
 Socket::Socket(){
 
@@ -54,7 +60,7 @@ int32_t Socket::getType(){
 
 void Socket::close(){
 //#if defined WIN32 && not defined __CYGWIN__
-#ifdef _MSC_VER
+#ifdef USE_WIN32_API
 	closesocket(fd);
 #else
 	::close(fd);

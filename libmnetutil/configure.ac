@@ -28,7 +28,6 @@ AC_LANG(C++)
 
 AC_C_BIGENDIAN
 
-
 dnl STL
 dnl For now STL is made mandatory
 
@@ -48,6 +47,24 @@ AC_ARG_ENABLE(debug,
       else
       	AC_DEFINE(NDEBUG, [], [No debug output])
       fi ])
+
+dnl
+dnl IPv6 support
+dnl
+AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
+AC_CHECK_TYPES([struct sockaddr_in6],,,[
+#ifdef HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+#ifdef HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
+])
+
+dnl
+dnl mingw support
+dnl
+AC_CHECK_LIB([wsock32], [main])
 
 dnl
 dnl libssl

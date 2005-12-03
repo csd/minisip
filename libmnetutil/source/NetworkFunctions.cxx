@@ -49,10 +49,11 @@
 #include<resolv.h>
 #endif
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || __MINGW32__
 #include <stdio.h>
 #include <windows.h>
 #include "iphlpapi.h"
+# define USE_WIN32_API
 #endif
 
 #ifdef HAVE_ARPA_NAMESER_COMPAT_H
@@ -78,7 +79,7 @@
 vector<string> NetworkFunctions::getAllInterfaces(){
 	vector<string >res;
 
-#ifdef _MSC_VER
+#ifdef USE_WIN32_API
 	ULONG           ulOutBufLen;
 	DWORD           dwRetVal;
 
@@ -154,7 +155,7 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	/* release resources */
 	free(buf);
 	close(sockfd);
-#endif //!_MSC_VER
+#endif //USE_WIN32_API
 
 	return res;
 }
@@ -166,7 +167,7 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 string NetworkFunctions::getInterfaceIPStr(string iface){
 	string ret;
 
-#ifdef _MSC_VER
+#ifdef USE_WIN32_API
 	ULONG           ulOutBufLen;
 	DWORD           dwRetVal;
 	
