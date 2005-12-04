@@ -4,6 +4,7 @@ EXTRA_DIST = libmikey.spec
 
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CPPFLAGS = -I$(top_srcdir)/include
+libmikey_la_LDFLAGS = -no-undefined
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 

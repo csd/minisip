@@ -20,6 +20,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_YACC
 dnl AC_PROG_RANLIB
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 AC_LANG(C++)
 
@@ -45,6 +46,19 @@ AC_ARG_ENABLE(debug,
       fi ])
 
 
+dnl OpenSSL libcrypto
+dnl library check
+AC_CHECK_LIB([crypto], [SSLeay],
+	[
+		LIBS="-lcrypto ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
+	])
+dnl header check
+AC_CHECK_HEADER([openssl/crypto.h],[],
+	[
+		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
+	])
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
