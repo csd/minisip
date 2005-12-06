@@ -52,29 +52,6 @@ SipHeaderFactoryFuncPtr sipHeaderAcceptFactory=acceptFactory;
 
 const string sipHeaderValueAcceptTypeStr="Accept";
 
-SipHeaderValueAccept::SipHeaderValueAccept(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_ACCEPT, sipHeaderValueAcceptTypeStr){
-	accept = trim(build_from);
-#ifdef DEBUG_OUTPUT
-	cerr << "DEBUG: parsed Accept to: "<< accept<< endl;;
-#endif
-}
-
-SipHeaderValueAccept::SipHeaderValueAccept():SipHeaderValue(SIP_HEADER_TYPE_ACCEPT,sipHeaderValueAcceptTypeStr){
-	accept="NOT_SET";
-}
-
-SipHeaderValueAccept::~SipHeaderValueAccept(){
-}
-
-string SipHeaderValueAccept::getString(){
-	return /*"Accept: "+*/accept;
-}
-
-string SipHeaderValueAccept::getAccept(){
-	return accept;
-}
-		
-void SipHeaderValueAccept::setAccept(const string &accept){
-	this->accept=accept;
+SipHeaderValueAccept::SipHeaderValueAccept(const string &build_from):SipHeaderValueString(SIP_HEADER_TYPE_ACCEPT, sipHeaderValueAcceptTypeStr, build_from){
 }
 

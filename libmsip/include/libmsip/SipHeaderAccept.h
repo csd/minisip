@@ -36,6 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 /**
  * @author Erik Eliasson
@@ -43,34 +44,16 @@
 
 extern SipHeaderFactoryFuncPtr sipHeaderAcceptFactory;
 
-// Ex: Via: SIP/2.0/UDP 10.0.0.2:5043
-// 
-class LIBMSIP_API SipHeaderValueAccept: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueAccept: public SipHeaderValueString{
 
 	public:
 		
-		SipHeaderValueAccept();
 		SipHeaderValueAccept(const string &build_from);
-
-		virtual ~SipHeaderValueAccept();
-		
 
                 virtual std::string getMemObjectType(){return "SipHeaderAccept";}
 		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-		/**
-		 * @return The IP address of the contact header.
-		 */
-		string getAccept();
-		
-		void setAccept(const string &accept);
-
-	private:
-		string accept;
+		//getString is inherited from SipHeaderValueString
+		//and returns the string passed to the constructor.
 };
 
 #endif
