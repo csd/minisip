@@ -49,6 +49,10 @@ SipURI::SipURI(string buildFrom){
 	setUri( buildFrom );
 }
 
+SipURI::~SipURI(){
+
+}
+
 void SipURI::setUri( string buildFrom ) {
 	size_t pos;
 	string uriData;
@@ -210,7 +214,7 @@ void SipURI::clear( ) {
 	this->validUri = false;
 }
 
-string SipURI::getString(){
+string SipURI::getString() const {
 	string uri = "";
 	
 	if( !isValid() ) {
@@ -241,7 +245,7 @@ string SipURI::getString(){
 	return uri;
 }
 
-string SipURI::getUserIpString(){
+string SipURI::getUserIpString() const {
 	string uri = "";
 	
 	if( !isValid() ) {
@@ -260,7 +264,7 @@ string SipURI::getUserIpString(){
 	return uri;
 }
 
-string SipURI::getRequestUriString() {
+string SipURI::getRequestUriString() const {
 	string uri = "";
 	
 	if( !isValid() ) {
@@ -291,7 +295,7 @@ void SipURI::setDisplayName(string dispName) {
 #endif
 }
 
-string SipURI::getDisplayName(){
+string SipURI::getDisplayName() const {
 	return displayName;
 }
 
@@ -302,7 +306,7 @@ void SipURI::setProtocolId(string id){
 #endif
 }
 
-string SipURI::getProtocolId(){
+string SipURI::getProtocolId() const {
 	return protocolId;
 }
 
@@ -315,7 +319,7 @@ void SipURI::setUser(string name){
 #endif
 }
 
-string SipURI::getUserName(){
+string SipURI::getUserName() const {
 	return userName;
 }
 
@@ -326,7 +330,7 @@ void SipURI::setIp(string ip){
 #endif
 }
 
-string SipURI::getIp(){
+string SipURI::getIp() const {
 	return ip;
 }
 
@@ -337,7 +341,7 @@ void SipURI::setPort(int32_t port){
 #endif
 }
 
-int32_t SipURI::getPort(){
+int32_t SipURI::getPort() const {
 	return port;
 }
 
@@ -348,7 +352,7 @@ void SipURI::setUserType(string type){
 #endif
 }
 
-string SipURI::getUserType(){
+string SipURI::getUserType() const {
 	return userType;
 }
 
@@ -359,7 +363,7 @@ void SipURI::setTransport(string transp){
 #endif
 }
 
-string SipURI::getTransport(){
+string SipURI::getTransport() const {
 	return transport;
 }
 

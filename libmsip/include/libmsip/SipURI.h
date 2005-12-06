@@ -61,6 +61,8 @@ class LIBMSIP_API SipURI : public MObject{
 		Basic constructor ... it creates an invalid uri
 		*/
 		SipURI() { clear(); };
+
+		~SipURI();
 		
 		/**
 		This constructor, and the setUri function, parse 
@@ -92,48 +94,48 @@ class LIBMSIP_API SipURI : public MObject{
 		/**
 		Return the whole uri ...
 		*/
-		string getString();
+		string getString() const;
 		
 		/**
 		Return only userName@ip
 		*/
-		string getUserIpString();
+		string getUserIpString() const;
 		
 		/**
 		Return the uri in a valid form to be used as a request uri, 
 		that is, without: display name, '<', '>' and parameters.
 		*/
-		string getRequestUriString();
+		string getRequestUriString() const;
 
 		virtual std::string getMemObjectType(){return "SipURI";}
 
 		void setDisplayName(string id);
-		string getDisplayName();
+		string getDisplayName() const;
 		
 		void setProtocolId(string protocolId);
-		string getProtocolId();
+		string getProtocolId() const;
 	
 		void setUser(string id);
-		string getUserName();
+		string getUserName() const;
 
 		void setIp(string ip);
-		string getIp();
+		string getIp() const;
 
 		void setPort(int32_t port);
-		int32_t getPort();
+		int32_t getPort() const;
 
 		void setUserType(string userType);
-		string getUserType();
+		string getUserType() const;
 
 		void setTransport(string transp);
-		string getTransport();
+		string getTransport() const;
 		
 		/**
 		Use it to check whether the uri has valid stuff in it ... 
 		don't use if not valid.
 		If invalid and used, the getXXXString functions will return nothing
 		*/
-		bool isValid() { return validUri; };
+		bool isValid() const { return validUri; };
 		
 		/**
 		Use at your own risk ... forces uri in a (in)valid state
