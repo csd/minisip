@@ -45,7 +45,6 @@ extern SipHeaderFactoryFuncPtr sipHeaderContentLengthFactory;
 
 class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 	public:
-		SipHeaderValueContentLength();
 		SipHeaderValueContentLength(int32_t length);
 		SipHeaderValueContentLength(const string &build_from);
 

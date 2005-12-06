@@ -63,14 +63,6 @@ SipHeaderFactoryFuncPtr sipHeaderAcceptContactFactory=acceptContactFactory;
 const string sipHeaderValueValueTypeStr = "Accept-Contact";
 
 /**
- * Constructor
- */	
-SipHeaderValueAcceptContact::SipHeaderValueAcceptContact():SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT, sipHeaderValueValueTypeStr){
-
-}
-
-
-/**
  * Constructor. Parses the header from a string
  * @param build_from	the header is parsed from this string.
  *			Expected form:

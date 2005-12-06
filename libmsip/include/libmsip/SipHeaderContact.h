@@ -49,7 +49,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderValueContact();
+//		SipHeaderValueContact();
 		SipHeaderValueContact(const string &build_from);
 		SipHeaderValueContact(const string &username, 
 				const string &ip, 

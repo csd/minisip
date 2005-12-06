@@ -36,6 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 /**
  * @author Erik Eliasson
@@ -43,29 +44,15 @@
 
 extern SipHeaderFactoryFuncPtr sipHeaderEventFactory;
 
-class LIBMSIP_API SipHeaderValueEvent: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueEvent: public SipHeaderValueString{
 	public:
-		SipHeaderValueEvent();
 		SipHeaderValueEvent(const string &build_from);
-
-		virtual ~SipHeaderValueEvent();
 
                 virtual std::string getMemObjectType(){return "SipHeaderEvent";}
 		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-		/**
-		 * @return The IP address of the contact header.
-		 */
-		string getEvent();
-		
-		void setEvent(const string &event);
-
-	private:
-		string event;
+		// string getString(); is inherited from
+		// SipHeaderValueString that returns the string
+		// passed to the constructor
 };
 
 #endif

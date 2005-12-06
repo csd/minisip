@@ -30,9 +30,10 @@
  * 
 */
 
+#include<libmsip/SipHeaderTo.h>
+
 #include<config.h>
 
-#include<libmsip/SipHeaderTo.h>
 #include<libmutil/trim.h>
 
 MRef<SipHeaderValue *> toFactory(const string &build_from){
@@ -44,11 +45,6 @@ SipHeaderFactoryFuncPtr sipHeaderToFactory=toFactory;
 
 const string sipHeaderValueToTypeStr = "To";
 		
-SipHeaderValueTo::SipHeaderValueTo()
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
-{
-}
-		
 
 SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
@@ -57,10 +53,10 @@ SipHeaderValueTo::SipHeaderValueTo(const string &build_from)
 }
 
 
-SipHeaderValueTo::SipHeaderValueTo(const string &username, const string &ip)
+SipHeaderValueTo::SipHeaderValueTo(const SipURI& u)
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
-	uri.setParams(username, ip,"",0);
+	uri = u;
 }
 
 SipHeaderValueTo::~SipHeaderValueTo(){
@@ -68,12 +64,7 @@ SipHeaderValueTo::~SipHeaderValueTo(){
 }
 
 string SipHeaderValueTo::getString(){
-	//cerr << "To::get_string" << endl;
-	string ret = /*"To: "+*/ uri.getString();
-//	if (tag.length()>0)
-//		ret=ret+";tag="+tag;
-	
-	return ret;
+	return uri.getString();
 } 
 
 SipURI &SipHeaderValueTo::getUri(){
@@ -83,14 +74,4 @@ SipURI &SipHeaderValueTo::getUri(){
 void SipHeaderValueTo::setUri(const SipURI &uri){
 	this->uri=uri;
 }
-		
-/*
-void SipHeaderValueTo::setTag(const string &tag){
-	this->tag=tag;
-}
-
-string SipHeaderValueTo::getTag(){
-	return tag;
-}
-*/
 

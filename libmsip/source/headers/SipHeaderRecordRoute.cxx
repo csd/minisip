@@ -53,19 +53,7 @@ SipHeaderFactoryFuncPtr sipHeaderRecordRouteFactory=recordrouteFactory;
 const string sipHeaderValueRecordRouteTypeStr = "Record-Route";
 
 SipHeaderValueRecordRoute::SipHeaderValueRecordRoute(const string &build_from)
-		: SipHeaderValue(SIP_HEADER_TYPE_RECORDROUTE,sipHeaderValueRecordRouteTypeStr)
+		: SipHeaderValueString(SIP_HEADER_TYPE_RECORDROUTE,sipHeaderValueRecordRouteTypeStr, build_from)
 {
-	route = trim(build_from);
-}
-
-SipHeaderValueRecordRoute::~SipHeaderValueRecordRoute(){
-}
-
-string SipHeaderValueRecordRoute::getString(){
-	return /*"Record-Route: "+*/route;
-}
-
-string SipHeaderValueRecordRoute::getRoute(){
-	return route;
 }
 

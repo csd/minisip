@@ -69,15 +69,14 @@ SipHeaderValueCSeq::SipHeaderValueCSeq(const string &build_from):SipHeaderValue(
 	setCSeq(atoi((trim(num)).c_str()));
 }
 
-SipHeaderValueCSeq::SipHeaderValueCSeq() : SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){
-	method="NOT_SET";
+SipHeaderValueCSeq::SipHeaderValueCSeq(const string &meth, int s) : SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr), method(meth),seq(s) {
 }
 
 SipHeaderValueCSeq::~SipHeaderValueCSeq(){
 }
 
 string SipHeaderValueCSeq::getString(){
-	return /*"CSeq: "+*/itoa(seq)+" "+method;
+	return itoa(seq)+" "+method;
 }
 
 string SipHeaderValueCSeq::getMethod(){
@@ -95,3 +94,4 @@ void SipHeaderValueCSeq::setCSeq(int32_t n){
 int32_t SipHeaderValueCSeq::getCSeq(){
 	return seq;
 }
+

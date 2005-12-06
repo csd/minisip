@@ -46,9 +46,8 @@ extern SipHeaderFactoryFuncPtr sipHeaderToFactory;
 
 class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 	public:
-		SipHeaderValueTo();
 		SipHeaderValueTo(const string &build_from);
-		SipHeaderValueTo(const string &username, const string &ip);
+		SipHeaderValueTo(const SipURI& uri);
 
 		virtual ~SipHeaderValueTo();
 		
@@ -65,11 +64,8 @@ class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 		SipURI &getUri();
 		void setUri(const SipURI &uri);
 		
-//		void setTag(const string &tag);
-//		string getTag();
 	private:
 		SipURI uri;
-//		string tag;
 };
 
 #endif

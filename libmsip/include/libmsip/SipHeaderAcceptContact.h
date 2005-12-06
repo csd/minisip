@@ -62,8 +62,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderAcceptContactFactory;
 class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 
 	public:
-		
-		SipHeaderValueAcceptContact();
+
 		SipHeaderValueAcceptContact(string build_from);
 		SipHeaderValueAcceptContact(string featuretag, 
 				bool set_require, 

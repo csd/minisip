@@ -51,32 +51,7 @@ SipHeaderFactoryFuncPtr sipHeaderEventFactory=eventFactory;
 const string sipHeaderValueEventTypeStr = "Event";
 
 SipHeaderValueEvent::SipHeaderValueEvent(const string &build_from)
-		: SipHeaderValue(SIP_HEADER_TYPE_EVENT,sipHeaderValueEventTypeStr)
+		: SipHeaderValueString(SIP_HEADER_TYPE_EVENT,sipHeaderValueEventTypeStr,build_from)
 {
-	event= trim(build_from);
-#ifdef DEBUG_OUTPUT
-	cerr << "DEBUG: parsed Event to: "<< event << endl;;
-#endif
-}
-
-SipHeaderValueEvent::SipHeaderValueEvent()
-		: SipHeaderValue(SIP_HEADER_TYPE_EVENT,sipHeaderValueEventTypeStr)
-{
-	event="NOT_SET";
-}
-
-SipHeaderValueEvent::~SipHeaderValueEvent(){
-}
-
-string SipHeaderValueEvent::getString(){
-	return /*"Event: "+*/ event;
-}
-
-string SipHeaderValueEvent::getEvent(){
-	return event;
-}
-		
-void SipHeaderValueEvent::setEvent(const string &event){
-	this->event=event;
 }
 

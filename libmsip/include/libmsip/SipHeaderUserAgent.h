@@ -35,7 +35,7 @@
 
 #include<libmsip/libmsip_config.h>
 
-#include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 #define HEADER_USER_AGENT_DEFAULT	"Minisip"
 
@@ -45,29 +45,11 @@
 
 extern SipHeaderFactoryFuncPtr sipHeaderUserAgentFactory;
 
-class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValueString{
 	public:
-		SipHeaderValueUserAgent();
 		SipHeaderValueUserAgent(const string &build_from);
 
-		virtual ~SipHeaderValueUserAgent();
-
                 virtual std::string getMemObjectType(){return "SipHeaderUserAgent";}
-		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-		/**
-		 * @return The IP address of the contact header.
-		 */
-		string getUserAgent();
-		
-		void setUserAgent(const string &ua);
-		
-	private:
-		string user_agent;
 };
 
 #endif

@@ -53,29 +53,8 @@ SipHeaderFactoryFuncPtr sipHeaderContentTypeFactory=contenttypeFactory;
 const string sipHeaderValueContentTypeTypeStr = "Content-Type"; 
 
 SipHeaderValueContentType::SipHeaderValueContentType(const string &build_from)
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTTYPE,sipHeaderValueContentTypeTypeStr)
+		: SipHeaderValueString(SIP_HEADER_TYPE_CONTENTTYPE,sipHeaderValueContentTypeTypeStr, build_from)
 {
-	content_type=trim(build_from); //strlen("Content-Type:")
 }
 
-SipHeaderValueContentType::SipHeaderValueContentType()
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTTYPE,sipHeaderValueContentTypeTypeStr)
-{
-	content_type="NOT_SET";
-}
-
-SipHeaderValueContentType::~SipHeaderValueContentType(){
-}
-
-string SipHeaderValueContentType::getString(){
-	return /*"Content-Type: "+*/content_type;
-}
-
-string SipHeaderValueContentType::getContentType(){
-	return content_type;
-}
-		
-void SipHeaderValueContentType::setContentType(const string &content_type){
-	this->content_type=content_type;
-}
 

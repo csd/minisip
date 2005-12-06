@@ -50,42 +50,8 @@ SipHeaderFactoryFuncPtr sipHeaderCallIdFactory=callidFactory;
 
 const string sipHeaderValueCallIdTypeStr = "Call-ID";
 
-SipHeaderValueCallID::SipHeaderValueCallID(const string &build_from)
-	: SipHeaderValue(SIP_HEADER_TYPE_CALLID,sipHeaderValueCallIdTypeStr)
+SipHeaderValueCallID::SipHeaderValueCallID(const string& i)
+	: SipHeaderValueString(SIP_HEADER_TYPE_CALLID,sipHeaderValueCallIdTypeStr, i)
 {
-	unsigned i=0;
-	while (!(i>=build_from.length())){
-		id+=build_from[i];
-		i++;
-	}
-	id=trim(id);
-}
-
-SipHeaderValueCallID::SipHeaderValueCallID()
-	: SipHeaderValue(SIP_HEADER_TYPE_CALLID,sipHeaderValueCallIdTypeStr)
-{
-	id="NOT_SET";
-}
-
-SipHeaderValueCallID::~SipHeaderValueCallID(){
-}
-
-string SipHeaderValueCallID::getString(){
-	return /*"Call-ID: "+*/id;
-}
-
-string SipHeaderValueCallID::getId(){
-	return id;
-}
-		
-void SipHeaderValueCallID::setId(const string &id){
-	this->id=id;
-}
-
-void SipHeaderValueCallID::generateId(){
-#ifdef DEBUG_OUTPUT
-	cerr<<"TODO: running not implemented function (SipHeaderValueCallID::generate_id)"<< endl;
-#endif
-	this->id = string("RANDOM_NUMBER")+"@"+"LOCAL_IP";
 }
 

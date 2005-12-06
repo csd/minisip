@@ -61,12 +61,6 @@ SipHeaderValueContentLength::SipHeaderValueContentLength(const string &build_fro
 	content_length=atoi(num.c_str());
 }
 
-SipHeaderValueContentLength::SipHeaderValueContentLength()
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
-{
-	content_length=0;
-}
-
 SipHeaderValueContentLength::SipHeaderValueContentLength(int32_t length)
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {

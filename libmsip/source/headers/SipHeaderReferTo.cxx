@@ -52,33 +52,7 @@ SipHeaderFactoryFuncPtr sipHeaderReferToFactory=refertoFactory;
 const string sipHeaderValueReferToTypeStr = "Refer-To";
 
 SipHeaderValueReferTo::SipHeaderValueReferTo(const string &build_from)
-	: SipHeaderValue(SIP_HEADER_TYPE_REFERTO,sipHeaderValueReferToTypeStr)
+	: SipHeaderValueString(SIP_HEADER_TYPE_REFERTO,sipHeaderValueReferToTypeStr, build_from)
 {
-	unsigned i=0;
-	while (!(i>=build_from.length())){
-		uri+=build_from[i];
-		i++;
-	}
-	uri=trim(uri);
 }
 
-SipHeaderValueReferTo::SipHeaderValueReferTo()
-	: SipHeaderValue(SIP_HEADER_TYPE_REFERTO,sipHeaderValueReferToTypeStr)
-{
-	uri="NOT_SET";
-}
-
-SipHeaderValueReferTo::~SipHeaderValueReferTo(){
-}
-
-string SipHeaderValueReferTo::getString(){
-	return uri;
-}
-
-string SipHeaderValueReferTo::getUri(){
-	return uri;
-}
-		
-void SipHeaderValueReferTo::setUri(const string &uri){
-	this->uri=uri;
-}

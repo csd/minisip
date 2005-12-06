@@ -63,7 +63,7 @@ class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 		 */
 		int32_t getMaxForwards();
 		
-		void setMaxForwards(int32_t max);
+		//void setMaxForwards(int32_t max);
 
 	private:
 		int32_t max;

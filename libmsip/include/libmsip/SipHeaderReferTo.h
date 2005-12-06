@@ -36,7 +36,7 @@
 
 #include<libmsip/libmsip_config.h>
 
-#include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 /**
  * @author Erik Eliasson
@@ -46,31 +46,16 @@
 extern SipHeaderFactoryFuncPtr sipHeaderReferToFactory;
 
 
-class LIBMSIP_API SipHeaderValueReferTo: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueReferTo: public SipHeaderValueString{
 
 	public:
-		
-		SipHeaderValueReferTo();
+		/**
+		 * @param build_from	String that is expected to
+		 * 			be a sip uri.
+		 */
 		SipHeaderValueReferTo(const string &build_from);
 
-		virtual ~SipHeaderValueReferTo();
-		
                 virtual std::string getMemObjectType(){return "SipHeaderReferTo";}
-		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-		/**
-		 * @return The IP address of the contact header.
-		 */
-		string getUri();
-		
-		void setUri(const string &uri);
-
-	private:
-		string uri;
 };
 
 #endif

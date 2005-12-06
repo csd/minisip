@@ -37,15 +37,7 @@
 const string sipHeaderUnsupportedTypeString ="";
 
 SipHeaderValueUnsupported::SipHeaderValueUnsupported(const string &build_from)
-		:SipHeaderValue(SIP_HEADER_TYPE_UNSUPPORTED,sipHeaderUnsupportedTypeString)
+		:SipHeaderValueString(SIP_HEADER_TYPE_UNSUPPORTED,sipHeaderUnsupportedTypeString, build_from)
 {
-	string_data = build_from;
-}
-
-SipHeaderValueUnsupported::~SipHeaderValueUnsupported(){
-}
-
-string SipHeaderValueUnsupported::getString(){
-	return string_data;
 }
 

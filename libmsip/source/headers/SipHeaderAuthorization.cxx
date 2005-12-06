@@ -46,12 +46,6 @@ SipHeaderFactoryFuncPtr sipHeaderAuthorizationFactory=authorizationFactory;
 
 const string sipHeaderValueAuthorizationTypeString="Authorization";
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization() 
-	: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION,sipHeaderValueAuthorizationTypeString),uri()
-{
-
-}
-
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &typeStr) 
 	: SipHeaderValue(type, typeStr),uri()
 {

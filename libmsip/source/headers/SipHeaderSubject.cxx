@@ -30,12 +30,9 @@
  * 
 */
 
-#include<config.h>
-
-
 #include<libmsip/SipHeaderSubject.h>
 
-#include<libmutil/itoa.h>
+#include<config.h>
 
 MRef<SipHeaderValue *> subjectFactory(const string &build_from){
 	                return new SipHeaderValueSubject(build_from);
@@ -43,33 +40,10 @@ MRef<SipHeaderValue *> subjectFactory(const string &build_from){
 
 SipHeaderFactoryFuncPtr sipHeaderSubjectFactory=subjectFactory;
 
-
 const string sipHeaderValueSubjectTypeStr = "Subject";
 
 SipHeaderValueSubject::SipHeaderValueSubject(const string &build_from)
-		: SipHeaderValue(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr)
+		: SipHeaderValueString(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr, build_from)
 {
-	subject=build_from;
-}
-
-SipHeaderValueSubject::SipHeaderValueSubject()
-		: SipHeaderValue(SIP_HEADER_TYPE_SUBJECT,sipHeaderValueSubjectTypeStr)
-{
-	subject="NOT_SET";
-}
-
-SipHeaderValueSubject::~SipHeaderValueSubject(){
-}
-
-string SipHeaderValueSubject::getString(){
-	return /*"Subject: "+*/subject;
-}
-
-string SipHeaderValueSubject::getSubject(){
-	return subject;
-}
-		
-void SipHeaderValueSubject::setSubject(const string &subject){
-	this->subject=subject;
 }
 

@@ -46,7 +46,6 @@ extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthorizationFactory;
 
 class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthorization{
 	public:
-		SipHeaderValueProxyAuthorization();
 		SipHeaderValueProxyAuthorization(const string &build_from);
 		SipHeaderValueProxyAuthorization(const string &sip_method,
 				const string &username, 

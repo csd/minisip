@@ -45,10 +45,6 @@ SipHeaderFactoryFuncPtr sipHeaderProxyAuthorizationFactory=proxyauthorizationFac
 
 const string sipHeaderValueProxyAuthorization = "Proxy-Authorization";
 
-SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization() : SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,sipHeaderValueProxyAuthorization){
-//	type = SIP_HEADER_TYPE_PROXYAUTHORIZATION;
-}
-		
 
 SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string &build_from) 
 		: SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION, build_from,sipHeaderValueProxyAuthorization)

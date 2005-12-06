@@ -30,26 +30,19 @@
  * 
 */
 
+#include<libmsip/SipHeaderFrom.h>
+
 #include<config.h>
 
-
-#include<libmsip/SipHeaderFrom.h>
 #include<libmutil/trim.h>
 
 MRef<SipHeaderValue *> fromFactory(const string &build_from){
-	                return new SipHeaderValueFrom(build_from);
+	return new SipHeaderValueFrom(build_from);
 }
 
 SipHeaderFactoryFuncPtr sipHeaderFromFactory=fromFactory;
 
 const string sipHeaderValueFrom = "From";
-		
-SipHeaderValueFrom::SipHeaderValueFrom()
-		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
-{
-	//tag="";
-}
-		
 
 SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
@@ -57,10 +50,10 @@ SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from)
 	uri = SipURI( build_from );
 }
 
-SipHeaderValueFrom::SipHeaderValueFrom(const string &username, const string &ip)
+SipHeaderValueFrom::SipHeaderValueFrom(const SipURI& u)
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
 {
-	uri.setParams(username, ip, "", 0);
+	uri = u;
 }
 
 SipHeaderValueFrom::~SipHeaderValueFrom(){
@@ -68,13 +61,7 @@ SipHeaderValueFrom::~SipHeaderValueFrom(){
 }
 		
 string SipHeaderValueFrom::getString(){
-//	merr << "SipHeaderValueFrom: Runnign get_string"<< end;
-	string ret = /*"From: "+*/uri.getString();
-//	merr << "SipHeaderValueFrom: Runnign get_string(2)"<< end;
-//	if (tag.length()>0)
-//		ret=ret+";tag="+tag;
-//	merr << "SipHeaderValueFrom: returning string: "<< ret<< end;
-	return ret;
+	return uri.getString();
 } 
 
 SipURI &SipHeaderValueFrom::getUri(){
@@ -85,12 +72,3 @@ void SipHeaderValueFrom::setUri(const SipURI &uri){
 	this->uri=uri;
 }
 		
-/*
-void SipHeaderValueFrom::setTag(const string &tag){
-	this->tag = tag;
-}
-
-string SipHeaderValueFrom::getTag(){
-	return tag;
-}
-*/

@@ -43,35 +43,10 @@ MRef<SipHeaderValue *> useragentFactory(const string &build_from){
 
 SipHeaderFactoryFuncPtr sipHeaderUserAgentFactory=useragentFactory;
 
-
-
 const string sipHeaderValueTypeUserAgentTypeStr = "User-Agent";
 
 SipHeaderValueUserAgent::SipHeaderValueUserAgent(const string &build_from)
-		: SipHeaderValue(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr)
+		: SipHeaderValueString(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr, build_from)
 {
-	user_agent=build_from;
-}
-
-SipHeaderValueUserAgent::SipHeaderValueUserAgent()
-		: SipHeaderValue(SIP_HEADER_TYPE_USERAGENT,sipHeaderValueTypeUserAgentTypeStr)
-{
-	user_agent="NOT_SET";
-}
-
-SipHeaderValueUserAgent::~SipHeaderValueUserAgent(){
-
-}
-
-string SipHeaderValueUserAgent::getString(){
-	return /*"User-Agent: "+*/ user_agent;
-}
-
-string SipHeaderValueUserAgent::getUserAgent(){
-	return user_agent;
-}
-		
-void SipHeaderValueUserAgent::setUserAgent(const string &ua){
-	this->user_agent=ua;
 }
 

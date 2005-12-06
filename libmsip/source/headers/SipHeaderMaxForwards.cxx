@@ -51,7 +51,7 @@ SipHeaderValueMaxForwards::SipHeaderValueMaxForwards(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_MAXFORWARDS,sipHeaderValueMaxForwardsTypeStr),
 		max(-1)
 {
-	max = atoi( trim( build_from).c_str()); //strlen("max-forwards:")==13
+	max = atoi( trim( build_from).c_str());
 }
 
 SipHeaderValueMaxForwards::SipHeaderValueMaxForwards(int32_t mf)
@@ -70,8 +70,10 @@ string SipHeaderValueMaxForwards::getString(){
 int32_t SipHeaderValueMaxForwards::getMaxForwards(){
 	return max;
 }
-		
+
+/*
 void SipHeaderValueMaxForwards::setMaxForwards(int32_t m){
 	max=m;
 }
+*/
 

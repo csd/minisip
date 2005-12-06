@@ -43,14 +43,7 @@ SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory=proxyauthFactory;
 
 const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
-SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate()
-		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
-{
-	
-}
-		
-
-SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &/*build_from*/) //TODO: Parse proxy authenticate header value
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &/*build_from*/) //TODO: FIXME: Parse proxy authenticate header value
 		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
 {
 	
@@ -61,7 +54,7 @@ SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
 }
 		
 string SipHeaderValueProxyAuthenticate::getString(){
-	return /*"Proxy-Authenticate: "+*/method+", realm="+realm+", nonce="+nonce+", algorithm="+algorithm;
+	return method +", realm="+realm +", nonce="+nonce +", algorithm="+algorithm;
 } 
 
 string SipHeaderValueProxyAuthenticate::getMethod(){

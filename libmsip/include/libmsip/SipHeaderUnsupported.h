@@ -35,27 +35,23 @@
 
 #include<libmsip/libmsip_config.h>
 
-#include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 /**
+ * libmsip handles SIP headers that are not known to it by placing
+ * the entire header in a SipHeaderValueUnsupported. This is
+ * the only header where the "header value" also will contain
+ * the header "name" (the identifier starting the header line before 
+ * the colon). The "getString" method (inherited from 
+ * SipHeaderValueString) will therefore return the entire header.
+ * 
  * @author Erik Eliasson
 */
-
-class LIBMSIP_API SipHeaderValueUnsupported: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueUnsupported: public SipHeaderValueString{
 	public:
 		SipHeaderValueUnsupported(const string &build_from);
 
-		virtual ~SipHeaderValueUnsupported();
-
                 virtual std::string getMemObjectType(){return "SipHeaderUnsupported";}
-		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-	private:
-		string string_data;
 };
 
 #endif

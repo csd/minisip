@@ -56,6 +56,11 @@ SipHeaderValueRoute::SipHeaderValueRoute(const string &build_from)
 	route = trim(build_from);
 }
 
+//FIXME: This is against what a header value should contains.
+//This implementation puts several header values into a header
+//value (each comma separated value should be a header value by
+//it self - this is how it will be represented when it is 
+//received).
 SipHeaderValueRoute::SipHeaderValueRoute(list<string> &routeSet)
 		: SipHeaderValue(SIP_HEADER_TYPE_ROUTE,sipHeaderValueRouteTypeStr)
 {
@@ -73,7 +78,7 @@ SipHeaderValueRoute::~SipHeaderValueRoute(){
 }
 
 string SipHeaderValueRoute::getString(){
-	return /*"Route: "+*/route;
+	return route;
 }
 
 string SipHeaderValueRoute::getRoute(){

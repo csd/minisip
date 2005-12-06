@@ -35,7 +35,7 @@
 
 #include<libmsip/libmsip_config.h>
 
-#include<libmsip/SipHeader.h>
+#include<libmsip/SipHeaderString.h>
 
 /**
  * @author Erik Eliasson
@@ -43,24 +43,11 @@
 
 extern SipHeaderFactoryFuncPtr sipHeaderRecordRouteFactory;
 
-class LIBMSIP_API SipHeaderValueRecordRoute: public SipHeaderValue{
+class LIBMSIP_API SipHeaderValueRecordRoute: public SipHeaderValueString{
 	public:
-		SipHeaderValueRecordRoute();
 		SipHeaderValueRecordRoute(const string &build_from);
 
-		virtual ~SipHeaderValueRecordRoute();
-
                 virtual std::string getMemObjectType(){return "SipHeaderRecordRoute";}
-		
-		/**
-		 * returns string representation of the header
-		 */
-		string getString(); 
-
-		string getRoute();
-		
-	private:
-		string route;
 };
 
 #endif

@@ -47,7 +47,7 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderValueCSeq();
+		SipHeaderValueCSeq(const string &method, int seq);
 		SipHeaderValueCSeq(const string &build_from);
 
 		virtual ~SipHeaderValueCSeq();
@@ -64,7 +64,6 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 		 * @return The IP address of the contact header.
 		 */
 		int32_t getCSeq();
-		
 		void setCSeq(int32_t n);
 
 
