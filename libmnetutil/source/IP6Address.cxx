@@ -79,7 +79,7 @@ IP6Address::IP6Address(string addr){
 #ifdef DEBUG_OUTPUT
 		cerr << "ERROR:(in IP6Address) Unknown host: <" << ipaddr.c_str() <<">"<< endl;
 #endif
-		throw new HostNotFound( ipaddr );
+		throw HostNotFound( ipaddr );
 
 	}
 	unsigned short *ip = (unsigned short *)hp->h_addr;
@@ -163,7 +163,7 @@ void IP6Address::connect(Socket &socket, int32_t port){
 		cerr << "ERROR:(in IP6Address::connect) Unknown host: " << ipaddr << endl;
 #endif
 
-		throw new HostNotFound( ipaddr );
+		throw HostNotFound( ipaddr );
 	}
 	
 	struct sockaddr_in6 sin;
@@ -177,7 +177,7 @@ void IP6Address::connect(Socket &socket, int32_t port){
 	if (::connect(socket.getFd(), (struct sockaddr *)&sin, sizeof(sin)) < 0){
 		perror("(in IP6Address::connect()): connect");
 		socket.close();
-		throw new ConnectFailed( errno );
+		throw ConnectFailed( errno );
 	}
 
 }

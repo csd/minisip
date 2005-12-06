@@ -75,7 +75,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 #endif
 
 	if ((fd = (int32_t)socket(use_ipv6? PF_INET6:PF_INET, SOCK_DGRAM, IPPROTO_UDP ))<0){
-		throw new SocketFailed( errno );
+		throw SocketFailed( errno );
 	}
 	int32_t on=1;
 #ifndef WIN32
@@ -92,7 +92,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 		addr.sin6_addr=in6addr_any;
 	
 		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))!=0){
-			throw new BindFailed( errno );
+			throw BindFailed( errno );
 		}
 
 	}else
@@ -104,7 +104,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 		addr.sin_addr.s_addr=htonl(INADDR_ANY);
 	
 		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))!=0){
-			throw new BindFailed( errno );
+			throw BindFailed( errno );
 		}
 	}
 	return true;
@@ -137,11 +137,11 @@ int32_t UDPSocket::getPort(){
 int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len){
 	if (use_ipv6 && ( to_addr.getType() != IP_ADDRESS_TYPE_V6)){
 		cerr << "Error: trying to send to IPv4 address using IPv6 socket" << endl;
-		throw new SendFailed( errno );
+		throw SendFailed( errno );
 	}
 	if (!use_ipv6 && (to_addr.getType() != IP_ADDRESS_TYPE_V4)){
 		cerr << "Error: trying to send to IPv6 address using IPv4 socket" << endl;
-		throw new SendFailed( errno );
+		throw SendFailed( errno );
 	}
 	
 //	cerr << "DEBUG: sending UDP message of length "<< len <<" use_ipv6 is "<<use_ipv6<< endl; 

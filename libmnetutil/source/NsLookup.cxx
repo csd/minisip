@@ -68,7 +68,7 @@ string NsLookup::staticLookup_str(string addr){
 		     << gai_streror(err)<< endl;
 //		fprintf(stderr, "error : %s", gai_strerror(err));
 		freeaddrinfo(res);
-		throw new NsLookupHostNotFound(addr);
+		throw NsLookupHostNotFound(addr);
 		exit(1);
 	}
 */        

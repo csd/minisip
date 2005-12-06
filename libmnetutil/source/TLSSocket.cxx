@@ -67,7 +67,7 @@ TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
 	if( error <= 0 ){
 		cerr << "Could not establish an incoming TLS connection" << endl;
 		ERR_print_errors_fp(stderr);
-		throw new TLSConnectFailed( error, ssl );
+		throw TLSConnectFailed( error, ssl );
 	}
 }
 
@@ -105,7 +105,7 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 		if( this->ssl_ctx == NULL ){
 			cerr << "Could not create SSL session" << endl;
 			ERR_print_errors_fp(stderr);
-			throw new TLSInitFailed();
+			throw TLSInitFailed();
 		}
 		
 		if( sslCipherListIndex != 0 ) 
@@ -128,13 +128,13 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 			cert->get_openssl_private_key() ) <= 0 ){
 				cerr << "SSL: Could not use private key" << endl;
 				ERR_print_errors_fp(stderr);
-				throw new TLSContextInitFailed(); 
+				throw TLSContextInitFailed(); 
 			}
 			if( SSL_CTX_use_certificate( this->ssl_ctx,
 			cert->get_openssl_certificate() ) <= 0 ){
 				cerr << "SSL: Could not use certificate" << endl;
 				ERR_print_errors_fp(stderr);
-				throw new TLSContextInitFailed(); 
+				throw TLSContextInitFailed(); 
 			}
 		}
 
@@ -171,7 +171,7 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	if( err <= 0 ){
 		cerr << "SSL: connect failed" << endl;
 		ERR_print_errors_fp(stderr);
-		throw new TLSConnectFailed( err, this->ssl );
+		throw TLSConnectFailed( err, this->ssl );
 	}
 
 	try{
