@@ -63,6 +63,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderRecordRoute.cxx \
                      source/headers/SipHeaderReferTo.cxx \
                      source/headers/SipHeaderRoute.cxx \
+                     source/headers/SipHeaderString.cxx \
                      source/headers/SipHeaderSubject.cxx \
                      source/headers/SipHeaderTo.cxx \
                      source/headers/SipHeaderUnsupported.cxx \

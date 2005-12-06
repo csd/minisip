@@ -19,6 +19,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderRecordRoute.h \
                      libmsip/SipHeaderRoute.h \
                      libmsip/SipHeaderSubject.h \
+                     libmsip/SipHeaderString.h \
                      libmsip/SipHeaderTo.h \
                      libmsip/SipHeaderUnsupported.h \
                      libmsip/SipHeaderUserAgent.h \
