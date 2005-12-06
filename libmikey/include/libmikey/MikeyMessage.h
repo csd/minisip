@@ -26,7 +26,15 @@
 #ifndef MIKEYMESSAGE_H
 #define MIKEYMESSAGE_H
 
-#include<libmikey/libmikey_config.h>
+#ifdef _MSC_VER
+#ifdef LIBMIKEY_EXPORTS
+#define LIBMIKEY_API __declspec(dllexport)
+#else
+#define LIBMIKEY_API __declspec(dllimport)
+#endif
+#else
+#define LIBMIKEY_API
+#endif
 
 #include<list>
 #include<iostream>
@@ -41,6 +49,7 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
+#include<libmikey/KeyAgreementPKE.h>
 
 
 #define MIKEY_TYPE_PSK_INIT    0
@@ -76,6 +85,13 @@ class LIBMIKEY_API MikeyMessage{
 		MikeyMessage( KeyAgreementPSK * ka,
 			      int encrAlg = MIKEY_ENCR_AES_CM_128, 
 			      int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );
+		
+		//added by choehn
+		MikeyMessage(KeyAgreementPKE* ka,
+				  int encrAlg = MIKEY_ENCR_AES_CM_128,
+				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
+				  EVP_PKEY* privKeyInitiator = NULL);
+
 		~MikeyMessage();
 		
 		void addPayload( MikeyPayload * payload );
@@ -84,6 +100,13 @@ class LIBMIKEY_API MikeyMessage{
 		void addVPayload( int macAlg, uint64_t receivedT,
 			byte_t * authKey, uint32_t authKeyLength);
 		void addKemacPayload(
+				byte_t * tgk, int tgkLength,
+				byte_t * encrKey, byte_t * iv,
+				byte_t * authKey,
+				int encrAlg, int macAlg );
+				
+		//added by choehn
+		void addKemacPayloadPKE(
 				byte_t * tgk, int tgkLength,
 				byte_t * encrKey, byte_t * iv,
 				byte_t * authKey,
@@ -106,16 +129,28 @@ class LIBMIKEY_API MikeyMessage{
 
 		MikeyMessage * parseResponse( KeyAgreementDH  * ka );
 		MikeyMessage * parseResponse( KeyAgreementPSK * ka );
+		
+		//added by choehn
+		MikeyMessage * parseResponse( KeyAgreementPKE * ka );
 
 		void setOffer( KeyAgreementDH * ka );
 		void setOffer( KeyAgreementPSK * ka );
+		
+		//added by choehn
+		void setOffer( KeyAgreementPKE * ka );
 
 		MikeyMessage * buildResponse( KeyAgreementDH  * ka );
 		MikeyMessage * buildResponse( KeyAgreementPSK * ka );
+		
+		//added by choehn
+		MikeyMessage * buildResponse( KeyAgreementPKE * ka );
 
 
 		bool authenticate( KeyAgreementDH  * ka );
 		bool authenticate( KeyAgreementPSK * ka );
+		
+		//added by choehn
+		bool authenticate( KeyAgreementPKE * ka );
 
 	protected:
 		list<MikeyPayload *> payloads;
