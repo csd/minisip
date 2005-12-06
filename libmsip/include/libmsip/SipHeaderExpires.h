@@ -45,7 +45,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderExpiresFactory;
 
 class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 	public:
-		SipHeaderValueExpires();
+		SipHeaderValueExpires(int n=300);
 		SipHeaderValueExpires(const string &build_from);
 
 		virtual ~SipHeaderValueExpires();
@@ -62,7 +62,7 @@ class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 		 */
 		int32_t getTimeout();
 		
-		void setTimeout(int32_t timeout);
+//		void setTimeout(int32_t timeout);
 
 	private:
 		int32_t timeout;

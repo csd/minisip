@@ -36,6 +36,7 @@
 #include<libmsip/SipHeaderExpires.h>
 
 #include<libmutil/itoa.h>
+#include<libmutil/trim.h>
 
 MRef<SipHeaderValue *> expiresFactory(const string &build_from){
 	                return new SipHeaderValueExpires(build_from);
@@ -47,30 +48,40 @@ SipHeaderFactoryFuncPtr sipHeaderExpiresFactory=expiresFactory;
 
 const string sipHeaderValueExpiresTypeStr = "Expires";
 
-SipHeaderValueExpires::SipHeaderValueExpires(const string &/*build_from*/) //TODO: parse expires header
+SipHeaderValueExpires::SipHeaderValueExpires(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_EXPIRES,sipHeaderValueExpiresTypeStr)
 {
-	timeout=300;			//TODO: XXX
+	string tmp = trim(build_from);
+	char *endptr;
+	const char *s = tmp.c_str();
+	int n = strtol(s, &endptr, 10);
+	if (*endptr==0){
+		timeout=n;
+	}else{
+		merr << "WARNING: Could not parse Expires header - setting to 300 instead"<<end;
+		timeout=300;
+	}
 }
 
-SipHeaderValueExpires::SipHeaderValueExpires()
+SipHeaderValueExpires::SipHeaderValueExpires(int sec)
 		: SipHeaderValue(SIP_HEADER_TYPE_EXPIRES,sipHeaderValueExpiresTypeStr)
 {
-	timeout=300;
+	timeout=sec;
 }
 
 SipHeaderValueExpires::~SipHeaderValueExpires(){
 }
 
 string SipHeaderValueExpires::getString(){
-	return /*"Expires: "+*/ itoa(timeout);
+	return itoa(timeout);
 }
 
 int32_t SipHeaderValueExpires::getTimeout(){
 	return timeout;
 }
 		
+/*
 void SipHeaderValueExpires::setTimeout(int32_t timeout){
 	this->timeout=timeout;
 }
-
+*/
