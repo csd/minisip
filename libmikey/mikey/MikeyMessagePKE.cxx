@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <libmikey/MikeyMessage.h>
 #include <libmikey/MikeyPayloadHDR.h>
 #include <libmikey/MikeyPayloadT.h>
@@ -161,11 +163,12 @@ void MikeyMessage::addKemacPayloadPKE(byte_t* tgk, int tgkLength, byte_t* encrKe
 	MikeyPayloadKEMAC * payload;
 	
 	switch(encrAlg){
-		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_CM_128:
+		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_CM_128: {
 			AES* aes = new AES(encrKey, 16);
 			aes->ctr_encrypt(tgk, tgkLength, encrData, iv);
 			delete aes;
 			break;
+		}
 		case MIKEY_PAYLOAD_KEMAC_ENCR_NULL:
 			memcpy(encrData, tgk, tgkLength);
 			break;
@@ -563,13 +566,13 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 		
 		macInputLength = (kemac->encrDataLength() + 4);
 		macInput = new byte_t[macInputLength];
-		macInput[0] = (u_int8_t)kemac->encrAlg();
-		u_int16_t ip = (u_int16_t)kemac->encrDataLength();
+		macInput[0] = (uint8_t)kemac->encrAlg();
+		uint16_t ip = (uint16_t)kemac->encrDataLength();
 		memcpy(macInput + 1, &ip, 2);
 		macInput[1] = 0;   //TODO
 		macInput[2] = 0x22;
 		memcpy(macInput + 3, kemac->encrData(), kemac->encrDataLength());
-		macInput[3 + kemac->encrDataLength()] = (u_int8_t)kemac->macAlg();
+		macInput[3 + kemac->encrDataLength()] = (uint8_t)kemac->macAlg();
 		
 		ka->setCsbId( csbId() );
 	}

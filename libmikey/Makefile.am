@@ -12,6 +12,7 @@ mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyCsIdMap.cxx \
                      mikey/MikeyMessage.cxx \
                      mikey/MikeyMessageDH.cxx \
+                     mikey/MikeyMessagePKE.cxx \
                      mikey/MikeyMessagePSK.cxx \
                      mikey/MikeyPayloadCERT.cxx \
                      mikey/MikeyPayloadCHASH.cxx \
@@ -33,4 +34,5 @@ mikey_src =          mikey/MikeyException.cxx \
 ka_src =             keyagreement/keyagreement.cxx \
                      keyagreement/keyagreement_dh.cxx \
 	             keyagreement/keyagreement_psk.cxx \
+	             keyagreement/KeyAgreementPKE.cxx \
 		     keyagreement/keyvalidity.cxx

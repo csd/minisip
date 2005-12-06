@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <libmikey/KeyAgreementPKE.h>
 #include <openssl/rand.h>
 
