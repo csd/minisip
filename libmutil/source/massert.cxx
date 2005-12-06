@@ -1,7 +1,7 @@
 
-#include<libmutil/massert.h>
-
 #include<config.h>
+
+#include<libmutil/massert.h>
 
 #include<string.h>
 #include<iostream>

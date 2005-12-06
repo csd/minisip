@@ -42,15 +42,7 @@ extern "C"{
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-#ifdef _MSC_VER
-#ifdef LIBMUTIL_EXPORTS
-#define LIBMUTIL_API __declspec(dllexport)
-#else
-#define LIBMUTIL_API __declspec(dllimport)
-#endif
-#else
-#define LIBMUTIL_API
-#endif
+#include<libmutil/libmutil_config.h>
 
 class certificate;
 

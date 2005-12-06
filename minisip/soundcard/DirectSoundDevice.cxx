@@ -29,6 +29,7 @@
 #include"DirectSoundDevice.h"
 
 #include<config.h>
+#include<wincon.h>
 
 #include<libmutil/merror.h>
 

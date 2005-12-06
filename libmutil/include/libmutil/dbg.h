@@ -30,15 +30,7 @@
 #define DBG_INFO 0
 #define DBG_ERROR 1
 
-#ifdef _MSC_VER
-#ifdef LIBMUTIL_EXPORTS
-#define LIBMUTIL_API __declspec(dllexport)
-#else
-#define LIBMUTIL_API __declspec(dllimport)
-#endif
-#else
-#define LIBMUTIL_API
-#endif
+#include<libmutil/libmutil_config.h>
 
 class LIBMUTIL_API DbgEndl{
     public:

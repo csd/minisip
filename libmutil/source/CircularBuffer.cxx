@@ -20,9 +20,8 @@
 See Note in the header file about the source.
 */
 
-#include <libmutil/CircularBuffer.h>
-
 #include <config.h>
+#include <libmutil/CircularBuffer.h>
 
 // #include<stdio.h>
 

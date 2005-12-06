@@ -25,15 +25,7 @@
 #ifndef SIPDialogREGISTER_H
 #define SIPDialogREGISTER_H
 
-#ifdef _MSC_VER
-#ifdef LIBMSIP_EXPORTS
-#define LIBMSIP_API __declspec(dllexport)
-#else
-#define LIBMSIP_API __declspec(dllimport)
-#endif
-#else
-#define LIBMSIP_API
-#endif
+#include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>

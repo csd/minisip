@@ -21,9 +21,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libmsip/SipCommandString.h>
-
 #include<config.h>
+#include<libmsip/SipCommandString.h>
 
 using namespace std;
 

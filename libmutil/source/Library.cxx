@@ -1,4 +1,5 @@
 
+#include<config.h>
 #include<libmutil/Library.h>
 #include<libmutil/massert.h>
 

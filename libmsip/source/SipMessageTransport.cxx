@@ -64,6 +64,9 @@
 #define NB_THREADS 5
 #define BUFFER_UNIT 1024
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+# define ENABLE_TS
+#endif
 
 #ifdef _MSC_VER
 static int nocaseequal(char c1, char c2){
@@ -211,11 +214,11 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 					memcpy(&tmp[0], buffer , 11);
 					string messageString( (char *)buffer, index );
 					init();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save(tmp);
 #endif
 					MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("createMessage end");
 #endif
 					return msg;
@@ -234,11 +237,11 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				memcpy(&tmp[0], buffer , 11);
 				string messageString( (char*)buffer, index );
 				init();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save(tmp);
 #endif
 				MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save("createMessage end");
 #endif
 				return msg;
@@ -623,7 +626,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (STREAM)", packetString);
 #endif
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 			//ts.save( PACKET_OUT );
 			char tmp[12];
 			tmp[11]=0;
@@ -638,7 +641,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 #ifdef DEBUG_OUTPUT
 			printMessage("OUT (UDP)", packetString);
 #endif
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 			//ts.save( PACKET_OUT );
 			char tmp[12];
 			tmp[11]=0;
@@ -773,7 +776,7 @@ void SipMessageTransport::udpSocketRead(){
 			}
 
 			try{
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				//ts.save( PACKET_IN );
 				char tmp[12];
 				tmp[11]=0;
@@ -891,7 +894,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// Connection was closed
 				break;
 			}
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 			//ts.save( PACKET_IN );
 
 

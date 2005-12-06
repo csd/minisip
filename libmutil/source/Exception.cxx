@@ -1,7 +1,6 @@
 
-#include<libmutil/Exception.h>
-
 #include<config.h>
+#include<libmutil/Exception.h>
 
 #ifdef HAVE_EXECINFO_H
 #include <execinfo.h>

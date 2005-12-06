@@ -85,7 +85,7 @@ bool Session::responderAuthenticate( string message ){
 						}
 						ka->setInitiatorData( init_mes );
 
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_START );
 #endif
 						if( init_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
@@ -100,7 +100,7 @@ bool Session::responderAuthenticate( string message ){
 
 						merr << "Authentication successful, controling the certificate" << end;
 
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( TMP );
 #endif
 						if( securityConfig.check_cert ){
@@ -113,7 +113,7 @@ bool Session::responderAuthenticate( string message ){
 								return false;
 							}
 						}
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_END );
 #endif
 
@@ -133,7 +133,7 @@ bool Session::responderAuthenticate( string message ){
 						ka = new KeyAgreementPSK( securityConfig.psk, securityConfig.psk_length );
 						ka->setInitiatorData( init_mes );
 						
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_START );
 #endif
 
@@ -145,7 +145,7 @@ bool Session::responderAuthenticate( string message ){
 							return false;
 						}
 						
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_END );
 #endif
 
@@ -238,25 +238,25 @@ string Session::responderParse(){
 	try{
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_START );
 #endif
 
 				addStreamsToKa( false );
 				responseMessage = initMessage->buildResponse((KeyAgreementDH *)*ka);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_END );
 #endif
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_START );
 #endif
 				
 				addStreamsToKa( false );
 
 				responseMessage = initMessage->buildResponse((KeyAgreementPSK *)*ka);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_END );
 #endif
 				break;
@@ -321,7 +321,7 @@ string Session::initiatorCreate(){
 				if( !securityConfig.cert || securityConfig.cert->is_empty() ){
 					throw MikeyException( "No certificate provided for DH key agreement" );
 				}
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( DH_PRECOMPUTE_START );
 #endif
 
@@ -332,29 +332,29 @@ string Session::initiatorCreate(){
 					ka = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 				}
 				addStreamsToKa();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( DH_PRECOMPUTE_END );
 #endif
 				message = new MikeyMessage( ((KeyAgreementDH *)*ka) );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_END );
 #endif
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( DH_PRECOMPUTE_START );
 #endif
 				ka = new KeyAgreementPSK( securityConfig.psk, securityConfig.psk_length );
 				addStreamsToKa();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( DH_PRECOMPUTE_END );
 #endif
 				((KeyAgreementPSK *)*ka)->generateTgk();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_START );
 #endif
 				message = new MikeyMessage( ((KeyAgreementPSK *)*ka) );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_END );
 #endif
 				break;
@@ -404,7 +404,7 @@ bool Session::initiatorAuthenticate( string message ){
 				switch( securityConfig.ka_type ){
 					case KEY_MGMT_METHOD_MIKEY_DH:
 						
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_START );
 #endif
 						if( resp_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
@@ -412,7 +412,7 @@ bool Session::initiatorAuthenticate( string message ){
 							  "Authentication of the DH response message failed" );
 						}
 						
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( TMP );
 #endif
 						if( securityConfig.check_cert ){
@@ -420,7 +420,7 @@ bool Session::initiatorAuthenticate( string message ){
 								throw MikeyExceptionAuthentication(
 									"Certificate control failed" );
 						}
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_END );
 #endif
 						securityConfig.secured = true;
@@ -437,14 +437,14 @@ bool Session::initiatorAuthenticate( string message ){
 						
 					case KEY_MGMT_METHOD_MIKEY_PSK:
 
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_START );
 #endif
 						if( resp_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
 							throw MikeyExceptionAuthentication(
 							"Authentication of the PSK verification message failed" );
 						}
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 						ts.save( AUTH_END );
 #endif
 					/*	
@@ -525,20 +525,20 @@ string Session::initiatorParse(){
 			
 		switch( securityConfig.ka_type ){
 			case KEY_MGMT_METHOD_MIKEY_DH:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_START );
 #endif
 				responseMessage = initMessage->parseResponse((KeyAgreementDH *)*ka);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_END );
 #endif
 				break;
 			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_START );
 #endif
 				responseMessage = initMessage->parseResponse((KeyAgreementPSK *)*ka);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 				ts.save( MIKEY_PARSE_END );
 #endif
 

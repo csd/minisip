@@ -26,15 +26,7 @@
 #ifndef KEYAGREEMENT_H
 #define KEYAGREEMENT_H
 
-#ifdef _MSC_VER
-#ifdef LIBMIKEY_EXPORTS
-#define LIBMIKEY_API __declspec(dllexport)
-#else
-#define LIBMIKEY_API __declspec(dllimport)
-#endif
-#else
-#define LIBMIKEY_API
-#endif
+#include<libmikey/libmikey_config.h>
 
 #include<assert.h>
 #include<iostream>

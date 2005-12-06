@@ -23,6 +23,7 @@ pkginclude_HEADERS =    libmikey/exception.h \
 			libmikey/MikeyPayloadT.h \
 			libmikey/MikeyPayloadV.h \
 			libmikey/MikeyCsIdMap.h \
-			libmikey/oakley_groups.h
-			
+			libmikey/oakley_groups.h \
+			libmikey/libmikey_config.h
+
 noinst_HEADERS = 	config.h

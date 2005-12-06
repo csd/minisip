@@ -22,10 +22,8 @@
 */
 
 
-#include<libmutil/CondVar.h>
-
 #include<config.h>
-
+#include<libmutil/CondVar.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/merror.h>
 #if defined WIN32

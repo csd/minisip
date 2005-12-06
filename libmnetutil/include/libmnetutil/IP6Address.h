@@ -24,15 +24,7 @@
 #ifndef IP6ADDRESS_H
 #define IP6ADDRESS_H
 
-#ifdef _MSC_VER
-#ifdef LIBMNETUTIL_EXPORTS
-#define LIBMNETUTIL_API __declspec(dllexport)
-#else
-#define LIBMNETUTIL_API __declspec(dllimport)
-#endif
-#else
-#define LIBMNETUTIL_API
-#endif
+#include<libmnetutil/libmnetutil_config.h>
 
 #include "IPAddress.h"
 

@@ -13,7 +13,8 @@ pkginclude_HEADERS =    libmnetutil/IP4Address.h \
 			libmnetutil/TLSSocket.h \
 			libmnetutil/NsLookup.h \
 			libmnetutil/NetUtil.h \
-			libmnetutil/UDPSocket.h
+			libmnetutil/UDPSocket.h \
+			libmnetutil/libmnetutil_config.h
 
 noinst_HEADERS = 	config.h
 

@@ -25,15 +25,7 @@
 #ifndef KEYVALIDITY_H
 #define KEYVALIDITY_H
 
-#ifdef _MSC_VER
-#ifdef LIBMIKEY_EXPORTS
-#define LIBMIKEY_API __declspec(dllexport)
-#else
-#define LIBMIKEY_API __declspec(dllimport)
-#endif
-#else
-#define LIBMIKEY_API
-#endif
+#include<libmikey/libmikey_config.h>
 
 #define KEYVALIDITY_NULL     0
 #define KEYVALIDITY_SPI      1

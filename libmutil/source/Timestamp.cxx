@@ -25,6 +25,9 @@
 
 #ifndef WIN32
 #ifndef _MSC_VER
+
+#include<config.h>
+
 #include<libmutil/Timestamp.h>
 
 

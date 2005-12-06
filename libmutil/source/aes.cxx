@@ -22,8 +22,9 @@
 */
 
 
-#include <libmutil/aes.h>
 #include<config.h>
+
+#include <libmutil/aes.h>
 
 //debug:
 #ifdef DEBUG_OUTPUT

@@ -32,15 +32,7 @@
 #define MINILIST_FORWARD_ITERATOR_OPTIMIZE 1
 //#undef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 
-#ifdef _MSC_VER
-#ifdef LIBMUTIL_EXPORTS
-#define LIBMUTIL_API __declspec(dllexport)
-#else
-#define LIBMUTIL_API __declspec(dllimport)
-#endif
-#else
-#define LIBMUTIL_API
-#endif
+#include<libmutil/libmutil_config.h>
 
 //#define MINILIST_VALIDATE
 

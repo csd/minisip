@@ -24,15 +24,7 @@
 #ifndef HMAC_H
 #define HMAC_H
 
-#ifdef _MSC_VER
-#ifdef LIBMUTIL_EXPORTS
-#define LIBMUTIL_API __declspec(dllexport)
-#else
-#define LIBMUTIL_API __declspec(dllimport)
-#endif
-#else
-#define LIBMUTIL_API
-#endif
+#include<libmutil/libmutil_config.h>
 
 LIBMUTIL_API void hmac_sha1( unsigned char * key, unsigned int key_length,
                 unsigned char * data, unsigned int data_length,

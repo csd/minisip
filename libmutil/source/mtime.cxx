@@ -22,9 +22,9 @@
 */
 
 
-#include<libmutil/mtime.h>
 #include<config.h>
 
+#include<libmutil/mtime.h>
 
 #include<time.h>
 

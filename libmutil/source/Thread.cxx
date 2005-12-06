@@ -23,10 +23,10 @@
 
 
 
+#include<config.h>
+
 #include<libmutil/Thread.h>
 
-
-#include<config.h>
 
 #ifdef WIN32 
 //#include"stdafx.h"

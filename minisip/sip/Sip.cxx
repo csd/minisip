@@ -125,7 +125,7 @@ void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
 string Sip::invite(string &user){
 	bool gotAtSign;
 	SipDialogSecurityConfig securityConfig;
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
 	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
@@ -214,7 +214,7 @@ string Sip::invite(string &user){
         cerr << "After addDialog" << endl;
 #endif
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( TMP );
 #endif
 	
@@ -235,7 +235,7 @@ string Sip::invite(string &user){
 }
 string Sip::confjoin(string &user, minilist<ConfMember> *list, string confId){
 	SipDialogSecurityConfig securityConfig;
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
 	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
@@ -322,7 +322,7 @@ MRef<Session *> mediaSession =
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 	
 	CommandString inv(voipConfCall->getCallId(), SipCommandString::invite, user);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( TMP );
 #endif
 	
@@ -334,7 +334,7 @@ MRef<Session *> mediaSession =
 }
 string Sip::confconnect(string &user, string confId){
 	SipDialogSecurityConfig securityConfig;
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
 	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
@@ -421,7 +421,7 @@ MRef<Session *> mediaSession =
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 	
 	CommandString inv(voipConfCall->getCallId(), SipCommandString::invite, user);
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( TMP );
 #endif
 	

@@ -21,6 +21,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 
 #include<libmutil/print_hex.h>
 

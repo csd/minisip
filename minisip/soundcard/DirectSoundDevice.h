@@ -27,7 +27,7 @@
 
 #include"SoundDevice.h"
 
-#include"Dsound.h"
+#include"dsound.h"
 
 //#define NUM_PLAY_NOTIFICATIONS  16
 

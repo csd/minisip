@@ -31,6 +31,8 @@
  * 	Removes whitespace in the start and end of a String.
 */
 
+#include<config.h>
+
 #include<libmutil/trim.h>
 #include<libmutil/mtypes.h>
 #include<ctype.h>

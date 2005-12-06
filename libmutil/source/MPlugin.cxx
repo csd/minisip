@@ -1,6 +1,6 @@
-#include<libmutil/MPlugin.h>
-
 #include<config.h>
+
+#include<libmutil/MPlugin.h>
 #include<libmutil/Library.h>
 
 #include<sys/types.h>

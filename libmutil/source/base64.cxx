@@ -22,10 +22,11 @@
 */
 
 
+#include<config.h>
+
 #include <libmutil/base64.h>
 #define LINE_LENGTH 60
 
-#include<config.h>
 
 using namespace std;
 

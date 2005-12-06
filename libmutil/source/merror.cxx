@@ -1,7 +1,7 @@
 
-#include<libmutil/merror.h>
-
 #include<config.h>
+
+#include<libmutil/merror.h>
 
 #ifdef _MSC_VER
 #include<Windows.h>

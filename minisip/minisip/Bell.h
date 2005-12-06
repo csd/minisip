@@ -27,6 +27,7 @@
 #include<sys/types.h>
 #include<signal.h>
 #include<string>
+#include<libmutil/MemObject.h>
 //#include<libmutil/TimeoutProvider.h>
 
 using namespace std;

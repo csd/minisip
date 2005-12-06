@@ -354,7 +354,7 @@ static bool first=true;
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	SRtpPacket * packet;
 	if (first){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("rtp_send");
 #endif
 		first=false;

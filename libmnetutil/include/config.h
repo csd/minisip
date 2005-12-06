@@ -23,6 +23,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifndef LIBMNETUTIL_EXPORTS
+# ifdef DLL_EXPORT
+#  define LIBMUTIL_IMPORTS
+#  define LIBMNETUTIL_EXPORTS
+# endif  // DLL_EXPORT
+#endif  // LIBMNETUTIL_EXPORTS
 
 #ifdef _MSC_VER 
 

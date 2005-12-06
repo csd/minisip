@@ -184,7 +184,7 @@ gui(failed)              |                                    |  a5:new ByeResp|
 bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipCommandString::invite)){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("a0_start_callingnoauth_invite");
 #endif
 		//int seqNo = requestSeqNo();
@@ -221,7 +221,7 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 
 		MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
 
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save( RINGING );
 #endif
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
@@ -232,10 +232,11 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 		
 		//string peerUri = command.getCommandPacket()->getTo().getString();
 		string peerUri = dialogState.remoteUri; //use the dialog state ...
-	
-		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
-		if ( !sdp.isNull() ){
-			//Early media
+
+		MRef<SipMessageContent *> content = resp->getContent();
+		if( !content.isNull() ){
+			MRef<SdpPacket*> sdp((SdpPacket*)*content);
+			//Early media	
 			getMediaSession()->setSdpAnswer( sdp, peerUri );
 		}
 
@@ -261,7 +262,7 @@ bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &comm
 bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("a3_callingnoauth_incall_2xx");
 #endif
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
@@ -540,7 +541,7 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipCommandString::accept_invite)){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save(USER_ACCEPT);
 #endif
 
@@ -706,7 +707,7 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 	
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save( RINGING );
 #endif
 
@@ -1318,11 +1319,11 @@ void SipDialogVoip::sendInvite(const string &branch){
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		sdp = mediaSession->getSdpOffer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		if( !sdp ){
@@ -1423,11 +1424,11 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		sdp = mediaSession->getSdpOffer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		if( !sdp ){
@@ -1651,11 +1652,11 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
 #endif
 		sdp = mediaSession->getSdpAnswer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
 #endif
 		if( !sdp ){
@@ -1927,17 +1928,17 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
 			switch (type){
 				case 10:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpOffer");
 #endif
 					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpOffer");
 #endif
 					return true;
 				case 3:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpAnswer");
 #endif
 					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) ){
@@ -1945,7 +1946,7 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 						return false;
 					}
 					getMediaSession()->start();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpAnswer");
 #endif
 					return true;

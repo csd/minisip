@@ -26,15 +26,7 @@
 #ifndef MIKEYCSIDMAP_H
 #define MIKEYCSIDMAP_H
 
-#ifdef _MSC_VER
-#ifdef LIBMIKEY_EXPORTS
-#define LIBMIKEY_API __declspec(dllexport)
-#else
-#define LIBMIKEY_API __declspec(dllimport)
-#endif
-#else
-#define LIBMIKEY_API
-#endif
+#include<libmikey/libmikey_config.h>
 
 #define HDR_CS_ID_MAP_TYPE_SRTP_ID 0
 #define HDR_CS_ID_MAP_TYPE_IPSEC4_ID 7

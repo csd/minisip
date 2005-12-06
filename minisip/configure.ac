@@ -444,6 +444,34 @@ dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
 dnl
+dnl libmutil
+dnl
+AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
+	headers/library. Try installing the libmutil-devel package for your
+	distribution."])])
+AC_CHECK_LIB([mutil], [main],
+	[
+		LIBS="-lmutil ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
+	])
+
+
+dnl
+dnl libmnetutil
+dnl
+AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
+        headers/library. Try installing the libmnetutil-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mnetutil], [main],
+        [
+                LIBS="-lmnetutil ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
+        ])
+
+
+dnl
 dnl libmsip
 dnl
 AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
@@ -472,6 +500,9 @@ AC_CHECK_LIB([mikey], [main],
 dnl Checks for libraries.
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
+AC_CHECK_LIB([dsound], [main])
+AC_CHECK_LIB([uuid], [main])
+AC_CHECK_LIB([dxguid], [main])
 
 dnl FIXME: Replace `main' with a function in `-lX11':
 AC_CHECK_LIB([X11], [main])

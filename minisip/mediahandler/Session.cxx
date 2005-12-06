@@ -439,11 +439,11 @@ void Session::start(){
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
 
 	if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( TGK_START );
 #endif
 	((KeyAgreementDH *)*ka)->computeTgk();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	ts.save( TGK_END );
 #endif
 	}

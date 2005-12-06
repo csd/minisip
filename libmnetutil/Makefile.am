@@ -6,6 +6,7 @@ EXTRA_DIST = libmnetutil.spec
 
 lib_LTLIBRARIES = libmnetutil.la
 libmnetutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include
+libmnetutil_la_LDFLAGS = -no-undefined
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
 

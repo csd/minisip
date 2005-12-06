@@ -22,13 +22,14 @@
 */
 
 
+#include<config.h>
+
 #include<libmutil/XMLParser.h>
 #include<fstream>
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 #include<iostream>
 #include<sys/types.h>
-#include<config.h>
 
 
 static bool is_blank(char c){

@@ -30,6 +30,8 @@
  * 	Takes a string as argument and splits it at any new line.
 */
 
+#include<config.h>
+
 #include<libmutil/split_in_lines.h>
 #include<libmutil/trim.h>
 #include<string>

@@ -26,15 +26,7 @@
 #ifndef _SIPTIMERS_H
 #define _SIPTIMERS_H
 
-#ifdef _MSC_VER
-#ifdef LIBMSIP_EXPORTS
-#define LIBMSIP_API __declspec(dllexport)
-#else
-#define LIBMSIP_API __declspec(dllimport)
-#endif
-#else
-#define LIBMSIP_API
-#endif
+#include<libmsip/libmsip_config.h>
 
 #include<libmutil/MemObject.h>
 

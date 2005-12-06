@@ -21,7 +21,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
+#include<config.h>
 #include<libmutil/CommandString.h>
 
 CommandString::CommandString(string destination_id, 

@@ -22,11 +22,11 @@
 */
 
 
+#include<config.h>
 
 #include<libmutil/Mutex.h>
 #include<libmutil/merror.h>
 
-#include<config.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<libmutil/massert.h>

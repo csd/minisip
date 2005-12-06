@@ -23,6 +23,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifndef LIBMSIP_EXPORTS
+# ifdef DLL_EXPORT
+#  define LIBMUTIL_IMPORTS
+#  define LIBMNETUTIL_IMPORTS
+#  define LIBMSIP_EXPORTS
+# endif	 // DLL_EXPORT
+#endif	// LIBMSIP_EXPORTS
+
 
 #ifdef _MSC_VER
 #define W32			//FIXME: not correct for WCE env?

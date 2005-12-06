@@ -23,6 +23,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifndef LIBMUTIL_EXPORTS
+# ifdef DLL_EXPORT
+#  define LIBMUTIL_EXPORTS
+#  define OPENSSL_OPT_WINDLL	// import Windows dll
+# endif	 // DLL_EXPORT
+#endif	// LIBMUTIL_EXPORTS
 
 
 #ifdef _MSC_VER

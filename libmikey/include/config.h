@@ -25,6 +25,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifndef LIBMIKEY_EXPORTS
+# ifdef DLL_EXPORT
+#  define LIMMUTIL_IMPORTS
+#  define LIBMIKEY_EXPORTS
+#  define OPENSSL_OPT_WINDLL	// import Windows dll
+# endif	 // DLL_EXPORT
+#endif	// LIBMIKEY_EXPORTS
+
 
 #ifdef _MSC_VER 
 

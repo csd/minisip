@@ -1,6 +1,8 @@
 #ifndef SIP_DIALOG_SECURITY_CONFIG
 #define SIP_DIALOG_SECURITY_CONFIG
 
+#include<libmutil/MemObject.h>
+
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10
 #define KEY_MGMT_METHOD_MIKEY_DH        0x11

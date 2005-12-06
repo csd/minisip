@@ -35,19 +35,12 @@
 #ifndef SIPDialogCONFIG_H
 #define SIPDialogCONFIG_H
 
-#ifdef _MSC_VER
-#ifdef LIBMSIP_EXPORTS
-#define LIBMSIP_API __declspec(dllexport)
-#else
-#define LIBMSIP_API __declspec(dllimport)
-#endif
-#else
-#define LIBMSIP_API
-#endif
+#include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipInvite.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
+#include<libmutil/Mutex.h>
 
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10

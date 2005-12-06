@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2005  Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,41 +20,24 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
+#ifndef _MLIBMIKEY_CONFIG_H
+#define _MLIBMIKEY_CONFIG_H
 
-#ifndef MIKEYPAYLOADV_H
-#define MIKEYPAYLOADV_H
-
-#include<libmikey/libmikey_config.h>
-
-#include<libmikey/MikeyPayload.h>
-
-#define MIKEYPAYLOAD_V_PAYLOAD_TYPE 9
-
-#define MIKEY_PAYLOAD_V_MAC_HMAC_SHA1_160 0
-#define MIKEY_PAYLOAD_V_MAC_NULL 1
-/**
- * @author Erik Eliasson, Johan Bilien
-*/
-class LIBMIKEY_API MikeyPayloadV : public MikeyPayload{
-	public:
-		MikeyPayloadV( int mac_alg, byte_t * verData );
-		MikeyPayloadV( byte_t * start, int lengthLimit );
-
-		virtual void writeData( byte_t * start, int expectedLength );
-		virtual int length();
-
-		int macAlg();
-		byte_t * verData();
-
-		void setMac( byte_t * data );
-
-	private:
-		int macAlgValue;
-		byte_t * verDataPtr;
-		
-};
-
-
+#ifdef _MSC_VER
+# ifndef LIBMIKEY_EXPORTS
+#  define LIBMIKEY_IMPORTS
+# endif
 #endif
+
+#if defined(WIN32) && defined(LIBMIKEY_EXPORTS)
+# define LIBMIKEY_API __declspec(dllexport)
+#elif defined(WIN32) && defined(LIBMIKEY_IMPORTS)
+# define LIBMIKEY_API __declspec(dllimport)
+#else
+# define LIBMIKEY_API
+#endif
+
+#endif	// _MLIBMIKEY_CONFIG_H

@@ -34,9 +34,10 @@
 
 
 
+#include<config.h>
+
 #include<libmutil/itoa.h>
 #include<stdio.h>
-#include<config.h>
 #include<assert.h>
 using namespace std;
 

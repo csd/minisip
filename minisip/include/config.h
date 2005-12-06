@@ -23,8 +23,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define LIBMUTIL_IMPORTS
+#define LIBMNETUTIL_IMPORTS
+#define LIBMSIP_IMPORTS
+#define LIBMIKEY_IMPORTS
 
-#include<libmutil/MemObject.h>
 
 
 //#define DISABLE_OSS
@@ -78,10 +81,18 @@ typedef __int64  int64_t;
 typedef unsigned long long  uint64_t;
 #endif
 
-#else
+#else  // !_MSC_VER
 #include"compilation_config.h"/* STL replacement */
 #include<stdint.h>
-#endif
+
+#ifdef __MINGW32__
+# define WINVER 0x0500
+# define DSOUND
+#else  // !__MINGW32__
+# define ENABLE_TS
+#endif	// !__MINGW32__
+
+#endif	// !_MSC_VER
 
 // FIXME!!
 

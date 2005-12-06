@@ -25,15 +25,7 @@
 #ifndef KEYAGREEMENT_PSK_H
 #define KEYAGREEMENT_PSK_H
 
-#ifdef _MSC_VER
-#ifdef LIBMIKEY_EXPORTS
-#define LIBMIKEY_API __declspec(dllexport)
-#else
-#define LIBMIKEY_API __declspec(dllimport)
-#endif
-#else
-#define LIBMIKEY_API
-#endif
+#include<libmikey/libmikey_config.h>
 
 #include<openssl/dh.h>
 #include<openssl/rand.h>

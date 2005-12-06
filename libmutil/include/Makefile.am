@@ -31,6 +31,7 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/CommandString.h \
 			libmutil/XMLParser.h \
 			libmutil/MPlugin.h \
-			libmutil/CircularBuffer.h
-			
+			libmutil/CircularBuffer.h \
+			libmutil/libmutil_config.h
+
 noinst_HEADERS = 	config.h

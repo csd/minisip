@@ -52,6 +52,10 @@
 	#include<time.h>
 #endif
 
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#define USE_WIN32_API
+#endif
+
 int filesleep( unsigned long usec ){
 #ifdef WIN32
 #include<winsock2.h>
@@ -433,7 +437,7 @@ void FileSoundDevice::printError( string func ) {
 		case EEXIST: errStr + "eexist"; break;
 		case EFAULT: errStr + "efault"; break;
 		case EISDIR: errStr + "eisdir"; break;
-#ifndef _MSC_VER
+#ifndef USE_WIN32_API
 		case ELOOP: errStr + "eloop"; break;
 #endif
 		case EMFILE: errStr + "emfile"; break;
@@ -445,11 +449,11 @@ void FileSoundDevice::printError( string func ) {
 		case ENOSPC: errStr + "enospc"; break;
 		case ENOTDIR: errStr + "enotdir"; break;
 		case ENXIO: errStr + "enxio"; break;
-#ifndef _MSC_VER
+#ifndef USE_WIN32_API
 		case EOVERFLOW: errStr + "eoverflow"; break;
 #endif
 		case EROFS: errStr + "erofs"; break;
-#ifndef _MSC_VER
+#ifndef USE_WIN32_API
 		case ETXTBSY: errStr + "etxtbsy"; break;
 #endif
 		default: errStr + "unknown";

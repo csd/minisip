@@ -23,10 +23,10 @@
 
 
 
-#include<libmsip/SipUtils.h>
 #include<ctype.h>
 
 #include<config.h>
+#include<libmsip/SipUtils.h>
 
 #include<iostream>
 

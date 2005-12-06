@@ -131,7 +131,7 @@ gui(failed)              |                                    |                |
 bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 {//cerr<<"************************************invite receivedqwe"<<endl;
 	if (transitionMatch(command, SipCommandString::invite)){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("a0_start_callingnoauth_invite");
 #endif
 		//cerr<<"sending invite1*************"<<endl;
@@ -171,7 +171,7 @@ bool SipDialogConfVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &
 
 	    MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
 
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 	    ts.save( RINGING );
 #endif
 	    CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
@@ -215,7 +215,7 @@ bool SipDialogConfVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &
 bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("a3_callingnoauth_incall_2xx");
 #endif
 
@@ -540,7 +540,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 {
 	
 	if (transitionMatch(command, SipCommandString::accept_invite)){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save(USER_ACCEPT);
 #endif
 		//bm
@@ -705,7 +705,7 @@ bool SipDialogConfVoip::a21_callingauth_callingauth_18X( const SipSMCommand &com
 	
 	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save( RINGING );
 #endif
 
@@ -1151,11 +1151,11 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		sdp = mediaSession->getSdpOffer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		if( !sdp ){
@@ -1267,11 +1267,11 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		sdp = mediaSession->getSdpOffer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		if( !sdp ){
@@ -1394,11 +1394,11 @@ void SipDialogConfVoip::sendAck(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		sdp = mediaSession->getSdpOffer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
 		if( !sdp ){
@@ -1537,11 +1537,11 @@ void SipDialogConfVoip::sendInviteOk(const string &branch){
 //      There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
 #endif
 		sdp = mediaSession->getSdpAnswer();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
 #endif
 		if( !sdp ){
@@ -1763,23 +1763,23 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
 			switch (type){
 				case 10:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpOffer");
 #endif
 					if( !getMediaSession()->setSdpOffer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpOffer");
 #endif
 					return true;
 				case 3:
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpAnswer");
 #endif
 					if( !getMediaSession()->setSdpAnswer( (SdpPacket*)*Offer, peerUri ) )
 						return false;
 					getMediaSession()->start();
-#ifndef _MSC_VER
+#ifdef ENABLE_TS
 					ts.save("setSdpAnswer");
 #endif
 					return true;
