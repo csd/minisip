@@ -77,8 +77,6 @@ void startFunction( void* (*f)() ){
 		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
-	}catch(...){
-		cerr << "Thread: caught unknown exception"<<endl;
 	}
 
 }
@@ -96,8 +94,6 @@ void *startFunctionArg( void* (*f)(void*), void* arg){
 		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
-	}catch(...){
-		cerr << "Thread: caught unknown exception"<<endl;
 	}
 
 	return NULL;
@@ -117,8 +113,6 @@ void startRunnable(MRef<Runnable*> r){
 		cerr << "Thread: caught exception:"<< flush << e.what()<<endl;
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
-	}catch(...){
-		cerr << "Thread: caught unknown exception"<<endl;
 	}
 }
 
