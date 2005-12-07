@@ -39,8 +39,8 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
+#include<libmsip/SipDialogConfig.h>
 
-class IPAddress;
 class SipDialog;
 class SipMessage;
 class SipMessageDispatcher;
@@ -89,11 +89,19 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 
 		
 	protected:
+		/**
+		 * The transaction can be either within or not within
+		 * a dialog. This function returns the configuration
+		 * that is the one of the dialog (if within it) or
+		 * the one of the sip stack (if not within a dialog).
+		 */
+		MRef<SipCommonConfig *> getConfig();
+		
 		void setCSeqNo(int n){cSeqNo=n;}
 		MRef<SipStack*> sipStack;
 		MRef<SipDialog*> dialog; 
 		Socket * socket;
-		IPAddress * toaddr;             //FIXME: This is leaked?
+		//IPAddress * toaddr;             //FIXME: This is leaked?
 		int32_t port;
 		string transport;
 		string callId;

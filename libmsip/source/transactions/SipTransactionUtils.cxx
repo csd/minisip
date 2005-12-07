@@ -51,8 +51,9 @@ bool sipResponseFilterMatch(MRef<SipResponse*> resp, const string &pattern){
 }
 
 
-bool transitionMatch(const SipSMCommand &command,
-		int packetType,
+bool transitionMatch(
+		const std::string& packetType,
+		const SipSMCommand &command,
 		int source,
 		int destination,
 		const string &respFilter)
@@ -66,7 +67,7 @@ bool transitionMatch(const SipSMCommand &command,
 	if (command.getType()!=SipSMCommand::COMMAND_PACKET){
 		return false;
 	}
-	if (packetType!=IGN && command.getCommandPacket()->getType()!=packetType){
+	if (packetType!="" && command.getCommandPacket()->getType()!=packetType){
 		return false;
 	}
 	if (respFilter.size()>0){
@@ -82,7 +83,8 @@ bool transitionMatch(const SipSMCommand &command,
 }
 
 
-bool transitionMatch(const SipSMCommand &command,
+bool transitionMatch(
+		const SipSMCommand &command,
 		const string &cmd_str,
 		int source,
 		int destination)

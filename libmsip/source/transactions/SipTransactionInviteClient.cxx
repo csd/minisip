@@ -80,7 +80,6 @@ resp. to TU |  1xx             V                     |
 
 #include<libmsip/SipTransactionInviteClient.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipAck.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
@@ -95,8 +94,8 @@ resp. to TU |  1xx             V                     |
 
 bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipInvite::type, SipSMCommand::TU, IGN)){
-		lastInvite = (SipInvite *) *command.getCommandPacket();
+	if (transitionMatch("INVITE", command, SipSMCommand::TU, IGN)){
+		lastInvite = (SipRequest*) *command.getCommandPacket();
 		if( isUnreliable() ) { // retx timer
 			timerA = sipStack->getTimers()->getA();
 			requestTimeout( timerA , "timerA" );
@@ -104,12 +103,12 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		
 		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
 
-		if( toaddr ){
+		if( /*toaddr*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0 ){
 			MRef<SipHeaderValue*> hdr;
 			hdr = lastInvite->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
 
 			if( !hdr ){
-				lastInvite->addRoute( toaddr->getString(),
+				lastInvite->addRoute( /*toaddr->getString()*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
 						      port, transport );
 			}
 		}
@@ -137,7 +136,7 @@ bool SipTransactionInviteClient::a1_calling_calling_timerA( const SipSMCommand &
 
 bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command,SipResponse::type, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		SipSMCommand cmd(
@@ -156,7 +155,7 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 
 bool SipTransactionInviteClient::a3_calling_completed_resp36( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
 		
 		MRef<SipResponse*> resp( (SipResponse*) *command.getCommandPacket() );
 		
@@ -212,7 +211,7 @@ bool SipTransactionInviteClient::a4_calling_terminated_ErrOrTimerB( const SipSMC
 
 bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
 		
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
@@ -240,7 +239,7 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 
 bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
@@ -258,7 +257,7 @@ bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMComman
 //TODO: make sure  transport_error is sent when it should be
 bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		
@@ -285,7 +284,7 @@ bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMComman
 
 bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMCommand &command){
 		
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
@@ -311,7 +310,7 @@ bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMComm
 
 bool SipTransactionInviteClient::a9_completed_completed_resp36( const SipSMCommand &command){
 
-	if (transitionMatch(command,SipResponse::type, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "3**\n4**\n5**\n6**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		sendAck(resp);
 		return true;
@@ -454,7 +453,7 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, MR
 	}
 	
 	timerA=sipStack->getTimers()->getA();
-	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
@@ -490,11 +489,11 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
 	
 	MRef<SipMessage*> ref( *resp);
-	MRef<SipAck*> ack= new SipAck( getBranch(), 
+	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( getBranch(), 
 			ref, 
-			dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
-			conf->sipIdentity->sipDomain
-			); 
+			dialog->dialogState.getRemoteTarget() //FIXME: uses dialog here, but it could be NULL
+			);
+		
 	//add route headers, if needed
 	if( dialog->dialogState.routeSet.size() > 0 ) {
 		//merr << "CESC: SipTransInvCli:sendACK : adding header route! " << end;

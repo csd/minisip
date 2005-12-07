@@ -69,7 +69,7 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 		conf = sipStack->getStackConfig();
 	}
 
-	toaddr = NULL;
+	//toaddr = NULL;
 
 #if 0
 	try{	
@@ -89,9 +89,9 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 }
 
 SipTransaction::~SipTransaction(){
-	if( toaddr ){
-		delete toaddr;
-	}
+//	if( toaddr ){
+//		delete toaddr;
+//	}
 
 }
 
@@ -118,6 +118,16 @@ string SipTransaction::getBranch(){
 
 void SipTransaction::setBranch(string b) {
 	branch = b;
+}
+
+MRef<SipCommonConfig *> SipTransaction::getConfig(){
+	MRef<SipCommonConfig *> conf;
+	if (dialog){
+		conf = dialog->getDialogConfig()->inherited;
+	}else{
+		conf = sipStack->getStackConfig();
+	}
+	return conf;
 }
 
 void SipTransaction::handleTimeout(const string &c){

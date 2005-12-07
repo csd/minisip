@@ -28,6 +28,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
+#include<string>
 
 class SipResponse;
 
@@ -42,16 +43,18 @@ bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const string &p
 
 #define IGN -1
 
-bool LIBMSIP_API transitionMatch(const SipSMCommand &command,
-	int packetType=IGN,
-	int source=IGN,
-	int destination=IGN,
-	const string &respFilter="");
+bool LIBMSIP_API transitionMatch(
+		const string& packetType,
+		const SipSMCommand &command,
+		int source=IGN,
+		int destination=IGN,
+		const string &respFilter="");
 
-bool LIBMSIP_API transitionMatch(const SipSMCommand &command,
-	const string &cmd_str,
-	int source=IGN,
-	int destination=IGN);
+bool LIBMSIP_API transitionMatch(
+		const SipSMCommand &command,
+		const string &cmd_str,
+		int source=IGN,
+		int destination=IGN);
 
 #endif
 

@@ -94,7 +94,7 @@
 
 bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
 		if( isUnreliable() ) {

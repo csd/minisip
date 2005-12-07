@@ -40,9 +40,6 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 
-class SipInvite;
-class SipResponse;
-
 class SipResponse;
 
 /**
@@ -79,7 +76,7 @@ class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 				But it is not possible until the ACK for 2xx responses are handled/sent by
 				the dialog/TU and not by the transaction (in violation of the RFC).
 		*/
-		void setDialogRouteSet(MRef<SipInvite *> inv);
+		void setDialogRouteSet(MRef<SipRequest*> inv);
 
 
 		void sendTrying();

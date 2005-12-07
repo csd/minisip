@@ -40,7 +40,6 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransactionInviteServer.h>
 
-class SipInvite;
 class SipResponse;
 
 /**

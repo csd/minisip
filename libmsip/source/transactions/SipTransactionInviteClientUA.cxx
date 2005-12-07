@@ -95,7 +95,7 @@ resp. to TU |  1xx             V                     |   |
 
 	
 bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
 		MRef<SipResponse *> resp((SipResponse*) *command.getCommandPacket());
 		
 		cancelTimeout("timerA");
@@ -125,7 +125,7 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 }
 	
 bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
@@ -154,7 +154,7 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 }
 	
 bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1003************"<<endl;

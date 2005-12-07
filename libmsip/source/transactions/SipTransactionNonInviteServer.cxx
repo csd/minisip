@@ -45,7 +45,7 @@
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(command, IGN, SipSMCommand::remote, IGN)){
+	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::remote, IGN)){
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
@@ -55,7 +55,7 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 
 		SipSMCommand cmd(command);
 #ifdef DEBUG_OUTPUT
-		/*server->*/setDebugTransType(command.getCommandPacket()->getTypeString() );
+		/*server->*/setDebugTransType(command.getCommandPacket()->getType() );
 #endif
 		cmd.setSource(SipSMCommand::transaction);
 		cmd.setDestination(SipSMCommand::TU);
@@ -72,7 +72,7 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); //Do not add via header to responses
 							//they are copied from the request
@@ -86,7 +86,7 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
@@ -102,7 +102,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		if( isUnreliable() )
@@ -143,7 +143,7 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
 		send(MRef<SipMessage*>(*pack), false);
@@ -336,7 +336,7 @@ SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> sta
 		conf = sipStack->getStackConfig();
 	}
 	
-	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	
 	setUpStateMachine();

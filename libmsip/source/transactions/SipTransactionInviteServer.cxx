@@ -81,7 +81,6 @@
 
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipAck.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
@@ -99,7 +98,7 @@
  */
 bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::transaction)){
+	if (transitionMatch("INVITE", command, IGN, SipSMCommand::transaction)){
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
@@ -113,7 +112,7 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
 		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		
 		//update dialogs route set ... needed to add route headers to the ACK we are going to send
-		setDialogRouteSet( (SipInvite *)*command.getCommandPacket() );
+		setDialogRouteSet( (SipRequest*)*command.getCommandPacket() );
 		
 		return true;
 	}else{
@@ -131,7 +130,7 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
  */
 bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipInvite::type, SipSMCommand::remote, SipSMCommand::transaction)){
+	if (transitionMatch("INVITE", command, SipSMCommand::remote, SipSMCommand::transaction)){
 		MRef<SipResponse*> resp = lastResponse;
 		if (resp.isNull()){
 #ifdef DEBUG_OUTPUT
@@ -151,7 +150,7 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
  * remote side and save it in case we need to retransmit it.
  */
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		//no need for via header, it is copied from the request msg
 		send(command.getCommandPacket(), false);
@@ -170,7 +169,7 @@ bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMComman
  */
 bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());		
 		if( isUnreliable() ) {
 			timerG = sipStack->getTimers()->getG();
@@ -218,7 +217,7 @@ bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMComman
  */
 bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
 		//no need for via header, it is copied from the request msg
@@ -241,7 +240,7 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
  */
 bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipInvite::type, SipSMCommand::remote, SipSMCommand::transaction)){
+	if (transitionMatch("INVITE", command, SipSMCommand::remote, SipSMCommand::transaction)){
 		MRef<SipResponse*> resp = lastResponse;
 		
 		send(MRef<SipMessage*>(*resp), false);
@@ -259,7 +258,7 @@ bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMComma
  */
 bool SipTransactionInviteServer::a7_completed_confirmed_ACK( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipAck::type, SipSMCommand::remote, SipSMCommand::transaction)){
+	if (transitionMatch("ACK",command, SipSMCommand::remote, SipSMCommand::transaction)){
 		cancelTimeout("timerG");//response re-tx 
 		cancelTimeout("timerH"); //wait for ACK reception
 		if( isUnreliable() )
@@ -432,7 +431,7 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, MR
 		conf = sipStack->getStackConfig();
 	}
 	
-	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
@@ -441,7 +440,7 @@ SipTransactionInviteServer::~SipTransactionInviteServer(){
 }
 
 	
-void SipTransactionInviteServer::setDialogRouteSet(MRef<SipInvite *> inv) {
+void SipTransactionInviteServer::setDialogRouteSet(MRef<SipRequest*> inv) {
 	if( dialog->dialogState.routeSet.size() == 0 ) {
 		merr << "CESC: parent dialog has NO routeset" << end;
 		/*SipMessage::getRouteSet returns the top-to-bottom ordered 

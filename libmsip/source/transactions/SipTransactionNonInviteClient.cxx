@@ -46,9 +46,9 @@
 #endif
 
 bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand &command) {
-	if (transitionMatch(command, IGN, SipSMCommand::TU,IGN)){
+	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::TU,IGN)){
 #ifdef DEBUG_OUTPUT
-		setDebugTransType(command.getCommandPacket()->getTypeString() );
+		setDebugTransType(command.getCommandPacket()->getType() );
 #endif
 		lastRequest = dynamic_cast<SipRequest*>(*command.getCommandPacket());
 		if( isUnreliable() ) {
@@ -56,14 +56,15 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 			requestTimeout(timerE, "timerE");
 		}
 		requestTimeout(sipStack->getTimers()->getF(), "timerF");
-
-		if( toaddr ){
+		massert(getConfig());
+		massert(getConfig()->sipIdentity);
+		if( /*toaddr*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0){
 			MRef<SipHeaderValue*> hdr;
 
 			hdr = lastRequest->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
 
 			if( !hdr ){
-				lastRequest->addRoute( toaddr->getString(),
+				lastRequest->addRoute( /*toaddr->getString()*/getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
 						       port, transport );
 			}
 		}
@@ -79,7 +80,7 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 
 bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		SipSMCommand cmd(
@@ -124,7 +125,7 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 
 bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		cancelTimeout("timerE"); //no more retx of the request
@@ -170,7 +171,7 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 
 bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		MRef<SipMessage*> pref(*pack);
 		SipSMCommand cmd( pref, 
@@ -215,7 +216,7 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 
 
 bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMCommand &command) {
-	if (transitionMatch(command, SipResponse::type, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
 		
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
@@ -360,17 +361,17 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 	
 	//timers are set in the initial transition
 
-	MRef<SipCommonConfig *> conf;
-	if (dialog){
-		conf = dialog->getDialogConfig()->inherited;
-	}else{
-		conf = sipStack->getStackConfig();
-	}
+	MRef<SipCommonConfig *> conf = getConfig(); 
+//	if (dialog){
+//		conf = dialog->getDialogConfig()->inherited;
+//	}else{
+//		conf = sipStack->getStackConfig();
+//	}
 
 	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; massert (0);}
 	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; massert (0);}
-	if( !conf->sipIdentity->getSipProxy()->sipProxyIpAddr ) { cerr << "SipTranNonInvCli: ipaddr null" << endl; massert (0);}
-	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
+	if( conf->sipIdentity->getSipProxy()->sipProxyAddressString.size()<=0 ) { cerr << "SipTranNonInvCli: no ipaddr" << endl; massert (0);}
+//	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
