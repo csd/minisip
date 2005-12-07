@@ -45,11 +45,13 @@ class LIBMNETUTIL_API StreamSocket : public Socket {
 		string received;
 
 		bool matchesPeer(IPAddress& address, uint16_t port);
+		bool matchesPeer(string address, uint16_t port);
 
 		IPAddress * getPeerAddress();
 		uint16_t getPeerPort();
 	protected:
 		IPAddress * peerAddress;
+		string remoteHostUnresolved;
 		uint16_t peerPort;
 
 };

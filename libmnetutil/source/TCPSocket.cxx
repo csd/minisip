@@ -63,6 +63,7 @@ using namespace std;
 #endif
 
 TCPSocket::TCPSocket(string addr, int32_t port){
+	remoteHostUnresolved = addr;
 	MRef<IPAddress *> tmp = IPAddress::create(addr);
 	initTCPSocket( **tmp, port );
 }
@@ -77,7 +78,7 @@ void TCPSocket::initTCPSocket(IPAddress &ipaddress, int32_t port){
 
 	type = SOCKET_TYPE_TCP;
 	if ((fd = (int32_t)::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
-		throw new SocketFailed( errno );
+		throw SocketFailed( errno );
 	}
 	int32_t on=1;
 #ifndef WIN32

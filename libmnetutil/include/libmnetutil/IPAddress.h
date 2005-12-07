@@ -54,6 +54,13 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		virtual IPAddress * clone() const =0;
 
 		static IPAddress * create(sockaddr * addr, int32_t addr_len);
+
+		/**
+		 * Tries to create IPv4 or IPv6 address. First v4 is tried
+		 * and if that fails, v6 is tried.
+		 * NOTE: The method returns NULL if the host can not be
+		 * resolved, and does not throw an exception.
+		 */
 		static IPAddress * create(const string &addr);
 
 	protected:
