@@ -37,8 +37,6 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipInvite.h>
-
 
 /**
  * 
@@ -48,7 +46,7 @@
 class LIBMSIP_API SipResponse : public SipMessage{
 
 	public:
-		static const int type;
+		static const string type;
 
 		SipResponse(string branch, int32_t status, string status_desc, MRef<SipMessage*> inv);
 
@@ -72,6 +70,8 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		string getStatusDesc();
 
 		string getString();
+
+		virtual const string& getType(){return type;}
 
 	private:
 		int32_t status_code;

@@ -47,13 +47,13 @@
 #include<libmsip/SipException.h>
 #include<libmsip/SipUtils.h>
 
-const int SipResponse::type=8;
+const string SipResponse::type="RESPONSE";
 
 SipResponse::SipResponse(string branch, 
 		int32_t status, 
 		string status_desc, 
 		MRef<SipMessage*> inv)
-			:SipMessage(branch, SipResponse::type)
+			:SipMessage(branch)
 {
 	setContent(NULL);
 
@@ -81,7 +81,7 @@ SipResponse::SipResponse(string branch,
 }
 
 //TODO: This constructor needs rewriting (re-use from sipmessage)
-SipResponse::SipResponse(string &resp): SipMessage(SipResponse::type, resp)
+SipResponse::SipResponse(string &resp): SipMessage(-1, resp)
 {
 
 	if(resp.size() < 11){
