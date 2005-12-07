@@ -109,6 +109,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Via", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("v", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
+	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderProxyAuthenticateFactory);
 	
 
 	 transportLayer = MRef<SipMessageTransport*>(new
