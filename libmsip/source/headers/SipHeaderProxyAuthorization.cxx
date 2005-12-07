@@ -78,6 +78,6 @@ SipHeaderValueProxyAuthorization::~SipHeaderValueProxyAuthorization() {
 }
 		
 string SipHeaderValueProxyAuthorization::getString(){
-	return /*"Proxy-"+*/SipHeaderValueAuthorization::getString(); //FIXME: XXX XXX
+	return SipHeaderValueAuthorization::getString();
 } 
 

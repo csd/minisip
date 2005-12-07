@@ -32,6 +32,7 @@
 
 #include<config.h>
 
+#include<libmutil/trim.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 
 MRef<SipHeaderValue *> proxyauthFactory(const string &build_from){
@@ -43,10 +44,40 @@ SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory=proxyauthFactory;
 
 const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
-SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &/*build_from*/) //TODO: FIXME: Parse proxy authenticate header value
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(int type, string typeStr, const string &build_from)
+		: SipHeaderValue(type, typeStr)
+{
+	init(build_from);
+}
+
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_PROXYAUTHENTICATE,sipHeaderValueProxyAuthenticationTypeStr)
 {
-	
+	init(build_from);
+}
+
+void SipHeaderValueProxyAuthenticate::init(const string &build_from){
+	string line = trim(build_from);
+	if (line.substr(0,6)=="Digest"){
+		hasDigest=true;
+		line = trim(line.substr(6));
+	}else{
+		hasDigest=false;
+	}
+
+	size_t pos = line.find("=");
+	if (pos==string::npos){
+		cerr << "Warning: could not find key-value parir in authenticate header"<<endl;
+	}else{
+		property = trim(line.substr(0,pos));
+		value = trim(line.substr(pos+1));
+		if (value.size()>=2 && value[0]=='\"' && value[value.size()-1]=='\"'){
+			value = trim(value.substr(1,value.size()-2));
+			hasQuotes=true;
+		}else{
+			hasQuotes=false;
+		}
+	}
 }
 
 SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
@@ -54,38 +85,16 @@ SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
 }
 		
 string SipHeaderValueProxyAuthenticate::getString(){
-	return method +", realm="+realm +", nonce="+nonce +", algorithm="+algorithm;
+	string ret;
+	if (hasDigest)
+		ret+="Digest ";
+	string v;
+	if (hasQuotes)
+		v="\""+value+"\"";
+	else
+		v=value;
+	ret=ret+property+"="+v;
+	return ret;
 } 
 
-string SipHeaderValueProxyAuthenticate::getMethod(){
-	return method;
-}
 
-void SipHeaderValueProxyAuthenticate::setMethod(const string &m){
-	this->method=m;
-}
-	
-string SipHeaderValueProxyAuthenticate::getNonce(){
-	return nonce;
-}
-
-void SipHeaderValueProxyAuthenticate::setNonce(const string &n){
-	this->nonce=n;
-}
-		
-string SipHeaderValueProxyAuthenticate::getRealm(){
-	return realm;
-}
-
-void SipHeaderValueProxyAuthenticate::setRealm(const string &r){
-	this->realm=r;
-}
-			
-string SipHeaderValueProxyAuthenticate::getAlgorithm(){
-	return algorithm;
-}
-
-void SipHeaderValueProxyAuthenticate::setAlgorithm(const string &a){
-	this->algorithm=a;
-}
-	

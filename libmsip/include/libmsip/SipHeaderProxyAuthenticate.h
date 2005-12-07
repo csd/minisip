@@ -45,8 +45,22 @@
 
 extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory;
 
+/**
+ *
+ * Note that a Proxy-Authenticate header contains several
+ * header values where each value is a key-value pair
+ * (one header value can for example be nonce="123")
+ *
+ * In this implementation the "key" is called "property"
+ * and according to RFC3261 it can be for example username, 
+ * realm, nonce,...
+ *
+ */
 class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 	public:
+		
+		SipHeaderValueProxyAuthenticate(int type, string typeStr, const string &build_from);
+		
 		SipHeaderValueProxyAuthenticate(const string &build_from);
 
 		virtual ~SipHeaderValueProxyAuthenticate();
@@ -58,26 +72,18 @@ class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 		 */
 		string getString(); 
 
-		/**
-		 * returns the protocol used. This can be either UDP or TCP
-		 */
-		string getMethod();
-		void setMethod(const string &meth);
+		string getProperty(){return property;}
+		string getValue(){return value;}
 
-		string getRealm();
-		void setRealm(const string &r);
-
-		string getNonce();
-		void setNonce(const string &n);
-
-		string getAlgorithm();
-		void setAlgorithm(const string &a);
-		
 	private:
-		string method;
-		string realm;
-		string nonce;
-		string algorithm;
+		void init(const string& build_from);
+
+		bool hasDigest;
+		bool hasQuotes;
+		string property;
+		string value;
+		
+		
 };
 
 #endif
