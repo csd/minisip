@@ -30,9 +30,9 @@
  * 
 */
 
-#include<libmsip/SipHeaderSubject.h>
-
 #include<config.h>
+
+#include<libmsip/SipHeaderSubject.h>
 
 MRef<SipHeaderValue *> subjectFactory(const string &build_from){
 	                return new SipHeaderValueSubject(build_from);

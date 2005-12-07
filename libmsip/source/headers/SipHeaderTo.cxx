@@ -30,9 +30,9 @@
  * 
 */
 
-#include<libmsip/SipHeaderTo.h>
-
 #include<config.h>
+
+#include<libmsip/SipHeaderTo.h>
 
 #include<libmutil/trim.h>
 
