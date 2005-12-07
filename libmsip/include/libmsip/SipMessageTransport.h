@@ -113,7 +113,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 	protected:
 		void sendMessage(MRef<SipMessage*> pack, 
-				IPAddress &toaddr, 
+				/*IPAddress &*/ string toaddr, 
 				int32_t port, 
 				string branch,
 				string preferredTransport,
@@ -122,9 +122,9 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 			
 	private:
 		void addViaHeader( MRef<SipMessage*> pack, MRef<Socket *> socket, string branch );
-		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
+		MRef<StreamSocket *> findStreamSocket(/*IPAddress&*/ string, uint16_t);
 		MRef<Socket*> findSocket(const string &transport,
-					 IPAddress &addr,
+					 /*IPAddress &*/ string addr,
 					 uint16_t port);
 		
 		MRef<UDPSocket*> udpsock;

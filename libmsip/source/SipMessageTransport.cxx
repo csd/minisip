@@ -33,12 +33,7 @@
 
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipAck.h>
-#include<libmsip/SipCancel.h>
-#include<libmsip/SipBye.h>
-#include<libmsip/SipSubscribe.h>
-#include<libmsip/SipNotify.h>
-#include<libmsip/SipIMMessage.h>
+#include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderRoute.h>
@@ -462,7 +457,7 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 }
 
 
-static bool getDestination(MRef<SipMessage*> pack, MRef<IPAddress*> &destAddr,
+static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &destAddr,
 			   int32_t &destPort, string &destTransport)
 {
 	if( pack->getType() == SipResponse::type ){
@@ -476,8 +471,9 @@ static bool getDestination(MRef<SipMessage*> pack, MRef<IPAddress*> &destAddr,
 				peer = via->getIp();
 			}
 
-			destAddr = IPAddress::create( via->getIp() );
-			if( destAddr ){
+			//destAddr = IPAddress::create( via->getIp() );
+			destAddr = via->getIp();
+			if( destAddr.size()>0 ){
 				string rport = via->getParameter( "rport" );
 				if( rport != "" ){
 					destPort = atoi( rport.c_str() );
@@ -515,8 +511,10 @@ static bool getDestination(MRef<SipMessage*> pack, MRef<IPAddress*> &destAddr,
 		}
 
 		if( uri.isValid() ){
-			destAddr = IPAddress::create( uri.getIp() );
-			if( destAddr ){
+			//destAddr = IPAddress::create( uri.getIp() );
+			destAddr = uri.getIp();
+			
+			if( /*destAddr*/ destAddr.size()>0 ){
 				destPort = uri.getPort();
 				if( !destPort ){
 					if( uri.getProtocolId() == "sips" ){
@@ -542,24 +540,28 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				      const string &branch,
 				      bool addVia)
 {
-	MRef<IPAddress*> destAddr;
+	//MRef<IPAddress*> destAddr;
+	string destAddr;
 	int32_t destPort = 0;
 	string destTransport;
 
 	if( !getDestination( pack, destAddr, destPort, destTransport) ){
+#ifdef DEBUG_OUTPUT
+		cerr << "SipMessageTransport: WARNING: Could not find destination. Packet dropped."<<endl;
+#endif
 		return;
 	}
 
 	transform( destTransport.begin(), destTransport.end(),
 		   destTransport.begin(), (int(*)(int))toupper );
 
-	sendMessage( pack, **destAddr, destPort,
+	sendMessage( pack, /* **destAddr */ destAddr, destPort,
 		     branch, destTransport, addVia );
 }
 
 
 MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
-					      IPAddress &destAddr,
+					      /*IPAddress &*/ string destAddr,
 					      uint16_t port)
 {
 	MRef<Socket*> socket;
@@ -592,7 +594,7 @@ MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
 
 
 void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
-				      IPAddress &ip_addr, 
+				      /*IPAddress &*/ string ip_addr, 
 				      int32_t port, 
 				      string branch,
 				      string preferredTransport,
@@ -600,7 +602,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 {
 	MRef<Socket *> socket;
 	MRef<IPAddress *> tempAddr;
-	IPAddress *destAddr = &ip_addr;
+	//IPAddress *destAddr = &ip_addr;
 
 				
 	try{
@@ -616,6 +618,9 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		}
 
 		string packetString = pack->getString();
+		if (!socket){
+			cerr << "EE: NO SOCKET"<<endl<<endl;;
+		}
 
 		UDPSocket *dsocket = dynamic_cast<UDPSocket*>(*socket);
 		StreamSocket *ssocket = dynamic_cast<StreamSocket*>(*socket);
@@ -649,13 +654,33 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			ts.save( tmp );
 
 #endif
+			cerr << "Looking up IP"<<endl;
+			IPAddress *destAddr = IPAddress::create(ip_addr);
+			cerr << "Done Looking up IP"<<endl;
 
-			if( dsocket->sendTo( *destAddr, port, 
-					(const void*)packetString.c_str(),
-					(int32_t)packetString.length() ) == -1 ){
 			
-				throw SendFailed( errno );
-			
+			if (destAddr){
+				if( dsocket->sendTo( *destAddr, port, 
+							(const void*)packetString.c_str(),
+							(int32_t)packetString.length() ) == -1 ){
+
+					throw SendFailed( errno );
+
+				}
+			}else{
+				CommandString transportError( pack->getCallId(), 
+						SipCommandString::transport_error,
+						"SipMessageTransport: host could not be resolved: "+ip_addr);
+				SipSMCommand transportErrorCommand(
+						transportError, 
+						SipSMCommand::remote, 
+						SipSMCommand::transaction);
+
+				if (! commandReceiver.isNull())
+					commandReceiver->handleCommand( transportErrorCommand );
+				else
+					mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+
 			}
 		}
 		else{
@@ -695,7 +720,7 @@ void SipMessageTransport::addSocket(MRef<StreamSocket *> sock){
         semaphore.inc();
 }
 
-MRef<StreamSocket *> SipMessageTransport::findStreamSocket( IPAddress & address, uint16_t port ){
+MRef<StreamSocket *> SipMessageTransport::findStreamSocket( /*IPAddress &*/ string address, uint16_t port ){
 	list<MRef<StreamSocket *> >::iterator i;
 
 	socksLock.lock();
