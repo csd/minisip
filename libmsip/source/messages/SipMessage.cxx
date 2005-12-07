@@ -46,25 +46,15 @@
 #include<libmsip/SipHeaderCSeq.h>
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderContentLength.h>
-#include<libmsip/SipHeaderUserAgent.h>
 #include<libmsip/SipHeaderContact.h>
-#include<libmsip/SipHeaderEvent.h>
-#include<libmsip/SipHeaderAccept.h>
 #include<libmsip/SipHeaderRecordRoute.h>
 #include<libmsip/SipHeaderRoute.h>
-#include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipHeaderContentType.h>
-#include<libmsip/SipHeaderMaxForwards.h>
+#include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipHeaderWarning.h>
 
+#include<libmsip/SipRequest.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipAck.h>
-#include<libmsip/SipCancel.h>
-#include<libmsip/SipBye.h>
-#include<libmsip/SipSubscribe.h>
-#include<libmsip/SipNotify.h>
-#include<libmsip/SipRefer.h>
-#include<libmsip/SipIMMessage.h>
 #include<libmsip/SipUtils.h>
 
 #include<libmsip/SipMessageContentIM.h>
@@ -75,7 +65,8 @@
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
-#include<libmsip/SipResponse.h>
+
+const string SipMessage::anyType="";
 
 #ifdef _MSC_VER
 template class __declspec(dllexport) MRef<SipMessage*>;
@@ -90,8 +81,8 @@ SMCFCollection SipMessage::contentFactories=SMCFCollection();
 
 string SipMessage::getDescription(){
         string ret;
-	ret = getTypeString();
-	if (type==SipResponse::type)
+	ret = getType();
+	if (ret=="RESPONSE")
 		ret +="_"+itoa(((SipResponse*)(this))->getStatusCode());
 	return ret;
 }
@@ -109,32 +100,44 @@ MRef<SipMessage*> SipMessage::createMessage(string &data){
 			(data[2]=='P'||data[2]=='p' )){
 		return MRef<SipMessage*>(new SipResponse(data));
 	}else{
+		return new SipRequest(data);
+
+#if 0
 		if (n> 7 && data.substr(0, 7) == "MESSAGE"){
-			return MRef<SipMessage*>(new SipIMMessage(data));
+			//return MRef<SipMessage*>(new SipIMMessage(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_IMMESSAGE, data);
 		}
 		if (n> 6 && data.substr(0, 6) == "CANCEL"){
-			return MRef<SipMessage*>(new SipCancel(data));
+			//return MRef<SipMessage*>(new SipCancel(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_CANCEL, data);
 		}
 		if (n> 3 && data.substr(0, 3)=="BYE"){
-			return MRef<SipMessage*>(new SipBye(data));
+			//return MRef<SipMessage*>(new SipBye(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_BYE, data);
 		}
 		if (n> 6 && data.substr(0, 6)=="INVITE"){
-			return MRef<SipMessage*>(new SipInvite(data));
+			//return MRef<SipMessage*>(new SipInvite(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_INVITE, data);
 		}
 		if (n> 3 && data.substr(0, 3)=="ACK"){
-			return MRef<SipMessage*>(new SipAck(data));
+			//return MRef<SipMessage*>(new SipAck(data));
+			return MRef<SipMessage*>(new SipRequest(TYPE_SIP_MESSAGE_ACK,data));
 		}
 		if (n> 9 && data.substr(0, 9)=="SUBSCRIBE"){
-			return MRef<SipMessage*>(new SipSubscribe(data));
+			//return MRef<SipMessage*>(new SipSubscribe(data));
+			return  new SipRequest(TYPE_SIP_MESSAGE_SUBSCRIBE, data);
 		}
 		if (n> 6 && data.substr(0, 6)=="NOTIFY"){
-			return MRef<SipMessage*>(new SipNotify(data));
+			//return MRef<SipMessage*>(new SipNotify(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_NOTIFY, data);
 		}
 		if (n> 5 && data.substr(0, 5)=="REFER"){
-			return MRef<SipMessage*>(new SipRefer(data));
+			//return MRef<SipMessage*>(new SipRefer(data));
+			return new SipRequest(TYPE_SIP_MESSAGE_REFER, data);
 		}
 
 		return MRef<SipMessage*>( new SipRequest( data ));
+#endif
 	}
 	return NULL;
 }
@@ -145,9 +148,11 @@ ostream & operator<<(ostream &out, SipMessage &p){
 }
 
 
-SipMessage::SipMessage(string b, int type):branch(b),type(type){
+
+SipMessage::SipMessage(string b):branch(b){
 	content=NULL;
 }
+
 
 void SipMessage::addHeader(MRef<SipHeader*> header){
 	if( header.isNull() ) {
@@ -157,15 +162,13 @@ void SipMessage::addHeader(MRef<SipHeader*> header){
 	headers.push_back(header);
 }
 
-int SipMessage::getType(){
-	return type;
-}
-
-
 MRef<SipHeader*> SipMessage::getHeaderNo(int i){
+	if (i>=headers.size()){
+		MRef<SipHeader*> nullhdr;
+		return nullhdr;
+	}
 	return headers[i];
 }
-
 
 int SipMessage::getNoHeaders(){
 	return headers.size();
@@ -254,11 +257,11 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	return i;
 }
 
-SipMessage::SipMessage(int type, string &buildFrom): type(type)
+SipMessage::SipMessage(int, string &buildFrom)
 {
 	uint32_t i;
 
-	string header;
+	//string header;
 	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
 		if(i==buildFrom.size()){
 #ifdef DEBUG_OUTPUT
@@ -266,7 +269,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 #endif
 			throw SipExceptionInvalidMessage("SIP Message too short");
 		}
-		header = header + buildFrom[i];
+		//header = header + buildFrom[i];
 
 	}
 	
@@ -309,8 +312,9 @@ bool SipMessage::addLine(string line){
 	if( hdr.isNull() ) //do not add if null
 		return false;
 	addHeader(hdr);
+#if 0	
 	string ln = line;	//Hack to get realm an nonce... FIXME
-	if (getType()==SipResponse::type && (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){
+	if (/*getType()==SipResponse::type &&*/ (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){
 		size_t r_pos = ln.find("realm=");
 		size_t n_pos = ln.find("nonce=");
 		if (r_pos == string::npos || n_pos ==string::npos){
@@ -320,9 +324,12 @@ bool SipMessage::addLine(string line){
 		size_t n_end = ln.find("\"",n_pos+7);
 		string sub = ln.substr(n_pos+7, n_end-(n_pos+7));
 		setNonce(sub);
+		cerr << "MM: Settin nonce to "<< sub<<endl;
 		sub = ln.substr(r_pos+7, r_end-(r_pos+7));
 		setRealm( sub );
+		cerr << "MM: Settin realm to "<< sub<<endl;
 	}
+#endif
 	return true;
 }
 
@@ -519,6 +526,7 @@ MRef<SipHeaderValue*> SipMessage::getHeaderValueNo(int type, int i){
 			headerindex++;
 		}else{
 			MRef<SipHeaderValue*> nullhdr;
+			
 			return nullhdr;
 		}
 	}while(true);
@@ -535,6 +543,7 @@ string SipMessage::getWarningMessage(){
 }
 
 
+#if 0
 string SipMessage::getRealm(){
         return realm;
 }
@@ -550,6 +559,7 @@ string SipMessage::getNonce(){
 void SipMessage::setNonce(string n){
         nonce=n;
 }
+#endif
 
 list<string> SipMessage::getRouteSet() {
 	list<string> set;
@@ -579,3 +589,30 @@ MRef<Socket*> SipMessage::getSocket()
 	return sock;
 }
 
+
+string SipMessage::getAuthenticateProperty(string prop){
+        MRef<SipHeaderValue*> hdr;
+        int i=0;
+
+        do{
+                hdr=getHeaderValueNo(SIP_HEADER_TYPE_WWWAUTHENTICATE, i++);
+                if (hdr){
+                        MRef<SipHeaderValueWWWAuthenticate*> whdr = (SipHeaderValueWWWAuthenticate*)*hdr;
+                        if (whdr->getProperty()==prop)
+                                return whdr->getValue();
+                }
+        }while(hdr);
+
+        i=0;
+        do{
+                hdr=getHeaderValueNo(SIP_HEADER_TYPE_PROXYAUTHENTICATE, i++);
+                if (hdr){
+                        MRef<SipHeaderValueProxyAuthenticate*> phdr = (SipHeaderValueProxyAuthenticate*)*hdr;
+                        if (phdr->getProperty()==prop)
+                                return phdr->getValue();
+                }
+        }while(hdr);
+
+
+        return "";
+}

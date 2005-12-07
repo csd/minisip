@@ -63,6 +63,8 @@ MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const s
 class LIBMSIP_API SipMessage : public SipMessageContent{
 
 	public:
+		static const string anyType;
+		
 		virtual std::string getContentType(){ return "message/sipfrag"; };
 
 		/**
@@ -72,6 +74,8 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		static SMCFCollection contentFactories;
 
+
+	protected:
 		/**
 		 * Parent of all SIP messages that only sets branch and
 		 * type. Headers and content must be added to the message
@@ -81,24 +85,22 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * 			value (which transaction they
 		 * 			belong to). This argument may be an
 		 * 			empty string.
-		 * @param type		Each SIP message has a type. The
-		 * 			type can be accessed via the
-		 * 			getType method. Each SIP message
-		 * 			class has a static constant type
-		 * 			value that this can be checked
-		 * 			against. Example: if
-		 * 			(msg->getType()==SipInvite::type){...}
-		 * 			
+		 * @param type		Each SIP message has a type. It 
+		 * 			is a string that for a method
+		 * 			is the method string (for example
+		 * 			"INVITE"), and for a response it
+		 * 			is the string in SipResponse::type.
 		 */
-		SipMessage(string branch, int type);
+		SipMessage(string branch);
 
 
-	protected:
+
+		
 		/**
 		 * Creates a SIP message from a buffer. This superclass
 		 * parses the buffer and creates headers and content.
 		 */
-		SipMessage(int type, string &build_from);
+		SipMessage(int dummy, string &build_from);
 	public:
 		
 		virtual ~SipMessage();
@@ -108,27 +110,26 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 			* There are two ways to determine what kind of SIP message
 			* a SipMessage really is - dynamic_cast and getType.
-			* getType is ~10 times faster and does not require to test
-			* for each type individualy.
-			* @return The type of SIP message as integer. The
-			*     different types are defined (static const) in the 
-			*     respective sub-classes, for example SipBye::type.
+			* getType does not require run-time type
+			* information support (sometimes disabled, for
+			* example on handheld devices - i.e. Visual Studio
+			* for WinCE) and you don't have to test * for each 
+			* type individualy.
+			*
+			* Note that the method returns a reference to an
+			* internal member and that you therefore must
+			* be careful to not use the reference after the
+			* message has been deleted. The string is not
+			* a reference to the message, and it will therefore
+			* be garbage collected if there is no other
+			* reference to it.
+			* 
+			* @return The type of SIP message as string. The
+			*     different types are defined as the method of
+			*     a request of the string SipResponse::type for
+			*     a response.
 			*/
-		int getType();
-
-		/**
-		 * Returns a string representation of the type of the SIP
-		 * message IF it is implemented in libmsip and not extended
-		 * by the application using minisip. The purpose of this
-		 * method is mainly for debugging.
-		 */
-		string getTypeString(){
-			char *types[12]={"TYPE0","INVITE","REGISTER","BYE","CANCEL","ACK","NOTIFY","SUBSCRIBE","RESPONSE","MESSAGE","REFER","TYPE11"};
-			if (getType()>11)
-				return "UNDEFINED";
-			return string(types[getType()]);
-		}
-		
+		virtual const string& getType()=0;
 
 		/**
 		* Adds one header (specialization of SipHeader) to the SIP
@@ -267,16 +268,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		string getDestinationBranch();
 
 		/**
-		* @returns Nonce in this repsonse if available.
-		*/
-		string getNonce();
-
-		/**
-		* @returns Realm in this response if available.
-		*/
-		string getRealm();
-
-		/**
 		* @return Number of headers in this message. Notice that
 		* this is not the number of header values that can be
 		* higher.
@@ -317,10 +308,19 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		MRef<Socket*> getSocket();
 
+		/**
+		 * Searches the message for a "property" in
+		 * WWW-Authenticate or Proxy-Authenticate headers.
+		 * A property can be for example "nonce" or "realm".
+		 * If both WWW-Authenticate headers are searched first.
+		 * 
+		 * @param prop	Property to find. For example "nonce".
+		 * @return	First property found from top of message.
+		 */
+		string getAuthenticateProperty(string prop);
+
 	protected:
 		void setDestinationBranch(string b){branch = b;}
-		void setNonce(string n);
-		void setRealm(string r);
 
 		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
 
@@ -347,9 +347,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipHeaderValueVia*> getViaHeader(bool first);
 		string getViaHeaderBranch(bool first);
 		string branch;
-		int type;
-		string realm;
-		string nonce;
 
 		MRef<Socket*> sock;
 };
