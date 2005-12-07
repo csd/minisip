@@ -35,8 +35,6 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipSubscribe.h>
-#include<libmsip/SipNotify.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
@@ -127,7 +125,7 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 }
 
 bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
@@ -175,7 +173,7 @@ bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 }
 
 bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
-	if (transitionMatch(command, SipNotify::type, SipSMCommand::remote, IGN)){
+	if (transitionMatch("NOTIFY", command, SipSMCommand::remote, IGN)){
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
 		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		return true;
@@ -294,17 +292,17 @@ SipDialogPresenceClient::~SipDialogPresenceClient(){
 
 void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	
-	MRef<SipSubscribe*> sub;
+	MRef<SipRequest*> sub ;
 	
-	sub = MRef<SipSubscribe*>(new SipSubscribe(
+	sub = SipRequest::createSipMessageSubscribe(
 				branch,
 				dialogState.callId,
-				toUri,
-				getDialogConfig()->inherited->sipIdentity,
+				toUri->getSipUri(),
+				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				///getDialogConfig()->inherited.localUdpPort,
 //				im_seq_no
 				dialogState.seqNo
-				));
+				);
 
 	sub->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 

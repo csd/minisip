@@ -30,8 +30,6 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipIMMessage.h>
 
 #include"SipSoftPhoneConfiguration.h"
 #ifdef P2T_SUPPORT
@@ -137,7 +135,7 @@ class DefaultDialogHandler : public SipDialog{
 		 */
 		bool modifyDialogConfig(string user, MRef<SipDialogConfig *> dialogConfig);
 
-		void sendIMOk(MRef<SipIMMessage*> bye, const string &branch);
+		void sendIMOk(MRef<SipRequest*> immessage, const string &branch);
 		
 		void sendIM(const string &branch, string msg, int seqno, string toUri);
 			

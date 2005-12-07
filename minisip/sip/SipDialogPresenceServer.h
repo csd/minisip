@@ -39,10 +39,7 @@
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipSubscribe.h>
 #include<libmutil/StateMachine.h>
 #include<libmutil/minilist.h>
 
@@ -70,7 +67,7 @@ class SipDialogPresenceServer: public SipDialog{
 	private:
 		void sendNoticeToAll(string onlineStatus);
 		void sendNotice(string onlinestatus, string user);
-		void sendSubscribeOk(MRef<SipSubscribe *> sub);
+		void sendSubscribeOk(MRef<SipRequest*> sub);
 		void removeUser(string user);
 		void addUser(string user);
 		

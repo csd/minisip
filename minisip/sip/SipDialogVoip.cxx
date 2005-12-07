@@ -34,9 +34,6 @@
 #include<libmutil/massert.h>
 #include"SipDialogVoip.h"
 #include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipCancel.h>
-#include<libmsip/SipRefer.h>
-#include<libmsip/SipAck.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipTransactionInviteServerUA.h>
@@ -52,6 +49,7 @@
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/itoa.h>
+#include<libmutil/base64.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
@@ -59,6 +57,7 @@
 #include <time.h>
 #include"../minisip/LogEntry.h"
 
+#include<libmutil/print_hex.h>
 #include <iostream>
 #include<time.h>
 
@@ -179,6 +178,24 @@ gui(failed)              |                                    |  a5:new ByeResp|
 
    
 */
+
+
+/**
+ * Helper function that returns the uri in the referto header.
+ */
+static string getReferredUri(MRef<SipRequest*> req){
+	string referredUri;
+	MRef<SipHeaderValue*> hval;
+	if (req)
+		hval = req->getHeaderValueNo(SIP_HEADER_TYPE_REFERTO, 0);
+
+	if (hval)
+		referredUri = hval->getString();
+	else{
+		cerr << "WARNING: Referred to uri not found!"<<endl;
+	}
+	return referredUri;
+}
  
  
 bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
@@ -217,7 +234,7 @@ bool SipDialogVoip::a0_start_callingnoauth_invite( const SipSMCommand &command)
 
 bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &command)
 {	
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "18*")){
 
 		MRef<SipResponse*> resp= (SipResponse*) *command.getCommandPacket();
 
@@ -250,7 +267,7 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &command)
 {
 
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "1**")){
 		dialogState.updateState( MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) );
 		return true;
 	}else{
@@ -261,7 +278,7 @@ bool SipDialogVoip::a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &comm
 
 bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
 #ifdef ENABLE_TS
 		ts.save("a3_callingnoauth_incall_2xx");
 #endif
@@ -301,9 +318,9 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 bool SipDialogVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 {
 	
-	if (transitionMatch(command, SipBye::type, SipSMCommand::remote, IGN) &&
+	if (transitionMatch("BYE", command, SipSMCommand::remote, IGN) &&
 	    dialogState.remoteTag != ""){
-		MRef<SipBye*> bye = (SipBye*) *command.getCommandPacket();
+		MRef<SipRequest*> bye = (SipRequest*) *command.getCommandPacket();
 
 		//mdbg << "log stuff"<< end;
 		if( getLogEntry() ){
@@ -372,7 +389,7 @@ bool SipDialogVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 
 bool SipDialogVoip::a7_callingnoauth_termwait_CANCEL( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipCancel::type, SipSMCommand::remote, IGN)){
+	if (transitionMatch("CANCEL", command, SipSMCommand::remote, IGN)){
 //		setCurrentState(toState);
 
 		MRef<SipTransaction*> cancelresp( 
@@ -428,7 +445,7 @@ bool SipDialogVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &comman
 //Note: This is also used as: callingauth_terminated_36
 bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
 		
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
 		rejectedLog->start = time( NULL );
@@ -474,9 +491,9 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 
 bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipInvite::type, IGN, SipSMCommand::TU)){
+	if (transitionMatch("INVITE", command, IGN, SipSMCommand::TU)){
 		
-		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
+		setLastInvite(MRef<SipRequest*>((SipRequest *)*command.getCommandPacket()));
 		dialogState.updateState( getLastInvite() );
 		
 		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
@@ -514,17 +531,52 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		//	mdbg << "^^^^ SipDialogVoip: re-handling packet for transaction to catch:"<<command<<end;
 
+
+		//The transaction layer must receive to this message as
+		//well. We re-post it with the transaction layer
+		//as destination
 		SipSMCommand cmd(command);
 		cmd.setDestination(SipSMCommand::transaction);
-
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 
+/*		MRef<SipHeaderValue*> identity = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITY, 0);
+		MRef<SipHeaderValue*> identityinfo = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITYINFO, 0);
+		
+		bool identityVerified=false;
+		if (identity && identityinfo){
+			cerr << "IDENTITY: found identity and identity-info header values"<< endl;
+			assert(dynamic_cast<SipHeaderValueIdentity*>( *identity));
+			assert(dynamic_cast<SipHeaderValueIdentityInfo*>( *identityinfo));
+			MRef<SipHeaderValueIdentity*> ident = (SipHeaderValueIdentity*) *identity;
+			MRef<SipHeaderValueIdentity*> identinfo = (SipHeaderValueIdentity*) *identityinfo;
+
+			cerr << "IDENTITY: algorithm is: <"<< identinfo->getParameter("alg") << ">"<< endl;
+			
+			//downloadCertificate( identinfo->getCertUri() );
+			
+			identityVerified = verifyIdentityHeader(ident);
+
+
+			//TODO: check that the identity is rsa-sha1
+			
+			if (!identityVerified){
+#ifdef DEBUG_OUTPUT
+				cerr << "IDENTITY: the verification FAILED!"<< endl;
+#endif
+			}
+			
+			
+		}else{
+			cerr << "IDENTITY: did not find identity header value"<< endl;
+		}
+*/		
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		
 		sendRinging(ir->getBranch());
 		
 		if( getDialogConfig()->inherited->autoAnswer ){
@@ -572,10 +624,10 @@ bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 bool SipDialogVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 {
 
-	if (transitionMatch(command, SipCancel::type, SipSMCommand::remote,
+	if (transitionMatch("CANCEL", command, SipSMCommand::remote,
 			    SipSMCommand::TU)) {
-		MRef<SipCancel*> cancel =
-			(SipCancel*)*command.getCommandPacket();
+		MRef<SipRequest*> cancel =
+			(SipRequest*)*command.getCommandPacket();
 		const string branch = cancel->getLastViaBranch();
 
 		if (lastInvite->getLastViaBranch() != branch)
@@ -628,7 +680,8 @@ bool SipDialogVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 bool SipDialogVoip::a13_ringing_termwait_reject( const SipSMCommand &command)
 {
 	
-	if (transitionMatch(command, SipCommandString::reject_invite) || transitionMatch(command,SipCommandString::hang_up)){
+	if (transitionMatch(command, SipCommandString::reject_invite) || 
+			transitionMatch(command,SipCommandString::hang_up)){
 
 
 		sendReject( getLastInvite()->getDestinationBranch() );
@@ -644,9 +697,9 @@ bool SipDialogVoip::a13_ringing_termwait_reject( const SipSMCommand &command)
 
 bool SipDialogVoip::a16_start_termwait_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipInvite::type, SipSMCommand::remote, SipSMCommand::TU)){
+	if (transitionMatch("INVITE", command, SipSMCommand::remote, SipSMCommand::TU)){
 
-		setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
+		setLastInvite(MRef<SipRequest*>((SipRequest *)*command.getCommandPacket()));
 		
 		dialogState.updateState( getLastInvite() );
 
@@ -675,7 +728,7 @@ bool SipDialogVoip::a16_start_termwait_INVITE( const SipSMCommand &command){
 
 bool SipDialogVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &command){
 
-	if (transitionMatch(command,SipResponse::type, IGN, SipSMCommand::TU, "407\n401")){
+	if (transitionMatch(SipResponse::type, command,IGN, SipSMCommand::TU, "407\n401")){
 		
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 
@@ -691,8 +744,10 @@ bool SipDialogVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &comma
 				dialogState.callId));
 		registerTransaction(trans);
 		
-		realm = resp->getRealm();
-		nonce = resp->getNonce();
+		//realm = resp->getRealm();
+		realm = resp->getAuthenticateProperty("realm");
+		//nonce = resp->getNonce();
+		nonce = resp->getAuthenticateProperty("nonce");
 
 		sendAuthInvite(trans->getBranch());
 
@@ -705,7 +760,7 @@ bool SipDialogVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &comma
 
 bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "18*")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
 #ifdef ENABLE_TS
 		ts.save( RINGING );
@@ -732,7 +787,7 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 }
 
 bool SipDialogVoip::a22_callingauth_callingauth_1xx( const SipSMCommand &command){
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "1**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "1**")){
 
 		dialogState.updateState( MRef<SipResponse*> ( (SipResponse*)*command.getCommandPacket() ) );
 		return true;
@@ -742,7 +797,7 @@ bool SipDialogVoip::a22_callingauth_callingauth_1xx( const SipSMCommand &command
 }
 
 bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
 		dialogState.updateState( resp );
@@ -778,7 +833,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 
 bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
 
 		//int bye_seq_no= requestSeqNo();
 		++dialogState.seqNo;
@@ -853,7 +908,7 @@ bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); //this is for the shutdown dialog 
 		return true;
 	}
-	else if ( notifyEarlyTermination && transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "2**")){
+	else if ( notifyEarlyTermination && transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
 		lastInvite=NULL;                
 		//Notify the GUI and the dialog container ... 
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
@@ -929,7 +984,7 @@ bool SipDialogVoip::a27_incall_transferrequested_transfer( const SipSMCommand &c
 }
 
 bool SipDialogVoip::a28_transferrequested_transferpending_202( const SipSMCommand &command){
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "202")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "202")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 
 		CommandString cmdstr(dialogState.callId, 
@@ -951,7 +1006,7 @@ bool SipDialogVoip::a28_transferrequested_transferpending_202( const SipSMComman
 
 bool SipDialogVoip::a31_transferrequested_incall_36( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipResponse::type, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "3**\n4**\n5**\n6**")){
                 
 		CommandString cmdstr( dialogState.callId, 
 			SipCommandString::transfer_refused, 
@@ -966,13 +1021,13 @@ bool SipDialogVoip::a31_transferrequested_incall_36( const SipSMCommand &command
 bool SipDialogVoip::a32_transferpending_transferpending_notify( const SipSMCommand &command) {
 	bool ret = false;
 	
-	if (transitionMatch(command, SipNotify::type, SipSMCommand::transaction, SipSMCommand::TU)){
+	if (transitionMatch("NOTIFY", command, SipSMCommand::transaction, SipSMCommand::TU)){
 		//this is just the same notify, lifted from the transaction up to the dialog ... 
 		//we can safely absorb it ...
 		return true;
-	} else if (transitionMatch(command, SipNotify::type, SipSMCommand::remote, SipSMCommand::TU)){
-		MRef<SipNotify*> notif;
-		notif = (SipNotify*)*command.getCommandPacket();
+	} else if (transitionMatch("NOTIFY", command, SipSMCommand::remote, SipSMCommand::TU)){
+		MRef<SipRequest*> notif;
+		notif = (SipRequest*)*command.getCommandPacket();
 		
 		MRef<SipTransaction*> notifyResp = new SipTransactionNonInviteServer(
 				sipStack, 
@@ -997,7 +1052,7 @@ bool SipDialogVoip::a32_transferpending_transferpending_notify( const SipSMComma
 bool SipDialogVoip::a33_incall_transferaskuser_REFER( const SipSMCommand &command)
 {
 
-	if (transitionMatch(command, SipRefer::type, IGN, IGN)){
+	if (transitionMatch("REFER", command, IGN, IGN)){
 
 		MRef<SipTransaction*> cr( 
 			new SipTransactionNonInviteServer(sipStack, 
@@ -1013,18 +1068,28 @@ bool SipDialogVoip::a33_incall_transferaskuser_REFER( const SipSMCommand &comman
 
 		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		
-		lastRefer = dynamic_cast<SipRefer *>(*command.getCommandPacket());
-
+		if (command.getCommandPacket()->getType()=="REFER"){
+			lastRefer = dynamic_cast<SipRequest*>(*command.getCommandPacket());
+		}else{
+			lastRefer = NULL;
+		}
+			
+		
+		
+		string referredUri=getReferredUri(lastRefer);
+		
 		/* Tell the GUI */
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::transfer_requested,
-				lastRefer->getReferredUri());
+				referredUri);
 		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		return true;
 	}else{
 		return false;
 	}
 }
+
+
 
 bool SipDialogVoip::a34_transferaskuser_transferstarted_accept( const SipSMCommand &command)
 {
@@ -1033,7 +1098,7 @@ bool SipDialogVoip::a34_transferaskuser_transferstarted_accept( const SipSMComma
 		sendReferOk(lastRefer->getDestinationBranch() );
 
 		/* start a new call ... */
-		string uri = lastRefer->getReferredUri();
+		string uri = getReferredUri(lastRefer);
 		string newCallId = phoneconf->sip->invite( uri );
 
 		/* Send the new callId to the GUI */
@@ -1287,19 +1352,14 @@ SipDialogVoip::~SipDialogVoip(){
 	mediaSession->unregister();
 }
 
-/*
-void SipDialogVoip::handleSdp(MRef<SdpPacket*> sdp){
-
-}
-*/
 
 void SipDialogVoip::sendInvite(const string &branch){
 	//	mdbg << "ERROR: SipDialogVoip::sendInvite() UNIMPLEMENTED"<< end;
 	
-	MRef<SipInvite*> inv;
+	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
-	inv= MRef<SipInvite*>(
-		new SipInvite(
+	//inv= MRef<SipInvite*>(
+	inv = SipRequest::createSipMessageInvite(
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
@@ -1312,7 +1372,7 @@ void SipDialogVoip::sendInvite(const string &branch){
 			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
-			getDialogConfig()->inherited->getTransport() ) );
+			getDialogConfig()->inherited->getTransport() ) ;
 
 	/* Get the session description from the Session */
 		
@@ -1394,12 +1454,13 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 	//	merr << "ERROR: SipDialogVoip::sendAuthInvite() UNIMPLEMENTED"<< end;
 	//string call_id = getDialogConfig().callId;
 	//SipInvite * inv;
-	MRef<SipInvite*> inv;
+	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
 
 	//merr << "SipDialogVoip::sendAuthInv : dialogstate.remoteUri=" << dialogState.remoteUri << end;
 
-	inv= new SipInvite(
+	//inv= new SipInvite(
+	inv = SipRequest::createSipMessageInvite(
 		branch,
 		dialogState.callId,
 		dialogState.remoteUri,
@@ -1553,7 +1614,8 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 	//merr << "SipDialogVoip::sendBye : dialogstate.remoteUri=" << dialogState.remoteUri << end;
 
 //	mdbg << "///////////Creating bye with uri_foreign="<<getDialogConfig().uri_foreign << " and doman="<< domain<< end;
-	MRef<SipBye*> bye = new SipBye(
+	//MRef<Sip*> bye = new SipBye(
+	MRef<SipRequest*> bye = SipRequest::createSipMessageBye(
 			branch,
 			getLastInvite(),
 			//dialogState.remoteUri,
@@ -1593,7 +1655,8 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 	for ( ; i < tmp.length() ; i++)
 		domain = domain+tmp[i];
 */
-	MRef<SipRefer*> refer = new SipRefer(
+	//MRef<SipRefer*> refer = new SipRefer(
+	MRef<SipRequest*> refer = SipRequest::createSipMessageRefer(
 			branch,
 			getLastInvite(),
 			dialogState.getRemoteTarget(),
@@ -1616,7 +1679,8 @@ void SipDialogVoip::sendCancel(const string &branch){
 	
 	//merr << "SipDialogVoip::sendCancel : dialogstate.remoteUri=" << dialogState.remoteUri << end;
 	
-	MRef<SipCancel*> cancel = new SipCancel(
+	//MRef<SipCancel*> cancel = new SipCancel(
+	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
 			branch,
 			lastInvite,
 			dialogState.remoteUri,
@@ -1738,7 +1802,7 @@ void SipDialogVoip::sendReferOk(const string &branch){
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
-void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
+void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
@@ -1749,7 +1813,7 @@ void SipDialogVoip::sendByeOk(MRef<SipBye*> bye, const string &branch){
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
-void SipDialogVoip::sendNotifyOk(MRef<SipNotify*> notif, const string &branch){
+void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
 	MRef<SipResponse*> ok= new SipResponse( branch, 200, "OK", MRef<SipMessage*>(*notif) );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
@@ -1866,11 +1930,11 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	return handled;
 }
 
-MRef<SipInvite*> SipDialogVoip::getLastInvite(){
+MRef<SipRequest*> SipDialogVoip::getLastInvite(){
 	return lastInvite;
 }
 
-void SipDialogVoip::setLastInvite(MRef<SipInvite*> i){ 
+void SipDialogVoip::setLastInvite(MRef<SipRequest*> i){ 
 	lastInvite = i; 
 }
 

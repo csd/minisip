@@ -40,9 +40,6 @@
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipAck.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
@@ -105,8 +102,8 @@ class SipDialogConfVoip: public SipDialog{
 		
 		string type;
 		int numConnected;
-		MRef<SipInvite*> getLastInvite();
-		void setLastInvite(MRef<SipInvite*> i);
+		MRef<SipRequest*> getLastInvite();
+		void setLastInvite(MRef<SipRequest*> i);
 		
 		void sendInvite(const string &branch);
 		void sendAuthInvite(const string &branch);
@@ -114,13 +111,13 @@ class SipDialogConfVoip: public SipDialog{
 		void sendCancel(const string &branch);
 		void sendAck(const string &branch);
 		void sendInviteOk(const string &branch);
-		void sendByeOk(MRef<SipBye*> bye, const string &branch);
+		void sendByeOk(MRef<SipRequest*> bye, const string &branch);
 		void sendReject(const string &branch);
 		void sendRinging(const string &branch);
 		void sendNotAcceptable(const string &branch);
-		void modifyConfJoinInvite(MRef<SipInvite*>inv);
-		void modifyConfConnectInvite(MRef<SipInvite*>inv);
-		void modifyConfAck(MRef<SipAck*>ack);
+		void modifyConfJoinInvite(MRef<SipRequest*>inv);
+		void modifyConfConnectInvite(MRef<SipRequest*>inv);
+		void modifyConfAck(MRef<SipRequest*>ack);
 		void modifyConfOk(MRef<SipResponse*> ok);
 		bool a0_start_callingnoauth_invite( const SipSMCommand &command);
 		bool a1_callingnoauth_callingnoauth_18X( const SipSMCommand &command);
@@ -154,7 +151,7 @@ class SipDialogConfVoip: public SipDialog{
 		
 		MRef<LogEntry *> logEntry;
 
-		MRef<SipInvite*> lastInvite;
+		MRef<SipRequest*> lastInvite;
 		MRef<SipResponse*> lastResponse;
 		bool localCalled;
 		string nonce;

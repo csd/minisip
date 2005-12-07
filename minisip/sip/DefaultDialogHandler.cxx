@@ -31,15 +31,14 @@
 #include"SipDialogPresenceServer.h"
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
+#include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipIMMessage.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
-#include<libmsip/SipCancel.h>
 #include<libmutil/massert.h>
 
 #ifdef P2T_SUPPORT
@@ -103,19 +102,43 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 	}
 #endif
 
-	if (source==SipSMCommand::remote && pkt->getType()==SipInvite::type){
+	if (source==SipSMCommand::remote && pkt->getType()=="INVITE"){
 
 		//type casting
-		MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pkt);
+		MRef<SipRequest*> inv = MRef<SipRequest*>((SipRequest*)*pkt);
 		//inv->checkAcceptContact();
 		//check if it's a regular INVITE or a P2T INVITE
 #ifdef P2T_SUPPORT
 		if(inv->is_P2T()) {
 			inviteP2Treceived(SipSMCommand(pkt,source,destination));	
 		}
-		else 
 #endif
-        if(inv->is_ConfJoin()) {
+
+
+	bool isConfJoin=false;
+	bool isP2T=false;
+	bool isConfConnect=false;
+	MRef<SipHeaderValueAcceptContact*> acp;
+	int i=0;
+	MRef<SipHeaderValue*> hdr=inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
+	do{
+		if (hdr){
+			MRef<SipHeaderValueAcceptContact*> acp = (SipHeaderValueAcceptContact*)*hdr;
+                        if(acp && acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
+                                isP2T=true;
+                        else if(acp && acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"") {
+                                //cout << "SIPINVITE: Setting conjoin to true" << endl;
+                                isConfJoin=true;
+                        }
+                        else if(acp && acp->getFeaturetag()=="+sip.confconnect=\"TRUE\""){
+                                isConfConnect=true;
+			}
+		}
+		i++;
+		hdr = inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
+	}while(hdr);
+			
+        if(isConfJoin) {
 			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
 			string uri;
 			MRef<SipIdentity *> id = NULL;
@@ -190,7 +213,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 			mdbg << cmd << end;
 		}
-		else if(inv->is_ConfConnect()) {
+		else if(isConfConnect) {
 			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
 			string uri;
 			MRef<SipIdentity *> id = NULL;
@@ -284,9 +307,9 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 	}
 
 
-	if (source==SipSMCommand::remote && pkt->getType()==SipIMMessage::type){
+	if (source==SipSMCommand::remote && pkt->getType()=="MESSAGE"){
 
-		MRef<SipIMMessage*> im = MRef<SipIMMessage*>((SipIMMessage*)*pkt);
+		MRef<SipRequest*> im = (SipRequest*)*pkt;
 			 
 #ifdef DEBUG_OUTPUT			
 		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << end;
@@ -506,7 +529,7 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	//type casting
 	MRef<SipMessage*> pack = command.getCommandPacket();
-	MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
+	MRef<SipRequest*> inv = MRef<SipRequest*>((SipRequest*)*pack);
 	
 	//get the GroupList from the remote GroupListServer
 	MRef<GroupList*>grpList;
@@ -862,7 +885,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr = new IP4Address(proxy);
+			//dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr = new IP4Address(proxy);
+			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyAddressString = proxy;
 			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyPort = iport;
 		}catch(HostNotFound & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
@@ -876,7 +900,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 }
 
 
-void DefaultDialogHandler::sendIMOk(MRef<SipIMMessage*> bye, const string &branch){
+void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
         ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
@@ -905,12 +929,13 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	cerr << "DefaultDialogHandler::sendIM - toUri = " << toUri <<  endl;
 	#endif
 	
-	MRef<SipIMMessage*> im = new SipIMMessage(
+	//MRef<SipIMMessage*> im = new SipIMMessage(
+	MRef<SipRequest*> im = SipRequest::createSipMessageIMMessage(
 			std::string(branch),
 			std::string(dialogState.callId),
 // 			toId,
 			toUri, 	
-			getDialogConfig()->inherited->sipIdentity,
+			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			//getDialogConfig()->inherited.localUdpPort,
 			im_seq_no,
 			msg

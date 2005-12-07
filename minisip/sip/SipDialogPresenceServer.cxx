@@ -34,8 +34,6 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipSubscribe.h>
-#include<libmsip/SipNotify.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
@@ -153,8 +151,8 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 
 
 bool SipDialogPresenceServer::a5_default_default_SUBSCRIBE(const SipSMCommand &command){
-	if (transitionMatch(command, SipSubscribe::type, SipSMCommand::remote, IGN)){
-		MRef<SipSubscribe *> sub = (SipSubscribe*)*command.getCommandPacket();
+	if (transitionMatch("SUBSCRIBE", command, SipSMCommand::remote, IGN)){
+		MRef<SipRequest *> sub = (SipRequest*)*command.getCommandPacket();
 		
 		string user = sub->getHeaderValueTo()->getUri().getUserIpString();
 		cerr <<"SipDialogPresenceServer::a5_default_default_SUBSCRIBE: got subscribe request from <"<<user<<">"<<endl;
@@ -251,7 +249,7 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 	usersLock.unlock();
 }
 
-void SipDialogPresenceServer::sendSubscribeOk(MRef<SipSubscribe *> sub){
+void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
 	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this),
 				sub->getCSeq(),
 				sub->getCSeqMethod(),
@@ -288,20 +286,20 @@ void SipDialogPresenceServer::addUser(string user){
 
 void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, string cid){
 	
-	MRef<SipNotify*> notify;
+	MRef<SipRequest*> notify;
 	int32_t localSipPort;
 	
 	localSipPort = getDialogConfig()->inherited->getLocalSipPort( useSTUN );
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
-	notify = MRef<SipNotify*>(new SipNotify(
+	notify = SipRequest::createSipMessageNotify(
 				branch,
 				cid,
-				toId,
-				getDialogConfig()->inherited->sipIdentity,
+				toId->getSipUri(),
+				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				//getDialogConfig()->inherited.localUdpPort,
 				dialogState.seqNo
-				));
+				);
 
 	notify->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 

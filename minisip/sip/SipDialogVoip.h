@@ -40,10 +40,6 @@
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipRefer.h>
-#include<libmsip/SipNotify.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
@@ -82,16 +78,15 @@ class SipDialogVoip: public SipDialog{
 #endif
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
-		//void handleSdp(MRef<SdpPacket*> );
-                
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
+
 	private:
 		
 		void setUpStateMachine();
 		
-		MRef<SipInvite*> getLastInvite();
-		void setLastInvite(MRef<SipInvite*> i);
+		MRef<SipRequest*> getLastInvite();
+		void setLastInvite(MRef<SipRequest*> i);
 		
 		void sendInvite(const string &branch);
 		void sendAuthInvite(const string &branch);
@@ -99,8 +94,8 @@ class SipDialogVoip: public SipDialog{
 		void sendCancel(const string &branch);
 		void sendInviteOk(const string &branch);
 		void sendReferOk(const string &branch);
-		void sendByeOk(MRef<SipBye*> bye, const string &branch);
-		void sendNotifyOk(MRef<SipNotify*> notif, const string &branch);
+		void sendByeOk(MRef<SipRequest*> bye, const string &branch);
+		void sendNotifyOk(MRef<SipRequest*> notif, const string &branch);
 		void sendReject(const string &branch);
 		void sendReferReject(const string &branch);
 		void sendRefer(const string &branch, int, const string referredUri);
@@ -148,8 +143,8 @@ class SipDialogVoip: public SipDialog{
 		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
 		MRef<LogEntry *> logEntry;
 
-		MRef<SipInvite*> lastInvite;
-		MRef<SipRefer*> lastRefer;
+		MRef<SipRequest*> lastInvite;
+		MRef<SipRequest*> lastRefer;
 
 		bool localCalled;
 		string nonce;

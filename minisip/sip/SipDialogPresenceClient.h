@@ -39,8 +39,6 @@
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
