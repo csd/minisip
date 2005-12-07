@@ -29,6 +29,7 @@
 #define MAIN_WINDOW_H
 
 
+#include"GtkMainUI.h"
 #include"../Gui.h"
 //#include"../../LogEntry.h"
 #include<libmutil/MemObject.h>
@@ -57,13 +58,13 @@ class AccountsList;
 class AccountsStatusWidget;
 
 
-class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public DtmfHandler
+class MainWindow : public GtkMainUI, public DtmfHandler
 #ifdef OLDLIBGLADEMM
 		   ,public SigC::Object
 #endif
 {
 	public:
-		MainWindow( int argc, char ** argv );
+		MainWindow( Gtk::Main *main );
 		~MainWindow();
 
 		bool isVisible();
@@ -182,7 +183,7 @@ class MainWindow : public Gui, public LogEntryHandler, public DbgHandler, public
 		PhoneBookModel * phoneBookModel;
 		PhoneBookTree * phoneBookTree;
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection;
-		Gtk::Main kit;
+		Gtk::Main *kit;
 
 		Gtk::CheckMenuItem * viewCallListMenu;
 		Gtk::CheckMenuItem * viewStatusMenu;

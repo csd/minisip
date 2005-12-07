@@ -29,6 +29,28 @@ dnl Update: QT disabled for now
 QTGUI="no"
 
 
+dnl
+dnl Linker flags
+dnl mingw needs --enable-runtime-pseudo-reloc since it can't
+dnl auto import all symbols.
+dnl
+RELOC_LDFLAGS="-Wl,--enable-runtime-pseudo-reloc"
+AC_MSG_CHECKING([Linker flag ${RELOC_LDFLAGS}])
+cf_save_LDFLAGS="${LDFLAGS}"
+LDFLAGS="${LDFLAGS} ${RELOC_LDFLAGS}"
+reloc_result="no"
+AC_LINK_IFELSE([
+int main() {
+    return 0;
+}
+],[reloc_result="yes"],[RELOC_LDFLAGS=""])
+LDFLAGS="${cf_save_LDFLAGS}"
+AC_MSG_RESULT(${reloc_result})
+AC_SUBST(RELOC_LDFLAGS)
+
+dnl Check types
+AC_CHECK_TYPES([uint])
+
 dnl STL
 dnl AC_ARG_ENABLE(stl,
 dnl    [ --enable-stl enables the use of C++ STL (default disabled)],
@@ -352,6 +374,19 @@ if test "x${enable_gtk}" != "xno"
         [AC_MSG_ERROR([Could not find the glademm-2.0 library])]
       )]
     )
+    cf_save_CPPFLAGS="${CPPFLAGS}"
+    CPPFLAGS="${CPPFLAGS} ${GLADEMM_CFLAGS}"
+    AC_CHECK_HEADERS([glibconfig.h])
+    AC_CHECK_DECL(G_THREADS_ENABLED, [
+      PKG_CHECK_MODULES(GTHREAD, [gthread-2.0],,[
+        AC_MSG_ERROR([Could not find the gthread-2.0 library])
+      ])],, [
+#ifdef HAVE_GLIBCONFIG_H
+#include<glibconfig.h>
+#endif
+    ])
+    CPPFLAGS="${cf_save_CPPFLAGS}"
+      
     QTGUI="no"
 fi
 AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])

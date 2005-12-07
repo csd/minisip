@@ -1,7 +1,6 @@
 noinst_LIBRARIES = libminisip_gtkgui.a
-datadir = @datadir@/minisip
-AM_CXXFLAGS = @CXXFLAGS@ @GLADEMM_CFLAGS@
-AM_CPPFLAGS = @CPPFLAGS@ -DMINISIP_DATADIR="\"$(datadir)\"" -I$(top_srcdir)/include
+AM_CXXFLAGS = @GLADEMM_CFLAGS@ $(GTHREAD_CFLAGS)
+AM_CPPFLAGS = -DMINISIP_DATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/include
 
 libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
                               CallWidget.cxx \
@@ -17,9 +16,9 @@ libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
 			      AccountDialog.cxx \
 			      AccountsList.cxx \
 			      AccountsStatusWidget.cxx \
-			      DtmfWidget.cxx
-			  
-	
+			      DtmfWidget.cxx \
+			      GtkMainUI.h \
+			      GtkMainUI.cxx
 
 noinst_HEADERS  = MainWindow.h \
                   CallWidget.h \

@@ -11,8 +11,8 @@ libminisip_a_SOURCES = Bell.cxx \
 
 bin_PROGRAMS = minisip
 
-AM_LDFLAGS = @LDFLAGS@ @AVCODEC_LDFLAGS@ @OSSO_LIBS@
-AM_CXXFLAGS = @CXXFLAGS@ @OSSO_CFLAGS@
+AM_LDFLAGS = @AVCODEC_LDFLAGS@ @OSSO_LIBS@ $(RELOC_LDFLAGS)
+AM_CXXFLAGS = @OSSO_CFLAGS@
 minisip_LDADD = 
 
 if GCONF_SUPPORT
@@ -22,9 +22,9 @@ endif
 
 
 if GTK_GUI
-AM_LDFLAGS +=  @HILDON_LIBS@ @GLADEMM_LIBS@
+AM_LDFLAGS +=  @HILDON_LIBS@
 AM_CXXFLAGS += @HILDON_CFLAGS@ @GLADEMM_CFLAGS@
-minisip_LDADD += gui/gtkgui/libminisip_gtkgui.a
+minisip_LDADD += gui/gtkgui/libminisip_gtkgui.a $(GLADEMM_LIBS) $(GTHREAD_LIBS)
 else !GTK_GUI
 if TEXT_UI
 minisip_LDADD += gui/textui/libminisip_textui.a

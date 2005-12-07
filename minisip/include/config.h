@@ -160,12 +160,15 @@ static inline uint64_t U64_AT( void const * _p )
 
 #define SOUND_CARD_FREQ 48000
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #define TEXT_UI
 //#define DEBUG_OUTPUT
 #include<iostream>
 using namespace std;
 #endif
 
+#ifndef HAVE_UINT
+typedef unsigned int uint;
+#endif
 
 #endif

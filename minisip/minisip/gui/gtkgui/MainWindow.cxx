@@ -62,7 +62,7 @@
 #define BIND sigc::bind
 #endif
 
-MainWindow::MainWindow( int argc, char ** argv ):kit( argc, argv ){
+MainWindow::MainWindow( Gtk::Main *main ):kit( main ){
 
 	Gtk::Button * callButton;
 	Gtk::Button * imButton;
@@ -346,16 +346,16 @@ void MainWindow::run(){
 	if( trayIcon != NULL ){
 		Gtk::Window * window = NULL;
 		window = trayIcon->getWindow();
-		kit.run( *window );
+		kit->run( *window );
 		if( window != NULL )	delete window;
 	}
 	else
 #endif
-		kit.run( *mainWindowWidget );
+		kit->run( *mainWindowWidget );
 }
 
 void MainWindow::quit(){
-	kit.quit();
+	kit->quit();
 }
 
 bool MainWindow::isVisible(){

@@ -13,7 +13,7 @@ using namespace std;
 #include<libmutil/TextUI.h>
 #else //!TEXT_UI
 #ifdef GTK_GUI
-#include"gui/gtkgui/MainWindow.h"
+#include"gui/gtkgui/GtkMainUI.h"
 #else //!GTK_GUI
 #include"gui/qtgui/MinisipMainWindowWidget.h"
 #include"gui/qtgui/qtguistarter.h"
@@ -136,9 +136,9 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	#else //!TEXT_UI
 		#ifdef GTK_GUI
 			cerr << "Creating GTK GUI"<< endl;
-			gui = new MainWindow( argc, argv );
+			gui = GtkMainUI::create( argc, argv );
 			cerr << "Minisip: gtk 1" << endl;
-			LogEntry::handler = (MainWindow *)*gui;
+			LogEntry::handler = (GtkMainUI *)*gui;
 			cerr << "Minisip: gtk 2" << endl;
 			#ifdef DEBUG_OUTPUT
 				consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
