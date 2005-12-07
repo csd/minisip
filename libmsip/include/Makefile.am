@@ -15,6 +15,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderFrom.h \
                      libmsip/SipHeaderMaxForwards.h \
                      libmsip/SipHeaderProxyAuthenticate.h \
+                     libmsip/SipHeaderWWWAuthenticate.h \
                      libmsip/SipHeaderProxyAuthorization.h \
                      libmsip/SipHeaderRecordRoute.h \
                      libmsip/SipHeaderRoute.h \
@@ -47,17 +48,8 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipTransactionInviteServer.h \
 		     libmsip/SipTransactionInviteClientUA.h \
 		     libmsip/SipTransactionInviteServerUA.h \
-		     libmsip/SipAck.h \
-		     libmsip/SipBye.h \
-		     libmsip/SipCancel.h \
-		     libmsip/SipInvite.h \
-		     libmsip/SipNotify.h \
 		     libmsip/SipMessage.h \
-		     libmsip/SipIMMessage.h \
-		     libmsip/SipRefer.h \
-		     libmsip/SipRegister.h \
 		     libmsip/SipResponse.h \
-		     libmsip/SipSubscribe.h \
 		     libmsip/SipRequest.h \
 		     libmsip/SipDialog.h \
 		     libmsip/SipDialogRegister.h \
