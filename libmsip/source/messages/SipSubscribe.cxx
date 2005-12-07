@@ -69,31 +69,29 @@ SipSubscribe::SipSubscribe(string branch,
 
 	setUri(toUser + '@' + toDomain);
 
-	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain );
+	SipURI fromUri;
+	fromUri.setParams(fromIdentity->sipUsername, fromIdentity->sipDomain, "", 0);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromUri );
 	addHeader(new SipHeader(*fromp));
 
-	MRef<SipHeaderValue*> top = new SipHeaderValueTo(toIdentity->sipUsername, toIdentity->sipDomain);
+	SipURI toUri;
+	toUri.setParams(toIdentity->sipUsername, toIdentity->sipDomain, "", 0);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(toUri);
 	addHeader(new SipHeader(*top));
 	
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id);
 	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("SUBSCRIBE");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("SUBSCRIBE", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
-	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent();
-	ep->setEvent("presence");	
+	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent("presence");	
 	addHeader(new SipHeader(*ep));
 
-	MRef<SipHeaderValueAccept*> ap = new SipHeaderValueAccept();
-	ap->setAccept("application/xpidf+xml");
+	MRef<SipHeaderValueAccept*> ap = new SipHeaderValueAccept("application/xpidf+xml");
 	addHeader(new SipHeader(*ap));
 }
 

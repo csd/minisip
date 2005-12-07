@@ -97,15 +97,12 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 	}
 
 	/* Add the CSeq: header */
-	MRef<SipHeaderValueCSeq *> cseqVal = new SipHeaderValueCSeq();
-	cseqVal->setMethod("REFER");
-	cseqVal->setCSeq(cSeqNo);
+	MRef<SipHeaderValueCSeq *> cseqVal = new SipHeaderValueCSeq("REFER", cSeqNo);
 	header = new SipHeader( *cseqVal );
 	addHeader(header);
 	
 	/* Add the Refer-To: header */
-	MRef<SipHeaderValueReferTo *> rtVal = new SipHeaderValueReferTo();
-	rtVal->setUri(referredUri);
+	MRef<SipHeaderValueReferTo *> rtVal = new SipHeaderValueReferTo(referredUri);
 	header = new SipHeader( *rtVal );
 	addHeader(header);
 }
@@ -113,7 +110,7 @@ SipRefer::SipRefer(string branch, MRef<SipInvite*> inv,
 string SipRefer::getReferredUri(){
         for (uint32_t i = 0; i< (uint32_t)headers.size(); i++)
                 if ((headers[i])->getType() == SIP_HEADER_TYPE_REFERTO){
-                        string referredUri = ((SipHeaderValueReferTo *)*(headers[i]->getHeaderValue(0)))->getUri();
+                        string referredUri = ((SipHeaderValueReferTo *)*(headers[i]->getHeaderValue(0)))->getString();
                         return referredUri;
                 }
         return "";

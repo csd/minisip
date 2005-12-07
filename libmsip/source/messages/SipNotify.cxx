@@ -70,31 +70,30 @@ SipNotify::SipNotify(string branch,
 	toDomain = toIdentity->sipDomain;
 
 	setUri(toUser + '@' + toDomain);
-	
-	MRef<SipHeader*> fromp = new SipHeader(new SipHeaderValueFrom(fromIdentity->sipUsername, fromIdentity->sipDomain ));
+
+	SipURI fromUri;
+	fromUri.setParams(fromIdentity->sipUsername, fromIdentity->sipDomain, "", 0);
+	MRef<SipHeader*> fromp = new SipHeader(new SipHeaderValueFrom(fromUri));
 	addHeader(fromp);
 
-	MRef<SipHeader*> top = new SipHeader(new SipHeaderValueTo(toIdentity->sipUsername, toIdentity->sipDomain));
+	SipURI toUri;
+	toUri.setParams(toIdentity->sipUsername, toIdentity->sipDomain, "", 0);
+	MRef<SipHeader*> top = new SipHeader(new SipHeaderValueTo(toUri));
 	addHeader(top);
 	
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
 
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id);
 	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("NOTIFY");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("NOTIFY", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
-	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent();
-	ep->setEvent("presence");	
+	MRef<SipHeaderValueEvent*> ep = new SipHeaderValueEvent("presence");	
 	addHeader(new SipHeader(*ep));
 }
 

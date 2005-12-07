@@ -61,22 +61,21 @@ SipRegister::SipRegister(string branch,
 		int expires
 	) : SipRequest(branch, SipRegister::type, "REGISTER"), domain(domainarg)
 {
-	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
+	SipURI fromUri;
+	fromUri.setParams(from_tel_no, domain, "", 0);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromUri);
 	addHeader(new SipHeader(*fromp));
 	
-	MRef<SipHeaderValue*> top = new SipHeaderValueTo(from_tel_no, domain);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(fromUri);
 	addHeader(new SipHeader(*top));
 	
 	MRef<SipHeaderValue*> mf= new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
 	
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id);
 	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("REGISTER");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("REGISTER", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
 	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, 
@@ -93,8 +92,7 @@ SipRegister::SipRegister(string branch,
 	contactp_casted->setExpires(expires);
 	addHeader(new SipHeader(*contactp));
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
 	setUri("sip:" + domain);
@@ -118,29 +116,27 @@ SipRegister::SipRegister(string branch,
 	SipURI uri;
 	uri.setParams("", localIp,"", sip_listen_port);
 	 
-	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(from_tel_no, domain);
+	SipURI fromUri;
+	fromUri.setParams(from_tel_no, domain, "", 0);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom(fromUri);
 	addHeader(new SipHeader(fromp));
 	
-	MRef<SipHeaderValue*> top = new SipHeaderValueTo(from_tel_no, domain);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo(fromUri);
 	addHeader(new SipHeader(top));
 	
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
 	
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id);
 	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("REGISTER");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("REGISTER", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
 	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport, expires);
 	addHeader(new SipHeader(*contactp));
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 	
         MRef<SipHeaderValue*> authp = 

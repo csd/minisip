@@ -280,7 +280,7 @@ SipMessage::SipMessage(int type, string &buildFrom): type(type)
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
 			MRef<SipMessageContent*> smcref;
-			string contentType = ((SipHeaderValueContentType*)*(h->getHeaderValue(0) ))->getContentType();
+			string contentType = ((SipHeaderValueString*)*(h->getHeaderValue(0) ))->getString();
 //			string b = (SipHeaderValueContentType*)*(h->getHeaderValue(0) )->getParameter("boundary");
 //cerr <<"boundary="<< b <<endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
@@ -332,8 +332,7 @@ void SipMessage::setContent(MRef<SipMessageContent*> content){
 	if( content ){
 		string contentType = content->getContentType();
 		if( contentType != "" ){
-			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType();
-			contenttypep->setContentType( contentType );
+			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType( contentType );
 			addHeader(new SipHeader(*contenttypep));
 		}
 	}
@@ -348,7 +347,7 @@ string SipMessage::getCallId(){
 		MRef<SipHeaderValueCallID*> id;
 		if ((headers[i])->getType() == SIP_HEADER_TYPE_CALLID){
 			id = MRef<SipHeaderValueCallID*>((SipHeaderValueCallID*)*(headers[i]->getHeaderValue(0)));
-			return id->getId();
+			return id->getString();
 		}
 	}
 	return "";

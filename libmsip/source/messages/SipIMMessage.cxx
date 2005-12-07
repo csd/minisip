@@ -68,35 +68,27 @@ SipIMMessage::SipIMMessage(string branch,
 {
 
 	this->toUri = toUri;
-	int posAt = (int)toUri.find("@");
-	toUser = toUri.substr( 0, posAt );
-	if( posAt != (int)string::npos ) 
-		toDomain = toUri.substr( posAt + 1 );
-	else 	toDomain = "";
-
 	setUri(toUri);
 	
-	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromIdentity->sipUsername, fromIdentity->sipDomain );
+	SipURI fromUri;
+	fromUri.setParams(fromIdentity->sipUsername, fromIdentity->sipDomain, "", 0);
+	MRef<SipHeaderValue*> fromp = new SipHeaderValueFrom( fromUri );
 	addHeader(new SipHeader(*fromp));
 
-	MRef<SipHeaderValue*> top = new SipHeaderValueTo(toUser, toDomain);
+	MRef<SipHeaderValue*> top = new SipHeaderValueTo( toUri );
 	addHeader(new SipHeader(*top));
 	
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
 
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID();
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id);
 	addHeader(new SipHeader(*callidp));
 	
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("MESSAGE");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("MESSAGE", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 
 	setContent(new SipMessageContentIM(msg));

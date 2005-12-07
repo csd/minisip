@@ -178,15 +178,20 @@ void SipInvite::createHeadersAndContent(
 	this->user_type="";
 
 	setUri(tel_no);
+
+	SipURI fromUri;
+	fromUri.setParams(from_tel_no, proxyAddr, "", 0);
 	
-	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(from_tel_no, proxyAddr ) );
+	MRef<SipHeader*> fromp = new SipHeader( new SipHeaderValueFrom(fromUri) );
 	addHeader(fromp);
 
-	MRef<SipHeader*> top = new SipHeader( new SipHeaderValueTo(tel_no, proxyAddr) );
+	SipURI toUri;
+	toUri.setParams(tel_no, proxyAddr, "", 0);
+
+	MRef<SipHeader*> top = new SipHeader( new SipHeaderValueTo(toUri) );
 	addHeader(top);
 	
-	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID() ;
-	callidp->setId(call_id);
+	MRef<SipHeaderValueCallID*> callidp = new SipHeaderValueCallID(call_id) ;
 	addHeader(new SipHeader(*callidp) );
         
 	if ( username.length()>0 || nonce.length()>0 || realm.length()>0 ){
@@ -195,16 +200,13 @@ void SipInvite::createHeadersAndContent(
 	}
 
 
-	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq();
-	seqp->setMethod("INVITE");
-	seqp->setCSeq(seq_no);
+	MRef<SipHeaderValueCSeq*> seqp = new SipHeaderValueCSeq("INVITE", seq_no);
 	addHeader(new SipHeader(*seqp));
 	
 	MRef<SipHeaderValue*> contactp = new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"",transport);
 	addHeader(new SipHeader(contactp));
 	
-	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent();
-	uap->setUserAgent(HEADER_USER_AGENT_DEFAULT);
+	MRef<SipHeaderValueUserAgent*> uap = new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT);
 	addHeader(new SipHeader(*uap));
 }
 
