@@ -64,7 +64,6 @@
 #include<libmutil/MemObject.h>
 #include<libmnetutil/IP4Address.h>
 
-#include<libmsip/SipInvite.h>
 #include<libmsip/SipCommandString.h>
 
 #include<libmutil/massert.h>

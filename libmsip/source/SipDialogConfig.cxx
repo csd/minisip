@@ -36,7 +36,7 @@ int SipIdentity::globalIndex = 1; //give an initial value
 
 SipProxy::SipProxy(){
 	sipProxyAddressString = "";
-	sipProxyIpAddr = NULL;
+	//sipProxyIpAddr = NULL;
 	sipProxyPort = 0; 
 	autodetectSettings = false; //dont autodetect ... the values are invalid
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
@@ -140,12 +140,13 @@ void SipProxy::setProxy(std::string addr, int port){
 		}
 	}
 	
-	sipProxyIpAddr = new IP4Address(sipProxyAddressString);
+	//sipProxyIpAddr = new IP4Address(sipProxyAddressString);
 }
 
 std::string SipProxy::getDebugString(){
 	return "proxyString="+sipProxyAddressString
-		+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
+		//+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
+		+"; proxyString="+sipProxyAddressString
 		+"; port="+itoa(sipProxyPort)
 		+"; transport="+getTransport()
 		+"; autodetect="+ (autodetectSettings?"yes":"no")
