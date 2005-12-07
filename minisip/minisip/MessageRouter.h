@@ -24,13 +24,8 @@
 #define MESSAGE_ROUTER_H
 
 #include<libmsip/SipCallback.h>
-#include<libmsip/SipInvite.h>
-//#include<libmsip/SipResponse.h>
 #include<libmutil/minilist.h>
-//#include"SoundSender.h"
-//#include"SoundReceiver.h"
 #include"gui/GuiCallback.h"
-//#include"sip/SipStateMachine.h"
 #include"../sip/Sip.h"
 #include"gui/Gui.h"
 #include"../conf/ConferenceControl.h" 
