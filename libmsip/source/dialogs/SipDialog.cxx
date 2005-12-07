@@ -34,7 +34,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipInvite.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
@@ -48,6 +47,10 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
 {
 	dialogState.seqNo=100 * (rand()%9+1);
 	dialogState.remoteSeqNo=-1;
+	dialogState.secure=false;	//TODO: this variable is not maintained 
+	 				//properly, right?! (this at least does not leave it uninitialized) -EE 
+					
+	dialogState.isEarly=false;	//same as for "secure"?! -EE
 }
 
 SipDialog::~SipDialog(){
@@ -165,7 +168,7 @@ Establish a dialog acting as a UAS (receive a request)
 - local seq = empty
 - call-id = call-id value from request
 */
-bool SipDialogState::updateState( MRef<SipInvite*> inv ) {
+bool SipDialogState::updateState( MRef<SipRequest*> inv ) {
 	//merr << "SipDialogState: updating state ... " << end;
 	if( routeSet.size() == 0 ) {
 		//merr << "dialog state has NO routeset" << end;

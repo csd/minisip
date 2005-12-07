@@ -36,8 +36,8 @@
 #include<libmutil/StateMachine.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
-#include<libmsip/SipInvite.h>
 #include<libmsip/SipResponse.h>
+#include<libmsip/SipRequest.h>
 
 using namespace std;
 
@@ -68,7 +68,7 @@ class LIBMSIP_API SipDialogState{
 		- local seq = empty
 		- call-id = call-id value from request
 		*/
-		bool updateState( MRef<SipInvite*> inv );
+		bool updateState( MRef<SipRequest*> inv );
 		
 		/**
 		Establish a dialog acting as a UAC (send a request, create
@@ -199,12 +199,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
-/*
-#include<libmsip/SipTransaction.h>
-#include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipStack.h>
-*/
 
 #endif
 
