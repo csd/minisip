@@ -24,8 +24,9 @@
 
 /* Name
  * 	SipRequest.h
- * Author
+ * Authors
  * 	Mikael Magnusson, mikma@users.sourceforge.net
+ * 	Erik Eliasson, eliasson@it.kth.se
  * Purpose
  *	Base class of classes representing sip request messages, and
  *      used when parsing unsupported request methods.
@@ -44,18 +45,141 @@
 class LIBMSIP_API SipRequest : public SipMessage{
 
 	public:
-		static const int type;
-                
-		SipRequest(string branch, int type, const string &method,
-			   const string &uri = "");
+
+		
+		static MRef<SipRequest*> createSipMessageAck(
+				string branch,
+				MRef<SipMessage*> pack,
+				string to_tel_no);
+
+		static MRef<SipRequest*> createSipMessageBye(
+				string branch,
+				MRef<SipRequest*> inv,
+				string to_uri,
+				string from_uri,
+				string proxyAddr,
+				int32_t seq_no);
+
+		static MRef<SipRequest*> createSipMessageCancel(
+				string branch,
+				MRef<SipRequest*> inv,
+				string to_uri,
+				string from_uri,
+				string proxy
+				);
+
+		static MRef<SipRequest*> createSipMessageIMMessage(
+				string branch,
+				string call_id,
+				std::string toUri,
+				//MRef<SipIdentity*> fromIdentity,
+				const SipURI&fromUri,
+				int32_t seq_no,
+				string msg);
+
+
+		static MRef<SipRequest*> createSipMessageInvite(
+				const string &branch,
+				const string &call_id,
+				const string &tel_no,
+				const string &proxyAddr,
+				int32_t proxyPort,
+				const string &localAddr,
+				int32_t localSipPort,
+				const string &from_tel_no,
+				int32_t seq_no,
+				const string &transport
+				);
+
+		static MRef<SipRequest*> createSipMessageInvite(
+				const string &branch,
+				const string &call_id,
+				const string &tel_no,
+				const string &proxyAddr,
+				int32_t proxyPort,
+				const string &localAddr,
+				int32_t localSipPort,
+				const string &from_tel_no,
+				int32_t seq_no,
+				const string &username,
+				const string &nonce,
+				const string &realm,
+				const string &password,
+				const string &transport);
+
+		static MRef<SipRequest*> createSipMessageInvite(
+				const string &call_id,
+				const string &tel_no,   //FIXME: Send uris as const SipURI&
+				const string &proxyAddr,
+				int32_t proxyPort,
+				const string &localAddr,
+				int32_t localSipPort,
+				const string &from_tel_no,
+				int32_t seq_no,
+				const string &username,
+				const string &nonce,
+				const string &realm,
+				const string &password,
+				const string &transport
+				);
+
+
+		static MRef<SipRequest*> createSipMessageNotify(
+				string branch,
+				string call_id,
+				//MRef<SipIdentity*> toIdentity,
+				const SipURI& toUri,
+				//MRef<SipIdentity*> fromId,
+				const SipURI& fromUri,
+				int32_t seq_no
+				);
+
+		static MRef<SipRequest*> createSipMessageRefer(
+				string branch,
+				MRef<SipRequest*> inv,
+				string to_uri,
+				string from_uri,
+				string proxy,
+				string referredUri,
+				int cSeqNo);
+
+		static MRef<SipRequest*> createSipMessageRegister(
+				string branch,
+				string call_id,
+				string domainarg,
+				string localIp,
+				int32_t sip_listen_port,
+				string from_tel_no,
+				int32_t seq_no,
+				string transport,
+				int expires,
+				string auth_id="",
+				string realm="",
+				string nonce="",
+				string password="");
+
+		static MRef<SipRequest*> createSipMessageSubscribe(
+				string branch,
+				string call_id,
+				const SipURI& toUri,
+				const SipURI& fromUri,
+				int32_t seq_no);
+
+
+
 
 		SipRequest(string &build_from);
 
+		SipRequest(string branch, const string &method,
+				const string &uri = "");
+
 		virtual ~SipRequest();
 
-		virtual std::string getMemObjectType(){return "SipRequest";}
+		virtual std::string getMemObjectType(){return "SipRequest("+method+")";}
 
 		virtual string getString();
+
+		virtual const string& getType();
 
 		virtual void setMethod(const string &method);
 		virtual string getMethod();
@@ -79,8 +203,33 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		void addRoute(const string &addr, int32_t port,
 			      const string &transport);
 
+
+		/**
+		 * Adds From, To, CSeq, MaxForwards and CallId headers to
+		 * the request. These are the required headers 
+		 * that are added by the application layer (TU).
+		 * (Via and Contact(?) headers are handled by the
+		 *  transport layer.)
+		 *
+		 * This function is typically used when creating
+		 * a SIP new request message.
+		 *
+		 * @param fromUri	Used to create From header
+		 * @param toUri		Used to create To header
+		 * @param method	Used to create CSeq header
+		 * @param seqNo		Used to create CSeq header
+		 * @param callId	Used to create CallId header. If
+		 * 			empty string then a random value
+		 * 			will be generated.
+		 * 
+		 */
+		void addDefaultHeaders(const SipURI& fromUri, 
+				const SipURI& toUri, 
+				const string& method, 
+				int seqNo, 
+				const string& callId="");
+		
 	protected:
-		SipRequest(int type, string &build_from);
 
 		virtual void init(string &build_from);
 
@@ -88,5 +237,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		string method;
 		string uri;
 };
+
+
+
 
 #endif
