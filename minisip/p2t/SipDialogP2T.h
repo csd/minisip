@@ -28,8 +28,6 @@
 
 
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipInvite.h>
-#include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipStack.h>
 #include<libmutil/StateMachine.h>
