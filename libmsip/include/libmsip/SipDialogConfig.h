@@ -37,10 +37,10 @@
 
 #include<libmsip/libmsip_config.h>
 
-#include<libmsip/SipInvite.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
 #include<libmutil/Mutex.h>
+#include<libmsip/SipRequest.h>
 
 #define KEY_MGMT_METHOD_NULL            0x00
 #define KEY_MGMT_METHOD_MIKEY           0x10
@@ -53,7 +53,6 @@
 #include<string>
 
 class Socket;
-class IPAddress;
 
 class LIBMSIP_API SipProxy : public MObject{
 	public:
@@ -92,7 +91,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		static std::string findProxy(std::string uri, uint16_t &port, string transport="UDP");
 
 		std::string sipProxyAddressString;
-		IPAddress * sipProxyIpAddr;
+		//IPAddress * sipProxyIpAddr;
 		
 		int sipProxyPort;
 		
@@ -319,7 +318,7 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 
 		uint32_t local_ssrc;
 
-		MRef<SipInvite*> last_invite;
+		MRef<SipRequest*> last_invite;
 
 		/**
 		Set the identity to be used as default.
