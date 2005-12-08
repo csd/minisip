@@ -11,7 +11,6 @@
 #include <libmikey/MikeyPayloadKEMAC.h>
 #include <libmikey/MikeyPayloadV.h>
 #include <libmikey/MikeyPayloadPKE.h>
-#define AES_KEY notused
 #include <libmutil/aes.h>
 #include <libmutil/hmac.h>
 
