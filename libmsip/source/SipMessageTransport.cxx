@@ -654,9 +654,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			ts.save( tmp );
 
 #endif
-			cerr << "Looking up IP"<<endl;
 			IPAddress *destAddr = IPAddress::create(ip_addr);
-			cerr << "Done Looking up IP"<<endl;
 
 			
 			if (destAddr){
