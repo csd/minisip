@@ -37,6 +37,7 @@
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipSMCommand.h>
 #include<libmutil/massert.h>
 
 #ifdef DEBUG_OUTPUT
@@ -648,7 +649,7 @@ void SipDialogRegister::send_noauth(string branch){
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 	
-	SipSMCommand cmd(MRef<SipMessage*>(*reg), SipSMCommand::TU,SipSMCommand::transaction);
+	SipSMCommand cmd(*reg, SipSMCommand::TU, SipSMCommand::transaction);
 	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
@@ -670,8 +671,7 @@ void SipDialogRegister::send_auth(string branch){
 		nonce, 
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword
 	);
-        
-	SipSMCommand cmd(MRef<SipMessage*>((SipMessage*)*reg), SipSMCommand::TU,SipSMCommand::transaction);
+	SipSMCommand cmd( *reg, SipSMCommand::TU, SipSMCommand::transaction);
 	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
