@@ -104,7 +104,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		static int32_t setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx );
 		
 		/* Must be initialized ... now at Minisip.cxx::tls_server_thread*/
-		static int8_t sslCipherListIndex;  
+		static int8_t sslCipherListIndex;
 
 		friend std::ostream& operator<<(std::ostream&, TLSSocket&);
 
