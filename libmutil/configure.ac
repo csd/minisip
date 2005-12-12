@@ -72,7 +72,14 @@ AC_CHECK_HEADER([openssl/crypto.h],[],
 dnl REDHAT fix
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 dnl Check for AES support.
-AC_CHECK_HEADER([openssl/aes.h])
+AC_CHECK_HEADER([openssl/aes.h],[have_aes_h=yes])
+if test x$have_aes_h = xyes; then
+   HAVE_OPENSSL_AES_H="#define LIBMUTIL_HAVE_OPENSSL_AES_H 1"
+   AC_DEFINE([HAVE_OPENSSL_AES_H], 1, [Define to 1 if you have the <openssl/aes.h> header file.])
+else
+   HAVE_OPENSSL_AES_H="/* #undef LIBMUTIL_HAVE_OPENSSL_AES_H */"
+fi
+AC_SUBST(HAVE_OPENSSL_AES_H)
 
 
 dnl FIXME: Replace `main' with a function in `-lpthread':
@@ -111,5 +118,6 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_OUTPUT([Makefile include/Makefile debian/Makefile])
+AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile include/libmutil_config.h libmutil.pc])
+AC_OUTPUT
 

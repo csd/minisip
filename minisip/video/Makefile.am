@@ -2,7 +2,7 @@ abs_top_srcdir = @abs_top_srcdir@
 
 noinst_LIBRARIES = libvideo.a
 
-AM_CPPFLAGS = -I$(abs_top_srcdir)/include $(AVCODEC_CPPFLAGS)
+AM_CPPFLAGS += -I$(abs_top_srcdir)/include $(AVCODEC_CPPFLAGS)
 
 display_src = display/VideoDisplay.cxx display/X11Display.cxx
 if XV_VIDEO_DISPLAY

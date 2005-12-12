@@ -12,7 +12,7 @@ libminisip_a_SOURCES = Bell.cxx \
 bin_PROGRAMS = minisip
 
 AM_LDFLAGS = @AVCODEC_LDFLAGS@ @OSSO_LIBS@ $(RELOC_LDFLAGS)
-AM_CXXFLAGS = @OSSO_CFLAGS@
+AM_CXXFLAGS += @OSSO_CFLAGS@
 minisip_LDADD = 
 
 if GCONF_SUPPORT
@@ -67,7 +67,6 @@ AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
 endif
 
 
-                
 minisip_LDADD +=../rtp/librtp.a \
                 ../minisip/gui/libminisip_gui.a \
                 ../codecs/libcodecs.a \
@@ -78,7 +77,11 @@ minisip_LDADD +=../rtp/librtp.a \
 		../aec/libaec.a \
 		ipprovider/libipprovider.a \
 		confbackend/libconfbackend.a \
-                ../stun/libstun.a
+                ../stun/libstun.a \
+		$(MSIP_LIBS) \
+		$(MNETUTIL_LIBS) \
+		$(MIKEY_LIBS) \
+		$(MUTIL_LIBS)
 
 
 

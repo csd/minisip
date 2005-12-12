@@ -24,6 +24,12 @@
 
 #include<config.h>
 
+#ifdef HAVE_OPENSSL_AES_H
+#include <openssl/aes.h>
+#else
+#include <libmutil/rijndael-alg-fst.h>
+#endif
+
 #include <libmutil/aes.h>
 
 //debug:
@@ -39,14 +45,24 @@ using namespace std;
 
 #ifndef HAVE_OPENSSL_AES_H
 
+// Redefinition of this AES type to use Paulo Barreto 
+// <paulo.barreto@terra.com.br> implementation instead, 
+// to avoid the requirement for libssl 0.9.7
+#define NB_ROUND 10 /* 128 bits keys */
+
+struct AES_KEY_s{
+	unsigned int key[4*(NB_ROUND+1)];
+};
+
+
 
 // openssl AES functions using Paulo Barreto <paulo.barreto@terra.com.br>
 // implementation, to avoid the requirement for version 0.9.7 of libssl
-void AES_set_encrypt_key( unsigned char * key, int key_nb_bits, AES_KEY * aes_key ){
+static void AES_set_encrypt_key( unsigned char * key, int key_nb_bits, AES_KEY * aes_key ){
 	rijndaelKeySetupEnc( aes_key->key, key, key_nb_bits );
 }
 
-void AES_encrypt( const unsigned char * input, unsigned char * output, AES_KEY * aes_key ){
+static void AES_encrypt( const unsigned char * input, unsigned char * output, AES_KEY * aes_key ){
 	rijndaelEncrypt( aes_key->key, NB_ROUND, input, output );
 }
 #endif

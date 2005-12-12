@@ -1,8 +1,11 @@
 abs_top_srcdir = @abs_top_srcdir@
+pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmutil.spec
+
+pkgconfig_DATA = libmutil.pc
 
 lib_LTLIBRARIES = libmutil.la
 libmutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include

@@ -40,4 +40,6 @@
 # define LIBMUTIL_API
 #endif
 
+@HAVE_OPENSSL_AES_H@
+
 #endif	// _MLIBMUTIL_CONFIG_H

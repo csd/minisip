@@ -23,6 +23,7 @@ AC_C_BIGENDIAN
 AC_LANG(C++)
 
 AM_CPPFLAGS="-I\$(top_srcdir)/include"
+AM_CXXFLAGS=""
 
 dnl HACK: QT is compiled, unless GTK or textui is
 dnl Update: QT disabled for now
@@ -481,6 +482,14 @@ AC_CHECK_HEADERS([openssl/aes.h],[],[])
 dnl
 dnl libmutil
 dnl
+PKG_CHECK_MODULES(MUTIL, [libmutil >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MUTIL_CFLAGS}"
+
+save_CPPFLAGS="${CPPFLAGS}"
+save_LIBS="${LIBS}"
+CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
+LIBS="${MUTIL_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
 	headers/library. Try installing the libmutil-devel package for your
 	distribution."])])
@@ -495,6 +504,12 @@ AC_CHECK_LIB([mutil], [main],
 dnl
 dnl libmnetutil
 dnl
+PKG_CHECK_MODULES(MNETUTIL, [libmnetutil >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MNETUTIL_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MNETUTIL_CFLAGS}"
+LIBS="${MNETUTIL_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
         headers/library. Try installing the libmnetutil-devel package for your
         distribution."])])
@@ -509,6 +524,12 @@ AC_CHECK_LIB([mnetutil], [main],
 dnl
 dnl libmsip
 dnl
+PKG_CHECK_MODULES(MSIP, [libmsip >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MSIP_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MSIP_CFLAGS}"
+LIBS="${MSIP_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
         headers/library. Try installing the libmsip-devel package for your
         distribution."])])
@@ -522,6 +543,12 @@ AC_CHECK_LIB([msip], [main],
 dnl
 dnl libmikey
 dnl
+PKG_CHECK_MODULES(MIKEY, [libmikey >= 0.4.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MIKEY_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MIKEY_CFLAGS}"
+LIBS="${MIKEY_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
         headers/library. Try installing the libmikey-devel package for your
         distribution."])])
@@ -531,6 +558,9 @@ AC_CHECK_LIB([mikey], [main],
         ],[
                 AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
         ])
+
+CPPFLAGS="${save_CPPFLAGS}"
+LIBS="${save_LIBS}"
 
 dnl Checks for libraries.
 AC_CHECK_LIB([gdi32], [main])
@@ -600,10 +630,11 @@ AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h std
 AC_C_CONST
 AC_HEADER_TIME
 AC_SUBST(AM_CPPFLAGS)
+AC_SUBST(AM_CXXFLAGS)
 
 AC_SUBST(datadir)
 
-AC_OUTPUT([codecs/Makefile
+AC_CONFIG_FILES([codecs/Makefile
                  codecs/ilbc/Makefile
 		 codecs/g711/Makefile
                  minisip/Makefile
@@ -628,4 +659,4 @@ AC_OUTPUT([codecs/Makefile
 		 aec/Makefile
 		 debian/Makefile
 		 Makefile])
-
+AC_OUTPUT

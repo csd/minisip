@@ -62,6 +62,16 @@ AC_CHECK_HEADER([openssl/crypto.h],[],
 dnl Damn RedHat
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 
+dnl
+dnl libmutil
+dnl
+PKG_CHECK_MODULES(MUTIL, [libmutil >= 0.3.1])
+
+save_CPPFLAGS="${CPPFLAGS}"
+save_LIBS="${LIBS}"
+CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
+LIBS="${MUTIL_LIBS} ${LIBS}"
+
 AC_CHECK_LIB([mutil], [main],
 	[
 		LIBS="-lmutil ${LIBS}"
@@ -71,6 +81,9 @@ AC_CHECK_LIB([mutil], [main],
 
 dnl libmutil headers check
 AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil headers/library. Try installing the libmutil-devel package for your distribution."])])
+
+CPPFLAGS="${save_CPPFLAGS}"
+LIBS="${save_LIBS}"
 
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
@@ -84,5 +97,5 @@ AC_C_CONST
 AC_HEADER_TIME
 
 
-AC_OUTPUT([Makefile include/Makefile debian/Makefile])
-
+AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile libmikey.pc])
+AC_OUTPUT

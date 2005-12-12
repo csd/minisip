@@ -1,12 +1,17 @@
 abs_top_srcdir = @abs_top_srcdir@
+pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmsip.spec
 
+pkgconfig_DATA = libmsip.pc
+
 lib_LTLIBRARIES = libmsip.la
 libmsip_la_CPPFLAGS = -I$(abs_top_srcdir)/include
+libmsip_la_CXXFLAGS = $(MUTIL_CFLAGS) $(MNETUTIL_CFLAGS)
 libmsip_la_LDFLAGS = -no-undefined
+libmsip_la_LIBADD = $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
 libmsip_la_SOURCES = $(msip_src)
 

@@ -3,7 +3,7 @@ MOC = @MOC@
 
 noinst_LIBRARIES = libminisip_qtgui.a
 
-AM_CPPFLAGS = @CPPFLAGS@ -I@QT_INCLUDE@
+AM_CPPFLAGS += -I@QT_INCLUDE@
 
 libminisip_qtgui_a_SOURCES = CallDialog.cxx \
 			     MinisipMainWindowWidget.cxx \
@@ -28,7 +28,7 @@ moc_SettingsDialog.cpp: SettingsDialog.h
 
 moc_CertificateDialog.cpp: CertificateDialog.h
 	$(MOC) CertificateDialog.h -o moc_CertificateDialog.cpp
-	
+
 noinst_HEADERS  = CallDialog.h \
                   MinisipMainWindowWidget.h \
                   qtguistarter.h \

@@ -25,33 +25,15 @@
 #ifndef AES_H
 #define AES_H
 
-#ifdef HAVE_CONFIG_H
-#include<config.h>
-#endif
-
-#ifdef HAVE_OPENSSL_AES_H
-#include <openssl/aes.h>
-#else
-#include"rijndael-alg-fst.h"
-#endif
-
-#include <libmutil/libmutil_config.h>
+#include <libmutil_config.h>
 
 #include <stdlib.h>
 
-#define AES_BLOCK_SIZE 16
-
-#ifndef HAVE_OPENSSL_AES_H
-// Redefinition of this AES type to use Paulo Barreto 
-// <paulo.barreto@terra.com.br> implementation instead, 
-// to avoid the requirement for libssl 0.9.7
-#define NB_ROUND 10 /* 128 bits keys */
-
-struct AES_KEY_s{
-	unsigned int key[4*(NB_ROUND+1)];
-};
-
-typedef AES_KEY_s AES_KEY;
+#ifdef LIBMUTIL_HAVE_OPENSSL_AES_H
+# include <openssl/aes.h>
+#else
+# define AES_BLOCK_SIZE 16
+typedef struct AES_KEY_s AES_KEY;
 #endif
 
 class LIBMUTIL_API AES{

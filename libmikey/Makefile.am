@@ -1,10 +1,16 @@
+pkgconfigdir = $(libdir)/pkgconfig
+
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmikey.spec
 
+pkgconfig_DATA = libmikey.pc
+
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CPPFLAGS = -I$(top_srcdir)/include
+libmikey_la_CXXFLAGS = $(MUTIL_CFLAGS)
 libmikey_la_LDFLAGS = -no-undefined
+libmikey_la_LIBADD =  $(MUTIL_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 
