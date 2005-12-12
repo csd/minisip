@@ -145,7 +145,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 				MRef<Thread *> consoleDbgThread = consoleDbg->start();
 			#else
 				//in non-debug mode, send merr to the gui
-				merr.setExternalHandler( dynamic_cast<MainWindow *>( *gui ) ); 
+				merr.setExternalHandler( dynamic_cast<GtkMainUI*>( *gui ) ); 
 			#endif
 		#else //!GTK_GUI
 			gui= guiFactory(argc, argv, timeoutProvider);
