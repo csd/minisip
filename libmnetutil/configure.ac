@@ -2,15 +2,51 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libmnetutil, 0.3, eliasson@imit.kth.se)
-AC_CANONICAL_SYSTEM
+
+m4_define([mnetutil_major_version], [0])
+m4_define([mnetutil_minor_version], [3])
+m4_define([mnetutil_micro_version], [1])
+m4_define([mnetutil_version],
+          [mnetutil_major_version.mnetutil_minor_version.mnetutil_micro_version])
+
+dnl
+dnl Libtool style version info
+dnl update before each new release 
+dnl See node "Updating version info::" in info libtool
+dnl
+m4_define([lt_current], [0])
+m4_define([lt_revision], [0])
+m4_define([lt_age], [0])
+
+AC_INIT(libmnetutil, [mnetutil_major_version.mnetutil_minor_version],
+        eliasson@imit.kth.se)
+AC_CANONICAL_TARGET
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmnetutil, 0.3.1)
+AM_INIT_AUTOMAKE(libmnetutil, [mnetutil_version])
 
 
 AM_CONFIG_HEADER(include/compilation_config.h)
+
+MNETUTIL_MAJOR_VERSION=mnetutil_major_version
+MNETUTIL_MINOR_VERSION=mnetutil_minor_version
+MNETUTIL_MICRO_VERSION=mnetutil_micro_version
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
+AC_SUBST(MNETUTIL_MAJOR_VERSION)
+AC_SUBST(MNETUTIL_MINOR_VERSION)
+AC_SUBST(MNETUTIL_MICRO_VERSION)
+AC_SUBST(LT_VERSION_INFO)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
+
+case $host_os in
+     *mingw* )
+	     os_win=yes
+	     ;;
+esac
+
+AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -26,6 +62,13 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
 AC_LANG(C++)
+
+if test x$os_win = xyes; then
+    AC_CHECK_TOOL(WINDRES, [windres])
+    if test x$WINDRES = x; then
+        AC_MSG_ERROR([Could not find windres in your PATH.])
+    fi
+fi
 
 AC_C_BIGENDIAN
 
@@ -145,5 +188,5 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile libmnetutil.pc])
+AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmnetutil.pc win32/libmnetutil-res.rc])
 AC_OUTPUT

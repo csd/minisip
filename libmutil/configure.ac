@@ -2,13 +2,50 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libmutil, 0.3, eliasson@imit.kth.se)
+
+m4_define([mutil_major_version], [0])
+m4_define([mutil_minor_version], [3])
+m4_define([mutil_micro_version], [1])
+m4_define([mutil_version],
+          [mutil_major_version.mutil_minor_version.mutil_micro_version])
+
+dnl
+dnl Libtool style version info
+dnl update before each new release 
+dnl See node "Updating version info::" in info libtool
+dnl
+m4_define([lt_current], [0])
+m4_define([lt_revision], [0])
+m4_define([lt_age], [0])
+
+AC_INIT(libmutil, [mutil_major_version.mutil_minor_version],
+        eliasson@imit.kth.se)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libmutil, 0.3.1)
+AM_INIT_AUTOMAKE([libmutil], [mutil_version])
 
 AM_CONFIG_HEADER(include/compilation_config.h)
+
+MUTIL_MAJOR_VERSION=mutil_major_version
+MUTIL_MINOR_VERSION=mutil_minor_version
+MUTIL_MICRO_VERSION=mutil_micro_version
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
+AC_SUBST(MUTIL_MAJOR_VERSION)
+AC_SUBST(MUTIL_MINOR_VERSION)
+AC_SUBST(MUTIL_MICRO_VERSION)
+AC_SUBST(LT_VERSION_INFO)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
+
+AC_CANONICAL_HOST
+case $host_os in
+     *mingw* )
+	     os_win=yes
+	     ;;
+esac
+
+AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -22,6 +59,13 @@ AC_PROG_YACC
 dnl AC_PROG_RANLIB
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+
+if test x$os_win = xyes; then
+    AC_CHECK_TOOL(WINDRES, [windres])
+    if test x$WINDRES = x; then
+        AC_MSG_ERROR([Could not find windres in your PATH.])
+    fi
+fi
 
 AC_C_BIGENDIAN
 
@@ -118,6 +162,6 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile include/libmutil_config.h libmutil.pc])
+AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile include/libmutil_config.h libmutil.pc win32/libmutil-res.rc])
 AC_OUTPUT
 

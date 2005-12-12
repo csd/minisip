@@ -1,4 +1,4 @@
-SUBDIRS = gui contactdb ipprovider confbackend
+SUBDIRS = gui contactdb ipprovider confbackend win32
 
 noinst_LIBRARIES = libminisip.a
 
@@ -87,6 +87,12 @@ minisip_LDADD +=../rtp/librtp.a \
 
 minisip_SOURCES = Minisip.cxx
 #main.cxx
+
+if OS_WIN
+res_obj = win32/minisip-res.o
+minisip_LDADD += $(res_obj)
+minisip_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 
 noinst_HEADERS  = Bell.h \
                   LocationDetector.h \

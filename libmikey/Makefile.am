@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include
+SUBDIRS = include win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmikey.spec
 
@@ -9,10 +9,16 @@ pkgconfig_DATA = libmikey.pc
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CPPFLAGS = -I$(top_srcdir)/include
 libmikey_la_CXXFLAGS = $(MUTIL_CFLAGS)
-libmikey_la_LDFLAGS = -no-undefined
+libmikey_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
 libmikey_la_LIBADD =  $(MUTIL_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
+
+if OS_WIN
+res_obj = win32/libmikey-res.o
+libmikey_la_LDFLAGS += -Wl,$(res_obj)
+libmikey_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 
 mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyCsIdMap.cxx \

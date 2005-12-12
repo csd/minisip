@@ -1,0 +1,53 @@
+/*
+  Copyright (C) 2005  Mikael Magnusson
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/*
+ * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
+*/
+
+#include <winver.h>
+
+VS_VERSION_INFO VERSIONINFO 
+  FILEVERSION @MSIP_MAJOR_VERSION@,@MSIP_MINOR_VERSION@,@MSIP_MICRO_VERSION@,0
+  PRODUCTVERSION @MSIP_MAJOR_VERSION@,@MSIP_MINOR_VERSION@,@MSIP_MICRO_VERSION@,0
+  FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+  FILEFLAGS 0
+  FILEOS VOS_NT_WINDOWS32
+  FILETYPE VFT_DLL
+  FILESUBTYPE VFT2_UNKNOWN
+  {
+    BLOCK "StringFileInfo"
+    {
+      BLOCK "040904E4" // U.S. English, cp1252(4E4)
+      {
+        VALUE "Comment", "Copyright © 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad,  Florian Mauer. This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version."
+        VALUE "CompanyName", "The Minisip developer team"
+	VALUE "FileDescription", "Minisip SIP library"
+	VALUE "FileVersion", "@VERSION@"
+        VALUE "InternalName", "libmsip-@LT_CURRENT_MINUS_AGE@"
+        VALUE "LegalCopyright", "Refer to comment"
+	VALUE "OriginalFilename", "libmsip-@LT_CURRENT_MINUS_AGE@.dll"
+	VALUE "ProductName", "libmsip"
+	VALUE "ProductVersion", "@VERSION@"
+      }
+    }
+    BLOCK "VarFileInfo"
+    {
+      VALUE "Translation", 0x0409,1252 // U.S. English, cp1252 
+    }
+  }

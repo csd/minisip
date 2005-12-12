@@ -1,7 +1,7 @@
 abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include
+SUBDIRS = include win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmsip.spec
 
@@ -10,10 +10,16 @@ pkgconfig_DATA = libmsip.pc
 lib_LTLIBRARIES = libmsip.la
 libmsip_la_CPPFLAGS = -I$(abs_top_srcdir)/include
 libmsip_la_CXXFLAGS = $(MUTIL_CFLAGS) $(MNETUTIL_CFLAGS)
-libmsip_la_LDFLAGS = -no-undefined
+libmsip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
 libmsip_la_LIBADD = $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
 libmsip_la_SOURCES = $(msip_src)
+
+if OS_WIN
+res_obj = win32/libmsip-res.o
+libmsip_la_LDFLAGS += -Wl,$(res_obj)
+libmsip_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipStack.cxx \

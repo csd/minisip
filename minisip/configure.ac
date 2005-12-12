@@ -2,13 +2,36 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(minisip, 0.7, BUG-REPORT-ADDRESS)
+
+m4_define([minisip_major_version], [0])
+m4_define([minisip_minor_version], [7])
+m4_define([minisip_micro_version], [1])
+m4_define([minisip_version],
+          [minisip_major_version.minisip_minor_version.minisip_micro_version])
+
+AC_INIT(minisip, [minisip_major_version.minisip_minor_version], BUG-REPORT-ADDRESS)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(minisip, 0.7.1)
+AM_INIT_AUTOMAKE(minisip, [minisip_version])
 
 AM_CONFIG_HEADER(include/compilation_config.h)
+
+MINISIP_MAJOR_VERSION=minisip_major_version
+MINISIP_MINOR_VERSION=minisip_minor_version
+MINISIP_MICRO_VERSION=minisip_micro_version
+AC_SUBST(MINISIP_MAJOR_VERSION)
+AC_SUBST(MINISIP_MINOR_VERSION)
+AC_SUBST(MINISIP_MICRO_VERSION)
+
+AC_CANONICAL_HOST
+case $host_os in
+     *mingw* )
+	     os_win=yes
+	     ;;
+esac
+
+AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -17,6 +40,13 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
+
+if test x$os_win = xyes; then
+    AC_CHECK_TOOL(WINDRES, [windres])
+    if test x$WINDRES = x; then
+        AC_MSG_ERROR([Could not find windres in your PATH.])
+    fi
+fi
 
 AC_C_BIGENDIAN
 
@@ -645,6 +675,8 @@ AC_CONFIG_FILES([codecs/Makefile
                  minisip/gui/qtgui/Makefile
                  minisip/gui/gtkgui/Makefile
                  minisip/gui/textui/Makefile
+                 minisip/win32/Makefile
+                 minisip/win32/minisip-res.rc
                  rtp/Makefile
                  sip/Makefile
                  soundcard/Makefile

@@ -1,7 +1,7 @@
 abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include
+SUBDIRS = include win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmnetutil.spec
 
@@ -10,10 +10,16 @@ pkgconfig_DATA = libmnetutil.pc
 lib_LTLIBRARIES = libmnetutil.la
 libmnetutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include
 libmnetutil_la_CXXFLAGS = $(MUTIL_CFLAGS)
-libmnetutil_la_LDFLAGS = -no-undefined
+libmnetutil_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
 libmnetutil_la_LIBADD = $(MUTIL_LIBS)
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
+
+if OS_WIN
+res_obj = win32/libmnetutil-res.o
+libmnetutil_la_LDFLAGS += -Wl,$(res_obj)
+libmnetutil_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 
 mnetutil_src =      source/IPAddress.cxx \
 		    source/IP4Address.cxx \
