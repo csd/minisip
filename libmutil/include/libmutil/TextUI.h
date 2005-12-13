@@ -25,7 +25,7 @@
 #ifndef _TEXTUI_H
 #define _TEXTUI_H
 
-#include<libmutil_config.h>
+#include<libmutil/libmutil_config.h>
 
 
 #include<libmutil/CommandString.h>

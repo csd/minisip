@@ -24,7 +24,7 @@
 #include<libmutil/mtypes.h>
 #include<exception>
 
-#include<libmutil_config.h>
+#include<libmutil/libmutil_config.h>
 
 /**
  * A generic exception class that is a good candidate

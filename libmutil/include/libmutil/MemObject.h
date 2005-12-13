@@ -36,7 +36,7 @@
 
 #include <typeinfo>
 
-#include<libmutil_config.h>
+#include<libmutil/libmutil_config.h>
 
 #include<libmutil/minilist.h>
 
