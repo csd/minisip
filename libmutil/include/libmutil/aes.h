@@ -25,7 +25,7 @@
 #ifndef AES_H
 #define AES_H
 
-#include <libmutil_config.h>
+#include <libmutil/libmutil_config.h>
 
 #include <stdlib.h>
 

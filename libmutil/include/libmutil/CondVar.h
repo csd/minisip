@@ -26,7 +26,7 @@
 
 #include<libmutil/mtypes.h>
 
-#include<libmutil_config.h>
+#include<libmutil/libmutil_config.h>
 
 #include<string>
 #include<libmutil/MemObject.h>

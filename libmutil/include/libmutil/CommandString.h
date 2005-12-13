@@ -29,7 +29,7 @@
 #include<string>
 #include<map>
 
-#include<libmutil_config.h>
+#include<libmutil/libmutil_config.h>
 
 using namespace std;
 
