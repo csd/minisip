@@ -70,7 +70,7 @@
 
 typedef clock_t SystemTime;
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 class LIBMUTIL_API Timestamp{
 	public:

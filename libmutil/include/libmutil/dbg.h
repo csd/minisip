@@ -30,7 +30,7 @@
 #define DBG_INFO 0
 #define DBG_ERROR 1
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 class LIBMUTIL_API DbgEndl{
     public:

@@ -33,7 +33,7 @@
 #ifndef _MINISIPSEMAPHORE_H
 #define _MINISIPSEMAPHORE_H
 
-#include <libmutil/libmutil_config.h>
+#include <libmutil_config.h>
 
 #include<string>
 #include<libmutil/MemObject.h>

@@ -26,7 +26,7 @@ static const char* const vmd5HeaderVersion =
  * Still in the public domain.
  */
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 #ifdef __cplusplus
 extern "C"

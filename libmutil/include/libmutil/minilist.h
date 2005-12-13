@@ -32,7 +32,7 @@
 #define MINILIST_FORWARD_ITERATOR_OPTIMIZE 1
 //#undef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 //#define MINILIST_VALIDATE
 

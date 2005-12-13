@@ -42,7 +42,7 @@ extern "C"{
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 class certificate;
 
