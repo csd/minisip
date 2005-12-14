@@ -41,7 +41,7 @@
 
 using namespace std;
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 /*
 In the following example "name" is a attribute and FILE is an element

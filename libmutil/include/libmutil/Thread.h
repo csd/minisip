@@ -29,7 +29,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 class LIBMUTIL_API ThreadException : public Exception{
 public:

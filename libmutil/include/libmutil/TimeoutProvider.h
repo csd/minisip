@@ -45,7 +45,7 @@
 
 #include<list>
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 #include<libmutil/massert.h>
 #include"Mutex.h"

@@ -36,7 +36,7 @@
 
 #include<string>
 
-#include<libmutil/libmutil_config.h>
+#include<libmutil_config.h>
 
 LIBMUTIL_API std::string itoa(int i);
 
