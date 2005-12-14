@@ -440,7 +440,7 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 			
 		case SOCKET_TYPE_UDP:
 			transport = "UDP";
-			port = localUDPPort;
+			port = externalContactUdpPort;
 			break;
 
 		default:
