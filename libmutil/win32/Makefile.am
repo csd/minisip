@@ -8,3 +8,5 @@ endif OS_WIN
 	$(WINDRES) $< $@
 
 SUFFIXES = .rc .o
+
+MAINTAINERCLEANFILES = Makefile.in
