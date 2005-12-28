@@ -8,7 +8,6 @@ pkgincludedir=${includedir}/@PACKAGE@
 Name: @PACKAGE@
 Description:
 Version: @VERSION@
-URL: http://www.minisip.org/
 Libs: -L${libdir} -lmutil
 Libs.private: @LIBS@
 Cflags: -I${includedir} -I${pkglibdir}/include
