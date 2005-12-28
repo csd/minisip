@@ -27,8 +27,8 @@ endif
 config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	#CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/var/lib/install --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-	CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --disable-aec
+	CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/var/lib/install/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --disable-aec
+	#CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 
 build: build-stamp
@@ -67,7 +67,34 @@ install: build
 
 	# Add here commands to install the package into debian/minisip.
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/minisip
-#	mv $(CURDIR)/debian/minisip/var/lib/install/* $(CURDIR)/debian/minisip
+	cp share/minisip.desktop $(CURDIR)/debian/minisip/usr/share/applications/hildon
+	mv -f $(CURDIR)/debian/minisip/var/lib/install/usr/bin/* $(CURDIR)/debian/minisip/usr/bin
+	mv -f $(CURDIR)/debian/minisip/var/lib/install/usr/share/minisip/* $(CURDIR)/debian/minisip/usr/share/minisip
+	mv -f $(CURDIR)/debian/minisip/var/lib/install/usr/lib/* $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libmutil.so.0.0.0 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libmutil.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libmnetutil.so.0.0.0 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libmnetutil.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libmsip.so.0.0.0 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libmsip.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libmikey.so.0.0.0 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libmikey.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libsigc-2.0.so.0.0.0 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libsigc-2.0.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libglibmm-2.4.so.1.0.13 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libglibmm-2.4.so.1 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libgtkmm-2.4.so.1.0.11 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libgtkmm-2.4.so.1 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libglademm-2.4.so.1.0.2 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libglademm-2.4.so.1 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libglade-2.0.so.0.0.4 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libglade-2.0.so.0 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libatkmm-1.6.so.1.0.11 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libatkmm-1.6.so.1 $(CURDIR)/debian/minisip/usr/lib
+	cp /usr/lib/libpangomm-1.4.so.1.0.11 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libpangomm-1.4.so.1 $(CURDIR)/debian/minisip/usr/lib
+	cp  /usr/lib/libgdkmm-2.4.so.1.0.11 $(CURDIR)/debian/minisip/usr/lib
+	cp -P /usr/lib/libgdkmm-2.4.so.1 $(CURDIR)/debian/minisip/usr/lib
 
 # Build architecture-independent files here.
 binary-indep: build install

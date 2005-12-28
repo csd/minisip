@@ -7,7 +7,7 @@ Standards-Version: 3.6.1
 
 Package: minisip
 Architecture: any
-Depends: libmsip0 (>= 0.3.1), libmikey0 (>= 0.4.1), libglademm-2.4-1 (>=2.4)
+Depends: maemo
 Description: minisip is a SIP user agent, with security enhancements
  minisip is a soft telephone which uses the SIP protocol. It provides
  additional security, such as encryption and authentication, by using
