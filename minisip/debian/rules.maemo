@@ -67,6 +67,7 @@ install: build
 
 	# Add here commands to install the package into debian/minisip.
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/minisip
+	mkdir $(CURDIR)/debian/minisip/usr/share/applications
 	cp share/minisip.desktop $(CURDIR)/debian/minisip/usr/share/applications/hildon
 	mv -f $(CURDIR)/debian/minisip/var/lib/install/usr/bin/* $(CURDIR)/debian/minisip/usr/bin
 	mv -f $(CURDIR)/debian/minisip/var/lib/install/usr/share/minisip/* $(CURDIR)/debian/minisip/usr/share/minisip
