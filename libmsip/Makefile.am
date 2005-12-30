@@ -75,9 +75,14 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderVia.cxx \
                      source/headers/SipHeaderWarning.cxx
 
-
-
-
-                                                                                                       
-
+MAINTAINERCLEANFILES = \
+		$(srcdir)/Makefile.in \
+		$(srcdir)/configure \
+		$(srcdir)/aclocal.m4 \
+		$(srcdir)/depcomp \
+		$(srcdir)/config.sub \
+		$(srcdir)/config.guess \
+		$(srcdir)/install-sh \
+		$(srcdir)/ltmain.sh \
+		$(srcdir)/missing
 
