@@ -4,8 +4,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 SUBDIRS = include win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmutil.spec
-MAINTAINERCLEANFILES = configure Makefile.in missing ltmain.sh \
-	depcomp config.guess config.sub install-sh aclocal.m4
 
 pkgconfig_DATA = libmutil.pc
 
@@ -49,4 +47,15 @@ mutil_src =  	source/aes.cxx \
 		source/XMLParser.cxx \
 		source/MPlugin.cxx \
 		source/CircularBuffer.cxx
+
+MAINTAINERCLEANFILES = \
+		$(srcdir)/configure \
+		$(srcdir)/Makefile.in \
+		$(srcdir)/missing \
+		$(srcdir)/ltmain.sh \
+		$(srcdir)/depcomp \
+		$(srcdir)/config.guess \
+		$(srcdir)/config.sub \
+		$(srcdir)/install-sh \
+		$(srcdir)/aclocal.m4
 

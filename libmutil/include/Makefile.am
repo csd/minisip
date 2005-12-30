@@ -40,4 +40,4 @@ nodist_includepkglib_HEADERS = \
 noinst_HEADERS = 	config.h \
 			libmutil/rijndael-alg-fst.h
 
-MAINTAINERCLEANFILES = Makefile.in compilation_config.h.in
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in $(srcdir)/compilation_config.h.in

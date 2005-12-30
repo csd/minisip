@@ -9,4 +9,4 @@ endif OS_WIN
 
 SUFFIXES = .rc .o
 
-MAINTAINERCLEANFILES = Makefile.in
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
