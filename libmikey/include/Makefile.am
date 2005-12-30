@@ -28,3 +28,5 @@ pkginclude_HEADERS =    libmikey/exception.h \
 			libmikey/libmikey_config.h
 
 noinst_HEADERS = 	config.h
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in $(srcdir)/compilation_config.h.in
