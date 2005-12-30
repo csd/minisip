@@ -38,3 +38,13 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/UDPSocket.cxx \
 		    source/StreamSocket.cxx
 
+MAINTAINERCLEANFILES = \
+		$(srcdir)/Makefile.in \
+		$(srcdir)/aclocal.m4 \
+		$(srcdir)/configure \
+		$(srcdir)/depcomp \
+		$(srcdir)/config.sub \
+		$(srcdir)/config.guess \
+		$(srcdir)/install-sh \
+		$(srcdir)/ltmain.sh \
+		$(srcdir)/missing
