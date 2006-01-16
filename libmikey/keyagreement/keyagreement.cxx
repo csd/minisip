@@ -151,8 +151,8 @@ void prf( unsigned char * inkey,  unsigned int inkeyLength,
 	unsigned int i;
 	unsigned int j;
 	unsigned char * p_output;
-	n = inkeyLength / 64 + 1;
-	m = outkeyLength / 20 + 1;
+	n = ( inkeyLength + 31 )/ 32;
+	m = ( outkeyLength + 19 )/ 20;
 	
 	p_output = new unsigned char[ m * 20 ];
 
