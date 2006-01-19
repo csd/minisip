@@ -95,7 +95,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 			}
 
 			for( i = 6; i < 14; i++ ){
-				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)) & 0xFF);
+				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)*8) & 0xFF);
 			}
 			iv[14] = 0x00;
 			iv[15] = 0x00;
