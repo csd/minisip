@@ -31,6 +31,8 @@
 #include<config.h>
 #include<wincon.h>
 
+#include<initguid.h>
+
 #include<libmutil/merror.h>
 
 //Output buffer is set to 100ms
