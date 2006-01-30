@@ -29,6 +29,8 @@
 
 #include"libmutil/TextUI.h"
 
+
+
 #ifdef HAVE_TERMIOS_H
 #include<termios.h>
 #endif
@@ -165,7 +167,7 @@ void TextUI::addCompletionCallback(string m, TextUICompletionCallback *cb){
 
 void TextUI::displayMessage(string msg, int style){
     cout << (char)13;
-    if (msg[msg.size()-1]==10)
+    if (msg.size()>0 && msg[msg.size()-1]==10)
         msg=msg.substr(0,msg.size()-1);
 
     if (style<0){
