@@ -55,7 +55,8 @@ static int nocaseequal(char c1, char c2){
 }
 
 static int strcasecmp(const char *s1, const char *s2){
-	for (int i=0; s1[i]!=0 && s2[i]!=0; i++){
+	int i;
+	for ( i=0; s1[i]!=0 && s2[i]!=0; i++){
 		if ( !nocaseequal(s1[i],s2[i]) ){
 			if (s1[i]<s2[i]){
 				return -1;
