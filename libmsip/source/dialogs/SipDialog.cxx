@@ -110,17 +110,23 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 		
 		bool handled =false;
 		MRef<SipTransaction*> trans;
-		for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
-			if ((*i)->getCurrentStateName()=="terminated"){
-				trans = (*i);
-				sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
-				transactions.erase(i);
-				i=transactions.begin();
-				trans->freeStateMachine(); //let's break the cyclic references ...
-				//merr << "CESC: SipDlg::hdlCmd : freeing sip transaction state machine ... breaking the vicious circle!" << end;
-				handled=true;
+		bool done;
+		do{
+			done=true;
+			for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
+				if ((*i)->getCurrentStateName()=="terminated"){
+					trans = (*i);
+					sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
+					transactions.erase(i);
+					//i=transactions.begin();
+					trans->freeStateMachine(); //let's break the cyclic references ...
+					//merr << "CESC: SipDlg::hdlCmd : freeing sip transaction state machine ... breaking the vicious circle!" << end;
+					handled=true;
+					done=false;
+					break;
+				}
 			}
-		}
+		}while(!done);
 
 		if (handled){
 			signalIfNoTransactions();
