@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -26,18 +28,13 @@
 #define _DBG_H
 
 #include<string>
+#include<iostream>
+#include<sstream>
 
 #define DBG_INFO 0
 #define DBG_ERROR 1
 
 #include<libmutil_config.h>
-
-class LIBMUTIL_API DbgEndl{
-    public:
-        DbgEndl(){}
-    private:
-        int i;
-};
 
 class LIBMUTIL_API DbgHandler{
 	public:
@@ -45,31 +42,39 @@ class LIBMUTIL_API DbgHandler{
 	private:
 		virtual void displayMessage(std::string output,int style=-1)=0;
 		friend class Dbg;
+		friend class DbgBuf;
 };
 
+class LIBMUTIL_API DbgBuf: public std::stringbuf{
+	public:
+		DbgBuf( DbgHandler * dbgHandler );
+		virtual ~DbgBuf();
+		virtual void setExternalHandler(DbgHandler * dbgHandler);
+	protected:
+		virtual int sync();
+	private:
+		DbgHandler * debugHandler;
+};
 
-class LIBMUTIL_API Dbg{
+class LIBMUTIL_API Dbg: public std::ostream{
     public:
-        static const DbgEndl endl;
 	Dbg(bool error_output=false, bool enabled=true);
-        Dbg &operator<<(std::string);
-        Dbg &operator<<(int);
-        Dbg &operator<<(char);
-        Dbg &operator<<(DbgEndl &endl);
+	virtual ~Dbg();
 	void setEnabled(bool enabled);
 	bool getEnabled();
 	void setExternalHandler(DbgHandler * dbgHandler);
+
     private:
 	bool error_out;
 	bool enabled;
-	std::string str;
-	DbgHandler * debugHandler;
+	DbgBuf dbgBuf;
 };
+
 
 extern LIBMUTIL_API Dbg mout;
 extern LIBMUTIL_API Dbg merr;
 extern LIBMUTIL_API Dbg mdbg;
-extern LIBMUTIL_API DbgEndl end;
+extern LIBMUTIL_API std::ostream &end(std::ostream &os);
 
 extern LIBMUTIL_API bool outputStateMachineDebug;
 

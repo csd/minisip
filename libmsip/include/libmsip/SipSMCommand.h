@@ -77,7 +77,7 @@ class LIBMSIP_API SipSMCommand : public MObject{
 
 		MRef<SipMessage*> getCommandPacket() const;
 		CommandString getCommandString() const;
-		friend LIBMSIP_API Dbg & operator<<(Dbg &, const SipSMCommand &);
+		friend LIBMSIP_API ostream & operator<<(ostream &, const SipSMCommand &);
 
 //		bool getDispatched() const{return dispatched;}
 //		void setDispatched(bool d){dispatched = d;}

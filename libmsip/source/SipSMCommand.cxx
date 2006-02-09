@@ -37,7 +37,7 @@ const int SipSMCommand::transaction=3;
 const int SipSMCommand::ANY=4;
 const int SipSMCommand::DIALOGCONTAINER=5;
 
-Dbg & operator<<(Dbg &o, const SipSMCommand &c){
+ostream & operator<<(ostream &o, const SipSMCommand &c){
 	char *s[5]={"remote","TU","transaction","IGN","DIALOGCONTAINER"};
 	if (c.type==SipSMCommand::COMMAND_PACKET){
                 
