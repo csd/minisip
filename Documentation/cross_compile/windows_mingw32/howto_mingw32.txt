@@ -1,0 +1,215 @@
+
+------------------------------------------------------------------------
+INTRO  -----------------------------------------------------------------
+------------------------------------------------------------------------
+This howto explains in a step by step way howto compile minisip on to a 
+win32 based platform. 
+The original process was done by Mikael Magnusson (tks!) and I 
+(Cesc Santasusana) took the liberty to create this section in the minisip 
+documentation.
+
+------------------------------------------------------------------------
+HISTORY -----------------------------------------------------------
+------------------------------------------------------------------------
+First version -- February 2006 -- Cesc, from Mikael's experience
+
+------------------------------------------------------------------------
+KNOWN ISSUES -----------------------------------------------------------
+------------------------------------------------------------------------
+* There are some problems with the DirectSound driver in Minisip (Mikael)
+* Check the license under which dx80_mgw.zip is released (Mikael)
+* I have developed a PortAudio driver, but haven't committed it yet (Mikael)
+* Cannot create a statically linked minisip (Cesc)
+* Create a self-installable windows executable, which includes the gtk stuff.
+
+------------------------------------------------------------------------
+TOOLS NEEDED  ----------------------------------------------------------
+------------------------------------------------------------------------
+This process is described for a cross compilation on a Debian box (using etch, 
+the testing distro at the time of writing, Feb 2006).
+
+You need:
+
+* libtool
+	Should be fine with the corresponding version for your distro. 
+	Mikael reported success with libtool-1.5.20. I have successfully compiled using 1.5.22
+
+* mingw32 
+	Minimalist GNU win32 (cross) compiler.
+	The latest version should do. I did it with 3.4.4 (installed as a Debian packet).
+
+* OpenSSL source code
+	The process here described needs openssl-0.9.8a source code, as we have to add a patch to
+	able to cross compile openssl for windows (from our linux box).
+	You also need to patch it with openssl-0.9.8a-mingwx-mikma.diff (attached)
+
+* Gtk+/Win32 
+	I used the version 2.6.10-rc1 ( maybe higher versions work also).
+	To cross compile, we need the development version. 
+	Once we have compiled, the runtime version can be used to install the minisip.exe (and dlls)
+	on other machines.
+	Get it from: http://gladewin32.sourceforge.net/modules/news/article.php?storyid=41
+
+* gtkmm 2.6 for Mingw32 and MSVC.Net (Stable)
+	We used the 2.6 version (stable at the time of writing). Probably it also works with higher versions.
+	To cross compile, we need the development version. 
+	Once we have compiled, the runtime version can be used to install the minisip.exe (and dlls)
+	on other machines.
+	Get it from:   http://www.pcpm.ucl.ac.be/~gustin/win32_ports/gtkmm.html
+
+* DirectX headers
+	Simply download the file, for later installation.
+	http://alleg.sourceforge.net/files/dx80_mgw.zip
+
+THE CROSS-COMPILE FOLDER
+We'll need a folder on the linux machine were we'll have all the win32 library and header files will be, as well
+as the place where our compiled files will be installed to.
+Be aware, for now whatever name you give it will be also be needed to be on the windows boxes, as minisip will search
+for some files there. So i would use something close to the root ... say:
+
+$CROSS_COMPILE_FOLDER=/minisip/w32
+
+------------------------------------------------------------------------
+INSTALL THE TARGET BUILD ENVIRONMENT -----------------------------------
+------------------------------------------------------------------------
+
+Install Gtk+ and gtkmm
+-----------------------
+Gtk+ and gtkmm are Windows packages (*.exe files). 
+One option to install is to use wine (install it on your linux box):
+> wine gtk-devel-file.exe
+> wine gtkmm-devel-file.exe
+Install both on the same folder (yes, the same), say /tmp/GTK
+You now want to move everything to the CROSS_COMPILE_FOLDER:
+> mv /tmp/GTK/* $CROSS_COMPILE_FOLDER
+
+Install DirectX headers
+-----------------------
+Unzip the directxfile.zip, say into /tmp/directx
+It contains two subfolders: include and lib
+The contents of these folders need to be moved to the CROSS_COMPILE_FOLDER
+(where there are already the gtk(mm) include and lib folders). So, probably the best
+is  you copy recursively the /tmp/directx/* into CROSS_COMPILE_FOLDER.
+> cp -R /tmp/directx/* $CROSS_COMPILE_FOLDER
+
+Build OpenSSL for mingw32
+-------------------------
+Ungztar the sources (/tmp/openssl).
+Using the patch file provided here, patch the openssl sources:
+> cd /tmp/openssl; patch -p1 < patchfileformingw
+Now, Configure and build
+./Configure --prefix=$CROSS_COMPILE_FOLDER threads shared mingwx
+make
+make install
+There is one extra thing you need to do. Minisip will try to use the static openssl
+(.a) libraries when we cross compile it, instead of the .dll files. So, we'll trick him :)
+> cp /tmp/openssl/libeay32.lib.a $CROSS_COMPILE_FOLDER/lib/libcrypto.a
+> cp /tmp/openssl/libeay32.dll $CROSS_COMPILE_FOLDER/lib/libcrypto.dll
+> cp /tmp/openssl/ssleay32.lib.a $CROSS_COMPILE_FOLDER/lib/libssl.a
+> cp /tmp/openssl/ssleay32.dll $CROSS_COMPILE_FOLDER/lib/libssl.dll
+
+pkg-config
+----------
+I use a custom i586-mingw32msvc-pkg-config which translates the prefix
+used by Gtk+ and gtkmm to /usr/local/i586-mingw32msvc. This script is used during the
+autoconf of minisip (./configure).
+
+cat << EOF > /usr/local/bin/i586-mingw32msvc-pkg-config
+#!/bin/sh
+
+oldprefix=/target
+prefix=$CROSS_COMPILE_FOLDER
+
+output=`PKG_CONFIG_LIBDIR=${prefix}/lib/pkgconfig /usr/bin/pkg-config "$@"`
+result=$?
+
+echo -n ${output} | sed -e "s|-\([IL]\)${oldprefix}|\-\1${prefix}|g"
+exit $result
+EOF
+
+------------------------------------------------------------------------
+BUILDING MINISIP -------------------------------------------------------
+------------------------------------------------------------------------
+There are looots of ways to compile minisip.
+In the root of the source code, there is a script called "buildall.sh". That
+is one way. The nice thing is that it does an in-situ compilation, no need to
+install anything minisip-related thing in your system. It results in either 
+a shared-library based (a few libm*.so files plus an executable minisip) or
+a static-based distro (a minisip binary with all libraries built-in, to be found
+in minisip/minisip). 
+Of course, instead of the above, you can also manually enter each folder, 
+and the the ./bootstrap, ./configure, make, make install process. This may be a 
+good enough installation for one-time compilations. 
+Anyway ... we explain how to configure minisip to cross-compile ... we'll also
+provide a script ... hopefully you'll figure it out :) The "buildall_mingw32.sh" 
+script found in this folder can be used; copy it to $minisip_trunk/; modify the
+paths in there; execute.
+
+NOTE: For now, it seems that creating a "static" version of the whole minisip project
+	does not work, thus --disable-static IS COMPULSORY.
+
+Configure the libraries (libm*, except libminisip)
+-------------------------
+Here we specify the platform to build for, the compiler and the compiler and linker
+options, so it can find the header and library files needed.
+./configure 
+--host=i586-mingw32msvc 
+--build=i686-pc-linux-gnu
+--disable-static --enable-debug 
+prefix=$CROSS_COMPILE_FOLDER
+CPPFLAGS=-I$CROSS_COMPILE_FOLDER/include
+LDFLAGS=-L$CROSS_COMPILE_FOLDER/lib
+
+Note: 	enable-debug option is optional (it generates a much bigger file). See below about stripping.
+	IGNORE::disable-static is optional. You can simply not use it (then a static and a shared
+		version is built) or use --disable-shared (to build only a static version).
+
+Configure the minisip folder (GTK GUI)
+--------------------------
+./configure 
+--host=i586-mingw32msvc 
+--build=i686-pc-linux-gnu
+--enable-debug --enable-gtk --disable-gconf --disable-alsa --enable-dsound --disable-static
+prefix=/usr/local/i586-mingw32msvc 
+CPPFLAGS="-I/usr/local/i586-mingw32msvc/include -I/usr/local/i586-mingw32msvc/include/directx"
+LDFLAGS=-L/usr/local/i586-mingw32msvc/lib
+
+Note: 	enable-debug option is optional (it generates a much bigger file). See below about stripping.
+	IGNORE::disable-static is optional. You can simply not use it (then a static and a shared
+		version is built) or use --disable-shared (to build only a static version).
+	This two options should be the same as the ones used for the libraries.
+	disable-gconf is mandatory (gconf does not exhist on windows, i think)
+	disable-alsa (alsa is not for windows, we'll use direct sound).
+	enable-dsound is mandatory (we'll use the direct sound interface on windows).
+
+------------------------------------------------------------------------
+INSTALL MINISIP FOR WINDOWS (IN MS WINDOWS) ----------------------------
+------------------------------------------------------------------------
+Install Gtk+ (runtime is enough, no need for devel).
+Install Gtkmm (runtime is enough, no need for devel).
+The installation files can be located at the webpages commented above.
+
+Install the openssl DLLs: libeay32.dll and ssleay.dll. You can either take them from 
+the cross-compiled version (0.9.8a) from your linux box, or check whether openssl is 
+already installed in  your windows box (should be in /windows/system32; some programs
+install it for them; just make sure that the version is AT LEAST 0.9.8a).
+
+Install the minisip DLLs (libmutil-0.dll, libmnetutil-0.dll, libmikey-0.dll and libmsip-0.dll).
+In general, you want to copy them to /windows/system32 (where most DLLs are). But, it will 
+also work if you have the DLLs in the same folder as the minisip.exe
+
+Install minisip/share/* to c:\$CROSS_COMPILE_FOLDER\share\minisip. In the linux box, you can
+find the minisip/share under $CROSS_COMPILE_FOLDER/share/minisip.
+
+Install minisip.exe ... this basically means copying it somewhere in your windows box. Also,
+you  may want to create a link on  your desktop, quick launch and start menu.
+
+Modify c:\minisip.conf. 
+You need to change the sound_device, which is /dev/dsp by default,
+to "dsound:x". That is:
+<sound_device>
+       dsound:0
+</sound_device>
+
+
+

@@ -1,0 +1,191 @@
+diff -ur openssl-0.9.8a.orig/Configure openssl-0.9.8a/Configure
+--- openssl-0.9.8a.orig/Configure	2005-08-02 12:59:42.000000000 +0200
++++ openssl-0.9.8a/Configure	2005-12-04 20:40:04.000000000 +0100
+@@ -469,6 +469,7 @@
+ 
+ # MinGW
+ "mingw", "gcc:-mno-cygwin -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall -D_WIN32_WINNT=0x333:::MINGW32:-lwsock32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:cygwin-shared:-D_WINDLL -DOPENSSL_USE_APPLINK:-mno-cygwin -shared:.dll.a",
++"mingwx", "i586-mingw32msvc-cc:-mno-cygwin -DL_ENDIAN -fomit-frame-pointer -O3 -march=i486 -Wall -D_WIN32_WINNT=0x333 -DOPENSSL_NO_HW:::MINGW32:-lwsock32 -lgdi32:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts} EXPORT_VAR_AS_FN:${x86_coff_asm}:win32:mingw-shared:-D_WINDLL:-mno-cygwin -shared:.dll:i586-mingw32msvc-ranlib",
+ 
+ # UWIN 
+ "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
+@@ -909,7 +910,7 @@
+ 
+ $IsMK1MF=1 if ($target eq "mingw" && $^O ne "cygwin");
+ 
+-$exe_ext=".exe" if ($target eq "Cygwin" || $target eq "DJGPP" || $target eq "mingw");
++$exe_ext=".exe" if ($target eq "Cygwin" || $target eq "DJGPP" || $target eq "mingw" || $target eq "mingwx");
+ $exe_ext=".pm"  if ($target =~ /vos/);
+ $openssldir="/usr/local/ssl" if ($openssldir eq "" and $prefix eq "");
+ $prefix=$openssldir if $prefix eq "";
+@@ -1562,7 +1563,7 @@
+ }
+ 
+ # create the ms/version32.rc file if needed
+-if ($IsMK1MF) {
++if($IsMK1MF || $target eq "mingwx") {
+ 	my ($v1, $v2, $v3, $v4);
+ 	if ($version_num =~ /(^[0-9a-f]{1})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i) {
+ 		$v1=hex $1;
+@@ -1623,6 +1624,11 @@
+ 	close(OUT);
+   }
+   
++# ugly hack to disable engines
++if($target eq "mingwx") {
++	system("sed -e s/^LIB/XLIB/g -i engines/Makefile");
++}
++  
+ print <<EOF;
+ 
+ Configured for $target.
+diff -ur openssl-0.9.8a.orig/Makefile.org openssl-0.9.8a/Makefile.org
+--- openssl-0.9.8a.orig/Makefile.org	2005-07-05 07:14:21.000000000 +0200
++++ openssl-0.9.8a/Makefile.org	2005-12-04 20:40:04.000000000 +0100
+@@ -526,7 +526,7 @@
+ 	@pod2man="`cd util; ./pod2mantest $(PERL)`"; \
+ 	here="`pwd`"; \
+ 	filecase=; \
+-	if [ "$(PLATFORM)" = "DJGPP" -o "$(PLATFORM)" = "Cygwin" -o "$(PLATFORM)" = "mingw" ]; then \
++	if [ "$(PLATFORM)" = "DJGPP" -o "$(PLATFORM)" = "Cygwin" -o "$(PLATFORM)" = "mingw" -o $(PLATFORM) = "mingwx" ]; then \
+ 		filecase=-i; \
+ 	fi; \
+ 	set -e; for i in doc/apps/*.pod; do \
+diff -ur openssl-0.9.8a.orig/Makefile.shared openssl-0.9.8a/Makefile.shared
+--- openssl-0.9.8a.orig/Makefile.shared	2005-06-23 22:47:54.000000000 +0200
++++ openssl-0.9.8a/Makefile.shared	2005-12-05 13:09:47.000000000 +0100
+@@ -258,6 +258,45 @@
+ link_app.cygwin:
+ 	$(LINK_APP)
+ 
++link_o.mingw:
++	ULIB=lib$(LIBNAME); \
++	WLIB=$(LIBNAME)eay; \
++	WLIB32=$(LIBNAME)eay32; \
++	expr $(LIBNAME) : 'crypto' > /dev/null && WLIB="libeay" ; \
++	expr $(LIBNAME) : 'crypto' > /dev/null && WLIB32="libeay32" ; \
++	perl util/mkdef.pl 32 $$WLIB > ms/$$WLIB32.def &&  \
++	i586-mingw32msvc-cc  -mdll -o $$ULIB.tmp2 -Wl,--base-file,$$ULIB.tmp \
++		$$ULIB.a $(LIBDEPS) $(SHLIBDEPS) && \
++	rm -f $$ULIB.tmp2 && \
++	i586-mingw32msvc-dlltool --dllname $$WLIB32.dll --base-file $$ULIB.tmp \
++		--output-exp $$ULIB.exp --def ms/$$WLIB32.def && \
++	rm -f $$ULIB.tmp && \
++	i586-mingw32msvc-cc -shared -o $$WLIB32.dll \
++		-Wl,--out-implib,$$WLIB32.lib.a \
++		$$ULIB.exp $$ULIB.a $(LIBDEPS) $(SHLIBDEPS) && \
++	rm -f $$ULIB.exp
++link_a.mingw:
++	ULIB=lib$(LIBNAME); \
++	WLIB=$(LIBNAME)eay; \
++	WLIB32=$(LIBNAME)eay32; \
++	expr $(LIBNAME) : 'crypto' > /dev/null && WLIB="libeay" ; \
++	expr $(LIBNAME) : 'crypto' > /dev/null && WLIB32="libeay32" ; \
++	rm -f apps/$$WLIB32.dll; \
++	rm -f test/$$WLIB32.dll; \
++	perl util/mkdef.pl 32 $$WLIB > ms/$$WLIB32.def &&  \
++	i586-mingw32msvc-dlltool --dllname $$WLIB32.dll \
++		--output-exp $$ULIB.exp --def ms/$$WLIB32.def && \
++	i586-mingw32msvc-cc -shared -o $$WLIB32.dll \
++		-Wl,--out-implib,$$WLIB32.lib.a \
++		$$ULIB.exp $$ULIB.a $(LIBDEPS) $(SHLIBDEPS) && \
++	rm -f $$ULIB.exp  && \
++	cp -p $$WLIB32.dll apps/ && \
++	cp -p $$WLIB32.dll test/ && \
++	ln -fs $$WLIB32.lib.a $$ULIB.dll.a && \
++	ln -fs $$WLIB32.dll $$ULIB.dll
++link_app.mingw:
++	$(LINK_APP)
++
+ link_o.alpha-osf1:
+ 	@ if ${DETECT_GNU_LD}; then \
+ 		$(DO_GNU_SO); \
+@@ -538,7 +577,7 @@
+ 	expr $(PLATFORM) : '.*ia64' > /dev/null && SHLIB=lib$(LIBNAME).so; \
+ 	$(SYMLINK_SO)
+ # The following lines means those specific architectures do no symlinks
+-symlink.cygwin symlib.alpha-osf1 symlink.tru64 symlink.tru64-rpath:
++symlink.cygwin symlink.mingw symlib.alpha-osf1 symlink.tru64 symlink.tru64-rpath:
+ 
+ # Compatibility targets
+ link_o.bsd-gcc-shared link_o.linux-shared link_o.gnu-shared: link_o.gnu
+@@ -556,6 +595,10 @@
+ link_a.cygwin-shared: link_a.cygwin
+ link_app.cygwin-shared: link_app.cygwin
+ symlink.cygwin-shared: symlink.cygwin
++link_o.mingw-shared: link_o.mingw
++link_a.mingw-shared: link_a.mingw
++link_app.mingw-shared: link_app.mingw
++symlink.mingw-shared: symlink.mingw
+ link_o.alpha-osf1-shared: link_o.alpha-osf1
+ link_a.alpha-osf1-shared: link_a.alpha-osf1
+ link_app.alpha-osf1-shared: link_app.alpha-osf1
+diff -ur openssl-0.9.8a.orig/util/libeay.num openssl-0.9.8a/util/libeay.num
+--- openssl-0.9.8a.orig/util/libeay.num	2005-10-10 02:37:36.000000000 +0200
++++ openssl-0.9.8a/util/libeay.num	2005-12-04 20:40:04.000000000 +0100
+@@ -2071,7 +2071,6 @@
+ UI_add_error_string                     2633	EXIST::FUNCTION:
+ KRB5_CHECKSUM_free                      2634	EXIST::FUNCTION:
+ OCSP_REQUEST_get_ext                    2635	EXIST::FUNCTION:
+-ENGINE_load_ubsec                       2636	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ ENGINE_register_all_digests             2637	EXIST::FUNCTION:ENGINE
+ PKEY_USAGE_PERIOD_it                    2638	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+ PKEY_USAGE_PERIOD_it                    2638	EXIST:EXPORT_VAR_AS_FUNCTION:FUNCTION:
+@@ -2545,7 +2544,6 @@
+ AES_set_encrypt_key                     3024	EXIST::FUNCTION:AES
+ OCSP_resp_count                         3025	EXIST::FUNCTION:
+ KRB5_CHECKSUM_new                       3026	EXIST::FUNCTION:
+-ENGINE_load_cswift                      3027	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ OCSP_onereq_get0_id                     3028	EXIST::FUNCTION:
+ ENGINE_set_default_ciphers              3029	EXIST::FUNCTION:ENGINE
+ NOTICEREF_it                            3030	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+@@ -2576,7 +2574,6 @@
+ i2d_EXTENDED_KEY_USAGE                  3052	EXIST::FUNCTION:
+ i2d_OCSP_SIGNATURE                      3053	EXIST::FUNCTION:
+ asn1_enc_save                           3054	EXIST::FUNCTION:
+-ENGINE_load_nuron                       3055	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ _ossl_old_des_pcbc_encrypt              3056	EXIST::FUNCTION:DES
+ PKCS12_MAC_DATA_it                      3057	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+ PKCS12_MAC_DATA_it                      3057	EXIST:EXPORT_VAR_AS_FUNCTION:FUNCTION:
+@@ -2600,7 +2597,6 @@
+ i2d_KRB5_CHECKSUM                       3072	EXIST::FUNCTION:
+ ENGINE_set_table_flags                  3073	EXIST::FUNCTION:ENGINE
+ AES_options                             3074	EXIST::FUNCTION:AES
+-ENGINE_load_chil                        3075	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ OCSP_id_cmp                             3076	EXIST::FUNCTION:
+ OCSP_BASICRESP_new                      3077	EXIST::FUNCTION:
+ OCSP_REQUEST_get_ext_by_NID             3078	EXIST::FUNCTION:
+@@ -2667,7 +2663,6 @@
+ OCSP_CRLID_it                           3127	EXIST:EXPORT_VAR_AS_FUNCTION:FUNCTION:
+ i2d_KRB5_AUTHENTBODY                    3128	EXIST::FUNCTION:
+ OCSP_REQUEST_get_ext_count              3129	EXIST::FUNCTION:
+-ENGINE_load_atalla                      3130	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ X509_NAME_it                            3131	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+ X509_NAME_it                            3131	EXIST:EXPORT_VAR_AS_FUNCTION:FUNCTION:
+ USERNOTICE_it                           3132	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+@@ -2762,8 +2757,6 @@
+ DES_read_password                       3207	EXIST::FUNCTION:DES
+ UI_UTIL_read_pw                         3208	EXIST::FUNCTION:
+ UI_UTIL_read_pw_string                  3209	EXIST::FUNCTION:
+-ENGINE_load_aep                         3210	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+-ENGINE_load_sureware                    3211	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ OPENSSL_add_all_algorithms_noconf       3212	EXIST:!VMS:FUNCTION:
+ OPENSSL_add_all_algo_noconf             3212	EXIST:VMS:FUNCTION:
+ OPENSSL_add_all_algorithms_conf         3213	EXIST:!VMS:FUNCTION:
+@@ -2772,7 +2765,6 @@
+ AES_ofb128_encrypt                      3215	EXIST::FUNCTION:AES
+ AES_ctr128_encrypt                      3216	EXIST::FUNCTION:AES
+ AES_cfb128_encrypt                      3217	EXIST::FUNCTION:AES
+-ENGINE_load_4758cca                     3218	EXIST::FUNCTION:ENGINE,STATIC_ENGINE
+ _ossl_096_des_random_seed               3219	EXIST::FUNCTION:DES
+ EVP_aes_256_ofb                         3220	EXIST::FUNCTION:AES
+ EVP_aes_192_ofb                         3221	EXIST::FUNCTION:AES
+@@ -3107,7 +3099,6 @@
+ STORE_method_set_modify_function        3530	EXIST:!VMS:FUNCTION:
+ STORE_meth_set_modify_fn                3530	EXIST:VMS:FUNCTION:
+ STORE_parse_attrs_next                  3531	EXIST::FUNCTION:
+-ENGINE_load_padlock                     3532	EXIST::FUNCTION:ENGINE
+ EC_GROUP_set_curve_name                 3533	EXIST::FUNCTION:EC
+ X509_CERT_PAIR_it                       3534	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:
+ X509_CERT_PAIR_it                       3534	EXIST:EXPORT_VAR_AS_FUNCTION:FUNCTION:
+

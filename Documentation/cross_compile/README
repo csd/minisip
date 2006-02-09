@@ -1,0 +1,10 @@
+This folder contains info for those who want to cross compile minisip into other platforms than the 
+most common Linux on an "normal" PC. 
+
+If you have a success story, feel free to send it to the mailing list (minisip-users@minisip.org) so 
+we can add it here. Recommended documentation to include: howto-step-by-step file; links to needed extra
+software and libraries (plus how to install it); scripts that you used to automate the build; etc.
+
+Thanks, and enjoy!
+
+Minisip
