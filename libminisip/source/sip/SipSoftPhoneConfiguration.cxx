@@ -394,7 +394,12 @@ static void installConfigFile(string filename){
 		"<local_tcp_port> 5060 </local_tcp_port>\n"
 		"<local_tls_port> 5061 </local_tls_port>\n"
 		"<local_media_port> 10000 </local_media_port>\n"                                
+//for windows, use the direct sound device by default ... otherwise, it crashes minisip.
+#ifdef WIN32
+		"<sound_device>dsound:0</sound_device>\n"
+#else
 		"<sound_device>/dev/dsp</sound_device>\n"
+#endif
 #ifdef HAS_SPEEX
 		"<codec>speex</codec>\n"
 #endif
