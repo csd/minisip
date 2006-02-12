@@ -39,8 +39,8 @@ make_options="-k"
 
 #This are common params, usable in all folders
 base_configure_params=""
-#base_configure_params="$base_configure_params --enable-debug"
-#base_configure_params="$base_configure_params --disable-shared"
+base_configure_params="$base_configure_params --enable-debug"
+base_configure_params="$base_configure_params --disable-shared"
 
 #set special options for libmutil
 libmutil_configure_params=""
@@ -51,7 +51,7 @@ libmutil_configure_params=""
 #              show just a sample
 minisip_configure_params=""
 minisip_configure_params="$minisip_configure_params --enable-color-terminal"
-#minisip_configure_params="$minisip_configure_params --enable-alsa"
+minisip_configure_params="$minisip_configure_params --enable-alsa"
       #--enable-autocall enables automatic calling for debug purposes (default disabled)
       #--enable-ipaq enables various fixes for the iPAQ (default disabled)
       #--enable-ipsec-enable enables ipsec features (default disabled)
@@ -59,50 +59,86 @@ minisip_configure_params="$minisip_configure_params --enable-color-terminal"
       #--enable-video enables video features (default disabled)
       #--enable-textui enables the text based user interface (default disabled)
 
-      
 for subdir in ${SUBDIRS}
 do
-	echo "+++++++++++++++++++++++++++++++++++++"
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "Building ${subdir} ... "
-	echo "+++++++++++++++++++++++++++++++++++++"
-	echo
-	echo "LDFLAGS = $LOC_LDFLAGS" 
-	echo "CXXFLAGS = $LOC_CXXFLAGS"
-	echo
 	echo "+++++++++++++++++++++++++++++++++++++"
 		
 	cd ${subdir}
+
 	./bootstrap
-
-
+	
 	configure_params="$base_configure_params"
 	
 	if [ ${subdir} = "libmutil" ]; then 
+		LOC_MUTIL_LIBS=-L$PWD/.libs
+		#${subdir}.$LIBS_EXTENSION
+		LOC_MUTIL_CFLAGS=-I$PWD/include
 		echo libmutil can use special params
 		configure_params="$configure_params $libmutil_configure_params"
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
 	fi 
-	
+
+	if [ ${subdir} = "libmnetutil" ]; then 
+		LOC_MNETUTIL_LIBS=-L$PWD/.libs
+		LOC_MNETUTIL_CFLAGS=-I$PWD/include
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
+	fi 
+
+	if [ ${subdir} = "libmikey" ]; then 
+		LOC_MIKEY_LIBS=-L$PWD/.libs
+		LOC_MIKEY_CFLAGS=-I$PWD/include
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
+	fi 
+
+	if [ ${subdir} = "libmsip" ]; then 
+		LOC_MSIP_LIBS=-L$PWD/.libs
+		LOC_MSIP_CFLAGS=-I$PWD/include
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
+			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
+	fi 
+
 	if [ ${subdir} = "libminisip" ] ; then 
 		echo libminisip can also have special config params
 		configure_params="$configure_params $minisip_configure_params"
+		MUTIL_LIBS=$LOC_MUTIL_LIBS 	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
 	fi 
 	
 	if [ ${subdir} = "minisip" ]; then 
 		echo minisip can also have special config params
 		configure_params="$configure_params $minisip_configure_params"
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
+			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
+			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
+			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
+			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
+			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
 	fi 
-	
 	
 	echo "=========================================================="
 	echo "configure_params (${subdir})= $configure_params"
 	echo "=========================================================="
-	
-	LOC_LDFLAGS="$LOC_LDFLAGS -L$PWD -L$PWD/.libs"
-	LOC_CXXFLAGS="$LOC_CXXFLAGS -I$PWD/include"
-	
-	LDFLAGS=$LOC_LDFLAGS 					\
-		CXXFLAGS="$LOC_CXXFLAGS -Wall $compiler_debug"	\
-			./configure $configure_params
 	
 	make $make_options
 	
