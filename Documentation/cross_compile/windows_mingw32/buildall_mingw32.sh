@@ -13,8 +13,11 @@
 prefix_cross=/minisip
 prefix_cross_include=$prefix_cross/include
 prefix_cross_lib=$prefix_cross/lib
-host_option="--host=i586-mingw32msvc"
+host_type_name="i586-mingw32msvc"
+host_option="--host=$host_type_name"
 build_option="--build=i686-pc-linux-gnu"
+strip_bin="i586-mingw32msvc-strip"
+#strip_generated_files="yes"
 
 # Simple script to build minisip.
 #
@@ -56,8 +59,8 @@ make_options="-k"
 #This are common params, usable in all folders
 base_configure_params=""
 base_configure_params="$base_configure_params --enable-debug"
-#base_configure_params="$base_configure_params --disable-static"
-base_configure_params="$base_configure_params --disable-shared"
+base_configure_params="$base_configure_params --disable-static"
+#base_configure_params="$base_configure_params --disable-shared"
 
 #set special options for libmutil
 libmutil_configure_params=""
@@ -69,7 +72,7 @@ libmutil_configure_params=""
 minisip_configure_params=""
 	#the following are forced options for minisip, as we compile for win32
 minisip_configure_params="$minisip_configure_params --enable-dsound"
-minisip_configure_params="$minisip_configure_params --disable-alse"
+minisip_configure_params="$minisip_configure_params --disable-alsa"
 minisip_configure_params="$minisip_configure_params --disable-gconf"
 minisip_configure_params="$minisip_configure_params --enable-gtk"
       #--enable-autocall enables automatic calling for debug purposes (default disabled)
@@ -173,9 +176,28 @@ do
 	echo "=========================================================="
 	
 	make $make_options
-	
+
 	cd ..
 done
+
+mkdir -p compiled_files
+tmp_lib="libmutil"
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+tmp_lib="libmnetutil"
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+tmp_lib="libmikey"
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+tmp_lib="libmsip"
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+
+cp -f minisip/minisip/minisip.exe compiled_files/minisip_script.exe
+cp -f minisip/minisip/.libs/minisip.exe compiled_files/minisip.exe
+
+$strip_bin compiled_files/*
 
 echo "---------------------------------------------------------------------"
 echo "Warning:"
