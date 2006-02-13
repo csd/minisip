@@ -231,11 +231,14 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save("tls_server", tls_server? "yes":"no");
 
 	backend->save("ringtone", ringtone);
+	
+	//add code to load the default network interface
+	//<network_interface> into networkInterfaceName
+	//We are not saving the interface name of the current localIP ...
+	backend->save( "network_interface", networkInterfaceName );
 
 	backend->commit();
 
-//	parser->saveToFile( configFileName );
-	//delete( parser );
 
 }
 
@@ -352,9 +355,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	soundDevice =  backend->loadString("sound_device","");
 	
-	//not used anymore
-// 	muteAllButOne = backend->loadString("mute_all_but_one", "yes") == "yes";
-
 	soundIOmixerType = backend->loadString("mixer_type", "spatial");
 // 	cerr << "sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
@@ -448,6 +448,10 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		audioCodecs.push_back( "G.711" );
 		be->save( "codec[0]", "G.711" ); //save the changes ... 
 	}
+
+	//add code to load the default network interface
+	//<network_interface> into networkInterfaceName
+	networkInterfaceName = backend->loadString("network_interface", "");
 	
 	return ret;
 

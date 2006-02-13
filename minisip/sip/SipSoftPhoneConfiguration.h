@@ -195,6 +195,18 @@ class SipSoftPhoneConfiguration : public MObject{
 		 */
 		int32_t p2tGroupListServerPort;
 
+		/**
+		In the <network_interface> part of the config file, we can specify
+		the name of the adapter we want to use. We use the name, as the IP 
+		address may vary (DHCP, etc).
+		In linux: lo, eth0, eth1, ... 
+		In Windows XP: <1234ASD1-234F-988A-9102BDE1>
+		If empty, there is no preferred network interface, thus 
+			list all available, tell the user and try to choose
+			a correct one.
+		*/
+		string networkInterfaceName;
+
 	private:
 		MRef<ConfBackend *> backend;
 };

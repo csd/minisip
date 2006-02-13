@@ -31,7 +31,7 @@ using namespace std;
 
 
 SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
-        
+
 	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
 	
 	localIp = config->inherited->localIpString;
@@ -55,37 +55,69 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 		else return;
 	}
 	
-	for (unsigned i=0; i<ifaces.size(); i++){
-		string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-		#ifdef DEBUG_OUTPUT
-		cerr << "SimpleIPProvider: checking interface = " << ifaces[i] << " with IP=" << ip << endl;
-		#endif
-		if (ip.length()>0){
-			if (ifaces[i]==string("lo")){
-				if (localIp.length()<=0)
-					localIp = ip;//NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-			}else{
-				string ipstr = ip;//NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-				
-				//only update the local ip if it is the first interface with a private
-				//ip different from localhost or a public ip
-				if ( isInPrivateIpRange( ipstr )){
-					if (localIp.length()<=0 || localIp=="127.0.0.1")
-						localIp = ipstr;
-				}else{ 
-					//use first public ip we find ... overwritting the private one
-					if( localIp.length() <= 0 || 
-							localIp=="127.0.0.1" ||
-							localIp.substr(0,2)=="0." ||
-							isInPrivateIpRange( localIp) )
-						localIp = ipstr;
+	bool ipFound = false;
+		
+	//if a preferred network interface is specified in the config file ... 
+	if( config->networkInterfaceName != "") {
+		for (unsigned i=0; i<ifaces.size(); i++){
+			if ( config->networkInterfaceName == ifaces[i] ) {
+				localIp = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+				ipFound=true;
+				break;
+			}
+		}
+	#ifdef DEBUG_OUTPUT
+		cerr << "SimpleIPProvider: preferred network interface = " << config->networkInterfaceName  << endl;
+		if( ipFound ) cerr << "SimpleIPProvider: preferred interface found" << endl;
+		else cerr << "SimpleIPProvider: preferred interface NOT found" << endl;
+	#endif
+	} 
+
+	//if ip is not found (either not specified or the adapter is not good ... 
+	//use one which we consider apropriate	
+	if( ! ipFound ) {
+		//print message telling the user about defining a preferred interface
+		cout <<    "========================================================================" << endl
+			<< "|No network interface defined as preferred in the configuration, or" << endl
+			<< "|the one specified could not be found." << endl
+			<< "|Minisip will try to find an appropriate one." << endl
+			<< "|Minisip highly recommends you to add a preferred one. To do so, choose" << endl
+			<< "|from the list below and edit the configuration file, section <network_interface>" << endl;
+			for (unsigned i=0; i<ifaces.size(); i++){
+				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+		   		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
+			}	
+		cout <<    "========================================================================" << endl;
+		for (unsigned i=0; i<ifaces.size(); i++){
+			string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+			#ifdef DEBUG_OUTPUT
+			//cerr << "SimpleIPProvider: interface = " << ifaces[i] << "; IP=" << ip << endl;
+			#endif
+			if (ip.length()>0){
+				if (ifaces[i]==string("lo")){ //this interface only exhists in linux ...
+					if (localIp.length()<=0)
+						localIp = ip;
+				}else{
+					string ipstr = ip;
+					
+					//only update the local ip if it is the first interface with a private
+					//ip different from localhost or a public ip
+					if ( isInPrivateIpRange( ipstr )){
+						if (localIp.length()<=0 || localIp=="127.0.0.1")
+							localIp = ipstr;
+					}else{ 
+						//use first public ip we find ... overwritting the private one
+						if( localIp.length() <= 0 || 
+								localIp=="127.0.0.1" ||
+								localIp.substr(0,2)=="0." ||
+								isInPrivateIpRange( localIp) )
+							localIp = ipstr;
+					}
 				}
 			}
 		}
 	}
-	#ifdef DEBUG_OUTPUT
-	cerr << "SimpleIPProvider: using localIP =  " << localIp << endl;
-	#endif
+	cout << "Minisip is using IP =  " << localIp << endl;
 }
 
 bool SimpleIpProvider::isInPrivateIpRange( string ipstr ) {

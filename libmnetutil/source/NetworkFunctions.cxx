@@ -102,7 +102,9 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 
 	while (pAdapter) {
 		res.push_back(pAdapter->AdapterName);
+	#ifdef DEBUG_OUTPUT
 		printf("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
+	#endif
 		pAdapter = pAdapter->Next;
 	}
 	free(pAdapterInfo);
@@ -140,13 +142,13 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 		ifrp = (struct ifreq *)ptr;
 		sockaddr_ptr = (struct sockaddr_in *)&ifrp->ifr_ifru.ifru_addr;
 
-#ifdef DARWIN
+	#ifdef DARWIN
 		res.push_back(string(ifrp->ifr_name));
 		ptr += sizeof(ifrp->ifr_name) + len;
-#else
+	#else
 		res.push_back(string(ifrp->ifr_ifrn.ifrn_name));
 		ptr += sizeof(ifrp->ifr_ifrn.ifrn_name) + len;
-#endif
+	#endif
 //		printf("%s: ",ifrp->ifr_ifrn.ifrn_name);
 //		printf("%s\n",inet_ntoa(sockaddr_ptr->sin_addr.s_addr));
 
