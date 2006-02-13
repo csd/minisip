@@ -461,6 +461,12 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	//be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	be->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 	
+#ifdef WIN32
+	be->save( "network_interface", "{12345678-1234-1234-12345678}" );
+#else
+	be->save( "network_interface", "eth0" );
+#endif
+	
 	be->save( "account[0]/account_name", "My account" );
 	be->save( "account[0]/sip_uri", "username@domain.org" );
 	be->save( "account[0]/proxy_addr", "sip.domain.org" );
@@ -487,9 +493,14 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "local_tcp_port", 5060 );
 	be->save( "local_tls_port", 5061 );
 
+#ifdef WIN32
+	be->save( "sound_device", "dsound:0" );
+#else
 	be->save( "sound_device", "/dev/dsp" );
-// 	be->save( "mute_all_but_one", "yes" ); //not used
+#endif
+	
 	be->save( "mixer_type", "spatial" );
+
 #if defined HAS_SPEEX && defined HAS_GSM
 	be->save( "codec[0]", "speex" );
 	be->save( "codec[1]", "G.711" );
@@ -519,11 +530,11 @@ string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	char *home = getenv("HOME");
 	if (home==NULL){
 			merr << "WARNING: Could not determine home directory"<<end;
-#ifdef WIN32
-	phonebookFileName = string("c:\\minisip.addr");
-#else
-	phonebookFileName = string("/.minisip.addr");
-#endif
+		#ifdef WIN32
+			phonebookFileName = string("c:\\minisip.addr");
+		#else
+			phonebookFileName = string("/.minisip.addr");
+		#endif
 	}else{
 			phonebookFileName = string(home)+ string("/.minisip.addr");
 	}
