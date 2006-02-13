@@ -135,7 +135,9 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 		LogEntry::handler = NULL;
 	#else //!TEXT_UI
 		#ifdef GTK_GUI
+			#ifdef DEBUG_OUTPUT
 			cerr << "Creating GTK GUI"<< endl;
+			#endif
 			gui = GtkMainUI::create( argc, argv );
 			LogEntry::handler = (GtkMainUI *)*gui;
 			#ifdef DEBUG_OUTPUT
