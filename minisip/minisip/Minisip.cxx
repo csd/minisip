@@ -137,9 +137,7 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 		#ifdef GTK_GUI
 			cerr << "Creating GTK GUI"<< endl;
 			gui = GtkMainUI::create( argc, argv );
-			cerr << "Minisip: gtk 1" << endl;
 			LogEntry::handler = (GtkMainUI *)*gui;
-			cerr << "Minisip: gtk 2" << endl;
 			#ifdef DEBUG_OUTPUT
 				consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
 				MRef<Thread *> consoleDbgThread = consoleDbg->start();
