@@ -65,9 +65,15 @@ int DbgBuf::sync()
 		debugHandler->displayMessage(curStr, 0);
 		str("");
 	}
+	return 1;
 }
 
-Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), external_out( false ), std::ostream(NULL), dbgBuf( NULL ){
+Dbg::Dbg(bool error_output, bool isEnabled):
+			std::ostream(NULL), 
+			error_out(error_output), 
+			enabled(isEnabled), 
+			external_out( false ), 
+			dbgBuf( NULL ){
 	updateBuf();
 }
 
