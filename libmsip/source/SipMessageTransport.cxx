@@ -22,10 +22,6 @@
 */
 
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
-
 #include<config.h>
 
 #include<errno.h>
@@ -54,6 +50,10 @@
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 #include <stdio.h>
+
+#ifdef WIN32
+#include<winsock2.h>
+#endif
 
 #define TIMEOUT 600000
 #define NB_THREADS 5
