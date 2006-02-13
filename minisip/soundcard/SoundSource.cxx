@@ -163,7 +163,7 @@ void BasicSoundSource::pushSound(short * samples,
 		for( int32_t nSamples = nMonoSamples; nSamples > 0; ){
 			int32_t cur = nSamples;
 
-			if( cur > iFrames )
+			if( cur > (int32_t)iFrames )
 				cur = iFrames;
 			memset( temp, 0, iFrames * oNChannels ); 
 			for( int32_t i = 0; i<cur; i++ ) {

@@ -49,7 +49,11 @@ class PhoneBookModel;
 class PhoneBookTree;
 class SettingsDialog;
 class CertificateDialog;
-class MTrayIcon;
+
+#ifndef WIN32
+	class MTrayIcon;
+#endif
+
 class LogWidget;
 class LogEntry;
 class ImWidget;
@@ -200,7 +204,11 @@ class MainWindow : public GtkMainUI, public DtmfHandler
 		
 		SettingsDialog * settingsDialog;
 		CertificateDialog * certificateDialog;
-		MTrayIcon * trayIcon;
+		
+		#ifndef WIN32
+			MTrayIcon * trayIcon;
+		#endif
+		
 		LogWidget * logWidget;
 		AccountsStatusWidget * statusWidget;
 

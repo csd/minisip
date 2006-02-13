@@ -20,7 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
 #include"STUNTest.h"
 
 #include<libmnetutil/IP4Address.h>
@@ -66,12 +65,18 @@ STUNMessage *STUNTest::test(
 //		p.fd = sock.getFd();
 //		p.events = POLLIN;
 
-        fd_set set;
-        FD_ZERO(&set);
-        FD_SET(sock.getFd(), &set);
-        struct timeval tv;
-        tv.tv_sec = timeouts[timeoutIndex] / 1000;
-        tv.tv_usec = ( timeouts[timeoutIndex] % 1000 ) * 1000;
+	fd_set set;
+	FD_ZERO(&set);
+
+	#ifdef WIN32
+	FD_SET( (uint32_t) sock.getFd(),&set );
+	#else
+	FD_SET( sock.getFd(), 		&set );
+	#endif
+	
+	struct timeval tv;
+	tv.tv_sec = timeouts[timeoutIndex] / 1000;
+	tv.tv_usec = ( timeouts[timeoutIndex] % 1000 ) * 1000;
 
 //		cerr << "Waiting for max "<<timeouts[timeoutIndex]<<" ms"<<endl;
 		//int avail = poll(&p,1,timeouts[timeoutIndex]);

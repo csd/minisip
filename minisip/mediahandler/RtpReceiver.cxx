@@ -68,7 +68,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 		//generate a random port, even number, in the given range
 		float randPartial =  (float)rand()  /  RAND_MAX;
 		int port = (int) (RTP_LOCAL_PORT_RANGE * randPartial );
-		port = 2 * (int)( port/2  ); //turn this into an even number
+		port = (int) ( 2 * (int)(port/2 ) ); //turn this into an even number
 		port += RTP_LOCAL_PORT_RANGE_MIN; //add the min port to set it within the range
 		#ifdef DEBUG_OUTPUT
 		printf( "RtpReceiver:: final trying port = %d\n", port );
@@ -172,7 +172,11 @@ void RtpReceiver::run(){
 		int ret = -1;
 
 		FD_ZERO( &rfds );
+		#ifdef WIN32
+		FD_SET( (uint32_t) socket->getFd(), &rfds );
+		#else
 		FD_SET( socket->getFd(), &rfds );
+		#endif
 
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;

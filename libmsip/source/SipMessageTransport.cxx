@@ -22,6 +22,10 @@
 */
 
 
+#ifdef WIN32
+#include<winsock2.h>
+#endif
+
 #include<config.h>
 
 #include<errno.h>
@@ -50,10 +54,6 @@
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 #include <stdio.h>
-
-#ifdef WIN32
-#include<winsock2.h>
-#endif
 
 #define TIMEOUT 600000
 #define NB_THREADS 5
@@ -104,7 +104,12 @@ void SocketServer::run(){
 		int avail;
 		do{
 			FD_ZERO(&set);
+			#ifdef WIN32
+			FD_SET( (uint32_t) fd, &set);
+			#else
 			FD_SET(fd, &set);
+			#endif
+			
 			timeout.tv_sec = 5;
 			timeout.tv_usec= 0;
 			avail = select(fd+1,&set,NULL,NULL,&timeout );
@@ -773,7 +778,11 @@ void SipMessageTransport::udpSocketRead(){
 	
 	while( true ){
 		FD_ZERO(&set);
+		#ifdef WIN32
+		FD_SET( (uint32_t) udpsock->getFd(), &set);
+		#else
 		FD_SET(udpsock->getFd(), &set);
+		#endif
 
 		do{
 			avail = select(udpsock->getFd()+1,&set,NULL,NULL,NULL );
@@ -893,7 +902,11 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	
 	while( true ){
 		FD_ZERO(&set);
+		#ifdef WIN32
+		FD_SET( (uint32_t) socket->getFd(), &set);
+		#else
 		FD_SET(socket->getFd(), &set);
+		#endif
 
 		do{
 			avail = select(socket->getFd()+1,&set,NULL,NULL,&tv );

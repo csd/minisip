@@ -231,7 +231,7 @@ int DirectSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	VOID * lockedBuffer;
 	DWORD lockedBufferSize;
 	int readBlockSize = (48000*1*2)/50; // 20 ms, mono, 16 bit samples
-	assert(nSamples==readBlockSize/2);
+	assert( (int)nSamples == (readBlockSize/2) );
 	inputBufferHandle->Lock(wait_i*readBlockSize, readBlockSize, &lockedBuffer, &lockedBufferSize, NULL,NULL,0);
 	short *sp = (short*) lockedBuffer;
 	for (int n=0; n<readBlockSize/2; n++){
@@ -252,7 +252,7 @@ int DirectSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
 	VOID * lockedBuffer;
 	DWORD lockedBufferSize;
 	int writeBlockSize = (48000*2*2)/50;
-	assert(nSamples * 2 * getNChannelsPlay() ==writeBlockSize);
+	assert( (int)(nSamples * 2 * getNChannelsPlay()) == writeBlockSize);
 	
 	if (FAILED(hr=outputBufferHandle->Lock(wait_i*writeBlockSize, writeBlockSize, &lockedBuffer, &lockedBufferSize, NULL,NULL,0))){
 		cerr <<"DirectSoundDevice: Lock failed on buffer"<< endl;

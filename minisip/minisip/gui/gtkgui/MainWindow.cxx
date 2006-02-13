@@ -31,9 +31,11 @@
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
 #include"DtmfWidget.h"
+
 #ifndef WIN32
-#include"TrayIcon.h"
+	#include"TrayIcon.h"
 #endif
+
 #include"LogWidget.h"
 #include"ImWidget.h"
 #include"AccountsList.h"
@@ -314,9 +316,13 @@ MainWindow::~MainWindow(){
 	delete statusWidget;
 	delete logWidget;
 	delete phoneMenu;
+
+#ifndef WIN32
 	if( trayIcon ){
 		delete trayIcon;
 	}
+#endif
+
 	delete phoneBookTree;
 	delete mainWindowWidget;
 }

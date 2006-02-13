@@ -65,11 +65,11 @@ void IPAddress::setProtocolFamily(int pf){
 
 IPAddress * IPAddress::create( sockaddr * addr, int32_t addr_len ){
 	if( addr->sa_family == AF_INET &&
-	    addr_len >= sizeof(struct sockaddr_in)){
+	    addr_len >= (int32_t) sizeof(struct sockaddr_in)){
 		return new IP4Address( (sockaddr_in *)addr );
 	}
 	else if( addr->sa_family == AF_INET6 &&
-		 addr_len >= sizeof(struct sockaddr_in6)){
+		 addr_len >= (int32_t)sizeof(struct sockaddr_in6)){
 		return new IP6Address( (sockaddr_in6 *)addr );
 	}
 	// FIXME exception

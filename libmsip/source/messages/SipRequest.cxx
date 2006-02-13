@@ -451,17 +451,17 @@ void SipRequest::init(string &build_from){
 	int pos;
 	int pos2;
 	int end = 0;
-	int length = build_from.length();
+	//int length = build_from.length();
 	string requestLine;
 
 	// Skip white space
 	start = build_from.find_first_not_of( ' ', start );
-	if( start == string::npos ){
+	if( start == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - first line did not contain any non whitespace character");
 	}
 
 	end = build_from.find_first_of( "\r\n", start );
-	if( end == string::npos ){
+	if( end == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - only one line");
 	}
 
@@ -471,7 +471,7 @@ void SipRequest::init(string &build_from){
 
 	// Parse method
 	pos = requestLine.find( ' ', start );
-	if( pos == string::npos ){
+	if( pos == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - could not find method");
 	}
 
@@ -480,7 +480,7 @@ void SipRequest::init(string &build_from){
 
 	// Parse version
 	pos2 = requestLine.rfind( ' ', end - 1 );
-	if( pos2 == string::npos ){
+	if( pos2 == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - request line did not contain space between method and version");
 	}
 
