@@ -67,24 +67,32 @@ int DbgBuf::sync()
 	}
 }
 
-Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), std::ostream(NULL), dbgBuf( NULL ){
-	std::streambuf *buf = NULL;
-
-	// Initialize rdbuf from cerr or cout
-	if( error_out )
-		buf = std::cerr.rdbuf();
-	else
-		buf = std::cout.rdbuf();
-
-	rdbuf( buf );
+Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), external_out( false ), std::ostream(NULL), dbgBuf( NULL ){
+	updateBuf();
 }
 
 Dbg::~Dbg()
 {
 }
 
+void Dbg::updateBuf()
+{
+	std::streambuf *buf = NULL;
+
+	if( enabled ){
+		if( error_out )
+			buf = std::cerr.rdbuf();
+		else if( external_out )
+			buf = &dbgBuf;
+		else
+			buf = std::cout.rdbuf();
+	}
+	rdbuf( buf );
+}
+
 void Dbg::setEnabled(bool e){
 	enabled = e;
+	updateBuf();
 }
 
 bool Dbg::getEnabled(){
@@ -93,10 +101,9 @@ bool Dbg::getEnabled(){
 
 void Dbg::setExternalHandler(DbgHandler * dbgHandler )
 {
-	if( !error_out ){
-		dbgBuf.setExternalHandler( dbgHandler );
-		rdbuf( &dbgBuf );
-	}
+	dbgBuf.setExternalHandler( dbgHandler );
+	external_out = dbgHandler != NULL;
+	updateBuf();
 }
 
 std::ostream &end(std::ostream &os)

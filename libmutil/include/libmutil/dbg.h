@@ -64,9 +64,13 @@ class LIBMUTIL_API Dbg: public std::ostream{
 	bool getEnabled();
 	void setExternalHandler(DbgHandler * dbgHandler);
 
+    protected:
+	void updateBuf();
+
     private:
 	bool error_out;
 	bool enabled;
+	bool external_out;
 	DbgBuf dbgBuf;
 };
 
