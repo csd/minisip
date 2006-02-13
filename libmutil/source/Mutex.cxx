@@ -1,4 +1,4 @@
-/*
+	/*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   
   This library is free software; you can redistribute it and/or
@@ -112,7 +112,7 @@ Mutex::~Mutex(){
 		merror("Mutex::~Mutex: CloseHandle");
 		massert(1==0); //TODO: Handle better - exception
 	}
-	delete handle_ptr;
+	delete (HANDLE*)handle_ptr;
 
 #elif defined WINCE
 #error Mutex delete not implemented

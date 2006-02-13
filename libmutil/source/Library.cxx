@@ -37,7 +37,7 @@ Library::~Library(){
 		cerr << "Library: ERROR: Could not close library."<< endl;
 		
 	}
-	delete handle;
+	delete (HMODULE*)handle;
 	handle=NULL;
 #else
 	if(handle){

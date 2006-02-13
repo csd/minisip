@@ -79,7 +79,7 @@ CondVar::~CondVar(){
 	if (!CloseHandle( *INTERNAL_COND_WAIT )){
 		merror("CondVar::~CondVar: CloseHandle");
 	}
-	delete internalStruct;
+	delete (HANDLE *)internalStruct;
 	internalStruct=NULL;
 #endif
 }

@@ -580,8 +580,10 @@ bool Thread::kill( ) {
 #elif defined WIN32
 	HANDLE handle = *((HANDLE*)handle_ptr);
 	BOOL ret;
+	DWORD lpExitCode;
 	
-	ret = TerminateThread( handle, NULL );
+	GetExitCodeThread( handle, &lpExitCode );
+	ret = TerminateThread( handle, lpExitCode );
         if( ret == 0 ) {
 		
 		#ifdef DEBUG_OUTPUT
@@ -614,8 +616,10 @@ bool Thread::kill( int handle) {
 #elif defined WIN32
 	HANDLE h = (HANDLE)handle;
 	BOOL ret;
+	DWORD lpExitCode;
 	
-	ret = TerminateThread( h, NULL );
+	GetExitCodeThread( h, &lpExitCode );
+	ret = TerminateThread( h, lpExitCode );
         if( ret == 0 ) {
 		#ifdef DEBUG_OUTPUT
 			merror("Thread::kill: TerminateThread");
