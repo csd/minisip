@@ -33,8 +33,9 @@
 #include<libmutil/dbg.h>
 
 class LIBMUTIL_API TextUICompletionCallback{
-public:
-	virtual minilist<string> textuiCompletionSuggestion(string match)=0;
+	public:
+		virtual ~TextUICompletionCallback() {}
+		virtual minilist<string> textuiCompletionSuggestion(string match)=0;
 	
 };
 

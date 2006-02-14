@@ -66,14 +66,14 @@ class StockButton : public Gtk::Button{
 };
 
 class CallWidget : public Gtk::VBox
-#ifndef OLDLIBGLADEMM
-,public DtmfHandler 
-#endif
+			#ifndef OLDLIBGLADEMM
+			, virtual public DtmfHandler 
+			#endif
 {
 	public:
 		CallWidget( string callId, string remoteUri, MainWindow * mw, bool incoming, std::string secure="unprotected");
 
-		~CallWidget();
+		virtual ~CallWidget();
 
 		void hideAcceptButton();
 		virtual bool handleCommand( CommandString command );

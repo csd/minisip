@@ -179,7 +179,7 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 static void signalHandler(int signum, siginfo_t* info, void*ptr) {
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
-    int i, f = 0;
+    int f = 0;
     ucontext_t *ucontext = (ucontext_t*)ptr;
     Dl_info dlinfo;
     void **bp = 0;

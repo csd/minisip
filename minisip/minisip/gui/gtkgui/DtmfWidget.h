@@ -27,8 +27,9 @@
 
 
 class DtmfHandler{
-        public:
-                virtual void dtmfPressed( uint8_t symbol )=0;
+	public:
+		virtual ~DtmfHandler() {}
+		virtual void dtmfPressed( uint8_t symbol )=0;
 };
 
 
@@ -36,7 +37,7 @@ class DtmfWidget : public Gtk::Table{
 	public:
 		DtmfWidget();
 
-                void setHandler( DtmfHandler * handler );
+		void setHandler( DtmfHandler * handler );
 	private:
 		void buttonPressed();
 
@@ -53,8 +54,5 @@ class DtmfWidget : public Gtk::Table{
 		Gtk::Button sharpButton;
 		Gtk::Button starButton;
 };
-
-
-
 
 #endif

@@ -35,6 +35,7 @@
 class ConfCallback{
 	
 	public:
+		virtual ~ConfCallback() {}
 		//virtual void guicb_handleConfCommand(string &)=0;
 		virtual void confcb_handleSipCommand(string &)=0;
 		virtual void confcb_handleSipCommand(CommandString &)=0;

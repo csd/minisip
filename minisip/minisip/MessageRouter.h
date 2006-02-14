@@ -35,7 +35,9 @@
 #include<config.h>
 
 
-class MessageRouter: public SipCallback, public GuiCallback, public ConfCallback{
+class MessageRouter: 	public SipCallback, 
+			public GuiCallback, 
+			public ConfCallback{
 	public:
 		MessageRouter();
 		virtual ~MessageRouter(){}

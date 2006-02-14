@@ -62,14 +62,15 @@ class AccountsList;
 class AccountsStatusWidget;
 
 
-class MainWindow : public GtkMainUI, public DtmfHandler
-#ifdef OLDLIBGLADEMM
-		   ,public SigC::Object
-#endif
+class MainWindow : public GtkMainUI, 
+			public DtmfHandler
+		#ifdef OLDLIBGLADEMM
+			,public SigC::Object
+		#endif
 {
 	public:
 		MainWindow( Gtk::Main *main );
-		~MainWindow();
+		virtual ~MainWindow();
 
 		bool isVisible();
 		void hide();

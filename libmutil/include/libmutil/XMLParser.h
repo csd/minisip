@@ -83,6 +83,7 @@ class LIBMUTIL_API XMLFileNotFound: public XMLException{
 
 class LIBMUTIL_API XMLParserCallback{
 	public:
+		virtual ~XMLParserCallback() {}
 		virtual bool parsedElement(string path, string enclosedText)=0;
 		virtual bool parsedAttribute(string path, string value)=0;
 };

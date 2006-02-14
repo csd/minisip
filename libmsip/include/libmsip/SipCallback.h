@@ -48,6 +48,7 @@
  */
 class LIBMSIP_API SipCallback{
 	public:
+		virtual ~SipCallback() {}
 		/**
 		 * A incoming call is available. This method is intended to signal
 		 * that the SipStateMachine wants to be informed whether to accept

@@ -33,9 +33,10 @@
 class GuiCallback{
 	
 	public:
+		virtual ~GuiCallback() {}
 		virtual string guicb_doInvite(string sip_url)=0;
-                virtual void guicb_handleCommand(CommandString &)=0;
-                virtual void guicb_handleMediaCommand(CommandString &)=0;
+		virtual void guicb_handleCommand(CommandString &)=0;
+		virtual void guicb_handleMediaCommand(CommandString &)=0;
 		virtual void guicb_handleConfCommand(string &conferencename)=0;
 		virtual void guicb_handleConfCommand(CommandString &)=0;
 //		virtual string guicb_confDoInvite(string sip_url)=0;
