@@ -152,7 +152,7 @@ MRef<MPlugin *> MPlugin::loadFromLibrary( MRef<Library *> lib,
 
 	if( creatorFunction ){
 		MRef<MPlugin *> * pp = creatorFunction();
-		fprintf( stderr, "pp: %x\n", pp );
+		fprintf( stderr, "pp: %x\n", (uint)pp );
 		fprintf( stderr, "getName: %s\n", (**pp)->getName().c_str() );
 		fprintf( stderr, "getDescription: %s\n", (**pp)->getDescription().c_str() );
 		return *pp;
