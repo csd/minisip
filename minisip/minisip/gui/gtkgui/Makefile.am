@@ -17,7 +17,6 @@ libminisip_gtkgui_a_SOURCES = MainWindow.cxx \
 			      AccountsList.cxx \
 			      AccountsStatusWidget.cxx \
 			      DtmfWidget.cxx \
-			      GtkMainUI.h \
 			      GtkMainUI.cxx
 
 noinst_HEADERS  = MainWindow.h \
@@ -34,4 +33,5 @@ noinst_HEADERS  = MainWindow.h \
 		  AccountDialog.h \
 		  AccountsList.h \
 		  AccountsStatusWidget.h \
-		  DtmfWidget.h
+		  DtmfWidget.h \
+		  GtkMainUI.h 
