@@ -114,13 +114,15 @@ void XMLParser::addValue(XMLNode *cur, const char *path, string &value, int32_t 
 	
 	for (list<XMLNode *>::iterator itt = cur->subnodes.begin(); itt!= cur->subnodes.end(); itt++)
 		if ( (*itt)->getName()==part )
-			if ((index--)==0)
-				return addValue( *itt, path, value, i);
-			
+			if ((index--)==0) {
+				addValue( *itt, path, value, i);
+				return;
+			}
 //	cerr << "WARNING: node not found"<< endl;
 	XMLNode *newnode = new XMLElement(part);
 	cur->addNode(newnode);
-	return addValue(newnode, path, value, i/*+part.length()*/);
+	addValue(newnode, path, value, i/*+part.length()*/);
+	return;
 }
 
 string XMLParser::getValue(string path){
