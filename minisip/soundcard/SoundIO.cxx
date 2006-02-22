@@ -345,36 +345,6 @@ void SoundIO::start_recorder(){
 }
 
 
-
-//bool done=false;
-
-#if 0
-void SoundIO::registerSource(int sourceId, SoundIOPLCInterface *plc){	
-	cerr << "Calling register source on ID " << sourceId << endl;
-	int32_t j=1;
-	int32_t nextSize=sources.size()+1;
-        queueLock.lock();
-	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); 
-                        i!= sources.end(); 
-                        i++,j++){
-		if (sourceId==(*i)->getId()){
-			queueLock.unlock();
-			sourceListCond.broadcast();
-			return;
-		}
-		(*i)->setPos(spAudio.assignPos(j,nextSize));
-//		(*i)->initLookup(nextSize);
-	}
-	sources.push_front(
-		new BasicSoundSource( sourceId,plc,
-			spAudio.assignPos(nextSize,nextSize), 
-			/* Output parameters */
-			SOUND_CARD_FREQ, 20, 2 ));
-	queueLock.unlock();
-	sourceListCond.broadcast();
-}
-#endif
-
 void SoundIO::registerSource( MRef<SoundSource *> source ){
 #ifdef DEBUG_OUTPUT
 	cerr << "SoundIO::registerSource - Calling register source on created source " << source->getId() << endl;
@@ -431,28 +401,6 @@ void SoundIO::unRegisterSource(int sourceId){
 //	}
 	mixer->setSourcesPosition( sources, false );//removed sources
 	queueLock.unlock();
-}
-
-void SoundIO::pushSound(int sourceId,
-	       	short *buf, 
-		int32_t nMonoSamples, 
-		int index,
-		bool isStereo){
-
-	if (sourceId==-1){
-		return;
-	}
-        
-	queueLock.lock();
-
-	for (list<MRef<SoundSource *> >::iterator i=sources.begin(); i!= sources.end(); i++){
-		if (sourceId==(*i)->getId()){
-			(*i)->pushSound(buf, nMonoSamples, index, isStereo);
-			queueLock.unlock();	
-			return;
-		}
-        }
-	queueLock.unlock();	
 }
 
 void SoundIO::send_to_card(short *buf, int32_t n_samples){

@@ -189,12 +189,6 @@ class SoundIO : public MObject{
                 
 		void unRegisterSource(int sourceId);
                 
-		void pushSound(int sourceId, 
-                                short *buf, 
-                                int32_t nMonoSamples, 
-                                int index, 
-                                bool stereo=false);
-		
 		/**
 		 * Starts thread that takes data from queue 
                  * and sends to soundcard.
