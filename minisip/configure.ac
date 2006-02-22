@@ -79,6 +79,11 @@ LDFLAGS="${cf_save_LDFLAGS}"
 AC_MSG_RESULT(${reloc_result})
 AC_SUBST(RELOC_LDFLAGS)
 
+dnl Add linker flag to enable the stack trace
+
+LDFLAGS="${LDFLAGS} -rdynamic"
+
+
 dnl Check types
 AC_CHECK_TYPES([uint])
 
