@@ -24,10 +24,9 @@
 
 
 #include<config.h>
+
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
-//#include<map>
-//#include<iostream>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyPayloadT.h>
@@ -38,9 +37,9 @@
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
+
 #include<libmutil/hmac.h>
 
-//#define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
 const int64_t MAX_TIME_OFFSET = 0xe100000<<16; //1 hour
                                                                                 
 

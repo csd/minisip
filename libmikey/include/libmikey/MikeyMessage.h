@@ -28,21 +28,20 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<list>
-#include<iostream>
-#include<assert.h>
 #include<libmikey/MikeyDefs.h>
+
+#include<assert.h>
+
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadSIGN.h>
-//#include"../util/cert.h"
-//#include"../util/aes.h"
-//#include"../util/hmac.h"
-//#include"../util/base64.h"
+
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/KeyAgreementPKE.h>
 
+#include<list>
+#include<iostream>
 
 #define MIKEY_TYPE_PSK_INIT    0
 #define MIKEY_TYPE_PSK_RESP    1
@@ -59,14 +58,12 @@
 #define MIKEY_MAC_HMAC_SHA1_160 0
 #define MIKEY_MAC_NULL          1
 
-/**
- * @author Erik Eliasson, Johan Bilien
-*/
+// ... or is this other value: 0xe1000000000LL?????
+#define MAX_TIME_OFFSET (int64_t)(0xe100000<<16) //1 hour
 
 class aes;
 class certificate;
 class certificate_db;
-
 
 class LIBMIKEY_API MikeyMessage{
 	public:

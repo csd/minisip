@@ -24,7 +24,7 @@
 
 
 #include<config.h>
-#include<map>
+
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
@@ -47,6 +47,8 @@
 #include<libmutil/aes.h>
 #include<libmutil/base64.h>
 #include<libmutil/hmac.h>
+
+#include<map>
 
 MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
 
