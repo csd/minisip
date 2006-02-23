@@ -27,7 +27,7 @@
 
 #ifndef LIBMIKEY_EXPORTS
 # ifdef DLL_EXPORT
-#  define LIMMUTIL_IMPORTS
+#  define LIBMUTIL_IMPORTS
 #  define LIBMIKEY_EXPORTS
 #  define OPENSSL_OPT_WINDLL	// import Windows dll
 # endif	 // DLL_EXPORT
