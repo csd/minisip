@@ -40,7 +40,7 @@ MikeyPayloadV::MikeyPayloadV( int macAlgValue, byte_t * verDataPtr ){
 			break;
 		default:
 			throw MikeyExceptionMessageContent(
-					"Unknown MAC algorithm in V payload" );
+					"Unknown MAC algorithm in V payload (1)" );
 			return;
 	}
 }
@@ -75,7 +75,7 @@ MikeyPayload( start ){
 			break;
 		default:
 			throw MikeyExceptionMessageContent(
-					"Unknown MAC algorithm in V payload" );
+					"Unknown MAC algorithm in V payload (2)" );
 			return;
 	}	
 }
@@ -116,6 +116,6 @@ void MikeyPayloadV::setMac( byte_t * data ){
 			break;
 		default:
 			throw MikeyException( 
-				"Unknown MAC algorithm" );
+				"Unknown MAC algorithm (Payload V::setMac)" );
 	}
 }

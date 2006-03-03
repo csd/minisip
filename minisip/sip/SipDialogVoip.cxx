@@ -1496,7 +1496,7 @@ void SipDialogVoip::sendAuthInvite(const string &branch){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInvite" << end;
+		merr << "Sdp was NULL in sendAuthInvite" << end;
 		return; 
 		}
 	}
@@ -1727,7 +1727,7 @@ void SipDialogVoip::sendInviteOk(const string &branch){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInvite" << end;
+		merr << "Sdp was NULL in sendInviteOk" << end;
 		return; 
 		}
 	}

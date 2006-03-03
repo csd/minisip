@@ -49,7 +49,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC( int encrAlgValue,
 			this->macDataPtr = NULL;
 		default:
 			throw MikeyExceptionMessageContent(
-					"Unknown MAC algorithm" );
+					"Unknown MAC algorithm in KEYMAC Payload (1)" );
 	}
 }
 
@@ -90,7 +90,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC(byte_t *start, int lengthLimit):MikeyPayloa
 			break;
 		default:
 			throw MikeyExceptionMessageContent(
-				"Unknown MAC algorithm in KEYMAC Payload" );
+				"Unknown MAC algorithm in KEYMAC Payload (2)" );
 			return;
 	}
 	
@@ -210,6 +210,6 @@ void MikeyPayloadKEMAC::setMac( byte_t * data ){
 			break;
 		default:
 			throw MikeyException( 
-				"Unknown MAC algorithm" );
+				"Unknown MAC algorithm (PayloadKEMAC::setMac)" );
 	}
 }
