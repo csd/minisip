@@ -26,18 +26,14 @@
 
 #include<libmnetutil/libmnetutil_config.h>
 
+#include<openssl/ssl.h>
+
+#include<libmnetutil/TCPSocket.h>
+
+#include<libmutil/cert.h>
 #include<libmutil/mtypes.h>
 
-#include<libmnetutil/StreamSocket.h>
-#include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/IPAddress.h>
-#include<libmutil/cert.h>
-
-#include <openssl/crypto.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 
 #include<libmutil/MemObject.h>
 
@@ -75,9 +71,12 @@ NULL-SHA:NULL-MD5
 
 //Okay - another MSVC thing. Looks like I must explicitely instantiate
 //the MRef template like this to avoid linking errors --Erik.
+/// In Microsoft Embedded VC 4.0 this causes a warning ... remove
 #ifdef _MSC_VER
+#ifndef _WIN32_WCE
 template class __declspec(dllexport) MRef<certificate*>;
 template class __declspec(dllexport) MRef<ca_db*>;
+#endif
 #endif
 
 class LIBMNETUTIL_API TLSSocket : public StreamSocket {

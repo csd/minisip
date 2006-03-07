@@ -40,4 +40,8 @@
 # define LIBMNETUTIL_API
 #endif
 
+#ifdef _WIN32_WCE
+#include<openssl/err.h>
+#endif
+
 #endif	// _MLIBMNETUTIL_CONFIG_H

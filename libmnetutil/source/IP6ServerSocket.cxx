@@ -22,9 +22,9 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
+
+#include<libmnetutil/IP6ServerSocket.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -36,7 +36,6 @@
 #include<netdb.h>
 #endif
 
-#include<libmnetutil/IP6ServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
 
 
@@ -54,7 +53,7 @@ IP6ServerSocket::IP6ServerSocket(int32_t listenport, int32_t backlog): ServerSoc
 	memset(&sin, '0', sizeof(sin));
 	sin.sin6_family = AF_INET6;
 	sin.sin6_addr=in6addr_any;
-	sin.sin6_port = htons(listenport);
+	sin.sin6_port = htons( (unsigned short)listenport );
 	this->listen((struct sockaddr *)&sin,sizeof(sin),backlog);	 
 }
 

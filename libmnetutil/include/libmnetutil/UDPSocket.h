@@ -34,8 +34,8 @@ using namespace std;
 class LIBMNETUTIL_API UDPSocket : public Socket {
 	public:
 	
-		UDPSocket( bool use_ipv6=false, int32_t port=0 );
-		UDPSocket( int32_t port );
+		UDPSocket( int32_t port=0, bool use_ipv6=false );
+//		UDPSocket( int32_t port );
 		
 		virtual ~UDPSocket();
 
@@ -45,7 +45,7 @@ class LIBMNETUTIL_API UDPSocket : public Socket {
 		
 		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
 		
-		int32_t recvFrom(void *buf, int32_t len, IPAddress *& from, int &port);
+		int32_t recvFrom(void *buf, int32_t len, IPAddress *& from, int32_t &port);
 		
 		int32_t recv(void *buf, int32_t len);
 

@@ -35,6 +35,19 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
 
+//order of io.h and socket.h is important!
+//note (cesc): io.h is not really needed here ... but in wince, we need to make 
+//	sure that we are the first ones to include io.h and undefine close, read and write ... 
+//	otherwise, the stupid evc4.0 compiler says that Socket->_close is not a member ... of course not!
+#ifdef _MSC_VER
+#	ifdef _WIN32_WCE
+#		include<io.h>
+#		undef _read
+#		undef _write
+#		undef _close
+#	endif
+#endif
+
 class LIBMNETUTIL_API Socket : public MObject {
 	public:
 		Socket();
@@ -42,7 +55,11 @@ class LIBMNETUTIL_API Socket : public MObject {
 		virtual int32_t getFd();
 		int32_t getType();
 
-		void close();
+//#ifdef _WIN32_WCE
+/* Undef this ... it causes a link problem ... */
+//#undef close
+//#endif
+		void close( void );
 //		virtual std::string getMemObjectType(){return "Socket";};
 
 	protected:

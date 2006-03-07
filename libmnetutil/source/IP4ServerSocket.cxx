@@ -22,9 +22,9 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
+
+#include<libmnetutil/IP4ServerSocket.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -36,11 +36,7 @@
 #endif
 
 
-
-#include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
-
-
 
 #include<stdio.h>
 
@@ -57,7 +53,7 @@ IP4ServerSocket::IP4ServerSocket(int32_t listenport, int32_t backlog): ServerSoc
 	memset(&sin, '\0', sizeof(sin));
 	sin.sin_family = AF_INET;
 //	sin.sin_addr=0;//any
-	sin.sin_port = htons(listenport);
+	sin.sin_port = htons( (unsigned short)listenport );
 	this->listen((struct sockaddr *)&sin,sizeof(sin),backlog);	 
 }
 

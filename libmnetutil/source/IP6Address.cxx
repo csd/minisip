@@ -21,11 +21,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
 
+#include<libmnetutil/IP6Address.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -38,17 +36,14 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #include<netinet/in.h>
 #endif
 
-#include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
-
+#include<libmutil/merror.h>
 
 #include<stdio.h>
-#include<errno.h>
 
 #ifndef _MSC_VER
 #include<unistd.h>
 #endif
-
 
 #include<iostream>
 
@@ -135,7 +130,7 @@ IP6Address::~IP6Address(){
 }
 
 struct sockaddr *IP6Address::getSockaddrptr(int32_t port){
-	sockaddress->sin6_port = htons(port);
+	sockaddress->sin6_port = htons( (unsigned short)port );
 	return (struct sockaddr *) sockaddress;
 }
 
@@ -172,10 +167,10 @@ void IP6Address::connect(Socket &socket, int32_t port){
 	sin.sin6_family = AF_INET6;
 	//bcopy(hp->h_addr, (char *)&sin.sin6_addr, hp->h_length);
 	memcpy( &sin.sin6_addr,hp->h_addr, hp->h_length);
-	sin.sin6_port = htons(port);
+	sin.sin6_port = htons( (unsigned short)port );
 	
 	if (::connect(socket.getFd(), (struct sockaddr *)&sin, sizeof(sin)) < 0){
-		perror("(in IP6Address::connect()): connect");
+		merror("(in IP6Address::connect()): connect");
 		socket.close();
 		throw ConnectFailed( errno );
 	}

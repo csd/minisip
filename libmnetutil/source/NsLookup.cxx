@@ -22,10 +22,7 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
 
 #include<libmnetutil/NsLookup.h>
 
@@ -45,6 +42,7 @@ using namespace std;
 IPAddress *staticLookup(std::string addr){
 	std::cerr << "ERROR: NsLookup::staticLookup: UNIMPLEMENTED"<< std::endl;
 	exit(1);
+	return NULL; //it seems stupid, but MS EVC 4.0 forces to return something ... 
 }
 
 string NsLookup::staticLookup_str(string addr){
@@ -52,6 +50,7 @@ string NsLookup::staticLookup_str(string addr){
 #if defined WIN32
 	cerr << "ERROR: NsLookup::staticLookup_str: UNIMPLEMENTED"<< endl;
 	exit(1);
+	return NULL; //it seems stupid, but MS EVC 4.0 forces to return something ... 
 
 
 #elif defined HAVE_NETDB_H

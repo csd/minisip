@@ -22,15 +22,14 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
 
-#include<libmnetutil/NetworkException.h>
+#include<libmnetutil/NetworkFunctions.h>
+
+#include<iostream>
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 
 #ifdef HAVE_LINUX_SOCKIOS_H
 #include <linux/sockios.h> /* for SIOCG* */
@@ -50,7 +49,6 @@
 #endif
 
 #if defined _MSC_VER || __MINGW32__
-#include <stdio.h>
 #include <windows.h>
 #include "iphlpapi.h"
 # define USE_WIN32_API
@@ -60,14 +58,14 @@
 #include<arpa/nameser_compat.h>
 #endif
 
-#include<errno.h>
-#include<iostream>
-#include<libmnetutil/NetworkFunctions.h>
+#include<libmnetutil/NetworkException.h>
+
+#include<libmutil/merror.h>
 #include<libmutil/itoa.h>
-#include<stdio.h>
 
 #define BUFFER_SIZE 1024 /* bytes */
 
+using namespace std;
 
 //Linux: Thanks to linuxgazette tips, http://www.linuxgazette.com/issue84/misc/tips/interfaces.c.txt,
 //seems to be public domain.
@@ -214,7 +212,7 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 	strncpy(ifr.ifr_name, iface.c_str(), IF_NAMESIZE);
 
 	if ( ioctl(fd, SIOCGIFADDR, &ifr) == -1 ) {
-		perror("Error on ioctl");
+		merror("Error on ioctl");
 		close(fd);
 		return "";
 	}
@@ -264,7 +262,7 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	int32_t n,i;
 	for (i=0; i< qdcount; i++){                         // 3.
 		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
-			perror("dn_expand:");
+			merror("dn_expand:");
 		}
 		messageindex+=n+QFIXEDSZ;
 //		cerr << "\tName: "<< hostname << endl;
@@ -273,7 +271,7 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 //	cerr << "Answer fields returned:"<<endl;
 	for (i=0; i< ancount; i++){                 // 4.
 		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
-			perror("dn_expand:");
+			merror("dn_expand:");
 		}
 		messageindex+=n;                        // 5.
 //		cerr << "\tName: "<< hostname << endl;

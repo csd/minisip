@@ -22,9 +22,9 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
+
+#include<libmnetutil/UDPSocket.h>
 
 #if defined _MSC_VER || __MINGW32__
 #include<winsock2.h>
@@ -38,14 +38,12 @@
 //#include<netdb.h>
 #endif
 
-#include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/massert.h>
 #include<stdlib.h>
-#include<errno.h>
 
 #ifndef WIN32
 #include<unistd.h>
@@ -58,7 +56,6 @@
 #endif
 
 #include<iostream>
-#include<errno.h>
 
 #ifdef USE_WIN32_API
 typedef int socklen_t;
@@ -75,7 +72,11 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 #endif
 
 	if ((fd = (int32_t)socket(use_ipv6? PF_INET6:PF_INET, SOCK_DGRAM, IPPROTO_UDP ))<0){
+		#ifdef _WIN32_WCE //wince STLPort has not errno defined ... wcecompat has, though ... 
+		throw SocketFailed( -1 );
+		#else
 		throw SocketFailed( errno );
+		#endif
 	}
 	int32_t on=1;
 #ifndef WIN32
@@ -88,7 +89,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 		struct sockaddr_in6 addr;
 		memset(&addr, 0, sizeof(addr));
 		addr.sin6_family=PF_INET6;
-		addr.sin6_port=htons(port);
+		addr.sin6_port=htons( (unsigned short)port );
 		addr.sin6_addr=in6addr_any;
 	
 		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))!=0){
@@ -100,7 +101,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 	{
 		struct sockaddr_in addr;
 		addr.sin_family=PF_INET;
-		addr.sin_port=htons(port);
+		addr.sin_port = htons( (unsigned short)port );
 		addr.sin_addr.s_addr=htonl(INADDR_ANY);
 	
 		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))!=0){
@@ -110,13 +111,15 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 	return true;
 }
 
-UDPSocket::UDPSocket( int32_t port ) {
+UDPSocket::UDPSocket( int32_t port, bool use_ipv6 ) {
 	initUdpSocket( false, port );
 }
 
+/*
 UDPSocket::UDPSocket( bool use_ipv6, int32_t port ){
 	initUdpSocket( use_ipv6, port );
 }
+*/
 	
 UDPSocket::~UDPSocket(){
 
@@ -149,7 +152,7 @@ int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int
 	return sendto(fd, (const char*)msg, len, 0, to_addr.getSockaddrptr(port), to_addr.getSockaddrLength());
 }
 
-int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from, int &port){
+int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from, int32_t &port){
 	struct sockaddr_storage sa;
 	socklen_t sa_len = sizeof(sa);
 	int n;

@@ -50,7 +50,12 @@ class LIBMNETUTIL_API IP6Address : public IPAddress {
 		virtual bool operator ==(const IP6Address &i6) const;
 		virtual bool operator ==(const IPAddress &i) const;
 
-		virtual IP6Address * clone() const{return new IP6Address(*this);};
+//MS EVC 4.0 does not support changing the return type ... error C2555
+#ifdef _WIN32_WCE
+		virtual IPAddress * clone() const { return new IP6Address(*this); };
+#else
+		virtual IP6Address * clone() const{ return new IP6Address(*this); };
+#endif
 
 	private:
 		std::string ipaddr;

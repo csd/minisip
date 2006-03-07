@@ -30,13 +30,6 @@
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmutil/cert.h>
 
-#include <openssl/rsa.h>
-#include <openssl/crypto.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-
 class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 
 	public:

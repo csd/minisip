@@ -30,6 +30,8 @@
 
 #include<libmutil/mtypes.h>
 
+#include<string>
+
 struct sockaddr_in;
 
 class LIBMNETUTIL_API IP4Address : public IPAddress {
@@ -52,7 +54,12 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 		virtual bool operator ==(const IP4Address &i4) const;
 		virtual bool operator ==(const IPAddress &i) const;
 
-		virtual IP4Address * clone() const{ return new IP4Address(*this);};
+//MS EVC 4.0 does not support changing the return type ... error C2555
+#ifdef _WIN32_WCE
+		virtual IPAddress * clone()  const{ return new IP4Address(*this); };
+#else
+		virtual IP4Address * clone() const{ return new IP4Address(*this); };
+#endif
 
 	private:
 		std::string ipaddr;

@@ -22,26 +22,14 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
-#ifdef WIN32
-#include<winsock2.h>
-#ifdef HAVE_WS2TCPIP_H
-# include<ws2tcpip.h>
-#endif
-
-#elif defined HAVE_NETINET_IN_H
-#include<sys/types.h>
-#include<netinet/in.h>
-#include<sys/socket.h>
-#endif
 
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
+
+using namespace std;
 
 IPAddress::~IPAddress(){
 
@@ -79,12 +67,12 @@ IPAddress * IPAddress::create( sockaddr * addr, int32_t addr_len ){
 IPAddress * IPAddress::create(const string &addr){
 	try {
 		return new IP4Address( addr );
-	} catch( HostNotFound &e ){
+	} catch( HostNotFound & ){
 	}
 
 	try {
 		return new IP6Address( addr );
-	} catch( HostNotFound &e ){
+	} catch( HostNotFound & ){
 	}
 
 	return NULL;

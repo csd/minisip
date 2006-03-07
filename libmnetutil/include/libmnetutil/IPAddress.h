@@ -34,6 +34,20 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
+#ifdef _WIN32_WCE
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+#elif defined _MS_VER
+	#include<winsock2.h>
+	#ifdef HAVE_WS2TCPIP_H
+		# include<ws2tcpip.h>
+	#endif
+#elif defined HAVE_NETINET_IN_H
+	#include<sys/types.h>
+	#include<netinet/in.h>
+	#include<sys/socket.h>
+#endif
+
 class LIBMNETUTIL_API IPAddress : public MObject{
 	public:
 		virtual ~IPAddress();
@@ -61,7 +75,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		 * NOTE: The method returns NULL if the host can not be
 		 * resolved, and does not throw an exception.
 		 */
-		static IPAddress * create(const string &addr);
+		static IPAddress * create(const std::string &addr);
 
 	protected:
 		void setAddressFamily(int af);

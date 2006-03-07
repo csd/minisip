@@ -22,9 +22,9 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
+
+#include<libmnetutil/ServerSocket.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -35,18 +35,13 @@
 #include<arpa/inet.h>
 #endif
 
-#include<libmnetutil/ServerSocket.h>
+#include<libmutil/merror.h>
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/NetworkException.h>
 
-
-
 #include<stdio.h>
-#include <errno.h>
 
 #include<iostream>
-#include<errno.h>
-
 
 #ifdef WIN32
 typedef int socklen_t;
@@ -103,7 +98,7 @@ MRef<StreamSocket *>ServerSocket::accept(){
 	//sin = get_sockaddr_struct(sinlen);
 	
 	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
-		perror("in ServerSocket::accept(): accept:");
+		merror("in ServerSocket::accept(): accept:");
 	}
 	
 	return new TCPSocket(cli,(struct sockaddr*)&sin,sinlen);

@@ -23,9 +23,10 @@
 
 
 #include<config.h>
+
 #include<libmnetutil/Socket.h>
 
-#if defined _MSC_VER || __MINGW32__	// was: if defined WIN32 && not defined __CYGWIN__
+#if defined _MSC_VER || defined __MINGW32__	// was: if defined WIN32 && not defined __CYGWIN__
 #include<winsock2.h>
 # define USE_WIN32_API
 #else
@@ -46,7 +47,7 @@ Socket::Socket(){
 
 Socket::~Socket(){
 	if (fd!=-1){
-		close();
+		this->close();
 	}
 }
 
@@ -58,7 +59,8 @@ int32_t Socket::getType(){
 	return type;
 }
 
-void Socket::close(){
+
+void Socket::close( void ){
 //#if defined WIN32 && not defined __CYGWIN__
 #ifdef USE_WIN32_API
 	closesocket(fd);

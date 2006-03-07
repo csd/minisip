@@ -27,21 +27,19 @@
 #include<libmnetutil/libmnetutil_config.h>
 
 #include<vector>
-#include<libmutil/mtypes.h>
+#include<string>
 
-using namespace std;
+#include<libmutil/mtypes.h>
 
 class LIBMNETUTIL_API NetworkFunctions{
 	public:
-		static vector<string> getAllInterfaces();
-		static string getInterfaceIPStr(string iface);
-		static string getHostHandlingService(string service, string domain, uint16_t &ret_port);
-		static bool isLocalIP(uint32_t ip, vector<string> &localIPs);
+		static std::vector<std::string> getAllInterfaces();
+		static std::string getInterfaceIPStr(std::string iface);
+		static std::string getHostHandlingService(std::string service, std::string domain, uint16_t &ret_port);
+		static bool isLocalIP(uint32_t ip, std::vector<std::string> &localIPs);
 
 		//OBS: ip is host byte order
 		static void binIp2String(uint32_t ip, char *strBufMin16);
-
-	private:
 
 };
 #endif

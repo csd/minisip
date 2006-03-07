@@ -29,6 +29,7 @@
 #include<libmnetutil/Socket.h>
 
 #include<string>
+
 using namespace std;
 
 class IPAddress;
@@ -44,15 +45,15 @@ class LIBMNETUTIL_API StreamSocket : public Socket {
 		// Buffer of the received data;
 		string received;
 
-		bool matchesPeer(IPAddress& address, uint16_t port);
-		bool matchesPeer(string address, uint16_t port);
+		bool matchesPeer(IPAddress& address, int32_t port);
+		bool matchesPeer(string address, int32_t port);
 
 		IPAddress * getPeerAddress();
-		uint16_t getPeerPort();
+		int32_t getPeerPort();
 	protected:
 		IPAddress * peerAddress;
 		string remoteHostUnresolved;
-		uint16_t peerPort;
+		int32_t peerPort;
 
 };
 #endif

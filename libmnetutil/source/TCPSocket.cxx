@@ -22,45 +22,41 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
-#ifdef WIN32
-#include<winsock2.h>
-#elif defined HAVE_NETINET_TCP_H
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/tcp.h>
-#include<netinet/in.h>
-#endif
-
-#ifdef _MSC_VER
-#include<io.h>
-#endif
-
 
 #include<libmnetutil/TCPSocket.h>
+
+#ifdef WIN32
+#	include<winsock2.h>
+#elif defined HAVE_NETINET_TCP_H
+#	include<sys/types.h>
+#	include<sys/socket.h>
+#	include<netinet/tcp.h>
+#	include<netinet/in.h>
+#endif
+
+#include<stdlib.h>
+#include<stdio.h>
+#ifdef _MSC_VER
+#	include<io.h>
+#	define dup		::_dup
+#endif
+
+
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<errno.h>
 
 
 #ifndef _MSC_VER
 #include<unistd.h>
 #endif
 
-#include<errno.h>
-
 #include<iostream>
+
 using namespace std;
 
-#ifdef _MSC_VER
-#define dup ::_dup
-#endif
+
 
 TCPSocket::TCPSocket(string addr, int32_t port){
 	remoteHostUnresolved = addr;
@@ -100,7 +96,12 @@ TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr, int32_t addr_len){
 TCPSocket::TCPSocket(TCPSocket &sock){
 	type = SOCKET_TYPE_TCP;
 
+#ifdef _WIN32_WCE
+#	pragma message("LIBMUTIL::TCPSocket - COMPILATION Warning: dup(int fd) replacement not found for POCKET PC in EVC")
+	this->fd = sock.fd;
+#else
 	this->fd = dup(sock.fd);
+#endif
 
 #ifdef DEBUG_OUTPUT
 	cerr << "DEBUG: In TCPSocket copy constructor: First free descriptor number is " << this->fd << endl;
@@ -111,7 +112,7 @@ TCPSocket::TCPSocket(TCPSocket &sock){
 
 TCPSocket::~TCPSocket(){
 	if (fd!=-1){
-		close();
+		this->close();
 		this->fd=-1; //for debugging purpose (make sure error if using deleted pointer)
 	}
 	delete peerAddress;

@@ -22,22 +22,26 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
-#ifdef WIN32
-#include<winsock2.h>
-#elif defined HAVE_ARPA_INET_H
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#endif
 
 #include<libmnetutil/TLSServerSocket.h>
-#include<libmutil/massert.h>
 
+#ifdef WIN32
+#	include<winsock2.h>
+#elif defined HAVE_ARPA_INET_H
+#	include<sys/types.h>
+#	include<sys/socket.h>
+#	include<netinet/in.h>
+#	include<arpa/inet.h>
+#endif
+
+#ifndef _WIN32_WCE
+#	include<openssl/err.h>
+#endif
+
+
+#include<libmutil/merror.h>
+#include<libmutil/massert.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>
@@ -144,7 +148,7 @@ MRef<StreamSocket *> TLSServerSocket::accept(){
 	massert(sizeof(SOCKET)==4);
 #endif
 	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
-		perror("in ServerSocket::accept(): accept:");
+		merror("in ServerSocket::accept(): accept:");
 	}
 
 	return new TLSSocket( new TCPSocket( cli, (struct sockaddr*)&sin, sinlen), ssl_ctx );

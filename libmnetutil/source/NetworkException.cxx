@@ -22,34 +22,43 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
 
 #include<libmnetutil/NetworkException.h>
+
+#ifdef _WIN32_WCE
+#include<wcecompat/string.h>
+#endif
 
 using namespace std;
 
 ConnectFailed::ConnectFailed( int errorNumber ):NetworkException(errorNumber){};
-SendFailed::SendFailed( int errorNumber ):NetworkException(errorNumber){};
-ResolvError::ResolvError( int errorNumber ):NetworkException(errorNumber){};
-SocketFailed::SocketFailed( int errorNumber ):NetworkException(errorNumber){};
-ListenFailed::ListenFailed( int errorNumber ):NetworkException(errorNumber){};
-BindFailed::BindFailed( int errorNumber ):NetworkException(errorNumber){};
-GetSockNameFailed::GetSockNameFailed( int errorNumber ):NetworkException(errorNumber){};
-SetSockOptFailed::SetSockOptFailed( int errorNumber ):NetworkException(errorNumber){};
-NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){
-#ifdef WIN32
-	msg = string( strerror( errorNumber ));
-#else
-	char buf[256];
-	buf[0]=0;
-	strerror_r( errorNumber, buf, 256 );
-	msg = string((const char *)buf);
-#endif
 
+SendFailed::SendFailed( int errorNumber ):NetworkException(errorNumber){};
+
+ResolvError::ResolvError( int errorNumber ):NetworkException(errorNumber){};
+
+SocketFailed::SocketFailed( int errorNumber ):NetworkException(errorNumber){};
+
+ListenFailed::ListenFailed( int errorNumber ):NetworkException(errorNumber){};
+
+BindFailed::BindFailed( int errorNumber ):NetworkException(errorNumber){};
+
+GetSockNameFailed::GetSockNameFailed( int errorNumber ):NetworkException(errorNumber){};
+
+SetSockOptFailed::SetSockOptFailed( int errorNumber ):NetworkException(errorNumber){};
+
+NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){
+	#ifdef WIN32
+		msg = string( strerror( errorNumber ));
+	#else
+		char buf[256];
+		buf[0]=0;
+		strerror_r( errorNumber, buf, 256 );
+		msg = string((const char *)buf);
+	#endif
 };
+
 NetworkException::NetworkException():errorNumber(0){
 	msg="NetworkException";
 };

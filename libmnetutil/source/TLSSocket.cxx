@@ -21,12 +21,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
 
 #include<libmnetutil/TLSSocket.h>
+
+#include <openssl/crypto.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -36,9 +39,6 @@
 #endif
 
 #include<libmnetutil/IPAddress.h>
-
-
-
 
 #include<iostream>
 

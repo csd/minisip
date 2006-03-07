@@ -26,8 +26,8 @@
 
 #include<libmnetutil/libmnetutil_config.h>
 
-#include"TCPSocket.h"
-#include"IPAddress.h"
+#include<libmnetutil/TCPSocket.h>
+#include<libmnetutil/IPAddress.h>
 
 using namespace std;
 
@@ -49,6 +49,7 @@ class LIBMNETUTIL_API ServerSocket : public Socket {
 		void listen(string local_ip, int32_t local_port, int32_t backlog);
 
 	private:
-		int32_t domain, listen_port;
+		int32_t domain;
+		int32_t listen_port;
 };
 #endif

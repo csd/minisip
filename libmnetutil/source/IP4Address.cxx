@@ -22,45 +22,48 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
 #include<config.h>
-#endif
-
-
-
-#ifdef WIN32
-#include"winsock2.h"
-
-// borrowed from tcpdump
-int
-inet_aton(const char *cp, struct in_addr *addr)
-{
-  addr->s_addr = inet_addr(cp);
-  return (addr->s_addr == INADDR_NONE) ? 0 : 1;
-}
-
-#elif defined HAVE_NETINET_IN_H
-#include<netdb.h>
-#include<netinet/in.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#endif
 
 #include<libmnetutil/IP4Address.h>
-#include<libmnetutil/NetworkException.h>
 
-#include<stdio.h>
-#include<libmutil/massert.h>
-#include<libmutil/itoa.h>
-
-#ifndef _MSC_VER
-#include<strings.h>
+/*
+#ifdef _WIN32_WCE
+	#include<wcecompat/stdlib.h>
+	#include<wcecompat/stdio.h>
+	#ifndef _MSC_VER
+		#include<wcecompat/strings.h>
+	#endif
 #endif
+*/
 
 #include<iostream>
 
 #include<exception>
 #include<typeinfo>
+
+#ifdef WIN32
+	#include<winsock2.h>
+
+	// borrowed from tcpdump
+	int
+	inet_aton(const char *cp, struct in_addr *addr)
+	{
+	  addr->s_addr = inet_addr(cp);
+	  return (addr->s_addr == INADDR_NONE) ? 0 : 1;
+	}
+
+#elif defined HAVE_NETINET_IN_H
+	#include<netdb.h>
+	#include<netinet/in.h>
+	#include<sys/socket.h>
+	#include<arpa/inet.h>
+#endif
+
+#include<libmnetutil/NetworkException.h>
+
+#include<libmutil/merror.h>
+#include<libmutil/massert.h>
+#include<libmutil/itoa.h>
 
 using namespace std;
 
@@ -180,11 +183,11 @@ void IP4Address::connect(Socket &socket, int32_t port){
 	memset(&sin, '\0', sizeof(sin));
 	sin.sin_family = AF_INET;
 	memcpy(&sin.sin_addr, ip, sizeof(ip_data));
-	sin.sin_port = htons(port);
+	sin.sin_port = htons( (unsigned short)port );
 	
 	int error = ::connect(socket.getFd(), (struct sockaddr *)&sin, sizeof(sin));
 	if (error < 0){
-		perror("connect");
+		merror("connect");
 		socket.close();
 		throw ConnectFailed( error );
 	}
