@@ -24,14 +24,16 @@
 
 #include<config.h>
 
+#include<libmsip/SipMessageTransport.h>
+
 #include<errno.h>
 #include<stdio.h>
 
-#include<cctype>
-#include<string>
-#include<algorithm>
+#ifdef WIN32
+#include<winsock2.h>
+//#include<io.h>
+#endif
 
-#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
@@ -49,11 +51,10 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
-#include <stdio.h>
 
-#ifdef WIN32
-#include<winsock2.h>
-#endif
+#include<cctype>
+#include<string>
+#include<algorithm>
 
 #define TIMEOUT 600000
 #define NB_THREADS 5
@@ -366,7 +367,7 @@ SipMessageTransport::SipMessageTransport(
 			cert_db(cert_db),
 			tls_ctx(NULL)
 {
-	udpsock = new UDPSocket(false, local_udp_port);
+	udpsock = new UDPSocket(local_udp_port, false );
 	
 	Thread::createThread(udpThread, this);
 	
@@ -436,17 +437,17 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 	switch( socket->getType() ){
 		case SOCKET_TYPE_TLS:
 			transport = "TLS";
-			port = localTLSPort;
+			port = (uint16_t)localTLSPort;
 			break;
 			
 		case SOCKET_TYPE_TCP:
 			transport = "TCP";
-			port = localTCPPort;
+			port = (uint16_t)localTCPPort;
 			break;
 			
 		case SOCKET_TYPE_UDP:
 			transport = "UDP";
-			port = externalContactUdpPort;
+			port = (uint16_t)externalContactUdpPort;
 			break;
 
 		default:
@@ -615,7 +616,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		socket = pack->getSocket();
 
 		if( !socket ){
-			socket = findSocket(preferredTransport, ip_addr, port);
+			socket = findSocket(preferredTransport, ip_addr, (uint16_t)port);
 			pack->setSocket( socket );
 		}
 
@@ -774,7 +775,7 @@ void SipMessageTransport::udpSocketRead(){
 	int avail;
 	MRef<SipMessage*> pack;
 	int32_t nread;
-    	fd_set set;
+    fd_set set;
 	
 	while( true ){
 		FD_ZERO(&set);
@@ -790,7 +791,7 @@ void SipMessageTransport::udpSocketRead(){
 
 		if( FD_ISSET( udpsock->getFd(), &set )){
 			IPAddress *from = NULL;
-			int port = 0;
+			int32_t port = 0;
 
 			nread = udpsock->recvFrom(buffer, UDP_MAX_SIZE, from, port);
 			
@@ -824,7 +825,7 @@ void SipMessageTransport::udpSocketRead(){
 				pack = SipMessage::createMessage( data );
 				
 				pack->setSocket( *udpsock );
-				updateVia(pack, from, port);
+				updateVia(pack, from, (uint16_t)port);
 				
 				SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
 				
@@ -835,7 +836,7 @@ void SipMessageTransport::udpSocketRead(){
 				pack=NULL;
 			}
 			
-			catch(SipExceptionInvalidMessage & exc){
+			catch(SipExceptionInvalidMessage & ){
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
@@ -844,7 +845,7 @@ void SipMessageTransport::udpSocketRead(){
 				continue;
 			}
 			
-			catch(SipExceptionInvalidStart & exc){
+			catch(SipExceptionInvalidStart & ){
 				// This does not look like a SIP
 				// packet, close the connection
 				
@@ -950,7 +951,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 
 						IPAddress *peer = socket->getPeerAddress();
 						pack->setSocket( *socket );
-						updateVia( pack, peer, socket->getPeerPort() );
+						updateVia( pack, peer, (int16_t)socket->getPeerPort() );
 
 						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
 						if (!transport->commandReceiver.isNull()){
@@ -963,7 +964,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				}
 			}
 			
-			catch(SipExceptionInvalidMessage & exc){
+			catch(SipExceptionInvalidMessage & ){
 #if 0
 				// Check that we received data
 				// is not too big, in which case close
@@ -977,7 +978,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				continue;
 			}
 			
-			catch(SipExceptionInvalidStart & exc){
+			catch(SipExceptionInvalidStart & ){
 				// This does not look like a SIP
 				// packet, close the connection
 				
@@ -988,7 +989,8 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 }
 
 static void * streamThread( void * arg ){
-	StreamThreadData * data((StreamThreadData *)arg);
+	StreamThreadData * data;
+	data = (StreamThreadData *)arg;
 
 	data->run();
 	return NULL;

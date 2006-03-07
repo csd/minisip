@@ -68,8 +68,8 @@
 
 const string SipMessage::anyType="";
 
-#ifdef _MSC_VER
-template class __declspec(dllexport) MRef<SipMessage*>;
+#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+	template class __declspec(dllexport) MRef<SipMessage*>;
 #endif
 
 MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType){

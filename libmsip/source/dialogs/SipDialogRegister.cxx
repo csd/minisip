@@ -41,8 +41,8 @@
 #include<libmutil/massert.h>
 
 #ifdef DEBUG_OUTPUT
-#include<libmutil/Timestamp.h>
-#include<libmutil/dbg.h>
+//#	include<libmutil/Timestamp.h>
+#	include<libmutil/dbg.h>
 #endif
 
 /*               

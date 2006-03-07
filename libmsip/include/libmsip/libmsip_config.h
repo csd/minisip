@@ -40,4 +40,8 @@
 # define LIBMSIP_API
 #endif
 
+#ifdef _WIN32_WCE
+#include<openssl/err.h>
+#endif
+
 #endif	// _MLIBMSIP_CONFIG_H

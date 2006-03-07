@@ -39,14 +39,7 @@
 //#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 
-//#include<libmutil/dbg.h>
-//#include <iostream>
-
 #include<libmsip/SipSMCommand.h>
-
-//#include"../minisip/LogEntry.h"
-//#include<libmutil/MemObject.h>
-//#include<time.h>
 
 #include<libmsip/SipTransactionUtils.h>
 

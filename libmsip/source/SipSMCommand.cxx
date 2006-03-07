@@ -37,7 +37,11 @@ const int SipSMCommand::transaction=3;
 const int SipSMCommand::ANY=4;
 const int SipSMCommand::DIALOGCONTAINER=5;
 
+#ifdef _WIN32_WCE
+Dbg & operator<<(Dbg &o, const SipSMCommand &c){
+#else
 ostream & operator<<(ostream &o, const SipSMCommand &c){
+#endif
 	char *s[5]={"remote","TU","transaction","IGN","DIALOGCONTAINER"};
 	if (c.type==SipSMCommand::COMMAND_PACKET){
                 

@@ -31,14 +31,14 @@
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/ServerSocket.h>
-#include<libmutil/cert.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/Thread.h>
 #include<libmutil/Semaphore.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
-#include<list>
 #include<libmsip/SipMessage.h>
+
+#include<list>
 
 class SipDialogContainer;
 
@@ -89,8 +89,12 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		
 		
 		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
-		
+
+#if 0
+		//weird ... it is only defined, has not body ... but no one complained ... 
+		//until we tried with MS EVC++ 4.0 ... ???? (Cesc)
 		void setCommandReceiver(MRef<CommandStringReceiver* > rcvr);
+#endif
 
 		virtual std::string getMemObjectType(){return "SipMessageTransport";}
 
