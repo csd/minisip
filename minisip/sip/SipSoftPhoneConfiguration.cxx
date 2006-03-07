@@ -33,8 +33,8 @@
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
-#include<config.h>
 #include"SipSoftPhoneConfiguration.h"
+
 #include"../soundcard/SoundIO.h"
 #include"../mediahandler/MediaHandler.h"
 #include"../minisip/contactdb/PhoneBook.h"
@@ -42,6 +42,11 @@
 #include"../minisip/confbackend/ConfBackend.h"
 #include<fstream>
 #include"../soundcard/AudioMixer.h"
+
+#ifdef _WIN32_WCE
+#	include<stdlib.h>
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 #include<libmutil/dbg.h>
 
@@ -300,7 +305,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			#endif
 			autodetect = true; //empty proxy .. then autodetect ... just doing some checks ...
 		}
-		uint16_t proxyPort = backend->loadInt(accountPath +"proxy_port", 5060);
+		uint16_t proxyPort = (uint16_t)backend->loadInt(accountPath +"proxy_port", 5060);
 
 		ident->setDoRegister(backend->loadString(accountPath + "register","")=="yes");
 		
@@ -527,7 +532,10 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	string phonebookFileName;
-	char *home = getenv("HOME");
+	char *home;
+#ifndef _WIN32_WCE
+	home= getenv("HOME");
+#endif	
 	if (home==NULL){
 			merr << "WARNING: Could not determine home directory"<<end;
 		#ifdef WIN32

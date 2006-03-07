@@ -23,11 +23,11 @@
 #ifndef RtcpTransactionTakenFloor_H
 #define RtcpTransactionTakenFloor_H
 
+#include<config.h>
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include"SipDialogP2T.h"
-
-//#include<config.h>
 
 /** 
  * sends a Floor TAKEN message to a remote user.

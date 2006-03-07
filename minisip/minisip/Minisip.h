@@ -2,11 +2,8 @@
 #define MINISIP_H
 
 #include<config.h>
-//#include"../conf/ConferenceControl.h"
+
 #include<libmutil/MemObject.h>
-//#include<libmutil/Thread.h>
-//#include<libmutil/StateMachine.h>
-//#include"ConsoleDebugger.h"
 
 class MediaHandler;
 class Gui;

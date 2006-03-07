@@ -23,7 +23,7 @@
 #ifndef MEDIA_H
 #define MEDIA_H
 
-#include"config.h"
+#include<config.h>
 
 #include<libmutil/Mutex.h>
 
@@ -41,8 +41,6 @@ class SoundIO;
 class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
-
-typedef uint8_t byte_t;
 
 /**
  * The Media class is a representation of a medium type, namely
@@ -178,8 +176,8 @@ class Media : public MObject{
 		MRef<CodecState *> Media::createCodecInstance( uint8_t payloadType );
 		
 	protected:
-                Media();
-                Media( MRef<Codec *> defaultCodec );
+		Media();
+		Media( MRef<Codec *> defaultCodec );
 
 		Media( std::list<MRef<Codec *> > codecList );
 				

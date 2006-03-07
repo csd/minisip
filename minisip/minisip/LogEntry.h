@@ -23,10 +23,10 @@
 #ifndef LOG_ENTRY_H
 #define LOG_ENTRY_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include<string>
-
-using namespace std;
 
 class LogEntryHandler;
 
@@ -36,7 +36,7 @@ class LogEntry : public MObject{
 		virtual std::string getMemObjectType(){return "LogEntry";}
 		
 		int type;
-		string peerSipUri;
+		 std::string peerSipUri;
 		time_t start;
 		static MRef<LogEntryHandler *> handler;
 		void handle();
@@ -51,7 +51,7 @@ class LogEntrySuccess : public LogEntry {
 
 class LogEntryFailure : public LogEntry {
 	public:
-		string error;
+		 std::string error;
 
 };
 

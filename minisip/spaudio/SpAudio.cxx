@@ -59,8 +59,16 @@ void SpAudio::init(){
 	memcpy( assmatrix, assmatrix_, SPATIAL_MAXSOURCES * SPATIAL_MAXSOURCES * sizeof(int32_t) );
 	
 	/* lookup tables without gain control */
-	float lchvol[SPATIAL_POS]={1,0.8,1,0.6,0};
-	float rchvol[SPATIAL_POS]={0,0.6,1,0.8,1};
+	float lchvol[SPATIAL_POS]={	(float)1,
+								(float)0.8,
+								(float)1,
+								(float)0.6,
+								(float)0};
+	float rchvol[SPATIAL_POS]={	(float)0,
+								(float)0.6,
+								(float)1,
+								(float)0.8,
+								(float)1};
 	
 	/* lookup tables for gain control
 	float lchvol[SPATIAL_POS][SPATIAL_POS]={{1,0.8,1,0.6,0},{1,0,0,0,0},{0.5,0,0.5,0,0},{0.5,0.5,0,0.3,0},{0.5,0.5,0.5,0.3,0}};

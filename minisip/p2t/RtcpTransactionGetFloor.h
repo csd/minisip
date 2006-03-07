@@ -23,6 +23,12 @@
 #ifndef RTCPTRANSACTIONGETFLOOR_H
 #define RTCPTRANSACTIONGETFLOOR_H
 
+#include<config.h>
+
+#ifdef _WIN32_WCE
+#	include<libmnetutil/IPAddress.h>
+#endif
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include"SipDialogP2T.h"
@@ -199,7 +205,7 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		 * Control Messages.
 		 * @return <CODE>IPAdress</CODE> object.
 		 */
-		IPAddress *getAddr(){return toaddr;}
+		IPAddress *getAddr(){ return NULL; //was (the field does not exhist anymore in siptransaction): toaddr;}
 		
 		/**
 		 * returns the destination port for the Floor Control

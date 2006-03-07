@@ -31,6 +31,7 @@
 #include"ilbc/iLBC_encode.h"
 #include"ilbc/iLBC_decode.h"
 
+#include<string>
 
 class ILBCCodecState : public CodecState{
 	public:
@@ -75,13 +76,13 @@ class ILBCCodec : public AudioCodec{
 		
 		virtual int32_t getInputNrSamples();
 
-		virtual string getCodecName();
+		virtual std::string getCodecName();
 		
-		virtual string getCodecDescription();
+		virtual std::string getCodecDescription();
 		
 		virtual uint8_t getSdpMediaType();
 
-		virtual string getSdpMediaAttributes();
+		virtual std::string getSdpMediaAttributes();
 };
 
 #endif

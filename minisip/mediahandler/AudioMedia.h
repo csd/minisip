@@ -23,8 +23,10 @@
 #ifndef AUDIO_MEDIA_AND_AUDIOSOURCE_H
 #define AUDIO_MEDIA_AND_AUDIOSOURCE_H
 
+#include<config.h>
 
 #include"Media.h"
+
 #ifdef AEC_SUPPORT
 #include "../aec/aec.h"		//hanning
 #endif

@@ -33,7 +33,14 @@
 #include"SoundSource.h"
 #include"../spaudio/SpAudio.h"
 
-#include<libmutil/itoa.h> // cesc ... remove 
+	// cesc ... remove
+#include<libmutil/itoa.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
+
+using namespace std;
 
 AudioMixerSpatial::AudioMixerSpatial(MRef<SpAudio *> spatial) {
 	this->spAudio = spatial;

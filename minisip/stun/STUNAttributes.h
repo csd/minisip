@@ -38,6 +38,7 @@
 # include<winsock2.h>
 #endif
 
+#include<string>
 
 /**
  * Base class for  all STUN attributes.
@@ -56,8 +57,6 @@ class STUNAttribute{
 		static const int ERROR_CODE;		//TODO: implement generation and parsing
 		static const int UNKNOWN_ATTRIBUTES;	//TODO: implement generation and parsing
 		static const int REFLECTED_FROM;	//TODO: implement generation and parsing
-
-
 
 		
 		STUNAttribute(int type);
@@ -82,7 +81,7 @@ class STUNAttribute{
 		 * returns a string describing the attribute. This
 		 * method is mainly used while developing/debugging.
 		*/
-		virtual string getDesc()=0;
+		virtual std::string getDesc()=0;
 
 		/**
 		 * Writes the complete attribute to a buffer (it 
@@ -164,13 +163,13 @@ class STUNAttributeAddress : public STUNAttribute{
 		 * superclass.
 		 * @return	A string describing the address attribute.
 		*/
-		virtual string getDesc(){
+		virtual std::string getDesc(){
 			//char tmp[200];
 			uint32_t nip = htonl(address);
 			//inet_ntop(AF_INET,&nip,tmp,200);
-            string ip =string("")+itoa((nip >> 24)&0xFF)+"."+itoa((nip >>16)&0xFF)+"."+itoa((nip>>8)&0xFF)+"."+itoa(nip&0xFF);
+			std::string ip = std::string("") + itoa((nip >> 24)&0xFF)+"." + itoa((nip >>16)&0xFF)+"." + itoa((nip>>8)&0xFF)+"." + itoa(nip&0xFF);
 			//string ip(tmp);
-			return string("Type: ")+itoa(getType())+string("; Family: ")+itoa(family)+string("; port: ")+itoa(port)+"; address: "+ip;
+			return std::string("Type: ") + itoa(getType()) + std::string("; Family: ") + itoa(family) + std::string("; port: ") + itoa(port)+"; address: " + ip;
 		}
 
 		/**
@@ -311,8 +310,8 @@ class STUNAttributeChangeRequest : public STUNAttribute{
 		 * attribute as required by the superclass STUNAttribute
 		 * @return	String describing the attribute.
 		*/
-		virtual string getDesc(){
-			return string("type: CHANGE REQUEST; changeIP: ")+itoa(changeIP)+"; changePort: "+itoa(changePort);
+		virtual std::string getDesc(){
+			return std::string("type: CHANGE REQUEST; changeIP: ") + itoa(changeIP) + "; changePort: " + itoa(changePort);
 		}
 	protected:
 		/**
@@ -401,7 +400,7 @@ class STUNAttributeUsername: public STUNAttributeString{
 		 * Returns a string describing the attribute as required
 		 * by the superclass STUNAttribute.
 		*/
-		virtual string getDesc(){
+		virtual std::string getDesc(){
 			return "USERNAME";
 		}
 	
@@ -427,7 +426,7 @@ class STUNAttributePassword: public STUNAttributeString{
 		 * Returns a string describing the attribute as required
 		 * by the superclass STUNAttribute.
 		*/
-		virtual string getDesc(){
+		virtual std::string getDesc(){
 			return "PASSWORD";
 		}
 
@@ -475,8 +474,8 @@ class STUNAttributeErrorCode: public STUNAttribute{
 		 * Returns a string describing the attribute as 
 		 * required by the superclass STUNAttribute.
 		*/
-		virtual string getDesc(){
-			return string("Error code: ")+itoa(errorCode)+" Message: "+message;
+		virtual std::string getDesc(){
+			return std::string("Error code: ")+itoa(errorCode)+" Message: "+message;
 		}
 
 	private:
@@ -549,9 +548,9 @@ class STUNAttributeUnknownAttributes: public STUNAttribute{
 		 * Returns a string describing the attribute as 
 		 * required by the superclass STUNAttribute.
 		*/
-		virtual string getDesc(){
+		virtual std::string getDesc(){
 			
-			return string("Unknown Attributes");
+			return std::string("Unknown Attributes");
 			
 		}
 		

@@ -26,7 +26,7 @@
 #ifndef DISABLE_OSS
 #include<config.h>
 
-// #include<libmutil/mtime.h>
+#include<libmutil/merror.h>
 
 #include<unistd.h>
 #include<errno.h>
@@ -86,7 +86,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		#ifdef DEBUG_OUTPUT	
-		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
+		merror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
 		#endif
 	}
 
@@ -96,7 +96,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 		if( this->nChannelsPlay == 2 ) channels = 0;  
 		else channels = 1;
 		if( ioctl( fdPlayback, SNDCTL_DSP_STEREO, &channels ) == -1 ){
-			perror("ioctl, SNDCTL_DSP_STEREO (tried to fallback)");
+			merror("ioctl, SNDCTL_DSP_STEREO (tried to fallback)");
 		}
 
 	}
@@ -122,7 +122,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 			
 	if( ioctl( fdPlayback, SNDCTL_DSP_SETFMT, &ossFormat ) == -1 ){
 		#ifdef DEBUG_OUTPUT	
-		perror( "ioctl, SNDCTL_DSP_SETFMT (failed to set format to AFMT_S16_LE)" );
+		merror( "ioctl, SNDCTL_DSP_SETFMT (failed to set format to AFMT_S16_LE)" );
 		#endif
 	}
 
@@ -135,7 +135,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_CHANNELS, &channels ) == -1 ){
 		#ifdef DEBUG_OUTPUT	
-		perror("ioctl, SNDCTL_DSP_CHANNELS (tried to set channels number)");
+		merror("ioctl, SNDCTL_DSP_CHANNELS (tried to set channels number)");
 		#endif
 	}
 	
@@ -163,7 +163,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	
 	if( ioctl( fdPlayback, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
 		#ifdef DEBUG_OUTPUT	
-		perror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
+		merror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
 		#endif
 	}
 
@@ -207,7 +207,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SETFRAGMENT, &fragment_setting ) == -1 ){
 		#ifdef DEBUG_OUTPUT
-		perror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
+		merror( "ioctl, SNDCTL_DSP_SETFRAGMENT (set buffer size)" );
 		#endif
 	}
 	
@@ -217,7 +217,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_CHANNELS, &channels ) == -1 ){
 		#ifdef DEBUG_OUTPUT
-		perror("ioctl, SNDCTL_DSP_CHANNELS");
+		merror("ioctl, SNDCTL_DSP_CHANNELS");
 		#endif
 	}
 	
@@ -245,7 +245,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	}
 			
 	if( ioctl( fdRecord, SNDCTL_DSP_SETFMT, &ossFormat ) == -1 ){
-		perror( "ioctl, SNDCTL_DSP_SETFMT (failed to set format to AFMT_S16_LE)" );
+		merror( "ioctl, SNDCTL_DSP_SETFMT (failed to set format to AFMT_S16_LE)" );
 	}
 
 	int setSpeed;
@@ -263,7 +263,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 	
 	if( ioctl( fdRecord, SNDCTL_DSP_SPEED, &setSpeed ) == -1 ){
 		#ifdef DEBUG_OUTPUT
-		perror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
+		merror( "ioctl, SNDCTL_DSP_SPEED (tried to set sample rate to 8000)" );
 		#endif
 	}
 
@@ -328,7 +328,7 @@ int OssSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 	if( nReadBytes >= 0 ){
 		totalSamplesRead = nReadBytes / ( getSampleSize() * getNChannelsRecord() );
 	} else {
-		totalSamplesRead == -errno;
+		totalSamplesRead = -errno;
 	}
 	return totalSamplesRead;
 }
@@ -392,7 +392,7 @@ void OssSoundDevice::sync(){
 		interrupted = false;
 		if( ioctl( fdPlayback, SNDCTL_DSP_SYNC ) == -1 ){
 			#ifdef DEBUG_OUTPUT
-			perror( "ioctl sync error on soundcard" );
+			merror( "ioctl sync error on soundcard" );
 			#endif
 			interrupted=true;
 		}

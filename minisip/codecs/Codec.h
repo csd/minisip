@@ -23,13 +23,13 @@
 #ifndef CODECINTERFACE_H
 #define CODECINTERFACE_H
 
+#include<config.h>
+
 #include<sys/types.h>
 
 #include<string>
 
 #include<libmutil/MemObject.h>
-
-using namespace std;
 
 class Codec;
 class CodecState;

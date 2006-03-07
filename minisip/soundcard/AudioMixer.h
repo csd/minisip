@@ -33,19 +33,13 @@
 
 #include<libmutil/MemObject.h>
 
-#ifdef _MSC_VER
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-#else
-#include<stdint.h>
-#endif
-
 // PCM16 range: [-32767:32768]
 #define NORMALIZE_MAX_RANGE 32737
 
-class SoundSource;
+#include<string>
+#include<list>
 
+class SoundSource;
 
 /**
 Class AudioMixer (abstract).
@@ -70,7 +64,7 @@ class AudioMixer: public MObject{
 		The returned short * buffer is not to be deleted!
 		Before using this function, a call to init() must be made!!!
 		*/
-		virtual short * mix(list<MRef<SoundSource *> > sources) = 0;
+		virtual short * mix(std::list<MRef<SoundSource *> > sources) = 0;
 		
 		/**
 		Initialize the buffers and stuff, as well as receive any needed
@@ -91,7 +85,7 @@ class AudioMixer: public MObject{
 		To easy the tas, addingSource bool param is to be set to true if
 		  we have added a source, false if we have removed a source.
 		*/
-		virtual bool setSourcesPosition( list<MRef<SoundSource *> > &sources,
+		virtual bool setSourcesPosition( std::list<MRef<SoundSource *> > &sources,
 						bool addingSource = true) = 0;
 		
 		/**

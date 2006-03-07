@@ -35,6 +35,7 @@
 #define BIND sigc::bind
 #endif
 
+using namespace std;
 
 SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 		                CertificateDialog * certificateDialog){

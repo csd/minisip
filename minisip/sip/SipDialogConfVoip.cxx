@@ -28,11 +28,10 @@
  	Bilge Cetin <bilge[at]kth.se>
 	Max Loubser <loubser[at]kth.se>
 */
- 
-#include<config.h>
+#include"SipDialogConfVoip.h"
 
 #include<libmutil/massert.h>
-#include"SipDialogConfVoip.h"
+
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipMessageTransport.h>
@@ -64,6 +63,10 @@
 #include <iostream>
 #include<time.h>
 #include<libmnetutil/IP4Address.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 using namespace std;
 
@@ -1032,7 +1035,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 		phoneconf(pconf),
 		mediaSession(mediaSession), ipsecSession(ipsecSession)
 #else
-SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *list,string confid, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist,string confid, string cid) : 
                 SipDialog(stack,callconfig),
                 lastInvite(NULL), 
 		phoneconf(pconf),
@@ -1041,7 +1044,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 
 {
 	confId=confid;
-	numConnected= list->size();
+	numConnected= conflist->size();
 	type="join";
 	
 	//cerr << "CONFDIALOG: Creating SipDialogConfVoip's receivedList" << endl;
@@ -1049,7 +1052,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig
 	//this is the list you get/send as advice of who is in the conference. It will go to the GUI to be displayed to
 	//the user to make a decision to join or not.
 	//adviceList = new minilist<ConfMember>(*list);
-	adviceList=list;
+	adviceList=conflist;
 
 	
 	//CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());

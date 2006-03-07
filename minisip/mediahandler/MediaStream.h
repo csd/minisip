@@ -23,6 +23,8 @@
 #ifndef MEDIA_STREAM_H
 #define MEDIA_STREAM_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include"../rtp/CryptoContext.h"
 #include"Media.h"

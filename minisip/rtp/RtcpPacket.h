@@ -30,20 +30,20 @@
 
 #include<config.h>
 
+#include<vector>
+
 #define RTCP_TYPE_SR		0
 #define RTCP_TYPE_RR		1
 #define RTCP_TYPE_SDES		2
 #define RTCP_TYPE_BYE		3
 #define RTCP_TYPE_APP		4
 
-using namespace std;
-
 class RtcpPacket{
 	public:
 		RtcpPacket();
 		RtcpPacket(void *buildfrom, int length);
 		~RtcpPacket();
-		vector<RtcpReport *> &get_reports();
+		std::vector<RtcpReport *> &get_reports();
 		void add_report(RtcpReport *report);
 
 #ifdef DEBUG_OUTPUT
@@ -51,7 +51,7 @@ class RtcpPacket{
 #endif
 		int get_type();
 	private:
-		vector<RtcpReport *> reports;
+		std::vector<RtcpReport *> reports;
 		int type;
 		
 };

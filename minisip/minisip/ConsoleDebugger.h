@@ -1,6 +1,8 @@
 #ifndef _CONSOLEDEBUGGER_H
 #define _CONSOLEDEBUGGER_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include"../sip/SipSoftPhoneConfiguration.h"
 #include<libmutil/Thread.h>

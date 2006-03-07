@@ -153,7 +153,7 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 		}
 
 		for(i = 8; i < 14; i++ ){
-			iv[i] = ( 0xFF & ( index >> ((13-i)*8) ) ) ^ k_s[i];
+			iv[i] = ( 0xFF & (unsigned char)( index >> ((13-i)*8) ) ) ^ k_s[i];
 		}
 
 		iv[14] = iv[15] = 0;
@@ -231,7 +231,7 @@ static void compute_iv( unsigned char * iv, uint64_t label, uint64_t index, int 
         }
 
         for(i = 7; i < 14 ; i++ ){
-                iv[i] = (0xFF & (key_id >> (8*(13-i)))) ^
+                iv[i] = (unsigned char)(0xFF & (key_id >> (8*(13-i)))) ^
                         master_salt[i];
         }
 

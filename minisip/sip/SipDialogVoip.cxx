@@ -28,11 +28,10 @@
  * Purpose
  * 
 */
-
-#include<config.h>
+#include"SipDialogVoip.h"
 
 #include<libmutil/massert.h>
-#include"SipDialogVoip.h"
+
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
@@ -60,6 +59,10 @@
 #include<libmutil/print_hex.h>
 #include <iostream>
 #include<time.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 using namespace std;
 

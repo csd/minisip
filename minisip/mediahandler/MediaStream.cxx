@@ -21,8 +21,8 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include<config.h>
 #include"MediaStream.h"
+
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/keyagreement.h>
 #include"../sdp/SdpHeaderM.h"
@@ -37,6 +37,10 @@
 #include"../codecs/Codec.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include<iostream>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 using namespace std;
 
@@ -92,7 +96,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	string sdpFmtpParam;
 	
         //	int i;
-        uint8_t sdpPayloadType = m->getFormat(formatIndex);
+        uint8_t sdpPayloadType = (uint8_t) m->getFormat( formatIndex );
 
         media->handleMHeader( m );
 
@@ -461,7 +465,7 @@ bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	if( result && !selectedCodec ){
 		selectedCodec = media->createCodecInstance( 
 				localPayloadType  );
-		payloadType = m->getFormat( formatIndex );
+		payloadType = (uint8_t)m->getFormat( formatIndex );
 	}
 
 	return result;

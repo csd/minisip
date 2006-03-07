@@ -24,9 +24,18 @@
 #ifndef FILESOUNDDEVICE_H
 #define FILESOUNDDEVICE_H
 
+#ifdef _MSC_VER
+#	include<io.h>
+#	undef open
+#	undef close
+#	undef read
+#	undef write
+#else
+#	include<sys/time.h>
+#	include<unistd.h>
+#endif
+
 #include"SoundDevice.h"
-
-
 
 #include<stdio.h>
 #include <fcntl.h>

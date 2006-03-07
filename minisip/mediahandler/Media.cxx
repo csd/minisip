@@ -20,8 +20,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"Media.h"
+
 #include"../codecs/Codec.h"
 #include"../soundcard/SoundIO.h"
 #include"../minisip/ipprovider/IpProvider.h"
@@ -40,6 +40,9 @@
 #endif
 #include<libmutil/print_hex.h>
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 using namespace std;
 

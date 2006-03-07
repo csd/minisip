@@ -31,6 +31,8 @@
 #include<config.h>
 #include "AudioMixer.h"
 
+using namespace std;
+
 AudioMixer::AudioMixer() {
 	outputBuffer = NULL;
 	

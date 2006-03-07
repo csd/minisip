@@ -20,12 +20,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #include"G711CODEC.h"
 #include"g711/codec_g711.h"
 #include<libmutil/massert.h>
 #include<iostream>
+
+using namespace std;
 
 G711Codec::G711Codec(){
 

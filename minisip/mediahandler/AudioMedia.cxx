@@ -21,6 +21,7 @@
 */
 
 #include"AudioMedia.h"
+
 #include"../rtp/RtpHeader.h"
 #include"MediaStream.h"
 #include"../soundcard/FileSoundSource.h"
@@ -56,6 +57,10 @@
 class G711CODEC;
 #ifdef AEC_SUPPORT
 AEC AudioMedia::aec;		//hanning
+#endif
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 // pn430 Parameter list changed for multicodec

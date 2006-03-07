@@ -23,15 +23,11 @@
 #ifndef IP_PROVIDER_H
 #define IP_PROVIDER_H
 
-#ifdef _MSC_VER
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
-#else
-#include<stdint.h>
-#endif
+#include<config.h>
 
 #include<libmutil/MemObject.h>
+
+#include<string>
 
 class UDPSocket;
 class SipSoftPhoneConfiguration;

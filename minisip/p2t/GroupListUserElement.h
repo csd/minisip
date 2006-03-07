@@ -24,6 +24,7 @@
 #define GROUPLISTUSERELEMENT_H
 
 #include<config.h>
+
 #include<vector>
 #include<libmutil/MemObject.h>
 #include"../codecs/Codec.h"

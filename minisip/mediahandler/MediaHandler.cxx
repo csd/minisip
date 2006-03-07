@@ -20,7 +20,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
+#include"MediaHandler.h"
+
 #include<string.h>
 #include"../sdp/SdpPacket.h"
 #include<libmikey/keyagreement.h>
@@ -30,7 +31,7 @@
 #include"../codecs/Codec.h"
 #include"Session.h"
 #include"MediaStream.h"
-#include"MediaHandler.h"
+
 #include"Media.h"
 #include"RtpReceiver.h"
 #include"MediaCommandString.h"
@@ -40,6 +41,9 @@
 #include"../soundcard/SoundDevice.h"
 #include"../codecs/Codec.h"
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 #ifdef VIDEO_SUPPORT
 #include"../video/grabber/Grabber.h"

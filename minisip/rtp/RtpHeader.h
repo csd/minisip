@@ -23,8 +23,9 @@
 #ifndef RTPHEADER_H
 #define RTPHEADER_H
 
-#include<vector>
 #include<config.h>
+
+#include<vector>
 
 using namespace std;
 

@@ -26,21 +26,6 @@
 
 #include<config.h>
 
-#ifdef _MSC_VER
-#ifndef byte_t
-typedef unsigned char  byte_t;
-#endif
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-#ifndef uint32_t
-typedef unsigned int  uint32_t;
-#endif
-
-#else
-#include<stdint.h>
-#endif
-
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 
@@ -94,6 +79,7 @@ class SoundDevice: public MObject{
 		if deviceId = file:.....      -> FileSoundDevice
 		if deviceId = alsa: ....      -> AlsaSoundDevice
 		if deviceId = dsound: ....    -> DirectSoundDevice
+		if deviceId = wave: ....    -> WaveSoundDevice
 		anything else (i.e /dev/dsp)  -> OssSoundDevice
 		See each .h for extra information
 		@param deviceId string identifying the device. 

@@ -20,9 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
- 
-
-
 #ifndef P2TDEFINITIONS_H
 #define P2TDEFINITIONS_H
 

@@ -302,8 +302,11 @@ void RtcpReceiver::do_flush_socket(){
 
     fd_set set;
     FD_ZERO(&set);
-    FD_SET(fd, &set);
-            
+	#ifdef WIN32
+    FD_SET( (uint32_t) fd, &set);
+	#else
+	FD_SET(fd, &set);
+	#endif            
     
 	void *buffer = malloc(16384);
 	int nread;

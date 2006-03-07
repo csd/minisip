@@ -26,18 +26,20 @@
 #include<config.h>
 #include<gtkmm.h>
 
+#include<string>
+
 class ImMessageTextView;
 class MainWindow;
 
 class ImWidget : public Gtk::VBox{
 	public:
-		ImWidget( MainWindow * mainWindow, string toUri, string fromUri );
+		ImWidget( MainWindow * mainWindow, std::string toUri, std::string fromUri );
 		~ImWidget();
 
-		bool handleIm( string message, string from);
-		void send( string message );
+		bool handleIm( std::string message, std::string from);
+		void send( std::string message );
 
-		string getToUri(){ return toUri; };
+		std::string getToUri(){ return toUri; };
 
 		/**
 		This function should be called (from MainWindow::onTabChange) 
@@ -63,8 +65,8 @@ class ImWidget : public Gtk::VBox{
 		Gtk::HBox * buttonBox;
 		Gtk::Button * closeButton;
 
-		string toUri;
-		string fromUri;
+		std::string toUri;
+		std::string fromUri;
 		MainWindow * mainWindow;
 
 		/**
@@ -85,10 +87,10 @@ class ImMessageTextView : public Gtk::TextView{
 
 class ImEntry {
 	public:
-		ImEntry( string callId );
+		ImEntry( std::string callId );
 	
 	private:
-		string callId;
+		std::string callId;
 		Gtk::TextBuffer::iterator startIter;
 		Gtk::TextBuffer::iterator endIter;
 };

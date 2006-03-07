@@ -31,6 +31,8 @@
 #include"AudioMixerSimple.h"
 #include"SoundSource.h"
 
+using namespace std;
+
 AudioMixerSimple::AudioMixerSimple() {
 }
 

@@ -27,6 +27,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 SDES_NOTE::SDES_NOTE(void *buildfrom, int max_length){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
 	lengthptr++;

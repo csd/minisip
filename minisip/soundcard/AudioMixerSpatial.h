@@ -61,7 +61,7 @@ class AudioMixerSpatial: public AudioMixer {
 		The returned short * buffer is not to be deleted!
 		Before using this function, a call to init() must be made!!!
 		*/
-		virtual short * mix(list<MRef<SoundSource *> > sources);
+		virtual short * mix(std::list<MRef<SoundSource *> > sources);
 		
 		/**
 		Position the sources as we want.
@@ -72,7 +72,7 @@ class AudioMixerSpatial: public AudioMixer {
 		Example
 		* SPATIL_POS = 5; number of source = 3 -> 1=LEFT, 3=CENTER, 5=RIGHT
 		*/
-		virtual bool setSourcesPosition( list<MRef<SoundSource *> > &sources,
+		virtual bool setSourcesPosition( std::list<MRef<SoundSource *> > &sources,
 						bool addingSource = true);
 		
 	protected:
@@ -80,7 +80,7 @@ class AudioMixerSpatial: public AudioMixer {
 		Home-made algorithm to sort the sources in the list according to its
 		position index.
 		*/
-		bool sortSoundSourceList( list<MRef<SoundSource *> > &list );
+		bool sortSoundSourceList( std::list<MRef<SoundSource *> > &list );
 	
 	private:
 		/**

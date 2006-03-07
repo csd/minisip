@@ -106,7 +106,7 @@ DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 					&inputBufferHandle,
 					&outputBufferHandle,
 					NULL ))){
-		perror("Can not create DirectSound device (DirectSoundFullDuplexCreate8)");
+		merror("Can not create DirectSound device (DirectSoundFullDuplexCreate8)");
 	}
 
 	setCaptureNotificationPoints(inputBufferHandle);
@@ -177,7 +177,7 @@ int DirectSoundDevice::openRecord( int samplingRate, int nChannels, int format )
 	this->openedRecord = true;
 
 	if (FAILED(inputBufferHandle->Start(DSCBSTART_LOOPING))){
-		perror("Could not start recording on direct sound input buffer");		
+		merror("Could not start recording on direct sound input buffer");		
 	}
 
 	return 0;
@@ -206,14 +206,14 @@ int DirectSoundDevice::openPlayback( int samplingRate,
 
 int DirectSoundDevice::closeRecord(){
 	if (FAILED(inputBufferHandle->Stop())){
-		perror("Could not stop recording on direct sound input buffer");		
+		merror("Could not stop recording on direct sound input buffer");		
 	}
 	return 0;
 }
 
 int DirectSoundDevice::closePlayback(){
 	if (FAILED(outputBufferHandle->Stop())){
-		perror("Could not stop recording on direct sound input buffer");		
+		merror("Could not stop recording on direct sound input buffer");		
 	}
 	return 0;
 }

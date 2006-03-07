@@ -33,8 +33,6 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-
-
 #include"SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogManagement.h>
 #include"SipDialogVoip.h"
@@ -46,9 +44,12 @@
 #include"../p2t/GroupList.h"
 #include"PresenceMessageContent.h"
 
-
 #include<libmutil/dbg.h>
 #include<libmutil/termmanip.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler,
 		string localIpString, 
@@ -233,7 +234,7 @@ string Sip::invite(string &user){
 
 	return voipCall->getCallId();
 }
-string Sip::confjoin(string &user, minilist<ConfMember> *list, string confId){
+string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId){
 	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
@@ -312,10 +313,10 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list, confId, callID, ipsecSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, callID, ipsecSession)); 
 	
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, list, confId, "")); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
 
 #endif
 

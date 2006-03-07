@@ -23,6 +23,8 @@
 #ifndef SESSION_H
 #define SESSION_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
 #include"../sip/SipDialogSecurityConfig.h"

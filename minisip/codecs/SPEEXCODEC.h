@@ -23,6 +23,8 @@
 #ifndef SpeexCodec_H
 #define SpeexCodec_H
 
+#include<config.h>
+
 #include"Codec.h"
 
 #ifdef HAS_SPEEX

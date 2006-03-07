@@ -20,15 +20,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"SimpleIpProvider.h"
+
 #include"../../sip/SipSoftPhoneConfiguration.h"
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/UDPSocket.h>
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
+
 using namespace std;
-
-
 
 SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 
@@ -83,18 +85,18 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 			<< "|Minisip will try to find an appropriate one." << endl
 			<< "|Minisip highly recommends you to add a preferred one. To do so, choose" << endl
 			<< "|from the list below and edit the configuration file, section <network_interface>" << endl;
-			for (unsigned i=0; i<ifaces.size(); i++){
-				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-		   		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
+			for (unsigned i3=0; i3<ifaces.size(); i3++){
+				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i3]);
+		   		cout << "|       Network Interface: name = " << ifaces[i3] << "; IP=" << ip << endl;
 			}	
 		cout <<    "========================================================================" << endl;
-		for (unsigned i=0; i<ifaces.size(); i++){
-			string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+		for (unsigned i2=0; i2<ifaces.size(); i2++){
+			string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i2]);
 			#ifdef DEBUG_OUTPUT
-			//cerr << "SimpleIPProvider: interface = " << ifaces[i] << "; IP=" << ip << endl;
+			//cerr << "SimpleIPProvider: interface = " << ifaces[i2] << "; IP=" << ip << endl;
 			#endif
 			if (ip.length()>0){
-				if (ifaces[i]==string("lo")){ //this interface only exhists in linux ...
+				if (ifaces[i2]==string("lo")){ //this interface only exhists in linux ...
 					if (localIp.length()<=0)
 						localIp = ip;
 				}else{
@@ -157,5 +159,5 @@ string SimpleIpProvider::getLocalIp(){
 }
 
 uint16_t SimpleIpProvider::getExternalPort( MRef<UDPSocket *> sock ){
-	return sock->getPort();
+	return (uint16_t)sock->getPort();
 }

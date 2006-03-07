@@ -25,6 +25,8 @@
 
 #include"AlsaCard.h"
 
+using namespace std;
+
 AlsaCard::AlsaCard( string cardname, string devname ):
 		cardName(cardname),
 		devName(devname){

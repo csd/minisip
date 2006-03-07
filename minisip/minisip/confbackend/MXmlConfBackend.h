@@ -21,6 +21,8 @@
 */
 
 
+#include<config.h>
+
 #include"ConfBackend.h"
 
 class XMLFileParser;
@@ -42,7 +44,7 @@ class MXmlConfBackend : public ConfBackend {
 		virtual void commit();
 
 
-		string getMemObjectType(){return "MXmlConfBackend";}
+		 std::string getMemObjectType(){return "MXmlConfBackend";}
 	private:
 		std::string getDefaultConfigFilename();
 		std::string fileName;

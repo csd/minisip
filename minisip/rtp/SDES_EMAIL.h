@@ -27,10 +27,11 @@
 
 #include"SDESItem.h"
 
+#include<string>
+
 using namespace std;
 
-
-class SDES_EMAIL : public SDESItem{
+class SDES_EMAIL : public SDESItem {
 	public:
 		SDES_EMAIL(void *buildfrom, int max_length);
 		virtual ~SDES_EMAIL(){};

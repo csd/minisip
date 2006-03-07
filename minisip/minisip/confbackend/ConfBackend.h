@@ -23,6 +23,8 @@
 #ifndef CONF_BACKEND_H
 #define CONF_BACKEND_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
 #include<string>

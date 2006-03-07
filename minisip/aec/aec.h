@@ -73,7 +73,7 @@ class IIR6 {
 public:
   IIR6();
   float highpass(float in) {
-    const float AlphaHp = 0.075;  /* controls Transfer Frequence */
+    const float AlphaHp = (float)0.075;  /* controls Transfer Frequence */
     const float Gain6   = 1.45f;  /* gain to undo filter attenuation */
 
     /* Highpass = Signal - Lowpass. Lowpass = Exponential Smoothing */

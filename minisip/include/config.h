@@ -23,96 +23,100 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+/* Compilation time configuration */
+#ifndef _WIN32_WCE
+#	include"compilation_config.h"
+#else
+//#	pragma message("include for wince .............................. ")
+#	include"compilation_config_w32_wce.h"
+#endif
+
+#include<libmutil/mtypes.h>
+
 #define LIBMUTIL_IMPORTS
 #define LIBMNETUTIL_IMPORTS
 #define LIBMSIP_IMPORTS
 #define LIBMIKEY_IMPORTS
 
+#define SOUND_CARD_FREQ 48000
 
-
-//#define DISABLE_OSS
-//#define DISABLE_ALSA
-
-/* Compilation time configuration */
+#include<libmutil/mtypes.h>
 
 #ifdef _MSC_VER
+#	ifndef WIN32
+#		define WIN32
+#	endif
+#	pragma warning (disable: 4251)
 
-#define DSOUND
+	//In windows, use direct sound for all, except in windows ce (use then Wave in/out)
+#	ifndef _WIN32_WCE
+#		define DSOUND
+#	else
+#		define WAVE_SOUND
+#	endif
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0500
+#	ifndef _WIN32_WINNT
+#		define _WIN32_WINNT 0x0500
+#	endif
+
+#	pragma warning (disable: 4251)
+
+#	ifdef __MINGW32__
+#		define WINVER 0x0500
+#		define DSOUND
+#	else  // !__MINGW32__
+#		define ENABLE_TS
+#	endif	// !__MINGW32__
+
+#	ifndef WIN32
+#		define WIN32
+#	endif
+
 #endif
 
-#pragma warning (disable: 4251)
-
-#ifndef WIN32
-#define WIN32
+//Temporary ... STLPort does not allow addition of errno.h ... but WCEcompat does ... 
+//So we don't have to repeat this everytime, include errno.h for all files ... 
+//	anyway, it is just an int :)
+//Anyway, while compiling for EVC, it will still trigger some warnings ... ignore them, errno exhists for sure.
+#ifdef _WIN32_WCE
+#	ifndef _STLP_NATIVE_ERRNO_H_INCLUDED
+#		include<wcecompat/errno.h>
+#		define _STLP_NATIVE_ERRNO_H_INCLUDED
+#	endif
+#	include<openssl/err.h>
+#else
+#	include <errno.h>
 #endif
-
-#ifndef uint8_t
-typedef unsigned char  uint8_t;
-#endif
-
-#ifndef byte_t
-typedef unsigned char  byte_t;
-#endif
-
-#ifndef int16_t
-typedef __int16  int16_t;
-#endif
-
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
-
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-
-#ifndef uint32_t
-typedef unsigned int  uint32_t;
-#endif
-
-#ifndef int64_t
-typedef __int64  int64_t;
-#endif
-
-#ifndef uint64_t
-typedef unsigned long long  uint64_t;
-#endif
-
-#else  // !_MSC_VER
-#include"compilation_config.h"/* STL replacement */
-#include<stdint.h>
-
-#ifdef __MINGW32__
-# define WINVER 0x0500
-# define DSOUND
-#else  // !__MINGW32__
-# define ENABLE_TS
-#endif	// !__MINGW32__
-
-#endif	// !_MSC_VER
-
-// FIXME!!
 
 #ifndef WIN32
 #define LINUX
 #endif
 
-
-
+/*
 #ifdef USE_STL
-#undef __NO_ISOCEXT
-using namespace std;
-#include<string>
+#	undef __NO_ISOCEXT
+	using namespace std;
+	#include<string>
+#endif
+*/
 
-#else
-
+#ifdef DEBUG_OUTPUT
+#	define MSM_DEBUG
+#	define MSM_DEBUG_COMMAND
 #endif
 
-typedef uint8_t byte_t;
 
+#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(__MINGW32__)
+#	define TEXT_UI
+//#define DEBUG_OUTPUT
+#	include<iostream>
+	using namespace std;
+#	pragma message ("USING NAMESPACE STD ... in config.h")
+#endif
+
+#ifndef HAVE_UINT
+	typedef unsigned int uint;
+#endif
 
 /* big/little endian conversion */
 
@@ -152,23 +156,8 @@ static inline uint64_t U64_AT( void const * _p )
 #endif
 
 
-
-#ifdef DEBUG_OUTPUT
-#define MSM_DEBUG
-#define MSM_DEBUG_COMMAND
 #endif
 
-#define SOUND_CARD_FREQ 48000
 
-#if defined(WIN32) && !defined(__MINGW32__)
-#define TEXT_UI
-//#define DEBUG_OUTPUT
-#include<iostream>
-using namespace std;
-#endif
 
-#ifndef HAVE_UINT
-typedef unsigned int uint;
-#endif
 
-#endif

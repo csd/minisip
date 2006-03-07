@@ -34,6 +34,8 @@
 #include<libmutil/itoa.h>
 #include<iostream>
 
+using namespace std;
+
 SdpHeaderC::SdpHeaderC(string buildFrom):SdpHeader(SDP_HEADER_TYPE_C, 4){
 	if (buildFrom.substr(0,2)!="c="){
 		std::cerr << "ERROR: Contact sdp header is not starting with <c=>"<< std::endl;

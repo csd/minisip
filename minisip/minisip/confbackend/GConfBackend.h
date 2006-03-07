@@ -23,6 +23,8 @@
 #ifndef G_CONF_BACKEND_H
 #define G_CONF_BACKEND_H
 
+#include<config.h>
+
 #include"ConfBackend.h"
 
 typedef struct _GConfClient GConfClient;
@@ -49,7 +51,7 @@ class GConfBackend : public ConfBackend {
 	private:
 		GConfClient * client;
 
-		void sanitizeKey( string &key );
+		void sanitizeKey( std::string &key );
 
 };
 

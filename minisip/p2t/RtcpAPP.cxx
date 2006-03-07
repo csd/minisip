@@ -20,8 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #ifdef LINUX
 #include<sys/select.h>
 #include<netinet/in.h>
@@ -43,8 +41,10 @@
 #include<errno.h>
 #include"RtcpAPP.h"
 #include"RtcpAPPHeader.h"
+
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
+#include<libmutil/merror.h>
 
 
 
@@ -135,7 +135,12 @@ RtcpAPP *RtcpAPP::readPacket(UDPSocket &rtp_socket, int timeout){
 
 	fd_set set;
 	FD_ZERO(&set);
+	#ifdef WIN32
+    FD_SET( (uint32_t) rtp_socket.getFd(), &set);
+	#else
 	FD_SET(rtp_socket.getFd(), &set);
+	#endif
+
 	struct timeval tv;
     	struct timeval * p_tv;
     	if( timeout > 0 ){
@@ -155,8 +160,12 @@ RtcpAPP *RtcpAPP::readPacket(UDPSocket &rtp_socket, int timeout){
 			return NULL;
 		}
 		if (avail<0){
-			if (errno!=EINTR){
-				perror("Error when using poll:");
+				#ifndef _WIN32_WCE
+					if ( errno != EINTR ){
+				#else
+					if( errno != WSAEINTR ) { continue; }
+				#endif
+				merror("Error when using poll:");
 				exit(1);
 			}else{
 			}
@@ -166,7 +175,7 @@ RtcpAPP *RtcpAPP::readPacket(UDPSocket &rtp_socket, int timeout){
 
 	i = recvfrom(rtp_socket.getFd(), buf, 2048, 0, /*(struct sockaddr *) &from*/NULL, /*(socklen_t *)fromlen*/NULL);
 	if (i<0){
-		perror("recvfrom:");
+		merror("recvfrom:");
 		return NULL;
 	}
 

@@ -21,11 +21,15 @@
 */
 
 #include"LocationDetector.h"
+
 #include<stdio.h>
 #include<libmutil/itoa.h>
 #include<libmutil/CommandString.h>
 #include<libmsip/SipSMCommand.h>
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 LocationDetector::LocationDetector(MRef<SipDialogContainer*> cb):callback(cb){
 

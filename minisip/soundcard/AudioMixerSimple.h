@@ -64,7 +64,7 @@ class AudioMixerSimple: public AudioMixer {
 		
 		This mixer calls the normalize function, to prevent audio saturation.
 		*/
-		virtual short * mix(list<MRef<SoundSource *> > sources);
+		virtual short * mix(std::list<MRef<SoundSource *> > sources);
 	
 		/**
 		Overload the init() function ... we need to initialize the normalize
@@ -75,7 +75,7 @@ class AudioMixerSimple: public AudioMixer {
 		/**
 		Position the sources as we want ... in this simple mixer, do nothing
 		*/
-		virtual bool setSourcesPosition( list<MRef<SoundSource *> > &sources,
+		virtual bool setSourcesPosition( std::list<MRef<SoundSource *> > &sources,
 						bool addingSource = true);
 		
 	protected:
@@ -211,7 +211,7 @@ bool AudioMixerSimple::normalizeStereo( int32_t length ) {
 			else 
 				sample[1] = NORMALIZE_MAX_RANGE;
 			#ifdef DEBUG_OUTPUT
-			cerr << "n";
+			merr << "n";
 			#endif
 		}
 		

@@ -27,8 +27,6 @@
 #include<libmutil/MemObject.h>
 #include<string>
 
-using namespace std;
-
 class ContactDb;
 class PhoneBookPerson;
 
@@ -41,7 +39,7 @@ class ContactEntry : public MObject{
 	public:
 		ContactEntry();
 		ContactEntry( std::string uri, std::string desc, 
-			      MRef< PhoneBookPerson * > person = NULL );
+						MRef< PhoneBookPerson * > person = NULL );
 
 		~ContactEntry();
 
@@ -59,9 +57,9 @@ class ContactEntry : public MObject{
 		bool isOnline(){return onlineStatus==CONTACT_STATUS_ONLINE;}
 		bool isOffline(){return onlineStatus==CONTACT_STATUS_OFFLINE;}
 		void setOnlineStatus(int s){onlineStatus=s;}
-		void setOnlineStatusDesc(string s){onlineStatusDesc=s;}
+		void setOnlineStatusDesc( std::string s){onlineStatusDesc=s;}
 
-                uint32_t getPersonIndex(){return personIndex;}
+		uint32_t getPersonIndex(){return personIndex;}
 
 		virtual std::string getMemObjectType(){return "ContactEntry";}
 	private:
@@ -72,7 +70,7 @@ class ContactEntry : public MObject{
 		std::string desc;
 		uint32_t type;
 		MRef< PhoneBookPerson * > person;
-                uint32_t personIndex;
+		uint32_t personIndex;
 
 		std::string location;
 		int onlineStatus;
@@ -85,7 +83,7 @@ class ContactDb : public MObject{
 	public:
 		ContactDb();
 
-		ContactEntry * lookUp( string uri );
+		ContactEntry * lookUp(  std::string uri );
 		ContactEntry * lookUp( uint32_t id );
 
 		void addEntry( ContactEntry * entry );

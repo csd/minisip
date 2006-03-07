@@ -28,6 +28,8 @@
 #include<libglademm/xml.h>
 #include<gtkmm.h>
 
+#include<string>
+
 #include<libmutil/MemObject.h>
 #include"AccountsList.h"
 
@@ -82,7 +84,7 @@ class GeneralSettings
 	public:
 		GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 
-		string apply();
+		 std::string apply();
 		
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
 		void setAccounts( Glib::RefPtr<AccountsList> list );
@@ -117,7 +119,7 @@ class MediaSettings
 		MediaSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 		~MediaSettings();
 
-		string apply();
+		 std::string apply();
 		
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
 
@@ -158,7 +160,7 @@ class SecuritySettings
 	public:
 		SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 
-		string apply();
+		 std::string apply();
 		
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
 
@@ -194,7 +196,7 @@ class AdvancedSettings
 	public:
 		AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 
-		string apply();
+		 std::string apply();
 		
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
 

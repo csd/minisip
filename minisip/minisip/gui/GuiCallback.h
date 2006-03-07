@@ -24,11 +24,12 @@
 #define GUICALLBACK_H
 
 #include<config.h>
-#include"../../conf/ConferenceControl.h"
 #include<libmutil/CommandString.h>
 
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
+
+class ConferenceControl;
 
 class GuiCallback{
 	

@@ -32,6 +32,7 @@
 #define KEY_ROOT "/apps/minisip/"
 #endif
 
+using namespace std;
 
 GConfBackend::GConfBackend(){
 

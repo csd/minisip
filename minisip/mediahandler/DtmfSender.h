@@ -23,6 +23,8 @@
 #ifndef DTMFSENDER_H
 #define DTMFSENDER_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 
 class Session;

@@ -20,17 +20,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #include"RtpReceiver.h"
-#include"MediaStream.h"
-#include"../minisip/ipprovider/IpProvider.h"
-#include<libmnetutil/NetworkException.h>
+
 #include<libmnetutil/UDPSocket.h>
+#include<libmnetutil/NetworkException.h>
 #include<libmutil/Thread.h>
+
 #include"../rtp/SRtpPacket.h"
 #include"../codecs/Codec.h"
 #include<iostream>
+#include"MediaStream.h"
+#include"../minisip/ipprovider/IpProvider.h"
 
 #include<libmutil/itoa.h> //for debug ... remove ... cesc
 
@@ -48,6 +48,10 @@
 #include<sys/time.h>
 #include<unistd.h>
 #include<errno.h>
+#endif
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 //Set the range of rtp usable ports ... starting at min and spanning a range, up to max
@@ -71,7 +75,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 		port = (int) ( 2 * (int)(port/2 ) ); //turn this into an even number
 		port += RTP_LOCAL_PORT_RANGE_MIN; //add the min port to set it within the range
 		#ifdef DEBUG_OUTPUT
-		printf( "RtpReceiver:: final trying port = %d\n", port );
+			printf( "RtpReceiver:: final trying port = %d\n", port );
 		#endif
 		try{
 			socket = new UDPSocket( port );
@@ -79,7 +83,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 				break;
 			}
 		}
-		catch( NetworkException & exc ){
+		catch( NetworkException &  ){
 			// FIXME: do something nice
 // 			merr << "Minisip could not create a UDP socket!" << end;
 // 			merr << "Check your network settings." << end;
@@ -103,8 +107,8 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 }
 
 RtpReceiver::~RtpReceiver(){
-        thread->join();
-        delete thread;
+	thread->join();
+	delete thread;
 	socket->close();
 }
 
@@ -184,15 +188,20 @@ void RtpReceiver::run(){
 		while( ret < 0 ){
 			ret = select( socket->getFd() + 1, &rfds, NULL, NULL, &tv );
 			if( ret < 0 ){
-#ifdef DEBUG_OUTPUT
-				//FIXME: do something better
-				cerr << "RtpReceiver::run() - select returned -1" << endl;
-#endif
-				if( errno == EINTR ) { continue; }
-				else {
-					kill = true;
-					break;
-				}
+				#ifdef DEBUG_OUTPUT
+					//FIXME: do something better
+					cerr << "RtpReceiver::run() - select returned -1" << endl;
+				#endif
+
+				#ifndef _WIN32_WCE
+					if( errno == EINTR ) { continue; }
+				#else
+					if( errno == WSAEINTR ) { continue; }
+				#endif
+					else {
+						kill = true;
+						break;
+					}
 			}
 		}
 
@@ -213,7 +222,7 @@ void RtpReceiver::run(){
 			packet = SRtpPacket::readPacket( **socket );
 		}
 
-		catch (NetworkException & exc ){
+		catch (NetworkException &  ){
 			continue;
 		}
 

@@ -23,8 +23,9 @@
 #ifndef SIMPLE_IP_PROVIDER
 #define SIMPLE_IP_PROVIDER
 
-#include"IpProvider.h"
+#include<config.h>
 
+#include"IpProvider.h"
 
 class SimpleIpProvider: public IpProvider{
 	public:
@@ -41,7 +42,7 @@ class SimpleIpProvider: public IpProvider{
 		Helper function ... 
 		@return true if ip is in the private range defined by IETF
 		*/
-		bool isInPrivateIpRange( string ip );
+		bool isInPrivateIpRange( std::string ip );
 		std::string localIp;
 
 };

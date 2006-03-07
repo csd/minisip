@@ -21,9 +21,6 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include<config.h>
-
-
 #include"Session.h"
 #include"MediaStream.h"
 
@@ -36,6 +33,10 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyException.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 #define MIKEY_PROTO_SRTP	0
 
@@ -167,7 +168,7 @@ bool Session::responderAuthenticate( string message ){
 				securityConfig.secured = true;
 				authenticated = true;
 			}
-			catch( certificate_exception &exc ){
+			catch( certificate_exception & ){
 				// TODO: Tell the GUI
 				merr << "Could not open certificate" <<end;
 				securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -270,7 +271,7 @@ string Session::responderParse(){
 						"Unexpected type of message in INVITE" );
 		}
 	}
-	catch( certificate_exception & exc ){
+	catch( certificate_exception & ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
@@ -553,7 +554,7 @@ string Session::initiatorParse(){
 						"Unexpected type of message in INVITE" );
 		}
 	}
-	catch( certificate_exception &exc ){
+	catch( certificate_exception & ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate" <<end;
 		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;

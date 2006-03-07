@@ -24,10 +24,10 @@
 #define GUI_H
 
 #include<config.h>
-#include"GuiCallback.h"
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
 #include"../LogEntry.h"
+#include"GuiCallback.h"
 
 class SipSoftPhoneConfiguration;
 class ContactDb;

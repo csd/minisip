@@ -20,12 +20,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"IpProvider.h"
+
 #include"SimpleIpProvider.h"
 #include"StunIpProvider.h"
 #include"../sip/SipSoftPhoneConfiguration.h"
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
+
+using namespace std;
 
 MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config ){
 	MRef<IpProvider *> ret;

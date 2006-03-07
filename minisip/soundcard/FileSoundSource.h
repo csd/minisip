@@ -53,7 +53,7 @@ class FileSoundSource : public SoundSource{
          *                       is false.
 	 * @arg id               SoundSource id     
          */
-        FileSoundSource(string filename, uint32_t id, 
+        FileSoundSource( std::string filename, uint32_t id, 
 			uint32_t inputFreq,
 			uint32_t inputNChannels, 
 			uint32_t outputFreq,

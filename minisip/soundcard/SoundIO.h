@@ -38,35 +38,38 @@ class SoundIOPLCInterface;
 #include<libmutil/CondVar.h>
 
 #include<list>
-
+#include<string>
 //#include"../spaudio/SpAudio.h"
 
 #ifdef HAVE_LIBASOUND
-#define ALSA_PCM_NEW_HW_PARAMS_API
-#define ALSA_PCM_NEW_SW_PARAMS_API
-#include <alsa/asoundlib.h>
+#	define ALSA_PCM_NEW_HW_PARAMS_API
+#	define ALSA_PCM_NEW_SW_PARAMS_API
+#	include <alsa/asoundlib.h>
 #endif
 
-using namespace std;
-
-#include"AudioMixer.h" //this needs to be removed ... change in MRef
+//#include"AudioMixer.h" //this needs to be removed ... change in MRef
 class AudioMixer;
 
 class SoundSource;
 
 	//we need sounddevice.h for some defines
 #include"SoundDevice.h"
-class SoundDevice;
+//class SoundDevice;
 
 #ifndef WIN32
-class OssSoundDevice;
-#ifdef HAVE_LIBASOUND
-class AlsaSoundDevice;
-#endif
+	class OssSoundDevice;
+#	ifdef HAVE_LIBASOUND
+		class AlsaSoundDevice;
+#	endif
 #else
-class DirectSoundDevice;
+#	ifdef DSOUND
+		class DirectSoundDevice;
+#	elif defined(WAVE_SOUND)
+		class WaveSoundDevice;
+#	else
+#		error "NO Windows AUDIO Defined!"
+#	endif
 #endif
-
 
 /*             v                               <--- Play out point
  *   ........................................  <--- Audio buffer for one ssrc
@@ -119,7 +122,7 @@ class SoundIO : public MObject{
 		 * 		for a definition of valid types.
 		 */
 		SoundIO(MRef<SoundDevice *>device, 
-			string mixerType,
+			 std::string mixerType,
                         int nChannels=2, 
                         int32_t speed=8000, 
                         int format=SOUND_S16LE);
@@ -214,7 +217,7 @@ class SoundIO : public MObject{
 		Given a string, create the mixer type requested.
 		If not understood, the Spatial Audio mixer is created.
 		*/
-		bool setMixer( string type );
+		bool setMixer(  std::string type );
 
 	private:
 
@@ -244,8 +247,8 @@ class SoundIO : public MObject{
 
 		CondVar sourceListCond;
                 
-		list<MRef<SoundSource *> > sources;
-		list<RecorderReceiver *> recorder_callbacks;
+		std::list<MRef<SoundSource *> > sources;
+		std::list<RecorderReceiver *> recorder_callbacks;
                 
 		CondVar recorderCond;
 		

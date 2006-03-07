@@ -30,8 +30,11 @@
 
 #include<iostream>
 
-using namespace std;
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
+using namespace std;
 
 MessageRouter::MessageRouter(){
 }
@@ -174,10 +177,10 @@ void MessageRouter::guicb_handleCommand(CommandString &cmd){
 	sip->getSipStack()->handleCommand(sipcmd);
 }
 
-string MessageRouter::confcb_doJoin(string user, minilist<ConfMember> *list, string confId){
+string MessageRouter::confcb_doJoin(string user, minilist<ConfMember> *conflist, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	//cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
-	return sip->confjoin(user, list, confId);
+	return sip->confjoin(user, conflist, confId);
 	//return "12345";
 }
 string MessageRouter::confcb_doConnect(string user, string confId){

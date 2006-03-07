@@ -29,6 +29,7 @@
 //#include<libmnetutil/TCPSocket.h>
 //#include<iostream>
 
+using namespace std;
 
 PhoneBookTree::PhoneBookTree(){
 	add( name );

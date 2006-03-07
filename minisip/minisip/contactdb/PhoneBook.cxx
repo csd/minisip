@@ -20,8 +20,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"PhoneBook.h"
+
 #include"ContactDb.h"
 
 using namespace std;

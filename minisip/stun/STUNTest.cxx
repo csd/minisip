@@ -22,6 +22,7 @@
 
 #include"STUNTest.h"
 
+#include<libmutil/merror.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
 //#include<sys/poll.h>
@@ -83,8 +84,12 @@ STUNMessage *STUNTest::test(
         int avail = select(sock.getFd()+1,&set,NULL,NULL,&tv );
 //		cerr <<"After poll, return value is "<<avail<<endl;
 		if (avail < 0){
+		#ifndef _WIN32_WCE
 			if (errno!=EINTR){
-				perror("Error when using poll:");
+		#else
+			if (errno!=WSAEINTR){
+		#endif
+				merror("Error when using poll:");
 				exit(1);
 			}else{
 //				cerr << "Signal occured in wait_packet"<<endl;

@@ -28,14 +28,10 @@
  * 
 */
 
-
-#ifdef HAVE_CONFIG_H
-#include<config.h>
-#endif
-
+#include"RtcpTransactionIdleFloor.h"
 
 #include<assert.h>
-#include"RtcpTransactionIdleFloor.h"
+
 #include"P2T.h"
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>

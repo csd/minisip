@@ -34,6 +34,8 @@
 #define BIND sigc::bind
 #endif
 
+using namespace std;
+
 LogWidget::LogWidget( MainWindow * mainWindow ){
 	this->mainWindow = mainWindow;
 	

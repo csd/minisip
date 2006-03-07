@@ -40,6 +40,7 @@
 #include<iostream>
 #endif
 
+#include<libmutil/merror.h>
 #include<libmnetutil/UDPSocket.h>
 
 RtpPacket::RtpPacket(){
@@ -104,7 +105,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 
 	if( i < 0 ){
 #ifdef DEBUG_OUTPUT
-		perror("recvfrom:");
+		merror("recvfrom:");
 #endif
 		return NULL;
 	}

@@ -20,13 +20,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #include <stdio.h>
 #include <errno.h>
 #include "GroupListClient.h"
 #include <libmutil/dbg.h>
 #include <libmutil/itoa.h>
+#include <libmutil/merror.h>
 #include <libmutil/XMLParser.h>
 
 #include<ctype.h>
@@ -138,7 +137,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
     	WSADATA wsaData;
     	wVersionRequested = MAKEWORD (1, 1);
     	if (WSAStartup (wVersionRequested, &wsaData) != 0) {
-        	//perror("Failed to init windows Group List Server sockets");
+        	//merror("Failed to init windows Group List Server sockets");
 		return "ERROR failed to init Windows Group List Server socket";
     }
 #endif
@@ -146,7 +145,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
     	/* create socket */
     	sock = socket( PF_INET, SOCK_STREAM, 0);
     	if (sock < 0) {
-		//perror("Failed to create Group List Server socket");
+		//merror("Failed to create Group List Server socket");
 		return "ERROR failed to create Group List Server socket";
 	}
 
@@ -158,7 +157,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
     	host_info = gethostbyname( srv_addr);
     	
 	if (NULL == host_info) {
-        	//perror("unknown Group List server");
+        	//merror("unknown Group List server");
 		return "ERROR unknown Group List Server";
         }
     	memcpy( (char *)&server.sin_addr, host_info->h_addr, host_info->h_length);
@@ -168,7 +167,7 @@ string GroupListClient::connectServer(string command, char *srv_addr, int port) 
 
     	/* connect to the server */
     	if ( connect( sock, (struct sockaddr*)&server, sizeof( server)) < 0) {
-        	//perror("can't connect to GroupList Server");
+        	//merror("can't connect to GroupList Server");
 		return "ERROR can't connect to GroupList Server";
         }
 

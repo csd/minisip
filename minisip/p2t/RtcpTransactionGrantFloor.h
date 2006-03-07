@@ -23,6 +23,8 @@
 #ifndef RTCPTRANSACTIONGRANTFLOOR_H
 #define RTCPTRANSACTIONGRANTFLOOR_H
 
+#include<config.h>
+
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include"SipDialogP2T.h"

@@ -20,28 +20,23 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
+#include"ConferenceControl.h"
+
 #include<assert.h>
 #include<stdio.h>
 #include<vector>
-#include"ConferenceControl.h"
 #include"../minisip/MessageRouter.h"
 #include"../minisip/gui/Gui.h"
-//#include"../minisip/gui/textui/MinisipTextUI.h"
+
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/CommandString.h>
-#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
-//#include"../sip/DefaultDialogHandler.h"
 
-
-//extern TextUI *debugtextui;
-
-
-
-
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 ConferenceControl::ConferenceControl(){
     
@@ -554,19 +549,19 @@ void ConferenceControl::sendUpdatesToGui()
 	CommandString cmd(confId,"list updated",connectedusers,pendingusers);
 	callback->confcb_handleGuiCommand(cmd);
 }
-void ConferenceControl::handleOkAck(string callid, minilist<ConfMember> *list) {
+void ConferenceControl::handleOkAck(string callid, minilist<ConfMember> *conflist) {
 	pendingToConnected(callid);
-	updateLists(list);
+	updateLists(conflist);
 	sendUpdatesToGui();
 }
 	
 /**
 * Print a list of conference members
 */
-void ConferenceControl::printList(minilist<ConfMember> *list) {
-	for (int i = 0; i < list->size(); i++ ) {
-		cerr << "Member : " + ((*list)[i]).uri << endl;
-		cerr << "CallId : " + ((*list)[i]).callid << endl;
+void ConferenceControl::printList(minilist<ConfMember> *conflist) {
+	for (int i = 0; i < conflist->size(); i++ ) {
+		cerr << "Member : " + ((*conflist)[i]).uri << endl;
+		cerr << "CallId : " + ((*conflist)[i]).callid << endl;
 	} 
 }
         
@@ -627,12 +622,12 @@ void ConferenceControl::removeMember(string memberid) {
 /**
 * Check for new members to connect to
 */
-void ConferenceControl::updateLists(minilist<ConfMember> *list) {
+void ConferenceControl::updateLists(minilist<ConfMember> *conflist) {
 	bool handled = false;
 	
 	
-	for (int i = 0; i < list->size(); i++) {
-		string current = (*list)[i].uri;
+	for (int i = 0; i < conflist->size(); i++) {
+		string current = (*conflist)[i].uri;
 		
 		//check against pending list
 		for (int j = 0; j < pendingList.size(); j++ ) {

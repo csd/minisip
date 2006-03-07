@@ -32,31 +32,30 @@ typedef unsigned short  uint16_t;
 #endif
 
 class SilenceSensor{
-    public:
-        /**
-         * 
-         * @argument buf        Pointer to the raw audio samples.
-         * @argument n          Number of samples in the buffer.
-         * @return              True if the audio is in a silence period, and false
-         *                      if not.
-         */
-        virtual bool silence(uint16_t *buf, int n)=0;
-    private:
-
+	public:
+		virtual ~SilenceSensor() {}
+		/**
+		* 
+		* @argument buf        Pointer to the raw audio samples.
+		* @argument n          Number of samples in the buffer.
+		* @return              True if the audio is in a silence period, and false
+		*                      if not.
+		*/
+		virtual bool silence(uint16_t *buf, int n)=0;
+	private:
+	
 };
-
+	
 class SimpleSilenceSensor : public SilenceSensor{
-    public:
-        SimpleSilenceSensor();
-        virtual bool silence(uint16_t *buf, int n);
-
-    private:
-        bool inSilence;
-        float noiceLevel;
-        int limit_on;
-        int limit_off;
+	public:
+		SimpleSilenceSensor();
+		virtual bool silence(uint16_t *buf, int n);
+	
+	private:
+		bool inSilence;
+		float noiceLevel;
+		int limit_on;
+		int limit_off;
 };
-
-
 
 #endif

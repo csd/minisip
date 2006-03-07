@@ -29,8 +29,9 @@
 */
 
 
-#include<libmutil/massert.h>
 #include"SipDialogPresenceClient.h"
+
+#include<libmutil/massert.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
@@ -53,6 +54,10 @@
 #include"../mediahandler/MediaHandler.h"
 #include<libmutil/MemObject.h>
 #include<libmsip/SipHeaderExpires.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 /*
  Presence dialog for user "user@domain".

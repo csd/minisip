@@ -42,6 +42,8 @@
 #define SDP_HEADER_TYPE_T	5
 #define SDP_HEADER_TYPE_V	6
 
+#include<string>
+
 class SdpHeader : public MObject{
 	public:
                 SdpHeader(int type, int priority);

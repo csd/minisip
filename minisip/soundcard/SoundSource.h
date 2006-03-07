@@ -34,6 +34,8 @@
 #define RIGHT 5
 #define CENTER 3
 
+#include<string>
+
 class CircularBuffer;
 
 /**

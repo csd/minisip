@@ -27,8 +27,7 @@
 
 #include"SDESItem.h"
 
-using namespace std;
-
+#include<string>
 
 class SDES_NAME : public SDESItem{
 	public:
@@ -43,7 +42,7 @@ class SDES_NAME : public SDESItem{
 #endif
 
 	private:
-		string name;
+		std::string name;
 };
 
 #endif

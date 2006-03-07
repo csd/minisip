@@ -21,13 +21,9 @@
 */
 
 
-#ifdef HAVE_CONFIG_H
-#include<config.h>
-#endif
-
+#include"RtcpTransactionTakenFloor.h"
 
 #include<assert.h>
-#include"RtcpTransactionTakenFloor.h"
 #include"P2T.h"
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>

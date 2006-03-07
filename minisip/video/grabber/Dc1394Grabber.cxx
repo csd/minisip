@@ -27,6 +27,7 @@
 #include<stdio.h>
 #include<libmutil/mtime.h>
 #include<libmutil/itoa.h>
+#include<libmutil/merror.h>
 
 
 #define NUM_BUFFERS 2
@@ -53,14 +54,14 @@ void Dc1394Grabber::open(){
 
 	rawHandle = raw1394_new_handle();
 	if( rawHandle == NULL ){
-		perror( "raw1394_new_handle" );
+		merror( "raw1394_new_handle" );
                 throw VideoException( strerror( errno ) );
 	}
 
 	nbPorts = raw1394_get_port_info( rawHandle, ports, nbPorts );
 	
 	if( nbPorts < 0 ){
-		perror( "raw1394_get_port_info" );
+		merror( "raw1394_get_port_info" );
                 throw VideoException( strerror( errno ) );
 	}
 
@@ -168,7 +169,7 @@ void Dc1394Grabber::read( ImageHandler * handler ){
 
 	if( ret !=DC1394_SUCCESS ){
 		fprintf( stderr, "Error when starting iso transmission\n");
-		perror( "dc1394_start_iso_transmission" );
+		merror( "dc1394_start_iso_transmission" );
                 throw VideoException( strerror( errno ) );
 	}
 

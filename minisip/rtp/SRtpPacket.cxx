@@ -50,6 +50,7 @@
 #include"CryptoContext.h"
 
 #include<libmutil/print_hex.h>
+#include<libmutil/merror.h>
 #include<libmutil/MemObject.h>
 
 #ifdef DEBUG_OUTPUT
@@ -112,7 +113,7 @@ int SRtpPacket::unprotect( MRef<CryptoContext *> scontext ){
 	int length = get_tag_length();
 	
 	unsigned char * mac = new unsigned char[length];
-	scontext->rtp_authenticate( this, ( guessed_index >> 16 ), mac );
+	scontext->rtp_authenticate( this, (uint32_t)( guessed_index >> 16 ), mac );
 	//cerr << "MAC computed: " << print_hex( mac, 4 )<< endl;
 	for( int i = 0; i < length; i++ ){
 		if( tag[i] != mac[i] )
@@ -193,7 +194,7 @@ SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, int timeout){
 	
         if( i < 0 ){
 #ifdef DEBUG_OUTPUT
-		perror("recvfrom:");
+		merror("recvfrom:");
 #endif
 		return NULL;
         }

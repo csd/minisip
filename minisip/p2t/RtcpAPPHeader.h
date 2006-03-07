@@ -23,8 +23,9 @@
 #ifndef RTCPAPPHEADER_H
 #define RTCPAPPHEADER_H
 
-#include<vector>
 #include<config.h>
+
+#include<vector>
 #include<string>
 
 using namespace std;

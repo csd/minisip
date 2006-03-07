@@ -23,23 +23,16 @@
 #ifndef _CONFERENCECONTROL_H
 #define _CONFERENCECONTROL_H
 
+#include<config.h>
+
 #include<string>
+
 #include<libmutil/CommandString.h>
-//#include"../sip/SipSoftPhoneConfiguration.h"
-//#include"../minisip/gui/Gui.h"
-//#include"../../../p2t/GroupList.h"
-//#include"../../../p2t/GroupListClient.h"
-//#include"../p2t/GroupListUserElement.h"
-//#include"../p2t/P2T.h"
-//#include<libmutil/TextUI.h>
 #include<libmutil/minilist.h>
+
 #include "ConfCallback.h"
-
-
 #include "ConfMember.h"
 
-
-using namespace std;
 /**
  * A text user interface. 
  * The interface interacts with the user via the terminal, and with the <code>Sip</code> class

@@ -20,8 +20,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"StunIpProvider.h"
+
 #include"../../sip/SipSoftPhoneConfiguration.h"
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
@@ -29,8 +29,11 @@
 #include<libmnetutil/NetworkException.h>
 #include"../../stun/STUN.h"
 
-using namespace std;
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
+using namespace std;
 
 static vector<string> getLocalIPs(){
         vector<string> ret;
@@ -132,7 +135,7 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 	
 	UDPSocket sock(false);
 	
-	uint16_t localPort = sock.getPort();
+	uint16_t localPort = (uint16_t)sock.getPort();
 	char mappedip[16];
 	uint16_t mappedport;
 	int32_t natType = STUN::getNatType( *stunIp, stunPort, 
@@ -179,7 +182,7 @@ uint16_t StunIpProvider::getExternalPort( MRef<UDPSocket *> socket ){
 
 	if( natType == (unsigned)STUN::STUNTYPE_OPEN_INTERNET ){
 		/* In that case, don't bother do the STUN query */
-		return socket->getPort();
+		return (uint16_t)socket->getPort();
 	}
 	
 	STUN::getExternalMapping( *((IP4Address*)stunIp),

@@ -23,11 +23,12 @@
 #ifndef STUN_IP_PROVIDER
 #define STUN_IP_PROVIDER
 
+#include<config.h>
+
 #include"IpProvider.h"
 
 class IPAddress;
 class Gui;
-
 
 class StunIpProvider: public IpProvider{
 	public:

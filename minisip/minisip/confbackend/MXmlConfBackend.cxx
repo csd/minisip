@@ -20,11 +20,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
 #include"MXmlConfBackend.h"
+
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 
+#include<stdlib.h>
+
+using namespace std;
 
 MXmlConfBackend::MXmlConfBackend(){
 	fileName = getDefaultConfigFilename();
@@ -32,7 +35,7 @@ MXmlConfBackend::MXmlConfBackend(){
 	try{
 		parser = new XMLFileParser( fileName );
 	}
-	catch( XMLFileNotFound &exc ){
+	catch( XMLFileNotFound & ){
 		// Open a new one
 		parser = new XMLFileParser( "" );
 	}
@@ -105,8 +108,11 @@ int32_t MXmlConfBackend::loadInt( const std::string &key,
 
 string MXmlConfBackend::getDefaultConfigFilename(){
 
-        char *home = getenv("HOME");
         string ret;
+        char *home = NULL;
+#ifndef _WIN32_WCE
+		home = getenv("HOME");
+#endif
         if (home==NULL){
                 merr << "WARNING: Could not determine home directory"<<end;
 

@@ -23,6 +23,8 @@
 #ifndef RTPRECEIVER_H
 #define RTPRECEIVER_H
 
+#include<config.h>
+
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>

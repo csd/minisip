@@ -27,26 +27,22 @@
 #include"PhoneBook.h"
 #include<string>
 
-using namespace std;
-
 /* Uses mutil/XMLParser to read and save a phonebook file */
 
-
-
 class MXmlPhoneBookIo : public PhoneBookIo{
-        public:
-                MXmlPhoneBookIo( string fileName );
+	public:
+		MXmlPhoneBookIo( std::string fileName );
 
-                virtual void save( MRef< PhoneBook * > book );
-                virtual MRef< PhoneBook * > load();
+		virtual void save( MRef< PhoneBook * > book );
+		virtual MRef< PhoneBook * > load();
 		virtual std::string getMemObjectType(){return "PhoneBookIo";}
 
 		virtual std::string getPhoneBookId();
 
-        private:
+	private:
 		std::string getDefaultPhoneBookString();
 		void createDefault();
-                std::string fileName;
+		std::string fileName;
 };
 
 #endif

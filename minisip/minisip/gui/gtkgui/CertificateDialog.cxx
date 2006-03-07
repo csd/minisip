@@ -32,7 +32,7 @@
 #define MESSAGE_DIALOG_ARG false,Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,true 
 #endif
 
-
+using namespace std;
 
 CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 //	this->refXml = refXml;

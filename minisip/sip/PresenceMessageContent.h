@@ -1,6 +1,8 @@
 #ifndef _PRESENCEMESSAGECONTENT_H
 #define _PRESENCEMESSAGECONTENT_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>

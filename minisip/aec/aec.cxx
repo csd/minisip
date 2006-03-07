@@ -16,7 +16,9 @@
 #include <string.h>
 #include "aec.h"
 
-
+#ifdef _WIN32_WCE
+# define M_PI           3.14159265358979323846  /* pi */
+#endif
 
 /* ================================================================ */
 /* Exponential Smoothing or IIR Infinite Impulse Response Filter */
@@ -49,7 +51,7 @@ float IIR6::lowpass(float in)
 
 FIR1::FIR1()
 {
-  float x = exp(-2.0 * M_PI * PreWhiteTransferFreq/8000.0f);
+  float x = (float) exp(-2.0 * M_PI * PreWhiteTransferFreq/8000.0f);
   
   a0 = (1.0f + x) / 2.0f;
   a1 = -(1.0f + x) / 2.0f;
@@ -217,7 +219,7 @@ int AEC::doAEC(int d, int x)
   } else if (s0 < -MAXPCM) {
     return (int)-MAXPCM;
   } else {
-    return (int)floorf(s0+0.5);
+    return (int)floorf( ( float)(s0+0.5) );
   }
 }
 

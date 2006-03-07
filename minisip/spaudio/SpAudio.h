@@ -24,7 +24,7 @@
 #ifndef SPATIAL_AUDIO_H
 #define SPATIAL_AUDIO_H
 
-#include"config.h"
+#include<config.h>
 
 #include<libmutil/MemObject.h>
 

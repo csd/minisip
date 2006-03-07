@@ -20,15 +20,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-
 #include"ConfBackend.h"
+
 #ifdef GCONF_SUPPORT
 #include"GConfBackend.h"
 #endif
 
 #include"MXmlConfBackend.h"
 
+using namespace std;
 
 MRef<ConfBackend *> ConfBackend::create(){
 	try{
@@ -39,7 +39,7 @@ MRef<ConfBackend *> ConfBackend::create(){
 #endif
 
 	}
-	catch( ConfBackendException & exc ){
+	catch( ConfBackendException & ){
 		return NULL;
 	}
 }

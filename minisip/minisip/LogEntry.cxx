@@ -20,10 +20,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<config.h>
-#include<string>
+
 #include"LogEntry.h"
+
 #include<libmutil/MemObject.h>
+#include<string>
 
 using namespace std;
 

@@ -25,17 +25,22 @@
 
 #include"SoundDevice.h"
 #include"FileSoundDevice.h"
+
 #ifndef WIN32
-#include"OssSoundDevice.h"
+#	include"OssSoundDevice.h"
+#	ifdef HAVE_LIBASOUND
+#		include"AlsaSoundDevice.h"
+#	endif
+#else
+#	ifdef DSOUND
+#		include"DirectSoundDevice.h"
+#	elif defined(WAVE_SOUND)
+#		include"WaveSoundDevice.h"
+#	else
+#		error "NO Windows AUDIO Defined!"
+#	endif
 #endif
 
-#ifdef HAVE_LIBASOUND
-#include"AlsaSoundDevice.h"
-#endif
-
-#ifdef DSOUND
-#include"DirectSoundDevice.h"
-#endif
 
 #include<stdio.h>
 
@@ -72,6 +77,12 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 #ifdef DSOUND
 	if( devideId.substr( 0, 7 ) == "dsound:" ){
 		return new DirectSoundDevice( devideId.substr( 7, string::npos ) );
+	}
+#endif
+
+#ifdef WAVE_SOUND
+	if( devideId.substr( 0, 5 ) == "wave:" ){
+		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
 	}
 #endif
 
@@ -198,10 +209,10 @@ int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 			lastTimeWrite = currentTime - sleepTime;
 		}
 		
-		int sleep = sleepTime - (currentTime-lastTimeWrite);
+		uint64_t sleep = sleepTime - (currentTime-lastTimeWrite);
 	// 	printf( "\n\nsleep = %d\n", sleep );
 		while ( sleep > 0 ){
-			Thread::msleep( sleep );
+			Thread::msleep( (int32_t)sleep );
 			currentTime = mtime();
 			sleep = sleepTime - (currentTime-lastTimeWrite);
 		}

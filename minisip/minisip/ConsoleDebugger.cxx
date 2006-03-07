@@ -2,6 +2,7 @@
 #include"ConsoleDebugger.h"
 
 #include<libmutil/termmanip.h>
+#include<libmutil/merror.h>
 //#include<libmutil/Thread.h>
 
 #ifdef SM_DEBUG
@@ -14,14 +15,24 @@
 #include"../mediahandler/MediaCommandString.h"
 
 #include<iostream>
-#include<unistd.h>
+
+#ifdef HAVE_UNISTD_H
+#	include<unistd.h>
+#endif
 
 #ifdef HAVE_TERMIOS_H
-#include<termios.h>
+#	include<termios.h>
 #endif
 
 #ifdef WIN32
-#include<conio.h>
+#	include<conio.h>
+#	ifdef _WIN32_WCE
+#		include<stdio.h>
+#	endif
+#endif
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 using namespace std;
@@ -73,7 +84,11 @@ void ConsoleDebugger::run(){
 		char c;
 #ifdef _MSC_VER
 		int n=1;
+#	ifdef _WIN32_WCE
+		c= getchar();
+#	else
 		c= _getch();
+#	endif
 #else
 		int n = read(STDIN_FILENO, &c, 1);
 #endif
@@ -370,7 +385,7 @@ static int nonblockin_stdin()
     struct termios termattr;
     int ret=tcgetattr(STDIN_FILENO, &termattr);
     if (ret < 0) {
-        perror("tcgetattr:");
+        merror("tcgetattr:");
         return -1;
     }
     termattr.c_cc[VMIN]=1;
@@ -379,7 +394,7 @@ static int nonblockin_stdin()
 
     ret = tcsetattr (STDIN_FILENO, TCSANOW, &termattr);
     if (ret < 0) {
-        perror("tcsetattr");
+        merror("tcsetattr");
         return -1;
     }
 #endif

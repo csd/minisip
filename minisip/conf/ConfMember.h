@@ -12,6 +12,8 @@
 #ifndef _CONFMEMBER_H
 #define _CONFMEMBER_H
 
+#include<config.h>
+
 class ConfMember {
 	public:
 	
@@ -23,9 +25,6 @@ class ConfMember {
 		
 		string uri;
 		string callid;
-		
-	
-	
 };
 
 

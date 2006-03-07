@@ -23,6 +23,8 @@
 #ifndef MESSAGE_ROUTER_H
 #define MESSAGE_ROUTER_H
 
+#include<config.h>
+
 #include<libmsip/SipCallback.h>
 #include<libmutil/minilist.h>
 #include"gui/GuiCallback.h"
@@ -31,9 +33,6 @@
 #include"../conf/ConferenceControl.h" 
 #include "../conf/ConfCallback.h"
 #include"../sip/SipSoftPhoneConfiguration.h"
-
-#include<config.h>
-
 
 class MessageRouter: 	public SipCallback, 
 			public GuiCallback, 

@@ -21,8 +21,8 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include<config.h>
 #include"Session.h"
+
 #include"MediaStream.h"
 #include"Media.h"
 #include"AudioMedia.h"
@@ -43,6 +43,10 @@
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
+
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
 
 #define SESSION_LINE "s=Minisip Session"
 
@@ -281,7 +285,7 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 			}
 #endif
 	
-			(*iSStream)->setPort( m->getPort() );
+			(*iSStream)->setPort( (uint16_t)m->getPort() );
 			(*iSStream)->setRemoteAddress( remoteAddress );
 		}
 	}
@@ -609,9 +613,9 @@ string Session::getDebugString() {
 				it != mediaStreamReceivers.end(); it++ ) {
 		ret += "\n" + (*it)->getDebugString();
 	}
-	for( std::list< MRef<MediaStreamSender *> >::iterator it =  mediaStreamSenders.begin();
-				it !=  mediaStreamSenders.end(); it++ ) {
-		ret += "\n" + (*it)->getDebugString();
+	for( std::list< MRef<MediaStreamSender *> >::iterator it2 =  mediaStreamSenders.begin();
+				it2 !=  mediaStreamSenders.end(); it2++ ) {
+		ret += "\n" + (*it2)->getDebugString();
 	}
 	return ret;
 }

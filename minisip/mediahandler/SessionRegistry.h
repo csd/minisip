@@ -23,6 +23,8 @@
 #ifndef SESSIONREGISTRY_H
 #define SESSIONREGISTRY_H
 
+#include<config.h>
+
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 #include"Session.h"

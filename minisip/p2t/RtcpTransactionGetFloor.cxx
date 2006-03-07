@@ -28,12 +28,6 @@
  * 
 */
 
-
-
-#ifdef HAVE_CONFIG_H
-#include<config.h>
-#endif
-
 #include<assert.h>
 #include"RtcpTransactionGetFloor.h"
 #include"P2T.h"
@@ -433,7 +427,7 @@ RtcpTransactionGetFloor::RtcpTransactionGetFloor(MRef<SipDialog*> dialog, int se
 		seqNo(seqNo),
 		remoteSSRC(remoteSSRC)
 {
-	this->toaddr = toaddr;
+	//this->toaddr = toaddr;
 	this->port = port;
 	
 	counter=1;

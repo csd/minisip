@@ -33,12 +33,11 @@
 #ifndef RTCPTRANSACTIONRELEASEFLOOR_H
 #define RTCPTRANSACTIONRELEASEFLOOR_H
 
+#include<config.h>
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 #include"SipDialogP2T.h"
-
-//#include<config.h>
 
 /** 
  * implements the Floor Release Procedure if the local user releases the floor.

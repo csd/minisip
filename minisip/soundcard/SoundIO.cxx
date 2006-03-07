@@ -76,17 +76,23 @@
 #include"SoundDevice.h"
 
 #ifndef WIN32
-#include"OssSoundDevice.h"
-#ifdef HAVE_LIBASOUND
-#include"AlsaSoundDevice.h"
-#endif
+#	include"OssSoundDevice.h"
+#	ifdef HAVE_LIBASOUND
+#		include"AlsaSoundDevice.h"
+#	endif
 #else
-#include"DirectSoundDevice.h"
+#	ifdef DSOUND
+#		include"DirectSoundDevice.h"
+#	elif defined(WAVE_SOUND)
+#		include"WaveSoundDevice.h"
+#	else
+#		error "NO Windows AUDIO Defined!"
+#	endif
 #endif
-
 
 #define BS 160
 
+using namespace std;
 
 // //This object is created always, for now, even we do not 
 // //use spatial audio ...

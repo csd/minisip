@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<vector>
+//#include<vector>
 
 #define CNAME 1
 #define NAME 2
@@ -38,6 +38,8 @@
 
 class SDESItem{
 	public:
+		virtual ~SDESItem() {}
+		
 //		virtual vector<unsigned char> get_bytes()=0;
 		virtual int size()=0;
 		static SDESItem *build_from(void *from,int max_length);

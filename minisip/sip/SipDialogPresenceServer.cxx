@@ -54,6 +54,10 @@
 #include<libmsip/SipHeaderExpires.h>
 #include"PresenceMessageContent.h"
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
+
 /*
  Presence dialog for user "user@domain".
 

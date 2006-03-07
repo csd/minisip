@@ -1,5 +1,6 @@
-#include<config.h>
+
 #include"SipDialogSecurityConfig.h"
+
 #include"../minisip/confbackend/ConfBackend.h"
 #include<libmutil/cert.h>
 #include<libmutil/XMLParser.h>

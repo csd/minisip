@@ -20,7 +20,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
-#include<config.h>
+
 #include"GroupListServer.h"
 #include <ctype.h>
 #include<libmutil/dbg.h>

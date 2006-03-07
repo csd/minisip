@@ -41,6 +41,10 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmutil/massert.h>
 
+#ifdef _WIN32_WCE
+#	include"../include/minisip_wce_extra_includes.h"
+#endif
+
 #ifdef P2T_SUPPORT
 #include"../p2t/SipDialogP2T.h"
 #include"../p2t/SipDialogP2Tuser.h"

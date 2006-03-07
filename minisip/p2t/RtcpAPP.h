@@ -23,12 +23,12 @@
 #ifndef RTCPAPP_H
 #define RTCPAPP_H
 
+#include<config.h>
+
 #include"RtcpAPPHeader.h"
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 #include"P2T.h"
-
-#include<config.h>
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 

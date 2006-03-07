@@ -23,6 +23,8 @@
 
 #include<config.h>
 
+#include"FileSoundDevice.h"
+
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<fcntl.h>
@@ -34,18 +36,6 @@
 #include<libmutil/itoa.h>
 #include<libmutil/mtime.h>
 
-
-
-#ifdef _MSC_VER
-#include<io.h>
-#else
-#include<sys/time.h>
-#include<unistd.h>
-#endif
-
-#include"SoundDevice.h"
-#include"FileSoundDevice.h"
-
 #ifdef WIN32
 	#include<winsock2.h>
 #else
@@ -53,7 +43,7 @@
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
-#define USE_WIN32_API
+#	define USE_WIN32_API
 #endif
 
 int filesleep( unsigned long usec ){
@@ -129,7 +119,13 @@ int FileSoundDevice::openRecord(int32_t samplerate_, int nChannels_, int format_
 #ifdef DEBUG_OUTPUT
 	printf( "FileSoundDev:record - samplerate = %d, nChannels = %d, sampleSize = %d\n", samplingRate, nChannelsRecord, sampleSize );
 #endif
+
+#ifndef _WIN32_WCE
 	in_fd=::open(inFilename.c_str(), O_RDONLY);
+#else
+	//win32 wcecompat only takes 3 params ... open the file with mode = permission for everybody ... 
+	in_fd=::_open(inFilename.c_str(), O_RDONLY, S_IREAD | S_IWRITE | S_IEXEC);
+#endif
 	if (in_fd==-1){
 		printError("openRecord");
 		exit(-1); //FIX: handle nicer - exception
@@ -193,7 +189,11 @@ int FileSoundDevice::openPlayback(int32_t samplerate_, int nChannels_, int forma
 int FileSoundDevice::closeRecord(){
 	int ret;
 	openedRecord=false;
+#ifdef _WIN32_WCE
+	ret = ::_close(in_fd);
+#else
 	ret = ::close(in_fd);
+#endif
 	if( ret == -1 ) {
 		printError("openRecord");
 	}
@@ -204,7 +204,11 @@ int FileSoundDevice::closeRecord(){
 int FileSoundDevice::closePlayback(){
 	int ret;
 	openedPlayback=false;
+#ifdef _WIN32_WCE
+	ret = ::_close(out_fd);
+#else
 	ret = ::close(out_fd);
+#endif
 	if( ret == -1 ) {
 		printError("openPlayback");
 	}
@@ -256,9 +260,12 @@ int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 	//select the appropriate way to write to the file ...
 	switch( fileType ) {
 		case FILESOUND_TYPE_RAW: 
-			retValue = ::read(in_fd, 
-					buf, 
-					nSamples * getSampleSize() * getNChannelsRecord() );
+#ifdef _WIN32_WCE
+			retValue = ::_read(in_fd, buf, nSamples * getSampleSize() * getNChannelsRecord() );
+#else
+			retValue = ::read(in_fd, buf, nSamples * getSampleSize() * getNChannelsRecord() );
+#endif
+				
 			if( retValue == -1 ) {
 				retValue = -errno;
 				printError( "readFromDevice" );
@@ -278,7 +285,12 @@ int FileSoundDevice::readError( int errcode, byte_t * buffer, uint32_t nSamples 
 	bool mustReturn = true;
 	switch( errcode ) {
 		case -EAGAIN:
+
+	#ifndef _WIN32_WCE
 		case -EINTR:
+	#else
+		case WSAEINTR:
+	#endif
 			mustReturn = false;
 			break;
 		default:
@@ -298,8 +310,8 @@ void FileSoundDevice::readSleep( ) {
 	// (the time in the computer should not go backward, right?!
 // 	printf("R: %d ", currentTime - lastTimeRead );
 	while (currentTime - lastTimeRead < fileSoundBlockSleep){
-		int ret;
-		int sleep = fileSoundBlockSleep - (currentTime-lastTimeRead);
+		int32_t ret;
+		int32_t sleep = (int32_t ) (fileSoundBlockSleep - (currentTime-lastTimeRead));
 		if( sleep < 0 ) sleep = 0;
 // 		printf(" [%d] ", sleep);
 		ret = filesleep( sleep * 1000);
@@ -336,9 +348,11 @@ int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
 	switch( fileType ) {
 		case FILESOUND_TYPE_RAW: 
 			//write n samples to the file ... 
-			retValue = ::write(out_fd, 
-					buf, 
-					nSamples * getSampleSize() * getNChannelsPlay() );
+#ifdef _WIN32_WCE
+			retValue = ::_write(out_fd, buf, nSamples * getSampleSize() * getNChannelsPlay() );
+#else
+			retValue = ::write(out_fd, buf, nSamples * getSampleSize() * getNChannelsPlay() );
+#endif
 			if( retValue == -1 ) {
 				retValue = -errno;
 				printError( "write" );
@@ -359,7 +373,11 @@ int FileSoundDevice::writeError( int errcode, byte_t * buffer, uint32_t nSamples
 	bool mustReturn = true;
 	switch( errcode ) {
 		case -EAGAIN:
+	#ifndef _WIN32_WCE
 		case -EINTR:
+	#else
+		case WSAEINTR:
+	#endif
 			mustReturn = false;
 			break;
 		default:
@@ -380,8 +398,8 @@ void FileSoundDevice::writeSleep( ) {
 	// (the time in the computer should not go backward, right?!
 // 	printf("W: %d ", currentTime - lastTimeWrite );
 	while (currentTime - lastTimeWrite < fileSoundBlockSleep ){
-		int ret;
-		int sleep = fileSoundBlockSleep - (currentTime-lastTimeWrite);
+		int32_t ret;
+		int32_t sleep = (int32_t) (fileSoundBlockSleep - (currentTime-lastTimeWrite));
 		if( sleep < 0 ) sleep = 0;
 // 		printf(" [%d] ", sleep);
 		ret = filesleep( sleep * 1000);
@@ -432,14 +450,16 @@ int FileSoundDevice::getFileSize( int fd ) {
 void FileSoundDevice::printError( string func ) {
 	string errStr;	
 	errStr = "FileSoundDevice::" + func + " - errno = ";
+//cut the function in wince ... most of these are not defined ... not worth the trouble
+#ifndef _WIN32_WCE
 	switch( errno ) {
 		case EACCES: errStr + "eaccess"; break;
 		case EEXIST: errStr + "eexist"; break;
 		case EFAULT: errStr + "efault"; break;
 		case EISDIR: errStr + "eisdir"; break;
-#ifndef USE_WIN32_API
+	#ifndef USE_WIN32_API
 		case ELOOP: errStr + "eloop"; break;
-#endif
+	#endif
 		case EMFILE: errStr + "emfile"; break;
 		case ENAMETOOLONG: errStr + "toolong"; break;
 		case ENFILE: errStr + "enfile"; break;
@@ -449,15 +469,16 @@ void FileSoundDevice::printError( string func ) {
 		case ENOSPC: errStr + "enospc"; break;
 		case ENOTDIR: errStr + "enotdir"; break;
 		case ENXIO: errStr + "enxio"; break;
-#ifndef USE_WIN32_API
+	#ifndef USE_WIN32_API
 		case EOVERFLOW: errStr + "eoverflow"; break;
-#endif
+	#endif
 		case EROFS: errStr + "erofs"; break;
-#ifndef USE_WIN32_API
+	#ifndef USE_WIN32_API
 		case ETXTBSY: errStr + "etxtbsy"; break;
-#endif
+	#endif
 		default: errStr + "unknown";
 	}
+#endif
 	cerr << errStr << " (check man page for explanation)" << endl;
 }
 
