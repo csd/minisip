@@ -23,9 +23,9 @@
 */
 
 #include<config.h>
+#include<libmutil/itoa.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyCsIdMap.h>
-#include<libmutil/itoa.h>
 
 
 MikeySrtpCs::MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc ):

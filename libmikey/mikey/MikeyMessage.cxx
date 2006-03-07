@@ -253,7 +253,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 			//TODO
 		default:
 			delete [] encrData;
-			throw MikeyException( "Unknown encryption algorithm (MikeyMessage::addKemacPayload)" );
+			throw MikeyException( "Unknown encryption algorithm" );
 	}
 	
 	MikeyPayloadKEMAC * payload;
@@ -282,7 +282,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 			break;
 		default:
 			delete [] encrData;
-			throw MikeyException( "Unknown MAC algorithm (MikeyMessage::addKemacPayload)" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	compiled = false;
 	delete [] encrData;
@@ -337,7 +337,7 @@ void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 						macAlg, NULL ) );
 			break;
 		default:
-			throw MikeyException( "Unknown MAC algorithm (MikeyMessage::addVPayload)" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	compiled = false;
 }

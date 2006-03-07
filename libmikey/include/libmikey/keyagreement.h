@@ -27,14 +27,15 @@
 #define KEYAGREEMENT_H
 
 #include<libmikey/libmikey_config.h>
+#include<libmikey/MikeyDefs.h>
 
 #include<assert.h>
-#include<iostream>
+
 #include<libmutil/MemObject.h>
-#include<libmikey/MikeyDefs.h>
 #include<libmikey/keyvalidity.h>
 #include<libmikey/MikeyCsIdMap.h>
 
+#include<iostream>
 // different type of key derivation defined in MIKEY
 #define KEY_DERIV_TEK          0
 #define KEY_DERIV_SALT         1

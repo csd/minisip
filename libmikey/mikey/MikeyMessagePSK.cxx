@@ -40,11 +40,6 @@
 
 #include<libmutil/hmac.h>
 
-//const int64_t MAX_TIME_OFFSET = 0xe100000<<16; //1 hour
-                                                                                
-
-
-
 MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 		        int encrAlg, int macAlg ):
 			compiled(false), 
@@ -106,7 +101,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 		case MIKEY_ENCR_AES_KW_128:
 			//TODO
 		default:
-			throw MikeyException( "Unknown encryption algorithm (MikeyMessage::MikeyMessage) (PSK)" );
+			throw MikeyException( "Unknown encryption algorithm" );
 	}
 	switch( macAlg ){
 		case MIKEY_MAC_HMAC_SHA1_160:
@@ -117,7 +112,7 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 			authKey = NULL;
 			break;
 		default:
-			throw MikeyException( "Unknown MAC algorithm (MikeyMessage::MikeyMessage) (PSK)" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	
 	MikeyPayloadKeyData * keydata = 
@@ -547,7 +542,7 @@ bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
 		case MIKEY_MAC_NULL:
 			return false;
 		default:
-			throw MikeyException( "Unknown MAC algorithm (MikeyMessage::authenticate PSK)" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 
 }

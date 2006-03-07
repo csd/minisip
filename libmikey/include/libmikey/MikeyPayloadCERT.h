@@ -28,7 +28,6 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmikey/MikeyPayload.h>
-//#include"../util/cert.h"
 
 #define MIKEYPAYLOAD_CERT_PAYLOAD_TYPE 7
 

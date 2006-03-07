@@ -25,6 +25,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+/* Compilation time configuration */
+#ifndef _WIN32_WCE
+#	include"compilation_config.h"
+#else
+#	include"compilation_config_w32_wce.h"
+#endif
+
 #ifndef LIBMIKEY_EXPORTS
 # ifdef DLL_EXPORT
 #  define LIBMUTIL_IMPORTS
@@ -33,70 +40,31 @@
 # endif	 // DLL_EXPORT
 #endif	// LIBMIKEY_EXPORTS
 
+#include<libmutil/mtypes.h>
 
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
+	#define WIN32
+	#pragma warning (disable: 4251)
 
-#pragma warning (disable: 4251)
-
-#ifndef WIN32
-#define WIN32
+	#ifndef LIBMIKEY_EXPORTS
+		#error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMIKEY_EXPORTS not defined).
+	#endif
 #endif
 
-#ifndef uint8_t
-typedef unsigned char  uint8_t;
-#endif
-
-#ifndef byte_t
-typedef unsigned char  byte_t;
-#endif
-
-#ifndef int16_t
-typedef __int16  int16_t;
-#endif
-
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
-
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-
-#ifndef uint32_t
-typedef unsigned int  uint32_t;
-#endif
-
-#ifndef int64_t
-typedef __int64  int64_t;
-#endif
-
-#ifndef uint64_t
-typedef unsigned long long  uint64_t;
-#endif
-
+//Temporary ... STLPort does not allow addition of errno.h ... but WCEcompat does ... 
+//So we don't have to repeat this everytime, include errno.h for all files ... 
+//	anyway, it is just an int :)
+//Anyway, while compiling for EVC, it will still trigger some warnings ... ignore them, errno exhists for sure.
+#ifdef _WIN32_WCE
+#	ifndef _STLP_NATIVE_ERRNO_H_INCLUDED
+#		include<wcecompat/errno.h>
+#		define _STLP_NATIVE_ERRNO_H_INCLUDED
+#	endif
 #else
- 
-#include<stdint.h>
-
-#ifdef __CYGWIN__
-#define WIN32
+#	include <errno.h>
 #endif
-
-/* Compilation time configuration */
-#include"compilation_config.h"
-
-#endif
-
-/* STL replacement */
-
-
-#include<string>
-using namespace std;
-
-typedef uint8_t byte_t;
 
 /* big/little endian conversion */
-
 static inline uint16_t U16_AT( void const * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;

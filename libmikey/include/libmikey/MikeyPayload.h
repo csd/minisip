@@ -27,6 +27,13 @@
 
 #include<libmikey/libmikey_config.h>
 
+#ifdef _WIN32_WCE
+//openssl's err.h must be included before ANY <vector/map/list/hash/...> include ...
+//otherwise, it causes some conflict between STLPort and OpenSSL (in MS EVC++ 4.0)
+#	include<openssl/err.h>
+#endif
+
+#include<string>
 
 #define MIKEYPAYLOAD_LAST_PAYLOAD 0
 

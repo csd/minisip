@@ -58,12 +58,12 @@
 #define MIKEY_MAC_HMAC_SHA1_160 0
 #define MIKEY_MAC_NULL          1
 
-// ... or is this other value: 0xe1000000000LL?????
 #define MAX_TIME_OFFSET (int64_t)(0xe100000<<16) //1 hour
 
 class aes;
 class certificate;
 class certificate_db;
+
 
 class LIBMIKEY_API MikeyMessage{
 	public:

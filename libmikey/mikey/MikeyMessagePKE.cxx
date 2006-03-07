@@ -101,7 +101,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 		case MIKEY_ENCR_AES_KW_128:
 			//TODO
 		default:
-			throw new MikeyException( "Unknown encryption algorithm (MikeyMessage::MikeyMessage)" );
+			throw new MikeyException( "Unknown encryption algorithm" );
 	}
 	switch( macAlg ){
 		case MIKEY_MAC_HMAC_SHA1_160:
@@ -114,7 +114,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 			authKey = NULL;
 			break;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm (MikeyMessage::MikeyMessage)" );
+			throw new MikeyException( "Unknown MAC algorithm" );
 	}
 	
 	//adding KEMAC payload
@@ -653,6 +653,6 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 		case MIKEY_MAC_NULL:
 			return false;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm (MikeyMessage::authenticate)" );
+			throw new MikeyException( "Unknown MAC algorithm" );
 	}
 }

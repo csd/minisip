@@ -88,7 +88,8 @@ MikeyMessage * KeyAgreementPSK::parseResponse( MikeyMessage * response)
 
 void KeyAgreementPSK::setOffer( MikeyMessage * offer )
 {
-	return offer->setOffer( this );
+	offer->setOffer( this );
+	return;
 }
 
 MikeyMessage * KeyAgreementPSK::buildResponse( MikeyMessage * offer)

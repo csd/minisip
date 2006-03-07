@@ -23,39 +23,18 @@
 
 
 #include<config.h>
+
 #include<libmikey/MikeyPayloadT.h>
 #include<libmikey/MikeyException.h>
+
 #include<libmutil/itoa.h>
+#include<libmutil/mtime.h>
+
 #include<assert.h>
 
 #ifndef _MSC_VER
-#include<sys/time.h>
-#endif
-
-#include<time.h>
-
-
-#ifdef WIN32
-#include <sys/timeb.h>
-/* Emulate gettimeofday (Ulrich Leodolter, 1/11/95).  */
-struct timezone{
-		int tz_minuteswest;     /* Minutes west of GMT.  */
-		int tz_dsttime;     /* Nonzero if DST is ever in effect.  */
-};
-
-
-
-static void gettimeofday (struct timeval *tv, struct timezone *tz){
-   	struct _timeb tb;
-	_ftime (&tb);
-
-	tv->tv_sec = tb.time;
-	tv->tv_usec = tb.millitm * 1000L;
-	if( tz ){
-		tz->tz_minuteswest = tb.timezone;	/* minutes west of Greenwich  */
-		tz->tz_dsttime = tb.dstflag;	/* type of dst correction  */
-	}
-}
+#	include<time.h>
+#	include<sys/time.h>
 #endif
 
 MikeyPayloadT::MikeyPayloadT(){
@@ -64,7 +43,7 @@ MikeyPayloadT::MikeyPayloadT(){
 	tsTypeValue = T_TYPE_NTP_UTC;
 
 	struct timeval *tv;
-    struct timezone *tz;
+	struct timezone *tz;
 
 	tv = new struct timeval;
 	tz = new struct timezone;

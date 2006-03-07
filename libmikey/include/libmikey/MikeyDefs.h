@@ -21,8 +21,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+
+#ifndef _LIBMIKEY_MIKEYDEFS_H
+#define _LIBMIKEY_MIKEYDEFS_H
+
+/**
+If included, this file needs to be placed as the very first include of the source/header file
+(ok, after <config.h> and/or "libmikey_config.h").
+Otherwise, under _WIN32_WCE it causes compilation problems.
+*/
 #include<libmutil/cert.h>
 
-//typedef byte_t uint8_t;
-typedef uint8_t byte_t;
-
+#endif

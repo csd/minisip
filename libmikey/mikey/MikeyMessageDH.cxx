@@ -439,10 +439,11 @@ bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
 		return true;
 	}
 
-	return peerCert->get_first()->verif_sign( rawMessageData(),
-			rawMessageLength() - 
-			((MikeyPayloadSIGN *)sign)->sigLength(),
-			((MikeyPayloadSIGN *)sign)->sigData(),
-			((MikeyPayloadSIGN *)sign)->sigLength() );
-
+	int res; 
+	res = peerCert->get_first()->verif_sign( rawMessageData(),
+												rawMessageLength() - ((MikeyPayloadSIGN *)sign)->sigLength(),
+												((MikeyPayloadSIGN *)sign)->sigData(),
+												((MikeyPayloadSIGN *)sign)->sigLength() );
+	if( res > 0 ) return true;
+	else return false;
 }

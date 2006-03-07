@@ -181,7 +181,8 @@ MikeyMessage * KeyAgreementDH::parseResponse( MikeyMessage * response)
 
 void KeyAgreementDH::setOffer( MikeyMessage * offer )
 {
-	return offer->setOffer( this );
+	offer->setOffer( this );
+	return;
 }
 
 MikeyMessage * KeyAgreementDH::buildResponse( MikeyMessage * offer)
