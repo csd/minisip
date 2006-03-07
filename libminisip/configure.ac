@@ -2,16 +2,50 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libminisip, 0.1, eliasson@imit.kth.se)
 
-AC_LANG(C++)
+m4_define([minisiplib_major_version], [0])
+m4_define([minisiplib_minor_version], [3])
+m4_define([minisiplib_micro_version], [1])
+m4_define([minisiplib_version],
+          [minisiplib_major_version.minisiplib_minor_version.minisiplib_micro_version])
 
+dnl
+dnl Libtool style version info
+dnl update before each new release 
+dnl See node "Updating version info::" in info libtool
+dnl
+m4_define([lt_current], [0])
+m4_define([lt_revision], [0])
+m4_define([lt_age], [0])
+
+AC_INIT(libminisip, [minisiplib_major_version.minisiplib_minor_version],
+        eliasson@imit.kth.se)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE(libminisip, 0.1.0)
+AM_INIT_AUTOMAKE(libminisip, [minisiplib_version])
 
 AM_CONFIG_HEADER(include/compilation_config.h)
+
+MINISIPLIB_MAJOR_VERSION=minisiplib_major_version
+MINISIPLIB_MINOR_VERSION=minisiplib_minor_version
+MINISIPLIB_MICRO_VERSION=minisiplib_micro_version
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
+AC_SUBST(MINISIPLIB_MAJOR_VERSION)
+AC_SUBST(MINISIPLIB_MINOR_VERSION)
+AC_SUBST(MINISIPLIB_MICRO_VERSION)
+AC_SUBST(LT_VERSION_INFO)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
+
+AC_CANONICAL_HOST
+case $host_os in
+     *mingw* )
+	     os_win=yes
+	     ;;
+esac
+
+AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
 dnl AC_PROG_LEX
@@ -25,6 +59,26 @@ dnl AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
 
+AC_C_BIGENDIAN
+
+AC_LANG(C++)
+
+if test x$os_win = xyes; then
+    AC_CHECK_TOOL(WINDRES, [windres])
+    if test x$WINDRES = x; then
+        AC_MSG_ERROR([Could not find windres in your PATH.])
+    fi
+fi
+
+dnl STL
+dnl For now STL is made mandatory
+
+dnl AC_ARG_ENABLE(stl,
+dnl     [ --enable-stl enables the use of C++ STL (default enabled)],
+dnl     [ if test "${enable_stl}" = "yes"
+dnl       then
+        AC_DEFINE(USE_STL, [], [STL enabled])
+dnl       fi ])
 
 
 dnl debug flag
@@ -106,6 +160,14 @@ AC_CHECK_HEADER([samplerate.h],
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
 
+dnl Check for stack trace support
+AC_CHECK_HEADER([execinfo.h], 
+	[
+		AC_DEFINE(HAS_EXECINFO, [], [Stack trace functionality found])
+			HAS_EXECINFO="yes"
+	]
+)
+AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
 
 dnl Check for libspeex
 AC_CHECK_HEADER([speex/speex.h], 
@@ -117,9 +179,6 @@ AC_CHECK_HEADER([speex/speex.h],
 	]
 )
 AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
-
-
-
 
 dnl #############
 dnl IPSEC SUPPORT
@@ -279,8 +338,56 @@ dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
 dnl
+dnl libmutil
+dnl
+PKG_CHECK_MODULES(MUTIL, [libmutil >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MUTIL_CFLAGS}"
+
+save_CPPFLAGS="${CPPFLAGS}"
+save_LIBS="${LIBS}"
+CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
+LIBS="${MUTIL_LIBS} ${LIBS}"
+
+AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
+	headers/library. Try installing the libmutil-devel package for your
+	distribution."])])
+AC_CHECK_LIB([mutil], [main],
+	[
+		LIBS="-lmutil ${LIBS}"
+	],[
+		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
+	])
+
+
+dnl
+dnl libmnetutil
+dnl
+PKG_CHECK_MODULES(MNETUTIL, [libmnetutil >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MNETUTIL_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MNETUTIL_CFLAGS}"
+LIBS="${MNETUTIL_LIBS} ${LIBS}"
+
+AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
+        headers/library. Try installing the libmnetutil-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mnetutil], [main],
+        [
+                LIBS="-lmnetutil ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
+        ])
+
+
+dnl
 dnl libmsip
 dnl
+PKG_CHECK_MODULES(MSIP, [libmsip >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MSIP_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MSIP_CFLAGS}"
+LIBS="${MSIP_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
         headers/library. Try installing the libmsip-devel package for your
         distribution."])])
@@ -294,6 +401,12 @@ AC_CHECK_LIB([msip], [main],
 dnl
 dnl libmikey
 dnl
+PKG_CHECK_MODULES(MIKEY, [libmikey >= 0.4.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MIKEY_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MIKEY_CFLAGS}"
+LIBS="${MIKEY_LIBS} ${LIBS}"
+
 AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
         headers/library. Try installing the libmikey-devel package for your
         distribution."])])
@@ -304,9 +417,15 @@ AC_CHECK_LIB([mikey], [main],
                 AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
         ])
 
-dnl Checks for other libraries.
+CPPFLAGS="${save_CPPFLAGS}"
+LIBS="${save_LIBS}"
+
+dnl Checks for libraries.
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
+AC_CHECK_LIB([dsound], [main])
+AC_CHECK_LIB([uuid], [main])
+AC_CHECK_LIB([dxguid], [main])
 
 dnl FIXME: Replace `main' with a function in `-lX11':
 AC_CHECK_LIB([X11], [main])
@@ -322,8 +441,21 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
+dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
+dnl AC_C_VOLATILE
 
-AC_OUTPUT([Makefile include/Makefile])
+dnl Checks for library functions.
+dnl AC_FUNC_ERROR_AT_LINE
+dnl AC_PROG_GCC_TRADITIONAL
+dnl AC_FUNC_MALLOC
+dnl AC_TYPE_SIGNAL
+dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
 
+dnl AC_SUBST(CPPFLAGS)
+dnl AC_SUBST(LDFLAGS)
+
+dnl it shoudl be like this ... but for now, reduce it ...AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmsip.pc win32/libmsip-res.rc])
+AC_CONFIG_FILES([Makefile include/Makefile libminisip.pc])
+AC_OUTPUT

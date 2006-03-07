@@ -115,8 +115,14 @@ do
 	if [ ${subdir} = "libminisip" ] ; then 
 		echo libminisip can also have special config params
 		configure_params="$configure_params $minisip_configure_params"
-		MUTIL_LIBS=$LOC_MUTIL_LIBS 	\
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
+			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
+			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
+			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
+			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
+			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
 	fi 

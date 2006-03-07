@@ -22,16 +22,14 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
+#include<config.h>
 
 #include<libminisip/STUN.h>
-
-#include<config.h>
 
 #include<libminisip/STUNMessage.h>
 #include<libminisip/STUNTest.h>
 #include<libmutil/itoa.h>
 #include<libmnetutil/NetworkFunctions.h>
-
 
 #include<stdio.h>
 
@@ -268,4 +266,3 @@ int STUN::getNatType(IP4Address &stunAddr,
 const char * STUN::typeToString(int type){
 	return msgs[type];
 }
-

@@ -26,58 +26,71 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
-#include<libmutil/MemObject.h>
-
-
-//#define DISABLE_OSS
-//#define DISABLE_ALSA
-
 /* Compilation time configuration */
+#ifndef _WIN32_WCE
+#	include"compilation_config.h"
+#else
+//#	pragma message("include for wince .............................. ")
+#	include"compilation_config_w32_wce.h"
+#endif
+
+#include<libmutil/mtypes.h>
+
+#ifndef MINISIPLIB_EXPORTS
+#	ifdef DLL_EXPORT
+#		define LIBMUTIL_IMPORTS
+#		define LIBMNETUTIL_IMPORTS
+#		define LIBMSIP_IMPORTS
+#		define LIBMIKEY_IMPORTS
+#	endif	 // DLL_EXPORT
+#endif	// LIBMSIP_EXPORTS
+
+#define SOUND_CARD_FREQ 48000
+
+#include<libmutil/mtypes.h>
 
 #ifdef _MSC_VER
+#	ifndef WIN32
+#		define WIN32
+#	endif
+#	pragma warning (disable: 4251)
+	//use waveIn/Out for pocket pc ... direct sound for the rest of windows ... 
+#	ifdef _WIN32_WCE
+#		define WAVE_WCE
+#	else
+#		define DSOUND
+#	endif
 
-#pragma warning (disable: 4251)
+#	ifndef _WIN32_WINNT
+#		define _WIN32_WINNT 0x0500
+#	endif
 
-#ifndef WIN32
-#define WIN32
+#	pragma warning (disable: 4251)
+
+#	ifdef __MINGW32__
+#		define WINVER 0x0500
+#	else  // !__MINGW32__
+#		define ENABLE_TS
+#	endif	// !__MINGW32__
+
+#	ifndef WIN32
+#		define WIN32
+#	endif
+
 #endif
 
-#ifndef uint8_t
-typedef unsigned char  uint8_t;
-#endif
-
-#ifndef byte_t
-typedef unsigned char  byte_t;
-#endif
-
-#ifndef int16_t
-typedef __int16  int16_t;
-#endif
-
-#ifndef uint16_t
-typedef unsigned short  uint16_t;
-#endif
-
-#ifndef int32_t
-typedef __int32  int32_t;
-#endif
-
-#ifndef uint32_t
-typedef unsigned int  uint32_t;
-#endif
-
-#ifndef int64_t
-typedef __int64  int64_t;
-#endif
-
-#ifndef uint64_t
-typedef unsigned long long  uint64_t;
-#endif
-
+//Temporary ... STLPort does not allow addition of errno.h ... but WCEcompat does ... 
+//So we don't have to repeat this everytime, include errno.h for all files ... 
+//	anyway, it is just an int :)
+//Anyway, while compiling for EVC, it will still trigger some warnings ... ignore them, errno exhists for sure.
+#ifdef _WIN32_WCE
+#	ifndef _STLP_NATIVE_ERRNO_H_INCLUDED
+#		include<wcecompat/errno.h>
+#		define _STLP_NATIVE_ERRNO_H_INCLUDED
+#	endif
+#	include<openssl/err.h>
 #else
-#include"compilation_config.h"/* STL replacement */
-#include<stdint.h>
+#	include <errno.h>
 #endif
 
 // FIXME!!
@@ -85,19 +98,6 @@ typedef unsigned long long  uint64_t;
 #ifndef WIN32
 #define LINUX
 #endif
-
-
-
-#ifdef USE_STL
-#undef __NO_ISOCEXT
-using namespace std;
-#include<string>
-
-#else
-
-#endif
-
-typedef uint8_t byte_t;
 
 
 /* big/little endian conversion */
@@ -135,22 +135,6 @@ static inline uint64_t U64_AT( void const * _p )
 #   define ntoh16(i)   U16_AT(&i)
 #   define ntoh32(i)   U32_AT(&i)
 #   define ntoh64(i)   U64_AT(&i)
-#endif
-
-
-
-#ifdef DEBUG_OUTPUT
-#define SM_DEBUG
-#define SM_DEBUG_COMMAND
-#endif
-
-#define SOUND_CARD_FREQ 48000
-
-#ifdef WIN32
-#define TEXT_UI
-//#define DEBUG_OUTPUT
-#include<iostream>
-using namespace std;
 #endif
 
 

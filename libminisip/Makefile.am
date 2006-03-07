@@ -1,4 +1,5 @@
 abs_top_srcdir = @abs_top_srcdir@
+pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include 
 DIST_SUBDIRS = $(SUBDIRS)
@@ -14,13 +15,21 @@ if P2T_SUPPORT
   p2t_dir = p2t
 endif
 
+pkgconfig_DATA = libminisip.pc
+
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(CPPFLAGS) -I$(abs_top_srcdir)/include
+libminisip_la_CPPFLAGS = -I$(abs_top_srcdir)/include
+libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
+libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
+libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
-libminisip_la_SOURCES = $(minisip_src) $(sound_src)
+libminisip_la_SOURCES = $(libminisip_src)
 
-
-
+if OS_WIN
+res_obj = win32/libminisip-res.o
+libminisip_la_LDFLAGS += -Wl,$(res_obj)
+libminisip_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 if HAVE_LIBASOUND
 sound_src = source/soundcard/AlsaSoundDevice.cxx source/soundcard/OssSoundDevice.cxx
 else !HAVE_LIBASOUND
@@ -33,7 +42,7 @@ endif !HAVE_LIBASOUND
 
 
 
-minisip_src =          source/stun/STUN.cxx \
+minisip_src =  source/stun/STUN.cxx \
 		       source/stun/STUNMessage.cxx \
 		       source/stun/STUNTest.cxx \
 		       source/stun/STUNAttributes.cxx \

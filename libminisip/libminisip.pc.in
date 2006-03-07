@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pkglibdir=${libdir}/@PACKAGE@
+includedir=@includedir@
+pkgincludedir=${includedir}/@PACKAGE@
+
+Name: @PACKAGE@
+Description:
+Version: @VERSION@
+Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1, libmikey >= 0.3.1, libmsip >= 0.3.1
+Libs: -L${libdir} -lmsip
+Libs.private: @MNETUTIL_LIBS@ @MUTIL_LIBS@ @LIBS@
+Cflags: -I${includedir}

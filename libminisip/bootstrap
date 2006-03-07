@@ -1,5 +1,4 @@
 #! /bin/sh
-#! /bin/sh
 
 ##  bootstrap file - borrowed from VideoLAN's libdvdplay 
 ##  original verion by Sam Hocevar <sam@zoy.org>
