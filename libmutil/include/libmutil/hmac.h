@@ -24,7 +24,7 @@
 #ifndef HMAC_H
 #define HMAC_H
 
-#include<libmutil_config.h>
+#include <libmutil/libmutil_config.h>
 
 LIBMUTIL_API void hmac_sha1( unsigned char * key, unsigned int key_length,
                 unsigned char * data, unsigned int data_length,

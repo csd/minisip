@@ -33,6 +33,11 @@
 
 #include<libmutil/itoa.h>
 
+//==================================================================
+//if not win ce, pocket pc ... inherit from iostream and stringbuf
+//otherwise, use an old version of the debug class (release 1923)
+#ifndef _WIN32_WCE
+
 Dbg mout;
 Dbg merr(false);
 Dbg mdbg(true, false);
@@ -114,7 +119,107 @@ void Dbg::setExternalHandler(DbgHandler * dbgHandler )
 
 std::ostream &end(std::ostream &os)
 {
-	return endl( os );
+	#pragma message("eeeeo!")
+	return std::endl( os );
 }
 
-//#endif
+//==================================================================
+//if wince, use the old interface ... ======================
+#else
+
+Dbg mout;
+Dbg merr(false);
+Dbg mdbg(true, false);
+DbgEndl end;
+
+LIBMUTIL_API bool outputStateMachineDebug = false;
+
+Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), debugHandler(NULL){
+}
+
+void Dbg::setEnabled(bool e){
+	enabled = e;
+}
+
+bool Dbg::getEnabled(){
+	return enabled;
+}
+
+Dbg &Dbg::operator<<(std::string s){
+	if (!enabled)
+		return *this;
+	//    std::cerr << "Doing textui output"<< std::endl;
+	
+	if (debugHandler!=NULL){
+		str +=s;
+		if (str[str.size()-1]=='\n'){
+			if (error_out)
+				std::cerr << str << std::flush;
+			else
+				debugHandler->displayMessage(str,0);
+			str="";
+		}
+	}else{
+		if (error_out)
+			std::cerr << s;
+		else
+			std::cout<<s;
+	}
+	return *this;
+}
+
+Dbg &Dbg::operator<<(DbgEndl &){
+
+	if (!enabled)
+		return *this;
+	//    std::cerr << "DbgEndl called"<< std::endl;
+	if (debugHandler!=NULL){
+		str+="\n";
+		(*this)<< "";
+	}else{
+		if (error_out)
+			std::cerr << std::endl;
+		else
+			std::cout << std::endl;
+	}
+
+	return *this;
+}
+
+Dbg& Dbg::operator<<(int i){
+
+	if (!enabled)
+		return *this;
+    
+    if (debugHandler!=NULL)
+        str += itoa(i);
+    else{
+	if (error_out)
+		std::cerr << i;
+	else
+		std::cout << i;
+    }
+    return (*this);
+}
+
+Dbg& Dbg::operator<<(char c){
+
+	if (!enabled)
+		return *this;
+
+	if (debugHandler!=NULL)
+		str += c;
+	else{
+		if (error_out)
+			std::cerr << c;
+		else
+			std::cout << c;
+	}
+	return *this;
+}
+
+void Dbg::setExternalHandler(DbgHandler * debugHandler){
+	this->debugHandler = debugHandler;
+}
+
+#endif

@@ -21,16 +21,23 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+/*
+IMPORTANT ... IT IS TOTALLY USELESS IN WINDOWS SYSTEMS ... SEE THE .CXX FILE
+*/
 
 #ifndef TIMESTAMP_H
 #define TIMESTAMP_H
 
+#ifdef _MSC_VER
+#	pragma message ("Using libmutil::Timestamp.h in windows system ... useless ...")
+#endif
+
+#include <libmutil/libmutil_config.h>
 
 #ifdef _MSC_VER
-
 #else
-#include<stdint.h>
-#include<sys/time.h>
+#	include<stdint.h>
+#	include<sys/time.h>
 #endif
 
 
@@ -69,8 +76,6 @@
 #define TMP	     24
 
 typedef clock_t SystemTime;
-
-#include<libmutil_config.h>
 
 class LIBMUTIL_API Timestamp{
 	public:

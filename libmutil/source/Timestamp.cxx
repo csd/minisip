@@ -21,17 +21,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
-
-#ifndef WIN32
-#ifndef _MSC_VER
-
 #include<config.h>
 
 #include<libmutil/Timestamp.h>
-
-
-
 
 Timestamp ts;
 
@@ -41,84 +33,118 @@ using namespace std;
 
 string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end", "ringing", "packet_in", "packet_out", "tls_start", "tls_end", "dh_precompute_start", "dh_precompute_end", "mikey_create_start", "mikey_create_end", "rand_start", "rand_end", "sign_start", "sign_end", "auth_start", "auth_end",  "mikey_parse_start", "mikey_parse_end", "tgk_start", "tgk_end", "user_accept" ,"tmp"};
 
-Timestamp::Timestamp(){
-	tz = new struct timezone;
-	values = new struct timeval[ MAX_TIMESTAMPS ];
-	strings= new string[ MAX_TIMESTAMPS + 1];
-	ids = new int32_t[MAX_TIMESTAMPS];
-	index = 0;
-	auto_id=-1;
-}
+#ifdef _MSC_VER
+	Timestamp::Timestamp(){}
+#else
+	Timestamp::Timestamp(){
+		tz = new struct timezone;
+		values = new struct timeval[ MAX_TIMESTAMPS ];
+		strings= new string[ MAX_TIMESTAMPS + 1];
+		ids = new int32_t[MAX_TIMESTAMPS];
+		index = 0;
+		auto_id=-1;
+	}
+#endif
 
-Timestamp::~Timestamp(){
-	delete tz;
-	delete [] values;
-	delete [] strings;
-	delete [] ids;
-}
+#ifdef _MSC_VER
+	Timestamp::~Timestamp(){}
+#else
+	Timestamp::~Timestamp(){
+		delete tz;
+		delete [] values;
+		delete [] strings;
+		delete [] ids;
+	}
+#endif
 
-void Timestamp::save( uint32_t id ){
-	ids[index] = id;
-	gettimeofday( &values[index], tz );
-	index = ( index + 1 ) % MAX_TIMESTAMPS;
-	//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
-}
+#ifdef _MSC_VER
+	void Timestamp::save( uint32_t id ){}
+#else
+	void Timestamp::save( uint32_t id ){
+		ids[index] = id;
+		gettimeofday( &values[index], tz );
+		index = ( index + 1 ) % MAX_TIMESTAMPS;
+		//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
+	}
+#endif
 
-void Timestamp::save( string s){
-	ids[index] = auto_id--;
-	if( -(auto_id+1) > MAX_TIMESTAMPS )
-		auto_id = -1;
-//	cerr << "Placing string "<< s << " on index " << -(auto_id+1) << endl;
-	strings[-(auto_id+1)] = s;
-//	cerr << "strings[1]="<<strings[1]<< endl;
-	index = ( index + 1 ) % MAX_TIMESTAMPS;
-	gettimeofday( &values[index], tz );
-	//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
-}
-void Timestamp::print(){
-	uint32_t i;
-	struct timeval temp;
-	ofstream file( FILE_NAME );
-	file << "Saved timestamps: " << endl;
-	temp = values[0];
-	for( i = 0 ; i < index && i < MAX_TIMESTAMPS; i++ ){
-//		cerr << "using string index "<< -ids[i]<< endl;
-		if (ids[i]<0){
-			string val = strings[-ids[i]];
-//			cerr << "will write "<<val<< endl;
-			file << "  " << val << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
-		}else
-			file << "  " << id_names[ ids[i] ] << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
-		temp = values[i];
+#ifdef _MSC_VER
+	void Timestamp::save( string s){}
+#else
+	void Timestamp::save( string s){
+		ids[index] = auto_id--;
+		if( -(auto_id+1) > MAX_TIMESTAMPS )
+			auto_id = -1;
+	//	cerr << "Placing string "<< s << " on index " << -(auto_id+1) << endl;
+		strings[-(auto_id+1)] = s;
+	//	cerr << "strings[1]="<<strings[1]<< endl;
+		index = ( index + 1 ) % MAX_TIMESTAMPS;
+		gettimeofday( &values[index], tz );
+		//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
+	}
+#endif
+
+#ifdef _MSC_VER
+	void Timestamp::print(){}
+#else
+	void Timestamp::print(){
+		uint32_t i;
+		struct timeval temp;
+		ofstream file( FILE_NAME );
+		file << "Saved timestamps: " << endl;
+		temp = values[0];
+		for( i = 0 ; i < index && i < MAX_TIMESTAMPS; i++ ){
+	//		cerr << "using string index "<< -ids[i]<< endl;
+			if (ids[i]<0){
+				string val = strings[-ids[i]];
+	//			cerr << "will write "<<val<< endl;
+				file << "  " << val << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
+			}else
+				file << "  " << id_names[ ids[i] ] << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
+			temp = values[i];
+		}
+	}
+#endif
+
+#ifdef _MSC_VER
+	void Timestamp::init(std::string filename, std::string init_data){}
+#else
+	void Timestamp::init(std::string filename, std::string init_data){
+		this->filename=filename;
+		
+		ofstream file (&filename[0]);
+		//write init_data in file
+		file << init_data << endl;
+		file.close();
+	}
+#endif
+
+#ifdef _MSC_VER
+	void Timestamp::start(){}
+#else
+	void Timestamp::start(){
+		timeval tim;
+		gettimeofday(&tim, NULL);
+		startTime=tim.tv_sec + (tim.tv_usec/1000000.0);
 	}
 
-	
-}
+#endif
 
-void Timestamp::init(std::string filename, std::string init_data){
-	
-	this->filename=filename;
-	
-	ofstream file (&filename[0]);
-	//write init_data in file
-	file << init_data << endl;
-	file.close();
-}
-
-
-void Timestamp::start(){
-	timeval tim;
-	gettimeofday(&tim, NULL);
-	startTime=tim.tv_sec + (tim.tv_usec/1000000.0);
-}
-
-void Timestamp::stop(){
+#ifdef _MSC_VER
+	void Timestamp::stop(){}
+#else
+	void Timestamp::stop(){
 	timeval tim;
 	gettimeofday(&tim, NULL);
 	stopTime=tim.tv_sec + (tim.tv_usec/1000000.0);
 }
 
-string Timestamp::writeElapsedTime(std::string descr){
+#endif
+
+#ifdef _MSC_VER
+	string Timestamp::writeElapsedTime(std::string descr){ return "1"; }
+#else
+	string Timestamp::writeElapsedTime(std::string descr){
 	double elapsedTime = stopTime-startTime;
 	
 	//convert to string
@@ -132,7 +158,5 @@ string Timestamp::writeElapsedTime(std::string descr){
 	file.close();
 	
 	return s_elapsedTime;
-	
 }
-#endif
 #endif

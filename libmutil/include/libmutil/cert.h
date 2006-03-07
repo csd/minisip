@@ -25,16 +25,19 @@
 #ifndef CERT_H
 #define CERT_H
 
+#include <libmutil/libmutil_config.h>
 
-extern "C"{
-	#include<openssl/rsa.h>
-	#include<openssl/evp.h>
-	#include<openssl/objects.h>
-	#include<openssl/x509.h>
-	#include<openssl/err.h>
-	#include<openssl/pem.h>
-	#include<openssl/ssl.h>
-}
+/*Include openssl/err.h before any <list/map/hash/vector> ... it causes 
+compilation under EVC 4.0 to fail, collision between STLPort and Openssl
+.....\minisip.evc4\openssl098a\inc32\openssl\err.h(297) : error C2955: 'hash' : use of class template requires template argument list
+        ....\minisip.evc4\stlport501\stlport\stl\_hash_fun.h(40) : see declaration of 'hash'
+*/
+#ifdef _WIN32_WCE
+//openssl's err.h must be included before ANY <vector/map/list/hash/...> include ...
+//otherwise, it causes some conflict between STLPort and OpenSSL (in MS EVC++ 4.0)
+#	include<openssl/err.h>
+#endif
+#include<openssl/ossl_typ.h> //include only type definitions ... nothing else is needed here
 
 #include<string>
 #include<list>
@@ -42,10 +45,7 @@ extern "C"{
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-#include<libmutil_config.h>
-
 class certificate;
-
 
 #define CERT_DB_ITEM_TYPE_OTHER  0
 #define CERT_DB_ITEM_TYPE_FILE   1

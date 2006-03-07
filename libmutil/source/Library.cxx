@@ -20,7 +20,11 @@ Library::Library(const string &path):path(path){
 	handle = new HMODULE;
 	
 	HMODULE *ptr =(HMODULE*)handle;
+#ifdef _WIN32_WCE
+	*ptr = LoadLibrary( (const unsigned short *)path.c_str() );
+#else
 	*ptr = LoadLibrary( path.c_str() );
+#endif
 #else
 	handle = dlopen(path.c_str(), RTLD_LAZY);
 #ifdef DEBUG_OUTPUT
@@ -51,7 +55,11 @@ void *Library::getFunctionPtr(string name){
 #ifdef USE_WIN32_LIBS
 	massert(sizeof(FARPROC)==sizeof(void*));
 	HMODULE *hptr =(HMODULE*)handle;
+#ifdef _WIN32_WCE
+	return (void*)GetProcAddress(*hptr, (const unsigned short *)name.c_str());
+#else
 	return (void*)GetProcAddress(*hptr, name.c_str());
+#endif
 #else
 	void * ptr = dlsym(handle, name.c_str());
 	return ptr;

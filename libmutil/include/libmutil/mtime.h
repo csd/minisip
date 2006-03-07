@@ -26,9 +26,26 @@
 #ifndef MINISIP_TIME_H
 #define MINISIP_TIME_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<libmutil/mtypes.h>
 
-#include<libmutil_config.h>
+#if defined WIN32 || defined _MSC_VER
+	#include<time.h>
+	#include <sys/timeb.h>
+	/* Emulate gettimeofday (Ulrich Leodolter, 1/11/95).  */
+	struct timezone{
+			int tz_minuteswest;     /* Minutes west of GMT.  */
+			int tz_dsttime;     /* Nonzero if DST is ever in effect.  */
+	};
+
+	#ifdef _WIN32_WCE
+	//MS EVC++ 4.0 defines struct timeval in winsock.h and winsock2.h ... 
+	//it is sad, but we include winsock2.h just to obtain this structure ... 
+		#include<winsock2.h>
+	#endif
+	LIBMUTIL_API void gettimeofday (struct timeval *tv, struct timezone *tz);
+#endif
 
 LIBMUTIL_API uint64_t mtime();
 

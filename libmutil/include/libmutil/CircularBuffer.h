@@ -32,7 +32,7 @@ same (i mean, even writting from scratch, it would look pretty much the same).
 #ifndef _CIRCULARBUFFER_H
 #define _CIRCULARBUFFER_H
 
-#include <libmutil_config.h>
+#include <libmutil/libmutil_config.h>
 
 /**
 A circular buffer for shorts

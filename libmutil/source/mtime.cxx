@@ -34,14 +34,17 @@
 #include<sys/time.h>
 #endif
 
-
-
 LIBMUTIL_API uint64_t mtime(){
-#if defined WIN32 || defined _MSC_VER
-	struct _timeb tb;
-	_ftime (&tb);
 
-	return ((uint64_t)tb.time) * 1000LL + ((uint64_t)tb.millitm);
+#if defined WIN32 || defined _MSC_VER
+	#ifdef _WIN32_WCE
+		struct timeb tb;
+	#else
+		struct _timeb tb;
+	#endif
+		_ftime (&tb);
+
+	return ((uint64_t)tb.time) * (int64_t)1000 + ((uint64_t)tb.millitm);
 #else // FIXME: do a proper check for gettimeofday
 	struct timeval tv;
 
@@ -50,3 +53,22 @@ LIBMUTIL_API uint64_t mtime(){
 	return ((uint64_t)tv.tv_sec) * (uint64_t)1000 + ((uint64_t)tv.tv_usec) / (uint64_t)1000;
 #endif
 }
+
+
+#if defined WIN32 || defined _MSC_VER
+	void gettimeofday (struct timeval *tv, struct timezone *tz){
+		#ifdef _WIN32_WCE
+		struct timeb tb;
+		#else
+		struct _timeb tb;
+		#endif
+		_ftime (&tb);
+
+		tv->tv_sec = tb.time;
+		tv->tv_usec = tb.millitm * 1000L;
+		if( tz ){
+			tz->tz_minuteswest = tb.timezone;	/* minutes west of Greenwich  */
+			tz->tz_dsttime = tb.dstflag;	/* type of dst correction  */
+		}
+	}
+#endif

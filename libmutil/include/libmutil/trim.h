@@ -33,19 +33,16 @@
 
 #ifndef TRIM_H
 #define TRIM_H
-/**
- * @author Erik Eliasson
-*/
 
+#include <libmutil/libmutil_config.h>
+
+#include<string>
 
 /**
  * Removes whitespace from beginning and end of Strings.
  * 	@param s	String from which to remove whitespace (or rather copy and remove whitespace from)
+ * 	@author Erik Eliasson
 */
-#include<string>
-
-#include<libmutil_config.h>
-
 LIBMUTIL_API std::string trim(std::string s);
 
 

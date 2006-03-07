@@ -72,7 +72,7 @@ Semaphore::~Semaphore(){
 	delete (HANDLE*)handlePtr;
 #else
 	if (sem_destroy(SEMHANDLE)){
-		perror("Semaphore::~Semaphore: sem_destroy");
+		merror("Semaphore::~Semaphore: sem_destroy");
 	}
 	delete (sem_t*)handlePtr;
 #endif

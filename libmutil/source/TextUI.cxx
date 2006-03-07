@@ -47,6 +47,9 @@
 #else
 #include<unistd.h>
 #endif
+
+
+#include<libmutil/merror.h>
 #include<libmutil/trim.h>
 #include<libmutil/massert.h>
 
@@ -90,7 +93,7 @@ int TextUI::makeStdinNonblocking(){
 	if (ret < 0) {
 		delete (struct termios*)terminalSavedState;
 		terminalSavedState=NULL;
-		perror("tcgetattr:");
+		merror("tcgetattr:");
 		return -1;
 	}
 	termattr.c_cc[VMIN]=1;
@@ -99,7 +102,7 @@ int TextUI::makeStdinNonblocking(){
 
 	ret = tcsetattr (STDIN_FILENO, TCSANOW, &termattr);
 	if (ret < 0) {
-		perror("tcsetattr");
+		merror("tcsetattr");
 		return -1;
 	}
 	return 0;
@@ -121,7 +124,7 @@ void TextUI::restoreStdinBlocking(){
 	if (terminalSavedState){
 		int ret = tcsetattr (STDIN_FILENO, TCSANOW, (struct termios*)terminalSavedState);
 		if (ret < 0) {
-			perror("tcsetattr");
+			merror("tcsetattr");
 		}
 	}
 #endif	

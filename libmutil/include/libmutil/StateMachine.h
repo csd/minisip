@@ -43,6 +43,8 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<list>
 #include<libmutil/TimeoutProvider.h>
 #include<libmutil/MemObject.h>

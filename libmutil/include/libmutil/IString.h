@@ -19,6 +19,8 @@
 #ifndef _IString_H
 #define _IString_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<libmutil/MemObject.h>
 
 #include<string>

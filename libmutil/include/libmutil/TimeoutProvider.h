@@ -25,6 +25,8 @@
 #ifndef TIMEOUTPROVIDER_H
 #define TIMEOUTPROVIDER_H
 
+#include <libmutil/libmutil_config.h>
+
 /* Name
  *	TimeoutProvider.h
  * Purpose
@@ -44,8 +46,6 @@
 */ 
 
 #include<list>
-
-#include<libmutil_config.h>
 
 #include<libmutil/massert.h>
 #include"Mutex.h"

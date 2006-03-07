@@ -29,7 +29,11 @@ StringAtom::StringAtom(char *b, int len):buf(b),n(len){
 }
 
 StringAtom::StringAtom(std::string s){
+#ifdef _WIN32_WCE
+	buf = _strdup(s.c_str());
+#else
 	buf = strdup(s.c_str());
+#endif
 	n = (int)s.length();
 }
 

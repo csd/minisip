@@ -24,6 +24,8 @@
 #ifndef _LIBRARY_H
 #define _LIBRARY_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
 #include<libmutil/MemObject.h>
 

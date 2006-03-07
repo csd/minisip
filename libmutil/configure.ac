@@ -162,6 +162,6 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile include/libmutil_config.h libmutil.pc win32/libmutil-res.rc])
+AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmutil.pc win32/libmutil-res.rc])
 AC_OUTPUT
 

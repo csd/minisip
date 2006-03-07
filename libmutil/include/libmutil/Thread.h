@@ -25,11 +25,11 @@
 #ifndef EERUNNABLE_H
 #define EERUNNABLE_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
-
-#include<libmutil_config.h>
 
 class LIBMUTIL_API ThreadException : public Exception{
 public:
@@ -109,7 +109,7 @@ public:
 	 *		requestex number of milliseconds.
 	 * @return -1 if error, else otherwise
 	*/
-	static int msleep(int msec);
+	static int msleep(int32_t msec);
 
 private:
 	void *handle_ptr;

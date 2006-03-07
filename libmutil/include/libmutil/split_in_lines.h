@@ -36,8 +36,7 @@
 #include<vector>
 #include<string>
 
-#include<libmutil_config.h>
-
+#include <libmutil/libmutil_config.h>
 
 LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
 

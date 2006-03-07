@@ -546,7 +546,7 @@ void Thread::join(int handle){
 #endif
 }
 
-int Thread::msleep(int ms){
+int Thread::msleep(int32_t ms){
 #ifdef USE_WIN32_THREADS
 	Sleep(ms); //function returns void
 	return 0;

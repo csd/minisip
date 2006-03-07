@@ -19,12 +19,13 @@
 #ifndef _MEXCEPTION_H
 #define _MEXCEPTION_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
 
 #include<libmutil/mtypes.h>
 #include<exception>
 
-#include<libmutil_config.h>
 
 /**
  * A generic exception class that is a good candidate

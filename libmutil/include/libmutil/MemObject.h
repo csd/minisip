@@ -28,6 +28,8 @@
 #ifndef _MEMOBJECT_H
 #define _MEMOBJECT_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
 #include<list>
 
@@ -36,7 +38,6 @@
 
 #include <typeinfo>
 
-#include<libmutil_config.h>
 
 #include<libmutil/minilist.h>
 
@@ -46,8 +47,6 @@
 #ifdef DEBUG_OUTPUT
 #include <typeinfo>  //remove, for debug in ipaq
 #endif
-
-using namespace std;
 
 class Mutex;
 
@@ -295,8 +294,8 @@ void MRef<OPType>::setPointer(const OPType o){
 		if( dynamic_cast<OPType>(o) != NULL ) {
 			objp = o;
 		} else {
-			cerr << "MRef: Trying to use an MRef for a non MObject class" << endl;
-			cerr << "Stack trace: "<< getStackTraceString()<<endl;
+			std::cerr << "MRef: Trying to use an MRef for a non MObject class" << std::endl;
+			std::cerr << "Stack trace: " << getStackTraceString() << std::endl;
 		}	
 	} else { 
 		objp = NULL;
@@ -397,8 +396,10 @@ OPType MRef<OPType>::operator->() const {
 	ret = getPointer();
 	if( ret == NULL ) {
 		#ifdef DEBUG_OUTPUT
-		cerr << "MRef::operator-> : ERROR: trying to access a null pointer (" << typeid(OPType).name() << ")." << endl;
-		cerr << "Stack trace: "<< getStackTraceString()<<endl;
+		std::cerr << "MRef::operator-> : ERROR: trying to access a null pointer (";
+		std::cerr << typeid(OPType).name() << ").";
+		std::cerr << std::endl;
+		std::cerr << "Stack trace: "<< getStackTraceString() << std::endl;
 		#endif
 		assert( ret != NULL );
 	}
@@ -411,8 +412,8 @@ OPType MRef<OPType>::operator*() const{
 	ret = getPointer();
 	if( ret == NULL ) {
 		#ifdef DEBUG_OUTPUT
-		cerr << "MRef::operator* : Warning: accessing a null pointer (" << typeid(OPType).name() << ")." << endl;
-		cerr << "Stack trace: "<< getStackTraceString()<<endl;
+		std::cerr << "MRef::operator* : Warning: accessing a null pointer (" << typeid(OPType).name() << ")." << std::endl;
+		std::cerr << "Stack trace: "<< getStackTraceString() << std::endl;
 		#endif
 	}
 	return getPointer();

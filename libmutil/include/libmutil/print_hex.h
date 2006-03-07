@@ -25,11 +25,9 @@
 #ifndef PRINT_HEX_H
 #define PRINT_HEX_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
-
-
-#include<libmutil_config.h>
-
 
 using namespace std;
 

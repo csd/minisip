@@ -25,11 +25,11 @@
 #ifndef COMMANDSTRING_H
 #define COMMANDSTRING_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<libmutil/MemObject.h>
 #include<string>
 #include<map>
-
-#include<libmutil_config.h>
 
 using namespace std;
 

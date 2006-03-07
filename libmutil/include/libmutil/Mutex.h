@@ -25,8 +25,7 @@
 #ifndef _MUTEX_H
 #define _MUTEX_H
 
-
-#include<libmutil_config.h>
+#include <libmutil/libmutil_config.h>
 
 class LIBMUTIL_API Mutex{
         friend class CondVar; 

@@ -25,6 +25,8 @@
 #ifndef MINILIST_H
 #define MINILIST_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<libmutil/massert.h>
 
 #include<iostream>
@@ -32,22 +34,20 @@
 #define MINILIST_FORWARD_ITERATOR_OPTIMIZE 1
 //#undef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 
-#include<libmutil_config.h>
-
 //#define MINILIST_VALIDATE
 
 //Node for single linked list
 template<class T>
-class node{
+class MiniListNode{
 	public:
-		node(T v, node *next=NULL):value(v), next(next){}
-		node *getNext(){return next;}
-		void setNext(node *n){next = n;}
+		MiniListNode( T v, MiniListNode *next=NULL):value(v), next(next){}
+		MiniListNode * getNext(){ return next;} 
+		void setNext( MiniListNode *n ){ next = n; }
 		T getValue(){return value;}
 		
 	private:
 		T value;
-		node *next;
+		MiniListNode *next;
 		
 };
 
@@ -84,11 +84,11 @@ class minilist{
 		{
 			head=end=NULL;
 			nelem = l2.nelem;
-			node<T> *l2cur=l2.head;
-			node<T> *last=NULL;
+			MiniListNode<T> *l2cur=l2.head;
+			MiniListNode<T> *last=NULL;
 			
 			for (int i=0; i< nelem; i++){
-				node<T> *tmp = new node<T>( l2cur->getValue(), NULL ) ;
+				MiniListNode<T> *tmp = new MiniListNode<T>( l2cur->getValue(), NULL ) ;
 				if (i==0)
 					head = tmp;
 				if (i==nelem-1)
@@ -112,9 +112,9 @@ class minilist{
 		 * the list.
 		 */
 		void empty(){
-			node<T> *cur = head;
+			MiniListNode<T> *cur = head;
 			while (cur){
-				node<T> *tmp = cur;
+				MiniListNode<T> *tmp = cur;
 				cur = cur->getNext();
 				delete tmp;
 			}
@@ -130,7 +130,7 @@ class minilist{
 				last_index++;
 #endif
 			nelem++;
-			node<T> *n = new node<T>(item, NULL);
+			MiniListNode<T> *n = new MiniListNode<T>(item, NULL);
 			n->setNext(head);
 			head = n;
 			if (end==NULL)
@@ -143,7 +143,7 @@ class minilist{
 		 */
 		void push_back(T item){
 			nelem++;
-			node<T> *n = new node<T>(item, NULL);
+			MiniListNode<T> *n = new MiniListNode<T>(item, NULL);
 			if (head==NULL){
 				head=end=n;
 			}else{
@@ -170,7 +170,7 @@ class minilist{
 				head = end = NULL;
 				return ret;
 			}
-			node<T> *cur = head;
+			MiniListNode<T> *cur = head;
 			for (int i=0; i<nelem-1; i++)
 				cur = cur->getNext();
 			cur->setNext(NULL);
@@ -191,7 +191,7 @@ class minilist{
 			
 			if (size()==0 && i==0){ // only item
 				nelem++;
-				node<T> *n = new node<T>(item, NULL);
+				MiniListNode<T> *n = new MiniListNode<T>(item, NULL);
 				head = end = n;
 #ifdef MINILIST_VALIDATE
 				validate();
@@ -201,8 +201,8 @@ class minilist{
 
 			if (i==0){	// first, not only
 				nelem++;
-				node<T> *n = new node<T>(item, head);
-//				node<T> *old_first = head;
+				MiniListNode<T> *n = new MiniListNode<T>(item, head);
+//				MiniListNode<T> *old_first = head;
 				head = n;
 #ifdef MINILIST_VALIDATE
 				validate();
@@ -212,17 +212,17 @@ class minilist{
 
 			if (i==size()){ // last, not only
 				nelem++;
-				node<T> *n = new node<T>(item, NULL);
+				MiniListNode<T> *n = new MiniListNode<T>(item, NULL);
 				end->setNext(n);
 				end = n;
 				return;
 			}else{
-				node<T> *cur =head;
+				MiniListNode<T> *cur =head;
 				for (int j=0; j<i-1; j++)
 					cur = cur->getNext();
 
 				nelem++;
-				node<T> *n = new node<T>(item, cur->getNext() );
+				MiniListNode<T> *n = new MiniListNode<T>(item, cur->getNext() );
 				cur->setNext(n);
 			}
 #ifdef MINILIST_VALIDATE
@@ -259,14 +259,14 @@ class minilist{
 			//if first item
 			if (index==0){
 				nelem--;
-				node<T> *tmp=head;
+				MiniListNode<T> *tmp=head;
 				head = head->getNext();
 				delete tmp;
 				return;
 			}
 			//middle or last
-			node<T> *cur=head;
-			node<T> *prev=head;
+			MiniListNode<T> *cur=head;
+			MiniListNode<T> *prev=head;
 			for (int i=0; i<index; i++){
 				prev = cur;
 				cur=cur->getNext();
@@ -280,7 +280,7 @@ class minilist{
 
 #ifdef MINILIST_VALIDATE
 		void validate(){
-			node<T> *cur = head;
+			MiniListNode<T> *cur = head;
 			int i;
 			
 			for (i=0; i<nelem; i++){
@@ -324,11 +324,11 @@ class minilist{
 
 		minilist &operator=(const minilist &l2) {
 			nelem = l2.nelem;
-			node<T> *l2cur=l2.head;
-			node<T> *last=NULL;
+			MiniListNode<T> *l2cur=l2.head;
+			MiniListNode<T> *last=NULL;
 			
 			for (int i=0; i< nelem; i++){
-				node<T> *tmp = new node<T>( l2cur->getValue(), l2cur->getNext() ) ;
+				MiniListNode<T> *tmp = new MiniListNode<T>( l2cur->getValue(), l2cur->getNext() ) ;
 				if (i==0)
 					head = tmp;
 				if (i==nelem-1)
@@ -343,7 +343,7 @@ class minilist{
 
 		
 		T operator[](int i){
-			node<T> *cur = head;
+			MiniListNode<T> *cur = head;
 			massert(i>=0 && i<size());
 			
 			int j=0;
@@ -367,12 +367,12 @@ class minilist{
 		}
 		
 	private:
-		node<T> *head;
-		node<T> *end;
+		MiniListNode<T> *head;
+		MiniListNode<T> *end;
 		int nelem;
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
 		int last_index;
-		node<T> *last_node;
+		MiniListNode<T> *last_node;
 #endif
 };
 

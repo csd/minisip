@@ -19,10 +19,7 @@
 #ifndef MPLUGIN_H
 #define MPLUGIN_H
 
-
-
-
-
+#include <libmutil/libmutil_config.h>
 
 #include<string>
 #include<libmutil/mtypes.h>

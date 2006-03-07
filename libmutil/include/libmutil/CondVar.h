@@ -24,9 +24,9 @@
 #ifndef COND_VAR_H
 #define COND_VAR_H
 
-#include<libmutil/mtypes.h>
+#include <libmutil/libmutil_config.h>
 
-#include<libmutil_config.h>
+#include<libmutil/mtypes.h>
 
 #include<string>
 #include<libmutil/MemObject.h>

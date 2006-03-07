@@ -28,7 +28,7 @@
 
 //#include<stdint.h>
 
-#include<libmutil_config.h>
+#include <libmutil/libmutil_config.h>
 
 
 #include<string>

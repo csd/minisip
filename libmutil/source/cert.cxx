@@ -22,13 +22,24 @@
 */
 
 #include<config.h>
+
 #include<libmutil/cert.h>
 
+extern "C"{
+	#include<openssl/rsa.h>
+	#include<openssl/evp.h>
+	#include<openssl/objects.h>
+	#include<openssl/x509.h>
+	#include<openssl/err.h>
+	#include<openssl/pem.h>
+	#include<openssl/ssl.h>
+}
 
-#include<iostream>
+
 #include<stdio.h>
 #include<assert.h>
 
+#include<iostream>
 
 using namespace std;
 

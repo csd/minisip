@@ -27,6 +27,8 @@
 #ifndef _DBG_H
 #define _DBG_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
 #include<iostream>
 #include<sstream>
@@ -34,53 +36,106 @@
 #define DBG_INFO 0
 #define DBG_ERROR 1
 
-#include<libmutil_config.h>
+//==================================================================
+//if not win ce, pocket pc ... inherit from iostream and stringbuf
+//otherwise, use an old version of the debug class (release 1923)
+#ifndef _WIN32_WCE
 
-class LIBMUTIL_API DbgHandler{
-	public:
-		virtual ~DbgHandler(){}
-	private:
-		virtual void displayMessage(std::string output,int style=-1)=0;
-		friend class Dbg;
-		friend class DbgBuf;
-};
+	class LIBMUTIL_API DbgHandler {
+		public:
+			virtual ~DbgHandler(){}
+		private:
+			virtual void displayMessage(std::string output,int style=-1)=0;
+			friend class Dbg;
+			friend class DbgBuf;
+	};
 
-class LIBMUTIL_API DbgBuf: public std::stringbuf{
-	public:
-		DbgBuf( DbgHandler * dbgHandler );
-		virtual ~DbgBuf();
-		virtual void setExternalHandler(DbgHandler * dbgHandler);
-	protected:
-		virtual int sync();
-	private:
-		DbgHandler * debugHandler;
-};
+	class LIBMUTIL_API DbgBuf : public std::stringbuf {
+		public:
+			DbgBuf( DbgHandler * dbgHandler );
+			virtual ~DbgBuf();
+			virtual void setExternalHandler(DbgHandler * dbgHandler);
+		protected:
+			virtual int sync();
+		private:
+			DbgHandler * debugHandler;
+	};
 
-class LIBMUTIL_API Dbg: public std::ostream{
-    public:
-	Dbg(bool error_output=false, bool enabled=true);
-	virtual ~Dbg();
-	void setEnabled(bool enabled);
-	bool getEnabled();
-	void setExternalHandler(DbgHandler * dbgHandler);
+	class LIBMUTIL_API Dbg: public std::ostream {
+		public:
+		Dbg(bool error_output=false, bool enabled=true);
+		virtual ~Dbg();
+		void setEnabled(bool enabled);
+		bool getEnabled();
+		void setExternalHandler(DbgHandler * dbgHandler);
 
-    protected:
-	void updateBuf();
+		protected:
+		void updateBuf();
 
-    private:
-	bool error_out;
-	bool enabled;
-	bool external_out;
-	DbgBuf dbgBuf;
-};
+		private:
+		bool error_out;
+		bool enabled;
+		bool external_out;
+		DbgBuf dbgBuf;
+	};
 
 
-extern LIBMUTIL_API Dbg mout;
-extern LIBMUTIL_API Dbg merr;
-extern LIBMUTIL_API Dbg mdbg;
-extern LIBMUTIL_API std::ostream &end(std::ostream &os);
+	extern LIBMUTIL_API Dbg mout;
+	extern LIBMUTIL_API Dbg merr;
+	extern LIBMUTIL_API Dbg mdbg;
 
-extern LIBMUTIL_API bool outputStateMachineDebug;
+	extern LIBMUTIL_API bool outputStateMachineDebug;
+	
+	extern LIBMUTIL_API std::ostream &end(std::ostream &os);
+
+//==================================================================
+//if wince, use the old interface ... ======================
+#else
+
+	class LIBMUTIL_API DbgEndl{
+		public:
+			DbgEndl(){}
+		private:
+			int i;
+	};
+
+	class LIBMUTIL_API DbgHandler{
+		public:
+			virtual ~DbgHandler(){}
+		private:
+			virtual void displayMessage(std::string output,int style=-1)=0;
+			friend class Dbg;
+	};
+
+	class LIBMUTIL_API Dbg{
+		public:
+			static const DbgEndl endl;
+			Dbg(bool error_output=false, bool enabled=true);
+
+			Dbg &operator<<(std::string);
+			Dbg &operator<<(int);
+			Dbg &operator<<(char);
+			Dbg &operator<<(DbgEndl &endl);
+
+			void setEnabled(bool enabled);
+			bool getEnabled();
+			void setExternalHandler(DbgHandler * dbgHandler);
+
+		private:
+			bool error_out;
+			bool enabled;
+			std::string str;
+			DbgHandler * debugHandler;
+	};
+
+	extern LIBMUTIL_API Dbg mout;
+	extern LIBMUTIL_API Dbg merr;
+	extern LIBMUTIL_API Dbg mdbg;
+	extern LIBMUTIL_API DbgEndl end;
+
+	extern LIBMUTIL_API bool outputStateMachineDebug;
+
+#endif
 
 #endif
 

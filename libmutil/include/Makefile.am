@@ -30,12 +30,10 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/CommandString.h \
 			libmutil/XMLParser.h \
 			libmutil/MPlugin.h \
+			libmutil/libmutil_config.h \
 			libmutil/CircularBuffer.h
 
 includepkglibdir =      $(pkglibdir)/include
-
-nodist_includepkglib_HEADERS = \
-			libmutil_config.h
 
 noinst_HEADERS = 	config.h \
 			libmutil/rijndael-alg-fst.h

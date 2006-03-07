@@ -123,21 +123,15 @@ Mutex::~Mutex(){
 
 void Mutex::lock(){
 #ifdef USE_POSIX_THREADS
-	    
-	    int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
-	    if (ret!=0){
-	    	perror("pthread_mutex_lock");
+	int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
+	if (ret!=0){
+		merror("pthread_mutex_lock");
 		exit(1);
-	    }
-	    
+	}
 #elif defined USE_WIN32_THREADS
-	    if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
-	    	merror("Mutex::lock: WaitForSingleObject");
-	    }
-#elif defined WINCE
-	    if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
-	    	merror("Mutex::lock: WaitForSingleObject");
-	    }
+	if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
+		merror("Mutex::lock: WaitForSingleObject");
+	}
 #endif
 
 }
@@ -147,7 +141,7 @@ void Mutex::unlock(){
 	
 	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
 	if (ret!=0){
-		perror("pthread_mutex_unlock");
+		merror("pthread_mutex_unlock");
 		exit(1);
 	}
 

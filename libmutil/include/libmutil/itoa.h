@@ -34,11 +34,12 @@
 #ifndef ITOA_H
 #define ITOA_H
 
+#include <libmutil/libmutil_config.h>
+
 #include<string>
+#include<libmutil/mtypes.h>
 
-#include<libmutil_config.h>
-
-LIBMUTIL_API std::string itoa(int i);
+LIBMUTIL_API std::string itoa(int64_t i);
 
 #endif
 
