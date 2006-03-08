@@ -33,6 +33,9 @@
 #if defined WIN32 || defined _MSC_VER
 	#include<time.h>
 	#include <sys/timeb.h>
+	#ifdef __MINGW32__
+	#	include<sys/time.h>
+	#endif
 	/* Emulate gettimeofday (Ulrich Leodolter, 1/11/95).  */
 	struct timezone{
 			int tz_minuteswest;     /* Minutes west of GMT.  */
