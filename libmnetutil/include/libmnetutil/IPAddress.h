@@ -34,11 +34,8 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
-#ifdef _WIN32_WCE
+#ifdef WIN32
 	#include <winsock2.h>
-	#include <ws2tcpip.h>
-#elif defined _MS_VER
-	#include<winsock2.h>
 	#ifdef HAVE_WS2TCPIP_H
 		# include<ws2tcpip.h>
 	#endif
