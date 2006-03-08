@@ -33,7 +33,7 @@ using namespace std;
 
 string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end", "ringing", "packet_in", "packet_out", "tls_start", "tls_end", "dh_precompute_start", "dh_precompute_end", "mikey_create_start", "mikey_create_end", "rand_start", "rand_end", "sign_start", "sign_end", "auth_start", "auth_end",  "mikey_parse_start", "mikey_parse_end", "tgk_start", "tgk_end", "user_accept" ,"tmp"};
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	Timestamp::Timestamp(){}
 #else
 	Timestamp::Timestamp(){
@@ -46,7 +46,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	Timestamp::~Timestamp(){}
 #else
 	Timestamp::~Timestamp(){
@@ -57,7 +57,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::save( uint32_t id ){}
 #else
 	void Timestamp::save( uint32_t id ){
@@ -68,7 +68,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::save( string s){}
 #else
 	void Timestamp::save( string s){
@@ -84,7 +84,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::print(){}
 #else
 	void Timestamp::print(){
@@ -106,7 +106,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::init(std::string filename, std::string init_data){}
 #else
 	void Timestamp::init(std::string filename, std::string init_data){
@@ -119,7 +119,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::start(){}
 #else
 	void Timestamp::start(){
@@ -130,7 +130,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	void Timestamp::stop(){}
 #else
 	void Timestamp::stop(){
@@ -141,7 +141,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 	string Timestamp::writeElapsedTime(std::string descr){ return "1"; }
 #else
 	string Timestamp::writeElapsedTime(std::string descr){

@@ -28,13 +28,13 @@ IMPORTANT ... IT IS TOTALLY USELESS IN WINDOWS SYSTEMS ... SEE THE .CXX FILE
 #ifndef TIMESTAMP_H
 #define TIMESTAMP_H
 
-#ifdef _MSC_VER
+#ifdef WIN32
 #	pragma message ("Using libmutil::Timestamp.h in windows system ... useless ...")
 #endif
 
 #include <libmutil/libmutil_config.h>
 
-#ifdef _MSC_VER
+#ifdef WIN32
 #else
 #	include<stdint.h>
 #	include<sys/time.h>
