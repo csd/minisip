@@ -21,14 +21,14 @@ libmutil_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
 if HAVE_PTHREAD
-thread_src = 	source/PosixCondVar.cxx \
-	 	source/PosixMutex.cxx \
-		source/PosixSemaphore.cxx
+thread_src = 	source/CondVarPosix.cxx \
+	 	source/MutexPosix.cxx \
+		source/SemaphorePosix.cxx
 else
 if OS_WIN
-thread_src = 	source/Win32CondVar.cxx \
-		source/Win32Mutex.cxx \
-		source/Win32Semaphore.cxx
+thread_src = 	source/CondVarWin32.cxx \
+		source/MutexWin32.cxx \
+		source/SemaphoreWin32.cxx
 endif OS_WIN
 endif !HAVE_PTHREAD
 
