@@ -36,83 +36,33 @@ using namespace std;
 #include<libmutil/dbg.h>
 
 
-#if defined WIN32 || defined _MSC_VER
-#include<windows.h>
-#define SEMHANDLE (*((HANDLE*)(handlePtr)))
-#else
 #include<semaphore.h>
 #define SEMHANDLE (((sem_t*)(handlePtr)))
-#endif
 
 
 Semaphore::Semaphore(){
-	
-#ifdef WIN32
-	handlePtr = (void*) new HANDLE;
-	SEMHANDLE = CreateSemaphore(NULL, 0, 1000, NULL);
-	if (SEMHANDLE == NULL){
-		merror("Semaphore::Semaphore: CreateSemaphore");
-		throw SemaphoreException();
-	}
-#else
 	handlePtr = (void*) new sem_t;
 	if (sem_init( SEMHANDLE, 0, 0)){
 		merror("Semaphore::Semaphore: CreateSemaphore");
 		throw SemaphoreException();
 	}
-	
-#endif
 }
  
 Semaphore::~Semaphore(){
-#ifdef WIN32
-	if (!CloseHandle(SEMHANDLE)){
-		merror("Semaphore::~Semaphore: CloseHandle");
-	}
-	delete (HANDLE*)handlePtr;
-#else
 	if (sem_destroy(SEMHANDLE)){
 		merror("Semaphore::~Semaphore: sem_destroy");
 	}
 	delete (sem_t*)handlePtr;
-#endif
 }
 
 void Semaphore::inc(){
-#ifdef WIN32
-
-	if (!ReleaseSemaphore(SEMHANDLE, 1, NULL)){
-		merror("Semaphore::inc: ReleaseSemaphore");
-		throw SemaphoreException();
-	}
-	
-#else
 	if( sem_post( SEMHANDLE ) ){
 		merror("Semaphore::inc: sem_post");
 		throw SemaphoreException();
 	}
-#endif
 }
 
 void Semaphore::dec(){
-#ifdef WIN32
-	int dwWaitResult = WaitForSingleObject( 
-			SEMHANDLE,   // handle to semaphore
-			INFINITE);          // zero-second time-out interval
-
-	switch (dwWaitResult) 
-	{ 
-	case WAIT_OBJECT_0: 
-		// OK .
-		break; 
-
-	case WAIT_TIMEOUT: 
-		merror("Semaphore::dec: WaitForSingleObject");
-		throw SemaphoreException();
-		break; 
-	}
-
-#else
 	while( sem_wait( SEMHANDLE ) ){
 		switch( errno ){
 			case EINTR:
@@ -122,6 +72,4 @@ void Semaphore::dec(){
 				throw SemaphoreException();
 		}
 	}
-	
-#endif
 }

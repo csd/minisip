@@ -98,6 +98,10 @@ AC_ARG_ENABLE(memdebug,
         AC_DEFINE(MDEBUG, [], [Debug memory])
       fi ])
 
+AC_ARG_WITH(pthread,
+        [AS_HELP_STRING([--with-pthread],
+                [location of the pthread library])],
+        [pthread_path=$withval], [pthread_path="yes"])
 
 
 dnl OpenSSL libcrypto
@@ -126,8 +130,69 @@ fi
 AC_SUBST(HAVE_OPENSSL_AES_H)
 
 
-dnl FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB([pthread], [pthread_attr_init])
+dnl
+dnl pthread
+dnl
+have_pthread="no"
+if test ! x$pthread_path = xno; then
+
+   cf_save_CPPFLAGS="${CPPFLAGS}"
+   cf_save_LDFLAGS="${LDFLAGS}"
+   cf_save_LIBS="${LIBS}"
+
+   if test ! x$pthread_path = xyes; then
+      CPPFLAGS="${CPPFLAGS} -I${pthread_path}"
+      LDFLAGS="${LDFLAGS} -L${pthread_path}"
+   fi
+
+   dnl Pthreads-win32 depends on Windows libraries, check first
+   if test x$os_win = xyes; then
+      dnl Check for Pthreads-win32 begin
+
+      have_pthread=yes
+      AC_CHECK_LIB([winmm], [main])
+      AC_CHECK_LIB([wsock32], [main])
+
+      AC_SEARCH_LIBS([pthread_mutex_init], [pthreadGCE2 pthreadGCE1 pthreadGCE],, [have_pthread=no])
+      AC_CHECK_HEADERS([pthread.h semaphore.h],,[have_pthread=no])
+
+   dnl Check for Pthreads-win32 end
+   else
+      dnl Check for native pthread begin
+      have_pthread=yes
+
+      AC_CHECK_LIB([pthread], [pthread_attr_init],,[have_pthread=no])
+      AC_CHECK_HEADERS([pthread.h semaphore.h],,[have_pthread=no])
+
+      PTHREAD_CFLAGS="-D_REENTRANT"
+      dnl Check for native pthread end
+   fi
+
+   if test x$have_pthread = xno; then
+      LIBS="${cf_save_LIBS}"
+   fi
+   CPPFLAGS="${cf_save_CPPFLAGS}"
+   LDFLAGS="${cf_save_LDFLAGS}"
+fi
+
+if test x$have_pthread = xyes; then
+   if test ! x$pthread_path = xyes; then
+      PTHREAD_CFLAGS="${PTHREAD_CFLAGS} -I${pthread_path}"
+      PTHREAD_LIBS="-L${pthread_path}"
+      PTHREAD_PATH="${pthread_path}"
+   fi
+else
+   if test ! x$os_win = xyes; then
+      AC_MSG_ERROR([POSIX thread library and headers are required.])
+   fi
+fi
+
+AC_SUBST(PTHREAD_CFLAGS)
+AC_SUBST(PTHREAD_LIBS)
+AC_SUBST(PTHREAD_PATH)
+
+AM_CONDITIONAL(HAVE_PTHREAD, test "${have_pthread}" = "yes")
+
 dnl FIXME: Replace `main' with a function in `-ldl':
 AC_CHECK_LIB([dl], [dlopen])
 

@@ -1,4 +1,4 @@
-	/*
+/*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   
   This library is free software; you can redistribute it and/or
@@ -34,12 +34,8 @@
 // BSD 5.x: malloc.h has been replaced by stdlib.h
 // #include<malloc.h>
 
-#if defined _MSC_VER || __MINGW32__
-#include<windows.h>
-# define USE_WIN32_THREADS
-#elif HAVE_PTHREAD_H
+#if HAVE_PTHREAD_H
 #include<pthread.h>
-# define USE_POSIX_THREADS
 #endif
 
 #include<iostream>
@@ -60,99 +56,32 @@ Mutex& Mutex::operator=(const Mutex &){
 }
 
 Mutex::Mutex(const Mutex &){
-#ifdef _MSC_VER
-	massert(sizeof(HANDLE)==sizeof(int));
-#endif
 	createMutex();
 }
 
 void Mutex::createMutex(){
-#ifdef USE_POSIX_THREADS
-#define MINISIP_MUTEX_IMPLEMENTED
 	handle_ptr = new pthread_mutex_t;
 	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
-
-#elif defined USE_WIN32_THREADS
-#define MINISIP_MUTEX_IMPLEMENTED
-	handle_ptr = new HANDLE;
-	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
-	if (handle_ptr==NULL){  //TODO: handle better
-		merror("Mutex::createMutex: CreateMutex");
-		exit(1);
-	}else{
-
-	}
-
-#elif defined WINCE
-#define MINISIP_MUTEX_IMPLEMENTED
-	handle_ptr = malloc(1, sizeof(HANDLE));
-	*((HANDLE*)handle_ptr) = CreateMutex(NULL, FALSE, NULL);
-	if (hMutex==NULL){  //TODO: handle better
-		merror("Mutex::createMutex: CreateMutex");
-		exit(1);
-	}else{
-
-	}
-#endif
-
-#ifndef MINISIP_MUTEX_IMPLEMENTED
-#error Mutex not fully implemented
-#endif
-
 }
 
 Mutex::~Mutex(){
-
-#ifdef USE_POSIX_THREADS
 	pthread_mutex_destroy((pthread_mutex_t*)handle_ptr);
 	delete (pthread_mutex_t*)handle_ptr;
-
-#elif defined USE_WIN32_THREADS
-	if (!CloseHandle(*((HANDLE*)handle_ptr))){
-		merror("Mutex::~Mutex: CloseHandle");
-		massert(1==0); //TODO: Handle better - exception
-	}
-	delete (HANDLE*)handle_ptr;
-
-#elif defined WINCE
-#error Mutex delete not implemented
-#endif
-	
 }
 
 
 void Mutex::lock(){
-#ifdef USE_POSIX_THREADS
 	int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
 	if (ret!=0){
 		merror("pthread_mutex_lock");
 		exit(1);
 	}
-#elif defined USE_WIN32_THREADS
-	if (WaitForSingleObject(*((HANDLE*)handle_ptr),INFINITE)==WAIT_FAILED){
-		merror("Mutex::lock: WaitForSingleObject");
-	}
-#endif
-
 }
 
 void Mutex::unlock(){
-#ifdef USE_POSIX_THREADS
-	
 	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
 	if (ret!=0){
 		merror("pthread_mutex_unlock");
 		exit(1);
 	}
-
-#elif defined USE_WIN32_THREADS
-	if (!ReleaseMutex( *( (HANDLE*)handle_ptr) )){
-		merror("Mutex::unlock: ReleaseMutex:");
-		massert(1==0); // Could not release mutex TODO: Handle better - exception
-	}
-
-#elif defined WINCE
-	    ReleaseMutex(*((HANDLE*)handle_ptr));
-#endif
 }
-

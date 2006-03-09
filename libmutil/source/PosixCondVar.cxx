@@ -26,66 +26,33 @@
 #include<libmutil/CondVar.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/merror.h>
-#if defined WIN32
-
-#include<windows.h>
-
-#define INTERNAL_COND_WAIT ((HANDLE *)internalStruct)
-#define INTERNAL_MUTEX ((HANDLE *)internalMutexStruct)
-#if defined _MSC_VER || __MINGW32__
-# define USE_WIN32_THREADS
-#endif
-
-#elif defined HAVE_PTHREAD_H
+#include<libmutil/mtime.h>
+#if defined HAVE_PTHREAD_H
 #include<pthread.h>
 #include<sys/time.h>
 #include<time.h>
 
 #define INTERNAL_COND_WAIT ((pthread_cond_t *)internalStruct)
 #define INTERNAL_MUTEX ((pthread_mutex_t *)internalMutexStruct)
-#define USE_POSIX_THREADS
 
 #endif
 
 
 CondVar::CondVar(){
-#ifdef USE_POSIX_THREADS
-#define MINISIP_CONDVAR_IMPLEMENTED
 	condvarMutex = new Mutex;
 	internalStruct = new pthread_cond_t;
 
 	pthread_cond_init( INTERNAL_COND_WAIT, NULL );
-#elif defined WIN32
-#define MINISIP_CONDVAR_IMPLEMENTED
-	internalStruct = new HANDLE;
-	if ( (*INTERNAL_COND_WAIT = CreateEvent( NULL, TRUE, FALSE, NULL ))==NULL){
-		merror("CondVar::CondVar: CreateEvent");
-	}
-#endif
-
-
-#ifndef MINISIP_CONDVAR_IMPLEMENTED
-#error CondVar not fully implemented
-#endif
 }
 
 CondVar::~CondVar(){
-#ifdef USE_POSIX_THREADS
 	delete condvarMutex;
 	condvarMutex=NULL;
 	pthread_cond_destroy( INTERNAL_COND_WAIT );
 	delete INTERNAL_COND_WAIT;
-#elif defined WIN32
-	if (!CloseHandle( *INTERNAL_COND_WAIT )){
-		merror("CondVar::~CondVar: CloseHandle");
-	}
-	delete (HANDLE *)internalStruct;
-	internalStruct=NULL;
-#endif
 }
 
 void CondVar::wait( uint32_t timeout ){
-#ifdef USE_POSIX_THREADS
 	condvarMutex->lock();
 	if( timeout == 0 ){
 		pthread_cond_wait( INTERNAL_COND_WAIT, (pthread_mutex_t*)(condvarMutex->handle_ptr) );
@@ -110,33 +77,11 @@ void CondVar::wait( uint32_t timeout ){
 				&ts );
 	}
 	condvarMutex->unlock();
-				
-#elif defined WIN32
-	if( timeout == 0 ){
-		if (WaitForSingleObject(*INTERNAL_COND_WAIT, INFINITE)==WAIT_FAILED){
-			merror("CondVar::wait: WaitForSingleObject");
-		}
-	}
-	else{
-		if (WaitForSingleObject(*INTERNAL_COND_WAIT, timeout)==WAIT_FAILED){
-			merror("CondVar::wait: WaitForSingleObject");
-		}
-	}
-#endif
 }
 
 void CondVar::broadcast(){
-#ifdef USE_POSIX_THREADS
 	condvarMutex->lock();
 	pthread_cond_broadcast( INTERNAL_COND_WAIT );
 	condvarMutex->unlock();
-#elif defined WIN32
-	if (!SetEvent(*INTERNAL_COND_WAIT)){
-		merror("CondVar::broadcast: SetEvent");
-	}
-	if (!ResetEvent(*INTERNAL_COND_WAIT)){
-		merror("CondVar::broadcast: ResetEvent");
-	}
-#endif
 }
 
