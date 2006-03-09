@@ -29,7 +29,10 @@ IMPORTANT ... IT IS TOTALLY USELESS IN WINDOWS SYSTEMS ... SEE THE .CXX FILE
 #define TIMESTAMP_H
 
 #ifdef WIN32
-#	pragma message ("Using libmutil::Timestamp.h in windows system ... useless ...")
+	//do not alert in mingw32 ... i don't know the equivalent pragma message ...
+#	ifndef __MINGW32__
+#		pragma message ("Using libmutil::Timestamp.h in windows system ... useless ...")
+#	endif
 #endif
 
 #include <libmutil/libmutil_config.h>
