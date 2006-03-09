@@ -83,13 +83,13 @@ class SpeexCodec : public AudioCodec{
 		
 		virtual int32_t getInputNrSamples();
 		
-		virtual string getCodecName();
+		virtual std::string getCodecName();
 		
-		virtual string getCodecDescription();
+		virtual std::string getCodecDescription();
 
 		virtual uint8_t getSdpMediaType();
 
-		virtual string getSdpMediaAttributes();
+		virtual std::string getSdpMediaAttributes();
 		
 };
 

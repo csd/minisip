@@ -20,8 +20,6 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifdef HAS_SPEEX
-
 #include"SPEEXCODEC.h"
 #include<iostream>
 
@@ -154,6 +152,4 @@ MRef<CodecState *> SpeexCodec::newInstance(){
 	ret->setCodec( this );
 	return ret;
 }
-
-#endif
 
