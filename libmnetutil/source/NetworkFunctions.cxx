@@ -84,17 +84,20 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	IP_ADAPTER_INFO         *pAdapterInfo;
 	IP_ADAPTER_INFO         *pAdapter;
 
-	pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+	pAdapterInfo = (IP_ADAPTER_INFO *) calloc( 1, sizeof(IP_ADAPTER_INFO) );
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
 	if ((dwRetVal=GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != ERROR_SUCCESS) {
-		GlobalFree (pAdapterInfo);
-		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+		//GlobalFree (pAdapterInfo);
+		free(pAdapterInfo);
+		
+		pAdapterInfo = (IP_ADAPTER_INFO *) calloc (1, ulOutBufLen);
+
+		if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
+			printf("Call to GetAdaptersInfo failed.\n");
+		}
 	}
 
-	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
-		printf("Call to GetAdaptersInfo failed.\n");
-	}
 	pAdapter = pAdapterInfo;
 
 
@@ -174,23 +177,24 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 	IP_ADAPTER_INFO         *pAdapterInfo;
 	IP_ADAPTER_INFO         *pAdapter;
 
-	pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+	pAdapterInfo = (IP_ADAPTER_INFO *) calloc( 1, sizeof(IP_ADAPTER_INFO) );
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) != ERROR_SUCCESS) {
 		//We fail once to find out the buffer size
-		GlobalFree (pAdapterInfo);
-		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
-	}
-
-	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
-		printf("Call to GetAdaptersInfo failed.\n");
+		free (pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) calloc (1,ulOutBufLen);
+		
+		if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) != NO_ERROR) {
+			printf("Call to GetAdaptersInfo failed.\n");
+		}
 	}
 	pAdapter = pAdapterInfo;
 
 	while (pAdapter) {
 		if (pAdapter->AdapterName==iface){
-			ret = pAdapter->IpAddressList.IpAddress.String;
+			string tmp =pAdapter->IpAddressList.IpAddress.String;
+			ret=tmp;
 		}
 		pAdapter = pAdapter->Next;
 	}
