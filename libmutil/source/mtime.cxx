@@ -30,6 +30,7 @@
 
 #if ((defined WIN32) || (defined _MSC_VER))
 #include <sys/timeb.h>
+#include <winsock2.h>
 #else
 #include<sys/time.h>
 #endif
