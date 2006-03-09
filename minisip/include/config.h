@@ -58,8 +58,9 @@
 #	ifndef _WIN32_WINNT
 #		define _WIN32_WINNT 0x0500
 #	endif
-
-//#	pragma warning (disable: 4251)
+	
+	//warning message: class member needs to have dll-interface to be used by clients of class 'XXX'
+#	pragma warning (disable: 4251)
 
 #	ifdef __MINGW32__
 #		define WINVER 0x0500

@@ -117,7 +117,7 @@ string MXmlConfBackend::getDefaultConfigFilename(){
                 merr << "WARNING: Could not determine home directory"<<end;
 
 #ifdef WIN32
-                ret = string("c:\\minisip.conf");
+                ret = string("c:\\minisip\\minisip.conf");
 #else
                 ret = string("/.minisip.conf");
 #endif

@@ -532,14 +532,14 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
 	string phonebookFileName;
-	char *home;
+	char *home = NULL;
 #ifndef _WIN32_WCE
 	home= getenv("HOME");
 #endif	
 	if (home==NULL){
 			merr << "WARNING: Could not determine home directory"<<end;
 		#ifdef WIN32
-			phonebookFileName = string("c:\\minisip.addr");
+			phonebookFileName = string("c:\\minisip\\minisip.addr");
 		#else
 			phonebookFileName = string("/.minisip.addr");
 		#endif
