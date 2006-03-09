@@ -27,7 +27,6 @@
 #ifndef _WIN32_WCE
 #	include"compilation_config.h"
 #else
-//#	pragma message("include for wince .............................. ")
 #	include"compilation_config_w32_wce.h"
 #endif
 
@@ -42,36 +41,33 @@
 
 #include<libmutil/mtypes.h>
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __MINGW32__
 #	ifndef WIN32
 #		define WIN32
-#	endif
-#	pragma warning (disable: 4251)
+#	endif	
+#endif
 
+#ifdef WIN32
 	//In windows, use direct sound for all, except in windows ce (use then Wave in/out)
-#	ifndef _WIN32_WCE
-#		define DSOUND
-#	else
+#	ifdef _WIN32_WCE
 #		define WAVE_SOUND
+#	else
+#		define DSOUND
 #	endif
 
 #	ifndef _WIN32_WINNT
 #		define _WIN32_WINNT 0x0500
 #	endif
 
-#	pragma warning (disable: 4251)
+//#	pragma warning (disable: 4251)
 
 #	ifdef __MINGW32__
 #		define WINVER 0x0500
 #		define DSOUND
-#	else  // !__MINGW32__
-#		define ENABLE_TS
 #	endif	// !__MINGW32__
 
-#	ifndef WIN32
-#		define WIN32
-#	endif
-
+#else
+#	define LINUX
 #endif
 
 //Temporary ... STLPort does not allow addition of errno.h ... but WCEcompat does ... 
@@ -86,10 +82,6 @@
 #	include<openssl/err.h>
 #else
 #	include <errno.h>
-#endif
-
-#ifndef WIN32
-#define LINUX
 #endif
 
 /*

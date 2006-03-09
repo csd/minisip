@@ -24,9 +24,10 @@
 #ifndef DIRECT_SOUND_DEVICE_H
 #define DIRECT_SOUND_DEVICE_H
 
-
 #include"SoundDevice.h"
 
+#include<windows.h>
+#include<wincon.h>
 #include"dsound.h"
 
 //#define NUM_PLAY_NOTIFICATIONS  16
@@ -61,8 +62,7 @@ class DirectSoundDevice : public SoundDevice{
 		LPDIRECTSOUNDCAPTUREBUFFER8        inputBufferHandle; 
 		
 #define cEvents  2
-		HANDLE     inputSoundEvent[cEvents];
-	
+		HANDLE     inputSoundEvent[cEvents];	
 		
 };
 

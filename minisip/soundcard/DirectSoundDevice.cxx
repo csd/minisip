@@ -22,13 +22,10 @@
 */
 
 
-
-
-
+#include<config.h>
 
 #include"DirectSoundDevice.h"
 
-#include<config.h>
 #include<wincon.h>
 
 #include<initguid.h>

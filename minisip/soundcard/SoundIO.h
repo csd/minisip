@@ -42,9 +42,6 @@ class SoundIOPLCInterface;
 //#include"../spaudio/SpAudio.h"
 
 #ifdef HAVE_LIBASOUND
-#	define ALSA_PCM_NEW_HW_PARAMS_API
-#	define ALSA_PCM_NEW_SW_PARAMS_API
-#	include <alsa/asoundlib.h>
 #endif
 
 //#include"AudioMixer.h" //this needs to be removed ... change in MRef
@@ -60,6 +57,9 @@ class SoundSource;
 	class OssSoundDevice;
 #	ifdef HAVE_LIBASOUND
 		class AlsaSoundDevice;
+#		define ALSA_PCM_NEW_HW_PARAMS_API
+#		define ALSA_PCM_NEW_SW_PARAMS_API
+#		include <alsa/asoundlib.h>
 #	endif
 #else
 #	ifdef DSOUND
