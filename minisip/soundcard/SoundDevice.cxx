@@ -209,7 +209,7 @@ int SoundDevice::write( byte_t * buffer, uint32_t nSamples ){
 			lastTimeWrite = currentTime - sleepTime;
 		}
 		
-		uint64_t sleep = sleepTime - (currentTime-lastTimeWrite);
+		int64_t sleep = sleepTime - (currentTime-lastTimeWrite);
 	// 	printf( "\n\nsleep = %d\n", sleep );
 		while ( sleep > 0 ){
 			Thread::msleep( (int32_t)sleep );
