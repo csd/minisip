@@ -133,7 +133,7 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
 
 	uint16_t stunPort = phoneConf->stunServerPort;
 	
-	UDPSocket sock(false);
+	UDPSocket sock;
 	
 	uint16_t localPort = (uint16_t)sock.getPort();
 	char mappedip[16];

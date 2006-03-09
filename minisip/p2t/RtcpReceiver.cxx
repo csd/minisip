@@ -76,7 +76,7 @@ short array2[160];
 RtcpReceiver::RtcpReceiver(MRef<SipSoftPhoneConfiguration*> config, int RTPport){
 	
 	//open UDPSocket
-	rtcp_sock = new UDPSocket(false,++RTPport);
+	rtcp_sock = new UDPSocket(++RTPport);
 
 	//set contact ip and port without STUN
         contactMediaIP = config->inherited->localIpString;

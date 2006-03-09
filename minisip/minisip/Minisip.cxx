@@ -235,7 +235,7 @@ int Minisip::startSip() {
 		// FIXME: This should be done more often
 		localIpString = externalContactIP = ipProvider->getExternalIp();                
 		
-		MRef<UDPSocket*> udpSocket = new UDPSocket( false, phoneConf->inherited->localUdpPort );                
+		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->inherited->localUdpPort );                
 		
 		phoneConf->inherited->localUdpPort = ipProvider->getExternalPort( udpSocket );
 		phoneConf->inherited->localIpString = externalContactIP;
