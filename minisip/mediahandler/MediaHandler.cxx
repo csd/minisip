@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004, 2005 
+/* Copyright (C) 2004, 2005, 2006 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -131,7 +131,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	MRef<Session *> session;
 	MRef<MediaStreamReceiver *> rStream;
 	MRef<MediaStreamSender *> sStream;
-	MRef<RtpReceiver *> rtpReceiver;
+	MRef<RtpReceiver *> rtpReceiver = NULL;
 	string contactIp;
 
 	contactIp = ipProvider->getExternalIp();
@@ -146,10 +146,13 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 			session->addMediaStreamReceiver( rStream );
 		}
 		
-		if( (*i)->send ){
-			sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
-			session->addMediaStreamSender( sStream );
-		}
+        if( (*i)->send ){
+            if( !rtpReceiver ){
+                rtpReceiver = new RtpReceiver( ipProvider );
+            }
+            sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
+            session->addMediaStreamSender( sStream );
+        }
 	}
 	
 	//set the audio settings for this session ...
