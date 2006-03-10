@@ -325,7 +325,10 @@ callback function MessageRouter::guicb_handleCommand can be used.
 The media is controlled at the top level by the MediaHanlder class. It is
 connected to the message router (it can receive commands, but for now it
 does not send any), and also the Sip object has a direct reference to it,
-thus having direct access to it.
+thus having direct access to it. 
+
+\image html media_system.png "Media engine object diagram" width=10cm
+\image latex media_system.eps "Media engine object diagram" width=10cm
 
 \subsection MediaHandler Creating the MediaHandler object
 
