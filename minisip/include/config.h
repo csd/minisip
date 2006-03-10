@@ -60,7 +60,9 @@
 #	endif
 	
 	//warning message: class member needs to have dll-interface to be used by clients of class 'XXX'
+#ifndef __MINGW32__
 #	pragma warning (disable: 4251)
+#endif
 
 #	ifdef __MINGW32__
 #		define WINVER 0x0500
