@@ -9,7 +9,8 @@
 \mainpage MiniSIP Overview
 \author Cesc Santasusana, Thales Communications Netherlands BV (TCNL)
 \author Javier Cardona, cozybit Inc.
-\date June 06 2006
+\author Erik Eliasson, IMIT/TSLab, KTH.
+\date March 10 2006
 \version 0.1
 
 \attention This document is a work in progress.  Any statement expressed
@@ -100,6 +101,66 @@ reference to the mediaHandler object, needed to directly control the audio.
 The SIP engine classes is a complex mesh of objects, which exchange messages
 between them, causing actions to happen. We will try to describe the main
 classes involved and later describe how these actions are chained.
+
+
+\section Factories Application layer support for new headers and content types
+
+An application can add support for parsing new headers and types of
+content. You can do this in the application and do not need to modify any 
+code in libmsip. There is a tradeoff between supporting a new content
+type/header in the application layer or in libmsip. Adding it in
+libmsip makes the library bigger and harder to maintain, but then it
+offers the new functionality to any application using libmsip.
+
+Ideally, an application can create any number of SipStacks
+that can be configured independently. This is true for
+SIP timers, the transport layer, and all dialogs/transactions.
+This is not true for what content types and SIP headers
+are understood. Although having multiple SipStack objects in an
+application is likely to work, there might be some strange behavour.
+
+
+\subsection NewSipRequests Support for new SIP request messages
+
+The SIP stack supports sending an receiving any request method an 
+nothing needs to be done to be able to receive new types of SIP 
+requests.
+
+\subsection NewSipHeaders Support for new headers
+
+To receive and parse a message containing a SIP header that is not
+supported by default, you need to create a "factory" function for
+that type. It is a function taking a buffer of bytes as argument
+and returns a SipHeaderValue. You register the new factory by
+calling
+\code
+   SipHeader::headerFactories.addFactory("New-Type", sipHeaderNewTypeFactory);
+\endcode
+Note that this is per application and if it has several SipStack
+objects, all of them will be affected.
+
+When libmsip receives a header type that it does not recognize, that header 
+is parsed as a SipHeaderUnknown type. It is recommented that an application
+registers factories for any unsupported header types it uses, but by inspecting 
+SipHeaderUnknown headers it can processed them any way.
+
+
+\subsection NewContentTypes Support for new content types
+To receive a new content type you need to create a factory that can turn
+the raw data received into a SipMessageContent object.
+
+You register a new content factory function with libmsip that then uses it
+when parsing an incoming message. The following code registers the 
+"multipart/mixed" factory (this is done within libmsip when a SipStack
+is created):
+\code
+  SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
+\endcode
+
+Note that this is per application and if it has several SipStack
+objects, all of them will be affected.
+
+
 
 \section Sip Sip Class
 
