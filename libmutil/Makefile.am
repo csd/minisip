@@ -23,12 +23,14 @@ endif OS_WIN
 if HAVE_PTHREAD
 thread_src = 	source/CondVarPosix.cxx \
 	 	source/MutexPosix.cxx \
-		source/SemaphorePosix.cxx
+		source/SemaphorePosix.cxx \
+		source/ThreadPosix.cxx
 else
 if OS_WIN
 thread_src = 	source/CondVarWin32.cxx \
 		source/MutexWin32.cxx \
-		source/SemaphoreWin32.cxx
+		source/SemaphoreWin32.cxx \
+		source/ThreadWin32.cxx
 endif OS_WIN
 endif !HAVE_PTHREAD
 
@@ -44,7 +46,6 @@ mutil_src =  	source/aes.cxx \
 		source/merror.cxx \
 		source/cert.cxx \
 		source/hmac.cxx \
-		source/Thread.cxx \
 		source/TextUI.cxx \
 		source/Timestamp.cxx \
 		source/mtime.cxx \

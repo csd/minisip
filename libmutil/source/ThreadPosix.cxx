@@ -28,35 +28,21 @@
 #include<libmutil/Thread.h>
 
 
-#ifdef WIN32 
-//#include"stdafx.h"
-#include<windows.h>
-#endif
-
-#ifndef _MSC_VER
 #include <unistd.h>
-#endif
 
 #ifdef HAVE_PTHREAD_H
+#include<pthread.h>
 #include<signal.h>
-#endif
+#endif	// HAVE_PTHREAD_H
 
 #ifdef HAVE_EXECINFO_H
 #include<execinfo.h>
-#endif
+#endif	// HAVE_EXECINFO_H
 
 #include<libmutil/dbg.h>
 #include<libmutil/merror.h>
 #include<libmutil/Exception.h>
 #include<libmutil/massert.h>
-
-#if defined _MSC_VER || __MINGW32__
-# define USE_WIN32_THREADS
-#else
-# ifdef HAVE_PTHREAD_H
-#  define USE_POSIX_THREADS
-# endif
-#endif
 
 using namespace std;
 
@@ -121,47 +107,6 @@ typedef struct tmpstruct{
     void *arg;
 } tmpstruct;
 
-#ifdef WIN32
-#define MINISIP_THREAD_IMPLEMENTED
-static DWORD WINAPI ThreadStarter( LPVOID lpParam ) { 
-	MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(lpParam));
-	delete (static_cast<MRef <Runnable *> *>(lpParam));
-	startRunnable(self);
-	//self->run();
-	return 0; 
-} 
-
-static DWORD WINAPI StaticThreadStarter(LPVOID lpParam) {
-	void* (*f)();
-	f=(void* (*)())lpParam;
-	startFunction(f);
-	//(*f)();
-	return 0;
-}
-
-static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
-{
-	//printf("StaticThreadStarter: ALIVE - thread created\n");
-        tmpstruct *tmp = (tmpstruct*)lpParam;
-	void* (*f)(void*);
-	f=(void* (*)(void*)) tmp->fun;
-	void *arg = tmp->arg;
-	delete tmp;
-	//(*f)(tmp->arg);
-	startFunctionArg(f, arg);
-	
-	return 0;
-}
-
-
-
-
-#endif //WIN32
-
-#ifdef USE_POSIX_THREADS
-#define MINISIP_THREAD_IMPLEMENTED
-
-#ifdef USE_POSIX_THREADS
 #ifdef HAVE_EXECINFO_H
 #include <ucontext.h>
 #include <dlfcn.h>
@@ -172,7 +117,7 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 #define REGFORMAT "%08x"
 #else
 #define REGFORMAT "%x"
-#endif
+#endif	// defined(REG_RIP)
 
 //Thanks to Jaco Kroon for this function
 //http://tlug.up.ac.za/wiki/index.php/Obtaining_a_stack_trace_in_C_upon_SIGSEGV
@@ -204,7 +149,7 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
 #else
     fprintf(stderr, "Unable to retrieve Instruction Pointer (not printing stack trace).\n");
 #define SIGSEGV_NOSTACK
-#endif
+#endif	// defined(REG_RIP)
 
 #ifndef SIGSEGV_NOSTACK
     fprintf(stderr, "Stack trace:\n");
@@ -226,7 +171,7 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
         bp = (void**)bp[0];
     }
     fprintf(stderr, "End of stack trace\n");
-#endif
+#endif	// SIGSEGV_NOSTACK
 }
 
 
@@ -239,8 +184,7 @@ static bool handleSignal(int sig){
 	return sigaction(sig, &sa, NULL) == 0;
 }
 
-#endif
-#endif
+#endif	// HAVE_EXECINFO_H
 
 
 
@@ -268,25 +212,25 @@ void setupDefaultSignalHandling(){
 		cerr << "Thread: Could not install stack trace output for the SIGSEGV signal"<<endl;
 	}
 }
-#endif
+#endif	// HAVE_EXECINFO_H
 
 static void *LinuxThreadStarter(void *arg){
 #ifdef HAVE_EXECINFO_H
 	setupDefaultSignalHandling();
-#endif
+#endif	// HAVE_EXECINFO_H
 	/* Keep a reference to yourself as long as you run */
 	MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
 	delete (static_cast<MRef <Runnable *> *>(arg));
 #ifdef DEBUG_OUTPUT
 	mdbg << "LinuxThreadStarter: thread created"<< end;
-#endif
+#endif	// DEBUG_OUTPUT
 
 	startRunnable(self);
 	//self->run();
 
 #ifdef DEBUG_OUTPUT
 	mdbg <<"LinuxThreadStarter: thread terminated"<< end;
-#endif
+#endif	// DEBUG_OUTPUT
 	return NULL;
 	//pthread_exit( (void *) 0 ); //cesc
 }
@@ -294,7 +238,7 @@ static void *LinuxThreadStarter(void *arg){
 static void *LinuxStaticThreadStarter(void *arg){
 #ifdef HAVE_EXECINFO_H
 	setupDefaultSignalHandling();
-#endif
+#endif	// HAVE_EXECINFO_H
 	#ifdef DEBUG_OUTPUT
 		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
 	#endif
@@ -304,17 +248,17 @@ static void *LinuxStaticThreadStarter(void *arg){
 	startFunction(f);
 	#ifdef DEBUG_OUTPUT
 		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	return NULL;
 }
 
 static void *LinuxStaticThreadStarterArg(void *arg){
 #ifdef HAVE_EXECINFO_H
 	setupDefaultSignalHandling();
-#endif
+#endif	// HAVE_EXECINFO_H
 	#ifdef DEBUG_OUTPUT
 		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
-	#endif
+	#endif	// DEBUG_OUTPUT
         tmpstruct *tmp = (tmpstruct*)arg;
         void* (*f)(void*);
         f=(void* (*)(void*)) tmp->fun;
@@ -324,53 +268,26 @@ static void *LinuxStaticThreadStarterArg(void *arg){
 
 	#ifdef DEBUG_OUTPUT
 		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	return NULL;
 }
 
 
 
-#endif
-
 #ifndef SIGNAL_HANDLER_DECLARED
 void setupDefaultSignalHandling(){
 #ifdef DEBUG_OUTPUT
 	cerr << "libmutil: setupDefaultSignalHandling: No stack trace signal handler available"<<endl;
-#endif
+#endif	// DEBUG_OUTPUT
 }
-#endif
+#endif	// SIGNAL_HANDLER_DECLARED
 
-#ifndef MINISIP_THREAD_IMPLEMENTED
-#error Thread not fully implemented
-#endif
 
 
 Thread::Thread(MRef<Runnable *> runnable){
 	massert(runnable);
         MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
-#ifdef WIN32
-	DWORD threadId;
 
-	handle_ptr = new HANDLE;
-
-	*((HANDLE*)handle_ptr) = CreateThread(
-			NULL,                        // default security attributes
-			0,                           // use default stack size
-			ThreadStarter,                  // thread function
-			(LPVOID) self,                // argument to thread function
-			0,                           // use default creation flags
-			&threadId);
-	
-	if (*((HANDLE*)handle_ptr)==NULL){
-		merror("Thread::Thread: CreateThread");
-                delete self;
-		throw ThreadException("Could not create thread.");
-        }
-//	printf("In Thread, windows part - thread created\n");
-
-#endif //WIN32
-
-#ifdef USE_POSIX_THREADS
 	//handle_ptr = malloc(sizeof(pthread_t));
 	handle_ptr = new pthread_t;
 	int ret;
@@ -397,95 +314,33 @@ Thread::Thread(MRef<Runnable *> runnable){
                 delete self;
 		#ifdef DEBUG_OUTPUT
 			merr << "In Thread, linux part - thread NOT created" << end;
-		#endif
+		#endif	// DEBUG_OUTPUT
 		throw ThreadException("Could not create thread.");
 	}
 	#ifdef DEBUG_OUTPUT
 		mdbg << "In Thread, linux part - thread created" << end;
-	#endif
-	
-#endif
+	#endif	// DEBUG_OUTPUT
 
 }
 
 Thread::~Thread(){
 	if( handle_ptr ){
-#ifdef WIN32
-		delete (HANDLE *)handle_ptr;
-#endif
-#ifdef USE_POSIX_THREADS
 		delete (pthread_t *)handle_ptr;
-#endif
 	}
 	handle_ptr = NULL;
 }
 
-int Thread::createThread(void f()){
-#ifdef WIN32
-	HANDLE threadHandle;
-	massert(sizeof(threadHandle)==4);
-	DWORD id;
-	LPVOID fptr;
-	fptr = (void*)f;
-	threadHandle = CreateThread( 
-			NULL,                        // default security attributes 
-			0,                           // use default stack size 
-			StaticThreadStarter,                  // thread function 
-			fptr,                // argument to thread function
-			0,                           // use default creation flags
-			&id);
 
-	if (threadHandle==NULL){
-		merror("Thread::Thread: CreateThread");
-		throw ThreadException("Could not create thread.");
-	}
-	return (int)threadHandle;
-#endif
-	
-#ifdef USE_POSIX_THREADS
+int Thread::createThread(void f()){
 	pthread_t threadHandle;
 	#ifdef DEBUG_OUTPUT
  		mdbg << "Running createThread"<< end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarter, (void*)f);
 	return (int)threadHandle;
-#endif
-
 }
 
 int Thread::createThread(void *f(void*), void *arg){
-#ifdef WIN32
-//        massert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
-
-	tmpstruct *argptr = new struct tmpstruct;
-        argptr->fun = (void*)f;
-        argptr->arg = arg;
-        
-	HANDLE threadHandle;
-	DWORD id;
-	
-	#ifdef DEBUG_OUTPUT
-		mdbg << "createThread: Creating thread" << end;
-	#endif
-	threadHandle = CreateThread( 
-			NULL,                        // default security attributes 
-			0,                           // use default stack size  
-			StaticThreadStarterArg,                  // thread function 
-			argptr,                // argument to thread function 
-			0,                           // use default creation flags 
-			&id);
-	#ifdef DEBUG_OUTPUT
-		mdbg << "createThread: done Creating thread" << end;
-	#endif
-
-	if (threadHandle==NULL){
-		merror("Thread::createThread: CreateThread");
-		throw ThreadException("Could not create thread.");
-	}
-	return (int)threadHandle;
-#endif
-	
-#ifdef USE_POSIX_THREADS
 	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
@@ -493,21 +348,18 @@ int Thread::createThread(void *f(void*), void *arg){
 	pthread_t threadHandle;
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Running createThread" << end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarterArg, argptr);
 	return (int)threadHandle;
-#endif
-
 }
 
 void * Thread::join(){
-#ifdef USE_POSIX_THREADS
 	void * returnValue;
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Thread::join(): before join" << end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	ret = pthread_join( 
 			*( (pthread_t *)handle_ptr ), 
 			&returnValue );
@@ -516,118 +368,61 @@ void * Thread::join(){
 		
 		#ifdef DEBUG_OUTPUT
 			merror("Thread::join: pthread_join");
-		#endif
+		#endif	// DEBUG_OUTPUT
 		return NULL;
 	} 
 	
 	return returnValue;
-        
-#elif defined WIN32
-	HANDLE handle = *((HANDLE*)handle_ptr);
-	if (WaitForSingleObject( handle, INFINITE )==WAIT_FAILED){
-		merror("Thread::join: WaitForSingleObject");
-	}
-        return NULL;
-#endif
 }
 
 void Thread::join(int handle){
-#ifdef USE_WIN32_THREADS
-	HANDLE h = (HANDLE)handle;
-	if (WaitForSingleObject( h, INFINITE )==WAIT_FAILED){
-		merror("Thread::join:WaitForSingleObject");
-	}
-#elif defined USE_POSIX_THREADS
 	if( pthread_join( handle, NULL) ){
 		#ifdef DEBUG_OUTPUT
 			merror("Thread::join: pthread_join");
 		#endif
 	}
-#endif
 }
 
 int Thread::msleep(int32_t ms){
-#ifdef USE_WIN32_THREADS
-	Sleep(ms); //function returns void
-	return 0;
-#elif defined USE_POSIX_THREADS
 	struct timespec request;
 	request.tv_sec = ms/1000;
 	request.tv_nsec = (long) (ms%1000) * 1000 * 1000;
 	return nanosleep( &request, NULL );
-#endif
 }
 
 
 bool Thread::kill( ) {
-#ifdef USE_POSIX_THREADS
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Thread::kill(): before cancel" << end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	ret = pthread_cancel( *( (pthread_t *)handle_ptr ) );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
 			merr << "Thread::kill(): ERROR" << end;
-		#endif
+		#endif	// DEBUG_OUTPUT
 		return false;
 	} 
 	
 	return true;
-        
-#elif defined WIN32
-	HANDLE handle = *((HANDLE*)handle_ptr);
-	BOOL ret;
-	DWORD lpExitCode;
-	
-	GetExitCodeThread( handle, &lpExitCode );
-	ret = TerminateThread( handle, lpExitCode );
-        if( ret == 0 ) {
-		
-		#ifdef DEBUG_OUTPUT
-			merror("Thread::kill: TerminateThread");
-		#endif
-		return false;
-	}
-	return true;
-#endif
 }
 
 bool Thread::kill( int handle) {
-#ifdef USE_POSIX_THREADS
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Thread::kill(): before cancel" << end;
-	#endif
+	#endif	// DEBUG_OUTPUT
 	ret = pthread_cancel( handle );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
 			merr << "Thread::kill(): ERROR" << end;
-		#endif
+		#endif	// DEBUG_OUTPUT
 		return false;
 	} 
 	
 	return true;
-        
-#elif defined WIN32
-	HANDLE h = (HANDLE)handle;
-	BOOL ret;
-	DWORD lpExitCode;
-	
-	GetExitCodeThread( h, &lpExitCode );
-	ret = TerminateThread( h, lpExitCode );
-        if( ret == 0 ) {
-		#ifdef DEBUG_OUTPUT
-			merror("Thread::kill: TerminateThread");
-		#endif
-		return false;
-	}
-	return true;
-#endif
 }
-
-
