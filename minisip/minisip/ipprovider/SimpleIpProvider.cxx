@@ -33,7 +33,7 @@
 using namespace std;
 
 SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
-
+	unsigned i; //index
 	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
 	
 	localIp = config->inherited->localIpString;
@@ -43,7 +43,7 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 	
 	if (localIp.length()>0){
 		bool ok=false;
-		for (unsigned i=0; i<ifaces.size(); i++){
+		for ( i=0; i<ifaces.size(); i++ ){
 // 			cerr << "SimpleIP: checking interface = " << ifaces[i] << endl;
 			if (localIp==NetworkFunctions::getInterfaceIPStr(ifaces[i]))
 				ok=true;
@@ -85,18 +85,18 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 			<< "|Minisip will try to find an appropriate one." << endl
 			<< "|Minisip highly recommends you to add a preferred one. To do so, choose" << endl
 			<< "|from the list below and edit the configuration file, section <network_interface>" << endl;
-			for (unsigned i3=0; i3<ifaces.size(); i3++){
-				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i3]);
-		   		cout << "|       Network Interface: name = " << ifaces[i3] << "; IP=" << ip << endl;
+			for( i=0; i<ifaces.size(); i++ ){
+				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+		   		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
 			}	
 		cout <<    "========================================================================" << endl;
-		for (unsigned i2=0; i2<ifaces.size(); i2++){
-			string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i2]);
+		for ( i=0; i<ifaces.size(); i++ ){
+			string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
 			#ifdef DEBUG_OUTPUT
-			//cerr << "SimpleIPProvider: interface = " << ifaces[i2] << "; IP=" << ip << endl;
+			//cout << "SimpleIPProvider: interface = " << ifaces[i] << "; IP=" << ip << endl;
 			#endif
 			if (ip.length()>0){
-				if (ifaces[i2]==string("lo")){ //this interface only exhists in linux ...
+				if (ifaces[i]==string("lo")){ //this interface only exhists in linux ...
 					if (localIp.length()<=0)
 						localIp = ip;
 				}else{
@@ -105,7 +105,10 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 					//only update the local ip if it is the first interface with a private
 					//ip different from localhost or a public ip
 					if ( isInPrivateIpRange( ipstr )){
-						if (localIp.length()<=0 || localIp=="127.0.0.1")
+						if (localIp.length()<=0 || 
+								localIp == "127.0.0.1" || //this is the lo interface
+								localIp.substr(0,2)=="0."  //0.0.0.0 is used by windows ...
+								)
 							localIp = ipstr;
 					}else{ 
 						//use first public ip we find ... overwritting the private one
