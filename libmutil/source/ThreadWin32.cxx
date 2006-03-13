@@ -133,6 +133,12 @@ static DWORD WINAPI StaticThreadStarterArg(LPVOID lpParam)
 }
 
 
+void setupDefaultSignalHandling(){
+#ifdef DEBUG_OUTPUT
+	cerr << "libmutil: setupDefaultSignalHandling: No stack trace signal handler available"<<endl;
+#endif
+}
+
 
 Thread::Thread(MRef<Runnable *> runnable){
 	massert(runnable);
