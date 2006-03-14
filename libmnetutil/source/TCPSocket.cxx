@@ -123,7 +123,7 @@ int32_t TCPSocket::write(string data){
 #ifdef _MSC_VER
 	return ::_write(fd, data.c_str(), (unsigned int)data.length());
 #else
-	return ::write(fd, data.c_str(), data.length());
+	return ::send(fd, data.c_str(), data.length(), 0);
 #endif
 }
 
@@ -144,7 +144,7 @@ TCPSocket& operator<<(TCPSocket& sock, string str){
 }
 
 int32_t TCPSocket::read(void *buf, int32_t count){
-	return ::read(fd, buf, count);
+	return ::recv(fd, (char*)buf, count, 0);
 }
 
 
