@@ -39,45 +39,45 @@ endif !GTK_GUI
 
 
 
-minisip_LDADD +=gui/libminisip_gui.a \
+minisip_LDADD +=gui/libminisip_gui.la \
                 libminisip.a \
-                ../sip/libsip.a
+                ../sip/libsip.la
 
 if IPSEC_SUPPORT
-minisip_LDADD +=../ipsec/libmsipipsecapi.a
+minisip_LDADD +=../ipsec/libmsipipsecapi.la
 endif
 
 
-minisip_LDADD +=../sdp/libsdp.a \
-		contactdb/libcontactdb.a
+minisip_LDADD +=../sdp/libsdp.la \
+		contactdb/libcontactdb.la
 
 if P2T_SUPPORT
-minisip_LDADD +=../p2t/libp2t.a
+minisip_LDADD +=../p2t/libp2t.la
 endif
 
-minisip_LDADD +=../mediahandler/libmediahandler.a \
-		        ../conf/libconf.a 
+minisip_LDADD +=../mediahandler/libmediahandler.la \
+		        ../conf/libconf.la 
 
 
 
 
 if VIDEO_SUPPORT
-minisip_LDADD += ../video/libvideo.a
+minisip_LDADD += ../video/libvideo.la
 AM_LDFLAGS += @X_LIBS@ @X_EXTRA_LIBS@
 endif
 
 
-minisip_LDADD +=../rtp/librtp.a \
-                ../minisip/gui/libminisip_gui.a \
-                ../codecs/libcodecs.a \
-                ../codecs/ilbc/libcodec_ilbc.a \
-                ../codecs/g711/libcodec_g711.a \
-                ../soundcard/libsoundcard.a \
-		../spaudio/libspaudio.a \
-		../aec/libaec.a \
-		ipprovider/libipprovider.a \
-		confbackend/libconfbackend.a \
-                ../stun/libstun.a \
+minisip_LDADD +=../rtp/librtp.la \
+                ../minisip/gui/libminisip_gui.la \
+                ../codecs/libcodecs.la \
+                ../codecs/ilbc/libcodec_ilbc.la \
+                ../codecs/g711/libcodec_g711.la \
+                ../soundcard/libsoundcard.la \
+		../spaudio/libspaudio.la \
+		../aec/libaec.la \
+		ipprovider/libipprovider.la \
+		confbackend/libconfbackend.la \
+                ../stun/libstun.la \
 		$(MSIP_LIBS) \
 		$(MNETUTIL_LIBS) \
 		$(MIKEY_LIBS) \

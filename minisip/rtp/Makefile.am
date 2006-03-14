@@ -1,6 +1,6 @@
-noinst_LIBRARIES = librtp.a
+noinst_LTLIBRARIES = librtp.la
 
-librtp_a_SOURCES = RtpHeader.cxx \
+librtp_la_SOURCES = RtpHeader.cxx \
                    RtpPacket.cxx \
 		   CryptoContext.cxx \
 		   SRtpPacket.cxx \

@@ -1,9 +1,12 @@
-noinst_LIBRARIES = libsoundcard.a
+noinst_LTLIBRARIES = libsoundcard.la
+
+libsoundcard_la_LIBADD =
 
 RESAMPLER_SRC = resampler/Resampler.cxx \
 		resampler/SimpleResampler.cxx
 if FLOAT_RESAMPLER
 RESAMPLER_SRC += resampler/FloatResampler.cxx
+libsoundcard_la_LIBADD += $(SAMPLERATE_LIBS)
 endif
 
 RESAMPLER_HDR = resampler/Resampler.h \
@@ -27,25 +30,27 @@ BASIC_SOUNDCARD_SRC = SilenceSensor.cxx \
 		FileSoundDevice.cxx \
 		FileSoundSource.cxx \
 		SoundDevice.cxx 
-		
+
+ALSA_SRC =	AlsaCard.cxx \
+		AlsaSoundDevice.cxx 
+
+DSOUND_SRC = 	DirectSoundDevice.cxx 
+
+libsoundcard_la_SOURCES = $(BASIC_SOUNDCARD_SRC)
+
+if !OS_WIN
+libsoundcard_la_SOURCES += OssSoundDevice.cxx 
+endif !OS_WIN
+
 if HAVE_LIBASOUND
-
-libsoundcard_a_SOURCES = ${BASIC_SOUNDCARD_SRC} \
-			OssSoundDevice.cxx \
-			AlsaCard.cxx \
-			AlsaSoundDevice.cxx 
-
-else !HAVE_LIBASOUND 
+libsoundcard_la_SOURCES += $(ALSA_SRC)
+libsoundcard_la_LIBADD += $(ALSA_LIBS)
+endif HAVE_LIBASOUND
 
 if DIRECT_SOUND
-libsoundcard_a_SOURCES = ${BASIC_SOUNDCARD_SRC} \
-			DirectSoundDevice.cxx 
-else !DIRECT_SOUND
-libsoundcard_a_SOURCES = ${BASIC_SOUNDCARD_SRC} \
-			OssSoundDevice.cxx 
-endif !DIRECT_SOUND
-
-endif !HAVE_LIBASOUND
+libsoundcard_la_SOURCES += $(DSOUND_SRC)
+libsoundcard_la_LIBADD += $(DSOUND_LIBS)
+endif DIRECT_SOUND
 
 noinst_HEADERS  = SoundIO.h \
 		  SoundDevice.h \

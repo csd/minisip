@@ -1,9 +1,9 @@
-noinst_LIBRARIES = libcontactdb.a
+noinst_LTLIBRARIES = libcontactdb.la
 
-libcontactdb_a_SOURCES = ContactDb.cxx \
+libcontactdb_la_SOURCES = ContactDb.cxx \
 			 PhoneBook.cxx \
                          MXmlPhoneBookIo.cxx
 
-noinst_HEADERS  = ContactDb.h \
+noinst_HEADERS = ContactDb.h \
 		  PhoneBook.h \
                   MXmlPhoneBookIo.h

@@ -165,7 +165,7 @@ dnl Check for libsamplerate
 AC_CHECK_HEADER([samplerate.h], 
 	[
 		AC_CHECK_LIB([samplerate], [main],
-			[LIBS="-lsamplerate ${LIBS}"
+			[SAMPLERATE_LIBS="-lsamplerate"
 			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])
 			 FLOAT_RESAMPLER="yes"
                         ]
@@ -173,6 +173,7 @@ AC_CHECK_HEADER([samplerate.h],
 	]
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
+AC_SUBST(SAMPLERATE_LIBS)
 
 dnl Check for stack trace support
 AC_CHECK_HEADER([execinfo.h], 
@@ -187,24 +188,26 @@ AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
 dnl Check for libspeex
 AC_CHECK_HEADER([speex/speex.h], 
 	[
-		AC_CHECK_LIB([speex], [main],
-			[LIBS="-lspeex ${LIBS}"
+		AC_CHECK_LIB([speex], [speex_encoder_init],
+			[SPEEX_LIBS="-lspeex"
 			 AC_DEFINE(HAS_SPEEX, [], [Use the Speex CODEC])])
 			 HAS_SPEEX="yes"
 	]
 )
 AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
+AC_SUBST(SPEEX_LIBS)
 
 dnl Check for libgsm
 AC_CHECK_HEADER([gsm.h], 
 	[
-		AC_CHECK_LIB([gsm], [main],
-			[LIBS="-lgsm ${LIBS}"
+		AC_CHECK_LIB([gsm], [gsm_encode],
+			[GSM_LIBS="-lgsm"
 			 AC_DEFINE(HAS_GSM, [], [Use the GSM CODEC])])
 			 HAS_GSM="yes"
 	]
 )
 AM_CONDITIONAL(HAS_GSM, test "${HAS_GSM}" = "yes")
+AC_SUBST(GSM_LIBS)
 
 
 
@@ -357,19 +360,37 @@ AC_ARG_ENABLE(alsa,
     [ --enable-alsa enables ALSA sound support (default disabled)],
     [ if test "${enable_alsa}" = "yes"
       then
-        AC_CHECK_LIB([asound], [main],,
+        AC_CHECK_LIB([asound], [main],
+	   [ALSA_LIBS="-lasound"],
            [AC_MSG_ERROR([Could not find the alsa library])]
         )
       fi ])
 
 AM_CONDITIONAL(HAVE_LIBASOUND, [test "${enable_alsa}" = "yes"])
+AC_SUBST(ALSA_LIBS)
 
 dnl DirectSound sound interface
 AC_ARG_ENABLE(dsound,
     [ --enable-dsound enables DirectSound sound support (default disabled)],
     [ AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) ])
 
-AM_CONDITIONAL(DIRECT_SOUND, [test "${enable_dsound}" = "yes"])
+if test ! x$enable_dsound = xno; then
+   have_dsound=yes
+   save_LIBS="${LIBS}"
+   dnl Can't check stdcall function DirectSoundFullDuplexCreate.
+   AC_CHECK_LIB([dsound], [main],,[have_dsound=no])
+   AC_CHECK_LIB([uuid], [GUID_NULL],,[have_dsound=no])
+   AC_CHECK_LIB([dxguid], [IID_IDirectSoundNotify],,[have_dsound=no])
+   AC_CHECK_HEADERS([dsound.h],,[have_dsound=no])
+   if test x$have_dsound = xyes; then
+      DSOUND_LIBS="-ldxguid -luuid -ldsound"
+   elif test x$enable_dsound = xyes; then
+      AC_MSG_ERROR([Could not find libraries required by DirectSound support])
+   fi
+   LIBS="${save_LIBS}"
+   AC_SUBST(DSOUND_LIBS)
+   AM_CONDITIONAL(DIRECT_SOUND, [test "${have_dsound}" = "yes"])
+fi
 
 dnl TEXT UI
 AC_ARG_ENABLE(textui,
@@ -600,9 +621,6 @@ LIBS="${save_LIBS}"
 dnl Checks for libraries.
 AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
-AC_CHECK_LIB([dsound], [main])
-AC_CHECK_LIB([uuid], [main])
-AC_CHECK_LIB([dxguid], [main])
 
 dnl FIXME: Replace `main' with a function in `-lX11':
 AC_CHECK_LIB([X11], [main])

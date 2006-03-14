@@ -1,4 +1,4 @@
-noinst_LIBRARIES = libmsipipsecapi.a
+noinst_LTLIBRARIES = libmsipipsecapi.la
 
-libmsipipsecapi_a_SOURCES = MsipIpsecAPI.cxx 
+libmsipipsecapi_la_SOURCES = MsipIpsecAPI.cxx 
 noinst_HEADERS = MsipIpsecAPI.h 

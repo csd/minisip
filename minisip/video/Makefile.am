@@ -1,12 +1,15 @@
 abs_top_srcdir = @abs_top_srcdir@
 
-noinst_LIBRARIES = libvideo.a
+noinst_LTLIBRARIES = libvideo.la
 
 AM_CPPFLAGS += -I$(abs_top_srcdir)/include $(AVCODEC_CPPFLAGS)
+AM_LDFLAGS =
+libvideo_la_LIBADD =
 
 display_src = display/VideoDisplay.cxx display/X11Display.cxx
 if XV_VIDEO_DISPLAY
   display_src += display/XvDisplay.cxx
+  libvideo_la_LIBADD += $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
 if SDL_VIDEO_DISPLAY
@@ -36,7 +39,7 @@ codec_src = codec/AVCoder.cxx codec/AVDecoder.cxx codec/VideoCodec.cxx
 
 codec_hdr = codec/AVCoder.h codec/AVDecoder.h codec/VideoCodec.h codec/VideoEncoderCallback.h
 
-libvideo_a_SOURCES = $(display_src) \
+libvideo_la_SOURCES = $(display_src) \
                      $(grabber_src) \
                      $(codec_src) \
 		     $(mixer_src) \

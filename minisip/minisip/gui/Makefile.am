@@ -9,9 +9,9 @@ endif
 endif
 
 
-noinst_LIBRARIES = libminisip_gui.a
+noinst_LTLIBRARIES = libminisip_gui.la
 
-libminisip_gui_a_SOURCES = Gui.cxx \
+libminisip_gui_la_SOURCES = Gui.cxx \
                            GuiCallback.cxx
 
 noinst_HEADERS  = Gui.h \

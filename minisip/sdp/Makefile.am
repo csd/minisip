@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libsdp.a
+noinst_LTLIBRARIES = libsdp.la
 
-libsdp_a_SOURCES = SdpPacket.cxx \
+libsdp_la_SOURCES = SdpPacket.cxx \
                     SdpHeader.cxx \
                     SdpHeaderA.cxx \
                     SdpHeaderC.cxx \

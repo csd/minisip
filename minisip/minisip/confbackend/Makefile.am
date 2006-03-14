@@ -1,11 +1,12 @@
-noinst_LIBRARIES = libconfbackend.a
+noinst_LTLIBRARIES = libconfbackend.la
 
-libconfbackend_a_SOURCES = ConfBackend.cxx \
+libconfbackend_la_SOURCES = ConfBackend.cxx \
 			 MXmlConfBackend.cxx
 
 if GCONF_SUPPORT
 AM_CPPFLAGS += @GCONF_CFLAGS@
-libconfbackend_a_SOURCES += GConfBackend.cxx
+libconfbackend_la_SOURCES += GConfBackend.cxx
+libconfbackend_la_LIBADD = $(GCONF_LIBS)
 endif
 
 noinst_HEADERS  = ConfBackend.h \

@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libmediahandler.a
+noinst_LTLIBRARIES = libmediahandler.la
 
-libmediahandler_a_SOURCES = MediaHandler.cxx \
+libmediahandler_la_SOURCES = MediaHandler.cxx \
                             Session.cxx \
 			    MediaStream.cxx \
 			    Media.cxx \

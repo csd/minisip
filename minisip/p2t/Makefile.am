@@ -1,5 +1,5 @@
-noinst_LIBRARIES = libp2t.a
-libp2t_a_SOURCES = RtcpAPP.cxx \
+noinst_LTLIBRARIES = libp2t.la
+libp2t_la_SOURCES = RtcpAPP.cxx \
 		   RtcpAPPHeader.cxx \
 		   RtcpTransactionGetFloor.cxx \
 		   RtcpTransactionGrantFloor.cxx \

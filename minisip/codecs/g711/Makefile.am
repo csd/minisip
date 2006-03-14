@@ -1,5 +1,5 @@
-noinst_LIBRARIES = libcodec_g711.a
+noinst_LTLIBRARIES = libcodec_g711.la
 
-libcodec_g711_a_SOURCES = codec_g711.cxx
+libcodec_g711_la_SOURCES = codec_g711.cxx
 
 noinst_HEADERS = codec_g711.h

@@ -1,4 +1,4 @@
-noinst_LIBRARIES = libspaudio.a
+noinst_LTLIBRARIES = libspaudio.la
 
-libspaudio_a_SOURCES = SpAudio.cxx 
+libspaudio_la_SOURCES = SpAudio.cxx 
 noinst_HEADERS = SpAudio.h 

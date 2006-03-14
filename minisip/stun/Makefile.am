@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libstun.a
+noinst_LTLIBRARIES = libstun.la
 
-libstun_a_SOURCES = STUNAttributes.cxx \
+libstun_la_SOURCES = STUNAttributes.cxx \
                     STUN.cxx \
                     STUNMessage.cxx \
 		    STUNTest.cxx

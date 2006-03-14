@@ -1,8 +1,8 @@
 
-noinst_LIBRARIES = libsip.a
+noinst_LTLIBRARIES = libsip.la
 
 
-libsip_a_SOURCES = SipDialogVoip.cxx \
+libsip_la_SOURCES = SipDialogVoip.cxx \
 		   SipDialogConfVoip.cxx \
 		   SipDialogPresenceClient.cxx \
 		   SipDialogPresenceServer.cxx \
@@ -11,7 +11,7 @@ libsip_a_SOURCES = SipDialogVoip.cxx \
                    PresenceMessageContent.cxx \
                    SipDialogSecurityConfig.cxx \
 		   Sip.cxx
-		   
+
 noinst_HEADERS  = SipDialogVoip.h \
 		  SipDialogConfVoip.h \
 		  SipSoftPhoneConfiguration.h \

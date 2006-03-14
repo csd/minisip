@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libcodec_ilbc.a
+noinst_LTLIBRARIES = libcodec_ilbc.la
 
-libcodec_ilbc_a_SOURCES = anaFilter.cxx \
+libcodec_ilbc_la_SOURCES = anaFilter.cxx \
                     constants.cxx \
 		    createCB.cxx \
 		    doCPLC.cxx \

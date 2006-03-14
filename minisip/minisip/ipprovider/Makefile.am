@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libipprovider.a
+noinst_LTLIBRARIES = libipprovider.la
 
-libipprovider_a_SOURCES = IpProvider.cxx \
+libipprovider_la_SOURCES = IpProvider.cxx \
 			 SimpleIpProvider.cxx \
                          StunIpProvider.cxx
 
