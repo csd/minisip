@@ -22,7 +22,7 @@
 #ifndef GTK_MAIN_UI_H
 #define GTK_MAIN_UI_H
 
-#include "../Gui.h"
+#include <libminisip/minisip/gui/Gui.h>
 #include <libmutil/MemObject.h>
 #include <gtkmm.h>
 

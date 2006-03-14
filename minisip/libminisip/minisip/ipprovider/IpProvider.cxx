@@ -1,3 +1,4 @@
+
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@
 
 #include"SimpleIpProvider.h"
 #include"StunIpProvider.h"
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include"../../sip/SipSoftPhoneConfiguration.h"
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

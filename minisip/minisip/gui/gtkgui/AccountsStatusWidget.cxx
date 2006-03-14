@@ -25,7 +25,7 @@
 
 #include<libmsip/SipDialogConfig.h> // SipIdentity
 #include<libmsip/SipCommandString.h>
-#include"../GuiCallback.h"
+#include<libminisip/minisip/gui/GuiCallback.h>
 
 
 #ifdef OLDLIBGLADEMM

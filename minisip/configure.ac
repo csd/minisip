@@ -9,6 +9,15 @@ m4_define([minisip_micro_version], [1])
 m4_define([minisip_version],
           [minisip_major_version.minisip_minor_version.minisip_micro_version])
 
+dnl
+dnl Libtool style version info
+dnl update before each new release 
+dnl See node "Updating version info::" in info libtool
+dnl
+m4_define([lt_current], [0])
+m4_define([lt_revision], [0])
+m4_define([lt_age], [0])
+
 AC_INIT(minisip, [minisip_major_version.minisip_minor_version], BUG-REPORT-ADDRESS)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
@@ -20,9 +29,13 @@ AM_CONFIG_HEADER(include/compilation_config.h)
 MINISIP_MAJOR_VERSION=minisip_major_version
 MINISIP_MINOR_VERSION=minisip_minor_version
 MINISIP_MICRO_VERSION=minisip_micro_version
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
 AC_SUBST(MINISIP_MAJOR_VERSION)
 AC_SUBST(MINISIP_MINOR_VERSION)
 AC_SUBST(MINISIP_MICRO_VERSION)
+AC_SUBST(LT_VERSION_INFO)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
 
 AC_CANONICAL_HOST
 case $host_os in
@@ -39,6 +52,7 @@ AC_PROG_CPP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
 if test x$os_win = xyes; then
@@ -398,9 +412,8 @@ AC_ARG_ENABLE(textui,
     [ if test "${enable_textui}" = "yes"
       then
 	  AC_DEFINE(TEXT_UI, [], [Use the text based user interface])
-          QTGUI="no"
-	  enable_gtk="no"
-	  
+dnl          QTGUI="no"
+dnl	  enable_gtk="no"
       fi ])
 AM_CONDITIONAL(TEXT_UI, [test "${enable_textui}" = "yes"])
 
@@ -410,8 +423,8 @@ AC_ARG_ENABLE(qtui,
     [ if test "${enable_qtui}" = "yes"
       then
 	  AC_DEFINE(QT_GUI, [], [Use the Qt based user interface])
-          QTGUI="yes"
-	  enable_gtk="no"
+dnl          QTGUI="yes"
+dnl	  enable_gtk="no"
 	  
       fi ])
 AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
@@ -444,7 +457,7 @@ if test "x${enable_gtk}" != "xno"
     ])
     CPPFLAGS="${cf_save_CPPFLAGS}"
       
-    QTGUI="no"
+dnl    QTGUI="no"
 fi
 AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
 
@@ -687,31 +700,37 @@ AC_SUBST(AM_CXXFLAGS)
 
 AC_SUBST(datadir)
 
-AC_CONFIG_FILES([codecs/Makefile
-                 codecs/ilbc/Makefile
-		 codecs/g711/Makefile
+AC_CONFIG_FILES([libminisip/Makefile
+                 libminisip/libminisip.pc
+                 libminisip/codecs/Makefile
+                 libminisip/codecs/ilbc/Makefile
+                 libminisip/codecs/g711/Makefile
+                 libminisip/minisip/Makefile
+                 libminisip/minisip/contactdb/Makefile
+                 libminisip/minisip/confbackend/Makefile
+                 libminisip/minisip/ipprovider/Makefile
+                 libminisip/minisip/gui/Makefile
+                 libminisip/minisip/win32/Makefile
+                 libminisip/minisip/win32/libminisip-res.rc
+                 libminisip/rtp/Makefile
+                 libminisip/sip/Makefile
+                 libminisip/soundcard/Makefile
+                 libminisip/spaudio/Makefile
+                 libminisip/stun/Makefile
+                 libminisip/ipsec/Makefile
+                 libminisip/sdp/Makefile
+                 libminisip/p2t/Makefile
+                 libminisip/mediahandler/Makefile
+                 libminisip/video/Makefile
+                 libminisip/conf/Makefile
+                 libminisip/aec/Makefile
                  minisip/Makefile
-                 minisip/contactdb/Makefile
-                 minisip/confbackend/Makefile
-                 minisip/ipprovider/Makefile
                  minisip/gui/Makefile
                  minisip/gui/qtgui/Makefile
                  minisip/gui/gtkgui/Makefile
                  minisip/gui/textui/Makefile
                  minisip/win32/Makefile
                  minisip/win32/minisip-res.rc
-                 rtp/Makefile
-                 sip/Makefile
-                 soundcard/Makefile
-                 spaudio/Makefile
-                 stun/Makefile
-		 ipsec/Makefile
-                 sdp/Makefile
-                 p2t/Makefile
-		 mediahandler/Makefile
-                 video/Makefile
-		 conf/Makefile
-		 aec/Makefile
 		 debian/Makefile
 		 Makefile])
 AC_OUTPUT

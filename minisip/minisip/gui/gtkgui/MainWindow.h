@@ -30,7 +30,7 @@
 
 
 #include"GtkMainUI.h"
-#include"../Gui.h"
+#include<libminisip/minisip/gui/Gui.h>
 //#include"../../LogEntry.h"
 #include<libmutil/MemObject.h>
 #include"DtmfWidget.h"

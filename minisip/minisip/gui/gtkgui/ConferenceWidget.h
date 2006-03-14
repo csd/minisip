@@ -27,8 +27,8 @@
 #include <config.h>
 #include <gtkmm.h>
 #include<libmutil/CommandString.h>
-#include "../../../conf/ConferenceControl.h"
-#include"../../Bell.h"
+#include<libminisip/conf/ConferenceControl.h>
+#include<libminisip/minisip/Bell.h>
 #include"CallWidget.h"
 #include"DtmfWidget.h"
 

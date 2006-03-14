@@ -8,19 +8,6 @@ using namespace std;
 
 #include"Minisip.h"
 
-#ifdef TEXT_UI
-#include"gui/textui/MinisipTextUI.h"
-#include<libmutil/TextUI.h>
-#else //!TEXT_UI
-#ifdef GTK_GUI
-#include"gui/gtkgui/GtkMainUI.h"
-#else //!GTK_GUI
-#include"gui/qtgui/MinisipMainWindowWidget.h"
-#include"gui/qtgui/qtguistarter.h"
-#include<qmessagebox.h>
-#endif //GTK_GUI
-#endif //TEXT_UI
-
 #include<libmutil/termmanip.h>
 #include<libmsip/SipCallback.h>
 #include<libmsip/SipCommandString.h>
@@ -41,6 +28,7 @@ using namespace std;
 #include"../conf/ConferenceControl.h"
 #include"../conf/ConfCallback.h"
 #include"confbackend/ConfBackend.h"
+#include"confbackend/MXmlConfBackend.h"
 #include"MessageRouter.h"
 
 #include<libmsip/SipUtils.h>
@@ -78,7 +66,7 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
-Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
+Minisip::Minisip( MRef<Gui *> gui, int argc, char**argv ):ehandler(NULL),gui(gui){
 
 	srand((unsigned int)time(0));
 
@@ -125,33 +113,20 @@ Minisip::Minisip( int argc, char**argv ):ehandler(NULL){
 	mout << BOLD << "init 2/9: Creating GUI" << PLAIN << end;
 	#endif
 
-	#ifdef TEXT_UI
-		///*gui = */debugtextui = new MinisipTextUI();
-		cerr << "Creating TextUI"<< endl;
-	
-		gui = new MinisipTextUI();
-		
-		merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-		LogEntry::handler = NULL;
-	#else //!TEXT_UI
-		#ifdef GTK_GUI
-			#ifdef DEBUG_OUTPUT
-			cerr << "Creating GTK GUI"<< endl;
-			#endif
-			gui = GtkMainUI::create( argc, argv );
-			LogEntry::handler = (GtkMainUI *)*gui;
-			#ifdef DEBUG_OUTPUT
-				consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-				MRef<Thread *> consoleDbgThread = consoleDbg->start();
-			#else
-				//in non-debug mode, send merr to the gui
-				merr.setExternalHandler( dynamic_cast<GtkMainUI*>( *gui ) ); 
-			#endif
-		#else //!GTK_GUI
-			gui= guiFactory(argc, argv, timeoutProvider);
-			LogEntry::handler = NULL;
-		#endif //GTK_GUI
-	#endif //TEXT_UI
+#ifdef DEBUG_OUTPUT
+	       if( !dynamic_cast<TextUI *>( *gui ) ){
+
+		       consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+		       MRef<Thread *> consoleDbgThread = consoleDbg->start();
+	       }
+#endif
+
+	       if( !consoleDbg ){
+		       //in non-debug mode, send merr to the gui
+		       merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		       mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		       mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+	       }
 
 	#ifdef OSSO_SUPPORT
 		osso_context_t * ossoCtxt = NULL;
@@ -187,7 +162,6 @@ int Minisip::exit(){
 		sip->join();
 	}
 	
-#ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT
 	mout << end << "Stopping the Console Debugger thread" << end;
 	if( ! consoleDbg.isNull() ) {
@@ -195,8 +169,8 @@ int Minisip::exit(){
 		consoleDbg->join();
 	}
 #endif	
-#endif
 	if( ehandler ){
+		mout << "Delete ehandler" << end;
 		delete ehandler;
 	}
 
@@ -247,10 +221,10 @@ int Minisip::startSip() {
 #endif
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		ehandler->setMediaHandler( mediaHandler );
-#ifdef GTK_GUI
 #ifdef DEBUG_OUTPUT
-		consoleDbg->setMediaHandler( mediaHandler );
-#endif
+		if( consoleDbg ){
+			consoleDbg->setMediaHandler( mediaHandler );
+		}
 #endif
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
@@ -397,21 +371,5 @@ int Minisip::initParseConfig(){
 int Minisip::runGui(){
 	gui->run();
 	return 1;
-}
-
-int main( int argc, char ** argv ){
-	cerr << endl << "Starting MiniSIP ... welcome!" << endl << endl;
-	setupDefaultSignalHandling(); //Signal handlers are created for all 
-				      //threads created with libmutil/Thread.h
-				      //For the main thread we have to
-				      //install them
-	
-	Minisip minisip( argc, argv );
-	if( minisip.startSip() > 0 ) {
-		minisip.runGui();
-	} else {
-		cerr << endl << BOLD << "ERROR while starting SIP!" << PLAIN << endl << endl;
-	}
-	minisip.exit();
 }
 

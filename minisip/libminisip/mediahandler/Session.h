@@ -30,7 +30,7 @@
 #include"../sip/SipDialogSecurityConfig.h"
 #include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
-#include<../sdp/SdpPacket.h>
+#include"../sdp/SdpPacket.h"
 
 class MediaStreamReceiver;
 class MediaStreamSender;

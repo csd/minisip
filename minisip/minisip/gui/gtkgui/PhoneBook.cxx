@@ -23,8 +23,8 @@
 #include<config.h>
 #include"PhoneBook.h"
 #include"ContactDialog.h"
-#include"../../contactdb/PhoneBook.h"
-#include"../../contactdb/ContactDb.h"
+#include<libminisip/minisip/contactdb/PhoneBook.h>
+#include<libminisip/minisip/contactdb/ContactDb.h>
 //#include<libmutil/itoa.h>
 //#include<libmnetutil/TCPSocket.h>
 //#include<iostream>

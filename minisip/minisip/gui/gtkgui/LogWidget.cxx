@@ -22,9 +22,9 @@
 
 #include"LogWidget.h"
 
-#include"../../LogEntry.h"
+#include<libminisip/minisip/LogEntry.h>
 #include<libmutil/itoa.h>
-#include"../../contactdb/ContactDb.h"
+#include<libminisip/minisip/contactdb/ContactDb.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

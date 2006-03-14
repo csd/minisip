@@ -23,9 +23,9 @@
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
 #include"AccountsList.h"
-#include"../Gui.h"
-#include"../../../sip/SipSoftPhoneConfiguration.h"
-#include"../../../mediahandler/MediaCommandString.h"
+#include<libminisip/minisip/gui/Gui.h>
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/mediahandler/MediaCommandString.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

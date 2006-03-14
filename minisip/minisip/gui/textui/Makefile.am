@@ -1,6 +1,9 @@
 
-noinst_LIBRARIES = libminisip_textui.a
+bin_PROGRAMS = minisip_textui
 
-libminisip_textui_a_SOURCES = MinisipTextUI.cxx
+AM_CPPFLAGS += -I$(top_srcdir)
+
+minisip_textui_LDADD = ../../../libminisip/minisip/libminisip.la
+minisip_textui_SOURCES = MinisipTextUI.cxx MinisipTextMain.cxx
 
 noinst_HEADERS  = MinisipTextUI.h

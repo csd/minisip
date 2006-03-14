@@ -24,13 +24,13 @@
 #define _MINISIPTEXTUI_H
 
 #include<libmutil/CommandString.h>
-#include"../../../conf/ConferenceControl.h"
-#include"../../../sip/SipSoftPhoneConfiguration.h"
-#include"../Gui.h"
-#include"../../../p2t/GroupList.h"
-#include"../../../p2t/GroupListClient.h"
-#include"../../../p2t/GroupListUserElement.h"
-#include"../../../p2t/P2T.h"
+#include<libminisip/conf/ConferenceControl.h>
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/minisip/gui/Gui.h>
+#include<libminisip/p2t/GroupList.h>
+#include<libminisip/p2t/GroupListClient.h>
+#include<libminisip/p2t/GroupListUserElement.h>
+#include<libminisip/p2t/P2T.h>
 #include<libmutil/TextUI.h>
 #include<libmutil/minilist.h>
 #include<libmutil/Semaphore.h>

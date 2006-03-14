@@ -25,15 +25,15 @@
 #include<stdio.h>
 #include<vector>
 #include"MinisipTextUI.h"
-#include"../../../conf/ConferenceControl.h"
-#include"../../../mediahandler/MediaCommandString.h"
+#include<libminisip/conf/ConferenceControl.h>
+#include<libminisip/mediahandler/MediaCommandString.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
 #include<libmutil/termmanip.h>
 
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
-#include"../../../sip/DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 
 
 
@@ -1299,5 +1299,4 @@ void MinisipTextUI::guimain(){
 	semSipReady = NULL;
 	TextUI::guimain();
 }
-
 

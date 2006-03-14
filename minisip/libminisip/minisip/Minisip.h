@@ -12,16 +12,12 @@ class Sip;
 class SipSMCommand;
 class MessageRouter;
 class ConferenceControl;
-#ifdef GTK_GUI
-	#ifdef DEBUG_OUTPUT
-		class ConsoleDebugger;
-	#endif
-#endif
+class ConsoleDebugger;
 
 
 class Minisip : public MObject{
 	public:
-		Minisip( int argc, char**argv );
+		Minisip( MRef<Gui *> gui, int argc, char**argv );
 		virtual ~Minisip();
 		
 		std::string getMemObjectType(){return "Minisip";}
@@ -39,12 +35,7 @@ class Minisip : public MObject{
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
 		MessageRouter * ehandler;
-		
-#ifdef GTK_GUI
-	#ifdef DEBUG_OUTPUT
 		MRef<ConsoleDebugger *> consoleDbg;
-	#endif
-#endif
 };
 
 #endif

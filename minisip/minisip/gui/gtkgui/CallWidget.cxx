@@ -22,14 +22,14 @@
 
 #include"CallWidget.h"
 #include"MainWindow.h"
-//#include"../../../sip/state_machines/SipSMCommand.h"
-//#include"../../../sip/state_machines/SipSoftPhone.h"
+//#include<libminisip/sip/state_machines/SipSMCommand.h>
+//#include<libminisip/sip/state_machines/SipSoftPhone.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
-#include"../../Bell.h"
-#include"../../../mediahandler/MediaCommandString.h"
-#include"../../../mediahandler/Session.h"
-#include"../../../mediahandler/MediaStream.h"
+#include<libminisip/minisip/Bell.h>
+#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/mediahandler/Session.h>
+#include<libminisip/mediahandler/MediaStream.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

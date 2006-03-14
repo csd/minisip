@@ -23,7 +23,7 @@
 
 
 
-#include "../../../conf/ConferenceControl.h"
+#include <libminisip/conf/ConferenceControl.h>
 #include"MainWindow.h"
 #include"CallWidget.h"
 #include"ConferenceWidget.h"
@@ -40,11 +40,11 @@
 #include"ImWidget.h"
 #include"AccountsList.h"
 #include"AccountsStatusWidget.h"
-#include"../../../sip/SipSoftPhoneConfiguration.h"
-#include"../../contactdb/ContactDb.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/minisip/contactdb/ContactDb.h>
 #include<libmsip/SipCommandString.h>
 
-#include"../../../mediahandler/MediaCommandString.h"
+#include<libminisip/mediahandler/MediaCommandString.h>
 
 #include<libmutil/trim.h>
 #include<libmutil/itoa.h>
