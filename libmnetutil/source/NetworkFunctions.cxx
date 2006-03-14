@@ -326,6 +326,10 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	#ifdef DEBUG_OUTPUT
 	cerr << "NetworkFunc:getHostHandlingServ = " << ret << ":" << ret_port << endl;
 	#endif
+#else
+	cerr << "ERROR! NetworkFunctions::getHostHandlingService not implemented!" << endl << 
+		" Try resolving the IP manually and feeding the numeric form x.y.z.m to miniSIP" << endl <<
+		" We are working on it" << endl;
 #endif
 	return ret;
 }
