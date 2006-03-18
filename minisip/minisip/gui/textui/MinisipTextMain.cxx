@@ -38,7 +38,7 @@ int main( int argc, char *argv[] )
 				      //install them
 	
 	cerr << "Creating TextUI"<< endl;
-	MRef<Gui *> gui = new MinisipTextUI();
+	MRef<MinisipTextUI *> gui = new MinisipTextUI();
 	cerr << "Minisip: 1" << endl;
 // 	LogEntry::handler = (GtkMainUI *)*gui;
 	cerr << "Minisip: 2" << endl;
@@ -46,8 +46,12 @@ int main( int argc, char *argv[] )
 	merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
 	LogEntry::handler = NULL;
 
-	Minisip minisip( gui, argc, argv );
+	Minisip minisip( *gui, argc, argv );
 	if( minisip.startSip() > 0 ) {
+		gui->displayMessage("");
+		gui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
+		gui->displayMessage("");
+	  
 		minisip.runGui();
 	} else {
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;

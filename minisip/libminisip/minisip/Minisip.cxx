@@ -288,14 +288,6 @@ int Minisip::startSip() {
 //		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
 //		gui->handleCommand(pupd);
 
-#ifdef TEXT_UI
-		MRef<MinisipTextUI *> textui = dynamic_cast<MinisipTextUI *>(*gui);
-		if (textui){
-			textui->displayMessage("");
-			textui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
-		textui->displayMessage("");
-		}
-#endif
 		//sip->run();
 	}
 		
