@@ -69,7 +69,7 @@ class MainWindow : public GtkMainUI,
 		#endif
 {
 	public:
-		MainWindow( Gtk::Main *main );
+		MainWindow( Gtk::Main *main, std::string programDir );
 		virtual ~MainWindow();
 
 		bool isVisible();
@@ -127,6 +127,7 @@ class MainWindow : public GtkMainUI,
 
 		virtual std::string getMemObjectType(){return "MainWindow";};
 
+		std::string getDataFileName( std::string baseName );
 		
 	private:
 
@@ -228,6 +229,8 @@ class MainWindow : public GtkMainUI,
 		minilist< MRef<LogEntry *> > logEntries;
 		Mutex logEntriesLock;
 
+		std::string programDir;
+		std::string lastDataDir;
 };
 
 

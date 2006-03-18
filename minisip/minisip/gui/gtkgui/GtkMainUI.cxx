@@ -41,5 +41,7 @@ GtkMainUI *GtkMainUI::create( int argc, char ** argv )
 
 	}
 
-	return new MainWindow( kit );
+	string programDir = Glib::path_get_dirname( argv[0] );
+
+	return new MainWindow( kit, programDir );
 }

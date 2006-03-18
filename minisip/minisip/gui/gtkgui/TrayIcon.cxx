@@ -42,7 +42,7 @@ MTrayIcon::MTrayIcon( MainWindow * mainWindow,
 	
 
 	trayIcon = egg_tray_icon_new( "minisip" );
-	image = new Gtk::Image( (string)MINISIP_DATADIR + "/tray_icon.png" );
+	image = new Gtk::Image( mainWindow->getDataFileName( "tray_icon.png" ) );
 
 	box.add( *image );
 	gtk_container_add( GTK_CONTAINER(trayIcon), GTK_WIDGET(box.gobj()));

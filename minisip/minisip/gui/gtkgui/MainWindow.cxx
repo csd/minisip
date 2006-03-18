@@ -64,7 +64,7 @@
 #define BIND sigc::bind
 #endif
 
-MainWindow::MainWindow( Gtk::Main *main ):kit( main ){
+MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	Gtk::Button * callButton;
 	Gtk::Button * imButton;
@@ -83,10 +83,11 @@ MainWindow::MainWindow( Gtk::Main *main ):kit( main ){
 	Gtk::Expander * dtmfExpander;
 #endif
 	nextConfId=0;
+	this->programDir = programDir;
 	registerIcons();
 
 	try{
-		refXml = Gnome::Glade::Xml::create((string)MINISIP_DATADIR + "/minisip.glade");
+		refXml = Gnome::Glade::Xml::create( getDataFileName("minisip.glade") );
 	}
   
 	catch(const Gnome::Glade::XmlError& ex){
@@ -913,13 +914,52 @@ void MainWindow::runCertificateSettings(){
 	config->save();
 }
 
+static string ensureAbsolutePath( string fileName ){
+	if( Glib::path_is_absolute( fileName ) ){
+		return fileName;
+	}
+	else{
+		return Glib::build_filename( Glib::get_current_dir(), fileName );
+	}
+}
+
+string MainWindow::getDataFileName( string baseName ){
+
+	// Check last data dir
+	if( !lastDataDir.empty() ){
+		string lastDirName = Glib::build_filename( lastDataDir, baseName );
+		if( Glib::file_test( lastDirName, Glib::FILE_TEST_EXISTS ) ){
+			return ensureAbsolutePath( lastDirName );
+		}
+	}
+
+#ifdef MINISIP_DATADIR
+	// Check configured data dir
+	string dataDirName = Glib::build_filename( MINISIP_DATADIR, baseName );
+	if( Glib::file_test( dataDirName, Glib::FILE_TEST_EXISTS ) ){
+		lastDataDir = MINISIP_DATADIR;
+		return ensureAbsolutePath( dataDirName );
+	}
+#endif
+
+	// Check share sub directory in the program directory
+	string progDirName = Glib::build_filename( Glib::build_filename( programDir, "share" ), baseName );
+	if( Glib::file_test( progDirName, Glib::FILE_TEST_EXISTS ) ){
+		lastDataDir = Glib::build_filename( programDir, "share" );
+		return ensureAbsolutePath( progDirName );
+	}
+
+	merr << "Can't find data file: " << baseName << end;
+	return "";
+}
+
 void MainWindow::registerIcons(){
 	factory = Gtk::IconFactory::create();
 	
 	Gtk::IconSet * iconSet = new Gtk::IconSet;
 	Gtk::IconSource * iconSource = new Gtk::IconSource;
 
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/secure.png" );
+	iconSource->set_filename( getDataFileName( "secure.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
 	iconSet->add_source( *iconSource );
 
@@ -930,7 +970,7 @@ void MainWindow::registerIcons(){
 	iconSource = new Gtk::IconSource;
 	iconSet = new Gtk::IconSet;
 	
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/insecure.png" );
+	iconSource->set_filename( getDataFileName( "insecure.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_DIALOG );
 	iconSet->add_source( *iconSource );
 
@@ -941,7 +981,7 @@ void MainWindow::registerIcons(){
 	iconSource = new Gtk::IconSource;
 	iconSet = new Gtk::IconSet;
 	
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/play.png" );
+	iconSource->set_filename( getDataFileName( "play.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
 	iconSet->add_source( *iconSource );
 
@@ -952,7 +992,7 @@ void MainWindow::registerIcons(){
 	iconSource = new Gtk::IconSource;
 	iconSet = new Gtk::IconSet;
 	
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/noplay.png" );
+	iconSource->set_filename( getDataFileName( "noplay.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
 	iconSet->add_source( *iconSource );
 
@@ -963,7 +1003,7 @@ void MainWindow::registerIcons(){
 	iconSource = new Gtk::IconSource;
 	iconSet = new Gtk::IconSet;
 	
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/record.png" );
+	iconSource->set_filename( getDataFileName( "record.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
 	iconSet->add_source( *iconSource );
 
@@ -974,7 +1014,7 @@ void MainWindow::registerIcons(){
 	iconSource = new Gtk::IconSource;
 	iconSet = new Gtk::IconSet;
 	
-	iconSource->set_filename( (string)MINISIP_DATADIR + "/norecord.png" );
+	iconSource->set_filename( getDataFileName( "norecord.png" ) );
 	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
 	iconSet->add_source( *iconSource );
 
