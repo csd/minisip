@@ -8,6 +8,11 @@ libminisip_la_SOURCES = Bell.cxx \
 		       ConsoleDebugger.cxx \
 		       LogEntry.cxx
 
+if OS_WIN
+libminisip_la_SOURCES += UserConfigWin32.cxx
+else
+libminisip_la_SOURCES += UserConfigPosix.cxx
+endif
 
 AM_LDFLAGS = @AVCODEC_LDFLAGS@ @OSSO_LIBS@ $(RELOC_LDFLAGS)
 AM_CXXFLAGS += @OSSO_CFLAGS@
@@ -71,6 +76,7 @@ noinst_HEADERS  = Bell.h \
                   MessageRouter.h \
                   ConsoleDebugger.h \
 		  LogEntry.h \
-		  Minisip.h
+		  Minisip.h \
+		  UserConfig.h
 
 

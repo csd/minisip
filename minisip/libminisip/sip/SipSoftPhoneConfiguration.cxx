@@ -40,6 +40,7 @@
 #include"../minisip/contactdb/PhoneBook.h"
 #include"../minisip/contactdb/MXmlPhoneBookIo.h"
 #include"../minisip/confbackend/ConfBackend.h"
+#include"../minisip/UserConfig.h"
 #include<fstream>
 #include"../soundcard/AudioMixer.h"
 
@@ -531,22 +532,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 
 string SipSoftPhoneConfiguration::getDefaultPhoneBookFilename() {
-	string phonebookFileName;
-	char *home = NULL;
-#ifndef _WIN32_WCE
-	home= getenv("HOME");
-#endif	
-	if (home==NULL){
-			merr << "WARNING: Could not determine home directory"<<end;
-		#ifdef WIN32
-			phonebookFileName = string("c:\\minisip\\minisip.addr");
-		#else
-			phonebookFileName = string("/.minisip.addr");
-		#endif
-	}else{
-			phonebookFileName = string(home)+ string("/.minisip.addr");
-	}
-	return phonebookFileName;
+	return UserConfig::getFileName( "minisip.addr" );
 }
 
 bool SipSoftPhoneConfiguration::checkVersion( uint32_t fileVersion/* , string fileVersion_str */) {

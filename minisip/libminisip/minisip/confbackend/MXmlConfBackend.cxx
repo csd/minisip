@@ -21,6 +21,7 @@
 */
 
 #include"MXmlConfBackend.h"
+#include"../UserConfig.h"
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
@@ -107,22 +108,5 @@ int32_t MXmlConfBackend::loadInt( const std::string &key,
 }
 
 string MXmlConfBackend::getDefaultConfigFilename(){
-
-        string ret;
-        char *home = NULL;
-#ifndef _WIN32_WCE
-		home = getenv("HOME");
-#endif
-        if (home==NULL){
-                merr << "WARNING: Could not determine home directory"<<end;
-
-#ifdef WIN32
-                ret = string("c:\\minisip\\minisip.conf");
-#else
-                ret = string("/.minisip.conf");
-#endif
-        }else{
-                ret = string(home)+ string("/.minisip.conf");
-        }
-        return ret;
+	return UserConfig::getFileName( "minisip.conf" );
 }
