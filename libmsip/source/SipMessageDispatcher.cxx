@@ -114,7 +114,6 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 					SipSMCommand::TU);
 // 			managementHandler->handleCommand(cmd); //process the command, so it moves to terminated state
 			managementHandler->getSipStack()->getDialogContainer()->stopRunning();
-			dialogListLock.unlock();
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
