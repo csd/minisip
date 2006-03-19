@@ -101,6 +101,29 @@ LDFLAGS="${LDFLAGS} -rdynamic"
 dnl Check types
 AC_CHECK_TYPES([uint])
 
+dnl
+dnl PortAudio V19 support
+dnl
+AC_ARG_ENABLE(portaudio,
+	[AS_HELP_STRING([--enable-portaudio],
+		[enable PortAudio V19 support (default auto).])],,
+	[enable_portaudio=auto])
+
+if test ! x$enable_portaudio = xno; then
+   have_portaudio=yes
+   AC_CHECK_HEADERS([portaudio.h],,have_portaudio=no)
+   AC_CHECK_LIB([portaudio],[Pa_GetDefaultOutputDevice],[PORTAUDIO_LIBS=-lportaudio],have_portaudio=no)
+
+   if test x$have_portaudio = xyes; then
+      AC_DEFINE(PORTAUDIO_SUPPORT, [1], [PortAudio V19 SoundDevice support.])
+   elif test x$enable_portaudio = xyes; then
+      AC_MSG_ERROR([Could not find PortAudio requirement(s).])
+   fi
+
+   AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
+   AC_SUBST(PORTAUDIO_LIBS)
+fi
+
 dnl STL
 dnl AC_ARG_ENABLE(stl,
 dnl    [ --enable-stl enables the use of C++ STL (default disabled)],

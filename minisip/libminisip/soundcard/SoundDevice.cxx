@@ -27,20 +27,24 @@
 #include"FileSoundDevice.h"
 
 #ifndef WIN32
-#	include"OssSoundDevice.h"
-#	ifdef HAVE_LIBASOUND
-#		include"AlsaSoundDevice.h"
-#	endif
-#else
-#	ifdef DSOUND
-#		include"DirectSoundDevice.h"
-#	elif defined(WAVE_SOUND)
-#		include"WaveSoundDevice.h"
-#	else
-#		error "NO Windows AUDIO Defined!"
-#	endif
+#include"OssSoundDevice.h"
 #endif
 
+#ifdef HAVE_LIBASOUND
+#include"AlsaSoundDevice.h"
+#endif
+
+#ifdef DSOUND
+#include"DirectSoundDevice.h"
+#endif
+
+#ifdef WAVE_SOUND
+#include"WaveSoundDevice.h"
+#endif
+
+#ifdef PORTAUDIO_SUPPORT
+#include"PortAudioDevice.h"
+#endif
 
 #include<stdio.h>
 
@@ -83,6 +87,12 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 #ifdef WAVE_SOUND
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
+	}
+#endif
+
+#ifdef PORTAUDIO_SUPPORT
+	if( devideId.substr( 0, 3 ) == "pa:" ){
+		return new PortAudioDevice( devideId.substr( 3, string::npos ) );
 	}
 #endif
 

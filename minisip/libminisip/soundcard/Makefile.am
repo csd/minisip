@@ -36,6 +36,11 @@ ALSA_SRC =	AlsaCard.cxx \
 
 DSOUND_SRC = 	DirectSoundDevice.cxx 
 
+PORTAUDIO_SRC = PortAudioDevice.h	\
+		PortAudioDevice.cxx	\
+		ringbuffer/ringbuffer.h	\
+		ringbuffer/ringbuffer.c
+
 libsoundcard_la_SOURCES = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
@@ -51,6 +56,11 @@ if DIRECT_SOUND
 libsoundcard_la_SOURCES += $(DSOUND_SRC)
 libsoundcard_la_LIBADD += $(DSOUND_LIBS)
 endif DIRECT_SOUND
+
+if PORTAUDIO_SUPPORT
+libsoundcard_la_SOURCES += $(PORTAUDIO_SRC)
+libsoundcard_la_LIBADD += $(PORTAUDIO_LIBS)
+endif PORTAUDIO_SUPPORT
 
 noinst_HEADERS  = SoundIO.h \
 		  SoundDevice.h \
