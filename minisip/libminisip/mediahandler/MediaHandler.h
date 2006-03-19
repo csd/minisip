@@ -50,7 +50,7 @@ class MediaHandler : public MObject, public SessionRegistry {
 		 * for NAT traversal mechanisms
 		 */
 		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );
-// 		~MediaHandler();
+		virtual ~MediaHandler();
 		
 		/**
 		 * Creates a new media session, for use in a new VoIP call

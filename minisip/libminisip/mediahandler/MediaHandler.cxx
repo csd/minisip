@@ -64,6 +64,10 @@ MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpPro
 	init();
 }
 
+MediaHandler::~MediaHandler(){
+// 	cerr << "~MediaHandler" << end;
+}
+
 void MediaHandler::init(){
 
 	media.clear();

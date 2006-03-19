@@ -103,6 +103,10 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 }
 
 
+Sip::~Sip(){
+// 	cerr << "~Sip" << endl;
+}
+
 /*
 void Sip::setCallback(SipCallback *callback){
 	this->callback = callback;

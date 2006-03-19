@@ -39,7 +39,7 @@ class MessageRouter: 	public SipCallback,
 			public ConfCallback{
 	public:
 		MessageRouter();
-		virtual ~MessageRouter(){}
+		virtual ~MessageRouter();
 		
 		void setSip(MRef<Sip*> ssp);
 		void setGui(MRef<Gui *> guiptr){gui = guiptr;};

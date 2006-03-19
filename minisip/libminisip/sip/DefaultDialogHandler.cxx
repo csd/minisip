@@ -76,6 +76,10 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack,
 #endif
 }
 
+DefaultDialogHandler::~DefaultDialogHandler(){
+// 	cerr << "~DefaultDialogHandler" << endl;
+}
+
 string DefaultDialogHandler::getName(){
 	return "DefaultDialogHandler";
 }

@@ -83,6 +83,9 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	inherited = new SipCommonConfig;
 }
 
+SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
+// 	cerr << "~SipSoftPhoneConfiguration" << endl;
+}
 
 void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ... 

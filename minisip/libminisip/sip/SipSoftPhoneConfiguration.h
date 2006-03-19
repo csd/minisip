@@ -58,6 +58,7 @@ class PhoneBook;
 class SipSoftPhoneConfiguration : public MObject{
 	public:
 		SipSoftPhoneConfiguration();
+		virtual ~SipSoftPhoneConfiguration();
 
 		virtual std::string getMemObjectType(){return "SipSoftPhoneConfig";}
 

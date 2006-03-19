@@ -59,7 +59,7 @@ class DefaultDialogHandler : public SipDialog{
 		 * @param pconf      the phone configuration
 		 */
 		DefaultDialogHandler(MRef<SipStack*> stack, MRef<SipDialogConfig*> conf,MRef<SipSoftPhoneConfiguration*> pconf, MRef<MediaHandler *>mediaHandler);
-		~DefaultDialogHandler(){};
+		virtual ~DefaultDialogHandler();
 
 		virtual std::string getMemObjectType(){return "DefaultDialogHandler";}
 

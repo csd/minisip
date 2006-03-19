@@ -99,6 +99,8 @@ class Sip: public Runnable{
 				MRef<ca_db *> cert_db = NULL
 		    );
 
+		virtual ~Sip();
+
 		virtual std::string getMemObjectType(){return "Sip";}
 		
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig();

@@ -39,6 +39,10 @@ using namespace std;
 MessageRouter::MessageRouter(){
 }
 
+MessageRouter::~MessageRouter(){
+// 	cerr << "~MessageRouter" << endl;
+}
+
 void MessageRouter::setSip(MRef<Sip*> s){
 	if (s.isNull()){
 #ifdef DEBUG_OUTPUT		

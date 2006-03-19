@@ -160,19 +160,31 @@ int Minisip::exit(){
 		mout << "Waiting for the SipStack to close ..." << end;
 #endif
 		sip->join();
+		sip->getSipStack()->setCallback( NULL );
+		sip->getSipStack()->setDefaultHandler( NULL );
+		sip = NULL;
 	}
-	
+
+	gui->setCallback( NULL );
+	gui->setSipSoftPhoneConfiguration( NULL );
+
 #ifdef DEBUG_OUTPUT
 	mout << end << "Stopping the Console Debugger thread" << end;
 	if( ! consoleDbg.isNull() ) {
 		consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
 		consoleDbg->join();
+		consoleDbg->setMediaHandler( NULL );
+		consoleDbg = NULL;
 	}
 #endif	
 	if( ehandler ){
 		mout << "Delete ehandler" << end;
 		delete ehandler;
 	}
+
+	phoneConf->sip = NULL;
+	phoneConf = NULL;
+	mediaHandler = NULL;
 
 	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
 	return ret;
