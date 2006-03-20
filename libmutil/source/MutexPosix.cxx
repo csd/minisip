@@ -25,7 +25,6 @@
 #include<config.h>
 
 #include<libmutil/Mutex.h>
-#include<libmutil/merror.h>
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -60,8 +59,21 @@ Mutex::Mutex(const Mutex &){
 }
 
 void Mutex::createMutex(){
+	pthread_mutexattr_t *attr = NULL;
+
+#ifdef DEBUG_OUTPUT
+	pthread_mutexattr_t errorCheck;
+	pthread_mutexattr_init( &errorCheck );
+	pthread_mutexattr_settype( &errorCheck, PTHREAD_MUTEX_ERRORCHECK );
+	attr = &errorCheck;
+#endif
+
 	handle_ptr = new pthread_mutex_t;
-	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, NULL);
+	pthread_mutex_init( (pthread_mutex_t*)handle_ptr, attr );
+
+#ifdef DEBUG_OUTPUT
+	pthread_mutexattr_destroy( &errorCheck );
+#endif
 }
 
 Mutex::~Mutex(){
@@ -72,16 +84,10 @@ Mutex::~Mutex(){
 
 void Mutex::lock(){
 	int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
-	if (ret!=0){
-		merror("pthread_mutex_lock");
-		exit(1);
-	}
+	massert( ret == 0 );
 }
 
 void Mutex::unlock(){
 	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
-	if (ret!=0){
-		merror("pthread_mutex_unlock");
-		exit(1);
-	}
+	massert( ret == 0 );
 }
