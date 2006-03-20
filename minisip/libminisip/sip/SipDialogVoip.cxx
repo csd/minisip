@@ -1607,6 +1607,9 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 
 	//string tmp = getDialogConfig().inherited.userUri;
 	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
+	#ifdef DEBUG_OUTPUT
+	merr << "SipDialogVoip::sendBye : tmp=" << tmp << end;
+	#endif
 	uint32_t i = tmp.find("@");
 	massert(i!=string::npos);
 	i++;
