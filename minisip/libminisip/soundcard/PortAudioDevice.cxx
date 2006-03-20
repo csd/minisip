@@ -19,10 +19,13 @@
 #include<config.h>
 #include"PortAudioDevice.h"
 #include<portaudio.h>
+#include<math.h>
 #include<cstdlib>
 #include<iostream>
 
 using namespace std;
+
+const int BUFFER_WIDTH = sizeof(short);
 
 //#define PA_DEBUG
 
@@ -60,9 +63,6 @@ PortAudioDevice::PortAudioDevice( string device ): SoundDevice( device )
 	outRing = NULL;
 	inRing = NULL;
 
-	outBuffer = NULL;
-	inBuffer = NULL;
-
 	outBytesPerSample = 1;
 	inBytesPerSample = 1;
 
@@ -99,7 +99,7 @@ int PortAudioDevice::readFromDevice( byte_t * buffer, uint32_t nSamples )
 #endif
 	while( inRing ){
 		inMutex.lock();
-		long available = RingBuffer_GetReadAvailable( inRing );
+		long available = inRing->getSize() * BUFFER_WIDTH;
 
 		if( available < nBytes ){
 #ifdef PA_DEBUG
@@ -113,9 +113,9 @@ int PortAudioDevice::readFromDevice( byte_t * buffer, uint32_t nSamples )
 			continue;
 		}
 
-		int res = RingBuffer_Read( inRing, buffer, nBytes ) / inBytesPerSample / nChannelsRecord;
+		bool res = inRing->read((short *)buffer, nBytes / BUFFER_WIDTH );
 		inMutex.unlock();
-		return res;
+		return res ? nBytes / inBytesPerSample / nChannelsRecord : 0;
 	}
 
 	return -1;
@@ -130,7 +130,7 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 #endif
 	while( outRing ){
 		outMutex.lock();
-		long available = RingBuffer_GetWriteAvailable( outRing );
+		long available = outRing->getFree() * BUFFER_WIDTH;
 
 		if( available < nBytes ){
 #ifdef PA_DEBUG
@@ -144,9 +144,9 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 			continue;
 		}
 
-		int res = RingBuffer_Write( outRing, buffer, nBytes ) / outBytesPerSample / nChannelsPlay;
+		bool res = outRing->write( (const short *)buffer, nBytes / BUFFER_WIDTH );
 		outMutex.unlock();
-		return res;
+		return res ? nBytes / outBytesPerSample / nChannelsPlay : 0;
 	}
 
 	return -1;
@@ -201,15 +201,7 @@ int PortAudioDevice::openPlayback( int32_t samplingRate, int nChannels, int form
 	cerr << "RingBuffer playback size: " << num << endl;
 #endif
 	
-	outBuffer = new byte_t[num];
-	outRing = new RingBuffer();
-
-	int res = RingBuffer_Init( outRing, num, outBuffer );
-
-	if( res < 0 ){
-		cerr << "RingBuffer_Init failed" << endl;
-		return -1;
-	}
+	outRing = new CircularBuffer(num / BUFFER_WIDTH);
 
 	if( Pa_StartStream( outStream ) != paNoError ){
 		cerr << "Pa_StartStream failed" << endl;
@@ -256,14 +248,7 @@ int PortAudioDevice::openRecord( int32_t samplingRate, int nChannels, int format
 	cerr << "RingBuffer record size: " << num << endl;
 #endif
 
-	inBuffer = new byte_t[num];
-	inRing = new RingBuffer();
-
-	int res = RingBuffer_Init( inRing, num, inBuffer );
-	if( res < 0){
-		cerr << "RingBuffer_Init failed" << endl;
-		return -1;
-	}
+	inRing = new CircularBuffer(num / BUFFER_WIDTH);
 
 	if( Pa_StartStream( inStream ) != paNoError ){
 		cerr << "Pa_StartStream failed" << endl;
@@ -282,11 +267,12 @@ int PortAudioDevice::closePlayback()
 		outStream = NULL;
 
 		outMutex.lock();
-		delete outRing;
-		outRing = NULL;
+
+		if( outRing ){
+			delete outRing;
+			outRing = NULL;
+		}
 		
-		delete[] outBuffer;
-		outBuffer = NULL;
 		outMutex.unlock();
 
 		openedPlayback = false;
@@ -305,11 +291,12 @@ int PortAudioDevice::closeRecord()
 		inStream = NULL;
 
 		inMutex.lock();
-		delete inRing;
-		inRing = NULL;
+
+		if( inRing ){
+			delete inRing;
+			inRing = NULL;
+		}
 		
-		delete[] inBuffer;
-		inBuffer = NULL;
 		inMutex.unlock();
 
 		openedRecord = false;
@@ -350,7 +337,7 @@ int PortAudioDevice::callback( const void *inputBuffer,
 		//		cerr << frameCount << ',';
 
 		long nBytes = frameCount * inBytesPerSample * nChannelsRecord;
-		long available = RingBuffer_GetWriteAvailable( inRing );
+		long available = inRing->getFree() * BUFFER_WIDTH;
 
 		if( available > nBytes ){
 			available = nBytes;
@@ -358,7 +345,7 @@ int PortAudioDevice::callback( const void *inputBuffer,
 			cerr << 'V';
 		}
 
-		RingBuffer_Write( inRing, const_cast<void*>(inputBuffer), available );
+		inRing->write( (short *)inputBuffer, available / BUFFER_WIDTH );
 		inCond.broadcast();
 #ifdef PA_DEBUG
 		cerr << '<';
@@ -371,7 +358,7 @@ int PortAudioDevice::callback( const void *inputBuffer,
 		long nBytes = frameCount * outBytesPerSample * nChannelsPlay;
 		if ( outRing ){
 			outMutex.lock();
-			long available = RingBuffer_GetReadAvailable( outRing );
+			long available = outRing->getSize() * BUFFER_WIDTH;
 
 			if( available > nBytes ){
 				available = nBytes;
@@ -379,7 +366,7 @@ int PortAudioDevice::callback( const void *inputBuffer,
 				cerr << '^';
 			}
 
-			RingBuffer_Read( outRing, outputBuffer, available );
+			outRing->read( (short *)outputBuffer, available / BUFFER_WIDTH );
 			outCond.broadcast();
 			
 			if( available < nBytes ){

@@ -20,7 +20,7 @@
 #define PORTAUDIODEVICE_H
 
 #include<portaudio.h>
-#include"ringbuffer/ringbuffer.h"
+#include<libmutil/CircularBuffer.h>
 #include<libmutil/CondVar.h>
 #include"SoundDevice.h"
 
@@ -71,11 +71,8 @@ class PortAudioDevice: public SoundDevice{
 		PaStream *outStream;
 		PaStream *inStream;
 
-		RingBuffer *outRing;
-		RingBuffer *inRing;
-
-		byte_t *outBuffer;
-		byte_t *inBuffer;
+		CircularBuffer *outRing;
+		CircularBuffer *inRing;
 
 		int outBytesPerSample;
 		int inBytesPerSample;

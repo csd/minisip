@@ -37,9 +37,7 @@ ALSA_SRC =	AlsaCard.cxx \
 DSOUND_SRC = 	DirectSoundDevice.cxx 
 
 PORTAUDIO_SRC = PortAudioDevice.h	\
-		PortAudioDevice.cxx	\
-		ringbuffer/ringbuffer.h	\
-		ringbuffer/ringbuffer.c
+		PortAudioDevice.cxx
 
 libsoundcard_la_SOURCES = $(BASIC_SOUNDCARD_SRC)
 
