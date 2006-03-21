@@ -179,6 +179,9 @@ std::string SipProxy::findProxy(std::string uri, uint16_t &port, string transpor
 		srv = "_sip._udp"; 
 	}
 
+	#ifdef DEBUG_OUTPUT
+	cerr << "SipProxy::findProxy : srv=" << srv << "; domain=" << domain << "; port=" << port << endl;
+	#endif
 	std::string proxy = NetworkFunctions::getHostHandlingService(srv, domain, port);
 	if (proxy.length()<=0){
 		return "unknown";
