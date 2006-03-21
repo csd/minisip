@@ -50,6 +50,7 @@
 #endif
 
 #include<libmutil/dbg.h>
+#include<libmutil/massert.h>
 
 //update both!!!! the str define is to avoid including itoa.h
 #define CONFIG_FILE_VERSION_REQUIRED 2
@@ -88,6 +89,9 @@ SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
 }
 
 void SipSoftPhoneConfiguration::save(){
+	massert(backend); // This will happen if save() is done without first 
+			 // having done a load() (bug).
+			 
 	//Set the version of the file ... 
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 	

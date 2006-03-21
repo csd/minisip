@@ -27,11 +27,22 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
+#include"../gui/Gui.h"
 #include<string>
 
 class ConfBackend : public MObject{
 	public:
-		static MRef<ConfBackend *> create();
+		/**
+		 * @param gui	A configuration backend can need to provide
+		 * 		authentication information in order to 
+		 * 		access the configuration. In that case it
+		 * 		will ask the user via the gui object passed
+		 * 		to this method for username and password.
+		 * 		This is for example the case of the
+		 * 		configuration is stored on server instead
+		 * 		of on the local device.
+		 */
+		static MRef<ConfBackend *> create(MRef<Gui*> gui);
 
 		virtual void save( const std::string &key, 
 				const std::string &value )=0;

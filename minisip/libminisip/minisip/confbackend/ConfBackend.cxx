@@ -30,7 +30,8 @@
 
 using namespace std;
 
-MRef<ConfBackend *> ConfBackend::create(){
+MRef<ConfBackend *> ConfBackend::create(MRef<Gui*>){ // No configuration needs the GUI yet...
+						     
 	try{
 #ifdef GCONF_SUPPORT
 		return new GConfBackend();
