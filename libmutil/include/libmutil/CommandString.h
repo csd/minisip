@@ -67,12 +67,4 @@ class LIBMUTIL_API CommandString : public MObject{
 		map<string, string> keys;
 };
 
-class LIBMUTIL_API CommandStringReceiver{
-	public:
-		virtual ~CommandStringReceiver(){}
-		
-		virtual void handleCommand(const CommandString &)=0;
-};
-
-
 #endif
