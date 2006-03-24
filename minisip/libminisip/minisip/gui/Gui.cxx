@@ -22,7 +22,7 @@
 
 #include"Gui.h"
 
-#include"GuiCallback.h"
+#include"../ConfMessageRouter.h"
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -32,11 +32,22 @@ Gui::~Gui(){
 
 }
 
-void Gui::setCallback(GuiCallback *callback){
-	this->callback=callback;
+void Gui::setCallback(MRef<CommandReceiver*> cb){
+	this->callback=cb;
 }
 
-GuiCallback *Gui::getCallback(){
+MRef<CommandReceiver*> Gui::getCallback(){
 	return callback;
 }
+
+void Gui::setConfCallback(MRef<ConfMessageRouter*> cb){
+	confCallback = cb;
+}
+
+MRef<ConfMessageRouter*> Gui::getConfCallback(){
+	return confCallback;
+}
+
+
+
 

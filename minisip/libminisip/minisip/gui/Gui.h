@@ -26,13 +26,14 @@
 #include<config.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
+#include<libmutil/MessageRouter.h>
 #include"../LogEntry.h"
-#include"GuiCallback.h"
 
 class SipSoftPhoneConfiguration;
 class ContactDb;
+class ConfMessageRouter;
 
-class Gui : public Runnable {
+class Gui : public Runnable, public CommandReceiver {
 	public:
 		virtual ~Gui();
 
@@ -76,7 +77,19 @@ class Gui : public Runnable {
 		* @param command       Message that is passed to the
 		*                      user interface.
 		*/
-		virtual void handleCommand(CommandString command)=0;
+		virtual void handleCommand(const CommandString &command)=0;
+
+
+		void handleCommand(string subsystem, const CommandString &cmd){
+			assert(subsystem=="gui");
+			handleCommand(cmd);
+		}
+
+		CommandString handleCommandResp(string subsystem, const CommandString& cmd){
+			cerr << "Warning: Gui::handleCommandResp called (BUG)"<<endl;
+			CommandString ret("","");
+			return ret;
+		}
 
 		/**
 		* Purpose: The GUI and the rest of the application
@@ -86,9 +99,18 @@ class Gui : public Runnable {
 		* @param callback      Pointer to the object that will 
 		*                      receive messages FROM the GUI.
 		*/
-		virtual void setCallback(GuiCallback *callback);
+		virtual void setCallback(MRef<CommandReceiver*> cb);
 		
-		GuiCallback * getCallback();
+		MRef<CommandReceiver*> getCallback();
+
+		virtual void setConfCallback(MRef<ConfMessageRouter*> cb);
+		
+		MRef<ConfMessageRouter*> getConfCallback();
+
+		void sendCommand(string toSubsystem, const CommandString &cmd){
+			callback->handleCommand(toSubsystem, cmd);
+		}
+
 
 		// Lesson learned: Doing logging in the GUI is not good
 		// since when ever something interesting happend it is
@@ -103,7 +125,10 @@ class Gui : public Runnable {
 
 		
 	protected:
-		GuiCallback *callback;
+		MRef<CommandReceiver*> callback;
+		MRef<ConfMessageRouter*> confCallback;
+		//ConfCallback *confCallback;
+		//GuiCallback *callback;
 };
 
 
