@@ -4,7 +4,7 @@ lib_LTLIBRARIES = libminisip.la
 
 libminisip_la_SOURCES = Bell.cxx \
                        LocationDetector.cxx \
-		       MessageRouter.cxx \
+		       ConfMessageRouter.cxx \
 		       ConsoleDebugger.cxx \
 		       LogEntry.cxx
 
@@ -73,7 +73,7 @@ endif OS_WIN
 
 noinst_HEADERS  = Bell.h \
                   LocationDetector.h \
-                  MessageRouter.h \
+                  ConfMessageRouter.h \
                   ConsoleDebugger.h \
 		  LogEntry.h \
 		  Minisip.h \

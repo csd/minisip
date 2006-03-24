@@ -9,7 +9,6 @@ using namespace std;
 #include"Minisip.h"
 
 #include<libmutil/termmanip.h>
-#include<libmsip/SipCallback.h>
 #include<libmsip/SipCommandString.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
@@ -29,7 +28,10 @@ using namespace std;
 #include"../conf/ConfCallback.h"
 #include"confbackend/ConfBackend.h"
 #include"confbackend/MXmlConfBackend.h"
-#include"MessageRouter.h"
+#include<libmutil/MessageRouter.h>
+#include<gui/Gui.h>
+
+#include"ConfMessageRouter.h"
 
 #include<libmsip/SipUtils.h>
 #include<exception>
@@ -66,7 +68,7 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
-Minisip::Minisip( MRef<Gui *> gui, int argc, char**argv ):ehandler(NULL),gui(gui){
+Minisip::Minisip( MRef<Gui *> gui, int argc, char**argv ) : gui(gui){
 
 	srand((unsigned int)time(0));
 
@@ -177,10 +179,16 @@ int Minisip::exit(){
 		consoleDbg = NULL;
 	}
 #endif	
-	if( ehandler ){
-		mout << "Delete ehandler" << end;
-		delete ehandler;
+	
+/*	if( messageRouter){
+		mout << "Delete messageRouter" << end;
+		delete messageRouter;
 	}
+*/
+	
+	messageRouter->clear();
+	messageRouter=NULL;
+
 
 	phoneConf->sip = NULL;
 	phoneConf = NULL;
@@ -205,7 +213,8 @@ int Minisip::startSip() {
 	}
 
 	try{
-		ehandler =  new MessageRouter();
+		messageRouter =  new MessageRouter();
+		confMessageRouter =  new ConfMessageRouter();
 //		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT
@@ -232,7 +241,9 @@ int Minisip::startSip() {
 		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
-		ehandler->setMediaHandler( mediaHandler );
+		confMessageRouter->setMediaHandler( mediaHandler );
+		cerr << "EE: Adding media subsystem"<<endl;
+		messageRouter->addSubsystem("media",*mediaHandler);
 #ifdef DEBUG_OUTPUT
 		if( consoleDbg ){
 			consoleDbg->setMediaHandler( mediaHandler );
@@ -262,9 +273,13 @@ int Minisip::startSip() {
 
 		phoneConf->sip = sip;
 
-		sip->getSipStack()->setCallback(ehandler);
+		sip->getSipStack()->setCallback(*messageRouter);
+		sip->getSipStack()->setConfCallback(*confMessageRouter);
 
-		ehandler->setSip(sip);
+		//messageRouter->setSip(sip);
+		cerr << "EE: Adding sip subsystem"<<endl;
+		messageRouter->addSubsystem("sip",*sip);
+		confMessageRouter->setSip(sip);
 
 		/* Load the plugins at this stage */
 //		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
@@ -275,7 +290,10 @@ int Minisip::startSip() {
 		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
 #endif
 		gui->setSipSoftPhoneConfiguration(phoneConf);
-		ehandler->setGui(gui);
+		//messageRouter->setGui(gui);
+		cerr << "EE: Adding gui subsystem"<<endl;
+		messageRouter->addSubsystem("gui",*gui);
+		confMessageRouter->setGui(gui);
 
 	
 /*
@@ -293,8 +311,10 @@ int Minisip::startSip() {
 		sip->getSipStack()->handleCommand(sipcmd2);
 */
 		
+		gui->setCallback(*messageRouter);
+		gui->setConfCallback(*confMessageRouter);
+		
 		sip->start(); //run as a thread ...
-		gui->setCallback(ehandler);
 //		sleep(5);
 		
 //		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");

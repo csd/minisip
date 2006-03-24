@@ -10,9 +10,10 @@ class Gui;
 class SipSoftPhoneConfiguration;
 class Sip;
 class SipSMCommand;
-class MessageRouter;
 class ConferenceControl;
 class ConsoleDebugger;
+class MessageRouter;
+class ConfMessageRouter;
 
 
 class Minisip : public MObject{
@@ -34,7 +35,8 @@ class Minisip : public MObject{
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;
-		MessageRouter * ehandler;
+		MRef<MessageRouter*> messageRouter;
+		MRef<ConfMessageRouter*> confMessageRouter;
 		MRef<ConsoleDebugger *> consoleDbg;
 };
 

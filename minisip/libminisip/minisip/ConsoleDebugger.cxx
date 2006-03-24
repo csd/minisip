@@ -196,7 +196,7 @@ void ConsoleDebugger::sendManagementCommand( string str ) {
 void ConsoleDebugger::sendCommandToMediaHandler( string str ) {
 	CommandString cmdstr ("", str);
 	cerr << "========= MediaHandler Debug info : " << endl;
-	mediaHandler->handleCommand( cmdstr );
+	mediaHandler->handleCommand("media", cmdstr );
 	cerr << "=========" << endl;
 }
 

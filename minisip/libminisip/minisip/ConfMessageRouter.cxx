@@ -20,7 +20,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"MessageRouter.h"
+#include"ConfMessageRouter.h"
 //#include<libmsip/CODECInterface.h>
 //#include"../util/ConfigFile.h"
 //#include"../sip/SipSoftPhoneConfiguration.h"
@@ -36,29 +36,29 @@
 
 using namespace std;
 
-MessageRouter::MessageRouter(){
+ConfMessageRouter::ConfMessageRouter(){
 }
 
-MessageRouter::~MessageRouter(){
-// 	cerr << "~MessageRouter" << endl;
+ConfMessageRouter::~ConfMessageRouter(){
+// 	cerr << "~ConfMessageRouter" << endl;
 }
 
-void MessageRouter::setSip(MRef<Sip*> s){
+void ConfMessageRouter::setSip(MRef<Sip*> s){
 	if (s.isNull()){
 #ifdef DEBUG_OUTPUT		
-		cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
+		cerr << "ERROR: Sip is NULL in set_sip_state_machine in ConfMessageRouter"<< endl;
 #endif
 	}
 	sip= s;
 }
 
-void MessageRouter::confcb_handleGuiCommand(CommandString &command){
+void ConfMessageRouter::confcb_handleGuiCommand(const CommandString &command){
 	gui->handleCommand(command);
 }	
-void MessageRouter::sipcb_handleCommand(CommandString &command){
+void ConfMessageRouter::sipcb_handleCommand(const CommandString &command){
 	gui->handleCommand(command);
 }
-void MessageRouter::sipcb_handleConfCommand(CommandString &command){
+void ConfMessageRouter::sipcb_handleConfCommand(const CommandString &command){
 	bool done=false;
 	int i;
 	//cerr<<"command.getParam3 "+command.getParam3()<<endl;
@@ -82,12 +82,12 @@ void MessageRouter::sipcb_handleConfCommand(CommandString &command){
 	}
 }
 
-void MessageRouter::setConferenceController(ConferenceControl *conf)
+void ConfMessageRouter::setConferenceController(ConferenceControl *conf)
 {
 	confrout.push_back(conf);
 
 }
-void MessageRouter::removeConferenceController(ConferenceControl *conf)
+void ConfMessageRouter::removeConferenceController(ConferenceControl *conf)
 {
 	int i=0;
 	while ((i < confrout.size() ) ) {
@@ -98,7 +98,7 @@ void MessageRouter::removeConferenceController(ConferenceControl *conf)
 	}
 	
 }
-void MessageRouter::guicb_handleConfCommand(string &conferencename){
+void ConfMessageRouter::guicb_handleConfCommand(const string &conferencename){
 	//confrout=conf;
 	
 	//confrout->setCallback(this);
@@ -106,7 +106,7 @@ void MessageRouter::guicb_handleConfCommand(string &conferencename){
 	//confrout->handleGuiCommand(conferencename);
 	
 }//bm
-void MessageRouter::guicb_handleConfCommand(CommandString &command){
+void ConfMessageRouter::guicb_handleConfCommand(const CommandString &command){
 	bool done=false;
 	int i;
 	//cerr<<"command.getParam3 "+command.getParam3()<<endl;
@@ -134,7 +134,7 @@ void MessageRouter::guicb_handleConfCommand(CommandString &command){
 	
 	
 }//bm
-ConferenceControl* MessageRouter::getConferenceController(string confid)
+ConferenceControl* ConfMessageRouter::getConferenceController(string confid)
 {
 	bool done=false;
 	int i;
@@ -157,45 +157,46 @@ ConferenceControl* MessageRouter::getConferenceController(string confid)
 }
 
 /*
-string MessageRouter::guicb_confDoInvite(string sip_url){
+string ConfMessageRouter::guicb_confDoInvite(string sip_url){
 	//confrout=conf;
 	//cerr << "MR: from Gui -> CC: guicb_confDoInvite"<< endl;
 	//confrout->handleGuiDoInviteCommand(sip_url);
-	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in MessageRouter"<< endl;
+	//cerr << "ERROR: Sip is NULL in set_sip_state_machine in ConfMessageRouter"<< endl;
 	return ""; //FIXME: Should this method be deleted??? 
 }//bm
 */
 
-void MessageRouter::guicb_handleMediaCommand(CommandString &cmd){
-	mediaHandler->handleCommand(cmd);
+void ConfMessageRouter::guicb_handleMediaCommand(const CommandString &cmd){
+	mediaHandler->handleCommand("media",cmd);
 }
 
-string MessageRouter::guicb_doInvite(string user){
-//	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
-	return sip->invite(user);
-}
+//string ConfMessageRouter::guicb_doInvite(string user){
+////	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
+//	return sip->invite(user);
+//}
 
-void MessageRouter::guicb_handleCommand(CommandString &cmd){
+void ConfMessageRouter::guicb_handleCommand(const CommandString &cmd){
 	//return sip_machine->enqueueCommand(cmd);
 	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
 	sip->getSipStack()->handleCommand(sipcmd);
 }
 
-string MessageRouter::confcb_doJoin(string user, minilist<ConfMember> *conflist, string confId){
+string ConfMessageRouter::confcb_doJoin(string user, minilist<ConfMember> *conflist, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	//cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confjoin(user, conflist, confId);
 	//return "12345";
 }
-string MessageRouter::confcb_doConnect(string user, string confId){
+string ConfMessageRouter::confcb_doConnect(string user, string confId){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	//cerr << "MR: from CC -> MR: confcb_confDoInvite"<< endl;
 	return sip->confconnect(user, confId);
 }
-void MessageRouter::confcb_handleSipCommand(CommandString &command){
+void ConfMessageRouter::confcb_handleSipCommand(const CommandString &command){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	//cerr << "MR: from CC -> MR: confcb_handleSipCommand"<< endl;
 	SipSMCommand sipcmd(command, SipSMCommand::remote, SipSMCommand::TU);
 	sip->getSipStack()->handleCommand(sipcmd);
 	
 }
+

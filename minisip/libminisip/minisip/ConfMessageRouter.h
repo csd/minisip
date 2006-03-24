@@ -20,55 +20,59 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef MESSAGE_ROUTER_H
-#define MESSAGE_ROUTER_H
+#ifndef CONF_MESSAGE_ROUTER_H
+#define CONF_MESSAGE_ROUTER_H
 
 #include<config.h>
 
-#include<libmsip/SipCallback.h>
 #include<libmutil/minilist.h>
-#include"gui/GuiCallback.h"
 #include"../sip/Sip.h"
 #include"gui/Gui.h"
 #include"../conf/ConferenceControl.h" 
 #include "../conf/ConfCallback.h"
 #include"../sip/SipSoftPhoneConfiguration.h"
 
-class MessageRouter: 	public SipCallback, 
-			public GuiCallback, 
-			public ConfCallback{
+class ConfMessageRouter: 	//public SipCallback, 
+			//public GuiCallback, 
+			public ConfCallback, public CommandReceiver{
 	public:
-		MessageRouter();
-		virtual ~MessageRouter();
+		ConfMessageRouter();
+		virtual ~ConfMessageRouter();
+		
+		void handleCommand(string subsystem, const CommandString &cmd){
+			if (subsystem=="sip_conf"){
+				sipcb_handleConfCommand(cmd);
+				return;
+			}
+			
+			assert(1==0);
+		}
+
+		CommandString handleCommandResp(string subsystem, const CommandString &cmd){
+			
+			CommandString ret("","command_not_understood");
+			return ret;
+		}
 		
 		void setSip(MRef<Sip*> ssp);
 		void setGui(MRef<Gui *> guiptr){gui = guiptr;};
 		virtual void setConferenceController(ConferenceControl *conf);
 		virtual void removeConferenceController(ConferenceControl *conf);
-		//void setConfControl(ConferenceControl *confptr){conf = confptr;};
-		//void setConference(ConferenceControl *confptr){conf = confptr;};//bm
 		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
 			this->mediaHandler = mediaHandler;}
 
-		virtual void sipcb_handleCommand(CommandString &command);
-		virtual void sipcb_handleConfCommand(CommandString &command);
-		//virtual void sipcb_handleConfCommand(CommandString &command);
-		//virtual void confcb_handleSipCommand(CommandString &command);
-		//void confcb_handleGuiCommand(CommandString &command);
-		virtual void guicb_handleCommand(CommandString &command);
-		virtual void guicb_handleConfCommand(string &conferencename);
-		virtual void guicb_handleConfCommand(CommandString &command);
-//		virtual string guicb_confDoInvite(string sip_url);
-		virtual void guicb_handleMediaCommand(CommandString &command);
-		
-		virtual string guicb_doInvite(string sip_url);
+		virtual void sipcb_handleCommand(const CommandString &command);
+		virtual void sipcb_handleConfCommand(const CommandString &command);
+		virtual void guicb_handleCommand(const CommandString &command);
+		virtual void guicb_handleConfCommand(const string &conferencename);
+		virtual void guicb_handleConfCommand(const CommandString &command);
+		virtual void guicb_handleMediaCommand(const CommandString &command);
 		
 		virtual string confcb_doJoin(string user, minilist<ConfMember> *list, string congId);
 		virtual string confcb_doConnect(string user, string confId);
-		//virtual void guicb_handleConfCommand(ConferenceControl *conf){}
 		virtual void confcb_handleSipCommand(string &command){}
-		virtual void confcb_handleSipCommand(CommandString &command);
-		virtual void confcb_handleGuiCommand(CommandString &command);	
+		virtual void confcb_handleSipCommand(const CommandString &command);
+		virtual void confcb_handleGuiCommand(const CommandString &command);	
 		virtual ConferenceControl* getConferenceController(string confid);
 	private:
 		
