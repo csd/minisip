@@ -37,6 +37,7 @@ endif !HAVE_PTHREAD
 mutil_src =  	source/aes.cxx \
 		source/MemObject.cxx \
 		source/Library.cxx \
+		source/MessageRouter.cxx \
 		source/Exception.cxx \
 		source/massert.cxx \
 		source/IString.cxx \

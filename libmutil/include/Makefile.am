@@ -1,5 +1,6 @@
 pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/Exception.h \
+			libmutil/MessageRouter.h \
 			libmutil/massert.h \
 			libmutil/MemObject.h \
 			libmutil/Library.h \
