@@ -192,14 +192,14 @@ void CallWidget::accept(){
 	switch( state ){
                 
 		case CALL_WIDGET_STATE_INCOMING:
-			cmd = new CommandString( mainCallId, 
+			cmd = new CommandString( mainCallId,
 						SipCommandString::accept_invite );
-			mainWindow->getCallback()->guicb_handleCommand( *cmd );
+			mainWindow->getCallback()->handleCommand("sip", *cmd );
 			stopRinging();
 			break;
 		case CALL_WIDGET_STATE_INCOMING_TRANSFER:
 			cmd = new CommandString( mainCallId, SipCommandString::user_transfer_accept );
-			mainWindow->getCallback()->guicb_handleCommand( *cmd );
+			mainWindow->getCallback()->handleCommand("sip", *cmd );
 			break;
 	}
 	if( cmd ){
@@ -220,16 +220,19 @@ void CallWidget::reject(){
 		case CALL_WIDGET_STATE_RINGING:
 			mainWindow->removeCall( mainCallId );
 			cmdstr = CommandString( mainCallId, SipCommandString::hang_up );
-			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			//mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("sip", cmdstr );
 			break;
 		case CALL_WIDGET_STATE_INCOMING:
 			mainWindow->removeCall( mainCallId );
 			cmdstr = CommandString( mainCallId, SipCommandString::reject_invite);
-			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			//mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("sip", cmdstr );
 			break;
 		case CALL_WIDGET_STATE_INCOMING_TRANSFER:
 			cmdstr = CommandString( mainCallId, SipCommandString::user_transfer_refuse );
-			mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			//mainWindow->getCallback()->guicb_handleCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("sip", cmdstr );
 			status.set_markup( "<big><b>In call</b></big>" );
 			state = CALL_WIDGET_STATE_INCALL; 
 			break;
@@ -247,7 +250,8 @@ void CallWidget::monitorButtonToggled () {
 	CommandString cmdstr( getMainCallId(), 
 			MediaCommandString::set_session_sound_settings,
 			"senders", param2 );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	//mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 #endif
 }
 
@@ -262,7 +266,8 @@ void CallWidget::audioOutSilenceButtonToggled () {
 	CommandString cmdstr( getMainCallId(), 
 			MediaCommandString::set_session_sound_settings,
 			"receivers", param2 );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	//mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 #endif
 }
 
@@ -312,7 +317,7 @@ bool CallWidget::handleCommand( CommandString command ){
 			CommandString cmdstr( getMainCallId(), 
 					MediaCommandString::set_session_sound_settings,
 					"senders", "ON" );
-			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("media", cmdstr );
 		}
 
 		if( command.getOp() == SipCommandString::authentication_failed ){
@@ -464,7 +469,8 @@ void CallWidget::startRinging(){
 	}
 	bell->start();
 	CommandString cmdstr = CommandString( "", MediaCommandString::start_ringing );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	//mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 
 }
 
@@ -474,7 +480,7 @@ void CallWidget::stopRinging(){
 		bell=NULL;
 	}
 	CommandString cmdstr = CommandString( "", MediaCommandString::stop_ringing );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 }
 
 #ifndef OLDLIBGLADEMM
@@ -485,7 +491,8 @@ void CallWidget::transfer(){
 	
 			CommandString transfer( mainCallId, 
 							SipCommandString::user_transfer, uri );
-			mainWindow->getCallback()->guicb_handleCommand( transfer );
+			//mainWindow->getCallback()->guicb_handleCommand( transfer );
+			mainWindow->getCallback()->handleCommand("sip", transfer );
 
 			transferEntry.set_sensitive( false );
 			transferButton.set_sensitive( false );
@@ -551,7 +558,8 @@ void CallWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 		CommandString cmdstr( getMainCallId(), 
 				MediaCommandString::set_session_sound_settings,
 				"senders", "OFF" );
-		mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		//mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		mainWindow->getCallback()->handleCommand("media", cmdstr );
 		return;
 	} else {
 #ifdef DEBUG_OUTPUT
@@ -565,7 +573,8 @@ void CallWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 			CommandString cmdstr( getMainCallId(), 
 					MediaCommandString::set_session_sound_settings,
 					"senders", "ON" );
-			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+			//mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("media", cmdstr );
 		} else {
 #ifdef DEBUG_OUTPUT
 // 			fprintf( stderr, "CallWidget::onTabChange ... doing nothing (call widget state)!\n" );

@@ -25,18 +25,20 @@
 
 #include<gtkmm.h>
 #include<AccountsList.h>
+#include<libmutil/MessageRouter.h>
 
-class GuiCallback;
+//class GuiCallback;
 
 
 class AccountsStatusWidget: public Gtk::TreeView{
 	public:
 		AccountsStatusWidget( Glib::RefPtr<AccountsList> list );
 		~AccountsStatusWidget();
-		void setCallback( GuiCallback *callback );
+		void setCallback( MRef<CommandReceiver*> callback );
 	private:
 
-		GuiCallback * callback;
+		//GuiCallback * callback;
+		MRef<CommandReceiver*> callback;
 
 		// Popup menu
 		Gtk::Menu popupMenu;

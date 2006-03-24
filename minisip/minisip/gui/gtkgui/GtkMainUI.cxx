@@ -21,6 +21,7 @@
 
 #include"GtkMainUI.h"
 #include"MainWindow.h"
+#include<libminisip/minisip/ConfMessageRouter.h>
 
 Gtk::Main *GtkMainUI::kit = NULL;
 

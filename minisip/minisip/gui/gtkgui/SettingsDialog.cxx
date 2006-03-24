@@ -79,7 +79,7 @@ SettingsDialog::~SettingsDialog(){
 	delete dialogWindow;
 }
 
-void SettingsDialog::setCallback( GuiCallback * callback ){
+void SettingsDialog::setCallback( MRef<CommandReceiver*> callback ){
 	this->callback = callback;
 }
 
@@ -121,7 +121,7 @@ void SettingsDialog::accept(){
 	// FIXME: only reload the mediahandler when something actually
 	// changed in the media properties
 	CommandString cmdstr = CommandString( "", MediaCommandString::reload );
-	callback->guicb_handleMediaCommand( cmdstr );
+	callback->handleCommand("media", cmdstr );
 
 	if( warning != "" ){
 #ifdef OLDLIBGLADEMM

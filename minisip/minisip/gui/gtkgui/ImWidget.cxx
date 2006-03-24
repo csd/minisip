@@ -124,7 +124,7 @@ bool ImWidget::handleIm( string message, string from){
 void ImWidget::send( string message ){
 	handleIm( message, "Me" );
 	CommandString cmd("",SipCommandString::outgoing_im,message,toUri, fromUri);
-	mainWindow->getCallback()->guicb_handleCommand( cmd );
+	mainWindow->getCallback()->handleCommand("sip", cmd );
 	
 }
 

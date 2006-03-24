@@ -46,7 +46,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 
 	std::string getMemObjectType(){return "MinisipTextUI";}
 	
-        virtual void handleCommand(CommandString);
+        virtual void handleCommand(const CommandString&);
         virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);
         virtual void setContactDb(MRef<ContactDb *>){};
         virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf );
@@ -56,7 +56,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	virtual void run();
 
  	virtual void guimain();
-	virtual void setCallback(GuiCallback *callback);
+	virtual void setCallback(MRef<CommandReceiver*> callback);
 
 	virtual void keyPressed(int key);
 	virtual void guiExecute(string cmd);

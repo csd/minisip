@@ -31,6 +31,7 @@
 #include<string>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/MessageRouter.h>
 #include"AccountsList.h"
 
 class GeneralSettings;
@@ -39,7 +40,6 @@ class SecuritySettings;
 class AdvancedSettings;
 class SipSoftPhoneConfiguration;
 class CertificateDialog;
-class GuiCallback;
 
 class SettingsDialog 
 #ifdef OLDLIBGLADEMM
@@ -59,11 +59,11 @@ class SettingsDialog
 
 		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
 		void setAccounts( Glib::RefPtr<AccountsList> list );
-		void setCallback( GuiCallback * callback );
+		void setCallback( MRef<CommandReceiver*> callback );
 	
 	private:
-	
-		GuiCallback * callback;
+		MRef<CommandReceiver*> callback;
+		//GuiCallback * callback;
 
 		CertificateDialog * certificateDialog;
 		Gtk::Button * certificateButton;

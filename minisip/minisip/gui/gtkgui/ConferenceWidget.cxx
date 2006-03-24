@@ -31,6 +31,7 @@
 #include<libminisip/mediahandler/MediaCommandString.h>
 #include<libminisip/mediahandler/Session.h>
 #include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/minisip/ConfMessageRouter.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -56,7 +57,7 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 		initiatorUri(remoteUri)
 {
 	conf=new ConferenceControl(configUri,confId, !incoming);
-	mainWindow->getCallback()->setConferenceController(conf);
+	mainWindow->getConfCallback()->setConferenceController(conf);
 	mainConfId=confId;
 	bell = NULL;
 
@@ -131,7 +132,7 @@ ConferenceWidget::~ConferenceWidget(){
 void ConferenceWidget::accept(){
         CommandString command(mainCallId, SipCommandString::accept_invite, initiatorUri);
 	command.setParam3(mainConfId);
-	mainWindow->getCallback()->guicb_handleConfCommand(command);
+	mainWindow->getConfCallback()->guicb_handleConfCommand(command);
 	acceptButton.set_sensitive( false );
 	conferenceButton.set_sensitive(true);
 	rejectButton.set_label( "Quit" );
@@ -143,7 +144,7 @@ void ConferenceWidget::add(){
         
                 CommandString cmd("", "join",uri);
 		cmd.setParam3(mainConfId);
-		mainWindow->getCallback()->guicb_handleConfCommand(cmd);
+		mainWindow->getConfCallback()->guicb_handleConfCommand(cmd);
 
 		//conf->handleGuiDoInviteCommand("ali");
 		//mainWindow->getCallback()->guicb_confDoInvite(uri);
@@ -155,8 +156,8 @@ void ConferenceWidget::add(){
 void ConferenceWidget::reject(){
 	CommandString hup(mainCallId, SipCommandString::hang_up);
 	hup.setParam3(mainConfId);
-	mainWindow->getCallback()->guicb_handleConfCommand(hup);
-	mainWindow->getCallback()->guicb_handleCommand( hup );
+	mainWindow->getConfCallback()->guicb_handleConfCommand(hup);
+	mainWindow->getCallback()->handleCommand("sip", hup );
 	mainWindow->removeConference( mainConfId );
 	stopRinging();
 }
@@ -299,7 +300,7 @@ void ConferenceWidget::startRinging(){
 	}
 	bell->start();
 	CommandString cmdstr = CommandString( "", MediaCommandString::start_ringing );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 
 }
 
@@ -309,7 +310,7 @@ void ConferenceWidget::stopRinging(){
 		bell=NULL;
 	}
 	CommandString cmdstr = CommandString( "", MediaCommandString::stop_ringing );
-	mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+	mainWindow->getCallback()->handleCommand("media", cmdstr );
 }
 
 string ConferenceWidget::getMainCallId(){
@@ -344,7 +345,7 @@ void ConferenceWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 		CommandString cmdstr( getMainCallId(), 
 				MediaCommandString::set_session_sound_settings,
 				"senders", "OFF" );
-		mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+		mainWindow->getCallback()->handleCommand("media", cmdstr );
 		return;
 	} else {
 		#ifdef DEBUG_OUTPUT
@@ -354,7 +355,7 @@ void ConferenceWidget::activeWidgetChanged( bool isActive, int currentActive ) {
 			CommandString cmdstr( getMainCallId(), 
 					MediaCommandString::set_session_sound_settings,
 					"senders", "ON" );
-			mainWindow->getCallback()->guicb_handleMediaCommand( cmdstr );
+			mainWindow->getCallback()->handleCommand("media", cmdstr );
 		} else {
 			#ifdef DEBUG_OUTPUT
 			fprintf( stderr, "ConferenceWidget::onTabChange ... doing nothing (call widget state)!\n" );

@@ -85,7 +85,7 @@ class MainWindow : public GtkMainUI,
 		virtual void quit();
 		virtual void log( int type, string msg );
 
-		virtual void handleCommand( CommandString command );
+		virtual void handleCommand(const CommandString & command );
 		virtual void gotPacket( int32_t i );
 		virtual void displayMessage( string s, int style=-1 );
 		virtual void setSipSoftPhoneConfiguration( 
@@ -96,7 +96,7 @@ class MainWindow : public GtkMainUI,
 
 		virtual void setContactDb( MRef<ContactDb *> contactDb );
 
-		virtual void setCallback( GuiCallback *callback );
+		virtual void setCallback( MRef<CommandReceiver*> callback );
 
 		
 		/* used to select whether a node can or cannot be selected in

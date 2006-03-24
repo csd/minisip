@@ -133,7 +133,7 @@ void AccountsStatusWidget::registerClicked(){
 			reg["proxy_domain"] = id->sipDomain;
 			reg.setParam3( id->getSipProxy()->getDefaultExpires() );
 			id->unlock();
-			callback->guicb_handleCommand( reg );
+			callback->handleCommand("sip", reg );
 		}
 	}
 }
@@ -153,11 +153,11 @@ void AccountsStatusWidget::unregisterClicked(){
 			reg["proxy_domain"] = id->sipDomain;
 			id->unlock();
 			reg.setParam3( "0" );
-			callback->guicb_handleCommand( reg );
+			callback->handleCommand("sip", reg );
 		}
 	}
 }
 
-void AccountsStatusWidget::setCallback( GuiCallback * callback ){
+void AccountsStatusWidget::setCallback( MRef<CommandReceiver*> callback ){
 	this->callback = callback;
 }

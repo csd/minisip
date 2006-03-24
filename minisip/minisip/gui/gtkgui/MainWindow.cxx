@@ -384,7 +384,7 @@ void MainWindow::show(){
 void MainWindow::hideSlot(){
 }
 
-void MainWindow::handleCommand( CommandString command ){
+void MainWindow::handleCommand(const CommandString &command ){
 
 	commandsLock.lock();
 	commands.push_front( command );
@@ -754,8 +754,11 @@ void MainWindow::inviteClick() {
 void MainWindow::invite( string uri ){
 
 	if( uri.length() > 0 ){
-		string id = callback->guicb_doInvite( uri );
-
+		//string id = callback->guicb_doInvite( uri );
+		CommandString inv("",SipCommandString::invite, uri);
+		CommandString resp=callback->handleCommandResp("sip",inv);
+		string id = resp.getDestinationId();
+		
 		if( id == "malformed" ){
 			Gtk::MessageDialog dialog( "The SIP address you specified is not valid", Gtk::MESSAGE_WARNING );
 			dialog.show();
@@ -902,7 +905,7 @@ void MainWindow::viewToggle( uint8_t w ){
 	}
 }
 
-void MainWindow::setCallback( GuiCallback * callback ){
+void MainWindow::setCallback( MRef<CommandReceiver*> callback ){
 	statusWidget->setCallback( callback );
 	settingsDialog->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );
