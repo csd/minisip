@@ -83,13 +83,22 @@ MRef<SipDialog*> SipDialogContainer::getDefaultHandler(){
 	return defaultHandler;
 }
 
-void SipDialogContainer::setCallback(SipCallback *callback){
+void SipDialogContainer::setCallback(MRef<CommandReceiver*> callback){
 	this->callback = callback;
 }
 
-SipCallback * SipDialogContainer::getCallback() const{
+MRef<CommandReceiver*> SipDialogContainer::getCallback() const{
 	return callback;
 }
+
+void SipDialogContainer::setConfCallback(MRef<CommandReceiver*> callback){
+	this->confCallback = callback;
+}
+
+MRef<CommandReceiver*> SipDialogContainer::getConfCallback() const{
+	return confCallback;
+}
+
 
 void SipDialogContainer::enqueueCommand(const SipSMCommand &command, int queue,  int priority){
 	struct queue_type item;

@@ -61,7 +61,7 @@
 
 
 #include<libmutil/minilist.h>
-#include<libmsip/SipCallback.h>
+//#include<libmsip/SipCallback.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialogConfig.h>
@@ -103,9 +103,12 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		bool handleCommand(const SipSMCommand &command);
 		
-		void setCallback(SipCallback *callback);
-		SipCallback *getCallback();
+		void setCallback(MRef<CommandReceiver*> callback);
+		MRef<CommandReceiver *> getCallback();
 
+		void setConfCallback(MRef<CommandReceiver*> callback); // Hack to make the conference calling work - should not be here FIXME
+		MRef<CommandReceiver *> getConfCallback();
+		
 		void setDefaultHandler(MRef<SipDialog*> d);
 
 		void addDialog(MRef<SipDialog*> d);
@@ -121,7 +124,9 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 	private:
 		MRef<SipTimers*> timers;
 		MRef<SipCommonConfig *> config;
-		SipCallback *callback;
+		//SipCallback *callback;
+		MRef<CommandReceiver*> callback;
+		MRef<CommandReceiver*> confCallback;	//hack to make conference calling work until the ConfMessageRouter is removed
 		MRef<SipDialogContainer*> dialogContainer;
 
 		MRef<SipMessageTransport *> transportLayer;

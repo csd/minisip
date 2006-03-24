@@ -36,7 +36,7 @@
 #include<libmutil/Semaphore.h>
 #include<libmsip/SipTransaction.h>
 #include<libmutil/MemObject.h>
-#include<libmsip/SipCallback.h>
+#include<libmutil/MessageRouter.h>
 #include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipSMCommand.h>
 
@@ -167,8 +167,12 @@ class LIBMSIP_API SipDialogContainer : public MObject{
 
 		void addDialog(MRef<SipDialog*> call);
 
-		void setCallback(SipCallback* callback);
-		SipCallback* getCallback() const;
+		void setCallback(MRef<CommandReceiver*> callback);
+		MRef<CommandReceiver*> getCallback() const;
+		
+		void setConfCallback(MRef<CommandReceiver*> callback);
+		MRef<CommandReceiver*> getConfCallback() const;
+
 		
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
@@ -178,7 +182,9 @@ class LIBMSIP_API SipDialogContainer : public MObject{
 		
 		MRef<SipDialog*> defaultHandler;
 		
-		SipCallback* callback;
+		//SipCallback* callback;
+		MRef<CommandReceiver*> callback;
+		MRef<CommandReceiver*> confCallback;
 
 		Semaphore semaphore;
 		Mutex mlock;

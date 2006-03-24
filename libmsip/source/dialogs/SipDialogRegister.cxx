@@ -119,7 +119,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		send_noauth(trans->getBranch());
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
 	}else{
@@ -144,7 +144,7 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}
 		
@@ -205,7 +205,7 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 		//setRealm( resp->getRealm() );
@@ -228,7 +228,7 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 		//setRealm( resp->getRealm() );
@@ -283,7 +283,7 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		//TODO: inform GUI
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}		
 		//this is for the shutdown dialog 
@@ -316,7 +316,7 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
 		setRealm( getRealm() );
@@ -340,7 +340,7 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);   
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}
 		//this is for the shutdown dialog 
@@ -388,7 +388,7 @@ bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMComma
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::transport_error);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -435,7 +435,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;

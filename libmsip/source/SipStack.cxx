@@ -146,18 +146,29 @@ void SipStack::init(){
 }
 */
 
-void SipStack::setCallback(SipCallback *callback){
-	this->callback = callback;
-	dialogContainer->setCallback(callback);
-}
-
 MRef<SipDialogContainer*> SipStack::getDialogContainer(){
 	return dialogContainer;
 }
 
-SipCallback *SipStack::getCallback(){
+void SipStack::setCallback(MRef<CommandReceiver*> callback){
+	this->callback = callback;
+	dialogContainer->setCallback(callback);
+}
+
+MRef<CommandReceiver*> SipStack::getCallback(){
 	return callback;
 }
+
+void SipStack::setConfCallback(MRef<CommandReceiver*> callback){
+	this->confCallback = callback;
+	dialogContainer->setConfCallback(callback);
+}
+
+MRef<CommandReceiver*> SipStack::getConfCallback(){
+	return confCallback;
+}
+
+
 
 #if 0
 //returns a the call id

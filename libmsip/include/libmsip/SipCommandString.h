@@ -35,7 +35,7 @@ class LIBMSIP_API SipCommandString{
 		/*
 		 * Predefined command strings
 		 */
-		 
+
 		/*
 		Stack management
 		*/
