@@ -180,7 +180,7 @@ bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
 	if (transitionMatch("NOTIFY", command, SipSMCommand::remote, IGN)){
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui",cmdstr);
 		return true;
 	}else{
 		return false;

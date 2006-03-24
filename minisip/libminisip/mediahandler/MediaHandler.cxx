@@ -172,7 +172,14 @@ void MediaHandler::registerMedia( MRef<Media*> media ){
 	this->media.push_back( media );
 }
 
-void MediaHandler::handleCommand( CommandString command ){
+CommandString MediaHandler::handleCommandResp(string subsystem, const CommandString& command){
+	assert(1==0); //Not used
+}
+
+
+void MediaHandler::handleCommand(string subsystem, const CommandString& command ){
+	assert(subsystem=="media");
+
 	if( command.getOp() == MediaCommandString::start_ringing ){
 // 		cerr << "MediaHandler::handleCmd - start ringing" << endl;
 		if( audioMedia && ringtoneFile != "" ){

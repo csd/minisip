@@ -34,13 +34,14 @@
 #include"RtpReceiver.h"
 #include"../minisip/ipprovider/IpProvider.h"
 #include<libmutil/CommandString.h>
+#include<libmutil/MessageRouter.h>
 
 
 class SipSoftPhoneConfiguration;
 class IpProvider;
 
 
-class MediaHandler : public MObject, public SessionRegistry {
+class MediaHandler : public virtual MObject, public SessionRegistry, public CommandReceiver {
 
 	public:
 		/**
@@ -71,7 +72,10 @@ class MediaHandler : public MObject, public SessionRegistry {
 		 * Handles a command sent by the user interface
 		 * @param command the command to handle
 		 */
-		void handleCommand( CommandString command );
+		void handleCommand(string subsystem, const CommandString & command );
+
+
+		CommandString handleCommandResp(string subsystem, const CommandString& command);
 		
 		/**
 		 * Provides the IP address given as contact to the external

@@ -38,8 +38,8 @@ class ConfCallback{
 		virtual ~ConfCallback() {}
 		//virtual void guicb_handleConfCommand(string &)=0;
 		virtual void confcb_handleSipCommand(string &)=0;
-		virtual void confcb_handleSipCommand(CommandString &)=0;
-		virtual void confcb_handleGuiCommand(CommandString &)=0;
+		virtual void confcb_handleSipCommand(const CommandString &)=0;
+		virtual void confcb_handleGuiCommand(const CommandString &)=0;
 		virtual string confcb_doJoin(string user,minilist <ConfMember> *list, string confId)=0;
 		virtual string confcb_doConnect(string user, string confId)=0;
 };

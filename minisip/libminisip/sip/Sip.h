@@ -59,7 +59,6 @@
 #include<config.h>
 
 #include<libmutil/minilist.h>
-#include<libmsip/SipCallback.h>
 #include<libmsip/SipDialogContainer.h>
 #include"../sdp/SdpPacket.h"
 
@@ -82,7 +81,7 @@ class MediaHandler;
 
 using namespace std;
 
-class Sip: public Runnable{
+class Sip: public Runnable, public CommandReceiver{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
@@ -132,33 +131,22 @@ class Sip: public Runnable{
 		*/
 		virtual void run();
 
-		//void registerMediaStream(MRef<SdpPacket*> sdppack);
-
-		string invite(string &user);
 		string confjoin(string &user, minilist<ConfMember> *list, string confId);
 		string confconnect(string &user, string confId);
 		MRef<SipStack*> getSipStack(){return sipstack;}
-//		MRef<SipDialogContainer*> getDialogContainer();//{return dialogContainer;}
 
 		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
 
-//		bool handleCommand(const SipSMCommand &command);
-		
-//		void setCallback(SipCallback *callback);
-//
-//		SipCallback *getCallback();
+		void handleCommand(string subsystem, const CommandString &cmd);
+
+		CommandString handleCommandResp(string subsystem, const CommandString &cmd);
                 
 	private:
 		MRef<SipStack *> sipstack;
 		MRef<SipSoftPhoneConfiguration*> phoneconfig;
 		MRef<MediaHandler *> mediaHandler;
 		
-//		SipCallback *callback;
-
-//		MRef<SipDialogContainer*> dialogContainer;
-                
 		MRef<Thread *> thread;
-
 };
 
 

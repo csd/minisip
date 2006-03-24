@@ -50,10 +50,10 @@ class ConferenceControl{
 	ConferenceControl(string configUri, string cid, bool islocal);
 	//void setGui(Gui *guiptr){gui = guiptr;};
 	void handleGuiCommand(string cmd);
-	void handleGuiCommand(CommandString &command);
+	void handleGuiCommand(const CommandString &command);
 	void handleGuiDoInviteCommand(string sip_url);
 	
-	void handleSipCommand(CommandString &cmd);
+	void handleSipCommand(const CommandString &cmd);
         //virtual void handleGuiCommand(string);
 	void setCallback(ConfCallback *cb);
 	void setPendingList(string user);

@@ -25,7 +25,7 @@
 #include<assert.h>
 #include<stdio.h>
 #include<vector>
-#include"../minisip/MessageRouter.h"
+#include"../minisip/ConfMessageRouter.h"
 #include"../minisip/gui/Gui.h"
 
 #include<libmutil/MemObject.h>
@@ -98,7 +98,7 @@ void ConferenceControl::handleGuiCommand(string cmd){
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    
 }
-void ConferenceControl::handleGuiCommand(CommandString &command){
+void ConferenceControl::handleGuiCommand(const CommandString &command){
 
 	
     	//cerr << "CC: from MR -> CC: handleGuiCommand command"<< endl;
@@ -116,11 +116,12 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		//cerr<<"users "+users<<endl;
-		command.setParam2(users);
-		command.setParam3(confId);
+		CommandString cmd(command);
+		cmd.setParam2(users);
+		cmd.setParam3(confId);
 		//command.setParam2((string) &connectedList);
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
-		callback->confcb_handleSipCommand(command);
+		callback->confcb_handleSipCommand(cmd);
 	}
 	if(command.getOp()==SipCommandString::hang_up)
 	{
@@ -135,7 +136,7 @@ void ConferenceControl::handleGuiCommand(CommandString &command){
 			CommandString hup(pendingList[t].callid, SipCommandString::hang_up);
 			callback->confcb_handleSipCommand(hup);
 		}
-		((MessageRouter *)(callback))->removeConferenceController(this);
+		((ConfMessageRouter *)(callback))->removeConferenceController(this);
 	}
 	if(command.getOp()=="join")
 	{
@@ -207,7 +208,7 @@ void ConferenceControl::handleGuiDoInviteCommand(string sip_url){
         //string uri = trim(cmd.substr(5));
 	//displayMessage(cmd);    
 }
-void ConferenceControl::handleSipCommand(CommandString &cmd){
+void ConferenceControl::handleSipCommand( const CommandString &cmd){
     //cerr << "CC: from MR -> CC: handleSipCommand"<< endl;
 	   
     if (cmd.getOp()=="invite_ok"){
@@ -346,12 +347,13 @@ void ConferenceControl::handleSipCommand(CommandString &cmd){
 
 			users=users+ ((connectedList[t]).uri) + ";";       //was connectedList.uris[t]+";";
 		//cerr<<"users "+users<<endl;
-		cmd.setParam2(users);
+		CommandString c(cmd);
+		c.setParam2(users);
 		
-		cmd.setOp(SipCommandString::accept_invite);
+		c.setOp(SipCommandString::accept_invite);
 		//command.setParam2((string) &connectedList);
 		//cerr<<"(string) &connectedList************** "+(&connectedList)<<endl;
-		callback->confcb_handleSipCommand(cmd);
+		callback->confcb_handleSipCommand(c);
 	    //displayMessage("ERROR: "+cmd.getParam(), red);
     }
 	

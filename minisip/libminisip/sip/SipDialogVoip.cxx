@@ -245,7 +245,7 @@ bool SipDialogVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &comm
 		ts.save( RINGING );
 #endif
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
 	
 		//We must maintain the dialog state. 
 		dialogState.updateState( resp );
@@ -305,7 +305,7 @@ bool SipDialogVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command)
 		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",
 							(getMediaSession()->isSecure()?"secure":"unprotected"));
 		
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
 		
 #ifdef IPSEC_SUPPORT
 		// Check if IPSEC was required
@@ -349,7 +349,7 @@ bool SipDialogVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 		sendByeOk(bye, byeresp->getBranch() );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 
@@ -456,7 +456,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 		
 		if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"404")){
                         CommandString cmdstr(dialogState.callId, SipCommandString::remote_user_not_found);
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr);
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
 			((LogEntryFailure *)*rejectedLog)->error =
 				"User not found";
 			setLogEntry( rejectedLog );
@@ -469,7 +469,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 			rejectedLog->handle();
                         
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_unacceptable, command.getCommandPacket()->getWarningMessage());
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand( "gui", cmdstr );
 		}
 		else if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"4**")){
 			((LogEntryFailure *)*rejectedLog)->error =
@@ -477,7 +477,7 @@ bool SipDialogVoip::a9_callingnoauth_termwait_36( const SipSMCommand &command)
 			setLogEntry( rejectedLog );
 			rejectedLog->handle();
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_reject);
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand( "gui",cmdstr );
 		}
 		else{
 			merr << "ERROR: received response in SipDialogVoip"
@@ -578,7 +578,7 @@ bool SipDialogVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		
 		sendRinging(ir->getBranch());
 		
@@ -604,7 +604,7 @@ bool SipDialogVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 				SipCommandString::invite_ok,"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
@@ -669,7 +669,7 @@ bool SipDialogVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 
 		/* Tell the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite,"");
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -770,7 +770,7 @@ bool SipDialogVoip::a21_callingauth_callingauth_18X( const SipSMCommand &command
 #endif
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 		dialogState.updateState( resp );
 
@@ -818,7 +818,7 @@ bool SipDialogVoip::a23_callingauth_incall_2xx( const SipSMCommand &command){
 				"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
@@ -854,7 +854,7 @@ bool SipDialogVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 		sendBye(byetrans->getBranch(), dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -878,7 +878,7 @@ bool SipDialogVoip::a25_termwait_terminated_notransactions( const SipSMCommand &
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		/* Tell the GUI */
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 #ifdef IPSEC_SUPPORT
 		if(ipsecSession){
@@ -904,7 +904,7 @@ bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
 		/* Tell the GUI, once only */
 		if( notifyEarlyTermination ) {
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 			notifyEarlyTermination = false;
 		}
 		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
@@ -917,7 +917,7 @@ bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
 		
 		/* Tell the GUI, once only */
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		notifyEarlyTermination = false;
 		
 		//Tell the dialog container ... 
@@ -933,7 +933,7 @@ bool SipDialogVoip::a25_termwait_termwait_early( const SipSMCommand &command){
 bool SipDialogVoip::a26_callingnoauth_termwait_transporterror( const SipSMCommand &command){
 	if (transitionMatch(command, SipCommandString::transport_error )){
 		CommandString cmdstr(dialogState.callId, SipCommandString::transport_error);
-		getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
+		getDialogContainer()->getCallback()->handleCommand("gui",cmdstr);
 		return true;
 	}else{
 		return false;
@@ -993,7 +993,7 @@ bool SipDialogVoip::a28_transferrequested_transferpending_202( const SipSMComman
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::transfer_pending
 				);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		
 		/* Minisip does not actually keep track of the transfer ... 
 		if the REFER is accepted by the far end, then shutdown the media
@@ -1014,7 +1014,7 @@ bool SipDialogVoip::a31_transferrequested_incall_36( const SipSMCommand &command
 		CommandString cmdstr( dialogState.callId, 
 			SipCommandString::transfer_refused, 
 			command.getCommandPacket()->getWarningMessage());
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -1085,7 +1085,7 @@ bool SipDialogVoip::a33_incall_transferaskuser_REFER( const SipSMCommand &comman
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::transfer_requested,
 				referredUri);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -1102,11 +1102,15 @@ bool SipDialogVoip::a34_transferaskuser_transferstarted_accept( const SipSMComma
 
 		/* start a new call ... */
 		string uri = getReferredUri(lastRefer);
-		string newCallId = phoneconf->sip->invite( uri );
+
+		//string newCallId = phoneconf->sip->invite( uri );
+		CommandString invite("",SipCommandString::invite, uri);
+		CommandString resp = phoneconf->sip->handleCommandResp("sip",invite);
+		string newCallId=resp.getDestinationId();
 
 		/* Send the new callId to the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::call_transferred, newCallId);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
 	}else{

@@ -49,7 +49,7 @@
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 #include"DefaultDialogHandler.h"
-#include"../minisip/MessageRouter.h"
+#include"../minisip/ConfMessageRouter.h"
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -178,7 +178,7 @@ bool SipDialogConfVoip::a1_callingnoauth_callingnoauth_18X( const SipSMCommand &
 	    CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 	    cmdstr.setParam3(confId);
 	    //getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-	    getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+	    getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 
 	    //We must maintain the dialog state. We copy the remote tag and
 	    //the remote sequence number
@@ -252,11 +252,11 @@ bool SipDialogConfVoip::a3_callingnoauth_incall_2xx( const SipSMCommand &command
 		
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		//cerr<<"****************************sendack is called**********************"<<endl;
 		//sendAck(getLastInvite()->getDestinationBranch() );
 		//BM
-		MessageRouter * ptr=(MessageRouter *)(getDialogContainer()->getCallback());
+		MRef<ConfMessageRouter*> ptr=(ConfMessageRouter*) *(getDialogContainer()->getConfCallback());
 		adviceList=(ptr->getConferenceController(confId)->getConnectedList());
 		sendAck(getLastInvite()->getDestinationBranch());
 		
@@ -302,7 +302,7 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 
 		getMediaSession()->stop();
 
@@ -402,7 +402,7 @@ bool SipDialogConfVoip::a9_callingnoauth_termwait_36( const SipSMCommand &comman
 		if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"404")){
                         CommandString cmdstr(dialogState.callId, SipCommandString::remote_user_not_found);
 			cmdstr.setParam3(confId);
-			getDialogContainer()->getCallback()->sipcb_handleConfCommand(cmdstr);
+			getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr);
 			//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr);
 			((LogEntryFailure *)*rejectedLog)->error =
 				"User not found";
@@ -418,7 +418,7 @@ bool SipDialogConfVoip::a9_callingnoauth_termwait_36( const SipSMCommand &comman
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_unacceptable, command.getCommandPacket()->getWarningMessage());
 			cmdstr.setParam3(confId);
 			//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		}
 		else if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"4**")){
 			((LogEntryFailure *)*rejectedLog)->error =
@@ -428,7 +428,7 @@ bool SipDialogConfVoip::a9_callingnoauth_termwait_36( const SipSMCommand &comman
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_reject);
 			cmdstr.setParam3(confId);
 			//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-			getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		}
 		else{
 			merr << "ERROR: received response in SipDialogConfVoip"
@@ -511,7 +511,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected"),users
 				);//bm
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		}
 		else
 		{
@@ -520,7 +520,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 				"conf_connect_received", 
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected"),confId);//bm
-			getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+			getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		}
 		//getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
 		
@@ -587,7 +587,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		
 		cmdstr2.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr2 );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr2 );
 		getMediaSession()->start();
 
 		MRef<LogEntry *> logEntry = new LogEntryIncomingCompletedCall();
@@ -624,7 +624,7 @@ bool SipDialogConfVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		sendInviteOk(cr->getBranch() ); 
 
 		getMediaSession()->stop();
@@ -715,7 +715,7 @@ bool SipDialogConfVoip::a21_callingauth_callingauth_18X( const SipSMCommand &com
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
 		string peerUri = resp->getFrom().getString();
@@ -757,7 +757,7 @@ bool SipDialogConfVoip::a23_callingauth_incall_2xx( const SipSMCommand &command)
 				"",
 				(getMediaSession()->isSecure()?"secure":"unprotected"), confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
@@ -789,7 +789,7 @@ bool SipDialogConfVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -829,7 +829,7 @@ bool SipDialogConfVoip::a26_callingnoauth_termwait_transporterror( const SipSMCo
 		CommandString cmdstr(dialogState.callId, SipCommandString::transport_error);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -883,7 +883,7 @@ bool SipDialogConfVoip::a27_incall_incall_ACK( const SipSMCommand &command)
 		
 		
 		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
-		getDialogContainer()->getCallback()->sipcb_handleConfCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("sip_conf", cmdstr );
 		
 			
 			

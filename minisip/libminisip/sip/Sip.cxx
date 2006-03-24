@@ -107,27 +107,17 @@ Sip::~Sip(){
 // 	cerr << "~Sip" << endl;
 }
 
-/*
-void Sip::setCallback(SipCallback *callback){
-	this->callback = callback;
-	dialogContainer->setCallback(callback);
+void Sip::handleCommand(string subsystem, const CommandString &cmd){
+	assert(subsystem=="sip");
+	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
+	sipstack->handleCommand(sipcmd);
 }
-*/
 
-/*
-SipCallback *Sip::getCallback(){
-	return callback;
-}
-*/
-
-/*
-void Sip::registerMediaStream(MRef<SdpPacket*> sdppack){
-
-}
-*/
-
-//returns a the call id
-string Sip::invite(string &user){
+CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd){
+	assert(subsystem=="sip");
+	assert(cmd.getOp()=="invite");//TODO: no assert, return error message instead
+	
+	string user = cmd.getParam();
 	bool gotAtSign;
 	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
@@ -169,18 +159,20 @@ string Sip::invite(string &user){
 		string port;
 		uint32_t i=startAddr;
 		while (user[i]!='@')
-			if (user[i]==':')
-				return "malformed";
-			else
+			if (user[i]==':'){
+				//return "malformed";
+				return CommandString("malformed","");;
+			}else
 				i++;
 		i++;
 		while (user[i]!=':')
 			proxy = proxy + user[i++];
 		i++;
 		while (i<user.size())
-			if (user[i]<'0' || user[i]>'9')
-				return "malformed";
-			else
+			if (user[i]<'0' || user[i]>'9'){
+				//return "malformed";
+				return CommandString("malformed","");
+	}else
 				port = port + user[i++];
 		
 		
@@ -223,21 +215,25 @@ string Sip::invite(string &user){
 	ts.save( TMP );
 #endif
 	
-        SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+        SipSMCommand c(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
 	
 #ifdef DEBUG_OUTPUT
         cerr << "Before handleCommand" << endl;
 #endif
-	sipstack->handleCommand(cmd);
+	sipstack->handleCommand(c);
 #ifdef DEBUG_OUTPUT
         cerr << "After handleCommand" << endl;
 #endif
-	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+	//dialogContainer->enqueueCommand( c, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
         //
         mediaSession->setCallId( voipCall->getCallId() );
 
-	return voipCall->getCallId();
+	string cid = voipCall->getCallId();
+
+	CommandString ret(cid,"invite_started");
+	return ret;
 }
+
 string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId){
 	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
@@ -246,11 +242,11 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
 
 	securityConfig = phoneconfig->securityConfig;
-	
+
 	int startAddr=0;
 	if (user.substr(0,4)=="sip:")
 		startAddr = 4;
-	
+
 	if (user.substr(0,4)=="sips:")
 		startAddr = 5;
 
@@ -266,14 +262,14 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
 	}
 
-	
-	
-	
+
+
+
 	if (user.find(":", startAddr)!=string::npos){
 		if (user.find("@", startAddr)==string::npos){
 			return "malformed";
 		}
-		
+
 		string proxy;
 		string port;
 		uint32_t i=startAddr;
@@ -291,52 +287,53 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 				return "malformed";
 			else
 				port = port + user[i++];
-		
+
 		//int iport = atoi(port.c_str());
-				
-//		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
-		
-/*
-		try{
-			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
-//			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
-//			callconf->inherited.sipIdentity->sipProxyPort = iport;
+
+		//		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
+
+		/*
+		   try{
+		   callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
+		//			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
+		//			callconf->inherited.sipIdentity->sipProxyPort = iport;
 		}catch(IPAddressHostNotFoundException & exc){
-			merr << "Could not resolve PSTN proxy address:" << end;
-			merr << exc.what();
-			merr << "Will use default proxy instead" << end;
+		merr << "Could not resolve PSTN proxy address:" << end;
+		merr << exc.what();
+		merr << "Will use default proxy instead" << end;
 		}
-*/
-		
+		*/
+
 	}
 
 
-MRef<Session *> mediaSession = 
+	MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, callID, ipsecSession)); 
-	
+
 #else	
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
 
 #endif
 
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
-	
+
 	CommandString inv(voipConfCall->getCallId(), SipCommandString::invite, user);
 #ifdef ENABLE_TS
 	ts.save( TMP );
 #endif
-	
-        SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
-	
+
+	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+
 	sipstack->handleCommand(cmd);
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipConfCall->getCallId();
 }
+
 string Sip::confconnect(string &user, string confId){
 	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
@@ -510,16 +507,6 @@ void Sip::run(){
 
 	sipstack->run();
 }
-
-
-/*
-bool Sip::handleCommand(const SipSMCommand &command){
-	sipstack->handleCommand(command);
-//	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-	
-	return true;
-}
-*/
 
 void Sip::setMediaHandler( MRef<MediaHandler *> mediaHandler ){
 	this->mediaHandler = mediaHandler;

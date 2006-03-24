@@ -348,7 +348,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			im->getHeaderValueTo()->getUri().getIp();
 
 		CommandString cmdstr("", SipCommandString::incoming_im, imref->getString(), from, to );
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 
 	}
@@ -598,7 +598,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 		
 		//send invitation to the GUI
 		CommandString cmdstr(gID, "p2tInvitation", grpList->print(), inv_user);
-		getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		
 		
 	}
@@ -635,7 +635,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 		
 			//inform GUI. 
 			CommandString cmds(p2tDialogUser->getCallId(), "p2tAddUser", inv_user);
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmds );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmds );
 		}
 		//if user is not in GroupList deny it
 		else {
@@ -683,7 +683,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 			
 			//user has to accept it
 			CommandString cmds(p2tDialogUser->getCallId(), "p2tAddUser");
-			getDialogContainer()->getCallback()->sipcb_handleCommand( cmds );
+			getDialogContainer()->getCallback()->handleCommand("gui", cmds );
 
 		}
 	
@@ -763,7 +763,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	
 	//Inform GUI
 	CommandString cmdstr("", "p2tSessionCreated", p2tDialog->getCallId());
-	getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+	getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 
 
 
@@ -825,7 +825,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 
 	//send GUI the Group Identity
 	CommandString cmdstr("", "p2tSessionCreated", p2tDialog->getCallId());
-	getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
+	getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 	
 }
 
