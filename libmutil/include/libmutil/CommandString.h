@@ -43,25 +43,27 @@ class LIBMUTIL_API CommandString : public MObject{
 
 		CommandString(const CommandString &c);
 		
-		string getDestinationId();
+		string getDestinationId() const;
 		void setDestinationId(string id);
 		
-		string getOp();
+		string getOp() const;
 		void setOp(string op);
 
-		string getParam();
+		string getParam() const;
 		void setParam(string param);
 
-		string getParam2();
+		string getParam2() const;
 		void setParam2(string param2);
 		
-		string getParam3();
+		string getParam3() const;
 		void setParam3(string param3);
 		
-		string getString();
+		string getString() const;
                 virtual std::string getMemObjectType(){return "CommandString";}
 
 		string &operator[](string key);
+
+		string get(const string &key) const;
 
 	private:
 		map<string, string> keys;
