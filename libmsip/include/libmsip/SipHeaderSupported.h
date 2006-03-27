@@ -21,20 +21,24 @@
 */
 
 
-#include<config.h>
+#ifndef SIPHEADERSUPPORTED
+#define SIPHEADERSUPPORTED
 
-#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/libmsip_config.h>
 
-MRef<SipHeaderValue *> unsupportedFactory(const string &build_from){
-	                return new SipHeaderValueUnsupported(build_from);
-}
+#include<libmsip/SipHeaderString.h>
 
-SipHeaderFactoryFuncPtr sipHeaderUnsupportedFactory=unsupportedFactory;
+/**
+ * @author Erik Eliasson
+*/
 
-const string SipHeaderValueUnsupportedTypeStr = "Unsupported";
+extern SipHeaderFactoryFuncPtr sipHeaderSupportedFactory;
 
-SipHeaderValueUnsupported::SipHeaderValueUnsupported(const string &build_from)
-		: SipHeaderValueString(SIP_HEADER_TYPE_UNSUPPORTED,SipHeaderValueUnsupportedTypeStr, build_from)
-{
-}
+class LIBMSIP_API SipHeaderValueSupported: public SipHeaderValueString{
+	public:
+		SipHeaderValueSupported(const string &build_from);
 
+                virtual std::string getMemObjectType(){return "SipHeaderSupported";}
+};
+
+#endif

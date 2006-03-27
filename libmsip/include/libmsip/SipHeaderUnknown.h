@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Erik Eliasson
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -18,27 +18,40 @@
 
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
 */
 
 
-#ifndef SIPHEADERUNSUPPORTED_H
-#define SIPHEADERUNSUPPORTED_H
+/* Name
+ * 	SipHeaderSubject.h
+ * Author
+ * 	Erik Eliasson, eliasson@it.kth.se
+ * Purpose
+ * 
+*/
+
+#ifndef SIPHEADERUNKNOWN_H
+#define SIPHEADERUNKNOWN_H
 
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeaderString.h>
 
 /**
+ * libmsip handles SIP headers that are not known to it by placing
+ * the entire header in a SipHeaderValueUnknown. This is
+ * the only header where the "header value" also will contain
+ * the header "name" (the identifier starting the header line before 
+ * the colon). The "getString" method (inherited from 
+ * SipHeaderValueString) will therefore return the entire header.
+ * 
  * @author Erik Eliasson
 */
-
-extern SipHeaderFactoryFuncPtr sipHeaderUnsupportedFactory;
-
-class LIBMSIP_API SipHeaderValueUnsupported: public SipHeaderValueString{
+class LIBMSIP_API SipHeaderValueUnknown: public SipHeaderValueString{
 	public:
-		SipHeaderValueUnsupported(const string &build_from);
+		SipHeaderValueUnknown(const string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderUnsupported";}
+                virtual std::string getMemObjectType(){return "SipHeaderUnknown";}
 };
 
 #endif

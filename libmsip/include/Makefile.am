@@ -18,10 +18,13 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderWWWAuthenticate.h \
                      libmsip/SipHeaderProxyAuthorization.h \
                      libmsip/SipHeaderRecordRoute.h \
+                     libmsip/SipHeaderRequire.h \
                      libmsip/SipHeaderRoute.h \
                      libmsip/SipHeaderSubject.h \
+                     libmsip/SipHeaderSupported.h \
                      libmsip/SipHeaderString.h \
                      libmsip/SipHeaderTo.h \
+                     libmsip/SipHeaderUnknown.h \
                      libmsip/SipHeaderUnsupported.h \
                      libmsip/SipHeaderUserAgent.h \
 		     libmsip/SipHeaderVia.h \

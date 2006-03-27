@@ -23,18 +23,18 @@
 
 #include<config.h>
 
-#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipHeaderRequire.h>
 
-MRef<SipHeaderValue *> unsupportedFactory(const string &build_from){
-	                return new SipHeaderValueUnsupported(build_from);
+MRef<SipHeaderValue *> requireFactory(const string &build_from){
+	                return new SipHeaderValueRequire(build_from);
 }
 
-SipHeaderFactoryFuncPtr sipHeaderUnsupportedFactory=unsupportedFactory;
+SipHeaderFactoryFuncPtr sipHeaderRequireFactory=requireFactory;
 
-const string SipHeaderValueUnsupportedTypeStr = "Unsupported";
+const string SipHeaderValueRequireTypeStr = "Require";
 
-SipHeaderValueUnsupported::SipHeaderValueUnsupported(const string &build_from)
-		: SipHeaderValueString(SIP_HEADER_TYPE_UNSUPPORTED,SipHeaderValueUnsupportedTypeStr, build_from)
+SipHeaderValueRequire::SipHeaderValueRequire(const string &build_from)
+		: SipHeaderValueString(SIP_HEADER_TYPE_REQUIRE,SipHeaderValueRequireTypeStr, build_from)
 {
 }
 

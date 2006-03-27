@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Erik Eliasson
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -18,23 +18,26 @@
 
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
 */
 
 
+/* Name
+ * 	SipHeaderValueUnknown.cxx
+ * Author
+ * 	Erik Eliasson, eliasson@it.kth.se
+ * Purpose
+ * 
+*/
+
 #include<config.h>
 
-#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipHeaderUnknown.h>
 
-MRef<SipHeaderValue *> unsupportedFactory(const string &build_from){
-	                return new SipHeaderValueUnsupported(build_from);
-}
+const string sipHeaderUnknownTypeString ="";
 
-SipHeaderFactoryFuncPtr sipHeaderUnsupportedFactory=unsupportedFactory;
-
-const string SipHeaderValueUnsupportedTypeStr = "Unsupported";
-
-SipHeaderValueUnsupported::SipHeaderValueUnsupported(const string &build_from)
-		: SipHeaderValueString(SIP_HEADER_TYPE_UNSUPPORTED,SipHeaderValueUnsupportedTypeStr, build_from)
+SipHeaderValueUnknown::SipHeaderValueUnknown(const string &build_from)
+		:SipHeaderValueString(SIP_HEADER_TYPE_UNKNOWN,sipHeaderUnknownTypeString, build_from)
 {
 }
 

@@ -31,7 +31,7 @@
 #include<libmnetutil/IP4Address.h>
 
 #include<libmsip/SipHeaderContact.h>
-#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipHeaderUnknown.h>
 #include<libmsip/SipResponse.h>
 
 #include<libmsip/SipHeaderContentLength.h>
@@ -53,7 +53,10 @@
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderAuthorization.h>
+#include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderSubject.h>
+#include<libmsip/SipHeaderSupported.h>
+#include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipCommandString.h>
@@ -99,12 +102,16 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);
 	SipHeader::headerFactories.addFactory("Record-Route", sipHeaderRecordRouteFactory);
+	SipHeader::headerFactories.addFactory("Require", sipHeaderRequireFactory);
 	SipHeader::headerFactories.addFactory("Refer-To", sipHeaderReferToFactory);
 	SipHeader::headerFactories.addFactory("Route", sipHeaderRouteFactory);
 	SipHeader::headerFactories.addFactory("Subject", sipHeaderSubjectFactory);
 	SipHeader::headerFactories.addFactory("s", sipHeaderSubjectFactory);
+	SipHeader::headerFactories.addFactory("Supported", sipHeaderSupportedFactory);
+	SipHeader::headerFactories.addFactory("k", sipHeaderSupportedFactory);
 	SipHeader::headerFactories.addFactory("To", sipHeaderToFactory);
 	SipHeader::headerFactories.addFactory("t", sipHeaderToFactory);
+	SipHeader::headerFactories.addFactory("Unsupported", sipHeaderUnsupportedFactory);
 	SipHeader::headerFactories.addFactory("User-Agent", sipHeaderUserAgentFactory);
 	SipHeader::headerFactories.addFactory("Via", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("v", sipHeaderViaFactory);

@@ -65,10 +65,13 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderProxyAuthorization.cxx \
                      source/headers/SipHeaderRecordRoute.cxx \
                      source/headers/SipHeaderReferTo.cxx \
+                     source/headers/SipHeaderRequire.cxx \
                      source/headers/SipHeaderRoute.cxx \
                      source/headers/SipHeaderString.cxx \
                      source/headers/SipHeaderSubject.cxx \
+                     source/headers/SipHeaderSupported.cxx \
                      source/headers/SipHeaderTo.cxx \
+                     source/headers/SipHeaderUnknown.cxx \
                      source/headers/SipHeaderUnsupported.cxx \
                      source/headers/SipHeaderUserAgent.cxx \
                      source/headers/SipHeaderAcceptContact.cxx \

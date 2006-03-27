@@ -40,7 +40,7 @@
 #include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipHeaderContentType.h>
 #include<libmsip/SipHeaderMaxForwards.h>
-#include<libmsip/SipHeaderUnsupported.h>
+#include<libmsip/SipHeaderUnknown.h>
 #include<libmsip/SipHeaderWarning.h>
 
 #include<libmutil/split_in_lines.h>
@@ -225,7 +225,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 				hval = factory(value_zero);
 			}else{
 // 				cerr << "SipHeaderValueUnsupported: "<< line << endl;
-				hval = new SipHeaderValueUnsupported(value_zero);
+				hval = new SipHeaderValueUnknown(value_zero);
 			}	
 			
 			for(unsigned j=1; j<value_params.size(); j++){
