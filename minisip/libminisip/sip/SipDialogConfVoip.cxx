@@ -1482,35 +1482,19 @@ void SipDialogConfVoip::sendAck(const string &branch){
 
 void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 
-	//string tmp = getDialogConfig().inherited.userUri;
-	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
-	uint32_t i = tmp.find("@");
-	massert(i!=string::npos);
-	i++;
-	string domain;
-	for ( ; i < tmp.length() ; i++)
-		domain = domain+tmp[i];
-
-//	mdbg << "///////////Creating bye with uri_foreign="<<getDialogConfig().uri_foreign << " and doman="<< domain<< end;
-	//MRef<SipBye*> bye = new SipBye(
 	MRef<SipRequest*> bye = SipRequest::createSipMessageBye(
 			branch,
-			getLastInvite(),
+			dialogState.callId,
+			dialogState.getRemoteTarget(),
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			domain,
-//			getDialogConfig().seqNo+1,
-			bye_seq_no///,
-			///localCalled
-			);
+			bye_seq_no );
 
 	bye->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	bye->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
         MRef<SipMessage*> pref(*bye);
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-//	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 

@@ -1609,34 +1609,14 @@ void SipDialogVoip::sendAck(string branch){
 
 void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 
-	//string tmp = getDialogConfig().inherited.userUri;
-	string tmp = getDialogConfig()->inherited->sipIdentity->getSipUri();
-	#ifdef DEBUG_OUTPUT
-	merr << "SipDialogVoip::sendBye : tmp=" << tmp << end;
-	#endif
-	uint32_t i = tmp.find("@");
-	massert(i!=string::npos);
-	i++;
-	string domain;
-	for ( ; i < tmp.length() ; i++)
-		domain = domain+tmp[i];
-	
-	//merr << "SipDialogVoip::sendBye : dialogstate.remoteUri=" << dialogState.remoteUri << end;
-
-//	mdbg << "///////////Creating bye with uri_foreign="<<getDialogConfig().uri_foreign << " and doman="<< domain<< end;
-	//MRef<Sip*> bye = new SipBye(
 	MRef<SipRequest*> bye = SipRequest::createSipMessageBye(
 			branch,
-			getLastInvite(),
-			//dialogState.remoteUri,
+			dialogState.callId,
 			dialogState.getRemoteTarget(),
-			//getDialogConfig().inherited.userUri,
+			dialogState.remoteUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			domain,
-//			getDialogConfig().seqNo+1,
-			bye_seq_no///,
-			///localCalled
-			);
+			bye_seq_no );
+
 	//add route headers, if needed
 	if( dialogState.routeSet.size() > 0 ) {
 		//merr << "SipDlgVoip:sendBYE : adding header route! " << end;
@@ -1651,7 +1631,6 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 
 	MRef<SipMessage*> pref(*bye);
 	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-//	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
