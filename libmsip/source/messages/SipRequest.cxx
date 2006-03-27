@@ -79,48 +79,27 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 
 
 MRef<SipRequest*> SipRequest::createSipMessageBye(string branch,
-                MRef<SipRequest*> inv,
+		string callId,
+		string target,
                 string to_uri,
                 string from_uri,
-                string proxyAddr,
                 int32_t seq_no)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "BYE");
 	
-	req->setUri(to_uri);
+	req->setUri(target);
 	
         req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
-
-	int noHeaders = inv->getNoHeaders();
-	for (int32_t i=0; i < noHeaders; i++){
-		MRef<SipHeader *> header = inv->getHeaderNo(i);
-		int headerType = header->getType();
-		bool add = false;
-		switch (headerType){
-			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->removeParameter("tag");
-				add = true;
-				break;
-			case SIP_HEADER_TYPE_TO:
-				((SipHeaderValueTo*)*(header->getHeaderValue(0)))->removeParameter("tag");
-				add = true;
-				break;
 	
-			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setMethod("BYE");
-				((SipHeaderValueCSeq*)*(header->getHeaderValue(0)))->setCSeq(seq_no);
-				add=true;
-				break;
-			case SIP_HEADER_TYPE_CALLID:
-				add=true;
-				break;
-			
-		}
-		if (add){
-			req->addHeader(header);
-		}
-	}	
-
+	SipURI from(from_uri);
+	req->addHeader(new SipHeader(new SipHeaderValueFrom(from)));
+	
+	SipURI to(to_uri);
+	req->addHeader(new SipHeader(new SipHeaderValueTo(to)));
+	
+	req->addHeader(new SipHeader(new SipHeaderValueCSeq("BYE", seq_no)));
+	
+	req->addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
 	return req;
 
 }

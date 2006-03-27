@@ -39,8 +39,8 @@
                 +--------|           |--------+101-199 from TU
                 |        | Proceeding|        |a2:send response
                 +------->|           |<-------+
-        2xx from TU      |           |          Transport Err.
-        send resp        |           |          a4:Inform TU
+       2xx from TU       |           |          Transport Err.
+       a1001:send resp   |           |          a4:Inform TU
      +------------------N|           |--------------->+
      |                   +-----------+                |
      |      300-699 from TU |     X 2xx from TU       |
@@ -74,7 +74,8 @@
                          |           |
                          +-----------+
 
-              Figure 7: INVITE server transaction
+ Note: a5 has been removed and a1001 has been added compared
+       with the invite server transaction.
 */
 
 #include<config.h>

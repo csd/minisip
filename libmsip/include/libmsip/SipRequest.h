@@ -54,10 +54,10 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 		static MRef<SipRequest*> createSipMessageBye(
 				string branch,
-				MRef<SipRequest*> inv,
+				string callId,
+				string target,
 				string to_uri,
 				string from_uri,
-				string proxyAddr,
 				int32_t seq_no);
 
 		static MRef<SipRequest*> createSipMessageCancel(
