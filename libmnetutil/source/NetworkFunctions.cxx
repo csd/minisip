@@ -36,26 +36,60 @@
 #endif
 
 #ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h> /* inet_ntoa */
-#include <sys/types.h> /* socket() */
-#include <sys/socket.h>
-#include <net/if.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include<unistd.h>
-#include<arpa/nameser.h>
-#include<resolv.h>
+#	include <arpa/inet.h> /* inet_ntoa */
+#	include <sys/types.h> /* socket() */
+#	include <sys/socket.h>
+#	include <net/if.h>
+#	include <sys/socket.h>
+#	include <netinet/in.h>
+#	include <sys/ioctl.h>
+#	include<unistd.h>
+#	include<arpa/nameser.h>
+#	include<resolv.h>
 #endif
 
-#if defined _MSC_VER || __MINGW32__
-#include <windows.h>
-#include "iphlpapi.h"
-# define USE_WIN32_API
+/**
+libresolv is only for linux ...
+getaddrinfo works for linux and windows ... but in linux it does not correctly do SRV lookups ...and in windows is for xp or higher (and ce)
+windns is only for windows ... but it is not restricted to xp or higher ... thus better use it
+*/
+#if defined _MSC_VER || __MINGW32__ || _WIN32_WCE
+#	define USE_WIN32_API
+#	ifdef _WIN32_WCE
+#		define USE_WIN32_API_GETADDRINFO
+#	elif
+#		define USE_WIN32_API_WINDNS
+#	endif
+#endif
+
+#ifdef USE_WIN32_API
+#	ifdef USE_WIN32_API_GETADDRINFO && !_WIN32_WCE
+#		define _WIN32_WINNT 0x0501 //eeee ... XP only! ... use if "getaddrinfo" ... with windns, not needed
+#	endif
+#	include<windows.h>
+#	include "iphlpapi.h" //to obtain list of interfaces ...
+#	ifdef USE_WIN32_API_WINDNS
+#		include<windns.h> //for the DNS querying ... link with libdnsapi.lib
+#		ifndef DNS_TYPE_SRV
+			//mingw does not define this type ... 
+#			define DNS_TYPE_SRV (33)
+#		endif
+#	endif
+	//do not use getaddrinfo in linux ... it does not do SRV lookup (as of March 2006) ...
+	//in windows, it works fine ... for wce(?); and xp and higher.
+#	ifdef USE_WIN32_API_GETADDRINFO
+#		ifndef WIN32
+#			include<netdb.h> //for addrinfo stuff in linux ...
+#			include <netinet/in.h> //for ntohs ... in linux
+#		else
+#			include<winsock2.h>
+#			include<ws2tcpip.h>
+#		endif
+#	endif
 #endif
 
 #ifdef HAVE_ARPA_NAMESER_COMPAT_H
-#include<arpa/nameser_compat.h>
+#	include<arpa/nameser_compat.h>
 #endif
 
 #include<libmnetutil/NetworkException.h>
@@ -236,8 +270,12 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 string NetworkFunctions::getHostHandlingService(string service, string domain, uint16_t &ret_port){
 	string ret;
-#ifndef WIN32
+	
+#ifndef USE_WIN32_API
 	int32_t port=-1;
+	#ifdef DEBUG_OUTPUT
+	cerr <<"NetworkFunctions::getHostHandlingService - Using LIBRESOLV"<< endl;
+	#endif
 	if (res_init()){
 		throw ResolvError( errno );
 	}
@@ -327,14 +365,147 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	cerr << "NetworkFunc:getHostHandlingServ = " << ret << ":" << ret_port << endl;
 	#endif
 #else
-	cerr << "ERROR! NetworkFunctions::getHostHandlingService not implemented!" << endl << 
-		" Try resolving the IP manually and feeding the numeric form x.y.z.m to miniSIP" << endl <<
-		" We are working on it" << endl;
+#	ifdef USE_WIN32_API_WINDNS	
+		DNS_STATUS status;
+		DNS_RECORD *result = NULL;
+		DNS_RECORD *resultScan = NULL;
+		
+		string q = service + "." + domain;
+		
+		#ifdef DEBUG_OUTPUT
+		cerr <<"NetworkFunctions::getHostHandlingService - Using WINDNS"<< endl;
+		#endif
+	// 	cerr << "NetworkFunc:getHostHandlingServ: before query ... " << q << endl;
+		status = DnsQuery(
+				q.c_str(),
+				DNS_TYPE_SRV,
+				DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE,
+				NULL,
+				&result,
+				NULL);
+	// 	cerr << "NetworkFunc:getHostHandlingServ: query done ... " << endl;
+		if (status != 0)	{
+			#ifdef DEBUG_OUTPUT
+			cerr << "NetworkFunc:getHostHandlingServ: DnsQuery FAILED ! " << endl;
+			#endif
+			return "";
+		}
+	// 	cerr << "NetworkFunc:getHostHandlingServ: DnsQuery succeeded " << endl;
+		string first_domain = "";
+		
+		for( resultScan = result; resultScan != NULL; resultScan = resultScan->pNext ) {
+	// 			if( stricmp(resultScan->pName, domain.c_str()) != 0 ) {
+	// 				cerr << "NetworkFunc:getHostHandlingServ: different domain name " << endl;
+	// 				continue;
+	// 			} else {
+	// 				cerr << "NetworkFunc:getHostHandlingServ: domain name is the same ...  " << endl;
+	// 			}
+			
+			if( resultScan->wType == DNS_TYPE_SRV ) {
+				cerr << "NetworkFunc:getHostHandlingServ: SRV record found ... " << endl;
+				DNS_SRV_DATA *data;
+				data = &resultScan->Data.SRV;
+				#ifdef DEBUG_OUTPUT
+				cerr << "NetworkFunc:getHostHandlingServ: SRVrecord={" << string(data->pNameTarget) 
+						<< "; " << data->wPriority
+						<< "; " << data->wWeight
+						<< "; port=" << data->wPort 
+						<< "}" << endl;
+				#endif
+				if( first_domain == "" ) {
+					first_domain = string(data->pNameTarget);
+					ret_port = data->wPort;
+					ret = first_domain;
+				}		} else  {
+	// 			cerr << "NetworkFunc:getHostHandlingServ: Non SRV record found ... " << endl;
+				continue;
+			}
+		}
+		// Clean up by freeing up the records
+	// 	cerr << "NetworkFunc:getHostHandlingServ: before dnsrecordlistfree" << endl;
+		DnsRecordListFree(result,DnsFreeRecordList);
+	// 	cerr << "NetworkFunc:getHostHandlingServ: after dnsrecordlistfree" << endl; 
+	
+#	elif USE_WIN32_API_GETADDRINFO
+		#ifdef DEBUG_OUTPUT
+		cerr <<"NetworkFunctions::getHostHandlingService - Using GETADDRINFO (untested for WinCE)"<< endl;
+		#endif
+		/*
+		int getaddrinfo(
+			const TCHAR* nodename,
+			const TCHAR* servname,
+			const struct addrinfo* hints,
+			struct addrinfo** res
+		);
+		*/
+		struct addrinfo hints;
+		struct addrinfo *res = NULL;	
+		struct addrinfo *ai = NULL;	
+		
+		string gettaddr_service = "";
+		
+		if ( service == "_sip._tcp") {
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_protocol = IPPROTO_TCP;
+			gettaddr_service = "sip";
+		} else if ( service == "_sip._udp" ) {
+			hints.ai_socktype = SOCK_DGRAM;
+			hints.ai_protocol = IPPROTO_UDP;
+			gettaddr_service = "sip";
+		} else if ( service == "_sips._tcp" ) {
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_protocol = IPPROTO_TCP;
+			gettaddr_service = "sips"; //or sip-tls???
+			cerr << "NetworkFunctions::getHostHandlingService - UNTESTED!!!" << endl;
+		}else {
+			cerr << "NetworkFunctions::getHostHandlingService - Warning - unknown service = " << service << endl;
+			return "";
+		}
+		
+		hints.ai_flags = 0; //AI_PASSIVE;
+		hints.ai_family = PF_UNSPEC;
+		hints.ai_addrlen = 0;
+		hints.ai_addr = 0;
+		hints.ai_canonname = 0;
+	
+		int32_t retVal;
+		cerr << "gethosthandling: domain=" << domain << "; service=" << service << endl;
+		retVal = getaddrinfo(	domain.c_str(), 
+					gettaddr_service.c_str(), 
+					&hints, 
+					&res);
+		
+		if ( retVal != 0 ) {
+			cerr << "NetworkFunctions::getHostHandlingService - getaddrinfo() failed" << endl;
+			return "";
+		}
+		
+		ai = res;
+		for (ai = res; ai != NULL; ai = ai->ai_next) {
+			if (	ai->ai_socktype != hints.ai_socktype || ai->ai_protocol != hints.ai_protocol) {
+				cerr << "NetworkFUnctions:: different stuff while looping!" << endl;
+				continue;
+			}
+			sockaddr_in * saServer;
+			saServer = (sockaddr_in *)ai->ai_addr;
+			char tempStr[20];
+			binIp2String( ntohl( saServer->sin_addr.s_addr ), tempStr );
+			cerr << "Resolved to ---- ip=" << string( tempStr );
+			cerr << "; port=" << itoa( ntohs( saServer->sin_port ) ) << endl;
+		}
+
+	//error!
+#	else 
+
+#	endif
 #endif
+
 	return ret;
 }
 
-
+/**
+uint32_t ... in host order!
+*/
 void NetworkFunctions::binIp2String(uint32_t ip, char *strBufMin16){
 //      uint32_t nip = htonl(ip);
 //      inet_ntop(AF_INET, &nip, strBufMin16, 16);
