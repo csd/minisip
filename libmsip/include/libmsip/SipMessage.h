@@ -140,6 +140,16 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		*/
 		void addHeader(MRef<SipHeader*> header);
 
+
+                /**
+                 * Returns true if the message contains a SIP "Require" header with
+                 * the extension given as argument to this method.
+                 * @param extension     Extension to check for in the
+                 *                      "Require" headers.
+                 */
+		bool requires(string extension);
+
+
 		/**
 		* @return Size in bytes of the content of the SIP message.
 		* This is the number in the "ContentLength" header.

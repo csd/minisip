@@ -49,6 +49,7 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderRecordRoute.h>
 #include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderContentType.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipHeaderWarning.h>
@@ -616,3 +617,27 @@ string SipMessage::getAuthenticateProperty(string prop){
 
         return "";
 }
+
+
+bool SipMessage::requires(string extension){
+	MRef<SipHeaderValue*> hval;
+	bool ret=false;
+	int i=0;
+	bool done=false;
+
+	do{
+		hval = getHeaderValueNo(SIP_HEADER_TYPE_REQUIRE, i);
+		if (hval){
+			string e= ((SipHeaderValueRequire*)*hval)->getString();
+			if (e==extension){
+				ret=true;
+				done=true;
+			}
+		}
+		i++;
+	}while(!done && hval);
+
+	return ret;
+}
+
+
