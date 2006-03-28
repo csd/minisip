@@ -489,7 +489,7 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
 	
 	MRef<SipMessage*> ref( *resp);
-	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( getBranch(), 
+	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
 			ref, 
 			dialog->dialogState.getRemoteTarget() //FIXME: uses dialog here, but it could be NULL
 			);
