@@ -24,6 +24,7 @@ MY_LD_LIB_PATH="$MY_LD_LIB_PATH$PWD/minisip/.libs"
 cd ..
 echo "export LD_LIBRARY_PATH=$MY_LD_LIB_PATH"
 
-LD_LIBRARY_PATH="$MY_LD_LIB_PATH" minisip/minisip/minisip
+LD_LIBRARY_PATH="$MY_LD_LIB_PATH" minisip/minisip/gui/gtkgui/minisip_gtkgui
+LD_LIBRARY_PATH="$MY_LD_LIB_PATH" minisip/minisip/gui/textui/minisip_textui
 
 

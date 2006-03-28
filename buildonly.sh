@@ -52,24 +52,9 @@ echo "+++++++++++++++++++++++++++++++++++++"
 cd minisip
 
 #force to relink
-rm -f ./soundcard/libsoundcard.a
-rm -f ./conf/libconf.a
-rm -f ./sdp/libsdp.a
-rm -f ./aec/libaec.a
-rm -f ./stun/libstun.a
-rm -f ./rtp/librtp.a
-rm -f ./minisip/ipprovider/libipprovider.a
-rm -f ./minisip/gui/gtkgui/libminisip_gtkgui.a
-rm -f ./minisip/gui/libminisip_gui.a
-rm -f ./minisip/contactdb/libcontactdb.a
-rm -f ./minisip/libminisip.a
-rm -f ./mediahandler/libmediahandler.a
-rm -f ./sip/libsip.a
-rm -f ./codecs/g711/libcodec_g711.a
-rm -f ./codecs/ilbc/libcodec_ilbc.a
-rm -f ./codecs/libcodecs.a
-rm -f ./spaudio/libspaudio.a
-rm -f minisip/minisip
+find . -name "*.la" -exec rm -f {} \;
+find . -name "minisip_gtkgui" -exec rm -f {} \;
+find . -name "minisip_textui" -exec rm -f {} \;
 
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD"
 
