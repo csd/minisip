@@ -456,7 +456,9 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 	}
 	
 	MRef<SipHeaderValue*> hdrVal = 
-		new SipHeaderValueVia(transport, localIP, port, branch);
+		new SipHeaderValueVia(transport, localIP, port);
+	
+	hdrVal->setParameter("branch",branch);
 	
 	MRef<SipHeader*> hdr = new SipHeader( hdrVal );
 	

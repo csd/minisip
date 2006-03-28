@@ -377,9 +377,9 @@ string SipMessage::getViaHeaderBranch(bool first){
 	MRef<SipHeaderValueVia*> via = getViaHeader(first);
 
 	if( !via.isNull() ){
-		b = via->getBranch();
+		b = via->getParameter("branch");
 	}
-
+	
 	return b;
 }
 
