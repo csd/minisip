@@ -66,7 +66,6 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
 		branch = c.getCommandPacket()->getDestinationBranch();
 		seqMethod = c.getCommandPacket()->getCSeqMethod();
-		cerr << "EEEE: Parsed branch to: "<< branch << endl;
 	}
 
 #ifdef DEBUG_OUTPUT
@@ -143,15 +142,12 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 			      (seqMethod == "ACK" &&
 			       transactions[i]->getCSeqMethod() == "INVITE")) ){
 				
-				cerr << "EEEE: Dispatcher trying against a dialog with branch "<<transactions[i]->getBranch()<<endl;
-				
 				bool ret = transactions[i]->handleCommand(c);
 #ifdef DEBUG_OUTPUT
 				if (!ret && hasBranch)
 					mdbg << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
 #endif
 				if (ret){
-					cerr << "EEEE: Transaction returned true"<<endl;
 					dialogListLock.unlock();
 					return ret;
 				}
