@@ -137,7 +137,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 		}
 		
 		for (int i=0; i< transactions.size(); i++){
-			if ( (!hasBranch || transactions[i]->getBranch()== branch) &&
+			if ( (!hasBranch || transactions[i]->getBranch()== branch || seqMethod=="ACK") &&
 			     (!hasSeqMethod || transactions[i]->getCSeqMethod()==seqMethod || 
 			      (seqMethod == "ACK" &&
 			       transactions[i]->getCSeqMethod() == "INVITE")) ){

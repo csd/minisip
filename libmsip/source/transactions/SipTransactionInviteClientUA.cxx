@@ -116,7 +116,7 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1001************"<<endl;
 #endif
-		sendAck(resp, getBranch()/*+"ACK"*/);
+		sendAck(resp, getBranch()+"ACK");
 		
 		return true;
 	}else{
@@ -145,7 +145,7 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1002************"<<endl;
 #endif
-		sendAck(resp, getBranch()/*+"ACK"*/);
+		sendAck(resp, getBranch()+"ACK");
 
 		return true;
 	}else{
@@ -159,7 +159,7 @@ bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCom
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1003************"<<endl;
 #endif
-		sendAck(resp, getBranch()/*+"ACK"*/);
+		sendAck(resp, getBranch()+"ACK");
 
 		return true;
 	}else{
