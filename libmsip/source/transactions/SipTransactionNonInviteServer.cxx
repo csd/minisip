@@ -45,7 +45,7 @@
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::remote, IGN)){
+	if (transitionMatch( getCSeqMethod(), command, SipSMCommand::remote, IGN)){
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
