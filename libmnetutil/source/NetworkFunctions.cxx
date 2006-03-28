@@ -57,13 +57,13 @@ windns is only for windows ... but it is not restricted to xp or higher ... thus
 #	define USE_WIN32_API
 #	ifdef _WIN32_WCE
 #		define USE_WIN32_API_GETADDRINFO
-#	elif
+#	else
 #		define USE_WIN32_API_WINDNS
 #	endif
 #endif
 
 #ifdef USE_WIN32_API
-#	ifdef USE_WIN32_API_GETADDRINFO && !_WIN32_WCE
+#	if defined USE_WIN32_API_GETADDRINFO && !_WIN32_WCE
 #		define _WIN32_WINNT 0x0501 //eeee ... XP only! ... use if "getaddrinfo" ... with windns, not needed
 #	endif
 #	include<windows.h>
