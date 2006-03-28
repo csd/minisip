@@ -122,6 +122,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
 	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderProxyAuthenticateFactory);
 	
+	addSupportedExtension("100rel");
 
 	 transportLayer = MRef<SipMessageTransport*>(new
 			 SipMessageTransport(
@@ -314,4 +315,31 @@ MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipSt
 
 MRef<SipTimers*> SipStack::getTimers(){
 	return timers;
+}
+
+void SipStack::addSupportedExtension(string ext){
+	sipExtensions.push_back(ext);
+}
+
+bool SipStack::supports(string ext){
+	list<string>::iterator i;
+	for (i=sipExtensions.begin(); i!= sipExtensions.end(); i++){
+		if (*i == ext)
+			return true;
+	}
+	return false;
+}
+
+string SipStack::getAllSupportedExtensionsStr(){
+	string ret;
+	bool first=true;
+	list<string>::iterator i;
+	for (i=sipExtensions.begin(); i!=sipExtensions.end();i++){
+		if (!first){
+			ret = ret+",";
+			first=false;
+		}
+		ret = ret+(*i);
+	}
+	return ret;
 }

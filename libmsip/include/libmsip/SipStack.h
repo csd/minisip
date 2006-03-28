@@ -120,6 +120,10 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		//void setSipMessageTransport(...);
 		MRef<SipTimers*> getTimers();
 		MRef<SipCommonConfig*> getStackConfig(){return config;}
+
+		void addSupportedExtension(string extension);
+		string getAllSupportedExtensionsStr();
+		bool supports(string extension);
                 
 	private:
 		MRef<SipTimers*> timers;
@@ -132,6 +136,8 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		MRef<SipMessageTransport *> transportLayer;
 		
 		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
+
+		list<string> sipExtensions;
 };
 
 
