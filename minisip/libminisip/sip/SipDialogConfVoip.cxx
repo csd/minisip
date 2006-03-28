@@ -1148,7 +1148,8 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 				//getDialogConfig().inherited.userUri,
 				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
-				getDialogConfig()->inherited->getTransport() ) ;
+				getDialogConfig()->inherited->getTransport(),
+				sipStack) ;
 
 	/* Get the session description from the Session */
 		
@@ -1261,7 +1262,8 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 			nonce,
 			realm,
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
-			getDialogConfig()->inherited->getTransport() );
+			getDialogConfig()->inherited->getTransport(),
+			sipStack);
 
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	if(type=="join")
