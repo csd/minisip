@@ -78,7 +78,7 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 		*/
 		void setDialogRouteSet(MRef<SipResponse *> resp);
 
-		void sendAck(MRef<SipResponse *>, string branch=""); //if no branch specified, use transaction branch attribute
+		void sendAck(MRef<SipResponse *>, string branch="", bool provisional=false); //if no branch specified, use transaction branch attribute
 
 	private:
 		
@@ -191,6 +191,15 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 			Notify TU about transaction_terminated.
 		*/
 		bool a11_completed_terminated_timerD( const SipSMCommand &command);
+
+		/**
+		 * If the remote UA requires reliable transmission of 1xx
+		 * responses we need to do some extra processing. This
+		 * method should be called when ever receiving a 1XX
+		 * response to setup the reliable transmission (100rel SIP
+		 * extension, RFC3262)
+		 */
+		void rel1xxProcessing(MRef<SipResponse*> resp);
 		
 		MRef<SipRequest*> lastInvite;
 //		int timerT1;

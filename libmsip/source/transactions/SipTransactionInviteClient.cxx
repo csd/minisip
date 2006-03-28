@@ -79,6 +79,7 @@ resp. to TU |  1xx             V                     |
 
 
 #include<libmsip/SipTransactionInviteClient.h>
+#include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipTransactionUtils.h>
@@ -90,7 +91,23 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipDialogConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CommandString.h>
+#include<libmsip/SipHeaderRequire.h>
 #include<libmutil/dbg.h>
+
+void SipTransactionInviteClient::rel1xxProcessing(MRef<SipResponse*> resp){
+		// If the server requests PRACK, then we need to start a
+		// client transaction to transmit it.
+
+		int statusCode = resp->getStatusCode();
+		
+		if (statusCode>100 && statusCode<200 && resp->requires("100rel")){
+			dialog->dialogState.seqNo++;
+			MRef<SipTransaction*> trans =
+				new SipTransactionNonInviteClient(sipStack, dialog, dialog->dialogState.seqNo, "PRACK", dialog->dialogState.callId);
+			dialog->registerTransaction(trans);
+			sendAck(resp,trans->getBranch(), true); //last argument means that yes, we are ack:ing a 1xx -> PRACK
+		}
+}
 
 bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &command){
 
@@ -145,7 +162,13 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 				SipSMCommand::TU);
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
-		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		MRef<SipResponse*> resp =(SipResponse *)*command.getCommandPacket();
+		
+		dialog->dialogState.updateState( resp );
+
+
+		rel1xxProcessing(resp);
+		
 		
 		return true;
 	}else{
@@ -244,9 +267,13 @@ bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMComman
 				SipSMCommand::transaction, 
 				SipSMCommand::TU);
 
+		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
+
 		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 		
-		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		dialog->dialogState.updateState( resp );
+
+		rel1xxProcessing(resp);
 		
 		return true;
 	}else{
@@ -477,7 +504,7 @@ void SipTransactionInviteClient::setDialogRouteSet(MRef<SipResponse *> resp) {
 	}
 }
 
-void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
+void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, bool provisional){
 
 	MRef<SipCommonConfig *> conf;
 	if (dialog){
@@ -489,9 +516,11 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
 	
 	MRef<SipMessage*> ref( *resp);
+
 	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
 			ref, 
-			dialog->dialogState.getRemoteTarget() //FIXME: uses dialog here, but it could be NULL
+			dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
+			provisional
 			);
 		
 	//add route headers, if needed
@@ -504,4 +533,5 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br){
 	}
 	send(MRef<SipMessage*>(*ack), true, br);
 }
+
 
