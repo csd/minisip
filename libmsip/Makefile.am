@@ -63,6 +63,8 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderProxyAuthenticate.cxx \
                      source/headers/SipHeaderWWWAuthenticate.cxx \
                      source/headers/SipHeaderProxyAuthorization.cxx \
+                     source/headers/SipHeaderRAck.cxx \
+                     source/headers/SipHeaderRSeq.cxx \
                      source/headers/SipHeaderRecordRoute.cxx \
                      source/headers/SipHeaderReferTo.cxx \
                      source/headers/SipHeaderRequire.cxx \

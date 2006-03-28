@@ -73,6 +73,8 @@
 #define SIP_HEADER_TYPE_SUPPORTED		26
 #define SIP_HEADER_TYPE_UNSUPPORTED		27
 #define SIP_HEADER_TYPE_REQUIRE			28
+#define SIP_HEADER_TYPE_RACK			29
+#define SIP_HEADER_TYPE_RSEQ			30
 
 using namespace std;
 

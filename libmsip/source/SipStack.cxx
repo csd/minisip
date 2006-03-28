@@ -50,6 +50,8 @@
 #include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipHeaderRecordRoute.h>
 #include<libmsip/SipHeaderAccept.h>
+#include<libmsip/SipHeaderRAck.h>
+#include<libmsip/SipHeaderRSeq.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderAuthorization.h>
@@ -101,6 +103,8 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Max-Forwards", sipHeaderMaxForwardsFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authenticate", sipHeaderProxyAuthenticateFactory);
 	SipHeader::headerFactories.addFactory("Proxy-Authorization", sipHeaderProxyAuthorizationFactory);
+	SipHeader::headerFactories.addFactory("RAck", sipHeaderRAckFactory);
+	SipHeader::headerFactories.addFactory("RSeq", sipHeaderRSeqFactory);
 	SipHeader::headerFactories.addFactory("Record-Route", sipHeaderRecordRouteFactory);
 	SipHeader::headerFactories.addFactory("Require", sipHeaderRequireFactory);
 	SipHeader::headerFactories.addFactory("Refer-To", sipHeaderReferToFactory);

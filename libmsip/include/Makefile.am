@@ -17,6 +17,8 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderProxyAuthenticate.h \
                      libmsip/SipHeaderWWWAuthenticate.h \
                      libmsip/SipHeaderProxyAuthorization.h \
+                     libmsip/SipHeaderRAck.h \
+                     libmsip/SipHeaderRSeq.h \
                      libmsip/SipHeaderRecordRoute.h \
                      libmsip/SipHeaderRequire.h \
                      libmsip/SipHeaderRoute.h \
