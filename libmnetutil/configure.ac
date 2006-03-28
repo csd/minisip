@@ -110,6 +110,7 @@ dnl mingw support
 dnl
 AC_CHECK_LIB([wsock32], [main])
 AC_CHECK_LIB([iphlpapi], [main])
+AC_CHECK_LIB([dnsapi], [main])
 
 dnl OpenSSL libcrypto
 dnl library check
