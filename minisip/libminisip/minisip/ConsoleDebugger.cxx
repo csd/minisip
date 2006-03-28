@@ -77,7 +77,9 @@ void ConsoleDebugger::showHelp() {
 }
 
 void ConsoleDebugger::run(){
+#ifdef DEBUG_OUTPUT
 	bool tmpSet;
+#endif
 	
 	keepRunning = true;
 	while(keepRunning){
