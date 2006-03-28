@@ -42,6 +42,8 @@
 #include<libmsip/SipMessage.h>
 #include<libmutil/MemObject.h>
 
+class SipStack;
+
 class LIBMSIP_API SipRequest : public SipMessage{
 
 	public:
@@ -50,7 +52,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		static MRef<SipRequest*> createSipMessageAck(
 				string branch,
 				MRef<SipMessage*> pack,
-				string to_tel_no);
+				string to_tel_no,
+				bool provisional=false);
 
 		static MRef<SipRequest*> createSipMessageBye(
 				string branch,
@@ -88,7 +91,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				int32_t localSipPort,
 				const string &from_tel_no,
 				int32_t seq_no,
-				const string &transport
+				const string &transport,
+				MRef<SipStack*> stack
 				);
 
 		static MRef<SipRequest*> createSipMessageInvite(
@@ -105,7 +109,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const string &nonce,
 				const string &realm,
 				const string &password,
-				const string &transport);
+				const string &transport,
+				MRef<SipStack*> stack);
 
 		static MRef<SipRequest*> createSipMessageInvite(
 				const string &call_id,
@@ -120,7 +125,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const string &nonce,
 				const string &realm,
 				const string &password,
-				const string &transport
+				const string &transport,
+				MRef<SipStack*> stack
 				);
 
 

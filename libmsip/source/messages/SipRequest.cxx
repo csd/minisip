@@ -33,6 +33,7 @@
 
 #include<config.h>
 
+#include<libmsip/SipStack.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
 #include<libmsip/SipMessageContentIM.h>
@@ -49,12 +50,20 @@
 #include<libmsip/SipHeaderAccept.h>
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderReferTo.h>
+#include<libmsip/SipHeaderSupported.h>
 
 MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 		MRef<SipMessage*> pack,
-		string to_tel_no)
+		string to_tel_no, 
+		bool provisional)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "ACK");
+	string method;
+	if (provisional){
+		method = "PRACK";
+	}else{
+		method = "ACK";
+	}
+	MRef<SipRequest*> req = new SipRequest(branch, method);
 	req->setUri(to_tel_no);
 
 	req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
@@ -177,7 +186,8 @@ static void addHeaders( MRef<SipRequest*> req,
 		const string &nonce,
 		const string &realm,
 		const string &password,
-		const string &transport
+		const string &transport,
+		MRef<SipStack*> stack
 		)
 {
 
@@ -206,6 +216,9 @@ static void addHeaders( MRef<SipRequest*> req,
 	req->addHeader(new SipHeader(new SipHeaderValueCSeq("INVITE",seq_no)));
 	req->addHeader(new SipHeader(new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"",transport)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
+	if (stack){
+		req->addHeader(new SipHeader(new SipHeaderValueSupported(stack->getAllSupportedExtensionsStr())));
+	}
 }
 
 
@@ -221,7 +234,8 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
                 int32_t localSipPort,
                 const string &from_tel_no,
                 int32_t seq_no,
-                const string &transport
+                const string &transport,
+		MRef<SipStack*> stack
                 )
 {
 	MRef<SipRequest*> req = new SipRequest(branch,"INVITE");
@@ -229,7 +243,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 			proxyAddr, proxyPort, 
 			localAddr, localSipPort, 
 			from_tel_no, seq_no, 
-			"","","","",transport);
+			"","","","",transport, stack);
 	
 	
 	
@@ -249,7 +263,8 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
                 const string &nonce,
                 const string &realm,
                 const string &password,
-                const string &transport)
+                const string &transport,
+		MRef<SipStack*> stack)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "INVITE");
 	
@@ -257,7 +272,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 			proxyAddr, proxyPort, 
 			localAddr, localSipPort, 
 			from_tel_no, seq_no, 
-			username, nonce, realm, password, transport);
+			username, nonce, realm, password, transport,stack);
 	return req;
 }
 
