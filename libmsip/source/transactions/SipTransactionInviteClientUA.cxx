@@ -47,7 +47,6 @@
     300-699 +---------------+  |1xx to TU            |   | ACK sent
    ACK sent |                  |                     |   |
 resp. to TU |  1xx             V                     |   |
-            3A
             |  1xx to TU  -----------+               |   |
             |  +---------|           |               |   |
             |  |         |Proceeding |-X------------>|   |

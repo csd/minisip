@@ -96,6 +96,7 @@
 bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCommand &command){
 
 	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
+		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
 		if( isUnreliable() ) {

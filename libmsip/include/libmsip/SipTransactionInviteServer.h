@@ -86,7 +86,9 @@ class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 
 	protected:
 		MRef<SipResponse*> lastResponse;
+		MRef<SipResponse*> lastReliableResponse;
 		int timerG;
+		int timerRel1xxResend;
 
 	private:
 		
@@ -186,6 +188,14 @@ class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 		Move to TERMINATED and inform TU.
 		*/
 		bool a10_confirmed_terminated_timerI( const SipSMCommand &command);
+
+		/**
+		Transition from PROCEEDING to PROCEEDING
+		When timer timerRel1xxResend fires, we resend the 1XX response
+		and double the timer value.
+		This is used for the RFC3262 "100rel" SIP extension.
+		*/
+		bool a20_proceeding_proceeding_timerRel1xxResend( const SipSMCommand &command);
 		
 		bool user_has_accepted;
 		bool user_has_rejected;

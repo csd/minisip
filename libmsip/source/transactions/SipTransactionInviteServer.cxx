@@ -37,11 +37,11 @@
             INVITE             V send 100 if TU won't in 200ms
          a1:send response+-----------+
                 +--------|           |--------+101-199 from TU
-                |        | Proceeding|        |a2:send response
+                |        | Proceeding|        |a2:send response (if 100rel, set TimerRel1xx)
                 +------->|           |<-------+
-                         |           |          Transport Err.
-                         |           |          a4:Inform TU
-                         |           |--------------->+
+ a20:TimerRel1xx+--------|           |          Transport Err.
+ resendRel1xx   |        |           |          a4:Inform TU
+                +------->|           |--------------->+
                          +-----------+                |
             300-699 from TU |     |2xx from TU        |
          a3:send response   |     |a5:send response   |
@@ -80,6 +80,7 @@
 #include<config.h>
 
 #include<libmsip/SipTransactionInviteServer.h>
+#include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
@@ -151,9 +152,31 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
  */
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
 	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "1**")){
-		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
+		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
+		lastResponse = resp;
 		//no need for via header, it is copied from the request msg
+
+		
+		if (resp->requires("100rel")){
+			lastReliableResponse=resp;
+			//The order we want (no race): 	
+			//  1. Create PRACK server transaction
+			//  2. Request timeout
+			//  3. send 1xx message
+
+			MRef<SipTransaction*> pracktrans = new SipTransactionNonInviteServer(sipStack,
+					/*MRef<SipDialog*>(this)*/ dialog,
+					resp->getCSeq()+1, // The PRACK transaction MUST be the next in sequence
+					"PRACK",
+					/*bye->getLastViaBranch()*/ "",
+					dialog->dialogState.callId);
+			
+			
+			timerRel1xxResend = sipStack->getTimers()->getT1();
+			requestTimeout(timerRel1xxResend,"timerRel1xxResend");
+		}
 		send(command.getCommandPacket(), false);
+		
 		return true;
 	}else{
 		return false;
@@ -170,6 +193,7 @@ bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMComman
 bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMCommand &command){
 	
 	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "3**\n4**\n5**\n6**")){
+		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());		
 		if( isUnreliable() ) {
 			timerG = sipStack->getTimers()->getG();
@@ -193,6 +217,7 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMCommand &command){
 
 	if (transitionMatch(command, SipCommandString::transport_error)){
+		cancelTimeout("timerRel1xxResend");
 		
 		SipSMCommand cmd( CommandString(callId, SipCommandString::transport_error), 
 				SipSMCommand::transaction, 
@@ -218,6 +243,7 @@ bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMComman
 bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMCommand &command){
 
 	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
+		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
 		//no need for via header, it is copied from the request msg
@@ -340,6 +366,21 @@ bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCom
 	}
 }
 
+bool SipTransactionInviteServer::a20_proceeding_proceeding_timerRel1xxResend( const SipSMCommand &command){
+	
+	if (transitionMatch(command, "timerRel1xxResend")){
+
+		timerRel1xxResend*=2;
+		requestTimeout(timerRel1xxResend, "timerRel1xxResend");
+		
+		send(*lastResponse, false); // second parameter is "bool addVia"
+		
+		return true;
+	}else{
+		return false;
+	}
+}
+
 void SipTransactionInviteServer::setUpStateMachine(){
 		
 	State<SipSMCommand,string> *s_start=new State<SipSMCommand,string>(this,"start");
@@ -415,6 +456,10 @@ void SipTransactionInviteServer::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a10_confirmed_terminated_timerI,
 			s_confirmed, s_terminated);
 
+	new StateTransition<SipSMCommand,string>(this, "a20_proceeding_proceeding_timerRel1xxResend",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a20_proceeding_proceeding_timerRel1xxResend,
+			s_proceeding, s_proceeding);
+		
 	setCurrentState(s_start);
 }
 
