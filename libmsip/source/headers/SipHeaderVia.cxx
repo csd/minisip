@@ -89,6 +89,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		i++;
 	}
 
+/*
 	//FIXME: The following code considers parameters -  they are not
 	//part of the header value and should not be parsed here (they
 	//should not be in the string passed to this method)!!
@@ -114,7 +115,8 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 //			cerr << "branch parsed to: "<< branch<< endl;;
 		}
 	}
-
+*/
+	
 }
 
 SipHeaderValueVia::SipHeaderValueVia()
@@ -125,34 +127,23 @@ SipHeaderValueVia::SipHeaderValueVia()
 	ip="UNKNOWN_IP";
 }
 
-SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip, int32_t port, const string &branch)
+SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip, int32_t port/*, const string &branch*/)
 		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	setProtocol(proto);
 	setIp(ip);
 	setPort(port);
-	setBranch(branch);
 }
 
 SipHeaderValueVia::~SipHeaderValueVia(){
 }
 
 string SipHeaderValueVia::getString(){
-//	if (!(protocol=="TCP" || protocol=="UDP")){
-//		cerr << "Protocol not set"<< endl;
-//		throw string("Protocol not set in Via header");
-//	}
-///	if (port==0){
-///		cerr << "ERROR: In SipHeaderValueVia: port not set"<< endl;
-///		throw string("Port not set in Via header");
-///	}
 	string via;
-	via = /*"Via: */ "SIP/2.0/"+protocol+" "+ip;
+	via = "SIP/2.0/"+protocol+" "+ip;
 	if (port>0)
 		via=via+":"+itoa(port);
-	if (branch.length()>0)	
-		via=via+";branch="+branch;	//FIXME: Parameters should not be added here - they 
-	 					//shoud be set using the parameter functionality.
+	
 	return via;
 }
 
@@ -178,13 +169,5 @@ int32_t SipHeaderValueVia::getPort(){
 
 void SipHeaderValueVia::setPort(int32_t p){
 	this->port=p;
-}
-
-void SipHeaderValueVia::setBranch(const string &branch){
-	this->branch = branch;
-}
-		
-string SipHeaderValueVia::getBranch(){
-	return branch;
 }
 

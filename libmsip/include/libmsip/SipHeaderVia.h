@@ -49,7 +49,7 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 	public:
 		SipHeaderValueVia();
 		SipHeaderValueVia(const string &build_from);
-		SipHeaderValueVia(const string &proto, const string &ip, int32_t port, const string &branch);
+		SipHeaderValueVia(const string &proto, const string &ip, int32_t port);
 
 		virtual ~SipHeaderValueVia();
 
@@ -74,10 +74,6 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 		void setIp(const string &ip);
 
 
-		string getBranch();
-		void setBranch(const string &branch);
-		
-
 		/**
 		 *
 		 */
@@ -87,7 +83,6 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 	private:
 		string protocol;
 		string ip;
-		string branch;
 		int32_t port;
 };
 
