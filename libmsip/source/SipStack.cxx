@@ -62,7 +62,6 @@
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipCommandString.h>
-//#include"PresenceMessageContent.h"
 
 #include<libmutil/massert.h>
 
@@ -147,16 +146,6 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	transportLayer->setSipSMCommandReceiver(this);
 
 }
-/*
-void SipStack::init(){
-	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
-	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
-	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
-	transportLayer->setSipSMCommandReceiver(this);
-}
-*/
 
 MRef<SipDialogContainer*> SipStack::getDialogContainer(){
 	return dialogContainer;
@@ -180,124 +169,14 @@ MRef<CommandReceiver*> SipStack::getConfCallback(){
 	return confCallback;
 }
 
-
-
-#if 0
-//returns a the call id
-string SipStack::invite(string &user){
-	SipDialogSecurityConfig securityConfig;
-#ifndef _MSC_VER
-	ts.save( INVITE_START );
-#endif
-	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
-
-	securityConfig = phoneconfig->securityConfig;
-	
-	int startAddr=0;
-	if (user.substr(0,4)=="sip:")
-		startAddr = 4;
-	
-	if (user.substr(0,4)=="sips:")
-		startAddr = 5;
-
-	bool onlydigits=true;
-	for (unsigned i=0; i<user.length(); i++)
-		if (user[i]<'0' || user[i]>'9')
-			onlydigits=false;
-	if (onlydigits && phoneconfig->usePSTNProxy){
-		callconf->useIdentity( phoneconfig->pstnIdentity, false);
-		securityConfig.useIdentity( phoneconfig->pstnIdentity );
-	}
-	else{
-		securityConfig.useIdentity( phoneconfig->inherited.sipIdentity);
-	}
-
-	
-	
-	
-	if (user.find(":", startAddr)!=string::npos){
-		if (user.find("@", startAddr)==string::npos){
-			return "malformed";
-		}
-		
-		string proxy;
-		string port;
-		uint32_t i=startAddr;
-		while (user[i]!='@')
-			if (user[i]==':')
-				return "malformed";
-			else
-				i++;
-		i++;
-		while (user[i]!=':')
-			proxy = proxy + user[i++];
-		i++;
-		while (i<user.size())
-			if (user[i]<'0' || user[i]>'9')
-				return "malformed";
-			else
-				port = port + user[i++];
-		
-		//int iport = atoi(port.c_str());
-				
-//		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
-		
-/*
-		try{
-			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
-//			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
-//			callconf->inherited.sipIdentity->sipProxyPort = iport;
-		}catch(IPAddressHostNotFoundException &exc){
-			merr << "Could not resolve PSTN proxy address:" << end;
-			merr << exc->what();
-			merr << "Will use default proxy instead" << end;
-		}
-*/
-		
-	}
-
-
-MRef<Session *> mediaSession = 
-		mediaHandler->createSession( securityConfig );
-
-#ifdef IPSEC_SUPPORT
-	MRef<SipStackIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
-	string callID = "";
-	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
-	
-#else	
-	MRef<SipDialog*> voipCall( new SipDialogVoip(dialogContainer, callconf, phoneconfig, mediaSession)); 
-
-#endif
-
-#ifdef MINISIP_MEMDEBUG 
-	voipCall.setUser("Sip");
-#endif
-	dialogContainer->addDialog(voipCall);
-	
-	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
-#ifndef _MSC_VER
-	ts.save( TMP );
-#endif
-	
-        SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
-	dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-	return voipCall->getCallId();
-}
-#endif
-
-
 void SipStack::run(){
-
 	dialogContainer->run();
 }
-
 
 bool SipStack::handleCommand(const SipSMCommand &command){
 	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	return true;
 }
-
 
 void SipStack::setDefaultHandler(MRef<SipDialog*> d){
 	dialogContainer->setDefaultHandler(d);
@@ -307,7 +186,6 @@ void SipStack::addDialog(MRef<SipDialog*> d){
 	massert(dialogContainer);
 	dialogContainer->addDialog(d);
 }
-
 
 MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipStack::getTimeoutProvider(){
 	return timeoutProvider;
@@ -343,3 +221,4 @@ string SipStack::getAllSupportedExtensionsStr(){
 	}
 	return ret;
 }
+

@@ -69,30 +69,12 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cs
 		conf = sipStack->getStackConfig();
 	}
 
-	//toaddr = NULL;
-
-#if 0
-	try{	
-		toaddr = new IP4Address(conf->sipIdentity->sipProxy.sipProxyAddressString);
-	}
-	catch( HostNotFound & exc ){
-		toaddr = NULL;
-		SipSMCommand cmd( CommandString( callId, SipCommandString::transport_error, exc->errorDescription() ), SipSMCommand::transaction, SipSMCommand::TU );
-        	dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-		delete exc;
-	}
-#endif
-
 	MRef<SipProxy *> sipproxy = conf->sipIdentity->getSipProxy();
 	port = sipproxy->sipProxyPort;
 	transport = sipproxy->getTransport();
 }
 
 SipTransaction::~SipTransaction(){
-//	if( toaddr ){
-//		delete toaddr;
-//	}
-
 }
 
 

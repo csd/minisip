@@ -58,13 +58,13 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 		requestTimeout(sipStack->getTimers()->getF(), "timerF");
 		massert(getConfig());
 		massert(getConfig()->sipIdentity);
-		if( /*toaddr*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0){
+		if( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0){
 			MRef<SipHeaderValue*> hdr;
 
 			hdr = lastRequest->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
 
 			if( !hdr ){
-				lastRequest->addRoute( /*toaddr->getString()*/getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
+				lastRequest->addRoute( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
 						       port, transport );
 			}
 		}

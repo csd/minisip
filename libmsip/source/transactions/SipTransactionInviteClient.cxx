@@ -120,12 +120,12 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		
 		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
 
-		if( /*toaddr*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0 ){
+		if( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0 ){
 			MRef<SipHeaderValue*> hdr;
 			hdr = lastInvite->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
 
 			if( !hdr ){
-				lastInvite->addRoute( /*toaddr->getString()*/ getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
+				lastInvite->addRoute( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
 						      port, transport );
 			}
 		}
@@ -166,9 +166,7 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 		
 		dialog->dialogState.updateState( resp );
 
-
 		rel1xxProcessing(resp);
-		
 		
 		return true;
 	}else{

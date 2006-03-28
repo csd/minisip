@@ -543,25 +543,6 @@ string SipMessage::getWarningMessage(){
 	return "";
 }
 
-
-#if 0
-string SipMessage::getRealm(){
-        return realm;
-}
-
-void SipMessage::setRealm(string r){
-        realm = r;
-}
-
-string SipMessage::getNonce(){
-        return nonce;
-}
-
-void SipMessage::setNonce(string n){
-        nonce=n;
-}
-#endif
-
 list<string> SipMessage::getRouteSet() {
 	list<string> set;
 
