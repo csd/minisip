@@ -32,7 +32,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipMessageTransport.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
-		     source/SipURI.cxx \
+		     source/SipUri.cxx \
 		     source/SipTimers.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \

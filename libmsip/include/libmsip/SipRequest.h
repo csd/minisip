@@ -76,7 +76,7 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				string call_id,
 				std::string toUri,
 				//MRef<SipIdentity*> fromIdentity,
-				const SipURI&fromUri,
+				const SipUri& fromUri,
 				int32_t seq_no,
 				string msg);
 
@@ -134,9 +134,9 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				string branch,
 				string call_id,
 				//MRef<SipIdentity*> toIdentity,
-				const SipURI& toUri,
+				const SipUri& toUri,
 				//MRef<SipIdentity*> fromId,
-				const SipURI& fromUri,
+				const SipUri& fromUri,
 				int32_t seq_no
 				);
 
@@ -167,8 +167,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		static MRef<SipRequest*> createSipMessageSubscribe(
 				string branch,
 				string call_id,
-				const SipURI& toUri,
-				const SipURI& fromUri,
+				const SipUri& toUri,
+				const SipUri& fromUri,
 				int32_t seq_no);
 
 
@@ -229,8 +229,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 * 			will be generated.
 		 * 
 		 */
-		void addDefaultHeaders(const SipURI& fromUri, 
-				const SipURI& toUri, 
+		void addDefaultHeaders(const SipUri& fromUri, 
+				const SipUri& toUri, 
 				const string& method, 
 				int seqNo, 
 				const string& callId="");

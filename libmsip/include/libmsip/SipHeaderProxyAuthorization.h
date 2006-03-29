@@ -36,7 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeaderAuthorization.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 
 /**
  * @author Erik Eliasson
@@ -52,7 +52,7 @@ class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthori
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
-				const SipURI &uri, 
+				const SipUri &uri, 
 				const string &auth_id, 
 				const string &password,
 				const string &auth_method="DIGEST");

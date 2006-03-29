@@ -431,8 +431,8 @@ string SipMessage::getCSeqMethod(){
 	return "";
 }
 
-SipURI SipMessage::getFrom(){
-	SipURI ret;
+SipUri SipMessage::getFrom(){
+	SipUri ret;
 	MRef<SipHeaderValueFrom*> hfrom = getHeaderValueFrom();
 	if (hfrom)
 		ret = hfrom->getUri();
@@ -440,8 +440,8 @@ SipURI SipMessage::getFrom(){
 	return ret;
 }
 
-SipURI SipMessage::getTo(){
-	SipURI ret;
+SipUri SipMessage::getTo(){
+	SipUri ret;
 	MRef<SipHeaderValueTo*> hto = getHeaderValueTo();
 	if (hto)
 		ret = hto->getUri();

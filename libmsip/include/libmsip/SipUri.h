@@ -22,7 +22,7 @@
 */
 
 /* Name
- * 	SipURI.h
+ * 	SipUri.h
  * Author
  * 	Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
  * Purpose
@@ -45,7 +45,7 @@ using namespace std;
 
 /**
 A SipUri representation.
-It can create a uri from a string (parse it), 
+It can create a Uri from a string (parse it), 
 or from parameters that can be set.
 
 The scheme is:
@@ -55,20 +55,20 @@ The scheme is:
 FIXME: User and transport are the only understood params ... the rest
 are discarded.
 */
-class LIBMSIP_API SipURI : public MObject{
+class LIBMSIP_API SipUri : public MObject{
 	public:
 		/**
 		Basic constructor ... it creates an invalid uri
 		*/
-		SipURI() { clear(); };
+		SipUri() { clear(); };
 
-		~SipURI();
+		~SipUri();
 		
 		/**
 		This constructor, and the setUri function, parse 
 		a uri string. If everything is ok, the uri object is valid
 		*/
-		SipURI(string build_from);
+		SipUri(string build_from);
 		void setUri( string buildFrom );
 
 		/**
@@ -107,7 +107,7 @@ class LIBMSIP_API SipURI : public MObject{
 		*/
 		string getRequestUriString() const;
 
-		virtual std::string getMemObjectType(){return "SipURI";}
+		virtual std::string getMemObjectType(){return "SipUri";}
 
 		void setDisplayName(string id);
 		string getDisplayName() const;

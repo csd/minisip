@@ -37,7 +37,7 @@
 
 
 #include<libmsip/SipHeaderProxyAuthenticate.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 
 /**
  * @author Erik Eliasson

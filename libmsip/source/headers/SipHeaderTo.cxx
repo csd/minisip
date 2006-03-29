@@ -49,11 +49,11 @@ const string sipHeaderValueToTypeStr = "To";
 SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
-	uri = SipURI( build_from );
+	uri = SipUri( build_from );
 }
 
 
-SipHeaderValueTo::SipHeaderValueTo(const SipURI& u)
+SipHeaderValueTo::SipHeaderValueTo(const SipUri& u)
 		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
 {
 	uri = u;
@@ -67,11 +67,11 @@ string SipHeaderValueTo::getString(){
 	return uri.getString();
 } 
 
-SipURI &SipHeaderValueTo::getUri(){
+SipUri &SipHeaderValueTo::getUri(){
 	return uri;
 }
 
-void SipHeaderValueTo::setUri(const SipURI &uri){
+void SipHeaderValueTo::setUri(const SipUri &uri){
 	this->uri=uri;
 }
 

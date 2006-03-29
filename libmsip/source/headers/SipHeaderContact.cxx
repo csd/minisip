@@ -62,7 +62,7 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
 {
 
-	uri = SipURI( build_from );
+	uri = SipUri( build_from );
 	if( !uri.isValid() ) {
 		cerr << "SipHeaderValueContact::constructor - invalid contact uri" << endl;
 	}
@@ -141,11 +141,11 @@ string SipHeaderValueContact::getString(){
 	return ret;
 } 
 
-SipURI SipHeaderValueContact::getUri(){
+SipUri SipHeaderValueContact::getUri(){
 	return uri;
 }
 
-void SipHeaderValueContact::setUri(const SipURI &uri){
+void SipHeaderValueContact::setUri(const SipUri &uri){
 	this->uri=uri;
 }
 

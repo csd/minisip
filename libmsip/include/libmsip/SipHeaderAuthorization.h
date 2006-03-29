@@ -36,7 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 
 /**
  * @author Erik Eliasson
@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
-				const SipURI &uri, 
+				const SipUri &uri, 
 				const string &auth_id, 
 				const string &password,
 				const string &auth_method="DIGEST");
@@ -65,7 +65,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 				const string &username, 
 				const string &realm, 
 				const string &nonce, 
-				const SipURI &uri, 
+				const SipUri &uri, 
 				const string &auth_id, 
 				const string &password,
 				const string &auth_method,
@@ -96,8 +96,8 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		string getNonce();
 		void setNonce(const string &n);
 
-		SipURI getUri();
-		void setUri(const SipURI &uri);
+		SipUri getUri();
+		void setUri(const SipUri &uri);
 
 		string getResponse();
 		void setResponse(const string &resp);
@@ -110,7 +110,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		string username;
 		string realm;
 		string nonce;
-		SipURI uri;
+		SipUri uri;
 		string auth_id;
 		string password;
 		string auth_method;

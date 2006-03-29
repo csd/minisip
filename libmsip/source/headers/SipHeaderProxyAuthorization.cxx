@@ -56,7 +56,7 @@ SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string 
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
-		const SipURI &uri, 
+		const SipUri &uri, 
 		const string &auth_id, 
 		const string &password,
 		const string &auth_method)

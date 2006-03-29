@@ -506,7 +506,7 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 		MRef<SipHeaderValue*> routeHeader =
 			pack->getHeaderValueNo(SIP_HEADER_TYPE_ROUTE, 0);
 
-		SipURI uri;
+		SipUri uri;
 
 		if( routeHeader ){
 			MRef<SipHeaderValueRoute*> route =

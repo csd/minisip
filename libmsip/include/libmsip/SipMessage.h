@@ -39,7 +39,7 @@
 
 #include<libmutil/minilist.h>
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContentFactory.h>
@@ -237,12 +237,12 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 		* @return The URI in the "From:" header.
 		*/
-		SipURI getFrom();
+		SipUri getFrom();
 		
 		/**
 		* @return The URI in the "To:" header.
 		*/
-		SipURI getTo();
+		SipUri getTo();
                 
 		/**
 		 * Removes all via headers that may be in the message.

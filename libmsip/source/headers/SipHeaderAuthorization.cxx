@@ -70,7 +70,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &sip_metho
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
-		const SipURI &uri, 
+		const SipUri &uri, 
 		const string &auth_id, 
 		const string &password,
 		const string &auth_method)
@@ -92,7 +92,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
-		const SipURI &uri, 
+		const SipUri &uri, 
 		const string &auth_id, 
 		const string &password,
 		const string &auth_method,
@@ -198,11 +198,11 @@ void SipHeaderValueAuthorization::setRealm(const string &r){
 	this->realm=r;
 }
 
-SipURI SipHeaderValueAuthorization::getUri(){
+SipUri SipHeaderValueAuthorization::getUri(){
 	return uri;
 }
 
-void SipHeaderValueAuthorization::setUri(const SipURI &uri){
+void SipHeaderValueAuthorization::setUri(const SipUri &uri){
 	this->uri=uri;
 }
 

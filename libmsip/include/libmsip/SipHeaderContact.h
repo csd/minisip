@@ -37,7 +37,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 
 /**
  * @author Erik Eliasson
@@ -70,8 +70,8 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		SipURI getUri();
-		void setUri(const SipURI &uri);
+		SipUri getUri();
+		void setUri(const SipUri &uri);
 		
 		/**
 		 * can be used to set Caller Preferences for example in the 
@@ -89,7 +89,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		 void setExpires(int _expires);
 		 
 	private:
-		SipURI uri;
+		SipUri uri;
 		
 		//int expires; //now we only store in the params map ... see SipHeader.h
 		

@@ -36,7 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipURI.h>
+#include<libmsip/SipUri.h>
 
 /**
  * @author Erik Eliasson
@@ -47,7 +47,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderToFactory;
 class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 	public:
 		SipHeaderValueTo(const string &build_from);
-		SipHeaderValueTo(const SipURI& uri);
+		SipHeaderValueTo(const SipUri& uri);
 
 		virtual ~SipHeaderValueTo();
 		
@@ -61,11 +61,11 @@ class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		SipURI &getUri();
-		void setUri(const SipURI &uri);
+		SipUri &getUri();
+		void setUri(const SipUri &uri);
 		
 	private:
-		SipURI uri;
+		SipUri uri;
 };
 
 #endif

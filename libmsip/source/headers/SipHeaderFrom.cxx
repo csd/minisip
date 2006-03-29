@@ -47,10 +47,10 @@ const string sipHeaderValueFrom = "From";
 SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
 {
-	uri = SipURI( build_from );
+	uri = SipUri( build_from );
 }
 
-SipHeaderValueFrom::SipHeaderValueFrom(const SipURI& u)
+SipHeaderValueFrom::SipHeaderValueFrom(const SipUri& u)
 		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
 {
 	uri = u;
@@ -64,11 +64,11 @@ string SipHeaderValueFrom::getString(){
 	return uri.getString();
 } 
 
-SipURI &SipHeaderValueFrom::getUri(){
+SipUri &SipHeaderValueFrom::getUri(){
 	return uri;
 }
 
-void SipHeaderValueFrom::setUri(const SipURI &uri){
+void SipHeaderValueFrom::setUri(const SipUri &uri){
 	this->uri=uri;
 }
 		
