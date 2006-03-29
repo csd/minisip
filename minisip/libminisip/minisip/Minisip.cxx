@@ -242,9 +242,6 @@ int Minisip::startSip() {
 #endif
 		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		confMessageRouter->setMediaHandler( mediaHandler );
-#ifdef DEBUG_OUTPUT
-		cerr << "EE: Adding media subsystem"<<endl;
-#endif
 		messageRouter->addSubsystem("media",*mediaHandler);
 #ifdef DEBUG_OUTPUT
 		if( consoleDbg ){
@@ -279,9 +276,6 @@ int Minisip::startSip() {
 		sip->getSipStack()->setConfCallback(*confMessageRouter);
 
 		//messageRouter->setSip(sip);
-#ifdef DEBUG_OUTPUT
-		cerr << "EE: Adding sip subsystem"<<endl;
-#endif
 		messageRouter->addSubsystem("sip",*sip);
 
 		confMessageRouter->setSip(sip);
@@ -296,9 +290,6 @@ int Minisip::startSip() {
 #endif
 		gui->setSipSoftPhoneConfiguration(phoneConf);
 		//messageRouter->setGui(gui);
-#ifdef DEBUG_OUTPUT
-		cerr << "EE: Adding gui subsystem"<<endl;
-#endif
 		messageRouter->addSubsystem("gui",*gui);
 		confMessageRouter->setGui(gui);
 
