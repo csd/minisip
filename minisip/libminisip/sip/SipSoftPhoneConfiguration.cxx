@@ -572,7 +572,7 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 	return NULL;
 }
 
-MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipURI &uri ) {
+MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipUri &uri ) {
 	list< MRef<SipIdentity*> >::iterator it;
 	
 	for( it = identities.begin(); it!=identities.end(); it++ ) {

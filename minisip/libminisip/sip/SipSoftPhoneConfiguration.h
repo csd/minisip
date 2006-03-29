@@ -105,7 +105,7 @@ class SipSoftPhoneConfiguration : public MObject{
 		/**
 		 * Returns the identity when getUri() == uri
 		 */
-		MRef<SipIdentity *> getIdentity( SipURI &uri );
+		MRef<SipIdentity *> getIdentity( SipUri &uri );
 		
 		/*
 		IPAddress * pstnProxy;
