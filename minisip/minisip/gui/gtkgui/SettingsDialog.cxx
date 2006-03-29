@@ -27,6 +27,8 @@
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
 
+#include<libmnetutil/NetworkFunctions.h>
+
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
 #define BIND SigC::bind
@@ -564,7 +566,9 @@ string SecuritySettings::apply(){
 }
 
 AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
-	
+	refXml->get_widget( "networkInterfacesCombo", networkInterfacesCombo );
+	refXml->get_widget( "networkInterfacesEntry", networkInterfacesEntry );
+		
 	refXml->get_widget( "udpSpin", udpSpin );
 	refXml->get_widget( "tcpSpin", tcpSpin );
 	refXml->get_widget( "tlsSpin", tlsSpin );
@@ -589,6 +593,25 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
 	this->config = config;
 
+	//Set the choosen network interface ...
+	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
+	list<string> ifaceIP;
+	for(unsigned int i=0; i<ifaces.size(); i++ ){
+		string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
+		#ifdef DEBUG_OUTPUT
+		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
+		#endif
+		ifaceIP.push_back( ip );
+		
+	}	
+	networkInterfacesCombo->set_popdown_strings( ifaceIP );
+	networkInterfacesCombo->set_sensitive( ifaceIP.size() > 1 );
+	//set the preferred's IP as selected ...
+	if( config ) {
+		string preferredIfaceIP = NetworkFunctions::getInterfaceIPStr( config->networkInterfaceName );
+		networkInterfacesEntry->set_text( preferredIfaceIP );
+	}
+	
 	udpSpin->set_value( config->inherited->localUdpPort );
 	tcpSpin->set_value( config->inherited->localTcpPort );
 	tlsSpin->set_value( config->inherited->localTlsPort );
@@ -601,7 +624,6 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	stunCheck->set_active( config->useSTUN );
 	stunAutodetectCheck->set_active( config->useUserDefinedStunServer );
 	stunEntry->set_text( config->userDefinedStunServer );
-
 
 }
 
@@ -621,6 +643,16 @@ void AdvancedSettings::stunAutodetectChange(){
 }
 
 string AdvancedSettings::apply(){
+	//config->networkInterfaceName = networkInterfacesCombo->
+	string ipSelected = networkInterfacesEntry->get_text();
+	string ifaceSel = NetworkFunctions::getInterfaceOf( ipSelected );
+	#ifdef DEBUG_OUTPUT
+	cout << "AdvancedSettings::apply - ip = " << ipSelected << "; iface = " << ifaceSel << endl;
+	#endif
+	if( ifaceSel != "" ) {
+		config->networkInterfaceName = ifaceSel;
+	}
+
 	config->inherited->localUdpPort = udpSpin->get_value_as_int();
 	config->inherited->localTcpPort = tcpSpin->get_value_as_int();
 	config->inherited->localTlsPort = tlsSpin->get_value_as_int();
@@ -632,7 +664,6 @@ string AdvancedSettings::apply(){
 	config->useUserDefinedStunServer = stunAutodetectCheck->get_active()
 		&& stunEntry->get_text() != "";
 	config->userDefinedStunServer = stunEntry->get_text();
-	
 
 	return "";
 

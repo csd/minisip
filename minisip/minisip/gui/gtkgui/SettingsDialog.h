@@ -205,6 +205,12 @@ class AdvancedSettings
 		void transportChange();
 		void stunAutodetectChange();
 		
+		/** 
+		Contains a drop-down list of the available network interfaces
+		*/
+		Gtk::Combo * networkInterfacesCombo;
+		Gtk::Entry * networkInterfacesEntry;
+		
 		Gtk::SpinButton * udpSpin;
 		Gtk::SpinButton * tcpSpin;
 		Gtk::SpinButton * tlsSpin;
