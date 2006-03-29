@@ -6,7 +6,7 @@
 	#For a proper installation, select yes
 	#if you are debugging, compiling looking for errors, select "no", it will speed up the whole thing,
 	#	(though the files generated won't be runnable in windows?)
-do_make_install="yes"
+do_make_install="no"
 
 # Simple script to build minisip.
 #
@@ -67,24 +67,10 @@ echo "+++++++++++++++++++++++++++++++++++++"
 cd minisip
 
 #force to relink
-rm -f ./soundcard/libsoundcard.a
-rm -f ./conf/libconf.a
-rm -f ./sdp/libsdp.a
-rm -f ./aec/libaec.a
-rm -f ./stun/libstun.a
-rm -f ./rtp/librtp.a
-rm -f ./minisip/ipprovider/libipprovider.a
-rm -f ./minisip/gui/gtkgui/libminisip_gtkgui.a
-rm -f ./minisip/gui/libminisip_gui.a
-rm -f ./minisip/contactdb/libcontactdb.a
-rm -f ./minisip/libminisip.a
-rm -f ./mediahandler/libmediahandler.a
-rm -f ./sip/libsip.a
-rm -f ./codecs/g711/libcodec_g711.a
-rm -f ./codecs/ilbc/libcodec_ilbc.a
-rm -f ./codecs/libcodecs.a
-rm -f ./spaudio/libspaudio.a
-rm -f minisip/minisip
+#force to relink
+find . -name "*.la" -exec rm -f {} \;
+find . -name "minisip_gtkgui" -exec rm -f {} \;
+find . -name "minisip_textui" -exec rm -f {} \;
 
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH$PWD"
 
@@ -113,9 +99,13 @@ cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+tmp_lib="libminisip"
+cp -f minisip/libminisip/minisip/.libs/libminisip-0.dll compiled_files
+cp -f minisip/libminisip/minisip/.libs/libminisip.dll.a compiled_files
 
-cp -f minisip/minisip/minisip.exe compiled_files/minisip_script.exe
-cp -f minisip/minisip/.libs/minisip.exe compiled_files/minisip.exe
+					#set a minum 200k ... otherwise it finds the fake script.exe
+find minisip -name minisip_gtkgui.exe -size +200k -exec cp -f {} compiled_files/ \;
+find minisip -name minisip_textui.exe -size +200k -exec cp -f {} compiled_files/ \;
 
 $strip_bin compiled_files/*
 

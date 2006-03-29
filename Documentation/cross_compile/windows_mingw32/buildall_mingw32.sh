@@ -10,7 +10,7 @@
 
 #This options are added for the w32 compilation ... modify if needed, specially the cross-compile folder
 #This is the CROSS_COMPILE_FOLDER
-prefix_cross=/minisip
+prefix_cross="/minisip"
 prefix_cross_include=$prefix_cross/include
 prefix_cross_lib=$prefix_cross/lib
 host_type_name="i586-mingw32msvc"
@@ -193,15 +193,13 @@ cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+tmp_lib="libminisip"
+cp -f minisip/libminisip/minisip/.libs/libminisip-0.dll compiled_files
+cp -f minisip/libminisip/minisip/.libs/libminisip.dll.a compiled_files
 
-cp -f minisip/minisip/minisip.exe compiled_files/minisip_script.exe
-cp -f minisip/minisip/.libs/minisip.exe compiled_files/minisip.exe
+
+find minisip/ -name minisip_gtkgui.exe -size +200k -exec cp -f {} compilied_files/ \;
+find minisip/ -name minisip_textui.exe -size +200k -exec cp -f {} compilied_files/ \;
 
 $strip_bin compiled_files/*
 
-echo "---------------------------------------------------------------------"
-echo "Warning:"
-echo "   You may need to manually copy the minisip/share/minisip.glade file"
-echo "   to the _pkgdatadir_ folder (in debian: /usr/local/share)."
-echo " --------------------------------------------------------------------"
-echo
