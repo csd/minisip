@@ -32,7 +32,7 @@
  * is called with a subsystem that is not registred (using the
  * addSubsystem in the MessageRouter class).
  */
-class SubsystemNotFoundException : public Exception{
+class LIBMUTIL_API SubsystemNotFoundException : public Exception{
 	public:
 		/**
 		 * @param what	Name of the subsystem not found. The name
@@ -44,7 +44,7 @@ class SubsystemNotFoundException : public Exception{
 /**
  * Interface for a subsystem that receives CommandString messages.
  */
-class CommandReceiver : public virtual MObject{
+class LIBMUTIL_API CommandReceiver : public virtual MObject{
 	public:
 		/**
 		 * Note that the second argument is sent as reference (&) and
@@ -84,7 +84,7 @@ class MessageRouterInternal;
  * throw a SubsystemNotFoundException exception.
  *
  */
-class MessageRouter : public CommandReceiver{
+class LIBMUTIL_API MessageRouter : public CommandReceiver{
 	public:
 		MessageRouter();
 		~MessageRouter();
