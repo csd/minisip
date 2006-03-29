@@ -281,8 +281,9 @@ int Minisip::startSip() {
 		//messageRouter->setSip(sip);
 #ifdef DEBUG_OUTPUT
 		cerr << "EE: Adding sip subsystem"<<endl;
-		messageRouter->addSubsystem("sip",*sip);
 #endif
+		messageRouter->addSubsystem("sip",*sip);
+
 		confMessageRouter->setSip(sip);
 
 		/* Load the plugins at this stage */
