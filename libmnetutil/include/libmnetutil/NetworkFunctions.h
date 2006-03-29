@@ -31,14 +31,48 @@
 
 #include<libmutil/mtypes.h>
 
+/**
+Collection of network utilities
+*/
 class LIBMNETUTIL_API NetworkFunctions{
 	public:
+		/**
+		@return a string vector with all available network interfaces
+		*/
 		static std::vector<std::string> getAllInterfaces();
+		
+		/**
+		@return given the name of a network interface (obtained with Network::getAllInterfaces(),
+			for example), it returns a string formatted IP address (numerical).
+		*/
 		static std::string getInterfaceIPStr(std::string iface);
+		
+		/**
+		@param ipStr a string containing an ip address
+		@return string containing the interface using this string, or an empty string if the ip is 
+			not used by any interface
+		*/
+		static std::string getInterfaceOf(std::string ipStr);
+		
+		/**
+		Does an SRV query
+		@param service The service name, for example: _sip._udp
+		@param domain name/ip of the domain we want to obtain the service (for example, minisip.org)
+		@param ret_port a return param, filled by this function, contains the port number of the service
+		@return the name (or ip address, numeric) of the host handling the requested service
+		*/
 		static std::string getHostHandlingService(std::string service, std::string domain, uint16_t &ret_port);
+		
+		/**
+		Given a list of ips (strings) and a random ip, return whether that ip is in the list
+		*/
 		static bool isLocalIP(uint32_t ip, std::vector<std::string> &localIPs);
 
 		//OBS: ip is host byte order
+		/**
+		@param ip integer format ip (in host byte order ... )
+		@param strBufMin16 return parameter (the char * needs to be at least 16 chars long).
+		*/
 		static void binIp2String(uint32_t ip, char *strBufMin16);
 
 };

@@ -267,6 +267,26 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 }
 
+string NetworkFunctions::getInterfaceOf( string ipStr ) {
+	vector<string> ifaces;
+	string ifaceIP;
+	bool ifaceFound = false;
+	unsigned int i;
+	
+	ifaces = NetworkFunctions::getAllInterfaces();
+	for( i=0; i<ifaces.size(); i++ ) {
+		ifaceIP = NetworkFunctions::getInterfaceIPStr( ifaces[i] );
+		if( ifaceIP == ipStr ) {
+			ifaceFound = true;
+			break;
+		}
+	}
+	if( ifaceFound ) {
+		return ifaces[i];
+	} else {
+		return "";
+	}
+}
 
 string NetworkFunctions::getHostHandlingService(string service, string domain, uint16_t &ret_port){
 	string ret;
