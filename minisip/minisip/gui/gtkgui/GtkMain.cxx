@@ -42,9 +42,9 @@ int main( int argc, char *argv[] )
 	cerr << "Creating GTK GUI"<< endl;
 	MRef<Gui *> gui = GtkMainUI::create( argc, argv );
 
-	cerr << "Minisip: gtk 1" << endl;
+// 	cerr << "Minisip: gtk 1" << endl;
 // 	LogEntry::handler = (GtkMainUI *)*gui;
-	cerr << "Minisip: gtk 2" << endl;
+// 	cerr << "Minisip: gtk 2" << endl;
 
 	LogEntry::handler = (GtkMainUI *)*gui;
 
