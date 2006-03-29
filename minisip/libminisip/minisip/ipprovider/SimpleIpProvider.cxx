@@ -84,7 +84,8 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 			<< "|the one specified could not be found." << endl
 			<< "|Minisip will try to find an appropriate one." << endl
 			<< "|Minisip highly recommends you to add a preferred one. To do so, choose" << endl
-			<< "|from the list below and edit the configuration file, section <network_interface>" << endl;
+			<< "|    from the list below and edit the configuration file, section <network_interface>" << endl
+			<< "|    or use the GUI configuration;" << endl;
 			for( i=0; i<ifaces.size(); i++ ){
 				string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
 		   		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;

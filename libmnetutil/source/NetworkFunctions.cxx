@@ -138,7 +138,7 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	while (pAdapter) {
 		res.push_back(pAdapter->AdapterName);
 	#ifdef DEBUG_OUTPUT
-		printf("\tAdapter Name: \t%s\n", pAdapter->AdapterName);
+		printf("\tNetworkFunctions::getAllInterfaces - Adapter Name: \t%s\n", pAdapter->AdapterName);
 	#endif
 		pAdapter = pAdapter->Next;
 	}

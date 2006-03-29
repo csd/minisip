@@ -599,7 +599,7 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	for(unsigned int i=0; i<ifaces.size(); i++ ){
 		string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
 		#ifdef DEBUG_OUTPUT
-		cout << "|       Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
+		cout << "AdvancedSettings::setConfig - Network Interface: name = " << ifaces[i] << "; IP=" << ip << endl;
 		#endif
 		ifaceIP.push_back( ip );
 		
