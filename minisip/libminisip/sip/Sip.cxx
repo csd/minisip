@@ -35,7 +35,7 @@
 
 #include"SipSoftPhoneConfiguration.h"
 #include<libmsip/SipDialogManagement.h>
-#include"SipDialogVoip.h"
+#include"SipDialogVoipClient.h"
 #include"SipDialogConfVoip.h"
 #include<libmsip/SipCommandString.h>
 #include"../p2t/SipDialogP2T.h"
@@ -196,10 +196,10 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipCall( new SipDialogVoip(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
+	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
 	
 #else	
-	MRef<SipDialog*> voipCall( new SipDialogVoip(sipstack, callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, callconf, phoneconfig, mediaSession)); 
 
 #endif
 

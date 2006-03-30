@@ -25,7 +25,7 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
-#include"SipDialogVoip.h"
+#include"SipDialogVoipServer.h"
 #include"SipDialogConfVoip.h"
 #include"SipDialogPresenceClient.h"
 #include"SipDialogPresenceServer.h"
@@ -37,6 +37,7 @@
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipTransactionInviteServer.h>
+#include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmutil/massert.h>
@@ -295,17 +296,39 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 			
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession );
-			MRef<SipDialog*> voipCall( new SipDialogVoip(sipStack, callConf, 
+			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
 								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
 	
 #else	
 			
-			MRef<SipDialog*> voipCall( new SipDialogVoip(sipStack, callConf, 
+			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
 								phoneconf, mediaSession, pkt->getCallId()));
 #endif
 			sipStack->addDialog(voipCall);
 
-			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
+			
+			MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
+						sipStack,
+						voipCall,
+						pkt->getCSeq(),
+						pkt->getCSeqMethod(),
+						pkt->getLastViaBranch(),
+						voipCall->dialogState.callId) );
+			voipCall->registerTransaction(ir);
+
+/*			MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
+						sipStack,
+						voipCall,
+						command.getCommandPacket()->getCSeq(),
+						command.getCommandPacket()->getCSeqMethod(),
+						command.getCommandPacket()->getLastViaBranch(),
+						dialogState.callId) );
+			voipCall->registerTransaction(ir);
+*/
+
+			
+			
+			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::transaction);
 			cmd.setDispatchCount(dispatchCount);
 
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);

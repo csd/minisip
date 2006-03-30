@@ -3,6 +3,8 @@ noinst_LTLIBRARIES = libsip.la
 
 
 libsip_la_SOURCES = SipDialogVoip.cxx \
+		   SipDialogVoipClient.cxx \
+		   SipDialogVoipServer.cxx \
 		   SipDialogConfVoip.cxx \
 		   SipDialogPresenceClient.cxx \
 		   SipDialogPresenceServer.cxx \
@@ -14,6 +16,8 @@ libsip_la_SOURCES = SipDialogVoip.cxx \
 
 noinst_HEADERS  = SipDialogVoip.h \
 		  SipDialogConfVoip.h \
+		  SipDialogVoipClient.h \
+		  SipDialogVoipServer.h \
 		  SipSoftPhoneConfiguration.h \
 		  SipDialogPresenceClient.h \
 		  SipDialogPresenceServer.h \
