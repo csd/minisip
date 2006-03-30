@@ -49,6 +49,13 @@ class LIBMSIP_API SipRequest : public SipMessage{
 	public:
 
 		
+		/**
+		 *
+		 * Note: The message will have a sequence
+		 * number equal to the packet given as arguement
+		 * to the function. This is ok for ACK packets,
+		 * but for PRACK requests you will have to adjust it.
+		 */
 		static MRef<SipRequest*> createSipMessageAck(
 				string branch,
 				MRef<SipMessage*> pack,

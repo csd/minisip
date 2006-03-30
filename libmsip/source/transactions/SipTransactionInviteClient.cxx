@@ -89,6 +89,7 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTimers.h>
 #include<libmsip/SipDialogConfig.h>
+#include<libmsip/SipHeaderCSeq.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CommandString.h>
 #include<libmsip/SipHeaderRequire.h>
@@ -401,17 +402,9 @@ void SipTransactionInviteClient::setUpStateMachine(){
 	//Set up cancel transitions
 	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_start, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_calling, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_proceeding, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_completed, s_terminated);
+			StateMachine<SipSMCommand,string>::anyState, s_terminated);
 
+	//
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_calling_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteClient::a0_start_calling_INVITE, 
@@ -520,6 +513,11 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 			dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
 			provisional
 			);
+
+	if (provisional){
+		int seq = dialog->dialogState.seqNo++;
+		((SipHeaderValueCSeq*)*ack->getHeaderValueNo(SIP_HEADER_TYPE_CSEQ, 0))->setCSeq(seq);
+	}
 		
 	//add route headers, if needed
 	if( dialog->dialogState.routeSet.size() > 0 ) {

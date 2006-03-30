@@ -80,7 +80,7 @@ SipTransaction::~SipTransaction(){
 
 
 bool SipTransaction::a1000_cancel_transaction(const SipSMCommand &command){
-	if (transitionMatch(command, "cancel_transaction")){
+	if (transitionMatch(command, "cancel_transaction") && getCurrentStateName()!="terminated"){
 		//Notify the TU that the transaction is terminated
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),

@@ -171,6 +171,7 @@ bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMComman
 					/*bye->getLastViaBranch()*/ "",
 					dialog->dialogState.callId);
 			
+			dialog->registerTransaction(pracktrans);
 			
 			timerRel1xxResend = sipStack->getTimers()->getT1();
 			requestTimeout(timerRel1xxResend,"timerRel1xxResend");
@@ -401,13 +402,8 @@ void SipTransactionInviteServer::setUpStateMachine(){
 	///Set up transitions to enable cancellation of this transaction
 	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_proceeding, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_completed, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_confirmed, s_terminated);
+			StateMachine<SipSMCommand,string>::anyState, s_terminated);
+
 	//
 
 

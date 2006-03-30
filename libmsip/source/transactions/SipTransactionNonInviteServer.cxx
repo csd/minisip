@@ -268,16 +268,9 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 	///Set up transitions to enable cancellation of this transaction
 	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_start, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_trying, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_proceeding, s_terminated);
-	new StateTransition<SipSMCommand,string>(this, "transition_cancel_transaction",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransaction::a1000_cancel_transaction, 
-			s_completed, s_terminated);
+			StateMachine<SipSMCommand,string>::anyState, s_terminated);
+
+	
 	//
 
 
