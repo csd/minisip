@@ -129,8 +129,9 @@ using namespace std;
 bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &command)
 {
 	if (transitionMatch("INVITE", command, IGN, SipSMCommand::TU)){
+		MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
 		
-		setLastInvite(MRef<SipRequest*>((SipRequest *)*command.getCommandPacket()));
+		setLastInvite(inv);
 		dialogState.updateState( getLastInvite() );
 		
 		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
@@ -212,7 +213,7 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 				);
 		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
 		
-		sendRinging(ir->getBranch());
+		sendRinging(inv->getDestinationBranch());
 		
 		if( getDialogConfig()->inherited->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
