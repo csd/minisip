@@ -74,7 +74,7 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 		int headerType = header->getType();
 		switch (headerType){
 			case SIP_HEADER_TYPE_CSEQ:
-				((SipHeaderValueCSeq*) *(header->getHeaderValue(0)))->setMethod("ACK");
+				((SipHeaderValueCSeq*) *(header->getHeaderValue(0)))->setMethod(method);
 			case SIP_HEADER_TYPE_FROM:
 			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:
