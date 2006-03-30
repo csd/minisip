@@ -61,17 +61,50 @@ template<class CommandType, class TimeoutType> class State;
 
 /**
  * Implementation of a generic state machine.
+ *
+ * A special state, StateMachine::anyState with the name "libmutil_any",
+ * can be used as from-state in a transition. Such a transition will
+ * be tried regardless of the current state.
+ *
+ * The anyState/("libmutil_any") state MUST NOT be used as to-state
+ * in a transition.
  * 
- * Note:  State machines, states and transitions are using the MRef/MObject
+ * Note 1:  State machines, states and transitions are using the MRef/MObject
  * classes to handle "garbage collection". The state machines and the
  * transitions reference each other. Therefore we must break the circle 
  * so that the it becomes a chain that is not referenced by anyone (and therefore will
  * be freed). For this purpose you have the freeStateMachine method which
  * you (unfortunately) must run on any object you want to be removed
  * from the heap.
+ *
+ * Note 2: The state machine calls an action method to 
+ *  a) determine if the transaction should be done and 
+ *  b) perform the action associated with the transition.
+ * This is done in a single call to a action method, and 
+ * therefore the state machine has not transitioned into 
+ * it's new state when the action is executed. Special 
+ * attention has to be given to situations where an action 
+ * sends a new command to the same machine (recursion) since 
+ * the current state of the machine has not yet been updated 
+ * with the target state of the transition. 
+ *
+ * An action method for an integer state machine typically 
+ * looks like:
+ *   bool MyStateMachine::myTransitionAction(const int& input){
+ *           if (input=='1'){
+ *	             doActionMagic();
+ *	             return true;
+ *           }else{
+ *                   return false;
+ *           }
+ *   }
+ *   
 */
 template<class CommandType, class TimeoutType> class StateMachine : public virtual MObject{
 	public:
+
+		MRef<State<CommandType, TimeoutType> *> anyState;
+		
 		/**
 		 * Initializes the state machine to have no states and no
 		 * transitions.
@@ -83,19 +116,32 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 				current_state(NULL), 
 				timeoutProvider(tp)
 		{
+			anyState = new State<CommandType,TimeoutType>(this,"libmutil_any");
 		}
 					
 		virtual ~StateMachine(){
 		}
 
+		/**
+		 * De-allocates the state machine. After calling this
+		 * method, the state machine can not be used.
+		 *
+		 * Purpose: The state machine contains "reference loops"
+		 * that makes the MRef/MObject garbage collection not
+		 * free the resources unless the "freeStateMachine" method
+		 * has been called. 
+		 * After calling this method, the state machine can be
+		 * garbage collected as an ordinary MObject.
+		 *
+		 */
 		void freeStateMachine(){
 			current_state=NULL;
 			timeoutProvider=NULL;
+			anyState=NULL;
 
 			for (typename list<MRef<State<CommandType,TimeoutType> *> >::iterator i=states.begin(); 
 					i!=states.end(); i++){
 				(*i)->freeState();			//Break the state<---->transition circle
-			
 			}
 				
 			states.clear();
@@ -129,7 +175,9 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		 * A state machine has a current state that can only be
 		 * NULL if the state machine has no state. This method
 		 * sets which state is the current one (the state that
-		 * the machine is in).
+		 * the machine is in). Although allowed, a user of this 
+		 * class should not set the current state to be
+		 * anyState ("libmutil_any").
 		 */
 		void setCurrentState(MRef<State<CommandType,TimeoutType> *> state){
 			current_state = state;
@@ -148,12 +196,21 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		 * Handles input to the state machine. The machine can
 		 * react on the input depending on which state it is
 		 * in and which transitions that state has.
+		 *
+		 * A state machine will try (in the following order) until
+		 * a the action associated with the transition returns true
+		 * or all has been tried:
+		 *  1. All transitions in the current state in the
+		 *     order they were added.
+		 *  2. All transitions in the anyState/("libmutil_any") 
+		 *     state in the order they were added.
+		 * 
 		 * @return TRUE is returned if a transition/action was
 		 * 	   taken and FALSE if no transition was triggered.
 		 */
 		virtual bool handleCommand(const CommandType &command){
 			if (current_state){
-				return current_state->handleCommand(command);
+				return current_state->handleCommand(command) || anyState->handleCommand(command);
 			}else{
 				return false;
 			}
