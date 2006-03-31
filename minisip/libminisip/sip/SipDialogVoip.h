@@ -56,12 +56,21 @@ class LogEntry;
 
 class SipDialogVoip: public SipDialog{
 	public:
-#ifdef IPSEC_SUPPORT
+/*#ifdef IPSEC_SUPPORT
 		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
 		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
 
-#endif		
+#endif		*/
+		SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
+						MRef<SipDialogConfig*> callconfig,
+						MRef<SipSoftPhoneConfiguration*> pconf,
+						MRef<Session *> mediaSession,
+						string cid=""
+					#ifdef IPSEC_SUPPORT
+						, MRef<MsipIpsecAPI *> ipsecSession = NULL
+					#endif
+					);
 		virtual ~SipDialogVoip();
 
 		virtual void dummy()=0;

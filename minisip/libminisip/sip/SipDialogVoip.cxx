@@ -550,20 +550,22 @@ void SipDialogVoip::setUpStateMachine(){
 }
 
 
+SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack, 
+				MRef<SipDialogConfig*> callconfig, 
+				MRef<SipSoftPhoneConfiguration*> pconf, 
+				MRef<Session *> mediaSession, 
+				string cid
 #ifdef IPSEC_SUPPORT
-SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-		SipDialog(stack,callconfig),
-		lastInvite(NULL), 
-		phoneconf(pconf),
-		mediaSession(mediaSession), ipsecSession(ipsecSession)
-#else
-SipDialogVoip::SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-		SipDialog(stack,callconfig),
-		lastInvite(NULL), 
-		phoneconf(pconf),
-		mediaSession(mediaSession)
+				, MRef<MsipIpsecAPI *> ipsecSession
 #endif
-
+				) :
+		SipDialog(stack,callconfig),
+		phoneconf(pconf),
+		mediaSession(mediaSession),
+		lastInvite(NULL)
+#ifdef IPSEC_SUPPORT
+		, ipsecSession(ipsecSession)
+#endif
 {
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
