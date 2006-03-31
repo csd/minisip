@@ -119,24 +119,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const string &transport,
 				MRef<SipStack*> stack);
 
-		static MRef<SipRequest*> createSipMessageInvite(
-				const string &call_id,
-				const string &tel_no,   //FIXME: Send uris as const SipURI&
-				const string &proxyAddr,
-				int32_t proxyPort,
-				const string &localAddr,
-				int32_t localSipPort,
-				const string &from_tel_no,
-				int32_t seq_no,
-				const string &username,
-				const string &nonce,
-				const string &realm,
-				const string &password,
-				const string &transport,
-				MRef<SipStack*> stack
-				);
-
-
 		static MRef<SipRequest*> createSipMessageNotify(
 				string branch,
 				string call_id,
