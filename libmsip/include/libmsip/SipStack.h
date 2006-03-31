@@ -97,8 +97,6 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		//void init();
                 virtual void run();
 
-		string invite(string &user);
-
 		MRef<SipDialogContainer*> getDialogContainer();
 
 		bool handleCommand(const SipSMCommand &command);
