@@ -66,8 +66,10 @@ template<class CommandType, class TimeoutType> class State;
  * can be used as from-state in a transition. Such a transition will
  * be tried regardless of the current state.
  *
- * The anyState/("libmutil_any") state MUST NOT be used as to-state
- * in a transition.
+ * If the anyState/("libmutil_any") is used as destination state, 
+ * the state of the machine will not change. A transition from 
+ * anyState to anyState can be used to trap commands without 
+ * affecting the state.
  * 
  * Note 1:  State machines, states and transitions are using the MRef/MObject
  * classes to handle "garbage collection". The state machines and the
@@ -340,9 +342,10 @@ class StateTransition : public MObject{
 
 		bool handleCommand(const CommandType &c){
 			bool handled;
-			massert(action!=(bool (StateMachine<CommandType, TimeoutType>::*)(const CommandType& ))NULL);
+			massert(action!=(bool (StateMachine<CommandType,TimeoutType>::*)(const CommandType& ))NULL);
 			if (handled= ((**stateMachine).*action)(c) ){
-				stateMachine->setCurrentState(to_state);
+				if ( !(to_state == stateMachine->anyState) )
+					stateMachine->setCurrentState(to_state);
 #ifdef MSM_DEBUG
 				if( outputStateMachineDebug ) {
 					merr << "MSM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
