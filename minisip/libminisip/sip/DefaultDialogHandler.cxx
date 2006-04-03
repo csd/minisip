@@ -85,7 +85,11 @@ string DefaultDialogHandler::getName(){
 	return "DefaultDialogHandler";
 }
 
-bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<SipMessage*> pkt, int dispatchCount){
+bool DefaultDialogHandler::handleCommandPacket(int source, 
+		int /*destination*/,	//Not used here - we know it's either ANY or 
+					//TU (checked in handleCommand)
+		MRef<SipMessage*> pkt, 
+		int dispatchCount){
 
 	/* First, check if this is a packet that could not be handled by
 	 * any transaction and send 481 response if that is the case */
@@ -384,7 +388,10 @@ bool DefaultDialogHandler::handleCommandPacket(int source, int destination,MRef<
 
 }
 
-bool DefaultDialogHandler::handleCommandString(int source, int destination, CommandString &cmdstr, int dispatchCount ){
+bool DefaultDialogHandler::handleCommandString(int source, 
+		int /*destination*/,  	//Not used (it's either TU or ANY)
+		CommandString &cmdstr, 
+		int dispatchCount ){
 	if (dispatchCount>=2){
 		mdbg << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
 		return true;
@@ -545,14 +552,18 @@ bool DefaultDialogHandler::handleCommandString(int source, int destination, Comm
 
 bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 	mdbg << "DefaultDialogHandler: got command "<< command << end;
-
+	int src = command.getSource();
+	int dst = command.getDestination();
+	if ( !(dst==SipSMCommand::ANY || dst==SipSMCommand::TU) )
+		return false;
+	
 	int dispatchCount = command.getDispatchCount();
 	if (command.getType()==SipSMCommand::COMMAND_PACKET){
-		return handleCommandPacket( command.getSource(), command.getDestination(), command.getCommandPacket(), dispatchCount );
+		return handleCommandPacket( src, dst, command.getCommandPacket(), dispatchCount );
 	}else{
 		massert(command.getType()==SipSMCommand::COMMAND_STRING);
 		CommandString cmdstr = command.getCommandString();
-		return handleCommandString( command.getSource(), command.getDestination(), cmdstr ,dispatchCount );
+		return handleCommandString( src, dst, cmdstr, dispatchCount );
 	}
 }
 
@@ -960,14 +971,11 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	cerr << "DefaultDialogHandler::sendIM - toUri = " << toUri <<  endl;
 	#endif
 	
-	//MRef<SipIMMessage*> im = new SipIMMessage(
 	MRef<SipRequest*> im = SipRequest::createSipMessageIMMessage(
 			std::string(branch),
 			std::string(dialogState.callId),
-// 			toId,
 			toUri, 	
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			//getDialogConfig()->inherited.localUdpPort,
 			im_seq_no,
 			msg
 			);
@@ -975,13 +983,10 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	//FIXME: there should be a SipIMDialog, just like for register messages ...
 	// 	otherwise, we cannot keep track of local/remote tags, callids, etc ... 
 	//	very useful for matching incoming and outgoing IMs ...
-// 	im->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	im->getHeaderValueFrom()->setParameter("tag","12345678"); //we need a from tag ... anything ... 
-// 	im->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
 
 	MRef<SipMessage*> pref(*im);
 	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-//      handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 

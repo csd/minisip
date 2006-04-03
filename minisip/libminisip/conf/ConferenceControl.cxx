@@ -91,7 +91,7 @@ void ConferenceControl::setConnectedList(string user)
 }*/
 
 
-void ConferenceControl::handleGuiCommand(string cmd){
+void ConferenceControl::handleGuiCommand(string){
 
 	
     	//cerr << "CC: from MR -> CC: handleGuiCommand"<< endl;

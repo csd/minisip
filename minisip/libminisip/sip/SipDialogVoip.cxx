@@ -627,7 +627,6 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 			getLastInvite(),
 			dialogState.getRemoteTarget(),
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			getDialogConfig()->inherited->sipIdentity->sipDomain,
 			referredUri,
 			refer_seq_no
 			);
@@ -649,12 +648,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
 			branch,
 			lastInvite,
-			dialogState.remoteUri,
-			//getDialogConfig().inherited.userUri,
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
-			getDialogConfig()->inherited->sipIdentity->sipDomain///,
-			///localCalled
+			dialogState.remoteUri
 			);
 
 	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
@@ -662,7 +656,6 @@ void SipDialogVoip::sendCancel(const string &branch){
 
 	MRef<SipMessage*> pref(*cancel);
 	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-//	handleCommand( cmd );
 	getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 }
 
@@ -680,7 +673,6 @@ void SipDialogVoip::sendReferOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-//	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
@@ -707,12 +699,14 @@ void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
 }
 
 void SipDialogVoip::sendReferReject(const string &branch){
-	MRef<SipResponse*> forbidden = new SipResponse(branch,403,"Forbidden", MRef<SipMessage*>(*lastRefer));	
+	MRef<SipResponse*> forbidden = 
+		new SipResponse(branch,
+				403,"Forbidden", 
+				*lastRefer
+				);	
 	forbidden->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
-//	setLastResponse(ringing);
 	MRef<SipMessage*> pref(*forbidden);
 	SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
-//	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 }
 
@@ -734,10 +728,6 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 		}
 	
 	}
-	
-//	if (c.getType()!=SipSMCommand::COMMAND_PACKET && 
-//			c.getCommandPacket()->getCSeq()!= command_seq_no)
-//		return false;
 	
 	mdbg << "SipDialogVoip::handlePacket() got "<< c << end;
 	bool handled = SipDialog::handleCommand(c);

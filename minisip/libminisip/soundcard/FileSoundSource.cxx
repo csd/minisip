@@ -134,10 +134,10 @@ void FileSoundSource::disable(){
 }
 
 
-void FileSoundSource::pushSound(short *samples,
-                                int32_t nSamples,
-                                int32_t index,
-                                bool isStereo)
+void FileSoundSource::pushSound(short *,
+                                int32_t ,
+                                int32_t ,
+                                bool )
 {
 #ifdef DEBUG_OUTPUT
     cerr << "WARNING: FileSoundSource::push_sound: FORBIDDEN"<< endl;

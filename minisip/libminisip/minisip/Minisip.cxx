@@ -68,7 +68,7 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
-Minisip::Minisip( MRef<Gui *> gui, int argc, char**argv ) : gui(gui){
+Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 
 	srand((unsigned int)time(0));
 

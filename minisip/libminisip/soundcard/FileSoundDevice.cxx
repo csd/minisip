@@ -255,7 +255,7 @@ int FileSoundDevice::read(byte_t *buffer, uint32_t nSamples){
 }
 
 int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
-	int retValue;
+	int retValue=-1;
 
 	//select the appropriate way to write to the file ...
 	switch( fileType ) {

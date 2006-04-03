@@ -98,7 +98,7 @@ void ConfMessageRouter::removeConferenceController(ConferenceControl *conf)
 	}
 	
 }
-void ConfMessageRouter::guicb_handleConfCommand(const string &conferencename){
+void ConfMessageRouter::guicb_handleConfCommand(const string &){
 	//confrout=conf;
 	
 	//confrout->setCallback(this);

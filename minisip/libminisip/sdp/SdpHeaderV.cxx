@@ -32,11 +32,12 @@
 
 #include"SdpHeaderV.h"
 #include<libmutil/itoa.h>
+#include<stdlib.h>
 
 using namespace std;
 
 SdpHeaderV::SdpHeaderV(string buildFrom):SdpHeader(SDP_HEADER_TYPE_V, 1){
-	v=0;	//FIXME
+	v=atoi( buildFrom.c_str() );
 }
 
 SdpHeaderV::SdpHeaderV(int32_t ver):SdpHeader(SDP_HEADER_TYPE_V, 1){

@@ -328,7 +328,7 @@ MainWindow::~MainWindow(){
 	delete mainWindowWidget;
 }
 
-bool MainWindow::on_window_close (GdkEventAny* event  ) {
+bool MainWindow::on_window_close (GdkEventAny* /*event*/  ) {
 	//enter quit mode ...
 	quit();
 	return true;
@@ -530,7 +530,7 @@ void MainWindow::gotCommand(){
 void MainWindow::gotPacket( int32_t /*i*/ ){
 }
 
-void MainWindow::displayMessage( string s, int style ){
+void MainWindow::displayMessage( string s, int /*style*/ ){
 	handleCommand( CommandString( "", "error_message", 
 		Glib::locale_to_utf8( s ) ) );
 }
@@ -783,7 +783,7 @@ void MainWindow::im( string uri, string message ){
 	
 	if( uri.length() > 0 ){
 		bool found = false;
-		ImWidget * imW;
+		ImWidget * imW=NULL;
 		for( list<ImWidget *>::iterator i = imWidgets.begin();
 				i != imWidgets.end(); i++ ){
 			if( (*i)->getToUri() == uri ){

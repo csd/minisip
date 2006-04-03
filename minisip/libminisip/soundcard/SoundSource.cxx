@@ -154,7 +154,7 @@ void BasicSoundSource::pushSound(short * samples,
 	//If the incoming samples are already stereo, as is our circular buffer,
 	//just copy them to the buffer.
 	//Otherwise, transform them from mono to stereo (copy them twice ... ).
-	int writeRet;
+	int writeRet=false;
 	if( isStereo ) {
 		writeRet = cbuff->write( samples, nMonoSamples * 2, true );
 	} else {

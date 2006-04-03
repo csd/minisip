@@ -96,7 +96,7 @@ bool AudioMixerSpatial::setSourcesPosition(
 	
 	if( addingSource ) {
 		int size = (int)sources.size();
-		int newPosition;
+		int newPosition=1;
 		//if we have 5 sources, optimize the result with this 
 		//previous knowledge we have
 		if( SPATIAL_POS == 5 ) {

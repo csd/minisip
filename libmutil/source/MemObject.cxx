@@ -54,7 +54,7 @@ MObject::MObject() : refCount(0){
 // The reference count should be zero since
 // any references to the argument object
 // are not referencing us.
-MObject::MObject(const MObject &o):refCount(0){
+MObject::MObject(const MObject &):refCount(0){
 	refLock = new Mutex();	//We don't want to share the mutex
 #ifdef MDEBUG
 	global.lock();
@@ -80,7 +80,7 @@ MObject::~MObject(){
 	refLock=NULL;
 }
 
-void MObject::operator=(const MObject &o){
+void MObject::operator=(const MObject &){
 	// we don't copy the mutex handle - whe one we already
 	// have protects the reference counter we in this object.
 	// We also don't copy the reference counter. The value

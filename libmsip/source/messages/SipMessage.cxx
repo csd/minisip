@@ -73,7 +73,7 @@ const string SipMessage::anyType="";
 	template class __declspec(dllexport) MRef<SipMessage*>;
 #endif
 
-MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType){
+MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string &){
 	string tmp = buf;
 	return (*SipMessage::createMessage(tmp));
 }

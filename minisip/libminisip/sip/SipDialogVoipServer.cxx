@@ -328,7 +328,12 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		cr->handleCommand(cmd);
 
 		// Send 487 Request Cancelled for INVITE
-		MRef<SipResponse*> cancelledResp = new SipResponse( branch, 487,"Request Cancelled", MRef<SipMessage*>(*getLastInvite()) );
+		MRef<SipResponse*> cancelledResp = new SipResponse( 
+				branch, 
+				487,
+				"Request Cancelled", 
+				*getLastInvite() 
+				);
 		cancelledResp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 		MRef<SipMessage*> cancelledMsg(*cancelledResp);
 		SipSMCommand cancelledCmd( cancelledMsg, SipSMCommand::TU,

@@ -172,7 +172,7 @@ void MediaHandler::registerMedia( MRef<Media*> media ){
 	this->media.push_back( media );
 }
 
-CommandString MediaHandler::handleCommandResp(string subsystem, const CommandString& command){
+CommandString MediaHandler::handleCommandResp(string, const CommandString&){
 	assert(1==0); //Not used
 }
 

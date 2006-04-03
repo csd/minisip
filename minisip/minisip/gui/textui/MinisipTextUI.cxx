@@ -271,7 +271,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		string confid="";
 		string users=cmd.getParam3();
 		int i=0;	
-		while (users[i]!=';'&&users.length()!=0 &&!(i>(users.length()-1))){
+		while (users[i]!=';'&&users.length()!=0 &&!(i>((int)users.length()-1))){
 			confid=confid+users[i];
 			i++;
 		}

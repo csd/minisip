@@ -301,7 +301,6 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				cid,
 				toId->getSipUri(),
 				getDialogConfig()->inherited->sipIdentity->getSipUri(),
-				//getDialogConfig()->inherited.localUdpPort,
 				dialogState.seqNo
 				);
 

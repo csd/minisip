@@ -85,7 +85,7 @@ class Gui : public Runnable, public CommandReceiver {
 			handleCommand(cmd);
 		}
 
-		CommandString handleCommandResp(string subsystem, const CommandString& cmd){
+		CommandString handleCommandResp(string , const CommandString& ){
 			cerr << "Warning: Gui::handleCommandResp called (BUG)"<<endl;
 			CommandString ret("","");
 			return ret;

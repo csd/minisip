@@ -115,9 +115,7 @@ MRef<SipRequest*> SipRequest::createSipMessageBye(string branch,
 
 MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
                 MRef<SipRequest*> inv,
-                string to_uri,
-                string from_uri,
-                string proxy
+                string to_uri
                 )
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "CANCEL");
@@ -160,7 +158,6 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
 MRef<SipRequest*> SipRequest::createSipMessageIMMessage(string branch,
                                                 string callId,
                                                 std::string toUri,
-                                                //MRef<SipIdentity*> fromIdentity,
 						const SipUri& fromUri,
                                                 int32_t seqNo,
                                                 string msg)
@@ -282,9 +279,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 
 MRef<SipRequest*> SipRequest::createSipMessageNotify(string branch,
                 string callId,
-                //MRef<SipIdentity*> toIdentity,
 		const SipUri& toUri,
-                //MRef<SipIdentity*> fromId,
 		const SipUri& fromUri,
                 int32_t seqNo
                 )
@@ -303,7 +298,6 @@ MRef<SipRequest*> SipRequest::createSipMessageRefer(string branch,
 		MRef<SipRequest*> inv,
 		string to_uri,
 		string from_uri,
-		string proxy,
 		string referredUri,
 		int cSeqNo)
 {

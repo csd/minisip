@@ -617,13 +617,10 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
-	//		getDialogConfig().inherited.localIpString,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
 			getDialogConfig()->inherited->getTransport(),

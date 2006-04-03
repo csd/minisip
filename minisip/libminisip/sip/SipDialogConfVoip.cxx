@@ -1139,13 +1139,10 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 				branch,
 				dialogState.callId,
 				dialogState.remoteUri,
-				//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 				getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
 				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
-//				getDialogConfig().inherited.localIpString,
 				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-				//getDialogConfig().inherited.userUri,
 				getDialogConfig()->inherited->sipIdentity->getSipUri(),
 				dialogState.seqNo,
 				getDialogConfig()->inherited->getTransport(),
@@ -1248,16 +1245,12 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString(),
 			getDialogConfig()->inherited->sipIdentity->sipDomain,
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
-//			getDialogConfig().inherited.localIpString,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			//getDialogConfig().inherited.userUri,
 			getDialogConfig()->inherited->sipIdentity->getSipUri(),
 			dialogState.seqNo,
-//			requestSeqNo(),
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
 			nonce,
 			realm,
@@ -1506,9 +1499,7 @@ void SipDialogConfVoip::sendCancel(const string &branch){
 	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
 			branch,
 			lastInvite,
-			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			getDialogConfig()->inherited->sipIdentity->sipDomain///,
+			dialogState.remoteUri
 			);
 
 	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
