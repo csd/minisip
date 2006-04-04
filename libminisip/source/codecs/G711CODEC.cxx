@@ -22,8 +22,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/codecs/G711CODEC.h>
+
 #include<libminisip/codecs/g711/codec_g711.h>
+
 #include<libmutil/massert.h>
 #include<iostream>
 

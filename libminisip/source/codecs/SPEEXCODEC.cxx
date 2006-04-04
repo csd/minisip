@@ -22,7 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/codecs/SPEEXCODEC.h>
+
 #include<iostream>
 
 #include<speex/speex.h>

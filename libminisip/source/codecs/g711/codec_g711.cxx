@@ -38,9 +38,8 @@
  *
  */
 
-//#include "config_unix.h"
-//#include "config_win32.h"
-//#include "audio_types.h"
+#include<config.h>
+
 #include<libminisip/codecs/g711/codec_g711.h>
 
 /*

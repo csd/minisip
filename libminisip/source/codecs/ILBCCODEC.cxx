@@ -21,6 +21,8 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
+#include<config.h>
+
 #include<libminisip/codecs/ILBCCODEC.h>
 
 #include<libminisip/codecs/ilbc/iLBC_define.h>

@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/codecs/Codec.h>
 #include<libminisip/codecs/G711CODEC.h>
 #include<libminisip/codecs/ILBCCODEC.h>
@@ -29,9 +31,9 @@
 #include<libminisip/codecs/GsmCodec.h>
 
 MRef<CodecState *> AudioCodec::createState( uint8_t payloadType ){
-        switch( payloadType ){
-                case 0:
-                        return new G711CodecState();
+	switch( payloadType ){
+		case 0:
+			return new G711CodecState();
 #ifdef HAS_GSM
 		case 3:
 			return new GsmCodecState();
@@ -42,30 +44,30 @@ MRef<CodecState *> AudioCodec::createState( uint8_t payloadType ){
 		case 114: 
 			return new SpeexCodecState();
 #endif
-                default:
-                        return NULL;
-        }
+		default:
+			return NULL;
+	}
 }
 
 MRef<AudioCodec *> AudioCodec::create( const std::string & description ){
-        if( description == "G.711" ){
-                return new G711Codec();
-        }
-        
-        if( description == "iLBC" ){
-                return new ILBCCodec();
-        }
-        
+	if( description == "G.711" ){
+		return new G711Codec();
+	}
+	
+	if( description == "iLBC" ){
+		return new ILBCCodec();
+	}
+	
 #ifdef HAS_SPEEX
-        if( description == "speex" ){
-                return new SpeexCodec();
-        }
+	if( description == "speex" ){
+		return new SpeexCodec();
+	}
 #endif
 #ifdef HAS_GSM
-        if( description == "GSM" ){
-                return new GsmCodec();
-        }
+	if( description == "GSM" ){
+		return new GsmCodec();
+	}
 #endif
 
-        return NULL;
+	return NULL;
 }

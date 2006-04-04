@@ -15,11 +15,12 @@
     
    #include <math.h> 
    #include <stdlib.h> 
+   #include <string.h>
     
    #include<libminisip/codecs/ilbc/iLBC_define.h> 
    #include<libminisip/codecs/ilbc/constants.h> 
    #include<libminisip/codecs/ilbc/helpfun.h> 
-   #include "string.h" 
+
     
    /*----------------------------------------------------------------* 
     *  splitting an integer into first most significant bits and  

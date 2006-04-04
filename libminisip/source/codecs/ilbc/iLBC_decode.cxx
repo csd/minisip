@@ -15,6 +15,7 @@
     
    #include <math.h> 
    #include <stdlib.h> 
+   #include <string.h>
     
    #include<libminisip/codecs/ilbc/iLBC_define.h> 
    #include<libminisip/codecs/ilbc/StateConstructW.h> 

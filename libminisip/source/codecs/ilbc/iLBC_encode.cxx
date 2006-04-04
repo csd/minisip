@@ -14,21 +14,21 @@
    ******************************************************************/ 
     
    #include <math.h> 
-   #include <string.h> 
+   #include <string.h>
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/LPCencode.h> 
-   #include<libminisip/codecs/ilbc/FrameClassify.h> 
-   #include<libminisip/codecs/ilbc/StateSearchW.h> 
-   #include<libminisip/codecs/ilbc/StateConstructW.h> 
-   #include<libminisip/codecs/ilbc/helpfun.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
-   #include<libminisip/codecs/ilbc/packing.h> 
-   #include<libminisip/codecs/ilbc/iCBSearch.h> 
-   #include<libminisip/codecs/ilbc/iCBConstruct.h> 
-   #include<libminisip/codecs/ilbc/hpInput.h> 
-   #include<libminisip/codecs/ilbc/anaFilter.h> 
-   #include<libminisip/codecs/ilbc/syntFilter.h> 
+#include<libminisip/codecs/ilbc/iLBC_define.h>
+#include<libminisip/codecs/ilbc/LPCencode.h>
+#include<libminisip/codecs/ilbc/FrameClassify.h>
+#include<libminisip/codecs/ilbc/StateSearchW.h>
+#include<libminisip/codecs/ilbc/StateConstructW.h>
+#include<libminisip/codecs/ilbc/helpfun.h>
+#include<libminisip/codecs/ilbc/constants.h>
+#include<libminisip/codecs/ilbc/packing.h>
+#include<libminisip/codecs/ilbc/iCBSearch.h>
+#include<libminisip/codecs/ilbc/iCBConstruct.h>
+#include<libminisip/codecs/ilbc/hpInput.h>
+#include<libminisip/codecs/ilbc/anaFilter.h>
+#include<libminisip/codecs/ilbc/syntFilter.h>
     
    /*----------------------------------------------------------------* 
     *  Initiation of encoder instance. 

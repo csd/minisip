@@ -13,8 +13,9 @@
     
    ******************************************************************/ 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
+#include<libminisip/codecs/ilbc/constants.h> 
+#include<libminisip/codecs/ilbc/iLBC_define.h> 
+
    #include <string.h> 
     
    /*----------------------------------------------------------------* 
