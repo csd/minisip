@@ -25,11 +25,11 @@
 #ifndef CONFCALLBACK_H
 #define CONFCALLBACK_H
 
-#include<config.h>
-
-#include "ConfMember.h"
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/CommandString.h>
+
+#include<libminisip/conference/ConfMember.h>
 
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE

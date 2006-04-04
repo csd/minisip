@@ -25,12 +25,13 @@
 #ifndef BELL_H
 #define BELL_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<sys/types.h>
 #include<signal.h>
 #include<string>
+
 #include<libmutil/MemObject.h>
-//#include<libmutil/TimeoutProvider.h>
 
 using namespace std;
 

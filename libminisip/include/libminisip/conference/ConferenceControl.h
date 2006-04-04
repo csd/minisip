@@ -25,15 +25,15 @@
 #ifndef _CONFERENCECONTROL_H
 #define _CONFERENCECONTROL_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<string>
 
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
 
-#include "ConfCallback.h"
-#include "ConfMember.h"
+#include<libminisip/conference/ConfCallback.h>
+#include<libminisip/conference/ConfMember.h>
 
 /**
  * A text user interface. 

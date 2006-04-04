@@ -58,28 +58,25 @@
 #ifndef MINISIP_SIP_H
 #define MINISIP_SIP_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/minilist.h>
+
 #include<libmsip/SipDialogContainer.h>
-#include"../sdp/SdpPacket.h"
-
-#ifdef IPSEC_SUPPORT
-#include<../ipsec/MsipIpsecAPI.h>
-#endif
-
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipStack.h>
 
-#include "../conf/ConfMember.h"
+#ifdef IPSEC_SUPPORT
+#	include<libminisip/ipsec/MsipIpsecAPI.h>
+#endif
 
-#include"../minisip/LogEntry.h"
-
+#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/conference/ConfMember.h>
+#include<libminisip/gui/LogEntry.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 
 class SipSoftPhoneConfiguration;
 class MediaHandler;
-
 
 using namespace std;
 

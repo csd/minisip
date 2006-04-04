@@ -30,22 +30,24 @@
  * 
 */
 
-
 #ifndef SIPSOFTPHONECONFIGURATION_H
 #define SIPSOFTPHONECONFIGURATION_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
 #include<list>
+
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 #include<libmutil/MemObject.h>
+
 #include<libmsip/SipDialogConfig.h>
-#include"SipDialogSecurityConfig.h"
-#include"Sip.h"
-#include"../minisip/contactdb/PhoneBook.h"
-#include"../minisip/confbackend/ConfBackend.h"
+
+#include<libminisip/sip/SipDialogSecurityConfig.h>
+#include<libminisip/sip/Sip.h>
+#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/configbackend/ConfBackend.h>
 
 class IPAddress;
 class Socket;

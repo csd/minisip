@@ -1,7 +1,7 @@
 #ifndef SIP_DIALOG_SECURITY_CONFIG
 #define SIP_DIALOG_SECURITY_CONFIG
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
 
@@ -10,7 +10,6 @@
 #define KEY_MGMT_METHOD_MIKEY_DH        0x11
 #define KEY_MGMT_METHOD_MIKEY_PSK       0x12
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
-
 
 class XMLFileParser;
 class certificate_chain;

@@ -25,10 +25,11 @@
 #ifndef LOG_ENTRY_H
 #define LOG_ENTRY_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
+#include<string>
 
 #include<libmutil/MemObject.h>
-#include<string>
 
 class LogEntryHandler;
 

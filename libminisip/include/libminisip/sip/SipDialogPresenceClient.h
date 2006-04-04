@@ -30,21 +30,18 @@
  * 
 */
 
-
-
 #ifndef SipDialogPresenceClient_H
 #define SipDialogPresenceClient_H
 
+#include<libminisip/libminisip_config.h>
 
-#include<config.h>
-
+#include<libmutil/StateMachine.h>
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
-#include<libmutil/StateMachine.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 class Session;
 class SipDialogContainer;

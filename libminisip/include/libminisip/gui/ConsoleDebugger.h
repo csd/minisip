@@ -1,11 +1,12 @@
 #ifndef _CONSOLEDEBUGGER_H
 #define _CONSOLEDEBUGGER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmutil/Thread.h>
+
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 
 #include<string>

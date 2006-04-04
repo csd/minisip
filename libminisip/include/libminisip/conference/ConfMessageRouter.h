@@ -25,13 +25,14 @@
 #ifndef CONF_MESSAGE_ROUTER_H
 #define CONF_MESSAGE_ROUTER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/minilist.h>
+
 #include<libminisip/sip/Sip.h>
 #include<libminisip/gui/Gui.h>
 #include<libminisip/conference/ConferenceControl.h> 
-#include "../conf/ConfCallback.h"
+#include<libminisip/conference/ConfCallback.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 class ConfMessageRouter: 	//public SipCallback, 

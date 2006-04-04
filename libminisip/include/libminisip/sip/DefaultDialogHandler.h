@@ -25,18 +25,19 @@
 #ifndef DEFAULTDialogHANDLER_H
 #define DEFAULTDialogHANDLER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
+#include<libmutil/MemObject.h>
+
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
-//#include<libmsip/SipMessage.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmutil/MemObject.h>
 #include<libmsip/SipMessageTransport.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #ifdef P2T_SUPPORT
-#include"../p2t/GroupListServer.h"
-#include"../p2t/SipDialogP2T.h"
+#	include<libminisip/p2t/GroupListServer.h>
+#	include<libminisip/p2t/SipDialogP2T.h>
 #endif
 
 

@@ -31,26 +31,22 @@
  * 
 */
 
-
-
 #ifndef SipDialogConfVoip_H
 #define SipDialogConfVoip_H
 
+#include<libminisip/libminisip_config.h>
 
-#include<config.h>
-
+#include<libmutil/StateMachine.h>
+#include<libmutil/minilist.h>
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
-#include<libmutil/StateMachine.h>
 
-#include<libmutil/minilist.h>
-
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 #ifdef IPSEC_SUPPORT
-#include<../ipsec/MsipIpsecAPI.h>
+#	include<libminisip/ipsec/MsipIpsecAPI.h>
 #endif
 
 class Session;

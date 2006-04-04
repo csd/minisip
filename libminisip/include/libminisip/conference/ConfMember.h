@@ -12,7 +12,7 @@
 #ifndef _CONFMEMBER_H
 #define _CONFMEMBER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 class ConfMember {
 	public:

@@ -25,11 +25,13 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
 #include<libmutil/MessageRouter.h>
-#include"../LogEntry.h"
+
+#include<libminisip/gui/LogEntry.h>
 
 class SipSoftPhoneConfiguration;
 class ContactDb;
