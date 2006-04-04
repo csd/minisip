@@ -16,11 +16,7 @@
    #ifndef __iLBC_ILBCENCODE_H 
    #define __iLBC_ILBCENCODE_H 
     
-<<<<<<< .mine
    #include<libminisip/codecs/ilbc/iLBC_define.h>
-=======
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
->>>>>>> .r2127
     
    short initEncode(                   /* (o) Number of bytes encoded */ 
        iLBC_Enc_Inst_t *iLBCenc_inst   /* (i/o) Encoder instance */ 
