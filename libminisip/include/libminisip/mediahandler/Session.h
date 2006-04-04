@@ -171,7 +171,7 @@ class Session : public MObject{
 		 * during session transfer.
 		 * @param callId the new identifier, as a string
 		 */
-		void setCallId( const string callId );
+		void setCallId( const std::string callId );
 
 		friend class DtmfSender;
 		
@@ -218,7 +218,7 @@ class Session : public MObject{
 		/**
 		Return a debug string containing info about this Session
 		*/
-		virtual string getDebugString();
+		virtual std::string getDebugString();
 #endif
 		
 		/**

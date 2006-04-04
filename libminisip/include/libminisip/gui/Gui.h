@@ -50,7 +50,7 @@ class Gui : public Runnable, public CommandReceiver {
 		* @param s     Message that will be displayed to the
 		* user.
 		*/
-		//virtual void displayErrorMessage(string s)=0;
+		//virtual void displayErrorMessage(std::string s)=0;
 
 		/**
 		* Purpose: The user interface will probably need a
@@ -84,13 +84,13 @@ class Gui : public Runnable, public CommandReceiver {
 		virtual void handleCommand(const CommandString &command)=0;
 
 
-		void handleCommand(string subsystem, const CommandString &cmd){
+		void handleCommand(std::string subsystem, const CommandString &cmd){
 			assert(subsystem=="gui");
 			handleCommand(cmd);
 		}
 
-		CommandString handleCommandResp(string , const CommandString& ){
-			cerr << "Warning: Gui::handleCommandResp called (BUG)"<<endl;
+		CommandString handleCommandResp(std::string , const CommandString& ){
+			std::cerr << "Warning: Gui::handleCommandResp called (BUG)"<<std::endl;
 			CommandString ret("","");
 			return ret;
 		}
@@ -111,7 +111,7 @@ class Gui : public Runnable, public CommandReceiver {
 		
 		MRef<ConfMessageRouter*> getConfCallback();
 
-		void sendCommand(string toSubsystem, const CommandString &cmd){
+		void sendCommand(std::string toSubsystem, const CommandString &cmd){
 			callback->handleCommand(toSubsystem, cmd);
 		}
 
@@ -119,7 +119,7 @@ class Gui : public Runnable, public CommandReceiver {
 		// Lesson learned: Doing logging in the GUI is not good
 		// since when ever something interesting happend it is
 		// likely that the GUI has been shut down. 
-//		virtual void log(int type, string msg){}; 
+//		virtual void log(int type, std::string msg){}; 
 		
 //		virtual void gotPacket(int32_t i)=0;
 

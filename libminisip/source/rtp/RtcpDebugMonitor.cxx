@@ -47,6 +47,7 @@
 #include<iostream>
 #endif
 
+using namespace std;
 
 RtcpDebugMonitor::RtcpDebugMonitor(UDPSocket *s){
 	this->sock=s;

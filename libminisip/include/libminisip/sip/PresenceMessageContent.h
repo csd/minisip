@@ -7,26 +7,27 @@
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
 
+#include<string>
 
 
-MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &, const string &ContentType);
+MRef<SipMessageContent*> presenceSipMessageContentFactory(const std::string &, const std::string &ContentType);
 
 class PresenceMessageContent : public SipMessageContent{
 	public:
-		PresenceMessageContent(string from, string to, string onlineStatus, string onlineStatusDesc);
-		PresenceMessageContent(const string &buildFrom);
+		PresenceMessageContent(std::string from, std::string to, std::string onlineStatus, std::string onlineStatusDesc);
+		PresenceMessageContent(const std::string &buildFrom);
 		virtual std::string getMemObjectType(){return "PresenceMessageContent";}
 		virtual std::string getString();
 		virtual std::string getContentType(){return "application/xpidf+xml";}
 
 
 	private:
-		string fromUri;
-		string toUri;
-		string document;
-		string onlineStatus;
-		string onlineStatusDesc;
-		string presentity;
+		std::string fromUri;
+		std::string toUri;
+		std::string document;
+		std::string onlineStatus;
+		std::string onlineStatusDesc;
+		std::string presentity;
 };
 
 

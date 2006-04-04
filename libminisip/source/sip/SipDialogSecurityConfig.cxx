@@ -7,6 +7,7 @@
 #include<libmutil/itoa.h>
 #include<libmsip/SipDialogConfig.h>
 
+using namespace std;
 
 SipDialogSecurityConfig::SipDialogSecurityConfig():
 	secured(false),

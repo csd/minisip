@@ -199,35 +199,35 @@ if VIDEO_SUPPORT
 	libvideo_libadd =
 	display_src = source/video/display/VideoDisplay.cxx \
 			source/display/X11Display.cxx
-	if XV_VIDEO_DISPLAY
+if XV_VIDEO_DISPLAY
 		display_src += source/video/display/XvDisplay.cxx
 		libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
-	endif
-	
-	if SDL_VIDEO_DISPLAY
+endif
+
+if SDL_VIDEO_DISPLAY
 		display_src += source/video/display/SdlDisplay.cxx
-	endif
-	
+endif
+
 	grabber_src = source/video/grabber/Grabber.cxx
-	if V4L_VIDEO_GRABBER
+if V4L_VIDEO_GRABBER
 		grabber_src += source/video/grabber/V4LGrabber.cxx
-	endif
-	if DC1394_VIDEO_GRABBER
+endif
+if DC1394_VIDEO_GRABBER
 		grabber_src += source/video/grabber/Dc1394Grabber.cxx
-	endif
-	
+endif
+
 	mixer_src = source/video/mixer/ImageMixer.cxx
-	
+
 	codec_src = source/video/codec/AVCoder.cxx \
 			source/video/codec/AVDecoder.cxx \
 			source/video/codec/VideoCodec.cxx
-	
+
 	libvideo_src = $(display_src) \
 			$(grabber_src) \
 			$(codec_src) \
 			$(mixer_src) \
 			source/video/VideoMedia.cxx
-endif
+endif VIDEO_SUPPORT
 
 libcontactdb_src = source/contactdb/ContactDb.cxx \
 			source/contactdb/PhoneBook.cxx \
@@ -258,7 +258,7 @@ libconference_src = source/conference/ConferenceControl.cxx \
 			source/conference/ConfMessageRouter.cxx
 
 libconfigbackend_src = source/configbackend/ConfBackend.cxx \
-			source/ configbackend/MXmlConfBackend.cxx
+			source/configbackend/MXmlConfBackend.cxx
 if OS_WIN
 	libconfigbackend_src += source/configbackend/UserConfigWin32.cxx
 else
