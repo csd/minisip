@@ -75,7 +75,7 @@
 
 #include"../minisip/LogEntry.h"
 
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 class SipSoftPhoneConfiguration;
 class MediaHandler;

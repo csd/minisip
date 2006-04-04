@@ -53,7 +53,7 @@
 #include <time.h>
 #include"../minisip/LogEntry.h"
 #include<libmsip/SipCommandString.h>
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipHeaderExpires.h>
 

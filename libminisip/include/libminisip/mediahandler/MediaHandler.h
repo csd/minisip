@@ -34,7 +34,7 @@
 #include"MediaStream.h"
 #include"Session.h"
 #include"RtpReceiver.h"
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>
 

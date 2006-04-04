@@ -35,7 +35,7 @@
 #include"RtcpTransactionIdleFloor.h"
 #include"RtcpTransactionTakenFloor.h"
 #include<libmsip/SipDialog.h>
-#include"../sip/DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmutil/itoa.h>
 #include<sstream>
 

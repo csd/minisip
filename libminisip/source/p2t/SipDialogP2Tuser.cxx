@@ -46,7 +46,7 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
-#include"../sip/DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>

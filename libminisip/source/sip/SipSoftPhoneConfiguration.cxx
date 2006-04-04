@@ -38,7 +38,7 @@
 #include"SipSoftPhoneConfiguration.h"
 
 #include"../soundcard/SoundIO.h"
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 #include"../minisip/contactdb/PhoneBook.h"
 #include"../minisip/contactdb/MXmlPhoneBookIo.h"
 #include"../minisip/confbackend/ConfBackend.h"

@@ -29,7 +29,7 @@
 
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
-#include"../sip/SipDialogSecurityConfig.h"
+#include<libminisip/sip/SipDialogSecurityConfig.h>
 
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>

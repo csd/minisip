@@ -31,7 +31,7 @@
 #include"RtpReceiver.h"
 #include"DtmfSender.h"
 #include"../codecs/Codec.h"
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 #include"../sdp/SdpPacket.h"
 #include"../sdp/SdpHeaderV.h"
 #include"../sdp/SdpHeaderT.h"

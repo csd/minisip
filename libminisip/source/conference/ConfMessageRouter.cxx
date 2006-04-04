@@ -25,10 +25,10 @@
 #include"ConfMessageRouter.h"
 //#include<libmsip/CODECInterface.h>
 //#include"../util/ConfigFile.h"
-//#include"../sip/SipSoftPhoneConfiguration.h"
+//#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 //#include<libmsip/SipDialogContainer.h>
-//#include"../sip/DefaultDialogHandler.h"
-//#include"../conf/ConferenceControl.h"
+//#include<libminisip/sip/DefaultDialogHandler.h>
+//#include<libminisip/conference/ConferenceControl.h>
 
 #include<iostream>
 

@@ -41,10 +41,10 @@
 #include"GroupListUserElement.h"
 #include"GroupListClient.h"
 #include"P2T.h"
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 
 /**

@@ -28,7 +28,7 @@
 #include<stdio.h>
 #include<vector>
 #include"../minisip/ConfMessageRouter.h"
-#include"../minisip/gui/Gui.h"
+#include<libminisip/gui/Gui.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>

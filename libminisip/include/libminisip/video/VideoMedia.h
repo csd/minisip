@@ -25,7 +25,7 @@
 #ifndef VIDEO_MEDIA_H
 #define VIDEO_MEDIA_H
 
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 #include"ImageHandler.h"
 #include"display/VideoDisplay.h"
 #include"codec/AVDecoder.h"

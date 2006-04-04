@@ -30,7 +30,7 @@
 
 #include<libmnetutil/UDPSocket.h>
 #include<libmsip/SipDialog.h>
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmutil/Thread.h>
 #include"../minisip/gui/Gui.h"
 #include"../p2t/P2T.h"

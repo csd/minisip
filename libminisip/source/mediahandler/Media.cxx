@@ -26,7 +26,7 @@
 
 #include"../codecs/Codec.h"
 #include"../soundcard/SoundIO.h"
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 #include"MediaStream.h"
 #include"RtpReceiver.h"
 #include<libmutil/itoa.h>

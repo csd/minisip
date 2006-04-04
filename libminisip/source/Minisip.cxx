@@ -20,16 +20,16 @@ using namespace std;
 #include<libmsip/SipMessageTransport.h>
 #include<libmikey/keyagreement_dh.h>
 #include"ConsoleDebugger.h"
-#include"../sip/Sip.h"
+#include<libminisip/sip/Sip.h>
 #include"LogEntry.h"
-#include"contactdb/ContactDb.h"
-#include"../mediahandler/MediaHandler.h"
-#include"../conf/ConferenceControl.h"
-#include"../conf/ConfCallback.h"
-#include"confbackend/ConfBackend.h"
-#include"confbackend/MXmlConfBackend.h"
+#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/conference/ConferenceControl.h>
+#include<libminisip/conference/ConfCallback.h>
+#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/MXmlConfBackend.h>
 #include<libmutil/MessageRouter.h>
-#include<gui/Gui.h>
+#include<libminisip/gui/Gui.h>
 
 #include"ConfMessageRouter.h"
 

@@ -30,7 +30,7 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 
 class UDPSocket;
 class MediaStreamReceiver;

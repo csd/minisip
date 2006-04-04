@@ -32,7 +32,7 @@
 #include"../codecs/Codec.h"
 #include<iostream>
 #include"MediaStream.h"
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 
 #include<libmutil/itoa.h> //for debug ... remove ... cesc
 

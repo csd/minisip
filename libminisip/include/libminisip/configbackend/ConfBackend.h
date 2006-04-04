@@ -29,7 +29,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
-#include"../gui/Gui.h"
+#include<libminisip/gui/Gui.h>
 #include<string>
 
 class ConfBackend : public MObject{

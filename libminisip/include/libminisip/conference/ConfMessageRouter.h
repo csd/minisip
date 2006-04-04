@@ -28,11 +28,11 @@
 #include<config.h>
 
 #include<libmutil/minilist.h>
-#include"../sip/Sip.h"
-#include"gui/Gui.h"
-#include"../conf/ConferenceControl.h" 
+#include<libminisip/sip/Sip.h>
+#include<libminisip/gui/Gui.h>
+#include<libminisip/conference/ConferenceControl.h> 
 #include "../conf/ConfCallback.h"
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 class ConfMessageRouter: 	//public SipCallback, 
 			//public GuiCallback, 

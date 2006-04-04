@@ -26,7 +26,7 @@
 #include"Sip.h"
 
 #include"DefaultDialogHandler.h"
-//#include"../mediahandler/MediaHandler.h"
+//#include<libminisip/mediahandler/MediaHandler.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>

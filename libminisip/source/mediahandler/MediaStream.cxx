@@ -37,7 +37,7 @@
 #include"Media.h"
 #include"RtpReceiver.h"
 #include"../codecs/Codec.h"
-#include"../minisip/ipprovider/IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 #include<iostream>
 
 #ifdef _WIN32_WCE

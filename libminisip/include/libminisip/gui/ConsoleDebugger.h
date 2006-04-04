@@ -4,9 +4,9 @@
 #include<config.h>
 
 #include<libmutil/MemObject.h>
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmutil/Thread.h>
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 #include<string>
 

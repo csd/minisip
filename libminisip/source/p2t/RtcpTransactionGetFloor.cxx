@@ -38,7 +38,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmutil/itoa.h>
 //#include"DefaultCallHandler.h"
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 
 bool RtcpTransactionGetFloor::a0_start_reqsent( const SipSMCommand &command)

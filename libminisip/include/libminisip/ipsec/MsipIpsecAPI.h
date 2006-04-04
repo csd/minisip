@@ -26,7 +26,7 @@
 
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
-#include"../sip/SipDialogSecurityConfig.h"
+#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMIMEContent.h>
 #include <fcntl.h>

@@ -44,7 +44,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
-#include"../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 //P2T//
 #include"P2T.h"

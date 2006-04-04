@@ -27,7 +27,7 @@
 
 #include"SimpleIpProvider.h"
 #include"StunIpProvider.h"
-#include"../../sip/SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

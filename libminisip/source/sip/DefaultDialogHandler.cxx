@@ -53,7 +53,7 @@
 #include"../p2t/SipDialogP2Tuser.h"
 #endif
 
-#include"../mediahandler/MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 #ifdef IPSEC_SUPPORT
 #include<../ipsec/MsipIpsecAPI.h>

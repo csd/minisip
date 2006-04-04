@@ -12,7 +12,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipSMCommand.h>
 
-#include"../mediahandler/MediaCommandString.h"
+#include<libminisip/mediahandler/MediaCommandString.h>
 
 #include<iostream>
 

@@ -29,7 +29,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
-#include"../sip/SipDialogSecurityConfig.h"
+#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include"DtmfSender.h"
 #include<libmikey/keyagreement.h>
 #include"../sdp/SdpPacket.h"
