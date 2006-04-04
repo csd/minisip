@@ -114,7 +114,9 @@ do
 
 	if [ ${subdir} = "libminisip" ] ; then 
 		echo libminisip can also have special config params
-		configure_params="$configure_params $minisip_configure_params"
+		LOC_LIBMINISIP_LIBS=-L$PWD/.libs
+		LOC_LIBMINISIP_CFLAGS=-I$PWD/include
+		configure_params_libminisip="$configure_params $libminisip_configure_params"
 		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
@@ -124,12 +126,12 @@ do
 			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
 			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
-					./configure $configure_params
+					./configure $configure_params_libminisip
 	fi 
 	
 	if [ ${subdir} = "minisip" ]; then 
 		echo minisip can also have special config params
-		configure_params="$configure_params $minisip_configure_params"
+		configure_params_minisip="$configure_params $minisip_configure_params"
 		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
@@ -138,8 +140,10 @@ do
 			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
 			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
 			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
+			LIBMINISIP_LIBS="$LOC_LIBMINISIP_LIBS -lminisip"	\
+			LIBMINISIP_CFLAGS=$LOC_LIBMINISIP_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
-					./configure $configure_params
+					./configure $configure_params_minisip
 	fi 
 	
 	echo "=========================================================="

@@ -19,7 +19,7 @@ SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
-#SUBDIRS="${SUBDIRS} libminisip"
+SUBDIRS="${SUBDIRS} libminisip"
 
 #Also useful, you may want to call make with some options ... supply them
 #here. 
