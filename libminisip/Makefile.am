@@ -273,7 +273,7 @@ endif
 
 libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libaec_src) \
-			$(libcodec_ilbc_src) \
+			$(libcodecs_src) \
 			$(libconference_src) \
 			$(libconfigbackend_src) \
 			$(libcontactdb_src) \

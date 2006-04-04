@@ -31,6 +31,8 @@
 #include<speex/speex.h>
 #include<libmutil/print_hex.h>
 
+using namespace std;
+
 SpeexCodecState::SpeexCodecState(){
 	
 	speex_bits_init(&bits);  // both for encode and decode
