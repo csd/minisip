@@ -8,9 +8,9 @@ EXTRA_DIST = libminisip.spec
 pkgconfig_DATA = libminisip.pc
 
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = -I$(abs_top_srcdir)/include
+libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(abs_top_srcdir)/include
 libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
-libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
+libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS)
 libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
 if AEC_SUPPORT
@@ -49,17 +49,17 @@ libcodec_ilbc_src = source/codecs/ILBCCODEC.cxx \
 libcodecs_src += $(libcodec_ilbc_src)
 
 if HAS_SPEEX
-	libcodecs_src += source/codecs/SPEEXCODEC.cxx
-	libcodecs_libadd += $(SPEEX_LIBS)
+        libcodecs_src += source/codecs/SPEEXCODEC.cxx
+        libcodecs_libadd += $(SPEEX_LIBS)
 endif
 
 if HAS_GSM
-	libcodecs_src += source/codecs/GsmCodec.cxx
-	libcodecs_libadd += $(GSM_LIBS)
+        libcodecs_src += source/codecs/GsmCodec.cxx
+        libcodecs_libadd += $(GSM_LIBS)
 endif
 
 if IPSEC_SUPPORT
-	libmsipipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
+        libmsipipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
 endif
 
 libmediahandler_src = source/mediahandler/MediaHandler.cxx \
@@ -74,7 +74,7 @@ libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/DtmfSender.cxx
 
 if P2T_SUPPORT
-	libp2t_src = source/p2t/RtcpAPP.cxx \
+        libp2t_src = source/p2t/RtcpAPP.cxx \
 			source/p2t/RtcpAPPHeader.cxx \
 			source/p2t/RtcpTransactionGetFloor.cxx \
 			source/p2t/RtcpTransactionGrantFloor.cxx \
@@ -170,22 +170,22 @@ PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx
 libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
-	libsoundcard_src += source/soundcard/OssSoundDevice.cxx 
+        libsoundcard_src += source/soundcard/OssSoundDevice.cxx 
 endif !OS_WIN
 
 if HAVE_LIBASOUND
-	libsoundcard_src += $(ALSA_SRC)
-	libsoundcard_libadd += $(ALSA_LIBS)
+        libsoundcard_src += $(ALSA_SRC)
+        libsoundcard_libadd += $(ALSA_LIBS)
 endif HAVE_LIBASOUND
 
 if DIRECT_SOUND
-	libsoundcard_src += $(DSOUND_SRC)
-	libsoundcard_libadd += $(DSOUND_LIBS)
+        libsoundcard_src += $(DSOUND_SRC)
+        libsoundcard_libadd += $(DSOUND_LIBS)
 endif DIRECT_SOUND
 
 if PORTAUDIO_SUPPORT
-	libsoundcard_src += $(PORTAUDIO_SRC)
-	libsoundcard_libadd += $(PORTAUDIO_LIBS)
+        libsoundcard_src += $(PORTAUDIO_SRC)
+        libsoundcard_libadd += $(PORTAUDIO_LIBS)
 endif PORTAUDIO_SUPPORT
 
 libspaudio_src = source/spaudio/SpAudio.cxx 
@@ -196,33 +196,33 @@ libstun_src = source/stun/STUNAttributes.cxx \
 		source/stun/STUNTest.cxx
 
 if VIDEO_SUPPORT
-	libvideo_libadd =
-	display_src = source/video/display/VideoDisplay.cxx \
+        libvideo_libadd =
+        display_src = source/video/display/VideoDisplay.cxx \
 			source/display/X11Display.cxx
 if XV_VIDEO_DISPLAY
-		display_src += source/video/display/XvDisplay.cxx
-		libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
+        display_src += source/video/display/XvDisplay.cxx
+        libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
 if SDL_VIDEO_DISPLAY
-		display_src += source/video/display/SdlDisplay.cxx
+        display_src += source/video/display/SdlDisplay.cxx
 endif
 
-	grabber_src = source/video/grabber/Grabber.cxx
+        grabber_src = source/video/grabber/Grabber.cxx
 if V4L_VIDEO_GRABBER
-		grabber_src += source/video/grabber/V4LGrabber.cxx
+        grabber_src += source/video/grabber/V4LGrabber.cxx
 endif
 if DC1394_VIDEO_GRABBER
-		grabber_src += source/video/grabber/Dc1394Grabber.cxx
+        grabber_src += source/video/grabber/Dc1394Grabber.cxx
 endif
 
-	mixer_src = source/video/mixer/ImageMixer.cxx
+        mixer_src = source/video/mixer/ImageMixer.cxx
 
-	codec_src = source/video/codec/AVCoder.cxx \
+        codec_src = source/video/codec/AVCoder.cxx \
 			source/video/codec/AVDecoder.cxx \
 			source/video/codec/VideoCodec.cxx
 
-	libvideo_src = $(display_src) \
+        libvideo_src = $(display_src) \
 			$(grabber_src) \
 			$(codec_src) \
 			$(mixer_src) \
@@ -233,7 +233,7 @@ libcontactdb_src = source/contactdb/ContactDb.cxx \
 			source/contactdb/PhoneBook.cxx \
 			source/contactdb/MXmlPhoneBookIo.cxx
 
-libminisip_gui_src = source/gui/Gui.cxx \
+libgui_src = source/gui/Gui.cxx \
 			source/gui/LogEntry.cxx \
 			source/gui/Bell.cxx \
 			source/gui/ConsoleDebugger.cxx
@@ -243,9 +243,9 @@ libipprovider_src = source/ipprovider/IpProvider.cxx \
 			source/ipprovider/StunIpProvider.cxx
 
 if OS_WIN
-	res_obj = source/win32/libminisip-res.o
-	noinst_DATA = $(res_obj)
-	CLEANFILES = $(res_obj)
+        res_obj = source/win32/libminisip-res.o
+        noinst_DATA = $(res_obj)
+        CLEANFILES = $(res_obj)
 endif OS_WIN
 
 .rc.o:
@@ -260,15 +260,15 @@ libconference_src = source/conference/ConferenceControl.cxx \
 libconfigbackend_src = source/configbackend/ConfBackend.cxx \
 			source/configbackend/MXmlConfBackend.cxx
 if OS_WIN
-	libconfigbackend_src += source/configbackend/UserConfigWin32.cxx
+        libconfigbackend_src += source/configbackend/UserConfigWin32.cxx
 else
-	libconfigbackend_src += source/configbackend/UserConfigPosix.cxx
+        libconfigbackend_src += source/configbackend/UserConfigPosix.cxx
 endif
 
 if GCONF_SUPPORT
-	AM_CPPFLAGS += @GCONF_CFLAGS@
-	libconfigbackend_src += source/configbackend/GConfBackend.cxx
-	libconfigbackend_libadd = $(GCONF_LIBS)
+        AM_CPPFLAGS += $(GCONF_CFLAGS)
+        libconfigbackend_src += source/configbackend/GConfBackend.cxx
+        libconfigbackend_libadd = $(GCONF_LIBS)
 endif
 
 libminisip_la_SOURCES = source/Minisip.cxx \

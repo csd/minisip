@@ -1,5 +1,5 @@
 
-#include<libminisip/ConsoleDebugger.h>
+#include<libminisip/gui/ConsoleDebugger.h>
 
 #include<libmutil/termmanip.h>
 #include<libmutil/merror.h>
