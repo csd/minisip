@@ -12,7 +12,7 @@
 #ifndef CODEC_G711_H
 #define CODEC_G711_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 unsigned char linear2alaw(short pcm_val);	/* 2's complement (16-bit range) */
 

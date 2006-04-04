@@ -25,7 +25,9 @@
 #ifndef MINISIP_GSM_CODEC_H
 #define MINISIP_GSM_CODEC_H
 
-#include"Codec.h"
+#include<libminisip/libminisip_config.h>
+
+#include<libminisip/codecs/Codec.h>
 
 typedef struct gsm_state *      gsm;
 

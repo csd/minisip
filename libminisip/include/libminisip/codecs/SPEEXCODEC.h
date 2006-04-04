@@ -25,9 +25,9 @@
 #ifndef SpeexCodec_H
 #define SpeexCodec_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
-#include"Codec.h"
+#include<libminisip/codecs/Codec.h>
 
 #ifdef HAS_SPEEX
 

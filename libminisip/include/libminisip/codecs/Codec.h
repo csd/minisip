@@ -25,7 +25,7 @@
 #ifndef CODECINTERFACE_H
 #define CODECINTERFACE_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<sys/types.h>
 

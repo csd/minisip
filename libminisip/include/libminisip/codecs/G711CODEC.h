@@ -25,21 +25,23 @@
 #ifndef G711CODEC_H
 #define G711CODEC_H
 
-#include"Codec.h"
+#include<libminisip/libminisip_config.h>
+
+#include<libminisip/codecs/Codec.h>
 
 class G711CodecState : public CodecState{
 	public:
 
-                /**
-                 * @returns Number of bytes in output buffer
-                 */
-                virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		/**
+		* @returns Number of bytes in output buffer
+		*/
+		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
 
-                /**
-                 *
-                 * @returns Number of frames in output buffer
-                 */
-                virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		/**
+		*
+		* @returns Number of frames in output buffer
+		*/
+		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
 };
 
 class G711Codec : public AudioCodec{

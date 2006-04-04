@@ -25,15 +25,15 @@
 #ifndef ILBCCodec_H
 #define ILBCCodec_H
 
-#include<config.h>
-
-#include"Codec.h"
-
-#include"ilbc/iLBC_define.h"
-#include"ilbc/iLBC_encode.h"
-#include"ilbc/iLBC_decode.h"
+#include<libminisip/libminisip_config.h>
 
 #include<string>
+
+#include<libminisip/codecs/Codec.h>
+
+#include<libminisip/codecs/ilbc/iLBC_define.h>
+#include<libminisip/codecs/ilbc/iLBC_encode.h>
+#include<libminisip/codecs/ilbc/iLBC_decode.h>
 
 class ILBCCodecState : public CodecState{
 	public:
