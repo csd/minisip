@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"STUNTest.h"
+#include<libminisip/stun/STUNTest.h>
 
 #include<libmutil/merror.h>
 #include<libmnetutil/IP4Address.h>

@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include"SdpHeaderT.h"
+#include<libminisip/sdp/SdpHeaderT.h>
 #include<libmutil/itoa.h>
 
 #ifdef DEBUG_OUTPUT

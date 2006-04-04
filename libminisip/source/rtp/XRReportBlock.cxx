@@ -22,8 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"XRReportBlock.h"
-#include"XRVoIPReportBlock.h"
+#include<libminisip/rtp/XRReportBlock.h>
+#include<libminisip/rtp/XRVoIPReportBlock.h>
 #include<config.h>
 #include<stdlib.h>
 //#include<netinet/in.h>

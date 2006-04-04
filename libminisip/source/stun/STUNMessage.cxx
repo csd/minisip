@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"STUNMessage.h"
+#include<libminisip/stun/STUNMessage.h>
 
 #ifdef _MSC_VER
 #include<winsock2.h>

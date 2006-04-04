@@ -23,7 +23,7 @@
 */
 
 #include<libmutil/massert.h>
-#include"SDES_EMAIL.h"
+#include<libminisip/rtp/SDES_EMAIL.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

@@ -25,7 +25,7 @@
 
 #include<assert.h>
 #include<iostream>
-#include"STUNAttributes.h"
+#include<libminisip/stun/STUNAttributes.h>
 
 #ifdef LINUX
 #include<netinet/in.h>

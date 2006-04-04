@@ -23,7 +23,7 @@
 */
 
 #include<libmutil/massert.h>
-#include"SDES_PHONE.h"
+#include<libminisip/rtp/SDES_PHONE.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

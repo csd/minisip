@@ -22,8 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpPacket.h"
-#include"RtcpReport.h"
+#include<libminisip/rtp/RtcpPacket.h>
+#include<libminisip/rtp/RtcpReport.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

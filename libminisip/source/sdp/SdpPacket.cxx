@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include"SdpPacket.h"
+#include<libminisip/sdp/SdpPacket.h>
 #include<libmnetutil/IP4Address.h>
 
 #include<libmutil/trim.h>
@@ -40,13 +40,13 @@
 #include<libmutil/split_in_lines.h>
 
 
-#include"SdpHeaderV.h"
-#include"SdpHeaderO.h"
-#include"SdpHeaderS.h"
-#include"SdpHeaderC.h"
-#include"SdpHeaderT.h"
-#include"SdpHeaderM.h"
-#include"SdpHeaderA.h"
+#include<libminisip/sdp/SdpHeaderV.h>
+#include<libminisip/sdp/SdpHeaderO.h>
+#include<libminisip/sdp/SdpHeaderS.h>
+#include<libminisip/sdp/SdpHeaderC.h>
+#include<libminisip/sdp/SdpHeaderT.h>
+#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/sdp/SdpHeaderA.h>
 
 
 #include<iostream>

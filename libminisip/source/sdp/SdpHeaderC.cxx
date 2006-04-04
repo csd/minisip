@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include"SdpHeaderC.h"
+#include<libminisip/sdp/SdpHeaderC.h>
 #include<libmutil/itoa.h>
 #include<iostream>
 

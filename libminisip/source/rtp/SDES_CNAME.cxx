@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"SDES_CNAME.h"
+#include<libminisip/rtp/SDES_CNAME.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

@@ -111,7 +111,7 @@ class STUN{
 				uint16_t stunPort, 
 				UDPSocket &socket,
 //				IP4Address &localAddr,
-                                vector<string> localIPs,
+                                std::vector<std::string> localIPs,
 				uint16_t localPort,
 				char *mappedIPBuffer,
 				uint16_t &mappedPort);
@@ -124,7 +124,7 @@ class STUN{
 				uint16_t stunPort, 
 				UDPSocket &socket,
 //				IP4Address &localAddr,
-                                vector<string> localIPs,
+                                std::vector<std::string> localIPs,
 				uint16_t localPort);
 		
 

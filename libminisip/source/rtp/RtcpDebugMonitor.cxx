@@ -39,8 +39,8 @@
 #include<unistd.h>
 #endif
 
-#include"RtcpDebugMonitor.h"
-#include"RtcpPacket.h"
+#include<libminisip/rtp/RtcpDebugMonitor.h>
+#include<libminisip/rtp/RtcpPacket.h>
 #include<libmutil/Thread.h>
 
 #ifdef DEBUG_OUTPUT

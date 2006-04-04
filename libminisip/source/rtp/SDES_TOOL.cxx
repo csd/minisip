@@ -23,7 +23,7 @@
 */
 
 #include<libmutil/massert.h>
-#include"SDES_TOOL.h"
+#include<libminisip/rtp/SDES_TOOL.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

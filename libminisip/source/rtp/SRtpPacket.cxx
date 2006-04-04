@@ -48,8 +48,8 @@
 
 #include<errno.h>
 
-#include"SRtpPacket.h"
-#include"CryptoContext.h"
+#include<libminisip/rtp/SRtpPacket.h>
+#include<libminisip/rtp/CryptoContext.h>
 
 #include<libmutil/print_hex.h>
 #include<libmutil/merror.h>

@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpReportSR.h"
+#include<libminisip/rtp/RtcpReportSR.h>
 #include<iostream>
 
 RtcpReportSR::RtcpReportSR(void *buildfrom, int max_length):RtcpReport(0){

@@ -35,8 +35,8 @@
 
 
 #include<errno.h>
-#include"RtpPacket.h"
-#include"RtpHeader.h"
+#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/rtp/RtpHeader.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

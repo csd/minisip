@@ -22,14 +22,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"SDESItem.h"
-#include"SDES_CNAME.h"
-#include"SDES_NAME.h"
-#include"SDES_EMAIL.h"
-#include"SDES_PHONE.h"
-#include"SDES_LOC.h"
-#include"SDES_TOOL.h"
-#include"SDES_NOTE.h"
+#include<libminisip/rtp/SDESItem.h>
+#include<libminisip/rtp/SDES_CNAME.h>
+#include<libminisip/rtp/SDES_NAME.h>
+#include<libminisip/rtp/SDES_EMAIL.h>
+#include<libminisip/rtp/SDES_PHONE.h>
+#include<libminisip/rtp/SDES_LOC.h>
+#include<libminisip/rtp/SDES_TOOL.h>
+#include<libminisip/rtp/SDES_NOTE.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

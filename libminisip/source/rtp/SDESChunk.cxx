@@ -22,8 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"SDESChunk.h"
-#include"SDESItem.h"
+#include<libminisip/rtp/SDESChunk.h>
+#include<libminisip/rtp/SDESItem.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

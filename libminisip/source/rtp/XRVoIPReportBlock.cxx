@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"XRVoIPReportBlock.h"
+#include<libminisip/rtp/XRVoIPReportBlock.h>
 #include<config.h>
 #include<libmutil/massert.h>
 //#include<netinet/in.h>

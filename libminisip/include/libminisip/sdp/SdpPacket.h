@@ -43,7 +43,7 @@
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
 
-MRef<SipMessageContent*> sdpSipMessageContentFactory(const string & buf, const string & ContentType);
+MRef<SipMessageContent*> sdpSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 
 class SdpPacket : public SipMessageContent{
 	public:

@@ -22,11 +22,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpReport.h"
-#include"RtcpReportSR.h"
-#include"RtcpReportRR.h"
-#include"RtcpReportSDES.h"
-#include"RtcpReportXR.h"
+#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/rtp/RtcpReportSR.h>
+#include<libminisip/rtp/RtcpReportRR.h>
+#include<libminisip/rtp/RtcpReportSDES.h>
+#include<libminisip/rtp/RtcpReportXR.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

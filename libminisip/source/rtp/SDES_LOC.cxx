@@ -23,7 +23,7 @@
 */
 
 #include<libmutil/massert.h>
-#include"SDES_LOC.h"
+#include<libminisip/rtp/SDES_LOC.h>
 #ifdef DEBUG_OUTPUT
 #include<iostream>
 #endif

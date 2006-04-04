@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include"SdpHeaderV.h"
+#include<libminisip/sdp/SdpHeaderV.h>
 #include<libmutil/itoa.h>
 #include<stdlib.h>
 

@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpReportSenderInfo.h"
+#include<libminisip/rtp/RtcpReportSenderInfo.h>
 #include<stdlib.h>
 //#include<netinet/in.h>
 #include<iostream>
