@@ -452,36 +452,38 @@ dnl	  enable_gtk="no"
       fi ])
 AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
 
-
 dnl GTK GUI
 AC_ARG_ENABLE(gtk,
     [ --disable-gtk disables the GTK interface (default enabled).])
 
 if test "x${enable_gtk}" != "xno"
-  then
-    PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
-      [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])],
-      [PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
-        [AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
-	 AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])],
-        [AC_MSG_ERROR([Could not find the glademm-2.0 library])]
-      )]
-    )
-    cf_save_CPPFLAGS="${CPPFLAGS}"
-    CPPFLAGS="${CPPFLAGS} ${GLADEMM_CFLAGS}"
-    AC_CHECK_HEADERS([glibconfig.h])
-    AC_CHECK_DECL(G_THREADS_ENABLED, [
-      PKG_CHECK_MODULES(GTHREAD, [gthread-2.0],,[
-        AC_MSG_ERROR([Could not find the gthread-2.0 library])
-      ])],, [
-#ifdef HAVE_GLIBCONFIG_H
-#include<glibconfig.h>
-#endif
-    ])
-    CPPFLAGS="${cf_save_CPPFLAGS}"
-      
-dnl    QTGUI="no"
+	then
+		PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
+			[AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])],
+			[PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
+				[AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
+					AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])
+				],
+				[AC_MSG_ERROR([Could not find the glademm-2.0 library])]
+			)]
+		)
+		cf_save_CPPFLAGS="${CPPFLAGS}"
+		CPPFLAGS="${CPPFLAGS} ${GLADEMM_CFLAGS}"
+		AC_CHECK_HEADERS([glibconfig.h])
+		AC_CHECK_DECL(G_THREADS_ENABLED, 
+				[PKG_CHECK_MODULES(GTHREAD, [gthread-2.0],,[
+				AC_MSG_ERROR([Could not find the gthread-2.0 library])
+				])
+				],, [
+				#ifdef HAVE_GLIBCONFIG_H
+				#include<glibconfig.h>
+				#endif
+		])
+		CPPFLAGS="${cf_save_CPPFLAGS}"
+
+		dnl    QTGUI="no"
 fi
+
 AM_CONDITIONAL(GTK_GUI, [test "x${enable_gtk}" != "xno"])
 
 PKG_CHECK_MODULES(HILDON, [hildon-libs],
@@ -512,12 +514,6 @@ PKG_CHECK_MODULES(GCONF, [gconf-2.0],
 		fi
 	],[echo 'GConf development libraries not found, GConf support is disabled.'])
 AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
-
-
-
-
-
-
 
 
 QT="qt"
@@ -612,6 +608,24 @@ AC_CHECK_LIB([mnetutil], [main],
                 AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
         ])
 
+dnl
+dnl libmikey
+dnl
+PKG_CHECK_MODULES(MIKEY, [libmikey >= 0.4.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${MIKEY_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${MIKEY_CFLAGS}"
+LIBS="${MIKEY_LIBS} ${LIBS}"
+
+AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
+        headers/library. Try installing the libmikey-devel package for your
+        distribution."])])
+AC_CHECK_LIB([mikey], [main],
+        [
+                LIBS="-lmikey ${LIBS}"
+        ],[
+                AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
+        ])
 
 dnl
 dnl libmsip
@@ -632,24 +646,29 @@ AC_CHECK_LIB([msip], [main],
                 AC_MSG_ERROR([Could not find libmsip. Please install the corresponding package.])
         ])
 
-dnl
-dnl libmikey
-dnl
-PKG_CHECK_MODULES(MIKEY, [libmikey >= 0.4.1])
-AM_CXXFLAGS="${AM_CXXFLAGS} ${MIKEY_CFLAGS}"
 
-CPPFLAGS="${CPPFLAGS} ${MIKEY_CFLAGS}"
-LIBS="${MIKEY_LIBS} ${LIBS}"
+CPPFLAGS="${save_CPPFLAGS}"
+LIBS="${save_LIBS}"
 
-AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
-        headers/library. Try installing the libmikey-devel package for your
+dnl
+dnl libminisip
+dnl
+PKG_CHECK_MODULES(LIBMINISIP, [libminisip >= 0.3.1])
+AM_CXXFLAGS="${AM_CXXFLAGS} ${LIBMINISIP_CFLAGS}"
+
+CPPFLAGS="${CPPFLAGS} ${LIBMINISIP_CFLAGS}"
+LIBS="${LIBMINISIP_LIBS} ${LIBS}"
+
+AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libminisip
+        headers/library. Try installing the libminisip-devel package for your
         distribution."])])
-AC_CHECK_LIB([mikey], [main],
+AC_CHECK_LIB([msip], [main],
         [
-                LIBS="-lmikey ${LIBS}"
+                LIBS="-lminisip ${LIBS}"
         ],[
-                AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
+                AC_MSG_ERROR([Could not find libminisip. Please install the corresponding package.])
         ])
+
 
 CPPFLAGS="${save_CPPFLAGS}"
 LIBS="${save_LIBS}"
@@ -723,37 +742,13 @@ AC_SUBST(AM_CXXFLAGS)
 
 AC_SUBST(datadir)
 
-AC_CONFIG_FILES([libminisip/Makefile
-                 libminisip/libminisip.pc
-                 libminisip/codecs/Makefile
-                 libminisip/codecs/ilbc/Makefile
-                 libminisip/codecs/g711/Makefile
-                 libminisip/minisip/Makefile
-                 libminisip/minisip/contactdb/Makefile
-                 libminisip/minisip/confbackend/Makefile
-                 libminisip/minisip/ipprovider/Makefile
-                 libminisip/minisip/gui/Makefile
-                 libminisip/minisip/win32/Makefile
-                 libminisip/minisip/win32/libminisip-res.rc
-                 libminisip/rtp/Makefile
-                 libminisip/sip/Makefile
-                 libminisip/soundcard/Makefile
-                 libminisip/spaudio/Makefile
-                 libminisip/stun/Makefile
-                 libminisip/ipsec/Makefile
-                 libminisip/sdp/Makefile
-                 libminisip/p2t/Makefile
-                 libminisip/mediahandler/Makefile
-                 libminisip/video/Makefile
-                 libminisip/conf/Makefile
-                 libminisip/aec/Makefile
-                 minisip/Makefile
-                 minisip/gui/Makefile
-                 minisip/gui/qtgui/Makefile
-                 minisip/gui/gtkgui/Makefile
-                 minisip/gui/textui/Makefile
-                 minisip/win32/Makefile
-                 minisip/win32/minisip-res.rc
-		 debian/Makefile
-		 Makefile])
+AC_CONFIG_FILES([minisip/Makefile
+			minisip/gui/Makefile
+			minisip/gui/qtgui/Makefile
+			minisip/gui/gtkgui/Makefile
+			minisip/gui/textui/Makefile
+			minisip/win32/Makefile
+			minisip/win32/minisip-res.rc
+			debian/Makefile
+			Makefile])
 AC_OUTPUT
