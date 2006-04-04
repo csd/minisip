@@ -69,9 +69,9 @@ class SipSoftPhoneConfiguration : public MObject{
 		void save();
 		std::string load( MRef<ConfBackend *> be );
 		
-		static string getDefaultPhoneBookFilename();
+		static std::string getDefaultPhoneBookFilename();
 		
-		static void installConfigFile(string config, string address="", bool overwrite=false);
+		static void installConfigFile(std::string config, std::string address="", bool overwrite=false);
 		
 		bool checkVersion( uint32_t fileVersion );
 
@@ -99,12 +99,12 @@ class SipSoftPhoneConfiguration : public MObject{
 		List of identities we have extracted from the config file.
 		The default identity is in SipSoftPhoneConfiguration::inherited.sipIdentity
 		*/
-		list< MRef<SipIdentity*> > identities;
+		std::list< MRef<SipIdentity*> > identities;
 		
 		/**
 		Return the identity with getId()==id (from the identities list
 		*/
-		MRef<SipIdentity*> getIdentity( string id );
+		MRef<SipIdentity*> getIdentity( std::string id );
 
 		/**
 		 * Returns the identity when getUri() == uri
@@ -113,61 +113,61 @@ class SipSoftPhoneConfiguration : public MObject{
 		
 		/*
 		IPAddress * pstnProxy;
-		string pstnProxyString;
-		string pstnSipDomain;
+		std::string pstnProxyString;
+		std::string pstnSipDomain;
 		int32_t pstnProxyPort;
-		string pstnNumber;
-		string pstnProxyUsername;	// Advanced->PSTN proxy username
-		string pstnProxyPassword;  // Advanced->PSTN proxy password
+		std::string pstnNumber;
+		std::string pstnProxyUsername;	// Advanced->PSTN proxy username
+		std::string pstnProxyPassword;  // Advanced->PSTN proxy password
 		*/
 		
 
 		bool useSTUN;
-		string stunServerIpString;
+		std::string stunServerIpString;
 		uint16_t stunServerPort;
 
 		bool findStunServerFromSipUri;
 		bool findStunServerFromDomain;
-		string stunDomain;
+		std::string stunDomain;
 		bool useUserDefinedStunServer;
-		string userDefinedStunServer;
+		std::string userDefinedStunServer;
 		
 		Socket * proxyConnection;
 
 //		bool doRegister; 	//General->Register to proxy
 //		bool doRegisterPSTN; 	//Advanced...
 //		
-		string soundDevice;
-		string videoDevice;
+		std::string soundDevice;
+		std::string videoDevice;
 		uint32_t frameWidth;
 		uint32_t frameHeight;
 
 // 		bool autodetectProxy; //it is in SipProxy::
 		
 		bool usePSTNProxy;
-// 		string manualProxy; //was used in qt interface ... change the qt to be like gtk
+// 		std::string manualProxy; //was used in qt interface ... change the qt to be like gtk
 // 		bool dynamicSipPort; //was used in qt interface ... change the qt to be like gtk
 
 		bool tcp_server;
 
-//		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
+//		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> timeoutProvider;
 
 		bool tls_server;
 
-		list<MRef<PhoneBook *> > phonebooks;
+		std::list<MRef<PhoneBook *> > phonebooks;
 
 #ifdef MINISIP_AUTOCALL
-		string autoCall;
+		std::string autoCall;
 #endif
 
-		string ringtone;
+		std::string ringtone;
 		
-		list<string> audioCodecs;
+		std::list<std::string> audioCodecs;
 		
 		//not used anymore ... it was used in mediahandler ... 
 // 		bool muteAllButOne;
 		
-		string soundIOmixerType;
+		std::string soundIOmixerType;
 		
 		/**
 		Start up commands, specified in the config file.
@@ -189,7 +189,7 @@ class SipSoftPhoneConfiguration : public MObject{
 			</params>
 		</startup_cmd>
 		*/
-		list<string> startupActions;
+		std::list<std::string> startupActions;
 		
 		//P2T configurations:
 		//-------------------
@@ -210,7 +210,7 @@ class SipSoftPhoneConfiguration : public MObject{
 			list all available, tell the user and try to choose
 			a correct one.
 		*/
-		string networkInterfaceName;
+		std::string networkInterfaceName;
 
 	private:
 		MRef<ConfBackend *> backend;

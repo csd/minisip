@@ -29,7 +29,7 @@
 
 #ifdef FLOAT_RESAMPLER
 
-#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/soundcard/FloatResampler.h>
 #include<iostream>
 
 

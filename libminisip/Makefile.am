@@ -143,8 +143,8 @@ libsoundcard_libadd =
 RESAMPLER_SRC = source/soundcard/resampler/Resampler.cxx \
 		source/soundcard/resampler/SimpleResampler.cxx
 if FLOAT_RESAMPLER
-	RESAMPLER_SRC += source/soundcard/resampler/FloatResampler.cxx
-	libsoundcard_libadd += $(SAMPLERATE_LIBS)
+        RESAMPLER_SRC += source/soundcard/resampler/FloatResampler.cxx
+        libsoundcard_libadd += $(SAMPLERATE_LIBS)
 endif
 
 AUDIOMIXER_SRC = source/soundcard/AudioMixer.cxx \
@@ -291,5 +291,6 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libvideo_src)
 
 libminisip_la_LIBADD += $(libcodecs_libadd) \
+			$(libconfigbackend_libadd) \
 			$(libsoundcard_libadd) \
 			$(libvideo_libadd)

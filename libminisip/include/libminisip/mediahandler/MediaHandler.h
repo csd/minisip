@@ -61,7 +61,7 @@ class MediaHandler : public virtual MObject, public SessionRegistry, public Comm
 		 * @param callId identifier shared with the SIP stack
 		 * @returns a reference to the session created
 		 */
-		MRef<Session *> createSession( SipDialogSecurityConfig &config, string callId = "" );
+		MRef<Session *> createSession( SipDialogSecurityConfig &config, std::string callId = "" );
 		
 		/**
 		 * Registers a new media type (audio or video
@@ -74,10 +74,10 @@ class MediaHandler : public virtual MObject, public SessionRegistry, public Comm
 		 * Handles a command sent by the user interface
 		 * @param command the command to handle
 		 */
-		void handleCommand(string subsystem, const CommandString & command );
+		void handleCommand(std::string subsystem, const CommandString & command );
 
 
-		CommandString handleCommandResp(string subsystem, const CommandString& command);
+		CommandString handleCommandResp(std::string subsystem, const CommandString& command);
 		
 		/**
 		 * Provides the IP address given as contact to the external
@@ -90,7 +90,7 @@ class MediaHandler : public virtual MObject, public SessionRegistry, public Comm
 		virtual std::string getMemObjectType(){return "MediaHandler";}
 
 #ifdef DEBUG_OUTPUT	
-		virtual string getDebugString();
+		virtual std::string getDebugString();
 #endif
 
 #if 0
@@ -107,7 +107,7 @@ class MediaHandler : public virtual MObject, public SessionRegistry, public Comm
 
 		std::list< MRef<Media *> > media;
 
-		string ringtoneFile;
+		std::string ringtoneFile;
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;

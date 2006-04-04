@@ -39,6 +39,7 @@
 #include<libmutil/trim.h>
 #include<iostream>
 
+using namespace std;
 
 SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 9){
 	massert(buildFrom.substr(0,2)=="a=");
