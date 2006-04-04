@@ -8,6 +8,7 @@ pkgincludedir=${includedir}/@PACKAGE@
 Name: @PACKAGE@
 Description:
 Version: @VERSION@
+Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1, libmikey >= 0.3.1, libmsip >= 0.3.1
 Libs: -L${libdir} -lminisip
-Libs.private: @LIBS@
+Libs.private: @MSIP_LIBS@ @MIKEY_LIBS@ @MNETUTIL_LIBS@ @MUTIL_LIBS@ @LIBS@
 Cflags: -I${includedir}
