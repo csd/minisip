@@ -510,6 +510,7 @@ dnl AC_SUBST(LDFLAGS)
 dnl it shoudl be like this ... but for now, reduce it ...AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmsip.pc win32/libmsip-res.rc])
 AC_CONFIG_FILES([libminisip.pc
 		Makefile
+		include/Makefile
 		source/win32/Makefile
 		source/win32/libminisip-res.rc])
 
