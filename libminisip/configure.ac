@@ -172,13 +172,50 @@ AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
 dnl Check for libspeex
 AC_CHECK_HEADER([speex/speex.h], 
 	[
-		AC_CHECK_LIB([speex], [main],
-			[LIBS="-lspeex ${LIBS}"
+		AC_CHECK_LIB([speex], [speex_encoder_init],
+			[SPEEX_LIBS="-lspeex"
 			 AC_DEFINE(HAS_SPEEX, [], [Use the Speex CODEC])])
 			 HAS_SPEEX="yes"
 	]
 )
 AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
+AC_SUBST(SPEEX_LIBS)
+
+dnl Check for libgsm
+AC_CHECK_HEADER([gsm.h], 
+	[
+		AC_CHECK_LIB([gsm], [gsm_encode],
+			[GSM_LIBS="-lgsm"
+			 AC_DEFINE(HAS_GSM, [], [Use the GSM CODEC])])
+			 HAS_GSM="yes"
+	]
+)
+AM_CONDITIONAL(HAS_GSM, test "${HAS_GSM}" = "yes")
+AC_SUBST(GSM_LIBS)
+
+dnl
+dnl PortAudio V19 support
+dnl
+AC_ARG_ENABLE(portaudio,
+	[AS_HELP_STRING([--enable-portaudio],
+		[enable PortAudio V19 support (default auto).])],,
+	[enable_portaudio=auto])
+
+if test ! x$enable_portaudio = xno; then
+   have_portaudio=yes
+   AC_CHECK_HEADERS([portaudio.h],,have_portaudio=no)
+   AC_CHECK_LIB([portaudio],[Pa_GetDefaultOutputDevice],[PORTAUDIO_LIBS=-lportaudio],have_portaudio=no)
+
+   if test x$have_portaudio = xyes; then
+      AC_DEFINE(PORTAUDIO_SUPPORT, [1], [PortAudio V19 SoundDevice support.])
+   elif test x$enable_portaudio = xyes; then
+      AC_MSG_ERROR([Could not find PortAudio requirement(s).])
+   fi
+
+   AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
+   AC_SUBST(PORTAUDIO_LIBS)
+fi
+
 
 dnl #############
 dnl IPSEC SUPPORT
@@ -207,6 +244,20 @@ AC_ARG_ENABLE(aec,
     [  aec_enable=yes
 	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])])
 AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
+
+AC_ARG_ENABLE(gconf,
+    [ --enable-gconf enables support for GConf (default enabled).])
+
+PKG_CHECK_MODULES(GCONF, [gconf-2.0],
+	[
+		if test "x${enable_gconf}" != "xno"
+		then
+			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
+			gconf_support="yes"
+		fi
+	],[echo 'GConf development libraries not found, GConf support is disabled.'])
+AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
+
 
 dnl #############
 dnl VIDEO SUPPORT
@@ -457,5 +508,9 @@ dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
 dnl it shoudl be like this ... but for now, reduce it ...AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmsip.pc win32/libmsip-res.rc])
-AC_CONFIG_FILES([Makefile include/Makefile libminisip.pc])
+AC_CONFIG_FILES([libminisip.pc
+		Makefile
+		source/win32/Makefile
+		source/win32/libminisip-res.rc])
+
 AC_OUTPUT
