@@ -271,7 +271,7 @@ if GCONF_SUPPORT
 	libconfigbackend_libadd = $(GCONF_LIBS)
 endif
 
-libminisip_la_SOURCES = Minisip.cxx \
+libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libaec_src) \
 			$(libcodec_ilbc_src) \
 			$(libconference_src) \
