@@ -13,7 +13,9 @@ libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUT
 libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
 libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
-libaec_src = source/aec/aec.cxx
+if AEC_SUPPORT
+	libaec_src = source/aec/aec.cxx
+endif
 
 libcodecs_libadd = 
 libcodecs_src = source/codecs/G711CODEC.cxx \
@@ -193,37 +195,39 @@ libstun_src = source/stun/STUNAttributes.cxx \
 		source/stun/STUNMessage.cxx \
 		source/stun/STUNTest.cxx
 
-libvideo_libadd =
-display_src = source/video/display/VideoDisplay.cxx \
-		source/display/X11Display.cxx
-if XV_VIDEO_DISPLAY
-	display_src += source/video/display/XvDisplay.cxx
-	libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
+if VIDEO_SUPPORT
+	libvideo_libadd =
+	display_src = source/video/display/VideoDisplay.cxx \
+			source/display/X11Display.cxx
+	if XV_VIDEO_DISPLAY
+		display_src += source/video/display/XvDisplay.cxx
+		libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
+	endif
+	
+	if SDL_VIDEO_DISPLAY
+		display_src += source/video/display/SdlDisplay.cxx
+	endif
+	
+	grabber_src = source/video/grabber/Grabber.cxx
+	if V4L_VIDEO_GRABBER
+		grabber_src += source/video/grabber/V4LGrabber.cxx
+	endif
+	if DC1394_VIDEO_GRABBER
+		grabber_src += source/video/grabber/Dc1394Grabber.cxx
+	endif
+	
+	mixer_src = source/video/mixer/ImageMixer.cxx
+	
+	codec_src = source/video/codec/AVCoder.cxx \
+			source/video/codec/AVDecoder.cxx \
+			source/video/codec/VideoCodec.cxx
+	
+	libvideo_src = $(display_src) \
+			$(grabber_src) \
+			$(codec_src) \
+			$(mixer_src) \
+			source/video/VideoMedia.cxx
 endif
-
-if SDL_VIDEO_DISPLAY
-	display_src += source/video/display/SdlDisplay.cxx
-endif
-
-grabber_src = source/video/grabber/Grabber.cxx
-if V4L_VIDEO_GRABBER
-	grabber_src += source/video/grabber/V4LGrabber.cxx
-endif
-if DC1394_VIDEO_GRABBER
-	grabber_src += source/video/grabber/Dc1394Grabber.cxx
-endif
-
-mixer_src = source/video/mixer/ImageMixer.cxx
-
-codec_src = source/video/codec/AVCoder.cxx \
-		source/video/codec/AVDecoder.cxx \
-		source/video/codec/VideoCodec.cxx
-
-libvideo_src = $(display_src) \
-		$(grabber_src) \
-		$(codec_src) \
-		$(mixer_src) \
-		source/video/VideoMedia.cxx
 
 libcontactdb_src = source/contactdb/ContactDb.cxx \
 			source/contactdb/PhoneBook.cxx \
