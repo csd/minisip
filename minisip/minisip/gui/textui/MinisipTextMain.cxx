@@ -24,7 +24,7 @@
 #include<fstream>
 
 #include"MinisipTextUI.h"
-#include<libminisip/minisip/Minisip.h>
+#include<libminisip/Minisip.h>
 
 using namespace std;
 

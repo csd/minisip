@@ -21,8 +21,8 @@
 */
 
 #include"ContactDialog.h"
-#include<libminisip/minisip/contactdb/ContactDb.h>
-#include<libminisip/minisip/contactdb/PhoneBook.h>
+#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contactdb/PhoneBook.h>
 
 
 ContactDialog::ContactDialog():Gtk::Dialog( "Contact information", false ){

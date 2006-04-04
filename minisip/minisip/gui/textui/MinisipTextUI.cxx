@@ -25,7 +25,7 @@
 #include<stdio.h>
 #include<vector>
 #include"MinisipTextUI.h"
-#include<libminisip/conf/ConferenceControl.h>
+#include<libminisip/conference/ConferenceControl.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/trim.h>
@@ -35,7 +35,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
 
-#include<libminisip/minisip/ConfMessageRouter.h>
+#include<libminisip/conference/ConfMessageRouter.h>
 
 
 MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){

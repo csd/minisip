@@ -30,7 +30,7 @@
 
 
 #include"GtkMainUI.h"
-#include<libminisip/minisip/gui/Gui.h>
+#include<libminisip/gui/Gui.h>
 //#include"../../LogEntry.h"
 #include<libmutil/MemObject.h>
 #include"DtmfWidget.h"
@@ -61,6 +61,7 @@ class ContactDb;
 class AccountsList;
 class AccountsStatusWidget;
 
+using namespace std;
 
 class MainWindow : public GtkMainUI, 
 			public DtmfHandler

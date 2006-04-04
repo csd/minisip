@@ -26,7 +26,7 @@
 //#include<libminisip/sip/state_machines/SipSoftPhone.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/minisip/Bell.h>
+#include<libminisip/gui/Bell.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
 #include<libminisip/mediahandler/Session.h>
 #include<libminisip/mediahandler/MediaStream.h>

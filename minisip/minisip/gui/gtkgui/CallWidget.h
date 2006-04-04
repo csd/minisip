@@ -28,7 +28,7 @@
 #include <gtkmm.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/TimeoutProvider.h>
-#include<libminisip/minisip/Bell.h>
+#include<libminisip/gui/Bell.h>
 
 #include"DtmfWidget.h"
 

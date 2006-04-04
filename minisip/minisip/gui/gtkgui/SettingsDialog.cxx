@@ -23,7 +23,7 @@
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
 #include"AccountsList.h"
-#include<libminisip/minisip/gui/Gui.h>
+#include<libminisip/gui/Gui.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
 

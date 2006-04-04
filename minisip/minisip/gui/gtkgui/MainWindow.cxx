@@ -23,7 +23,7 @@
 
 
 
-#include <libminisip/conf/ConferenceControl.h>
+#include<libminisip/conference/ConferenceControl.h>
 #include"MainWindow.h"
 #include"CallWidget.h"
 #include"ConferenceWidget.h"
@@ -41,7 +41,7 @@
 #include"AccountsList.h"
 #include"AccountsStatusWidget.h"
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/minisip/contactdb/ContactDb.h>
+#include<libminisip/contactdb/ContactDb.h>
 #include<libmsip/SipCommandString.h>
 
 #include<libminisip/mediahandler/MediaCommandString.h>

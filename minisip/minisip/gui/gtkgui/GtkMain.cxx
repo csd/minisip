@@ -24,7 +24,7 @@
 #include<fstream>
 
 #include"GtkMainUI.h"
-#include<libminisip/minisip/Minisip.h>
+#include<libminisip/Minisip.h>
 
 #include<libmnetutil/TCPSocket.h>
 

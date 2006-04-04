@@ -9,7 +9,8 @@ AM_CPPFLAGS += -DMINISIP_DATADIR="\"$(pkgdatadir)\""	\
 
 minisip_gtkgui_LDADD = 	$(HILDON_LIBS)  \
 			$(GLADEMM_LIBS) \
-			$(GTHREAD_LIBS)
+			$(GTHREAD_LIBS) \
+			$(LIBMINISIP_LIBS)
 
 minisip_gtkgui_SOURCES = MainWindow.cxx \
 				CallWidget.cxx \
