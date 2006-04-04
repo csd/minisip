@@ -41,34 +41,34 @@
  * with <code>SipSMCommands</code> via the <code>MessageRouter</code>.
  */
 typedef struct CCList {
-    string uris[10];
-    string callids[10];
+    std::string uris[10];
+    std::string callids[10];
     int numUser;
 } cclist;
 
 class ConferenceControl{
     public:
         ConferenceControl();
-	ConferenceControl(string configUri, string cid, bool islocal);
+	ConferenceControl(std::string configUri, std::string cid, bool islocal);
 	//void setGui(Gui *guiptr){gui = guiptr;};
-	void handleGuiCommand(string cmd);
+	void handleGuiCommand(std::string cmd);
 	void handleGuiCommand(const CommandString &command);
-	void handleGuiDoInviteCommand(string sip_url);
+	void handleGuiDoInviteCommand(std::string sip_url);
 	
 	void handleSipCommand(const CommandString &cmd);
-        //virtual void handleGuiCommand(string);
+        //virtual void handleGuiCommand(std::string);
 	void setCallback(ConfCallback *cb);
-	void setPendingList(string user);
-	//string[10] getPendingList();
-	void setConnectedList(string user);
-	//string[10] getConnectedList();
+	void setPendingList(std::string user);
+	//std::string[10] getPendingList();
+	void setConnectedList(std::string user);
+	//std::string[10] getConnectedList();
 	ConfCallback* getCallback();
 	
 	
 	/**
 	* Moves a member from pending to connected and look for new members
 	*/
-	void handleOkAck(string callid, minilist<ConfMember> *list);
+	void handleOkAck(std::string callid, minilist<ConfMember> *list);
 	
 	/**
 	* Print a list of conference members
@@ -77,37 +77,37 @@ class ConferenceControl{
         minilist<ConfMember> * getConnectedList();
         
 	//virtual void run();
-	string confId;
+	std::string confId;
     private:
 	void sendUpdatesToGui();
 	/**
 	* Move a member from pending to connected status
 	*/
-	void pendingToConnected(string memberid);
+	void pendingToConnected(std::string memberid);
 	/**
 	* Check for new members to connect to
 	*/
 	void updateLists(minilist<ConfMember> *list);
-	void removeMember(string memberid); 
-	string addDomainToPrefix(string remoteUri);
+	void removeMember(std::string memberid); 
+	std::string addDomainToPrefix(std::string remoteUri);
 	//Gui *gui;
 	bool incoming;
-        string input;
-        string callId;
-        string state;
+        std::string input;
+        std::string callId;
+        std::string state;
 	ConfCallback *callback;
 	int numConnected;
 	int numPending;
-	//string connectedList[10];
+	//std::string connectedList[10];
 
 	
-	//string pendingList[10];
+	//std::string pendingList[10];
 	//cclist connectedList;
 	
 	minilist<ConfMember> connectedList;
 	minilist<ConfMember> pendingList;
-	string myUri;
-	string myDomain;
+	std::string myUri;
+	std::string myDomain;
 	
 	///a P2T Group Member List
 	//MRef<GroupList*>grpList;

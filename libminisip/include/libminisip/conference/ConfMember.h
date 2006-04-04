@@ -14,11 +14,14 @@
 
 #include<libminisip/libminisip_config.h>
 
+#include<string>
+#include<iostream>
+
 class ConfMember {
 	public:
 	
 		ConfMember(std::string the_uri, std::string the_callid ) {
-			cerr << "creating conf member" << endl;
+			std::cerr << "creating conf member" << std::endl;
 			uri = the_uri ;
 			callid = the_callid;
 		}

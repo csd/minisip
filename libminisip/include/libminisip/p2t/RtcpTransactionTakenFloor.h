@@ -29,7 +29,7 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/SipDialogP2T.h>
 
 /** 
  * sends a Floor TAKEN message to a remote user.

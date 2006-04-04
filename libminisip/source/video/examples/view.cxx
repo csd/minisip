@@ -24,8 +24,8 @@
 
 
 #include<libminisip/video/display/XvDisplay.h>
-//#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/grabber/Grabber.h>
+//#include<libminisip/video/grabber/Dc1394Grabber.h>
+#include<libminisip/video/grabber/V4LGrabber.h>
 #include<libminisip/video/mixer/ImageMixer.h>
 
 

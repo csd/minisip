@@ -23,7 +23,7 @@
 */
 
 #include<config.h>
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/GConfBackend.h>
 
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>

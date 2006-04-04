@@ -24,7 +24,7 @@
 
 #include<assert.h>
 #include<time.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/SipDialogP2T.h>
 #include<libmsip/SipDialogContainer.h>
 //#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionUtils.h>

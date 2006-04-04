@@ -80,13 +80,13 @@
 #ifndef WIN32
 #	include<libminisip/soundcard/OssSoundDevice.h>
 #	ifdef HAVE_LIBASOUND
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/soundcard/AlsaSoundDevice.h>
 #	endif
 #else
 #	ifdef DSOUND
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/soundcard/DirectSoundDevice.h>
 #	elif defined(WAVE_SOUND)
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/soundcard/WaveSoundDevice.h>
 #	else
 #		error "NO Windows AUDIO Defined!"
 #	endif

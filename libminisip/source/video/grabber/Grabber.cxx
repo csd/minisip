@@ -30,10 +30,10 @@
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/video/codec/AVDecoder.h>
 #include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/grabber/V4LGrabber.h>
 
 #ifdef DC1394_SUPPORT
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/grabber/Dc1394Grabber.h>
 #endif
 
 using namespace std;

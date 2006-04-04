@@ -25,10 +25,10 @@
 #include<libminisip/configbackend/ConfBackend.h>
 
 #ifdef GCONF_SUPPORT
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/GConfBackend.h>
 #endif
 
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/MXmlConfBackend.h>
 
 using namespace std;
 

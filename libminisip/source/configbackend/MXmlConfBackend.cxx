@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/MXmlConfBackend.h>
 #include<libminisip/configbackend/UserConfig.h>
 
 #include<libmutil/XMLParser.h>

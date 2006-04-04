@@ -48,7 +48,7 @@
 
 //P2T//
 #include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/SipDialogP2T.h>
 
 
 /** 

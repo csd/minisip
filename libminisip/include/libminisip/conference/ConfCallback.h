@@ -31,6 +31,8 @@
 
 #include<libminisip/conference/ConfMember.h>
 
+#include<string>
+
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
 
@@ -38,12 +40,12 @@ class ConfCallback{
 	
 	public:
 		virtual ~ConfCallback() {}
-		//virtual void guicb_handleConfCommand(string &)=0;
-		virtual void confcb_handleSipCommand(string &)=0;
+		//virtual void guicb_handleConfCommand(std::string &)=0;
+		virtual void confcb_handleSipCommand(std::string &)=0;
 		virtual void confcb_handleSipCommand(const CommandString &)=0;
 		virtual void confcb_handleGuiCommand(const CommandString &)=0;
-		virtual string confcb_doJoin(string user,minilist <ConfMember> *list, string confId)=0;
-		virtual string confcb_doConnect(string user, string confId)=0;
+		virtual std::string confcb_doJoin(std::string user,minilist <ConfMember> *list, std::string confId)=0;
+		virtual std::string confcb_doConnect(std::string user, std::string confId)=0;
 };
 
 #endif

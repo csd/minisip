@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/grabber/Dc1394Grabber.h>
 #include<libminisip/video/ImageHandler.h>
 #include<libminisip/video/VideoMedia.h>
 #include<libminisip/video/VideoException.h>

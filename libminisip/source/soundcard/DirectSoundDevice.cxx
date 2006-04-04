@@ -26,7 +26,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/soundcard/DirectSoundDevice.h>
 
 #include<wincon.h>
 
