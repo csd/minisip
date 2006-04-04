@@ -46,7 +46,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderToFactory;
 
 class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 	public:
-		SipHeaderValueTo(const string &build_from);
+		SipHeaderValueTo(const std::string &build_from);
 		SipHeaderValueTo(const SipUri& uri);
 
 		virtual ~SipHeaderValueTo();
@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP

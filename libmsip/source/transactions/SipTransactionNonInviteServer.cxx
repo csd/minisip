@@ -42,6 +42,8 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
 
+using namespace std;
+
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {

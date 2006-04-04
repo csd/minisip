@@ -58,15 +58,15 @@
 */
 class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClient{
 	public:
-		SipTransactionInviteClientUA(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, string callid);
+		SipTransactionInviteClientUA(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, std::string callid);
 		
 		virtual ~SipTransactionInviteClientUA();
 
 		void changeStateMachine();
 
-		virtual string getMemObjectType(){return "SipTransactionInviteClientUA";}
+		virtual std::string getMemObjectType(){return "SipTransactionInviteClientUA";}
 
-		virtual string getName(){return "transaction_ua_invite_client[branch="+getBranch()+"]";}
+		virtual std::string getName(){return "transaction_ua_invite_client[branch="+getBranch()+"]";}
 	private:
 		/**
 			Transition from CALLING to COMPLETED

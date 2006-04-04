@@ -52,6 +52,8 @@
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderSupported.h>
 
+using namespace std;
+
 MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 		MRef<SipMessage*> pack,
 		string to_tel_no, 

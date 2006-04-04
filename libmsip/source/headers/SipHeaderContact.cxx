@@ -39,6 +39,8 @@
 
 #include<libmsip/SipDialogConfig.h> //needed for the DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS define ...
 
+using namespace std;
+
 MRef<SipHeaderValue *> contactFactory(const string &build_from){
 	return new SipHeaderValueContact(build_from);
 }

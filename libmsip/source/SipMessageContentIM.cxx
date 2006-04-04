@@ -25,7 +25,7 @@
 
 #include<libmsip/SipMessageContentIM.h>
 
-
+using namespace std;
 
 MRef<SipMessageContent*> sipIMMessageContentFactory(const string &buf, const string &){
         return new SipMessageContentIM(buf);

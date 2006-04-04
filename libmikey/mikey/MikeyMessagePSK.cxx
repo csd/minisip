@@ -40,6 +40,8 @@
 
 #include<libmutil/hmac.h>
 
+using namespace std;
+
 MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 		        int encrAlg, int macAlg ):
 			compiled(false), 

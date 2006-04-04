@@ -25,6 +25,8 @@
 
 #include<libmsip/SipHeaderRequire.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> requireFactory(const string &build_from){
 	                return new SipHeaderValueRequire(build_from);
 }

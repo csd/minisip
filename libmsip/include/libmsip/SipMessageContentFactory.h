@@ -33,17 +33,15 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
-using namespace std;
-
-typedef MRef<SipMessageContent*>(*SipMessageContentFactoryFuncPtr)(const string & buf, const string & ContentType);
+typedef MRef<SipMessageContent*>(*SipMessageContentFactoryFuncPtr)(const std::string & buf, const std::string & ContentType);
 
 class LIBMSIP_API SMCFCollection{
 public:
-	void addFactory(string contentType, SipMessageContentFactoryFuncPtr);
-	SipMessageContentFactoryFuncPtr getFactory(const string contentType);
+	void addFactory(std::string contentType, SipMessageContentFactoryFuncPtr);
+	SipMessageContentFactoryFuncPtr getFactory(const std::string contentType);
 	
 private:
-	map<string, SipMessageContentFactoryFuncPtr > factories; // map with content type as key
+	std::map<std::string, SipMessageContentFactoryFuncPtr > factories; // map with content type as key
 };
 
 #endif

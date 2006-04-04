@@ -56,12 +56,12 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionNonInviteServer: public SipTransactionServer{
 	public:
-		SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
+		SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
 		
 		virtual ~SipTransactionNonInviteServer();
 
-		virtual string getMemObjectType(){return "SipTransactionNonInvServer";}
-		virtual string getName(){return "transaction_noninviteserver[branch="+getBranch()+",type="+getDebugTransType()+"]";}
+		virtual std::string getMemObjectType(){return "SipTransactionNonInvServer";}
+		virtual std::string getName(){return "transaction_noninviteserver[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
 		void setUpStateMachine();
 

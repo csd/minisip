@@ -29,6 +29,8 @@
 
 #include<assert.h>
 
+using namespace std;
+
 MikeyPayloadERR::MikeyPayloadERR( int errType ){
 	this->payloadTypeValue = MIKEYPAYLOAD_ERR_PAYLOAD_TYPE;
 	this->errTypeValue = errType;

@@ -24,6 +24,8 @@
 #include<config.h>
 #include<libmutil/CommandString.h>
 
+using namespace std;
+
 CommandString::CommandString(string destination_id, 
 		string operation, 
 		string parameter, 

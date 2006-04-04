@@ -52,7 +52,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderWWWAuthenticateFactory;
  */
 class LIBMSIP_API SipHeaderValueWWWAuthenticate: public SipHeaderValueProxyAuthenticate{
 	public:
-		SipHeaderValueWWWAuthenticate(const string &build_from);
+		SipHeaderValueWWWAuthenticate(const std::string &build_from);
 
 		virtual ~SipHeaderValueWWWAuthenticate();
 

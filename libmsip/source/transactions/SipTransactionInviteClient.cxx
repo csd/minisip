@@ -95,6 +95,8 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipHeaderRequire.h>
 #include<libmutil/dbg.h>
 
+using namespace std;
+
 void SipTransactionInviteClient::rel1xxProcessing(MRef<SipResponse*> resp){
 		// If the server requests PRACK, then we need to start a
 		// client transaction to transmit it.

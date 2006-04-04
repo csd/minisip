@@ -37,6 +37,8 @@
 
 #include<libmutil/itoa.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> viaFactory(const string &build_from){
 	                return new SipHeaderValueVia(build_from);
 }

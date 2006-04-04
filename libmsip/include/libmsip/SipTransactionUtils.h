@@ -38,21 +38,21 @@ class SipResponse;
  * @param resp 		SIP response to check against, for example "100 OK"
  * @param pattern	Pattern, for example "100" or "1**"
  */
-bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const string &pattern);
+bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const std::string &pattern);
 	
 
 #define IGN -1
 
 bool LIBMSIP_API transitionMatch(
-		const string& packetType,
+		const std::string& packetType,
 		const SipSMCommand &command,
 		int source=IGN,
 		int destination=IGN,
-		const string &respFilter="");
+		const std::string &respFilter="");
 
 bool LIBMSIP_API transitionMatch(
 		const SipSMCommand &command,
-		const string &cmd_str,
+		const std::string &cmd_str,
 		int source=IGN,
 		int destination=IGN);
 

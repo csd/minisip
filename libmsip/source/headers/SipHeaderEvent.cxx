@@ -41,6 +41,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 MRef<SipHeaderValue *> eventFactory(const string &build_from){
 	                return new SipHeaderValueEvent(build_from);
 }

@@ -42,6 +42,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 MRef<SipHeaderValue *> refertoFactory(const string &build_from){
 	                return new SipHeaderValueReferTo(build_from);
 }

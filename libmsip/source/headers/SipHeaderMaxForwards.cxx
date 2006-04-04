@@ -37,6 +37,8 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> maxforwardsFactory(const string &build_from){
 	                return new SipHeaderValueMaxForwards(build_from);
 }

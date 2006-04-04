@@ -38,6 +38,8 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> rackFactory(const string &build_from){
 	                return new SipHeaderValueRAck(build_from);
 }

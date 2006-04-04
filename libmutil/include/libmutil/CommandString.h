@@ -31,42 +31,40 @@
 #include<string>
 #include<map>
 
-using namespace std;
-
 class LIBMUTIL_API CommandString : public MObject{
 	public:
-		CommandString(const string destination_id, 
-				const string operation, 
-				const string parameter="", 
-				const string parameter2="", 
-				const string parameter3="");
+		CommandString(const std::string destination_id, 
+				const std::string operation, 
+				const std::string parameter="", 
+				const std::string parameter2="", 
+				const std::string parameter3="");
 
 		CommandString(const CommandString &c);
 		
-		string getDestinationId() const;
-		void setDestinationId(string id);
+		std::string getDestinationId() const;
+		void setDestinationId(std::string id);
 		
-		string getOp() const;
-		void setOp(string op);
+		std::string getOp() const;
+		void setOp(std::string op);
 
-		string getParam() const;
-		void setParam(string param);
+		std::string getParam() const;
+		void setParam(std::string param);
 
-		string getParam2() const;
-		void setParam2(string param2);
+		std::string getParam2() const;
+		void setParam2(std::string param2);
 		
-		string getParam3() const;
-		void setParam3(string param3);
+		std::string getParam3() const;
+		void setParam3(std::string param3);
 		
-		string getString() const;
+		std::string getString() const;
                 virtual std::string getMemObjectType(){return "CommandString";}
 
-		string &operator[](string key);
+		std::string &operator[](std::string key);
 
-		string get(const string &key) const;
+		std::string get(const std::string &key) const;
 
 	private:
-		map<string, string> keys;
+		std::map<std::string, std::string> keys;
 };
 
 #endif

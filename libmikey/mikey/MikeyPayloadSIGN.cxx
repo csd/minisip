@@ -29,6 +29,8 @@
 #include<libmutil/print_hex.h>
 #include<assert.h>
 
+using namespace std;
+
 MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,
 				    int type){
 

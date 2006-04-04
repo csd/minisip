@@ -68,8 +68,8 @@ class SocketServer : public Runnable{
 
 class LIBMSIP_API SipMessageTransport : public virtual MObject{
 	public:
-		SipMessageTransport(string local_ip, 
-							string contactIP,
+		SipMessageTransport(std::string local_ip, 
+							std::string contactIP,
 							int32_t externalContactUdpPort=5060, 
 							int32_t local_udp_port=5060, 
 							int32_t local_tcp_port=5060 
@@ -98,12 +98,12 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		virtual std::string getMemObjectType(){return "SipMessageTransport";}
 
-		void sendMessage(MRef<SipMessage*> pack, const string &branch,
+		void sendMessage(MRef<SipMessage*> pack, const std::string &branch,
 				 bool addVia);
 
 		void addSocket(MRef<StreamSocket *> sock);
 
-		string getLocalIP(){return localIP;};
+		std::string getLocalIP(){return localIP;};
 
 		int32_t getLocalUDPPort(){return localUDPPort;};
 		int32_t getLocalTCPPort(){return localTCPPort;};
@@ -117,18 +117,18 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 	protected:
 		void sendMessage(MRef<SipMessage*> pack, 
-				/*IPAddress &*/ string toaddr, 
+				/*IPAddress &*/ std::string toaddr, 
 				int32_t port, 
-				string branch,
-				string preferredTransport,
+				std::string branch,
+				std::string preferredTransport,
 				bool addVia
 				);
 			
 	private:
-		void addViaHeader( MRef<SipMessage*> pack, MRef<Socket *> socket, string branch );
-		MRef<StreamSocket *> findStreamSocket(/*IPAddress&*/ string, uint16_t);
-		MRef<Socket*> findSocket(const string &transport,
-					 /*IPAddress &*/ string addr,
+		void addViaHeader( MRef<SipMessage*> pack, MRef<Socket *> socket, std::string branch );
+		MRef<StreamSocket *> findStreamSocket(/*IPAddress&*/ std::string, uint16_t);
+		MRef<Socket*> findSocket(const std::string &transport,
+					 /*IPAddress &*/ std::string addr,
 					 uint16_t port);
 		
 		MRef<UDPSocket*> udpsock;
@@ -136,12 +136,12 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		MRef<SocketServer*> tlsSocketServer;
                 
 		Mutex socksLock;
-		list<MRef<StreamSocket *> > socks;
+		std::list<MRef<StreamSocket *> > socks;
 		Mutex socksPendingLock;
-		list<MRef<StreamSocket *> > socksPending;
+		std::list<MRef<StreamSocket *> > socksPending;
 
-		string localIP;
-		string contactIP;
+		std::string localIP;
+		std::string contactIP;
 		int32_t externalContactUdpPort;
 		int32_t localUDPPort;
 		int32_t localTCPPort;

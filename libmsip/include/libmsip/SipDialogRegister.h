@@ -41,14 +41,14 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
+		virtual std::string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 		
 		virtual std::string getMemObjectType(){return "SipDialogRegister";}
 		
-		string getRealm(){return realm;};
-		string getNonce(){return nonce;};
-		void setRealm(string r){realm = r;};
-		void setNonce(string n){nonce = n;};
+		std::string getRealm(){return realm;};
+		std::string getNonce(){return nonce;};
+		void setRealm(std::string r){realm = r;};
+		void setNonce(std::string n){nonce = n;};
 
 		void updateFailCount(){failCount++;};
 		uint32_t getFailCount(){return failCount;};
@@ -58,8 +58,8 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		bool getGuiFeedback(){return guiFeedback;}
 		void setGuiFeedback(bool fb){guiFeedback=fb;}
 
-		void send_noauth(string branch);
-		void send_auth(string branch);
+		void send_noauth(std::string branch);
+		void send_auth(std::string branch);
 	private:
 		bool a0_start_tryingnoauth_register( const SipSMCommand &command);
 		bool a1_tryingnoauth_registred_2xx( const SipSMCommand &command);
@@ -77,12 +77,12 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		
 		void setUpStateMachine();
 
-		string realm;
-		string nonce;
+		std::string realm;
+		std::string nonce;
 		uint32_t failCount;
 		bool guiFeedback;
 
-		string myDomain; // Only used for debuggin - used in getMemObjectType();
+		std::string myDomain; // Only used for debuggin - used in getMemObjectType();
 };
 
 

@@ -29,6 +29,8 @@
 #include<libmutil/print_hex.h>
 #include<assert.h>
 
+using namespace std;
+
 MikeyPayloadPKE::MikeyPayloadPKE( int c, byte_t * dataPtr, 
 		int dataLengthValue ){
 	this->payloadTypeValue = MIKEYPAYLOAD_PKE_PAYLOAD_TYPE;

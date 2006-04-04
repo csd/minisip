@@ -47,7 +47,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderMaxForwardsFactory;
 class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 	public:
 		SipHeaderValueMaxForwards(int32_t mf);
-		SipHeaderValueMaxForwards(const string &build_from);
+		SipHeaderValueMaxForwards(const std::string &build_from);
 
 		virtual ~SipHeaderValueMaxForwards();
 
@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * @return The IP address of the contact header.

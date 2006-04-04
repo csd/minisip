@@ -41,8 +41,6 @@
 
 #include<string>
 
-using namespace std;
-
 /*
 In the following example "name" is a attribute and FILE is an element
    
@@ -64,28 +62,28 @@ In the following example "name" is a attribute and FILE is an element
 
 class LIBMUTIL_API XMLException{
 	public:
-		XMLException(string msg){this->msg=msg;};
-		string what(){return msg;};
+		XMLException(std::string msg){this->msg=msg;};
+		std::string what(){return msg;};
 	private:
-		string msg;
+		std::string msg;
 };
 
 class LIBMUTIL_API XMLElementNotFound: public XMLException{
 	public:
-		XMLElementNotFound(string msg):XMLException(msg){};
+		XMLElementNotFound(std::string msg):XMLException(msg){};
 };
 
 class LIBMUTIL_API XMLFileNotFound: public XMLException{
 	public:
-		XMLFileNotFound(string msg):XMLException(msg){};
+		XMLFileNotFound(std::string msg):XMLException(msg){};
 };
 
 
 class LIBMUTIL_API XMLParserCallback{
 	public:
 		virtual ~XMLParserCallback() {}
-		virtual bool parsedElement(string path, string enclosedText)=0;
-		virtual bool parsedAttribute(string path, string value)=0;
+		virtual bool parsedElement(std::string path, std::string enclosedText)=0;
+		virtual bool parsedAttribute(std::string path, std::string value)=0;
 };
 
 class LIBMUTIL_API XMLNode;
@@ -95,22 +93,22 @@ class LIBMUTIL_API XMLParser{
 		XMLParser(XMLParserCallback *cb=NULL);
 		~XMLParser();
 		
-		string getValue(string path);
-		string getValue(string path, string defaultValue);
+		std::string getValue(std::string path);
+		std::string getValue(std::string path, std::string defaultValue);
 
-		int32_t getIntValue(string path);
-		int32_t getIntValue(string path, int32_t defaultValue);
+		int32_t getIntValue(std::string path);
+		int32_t getIntValue(std::string path, int32_t defaultValue);
 
 		void print();
 		
-		string xmlstring();
+		std::string xmlstring();
 		
-		void addValue(string elementPath, string value);
-		void changeValue(string elemPath, string value, bool addIfMissing=true);
+		void addValue(std::string elementPath, std::string value);
+		void changeValue(std::string elemPath, std::string value, bool addIfMissing=true);
 		
 	protected:
-		void addValue(XMLNode *root, const char *elementPath, string &value, int32_t start=0);
-		void parsestring(const string &s);
+		void addValue(XMLNode *root, const char *elementPath, std::string &value, int32_t start=0);
+		void parsestring(const std::string &s);
 		
 		XMLParserCallback *callback;
 		XMLNode *root;
@@ -118,20 +116,20 @@ class LIBMUTIL_API XMLParser{
 
 class LIBMUTIL_API XMLFileParser : public XMLParser{
 	public:
-		XMLFileParser(string filename="", XMLParserCallback *cb=NULL);
-		void saveToFile(string file="");
+		XMLFileParser(std::string filename="", XMLParserCallback *cb=NULL);
+		void saveToFile(std::string file="");
 	private:
-		string filename;
+		std::string filename;
 };
 
 class LIBMUTIL_API XMLstringParser : public XMLParser{
 	public: 
-		XMLstringParser(const string &s, XMLParserCallback *cb=NULL);
+		XMLstringParser(const std::string &s, XMLParserCallback *cb=NULL);
 };
 
 class LIBMUTIL_API XMLNode{
 	public:
-		XMLNode(int32_t type, string name, string value="");
+		XMLNode(int32_t type, std::string name, std::string value="");
 		virtual ~XMLNode();
 
 		int32_t getType(){return type;};
@@ -142,17 +140,17 @@ class LIBMUTIL_API XMLNode{
 		};
 
 		std::list<XMLNode *>& getNodes();
-		string getName(){return name;};
-		string getValue(){return value;}
-		void setValue(string v){value=v;}
+		std::string getName(){return name;};
+		std::string getValue(){return value;}
+		void setValue(std::string v){value=v;}
 		static XMLNode *getNode(XMLNode *searchNode, const char *path, int32_t start);
 
-		static string generatestring(int32_t index, XMLNode *cur);
+		static std::string generatestring(int32_t index, XMLNode *cur);
 
 		std::list<XMLNode *> subnodes;
 	protected:
-		string name;
-		string value;
+		std::string name;
+		std::string value;
 		int32_t type;
 	private:
 };
@@ -160,7 +158,7 @@ class LIBMUTIL_API XMLNode{
 
 class LIBMUTIL_API XMLAttribute : public XMLNode {
 	public:
-		XMLAttribute(string name, string value);
+		XMLAttribute(std::string name, std::string value);
 		~XMLAttribute();
 		
 	private:
@@ -168,10 +166,10 @@ class LIBMUTIL_API XMLAttribute : public XMLNode {
 
 class LIBMUTIL_API XMLElement : public XMLNode {
 	public:
-		XMLElement(string name);
+		XMLElement(std::string name);
 		~XMLElement();
-		string getEnclosed();
-		void setEnclosed(string encl);
+		std::string getEnclosed();
+		void setEnclosed(std::string encl);
 	private:
 
 };

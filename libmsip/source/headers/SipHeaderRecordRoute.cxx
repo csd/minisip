@@ -41,6 +41,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 MRef<SipHeaderValue *> recordrouteFactory(const string &build_from){
 	                return new SipHeaderValueRecordRoute(build_from);
 }

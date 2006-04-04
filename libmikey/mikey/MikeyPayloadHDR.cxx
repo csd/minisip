@@ -30,6 +30,7 @@
 #include<libmutil/itoa.h>
 #include<assert.h>
 
+using namespace std;
 
 MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, int csbId, 
 		int nCs, int mapType, MRef<MikeyCsIdMap *> map ) {

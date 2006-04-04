@@ -46,7 +46,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderExpiresFactory;
 class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 	public:
 		SipHeaderValueExpires(int n=300);
-		SipHeaderValueExpires(const string &build_from);
+		SipHeaderValueExpires(const std::string &build_from);
 
 		virtual ~SipHeaderValueExpires();
 		
@@ -55,7 +55,7 @@ class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * @return The IP address of the contact header.

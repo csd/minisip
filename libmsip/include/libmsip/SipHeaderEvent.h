@@ -46,7 +46,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderEventFactory;
 
 class LIBMSIP_API SipHeaderValueEvent: public SipHeaderValueString{
 	public:
-		SipHeaderValueEvent(const string &build_from);
+		SipHeaderValueEvent(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderEvent";}
 		

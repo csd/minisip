@@ -59,12 +59,12 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 	public:
-		SipTransactionInviteServer(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
+		SipTransactionInviteServer(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
 		
 		virtual ~SipTransactionInviteServer();
 
-		virtual string getMemObjectType(){return "SipTransactionInvServer";}
-		virtual string getName(){return "transaction_INVITE_responder[branch="+getBranch()+"]";}
+		virtual std::string getMemObjectType(){return "SipTransactionInvServer";}
+		virtual std::string getName(){return "transaction_INVITE_responder[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();
 		
@@ -200,7 +200,7 @@ class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 		bool user_has_accepted;
 		bool user_has_rejected;
 
-		string key_mgmt;
+		std::string key_mgmt;
 		int32_t key_mgmt_method;
 };
 

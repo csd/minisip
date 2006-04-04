@@ -80,6 +80,8 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
                                                                    +----------+
 */  
 
+using namespace std;
+
 //a12 also deals with proxy_register ... but once it is already registered ...
 bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
 

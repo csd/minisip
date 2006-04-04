@@ -29,7 +29,6 @@
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/IPAddress.h>
 
-using namespace std;
 
 class LIBMNETUTIL_API UDPSocket : public Socket {
 	public:

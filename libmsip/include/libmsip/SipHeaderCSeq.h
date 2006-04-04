@@ -47,8 +47,8 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderValueCSeq(const string &method, int seq);
-		SipHeaderValueCSeq(const string &build_from);
+		SipHeaderValueCSeq(const std::string &method, int seq);
+		SipHeaderValueCSeq(const std::string &build_from);
 
 		virtual ~SipHeaderValueCSeq();
 		
@@ -57,7 +57,7 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		
 		/**
@@ -67,11 +67,11 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 		void setCSeq(int32_t n);
 
 
-		string getMethod();
-		void setMethod(const string &method);
+		std::string getMethod();
+		void setMethod(const std::string &method);
 
 	private:
-		string method;
+		std::string method;
 		int32_t seq;
 };
 

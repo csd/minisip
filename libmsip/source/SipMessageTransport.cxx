@@ -56,6 +56,8 @@
 #include<string>
 #include<algorithm>
 
+using namespace std;
+
 #define TIMEOUT 600000
 #define NB_THREADS 5
 #define BUFFER_UNIT 1024

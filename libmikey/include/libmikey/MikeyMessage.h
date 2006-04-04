@@ -105,8 +105,8 @@ class LIBMIKEY_API MikeyMessage{
 		byte_t * rawMessageData();
 		int rawMessageLength();
 		
-		list<MikeyPayload *>::iterator firstPayload();
-		list<MikeyPayload *>::iterator lastPayload();
+		std::list<MikeyPayload *>::iterator firstPayload();
+		std::list<MikeyPayload *>::iterator lastPayload();
 		
 		MikeyPayload * extractPayload( int type );
 		void remove( MikeyPayload * );
@@ -142,7 +142,7 @@ class LIBMIKEY_API MikeyMessage{
 		bool authenticate( KeyAgreementPKE * ka );
 
 	protected:
-		list<MikeyPayload *> payloads;
+		std::list<MikeyPayload *> payloads;
 
 	private:
 		void parse( byte_t *message, int lengthLimit );

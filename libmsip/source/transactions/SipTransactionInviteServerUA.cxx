@@ -92,6 +92,7 @@
 #include<libmutil/termmanip.h>
 #endif
 
+using namespace std;
 
 bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCommand &command){
 

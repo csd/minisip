@@ -29,7 +29,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/split_in_lines.h>
 
-
+using namespace std;
 
 
 /**

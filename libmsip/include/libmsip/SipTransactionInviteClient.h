@@ -59,12 +59,12 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, string callid);
+		SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, std::string callid);
 		
 		virtual ~SipTransactionInviteClient();
 
-		virtual string getMemObjectType(){return "SipTransactionInvCli";}
-		virtual string getName(){return "transaction_invite_client[branch="+getBranch()+"]";}
+		virtual std::string getMemObjectType(){return "SipTransactionInvCli";}
+		virtual std::string getName(){return "transaction_invite_client[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();
 		
@@ -78,7 +78,7 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 		*/
 		void setDialogRouteSet(MRef<SipResponse *> resp);
 
-		void sendAck(MRef<SipResponse *>, string branch="", bool provisional=false); //if no branch specified, use transaction branch attribute
+		void sendAck(MRef<SipResponse *>, std::string branch="", bool provisional=false); //if no branch specified, use transaction branch attribute
 
 	private:
 		

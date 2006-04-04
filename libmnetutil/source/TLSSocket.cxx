@@ -45,6 +45,8 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/MemObject.h>
 
+using namespace std;
+
 int8_t TLSSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphers */
 
 

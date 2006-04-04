@@ -25,6 +25,8 @@
 
 #include<libmsip/SipHeaderUnsupported.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> unsupportedFactory(const string &build_from){
 	                return new SipHeaderValueUnsupported(build_from);
 }

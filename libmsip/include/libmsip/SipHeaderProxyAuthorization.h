@@ -46,16 +46,16 @@ extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthorizationFactory;
 
 class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthorization{
 	public:
-		SipHeaderValueProxyAuthorization(const string &build_from);
+		SipHeaderValueProxyAuthorization(const std::string &build_from);
 		
-		SipHeaderValueProxyAuthorization(const string &sip_method,
-				const string &username, 
-				const string &realm, 
-				const string &nonce, 
+		SipHeaderValueProxyAuthorization(const std::string &sip_method,
+				const std::string &username, 
+				const std::string &realm, 
+				const std::string &nonce, 
 				const SipUri &uri, 
-				const string &auth_id, 
-				const string &password,
-				const string &auth_method="DIGEST");
+				const std::string &auth_id, 
+				const std::string &password,
+				const std::string &auth_method="DIGEST");
 		
 
 		virtual ~SipHeaderValueProxyAuthorization();
@@ -65,7 +65,7 @@ class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthori
 		/**
 		 * returns string representation of the header
 		 */
-		virtual string getString(); 
+		virtual std::string getString(); 
 
 	private:
 	

@@ -36,6 +36,8 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmutil/vmd5.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> authorizationFactory(const string &build_from){
 	return new SipHeaderValueAuthorization(build_from);
 }

@@ -43,6 +43,8 @@
 
 #include<libmsip/SipTransactionUtils.h>
 
+using namespace std;
+
 //all timeouts in miliseconds, please
 //the max total time it will take to shutdown (given you come up with problems),
 //it is SHUTDOWN_CALLS_TIMEOUT + SHUTDOWN_DEREGISTER_TIMEOUT. Pick these values 

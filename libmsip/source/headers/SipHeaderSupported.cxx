@@ -25,6 +25,8 @@
 
 #include<libmsip/SipHeaderSupported.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> supportedFactory(const string &build_from){
 	                return new SipHeaderValueSupported(build_from);
 }

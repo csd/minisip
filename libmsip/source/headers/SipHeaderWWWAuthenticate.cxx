@@ -35,6 +35,8 @@
 #include<libmutil/trim.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> wwwAuthFactory(const string &build_from){
 	                return new SipHeaderValueWWWAuthenticate(build_from);
 }

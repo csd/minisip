@@ -57,12 +57,12 @@ class SipRequest;
 */
 class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionNonInviteClient(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, string callid);
+		SipTransactionNonInviteClient(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, std::string callid);
                 ~SipTransactionNonInviteClient();
 		
-		virtual string getMemObjectType(){return "SipTransactionNonInvCli";}
+		virtual std::string getMemObjectType(){return "SipTransactionNonInvCli";}
 		
-		virtual string getName(){return "transaction_noninviteclient[branch="+getBranch()+",type="+getDebugTransType()+"]";}
+		virtual std::string getName(){return "transaction_noninviteclient[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
 		void setUpStateMachine();
 

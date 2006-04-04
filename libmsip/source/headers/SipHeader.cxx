@@ -48,6 +48,8 @@
 
 #include<vector>
 
+using namespace std;
+
 SipHeaderFactories SipHeader::headerFactories=SipHeaderFactories();
 
 

@@ -31,6 +31,7 @@
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/massert.h>
 
+using namespace std;
 
 int SipIdentity::globalIndex = 1; //give an initial value
 

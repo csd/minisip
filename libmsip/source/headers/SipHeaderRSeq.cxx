@@ -31,6 +31,8 @@
 
 #include<libmutil/itoa.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> rseqFactory(const string &build_from){
 	                return new SipHeaderValueRSeq(build_from);
 }

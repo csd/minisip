@@ -34,6 +34,8 @@
 
 #include<libmsip/SipHeaderSubject.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> subjectFactory(const string &build_from){
 	                return new SipHeaderValueSubject(build_from);
 }

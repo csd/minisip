@@ -68,6 +68,8 @@
 #include<libmutil/dbg.h>
 #include<libmutil/cert.h>
 
+using namespace std;
+
 SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db,

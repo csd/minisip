@@ -29,21 +29,20 @@
 
 #include<libmsip/SipMessageContent.h>
 #include<iostream>
-using namespace std;
 
-MRef<SipMessageContent*> LIBMSIP_API sipIMMessageContentFactory(const string &, const string &ContentType);
+MRef<SipMessageContent*> LIBMSIP_API sipIMMessageContentFactory(const std::string &, const std::string &ContentType);
 
 class LIBMSIP_API SipMessageContentIM : public SipMessageContent{
 public:
-	SipMessageContentIM(string m);
+	SipMessageContentIM(std::string m);
 	
-	virtual string getMemObjectType(){return "SipMessageContentIM";}
+	virtual std::string getMemObjectType(){return "SipMessageContentIM";}
 	
 	virtual std::string getString();
 
 	virtual std::string getContentType();
 private:
-	string msg;
+	std::string msg;
 };
 
 #endif

@@ -47,8 +47,8 @@ class LIBMSIP_API SipHeaderValueRAck: public SipHeaderValue{
 
 	public:
 		
-		SipHeaderValueRAck(const string &method, int responseNum, int cseqNum);
-		SipHeaderValueRAck(const string &build_from);
+		SipHeaderValueRAck(const std::string &method, int responseNum, int cseqNum);
+		SipHeaderValueRAck(const std::string &build_from);
 
 		virtual ~SipHeaderValueRAck();
 		
@@ -57,18 +57,18 @@ class LIBMSIP_API SipHeaderValueRAck: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		int32_t getResponseNum();
 
 		int32_t getCSeqNum();
 
 
-		string getMethod();
-		void setMethod(const string &method);
+		std::string getMethod();
+		void setMethod(const std::string &method);
 
 	private:
-		string method;
+		std::string method;
 		int32_t cseqnum;
 		int32_t respnum;
 };

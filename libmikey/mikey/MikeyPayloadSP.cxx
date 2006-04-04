@@ -26,6 +26,7 @@
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/MikeyException.h>
 
+using namespace std;
 
 //
 // MikeyPolicyParam

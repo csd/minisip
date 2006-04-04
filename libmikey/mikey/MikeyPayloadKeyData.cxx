@@ -29,6 +29,7 @@
 #include<libmutil/print_hex.h>
 #include<assert.h>
 
+using namespace std;
 
 MikeyPayloadKeyData::MikeyPayloadKeyData( int type, byte_t * keyDataPtr, 
 		int keyDataLengthValue, MRef<KeyValidity *> kvPtr ){

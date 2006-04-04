@@ -37,6 +37,7 @@
 
 #include<libmutil/itoa.h>
 
+using namespace std;
 
 SipHeaderValueString::SipHeaderValueString(int type, const string& typeStr, const string &build_from)
 		: SipHeaderValue(type, typeStr)

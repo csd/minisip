@@ -37,7 +37,6 @@
 
 #include<libmutil/MemObject.h>
 
-using namespace std;
 
 /**
    Various lists of ciphers. It includes the default list used,
@@ -81,7 +80,7 @@ template class __declspec(dllexport) MRef<ca_db*>;
 
 class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 	public:
-		TLSSocket(string addr, int32_t port, void * &ssl_ctx,
+		TLSSocket(std::string addr, int32_t port, void * &ssl_ctx,
 			MRef<certificate *> cert = NULL,
 			MRef<ca_db *> cert_db=NULL );
 		
@@ -95,7 +94,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 
 		virtual std::string getMemObjectType(){return "TLSSocket";};
 
-		virtual int32_t write(string);
+		virtual int32_t write(std::string);
 		
 		virtual int32_t write(void *buf, int32_t count);
 		
@@ -123,5 +122,5 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		MRef<ca_db *> cert_db;
 };
 
-TLSSocket& operator<<(TLSSocket& sock, string str);
+TLSSocket& operator<<(TLSSocket& sock, std::string str);
 #endif

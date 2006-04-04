@@ -41,7 +41,6 @@
 
 #include<libmutil/MemObject.h>
 
-using namespace std;
 
 /**
 A SipUri representation.
@@ -68,14 +67,14 @@ class LIBMSIP_API SipUri : public MObject{
 		This constructor, and the setUri function, parse 
 		a uri string. If everything is ok, the uri object is valid
 		*/
-		SipUri(string build_from);
-		void setUri( string buildFrom );
+		SipUri(std::string build_from);
+		void setUri( std::string buildFrom );
 
 		/**
 		Given a string with the inside part of the uri (between, but without, 
 		the '<' and '>' ), parse and set the right parameters.
 		*/
-		void parseUserInfo( string userInfo );
+		void parseUserInfo( std::string userInfo );
 		                
 		/**
 		Sets at once all these params and creates a valid uri ...
@@ -89,46 +88,46 @@ class LIBMSIP_API SipUri : public MObject{
 		(correctly) that the user is an ip ... so ... if this happens, in this particular function,
 		we move the "ip = user" to the "userName = user" ...
 		*/
-		void setParams(string userName, string ip, string userType, int32_t port);
+		void setParams(std::string userName, std::string ip, std::string userType, int32_t port);
 		
 		/**
 		Return the whole uri ...
 		*/
-		string getString() const;
+		std::string getString() const;
 		
 		/**
 		Return only userName@ip
 		*/
-		string getUserIpString() const;
+		std::string getUserIpString() const;
 		
 		/**
 		Return the uri in a valid form to be used as a request uri, 
 		that is, without: display name, '<', '>' and parameters.
 		*/
-		string getRequestUriString() const;
+		std::string getRequestUriString() const;
 
 		virtual std::string getMemObjectType(){return "SipUri";}
 
-		void setDisplayName(string id);
-		string getDisplayName() const;
+		void setDisplayName(std::string id);
+		std::string getDisplayName() const;
 		
-		void setProtocolId(string protocolId);
-		string getProtocolId() const;
+		void setProtocolId(std::string protocolId);
+		std::string getProtocolId() const;
 	
-		void setUser(string id);
-		string getUserName() const;
+		void setUser(std::string id);
+		std::string getUserName() const;
 
-		void setIp(string ip);
-		string getIp() const;
+		void setIp(std::string ip);
+		std::string getIp() const;
 
 		void setPort(int32_t port);
 		int32_t getPort() const;
 
-		void setUserType(string userType);
-		string getUserType() const;
+		void setUserType(std::string userType);
+		std::string getUserType() const;
 
-		void setTransport(string transp);
-		string getTransport() const;
+		void setTransport(std::string transp);
+		std::string getTransport() const;
 		
 		/**
 		Use it to check whether the uri has valid stuff in it ... 
@@ -145,13 +144,13 @@ class LIBMSIP_API SipUri : public MObject{
 		void clear();
 
 	private:
-		string displayName;
-		string protocolId;
-		string userName;
-		string ip;
+		std::string displayName;
+		std::string protocolId;
+		std::string userName;
+		std::string ip;
 		int32_t port;
-		string userType;
-		string transport;
+		std::string userType;
+		std::string transport;
 		
 		bool validUri;
 };

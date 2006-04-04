@@ -30,7 +30,6 @@
 
 #include<string>
 
-using namespace std;
 
 class IPAddress;
 class IP4Address;
@@ -43,16 +42,16 @@ class LIBMNETUTIL_API StreamSocket : public Socket {
 		virtual int32_t read(void *buf, int32_t count)=0;
 
 		// Buffer of the received data;
-		string received;
+		std::string received;
 
 		bool matchesPeer(IPAddress& address, int32_t port);
-		bool matchesPeer(string address, int32_t port);
+		bool matchesPeer(std::string address, int32_t port);
 
 		IPAddress * getPeerAddress();
 		int32_t getPeerPort();
 	protected:
 		IPAddress * peerAddress;
-		string remoteHostUnresolved;
+		std::string remoteHostUnresolved;
 		int32_t peerPort;
 
 };

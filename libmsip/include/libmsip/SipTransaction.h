@@ -50,34 +50,34 @@ class Socket;
 /**
  * SipTransaction
  */
-class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
+class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>{
 	public:
 		
-		SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &cseqMethod, const string &branch, string callid);
+		SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const std::string &cseqMethod, const std::string &branch, std::string callid);
                 
 		virtual ~SipTransaction();
 		
-		virtual string getName()=0;
+		virtual std::string getName()=0;
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual void handleTimeout(const string &c);
+		virtual void handleTimeout(const std::string &c);
 		
-		string getBranch();
-		void setBranch(string branch);
+		std::string getBranch();
+		void setBranch(std::string branch);
 				
 		void setDialog(MRef<SipDialog*> );
-		void send(MRef<SipMessage*>  pack, bool addVia, string branch=""); // if not specified branch, use the attribute one - ok in most cases.
+		void send(MRef<SipMessage*>  pack, bool addVia, std::string branch=""); // if not specified branch, use the attribute one - ok in most cases.
 		void setSocket(Socket * sock){socket=sock;};
 		Socket * getSocket(){return socket;};
 
-		virtual string getMemObjectType(){return "SipTransaction";}
-		void setDebugTransType(string t){debugTransType = t;}
-		string getDebugTransType(){return debugTransType;}
+		virtual std::string getMemObjectType(){return "SipTransaction";}
+		void setDebugTransType(std::string t){debugTransType = t;}
+		std::string getDebugTransType(){return debugTransType;}
 
 		int getCSeqNo(){return cSeqNo;}
 
-		string getCSeqMethod(){return cSeqMethod;}
+		std::string getCSeqMethod(){return cSeqMethod;}
                 
 
 		//The transition to cancel a transaction is common to all
@@ -103,30 +103,30 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,string>{
 		Socket * socket;
 		//IPAddress * toaddr;             //FIXME: This is leaked?
 		int32_t port;
-		string transport;
-		string callId;
+		std::string transport;
+		std::string callId;
 
 		
 	private:
 		MRef<SipMessageDispatcher*> dispatcher;
-		string command;
+		std::string command;
 		int cSeqNo;
-		string cSeqMethod;
-		string branch;
+		std::string cSeqMethod;
+		std::string branch;
 
-		string debugTransType;
+		std::string debugTransType;
 };
 
 
 class LIBMSIP_API SipTransactionClient: public SipTransaction{
         public:
-                SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
+                SipTransactionClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
                 ~SipTransactionClient();
 };
 
 class LIBMSIP_API SipTransactionServer: public SipTransaction{
         public:
-                SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
+                SipTransactionServer(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
                 ~SipTransactionServer();
 };
 

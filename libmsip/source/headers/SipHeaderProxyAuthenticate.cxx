@@ -35,6 +35,8 @@
 #include<libmutil/trim.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> proxyauthFactory(const string &build_from){
 	                return new SipHeaderValueProxyAuthenticate(build_from);
 }

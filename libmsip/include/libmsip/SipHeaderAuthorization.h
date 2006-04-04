@@ -47,29 +47,29 @@ extern SipHeaderFactoryFuncPtr sipHeaderAuthorizationFactory;
 
 class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 	public:
-		SipHeaderValueAuthorization(int type, const string &typeStr);
+		SipHeaderValueAuthorization(int type, const std::string &typeStr);
 		
-		SipHeaderValueAuthorization(const string &build_from);
-		SipHeaderValueAuthorization(int type, const string &build_from, const string &typeStr);
+		SipHeaderValueAuthorization(const std::string &build_from);
+		SipHeaderValueAuthorization(int type, const std::string &build_from, const std::string &typeStr);
 		
-		SipHeaderValueAuthorization(const string &sip_method,
-				const string &username, 
-				const string &realm, 
-				const string &nonce, 
+		SipHeaderValueAuthorization(const std::string &sip_method,
+				const std::string &username, 
+				const std::string &realm, 
+				const std::string &nonce, 
 				const SipUri &uri, 
-				const string &auth_id, 
-				const string &password,
-				const string &auth_method="DIGEST");
+				const std::string &auth_id, 
+				const std::string &password,
+				const std::string &auth_method="DIGEST");
 		
-		SipHeaderValueAuthorization(int type, const string &sip_method,
-				const string &username, 
-				const string &realm, 
-				const string &nonce, 
+		SipHeaderValueAuthorization(int type, const std::string &sip_method,
+				const std::string &username, 
+				const std::string &realm, 
+				const std::string &nonce, 
 				const SipUri &uri, 
-				const string &auth_id, 
-				const string &password,
-				const string &auth_method,
-				const string &typeStr);
+				const std::string &auth_id, 
+				const std::string &password,
+				const std::string &auth_method,
+				const std::string &typeStr);
 
 		
 		virtual ~SipHeaderValueAuthorization();
@@ -79,41 +79,41 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		string getSipMethod();
-		void setSipMethod(const string &meth);
+		std::string getSipMethod();
+		void setSipMethod(const std::string &meth);
 
-		string getUsername();
-		void setUsername(const string &username);
+		std::string getUsername();
+		void setUsername(const std::string &username);
 
-		string getRealm();
-		void setRealm(const string &r);
+		std::string getRealm();
+		void setRealm(const std::string &r);
 
-		string getNonce();
-		void setNonce(const string &n);
+		std::string getNonce();
+		void setNonce(const std::string &n);
 
 		SipUri getUri();
 		void setUri(const SipUri &uri);
 
-		string getResponse();
-		void setResponse(const string &resp);
+		std::string getResponse();
+		void setResponse(const std::string &resp);
 
-		static string md5ToString(unsigned char *md5);
+		static std::string md5ToString(unsigned char *md5);
 	private:
-		string calcResponse();
+		std::string calcResponse();
 		
-		string sipMethod;
-		string username;
-		string realm;
-		string nonce;
+		std::string sipMethod;
+		std::string username;
+		std::string realm;
+		std::string nonce;
 		SipUri uri;
-		string auth_id;
-		string password;
-		string auth_method;
+		std::string auth_id;
+		std::string password;
+		std::string auth_method;
 };
 
 #endif

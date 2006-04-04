@@ -29,6 +29,7 @@
 #include<libmutil/print_hex.h>
 #include<assert.h>
 
+using namespace std;
 
 MikeyPayloadID::MikeyPayloadID( int type, int length, byte_t * data ){
 	this->payloadTypeValue = MIKEYPAYLOAD_ID_PAYLOAD_TYPE;

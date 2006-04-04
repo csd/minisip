@@ -38,6 +38,8 @@
 #include<libmutil/itoa.h>
 #include<libmutil/trim.h>
 
+using namespace std;
+
 // Ex: Route: <sip:vatn@213.100.38.57;ftag=2064763305;lr>,<...>
 
 MRef<SipHeaderValue *> routeFactory(const string &build_from){

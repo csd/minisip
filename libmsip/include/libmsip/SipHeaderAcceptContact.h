@@ -63,32 +63,32 @@ class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 
 	public:
 
-		SipHeaderValueAcceptContact(string build_from);
-		SipHeaderValueAcceptContact(string featuretag, 
+		SipHeaderValueAcceptContact(std::string build_from);
+		SipHeaderValueAcceptContact(std::string featuretag, 
 				bool set_require, 
 				bool set_explicit);
 
 		virtual ~SipHeaderValueAcceptContact();
 
-		string getMemObjectType(){return "SipHeaderAcceptContact";}
+		std::string getMemObjectType(){return "SipHeaderAcceptContact";}
 		
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 		
 		/**
 		 * returns the featuretag
 		 * @return  a string containing the feature tag
 		 */
-		string getFeaturetag(){return featuretag;}
+		std::string getFeaturetag(){return featuretag;}
 
 	private:
 		
 		/**
 		 * the feature that should be supported
 		 */		
-		string featuretag;
+		std::string featuretag;
 		
 		/**
 		 * set the require flag

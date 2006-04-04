@@ -59,12 +59,12 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
-		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch, string callid);
+		SipTransactionInviteServerUA(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
 		
 		virtual ~SipTransactionInviteServerUA();
 
-		virtual string getMemObjectType(){return "SipTransactionInvServerUA";}
-		virtual string getName(){return "transaction_ua_invite_server[branch="+getBranch()+"]";}
+		virtual std::string getMemObjectType(){return "SipTransactionInvServerUA";}
+		virtual std::string getName(){return "transaction_ua_invite_server[branch="+getBranch()+"]";}
 
 		void changeStateMachine();
 

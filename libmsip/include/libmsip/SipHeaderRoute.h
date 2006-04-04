@@ -46,8 +46,8 @@ extern SipHeaderFactoryFuncPtr sipHeaderRouteFactory;
 
 class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 	public:
-		SipHeaderValueRoute(list<string> &routeSet);
-		SipHeaderValueRoute(const string &build_from);
+		SipHeaderValueRoute(std::list<std::string> &routeSet);
+		SipHeaderValueRoute(const std::string &build_from);
 
 		virtual ~SipHeaderValueRoute();
 
@@ -56,12 +56,12 @@ class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
-		string getRoute();
+		std::string getRoute();
 
 	private:
-		string route;
+		std::string route;
 };
 
 #endif

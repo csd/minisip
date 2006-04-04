@@ -45,6 +45,8 @@
 #include<libmutil/dbg.h>
 #endif
 
+using namespace std;
+
 bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand &command) {
 	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::TU,IGN)){
 #ifdef DEBUG_OUTPUT

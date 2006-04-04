@@ -28,6 +28,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 void SMCFCollection::addFactory(string contentType, SipMessageContentFactoryFuncPtr f){
 	factories[contentType] = f;
 }

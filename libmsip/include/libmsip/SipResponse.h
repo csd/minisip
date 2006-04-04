@@ -46,9 +46,9 @@
 class LIBMSIP_API SipResponse : public SipMessage{
 
 	public:
-		static const string type;
+		static const std::string type;
 
-		SipResponse(string branch, int32_t status, string status_desc, MRef<SipMessage*> inv);
+		SipResponse(std::string branch, int32_t status, std::string status_desc, MRef<SipMessage*> inv);
 
 
 		virtual std::string getMemObjectType(){return "SipResponse";}
@@ -57,7 +57,7 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		 * Parses response packet from string representation.
 		 * @param respstr string representation of response packet.
 		 */
-		SipResponse(string &respstr);
+		SipResponse(std::string &respstr);
 
 		/**
 		 * @returns Status code of this response.
@@ -67,20 +67,20 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		/**
 		 * @resutns Returns status description of this response.
 		 */
-		string getStatusDesc();
+		std::string getStatusDesc();
 
-		string getString();
+		std::string getString();
 
-		virtual const string& getType(){return type;}
+		virtual const std::string& getType(){return type;}
 
 	private:
 		int32_t status_code;
-		string status_desc;
+		std::string status_desc;
 
-		string realm;
-		string nonce;
+		std::string realm;
+		std::string nonce;
 
-		string tag;
+		std::string tag;
 };
 
 

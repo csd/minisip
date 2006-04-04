@@ -67,6 +67,8 @@
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 
+using namespace std;
+
 const string SipMessage::anyType="";
 
 #if defined(_MSC_VER) && !defined(_WIN32_WCE)

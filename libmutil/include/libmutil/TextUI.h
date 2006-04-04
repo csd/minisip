@@ -34,7 +34,7 @@
 class LIBMUTIL_API TextUICompletionCallback{
 	public:
 		virtual ~TextUICompletionCallback() {}
-		virtual minilist<string> textuiCompletionSuggestion(string match)=0;
+		virtual minilist<std::string> textuiCompletionSuggestion(std::string match)=0;
 	
 };
 
@@ -74,13 +74,13 @@ public:
 	 * Method to be implemented by a sub-class.
 	 * @param cmd	Command entered by the user (single line)
 	 */
-	virtual void guiExecute(string cmd)=0;
+	virtual void guiExecute(std::string cmd)=0;
 	
 	/**
 	 * @param msg	String to be displayed on the screen
 	 * @param style	Color/bold/plain
 	 */
-	virtual void displayMessage(string msg, int style=-1);
+	virtual void displayMessage(std::string msg, int style=-1);
 
 	/**
 	 * Blocks and runs the gui
@@ -90,13 +90,13 @@ public:
 	/**
 	 * Set the prompt of the UI
 	 */
-	void setPrompt(string p);
+	void setPrompt(std::string p);
 
 	/**
 	 * Add a string to the list of auto-complete commands.
 	 * @param c 	String that the TextUI will use to auto-complete
 	 */
-	void addCommand(string c);
+	void addCommand(std::string c);
 
 	/**
 	 * A fixed set of strings to auto-complete with is not
@@ -104,7 +104,7 @@ public:
 	 * callbacks to retreive strings depending on what the
 	 * user has already written.
 	 */
-	void addCompletionCallback(string match, TextUICompletionCallback *cb);
+	void addCompletionCallback(std::string match, TextUICompletionCallback *cb);
 
 protected:
 	///The maximum number of hints that will be output to the screen.
@@ -137,18 +137,18 @@ private:
 	void *terminalSavedState; //Linux: stores state of console before
 				  //making it non-blocking.
 	
-	void outputSuggestions(minilist<string> &l);
-	string displaySuggestions(string);
+	void outputSuggestions(minilist<std::string> &l);
+	std::string displaySuggestions(std::string);
 
-	string input;
+	std::string input;
 
 	///Formating codes that will not take up any screen columns when printed
 	int promptFormat;
 
-	string promptText; ///The text that is displayed before the "$".
+	std::string promptText; ///The text that is displayed before the "$".
 
 	///List of known commands
-	minilist<string> commands;
+	minilist<std::string> commands;
 
 	///List of commands that can be further completed by asking a callback
 	minilist<struct completion_cb_item> completionCallbacks;

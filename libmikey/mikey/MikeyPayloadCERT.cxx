@@ -30,6 +30,8 @@
 #include<libmutil/print_hex.h>
 #include<assert.h>
 
+using namespace std;
+
 MikeyPayloadCERT::MikeyPayloadCERT( int type, int length, byte_t * data ){
 	this->payloadTypeValue = MIKEYPAYLOAD_CERT_PAYLOAD_TYPE;
 	this->type = type;

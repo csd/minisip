@@ -30,6 +30,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 
+using namespace std;
 
 void SipMessageDispatcher::addTransaction(MRef<SipTransaction*> t){
 	transactions.push_front(t);

@@ -39,6 +39,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmutil/CommandString.h>
 
+using namespace std;
 
 SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
                 StateMachine<SipSMCommand,string>(stack->getTimeoutProvider()), 

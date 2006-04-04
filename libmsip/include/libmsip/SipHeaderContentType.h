@@ -47,7 +47,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderContentTypeFactory;
 
 class LIBMSIP_API SipHeaderValueContentType: public SipHeaderValueString{
 	public:
-		SipHeaderValueContentType(const string &build_from);
+		SipHeaderValueContentType(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderContentType";}
 };

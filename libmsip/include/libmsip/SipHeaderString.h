@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueString: public SipHeaderValue{
 		 * 		"Content-type" etc.
 		 * @param build_from	String that is the header value.
 		 */
-		SipHeaderValueString(int type, const string& typeStr, const string& build_from);
+		SipHeaderValueString(int type, const std::string& typeStr, const std::string& build_from);
 
 		virtual ~SipHeaderValueString();
 		
@@ -65,10 +65,10 @@ class LIBMSIP_API SipHeaderValueString: public SipHeaderValue{
 		 * 	is the string passed to the constructor
 		 * 	with any white space in the ends removed.
 		 */
-		string getString(); 
+		std::string getString(); 
 
 	protected:
-		string str;
+		std::string str;
 };
 
 #endif

@@ -53,6 +53,8 @@
 
 #include<libmsip/SipHeaderAcceptContact.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> acceptContactFactory(const string &build_from){
 	return new SipHeaderValueAcceptContact(build_from);
 }

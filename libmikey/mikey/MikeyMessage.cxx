@@ -50,6 +50,8 @@
 
 #include<map>
 
+using namespace std;
+
 MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
 
 }

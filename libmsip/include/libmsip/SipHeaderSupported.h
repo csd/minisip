@@ -36,7 +36,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderSupportedFactory;
 
 class LIBMSIP_API SipHeaderValueSupported: public SipHeaderValueString{
 	public:
-		SipHeaderValueSupported(const string &build_from);
+		SipHeaderValueSupported(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderSupported";}
 };

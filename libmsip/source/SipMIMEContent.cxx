@@ -30,6 +30,8 @@
 #include<libmutil/massert.h>
 #include <iostream>
 
+using namespace std;
+
 MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const std::string & ContentType) {
 	return new SipMimeContent(buf, ContentType);
 }

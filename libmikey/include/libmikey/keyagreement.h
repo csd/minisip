@@ -136,7 +136,7 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		//For those common cases were the policy type value just is an uint8_t
 		//Only use this function if you know the policy type exist or it is not 0
 		uint8_t getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type);
-		list <Policy_type *> * getPolicy() { return &policy; }
+		std::list <Policy_type *> * getPolicy() { return &policy; }
 
 
 		std::string authError();

@@ -34,6 +34,8 @@
 
 #include<libmsip/SipHeaderUnknown.h>
 
+using namespace std;
+
 const string sipHeaderUnknownTypeString ="";
 
 SipHeaderValueUnknown::SipHeaderValueUnknown(const string &build_from)

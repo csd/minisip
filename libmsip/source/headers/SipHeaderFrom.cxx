@@ -36,6 +36,8 @@
 
 #include<libmutil/trim.h>
 
+using namespace std;
+
 MRef<SipHeaderValue *> fromFactory(const string &build_from){
 	return new SipHeaderValueFrom(build_from);
 }

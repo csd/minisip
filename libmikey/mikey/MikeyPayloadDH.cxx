@@ -30,6 +30,8 @@
 
 #include<assert.h>
 
+using namespace std;
+
 MikeyPayloadDH::MikeyPayloadDH( byte_t * start, int lengthLimit):
 		MikeyPayload( start ){
 	

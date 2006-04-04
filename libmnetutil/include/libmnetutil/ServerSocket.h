@@ -29,7 +29,6 @@
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
-using namespace std;
 
 class LIBMNETUTIL_API ServerSocket : public Socket {
 
@@ -46,7 +45,7 @@ class LIBMNETUTIL_API ServerSocket : public Socket {
 
 	protected:
 		void listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog);
-		void listen(string local_ip, int32_t local_port, int32_t backlog);
+		void listen(std::string local_ip, int32_t local_port, int32_t backlog);
 
 	private:
 		int32_t domain;

@@ -76,45 +76,43 @@
 #define SIP_HEADER_TYPE_RACK			29
 #define SIP_HEADER_TYPE_RSEQ			30
 
-using namespace std;
-
 class SipHeaderValue;
 
-typedef MRef<SipHeaderValue*>(*SipHeaderFactoryFuncPtr)(const string & buf);
+typedef MRef<SipHeaderValue*>(*SipHeaderFactoryFuncPtr)(const std::string & buf);
 
 class LIBMSIP_API SipHeaderFactories{
 	public:
-		void addFactory(string contentType, SipHeaderFactoryFuncPtr);
-		SipHeaderFactoryFuncPtr getFactory(const string contentType);
+		void addFactory(std::string contentType, SipHeaderFactoryFuncPtr);
+		SipHeaderFactoryFuncPtr getFactory(const std::string contentType);
 
 	private:
-		map<string, SipHeaderFactoryFuncPtr > factories;
+		std::map<std::string, SipHeaderFactoryFuncPtr > factories;
 };
 
 class LIBMSIP_API SipHeaderParameter:public MObject{
 	public:
-		SipHeaderParameter(string parseFrom);
-		SipHeaderParameter(string key, string value, bool hasEqual);	//hasEqual is there to support ;lr
-		string getMemObjectType(){return "SipHeaderParameter";}
-		string getKey(){return key;}
-		string getValue(){return value;}
-		void setValue(string v){value=v;}
-		string getString();
+		SipHeaderParameter(std::string parseFrom);
+		SipHeaderParameter(std::string key, std::string value, bool hasEqual);	//hasEqual is there to support ;lr
+		std::string getMemObjectType(){return "SipHeaderParameter";}
+		std::string getKey(){return key;}
+		std::string getValue(){return value;}
+		void setValue(std::string v){value=v;}
+		std::string getString();
 		
 	private:
-		string key;
-		string value;
+		std::string key;
+		std::string value;
 		bool hasEqual;
 
 };
 
 class LIBMSIP_API SipHeaderValue : public MObject{
 	public:
-		SipHeaderValue(int type, const string &hName);
-		virtual string getString()=0;	
+		SipHeaderValue(int type, const std::string &hName);
+		virtual std::string getString()=0;	
 		int getType(){return type;}
 
-		void setParameter(string key, string val){
+		void setParameter(std::string key, std::string val){
 			if (val.size()>0){
 				MRef<SipHeaderParameter*> param = new SipHeaderParameter(key,val,true);
 				addParameter(param);
@@ -136,7 +134,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			parameters.push_back(p);
 		}
 
-		bool hasParameter(const string &key){
+		bool hasParameter(const std::string &key){
 			for (int i=0; i< parameters.size();i++){
 				if (parameters[i]->getKey()==key){
 					return true;
@@ -145,7 +143,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			return false;
 		}
 
-		string getParameter(string key){
+		std::string getParameter(std::string key){
 			for (int i=0; i< parameters.size();i++){
 				if (parameters[i]->getKey()==key){
 					return parameters[i]->getValue();
@@ -154,7 +152,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			return "";
 		}
 
-		void removeParameter(string key){
+		void removeParameter(std::string key){
 			for (int i=0; i< parameters.size(); i++){
 				if (parameters[i]->getKey()==key){
 					parameters.remove(i);
@@ -164,8 +162,8 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 		
 		}
 
-		string getStringWithParameters(){
-			string parameterList;
+		std::string getStringWithParameters(){
+			std::string parameterList;
 			int nparam = parameters.size();
 			for (int i=0; i< nparam; i++){
 				parameterList+=";"+parameters[i]->getString();
@@ -173,7 +171,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			return getString()+parameterList;
 		}
 
-		const string &headerName;
+		const std::string &headerName;
 	protected:
 		int type;
 		minilist<MRef<SipHeaderParameter*> > parameters;
@@ -189,7 +187,7 @@ class LIBMSIP_API SipHeader : public MObject{
                 SipHeader(MRef<SipHeaderValue*> value);
 		virtual ~SipHeader();
 
-		string getString();
+		std::string getString();
 		void addHeaderValue(MRef<SipHeaderValue*> v);
 
                 virtual std::string getMemObjectType(){return "SipHeader";}
@@ -201,11 +199,11 @@ class LIBMSIP_API SipHeader : public MObject{
 			return headerValues[i];
 		}
 
-		static MRef<SipHeader *> parseHeader(const string &buildFrom);
+		static MRef<SipHeader *> parseHeader(const std::string &buildFrom);
 
 	private:
 		int32_t type;
-		string headerName;
+		std::string headerName;
 
 		minilist<MRef<SipHeaderValue*> > headerValues;
 };

@@ -73,8 +73,6 @@
 class SipDialog;
 class SipTransaction;
 
-using namespace std;
-
 class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 	public:
@@ -88,7 +86,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
 				MRef<ca_db *> cert_db = NULL,
-				MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp= NULL
+				MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> tp= NULL
 			  );
 
 
@@ -113,15 +111,15 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		MRef<SipMessageTransport *> getSipTransportLayer(){return transportLayer;}
 
-		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> getTimeoutProvider();
+		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
 
 		//void setSipMessageTransport(...);
 		MRef<SipTimers*> getTimers();
 		MRef<SipCommonConfig*> getStackConfig(){return config;}
 
-		void addSupportedExtension(string extension);
-		string getAllSupportedExtensionsStr();
-		bool supports(string extension);
+		void addSupportedExtension(std::string extension);
+		std::string getAllSupportedExtensionsStr();
+		bool supports(std::string extension);
                 
 	private:
 		MRef<SipTimers*> timers;
@@ -133,9 +131,9 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		MRef<SipMessageTransport *> transportLayer;
 		
-		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> timeoutProvider;
+		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> timeoutProvider;
 
-		list<string> sipExtensions;
+		std::list<std::string> sipExtensions;
 };
 
 

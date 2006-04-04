@@ -27,6 +27,8 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmnetutil/IPAddress.h>
 
+using namespace std;
+
 StreamSocket::~StreamSocket(){
 }
 

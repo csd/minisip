@@ -29,8 +29,6 @@
 
 #include<string>
 
-using namespace std;
-
-LIBMUTIL_API string print_hex( unsigned char * data, int length );
+LIBMUTIL_API std::string print_hex( unsigned char * data, int length );
 
 #endif

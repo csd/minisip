@@ -43,6 +43,8 @@
 
 #include<iostream>
 
+using namespace std;
+
 #ifdef WIN32
 typedef int socklen_t;
 #endif

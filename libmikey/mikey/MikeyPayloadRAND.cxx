@@ -38,7 +38,7 @@
 
 #include<openssl/rand.h>
 
-
+using namespace std;
 
 MikeyPayloadRAND::MikeyPayloadRAND( int randlen, byte_t * randDataPtr ){
 	this->payloadTypeValue = MIKEYPAYLOAD_RAND_PAYLOAD_TYPE;

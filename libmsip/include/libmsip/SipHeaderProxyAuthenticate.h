@@ -59,9 +59,9 @@ extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory;
 class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 	public:
 		
-		SipHeaderValueProxyAuthenticate(int type, string typeStr, const string &build_from);
+		SipHeaderValueProxyAuthenticate(int type, std::string typeStr, const std::string &build_from);
 		
-		SipHeaderValueProxyAuthenticate(const string &build_from);
+		SipHeaderValueProxyAuthenticate(const std::string &build_from);
 
 		virtual ~SipHeaderValueProxyAuthenticate();
 
@@ -70,18 +70,18 @@ class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
-		string getProperty(){return property;}
-		string getValue(){return value;}
+		std::string getProperty(){return property;}
+		std::string getValue(){return value;}
 
 	private:
-		void init(const string& build_from);
+		void init(const std::string& build_from);
 
 		bool hasDigest;
 		bool hasQuotes;
-		string property;
-		string value;
+		std::string property;
+		std::string value;
 		
 		
 };

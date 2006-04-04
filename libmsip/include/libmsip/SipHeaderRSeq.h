@@ -40,13 +40,13 @@ extern SipHeaderFactoryFuncPtr sipHeaderRSeqFactory;
 class LIBMSIP_API SipHeaderValueRSeq: public SipHeaderValue{
 	public:
 		SipHeaderValueRSeq(int32_t rnum);
-		SipHeaderValueRSeq(const string &build_from);
+		SipHeaderValueRSeq(const std::string &build_from);
 
 		virtual ~SipHeaderValueRSeq();
 
                 virtual std::string getMemObjectType(){return "SipHeaderRSeq";}
 		
-		virtual string getString(); 
+		virtual std::string getString(); 
 
 		int32_t getRSeq();
 		

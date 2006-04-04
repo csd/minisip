@@ -51,7 +51,7 @@ class SipHeaderValueTo;
 class SipHeaderValueVia;
 
 
-MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const string & ContentType);
+MRef<SipMessageContent*> sipSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 
 /**
  * Base class for the SIP packet classes.
@@ -63,7 +63,7 @@ MRef<SipMessageContent*> sipSipMessageContentFactory(const string & buf, const s
 class LIBMSIP_API SipMessage : public SipMessageContent{
 
 	public:
-		static const string anyType;
+		static const std::string anyType;
 		
 		virtual std::string getContentType(){ return "message/sipfrag"; };
 
@@ -91,7 +91,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * 			"INVITE"), and for a response it
 		 * 			is the string in SipResponse::type.
 		 */
-		SipMessage(string branch);
+		SipMessage(std::string branch);
 
 
 
@@ -100,12 +100,12 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * Creates a SIP message from a buffer. This superclass
 		 * parses the buffer and creates headers and content.
 		 */
-		SipMessage(int dummy, string &build_from);
+		SipMessage(int dummy, std::string &build_from);
 	public:
 		
 		virtual ~SipMessage();
 
-		static MRef<SipMessage*> createMessage(string &buf); 
+		static MRef<SipMessage*> createMessage(std::string &buf); 
 
 		/**
 			* There are two ways to determine what kind of SIP message
@@ -129,7 +129,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 			*     a request of the string SipResponse::type for
 			*     a response.
 			*/
-		virtual const string& getType()=0;
+		virtual const std::string& getType()=0;
 
 		/**
 		* Adds one header (specialization of SipHeader) to the SIP
@@ -147,7 +147,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                  * @param extension     Extension to check for in the
                  *                      "Require" headers.
                  */
-		bool requires(string extension);
+		bool requires(std::string extension);
 
 
 		/**
@@ -201,7 +201,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 		* @return The command sequence identifier (method part).
 		*/
-		string getCSeqMethod();
+		std::string getCSeqMethod();
 		
 		/**
 		* @return The branch parameter associated with the top
@@ -209,7 +209,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* header or if the branch is not set in the topmost via
 		* header.
 		*/
-		string getFirstViaBranch();
+		std::string getFirstViaBranch();
 
 		/**
 		* @return The top most via header, or a null reference
@@ -221,7 +221,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* @return The branch parameter in the last via header in
 		* the message.
 		*/
-		string getLastViaBranch();
+		std::string getLastViaBranch();
 		
 		/**
 		* @return The last via header or a null reference
@@ -232,7 +232,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 		* @return Call ID in the SIP message.
 		*/
-		string getCallId();
+		std::string getCallId();
 
 		/**
 		* @return The URI in the "From:" header.
@@ -252,21 +252,21 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 		* @return The complete message as a string.
 		*/
-		virtual string getString()=0;
+		virtual std::string getString()=0;
 		
 		/**
 		* @return The headers plus the content as a string. This
 		* is the complete SIP package minus the first line.
 		*/
-		virtual string getHeadersAndContent();
+		virtual std::string getHeadersAndContent();
 
 		/**
 		* @return The warning message contained in Warning: header
 		*/
-		string getWarningMessage();
+		std::string getWarningMessage();
 
 		
-		friend ostream & operator<<(ostream &out, SipMessage &);
+		friend std::ostream & operator<<(std::ostream &out, SipMessage &);
 		std::string getDescription();
 		
 		/**
@@ -275,7 +275,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* If it is non empty string it identifies which
 		* transaction it belongs to.
 		*/
-		string getDestinationBranch();
+		std::string getDestinationBranch();
 
 		/**
 		* @return Number of headers in this message. Notice that
@@ -305,7 +305,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* top Record-Route first).
 		* Return an empty list if no route-set or error.
 		*/
-		list<string> getRouteSet();
+		std::list<std::string> getRouteSet();
 
 		/**
 		 * Set the socket used by SipMessageTransport to send
@@ -327,10 +327,10 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * @param prop	Property to find. For example "nonce".
 		 * @return	First property found from top of message.
 		 */
-		string getAuthenticateProperty(string prop);
+		std::string getAuthenticateProperty(std::string prop);
 
 	protected:
-		void setDestinationBranch(string b){branch = b;}
+		void setDestinationBranch(std::string b){branch = b;}
 
 		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
 
@@ -342,7 +342,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * "factory" is available for the header type (and if the
 		 * string is a valid header of that type)
 		 */
-		bool addLine(string line);
+		bool addLine(std::string line);
 		
 	private: 
 		MRef<SipMessageContent*> content;
@@ -353,10 +353,10 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		
-		int parseHeaders(const string &buf, int startIndex);
+		int parseHeaders(const std::string &buf, int startIndex);
 		MRef<SipHeaderValueVia*> getViaHeader(bool first);
-		string getViaHeaderBranch(bool first);
-		string branch;
+		std::string getViaHeaderBranch(bool first);
+		std::string branch;
 
 		MRef<Socket*> sock;
 };

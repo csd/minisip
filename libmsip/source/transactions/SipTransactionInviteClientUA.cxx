@@ -91,6 +91,7 @@ resp. to TU |  1xx             V                     |   |
 #include<libmutil/MemObject.h>
 #include<libmutil/dbg.h>
 
+using namespace std;
 
 	
 bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMCommand &command) {

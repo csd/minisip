@@ -47,7 +47,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderUserAgentFactory;
 
 class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValueString{
 	public:
-		SipHeaderValueUserAgent(const string &build_from);
+		SipHeaderValueUserAgent(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderUserAgent";}
 };

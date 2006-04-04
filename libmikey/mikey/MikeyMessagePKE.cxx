@@ -40,6 +40,8 @@
 #include <libmutil/aes.h>
 #include <libmutil/hmac.h>
 
+using namespace std;
+
 MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKEY* privKeyInitiator):
 												compiled(false), rawData(NULL){
 

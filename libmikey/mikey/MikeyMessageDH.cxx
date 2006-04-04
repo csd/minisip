@@ -40,6 +40,8 @@
 
 #include<map>
 
+using namespace std;
+
 MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL){
 
 	MRef<certificate_chain *> certChain;

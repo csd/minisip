@@ -46,7 +46,7 @@ class LIBMSIP_API SipDialogManagement: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogManagement";}
 		
-		virtual string getName(){return "SipDialogManagement (The one and only)";}
+		virtual std::string getName(){return "SipDialogManagement (The one and only)";}
 
 		//virtual bool handleCommand(const SipSMCommand &command);
 
@@ -62,8 +62,8 @@ class LIBMSIP_API SipDialogManagement: public SipDialog{
 		d0 - register all identities
 		*/
 		void setUpStateMachine();
-		void setUpStateMachine_shutdown(State<SipSMCommand,string> *s_start);
-		void setUpStateMachine_dialogops(State<SipSMCommand,string> *s_start);
+		void setUpStateMachine_shutdown(State<SipSMCommand,std::string> *s_start);
+		void setUpStateMachine_dialogops(State<SipSMCommand,std::string> *s_start);
 		
 		//SHUTDOWN RELATED TRANSITIONS
 		/**

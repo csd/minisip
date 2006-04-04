@@ -45,6 +45,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 SipUri::SipUri(string buildFrom){
 	setUri( buildFrom );
 }

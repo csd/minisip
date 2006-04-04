@@ -31,6 +31,7 @@
 #include<iostream>
 #include<sys/types.h>
 
+using namespace std;
 
 static bool is_blank(char c){
 	if (c=='\t' || c==' ' || c=='\r' || c=='\n')

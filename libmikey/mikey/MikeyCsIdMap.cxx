@@ -27,6 +27,7 @@
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyCsIdMap.h>
 
+using namespace std;
 
 MikeySrtpCs::MikeySrtpCs( uint8_t policyNo, uint32_t ssrc, uint32_t roc ):
         policyNo( policyNo ), ssrc( ssrc ), roc( roc ){};

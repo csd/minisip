@@ -37,6 +37,7 @@
 
 #include<libmutil/itoa.h>
 
+using namespace std;
 
 MRef<SipHeaderValue *> warningFactory(const string &build_from){
 	                return new SipHeaderValueWarning(build_from);

@@ -30,6 +30,7 @@
 #include<libmutil/itoa.h>
 #include<libmutil/print_hex.h>
 
+using namespace std;
 
 MikeyPayloadKEMAC::MikeyPayloadKEMAC( int encrAlgValue, 
 		int encrDataLengthValue, byte_t * encrDataPtr, 

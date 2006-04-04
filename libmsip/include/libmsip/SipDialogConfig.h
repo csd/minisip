@@ -74,7 +74,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param transport transport to check for (_sip._udp, ... ). If TCP and fails, we will retry 
 		with UDP. If TLS, there is no fallback (they are all unsecured).
 		*/
-		SipProxy(std::string userUri, string transport);
+		SipProxy(std::string userUri, std::string transport);
 		
 		void setProxy(std::string addr, int port);
 
@@ -88,7 +88,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param transport transport protocol to find the host:port settings for
 		@return the proxy hostname (the port is returned by reference)
 		*/
-		static std::string findProxy(std::string uri, uint16_t &port, string transport="UDP");
+		static std::string findProxy(std::string uri, uint16_t &port, std::string transport="UDP");
 
 		std::string sipProxyAddressString;
 		//IPAddress * sipProxyIpAddr;
@@ -98,20 +98,20 @@ class LIBMSIP_API SipProxy : public MObject{
 		std::string sipProxyUsername;
 		std::string sipProxyPassword;
 		
-		void setRegisterExpires( string _expires );
+		void setRegisterExpires( std::string _expires );
 		void setRegisterExpires( int _expires );
-		string getRegisterExpires( );
+		std::string getRegisterExpires( );
 		int getRegisterExpires_int( ) {return registerExpires;}
 		
-		void setDefaultExpires( string _expires );
+		void setDefaultExpires( std::string _expires );
 		void setDefaultExpires( int _expires );
-		string getDefaultExpires( );
+		std::string getDefaultExpires( );
 		int getDefaultExpires_int( ) {return defaultExpires;}
 
-		string getTransport(){ return transport; };
-		void setTransport( string transport ){this->transport = transport; };
+		std::string getTransport(){ return transport; };
+		void setTransport( std::string transport ){this->transport = transport; };
 
-		string getMemObjectType(){return "SipProxy";}
+		std::string getMemObjectType(){return "SipProxy";}
 		
 		/**
 		True to indicate that the proxy settings are to be looked up using DNS SRV
@@ -147,20 +147,20 @@ class LIBMSIP_API SipProxy : public MObject{
 		Transport to use: (if TCP, we can fallback to UDP)
 		- UDP, TCP or TLS
 		*/
-		string transport;
+		std::string transport;
 		
 };
 
 class LIBMSIP_API SipIdentity : public MObject{
 	public:
 		SipIdentity();
-		SipIdentity(string sipuri);
+		SipIdentity(std::string sipuri);
 
-		void setIdentityName(string n);//{identityIdentifier = n;}
+		void setIdentityName(std::string n);//{identityIdentifier = n;}
 		
-		void setSipUri(string addr);
+		void setSipUri(std::string addr);
 		
-		string getSipUri();
+		std::string getSipUri();
 
 		/**
 		@returns the sip proxy used by this identity
@@ -182,7 +182,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		@param port used if autodetect = false ... port number to use for the proxy
 		@return string error message return string ... empty string if everything was ok.
 		*/
-		string setSipProxy( bool autodetect, string userUri, string transport, string proxyAddr, int port );
+		std::string setSipProxy( bool autodetect, std::string userUri, std::string transport, std::string proxyAddr, int port );
 		
 		void setDoRegister(bool f){
 			lock();
@@ -200,24 +200,24 @@ class LIBMSIP_API SipIdentity : public MObject{
 		void lock(){mutex.lock();};
 		void unlock(){mutex.unlock();};
 		
-		string getDebugString();
+		std::string getDebugString();
 
 		virtual std::string getMemObjectType(){return "SipIdentity";}
 		
 		/**
 		This identities index number. Useful to identify it across minisip.
 		*/
-		string getId() { 
+		std::string getId() { 
 			lock();
-			string ret = identityIdx; 
+			std::string ret = identityIdx; 
 			unlock();
 			return ret;
 		}
 		
-		string sipUsername;
-		string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
+		std::string sipUsername;
+		std::string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
 
-		string identityIdentifier;
+		std::string identityIdentifier;
 
 		bool securitySupport;
 
@@ -251,7 +251,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		We will use this index to be able to identify the identities
 		*/
 		static int globalIndex;
-		string identityIdx;
+		std::string identityIdx;
 		
 		/**
 		Indicates whether this identity is currently registered to a proxy.
@@ -272,20 +272,20 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		virtual std::string getMemObjectType(){return "SipCommonConfig";}
 		
 		//shared with Dialog config
-//		string userUri; 	//General->Users SIP address
-		string localIpString; //GEneral->Network Interface
-		string externalContactIP;
+//		std::string userUri; 	//General->Users SIP address
+		std::string localIpString; //GEneral->Network Interface
+		std::string externalContactIP;
 		int32_t externalContactUdpPort;
                 
 		int32_t localUdpPort;	// Advanced -> ...Sip port...
 		int32_t localTcpPort;
 		int32_t localTlsPort;
 		
-// 		string transport;
+// 		std::string transport;
 		/**
 		@return the transport set in the SipProxy (means preferred ... )
 		*/
-		string getTransport();
+		std::string getTransport();
 		
 		/**
 		@return the port in use, depending on the transport.
@@ -313,8 +313,8 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		Socket *proxyConnection; //TODO: verify that this is working ok - it has been moved here from SipSoftPhoneConfiguration
 
 		//Specific to calls
-		string proxyNonce;
-		string proxyRealm;
+		std::string proxyNonce;
+		std::string proxyRealm;
 
 		uint32_t local_ssrc;
 
@@ -328,7 +328,7 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		*/
 		void useIdentity( MRef<SipIdentity*> identity,
 				bool useSecurity,
-				string transport="UDP_X");
+				std::string transport="UDP_X");
 
 };
 

@@ -45,7 +45,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderRecordRouteFactory;
 
 class LIBMSIP_API SipHeaderValueRecordRoute: public SipHeaderValueString{
 	public:
-		SipHeaderValueRecordRoute(const string &build_from);
+		SipHeaderValueRecordRoute(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderRecordRoute";}
 };

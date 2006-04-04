@@ -48,8 +48,8 @@ extern SipHeaderFactoryFuncPtr sipHeaderViaFactory;
 class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 	public:
 		SipHeaderValueVia();
-		SipHeaderValueVia(const string &build_from);
-		SipHeaderValueVia(const string &proto, const string &ip, int32_t port);
+		SipHeaderValueVia(const std::string &build_from);
+		SipHeaderValueVia(const std::string &proto, const std::string &ip, int32_t port);
 
 		virtual ~SipHeaderValueVia();
 
@@ -58,20 +58,20 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		string getProtocol();
-		void setProtocol(const string &protocol);
+		std::string getProtocol();
+		void setProtocol(const std::string &protocol);
 		
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		string getIp();
+		std::string getIp();
 		
-		void setIp(const string &ip);
+		void setIp(const std::string &ip);
 
 
 		/**
@@ -81,8 +81,8 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 		void setPort(int32_t port);
 		
 	private:
-		string protocol;
-		string ip;
+		std::string protocol;
+		std::string ip;
 		int32_t port;
 };
 

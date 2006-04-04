@@ -80,7 +80,7 @@ class LIBMSIP_API SipSMCommand : public MObject{
 #ifdef _WIN32_WCE
         friend LIBMSIP_API Dbg & operator<<(Dbg &, const SipSMCommand &);	
 #else
-        friend LIBMSIP_API ostream & operator<<(ostream &, const SipSMCommand &);
+        friend LIBMSIP_API std::ostream & operator<<(std::ostream &, const SipSMCommand &);
 #endif
 
 //		bool getDispatched() const{return dispatched;}

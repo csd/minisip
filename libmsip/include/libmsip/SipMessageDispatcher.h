@@ -36,8 +36,6 @@
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
 
-using namespace std;
-
 //class SipTransaction;
 
 class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
@@ -52,8 +50,8 @@ class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
 		
-		list<MRef<SipDialog*> > getDialogs() {//return &dialogs;
-			list<MRef<SipDialog*> > l;
+		std::list<MRef<SipDialog*> > getDialogs() {//return &dialogs;
+			std::list<MRef<SipDialog*> > l;
 			dialogListLock.lock();
 			for (int i=0; i< dialogs.size(); i++)
 				l.push_back(dialogs[i]);

@@ -47,6 +47,8 @@
 #include<libmsip/SipException.h>
 #include<libmsip/SipUtils.h>
 
+using namespace std;
+
 const string SipResponse::type="RESPONSE";
 
 SipResponse::SipResponse(string branch, 

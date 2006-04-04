@@ -48,6 +48,8 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
+using namespace std;
+
 SipTransaction::SipTransaction(MRef<SipStack*> stack, MRef<SipDialog*> d, int cseq, const string &cSeqMethod, const string &b, string callid): 
 		StateMachine<SipSMCommand, string>(d->getTimeoutProvider() ), 
 		sipStack(stack),

@@ -42,6 +42,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 MRef<SipHeaderValue *> acceptFactory(const string &build_from){
 	        return new SipHeaderValueAccept(build_from);
 }

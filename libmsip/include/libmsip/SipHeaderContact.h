@@ -50,12 +50,12 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 	public:
 		
 //		SipHeaderValueContact();
-		SipHeaderValueContact(const string &build_from);
-		SipHeaderValueContact(const string &username, 
-				const string &ip, 
+		SipHeaderValueContact(const std::string &build_from);
+		SipHeaderValueContact(const std::string &username, 
+				const std::string &ip, 
 				int32_t port, 
-				const string &usertype="phone", 
-				const string &transport="",
+				const std::string &usertype="phone", 
+				const std::string &transport="",
 				int expires=1000);
 
 		virtual ~SipHeaderValueContact();
@@ -65,7 +65,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
@@ -78,7 +78,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		 * SIP REGISTER message
 		 * @param featuretag
 		 */
-		 void setFeatureTag(string featuretag){this->featuretag=featuretag;}
+		 void setFeatureTag(std::string featuretag){this->featuretag=featuretag;}
 		
 		 /**
 		  * Used to get/set the expires for this contact in the registrar.
@@ -94,7 +94,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		//int expires; //now we only store in the params map ... see SipHeader.h
 		
 		///the featuretag
-		string featuretag;
+		std::string featuretag;
 };
 
 #endif

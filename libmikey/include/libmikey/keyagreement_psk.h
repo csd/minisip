@@ -37,8 +37,6 @@
 #define DH_GROUP_OAKLEY2 2
 
 
-using namespace std;
-
 
 class LIBMIKEY_API KeyAgreementPSK : public KeyAgreement{
 	public:

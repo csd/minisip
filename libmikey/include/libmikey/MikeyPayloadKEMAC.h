@@ -61,7 +61,7 @@ class LIBMIKEY_API MikeyPayloadKEMAC : public MikeyPayload{
 		int encrDataLength();
 		byte_t * encrData();
 
-		list<MikeyPayloadKeyData *> keyData(
+		std::list<MikeyPayloadKeyData *> keyData(
 			      byte_t * encrKey, int encrKeyLength,
 			      byte_t * iv );
 

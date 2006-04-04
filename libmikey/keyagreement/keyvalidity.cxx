@@ -29,6 +29,8 @@
 #include<assert.h>
 #include<libmutil/print_hex.h>
 
+using namespace std;
+
 KeyValidity::KeyValidity(){ 
 	typeValue = KEYVALIDITY_NULL;
 

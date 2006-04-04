@@ -35,7 +35,6 @@
 #include<libmutil/MemObject.h>
 
 #define KeyValidityNull KeyValidity
-using namespace std;
 
 class LIBMIKEY_API KeyValidity : public MObject{
 	public:

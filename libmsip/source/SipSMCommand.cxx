@@ -29,6 +29,8 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipMessage.h>
 
+using namespace std;
+
 const int SipSMCommand::COMMAND_PACKET=1;
 const int SipSMCommand::COMMAND_STRING=2;
 const int SipSMCommand::remote=1;

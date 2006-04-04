@@ -57,99 +57,99 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 * but for PRACK requests you will have to adjust it.
 		 */
 		static MRef<SipRequest*> createSipMessageAck(
-				string branch,
+				std::string branch,
 				MRef<SipMessage*> pack,
-				string to_tel_no,
+				std::string to_tel_no,
 				bool provisional=false);
 
 		static MRef<SipRequest*> createSipMessageBye(
-				string branch,
-				string callId,
-				string target,
-				string to_uri,
-				string from_uri,
+				std::string branch,
+				std::string callId,
+				std::string target,
+				std::string to_uri,
+				std::string from_uri,
 				int32_t seq_no);
 
 		static MRef<SipRequest*> createSipMessageCancel(
-				string branch,
+				std::string branch,
 				MRef<SipRequest*> inv,
-				string to_uri
+				std::string to_uri
 				);
 
 		static MRef<SipRequest*> createSipMessageIMMessage(
-				string branch,
-				string call_id,
+				std::string branch,
+				std::string call_id,
 				std::string toUri,
 				const SipUri& fromUri,
 				int32_t seq_no,
-				string msg);
+				std::string msg);
 
 
 		static MRef<SipRequest*> createSipMessageInvite(
-				const string &branch,
-				const string &call_id,
-				const string &tel_no,
-				const string &proxyAddr,
+				const std::string &branch,
+				const std::string &call_id,
+				const std::string &tel_no,
+				const std::string &proxyAddr,
 				int32_t proxyPort,
-				const string &localAddr,
+				const std::string &localAddr,
 				int32_t localSipPort,
-				const string &from_tel_no,
+				const std::string &from_tel_no,
 				int32_t seq_no,
-				const string &transport,
+				const std::string &transport,
 				MRef<SipStack*> stack
 				);
 
 		static MRef<SipRequest*> createSipMessageInvite(
-				const string &branch,
-				const string &call_id,
-				const string &tel_no,
-				const string &proxyAddr,
+				const std::string &branch,
+				const std::string &call_id,
+				const std::string &tel_no,
+				const std::string &proxyAddr,
 				int32_t proxyPort,
-				const string &localAddr,
+				const std::string &localAddr,
 				int32_t localSipPort,
-				const string &from_tel_no,
+				const std::string &from_tel_no,
 				int32_t seq_no,
-				const string &username,
-				const string &nonce,
-				const string &realm,
-				const string &password,
-				const string &transport,
+				const std::string &username,
+				const std::string &nonce,
+				const std::string &realm,
+				const std::string &password,
+				const std::string &transport,
 				MRef<SipStack*> stack);
 
 		static MRef<SipRequest*> createSipMessageNotify(
-				string branch,
-				string call_id,
+				std::string branch,
+				std::string call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,
 				int32_t seq_no
 				);
 
 		static MRef<SipRequest*> createSipMessageRefer(
-				string branch,
+				std::string branch,
 				MRef<SipRequest*> inv,
-				string to_uri,
-				string from_uri,
-				string referredUri,
+				std::string to_uri,
+				std::string from_uri,
+				std::string referredUri,
 				int cSeqNo);
 
 		static MRef<SipRequest*> createSipMessageRegister(
-				string branch,
-				string call_id,
-				string domainarg,
-				string localIp,
+				std::string branch,
+				std::string call_id,
+				std::string domainarg,
+				std::string localIp,
 				int32_t sip_listen_port,
-				string from_tel_no,
+				std::string from_tel_no,
 				int32_t seq_no,
-				string transport,
+				std::string transport,
 				int expires,
-				string auth_id="",
-				string realm="",
-				string nonce="",
-				string password="");
+				std::string auth_id="",
+				std::string realm="",
+				std::string nonce="",
+				std::string password="");
 
 		static MRef<SipRequest*> createSipMessageSubscribe(
-				string branch,
-				string call_id,
+				std::string branch,
+				std::string call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,
 				int32_t seq_no);
@@ -157,30 +157,30 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 
 
-		SipRequest(string &build_from);
+		SipRequest(std::string &build_from);
 
-		SipRequest(string branch, const string &method,
-				const string &uri = "");
+		SipRequest(std::string branch, const std::string &method,
+				const std::string &uri = "");
 
 		virtual ~SipRequest();
 
 		virtual std::string getMemObjectType(){return "SipRequest("+method+")";}
 
-		virtual string getString();
+		virtual std::string getString();
 
-		virtual const string& getType();
+		virtual const std::string& getType();
 
-		virtual void setMethod(const string &method);
-		virtual string getMethod();
+		virtual void setMethod(const std::string &method);
+		virtual std::string getMethod();
 
-		virtual void setUri(const string &uri);
-		virtual string getUri();
+		virtual void setUri(const std::string &uri);
+		virtual std::string getUri();
 
 		/**
 		 * Insert a route first in the list of routes, forcing
 		 * the request through the proxy.
 		 */
-		void addRoute(const string &route);
+		void addRoute(const std::string &route);
 
 		/**
 		 * Insert a loose route first in the list of routes,
@@ -189,8 +189,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 * it's an empty string, and the default port if port
 		 * is set to zero.
 		 */
-		void addRoute(const string &addr, int32_t port,
-			      const string &transport);
+		void addRoute(const std::string &addr, int32_t port,
+			      const std::string &transport);
 
 
 		/**
@@ -214,17 +214,17 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 */
 		void addDefaultHeaders(const SipUri& fromUri, 
 				const SipUri& toUri, 
-				const string& method, 
+				const std::string& method, 
 				int seqNo, 
-				const string& callId="");
+				const std::string& callId="");
 		
 	protected:
 
-		virtual void init(string &build_from);
+		virtual void init(std::string &build_from);
 
 	private:
-		string method;
-		string uri;
+		std::string method;
+		std::string uri;
 };
 
 

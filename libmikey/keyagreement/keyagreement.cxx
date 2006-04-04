@@ -29,6 +29,8 @@
 #include<string.h>
 #include<libmutil/hmac.h>
 
+using namespace std;
+
 KeyAgreement::KeyAgreement():
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),

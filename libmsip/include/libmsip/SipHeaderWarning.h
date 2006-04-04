@@ -46,8 +46,8 @@ extern SipHeaderFactoryFuncPtr sipHeaderWarningFactory;
 
 class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 	public:
-		SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning);
-		SipHeaderValueWarning(const string &build_from);
+		SipHeaderValueWarning(std::string domainName, uint16_t errorCode, std::string warning);
+		SipHeaderValueWarning(const std::string &build_from);
 
 		virtual ~SipHeaderValueWarning();
 
@@ -56,27 +56,27 @@ class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		string getString(); 
+		std::string getString(); 
 
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		string getWarning();
+		std::string getWarning();
 		
-		void setWarning(const string &ua);
+		void setWarning(const std::string &ua);
 
 		uint16_t getErrorCode();
 
 		void setErrorCode(const uint16_t &errorCodec);
 
-		string getDomainName();
+		std::string getDomainName();
 
-		void setDomainName(const string &domainName);
+		void setDomainName(const std::string &domainName);
 		
 	private:
-		string warning;
+		std::string warning;
 		uint16_t errorCode;
-		string domainName;
+		std::string domainName;
 };
 
 #endif

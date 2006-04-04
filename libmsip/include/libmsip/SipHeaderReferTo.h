@@ -53,7 +53,7 @@ class LIBMSIP_API SipHeaderValueReferTo: public SipHeaderValueString{
 		 * @param build_from	String that is expected to
 		 * 			be a sip uri.
 		 */
-		SipHeaderValueReferTo(const string &build_from);
+		SipHeaderValueReferTo(const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderReferTo";}
 };

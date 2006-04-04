@@ -46,7 +46,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderContentLengthFactory;
 class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 	public:
 		SipHeaderValueContentLength(int32_t length);
-		SipHeaderValueContentLength(const string &build_from);
+		SipHeaderValueContentLength(const std::string &build_from);
 
 		virtual ~SipHeaderValueContentLength();
 		
@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		virtual string getString(); 
+		virtual std::string getString(); 
 
 		/**
 		 * @return The IP address of the contact header.

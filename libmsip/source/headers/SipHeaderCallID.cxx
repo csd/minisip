@@ -41,6 +41,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 MRef<SipHeaderValue *> callidFactory(const string &build_from){
 	                return new SipHeaderValueCallID(build_from);
 }

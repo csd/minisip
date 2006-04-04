@@ -92,6 +92,8 @@
 #include<libmutil/termmanip.h>
 #endif
 
+using namespace std;
+
 /**
  * The first command a INVITE server transaction receives is an INVITE
  * packet. It forwards the packet to the TU/call. We send no 1xx since we

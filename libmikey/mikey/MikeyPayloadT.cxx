@@ -37,6 +37,8 @@
 #	include<sys/time.h>
 #endif
 
+using namespace std;
+
 MikeyPayloadT::MikeyPayloadT(){
 
 	this->payloadTypeValue = MIKEYPAYLOAD_T_PAYLOAD_TYPE;

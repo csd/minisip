@@ -39,8 +39,6 @@
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipRequest.h>
 
-using namespace std;
-
 class SipStack;
 class SipTransaction;
 class SipDialogConfig;
@@ -85,13 +83,13 @@ class LIBMSIP_API SipDialogState{
 		*/
 		bool updateState( MRef<SipResponse*> resp);
 		
-		string callId;
-		string localTag;
-		string remoteTag;
+		std::string callId;
+		std::string localTag;
+		std::string remoteTag;
 		
 		int seqNo;
 		int remoteSeqNo;
-		string localUri;	// not used yet
+		std::string localUri;	// not used yet
 
 		/**
 		When constructing the ACK or follow up in-dialog requests,
@@ -100,11 +98,11 @@ class LIBMSIP_API SipDialogState{
 		the remoteUri (either the To or From uri) and give an error
 		messge.
 		*/
-		string getRemoteTarget();
-		string remoteUri;
-		string remoteTarget;
+		std::string getRemoteTarget();
+		std::string remoteUri;
+		std::string remoteTarget;
 		bool secure;
-		list<string> routeSet;
+		std::list<std::string> routeSet;
 	
 		bool isEarly;
 };
@@ -119,7 +117,7 @@ class LIBMSIP_API SipDialogState{
  * @author Erik Eliasson, eliasson@it.kth.se
  */
 
-class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,string>{
+class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<SipSMCommand,std::string>{
 
 	public:
 		/**
@@ -135,7 +133,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		virtual ~SipDialog();
 		
-		virtual string getMemObjectType(){return "SipDialog";}
+		virtual std::string getMemObjectType(){return "SipDialog";}
 
 		/**
 		 * The SipSMCommand handler.
@@ -143,9 +141,9 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */		
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual string getName()=0;
+		virtual std::string getName()=0;
 
-		virtual void handleTimeout(const string &c);
+		virtual void handleTimeout(const std::string &c);
 		
 		/**
 		 * get the dialog configuration
@@ -157,7 +155,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * get the Call-Id of the dialog
 		 * @return string containing the Call-Id
 		 */
-		string getCallId(){return dialogState.callId;}
+		std::string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * get a reference to the dialog container.
@@ -175,15 +173,15 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		void registerTransaction(MRef<SipTransaction*> trans);
 
-		list<string> getRouteSet(){return dialogState.routeSet;}
+		std::list<std::string> getRouteSet(){return dialogState.routeSet;}
 		
-                list<MRef<SipTransaction*> > getTransactions(){return transactions;}
+                std::list<MRef<SipTransaction*> > getTransactions(){return transactions;}
 
 		SipDialogState dialogState;
 		
 	protected:
 		///a list containing all transactions
-		list<MRef<SipTransaction*> > transactions;
+		std::list<MRef<SipTransaction*> > transactions;
 
 		//the dialog container
 		//MRef<SipDialogContainer*> dialogContainer;
