@@ -6,10 +6,24 @@
 using namespace std;
 #endif
 
-#include"Minisip.h"
+#include<libminisip/Minisip.h>
+
+#include<exception>
+
+#include<libmutil/Timestamp.h>
+#include<libmutil/TextUI.h>
+#include<libmutil/Thread.h>
+
+#ifndef WIN32
+#	ifdef DEBUG_OUTPUT
+#		include<signal.h>
+#		include<libmutil/Timestamp.h>
+#	endif
+#endif
 
 #include<libmutil/termmanip.h>
-#include<libmsip/SipCommandString.h>
+#include<libmutil/MessageRouter.h>
+
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
@@ -17,36 +31,24 @@ using namespace std;
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
-#include<libmsip/SipMessageTransport.h>
+
 #include<libmikey/keyagreement_dh.h>
-#include"ConsoleDebugger.h"
+
+#include<libmsip/SipUtils.h>
+#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipCommandString.h>
+
+#include<libminisip/gui/Gui.h>
+#include<libminisip/gui/ConsoleDebugger.h>
 #include<libminisip/sip/Sip.h>
-#include"LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 #include<libminisip/contactdb/ContactDb.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libminisip/conference/ConferenceControl.h>
 #include<libminisip/conference/ConfCallback.h>
 #include<libminisip/configbackend/ConfBackend.h>
 #include<libminisip/configbackend/MXmlConfBackend.h>
-#include<libmutil/MessageRouter.h>
-#include<libminisip/gui/Gui.h>
-
-#include"ConfMessageRouter.h"
-
-#include<libmsip/SipUtils.h>
-#include<exception>
-#include<libmutil/Timestamp.h>
-#include<libmutil/TextUI.h>
-#include<libmutil/Thread.h>
-
-//extern TextUI *debugtextui;
-
-#ifndef WIN32
-#ifdef DEBUG_OUTPUT
-#include<signal.h>
-#include<libmutil/Timestamp.h>
-#endif
-#endif
+#include<libminisip/conference/ConfMessageRouter.h>
 
 #ifdef OSSO_SUPPORT
 #include<libosso.h>
