@@ -22,8 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"MXmlConfBackend.h"
-#include"../UserConfig.h"
+#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/UserConfig.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>

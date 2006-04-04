@@ -31,7 +31,7 @@
 */
 
 
-#include"SipDialogPresenceClient.h"
+#include<libminisip/sip/SipDialogPresenceClient.h>
 
 #include<libmutil/massert.h>
 #include<libmsip/SipDialogContainer.h>
@@ -44,14 +44,14 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
-#include"DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
-#include"../minisip/LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libmutil/MemObject.h>

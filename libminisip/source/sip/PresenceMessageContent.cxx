@@ -1,5 +1,5 @@
 
-#include"PresenceMessageContent.h"
+#include<libminisip/sip/PresenceMessageContent.h>
 
 MRef<SipMessageContent*> presenceSipMessageContentFactory(const string &buf, const string &){
 	        return new PresenceMessageContent(buf);

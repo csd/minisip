@@ -23,20 +23,20 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include"MediaStream.h"
+#include<libminisip/mediahandler/MediaStream.h>
 
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/keyagreement.h>
-#include"../sdp/SdpHeaderM.h"
-#include"../sdp/SdpHeaderA.h"
-#include"../sdp/SdpPacket.h"
+#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/sdp/SdpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/print_hex.h>
-#include"Media.h"
-#include"RtpReceiver.h"
-#include"../codecs/Codec.h"
+#include<libminisip/mediahandler/Media.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/codecs/Codec.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<iostream>
 

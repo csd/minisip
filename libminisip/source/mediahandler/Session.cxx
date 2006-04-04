@@ -23,23 +23,23 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
-#include"Session.h"
+#include<libminisip/mediahandler/Session.h>
 
-#include"MediaStream.h"
-#include"Media.h"
-#include"AudioMedia.h"
-#include"RtpReceiver.h"
-#include"DtmfSender.h"
-#include"../codecs/Codec.h"
+#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/mediahandler/Media.h>
+#include<libminisip/mediahandler/AudioMedia.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/mediahandler/DtmfSender.h>
+#include<libminisip/codecs/Codec.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include"../sdp/SdpPacket.h"
-#include"../sdp/SdpHeaderV.h"
-#include"../sdp/SdpHeaderT.h"
-#include"../sdp/SdpHeaderC.h"
-#include"../sdp/SdpHeaderA.h"
-#include"../sdp/SdpHeaderM.h"
-#include"../sdp/SdpHeaderS.h"
-#include"../sdp/SdpHeaderO.h"
+#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/sdp/SdpHeaderV.h>
+#include<libminisip/sdp/SdpHeaderT.h>
+#include<libminisip/sdp/SdpHeaderC.h>
+#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/sdp/SdpHeaderS.h>
+#include<libminisip/sdp/SdpHeaderO.h>
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmutil/dbg.h>

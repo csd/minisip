@@ -13,7 +13,7 @@
     
    ******************************************************************/ 
     
-   #include "iLBC_define.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
     
    /*----------------------------------------------------------------* 
     *  Classification of subframes to localize start state                           

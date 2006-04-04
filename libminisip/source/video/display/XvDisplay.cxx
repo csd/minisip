@@ -22,9 +22,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include "XvDisplay.h"
+#include<libminisip/video/display/XvDisplay.h>
 #include<sys/time.h>
-#include"../VideoException.h"
+#include<libminisip/video/VideoException.h>
 
 using namespace std;
 

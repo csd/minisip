@@ -32,7 +32,7 @@
 */
 
 #include<assert.h>
-#include"SipDialogP2Tuser.h"
+#include<libminisip/p2t/SipDialogP2Tuser.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipBye.h>
@@ -53,7 +53,7 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
-#include"../minisip/LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
 
 using namespace std;

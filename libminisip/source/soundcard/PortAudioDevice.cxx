@@ -17,7 +17,7 @@
  */
 
 #include<config.h>
-#include"PortAudioDevice.h"
+#include<libminisip/soundcard/PortAudioDevice.h>
 #include<portaudio.h>
 #include<math.h>
 #include<cstdlib>

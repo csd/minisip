@@ -24,7 +24,7 @@
 
 #ifndef SDL_DISPLAY_H
 #define SDL_DISPLAY_H
-#include"VideoDisplay.h"
+#include<libminisip/video/display/VideoDisplay.h>
 
 #include<SDL/SDL.h>
 #include<X11/Xlib.h>

@@ -28,7 +28,7 @@
 #include<libmutil/MemObject.h>
 #include<string>
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 class ImageHandler;
 class MImage;

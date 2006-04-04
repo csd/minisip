@@ -30,10 +30,10 @@
 
 #include<config.h>
 
-#include"SoundRecorderCallback.h"
+#include<libminisip/soundcard/SoundRecorderCallback.h>
 //class SoundRecorderCallback
 
-//#include"SoundIOPLCInterface.h"
+//#include<libminisip/soundcard/SoundIOPLCInterface.h>
 class SoundIOPLCInterface;
 
 #include<libmutil/Mutex.h>
@@ -41,18 +41,18 @@ class SoundIOPLCInterface;
 
 #include<list>
 #include<string>
-//#include"../spaudio/SpAudio.h"
+//#include<libminisip/spaudio/SpAudio.h>
 
 #ifdef HAVE_LIBASOUND
 #endif
 
-//#include"AudioMixer.h" //this needs to be removed ... change in MRef
+//#include<libminisip/soundcard/AudioMixer.h> //this needs to be removed ... change in MRef
 class AudioMixer;
 
 class SoundSource;
 
 	//we need sounddevice.h for some defines
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 //class SoundDevice;
 
 #ifndef WIN32

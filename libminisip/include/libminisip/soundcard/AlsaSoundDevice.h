@@ -26,7 +26,7 @@
 #ifndef ALSASOUNDDEVICE_H
 #define ALSASOUNDDEVICE_H
 
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API

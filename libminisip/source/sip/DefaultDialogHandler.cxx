@@ -22,15 +22,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
-#include"SipDialogVoipServer.h"
-#include"SipDialogConfVoip.h"
-#include"SipDialogPresenceClient.h"
-#include"SipDialogPresenceServer.h"
+#include<libminisip/sip/SipDialogVoipServer.h>
+#include<libminisip/sip/SipDialogConfVoip.h>
+#include<libminisip/sip/SipDialogPresenceClient.h>
+#include<libminisip/sip/SipDialogPresenceServer.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipHeaderAcceptContact.h>
@@ -49,8 +49,8 @@
 #endif
 
 #ifdef P2T_SUPPORT
-#include"../p2t/SipDialogP2T.h"
-#include"../p2t/SipDialogP2Tuser.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/SipDialogP2Tuser.h>
 #endif
 
 #include<libminisip/mediahandler/MediaHandler.h>

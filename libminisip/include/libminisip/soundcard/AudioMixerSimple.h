@@ -34,7 +34,7 @@
 #define AUDIO_MIXER_SIMPLE_H
 
 #include<config.h>
-#include"AudioMixer.h"
+#include<libminisip/soundcard/AudioMixer.h>
 
 class SoundSource;
 

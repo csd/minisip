@@ -25,14 +25,14 @@
 #ifndef X11_DISPLAY_H
 #define X11_DISPLAY_H
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include"VideoDisplay.h"
+#include<libminisip/video/display/VideoDisplay.h>
 
 
 

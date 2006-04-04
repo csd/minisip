@@ -29,11 +29,11 @@
 
 #include<libmutil/MemObject.h>
 
-#include"Media.h"
-#include"AudioMedia.h"
-#include"MediaStream.h"
-#include"Session.h"
-#include"RtpReceiver.h"
+#include<libminisip/mediahandler/Media.h>
+#include<libminisip/mediahandler/AudioMedia.h>
+#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/mediahandler/Session.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>

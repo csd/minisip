@@ -22,9 +22,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include "X11Display.h"
+#include<libminisip/video/display/X11Display.h>
 #include<sys/time.h>
-#include"../VideoException.h"
+#include<libminisip/video/VideoException.h>
 #include<X11/Xatom.h>
 
 using namespace std;

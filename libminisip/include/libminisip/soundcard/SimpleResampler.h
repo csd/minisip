@@ -26,7 +26,7 @@
 #ifndef SIMPLE_RESAMPLER_H
 #define SIMPLE_RESAMPLER_H
 
-#include"Resampler.h"
+#include<libminisip/soundcard/Resampler.h>
 
 class SimpleResampler : public Resampler {
 	public: 

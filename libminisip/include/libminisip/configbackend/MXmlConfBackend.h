@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include"ConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 
 class XMLFileParser;
 

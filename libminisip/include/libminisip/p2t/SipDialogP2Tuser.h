@@ -47,8 +47,8 @@
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 //P2T//
-#include"P2T.h"
-#include"SipDialogP2T.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/P2T.h>
 
 
 /** 

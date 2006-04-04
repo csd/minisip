@@ -31,7 +31,7 @@
 
 
 #include<config.h>
-#include "AudioMixer.h"
+#include<libminisip/soundcard/AudioMixer.h>
 
 using namespace std;
 

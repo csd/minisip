@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<list>
 #include<string>
-#include"ContactDb.h"
+#include<libminisip/contactdb/ContactDb.h>
 
 class PhoneBookPerson;
 class PhoneBookIo;

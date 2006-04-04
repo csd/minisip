@@ -30,7 +30,7 @@
 
 #include<config.h>
 
-#include"RtpPacket.h"
+#include<libminisip/rtp/RtpPacket.h>
 #include<libmutil/aes.h>
 #include<libmutil/hmac.h>
 #include<libmutil/MemObject.h>

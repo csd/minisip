@@ -27,10 +27,10 @@
 
 #include<config.h>
 
-#include"RtcpAPPHeader.h"
+#include<libminisip/p2t/RtcpAPPHeader.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
-#include"P2T.h"
+#include<libminisip/p2t/P2T.h>
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 

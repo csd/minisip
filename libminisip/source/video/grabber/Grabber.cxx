@@ -24,16 +24,16 @@
 
 #include<config.h>
 #include<libmutil/dbg.h>
-#include"../VideoMedia.h"
-#include"../VideoException.h"
-#include"../../codecs/Codec.h"
-#include"../display/VideoDisplay.h"
-#include"../codec/AVDecoder.h"
-#include"Grabber.h"
-#include"V4LGrabber.h"
+#include<libminisip/video/VideoMedia.h>
+#include<libminisip/video/VideoException.h>
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/codec/AVDecoder.h>
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/grabber/Grabber.h>
 
 #ifdef DC1394_SUPPORT
-#include"Dc1394Grabber.h"
+#include<libminisip/video/grabber/Grabber.h>
 #endif
 
 using namespace std;

@@ -33,7 +33,7 @@
 
 
 
-#include"GroupListUserElement.h"
+#include<libminisip/p2t/GroupListUserElement.h>
 
 GroupListUserElement::GroupListUserElement(string uri, IPAddress* addr, int RTPport, int RTCPport, Codec *codec,
 			int priority,

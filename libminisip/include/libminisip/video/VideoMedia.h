@@ -26,13 +26,13 @@
 #define VIDEO_MEDIA_H
 
 #include<libminisip/mediahandler/MediaHandler.h>
-#include"ImageHandler.h"
-#include"display/VideoDisplay.h"
-#include"codec/AVDecoder.h"
-#include"codec/VideoEncoderCallback.h"
-#include"grabber/Grabber.h"
+#include<libminisip/video/ImageHandler.h>
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/codec/AVDecoder.h>
+#include<libminisip/video/codec/VideoEncoderCallback.h>
+#include<libminisip/video/grabber/Grabber.h>
 
-#include"../codecs/Codec.h"
+#include<libminisip/codecs/Codec.h>
 
 #define MAX_SOURCES 256
 

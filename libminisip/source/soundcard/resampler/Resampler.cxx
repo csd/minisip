@@ -24,11 +24,11 @@
 */
 
 #include<config.h>
-#include"Resampler.h"
-#include"SimpleResampler.h"
+#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/soundcard/SimpleResampler.h>
 
 #ifdef FLOAT_RESAMPLER
-#include"FloatResampler.h"
+#include<libminisip/soundcard/Resampler.h>
 #endif
 
 #include<iostream>

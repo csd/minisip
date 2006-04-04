@@ -25,7 +25,7 @@
 #ifndef VIDEO_DISPLAY_H
 #define VIDEO_DISPLAY_H
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>

@@ -17,7 +17,7 @@
    #ifndef __ENHANCER_H 
    #define __ENHANCER_H 
     
-   #include "iLBC_define.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
     
    float xCorrCoef(  
        float *target,      /* (i) first array */ 

@@ -22,10 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"V4LGrabber.h"
-#include"../VideoMedia.h"
-#include"../VideoException.h"
-#include"../ImageHandler.h"
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/VideoMedia.h>
+#include<libminisip/video/VideoException.h>
+#include<libminisip/video/ImageHandler.h>
 #include<stdio.h>
 #include<fcntl.h>
 #include<sys/ioctl.h>

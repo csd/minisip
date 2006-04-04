@@ -26,9 +26,9 @@
 #ifndef _FILESOUNDSOURCE_H
 #define _FILESOUNDSOURCE_H
 
-//#include"SoundIO.h"
+//#include<libminisip/soundcard/SoundIO.h>
 
-#include"SoundSource.h"
+#include<libminisip/soundcard/SoundSource.h>
 
 class Resampler;
 

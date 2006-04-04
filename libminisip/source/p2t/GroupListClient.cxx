@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include "GroupListClient.h"
+#include<libminisip/p2t/GroupListClient.h>
 #include <libmutil/dbg.h>
 #include <libmutil/itoa.h>
 #include <libmutil/merror.h>

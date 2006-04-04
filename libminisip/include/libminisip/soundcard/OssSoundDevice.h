@@ -26,7 +26,7 @@
 #ifndef OSSSOUNDDEVICE_H
 #define OSSSOUNDDEVICE_H
 
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 #ifndef DISABLE_OSS
 

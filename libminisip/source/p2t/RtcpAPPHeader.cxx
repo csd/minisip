@@ -22,8 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpAPPHeader.h"
-#include"RtcpAPP.h"
+#include<libminisip/p2t/RtcpAPPHeader.h>
+#include<libminisip/p2t/RtcpAPP.h>
 #include<libmutil/dbg.h>
 
 

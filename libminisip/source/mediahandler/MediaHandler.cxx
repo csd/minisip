@@ -22,38 +22,38 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"MediaHandler.h"
+#include<libminisip/mediahandler/MediaHandler.h>
 
 #include<string.h>
-#include"../sdp/SdpPacket.h"
+#include<libminisip/sdp/SdpPacket.h>
 #include<libmikey/keyagreement.h>
 #include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include"../codecs/Codec.h"
-#include"Session.h"
-#include"MediaStream.h"
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/mediahandler/Session.h>
+#include<libminisip/mediahandler/MediaStream.h>
 
-#include"Media.h"
-#include"RtpReceiver.h"
-#include"MediaCommandString.h"
+#include<libminisip/mediahandler/Media.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/mediahandler/MediaCommandString.h>
 #include<libmnetutil/UDPSocket.h>
 
-#include"../soundcard/SoundIO.h"
-#include"../soundcard/SoundDevice.h"
-#include"../codecs/Codec.h"
+#include<libminisip/soundcard/SoundIO.h>
+#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/codecs/Codec.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 #ifdef VIDEO_SUPPORT
-#include"../video/grabber/Grabber.h"
-#include"../video/display/VideoDisplay.h"
-#include"../video/codec/VideoCodec.h"
-#include"../video/codec/AVCoder.h"
-#include"../video/codec/AVDecoder.h"
-#include"../video/mixer/ImageMixer.h"
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/codec/VideoCodec.h>
+#include<libminisip/video/codec/AVCoder.h>
+#include<libminisip/video/codec/AVDecoder.h>
+#include<libminisip/video/mixer/ImageMixer.h>
 #endif
 
 

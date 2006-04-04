@@ -23,7 +23,7 @@
 */
 
 
-#include"LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 
 #include<libmutil/MemObject.h>
 #include<string>

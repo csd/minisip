@@ -29,8 +29,8 @@
 #include<config.h>
 #include<libmutil/MemObject.h>
 #include<libmnetutil/IPAddress.h>
-#include"P2T.h"
-#include"GroupList.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/GroupList.h>
 
 
 /**

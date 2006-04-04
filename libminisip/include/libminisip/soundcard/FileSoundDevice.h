@@ -37,7 +37,7 @@
 #	include<unistd.h>
 #endif
 
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 #include<stdio.h>
 #include <fcntl.h>

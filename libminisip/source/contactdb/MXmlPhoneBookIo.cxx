@@ -22,10 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"MXmlPhoneBookIo.h"
+#include<libminisip/contactdb/MXmlPhoneBookIo.h>
 
-#include"PhoneBook.h"
-#include"ContactDb.h"
+#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/contactdb/ContactDb.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>

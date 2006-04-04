@@ -33,8 +33,8 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
-#include"SipDialogP2T.h"
-#include"GroupListUserElement.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/GroupListUserElement.h>
 
 //#include<config.h>
 

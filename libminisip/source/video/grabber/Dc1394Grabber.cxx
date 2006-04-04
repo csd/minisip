@@ -22,10 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"Dc1394Grabber.h"
-#include"../ImageHandler.h"
-#include"../VideoMedia.h"
-#include"../VideoException.h"
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/ImageHandler.h>
+#include<libminisip/video/VideoMedia.h>
+#include<libminisip/video/VideoException.h>
 #include<stdio.h>
 #include<libmutil/mtime.h>
 #include<libmutil/itoa.h>

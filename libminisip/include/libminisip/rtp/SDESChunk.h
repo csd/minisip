@@ -28,7 +28,7 @@
 #include<config.h>
 
 #include<vector>
-#include"SDESItem.h"
+#include<libminisip/rtp/SDESItem.h>
 using namespace std;
 
 class SDESChunk{

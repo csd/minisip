@@ -17,11 +17,11 @@
    #include <math.h> 
    #include <string.h> 
     
-   #include "iLBC_define.h" 
-   #include "gainquant.h" 
-   #include "createCB.h" 
-   #include "filter.h" 
-   #include "constants.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
+   #include<libminisip/codecs/ilbc/gainquant.h> 
+   #include<libminisip/codecs/ilbc/createCB.h> 
+   #include<libminisip/codecs/ilbc/filter.h> 
+   #include<libminisip/codecs/ilbc/constants.h> 
     
    /*----------------------------------------------------------------* 
     *  Search routine for codebook encoding and gain quantization. 

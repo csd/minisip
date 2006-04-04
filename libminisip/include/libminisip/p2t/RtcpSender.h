@@ -38,7 +38,7 @@
 
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
-#include"P2T.h"
+#include<libminisip/p2t/P2T.h>
 
 #include<libmsip/SipDialog.h>
 

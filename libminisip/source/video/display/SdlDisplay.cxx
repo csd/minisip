@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include "SdlDisplay.h"
+#include<libminisip/video/display/SdlDisplay.h>
 #include<config.h>
 #include<sys/time.h>
 #include<SDL/SDL_syswm.h>

@@ -25,8 +25,8 @@
 #ifndef AV_CODEC_H
 #define AV_CODEC_H
 
-#include"../ImageHandler.h"
-#include"../../codecs/Codec.h"
+#include<libminisip/video/ImageHandler.h>
+#include<libminisip/codecs/Codec.h>
 
 class MediaStreamSender;
 class AVEncoder;

@@ -22,23 +22,23 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"Media.h"
+#include<libminisip/mediahandler/Media.h>
 
-#include"../codecs/Codec.h"
-#include"../soundcard/SoundIO.h"
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/soundcard/SoundIO.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include"MediaStream.h"
-#include"RtpReceiver.h"
+#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
 #include<libmutil/itoa.h>
-#include"../sdp/SdpHeaderM.h"
-#include"../sdp/SdpHeaderA.h"
+#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/sdp/SdpHeaderA.h>
 
 #ifdef VIDEO_SUPPORT
-#include"../video/codec/VideoCodec.h"
-#include"../video/codec/VideoEncoderCallback.h"
-#include"../video/grabber/Grabber.h"
-#include"../video/display/VideoDisplay.h"
-#include"../video/mixer/ImageMixer.h"
+#include<libminisip/video/codec/VideoCodec.h>
+#include<libminisip/video/codec/VideoEncoderCallback.h>
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/mixer/ImageMixer.h>
 #endif
 #include<libmutil/print_hex.h>
 

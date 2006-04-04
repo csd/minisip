@@ -31,7 +31,7 @@
 */
 
 
-#include"SipDialogPresenceServer.h"
+#include<libminisip/sip/SipDialogPresenceServer.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
@@ -42,19 +42,19 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
-#include"DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
-#include"../minisip/LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipHeaderExpires.h>
-#include"PresenceMessageContent.h"
+#include<libminisip/sip/PresenceMessageContent.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

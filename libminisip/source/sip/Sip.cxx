@@ -23,9 +23,9 @@
  *	    Joachim Orrblad <joachim[at]orrblad.com>
 */
 
-#include"Sip.h"
+#include<libminisip/sip/Sip.h>
 
-#include"DefaultDialogHandler.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
 //#include<libminisip/mediahandler/MediaHandler.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipMessageContentIM.h>
@@ -35,16 +35,16 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmsip/SipDialogManagement.h>
-#include"SipDialogVoipClient.h"
-#include"SipDialogConfVoip.h"
+#include<libminisip/sip/SipDialogVoipClient.h>
+#include<libminisip/sip/SipDialogConfVoip.h>
 #include<libmsip/SipCommandString.h>
-#include"../p2t/SipDialogP2T.h"
-#include"../p2t/GroupListClient.h"
-#include"../p2t/GroupListServer.h"
-#include"../p2t/GroupList.h"
-#include"PresenceMessageContent.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/GroupListClient.h>
+#include<libminisip/p2t/GroupListServer.h>
+#include<libminisip/p2t/GroupList.h>
+#include<libminisip/sip/PresenceMessageContent.h>
 
 #include<libmutil/dbg.h>
 #include<libmutil/termmanip.h>

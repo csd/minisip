@@ -31,8 +31,8 @@
 */
 
 #include<assert.h>
-#include"RtcpTransactionGetFloor.h"
-#include"P2T.h"
+#include<libminisip/p2t/RtcpTransactionGetFloor.h>
+#include<libminisip/p2t/P2T.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialog.h>

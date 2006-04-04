@@ -26,7 +26,7 @@
 #define STUNMESSAGE_H
 
 #include<list>
-#include"STUNAttributes.h"
+#include<libminisip/stun/STUNAttributes.h>
 
 using namespace std;
 

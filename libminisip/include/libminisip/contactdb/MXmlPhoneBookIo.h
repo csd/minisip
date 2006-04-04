@@ -26,7 +26,7 @@
 #define MXML_PHONEBOOK_IO_H
 
 #include<config.h>
-#include"PhoneBook.h"
+#include<libminisip/contactdb/PhoneBook.h>
 #include<string>
 
 /* Uses mutil/XMLParser to read and save a phonebook file */

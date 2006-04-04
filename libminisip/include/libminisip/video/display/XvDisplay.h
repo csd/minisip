@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
@@ -32,8 +32,8 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
-#include"VideoDisplay.h"
-#include"X11Display.h"
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/display/X11Display.h>
 
 
 

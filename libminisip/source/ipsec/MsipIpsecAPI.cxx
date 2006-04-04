@@ -28,7 +28,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <linux/ipsec.h>
-#include "MsipIpsecAPI.h"
+#include<libminisip/ipsec/MsipIpsecAPI.h>
 #include <libmikey/keyagreement.h>
 #include <libmikey/MikeyCsIdMap.h>
 #include <libmikey/MikeyMessage.h>
@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <iostream>
 extern "C" {
-#include "libpfkey.h"
+#include<libminisip/ipsec/libpfkey.h>
 }
 
 

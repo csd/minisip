@@ -23,10 +23,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 
-#include"SimpleIpProvider.h"
-#include"StunIpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
+#include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 #ifdef _WIN32_WCE

@@ -23,7 +23,7 @@
  *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
-#include"OssSoundDevice.h"
+#include<libminisip/soundcard/OssSoundDevice.h>
 
 #ifndef DISABLE_OSS
 #include<config.h>

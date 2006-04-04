@@ -22,16 +22,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtpReceiver.h"
+#include<libminisip/mediahandler/RtpReceiver.h>
 
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/Thread.h>
 
-#include"../rtp/SRtpPacket.h"
-#include"../codecs/Codec.h"
+#include<libminisip/rtp/SRtpPacket.h>
+#include<libminisip/codecs/Codec.h>
 #include<iostream>
-#include"MediaStream.h"
+#include<libminisip/mediahandler/MediaStream.h>
 #include<libminisip/ipprovider/IpProvider.h>
 
 #include<libmutil/itoa.h> //for debug ... remove ... cesc

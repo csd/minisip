@@ -23,10 +23,10 @@
 */
 
 
-#include"../display/XvDisplay.h"
-//#include"../grabber/Dc1394Grabber.h"
-#include"../grabber/V4LGrabber.h"
-#include"../mixer/ImageMixer.h"
+#include<libminisip/video/display/XvDisplay.h>
+//#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/mixer/ImageMixer.h>
 
 
 int main(){

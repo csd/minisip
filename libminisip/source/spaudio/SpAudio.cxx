@@ -23,11 +23,11 @@
 */
 
 
-#include "SpAudio.h"
+#include<libminisip/spaudio/SpAudio.h>
 
 #include<string.h> //for memset
 
-#include"../soundcard/SoundSource.h"
+#include<libminisip/soundcard/SoundSource.h>
 
 #include<libmutil/itoa.h> //cesc ... remove
 

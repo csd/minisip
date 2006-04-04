@@ -25,7 +25,7 @@
 #ifndef GRABBER_H
 #define GRABBER_H
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>

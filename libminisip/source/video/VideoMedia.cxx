@@ -24,16 +24,16 @@
 
 #include<config.h>
 
-#include"VideoMedia.h"
-#include"../codecs/Codec.h"
-#include"codec/VideoCodec.h"
-#include"codec/AVDecoder.h"
-#include"codec/AVCoder.h"
-#include"grabber/Grabber.h"
-#include"mixer/ImageMixer.h"
-#include"display/VideoDisplay.h"
-#include"../sdp/SdpHeaderM.h"
-#include"../sdp/SdpHeaderA.h"
+#include<libminisip/video/VideoMedia.h>
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/video/codec/VideoCodec.h>
+#include<libminisip/video/codec/AVDecoder.h>
+#include<libminisip/video/codec/AVCoder.h>
+#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/mixer/ImageMixer.h>
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/sdp/SdpHeaderA.h>
 #include<libmutil/itoa.h>
 #include<libmutil/massert.h>
 

@@ -22,7 +22,7 @@
 #include<portaudio.h>
 #include<libmutil/CircularBuffer.h>
 #include<libmutil/CondVar.h>
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 typedef void PortAudioStream;
 

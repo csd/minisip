@@ -16,18 +16,18 @@
    #include <math.h> 
    #include <stdlib.h> 
     
-   #include "iLBC_define.h" 
-   #include "StateConstructW.h" 
-   #include "LPCdecode.h" 
-   #include "iCBConstruct.h" 
-   #include "doCPLC.h" 
-   #include "helpfun.h" 
-   #include "constants.h" 
-   #include "packing.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
+   #include<libminisip/codecs/ilbc/StateConstructW.h> 
+   #include<libminisip/codecs/ilbc/LPCdecode.h> 
+   #include<libminisip/codecs/ilbc/iCBConstruct.h> 
+   #include<libminisip/codecs/ilbc/doCPLC.h> 
+   #include<libminisip/codecs/ilbc/helpfun.h> 
+   #include<libminisip/codecs/ilbc/constants.h> 
+   #include<libminisip/codecs/ilbc/packing.h> 
    #include "string.h" 
-   #include "enhancer.h" 
-   #include "hpOutput.h" 
-   #include "syntFilter.h" 
+   #include<libminisip/codecs/ilbc/enhancer.h> 
+   #include<libminisip/codecs/ilbc/hpOutput.h> 
+   #include<libminisip/codecs/ilbc/syntFilter.h> 
     
    /*----------------------------------------------------------------* 
     *  Initiation of decoder instance. 

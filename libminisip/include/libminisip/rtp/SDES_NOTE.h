@@ -27,7 +27,7 @@
 
 #include<config.h>
 
-#include"SDESItem.h"
+#include<libminisip/rtp/SDESItem.h>
 
 #include<string>
 

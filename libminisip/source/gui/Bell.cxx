@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"Bell.h"
+#include<libminisip/gui/Bell.h>
 
 #include<stdlib.h>
 #include<stdio.h>

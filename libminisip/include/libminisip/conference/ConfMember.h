@@ -17,14 +17,14 @@
 class ConfMember {
 	public:
 	
-		ConfMember(string the_uri, string the_callid ) {
+		ConfMember(std::string the_uri, std::string the_callid ) {
 			cerr << "creating conf member" << endl;
 			uri = the_uri ;
 			callid = the_callid;
 		}
 		
-		string uri;
-		string callid;
+		std::string uri;
+		std::string callid;
 };
 
 

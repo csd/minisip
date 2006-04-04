@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"RtcpSender.h"
+#include<libminisip/p2t/RtcpSender.h>
 
 
 #include<libmsip/SipTransaction.h>
@@ -42,7 +42,7 @@
 #endif
 
 #include<stdio.h>
-#include"../p2t/RtcpAPP.h"
+#include<libminisip/p2t/RtcpAPP.h>
 #include<libmutil/print_hex.h>
 
 #ifndef _MSC_VER

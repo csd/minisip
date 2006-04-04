@@ -22,10 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"DtmfSender.h"
+#include<libminisip/mediahandler/DtmfSender.h>
 
-#include"Session.h"
-#include"MediaStream.h"
+#include<libminisip/mediahandler/Session.h>
+#include<libminisip/mediahandler/MediaStream.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

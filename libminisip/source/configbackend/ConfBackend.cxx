@@ -22,13 +22,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"ConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 
 #ifdef GCONF_SUPPORT
-#include"GConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 #endif
 
-#include"MXmlConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 
 using namespace std;
 

@@ -23,8 +23,8 @@
 */
 
 #include<config.h>
-#include"AVDecoder.h"
-#include"../ImageHandler.h"
+#include<libminisip/video/codec/AVDecoder.h>
+#include<libminisip/video/ImageHandler.h>
 
 #include<iostream>
 #include<libmutil/print_hex.h>

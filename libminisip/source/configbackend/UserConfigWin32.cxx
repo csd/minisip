@@ -19,7 +19,7 @@
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#include"UserConfig.h"
+#include<libminisip/configbackend/UserConfig.h>
 #include<shlobj.h>
 #include<io.h>
 #include<sys/stat.h>

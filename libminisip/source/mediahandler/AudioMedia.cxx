@@ -22,16 +22,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"AudioMedia.h"
+#include<libminisip/mediahandler/AudioMedia.h>
 
-#include"../rtp/RtpHeader.h"
-#include"MediaStream.h"
-#include"../soundcard/FileSoundSource.h"
+#include<libminisip/rtp/RtpHeader.h>
+#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/soundcard/FileSoundSource.h>
 
-#include"../soundcard/resampler/Resampler.h"
-#include"../soundcard/SoundSource.h"
+#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/soundcard/SoundSource.h>
 
-#include"../rtp/RtpPacket.h"
+#include<libminisip/rtp/RtpPacket.h>
 
 
 #define RINGTONE_SOURCE_ID 0x42124212

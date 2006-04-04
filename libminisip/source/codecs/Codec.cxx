@@ -22,11 +22,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"Codec.h"
-#include"G711CODEC.h"
-#include"ILBCCODEC.h"
-#include"SPEEXCODEC.h"
-#include"GsmCodec.h"
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/codecs/G711CODEC.h>
+#include<libminisip/codecs/ILBCCODEC.h>
+#include<libminisip/codecs/SPEEXCODEC.h>
+#include<libminisip/codecs/GsmCodec.h>
 
 MRef<CodecState *> AudioCodec::createState( uint8_t payloadType ){
         switch( payloadType ){

@@ -34,13 +34,13 @@
 #include<libmsip/SipStack.h>
 #include<libmutil/StateMachine.h>
 #include<libmnetutil/IPAddress.h>
-#include"../codecs/Codec.h"
-#include"RtcpReceiver.h"
-#include"RtcpSender.h"
-#include"GroupList.h"
-#include"GroupListUserElement.h"
-#include"GroupListClient.h"
-#include"P2T.h"
+#include<libminisip/codecs/Codec.h>
+#include<libminisip/p2t/RtcpReceiver.h>
+#include<libminisip/p2t/RtcpSender.h>
+#include<libminisip/p2t/GroupList.h>
+#include<libminisip/p2t/GroupListUserElement.h>
+#include<libminisip/p2t/GroupListClient.h>
+#include<libminisip/p2t/P2T.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 
 

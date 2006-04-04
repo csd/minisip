@@ -27,7 +27,7 @@
 
 #include<config.h>
 
-#include"ConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 
 typedef struct _GConfClient GConfClient;
 

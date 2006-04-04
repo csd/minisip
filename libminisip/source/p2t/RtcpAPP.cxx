@@ -41,8 +41,8 @@
 #endif
 
 #include<errno.h>
-#include"RtcpAPP.h"
-#include"RtcpAPPHeader.h"
+#include<libminisip/p2t/RtcpAPP.h>
+#include<libminisip/p2t/RtcpAPPHeader.h>
 
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>

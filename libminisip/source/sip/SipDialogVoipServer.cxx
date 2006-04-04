@@ -30,7 +30,7 @@
  * Purpose
  * 
 */
-#include"SipDialogVoipServer.h"
+#include<libminisip/sip/SipDialogVoipServer.h>
 
 #include<libmutil/massert.h>
 
@@ -57,7 +57,7 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
-#include"../minisip/LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 
 #include<libmutil/print_hex.h>
 #include <iostream>

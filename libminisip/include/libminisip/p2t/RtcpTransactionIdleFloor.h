@@ -29,7 +29,7 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
-#include"SipDialogP2T.h"
+#include<libminisip/p2t/P2T.h>
 
 /** 
  * implements the Floor Release Procedure if a remote user releases the floor..

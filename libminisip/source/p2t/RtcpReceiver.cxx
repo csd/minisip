@@ -23,7 +23,7 @@
 */
 
 
-#include"RtcpReceiver.h"
+#include<libminisip/p2t/RtcpReceiver.h>
 
 #ifndef _MSC_VER
 #include<unistd.h>
@@ -50,8 +50,8 @@
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/IP4Address.h>
 #include<vector>
-#include"../stun/STUN.h"
-#include"../p2t/RtcpAPP.h"
+#include<libminisip/stun/STUN.h>
+#include<libminisip/p2t/RtcpAPP.h>
 #include<libmutil/dbg.h>
 
 //#include<libminisip/sip/DefaultCallHandler.h>

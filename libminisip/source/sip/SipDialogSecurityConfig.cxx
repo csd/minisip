@@ -1,7 +1,7 @@
 
-#include"SipDialogSecurityConfig.h"
+#include<libminisip/sip/SipDialogSecurityConfig.h>
 
-#include"../minisip/confbackend/ConfBackend.h"
+#include<libminisip/configbackend/ConfBackend.h>
 #include<libmutil/cert.h>
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>

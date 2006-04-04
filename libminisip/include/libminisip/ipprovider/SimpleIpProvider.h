@@ -27,7 +27,7 @@
 
 #include<config.h>
 
-#include"IpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 
 class SimpleIpProvider: public IpProvider{
 	public:

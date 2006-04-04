@@ -31,7 +31,7 @@ typedef unsigned short uint16_t;
 #include<stdint.h>
 #endif
 
-#include"STUNMessage.h"
+#include<libminisip/stun/STUNMessage.h>
 
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IP4Address.h>

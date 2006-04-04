@@ -29,15 +29,15 @@
 
 #include<libmutil/Mutex.h>
 
-#include"../soundcard/SoundRecorderCallback.h"
-#include"../soundcard/SoundIO.h"
+#include<libminisip/soundcard/SoundRecorderCallback.h>
+#include<libminisip/soundcard/SoundIO.h>
 #ifdef VIDEO_SUPPORT
-#include"../video/codec/VideoEncoderCallback.h"
+#include<libminisip/video/codec/VideoEncoderCallback.h>
 #endif
 
-#include"../codecs/Codec.h"
+#include<libminisip/codecs/Codec.h>
 
-#include"../rtp/RtpPacket.h"
+#include<libminisip/rtp/RtpPacket.h>
 
 class SoundIO;
 class MediaStreamSender;

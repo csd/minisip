@@ -22,9 +22,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"Gui.h"
+#include<libminisip/gui/Gui.h>
 
-#include"../ConfMessageRouter.h"
+#include<libminisip/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

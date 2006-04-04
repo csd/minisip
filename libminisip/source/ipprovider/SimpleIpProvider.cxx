@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"SimpleIpProvider.h"
+#include<libminisip/ipprovider/IpProvider.h>
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/NetworkFunctions.h>

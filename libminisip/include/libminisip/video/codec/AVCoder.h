@@ -28,7 +28,7 @@
 
 #include<string>
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<avcodec.h>

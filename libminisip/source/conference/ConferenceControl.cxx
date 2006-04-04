@@ -22,12 +22,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"ConferenceControl.h"
+#include<libminisip/conference/ConferenceControl.h>
 
 #include<assert.h>
 #include<stdio.h>
 #include<vector>
-#include"../minisip/ConfMessageRouter.h"
+#include<libminisip/conference/ConfMessageRouter.h>
 #include<libminisip/gui/Gui.h>
 
 #include<libmutil/MemObject.h>

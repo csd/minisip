@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include"GsmCodec.h"
+#include<libminisip/codecs/GsmCodec.h>
 
 #include<gsm.h>
 

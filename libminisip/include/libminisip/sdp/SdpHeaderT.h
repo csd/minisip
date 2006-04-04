@@ -34,7 +34,7 @@
 #ifndef SDPHEADERT_H
 #define SDPHEADERT_H
 
-#include"../sdp/SdpHeader.h"
+#include<libminisip/sdp/SdpHeader.h>
 
 using namespace std;
 

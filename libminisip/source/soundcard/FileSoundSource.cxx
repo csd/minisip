@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"FileSoundSource.h"
+#include<libminisip/soundcard/FileSoundSource.h>
 #include<fstream>
 #include<libmutil/print_hex.h>
 

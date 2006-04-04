@@ -28,13 +28,13 @@
 #include<config.h>
 
 #include<libmutil/MemObject.h>
-#include"../rtp/CryptoContext.h"
-#include"Media.h"
-#include"Session.h"
-#include"RtpReceiver.h"
-#include"../rtp/SRtpPacket.h"
+#include<libminisip/rtp/CryptoContext.h>
+#include<libminisip/mediahandler/Media.h>
+#include<libminisip/mediahandler/Session.h>
+#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/rtp/SRtpPacket.h>
 
-#include"../rtp/SRtpPacket.h"
+#include<libminisip/rtp/SRtpPacket.h>
 
 class KeyAgreement;
 class UDPSocket;

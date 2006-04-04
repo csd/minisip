@@ -28,8 +28,8 @@
 #include<config.h>
 
 #include<vector>
-#include"XRReportBlock.h"
-#include"RtcpReport.h"
+#include<libminisip/rtp/XRReportBlock.h>
+#include<libminisip/rtp/RtcpReport.h>
 #include<vector>
 using namespace std;
 

@@ -31,9 +31,9 @@
 
 
 #include<config.h>
-#include"AudioMixerSpatial.h"
-#include"SoundSource.h"
-#include"../spaudio/SpAudio.h"
+#include<libminisip/soundcard/AudioMixerSpatial.h>
+#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/spaudio/SpAudio.h>
 
 	// cesc ... remove
 #include<libmutil/itoa.h>

@@ -30,8 +30,8 @@
 */
 
 
-#include"AudioMixerSimple.h"
-#include"SoundSource.h"
+#include<libminisip/soundcard/AudioMixerSimple.h>
+#include<libminisip/soundcard/SoundSource.h>
 
 using namespace std;
 

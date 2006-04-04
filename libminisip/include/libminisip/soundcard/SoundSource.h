@@ -29,7 +29,7 @@
 
 #include<libmutil/Mutex.h>
 
-#include"SoundIOPLCInterface.h"
+#include<libminisip/soundcard/SoundIOPLCInterface.h>
 #include<libminisip/soundcard/Resampler.h>
 
 #define LEFT 1

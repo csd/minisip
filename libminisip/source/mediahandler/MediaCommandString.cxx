@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"MediaCommandString.h"
+#include<libminisip/mediahandler/MediaCommandString.h>
 
 using namespace std;
 

@@ -31,7 +31,7 @@
  * 
 */
 
-#include"GroupList.h"
+#include<libminisip/p2t/GroupList.h>
 #include<libmutil/itoa.h>
 #include<libmutil/XMLParser.h>
 

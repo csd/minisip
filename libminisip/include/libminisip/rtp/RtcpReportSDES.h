@@ -25,8 +25,8 @@
 #ifndef RTCPREPORTSDES_H
 #define RTCPREPORTSDES_H
 
-#include"RtcpReport.h"
-#include"SDESChunk.h"
+#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/rtp/SDESChunk.h>
 
 #include<config.h>
 

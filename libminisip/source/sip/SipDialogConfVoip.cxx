@@ -30,7 +30,7 @@
  	Bilge Cetin <bilge[at]kth.se>
 	Max Loubser <loubser[at]kth.se>
 */
-#include"SipDialogConfVoip.h"
+#include<libminisip/sip/SipDialogConfVoip.h>
 
 #include<libmutil/massert.h>
 
@@ -50,15 +50,15 @@
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
-#include"DefaultDialogHandler.h"
-#include"../minisip/ConfMessageRouter.h"
+#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/conference/ConfMessageRouter.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include <time.h>
-#include"../minisip/LogEntry.h"
+#include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libmutil/MemObject.h>

@@ -22,12 +22,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"AVCoder.h"
+#include<libminisip/video/codec/AVCoder.h>
 #include<sys/time.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmutil/mtime.h>
-#include"VideoEncoderCallback.h"
-//#include"RtpPacket.h"
+#include<libminisip/video/codec/VideoEncoderCallback.h>
+//#include<libminisip/rtp/RtpPacket.h>
 
 #include<stdio.h>
 #include<fcntl.h>

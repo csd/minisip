@@ -22,9 +22,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"ContactDb.h"
+#include<libminisip/contactdb/ContactDb.h>
 
-#include"PhoneBook.h"
+#include<libminisip/contactdb/PhoneBook.h>
 
 using namespace std;
 

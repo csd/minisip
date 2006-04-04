@@ -23,7 +23,7 @@
 */
 
 
-#include"SilenceSensor.h"
+#include<libminisip/soundcard/SilenceSensor.h>
 
 static int iabs(int i){
     if (i<0)

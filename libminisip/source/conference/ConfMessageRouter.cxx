@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"ConfMessageRouter.h"
+#include<libminisip/conference/ConfMessageRouter.h>
 //#include<libmsip/CODECInterface.h>
 //#include"../util/ConfigFile.h"
 //#include<libminisip/sip/SipSoftPhoneConfiguration.h>

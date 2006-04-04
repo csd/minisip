@@ -25,11 +25,11 @@
 #ifndef IMAGE_MIXER_H
 #define IMAGE_MIXER_H
 
-#include"../ImageHandler.h"
+#include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
-#include"../VideoMedia.h"
+#include<libminisip/video/VideoMedia.h>
 
 
 class ImageMixer : public ImageHandler, public MObject{

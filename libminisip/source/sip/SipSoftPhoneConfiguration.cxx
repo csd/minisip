@@ -35,16 +35,16 @@
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
-#include"SipSoftPhoneConfiguration.h"
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
-#include"../soundcard/SoundIO.h"
+#include<libminisip/soundcard/SoundIO.h>
 #include<libminisip/mediahandler/MediaHandler.h>
-#include"../minisip/contactdb/PhoneBook.h"
-#include"../minisip/contactdb/MXmlPhoneBookIo.h"
-#include"../minisip/confbackend/ConfBackend.h"
-#include"../minisip/UserConfig.h"
+#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/contactdb/MXmlPhoneBookIo.h>
+#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/UserConfig.h>
 #include<fstream>
-#include"../soundcard/AudioMixer.h"
+#include<libminisip/soundcard/AudioMixer.h>
 
 #ifdef _WIN32_WCE
 #	include<stdlib.h>

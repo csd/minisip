@@ -27,11 +27,11 @@
 
 #include<config.h>
 #include<vector>
-#include"../codecs/Codec.h"
+#include<libminisip/codecs/Codec.h>
 #include<libmutil/MemObject.h>
 #include<libmnetutil/IPAddress.h>
-#include"P2T.h"
-#include"GroupListUserElement.h"
+#include<libminisip/p2t/P2T.h>
+#include<libminisip/p2t/GroupListUserElement.h>
 
 /**
  * the GroupList contains all information about a P2T Session

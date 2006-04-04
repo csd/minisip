@@ -28,7 +28,7 @@
 
 #ifdef FLOAT_RESAMPLER
 
-#include"Resampler.h"
+#include<libminisip/soundcard/Resampler.h>
 #include<samplerate.h>
 
 class FloatResampler : public Resampler {

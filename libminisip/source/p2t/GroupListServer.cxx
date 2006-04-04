@@ -23,7 +23,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include"GroupListServer.h"
+#include<libminisip/p2t/GroupListServer.h>
 #include <ctype.h>
 #include<libmutil/dbg.h>
 #include<libmnetutil/IP4Address.h>

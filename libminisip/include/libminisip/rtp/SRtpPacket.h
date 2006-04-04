@@ -27,10 +27,10 @@
 
 #include<config.h>
 
-#include "RtpPacket.h"
+#include<libminisip/rtp/RtpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
-#include "CryptoContext.h"
+#include<libminisip/rtp/CryptoContext.h>
 
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );

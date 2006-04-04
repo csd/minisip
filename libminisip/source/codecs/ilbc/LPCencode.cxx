@@ -16,10 +16,10 @@
     
    #include <string.h> 
     
-   #include "iLBC_define.h" 
-   #include "helpfun.h" 
-   #include "lsf.h" 
-   #include "constants.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
+   #include<libminisip/codecs/ilbc/helpfun.h> 
+   #include<libminisip/codecs/ilbc/lsf.h> 
+   #include<libminisip/codecs/ilbc/constants.h> 
     
    /*----------------------------------------------------------------* 
     *  lpc analysis (subrutine to LPCencode)                            

@@ -24,15 +24,15 @@
 
 #include<config.h>
 #include<libmutil/dbg.h>
-#include"VideoDisplay.h"
-#include"../VideoException.h"
+#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/video/VideoException.h>
 #ifdef XV_SUPPORT
-#include"XvDisplay.h"
+#include<libminisip/video/display/XvDisplay.h>
 #endif
 #ifdef SDL_SUPPORT
-#include"SdlDisplay.h"
+#include<libminisip/video/display/SdlDisplay.h>
 #endif
-#include"X11Display.h"
+#include<libminisip/video/display/X11Display.h>
 
 #include<iostream>
 #define NB_IMAGES 3

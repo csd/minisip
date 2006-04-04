@@ -25,9 +25,9 @@
 #ifndef RTCPREPORTSR_H
 #define RTCPREPORTSR_H
 
-#include"RtcpReport.h"
-#include"RtcpReportReceptionBlock.h"
-#include"RtcpReportSenderInfo.h"
+#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/rtp/RtcpReportReceptionBlock.h>
+#include<libminisip/rtp/RtcpReportSenderInfo.h>
 #include<vector>
 #include<config.h>
 

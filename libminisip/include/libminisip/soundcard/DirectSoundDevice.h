@@ -26,7 +26,7 @@
 #ifndef DIRECT_SOUND_DEVICE_H
 #define DIRECT_SOUND_DEVICE_H
 
-#include"SoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 #include<windows.h>
 #include<wincon.h>

@@ -16,7 +16,7 @@
    #ifndef __iLBC_ILBCDECODE_H 
    #define __iLBC_ILBCDECODE_H 
     
-   #include "iLBC_define.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
     
    short initDecode(                   /* (o) Number of decoded  
                                               samples */ 

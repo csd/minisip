@@ -29,7 +29,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
-#include"Session.h"
+#include<libminisip/mediahandler/Session.h>
 
 
 class SessionRegistry{

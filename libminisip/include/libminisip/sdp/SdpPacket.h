@@ -36,8 +36,8 @@
 
 #include<libmnetutil/IPAddress.h>
 #include<vector>
-#include"../sdp/SdpPacket.h"
-#include"../sdp/SdpHeader.h"
+#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/sdp/SdpHeader.h>
 //#include<libmsip/CODECInterface.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContent.h>

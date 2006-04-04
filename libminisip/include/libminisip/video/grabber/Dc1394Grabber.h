@@ -26,7 +26,7 @@
 #include<libraw1394/raw1394.h>
 #include<libdc1394/dc1394_control.h>
 #include<libmutil/Mutex.h>
-#include"Grabber.h"
+#include<libminisip/video/grabber/Grabber.h>
 
 #define MAX_PORTS   4
 #define MAX_CAMERAS 8

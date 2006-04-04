@@ -23,7 +23,7 @@
  *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
-#include"AlsaSoundDevice.h"
+#include<libminisip/soundcard/SoundDevice.h>
 
 #include<libmutil/Thread.h>
 #include<libmutil/mtime.h>

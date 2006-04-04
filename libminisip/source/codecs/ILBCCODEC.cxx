@@ -21,11 +21,11 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
 */
-#include"ILBCCODEC.h"
+#include<libminisip/codecs/ILBCCODEC.h>
 
-#include"ilbc/iLBC_define.h"
-#include"ilbc/iLBC_encode.h"
-#include"ilbc/iLBC_decode.h"
+#include<libminisip/codecs/ilbc/iLBC_define.h>
+#include<libminisip/codecs/ilbc/iLBC_encode.h>
+#include<libminisip/codecs/ilbc/iLBC_decode.h>
 
 #include<libmutil/massert.h>
 

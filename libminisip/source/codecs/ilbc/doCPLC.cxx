@@ -16,7 +16,7 @@
    #include <math.h> 
    #include <string.h> 
     
-   #include "iLBC_define.h" 
+   #include<libminisip/codecs/ilbc/iLBC_define.h> 
     
    /*----------------------------------------------------------------* 
     *  Compute cross correlation and pitch gain for pitch prediction 
