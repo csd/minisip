@@ -39,8 +39,7 @@
 #define BIND sigc::bind
 #endif
 
-
-
+using namespace std;
 
 CallWidget::CallWidget( string callId, string remoteUri, 
                         MainWindow * mw, bool incoming, string secure):

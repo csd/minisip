@@ -1,4 +1,4 @@
-SUBDIRS =
+SUBDIRS = 
 DIST_SUBDIRS = textui gtkgui qtgui
 
 if TEXT_UI

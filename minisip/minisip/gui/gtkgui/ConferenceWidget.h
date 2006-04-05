@@ -58,7 +58,7 @@ class MainWindow;
 class ConferenceWidget : public Gtk::VBox
 {
 	public:
-		ConferenceWidget(string configUri, string confId, string users,string remoteUri,string callId, MainWindow * mw, bool incoming);
+		ConferenceWidget( std::string configUri,  std::string confId,  std::string users, std::string remoteUri, std::string callId, MainWindow * mw, bool incoming);
 
 		~ConferenceWidget();
 
@@ -69,9 +69,9 @@ class ConferenceWidget : public Gtk::VBox
 		void reject();
 		void add();
 
-		string getMainCallId();
-		string getMainConfId();
-                bool handlesConfId( string confId );
+		 std::string getMainCallId();
+		 std::string getMainConfId();
+                bool handlesConfId(  std::string confId );
 
 		int32_t getState() { return state;  }
 		
@@ -95,22 +95,22 @@ class ConferenceWidget : public Gtk::VBox
 		Gtk::Label status;
 		Gtk::Label secStatus;
 		Gtk::HBox buttonBox;
-                Gtk::HBox conferenceHBox;
-                Gtk::HBox conferenceHBox2;
+		Gtk::HBox conferenceHBox;
+		Gtk::HBox conferenceHBox2;
 		Gtk::Entry conferenceEntry;
-                Gtk::Button conferenceButton;
+		Gtk::Button conferenceButton;
 		Gtk::Image secureImage;
-                Gtk::Image insecureImage;
+		Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
 //		TimeoutProvider<string> *timeoutProvider;      
-                list<string> confIds;
-                string mainCallId;
-		string mainConfId;
-		string initiatorUri;
+		std::list<std::string> confIds;
+		std::string mainCallId;
+		std::string mainConfId;
+		std::string initiatorUri;
 		ConferenceControl* conf;
 		
 		/**

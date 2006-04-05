@@ -20,23 +20,17 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-
-
-
-
-
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+#include<libmutil/MemObject.h>
+
+#include<libminisip/gui/Gui.h>
 
 #include"GtkMainUI.h"
-#include<libminisip/gui/Gui.h>
-//#include"../../LogEntry.h"
-#include<libmutil/MemObject.h>
+
 #include"DtmfWidget.h"
 
-//#include "../../../conf/ConferenceControl.h"
-//#include"ConferenceWidget.h"
 #include<libmutil/Mutex.h>
 #include<libmutil/minilist.h>
 #include <libglademm/xml.h>
@@ -84,11 +78,11 @@ class MainWindow : public GtkMainUI,
 		Do any clean up deemed necessary here.
 		*/
 		virtual void quit();
-		virtual void log( int type, string msg );
+		virtual void log( int type,  std::string msg );
 
 		virtual void handleCommand(const CommandString & command );
 		virtual void gotPacket( int32_t i );
-		virtual void displayMessage( string s, int style=-1 );
+		virtual void displayMessage(  std::string s, int style=-1 );
 		virtual void setSipSoftPhoneConfiguration( 
 				MRef<SipSoftPhoneConfiguration *> config );
 		MRef<SipSoftPhoneConfiguration *>  getSipSoftPhoneConfiguration();
@@ -110,9 +104,9 @@ class MainWindow : public GtkMainUI,
 		void viewToggle( uint8_t );
 
 		virtual void handle( MRef<LogEntry *> );
-		void removeCall( string callId );
-		void removeConference( string callId );
-		void removeIm( string uri );
+		void removeCall(  std::string callId );
+		void removeConference(  std::string callId );
+		void removeIm(  std::string uri );
 
 		/**
 		Use this functions to set the active tab in the notebook from
@@ -137,31 +131,31 @@ class MainWindow : public GtkMainUI,
 		void phoneTreeClicked( GdkEventButton * event );
 		
 		void inviteClick();
-		void invite( string uri="" );
+		void invite(  std::string uri="" );
 		
 		void conference();
 		
 		void imClick( );
-		void im( string uri="", string message="" );
+		void im(  std::string uri="",  std::string message="" );
 		
 		void inviteFromTreeview( const Gtk::TreeModel::Path&,
 				         Gtk::TreeViewColumn * );
 		void gotCommand();
 		void gotLogEntry();
 		
-		CallWidget * addCall( string callId, 
-					string remoteUri, 
+		CallWidget * addCall(  std::string callId, 
+					 std::string remoteUri, 
 					bool incoming,
-			      		string securityStatus="unprotected" );
-		ImWidget * addIm( string uri );
-		void addConference( string confId, 
-					string users, 
-					string remoteUri,
-					string callId, 
+			      		 std::string securityStatus="unprotected" );
+		ImWidget * addIm(  std::string uri );
+		void addConference(  std::string confId, 
+					 std::string users, 
+					 std::string remoteUri,
+					 std::string callId, 
 					bool incoming );
 		
 		void updateConfig();
-		void doDisplayErrorMessage( string s );
+		void doDisplayErrorMessage(  std::string s );
 		void runCertificateSettings();
 		
 		/**

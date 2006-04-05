@@ -76,7 +76,7 @@ QTGUI="no"
 
 dnl
 dnl Linker flags
-dnl mingw needs --enable-runtime-pseudo-reloc since it can't
+dnl mingw needs --enable-runtime-pseudo-reloc since it can`t
 dnl auto import all symbols.
 dnl
 RELOC_LDFLAGS="-Wl,--enable-runtime-pseudo-reloc"
@@ -414,7 +414,7 @@ AC_ARG_ENABLE(dsound,
 if test ! x$enable_dsound = xno; then
    have_dsound=yes
    save_LIBS="${LIBS}"
-   dnl Can't check stdcall function DirectSoundFullDuplexCreate.
+   dnl Can`t check stdcall function DirectSoundFullDuplexCreate.
    AC_CHECK_LIB([dsound], [main],,[have_dsound=no])
    AC_CHECK_LIB([uuid], [GUID_NULL],,[have_dsound=no])
    AC_CHECK_LIB([dxguid], [IID_IDirectSoundNotify],,[have_dsound=no])
@@ -647,9 +647,6 @@ AC_CHECK_LIB([msip], [main],
         ])
 
 
-CPPFLAGS="${save_CPPFLAGS}"
-LIBS="${save_LIBS}"
-
 dnl
 dnl libminisip
 dnl
@@ -659,7 +656,7 @@ AM_CXXFLAGS="${AM_CXXFLAGS} ${LIBMINISIP_CFLAGS}"
 CPPFLAGS="${CPPFLAGS} ${LIBMINISIP_CFLAGS}"
 LIBS="${LIBMINISIP_LIBS} ${LIBS}"
 
-AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libminisip
+AC_CHECK_HEADER(libminisip/gui/Gui.h,,[AC_MSG_ERROR(["You need the libminisip
         headers/library. Try installing the libminisip-devel package for your
         distribution."])])
 AC_CHECK_LIB([msip], [main],

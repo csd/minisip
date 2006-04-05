@@ -25,6 +25,8 @@
 
 Gtk::Main *GtkMainUI::kit = NULL;
 
+using namespace std;
+
 GtkMainUI::GtkMainUI()
 {
 }

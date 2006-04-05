@@ -21,10 +21,19 @@
 */
 
 
-
-
-#include<libminisip/conference/ConferenceControl.h>
 #include"MainWindow.h"
+
+#include <libminisip/conference/ConferenceControl.h>
+
+#include<libmutil/trim.h>
+#include<libmutil/itoa.h>
+
+#include<libmsip/SipCommandString.h>
+
+#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/mediahandler/MediaCommandString.h>
+
 #include"CallWidget.h"
 #include"ConferenceWidget.h"
 #include"PhoneBook.h"
@@ -33,36 +42,33 @@
 #include"DtmfWidget.h"
 
 #ifndef WIN32
-	#include"TrayIcon.h"
+#	include"TrayIcon.h"
 #endif
 
 #include"LogWidget.h"
 #include"ImWidget.h"
 #include"AccountsList.h"
 #include"AccountsStatusWidget.h"
+
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/contactdb/ContactDb.h>
 #include<libmsip/SipCommandString.h>
 
-#include<libminisip/mediahandler/MediaCommandString.h>
-
-#include<libmutil/trim.h>
-#include<libmutil/itoa.h>
 
 #ifdef HILDON_SUPPORT
-#include<hildon-lgpl/hildon-widgets/hildon-app.h>
-#include<hildon-lgpl/hildon-widgets/hildon-appview.h>
+#	include<hildon-lgpl/hildon-widgets/hildon-app.h>
+#	include<hildon-lgpl/hildon-widgets/hildon-appview.h>
 #endif
 
-//#include<libmsip/SipSoftPhone.h>
-//
 #ifdef OLDLIBGLADEMM
-#define SLOT(a,b) SigC::slot(a,b)
-#define BIND SigC::bind 
+#	define SLOT(a,b) SigC::slot(a,b)
+#	define BIND SigC::bind 
 #else
-#define SLOT(a,b) sigc::mem_fun(a,b) 
-#define BIND sigc::bind
+#	define SLOT(a,b) sigc::mem_fun(a,b) 
+#	define BIND sigc::bind
 #endif
+
+using namespace std;
 
 MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 

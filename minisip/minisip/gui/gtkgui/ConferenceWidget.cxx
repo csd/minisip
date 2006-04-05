@@ -21,7 +21,9 @@
 */
 
 #include"ConferenceWidget.h"
-#include<libminisip/conference/ConferenceControl.h>
+
+#include <libminisip/conference/ConferenceControl.h>
+
 #include"MainWindow.h"
 //#include<libminisip/sip/state_machines/SipSMCommand.h>
 //#include<libminisip/sip/state_machines/SipSoftPhone.h>
@@ -41,17 +43,16 @@
 #define BIND sigc::bind
 #endif
 
-
-
+using namespace std;
 
 ConferenceWidget::ConferenceWidget(string configUri, string confId, string users, string remoteUri,string callId, MainWindow * mw, bool incoming):
 		mainWindow( mw ),
 		status( "", Gtk::ALIGN_LEFT ),
 		secStatus( "", Gtk::ALIGN_LEFT ),
-                buttonBox(/*homogenius*/ true ),
+		buttonBox(/*homogenius*/ true ),
 		conferenceButton("Add Member"),
-                acceptButton( Gtk::Stock::OK, "Accept" ),
-                rejectButton( Gtk::Stock::CANCEL, "Reject" ),
+		acceptButton( Gtk::Stock::OK, "Accept" ),
+		rejectButton( Gtk::Stock::CANCEL, "Reject" ),
 		bell(),
 		mainCallId(callId),
 		initiatorUri(remoteUri)
@@ -63,23 +64,23 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 
 	activeCallWidget = false;
 
-        Gtk::HBox * topBox = manage( new Gtk::HBox );
+	Gtk::HBox * topBox = manage( new Gtk::HBox );
 
-        Gtk::VBox * rightTopBox = manage( new Gtk::VBox );
-        topBox->pack_start( *rightTopBox, false, false, 5 );
+	Gtk::VBox * rightTopBox = manage( new Gtk::VBox );
+	topBox->pack_start( *rightTopBox, false, false, 5 );
 
-        
-        rightTopBox->pack_start( status, false, false, 5 );
-        rightTopBox->pack_start( secStatus, false, false, 5 );
-        
-        pack_start( *topBox, false, false, 5 );
+	
+	rightTopBox->pack_start( status, false, false, 5 );
+	rightTopBox->pack_start( secStatus, false, false, 5 );
+	
+	pack_start( *topBox, false, false, 5 );
 
-        Pango::AttrList attrList( "<big><b></b></big>" );
-        status.set_attributes( attrList );
+	Pango::AttrList attrList( "<big><b></b></big>" );
+	status.set_attributes( attrList );
 
-        Gtk::HSeparator * separator = manage( new Gtk::HSeparator );
-        pack_start( *separator, false, false, 5 );
-        separator->show();
+	Gtk::HSeparator * separator = manage( new Gtk::HSeparator );
+	pack_start( *separator, false, false, 5 );
+	separator->show();
 
 //	add( status );
 //	add( secStatus );
@@ -90,7 +91,7 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 	status.set_use_markup( true );
 	secStatus.set_use_markup( true );
 	conferenceHBox.pack_end( conferenceButton, false, false ); 
-        conferenceHBox.pack_end( conferenceEntry, true, true ); 
+	conferenceHBox.pack_end( conferenceEntry, true, true ); 
 	pack_end( conferenceHBox, false, false, 4 );
 	conferenceHBox.show_all();
 
@@ -98,7 +99,7 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 	buttonBox.add( rejectButton );
 
 
-        topBox->show_all();
+	topBox->show_all();
 	buttonBox.show_all();
 //	rejectButton.show();
 //        acceptButton.hide();
@@ -119,7 +120,7 @@ ConferenceWidget::ConferenceWidget(string configUri, string confId, string users
 		startRinging();
 	}
 	else{
-                acceptButton.set_sensitive( false );
+		acceptButton.set_sensitive( false );
 		state = CONFERENCE_WIDGET_STATE_CREATED;
 		acceptButton.set_label( "Accept" );
 		rejectButton.set_label( "Quit" );
@@ -139,17 +140,17 @@ void ConferenceWidget::accept(){
 	stopRinging();
 }
 void ConferenceWidget::add(){
-        string uri = Glib::locale_from_utf8( conferenceEntry.get_text() );
-        if( uri.size() > 0 ){
-        
-                CommandString cmd("", "join",uri);
+	string uri = Glib::locale_from_utf8( conferenceEntry.get_text() );
+	if( uri.size() > 0 ){
+	
+		CommandString cmd("", "join",uri);
 		cmd.setParam3(mainConfId);
 		mainWindow->getConfCallback()->guicb_handleConfCommand(cmd);
 
 		//conf->handleGuiDoInviteCommand("ali");
 		//mainWindow->getCallback()->guicb_confDoInvite(uri);
 		//transferProgress.pulse();
-        }
+	}
 	//mainWindow->getCallback()->guicb_confDoInvite(uri);
 	
 }
@@ -195,12 +196,12 @@ bool ConferenceWidget::handleCommand( CommandString command ){
 			secStatus.set_markup( "The call is <b>" + 
 					command.getParam2() + "</b>" );
 
-                        if( command.getParam2() == "secure" ){
-                                secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
-                        }
-                        else{
-                                secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
-                        }
+			if( command.getParam2() == "secure" ){
+				secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
+			}
+			else{
+				secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
+			}
 
 			rejectButton.set_label( "Hang up" );
 			hideAcceptButton();
@@ -286,7 +287,7 @@ bool ConferenceWidget::handleCommand( CommandString command ){
 			state = CONFERENCE_WIDGET_STATE_TERMINATED;
 		}
 		
-                
+		
 
 		return true;
 	}
@@ -314,20 +315,20 @@ void ConferenceWidget::stopRinging(){
 }
 
 string ConferenceWidget::getMainCallId(){
-        return mainCallId;
+	return mainCallId;
 }
 
 string ConferenceWidget::getMainConfId(){
-        return mainConfId;
+	return mainConfId;
 }
 
 bool ConferenceWidget::handlesConfId( string confId ){
-        
+	
 
-        if(confId==mainConfId){
-               return true;
-        }
-        return false;
+	if(confId==mainConfId){
+		return true;
+	}
+	return false;
 }
 
 void ConferenceWidget::activeWidgetChanged( bool isActive, int currentActive ) {

@@ -24,6 +24,7 @@
 #include<libminisip/contactdb/ContactDb.h>
 #include<libminisip/contactdb/PhoneBook.h>
 
+using namespace std;
 
 ContactDialog::ContactDialog():Gtk::Dialog( "Contact information", false ){
 	Gtk::VBox * vbox = get_vbox();//= new Gtk::VBox;

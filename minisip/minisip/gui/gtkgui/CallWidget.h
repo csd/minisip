@@ -71,7 +71,7 @@ class CallWidget : public Gtk::VBox
 			#endif
 {
 	public:
-		CallWidget( string callId, string remoteUri, MainWindow * mw, bool incoming, std::string secure="unprotected");
+		CallWidget(  std::string callId,  std::string remoteUri, MainWindow * mw, bool incoming, std::string secure="unprotected");
 
 		virtual ~CallWidget();
 
@@ -81,8 +81,8 @@ class CallWidget : public Gtk::VBox
 		void accept();
 		void reject();
 
-		string getMainCallId();
-		bool handlesCallId( string callId );
+		 std::string getMainCallId();
+		bool handlesCallId(  std::string callId );
 		
 		int32_t getState() {return state;}
 		
@@ -145,9 +145,9 @@ class CallWidget : public Gtk::VBox
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
 		MRef<Bell *> bell;
-//		TimeoutProvider<string> *timeoutProvider;      
-		list<string> callIds;
-		string mainCallId;
+//		TimeoutProvider< std::string> *timeoutProvider;      
+		std::list< std::string> callIds;
+		std::string mainCallId;
 		
 		/**
 		Indicates whether this callWidget is the one currently

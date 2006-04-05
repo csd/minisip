@@ -32,6 +32,9 @@
 #define BIND sigc::bind
 #endif
 
+using namespace std;
+
+
 MTrayIcon::MTrayIcon( MainWindow * mainWindow, 
 		      Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	this->mainWindow = mainWindow;

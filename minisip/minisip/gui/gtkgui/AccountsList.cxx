@@ -21,10 +21,11 @@
 */
 
 #include<config.h>
+
 #include"AccountsList.h"
 #include"AccountDialog.h"
+
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
-// #include<libmnetutil/NetworkException.h>
 
 using namespace std;
 

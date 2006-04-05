@@ -21,6 +21,7 @@
 */
 
 #include<config.h>
+
 #include"AccountDialog.h"
 #include"AccountsList.h"
 
@@ -36,6 +37,7 @@
 #define ADD_SECOND_COLUMN( w ) table->attach( *w, 1, 2, row, row+1 );row++;
 #define ADD( w ) table->attach( *w, 0, 2, row, row+1 );row++;
 
+using namespace std;
 
 AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", false ){
 #ifdef HILDON_SUPPORT

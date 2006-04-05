@@ -1,13 +1,3 @@
 SUBDIRS = win32 gui
 
-#AM_LDFLAGS = @AVCODEC_LDFLAGS@ @OSSO_LIBS@ $(RELOC_LDFLAGS)
-#AM_CXXFLAGS += @OSSO_CFLAGS@
-
-
-#if QT_GUI
-#AM_CPPFLAGS += -I@QT_INCLUDE@
-#AM_LDFLAGS += -L@QT_LIB_LOCATION@
-#minisip_LDADD += gui/qtgui/libminisip_qtgui.a
-#endif QT_GUI
-
 

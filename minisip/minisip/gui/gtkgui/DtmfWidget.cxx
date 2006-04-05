@@ -33,20 +33,22 @@
 #define BIND sigc::bind
 #endif
 
+using namespace std;
+
 DtmfWidget::DtmfWidget():
-	        Gtk::Table( 4, 3, true ),
+		Gtk::Table( 4, 3, true ),
 		oneButton( "1" ),
-                twoButton( "2" ),
-                threeButton( "3" ),
-                fourButton( "4" ),
-                fiveButton( "5" ),
-                sixButton( "6" ),
-                sevenButton( "7" ),
-                eightButton( "8" ),
-                nineButton( "9" ),
-                zeroButton( "0" ),
-                sharpButton( "#" ),
-                starButton( "*" ){
+		twoButton( "2" ),
+		threeButton( "3" ),
+		fourButton( "4" ),
+		fiveButton( "5" ),
+		sixButton( "6" ),
+		sevenButton( "7" ),
+		eightButton( "8" ),
+		nineButton( "9" ),
+		zeroButton( "0" ),
+		sharpButton( "#" ),
+		starButton( "*" ){
 	
 	attach( oneButton, 0, 1, 0, 1 );
 	attach( twoButton, 1, 2, 0, 1 );
@@ -69,66 +71,65 @@ DtmfWidget::DtmfWidget():
 
 void DtmfWidget::setHandler( DtmfHandler * handler ){
 #ifndef OLDLIBGLADEMM
-        
-        oneButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  1 ));
-        
-        twoButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  2 ));
-        
-        threeButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  3 ));
-        
-        fourButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  4 ));
-        
-        fiveButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  5 ));
-        
-        sixButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  6 ));
-        
-        sevenButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  7 ));
-        
-        eightButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  8 ));
-        
-        nineButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  9 ));
-        
-        zeroButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  0 ));
-        
-        starButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  10 ));
-        
-        sharpButton.signal_clicked().connect(
-              BIND<uint8_t>(
-                  SLOT( *handler, &DtmfHandler::dtmfPressed ),
-                  11 ));
+	oneButton.signal_clicked().connect(
+			BIND<uint8_t>(
+			SLOT( *handler, &DtmfHandler::dtmfPressed ),
+			1 ));
+	
+	twoButton.signal_clicked().connect(
+			BIND<uint8_t>(
+			SLOT( *handler, &DtmfHandler::dtmfPressed ),
+			2 ));
+	
+	threeButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		3 ));
+	
+	fourButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		4 ));
+	
+	fiveButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		5 ));
+	
+	sixButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		6 ));
+	
+	sevenButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		7 ));
+	
+	eightButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		8 ));
+	
+	nineButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		9 ));
+	
+	zeroButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		0 ));
+	
+	starButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		10 ));
+	
+	sharpButton.signal_clicked().connect(
+		BIND<uint8_t>(
+		SLOT( *handler, &DtmfHandler::dtmfPressed ),
+		11 ));
 #endif
 }
 

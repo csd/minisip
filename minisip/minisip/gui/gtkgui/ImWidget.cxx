@@ -21,6 +21,7 @@
 */
 
 #include"ImWidget.h"
+
 #include"MainWindow.h"
 #include<libmsip/SipCommandString.h>
 
@@ -31,6 +32,8 @@
 #define SLOT(a,b) sigc::mem_fun(a,b)
 #define BIND sigc::bind
 #endif
+
+using namespace std;
 
 ImWidget::ImWidget( MainWindow * mainWindow, string toUri, string fromUri ){
 	this->mainWindow = mainWindow;
