@@ -575,7 +575,6 @@ dnl it shoudl be like this ... but for now, reduce it ...AC_CONFIG_FILES([Makefi
 AC_CONFIG_FILES([libminisip.pc
 		Makefile
 		include/Makefile
-		source/win32/Makefile
 		source/win32/libminisip-res.rc])
 
 AC_OUTPUT

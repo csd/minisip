@@ -16,7 +16,7 @@ libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_L
 libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 
 if AEC_SUPPORT
-	libaec_src = source/aec/aec.cxx
+        libaec_src = source/aec/aec.cxx
 endif
 
 libcodecs_libadd = 
@@ -61,7 +61,7 @@ if HAS_GSM
 endif
 
 if IPSEC_SUPPORT
-        libmsipipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
+        libipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
 endif
 
 libmediahandler_src = source/mediahandler/MediaHandler.cxx \
@@ -200,7 +200,7 @@ libstun_src = source/stun/STUNAttributes.cxx \
 if VIDEO_SUPPORT
         libvideo_libadd =
         display_src = source/video/display/VideoDisplay.cxx \
-			source/display/X11Display.cxx
+			source/video/display/X11Display.cxx
 if XV_VIDEO_DISPLAY
         display_src += source/video/display/XvDisplay.cxx
         libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
