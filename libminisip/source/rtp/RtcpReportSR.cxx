@@ -22,8 +22,12 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtcpReportSR.h>
 #include<iostream>
+
+using namespace std;
 
 RtcpReportSR::RtcpReportSR(void *buildfrom, int max_length):RtcpReport(0){
 	if (max_length<4){

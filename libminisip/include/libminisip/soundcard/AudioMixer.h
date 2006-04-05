@@ -33,6 +33,8 @@
 #ifndef AUDIO_MIXER_H
 #define AUDIO_MIXER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
 
 // PCM16 range: [-32767:32768]

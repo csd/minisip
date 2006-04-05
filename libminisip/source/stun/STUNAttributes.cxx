@@ -22,18 +22,19 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 
 #include<assert.h>
 #include<iostream>
 #include<libminisip/stun/STUNAttributes.h>
 
 #ifdef LINUX
-#include<netinet/in.h>
-#include<netdb.h>
+#	include<netinet/in.h>
+#	include<netdb.h>
 #endif
 
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 using namespace std;

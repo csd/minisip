@@ -25,19 +25,20 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
+
+#include<libmikey/keyagreement.h>
+
 #include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libminisip/mediahandler/DtmfSender.h>
-#include<libmikey/keyagreement.h>
 #include<libminisip/sdp/SdpPacket.h>
 
 class MediaStreamReceiver;
 class MediaStreamSender;
 class SdpHeaderM;
-//class KeyAgreement;
 class IPAddress;
 class SessionRegistry;
 

@@ -25,12 +25,12 @@
 #ifndef RTCPREPORTRR_H
 #define RTCPREPORTRR_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/rtp/RtcpReport.h>
 #include<libminisip/rtp/RtcpReportReceptionBlock.h>
-#include<vector>
-#include<config.h>
 
-using namespace std;
+#include<vector>
 
 class RtcpReportRR : public RtcpReport{
 	public:
@@ -56,8 +56,7 @@ class RtcpReportRR : public RtcpReport{
 		
 	private:
 		unsigned sender_ssrc;
-		//-------------
-		vector<RtcpReportReceptionBlock>reception_blocks;
+		std::vector<RtcpReportReceptionBlock>reception_blocks;
 };
 
 #endif

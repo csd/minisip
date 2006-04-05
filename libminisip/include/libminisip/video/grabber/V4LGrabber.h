@@ -25,6 +25,8 @@
 #ifndef V4L_GRABBER_H
 #define V4L_GRABBER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<string>
 #include<stdint.h>
 #include<libmutil/Mutex.h>
@@ -35,7 +37,6 @@
 #define N_BUFFERS 20
 
 struct v4l2_capability;
-
 
 struct cardBuffer{
 	uint8_t * start;

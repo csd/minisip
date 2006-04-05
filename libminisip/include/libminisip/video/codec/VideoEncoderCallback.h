@@ -25,6 +25,8 @@
 #ifndef VIDEO_ENCODER_CALLBACK_H
 #define VIDEO_ENCODER_CALLBACK_H
 
+#include<libminisip/libminisip_config.h>
+
 class VideoEncoderCallback{
 	public:
 	        virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false )=0;

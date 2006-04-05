@@ -25,10 +25,10 @@
 #ifndef STUNMESSAGE_H
 #define STUNMESSAGE_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<list>
 #include<libminisip/stun/STUNAttributes.h>
-
-using namespace std;
 
 /**
  * Defines the message header that is common to all STUN messages.
@@ -88,7 +88,7 @@ class STUNMessage{
 		void parseAttributes(unsigned char *data, int length);
 
 		MessageHeader header;
-		list<STUNAttribute *> attributes;
+		std::list<STUNAttribute *> attributes;
 	private:
 };
 

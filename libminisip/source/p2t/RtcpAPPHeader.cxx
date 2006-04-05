@@ -22,10 +22,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/p2t/RtcpAPPHeader.h>
 #include<libminisip/p2t/RtcpAPP.h>
 #include<libmutil/dbg.h>
-
 
 RtcpAPPHeader::RtcpAPPHeader(){
 	//According RFC

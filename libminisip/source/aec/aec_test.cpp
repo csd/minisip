@@ -12,12 +12,14 @@ c++ -DWIDEB=1 -O2 -march=pentium3 -o aec_test aec_test.cpp aec.cpp -lm
  * Version 1.3 set/get ambient in dB
  */
 
+#include<config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
-#include "aec.h"
+#include <libminisip/aec.h>
 
 #define TAPS  	(80*WIDEB*8)
 

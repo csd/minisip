@@ -23,6 +23,8 @@
 */
 
 
+#include <config.h>
+
 #include<libminisip/p2t/RtcpReceiver.h>
 
 #ifndef _MSC_VER

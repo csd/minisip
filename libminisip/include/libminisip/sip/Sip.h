@@ -78,19 +78,17 @@
 class SipSoftPhoneConfiguration;
 class MediaHandler;
 
-using namespace std;
-
 class Sip: public Runnable, public CommandReceiver{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
 				MRef<MediaHandler*> mediaHandler,
-				string localIpString,
-				string externalContactIP,
+				std::string localIpString,
+				std::string externalContactIP,
 				int32_t localUdpPort=5060,
 				int32_t localTcpPort=5060,
 				int32_t externalContactUdpPort=5060,
-				string defaultTransportProtocol="UDP"
+				std::string defaultTransportProtocol="UDP"
 				,int32_t localTlsPort=5061,
 				MRef<certificate_chain *> cert=NULL,    //The certificate chain is used by TLS
 				//TODO: TLS should use the whole chain instead of only the f$
@@ -130,15 +128,15 @@ class Sip: public Runnable, public CommandReceiver{
 		*/
 		virtual void run();
 
-		string confjoin(string &user, minilist<ConfMember> *list, string confId);
-		string confconnect(string &user, string confId);
+		std::string confjoin(std::string &user, minilist<ConfMember> *conflist, std::string confId);
+		std::string confconnect(std::string &user, std::string confId);
 		MRef<SipStack*> getSipStack(){return sipstack;}
 
 		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
 
-		void handleCommand(string subsystem, const CommandString &cmd);
+		void handleCommand(std::string subsystem, const CommandString &cmd);
 
-		CommandString handleCommandResp(string subsystem, const CommandString &cmd);
+		CommandString handleCommandResp(std::string subsystem, const CommandString &cmd);
                 
 	private:
 		MRef<SipStack *> sipstack;

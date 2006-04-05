@@ -56,16 +56,16 @@ class LogEntry;
 class SipDialogVoip: public SipDialog{
 	public:
 /*#ifdef IPSEC_SUPPORT
-		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 #endif		*/
 		SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 						MRef<SipDialogConfig*> callconfig,
 						MRef<SipSoftPhoneConfiguration*> pconf,
 						MRef<Session *> mediaSession,
-						string cid=""
+						std::string cid=""
 					#ifdef IPSEC_SUPPORT
 						, MRef<MsipIpsecAPI *> ipsecSession = NULL
 					#endif
@@ -76,7 +76,7 @@ class SipDialogVoip: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogVoip";}
 		
-		virtual string getName(){return "SipDialogVoip[callid="+dialogState.callId +"]";}
+		virtual std::string getName(){return "SipDialogVoip[callid="+dialogState.callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);
@@ -88,12 +88,12 @@ class SipDialogVoip: public SipDialog{
 #endif
 
 	protected:
-		void sendBye(const string &branch, int);
-		void sendByeOk(MRef<SipRequest*> bye, const string &branch);
-		void sendCancel(const string &branch);
+		void sendBye(const std::string &branch, int);
+		void sendByeOk(MRef<SipRequest*> bye, const std::string &branch);
+		void sendCancel(const std::string &branch);
 		MRef<SipRequest*> getLastInvite();
 		void setLastInvite(MRef<SipRequest*> i);
-		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
+		bool sortMIME(MRef<SipMessageContent *> Offer, std::string peerUri, int type);		
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
 
@@ -114,10 +114,10 @@ class SipDialogVoip: public SipDialog{
 		void setUpStateMachine();
 		
 		
-		void sendReferOk(const string &branch);
-		void sendNotifyOk(MRef<SipRequest*> notif, const string &branch);
-		void sendReferReject(const string &branch);
-		void sendRefer(const string &branch, int, const string referredUri);
+		void sendReferOk(const std::string &branch);
+		void sendNotifyOk(MRef<SipRequest*> notif, const std::string &branch);
+		void sendReferReject(const std::string &branch);
+		void sendRefer(const std::string &branch, int, const std::string referredUri);
 		
 		/* Ending a call */
 		bool a1001_incall_termwait_BYE( const SipSMCommand &command);
@@ -136,7 +136,6 @@ class SipDialogVoip: public SipDialog{
 		bool a1301_incall_transferaskuser_REFER( const SipSMCommand &command);
 		bool a1302_transferaskuser_transferstarted_accept( const SipSMCommand &command);
 		bool a1303_transferaskuser_incall_refuse( const SipSMCommand &command);
-                
 		
 		MRef<LogEntry *> logEntry;
 

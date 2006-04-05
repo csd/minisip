@@ -40,12 +40,7 @@
 #	include<libminisip/p2t/SipDialogP2T.h>
 #endif
 
-
-
 class SipDialogContainer;
-//class SipDialogConfig;
-//class SipSMCommand;
-//class SipMessage;
 
 /**
  * the final destination for a SipSMCommand if no dialog handled it before.
@@ -66,7 +61,7 @@ class DefaultDialogHandler : public SipDialog{
 
 		virtual std::string getMemObjectType(){return "DefaultDialogHandler";}
 
-		virtual string getName();
+		virtual std::string getName();
 		
 		virtual bool handleCommand(const SipSMCommand &command);
 		
@@ -136,11 +131,11 @@ class DefaultDialogHandler : public SipDialog{
 		 *                     modified
 		 * @return true if the SIP URI is valid
 		 */
-		bool modifyDialogConfig(string user, MRef<SipDialogConfig *> dialogConfig);
+		bool modifyDialogConfig(std::string user, MRef<SipDialogConfig *> dialogConfig);
 
-		void sendIMOk(MRef<SipRequest*> immessage, const string &branch);
+		void sendIMOk(MRef<SipRequest*> immessage, const std::string &branch);
 		
-		void sendIM(const string &branch, string msg, int seqno, string toUri);
+		void sendIM(const std::string &branch, std::string msg, int seqno, std::string toUri);
 			
 
 };

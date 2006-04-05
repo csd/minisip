@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<assert.h>
 #include<time.h>
 #include<libminisip/p2t/SipDialogP2T.h>

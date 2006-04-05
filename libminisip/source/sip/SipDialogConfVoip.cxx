@@ -30,6 +30,9 @@
  	Bilge Cetin <bilge[at]kth.se>
 	Max Loubser <loubser[at]kth.se>
 */
+
+#include<config.h>
+
 #include<libminisip/sip/SipDialogConfVoip.h>
 
 #include<libmutil/massert.h>

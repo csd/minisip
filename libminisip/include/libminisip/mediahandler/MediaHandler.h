@@ -25,7 +25,7 @@
 #ifndef MEDIA_HANDLER_H
 #define MEDIA_HANDLER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
 

@@ -25,7 +25,7 @@
 #ifndef SDES_NAME_H
 #define SDES_NAME_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/rtp/SDESItem.h>
 

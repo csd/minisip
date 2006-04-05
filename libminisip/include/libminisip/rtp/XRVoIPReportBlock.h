@@ -25,8 +25,9 @@
 #ifndef XRVOIPREPORTBLOCK_H 
 #define XRVOIPREPORTBLOCK_H 
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/rtp/XRReportBlock.h>
-#include<config.h>
 
 class XRVoIPReportBlock : public XRReportBlock{
 	public:

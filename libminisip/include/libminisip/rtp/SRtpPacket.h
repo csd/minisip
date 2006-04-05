@@ -25,46 +25,49 @@
 #ifndef SRTPPACKET_H
 #define SRTPPACKET_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
-#include<libminisip/rtp/RtpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
-#include<libminisip/rtp/CryptoContext.h>
 
+#include<libminisip/rtp/CryptoContext.h>
+#include<libminisip/rtp/RtpPacket.h>
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );
 
 class SRtpPacket : public RtpPacket{
-        public:
-                SRtpPacket();
-                SRtpPacket(CryptoContext *scontext, RtpPacket *rtppacket);
-                SRtpPacket(RtpHeader hdr, 
-				unsigned char *content, int content_length,
-				unsigned char *tag, int tag_length, 
-				unsigned char *mki, int mki_length);
+	public:
+		SRtpPacket();
+		SRtpPacket(CryptoContext *scontext, RtpPacket *rtppacket);
+		SRtpPacket(RtpHeader hdr, 
+				unsigned char *content, 
+				int content_length,
+				unsigned char *tag, 
+				int tag_length, 
+				unsigned char *mki, 
+				int mki_length);
 		SRtpPacket( unsigned char *content, int content_length, 
 			int seq_no, unsigned timestamp,
 			unsigned ssrc);
-                virtual ~SRtpPacket();
+		virtual ~SRtpPacket();
 
-                static SRtpPacket *readPacket( UDPSocket &udp_sock, int timeout=-1 ); // static????
+		static SRtpPacket *readPacket( UDPSocket &udp_sock, int timeout=-1 ); // static????
 
-                void protect( MRef<CryptoContext *> scontext );
-                int unprotect( MRef<CryptoContext *> scontext );
+		void protect( MRef<CryptoContext *> scontext );
+		int unprotect( MRef<CryptoContext *> scontext );
 
-                unsigned char *get_tag();
+		unsigned char *get_tag();
 		unsigned int get_tag_length();
-                void remove_tag();
-                void set_tag(unsigned char *tag);
-                
+		void remove_tag();
+		void set_tag(unsigned char *tag);
+		
 		virtual char * getBytes();
-                virtual int size();
-                
+		virtual int size();
+		
 
-        private:
+	private:
 		bool encrypted;
-                unsigned char *tag;
+		unsigned char *tag;
 		unsigned int tag_length;
 		unsigned char * mki;
 		unsigned int mki_length;

@@ -25,15 +25,15 @@
 #ifndef RTCPSENDER_H
 #define RTCPSENDER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #ifdef HAVE_NETINET_IN_H
-#include<sys/socket.h>
-#include<netinet/in.h>
+#	include<sys/socket.h>
+#	include<netinet/in.h>
 #endif
 
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 #include<libmnetutil/IPAddress.h>
@@ -69,7 +69,7 @@ class RtcpSender{
 		 * @param to      the destination address
 		 * @param port    the destination port
 		 */
-		void send_APP(unsigned subtype, unsigned ssrc, string name, IPAddress *to, int port);
+		void send_APP(unsigned subtype, unsigned ssrc,  std::string name, IPAddress *to, int port);
 
 		/**
 		 * sends a RTCP APP packet with application data especially for floor
@@ -82,7 +82,7 @@ class RtcpSender{
 		 * @param seqNo    the sequence number
 		 * @param optional the optional field. Used for warning code, deny reason and collision flag.
 		 */
-		void send_APP_FC(unsigned subtype, unsigned ssrc, string name, IPAddress *to, int port,
+		void send_APP_FC(unsigned subtype, unsigned ssrc,  std::string name, IPAddress *to, int port,
 				int seqNo,
 				int optional=0);
 		

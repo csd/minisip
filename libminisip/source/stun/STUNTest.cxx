@@ -22,19 +22,20 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/stun/STUNTest.h>
 
 #include<libmutil/merror.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
-//#include<sys/poll.h>
 
 #ifdef LINUX
-#include<sys/select.h>
+#	include<sys/select.h>
 #endif
 
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 #include<errno.h>

@@ -25,10 +25,12 @@
 #ifndef RTCPTRANSACTIONIDLEFLOOR_H
 #define RTCPTRANSACTIONIDLEFLOOR_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
+
+#include<libminisip/p2t/P2T.h>
 #include<libminisip/p2t/SipDialogP2T.h>
 
 /** 
@@ -86,22 +88,22 @@ class RtcpTransactionIdleFloor: public SipTransaction{
 		 * @param remoteSSRC the SSRC from the remote user. The transaction accepts only floor control
 		 *                   messages with this number.
 		 */
-		RtcpTransactionIdleFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port, string callId, unsigned remoteSSRC);
+		RtcpTransactionIdleFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port,  std::string callId, unsigned remoteSSRC);
 		
 		/**
 		 * Destructor
 		 */
 		virtual ~RtcpTransactionIdleFloor();
 
-		void setCallId(string id){callId = id;}
-		string getCallId(){return callId;}
+		void setCallId( std::string id){callId = id;}
+		 std::string getCallId(){return callId;}
 
 		/**
 		 * returns the name of the transaction.
 		 * Used by the Memory Handling of Minisip.
-		 * @return the string 'RtcpTransactionIdleFloor'
+		 * @return the  std::string 'RtcpTransactionIdleFloor'
 		 */
-		virtual string getName(){return "RtcpTransactionIdleFloor";}
+		virtual  std::string getName(){return "RtcpTransactionIdleFloor";}
 
 		/**
 		 * handles the incoming commands.

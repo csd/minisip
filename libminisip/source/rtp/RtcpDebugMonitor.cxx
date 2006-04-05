@@ -27,16 +27,18 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<libmnetutil/UDPSocket.h>
+
 #ifdef LINUX
-#include<netinet/in.h>
-#include<sys/socket.h>
+#	include<netinet/in.h>
+#	include<sys/socket.h>
 #endif
+
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 #ifndef _MSC_VER
-#include<unistd.h>
+#	include<unistd.h>
 #endif
 
 #include<libminisip/rtp/RtcpDebugMonitor.h>
@@ -44,7 +46,7 @@
 #include<libmutil/Thread.h>
 
 #ifdef DEBUG_OUTPUT
-#include<iostream>
+#	include<iostream>
 #endif
 
 using namespace std;

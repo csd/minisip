@@ -26,13 +26,14 @@
 #ifndef OSSSOUNDDEVICE_H
 #define OSSSOUNDDEVICE_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/soundcard/SoundDevice.h>
 
 #ifndef DISABLE_OSS
 
 #include<sys/soundcard.h>
 #include<sys/ioctl.h>
-
 
 #include<unistd.h>
 #include<stdio.h>

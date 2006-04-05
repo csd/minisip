@@ -30,8 +30,6 @@
  * 
 */
 
-
-
 #ifndef SipDialogPresenceServer_H
 #define SipDialogPresenceServer_H
 
@@ -59,20 +57,20 @@ class SipDialogPresenceServer: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogPresenceServer";}
 		
-		virtual string getName(){return "SipDialogPresenceServer[callid="+dialogState.callId +"]";}
+		virtual  std::string getName(){return "SipDialogPresenceServer[callid="+dialogState.callId +"]";}
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
 		void setUpStateMachine();
 
 	private:
-		void sendNoticeToAll(string onlineStatus);
-		void sendNotice(string onlinestatus, string user);
+		void sendNoticeToAll( std::string onlineStatus);
+		void sendNotice( std::string onlinestatus,  std::string user);
 		void sendSubscribeOk(MRef<SipRequest*> sub);
-		void removeUser(string user);
-		void addUser(string user);
+		void removeUser( std::string user);
+		void addUser( std::string user);
 		
-		void sendNotify(const string &branch, string toUri, string callId);
+		void sendNotify(const  std::string &branch,  std::string toUri,  std::string callId);
 //		void createNotifyClientTransaction();
 		
 		bool a0_start_default_startpresenceserver(const SipSMCommand &command);
@@ -83,10 +81,10 @@ class SipDialogPresenceServer: public SipDialog{
 		bool a5_default_default_SUBSCRIBE(const SipSMCommand &command);
 
 		bool useSTUN;
-		minilist<string> subscribing_users;
+		minilist< std::string> subscribing_users;
 		Mutex usersLock;
 
-		string onlineStatus;
+		 std::string onlineStatus;
 };
 
 #endif

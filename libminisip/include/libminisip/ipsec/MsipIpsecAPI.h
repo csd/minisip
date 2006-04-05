@@ -24,11 +24,17 @@
 #ifndef MINISIPIPSEC_H
 #define MINISIPIPSEC_H
 
+#include<libminisip/libminisip_config.h>
+
+#include<libmutil/MemObject.h>
+
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
-#include<libminisip/sip/SipDialogSecurityConfig.h>
-#include<libmutil/MemObject.h>
+
 #include<libmsip/SipMIMEContent.h>
+
+#include<libminisip/sip/SipDialogSecurityConfig.h>
+
 #include <fcntl.h>
 
 class MsipIpsecRequest{

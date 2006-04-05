@@ -25,13 +25,15 @@
 #ifndef RTCPRECEIVER_H
 #define RTCPRECEIVER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
+#include<libmutil/Thread.h>
 
 #include<libmnetutil/UDPSocket.h>
+
 #include<libmsip/SipDialog.h>
+
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libmutil/Thread.h>
 #include<libminisip/gui/Gui.h>
 #include<libminisip/p2t/P2T.h>
 
@@ -132,7 +134,7 @@ class RtcpReceiver : public Runnable{
 		 * get the IP address of the RTCP receiver.
 		 * @return string containing the IP address of the server
 		 */
-		string getContactIp(){return contactMediaIP;}
+		 std::string getContactIp(){return contactMediaIP;}
 		
 		/**
 		 * get the port of the RTCP receiver.
@@ -155,7 +157,7 @@ class RtcpReceiver : public Runnable{
 		bool flush_flag;
 		
 		///the IP address where the receiver is listening.
-		string contactMediaIP;
+		 std::string contactMediaIP;
 		
 		///the port where the receiver is listening.
 		int contactMediaPort;

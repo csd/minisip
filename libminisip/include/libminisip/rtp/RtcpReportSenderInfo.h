@@ -25,7 +25,7 @@
 #ifndef RTCPREPORTSENDERINFO_H
 #define RTCPREPORTSENDERINFO_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 class RtcpReportSenderInfo{
 	public:

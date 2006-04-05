@@ -12,11 +12,13 @@
  * Version 0.3 filter created with www.dsptutor.freeuk.com
  */
 
+#include<config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "aecfix.h"
+#include <libminisip/aecfix.h>
 
 #if 1
 /* Vector Dot Product */

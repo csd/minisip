@@ -30,9 +30,10 @@
  * 
 */
 
-
 #ifndef SDPHEADERC_H
 #define SDPHEADERC_H
+
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/sdp/SdpHeader.h>
 

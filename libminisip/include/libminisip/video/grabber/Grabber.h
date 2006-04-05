@@ -25,13 +25,14 @@
 #ifndef GRABBER_H
 #define GRABBER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
 
 class ImageMixer;
-
 
 class Grabber : public Runnable{
 	public:

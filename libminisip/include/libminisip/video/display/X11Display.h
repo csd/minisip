@@ -25,6 +25,8 @@
 #ifndef X11_DISPLAY_H
 #define X11_DISPLAY_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
@@ -33,9 +35,6 @@
 #include <X11/keysym.h>
 
 #include<libminisip/video/display/VideoDisplay.h>
-
-
-
 
 class X11Display: public VideoDisplay{
 	public: 
@@ -77,10 +76,8 @@ class X11Display: public VideoDisplay{
 
 	private:
 
-
-
-                uint32_t bytesPerPixel;
-                XVisualInfo * visualInfo;
+		uint32_t bytesPerPixel;
+		XVisualInfo * visualInfo;
 
 };
 

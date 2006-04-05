@@ -26,6 +26,8 @@
 #define AV_CODER_H
 #define HAVE_MMX
 
+#include<libminisip/libminisip_config.h>
+
 #include<string>
 
 #include<libminisip/video/ImageHandler.h>

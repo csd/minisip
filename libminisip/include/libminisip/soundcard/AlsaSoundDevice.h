@@ -26,14 +26,14 @@
 #ifndef ALSASOUNDDEVICE_H
 #define ALSASOUNDDEVICE_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/soundcard/SoundDevice.h>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 #define MIN_HW_PO_BUFFER (20 * 1000)   /* This buffer size is in micro secs ...*/
-
-
 
 class AlsaSoundDevice: public SoundDevice{
 	public:

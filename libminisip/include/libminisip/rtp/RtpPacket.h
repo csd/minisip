@@ -25,12 +25,14 @@
 #ifndef RTPPACKET_H
 #define RTPPACKET_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
-#include<libminisip/rtp/RtpHeader.h>
+
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
-#include<config.h>
+#include<libminisip/rtp/RtpHeader.h>
 
 class RtpPacket: public MObject {
 	public:

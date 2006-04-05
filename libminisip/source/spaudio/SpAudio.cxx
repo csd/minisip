@@ -22,6 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 
 #include<libminisip/spaudio/SpAudio.h>
 
@@ -31,9 +32,7 @@
 
 #include<libmutil/itoa.h> //cesc ... remove
 
-
 SpAudio::SpAudio(int32_t numPos){
-
 	nPos=numPos;
 }
 

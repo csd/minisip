@@ -25,11 +25,11 @@
 #ifndef SDESCHUNK_H
 #define SDESCHUNK_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
+
 #include<libminisip/rtp/SDESItem.h>
-using namespace std;
 
 class SDESChunk{
 	public:
@@ -41,7 +41,7 @@ class SDESChunk{
 
 	private:
 		unsigned ssrc_or_csrc;
-		vector<SDESItem *>sdes_items;
+		std::vector<SDESItem *>sdes_items;
 };
 
 #endif

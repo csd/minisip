@@ -42,7 +42,7 @@ class ConfMessageRouter: 	//public SipCallback,
 		ConfMessageRouter();
 		virtual ~ConfMessageRouter();
 		
-		void handleCommand(string subsystem, const CommandString &cmd){
+		void handleCommand(std::string subsystem, const CommandString &cmd){
 			if (subsystem=="sip_conf"){
 				sipcb_handleConfCommand(cmd);
 				return;
@@ -51,7 +51,7 @@ class ConfMessageRouter: 	//public SipCallback,
 			assert(1==0);
 		}
 
-		CommandString handleCommandResp(string /*subsystem*/, const CommandString &/*cmd*/){
+		CommandString handleCommandResp(std::string /*subsystem*/, const CommandString &/*cmd*/){
 			
 			CommandString ret("","command_not_understood");
 			return ret;
@@ -67,16 +67,16 @@ class ConfMessageRouter: 	//public SipCallback,
 		virtual void sipcb_handleCommand(const CommandString &command);
 		virtual void sipcb_handleConfCommand(const CommandString &command);
 		virtual void guicb_handleCommand(const CommandString &command);
-		virtual void guicb_handleConfCommand(const string &conferencename);
+		virtual void guicb_handleConfCommand(const std::string &conferencename);
 		virtual void guicb_handleConfCommand(const CommandString &command);
 		virtual void guicb_handleMediaCommand(const CommandString &command);
 		
-		virtual string confcb_doJoin(string user, minilist<ConfMember> *list, string congId);
-		virtual string confcb_doConnect(string user, string confId);
-		virtual void confcb_handleSipCommand(string &/*command*/){}
+		virtual std::string confcb_doJoin(std::string user, minilist<ConfMember> *conflist, std::string congId);
+		virtual std::string confcb_doConnect(std::string user, std::string confId);
+		virtual void confcb_handleSipCommand(std::string &/*command*/){}
 		virtual void confcb_handleSipCommand(const CommandString &command);
 		virtual void confcb_handleGuiCommand(const CommandString &command);	
-		virtual ConferenceControl* getConferenceController(string confid);
+		virtual ConferenceControl* getConferenceController(std::string confid);
 	private:
 		
 		MRef<Gui *> gui;

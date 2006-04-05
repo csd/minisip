@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <errno.h>
 #include<libminisip/p2t/GroupListClient.h>

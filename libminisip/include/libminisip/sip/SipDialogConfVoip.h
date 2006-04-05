@@ -57,14 +57,14 @@ class LogEntry;
 class SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *list, string confid, string callId="");
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
 #endif
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string confid, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string confid, string callId="");
+		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
 
 
 #endif		
@@ -72,7 +72,7 @@ class SipDialogConfVoip: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogConfVoip";}
 		
-		virtual string getName(){return "SipDialogConfVoip[callid="+dialogState.callId +"]";}
+		virtual std::string getName(){return "SipDialogConfVoip[callid="+dialogState.callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);
@@ -85,11 +85,10 @@ class SipDialogConfVoip: public SipDialog{
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
 		//void handleSdp(MRef<SdpPacket*> );
-                
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
 	private:
-		string confId;
+		std::string confId;
 		void setUpStateMachine();
 		
 		//string connectedList[10]; //old static list
@@ -98,21 +97,21 @@ class SipDialogConfVoip: public SipDialog{
 		//this is the list that will be sent in an Ok or Ack message.
 		minilist<ConfMember> connectedList;
 		
-		string type;
+		std::string type;
 		int numConnected;
 		MRef<SipRequest*> getLastInvite();
 		void setLastInvite(MRef<SipRequest*> i);
 		
-		void sendInvite(const string &branch);
-		void sendAuthInvite(const string &branch);
-		void sendBye(const string &branch, int);
-		void sendCancel(const string &branch);
-		void sendAck(const string &branch);
-		void sendInviteOk(const string &branch);
-		void sendByeOk(MRef<SipRequest*> bye, const string &branch);
-		void sendReject(const string &branch);
-		void sendRinging(const string &branch);
-		void sendNotAcceptable(const string &branch);
+		void sendInvite(const std::string &branch);
+		void sendAuthInvite(const std::string &branch);
+		void sendBye(const std::string &branch, int);
+		void sendCancel(const std::string &branch);
+		void sendAck(const std::string &branch);
+		void sendInviteOk(const std::string &branch);
+		void sendByeOk(MRef<SipRequest*> bye, const std::string &branch);
+		void sendReject(const std::string &branch);
+		void sendRinging(const std::string &branch);
+		void sendNotAcceptable(const std::string &branch);
 		void modifyConfJoinInvite(MRef<SipRequest*>inv);
 		void modifyConfConnectInvite(MRef<SipRequest*>inv);
 		void modifyConfAck(MRef<SipRequest*>ack);
@@ -143,17 +142,15 @@ class SipDialogConfVoip: public SipDialog{
 		bool a26_callingauth_termwait_cancel( const SipSMCommand &command);
 		bool a27_incall_incall_ACK( const SipSMCommand &command);
 		
-		bool sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type);		
-		
-		
+		bool sortMIME(MRef<SipMessageContent *> Offer, std::string peerUri, int type);		
 		
 		MRef<LogEntry *> logEntry;
 
 		MRef<SipRequest*> lastInvite;
 		MRef<SipResponse*> lastResponse;
 		bool localCalled;
-		string nonce;
-		string realm;
+		std::string nonce;
+		std::string realm;
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<Session *> mediaSession;
 

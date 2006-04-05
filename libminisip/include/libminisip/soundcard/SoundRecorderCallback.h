@@ -25,6 +25,8 @@
 #ifndef SOUNDRECORDERCALLBACK_H
 #define SOUNDRECORDERCALLBACK_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<sys/types.h>
 
 /**

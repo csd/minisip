@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/gui/Gui.h>
 
 #include<libminisip/conference/ConfMessageRouter.h>

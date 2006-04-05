@@ -30,6 +30,8 @@
  * 
 */
 
+#include <config.h>
+
 #include<libminisip/p2t/RtcpTransactionReleaseFloor.h>
 
 #include<assert.h>

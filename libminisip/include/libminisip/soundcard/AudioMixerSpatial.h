@@ -33,12 +33,12 @@
 #ifndef AUDIO_MIXER_SPATIAL_H
 #define AUDIO_MIXER_SPATIAL_H
 
-#include"config.h"
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/soundcard/AudioMixer.h>
 
 class SoundSource;
 class SpAudio;
-
 
 /**
 A Spatial Audio mixer.

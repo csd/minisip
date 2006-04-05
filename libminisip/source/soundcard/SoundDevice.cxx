@@ -29,23 +29,23 @@
 #include<libminisip/soundcard/FileSoundDevice.h>
 
 #ifndef WIN32
-#include<libminisip/soundcard/OssSoundDevice.h>
+#	include<libminisip/soundcard/OssSoundDevice.h>
 #endif
 
 #ifdef HAVE_LIBASOUND
-#include<libminisip/soundcard/AlsaSoundDevice.h>
+#	include<libminisip/soundcard/AlsaSoundDevice.h>
 #endif
 
 #ifdef DSOUND
-#include<libminisip/soundcard/DirectSoundDevice.h>
+#	include<libminisip/soundcard/DirectSoundSoundDevice.h>
 #endif
 
 #ifdef WAVE_SOUND
-#include<libminisip/soundcard/WaveSoundDevice.h>
+#	include<libminisip/soundcard/WaveSoundDevice.h>
 #endif
 
 #ifdef PORTAUDIO_SUPPORT
-#include<libminisip/soundcard/PortAudioDevice.h>
+#	include<libminisip/soundcard/PortAudioDevice.h>
 #endif
 
 #include<stdio.h>

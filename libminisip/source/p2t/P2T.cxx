@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/p2t/P2T.h>
 
 //Performance measurements

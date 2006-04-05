@@ -31,6 +31,8 @@
  * 
 */
 
+#include <config.h>
+
 #include<assert.h>
 #include<libminisip/p2t/SipDialogP2Tuser.h>
 #include<libmsip/SipDialogContainer.h>

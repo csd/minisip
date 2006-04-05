@@ -25,10 +25,11 @@
 #ifndef RTCPDEBUGMONITOR_H
 #define RTCPDEBUGMONITOR_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
+#include<libmutil/Thread.h>
 
 #include<libmnetutil/UDPSocket.h>
-#include<libmutil/Thread.h>
 
 class RtcpDebugMonitor : public Runnable{
 	public:

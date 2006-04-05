@@ -30,6 +30,7 @@
  * 
 */
 
+#include<libminisip/libminisip_config.h>
 
 #ifndef SDPHEADERA_H
 #define SDPHEADERA_H

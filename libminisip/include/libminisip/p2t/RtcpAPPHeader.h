@@ -25,7 +25,7 @@
 #ifndef RTCPAPPHEADER_H
 #define RTCPAPPHEADER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
 #include<string>
@@ -94,7 +94,7 @@ class RtcpAPPHeader{
 		 * set the name
 		 * @param name name defining the set of APP packets
 		 */
-		void setName(string name);
+		void setName( std::string name);
 		
 		/**
 		 * get the version value
@@ -136,7 +136,7 @@ class RtcpAPPHeader{
 		 * get the name
 		 * @return name
 		 */
-		string getName();
+		 std::string getName();
 
 		/**
 		 * get the size of the header fields

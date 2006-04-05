@@ -26,14 +26,16 @@
 #ifndef SipDialogP2T_H
 #define SipDialogP2T_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
+#include<libmutil/StateMachine.h>
+
+#include<libmnetutil/IPAddress.h>
 
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipStack.h>
-#include<libmutil/StateMachine.h>
-#include<libmnetutil/IPAddress.h>
+
 #include<libminisip/codecs/Codec.h>
 #include<libminisip/p2t/RtcpReceiver.h>
 #include<libminisip/p2t/RtcpSender.h>
@@ -42,8 +44,6 @@
 #include<libminisip/p2t/GroupListClient.h>
 #include<libminisip/p2t/P2T.h>
 #include<libminisip/mediahandler/MediaHandler.h>
-
-
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 
@@ -285,12 +285,12 @@ class SipDialogP2T: public SipDialog{
 		/**
 		 * @return the name "SipDialogP2T"
 		 */	
-		virtual string getName(){return "SipDialogP2T";}
+		virtual std::string getName(){return "SipDialogP2T";}
 
 		virtual std::string getMemObjectType(){return getName();}
 
-		void setCallId(string id){dialogState.callId = id;}
-		string getCallId(){return dialogState.callId;}
+		void setCallId(std::string id){dialogState.callId = id;}
+		std::string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * handles the incoming commands. Accepts commands only if they have the
@@ -335,7 +335,7 @@ class SipDialogP2T: public SipDialog{
 		 * @param callId    the SipDialogP2Tuser callId
  		 * @return true if the user was successfully modified
  		 */
-		bool modifyUser(string uri, IPAddress *ip, int RTPport, int RTCPport, Codec *codec, string callId);
+		bool modifyUser(std::string uri, IPAddress *ip, int RTPport, int RTCPport, Codec *codec, std::string callId);
 		
 		/**
 		 * removes a user from the Group Member List.
@@ -347,7 +347,7 @@ class SipDialogP2T: public SipDialog{
 		 *                parameter are similar.
 		 * @return true if the user was successfully removed
 		 */
-		bool removeUser(string user, string reason, string callId);
+		bool removeUser(std::string user, std::string reason, std::string callId);
 
 		/**
 		 * get the RtcpSender that is responsible for sending
@@ -403,7 +403,7 @@ class SipDialogP2T: public SipDialog{
 		 * @param users  a vector containing strings
 		 * @return boolean returns true if local user has highest priority.
 		 */
-		bool highestPrio(int status,vector<string> &users);
+		bool highestPrio(int status,std::vector<std::string> &users);
 		
 		/**
 		 * sets the status of every user in the Group Member List

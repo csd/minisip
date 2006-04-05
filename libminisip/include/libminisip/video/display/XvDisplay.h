@@ -22,6 +22,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef XVDISPLAY_INCLUDE_HEADER
+#define XVDISPLAY_INCLUDE_HEADER
+
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
@@ -34,9 +39,6 @@
 
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/video/display/X11Display.h>
-
-
-
 
 class XvDisplay: public X11Display{
 	public: 
@@ -73,3 +75,5 @@ class XvDisplay: public X11Display{
 		bool fullscreen;
 
 };
+
+#endif

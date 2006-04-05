@@ -23,6 +23,8 @@
  *	    Joachim Orrblad <joachim[at]orrblad.com>
 */
 
+#include<config.h>
+
 #include<libminisip/sip/Sip.h>
 
 #include<libminisip/sip/DefaultDialogHandler.h>
@@ -52,6 +54,8 @@
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
+
+using namespace std;
 
 Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler,
 		string localIpString, 
@@ -206,11 +210,11 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 #endif
 
 #ifdef DEBUG_OUTPUT
-        cerr << "Before addDialog" << endl;
+	cerr << "Before addDialog" << endl;
 #endif	
 	/*dialogContainer*/sipstack->addDialog(voipCall);
 #ifdef DEBUG_OUTPUT
-        cerr << "After addDialog" << endl;
+	cerr << "After addDialog" << endl;
 #endif
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifdef ENABLE_TS
@@ -227,8 +231,8 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
         cerr << "After handleCommand" << endl;
 #endif
 	//dialogContainer->enqueueCommand( c, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-        //
-        mediaSession->setCallId( voipCall->getCallId() );
+	//
+	mediaSession->setCallId( voipCall->getCallId() );
 
 	string cid = voipCall->getCallId();
 

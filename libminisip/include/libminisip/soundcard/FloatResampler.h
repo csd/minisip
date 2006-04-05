@@ -28,6 +28,8 @@
 
 #ifdef FLOAT_RESAMPLER
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/soundcard/Resampler.h>
 #include<samplerate.h>
 

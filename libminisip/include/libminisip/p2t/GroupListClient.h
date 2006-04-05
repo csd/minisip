@@ -26,9 +26,12 @@
 #ifndef GROUPLISTCLIENT_H
 #define GROUPLISTCLIENT_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
+
 #include<libmnetutil/IPAddress.h>
+
 #include<libminisip/p2t/P2T.h>
 #include<libminisip/p2t/GroupList.h>
 
@@ -84,7 +87,7 @@ class GroupListClient: public MObject{
 		 * @param port     the port of the GroupList Server
 		 * @return a <code>GroupList</code> object
 		 */
-		MRef<GroupList*> getGroupList(string GroupId, char *srv_addr, int port);
+		MRef<GroupList*> getGroupList( std::string GroupId, char *srv_addr, int port);
 		
 		/**
 		 * connects to a HTTP server and download the specified file. The file must
@@ -94,29 +97,29 @@ class GroupListClient: public MObject{
 		 * @param port     the port of the server
 		 * @return a <code>GroupList</code> object
 		 */
-		MRef<GroupList*> downloadGroupList(string file, char *srv_addr, int port);
+		MRef<GroupList*> downloadGroupList( std::string file, char *srv_addr, int port);
 	
 		
 	private:
 		/**
 		 * This function is used by <CODE>getGroupList</CODE> to
 		 * connect to the server.
-		 * @return string with the GroupList in xml code
+		 * @return  std::string with the GroupList in xml code
 		 * @param GroupId  the group identity for which the GroupList should
 		 *                 be downloaded
 		 * @param srv_addr the address of the GroupList Server
 		 * @param port     the port of the GroupList Server
 		 */
-		string connectServer(string GroupId, char *srv_addr, int port);
+		 std::string connectServer( std::string GroupId, char *srv_addr, int port);
 		
 		/**
-		 * returns true if the string <CODE>line</CODE> starts with the
-		 * string specified in <code>part</code>.
+		 * returns true if the  std::string <CODE>line</CODE> starts with the
+		 *  std::string specified in <code>part</code>.
 		 * @param line 
-		 * @param part the string where <CODE>line</CODE> has to start with
+		 * @param part the  std::string where <CODE>line</CODE> has to start with
 		 * @return true or false
 		 */
-		bool starts_with(string line, string part);
+		bool starts_with( std::string line,  std::string part);
 };
 
 #endif

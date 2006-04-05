@@ -25,26 +25,27 @@
 #ifndef SESSIONREGISTRY_H
 #define SESSIONREGISTRY_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
+
 #include<libminisip/mediahandler/Session.h>
 
 
 class SessionRegistry{
-        friend class Session;
-        
-        public:
-                MRef<Session *> getSession( std::string callId );
+	friend class Session;
+	
+	public:
+		MRef<Session *> getSession( std::string callId );
 		std::list<MRef<Session *> > getAllSessions(); 
 		
-        protected:
-                void registerSession( MRef<Session *> session );
-                void unregisterSession( MRef<Session *> session );
+	protected:
+		void registerSession( MRef<Session *> session );
+		void unregisterSession( MRef<Session *> session );
 
-                std::list<MRef<Session *> > sessions;
-                Mutex sessionsLock;
+		std::list<MRef<Session *> > sessions;
+		Mutex sessionsLock;
 };
 
 #endif

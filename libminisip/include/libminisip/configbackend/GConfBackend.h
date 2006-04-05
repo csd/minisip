@@ -25,7 +25,7 @@
 #ifndef G_CONF_BACKEND_H
 #define G_CONF_BACKEND_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/configbackend/ConfBackend.h>
 

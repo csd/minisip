@@ -33,8 +33,6 @@
 
 #include<libmutil/MemObject.h>
 
-using namespace std;
-
 class Bell: public MObject{
 	public:
 		Bell();
@@ -43,7 +41,7 @@ class Bell: public MObject{
 		void stop();
 		void loop();
 
-		void timeout(const string &command);
+		void timeout(const std::string &command);
 		virtual std::string getMemObjectType(){return "Bell";};
 	private:
 //		TimeoutProvider<string, MRef<Bell*> > timeout_provider;

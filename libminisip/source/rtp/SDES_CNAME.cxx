@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/SDES_CNAME.h>
 
 #ifdef DEBUG_OUTPUT

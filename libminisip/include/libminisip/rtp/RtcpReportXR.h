@@ -25,14 +25,12 @@
 #ifndef RTCPREPORTXR_H
 #define RTCPREPORTXR_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
+
 #include<libminisip/rtp/XRReportBlock.h>
 #include<libminisip/rtp/RtcpReport.h>
-#include<vector>
-using namespace std;
-
 
 class RtcpReportXR : public RtcpReport{
 	public:
@@ -46,7 +44,7 @@ class RtcpReportXR : public RtcpReport{
 		
 	private:
 		unsigned ssrc_or_csrc;
-		vector <XRReportBlock *> xr_blocks;
+		std::vector <XRReportBlock *> xr_blocks;
 };
 
 #endif

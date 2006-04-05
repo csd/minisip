@@ -25,39 +25,51 @@
 #ifndef DTMFSENDER_H
 #define DTMFSENDER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
 
 class Session;
 
 class DtmfEvent{
-        public:
-                DtmfEvent( uint8_t symbol, uint8_t volume, uint16_t duration, bool endOfEvent, bool startOfEvent, uint32_t * ts, bool lastBlock = false ):
-                        symbol(symbol),volume(volume),duration(duration),endOfEvent(endOfEvent),startOfEvent(startOfEvent),ts(ts),lastBlock(lastBlock){};
+	public:
+		DtmfEvent( uint8_t symbol, 
+				uint8_t volume, 
+				uint16_t duration, 
+				bool endOfEvent, 
+				bool startOfEvent, 
+				uint32_t * ts, 
+				bool lastBlock = false ):
+					symbol(symbol),
+					volume(volume),
+					duration(duration),
+					endOfEvent(endOfEvent),
+					startOfEvent(startOfEvent),
+					ts(ts),
+					lastBlock(lastBlock){
+	};
 
-        private:
-               
-                uint8_t symbol;
-                uint8_t volume;
-                uint16_t duration;
-                bool endOfEvent;
-                bool startOfEvent;
-                uint32_t * ts;
-                bool lastBlock;
-        
-                friend class DtmfSender;
+	private:
+		uint8_t symbol;
+		uint8_t volume;
+		uint16_t duration;
+		bool endOfEvent;
+		bool startOfEvent;
+		uint32_t * ts;
+		bool lastBlock;
+	
+		friend class DtmfSender;
 };
-        
+
 class DtmfSender : public MObject {
-        public:
-                DtmfSender( MRef<Session *> session );
-                void timeout( DtmfEvent * event );
+	public:
+		DtmfSender( MRef<Session *> session );
+		void timeout( DtmfEvent * event );
 		virtual std::string getMemObjectType(){ return "DtmfSender"; };
 
-        private:
-                MRef<Session *> session;
-                void sendPayload( uint8_t payload[], bool mark, uint32_t * ts );
+	private:
+		MRef<Session *> session;
+		void sendPayload( uint8_t payload[], bool mark, uint32_t * ts );
 };
 
 #endif

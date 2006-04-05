@@ -25,11 +25,12 @@
 #ifndef RTPRECEIVER_H
 #define RTPRECEIVER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
+
 #include<libminisip/ipprovider/IpProvider.h>
 
 class UDPSocket;
@@ -111,7 +112,7 @@ class RtpReceiver : public Runnable{
 
 		Mutex mediaStreamsLock;
 
-                Thread * thread;
+		Thread * thread;
 };
 
 #endif

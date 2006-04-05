@@ -31,7 +31,7 @@
  * 
 */
 
-
+#include <config.h>
 
 #include<libminisip/p2t/GroupListUserElement.h>
 

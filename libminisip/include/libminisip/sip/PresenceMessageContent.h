@@ -20,7 +20,6 @@ class PresenceMessageContent : public SipMessageContent{
 		virtual std::string getString();
 		virtual std::string getContentType(){return "application/xpidf+xml";}
 
-
 	private:
 		std::string fromUri;
 		std::string toUri;

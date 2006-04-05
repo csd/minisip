@@ -29,8 +29,8 @@
  * 	Base class for audio mixing implementations.
 */
 
-
 #include<config.h>
+
 #include<libminisip/soundcard/AudioMixerSpatial.h>
 #include<libminisip/soundcard/SoundSource.h>
 #include<libminisip/spaudio/SpAudio.h>

@@ -22,15 +22,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/sip/DefaultDialogHandler.h>
+
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
+
 #include<libmsip/SipDialogRegister.h>
 #include<libmsip/SipDialogContainer.h>
-#include<libminisip/sip/SipDialogVoipServer.h>
-#include<libminisip/sip/SipDialogConfVoip.h>
-#include<libminisip/sip/SipDialogPresenceClient.h>
-#include<libminisip/sip/SipDialogPresenceServer.h>
+
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipHeaderAcceptContact.h>
@@ -44,24 +45,30 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmutil/massert.h>
 
+#include<libminisip/sip/SipDialogVoipServer.h>
+#include<libminisip/sip/SipDialogConfVoip.h>
+#include<libminisip/sip/SipDialogPresenceClient.h>
+#include<libminisip/sip/SipDialogPresenceServer.h>
+
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 #ifdef P2T_SUPPORT
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/SipDialogP2Tuser.h>
+#	include<libminisip/p2t/P2T.h>
+#	include<libminisip/p2t/SipDialogP2Tuser.h>
 #endif
 
 #include<libminisip/mediahandler/MediaHandler.h>
 
 #ifdef IPSEC_SUPPORT
-#include<../ipsec/MsipIpsecAPI.h>
+#	include<../ipsec/MsipIpsecAPI.h>
 #endif
 
 
 #include<libmutil/dbg.h>
 
+using namespace std;
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack, 
             //SipDialogConfig &conf,

@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libmutil/massert.h>
 #include<libminisip/rtp/SDES_TOOL.h>
 

@@ -25,28 +25,29 @@
 #ifndef IMAGE_MIXER_H
 #define IMAGE_MIXER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 #include<libminisip/video/VideoMedia.h>
 
-
 class ImageMixer : public ImageHandler, public MObject{
 	public:
 
 		ImageMixer::ImageMixer();
 
-                virtual bool handlesChroma( uint32_t chroma );
-                virtual void init( uint32_t width, uint32_t height );
+		virtual bool handlesChroma( uint32_t chroma );
+		virtual void init( uint32_t width, uint32_t height );
 
-                virtual void handle( MImage * );
+		virtual void handle( MImage * );
 
-                virtual MImage * provideImage();
-                
+		virtual MImage * provideImage();
+		
 		virtual MImage * provideImage( uint32_t ssrc );
-                virtual void releaseImage( MImage * );
-                virtual bool providesImage();
+		virtual void releaseImage( MImage * );
+		virtual bool providesImage();
 
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();

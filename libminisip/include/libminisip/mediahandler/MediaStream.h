@@ -25,15 +25,14 @@
 #ifndef MEDIA_STREAM_H
 #define MEDIA_STREAM_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
+
 #include<libminisip/rtp/CryptoContext.h>
 #include<libminisip/mediahandler/Media.h>
 #include<libminisip/mediahandler/Session.h>
 #include<libminisip/mediahandler/RtpReceiver.h>
-#include<libminisip/rtp/SRtpPacket.h>
-
 #include<libminisip/rtp/SRtpPacket.h>
 
 class KeyAgreement;
@@ -59,7 +58,7 @@ class MediaStream : public MObject{
 		virtual void stop() = 0;
 
 #ifdef DEBUG_OUTPUT
-		virtual string getDebugString();
+		virtual std::string getDebugString();
 #endif
 		
 		/**
@@ -157,7 +156,7 @@ class MediaStreamReceiver : public MediaStream{
 				MRef<IpProvider *> ipProvider );
 
 #ifdef DEBUG_OUTPUT
-		virtual string getDebugString();
+		virtual std::string getDebugString();
 #endif
 
 		virtual std::string getMemObjectType(){return "MediaStreamReceiver";}
@@ -245,7 +244,7 @@ class MediaStreamSender : public MediaStream{
 				   MRef<UDPSocket *> senderSock=NULL );
 
 #ifdef DEBUG_OUTPUT
-		virtual string getDebugString();
+		virtual std::string getDebugString();
 #endif
 		
 		virtual std::string getMemObjectType(){return "MediaStreamSender";}

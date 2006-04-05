@@ -25,6 +25,8 @@
 #ifndef AV_CODEC_H
 #define AV_CODEC_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 #include<libminisip/codecs/Codec.h>
 
@@ -60,10 +62,6 @@ class VideoCodec : public Codec{
 		void startSend( uint32_t width, uint32_t height );
 		void stopSend();
 
-
-
-
-
 		virtual std::string getMemObjectType(){return "AVCodec";}
 
 	private:
@@ -75,6 +73,5 @@ class VideoCodec : public Codec{
 		MRef<Grabber *> grabber;
 		MRef<VideoDisplay *> display;
 };
-
 
 #endif

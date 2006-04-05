@@ -26,6 +26,8 @@
 #ifndef FILESOUNDDEVICE_H
 #define FILESOUNDDEVICE_H
 
+#include<libminisip/libminisip_config.h>
+
 #ifdef _MSC_VER
 #	include<io.h>
 #	undef open

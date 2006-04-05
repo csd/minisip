@@ -26,14 +26,17 @@
 #ifndef GROUPLISTSERVER_H
 #define GROUPLISTSERVER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<vector>
+
 #include<libmutil/dbg.h>
 #include<libmutil/Thread.h>
 #include<libmutil/MemObject.h>
 
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/TCPSocket.h>
+
 #include<libminisip/p2t/P2T.h>
 #include<libminisip/p2t/GroupList.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
@@ -113,7 +116,7 @@ class GroupListServer: public Runnable{
 		 * get the IP address of the server.
 		 * @return the IP address of the server
 		 */
-		string getIp(){return ip;}
+		 std::string getIp(){return ip;}
 		
 		/**
 		 * add a Group Member List to the server. 
@@ -125,7 +128,7 @@ class GroupListServer: public Runnable{
 		 * get a Group Member List  
 		 * @param groupId the Group Identity
 		 */
-		MRef<GroupList*> getGroupList(string groupId);
+		MRef<GroupList*> getGroupList( std::string groupId);
 
 		
 		
@@ -137,13 +140,13 @@ class GroupListServer: public Runnable{
 		int32_t port;
 		
 		///the ip address of the server
-		string ip;
+		 std::string ip;
 		
 		///the server runs as long this variable is true
 		bool running;
 		
 		///contains all Group Member Lists
-		vector<MRef<GroupList*> > grpLists;
+		std::vector<MRef<GroupList*> > grpLists;
 		
 		///the SipSoftPhoneConfiguration
 		MRef<SipSoftPhoneConfiguration*>phoneconfig;
@@ -154,7 +157,7 @@ class GroupListServer: public Runnable{
 		 * with the string specified in <code>part</code>.
 		 * @return true/false
 		 */
-		bool starts_with(string line, string part);
+		bool starts_with( std::string line,  std::string part);
 };
 
 #endif

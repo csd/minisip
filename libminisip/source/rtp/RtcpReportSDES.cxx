@@ -22,7 +22,10 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtcpReportSDES.h>
+
 #include<libmutil/massert.h>
 #include<iostream>
 

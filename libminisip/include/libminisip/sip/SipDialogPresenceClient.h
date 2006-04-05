@@ -56,7 +56,7 @@ class SipDialogPresenceClient: public SipDialog{
 
 		virtual std::string getMemObjectType(){return "SipDialogPresenceClient";}
 		
-		virtual string getName(){return "SipDialogPresenceClient[callid="+dialogState.callId +"]";}
+		virtual  std::string getName(){return "SipDialogPresenceClient[callid="+dialogState.callId +"]";}
 
 
 		virtual bool handleCommand(const SipSMCommand &command);
@@ -69,15 +69,15 @@ class SipDialogPresenceClient: public SipDialog{
 		
 		void setLastInvite(MRef<SipInvite*> i);
 		
-		void sendInvite(const string &branch);
-		void sendAuthInvite(const string &branch);
-		void sendBye(const string &branch, int);
-		void sendCancel(const string &branch);
-		void sendInviteOk(const string &branch);
-		void sendByeOk(MRef<SipBye*> bye, const string &branch);
-		void sendReject(const string &branch);
-		void sendRinging(const string &branch);
-		void sendNotAcceptable(const string &branch);
+		void sendInvite(const  std::string &branch);
+		void sendAuthInvite(const  std::string &branch);
+		void sendBye(const  std::string &branch, int);
+		void sendCancel(const  std::string &branch);
+		void sendInviteOk(const  std::string &branch);
+		void sendByeOk(MRef<SipBye*> bye, const  std::string &branch);
+		void sendReject(const  std::string &branch);
+		void sendRinging(const  std::string &branch);
+		void sendNotAcceptable(const  std::string &branch);
 
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
@@ -85,9 +85,9 @@ class SipDialogPresenceClient: public SipDialog{
                 
 		void setLocalCalled(bool lc){localCalled=lc;}
 		
-		void setNonce(const string &n){ nonce = n; }
+		void setNonce(const  std::string &n){ nonce = n; }
 
-		void setRealm(const string &r){ realm = r; }
+		void setRealm(const  std::string &r){ realm = r; }
 
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig(){return phoneconf;}
 
@@ -96,7 +96,7 @@ class SipDialogPresenceClient: public SipDialog{
 */
 	private:
 		
-		void sendSubscribe(const string &branch);
+		void sendSubscribe(const  std::string &branch);
 		void createSubscribeClientTransaction();
 		
 		bool a0_start_trying_presence(const SipSMCommand &command);

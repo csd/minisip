@@ -22,11 +22,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libmutil/massert.h>
 #include<libminisip/rtp/SDES_EMAIL.h>
 
 #ifdef DEBUG_OUTPUT
-#include<iostream>
+#	include<iostream>
 #endif
 
 using namespace std;

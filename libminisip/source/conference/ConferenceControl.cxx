@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/conference/ConferenceControl.h>
 
 #include<assert.h>
@@ -37,30 +39,34 @@
 #include<libmsip/SipCommandString.h>
 
 #ifdef _WIN32_WCE
-#	include"../include/minisip_wce_extra_includes.h"
+#	include<libminisip/minisip_wce_extra_includes.h>
 #endif
 
+using namespace std;
+
 ConferenceControl::ConferenceControl(){
-    
-    numPending = 0;
+	numPending = 0;
 }
+
 ConferenceControl::ConferenceControl(string configUri, string cid, bool islocal){
-
-    confId=cid;
-
-    uint32_t i = (uint32_t)configUri.find("@");
-    assert(i!=string::npos);
-    myUri=configUri.substr(0,i);
-    myDomain=trim(configUri.substr(i));
-    //cerr<<"my Uri and domain: "+myUri+" "+myDomain<<endl;
-    incoming=islocal;
-    
-    numPending = 0;
+	
+	confId=cid;
+	
+	uint32_t i = (uint32_t)configUri.find("@");
+	assert(i!=string::npos);
+	myUri=configUri.substr(0,i);
+	myDomain=trim(configUri.substr(i));
+	//cerr<<"my Uri and domain: "+myUri+" "+myDomain<<endl;
+	incoming=islocal;
+	
+	numPending = 0;
 }
+
 minilist<ConfMember> * ConferenceControl::getConnectedList()
 {	
 	return &connectedList;
 }
+
 void ConferenceControl::setCallback(ConfCallback *cb){
 	this->callback=cb;
 }
@@ -68,6 +74,7 @@ void ConferenceControl::setCallback(ConfCallback *cb){
 ConfCallback *ConferenceControl::getCallback(){
 	return callback;
 }
+
 void ConferenceControl::setPendingList(string user)
 {
 	user=addDomainToPrefix(user);

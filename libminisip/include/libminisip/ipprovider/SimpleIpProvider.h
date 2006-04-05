@@ -25,7 +25,7 @@
 #ifndef SIMPLE_IP_PROVIDER
 #define SIMPLE_IP_PROVIDER
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/ipprovider/IpProvider.h>
 

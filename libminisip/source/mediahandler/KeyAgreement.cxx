@@ -23,9 +23,10 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include <config.h>
+
 #include<libminisip/mediahandler/Session.h>
 #include<libminisip/mediahandler/MediaStream.h>
-
 
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>

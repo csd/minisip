@@ -24,17 +24,18 @@
 */
 
 #include<config.h>
+
 #include<iostream>
 
 #ifdef LINUX
-#include<netinet/in.h>
-#include<sys/socket.h>
-#include<sys/select.h>
-#include <err.h>
+#	include<netinet/in.h>
+#	include<sys/socket.h>
+#	include<sys/select.h>
+#	include <err.h>
 #endif
 
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 #include<stdio.h>

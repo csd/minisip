@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtcpReport.h>
 #include<libminisip/rtp/RtcpReportSR.h>
 #include<libminisip/rtp/RtcpReportRR.h>
@@ -29,8 +31,10 @@
 #include<libminisip/rtp/RtcpReportXR.h>
 
 #ifdef DEBUG_OUTPUT
-#include<iostream>
+#	include<iostream>
 #endif
+
+using namespace std;
 
 /*
 struct reportheader{
@@ -73,11 +77,11 @@ RtcpReport *RtcpReport::build_from(void *buildfrom, int max_length){
 		case PACKET_TYPE_XR:
 			return new RtcpReportXR(buildfrom,max_length);
 		default:
-			;
 #ifdef DEBUG_OUTPUT
-			cerr << "ERROR: Received unknown RTCP report (type="<<packet_type<<")"<< endl;
+			cerr << "ERROR: Received unknown RTCP report (type=" << packet_type << ")" << endl;
 			exit(1);
 #endif
+			;
 	}
 
 	return NULL;

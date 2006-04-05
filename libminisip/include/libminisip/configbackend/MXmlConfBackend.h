@@ -23,7 +23,7 @@
 */
 
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/configbackend/ConfBackend.h>
 

@@ -6,6 +6,8 @@
  * Version 1.1
  */
 
+#include<config.h>
+
 #ifdef _MSC_VER
 #define _USE_MATH_DEFINES
 #endif
@@ -14,6 +16,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
 #include<libminisip/aec/aec.h>
 
 #ifdef _WIN32_WCE

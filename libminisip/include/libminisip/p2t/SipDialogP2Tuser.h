@@ -36,13 +36,14 @@
 #ifndef SipDialogP2Tuser_H
 #define SipDialogP2Tuser_H
 
+#include<libminisip/libminisip_config.h>
 
-#include<config.h>
+#include<libmutil/StateMachine.h>
+
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipInvite.h>
 #include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
-#include<libmutil/StateMachine.h>
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
@@ -88,8 +89,8 @@ class SipDialogP2Tuser: public SipDialog{
 		 */
 		virtual ~SipDialogP2Tuser();
 	
-		void setCallId(string id){dialogState.callId = id;}
-		string getCallId(){return dialogState.callId;}
+		void setCallId( std::string id){dialogState.callId = id;}
+		 std::string getCallId(){return dialogState.callId;}
 		
 		/**
 		 * returns the type of the dialog. Used by the memory management.
@@ -114,7 +115,7 @@ class SipDialogP2Tuser: public SipDialog{
 		virtual bool handleCommand(const SipSMCommand &command);
 
 	
-//		virtual void timeout(const string &c){
+//		virtual void timeout(const  std::string &c){
 //                    SipSMCommand cmd(CommandString("",c),SipSMCommand::TU, SipSMCommand::TU);
 //                    handleCommand(cmd);
 //                };
@@ -141,16 +142,16 @@ class SipDialogP2Tuser: public SipDialog{
 
 //		int getTimerT1(){return timerT1;}
 
-		void sendInvite(const string &branch);
-		void sendAuthInvite(const string &branch);
+		void sendInvite(const  std::string &branch);
+		void sendAuthInvite(const  std::string &branch);
 //		void sendAck();
-		void sendBye(const string &branch, int);
-		void sendCancel(const string &branch);
-		void sendInviteOk(const string &branch);
-		void sendByeOk(MRef<SipBye*> bye, const string &branch);
-		void sendReject(const string &branch);
-		void sendRinging(const string &branch);
-		void sendNotAcceptable(const string &branch);
+		void sendBye(const  std::string &branch, int);
+		void sendCancel(const  std::string &branch);
+		void sendInviteOk(const  std::string &branch);
+		void sendByeOk(MRef<SipBye*> bye, const  std::string &branch);
+		void sendReject(const  std::string &branch);
+		void sendRinging(const  std::string &branch);
+		void sendNotAcceptable(const  std::string &branch);
 
 		//SoundSender *getSoundSender(){return soundSender;}
 		//SoundReceiver *getSoundReceiver(){return soundReceiver;}
@@ -158,20 +159,20 @@ class SipDialogP2Tuser: public SipDialog{
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
 		KeyAgreement *getKeyagreement();
-		string getKeyManagementMessage(){return key_mgmt;};
+		 std::string getKeyManagementMessage(){return key_mgmt;};
 
-		void setKeyManagementMessage(const string &key_mgmt){this->key_mgmt = key_mgmt;};
+		void setKeyManagementMessage(const  std::string &key_mgmt){this->key_mgmt = key_mgmt;};
 
 		void handleSdp(MRef<SdpPacket*> );
-                
+
 		void setLocalCalled(bool lc){localCalled=lc;}
 		
 //		void setLastBye(MRef<SipBye*> bye);
 //		MRef<SipBye*> getLastBye();
 
-		void setNonce(const string &n){ nonce = n; }
+		void setNonce(const  std::string &n){ nonce = n; }
 
-		void setRealm(const string &r){ realm = r; }
+		void setRealm(const  std::string &r){ realm = r; }
 
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig(){return phoneconf;}
 
@@ -197,12 +198,12 @@ class SipDialogP2Tuser: public SipDialog{
 		bool a2_callingnoauth_callingnoauth_1xx( const SipSMCommand &command);
 		bool a3_callingnoauth_incall_2xx( const SipSMCommand &command);
 		bool a5_incall_termwait_BYE( const SipSMCommand &command);
-		bool a6_incall_termwait_hangup(/*State<SipSMCommand, string> *fromState,
-				                State<SipSMCommand, string> *toState,*/const SipSMCommand &command);
-		bool a7_callingnoauth_termwait_CANCEL(/*State<SipSMCommand, string> *fromState,
-				                State<SipSMCommand, string> *toState,*/const SipSMCommand &command);
-		bool a8_callingnoauth_termwait_cancel(/*State<SipSMCommand, string> *fromState,
-				                State<SipSMCommand, string> *toState,*/const SipSMCommand &command);
+		bool a6_incall_termwait_hangup(/*State<SipSMCommand,  std::string> *fromState,
+				                State<SipSMCommand,  std::string> *toState,*/const SipSMCommand &command);
+		bool a7_callingnoauth_termwait_CANCEL(/*State<SipSMCommand,  std::string> *fromState,
+				                State<SipSMCommand,  std::string> *toState,*/const SipSMCommand &command);
+		bool a8_callingnoauth_termwait_cancel(/*State<SipSMCommand,  std::string> *fromState,
+				                State<SipSMCommand,  std::string> *toState,*/const SipSMCommand &command);
 		bool a9_callingnoauth_termwait_36( const SipSMCommand &command);
 		bool a10_start_ringing_INVITE( const SipSMCommand &command);
 		bool a11_ringing_incall_accept( const SipSMCommand &command);
@@ -213,8 +214,8 @@ class SipDialogP2Tuser: public SipDialog{
 		bool a21_callingauth_callingauth_18X( const SipSMCommand &command);
 		bool a22_callingauth_callingauth_1xx( const SipSMCommand &command);
 		bool a23_callingauth_incall_2xx( const SipSMCommand &command);
-		bool a24_calling_termwait_2xx(/*State<SipSMCommand, string> *fromState,
-				                State<SipSMCommand, string> *toState,*/const SipSMCommand &command);
+		bool a24_calling_termwait_2xx(/*State<SipSMCommand,  std::string> *fromState,
+				                State<SipSMCommand,  std::string> *toState,*/const SipSMCommand &command);
 		bool a25_termwait_terminated_notransactions( const SipSMCommand &command);
 		bool a26_callingnoauth_termwait_transporterror( const SipSMCommand &command);
 		
@@ -227,14 +228,14 @@ class SipDialogP2Tuser: public SipDialog{
 
 //		MRef<SipResponse*> lastResponse;
 
-//		string callId;
+//		 std::string callId;
 
-		string key_mgmt;
+		std::string key_mgmt;
 
 		bool localCalled;
 //		MRef<SipBye*> lastBye;
-		string nonce;
-		string realm;
+		std::string nonce;
+		std::string realm;
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		
 		/**

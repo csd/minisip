@@ -25,12 +25,11 @@
 #ifndef SDES_LOC_H
 #define SDES_LOC_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/rtp/SDESItem.h>
+
 #include<string>
-
-
 
 class SDES_LOC : public SDESItem{
 	public:

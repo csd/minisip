@@ -34,11 +34,10 @@
 #ifndef SOUNDCARDPLCINTERFACE_H
 #define SOUNDCARDPLCINTERFACE_H
 
-#include"config.h"
+#include<libminisip/libminisip_config.h>
 
 /**
- * @author Erik Eliasson
- */
+ * @author Erik Eliasson */
 class SoundIOPLCInterface{
 
 	public:

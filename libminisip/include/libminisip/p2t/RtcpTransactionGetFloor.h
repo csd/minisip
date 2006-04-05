@@ -25,7 +25,7 @@
 #ifndef RTCPTRANSACTIONGETFLOOR_H
 #define RTCPTRANSACTIONGETFLOOR_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #ifdef _WIN32_WCE
 #	include<libmnetutil/IPAddress.h>
@@ -33,6 +33,8 @@
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
+
+#include<libminisip/p2t/P2T.h>
 #include<libminisip/p2t/SipDialogP2T.h>
 #include<libminisip/p2t/GroupListUserElement.h>
 
@@ -157,7 +159,7 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		 *                   messages with this number or the specified user (<CODE>setUser()</CODE>).
 		 *                   This parameter is optional if you set the user.
 		 */
-		RtcpTransactionGetFloor(MRef<SipDialog*> dialog, int seqNo, IPAddress *toaddr, int32_t port, string callId, unsigned remoteSSRC=0);
+		RtcpTransactionGetFloor(MRef<SipDialog*> dialog, int seqNo, IPAddress *toaddr, int32_t port,  std::string callId, unsigned remoteSSRC=0);
 		
 		/**
 		 * Destructor
@@ -165,14 +167,14 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		virtual ~RtcpTransactionGetFloor();
 
 
-		void setCallId(string id){callId = id;}
-		string getCallId(){return callId;}
+		void setCallId( std::string id){callId = id;}
+		 std::string getCallId(){return callId;}
 		/**
 		 * returns the name of the transaction.
 		 * Used by the Memory Handling of Minisip.
 		 * @return the string 'RtcpTransactionGetFloor'
 		 */
-		virtual string getName(){return "RtcpTransactionGetFloor";}
+		virtual  std::string getName(){return "RtcpTransactionGetFloor";}
 
 		/**
 		 * handles the incoming commands.
@@ -232,13 +234,13 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		 * SSRC or this URI are accepted by the transaction.
 		 * @param user SIP URI of the remote user.
 		 */
-		void setUser(string user);
+		void setUser( std::string user);
 		
 		/**
 		 * returns the SIP URI of the remote user.
 		 * @return <CODE>string</CODE> value.
 		 */
-		string getUser(){return user;}
+		 std::string getUser(){return user;}
 		
 		/** 
 		 * returns the used sequence number
@@ -318,10 +320,6 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		bool first_invitation;
 		
 
-		
-
-		
-			
 	private:
 		
 		bool a0_start_reqsent( const SipSMCommand &command);
@@ -348,7 +346,7 @@ class RtcpTransactionGetFloor: public SipTransaction{
 		int remoteSeqNo;
 		
 		///the SIP URI of the remote user
-		string user;
+		 std::string user;
 		
 		///the Collision Counter value that is used in the Floor REQUEST messages.
 		int CollisionCounter;

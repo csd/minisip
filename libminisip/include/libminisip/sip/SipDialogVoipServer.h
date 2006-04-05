@@ -56,9 +56,9 @@ class LogEntry;
 class SipDialogVoipServer: public SipDialogVoip{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 #endif		
 		virtual ~SipDialogVoipServer();
@@ -67,16 +67,16 @@ class SipDialogVoipServer: public SipDialogVoip{
 
 		virtual std::string getMemObjectType(){return "SipDialogVoipServer";}
 		
-		virtual string getName(){return "SipDialogVoipServer[callid="+dialogState.callId +"]";}
+		virtual std::string getName(){return "SipDialogVoipServer[callid="+dialogState.callId +"]";}
 
 	private:
 		
 		void setUpStateMachine();
 		
-		void sendInviteOk(const string &branch);
-		void sendReject(const string &branch);
-		void sendRinging(const string &branch);
-		void sendNotAcceptable(const string &branch);
+		void sendInviteOk(const std::string &branch);
+		void sendReject(const std::string &branch);
+		void sendRinging(const std::string &branch);
+		void sendNotAcceptable(const std::string &branch);
 
 		bool a3001_start_ringing_INVITE( const SipSMCommand &command);
 		bool a3002_ringing_incall_accept( const SipSMCommand &command);

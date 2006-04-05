@@ -22,8 +22,9 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/p2t/RtcpSender.h>
+#include <config.h>
 
+#include<libminisip/p2t/RtcpSender.h>
 
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>

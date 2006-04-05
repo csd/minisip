@@ -24,15 +24,12 @@
 
 #include<config.h>
 
-
 #include<stdio.h>
 
 #ifdef _MSC_VER
-
 #else
 #include<unistd.h>
 #endif
-
 
 #include<errno.h>
 #include<libminisip/rtp/RtpPacket.h>
@@ -44,6 +41,8 @@
 
 #include<libmutil/merror.h>
 #include<libmnetutil/UDPSocket.h>
+
+using namespace std;
 
 RtpPacket::RtpPacket(){
 	content_length=0;

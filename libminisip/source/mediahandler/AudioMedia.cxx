@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/mediahandler/AudioMedia.h>
 
 #include<libminisip/rtp/RtpHeader.h>
@@ -32,7 +34,6 @@
 #include<libminisip/soundcard/SoundSource.h>
 
 #include<libminisip/rtp/RtpPacket.h>
-
 
 #define RINGTONE_SOURCE_ID 0x42124212
 
@@ -65,24 +66,27 @@ AEC AudioMedia::aec;		//hanning
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
+using namespace std;
+
 // pn430 Parameter list changed for multicodec
 //AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 //                Media(codec),
 //                soundIo(soundIo){
-AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList ):
-                Media(codecList),
-                soundIo(soundIo){
-        
+AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, 
+			std::list<MRef<Codec *> > codecList ):
+							Media(codecList),
+							soundIo(soundIo){
+						
 	// for audio media, we assume that we can both send and receive
-        receive = true;
-        send = true;
+	receive = true;
+	send = true;
 	// pn430 Changed for multicodec
 	//MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
 	
 	// NOTE Frame size FIXED to 20 ms
-        soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ * 20 / 1000, false );
+	soundIo->register_recorder_receiver( this, SOUND_CARD_FREQ * 20 / 1000, false );
 
-        seqNo = 0;
+	seqNo = 0;
 	
 	// NOTE Sampling frequency FIXED to 8000 Hz
 	resampler = Resampler::create( SOUND_CARD_FREQ, 8000, 20, 1 /*Nb channels */);
@@ -93,27 +97,27 @@ string AudioMedia::getSdpMediaType(){
 }
 
 void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
-        sendersLock.lock();
-        if( senders.empty() ){
-                sendersLock.unlock();
-                soundIo->startRecord();
-                sendersLock.lock();
-        }
+	sendersLock.lock();
+	if( senders.empty() ){
+		sendersLock.unlock();
+		soundIo->startRecord();
+		sendersLock.lock();
+	}
 
-        senders.push_back( sender );
-        sendersLock.unlock();
+	senders.push_back( sender );
+	sendersLock.unlock();
 }
 
 void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
-        bool emptyList;
-        sendersLock.lock();
-        senders.remove( sender );
-        emptyList = senders.empty();
-        sendersLock.unlock();
+	bool emptyList;
+	sendersLock.lock();
+	senders.remove( sender );
+	emptyList = senders.empty();
+	sendersLock.unlock();
 
-        if( emptyList ){
-                soundIo->stopRecord();
-        }
+	if( emptyList ){
+		soundIo->stopRecord();
+	}
 }
 
 void AudioMedia::registerMediaSource( uint32_t ssrc ){
@@ -152,10 +156,9 @@ void AudioMedia::playData( MRef<RtpPacket *> packet ){
 //this function is called from SoundIO::recorderLoop
 //the void *data is originally a short *
 void AudioMedia::srcb_handleSound( void * data, int length){
-
-        resampler->resample( (short *)data, resampledData );
-        sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
-        seqNo ++;
+	resampler->resample( (short *)data, resampledData );
+	sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
+	seqNo ++;
 }
 
 #ifdef AEC_SUPPORT
@@ -167,7 +170,7 @@ void AudioMedia::srcb_handleSound( void * data, int length, void * dataR){				//
 		resampledData[j] = (short)aec.doAEC((int)resampledData[j], (int)resampledDataR[j]);
 	}
 	sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
-        seqNo ++;
+	seqNo ++;
 }
 #endif
 
@@ -243,12 +246,12 @@ string AudioMedia::getDebugString() {
 MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
 	std::list<MRef<AudioMediaSource *> >::iterator i;
 
-        for( i = sources.begin(); i != sources.end(); i++ ){
-                if( (*i)->getSsrc() == ssrc ){
-                        return (*i);
-                }
-        }
-        return NULL;
+	for( i = sources.begin(); i != sources.end(); i++ ){
+		if( (*i)->getSsrc() == ssrc ){
+			return (*i);
+		}
+	}
+	return NULL;
 }
 
 

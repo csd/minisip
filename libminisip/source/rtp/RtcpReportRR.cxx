@@ -22,10 +22,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtcpReportRR.h>
 #include<config.h>
 //#include <netinet/in.h>
 #include<iostream>
+
+using namespace std;
 
 RtcpReportRR::RtcpReportRR(unsigned sender_ssrc): RtcpReport(201),sender_ssrc(sender_ssrc){
 

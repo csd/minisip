@@ -25,6 +25,8 @@
 #ifndef XRREPORTBLOCK_H
 #define XRREPORTBLOCK_H
 
+#include<libminisip/libminisip_config.h>
+
 #define LOSS_RLE_REPORT            1
 #define DUPLICATE_RLE_REPORT       2
 #define TIMESTAMP_REPORT           3
@@ -33,8 +35,6 @@
 #define DLRR_REPORT                6
 #define VOIP_METRICS_REPORT        7
 
-#include<config.h>
-	
 class XRReportBlock{
 	public:
 		virtual ~XRReportBlock(){}

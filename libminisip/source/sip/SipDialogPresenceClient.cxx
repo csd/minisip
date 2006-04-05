@@ -29,7 +29,7 @@
  * Purpose
  * 
 */
-
+#include<config.h>
 
 #include<libminisip/sip/SipDialogPresenceClient.h>
 
@@ -60,6 +60,8 @@
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
+
+using namespace std;
 
 /*
  Presence dialog for user "user@domain".

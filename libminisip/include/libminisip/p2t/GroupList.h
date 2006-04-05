@@ -25,13 +25,17 @@
 #ifndef GROUPLIST_H
 #define GROUPLIST_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<vector>
-#include<libminisip/codecs/Codec.h>
+
 #include<libmutil/MemObject.h>
+
 #include<libmnetutil/IPAddress.h>
+
 #include<libminisip/p2t/P2T.h>
 #include<libminisip/p2t/GroupListUserElement.h>
+#include<libminisip/codecs/Codec.h>
 
 /**
  * the GroupList contains all information about a P2T Session
@@ -67,7 +71,7 @@ class GroupList: public MObject{
 		 * creates a GroupList from the xml code.
 		 * @param xml the xml code
 		 */
-		 GroupList(string xml);
+		 GroupList( std::string xml);
 		
 		/**
 		 * Destructor
@@ -78,12 +82,12 @@ class GroupList: public MObject{
 		 * set the GroupIdentity
 		 * @param Gid Group Identity
 		 */
-		void setGroupIdentity(string Gid) {GroupIdentity=Gid;}
+		void setGroupIdentity( std::string Gid) {GroupIdentity=Gid;}
 
 		/**
 		 * returns the name of the GroupList.
 		 * Used by the Memory Handling of Minisip.
-		 * @return the string 'GroupList'
+		 * @return the  std::string 'GroupList'
 		 */
 		virtual std::string getMemObjectType(){return "GroupList";}
 		
@@ -91,31 +95,31 @@ class GroupList: public MObject{
 		 *get the GroupIdentity
 		 *@return a string with the GroupIdentity
 		 */
-		string getGroupIdentity(){return GroupIdentity;}
+		 std::string getGroupIdentity(){return GroupIdentity;}
 		
 		/**
 		 * set the Group Owner
 		 * @param owner Group Owner
 		 */
-		void setGroupOwner(string owner) {GroupOwner=owner;}
+		void setGroupOwner( std::string owner) {GroupOwner=owner;}
 		
 		/**
 		 * get the Group Owner
-		 * @return a string with the Group Owner
+		 * @return a  std::string with the Group Owner
 		 */
-		string getGroupOwner(){return GroupOwner;}
+		 std::string getGroupOwner(){return GroupOwner;}
 		
 		/**
 		 * set the Group Description
 		 * @param description the description
 		 */
-		void setDescription(string Description) {this->Description=Description;}
+		void setDescription( std::string Description) {this->Description=Description;}
 		
 		/**
 		 * get the Group Descrition
-		 * @return a string with the Group Owner
+		 * @return a  std::string with the Group Owner
 		 */
-		string getDescription(){return Description;}
+		 std::string getDescription(){return Description;}
 		
 		/**
 		 * set the SessionType.
@@ -176,7 +180,7 @@ class GroupList: public MObject{
 		 * add a uri to the member list
 		 * @param uri the uri of the user
 		 */
-		void addMember(string uri);
+		void addMember( std::string uri);
 		
 		/**
 		 * can be used to check if a uri is in the memberlist
@@ -184,14 +188,14 @@ class GroupList: public MObject{
 		 * P2T Session.
 		 * @return true if uri is in memberlist
 		 */
-		bool isMember(string uri);
+		bool isMember( std::string uri);
 				
 		/**
 		 * can be used to check if a uri is in the participants
 		 * list.
 		 * @return true if uri is in memberlist
 		 */
-		bool isParticipant(string uri);
+		bool isParticipant( std::string uri);
 		
 		/**
 		 * can be used to check if a SSRC is in the participants
@@ -203,9 +207,9 @@ class GroupList: public MObject{
 		
 		/**
 		 * return all members
-		 * @return a vector containing strings with the uri
+		 * @return a vector containing  std::strings with the uri
 		 */
-		vector<string> getAllMember(){return members;}
+		std::vector<std::string> getAllMember(){return members;}
 		
 		
 		
@@ -223,7 +227,7 @@ class GroupList: public MObject{
 		                    requested also the floor).
 		 * @see p2tDefinitions
 		 */
-		void addUser(string uri, IPAddress* to_addr, int RTPport, int RTCPport, Codec *codec,
+		void addUser( std::string uri, IPAddress* to_addr, int RTPport, int RTCPport, Codec *codec,
 			int priority=0,
 			int seqNo=0,
 			int status=0);
@@ -238,7 +242,7 @@ class GroupList: public MObject{
 		 *                  requested also the floor).
 		 * @see p2tDefinitions
 		 */
-		void addUser(string uri, int priority=0,int status=0);
+		void addUser( std::string uri, int priority=0,int status=0);
 		
 
 		
@@ -248,7 +252,7 @@ class GroupList: public MObject{
 		 * @return a <code>GroupListUserElement</code> object
 		 * @see GroupListUserElement
 		 */
-		MRef<GroupListUserElement*> getUser(string uri);
+		MRef<GroupListUserElement*> getUser( std::string uri);
 		
 		/**
 		 * Get the information about a specific user.
@@ -264,33 +268,33 @@ class GroupList: public MObject{
 		 * @return vector with <code>GroupListUserElement</code> objects.
 		 * @see GroupListUserElement
 		 */
-		vector<MRef<GroupListUserElement*> > getAllUser(){return users;}
+		std::vector<MRef<GroupListUserElement*> > getAllUser(){return users;}
 				
 		/**
 		 * remove a user from the GroupList.
 		 * @param uri the uri of the user that should be removed
 		 */
-		void removeUser(string uri);
+		void removeUser( std::string uri);
 		
 		/**
 		 * returns the GroupList in XML format
 		 * @return the GroupList in XML format
 		 */
-		string print();
+		 std::string print();
 		
-		string print_debug();
+		 std::string print_debug();
 	
 
 	private:
 		
 		///the identity or name of the group
-		string GroupIdentity;
+		 std::string GroupIdentity;
 		
 		///The owner who is responsible for the GroupList
-		string GroupOwner;
+		 std::string GroupOwner;
 		
 		///The description of the P2T Session
-		string Description;
+		 std::string Description;
 		
 		/**
 		 * The type of P2T Session (Instant Personal Talk, 
@@ -311,10 +315,10 @@ class GroupList: public MObject{
 		 * a vector containing <code>MRef<GroupListUserElement*></code> objects
 		 * with SIP URIs and priorities of the participating members
 		*/
-		vector<MRef<GroupListUserElement*> > users;
+		std::vector<MRef<GroupListUserElement*> > users;
 		
 		///a vector containing URIs of the allowed members
-		vector<string> members;
+		std::vector< std::string> members;
 		
 
 };

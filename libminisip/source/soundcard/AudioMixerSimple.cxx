@@ -29,6 +29,7 @@
  * 	Simple Audio Mixer implementation (mix all together and normalize)
 */
 
+#include<config.h>
 
 #include<libminisip/soundcard/AudioMixerSimple.h>
 #include<libminisip/soundcard/SoundSource.h>

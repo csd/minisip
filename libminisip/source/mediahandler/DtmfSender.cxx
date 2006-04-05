@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/mediahandler/DtmfSender.h>
 
 #include<libminisip/mediahandler/Session.h>

@@ -24,6 +24,9 @@
 
 #ifndef SDL_DISPLAY_H
 #define SDL_DISPLAY_H
+
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/display/VideoDisplay.h>
 
 #include<SDL/SDL.h>
@@ -32,8 +35,6 @@
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
-
-
 
 class SdlDisplay: public VideoDisplay{
 	public: 

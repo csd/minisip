@@ -25,12 +25,15 @@
 #ifndef VIDEO_DISPLAY_H
 #define VIDEO_DISPLAY_H
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 #include<libmutil/Semaphore.h>
+
+#include<libminisip/video/ImageHandler.h>
 
 class VideoDisplay : public ImageHandler, public Runnable{
 	public:

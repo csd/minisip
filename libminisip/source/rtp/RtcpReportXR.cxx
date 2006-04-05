@@ -22,10 +22,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtcpReportXR.h>
 //#include<netinet/in.h>
 #include<iostream>
 
+using namespace std;
 
 RtcpReportXR::RtcpReportXR(void *build_from, int max_length) : RtcpReport(0){
 	if (max_length<4){

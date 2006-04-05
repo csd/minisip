@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/SDESItem.h>
 #include<libminisip/rtp/SDES_CNAME.h>
 #include<libminisip/rtp/SDES_NAME.h>

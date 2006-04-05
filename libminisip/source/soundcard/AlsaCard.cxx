@@ -23,6 +23,7 @@
 */
 
 #include<config.h>
+
 #ifdef HAVE_LIBASOUND
 
 #include<libminisip/soundcard/AlsaCard.h>

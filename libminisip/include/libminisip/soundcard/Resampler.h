@@ -26,6 +26,8 @@
 #ifndef RESAMPLER_H
 #define RESAMPLER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
 
 class Resampler : public MObject{

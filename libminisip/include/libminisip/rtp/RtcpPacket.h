@@ -25,9 +25,10 @@
 #ifndef RTCPPACKET_H
 #define RTCPPACKET_H
 
-
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
+
 #include<libminisip/rtp/RtcpReport.h>
 
 #include<config.h>

@@ -25,7 +25,8 @@
 #ifndef CONTACT_DB_H
 #define CONTACT_DB_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
 #include<string>
 

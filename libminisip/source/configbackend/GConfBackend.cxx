@@ -23,15 +23,16 @@
 */
 
 #include<config.h>
+
 #include<libminisip/configbackend/GConfBackend.h>
 
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 
 #ifdef MAEMO_SUPPORT
-#define KEY_ROOT "/apps/maemo/minisip/"
+#	define KEY_ROOT "/apps/maemo/minisip/"
 #else
-#define KEY_ROOT "/apps/minisip/"
+#	define KEY_ROOT "/apps/minisip/"
 #endif
 
 using namespace std;

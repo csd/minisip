@@ -1,3 +1,28 @@
+/*
+ Copyright (C) 2004-2006 the Minisip Team
+ 
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+ */
+
+/* Copyright (C) 2004 
+ *
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+*/
+
+#include<config.h>
 
 #include<libminisip/sip/SipDialogSecurityConfig.h>
 
@@ -26,86 +51,86 @@ SipDialogSecurityConfig::SipDialogSecurityConfig():
 
 void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 
-        backend->save("secured", secured?string("yes"): string("no"));
+	backend->save("secured", secured?string("yes"): string("no"));
 
 	backend->save("use_srtp", use_srtp?string("yes"): string("no"));
 	backend->save("use_ipsec", use_ipsec?string("yes"): string("no"));
 
-        backend->save("psk_enabled", psk_enabled?string("yes"): string("no"));
-        backend->save("dh_enabled", dh_enabled?string("yes"): string("no"));
+	backend->save("psk_enabled", psk_enabled?string("yes"): string("no"));
+	backend->save("dh_enabled", dh_enabled?string("yes"): string("no"));
 
-        char * pskString = new char[psk_length+1];
-        memcpy( pskString, psk, psk_length );
-        pskString[psk_length] = '\0';
-        backend->save("psk", pskString);
-        delete [] pskString;
+	char * pskString = new char[psk_length+1];
+	memcpy( pskString, psk, psk_length );
+	pskString[psk_length] = '\0';
+	backend->save("psk", pskString);
+	delete [] pskString;
 
-        string kaTypeString;
-        switch( ka_type ){
-                case KEY_MGMT_METHOD_MIKEY_DH:
-                        kaTypeString = "dh";
-                        break;
-                case KEY_MGMT_METHOD_MIKEY_PSK:
-                        kaTypeString = "psk";
-                        break;
-                case KEY_MGMT_METHOD_MIKEY_PK:
-                        kaTypeString = "pk";
-        }
+	string kaTypeString;
+	switch( ka_type ){
+		case KEY_MGMT_METHOD_MIKEY_DH:
+			kaTypeString = "dh";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PSK:
+			kaTypeString = "psk";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PK:
+			kaTypeString = "pk";
+	}
 
-        backend->save("ka_type", kaTypeString);
- 
+	backend->save("ka_type", kaTypeString);
+
 	/***********************************************************
-         * Certificate settings
-         ***********************************************************/
+	* Certificate settings
+	***********************************************************/
 
-        /* Update the certificate part of the configuration file */
-        cert->lock();
-        cert->init_index();
-        MRef<certificate *> certItem = cert->get_next();
+	/* Update the certificate part of the configuration file */
+	cert->lock();
+	cert->init_index();
+	MRef<certificate *> certItem = cert->get_next();
 
-        /* The first element is the personal certificate, the next ones
-         * are saved as certificate_chain */
-        if( !certItem.isNull() ){
-                backend->save("certificate",certItem->get_file());
-                backend->save("private_key",certItem->get_pk_file());
-                certItem = cert->get_next();
-        }
+	/* The first element is the personal certificate, the next ones
+	* are saved as certificate_chain */
+	if( !certItem.isNull() ){
+		backend->save("certificate",certItem->get_file());
+		backend->save("private_key",certItem->get_pk_file());
+		certItem = cert->get_next();
+	}
 
-        uint32_t i = 0;
+	uint32_t i = 0;
 
- 	while( !certItem.isNull() ){
-                backend->save("certificate_chain["+itoa(i)+"]",
-                                certItem->get_file() );
-                i++;
-                certItem = cert->get_next();
-        }
+	while( !certItem.isNull() ){
+		backend->save("certificate_chain["+itoa(i)+"]",
+				certItem->get_file() );
+		i++;
+		certItem = cert->get_next();
+	}
 
-        cert->unlock();
+	cert->unlock();
 
- 	/* CA database saved in the config file */
-        uint32_t iFile = 0;
-        uint32_t iDir  = 0;
-        cert_db->lock();
-        cert_db->init_index();
-        ca_db_item * caDbItem = cert_db->get_next();
+	/* CA database saved in the config file */
+	uint32_t iFile = 0;
+	uint32_t iDir  = 0;
+	cert_db->lock();
+	cert_db->init_index();
+	ca_db_item * caDbItem = cert_db->get_next();
 
-        while( caDbItem != NULL ){
-                switch( caDbItem->type ){
-                        case CERT_DB_ITEM_TYPE_FILE:
-                                backend->save("ca_file["+itoa(iFile)+"]",
-                                        caDbItem->item);
-                                iFile ++;
-                                break;
-                        case CERT_DB_ITEM_TYPE_DIR:
-                                backend->save("ca_dir["+itoa(iDir)+"]",
-                                        caDbItem->item);
-                                iDir ++;
-                                break;
-                }
+	while( caDbItem != NULL ){
+		switch( caDbItem->type ){
+			case CERT_DB_ITEM_TYPE_FILE:
+				backend->save("ca_file["+itoa(iFile)+"]",
+					caDbItem->item);
+				iFile ++;
+				break;
+			case CERT_DB_ITEM_TYPE_DIR:
+				backend->save("ca_dir["+itoa(iDir)+"]",
+					caDbItem->item);
+				iDir ++;
+				break;
+		}
 
-                caDbItem = cert_db->get_next();
-        }
-        
+		caDbItem = cert_db->get_next();
+	}
+	
 	cert_db->unlock();
 }
 

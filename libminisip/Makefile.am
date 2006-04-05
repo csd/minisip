@@ -5,6 +5,8 @@ SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
+AM_CPPFLAGS = 
+
 pkgconfig_DATA = libminisip.pc
 
 lib_LTLIBRARIES = libminisip.la

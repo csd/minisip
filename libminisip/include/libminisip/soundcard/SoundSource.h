@@ -27,6 +27,8 @@
 #ifndef SOUND_SOURCE_H
 #define SOUND_SOURCE_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/Mutex.h>
 
 #include<libminisip/soundcard/SoundIOPLCInterface.h>

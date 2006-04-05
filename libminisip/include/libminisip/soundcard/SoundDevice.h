@@ -26,7 +26,7 @@
 #ifndef SOUND_DEVICE_H
 #define SOUND_DEVICE_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>

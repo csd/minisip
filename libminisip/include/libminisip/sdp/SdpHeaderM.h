@@ -34,6 +34,8 @@
 #ifndef SDPHEADERM_H
 #define SDPHEADERM_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/sdp/SdpHeader.h>
 #include<vector>
 

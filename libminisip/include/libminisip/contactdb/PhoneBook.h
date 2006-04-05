@@ -25,11 +25,13 @@
 #ifndef PHONEBOOK_H
 #define PHONEBOOK_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
+
 #include<list>
 #include<string>
+
 #include<libminisip/contactdb/ContactDb.h>
 
 class PhoneBookPerson;

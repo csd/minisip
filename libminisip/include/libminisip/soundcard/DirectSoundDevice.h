@@ -26,11 +26,15 @@
 #ifndef DIRECT_SOUND_DEVICE_H
 #define DIRECT_SOUND_DEVICE_H
 
+#include<libminisip/libminisip_config.h>
+
+
 #include<libminisip/soundcard/SoundDevice.h>
 
 #include<windows.h>
 #include<wincon.h>
-#include"dsound.h"
+
+#include<dsound.h>
 
 //#define NUM_PLAY_NOTIFICATIONS  16
 

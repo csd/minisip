@@ -28,13 +28,12 @@
 #include<libmutil/MemObject.h>
 #include<string>
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/video/ImageHandler.h>
 
 class ImageHandler;
 class MImage;
-
-
-
 
 class AVDecoder : public MObject{
 	public:
@@ -63,7 +62,7 @@ class AVDecoder : public MObject{
 
 		uint32_t ssrc;
 
-                bool needsConvert;
+		bool needsConvert;
 
 };
 

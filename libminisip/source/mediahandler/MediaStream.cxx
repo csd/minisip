@@ -23,6 +23,8 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include <config.h>
+
 #include<libminisip/mediahandler/MediaStream.h>
 
 #include<libmikey/MikeyPayloadSP.h>
@@ -45,7 +47,6 @@
 #endif
 
 using namespace std;
-
 
 #ifdef _MSC_VER
 

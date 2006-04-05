@@ -22,14 +22,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #ifdef LINUX
-#include<sys/select.h>
-#include<netinet/in.h>
-#include<sys/socket.h>
+#	include<sys/select.h>
+#	include<netinet/in.h>
+#	include<sys/socket.h>
 #endif
 
 #ifdef WIN32
-#include<winsock2.h>
+#	include<winsock2.h>
 #endif
 
 #include<stdio.h>
@@ -37,7 +39,7 @@
 #ifdef _MSC_VER
 
 #else
-#include<unistd.h>
+#	include<unistd.h>
 #endif
 
 #include<errno.h>
@@ -47,8 +49,6 @@
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
 #include<libmutil/merror.h>
-
-
 
 RtcpAPP::RtcpAPP() {
 

@@ -25,6 +25,8 @@
 #ifndef VIDEO_MEDIA_H
 #define VIDEO_MEDIA_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libminisip/video/ImageHandler.h>
 #include<libminisip/video/display/VideoDisplay.h>
@@ -47,41 +49,41 @@ class RtpPacket;
 
 class VideoMedia : public Media, public VideoEncoderCallback{
 
-        public:
-                VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
-                virtual std::string getMemObjectType(){return "VideoMedia";}
+	public:
+		VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
+		virtual std::string getMemObjectType(){return "VideoMedia";}
 
-                virtual std::string getSdpMediaType();
+		virtual std::string getSdpMediaType();
 
-                virtual void playData( MRef<RtpPacket *> rtpPacket );
+		virtual void playData( MRef<RtpPacket *> rtpPacket );
 
-                virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
+		virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
-                virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
-                virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
-                virtual void registerMediaSource( uint32_t ssrc );
-                virtual void unRegisterMediaSource( uint32_t ssrc );
-                virtual void handleMHeader( MRef<SdpHeaderM *> m );
+		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void unRegisterMediaSource( uint32_t ssrc );
+		virtual void handleMHeader( MRef<SdpHeaderM *> m );
 
 
 		MRef<VideoMediaSource *> getSource( uint32_t ssrc );
 		void getImagesFromSources( MImage ** images, 
-				           uint32_t & nImagesToMix,
-				           uint32_t mainSource );
+					uint32_t & nImagesToMix,
+					uint32_t mainSource );
 		void releaseImagesToSources( MImage ** images, 
-				             uint32_t nImages );
+					uint32_t nImages );
 
-        private:
-                MRef<Grabber *> grabber; // NULL if receive only
+	private:
+		MRef<Grabber *> grabber; // NULL if receive only
 		MRef<VideoDisplay *> display;
 		MRef<ImageMixer *> mixer;
-                MRef<VideoCodec *> codec;
+		MRef<VideoCodec *> codec;
 
-                uint32_t receivingWidth;
-                uint32_t receivingHeight;
+		uint32_t receivingWidth;
+		uint32_t receivingHeight;
 
-                uint32_t sendingWidth;
-                uint32_t sendingHeight;
+		uint32_t sendingWidth;
+		uint32_t sendingHeight;
 
 		std::list<MRef<VideoMediaSource *> > sources;
 		Mutex sourcesLock;
@@ -91,12 +93,12 @@ class VideoMediaSource : public MObject {
 	public:
 		VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t height );
 
-                MImage * provideEmptyImage();
-                MImage * provideFilledImage();
+		MImage * provideEmptyImage();
+		MImage * provideFilledImage();
 
-                void addEmptyImage( MImage * image );
-                void addFilledImage( MImage * image );
-                
+		void addEmptyImage( MImage * image );
+		void addFilledImage( MImage * image );
+		
 		virtual void playData( MRef<RtpPacket *> packet ); 
 
 		MRef<AVDecoder *> getDecoder();
@@ -105,27 +107,27 @@ class VideoMediaSource : public MObject {
 
 		virtual std::string getMemObjectType(){ return "VideoMediaSource"; };
 
-                friend class VideoMedia;
+		friend class VideoMedia;
 	private:
 		void addPacketToFrame( MRef<RtpPacket *> packet );
 
 		MRef<AVDecoder *> decoder;
-                MRef<VideoDisplay *> display;
+		MRef<VideoDisplay *> display;
 
-                uint32_t width;
-                uint32_t height;
+		uint32_t width;
+		uint32_t height;
 
-                byte_t frame[100000];
-                uint32_t index;
-                bool packetLoss;
-                uint16_t expectedSeqNo;
+		byte_t frame[100000];
+		uint32_t index;
+		bool packetLoss;
+		uint16_t expectedSeqNo;
 
 
-                std::list<MImage *> emptyImages;
-                Mutex emptyImagesLock;
+		std::list<MImage *> emptyImages;
+		Mutex emptyImagesLock;
 
-                std::list<MImage *> filledImages;
-                Mutex filledImagesLock;
+		std::list<MImage *> filledImages;
+		Mutex filledImagesLock;
 
 		MRef<RtpPacket *> savedPacket;
 };

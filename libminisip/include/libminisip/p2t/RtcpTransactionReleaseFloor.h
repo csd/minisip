@@ -35,10 +35,11 @@
 #ifndef RTCPTRANSACTIONRELEASEFLOOR_H
 #define RTCPTRANSACTIONRELEASEFLOOR_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
+
 #include<libminisip/p2t/P2T.h>
 
 /** 
@@ -128,22 +129,22 @@ class RtcpTransactionReleaseFloor: public SipTransaction{
 		 * @param remoteSSRC the SSRC from the remote user. The transaction accepts only floor control
 		 *                   messages with this number.
 		 */
-		RtcpTransactionReleaseFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port, string callId, unsigned remoteSSRC);
+		RtcpTransactionReleaseFloor(MRef<SipDialog*> call, int seqNo, IPAddress *toaddr, int32_t port,  std::string callId, unsigned remoteSSRC);
 		
 		/**
 		 * Destructor
 		 */
 		virtual ~RtcpTransactionReleaseFloor();
 
-		void setCallId(string id){callId = id;}
-		string getCallId(){return callId;}
+		void setCallId( std::string id){callId = id;}
+		 std::string getCallId(){return callId;}
 
 		/**
 		 * returns the name of the transaction.
 		 * Used by the Memory Handling of Minisip.
 		 * @return the string 'RtcpTransactionIdleFloor'
 		 */
-		virtual string getName(){return "RtcpTransactionReleaseFloor";}
+		virtual  std::string getName(){return "RtcpTransactionReleaseFloor";}
 		
 		/**
 		 * handles the incoming commands.

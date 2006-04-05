@@ -25,16 +25,9 @@
 #ifndef P2TDEFINITIONS_H
 #define P2TDEFINITIONS_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<string>
-
-using namespace std;
-
-//reason codes for DENY messages
-//#define P2T_NO_USER_SPECIFIED	0 //cname field was empty
-//#define P2T_INVALID_USER	1 //cname value was invalid
-//#define P2T_NOT_IN_SESSION	2 //user is not in active p2t session
 
 /**
  * first part of the application-dependent data in a RTCP APP packet.
@@ -100,7 +93,7 @@ class P2T{
 	/**@name Performance Measurements */
 	//@{
 	///the filename where the results will be saved.
-	static const string PERFORMANCE_FILE;
+	static const std::string PERFORMANCE_FILE;
 	//@}
 	
 	
@@ -142,10 +135,10 @@ class P2T{
 		/**
 		 * returns the name of a status.
 		 * @param status
-		 * @param return a string containing the name
+		 * @param return a std::string containing the name
 		 *               of the specified status
 		 */
-		static string getStatus(int status);
+		static std::string getStatus(int status);
 		
 		//@}
 		
@@ -167,10 +160,10 @@ class P2T{
 		/**
 		 * returns the name of the session type
 		 * @param type
-		 * @param return a string containing the name
+		 * @param return a std::string containing the name
 		 *               of the specified session type
 		 */
-		static string getSessionType(int type);
+		static std::string getSessionType(int type);
 		
 		//@}
 		
@@ -184,10 +177,10 @@ class P2T{
 		/**
 		 * returns the membership
 		 * @param membership
-		 * @return a string containing the membership
+		 * @return a std::string containing the membership
 		 *         (open/restricted)      
 		 */
-		static string getMembership(int membership);
+		static std::string getMembership(int membership);
 		//@}
 	//@}
 		
@@ -233,7 +226,7 @@ class P2T{
 	//@{
 		
 		///the name for the RTCP APP packets set
-		static const string APP_NAME;
+		static const std::string APP_NAME;
 
 		/**@name Subtype */
 		//@{

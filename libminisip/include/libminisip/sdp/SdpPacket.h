@@ -30,18 +30,22 @@
  * 
 */
 
-
 #ifndef SDPPACKET_H
 #define SDPPACKET_H
 
-#include<libmnetutil/IPAddress.h>
+#include<libminisip/libminisip_config.h>
+
 #include<vector>
-#include<libminisip/sdp/SdpPacket.h>
-#include<libminisip/sdp/SdpHeader.h>
-//#include<libmsip/CODECInterface.h>
+
 #include<libmutil/MemObject.h>
+
+#include<libmnetutil/IPAddress.h>
+
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
+
+#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/sdp/SdpHeader.h>
 
 MRef<SipMessageContent*> sdpSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 

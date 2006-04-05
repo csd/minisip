@@ -22,18 +22,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/conference/ConfMessageRouter.h>
-//#include<libmsip/CODECInterface.h>
-//#include"../util/ConfigFile.h"
-//#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-//#include<libmsip/SipDialogContainer.h>
-//#include<libminisip/sip/DefaultDialogHandler.h>
-//#include<libminisip/conference/ConferenceControl.h>
 
 #include<iostream>
 
 #ifdef _WIN32_WCE
-#	include"../include/minisip_wce_extra_includes.h"
+#	include<libminisip/minisip_wce_extra_includes.h>
 #endif
 
 using namespace std;

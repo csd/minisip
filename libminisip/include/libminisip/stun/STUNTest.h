@@ -25,11 +25,7 @@
 #ifndef STUNTEST_H
 #define STUNTEST_H
 
-#ifdef _MSC_VER
-typedef unsigned short uint16_t;
-#else
-#include<stdint.h>
-#endif
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/stun/STUNMessage.h>
 

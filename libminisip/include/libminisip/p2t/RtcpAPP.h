@@ -25,7 +25,7 @@
 #ifndef RTCPAPP_H
 #define RTCPAPP_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libminisip/p2t/RtcpAPPHeader.h>
 #include<libmnetutil/UDPSocket.h>
@@ -116,7 +116,7 @@ class RtcpAPP{
 		 * @param name value for the name field
 		 * @param ssrc value for the ssrc field
 		 **/
-		RtcpAPP(string name, unsigned ssrc );
+		RtcpAPP( std::string name, unsigned ssrc );
 		
 		/**
 		 * Constructor.
@@ -124,7 +124,7 @@ class RtcpAPP{
 		 * @param name    value for the name field
 		 * @param ssrc    value for the ssrc field
 		 **/
-		RtcpAPP(unsigned subtype, string name, unsigned ssrc );
+		RtcpAPP(unsigned subtype, std::string name, unsigned ssrc );
 		
 		/**
 		 * Constructor.
@@ -134,7 +134,7 @@ class RtcpAPP{
 		 * @param name             value for the name field
 		 * @param ssrc             value for the ssrc field
 		 **/
-		RtcpAPP(unsigned char *appdata, int appdata_length, unsigned subtype, string name, unsigned ssrc );
+		RtcpAPP(unsigned char *appdata, int appdata_length, unsigned subtype, std::string name, unsigned ssrc );
 		
 		/**
 		 * Destructor

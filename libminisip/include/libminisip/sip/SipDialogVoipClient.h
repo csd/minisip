@@ -56,9 +56,9 @@ class LogEntry;
 class SipDialogVoipClient: public SipDialogVoip{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession,  std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 #endif		
 		virtual ~SipDialogVoipClient();
@@ -67,19 +67,19 @@ class SipDialogVoipClient: public SipDialogVoip{
 
 		virtual std::string getMemObjectType(){return "SipDialogVoipClient";}
 		
-		virtual string getName(){return "SipDialogVoipClient[callid="+dialogState.callId +"]";}
+		virtual std::string getName(){return "SipDialogVoipClient[callid="+dialogState.callId +"]";}
 
 	private:
 		
-		string realm;
-		string nonce;
+		std::string realm;
+		std::string nonce;
 		
 		void setUpStateMachine();
 		
-		void sendInviteOk(const string &branch);
+		void sendInviteOk(const std::string &branch);
 		
-		void sendInvite(const string &branch);
-		void sendAuthInvite(const string &branch);
+		void sendInvite(const std::string &branch);
+		void sendAuthInvite(const std::string &branch);
 
 		bool a2001_start_callingnoauth_invite( const SipSMCommand &command);
 		bool a2002_callingnoauth_callingnoauth_18X( const SipSMCommand &command);

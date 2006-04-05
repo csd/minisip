@@ -22,19 +22,22 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/stun/STUNMessage.h>
 
 #ifdef _MSC_VER
-#include<winsock2.h>
-#include<io.h>
+#	include<winsock2.h>
+#	include<io.h>
 #else
-#include<unistd.h>
+#	include<unistd.h>
 #endif
 
 #include<assert.h>
-//#include<netinet/in.h>
 
 #include<iostream>
+
+using namespace std;
 
 MessageHeader::MessageHeader(int type): messageType(type), messageLength(0){
 	for (int i=0; i< 16; i++)

@@ -1,7 +1,7 @@
 #ifndef WAVE_SOUND_DEVICE_MSIP_H
 #define WAVE_SOUND_DEVICE_MSIP_H
  
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include <windows.h>
 #include <commctrl.h>
@@ -34,9 +34,6 @@ class WaveSoundDevice:public SoundDevice{
 		void playBack();
 		
 		virtual void sync();
-
-
-	
 
 		virtual std::string getMemObjectType(){ return "OssSoundDevice";};
 

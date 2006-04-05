@@ -25,12 +25,15 @@
 #ifndef GROUPLISTUSERELEMENT_H
 #define GROUPLISTUSERELEMENT_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
+
 #include<libmutil/MemObject.h>
-#include<libminisip/codecs/Codec.h>
+
 #include<libmnetutil/IPAddress.h>
+
+#include<libminisip/codecs/Codec.h>
 #include<libminisip/p2t/P2T.h>
 
 /**
@@ -61,12 +64,12 @@ class GroupListUserElement: public MObject{
 		 * @param callId    the callId of the SipDialogP2Tuser dialog for this user
 		 * @see P2T
 		 */
-		GroupListUserElement(string uri, IPAddress* addr, int RTPport, int RTCPport, Codec *codec,
+		GroupListUserElement( std::string uri, IPAddress* addr, int RTPport, int RTCPport, Codec *codec,
 			int priority=0,
 			int seqNo=0,
 			int status=0,
 			int ssrc=0,
-			string callId="");
+			 std::string callId="");
 		
 		/**
 		 * Constructor
@@ -76,7 +79,7 @@ class GroupListUserElement: public MObject{
 		 *                  states are defined in the P2T class.
 		 * @see P2T
 		*/
-		GroupListUserElement(string uri, int priority=0, int status=0);
+		GroupListUserElement( std::string uri, int priority=0, int status=0);
 		
 		/**
 		 * Destructor
@@ -86,7 +89,7 @@ class GroupListUserElement: public MObject{
 		/**
 		 * returns the name of the GroupListUserElement.
 		 * Used by the Memory Handling of Minisip.
-		 * @return the string 'GroupListUserElement'
+		 * @return the  std::string 'GroupListUserElement'
 		 */
 		virtual std::string getMemObjectType(){return "GroupListUserElement";}
 
@@ -94,7 +97,7 @@ class GroupListUserElement: public MObject{
 		 * set user's uri
 		 * @param uri the uri of the user
 		 */
-		void setUri(string uri){this->uri=uri;}
+		void setUri(std::string uri){this->uri=uri;}
 		
 		/**
 		 * set user's address
@@ -149,7 +152,7 @@ class GroupListUserElement: public MObject{
 		 * set user's callId
 		 * @param callId the callId of the SipDialogP2Tuser dialog
 		 */
-		void setCallId(string callId){this->callId=callId;}
+		void setCallId( std::string callId){this->callId=callId;}
 		
 		/**
 		 * set localStarted. 
@@ -161,9 +164,9 @@ class GroupListUserElement: public MObject{
 
 		/**
 		 *get user's uri
-		 *@return a string containing the uri
+		 *@return a  std::string containing the uri
 		 */
-		string getUri(){return uri;}
+		 std::string getUri(){return uri;}
 		
 		/**
 		 *get user's address
@@ -216,7 +219,7 @@ class GroupListUserElement: public MObject{
 		 *get user's callId 
 		 *@return the callId of the SipDialogP2Tuser dialog
 		 */
-		string getCallId(){return callId;}	
+		 std::string getCallId(){return callId;}	
 		
 		/**
 		 * return true if the SIP Session was initiated by
@@ -230,7 +233,7 @@ class GroupListUserElement: public MObject{
 	
 	private:
 		///the uri of the user
-		string uri;
+		 std::string uri;
 		///the address of the user
 		IPAddress* to_addr;
 		///the priority of the user
@@ -248,7 +251,7 @@ class GroupListUserElement: public MObject{
 		///the status of the user for the floor control
 		int status;
 		///the callID of the SipDialogP2Tuser dialog
-		string callId;
+		 std::string callId;
 		///indicates that the local user sent the INVITE message
 		bool localStarted;
 		

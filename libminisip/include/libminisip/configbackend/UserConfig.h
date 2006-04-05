@@ -22,6 +22,8 @@
 #ifndef USER_CONFIG_H
 #define USER_CONFIG_H
 
+#include<libminisip/libminisip_config.h>
+
 #include <string>
 
 class UserConfig

@@ -22,6 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
 
 #include<libminisip/p2t/RtcpTransactionTakenFloor.h>
 
@@ -32,7 +33,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmutil/itoa.h>
 //#include"DefaultCallHandler.h"
-
 
 bool RtcpTransactionTakenFloor::a0_start_takensent( const SipSMCommand &command)
 {

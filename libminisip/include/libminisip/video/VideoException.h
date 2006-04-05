@@ -25,12 +25,14 @@
 #ifndef VIDEO_EXCEPTION_H
 #define VIDEO_EXCEPTION_H
 
+#include<libminisip/libminisip_config.h>
+
 class VideoException{
-        public:
-                VideoException( std::string message ):message(message){};
-                std::string error(){ return message; };
-        private:
-                std::string message;
+	public:
+		VideoException( std::string message ):message(message){};
+		std::string error(){ return message; };
+	private:
+		std::string message;
 };
 
 #endif

@@ -34,6 +34,8 @@
 #ifndef SDPHEADER_H
 #define SDPHEADER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libmutil/MemObject.h>
 
 #define SDP_HEADER_TYPE_A	0

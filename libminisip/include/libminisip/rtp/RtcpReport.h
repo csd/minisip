@@ -25,10 +25,9 @@
 #ifndef RTCPREPORT_H
 #define RTCPREPORT_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<vector>
-
-#include<config.h>
-
 
 #define PACKET_TYPE_SR 200
 #define PACKET_TYPE_RR 201

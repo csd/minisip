@@ -23,6 +23,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/p2t/GroupListServer.h>
 #include <ctype.h>
 #include<libmutil/dbg.h>
@@ -30,7 +32,6 @@
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmutil/itoa.h>
 #include<libminisip/mediahandler/MediaHandler.h>
-
 
 GroupListServer::GroupListServer(MRef<SipSoftPhoneConfiguration*>config,  int32_t localPort){
 	

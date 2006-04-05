@@ -22,12 +22,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/rtp/RtpHeader.h>
 #include<libminisip/rtp/RtpPacket.h>
 
 #ifdef DEBUG_OUTPUT
-#include<iostream>
+#	include<iostream>
 #endif
+
+using namespace std;
 
 RtpHeader::RtpHeader(){
 	version=0;

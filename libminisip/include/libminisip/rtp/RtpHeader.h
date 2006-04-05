@@ -25,11 +25,9 @@
 #ifndef RTPHEADER_H
 #define RTPHEADER_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<vector>
-
-using namespace std;
 
 class RtpHeader{
 
@@ -73,7 +71,7 @@ class RtpHeader{
 		uint16_t sequence_number;
 		uint32_t timestamp;
 		uint32_t SSRC;
-		vector<int> CSRC; 
+		std::vector<int> CSRC; 
 		
 	private:
 #ifdef TCP_FRIENDLY 

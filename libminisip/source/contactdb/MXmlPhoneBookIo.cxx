@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/contactdb/MXmlPhoneBookIo.h>
 
 #include<libminisip/contactdb/PhoneBook.h>
@@ -29,6 +31,7 @@
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
+
 #include<string>
 #include<fstream>
 

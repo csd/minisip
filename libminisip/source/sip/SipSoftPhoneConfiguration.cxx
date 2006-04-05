@@ -35,6 +35,8 @@
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
+#include<config.h>
+
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
 #include<libminisip/soundcard/SoundIO.h>
@@ -57,6 +59,8 @@
 //update both!!!! the str define is to avoid including itoa.h
 #define CONFIG_FILE_VERSION_REQUIRED 2
 #define CONFIG_FILE_VERSION_REQUIRED_STR "2"
+
+using namespace std;
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
 	securityConfig(),

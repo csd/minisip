@@ -25,10 +25,10 @@
 #ifndef RTCPREPORTSDES_H
 #define RTCPREPORTSDES_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<libminisip/rtp/RtcpReport.h>
 #include<libminisip/rtp/SDESChunk.h>
-
-#include<config.h>
 
 class RtcpReportSDES : public RtcpReport{
 	public:
@@ -41,7 +41,7 @@ class RtcpReportSDES : public RtcpReport{
 		virtual void debug_print();
 #endif
 	private:
-		vector<SDESChunk>chunks;
+		std::vector<SDESChunk>chunks;
 };
 
 #endif

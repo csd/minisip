@@ -24,6 +24,8 @@
  *	    Joachim Orrblad <joachim@orrblad.com>
 */
 
+#include <config.h>
+
 #include<iostream>
 
 #include<libmutil/massert.h>

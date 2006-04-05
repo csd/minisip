@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include <config.h>
+
 #include<libminisip/mediahandler/Media.h>
 
 #include<libminisip/codecs/Codec.h>

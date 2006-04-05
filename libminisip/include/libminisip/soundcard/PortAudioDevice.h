@@ -19,6 +19,8 @@
 #ifndef PORTAUDIODEVICE_H
 #define PORTAUDIODEVICE_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<portaudio.h>
 #include<libmutil/CircularBuffer.h>
 #include<libmutil/CondVar.h>

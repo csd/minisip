@@ -22,6 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
 
 #include<libminisip/gui/LogEntry.h>
 
@@ -29,7 +30,6 @@
 #include<string>
 
 using namespace std;
-
 
 MRef<LogEntryHandler *> LogEntry::handler;
 

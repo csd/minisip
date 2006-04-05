@@ -22,6 +22,11 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#ifndef DC1394GRABBER_INCLUDE_HEADER
+#define DC1394GRABBER_INCLUDE_HEADER
+
+#include<libminisip/libminisip_config.h>
+
 #include<stdint.h>
 #include<libraw1394/raw1394.h>
 #include<libdc1394/dc1394_control.h>
@@ -30,8 +35,6 @@
 
 #define MAX_PORTS   4
 #define MAX_CAMERAS 8
-
-
 
 class ImageHandler;
 
@@ -78,3 +81,4 @@ class Dc1394Grabber : public Grabber{
 
 };
 
+#endif

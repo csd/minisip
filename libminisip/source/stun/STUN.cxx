@@ -22,12 +22,15 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/stun/STUN.h>
 #include<libminisip/stun/STUNMessage.h>
 #include<libminisip/stun/STUNTest.h>
-#include<libmutil/itoa.h>
-#include<libmnetutil/NetworkFunctions.h>
 
+#include<libmutil/itoa.h>
+
+#include<libmnetutil/NetworkFunctions.h>
 
 #include<stdio.h>
 
@@ -49,6 +52,8 @@ static char *msgs[]={
 	"PortRestricted", 
 	"Restricted",
 	"SymmetricFirewall"};
+
+using namespace std;
 
 /*                                         
  * The following four tests are executed to test 

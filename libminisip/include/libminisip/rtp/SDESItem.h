@@ -25,9 +25,7 @@
 #ifndef SDESITEM_H
 #define SDESITEM_H
 
-#include<config.h>
-
-//#include<vector>
+#include<libminisip/libminisip_config.h>
 
 #define CNAME 1
 #define NAME 2
@@ -36,7 +34,6 @@
 #define LOC 5
 #define TOOL 6
 #define NOTE 7
-
 
 class SDESItem{
 	public:

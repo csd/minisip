@@ -32,15 +32,6 @@
  * --Erik Eliasson, eliasson@it.kth.se
  */
 
-
-/*
- * Sample=
- *
- *
- *
- *
-*/
-
 #include<config.h>
 
 #include<sys/types.h>
@@ -66,27 +57,28 @@
 #include<libminisip/spaudio/SpAudio.h>
 
 #ifdef AEC_SUPPORT
-#include<libminisip/aec/aec.h>
+#	include<libminisip/aec/aec.h>
 #endif
 
 #ifdef _MSC_VER
 
 #else
-#include<sys/time.h>
-#include<unistd.h>
+#	include<sys/time.h>
+#	include<unistd.h>
 #endif
+
 #include<libminisip/soundcard/SoundDevice.h>
 
 #ifndef WIN32
 #	include<libminisip/soundcard/OssSoundDevice.h>
 #	ifdef HAVE_LIBASOUND
-#		include<libminisip/soundcard/AlsaSoundDevice.h>
+#		include<libminisip/soundcard/SoundDevice.h>
 #	endif
 #else
 #	ifdef DSOUND
-#		include<libminisip/soundcard/DirectSoundDevice.h>
+#		include<libminisip/soundcard/SoundDevice.h>
 #	elif defined(WAVE_SOUND)
-#		include<libminisip/soundcard/WaveSoundDevice.h>
+#		include<libminisip/soundcard/SoundDevice.h>
 #	else
 #		error "NO Windows AUDIO Defined!"
 #	endif

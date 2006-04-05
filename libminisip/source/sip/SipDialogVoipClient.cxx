@@ -30,6 +30,8 @@
  * Purpose
  * 
 */
+#include<config.h>
+
 #include<libminisip/sip/SipDialogVoipClient.h>
 
 #include<libmutil/massert.h>

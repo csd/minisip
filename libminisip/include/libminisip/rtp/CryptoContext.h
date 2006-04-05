@@ -28,12 +28,13 @@
 #ifndef CRYPTOCONTEXT_H
 #define CRYPTOCONTEXT_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
-#include<libminisip/rtp/RtpPacket.h>
 #include<libmutil/aes.h>
 #include<libmutil/hmac.h>
 #include<libmutil/MemObject.h>
+
+#include<libminisip/rtp/RtpPacket.h>
 
 #define REPLAY_WINDOW_SIZE 64
 

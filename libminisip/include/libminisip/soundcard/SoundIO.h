@@ -26,14 +26,10 @@
 #ifndef SOUNDIO_H
 #define SOUNDIO_H
 
-//#define HAVE_LIBASOUND
+#include<libminisip/libminisip_config.h>
 
-#include<config.h>
 
 #include<libminisip/soundcard/SoundRecorderCallback.h>
-//class SoundRecorderCallback
-
-//#include<libminisip/soundcard/SoundIOPLCInterface.h>
 class SoundIOPLCInterface;
 
 #include<libmutil/Mutex.h>
@@ -41,12 +37,7 @@ class SoundIOPLCInterface;
 
 #include<list>
 #include<string>
-//#include<libminisip/spaudio/SpAudio.h>
 
-#ifdef HAVE_LIBASOUND
-#endif
-
-//#include<libminisip/soundcard/AudioMixer.h> //this needs to be removed ... change in MRef
 class AudioMixer;
 
 class SoundSource;

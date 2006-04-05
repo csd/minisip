@@ -23,7 +23,6 @@
  *	    Cesc Santasusana <c e s c DOT s a n t a [AT} g m a i l DOT c o m>
 */
 
-
 #include<config.h>
 
 #include<libminisip/soundcard/DirectSoundDevice.h>

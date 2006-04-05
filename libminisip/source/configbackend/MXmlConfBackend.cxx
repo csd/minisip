@@ -22,6 +22,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
+#include<config.h>
+
 #include<libminisip/configbackend/MXmlConfBackend.h>
 #include<libminisip/configbackend/UserConfig.h>
 
