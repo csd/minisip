@@ -7,6 +7,8 @@ AM_CPPFLAGS += -DMINISIP_DATADIR="\"$(pkgdatadir)\""	\
 		-I$(top_srcdir)/include \
 		-I$(top_srcdir)
 
+AM_LDFLAGS = $(RELOC_LDFLAGS)
+
 minisip_gtkgui_LDADD =	$(LIBMINISIP_LIBS) \
 			$(MSIP_LIBS) \
 			$(MIKEY_LIBS) \

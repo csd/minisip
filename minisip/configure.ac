@@ -9,15 +9,6 @@ m4_define([minisip_micro_version], [1])
 m4_define([minisip_version],
           [minisip_major_version.minisip_minor_version.minisip_micro_version])
 
-dnl
-dnl Libtool style version info
-dnl update before each new release 
-dnl See node "Updating version info::" in info libtool
-dnl
-m4_define([lt_current], [0])
-m4_define([lt_revision], [0])
-m4_define([lt_age], [0])
-
 AC_INIT(minisip, [minisip_major_version.minisip_minor_version], BUG-REPORT-ADDRESS)
 dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
@@ -29,13 +20,9 @@ AM_CONFIG_HEADER(include/compilation_config.h)
 MINISIP_MAJOR_VERSION=minisip_major_version
 MINISIP_MINOR_VERSION=minisip_minor_version
 MINISIP_MICRO_VERSION=minisip_micro_version
-LT_VERSION_INFO="lt_current:lt_revision:lt_age"
-LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
 AC_SUBST(MINISIP_MAJOR_VERSION)
 AC_SUBST(MINISIP_MINOR_VERSION)
 AC_SUBST(MINISIP_MICRO_VERSION)
-AC_SUBST(LT_VERSION_INFO)
-AC_SUBST(LT_CURRENT_MINUS_AGE)
 
 AC_CANONICAL_HOST
 case $host_os in
@@ -101,29 +88,6 @@ LDFLAGS="${LDFLAGS} -rdynamic"
 dnl Check types
 AC_CHECK_TYPES([uint])
 
-dnl
-dnl PortAudio V19 support
-dnl
-AC_ARG_ENABLE(portaudio,
-	[AS_HELP_STRING([--enable-portaudio],
-		[enable PortAudio V19 support (default auto).])],,
-	[enable_portaudio=auto])
-
-if test ! x$enable_portaudio = xno; then
-   have_portaudio=yes
-   AC_CHECK_HEADERS([portaudio.h],,have_portaudio=no)
-   AC_CHECK_LIB([portaudio],[Pa_GetDefaultOutputDevice],[PORTAUDIO_LIBS=-lportaudio],have_portaudio=no)
-
-   if test x$have_portaudio = xyes; then
-      AC_DEFINE(PORTAUDIO_SUPPORT, [1], [PortAudio V19 SoundDevice support.])
-   elif test x$enable_portaudio = xyes; then
-      AC_MSG_ERROR([Could not find PortAudio requirement(s).])
-   fi
-
-   AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
-   AC_SUBST(PORTAUDIO_LIBS)
-fi
-
 dnl STL
 dnl AC_ARG_ENABLE(stl,
 dnl    [ --enable-stl enables the use of C++ STL (default disabled)],
@@ -188,84 +152,6 @@ AC_ARG_ENABLE(buzzer,
       fi ])
 
 
-dnl --with-avcodec argument
-AC_ARG_WITH(avcodec,
-    [ --with-avcodec=DIR location of the libavcodec tree],
-    [ if test "${with_avcodec}" != "no"
-      then
-        AVCODEC_CPPFLAGS="-I${with_avcodec}"
-        AVCODEC_LDFLAGS="-L${with_avcodec}"
-      fi ])
-
-
-dnl Check for libsamplerate
-AC_CHECK_HEADER([samplerate.h], 
-	[
-		AC_CHECK_LIB([samplerate], [main],
-			[SAMPLERATE_LIBS="-lsamplerate"
-			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])
-			 FLOAT_RESAMPLER="yes"
-                        ]
-                )
-	]
-)
-AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
-AC_SUBST(SAMPLERATE_LIBS)
-
-dnl Check for stack trace support
-AC_CHECK_HEADER([execinfo.h], 
-	[
-		AC_DEFINE(HAS_EXECINFO, [], [Stack trace functionality found])
-			HAS_EXECINFO="yes"
-	]
-)
-AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
-
-
-dnl Check for libspeex
-AC_CHECK_HEADER([speex/speex.h], 
-	[
-		AC_CHECK_LIB([speex], [speex_encoder_init],
-			[SPEEX_LIBS="-lspeex"
-			 AC_DEFINE(HAS_SPEEX, [], [Use the Speex CODEC])])
-			 HAS_SPEEX="yes"
-	]
-)
-AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
-AC_SUBST(SPEEX_LIBS)
-
-dnl Check for libgsm
-AC_CHECK_HEADER([gsm.h], 
-	[
-		AC_CHECK_LIB([gsm], [gsm_encode],
-			[GSM_LIBS="-lgsm"
-			 AC_DEFINE(HAS_GSM, [], [Use the GSM CODEC])])
-			 HAS_GSM="yes"
-	]
-)
-AM_CONDITIONAL(HAS_GSM, test "${HAS_GSM}" = "yes")
-AC_SUBST(GSM_LIBS)
-
-
-
-
-
-dnl #############
-dnl IPSEC SUPPORT
-dnl #############
-AC_ARG_ENABLE(ipsec,
-    [ --enable-ipsec enables ipsec features (default disabled)],
-    [	if test "${enable_ipsec}" = "yes"
-        then
-	  AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
-	    [Could not locate libipsec, required for ipsec features.])])
-	  AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])
-        fi
-    ]
-)
-
-AM_CONDITIONAL(IPSEC_SUPPORT, test "${enable_ipsec}" = "yes")
-
 dnl P2T support
 AC_ARG_ENABLE(p2t,
     [ --enable-p2t enables push-2-talk features (default disabled)],
@@ -278,16 +164,6 @@ AC_ARG_ENABLE(p2t,
 )
 
 AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
-
-dnl AEC support
-AC_ARG_ENABLE(aec,
-    [ --enable-aec enables echo cancelling features (default enabled)],
-    [ if test "${enable_aec}" != "no"
-      then
-	   AC_DEFINE(AEC_SUPPORT, [], [AEC support]) 
-      fi])
-
-AM_CONDITIONAL(AEC_SUPPORT, test "${enable_aec}" != "no")
 
 dnl #############
 dnl VIDEO SUPPORT
@@ -392,43 +268,6 @@ AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 
       
 
-dnl ALSA sound interface
-AC_ARG_ENABLE(alsa,
-    [ --enable-alsa enables ALSA sound support (default disabled)],
-    [ if test "${enable_alsa}" = "yes"
-      then
-        AC_CHECK_LIB([asound], [main],
-	   [ALSA_LIBS="-lasound"],
-           [AC_MSG_ERROR([Could not find the alsa library])]
-        )
-      fi ])
-
-AM_CONDITIONAL(HAVE_LIBASOUND, [test "${enable_alsa}" = "yes"])
-AC_SUBST(ALSA_LIBS)
-
-dnl DirectSound sound interface
-AC_ARG_ENABLE(dsound,
-    [ --enable-dsound enables DirectSound sound support (default disabled)],
-    [ AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) ])
-
-if test ! x$enable_dsound = xno; then
-   have_dsound=yes
-   save_LIBS="${LIBS}"
-   dnl Can`t check stdcall function DirectSoundFullDuplexCreate.
-   AC_CHECK_LIB([dsound], [main],,[have_dsound=no])
-   AC_CHECK_LIB([uuid], [GUID_NULL],,[have_dsound=no])
-   AC_CHECK_LIB([dxguid], [IID_IDirectSoundNotify],,[have_dsound=no])
-   AC_CHECK_HEADERS([dsound.h],,[have_dsound=no])
-   if test x$have_dsound = xyes; then
-      DSOUND_LIBS="-ldxguid -luuid -ldsound"
-   elif test x$enable_dsound = xyes; then
-      AC_MSG_ERROR([Could not find libraries required by DirectSound support])
-   fi
-   LIBS="${save_LIBS}"
-   AC_SUBST(DSOUND_LIBS)
-   AM_CONDITIONAL(DIRECT_SOUND, [test "${have_dsound}" = "yes"])
-fi
-
 dnl TEXT UI
 AC_ARG_ENABLE(textui,
     [ --enable-textui enables the text based user interface (default disabled)],
@@ -501,19 +340,6 @@ PKG_CHECK_MODULES(OSSO, [libosso],
 	],[echo 'No libosso support.'])
 
 AM_CONDITIONAL(OSSO_SUPPORT, [test "${osso_support}" = "yes"])
-
-AC_ARG_ENABLE(gconf,
-    [ --enable-gconf enables support for GConf (default enabled).])
-
-PKG_CHECK_MODULES(GCONF, [gconf-2.0],
-	[
-		if test "x${enable_gconf}" != "xno"
-		then
-			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
-			gconf_support="yes"
-		fi
-	],[echo 'GConf development libraries not found, GConf support is disabled.'])
-AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
 QT="qt"

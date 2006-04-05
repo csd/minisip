@@ -16,7 +16,7 @@ class MessageRouter;
 class ConfMessageRouter;
 
 
-class Minisip : public MObject{
+class LIBMINISIP_API Minisip : public MObject{
 	public:
 		Minisip( MRef<Gui *> gui, int argc, char**argv );
 		virtual ~Minisip();
