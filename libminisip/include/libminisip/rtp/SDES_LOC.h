@@ -31,7 +31,7 @@
 
 #include<string>
 
-class SDES_LOC : public SDESItem{
+class LIBMINISIP_API SDES_LOC : public SDESItem{
 	public:
 		SDES_LOC(void *buildfrom, int max_length);
 		virtual ~SDES_LOC(){};

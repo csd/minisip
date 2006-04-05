@@ -82,7 +82,7 @@ NOTE: The output/input of this device for now is RAW. This means that
 	tool SOX, for example).
 	sox somemp3.mp3 -r 48000 -c 2 -s -w minisip.play.sw
 */
-class FileSoundDevice: public SoundDevice{
+class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 	public:
 		FileSoundDevice(string in_file="", 
 				string out_file="", 

@@ -50,7 +50,7 @@ This mixer is slightly more than simple.
 The sources are all mixed together without any spatial audio processing, 
 thus they all sound as if they were in front of us (in stereo).
 */
-class AudioMixerSimple: public AudioMixer {
+class LIBMINISIP_API AudioMixerSimple: public AudioMixer {
 
 	public:
 		AudioMixerSimple();

@@ -48,7 +48,7 @@ A SoundSource object is capable of acting as a buffer for
 audio samples (read from the network) before they are 
 "get" by the SoundDevice and played. 
 */
-class SoundSource : public MObject{
+class LIBMINISIP_API SoundSource : public MObject{
 	public:
 		SoundSource(int id);
 		virtual ~SoundSource(){};

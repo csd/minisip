@@ -38,7 +38,7 @@
 
 class SoundSource;
 
-class SpAudio: public MObject{
+class LIBMINISIP_API SpAudio: public MObject{
 
 	public:
 

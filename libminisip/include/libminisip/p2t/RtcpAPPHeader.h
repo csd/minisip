@@ -46,7 +46,7 @@ using namespace std;
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class RtcpAPPHeader{
+class LIBMINISIP_API RtcpAPPHeader{
 
 	public:
 		/**

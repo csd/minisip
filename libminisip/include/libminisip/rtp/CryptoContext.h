@@ -38,7 +38,7 @@
 
 #define REPLAY_WINDOW_SIZE 64
 
-class CryptoContext : public MObject{
+class LIBMINISIP_API CryptoContext : public MObject{
 	public:
 		CryptoContext( uint32_t ssrc );
 		

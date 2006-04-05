@@ -43,7 +43,7 @@ class SipSoftPhoneConfiguration;
 class IpProvider;
 
 
-class MediaHandler : public virtual MObject, public SessionRegistry, public CommandReceiver {
+class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegistry, public CommandReceiver {
 
 	public:
 		/**

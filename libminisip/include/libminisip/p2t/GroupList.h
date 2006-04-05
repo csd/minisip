@@ -58,7 +58,7 @@
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class GroupList: public MObject{
+class LIBMINISIP_API GroupList: public MObject{
 	public:
 		
 		/**

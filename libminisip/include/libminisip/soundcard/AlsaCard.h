@@ -35,7 +35,7 @@ extern "C"{
 #include<iostream>
 
 
-class AlsaCard{
+class LIBMINISIP_API AlsaCard{
 	public:
 		AlsaCard( std::string cardname, std::string devname );
 

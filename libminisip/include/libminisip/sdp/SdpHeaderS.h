@@ -39,7 +39,7 @@
 
 using namespace std;
 
-class SdpHeaderS : public SdpHeader{
+class LIBMINISIP_API SdpHeaderS : public SdpHeader{
 	public:
 		SdpHeaderS(string buildFrom);
 		virtual ~SdpHeaderS();

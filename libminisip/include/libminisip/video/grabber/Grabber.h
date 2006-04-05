@@ -34,7 +34,7 @@
 
 class ImageMixer;
 
-class Grabber : public Runnable{
+class LIBMINISIP_API Grabber : public Runnable{
 	public:
 		static MRef<Grabber *> create( std::string device );
 		virtual void open()=0;

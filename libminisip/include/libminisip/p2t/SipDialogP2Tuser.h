@@ -68,7 +68,7 @@
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class SipDialogP2Tuser: public SipDialog{
+class LIBMINISIP_API SipDialogP2Tuser: public SipDialog{
 	public:
 		
 		/**

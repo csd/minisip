@@ -52,7 +52,7 @@ class SdpHeaderM;
  * Media sessions register their MediaStreamSender objects to
  * the Media objects.
  */
-class Media : public MObject{
+class LIBMINISIP_API Media : public MObject{
 	public:
 
 		/**

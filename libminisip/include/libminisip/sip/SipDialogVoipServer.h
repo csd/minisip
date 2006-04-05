@@ -53,7 +53,7 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogVoipServer: public SipDialogVoip{
+class LIBMINISIP_API SipDialogVoipServer: public SipDialogVoip{
 	public:
 #ifdef IPSEC_SUPPORT
 		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);

@@ -31,7 +31,7 @@
 
 class Session;
 
-class DtmfEvent{
+class LIBMINISIP_API DtmfEvent{
 	public:
 		DtmfEvent( uint8_t symbol, 
 				uint8_t volume, 
@@ -61,7 +61,7 @@ class DtmfEvent{
 		friend class DtmfSender;
 };
 
-class DtmfSender : public MObject {
+class LIBMINISIP_API DtmfSender : public MObject {
 	public:
 		DtmfSender( MRef<Session *> session );
 		void timeout( DtmfEvent * event );

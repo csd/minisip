@@ -64,7 +64,7 @@
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class GroupListServer: public Runnable{
+class LIBMINISIP_API GroupListServer: public Runnable{
 	public:
 		
 		/**

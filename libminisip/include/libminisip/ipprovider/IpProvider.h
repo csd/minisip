@@ -34,7 +34,7 @@
 class UDPSocket;
 class SipSoftPhoneConfiguration;
 
-class IpProvider: public MObject{
+class LIBMINISIP_API IpProvider: public MObject{
 	public:
 		virtual std::string getExternalIp()=0;
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock )=0;

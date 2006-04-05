@@ -29,7 +29,7 @@
 
 class XMLFileParser;
 
-class MXmlConfBackend : public ConfBackend {
+class LIBMINISIP_API MXmlConfBackend : public ConfBackend {
 	public:
 		MXmlConfBackend();
 		~MXmlConfBackend();

@@ -59,7 +59,7 @@ class PhoneBook;
 /**
  * The phone configuration.
  */
-class SipSoftPhoneConfiguration : public MObject{
+class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 	public:
 		SipSoftPhoneConfiguration();
 		virtual ~SipSoftPhoneConfiguration();

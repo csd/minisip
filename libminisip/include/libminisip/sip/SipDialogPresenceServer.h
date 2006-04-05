@@ -49,7 +49,7 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogPresenceServer: public SipDialog{
+class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 	public:
 		SipDialogPresenceServer(MRef<SipStack*> dContainer, MRef<SipDialogConfig*> callconfig, bool use_stun);
 		

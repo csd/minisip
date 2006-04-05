@@ -35,7 +35,7 @@
 #define TOOL 6
 #define NOTE 7
 
-class SDESItem{
+class LIBMINISIP_API SDESItem{
 	public:
 		virtual ~SDESItem() {}
 		

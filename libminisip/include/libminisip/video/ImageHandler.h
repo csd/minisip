@@ -25,6 +25,8 @@
 #ifndef IMAGE_HANDLER_H
 #define IMAGE_HANDLER_H
 
+#include<libminisip/libminisip_config.h>
+
 #include<string>
 #include<stdint.h>
 
@@ -64,7 +66,7 @@ typedef struct MImage{
 
 /* Interface used by image encoders and display */
 
-class ImageHandler{
+class LIBMINISIP_API ImageHandler{
 	public:
 		virtual bool handlesChroma( uint32_t chroma )=0;
 		virtual void init( uint32_t width, uint32_t height )=0;

@@ -32,7 +32,7 @@
 class IPAddress;
 class Gui;
 
-class StunIpProvider: public IpProvider{
+class LIBMINISIP_API StunIpProvider: public IpProvider{
 	public:
 		static MRef<StunIpProvider *> create( MRef<SipSoftPhoneConfiguration *> config );
 		

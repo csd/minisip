@@ -42,7 +42,7 @@ typedef uint8_t byte_t;
 class VideoEncoderCallback;
 
 
-class AVEncoder: public ImageHandler, public MObject{
+class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 	public:
 		AVEncoder();
 		virtual void handle( MImage * image );

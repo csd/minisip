@@ -78,7 +78,7 @@
 class SipSoftPhoneConfiguration;
 class MediaHandler;
 
-class Sip: public Runnable, public CommandReceiver{
+class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
@@ -101,7 +101,6 @@ class Sip: public Runnable, public CommandReceiver{
 		
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig();
 		
-                
 		/**
 		Starts this Sip object as a Thread.
 		You can still run the Sip object in non-thread by directly calling
@@ -137,7 +136,7 @@ class Sip: public Runnable, public CommandReceiver{
 		void handleCommand(std::string subsystem, const CommandString &cmd);
 
 		CommandString handleCommandResp(std::string subsystem, const CommandString &cmd);
-                
+
 	private:
 		MRef<SipStack *> sipstack;
 		MRef<SipSoftPhoneConfiguration*> phoneconfig;

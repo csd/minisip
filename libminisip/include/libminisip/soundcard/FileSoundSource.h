@@ -38,7 +38,7 @@ class Resampler;
  *
  * Note: The current implementation does not support stereo.
  */
-class FileSoundSource : public SoundSource{
+class LIBMINISIP_API FileSoundSource : public SoundSource{
     public:
         /**
          * 

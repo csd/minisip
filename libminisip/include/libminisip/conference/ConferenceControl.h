@@ -46,7 +46,7 @@ typedef struct CCList {
     int numUser;
 } cclist;
 
-class ConferenceControl{
+class LIBMINISIP_API ConferenceControl{
     public:
         ConferenceControl();
 	ConferenceControl(std::string configUri, std::string cid, bool islocal);
@@ -75,7 +75,7 @@ class ConferenceControl{
 	*/
 	void printList(minilist<ConfMember> *list);
         minilist<ConfMember> * getConnectedList();
-        
+
 	//virtual void run();
 	std::string confId;
     private:

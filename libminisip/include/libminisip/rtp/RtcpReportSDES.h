@@ -30,7 +30,7 @@
 #include<libminisip/rtp/RtcpReport.h>
 #include<libminisip/rtp/SDESChunk.h>
 
-class RtcpReportSDES : public RtcpReport{
+class LIBMINISIP_API RtcpReportSDES : public RtcpReport{
 	public:
 		RtcpReportSDES(void * build_from, int max_length);
 		virtual ~RtcpReportSDES();

@@ -38,7 +38,7 @@
 
 class ImageHandler;
 
-class Dc1394Grabber : public Grabber{
+class LIBMINISIP_API Dc1394Grabber : public Grabber{
 	public:
 		Dc1394Grabber( uint32_t portId, uint32_t cameraId );
 

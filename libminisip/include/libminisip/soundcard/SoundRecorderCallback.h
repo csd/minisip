@@ -35,7 +35,7 @@
  * @author Erik Eliasson, eliasson@it.kth.se
  * @version 0.01
  */
-class SoundRecorderCallback{
+class LIBMINISIP_API SoundRecorderCallback{
 	public:
 		virtual ~SoundRecorderCallback() {}
 		

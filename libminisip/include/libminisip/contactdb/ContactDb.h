@@ -37,7 +37,7 @@ class PhoneBookPerson;
 #define CONTACT_STATUS_OFFLINE 2
 #define CONTACT_STATUS_UNKNOWN 3
 
-class ContactEntry : public MObject{
+class LIBMINISIP_API ContactEntry : public MObject{
 
 	public:
 		ContactEntry();
@@ -82,7 +82,7 @@ class ContactEntry : public MObject{
                 friend class PhoneBook;
 };
 
-class ContactDb : public MObject{
+class LIBMINISIP_API ContactDb : public MObject{
 	public:
 		ContactDb();
 

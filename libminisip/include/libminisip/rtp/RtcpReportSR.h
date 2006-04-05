@@ -33,7 +33,7 @@
 
 #include<vector>
 
-class RtcpReportSR : public RtcpReport{
+class LIBMINISIP_API RtcpReportSR : public RtcpReport{
 	public:
 		RtcpReportSR(unsigned ssrc);
 		

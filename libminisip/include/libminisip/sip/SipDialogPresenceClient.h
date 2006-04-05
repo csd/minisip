@@ -48,7 +48,7 @@ class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
 
-class SipDialogPresenceClient: public SipDialog{
+class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 	public:
 		SipDialogPresenceClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, bool use_stun);
 		
@@ -82,7 +82,7 @@ class SipDialogPresenceClient: public SipDialog{
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
 		void handleSdp(MRef<SdpPacket*> );
-                
+
 		void setLocalCalled(bool lc){localCalled=lc;}
 		
 		void setNonce(const  std::string &n){ nonce = n; }

@@ -26,7 +26,7 @@
 
 #include <string>
 
-class UserConfig
+class LIBMINISIP_API UserConfig
 {
 	public:
 		static std::string getFileName(std::string baseName);

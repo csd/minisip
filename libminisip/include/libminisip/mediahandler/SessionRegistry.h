@@ -33,7 +33,7 @@
 #include<libminisip/mediahandler/Session.h>
 
 
-class SessionRegistry{
+class LIBMINISIP_API SessionRegistry{
 	friend class Session;
 	
 	public:

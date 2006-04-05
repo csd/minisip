@@ -45,7 +45,7 @@ class IpProvider;
  * MediaStreamSender and MediaStreamReceiver
  */
 
-class MediaStream : public MObject{
+class LIBMINISIP_API MediaStream : public MObject{
 	public:
 		/**
 		 * Starts the transmission or reception of a the stream.
@@ -136,7 +136,7 @@ class MediaStream : public MObject{
  * given session. It is responsible for decryption and replay protection
  * in the case of SRTP.
  */
-class MediaStreamReceiver : public MediaStream{ 
+class LIBMINISIP_API MediaStreamReceiver : public MediaStream{ 
 	public:
 		/**
 		 * Constructor, called by the MediaHandler when creating
@@ -229,7 +229,7 @@ class MediaStreamReceiver : public MediaStream{
  * a specific media Session. It holds the CODEC instance selected for
  * this peer, and is responsible for encryption.
  */
-class MediaStreamSender : public MediaStream{ 
+class LIBMINISIP_API MediaStreamSender : public MediaStream{ 
 	public:
 		/**
 		 * Constructor, used by the MediaHandler during the

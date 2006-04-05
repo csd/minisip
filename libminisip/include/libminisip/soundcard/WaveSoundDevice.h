@@ -10,7 +10,7 @@
 #include<libminisip/soundcard/SoundDevice.h>
 #include<libminisip/soundcard/SoundDevice.h>
 
-class WaveSoundDevice:public SoundDevice{
+class LIBMINISIP_API WaveSoundDevice:public SoundDevice{
 
 	public:
 		virtual ~WaveSoundDevice( );

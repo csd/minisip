@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-class VideoException{
+class LIBMINISIP_API VideoException{
 	public:
 		VideoException( std::string message ):message(message){};
 		std::string error(){ return message; };

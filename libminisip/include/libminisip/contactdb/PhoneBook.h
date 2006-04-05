@@ -38,7 +38,7 @@ class PhoneBookPerson;
 class PhoneBookIo;
 //class ContactEntry;
 
-class PhoneBook : public MObject{
+class LIBMINISIP_API PhoneBook : public MObject{
 	public:
 		static MRef<PhoneBook *> create( MRef< PhoneBookIo * > io );
 		
@@ -65,14 +65,14 @@ class PhoneBook : public MObject{
 
 };
 
-class PhoneBookIo : public MObject{
+class LIBMINISIP_API PhoneBookIo : public MObject{
 	public:
 		virtual void save( MRef< PhoneBook * > book )=0;
 		virtual MRef< PhoneBook * > load()=0;
 		virtual std::string getPhoneBookId()=0;
 };
 
-class PhoneBookPerson : public MObject{
+class LIBMINISIP_API PhoneBookPerson : public MObject{
 	public:
 		PhoneBookPerson( std::string name );
 		~PhoneBookPerson();

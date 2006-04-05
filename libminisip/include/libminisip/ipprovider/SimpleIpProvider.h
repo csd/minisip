@@ -29,7 +29,7 @@
 
 #include<libminisip/ipprovider/IpProvider.h>
 
-class SimpleIpProvider: public IpProvider{
+class LIBMINISIP_API SimpleIpProvider: public IpProvider{
 	public:
 		SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config );
 		

@@ -30,7 +30,7 @@
 
 #include<libmutil/MemObject.h>
 
-class Resampler : public MObject{
+class LIBMINISIP_API Resampler : public MObject{
 	public: 
 		static MRef<Resampler *> create(
 				    uint32_t inputFreq, uint32_t outputFreq,

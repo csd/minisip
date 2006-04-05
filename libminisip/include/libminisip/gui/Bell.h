@@ -33,7 +33,7 @@
 
 #include<libmutil/MemObject.h>
 
-class Bell: public MObject{
+class LIBMINISIP_API Bell: public MObject{
 	public:
 		Bell();
 		~Bell();

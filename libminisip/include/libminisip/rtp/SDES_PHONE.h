@@ -31,7 +31,7 @@
 
 #include<string>
 
-class SDES_PHONE : public SDESItem{
+class LIBMINISIP_API SDES_PHONE : public SDESItem{
 	public:
 		SDES_PHONE(void *buildfrom, int max_length);
 		virtual ~SDES_PHONE(){};

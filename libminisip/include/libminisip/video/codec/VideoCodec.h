@@ -39,7 +39,7 @@ class VideoEncoderCallback;
 
 typedef uint8_t byte_t;
 
-class VideoCodec : public Codec{
+class LIBMINISIP_API VideoCodec : public Codec{
 	public:
 
 		MRef<CodecState *> newInstance(){/*TODO*/ return NULL;};

@@ -95,7 +95,7 @@ struct rtcpAPPheader{               // WARNING: ONLY FOR x86 arch...
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
 
-class RtcpAPP{
+class LIBMINISIP_API RtcpAPP{
 	public:
 		/**
 		 * Constructor.

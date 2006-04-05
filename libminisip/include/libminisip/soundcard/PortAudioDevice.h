@@ -28,7 +28,7 @@
 
 typedef void PortAudioStream;
 
-class PortAudioDevice: public SoundDevice{
+class LIBMINISIP_API PortAudioDevice: public SoundDevice{
 	public:
 		PortAudioDevice( std::string device );
 		virtual ~PortAudioDevice();

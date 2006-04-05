@@ -37,7 +37,7 @@
 
 #include <fcntl.h>
 
-class MsipIpsecRequest{
+class LIBMINISIP_API MsipIpsecRequest{
 	public:
 		MsipIpsecRequest(struct sockaddr * src, struct sockaddr * dst, int so, u_int32_t seq, int otype);
 		~MsipIpsecRequest();
@@ -55,7 +55,7 @@ class MsipIpsecRequest{
 };
 
 
-class MsipIpsecSA : public MsipIpsecRequest{
+class LIBMINISIP_API MsipIpsecSA : public MsipIpsecRequest{
 	public:
 		MsipIpsecSA(int so, u_int satype, u_int mode, u_int32_t reqid, u_int32_t seq, 
 				struct sockaddr * src, struct sockaddr * dst,
@@ -101,7 +101,7 @@ class MsipIpsecSA : public MsipIpsecRequest{
 		 
 };
 
-class MsipIpsecPolicy : public MsipIpsecRequest{
+class LIBMINISIP_API MsipIpsecPolicy : public MsipIpsecRequest{
 	public:
 		MsipIpsecPolicy(int so, struct sockaddr * src, struct sockaddr * dst, u_int proto,
 				char * policy, int policylen, u_int32_t seq,
@@ -119,7 +119,7 @@ class MsipIpsecPolicy : public MsipIpsecRequest{
 };
 
 
-class MsipIpsecAPI : public MObject{
+class LIBMINISIP_API MsipIpsecAPI : public MObject{
         public:
 		MsipIpsecAPI(string localIp, SipDialogSecurityConfig &securityConfig);
 		~MsipIpsecAPI();

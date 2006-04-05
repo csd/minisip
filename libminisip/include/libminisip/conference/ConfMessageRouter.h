@@ -35,7 +35,7 @@
 #include<libminisip/conference/ConfCallback.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
-class ConfMessageRouter: 	//public SipCallback, 
+class LIBMINISIP_API ConfMessageRouter: 	//public SipCallback, 
 			//public GuiCallback, 
 			public ConfCallback, public CommandReceiver{
 	public:

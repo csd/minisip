@@ -31,7 +31,7 @@
 
 #include<string>
 
-class SDES_NOTE : public SDESItem{
+class LIBMINISIP_API SDES_NOTE : public SDESItem{
 	public:
 		SDES_NOTE(void *buildfrom, int max_length);
 		virtual ~SDES_NOTE(){};

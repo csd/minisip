@@ -48,7 +48,7 @@
  * <p>
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
-class GroupListUserElement: public MObject{
+class LIBMINISIP_API GroupListUserElement: public MObject{
 	public:
 		/**
 		 * Constructor

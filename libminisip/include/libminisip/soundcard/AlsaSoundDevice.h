@@ -35,7 +35,7 @@
 #include <alsa/asoundlib.h>
 #define MIN_HW_PO_BUFFER (20 * 1000)   /* This buffer size is in micro secs ...*/
 
-class AlsaSoundDevice: public SoundDevice{
+class LIBMINISIP_API AlsaSoundDevice: public SoundDevice{
 	public:
 		AlsaSoundDevice( std::string device );
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );

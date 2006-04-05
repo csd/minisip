@@ -31,7 +31,7 @@
 
 #include<libmnetutil/UDPSocket.h>
 
-class RtcpDebugMonitor : public Runnable{
+class LIBMINISIP_API RtcpDebugMonitor : public Runnable{
 	public:
 		RtcpDebugMonitor(UDPSocket *s);
 		virtual void run();

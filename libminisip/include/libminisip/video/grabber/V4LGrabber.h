@@ -45,7 +45,7 @@ struct cardBuffer{
 
 class ImageHandler;
 
-class V4LGrabber : public Grabber{
+class LIBMINISIP_API V4LGrabber : public Grabber{
 	public:
 		V4LGrabber( std::string device );
 

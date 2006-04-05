@@ -43,7 +43,7 @@ class CryptoContext;
  * MediaStreamReceiver objects register to it when they are ready
  * to receive a specific media type.
  */
-class RtpReceiver : public Runnable{
+class LIBMINISIP_API RtpReceiver : public Runnable{
 	public:
 		/**
 		 * Constructor, called by the MediaHandler upon

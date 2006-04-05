@@ -31,7 +31,7 @@
 
 typedef struct _GConfClient GConfClient;
 
-class GConfBackend : public ConfBackend {
+class LIBMINISIP_API GConfBackend : public ConfBackend {
 	public:
 		virtual void save( const std::string &key, 
 				const std::string &value );

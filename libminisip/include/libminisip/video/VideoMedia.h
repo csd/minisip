@@ -47,7 +47,7 @@ class AVDecoder;
 class ImageMixer;
 class RtpPacket;
 
-class VideoMedia : public Media, public VideoEncoderCallback{
+class LIBMINISIP_API VideoMedia : public Media, public VideoEncoderCallback{
 
 	public:
 		VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
@@ -89,7 +89,7 @@ class VideoMedia : public Media, public VideoEncoderCallback{
 		Mutex sourcesLock;
 };
 
-class VideoMediaSource : public MObject {
+class LIBMINISIP_API VideoMediaSource : public MObject {
 	public:
 		VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t height );
 

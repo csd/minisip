@@ -42,7 +42,7 @@
 using namespace std;
 class SdpHeaderA;
 
-class SdpHeaderM : public SdpHeader{
+class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 	public:
 		SdpHeaderM(string buildFrom);
 		SdpHeaderM(string media, int32_t port, int32_t n_ports, string transport);

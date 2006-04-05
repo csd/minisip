@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-class RtcpReportReceptionBlock{
+class LIBMINISIP_API RtcpReportReceptionBlock{
 	public:
 		RtcpReportReceptionBlock(unsigned ssrc);
 		

@@ -33,7 +33,7 @@
 #include<libmutil/Mutex.h>
 #include<libminisip/video/VideoMedia.h>
 
-class ImageMixer : public ImageHandler, public MObject{
+class LIBMINISIP_API ImageMixer : public ImageHandler, public MObject{
 	public:
 
 		ImageMixer::ImageMixer();

@@ -35,7 +35,7 @@
 class ImageHandler;
 class MImage;
 
-class AVDecoder : public MObject{
+class LIBMINISIP_API AVDecoder : public MObject{
 	public:
 		AVDecoder();
 

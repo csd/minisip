@@ -39,7 +39,7 @@
 
 using namespace std;
 
-class SdpHeaderT : public SdpHeader{
+class LIBMINISIP_API SdpHeaderT : public SdpHeader{
 	public:
 		SdpHeaderT(string buildFrom);
 		SdpHeaderT(int32_t start_time, int32_t stop_time);

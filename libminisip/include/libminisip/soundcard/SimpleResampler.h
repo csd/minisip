@@ -30,7 +30,7 @@
 
 #include<libminisip/soundcard/Resampler.h>
 
-class SimpleResampler : public Resampler {
+class LIBMINISIP_API SimpleResampler : public Resampler {
 	public: 
 		virtual void resample( short * input, short * output );
 		SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 

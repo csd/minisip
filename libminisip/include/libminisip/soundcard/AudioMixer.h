@@ -55,7 +55,7 @@ the mix() function.
 The selected mixer is set within the SoundIO class, using the 
 SoundIO::setMixer(string) function.
 */
-class AudioMixer: public MObject{
+class LIBMINISIP_API AudioMixer: public MObject{
 	public:
 		AudioMixer();
 		virtual ~AudioMixer();

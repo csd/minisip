@@ -35,15 +35,15 @@
 
 #include<libminisip/video/ImageHandler.h>
 
-class VideoDisplay : public ImageHandler, public Runnable{
+class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 	public:
 
-                static MRef<VideoDisplay *> create( uint32_t width, uint32_t height );
-                static uint32_t displayCounter;
-                static Mutex displayCounterLock;
+		static MRef<VideoDisplay *> create( uint32_t width, uint32_t height );
+		static uint32_t displayCounter;
+		static Mutex displayCounterLock;
 
 		virtual std::string getMemObjectType(){ return "VideoDisplay"; };
-                ~VideoDisplay();
+		~VideoDisplay();
 		virtual void start();
 		virtual void stop();
 
@@ -69,23 +69,23 @@ class VideoDisplay : public ImageHandler, public Runnable{
 		virtual MImage * allocateImage()=0;
 		virtual void deallocateImage( MImage * image )=0;
 	private:
-                std::list<MImage *> filledImages;
-                Mutex filledImagesLock;
+		std::list<MImage *> filledImages;
+		Mutex filledImagesLock;
 
-                std::list<MImage *> emptyImages;
-                Mutex emptyImagesLock;
-                
-                std::list<MImage *> allocatedImages;
+		std::list<MImage *> emptyImages;
+		Mutex emptyImagesLock;
+		
+		std::list<MImage *> allocatedImages;
 
-                Semaphore emptyImagesSem;
-                Semaphore filledImagesSem;
+		Semaphore emptyImagesSem;
+		Semaphore filledImagesSem;
 
 		CondVar showCond;
 		Mutex showCondLock;
 		bool show;
 
-                Thread * thread;
-                MRef<Semaphore *> sem;
+		Thread * thread;
+		MRef<Semaphore *> sem;
 
 };
 

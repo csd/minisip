@@ -118,7 +118,7 @@
  * @author Florian Maurer, <a href=mailto:florian.maurer@floHweb.ch>florian.maurer@floHweb.ch</a>
  */
 
-class RtcpTransactionReleaseFloor: public SipTransaction{
+class LIBMINISIP_API RtcpTransactionReleaseFloor: public SipTransaction{
 	public:
 		/**
 		 * Constructor.

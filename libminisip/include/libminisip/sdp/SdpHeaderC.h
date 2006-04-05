@@ -39,7 +39,7 @@
 
 #include<string>
 
-class SdpHeaderC : public SdpHeader{
+class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 	public:
 		SdpHeaderC(std::string buildFrom);
 		SdpHeaderC(std::string netType, std::string addrType, std::string addr);

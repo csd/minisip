@@ -33,7 +33,7 @@
 #include<libminisip/soundcard/Resampler.h>
 #include<samplerate.h>
 
-class FloatResampler : public Resampler {
+class LIBMINISIP_API FloatResampler : public Resampler {
 	public: 
 
 		FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 

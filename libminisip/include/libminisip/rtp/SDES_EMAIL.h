@@ -31,7 +31,7 @@
 
 #include<string>
 
-class SDES_EMAIL : public SDESItem {
+class LIBMINISIP_API SDES_EMAIL : public SDESItem {
 	public:
 		SDES_EMAIL(void *buildfrom, int max_length);
 		virtual ~SDES_EMAIL(){};

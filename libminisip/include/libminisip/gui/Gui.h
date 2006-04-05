@@ -37,7 +37,7 @@ class SipSoftPhoneConfiguration;
 class ContactDb;
 class ConfMessageRouter;
 
-class Gui : public Runnable, public CommandReceiver {
+class LIBMINISIP_API Gui : public Runnable, public CommandReceiver {
 	public:
 		virtual ~Gui();
 

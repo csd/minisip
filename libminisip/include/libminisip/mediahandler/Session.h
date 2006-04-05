@@ -49,7 +49,7 @@ class SessionRegistry;
  * used by the SIP stack to send and receive session descriptions (SDP)
  * and to start or stop the media transmission
  */
-class Session : public MObject{
+class LIBMINISIP_API Session : public MObject{
 	public:
 
 		/**

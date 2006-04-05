@@ -35,7 +35,7 @@
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );
 
-class SRtpPacket : public RtpPacket{
+class LIBMINISIP_API SRtpPacket : public RtpPacket{
 	public:
 		SRtpPacket();
 		SRtpPacket(CryptoContext *scontext, RtpPacket *rtppacket);

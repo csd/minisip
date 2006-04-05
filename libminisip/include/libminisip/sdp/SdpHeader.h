@@ -48,7 +48,7 @@
 
 #include<string>
 
-class SdpHeader : public MObject{
+class LIBMINISIP_API SdpHeader : public MObject{
 	public:
                 SdpHeader(int type, int priority);
 		

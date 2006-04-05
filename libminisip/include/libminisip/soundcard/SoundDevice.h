@@ -71,7 +71,7 @@ but it is opened in NON-BLOCKING mode for playback (it has to be like
 this, otherwise the playback thread cannot catch up with the producers
 on the network side).
 */
-class SoundDevice: public MObject{
+class LIBMINISIP_API SoundDevice: public MObject{
 	public:
 		/**
 		Creator function. 

@@ -70,7 +70,7 @@
  * @author Florian Maurer, <a href=mailto:florian.maurer@floHweb.ch>florian.maurer@floHweb.ch</a>
  */
 
-class RtcpTransactionTakenFloor: public SipTransaction{
+class LIBMINISIP_API RtcpTransactionTakenFloor: public SipTransaction{
 	public:
 		
 		/**

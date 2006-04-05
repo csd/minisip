@@ -35,7 +35,7 @@
 
 #include<string>
 
-class ConsoleDebugger : public Runnable{
+class LIBMINISIP_API ConsoleDebugger : public Runnable{
 	public:
 		ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf);
 		~ConsoleDebugger();

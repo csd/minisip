@@ -37,7 +37,7 @@
 
 #include<libminisip/sdp/SdpHeader.h>
 
-class SdpHeaderA : public SdpHeader{
+class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 	public:
 		SdpHeaderA(std::string buildFrom);
 		virtual ~SdpHeaderA();

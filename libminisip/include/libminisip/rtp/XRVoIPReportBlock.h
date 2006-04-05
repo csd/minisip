@@ -29,7 +29,7 @@
 
 #include<libminisip/rtp/XRReportBlock.h>
 
-class XRVoIPReportBlock : public XRReportBlock{
+class LIBMINISIP_API XRVoIPReportBlock : public XRReportBlock{
 	public:
 		XRVoIPReportBlock(void *build_from, int max_length);
 		

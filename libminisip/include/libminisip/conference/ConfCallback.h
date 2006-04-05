@@ -36,7 +36,7 @@
 //TODO: Add "enqueueCommand" functionality to this class, and make "qtgui"
 //package move to the callback as much as possible --EE
 
-class ConfCallback{
+class LIBMINISIP_API ConfCallback{
 	
 	public:
 		virtual ~ConfCallback() {}

@@ -32,7 +32,7 @@
 #include<libminisip/rtp/XRReportBlock.h>
 #include<libminisip/rtp/RtcpReport.h>
 
-class RtcpReportXR : public RtcpReport{
+class LIBMINISIP_API RtcpReportXR : public RtcpReport{
 	public:
 		RtcpReportXR(void *build_from, int max_length);
 		virtual ~RtcpReportXR(){}

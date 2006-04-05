@@ -31,7 +31,7 @@
 
 #include<libminisip/rtp/SDESItem.h>
 
-class SDESChunk{
+class LIBMINISIP_API SDESChunk{
 	public:
 		SDESChunk(void *buildfrom, int max_length);
 		int size();

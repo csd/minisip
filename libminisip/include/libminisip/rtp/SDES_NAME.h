@@ -31,7 +31,7 @@
 
 #include<string>
 
-class SDES_NAME : public SDESItem{
+class LIBMINISIP_API SDES_NAME : public SDESItem{
 	public:
 		SDES_NAME(void *buildfrom, int max_length);
 		virtual ~SDES_NAME(){};

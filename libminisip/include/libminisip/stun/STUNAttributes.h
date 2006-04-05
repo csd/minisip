@@ -25,7 +25,7 @@
 #ifndef STUNATTRIBUTES_H
 #define STUNATTRIBUTES_H
 
-#include<config.h>
+#include<libminisip/libminisip_config.h>
 
 #include<libmutil/itoa.h>
 
@@ -46,7 +46,7 @@
  * Base class for  all STUN attributes.
  * @author Erik Eliasson
 */
-class STUNAttribute{
+class LIBMINISIP_API STUNAttribute{
 	public:
 		static const int MAPPED_ADDRESS;
 		static const int RESPONSE_ADDRESS;

@@ -75,7 +75,7 @@
  *
  * @author Florian Maurer, florian.maurer@floHweb.ch
  */
-class RtcpReceiver : public Runnable{
+class LIBMINISIP_API RtcpReceiver : public Runnable{
 	public:
 		
 		/**

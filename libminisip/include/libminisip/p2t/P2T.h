@@ -86,7 +86,7 @@ struct rtcpAPPfloorControl2{
  * @author Florian Maurer florian.maurer@floHweb.ch
  */
 
-class P2T{
+class LIBMINISIP_API P2T{
 	
 	public:
 

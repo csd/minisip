@@ -36,7 +36,7 @@
  * Declares the test used by the STUN client to determine the type of NAT.
  * @author Erik Eliasson
 */
-class STUNTest{
+class LIBMINISIP_API STUNTest{
 	public:
 		/**
 		 * Provides a reliable transport for sending a request to

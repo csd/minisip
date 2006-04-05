@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-class SilenceSensor{
+class LIBMINISIP_API SilenceSensor{
 	public:
 		virtual ~SilenceSensor() {}
 		/**
@@ -42,7 +42,7 @@ class SilenceSensor{
 	
 };
 	
-class SimpleSilenceSensor : public SilenceSensor{
+class LIBMINISIP_API SimpleSilenceSensor : public SilenceSensor{
 	public:
 		SimpleSilenceSensor();
 		virtual bool silence(uint16_t *buf, int n);

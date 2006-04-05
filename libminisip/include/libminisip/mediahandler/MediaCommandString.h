@@ -29,7 +29,7 @@
 
 #include<string>
 
-class MediaCommandString{
+class LIBMINISIP_API MediaCommandString{
 	public:
 		static const std::string start_ringing;
 		static const std::string stop_ringing;

@@ -49,7 +49,7 @@ in different positions space-wise.
 
 The only pitfall is that it uses quite some memory, for now.
 */
-class AudioMixerSpatial: public AudioMixer {
+class LIBMINISIP_API AudioMixerSpatial: public AudioMixer {
 
 	public:
 		AudioMixerSpatial(MRef<SpAudio *> spatial);

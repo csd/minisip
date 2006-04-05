@@ -36,7 +36,7 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 
-class SdlDisplay: public VideoDisplay{
+class LIBMINISIP_API SdlDisplay: public VideoDisplay{
 	public: 
 		SdlDisplay( uint32_t width, uint32_t height );
 		virtual void init( uint32_t height,  uint32_t width );
@@ -51,13 +51,13 @@ class SdlDisplay: public VideoDisplay{
 		uint32_t baseWindowWidth;
 
 		void openDisplay();
-                virtual void createWindow();
-                virtual void destroyWindow();
+		virtual void createWindow();
+		virtual void destroyWindow();
 
 		virtual void displayImage( MImage * image );
 
-                virtual MImage * allocateImage();
-                virtual void deallocateImage( MImage * image );
+		virtual MImage * allocateImage();
+		virtual void deallocateImage( MImage * image );
 
 		virtual void handleEvents();
 

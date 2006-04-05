@@ -41,7 +41,7 @@
 #define RTCP_TYPE_BYE		3
 #define RTCP_TYPE_APP		4
 
-class RtcpPacket{
+class LIBMINISIP_API RtcpPacket{
 	public:
 		RtcpPacket();
 		RtcpPacket(void *buildfrom, int length);

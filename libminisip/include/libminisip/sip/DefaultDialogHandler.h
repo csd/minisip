@@ -47,7 +47,7 @@ class SipDialogContainer;
  * If even the DefaultDialogHandler cannot handle the command, it will be
  * discarded.
  */
-class DefaultDialogHandler : public SipDialog{
+class LIBMINISIP_API DefaultDialogHandler : public SipDialog{
 	public:
 		
 		/**

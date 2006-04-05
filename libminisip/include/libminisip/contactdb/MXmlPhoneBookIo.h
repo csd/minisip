@@ -33,7 +33,7 @@
 
 /* Uses mutil/XMLParser to read and save a phonebook file */
 
-class MXmlPhoneBookIo : public PhoneBookIo{
+class LIBMINISIP_API MXmlPhoneBookIo : public PhoneBookIo{
 	public:
 		MXmlPhoneBookIo( std::string fileName );
 

@@ -32,7 +32,7 @@
 #include<libminisip/gui/Gui.h>
 #include<string>
 
-class ConfBackend : public MObject{
+class LIBMINISIP_API ConfBackend : public MObject{
 	public:
 		/**
 		 * @param gui	A configuration backend can need to provide
@@ -64,7 +64,7 @@ class ConfBackend : public MObject{
 		int32_t loadInt( const char * key, const int32_t defaultValue=0 );
 };
 
-class ConfBackendException{};
+class LIBMINISIP_API ConfBackendException{};
 
 
 #endif

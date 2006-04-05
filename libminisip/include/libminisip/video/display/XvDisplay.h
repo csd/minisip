@@ -40,7 +40,7 @@
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/video/display/X11Display.h>
 
-class XvDisplay: public X11Display{
+class LIBMINISIP_API XvDisplay: public X11Display{
 	public: 
 		XvDisplay( uint32_t width, uint32_t height );
 

@@ -51,7 +51,7 @@
  * only RTCP APP packets and especially Floor Control Messages are implemented.
  */
 
-class RtcpSender{
+class LIBMINISIP_API RtcpSender{
 	public:
 		
 		/**

@@ -41,7 +41,7 @@ class ca_db;
 class SipIdentity;
 class ConfBackend;
 
-class SipDialogSecurityConfig{
+class LIBMINISIP_API SipDialogSecurityConfig{
 	public:
 		SipDialogSecurityConfig();
 

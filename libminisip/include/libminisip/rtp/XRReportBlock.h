@@ -35,7 +35,7 @@
 #define DLRR_REPORT                6
 #define VOIP_METRICS_REPORT        7
 
-class XRReportBlock{
+class LIBMINISIP_API XRReportBlock{
 	public:
 		virtual ~XRReportBlock(){}
 		static XRReportBlock *build_from(void *from, int max_length);

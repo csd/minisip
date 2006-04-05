@@ -37,7 +37,7 @@
 
 #define PACKET_TYPE_XR 207
 
-class RtcpReport{
+class LIBMINISIP_API RtcpReport{
 	public:
 		//		RtcpReport(void *buildfrom, int max_length);
 		RtcpReport(unsigned packet_type);

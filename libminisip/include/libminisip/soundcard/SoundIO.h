@@ -75,7 +75,7 @@ class SoundSource;
 */
 
 
-class RecorderReceiver{
+class LIBMINISIP_API RecorderReceiver{
 	public:
 		RecorderReceiver(SoundRecorderCallback *, bool stereo);
 		bool getStereo();
@@ -98,7 +98,7 @@ class RecorderReceiver{
  * @author Erik Eliasson eliasson@it.kth.se
  * @version 0.01
 */
-class SoundIO : public MObject{
+class LIBMINISIP_API SoundIO : public MObject{
 
 	public:
 		/**
@@ -182,9 +182,9 @@ class SoundIO : public MObject{
         //                            SoundIOPLCInterface *plc=NULL);
 
 		void registerSource(MRef<SoundSource *> source);
-                
+
 		void unRegisterSource(int sourceId);
-                
+
 		/**
 		 * Starts thread that takes data from queue 
                  * and sends to soundcard.
@@ -239,10 +239,10 @@ class SoundIO : public MObject{
 		MRef< AudioMixer *> mixer;
 
 		CondVar sourceListCond;
-                
+
 		std::list<MRef<SoundSource *> > sources;
 		std::list<RecorderReceiver *> recorder_callbacks;
-                
+
 		CondVar recorderCond;
 		
                 volatile int32_t recorder_buffer_size;

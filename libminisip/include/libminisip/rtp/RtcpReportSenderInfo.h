@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-class RtcpReportSenderInfo{
+class LIBMINISIP_API RtcpReportSenderInfo{
 	public:
 		RtcpReportSenderInfo(){}
 		RtcpReportSenderInfo(void *buildfrom, int max_length);

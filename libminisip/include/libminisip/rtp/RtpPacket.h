@@ -34,7 +34,7 @@
 
 #include<libminisip/rtp/RtpHeader.h>
 
-class RtpPacket: public MObject {
+class LIBMINISIP_API RtpPacket: public MObject {
 	public:
 		RtpPacket();
 		RtpPacket(unsigned char *content, int content_length, int seq_no, unsigned timestamp, unsigned ssrc);

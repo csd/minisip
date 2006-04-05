@@ -49,7 +49,7 @@
 
 MRef<SipMessageContent*> sdpSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 
-class SdpPacket : public SipMessageContent{
+class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	public:
 		SdpPacket();
 		SdpPacket(std::string build_from);

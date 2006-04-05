@@ -29,7 +29,7 @@
 
 #include<vector>
 
-class RtpHeader{
+class LIBMINISIP_API RtpHeader{
 
 	public:
 		RtpHeader();

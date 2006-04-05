@@ -17,7 +17,7 @@
 #include<string>
 #include<iostream>
 
-class ConfMember {
+class LIBMINISIP_API ConfMember {
 	public:
 	
 		ConfMember(std::string the_uri, std::string the_callid ) {

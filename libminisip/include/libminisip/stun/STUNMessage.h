@@ -34,7 +34,7 @@
  * Defines the message header that is common to all STUN messages.
  * @author Erik Eliasson
 */
-class MessageHeader{
+class LIBMINISIP_API MessageHeader{
 	public:
 		MessageHeader(int type);
 		
@@ -57,7 +57,7 @@ class MessageHeader{
  * Declares the super class of all STUN messages.
  * @author Erik Eliasson
 */
-class STUNMessage{
+class LIBMINISIP_API STUNMessage{
 	public:
 		static const int BINDING_REQUEST;
 		static const int BINDING_RESPONSE;

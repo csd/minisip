@@ -44,7 +44,7 @@ class Resampler;
  * play out audio data. It is created upon startup, or when the
  * media configuration changes.
  */
-class AudioMedia : public Media, public SoundRecorderCallback{
+class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 
 	public:
 		/**
@@ -174,7 +174,7 @@ class AudioMedia : public Media, public SoundRecorderCallback{
 		
 };
 
-class AudioMediaSource : public BasicSoundSource{
+class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 	public:
 		AudioMediaSource( uint32_t ssrc, MRef<Media *> media );
 

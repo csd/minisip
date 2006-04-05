@@ -36,7 +36,7 @@
 
 #include<libminisip/video/display/VideoDisplay.h>
 
-class X11Display: public VideoDisplay{
+class LIBMINISIP_API X11Display: public VideoDisplay{
 	public: 
 		X11Display( uint32_t width, uint32_t height );
 

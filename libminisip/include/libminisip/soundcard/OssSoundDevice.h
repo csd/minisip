@@ -41,7 +41,7 @@
 #include<iostream>
 #include<errno.h>
 
-class OssSoundDevice: public SoundDevice{
+class LIBMINISIP_API OssSoundDevice: public SoundDevice{
 	public:
 		OssSoundDevice( std::string device );
 		

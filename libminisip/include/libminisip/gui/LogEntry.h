@@ -33,7 +33,7 @@
 
 class LogEntryHandler;
 
-class LogEntry : public MObject{
+class LIBMINISIP_API LogEntry : public MObject{
 	public:
 
 		virtual std::string getMemObjectType(){return "LogEntry";}
@@ -45,38 +45,38 @@ class LogEntry : public MObject{
 		void handle();
 };
 
-class LogEntrySuccess : public LogEntry {
+class LIBMINISIP_API LogEntrySuccess : public LogEntry {
 	public:
 		time_t duration;
 		bool secured;
 		int mos;
 };
 
-class LogEntryFailure : public LogEntry {
+class LIBMINISIP_API LogEntryFailure : public LogEntry {
 	public:
 		 std::string error;
 
 };
 
-class LogEntryIncoming{};
-class LogEntryOutgoing{};
+class LIBMINISIP_API LogEntryIncoming{};
+class LIBMINISIP_API LogEntryOutgoing{};
 
-class LogEntryMissedCall:public LogEntryFailure, public LogEntryIncoming{
-
-};
-
-class LogEntryCallRejected:public LogEntryFailure, public LogEntryOutgoing{
+class LIBMINISIP_API LogEntryMissedCall:public LogEntryFailure, public LogEntryIncoming{
 
 };
 
-class LogEntryIncomingCompletedCall : public LogEntryIncoming, public LogEntrySuccess{
+class LIBMINISIP_API LogEntryCallRejected:public LogEntryFailure, public LogEntryOutgoing{
 
 };
 
-class LogEntryOutgoingCompletedCall : public LogEntryOutgoing, public LogEntrySuccess{
+class LIBMINISIP_API LogEntryIncomingCompletedCall : public LogEntryIncoming, public LogEntrySuccess{
+
 };
 
-class LogEntryHandler : public virtual MObject{
+class LIBMINISIP_API LogEntryOutgoingCompletedCall : public LogEntryOutgoing, public LogEntrySuccess{
+};
+
+class LIBMINISIP_API LogEntryHandler : public virtual MObject{
 	public:
 		virtual void handle( MRef<LogEntry *> )=0;
 

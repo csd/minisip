@@ -12,7 +12,7 @@
 
 MRef<SipMessageContent*> presenceSipMessageContentFactory(const std::string &, const std::string &ContentType);
 
-class PresenceMessageContent : public SipMessageContent{
+class LIBMINISIP_API PresenceMessageContent : public SipMessageContent{
 	public:
 		PresenceMessageContent(std::string from, std::string to, std::string onlineStatus, std::string onlineStatusDesc);
 		PresenceMessageContent(const std::string &buildFrom);
