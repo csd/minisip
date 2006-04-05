@@ -37,7 +37,7 @@
 #endif
 
 #ifdef DSOUND
-#	include<libminisip/soundcard/DirectSoundSoundDevice.h>
+#	include<libminisip/soundcard/DirectSoundDevice.h>
 #endif
 
 #ifdef WAVE_SOUND

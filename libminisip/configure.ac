@@ -48,14 +48,10 @@ esac
 AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
-dnl AC_PROG_LEX
-dnl AM_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-dnl AC_PROG_YACC
-dnl AC_PROG_RANLIB
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-dnl AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
 
@@ -69,6 +65,32 @@ if test x$os_win = xyes; then
         AC_MSG_ERROR([Could not find windres in your PATH.])
     fi
 fi
+
+dnl
+dnl Linker flags
+dnl mingw needs --enable-runtime-pseudo-reloc since it can't
+dnl auto import all symbols.
+dnl
+RELOC_LDFLAGS="-Wl,--enable-runtime-pseudo-reloc"
+AC_MSG_CHECKING([Linker flag ${RELOC_LDFLAGS}])
+cf_save_LDFLAGS="${LDFLAGS}"
+LDFLAGS="${LDFLAGS} ${RELOC_LDFLAGS}"
+reloc_result="no"
+AC_LINK_IFELSE([
+int main() {
+    return 0;
+}
+],[reloc_result="yes"],[RELOC_LDFLAGS=""])
+LDFLAGS="${cf_save_LDFLAGS}"
+AC_MSG_RESULT(${reloc_result})
+AC_SUBST(RELOC_LDFLAGS)
+
+dnl Add linker flag to enable the stack trace
+LDFLAGS="${LDFLAGS} -rdynamic"
+
+
+dnl Check types
+AC_CHECK_TYPES([uint])
 
 dnl STL
 dnl For now STL is made mandatory
@@ -151,7 +173,7 @@ dnl Check for libsamplerate
 AC_CHECK_HEADER([samplerate.h], 
 	[
 		AC_CHECK_LIB([samplerate], [main],
-			[LIBS="-lsamplerate ${LIBS}"
+			[SAMPLERATE_LIBS="-lsamplerate"
 			 AC_DEFINE(FLOAT_RESAMPLER, [], [Use the advanced floating point based resampler])
 			 FLOAT_RESAMPLER="yes"
                         ]
@@ -159,6 +181,7 @@ AC_CHECK_HEADER([samplerate.h],
 	]
 )
 AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
+AC_SUBST(SAMPLERATE_LIBS)
 
 dnl Check for stack trace support
 AC_CHECK_HEADER([execinfo.h], 
@@ -367,19 +390,60 @@ AC_ARG_ENABLE(alsa,
     [ --enable-alsa enables ALSA sound support (default disabled)],
     [ if test "${enable_alsa}" = "yes"
       then
-        AC_CHECK_LIB([asound], [main],,
+        AC_CHECK_LIB([asound], [main],
+	   [ALSA_LIBS="-lasound"],
            [AC_MSG_ERROR([Could not find the alsa library])]
         )
       fi ])
 
 AM_CONDITIONAL(HAVE_LIBASOUND, [test "${enable_alsa}" = "yes"])
+AC_SUBST(ALSA_LIBS)
 
 dnl DirectSound sound interface
 AC_ARG_ENABLE(dsound,
     [ --enable-dsound enables DirectSound sound support (default disabled)],
     [ AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) ])
 
-AM_CONDITIONAL(DIRECT_SOUND, [test "${enable_dsound}" = "yes"])
+if test ! x$enable_dsound = xno; then
+   have_dsound=yes
+   save_LIBS="${LIBS}"
+   dnl Can't check stdcall function DirectSoundFullDuplexCreate.
+   AC_CHECK_LIB([dsound], [main],,[have_dsound=no])
+   AC_CHECK_LIB([uuid], [GUID_NULL],,[have_dsound=no])
+   AC_CHECK_LIB([dxguid], [IID_IDirectSoundNotify],,[have_dsound=no])
+   AC_CHECK_HEADERS([dsound.h],,[have_dsound=no])
+   if test x$have_dsound = xyes; then
+      DSOUND_LIBS="-ldxguid -luuid -ldsound"
+   elif test x$enable_dsound = xyes; then
+      AC_MSG_ERROR([Could not find libraries required by DirectSound support])
+   fi
+   LIBS="${save_LIBS}"
+   AC_SUBST(DSOUND_LIBS)
+   AM_CONDITIONAL(DIRECT_SOUND, [test "${have_dsound}" = "yes"])
+fi
+
+
+PKG_CHECK_MODULES(OSSO, [libosso],
+	[
+	 	AC_DEFINE(OSSO_SUPPORT, [], [Support the libosso library])
+		osso_support="yes"
+	],[echo 'No libosso support.'])
+
+AM_CONDITIONAL(OSSO_SUPPORT, [test "${osso_support}" = "yes"])
+
+AC_ARG_ENABLE(gconf,
+    [ --enable-gconf enables support for GConf (default enabled).])
+
+PKG_CHECK_MODULES(GCONF, [gconf-2.0],
+	[
+		if test "x${enable_gconf}" != "xno"
+		then
+			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
+			gconf_support="yes"
+		fi
+	],[echo 'GConf development libraries not found, GConf support is disabled.'])
+AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
+
 
 
 dnl Damn RedHat
@@ -472,40 +536,40 @@ CPPFLAGS="${save_CPPFLAGS}"
 LIBS="${save_LIBS}"
 
 dnl Checks for libraries.
-AC_CHECK_LIB([gdi32], [main])
 AC_CHECK_LIB([wsock32], [main])
-AC_CHECK_LIB([dsound], [main])
-AC_CHECK_LIB([uuid], [main])
-AC_CHECK_LIB([dxguid], [main])
 
-dnl FIXME: Replace `main' with a function in `-lX11':
-AC_CHECK_LIB([X11], [main])
-dnl FIXME: Replace `main' with a function in `-lXext':
-AC_CHECK_LIB([Xext], [main])
 dnl FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
 dnl FIXME: Replace `main' with a function in `-lnsl':
 AC_CHECK_LIB([nsl], [main])
 
+
+dnl OPIE
+AC_ARG_ENABLE(opie,
+    [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
+    [ if test "${enable_opie}" = "yes"
+      then
+	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"
+        AC_CHECK_LIB([qpe], [main],,
+           [AC_MSG_ERROR([Could not find the QPE library])]
+	)
+        AC_CHECK_LIB([opie], [main],,
+           [AC_MSG_ERROR([Could not find the OPIE library])]
+	)
+        AC_DEFINE(OPIE, [], [Use OPIE library])
+	CPPFLAGS="${CPPFLAGS} -I${OPIEDIR}/include"
+      fi ])
+
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h syslog.h unistd.h])
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
-dnl AC_C_VOLATILE
+AC_SUBST(AM_CPPFLAGS)
+AC_SUBST(AM_CXXFLAGS)
 
-dnl Checks for library functions.
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_TYPE_SIGNAL
-dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
-
-dnl AC_SUBST(CPPFLAGS)
-dnl AC_SUBST(LDFLAGS)
+AC_SUBST(datadir)
 
 dnl it shoudl be like this ... but for now, reduce it ...AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmsip.pc win32/libmsip-res.rc])
 AC_CONFIG_FILES([libminisip.pc

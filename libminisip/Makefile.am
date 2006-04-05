@@ -246,6 +246,8 @@ libipprovider_src = source/ipprovider/IpProvider.cxx \
 
 if OS_WIN
         res_obj = source/win32/libminisip-res.o
+        libminisip_la_LDFLAGS += -Wl,$(res_obj)
+        libminisip_la_DEPENDENCIES = $(res_obj)
         noinst_DATA = $(res_obj)
         CLEANFILES = $(res_obj)
 endif OS_WIN
