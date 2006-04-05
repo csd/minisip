@@ -48,16 +48,16 @@
 
 #define SOUND_CARD_FREQ 48000
 
-#include<libmutil/mtypes.h>
-
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __MINGW32__
 #	ifndef WIN32
 #		define WIN32
-#	endif
-#	pragma warning (disable: 4251)
-	//use waveIn/Out for pocket pc ... direct sound for the rest of windows ... 
+#	endif	
+#endif
+
+#ifdef WIN32
+	//In windows, use direct sound for all, except in windows ce (use then Wave in/out)
 #	ifdef _WIN32_WCE
-#		define WAVE_WCE
+#		define WAVE_SOUND
 #	else
 #		define DSOUND
 #	endif
@@ -65,20 +65,23 @@
 #	ifndef _WIN32_WINNT
 #		define _WIN32_WINNT 0x0500
 #	endif
-
-#	pragma warning (disable: 4251)
-
-#	ifdef __MINGW32__
-#		define WINVER 0x0500
-#	else  // !__MINGW32__
-#		define ENABLE_TS
-#	endif	// !__MINGW32__
-
-#	ifndef WIN32
-#		define WIN32
+	
+	//warning message: class member needs to have dll-interface to be used by clients of class 'XXX'
+#	ifndef __MINGW32__
+#		pragma warning (disable: 4251)
 #	endif
 
+#	ifdef __MINGW32__
+#		define _WIN32_WINNT 0x0500
+#		define DSOUND
+#	endif	// !__MINGW32__
+
+#else
+#	define LINUX
 #endif
+
+
+#include<libmutil/mtypes.h>
 
 //Temporary ... STLPort does not allow addition of errno.h ... but WCEcompat does ... 
 //So we don't have to repeat this everytime, include errno.h for all files ... 

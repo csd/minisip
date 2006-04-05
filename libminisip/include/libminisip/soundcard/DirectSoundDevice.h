@@ -28,11 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-
 #include<libminisip/soundcard/SoundDevice.h>
-
-#include<windows.h>
-#include<wincon.h>
 
 #include<dsound.h>
 

@@ -27,7 +27,7 @@
 
 #include<libminisip/soundcard/DirectSoundDevice.h>
 
-#include<wincon.h>
+#include<windows.h>
 
 #include<initguid.h>
 
@@ -89,8 +89,13 @@ DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 	dsbd.dwBufferBytes   = /*g_dwOutputBufferSize*/ DS_OUTPUT_BUFFER_SIZE;
 	dsbd.guid3DAlgorithm = GUID_NULL;
 	dsbd.lpwfxFormat     = &outAudioFormat;
-
-
+/*
+#if (_WIN32_WINNT >= 0x0500)
+#warning "WIN32 0500"
+#else
+#warning "WIN32 not high enough"
+#endif
+*/
 	//The following requires Windows XP - if not supported, then
 	//DirectSoundCreate can be used (windows echo cancelling filter
 	//will not be possible).
