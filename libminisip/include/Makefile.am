@@ -1,4 +1,4 @@
-pkginclude_HEADERS =    libminisip/aec/aecfix.h \
+nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/aec/aec.h \
 			libminisip/codecs/g711/codec_g711.h \
 			libminisip/codecs/ilbc/StateConstructW.h \
