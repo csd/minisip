@@ -46,23 +46,6 @@ class SoundSource;
 #include<libminisip/soundcard/SoundDevice.h>
 //class SoundDevice;
 
-#ifndef WIN32
-	class OssSoundDevice;
-#	ifdef HAVE_LIBASOUND
-		class AlsaSoundDevice;
-#		define ALSA_PCM_NEW_HW_PARAMS_API
-#		define ALSA_PCM_NEW_SW_PARAMS_API
-#		include <alsa/asoundlib.h>
-#	endif
-#else
-#	ifdef DSOUND
-		class DirectSoundDevice;
-#	elif defined(WAVE_SOUND)
-		class WaveSoundDevice;
-#	else
-#		error "NO Windows AUDIO Defined!"
-#	endif
-#endif
 
 /*             v                               <--- Play out point
  *   ........................................  <--- Audio buffer for one ssrc
