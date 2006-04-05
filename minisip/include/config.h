@@ -40,8 +40,6 @@
 
 #define SOUND_CARD_FREQ 48000
 
-#include<libmutil/mtypes.h>
-
 #if defined _MSC_VER || defined __MINGW32__
 #	ifndef WIN32
 #		define WIN32
@@ -61,12 +59,12 @@
 #	endif
 	
 	//warning message: class member needs to have dll-interface to be used by clients of class 'XXX'
-#ifndef __MINGW32__
-#	pragma warning (disable: 4251)
-#endif
+#	ifndef __MINGW32__
+#		pragma warning (disable: 4251)
+#	endif
 
 #	ifdef __MINGW32__
-#		define WINVER 0x0500
+#		define _WIN32_WINNT 0x0500
 #		define DSOUND
 #	endif	// !__MINGW32__
 

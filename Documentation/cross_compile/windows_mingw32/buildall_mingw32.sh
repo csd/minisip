@@ -39,7 +39,7 @@ SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
-#SUBDIRS="${SUBDIRS} libminisip"
+SUBDIRS="${SUBDIRS} libminisip"
 SUBDIRS="${SUBDIRS} minisip"
 
 #If you are debugging, you probably want to build with "g++ -g", to build
@@ -144,18 +144,10 @@ do
 	fi 
 
 	if [ ${subdir} = "libminisip" ] ; then 
+		LOC_LIBMINISIP_LIBS=-L$PWD/.libs
+		LOC_LIBMINISIP_CFLAGS=-I$PWD/include
+		configure_params_libminisip="$configure_params $minisip_configure_params"
 		echo libminisip can also have special config params
-		configure_params="$configure_params $minisip_configure_params"
-		MUTIL_LIBS=$LOC_MUTIL_LIBS 	\
-			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
-			CPPFLAGS="-I$prefix_cross_include " 	\
-			CXXFLAGS="-Wall $compiler_debug" 	\
-			LDFLAGS="-L$prefix_cross_lib"	\
-					./configure $host_option $build_option prefix=$prefix_cross $configure_params 
-	fi 
-	
-	if [ ${subdir} = "minisip" ]; then 
-		echo minisip can also have special config params
 		configure_params="$configure_params $minisip_configure_params"
 		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
@@ -168,7 +160,26 @@ do
 			CPPFLAGS="-I$prefix_cross_include " 	\
 			CXXFLAGS="-Wall $compiler_debug" 	\
 			LDFLAGS="-L$prefix_cross_lib"	\
-					./configure $host_option $build_option prefix=$prefix_cross $configure_params 
+					./configure $host_option $build_option prefix=$prefix_cross $configure_params_libminisip 
+	fi 
+	
+	if [ ${subdir} = "minisip" ]; then 
+		echo minisip can also have special config params
+		configure_params_minisip="$configure_params $minisip_configure_params"
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
+			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
+			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
+			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
+			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
+			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
+			LIBMINISIP_LIBS="$LOC_LIBMINISIP_LIBS -lminisip"	\
+			LIBMINISIP_CFLAGS=$LOC_LIBMINISIP_CFLAGS \
+			CPPFLAGS="-I$prefix_cross_include " 	\
+			CXXFLAGS="-Wall $compiler_debug" 	\
+			LDFLAGS="-L$prefix_cross_lib"	\
+					./configure $host_option $build_option prefix=$prefix_cross $configure_params_minisip
 	fi 
 	
 	echo "=========================================================="
@@ -194,9 +205,8 @@ tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libminisip"
-cp -f minisip/libminisip/minisip/.libs/libminisip-0.dll compiled_files
-cp -f minisip/libminisip/minisip/.libs/libminisip.dll.a compiled_files
-
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 
 find minisip/ -name minisip_gtkgui.exe -size +200k -exec cp -f {} compilied_files/ \;
 find minisip/ -name minisip_textui.exe -size +200k -exec cp -f {} compilied_files/ \;

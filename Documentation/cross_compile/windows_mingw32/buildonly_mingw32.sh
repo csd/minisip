@@ -27,7 +27,7 @@ SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
-#SUBDIRS="${SUBDIRS} libminisip"
+SUBDIRS="${SUBDIRS} libminisip"
 
 strip_generated_files="no"
 strip_bin="i586-mingw32msvc-strip"
@@ -100,8 +100,8 @@ tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libminisip"
-cp -f minisip/libminisip/minisip/.libs/libminisip-0.dll compiled_files
-cp -f minisip/libminisip/minisip/.libs/libminisip.dll.a compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
+cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 
 					#set a minum 200k ... otherwise it finds the fake script.exe
 find minisip -name minisip_gtkgui.exe -size +200k -exec cp -f {} compiled_files/ \;
