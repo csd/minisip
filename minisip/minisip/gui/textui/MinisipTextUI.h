@@ -35,76 +35,78 @@
 #include<libmutil/minilist.h>
 #include<libmutil/Semaphore.h>
 
+#include<string>
+
 /**
  * A text user interface. 
  * The interface interacts with the user via the terminal, and with the <code>Sip</code> class
  * with <code>SipSMCommands</code> via the <code>MessageRouter</code>.
  */
 class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
-    public:
-        MinisipTextUI();
-
-	std::string getMemObjectType(){return "MinisipTextUI";}
+	public:
+		MinisipTextUI();
 	
-        virtual void handleCommand(const CommandString&);
-        virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);
-        virtual void setContactDb(MRef<ContactDb *>){};
-        virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf );
-
-	virtual void displayErrorMessage(string msg);
-
-	virtual void run();
-
- 	virtual void guimain();
-	virtual void setCallback(MRef<CommandReceiver*> callback);
-
-	virtual void keyPressed(int key);
-	virtual void guiExecute(string cmd);
-	virtual minilist<std::string> textuiCompletionSuggestion(string match);
-
-    private:
+		std::string getMemObjectType(){return "MinisipTextUI";}
+		
+		virtual void handleCommand(const CommandString&);
+		virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);
+		virtual void setContactDb(MRef<ContactDb *>){};
+		virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf );
 	
-        void showMem();
-        void showCalls();
-        void showStat();
-        void showTransactions(string);
-        void showTimeouts();
-	void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header);
+		virtual void displayErrorMessage(std::string msg);
 	
-	ConferenceControl *currentconf;
-	string currentconfname;
-	string currentcaller;
-        string input;
-        string callId;
-        string state;
-        MRef<SipSoftPhoneConfiguration *> config;
-	bool autoanswer;
-	MRef<Semaphore *> semSipReady;
+		virtual void run();
 	
-	///indicates that the user is in a call and cannot answer any other incoming calls
-	bool inCall;
+		virtual void guimain();
+		virtual void setCallback(MRef<CommandReceiver*> callback);
 	
-	///indicates that the TextUI is in the P2T Mode
-	bool p2tmode;
+		virtual void keyPressed(int key);
+		virtual void guiExecute(std::string cmd);
+		virtual minilist<std::string> textuiCompletionSuggestion(std::string match);
+	
+	private:
+		
+		void showMem();
+		void showCalls();
+		void showStat();
+		void showTransactions(std::string);
+		void showTimeouts();
+		void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, std::string header);
+		
+		ConferenceControl *currentconf;
+		std::string currentconfname;
+		std::string currentcaller;
+		std::string input;
+		std::string callId;
+		std::string state;
+		MRef<SipSoftPhoneConfiguration *> config;
+		bool autoanswer;
+		MRef<Semaphore *> semSipReady;
+		
+		///indicates that the user is in a call and cannot answer any other incoming calls
+		bool inCall;
+		
+		///indicates that the TextUI is in the P2T Mode
+		bool p2tmode;
 #ifdef P2T_SUPPORT
-	
-	///the P2T Group Identity
-	string p2tGroupId;
-	
-	///the user which invited to a P2T Session
-	string inviting_user;
-	
-	///the dialog callID from the inviting user
-	string inviting_callId;
-	
-	///a P2T Group Member List
-	MRef<GroupList*>grpList;
-	
-	///shows the GroupList
-	void showGroupList();
-	
-	///shows a P2T help
-	void showP2TInfo();
+		
+		///the P2T Group Identity
+		std::string p2tGroupId;
+		
+		///the user which invited to a P2T Session
+		std::string inviting_user;
+		
+		///the dialog callID from the inviting user
+		std::string inviting_callId;
+		
+		///a P2T Group Member List
+		MRef<GroupList*>grpList;
+		
+		///shows the GroupList
+		void showGroupList();
+		
+		///shows a P2T help
+		void showP2TInfo();
 
 #endif
 };

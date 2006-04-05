@@ -45,27 +45,17 @@ PhoneBookModel::PhoneBookModel( PhoneBookTree * tree ):
 }
 
 void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
-        string phonebookName;
+	string phonebookName;
 	
 	if( !defaultPhonebook ){
 		defaultPhonebook = phonebook;
 	}
-                
+		
 	phonebookName = phonebook->getName();
-        
+	
 	list< MRef<PhoneBookPerson *> > persons = phonebook->getPersons();
 	list< MRef<PhoneBookPerson *> >::iterator iPerson;
 
-	
-#if 0
-
-	Gtk::TreeModel::iterator phonebookparent = append();
-	(*phonebookparent)[tree->name] = Glib::locale_to_utf8( phonebookName ); //FIXME: BUG: Throws exception that is not caught if there is a strange character in the string.
-	(*phonebookparent)[tree->phonebook] = phonebook;
-	(*phonebookparent)[tree->person] = NULL;
-	(*phonebookparent)[tree->contactEntry] = NULL;
-	
-#endif
 	string contact;
 
 	for( iPerson = persons.begin(); iPerson != persons.end(); iPerson++ ){
@@ -95,7 +85,7 @@ void PhoneBookModel::setPhoneBook( MRef<PhoneBook *> phonebook ){
 				(*item)[tree->phonebook] = phonebook;
 			}
 		}
-	}                                       
+	}
 }
 
 void PhoneBookModel::addContact( Glib::RefPtr<Gtk::TreeSelection> selection, 

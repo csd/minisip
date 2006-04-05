@@ -28,7 +28,6 @@
 
 using namespace std;
 
-
 int main( int argc, char *argv[] )
 {
 	cerr << endl << "Starting MiniSIP TextUI ... welcome!" << endl << endl;

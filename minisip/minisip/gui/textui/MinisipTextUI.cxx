@@ -37,6 +37,7 @@
 
 #include<libminisip/conference/ConfMessageRouter.h>
 
+using namespace std;
 
 MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
     inCall=false;
