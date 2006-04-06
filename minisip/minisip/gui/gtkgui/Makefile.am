@@ -55,7 +55,7 @@ noinst_HEADERS  = MainWindow.h \
 			GtkMainUI.h 
 
 if OS_WIN
-	res_obj = ../../win32/minisip-res.o
-	minisip_gtkgui_LDADD += $(res_obj)
-	minisip_gtkgui_DEPENDENCIES = $(res_obj)
+        res_obj = ../../win32/minisip-res.o
+        minisip_gtkgui_LDADD += $(res_obj)
+        minisip_gtkgui_DEPENDENCIES = $(res_obj)
 endif OS_WIN
