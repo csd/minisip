@@ -84,14 +84,14 @@ void MessageRouter::handleCommand(string subsystem, const CommandString &cmd){
 
 CommandString MessageRouter::handleCommandResp(string subsystem, const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
-	cerr << "MessageRouter:  To(request):"<<subsystem<<" Command:"<<cmd.getString()<<endl;
+	mdbg << "MessageRouter:  To(request):"<<subsystem<<" Command:"<<cmd.getString()<<endl;
 #endif
 	list<Route>::iterator i;
 	for (i=internal->subsystems.begin(); i!=internal->subsystems.end(); i++){
 		if ((*i).ssname==subsystem){
 			CommandString ret =(*i).dest->handleCommandResp(subsystem, cmd);
 #ifdef DEBUG_OUTPUT
-			cerr << "MessageRouter:  Response from:"<<subsystem<<" Command:"<<ret.getString()<<endl;
+			mdbg << "MessageRouter:  Response from:"<<subsystem<<" Command:"<<ret.getString()<<endl;
 #endif
 			return ret;
 		}
