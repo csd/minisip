@@ -43,6 +43,17 @@ public:
 };
 
 
+class LIBMUTIL_API ThreadHandle{
+	public:
+		ThreadHandle();
+		ThreadHandle(const ThreadHandle &);
+		~ThreadHandle();
+		
+	private:
+		void *hptr;
+		friend class Thread;
+};
+
 /**
  * 
  * TODO: Add join capability.
@@ -60,7 +71,7 @@ public:
 	 * that can be passed to the static join method
          * @return Handle to the created thread.
 	 */
-	static int createThread( void f());
+	static ThreadHandle createThread( void f());
 
 	/**
 	 * Purpose: Create thread that executes a function that takes an
@@ -69,7 +80,7 @@ public:
 	 *       Change the API to let the join method return this value
 	 *       under both MSVC and pthread.
 	 */
-	static int createThread( void* f(void*), void *arg);
+	static ThreadHandle createThread( void* f(void*), void *arg);
 
 	
 	/**
@@ -81,7 +92,7 @@ public:
 	/**
 	See non-static join
 	*/
-	static void join(int handle);
+	static void join(const ThreadHandle& handle);
 
 	/**
 	Dangerous function
@@ -98,9 +109,9 @@ public:
 	/**
 	See non-static kill()
 	*/
-	static bool kill( int handle );
+	static bool kill( const ThreadHandle& handle );
 
-	void * getHandle() {return handle_ptr;}
+	ThreadHandle getHandle() {return handle;}
 	
 	/**
 	 * Purpose: Implement a platform independent way of delaying 
@@ -112,8 +123,11 @@ public:
 	static int msleep(int32_t msec);
 
 private:
-	void *handle_ptr;
+	ThreadHandle handle;
+//	void *handle_ptr;
 };
+
+
 
 LIBMUTIL_API void setupDefaultSignalHandling();
 

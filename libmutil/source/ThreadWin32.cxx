@@ -171,13 +171,17 @@ Thread::~Thread(){
 	handle_ptr = NULL;
 }
 
-int Thread::createThread(void f()){
-	HANDLE threadHandle;
-	massert(sizeof(threadHandle)==4);
+ThreadHandle Thread::createThread(void f()){
+	//HANDLE threadHandle;
+	ThreadHandle handle;
+	
+	//massert(sizeof(threadHandle)==4);
+	
 	DWORD id;
 	LPVOID fptr;
 	fptr = (void*)f;
-	threadHandle = CreateThread( 
+	//threadHandle = CreateThread( 
+	*handle.hptr = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size 
 			StaticThreadStarter,                  // thread function 
@@ -185,27 +189,28 @@ int Thread::createThread(void f()){
 			0,                           // use default creation flags
 			&id);
 
-	if (threadHandle==NULL){
+	if (*handle.hptr==NULL){
 		merror("Thread::Thread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
-	return (int)threadHandle;
+	return handle;
 }
 
-int Thread::createThread(void *f(void*), void *arg){
+ThreadHandle Thread::createThread(void *f(void*), void *arg){
 //        massert(1==0 /*UNIMPLEMENTED - ARGUMENT TO THREAD*/);
 
 	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
         
-	HANDLE threadHandle;
+	//HANDLE threadHandle;
+	ThreadHandle handle;
 	DWORD id;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "createThread: Creating thread" << end;
 	#endif	// DEBUG_OUTPUT
-	threadHandle = CreateThread( 
+	*handle.hptr = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size  
 			StaticThreadStarterArg,                  // thread function 
@@ -216,23 +221,24 @@ int Thread::createThread(void *f(void*), void *arg){
 		mdbg << "createThread: done Creating thread" << end;
 	#endif	// DEBUG_OUTPUT
 
-	if (threadHandle==NULL){
+	if (*handle.hptr==NULL){
 		merror("Thread::createThread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
-	return (int)threadHandle;
+	return handle;
 }
 
 void * Thread::join(){
-	HANDLE handle = *((HANDLE*)handle_ptr);
-	if (WaitForSingleObject( handle, INFINITE )==WAIT_FAILED){
-		merror("Thread::join: WaitForSingleObject");
-	}
+	HANDLE handle = *((HANDLE*)handle.hptr);
+	join(handle);
+//	if (WaitForSingleObject( handle, INFINITE )==WAIT_FAILED){
+//		merror("Thread::join: WaitForSingleObject");
+//	}
         return NULL;
 }
 
-void Thread::join(int handle){
-	HANDLE h = (HANDLE)handle;
+void Thread::join(ThreadHandle handle){
+	HANDLE h = *((HANDLE*)handle.hptr);
 	if (WaitForSingleObject( h, INFINITE )==WAIT_FAILED){
 		merror("Thread::join:WaitForSingleObject");
 	}
@@ -245,12 +251,15 @@ int Thread::msleep(int32_t ms){
 
 
 bool Thread::kill( ) {
-	HANDLE handle = *((HANDLE*)handle_ptr);
+	return kill( handle );
+	
+#if 0
+	HANDLE h = *((HANDLE*)handle.hptr);
 	BOOL ret;
 	DWORD lpExitCode;
-	
-	GetExitCodeThread( handle, &lpExitCode );
-	ret = TerminateThread( handle, lpExitCode );
+
+	GetExitCodeThread( h, &lpExitCode );
+	ret = TerminateThread( h, lpExitCode );
         if( ret == 0 ) {
 		
 		#ifdef DEBUG_OUTPUT
@@ -259,10 +268,11 @@ bool Thread::kill( ) {
 		return false;
 	}
 	return true;
+#endif	
 }
 
-bool Thread::kill( int handle) {
-	HANDLE h = (HANDLE)handle;
+bool Thread::kill( const ThreadHandle &handle) {
+	HANDLE h = *((HANDLE*)handle.hptr);
 	BOOL ret;
 	DWORD lpExitCode;
 	
@@ -276,5 +286,20 @@ bool Thread::kill( int handle) {
 	}
 	return true;
 }
+
+ThreadHandle::ThreadHandle(){
+	hptr = (void*) new HANDLE;
+}
+
+ThreadHandle::~ThreadHandle(){
+	delete (HANDLE*)hptr;
+	hptr=NULL;
+}
+
+ThreadHandle::ThreadHandle(const ThreadHandle &h){
+	hptr = (void*)new HANDLE;
+	*((HANDLE*)hptr)= *((HANDLE*)h.hptr);
+}
+
 
 

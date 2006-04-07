@@ -289,7 +289,7 @@ Thread::Thread(MRef<Runnable *> runnable){
         MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
 
 	//handle_ptr = malloc(sizeof(pthread_t));
-	handle_ptr = new pthread_t;
+	//handle_ptr = new pthread_t;
 	int ret;
 	
 	//set attribs for the threads ...
@@ -302,7 +302,8 @@ Thread::Thread(MRef<Runnable *> runnable){
 */
 	
 	ret = pthread_create(
-			(pthread_t*)handle_ptr, 
+			//(pthread_t*)handle_ptr, 
+			(pthread_t*)handle.hptr, 
 			NULL, // either NULL or &attr,
 			LinuxThreadStarter, 
 			self);
@@ -324,33 +325,35 @@ Thread::Thread(MRef<Runnable *> runnable){
 }
 
 Thread::~Thread(){
-	if( handle_ptr ){
-		delete (pthread_t *)handle_ptr;
-	}
-	handle_ptr = NULL;
+//	if( handle_ptr ){
+//		delete (pthread_t *)handle_ptr;
+//	}
+//	handle_ptr = NULL;
 }
 
 
-int Thread::createThread(void f()){
-	pthread_t threadHandle;
+ThreadHandle Thread::createThread(void f()){
+	//pthread_t threadHandle;
+	ThreadHandle handle;
 	#ifdef DEBUG_OUTPUT
  		mdbg << "Running createThread"<< end;
 	#endif	// DEBUG_OUTPUT
-	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarter, (void*)f);
-	return (int)threadHandle;
+	pthread_create((pthread_t*)handle.hptr, NULL, LinuxStaticThreadStarter, (void*)f);
+	return handle;
 }
 
-int Thread::createThread(void *f(void*), void *arg){
+ThreadHandle Thread::createThread(void *f(void*), void *arg){
 	tmpstruct *argptr = new struct tmpstruct;
         argptr->fun = (void*)f;
         argptr->arg = arg;
  
-	pthread_t threadHandle;
+	//pthread_t threadHandle;
+	ThreadHandle handle;
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Running createThread" << end;
 	#endif	// DEBUG_OUTPUT
-	pthread_create(&threadHandle, NULL, LinuxStaticThreadStarterArg, argptr);
-	return (int)threadHandle;
+	pthread_create((pthread_t*)handle.hptr, NULL, LinuxStaticThreadStarterArg, argptr);
+	return handle;
 }
 
 void * Thread::join(){
@@ -361,7 +364,8 @@ void * Thread::join(){
 		mdbg << "Thread::join(): before join" << end;
 	#endif	// DEBUG_OUTPUT
 	ret = pthread_join( 
-			*( (pthread_t *)handle_ptr ), 
+			// *( (pthread_t *)handle_ptr ), 
+			*((pthread_t *)handle.hptr), 
 			&returnValue );
 	
 	if( ret != 0 ){
@@ -375,8 +379,8 @@ void * Thread::join(){
 	return returnValue;
 }
 
-void Thread::join(int handle){
-	if( pthread_join( handle, NULL) ){
+void Thread::join(const ThreadHandle &handle){
+	if( pthread_join( *((pthread_t*)handle.hptr), NULL) ){
 		#ifdef DEBUG_OUTPUT
 			merror("Thread::join: pthread_join");
 		#endif
@@ -397,7 +401,8 @@ bool Thread::kill( ) {
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Thread::kill(): before cancel" << end;
 	#endif	// DEBUG_OUTPUT
-	ret = pthread_cancel( *( (pthread_t *)handle_ptr ) );
+	//ret = pthread_cancel( *( (pthread_t *)handle_ptr ) );
+	ret = pthread_cancel( *( (pthread_t *)handle.hptr) );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
@@ -409,13 +414,13 @@ bool Thread::kill( ) {
 	return true;
 }
 
-bool Thread::kill( int handle) {
+bool Thread::kill( const ThreadHandle &handle) {
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Thread::kill(): before cancel" << end;
 	#endif	// DEBUG_OUTPUT
-	ret = pthread_cancel( handle );
+	ret = pthread_cancel( *((pthread_t*)handle.hptr) );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
@@ -426,3 +431,20 @@ bool Thread::kill( int handle) {
 	
 	return true;
 }
+
+ThreadHandle::ThreadHandle(){
+	hptr = (void*)new pthread_t;
+}
+
+ThreadHandle::~ThreadHandle(){
+	delete (pthread_t*)hptr;
+	hptr=NULL;
+}
+
+ThreadHandle::ThreadHandle(const ThreadHandle &h){
+	hptr = (void*)new pthread_t;
+	*((pthread_t*)hptr)= *((pthread_t*)h.hptr);
+}
+
+
+

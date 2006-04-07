@@ -347,8 +347,7 @@ class StateTransition : public MObject{
 					stateMachine->setCurrentState(to_state);
 #ifdef MSM_DEBUG
 				if( outputStateMachineDebug ) {
-					merr << "MSM_DEBUG: " << stateMachine->getMemObjectType() << ": Transition Success: " << name << ": " << from_state->getName()
-						<<" -> "<<to_state->getName();
+					merr << "MSM_DEBUG: "<<from_state->getName()<<" --> "<< to_state->getName()<<":\t" << stateMachine->getMemObjectType() << ": transition: " << name;
 		#ifdef MSM_DEBUG_COMMAND
 					merr << " ("<< c << ")";
 		#endif
