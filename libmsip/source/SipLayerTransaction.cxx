@@ -139,7 +139,6 @@ list<MRef<SipTransaction*> > SipLayerTransaction::getTransactionsWithCallId(stri
 //TODO: Optimize how transactions are found based on branch parameter.
 bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	assert(c.getDestination()==SipSMCommand::transaction_layer);
-	assert(c.getType()==SipSMCommand::COMMAND_PACKET);
 
 #ifdef DEBUG_OUTPUT	
 	mdbg << "SipLayerTransaction: handleCommand got: "<< c<<endl;
@@ -149,20 +148,12 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	// 
 	string branch;
 	string seqMethod;
-	branch = c.getCommandPacket()->getDestinationBranch();
-	seqMethod = c.getCommandPacket()->getCSeqMethod();
+	if (c.getType()==SipSMCommand::COMMAND_PACKET){
+		branch = c.getCommandPacket()->getDestinationBranch();
+		seqMethod = c.getCommandPacket()->getCSeqMethod();
+	}
 	bool hasBranch = (branch!="");
 	bool hasSeqMethod = (seqMethod!="");
-
-//#ifdef DEBUG_OUTPUT
-//	mdbg<< end << 	"Dispatcher got command: "<< end << 
-//			"'----> " << c << end;
-//#endif
-
-
-#ifdef DEBUG_OUTPUT
-	mdbg<< "Dispatcher(0): Trying to find transaction"<<end;
-#endif
 
 	if (!hasBranch){
 		mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
@@ -182,14 +173,13 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 				mdbg << "WARNING: SipLayerTransaction: transaction did not handle message with matching branch id"<<end;
 #endif
 			if (ret){
-				//dialogListLock.unlock();
 				return ret;
 			}
 		}
 	}
 
-	//No transaction handled the command. It could be a message that 
-	//triggers the creation of a transactio or something bad.
+	//No transaction handled the command. It could be a message that
+	//will trigger the creation of a transaction or it's a bad message..
 	//The defaultCommandHandler creates new trasactions if needed.
 	return defaultCommandHandler(c);
 }
