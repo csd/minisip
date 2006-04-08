@@ -33,7 +33,7 @@
 #include<config.h>
 
 #include<libminisip/sip/SipDialogPresenceServer.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
@@ -106,7 +106,10 @@ void SipDialogPresenceServer::createNotifyClientTransaction(){
 */
 
 bool SipDialogPresenceServer::a0_start_default_startpresenceserver(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::start_presence_server)){
+	if (transitionMatch(command, 
+				SipCommandString::start_presence_server,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 		return true;
 	}else{
 		return false;
@@ -116,6 +119,7 @@ bool SipDialogPresenceServer::a0_start_default_startpresenceserver(const SipSMCo
 bool SipDialogPresenceServer::a1_default_default_timerremovesubscriber(const SipSMCommand &command){
 	if (command.getType()==SipSMCommand::COMMAND_STRING && 
 			command.getCommandString().getOp().substr(0,22)=="timerRemoveSubscriber_"){
+		
 		string user = command.getCommandString().getOp().substr(22);
 		cerr << "Removing user <"<< user << ">"<< endl;
 		removeUser(user);
@@ -126,7 +130,10 @@ bool SipDialogPresenceServer::a1_default_default_timerremovesubscriber(const Sip
 }
 
 bool SipDialogPresenceServer::a2_default_default_localpresenceupdated(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::local_presence_update)){
+	if (transitionMatch(command, 
+				SipCommandString::local_presence_update,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 		onlineStatus = command.getCommandString().getParam();
 		sendNoticeToAll(command.getCommandString().getParam());
 		return true;
@@ -137,7 +144,10 @@ bool SipDialogPresenceServer::a2_default_default_localpresenceupdated(const SipS
 
 
 bool SipDialogPresenceServer::a3_default_termwait_stoppresenceserver(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::stop_presence_server)){
+	if (transitionMatch(command, 
+				SipCommandString::stop_presence_server,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -147,11 +157,15 @@ bool SipDialogPresenceServer::a3_default_termwait_stoppresenceserver(const SipSM
 }
 
 bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::no_transactions) ){
+	if (transitionMatch(command, 
+				SipCommandString::no_transactions,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer) ){
+		
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
-				  SipSMCommand::TU,
-				  SipSMCommand::DIALOGCONTAINER);
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+				  SipSMCommand::dialog_layer,
+				  SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 		return true;
 	}else{
 		return false;
@@ -160,7 +174,7 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 
 
 bool SipDialogPresenceServer::a5_default_default_SUBSCRIBE(const SipSMCommand &command){
-	if (transitionMatch("SUBSCRIBE", command, SipSMCommand::remote, IGN)){
+	if (transitionMatch("SUBSCRIBE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		MRef<SipRequest *> sub = (SipRequest*)*command.getCommandPacket();
 		
 		string user = sub->getHeaderValueTo()->getUri().getUserIpString();
@@ -244,9 +258,14 @@ void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ 
 	//int seqNo = requestSeqNo();
 	++dialogState.seqNo;
 	string cid = "FIXME"+itoa(rand());
-	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, "NOTIFY", /*callId*/cid);
-	registerTransaction(subscribetrans);
-	sendNotify(subscribetrans->getBranch(), user, cid);
+/*	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, 
+			//MRef<SipDialog *>(this), 
+			dialogState.seqNo, 
+			"NOTIFY", 
+			cid);
+	dispatcher->getLayerTransaction()->addTransaction(subscribetrans);
+*/	//registerTransactionToDialog(subscribetrans);
+	sendNotify(""/*subscribetrans->getBranch()*/, user, cid);
 
 }
 
@@ -259,23 +278,26 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 }
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
-	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(sipStack, MRef<SipDialog*>(this),
+/*	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(sipStack, 
+				//MRef<SipDialog*>(this),
 				sub->getCSeq(),
 				sub->getCSeqMethod(),
 				sub->getLastViaBranch(),
 				sub->getCallId()) );
-	registerTransaction(sr);
+	dispatcher->getLayerTransaction()->addTransaction(sr);
+	//registerTransactionToDialog(sr);
 
 	MRef<SipMessage*> mref = *sub;
-	SipSMCommand c( mref, SipSMCommand::remote, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(c, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand c( mref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(c, HIGH_PRIO_QUEUE);
+*/
 	
-	MRef<SipResponse*> ok= new SipResponse(sr->getBranch(), 200,"OK", MRef<SipMessage*>(*sub));
+	MRef<SipResponse*> ok= new SipResponse(""/*sr->getBranch()*/, 200,"OK", MRef<SipMessage*>(*sub));
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
-        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-        getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+        SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+        dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 
 	sendNotice(onlineStatus, sub->getFrom().getUserIpString());
@@ -321,11 +343,11 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 
         SipSMCommand scmd(
                 pktr, 
-                SipSMCommand::TU, 
-                SipSMCommand::transaction
+                SipSMCommand::dialog_layer, 
+                SipSMCommand::transaction_layer
                 );
 	
-	getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){

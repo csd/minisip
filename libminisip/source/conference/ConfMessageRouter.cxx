@@ -175,7 +175,7 @@ void ConfMessageRouter::guicb_handleMediaCommand(const CommandString &cmd){
 
 void ConfMessageRouter::guicb_handleCommand(const CommandString &cmd){
 	//return sip_machine->enqueueCommand(cmd);
-	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
+	SipSMCommand sipcmd(cmd, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
 	sip->getSipStack()->handleCommand(sipcmd);
 }
 
@@ -193,7 +193,7 @@ string ConfMessageRouter::confcb_doConnect(string user, string confId){
 void ConfMessageRouter::confcb_handleSipCommand(const CommandString &command){
 //	cerr << "ERROR: INVITE USER UNIMPLEMENTED"<< endl;
 	//cerr << "MR: from CC -> MR: confcb_handleSipCommand"<< endl;
-	SipSMCommand sipcmd(command, SipSMCommand::remote, SipSMCommand::TU);
+	SipSMCommand sipcmd(command, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
 	sip->getSipStack()->handleCommand(sipcmd);
 	
 }

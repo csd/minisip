@@ -36,7 +36,7 @@
 
 #include<libmutil/massert.h>
 
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipTransactionInviteServerUA.h>
@@ -132,19 +132,20 @@ using namespace std;
 
 bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &command)
 {
-	if (transitionMatch("INVITE", command, IGN, SipSMCommand::TU)){
+	if (transitionMatch("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
+		string branch = inv->getDestinationBranch();
 		
 		setLastInvite(inv);
-		dialogState.updateState( getLastInvite() );
+		dialogState.updateState( inv );
 		
 		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
 		string peerUri = dialogState.remoteUri;
 		
-		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
+		getDialogConfig()->inherited->sipIdentity->setSipUri(inv->getHeaderValueTo()->getUri().getUserIpString());
 		
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
-		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
+		if(!sortMIME(*inv->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
 			return false;
 		}
@@ -156,29 +157,11 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 		}
 #endif
 		
-/*		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
-						sipStack,
-						MRef<SipDialog*>( this ), 
-						command.getCommandPacket()->getCSeq(),
-						command.getCommandPacket()->getCSeqMethod(),
-						command.getCommandPacket()->getLastViaBranch(), 
-						dialogState.callId) );
-
-		registerTransaction(ir);
-*/
-		//	command.setSource(SipSMCommand::TU);
-		//	command.setDestination(SipSMCommand::transaction);
-
-		//	mdbg << "^^^^ SipDialogVoipServer: re-handling packet for transaction to catch:"<<command<<end;
-
-
-		//The transaction layer must receive to this message as
-		//well. We re-post it with the transaction layer
-		//as destination
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction);
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-
+//		cerr << "EEEEEEEE: finding transaction and adding to dialogs set"<<endl;
+//		MRef<SipTransaction*> trans = dispatcher->getLayerTransaction()->findTransaction(branch);
+//		massert(trans);
+//		registerTransactionToDialog(trans);
+		
 /*		MRef<SipHeaderValue*> identity = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITY, 0);
 		MRef<SipHeaderValue*> identityinfo = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITYINFO, 0);
 		
@@ -215,14 +198,14 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		
-		sendRinging(inv->getDestinationBranch());
+		sendRinging(branch);
 		
 		if( getDialogConfig()->inherited->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
-			SipSMCommand sipcmd(accept, SipSMCommand::remote, SipSMCommand::TU);
-			getDialogContainer()->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			SipSMCommand sipcmd(accept, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
+			dispatcher->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 		}
 		return true;
 	}else{
@@ -232,7 +215,10 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 
 bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &command)
 {
-	if (transitionMatch(command, SipCommandString::accept_invite)){
+	if (transitionMatch(command, 
+				SipCommandString::accept_invite,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 #ifdef ENABLE_TS
 		ts.save(USER_ACCEPT);
 #endif
@@ -241,7 +227,7 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 				SipCommandString::invite_ok,"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 
 		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
@@ -264,7 +250,10 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &command)
 {
 	
-	if (transitionMatch("BYE", command, SipSMCommand::remote, IGN) &&
+	if (transitionMatch("BYE", 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer) &&
 	    dialogState.remoteTag != ""){
 		MRef<SipRequest*> bye = (SipRequest*) *command.getCommandPacket();
 
@@ -276,23 +265,27 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 			getLogEntry()->handle();
 		}
 
+/*
 		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(sipStack, 
-				MRef<SipDialog*>(this), 
+				//MRef<SipDialog*>(this), 
 				bye->getCSeq(),
 				bye->getCSeqMethod(),
 				bye->getLastViaBranch(), 
 				dialogState.callId); //TODO: remove second argument
 
-		registerTransaction(byeresp);
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction);
-		cmd.setSource(command.getSource());
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		dispatcher->getLayerTransaction()->addTransaction(byeresp);
+		registerTransactionToDialog(byeresp);
 
-		sendByeOk(bye, byeresp->getBranch() );
+		
+		SipSMCommand cmd(command);
+		cmd.setDestination(SipSMCommand::transaction_layer);
+		cmd.setSource(command.getSource());
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+*/
+		sendByeOk(bye, /*byeresp->getBranch()*/"" );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr);
+		dispatcher->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 
@@ -307,8 +300,8 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &command)
 {
 
-	if (transitionMatch("CANCEL", command, SipSMCommand::remote,
-			    SipSMCommand::TU)) {
+	if (transitionMatch("CANCEL", command, SipSMCommand::transaction_layer,
+			    SipSMCommand::dialog_layer)) {
 		MRef<SipRequest*> cancel =
 			(SipRequest*)*command.getCommandPacket();
 		const string branch = cancel->getLastViaBranch();
@@ -316,20 +309,23 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		if (getLastInvite()->getLastViaBranch() != branch)
 			return false;
 
+#if 0
 		// Create CANCEL transaction and handle the request
 		MRef<SipTransaction*> cr( 
 			new SipTransactionNonInviteServer(sipStack, 
-				MRef<SipDialog*>(this), 
+				//MRef<SipDialog*>(this), 
 				command.getCommandPacket()->getCSeq(), 
 				command.getCommandPacket()->getCSeqMethod(), 
 				command.getCommandPacket()->getLastViaBranch(), 
 				dialogState.callId) );
-		registerTransaction(cr);
+		dispatcher->getLayerTransaction()->addTransaction(cr);
+		registerTransactionToDialog(cr);
 
 		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction);
+		cmd.setDestination(SipSMCommand::transaction_layer);
 
 		cr->handleCommand(cmd);
+#endif
 
 		// Send 487 Request Cancelled for INVITE
 		MRef<SipResponse*> cancelledResp = new SipResponse( 
@@ -340,21 +336,22 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 				);
 		cancelledResp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 		MRef<SipMessage*> cancelledMsg(*cancelledResp);
-		SipSMCommand cancelledCmd( cancelledMsg, SipSMCommand::TU,
-				  SipSMCommand::transaction);
-		getDialogContainer()->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		SipSMCommand cancelledCmd( cancelledMsg, SipSMCommand::dialog_layer,
+				  SipSMCommand::transaction_layer);
+		dispatcher->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 		// Send 200 OK for CANCEL
 		MRef<SipResponse*> okResp = new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*cancel) );
 		okResp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 		MRef<SipMessage*> okMsg(*okResp);
-		SipSMCommand okCmd( okMsg, SipSMCommand::TU,
-				  SipSMCommand::transaction);
-		cr->handleCommand(okCmd);
+		SipSMCommand okCmd( okMsg, SipSMCommand::dialog_layer,
+				  SipSMCommand::transaction_layer);
+		//cr->handleCommand(okCmd);
+		dispatcher->enqueueCommand(okCmd, HIGH_PRIO_QUEUE);
 
 		/* Tell the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite,"");
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -367,8 +364,14 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 bool SipDialogVoipServer::a3005_ringing_termwait_reject( const SipSMCommand &command)
 {
 	
-	if (transitionMatch(command, SipCommandString::reject_invite) || 
-			transitionMatch(command,SipCommandString::hang_up)){
+	if (		transitionMatch(command, 
+				SipCommandString::reject_invite,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer) || 
+			transitionMatch(command,
+				SipCommandString::hang_up,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 
 
 		sendReject( getLastInvite()->getDestinationBranch() );
@@ -384,26 +387,28 @@ bool SipDialogVoipServer::a3005_ringing_termwait_reject( const SipSMCommand &com
 //In case a3001 does not accept the invite
 bool SipDialogVoipServer::a3006_start_termwait_INVITE( const SipSMCommand &command)
 {	
-	if (transitionMatch("INVITE", command, SipSMCommand::remote, SipSMCommand::TU)){
+	if (transitionMatch("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 
 		setLastInvite(MRef<SipRequest*>((SipRequest *)*command.getCommandPacket()));
 		
 		dialogState.updateState( getLastInvite() );
 
+#if 0
 		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(sipStack, 
-						MRef<SipDialog*>(this), 
+						//MRef<SipDialog*>(this), 
 						command.getCommandPacket()->getCSeq(), 
 						command.getCommandPacket()->getCSeqMethod(), 
 						command.getCommandPacket()->getLastViaBranch(), 
 						dialogState.callId ));
 
-		registerTransaction(ir);
+		dispatcher->getLayerTransaction()->addTransaction(ir);
+		registerTransactionToDialog(ir);
 
 		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction);
+		cmd.setDestination(SipSMCommand::transaction_layer);
 
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+#endif
 		sendNotAcceptable( command.getCommandPacket()->getDestinationBranch() );
 
 		signalIfNoTransactions();
@@ -549,16 +554,16 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 //	else return; 
 
 	MRef<SipMessage*> pref(*ok);
-	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 void SipDialogVoipServer::sendReject(const string &branch){
 	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*ringing);
-	SipSMCommand cmd( pref,SipSMCommand::TU, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 void SipDialogVoipServer::sendRinging(const string &branch){
@@ -578,8 +583,8 @@ void SipDialogVoipServer::sendRinging(const string &branch){
 	ringing->addHeader( new SipHeader(*contact) );
 
 	MRef<SipMessage*> pref(*ringing);
-	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
@@ -595,7 +600,7 @@ void SipDialogVoipServer::sendNotAcceptable(const string &branch){
 
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*not_acceptable);
-	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 

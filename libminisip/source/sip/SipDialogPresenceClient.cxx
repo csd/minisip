@@ -34,7 +34,7 @@
 #include<libminisip/sip/SipDialogPresenceClient.h>
 
 #include<libmutil/massert.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
@@ -111,16 +111,25 @@ stop_presence|    +------+
 void SipDialogPresenceClient::createSubscribeClientTransaction(){
 	//int seqNo = requestSeqNo();
 	++dialogState.seqNo;
-	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, MRef<SipDialog *>(this), dialogState.seqNo, "SUBSCRIBE", dialogState.callId);
+/*	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, 
+			//MRef<SipDialog *>(this), 
+			dialogState.seqNo, 
+			"SUBSCRIBE", 
+			dialogState.callId);
 //	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
-	registerTransaction(subscribetrans);
-	sendSubscribe(subscribetrans->getBranch());
+	dispatcher->getLayerTransaction()->addTransaction(subscribetrans);
+	//registerTransactionToDialog(subscribetrans);
+*/
+	sendSubscribe(""/*subscribetrans->getBranch()*/);
 }
    
 
 bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::start_presence_client)){
+	if (transitionMatch(command, 
+				SipCommandString::start_presence_client,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 #ifdef DEBUG_OUTPUT
 		merr << "SipDialogPresenceClient::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< end;
 #endif
@@ -134,7 +143,7 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 }
 
 bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command){
-	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
@@ -162,7 +171,10 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 }
 
 bool SipDialogPresenceClient::a2_trying_retrywait_transperror(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::transport_error )){
+	if (transitionMatch(command, 
+				SipCommandString::transport_error,
+				SipSMCommand::transaction_layer,
+				SipSMCommand::dialog_layer )){
 		mdbg << "WARNING: Transport error when subscribing - trying again in five minutes"<< end;
 		requestTimeout(300, "timerDoSubscribe");
 		return true;
@@ -173,7 +185,9 @@ bool SipDialogPresenceClient::a2_trying_retrywait_transperror(const SipSMCommand
 }
 
 bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
-	if (transitionMatch(command, "timerDoSubscribe")){
+	if (transitionMatch(command, "timerDoSubscribe",
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 		createSubscribeClientTransaction();
 		return true;
 	}else{
@@ -182,9 +196,9 @@ bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 }
 
 bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
-	if (transitionMatch("NOTIFY", command, SipSMCommand::remote, IGN)){
+	if (transitionMatch("NOTIFY", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
-		getDialogContainer()->getCallback()->handleCommand("gui",cmdstr);
+		sipStack->getCallback()->handleCommand("gui",cmdstr);
 		return true;
 	}else{
 		return false;
@@ -192,7 +206,10 @@ bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMComma
 }
 
 bool SipDialogPresenceClient::a6_subscribing_termwait_stoppresence(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::hang_up)){
+	if (transitionMatch(command, 
+				SipCommandString::hang_up,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -202,11 +219,14 @@ bool SipDialogPresenceClient::a6_subscribing_termwait_stoppresence(const SipSMCo
 }
 
 bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMCommand &command){
-	if (transitionMatch(command, SipCommandString::no_transactions) ){
+	if (transitionMatch(command, 
+				SipCommandString::no_transactions,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer) ){
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated),
-				  SipSMCommand::TU,
-				  SipSMCommand::DIALOGCONTAINER);
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+				  SipSMCommand::dialog_layer,
+				  SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 		return true;
 	}else{
 		return false;
@@ -317,11 +337,11 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 
         SipSMCommand scmd(
                 pktr, 
-                SipSMCommand::TU, 
-                SipSMCommand::transaction
+                SipSMCommand::dialog_layer, 
+                SipSMCommand::transaction_layer
                 );
 	
-	getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 //	setLastSubsc(inv);
 
 }

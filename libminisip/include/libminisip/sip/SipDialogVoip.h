@@ -121,7 +121,8 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		
 		/* Ending a call */
 		bool a1001_incall_termwait_BYE( const SipSMCommand &command);
-		bool a1002_incall_termwait_hangup( const SipSMCommand &command);
+		bool a1002_incall_byerequest_hangup( const SipSMCommand &command);
+		bool a1003_byerequest_termwait_26( const SipSMCommand &command);
 		
 		/* Dialog/transaction management */
 		bool a1101_termwait_terminated_notransactions( const SipSMCommand &command);

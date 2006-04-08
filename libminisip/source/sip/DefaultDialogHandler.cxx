@@ -30,7 +30,7 @@
 #include<libmnetutil/NetworkException.h>
 
 #include<libmsip/SipDialogRegister.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
@@ -49,6 +49,7 @@
 #include<libminisip/sip/SipDialogConfVoip.h>
 #include<libminisip/sip/SipDialogPresenceClient.h>
 #include<libminisip/sip/SipDialogPresenceServer.h>
+#include<libminisip/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -72,14 +73,17 @@ using namespace std;
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack, 
             //SipDialogConfig &conf,
-	    MRef<SipDialogConfig *> conf,
+	    //MRef<SipDialogConfig *> conf,
 	    MRef<SipSoftPhoneConfiguration*> pconf,
 	    MRef<MediaHandler *>mediaHandler): 
-                SipDialog(stack, conf),
+		sipStack(stack),
+                //SipDialog(stack, conf),
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
-	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
+	outsideDialogSeqNo=1;
+
+//	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 #ifdef P2T_SUPPORT
 	//Initialize GroupListServer
 	grpListServer=NULL;
@@ -94,22 +98,19 @@ string DefaultDialogHandler::getName(){
 	return "DefaultDialogHandler";
 }
 
-bool DefaultDialogHandler::handleCommandPacket(int source, 
-		int /*destination*/,	//Not used here - we know it's either ANY or 
-					//TU (checked in handleCommand)
-		MRef<SipMessage*> pkt, 
-		int dispatchCount){
+bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
+#if 0
 	/* First, check if this is a packet that could not be handled by
 	 * any transaction and send 481 response if that is the case */
-	if (source==SipSMCommand::remote && dispatchCount>=2){ // this is the packets second run of handling.
+	if (source==SipSMCommand::transaction_layer && dispatchCount>=2){ // this is the packets second run of handling.
 		mdbg << "DefaultCallHandler::handleCommand: Detected dispatched already - sending 481"<< end;
 
 		//FIXME: Check what branch parameter to send.
 		MRef<SipResponse*> no_call= new SipResponse("nobranch", 481,"Call Leg/Transaction Does Not Exist", MRef<SipMessage*>(*pkt));
 		MRef<SipMessage*> pref(*no_call);
 
-		sipStack->getSipTransportLayer()->sendMessage(pref,
+		sipStack->getDispatcher()->getLayerTransport()->sendMessage(pref,
 				string(""), //branch
 				false
 				);
@@ -118,16 +119,18 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 	}
 
 #ifdef DEBUG_OUTPUT
-	if (source==SipSMCommand::remote && dispatchCount>=2){ // this is the packets second run of handling.
+	if (source==SipSMCommand::transaction_layer&& dispatchCount>=2){ // this is the packets second run of handling.
 		cerr << "WARNING: INTERNAL ERROR: command was not handled (dispatched flag indication)"<<endl;
 		return true;
 	}
 #endif
+	
+#endif
 
-	if (source==SipSMCommand::remote && pkt->getType()=="INVITE"){
-
+	if (pkt->getType()=="INVITE"){
 		//type casting
-		MRef<SipRequest*> inv = MRef<SipRequest*>((SipRequest*)*pkt);
+		//MRef<SipRequest*> inv = MRef<SipRequest*>((SipRequest*)*pkt);
+		MRef<SipRequest*> inv = dynamic_cast<SipRequest*>(*pkt);
 		//inv->checkAcceptContact();
 		//check if it's a regular INVITE or a P2T INVITE
 #ifdef P2T_SUPPORT
@@ -137,30 +140,30 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 #endif
 
 
-	bool isConfJoin=false;
-	bool isP2T=false;
-	bool isConfConnect=false;
-	MRef<SipHeaderValueAcceptContact*> acp;
-	int i=0;
-	MRef<SipHeaderValue*> hdr=inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
-	do{
-		if (hdr){
-			MRef<SipHeaderValueAcceptContact*> acp = (SipHeaderValueAcceptContact*)*hdr;
-                        if(acp && acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
-                                isP2T=true;
-                        else if(acp && acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"") {
-                                //cout << "SIPINVITE: Setting conjoin to true" << endl;
-                                isConfJoin=true;
-                        }
-                        else if(acp && acp->getFeaturetag()=="+sip.confconnect=\"TRUE\""){
-                                isConfConnect=true;
+		bool isConfJoin=false;
+		bool isP2T=false;
+		bool isConfConnect=false;
+		MRef<SipHeaderValueAcceptContact*> acp;
+		int i=0;
+		MRef<SipHeaderValue*> hdr=inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
+		do{
+			if (hdr){
+				MRef<SipHeaderValueAcceptContact*> acp = (SipHeaderValueAcceptContact*)*hdr;
+				if(acp && acp->getFeaturetag()=="+sip.p2t=\"TRUE\"")
+					isP2T=true;
+				else if(acp && acp->getFeaturetag()=="+sip.confjoin=\"TRUE\"") {
+					//cout << "SIPINVITE: Setting conjoin to true" << endl;
+					isConfJoin=true;
+				}
+				else if(acp && acp->getFeaturetag()=="+sip.confconnect=\"TRUE\""){
+					isConfConnect=true;
+				}
 			}
-		}
-		i++;
-		hdr = inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
-	}while(hdr);
-			
-        if(isConfJoin) {
+			i++;
+			hdr = inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
+		}while(hdr);
+
+		if(isConfJoin) {
 			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
 			string uri;
 			MRef<SipIdentity *> id = NULL;
@@ -173,27 +176,27 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 #endif			
 			//MRef<SipMessage*> pack = command.getCommandPacket();
 			//MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
-	
+
 			//get the GroupList from the remote GroupListServer
 			//MRef<GroupList*>grpList;
 			massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
 			string numToConnect = sdp->getSessionLevelAttribute("conf_#participants");
-			
-			
+
+
 			//this is a join packet and contains an advice list. The list is created from the
 			// packet here in order to send it to the GUI for display.
-			
-			
+
+
 			int num = 0;
 
-   //--- Convert each digit char and add into result.
-   			int t=0;
+			//--- Convert each digit char and add into result.
+			int t=0;
 			while (numToConnect[t] >= '0' && numToConnect[t] <='9') {
-      				num = (num * 10) + (numToConnect[t] - '0');
-      				t++;
-   			}
+				num = (num * 10) + (numToConnect[t] - '0');
+				t++;
+			}
 			for(t=0;t<num;t++)
 				//connectList[t]=  sdp->getSessionLevelAttribute("participant_"+itoa(t+1));
 				connectList.push_back((ConfMember(sdp->getSessionLevelAttribute("participant_"+itoa(t+1)),"")));
@@ -215,25 +218,32 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-			
+
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
 			//BM is it safe to pass the list like this?
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, &connectList,confid, pkt->getCallId(), ipsecSession )); 
-	
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack->getConfCallback(),sipStack, callConf, 
+						phoneconf, mediaSession, &connectList,confid, pkt->getCallId(), ipsecSession )); 
+
 #else	
-			
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, &connectList,confid, pkt->getCallId()));
+
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()), sipStack, callConf, 
+						phoneconf, mediaSession, &connectList,confid, pkt->getCallId()));
 #endif
 			sipStack->addDialog(voipConfCall);
 
-			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
-			cmd.setDispatchCount(dispatchCount);
+			
+			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+			bool handled = voipConfCall->handleCommand(cmd);
 
-			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-			mdbg << cmd << end;
+			if (!handled){
+				cerr<<"Error: DefaultDialogHandler: VoIP dialog refused to handle the incoming INVITE"<<endl;
+			}
+			
+//			cmd.setDispatchCount(dispatchCount);
+
+//			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+//			mdbg << cmd << end;
 		}
 		else if(isConfConnect) {
 			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
@@ -246,7 +256,7 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
-			
+
 
 			massert(dynamic_cast<SdpPacket*>(*inv->getContent())!=NULL);
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
@@ -263,24 +273,24 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-			
+
 			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
 			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
 			//BM is it safe to pass the list like this?
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, confid, pkt->getCallId(), ipsecSession )); 
-	
+						phoneconf, mediaSession, confid, pkt->getCallId(), ipsecSession )); 
+
 #else	
-			
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-								phoneconf, mediaSession, confid, pkt->getCallId()));
+
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()),sipStack, callConf, 
+						phoneconf, mediaSession, confid, pkt->getCallId()));
 #endif
 			sipStack->addDialog(voipConfCall);
 
-			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::TU);
-			cmd.setDispatchCount(dispatchCount);
+			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+			//cmd.setDispatchCount(dispatchCount);
 
-			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 			mdbg << cmd << end;
 		}
 		//start SipDialogVoIP
@@ -306,73 +316,38 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 
 #ifdef IPSEC_SUPPORT
 			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-			
-			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
-			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession );
+
 			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
-								phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
-	
+						phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
+
 #else	
-			
+
 			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
-								phoneconf, mediaSession, pkt->getCallId()));
+						phoneconf, mediaSession, pkt->getCallId()));
 #endif
 			sipStack->addDialog(voipCall);
 
-			
-			MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
-						sipStack,
-						voipCall,
-						pkt->getCSeq(),
-						pkt->getCSeqMethod(),
-						pkt->getLastViaBranch(),
-						voipCall->dialogState.callId) );
-			voipCall->registerTransaction(ir);
 
-/*			MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(
-						sipStack,
-						voipCall,
-						command.getCommandPacket()->getCSeq(),
-						command.getCommandPacket()->getCSeqMethod(),
-						command.getCommandPacket()->getLastViaBranch(),
-						dialogState.callId) );
-			voipCall->registerTransaction(ir);
-*/
+			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+			//cmd.setDispatchCount(dispatchCount);
 
-			
-			
-			SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::transaction);
-			cmd.setDispatchCount(dispatchCount);
-
-			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 			mdbg << cmd << end;
 		}
 		return true;
 	}
 
 
-	if (source==SipSMCommand::remote && pkt->getType()=="MESSAGE"){
+	if (pkt->getType()=="MESSAGE"){
 
 		MRef<SipRequest*> im = (SipRequest*)*pkt;
-			 
+
 #ifdef DEBUG_OUTPUT			
 		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << end;
 #endif			
 		string branch = im->getDestinationBranch();
 
-		MRef<SipTransaction*> trans = new SipTransactionNonInviteServer(sipStack, this, im->getCSeq(), im->getCSeqMethod(), branch, im->getCallId());
-		registerTransaction(trans);
-
-		SipSMCommand cmd(pkt, SipSMCommand::remote, SipSMCommand::transaction);
-		cmd.setDispatchCount(dispatchCount);
-		//SipSMCommand cmd(command);
-		//cmd.setSource(SipSMCommand::remote);
-		//cmd.setDestination(SipSMCommand::transaction);
-			
-				//voipCall->handleCommand(command);
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-
-		sendIMOk(im, trans->getBranch() );
+		sendIMOk(im, branch);
 
 		massert(dynamic_cast<SipMessageContentIM*>(*im->getContent())!=NULL);
 
@@ -384,28 +359,27 @@ bool DefaultDialogHandler::handleCommandPacket(int source,
 			im->getHeaderValueTo()->getUri().getIp();
 
 		CommandString cmdstr("", SipCommandString::incoming_im, imref->getString(), from, to );
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 
 	}
 
-//	if (command.getType()==SipSMCommand::COMMAND_PACKET){
+	//	if (command.getType()==SipSMCommand::COMMAND_PACKET){
 	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
-//	}
+	//	}
 
 	return false;
 
 }
 
-bool DefaultDialogHandler::handleCommandString(int source, 
-		int /*destination*/,  	//Not used (it's either TU or ANY)
-		CommandString &cmdstr, 
-		int dispatchCount ){
+bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
+/*	
 	if (dispatchCount>=2){
 		mdbg << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
 		return true;
 	}
-
+*/
+	
 	if (cmdstr.getOp() == SipCommandString::start_presence_client){
 		cerr << "DefaultDialogHandler: Creating SipDialogPresenceClient for start_presence_client command"<< endl;
 		
@@ -417,9 +391,9 @@ bool DefaultDialogHandler::handleCommandString(int source,
 		
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
-		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
-		cmd.setDispatchCount(dispatchCount);
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+		//cmd.setDispatchCount(dispatchCount);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 		return true;
 	}
@@ -435,9 +409,9 @@ bool DefaultDialogHandler::handleCommandString(int source,
 		
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
-		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
-		cmd.setDispatchCount(dispatchCount);
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+		//cmd.setDispatchCount(dispatchCount);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 		return true;
 	}
@@ -446,12 +420,18 @@ bool DefaultDialogHandler::handleCommandString(int source,
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		//cerr << "DefaultDialogHandler: Creating SipTransactionClient for outgoing_im command"<< endl;
 		//int im_seq_no= requestSeqNo();
-		++dialogState.seqNo;
-		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, this, dialogState.seqNo, "MESSAGE", dialogState.callId);
+		++outsideDialogSeqNo;
+		//++dialogState.seqNo;
+/*		MRef<SipTransaction*> trans = new SipTransactionNonInviteClient(sipStack, 
+				//NULL, 
+				outsideDialogSeqNo, 
+				"MESSAGE", 
+				"");
 		mdbg << "WWWWWWW: transaction created, branch id is <"<<trans->getBranch()<<">."<< end; 
 		//cerr << "command standard arguments is <"<< command.getCommandString().getString() <<">"<< endl;
-		registerTransaction(trans);
-		sendIM( trans->getBranch(), cmdstr.getParam(), dialogState.seqNo, cmdstr.getParam2() );
+		sipStack->getDispatcher()->getLayerTransaction()->addTransaction(trans);
+*/
+		sendIM( ""/*trans->getBranch()*/, cmdstr.getParam(), outsideDialogSeqNo, cmdstr.getParam2() );
 		return true;
 	}
 
@@ -478,9 +458,9 @@ bool DefaultDialogHandler::handleCommandString(int source,
 		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf));
 		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
-		SipSMCommand cmd( cmdstr, SipSMCommand::remote, SipSMCommand::TU);
-		cmd.setDispatchCount(dispatchCount);
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
+		//cmd.setDispatchCount(dispatchCount);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 		return true;
 	}
 
@@ -546,7 +526,7 @@ bool DefaultDialogHandler::handleCommandString(int source,
 
 		//send invite message
 		CommandString inv(p2tUserDialog->getCallId(), SipCommandString::invite, user);
-		SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+		SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer));
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 
 		return true;
@@ -561,18 +541,17 @@ bool DefaultDialogHandler::handleCommandString(int source,
 
 bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 	mdbg << "DefaultDialogHandler: got command "<< command << end;
-	int src = command.getSource();
 	int dst = command.getDestination();
-	if ( !(dst==SipSMCommand::ANY || dst==SipSMCommand::TU) )
+	if ( dst!=SipSMCommand::dialog_layer)
 		return false;
 	
-	int dispatchCount = command.getDispatchCount();
+	//int dispatchCount = command.getDispatchCount();
 	if (command.getType()==SipSMCommand::COMMAND_PACKET){
-		return handleCommandPacket( src, dst, command.getCommandPacket(), dispatchCount );
+		return handleCommandPacket( command.getCommandPacket()/*, dispatchCount*/);
 	}else{
 		massert(command.getType()==SipSMCommand::COMMAND_STRING);
 		CommandString cmdstr = command.getCommandString();
-		return handleCommandString( src, dst, cmdstr, dispatchCount );
+		return handleCommandString( cmdstr/*, dispatchCount */);
 	}
 }
 
@@ -672,8 +651,8 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 			grpList->getUser(inv_user)->setStatus(P2T::STATUS_WAITACCEPT);
 		
 			SipSMCommand cmd(command);
-			cmd.setSource(SipSMCommand::remote);
-			cmd.setDestination(SipSMCommand::TU);
+			cmd.setSource(SipSMCommand::transaction_layer);
+			cmd.setDestination(SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		
 			//inform GUI. 
@@ -683,7 +662,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 		//if user is not in GroupList deny it
 		else {
 			CommandString rej(/*p2tDialogUser->getDialogConfig().callId*/ p2tDialogUser->getCallId(), SipCommandString::reject_invite);
-			SipSMCommand cmd(rej, SipSMCommand::remote, SipSMCommand::TU);
+			SipSMCommand cmd(rej, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 			 
 		}
@@ -702,13 +681,13 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 			}
 			
 			SipSMCommand cmd(command);
-			cmd.setSource(SipSMCommand::remote);
-			cmd.setDestination(SipSMCommand::TU);
+			cmd.setSource(SipSMCommand::transaction_layer);
+			cmd.setDestination(SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 			
 			//reject this call
 			CommandString cmds(p2tDialogUser->getCallId(), SipCommandString::reject_invite);
-			SipSMCommand scmd(cmds, SipSMCommand::remote, SipSMCommand::TU);
+			SipSMCommand scmd(cmds, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
 		
@@ -720,8 +699,8 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 			grpList->getUser(inv_user)->setStatus(P2T::STATUS_WAITACCEPT);
 			
 			SipSMCommand cmd(command);
-			cmd.setSource(SipSMCommand::remote);
-			cmd.setDestination(SipSMCommand::TU);
+			cmd.setSource(SipSMCommand::transaction_layer);
+			cmd.setDestination(SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 			
 			//user has to accept it
@@ -759,7 +738,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	for(uint32_t l=0; l<grpList->getAllUser().size(); l++){
 		if(grpList->getAllUser()[l]->getStatus()==P2T::STATUS_WAITACCEPT){
 			CommandString cmds(grpList->getAllUser()[l]->getCallId(), SipCommandString::accept_invite);
-			SipSMCommand scmd(cmds, SipSMCommand::remote, SipSMCommand::TU);
+			SipSMCommand scmd(cmds, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 			getDialogContainer()->enqueueCommand(scmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 		}
 	}
@@ -800,7 +779,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 		grpList->getAllUser()[k]->setLocalStarted(true);
 		
 		CommandString inv(p2tUserDialog->getCallId(), SipCommandString::invite, user);
-        	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+        	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer));
 		getDialogContainer()->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	}
 	
@@ -862,7 +841,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		grpList->getAllUser()[k]->setLocalStarted(true);
 		
 		CommandString inv(p2tUserDialog->getCallId(), SipCommandString::invite, user);
-        	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+        	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer));
 		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	}
 
@@ -953,11 +932,11 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+        ok->getHeaderValueTo()->setParameter("tag",/*dialogState.localTag*/"libminisip");
 
         MRef<SipMessage*> pref(*ok);
-        SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-        getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+        SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+        sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 
@@ -968,8 +947,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	posAt = toUri.find("@");
 	if( posAt == string::npos ) { //toUri does not have a domain ...
 		//get one, from the default identity
-		if( getDialogConfig()->inherited->sipIdentity->sipDomain != "" ) {
-			toUri += "@" + getDialogConfig()->inherited->sipIdentity->sipDomain;
+		if( phoneconf->inherited->sipIdentity->sipDomain != "" ) {
+			toUri += "@" + phoneconf->inherited->sipIdentity->sipDomain;
 		} else {
 			#ifdef DEBUG_OUTPUT
 			cerr << "DefaultDialogHandler::sendIM - toUri without domain" << endl;
@@ -982,9 +961,9 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	
 	MRef<SipRequest*> im = SipRequest::createSipMessageIMMessage(
 			std::string(branch),
-			std::string(dialogState.callId),
+			itoa(rand()),	//Generate random callId
 			toUri, 	
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			phoneconf->inherited->sipIdentity->getSipUri(),
 			im_seq_no,
 			msg
 			);
@@ -992,11 +971,11 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	//FIXME: there should be a SipIMDialog, just like for register messages ...
 	// 	otherwise, we cannot keep track of local/remote tags, callids, etc ... 
 	//	very useful for matching incoming and outgoing IMs ...
-	im->getHeaderValueFrom()->setParameter("tag","12345678"); //we need a from tag ... anything ... 
+	im->getHeaderValueFrom()->setParameter("tag","libminisip"); //we need a from tag ... anything ... 
 
 	MRef<SipMessage*> pref(*im);
-	SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
-	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 

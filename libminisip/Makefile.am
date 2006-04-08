@@ -277,6 +277,7 @@ endif
 
 libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libaec_src) \
+			$(libsip_src) \
 			$(libcodecs_src) \
 			$(libconference_src) \
 			$(libconfigbackend_src) \
@@ -288,7 +289,6 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libp2t_src) \
 			$(librtp_src) \
 			$(libsdp_src) \
-			$(libsip_src) \
 			$(libsoundcard_src) \
 			$(libspaudio_src) \
 			$(libstun_src) \

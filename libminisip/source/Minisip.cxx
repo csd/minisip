@@ -181,7 +181,8 @@ int Minisip::exit(){
 		//Send a shutdown command to the sip stack ... 
 		//it will take care of de-registering and closing on-going calls
 		CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
-		SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
+		SipSMCommand sipcmd(cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
+		sip->getSipStack()->handleCommand(sipcmd);
 		sip->stop();
 	
 #ifdef DEBUG_OUTPUT
@@ -189,7 +190,7 @@ int Minisip::exit(){
 #endif
 		sip->join();
 		sip->getSipStack()->setCallback( NULL );
-		sip->getSipStack()->setDefaultHandler( NULL );
+		sip->getSipStack()->setDefaultDialogCommandHandler( NULL );
 		sip = NULL;
 	}
 
@@ -299,7 +300,9 @@ int Minisip::startSip() {
 		phoneConf->sip = sip;
 
 		sip->getSipStack()->setCallback(*messageRouter);
-		sip->getSipStack()->setConfCallback(*confMessageRouter);
+		//sip->getSipStack()->setConfCallback(*confMessageRouter);
+		//TODO: Send the callback to the  conference dialog
+		//instead.
 
 		//messageRouter->setSip(sip);
 		messageRouter->addSubsystem("sip",*sip);

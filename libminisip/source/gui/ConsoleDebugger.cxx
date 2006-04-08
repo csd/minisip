@@ -209,9 +209,10 @@ void ConsoleDebugger::run(){
 void ConsoleDebugger::sendManagementCommand( string str ) {
 	CommandString cmdstr ( "", str );
 	SipSMCommand cmd( cmdstr, 
-			SipSMCommand::remote,
-			SipSMCommand::DIALOGCONTAINER);
-	config->sip->getSipStack()->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+			SipSMCommand::dialog_layer,
+			SipSMCommand::dispatcher);
+	//config->sip->getSipStack()->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	config->sip->getSipStack()->handleCommand(cmd);
 }
 
 void ConsoleDebugger::sendCommandToMediaHandler( string str ) {
@@ -319,14 +320,14 @@ void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
 }
 
 void ConsoleDebugger::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogContainer()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
 		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
 
-	cerr << "    (DefaultHandler) ";
-	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(),false);
+//	cerr << "    (DefaultHandler) ";
+//	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(),false);
 	
 	cerr << BOLD << " Calls:" << PLAIN << endl;
 	if (calls.size()==0)

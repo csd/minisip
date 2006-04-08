@@ -62,7 +62,6 @@
 
 #include<libmutil/minilist.h>
 
-#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipStack.h>
 

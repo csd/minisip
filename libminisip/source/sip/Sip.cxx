@@ -47,6 +47,7 @@
 #include<libminisip/p2t/GroupListServer.h>
 #include<libminisip/p2t/GroupList.h>
 #include<libminisip/sip/PresenceMessageContent.h>
+#include<libminisip/conference/ConfMessageRouter.h>
 
 #include<libmutil/dbg.h>
 #include<libmutil/termmanip.h>
@@ -63,14 +64,11 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 		int32_t localUdpPort,
 		int32_t localTcpPort,
 		int32_t externalContactUdpPort,
-		string defaultTransportProtocol		//Warning: Not used -EE
+		string /*defaultTransportProtocol*/		//Warning: Not used -EE
 		,int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
 		){
-//	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
-	
-
 
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
@@ -85,17 +83,15 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	
 	sipstack = new SipStack(stackConfig, cert_chain,cert_db);
 
-	//sipstack->init();
-	
 	MRef<SipDialogConfig*> callconf = new SipDialogConfig(phoneconfig->inherited);
 	MRef<DefaultDialogHandler*> defaultDialogHandler = new DefaultDialogHandler(sipstack,
-					callconf,phoneconfig,mediaHandler);
+					/*callconf,*/phoneconfig,mediaHandler);
 	
-	sipstack->setDefaultHandler(MRef<SipDialog*>(*defaultDialogHandler));
+	sipstack->setDefaultDialogCommandHandler(*defaultDialogHandler);
 
 	//CESC -- change to use set/get
 	MRef<SipDialogManagement *> shutdown = new SipDialogManagement(sipstack);	
-	sipstack->getDialogContainer()->getDispatcher()->managementHandler = MRef<SipDialog*>(*shutdown);
+	sipstack->getDispatcher()->setDialogManagement(*shutdown);
 
 	//Register content factories that are able to parse the content of
 	//sip messages. text/plain, multipart/mixed, multipart/alternative
@@ -115,8 +111,9 @@ Sip::~Sip(){
 
 void Sip::handleCommand(string subsystem, const CommandString &cmd){
 	assert(subsystem=="sip");
-	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
-	sipstack->handleCommand(sipcmd);
+	sipstack->handleCommand(cmd);
+//	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
+//	sipstack->handleCommand(sipcmd);
 }
 
 CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd){
@@ -221,7 +218,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 	ts.save( TMP );
 #endif
 	
-        SipSMCommand c(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+        SipSMCommand c(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //TODO: send directly to dialog instead
 	
 #ifdef DEBUG_OUTPUT
         cerr << "Before handleCommand" << endl;
@@ -319,10 +316,10 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, callID, ipsecSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, conflist, confId, callID, ipsecSession)); 
 
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
 
 #endif
 
@@ -333,7 +330,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	ts.save( TMP );
 #endif
 
-	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //FIXME: send directly to dialog instead
 
 	sipstack->handleCommand(cmd);
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
@@ -419,10 +416,10 @@ MRef<Session *> mediaSession =
 #ifdef IPSEC_SUPPORT
 	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
 	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, confId, callID, ipsecSession)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, confId, callID, ipsecSession)); 
 	
 #else	
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipstack, callconf, phoneconfig, mediaSession, confId)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, confId)); 
 
 #endif
 
@@ -433,7 +430,7 @@ MRef<Session *> mediaSession =
 	ts.save( TMP );
 #endif
 	
-        SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::remote, SipSMCommand::TU));
+        SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer));
 	
 	sipstack->handleCommand(cmd);
 	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
@@ -448,7 +445,7 @@ bool Sip::start() {
 
 void Sip::stop() {
 	CommandString cmdstr( "", SipCommandString::sip_stack_shutdown );
-	SipSMCommand sipcmd(cmdstr, SipSMCommand::remote, SipSMCommand::DIALOGCONTAINER);
+	SipSMCommand sipcmd(cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
 	
 	getSipStack()->handleCommand(sipcmd);
 }
@@ -470,7 +467,7 @@ void Sip::run(){
 			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
 #endif
 
-			sipstack->getSipTransportLayer()->startTcpServer();
+			sipstack->getDispatcher()->getLayerTransport()->startTcpServer();
 
 		}
 
@@ -482,7 +479,7 @@ void Sip::run(){
 #ifdef DEBUG_OUTPUT
 				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
 #endif
-				sipstack->getSipTransportLayer()->startTlsServer();
+				sipstack->getDispatcher()->getLayerTransport()->startTlsServer();
 			}
 		}
 	}
@@ -497,7 +494,7 @@ void Sip::run(){
 #endif
 
 	//We would like to use the SipSMCommand::register_all_identities, which is managed by the
-	//SipDialogManagement. Unfortunately, this dialog only know about already exhisting dialogs ...
+	//SipDialogManagement. Unfortunately, this dialog only know about already existing dialogs ...
 	cerr << endl;
 	for (list<MRef<SipIdentity*> >::iterator i=phoneconfig->identities.begin() ; i!=phoneconfig->identities.end(); i++){
 		if ( (*i)->registerToProxy  ){
@@ -505,7 +502,7 @@ void Sip::run(){
 			CommandString reg("",SipCommandString::proxy_register);
 			reg["proxy_domain"] = (*i)->sipDomain;
 			reg["identityId"] = (*i)->getId();
-			SipSMCommand sipcmd(reg, SipSMCommand::remote, SipSMCommand::TU);
+			SipSMCommand sipcmd(reg, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
 			sipstack->handleCommand(sipcmd);
 		}
 	}

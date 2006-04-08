@@ -32,7 +32,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipMessageTransport.h>
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #ifdef P2T_SUPPORT
@@ -47,7 +46,7 @@ class SipDialogContainer;
  * If even the DefaultDialogHandler cannot handle the command, it will be
  * discarded.
  */
-class LIBMINISIP_API DefaultDialogHandler : public SipDialog{
+class LIBMINISIP_API DefaultDialogHandler : public /*SipDialog*/ SipSMCommandReceiver{
 	public:
 		
 		/**
@@ -56,7 +55,11 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDialog{
 		 * @param conf       the dialog configuration
 		 * @param pconf      the phone configuration
 		 */
-		DefaultDialogHandler(MRef<SipStack*> stack, MRef<SipDialogConfig*> conf,MRef<SipSoftPhoneConfiguration*> pconf, MRef<MediaHandler *>mediaHandler);
+		DefaultDialogHandler(MRef<SipStack*> stack, 
+				/*MRef<SipDialogConfig*> conf,*/ 
+				MRef<SipSoftPhoneConfiguration*> pconf, 
+				MRef<MediaHandler *> mediaHandler);
+		
 		virtual ~DefaultDialogHandler();
 
 		virtual std::string getMemObjectType(){return "DefaultDialogHandler";}
@@ -68,9 +71,13 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDialog{
 	private:
 		minilist<ConfMember> connectList;
 
+		MRef<SipStack*> sipStack;
+
+		int outsideDialogSeqNo;
+
 		
-		bool handleCommandPacket(int source, int destination, MRef<SipMessage*> pkt, int dispatchCount);
-		bool handleCommandString(int source, int destination, CommandString &command, int dispatchCount);
+		bool handleCommandPacket(MRef<SipMessage*> pkt );
+		bool handleCommandString(CommandString &command );
 		
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<MediaHandler*> mediaHandler;

@@ -57,14 +57,14 @@ class LogEntry;
 class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
 #endif
 #ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogConfVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
 
 
 #endif		
@@ -88,6 +88,7 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
 	private:
+		MRef<ConfMessageRouter*> confCallback;
 		std::string confId;
 		void setUpStateMachine();
 		
