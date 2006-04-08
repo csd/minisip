@@ -38,13 +38,13 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
 
-//#include<libmsip/SipMessageDispatcher.h>
+//#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipRequest.h>
 
 class SipStack;
 class SipTransaction;
 class SipDialogConfig;
-class SipMessageDispatcher;
+class SipCommandDispatcher;
 //class SipDialogContainer;
 
 
@@ -160,7 +160,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		std::string getCallId(){return dialogState.callId;}
 		
-		//MRef<SipMessageDispatcher*> getDispatcher();
+		//MRef<SipCommandDispatcher*> getDispatcher();
 
 		MRef<SipStack*> getSipStack();
 
@@ -193,7 +193,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		///
 		MRef<SipStack*> sipStack;
 		
-		MRef<SipMessageDispatcher*> dispatcher;
+		MRef<SipCommandDispatcher*> dispatcher;
 
 	private:
 		
@@ -203,7 +203,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 
 #endif
 

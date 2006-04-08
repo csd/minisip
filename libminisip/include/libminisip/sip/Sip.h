@@ -47,7 +47,7 @@
  | | [defaultHandler]     |<---+                |
  | +----------------------+    |                |
  |                             |                |
- | [SipMessageTransport]-------+                |
+ | [SipLayerTransport]---------+                |
  | [SipSoftPhoneConfiguration]                  |
  |                                              |
  |                                              |

@@ -37,9 +37,9 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipHeaderVia.h>
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmutil/dbg.h>
 

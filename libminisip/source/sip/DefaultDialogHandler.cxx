@@ -37,7 +37,6 @@
 #include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentIM.h>
-#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipTransactionInviteServerUA.h>

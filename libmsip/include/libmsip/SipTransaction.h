@@ -40,12 +40,12 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 
 class SipDialog;
 class SipMessage;
-class SipMessageDispatcher;
-class SipMessageTransport;
+class SipCommandDispatcher;
+class SipLayerTransport;
 class SipStack;
 class Socket;
 
@@ -130,10 +130,10 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 		
 		
 		void setCSeqNo(int n){cSeqNo=n;}
-		MRef<SipMessageDispatcher*> dispatcher;
+		MRef<SipCommandDispatcher*> dispatcher;
 		//MRef<SipCommonConfig *> conf;
 		MRef<SipStack*> sipStack;
-		MRef<SipMessageTransport*> transportLayer;
+		MRef<SipLayerTransport*> transportLayer;
 		Socket * socket;
 		//IPAddress * toaddr;             //FIXME: This is leaked?
 		

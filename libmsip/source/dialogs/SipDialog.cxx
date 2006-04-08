@@ -33,7 +33,6 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
 //#include<libmsip/SipDialogContainer.h>
-#include<libmsip/SipMessageTransport.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>

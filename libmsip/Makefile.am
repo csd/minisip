@@ -29,8 +29,8 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/messages/SipResponse.cxx \
                      source/messages/SipRequest.cxx \
 		     source/SipUtils.cxx \
-		     source/SipMessageDispatcher.cxx \
-		     source/SipMessageTransport.cxx \
+		     source/SipCommandDispatcher.cxx \
+		     source/SipLayerTransport.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
 		     source/SipUri.cxx \

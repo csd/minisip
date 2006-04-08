@@ -23,8 +23,8 @@
 #include<config.h>
 #include<libmsip/SipStack.h>
 
-#include<libmsip/SipMessageTransport.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipLayerTransport.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>
@@ -126,8 +126,8 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 
 	addSupportedExtension("100rel");
 
-	MRef<SipMessageTransport*> transp = MRef<SipMessageTransport*>(new
-			SipMessageTransport(
+	MRef<SipLayerTransport*> transp = MRef<SipLayerTransport*>(new
+			SipLayerTransport(
 				stackConfig->localIpString,
 				stackConfig->externalContactIP,
 				stackConfig->externalContactUdpPort,
@@ -146,7 +146,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	// Here it's ok since the dispatcher will keep
 	// a reference to the SipStack thus we won't be
 	// freed (crash) when this line executes.
-	dispatcher = new SipMessageDispatcher(this,transp);
+	dispatcher = new SipCommandDispatcher(this,transp);
 
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
@@ -156,7 +156,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 
 }
 
-MRef<SipMessageDispatcher*> SipStack::getDispatcher(){
+MRef<SipCommandDispatcher*> SipStack::getDispatcher(){
 	return dispatcher;
 }
 

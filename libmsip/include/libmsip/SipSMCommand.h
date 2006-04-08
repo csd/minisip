@@ -46,7 +46,7 @@ class LIBMSIP_API SipSMCommand : public MObject{
 		static const int transport_layer;
 		static const int dialog_layer;
 		static const int transaction_layer;
-		static const int dispatcher;    ///SipMessageDispatcher; manages transactions and dialogs. Transactions/dialogs
+		static const int dispatcher;    ///SipCommandDispatcher; manages transactions and dialogs. Transactions/dialogs
 						///tell it when they
 						//terminate.
 

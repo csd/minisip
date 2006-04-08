@@ -45,7 +45,7 @@
  | | [defaultHandler]     |<---+                |
  | +----------------------+    |                |
  |                             |                |
- | [SipMessageTransport]-------+                |
+ | [SipLayerTransport]-------+                |
  | [SipSoftPhoneConfiguration]                  |
  |                                              |
  |                                              |
@@ -112,7 +112,7 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
 
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 #include<libmutil/cert.h>
 #include<libmutil/MessageRouter.h>
 
@@ -139,7 +139,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		
                 virtual void run();
 
-		MRef<SipMessageDispatcher*> getDispatcher();
+		MRef<SipCommandDispatcher*> getDispatcher();
 
 		bool handleCommand(const CommandString &cmd){
 			//Commands from the gui etc is always sent to the
@@ -160,7 +160,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		void addDialog(MRef<SipDialog*> d);
 
-//		MRef<SipMessageTransport *> getSipTransportLayer(){return transportLayer;}
+//		MRef<SipLayerTransport *> getSipTransportLayer(){return transportLayer;}
 
 		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
 
@@ -179,7 +179,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		MRef<CommandReceiver*> confCallback;	//hack to make conference calling work until the ConfMessageRouter is removed
 		
 		//
-		MRef<SipMessageDispatcher*> dispatcher;
+		MRef<SipCommandDispatcher*> dispatcher;
 
 		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> timeoutProvider;
 

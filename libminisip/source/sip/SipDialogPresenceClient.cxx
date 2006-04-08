@@ -38,7 +38,6 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>

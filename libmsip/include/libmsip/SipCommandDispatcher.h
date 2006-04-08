@@ -22,8 +22,8 @@
 */
 
 
-#ifndef _SIPMESSAGEDISPATCHER_H
-#define _SIPMESSAGEDISPATCHER_H
+#ifndef _SipCommandDispatcher_H
+#define _SipCommandDispatcher_H
 
 #include<libmsip/libmsip_config.h>
 
@@ -38,7 +38,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipLayerDialog.h>
 #include<libmsip/SipLayerTransaction.h>
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 
 /**
  * queue_type: For internal use only!
@@ -52,6 +52,7 @@ typedef struct queue_type{
 } queue_type;
 
 class SipLayerDialog;
+class SipLayerTransport;
 class SipDialog;
 class SipStack;
 
@@ -64,9 +65,9 @@ class SipStack;
 
 using namespace std;
 
-class LIBMSIP_API SipMessageDispatcher : public MObject{
+class LIBMSIP_API SipCommandDispatcher : public MObject{
 	public:
-		SipMessageDispatcher(MRef<SipStack*> stack, MRef<SipMessageTransport*> transport);
+		SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerTransport*> transport);
 
 		void setCallback(MRef<CommandReceiver*> cb);
 		MRef<CommandReceiver*> getCallback(){return callback;}
@@ -82,7 +83,7 @@ class LIBMSIP_API SipMessageDispatcher : public MObject{
 		MRef<SipStack*> getSipStack();
 		
 //#ifdef DEBUG_OUTPUT
-		virtual std::string getMemObjectType() {return "SipMessageDispatcher";}
+		virtual std::string getMemObjectType() {return "SipCommandDispatcher";}
 //#endif
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
@@ -96,7 +97,7 @@ class LIBMSIP_API SipMessageDispatcher : public MObject{
 		void enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &);
 
 
-		MRef<SipMessageTransport*> getLayerTransport();
+		MRef<SipLayerTransport*> getLayerTransport();
 		MRef<SipLayerTransaction*> getLayerTransaction();
 		MRef<SipLayerDialog*> getLayerDialog();
 
@@ -124,7 +125,7 @@ class LIBMSIP_API SipMessageDispatcher : public MObject{
                 MRef<SipLayerTransaction*> transactionLayer;
 
                 //
-                MRef<SipMessageTransport *> transportLayer;
+                MRef<SipLayerTransport *> transportLayer;
 		
 		Mutex dialogListLock;
 

@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 
 #include<errno.h>
 #include<stdio.h>
@@ -94,7 +94,7 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 #endif
 
 
-SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r): ssock(sock), receiver(r),doStop(false){
+SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipLayerTransport*> r): ssock(sock), receiver(r),doStop(false){
 
 }
 
@@ -126,7 +126,7 @@ void SocketServer::run(){
 		//if (avail==0){
 		//	cerr<< "SocketServer::run(): Timeout"<< endl;
 		//}
-		MRef<SipMessageTransport *> r = receiver;
+		MRef<SipLayerTransport *> r = receiver;
 		if (avail && !doStop && r){
 			MRef<StreamSocket *> ss;
 
@@ -291,14 +291,14 @@ uint32_t SipMessageParser::findContentLength(){
 
 class StreamThreadData{
 	public:
-		StreamThreadData( MRef<SipMessageTransport *> );
+		StreamThreadData( MRef<SipLayerTransport *> );
 		SipMessageParser parser;
-		MRef<SipMessageTransport  *> transport;
+		MRef<SipLayerTransport  *> transport;
 		void run();
 		void streamSocketRead( MRef<StreamSocket *> socket );
 };
 
-StreamThreadData::StreamThreadData( MRef<SipMessageTransport *> transport){
+StreamThreadData::StreamThreadData( MRef<SipLayerTransport *> transport){
 	this->transport = transport;
 }
 
@@ -351,7 +351,7 @@ void printMessage(string header, string packet){
 static void * udpThread( void * arg );
 static void * streamThread( void * arg );
 
-SipMessageTransport::SipMessageTransport(
+SipLayerTransport::SipLayerTransport(
 						string local_ip, 
 						string contactIP, 
 						int32_t externalContactUdpPort, 
@@ -382,15 +382,15 @@ SipMessageTransport::SipMessageTransport(
 	}
 }
 
-//void SipMessageTransport::startUdpServer(){ }
-//void SipMessageTransport::stopUdpServer(){ }
+//void SipLayerTransport::startUdpServer(){ }
+//void SipLayerTransport::stopUdpServer(){ }
 
-bool SipMessageTransport::handleCommand(const SipSMCommand& ){
-	cerr << "SipMessageTransport::handleCommand: NOT IMPLEMENTED - BUG"<<endl;
+bool SipLayerTransport::handleCommand(const SipSMCommand& ){
+	cerr << "SipLayerTransport::handleCommand: NOT IMPLEMENTED - BUG"<<endl;
 	
 }
 
-void SipMessageTransport::startTcpServer(){
+void SipLayerTransport::startTcpServer(){
 	try{
 		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
 		tcpSocketServer->start();
@@ -400,12 +400,12 @@ void SipMessageTransport::startTcpServer(){
 	}
 }
 
-void SipMessageTransport::stopTcpServer(){
+void SipLayerTransport::stopTcpServer(){
 	tcpSocketServer->stop();
 	tcpSocketServer=NULL;
 }
 
-void SipMessageTransport::startTlsServer(){
+void SipLayerTransport::startTlsServer(){
 	if( getMyCertificate().isNull() ){
 		merr << "You need a personal certificate to run "
 			"a TLS server. Please specify one in "
@@ -426,18 +426,18 @@ void SipMessageTransport::startTlsServer(){
 
 }
 
-void SipMessageTransport::stopTlsServer(){
+void SipLayerTransport::stopTlsServer(){
 	tlsSocketServer->stop();
 	tlsSocketServer=NULL;
 }
 
 /*
-void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
+void SipLayerTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
 	commandReceiver = rec;
 }
 */
 
-void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
+void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 									MRef<Socket *> socket,
 									string branch ){
 	string transport;
@@ -463,7 +463,7 @@ void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 			break;
 
 		default:
-			mdbg<< "SipMessageTransport: Unknown transport protocol " + socket->getType() <<end;
+			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<end;
 			return;
 	}
 	
@@ -557,7 +557,7 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 	return false;
 }
 
-void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
+void SipLayerTransport::sendMessage(MRef<SipMessage*> pack, 
 				      const string &branch,
 				      bool addVia)
 {
@@ -568,7 +568,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 
 	if( !getDestination( pack, destAddr, destPort, destTransport) ){
 #ifdef DEBUG_OUTPUT
-		cerr << "SipMessageTransport: WARNING: Could not find destination. Packet dropped."<<endl;
+		cerr << "SipLayerTransport: WARNING: Could not find destination. Packet dropped."<<endl;
 #endif
 		return;
 	}
@@ -581,7 +581,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 }
 
 
-MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
+MRef<Socket*> SipLayerTransport::findSocket(const string &transport,
 					      /*IPAddress &*/ string destAddr,
 					      uint16_t port)
 {
@@ -595,7 +595,7 @@ MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
 		if( ssocket.isNull() ) {
 			/* No existing StreamSocket to that host,
 			 * create one */
-			cerr << "SipMessageTransport: sendMessage: creating new socket" << endl;
+			cerr << "SipLayerTransport: sendMessage: creating new socket" << endl;
 			if( transport == "TLS" ){
 				ssocket = new TLSSocket( destAddr, 
 							port, tls_ctx, getMyCertificate(),
@@ -606,7 +606,7 @@ MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
 			}
 
 			addSocket( ssocket );
-		} else cerr << "SipMessageTransport: sendMessage: reusing old socket" << endl;
+		} else cerr << "SipLayerTransport: sendMessage: reusing old socket" << endl;
 		socket = *ssocket;
 	}
 
@@ -614,7 +614,7 @@ MRef<Socket*> SipMessageTransport::findSocket(const string &transport,
 }
 
 
-void SipMessageTransport::sendMessage(MRef<SipMessage*> pack, 
+void SipLayerTransport::sendMessage(MRef<SipMessage*> pack, 
 				      /*IPAddress &*/ string ip_addr, 
 				      int32_t port, 
 				      string branch,
@@ -689,7 +689,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 			}else{
 				CommandString transportError( pack->getCallId(), 
 						SipCommandString::transport_error,
-						"SipMessageTransport: host could not be resolved: "+ip_addr);
+						"SipLayerTransport: host could not be resolved: "+ip_addr);
 				SipSMCommand transportErrorCommand(
 						transportError, 
 						SipSMCommand::transport_layer, 
@@ -698,7 +698,7 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 				if (dispatcher)
 					dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 				else
-					mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+					mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 
 			}
 		}
@@ -710,12 +710,12 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc.what();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		mdbg << "Transport error in SipMessageTransport: " << message << end;
-		cerr << "SipMessageTransport: sendMessage: exception thrown!" << endl;
+		mdbg << "Transport error in SipLayerTransport: " << message << end;
+		cerr << "SipLayerTransport: sendMessage: exception thrown!" << endl;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
-					      "SipMessageTransport: "+message );
+					      "SipLayerTransport: "+message );
 		SipSMCommand transportErrorCommand(
 				transportError, 
 				SipSMCommand::transport_layer, 
@@ -724,16 +724,16 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 		if (dispatcher)
 			dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 		else
-			mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+			mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 	}
 	
 }
 
-void SipMessageTransport::setDispatcher(MRef<SipMessageDispatcher*> d){
+void SipLayerTransport::setDispatcher(MRef<SipCommandDispatcher*> d){
 	dispatcher=d;
 }
 
-void SipMessageTransport::addSocket(MRef<StreamSocket *> sock){
+void SipLayerTransport::addSocket(MRef<StreamSocket *> sock){
 	socksLock.lock();
 	this->socks.push_back(sock);
 	socksLock.unlock();
@@ -743,7 +743,7 @@ void SipMessageTransport::addSocket(MRef<StreamSocket *> sock){
         semaphore.inc();
 }
 
-MRef<StreamSocket *> SipMessageTransport::findStreamSocket( /*IPAddress &*/ string address, uint16_t port ){
+MRef<StreamSocket *> SipLayerTransport::findStreamSocket( /*IPAddress &*/ string address, uint16_t port ){
 	list<MRef<StreamSocket *> >::iterator i;
 
 	socksLock.lock();
@@ -783,7 +783,7 @@ static void updateVia(MRef<SipMessage*> pack, IPAddress *from,
 
 #define UDP_MAX_SIZE 65536
 
-void SipMessageTransport::udpSocketRead(){
+void SipLayerTransport::udpSocketRead(){
 	char buffer[UDP_MAX_SIZE];
 
 	for (int i=0; i<UDP_MAX_SIZE; i++){
@@ -852,7 +852,7 @@ void SipMessageTransport::udpSocketRead(){
 				if (dispatcher)
 					dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 				else
-					mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+					mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 				pack=NULL;
 			}
 			
@@ -977,7 +977,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						if (transport->dispatcher){
 							transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 						}else
-							mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+							mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 						pack=NULL;
 					}
 
@@ -1017,7 +1017,7 @@ static void * streamThread( void * arg ){
 }
 
 static void * udpThread( void * arg ){
-	MRef<SipMessageTransport*>  trans( (SipMessageTransport *)arg);
+	MRef<SipLayerTransport*>  trans( (SipLayerTransport *)arg);
 
 	trans->udpSocketRead();
 	return NULL;

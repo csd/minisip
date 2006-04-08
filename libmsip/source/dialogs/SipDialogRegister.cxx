@@ -29,7 +29,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogRegister.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipRequest.h>

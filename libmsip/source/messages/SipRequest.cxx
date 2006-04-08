@@ -36,7 +36,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipHeaderRoute.h>

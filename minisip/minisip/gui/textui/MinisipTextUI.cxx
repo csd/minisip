@@ -32,7 +32,7 @@
 #include<libmutil/termmanip.h>
 
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
 
 #include<libminisip/conference/ConfMessageRouter.h>

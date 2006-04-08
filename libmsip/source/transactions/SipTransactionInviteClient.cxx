@@ -83,7 +83,7 @@ resp. to TU |  1xx             V                     |
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>

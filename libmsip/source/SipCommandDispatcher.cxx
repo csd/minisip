@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipLayerDialog.h>
@@ -34,7 +34,7 @@
 
 using namespace std;
 
-SipMessageDispatcher::SipMessageDispatcher(MRef<SipStack*> stack, MRef<SipMessageTransport*> transp):sipStack(stack),keepRunning(true){
+SipCommandDispatcher::SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerTransport*> transp):sipStack(stack),keepRunning(true){
 	transportLayer = transp;
 	transactionLayer = new SipLayerTransaction(this,transportLayer);
 	dialogLayer = new SipLayerDialog(this);
@@ -45,15 +45,15 @@ SipMessageDispatcher::SipMessageDispatcher(MRef<SipStack*> stack, MRef<SipMessag
 
 }
 
-MRef<SipStack*> SipMessageDispatcher::getSipStack(){
+MRef<SipStack*> SipCommandDispatcher::getSipStack(){
 	return sipStack;
 }
 
-list<MRef<SipDialog *> > SipMessageDispatcher::getDialogs(){
+list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
 	return dialogLayer->getDialogs();
 }
 
-void SipMessageDispatcher::run(){
+void SipCommandDispatcher::run(){
 #ifdef DEBUG_OUTPUT
 	static int runcount = 1;
 #endif
@@ -129,28 +129,28 @@ void SipMessageDispatcher::run(){
 	}
 }
 
-void SipMessageDispatcher::setCallback(MRef<CommandReceiver*> callback){
+void SipCommandDispatcher::setCallback(MRef<CommandReceiver*> callback){
         this->callback = callback;
 }
 
 
-MRef<SipMessageTransport*> SipMessageDispatcher::getLayerTransport(){
+MRef<SipLayerTransport*> SipCommandDispatcher::getLayerTransport(){
 	return transportLayer;
 }
 
-MRef<SipLayerTransaction*> SipMessageDispatcher::getLayerTransaction(){
+MRef<SipLayerTransaction*> SipCommandDispatcher::getLayerTransaction(){
 	return transactionLayer;
 }
 
-MRef<SipLayerDialog*> SipMessageDispatcher::getLayerDialog(){
+MRef<SipLayerDialog*> SipCommandDispatcher::getLayerDialog(){
 	return dialogLayer;
 }
 
-void SipMessageDispatcher::addDialog(MRef<SipDialog*> d){
+void SipCommandDispatcher::addDialog(MRef<SipDialog*> d){
 	dialogLayer->addDialog(d);
 }
 
-void SipMessageDispatcher::enqueueCommand(const SipSMCommand &command, int queue){
+void SipCommandDispatcher::enqueueCommand(const SipSMCommand &command, int queue){
 #ifdef DEBUG_OUTPUT
 	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
 #endif
@@ -169,7 +169,7 @@ void SipMessageDispatcher::enqueueCommand(const SipSMCommand &command, int queue
 }
 
 
-void SipMessageDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
+void SipCommandDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
 	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
 #endif
@@ -187,7 +187,7 @@ void SipMessageDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const 
         semaphore.inc();
 }
 
-void SipMessageDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &command){
+void SipCommandDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
 	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
 #endif
@@ -207,10 +207,10 @@ void SipMessageDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSM
 
 
 //TODO: Optimize how transactions are found based on branch parameter.
-bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
+bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 
 #ifdef DEBUG_OUTPUT
-	mdbg << "DISPATCHER: SipMessageDispatcher got command "<< c<<endl;
+	mdbg << "DISPATCHER: SipCommandDispatcher got command "<< c<<endl;
 #endif
 	
 	int dst = c.getDestination();
@@ -235,12 +235,12 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 	
 		ret = maintainenceHandleCommand(c);
 	}else{
-		cerr << "ERROR: SipMessageDispatcher::handleCommand: Unknown destilation (layer)"<<endl;
+		cerr << "ERROR: SipCommandDispatcher::handleCommand: Unknown destilation (layer)"<<endl;
 	}
 	
 	if (!ret){
 #ifdef DEBUG_OUTPUT
-		mdbg <<"WARNING SipMessageDispatcher: The destination layer did not handle the command!"<<endl;
+		mdbg <<"WARNING SipCommandDispatcher: The destination layer did not handle the command!"<<endl;
 #endif
 	}
 
@@ -248,7 +248,7 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 		
 }
 
-bool SipMessageDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
+bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING){	
 
@@ -299,7 +299,7 @@ bool SipMessageDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
-			mdbg << "SipMessageDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << end;
+			mdbg << "SipCommandDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << end;
 #endif
 			return false;
 		}

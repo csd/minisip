@@ -84,7 +84,7 @@
 #include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
 

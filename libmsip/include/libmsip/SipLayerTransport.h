@@ -22,8 +22,8 @@
 */
 
 
-#ifndef SIPMESSAGETRANSPORT_H
-#define SIPMESSAGETRANSPORT_H
+#ifndef SipLayerTransport_H
+#define SipLayerTransport_H
 
 #include<libmsip/libmsip_config.h>
 
@@ -37,14 +37,14 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipMessageDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 
 #include<list>
 
 class SipMessage;
 
-class SipMessageTransport;
-class SipMessageDispatcher;
+class SipLayerTransport;
+class SipCommandDispatcher;
 
 /**
  * Purpose: Listens on a TCP or TLS server socket and reports
@@ -53,7 +53,7 @@ class SipMessageDispatcher;
  */
 class SocketServer : public Runnable{
 	public:
-		SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r);
+		SocketServer(MRef<ServerSocket*> sock, MRef<SipLayerTransport*> r);
 		std::string getMemObjectType(){return "SocketServer";}
 		void run();
 		void start();
@@ -61,14 +61,14 @@ class SocketServer : public Runnable{
 
 	private:
 		MRef<ServerSocket *> ssock;
-		MRef<SipMessageTransport *> receiver;
+		MRef<SipLayerTransport *> receiver;
 		bool doStop;
 };
 
 
-class LIBMSIP_API SipMessageTransport : /*public virtual MObject*/ public SipSMCommandReceiver {
+class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCommandReceiver {
 	public:
-		SipMessageTransport(std::string local_ip, 
+		SipLayerTransport(std::string local_ip, 
 							std::string contactIP,
 							int32_t externalContactUdpPort=5060, 
 							int32_t local_udp_port=5060, 
@@ -91,7 +91,7 @@ class LIBMSIP_API SipMessageTransport : /*public virtual MObject*/ public SipSMC
 		
 		
 		//void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
-		void setDispatcher(MRef<SipMessageDispatcher*> d);
+		void setDispatcher(MRef<SipCommandDispatcher*> d);
 
 #if 0
 		//weird ... it is only defined, has not body ... but no one complained ... 
@@ -99,7 +99,7 @@ class LIBMSIP_API SipMessageTransport : /*public virtual MObject*/ public SipSMC
 		void setCommandReceiver(MRef<CommandStringReceiver* > rcvr);
 #endif
 
-		virtual std::string getMemObjectType(){return "SipMessageTransport";}
+		virtual std::string getMemObjectType(){return "SipLayerTransport";}
 
 		void sendMessage(MRef<SipMessage*> pack, const std::string &branch,
 				 bool addVia);
@@ -155,7 +155,7 @@ class LIBMSIP_API SipMessageTransport : /*public virtual MObject*/ public SipSMC
 		void * tls_ctx;
 
 		//MRef<SipSMCommandReceiver *> commandReceiver;
-		MRef<SipMessageDispatcher*> dispatcher;
+		MRef<SipCommandDispatcher*> dispatcher;
 
 		Semaphore semaphore;
 

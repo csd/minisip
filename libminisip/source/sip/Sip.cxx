@@ -29,7 +29,7 @@
 
 #include<libminisip/sip/DefaultDialogHandler.h>
 //#include<libminisip/mediahandler/MediaHandler.h>
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>

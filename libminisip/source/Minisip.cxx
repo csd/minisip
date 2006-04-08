@@ -57,7 +57,7 @@
 #include<libmikey/keyagreement_dh.h>
 
 #include<libmsip/SipUtils.h>
-#include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipCommandString.h>
 
 #include<libminisip/gui/Gui.h>

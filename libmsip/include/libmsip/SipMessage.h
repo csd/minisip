@@ -308,7 +308,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		std::list<std::string> getRouteSet();
 
 		/**
-		 * Set the socket used by SipMessageTransport to send
+		 * Set the socket used by SipLayerTransport to send
 		 * the message.
 		 */
 		void setSocket(MRef<Socket*> sock);
