@@ -43,11 +43,12 @@ class LIBMSIP_API SipSMCommand : public MObject{
 	public:
 		static const int COMMAND_PACKET;
 		static const int COMMAND_STRING;
-		static const int remote;
-		static const int TU;
-		static const int transaction;
-		static const int ANY;
-		static const int DIALOGCONTAINER;
+		static const int transport_layer;
+		static const int dialog_layer;
+		static const int transaction_layer;
+		static const int dispatcher;    ///SipMessageDispatcher; manages transactions and dialogs. Transactions/dialogs
+						///tell it when they
+						//terminate.
 
 		/**
 		 * Constructor.
@@ -83,21 +84,12 @@ class LIBMSIP_API SipSMCommand : public MObject{
         friend LIBMSIP_API std::ostream & operator<<(std::ostream &, const SipSMCommand &);
 #endif
 
-//		bool getDispatched() const{return dispatched;}
-//		void setDispatched(bool d){dispatched = d;}
-		void incDispatchCount(){dispatchCount++;}
-		int getDispatchCount() const {return dispatchCount;}
-		void setDispatchCount(char c){dispatchCount=c;}
 	private:
 		int type;
 		CommandString cmdstr;
 		MRef<SipMessage*> cmdpkt;
 		int source;
 		int destination;
-		
-//		bool dispatched;
-		char dispatchCount;
-
 };
 
 /**

@@ -31,33 +31,75 @@
 
 #include<list>
 #include<libmutil/Mutex.h>
+#include<libmutil/MessageRouter.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipLayerDialog.h>
+#include<libmsip/SipLayerTransaction.h>
+#include<libmsip/SipMessageTransport.h>
 
-//class SipTransaction;
+/**
+ * queue_type: For internal use only!
+ * An item in the priority queue of commands to dispatch.
+ */
+typedef struct queue_type{
+        int type;
+        MRef<SipSMCommand*> command;
+        MRef<SipTransaction*> transaction_receiver;
+        MRef<SipDialog*> call_receiver;
+} queue_type;
 
-class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
+class SipLayerDialog;
+class SipDialog;
+class SipStack;
+
+#define TYPE_COMMAND 2
+#define TYPE_TIMEOUT 3
+
+#define HIGH_PRIO_QUEUE 2
+#define LOW_PRIO_QUEUE 4
+
+
+using namespace std;
+
+class LIBMSIP_API SipMessageDispatcher : public MObject{
 	public:
-		void addTransaction(MRef<SipTransaction*> t);
-		void removeTransaction(MRef<SipTransaction*> t);
+		SipMessageDispatcher(MRef<SipStack*> stack, MRef<SipMessageTransport*> transport);
+
+		void setCallback(MRef<CommandReceiver*> cb);
+		MRef<CommandReceiver*> getCallback(){return callback;}
+		
 		void addDialog(MRef<SipDialog*> d);
+		list<MRef<SipDialog *> > getDialogs();
+
+		void setDialogManagement(MRef<SipDialog*> mgmt){managementHandler=mgmt;}
+
+		virtual void run();
+		void stopRunning(){keepRunning=false;}
+
+		MRef<SipStack*> getSipStack();
 		
 //#ifdef DEBUG_OUTPUT
 		virtual std::string getMemObjectType() {return "SipMessageDispatcher";}
 //#endif
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
+		bool dispatch(const SipSMCommand &cmd);
+
+ 		bool maintainenceHandleCommand(const SipSMCommand &cmd);
 		
-		std::list<MRef<SipDialog*> > getDialogs() {//return &dialogs;
-			std::list<MRef<SipDialog*> > l;
-			dialogListLock.lock();
-			for (int i=0; i< dialogs.size(); i++)
-				l.push_back(dialogs[i]);
-			dialogListLock.unlock();
-			return l;
-		}
+		void enqueueCommand(const SipSMCommand &cmd, int queue=LOW_PRIO_QUEUE);
+
+		void enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &);
+		void enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &);
+
+
+		MRef<SipMessageTransport*> getLayerTransport();
+		MRef<SipLayerTransaction*> getLayerTransaction();
+		MRef<SipLayerDialog*> getLayerDialog();
+
 
 		/**
 		//CESC::
@@ -66,9 +108,32 @@ class LIBMSIP_API SipMessageDispatcher : public SipSMCommandReceiver{
 		MRef<SipDialog*> managementHandler;
 		                
 	private:
-		minilist<MRef<SipTransaction*> > transactions;
-		minilist<MRef<SipDialog*> > dialogs;
+		MRef<CommandReceiver*> callback;
+		MRef<SipStack *> sipStack;
+
+		Semaphore semaphore;
+		Mutex mlock;
+                minilist<queue_type> high_prio_command_q;
+                minilist<queue_type> low_prio_command_q;
+
+		
+                //
+                MRef<SipLayerDialog*> dialogLayer;
+
+                //
+                MRef<SipLayerTransaction*> transactionLayer;
+
+                //
+                MRef<SipMessageTransport *> transportLayer;
+		
 		Mutex dialogListLock;
+
+                /**
+                We will use this to stop the dialog container :: run()
+                on stack shutdown.
+                */
+                bool keepRunning;
+
 };
 
 #endif

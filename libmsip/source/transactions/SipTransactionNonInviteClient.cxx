@@ -34,6 +34,7 @@
 
 #include<libmutil/massert.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipCommandString.h>
@@ -48,7 +49,7 @@
 using namespace std;
 
 bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand &command) {
-	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::TU,IGN)){
+	if (transitionMatch(SipMessage::anyType, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer)){
 #ifdef DEBUG_OUTPUT
 		setDebugTransType(command.getCommandPacket()->getType() );
 #endif
@@ -58,38 +59,48 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 			requestTimeout(timerE, "timerE");
 		}
 		requestTimeout(sipStack->getTimers()->getF(), "timerF");
+
+/* TODO/FIXME: This is a bit tricky - we don't know which identity is
+ * currently being used (the getConfig() one will have a null one if
+ * not within a dialog). Maybe the creator of the transaction should
+ * explicitely add a route set instead of implicitely specifying it always?
+ * -EE
+ 
 		massert(getConfig());
 		massert(getConfig()->sipIdentity);
-		if( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0){
+
+		MRef<SipProxy*> proxy = getConfig()->sipIdentity->getSipProxy();
+		
+		if( proxy->sipProxyAddressString.size()>0){
 			MRef<SipHeaderValue*> hdr;
 
 			hdr = lastRequest->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
 
 			if( !hdr ){
-				lastRequest->addRoute( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
-						       port, transport );
+				lastRequest->addRoute( proxy->sipProxyAddressString,
+						       proxy->sipProxyPort, 
+						       proxy->getTransport() );
 			}
 		}
-
+*/
 		send(*lastRequest,true);
 		
 		return true;
 	}else{
-		
 		return false;
 	}
 }
 
 bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer,/*IGN*/ SipSMCommand::transaction_layer, "1**")){
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		SipSMCommand cmd(
 				command.getCommandPacket(), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU );
-		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer );
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 		
 		return true;
 	}else{
@@ -100,22 +111,22 @@ bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand
 
 bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipCommandString::transport_error) 
-			|| transitionMatch(command, "timerF")){
+	if (transitionMatch(command, SipCommandString::transport_error, SipSMCommand::transport_layer, SipSMCommand::transaction_layer) 
+			|| transitionMatch(command, "timerF", SipSMCommand::transaction_layer, SipSMCommand::transaction_layer)){
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transport_error),
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
-			SipSMCommand::transaction,
-			SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+			SipSMCommand::transaction_layer,
+			SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE */);
 		
 		
 		return true;
@@ -127,7 +138,7 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 
 bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const SipSMCommand &command){
 
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
 		
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		cancelTimeout("timerE"); //no more retx of the request
@@ -139,9 +150,9 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 		//forward to TU
 		MRef<SipMessage*> pref(*pack);
 		SipSMCommand cmd(pref, 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 
 		
 		return true;
@@ -153,7 +164,7 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 
 bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, "timerE")){
+	if (transitionMatch(command, "timerE",SipSMCommand::transaction_layer,SipSMCommand::transaction_layer)){
 		timerE *= 2;
 		if( timerE > sipStack->getTimers()->getT2() ) 
 			timerE = sipStack->getTimers()->getT2();
@@ -173,15 +184,15 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 
 bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "1**")){
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		MRef<SipMessage*> pref(*pack);
 		SipSMCommand cmd( pref, 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
 		cancelTimeout("timerE");
 
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 		
 		return true;
 	}else{
@@ -193,20 +204,27 @@ bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCom
 //TODO: make sure  transport_error is sent when it should be
 bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( const SipSMCommand &command){
 		
-	if (transitionMatch(command, SipCommandString::transport_error) || transitionMatch(command, "timerF")){
+	if (		transitionMatch(command, 
+				SipCommandString::transport_error,
+				SipSMCommand::transport_layer,
+				SipSMCommand::transaction_layer) 
+			|| transitionMatch(command, 
+				"timerF",
+				SipSMCommand::transaction_layer,
+				SipSMCommand::transaction_layer)){
 
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
 
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
-				SipSMCommand::transaction,
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+				SipSMCommand::transaction_layer,
+				SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
 
 		
 		return true;
@@ -218,16 +236,16 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 
 
 bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMCommand &command) {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
 		
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		//send command to TU
 		SipSMCommand cmd(
 				command.getCommandPacket(), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 		
 		if( isUnreliable() ) 
 			requestTimeout(sipStack->getTimers()->getK(), "timerK");
@@ -244,7 +262,10 @@ bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMC
 
 bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand &command) {
 		
-	if (transitionMatch(command, "timerE")){
+	if (transitionMatch(command, 
+				"timerE",
+				SipSMCommand::transaction_layer,
+				SipSMCommand::transaction_layer)){
 		//no need to check if isUnreliable() ... timerE will never be started anyway
 		timerE *= 2;
 		if( timerE > sipStack->getTimers()->getT2() ) 
@@ -263,12 +284,15 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 }
 
 bool SipTransactionNonInviteClient::a9_completed_terminated_timerK( const SipSMCommand &command) {
-	if (transitionMatch(command, "timerK")){
+	if (transitionMatch(command, 
+				"timerK",
+				SipSMCommand::transaction_layer,
+				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
 			CommandString( callId, SipCommandString::transaction_terminated),
-			SipSMCommand::transaction,
-			SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+			SipSMCommand::transaction_layer,
+			SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
 		
 		return true;
 	}else{
@@ -350,26 +374,28 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 
 SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipStack *> stack,
-		MRef<SipDialog*> d, 
-		int seq_no, const string &cSeqMethod, string callid) : 
-		SipTransactionClient(stack, d, seq_no, cSeqMethod, "", callid),
+		//MRef<SipDialog*> d, 
+		int seq_no, 
+		const string &cSeqMethod, 
+		const string &callid) : 
+			SipTransactionClient(stack, /*d,*/ seq_no, cSeqMethod, "", callid),
 			lastRequest(NULL)
 {
 	
 	//timers are set in the initial transition
 
-	MRef<SipCommonConfig *> conf = getConfig(); 
+//	MRef<SipCommonConfig *> conf = getConfig(); 
 //	if (dialog){
 //		conf = dialog->getDialogConfig()->inherited;
 //	}else{
 //		conf = sipStack->getStackConfig();
 //	}
 
-	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; massert (0);}
-	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; massert (0);}
-	if( conf->sipIdentity->getSipProxy()->sipProxyAddressString.size()<=0 ) { cerr << "SipTranNonInvCli: no ipaddr" << endl; massert (0);}
+//	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; massert (0);}
+//	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; massert (0);}
+//	if( conf->sipIdentity->getSipProxy()->sipProxyAddressString.size()<=0 ) { cerr << "SipTranNonInvCli: no ipaddr" << endl; massert (0);}
 //	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
-	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
+	//port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
 

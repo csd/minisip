@@ -28,66 +28,249 @@
 #include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipLayerDialog.h>
+#include<libmsip/SipLayerTransaction.h>
 #include<libmsip/SipCommandString.h>
 
 using namespace std;
 
-void SipMessageDispatcher::addTransaction(MRef<SipTransaction*> t){
-	transactions.push_front(t);
+SipMessageDispatcher::SipMessageDispatcher(MRef<SipStack*> stack, MRef<SipMessageTransport*> transp):sipStack(stack),keepRunning(true){
+	transportLayer = transp;
+	transactionLayer = new SipLayerTransaction(this,transportLayer);
+	dialogLayer = new SipLayerDialog(this);
+
+	//transportLayer->setSipSMCommandReceiver(this);
+	transportLayer->setDispatcher(this);
+
+
 }
 
-void SipMessageDispatcher::removeTransaction(MRef<SipTransaction*> t){
+MRef<SipStack*> SipMessageDispatcher::getSipStack(){
+	return sipStack;
+}
 
-	for (int i=0; i< transactions.size(); i++){
-		if (transactions[i]==t){
-			transactions.remove(i);
-			i=0;
-			return;
+list<MRef<SipDialog *> > SipMessageDispatcher::getDialogs(){
+	return dialogLayer->getDialogs();
+}
+
+void SipMessageDispatcher::run(){
+#ifdef DEBUG_OUTPUT
+	static int runcount = 1;
+#endif
+
+	while (keepRunning){
+#ifdef DEBUG_OUTPUT
+		runcount--;
+#endif
+		mdbg << "DIALOG CONTAINER: waiting for command"<< end;
+                semaphore.dec();
+
+#ifdef DEBUG_OUTPUT
+		runcount++;
+		massert(runcount==1);
+#endif
+		
+		struct queue_type item;
+                
+                mlock.lock();
+		if (high_prio_command_q.size()>0)
+			item = high_prio_command_q.pop_back();	
+		else{
+			massert(low_prio_command_q.size()>0);
+			item = low_prio_command_q.pop_back();	
 		}
+                mlock.unlock();
+		mdbg << "DISPATCHER: got command!"<<end;
+		if (item.type==TYPE_COMMAND)
+			mdbg << "command: "<< **item.command << end;
+		else
+			mdbg << "timeout: "<< **item.command << end;
+
+
+		bool handled=false;
+		
+		// There are two types of "commands" - SipSMCommands and
+		// timeouts. SipSMCommands are passed to the dispatcher
+		// (and the defaultHandler if they are not handled).
+		// Timeouts have a known receiver set in the queue item.
+		if (item.type==TYPE_COMMAND){
+			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << end;
+		}else{
+			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << end;
+		}
+
+		
+		if (item.type == TYPE_COMMAND){
+		
+			handled=handleCommand(**(item.command));
+			
+		}else{  // item.type == TYPE_TIMEOUT
+			if ( !item.transaction_receiver.isNull() ){
+				handled = item.transaction_receiver->handleCommand(**item.command);
+			}
+
+			if ( !item.call_receiver.isNull() ){
+				handled = item.call_receiver->handleCommand(**item.command);
+			}
+		}
+		
+
+		if (handled){
+			//mdbg<<"DISPATCHER: command handled"<<endl;
+		}else{
+#ifdef DEBUG_OUTPUT			
+			mdbg<<"DISPATCHER: command NOT handled"<<endl;
+#endif
+		}
+
+		item.command=NULL;
+                item.transaction_receiver=NULL;
+                item.call_receiver=NULL;
 	}
-	mdbg << "WARNING: BUG? Cound not remove transaction from SipMessageDispatcher!!!!!"<< end;
 }
 
+void SipMessageDispatcher::setCallback(MRef<CommandReceiver*> callback){
+        this->callback = callback;
+}
+
+
+MRef<SipMessageTransport*> SipMessageDispatcher::getLayerTransport(){
+	return transportLayer;
+}
+
+MRef<SipLayerTransaction*> SipMessageDispatcher::getLayerTransaction(){
+	return transactionLayer;
+}
+
+MRef<SipLayerDialog*> SipMessageDispatcher::getLayerDialog(){
+	return dialogLayer;
+}
 
 void SipMessageDispatcher::addDialog(MRef<SipDialog*> d){
-	dialogListLock.lock();
-	dialogs.push_front(d);
-	dialogListLock.unlock();
+	dialogLayer->addDialog(d);
+}
+
+void SipMessageDispatcher::enqueueCommand(const SipSMCommand &command, int queue){
+#ifdef DEBUG_OUTPUT
+	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+#endif
+	struct queue_type item;
+	item.type = TYPE_COMMAND;
+	item.command = MRef<SipSMCommand*>(new SipSMCommand(command));
+
+	mlock.lock();
+	if (queue == HIGH_PRIO_QUEUE){
+		high_prio_command_q.push_front(item);
+	}else{
+		low_prio_command_q.push_front(item);
+	}
+	mlock.unlock();
+	semaphore.inc();
+}
+
+
+void SipMessageDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
+#ifdef DEBUG_OUTPUT
+	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+#endif
+
+        struct queue_type item;
+        item.type = TYPE_TIMEOUT;
+        item.command = MRef<SipSMCommand*>( new SipSMCommand(command));
+        item.transaction_receiver = receiver;
+        item.call_receiver = NULL;
+
+        mlock.lock();
+        high_prio_command_q.push_front(item);
+        mlock.unlock();
+
+        semaphore.inc();
+}
+
+void SipMessageDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &command){
+#ifdef DEBUG_OUTPUT
+	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+#endif
+
+        struct queue_type item;
+        item.type = TYPE_TIMEOUT;
+        item.command = MRef<SipSMCommand*>( new SipSMCommand(command));
+
+        item.call_receiver = receiver;
+
+        mlock.lock();
+        high_prio_command_q.push_front(item);
+        mlock.unlock();
+
+        semaphore.inc();
 }
 
 
 //TODO: Optimize how transactions are found based on branch parameter.
 bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 
-	// 0. Find transaction based on branch parameter
-	// 
+#ifdef DEBUG_OUTPUT
+	mdbg << "DISPATCHER: SipMessageDispatcher got command "<< c<<endl;
+#endif
 	
-	string branch;
-	string seqMethod;
-	if (c.getType()==SipSMCommand::COMMAND_PACKET){
-		branch = c.getCommandPacket()->getDestinationBranch();
-		seqMethod = c.getCommandPacket()->getCSeqMethod();
+	int dst = c.getDestination();
+	
+	bool ret=false;
+	if (dst==SipSMCommand::dialog_layer){
+		if (c.getSource()!=SipSMCommand::dialog_layer && c.getSource()!=SipSMCommand::transaction_layer){
+			mdbg<< "DISPATCHER: WARNING: Dialog layer is expected to receive commands only from dialog or trasaction"<<endl;
+		}
+		ret=dialogLayer->handleCommand(c);
+	}else
+	if (dst==SipSMCommand::transaction_layer){
+		ret=transactionLayer->handleCommand(c);
+	}else
+	if (dst==SipSMCommand::transport_layer){
+		if (c.getSource()!=SipSMCommand::transaction_layer){
+			mdbg<< "DISPATCHER: WARNING: Transport layer is expected to receive commands only from trasaction"<<endl;
+		}
+		ret=transportLayer->handleCommand(c);
+	}else
+	if (dst==SipSMCommand::dispatcher){
+	
+		ret = maintainenceHandleCommand(c);
+	}else{
+		cerr << "ERROR: SipMessageDispatcher::handleCommand: Unknown destilation (layer)"<<endl;
+	}
+	
+	if (!ret){
+#ifdef DEBUG_OUTPUT
+		mdbg <<"WARNING SipMessageDispatcher: The destination layer did not handle the command!"<<endl;
+#endif
 	}
 
-#ifdef DEBUG_OUTPUT
-	mdbg<< end << 	"Dispatcher got command: "<< end << 
-			"'----> " << c << end;
-#endif
+	return ret;
+		
+}
 
-	dialogListLock.lock();
-	if ((c.getDestination()==SipSMCommand::DIALOGCONTAINER)
-			&& c.getType()==SipSMCommand::COMMAND_STRING){	
-		if (c.getCommandString().getOp()==SipCommandString::call_terminated){
-			for (int i=0; i< dialogs.size(); i++){
-				if (dialogs[i]->getCurrentStateName()=="terminated"){
-					MRef<SipDialog *> dlg = dialogs[i];
-					dialogs.remove(i);
-					//merr << "CESC: SipMsgDispatcher::hdleCmd : breaking the dialog vicious circle" << end;
-					dlg->freeStateMachine();
-					i=0;
+bool SipMessageDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
+
+	if (c.getType()==SipSMCommand::COMMAND_STRING){	
+
+		if (c.getCommandString().getOp()==SipCommandString::transaction_terminated){
+			transactionLayer->removeTerminatedTransactions();
+
+			// All transactions will be tried every time a transaction terminates
+			// This can be improved, but is perfectly ok for an
+			// UA. An application with a large number of
+			// dialogs might want to optimize.
+			list<MRef<SipDialog*> > dlgs = getDialogs();
+			list<MRef<SipDialog*> >::iterator i;
+			for ( i=dlgs.begin(); i!=dlgs.end(); i++){
+				if ( (*i)->getCurrentStateName()=="termwait" ){
+					(*i)->signalIfNoTransactions();
 				}
 			}
-			dialogListLock.unlock();
+
+			return true;
+
+		}else if (c.getCommandString().getOp()==SipCommandString::call_terminated){
+			dialogLayer->removeTerminatedDialogs();
 			return true;
 			
 		}else if ( 	c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||
@@ -100,126 +283,28 @@ bool SipMessageDispatcher::handleCommand(const SipSMCommand &c){
 				c.getCommandString().getOp() == SipCommandString::call_terminated_early ||
 				c.getCommandString().getOp() == SipCommandString::register_ok) { 
 			//commands that are only interesting to the management dialog ...
-			dialogListLock.unlock(); //unlock the list ... it may be used in the SipDialogManagement
 			//Refurbish the command ... or the SipDialog::handleCmd won't let it through
 			SipSMCommand cmd( c.getCommandString(),
-					SipSMCommand::DIALOGCONTAINER,
-					SipSMCommand::TU);
+					SipSMCommand::dispatcher,
+					SipSMCommand::dispatcher);
 			managementHandler->handleCommand(cmd);
 			return true;
 			
 		}else if ( c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
-			dialogListLock.unlock(); //unlock the list ... it may be used in the SipDialogManagement
 			SipSMCommand cmd( c.getCommandString(),
-					SipSMCommand::DIALOGCONTAINER,
-					SipSMCommand::TU);
+					SipSMCommand::dispatcher,
+					SipSMCommand::dispatcher);
 // 			managementHandler->handleCommand(cmd); //process the command, so it moves to terminated state
-			managementHandler->getSipStack()->getDialogContainer()->stopRunning();
+			managementHandler->getSipStack()->getDispatcher()->stopRunning();
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
-			mdbg << "SipMessageDispatcher: Error: did not understand command: "<< c << end;
+			mdbg << "SipMessageDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << end;
 #endif
-			dialogListLock.unlock();
 			return false;
 		}
 	}
-	if ((c.getDestination()==SipSMCommand::ANY || c.getDestination()==SipSMCommand::transaction )
-			&& c.getType()==SipSMCommand::COMMAND_PACKET){	
 
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(0): Trying to find transaction"<<end;
-#endif
-
-		bool hasBranch = (branch!="");
-		bool hasSeqMethod = (seqMethod!="");
-		if (!hasBranch){
-			mdbg <<  "WARNING: SipMessageDispatcher::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
-		}
-		
-		for (int i=0; i< transactions.size(); i++){
-			if ( (!hasBranch || transactions[i]->getBranch()== branch || seqMethod=="ACK" || seqMethod=="PRACK") &&
-			     (!hasSeqMethod || transactions[i]->getCSeqMethod()==seqMethod || 
-			        (seqMethod == "ACK" && transactions[i]->getCSeqMethod() == "INVITE")) ){
-				
-				bool ret = transactions[i]->handleCommand(c);
-#ifdef DEBUG_OUTPUT
-				if (!ret && hasBranch)
-					mdbg << "SipMessageDispatcher: transaction did not handle message with matching branch id"<<end;
-#endif
-				if (ret){
-					dialogListLock.unlock();
-					return ret;
-				}
-			}
-		}
-
-	}else{
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(0): NOT trying to find transaction (destination is other than transaction)"<<end;
-#endif
-	}
-
-/*
-	// 1. If no branch parameter was set
-	if (c.getDestination()==SipSMCommand::ANY 
-			|| c.getDestination()==SipSMCommand::transaction 
-			&& !(c.getType()==SipSMCommand::COMMAND_PACKET && branch!="")){
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(1): trying all transactions (WARNING - SUB OPTIMAL INTERNAL MESSAGE ROUTING)"<<end;
-#endif
-		for (int i=0; i< transactions.size(); i++){
-		//for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
-			mdbg << "Trying transaction: "<< transactions[i]->getMemObjectType()<< end;
-			if ( transactions[i]->handleCommand(c) ){
-				dialogListLock.unlock();
-				return true;
-			}
-		}
-	}else{
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(1): NOT trying all transactions"<<end;
-#endif
-	}
-*/	
-	// 2. If not any branch parameter or the transaction was not found, try with each dialog
-	//int j=0; //unused??
-        MRef<SipDialog *> dialog;
-	if (c.getDestination()==SipSMCommand::ANY || c.getDestination()==SipSMCommand::TU){
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(2): trying all dialogs"<<end;
-#endif
-		int i;
-		try{
-		for (i=0; i<dialogs.size(); i++){
-//#ifdef DEBUG_OUTPUT
-//			mdbg << "SipMessageDispatcher: trying dialog with index "<< j++ << end;
-//#endif
-                        dialog = dialogs[i];
-                        dialogListLock.unlock();
-			
-			if ( dialog->handleCommand(c) ){
-				//dialogListLock.unlock();
-				return true;
-			}
-                        dialogListLock.lock();
-		}
-		}catch(exception &){
-			cerr << "SipMessageDispatcher: caught exception i="<< i << endl;
-		}
-
-
-	}else{
-#ifdef DEBUG_OUTPUT
-		mdbg<< "Dispatcher(2): NOT trying all dialogs (destination other than TU)"<<end;
-#endif
-	}
-	
-	//No transaction or dialog handled the command. (SipDialogContainer
-	//is responsible for sending the command to the default handler)
-	mdbg<< "Dispatcher: not handled by transaction or dialog"<<end;
-	dialogListLock.unlock();
 	return false;
-
 }
 

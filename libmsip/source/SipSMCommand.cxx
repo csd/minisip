@@ -33,29 +33,30 @@ using namespace std;
 
 const int SipSMCommand::COMMAND_PACKET=1;
 const int SipSMCommand::COMMAND_STRING=2;
-const int SipSMCommand::remote=1;
-const int SipSMCommand::TU=2;
-const int SipSMCommand::transaction=3;
-const int SipSMCommand::ANY=4;
-const int SipSMCommand::DIALOGCONTAINER=5;
+//const int SipSMCommand::remote=1;
+const int SipSMCommand::dialog_layer=2;
+const int SipSMCommand::transaction_layer=3;
+//const int SipSMCommand::callback=4;
+const int SipSMCommand::dispatcher=5;
+const int SipSMCommand::transport_layer=6;
 
 #ifdef _WIN32_WCE
 Dbg & operator<<(Dbg &o, const SipSMCommand &c){
 #else
 ostream & operator<<(ostream &o, const SipSMCommand &c){
 #endif
-	char *s[5]={"remote","TU","transaction","IGN","DIALOGCONTAINER"};
+	char *s[6]={"(illegal)","dialog_layer","transaction_layer","(illegal)","dispatcher","transport_layer"};
 	if (c.type==SipSMCommand::COMMAND_PACKET){
                 
 		o <<"COMMAND_PACKET:"
                     << (**c.getCommandPacket()).getDescription() 
                     <<" source="<< s[c.source-1]
-                    <<",dest="<<s[c.destination-1];
+                    <<" dest="<<s[c.destination-1];
         }else{
 		o <<"COMMAND_STRING:"<<c.getCommandString().getString()
                     <<",source="<< s[c.source-1]
-                    <<",dest="<<s[c.destination-1];
-			
+                    <<" dest="<<s[c.destination-1];
+		
         }
 	return o;
 }
@@ -87,8 +88,8 @@ SipSMCommand::SipSMCommand(MRef<SipMessage*> p,
 			cmdstr("",""), 
 			cmdpkt(p), 
 			source(source), 
-			destination(destination), 
-			dispatchCount(0){
+			destination(destination)
+{
 
 }
 
@@ -99,8 +100,8 @@ SipSMCommand::SipSMCommand(const CommandString &s,
 			cmdstr(s),
 			cmdpkt(NULL),
 			source(source), 
-			destination(destination), 
-			dispatchCount(0){
+			destination(destination)
+{
 
 }
 

@@ -24,6 +24,7 @@
 #include<libmsip/SipStack.h>
 
 #include<libmsip/SipMessageTransport.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>
@@ -84,7 +85,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	}else{
 		timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
 	}
-	
+
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
 	SipHeader::headerFactories.addFactory("Authorization", sipHeaderAuthorizationFactory);
@@ -122,40 +123,55 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("v", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
 	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderProxyAuthenticateFactory);
-	
+
 	addSupportedExtension("100rel");
 
-	 transportLayer = MRef<SipMessageTransport*>(new
-			 SipMessageTransport(
-				 stackConfig->localIpString,
-				 stackConfig->externalContactIP,
-				 stackConfig->externalContactUdpPort,
-				 stackConfig->localUdpPort,
-				 stackConfig->localTcpPort,
-				 stackConfig->localTlsPort,
-				 cert_chain,
-				 cert_db
-				 )
-			 );
-	
-	dialogContainer = MRef<SipDialogContainer*>(new SipDialogContainer());
-	
+	MRef<SipMessageTransport*> transp = MRef<SipMessageTransport*>(new
+			SipMessageTransport(
+				stackConfig->localIpString,
+				stackConfig->externalContactIP,
+				stackConfig->externalContactUdpPort,
+				stackConfig->localUdpPort,
+				stackConfig->localTcpPort,
+				stackConfig->localTlsPort,
+				cert_chain,
+				cert_db
+				)
+			);
+
+	// Here we need to really know what we are doing since
+	// we are "breaking the law" of not passing this
+	// as argument in the constructor.
+	//
+	// Here it's ok since the dispatcher will keep
+	// a reference to the SipStack thus we won't be
+	// freed (crash) when this line executes.
+	dispatcher = new SipMessageDispatcher(this,transp);
+
 	SipMessage::contentFactories.addFactory("text/plain", sipIMMessageContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/mixed", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/alternative", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
-	transportLayer->setSipSMCommandReceiver(this);
 
 }
 
-MRef<SipDialogContainer*> SipStack::getDialogContainer(){
-	return dialogContainer;
+MRef<SipMessageDispatcher*> SipStack::getDispatcher(){
+	return dispatcher;
 }
+
+void SipStack::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
+	dispatcher->getLayerDialog()->setDefaultDialogCommandHandler(cb);
+}
+
+void SipStack::setTransactionHandlesAck(bool transHandleAck){
+	dispatcher->getLayerTransaction()->doHandleAck(transHandleAck);
+}
+
 
 void SipStack::setCallback(MRef<CommandReceiver*> callback){
 	this->callback = callback;
-	dialogContainer->setCallback(callback);
+	dispatcher->setCallback(callback);
 }
 
 MRef<CommandReceiver*> SipStack::getCallback(){
@@ -164,7 +180,6 @@ MRef<CommandReceiver*> SipStack::getCallback(){
 
 void SipStack::setConfCallback(MRef<CommandReceiver*> callback){
 	this->confCallback = callback;
-	dialogContainer->setConfCallback(callback);
 }
 
 MRef<CommandReceiver*> SipStack::getConfCallback(){
@@ -172,21 +187,16 @@ MRef<CommandReceiver*> SipStack::getConfCallback(){
 }
 
 void SipStack::run(){
-	dialogContainer->run();
+	dispatcher->run();
 }
 
 bool SipStack::handleCommand(const SipSMCommand &command){
-	dialogContainer->enqueueCommand(command, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	dispatcher->enqueueCommand(command, LOW_PRIO_QUEUE);
 	return true;
 }
 
-void SipStack::setDefaultHandler(MRef<SipDialog*> d){
-	dialogContainer->setDefaultHandler(d);
-}
-
 void SipStack::addDialog(MRef<SipDialog*> d){
-	massert(dialogContainer);
-	dialogContainer->addDialog(d);
+	dispatcher->addDialog(d);
 }
 
 MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipStack::getTimeoutProvider(){

@@ -58,10 +58,10 @@ bool transitionMatch(
 		int destination,
 		const string &respFilter)
 {
-	if (source!=IGN &&      command.getSource()!=SipSMCommand::ANY &&      command.getSource() != source){
+	if (/*source!=IGN &&  command.getSource()!=SipSMCommand::ANY &&*/      command.getSource() != source){
 		return false;
 	}
-	if (destination!=IGN && command.getDestination()!=SipSMCommand::ANY && command.getDestination() != destination){
+	if (/*destination!=IGN && command.getDestination()!=SipSMCommand::ANY &&*/ command.getDestination() != destination){
 		return false;
 	}
 	if (command.getType()!=SipSMCommand::COMMAND_PACKET){
@@ -92,10 +92,10 @@ bool transitionMatch(
 	if (command.getType()!=SipSMCommand::COMMAND_STRING){
 		return false;
 	}
-	if (destination!=IGN && destination!=SipSMCommand::ANY && command.getDestination() != destination){
+	if (/*destination!=IGN && destination!=SipSMCommand::ANY && */ command.getDestination() != destination){
 		return false;
 	}
-	if (source!=IGN && source!=SipSMCommand::ANY && command.getSource() != source){
+	if (/*source!=IGN && source!=SipSMCommand::ANY &&*/ command.getSource() != source){
 		return false;
 	}
 	if (command.getCommandString().getOp()!=cmd_str){

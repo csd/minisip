@@ -84,7 +84,7 @@ resp. to TU |  1xx             V                     |   |
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
@@ -95,7 +95,7 @@ using namespace std;
 
 	
 bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**")){
 		MRef<SipResponse *> resp((SipResponse*) *command.getCommandPacket());
 		
 		cancelTimeout("timerA");
@@ -107,12 +107,15 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 
 		//update dialogs route set ... needed to add route headers to the ACK we are going to send
 		//setDialogRouteSet( resp );
-		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		//assert(dialog); //An invite transaction must always be within a dialog
+
+		//TODO/XXX/FIXME: Do this in the TU instead!! --EE
+//		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
 			
 		SipSMCommand cmd( command.getCommandPacket(), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1001************"<<endl;
 #endif
@@ -125,7 +128,7 @@ bool SipTransactionInviteClientUA::a1001_calling_completed_2xx( const SipSMComma
 }
 	
 bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
@@ -136,12 +139,14 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 		
 		//update dialogs route set ... needed to add route headers to the ACK we are going to send
 		//setDialogRouteSet( resp );
-		dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
+		//assert(dialog);
+		//TODO/XXX/FIXME: Do in TU instead
+		//dialog->dialogState.updateState( (MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) ) );
 			
 		SipSMCommand cmd( command.getCommandPacket(), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1002************"<<endl;
 #endif
@@ -154,7 +159,7 @@ bool SipTransactionInviteClientUA::a1002_proceeding_completed_2xx( const SipSMCo
 }
 	
 bool SipTransactionInviteClientUA::a1003_completed_completed_2xx( const SipSMCommand &command) {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::remote, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**")){
 		MRef<SipResponse *> resp((SipResponse*)*command.getCommandPacket());
 #ifdef DEBUG_OUTPUT
 		cerr<<"****************1003************"<<endl;
@@ -199,9 +204,12 @@ void SipTransactionInviteClientUA::changeStateMachine(){
 }
 
 
-SipTransactionInviteClientUA::SipTransactionInviteClientUA(MRef<SipStack*> stack, MRef<SipDialog*> call, 
-            int seq_no, const string &cSeqMethod, string callid): 
-		SipTransactionInviteClient(stack, call, seq_no, cSeqMethod, callid)
+SipTransactionInviteClientUA::SipTransactionInviteClientUA(MRef<SipStack*> stack, 
+		//MRef<SipDialog*> call, 
+		int seq_no, 
+		const string &cSeqMethod, 
+		const string &callid): 
+			SipTransactionInviteClient(stack, /*call,*/ seq_no, cSeqMethod, callid)
 {
 	changeStateMachine();
 }

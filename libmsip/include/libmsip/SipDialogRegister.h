@@ -74,6 +74,8 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		bool a10_tryingnoauth_failed_transporterror( const SipSMCommand &command);
 		bool a12_registred_tryingnoauth_proxyregister( const SipSMCommand &command);
 		bool a13_failed_terminated_notransactions( const SipSMCommand &command);
+		bool a14_noauth_noauth_1xx( const SipSMCommand &command);
+		bool a15_stored_stored_1xx( const SipSMCommand &command);
 		
 		void setUpStateMachine();
 

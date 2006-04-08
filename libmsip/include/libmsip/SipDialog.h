@@ -37,12 +37,15 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
+
+//#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipRequest.h>
 
 class SipStack;
 class SipTransaction;
 class SipDialogConfig;
-class SipDialogContainer;
+class SipMessageDispatcher;
+//class SipDialogContainer;
 
 
 /**
@@ -157,37 +160,40 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		std::string getCallId(){return dialogState.callId;}
 		
-		/**
-		 * get a reference to the dialog container.
-		 * @return reference to <code>SipDialogContainer</code>
-		 */
-		MRef<SipDialogContainer*> getDialogContainer();
+		//MRef<SipMessageDispatcher*> getDispatcher();
 
 		MRef<SipStack*> getSipStack();
 
 		void signalIfNoTransactions();
 
 		/**
-		 * register a transaction for this dialog
-		 * @param trans the SipTransaction that should be registered
+		 * Register a transaction to this dialog. This does
+		 * not mean that it is added to the transaction layer.
+		 * 
+		 * @param trans the SipTransaction that should be associated
+		 *        with this dialog.
 		 */
-		void registerTransaction(MRef<SipTransaction*> trans);
+//		void registerTransactionToDialog(MRef<SipTransaction*> trans);
 
 		std::list<std::string> getRouteSet(){return dialogState.routeSet;}
 		
-                std::list<MRef<SipTransaction*> > getTransactions(){return transactions;}
+		/**
+		 * Returns all dialogs within this transaction (all
+		 * transactions that have the same call id as this 
+		 * dialog).
+		 */
+                std::list<MRef<SipTransaction*> > getTransactions();//{return transactions;}
 
 		SipDialogState dialogState;
 		
 	protected:
-		///a list containing all transactions
-		std::list<MRef<SipTransaction*> > transactions;
-
-		//the dialog container
-		//MRef<SipDialogContainer*> dialogContainer;
+//		///a list containing all transactions
+//		std::list<MRef<SipTransaction*> > transactions;
 
 		///
 		MRef<SipStack*> sipStack;
+		
+		MRef<SipMessageDispatcher*> dispatcher;
 
 	private:
 		
@@ -197,6 +203,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
+#include<libmsip/SipMessageDispatcher.h>
 
 #endif
 

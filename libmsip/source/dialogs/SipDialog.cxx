@@ -32,7 +32,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipMessageTransport.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
@@ -46,6 +46,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
                 sipStack(stack), 
                 callConfig(callconf)
 {
+	dispatcher = stack->getDispatcher();
 	dialogState.seqNo=100 * (rand()%9+1);
 	dialogState.remoteSeqNo=-1;
 	dialogState.secure=false;	//TODO: this variable is not maintained 
@@ -65,83 +66,51 @@ MRef<SipDialogConfig*> SipDialog::getDialogConfig(){
 void SipDialog::handleTimeout(const string &c){
 	SipSMCommand cmd( 
 			CommandString(dialogState.callId, c), 
-			SipSMCommand::TU, 
-			SipSMCommand::TU );
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::dialog_layer );
 
-	sipStack->getDialogContainer()->enqueueTimeout(
-			MRef<SipDialog*>(this),
-			cmd
-			);
-}
-
-MRef<SipDialogContainer*> SipDialog::getDialogContainer(){
-	return sipStack->getDialogContainer();
-}
-
-void SipDialog::registerTransaction(MRef<SipTransaction*> trans){
-	sipStack->getDialogContainer()->getDispatcher()->addTransaction(trans);
-	transactions.push_front(trans);
+	dispatcher->enqueueTimeout( this, cmd);
 }
 
 void SipDialog::signalIfNoTransactions(){
-	if (transactions.size()==0){
-		SipSMCommand cmd(
-				CommandString(dialogState.callId, SipCommandString::no_transactions), 
-				SipSMCommand::TU, 
-				SipSMCommand::TU 
-				);
 
-				// Dialogs does not need to be deleted immediately (unlike
-				// transactions), and can be placed in the end of the queue. 
-				// It is placed in the high prio queue so that it is guaranteed 
-				// to be deleted even under high load.
-		getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE); 
+	if (getCurrentStateName()=="termwait"){
+
+		list<MRef<SipTransaction*> > t = getTransactions();
+
+		if (t.size()==0){
+			SipSMCommand cmd(
+					CommandString(dialogState.callId, SipCommandString::no_transactions), 
+					SipSMCommand::dialog_layer, 
+					SipSMCommand::dialog_layer 
+					);
+
+			// Dialogs does not need to be deleted immediately (unlike
+			// transactions), and can be placed in the end of the queue. 
+			// It is placed in the high prio queue so that it is guaranteed 
+			// to be deleted even under high load.
+			dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/); 
+		}
 	}
 }
 
-
+list<MRef<SipTransaction*> > SipDialog::getTransactions(){
+	return sipStack->getDispatcher()->getLayerTransaction()->getTransactionsWithCallId(getCallId());
+}
 
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
 	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
 	
-	//cerr<<"SD: "+command.getCommandString().getString()<<endl;
-	if (command.getType()==SipSMCommand::COMMAND_STRING 
-			&& command.getCommandString().getOp()==SipCommandString::transaction_terminated){
-		
-		bool handled =false;
-		MRef<SipTransaction*> trans;
-		bool done;
-		do{
-			done=true;
-			for (list<MRef<SipTransaction*> >::iterator i=transactions.begin(); i!=transactions.end(); i++){
-				if ((*i)->getCurrentStateName()=="terminated"){
-					trans = (*i);
-					sipStack->getDialogContainer()->getDispatcher()->removeTransaction(*i);
-					transactions.erase(i);
-					//i=transactions.begin();
-					trans->freeStateMachine(); //let's break the cyclic references ...
-					//merr << "CESC: SipDlg::hdlCmd : freeing sip transaction state machine ... breaking the vicious circle!" << end;
-					handled=true;
-					done=false;
-					break;
-				}
-			}
-		}while(!done);
-
-		if (handled){
-			signalIfNoTransactions();
-			return true;
-		}
-	}
-	
-	if (! (command.getDestination()==SipSMCommand::TU||command.getDestination()==SipSMCommand::ANY) ){
+	if (! (command.getDestination()==SipSMCommand::dialog_layer) ){
 		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< end;
 		
 		return false;
 	}
 
-	if (command.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId!="" && dialogState.callId != command.getCommandPacket()->getCallId()){
+	if (command.getType()==SipSMCommand::COMMAND_PACKET 
+			&& dialogState.callId != "" 
+			&& dialogState.callId != command.getCommandPacket()->getCallId()){
 		mdbg << "SipDialog: denying command based on destination id"<< end;
 		
 		return false;

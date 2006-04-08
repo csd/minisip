@@ -29,7 +29,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogRegister.h>
-#include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipRequest.h>
@@ -57,16 +57,16 @@
 cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                        |
   a0 send_noauth   |  |      a2 send_auth    | S3            |---------------------+  |
                    |  | +------------------->| Trying_stored |                     |  |
-                   V  | |                    |               |-+                   |  |
-            +-------------+                  +---------------+ | 401               |  |
+                   V  | |            1xx   +-|               |-+                   |  |
+            +-------------+          a15 - +>+---------------+ | 401               |  |
             |S1           | 401&&nopass                        | a4 ask_dialog     |  |
         +-->|Trying_noauth| a3 ask_dialog    +---------------+ |                   |  |
-        |   |             |------------------| S4            |<+                   |  |
+        |   |             |----------------->| S4            |<+                   |  |
         |   +-------------+                  | Ask password  |---+ cmdstr:setpass  |  |
-        |          |                         |               |   | a5 send_auth    |  |
-        |          |                         +---------------+<--+                 |  |
-        |   2xx OK |                           | |      ^  |cancel +----------+    |  |
-        |   a1 -   |                           | +------+  +------>| S5       |<---)--+
+        |          |  |  ^                   |               |   | a5 send_auth    |  |
+        |          |  +--+                   +---------------+<--+                 |  |
+        |   2xx OK |    1xx                    | |      ^  |cancel +----------+    |  |
+        |   a1 -   |    a14 -                  | +------+  +------>| S5       |<---)--+
         |          V           200             |  401       a9     | Failed   |    |
         |   +-------------+    a6 -            |  a7 ask_dialog a8 |          |    |
         |   |  S2         |<-------------------+                   +----------+    |
@@ -78,6 +78,7 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
              a12 cmdstr:register <proxy>                           |terminated|
                                                                    |          |
                                                                    +----------+
+  TODO: handle all possible responses							
 */  
 
 using namespace std;
@@ -85,7 +86,10 @@ using namespace std;
 //a12 also deals with proxy_register ... but once it is already registered ...
 bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::proxy_register)){
+	if (transitionMatch(command, 
+				SipCommandString::proxy_register,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
@@ -109,22 +113,26 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		}
 			
 		++dialogState.seqNo;
-
+/*
 		MRef<SipTransaction*> trans = 
 			new SipTransactionNonInviteClient(
 				sipStack, 
-				this, 
-				/*seqNo*/ dialogState.seqNo, 
+				//this, 
+				dialogState.seqNo, 
 				"REGISTER",
 				dialogState.callId);
-		registerTransaction(trans);
-		send_noauth(trans->getBranch());
+		dispatcher->getLayerTransaction()->addTransaction(trans);
+		registerTransactionToDialog(trans);
+*/
+		send_noauth(/*trans->getBranch()*/"");
+		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
 	}else{
+		cerr << "EEEE: Error: command is "<<command<<endl;
 		massert(1==0); // this should never happen - the first transaction MUST be register command
 		return false;
 	}
@@ -132,7 +140,11 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 
 bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "2**")){  
+	if (transitionMatch(SipResponse::type,
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"2**")){  
 
 ///FIXME: XXXXXX Removed socket from packet - this functionality needs to be looked over
 ///		regcall->getDialogContainer()->getPhoneConfig()->proxyConnection = command.getCommandPacket()->getSocket();
@@ -146,13 +158,13 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+			dispatcher->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}
 		
 		//this is for the shutdown dialog 
-		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
 
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
@@ -169,18 +181,24 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 }
 
 bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMCommand &command){
-	if ( hasPassword() && transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "401")){
+	if ( 		hasPassword() 
+			&& transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"401")){
 		++dialogState.seqNo;
 
-		MRef<SipTransaction*> trans( 
+/*		MRef<SipTransaction*> trans( 
 			new SipTransactionNonInviteClient(
 				sipStack, 
-				this, 
+				//this, 
 				dialogState.seqNo, 
 				"REGISTER",
 				dialogState.callId));
-		registerTransaction(trans);
-
+		dispatcher->getLayerTransaction()->addTransaction(trans);
+		registerTransactionToDialog(trans);
+*/
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 		
@@ -189,7 +207,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 		//setNonce( resp->getNonce() );
 		setNonce(resp->getAuthenticateProperty("nonce"));
 
-		send_auth(trans->getBranch());
+		send_auth(/*trans->getBranch()*/"");
 		//TODO: inform GUI
 
 		return true;
@@ -199,7 +217,12 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 }
 
 bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMCommand &command){
-	if ( hasPassword() && transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "401")){
+	if ( 		!hasPassword() 
+			&& transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"401")){
 		
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -207,7 +230,7 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 		//setRealm( resp->getRealm() );
@@ -222,7 +245,11 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 
 bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::TU, "401")){
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"401")){
 
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -230,7 +257,7 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 		//setRealm( resp->getRealm() );
@@ -246,7 +273,10 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 
 bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipCommandString::setpassword)){
+	if (transitionMatch(command, 
+				SipCommandString::setpassword,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 
 	    //TODO: Ask password
 		
@@ -255,16 +285,18 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 		
 		++dialogState.seqNo;
 
-		MRef<SipTransaction*> trans( 
+/*		MRef<SipTransaction*> trans( 
 			new SipTransactionNonInviteClient(
 				sipStack, 
-				this, 
+				//this, 
 				dialogState.seqNo, 
 				"REGISTER",
 				dialogState.callId));
-		registerTransaction(trans);
+		dispatcher->getLayerTransaction()->addTransaction(trans);
+		registerTransactionToDialog(trans);
+*/
 
-		send_auth(trans->getBranch());
+		send_auth(/*trans->getBranch()*/"");
 		return true;
 	}else{
 		return false;
@@ -273,7 +305,11 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 
 bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer,
+				SipSMCommand::dialog_layer, 
+				"2**")){
 		
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
@@ -285,12 +321,12 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		//TODO: inform GUI
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+			dispatcher->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}		
 		//this is for the shutdown dialog 
-		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
 		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
@@ -310,7 +346,11 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 
 bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction, IGN, "401")){
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"401")){
 
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -318,7 +358,7 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 			SipCommandString::ask_password, 
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
 		setRealm( getRealm() );
@@ -331,7 +371,11 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 
 bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction, IGN, "2**")){
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"2**")){
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
 	
@@ -342,12 +386,12 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);   
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		if (getGuiFeedback()){
-			getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+			dispatcher->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}
 		//this is for the shutdown dialog 
-		SipSMCommand cmd( cmdstr, SipSMCommand::TU, SipSMCommand::DIALOGCONTAINER );
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE ); 
+		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
 		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
@@ -368,7 +412,11 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &command){
 	
 	//TODO: implement cancel functionality in GUI
-	if (transitionMatch(command, "cancel_register")){
+	if (transitionMatch(command, 
+				"cancel_register",
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
+
 		//Mark the identity as currently un-registered
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( false );
 	
@@ -383,14 +431,17 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 
 bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipCommandString::transport_error)){
+	if (transitionMatch(command, 
+				SipCommandString::transport_error,
+				SipSMCommand::transport_layer,
+				SipSMCommand::dialog_layer)){
 		
 		//Mark the identity as currently un-registered
 		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( false );
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::transport_error);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -399,7 +450,10 @@ bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMComma
 
 bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::proxy_register)){
+	if (transitionMatch(command, 
+				SipCommandString::proxy_register,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
 
 		cancelTimeout(SipCommandString::proxy_register);
 
@@ -425,19 +479,21 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		}		
 		
 		++dialogState.seqNo;
-		MRef<SipTransaction*> trans = 
+/*		MRef<SipTransaction*> trans = 
 			new SipTransactionNonInviteClient(
 				sipStack, 
-				this, 
+				//this, 
 				dialogState.seqNo, 
 				"REGISTER",
 				dialogState.callId);
-		registerTransaction(trans);
-		send_noauth(trans->getBranch());
+		dispatcher->getLayerTransaction()->addTransaction(trans);
+		registerTransactionToDialog(trans);
+*/
+		send_noauth(/*trans->getBranch()*/"");
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
-		getDialogContainer()->getCallback()->handleCommand("gui", cmdstr );
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -447,16 +503,46 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 
 bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::no_transactions)){
+	if (transitionMatch(command, 
+				SipCommandString::no_transactions,
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer)){
+
 		CommandString cmdstr ( dialogState.callId, 
 				SipCommandString::call_terminated);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
 		SipSMCommand cmd(cmdstr,
-				SipSMCommand::TU,
-				SipSMCommand::DIALOGCONTAINER);
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dispatcher);
 		
-		getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogRegister::a14_noauth_noauth_1xx( const SipSMCommand &command){
+	
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"1**")){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogRegister::a15_stored_stored_1xx( const SipSMCommand &command){
+	
+	if (transitionMatch(SipResponse::type, 
+				command, 
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer, 
+				"1**")){
 		return true;
 	}else{
 		return false;
@@ -594,14 +680,14 @@ bool SipDialogRegister::hasPassword(){
 bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 
 	if (command.getType()==SipSMCommand::COMMAND_PACKET 
-			&& !(command.getDestination()==SipSMCommand::TU 
-			|| command.getDestination()==SipSMCommand::ANY)){
+			&& !(command.getDestination()==SipSMCommand::dialog_layer 
+			/*|| command.getDestination()==SipSMCommand::ANY*/)){
 		merr << "WARNING: UNEXPECTED: received packet in SipDialogRegister: "<<command.getCommandPacket()->getDescription() << end;
 		return false;
 	}
 
 	if (command.getType()==SipSMCommand::COMMAND_STRING 
-		&& (command.getDestination()==SipSMCommand::TU || command.getDestination()==SipSMCommand::ANY)
+		&& (command.getDestination()==SipSMCommand::dialog_layer /*|| command.getDestination()==SipSMCommand::ANY*/)
 		&& (command.getCommandString().getOp()==SipCommandString::proxy_register)
 		&& ( command.getCommandString()["proxy_domain"]=="" 
 			 || command.getCommandString()["proxy_domain"]== getDialogConfig()->inherited->sipIdentity->sipDomain)
@@ -610,8 +696,8 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 	}
 
 	if (command.getType()==SipSMCommand::COMMAND_STRING
-		&& (command.getDestination()==SipSMCommand::TU 
-		|| command.getDestination()==SipSMCommand::ANY)){
+		&& (command.getDestination()==SipSMCommand::dialog_layer 
+		/*|| command.getDestination()==SipSMCommand::ANY*/)){
 		
 		if (dialogState.callId == command.getCommandString().getDestinationId()){
 //			getPhone()->log(LOG_INFO, "SipDialogRegister::handleCommand: found matching call id");
@@ -651,8 +737,8 @@ void SipDialogRegister::send_noauth(string branch){
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 	
-	SipSMCommand cmd(*reg, SipSMCommand::TU, SipSMCommand::transaction);
-	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 void SipDialogRegister::send_auth(string branch){
@@ -673,8 +759,8 @@ void SipDialogRegister::send_auth(string branch){
 		nonce, 
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword
 	);
-	SipSMCommand cmd( *reg, SipSMCommand::TU, SipSMCommand::transaction);
-	sipStack->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+	SipSMCommand cmd( *reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
 

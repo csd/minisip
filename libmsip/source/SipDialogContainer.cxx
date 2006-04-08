@@ -100,22 +100,21 @@ MRef<CommandReceiver*> SipDialogContainer::getConfCallback() const{
 }
 
 
-void SipDialogContainer::enqueueCommand(const SipSMCommand &command, int queue,  int priority){
+void SipMessageDispatcher::enqueueCommand(const SipSMCommand &command, int queue,  int priority){
 	struct queue_type item;
 	item.type = TYPE_COMMAND;
 	item.command = MRef<SipSMCommand*>(new SipSMCommand(command));
-//	mdbg << "SipDialogContainer: enqueueing command "<< command << end;
        
         mlock.lock();
 	if (queue == HIGH_PRIO_QUEUE){
-		if (priority==PRIO_FIRST_IN_QUEUE)
-			high_prio_command_q.push_back(item);	
-		else
+//		if (priority==PRIO_FIRST_IN_QUEUE)
+//			high_prio_command_q.push_back(item);	
+//		else
 			high_prio_command_q.push_front(item);
 	}else{
-		if (priority==PRIO_FIRST_IN_QUEUE)
-			low_prio_command_q.push_back(item);	
-		else
+//		if (priority==PRIO_FIRST_IN_QUEUE)
+//			low_prio_command_q.push_back(item);	
+//		else
 			low_prio_command_q.push_front(item);
 	}
 		
@@ -123,7 +122,7 @@ void SipDialogContainer::enqueueCommand(const SipSMCommand &command, int queue, 
         semaphore.inc();
 }
 
-void SipDialogContainer::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
+void SipMessageDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
 	struct queue_type item;
 	item.type = TYPE_TIMEOUT;
 	item.command = MRef<SipSMCommand*>( new SipSMCommand(command));
@@ -132,7 +131,7 @@ void SipDialogContainer::enqueueTimeout(MRef<SipTransaction*> receiver, const Si
 
         mlock.lock();
 	//high_prio_command_q.push_back(item);
-	low_prio_command_q.push_front(item);
+	high_prio_command_q.push_front(item);
         mlock.unlock();
         
         semaphore.inc();
@@ -147,7 +146,7 @@ void SipDialogContainer::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCo
         
         mlock.lock();
 	//high_prio_command_q.push_back(item);
-	low_prio_command_q.push_front(item);
+	high_prio_command_q.push_front(item);
         mlock.unlock();
 
         semaphore.inc();

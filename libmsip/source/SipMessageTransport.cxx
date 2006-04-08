@@ -49,7 +49,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/mtime.h>
 #include<libmutil/dbg.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 
 #include<cctype>
@@ -97,6 +97,9 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipMessageTransport*> r): ssock(sock), receiver(r),doStop(false){
 
 }
+
+
+
 
 void SocketServer::run(){
 	struct timeval timeout;
@@ -382,6 +385,11 @@ SipMessageTransport::SipMessageTransport(
 //void SipMessageTransport::startUdpServer(){ }
 //void SipMessageTransport::stopUdpServer(){ }
 
+bool SipMessageTransport::handleCommand(const SipSMCommand& ){
+	cerr << "SipMessageTransport::handleCommand: NOT IMPLEMENTED - BUG"<<endl;
+	
+}
+
 void SipMessageTransport::startTcpServer(){
 	try{
 		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
@@ -423,9 +431,11 @@ void SipMessageTransport::stopTlsServer(){
 	tlsSocketServer=NULL;
 }
 
+/*
 void SipMessageTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
 	commandReceiver = rec;
 }
+*/
 
 void SipMessageTransport::addViaHeader( MRef<SipMessage*> pack,
 									MRef<Socket *> socket,
@@ -682,11 +692,11 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 						"SipMessageTransport: host could not be resolved: "+ip_addr);
 				SipSMCommand transportErrorCommand(
 						transportError, 
-						SipSMCommand::remote, 
-						SipSMCommand::transaction);
+						SipSMCommand::transport_layer, 
+						SipSMCommand::transaction_layer);
 
-				if (! commandReceiver.isNull())
-					commandReceiver->handleCommand( transportErrorCommand );
+				if (dispatcher)
+					dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 				else
 					mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 
@@ -708,15 +718,19 @@ void SipMessageTransport::sendMessage(MRef<SipMessage*> pack,
 					      "SipMessageTransport: "+message );
 		SipSMCommand transportErrorCommand(
 				transportError, 
-				SipSMCommand::remote, 
-				SipSMCommand::transaction);
+				SipSMCommand::transport_layer, 
+				SipSMCommand::transaction_layer);
 
-		if (! commandReceiver.isNull())
-			commandReceiver->handleCommand( transportErrorCommand );
+		if (dispatcher)
+			dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 		else
 			mdbg<< "SipMessageTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
 	}
 	
+}
+
+void SipMessageTransport::setDispatcher(MRef<SipMessageDispatcher*> d){
+	dispatcher=d;
 }
 
 void SipMessageTransport::addSocket(MRef<StreamSocket *> sock){
@@ -831,10 +845,12 @@ void SipMessageTransport::udpSocketRead(){
 				pack->setSocket( *udpsock );
 				updateVia(pack, from, (uint16_t)port);
 				
-				SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
+				SipSMCommand cmd(pack, 
+						SipSMCommand::transport_layer, 
+						SipSMCommand::transaction_layer);
 				
-				if (!commandReceiver.isNull())
-					commandReceiver->handleCommand( cmd );
+				if (dispatcher)
+					dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 				else
 					mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 				pack=NULL;
@@ -957,9 +973,9 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						pack->setSocket( *socket );
 						updateVia( pack, peer, (int16_t)socket->getPeerPort() );
 
-						SipSMCommand cmd(pack, SipSMCommand::remote, SipSMCommand::ANY);
-						if (!transport->commandReceiver.isNull()){
-							transport->commandReceiver->handleCommand( cmd );
+						SipSMCommand cmd(pack, SipSMCommand::transport_layer, /*SipSMCommand::ANY*/ SipSMCommand::transaction_layer);
+						if (transport->dispatcher){
+							transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 						}else
 							mdbg<< "SipMessageTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
 						pack=NULL;

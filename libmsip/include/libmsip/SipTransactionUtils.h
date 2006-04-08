@@ -46,15 +46,15 @@ bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const std::stri
 bool LIBMSIP_API transitionMatch(
 		const std::string& packetType,
 		const SipSMCommand &command,
-		int source=IGN,
-		int destination=IGN,
+		int source/*=IGN*/,
+		int destination/*=IGN*/,
 		const std::string &respFilter="");
 
 bool LIBMSIP_API transitionMatch(
 		const SipSMCommand &command,
 		const std::string &cmd_str,
-		int source=IGN,
-		int destination=IGN);
+		int source/*=SipSMCommand::dialog_layer*/,
+		int destination/*=SipSMCommand::dialog_layer*/);
 
 #endif
 

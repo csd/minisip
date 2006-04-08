@@ -59,7 +59,12 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
 	public:
-		SipTransactionInviteServer(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, const std::string &branch, std::string callid);
+		SipTransactionInviteServer(MRef<SipStack *> stack, 
+				//MRef<SipDialog*> d, 
+				int seq_no, 
+				const std::string &cSeqMethod, 
+				const std::string &branch, 
+				const std::string &callid);
 		
 		virtual ~SipTransactionInviteServer();
 

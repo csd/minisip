@@ -84,7 +84,7 @@
 #include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
 
@@ -96,7 +96,7 @@ using namespace std;
 
 bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCommand &command){
 
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, SipSMCommand::transaction, "2**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "2**")){
 		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
@@ -137,8 +137,13 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 }
 
 
-SipTransactionInviteServerUA::SipTransactionInviteServerUA(MRef<SipStack*> stack,MRef<SipDialog*> d, int seq_no, const string &cSeqMethod, const string &branch,string callid) : 
-		SipTransactionInviteServer(stack, d, seq_no, cSeqMethod, branch, callid)
+SipTransactionInviteServerUA::SipTransactionInviteServerUA(MRef<SipStack*> stack,
+		//MRef<SipDialog*> d, 
+		int seq_no, 
+		const string &cSeqMethod, 
+		const string &branch,
+		const string &callid) : 
+			SipTransactionInviteServer(stack, /*d,*/ seq_no, cSeqMethod, branch, callid)
 {
 	changeStateMachine();
 }

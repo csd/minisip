@@ -36,7 +36,7 @@
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmsip/SipDialogContainer.h>
+#include<libmsip/SipMessageDispatcher.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>
@@ -47,7 +47,7 @@ using namespace std;
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {
-	if (transitionMatch( getCSeqMethod(), command, SipSMCommand::remote, IGN)){
+	if (transitionMatch( getCSeqMethod(), command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer)){
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
@@ -59,10 +59,10 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 #ifdef DEBUG_OUTPUT
 		/*server->*/setDebugTransType(command.getCommandPacket()->getType() );
 #endif
-		cmd.setSource(SipSMCommand::transaction);
-		cmd.setDestination(SipSMCommand::TU);
+		cmd.setSource(SipSMCommand::transaction_layer);
+		cmd.setDestination(SipSMCommand::dialog_layer);
 		
-		dialog->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 		
 		return true;
 	}else{
@@ -74,7 +74,7 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, /*IGN,*/ SipSMCommand::transaction_layer,"1**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); //Do not add via header to responses
 							//they are copied from the request
@@ -88,7 +88,7 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
@@ -104,7 +104,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		if( isUnreliable() )
@@ -123,7 +123,7 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 		const SipSMCommand &command)
 {
 	merr << "CESC: SipTransNIS::a4 ... " << end;
-	if (command.getSource()!=SipSMCommand::remote)
+	if (command.getSource()!=SipSMCommand::transport_layer)
 		return false;
 	
 	if (command.getType()!=SipSMCommand::COMMAND_PACKET){
@@ -145,7 +145,7 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::TU, IGN, "1**")){
+	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "1**")){
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
 		send(MRef<SipMessage*>(*pack), false);
@@ -160,20 +160,23 @@ bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 		const SipSMCommand &command){
 		
-	if (transitionMatch(command, SipCommandString::transport_error)){
+	if (transitionMatch(command, 
+				SipCommandString::transport_error,
+				SipSMCommand::transport_layer,
+				SipSMCommand::transaction_layer)){
 		//inform TU
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
 
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
-			SipSMCommand::transaction,
-			SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE);
+			SipSMCommand::transaction_layer,
+			SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/);
 		
 		
 		return true;
@@ -188,7 +191,7 @@ bool SipTransactionNonInviteServer::a7_completed_completed_request(
 		const SipSMCommand &command){
 	
 	
-	if (command.getSource()!=SipSMCommand::remote)
+	if (command.getSource()!=SipSMCommand::transport_layer)
 		return false;
 	
 	if (command.getType()!=SipSMCommand::COMMAND_PACKET){
@@ -207,19 +210,22 @@ bool SipTransactionNonInviteServer::a7_completed_completed_request(
 bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 		const SipSMCommand &command){
 
-	if (transitionMatch(command, SipCommandString::transport_error)){
+	if (transitionMatch(command, 
+				SipCommandString::transport_error,
+				SipSMCommand::transport_layer,
+				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
-				SipSMCommand::transaction, 
-				SipSMCommand::TU);
+				SipSMCommand::transaction_layer, 
+				SipSMCommand::dialog_layer);
 
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE */);
 		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
-			SipSMCommand::transaction,
-			SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+			SipSMCommand::transaction_layer,
+			SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
 
 		
 		return true;
@@ -233,12 +239,15 @@ bool SipTransactionNonInviteServer::a9_completed_terminated_timerJ(
 		const SipSMCommand &command){
 	
 		
-	if (transitionMatch(command, "timerJ")){
+	if (transitionMatch(command, 
+				"timerJ",
+				SipSMCommand::transaction_layer,
+				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
 			CommandString( callId, SipCommandString::transaction_terminated),
-			SipSMCommand::transaction,
-			SipSMCommand::TU);
-		dialog->getDialogContainer()->enqueueCommand( cmd, HIGH_PRIO_QUEUE, PRIO_FIRST_IN_QUEUE );
+			SipSMCommand::transaction_layer,
+			SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
 
 		
 		return true;
@@ -320,19 +329,25 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 	setCurrentState(s_start);
 }
 
-SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, MRef<SipDialog*> call, int seq_no, const string &cSeqMethod, const string &branch,string callid) : 
-		SipTransactionServer(stack, call, seq_no, cSeqMethod, branch, callid),
-		lastResponse(NULL)
+SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, 
+	//	MRef<SipDialog*> call, 
+		int seq_no, 
+		const string &cSeqMethod, 
+		const string &branch,
+		const string &callid) : 
+			SipTransactionServer(stack, /*call,*/ seq_no, cSeqMethod, branch, callid),
+			lastResponse(NULL)
 {
-	MRef<SipCommonConfig *> conf;
-	if (dialog){
-		conf = dialog->getDialogConfig()->inherited;
-	}else{
-		conf = sipStack->getStackConfig();
-	}
+//	MRef<SipCommonConfig *> conf;
+//	if (dialog){
+//		conf = dialog->getDialogConfig()->inherited;
+//	}else{
+//		conf = sipStack->getStackConfig();
+//	}
 	
 	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
-	port = conf->sipIdentity->getSipProxy()->sipProxyPort;
+	
+	//port = getConfig()->sipIdentity->getSipProxy()->sipProxyPort;
 	
 	setUpStateMachine();
 }

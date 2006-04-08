@@ -58,7 +58,11 @@
 */
 class LIBMSIP_API SipTransactionInviteClientUA: public SipTransactionInviteClient{
 	public:
-		SipTransactionInviteClientUA(MRef<SipStack *> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, std::string callid);
+		SipTransactionInviteClientUA(MRef<SipStack *> stack, 
+				//MRef<SipDialog*> d, 
+				int seq_no, 
+				const std::string &cSeqMethod, 
+				const std::string &callid);
 		
 		virtual ~SipTransactionInviteClientUA();
 

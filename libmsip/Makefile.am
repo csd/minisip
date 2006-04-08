@@ -23,11 +23,12 @@ endif OS_WIN
 
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipStack.cxx \
+		     source/SipLayerDialog.cxx \
+		     source/SipLayerTransaction.cxx \
                      source/messages/SipMessage.cxx \
                      source/messages/SipResponse.cxx \
                      source/messages/SipRequest.cxx \
 		     source/SipUtils.cxx \
-		     source/SipDialogContainer.cxx \
 		     source/SipMessageDispatcher.cxx \
 		     source/SipMessageTransport.cxx \
 		     source/SipSMCommand.cxx \

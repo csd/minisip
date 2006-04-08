@@ -37,14 +37,14 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
+#include<libmsip/SipMessageDispatcher.h>
 
 #include<list>
-
-class SipDialogContainer;
 
 class SipMessage;
 
 class SipMessageTransport;
+class SipMessageDispatcher;
 
 /**
  * Purpose: Listens on a TCP or TLS server socket and reports
@@ -66,7 +66,7 @@ class SocketServer : public Runnable{
 };
 
 
-class LIBMSIP_API SipMessageTransport : public virtual MObject{
+class LIBMSIP_API SipMessageTransport : /*public virtual MObject*/ public SipSMCommandReceiver {
 	public:
 		SipMessageTransport(std::string local_ip, 
 							std::string contactIP,
@@ -86,9 +86,12 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 
 		void startTlsServer();
 		void stopTlsServer();
+
+		bool handleCommand(const SipSMCommand& cmd);
 		
 		
-		void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
+		//void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
+		void setDispatcher(MRef<SipMessageDispatcher*> d);
 
 #if 0
 		//weird ... it is only defined, has not body ... but no one complained ... 
@@ -151,7 +154,8 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 		MRef<ca_db *> cert_db;
 		void * tls_ctx;
 
-		MRef<SipSMCommandReceiver *> commandReceiver;
+		//MRef<SipSMCommandReceiver *> commandReceiver;
+		MRef<SipMessageDispatcher*> dispatcher;
 
 		Semaphore semaphore;
 
@@ -160,7 +164,7 @@ class LIBMSIP_API SipMessageTransport : public virtual MObject{
 };
 
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipDialogContainer.h>
+//#include<libmsip/SipDialogContainer.h>
 
 
 LIBMSIP_API void set_debug_print_packets(bool);

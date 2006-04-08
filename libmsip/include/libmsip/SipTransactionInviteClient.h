@@ -59,7 +59,11 @@ class SipResponse;
 */
 class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionInviteClient(MRef<SipStack*> stack, MRef<SipDialog*> d, int seq_no, const std::string &cSeqMethod, std::string callid);
+		SipTransactionInviteClient(MRef<SipStack*> stack, 
+				//MRef<SipDialog*> d, 
+				int seq_no, 
+				const std::string &cSeqMethod, 
+				const std::string &callid);
 		
 		virtual ~SipTransactionInviteClient();
 
@@ -199,7 +203,7 @@ class LIBMSIP_API SipTransactionInviteClient: public SipTransactionClient{
 		 * response to setup the reliable transmission (100rel SIP
 		 * extension, RFC3262)
 		 */
-		void rel1xxProcessing(MRef<SipResponse*> resp);
+		//void rel1xxProcessing(MRef<SipResponse*> resp);
 		
 		MRef<SipRequest*> lastInvite;
 //		int timerT1;
