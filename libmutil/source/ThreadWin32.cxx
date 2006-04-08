@@ -143,11 +143,10 @@ void setupDefaultSignalHandling(){
 Thread::Thread(MRef<Runnable *> runnable){
 	massert(runnable);
         MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
+	HANDLE h;
 	DWORD threadId;
 
-	handle_ptr = new HANDLE;
-
-	*((HANDLE*)handle_ptr) = CreateThread(
+	h = CreateThread(
 			NULL,                        // default security attributes
 			0,                           // use default stack size
 			ThreadStarter,                  // thread function
@@ -155,33 +154,26 @@ Thread::Thread(MRef<Runnable *> runnable){
 			0,                           // use default creation flags
 			&threadId);
 	
-	if (*((HANDLE*)handle_ptr)==NULL){
+	if (h==NULL){
 		merror("Thread::Thread: CreateThread");
                 delete self;
 		throw ThreadException("Could not create thread.");
         }
+	*((HANDLE*)handle.hptr) = h;
 //	printf("In Thread, windows part - thread created\n");
 
 }
 
 Thread::~Thread(){
-	if( handle_ptr ){
-		delete (HANDLE *)handle_ptr;
-	}
-	handle_ptr = NULL;
 }
 
 ThreadHandle Thread::createThread(void f()){
-	//HANDLE threadHandle;
 	ThreadHandle handle;
-	
-	//massert(sizeof(threadHandle)==4);
-	
+	HANDLE h;
 	DWORD id;
 	LPVOID fptr;
 	fptr = (void*)f;
-	//threadHandle = CreateThread( 
-	*handle.hptr = CreateThread( 
+	h = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size 
 			StaticThreadStarter,                  // thread function 
@@ -189,10 +181,11 @@ ThreadHandle Thread::createThread(void f()){
 			0,                           // use default creation flags
 			&id);
 
-	if (*handle.hptr==NULL){
+	if (h==NULL){
 		merror("Thread::Thread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
+	*((HANDLE*)handle.hptr) = h;
 	return handle;
 }
 
@@ -203,14 +196,14 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
         argptr->fun = (void*)f;
         argptr->arg = arg;
         
-	//HANDLE threadHandle;
 	ThreadHandle handle;
+	HANDLE h;
 	DWORD id;
 	
 	#ifdef DEBUG_OUTPUT
 		mdbg << "createThread: Creating thread" << end;
 	#endif	// DEBUG_OUTPUT
-	*handle.hptr = CreateThread( 
+		h = CreateThread( 
 			NULL,                        // default security attributes 
 			0,                           // use default stack size  
 			StaticThreadStarterArg,                  // thread function 
@@ -221,23 +214,20 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 		mdbg << "createThread: done Creating thread" << end;
 	#endif	// DEBUG_OUTPUT
 
-	if (*handle.hptr==NULL){
+	if (h==NULL){
 		merror("Thread::createThread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
+	*((HANDLE*)handle.hptr) = h;
 	return handle;
 }
 
 void * Thread::join(){
-	HANDLE handle = *((HANDLE*)handle.hptr);
 	join(handle);
-//	if (WaitForSingleObject( handle, INFINITE )==WAIT_FAILED){
-//		merror("Thread::join: WaitForSingleObject");
-//	}
         return NULL;
 }
 
-void Thread::join(ThreadHandle handle){
+void Thread::join(const ThreadHandle &handle){
 	HANDLE h = *((HANDLE*)handle.hptr);
 	if (WaitForSingleObject( h, INFINITE )==WAIT_FAILED){
 		merror("Thread::join:WaitForSingleObject");
@@ -252,23 +242,6 @@ int Thread::msleep(int32_t ms){
 
 bool Thread::kill( ) {
 	return kill( handle );
-	
-#if 0
-	HANDLE h = *((HANDLE*)handle.hptr);
-	BOOL ret;
-	DWORD lpExitCode;
-
-	GetExitCodeThread( h, &lpExitCode );
-	ret = TerminateThread( h, lpExitCode );
-        if( ret == 0 ) {
-		
-		#ifdef DEBUG_OUTPUT
-			merror("Thread::kill: TerminateThread");
-		#endif
-		return false;
-	}
-	return true;
-#endif	
 }
 
 bool Thread::kill( const ThreadHandle &handle) {
