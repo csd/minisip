@@ -23,35 +23,6 @@
 
 /*
 
- +-SipStack-------------------------------------+
- |                                              |  invite(string)
- | +-SipDialogContainer---+                     |<----------------------------------
- | |                      | addDialog(d)        |
- | |                      |<----------------    | handleCommand(SipSMCommand)
- | |                      |                     |<----------------------------------
- | |                      | handleCommand(CS)   |
- | |                      |-------------------->| sipcb_handleCommand(CommandString)
- | |                      |                     |---------------------------------->
- | |                      | sipcb_handleCommand |
- | |                      |-------------------->|  setDefaultDialog()
- | |                      |                     |<----------------------------------
- | |                      | enqueuePacket()     |
- | |                      |<----------------    |  addDialog(d)
- | |                      |                     |<----------------------------------
- | |                      | enqueueCommand()    |
- | |                      |<----------------    |
- | |                      |                     |
- | | [call_list]          | handleSipMessage()  |
- | | [defaultHandler]     |<---+                |
- | +----------------------+    |                |
- |                             |                |
- | [SipLayerTransport]-------+                |
- | [SipSoftPhoneConfiguration]                  |
- |                                              |
- |                                              |
- +----------------------------------------------+
-
-
  SipStack object figure:
 
  +-----------------------------------------------------------------+
@@ -108,7 +79,6 @@
 #include<libmutil/minilist.h>
 #include<libmutil/CommandString.h>
 #include<libmsip/SipTransaction.h>
-//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
 
@@ -121,6 +91,40 @@ class SipTransaction;
 
 //TODO: Enable conference calling
 
+
+/**
+ * \brief A SipStack object is the interface to the libmsip SIP
+ *        stack. An application sends commands to
+ *        the SipStack which sends commands (CommandString)
+ *        to the application.
+ *
+ * Ideally, an application can create any number of SipStacks
+ * that can be configured independently. This is true for
+ * SIP timers, the transport layer, and all dialogs/transactions.
+ * This is not true for what content types and SIP headers
+ * are understood.
+ *
+ * The most commonly used methods of the SipStack API are:
+ *  - handleCommand(SipSMCommand)
+ *    Application to SIP stack command. For example, the following code
+ *    will hang up a call with the matching call id.
+ *      SipSMCommand cmd(callid,"hang_up");
+ *      stack->handleCommand(cmd)
+ *    Note that constants defined in SipCommandString.h should be used
+ *    instead of locally declaring the command string (in this case
+ *    SipCommandString::hang_up).
+ *
+ *  - The object passed to setCallback will receive commands from the
+ *    SIP stack. The commands are passed as CommandString objects.
+ *  - string SipStack::invite(string uri)
+ *    This is the exception to the rule that all messages are passed
+ *    using the handleCommand method and the similar one in the callback.
+ *    This method is introduced so that the application knows the
+ *    call id of the dialog created..
+ *
+ * See the main documentation document for how to implement application
+ * layer support for new header and content types (@see Factories).
+*/
 class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 	public:
