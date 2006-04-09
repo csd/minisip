@@ -57,8 +57,17 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_YACC
 dnl AC_PROG_RANLIB
+
+dnl Enable building of the convenience library
+dnl and set LIBLTDL accordingly
+AC_LIBLTDL_CONVENIENCE
+dnl Check for dlopen support
+AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+
+AC_SUBST(LIBLTDL)
+AC_SUBST(LTDLINCL)
 
 if test x$os_win = xyes; then
     AC_CHECK_TOOL(WINDRES, [windres])
@@ -228,5 +237,9 @@ dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
 AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmutil.pc win32/libmutil-res.rc])
+
+dnl Configure libltdl
+AC_CONFIG_SUBDIRS(libltdl)
+
 AC_OUTPUT
 

@@ -54,7 +54,7 @@ rm -f aclocal.m4 configure config.guess config.log config.sub config.cache confi
 rm -Rf autom4te.cache
 
 aclocal${amvers}
-${libtoolize} --copy --force
+${libtoolize} --copy --force --ltdl
 
 autoconf
 autoheader

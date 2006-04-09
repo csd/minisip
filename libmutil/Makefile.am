@@ -1,9 +1,11 @@
 abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include win32
+SUBDIRS = libltdl include win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmutil.spec
+
+INCLUDES = $(LTDLINCL)
 
 pkgconfig_DATA = libmutil.pc
 
@@ -11,13 +13,14 @@ lib_LTLIBRARIES = libmutil.la
 libmutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include
 libmutil_la_CXXFLAGS = $(PTHREAD_CFLAGS)
 libmutil_la_LDFLAGS = $(PTHREAD_CFLAGS) -no-undefined -version-info $(LT_VERSION_INFO)
-libmutil_la_LIBADD = $(PTHREAD_LIBS)
+libmutil_la_LIBADD = $(PTHREAD_LIBS) $(LIBLTDL)
+libmutil_la_DEPENDENCIES = $(LIBLTDL)
 libmutil_la_SOURCES = $(mutil_src)
 
 if OS_WIN
 res_obj = win32/libmutil-res.o
 libmutil_la_LDFLAGS += -Wl,$(res_obj)
-libmutil_la_DEPENDENCIES = $(res_obj)
+libmutil_la_DEPENDENCIES += $(res_obj)
 endif OS_WIN
 
 if HAVE_PTHREAD

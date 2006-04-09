@@ -35,7 +35,7 @@
  * @author Erik Eliasson, eliasson@imit.kth.se
  * @author Johan Bilien, jobi@via.ecp.fr
  */
-class Library : public MObject{
+class LIBMUTIL_API Library : public MObject{
 public:
 	/**
 	 * Opens a library.
@@ -78,7 +78,7 @@ private:
 			///that is different on different 
 			///platforms.
 	const std::string &path; // file name from which the library was opened.
-	
+	static int refCount;
 };
 
 

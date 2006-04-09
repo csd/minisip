@@ -1,69 +1,72 @@
+/*
+  Copyright (C) 2004-2006 the Minisip Team
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/*
+ * Copyright (C) 2004-2006
+ *
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
+*/
 
 #include<config.h>
 #include<libmutil/Library.h>
 #include<libmutil/massert.h>
 
-#if defined _MSC_VER || __MINGW32__
-#include<windows.h>
-# define USE_WIN32_LIBS
-#else
-#include<dlfcn.h>
-# define USE_POSIX_LIBS
-#endif
 #include<iostream>
+
+// Use ltdl symbols defined in ltdl.c
+#define LT_SCOPE extern
+#include<ltdl.h>
 
 using namespace std;
 
+int Library::refCount;
+
 Library::Library(const string &path):path(path){
-#ifdef USE_WIN32_LIBS
-	massert(sizeof(FARPROC)==sizeof(void*));
-	handle = new HMODULE;
-	
-	HMODULE *ptr =(HMODULE*)handle;
-#ifdef _WIN32_WCE
-	*ptr = LoadLibrary( (const unsigned short *)path.c_str() );
-#else
-	*ptr = LoadLibrary( path.c_str() );
-#endif
-#else
-	handle = dlopen(path.c_str(), RTLD_LAZY);
+
+	if( refCount == 0 )
+		lt_dlinit();
+
+	refCount++;
+
+	handle = lt_dlopenext(path.c_str());
 #ifdef DEBUG_OUTPUT
 	if( !handle ){
-		cerr << dlerror() << endl;
+		cerr << lt_dlerror() << endl;
 	}
-#endif
 #endif
 }
 
 Library::~Library(){
-#ifdef USE_WIN32_LIBS
-	if (!FreeLibrary(*((HMODULE*)handle)) ){
-		cerr << "Library: ERROR: Could not close library."<< endl;
-		
-	}
-	delete (HMODULE*)handle;
-	handle=NULL;
-#else
 	if(handle){
-		dlclose(handle);
+		lt_dlclose((lt_dlhandle)handle);
 		handle=NULL;
 	}
-#endif
+
+	refCount--;
+	if( refCount == 0 )
+		lt_dlexit();
 }
 
 void *Library::getFunctionPtr(string name){
-#ifdef USE_WIN32_LIBS
-	massert(sizeof(FARPROC)==sizeof(void*));
-	HMODULE *hptr =(HMODULE*)handle;
-#ifdef _WIN32_WCE
-	return (void*)GetProcAddress(*hptr, (const unsigned short *)name.c_str());
-#else
-	return (void*)GetProcAddress(*hptr, name.c_str());
-#endif
-#else
-	void * ptr = dlsym(handle, name.c_str());
+	void * ptr = lt_dlsym((lt_dlhandle)handle, name.c_str());
 	return ptr;
-#endif
 }
 
 MRef<Library *> Library::open(const string &path){
