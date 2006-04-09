@@ -235,7 +235,7 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	
 		ret = maintainenceHandleCommand(c);
 	}else{
-		cerr << "ERROR: SipCommandDispatcher::handleCommand: Unknown destilation (layer)"<<endl;
+		cerr << "ERROR: SipCommandDispatcher::handleCommand: Unknown destination (layer)"<<endl;
 	}
 	
 	if (!ret){
@@ -286,14 +286,15 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			//Refurbish the command ... or the SipDialog::handleCmd won't let it through
 			SipSMCommand cmd( c.getCommandString(),
 					SipSMCommand::dispatcher,
-					SipSMCommand::dispatcher);
+					SipSMCommand::dialog_layer);	//It's a SipDialog sub-class
 			managementHandler->handleCommand(cmd);
 			return true;
 			
 		}else if ( c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
-			SipSMCommand cmd( c.getCommandString(),
-					SipSMCommand::dispatcher,
-					SipSMCommand::dispatcher);
+			
+//			SipSMCommand cmd( c.getCommandString(),
+//					SipSMCommand::dispatcher,
+//					SipSMCommand::dispatcher);
 // 			managementHandler->handleCommand(cmd); //process the command, so it moves to terminated state
 			managementHandler->getSipStack()->getDispatcher()->stopRunning();
 			return true;
