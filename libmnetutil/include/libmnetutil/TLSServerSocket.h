@@ -35,7 +35,6 @@ class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 	public:
 		TLSServerSocket( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
 		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
-//		~TLSServerSocket();
 		virtual std::string getMemObjectType(){return "TLSServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
@@ -55,6 +54,6 @@ class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 		 CA db 
 		 */
 		MRef<ca_db *> cert_db;
-		ServerSocket * tcp_socket;
+		MRef<ServerSocket *> tcp_socket;
 };
 #endif

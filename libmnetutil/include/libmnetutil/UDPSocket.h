@@ -44,7 +44,7 @@ class LIBMNETUTIL_API UDPSocket : public Socket {
 		
 		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
 		
-		int32_t recvFrom(void *buf, int32_t len, IPAddress *& from, int32_t &port);
+		int32_t recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int32_t &port);
 		
 		int32_t recv(void *buf, int32_t len);
 

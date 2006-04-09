@@ -51,7 +51,7 @@ void IPAddress::setProtocolFamily(int pf){
 	protocol_family=pf;
 }
 
-IPAddress * IPAddress::create( sockaddr * addr, int32_t addr_len ){
+MRef<IPAddress *> IPAddress::create( sockaddr * addr, int32_t addr_len ){
 	if( addr->sa_family == AF_INET &&
 	    addr_len >= (int32_t) sizeof(struct sockaddr_in)){
 		return new IP4Address( (sockaddr_in *)addr );
@@ -64,7 +64,7 @@ IPAddress * IPAddress::create( sockaddr * addr, int32_t addr_len ){
 	else return NULL;
 }
 
-IPAddress * IPAddress::create(const string &addr){
+MRef<IPAddress *> IPAddress::create(const string &addr){
 	try {
 		return new IP4Address( addr );
 	} catch( HostNotFound & ){

@@ -47,10 +47,10 @@ class LIBMNETUTIL_API StreamSocket : public Socket {
 		bool matchesPeer(IPAddress& address, int32_t port);
 		bool matchesPeer(std::string address, int32_t port);
 
-		IPAddress * getPeerAddress();
+		MRef<IPAddress *> getPeerAddress();
 		int32_t getPeerPort();
 	protected:
-		IPAddress * peerAddress;
+		MRef<IPAddress *> peerAddress;
 		std::string remoteHostUnresolved;
 		int32_t peerPort;
 

@@ -60,7 +60,6 @@ class LIBMNETUTIL_API Socket : public MObject {
 //#undef close
 //#endif
 		void close( void );
-//		virtual std::string getMemObjectType(){return "Socket";};
 
 	protected:
 		int32_t type;

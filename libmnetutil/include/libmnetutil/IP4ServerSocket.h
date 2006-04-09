@@ -37,6 +37,8 @@ class LIBMNETUTIL_API IP4ServerSocket : public ServerSocket {
 
 		//inherited: TCPSocket *accept();
 		virtual struct sockaddr *getSockaddrStruct(int32_t &ret_length);
-		virtual TCPSocket * createSocket(int32_t fd, struct sockaddr_in *saddr);
+
+		virtual MRef<TCPSocket *> createSocket(int32_t fd, struct sockaddr_in *saddr);
 };
+
 #endif

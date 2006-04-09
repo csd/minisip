@@ -195,8 +195,8 @@ TLSSocket::~TLSSocket(){
 	SSL_shutdown( ssl );
 	SSL_free( ssl );
 	//SSL_CTX_free( ssl_ctx );
-	delete tcp_socket;
-	delete peerAddress;
+	//delete tcp_socket;
+	//delete peerAddress;
 }
 
 int32_t TLSSocket::write( string data ){

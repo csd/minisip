@@ -35,7 +35,7 @@ class LIBMNETUTIL_API NsLookup{
 		//IPAddress *lookup(string addr);
 		//string lookup_str(string addr);
 
-		static IPAddress *staticLookup(std::string addr);
+		static MRef<IPAddress *> staticLookup(std::string addr);
 		static std::string staticLookup_str(std::string addr);
 		//void clearCache();
 	private:

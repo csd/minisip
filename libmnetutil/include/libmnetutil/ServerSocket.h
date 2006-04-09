@@ -41,7 +41,11 @@ class LIBMNETUTIL_API ServerSocket : public Socket {
 		* connections.
 		* @return the port number
 		*/
-		int32_t getPort();
+		virtual int32_t getPort(); // The method is virtual to support exotic sub-classes.
+					   // Example: To support incoming TLS/TCP connections behind 
+					   // NAT, someone can create a server socket that accepts 
+					   // connections via a proxy (it would connect as client to 
+					   // this proxy).
 
 	protected:
 		void listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog);

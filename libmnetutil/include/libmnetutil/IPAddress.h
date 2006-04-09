@@ -62,9 +62,9 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		virtual int32_t getSockaddrLength()=0;
 
 		virtual bool operator ==(const IPAddress &i) const =0;
-		virtual IPAddress * clone() const =0;
+		virtual MRef<IPAddress *> clone() const =0;
 
-		static IPAddress * create(sockaddr * addr, int32_t addr_len);
+		static MRef<IPAddress *> create(sockaddr * addr, int32_t addr_len);
 
 		/**
 		 * Tries to create IPv4 or IPv6 address. First v4 is tried
@@ -72,7 +72,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		 * NOTE: The method returns NULL if the host can not be
 		 * resolved, and does not throw an exception.
 		 */
-		static IPAddress * create(const std::string &addr);
+		static MRef<IPAddress *> create(const std::string &addr);
 
 	protected:
 		void setAddressFamily(int af);

@@ -643,8 +643,8 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 			cerr << "EE: NO SOCKET"<<endl<<endl;;
 		}
 
-		UDPSocket *dsocket = dynamic_cast<UDPSocket*>(*socket);
-		StreamSocket *ssocket = dynamic_cast<StreamSocket*>(*socket);
+		MRef<UDPSocket *> dsocket = dynamic_cast<UDPSocket*>(*socket);
+		MRef<StreamSocket *> ssocket = dynamic_cast<StreamSocket*>(*socket);
 		
 		if( ssocket ){
 			/* At this point if socket != we send on a 
@@ -675,11 +675,11 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 			ts.save( tmp );
 
 #endif
-			IPAddress *destAddr = IPAddress::create(ip_addr);
+			MRef<IPAddress *>destAddr = IPAddress::create(ip_addr);
 
 			
 			if (destAddr){
-				if( dsocket->sendTo( *destAddr, port, 
+				if( dsocket->sendTo( **destAddr, port, 
 							(const void*)packetString.c_str(),
 							(int32_t)packetString.length() ) == -1 ){
 
@@ -757,7 +757,7 @@ MRef<StreamSocket *> SipLayerTransport::findStreamSocket( /*IPAddress &*/ string
 	return NULL;
 }
 
-static void updateVia(MRef<SipMessage*> pack, IPAddress *from,
+static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
 		      uint16_t port)
 {
 	MRef<SipHeaderValueVia*> via = pack->getFirstVia();
@@ -808,7 +808,7 @@ void SipLayerTransport::udpSocketRead(){
 		} while( avail < 0 );
 
 		if( FD_ISSET( udpsock->getFd(), &set )){
-			IPAddress *from = NULL;
+			MRef<IPAddress *> from;
 			int32_t port = 0;
 
 			nread = udpsock->recvFrom(buffer, UDP_MAX_SIZE, from, port);
@@ -969,7 +969,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 #endif
 						//					dialogContainer->enqueueMessage( pack );
 
-						IPAddress *peer = socket->getPeerAddress();
+						MRef<IPAddress *> peer = socket->getPeerAddress();
 						pack->setSocket( *socket );
 						updateVia( pack, peer, (int16_t)socket->getPeerPort() );
 

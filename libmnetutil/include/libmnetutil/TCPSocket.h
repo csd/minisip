@@ -52,7 +52,6 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 
 	private:
 		void initTCPSocket(IPAddress &ipaddress, int32_t port);
-//		IPAddress *ipaddr;
 };
 
 TCPSocket& operator<<(TCPSocket& sock, std::string str);

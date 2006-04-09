@@ -115,8 +115,7 @@ TCPSocket::~TCPSocket(){
 		this->close();
 		this->fd=-1; //for debugging purpose (make sure error if using deleted pointer)
 	}
-	delete peerAddress;
-	
+	//delete peerAddress;
 }
 
 int32_t TCPSocket::write(string data){

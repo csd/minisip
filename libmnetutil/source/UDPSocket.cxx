@@ -152,7 +152,7 @@ int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int
 	return sendto(fd, (const char*)msg, len, 0, to_addr.getSockaddrptr(port), to_addr.getSockaddrLength());
 }
 
-int32_t UDPSocket::recvFrom(void *buf, int32_t len, IPAddress *& from, int32_t &port){
+int32_t UDPSocket::recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int32_t &port){
 	struct sockaddr_storage sa;
 	socklen_t sa_len = sizeof(sa);
 	int n;

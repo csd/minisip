@@ -110,7 +110,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		void TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 			MRef<certificate *> cert, MRef<ca_db *> cert_db );
 		
-		TCPSocket * tcp_socket;
+		MRef<TCPSocket *> tcp_socket;
 		
 		SSL_CTX* ssl_ctx;
 		

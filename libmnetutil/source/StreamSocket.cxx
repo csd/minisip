@@ -37,7 +37,7 @@ bool StreamSocket::matchesPeer(IPAddress& address, int32_t port){
 // 	cerr << "StreamSocket:matchesPeer: 1 - " << address.getString() << ":" << port << endl;
 // 	cerr << "StreamSocket:matchesPeer: 2 - " << getPeerAddress()->getString() << ":" << getPeerPort() << endl;
 	#endif
-	return *peerAddress == address && port == peerPort;
+	return **peerAddress == address && port == peerPort;
 }
 
 bool StreamSocket::matchesPeer(string address, int32_t port){
@@ -48,11 +48,11 @@ bool StreamSocket::matchesPeer(string address, int32_t port){
 	if (remoteHostUnresolved.size()>0){
 		return remoteHostUnresolved==address && port==peerPort;
 	}else{
-		return *peerAddress == *(IPAddress::create(address)) && port==peerPort;
+		return **peerAddress == **(IPAddress::create(address)) && port==peerPort;
 	}
 }
 
-IPAddress * StreamSocket::getPeerAddress(){
+MRef<IPAddress *> StreamSocket::getPeerAddress(){
 	return peerAddress;
 }
 
