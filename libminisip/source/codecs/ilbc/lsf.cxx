@@ -16,7 +16,7 @@
    #include <string.h> 
    #include <math.h> 
     
-#include<libminisip/codecs/ilbc/iLBC_define.h>
+#include"iLBC_define.h"
     
    /*----------------------------------------------------------------* 
     *  conversion from lpc coefficients to lsf coefficients  

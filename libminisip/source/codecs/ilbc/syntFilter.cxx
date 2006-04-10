@@ -12,7 +12,7 @@
     
    ******************************************************************/ 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
+   #include"iLBC_define.h" 
     
    /*----------------------------------------------------------------* 
     *  LP synthesis filter. 

@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/codecs/SPEEXCODEC.h>
+#include"SPEEXCODEC.h"
 
 #include<iostream>
 
@@ -32,6 +32,27 @@
 #include<libmutil/print_hex.h>
 
 using namespace std;
+
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+extern "C"
+std::list<std::string> *mspeex_LTX_listPlugins( MRef<Library *> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new SpeexCodec( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mspeex_LTX_getPlugin(){
+	return &plugin;
+}
+
 
 SpeexCodecState::SpeexCodecState(){
 	
@@ -110,6 +131,8 @@ uint32_t SpeexCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_bu
 
 }
 
+SpeexCodec::SpeexCodec( MRef<Library *> lib ): AudioCodec( lib ){
+}
 
 int32_t SpeexCodec::getSamplingSizeMs(){
 	return 20;
@@ -132,7 +155,7 @@ int32_t SpeexCodec::getInputNrSamples(){
 }
 
 string SpeexCodec::getCodecName(){
-	return "SPEEX";
+	return "speex";
 }
 
 string SpeexCodec::getCodecDescription(){
@@ -160,3 +183,6 @@ MRef<CodecState *> SpeexCodec::newInstance(){
 	return ret;
 }
 
+uint32_t SpeexCodec::getVersion()const{
+	return 0x00000001;
+}

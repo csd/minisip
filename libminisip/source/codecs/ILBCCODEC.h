@@ -31,9 +31,9 @@
 
 #include<libminisip/codecs/Codec.h>
 
-#include<libminisip/codecs/ilbc/iLBC_define.h>
-#include<libminisip/codecs/ilbc/iLBC_encode.h>
-#include<libminisip/codecs/ilbc/iLBC_decode.h>
+#include"ilbc/iLBC_define.h"
+#include"ilbc/iLBC_encode.h"
+#include"ilbc/iLBC_decode.h"
 
 class ILBCCodecState : public CodecState{
 	public:
@@ -59,6 +59,8 @@ class ILBCCodecState : public CodecState{
 
 class ILBCCodec : public AudioCodec{
 	public:
+		ILBCCodec( MRef<Library *> lib );
+
 		virtual MRef<CodecState *> newInstance();
 	
 		/**
@@ -85,6 +87,8 @@ class ILBCCodec : public AudioCodec{
 		virtual uint8_t getSdpMediaType();
 
 		virtual std::string getSdpMediaAttributes();
+
+		virtual uint32_t getVersion()const;
 };
 
 #endif

@@ -15,8 +15,8 @@
     
    #include <math.h> 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
+   #include"iLBC_define.h" 
+   #include"constants.h" 
     
      
    /*----------------------------------------------------------------* 

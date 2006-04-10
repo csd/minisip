@@ -54,6 +54,7 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 AC_PROG_CPP
 AC_PROG_CXX
+PKG_PROG_PKG_CONFIG
 
 AC_C_BIGENDIAN
 
@@ -271,14 +272,20 @@ AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
 AC_ARG_ENABLE(gconf,
     [ --enable-gconf enables support for GConf (default enabled).])
 
-PKG_CHECK_MODULES(GCONF, [gconf-2.0],
-	[
-		if test "x${enable_gconf}" != "xno"
-		then
-			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
-			gconf_support="yes"
-		fi
-	],[echo 'GConf development libraries not found, GConf support is disabled.'])
+if test "x${enable_gconf}" != "xno"; then
+   gconf_support="yes"
+   PKG_CHECK_MODULES(GOBJECT, [gobject-2.0],, [gconf_support="no"])
+
+   PKG_CHECK_MODULES(GCONF, [gconf-2.0],, [gconf_support="no"])
+
+   if test "x${gconf_support}" = "xyes"; then
+      AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
+   elif test "x${enable_gconf}" = "xyes"; then
+      AC_MSG_ERROR([GConf development libraries not found.])
+   else
+      AC_MSG_NOTICE([GConf development libraries not found, GConf support is disabled.])
+   fi
+fi
 AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
@@ -430,19 +437,6 @@ PKG_CHECK_MODULES(OSSO, [libosso],
 	],[echo 'No libosso support.'])
 
 AM_CONDITIONAL(OSSO_SUPPORT, [test "${osso_support}" = "yes"])
-
-AC_ARG_ENABLE(gconf,
-    [ --enable-gconf enables support for GConf (default enabled).])
-
-PKG_CHECK_MODULES(GCONF, [gconf-2.0],
-	[
-		if test "x${enable_gconf}" != "xno"
-		then
-			AC_DEFINE(GCONF_SUPPORT, [], [Support gconf.])
-			gconf_support="yes"
-		fi
-	],[echo 'GConf development libraries not found, GConf support is disabled.'])
-AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
 

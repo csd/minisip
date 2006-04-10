@@ -16,9 +16,9 @@
    #include <math.h> 
    #include <string.h> 
 
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
-   #include<libminisip/codecs/ilbc/filter.h> 
+   #include"iLBC_define.h" 
+   #include"constants.h" 
+   #include"filter.h" 
     
    /*----------------------------------------------------------------* 
     * Find index in array such that the array element with said 

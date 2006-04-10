@@ -24,15 +24,39 @@
 
 #include<config.h>
 
-#include<libminisip/codecs/GsmCodec.h>
+#include"GsmCodec.h"
 
 #include<gsm.h>
 
 #define GSM_EXEPECTED_INPUT 160
 #define GSM_FRAME_SIZE 33
 
+
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+extern "C"
+std::list<std::string> *mgsm_LTX_listPlugins( MRef<Library *> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new GsmCodec( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mgsm_LTX_getPlugin( MRef<Library *> lib ){
+	return &plugin;
+}
+
+GsmCodec::GsmCodec( MRef<Library *> lib ): AudioCodec( lib ){
+}
+
 std::string GsmCodec::getCodecName(){
-	return "gsm";
+	return "GSM";
 }
 
 std::string GsmCodec::getCodecDescription(){
@@ -99,4 +123,8 @@ MRef<CodecState *> GsmCodec::newInstance(){
 	MRef<CodecState *> ret =  new GsmCodecState();
 	ret->setCodec( this );
 	return ret;
+}
+
+uint32_t GsmCodec::getVersion()const{
+	return 0x00000001;
 }

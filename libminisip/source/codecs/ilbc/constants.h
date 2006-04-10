@@ -16,7 +16,7 @@
    #ifndef __iLBC_CONSTANTS_H 
    #define __iLBC_CONSTANTS_H 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
+   #include"iLBC_define.h" 
     
    /* bit allocation */ 
     

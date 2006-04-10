@@ -30,7 +30,8 @@ typedef void PortAudioStream;
 
 class LIBMINISIP_API PortAudioDevice: public SoundDevice{
 	public:
-		PortAudioDevice( std::string device );
+// 		PortAudioDevice( std::string device );
+		PortAudioDevice( PaDeviceIndex device );
 		virtual ~PortAudioDevice();
 		
 		virtual int readFromDevice( byte_t * buffer, uint32_t nSamples );
@@ -67,8 +68,8 @@ class LIBMINISIP_API PortAudioDevice: public SoundDevice{
 		bool initialized;
 		PaTime latency;
 
-		PaDeviceIndex outId;
 		PaDeviceIndex inId;
+		PaDeviceIndex outId;
 
 		PaStream *outStream;
 		PaStream *inStream;

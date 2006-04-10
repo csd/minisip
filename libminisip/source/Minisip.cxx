@@ -45,6 +45,8 @@
 
 #include<libmutil/termmanip.h>
 #include<libmutil/MessageRouter.h>
+#include<libmutil/MPlugin.h>
+#include<libmutil/Library.h>
 
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
@@ -71,6 +73,8 @@
 #include<libminisip/configbackend/ConfBackend.h>
 #include<libminisip/configbackend/MXmlConfBackend.h>
 #include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/soundcard/SoundDriverRegistry.h>
+#include<libminisip/codecs/Codec.h>
 
 #ifdef OSSO_SUPPORT
 #include<libosso.h>
@@ -106,6 +110,15 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 	
 
 	#ifdef DEBUG_OUTPUT
+	mout << "Loading plugins"<<end;
+	#endif
+
+	SoundDriverRegistry::getInstance();
+	AudioCodecRegistry::getInstance();
+	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
+	pluginManager->loadFromDirectory(MINISIP_PLUGINDIR);
+
+	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;
 	#endif
 
@@ -114,6 +127,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 		merr << "ERROR: Could not initialize NetUtil package"<<end;
 		exit();
 	}
+
 	#ifdef DEBUG_OUTPUT
 	cerr << "Creating SipSoftPhoneConfiguration"<< endl;
 	#endif

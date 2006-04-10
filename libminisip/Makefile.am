@@ -1,29 +1,51 @@
 abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
+pluginsdir = $(pkglibdir)/plugins
 
 SUBDIRS = include
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
-AM_CPPFLAGS = 
+AM_CPPFLAGS = -I$(top_srcdir)/include -DMINISIP_PLUGINDIR=\"$(pluginsdir)\"
 
 pkgconfig_DATA = libminisip.pc
 
+
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(abs_top_srcdir)/include
+libminisip_la_CPPFLAGS = $(AM_CPPFLAGS)
 libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
 libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS)
 libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
+plugins_LTLIBRARIES =
+
 
 if AEC_SUPPORT
         libaec_src = source/aec/aec.cxx
 endif
 
 libcodecs_libadd = 
-libcodecs_src = source/codecs/G711CODEC.cxx \
+libcodecs_src = source/codecs/Codec.cxx
+
+
+#
+# G.711 codec plugin
+#
+libcodec_g711_src = source/codecs/G711CODEC.cxx \
 			source/codecs/g711/codec_g711.cxx \
-			source/codecs/Codec.cxx
+			source/codecs/G711CODEC.h \
+			source/codecs/g711/codec_g711.h
+
+plugins_LTLIBRARIES += mg711.la
+mg711_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mg711_la_SOURCES = $(libcodec_g711_src)
+mg711_la_LIBADD = libminisip.la $(MUTIL_LIBS)
+
+
+#
+# iLBC codec plugin
+#
 libcodec_ilbc_src = source/codecs/ILBCCODEC.cxx \
+			source/codecs/ILBCCODEC.h \
 			source/codecs/ilbc/anaFilter.cxx \
 			source/codecs/ilbc/constants.cxx \
 			source/codecs/ilbc/createCB.cxx \
@@ -46,19 +68,59 @@ libcodec_ilbc_src = source/codecs/ILBCCODEC.cxx \
 			source/codecs/ilbc/packing.cxx \
 			source/codecs/ilbc/StateConstructW.cxx \
 			source/codecs/ilbc/StateSearchW.cxx \
-			source/codecs/ilbc/syntFilter.cxx
+			source/codecs/ilbc/syntFilter.cxx \
+			source/codecs/ilbc/StateConstructW.h \
+			source/codecs/ilbc/StateSearchW.h \
+			source/codecs/ilbc/helpfun.h \
+			source/codecs/ilbc/iCBConstruct.h \
+			source/codecs/ilbc/syntFilter.h \
+			source/codecs/ilbc/anaFilter.h \
+			source/codecs/ilbc/iLBC_decode.h \
+			source/codecs/ilbc/constants.h \
+			source/codecs/ilbc/getCBvec.h \
+			source/codecs/ilbc/enhancer.h \
+			source/codecs/ilbc/iCBSearch.h \
+			source/codecs/ilbc/hpInput.h \
+			source/codecs/ilbc/gainquant.h \
+			source/codecs/ilbc/LPCencode.h \
+			source/codecs/ilbc/createCB.h \
+			source/codecs/ilbc/doCPLC.h \
+			source/codecs/ilbc/iLBC_define.h \
+			source/codecs/ilbc/packing.h \
+			source/codecs/ilbc/LPCdecode.h \
+			source/codecs/ilbc/hpOutput.h \
+			source/codecs/ilbc/lsf.h \
+			source/codecs/ilbc/filter.h \
+			source/codecs/ilbc/iLBC_encode.h \
+			source/codecs/ilbc/FrameClassify.h
 
-libcodecs_src += $(libcodec_ilbc_src)
+plugins_LTLIBRARIES += milbc.la
+milbc_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+milbc_la_SOURCES = $(libcodec_ilbc_src)
+milbc_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 
+
+#
+# Speex codec plugin
+#
 if HAS_SPEEX
-        libcodecs_src += source/codecs/SPEEXCODEC.cxx
-        libcodecs_libadd += $(SPEEX_LIBS)
+plugins_LTLIBRARIES += mspeex.la
+mspeex_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mspeex_la_SOURCES = source/codecs/SPEEXCODEC.cxx source/codecs/SPEEXCODEC.h
+mspeex_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SPEEX_LIBS)
 endif
 
+
+#
+# Gsm codec plugin
+#
 if HAS_GSM
-        libcodecs_src += source/codecs/GsmCodec.cxx
-        libcodecs_libadd += $(GSM_LIBS)
+plugins_LTLIBRARIES += mgsm.la
+mgsm_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mgsm_la_SOURCES = source/codecs/GsmCodec.cxx source/codecs/GsmCodec.h
+mgsm_la_LIBADD = libminisip.la $(GSM_LIBS)
 endif
+
 
 if IPSEC_SUPPORT
         libipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
@@ -160,14 +222,19 @@ BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
 			${AUDIOMIXER_SRC} \
 			source/soundcard/FileSoundDevice.cxx \
 			source/soundcard/FileSoundSource.cxx \
-			source/soundcard/SoundDevice.cxx 
+			source/soundcard/SoundDevice.cxx \
+			source/soundcard/SoundDriver.cxx \
+			source/soundcard/SoundDriverRegistry.cxx 
 
 ALSA_SRC =	source/soundcard/AlsaCard.cxx \
 		source/soundcard/AlsaSoundDevice.cxx 
 
 DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx 
 
-PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx
+PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx \
+			source/soundcard/PortAudioDriver.cxx \
+			source/soundcard/PortAudioDevice.h \
+			source/soundcard/PortAudioDriver.h
 
 libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
@@ -185,10 +252,17 @@ if DIRECT_SOUND
         libsoundcard_libadd += $(DSOUND_LIBS)
 endif DIRECT_SOUND
 
+
+#
+# PortAudio plugin
+#
 if PORTAUDIO_SUPPORT
-        libsoundcard_src += $(PORTAUDIO_SRC)
-        libsoundcard_libadd += $(PORTAUDIO_LIBS)
+plugins_LTLIBRARIES += mportaudio.la
+mportaudio_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mportaudio_la_SOURCES = $(PORTAUDIO_SRC)
+mportaudio_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(PORTAUDIO_LIBS)
 endif PORTAUDIO_SUPPORT
+
 
 libspaudio_src = source/spaudio/SpAudio.cxx 
 

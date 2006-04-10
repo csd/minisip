@@ -29,8 +29,6 @@
 
 #include<libminisip/codecs/Codec.h>
 
-#ifdef HAS_SPEEX
-
 #include<speex/speex.h> 
 
 #define     MAX_NB_BYTES  1024
@@ -66,6 +64,7 @@ class SpeexCodecState : public CodecState{
 
 class SpeexCodec : public AudioCodec{
 	public:
+		SpeexCodec( MRef<Library *> lib );
 		virtual MRef<CodecState *> newInstance();
 
 		/**
@@ -92,9 +91,8 @@ class SpeexCodec : public AudioCodec{
 		virtual uint8_t getSdpMediaType();
 
 		virtual std::string getSdpMediaAttributes();
-		
-};
 
-#endif //HAS_SPEEX
+		virtual uint32_t getVersion()const;
+};
 
 #endif

@@ -15,8 +15,8 @@
     
    #include <string.h> 
    #include <math.h> 
-#include<libminisip/codecs/ilbc/constants.h> 
-#include<libminisip/codecs/ilbc/filter.h> 
+#include"constants.h" 
+#include"filter.h" 
     
    /*----------------------------------------------------------------* 
     *  quantizer for the gain in the gain-shape coding of residual 

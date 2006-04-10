@@ -99,19 +99,25 @@ void MediaHandler::init(){
 
 		std::list<MRef<Codec *> > codecList;
 		std::list<std::string>::iterator iCodec;
-		MRef<Codec *> selectedCodec;
 
 		for( iCodec = config->audioCodecs.begin(); 
 					iCodec != config->audioCodecs.end();
 					iCodec ++ ){
+			MRef<Codec *> selectedCodec;
+			MRef<AudioCodec *> codec = AudioCodecRegistry::getInstance()->create( *iCodec );
 
-			selectedCodec = (Codec*)*AudioCodec::create( *iCodec );
+
+			if( codec ){
+				selectedCodec = *codec;
+			}
+
 			if( selectedCodec ){
 #ifdef DEBUG_OUTPUT
 				cerr << "Adding audio codec: " << selectedCodec->getCodecName() << endl;
 #endif
 				codecList.push_back( selectedCodec );
 			}
+			
 		}
 		
 		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList );

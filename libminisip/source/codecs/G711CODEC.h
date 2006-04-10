@@ -48,7 +48,7 @@ class G711Codec : public AudioCodec{
 	public:
 		virtual MRef<CodecState *> newInstance();
 		
-		G711Codec();
+		G711Codec( MRef<Library *> lib );
 		virtual ~G711Codec();
 	
 		/**
@@ -78,7 +78,7 @@ class G711Codec : public AudioCodec{
 		
 		virtual std::string getMemObjectType(){return "G711Codec";}		
 		
-		
+		virtual uint32_t getVersion()const;
 };
 
 #endif

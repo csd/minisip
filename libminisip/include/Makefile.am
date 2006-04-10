@@ -1,35 +1,6 @@
 nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/aec/aec.h \
-			libminisip/codecs/g711/codec_g711.h \
-			libminisip/codecs/ilbc/StateConstructW.h \
-			libminisip/codecs/ilbc/StateSearchW.h \
-			libminisip/codecs/ilbc/helpfun.h \
-			libminisip/codecs/ilbc/iCBConstruct.h \
-			libminisip/codecs/ilbc/syntFilter.h \
-			libminisip/codecs/ilbc/anaFilter.h \
-			libminisip/codecs/ilbc/iLBC_decode.h \
-			libminisip/codecs/ilbc/constants.h \
-			libminisip/codecs/ilbc/getCBvec.h \
-			libminisip/codecs/ilbc/enhancer.h \
-			libminisip/codecs/ilbc/iCBSearch.h \
-			libminisip/codecs/ilbc/hpInput.h \
-			libminisip/codecs/ilbc/gainquant.h \
-			libminisip/codecs/ilbc/LPCencode.h \
-			libminisip/codecs/ilbc/createCB.h \
-			libminisip/codecs/ilbc/doCPLC.h \
-			libminisip/codecs/ilbc/iLBC_define.h \
-			libminisip/codecs/ilbc/packing.h \
-			libminisip/codecs/ilbc/LPCdecode.h \
-			libminisip/codecs/ilbc/hpOutput.h \
-			libminisip/codecs/ilbc/lsf.h \
-			libminisip/codecs/ilbc/filter.h \
-			libminisip/codecs/ilbc/iLBC_encode.h \
-			libminisip/codecs/ilbc/FrameClassify.h \
-			libminisip/codecs/G711CODEC.h \
 			libminisip/codecs/Codec.h \
-			libminisip/codecs/SPEEXCODEC.h \
-			libminisip/codecs/GsmCodec.h \
-			libminisip/codecs/ILBCCODEC.h \
 			libminisip/gui/LogEntry.h \
 			libminisip/gui/Gui.h \
 			libminisip/gui/Bell.h \
@@ -124,7 +95,8 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/soundcard/SilenceSensor.h \
 			libminisip/soundcard/SoundIO.h \
 			libminisip/soundcard/AudioMixerSimple.h \
-			libminisip/soundcard/PortAudioDevice.h \
+			libminisip/soundcard/SoundDriver.h \
+			libminisip/soundcard/SoundDriverRegistry.h \
 			libminisip/spaudio/SpAudio.h \
 			libminisip/stun/STUNTest.h \
 			libminisip/stun/STUN.h \

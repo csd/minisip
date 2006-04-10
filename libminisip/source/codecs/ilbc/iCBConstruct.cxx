@@ -15,9 +15,9 @@
     
    #include <math.h> 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/gainquant.h> 
-   #include<libminisip/codecs/ilbc/getCBvec.h> 
+   #include"iLBC_define.h" 
+   #include"gainquant.h" 
+   #include"getCBvec.h" 
     
    /*----------------------------------------------------------------* 
     *  Convert the codebook indexes to make the search easier 

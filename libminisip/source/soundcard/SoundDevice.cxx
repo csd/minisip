@@ -26,6 +26,7 @@
 #include<config.h>
 
 #include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/soundcard/FileSoundDevice.h>
 
 #ifndef WIN32
@@ -44,10 +45,6 @@
 #	include<libminisip/soundcard/WaveSoundDevice.h>
 #endif
 
-#ifdef PORTAUDIO_SUPPORT
-#	include<libminisip/soundcard/PortAudioDevice.h>
-#endif
-
 #include<stdio.h>
 
 #include<libmutil/Thread.h>
@@ -58,6 +55,11 @@ using namespace std;
 MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	if( devideId == "" ){
 		return NULL;
+	}
+
+	MRef<SoundDevice*> device = SoundDriverRegistry::getInstance()->createDevice( devideId );
+	if( device ){
+		return device;
 	}
 
 	if( devideId.substr( 0, 5 ) == "file:" ){
@@ -89,12 +91,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 #ifdef WAVE_SOUND
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
-	}
-#endif
-
-#ifdef PORTAUDIO_SUPPORT
-	if( devideId.substr( 0, 3 ) == "pa:" ){
-		return new PortAudioDevice( devideId.substr( 3, string::npos ) );
 	}
 #endif
 

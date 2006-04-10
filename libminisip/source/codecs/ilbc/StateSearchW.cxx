@@ -17,10 +17,10 @@
    #include <math.h>  
    #include <string.h> 
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
-   #include<libminisip/codecs/ilbc/filter.h> 
-   #include<libminisip/codecs/ilbc/helpfun.h> 
+   #include"iLBC_define.h" 
+   #include"constants.h" 
+   #include"filter.h" 
+   #include"helpfun.h" 
     
    /*----------------------------------------------------------------* 
     *  predictive noise shaping encoding of scaled start state  

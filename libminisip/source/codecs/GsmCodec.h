@@ -33,6 +33,8 @@ typedef struct gsm_state *      gsm;
 
 class GsmCodec: public AudioCodec{
 	public:
+		GsmCodec( MRef<Library *> lib );
+
 		MRef<CodecState *> newInstance();
 		std::string getCodecName();
 		std::string getCodecDescription();
@@ -44,6 +46,7 @@ class GsmCodec: public AudioCodec{
 		int32_t getInputNrSamples();
 		int32_t getSamplingFreq();
 		int32_t getSamplingSizeMs();
+		virtual uint32_t getVersion()const;
 };
 
 class GsmCodecState: public CodecState{

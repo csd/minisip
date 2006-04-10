@@ -32,11 +32,12 @@
 #include<string>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/MPlugin.h>
 
 class Codec;
 class CodecState;
 
-class Codec: public MObject{
+class Codec: public MPlugin{
 	public:
 
 		virtual MRef<CodecState *> newInstance()=0;
@@ -51,6 +52,17 @@ class Codec: public MObject{
 
 		virtual std::string getMemObjectType(){return "Codec";}
 
+		virtual std::string getName()const {
+			return (const_cast<Codec*>(this))->getCodecName();
+		}
+
+		virtual std::string getDescription()const {
+			return (const_cast<Codec*>(this))->getCodecDescription();
+		}
+
+	protected:
+		Codec( MRef<Library *> lib ): MPlugin( lib ) {}
+		Codec(): MPlugin() {}
 };
 
 class CodecState: public MObject{
@@ -83,20 +95,6 @@ class CodecState: public MObject{
 class AudioCodec : public Codec{
 	public:
 		/**
-		 * @returns A CODEC state for the given payloadType
-		 * (NULL if not handled)
-		 */
-		static MRef<CodecState *> createState( uint8_t payloadType );
-		
-                /**
-		 * @returns A CODEC instance for the given description string
-		 * (NULL if not handled)
-		 */
-		static MRef<AudioCodec *> create( const std::string& );
-
-
-		
-		/**
 		 * size of the output of the codec in bytes.
 		 * Returns -1 if output size may vary.
 		 */
@@ -115,8 +113,42 @@ class AudioCodec : public Codec{
 		virtual int32_t getSamplingSizeMs()=0;
 		
 		//virtual std::string getMemObjectType(){return "AudioCodec";}
-		
+
+		virtual std::string getPluginType()const { return "AudioCodec"; }		
+
+	protected:
+		AudioCodec( MRef<Library *> lib ): Codec( lib ) {}
+		AudioCodec(): Codec() {}
 };
 
+/** Registry of audio codec plugins */
+class AudioCodecRegistry: public MPluginRegistry{
+	public:
+		virtual ~AudioCodecRegistry();
+
+		virtual std::string getPluginType(){ return "AudioCodec"; }
+
+		static MRef<AudioCodecRegistry*> getInstance();
+
+		virtual void registerPlugin( MRef<MPlugin*> plugin );
+
+		/**
+		 * @returns A CODEC state for the given payloadType
+		 * (NULL if not handled)
+		 */
+		MRef<CodecState *> createState( uint8_t payloadType );
+		
+                /**
+		 * @returns A CODEC instance for the given description string
+		 * (NULL if not handled)
+		 */
+		MRef<AudioCodec *> create( const std::string& );
+
+	protected:
+		AudioCodecRegistry();
+		void registerBuiltinDrivers();
+
+		static MRef<AudioCodecRegistry *> instance;
+};
 
 #endif

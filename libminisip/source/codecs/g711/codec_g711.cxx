@@ -40,7 +40,7 @@
 
 #include<config.h>
 
-#include<libminisip/codecs/g711/codec_g711.h>
+#include"codec_g711.h"
 
 /*
  * g711.c

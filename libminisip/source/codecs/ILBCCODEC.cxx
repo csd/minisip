@@ -23,15 +23,32 @@
 */
 #include<config.h>
 
-#include<libminisip/codecs/ILBCCODEC.h>
-
-#include<libminisip/codecs/ilbc/iLBC_define.h>
-#include<libminisip/codecs/ilbc/iLBC_encode.h>
-#include<libminisip/codecs/ilbc/iLBC_decode.h>
+#include"ILBCCODEC.h"
 
 #include<libmutil/massert.h>
 
 using namespace std;
+
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+extern "C"
+std::list<std::string> *milbc_LTX_listPlugins( MRef<Library *> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new ILBCCodec( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *milbc_LTX_getPlugin( MRef<Library *> lib ){
+	return &plugin;
+}
+
 
 ILBCCodecState::ILBCCodecState(){
 	initEncode(&enc_inst); 
@@ -69,6 +86,10 @@ uint32_t ILBCCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf
 	} 
 
 	return BLOCKL;
+}
+
+
+ILBCCodec::ILBCCodec( MRef<Library *> lib ): AudioCodec( lib ){
 }
 
 #if 0
@@ -136,4 +157,8 @@ MRef<CodecState *> ILBCCodec::newInstance(){
 	MRef<CodecState *> ret = new ILBCCodecState();
 	ret->setCodec( this );
 	return ret;
+}
+
+uint32_t ILBCCodec::getVersion()const{
+	return 0x00000001;
 }

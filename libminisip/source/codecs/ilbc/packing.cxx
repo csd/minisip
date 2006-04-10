@@ -17,9 +17,9 @@
    #include <stdlib.h> 
    #include <string.h>
     
-   #include<libminisip/codecs/ilbc/iLBC_define.h> 
-   #include<libminisip/codecs/ilbc/constants.h> 
-   #include<libminisip/codecs/ilbc/helpfun.h> 
+   #include"iLBC_define.h" 
+   #include"constants.h" 
+   #include"helpfun.h" 
 
     
    /*----------------------------------------------------------------* 

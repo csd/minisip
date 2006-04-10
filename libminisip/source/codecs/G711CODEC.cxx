@@ -24,16 +24,37 @@
 
 #include<config.h>
 
-#include<libminisip/codecs/G711CODEC.h>
+#include"G711CODEC.h"
 
-#include<libminisip/codecs/g711/codec_g711.h>
+#include"g711/codec_g711.h"
 
 #include<libmutil/massert.h>
 #include<iostream>
 
 using namespace std;
 
-G711Codec::G711Codec(){
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+extern "C"
+std::list<std::string> *mg711_LTX_listPlugins( MRef<Library *> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new G711Codec( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mg711_LTX_getPlugin(){
+	return &plugin;
+}
+
+
+G711Codec::G711Codec( MRef<Library *> lib ): AudioCodec( lib ){
 
 }
 
@@ -104,4 +125,8 @@ MRef<CodecState *> G711Codec::newInstance(){
 	MRef<CodecState *> ret = new G711CodecState();
 	ret->setCodec( this );
 	return ret;
+}
+
+uint32_t G711Codec::getVersion()const{
+	return 0x00000001;
 }

@@ -18,7 +18,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/PortAudioDevice.h>
+#include"PortAudioDevice.h"
 
 #include<portaudio.h>
 #include<math.h>
@@ -55,7 +55,8 @@ static PaSampleFormat toPaSampleFormat( int format )
 	}
 }
 
-PortAudioDevice::PortAudioDevice( string device ): SoundDevice( device )
+//PortAudioDevice::PortAudioDevice( string device ): SoundDevice( device )
+PortAudioDevice::PortAudioDevice( PaDeviceIndex device ): SoundDevice("!PORTAUDIO!"), inId( device ), outId( device )
 {
 	initialized = false;
 
@@ -72,8 +73,8 @@ PortAudioDevice::PortAudioDevice( string device ): SoundDevice( device )
 	nChannelsPlay = 1;
 	nChannelsRecord = 1;
 
-	outId = atoi(device.c_str());
-	inId = outId;
+// 	outId = atoi(device.c_str());
+// 	inId = outId;
 
 	latency = 0.020;
 
