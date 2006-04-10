@@ -1,7 +1,7 @@
 Source: libmnetutil
 Priority: optional
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
-Build-Depends: debhelper (>= 4.0.0), libmutil-dev (>= 0.3.0)
+Build-Depends: debhelper (>= 4.0.0), pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
 Package: libmnetutil0

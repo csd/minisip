@@ -1,7 +1,7 @@
 Source: libmutil
 Priority: optional
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 4.0.0), libssl-dev (>= 0.9.7)
 Standards-Version: 3.6.1
 
 Package: libmutil0
