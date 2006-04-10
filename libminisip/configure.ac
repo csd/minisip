@@ -303,14 +303,21 @@ AC_ARG_ENABLE(video,
 dnl first check for libavcodec
         CPPFLAGS_SAVE="${CPPFLAGS}"
 	LDFLAGS_SAVE="${LDFLAGS}"
+        LIBS_SAVE="${LIBS}"
+
 	CPPFLAGS="${CPPFLAGS} ${AVCODEC_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
 	
         AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no)
         if test "${FFMPEG_CONFIG}" != "no"
         then
-          CPPFLAGS="${CPPFLAGS} `ffmpeg-config --cflags`"
-          LIBS="`ffmpeg-config --libs avcodec` ${LIBS}"
+          FFMPEG_CFLAGS="`ffmpeg-config --cflags`"
+          FFMPEG_LIBS="`ffmpeg-config --libs avcodec`"
+          CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
+          LIBS="${FFMPEG_LIBS} ${LIBS}"
+
+          AC_SUBST(FFMPEG_LIBS)
+          AC_SUBST(FFMPEG_CFLAGS)
         else
 	  AC_CHECK_HEADER([avcodec.h], [],
             [
@@ -327,8 +334,9 @@ dnl first check for libavcodec
 	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
 	    [Could not find zlib, required by libavcodec.])])
         fi
-dnl	CPPFLAGS="${CPPFLAGS_SAVE}"
-dnl	LDFLAGS="${LDFLAGS_SAVE}"
+	CPPFLAGS="${CPPFLAGS_SAVE}"
+	LDFLAGS="${LDFLAGS_SAVE}"
+	LIBS="${LIBS_SAVE}"
         
 dnl look for V4L headers
         AC_CHECK_HEADERS([linux/videodev.h],
@@ -342,21 +350,39 @@ dnl look for libdc1394
 	       VIDEO_GRABBER="${VIDEO_GRABBER} dc1394}"
 	       DC1394_VIDEO_GRABBER="yes" 
 	       AC_DEFINE(DC1394_SUPPORT, [], [Compile DC1394 support])
-	       LIBS="${LIBS} -ldc1394_control -lraw1394"
+	       DC1394_LIBS="-ldc1394_control -lraw1394"
 	       ], [], [-lraw1394])
 	       ])
+               AC_SUBST(DC1394_LIBS)
 	     ])
 dnl look for xvideo
+	CPPFLAGS_SAVE="${CPPFLAGS}"
+	LDFLAGS_SAVE="${LDFLAGS}"
+	LIBS_SAVE="${LIBS}"
+
 	AC_PATH_XTRA
 	X_LIBS="$X_LIBS -lX11"
 	LDFLAGS="${LDFLAGS} ${X_EXTRA_LIBS} ${X_LIBS}"
-	AC_CHECK_LIB([Xv], [main])
+	have_xv="yes"
+	AC_CHECK_LIB([Xv], [main],,[have_xv="no"])
+	AC_CHECK_HEADERS([X11/Xlib.h],,[have_xv="no"])
         AC_CHECK_HEADERS([X11/extensions/Xv.h],[
           AC_CHECK_HEADERS([X11/extensions/Xvlib.h],
-	    [VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
-	     AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
-	     XV_VIDEO_DISPLAY="yes" ],[])
-	  ])
+	    [],[have_xv="no"],
+[
+#if HAVE_X11_XLIB_H
+# include<X11/Xlib.h>
+#endif
+])
+	  ],[have_xv="no"])
+
+	if test "${have_xv}" = "yes"; then
+	  X_LIBS="-lXv $X_LIBS"
+	  VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
+	  AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
+	  XV_VIDEO_DISPLAY="yes" 
+	fi
+
 dnl check for SDL
         AC_CHECK_HEADERS([SDL/SDL.h],
 	  [
@@ -366,12 +392,18 @@ dnl check for SDL
 	         VIDEO_DISPLAY="${VIDEO_DISPLAY} sdl"
 	         SDL_VIDEO_DISPLAY="yes" 
 	         AC_DEFINE(SDL_SUPPORT, [], [Compile SDL support])
-	         LIBS="${LIBS} -lSDL ${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread"
+                 X_EXTRA_LIBS="${X_EXTRA_LIBS} -lXext"
+		 SDL_LIBS="-lSDL -pthread"
 	         CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
+
+		 AC_SUBST(SDL_LIBS)
                fi
 	     ], [], [${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread] )
 	  ])
 	
+	CPPFLAGS="${CPPFLAGS_SAVE}"
+	LDFLAGS="${LDFLAGS_SAVE}"
+	LIBS="${LIBS_SAVE}"
 	
 	if test "x${VIDEO_DISPLAY}" != "x"
 	then
@@ -381,6 +413,10 @@ dnl check for SDL
 	  AC_SUBST(AVCODEC_CPPFLAGS)
 	fi
       fi ])
+
+AC_SUBST(X_LIBS)
+AC_SUBST(X_CFLAGS)
+AC_SUBST(X_EXTRA_LIBS)
 
 AM_CONDITIONAL(VIDEO_SUPPORT, test "${enable_video}" = "yes")
 AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")

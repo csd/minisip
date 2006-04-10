@@ -29,6 +29,7 @@
 
 class LIBMINISIP_API VideoEncoderCallback{
 	public:
+		virtual ~VideoEncoderCallback(){}
 	        virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false )=0;
 };
 

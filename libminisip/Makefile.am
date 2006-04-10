@@ -12,10 +12,10 @@ pkgconfig_DATA = libminisip.pc
 
 
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(AM_CPPFLAGS)
+libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) $(FFMPEG_CFLAGS) $(X_CFLAGS)
 libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
 libminisip_la_LDFLAGS = -Wl,--no-undefined -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS)
-libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
+libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS) $(FFMPEG_LIBS) $(DC1394_LIBS) $(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
 plugins_LTLIBRARIES =
 
 

@@ -30,6 +30,7 @@
 #include<fcntl.h>
 #include<sys/ioctl.h>
 #include<sys/mman.h>
+#include<errno.h>
 
 #include<iostream>
 #include<fstream>

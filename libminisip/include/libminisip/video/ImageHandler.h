@@ -68,6 +68,8 @@ typedef struct MImage{
 
 class LIBMINISIP_API ImageHandler{
 	public:
+		virtual ~ImageHandler(){}
+
 		virtual bool handlesChroma( uint32_t chroma )=0;
 		virtual void init( uint32_t width, uint32_t height )=0;
 		

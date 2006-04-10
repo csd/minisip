@@ -31,6 +31,7 @@
 
 #define MAX_SOURCE 256
 
+using namespace std;
 
 ImageMixer::ImageMixer():mainSource(0),newMainSource(0),
 			 mainSourceImagesCounter(0){

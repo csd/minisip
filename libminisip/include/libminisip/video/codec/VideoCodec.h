@@ -64,6 +64,10 @@ class LIBMINISIP_API VideoCodec : public Codec{
 
 		virtual std::string getMemObjectType(){return "AVCodec";}
 
+		virtual std::string getPluginType()const{return "VideoCodec";}
+
+		virtual uint32_t getVersion() const;
+
 	private:
 
 		MRef<MediaStreamSender *> senders;

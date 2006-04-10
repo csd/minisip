@@ -117,3 +117,7 @@ void VideoCodec::stopSend(){
 	coder->close();
 
 }
+
+uint32_t VideoCodec::getVersion() const{
+	return 0x00000001;
+}

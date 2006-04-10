@@ -37,6 +37,8 @@
 #include<iostream>
 #define NB_IMAGES 3
 
+using namespace std;
+
 Mutex VideoDisplay::displayCounterLock;
 uint32_t VideoDisplay::displayCounter = 0;
 
