@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/configbackend/MXmlConfBackend.h>
+#include"MXmlConfBackend.h"
 #include<libminisip/configbackend/UserConfig.h>
 
 #include<libmutil/XMLParser.h>
@@ -33,6 +33,27 @@
 #include<stdlib.h>
 
 using namespace std;
+
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+
+extern "C"
+std::list<std::string> *mxmlconf_LTX_listPlugins( MRef<Library*> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new MXmlConfigPlugin( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
+	return &plugin;
+}
 
 MXmlConfBackend::MXmlConfBackend(){
 	fileName = getDefaultConfigFilename();
@@ -113,4 +134,23 @@ int32_t MXmlConfBackend::loadInt( const std::string &key,
 
 string MXmlConfBackend::getDefaultConfigFilename(){
 	return UserConfig::getFileName( "minisip.conf" );
+}
+
+MXmlConfigPlugin::MXmlConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
+}
+
+MRef<ConfBackend *> MXmlConfigPlugin::createBackend(MRef<Gui*> gui)const{
+	return new MXmlConfBackend();
+}
+
+std::string MXmlConfigPlugin::getName()const{
+	return "mxmlconf";
+}
+
+std::string MXmlConfigPlugin::getDescription()const{
+	return "MXmlConf backend";
+}
+
+uint32_t MXmlConfigPlugin::getVersion()const{
+	return 0x00000001;
 }

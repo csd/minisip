@@ -71,7 +71,6 @@
 #include<libminisip/conference/ConferenceControl.h>
 #include<libminisip/conference/ConfCallback.h>
 #include<libminisip/configbackend/ConfBackend.h>
-#include<libminisip/configbackend/MXmlConfBackend.h>
 #include<libminisip/conference/ConfMessageRouter.h>
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/codecs/Codec.h>
@@ -115,6 +114,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 
 	SoundDriverRegistry::getInstance();
 	AudioCodecRegistry::getInstance();
+	ConfigRegistry::getInstance();
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
 	pluginManager->loadFromDirectory(MINISIP_PLUGINDIR);
 
@@ -392,7 +392,7 @@ int Minisip::initParseConfig(){
 			mout << BOLD << "init 3/9: Parsing configuration file ("
 					<< conffile<<")" << PLAIN << end;
 #endif
-			MRef<ConfBackend *> confBackend = ConfBackend::create(gui);
+			MRef<ConfBackend *> confBackend = ConfigRegistry::getInstance()->createBackend( gui );
 			if( !confBackend ){
 				merr << "Minisip could not load a configuration"
 					"back end. The application will now"

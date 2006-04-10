@@ -26,23 +26,36 @@
 
 #include<libminisip/configbackend/ConfBackend.h>
 
-#ifdef GCONF_SUPPORT
-#	include<libminisip/configbackend/GConfBackend.h>
-#endif
-
-#include<libminisip/configbackend/MXmlConfBackend.h>
-
 using namespace std;
 
-MRef<ConfBackend *> ConfBackend::create(MRef<Gui*>){ // No configuration needs the GUI yet...
+MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string backendName ){
 						     
 	try{
-#ifdef GCONF_SUPPORT
-		return new GConfBackend();
-#else
-		return new MXmlConfBackend();
-#endif
+		MRef<MPlugin *> plugin;
 
+		if( !backendName.empty() ){
+			plugin = findPlugin( backendName );
+		}
+		else {
+			plugin = findPlugin( "gconf" );
+
+			if( !plugin ){
+				plugin = findPlugin( "mxmlconf" );
+			}
+		}
+
+		if( !plugin ){
+			merr << "ConfigRegistry: Can't create config backend " << backendName << end;
+			return NULL;
+		}
+		
+		ConfigPlugin *config = dynamic_cast<ConfigPlugin*>(*plugin);
+		if( !config ){
+			merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << end;
+			return NULL;
+		}
+
+		return config->createBackend( gui );
 	}
 	catch( ConfBackendException & ){
 		return NULL;
@@ -63,4 +76,39 @@ void ConfBackend::save( const char * key, const int32_t value ){
 
 void ConfBackend::save( const char * key, const string &value ){
 	save( std::string( key ), value );
+}
+
+
+ConfigPlugin::ConfigPlugin( MRef<Library *> lib ): MPlugin( lib ){
+}
+
+
+MRef<ConfigRegistry *> ConfigRegistry::instance;
+
+ConfigRegistry::ConfigRegistry(){
+}
+
+ConfigRegistry::~ConfigRegistry(){
+}
+
+void ConfigRegistry::registerBuiltins(){
+}
+
+MRef<ConfigRegistry *> ConfigRegistry::getInstance(){
+	if( !instance ){
+		instance = new ConfigRegistry();
+		instance->registerBuiltins();
+	}
+	return instance;
+}
+
+void ConfigRegistry::registerPlugin( MRef<MPlugin*> plugin ){
+	ConfigPlugin *config = dynamic_cast<ConfigPlugin *>(*plugin);
+
+	if( config ){
+		MPluginRegistry::registerPlugin( plugin );
+	}
+	else {
+		merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << end;
+	}
 }

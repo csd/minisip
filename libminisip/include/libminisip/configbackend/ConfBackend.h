@@ -29,23 +29,12 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
+#include<libmutil/MPlugin.h>
 #include<libminisip/gui/Gui.h>
 #include<string>
 
 class LIBMINISIP_API ConfBackend : public MObject{
 	public:
-		/**
-		 * @param gui	A configuration backend can need to provide
-		 * 		authentication information in order to 
-		 * 		access the configuration. In that case it
-		 * 		will ask the user via the gui object passed
-		 * 		to this method for username and password.
-		 * 		This is for example the case of the
-		 * 		configuration is stored on server instead
-		 * 		of on the local device.
-		 */
-		static MRef<ConfBackend *> create(MRef<Gui*> gui);
-
 		virtual void save( const std::string &key, 
 				const std::string &value )=0;
 		virtual void save( const std::string &key, const int32_t value )=0;
@@ -66,5 +55,47 @@ class LIBMINISIP_API ConfBackend : public MObject{
 
 class LIBMINISIP_API ConfBackendException{};
 
+class LIBMINISIP_API ConfigPlugin : public MPlugin{
+	public:
+		/**
+		 * @param gui	A configuration backend can need to provide
+		 * 		authentication information in order to 
+		 * 		access the configuration. In that case it
+		 * 		will ask the user via the gui object passed
+		 * 		to this method for username and password.
+		 * 		This is for example the case of the
+		 * 		configuration is stored on server instead
+		 * 		of on the local device.
+		 */
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const=0;
+
+		virtual std::string getPluginType()const{ return "Config"; }
+
+	protected:
+		ConfigPlugin( MRef<Library *> lib );
+};
+
+/**
+ * Registry of config plugins.
+ */
+class ConfigRegistry: public MPluginRegistry{
+	public:
+		virtual ~ConfigRegistry();
+
+		virtual std::string getPluginType(){ return "Config"; }
+
+		static MRef<ConfigRegistry*> getInstance();
+
+		MRef<ConfBackend*> createBackend( MRef<Gui*> gui, std::string backendName="" );
+
+		virtual void registerPlugin( MRef<MPlugin*> plugin );
+
+	protected:
+		ConfigRegistry();
+		void registerBuiltins();
+
+	private:
+		static MRef<ConfigRegistry *> instance;
+};
 
 #endif

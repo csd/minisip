@@ -29,7 +29,7 @@
 
 class XMLFileParser;
 
-class LIBMINISIP_API MXmlConfBackend : public ConfBackend {
+class MXmlConfBackend : public ConfBackend {
 	public:
 		MXmlConfBackend();
 		~MXmlConfBackend();
@@ -51,5 +51,30 @@ class LIBMINISIP_API MXmlConfBackend : public ConfBackend {
 		std::string getDefaultConfigFilename();
 		std::string fileName;
 		XMLFileParser * parser;
+};
+
+class MXmlConfigPlugin : public ConfigPlugin{
+	public:
+		MXmlConfigPlugin( MRef<Library *> lib );
+
+		/**
+		 * @param gui	A configuration backend can need to provide
+		 * 		authentication information in order to 
+		 * 		access the configuration. In that case it
+		 * 		will ask the user via the gui object passed
+		 * 		to this method for username and password.
+		 * 		This is for example the case of the
+		 * 		configuration is stored on server instead
+		 * 		of on the local device.
+		 */
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
+
+		virtual std::string getMemObjectType() { return "MXmlConfBackend"; }
+
+		virtual std::string getName()const;
+
+		virtual std::string getDescription()const;
+
+		virtual uint32_t getVersion()const;
 };
 

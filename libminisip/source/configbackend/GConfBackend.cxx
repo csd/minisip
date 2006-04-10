@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/configbackend/GConfBackend.h>
+#include"GConfBackend.h"
 
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
@@ -36,6 +36,28 @@
 #endif
 
 using namespace std;
+
+static std::list<std::string> pluginList;
+static int initialized;
+static MRef<MPlugin *> plugin;
+
+
+extern "C"
+std::list<std::string> *mgconf_LTX_listPlugins( MRef<Library*> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		
+		plugin = new GConfigPlugin( lib );
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mgconf_LTX_getPlugin( MRef<Library*> lib ){
+	return &plugin;
+}
+
 
 GConfBackend::GConfBackend(){
 
@@ -173,4 +195,23 @@ void GConfBackend::sanitizeKey( string &key ){
 		}
 	} while( n != string::npos );
 
+}
+
+GConfigPlugin::GConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
+}
+
+MRef<ConfBackend *> GConfigPlugin::createBackend(MRef<Gui*> gui)const{
+	return new GConfBackend();
+}
+
+std::string GConfigPlugin::getName()const{
+	return "gconf";
+}
+
+std::string GConfigPlugin::getDescription()const{
+	return "GConf backend";
+}
+
+uint32_t GConfigPlugin::getVersion()const{
+	return 0x00000001;
 }

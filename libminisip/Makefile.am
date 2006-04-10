@@ -14,7 +14,7 @@ pkgconfig_DATA = libminisip.pc
 lib_LTLIBRARIES = libminisip.la
 libminisip_la_CPPFLAGS = $(AM_CPPFLAGS)
 libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
-libminisip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS)
+libminisip_la_LDFLAGS = -Wl,--no-undefined -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS)
 libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS)
 plugins_LTLIBRARIES =
 
@@ -335,8 +335,15 @@ libconference_src = source/conference/ConferenceControl.cxx \
 			source/conference/ConfCallback.cxx \
 			source/conference/ConfMessageRouter.cxx
 
-libconfigbackend_src = source/configbackend/ConfBackend.cxx \
-			source/configbackend/MXmlConfBackend.cxx
+libconfigbackend_src = source/configbackend/ConfBackend.cxx
+
+plugins_LTLIBRARIES += mxmlconf.la
+mxmlconf_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mxmlconf_la_SOURCES = source/configbackend/MXmlConfBackend.cxx \
+			source/configbackend/MXmlConfBackend.h
+mxmlconf_la_LIBADD = libminisip.la $(MUTIL_LIBS)
+
+
 if OS_WIN
         libconfigbackend_src += source/configbackend/UserConfigWin32.cxx
 else
@@ -344,9 +351,12 @@ else
 endif
 
 if GCONF_SUPPORT
-        AM_CPPFLAGS += $(GCONF_CFLAGS)
-        libconfigbackend_src += source/configbackend/GConfBackend.cxx
-        libconfigbackend_libadd = $(GCONF_LIBS)
+plugins_LTLIBRARIES += mgconf.la
+mgconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(GCONF_CFLAGS)
+mgconf_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mgconf_la_SOURCES = source/configbackend/GConfBackend.cxx \
+			source/configbackend/GConfBackend.h
+mgconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GCONF_LIBS)
 endif
 
 libminisip_la_SOURCES = source/Minisip.cxx \

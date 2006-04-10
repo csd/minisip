@@ -31,7 +31,7 @@
 
 typedef struct _GConfClient GConfClient;
 
-class LIBMINISIP_API GConfBackend : public ConfBackend {
+class GConfBackend : public ConfBackend {
 	public:
 		virtual void save( const std::string &key, 
 				const std::string &value );
@@ -55,6 +55,31 @@ class LIBMINISIP_API GConfBackend : public ConfBackend {
 
 		void sanitizeKey( std::string &key );
 
+};
+
+class GConfigPlugin : public ConfigPlugin{
+	public:
+		GConfigPlugin( MRef<Library *> lib );
+
+		/**
+		 * @param gui	A configuration backend can need to provide
+		 * 		authentication information in order to 
+		 * 		access the configuration. In that case it
+		 * 		will ask the user via the gui object passed
+		 * 		to this method for username and password.
+		 * 		This is for example the case of the
+		 * 		configuration is stored on server instead
+		 * 		of on the local device.
+		 */
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
+
+		virtual std::string getMemObjectType() { return "GConfBackend"; }
+
+		virtual std::string getName()const;
+
+		virtual std::string getDescription()const;
+
+		virtual uint32_t getVersion()const;
 };
 
 #endif
