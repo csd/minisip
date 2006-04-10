@@ -247,3 +247,18 @@ MPluginRegistry::~MPluginRegistry(){
 	plugins.clear();
 	manager->removeRegistry( this );
 }
+
+MRef<MPlugin*> MPluginRegistry::findPlugin( std::string name ){
+	list< MRef<MPlugin *> >::iterator iter;
+	list< MRef<MPlugin *> >::iterator last = plugins.end();
+
+	for( iter = plugins.begin(); iter != last; iter++ ){
+		MRef<MPlugin *> plugin = *iter;
+
+		if( plugin->getName() == name ){
+			return plugin;
+		}
+	}
+
+	return NULL;
+}

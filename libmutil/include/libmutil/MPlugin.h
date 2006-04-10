@@ -176,7 +176,10 @@ class LIBMUTIL_API MPluginRegistry: public MObject {
 		virtual std::string getPluginType()=0;
 
 		virtual void registerPlugin( MRef<MPlugin *> p );
+
 	protected:
+		virtual MRef<MPlugin*> findPlugin( std::string name );
+
 		std::list< MRef<MPlugin *> > plugins;
 
 	private:
