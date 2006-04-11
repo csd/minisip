@@ -99,7 +99,7 @@ list<MRef<SipTransaction*> > SipDialog::getTransactions(){
 
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
-	mdbg << "SipDialog::handleCommand got command "<< command << "("<<getName()<<")"<<end;
+	mdbg << "SipDialog("<<getMemObjectType()<<")::handleCommand got command "<< command << "("<<getName()<<")"<<end;
 	
 	if (! (command.getDestination()==SipSMCommand::dialog_layer) ){
 		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< end;
