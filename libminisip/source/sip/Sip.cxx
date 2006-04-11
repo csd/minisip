@@ -83,9 +83,10 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	
 	sipstack = new SipStack(stackConfig, cert_chain,cert_db);
 
-	MRef<SipDialogConfig*> callconf = new SipDialogConfig(phoneconfig->inherited);
-	MRef<DefaultDialogHandler*> defaultDialogHandler = new DefaultDialogHandler(sipstack,
-					/*callconf,*/phoneconfig,mediaHandler);
+	MRef<DefaultDialogHandler*> defaultDialogHandler = 
+			new DefaultDialogHandler(sipstack,
+						phoneconfig,
+						mediaHandler);
 	
 	sipstack->setDefaultDialogCommandHandler(*defaultDialogHandler);
 

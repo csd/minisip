@@ -198,8 +198,10 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		dispatcher->getCallback()->handleCommand("gui", cmdstr );
+
+		bool rel100Supported = inv->supported("100rel");
 		
-		sendRinging(branch);
+		sendRinging(branch, rel100Supported && getDialogConfig()->inherited->use100Rel );
 		
 		if( getDialogConfig()->inherited->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
@@ -565,10 +567,12 @@ void SipDialogVoipServer::sendReject(const string &branch){
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
-void SipDialogVoipServer::sendRinging(const string &branch){
+void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", MRef<SipMessage*>(*getLastInvite()));	
 
-	//ringing->addHeader(new SipHeader(new SipHeaderValueRequire("100rel"))); //EEEEEE
+	if (use100Rel){
+		ringing->addHeader(new SipHeader(new SipHeaderValueRequire("100rel")));
+	}
 	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	

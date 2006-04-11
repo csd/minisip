@@ -77,19 +77,20 @@ using namespace std;
  The "dotted" states are implemented in SipDialogVoip.cxx.
    
 
+
                  +---------------+
                  |               |
                  |     start     |
                  |               |
-a26transport_err +---------------+
-gui(failed)              |
-  +----------------+     | invite
-  |                |     V a2001: new TransInvite
-  |              +---------------+
-  |         +----|               |----+
-  |     1xx |    |Calling_noauth |    | 180
-  |a3:(null)+--->|               |<---+ a2002: gui(ringing)
-  +--------------+---------------+                     
+a26transport_err +---------------+      100rel
+gui(failed)              |              a2015:PRACK +------------------+
+  +----------------+     | invite                   |                  |
+  |                |     V a2001: new TransInvite   |    prack_sent    |
+  |              +---------------+----------------->|                  |
+  |         +----|               |<------------(*)--+------------------+
+  |     1xx |    |Calling_noauth |----+ 180
+  |a3:(null)+--->|               |    | a2002: gui(ringing)      (*) 200 OK
+  +--------------+---------------+<---+                          a2016: -
   |                      |     |       2xx/a2004:
   |   cancel|hangup      |     +------------------------------+
   |   a2014              |                                    |
@@ -553,6 +554,44 @@ bool SipDialogVoipClient::a2014_callingauth_termwait_cancel( const SipSMCommand 
 	}
 }
 
+
+bool SipDialogVoipClient::a2015_calling_pracksent_100rel( const SipSMCommand &command)
+{
+        if (transitionMatch(SipResponse::type,
+                                command,
+                                SipSMCommand::transaction_layer,
+                                SipSMCommand::dialog_layer,
+                                "1**")){
+
+                MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
+                if (!(resp->requires("100rel") && resp->getStatusCode()!=100)){
+			return false;
+		}
+		
+		sendPrack(resp);
+		
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogVoipClient::a2016_pracksent_calling_2XX( const SipSMCommand &command)
+{
+        if (transitionMatch(SipResponse::type,
+                                command,
+                                SipSMCommand::transaction_layer,
+                                SipSMCommand::dialog_layer,
+                                "2**")){
+		return true;
+	}else{
+		return false;
+	}
+
+}
+
+
+
 void SipDialogVoipClient::setUpStateMachine(){
 
 	State<SipSMCommand,string> *s_start=new State<SipSMCommand,string>(this,"start");
@@ -564,8 +603,22 @@ void SipDialogVoipClient::setUpStateMachine(){
 	State<SipSMCommand,string> *s_callingauth=new State<SipSMCommand,string>(this,"callingauth");
 	addState(s_callingauth);
 
+	State<SipSMCommand,string> *s_pracksent=new State<SipSMCommand,string>(this,"pracksent");
+	addState(s_pracksent);
+
 	MRef<State<SipSMCommand,string> *> s_incall = getState("incall");
 	MRef<State<SipSMCommand,string> *> s_termwait= getState("termwait");
+
+	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_pracksent_100rel",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2015_calling_pracksent_100rel, 
+			s_callingnoauth, s_pracksent);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_pracksent_callingnoauth_2XX",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2016_pracksent_calling_2XX, 
+			s_pracksent, s_callingnoauth);
+
+
+
 
 	new StateTransition<SipSMCommand,string>(this, "transition_start_callingnoauth_invite",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2001_start_callingnoauth_invite, 
@@ -745,6 +798,25 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 	setLastInvite(inv);
 
+}
+
+void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
+	
+	MRef<SipRequest*> prack = SipRequest::createSipMessageAck(
+			"",
+			*rel100resp,
+			dialogState.remoteUri,
+			true
+			) ;
+
+	
+	SipSMCommand scmd(
+			*prack, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer
+			);
+	
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipClient::sendAuthInvite(const string &branch){

@@ -81,6 +81,8 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 		void sendInvite(const std::string &branch);
 		void sendAuthInvite(const std::string &branch);
 
+		void sendPrack(MRef<SipResponse*>);
+
 		bool a2001_start_callingnoauth_invite( const SipSMCommand &command);
 		bool a2002_callingnoauth_callingnoauth_18X( const SipSMCommand &command);
 		bool a2003_callingnoauth_callingnoauth_1xx( const SipSMCommand &command);
@@ -96,6 +98,9 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 
 		bool a2013_callingnoauth_termwait_transporterror( const SipSMCommand &command);
 		bool a2014_callingauth_termwait_cancel( const SipSMCommand &command);
+
+		bool a2015_calling_pracksent_100rel( const SipSMCommand &command);
+		bool a2016_pracksent_calling_2XX( const SipSMCommand &command);
 		
 };
 
