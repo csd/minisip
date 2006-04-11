@@ -149,6 +149,15 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                  */
 		bool requires(std::string extension);
 
+		/**
+		 * Returns true if the message contains a SIP "Supported" header with
+		 * the extension given as argument to this method.
+		 * @param extension     Extension to check for in the
+		 *                      "Supported" headers.
+		 */
+		bool supported(std::string extension);
+
+
 
 		/**
 		* @return Size in bytes of the content of the SIP message.
