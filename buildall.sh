@@ -46,19 +46,32 @@ base_configure_params="$base_configure_params --disable-shared"
 libmutil_configure_params=""
 #libmutil_configure_params="$libmutil_configure_params --enable-memdebug"
 
-#set special options for libminisip and minisip
+#set special options for libminisip
 #   do a ./configure --help to see ALL available options ... here
 #              show just a sample
-minisip_configure_params=""
-minisip_configure_params="$minisip_configure_params --enable-color-terminal"
-minisip_configure_params="$minisip_configure_params --enable-alsa"
+libminisip_configure_params=""
+libminisip_configure_params="$libminisip_configure_params --enable-color-terminal"
+libminisip_configure_params="$libminisip_configure_params --enable-alsa"
       #--enable-autocall enables automatic calling for debug purposes (default disabled)
       #--enable-ipaq enables various fixes for the iPAQ (default disabled)
       #--enable-ipsec-enable enables ipsec features (default disabled)
       #--enable-aec enables push-2-talk features (default enabled)
       #--enable-video enables video features (default disabled)
-      #--enable-textui enables the text based user interface (default disabled)
-
+      #--enable-buzzer enables IPAQ buzzer (default disabled)
+      #--enable-dsound enables DirectSound sound support (default disabled)
+      #--enable-portaudio      enable PortAudio V19 support (default auto).
+      #--enable-gconf enables support for GConf (default enabled).
+      #--enable-sdl enables SDL video output if the required library is found
+      #--enable-video enables video features (default disabled)
+ 
+#set special options for minisip
+#   do a ./configure --help to see ALL available options ... here
+#              show just a sample
+minisip_configure_params=""
+minisip_configure_params="$minisip_configure_params --enable-gtk"
+	#minisip_configure_params="$minisip_configure_params --enable-textui"
+	#Here you could have per gui-specific parameters ... 
+	
 for subdir in ${SUBDIRS}
 do
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
