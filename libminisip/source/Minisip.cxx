@@ -75,6 +75,8 @@
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/codecs/Codec.h>
 
+#include<stdlib.h>
+
 #ifdef OSSO_SUPPORT
 #include<libosso.h>
 #endif
@@ -97,6 +99,22 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
+static void loadPlugins(){
+	SoundDriverRegistry::getInstance();
+	AudioCodecRegistry::getInstance();
+	ConfigRegistry::getInstance();
+
+	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
+
+	const char *path = getenv( "MINISIP_PLUGIN_PATH" );
+
+	if( !path ){
+		path = MINISIP_PLUGINDIR;
+	}
+
+	pluginManager->loadFromDirectory(path);
+}
+
 Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 
 	srand((unsigned int)time(0));
@@ -112,11 +130,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 	mout << "Loading plugins"<<end;
 	#endif
 
-	SoundDriverRegistry::getInstance();
-	AudioCodecRegistry::getInstance();
-	ConfigRegistry::getInstance();
-	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
-	pluginManager->loadFromDirectory(MINISIP_PLUGINDIR);
+	loadPlugins();
 
 	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;
