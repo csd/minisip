@@ -376,7 +376,8 @@ SipCommonConfig::SipCommonConfig():
 	localUdpPort(0),
 	localTcpPort(0),
 	localTlsPort(0),
-	autoAnswer(false){
+	autoAnswer(false),
+	use100Rel(false){
 
 }
 

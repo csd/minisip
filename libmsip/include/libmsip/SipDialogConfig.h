@@ -299,6 +299,13 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 		
 		bool autoAnswer;
 
+
+                /**
+                 * This is the setting telling a dialogwhether it should
+                 * use the 100rel extension if the remote user supports it.
+                 */
+                bool use100Rel;
+
 };
 
 
