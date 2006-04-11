@@ -45,6 +45,7 @@
 #include<libmutil/massert.h>
 
 #include<libminisip/sip/SipDialogVoipServer.h>
+#include<libminisip/sip/SipDialogVoipServer100rel.h>
 #include<libminisip/sip/SipDialogConfVoip.h>
 #include<libminisip/sip/SipDialogPresenceClient.h>
 #include<libminisip/sip/SipDialogPresenceServer.h>
@@ -320,9 +321,20 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 						phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
 
 #else	
-
-			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
-						phoneconf, mediaSession, pkt->getCallId()));
+			MRef<SipDialog*> voipCall;
+//			if (pkt->supported("100rel")){
+//				voipCall = new SipDialogVoipServer100rel(sipStack,
+//						callConf,
+//						phoneconf,
+//						mediaSession,
+//						pkt->getCallId());
+//			}else{
+				voipCall = new SipDialogVoipServer(sipStack,
+						callConf,
+						phoneconf,
+						mediaSession,
+						pkt->getCallId());
+//			}
 #endif
 			sipStack->addDialog(voipCall);
 

@@ -451,7 +451,7 @@ void SipDialogVoipServer::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3005_ringing_termwait_reject,
 			s_ringing, s_termwait);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_start_termwait_INVITE",
+	new StateTransition<SipSMCommand,string>(this, "transition_start_termwait_INVITEnothandled",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3006_start_termwait_INVITE,
 			s_start, s_termwait);
 

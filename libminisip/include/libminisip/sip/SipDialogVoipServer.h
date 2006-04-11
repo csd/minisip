@@ -69,13 +69,15 @@ class LIBMINISIP_API SipDialogVoipServer: public SipDialogVoip{
 		
 		virtual std::string getName(){return "SipDialogVoipServer[callid="+dialogState.callId +"]";}
 
+	protected:
+		void sendRinging(const std::string &branch, bool use100Rel);
+		
 	private:
 		
 		void setUpStateMachine();
 		
 		void sendInviteOk(const std::string &branch);
 		void sendReject(const std::string &branch);
-		void sendRinging(const std::string &branch, bool use100Rel);
 		void sendNotAcceptable(const std::string &branch);
 
 		bool a3001_start_ringing_INVITE( const SipSMCommand &command);
