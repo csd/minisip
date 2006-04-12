@@ -44,8 +44,9 @@
 	class LIBMUTIL_API DbgHandler {
 		public:
 			virtual ~DbgHandler(){}
-		private:
+		protected:
 			virtual void displayMessage(std::string output,int style=-1)=0;
+		private:
 			friend class Dbg;
 			friend class DbgBuf;
 	};
@@ -102,8 +103,9 @@
 	class LIBMUTIL_API DbgHandler{
 		public:
 			virtual ~DbgHandler(){}
-		private:
+		protected:
 			virtual void displayMessage(std::string output,int style=-1)=0;
+		private:
 			friend class Dbg;
 	};
 

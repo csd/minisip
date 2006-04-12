@@ -91,10 +91,10 @@ void Dbg::updateBuf()
 	std::streambuf *buf = NULL;
 
 	if( enabled ){
-		if( error_out )
-			buf = std::cerr.rdbuf();
-		else if( external_out )
+		if( external_out )
 			buf = &dbgBuf;
+		else if( error_out )
+			buf = std::cerr.rdbuf();
 		else
 			buf = std::cout.rdbuf();
 	}

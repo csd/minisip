@@ -27,6 +27,7 @@
 
 #include<config.h>
 
+#include<libmutil/dbg.h>
 #include<libmutil/MPlugin.h>
 #include<libmutil/Library.h>
 
@@ -202,10 +203,11 @@ MRef<MPlugin *> MPluginManager::loadFromLibrary( MRef<Library *> lib,
 
 	if( creatorFunction ){
 		MRef<MPlugin *> * pp = creatorFunction( lib );
-		fprintf( stderr, "pp: %x\n", (unsigned int)pp );
-		fprintf( stderr, "getName: %s\n", (**pp)->getName().c_str() );
-		fprintf( stderr, "getDescription: %s\n", (**pp)->getDescription().c_str() );
-		return *pp;
+		
+		if( pp ){
+			mdbg << "MPluginManager: loaded " << (*pp)->getName() << "(" << (*pp)->getDescription() << ")" << end;
+			return *pp;
+		}
 	}
 
 	return NULL;
