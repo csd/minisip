@@ -27,12 +27,11 @@
 
 #include<libmsip/SipLayerTransaction.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
-#include<libmsip/SipTransactionInviteServer.h>
-#include<libmsip/SipTransactionInviteServerUA.h>
-#include<libmsip/SipTransactionNonInviteServer.h>
+//#include<libmsip/SipTransactionInviteServer.h>
+//#include<libmsip/SipTransactionInviteServerUA.h>
+//#include<libmsip/SipTransactionNonInviteServer.h>
 
 SipLayerTransaction::SipLayerTransaction(
 		MRef<SipCommandDispatcher*> d,
@@ -74,18 +73,9 @@ bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 
 }
 
-/*
-void SipLayerTransaction::sendToTU(const CommandString &cmd){
-	SipSMCommand c(cmd,SipSMCommand::dialogLayer);
-	dispatcher->enqueueCommand(c,HIGH_PRIO_QUEUE);
+void SipLayerTransaction::doHandleAck(bool b){
+	handleAck=b;
 }
-*/
-
-/*
-void sendToTransport(MRef<SipMessage*> pack, string branch, bool addVia){
-	transportLayer->->sendMessage(pack, br, addVia)
-}
-*/
 
 MRef<SipTransaction*> SipLayerTransaction::findTransaction(std::string branch){
 	for (int i=0; i<transactions.size();i++)
@@ -106,7 +96,6 @@ void SipLayerTransaction::removeTransaction(MRef<SipTransaction*> t){
 	for (int i=0; i< transactions.size(); i++){
 		if (transactions[i]==t){
 			transactions.remove(i);
-			i=0;
 			return;
 		}
 	}
@@ -144,7 +133,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	mdbg << "SipLayerTransaction: handleCommand got: "<< c<<endl;
 #endif
 	
-	// 0. Find transaction based on branch parameter
+	// Find transaction based on branch parameter
 	// 
 	string branch;
 	string seqMethod;
@@ -169,11 +158,12 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 			bool ret = transactions[i]->handleCommand(c);
 //			cerr << "SipLayerTransaction: transaction returned "<<ret<<endl;
 #ifdef DEBUG_OUTPUT
-			if (!ret && hasBranch)
+			if (!ret && hasBranch){
 				mdbg << "WARNING: SipLayerTransaction: transaction did not handle message with matching branch id"<<end;
+			}
 #endif
 			if (ret){
-				return ret;
+				return true;
 			}
 		}
 	}

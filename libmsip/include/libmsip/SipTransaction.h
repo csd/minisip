@@ -92,10 +92,9 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 		std::string getBranch();
 		void setBranch(std::string branch);
 				
-//		void setDialog(MRef<SipDialog*> );
 		void send(MRef<SipMessage*>  pack, bool addVia, std::string branch=""); // if not specified branch, use the attribute one - ok in most cases.
 		void setSocket(Socket * sock){socket=sock;};
-		Socket * getSocket(){return socket;};
+		MRef<Socket *> getSocket(){return socket;};
 
 		virtual std::string getMemObjectType(){return "SipTransaction";}
 		void setDebugTransType(std::string t){debugTransType = t;}
@@ -108,44 +107,25 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 
 		//The transition to cancel a transaction is common to all
 		//transactions and is defined in this class.
-		bool a1000_cancel_transaction(const SipSMCommand &command);
+		bool a1000_anyState_terminated_canceltransaction(const SipSMCommand &command);
 
 		//FIXME: get the reliability correctly
 		bool isUnreliable();
 
 		
 	protected:
-		/**
-		 * The transaction can be either within or not within
-		 * a dialog. This function returns the configuration
-		 * that is the one of the dialog (if within it) or
-		 * the one of the sip stack (if not within a dialog).
-		 */
-//		MRef<SipCommonConfig *> getConfig();
-
-//		MRef<SipDialog*> dialog; /// The transaction can be within a dialog. In that
-					 /// case this reference is not
-					 /// null.
-
-		
 		
 		void setCSeqNo(int n){cSeqNo=n;}
 		MRef<SipCommandDispatcher*> dispatcher;
-		//MRef<SipCommonConfig *> conf;
 		MRef<SipStack*> sipStack;
 		MRef<SipLayerTransport*> transportLayer;
-		Socket * socket;
-		//IPAddress * toaddr;             //FIXME: This is leaked?
-		
-		//int32_t port;
-		//std::string transport;
+		MRef<Socket *> socket;
 		
 		std::string callId;
-
 		
 	private:
 		
-		std::string command;
+		//std::string command;
 		int cSeqNo;
 		std::string cSeqMethod;
 		std::string branch;

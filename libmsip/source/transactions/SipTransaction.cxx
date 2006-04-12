@@ -35,15 +35,12 @@
 
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipStack.h>
-#include<libmsip/SipDialog.h>
-#include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipCommandString.h>
 #include<libmutil/dbg.h>
 
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipTransactionInviteClient.h>
 #include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipTransactionInviteServer.h>
@@ -51,21 +48,16 @@
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipTransactionUtils.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/NetworkException.h>
 
 using namespace std;
 
 SipTransaction::SipTransaction(MRef<SipStack*> stack, 
-//		MRef<SipDialog*> d, 
 		int cseq, 
 		const string &cSeqMethod, 
 		const string &b, 
 		const string &callid): 
 			StateMachine<SipSMCommand, string>(stack->getTimeoutProvider() ), 
 			sipStack(stack),
-//			dialog(d), 
-			socket(NULL),
 			cSeqNo(cseq),
 			cSeqMethod(cSeqMethod),
 			branch(b)
@@ -79,19 +71,6 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack,
 	if (b==""){
 		branch = "z9hG4bK" + itoa(rand());		//magic cookie plus random number
 	}
-	
-/*	if (dialog){
-		conf = dialog->getDialogConfig()->inherited;
-	}else{
-		conf = sipStack->getStackConfig();
-	}
-*/
-	
-//	massert(getConfig());
-//	massert(getConfig()->sipIdentity);
-//	MRef<SipProxy *> sipproxy = getConfig()->sipIdentity->getSipProxy();
-//	port = sipproxy->sipProxyPort;
-//	transport = sipproxy->getTransport();
 }
 
 SipTransaction::~SipTransaction(){
@@ -136,7 +115,7 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStack*> stack,
 	
 }
 
-bool SipTransaction::a1000_cancel_transaction(const SipSMCommand &command){
+bool SipTransaction::a1000_anyState_terminated_canceltransaction(const SipSMCommand &command){
 	if (transitionMatch(command, 
 				"cancel_transaction", 
 				SipSMCommand::dialog_layer, 
@@ -165,18 +144,6 @@ void SipTransaction::setBranch(string b) {
 	branch = b;
 }
 
-/*
-MRef<SipCommonConfig *> SipTransaction::getConfig(){
-	MRef<SipCommonConfig *> conf;
-	if (dialog){
-		conf = dialog->getDialogConfig()->inherited;
-	}else{
-		conf = sipStack->getStackConfig();
-	}
-	return conf;
-}
-*/
-
 void SipTransaction::handleTimeout(const string &c){
         SipSMCommand cmd(CommandString(callId,c),SipSMCommand::transaction_layer,SipSMCommand::transaction_layer); //Is the second parameter ignored? --EE
         dispatcher->enqueueTimeout( this, cmd);
@@ -190,7 +157,6 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 		if( pack->getType() == SipResponse::type )
 			pack->setSocket( getSocket() );
 
-		// /*transactionLayer->*/sendToTransport(pack,br,addVia);
 		transportLayer->sendMessage(pack, br, addVia);
 
 		if( pack->getType() != SipResponse::type && pack->getSocket() )
@@ -244,12 +210,11 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 
 
 SipTransactionClient::SipTransactionClient(MRef<SipStack*> stack, 
-//		MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 
 		const string &branch, 
 		const string &callid):
-			SipTransaction(stack, /*d,*/ seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stack, seq_no,cSeqMethod,branch,callid)
 {
 	
 }
@@ -259,12 +224,11 @@ SipTransactionClient::~SipTransactionClient(){
 }
 
 SipTransactionServer::SipTransactionServer(MRef<SipStack*> stack, 
-		//MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 
 		const string &branch, 
 		const string &callid):
-			SipTransaction(stack,/*d,*/seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stack,seq_no,cSeqMethod,branch,callid)
 {
 	
 }

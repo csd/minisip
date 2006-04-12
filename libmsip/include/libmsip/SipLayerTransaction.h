@@ -21,8 +21,8 @@
 */
 
 
-#ifndef SIPLAYERTRANSACTION 
-#define SIPLAYERTRANSACTION 
+#ifndef SIPLAYERTRANSACTION_H
+#define SIPLAYERTRANSACTION_H
 
 #include<libmsip/libmsip_config.h>
 
@@ -32,7 +32,6 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
-//#include<libmsip/SipTransaction.h>
 
 class SipCommandDispatcher;
 class SipTransaction;
@@ -40,9 +39,10 @@ class SipLayerTransport;
 
 class LIBMSIP_API SipLayerTransaction: public SipSMCommandReceiver{
 	public:
-		SipLayerTransaction(MRef<SipCommandDispatcher*> dispatcher, MRef<SipLayerTransport*> transp);
+		SipLayerTransaction(MRef<SipCommandDispatcher*> dispatcher, 
+				MRef<SipLayerTransport*> transp);
 
-		void doHandleAck(bool b){handleAck=b;}
+		void doHandleAck(bool b);
 		
 		void removeTransaction(MRef<SipTransaction*> t);
 		MRef<SipTransaction*> findTransaction(std::string branch);
@@ -51,14 +51,9 @@ class LIBMSIP_API SipLayerTransaction: public SipSMCommandReceiver{
 		
 		std::list<MRef<SipTransaction*> > getTransactionsWithCallId(std::string callid);
 		
-//#ifdef DEBUG_OUTPUT
 		virtual std::string getMemObjectType() {return "SipLayerTransaction";}
-//#endif
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
-		
-
-		//void sendToTU(const SipSMCommand &cmd);
 		
 	private:
 		void addTransaction(MRef<SipTransaction*> t);
@@ -71,8 +66,6 @@ class LIBMSIP_API SipLayerTransaction: public SipSMCommandReceiver{
 
 		MRef<SipCommandDispatcher*> dispatcher;
 		MRef<SipLayerTransport*> transportLayer;
-		
-		//Mutex transactionListLock;
 };
 
 #endif

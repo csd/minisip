@@ -28,13 +28,9 @@
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>
-#include<libmutil/dbg.h>
-#include<libmnetutil/IP4Address.h>
 
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderUnknown.h>
-#include<libmsip/SipResponse.h>
-
 #include<libmsip/SipHeaderContentLength.h>
 #include<libmsip/SipHeaderUserAgent.h>
 #include<libmsip/SipHeaderContentType.h>         
@@ -73,18 +69,18 @@ using namespace std;
 
 SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db,
-		MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
+		MRef<ca_db *> cert_db//,
+		//MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
 		)
 {
 	timers = new SipTimers;
 	this->config = stackConfig;
 
-	if (tp){
-		timeoutProvider = tp;
-	}else{
+//	if (tp){
+//		timeoutProvider = tp;
+//	}else{
 		timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
-	}
+//	}
 
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
@@ -195,9 +191,17 @@ bool SipStack::handleCommand(const SipSMCommand &command){
 	return true;
 }
 
+bool SipStack::handleCommand(const CommandString &cmd){
+		//Commands from the gui etc is always sent to the
+		//TU layer
+	SipSMCommand c(cmd, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
+	return handleCommand(c);
+}
+
 void SipStack::addDialog(MRef<SipDialog*> d){
 	dispatcher->addDialog(d);
 }
+
 
 MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> SipStack::getTimeoutProvider(){
 	return timeoutProvider;

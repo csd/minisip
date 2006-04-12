@@ -23,38 +23,6 @@
 */
 
 
-/*
-
- +-Sip------------------------------------------+
- |                                              |  invite(string)
- | +-SipDialogContainer---+                     |<----------------------------------
- | |                      | addCall(SipCall)    |
- | |                      |<----------------    | handleCommand(SipSMCommand)
- | |                      |                     |<----------------------------------
- | |                      | handleCommand(CS)   |
- | |                      |-------------------->| sipcb_handleCommand(CommandString)
- | |                      |                     |---------------------------------->
- | |                      | sipcb_handleCommand |
- | |                      |-------------------->|
- | |                      |                     |
- | |                      | enqueuePacket()     |
- | |                      |<----------------    |
- | |                      |                     |
- | |                      | enqueueCommand()    |
- | |                      |<----------------    |
- | |                      |                     |
- | | [call_list]          | handleSipMessage()  |
- | | [defaultHandler]     |<---+                |
- | +----------------------+    |                |
- |                             |                |
- | [SipLayerTransport]---------+                |
- | [SipSoftPhoneConfiguration]                  |
- |                                              |
- |                                              |
- +----------------------------------------------+
-
-*/
-
 #ifndef MINISIP_SIP_H
 #define MINISIP_SIP_H
 

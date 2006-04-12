@@ -66,7 +66,7 @@ class SocketServer : public Runnable{
 };
 
 
-class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCommandReceiver {
+class LIBMSIP_API SipLayerTransport : public SipSMCommandReceiver {
 	public:
 		SipLayerTransport(std::string local_ip, 
 							std::string contactIP,
@@ -78,9 +78,6 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 							MRef<ca_db *> cert_db = NULL
 		);
 
-//		void startUdpServer();
-//		void stopUdpServer();
-
 		void startTcpServer();
 		void stopTcpServer();
 
@@ -90,14 +87,7 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 		bool handleCommand(const SipSMCommand& cmd);
 		
 		
-		//void setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec);
 		void setDispatcher(MRef<SipCommandDispatcher*> d);
-
-#if 0
-		//weird ... it is only defined, has not body ... but no one complained ... 
-		//until we tried with MS EVC++ 4.0 ... ???? (Cesc)
-		void setCommandReceiver(MRef<CommandStringReceiver* > rcvr);
-#endif
 
 		virtual std::string getMemObjectType(){return "SipLayerTransport";}
 
@@ -120,7 +110,7 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 
 	protected:
 		void sendMessage(MRef<SipMessage*> pack, 
-				/*IPAddress &*/ std::string toaddr, 
+				std::string toaddr, 
 				int32_t port, 
 				std::string branch,
 				std::string preferredTransport,
@@ -129,9 +119,9 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 			
 	private:
 		void addViaHeader( MRef<SipMessage*> pack, MRef<Socket *> socket, std::string branch );
-		MRef<StreamSocket *> findStreamSocket(/*IPAddress&*/ std::string, uint16_t);
+		MRef<StreamSocket *> findStreamSocket( std::string, uint16_t);
 		MRef<Socket*> findSocket(const std::string &transport,
-					 /*IPAddress &*/ std::string addr,
+					 std::string addr,
 					 uint16_t port);
 		
 		MRef<UDPSocket*> udpsock;
@@ -154,7 +144,6 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 		MRef<ca_db *> cert_db;
 		void * tls_ctx;
 
-		//MRef<SipSMCommandReceiver *> commandReceiver;
 		MRef<SipCommandDispatcher*> dispatcher;
 
 		Semaphore semaphore;
@@ -164,7 +153,6 @@ class LIBMSIP_API SipLayerTransport : /*public virtual MObject*/ public SipSMCom
 };
 
 #include<libmsip/SipMessage.h>
-//#include<libmsip/SipDialogContainer.h>
 
 
 LIBMSIP_API void set_debug_print_packets(bool);

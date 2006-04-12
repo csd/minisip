@@ -27,8 +27,6 @@
 
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipLayerDialog.h>
-#include<libmsip/SipTransaction.h>
-#include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
@@ -37,6 +35,16 @@
 SipLayerDialog::SipLayerDialog(MRef<SipCommandDispatcher*> d):dispatcher(d){
 	
 }
+
+list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
+	list<MRef<SipDialog*> > l;
+	dialogListLock.lock();
+	for (int i=0; i< dialogs.size(); i++)
+		l.push_back(dialogs[i]);
+	dialogListLock.unlock();
+	return l;
+}
+
 
 void SipLayerDialog::removeTerminatedDialogs(){
 
@@ -51,27 +59,13 @@ void SipLayerDialog::removeTerminatedDialogs(){
 	}
 }
 
-/*
-void SipLayerDialog::removeTransaction(MRef<SipTransaction*> t){
-
-	for (int i=0; i< transactions.size(); i++){
-		if (transactions[i]==t){
-			transactions.remove(i);
-			i=0;
-			return;
-		}
-	}
-	mdbg << "WARNING: BUG? Cound not remove transaction from SipLayerDialog!!!!!"<< end;
-}
-*/
-
 void SipLayerDialog::addDialog(MRef<SipDialog*> d){
 	dialogListLock.lock();
 	dialogs.push_front(d);
 	dialogListLock.unlock();
 }
 
-//TODO: Optimize how transactions are found based on branch parameter.
+//TODO: Optimize how dialogs are found based on callid parameter.
 bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 	assert(c.getDestination()==SipSMCommand::dialog_layer);
 
@@ -109,4 +103,5 @@ bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 		return false;
 	}
 }
+
 

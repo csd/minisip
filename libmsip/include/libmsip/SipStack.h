@@ -131,8 +131,8 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		SipStack( MRef<SipCommonConfig*> stackConfig,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
-				MRef<ca_db *> cert_db = NULL,
-				MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> tp= NULL
+				MRef<ca_db *> cert_db = NULL//,
+				/*MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> tp= NULL*/
 			  );
 
 		void setTransactionHandlesAck(bool transHandleAck);
@@ -145,12 +145,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 
 		MRef<SipCommandDispatcher*> getDispatcher();
 
-		bool handleCommand(const CommandString &cmd){
-			//Commands from the gui etc is always sent to the
-			//TU layer
-			SipSMCommand c(cmd, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
-			return handleCommand(c);
-		}
+		bool handleCommand(const CommandString &cmd);
 
 		bool handleCommand(const SipSMCommand &command);
 		
@@ -160,12 +155,15 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		void setConfCallback(MRef<CommandReceiver*> callback); // Hack to make the conference calling work - should not be here FIXME
 		MRef<CommandReceiver *> getConfCallback();
 		
-		//void setDefaultHandler(MRef<SipDialog*> d);
-
 		void addDialog(MRef<SipDialog*> d);
 
-//		MRef<SipLayerTransport *> getSipTransportLayer(){return transportLayer;}
-
+		/**
+		 * Each SipStack object creates a TimeoutProvider that with
+		 * a thread of it's own keeps track of timers waiting to
+		 * fire. This method is used by the transactions and
+		 * dialogs that wish to use timeouts to retrieve which
+		 * timeout provider to use.
+		 */
 		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
 
 		MRef<SipTimers*> getTimers();

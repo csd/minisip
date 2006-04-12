@@ -28,14 +28,10 @@
 #include<libminisip/sip/Sip.h>
 
 #include<libminisip/sip/DefaultDialogHandler.h>
-//#include<libminisip/mediahandler/MediaHandler.h>
-#include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/NetworkException.h>
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libmsip/SipDialogManagement.h>
