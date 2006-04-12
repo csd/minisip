@@ -43,6 +43,9 @@ int main( int argc, char *argv[] )
 	cerr << "Minisip: 2" << endl;
 
 	merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+	mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+	mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+
 	LogEntry::handler = NULL;
 
 	Minisip minisip( *gui, argc, argv );
@@ -56,5 +59,6 @@ int main( int argc, char *argv[] )
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;
 	}
 	minisip.exit();
+	return 0;
 }
 

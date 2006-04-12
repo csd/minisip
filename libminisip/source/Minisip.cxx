@@ -127,7 +127,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 	
 
 	#ifdef DEBUG_OUTPUT
-	mout << "Loading plugins"<<end;
+	mdbg << "Loading plugins"<<end;
 	#endif
 
 	loadPlugins();
@@ -163,27 +163,6 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 	ContactDb *contactDb = new ContactDb();
 	ContactEntry::setDb(contactDb);
 	
-	//FIXME: move all this in a Gui::create()
-
-	#ifdef DEBUG_OUTPUT
-	mout << BOLD << "init 2/9: Creating GUI" << PLAIN << end;
-	#endif
-
-#ifdef DEBUG_OUTPUT
-	       if( !dynamic_cast<TextUI *>( *gui ) ){
-
-		       consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
-		       MRef<Thread *> consoleDbgThread = consoleDbg->start();
-	       }
-#endif
-
-	       if( !consoleDbg ){
-		       //in non-debug mode, send merr to the gui
-		       merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-		       mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-		       mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-	       }
-
 	#ifdef OSSO_SUPPORT
 		osso_context_t * ossoCtxt = NULL;
 		ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
@@ -225,15 +204,7 @@ int Minisip::exit(){
 	gui->setCallback( NULL );
 	gui->setSipSoftPhoneConfiguration( NULL );
 
-#ifdef DEBUG_OUTPUT
-	mout << end << "Stopping the Console Debugger thread" << end;
-	if( ! consoleDbg.isNull() ) {
-		consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
-		consoleDbg->join();
-		consoleDbg->setMediaHandler( NULL );
-		consoleDbg = NULL;
-	}
-#endif	
+	stopDebugger();
 	
 /*	if( messageRouter){
 		mout << "Delete messageRouter" << end;
@@ -248,6 +219,9 @@ int Minisip::exit(){
 	phoneConf->sip = NULL;
 	phoneConf = NULL;
 	mediaHandler = NULL;
+	confMessageRouter->setGui(NULL);
+	confMessageRouter = NULL;
+	gui = NULL;
 
 	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
 	return ret;
@@ -295,14 +269,14 @@ int Minisip::startSip() {
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
-		MRef<MediaHandler *> mediaHandler = new MediaHandler( phoneConf, ipProvider );
+		mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		confMessageRouter->setMediaHandler( mediaHandler );
 		messageRouter->addSubsystem("media",*mediaHandler);
-#ifdef DEBUG_OUTPUT
+
 		if( consoleDbg ){
 			consoleDbg->setMediaHandler( mediaHandler );
 		}
-#endif
+
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
 	//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
@@ -452,3 +426,18 @@ int Minisip::runGui(){
 	return 1;
 }
 
+void Minisip::startDebugger(){
+	cerr << "startDebugger" << endl;
+	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+	MRef<Thread *> consoleDbgThread = consoleDbg->start();
+}
+
+void Minisip::stopDebugger(){
+	if( ! consoleDbg.isNull() ) {
+		mout << end << "Stopping the Console Debugger thread" << end;
+		consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
+		consoleDbg->join();
+		consoleDbg->setMediaHandler( NULL );
+		consoleDbg = NULL;
+	}
+}

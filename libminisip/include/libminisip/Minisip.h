@@ -26,6 +26,10 @@ class LIBMINISIP_API Minisip : public MObject{
 		int exit();
 		int startSip();
 		int runGui();
+
+		void startDebugger();
+		void stopDebugger();
+
 	private:
 		
 		int initParseConfig();

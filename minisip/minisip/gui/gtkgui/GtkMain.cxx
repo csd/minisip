@@ -51,6 +51,15 @@ int main( int argc, char *argv[] )
 	Minisip minisip( gui, argc, argv );
 
 	if( minisip.startSip() > 0 ) {
+#ifdef DEBUG_OUTPUT
+		minisip.startDebugger();
+#else
+		//in non-debug mode, send merr to the gui
+		merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+#endif	// DEBUG_OUTPUT
+
 		minisip.runGui();
 	} else {
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;
