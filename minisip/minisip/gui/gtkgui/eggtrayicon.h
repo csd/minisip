@@ -37,21 +37,19 @@ G_BEGIN_DECLS
 typedef struct _EggTrayIcon	  EggTrayIcon;
 typedef struct _EggTrayIconClass  EggTrayIconClass;
 
-struct _EggTrayIcon
-{
-  GtkPlug parent_instance;
-
-  guint stamp;
-  
-  Atom selection_atom;
-  Atom manager_atom;
-  Atom system_tray_opcode_atom;
-  Window manager_window;
+struct _EggTrayIcon {
+	GtkPlug parent_instance;
+	
+	guint stamp;
+	
+	Atom selection_atom;
+	Atom manager_atom;
+	Atom system_tray_opcode_atom;
+	Window manager_window;
 };
 
-struct _EggTrayIconClass
-{
-  GtkPlugClass parent_class;
+struct _EggTrayIconClass {
+	GtkPlugClass parent_class;
 };
 
 GType        egg_tray_icon_get_type       (void);
@@ -63,13 +61,13 @@ EggTrayIcon *egg_tray_icon_new_for_screen (GdkScreen   *screen,
 
 EggTrayIcon *egg_tray_icon_new            (const gchar *name);
 
-guint        egg_tray_icon_send_message   (EggTrayIcon *icon,
+guint 	egg_tray_icon_send_message   (EggTrayIcon *icon,
 					   gint         timeout,
 					   const char  *message,
 					   gint         len);
-void         egg_tray_icon_cancel_message (EggTrayIcon *icon,
-					   guint        id);
 
+void 	egg_tray_icon_cancel_message (EggTrayIcon *icon,
+					   guint        id);
 
 					    
 G_END_DECLS

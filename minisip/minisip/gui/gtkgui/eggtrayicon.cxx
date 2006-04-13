@@ -27,7 +27,7 @@
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 #define SYSTEM_TRAY_BEGIN_MESSAGE   1
 #define SYSTEM_TRAY_CANCEL_MESSAGE  2
-         
+
 static GtkPlugClass *parent_class = NULL;
 
 static void egg_tray_icon_init (EggTrayIcon *icon);
@@ -37,9 +37,8 @@ static void egg_tray_icon_unrealize (GtkWidget *widget);
 
 static void egg_tray_icon_update_manager_window (EggTrayIcon *icon);
 
-GType
-egg_tray_icon_get_type (void)
-{
+GType  egg_tray_icon_get_type (void) {
+ 
 	static GType our_type = 0;
 	
 	our_type = g_type_from_name("EggTrayIcon");
@@ -129,8 +128,7 @@ static void egg_tray_icon_unrealize (GtkWidget *widget) {
 		(* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
 }
 
-static void
-egg_tray_icon_send_manager_message (EggTrayIcon *icon,
+static void  egg_tray_icon_send_manager_message (EggTrayIcon *icon,
 				    long         message,
 				    Window       window,
 				    long         data1,
