@@ -100,8 +100,8 @@ tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libminisip"
-cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
-cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+cp -f $tmp_lib/.libs/*.dll compiled_files
+cp -f $tmp_lib/.libs/*.dll.a compiled_files
 
 					#set a minum 200k ... otherwise it finds the fake script.exe
 find minisip -name minisip_gtkgui.exe -size +200k -exec cp -f {} compiled_files/ \;

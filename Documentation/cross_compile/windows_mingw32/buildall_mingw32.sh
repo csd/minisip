@@ -66,21 +66,32 @@ base_configure_params="$base_configure_params --disable-static"
 libmutil_configure_params=""
 #libmutil_configure_params="$libmutil_configure_params --enable-memdebug"
 
-#set special options for libminisip and minisip
+#set special options for libminisip
 #   do a ./configure --help to see ALL available options ... here
 #              show just a sample
-minisip_configure_params=""
-	#the following are forced options for minisip, as we compile for win32
-minisip_configure_params="$minisip_configure_params --enable-dsound"
-minisip_configure_params="$minisip_configure_params --disable-alsa"
-minisip_configure_params="$minisip_configure_params --disable-gconf"
-minisip_configure_params="$minisip_configure_params --enable-gtk"
+libminisip_configure_params=""
+libminisip_configure_params="$libminisip_configure_params --enable-dsound"
+libminisip_configure_params="$libminisip_configure_params --disable-alsa"
+libminisip_configure_params="$libminisip_configure_params --disable-gconf"
       #--enable-autocall enables automatic calling for debug purposes (default disabled)
       #--enable-ipaq enables various fixes for the iPAQ (default disabled)
       #--enable-ipsec-enable enables ipsec features (default disabled)
       #--enable-aec enables push-2-talk features (default enabled)
       #--enable-video enables video features (default disabled)
-      #--enable-textui enables the text based user interface (default disabled)
+      #--enable-buzzer enables IPAQ buzzer (default disabled)
+      #--enable-dsound enables DirectSound sound support (default disabled)
+      #--enable-portaudio      enable PortAudio V19 support (default auto).
+      #--enable-gconf enables support for GConf (default enabled).
+      #--enable-sdl enables SDL video output if the required library is found
+      #--enable-video enables video features (default disabled)
+ 
+#set special options for minisip
+#   do a ./configure --help to see ALL available options ... here
+#              show just a sample
+minisip_configure_params=""
+minisip_configure_params="$minisip_configure_params --enable-gtk"
+	#minisip_configure_params="$minisip_configure_params --enable-textui"
+	#Here you could have per gui-specific parameters ... 
 
 for subdir in ${SUBDIRS}
 do
@@ -146,7 +157,7 @@ do
 	if [ ${subdir} = "libminisip" ] ; then 
 		LOC_LIBMINISIP_LIBS=-L$PWD/.libs
 		LOC_LIBMINISIP_CFLAGS=-I$PWD/include
-		configure_params_libminisip="$configure_params $minisip_configure_params"
+		configure_params_libminisip="$configure_params $libminisip_configure_params"
 		echo libminisip can also have special config params
 		configure_params="$configure_params $minisip_configure_params"
 		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
@@ -205,8 +216,8 @@ tmp_lib="libmsip"
 cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
 cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
 tmp_lib="libminisip"
-cp -f $tmp_lib/.libs/$tmp_lib-0.dll compiled_files
-cp -f $tmp_lib/.libs/$tmp_lib.dll.a compiled_files
+cp -f $tmp_lib/.libs/*.dll compiled_files
+cp -f $tmp_lib/.libs/*.dll.a compiled_files
 
 find minisip/ -name minisip_gtkgui.exe -size +200k -exec cp -f {} compilied_files/ \;
 find minisip/ -name minisip_textui.exe -size +200k -exec cp -f {} compilied_files/ \;
