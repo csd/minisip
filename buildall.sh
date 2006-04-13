@@ -40,7 +40,7 @@ make_options="-k"
 #This are common params, usable in all folders
 base_configure_params=""
 base_configure_params="$base_configure_params --enable-debug"
-base_configure_params="$base_configure_params --disable-shared"
+base_configure_params="$base_configure_params --disable-static"
 
 #set special options for libmutil
 libmutil_configure_params=""
