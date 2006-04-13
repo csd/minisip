@@ -53,7 +53,7 @@ int main( int argc, char *argv[] )
 		gui->displayMessage("");
 		gui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
 		gui->displayMessage("");
-	  
+
 		minisip.runGui();
 	} else {
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;

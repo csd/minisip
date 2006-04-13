@@ -40,42 +40,42 @@
 using namespace std;
 
 MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
-    inCall=false;
-    p2tmode=false;
-
-//#ifdef DEBUG_OUTPUT
-//    mdbg << "Setting global MinisipTextUI"<< end;
-//    debugtextui=this;
-//#endif
-
-    addCommand("quit");
-    addCommand("answer");
-    addCommand("disable autoanswer");
-    addCommand("enable autoanswer");
-    addCommand("enable debugmsgs");
-    addCommand("disable debugmsgs");
-    addCommand("hangup");
-    addCommand("hide packets");
-    addCommand("register");
-    addCommand("show all");
-    addCommand("show calls");
-    addCommand("show transactions");
-    addCommand("show packets");
-    addCommand("cmd");
-    addCommand("transfer");
-    addCommand("refuse");
-    addCommand("conf");
-    addCommand("join");
-    addCommand("accept"); //accept incoming P2T Session
-    addCommand("deny");   //deny incoming P2T Session
-    addCommand("im");   //deny incoming P2T Session
-//    addCommand("quit");
-    addCompletionCallback("call", this);
-    addCompletionCallback("im", this);
-    
-    state="IDLE";
-    setPrompt("IDLE");
-    semSipReady = new Semaphore();
+	inCall=false;
+	p2tmode=false;
+	
+	//#ifdef DEBUG_OUTPUT
+	//    mdbg << "Setting global MinisipTextUI"<< end;
+	//    debugtextui=this;
+	//#endif
+	
+	addCommand("quit");
+	addCommand("answer");
+	addCommand("disable autoanswer");
+	addCommand("enable autoanswer");
+	addCommand("enable debugmsgs");
+	addCommand("disable debugmsgs");
+	addCommand("hangup");
+	addCommand("hide packets");
+	addCommand("register");
+	addCommand("show all");
+	addCommand("show calls");
+	addCommand("show transactions");
+	addCommand("show packets");
+	addCommand("cmd");
+	addCommand("transfer");
+	addCommand("refuse");
+	addCommand("conf");
+	addCommand("join");
+	addCommand("accept"); //accept incoming P2T Session
+	addCommand("deny");   //deny incoming P2T Session
+	addCommand("im");   //deny incoming P2T Session
+	//    addCommand("quit");
+	addCompletionCallback("call", this);
+	addCompletionCallback("im", this);
+	
+	state="IDLE";
+	setPrompt("IDLE");
+	semSipReady = new Semaphore();
 }
 
 void MinisipTextUI::run(){
@@ -154,330 +154,326 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
 	mdbg << FG_MAGENTA << "MinisipTextUI::handleCommand: Got "<<cmd.getString() << PLAIN <<end;
 #endif
-	
-    if (cmd.getOp()=="register_ok"){
-        displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
-    }
-	
-    if (cmd.getOp()==SipCommandString::incoming_im){
-        displayMessage("IM to <"+cmd.getParam3()+"> from <"+cmd.getParam2()+">: "+cmd.getParam(), bold);
-    }
- 
-   
-    if (cmd.getOp()=="invite_ok"){
-	    state="INCALL";
-            inCall = true;
-	    setPrompt(state);
-	    displayMessage("PROGRESS: remote participant accepted the call...", blue);
-
-	    
-	    displayMessage("PROGRESS: Unmuting sending of sound.", blue);
-	    CommandString cmdstr( callId,
-			    MediaCommandString::set_session_sound_settings,
-			    "senders", "ON");
-	    //callback->guicb_handleMediaCommand(cmdstr);
-	    sendCommand("media", cmdstr);
-
-    }
-
-    if (cmd.getOp()=="remote_ringing"){
-	    state="REMOTE RINGING";
-	    setPrompt(state);
-	    displayMessage("PROGRESS: the remote UA is ringing...", blue);
-    }
-
-
-
-    if (autoanswer && cmd.getOp()==SipCommandString::incoming_available){
-	    CommandString command(callId, SipCommandString::accept_invite);
-	    //callback->guicb_handleCommand(command);
-	    sendCommand("sip",command);
-
-	    state="INCALL";
-	    setPrompt(state);
-	    displayMessage("Autoanswered call from "+ cmd.getParam());
-	    displayMessage("Unmuting sending of sound.", blue);
-	    CommandString cmdstr( callId,
-			    MediaCommandString::set_session_sound_settings,
-			    "senders", "ON");
-	    //callback->guicb_handleMediaCommand(cmdstr);
-	    sendCommand("media",cmdstr);
-
-	    return;
-    }
-
-    if (cmd.getOp()==SipCommandString::remote_user_not_found && !p2tmode){
-        state="IDLE";
-	setPrompt(state);
-        displayMessage("User "+cmd.getParam()+" not found.",red);
-        callId=""; //FIXME: should check the callId of cmd.
-    }
-
-    if (cmd.getOp()==SipCommandString::remote_hang_up){
-        state="IDLE";
-	setPrompt(state);
-        displayMessage("Remote user ended the call.",red);
-        callId=""; //FIXME: should check the callId of cmd.
-	inCall=false;
-    }
-
-
-
-    if (cmd.getOp()==SipCommandString::transport_error && !p2tmode){
-	    state="IDLE";
-	    setPrompt(state);
-	    displayMessage("The call could not be completed because of a network error.", red);
-	    callId=""; //FIXME: should check the callId of cmd.
-    }
-
-
-    if (cmd.getOp()=="error_message"){
-	    displayMessage("ERROR: "+cmd.getParam(), red);
-    }
-
-    if (cmd.getOp()=="remote_reject" && !p2tmode){
-	    state="IDLE";
-	    setPrompt(state);
-	    callId="";
-	    displayMessage("The remote user rejected the call.", red);
-    }
-
-    if (cmd.getOp()==SipCommandString::incoming_available){
-	    if(state=="IDLE"){
-	    	state="ANSWER?";
-	    	setPrompt(state);
-	    	callId=cmd.getDestinationId();
-	    	displayMessage("The incoming call from "+cmd.getParam(), blue);
-	    }
-	    else{
-	    	displayMessage("You missed call from "+cmd.getParam(), red);
-	    	CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
-		//callback->guicb_handleCommand(hup);
-		sendCommand("sip",hup);
-	    
-	    }
-	    
-    }
-    if (cmd.getOp()=="conf_join_received"){
-	    if(state=="IDLE"){
-	    	state="ANSWER?";
-	    	setPrompt(state);
-	    	callId=cmd.getDestinationId();
-		//addCommand("addc");
 		
-	    	
-		currentcaller=cmd.getParam();
+	if (cmd.getOp()=="register_ok"){
+		displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
+	}
 		
-				//conf->setGui(this);
-		string confid="";
-		string users=cmd.getParam3();
-		int i=0;	
-		while (users[i]!=';'&&users.length()!=0 &&!(i>((int)users.length()-1))){
-			confid=confid+users[i];
-			i++;
+	if (cmd.getOp()==SipCommandString::incoming_im){
+		displayMessage("IM to <"+cmd.getParam3()+"> from <"+cmd.getParam2()+">: "+cmd.getParam(), bold);
+	}
+	
+	
+	if (cmd.getOp()=="invite_ok"){
+		state="INCALL";
+		inCall = true;
+		setPrompt(state);
+		displayMessage("PROGRESS: remote participant accepted the call...", blue);
+		
+		displayMessage("PROGRESS: Unmuting sending of sound.", blue);
+		CommandString cmdstr( callId,
+				MediaCommandString::set_session_sound_settings,
+				"senders", "ON");
+		//callback->guicb_handleMediaCommand(cmdstr);
+		sendCommand("media", cmdstr);
+	
+	}
+	
+	if (cmd.getOp()=="remote_ringing"){
+		state="REMOTE RINGING";
+		setPrompt(state);
+		displayMessage("PROGRESS: the remote UA is ringing...", blue);
+	}
+	
+	if (autoanswer && cmd.getOp()==SipCommandString::incoming_available){
+		CommandString command(callId, SipCommandString::accept_invite);
+		//callback->guicb_handleCommand(command);
+		sendCommand("sip",command);
+		state="INCALL";
+		setPrompt(state);
+		displayMessage("Autoanswered call from "+ cmd.getParam());
+		displayMessage("Unmuting sending of sound.", blue);
+		CommandString cmdstr( callId,
+				MediaCommandString::set_session_sound_settings,
+				"senders", "ON");
+		//callback->guicb_handleMediaCommand(cmdstr);
+		sendCommand("media",cmdstr);
+	
+		return;
+	}
+	
+	if (cmd.getOp()==SipCommandString::remote_user_not_found && !p2tmode){
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("User "+cmd.getParam()+" not found.",red);
+		callId=""; //FIXME: should check the callId of cmd.
+	}
+	
+	if (cmd.getOp()==SipCommandString::remote_hang_up){
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("Remote user ended the call.",red);
+		callId=""; //FIXME: should check the callId of cmd.
+		inCall=false;
+	}
+	
+
+	
+	if (cmd.getOp()==SipCommandString::transport_error && !p2tmode){
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("The call could not be completed because of a network error.", red);
+		callId=""; //FIXME: should check the callId of cmd.
+	}
+	
+	
+	if (cmd.getOp()=="error_message"){
+		displayMessage("ERROR: "+cmd.getParam(), red);
+	}
+	
+	if (cmd.getOp()=="remote_reject" && !p2tmode){
+		state="IDLE";
+		setPrompt(state);
+		callId="";
+		displayMessage("The remote user rejected the call.", red);
+	}
+	
+	if (cmd.getOp()==SipCommandString::incoming_available){
+		if(state=="IDLE"){
+			state="ANSWER?";
+			setPrompt(state);
+			callId=cmd.getDestinationId();
+			displayMessage("The incoming call from "+cmd.getParam(), blue);
 		}
-		string mysipuri = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
-		users=trim(users.substr(i));
-		cerr<<"confididididididididididididiidididid "+confid<<endl;
-		currentconf=new ConferenceControl(mysipuri,confid,false);
-		confCallback->setConferenceController(currentconf);
-		displayMessage("The incoming conference call from "+cmd.getParam(), blue);
-		displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
-	    	currentconfname=confid;
-	    }
-	    else{
-	    	displayMessage("You missed call from "+cmd.getParam(), red);
-	    	CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
-		confCallback->guicb_handleCommand(hup);
+		else{
+			displayMessage("You missed call from "+cmd.getParam(), red);
+			CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
+			//callback->guicb_handleCommand(hup);
+			sendCommand("sip",hup);
 		
-	    
-	    }
-	    
-    }
-    
-    if (cmd.getOp()==SipCommandString::transfer_pending){
-	    if(inCall){
-		    displayMessage( "Call transfer in progress..." );
-	    }
-	    
-    }
-    
-    if (cmd.getOp()==SipCommandString::transfer_requested){
-            cerr << "TestUI got transfer_requested" << endl;
-	    if(inCall){
-		    state="TRANSFER?";
-		    setPrompt(state);
-		    displayMessage("Accept call transfer to "+cmd.getParam(), blue );
-	    }
-	    
-    }
-
-    if (cmd.getOp()==SipCommandString::call_transferred){
-            callId = cmd.getParam();
-            state="INCALL";
-            displayMessage("Call transferred ...");
-            setPrompt(state);
-    }
+		}
+		
+	}
+	if (cmd.getOp()=="conf_join_received"){
+		if(state=="IDLE"){
+			state="ANSWER?";
+			setPrompt(state);
+			callId=cmd.getDestinationId();
+			//addCommand("addc");
+			
+			
+			currentcaller=cmd.getParam();
+			
+					//conf->setGui(this);
+			string confid="";
+			string users=cmd.getParam3();
+			int i=0;	
+			while (users[i]!=';'&&users.length()!=0 &&!(i>((int)users.length()-1))){
+				confid=confid+users[i];
+				i++;
+			}
+			string mysipuri = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
+			users=trim(users.substr(i));
+			cerr<<"confididididididididididididiidididid "+confid<<endl;
+			currentconf=new ConferenceControl(mysipuri,confid,false);
+			confCallback->setConferenceController(currentconf);
+			displayMessage("The incoming conference call from "+cmd.getParam(), blue);
+			displayMessage("The participants are "+cmd.getParam()+" "+users, blue);
+			currentconfname=confid;
+		}
+		else{
+			displayMessage("You missed call from "+cmd.getParam(), red);
+			CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
+			confCallback->guicb_handleCommand(hup);
+			
+		
+		}
+		
+	}
+	
+	if (cmd.getOp()==SipCommandString::transfer_pending){
+		if(inCall){
+			displayMessage( "Call transfer in progress..." );
+		}
+		
+	}
+	
+	if (cmd.getOp()==SipCommandString::transfer_requested){
+		cerr << "TestUI got transfer_requested" << endl;
+		if(inCall){
+			state="TRANSFER?";
+			setPrompt(state);
+			displayMessage("Accept call transfer to "+cmd.getParam(), blue );
+		}
+		
+	}
+	
+	if (cmd.getOp()==SipCommandString::call_transferred){
+		callId = cmd.getParam();
+		state="INCALL";
+		displayMessage("Call transferred ...");
+		setPrompt(state);
+	}
 #ifdef P2T_SUPPORT
-
-    //P2T commands
-    if (cmd.getOp()=="p2tFloorGranted"){
-	    displayMessage("Floor is granted!!!", blue);
-
-	    
-    }else if (cmd.getOp()=="p2tFloorTaken"){
-	    displayMessage("Floor is granted to "+cmd.getParam(),blue);
-
-    }
-    else if (cmd.getOp()=="p2tFloorReleased"){
-	    displayMessage("Floor available!", blue);
-	    state="P2T CONNECTED";
-	    setPrompt(state);
-    }
-    else if (cmd.getOp()=="p2tFloorRevokeActive"){
-	    displayMessage("Maximum Floortime reached. Revoking floor...", red);
-	    state="P2T CONNECTED";
-	    setPrompt(state);
-    }
-
-     /****
-     * p2tFloorRevokePassiv
-     * DestinationID: GroupIdentity
-     * Param:	      user SIP URI
-     * Param2:	      warning code
-     * Description:   remote user revoked floor.
-     ****/
-    else if (cmd.getOp()=="p2tFloorRevokePassiv"){
-	    if(cmd.getParam2()=="1"){
-	    	displayMessage("User " + cmd.getParam() + ":", bold);
-	    	displayMessage("Please stop talking. Maximum floortime reached.", blue);
-	    }
-	    else if(cmd.getParam2()=="3"){
-	    	displayMessage("User " + cmd.getParam() + " stopped listening!", red);
-	    }
-    }
-    
-    /****
-     * p2tAddUser
-     * DestinationID: CallId (SipDialogP2Tuser) 
-     * Param1:        SIP URI
-     * Description:   a remote user wants to be added to a P2T Session. 
-     *                This command is received when the SipDialogP2Tuser
-     *                is in the RINGING state and waits for an accept.
-     ****/
-    else if (cmd.getOp()=="p2tAddUser"){
-	    if(inCall==true && p2tmode==true){
-	    	//send automatically an accept back
-		CommandString command(cmd.getDestinationId(),  SipCommandString::accept_invite);
-		callback->guicb_handleCommand(command);
+	
+	//P2T commands
+	if (cmd.getOp()=="p2tFloorGranted"){
+		displayMessage("Floor is granted!!!", blue);
+	
 		
-		if(grpList->isParticipant(cmd.getParam())==false){
-			grpList->addUser(cmd.getParam());
-			displayMessage("User " + cmd.getParam() + " added!", blue);
+	}else if (cmd.getOp()=="p2tFloorTaken"){
+		displayMessage("Floor is granted to "+cmd.getParam(),blue);
+	
+	}
+	else if (cmd.getOp()=="p2tFloorReleased"){
+		displayMessage("Floor available!", blue);
+		state="P2T CONNECTED";
+		setPrompt(state);
+	}
+	else if (cmd.getOp()=="p2tFloorRevokeActive"){
+		displayMessage("Maximum Floortime reached. Revoking floor...", red);
+		state="P2T CONNECTED";
+		setPrompt(state);
+	}
+	
+	/****
+	* p2tFloorRevokePassiv
+	* DestinationID: GroupIdentity
+	* Param:	      user SIP URI
+	* Param2:	      warning code
+	* Description:   remote user revoked floor.
+	****/
+	else if (cmd.getOp()=="p2tFloorRevokePassiv"){
+		if(cmd.getParam2()=="1"){
+			displayMessage("User " + cmd.getParam() + ":", bold);
+			displayMessage("Please stop talking. Maximum floortime reached.", blue);
 		}
-		
-	    }
-	    else if(inCall==true && p2tmode==false){
-	    	//do nothing, because
-		//the user has first to accept or deny
-		//a incoming P2T Session. The answer will
-		//be sent there to this user
-	    }
-    }
-    
-    /****
-     * p2tRemoveUser
-     * DestinationID: GroupId (SipDialogP2T) 
-     * Param1:        SIP URI
-     * Param2:        reason
-     * Description:   a remote user wants to be added to a P2T Session. 
-     *                This command is received when the SipDialogP2Tuser
-     *                is in the RINGING state and waits for an accept.
-     ****/
-    else if (cmd.getOp()=="p2tRemoveUser"){
-	    if(inCall==true && p2tmode==true){
-		displayMessage("User " + cmd.getParam() + " removed ("+ cmd.getParam2() +").", red);
-		grpList->removeUser(cmd.getParam());
-	    }
-    }
-    
-     /****
-     * p2tModifyUser
-     * DestinationID: GroupId (SipDialogP2T) 
-     * Param1:        SIP URI
-     * Param2:        status
-     * Description:   information about a state (in the floor control)
-     *                of a user.
-     ****/
-    else if (cmd.getOp()=="p2tModifyUser"){
-	    if(inCall==true && p2tmode==true){
-	    	
-	    	int status=0;
-		for(uint32_t k=0;k<cmd.getParam2().size();k++) 
-			status = (status*10) + (cmd.getParam2()[k]-'0');
-	    	
-		grpList->getUser(cmd.getParam())->setStatus(status);
-	    }
-    }
-     
-     /****
-     * p2tInvitation
-     * DestinationID: GroupID (SipDialogP2T)
-     * Param1:        Group Member List (XML-code)
-     * Param2:        uri inviting user
-     * 
-     * Description:   an invitation to a P2T Session
-     ****/
-    else if (cmd.getOp()=="p2tInvitation"){
-	    //if already in a call, send DENY back
-	    if(inCall){
+		else if(cmd.getParam2()=="3"){
+			displayMessage("User " + cmd.getParam() + " stopped listening!", red);
+		}
+	}
 	
-		//Close SipDialogP2T
-		//CommandString cmd_term(cmd.getDestinationId(), "p2tTerminate");
-		//callback->guicb_handleCommand(cmd_term);	
-		
-		//inform SipDialogP2Tuser
-		//CommandString cmd_rej(cmd.getParam3(), SipCommandString::reject_invite);
-		//callback->guicb_handleCommand(cmd_rej);
+	/****
+	* p2tAddUser
+	* DestinationID: CallId (SipDialogP2Tuser) 
+	* Param1:        SIP URI
+	* Description:   a remote user wants to be added to a P2T Session. 
+	*                This command is received when the SipDialogP2Tuser
+	*                is in the RINGING state and waits for an accept.
+	****/
+	else if (cmd.getOp()=="p2tAddUser"){
+		if(inCall==true && p2tmode==true){
+			//send automatically an accept back
+			CommandString command(cmd.getDestinationId(),  SipCommandString::accept_invite);
+			callback->guicb_handleCommand(command);
+			
+			if(grpList->isParticipant(cmd.getParam())==false){
+				grpList->addUser(cmd.getParam());
+				displayMessage("User " + cmd.getParam() + " added!", blue);
+			}
+			
+		}
+		else if(inCall==true && p2tmode==false){
+			//do nothing, because
+			//the user has first to accept or deny
+			//a incoming P2T Session. The answer will
+			//be sent there to this user
+		}
+	}
 	
-		//displayMessage("You missed P2T invitation from " + cmd.getParam2() +".", red);	    
-	    }
-	    //aks user to accept
-	    else{
-	    	inCall=true;
-		grpList = new GroupList(cmd.getParam());
-	    	inviting_user=cmd.getParam2();
-	    	//inviting_callId=cmd.getParam3();
-	    	p2tGroupId=grpList->getGroupIdentity();   
-	    	
-		displayMessage(inviting_user + " invited you to a P2T Session:", blue);
-	    	showGroupList();
-	    	displayMessage("type 'accept' or 'deny'", blue);
-	    	state="P2T ACCEPT?";
-	    	setPrompt("P2T ACCEPT?");
-	    }
-
-    }
-    
-     /****
-     * p2tSessionCreated
-     * DestinationID: 
-     * Param1:        GroupId (SipDialogP2T)
-     * Param2:
-     * Param3:
-     * Description:   the P2T Session is set up
-     ****/
-    else if (cmd.getOp()=="p2tSessionCreated"){
-	    p2tGroupId=cmd.getParam();
-	    displayMessage("P2T Session "+ p2tGroupId + " created", green);
-	    grpList->setGroupIdentity(p2tGroupId);
-	    state="P2T CONNECTED";
-	    setPrompt(state);
-    }    
-    
-    else if (cmd.getOp().substr(0,3)=="p2t"){
-	    displayMessage("Received: "+cmd.getOp(), blue);
-    }
+	/****
+	* p2tRemoveUser
+	* DestinationID: GroupId (SipDialogP2T) 
+	* Param1:        SIP URI
+	* Param2:        reason
+	* Description:   a remote user wants to be added to a P2T Session. 
+	*                This command is received when the SipDialogP2Tuser
+	*                is in the RINGING state and waits for an accept.
+	****/
+	else if (cmd.getOp()=="p2tRemoveUser"){
+		if(inCall==true && p2tmode==true){
+			displayMessage("User " + cmd.getParam() + " removed ("+ cmd.getParam2() +").", red);
+			grpList->removeUser(cmd.getParam());
+		}
+	}
+	
+	/****
+	* p2tModifyUser
+	* DestinationID: GroupId (SipDialogP2T) 
+	* Param1:        SIP URI
+	* Param2:        status
+	* Description:   information about a state (in the floor control)
+	*                of a user.
+	****/
+	else if (cmd.getOp()=="p2tModifyUser"){
+		if(inCall==true && p2tmode==true){
+			
+			int status=0;
+			for(uint32_t k=0;k<cmd.getParam2().size();k++) 
+				status = (status*10) + (cmd.getParam2()[k]-'0');
+			
+			grpList->getUser(cmd.getParam())->setStatus(status);
+		}
+	}
+	
+	/****
+	* p2tInvitation
+	* DestinationID: GroupID (SipDialogP2T)
+	* Param1:        Group Member List (XML-code)
+	* Param2:        uri inviting user
+	* 
+	* Description:   an invitation to a P2T Session
+	****/
+	else if (cmd.getOp()=="p2tInvitation"){
+		//if already in a call, send DENY back
+		if(inCall){
+		
+			//Close SipDialogP2T
+			//CommandString cmd_term(cmd.getDestinationId(), "p2tTerminate");
+			//callback->guicb_handleCommand(cmd_term);	
+			
+			//inform SipDialogP2Tuser
+			//CommandString cmd_rej(cmd.getParam3(), SipCommandString::reject_invite);
+			//callback->guicb_handleCommand(cmd_rej);
+		
+			//displayMessage("You missed P2T invitation from " + cmd.getParam2() +".", red);	    
+		}
+		//aks user to accept
+		else{
+			inCall=true;
+			grpList = new GroupList(cmd.getParam());
+			inviting_user=cmd.getParam2();
+			//inviting_callId=cmd.getParam3();
+			p2tGroupId=grpList->getGroupIdentity();   
+			
+			displayMessage(inviting_user + " invited you to a P2T Session:", blue);
+			showGroupList();
+			displayMessage("type 'accept' or 'deny'", blue);
+			state="P2T ACCEPT?";
+			setPrompt("P2T ACCEPT?");
+		}
+	
+	}
+	
+	/****
+	* p2tSessionCreated
+	* DestinationID: 
+	* Param1:        GroupId (SipDialogP2T)
+	* Param2:
+	* Param3:
+	* Description:   the P2T Session is set up
+	****/
+	else if (cmd.getOp()=="p2tSessionCreated"){
+		p2tGroupId=cmd.getParam();
+		displayMessage("P2T Session "+ p2tGroupId + " created", green);
+		grpList->setGroupIdentity(p2tGroupId);
+		state="P2T CONNECTED";
+		setPrompt(state);
+	}    
+	
+	else if (cmd.getOp().substr(0,3)=="p2t"){
+		displayMessage("Received: "+cmd.getOp(), blue);
+	}
 #endif
 }
 
@@ -554,89 +550,83 @@ void MinisipTextUI::showTimeouts(){
 
 
 void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header){
-
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-			config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
-
+				config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
+		
 	if (usesStateMachine){
 		displayMessage(header + d->getName() + "   State: " + d->getCurrentStateName());
 	}else{
 		displayMessage(header + d->getName());
 	}
-
+		
 	displayMessage("        SipDialogState:",bold);
-       cerr << BOLD << "        SipDialogState: "<< PLAIN;
-        displayMessage(
-                       string("            secure=") + (d->dialogState.secure?string("true"):string("false"))
-                        +"; localTag=" + d->dialogState.localTag
-                        +"; remoteTag=" + d->dialogState.remoteTag
-                        +"; seqNo=" + itoa(d->dialogState.seqNo)
-                        +"; remoteSeqNo=" + itoa(d->dialogState.remoteSeqNo)
-                        +"; remoteUri=" + d->dialogState.remoteUri
-                        +"; remoteTarget=" + d->dialogState.remoteTarget
-                        +"; isEarly=" + (d->dialogState.isEarly?string("true"):string("false"))
-		      );
-	string routeset;
-        list<string>::iterator i;
-        for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
-                if (i!=d->dialogState.routeSet.begin())
-                        routeset+= ",";
-                routeset+= *i;
-        }
-        displayMessage( string("            route_set: ")+routeset);
-	
-//	displayMessage("        Timeouts:", bold);
-	int ntimeouts=0;
-	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-	for (uint32_t j=0; j< torequests.size(); j++,jj++){
-		if ( *d == *((*jj).get_subscriber()) ){
-			int ms= (*jj).get_ms_to_timeout();
-			string theader = ntimeouts==0?"        Timeouts: ": "                  ";
-			displayMessage(theader+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-			ntimeouts++;
+	cerr << BOLD << "        SipDialogState: "<< PLAIN;
+	displayMessage(
+			string("            secure=") + (d->dialogState.secure?string("true"):string("false"))
+				+"; localTag=" + d->dialogState.localTag
+				+"; remoteTag=" + d->dialogState.remoteTag
+				+"; seqNo=" + itoa(d->dialogState.seqNo)
+				+"; remoteSeqNo=" + itoa(d->dialogState.remoteSeqNo)
+				+"; remoteUri=" + d->dialogState.remoteUri
+				+"; remoteTarget=" + d->dialogState.remoteTarget
+				+"; isEarly=" + (d->dialogState.isEarly?string("true"):string("false"))
+			);
+		string routeset;
+		list<string>::iterator i;
+		for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
+			if (i!=d->dialogState.routeSet.begin())
+				routeset+= ",";
+			routeset+= *i;
 		}
-	}
-	if (ntimeouts==0){
-		displayMessage("        (no timeouts)");
-	}
-
-
-//	displayMessage( "        Transactions:", bold);
-	list<MRef<SipTransaction*> > transactions = d->getTransactions();
-	if (transactions.size()==0)
-		displayMessage("        (no transactions)");
-	else{
-		int n=0;
-		for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-				i!=transactions.end(); i++){
-			
-			string header =  n==0 ? "        Transactions: " : "                      " ;
-			displayMessage(header +  string("(")+itoa(n)+") "+ (*i)->getName() + "   State: " + (*i)->getCurrentStateName());
-			n++;
-
-//			displayMessage("                Timeouts:", bold);
-
-			int ntimeouts=0;
-			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-			for (uint32_t j=0; j< torequests.size(); j++, jj++){
-				if ( *((*i)) == *((*jj).get_subscriber()) ){
-					int ms= (*jj).get_ms_to_timeout();
-					string header = ntimeouts==0?"            Timeouts: " : "                      ";
-					displayMessage(header + string("      timeout: ")
-						+ (*jj).get_command()
-						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-					ntimeouts++;
-				}
+		displayMessage( string("            route_set: ")+routeset);
+		
+	//	displayMessage("        Timeouts:", bold);
+		int ntimeouts=0;
+		std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
+		for (uint32_t j=0; j< torequests.size(); j++,jj++){
+			if ( *d == *((*jj).get_subscriber()) ){
+				int ms= (*jj).get_ms_to_timeout();
+				string theader = ntimeouts==0?"        Timeouts: ": "                  ";
+				displayMessage(theader+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
+				ntimeouts++;
 			}
-			if (ntimeouts==0)
-				displayMessage("                        (no timeouts)");
 		}
-	}
+		if (ntimeouts==0){
+			displayMessage("        (no timeouts)");
+		}
 
-
-
-
-
+	//	displayMessage( "        Transactions:", bold);
+		list<MRef<SipTransaction*> > transactions = d->getTransactions();
+		if (transactions.size()==0)
+			displayMessage("        (no transactions)");
+		else{
+			int n=0;
+			for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
+					i!=transactions.end(); i++){
+				
+				string header =  n==0 ? "        Transactions: " : "                      " ;
+				displayMessage(header +  string("(")+itoa(n)+") "+ (*i)->getName() + "   State: " + (*i)->getCurrentStateName());
+				n++;
+	
+	//			displayMessage("                Timeouts:", bold);
+	
+				int ntimeouts=0;
+				std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
+				for (uint32_t j=0; j< torequests.size(); j++, jj++){
+					if ( *((*i)) == *((*jj).get_subscriber()) ){
+						int ms= (*jj).get_ms_to_timeout();
+						string header = ntimeouts==0?"            Timeouts: " : "                      ";
+						displayMessage(header + string("      timeout: ")
+							+ (*jj).get_command()
+							+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
+						ntimeouts++;
+					}
+				}
+				if (ntimeouts==0)
+					displayMessage("                        (no timeouts)");
+			}
+		}
+	
 }
 
 void MinisipTextUI::showStat(){
@@ -672,48 +662,45 @@ void MinisipTextUI::showMem(){
 #ifdef P2T_SUPPORT
 
 void MinisipTextUI::showGroupList(){
-    if (grpList->getDescription().substr(0,5)=="ERROR"){
-    	displayMessage(grpList->getDescription(), red);
-	return;
-    }
-    
-    
-    displayMessage("Session Parameters:", bold);
-    
-    if(grpList->getDescription()!="")
-    	displayMessage("Description:      " + grpList->getDescription());
-    
-    if(grpList->getGroupIdentity()!="")
-    	displayMessage("Group Id:         " + grpList->getGroupIdentity());
-    
-    if(grpList->getGroupOwner()!="")    
-    	displayMessage("Group Owner:      " + grpList->getGroupOwner());
-        
-    displayMessage("Session Type:     " + P2T::getSessionType(grpList->getSessionType()));
-    displayMessage("Membership:       " + P2T::getMembership(grpList->getMembership()));   
-    
-    if(grpList->getMaxFloorTime()>0)
-    	displayMessage("Max Floor Time:   " + itoa(grpList->getMaxFloorTime()));
-    
-    if(grpList->getMaxParticipants()>0)
-    	displayMessage("Max Participants: " + itoa(grpList->getMaxParticipants()));
-
-    if(grpList->getAllMember().size()>0){
-        displayMessage("Members:", bold);
-    	for(uint32_t k=0;k<grpList->getAllMember().size();k++)
-        	displayMessage(grpList->getAllMember().at(k));
-    }
-
-    if(grpList->getAllUser().size()>0){
-    	displayMessage("Participants:", bold);
-        for(uint32_t k=0;k<grpList->getAllUser().size();k++)
-        	displayMessage(grpList->getAllUser().at(k)->getUri() + " (" + 
-			itoa(grpList->getAllUser().at(k)->getPriority()) + ") " +
-			P2T::getStatus(grpList->getAllUser().at(k)->getStatus()));
-    }
+	if (grpList->getDescription().substr(0,5)=="ERROR"){
+		displayMessage(grpList->getDescription(), red);
+		return;
+	}
+	displayMessage("Session Parameters:", bold);
+	
+	if(grpList->getDescription()!="")
+		displayMessage("Description:      " + grpList->getDescription());
+	
+	if(grpList->getGroupIdentity()!="")
+		displayMessage("Group Id:         " + grpList->getGroupIdentity());
+	
+	if(grpList->getGroupOwner()!="")    
+		displayMessage("Group Owner:      " + grpList->getGroupOwner());
+		
+	displayMessage("Session Type:     " + P2T::getSessionType(grpList->getSessionType()));
+	displayMessage("Membership:       " + P2T::getMembership(grpList->getMembership()));   
+	
+	if(grpList->getMaxFloorTime()>0)
+		displayMessage("Max Floor Time:   " + itoa(grpList->getMaxFloorTime()));
+	
+	if(grpList->getMaxParticipants()>0)
+		displayMessage("Max Participants: " + itoa(grpList->getMaxParticipants()));
+	
+	if(grpList->getAllMember().size()>0){
+		displayMessage("Members:", bold);
+		for(uint32_t k=0;k<grpList->getAllMember().size();k++) {
+			displayMessage(grpList->getAllMember().at(k));
+		}
+	}
+	
+	if(grpList->getAllUser().size()>0){
+		displayMessage("Participants:", bold);
+		for(uint32_t k=0;k<grpList->getAllUser().size();k++)
+			displayMessage(grpList->getAllUser().at(k)->getUri() + " (" + 
+				itoa(grpList->getAllUser().at(k)->getPriority()) + ") " +
+				P2T::getStatus(grpList->getAllUser().at(k)->getStatus()));
+	}
 }
-
-
 
 void MinisipTextUI::showP2TInfo(){
 	displayMessage("*********************************************", blue);

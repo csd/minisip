@@ -832,26 +832,25 @@ void MainWindow::phoneSelected(){
 }
 
 void MainWindow::phoneTreeClicked( GdkEventButton * event ){
-        Gtk::TreeModel::Path path;
-        Gtk::TreeViewColumn * column;
-        int cellx,celly;
-        bool gotPath;
-        
-        gotPath = phoneBookTreeView->get_path_at_pos( (int)event->x, (int)event->y, path, column, cellx, celly );
-
-        /* Collapse or expand the phonebook entries */
-        // FIXME: cellx >= 13 used to avoid the expander arrow, find
-        // some proper way
-        if( event->button == 1 && gotPath && path.get_depth() <= 1 && cellx >= 13){
-                if( phoneBookTreeView->row_expanded( path ) ){
-                        phoneBookTreeView->collapse_row( path );
-                }
-                else{
-
-                        phoneBookTreeView->collapse_all();
-                        phoneBookTreeView->expand_row( path, true );
-                }
-        }
+	Gtk::TreeModel::Path path;
+	Gtk::TreeViewColumn * column;
+	int cellx,celly;
+	bool gotPath;
+	gotPath = phoneBookTreeView->get_path_at_pos( (int)event->x, (int)event->y, path, column, cellx, celly );
+	
+	/* Collapse or expand the phonebook entries */
+	// FIXME: cellx >= 13 used to avoid the expander arrow, find
+	// some proper way
+	if( event->button == 1 && gotPath && path.get_depth() <= 1 && cellx >= 13){
+		if( phoneBookTreeView->row_expanded( path ) ){
+			phoneBookTreeView->collapse_row( path );
+		}
+		else{
+	
+			phoneBookTreeView->collapse_all();
+			phoneBookTreeView->expand_row( path, true );
+		}
+	}
 
         /* right click: pop up the menu */
         else if( event->button == 3 ){
