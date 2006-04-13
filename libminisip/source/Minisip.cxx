@@ -382,8 +382,8 @@ int Minisip::initParseConfig(){
 #endif
 			MRef<ConfBackend *> confBackend = ConfigRegistry::getInstance()->createBackend( gui );
 			if( !confBackend ){
-				merr << "Minisip could not load a configuration"
-					"back end. The application will now"
+				merr << "Minisip could not load a configuration" << end << 
+					"back end. The application will now" << end <<
 					"exit." << end;
 				::exit( 1 );
 			}
