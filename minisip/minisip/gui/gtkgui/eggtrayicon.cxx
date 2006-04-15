@@ -20,7 +20,7 @@
 
 #ifndef WIN32
 #include <string.h>
-#include <gtk-2.0/gdk/gdkx.h>
+#include <gdk/gdkx.h>
 //#include<gtkmm.h>
 #include "eggtrayicon.h"
 

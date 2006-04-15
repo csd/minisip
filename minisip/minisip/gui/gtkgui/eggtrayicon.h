@@ -22,8 +22,8 @@
 #define __EGG_TRAY_ICON_H__
 
 #ifndef WIN32
-#include <gtk-2.0/gtk/gtkplug.h>
-#include <gtk-2.0/gdk/gdkx.h>
+#include <gtk/gtkplug.h>
+#include <gdk/gdkx.h>
 
 G_BEGIN_DECLS
 
