@@ -434,7 +434,8 @@ AC_ARG_ENABLE(alsa,
     [ if test "${enable_alsa}" = "yes"
       then
         AC_CHECK_LIB([asound], [main],
-	   [ALSA_LIBS="-lasound"],
+	   [ALSA_LIBS="-lasound"
+	    AC_DEFINE(HAVE_LIBASOUND, [1], [Define to 1 if you have the `asound' library (-lasound).])],
            [AC_MSG_ERROR([Could not find the alsa library])]
         )
       fi ])
