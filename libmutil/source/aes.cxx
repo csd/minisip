@@ -41,8 +41,6 @@ using namespace std;
 
 #include<string.h>
 
-
-
 #ifndef HAVE_OPENSSL_AES_H
 
 // Redefinition of this AES type to use Paulo Barreto 
@@ -151,3 +149,131 @@ void AES::ctr_encrypt( unsigned char * data, unsigned int data_length,
 	}
 	delete[] cipher_stream;
 }
+
+void AES::f8_encrypt(unsigned char *data, unsigned int data_length,
+		     unsigned char *iv, unsigned char *origKey, unsigned int keyLen,
+		     unsigned char *salt, unsigned int saltLen ){
+    
+    f8_encrypt(data, data_length, data, iv, origKey, keyLen, salt, saltLen);
+}
+
+void AES::f8_encrypt(unsigned char *in, unsigned int in_length, unsigned char *out,
+		     unsigned char *iv, unsigned char *origKey, unsigned int keyLen,
+		     unsigned char *salt, unsigned int saltLen ){
+
+
+    unsigned char *saltMask;
+    unsigned char *maskedKey;
+    unsigned char *cp_in, *cp_in1, *cp_out;
+    unsigned int i;
+    int offset = 0;
+
+    F8_CIPHER_CTX f8ctx;
+   
+    /*
+     * Get memory for the derived IV (IV')
+     */
+    f8ctx.ivAccent = (unsigned char *)malloc(AES_BLOCK_SIZE);
+    
+    /*
+     * Get memory for the special key. This is the key to compute the
+     * derived IV (IV').
+     */
+    saltMask = (unsigned char *)malloc(keyLen);
+    maskedKey = (unsigned char *)malloc(keyLen);
+
+    /*
+     * First copy the salt into the mask field, then fill with 0x55 to
+     * get a full key.
+     */
+    memcpy(saltMask, salt, saltLen);
+    memset(saltMask+saltLen, 0x55, keyLen-saltLen);
+    
+    /*
+     * XOR the original key with the above created mask to
+     * get the special key.
+     */
+    cp_out = maskedKey;
+    cp_in = origKey;
+    cp_in1 = saltMask;    
+    for (i = 0; i < keyLen; i++) {
+        *cp_out++ = *cp_in++ ^ *cp_in1++;
+    }    
+    /*
+     * Prepare the a new AES cipher with the special key to compute IV'
+     */
+    AES *aes = new AES(maskedKey, keyLen);
+    
+    /*
+     * Use the masked key to encrypt the original IV to produce IV'. 
+     * 
+     * After computing the IV' we don't need this cipher context anymore, free it.
+     */
+    aes->encrypt(iv, f8ctx.ivAccent);
+    delete aes;
+
+    memset(maskedKey, 0, keyLen);
+    free(saltMask);
+    free(maskedKey);                   // both values are no longer needed
+
+    f8ctx.J.J = 0;                     // initialize the counter
+    f8ctx.S = (unsigned char *)malloc(AES_BLOCK_SIZE);  // get the key stream buffer
+
+    memset(f8ctx.S, 0, AES_BLOCK_SIZE); // initial value for key stream
+ 
+    while (in_length >= AES_BLOCK_SIZE) {
+        processBlock(&f8ctx, in+offset, AES_BLOCK_SIZE, out+offset);
+        in_length -= AES_BLOCK_SIZE;
+        offset += AES_BLOCK_SIZE;
+    }
+    if (in_length > 0) {
+        processBlock(&f8ctx, in+offset, in_length, out+offset);
+    }
+    memset(f8ctx.ivAccent, 0, AES_BLOCK_SIZE);
+    memset(f8ctx.S, 0, AES_BLOCK_SIZE);
+    free(f8ctx.ivAccent);
+    free(f8ctx.S);
+}
+
+int AES::processBlock(F8_CIPHER_CTX *f8ctx, unsigned char *in, int length, unsigned char *out) {
+
+    int i;
+    unsigned char *cp_in, *cp_in1, *cp_out;
+
+    /*
+     * XOR the previous key stream with IV'
+     * ( S(-1) xor IV' )
+     */
+    cp_in = f8ctx->ivAccent;
+    cp_out = f8ctx->S;
+    for (i = 0; i < AES_BLOCK_SIZE; i++) {
+        *cp_out++ ^= *cp_in++;
+    }
+    cp_out = f8ctx->S + AES_BLOCK_SIZE;
+    cp_in = f8ctx->J.jb;
+    /*
+     * Now XOR (S(n-1) xor IV') with the current counter, then increment the counter
+     */
+    *--cp_out ^= *cp_in++;
+    *--cp_out ^= *cp_in++;
+    *--cp_out ^= *cp_in++;                
+    *--cp_out ^= *cp_in++;
+    f8ctx->J.J++;
+    /*
+     * Now compute the new key stream using AES encrypt
+     */
+    AES_encrypt(f8ctx->S, f8ctx->S, key);
+    /*
+     * as the last step XOR the plain text with the key stream to produce 
+     * the ciphertext.
+     */
+    cp_out = out;
+    cp_in = in;
+    cp_in1 = f8ctx->S;
+    for (i = 0; i < length; i++) {
+        *cp_out++ = *cp_in++ ^ *cp_in1++;
+    }
+    return length;
+}
+
+

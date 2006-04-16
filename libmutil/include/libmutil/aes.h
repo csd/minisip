@@ -36,6 +36,17 @@
 typedef struct AES_KEY_s AES_KEY;
 #endif
 
+typedef struct _f8_ctx {
+    unsigned char *S;
+    unsigned char *ivAccent;
+    union {
+        unsigned int J;
+        unsigned char jb[4];
+    } J;
+} F8_CIPHER_CTX;
+
+
+
 class LIBMUTIL_API AES{
 	public:
 		AES();
@@ -55,7 +66,31 @@ class LIBMUTIL_API AES{
 				  unsigned int data_length,
 			 	  unsigned char * iv );
 
+		/* f8-mode encryption, in place */
+		void f8_encrypt( unsigned char * data, 
+				 unsigned int data_length,
+				 unsigned char * iv,
+				 unsigned char *key,
+				 unsigned int keyLen,
+				 unsigned char *salt, 
+				 unsigned int saltLen);
+
+		/* f8-mode encryption */
+		void f8_encrypt(unsigned char *in, 
+				unsigned int in_length, 
+				unsigned char *out,
+				unsigned char *iv, 
+				unsigned char *key,
+				unsigned int keyLen,
+				unsigned char *salt, 
+				unsigned int saltLen);
+
+
 	private:
+		int processBlock(F8_CIPHER_CTX *f8ctx, 
+			     unsigned char *in, 
+			     int length, 
+			     unsigned char *out);
 		AES_KEY *key;
 };
 
