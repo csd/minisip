@@ -953,7 +953,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch)
 
 void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
 	
-	uint32_t posAt;
+	size_t posAt;
 	
 	posAt = toUri.find("@");
 	if( posAt == string::npos ) { //toUri does not have a domain ...
