@@ -106,7 +106,8 @@ dnl       fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(autocall,
-    [ --enable-autocall enables automatic calling for debug purposes (default disabled)],
+    [AS_HELP_STRING([--enable-autocall], 
+    	[enables automatic calling for debug purposes (default disabled)])],
     [ if test "${enable_autocall}" = "yes"
       then
         AC_DEFINE(MINISIP_AUTOCALL, [], [Debug autocalling])
@@ -114,7 +115,8 @@ AC_ARG_ENABLE(autocall,
 
 dnl compile for iPAQ
 AC_ARG_ENABLE(ipaq,
-    [ --enable-ipaq enables various fixes for the iPAQ (default disabled)],
+    [AS_HELP_STRING([--enable-ipaq],
+    	[enables various fixes for the iPAQ (default disabled)])],
     [ if test "${enable_ipaq}" = "yes"
       then
         AC_DEFINE(IPAQ, [], [Compile for iPAQ])
@@ -122,9 +124,9 @@ AC_ARG_ENABLE(ipaq,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    [ --enable-memdebug enables memory debugging code. WARNING: This changes
-     the MemObject API that is used by both libraries and applications. Use
-     with care (default disabled)],
+    [AS_HELP_STRING([--enable-memdebug], [enables memory debugging code. 
+    WARNING: This changes the MemObject API that is used by both libraries 
+    and applications. Use with care (default disabled)])],
     [ if test "${enable_memdebug}" = "yes"
       then
         AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
@@ -132,7 +134,8 @@ AC_ARG_ENABLE(memdebug,
 
 dnl debug flag
 AC_ARG_ENABLE(debug,
-    [ --enable-debug enables debug output (default disabled)],
+    [AS_HELP_STRING([--enable-debug], 
+    	[enables debug output (default disabled)])],
     [ if test "${enable_debug}" = "yes"
       then
         AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
@@ -142,7 +145,8 @@ AC_ARG_ENABLE(debug,
 
 dnl debug flag
 AC_ARG_ENABLE(color-terminal,
-    [ --enable-color-terminal enables color coding of some debug messages (default disabled)],
+    [AS_HELP_STRING([--enable-color-terminal], 
+    	[enables color coding of some debug messages (default disabled)])],
     [ if test "${enable_color_terminal}" = "yes"
       then
         AC_DEFINE(COLOR_TERMINAL, [], [Color terminal support])
@@ -151,7 +155,8 @@ AC_ARG_ENABLE(color-terminal,
 
 dnl ipaq buzzer
 AC_ARG_ENABLE(buzzer,
-    [ --enable-buzzer enables IPAQ buzzer (default disabled)],
+    [AS_HELP_STRING([--enable-buzzer], 
+    	[enables IPAQ buzzer (default disabled)])],
     [ if test "${enable_buzzer}" = "yes" -o "${enable_ipaq}" = "yes"
       then
         AC_DEFINE(IPAQ_BUZZER, [], [iPAQ buzzer support])
@@ -162,7 +167,7 @@ AC_ARG_ENABLE(buzzer,
 
 dnl --with-avcodec argument
 AC_ARG_WITH(avcodec,
-    [ --with-avcodec=DIR location of the libavcodec tree],
+    [AS_HELP_STRING([--with-avcodec=DIR],[location of the libavcodec tree])],
     [ if test "${with_avcodec}" != "no"
       then
         AVCODEC_CPPFLAGS="-I${with_avcodec}"
@@ -302,10 +307,12 @@ dnl VIDEO SUPPORT
 dnl #############
 
 AC_ARG_ENABLE(sdl,
-    [ --enable-sdl enables SDL video output if the required library is found])
+    [AS_HELP_STRING([--enable-sdl],
+    	[enables SDL video output (if present)])])
 
 AC_ARG_ENABLE(video,
-    [ --enable-video enables video features (default disabled)],
+    [AS_HELP_STRING([--enable-video], 
+    	[enables video features (default disabled)])],
     [ if test "${enable_video}" = "yes"
       then
 dnl first check for libavcodec
@@ -440,7 +447,8 @@ AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 
 dnl ALSA sound interface
 AC_ARG_ENABLE(alsa,
-    [ --enable-alsa enables ALSA sound support (default disabled)],
+    [AS_HELP_STRING([--enable-alsa], 
+    	[enables ALSA sound support (default disabled)])],
     [ if test "${enable_alsa}" = "yes"
       then
         AC_CHECK_LIB([asound], [main],
@@ -591,7 +599,8 @@ AC_CHECK_LIB([nsl], [main])
 
 dnl OPIE
 AC_ARG_ENABLE(opie,
-    [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
+    [AS_HELP_STRING([--enable-opie],
+    	[enables Open Palmtop Integrated Environment support (default disabled)])],
     [ if test "${enable_opie}" = "yes"
       then
 	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"
