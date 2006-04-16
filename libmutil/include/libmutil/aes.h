@@ -39,10 +39,7 @@ typedef struct AES_KEY_s AES_KEY;
 typedef struct _f8_ctx {
     unsigned char *S;
     unsigned char *ivAccent;
-    union {
-        unsigned int J;
-        unsigned char jb[4];
-    } J;
+    uint32_t J;
 } F8_CIPHER_CTX;
 
 

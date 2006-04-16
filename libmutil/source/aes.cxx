@@ -216,7 +216,7 @@ void AES::f8_encrypt(unsigned char *in, unsigned int in_length, unsigned char *o
     free(saltMask);
     free(maskedKey);                   // both values are no longer needed
 
-    f8ctx.J.J = 0;                     // initialize the counter
+    f8ctx.J = 0;                       // initialize the counter
     f8ctx.S = (unsigned char *)malloc(AES_BLOCK_SIZE);  // get the key stream buffer
 
     memset(f8ctx.S, 0, AES_BLOCK_SIZE); // initial value for key stream
@@ -239,6 +239,7 @@ int AES::processBlock(F8_CIPHER_CTX *f8ctx, unsigned char *in, int length, unsig
 
     int i;
     unsigned char *cp_in, *cp_in1, *cp_out;
+    uint32_t *ui32p;
 
     /*
      * XOR the previous key stream with IV'
@@ -249,16 +250,12 @@ int AES::processBlock(F8_CIPHER_CTX *f8ctx, unsigned char *in, int length, unsig
     for (i = 0; i < AES_BLOCK_SIZE; i++) {
         *cp_out++ ^= *cp_in++;
     }
-    cp_out = f8ctx->S + AES_BLOCK_SIZE;
-    cp_in = f8ctx->J.jb;
     /*
      * Now XOR (S(n-1) xor IV') with the current counter, then increment the counter
      */
-    *--cp_out ^= *cp_in++;
-    *--cp_out ^= *cp_in++;
-    *--cp_out ^= *cp_in++;                
-    *--cp_out ^= *cp_in++;
-    f8ctx->J.J++;
+    ui32p = (uint32_t *)f8ctx->S;
+    ui32p[3] ^= hton32(f8ctx->J);
+    f8ctx->J++;
     /*
      * Now compute the new key stream using AES encrypt
      */
