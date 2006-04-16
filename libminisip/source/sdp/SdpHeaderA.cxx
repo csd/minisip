@@ -62,7 +62,7 @@ string SdpHeaderA::getString(){
 }
 
 string SdpHeaderA::getAttributeType(){
-	uint32_t pos;
+	size_t pos;
 	
 	if(( pos = attributes.find( ":" )) == string::npos )
 		return "property";
