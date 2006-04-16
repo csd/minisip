@@ -566,12 +566,14 @@ AC_SUBST(AM_CXXFLAGS)
 AC_SUBST(datadir)
 
 AC_CONFIG_FILES([minisip/Makefile
+			include/Makefile
 			minisip/gui/Makefile
 			minisip/gui/qtgui/Makefile
 			minisip/gui/gtkgui/Makefile
 			minisip/gui/textui/Makefile
 			minisip/win32/Makefile
 			minisip/win32/minisip-res.rc
+			share/Makefile
 			debian/Makefile
 			Makefile])
 AC_OUTPUT
