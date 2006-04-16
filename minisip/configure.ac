@@ -141,17 +141,6 @@ AC_ARG_ENABLE(color-terminal,
       fi ])
 
 
-dnl ipaq buzzer
-AC_ARG_ENABLE(buzzer,
-    [ --enable-buzzer enables IPAQ buzzer (default disabled)],
-    [ if test "${enable_buzzer}" = "yes" -o "${enable_ipaq}" = "yes"
-      then
-        AC_DEFINE(IPAQ_BUZZER, [], [iPAQ buzzer support])
-      else
-      	AC_DEFINE(NBUZZER, [], [No iPAQ buzzer support])
-      fi ])
-
-
 dnl P2T support
 AC_ARG_ENABLE(p2t,
     [ --enable-p2t enables push-2-talk features (default disabled)],
