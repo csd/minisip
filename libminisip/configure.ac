@@ -244,33 +244,41 @@ AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
 dnl #############
 dnl IPSEC SUPPORT
 dnl #############
-ipsec_enable=no
 AC_ARG_ENABLE(ipsec-enable,
-    [ --enable-ipsec-enable enables ipsec features (default disabled)],
-    [	ipsec_enable=yes
-	AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
-	  [Could not locate libipsec, required for ipsec features.])])
-	AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])])
-AM_CONDITIONAL(IPSEC_SUPPORT, test "${ipsec_enable}" = "yes")
+    [AS_HELP_STRING([--enable-ipsec-enable],
+    	[enable ipsec features (default disabled).])],
+    [	if "${enable_ipsec}" = "yes"
+        then
+	    AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
+	      [Could not locate libipsec, required for ipsec features.])])
+	    AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])
+        fi ])
+AM_CONDITIONAL(IPSEC_SUPPORT, test "${enable_ipsec}" = "yes")
 
 dnl P2T support
-p2t_enabled=no
 AC_ARG_ENABLE(p2t,
-    [ --enable-ipsec-enable enables push-2-talk features (default enabled)],
-    [  p2t_enable=yes
-	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])])
-AM_CONDITIONAL(P2T_SUPPORT, test "${p2t_enabled}" = "yes")
+    [AS_HELP_STRING([--enable-p2t],
+    	[enable push-2-talk features (default disabled)])],
+    [  if test "${enable_p2t}" = "yes"
+       then
+	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])
+       fi ])
+AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
 
 dnl AEC support
-aec_enabled=no
 AC_ARG_ENABLE(aec,
-    [ --enable-aec enables push-2-talk features (default enabled)],
-    [  aec_enable=yes
-	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])])
-AM_CONDITIONAL(AEC_SUPPORT, test "${aec_enabled}" = "yes")
+    [AS_HELP_STRING([--enable-aec],
+    	[enables Auto Echo Cancellation features (default disabled)])],
+    [  if test "${enable_aec}" = "yes"
+       then
+	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])
+       fi ])
+AM_CONDITIONAL(AEC_SUPPORT, test "${enabled_aec}" = "yes")
 
 AC_ARG_ENABLE(gconf,
-    [ --enable-gconf enables support for GConf (default enabled).])
+    [AS_HELP_STRING([--enable-gconf], 
+    	[enables support for GConf (default disabled).])]
+   )
 
 if test "x${enable_gconf}" != "xno"; then
    gconf_support="yes"
@@ -445,8 +453,12 @@ AC_SUBST(ALSA_LIBS)
 
 dnl DirectSound sound interface
 AC_ARG_ENABLE(dsound,
-    [ --enable-dsound enables DirectSound sound support (default disabled)],
-    [ AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) ])
+    [AS_HELP_STRING([--enable-dsound], 
+    	[enables DirectSound sound support (default disabled)])],
+    [ if test "${enable_dsound}" = "yes"
+      then
+        AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) 
+      fi ])
 
 if test ! x$enable_dsound = xno; then
    have_dsound=yes
