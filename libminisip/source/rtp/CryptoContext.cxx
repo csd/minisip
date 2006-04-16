@@ -168,6 +168,49 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 				  iv );
 		delete aes;
 	}
+
+	if( ealg == MIKEY_SRTP_EALG_AESF8 )
+	{
+
+		/* Create the IV:
+		   IV = 0x00 || M || PT || SEQ  ||      TS    ||    SSRC   ||    ROC
+		        8Bit  1bit  7bit  16bit       32bit        32bit        32bit
+		   ------------\       /----------------------------
+		         XX       XX      XX XX   XX XX XX XX   XX XX XX XX  XX XX XX XX
+		*/
+	    unsigned char iv[16];
+	    RtpHeader &rtph = rtp->getHeader();
+	    uint16_t seq_no = rtph.getSeqNo();
+	    uint32_t ui32;
+	    uint32_t *ui32p = (uint32_t *)iv;
+	    uint16_t *ui16p = (uint16_t *)iv;
+
+	    iv[0] = 0;
+	    iv[1] = rtph.getMarker() ? 0x80 : 0x00;
+	    iv[1] |= rtph.getPayloadType() & 0x7f;
+	    ui16p[1] = hton16(seq_no);
+
+
+	    // Set the timestamp in big endian order into IV
+	    ui32 = rtph.getTimestamp();
+	    ui32p[1] = hton32(ui32);
+
+	    // set the SSRC in big endian order into IV
+	    ui32 = rtph.getSSRC();
+	    ui32p[2] = hton32(ui32);
+
+	    // set the ROC in big endian order into IV
+	    // TODO: cross check if ROC has to be in big endian order and if we have
+	    // the correct (current) ROC here !!!
+
+	    ui32p[3] = hton32(roc);
+
+	    AES *aes = new AES(k_e, n_e);
+	    aes->f8_encrypt(rtp->getContent(),
+			    rtp->getContentLength(),
+			    iv, k_e, n_e, k_s, n_s);
+	    delete aes;
+	}
 }
 
 /* Warning: tag must have been initialized */
