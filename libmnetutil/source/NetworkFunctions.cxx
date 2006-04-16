@@ -145,13 +145,11 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	free(pAdapterInfo);
 
 #else
-	int32_t sockfd, len;
+	int32_t sockfd;
 	char *buf, *ptr;
 	struct ifconf ifc;
 	struct ifreq *ifrp;
 	struct sockaddr_in *sockaddr_ptr;
-
-	len = sizeof(struct sockaddr);
 
 	/* socket needed for ioctl() operations */
 	sockfd = socket(AF_INET,SOCK_DGRAM,0);
@@ -177,14 +175,13 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 		ifrp = (struct ifreq *)ptr;
 		sockaddr_ptr = (struct sockaddr_in *)&ifrp->ifr_ifru.ifru_addr;
 
-	#ifdef DARWIN
+#ifdef DARWIN
 		res.push_back(string(ifrp->ifr_name));
-		ptr += sizeof(ifrp->ifr_name) + len;
-	#else
+#else
 		res.push_back(string(ifrp->ifr_ifrn.ifrn_name));
-		ptr += sizeof(ifrp->ifr_ifrn.ifrn_name) + len;
-	#endif
-//		printf("%s: ",ifrp->ifr_ifrn.ifrn_name);
+#endif
+		ptr += sizeof(struct ifreq);
+//		printf("IPIF names: %s: \n",ifrp->ifr_ifrn.ifrn_name);
 //		printf("%s\n",inet_ntoa(sockaddr_ptr->sin_addr.s_addr));
 
 	} /* for */
@@ -546,3 +543,4 @@ bool NetworkFunctions::isLocalIP(uint32_t ip, vector<string> &localIPs){
 	
 	return false;
 }
+
