@@ -313,20 +313,20 @@ dnl first check for libavcodec
 	LDFLAGS_SAVE="${LDFLAGS}"
         LIBS_SAVE="${LIBS}"
 
-	CPPFLAGS="${CPPFLAGS} ${AVCODEC_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
-	
         AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no)
         if test "${FFMPEG_CONFIG}" != "no"
         then
           FFMPEG_CFLAGS="`ffmpeg-config --cflags`"
           FFMPEG_LIBS="`ffmpeg-config --libs avcodec`"
-          CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
-          LIBS="${FFMPEG_LIBS} ${LIBS}"
+	else
+	  FFMPEG_CFLAGS=
+	  FFMPEG_LIBS="-lavcodec -lz"
+	fi
+        
+	LIBS="${FFMPEG_LIBS} ${LIBS}"
+	CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS} ${AVCODEC_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
 
-          AC_SUBST(FFMPEG_LIBS)
-          AC_SUBST(FFMPEG_CFLAGS)
-        else
 	  AC_CHECK_HEADER([avcodec.h], [],
             [
               AC_MSG_ERROR(
@@ -341,7 +341,7 @@ dnl first check for libavcodec
 
 	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
 	    [Could not find zlib, required by libavcodec.])])
-        fi
+
 	CPPFLAGS="${CPPFLAGS_SAVE}"
 	LDFLAGS="${LDFLAGS_SAVE}"
 	LIBS="${LIBS_SAVE}"
@@ -417,6 +417,8 @@ dnl check for SDL
 	then
 	  AC_DEFINE(VIDEO_SUPPORT, [], [Compile video features])
 	  
+	  AC_SUBST(FFMPEG_LIBS)
+	  AC_SUBST(FFMPEG_CFLAGS)
 	  AC_SUBST(AVCODEC_LDFLAGS)
 	  AC_SUBST(AVCODEC_CPPFLAGS)
 	fi
