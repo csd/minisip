@@ -34,3 +34,5 @@ noinst_HEADERS  = CallDialog.h \
                   qtguistarter.h \
                   SettingsDialog.h \
 		  CertificateDialog.h
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

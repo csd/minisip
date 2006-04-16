@@ -10,3 +10,5 @@ EXTRA_DIST = minisip.ico
 	$(WINDRES) -I$(srcdir) -I$(top_srcdir)/share $< $@
 
 SUFFIXES = .rc .o
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

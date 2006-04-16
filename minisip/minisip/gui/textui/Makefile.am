@@ -10,3 +10,5 @@ minisip_textui_SOURCES = MinisipTextUI.cxx \
 				MinisipTextMain.cxx
 
 noinst_HEADERS  = MinisipTextUI.h
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

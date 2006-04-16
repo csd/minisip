@@ -59,3 +59,5 @@ if OS_WIN
         minisip_gtkgui_LDADD += $(res_obj)
         minisip_gtkgui_DEPENDENCIES = $(res_obj)
 endif OS_WIN
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

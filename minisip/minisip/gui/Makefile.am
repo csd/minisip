@@ -12,3 +12,5 @@ endif
 if QT_GUI
         SUBDIRS += qtgui
 endif
+
+MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
