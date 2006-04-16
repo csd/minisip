@@ -383,3 +383,14 @@ libminisip_la_LIBADD += $(libcodecs_libadd) \
 			$(libconfigbackend_libadd) \
 			$(libsoundcard_libadd) \
 			$(libvideo_libadd)
+
+MAINTAINERCLEANFILES  = $(srcdir)/configure \
+			$(srcdir)/Makefile.in \
+			$(srcdir)/depcomp \
+			$(srcdir)/config.guess \
+			$(srcdir)/config.sub \
+			$(srcdir)/ltmain.sh \
+			$(srcdir)/missing \
+			$(srcdir)/aclocal.m4 \
+			$(srcdir)/install-sh
+
