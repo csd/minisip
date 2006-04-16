@@ -236,9 +236,9 @@ if test ! x$enable_portaudio = xno; then
       AC_MSG_ERROR([Could not find PortAudio requirement(s).])
    fi
 
-   AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
    AC_SUBST(PORTAUDIO_LIBS)
 fi
+AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
 
 
 dnl #############
@@ -463,8 +463,8 @@ if test ! x$enable_dsound = xno; then
    fi
    LIBS="${save_LIBS}"
    AC_SUBST(DSOUND_LIBS)
-   AM_CONDITIONAL(DIRECT_SOUND, [test "${have_dsound}" = "yes"])
 fi
+AM_CONDITIONAL(DIRECT_SOUND, [test "${have_dsound}" = "yes"])
 
 
 PKG_CHECK_MODULES(OSSO, [libosso],
