@@ -52,7 +52,7 @@ ConferenceControl::ConferenceControl(string configUri, string cid, bool islocal)
 	
 	confId=cid;
 	
-	uint32_t i = (uint32_t)configUri.find("@");
+	size_t i = (uint32_t)configUri.find("@");
 	assert(i!=string::npos);
 	myUri=configUri.substr(0,i);
 	myDomain=trim(configUri.substr(i));
