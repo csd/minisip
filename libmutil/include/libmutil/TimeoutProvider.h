@@ -184,7 +184,8 @@ class TimeoutProvider : public Runnable{
 
 
 		/**
-		 * @param signal_no	The TimeoutProvider uses signals internally. Which 
+		 * Timeout Provide Constructor 
+		 * The TimeoutProvider uses signals internally. Which 
 		 * 			signal being used is specified as argument to the 
 		 * 			constructor. The signal is only reveiced by the 
 		 * 			internal thread (but it still has side effects such

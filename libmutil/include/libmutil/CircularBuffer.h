@@ -70,7 +70,6 @@ class LIBMUTIL_API CircularBuffer {
 		/**
 		Simulate a read of len elements, but do not care what is read.
 		If more than available elements is requested, nothing is removed
-		@param s data buffer
 		@param len length of the data buffer
 		@return true if read correctly, else false (indicates
 			either an error or that there were not enough elements).

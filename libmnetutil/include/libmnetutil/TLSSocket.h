@@ -70,7 +70,7 @@ NULL-SHA:NULL-MD5
 
 //Okay - another MSVC thing. Looks like I must explicitely instantiate
 //the MRef template like this to avoid linking errors --Erik.
-/// In Microsoft Embedded VC 4.0 this causes a warning ... remove
+// In Microsoft Embedded VC 4.0 this causes a warning ... remove
 #ifdef _MSC_VER
 #ifndef _WIN32_WCE
 template class __declspec(dllexport) MRef<certificate*>;
