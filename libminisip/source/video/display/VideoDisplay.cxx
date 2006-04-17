@@ -129,9 +129,6 @@ void VideoDisplay::showWindow(){
 
 /* The lock on emptyImages should always have been taken */
 void VideoDisplay::hideWindow(){
-        list<MImage *>::iterator i;
-
-        
         while( ! emptyImages.empty() ){
                 emptyImages.pop_front();
                 emptyImagesSem.dec();
@@ -141,7 +138,6 @@ void VideoDisplay::hideWindow(){
                 deallocateImage( *allocatedImages.begin() );
                 allocatedImages.pop_front();
         }
-
 
         destroyWindow();
 }
