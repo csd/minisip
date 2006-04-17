@@ -91,7 +91,8 @@ dnl       fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(debug,
-    [ --enable-debug enables debug output (default disabled)],
+    AS_HELP_STRING([--enable-debug],
+	[enables debug output. (default disabled)]),
     [ if test "${enable_debug}" = "yes"
       then
         AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
@@ -101,7 +102,8 @@ AC_ARG_ENABLE(debug,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    [ --enable-memdebug enables memory debugging code. (default disabled)],
+    AS_HELP_STRING([--enable-memdebug],
+	[enables memory debugging code. (default disabled)]),
     [ if test "${enable_memdebug}" = "yes"
       then
         AC_DEFINE(MDEBUG, [], [Debug memory])
