@@ -301,6 +301,14 @@ AC_ARG_ENABLE(sdl,
     [AS_HELP_STRING([--enable-sdl],
     	[enables SDL video output (if present)])])
 
+AC_ARG_ENABLE(avcodec-fixes,
+    [AS_HELP_STRING([--enable-avcodec-fixes],
+	[enables support for new avcodec abi (default: off)])],
+    [  if test "x${enable_avcodec_fixes}" = "xyes"
+       then
+	   AC_DEFINE(AVCODEC_FIXES, [], [Use new avcodec context abi.])
+       fi ])
+
 AC_ARG_ENABLE(video,
     [AS_HELP_STRING([--enable-video], 
     	[enables video features (default disabled)])],

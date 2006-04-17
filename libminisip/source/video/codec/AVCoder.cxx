@@ -29,6 +29,7 @@
 #include<libminisip/video/codec/VideoEncoderCallback.h>
 //#include<libminisip/rtp/RtpPacket.h>
 
+#include<config.h>
 #include<stdio.h>
 #include<fcntl.h>
 #include<iostream>
@@ -106,13 +107,13 @@ AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
 	context->bit_rate = 1000000;
 	context->bit_rate_tolerance = 2*1024*1024;
 
-#if 1
-//	context->frame_rate = 1000; 
+#ifndef AVCODEC_FIXES
 	context->frame_rate = 15; 
 	context->frame_rate_base = 1;
 #else
 	AVRational timeBase = { 1, 15 };
 	context->time_base = timeBase;
+	context->pix_fmt = PIX_FMT_YUV420P;
 #endif
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
