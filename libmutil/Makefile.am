@@ -75,3 +75,6 @@ MAINTAINERCLEANFILES = \
 		$(srcdir)/install-sh \
 		$(srcdir)/aclocal.m4
 
+maintainer-clean-local:
+	rm -rf $(srcdir)/libltdl
+
