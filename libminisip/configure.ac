@@ -143,16 +143,6 @@ AC_ARG_ENABLE(debug,
       	AC_DEFINE(NDEBUG, [], [No debug output])
       fi ])
 
-dnl debug flag
-AC_ARG_ENABLE(color-terminal,
-    [AS_HELP_STRING([--enable-color-terminal], 
-    	[enables color coding of some debug messages (default disabled)])],
-    [ if test "${enable_color_terminal}" = "yes"
-      then
-        AC_DEFINE(COLOR_TERMINAL, [], [Color terminal support])
-      fi ])
-
-
 dnl ipaq buzzer
 AC_ARG_ENABLE(buzzer,
     [AS_HELP_STRING([--enable-buzzer], 
