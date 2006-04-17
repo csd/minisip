@@ -14,6 +14,7 @@ dnl AC_CONFIG_HEADER([config.h])
 dnl AM_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE(minisip, [minisip_version])
+AM_MAINTAINER_MODE
 
 AM_CONFIG_HEADER(include/compilation_config.h)
 
