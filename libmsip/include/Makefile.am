@@ -63,4 +63,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 
 noinst_HEADERS = 	config.h
 
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in $(srcdir)/compilation_config.h.in
+MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
+			$(srcdir)/compilation_config.h.in \
+			$(srcdir)/compilation_config.h.in~
