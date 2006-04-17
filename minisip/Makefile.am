@@ -14,7 +14,7 @@ SUBDIRS = include share minisip debian
 dist-hook:
 	for i in test_cert Documentation; do \
 		cp -a $(srcdir)/$$i $(distdir)/$$i; \
-		find $(distdir)/$$i -name '.svn' -a -type d | xargs rm -r; \
+		find $(distdir)/$$i -name '.svn' -a -type d | xargs -r rm -r; \
 	done
 
 MAINTAINERCLEANFILES = \
