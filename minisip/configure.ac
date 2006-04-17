@@ -132,15 +132,6 @@ AC_ARG_ENABLE(debug,
       	AC_DEFINE(NDEBUG, [], [No debug output])
       fi ])
 
-dnl debug flag
-AC_ARG_ENABLE(color-terminal,
-    [ --enable-color-terminal enables color coding of some debug messages (default disabled)],
-    [ if test "${enable_color_terminal}" = "yes"
-      then
-        AC_DEFINE(COLOR_TERMINAL, [], [Color terminal support])
-      fi ])
-
-
 dnl P2T support
 AC_ARG_ENABLE(p2t,
     [ --enable-p2t enables push-2-talk features (default disabled)],
@@ -151,111 +142,19 @@ AC_ARG_ENABLE(p2t,
       fi
     ]
 )
-
 AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
 
 dnl #############
 dnl VIDEO SUPPORT
 dnl #############
 
-AC_ARG_ENABLE(sdl,
-    [ --enable-sdl enables SDL video output if the required library is found])
-
 AC_ARG_ENABLE(video,
     [ --enable-video enables video features (default disabled)],
     [ if test "${enable_video}" = "yes"
       then
-dnl first check for libavcodec
-        CPPFLAGS_SAVE="${CPPFLAGS}"
-	LDFLAGS_SAVE="${LDFLAGS}"
-	CPPFLAGS="${CPPFLAGS} ${AVCODEC_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
-	
-        AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no)
-        if test "${FFMPEG_CONFIG}" != "no"
-        then
-          CPPFLAGS="${CPPFLAGS} `ffmpeg-config --cflags`"
-          LIBS="`ffmpeg-config --libs avcodec` ${LIBS}"
-        else
-	  AC_CHECK_HEADER([avcodec.h], [],
-            [
-              AC_MSG_ERROR(
-	      [Could not locate avcodec header files. Please install 
-               the libavcodec-devel package.]
-              )
-            ]
-          )
-            
-	  AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
-	    [Could not locate libavcodec, required for video features.])])
-
-	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
-	    [Could not find zlib, required by libavcodec.])])
-        fi
-dnl	CPPFLAGS="${CPPFLAGS_SAVE}"
-dnl	LDFLAGS="${LDFLAGS_SAVE}"
-        
-dnl look for V4L headers
-        AC_CHECK_HEADERS([linux/videodev.h],
-          [VIDEO_GRABBER="${VIDEO_GRABBER} v4l"
-	   V4L_VIDEO_GRABBER="yes" ])
-dnl look for libdc1394
-        AC_CHECK_HEADERS([libdc1394/dc1394_control.h],
-	  [
-	   AC_CHECK_LIB([raw1394],[main], [
-	     AC_CHECK_LIB([dc1394_control],[main], [
-	       VIDEO_GRABBER="${VIDEO_GRABBER} dc1394}"
-	       DC1394_VIDEO_GRABBER="yes" 
-	       AC_DEFINE(DC1394_SUPPORT, [], [Compile DC1394 support])
-	       LIBS="${LIBS} -ldc1394_control -lraw1394"
-	       ], [], [-lraw1394])
-	       ])
-	     ])
-dnl look for xvideo
-	AC_PATH_XTRA
-	X_LIBS="$X_LIBS -lX11"
-	LDFLAGS="${LDFLAGS} ${X_EXTRA_LIBS} ${X_LIBS}"
-	AC_CHECK_LIB([Xv], [main])
-        AC_CHECK_HEADERS([X11/extensions/Xv.h],[
-          AC_CHECK_HEADERS([X11/extensions/Xvlib.h],
-	    [VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
-	     AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
-	     XV_VIDEO_DISPLAY="yes" ],[])
-	  ])
-dnl check for SDL
-        AC_CHECK_HEADERS([SDL/SDL.h],
-	  [
-	   AC_CHECK_LIB([SDL],[main], [
-               if test "x${enable_sdl}" != "xno"
-               then
-	         VIDEO_DISPLAY="${VIDEO_DISPLAY} sdl"
-	         SDL_VIDEO_DISPLAY="yes" 
-	         AC_DEFINE(SDL_SUPPORT, [], [Compile SDL support])
-	         LIBS="${LIBS} -lSDL ${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread"
-	         CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
-               fi
-	     ], [], [${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread] )
-	  ])
-	
-	
-	if test "x${VIDEO_DISPLAY}" != "x"
-	then
 	  AC_DEFINE(VIDEO_SUPPORT, [], [Compile video features])
-	  
-	  AC_SUBST(AVCODEC_LDFLAGS)
-	  AC_SUBST(AVCODEC_CPPFLAGS)
-	fi
       fi ])
-
 AM_CONDITIONAL(VIDEO_SUPPORT, test "${enable_video}" = "yes")
-AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")
-AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
-AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
-AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
-
-
-
-      
 
 dnl TEXT UI
 AC_ARG_ENABLE(textui,
