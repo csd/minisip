@@ -1,0 +1,147 @@
+HOWTO: Using build.pl for fun and profit, or efficient multiproject building.
+by Zachary T Welch <zw@superlucidity.net>
+Last Updated: April 16, 2006
+
+The build.pl script helps automate the process for building the various
+dependencies for minisip.  It builds them under the main repository tree,
+in separate trees, then installs them in a common root.
+
+Quick Start
+-----------
+
+If the repository is stable, the following steps (when run from the root
+of your local working copy) will bootstrap, build, and install minisip and 
+its dependencies (as the current user):
+
+	cp build.local.example build.local
+	${EDITOR} build.local	# set approriate options
+	./build.pl run minisip
+
+This last command encapsulates many different individual steps, which are
+described in the rest of this document.
+
+Configuration
+-------------
+
+Before using the build script for the first time, it will be useful to
+familiarize yourself with the build configuration file.  Used to establish
+the package dependencies and configure options, the 'build.conf' file 
+contains a few perl definitions that should be easy to understand and change.
+
+Instead of modifying the 'build.conf' file directly, you can should
+a file named "build.local" and make the relevant changes there.  This
+file is loaded immediately after the global build.conf file, and examples
+are provided in 'build.local.example'.  As that file should show, changes 
+are made to the definitions made in 'build.conf' using standard Perl calls.
+
+Default Directories
+-------------------
+
+By default, the build script will create two local directories called
+'build' and 'install'.  All stages (after 'bootstrap') are performed in an
+"object" directory located under 'build'.  The 'install' directory is used 
+as the '--prefix' to each project's configure script.
+
+As a result, the build or install state can be cleaned simply by removing 
+the appropriate directory.  This setup also makes it possible to build for 
+more than one target, such as x86 and arm, at the same time (but with 
+different "object directories").
+
+You can change the location of the 'build' and 'install' directories through
+the command line options or your 'build.local' file (see above).
+
+Usage Instructions
+------------------
+
+The basic command usage form is:
+
+	./build.pl [<options>] <action(s)> <targets>
+
+The options, actions, and targets can be discovered using the following 
+help options that are built into the 'build.pl' script:
+
+	./build.pl --help
+	./build.pl --list-actions
+	./build.pl --list-targets
+
+Basic Instructions
+------------------
+
+To build the entire set of projects and install them in a temporary install
+directory for testing, simply issue the following command:
+
+	./build.pl install minisip
+
+If you have a fresh copy of the repository, this will run 'bootstrap', 
+'configure', 'make', and 'make install' for each of the projects in turn.
+It will pass the correct options to configure, based on the definitions
+in 'build.conf' and 'build.local'. 
+
+To clean up everything (including the bootstrap files), you can run use
+the build script as well:
+
+	./build.pl mclean minisip
+
+At this point, the repository should contain no extra files, unless you 
+have added them during the process of development.
+
+Building Single Projects
+------------------------
+
+The above examples work on all local projects required by minisip, which is
+pretty much all of them.  If you want to work on a single project, you can
+turn off the automatic dependency resolution.  To build only libmsip,
+you can use the following sequence of commands:
+
+	./build.pl -S compile libmsip
+
+For that to succeed, you must have previously installed 'libmutil' and
+'libmnetutil', perhaps with something like the following command:
+
+	./build.pl -S install libmutil libmnetutil
+
+Since 'libmnetutil' depends on 'libmutil', it would have been faster to
+use the equivalent command with dependency resolution:
+
+	./build.pl install libmnetutil
+
+
+Additional options may be passed to the script that alter the build process;
+run './build.pl --help' for a description of all options.
+
+Multiple Actions
+----------------
+
+Occasionally, it can be useful to perform multiple actions in the same step,
+such as when tooling around with the build system itself.  To do this, you
+can combine actions with the '+' delimiter:
+
+	./build.pl bootstrap+configure+compile+install minisip
+
+Normally, the system tries to detect an existing 'configure' script and main 
+'Makefile'; if found, it assumes the 'bootstrap' and 'configure' steps have 
+already been performed, respectively.  If that is the case, you will need
+to either run the steps by hand individually or combine them.  
+
+If you have not performed any actions in your repository, the above command 
+is just the long (and redundant) form of the following:
+	
+	./build.pl install minisip
+
+When changing a Makefile.am in a project that has already been compiled, 
+you might want to have the system to perform a 'bootstrap+configure':
+
+	./build.pl -S bootstrap+configure minisip
+
+That rebuilds the Makefiles for the minisip project (and only minisip).
+
+Advanced Instructions
+---------------------
+
+cat build.pl | grok --enable-wetware --ignore-pets --allow-caffeine
+
+For More Information
+--------------------
+
+Talk with the author of this script in #minisip channel on irc.freenode.net.
+

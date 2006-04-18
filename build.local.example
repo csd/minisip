@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+#
+#  build.local overrides example for minisip
+#
+#  Make a copy of this file named 'build.local' in the same directory, then
+#  you can simply remove comments from approriate lines to suit your needs. 
+#  Also, you can remove these fluffy comments if they make your skin crawl.
+#
+#  The settings provided here should be the opposite of the defaults.
+#
+#######
+
+###
+# These options override the equivalent command line option defaults
+# XXX: They also cause the command line options to be ignored.
+
+## Override default path locations
+## Note: these are not normally require and use sensible defaults.
+##
+# $topdir = '/path/to/repository/trunk';
+# $builddir = '/path/to/builddir';
+# $installdir = '/path/to/installdir';
+
+## Override default host distribution (only affects 'merge' command)
+## Distributions currently supported by this system:
+##	gentoo
+##
+# $host_dist = 'gentoo';
+
+## Use batch setting by default, with -S enabling "single mode"; normally, 
+## the targets specified by the user are built, and -S enables batch mode
+##
+# $toggle_batch = 1;
+
+## The default_action can be used to let the build.pl script run without
+## bany arguments (excluding option parameters).
+##
+## Example #1: (re)install, (re)package, and (re)merge the target(s)
+# $default_action = 'install+dist+merge';
+##
+## Example #2: run distcheck on the target(s); performs critical checking
+# $default_action = 'distcheck';
+##
+## Example #3: run the target(s); previous steps are implicit
+# $default_action = 'run';
+
+## The default_target can be set to further expediate command line entry.
+## Typically, this should specify the topologically ultimate leaf target, 
+## which no other package (being built here) subsequently requires.
+##
+# $default_target = 'minisip';
+
+###
+# The settings in this section override the configuration options for 
+# each package, providing alternatives for the defaults in 'build.conf'.
+
+## Override global configure parameters; also settable via the CLI.
+# set_global_configure_param(
+# 			debug => 1,
+# 			shared => 0,
+# 		);
+
+## override libmutil configure parameters
+# set_configure_param('libmutil', 
+#			'color-terminal' => 0,
+# 			memdebug => 0,
+# 			pthread => '/path/to/pthread',
+# 		);
+
+## override shared libminisip/minisip configure parameters
+# set_configure_param(['minisip', 'libminisip'],
+#			autocall => 1,
+#			ipaq => 1,
+#			opie => 1,
+#			video => 1,
+#		);
+
+## override libminisip configure parameters
+# set_configure_param('libminisip',
+# 			aec => 1,
+#			alsa => 1,
+#			avcodec => '/path/to/libavcodec',
+#			'avcodec-fixes' => 1,
+#			buzzer => 1,
+#			dsound => 1,
+#			gconf => 0,
+#			ipsec => 1,
+#			portaudio => 1,
+#			p2t => 1,
+#			sdl => 1,
+#		);
+
+## override minisip configure parameters
+# set_configure_param('minisip', 
+#			gtk => 0,
+#			p2t => 1,
+#			qtui => 1,
+#			qte => 1,
+#			textui => 1
+#		);
+
