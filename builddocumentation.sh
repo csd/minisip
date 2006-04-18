@@ -8,13 +8,13 @@
 #cd to the running folder ...
 cd Documentation
 
-doxygen doxygen.conf/doxygen.develguide.conf
-doxygen doxygen.conf/doxygen.libmutil.conf
-doxygen doxygen.conf/doxygen.libmnetutil.conf
-doxygen doxygen.conf/doxygen.libmikey.conf
-doxygen doxygen.conf/doxygen.libmsip.conf
-doxygen doxygen.conf/doxygen.libminisip.conf
-doxygen doxygen.conf/doxygen.minisip.conf
+doxygen doxygen.d/doxygen.develguide.conf
+doxygen doxygen.d/doxygen.libmutil.conf
+doxygen doxygen.d/doxygen.libmnetutil.conf
+doxygen doxygen.d/doxygen.libmikey.conf
+doxygen doxygen.d/doxygen.libmsip.conf
+doxygen doxygen.d/doxygen.libminisip.conf
+doxygen doxygen.d/doxygen.minisip.conf
 
 echo "MiniSIP builddocumentation finished (maybe with errors ... i didn't check)"
 echo "      The main index web page can be located under:"
