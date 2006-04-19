@@ -28,9 +28,11 @@
 # $host_dist = 'gentoo';
 
 ## Use batch setting by default, with -S enabling "single mode"; normally, 
-## the targets specified by the user are built, and -S enables batch mode
+## the targets specified by the user are built, and -S enables batch mode.
+## Note: The instructions in README.build assume this has been set, so
+## this ensures users following its instructions get what they expect.
 ##
-# $toggle_batch = 1;
+$toggle_batch = 1;
 
 ## The default_action can be used to let the build.pl script run without
 ## bany arguments (excluding option parameters).

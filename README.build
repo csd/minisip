@@ -34,6 +34,19 @@ file is loaded immediately after the global build.conf file, and examples
 are provided in 'build.local.example'.  As that file should show, changes 
 are made to the definitions made in 'build.conf' using standard Perl calls.
 
+Batch Mode
+----------
+
+By default (without '-S'), the script will only apply actions to the 
+targets explicitly specified on the command line.  With '-S', the script 
+will also include dependencies of the targets specified on the command line.
+
+The '$toggle_batch' option allows you to swap these behaviors.  When set to
+a non-zero value in 'build.local', the script will include dependencies by 
+default and '-S' will be required to restricts actions to single projects.
+
+The following instructions assume that you have set $toggle_batch = 1.
+
 Default Directories
 -------------------
 
