@@ -36,6 +36,7 @@
 SipLayerTransaction::SipLayerTransaction(
 		MRef<SipCommandDispatcher*> d,
 		MRef<SipLayerTransport*> transp):
+			handleAck(true),
 			dispatcher(d),
 			transportLayer(transp)
 {
