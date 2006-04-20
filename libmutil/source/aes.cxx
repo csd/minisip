@@ -27,6 +27,8 @@
 #ifdef HAVE_OPENSSL_AES_H
 #include <openssl/aes.h>
 #else
+# define AES_BLOCK_SIZE 16
+typedef struct AES_KEY_s AES_KEY;
 #include <libmutil/rijndael-alg-fst.h>
 #endif
 
@@ -71,7 +73,7 @@ AES::AES():key(NULL){
 AES::AES( unsigned char * key, int key_length ){
 	this->key = (AES_KEY *) malloc( sizeof( AES_KEY ) );
 	memset( this->key, '\0', sizeof( AES_KEY ) );;
-	AES_set_encrypt_key( key, key_length*8, this->key );
+	AES_set_encrypt_key( key, key_length*8, (AES_KEY *) this->key );
 }
 
 AES::~AES(){
@@ -80,7 +82,7 @@ AES::~AES(){
 }
 
 void AES::encrypt( const unsigned char * input, unsigned char * output ){
-	AES_encrypt( input, output, key );
+	AES_encrypt( input, output, (AES_KEY *) key );
 }
 
 void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
@@ -104,7 +106,7 @@ void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 		aes_input[14] = (byte_t)((input & 0x0000FF00) >>  8);
 		aes_input[15] = (byte_t)((input & 0x000000FF));
 
-		AES_encrypt( aes_input, &output[ctr*AES_BLOCK_SIZE], key );
+		AES_encrypt( aes_input, &output[ctr*AES_BLOCK_SIZE], (AES_KEY *) key );
 	}
 
 	// Treat the last bytes:
@@ -114,7 +116,7 @@ void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 	aes_input[14] = (byte_t)((input & 0x0000FF00) >>  8);
 	aes_input[15] = (byte_t)((input & 0x000000FF));
 	
-	AES_encrypt( aes_input, temp, key );
+	AES_encrypt( aes_input, temp, (AES_KEY *) key );
 	memcpy( &output[ctr*AES_BLOCK_SIZE], temp, length % AES_BLOCK_SIZE );
 
 	free( temp );
@@ -259,7 +261,7 @@ int AES::processBlock(F8_CIPHER_CTX *f8ctx, unsigned char *in, int length, unsig
     /*
      * Now compute the new key stream using AES encrypt
      */
-    AES_encrypt(f8ctx->S, f8ctx->S, key);
+    AES_encrypt(f8ctx->S, f8ctx->S, (AES_KEY *) key);
     /*
      * as the last step XOR the plain text with the key stream to produce 
      * the ciphertext.

@@ -29,13 +29,6 @@
 
 #include <stdlib.h>
 
-#ifdef HAVE_OPENSSL_AES_H
-# include <openssl/aes.h>
-#else
-# define AES_BLOCK_SIZE 16
-typedef struct AES_KEY_s AES_KEY;
-#endif
-
 typedef struct _f8_ctx {
     unsigned char *S;
     unsigned char *ivAccent;
@@ -88,7 +81,7 @@ class LIBMUTIL_API AES{
 			     unsigned char *in, 
 			     int length, 
 			     unsigned char *out);
-		AES_KEY *key;
+		void *key;
 };
 
 #endif
