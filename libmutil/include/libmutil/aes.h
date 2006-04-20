@@ -29,7 +29,7 @@
 
 #include <stdlib.h>
 
-#ifdef LIBMUTIL_HAVE_OPENSSL_AES_H
+#ifdef HAVE_OPENSSL_AES_H
 # include <openssl/aes.h>
 #else
 # define AES_BLOCK_SIZE 16
