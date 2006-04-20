@@ -39,6 +39,8 @@ my $man = 0;
 my $list_actions = 0;	# show the actions permitted by this script
 my $list_targets = 0;	# show the targets known by this script
 
+our $default_ui = 'gtkgui';	# Which ui does the user want to use?
+
 our $hostdist = 'autodetect';	# This host's distribution (e.g. gentoo).
 our $buildspec = 'autodetect';  # This host's compiler specification.
 our $hostspec = 'autodetect';	# The target host's compiler specification.
@@ -78,6 +80,9 @@ Directory Options:
 Distribution Merge Options:
     -D|--distro=...	Sets package manager features (default: $hostdist)
 
+Run Options:
+    -U|--ui=...		Sets user interface to use (default: $default_ui)
+
 General Options:
     -p|--pretend	Do not actually perform actions
     -v|--verbose	Verbose output mode
@@ -96,6 +101,7 @@ my $result = GetOptions(
 		"builddir|B=s" => \$builddir,
 		"installdir|I=s" => \$installdir,
 		"distro|D=s" => \$hostdist,
+		"ui|U=s" => \$default_ui,
 
 		"debug|d!" => \$debug,
 		"static|s!" => \$static,
@@ -383,7 +389,7 @@ $mergefunc = sub { die "+BUG: unable to merge packages under '$hostdist'" };
 		 #  For what it's worth, it is "equivalent" to the old .sh
 		return unless $pkg eq 'minisip';
 		$ENV{LD_LIBRARY_PATH} = "$installdir/usr/lib";
-		act('run', "$bindir/$pkg");
+		act('run', "$bindir/$pkg" . "_$default_ui");
 	},
 	tarclean => sub {
 		for my $p ( distfiles() ) {
