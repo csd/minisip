@@ -119,7 +119,6 @@ void Dbg::setExternalHandler(DbgHandler * dbgHandler )
 
 std::ostream &end(std::ostream &os)
 {
-	#pragma message("eeeeo!")
 	return std::endl( os );
 }
 
