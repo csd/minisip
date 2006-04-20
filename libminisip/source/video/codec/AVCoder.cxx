@@ -173,9 +173,6 @@ void AVEncoder::close(){
 
 void AVEncoder::handle( MImage * image ){
 	int ret;
-	struct timeval tv;
-	struct timeval tv2;
-	struct timezone tz;
 	AVFrame frame;
 	bool mustFreeFrame = false;
 	

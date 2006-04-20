@@ -36,7 +36,7 @@ XvDisplay::XvDisplay( uint32_t width, uint32_t height):X11Display( width, height
 
 void XvDisplay::openDisplay(){
 	char * displayName = NULL;
-	unsigned int i,j,k;
+	unsigned int i,k;
 	unsigned int nAdaptors;
 	XvAdaptorInfo * adaptors;
 

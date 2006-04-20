@@ -43,7 +43,6 @@ void X11Display::openDisplay(){
         XVisualInfo xVisualTemplate;
         XPixmapFormatValues * format;
 	char * displayName = NULL;
-	unsigned int i,j,k;
 	int nFormat;
 
 	displayName = getenv( "DISPLAY" );
@@ -100,7 +99,6 @@ void X11Display::createWindow(){
 	XSizeHints sizeHints;
 	XSetWindowAttributes windowAttributes;
 	XGCValues gcValues;
-	char * imageData = NULL;
 	bool exposeSent = false;
 	bool mapNotifySent = false;
 	bool configureNotifySent = false;

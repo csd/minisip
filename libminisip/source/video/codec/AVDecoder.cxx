@@ -54,8 +54,9 @@ int AVDecoder::ffmpegGetBuffer( struct AVCodecContext * context, AVFrame * frame
 }
 
 void AVDecoder::ffmpegReleaseBuffer( struct AVCodecContext * context, AVFrame * frame ){
-	AVDecoder * decoder = (AVDecoder*)context->opaque;
+	//AVDecoder * decoder = (AVDecoder*)context->opaque;
 	memset( frame, '\0', sizeof( MImage ) );
+	// XXX: is this still valid code?
 	//decoder->lastImage = NULL;
 }
 
