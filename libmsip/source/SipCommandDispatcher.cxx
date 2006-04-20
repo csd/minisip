@@ -80,11 +80,13 @@ void SipCommandDispatcher::run(){
 			item = low_prio_command_q.pop_back();	
 		}
                 mlock.unlock();
+#ifdef DEBUG_OUTPUT
 		mdbg << "DISPATCHER: got command!"<<end;
 		if (item.type==TYPE_COMMAND)
 			mdbg << "command: "<< **item.command << end;
 		else
 			mdbg << "timeout: "<< **item.command << end;
+#endif
 
 
 		bool handled=false;
@@ -93,12 +95,13 @@ void SipCommandDispatcher::run(){
 		// timeouts. SipSMCommands are passed to the dispatcher
 		// (and the defaultHandler if they are not handled).
 		// Timeouts have a known receiver set in the queue item.
+#ifdef DEBUG_OUTPUT
 		if (item.type==TYPE_COMMAND){
 			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << end;
 		}else{
 			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << end;
 		}
-
+#endif
 		
 		if (item.type == TYPE_COMMAND){
 		
@@ -115,13 +118,13 @@ void SipCommandDispatcher::run(){
 		}
 		
 
+#ifdef DEBUG_OUTPUT			
 		if (handled){
 			//mdbg<<"DISPATCHER: command handled"<<endl;
 		}else{
-#ifdef DEBUG_OUTPUT			
 			mdbg<<"DISPATCHER: command NOT handled"<<endl;
-#endif
 		}
+#endif
 
 		item.command=NULL;
                 item.transaction_receiver=NULL;

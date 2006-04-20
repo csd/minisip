@@ -41,6 +41,7 @@ SoundDriverRegistry::SoundDriverRegistry(){
 SoundDriverRegistry::~SoundDriverRegistry(){
 }
 
+#ifdef DEBUG_OUTPUT
 static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 	std::vector<SoundDeviceName> names = instance->getAllDeviceNames();
 
@@ -52,6 +53,7 @@ static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 		mdbg << iter->getName() << " " << iter->getDescription() << " in:" << iter->getMaxInputChannels() << ", out:" << iter->getMaxOutputChannels() << end;
 	}
 }
+#endif
 
 MRef<SoundDriverRegistry*> SoundDriverRegistry::getInstance(){
 	if( !instance ){
