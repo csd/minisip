@@ -121,6 +121,7 @@ void Dc1394Grabber::getImageFormat(){
 }
 
 bool Dc1394Grabber::setImageChroma( uint32_t chroma ){
+	return 0;
 }
 
 	

@@ -387,7 +387,7 @@ SipLayerTransport::SipLayerTransport(
 
 bool SipLayerTransport::handleCommand(const SipSMCommand& ){
 	cerr << "SipLayerTransport::handleCommand: NOT IMPLEMENTED - BUG"<<endl;
-	
+	return 0;
 }
 
 void SipLayerTransport::startTcpServer(){

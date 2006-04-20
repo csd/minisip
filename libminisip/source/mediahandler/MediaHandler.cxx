@@ -182,8 +182,9 @@ void MediaHandler::registerMedia( MRef<Media*> media ){
 	this->media.push_back( media );
 }
 
-CommandString MediaHandler::handleCommandResp(string, const CommandString&){
+CommandString MediaHandler::handleCommandResp(string, const CommandString& c){
 	assert(1==0); //Not used
+	return c; // Not reached; masks warning
 }
 
 
