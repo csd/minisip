@@ -157,7 +157,6 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                         }
                         
                         else{
-                                fprintf( stderr, "Callong handle without convert\n");
                                 handler->handle( lastImage );
                         }
 			lastImage = NULL;

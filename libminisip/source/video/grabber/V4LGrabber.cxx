@@ -195,7 +195,7 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
 
 	switch( chroma ){
 		case M_CHROMA_I420:
-			imageFormat->palette = VIDEO_PALETTE_YUV420;
+			imageFormat->palette = VIDEO_PALETTE_YUV420P;
                         imageFormat->depth = 12;
 			break;
 		case M_CHROMA_RV24:
@@ -207,33 +207,33 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
                         imageFormat->depth = 32;
 			break;
 		default:
-                        throw VideoException( "Unhandled image format" );
+                        return false;
 	}
 
         fprintf( stderr, "Depth: %i\n", imageFormat->depth );
 
 	if( ioctl( fd, VIDIOCSPICT,  imageFormat ) != 0 ){
 		merror( "VIDIOCSPICT" );
-                throw VideoException( strerror( errno ) );
+		return false;
 	}
 
 	getImageFormat();
 	
 	switch( chroma ){
 		case M_CHROMA_I420:
-			if( imageFormat->palette != VIDEO_PALETTE_YUV420 );
-			return false;
+			if( imageFormat->palette != VIDEO_PALETTE_YUV420P )
+				return false;
 			break;
 		case M_CHROMA_RV24:
-			if( imageFormat->palette != VIDEO_PALETTE_RGB24 );
-			return false;
+			if( imageFormat->palette != VIDEO_PALETTE_RGB24 )
+				return false;
 			break;
 		case M_CHROMA_RV32:
-			if( imageFormat->palette != VIDEO_PALETTE_RGB32 );
-                        return false;
+			if( imageFormat->palette != VIDEO_PALETTE_RGB32 )
+				return false;
 			break;
 		default:
-                        throw VideoException( "Unhandled image format" );
+			return false;
 	}
 	return true;
 }
@@ -331,7 +331,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 	bool handlerProvidesImage = ( handler && handler->providesImage() );
 	uint32_t handlerInputWidth = handler->getRequiredWidth();
 	uint32_t handlerInputHeight = handler->getRequiredHeight();
-        uint32_t mChroma;
+        uint32_t mChroma = 0;
         uint8_t pixelSize;
 
 	if( v4lCapacity == NULL ){
@@ -359,6 +359,10 @@ void V4LGrabber::read( ImageHandler * handler ){
                 pixelSize = 4;
                 mChroma = M_CHROMA_RV32;
         }
+	else if( imageFormat->palette == VIDEO_PALETTE_YUV420P ){
+		pixelSize = 0;	// handlerProvidesImage not supported
+		mChroma = M_CHROMA_I420;
+	}
 	
 	mMap.frame = 0;
 	mMap.height = height;//v4lCapacity->maxheight;
@@ -375,13 +379,19 @@ void V4LGrabber::read( ImageHandler * handler ){
 
 	if( !handlerProvidesImage ){
                 image = new MImage;
-                image->data[0] = NULL;//new uint8_t[ width * height * 3];
-                image->data[1] = NULL;
-                image->data[2] = NULL;
-		/* Truncate the image */
-                image->linesize[0] = /*handlerInputWidth * 3;*/width*pixelSize;
-                image->linesize[1] = 0;
-                image->linesize[2] = 0;
+
+		memset(image, 0, sizeof(*image));
+
+		switch( mChroma ){
+			case M_CHROMA_I420:
+				image->linesize[0] = width;
+				image->linesize[1] = width / 2;
+				image->linesize[2] = width / 2;
+				break;
+
+			default:
+				image->linesize[0] = /*handlerInputWidth * 3;*/width*pixelSize;
+		}
 
 		image->chroma = mChroma;
 	}
@@ -416,9 +426,11 @@ void V4LGrabber::read( ImageHandler * handler ){
 			}
 			else{
 				image->data[0] = buffers[i]->start;
-				image->data[1] = NULL;
-				image->data[2] = NULL;
-				image->data[3] = NULL;       
+
+				if( image->chroma == M_CHROMA_I420 ){
+					image->data[1] = image->data[0] + image->linesize[0] * height;
+					image->data[2] = image->data[1] + image->linesize[1] * height / 2;
+				}
 			}
 
                         /* FIXME get it from the camera */
