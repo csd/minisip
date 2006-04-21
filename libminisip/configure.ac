@@ -107,8 +107,8 @@ dnl       fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(autocall,
-    [AS_HELP_STRING([--enable-autocall], 
-    	[enables automatic calling for debug purposes (default disabled)])],
+    AS_HELP_STRING([--enable-autocall], 
+    	[enables automatic calling for debug purposes (default disabled)]),
     [ if test "${enable_autocall}" = "yes"
       then
         AC_DEFINE(MINISIP_AUTOCALL, [], [Debug autocalling])
@@ -116,8 +116,8 @@ AC_ARG_ENABLE(autocall,
 
 dnl compile for iPAQ
 AC_ARG_ENABLE(ipaq,
-    [AS_HELP_STRING([--enable-ipaq],
-    	[enables various fixes for the iPAQ (default disabled)])],
+    AS_HELP_STRING([--enable-ipaq],
+    	[enables various fixes for the iPAQ (default disabled)]),
     [ if test "${enable_ipaq}" = "yes"
       then
         AC_DEFINE(IPAQ, [], [Compile for iPAQ])
@@ -125,9 +125,9 @@ AC_ARG_ENABLE(ipaq,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    [AS_HELP_STRING([--enable-memdebug], [enables memory debugging code. 
+    AS_HELP_STRING([--enable-memdebug], [enables memory debugging code. 
     WARNING: This changes the MemObject API that is used by both libraries 
-    and applications. Use with care (default disabled)])],
+    and applications. Use with care (default disabled)]),
     [ if test "${enable_memdebug}" = "yes"
       then
         AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
@@ -135,8 +135,8 @@ AC_ARG_ENABLE(memdebug,
 
 dnl debug flag
 AC_ARG_ENABLE(debug,
-    [AS_HELP_STRING([--enable-debug], 
-    	[enables debug output (default disabled)])],
+    AS_HELP_STRING([--enable-debug], 
+    	[enables debug output (default disabled)]),
     [ if test "${enable_debug}" = "yes"
       then
         AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
@@ -146,8 +146,8 @@ AC_ARG_ENABLE(debug,
 
 dnl ipaq buzzer
 AC_ARG_ENABLE(buzzer,
-    [AS_HELP_STRING([--enable-buzzer], 
-    	[enables IPAQ buzzer (default disabled)])],
+    AS_HELP_STRING([--enable-buzzer], 
+    	[enables IPAQ buzzer (default disabled)]),
     [ if test "${enable_buzzer}" = "yes" -o "${enable_ipaq}" = "yes"
       then
         AC_DEFINE(IPAQ_BUZZER, [], [iPAQ buzzer support])
@@ -158,7 +158,7 @@ AC_ARG_ENABLE(buzzer,
 
 dnl --with-avcodec argument
 AC_ARG_WITH(avcodec,
-    [AS_HELP_STRING([--with-avcodec=DIR],[location of the libavcodec tree])],
+    AS_HELP_STRING([--with-avcodec=DIR],[location of the libavcodec tree]),
     [ if test "${with_avcodec}" != "no"
       then
         AVCODEC_CPPFLAGS="-I${with_avcodec}"
@@ -217,8 +217,8 @@ dnl
 dnl PortAudio V19 support
 dnl
 AC_ARG_ENABLE(portaudio,
-	[AS_HELP_STRING([--enable-portaudio],
-		[enable PortAudio V19 support (default auto).])],,
+	AS_HELP_STRING([--enable-portaudio],
+		[enable PortAudio V19 support (default auto).]),,
 	[enable_portaudio=auto])
 
 if test ! x$enable_portaudio = xno; then
@@ -241,8 +241,8 @@ dnl #############
 dnl IPSEC SUPPORT
 dnl #############
 AC_ARG_ENABLE(ipsec-enable,
-    [AS_HELP_STRING([--enable-ipsec-enable],
-    	[enable ipsec features (default disabled).])],
+    AS_HELP_STRING([--enable-ipsec-enable],
+    	[enable ipsec features (default disabled).]),
     [	if "${enable_ipsec}" = "yes"
         then
 	    AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
@@ -253,8 +253,8 @@ AM_CONDITIONAL(IPSEC_SUPPORT, test "${enable_ipsec}" = "yes")
 
 dnl P2T support
 AC_ARG_ENABLE(p2t,
-    [AS_HELP_STRING([--enable-p2t],
-    	[enable push-2-talk features (default disabled)])],
+    AS_HELP_STRING([--enable-p2t],
+    	[enable push-2-talk features (default disabled)]),
     [  if test "${enable_p2t}" = "yes"
        then
 	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])
@@ -263,8 +263,8 @@ AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
 
 dnl AEC support
 AC_ARG_ENABLE(aec,
-    [AS_HELP_STRING([--enable-aec],
-    	[enables Auto Echo Cancellation features (default disabled)])],
+    AS_HELP_STRING([--enable-aec],
+    	[enables Auto Echo Cancellation features (default disabled)]),
     [  if test "${enable_aec}" = "yes"
        then
 	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])
@@ -272,8 +272,8 @@ AC_ARG_ENABLE(aec,
 AM_CONDITIONAL(AEC_SUPPORT, test "${enabled_aec}" = "yes")
 
 AC_ARG_ENABLE(gconf,
-    [AS_HELP_STRING([--enable-gconf], 
-    	[enables support for GConf (default disabled).])]
+    AS_HELP_STRING([--enable-gconf], 
+    	[enables support for GConf (default disabled).])
    )
 
 if test "x${enable_gconf}" != "xno"; then
@@ -298,20 +298,20 @@ dnl VIDEO SUPPORT
 dnl #############
 
 AC_ARG_ENABLE(sdl,
-    [AS_HELP_STRING([--enable-sdl],
-    	[enables SDL video output (if present)])])
+    AS_HELP_STRING([--enable-sdl],
+    	[enables SDL video output (if present)]))
 
 AC_ARG_ENABLE(avcodec-fixes,
-    [AS_HELP_STRING([--enable-avcodec-fixes],
-	[enables support for new avcodec abi (default: off)])],
+    AS_HELP_STRING([--enable-avcodec-fixes],
+	[enables support for new avcodec abi (default: off)]),
     [  if test "x${enable_avcodec_fixes}" = "xyes"
        then
 	   AC_DEFINE(AVCODEC_FIXES, [], [Use new avcodec context abi.])
        fi ])
 
 AC_ARG_ENABLE(video,
-    [AS_HELP_STRING([--enable-video], 
-    	[enables video features (default disabled)])],
+    AS_HELP_STRING([--enable-video], 
+    	[enables video features (default disabled)]),
     [ if test "${enable_video}" = "yes"
       then
 dnl first check for libavcodec
@@ -446,8 +446,8 @@ AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 
 dnl ALSA sound interface
 AC_ARG_ENABLE(alsa,
-    [AS_HELP_STRING([--enable-alsa], 
-    	[enables ALSA sound support (default disabled)])],
+    AS_HELP_STRING([--enable-alsa], 
+    	[enables ALSA sound support (default disabled)]),
     [ if test "${enable_alsa}" = "yes"
       then
         AC_CHECK_LIB([asound], [main],
@@ -462,8 +462,8 @@ AC_SUBST(ALSA_LIBS)
 
 dnl DirectSound sound interface
 AC_ARG_ENABLE(dsound,
-    [AS_HELP_STRING([--enable-dsound], 
-    	[enables DirectSound sound support (default disabled)])],
+    AS_HELP_STRING([--enable-dsound], 
+    	[enables DirectSound sound support (default disabled)]),
     [ if test "${enable_dsound}" = "yes"
       then
         AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) 
@@ -598,8 +598,8 @@ AC_CHECK_LIB([nsl], [main])
 
 dnl OPIE
 AC_ARG_ENABLE(opie,
-    [AS_HELP_STRING([--enable-opie],
-    	[enables Open Palmtop Integrated Environment support (default disabled)])],
+    AS_HELP_STRING([--enable-opie],
+    	[enables Open Palmtop Integrated Environment support (default disabled)]),
     [ if test "${enable_opie}" = "yes"
       then
 	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"

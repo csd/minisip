@@ -99,7 +99,8 @@ dnl      fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(autocall,
-    [ --enable-autocall enables automatic calling for debug purposes (default disabled)],
+    AS_HELP_STRING([--enable-autocall],
+        [enables automatic calling for debug purposes (default disabled)]),
     [ if test "${enable_autocall}" = "yes"
       then
         AC_DEFINE(MINISIP_AUTOCALL, [], [Debug autocalling])
@@ -107,7 +108,8 @@ AC_ARG_ENABLE(autocall,
 
 dnl compile for iPAQ
 AC_ARG_ENABLE(ipaq,
-    [ --enable-ipaq enables various fixes for the iPAQ (default disabled)],
+    AS_HELP_STRING([--enable-ipaq],
+        [enables various fixes for the iPAQ (default disabled)]),
     [ if test "${enable_ipaq}" = "yes"
       then
         AC_DEFINE(IPAQ, [], [Compile for iPAQ])
@@ -115,9 +117,10 @@ AC_ARG_ENABLE(ipaq,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    [ --enable-memdebug enables memory debugging code. WARNING: This changes
+    AS_HELP_STRING([--enable-memdebug],
+    [enables memory debugging code. WARNING: This changes
      the MemObject API that is used by both libraries and applications. Use
-     with care (default disabled)],
+     with care (default disabled)]),
     [ if test "${enable_memdebug}" = "yes"
       then
         AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
@@ -125,7 +128,8 @@ AC_ARG_ENABLE(memdebug,
 
 dnl debug flag
 AC_ARG_ENABLE(debug,
-    [ --enable-debug enables debug output (default disabled)],
+    AS_HELP_STRING([--enable-debug],
+        [enables debug output (default disabled)]),
     [ if test "${enable_debug}" = "yes"
       then
         AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
@@ -135,7 +139,8 @@ AC_ARG_ENABLE(debug,
 
 dnl P2T support
 AC_ARG_ENABLE(p2t,
-    [ --enable-p2t enables push-2-talk features (default disabled)],
+    AS_HELP_STRING([--enable-p2t],
+        [enables push-2-talk features (default disabled)]),
     [  
       if test "${enable_p2t}" = "yes"
       then
@@ -150,7 +155,8 @@ dnl VIDEO SUPPORT
 dnl #############
 
 AC_ARG_ENABLE(video,
-    [ --enable-video enables video features (default disabled)],
+    AS_HELP_STRING([--enable-video],
+        [enables video features (default disabled)]),
     [ if test "${enable_video}" = "yes"
       then
 	  AC_DEFINE(VIDEO_SUPPORT, [], [Compile video features])
@@ -159,7 +165,8 @@ AM_CONDITIONAL(VIDEO_SUPPORT, test "${enable_video}" = "yes")
 
 dnl TEXT UI
 AC_ARG_ENABLE(textui,
-    [ --enable-textui enables the text based user interface (default disabled)],
+    AS_HELP_STRING([--enable-textui],
+        [enables the text based user interface (default disabled)]),
     [ if test "${enable_textui}" = "yes"
       then
 	  AC_DEFINE(TEXT_UI, [], [Use the text based user interface])
@@ -170,7 +177,8 @@ AM_CONDITIONAL(TEXT_UI, [test "${enable_textui}" = "yes"])
 
 dnl Qt GUI
 AC_ARG_ENABLE(qtui,
-    [ --enable-qtui enables the Qt based user interface (default disabled)],
+    AS_HELP_STRING([--enable-qtui],
+        [enables the Qt based user interface (default disabled)]),
     [ if test "${enable_qtui}" = "yes"
       then
 	  AC_DEFINE(QT_GUI, [], [Use the Qt based user interface])
@@ -182,7 +190,8 @@ AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
 
 dnl GTK GUI
 AC_ARG_ENABLE(gtk,
-    [ --disable-gtk disables the GTK interface (default enabled).])
+    AS_HELP_STRING([--disable-gtk],
+        [disables the GTK interface (default enabled).])
 
 if test "x${enable_gtk}" != "xno"
 	then
@@ -235,7 +244,8 @@ QT="qt"
 
 dnl QT embedded
 AC_ARG_ENABLE(qte,
-    [ --enable-qte enables Qt Embedded support (default disabled)],
+    AS_HELP_STRING([--enable-qte],
+        [enables Qt Embedded support (default disabled)]),
     [ if test "${enable_qte}" = "yes"
       then
       	QT="qte"
@@ -255,7 +265,8 @@ then
 
 dnl Set the QTDIR directory
 AC_ARG_WITH(qtdir,
-    [ --with-qtdir=DIR QT installation directory (default /usr)],
+    AS_HELP_STRING([--with-qtdir=DIR],
+        [QT installation directory (default /usr)]),
     [ if test "${with_qtdir}" != "no"
       then
         QTDIR="${with_qtdir}"
@@ -429,7 +440,8 @@ fi
 
 dnl OPIE
 AC_ARG_ENABLE(opie,
-    [ --enable-opie enables Open Palmtop Integrated Environment support (default disabled)],
+    AS_HELP_STRING([--enable-opie],
+      [enables Open Palmtop Integrated Environment support (default disabled)]),
     [ if test "${enable_opie}" = "yes"
       then
 	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"
