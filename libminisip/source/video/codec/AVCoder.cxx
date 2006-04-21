@@ -55,7 +55,7 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 //	memcpy( encoder->rtpPayload + 4, data, size );
 
         encoder->mbCounter += packetNumber;
-        bool endOfFrame = ( (int32_t)encoder->mbCounter == 
+        bool endOfFrame = ( encoder->mbCounter == (uint32_t)
                         ((context->width+15)/16)*((context->height+15)/16) );
 #if 0
         cerr << "NB_MACROBLOCK: " << packetNumber << endl;
