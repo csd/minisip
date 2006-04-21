@@ -191,7 +191,7 @@ AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
 dnl GTK GUI
 AC_ARG_ENABLE(gtk,
     AS_HELP_STRING([--disable-gtk],
-        [disables the GTK interface (default enabled).])
+        [disables the GTK interface (default enabled).]))
 
 if test "x${enable_gtk}" != "xno"
 	then
