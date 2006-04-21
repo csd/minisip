@@ -437,6 +437,8 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "kaTypeLabel", kaTypeLabel );
 
+	refXml->get_widget( "pskLabel", pskLabel );
+
 	
 	dhCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::kaChange ) );
@@ -482,6 +484,8 @@ void SecuritySettings::kaChange(){
 
 	pskEntry->set_sensitive( pskCheck->get_active() );
 	
+	pskLabel->set_sensitive( pskCheck->get_active() );
+
 	secureCheck->set_sensitive( pskCheck->get_active() 
 			|| dhCheck->get_active() );
 

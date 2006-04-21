@@ -179,6 +179,7 @@ class SecuritySettings
 		Gtk::Table * secureTable;
 
 		Gtk::Label * kaTypeLabel;
+		Gtk::Label * pskLabel;
 		Gtk::RadioButton * pskRadio;
 		Gtk::RadioButton * dhRadio;
 
