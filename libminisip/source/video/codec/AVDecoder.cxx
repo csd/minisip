@@ -60,7 +60,7 @@ void AVDecoder::ffmpegReleaseBuffer( struct AVCodecContext * context, AVFrame * 
 	//decoder->lastImage = NULL;
 }
 
-AVDecoder::AVDecoder():codec( NULL ), context( NULL ),handler(NULL){
+AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 
 	/* Initialize AVcodec */
 	avcodec_init();

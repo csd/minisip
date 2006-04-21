@@ -43,7 +43,7 @@
 using namespace std;
 
 VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
-                Media( codec ),display(display),grabber(grabber),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
+                Media( codec ),grabber(grabber),display(display),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
         this->codec = dynamic_cast<VideoCodec *>(*codec);
         massert( this->codec );

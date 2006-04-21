@@ -88,7 +88,7 @@ void rtpCallback( struct AVCodecContext * context, void *data,
 }
 
 
-AVEncoder::AVEncoder():codec( NULL ),context( NULL ){
+AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 	/* Initialize AVcodec */
 	avcodec_init();
 	avcodec_register_all();
