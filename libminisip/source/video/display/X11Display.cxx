@@ -82,8 +82,9 @@ void X11Display::openDisplay(){
 
         for( ; nFormat --; format ++ ){
                 if( format->depth == screenDepth ){
-                        if( format->bits_per_pixel / 8  > bytesPerPixel ){
-                                bytesPerPixel = format->bits_per_pixel / 8;
+                        uint32_t bpp = format->bits_per_pixel / 8;
+                        if( bpp > bytesPerPixel ){
+                                bytesPerPixel = bpp;
                         }
                 }
         }

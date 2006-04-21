@@ -68,7 +68,7 @@ void Dc1394Grabber::open(){
                 throw VideoException( strerror( errno ) );
 	}
 
-	if( portId >= nbPorts ){
+	if( portId >= (uint32_t)nbPorts ){
                 throw VideoException(
                           "Could not find raw1394 port id " + portId );
 	}
@@ -83,7 +83,7 @@ void Dc1394Grabber::open(){
 
 	raw1394_destroy_handle( rawHandle );
 
-	if( cameraId >= nbCameras ){
+	if( cameraId >= (uint32_t)nbCameras ){
                 throw VideoException( (std::string)"Could not find camera id " + itoa( cameraId  )+ " on IEEE1394 bus " + itoa( portId )  );
 	}
 	
