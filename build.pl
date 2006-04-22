@@ -236,7 +236,11 @@ unless ($action) {
 	usage();
 }
 
-sub add_targets { map { ( $_, add_targets(@{$dependencies{$_}}) ) } @_ };
+sub add_targets { 
+	my @targets = map { ( add_targets(@{$dependencies{$_}}), $_) } @_;
+	my %targets = map { $_ => 1 } @targets;
+	return grep { delete $targets{$_} } @targets;
+};
 my @targets = @ARGV;
 push @targets, $default_target if !@targets && $default_target;
 for ( @targets ) {
@@ -507,20 +511,14 @@ if ($ccache) {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
-for $pkg ( @packages ) {
+for $pkg ( @targets ) {
 	# XXX: be afraid! dynamic scoping... icky icky icky, but so darn handy
 	local $pkg = $pkg;
 	local $srcdir = File::Spec->catdir($topdir, $pkg);
 	local $objdir = File::Spec->catdir($builddir, $pkg);
 	easy_mkdir($objdir);
 
-	print "+Checking for $pkg in targets..." if $verbose;
-	unless (grep(/^$pkg$/, @targets)) {
-		print " Skipping\n" if $verbose; 
-		next; 
-	} 
-	print " continuing.\n", 
-		"+Source directory: $srcdir\n",
+	print "+Source directory: $srcdir\n",
 		"+Object directory: $objdir\n" if $verbose;
 
 	if ($show_env) {
