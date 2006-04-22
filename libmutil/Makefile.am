@@ -1,7 +1,7 @@
 abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = libltdl include win32
+SUBDIRS = libltdl include win32 m4
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmutil.spec
 
