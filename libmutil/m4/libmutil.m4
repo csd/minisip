@@ -16,6 +16,8 @@ AC_DEFUN([MINISIP_CHECK_LIBMUTIL],[
 		[
 			PKG_CHECK_MODULES(MUTIL, [libmutil >= $1])
 		])
+	
+	AM_CXXFLAGS="${AM_CXXFLAGS} ${MUTIL_CFLAGS}"
 
 	save_CPPFLAGS="${CPPFLAGS}"
 	save_LIBS="${LIBS}"
@@ -26,10 +28,7 @@ AC_DEFUN([MINISIP_CHECK_LIBMUTIL],[
 		AC_MSG_ERROR(["You need the libmutil headers/library. 
 			Try installing the libmutil-devel package for your
 			distribution."])])
-	AC_CHECK_LIB([mutil], [main],
-		[
-			LIBS="-lmutil ${LIBS}"
-		],[
+	AC_CHECK_LIB([mutil], [main], [], [
 			AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
 		])
 			
