@@ -72,6 +72,9 @@ minisip_configure_params="$minisip_configure_params --enable-gtk"
 	#minisip_configure_params="$minisip_configure_params --enable-textui"
 	#Here you could have per gui-specific parameters ... 
 	
+# bootstrap needs to be given paths to m4 directories
+bootstrap_params=""
+
 for subdir in ${SUBDIRS}
 do
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -80,7 +83,8 @@ do
 		
 	cd ${subdir}
 
-	./bootstrap
+	./bootstrap $bootstrap_params
+	bootstrap_param="$bootstrap_params -I${subdir}/m4"
 	
 	configure_params="$base_configure_params"
 	
