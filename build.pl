@@ -417,7 +417,9 @@ $mergefunc = sub { die "+BUG: unable to merge packages under '$hostdist'" };
 my $need_bootstrap = sub { callact('bootstrap') unless -e "$srcdir/configure" };
 my $need_configure = sub { callact('configure') unless -e "$objdir/Makefile" };
 my $need_compile = sub { callact('compile') }; # always rebuild, just in case
-my $need_install = sub { callact('install') unless -x "$bindir/minisip"; }; 
+my $need_install = sub { 
+	callact('install') unless -x "$bindir/minisip_$default_ui"; 
+}; 
 my $need_tarclean = sub { callact('tarclean'); $need_compile->() };
 my $need_dist = sub { callact('dist') unless scalar(distfiles()) };
 
