@@ -467,9 +467,13 @@ if ($verbose) {
 }
 
 # setup common environment
-$ENV{LDFLAGS} = '';
+#  LDFLAGS: add local install library path
+$ENV{LDFLAGS} ||= '';
+$ENV{LDFLAGS} .= " -L$installdir/usr/lib";
+#  CPPFLAGS: add local install include path (XXX: needed?)
 $ENV{CPPFLAGS} ||= '';
 $ENV{CPPFLAGS} .= " -I$installdir/usr/include";
+#  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= "-Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
@@ -487,12 +491,6 @@ if ($ccache) {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
-# XXX: this is screwy and results improperly long g++ command lines, but 
-# since it seems to work, it's here for now.  Hacks is as hacks are.
-sub append_pkg_flags {
-	$ENV{CPPFLAGS} .= " -I$srcdir/include";
-}
-
 for $pkg ( @packages ) {
 	# XXX: be afraid! dynamic scoping... icky icky icky, but so darn handy
 	local $pkg = $pkg;
@@ -503,7 +501,6 @@ for $pkg ( @packages ) {
 	print "+Checking for $pkg in targets..." if $verbose;
 	unless (grep(/^$pkg$/, @targets)) {
 		print " Skipping\n" if $verbose; 
-		append_pkg_flags();
 		next; 
 	} 
 	print " continuing.\n", 
@@ -517,6 +514,5 @@ for $pkg ( @packages ) {
 	}
 
 	callact($_) for split(/\+/, $action); 
-	append_pkg_flags();
 }
 
