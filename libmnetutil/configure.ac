@@ -20,9 +20,8 @@ m4_define([lt_age], [0])
 
 AC_INIT(libmnetutil, [mnetutil_major_version.mnetutil_minor_version],
         eliasson@imit.kth.se)
+AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_TARGET
-dnl AC_CONFIG_HEADER([config.h])
-dnl AM_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE(libmnetutil, [mnetutil_version])
 AM_MAINTAINER_MODE

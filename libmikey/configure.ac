@@ -19,8 +19,7 @@ m4_define([lt_revision], [0])
 m4_define([lt_age], [0])
 
 AC_INIT(libmikey, [mikey_major_version.mikey_minor_version], jobi@via.ecp.fr)
-dnl AC_CONFIG_HEADER([config.h])
-dnl AM_CONFIG_HEADER([config.h])
+AC_CONFIG_AUX_DIR(config)
 
 AM_INIT_AUTOMAKE(libmikey, [mikey_version])
 AM_MAINTAINER_MODE

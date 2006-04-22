@@ -20,8 +20,7 @@ m4_define([lt_age], [0])
 
 AC_INIT(libmutil, [mutil_major_version.mutil_minor_version],
         eliasson@imit.kth.se)
-dnl AC_CONFIG_HEADER([config.h])
-dnl AM_CONFIG_HEADER([config.h])
+AC_CONFIG_AUX_DIR(config)
 
 AM_INIT_AUTOMAKE([libmutil], [mutil_version])
 AM_MAINTAINER_MODE

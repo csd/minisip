@@ -20,8 +20,7 @@ m4_define([lt_age], [0])
 
 AC_INIT(libminisip, [minisiplib_major_version.minisiplib_minor_version],
         eliasson@imit.kth.se)
-dnl AC_CONFIG_HEADER([config.h])
-dnl AM_CONFIG_HEADER([config.h])
+AC_CONFIG_AUX_DIR(config)
 
 AM_INIT_AUTOMAKE(libminisip, [minisiplib_version])
 AM_MAINTAINER_MODE

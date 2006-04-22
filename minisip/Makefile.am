@@ -20,6 +20,12 @@ dist-hook:
 MAINTAINERCLEANFILES = \
 	$(srcdir)/configure \
 	$(srcdir)/Makefile.in \
+	$(srcdir)/config/depcomp \
+	$(srcdir)/config/config.sub \
+	$(srcdir)/config/config.guess \
+	$(srcdir)/config/install-sh \
+	$(srcdir)/config/ltmain.sh \
+	$(srcdir)/config/missing \
 	$(srcdir)/depcomp \
 	$(srcdir)/aclocal.m4 \
 	$(srcdir)/missing \

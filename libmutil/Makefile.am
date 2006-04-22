@@ -67,6 +67,12 @@ mutil_src =  	source/aes.cxx \
 MAINTAINERCLEANFILES = \
 		$(srcdir)/configure \
 		$(srcdir)/Makefile.in \
+		$(srcdir)/config/depcomp \
+		$(srcdir)/config/config.sub \
+		$(srcdir)/config/config.guess \
+		$(srcdir)/config/install-sh \
+		$(srcdir)/config/ltmain.sh \
+		$(srcdir)/config/missing \
 		$(srcdir)/missing \
 		$(srcdir)/ltmain.sh \
 		$(srcdir)/depcomp \

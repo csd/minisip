@@ -85,6 +85,12 @@ MAINTAINERCLEANFILES = \
 		$(srcdir)/Makefile.in \
 		$(srcdir)/configure \
 		$(srcdir)/aclocal.m4 \
+		$(srcdir)/config/depcomp \
+		$(srcdir)/config/config.sub \
+		$(srcdir)/config/config.guess \
+		$(srcdir)/config/install-sh \
+		$(srcdir)/config/ltmain.sh \
+		$(srcdir)/config/missing \
 		$(srcdir)/depcomp \
 		$(srcdir)/config.sub \
 		$(srcdir)/config.guess \

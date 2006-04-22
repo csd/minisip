@@ -10,8 +10,7 @@ m4_define([minisip_version],
           [minisip_major_version.minisip_minor_version.minisip_micro_version])
 
 AC_INIT(minisip, [minisip_major_version.minisip_minor_version], BUG-REPORT-ADDRESS)
-dnl AC_CONFIG_HEADER([config.h])
-dnl AM_CONFIG_HEADER([config.h])
+AC_CONFIG_AUX_DIR(config)
 
 AM_INIT_AUTOMAKE(minisip, [minisip_version])
 AM_MAINTAINER_MODE
