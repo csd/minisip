@@ -100,12 +100,15 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 		exit( 1 );
 	}
 
+	int bitRate = 100 * 1000;
+	int bitRateTolerance = 50 * 1000;
+
 	context = avcodec_alloc_context();
 
 	context->dsp_mask = ( FF_MM_MMX | FF_MM_MMXEXT | FF_MM_SSE );
 
-	context->bit_rate = 1000000;
-	context->bit_rate_tolerance = 2*1024*1024;
+	context->bit_rate = bitRate;
+	context->bit_rate_tolerance = bitRateTolerance;
 
 #ifndef AVCODEC_FIXES
 	context->frame_rate = 15; 
@@ -117,9 +120,9 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 #endif
         context->flags |= CODEC_FLAG_QP_RD;
         context->mb_decision = FF_MB_DECISION_RD;
-        context->rc_max_rate = 1000000;
-        context->rc_min_rate = 1000000;
-        context->rc_buffer_size = 10000;
+	context->rc_max_rate = bitRate + bitRateTolerance;
+	context->rc_min_rate = 0;
+	context->rc_buffer_size = bitRate + bitRateTolerance;
 
 
 	context->rtp_mode = 1;
@@ -142,7 +145,7 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 //        context->flags |= CODEC_FLAG_QP_RD;
         context->flags |= CODEC_FLAG_H263P_SLICE_STRUCT;
 	
-	context->gop_size = 1;
+	context->gop_size = 60;
 
 	context->thread_count = 1;
 
