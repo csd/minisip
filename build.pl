@@ -14,7 +14,10 @@ use Cwd;
 our $topdir = getcwd();	# path to common source directory (svn trunk)
 our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
+
 my $bindir = undef;	#   path to installed executables
+my $pkgconfigdir = undef; # path to installed .pc files
+my $aclocaldir = undef; # path to installed .m4 files
 
 our $srcdir = undef;	# path to package source directory
 our $objdir = undef;	# path to package build directory
@@ -386,7 +389,9 @@ $mergefunc = sub { die "+BUG: unable to merge packages under '$hostdist'" };
 #  Common action functions
 
 %actions = (
-	bootstrap => sub { act('bootstrap', './bootstrap'); },
+	bootstrap => sub {
+		act('bootstrap', './bootstrap', '-I', $aclocaldir);
+	},
 	configure => sub { 
 		act('configure', "$srcdir/configure", configure_params()); 
 	},
@@ -469,8 +474,10 @@ $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= "-Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
-$ENV{PKG_CONFIG_PATH} = "$installdir/usr/lib/pkgconfig";
-easy_mkdir($installdir);
+$pkgconfigdir = $ENV{PKG_CONFIG_PATH} = "$installdir/usr/lib/pkgconfig";
+easy_mkdir($pkgconfigdir);
+$aclocaldir = $ENV{PKG_CONFIG_PATH} = "$installdir/usr/share/aclocal";
+easy_mkdir($aclocaldir);
 $ENV{PKG_CONFIG_PATH} .= ":/usr/lib/pkgconfig" 
 	if $installdir ne '/usr' && !cross_compiling();
 

@@ -49,11 +49,7 @@ if test "$libtoolize" = "no"; then
   exit 1
 fi
 
-# Remove old cruft
-rm -f aclocal.m4 configure config.guess config.log config.sub config.cache config.h.in config.h compile ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
-rm -Rf autom4te.cache
-
-aclocal${amvers}
+aclocal${amvers} "$@"
 ${libtoolize} --copy --force --ltdl
 
 autoconf
