@@ -122,32 +122,6 @@ use the equivalent command with dependency resolution:
 Additional options may be passed to the script that alter the build process;
 run './build.pl --help' for a description of all options.
 
-Multiple Actions
-----------------
-
-Occasionally, it can be useful to perform multiple actions in the same step,
-such as when tooling around with the build system itself.  To do this, you
-can combine actions with the '+' delimiter:
-
-	./build.pl bootstrap+configure+compile+install minisip
-
-Normally, the system tries to detect an existing 'configure' script and main 
-'Makefile'; if found, it assumes the 'bootstrap' and 'configure' steps have 
-already been performed, respectively.  If that is the case, you will need
-to either run the steps by hand individually or combine them.  
-
-If you have not performed any actions in your repository, the above command 
-is just the long (and redundant) form of the following:
-	
-	./build.pl install minisip
-
-When changing a Makefile.am in a project that has already been compiled, 
-you might want to have the system to perform a 'bootstrap+configure':
-
-	./build.pl -S bootstrap+configure minisip
-
-That rebuilds the Makefiles for the minisip project (and only minisip).
-
 Advanced Instructions
 ---------------------
 
@@ -156,5 +130,10 @@ cat build.pl | grok --enable-wetware --ignore-pets --allow-caffeine
 For More Information
 --------------------
 
-Talk with the author of this script in #minisip channel on irc.freenode.net.
+Additional documentation files can be found in the following directory:
+
+	/Documentation/build/
+
+You are also encouraged to discuss this script in the #minisip channel,
+on irc.freenode.net.
 
