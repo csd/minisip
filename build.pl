@@ -178,11 +178,13 @@ our @packages; 		# absolute package build order
 our %dependencies; 	# package dependency lists
 our %configure_params;	# package configure parameter tables
 
-our @actions = ( qw( 
-		bootstrap configure compile 
-		dist distcheck install merge run
-		clean dclean mclean tarclean
-	) );
+my @dist_actions = ( qw( packages package pkgclean merge purge ) );
+our @actions = ( qw( bootstrap configure compile ),
+		qw( clean dclean mclean ),
+		qw( dist distcheck tarballs tarclean ),
+		@dist_actions, 
+		qw( install run ),
+	);
 
 # load primary definitions
 do "$topdir/build.conf" or die "error: unable to load build.conf:\n$@";
@@ -289,7 +291,7 @@ sub callact {
 
 	my $tgtdir = $a eq 'bootstrap' ? $srcdir : $objdir;
 	if ($tgtdir ne $ENV{PWD}) {
-		print "Changing to $tgtdir...\n";
+		print "Changing to $tgtdir...\n" if $verbose;
 		chdir $tgtdir or die "unable to cd to $tgtdir";
 	}
 	$actions{$a}->();
@@ -332,6 +334,19 @@ sub configure_params {
 	return @spec;
 }
 
+sub list_files {
+	my $label = shift;
+	print $label, join(", ", map { basename($_) } @_), "\n";
+	return @_;
+}
+sub remove_files {
+	my ( $label, @files ) = @_;
+	for my $p ( @files ) {
+		print "+removing $pkg $label: $p\n";
+		unlink($p) or die "can't unlink $p: $!"; 
+	}
+}
+
 ########
 # XXX: add better distribution support (currently only supports Gentoo)
 #  How to do that:  
@@ -353,6 +368,21 @@ sub gentoo_distdir {
 	return $distdir;
 }
 
+sub gentoo_package {
+	act('gentoo: package', 'echo',
+		'gentoo: This plug-in does not support binary packaging.');
+	# XXX: Gentoo supports binary packages, but this plug-in doesn't;
+	# as such, this could be problematic and should be optionally enabled.
+	#return gentoo_merge('-b') if $gentoo_binary_packages;
+	# XXX: for now, we're okay if we have distfiles to merge
+	return distfiles();
+}
+
+sub gentoo_pkgfiles {
+	# For now, just return tarballs required for merge
+	return distfiles(); 
+}
+
 sub gentoo_merge {
 	my @distfiles = distfiles();
 	die "no distfiles!" unless @distfiles;
@@ -368,18 +398,24 @@ sub gentoo_merge {
 			die "copy failed: $p -> $tgt: $!";
 		}
 	}
-	act('system merge', qw( sudo emerge ), $pkg, '--digest');
+	act('gentoo: merge', qw( sudo emerge ), $pkg, '--digest', @_);
 }
 
 sub gentoo_purge {
-	act('system purge', qw( sudo emerge ), '-C', $pkg);
+	act('gentoo: purge', qw( sudo emerge ), '-C', $pkg);
 }
+
+my %gentoo_callbacks = (
+		'pkgfiles' => \&gentoo_pkgfiles,
+		'package' => \&gentoo_package,
+		merge => \&gentoo_merge,
+		purge => \&gentoo_purge, 
+	);
 
 ###
 # select approriate functions
 # XXX: this needs revisiting as other distros become supported
 
-my @distfuncs = qw( merge purge );
 my %distfuncs;
 
 sub autodetect_hostdist {
@@ -388,20 +424,24 @@ sub autodetect_hostdist {
 
 for ($hostdist) {
 /^autodetect$/ and do { autodetect_hostdist(); }; # fall through!
-/^gentoo$/ and do { 
-	%distfuncs = (
-			merge => \&gentoo_merge,
-			purge => \&gentoo_purge, 
-		);
-	last
-};
+/^gentoo$/ and do { %distfuncs = %gentoo_callbacks; last };
 }
 
-# provide sane defaults
-for ( @distfuncs ) {
-	$distfuncs{$_} = sub { 
-			die "+BUG: unable to $_ packages under '$hostdist'" 
-		} unless exists $distfuncs{$_};
+$distfuncs{packages} = sub { 
+		list_files("$hostdist: $pkg packages: ", dist_pkgfiles()) 
+	} unless exists $distfuncs{packages};
+$distfuncs{pkgclean} = sub { 
+		remove_files("$hostdist package", dist_pkgfiles()) 
+	} unless exists $distfuncs{pkgclean};
+
+# provide debuggable defaults and automatic accessors
+for my $f ( @dist_actions, qw( pkgfiles ) ) {
+	$distfuncs{$f} = sub {
+			die "+BUG: unable to $f packages under '$hostdist'\n"
+		} unless exists $distfuncs{$f};
+	no strict 'refs';
+	my $callback = "dist_$f";
+	*$callback = sub { return $distfuncs{$f}->(@_) };
 }
 
 ######
@@ -423,16 +463,11 @@ for ( @distfuncs ) {
 		$ENV{LD_LIBRARY_PATH} = "$installdir/usr/lib";
 		act('run', "$bindir/$pkg" . "_$default_ui");
 	},
-	tarclean => sub {
-		for my $p ( distfiles() ) {
-			print "+removing $p\n";
-			unlink($p) or die "can't unlink $p: $!"; 
-		}
-	},
+	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
+	tarclean => sub { remove_files("tarballs", distfiles()); },
 	dist => sub { act('distribution', 'make', @make_args, 'dist'); },
 	distcheck => sub { act('distcheck', 'make', @make_args, 'distcheck'); },
-	merge => $distfuncs{merge},
-	purge => $distfuncs{purge},
+	%distfuncs,
 	clean => sub { act('cleanup', 'make', 'clean'); }, 
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
@@ -447,6 +482,7 @@ my $need_install = sub {
 }; 
 my $need_tarclean = sub { callact('tarclean'); $need_compile->() };
 my $need_dist = sub { callact('dist') unless scalar(distfiles()) };
+my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 
 %act_deps = (
 	configure => $need_bootstrap,
@@ -455,7 +491,9 @@ my $need_dist = sub { callact('dist') unless scalar(distfiles()) };
 	run => $need_install,
 	dist => $need_tarclean,
 	distcheck => $need_tarclean,
-	merge => $need_dist,
+	'package' => $need_dist,
+	'packages' => $need_package,
+	merge => $need_package,
 	clean => $need_configure,
 	dclean => $need_configure,
 	mclean => $need_configure,
