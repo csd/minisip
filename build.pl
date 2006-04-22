@@ -255,6 +255,7 @@ print "$action: @targets\n" unless $quiet;
 use File::Spec;
 use File::Glob ':glob';
 use File::Copy;
+use File::Path;
 use File::Basename;
 
 our $pkg;
@@ -262,13 +263,10 @@ my %actions;
 my %act_deps;
 
 sub easy_mkdir {
-	my $dir = shift;
-	unless (-d $dir) {
-		my $r = shift;
-		easy_mkdir(dirname($dir), $r) if $r-- && ! -d dirname($dir);
-		mkdir $dir or die "unable to create '$dir': $!";
-	}
-	return $dir;
+	my ( $path, $print ) = @_;
+	eval { mkpath($path, $print, 0775) };
+	die "unable to create $path:\n$@" if $@;
+	return $path;
 }
 
 sub act {
