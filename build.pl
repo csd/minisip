@@ -369,11 +369,16 @@ sub gentoo_merge {
 	act('system merge', qw( sudo emerge ), $pkg, '--digest');
 }
 
+sub gentoo_purge {
+	act('system purge', qw( sudo emerge ), '-C', $pkg);
+}
+
 ###
 # select approriate functions
 # XXX: this needs revisiting as other distros become supported
 
-my $mergefunc = undef;
+my @distfuncs = qw( merge purge );
+my %distfuncs;
 
 sub autodetect_hostdist {
 	$hostdist = 'gentoo';
@@ -381,8 +386,20 @@ sub autodetect_hostdist {
 
 for ($hostdist) {
 /^autodetect$/ and do { autodetect_hostdist(); }; # fall through!
-/^gentoo$/ and do { $mergefunc = \&gentoo_merge; last };
-$mergefunc = sub { die "+BUG: unable to merge packages under '$hostdist'" };
+/^gentoo$/ and do { 
+	%distfuncs = (
+			merge => \&gentoo_merge,
+			purge => \&gentoo_purge, 
+		);
+	last
+};
+}
+
+# provide sane defaults
+for ( @distfuncs ) {
+	$distfuncs{$_} = sub { 
+			die "+BUG: unable to $_ packages under '$hostdist'" 
+		} unless exists $distfuncs{$_};
 }
 
 ######
@@ -412,7 +429,8 @@ $mergefunc = sub { die "+BUG: unable to merge packages under '$hostdist'" };
 	},
 	dist => sub { act('distribution', 'make', @make_args, 'dist'); },
 	distcheck => sub { act('distcheck', 'make', @make_args, 'distcheck'); },
-	merge => $mergefunc,
+	merge => $distfuncs{merge},
+	purge => $distfuncs{purge},
 	clean => sub { act('cleanup', 'make', 'clean'); }, 
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
