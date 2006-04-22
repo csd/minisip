@@ -476,7 +476,7 @@ $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
 $pkgconfigdir = $ENV{PKG_CONFIG_PATH} = "$installdir/usr/lib/pkgconfig";
 easy_mkdir($pkgconfigdir);
-$aclocaldir = $ENV{PKG_CONFIG_PATH} = "$installdir/usr/share/aclocal";
+$aclocaldir = "$installdir/usr/share/aclocal";
 easy_mkdir($aclocaldir);
 $ENV{PKG_CONFIG_PATH} .= ":/usr/lib/pkgconfig" 
 	if $installdir ne '/usr' && !cross_compiling();
