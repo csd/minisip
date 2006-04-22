@@ -84,7 +84,7 @@ do
 	cd ${subdir}
 
 	./bootstrap $bootstrap_params
-	bootstrap_param="$bootstrap_params -I${subdir}/m4"
+	bootstrap_params="$bootstrap_params -I${subdir}/m4"
 	
 	configure_params="$base_configure_params"
 	
