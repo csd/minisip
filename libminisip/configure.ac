@@ -503,27 +503,7 @@ AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
-dnl
-dnl libmutil
-dnl
-PKG_CHECK_MODULES(MUTIL, [libmutil >= 0.3.1])
-AM_CXXFLAGS="${AM_CXXFLAGS} ${MUTIL_CFLAGS}"
-
-save_CPPFLAGS="${CPPFLAGS}"
-save_LIBS="${LIBS}"
-CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
-LIBS="${MUTIL_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
-	headers/library. Try installing the libmutil-devel package for your
-	distribution."])])
-AC_CHECK_LIB([mutil], [main],
-	[
-		LIBS="-lmutil ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
-	])
-
+MINISIP_CHECK_LIBMUTIL(0.3.1)
 
 dnl
 dnl libmnetutil
@@ -531,6 +511,8 @@ dnl
 PKG_CHECK_MODULES(MNETUTIL, [libmnetutil >= 0.3.1])
 AM_CXXFLAGS="${AM_CXXFLAGS} ${MNETUTIL_CFLAGS}"
 
+save_CPPFLAGS="${CPPFLAGS}"
+save_LIBS="${LIBS}"
 CPPFLAGS="${CPPFLAGS} ${MNETUTIL_CFLAGS}"
 LIBS="${MNETUTIL_LIBS} ${LIBS}"
 

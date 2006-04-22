@@ -142,32 +142,9 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 		AC_MSG_ERROR([Could not find libssl header files. Please install the corresponding development package.])
 	])
 
-dnl
-dnl libmutil
-dnl
-PKG_CHECK_MODULES(MUTIL, [libmutil >= 0.3.1])
-
-save_CPPFLAGS="${CPPFLAGS}"
-save_LIBS="${LIBS}"
-CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
-LIBS="${MUTIL_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmutil/itoa.h,,[AC_MSG_ERROR(["You need the libmutil
-	headers/library. Try installing the libmutil-devel package for your
-	distribution."])])
-AC_CHECK_LIB([mutil], [main],
-	[
-		LIBS="-lmutil ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
-	])
-		
-CPPFLAGS="${save_CPPFLAGS}"
-LIBS="${save_LIBS}"
+MINISIP_CHECK_LIBMUTIL([0.3.1])
 
 AC_CHECK_LIB([resolv], [main])
-
-
 
 dnl Checks for header files.
 AC_HEADER_STDC
