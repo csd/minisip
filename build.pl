@@ -311,11 +311,19 @@ sub _package_configure_params {
 }
 sub configure_params {
 	my $spec = $configure_params{$pkg};
-	my @spec = _feature_configure_params($spec);
-	push @spec, _package_configure_params($spec);
+	my @spec = ( 
+			"--srcdir=$srcdir", 
+			"--prefix=$installdir/usr",
+			_feature_configure_params($spec),
+			_package_configure_params($spec),
+		);
 	unshift @spec, "--build=$buildspec", "--host=$hostspec"
 		if cross_compiling();
-	unshift @spec, "--prefix=$installdir/usr";
+	# XXX: the following changes require further configure.ac changes;
+	#      however, they should not interfere until that time
+	my $deps = $dependencies{$pkg};
+	my %deps = map { $_ => /^lib(.*)$/ } @$deps;
+	push @spec, map { "--with-" . $deps{$_} . "=$topdir/$_" } @$deps;
 	return @spec;
 }
 
