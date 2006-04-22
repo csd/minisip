@@ -183,7 +183,7 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( clean dclean mclean ),
 		qw( dist distcheck tarballs tarclean ),
 		@dist_actions, 
-		qw( install run ),
+		qw( check install run ),
 	);
 
 # load primary definitions
@@ -455,6 +455,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 		act('configure', "$srcdir/configure", configure_params()); 
 	},
 	compile => sub { act('compile', 'make', @make_args); },
+	check => sub { act('check', 'make', @make_args, 'check'); },
 	install => sub { act('install', 'make', @make_args, 'install'); },
 	run => sub {
 		 # XXX: This needs to be generalized, but it works for now.
@@ -487,6 +488,7 @@ my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 %act_deps = (
 	configure => $need_bootstrap,
 	compile => $need_configure,
+	check => $need_compile,
 	install => $need_compile,
 	run => $need_install,
 	dist => $need_tarclean,
