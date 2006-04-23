@@ -61,7 +61,7 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 #endif		*/
-		SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
+		SipDialogVoip(	MRef<SipStack*> stack,
 						MRef<SipDialogConfig*> callconfig,
 						MRef<SipSoftPhoneConfiguration*> pconf,
 						MRef<Session *> mediaSession,

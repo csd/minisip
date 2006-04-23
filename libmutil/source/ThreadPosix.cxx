@@ -157,6 +157,14 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
         if(!dladdr(ip, &dlinfo))
             break;
 
+#if __WORDSIZE == 64
+        fprintf(stderr, "% 2d: %p <%s+%lu> (%s)\n",
+                ++f,
+                ip,
+                dlinfo.dli_sname,
+                (unsigned long)((unsigned long)ip - (unsigned long)dlinfo.dli_saddr),
+                dlinfo.dli_fname);
+#else
         fprintf(stderr, "% 2d: %p <%s+%u> (%s)\n",
                 ++f,
                 ip,
@@ -164,6 +172,7 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
                 (unsigned)((unsigned)ip - (unsigned)dlinfo.dli_saddr),
                 dlinfo.dli_fname);
 
+#endif
         if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
             break;
 

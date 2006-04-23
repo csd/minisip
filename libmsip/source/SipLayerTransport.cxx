@@ -186,7 +186,9 @@ SipMessageParser::SipMessageParser(){
 }
 
 void SipMessageParser::init(){
-	realloc( buffer, BUFFER_UNIT );
+	buffer = (uint8_t *)realloc(buffer, BUFFER_UNIT * sizeof( uint8_t ) );
+	for (unsigned int i=0; i< BUFFER_UNIT * sizeof( uint8_t ); i++)
+		buffer[i]=0;
 	length = BUFFER_UNIT;
 	state = 0;
 	index = 0;
@@ -811,7 +813,7 @@ void SipLayerTransport::udpSocketRead(){
 			MRef<IPAddress *> from;
 			int32_t port = 0;
 
-			nread = udpsock->recvFrom(buffer, UDP_MAX_SIZE, from, port);
+			nread = udpsock->recvFrom((void *)buffer, UDP_MAX_SIZE, from, port);
 			
 			if (nread == -1){
 				mdbg << "Some error occured while reading from UdpSocket"<<end;

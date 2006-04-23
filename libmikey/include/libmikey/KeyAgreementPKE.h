@@ -20,7 +20,7 @@ class KeyAgreementPKE : public KeyAgreement{
 	    /**
 	     * Destructor deletes some objects to prevent memory leaks
 	     */
-	    KeyAgreementPKE::~KeyAgreementPKE();
+	    ~KeyAgreementPKE();
 	
 	    /**
 	     * Generates a TGK of de given length with the random function from the

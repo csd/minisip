@@ -597,7 +597,7 @@ void Session::silenceSources ( bool silence ) {
 #ifdef DEBUG_OUTPUT
 string Session::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + ": this=" + itoa((int)this) +
+	ret = getMemObjectType() + ": this=" + itoa((int64_t)this) +
 		"\n;          callid=" + getCallId() +
 		"; peerUri=" + peerUri;
 		

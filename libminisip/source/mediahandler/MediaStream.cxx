@@ -410,14 +410,14 @@ void MediaStreamSender::setRemoteAddress( IPAddress * remoteAddress ){
 #ifdef DEBUG_OUTPUT
 string MediaStream::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + " this=" + itoa((int)this) +
+	ret = getMemObjectType() + " this=" + itoa((int64_t)this) +
 		": port=" + itoa(getPort());
 
 	return ret;
 }
 string MediaStreamReceiver::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + " this=" + itoa((int)this) +
+	ret = getMemObjectType() + " this=" + itoa((int64_t)this) +
 		": listening port=" + itoa(rtpReceiver->getPort());
 	for( std::list<uint32_t>::iterator it = ssrcList.begin();
 				it != ssrcList.end();
@@ -429,7 +429,7 @@ string MediaStreamReceiver::getDebugString() {
 string MediaStreamSender::getDebugString() {
 	string ret;
 	
-	ret = getMemObjectType() + " this=" + itoa((int)this) +
+	ret = getMemObjectType() + " this=" + itoa((int64_t)this) +
 		": port=" + itoa(getPort()) +
 		"; remotePort=" + itoa(remotePort);
 	

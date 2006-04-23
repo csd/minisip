@@ -138,7 +138,7 @@ class LIBMINISIP_API Media : public MObject{
 		 * @returns a list of reference to Codec objects, sorted
 		 * according to user preferences (first is preferred)
 		 */
-		std::list< MRef<Codec *> >  Media::getAvailableCodecs();
+		std::list< MRef<Codec *> >  getAvailableCodecs();
 
 		/**
 		 * Used to query media specific attributes to add in the
@@ -175,7 +175,7 @@ class LIBMINISIP_API Media : public MObject{
 		 * @returns a reference to the CODEC instance created, or
 		 * NULL if no CODEC with this payload type was available
 		 */
-		MRef<CodecState *> Media::createCodecInstance( uint8_t payloadType );
+		MRef<CodecState *> createCodecInstance( uint8_t payloadType );
 		
 	protected:
 		Media();
