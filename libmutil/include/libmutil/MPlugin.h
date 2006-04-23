@@ -150,6 +150,12 @@ class LIBMUTIL_API MPluginManager: public MObject{
 		void addRegistry( MPluginRegistry * registry );
 		void removeRegistry( MPluginRegistry * registry );
 
+		/**
+		 * Set directory search path used by loadFromLibrary,
+		 * and loadFromFile.
+		 **/
+		bool setSearchPath( const std::string &searchPath );
+
 	protected:
 		MPluginManager();
 

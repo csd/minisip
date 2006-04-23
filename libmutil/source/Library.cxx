@@ -72,6 +72,13 @@ void *Library::getFunctionPtr(string name){
 MRef<Library *> Library::open(const string &path){
 	MRef<Library *> ret = new Library(path);
 	if(ret->handle){
+		const lt_dlinfo *info;
+
+		info = lt_dlgetinfo( (lt_dlhandle)ret->handle );
+		if( info && info->filename ){
+			ret->path = info->filename;
+		}
+
 		return ret;
 	}
 	ret = NULL;

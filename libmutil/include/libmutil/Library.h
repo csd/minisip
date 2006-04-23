@@ -46,15 +46,9 @@ public:
 	static MRef<Library *> open(const std::string &path);
 
 	/**
-	 * Opens a library.
-	 * @param path	File name/path to a library that will be opened.
-	 */
-	Library(const std::string &path);
-
-	/**
 	 * Closes the library
 	 */
-	~Library();
+	virtual ~Library();
 
 	/**
 	 * NOTE: This method assumes that the function pointers
@@ -72,12 +66,21 @@ public:
 	 * Defined in MObject. Used only for monitoring/debugging.
 	 */
 	std::string getMemObjectType(){ return "Library"; }
+
+protected:
+	/**
+	 * Opens a library.
+	 * @param path	File name/path to a library that will be opened.
+	 */
+	Library(const std::string &path);
+
+
 private:
 	
 	void *handle;	///Pointer to internal data structure
 			///that is different on different 
 			///platforms.
-	const std::string &path; // file name from which the library was opened.
+	std::string path; // file name from which the library was opened.
 	static int refCount;
 };
 

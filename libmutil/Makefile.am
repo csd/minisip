@@ -1,4 +1,3 @@
-abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = libltdl include win32 m4
@@ -9,8 +8,9 @@ INCLUDES = $(LTDLINCL)
 
 pkgconfig_DATA = libmutil.pc
 
+AM_CPPFLAGS = -I$(top_srcdir)/include
+
 lib_LTLIBRARIES = libmutil.la
-libmutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include
 libmutil_la_CXXFLAGS = $(PTHREAD_CFLAGS)
 libmutil_la_LDFLAGS = $(PTHREAD_CFLAGS) -no-undefined -version-info $(LT_VERSION_INFO)
 libmutil_la_LIBADD = $(PTHREAD_LIBS) $(LIBLTDL)

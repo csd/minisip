@@ -53,11 +53,14 @@ string MPlugin::getMemObjectType(){
 }
 
 MPluginManager::MPluginManager(){
+	lt_dlinit();
+	libraries.clear();
 }
 
 MPluginManager::~MPluginManager(){
 	libraries.clear();
 	registries.clear();
+	lt_dlexit();
 }
 
 MRef<MPluginManager*> MPluginManager::getInstance(){
@@ -84,13 +87,23 @@ int32_t MPluginManager::loadFromFile( const std::string &filename ){
 	int32_t nPlugins = 0;
 	list<string> * entryPoints;
 	MRef<Library *> lib;
+	list< MRef<Library *> >::iterator iLib;
 
 	lib = Library::open( filename );
 
 	if( !lib ){
-		merr << "MPluginManager: Can't load " << filename << end;
+		mdbg << "MPluginManager: Can't load " << filename << end;
 		// Continue;
 		return -1;
+	}
+
+	for( iLib = libraries.begin(); iLib != libraries.end(); iLib++ ){
+		MRef<Library *> cur = *iLib;
+
+		if( cur->getPath() == lib->getPath() ){
+			mdbg << "MPluginManager: Already loaded " << filename << end;
+			return -1;
+		}
 	}
 
 	entryPoints = getListFromLibrary( lib );
@@ -236,6 +249,11 @@ void MPluginManager::removeRegistry( MPluginRegistry * registry ){
 	registries.remove( registry );
 }
 
+bool MPluginManager::setSearchPath( const std::string &searchPath ){
+	bool res = lt_dlsetsearchpath( searchPath.c_str() );
+	return res;
+}
+
 void MPluginRegistry::registerPlugin( MRef<MPlugin *> p ){
 	plugins.push_back( p );
 }
@@ -264,3 +282,4 @@ MRef<MPlugin*> MPluginRegistry::findPlugin( std::string name ){
 
 	return NULL;
 }
+
