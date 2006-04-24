@@ -495,10 +495,16 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
 	allclean => sub {
-		callact('mclean') if -e "$objdir/Makefile";
-		# completely remove build and install directories
-		rmtree( [ $builddir, $installdir ], 0, 0 );
-	}
+		if (-e "$objdir/Makefile") {
+			callact('uninstall');
+			callact('mclean');
+		}
+		#  remove but recreate objdir, in case of pending actions
+		easy_chdir($builddir);
+		rmtree($objdir, 1, 0);
+		easy_chdir($objdir);
+	},
+	repoclean => { callact('allclean') },
 );
 
 # common checks for preconditions
@@ -579,6 +585,16 @@ if ($ccache) {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
+# special pre-target processing
+for my $a ( @action ) {
+/^repoclean$/ and do {
+	# repoclean always operates on all packages
+	@targets = @packages;
+	last
+};
+# no pre-target work to do
+}
+
 create_working_paths(1);
 
 for $pkg ( @targets ) {
@@ -603,3 +619,12 @@ for $pkg ( @targets ) {
 	callact($_) for @action;
 }
 
+# special post-target processing
+for my $a ( @action ) {
+/^repoclean$/ and do {
+	easy_chdir($top_builddir);
+	rmtree( [ $builddir, $installdir ], 1, 0 );
+	exit(0);
+};
+# no post-target work to do
+}

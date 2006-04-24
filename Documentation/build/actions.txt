@@ -73,7 +73,8 @@ pkgclean	Remove distribution packages.
 merge		Merge distribution packages into system.
 purge		Purge distribution packages from system.
 
-allclean	Run mclean (if needed), then remove build/install trees.
+allclean	Run uninstall, mclean (if needed), and remove build objects.
+repoclean	Run allclean for all targets, then remove build/install trees.
 check		Run 'make check' to test projects.
 run		Run the application from the local install tree.
 
@@ -205,8 +206,15 @@ Remove the distribution packages from the local platform.
 allclean
 --------
 
-Run 'make mclean' (if project Makefile exists), then remove the project's
-build and install trees.
+Run 'make uninstall', 'make mclean' (if project Makefile exists), then 
+remove the project's object tree.
+
+repoclean
+---------
+
+Run allclean for all packages, then completely remove build/install trees.
+In effect, this commands attempts to revert a working copy of the repository 
+to its pristine state in one step.
 
 check
 -----
