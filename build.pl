@@ -478,6 +478,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	compile => sub { act('compile', 'make', @make_args); },
 	check => sub { act('check', 'make', @make_args, 'check'); },
 	install => sub { act('install', 'make', @make_args, 'install'); },
+	uninstall => sub { act('uninstall', 'make', @make_args, 'uninstall'); },
 	run => sub {
 		 # XXX: This needs to be generalized, but it works for now.
 		 #  For what it's worth, it is "equivalent" to the old .sh

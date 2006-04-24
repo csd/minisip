@@ -56,6 +56,7 @@ configure	Run configure to create Makefiles.
 
 compile		Run 'make'.
 install		Run 'make install'.
+uninstall	Run 'make uninstall'.
 clean		Run 'make clean'.
 dclean		Run 'make distclean'.
 mclean		Run 'make maintainer-clean'.
@@ -112,6 +113,11 @@ install
 -------
 
 Run 'make install' to update this repository's installation.
+
+uninstall
+---------
+
+Run 'make uninstall' to clean this repository's installation.
 
 clean
 -----
