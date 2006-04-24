@@ -504,69 +504,9 @@ dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
-
-dnl
-dnl libmnetutil
-dnl
-PKG_CHECK_MODULES(MNETUTIL, [libmnetutil >= 0.3.1])
-AM_CXXFLAGS="${AM_CXXFLAGS} ${MNETUTIL_CFLAGS}"
-
-save_CPPFLAGS="${CPPFLAGS}"
-save_LIBS="${LIBS}"
-CPPFLAGS="${CPPFLAGS} ${MNETUTIL_CFLAGS}"
-LIBS="${MNETUTIL_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
-        headers/library. Try installing the libmnetutil-devel package for your
-        distribution."])])
-AC_CHECK_LIB([mnetutil], [main],
-        [
-                LIBS="-lmnetutil ${LIBS}"
-        ],[
-                AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
-        ])
-
-
-dnl
-dnl libmsip
-dnl
-PKG_CHECK_MODULES(MSIP, [libmsip >= 0.3.1])
-AM_CXXFLAGS="${AM_CXXFLAGS} ${MSIP_CFLAGS}"
-
-CPPFLAGS="${CPPFLAGS} ${MSIP_CFLAGS}"
-LIBS="${MSIP_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmsip/SipStack.h,,[AC_MSG_ERROR(["You need the libmsip
-        headers/library. Try installing the libmsip-devel package for your
-        distribution."])])
-AC_CHECK_LIB([msip], [main],
-        [
-                LIBS="-lmsip ${LIBS}"
-        ],[
-                AC_MSG_ERROR([Could not find libmsip. Please install the corresponding package.])
-        ])
-
-dnl
-dnl libmikey
-dnl
-PKG_CHECK_MODULES(MIKEY, [libmikey >= 0.4.1])
-AM_CXXFLAGS="${AM_CXXFLAGS} ${MIKEY_CFLAGS}"
-
-CPPFLAGS="${CPPFLAGS} ${MIKEY_CFLAGS}"
-LIBS="${MIKEY_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmikey/MikeyMessage.h,,[AC_MSG_ERROR(["You need the libmikey
-        headers/library. Try installing the libmikey-devel package for your
-        distribution."])])
-AC_CHECK_LIB([mikey], [main],
-        [
-                LIBS="-lmikey ${LIBS}"
-        ],[
-                AC_MSG_ERROR([Could not find libmikey. Please install the corresponding package.])
-        ])
-
-CPPFLAGS="${save_CPPFLAGS}"
-LIBS="${save_LIBS}"
+AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMSIP([0.3.1])
+AM_MINISIP_CHECK_LIBMIKEY([0.4.1])
 
 dnl Checks for libraries.
 AC_CHECK_LIB([wsock32], [main])

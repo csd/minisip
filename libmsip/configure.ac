@@ -113,30 +113,7 @@ dnl
 AC_CHECK_LIB([wsock32], [main])
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
-
-dnl
-dnl libmnetutil
-dnl
-PKG_CHECK_MODULES(MNETUTIL, [libmnetutil >= 0.3.1])
-
-save_CPPFLAGS="${CPPFLAGS}"
-save_LIBS="${LIBS}"
-CPPFLAGS="${CPPFLAGS} ${MNETUTIL_CFLAGS}"
-LIBS="${MNETUTIL_LIBS} ${LIBS}"
-
-AC_CHECK_HEADER(libmnetutil/NetUtil.h,,[AC_MSG_ERROR(["You need the libmnetutil
-        headers/library. Try installing the libmnetutil-devel package for your
-        distribution."])])
-AC_CHECK_LIB([mnetutil], [main],
-        [
-                LIBS="-lmnetutil ${LIBS}"
-        ],[
-                AC_MSG_ERROR([Could not find libmnetutil. Please install the corresponding package.])
-        ])
-
-CPPFLAGS="${save_CPPFLAGS}"
-LIBS="${save_LIBS}"
-
+AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 
 dnl Checks for header files.
 AC_HEADER_STDC
