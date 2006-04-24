@@ -7,13 +7,21 @@
 use strict;
 use warnings;
 
+use Cwd;
+use File::Spec;
+use File::Glob ':glob';
+use File::Copy;
+use File::Path;
 use File::Basename;
+use Getopt::Long qw( :config gnu_getopt );
+use Pod::Usage;
+use Text::Wrap;
+
 my $app_name = basename($0);
 
 #######
 # script configuration option definitions
 
-use Cwd;
 our $topdir = getcwd();	# path to common source directory (svn trunk)
 our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
@@ -100,7 +108,6 @@ USAGE
 #	--man		Show built-in man page
 }
 
-use Getopt::Long qw( :config gnu_getopt );
 my $result = GetOptions(
 		"topdir|T=s" => \$topdir,
 
@@ -131,7 +138,6 @@ my $result = GetOptions(
 	);
 usage() if !$result || $help || $man;
 
-use Pod::Usage;
 pod2usage(2) unless $result;
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -265,11 +271,6 @@ print "$action: @targets\n" unless $quiet;
 
 #######
 # common action funtions
-
-use File::Spec;
-use File::Glob ':glob';
-use File::Copy;
-use File::Path;
 
 our $pkg;
 my %actions;
@@ -535,7 +536,6 @@ my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 	mclean => $need_configure,
 );
 
-use Text::Wrap;
 sub list_actions {
 	return "This script supports the following actions:\n" .
 		wrap("\t", "\t", join(", ", @actions)) . "\n";
