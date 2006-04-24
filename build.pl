@@ -587,7 +587,7 @@ if ($ccache) {
 }
 
 # special pre-target processing
-for my $a ( @action ) {
+for ( @action ) {
 /^repoclean$/ and do {
 	# repoclean always operates on all packages
 	@targets = @packages;
@@ -621,7 +621,7 @@ for $pkg ( @targets ) {
 }
 
 # special post-target processing
-for my $a ( @action ) {
+for ( @action ) {
 /^repoclean$/ and do {
 	easy_chdir($top_builddir);
 	rmtree( [ $builddir, $installdir ], 1, 0 );
