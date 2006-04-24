@@ -150,6 +150,7 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 $confdir = $confdir || "$topdir/build.d";
 my $conffile = "$confdir/build.conf";
 die "'$confdir' is not a valid configuration directory.'" unless -f $conffile;
+my $confdistdir = "$confdir/dist";
 
 # cross-compiling support
 
@@ -403,84 +404,43 @@ sub remove_files {
 }
 
 ########
-# XXX: add better distribution support (currently only supports Gentoo)
-#  How to do that:  
-#   1) factor existing implementation into build.d/dists/gentoo.pl module
-#   2) define common set of entry points, change existing references
-#   3) add new modules (the details are left as an exercise to reader)
-# For bonus points, move configuration files into build.d when you're done.
-#
-# Finally, these suggestions are not meant to be implemented without review;
-# this does not represent the best possible plan, just that plan is possible.
-
-###
-# Gentoo support
-
-sub gentoo_distdir {
-	my $distdir = `portageq envvar DISTDIR` or die "can't get DISTDIR";
-	chomp $distdir;
-	print "+portageq envvar DISTDIR=$distdir\n" if $verbose;
-	return $distdir;
-}
-
-sub gentoo_package {
-	act('gentoo: package', 'echo',
-		'gentoo: This plug-in does not support binary packaging.');
-	# XXX: Gentoo supports binary packages, but this plug-in doesn't;
-	# as such, this could be problematic and should be optionally enabled.
-	#return gentoo_merge('-b') if $gentoo_binary_packages;
-	# XXX: for now, we're okay if we have distfiles to merge
-	return distfiles();
-}
-
-sub gentoo_pkgfiles {
-	# For now, just return tarballs required for merge
-	return distfiles(); 
-}
-
-sub gentoo_merge {
-	my @distfiles = distfiles();
-	die "no distfiles!" unless @distfiles;
-	my $distdir = gentoo_distdir();
-	for my $p ( @distfiles ) {
-		my $tgt = File::Spec->catdir($distdir, basename($p));
-		if ( -e $tgt ) {
-			print "+removing old $tgt\n";
-			unlink($tgt) or die "can't unlink $tgt: $!"; 
-		}
-		print "+copying $p -> $tgt\n";
-		unless (link($p, $tgt) or copy($p, $tgt)) {
-			die "copy failed: $p -> $tgt: $!";
-		}
-	}
-	act('gentoo: merge', qw( sudo emerge ), $pkg, '--digest', @_);
-}
-
-sub gentoo_purge {
-	act('gentoo: purge', qw( sudo emerge ), '-C', $pkg);
-}
-
-my %gentoo_callbacks = (
-		'pkgfiles' => \&gentoo_pkgfiles,
-		'package' => \&gentoo_package,
-		merge => \&gentoo_merge,
-		purge => \&gentoo_purge, 
-	);
-
-###
-# select approriate functions
-# XXX: this needs revisiting as other distros become supported
+# Target/host distribution support
 
 my %distfuncs;
+sub set_dist_callbacks { 
+	my %newfuncs = @_; 
+	$distfuncs{$_} = $newfuncs{$_} for keys %newfuncs;
+	return 1;
+} 
+# autodetection helpers
+sub set_dist_detect { $distfuncs{detect} = shift }
+sub dist_detect { $distfuncs{detect}->() }
 
-sub autodetect_hostdist {
-	$hostdist = 'gentoo';
+# set-up distribution and locate its configuration directory
+if ($hostdist eq 'autodetect') {
+	my %scores = ( );
+	for my $distdir ( bsd_glob("$confdistdir/*") ) {
+		my $detectfile = "$distdir/detect.pl";
+		next unless load_file_if_exists($detectfile);
+		$scores{basename($distdir)} = dist_detect();
+	} 
+	( $hostdist ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
+} 
+my $hostconfdir = "$confdistdir/$hostdist";
+
+my $distconf = "$hostconfdir/dist.pl";
+if (load_file_if_exists($distconf)) {
+	print "+Using package management functions for '$hostdist'\n:" .
+		"\t$distconf\n" if $verbose;
+} else {
+	warn <<NODIST unless $quiet;
+warning: The 'dist.pl' script does not exist for '$hostdist'.
+warning: Packaging actions will not available until one is created!
+NODIST
 }
 
-for ($hostdist) {
-/^autodetect$/ and do { autodetect_hostdist(); }; # fall through!
-/^gentoo$/ and do { %distfuncs = %gentoo_callbacks; last };
-}
+load_file_if_exists("$hostconfdir/dist.conf");
+load_file_if_exists("$hostconfdir/dist.local");
 
 $distfuncs{packages} = sub { 
 		list_files("$hostdist: $pkg packages: ", dist_pkgfiles()) 
