@@ -149,8 +149,10 @@ die "$hostspec-gcc not found."
 	if cross_compiling() && ! -x "/usr/bin/$hostspec-gcc";
 
 # set-up paths
-$builddir = "$topdir/build/$hostspec" unless $builddir;
-$installdir = "$topdir/install/$hostspec" unless $installdir;
+my $top_builddir = $builddir || "$topdir/build";
+$builddir .= "$top_builddir/$hostspec";
+my $top_installdir = $installdir || "$topdir/install";
+$installdir .= "$top_installdir/$hostspec";
 $bindir = "$installdir/usr/bin";
 
 # set-up common options
@@ -237,6 +239,10 @@ unless ($action) {
 	list_actions();
 	usage();
 }
+my @action = split(/\+/, $action); 
+for ( @action ) {
+	die "'$_' is not a valid action.\n" unless grep /^$_$/, @actions;
+}
 
 sub add_targets { 
 	my @targets = map { ( add_targets(@{$dependencies{$_}}), $_) } @_;
@@ -274,6 +280,20 @@ sub easy_mkdir {
 	die "unable to create $path:\n$@" if $@;
 	return $path;
 }
+sub easy_chdir {
+	my $path = shift;
+	easy_mkdir($path) unless -d $path;
+	print "+Changing to $path...\n" if $verbose;
+	chdir($path) or die "unable to change to $path: $!";
+}
+
+sub create_working_paths {
+	my $print = shift;
+	easy_mkdir($builddir, $print);
+	easy_mkdir($installdir, $print);
+	easy_mkdir($aclocaldir);
+	easy_mkdir($pkgconfigdir);
+}
 
 sub act {
 	my $label = shift;
@@ -291,8 +311,7 @@ sub callact {
 
 	my $tgtdir = $a eq 'bootstrap' ? $srcdir : $objdir;
 	if ($tgtdir ne $ENV{PWD}) {
-		print "Changing to $tgtdir...\n" if $verbose;
-		chdir $tgtdir or die "unable to cd to $tgtdir";
+		easy_chdir($tgtdir);
 	}
 	$actions{$a}->();
 }
@@ -524,9 +543,6 @@ sub list_targets {
 ########################################################################
 #  Main Program Start
 
-# create and possibly report directories
-easy_mkdir($builddir, 1);
-easy_mkdir($installdir, 1);
 if ($verbose) {
 	print "+Top directory: $topdir\n";
 	print "+Build directory: $builddir\n";
@@ -546,14 +562,12 @@ $ENV{CXXFLAGS} .= "-Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
 $aclocaldir = "$installdir/usr/share/aclocal";
-easy_mkdir($aclocaldir);
 
 # pkg-config search order (tries to find the "most recent copy"):
 #   1) Project directories
 #   2) Local install directory
 #   3) System directories 
 $pkgconfigdir = "$installdir/usr/lib/pkgconfig";
-easy_mkdir($pkgconfigdir);
 my @pkgconfigdirs = ( ( map { "$builddir/$_" } @packages ), $pkgconfigdir );
 push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
 $ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
@@ -563,6 +577,8 @@ if ($ccache) {
 	$ENV{CCACHE_DIR} = easy_mkdir(File::Spec->catdir($topdir, '.ccache'))
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
+
+create_working_paths(1);
 
 for $pkg ( @targets ) {
 	# XXX: be afraid! dynamic scoping... icky icky icky, but so darn handy
@@ -583,6 +599,6 @@ for $pkg ( @targets ) {
 		print "Build environment for $pkg: @env\n";
 	}
 
-	callact($_) for split(/\+/, $action); 
+	callact($_) for @action;
 }
 
