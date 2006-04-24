@@ -182,10 +182,11 @@ our %configure_params;	# package configure parameter tables
 
 my @dist_actions = ( qw( packages package pkgclean merge purge ) );
 our @actions = ( qw( bootstrap configure compile ),
+		qw( install uninstall ),
 		qw( clean dclean mclean ),
 		qw( dist distcheck tarballs tarclean ),
 		@dist_actions, 
-		qw( check install run ),
+		qw( check run allclean repoclean ),
 	);
 
 # load primary definitions
