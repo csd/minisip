@@ -9,15 +9,13 @@ in separate trees, then installs them in a common root.
 Quick Start
 -----------
 
-If the repository is stable, the following steps (when run from the root
+If the repository is stable, the following step (when run from the base
 of your local working copy) will bootstrap, build, and install minisip and 
 its dependencies (as the current user):
 
-	cp build.local.example build.local
-	${EDITOR} build.local	# set approriate options
 	./build.pl run minisip
 
-This last command encapsulates many different individual steps, which are
+This command encapsulates many different individual steps, which are
 described in the rest of this document.
 
 Configuration
@@ -28,11 +26,11 @@ familiarize yourself with the build configuration file.  Used to establish
 the package dependencies and configure options, the 'build.conf' file 
 contains a few perl definitions that should be easy to understand and change.
 
-Instead of modifying the 'build.conf' file directly, you can should
-a file named "build.local" and make the relevant changes there.  This
-file is loaded immediately after the global build.conf file, and examples
-are provided in 'build.local.example'.  As that file should show, changes 
-are made to the definitions made in 'build.conf' using standard Perl calls.
+Instead of modifying the 'build.conf' file directly, you should locate 
+the file named 'build.local' and make the relevant changes there.  This
+file is loaded immediately after the global build.conf file.
+
+The 'build.pl' will create a 'build.local' if one does not exist.
 
 Batch Mode
 ----------
@@ -45,10 +43,15 @@ The '$toggle_batch' option allows you to swap these behaviors.  When set to
 a non-zero value in 'build.local', the script will include dependencies by 
 default and '-S' will be required to restricts actions to single projects.
 
-The following instructions assume that you have set $toggle_batch = 1.
+The following instructions assume that you have set $toggle_batch = 1,
+which is set by the default 'build.local' file.
 
 Default Directories
 -------------------
+
+The 'build.pl' script stores its own configuration files in the 'build.d'
+directory by default.  This can be overridden by a command line option,
+but this is not generally recommended unless you know what you are doing.
 
 By default, the build script will create two local directories called
 'build' and 'install'.  All stages (after 'bootstrap') are performed in an
@@ -61,7 +64,7 @@ more than one target, such as x86 and arm, at the same time (but with
 different "object directories").
 
 You can change the location of the 'build' and 'install' directories through
-the command line options or your 'build.local' file (see above).
+the command line options or your 'build.local' file (see "Configuration").
 
 Usage Instructions
 ------------------

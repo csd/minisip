@@ -23,6 +23,7 @@ my $app_name = basename($0);
 # script configuration option definitions
 
 our $topdir = getcwd();	# path to common source directory (svn trunk)
+our $confdir = undef;	# path to common build.d directory
 our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
 
@@ -86,6 +87,8 @@ Advanced Build Options:
 Directory Options:
     -T|--topdir=...	Select location of svn repository. 
 			(currently: $topdir)
+    -C|--confdir=...	Select location of configuration directory.
+			(currently: $topdir/build.d)
     -B|--builddir=...	Select location for build directories.
 			(currently: $topdir/build)
     -I|--installdir=...	Select common install directory (sets --prefix).
@@ -111,6 +114,7 @@ USAGE
 my $result = GetOptions(
 		"topdir|T=s" => \$topdir,
 
+		"confdir|C=s" => \$confdir,
 		"builddir|B=s" => \$builddir,
 		"installdir|I=s" => \$installdir,
 		"distro|D=s" => \$hostdist,
@@ -141,6 +145,11 @@ usage() if !$result || $help || $man;
 pod2usage(2) unless $result;
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+# set-up configuration file paths
+$confdir = $confdir || "$topdir/build.d";
+my $conffile = "$confdir/build.conf";
+die "'$confdir' is not a valid configuration directory.'" unless -f $conffile;
 
 # cross-compiling support
 
@@ -199,7 +208,7 @@ our @actions = ( qw( bootstrap configure compile ),
 	);
 
 # load primary definitions
-do "$topdir/build.conf" or die "error: unable to load build.conf:\n$@";
+do $conffile or die "error: unable to load $conffile:\n$@";
 
 sub set_configure_param {
 	my ( $package, %params ) = @_;
@@ -229,11 +238,29 @@ sub set_global_configure_param {
 	return 1;
 }
 
-# allow overrides using the above pair of accessors
-my $localconf = "$topdir/build.local";
-if (-f "$localconf") {
-	do "$localconf" or die "error: unable to load build.local:\n$@";
+my $localconf = "$confdir/build.local";
+unless (-f $localconf) {
+	# XXX: automatic upgrade code; remove this on or after May 1, 2006
+	my $oldconf = "$topdir/build.local";
+	if (-f $oldconf) {
+		my $move_msg = "local configuration file to:\n" . 
+			"\t$localconf\n\tfrom $oldconf\n";
+		warn "Moving $move_msg";
+		move($oldconf, $localconf) or
+			die "error: unable to move $move_msg" .  "error: $!\n";
+	} else {
+	# XXX: end of automatic upgrade path (except closing else brace below)
+	# Create 
+	my $exampleconf = "$confdir/build.local.example";
+	my $create_msg = "local configuration file:\n" . 
+		"\t$localconf\n\tfrom $exampleconf\n";
+	warn "Creating new $create_msg";
+	copy($exampleconf, $localconf) or 
+		die "error: unable to create $create_msg" . "error: $!\n";
+	} # XXX
 }
+# allow overrides using the 'set*_configure_param' accessors
+do $localconf or die "error: unable to load $localconf:\n$@";
 
 die list_actions() if $list_actions;
 die list_targets() if $list_targets;
