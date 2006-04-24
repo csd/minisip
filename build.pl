@@ -7,6 +7,9 @@
 use strict;
 use warnings;
 
+use File::Basename;
+my $app_name = basename($0);
+
 #######
 # script configuration option definitions
 
@@ -56,9 +59,9 @@ umask(0007) or die "unable to set umask to 0007: $!";
 # process option arguments
 
 sub usage { 
-	print @_, "\n" if @_;
+	warn @_, "\n" if @_;
 	die <<USAGE;
-usage: $0 [<options>] <action>[+<action>...] [<targets>]
+usage: $app_name [<options>] <action>[+<action>...] [<targets>]
 Build Options:
     -d|--debug		Enabled debugging in resulting builds
     -s|--static		Enabled static build (uses --disable-shared)
@@ -226,20 +229,17 @@ if (-f "$localconf") {
 	do "$localconf" or die "error: unable to load build.local:\n$@";
 }
 
-list_actions() if $list_actions;
-list_targets() if $list_targets;
+die list_actions() if $list_actions;
+die list_targets() if $list_targets;
 
 #######
 # process action and target arguments
 
 my $action = shift @ARGV || $default_action;
-unless ($action) {
-	print "error: No action specified! You must provide at least ",
-		"one valid action.\n       You may combine actions with ",
-		"'+', such as 'bootstrap+configure'.\n";
-	list_actions();
-	usage();
-}
+die "error: No action specified! You must provide at least " .
+	"one valid action.\n       You may combine actions with " .
+	"'+', such as 'bootstrap+configure'.\n\n" . list_actions() .
+	"\nFor more information, see '$app_name --help'.\n" unless $action;
 my @action = split(/\+/, $action); 
 for my $a ( @action ) {
 	die "'$a' is not a valid action.\n" unless grep /^$a$/, @actions;
@@ -257,8 +257,9 @@ for ( @targets ) {
 }
 $batch = !$batch if $toggle_batch;
 @targets = add_targets(@targets) if $batch;
-usage("error: no target specified!\nPossible packages are:\n",
-	map { "\t$_\n" } @packages, "\n") unless @targets;
+die "error: no target specified!\nYou must specify at least " .
+	"one valid target.\n\n" . list_targets() .
+	"\nFor more information, see '$app_name --help'.\n" unless @targets;
 
 print "$action: @targets\n" unless $quiet;
 
@@ -269,7 +270,6 @@ use File::Spec;
 use File::Glob ':glob';
 use File::Copy;
 use File::Path;
-use File::Basename;
 
 our $pkg;
 my %actions;
@@ -537,15 +537,13 @@ my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 
 use Text::Wrap;
 sub list_actions {
-	print "This script supports the following actions:\n";
-	print wrap("\t", "\t", join(", ", @actions)), "\n";
-	exit(0);
+	return "This script supports the following actions:\n" .
+		wrap("\t", "\t", join(", ", @actions)) . "\n";
 }
 
 sub list_targets {
-	print "This script knows about the following targets:\n";
-	print wrap("\t", "\t", join(", ", @packages)), "\n";
-	exit(0);
+	return "This script knows about the following targets:\n" .
+		wrap("\t", "\t", join(", ", @packages)) . "\n";
 }
 
 ########################################################################
