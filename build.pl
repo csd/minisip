@@ -505,7 +505,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 		rmtree($objdir, 1, 0);
 		easy_chdir($objdir);
 	},
-	repoclean => { callact('allclean') },
+	repoclean => sub { callact('allclean') },
 );
 
 # common checks for preconditions
