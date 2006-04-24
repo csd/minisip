@@ -449,7 +449,9 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 
 %actions = (
 	bootstrap => sub {
-		act('bootstrap', './bootstrap', '-I', $aclocaldir);
+		my @m4_paths = map { "$topdir/$_/m4" } @packages;
+		my @bootstrap_args = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
+		act('bootstrap', './bootstrap', @bootstrap_args);
 	},
 	configure => sub { 
 		act('configure', "$srcdir/configure", configure_params()); 
