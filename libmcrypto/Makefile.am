@@ -1,4 +1,4 @@
-SUBDIRS = include
+SUBDIRS = include m4
 
 lib_LTLIBRARIES = libmcrypto.la
 libmcrypto_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmcrypto

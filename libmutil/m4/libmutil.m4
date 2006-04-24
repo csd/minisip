@@ -6,7 +6,7 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[
 		[
 			if test "x${withval}" = "no"
 			then
-				AC_MSG_ERROR([libmutil is required. Nice try.])
+				AC_MSG_ERROR([libmutil is required.])
 			fi
 			MUTIL_CFLAGS="-I${withval}/include"
 			MUTIL_LIBS="-L${withval}/lib -lmutil"
@@ -17,20 +17,18 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[
 			PKG_CHECK_MODULES(MUTIL, [libmutil >= $1])
 		])
 	
-	AM_CXXFLAGS="${AM_CXXFLAGS} ${MUTIL_CFLAGS}"
-
 	save_CPPFLAGS="${CPPFLAGS}"
 	save_LIBS="${LIBS}"
 	CPPFLAGS="${CPPFLAGS} ${MUTIL_CFLAGS}"
 	LIBS="${MUTIL_LIBS} ${LIBS}"
 
-	AC_CHECK_HEADER(libmutil/itoa.h,,[
-		AC_MSG_ERROR(["You need the libmutil headers/library. 
-			Try installing the libmutil-devel package for your
-			distribution."])])
+	AC_CHECK_HEADER(libmutil/libmutil_config.h,[],[
+		AC_MSG_ERROR([You need the libmutil headers/library.
+Try installing the libmutil-devel package for your distribution."])])
+
 	AC_CHECK_LIB([mutil], [main], [], [
-			AC_MSG_ERROR([Could not find libmutil. Please install the corresponding package.])
-		])
+		AC_MSG_ERROR([Could not find libmutil. dnl
+Please install the corresponding package.])])
 			
 	CPPFLAGS="${save_CPPFLAGS}"
 	LIBS="${save_LIBS}"

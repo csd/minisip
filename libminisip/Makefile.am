@@ -2,7 +2,7 @@ abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 pluginsdir = $(pkglibdir)/plugins
 
-SUBDIRS = include
+SUBDIRS = include m4
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 

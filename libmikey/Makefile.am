@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include win32
+SUBDIRS = include m4 win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmikey.spec
 

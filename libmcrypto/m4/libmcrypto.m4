@@ -8,7 +8,7 @@ dnl	AC_REQUIRE([AM_MINISIP_CHECK_OPENSSL]) dnl
 		[
 			if test "x${withval}" = "no"
 			then
-				AC_MSG_ERROR([libmutil is required. Nice try.])
+				AC_MSG_ERROR([libmcrypto is required.])
 			fi
 			MCRYPTO_CFLAGS="-I${withval}/include"
 			MCRYPTO_LIBS="-L${withval}/lib -lmcrypto -lssl"
@@ -24,11 +24,13 @@ dnl	AC_REQUIRE([AM_MINISIP_CHECK_OPENSSL]) dnl
 	CPPFLAGS="${CPPFLAGS} ${MCRYPTO_CFLAGS} ${MUTIL_CFLAGS}"
 	LIBS="${MUTIL_LIBS} ${MCRYPTO_LIBS} ${LIBS}"
 
-	AC_CHECK_HEADER(libmcrypto/aes.h,[],[
-		AC_MSG_ERROR([You need the libmcrypto headers/library.  Try installing the libmcrypto-devel package for your distribution."])])
+	AC_CHECK_HEADER(libmcrypto/config.h,[],[
+		AC_MSG_ERROR([You need the libmcrypto headers/library.
+Try installing the libmcrypto-devel package for your distribution."])])
 
 	AC_CHECK_LIB([mcrypto], [main], [], [
-			AC_MSG_ERROR([Could not find libmcrypto. Please install the corresponding package.])
+			AC_MSG_ERROR([Could not find libmcrypto.  dnl
+Please install the corresponding package.])
 		])
 			
 	CPPFLAGS="${save_CPPFLAGS}"

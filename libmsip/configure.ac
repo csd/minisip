@@ -158,5 +158,13 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmsip.pc win32/libmsip-res.rc])
+AC_CONFIG_FILES([
+		Makefile 
+		libmsip.pc 
+		debian/Makefile 
+		include/Makefile 
+		m4/Makefile 
+		win32/Makefile 
+		win32/libmsip-res.rc
+	])
 AC_OUTPUT

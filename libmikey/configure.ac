@@ -117,5 +117,13 @@ AC_C_CONST
 AC_HEADER_TIME
 
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmikey.pc win32/libmikey-res.rc])
+AC_CONFIG_FILES([
+		Makefile 
+		libmikey.pc 
+		debian/Makefile 
+		include/Makefile 
+		m4/Makefile 
+		win32/Makefile 
+		win32/libmikey-res.rc
+	])
 AC_OUTPUT

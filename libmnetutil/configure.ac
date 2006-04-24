@@ -166,5 +166,13 @@ dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt 
 dnl AC_SUBST(CPPFLAGS)
 dnl AC_SUBST(LDFLAGS)
 
-AC_CONFIG_FILES([Makefile include/Makefile debian/Makefile win32/Makefile libmnetutil.pc win32/libmnetutil-res.rc])
+AC_CONFIG_FILES([
+		Makefile 
+		libmnetutil.pc 
+		debian/Makefile 
+		include/Makefile 
+		m4/Makefile 
+		win32/Makefile 
+		win32/libmnetutil-res.rc
+	])
 AC_OUTPUT
