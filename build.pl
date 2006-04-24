@@ -205,7 +205,7 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( clean dclean mclean ),
 		qw( dist distcheck tarballs tarclean ),
 		@dist_actions, 
-		qw( check run allclean repoclean ),
+		qw( check run allclean hostclean repoclean ),
 	);
 
 sub load_file_if_exists {
@@ -491,16 +491,17 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
 	allclean => sub {
-		if (-e "$objdir/Makefile") {
-			callact('uninstall');
-			callact('mclean');
-		}
+		return unless -e "$objdir/Makefile";
+		callact('uninstall');
+		callact('mclean');
+	},
+	hostclean => sub { 
 		#  remove but recreate objdir, in case of pending actions
 		easy_chdir($builddir);
 		rmtree($objdir, 1, 0);
 		easy_chdir($objdir);
 	},
-	repoclean => sub { callact('allclean') },
+	repoclean => sub { },
 );
 
 # common checks for preconditions
@@ -513,6 +514,7 @@ my $need_install = sub {
 my $need_tarclean = sub { callact('tarclean'); $need_compile->() };
 my $need_dist = sub { callact('dist') unless scalar(distfiles()) };
 my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
+my $need_allclean = sub { callact('allclean') };
 
 %act_deps = (
 	configure => $need_bootstrap,
@@ -528,6 +530,8 @@ my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 	clean => $need_configure,
 	dclean => $need_configure,
 	mclean => $need_configure,
+	hostclean => $need_allclean,
+	repoclean => $need_allclean,
 );
 
 sub list_actions {
@@ -614,9 +618,14 @@ for $pkg ( @targets ) {
 
 # special post-target processing
 for ( @action ) {
-/^repoclean$/ and do {
-	easy_chdir($top_builddir);
+/^hostclean$/ and do {
+	easy_chdir($topdir);
 	rmtree( [ $builddir, $installdir ], 1, 0 );
+	exit(0);
+};
+/^repoclean$/ and do {
+	easy_chdir($topdir);
+	rmtree( [ $top_builddir, $top_installdir ], 1, 0 );
 	exit(0);
 };
 # no post-target work to do
