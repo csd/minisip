@@ -153,9 +153,9 @@ die "$hostspec-gcc not found."
 
 # set-up paths
 my $top_builddir = $builddir || "$topdir/build";
-$builddir .= "$top_builddir/$hostspec";
+$builddir = "$top_builddir/$hostspec";
 my $top_installdir = $installdir || "$topdir/install";
-$installdir .= "$top_installdir/$hostspec";
+$installdir = "$top_installdir/$hostspec";
 $bindir = "$installdir/usr/bin";
 
 # set-up common options
