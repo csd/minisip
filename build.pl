@@ -207,8 +207,15 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( check run allclean repoclean ),
 	);
 
+sub load_file_if_exists {
+	my $file = shift;
+	return 0 unless -f $file;
+	do $file or die "error: unable to load '$file':\n$@";
+	return 1;
+}
+
 # load primary definitions
-do $conffile or die "error: unable to load $conffile:\n$@";
+load_file_if_exists($conffile);
 
 sub set_configure_param {
 	my ( $package, %params ) = @_;
@@ -260,7 +267,7 @@ unless (-f $localconf) {
 	} # XXX
 }
 # allow overrides using the 'set*_configure_param' accessors
-do $localconf or die "error: unable to load $localconf:\n$@";
+load_file_if_exists($localconf);
 
 die list_actions() if $list_actions;
 die list_targets() if $list_targets;
