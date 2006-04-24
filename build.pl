@@ -241,8 +241,8 @@ unless ($action) {
 	usage();
 }
 my @action = split(/\+/, $action); 
-for ( @action ) {
-	die "'$_' is not a valid action.\n" unless grep /^$_$/, @actions;
+for my $a ( @action ) {
+	die "'$a' is not a valid action.\n" unless grep /^$a$/, @actions;
 }
 
 sub add_targets { 
