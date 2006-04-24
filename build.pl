@@ -538,12 +538,18 @@ $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= "-Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
-$pkgconfigdir = $ENV{PKG_CONFIG_PATH} = "$installdir/usr/lib/pkgconfig";
-easy_mkdir($pkgconfigdir);
 $aclocaldir = "$installdir/usr/share/aclocal";
 easy_mkdir($aclocaldir);
-$ENV{PKG_CONFIG_PATH} .= ":/usr/lib/pkgconfig" 
-	if $installdir ne '/usr' && !cross_compiling();
+
+# pkg-config search order (tries to find the "most recent copy"):
+#   1) Project directories
+#   2) Local install directory
+#   3) System directories 
+$pkgconfigdir = "$installdir/usr/lib/pkgconfig";
+easy_mkdir($pkgconfigdir);
+my @pkgconfigdirs = ( ( map { "$builddir/$_" } @packages ), $pkgconfigdir );
+push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
+$ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
 
 if ($ccache) {
 	$ENV{PATH} = join(':', '/usr/lib/ccache/bin', $ENV{PATH});
@@ -562,7 +568,10 @@ for $pkg ( @targets ) {
 		"+Object directory: $objdir\n" if $verbose;
 
 	if ($show_env) {
-		my @envvars = ( qw( PWD PATH CCACHE_DIR CPPFLAGS CXXFLAGS LDFLAGS ) );
+		my @envvars = ( qw( 
+				PWD PATH CCACHE_DIR PKG_CONFIG_PATH
+				CPPFLAGS CXXFLAGS LDFLAGS 
+			) );
 		my @env = map { "\n\t$_=" . $ENV{$_} } @envvars;
 		print "Build environment for $pkg: @env\n";
 	}
