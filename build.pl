@@ -474,6 +474,11 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	clean => sub { act('cleanup', 'make', 'clean'); }, 
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
+	allclean => sub {
+		callact('mclean') if -e "$objdir/Makefile";
+		# completely remove build and install directories
+		rmtree( [ $builddir, $installdir ], 0, 0 );
+	}
 );
 
 # common checks for preconditions

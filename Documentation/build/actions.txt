@@ -56,7 +56,6 @@ configure	Run configure to create Makefiles.
 
 compile		Run 'make'.
 install		Run 'make install'.
-check		Run 'make check'.
 clean		Run 'make clean'.
 dclean		Run 'make distclean'.
 mclean		Run 'make maintainer-clean'.
@@ -73,6 +72,9 @@ pkgclean	Remove distribution packages.
 merge		Merge distribution packages into system.
 purge		Purge distribution packages from system.
 
+allclean	Run mclean (if needed), then remove build/install trees.
+check		Run 'make check' to test projects.
+run		Run the application from the local install tree.
 
    ===================================================================
  
@@ -193,6 +195,13 @@ Remove the distribution packages from the local platform.
 
                        Miscellaneous Actions
                        .....................
+
+allclean
+--------
+
+Run 'make mclean' (if project Makefile exists), then remove the project's
+build and install trees.
+
 check
 -----
 
