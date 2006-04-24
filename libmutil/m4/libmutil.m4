@@ -1,6 +1,6 @@
-# MINISIP_CHECK_LIBMUTIL(VERSION)
+# AM_MINISIP_CHECK_LIBMUTIL(VERSION)
 # -------------------------------
-AC_DEFUN([MINISIP_CHECK_LIBMUTIL],[ 
+AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[ 
 	AC_ARG_WITH([mutil],
 		AS_HELP_STRING([--with-mutil=PATH], [location of libmutil]),
 		[
@@ -36,5 +36,5 @@ AC_DEFUN([MINISIP_CHECK_LIBMUTIL],[
 	LIBS="${save_LIBS}"
   ])
 #
-# End of MINISIP_CHECK_LIBMUTIL
+# End of AM_MINISIP_CHECK_LIBMUTIL
 #

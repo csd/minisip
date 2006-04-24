@@ -292,7 +292,7 @@ fi
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
-MINISIP_CHECK_LIBMUTIL(0.3.1)
+AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 
 dnl
 dnl libmnetutil

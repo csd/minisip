@@ -142,7 +142,7 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 		AC_MSG_ERROR([Could not find libssl header files. Please install the corresponding development package.])
 	])
 
-MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 
 AC_CHECK_LIB([resolv], [main])
 

@@ -112,7 +112,7 @@ dnl mingw support
 dnl
 AC_CHECK_LIB([wsock32], [main])
 
-MINISIP_CHECK_LIBMUTIL(0.3.1)
+AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 
 dnl
 dnl libmnetutil

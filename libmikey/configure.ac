@@ -106,7 +106,7 @@ AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
 dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
-MINISIP_CHECK_LIBMUTIL(0.3.1)
+AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 
 dnl Checks for header files.
 AC_HEADER_STDC
