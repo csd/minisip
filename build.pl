@@ -57,7 +57,7 @@ my $list_actions = 0;	# show the actions permitted by this script
 my $list_targets = 0;	# show the targets known by this script
 
 my $_run_app = undef;	# Which application did the user specify with -A?
-my $run_app = undef;	# Which application does the user want to run?
+our $run_app = undef;	# Which application does the user want to run?
 
 our $hostdist = 'autodetect';	# This host's distribution (e.g. gentoo).
 our $buildspec = 'autodetect';  # This host's compiler specification.
