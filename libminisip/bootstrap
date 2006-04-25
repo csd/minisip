@@ -49,7 +49,7 @@ if test "$libtoolize" = "no"; then
   exit 1
 fi
 
-aclocal${amvers} "$@"
+aclocal${amvers} "$@" ${ACLOCAL_FLAGS}
 ${libtoolize} --copy --force
 
 autoconf
