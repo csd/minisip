@@ -28,6 +28,8 @@ our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
 
 my $bindir = undef;	#   path to installed executables
+my $libdir = undef;	#   path to installed libraries
+my $includedir = undef;	#   path to installed header files
 my $pkgconfigdir = undef; # path to installed .pc files
 my $aclocaldir = undef; # path to installed .m4 files
 
@@ -325,11 +327,12 @@ sub easy_chdir {
 }
 
 sub create_working_paths {
-	my $print = shift;
-	easy_mkdir($builddir, $print);
-	easy_mkdir($installdir, $print);
-	easy_mkdir($aclocaldir);
-	easy_mkdir($pkgconfigdir);
+	my @paths = ( 
+			$builddir, $installdir,
+			$bindir, $libdir, $includedir,
+			$aclocaldir, $pkgconfigdir,
+		);
+	easy_mkdir($_, !$quiet) for @paths;
 }
 
 sub act {
@@ -556,10 +559,12 @@ if ($verbose) {
 # setup common environment
 #  LDFLAGS: add local install library path
 $ENV{LDFLAGS} ||= '';
-$ENV{LDFLAGS} .= " -L$installdir/usr/lib";
+$libdir = "$installdir/usr/lib";
+$ENV{LDFLAGS} .= " -L$libdir";
 #  CPPFLAGS: add local install include path (XXX: needed?)
 $ENV{CPPFLAGS} ||= '';
-$ENV{CPPFLAGS} .= " -I$installdir/usr/include";
+$includedir = "$installdir/usr/include";
+$ENV{CPPFLAGS} .= " -I$includedir ";
 #  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= "-Wall";
@@ -592,7 +597,7 @@ for ( @action ) {
 # no pre-target work to do
 }
 
-create_working_paths(1);
+create_working_paths();
 
 for $pkg ( @targets ) {
 	# XXX: be afraid! dynamic scoping... icky icky icky, but so darn handy
