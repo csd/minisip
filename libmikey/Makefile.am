@@ -7,10 +7,9 @@ EXTRA_DIST = libmikey.spec
 pkgconfig_DATA = libmikey.pc
 
 lib_LTLIBRARIES = libmikey.la
-libmikey_la_CPPFLAGS = -I$(top_srcdir)/include
-libmikey_la_CXXFLAGS = $(MUTIL_CFLAGS)
+libmikey_la_CXXFLAGS = $(MINISIP_CFLAGS)
 libmikey_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
-libmikey_la_LIBADD =  $(MUTIL_LIBS)
+libmikey_la_LIBADD =  $(MINISIP_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 

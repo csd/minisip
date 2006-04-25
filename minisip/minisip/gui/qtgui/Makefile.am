@@ -1,9 +1,8 @@
 MOC = @MOC@
 
-
 noinst_LIBRARIES = libminisip_qtgui.a
 
-AM_CPPFLAGS += -I@QT_INCLUDE@
+AM_CPPFLAGS = -I@QT_INCLUDE@
 
 libminisip_qtgui_a_SOURCES = CallDialog.cxx \
 			     MinisipMainWindowWidget.cxx \

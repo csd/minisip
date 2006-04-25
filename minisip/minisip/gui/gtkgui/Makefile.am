@@ -1,23 +1,18 @@
 bin_PROGRAMS = minisip_gtkgui
-AM_CXXFLAGS += $(HILDON_CFLAGS) \
+AM_CXXFLAGS = $(HILDON_CFLAGS) \
 		$(GLADEMM_CFLAGS) \
 		$(GTHREAD_CFLAGS)
 
-AM_CPPFLAGS += -DMINISIP_DATADIR="\"$(pkgdatadir)\""	\
+AM_CPPFLAGS = -DMINISIP_DATADIR="\"$(pkgdatadir)\""	\
 		-I$(top_srcdir)/include \
-		-I$(top_srcdir)
+		$(MINISIP_CFLAGS)
 
 AM_LDFLAGS = $(RELOC_LDFLAGS)
 
-minisip_gtkgui_LDADD =	$(LIBMINISIP_LIBS) \
-			$(MSIP_LIBS) \
-			$(MIKEY_LIBS) \
-			$(MNETUTIL_LIBS) \
-			$(MUTIL_LIBS) \
+minisip_gtkgui_LDADD =	$(MINISIP_LIBS) \
 			$(HILDON_LIBS)  \
 			$(GLADEMM_LIBS) \
-			$(GTHREAD_LIBS) \
-			$(LIBMINISIP_LIBS)
+			$(GTHREAD_LIBS)
 
 minisip_gtkgui_SOURCES = MainWindow.cxx \
 				CallWidget.cxx \

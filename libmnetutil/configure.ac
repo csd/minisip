@@ -143,6 +143,7 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 	])
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_COMPLETE
 
 AC_CHECK_LIB([resolv], [main])
 
@@ -163,8 +164,6 @@ dnl AC_FUNC_MALLOC
 dnl AC_TYPE_SIGNAL
 dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
 
-dnl AC_SUBST(CPPFLAGS)
-dnl AC_SUBST(LDFLAGS)
 
 AC_CONFIG_FILES([
 		Makefile 

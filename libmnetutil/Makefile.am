@@ -1,4 +1,3 @@
-abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include m4 win32
@@ -8,10 +7,9 @@ EXTRA_DIST = libmnetutil.spec
 pkgconfig_DATA = libmnetutil.pc
 
 lib_LTLIBRARIES = libmnetutil.la
-libmnetutil_la_CPPFLAGS = -I$(abs_top_srcdir)/include
-libmnetutil_la_CXXFLAGS = $(MUTIL_CFLAGS)
+libmnetutil_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmnetutil_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
-libmnetutil_la_LIBADD = $(MUTIL_LIBS)
+libmnetutil_la_LIBADD = $(MINISIP_LIBS)
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
 

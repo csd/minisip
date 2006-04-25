@@ -1,4 +1,3 @@
-abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include m4 win32
@@ -8,10 +7,9 @@ EXTRA_DIST = libmsip.spec
 pkgconfig_DATA = libmsip.pc
 
 lib_LTLIBRARIES = libmsip.la
-libmsip_la_CPPFLAGS = -I$(abs_top_srcdir)/include
-libmsip_la_CXXFLAGS = $(MUTIL_CFLAGS) $(MNETUTIL_CFLAGS)
+libmsip_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmsip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
-libmsip_la_LIBADD = $(MNETUTIL_LIBS) $(MUTIL_LIBS)
+libmsip_la_LIBADD = $(MINISIP_LIBS)
 
 libmsip_la_SOURCES = $(msip_src)
 

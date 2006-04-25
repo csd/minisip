@@ -53,13 +53,9 @@ AC_C_BIGENDIAN
 
 AC_LANG(C++)
 
-AM_CPPFLAGS="-I\$(top_srcdir)/include"
-AM_CXXFLAGS=""
-
 dnl HACK: QT is compiled, unless GTK or textui is
 dnl Update: QT disabled for now
 QTGUI="no"
-
 
 dnl
 dnl Linker flags
@@ -297,6 +293,7 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMSIP([0.3.1])
 AM_MINISIP_CHECK_LIBMIKEY([0.4.1])
 AM_MINISIP_CHECK_LIBMINISIP([0.3.1])
+AM_MINISIP_CHECK_COMPLETE
 
 dnl Checks for libraries.
 AC_CHECK_LIB([gdi32], [main])
@@ -363,8 +360,6 @@ AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h std
 
 AC_C_CONST
 AC_HEADER_TIME
-AC_SUBST(AM_CPPFLAGS)
-AC_SUBST(AM_CXXFLAGS)
 
 AC_SUBST(datadir)
 

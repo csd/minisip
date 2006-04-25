@@ -1,14 +1,14 @@
-
 bin_PROGRAMS = minisip_textui
 
-AM_CPPFLAGS += -I$(top_srcdir)
+minisip_textui_CPPFLAGS = -I$(top_srcdir) $(MINISIP_CFLAGS)
+minisip_textui_SOURCES = \
+		MinisipTextUI.cxx \
+		MinisipTextMain.cxx
+minisip_textui_LDFLAGS = $(RELOC_LDFLAGS)
+minisip_textui_LDADD = $(MINISIP_LIBS)
 
-AM_LDFLAGS = $(RELOC_LDFLAGS)
+noinst_HEADERS = \
+		MinisipTextUI.h
 
-minisip_textui_LDADD = $(LIBMINISIP_LIBS)
-minisip_textui_SOURCES = MinisipTextUI.cxx \
-				MinisipTextMain.cxx
-
-noinst_HEADERS  = MinisipTextUI.h
-
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
+MAINTAINERCLEANFILES = \
+		$(srcdir)/Makefile.in

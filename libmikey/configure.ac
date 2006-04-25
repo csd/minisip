@@ -107,6 +107,7 @@ dnl Check for libssl 0.9.7
 AC_CHECK_HEADERS([openssl/aes.h],[],[])
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_COMPLETE
 
 dnl Checks for header files.
 AC_HEADER_STDC

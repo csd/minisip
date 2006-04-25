@@ -6,16 +6,21 @@ SUBDIRS = include m4
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -DMINISIP_PLUGINDIR=\"$(pluginsdir)\"
+AM_CPPFLAGS = -I$(top_srcdir)/include $(MINISIP_CFLAGS) 
 
 pkgconfig_DATA = libminisip.pc
 
 
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS) $(X_CFLAGS)
-libminisip_la_CXXFLAGS = $(MSIP_CFLAGS) $(MIKEY_CFLAGS) $(MNETUTIL_CFLAGS) $(MUTIL_CFLAGS) 
-libminisip_la_LDFLAGS = -Wl,--no-undefined -no-undefined -version-info $(LT_VERSION_INFO) $(RELOC_LDFLAGS) $(AVCODEC_LDFLAGS)
-libminisip_la_LIBADD = $(MSIP_LIBS) $(MIKEY_LIBS) $(MNETUTIL_LIBS) $(MUTIL_LIBS) $(FFMPEG_LIBS) $(DC1394_LIBS) $(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
+libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\" \
+		$(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS) $(X_CFLAGS)
+
+libminisip_la_LDFLAGS = -Wl,--no-undefined -no-undefined -version-info \
+		$(LT_VERSION_INFO) $(RELOC_LDFLAGS) $(AVCODEC_LDFLAGS)
+
+libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS) $(DC1394_LIBS) \
+		$(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
+
 plugins_LTLIBRARIES =
 
 
