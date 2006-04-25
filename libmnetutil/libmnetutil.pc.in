@@ -6,9 +6,9 @@ includedir=@includedir@
 pkgincludedir=${includedir}/@PACKAGE@
 
 Name: @PACKAGE@
-Description:
+Description: Minisip Network Utility Toolkit Implementation Library (MNETUTIL)
 Version: @VERSION@
 Requires: libmutil >= 0.3.1
 Libs: -L${libdir} -lmnetutil
-Libs.private: @MUTIL_LIBS@ @LIBS@
+Libs.private: @MINISIP_LIBS@ @LIBS@
 Cflags: -I${includedir}

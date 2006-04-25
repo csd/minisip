@@ -6,9 +6,9 @@ includedir=@includedir@
 pkgincludedir=${includedir}/@PACKAGE@
 
 Name: @PACKAGE@
-Description:
+Description: Minisip Session Initiation Protocol (SIP) Library
 Version: @VERSION@
 Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1
 Libs: -L${libdir} -lmsip
-Libs.private: @MNETUTIL_LIBS@ @MUTIL_LIBS@ @LIBS@
+Libs.private: @MINISIP_LIBS@ @LIBS@
 Cflags: -I${includedir}
