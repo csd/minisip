@@ -157,8 +157,8 @@ my $confdistdir = "$confdir/dist";
 # cross-compiling support
 
 sub cross_compiling { return $buildspec ne $hostspec }
-sub autodetect_buildspec { return 'x86-pc-linux-gnu'; }
-sub autodetect_hostspec { return autodetect_buildspec(); }
+sub autodetect_buildspec { return $buildspec || 'x86-pc-linux-gnu' }
+sub autodetect_hostspec { return $hostspec || autodetect_buildspec() }
 
 for ($buildspec) {
 /^autodetect$/ and do { $buildspec = autodetect_buildspec(); };

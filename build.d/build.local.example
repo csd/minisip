@@ -21,6 +21,18 @@
 # $builddir = '/path/to/builddir';
 # $installdir = '/path/to/installdir';
 
+## Override default build machine specification
+## Note: Autodetection does not work (default is x86-pc-linux-pc)
+##
+# $buildspec = 'i686-pc-linux-gnu';
+
+## Override default host machine specification
+## Note: You should only set this when you are cross-compiling;
+##       if $hostspec is not set, the value of $buildspec is used.
+##
+# $hostspec = 'arm-unknown-linux-gnu';
+# $hostspec = 'powerpc-unknown-linux-gnu';
+
 ## Override default host distribution (only affects 'merge' command)
 ## Distributions currently supported by this system:
 ##	gentoo
