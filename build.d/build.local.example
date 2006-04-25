@@ -40,9 +40,9 @@
 # $host_dist = 'gentoo';
 
 ## Select which UI you which to use with the 'run' action.  You can also
-## use the -U option to override this on the commandline.
-# $default_ui = 'gtkgui';
-# $default_ui = 'textui';
+## use the -A option to set this on the command line.
+# $run_app ||= '/usr/bin/minisip_textui';
+$run_app = '/usr/bin/minisip_gtkgui';
 
 ## Use batch setting by default, with -S enabling "single mode"; normally, 
 ## the targets specified by the user are built, and -S enables batch mode.

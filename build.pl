@@ -56,7 +56,8 @@ my $man = 0;
 my $list_actions = 0;	# show the actions permitted by this script
 my $list_targets = 0;	# show the targets known by this script
 
-our $default_ui = 'gtkgui';	# Which ui does the user want to use?
+my $_run_app = undef;	# Which application did the user specify with -A?
+my $run_app = undef;	# Which application does the user want to run?
 
 our $hostdist = 'autodetect';	# This host's distribution (e.g. gentoo).
 our $buildspec = 'autodetect';  # This host's compiler specification.
@@ -100,7 +101,7 @@ Distribution Merge Options:
     -D|--distro=...	Sets package manager features (default: $hostdist)
 
 Run Options:
-    -U|--ui=...		Sets user interface to use (default: $default_ui)
+    -A|--app=...	Select application to run (default: check build.local)
 
 General Options:
     -p|--pretend	Do not actually perform actions
@@ -120,7 +121,7 @@ my $result = GetOptions(
 		"builddir|B=s" => \$builddir,
 		"installdir|I=s" => \$installdir,
 		"distro|D=s" => \$hostdist,
-		"ui|U=s" => \$default_ui,
+		"app|A=s" => \$_run_app,
 
 		"debug|d!" => \$debug,
 		"static|s!" => \$static,
@@ -463,6 +464,12 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 ######
 #  Common action functions
 
+sub run_app_path {
+	die "error: No application was specified in build.local or with -A.\n"
+		unless $run_app;
+	return $installdir . $run_app;
+}
+
 %actions = (
 	bootstrap => sub {
 		my @m4_paths = map { "$topdir/$_/m4" } @packages;
@@ -481,7 +488,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 		 #  For what it's worth, it is "equivalent" to the old .sh
 		return unless $pkg eq 'minisip';
 		$ENV{LD_LIBRARY_PATH} = "$installdir/usr/lib";
-		act('run', "$bindir/$pkg" . "_$default_ui");
+		act('run', run_app_path());
 	},
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
 	tarclean => sub { remove_files("tarballs", distfiles()); },
@@ -510,7 +517,7 @@ my $need_bootstrap = sub { callact('bootstrap') unless -e "$srcdir/configure" };
 my $need_configure = sub { callact('configure') unless -e "$objdir/Makefile" };
 my $need_compile = sub { callact('compile') }; # always rebuild, just in case
 my $need_install = sub { 
-	callact('install') unless -x "$bindir/minisip_$default_ui"; 
+	callact('install') unless -x run_app_path();
 }; 
 my $need_tarclean = sub { callact('tarclean'); $need_compile->() };
 my $need_dist = sub { callact('dist') unless scalar(distfiles()) };
@@ -547,6 +554,9 @@ sub list_targets {
 
 ########################################################################
 #  Main Program Start
+
+# override application to run, if user specified one via CLI
+$run_app = $_run_app if defined $_run_app;
 
 if ($verbose) {
 	print "+Top directory: $topdir\n";
