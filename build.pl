@@ -154,28 +154,6 @@ my $conffile = "$confdir/build.conf";
 die "'$confdir' is not a valid configuration directory.'" unless -f $conffile;
 my $confdistdir = "$confdir/dist";
 
-# cross-compiling support
-
-sub cross_compiling { return $buildspec ne $hostspec }
-sub autodetect_buildspec { return $buildspec || 'x86-pc-linux-gnu' }
-sub autodetect_hostspec { return $hostspec || autodetect_buildspec() }
-
-for ($buildspec) {
-/^autodetect$/ and do { $buildspec = autodetect_buildspec(); };
-}
-for ($hostspec) {
-/^autodetect$/ and do { $hostspec = autodetect_hostspec(); };
-}
-die "$hostspec-gcc not found." 
-	if cross_compiling() && ! -x "/usr/bin/$hostspec-gcc";
-
-# set-up paths
-my $top_builddir = $builddir || "$topdir/build";
-$builddir = "$top_builddir/$hostspec";
-my $top_installdir = $installdir || "$topdir/install";
-$installdir = "$top_installdir/$hostspec";
-$bindir = "$installdir/usr/bin";
-
 # set-up common options
 $show_env = 1 if $pretend && $verbose;
 $verbose = 1 if $pretend;
@@ -274,6 +252,26 @@ load_file_if_exists($localconf);
 
 die list_actions() if $list_actions;
 die list_targets() if $list_targets;
+
+#######
+# cross-compiling support
+
+sub cross_compiling { return $buildspec ne $hostspec }
+sub __detect { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
+sub autodetect_buildspec { __detect($buildspec, sub { 'x86-pc-linux-gnu' }) }
+sub autodetect_hostspec { __detect($hostspec, sub { autodetect_buildspec() }) }
+
+$buildspec = autodetect_buildspec();
+$hostspec = autodetect_hostspec();
+die "$hostspec-gcc not found." 
+	if cross_compiling() && ! -x "/usr/bin/$hostspec-gcc";
+
+# set-up paths
+my $top_builddir = $builddir || "$topdir/build";
+$builddir = "$top_builddir/$hostspec";
+my $top_installdir = $installdir || "$topdir/install";
+$installdir = "$top_installdir/$hostspec";
+$bindir = "$installdir/usr/bin";
 
 #######
 # process action and target arguments
