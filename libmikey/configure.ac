@@ -48,7 +48,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_HEADER_TIME
 
-
 AC_CONFIG_FILES([
 		Makefile 
 		libmikey.pc 

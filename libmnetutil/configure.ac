@@ -79,18 +79,8 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h sys/types.h sys/socket.h netdb.h netinet/in.h arpa/inet.h netinet/tcp.h linux/sockios.h arpa/nameser_compat.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-dnl AC_HEADER_STDBOOL
 AC_C_CONST
 AC_HEADER_TIME
-dnl AC_C_VOLATILE
-
-dnl Checks for library functions.
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_TYPE_SIGNAL
-dnl AC_CHECK_FUNCS([bzero gettimeofday inet_ntoa memmove memset pow socket sqrt strtol])
-
 
 AC_CONFIG_FILES([
 		Makefile 

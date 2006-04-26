@@ -43,17 +43,6 @@ LDFLAGS="${LDFLAGS} -rdynamic"
 dnl Check types
 AC_CHECK_TYPES([uint])
 
-dnl STL
-dnl For now STL is made mandatory
-
-dnl AC_ARG_ENABLE(stl,
-dnl     [ --enable-stl enables the use of C++ STL (default enabled)],
-dnl     [ if test "${enable_stl}" = "yes"
-dnl       then
-        AC_DEFINE(USE_STL, [], [STL enabled])
-dnl       fi ])
-
-
 dnl debug flag
 AC_ARG_ENABLE(autocall,
     AS_HELP_STRING([--enable-autocall], 
