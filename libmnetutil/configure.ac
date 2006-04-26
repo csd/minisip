@@ -78,9 +78,10 @@ AC_CONFIG_FILES([
 		Makefile 
 		libmnetutil.pc 
 		debian/Makefile 
+		examples/Makefile
 		include/Makefile 
 		m4/Makefile 
-		examples/Makefile
+		tests/Makefile
 		win32/Makefile 
 		win32/libmnetutil-res.rc
 	])
