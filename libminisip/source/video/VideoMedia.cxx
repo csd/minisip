@@ -112,7 +112,7 @@ void VideoMedia::registerMediaSource( uint32_t ssrc ){
         }
 
         else{
-                MRef<VideoDisplay *> newdisplay = VideoDisplay::create( receivingWidth, receivingHeight );
+                MRef<VideoDisplay *> newdisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight );
                 source->getDecoder()->setHandler( *newdisplay );
                 source->display = newdisplay;
                 if( newdisplay ){

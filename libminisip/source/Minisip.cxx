@@ -76,6 +76,7 @@
 #include<libminisip/codecs/Codec.h>
 #ifdef VIDEO_SUPPORT
 #include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/video/display/VideoDisplay.h>
 #endif
 
 #include<stdlib.h>
@@ -108,6 +109,7 @@ static void loadPlugins(){
 	ConfigRegistry::getInstance();
 #ifdef VIDEO_SUPPORT
 	GrabberRegistry::getInstance();
+	VideoDisplayRegistry::getInstance();
 #endif
 
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();

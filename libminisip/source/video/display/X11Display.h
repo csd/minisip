@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net> 
 */
 
 #ifndef X11_DISPLAY_H
@@ -36,7 +37,7 @@
 
 #include<libminisip/video/display/VideoDisplay.h>
 
-class LIBMINISIP_API X11Display: public VideoDisplay{
+class X11Display: public VideoDisplay{
 	public: 
 		X11Display( uint32_t width, uint32_t height );
 
@@ -79,6 +80,23 @@ class LIBMINISIP_API X11Display: public VideoDisplay{
 		uint32_t bytesPerPixel;
 		XVisualInfo * visualInfo;
 
+};
+
+class X11Plugin: public VideoDisplayPlugin{
+	public:
+		X11Plugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){}
+		
+		virtual std::string getName() const { return "x11"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "X11 display"; }
+
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
+			return new X11Display( width, height );
+		}
+
+		virtual std::string getMemObjectType(){ return "X11Plugin"; }
 };
 
 #endif

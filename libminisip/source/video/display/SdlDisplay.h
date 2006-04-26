@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net> 
 */
 
 #ifndef SDL_DISPLAY_H
@@ -36,7 +37,7 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 
-class LIBMINISIP_API SdlDisplay: public VideoDisplay{
+class SdlDisplay: public VideoDisplay{
 	public: 
 		SdlDisplay( uint32_t width, uint32_t height );
 		virtual void init( uint32_t height,  uint32_t width );
@@ -74,4 +75,22 @@ class LIBMINISIP_API SdlDisplay: public VideoDisplay{
 		int bpp;        
 
 };
+
+class SdlPlugin: public VideoDisplayPlugin{
+	public:
+		SdlPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){}
+		
+		virtual std::string getMemObjectType() { return "SdlPlugin"; }
+
+		virtual std::string getName() const { return "sdl"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "SDL display"; }
+
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
+			return new SdlDisplay( width, height );
+		}
+};
+
 #endif

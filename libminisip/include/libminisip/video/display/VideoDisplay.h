@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net> 
 */
 
 #ifndef VIDEO_DISPLAY_H
@@ -32,16 +33,13 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 #include<libmutil/Semaphore.h>
+#include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 
 #include<libminisip/video/ImageHandler.h>
 
 class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 	public:
-
-		static MRef<VideoDisplay *> create( uint32_t width, uint32_t height );
-		static uint32_t displayCounter;
-		static Mutex displayCounterLock;
-
 		virtual std::string getMemObjectType(){ return "VideoDisplay"; };
 		~VideoDisplay();
 		virtual void start();
@@ -87,6 +85,37 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 		Thread * thread;
 		MRef<Semaphore *> sem;
 
+};
+
+class LIBMINISIP_API VideoDisplayPlugin : public MPlugin{
+	public:
+		VideoDisplayPlugin( MRef<Library *> lib );
+
+		virtual std::string getPluginType() const{
+			return "VideoDisplay";
+		}
+
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const = 0;
+};
+
+/**
+ * Registry of video display plugins.
+ */
+class LIBMINISIP_API VideoDisplayRegistry: public MPluginRegistry, public MSingleton<VideoDisplayRegistry>{
+	public:
+		virtual std::string getPluginType(){ return "VideoDisplay"; }
+
+		MRef<VideoDisplay*> createDisplay( uint32_t width, uint32_t height );
+		void signalDisplayDeleted();
+
+	protected:
+		VideoDisplayRegistry();
+
+	private:
+		uint32_t displayCounter;
+		Mutex displayCounterLock;
+
+		friend class MSingleton<VideoDisplayRegistry>;
 };
 
 #endif

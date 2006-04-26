@@ -16,19 +16,38 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004, 2005
+/* Copyright (C) 2004, 2005, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
-#include<libminisip/video/display/XvDisplay.h>
+#include"XvDisplay.h"
 #include<sys/time.h>
 #include<libminisip/video/VideoException.h>
 
 using namespace std;
 
 #define NB_IMAGES 3
+
+static std::list<std::string> pluginList;
+static MRef<MPlugin *> plugin;
+
+
+extern "C"
+std::list<std::string> *mxv_LTX_listPlugins( MRef<Library*> lib ){
+	pluginList.push_back("getPlugin");
+	plugin = new XvPlugin( lib );
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mxv_LTX_getPlugin( MRef<Library*> lib ){
+	return &plugin;
+}
+
 
 XvDisplay::XvDisplay( uint32_t width, uint32_t height):X11Display( width, height){
 	xvPort = -1;

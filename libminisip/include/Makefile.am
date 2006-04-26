@@ -106,9 +106,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/video/mixer/ImageMixer.h \
 			libminisip/video/grabber/Grabber.h \
 			libminisip/video/display/VideoDisplay.h \
-			libminisip/video/display/X11Display.h \
-			libminisip/video/display/XvDisplay.h \
-			libminisip/video/display/SdlDisplay.h \
 			libminisip/video/codec/AVDecoder.h \
 			libminisip/video/codec/AVCoder.h \
 			libminisip/video/codec/VideoCodec.h \

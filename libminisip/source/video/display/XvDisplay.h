@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #ifndef XVDISPLAY_INCLUDE_HEADER
@@ -38,9 +39,9 @@
 #include <X11/extensions/Xvlib.h>
 
 #include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/display/X11Display.h>
+#include"X11Display.h"
 
-class LIBMINISIP_API XvDisplay: public X11Display{
+class XvDisplay: public X11Display{
 	public: 
 		XvDisplay( uint32_t width, uint32_t height );
 
@@ -75,5 +76,23 @@ class LIBMINISIP_API XvDisplay: public X11Display{
 		bool fullscreen;
 
 };
+
+class XvPlugin: public VideoDisplayPlugin{
+	public:
+		XvPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){}
+		
+		virtual std::string getMemObjectType() { return "XvPlugin"; }
+
+		virtual std::string getName() const { return "xv"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "XVideo display"; }
+
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
+			return new XvDisplay( width, height );
+		}
+};
+
 
 #endif

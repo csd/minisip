@@ -16,72 +16,81 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net> 
 */
 
 #include<config.h>
 #include<libmutil/dbg.h>
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/video/VideoException.h>
-#ifdef XV_SUPPORT
-#include<libminisip/video/display/XvDisplay.h>
-#endif
-#ifdef SDL_SUPPORT
-#include<libminisip/video/display/SdlDisplay.h>
-#endif
-#include<libminisip/video/display/X11Display.h>
 
 #include<iostream>
 #define NB_IMAGES 3
 
 using namespace std;
 
-Mutex VideoDisplay::displayCounterLock;
-uint32_t VideoDisplay::displayCounter = 0;
+VideoDisplayRegistry::VideoDisplayRegistry(): displayCounter( 0 ){
+}
 
-
-MRef<VideoDisplay *> VideoDisplay::create( uint32_t width, uint32_t height ){
+MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height ){
         MRef<VideoDisplay *> display = NULL;
+	const char *names[] = { "sdl", "xv", "x11", NULL };
         
-        VideoDisplay::displayCounterLock.lock();
+        displayCounterLock.lock();
 
-#if defined SDL_SUPPORT || defined XV_SUPPORT
-        if( VideoDisplay::displayCounter == 0 ){
-                try{
-#ifdef SDL_SUPPORT
-                display = new SdlDisplay( width, height );
-                display->start();
-#elif defined XV_SUPPORT
-                display =  new XvDisplay( width, height );
-                display->start();
-#endif
-                displayCounter ++;
-                displayCounterLock.unlock();
-                return display;
-                }
-                catch( VideoException & exc ){
-                        mdbg << "Error opening the video display: "
-                             << exc.error() << end;
-                }
-        }
-#endif
+	for( int i = 0;; i++ ){
+		if( !names[i] ){
+			break;
+		}
 
-        try{
-                display = new X11Display( width, height );
-                display->start();
-        }
-        catch( VideoException & exc ){
-                merr << "Error opening the video display: "
-                        << exc.error() << end;
-        }
+		string name = names[i];
 
-        displayCounter ++;
+		if( displayCounter != 0 &&
+		    ( name == "sdl" || name == "xv" ) )
+			continue;
+
+		try{
+			MRef<MPlugin *> plugin;
+			plugin = findPlugin( name );
+			if( !plugin )
+				continue;
+			
+			MRef<VideoDisplayPlugin *> videoPlugin;
+			
+			videoPlugin = dynamic_cast<VideoDisplayPlugin*>( *plugin );
+			if( !videoPlugin )
+				continue;
+			
+			display = videoPlugin->create( width, height );
+			
+			if( !display )
+				continue;
+			
+			display->start();
+			displayCounter ++;
+			break;
+		}
+		catch( VideoException & exc ){
+			mdbg << "Error opening the video display: "
+			     << exc.error() << end;
+		}
+	}
+
         displayCounterLock.unlock();
         return display;
 }
+
+void VideoDisplayRegistry::signalDisplayDeleted(){
+	displayCounterLock.lock();
+        displayCounter --;
+        displayCounterLock.unlock();
+
+}
+
 
 VideoDisplay::VideoDisplay(){
 	show = false;
@@ -91,10 +100,7 @@ VideoDisplay::VideoDisplay(){
 
 VideoDisplay::~VideoDisplay(){
 //        thread->join();
-        VideoDisplay::displayCounterLock.lock();
-        VideoDisplay::displayCounter --;
-        VideoDisplay::displayCounterLock.unlock();
-
+	VideoDisplayRegistry::getInstance()->signalDisplayDeleted();
 }
 
 void VideoDisplay::start(){
@@ -252,3 +258,6 @@ bool VideoDisplay::providesImage(){
 void VideoDisplay::releaseImage( MImage * mimage ){
 }
 
+
+VideoDisplayPlugin::VideoDisplayPlugin( MRef<Library *> lib ): MPlugin( lib ){
+}

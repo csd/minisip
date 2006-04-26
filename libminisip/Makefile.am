@@ -18,8 +18,7 @@ libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\" \
 libminisip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) \
 		$(AVCODEC_LDFLAGS) $(RELOC_LDFLAGS) 
 
-libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS) \
-		$(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
+libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS)
 
 plugins_LTLIBRARIES =
 
@@ -280,15 +279,41 @@ libstun_src = source/stun/STUNAttributes.cxx \
 
 if VIDEO_SUPPORT
         libvideo_libadd =
-        display_src = source/video/display/VideoDisplay.cxx \
-			source/video/display/X11Display.cxx
+        display_src = source/video/display/VideoDisplay.cxx
+
+#
+# X11 display plugin
+#
+plugins_LTLIBRARIES += mx11.la
+mx11_la_CXXFLAGS = $(AM_CXXFLAGS) $(X_CFLAGS)
+mx11_la_LDFLAGS = $(plugins_LDFLAGS)
+mx11_la_SOURCES = source/video/display/X11Display.cxx \
+			source/video/display/X11Display.h
+mx11_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
+
+#
+# Xv display plugin
+#
 if XV_VIDEO_DISPLAY
-        display_src += source/video/display/XvDisplay.cxx
-        libvideo_libadd += $(X_LIBS) $(X_EXTRA_LIBS)
+plugins_LTLIBRARIES += mxv.la
+mxv_la_CXXFLAGS = $(AM_CXXFLAGS) $(X_CFLAGS)
+mxv_la_LDFLAGS = $(plugins_LDFLAGS)
+mxv_la_SOURCES = source/video/display/XvDisplay.cxx \
+			source/video/display/XvDisplay.h \
+			source/video/display/X11Display.cxx \
+			source/video/display/X11Display.h
+mxv_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
+#
+# SDL display plugin
+#
 if SDL_VIDEO_DISPLAY
-        display_src += source/video/display/SdlDisplay.cxx
+plugins_LTLIBRARIES += msdl.la
+msdl_la_LDFLAGS = $(plugins_LDFLAGS)
+msdl_la_SOURCES = source/video/display/SdlDisplay.cxx \
+			source/video/display/SdlDisplay.h
+msdl_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SDL_LIBS)
 endif
 
         grabber_src = source/video/grabber/Grabber.cxx
@@ -297,6 +322,9 @@ if V4L_VIDEO_GRABBER
 			source/video/grabber/V4LGrabber.h
 endif
 
+#
+# IEEE1394 Digital camera plugin
+#
 if DC1394_VIDEO_GRABBER
 plugins_LTLIBRARIES += mdc1394.la
 mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)

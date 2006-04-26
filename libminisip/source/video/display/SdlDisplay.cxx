@@ -16,13 +16,14 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net> 
 */
 
-#include<libminisip/video/display/SdlDisplay.h>
+#include"SdlDisplay.h"
 #include<config.h>
 #include<sys/time.h>
 #include<SDL/SDL_syswm.h>
@@ -32,6 +33,25 @@
 using namespace std;
 
 #define NB_IMAGES 3
+
+
+static std::list<std::string> pluginList;
+static MRef<MPlugin *> plugin;
+
+
+extern "C"
+std::list<std::string> *msdl_LTX_listPlugins( MRef<Library*> lib ){
+	pluginList.push_back("getPlugin");
+	plugin = new SdlPlugin( lib );
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *msdl_LTX_getPlugin( MRef<Library*> lib ){
+	return &plugin;
+}
+
 
 SdlDisplay::SdlDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->width = width;
