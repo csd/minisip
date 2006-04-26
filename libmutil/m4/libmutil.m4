@@ -50,6 +50,7 @@ AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
 AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
