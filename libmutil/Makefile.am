@@ -64,6 +64,8 @@ mutil_src =  	source/aes.cxx \
 		source/CircularBuffer.cxx \
 		$(thread_src)
 
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 		$(srcdir)/configure \
 		$(srcdir)/Makefile.in \

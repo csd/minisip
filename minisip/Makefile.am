@@ -17,6 +17,8 @@ dist-hook:
 		find $(distdir)/$$i -name '.svn' -a -type d | xargs -r rm -r; \
 	done
 
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 	$(srcdir)/configure \
 	$(srcdir)/Makefile.in \

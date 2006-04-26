@@ -36,6 +36,8 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/UDPSocket.cxx \
 		    source/StreamSocket.cxx
 
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 		$(srcdir)/Makefile.in \
 		$(srcdir)/aclocal.m4 \

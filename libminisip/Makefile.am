@@ -389,6 +389,8 @@ libminisip_la_LIBADD += $(libcodecs_libadd) \
 			$(libsoundcard_libadd) \
 			$(libvideo_libadd)
 
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES  = $(srcdir)/configure \
 			$(srcdir)/Makefile.in \
 			$(srcdir)/config/depcomp \

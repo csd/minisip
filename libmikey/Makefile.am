@@ -49,6 +49,8 @@ ka_src =             keyagreement/keyagreement.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
 		     keyagreement/keyvalidity.cxx
 		     
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 		$(srcdir)/Makefile.in \
 		$(srcdir)/configure \

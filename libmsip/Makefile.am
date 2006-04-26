@@ -79,6 +79,8 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderVia.cxx \
                      source/headers/SipHeaderWarning.cxx
 
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 		$(srcdir)/Makefile.in \
 		$(srcdir)/configure \
