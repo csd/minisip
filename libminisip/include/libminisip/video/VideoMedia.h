@@ -120,6 +120,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		byte_t frame[100000];
 		uint32_t index;
 		bool packetLoss;
+		bool firstSeqNo;
 		uint16_t expectedSeqNo;
 
 

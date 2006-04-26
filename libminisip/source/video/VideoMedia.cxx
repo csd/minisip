@@ -230,6 +230,7 @@ VideoMediaSource::VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t heig
         MImage * image;
 	index = 0;
 	packetLoss = false;
+	firstSeqNo = true;
 	expectedSeqNo = 0;
 	savedPacket = NULL;
         display = NULL;
@@ -301,6 +302,11 @@ MRef<AVDecoder *> VideoMediaSource::getDecoder(){
 
 void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 	int seqNo = packet->getHeader().getSeqNo();
+
+	if( firstSeqNo ){
+		expectedSeqNo = seqNo;
+		firstSeqNo = false;
+	}
 
 	if( savedPacket ){
 		if( seqNo != expectedSeqNo - 2 ){
