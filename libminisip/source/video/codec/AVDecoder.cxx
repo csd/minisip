@@ -127,7 +127,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                         if( needsConvert ){
                                int ffmpegFormat;
 
-                               MImage * converted;
+                               MImage * converted = NULL;
                                if( handler->providesImage() ){
                                        converted = handler->provideImage();
                                }
@@ -139,8 +139,10 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                                        case M_CHROMA_RV16:
                                                ffmpegFormat = PIX_FMT_RGB565;
                                                break;
-                                       case M_CHROMA_RV24:
                                        case M_CHROMA_RV32:
+                                               ffmpegFormat = PIX_FMT_RGBA32;
+					       break;
+                                       case M_CHROMA_RV24:
                                        default:
                                                ffmpegFormat = PIX_FMT_RGB24;
                                                break;
