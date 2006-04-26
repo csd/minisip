@@ -79,12 +79,29 @@ dnl  =================================================================
 dnl               minisip configure check helper macros
 
 # AM_MINISIP_LIBTOOL_EXTRAS()
-# -------------------------
+# ---------------------------
 AC_DEFUN([AM_MINISIP_LIBTOOL_EXTRAS],[
 AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
 ])
 # End of AM_MINISIP_LIBTOOL_EXTRAS
+#
+
+# AM_MINISIP_ENABLE_DEBUG()
+# -------------------------
+AC_DEFUN([AM_MINISIP_ENABLE_DEBUG],[
+AC_ARG_ENABLE(debug,
+	AS_HELP_STRING([--enable-debug],
+		[enables debug output. (default disabled)]), [ 
+if test "${enable_debug}" = "yes"
+then
+	AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
+else
+	AC_DEFINE(NDEBUG, [], [No debug output])
+fi 
+		])
+	])
+# End of AM_MINISIP_ENABLE_DEBUG
 #
 
 dnl  =================================================================

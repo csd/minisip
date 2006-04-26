@@ -17,16 +17,7 @@ AM_MINISIP_PACKAGE_INIT
 AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
 
-dnl debug flag
-AC_ARG_ENABLE(debug,
-    AS_HELP_STRING([--enable-debug],
-        [enables debug output (default disabled)]),
-    [ if test "${enable_debug}" = "yes"
-      then
-        AC_DEFINE(DEBUG_OUTPUT, [], [Debug output])
-      else
-      	AC_DEFINE(NDEBUG, [], [No debug output])
-      fi ])
+AM_MINISIP_ENABLE_DEBUG
 
 dnl
 dnl IPv6 support
