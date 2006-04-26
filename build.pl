@@ -471,11 +471,7 @@ sub run_app_path {
 }
 
 %actions = (
-	bootstrap => sub {
-		my @m4_paths = map { "$topdir/$_/m4" } @packages;
-		my @bootstrap_args = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
-		act('bootstrap', './bootstrap', @bootstrap_args);
-	},
+	bootstrap => sub { act('bootstrap', './bootstrap') },
 	configure => sub { 
 		act('configure', "$srcdir/configure", configure_params()); 
 	},
@@ -579,6 +575,14 @@ $ENV{CXXFLAGS} .= "-Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
 $aclocaldir = "$installdir/usr/share/aclocal";
+
+sub aclocal_flags {
+	my @m4_paths = map { "$topdir/$_/m4" } @packages;
+	my @aclocal_flags = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
+	return join(' ', '', @aclocal_flags);
+}
+$ENV{ACLOCAL_FLAGS} ||= '';
+$ENV{ACLOCAL_FLAGS} .= aclocal_flags();
 
 # pkg-config search order (tries to find the "most recent copy"):
 #   1) Project directories

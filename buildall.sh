@@ -72,8 +72,8 @@ minisip_configure_params="$minisip_configure_params --enable-gtk"
 	#minisip_configure_params="$minisip_configure_params --enable-textui"
 	#Here you could have per gui-specific parameters ... 
 	
-# bootstrap needs to be given paths to m4 directories
-bootstrap_params=""
+# aclocal needs to be given paths to m4 directories
+aclocal_flags="${ACLOCAL_FLAGS}"
 
 for subdir in ${SUBDIRS}
 do
@@ -83,8 +83,7 @@ do
 		
 	cd ${subdir}
 
-	./bootstrap $bootstrap_params
-	bootstrap_params="$bootstrap_params -I ../${subdir}/m4"
+	ACLOCAL_FLAGS="$aclocal_flags" ./bootstrap
 	
 	configure_params="$base_configure_params"
 	
@@ -94,7 +93,8 @@ do
 		LOC_MUTIL_CFLAGS=-I$PWD/include
 		echo libmutil can use special params
 		configure_params="$configure_params $libmutil_configure_params"
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
@@ -103,7 +103,8 @@ do
 	if [ ${subdir} = "libmnetutil" ]; then 
 		LOC_MNETUTIL_LIBS=-L$PWD/.libs
 		LOC_MNETUTIL_CFLAGS=-I$PWD/include
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
@@ -112,7 +113,8 @@ do
 	if [ ${subdir} = "libmikey" ]; then 
 		LOC_MIKEY_LIBS=-L$PWD/.libs
 		LOC_MIKEY_CFLAGS=-I$PWD/include
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
@@ -121,7 +123,8 @@ do
 	if [ ${subdir} = "libmsip" ]; then 
 		LOC_MSIP_LIBS=-L$PWD/.libs
 		LOC_MSIP_CFLAGS=-I$PWD/include
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
@@ -134,7 +137,8 @@ do
 		LOC_LIBMINISIP_LIBS=-L$PWD/.libs
 		LOC_LIBMINISIP_CFLAGS=-I$PWD/include
 		configure_params_libminisip="$configure_params $libminisip_configure_params"
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
@@ -149,7 +153,8 @@ do
 	if [ ${subdir} = "minisip" ]; then 
 		echo minisip can also have special config params
 		configure_params_minisip="$configure_params $minisip_configure_params"
-		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
@@ -167,8 +172,11 @@ do
 	echo "configure_params (${subdir})= $configure_params"
 	echo "=========================================================="
 	
-	make $make_options
+	ACLOCAL_FLAGS="$aclocal_flags" \
+		make $make_options
 	
+	aclocal_flags="$aclocal_flags -I ../${subdir}/m4"
+
 	cd ..
 done
 
