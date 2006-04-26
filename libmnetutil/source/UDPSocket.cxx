@@ -39,8 +39,6 @@
 #endif
 
 #include<libmnetutil/IPAddress.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/IP6Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/massert.h>
 #include<stdlib.h>
@@ -84,7 +82,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 #else
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
 #endif
-#ifdef HAVE_STRUCT_SOCKADDR_IN6
+#ifdef HAVE_IPV6
 	if (use_ipv6){
 		struct sockaddr_in6 addr;
 		memset(&addr, 0, sizeof(addr));
@@ -97,7 +95,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 		}
 
 	}else
-#endif
+#endif // defined(HAVE_IPV6) && defined(HAVE_STRUCT_SOCKADDR_IN6)
 	{
 		struct sockaddr_in addr;
 		addr.sin_family=PF_INET;

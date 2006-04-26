@@ -1,8 +1,10 @@
-#include <libmnetutil/libmnetutil_config.h>
+#include <config.h>
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/IP4ServerSocket.h>
+#if HAVE_IPV6
 #include<libmnetutil/IP6Address.h>
 #include<libmnetutil/IP6ServerSocket.h>
+#endif
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>

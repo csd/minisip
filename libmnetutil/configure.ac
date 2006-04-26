@@ -18,19 +18,11 @@ AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
 
 AM_MINISIP_ENABLE_DEBUG
+AM_MINISIP_ENABLE_IPV6
 
-dnl
-dnl IPv6 support
-dnl
+dnl networking headers
 AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
-AC_CHECK_TYPES([struct sockaddr_in6],,,[
-#ifdef HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
-#ifdef HAVE_WS2TCPIP_H
-# include <ws2tcpip.h>
-#endif
-])
+AM_MINISIP_CHECK_IPV6
 
 dnl
 dnl mingw support

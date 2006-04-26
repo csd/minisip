@@ -26,7 +26,9 @@
 
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/IP4Address.h>
+#ifdef HAVE_IPV6
 #include<libmnetutil/IP6Address.h>
+#endif
 #include<libmnetutil/NetworkException.h>
 
 using namespace std;
@@ -56,10 +58,12 @@ MRef<IPAddress *> IPAddress::create( sockaddr * addr, int32_t addr_len ){
 	    addr_len >= (int32_t) sizeof(struct sockaddr_in)){
 		return new IP4Address( (sockaddr_in *)addr );
 	}
+#ifdef HAVE_IPV6
 	else if( addr->sa_family == AF_INET6 &&
 		 addr_len >= (int32_t)sizeof(struct sockaddr_in6)){
 		return new IP6Address( (sockaddr_in6 *)addr );
 	}
+#endif
 	// FIXME exception
 	else return NULL;
 }
@@ -69,11 +73,11 @@ MRef<IPAddress *> IPAddress::create(const string &addr){
 		return new IP4Address( addr );
 	} catch( HostNotFound & ){
 	}
-
+#ifdef HAVE_IPV6
 	try {
 		return new IP6Address( addr );
 	} catch( HostNotFound & ){
 	}
-
+#endif
 	return NULL;
 }

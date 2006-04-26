@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = . examples include m4 win32
+SUBDIRS = . examples include m4 tests win32
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmnetutil.spec
 
@@ -19,11 +19,17 @@ libmnetutil_la_LDFLAGS += -Wl,$(res_obj)
 libmnetutil_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
+ipv6_src =
+if HAVE_IPV6
+ipv6_src += \
+		    source/IP6Address.cxx \
+		    source/IP6ServerSocket.cxx
+endif
+
 mnetutil_src =      source/IPAddress.cxx \
 		    source/IP4Address.cxx \
 		    source/IP4ServerSocket.cxx \
-		    source/IP6Address.cxx \
-		    source/IP6ServerSocket.cxx \
+		    $(ipv6_src) \
 		    source/NetworkException.cxx \
 		    source/NetworkFunctions.cxx \
 		    source/ServerSocket.cxx \
