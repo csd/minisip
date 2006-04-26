@@ -37,7 +37,7 @@ class MPluginRegistry;
  * @author Erik Eliasson, eliasson@it.kth.se 
  */
 
-class LIBMUTIL_API MPlugin : public MObject{
+class LIBMUTIL_API MPlugin : public virtual MObject{
 	public:	
 		virtual ~MPlugin();
 		/**
