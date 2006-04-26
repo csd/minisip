@@ -29,17 +29,15 @@
 #include<vector>
 #include<libmutil/MemObject.h>
 #include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 #include<libminisip/soundcard/SoundDriver.h>
 
 /**
  * Registry of sound driver plugins.
  */
-class SoundDriverRegistry: public MPluginRegistry{
+class SoundDriverRegistry: public MPluginRegistry, public MSingleton<SoundDriverRegistry>{
 	public:
-		virtual ~SoundDriverRegistry();
-
 		virtual std::string getPluginType(){ return "SoundDriver"; }
-		static MRef<SoundDriverRegistry*> getInstance();
 		const std::vector<MRef<SoundDriver*> > &getDrivers() const;
 		std::vector<SoundDeviceName> getAllDeviceNames() const;
 
@@ -55,11 +53,9 @@ class SoundDriverRegistry: public MPluginRegistry{
 		bool unregisterDriver( MRef<SoundDriver*> driver );
 
 	protected:
-		SoundDriverRegistry();
 		void registerBuiltinDrivers();
 
 	private:
-		static MRef<SoundDriverRegistry *> instance;
 		std::vector< MRef<SoundDriver*> > drivers;
 };
 

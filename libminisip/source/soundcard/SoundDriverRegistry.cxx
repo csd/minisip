@@ -33,14 +33,6 @@
 
 using namespace std;
 
-MRef<SoundDriverRegistry *> SoundDriverRegistry::instance;
-
-SoundDriverRegistry::SoundDriverRegistry(){
-}
-
-SoundDriverRegistry::~SoundDriverRegistry(){
-}
-
 #ifdef DEBUG_OUTPUT
 static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 	std::vector<SoundDeviceName> names = instance->getAllDeviceNames();
@@ -54,21 +46,6 @@ static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 	}
 }
 #endif
-
-MRef<SoundDriverRegistry*> SoundDriverRegistry::getInstance(){
-	if( !instance ){
-		instance = new SoundDriverRegistry();
-
-#ifdef PORTAUDIO_SUPPORT
-// 		instance->registerDriver( new PortAudioDriver() );
-#endif
-#ifdef DEBUG_OUTPUT
-		dumpAllNames( instance );
-#endif
-	}
-
-	return instance;
-}
 
 const std::vector< MRef<SoundDriver*> > &SoundDriverRegistry::getDrivers() const{
 	return drivers;
