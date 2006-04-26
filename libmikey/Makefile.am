@@ -8,7 +8,8 @@ pkgconfig_DATA = libmikey.pc
 
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CXXFLAGS = $(MINISIP_CFLAGS)
-libmikey_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
+libmikey_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
+		
 libmikey_la_LIBADD =  $(MINISIP_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)

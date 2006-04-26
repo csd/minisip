@@ -12,7 +12,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libmutil.la
 libmutil_la_CXXFLAGS = $(PTHREAD_CFLAGS)
-libmutil_la_LDFLAGS = $(PTHREAD_CFLAGS) -no-undefined -version-info $(LT_VERSION_INFO)
+libmutil_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 libmutil_la_LIBADD = $(PTHREAD_LIBS) $(LIBLTDL)
 libmutil_la_DEPENDENCIES = $(LIBLTDL)
 libmutil_la_SOURCES = $(mutil_src)

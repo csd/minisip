@@ -2,35 +2,20 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
-AC_INIT(libmcrypto, 0.1, jobi@via.ecp.fr)
+
+m4_MINISIP_PACKAGE_VERSION(libmcrypto, mcrypto, 0, 3, 1)
+m4_MINISIP_PACKAGE_CONTACT([Zachary T Welch], [zw@superlucidity.net])
+m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
+
+AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
 AC_CONFIG_AUX_DIR(config)
-
-AM_INIT_AUTOMAKE(libmcrypto, 0.2)
-
+AM_INIT_AUTOMAKE(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION)
+AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(include/compilation_config.h)
+AM_MINISIP_PACKAGE_INIT
 
-dnl Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-AC_PROG_CPP
-dnl AC_PROG_LEX
-dnl AM_PROG_LEX
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_YACC
-dnl AC_PROG_RANLIB
+AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
-
-
-dnl STL
-dnl For now STL is made mandatory
-
-dnl AC_ARG_ENABLE(stl,
-dnl     [ --enable-stl enables the use of C++ STL (default disabled)],
-dnl     [ if test "${enable_stl}" = "yes"
-dnl       then
-        AC_DEFINE(USE_STL, [], [STL enabled])
-dnl       fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(debug,

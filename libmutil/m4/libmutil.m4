@@ -1,5 +1,97 @@
+dnl  =================================================================
+dnl                minisip configure initialization macros
+
+# m4_MINISIP_PACKAGE_VERSION(NAME, PREFIX, MAJOR, MINOR, MICRO)
+# -------------------------------------------------------------
+m4_define([m4_MINISIP_PACKAGE_VERSION],[
+		m4_define([$2_major_version], [$3])
+		m4_define([$2_minor_version], [$4])
+		m4_define([$2_micro_version], [$5])
+		m4_define([$2_version],
+			  [$2_major_version.$2_minor_version.$2_micro_version])
+		m4_define([MINISIP_PACKAGE_NAME],[$1])
+		m4_define([MINISIP_PACKAGE_PREFIX],[$2])
+		m4_define([MINISIP_PACKAGE_MACRO],m4_translit([$2],[a-z],[A-Z]))
+		m4_define([MINISIP_PACKAGE_VERSION],[$2_version])
+	])
+# End of m4_MINISIP_PACKAGE_VERSION
+#
+
+# m4_MINISIP_PACKAGE_CONTACT(NAME, EMAIL)
+# ---------------------------------------
+m4_define([m4_MINISIP_PACKAGE_CONTACT],[
+		m4_define([MINISIP_PACKAGE_CONTACT],[$1 <$2>])
+	])
+# End of m4_MINISIP_PACKAGE_CONTACT
+#
+
+# m4_MINISIP_LIBRARY_VERSION(CURRENT, REVISION, AGE)
+# --------------------------------------------------
+m4_define([m4_MINISIP_LIBRARY_VERSION],[
+		m4_define([lt_current], [$1])
+		m4_define([lt_revision], [$2])
+		m4_define([lt_age], [$3])
+		m4_define([lt_minus_age], m4_eval(lt_current - lt_age))
+	])
+# End of m4_MINISIP_LIBRARY_VESRION
+#
+
+# AM_MINISIP_PACKAGE_INIT()
+# -------------------------
+AC_DEFUN([AM_MINISIP_PACKAGE_INIT],[
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+case $host_os in
+     *mingw* )
+	     os_win=yes
+	     ;;
+esac
+AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
+
+dnl Checks for programs.
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+if test x$os_win = xyes; then
+    AC_CHECK_TOOL(WINDRES, [windres])
+    if test x$WINDRES = x; then
+        AC_MSG_ERROR([Could not find windres in your PATH.])
+    fi
+fi
+AC_C_BIGENDIAN
+AC_LANG(C++)
+dnl For now, STL is made mandatory
+dnl AC_ARG_ENABLE(stl,
+dnl	AS_HELP_STRING([--enable-stl],
+dnl		[enables the use of C++ STL (default enabled)]),
+dnl		[ 
+dnl		if test "${enable_stl}" = "yes"; then
+AC_DEFINE(USE_STL, [], [STL enabled])
+dnl		fi ])
+PKG_PROG_PKG_CONFIG
+])
+# End of AM_MINISIP_PACKAGE_INIT
+#
+
+dnl  =================================================================
+dnl               minisip configure check helper macros
+
+# AM_MINISIP_LIBTOOL_EXTRAS()
+# -------------------------
+AC_DEFUN([AM_MINISIP_LIBTOOL_EXTRAS],[
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
+])
+# End of AM_MINISIP_LIBTOOL_EXTRAS
+#
+
+dnl  =================================================================
+dnl               minisip `configure --with-m*` argument macros
+
 # AC_MINISIP_CHECK_WITH_ARG(MACRO, NAME, LIBS)
-# --------------------------------------
+# --------------------------------------------
 AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 		if test "x${withval}" = "xyes"; then
 			# proceed with default installation
@@ -34,7 +126,7 @@ Maybe you forgot to compile $2 first?
 #
 
 # AC_MINISIP_MAYBE_WITH_ARG(MACRO, WITHARG, NAME, TYPE, LIBS)
-# ----------------------------------------------------------------
+# -----------------------------------------------------------
 AC_DEFUN([AC_MINISIP_MAYBE_WITH_ARG],[
 		if test "x${withval}" = "no"; then
 			AC_MINISIP_$4_LIB($1, $3)
@@ -46,7 +138,7 @@ AC_DEFUN([AC_MINISIP_MAYBE_WITH_ARG],[
 #
 
 # AC_MINISIP_WITH_ARG(MACRO, WITHARG, NAME, VERSION, TYPE, LIBS)
-# ----------------------------------------------------------------
+# --------------------------------------------------------------
 AC_DEFUN([AC_MINISIP_WITH_ARG],[
 		AC_ARG_WITH($2,
 			AS_HELP_STRING([--with-$2=PATH], [location of $3]),
@@ -97,18 +189,52 @@ Please install the corresponding package.]) dnl
 # End of AC_MINISIP_CHECK_LIBRARY
 #
 
+dnl  =================================================================
+dnl                   minisip configure completion macros
+
+# AC_MINISIP_VERSION_SUBST(MACRO, PREFIX)
+# ---------------------------------------
+AC_DEFUN([AC_MINISIP_VERSION_SUBST], [
+		$1_MAJOR_VERSION=$2_major_version
+		$1_MINOR_VERSION=$2_minor_version
+		$1_MICRO_VERSION=$2_micro_version
+		AC_SUBST($1_MAJOR_VERSION) dnl
+		AC_SUBST($1_MINOR_VERSION) dnl
+		AC_SUBST($1_MICRO_VERSION) dnl
+	])
+# End of AM_MINISIP_VERSION_SUBST
+#
+
 # AC_MINISIP_CHECK_COMPLETE()
 # ---------------------------
 AC_DEFUN([AM_MINISIP_CHECK_COMPLETE],[ 
 		MINISIP_CFLAGS="-I\$(top_srcdir)/include ${MINISIP_CFLAGS}"
 		AC_SUBST(MINISIP_CFLAGS)
 		AC_SUBST(MINISIP_LIBS)
+		dnl process AM_MINISIP_PACKAGE_VERSION
+		AC_MINISIP_VERSION_SUBST( 
+			MINISIP_PACKAGE_MACRO,
+			MINISIP_PACKAGE_PREFIX) dnl
+		dnl process AM_MINISIP_LIBRARY_VERSION if it was invoked
+		if test x"lt_current" != "xlt_current"; then
+			LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+			LT_CURRENT_MINUS_AGE="lt_minus_age"
+			AC_SUBST(LT_VERSION_INFO) dnl
+			AC_SUBST(LT_CURRENT_MINUS_AGE) dnl
+			m_no_undef="-Wl,--no-undefined -no-undefined"
+			m_lt_version="-version-info ${LT_VERSION_INFO}"
+			MINISIP_LIBRARY_LDFLAGS="${m_no_undef} ${m_lt_version}"
+			AC_SUBST(MINISIP_LIBRARY_LDFLAGS) dnl
+		fi
 	])
 # End of AC_MINISIP_CHECK_COMPLETE
 #
 
+dnl  =================================================================
+dnl                          libmutil macros
+
 # AM_MINISIP_CHECK_LIBMUTIL(VERSION)
-# -------------------------------
+# ----------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[ 
 	AC_MINISIP_WITH_ARG(MUTIL, mutil, libmutil, $1, [REQUIRED])
 	AC_MINISIP_CHECK_LIBRARY(libmutil, libmutil_config.h, mutil)

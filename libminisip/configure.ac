@@ -3,69 +3,19 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
 
-m4_define([minisiplib_major_version], [0])
-m4_define([minisiplib_minor_version], [3])
-m4_define([minisiplib_micro_version], [1])
-m4_define([minisiplib_version],
-          [minisiplib_major_version.minisiplib_minor_version.minisiplib_micro_version])
+m4_MINISIP_PACKAGE_VERSION(libminisip, minisip, 0, 3, 1)
+m4_MINISIP_PACKAGE_CONTACT([Erik Eliasson], [eliasson@imit.kth.se])
+m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
 
-dnl
-dnl Libtool style version info
-dnl update before each new release 
-dnl See node "Updating version info::" in info libtool
-dnl
-m4_define([lt_current], [0])
-m4_define([lt_revision], [0])
-m4_define([lt_age], [0])
-
-AC_INIT(libminisip, [minisiplib_major_version.minisiplib_minor_version],
-        eliasson@imit.kth.se)
+AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
 AC_CONFIG_AUX_DIR(config)
-
-AM_INIT_AUTOMAKE(libminisip, [minisiplib_version])
+AM_INIT_AUTOMAKE(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
-
 AM_CONFIG_HEADER(include/compilation_config.h)
+AM_MINISIP_PACKAGE_INIT
 
-MINISIPLIB_MAJOR_VERSION=minisiplib_major_version
-MINISIPLIB_MINOR_VERSION=minisiplib_minor_version
-MINISIPLIB_MICRO_VERSION=minisiplib_micro_version
-LT_VERSION_INFO="lt_current:lt_revision:lt_age"
-LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
-AC_SUBST(MINISIPLIB_MAJOR_VERSION)
-AC_SUBST(MINISIPLIB_MINOR_VERSION)
-AC_SUBST(MINISIPLIB_MICRO_VERSION)
-AC_SUBST(LT_VERSION_INFO)
-AC_SUBST(LT_CURRENT_MINUS_AGE)
-
-AC_CANONICAL_HOST
-case $host_os in
-     *mingw* )
-	     os_win=yes
-	     ;;
-esac
-
-AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
-
-dnl Checks for programs.
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_LIBTOOL_WIN32_DLL
+AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
-AC_PROG_CPP
-AC_PROG_CXX
-PKG_PROG_PKG_CONFIG
-
-AC_C_BIGENDIAN
-
-AC_LANG(C++)
-
-if test x$os_win = xyes; then
-    AC_CHECK_TOOL(WINDRES, [windres])
-    if test x$WINDRES = x; then
-        AC_MSG_ERROR([Could not find windres in your PATH.])
-    fi
-fi
 
 dnl
 dnl Linker flags

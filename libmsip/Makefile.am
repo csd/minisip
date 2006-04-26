@@ -8,7 +8,7 @@ pkgconfig_DATA = libmsip.pc
 
 lib_LTLIBRARIES = libmsip.la
 libmsip_la_CPPFLAGS = $(MINISIP_CFLAGS)
-libmsip_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO)
+libmsip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 libmsip_la_LIBADD = $(MINISIP_LIBS)
 
 libmsip_la_SOURCES = $(msip_src)

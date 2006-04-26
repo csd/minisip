@@ -2,6 +2,7 @@ SUBDIRS = include m4
 
 lib_LTLIBRARIES = libmcrypto.la
 libmcrypto_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmcrypto
+libmcrypto_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 
 libmcrypto_la_SOURCES = source/certificate.cxx
 

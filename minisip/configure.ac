@@ -3,55 +3,18 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
 
-m4_define([minisip_major_version], [0])
-m4_define([minisip_minor_version], [7])
-m4_define([minisip_micro_version], [1])
-m4_define([minisip_version],
-          [minisip_major_version.minisip_minor_version.minisip_micro_version])
+m4_MINISIP_PACKAGE_VERSION(minisip, minisip_ui, 0, 7, 1)
+m4_MINISIP_PACKAGE_CONTACT([Erik Eliasson], [eliasson@imit.kth.se])
 
-AC_INIT(minisip, [minisip_major_version.minisip_minor_version], BUG-REPORT-ADDRESS)
+AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
 AC_CONFIG_AUX_DIR(config)
-
-AM_INIT_AUTOMAKE(minisip, [minisip_version])
+AM_INIT_AUTOMAKE(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
-
 AM_CONFIG_HEADER(include/compilation_config.h)
+AM_MINISIP_PACKAGE_INIT
 
-MINISIP_MAJOR_VERSION=minisip_major_version
-MINISIP_MINOR_VERSION=minisip_minor_version
-MINISIP_MICRO_VERSION=minisip_micro_version
-AC_SUBST(MINISIP_MAJOR_VERSION)
-AC_SUBST(MINISIP_MINOR_VERSION)
-AC_SUBST(MINISIP_MICRO_VERSION)
-
-AC_CANONICAL_HOST
-case $host_os in
-     *mingw* )
-	     os_win=yes
-	     ;;
-esac
-
-AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
-
-dnl Checks for programs.
-AC_PROG_CXX
-AC_PROG_CPP
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
+AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
-
-if test x$os_win = xyes; then
-    AC_CHECK_TOOL(WINDRES, [windres])
-    if test x$WINDRES = x; then
-        AC_MSG_ERROR([Could not find windres in your PATH.])
-    fi
-fi
-
-AC_C_BIGENDIAN
-
-AC_LANG(C++)
 
 dnl HACK: QT is compiled, unless GTK or textui is
 dnl Update: QT disabled for now
@@ -80,17 +43,8 @@ dnl Add linker flag to enable the stack trace
 
 LDFLAGS="${LDFLAGS} -rdynamic"
 
-
 dnl Check types
 AC_CHECK_TYPES([uint])
-
-dnl STL
-dnl AC_ARG_ENABLE(stl,
-dnl    [ --enable-stl enables the use of C++ STL (default disabled)],
-dnl    [ if test "${enable_stl}" = "yes"
-dnl      then
-        AC_DEFINE(USE_STL, [], [STL enabled])
-dnl      fi ])
 
 dnl debug flag
 AC_ARG_ENABLE(autocall,

@@ -15,8 +15,8 @@ lib_LTLIBRARIES = libminisip.la
 libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\" \
 		$(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS) $(X_CFLAGS)
 
-libminisip_la_LDFLAGS = -Wl,--no-undefined -no-undefined -version-info \
-		$(LT_VERSION_INFO) $(RELOC_LDFLAGS) $(AVCODEC_LDFLAGS)
+libminisip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) \
+		$(AVCODEC_LDFLAGS) $(RELOC_LDFLAGS) 
 
 libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS) $(DC1394_LIBS) \
 		$(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
