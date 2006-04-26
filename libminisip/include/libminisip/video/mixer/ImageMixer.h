@@ -36,7 +36,7 @@
 class LIBMINISIP_API ImageMixer : public ImageHandler, public MObject{
 	public:
 
-		ImageMixer::ImageMixer();
+		ImageMixer();
 
 		virtual bool handlesChroma( uint32_t chroma );
 		virtual void init( uint32_t width, uint32_t height );
