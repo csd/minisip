@@ -4,7 +4,7 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMNETUTIL],[
 	AC_REQUIRE([AM_MINISIP_CHECK_LIBMUTIL]) dnl
 dnl	AC_REQUIRE([AM_MINISIP_CHECK_LIBMCRYPTO]) dnl
 	AC_MINISIP_WITH_ARG(MNETUTIL, mnetutil, libmnetutil, $1, [REQUIRED])
-	AC_MINISIP_CHECK_LIBRARY(libmnetutil, libmnetutil_config.h, mnetutil)
+	AC_MINISIP_CHECK_LIBRARY(MNETUTIL, libmnetutil, libmnetutil_config.h, mnetutil)
   ])
 # End of AM_MINISIP_CHECK_LIBMNETUTIL
 #

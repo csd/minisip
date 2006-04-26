@@ -4,7 +4,7 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMINISIP],[
 	AC_REQUIRE([AM_MINISIP_CHECK_LIBMIKEY]) dnl
 	AC_REQUIRE([AM_MINISIP_CHECK_LIBMSIP]) dnl
 	AC_MINISIP_WITH_ARG(LIBMINISIP, minisip, libminisip, $1, [REQUIRED])
-	AC_MINISIP_CHECK_LIBRARY(libminisip, libminisip_config.h, minisip)
+	AC_MINISIP_CHECK_LIBRARY(LIBMINISIP, libminisip, libminisip_config.h, minisip)
   ])
 # End of AM_MINISIP_CHECK_LIBMINISIP
 #

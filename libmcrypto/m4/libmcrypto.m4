@@ -11,7 +11,7 @@ dnl if HAVE_GNUTLS
 dnl			-lgnutls
 dnl endif
 		])
-	AC_MINISIP_CHECK_LIBRARY(libmcrypto, config.h, mcrypto)
+	AC_MINISIP_CHECK_LIBRARY(MCRYPTO, libmcrypto, config.h, mcrypto)
   ])
 # End of AM_MINISIP_CHECK_LIBMCRYPTO
 #

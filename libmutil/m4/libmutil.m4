@@ -184,19 +184,19 @@ AC_DEFUN([AC_MINISIP_REQUIRED_LIB], [ dnl
 # End of AC_MINISIP_REQUIRED_LIB
 #
 
-# AC_MINISIP_CHECK_LIBRARY(NAME, HEADER, LIB)
-# -------------------------------------------
+# AC_MINISIP_CHECK_LIBRARY(MACRO, NAME, HEADER, LIB)
+# --------------------------------------------------
 AC_DEFUN([AC_MINISIP_CHECK_LIBRARY], [
 		save_CPPFLAGS="${CPPFLAGS}"
 		save_LIBS="${LIBS}"
-		CPPFLAGS="${MINISIP_CFLAGS} ${CPPFLAGS}"
-		LIBS="${MINISIP_LIBS} ${LIBS}"
-		AC_CHECK_HEADER([$1/$2],[],[
-			AC_MSG_ERROR([You need the $1 headers/library.
-Try installing the $1-devel package for your distribution."])])
+		CPPFLAGS="${$1_CFLAGS} ${CPPFLAGS}"
+		LIBS="${$1_LIBS} ${LIBS}"
+		AC_CHECK_HEADER([$2/$3],[],[
+			AC_MSG_ERROR([You need the $2 headers/library.
+Try installing the $2-devel package for your distribution."])])
 
-		AC_CHECK_LIB([$3], [main], [], [ dnl
-				AC_MSG_ERROR([Could not find $1. dnl
+		AC_CHECK_LIB([$4], [main], [], [ dnl
+				AC_MSG_ERROR([Could not find $2. dnl
 Please install the corresponding package.]) dnl
 			])
 				
@@ -255,7 +255,7 @@ dnl                          libmutil macros
 # ----------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[ 
 	AC_MINISIP_WITH_ARG(MUTIL, mutil, libmutil, $1, [REQUIRED])
-	AC_MINISIP_CHECK_LIBRARY(libmutil, libmutil_config.h, mutil)
+	AC_MINISIP_CHECK_LIBRARY(MUTIL, libmutil, libmutil_config.h, mutil)
   ])
 # End of AM_MINISIP_CHECK_LIBMUTIL
 #
