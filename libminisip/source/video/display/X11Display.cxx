@@ -197,11 +197,11 @@ void X11Display::createWindow(){
 
 void X11Display::destroyWindow(){
 	XSync( display, False );
-	fprintf( stderr, "Destroying video window\n");
+	mdbg << "Destroying video window" << end;
 	XDestroyWindow( display, videoWindow );
 	XFreeGC( display, gc );
 
-	fprintf( stderr, "Destroying base window\n");
+	mdbg << "Destroying base window" << end;
 	XUnmapWindow( display, baseWindow );
 	XDestroyWindow( display, baseWindow );
 	XCloseDisplay( display );
@@ -264,7 +264,7 @@ bool X11Display::handlesChroma( uint32_t chroma ){
 
 void X11Display::displayImage( MImage * mimage ){
 
-        fprintf( stderr, "Called X11Display::displayImage\n" );
+        mdbg << "Called X11Display::displayImage" << end;
 
 	XPutImage( display, videoWindow, gc,
                     (XImage*)(mimage->privateData),
@@ -288,7 +288,7 @@ void X11Display::handleEvents(){
 			StructureNotifyMask | KeyPressMask, &xEvent ) == True ){
 
 		if( xEvent.type == ConfigureNotify ){
-			fprintf( stderr, "Got ConfigureNotify event\n");
+			mdbg << "Got ConfigureNotify event" << end;
 			if( (uint32_t)xEvent.xconfigure.width 
 					!= baseWindowWidth ||
 			    (uint32_t)xEvent.xconfigure.height
@@ -301,7 +301,7 @@ void X11Display::handleEvents(){
 		}
 
 		else if( xEvent.type == KeyPress ){
-			fprintf( stderr, "KeyPressed event\n");
+			mdbg << "KeyPressed event" << end;
 			KeySym xKeySymbol;
 
 			xKeySymbol = XKeycodeToKeysym( display, xEvent.xkey.keycode, 0 );
