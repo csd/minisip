@@ -1,11 +1,40 @@
-SUBDIRS = include m4
+SUBDIRS = \
+	include \
+	m4 \
+	source \
+	tests
+#DIST_SUBDIRS = $(SUBDIRS) debian
 
+# 
+# start of libmcrypto.la rules
 lib_LTLIBRARIES = libmcrypto.la
-libmcrypto_la_CPPFLAGS = $(CPPFLAGS) -I../include/libmcrypto
-libmcrypto_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 
-libmcrypto_la_SOURCES = source/certificate.cxx
+BUILD_SRC =
+if OS_WIN
+BUILD_SRC += libmcrypto.cpp
+endif OS_WIN
 
+libmcrypto_la_SOURCES = $(BUILD_SRC)
+libmcrypto_la_CPPFLAGS = $(MINISIP_CFLAGS)
+libmcrypto_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) $(MINISIP_LIBS)
+libmcrypto_la_LIBADD = \
+	source/libmcrypto_core.la \
+	source/libmcrypto_imp.la
+
+if OS_WIN
+res_obj = win32/libmnetutil-res.o
+libmcrypto_la_LDFLAGS += -Wl,$(res_obj)
+libmnetutil_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
+
+# end of libmcrypto.la rules
+#
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libmcrypto.pc
+
+# maintainer rules
+ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
 MAINTAINERCLEANFILES = \
 	$(srcdir)/configure \
 	$(srcdir)/Makefile.in \
@@ -22,4 +51,3 @@ MAINTAINERCLEANFILES = \
 	$(srcdir)/config.guess \
 	$(srcdir)/config.sub \
 	$(srcdir)/ltmain.sh
-
