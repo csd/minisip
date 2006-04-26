@@ -45,7 +45,7 @@ struct cardBuffer{
 
 class ImageHandler;
 
-class LIBMINISIP_API V4LGrabber : public Grabber{
+class V4LGrabber : public Grabber{
 	public:
 		V4LGrabber( std::string device );
 
@@ -92,6 +92,23 @@ class LIBMINISIP_API V4LGrabber : public Grabber{
 
 		bool stopped;
 
+};
+
+
+class V4LPlugin : public GrabberPlugin{
+	public:
+		V4LPlugin( MRef<Library *> lib ) : GrabberPlugin( lib ){}
+
+		virtual MRef<Grabber *> create( const std::string &device ) const{
+			return new V4LGrabber( device );
+		}
+
+		virtual std::string getName() const { return "v4l"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "Video4linux grabber"; }
+		virtual std::string getMemObjectType() { return "V4LPlugin"; }
 };
 
 #endif

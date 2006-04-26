@@ -30,35 +30,51 @@
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/video/codec/AVDecoder.h>
 #include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/grabber/V4LGrabber.h>
-
-#ifdef DC1394_SUPPORT
-#include<libminisip/video/grabber/Dc1394Grabber.h>
+#ifdef HAVE_LINUX_VIDEODEV_H
+#include"V4LGrabber.h"
 #endif
 
 using namespace std;
 
 
+GrabberPlugin::GrabberPlugin( MRef<Library *> lib ){
+}
 
-MRef<Grabber *> Grabber::create( string device ){
+GrabberPlugin::~GrabberPlugin(){
+}
+
+
+GrabberRegistry::GrabberRegistry(){
+#ifdef HAVE_LINUX_VIDEODEV_H
+	registerPlugin( new V4LPlugin( NULL ) );
+#endif
+}
+
+MRef<Grabber *> GrabberRegistry::createGrabber( string device ){
 	MRef<Grabber *> result;
         try{
+		size_t pos = device.find(':');
+		string name;
+		string dev;
 
-#ifdef DC1394_SUPPORT
-	if( device.substr( 0, 3 ) == "fw:" ){
-		uint32_t portId = atoi( device.substr( 3, 1 ).c_str() );
-		uint32_t cameraId = atoi( device.substr( 5, 1 ).c_str() );
-		
-		Dc1394Grabber * dc1394Grabber = new Dc1394Grabber( portId, cameraId );
-		result = (Grabber *)dc1394Grabber;
-		return result;
-	}
-#endif
+		if( pos == string::npos ){
+			name = "v4l";
+			dev = device;
+		}
+		else{
+			name = device.substr( 0, pos );
+			dev = device.substr( pos + 1 );
+		}
 
-	if( device != "" ){
-		V4LGrabber * v4lGrabber = new V4LGrabber( device );
-		result = (Grabber*)v4lGrabber;
-	}
+		MRef<MPlugin *> plugin = findPlugin( name );
+
+		if( !plugin ) {
+			merr << "GrabberRegistry: " << name << " grabber not found " << end;
+			return NULL;
+		}
+
+		MRef<GrabberPlugin *> gPlugin = dynamic_cast<GrabberPlugin *>(*plugin);
+		result = gPlugin->create( dev );
         }
         catch( VideoException & exc ){
                 merr << exc.error() << end;
@@ -67,3 +83,4 @@ MRef<Grabber *> Grabber::create( string device ){
 
 	return result;
 }
+

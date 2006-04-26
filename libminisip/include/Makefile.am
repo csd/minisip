@@ -104,8 +104,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/stun/STUNMessage.h \
 			libminisip/stun/STUNAttributes.h \
 			libminisip/video/mixer/ImageMixer.h \
-			libminisip/video/grabber/Dc1394Grabber.h \
-			libminisip/video/grabber/V4LGrabber.h \
 			libminisip/video/grabber/Grabber.h \
 			libminisip/video/display/VideoDisplay.h \
 			libminisip/video/display/X11Display.h \

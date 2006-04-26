@@ -77,7 +77,7 @@ void MediaHandler::init(){
 	media.clear();
 
 #ifdef VIDEO_SUPPORT
-	MRef<Grabber *> grabber = Grabber::create( config->videoDevice );
+	MRef<Grabber *> grabber = GrabberRegistry::getInstance()->createGrabber( config->videoDevice );
 	MRef<VideoCodec *> videoCodec = new VideoCodec();
 	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
 	MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );

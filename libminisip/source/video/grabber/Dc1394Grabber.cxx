@@ -22,7 +22,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/video/grabber/Dc1394Grabber.h>
+#include"Dc1394Grabber.h"
 #include<libminisip/video/ImageHandler.h>
 #include<libminisip/video/VideoMedia.h>
 #include<libminisip/video/VideoException.h>
@@ -38,6 +38,25 @@
 
 
 using namespace std;
+
+
+static std::list<std::string> pluginList;
+static MRef<MPlugin *> plugin;
+
+
+extern "C"
+std::list<std::string> *mdc1394_LTX_listPlugins( MRef<Library*> lib ){
+	pluginList.push_back("getPlugin");
+	plugin = new Dc1394Plugin( lib );
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> *mdc1394_LTX_getPlugin( MRef<Library*> lib ){
+	return &plugin;
+}
+
 
 static void yuv422_to_yuv420p(MData *dst, const MData *src,
                               int width, int height, int downsamplingFactor);
@@ -319,7 +338,9 @@ static void yuv422_to_yuv420p(MData *dst, const MData *src,
 }
 
 
-
-
-
-
+MRef<Grabber *> Dc1394Plugin::create( const std::string &device ) const{
+	uint32_t portId = atoi( device.substr( 0, 1 ).c_str() );
+	uint32_t cameraId = atoi( device.substr( 2, 1 ).c_str() );
+		
+	return new Dc1394Grabber( portId, cameraId );
+}

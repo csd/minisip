@@ -30,13 +30,14 @@
 #include<libminisip/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/MSingleton.h>
+#include<libmutil/MPlugin.h>
 #include<libmutil/Thread.h>
 
 class ImageMixer;
 
 class LIBMINISIP_API Grabber : public Runnable{
 	public:
-		static MRef<Grabber *> create( std::string device );
 		virtual void open()=0;
 		virtual void getCapabilities()=0;
 		virtual void getImageFormat()=0;
@@ -53,6 +54,30 @@ class LIBMINISIP_API Grabber : public Runnable{
 
 		virtual std::string getMemObjectType(){return "Grabber";}
 		
+};
+
+class LIBMINISIP_API GrabberPlugin : public MPlugin{
+	public:
+		GrabberPlugin( MRef<Library *> lib );
+		virtual ~GrabberPlugin();
+
+		virtual std::string getPluginType() const{
+			return "Grabber";
+		}
+
+		virtual MRef<Grabber *> create( const std::string &device ) const = 0;
+};
+
+class LIBMINISIP_API GrabberRegistry: public MPluginRegistry, public MSingleton<GrabberRegistry>{
+	public:
+		virtual std::string getPluginType(){ return "Grabber"; }
+
+		MRef<Grabber*> createGrabber( std::string deviceName );
+
+	protected:
+		GrabberRegistry();
+
+		friend class MSingleton<GrabberRegistry>;
 };
 
 #endif

@@ -18,11 +18,12 @@ libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\" \
 libminisip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) \
 		$(AVCODEC_LDFLAGS) $(RELOC_LDFLAGS) 
 
-libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS) $(DC1394_LIBS) \
+libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS) \
 		$(SDL_LIBS) $(X_EXTRA_LIBS) $(X_LIBS)
 
 plugins_LTLIBRARIES =
 
+plugins_LDFLAGS = -Wl,--no-undefined -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
 
 if AEC_SUPPORT
         libaec_src = source/aec/aec.cxx
@@ -41,7 +42,7 @@ libcodec_g711_src = source/codecs/G711CODEC.cxx \
 			source/codecs/g711/codec_g711.h
 
 plugins_LTLIBRARIES += mg711.la
-mg711_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mg711_la_LDFLAGS = $(plugins_LDFLAGS)
 mg711_la_SOURCES = $(libcodec_g711_src)
 mg711_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 
@@ -100,7 +101,7 @@ libcodec_ilbc_src = source/codecs/ILBCCODEC.cxx \
 			source/codecs/ilbc/FrameClassify.h
 
 plugins_LTLIBRARIES += milbc.la
-milbc_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+milbc_la_LDFLAGS = $(plugins_LDFLAGS)
 milbc_la_SOURCES = $(libcodec_ilbc_src)
 milbc_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 
@@ -110,7 +111,7 @@ milbc_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 #
 if HAS_SPEEX
 plugins_LTLIBRARIES += mspeex.la
-mspeex_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mspeex_la_LDFLAGS = $(plugins_LDFLAGS)
 mspeex_la_SOURCES = source/codecs/SPEEXCODEC.cxx source/codecs/SPEEXCODEC.h
 mspeex_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SPEEX_LIBS)
 endif
@@ -121,9 +122,9 @@ endif
 #
 if HAS_GSM
 plugins_LTLIBRARIES += mgsm.la
-mgsm_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mgsm_la_LDFLAGS = $(plugins_LDFLAGS)
 mgsm_la_SOURCES = source/codecs/GsmCodec.cxx source/codecs/GsmCodec.h
-mgsm_la_LIBADD = libminisip.la $(GSM_LIBS)
+mgsm_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GSM_LIBS)
 endif
 
 
@@ -264,7 +265,7 @@ endif DIRECT_SOUND
 #
 if PORTAUDIO_SUPPORT
 plugins_LTLIBRARIES += mportaudio.la
-mportaudio_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mportaudio_la_LDFLAGS = $(plugins_LDFLAGS)
 mportaudio_la_SOURCES = $(PORTAUDIO_SRC)
 mportaudio_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(PORTAUDIO_LIBS)
 endif PORTAUDIO_SUPPORT
@@ -293,9 +294,15 @@ endif
         grabber_src = source/video/grabber/Grabber.cxx
 if V4L_VIDEO_GRABBER
         grabber_src += source/video/grabber/V4LGrabber.cxx
+			source/video/grabber/V4LGrabber.h
 endif
+
 if DC1394_VIDEO_GRABBER
-        grabber_src += source/video/grabber/Dc1394Grabber.cxx
+plugins_LTLIBRARIES += mdc1394.la
+mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)
+mdc1394_la_SOURCES = source/video/grabber/Dc1394Grabber.cxx
+			source/video/grabber/Dc1394Grabber.h
+mdc1394_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(DC1394_LIBS)
 endif
 
         mixer_src = source/video/mixer/ImageMixer.cxx
@@ -344,7 +351,7 @@ libconference_src = source/conference/ConferenceControl.cxx \
 libconfigbackend_src = source/configbackend/ConfBackend.cxx
 
 plugins_LTLIBRARIES += mxmlconf.la
-mxmlconf_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mxmlconf_la_LDFLAGS = $(plugins_LDFLAGS)
 mxmlconf_la_SOURCES = source/configbackend/MXmlConfBackend.cxx \
 			source/configbackend/MXmlConfBackend.h
 mxmlconf_la_LIBADD = libminisip.la $(MUTIL_LIBS)
@@ -359,10 +366,10 @@ endif
 if GCONF_SUPPORT
 plugins_LTLIBRARIES += mgconf.la
 mgconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(GCONF_CFLAGS)
-mgconf_la_LDFLAGS = -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
+mgconf_la_LDFLAGS = $(plugins_LDFLAGS)
 mgconf_la_SOURCES = source/configbackend/GConfBackend.cxx \
 			source/configbackend/GConfBackend.h
-mgconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GCONF_LIBS)
+mgconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GCONF_LIBS) $(GOBJECT_LIBS)
 endif
 
 libminisip_la_SOURCES = source/Minisip.cxx \

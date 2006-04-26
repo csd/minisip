@@ -38,7 +38,7 @@
 
 class ImageHandler;
 
-class LIBMINISIP_API Dc1394Grabber : public Grabber{
+class Dc1394Grabber : public Grabber{
 	public:
 		Dc1394Grabber( uint32_t portId, uint32_t cameraId );
 
@@ -78,6 +78,22 @@ class LIBMINISIP_API Dc1394Grabber : public Grabber{
 		bool handlerProvidesImage;
 
 		MImage * oldImage;
+
+};
+
+class Dc1394Plugin : public GrabberPlugin{
+	public:
+		Dc1394Plugin( MRef<Library *> lib ) : GrabberPlugin( lib ){}
+
+		virtual MRef<Grabber *> create( const std::string &device ) const;
+
+		virtual std::string getMemObjectType() { return "Dc1394Plugin"; }
+
+		virtual std::string getName() const { return "fw"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "Video4linux grabber"; }
 
 };
 

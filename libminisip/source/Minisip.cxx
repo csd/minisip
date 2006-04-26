@@ -74,6 +74,9 @@
 #include<libminisip/conference/ConfMessageRouter.h>
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/codecs/Codec.h>
+#ifdef VIDEO_SUPPORT
+#include<libminisip/video/grabber/Grabber.h>
+#endif
 
 #include<stdlib.h>
 
@@ -103,6 +106,9 @@ static void loadPlugins(){
 	SoundDriverRegistry::getInstance();
 	AudioCodecRegistry::getInstance();
 	ConfigRegistry::getInstance();
+#ifdef VIDEO_SUPPORT
+	GrabberRegistry::getInstance();
+#endif
 
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
 
