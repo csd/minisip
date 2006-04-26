@@ -226,5 +226,18 @@ void SdlDisplay::handleEvents(){
 			}
 			break;
 		}
+		else if( event.type == SDL_VIDEORESIZE ){
+			//XSync( display, false );
+			baseWindowWidth = event.resize.w;
+			baseWindowHeight = event.resize.h;
+
+			SDL_UnlockSurface( surface );
+			SDL_FreeSurface( surface );
+			surface = SDL_SetVideoMode( baseWindowWidth, 
+				baseWindowHeight, bpp, flags);
+//			initWm();
+			SDL_LockSurface( surface );	
+		}
+
 	}
 }
