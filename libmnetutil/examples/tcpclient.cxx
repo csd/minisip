@@ -1,11 +1,9 @@
-
-#define OPENSSL_NO_KRB5
-
+/* tcpclient - distributed with @PACKAGE@-@PACKAGE_VERSION@ */
 #include<libmnetutil/TCPSocket.h> 
-
 #include<libmnetutil/NetworkException.h> //ConnectFailed && HostNotFound
-
 #include<libmutil/trim.h>  //removes whitespace from start and end of strings
+
+using namespace std;
 
 int main(int argc, char **argv){
 

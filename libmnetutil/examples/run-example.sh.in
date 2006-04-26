@@ -1,0 +1,12 @@
+#!/bin/bash -i
+
+export LD_LIBRARY_PATH=@libdir@
+
+echo ---------------------------------------
+echo A new shell has just been started, with
+echo LD_LIBRARY_PATH set to the proper path.
+echo When you are done running the examples,
+echo use 'exit' or '^D' to leave this shell.
+echo ---------------------------------------
+
+${SHELL}

@@ -1,11 +1,10 @@
-
-#define OPENSSL_NO_KRB5
-
+/* tcpclient - distributed with @PACKAGE@-@PACKAGE_VERSION@ */
 #include<libmnetutil/IP4ServerSocket.h> 
-
 #include<libmutil/trim.h>  //removes whitespace from start and end of strings
 
 #define SERVER_PORT 3333   //This defines the port number that the server will open
+
+using namespace std;
 
 int main(int argc, char **argv){
 

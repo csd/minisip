@@ -1,0 +1,5 @@
+#!/bin/bash -x
+
+for i in @EXAMPLES@; do
+	gcc @MINISIP_CFLAGS@ @MINISIP_LIBS@ -o ${i%.cpp} $i
+done
