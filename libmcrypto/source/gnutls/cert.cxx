@@ -22,12 +22,11 @@
 
 
 #include<config.h>
-#include<iostream>
 
+#include<libmcrypto/gnutls/cert.h>
 #include<gnutls/openssl.h>
 
-#include<libmcrypto/certificate.h>
-
+#include<iostream>
 
 using namespace std;
 
