@@ -280,15 +280,31 @@ die list_targets() if $list_targets;
 #######
 # cross-compiling support
 
-sub cross_compiling { return $buildspec ne $hostspec }
-sub __detect { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
-sub autodetect_buildspec { __detect($buildspec, sub { 'x86-pc-linux-gnu' }) }
-sub autodetect_hostspec { __detect($hostspec, sub { autodetect_buildspec() }) }
+my $arch_class;
+sub cur_arch_class { $arch_class }
+sub set_arch_callbacks { 
+	my %funcs = @_;
+	my @funcs = map { $arch_class . '_' . $_ => $funcs{$_} } keys %funcs;
+	set_callbacks('arch', @funcs); 
+}
+sub set_arch_detect { set_callback(qw( arch detect ), $_[0]) }
+sub arch_detect { run_callback(qw( arch detect )) }
 
-$buildspec = autodetect_buildspec();
-$hostspec = autodetect_hostspec();
-die "$hostspec-gcc not found." 
-	if cross_compiling() && ! -x "/usr/bin/$hostspec-gcc";
+sub cross_compiling { return $buildspec ne $hostspec }
+sub autodetect_platform { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
+$buildspec = autodetect_platform($buildspec, sub { 'x86-pc-linux-gnu' });
+$hostspec = autodetect_platform($hostspec, sub { $buildspec });
+ 
+$arch_class = 'build';
+my $buildarch = autodetect_probe('arch', 'autodetect', $buildspec);
+$arch_class = 'host';
+my $hostarch = autodetect_probe('arch', 'autodetect', $hostspec);
+#$arch_class = 'target';
+#my $targetarch = autodetect_probe('arch', $targetspec);  # XXX: insanity!
+ 
+# do an early check for cross-compiler, if one will be required
+my ( $cross_compiler ) = grep { -x "$_/$hostspec-gcc" } split(':', $ENV{PATH});
+die "$hostspec-gcc not found." if !$cross_compiler && cross_compiling();
 
 # set-up paths
 my $top_builddir = $builddir || "$topdir/build";
@@ -439,25 +455,27 @@ sub remove_files {
 # autodetection helpers
 
 sub autodetect_probe_path {
-	my ( $type, $setting ) = @_;
+	my ( $type, $setting, $hint ) = @_;
 	return $setting unless $setting eq 'autodetect';
 	# probes can factor multiple scores, allow configurations to be 
 	#  selected by more than one criteria.
 	my %scores = ( );
 	for my $dir ( bsd_glob("$confdir/$type/*") ) {
 		my $file = "$dir/detect.pl";
+		print "+Looking for $type called $dir...\n" if $verbose;
 		next unless load_file_if_exists($file);
+		print "+Probing the $type called $dir...\n" if $verbose;
 		no strict 'refs';
 		my $f = $type . '_detect';
-		$scores{basename($dir)} = eval "$f()";
+		$scores{basename($dir)} = eval "$f()" for $hint;
 	}
 	# pick the top scoring probe
 	( $setting ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
 	return $setting;
 } 
 sub autodetect_probe {
-	my ( $type, $setting ) = @_;
-	( $setting ) = autodetect_probe_path($type, $setting);
+	my ( $type, $setting, $hint ) = @_;
+	( $setting ) = autodetect_probe_path($type, $setting, $hint);
 	my $xconfdir = "$confdir/$type/$setting";
 	my $conf = "$xconfdir/$type.pl";
 	if (load_file_if_exists($conf)) {
