@@ -428,16 +428,16 @@ sub remove_files {
 # autodetection helpers
 
 sub autodetect_probe_path {
-	my ( $prefix, $setting ) = @_;
+	my ( $type, $setting ) = @_;
 	return $setting unless $setting eq 'autodetect';
 	# probes can factor multiple scores, allow configurations to be 
 	#  selected by more than one criteria.
 	my %scores = ( );
-	for my $dir ( bsd_glob("$confdir/$prefix/*") ) {
+	for my $dir ( bsd_glob("$confdir/$type/*") ) {
 		my $file = "$dir/detect.pl";
 		next unless load_file_if_exists($file);
 		no strict 'refs';
-		my $f = $prefix . '_detect';
+		my $f = $type . '_detect';
 		$scores{basename($dir)} = eval "$f()";
 	}
 	# pick the top scoring probe
@@ -445,19 +445,19 @@ sub autodetect_probe_path {
 	return $setting;
 } 
 sub autodetect_probe {
-	my ( $prefix, $setting ) = @_;
-	( $setting ) = autodetect_probe_path($prefix, $setting);
-	my $xconfdir = "$confdir/$prefix/$setting";
-	my $conf = "$xconfdir/$prefix.pl";
+	my ( $type, $setting ) = @_;
+	( $setting ) = autodetect_probe_path($type, $setting);
+	my $xconfdir = "$confdir/$type/$setting";
+	my $conf = "$xconfdir/$type.pl";
 	if (load_file_if_exists($conf)) {
-		print "+Using '$prefix' functions '$setting'\n:" .
+		print "+Using '$type' functions '$setting'\n:" .
 			"\t$conf\n" if $verbose;
-		load_file_if_exists("$xconfdir/$prefix.conf");
-		load_file_if_exists("$xconfdir/$prefix.local");
+		load_file_if_exists("$xconfdir/$type.conf");
+		load_file_if_exists("$xconfdir/$type.local");
 	} else {
 		warn <<NOCODE unless $quiet;
-warning: The '$prefix.pl' script does not exist for '$setting'.
-warning: '$prefix' actions will be disabled until one is created!
+warning: The '$type.pl' script does not exist for '$setting'.
+warning: '$type' actions will be disabled until one is created!
 NOCODE
 	} 
 	return $setting;
@@ -471,17 +471,17 @@ my %callbacks;
 sub get_extended_actions { map { %$_ } values %callbacks }
 
 sub set_callbacks {
-	my ( $prefix, %newfuncs ) = @_;
-	$callbacks{$prefix} = {} unless exists $callbacks{$prefix};
-	$callbacks{$prefix}->{$_} = $newfuncs{$_} for keys %newfuncs;
+	my ( $type, %newfuncs ) = @_;
+	$callbacks{$type} = {} unless exists $callbacks{$type};
+	$callbacks{$type}->{$_} = $newfuncs{$_} for keys %newfuncs;
 	return 1;
 }
 sub set_callback { $callbacks{$_[0]}->{$_[1]} = $_[2] }
 sub set_default_callback {
-	my ( $prefix, $callback, $func ) = @_;
-	return unless exists $callbacks{$prefix};
-	return if exists $callbacks{$prefix}->{$callback};
-	return set_callback($prefix, $callback, $func);
+	my ( $type, $callback, $func ) = @_;
+	return unless exists $callbacks{$type};
+	return if exists $callbacks{$type}->{$callback};
+	return set_callback($type, $callback, $func);
 }
 sub run_callback { $callbacks{$_[0]}->{$_[1]}->(@_) }
  
