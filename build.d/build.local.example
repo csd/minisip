@@ -87,7 +87,8 @@ $toggle_batch = 1;
 # 		);
 
 ## override libmcrypt configure parameters
-# set_configure_param('libmcrypt', 
+# set_configure_param('libmcrypto', 
+# 			'fast-aes' => 1,
 # 			openssl => '/path/to/openssl',
 # 			gnutls => '/path/to/gnutls',
 # 		);
