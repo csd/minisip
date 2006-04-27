@@ -163,7 +163,7 @@ $quiet = 0 if $pretend;
 
 # guess number of jobs
 # XXX: will not work for all platforms; needs revisiting, but okay for now
-$njobs = `grep processor /proc/cpuinfo | wc -l` unless $njobs;
+$njobs = `grep ^processor /proc/cpuinfo | wc -l` unless $njobs;
 
 # extra arguments to pass to make
 my @make_args = ();
