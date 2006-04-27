@@ -518,7 +518,7 @@ sub run_app_path {
 		 # XXX: This needs to be generalized, but it works for now.
 		 #  For what it's worth, it is "equivalent" to the old .sh
 		return unless $pkg eq 'minisip';
-		$ENV{LD_LIBRARY_PATH} = "$destdir$prefix/lib";
+		$ENV{LD_LIBRARY_PATH} = join(':', ( map { "$builddir/$_/.libs" } @packages )) . "$destdir$prefix/lib";
 		act('run', run_app_path());
 	},
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
