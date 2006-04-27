@@ -77,6 +77,7 @@ $toggle_batch = 1;
 # set_global_configure_param(
 # 			debug => 1,
 # 			shared => 0,
+# 			static => 1,
 # 		);
 
 ## override libmutil configure parameters
