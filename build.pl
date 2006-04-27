@@ -463,37 +463,55 @@ NOCODE
 	return $setting;
 }
 
+#########
+# Generic callback support
+
+my %callbacks;
+
+sub get_extended_actions { map { %$_ } values %callbacks }
+
+sub set_callbacks {
+	my ( $prefix, %newfuncs ) = @_;
+	$callbacks{$prefix} = {} unless exists $callbacks{$prefix};
+	$callbacks{$prefix}->{$_} = $newfuncs{$_} for keys %newfuncs;
+	return 1;
+}
+sub set_callback { $callbacks{$_[0]}->{$_[1]} = $_[2] }
+sub set_default_callback {
+	my ( $prefix, $callback, $func ) = @_;
+	return unless exists $callbacks{$prefix};
+	return if exists $callbacks{$prefix}->{$callback};
+	return set_callback($prefix, $callback, $func);
+}
+sub run_callback { $callbacks{$_[0]}->{$_[1]}->(@_) }
+ 
+ 
 ########
 # Target/host distribution support
 
-my %distfuncs;
-sub set_dist_callbacks { 
-	my %newfuncs = @_; 
-	$distfuncs{$_} = $newfuncs{$_} for keys %newfuncs;
-	return 1;
-} 
-sub set_dist_detect { $distfuncs{detect} = shift }
-sub dist_detect { $distfuncs{detect}->() }
+sub set_dist_callbacks { set_callbacks('dist', @_) }
+sub set_dist_detect { set_callback(qw( dist detect ), $_[0]) }
+sub dist_detect { run_callback(qw( dist detect )) }
 
 # probe the given hostdist; load its configuration files
 $hostdist = autodetect_probe('dist', $hostdist);
 
 # create standard dist accessor implementations
-$distfuncs{packages} = sub { 
+set_default_callback(qw( dist packages ), sub { 
 		list_files("$hostdist: $pkg packages: ", dist_pkgfiles()) 
-	} unless exists $distfuncs{packages};
-$distfuncs{pkgclean} = sub { 
+	});
+set_default_callback(qw( dist pkgclean ), sub { 
 		remove_files("$hostdist package", dist_pkgfiles()) 
-	} unless exists $distfuncs{pkgclean};
+	});
 
 # provide debuggable defaults and automatic accessors
 for my $f ( @dist_actions, qw( pkgfiles ) ) {
-	$distfuncs{$f} = sub {
+	set_default_callback('dist', $f, sub {
 			die "+BUG: unable to $f packages under '$hostdist'\n"
-		} unless exists $distfuncs{$f};
+		});
 	no strict 'refs';
 	my $callback = "dist_$f";
-	*$callback = sub { return $distfuncs{$f}->(@_) };
+	*$callback = sub { return run_callback('dist', $f, @_) };
 }
 
 ######
@@ -506,6 +524,7 @@ sub run_app_path {
 }
 
 %actions = (
+	get_extended_actions(),
 	bootstrap => sub { act('bootstrap', './bootstrap') },
 	configure => sub { 
 		act('configure', "$srcdir/configure", configure_params()); 
@@ -525,7 +544,6 @@ sub run_app_path {
 	tarclean => sub { remove_files("tarballs", distfiles()); },
 	dist => sub { act('distribution', 'make', @make_args, 'dist'); },
 	distcheck => sub { act('distcheck', 'make', @make_args, 'distcheck'); },
-	%distfuncs,
 	clean => sub { act('cleanup', 'make', 'clean'); }, 
 	dclean => sub { act('distribution cleanup', 'make', 'distclean'); },
 	mclean => sub { act('developer cleanup', 'make', 'maintainer-clean'); },
