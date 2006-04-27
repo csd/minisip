@@ -26,6 +26,8 @@ our $topdir = getcwd();	# path to common source directory (svn trunk)
 our $confdir = undef;	# path to common build.d directory
 our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
+our $prefix = undef;	# installation prefix directory
+our $destdir = "";	# destination installation directory
 
 my $bindir = undef;	#   path to installed executables
 my $libdir = undef;	#   path to installed libraries
@@ -101,6 +103,8 @@ Directory Options:
 			(currently: $topdir/build)
     -I|--installdir=...	Select common install directory (sets --prefix).
 	                (currently: $topdir/install)
+    -P|--prefix=...	Select install prefix (overrides installdir)
+       --destdir=...	Select destination install directory
 
 Distribution Merge Options:
     -D|--distro=...	Sets package manager features (default: $hostdist)
@@ -125,6 +129,8 @@ my $result = GetOptions(
 		"confdir|C=s" => \$confdir,
 		"builddir|B=s" => \$builddir,
 		"installdir|I=s" => \$installdir,
+		"destdir=s" => \$destdir,
+		"prefix|P=s" => \$prefix,
 		"distro|D=s" => \$hostdist,
 		"app|A=s" => \$_run_app,
 
@@ -282,7 +288,10 @@ my $top_builddir = $builddir || "$topdir/build";
 $builddir = "$top_builddir/$hostspec";
 my $top_installdir = $installdir || "$topdir/install";
 $installdir = "$top_installdir/$hostspec";
-$bindir = "$installdir/usr/bin";
+$prefix = $prefix || "$installdir/usr";
+$bindir = "$destdir$prefix/bin";
+
+push @make_args, "DESTDIR=$destdir" if $destdir ne '';
 
 #######
 # process action and target arguments
@@ -388,7 +397,7 @@ sub configure_params {
 	my $spec = $configure_params{$pkg};
 	my @spec = ( 
 			"--srcdir=$srcdir", 
-			"--prefix=$installdir/usr",
+			"--prefix=$prefix",
 			_feature_configure_params($spec),
 			_package_configure_params($spec),
 		);
@@ -493,7 +502,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 sub run_app_path {
 	die "error: No application was specified in build.local or with -A.\n"
 		unless $run_app;
-	return $installdir . $run_app;
+	return $destdir . $prefix . '/bin/' . $run_app;
 }
 
 %actions = (
@@ -509,7 +518,7 @@ sub run_app_path {
 		 # XXX: This needs to be generalized, but it works for now.
 		 #  For what it's worth, it is "equivalent" to the old .sh
 		return unless $pkg eq 'minisip';
-		$ENV{LD_LIBRARY_PATH} = "$installdir/usr/lib";
+		$ENV{LD_LIBRARY_PATH} = "$destdir$prefix/lib";
 		act('run', run_app_path());
 	},
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
@@ -583,24 +592,24 @@ $run_app = $_run_app if defined $_run_app;
 if ($verbose) {
 	print "+Top directory: $topdir\n";
 	print "+Build directory: $builddir\n";
-	print "+Install directory: $installdir\n";
+	print "+Install directory: $destdir$prefix\n";
 }
 
 # setup common environment
 #  LDFLAGS: add local install library path
 $ENV{LDFLAGS} ||= '';
-$libdir = "$installdir/usr/lib";
+$libdir = "$destdir$prefix/lib";
 $ENV{LDFLAGS} .= " -L$libdir";
 #  CPPFLAGS: add local install include path (XXX: needed?)
 $ENV{CPPFLAGS} ||= '';
-$includedir = "$installdir/usr/include";
+$includedir = "$destdir$prefix/include";
 $ENV{CPPFLAGS} .= " -I$includedir ";
 #  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= " -Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
-$aclocaldir = "$installdir/usr/share/aclocal";
+$aclocaldir = "$destdir$prefix/share/aclocal";
 
 sub aclocal_flags {
 	my @m4_paths = map { "$topdir/$_/m4" } @packages;
@@ -614,7 +623,7 @@ $ENV{ACLOCAL_FLAGS} .= aclocal_flags();
 #   1) Project directories
 #   2) Local install directory
 #   3) System directories 
-$pkgconfigdir = "$installdir/usr/lib/pkgconfig";
+$pkgconfigdir = "$destdir$prefix/lib/pkgconfig";
 my @pkgconfigdirs = ( ( map { "$builddir/$_" } @packages ), $pkgconfigdir );
 push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
 $ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
