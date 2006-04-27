@@ -27,6 +27,7 @@ our $confdir = undef;	# path to common build.d directory
 our $builddir = undef;	# path to common build directory
 our $installdir = undef; # path to common installation directory
 our $prefix = undef;	# installation prefix directory
+my $prefixdir = undef;	# active prefix; set to one of previous four paths
 our $destdir = "";	# destination installation directory
 
 my $bindir = undef;	#   path to installed executables
@@ -101,9 +102,9 @@ Directory Options:
 			(currently: $topdir/build.d)
     -B|--builddir=...	Select location for build directories.
 			(currently: $topdir/build)
-    -I|--installdir=...	Select common install directory (sets --prefix).
+    -I|--installdir=...	Select testing install directory (sets --prefix).
 	                (currently: $topdir/install)
-    -P|--prefix=...	Select install prefix (overrides installdir)
+    -P|--prefix=...	Select "live" install prefix (overrides installdir)
        --destdir=...	Select destination install directory
 
 Distribution Merge Options:
@@ -288,8 +289,12 @@ my $top_builddir = $builddir || "$topdir/build";
 $builddir = "$top_builddir/$hostspec";
 my $top_installdir = $installdir || "$topdir/install";
 $installdir = "$top_installdir/$hostspec";
-$prefix = $prefix || "$installdir/usr";
-$bindir = "$destdir$prefix/bin";
+
+sub prefix_is_live { return $prefix }
+sub prefix_path { prefix_is_live() || "$installdir/usr" }
+
+$prefixdir = prefix_path();
+$bindir = "$destdir$prefixdir/bin";
 
 push @make_args, "DESTDIR=$destdir" if $destdir ne '';
 
@@ -397,7 +402,7 @@ sub configure_params {
 	my $spec = $configure_params{$pkg};
 	my @spec = ( 
 			"--srcdir=$srcdir", 
-			"--prefix=$prefix",
+			"--prefix=$prefixdir",
 			_feature_configure_params($spec),
 			_package_configure_params($spec),
 		);
@@ -520,7 +525,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 sub run_app_path {
 	die "error: No application was specified in build.local or with -A.\n"
 		unless $run_app;
-	return $destdir . $prefix . '/bin/' . $run_app;
+	return $destdir . $prefixdir . $run_app;
 }
 
 %actions = (
@@ -537,7 +542,7 @@ sub run_app_path {
 		 # XXX: This needs to be generalized, but it works for now.
 		 #  For what it's worth, it is "equivalent" to the old .sh
 		return unless $pkg eq 'minisip';
-		$ENV{LD_LIBRARY_PATH} = join(':', ( map { "$builddir/$_/.libs" } @packages )) . "$destdir$prefix/lib";
+		$ENV{LD_LIBRARY_PATH} = join(':', ( map { "$builddir/$_/.libs" } @packages ), $libdir);
 		act('run', run_app_path());
 	},
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
@@ -608,26 +613,28 @@ sub list_targets {
 $run_app = $_run_app if defined $_run_app;
 
 if ($verbose) {
-	print "+Top directory: $topdir\n";
-	print "+Build directory: $builddir\n";
-	print "+Install directory: $destdir$prefix\n";
+	print "+Top directory:              $topdir\n";
+	print "+Build directory:            $builddir\n";
+	print "+Install \$DESTDIR directory: $destdir\n" if $destdir;
+	print "+Install --prefix directory: $prefixdir\n";
+	print "+Full path to local install: $destdir$prefixdir\n" if $destdir;
 }
 
 # setup common environment
 #  LDFLAGS: add local install library path
 $ENV{LDFLAGS} ||= '';
-$libdir = "$destdir$prefix/lib";
+$libdir = "$destdir$prefixdir/lib";
 $ENV{LDFLAGS} .= " -L$libdir";
 #  CPPFLAGS: add local install include path (XXX: needed?)
 $ENV{CPPFLAGS} ||= '';
-$includedir = "$destdir$prefix/include";
+$includedir = "$destdir$prefixdir/include";
 $ENV{CPPFLAGS} .= " -I$includedir ";
 #  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= " -Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
-$aclocaldir = "$destdir$prefix/share/aclocal";
+$aclocaldir = "$destdir$prefixdir/share/aclocal";
 
 sub aclocal_flags {
 	my @m4_paths = map { "$topdir/$_/m4" } @packages;
@@ -641,7 +648,7 @@ $ENV{ACLOCAL_FLAGS} .= aclocal_flags();
 #   1) Project directories
 #   2) Local install directory
 #   3) System directories 
-$pkgconfigdir = "$destdir$prefix/lib/pkgconfig";
+$pkgconfigdir = "$destdir$prefixdir/lib/pkgconfig";
 my @pkgconfigdirs = ( ( map { "$builddir/$_" } @packages ), $pkgconfigdir );
 push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
 $ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
