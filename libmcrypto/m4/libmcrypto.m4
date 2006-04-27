@@ -1,3 +1,14 @@
+# AM_LIBMCRYPTO_ENABLE_FAST_AES(VERSION)
+# ------------------------------------
+AC_DEFUN([AM_LIBMCRYPTO_ENABLE_FAST_AES], [
+AC_ARG_ENABLE(fast-aes,
+	AS_HELP_STRING([--enable-fast-aes],
+		[enables built-in Rijndael/AES algorithm. (default disabled)]), 
+	[], [])
+])
+# End of AM_LIBMCRYPTO_ENABLE_FAST_AES
+#
+
 # AM_LIBMCRYPTO_CHECK_OPENSSL(VERSION)
 # ------------------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_OPENSSL], [
@@ -15,10 +26,10 @@ AC_CHECK_HEADER([openssl/crypto.h],[], [
 		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
 	])
 
-dnl Check for AES support.
-AC_CHECK_HEADER([openssl/aes.h],[have_aes_h=yes])
-if test x$have_aes_h = xyes; then
-   AC_DEFINE([HAVE_OPENSSL_AES_H], 1, [Define to 1 if you have the <openssl/aes.h> header file.])
+# disable OpenSSL AES if user did not ask to use our built-in algorithm
+if test x$enable_fast_aes != xyes; then
+	AC_CHECK_HEADER([openssl/aes.h],[AC_DEFINE([HAVE_OPENSSL_AES_H], 1, 
+		[Define to 1 if you have the <openssl/aes.h> header file.])])
 fi
 
 dnl OpenSSL libssl
