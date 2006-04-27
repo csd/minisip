@@ -182,10 +182,10 @@ $quiet = 0 if $pretend;
 
 # guess number of jobs
 # XXX: will not work for all platforms; needs revisiting, but okay for now
-$njobs = `grep ^processor /proc/cpuinfo | wc -l` unless $njobs;
+$njobs = int(`grep ^processor /proc/cpuinfo | wc -l`) unless $njobs;
 $njobs = 1 unless $njobs;
 $njobs = 'unlimited' if $supercompute;
-print "+info: make will attempt to run $njobs parallel build jobs" if $verbose;
+print "+info: make will try to run $njobs parallel build jobs\n" if $verbose;
 
 # extra arguments to pass to make
 my @make_args = ();
