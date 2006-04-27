@@ -43,6 +43,7 @@ my $batch = 0;		# perform actions on dependencies as well as targets
 our $toggle_batch = 0;  # reverse meaning of batch flag (default to batch mode)
 
 my $njobs = 0;		# number of parallel jobs during makes (0 = autodetect)
+my $supercompute = 0;   #  run unlimited parallel jobs during makes (yikes!)
 my $ccache = 1;		# enable ccache support
 my $force = 0;		# continue despite errors
 my $show_env = 0;	# output environment variables this script changes
@@ -83,6 +84,7 @@ Advanced Build Options:
     -t|--host=...	Build libraries and programs that run on this platform.
     -S|--batch		Perform actions on dependencies as well as targets.
     -j|--jobs=n		Set number of parallel jobs (default: $njobs)
+    -J|--supercompute	Run an unlimited number of parallel jobs (for testing)
     -c|--ccache		Enable ccache support (is on by default; use --noccache)
     -f|--force		Continue building despite any errors along the way
     -E|--show-env	Show environment variables when we update them
@@ -131,6 +133,7 @@ my $result = GetOptions(
 		"host|t=s" => \$hostspec,
 
 		"jobs|j=i" => \$njobs,
+		"supercompute|J!" => \$supercompute,
 		"ccache|c!" => \$ccache,
 		"force|f!" => \$force,
 		"show-env|E!" => \$show_env,
@@ -164,11 +167,15 @@ $quiet = 0 if $pretend;
 # guess number of jobs
 # XXX: will not work for all platforms; needs revisiting, but okay for now
 $njobs = `grep ^processor /proc/cpuinfo | wc -l` unless $njobs;
+$njobs = 1 unless $njobs;
+$njobs = 'unlimited' if $supercompute;
+print "+info: make will attempt to run $njobs parallel build jobs" if $verbose;
 
 # extra arguments to pass to make
 my @make_args = ();
 push @make_args, '-k' if $force;
-push @make_args, "-j$njobs" if $njobs > 1;
+push @make_args, '-j' if $supercompute;
+push @make_args, "-j$njobs" if int($njobs) > 1;
 
 #######
 # load package, dependency, and configure parameter definitions (see build.conf)
