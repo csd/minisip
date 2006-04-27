@@ -1,4 +1,5 @@
 SUBDIRS = \
+	win32 \
 	include \
 	m4 \
 	source \
@@ -25,11 +26,11 @@ libmcrypto_la_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CXX)	\
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 
-# if OS_WIN
-# res_obj = win32/libmnetutil-res.o
-# libmcrypto_la_LDFLAGS += -Wl,$(res_obj)
-# libmnetutil_la_DEPENDENCIES = $(res_obj)
-# endif OS_WIN
+if OS_WIN
+res_obj = win32/$(PACKAGE)-res.o
+libmcrypto_la_LDFLAGS += -Wl,$(res_obj)
+libmcrypto_la_DEPENDENCIES = $(res_obj)
+endif OS_WIN
 
 # end of libmcrypto.la rules
 #
