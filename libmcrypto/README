@@ -1,0 +1,24 @@
+README for libmcrypto
+=====================
+
+The libmcrypto library provides cryptographic encryption and hashing 
+interfaces that are leveraged by the Minisip application stack.
+
+Requirements:
+	libmutil
+	OpenSSL v0.9.6+
+	GNUTLS	(optional, not yet supported)
+
+Installation:
+   Please refer to the INSTALL file for installation instructions.
+
+   In most cases, this should be enough:
+     $ ./configure
+     $ make
+     # make install		# run as root (or with sudo)
+
+   ./configure --help will give you the available compilation time options.
+
+License:
+   Please refer to the COPYING.LESSER file for license information.	
+
