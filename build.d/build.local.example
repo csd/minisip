@@ -37,7 +37,7 @@
 ## Distributions currently supported by this system:
 ##	gentoo
 ##
-# $host_dist = 'gentoo';
+# $hostdist = 'gentoo';
 
 ## Select which UI you which to use with the 'run' action.  You can also
 ## use the -A option to set this on the command line.
