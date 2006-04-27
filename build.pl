@@ -63,6 +63,7 @@ my $list_targets = 0;	# show the targets known by this script
 
 my $_run_app = undef;	# Which application did the user specify with -A?
 our $run_app = undef;	# Which application does the user want to run?
+my @run_paths = qw( bin sbin );
 
 our $hostdist = 'autodetect';	# This host's distribution (e.g. gentoo).
 our $buildspec = 'autodetect';  # This host's compiler specification.
@@ -71,6 +72,11 @@ our $hostspec = 'autodetect';	# The target host's compiler specification.
 
 # reset umask; fixes problems from mixing ccache with merge action
 umask(0007) or die "unable to set umask to 0007: $!";
+
+#######
+# option processing helpers - use this API in configuration files
+
+sub add_run_paths { push @run_paths, @_ }
 
 #######
 # process option arguments
@@ -525,7 +531,16 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 sub run_app_path {
 	die "error: No application was specified in build.local or with -A.\n"
 		unless $run_app;
-	return $destdir . $prefixdir . $run_app;
+	my $rootpath = $destdir . $prefixdir;
+	for my $path ( @run_paths ) {
+		my $target = "$rootpath/$path/$run_app";
+		print "+checking for $target..." if $verbose;
+		next unless -x $target;
+		print "+found $target..." unless $quiet;
+		return $target;
+	}
+	return $rootpath . $run_app;
+	
 }
 
 %actions = (

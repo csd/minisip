@@ -39,10 +39,18 @@
 ##
 # $hostdist = 'gentoo';
 
+# ====================================================================
+
 ## Select which UI you which to use with the 'run' action.  You can also
 ## use the -A option to set this on the command line.
-# $run_app ||= '/usr/bin/minisip_textui';
-$run_app = '/usr/bin/minisip_gtkgui';
+## This can be an absolute path (without --prefix) or a program name.
+# $run_app = '/bin/minisip_textui';
+$run_app = 'minisip_gtkgui';
+
+## For programs, add_run_path can be used to extend the search path.
+# add_run_paths('lib/minisip/bin', 'libexec/minisip/bin');
+
+# ====================================================================
 
 ## Use batch setting by default, with -S enabling "single mode"; normally, 
 ## the targets specified by the user are built, and -S enables batch mode.
@@ -68,6 +76,8 @@ $toggle_batch = 1;
 ## which no other package (being built here) subsequently requires.
 ##
 # $default_target = 'minisip';
+
+# ====================================================================
 
 ###
 # The settings in this section override the configuration options for 
