@@ -23,7 +23,7 @@
 
 #include<config.h>
 
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 
 extern "C"{
 	#include<openssl/rsa.h>
@@ -234,15 +234,15 @@ string certificate::get_name(){
 
 string certificate::get_cn(){
 	string name = get_name();
-	size_t pos, pos2;
+	unsigned pos, pos2;
 
-	pos = name.find( "/CN=" );
+	pos = (unsigned int)name.find( "/CN=" );
 
 	if( pos == string::npos ){
 		return "No common name";
 	}
 
-	pos2 = name.find( "/", pos + 1 );
+	pos2 = (unsigned int)name.find( "/", pos + 1 );
 
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }

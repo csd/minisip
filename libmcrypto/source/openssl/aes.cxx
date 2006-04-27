@@ -29,10 +29,10 @@
 #else
 # define AES_BLOCK_SIZE 16
 typedef struct AES_KEY_s AES_KEY;
-#include <libmutil/rijndael-alg-fst.h>
+#include <libmcrypto/rijndael-alg-fst.h>
 #endif
 
-#include <libmutil/aes.h>
+#include <libmcrypto/aes.h>
 
 //debug:
 #ifdef DEBUG_OUTPUT

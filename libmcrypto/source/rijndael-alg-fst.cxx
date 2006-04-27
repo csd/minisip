@@ -29,7 +29,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <libmutil/rijndael-alg-fst.h>
+#include <libmcrypto/rijndael-alg-fst.h>
 
 /*
 Te0[x] = S [x].[02, 01, 01, 03];

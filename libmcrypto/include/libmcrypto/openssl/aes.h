@@ -25,7 +25,7 @@
 #ifndef AES_H
 #define AES_H
 
-#include <libmutil/libmutil_config.h>
+#include <libmcrypto/config.h>
 
 #include <stdlib.h>
 
@@ -37,7 +37,7 @@ typedef struct _f8_ctx {
 
 
 
-class LIBMUTIL_API AES{
+class LIBMCRYPTO_API AES{
 	public:
 		AES();
 		AES( unsigned char * key, int key_length );

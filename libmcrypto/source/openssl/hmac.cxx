@@ -25,7 +25,7 @@
 #include<config.h>
 
 #include <openssl/hmac.h>
-#include <libmutil/hmac.h>
+#include <libmcrypto/hmac.h>
 
 
 void hmac_sha1( unsigned char * key, unsigned int key_length,

@@ -21,17 +21,20 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef HMAC_H
-#define HMAC_H
 
-#include <libmutil/libmutil_config.h>
 
-LIBMUTIL_API void hmac_sha1( unsigned char * key, unsigned int key_length,
-                unsigned char * data, unsigned int data_length,
-                unsigned char * mac, unsigned int * mac_length );
+#ifndef BASE64_H
+#define BASE64_H
 
-LIBMUTIL_API void hmac_sha1( unsigned char * key, unsigned int key_length,
-                unsigned char * data[], unsigned int data_length[],
-                unsigned char * mac, unsigned int * mac_length );
+//#include<stdint.h>
+
+#include <libmcrypto/config.h>
+
+
+#include<string>
+
+LIBMCRYPTO_API std::string base64_encode( unsigned char *, int );
+LIBMCRYPTO_API unsigned char * base64_decode( std::string, int * );
+LIBMCRYPTO_API unsigned char * base64_decode( unsigned char *, int, int * );
 
 #endif

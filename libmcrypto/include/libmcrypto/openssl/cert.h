@@ -25,7 +25,7 @@
 #ifndef CERT_H
 #define CERT_H
 
-#include <libmutil/libmutil_config.h>
+#include <libmcrypto/config.h>
 
 /*Include openssl/err.h before any <list/map/hash/vector> ... it causes 
 compilation under EVC 4.0 to fail, collision between STLPort and Openssl
@@ -51,7 +51,7 @@ class certificate;
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
 
-class LIBMUTIL_API ca_db_item{
+class LIBMCRYPTO_API ca_db_item{
 	public:
 		std::string item;
 		int type;
@@ -62,7 +62,7 @@ class LIBMUTIL_API ca_db_item{
 };
 
 
-class LIBMUTIL_API ca_db: public MObject{
+class LIBMCRYPTO_API ca_db: public MObject{
 	public:
 		ca_db();
 		~ca_db();
@@ -93,7 +93,7 @@ class LIBMUTIL_API ca_db: public MObject{
 		
 };
 
-class LIBMUTIL_API certificate: public MObject{
+class LIBMCRYPTO_API certificate: public MObject{
 	public:
 		certificate();
 		certificate( X509 * openssl_cert );
@@ -133,7 +133,7 @@ class LIBMUTIL_API certificate: public MObject{
 		std::string pk_file;
 };
 
-class LIBMUTIL_API certificate_chain: public MObject{
+class LIBMCRYPTO_API certificate_chain: public MObject{
 	public:
 		certificate_chain();
 		certificate_chain( MRef<certificate *> cert );
@@ -165,27 +165,27 @@ class LIBMUTIL_API certificate_chain: public MObject{
                 Mutex mLock;
 };
 
-class LIBMUTIL_API certificate_exception : public Exception{
+class LIBMCRYPTO_API certificate_exception : public Exception{
 	public:
 		certificate_exception( const char *desc):Exception(desc){};
 };
 
-class LIBMUTIL_API certificate_exception_file : public certificate_exception{
+class LIBMCRYPTO_API certificate_exception_file : public certificate_exception{
 	public:
 		certificate_exception_file( const char *message ):certificate_exception(message){};
 };
 
-class LIBMUTIL_API certificate_exception_init : public certificate_exception{
+class LIBMCRYPTO_API certificate_exception_init : public certificate_exception{
 	public:
 		certificate_exception_init( const char *message ):certificate_exception(message){};
 };
 
-class LIBMUTIL_API certificate_exception_pkey : public certificate_exception{
+class LIBMCRYPTO_API certificate_exception_pkey : public certificate_exception{
 	public:
 		certificate_exception_pkey( const char *message ):certificate_exception(message){};
 };
 
-class LIBMUTIL_API certificate_exception_chain : public certificate_exception{
+class LIBMCRYPTO_API certificate_exception_chain : public certificate_exception{
 	public:
 		certificate_exception_chain( const char *message ):certificate_exception(message){};
 };

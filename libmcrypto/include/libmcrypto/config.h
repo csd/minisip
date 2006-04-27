@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+  Copyright (C) 2005  Mikael Magnusson
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,22 +20,28 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
+ */
 
+#ifndef _MLIBMCRYPTO_CONFIG_H
+#define _MLIBMCRYPTO_CONFIG_H
 
-
-#ifndef BASE64_H
-#define BASE64_H
-
-//#include<stdint.h>
-
-#include <libmutil/libmutil_config.h>
-
-
-#include<string>
-
-LIBMUTIL_API std::string base64_encode( unsigned char *, int );
-LIBMUTIL_API unsigned char * base64_decode( std::string, int * );
-LIBMUTIL_API unsigned char * base64_decode( unsigned char *, int, int * );
-
+#ifdef _MSC_VER
+# ifndef LIBMCRYPTO_EXPORTS
+#  define LIBMCRYPTO_IMPORTS
+# endif
 #endif
+
+#if defined(WIN32) && defined(LIBMCRYPTO_EXPORTS)
+# define LIBMCRYPTO_API __declspec(dllexport)
+#elif defined(WIN32) && defined(LIBMCRYPTO_IMPORTS)
+# define LIBMCRYPTO_API __declspec(dllimport)
+#else
+# define LIBMCRYPTO_API
+#endif
+
+#ifdef _WIN32_WCE
+#include<openssl/err.h>
+#endif
+
+#endif	// _MLIBMCRYPTO_CONFIG_H

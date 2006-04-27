@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include <libmutil/base64.h>
+#include <libmcrypto/base64.h>
 #define LINE_LENGTH 60
 
 
@@ -36,7 +36,7 @@ using namespace std;
 #include<malloc.h>
 #endif
 
-LIBMUTIL_API string base64_encode( unsigned char * input, int length )
+LIBMCRYPTO_API string base64_encode( unsigned char * input, int length )
 {
 	int counter = 0;
 	int i;
@@ -73,7 +73,7 @@ LIBMUTIL_API string base64_encode( unsigned char * input, int length )
 	return "";
 }
 
-LIBMUTIL_API unsigned char *  base64_decode( string input, int * output_length )
+LIBMCRYPTO_API unsigned char *  base64_decode( string input, int * output_length )
 {
 	string input_cpy = input;
 	size_t pos;
@@ -215,7 +215,7 @@ LIBMUTIL_API unsigned char *  base64_decode( string input, int * output_length )
 	return NULL;
 }
 
-LIBMUTIL_API unsigned char * base64_decode( unsigned char * input, int input_length,
+LIBMCRYPTO_API unsigned char * base64_decode( unsigned char * input, int input_length,
 		   int * output_length ){
 	string s( (char *)input, input_length );
 
