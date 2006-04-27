@@ -37,8 +37,8 @@
 #include <libmikey/MikeyPayloadKEMAC.h>
 #include <libmikey/MikeyPayloadV.h>
 #include <libmikey/MikeyPayloadPKE.h>
-#include <libmutil/aes.h>
-#include <libmutil/hmac.h>
+#include <libmcrypto/aes.h>
+#include <libmcrypto/hmac.h>
 
 using namespace std;
 

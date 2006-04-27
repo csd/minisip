@@ -1,4 +1,4 @@
-pkginclude_HEADERS =    libmutil/aes.h \
+pkginclude_HEADERS = \
 			libmutil/Exception.h \
 			libmutil/MessageRouter.h \
 			libmutil/massert.h \
@@ -7,10 +7,7 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/IString.h \
 			libmutil/dbg.h \
 			libmutil/merror.h \
-			libmutil/base64.h \
 			libmutil/dbg.h \
-			libmutil/cert.h \
-			libmutil/hmac.h \
 			libmutil/Thread.h \
 			libmutil/TextUI.h \
 			libmutil/Timestamp.h \
@@ -34,10 +31,7 @@ pkginclude_HEADERS =    libmutil/aes.h \
 			libmutil/libmutil_config.h \
 			libmutil/CircularBuffer.h
 
-includepkglibdir =      $(pkglibdir)/include
-
-noinst_HEADERS = 	config.h \
-			libmutil/rijndael-alg-fst.h
+noinst_HEADERS = 	config.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
 			$(srcdir)/compilation_config.h.in \

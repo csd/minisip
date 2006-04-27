@@ -30,7 +30,7 @@
 
 #include<libmnetutil/TCPSocket.h>
 
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 #include<libmutil/mtypes.h>
 
 #include<libmnetutil/IPAddress.h>

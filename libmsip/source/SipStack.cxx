@@ -63,7 +63,7 @@
 #include<libmutil/massert.h>
 
 #include<libmutil/dbg.h>
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 
 using namespace std;
 

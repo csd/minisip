@@ -43,7 +43,7 @@
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/itoa.h>
-#include<libmutil/base64.h>
+#include<libmcrypto/base64.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>

@@ -30,8 +30,8 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libmutil/aes.h>
-#include<libmutil/hmac.h>
+#include<libmcrypto/aes.h>
+#include<libmcrypto/hmac.h>
 #include<libmutil/MemObject.h>
 
 #include<libminisip/rtp/RtpPacket.h>

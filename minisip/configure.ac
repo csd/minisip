@@ -191,14 +191,7 @@ AC_ARG_ENABLE(qte,
       	QT="qte"
 	CXXFLAGS="${CXXFLAGS} -fno-rtti"
 	AC_DEFINE(QWS, [], [Use Qt Embedded windowing system])
-	dnl For some reason the openssl libs I cross-compiled require this
-	LDFLAGS="${LDFLAGS} -ldl"
-	
       fi ])
-
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-
 
 if test "${QTGUI}" = "yes"
 then
@@ -230,10 +223,8 @@ fi
 AC_SUBST(MOC)
 fi
 
-dnl Check for libssl 0.9.7
-AC_CHECK_HEADERS([openssl/aes.h],[],[])
-
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMSIP([0.3.1])
 AM_MINISIP_CHECK_LIBMIKEY([0.4.1])

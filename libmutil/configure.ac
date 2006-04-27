@@ -44,33 +44,6 @@ AC_ARG_WITH(pthread,
                 [location of the pthread library])],
         [pthread_path=$withval], [pthread_path="yes"])
 
-
-dnl OpenSSL libcrypto
-dnl library check
-AC_CHECK_LIB([crypto], [SSLeay],
-	[
-		LIBS="-lcrypto ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
-	])
-dnl header check
-AC_CHECK_HEADER([openssl/crypto.h],[],
-	[
-		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
-	])
-dnl REDHAT fix
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-dnl Check for AES support.
-AC_CHECK_HEADER([openssl/aes.h],[have_aes_h=yes])
-if test x$have_aes_h = xyes; then
-   HAVE_OPENSSL_AES_H="#define LIBMUTIL_HAVE_OPENSSL_AES_H 1"
-   AC_DEFINE([HAVE_OPENSSL_AES_H], 1, [Define to 1 if you have the <openssl/aes.h> header file.])
-else
-   HAVE_OPENSSL_AES_H="/* #undef LIBMUTIL_HAVE_OPENSSL_AES_H */"
-fi
-AC_SUBST(HAVE_OPENSSL_AES_H)
-
-
 dnl
 dnl pthread
 dnl
@@ -136,7 +109,6 @@ AM_CONDITIONAL(HAVE_PTHREAD, test "${have_pthread}" = "yes")
 
 dnl FIXME: Replace `main' with a function in `-ldl':
 AC_CHECK_LIB([dl], [dlopen])
-
 
 dnl Check for stack trace support
 AC_CHECK_HEADER([execinfo.h],

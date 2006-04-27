@@ -27,7 +27,7 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include<string.h>
-#include<libmutil/hmac.h>
+#include<libmcrypto/hmac.h>
 
 using namespace std;
 

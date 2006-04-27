@@ -28,7 +28,7 @@
 
 #include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/IP4ServerSocket.h>
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 
 class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 

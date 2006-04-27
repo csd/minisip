@@ -425,15 +425,8 @@ PKG_CHECK_MODULES(OSSO, [libosso],
 
 AM_CONDITIONAL(OSSO_SUPPORT, [test "${osso_support}" = "yes"])
 
-
-
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-
-dnl Check for libssl 0.9.7
-AC_CHECK_HEADERS([openssl/aes.h],[],[])
-
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMSIP([0.3.1])
 AM_MINISIP_CHECK_LIBMIKEY([0.4.1])

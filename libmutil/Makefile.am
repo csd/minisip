@@ -37,19 +37,15 @@ thread_src = 	source/CondVarWin32.cxx \
 endif OS_WIN
 endif !HAVE_PTHREAD
 
-mutil_src =  	source/aes.cxx \
+mutil_src = \
 		source/MemObject.cxx \
 		source/Library.cxx \
 		source/MessageRouter.cxx \
 		source/Exception.cxx \
 		source/massert.cxx \
 		source/IString.cxx \
-		source/rijndael-alg-fst.cxx \
-		source/base64.cxx \
 		source/dbg.cxx \
 		source/merror.cxx \
-		source/cert.cxx \
-		source/hmac.cxx \
 		source/TextUI.cxx \
 		source/Timestamp.cxx \
 		source/mtime.cxx \

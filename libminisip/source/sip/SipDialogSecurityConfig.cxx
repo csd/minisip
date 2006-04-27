@@ -27,7 +27,7 @@
 #include<libminisip/sip/SipDialogSecurityConfig.h>
 
 #include<libminisip/configbackend/ConfBackend.h>
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 #include<libmutil/XMLParser.h>
 #include<libmutil/itoa.h>
 #include<libmsip/SipDialogConfig.h>

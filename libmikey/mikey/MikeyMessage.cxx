@@ -44,9 +44,9 @@
 #include<libmikey/MikeyPayloadGeneralExtension.h>
 #include<libmikey/MikeyException.h>
 
-#include<libmutil/aes.h>
-#include<libmutil/base64.h>
-#include<libmutil/hmac.h>
+#include<libmcrypto/aes.h>
+#include<libmcrypto/base64.h>
+#include<libmcrypto/hmac.h>
 
 #include<map>
 

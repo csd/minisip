@@ -26,7 +26,7 @@
 #include<libmikey/MikeyPayloadKEMAC.h>
 #include<libmikey/MikeyException.h>
 #include<assert.h>
-#include<libmutil/aes.h>
+#include<libmcrypto/aes.h>
 #include<libmutil/itoa.h>
 #include<libmutil/print_hex.h>
 

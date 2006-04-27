@@ -38,7 +38,7 @@
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
 
-#include<libmutil/hmac.h>
+#include<libmcrypto/hmac.h>
 
 using namespace std;
 

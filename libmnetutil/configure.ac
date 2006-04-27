@@ -31,37 +31,8 @@ AC_CHECK_LIB([wsock32], [main])
 AC_CHECK_LIB([iphlpapi], [main])
 AC_CHECK_LIB([dnsapi], [main])
 
-dnl OpenSSL libcrypto
-dnl library check
-AC_CHECK_LIB([crypto], [SSLeay],
-	[
-		LIBS="-lcrypto ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
-	])
-dnl header check
-AC_CHECK_HEADER([openssl/crypto.h],[],
-	[
-		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
-	])
-
-dnl
-dnl libssl
-dnl
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-AC_CHECK_LIB([ssl], [SSL_library_init],
-	[
-		LIBS="-lssl ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libssl. Please install the corresponding package.])
-	])
-AC_CHECK_HEADER([openssl/ssl.h], [],
-	[
-		AC_MSG_ERROR([Could not find libssl header files. Please install the corresponding development package.])
-	])
-
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 AC_CHECK_LIB([resolv], [main])

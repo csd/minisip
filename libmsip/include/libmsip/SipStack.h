@@ -83,7 +83,7 @@
 #include<libmsip/SipTimers.h>
 
 #include<libmsip/SipLayerTransport.h>
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 #include<libmutil/MessageRouter.h>
 
 class SipDialog;

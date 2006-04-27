@@ -17,6 +17,7 @@
 # out by default, but feel free to use them.
 
 SUBDIRS="${SUBDIRS} libmutil"
+SUBDIRS="${SUBDIRS} libmcrypto"
 SUBDIRS="${SUBDIRS} libmnetutil"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
@@ -100,12 +101,22 @@ do
 					./configure $configure_params
 	fi 
 
+	if [ ${subdir} = "libmcrypto" ]; then
+		LOC_MCRYPTO_LIBS=-L$PWD/.libs
+		LOC_MCRYPTO_CFLAGS=-I$PWD/include
+		MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
+	fi
 	if [ ${subdir} = "libmnetutil" ]; then 
 		LOC_MNETUTIL_LIBS=-L$PWD/.libs
 		LOC_MNETUTIL_CFLAGS=-I$PWD/include
 		ACLOCAL_FLAGS="$aclocal_flags" \
 			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
 	fi 
@@ -116,6 +127,8 @@ do
 		ACLOCAL_FLAGS="$aclocal_flags" \
 			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
 	fi 
@@ -126,6 +139,8 @@ do
 		ACLOCAL_FLAGS="$aclocal_flags" \
 			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
@@ -140,6 +155,8 @@ do
 		ACLOCAL_FLAGS="$aclocal_flags" \
 			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
 			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
@@ -156,6 +173,8 @@ do
 		ACLOCAL_FLAGS="$aclocal_flags" \
 			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
 			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
 			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
 			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\

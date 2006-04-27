@@ -19,25 +19,8 @@ AC_PROG_LIBTOOL
 
 AM_MINISIP_ENABLE_DEBUG
 
-dnl OpenSSL libcrypto
-dnl library check
-AC_CHECK_LIB([crypto], [SSLeay],
-	[
-		LIBS="-lcrypto ${LIBS}"
-	],[
-		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
-	])
-dnl header check
-AC_CHECK_HEADER([openssl/crypto.h],[],
-	[
-		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
-	])
-dnl Damn RedHat
-AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-dnl Check for libssl 0.9.7
-AC_CHECK_HEADERS([openssl/aes.h],[],[])
-
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 dnl Checks for header files.
@@ -54,6 +37,7 @@ AC_CONFIG_FILES([
 		debian/Makefile 
 		include/Makefile 
 		m4/Makefile 
+		tests/Makefile
 		win32/Makefile 
 		win32/libmikey-res.rc
 	])

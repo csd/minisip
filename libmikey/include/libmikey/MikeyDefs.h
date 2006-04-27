@@ -30,6 +30,6 @@ If included, this file needs to be placed as the very first include of the sourc
 (ok, after <config.h> and/or "libmikey_config.h").
 Otherwise, under _WIN32_WCE it causes compilation problems.
 */
-#include<libmutil/cert.h>
+#include<libmcrypto/cert.h>
 
 #endif
