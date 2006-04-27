@@ -582,7 +582,7 @@ $includedir = "$installdir/usr/include";
 $ENV{CPPFLAGS} .= " -I$includedir ";
 #  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
-$ENV{CXXFLAGS} .= "-Wall";
+$ENV{CXXFLAGS} .= " -Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
 $aclocaldir = "$installdir/usr/share/aclocal";
