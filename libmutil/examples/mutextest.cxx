@@ -1,4 +1,4 @@
-
+/* mutextest: distributed with @PACKAGE@-@PACKAGE_VERSION@ */
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<iostream>
@@ -7,7 +7,6 @@
 using namespace std;
 
 Mutex m;
-
 
 static int n=0;
 
@@ -33,8 +32,8 @@ int main(int argc, char **argv){
 	cerr << "Hello world"<< endl;
 	{Mutex dummy;}
 	
-	int t1 = Thread::createThread(loop);
-	int t2 = Thread::createThread(loop);
+	ThreadHandle t1 = Thread::createThread(loop);
+	ThreadHandle t2 = Thread::createThread(loop);
 
 	cerr << "Waiting for thread 1"<< endl;
 	Thread::join(t1);
@@ -43,3 +42,4 @@ int main(int argc, char **argv){
 
 	return 0;
 }
+
