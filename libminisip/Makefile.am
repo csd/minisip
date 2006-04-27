@@ -327,10 +327,11 @@ endif
 #
 if DC1394_VIDEO_GRABBER
 plugins_LTLIBRARIES += mdc1394.la
+mdc1394_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS)
 mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)
 mdc1394_la_SOURCES = source/video/grabber/Dc1394Grabber.cxx
 			source/video/grabber/Dc1394Grabber.h
-mdc1394_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(DC1394_LIBS)
+mdc1394_la_LIBADD = libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
 endif
 
         mixer_src = source/video/mixer/ImageMixer.cxx
