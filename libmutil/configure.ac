@@ -161,6 +161,7 @@ AM_MINISIP_CHECK_COMPLETE
 AC_CONFIG_FILES([ 
 		Makefile
 		debian/Makefile
+		examples/Makefile
 		include/Makefile
 		m4/Makefile
 		win32/Makefile

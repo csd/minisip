@@ -1,0 +1,7 @@
+#!/bin/bash -x
+
+export LD_LIBRARY_PATH="@buildlibdir@"
+
+for i in @EXAMPLES@; do
+	./${i%.cpp}
+done
