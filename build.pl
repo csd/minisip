@@ -47,6 +47,7 @@ my $supercompute = 0;   #  run unlimited parallel jobs during makes (yikes!)
 my $ccache = 1;		# enable ccache support
 my $force = 0;		# continue despite errors
 my $show_env = 0;	# output environment variables this script changes
+my $localconf = undef;	# local config overrides
 
 my $pretend = 0;	# don't actually do anything
 my $verbose = 0;	# enable verbose script output
@@ -88,6 +89,8 @@ Advanced Build Options:
     -c|--ccache		Enable ccache support (is on by default; use --noccache)
     -f|--force		Continue building despite any errors along the way
     -E|--show-env	Show environment variables when we update them
+    -l|--localconf	Config overrides
+			(currently: $topdir/build.d/build.local)
 
 Directory Options:
     -T|--topdir=...	Select location of svn repository. 
@@ -137,6 +140,7 @@ my $result = GetOptions(
 		"ccache|c!" => \$ccache,
 		"force|f!" => \$force,
 		"show-env|E!" => \$show_env,
+		"localconf|l=s" => \$localconf,
 
 		"pretend|p!" => \$pretend,
 		"verbose|v!" => \$verbose,
@@ -234,7 +238,7 @@ sub set_global_configure_param {
 	return 1;
 }
 
-my $localconf = "$confdir/build.local";
+$localconf = $localconf || "$confdir/build.local";
 unless (-f $localconf) {
 	# XXX: automatic upgrade code; remove this on or after May 1, 2006
 	my $oldconf = "$topdir/build.local";
