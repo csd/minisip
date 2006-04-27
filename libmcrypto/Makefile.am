@@ -16,10 +16,11 @@ endif OS_WIN
 
 libmcrypto_la_SOURCES = $(BUILD_SRC)
 libmcrypto_la_CPPFLAGS = $(MINISIP_CFLAGS)
-libmcrypto_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) $(MINISIP_LIBS)
+libmcrypto_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) 
 libmcrypto_la_LIBADD = \
 	source/libmcrypto_core.la \
-	source/libmcrypto_imp.la
+	source/libmcrypto_imp.la \
+	$(MINISIP_LIBS)
 
 if OS_WIN
 res_obj = win32/libmnetutil-res.o

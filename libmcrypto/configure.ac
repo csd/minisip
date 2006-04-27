@@ -19,18 +19,32 @@ AC_PROG_LIBTOOL
 
 AM_MINISIP_ENABLE_DEBUG
 
-dnl Checks for libraries.
-AC_CHECK_LIB([gcrypt], [main])
+AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_COMPLETE
 
-AC_CHECK_LIB([gnutls], [main])
+dnl Checks for libraries.
+AM_LIBMCRYPTO_CHECK_OPENSSL
+AM_LIBMCRYPTO_CHECK_GNUTLS
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h gnutls/x509.h])
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_HEADER_TIME
 
-AC_OUTPUT([Makefile include/Makefile])
-
+AC_CONFIG_FILES([
+		Makefile
+		libmcrypto.pc
+		include/Makefile
+		include/libmcrypto/Makefile
+		include/libmcrypto/gnutls/Makefile
+		include/libmcrypto/openssl/Makefile
+		m4/Makefile
+		source/Makefile
+		source/gnutls/Makefile
+		source/openssl/Makefile
+		tests/Makefile
+	])
+AC_OUTPUT
