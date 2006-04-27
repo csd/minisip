@@ -160,7 +160,6 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 $confdir = $confdir || "$topdir/build.d";
 my $conffile = "$confdir/build.conf";
 die "'$confdir' is not a valid configuration directory.'" unless -f $conffile;
-my $confdistdir = "$confdir/dist";
 
 # set-up common options
 $show_env = 1 if $pretend && $verbose;
@@ -416,6 +415,45 @@ sub remove_files {
 	}
 }
 
+#######
+# autodetection helpers
+
+sub autodetect_probe_path {
+	my ( $prefix, $setting ) = @_;
+	return $setting unless $setting eq 'autodetect';
+	# probes can factor multiple scores, allow configurations to be 
+	#  selected by more than one criteria.
+	my %scores = ( );
+	for my $dir ( bsd_glob("$confdir/$prefix/*") ) {
+		my $file = "$dir/detect.pl";
+		next unless load_file_if_exists($file);
+		no strict 'refs';
+		my $f = $prefix . '_detect';
+		$scores{basename($dir)} = eval "$f()";
+	}
+	# pick the top scoring probe
+	( $setting ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
+	return $setting;
+} 
+sub autodetect_probe {
+	my ( $prefix, $setting ) = @_;
+	( $setting ) = autodetect_probe_path($prefix, $setting);
+	my $xconfdir = "$confdir/$prefix/$setting";
+	my $conf = "$xconfdir/$prefix.pl";
+	if (load_file_if_exists($conf)) {
+		print "+Using '$prefix' functions '$setting'\n:" .
+			"\t$conf\n" if $verbose;
+		load_file_if_exists("$xconfdir/$prefix.conf");
+		load_file_if_exists("$xconfdir/$prefix.local");
+	} else {
+		warn <<NOCODE unless $quiet;
+warning: The '$prefix.pl' script does not exist for '$setting'.
+warning: '$prefix' actions will be disabled until one is created!
+NOCODE
+	} 
+	return $setting;
+}
+
 ########
 # Target/host distribution support
 
@@ -425,36 +463,13 @@ sub set_dist_callbacks {
 	$distfuncs{$_} = $newfuncs{$_} for keys %newfuncs;
 	return 1;
 } 
-# autodetection helpers
 sub set_dist_detect { $distfuncs{detect} = shift }
 sub dist_detect { $distfuncs{detect}->() }
 
-# set-up distribution and locate its configuration directory
-if ($hostdist eq 'autodetect') {
-	my %scores = ( );
-	for my $distdir ( bsd_glob("$confdistdir/*") ) {
-		my $detectfile = "$distdir/detect.pl";
-		next unless load_file_if_exists($detectfile);
-		$scores{basename($distdir)} = dist_detect();
-	} 
-	( $hostdist ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
-} 
-my $hostconfdir = "$confdistdir/$hostdist";
+# probe the given hostdist; load its configuration files
+$hostdist = autodetect_probe('dist', $hostdist);
 
-my $distconf = "$hostconfdir/dist.pl";
-if (load_file_if_exists($distconf)) {
-	print "+Using package management functions for '$hostdist'\n:" .
-		"\t$distconf\n" if $verbose;
-} else {
-	warn <<NODIST unless $quiet;
-warning: The 'dist.pl' script does not exist for '$hostdist'.
-warning: Packaging actions will not available until one is created!
-NODIST
-}
-
-load_file_if_exists("$hostconfdir/dist.conf");
-load_file_if_exists("$hostconfdir/dist.local");
-
+# create standard dist accessor implementations
 $distfuncs{packages} = sub { 
 		list_files("$hostdist: $pkg packages: ", dist_pkgfiles()) 
 	} unless exists $distfuncs{packages};
