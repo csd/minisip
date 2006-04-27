@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = . examples include m4 tests win32
+SUBDIRS = win32 . examples include m4 tests
 DIST_SUBDIRS = $(SUBDIRS) debian
 EXTRA_DIST = libmnetutil.spec
 
