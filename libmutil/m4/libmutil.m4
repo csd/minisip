@@ -105,6 +105,21 @@ fi
 # End of AM_MINISIP_ENABLE_DEBUG
 #
 
+# AM_MINISIP_ENABLE_TEST_SUITE()
+# ------------------------------
+AC_DEFUN([AM_MINISIP_ENABLE_TEST_SUITE],[
+AC_ARG_ENABLE(test-suite,
+	AS_HELP_STRING([--enable-test-suite],
+		[enables extended test suite. (default disabled)]))
+if test x${enable_test_suite} = xyes; then
+	AC_DEFINE(TEST_SUITE, [], [Build and run extended test suite])
+fi 
+AM_CONDITIONAL(TEST_SUITE, test x${enable_test_suite} = xyes)
+	])
+# End of AM_MINISIP_ENABLE_TEST_SUITE
+#
+
+
 dnl  =================================================================
 dnl               minisip `configure --with-m*` argument macros
 

@@ -72,6 +72,7 @@ AC_ARG_ENABLE(memdebug,
       fi ])
 
 AM_MINISIP_ENABLE_DEBUG
+AM_MINISIP_ENABLE_TEST_SUITE
 
 dnl ipaq buzzer
 AC_ARG_ENABLE(buzzer,

@@ -31,6 +31,8 @@ AC_ARG_ENABLE(memdebug,
         AC_DEFINE(MDEBUG, [], [Debug memory])
       fi ])
 
+AM_MINISIP_ENABLE_TEST_SUITE
+
 AC_ARG_ENABLE(color-terminal,
     AS_HELP_STRING([--enable-color-terminal], 
 	[enables color coding of some debug messages (default disabled)]),
