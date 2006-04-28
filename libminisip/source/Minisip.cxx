@@ -74,10 +74,6 @@
 #include<libminisip/conference/ConfMessageRouter.h>
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/codecs/Codec.h>
-#ifdef VIDEO_SUPPORT
-#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#endif
 
 #include<stdlib.h>
 
@@ -103,27 +99,55 @@ static void signal_handler( int signal ){
 #endif
 #endif
 
-static void loadPlugins(){
+#ifdef WIN32
+static string buildPluginPath( const string &argv0 ){
+	string pluginPath;
+	size_t pos = argv0.find_last_of('\\');
+
+	if( pos != string::npos )
+		pluginPath += argv0.substr( 0, pos ) + "\\plugins";
+	else{
+		pluginPath += "plugins";
+	}
+
+	return pluginPath;
+}
+#endif
+
+static void loadPlugins(const string &argv0){
 	SoundDriverRegistry::getInstance();
 	AudioCodecRegistry::getInstance();
 	ConfigRegistry::getInstance();
-#ifdef VIDEO_SUPPORT
-	GrabberRegistry::getInstance();
-	VideoDisplayRegistry::getInstance();
-#endif
+	MediaRegistry::getInstance();
 
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
 
+	string pluginPath;
 	const char *path = getenv( "MINISIP_PLUGIN_PATH" );
 
 	if( !path ){
-		path = MINISIP_PLUGINDIR;
-	}
 
-	pluginManager->loadFromDirectory(path);
+#ifdef MINISIP_PLUGINDIR
+		pluginPath = string( MINISIP_PLUGINDIR );
+#endif
+
+#ifdef WIN32
+		pluginPath += ';' + buildPluginPath( argv0 );
+#endif
+	}
+	else
+		pluginPath = path;
+
+
+	// Load the video plugin first, if available, since it need to
+	// initialize the grabber and display registries before those
+	// plugins are loaded.
+	pluginManager->setSearchPath( pluginPath );
+	pluginManager->loadFromFile( "mvideo.la" );
+	pluginManager->loadFromDirectory( pluginPath );
 }
 
-Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
+Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 
 	srand((unsigned int)time(0));
 
@@ -138,7 +162,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char** /*argv*/ ) : gui(gui){
 	mdbg << "Loading plugins"<<end;
 	#endif
 
-	loadPlugins();
+	loadPlugins( argv[0] );
 
 	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;

@@ -49,14 +49,6 @@
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
-#ifdef VIDEO_SUPPORT
-#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/codec/VideoCodec.h>
-#include<libminisip/video/codec/AVCoder.h>
-#include<libminisip/video/codec/AVDecoder.h>
-#include<libminisip/video/mixer/ImageMixer.h>
-#endif
 
 
 using namespace std;
@@ -76,54 +68,25 @@ void MediaHandler::init(){
 
 	media.clear();
 
-#ifdef VIDEO_SUPPORT
-	MRef<Grabber *> grabber = GrabberRegistry::getInstance()->createGrabber( config->videoDevice );
-	MRef<VideoCodec *> videoCodec = new VideoCodec();
-	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
-	MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );
-	if( mixer ){
-		mixer->setMedia( videoMedia );
-	}
-	registerMedia( *videoMedia );
-#endif
+	MRef<MediaRegistry*> registry = MediaRegistry::getInstance();
+	std::list< MRef<MPlugin*> >::const_iterator i;
+	std::list< MRef<MPlugin*> >::const_iterator last = registry->end();
 
-	string soundDev = config->soundDevice;
-	if( soundDev != "" ){
+	for( i = registry->begin(); i != last; i++ ){
+		MRef<MPlugin *> plugin = *i;
+		MRef<MediaPlugin *> mediaPlugin = dynamic_cast<MediaPlugin*>( *plugin );
+		if( mediaPlugin ){
+			MRef<Media *> media = mediaPlugin->createMedia( config );
+			MRef<AudioMedia *> audio = dynamic_cast<AudioMedia *>( *media );
 
-		MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
-		MRef<SoundIO *> soundIo = new SoundIO( 
-						sounddev, 
-						config->soundIOmixerType, 
-						2,  //number of channels
-						48000 ); //sampling rate
-
-		std::list<MRef<Codec *> > codecList;
-		std::list<std::string>::iterator iCodec;
-
-		for( iCodec = config->audioCodecs.begin(); 
-					iCodec != config->audioCodecs.end();
-					iCodec ++ ){
-			MRef<Codec *> selectedCodec;
-			MRef<AudioCodec *> codec = AudioCodecRegistry::getInstance()->create( *iCodec );
-
-
-			if( codec ){
-				selectedCodec = *codec;
+			if( media ){
+				registerMedia( media );
 			}
 
-			if( selectedCodec ){
-#ifdef DEBUG_OUTPUT
-				cerr << "Adding audio codec: " << selectedCodec->getCodecName() << endl;
-#endif
-				codecList.push_back( selectedCodec );
+			if( !audioMedia && audio ){
+				audioMedia = audio;
 			}
-			
 		}
-		
-		MRef<AudioMedia *> media = new AudioMedia( soundIo, codecList );
-		
-		registerMedia( *media );
-		audioMedia = media;
 	}
 
 //	muteAllButOne = config->muteAllButOne;
@@ -154,17 +117,19 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
-		if( (*i)->receive ){
+		MRef<Media *> media = *i;
+
+		if( media->receive ){
 			rtpReceiver = new RtpReceiver( ipProvider );
-			rStream = new MediaStreamReceiver( *i, rtpReceiver, ipProvider );
+			rStream = new MediaStreamReceiver( media, rtpReceiver, ipProvider );
 			session->addMediaStreamReceiver( rStream );
 		}
 		
-        if( (*i)->send ){
+        if( media->send ){
             if( !rtpReceiver ){
                 rtpReceiver = new RtpReceiver( ipProvider );
             }
-            sStream = new MediaStreamSender( *i, rtpReceiver->getSocket() );
+            sStream = new MediaStreamSender( media, rtpReceiver->getSocket() );
             session->addMediaStreamSender( sStream );
         }
 	}

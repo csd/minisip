@@ -12,13 +12,12 @@ pkgconfig_DATA = libminisip.pc
 
 
 lib_LTLIBRARIES = libminisip.la
-libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\" \
-		$(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS) $(X_CFLAGS)
+libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\"
 
 libminisip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) \
-		$(AVCODEC_LDFLAGS) $(RELOC_LDFLAGS) 
+		$(RELOC_LDFLAGS) 
 
-libminisip_la_LIBADD = $(MINISIP_LIBS) $(FFMPEG_LIBS)
+libminisip_la_LIBADD = $(MINISIP_LIBS)
 
 plugins_LTLIBRARIES =
 
@@ -139,6 +138,8 @@ libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/KeyAgreement.cxx \
 			source/mediahandler/MediaCommandString.cxx \
 			source/mediahandler/AudioMedia.cxx \
+			source/mediahandler/AudioPlugin.cxx \
+			source/mediahandler/AudioPlugin.h \
 			source/mediahandler/SessionRegistry.cxx \
 			source/mediahandler/DtmfSender.cxx
 
@@ -278,6 +279,19 @@ libstun_src = source/stun/STUNAttributes.cxx \
 		source/stun/STUNTest.cxx
 
 if VIDEO_SUPPORT
+pkglib_LTLIBRARIES = libminisip_video.la
+libminisip_video_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)	\
+		$(FFMPEG_CFLAGS)
+libminisip_video_la_LDFLAGS = $(AVCODEC_LDFLAGS) 
+libminisip_video_la_SOURCES = $(libvideo_src)
+libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)
+
+plugins_LTLIBRARIES += mvideo.la
+mvideo_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)
+mvideo_la_LDFLAGS = $(plugins_LDFLAGS)
+mvideo_la_SOURCES = source/video/VideoPlugin.cxx
+mvideo_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS)
+
         libvideo_libadd =
         display_src = source/video/display/VideoDisplay.cxx
 
@@ -289,7 +303,7 @@ mx11_la_CXXFLAGS = $(AM_CXXFLAGS) $(X_CFLAGS)
 mx11_la_LDFLAGS = $(plugins_LDFLAGS)
 mx11_la_SOURCES = source/video/display/X11Display.cxx \
 			source/video/display/X11Display.h
-mx11_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
+mx11_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 
 #
 # Xv display plugin
@@ -302,7 +316,7 @@ mxv_la_SOURCES = source/video/display/XvDisplay.cxx \
 			source/video/display/XvDisplay.h \
 			source/video/display/X11Display.cxx \
 			source/video/display/X11Display.h
-mxv_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
+mxv_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
 #
@@ -313,12 +327,12 @@ plugins_LTLIBRARIES += msdl.la
 msdl_la_LDFLAGS = $(plugins_LDFLAGS)
 msdl_la_SOURCES = source/video/display/SdlDisplay.cxx \
 			source/video/display/SdlDisplay.h
-msdl_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SDL_LIBS)
+msdl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(SDL_LIBS)
 endif
 
         grabber_src = source/video/grabber/Grabber.cxx
 if V4L_VIDEO_GRABBER
-        grabber_src += source/video/grabber/V4LGrabber.cxx
+        grabber_src += source/video/grabber/V4LGrabber.cxx \
 			source/video/grabber/V4LGrabber.h
 endif
 
@@ -331,7 +345,7 @@ mdc1394_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS)
 mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)
 mdc1394_la_SOURCES = source/video/grabber/Dc1394Grabber.cxx
 			source/video/grabber/Dc1394Grabber.h
-mdc1394_la_LIBADD = libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
+mdc1394_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
 endif
 
         mixer_src = source/video/mixer/ImageMixer.cxx
@@ -417,13 +431,11 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libsdp_src) \
 			$(libsoundcard_src) \
 			$(libspaudio_src) \
-			$(libstun_src) \
-			$(libvideo_src)
+			$(libstun_src)
 
 libminisip_la_LIBADD += $(libcodecs_libadd) \
 			$(libconfigbackend_libadd) \
-			$(libsoundcard_libadd) \
-			$(libvideo_libadd)
+			$(libsoundcard_libadd)
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)

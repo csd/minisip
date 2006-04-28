@@ -321,7 +321,7 @@ dnl look for xvideo
 	  ],[have_xv="no"])
 
 	if test "${have_xv}" = "yes"; then
-	  X_LIBS="-lXv $X_LIBS"
+	  XV_LIBS="-lXv"
 	  VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
 	  AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
 	  XV_VIDEO_DISPLAY="yes" 
@@ -342,7 +342,7 @@ dnl check for SDL
 
 		 AC_SUBST(SDL_LIBS)
                fi
-	     ], [], [${X_EXTRA_LIBS} -lXext ${X_LIBS} -lpthread] )
+	     ], [], [${X_EXTRA_LIBS} -lXext ${XV_LIBS} ${X_LIBS} -lpthread] )
 	  ])
 	
 	CPPFLAGS="${CPPFLAGS_SAVE}"
@@ -361,6 +361,7 @@ dnl check for SDL
       fi ])
 
 AC_SUBST(X_LIBS)
+AC_SUBST(XV_LIBS)
 AC_SUBST(X_CFLAGS)
 AC_SUBST(X_EXTRA_LIBS)
 

@@ -35,18 +35,13 @@
 #include<libminisip/sdp/SdpHeaderM.h>
 #include<libminisip/sdp/SdpHeaderA.h>
 
-#ifdef VIDEO_SUPPORT
-#include<libminisip/video/codec/VideoCodec.h>
-#include<libminisip/video/codec/VideoEncoderCallback.h>
-#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/mixer/ImageMixer.h>
-#endif
 #include<libmutil/print_hex.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
+
+#include"AudioPlugin.h"
 
 using namespace std;
 
@@ -147,3 +142,22 @@ MRef<CodecState *> Media::createCodecInstance( uint8_t payloadType ){
 	return NULL;
 }
 
+
+MediaPlugin::MediaPlugin( MRef<Library*> lib ): MPlugin( lib ){
+}
+
+MediaPlugin::~MediaPlugin(){
+}
+
+
+MediaRegistry::MediaRegistry(){
+	registerPlugin( new AudioPlugin( NULL ) );
+}
+
+std::list< MRef<MPlugin*> >::const_iterator MediaRegistry::begin() const{
+	return plugins.begin();
+}
+
+std::list< MRef<MPlugin*> >::const_iterator MediaRegistry::end() const{
+	return plugins.end();
+}

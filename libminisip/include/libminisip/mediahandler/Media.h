@@ -28,12 +28,11 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libmutil/Mutex.h>
+#include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 
 #include<libminisip/soundcard/SoundRecorderCallback.h>
 #include<libminisip/soundcard/SoundIO.h>
-#ifdef VIDEO_SUPPORT
-#include<libminisip/video/codec/VideoEncoderCallback.h>
-#endif
 
 #include<libminisip/codecs/Codec.h>
 
@@ -43,6 +42,7 @@ class SoundIO;
 class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
+class SipSoftPhoneConfiguration;
 
 /**
  * The Media class is a representation of a medium type, namely
@@ -191,6 +191,33 @@ class LIBMINISIP_API Media : public MObject{
 		Mutex sourcesLock;
 		
 		std::list<std::string> sdpAttributes;
+};
+
+
+class LIBMINISIP_API MediaPlugin : public MPlugin{
+	public:
+		MediaPlugin(MRef<Library*> lib);
+		virtual ~MediaPlugin();
+
+		virtual MRef<Media*> createMedia( MRef<SipSoftPhoneConfiguration *> config ) = 0;
+
+		virtual std::string getPluginType() const{ return "Media"; }
+
+};
+
+
+class LIBMINISIP_API MediaRegistry : public MPluginRegistry, public MSingleton<MediaRegistry>{
+	public:
+		virtual std::string getPluginType(){ return "Media"; }
+
+		std::list< MRef<MPlugin*> >::const_iterator begin() const;
+		std::list< MRef<MPlugin*> >::const_iterator end() const;
+
+	protected:
+		MediaRegistry();
+
+	private:
+		friend class MSingleton<MediaRegistry>;
 };
 
 #endif
