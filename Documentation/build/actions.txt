@@ -51,6 +51,7 @@ supported actions.
 
 Action Name	Description
 -------------	-------------
+confdump	Check your configure options before building!!!
 bootstrap	Run autotools to create 'configure'.
 configure	Run configure to create Makefiles.
 
@@ -76,6 +77,9 @@ purge		Purge distribution packages from system.
 allclean	Run uninstall and mclean (if needed).
 hostclean	Run allclean, then remove current host build/install trees.
 repoclean	Run hostclean for all targets, then remove build/install trees.
+
+confclean	Remove all *.local configuration files from the build.d tree.
+
 check		Run 'make check' to test projects.
 run		Run the application from the local install tree.
 
@@ -89,6 +93,14 @@ This section provides tips for using each supported action.
 
                              Bootstrap Actions
 			     ..................
+
+confdump
+--------
+
+This action simply displays your current build configuration, which takes
+into account settings from many different files.  Running this action
+before proceeding with development ensures that you actually end up with
+the build configured like you originally intended.
 
 bootstrap
 ---------
@@ -223,6 +235,14 @@ repoclean
 Run 'hostclean' for all packages, then completely remove build/install trees.
 In effect, this commands attempts to revert a working copy of the repository 
 to its pristine state in one step.
+
+confclean
+---------
+
+Remove any local configuration files in your build.d tree; this presently
+includes build.local, dist/*/dist.local, and arch/*/arch.local.  These 
+files will be automatically re-created the next time you run build.pl, so
+this can be useful to retreive their latest versions.
 
 check
 -----

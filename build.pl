@@ -209,6 +209,7 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( dist distcheck tarballs tarclean ),
 		@dist_actions, 
 		qw( check run allclean hostclean repoclean ),
+		qw( confdump confclean ),
 	);
 
 sub load_file_if_exists {
@@ -581,6 +582,65 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	*$callback = sub { return run_callback('dist', $f, @_) };
 }
 
+#######
+# action callbacks
+
+sub cb_noop { }
+
+sub cb_confdump {
+	my $spec = $configure_params{$pkg};
+	# XXX: quick and dirty, to see the composite results of loading
+	# multiple configuration files that may define/redefine settings.
+	print "Active configuration for $pkg:\n";
+	my @keys = sort grep { defined $spec->{$_} } keys %$spec;
+	print "\t", join(' = ', $_, $spec->{$_}), "\n" for @keys;
+	print "\n";
+}
+
+sub cb_hostclean { 
+	#  remove but recreate objdir, in case of pending actions
+	easy_chdir($builddir);
+	rmtree($objdir, !$quiet, 0);
+	easy_chdir($objdir);
+}
+
+sub cb_hostclean_post { 
+	easy_chdir($topdir);
+	rmtree( [ $builddir, $installdir ], !$quiet, 0 );
+	exit(0);
+}
+
+# repoclean always operates on all packages
+sub cb_repoclean_pre { @targets = @packages }
+sub cb_repoclean_post {
+	easy_chdir($topdir);
+	rmtree( [ $top_builddir, $top_installdir ], !$quiet, 0 );
+	exit(0);
+}
+
+sub cb_confclean_post {
+	# XXX: this could be highly undesirable.  maybe ask to confirm?
+	my @sublocals = bsd_glob("$confdir/*/*/*.local");
+	for my $file ( @sublocals, $default_build_local ) {
+		print "+removing $file...\n" unless $quiet;
+		unlink $file or die "unable to remove '$file': $!";
+	}
+}
+
+set_pre_callbacks(
+		repoclean => \&cb_repoclean_pre,
+	);
+set_build_callbacks(
+		confdump => \&cb_confdump,
+		hostclean => \&cb_hostclean,
+		confclean => \&cb_noop,
+	);
+set_post_callbacks(
+		repoclean => \&cb_repoclean_post,
+		hostclean => \&cb_hostclean_post,
+		confclean => \&cb_confclean_post,
+	);
+
 ######
 #  Common action functions
 
@@ -628,13 +688,6 @@ sub run_app_path {
 		callact('uninstall');
 		callact('mclean');
 	},
-	hostclean => sub { 
-		#  remove but recreate objdir, in case of pending actions
-		easy_chdir($builddir);
-		rmtree($objdir, 1, 0);
-		easy_chdir($objdir);
-	},
-	repoclean => sub { },
 );
 
 # common checks for preconditions
@@ -734,14 +787,7 @@ if ($ccache) {
 }
 
 # special pre-target processing
-for ( @action ) {
-/^repoclean$/ and do {
-	# repoclean always operates on all packages
-	@targets = @packages;
-	last
-};
-# no pre-target work to do
-}
+try_callback('pre', $_) for @action;
 
 create_working_paths();
 
@@ -768,16 +814,4 @@ for $pkg ( @targets ) {
 }
 
 # special post-target processing
-for ( @action ) {
-/^hostclean$/ and do {
-	easy_chdir($topdir);
-	rmtree( [ $builddir, $installdir ], 1, 0 );
-	exit(0);
-};
-/^repoclean$/ and do {
-	easy_chdir($topdir);
-	rmtree( [ $top_builddir, $top_installdir ], 1, 0 );
-	exit(0);
-};
-# no post-target work to do
-}
+try_callback('post', $_) for @action;
