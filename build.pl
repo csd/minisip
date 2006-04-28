@@ -185,7 +185,6 @@ $quiet = 0 if $pretend;
 $njobs = int(`grep ^processor /proc/cpuinfo | wc -l`) unless $njobs;
 $njobs = 1 unless $njobs;
 $njobs = 'unlimited' if $supercompute;
-print "+info: make will try to run $njobs parallel build jobs\n" if $verbose;
 
 # extra arguments to pass to make
 my @make_args = ();
@@ -354,7 +353,6 @@ die "error: no target specified!\nYou must specify at least " .
 	"one valid target.\n\n" . list_targets() .
 	"\nFor more information, see '$app_name --help'.\n" unless @targets;
 
-print "$action: @targets\n" unless $quiet;
 
 #######
 # common action funtions
@@ -467,9 +465,9 @@ sub autodetect_probe_path {
 	my %scores = ( );
 	for my $dir ( bsd_glob("$confdir/$type/*") ) {
 		my $file = "$dir/detect.pl";
-		print "+Looking for $type called $dir...\n" if $verbose;
+#		print "+Looking for $type called $dir...\n" if $verbose;
 		next unless load_file_if_exists($file);
-		print "+Probing the $type called $dir...\n" if $verbose;
+#		print "+Probing the $type called $dir...\n" if $verbose;
 		no strict 'refs';
 		my $f = $type . '_detect';
 		$scores{basename($dir)} = eval "$f()" for $hint;
@@ -484,7 +482,7 @@ sub autodetect_probe {
 	my $xconfdir = "$confdir/$type/$setting";
 	my $conf = "$xconfdir/$type.pl";
 	if (load_file_if_exists($conf)) {
-		print "+Using '$type' functions '$setting'\n:" .
+		print "+Using '$type' functions '$setting':\n" .
 			"\t$conf\n" if $verbose;
 		load_file_if_exists("$xconfdir/$type.conf");
 		load_file_if_exists("$xconfdir/$type.local");
@@ -650,12 +648,15 @@ sub list_targets {
 # override application to run, if user specified one via CLI
 $run_app = $_run_app if defined $_run_app;
 
+print "$action: @targets\n" unless $quiet;
+
 if ($verbose) {
-	print "+Top directory:              $topdir\n";
+	print "+\n+Top directory:              $topdir\n";
 	print "+Build directory:            $builddir\n";
 	print "+Install \$DESTDIR directory: $destdir\n" if $destdir;
 	print "+Install --prefix directory: $prefixdir\n";
 	print "+Full path to local install: $destdir$prefixdir\n" if $destdir;
+	print "+\n+Make will try to run $njobs parallel build jobs\n+\n";
 }
 
 # setup common environment
