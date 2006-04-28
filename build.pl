@@ -249,27 +249,31 @@ sub set_global_configure_param {
 	return 1;
 }
 
-$localconf = $localconf || "$confdir/build.local";
-unless (-f $localconf) {
-	# XXX: automatic upgrade code; remove this on or after May 1, 2006
-	my $oldconf = "$topdir/build.local";
-	if (-f $oldconf) {
-		my $move_msg = "local configuration file to:\n" . 
-			"\t$localconf\n\tfrom $oldconf\n";
-		warn "Moving $move_msg";
-		move($oldconf, $localconf) or
-			die "error: unable to move $move_msg" .  "error: $!\n";
-	} else {
-	# XXX: end of automatic upgrade path (except closing else brace below)
-	# Create 
-	my $exampleconf = "$confdir/build.local.example";
-	my $create_msg = "local configuration file:\n" . 
-		"\t$localconf\n\tfrom $exampleconf\n";
-	warn "Creating new $create_msg";
-	copy($exampleconf, $localconf) or 
-		die "error: unable to create $create_msg" . "error: $!\n";
-	} # XXX
+# To assist the setup of new working copies, create *.local configuration 
+# files from their *.local.example counterparts.
+sub replace_missing_conf_file {
+	my ( $dest, $type, $src, $name ) = @_;
+	return if -f $dest;
+	$src = "$dest.example" unless $src;
+	$name = $name ? " for '$name'" : '';
+	my $create_msg = "local $type configuration file$name:\n" . 
+		"\t$dest\n\tfrom $src";
+	print "+Creating new $create_msg\n";
+	unless (-f $src) {
+		my $prep = $name ? 'this ' : '';
+		warn "+warning: '$src' does not exist$name\n" .
+			"+warning: no default settings for $prep$type.\n";
+		return;
+	}
+	copy($src, $dest) or 
+		die "error: unable to create $create_msg\nerror: $!\n";
 }
+
+# create local configuration file
+my $default_build_local = "$confdir/build.local";
+$localconf = $localconf || $default_build_local;
+replace_missing_conf_file($localconf, 'build', "$default_build_local.example");
+
 # allow overrides using the 'set*_configure_param' accessors
 load_file_if_exists($localconf);
 
@@ -476,6 +480,18 @@ sub autodetect_probe_path {
 	( $setting ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
 	return $setting;
 } 
+
+sub autodetect_warning {
+	my ( $type, $setting, $ext, $disable ) = @_;
+	my $warning = $disable ?
+		'will be disabled until one is created' :
+		'may not work correctly without it';
+	warn <<MISSING unless $quiet;
++warning: The '$type.$ext' script does not exist for '$setting'.
++warning: '$type' actions $warning.
+MISSING
+}
+
 sub autodetect_probe {
 	my ( $type, $setting, $hint ) = @_;
 	( $setting ) = autodetect_probe_path($type, $setting, $hint);
@@ -484,13 +500,16 @@ sub autodetect_probe {
 	if (load_file_if_exists($conf)) {
 		print "+Using '$type' functions '$setting':\n" .
 			"\t$conf\n" if $verbose;
-		load_file_if_exists("$xconfdir/$type.conf");
-		load_file_if_exists("$xconfdir/$type.local");
+		my $xlocalconf = "$xconfdir/$type.conf";
+		load_file_if_exists($xlocalconf) or
+			autodetect_warning($type, $setting, 'conf');
+
+		$xlocalconf = "$xconfdir/$type.local";
+		replace_missing_conf_file($xlocalconf, $type, undef, $hint);
+		load_file_if_exists($xlocalconf) or
+			autodetect_warning($type, $setting, 'local');
 	} else {
-		warn <<NOCODE unless $quiet;
-warning: The '$type.pl' script does not exist for '$setting'.
-warning: '$type' actions will be disabled until one is created!
-NOCODE
+		autodetect_warning($type, $setting, 'pl', 1);
 	} 
 	return $setting;
 }
