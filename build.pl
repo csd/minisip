@@ -295,10 +295,15 @@ sub autodetect_platform { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
 $buildspec = autodetect_platform($buildspec, sub { 'x86-pc-linux-gnu' });
 $hostspec = autodetect_platform($hostspec, sub { $buildspec });
  
+my ( $buildarch, $hostarch );
 $arch_class = 'build';
-my $buildarch = autodetect_probe('arch', 'autodetect', $buildspec);
-$arch_class = 'host';
-my $hostarch = autodetect_probe('arch', 'autodetect', $hostspec);
+$buildarch = autodetect_probe('arch', 'autodetect', $buildspec);
+if (cross_compiling()) {
+	$arch_class = 'host';
+	$hostarch = autodetect_probe('arch', 'autodetect', $hostspec);
+} else {
+	$hostarch = $buildarch;
+}
 #$arch_class = 'target';
 #my $targetarch = autodetect_probe('arch', $targetspec);  # XXX: insanity!
  
