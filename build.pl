@@ -290,8 +290,8 @@ sub set_arch_callbacks {
 	my @funcs = map { $arch_class . '_' . $_ => $funcs{$_} } keys %funcs;
 	set_callbacks('arch', @funcs); 
 }
-sub set_arch_detect { set_callback(qw( arch detect ), $_[0]) }
-sub arch_detect { run_callback(qw( arch detect )) }
+sub set_arch_detect { set_callbacks('arch', detect => $_[0]) }
+sub arch_detect { run_callbacks('arch', 'detect') }
 
 sub cross_compiling { return $buildspec ne $hostspec }
 sub autodetect_platform { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
@@ -458,8 +458,14 @@ sub remove_files {
 	}
 }
 
+
 #######
 # autodetection helpers
+
+sub autodetection {
+	my ( $type, $hint ) = @_;
+	return eval { try_callback($type, 'detect') for $hint };
+}
 
 sub autodetect_probe_path {
 	my ( $type, $setting, $hint ) = @_;
@@ -472,9 +478,7 @@ sub autodetect_probe_path {
 #		print "+Looking for $type called $dir...\n" if $verbose;
 		next unless load_file_if_exists($file);
 #		print "+Probing the $type called $dir...\n" if $verbose;
-		no strict 'refs';
-		my $f = $type . '_detect';
-		$scores{basename($dir)} = eval "$f()" for $hint;
+		$scores{basename($dir)} = autodetection($type, $hint);
 	}
 	# pick the top scoring probe
 	( $setting ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
@@ -519,30 +523,42 @@ sub autodetect_probe {
 
 my %callbacks;
 
-sub get_extended_actions { map { %$_ } values %callbacks }
+sub get_extended_actions { 
+	return map { %$_ } grep !/^(?:pre|post)$/, values %callbacks 
+}
 
+sub set_pre_callbacks { set_callbacks('pre', @_) }
+sub set_post_callbacks { set_callbacks('post', @_) }
+sub set_build_callbacks { set_callbacks('build', @_) }
 sub set_callbacks {
 	my ( $type, %newfuncs ) = @_;
 	$callbacks{$type} = {} unless exists $callbacks{$type};
 	$callbacks{$type}->{$_} = $newfuncs{$_} for keys %newfuncs;
 	return 1;
 }
-sub set_callback { $callbacks{$_[0]}->{$_[1]} = $_[2] }
 sub set_default_callback {
 	my ( $type, $callback, $func ) = @_;
 	return unless exists $callbacks{$type};
 	return if exists $callbacks{$type}->{$callback};
-	return set_callback($type, $callback, $func);
+	return set_callbacks($type, $callback, $func);
 }
-sub run_callback { $callbacks{$_[0]}->{$_[1]}->(@_) }
+sub run_callback { 
+#	print "+callback: ", $_[0], "->", $_[1], "\n"; 
+	$callbacks{$_[0]}->{$_[1]}->(@_) 
+}
+sub try_callback { 
+	return unless exists $callbacks{$_[0] || '_unknown_'};
+	return unless exists $callbacks{$_[0]}->{$_[1] || '_unknown_'};
+	return run_callback(@_);
+}
  
  
 ########
 # Target/host distribution support
 
 sub set_dist_callbacks { set_callbacks('dist', @_) }
-sub set_dist_detect { set_callback(qw( dist detect ), $_[0]) }
-sub dist_detect { run_callback(qw( dist detect )) }
+sub set_dist_detect { set_callbacks('dist', detect => $_[0]) }
+sub dist_detect { run_callbacks('dist', 'detect') }
 
 # probe the given hostdist; load its configuration files
 $hostdist = autodetect_probe('dist', $hostdist);
