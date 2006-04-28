@@ -64,6 +64,7 @@ dnl		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
 dnl		HAVE_GNUTLS=yes
 	],[])
 AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
+AC_SUBST(HAVE_GNUTLS)
 ])
 # End of AM_LIBMCRYPTO_CHECK_GNUTLS
 #
