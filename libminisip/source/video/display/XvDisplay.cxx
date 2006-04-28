@@ -32,20 +32,21 @@ using namespace std;
 #define NB_IMAGES 3
 
 static std::list<std::string> pluginList;
-static MRef<MPlugin *> plugin;
-
+static bool initialized;
 
 extern "C"
 std::list<std::string> *mxv_LTX_listPlugins( MRef<Library*> lib ){
-	pluginList.push_back("getPlugin");
-	plugin = new XvPlugin( lib );
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mxv_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+MRef<MPlugin *> mxv_LTX_getPlugin( MRef<Library*> lib ){
+	return  new XvPlugin( lib );
 }
 
 

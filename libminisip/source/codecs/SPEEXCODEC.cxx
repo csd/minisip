@@ -35,22 +35,20 @@ using namespace std;
 
 static std::list<std::string> pluginList;
 static int initialized;
-static MRef<MPlugin *> plugin;
 
 extern "C"
 std::list<std::string> *mspeex_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
-		
-		plugin = new SpeexCodec( lib );
+		initialized = true;
 	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mspeex_LTX_getPlugin(){
-	return &plugin;
+MRef<MPlugin *> mspeex_LTX_getPlugin( MRef<Library *> lib ){
+	return new SpeexCodec( lib );
 }
 
 

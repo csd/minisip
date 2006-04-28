@@ -74,7 +74,7 @@ class LIBMUTIL_API MPlugin : public virtual MObject{
 		 * \brief MPlugin object factory, entry point in the
 		 * shared library.
 		 **/
-		typedef MRef<MPlugin *> * (* creator)(MRef<Library*> lib);
+		typedef MRef<MPlugin *> (* creator)(MRef<Library*> lib);
 
 		/**
 		 * @returns the MemObject type.

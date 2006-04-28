@@ -33,22 +33,21 @@ using namespace std;
 #define NB_IMAGES 3
 
 static std::list<std::string> pluginList;
-static MRef<MPlugin *> plugin;
-
+static bool initialized;
 
 extern "C"
 std::list<std::string> *mx11_LTX_listPlugins( MRef<Library*> lib ){
-	cerr << "VideoPlugin " << endl;
-
-	pluginList.push_back("getPlugin");
-	plugin = new X11Plugin( lib );
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mx11_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+MRef<MPlugin *> mx11_LTX_getPlugin( MRef<Library*> lib ){
+	return new X11Plugin( lib );
 }
 
 X11Display::X11Display( uint32_t width, uint32_t height):VideoDisplay(){

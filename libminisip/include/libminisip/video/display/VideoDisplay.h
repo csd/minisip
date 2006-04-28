@@ -89,11 +89,9 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 
 class LIBMINISIP_API VideoDisplayPlugin : public MPlugin{
 	public:
-		VideoDisplayPlugin( MRef<Library *> lib );
+		virtual std::string getPluginType() const;
 
-		virtual std::string getPluginType() const{
-			return "VideoDisplay";
-		}
+		VideoDisplayPlugin( MRef<Library *> lib );
 
 		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const = 0;
 };

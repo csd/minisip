@@ -37,19 +37,22 @@ using namespace std;
 
 static std::list<std::string> pluginList;
 static MRef<MPlugin *> plugin;
+static bool initialized;
 
 
 extern "C"
 std::list<std::string> *msdl_LTX_listPlugins( MRef<Library*> lib ){
-	pluginList.push_back("getPlugin");
-	plugin = new SdlPlugin( lib );
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *msdl_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+MRef<MPlugin *> msdl_LTX_getPlugin( MRef<Library*> lib ){
+	return new SdlPlugin( lib );
 }
 
 
@@ -260,4 +263,11 @@ void SdlDisplay::handleEvents(){
 		}
 
 	}
+}
+
+
+SdlPlugin::SdlPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){
+}
+
+SdlPlugin::~SdlPlugin(){
 }

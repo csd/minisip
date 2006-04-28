@@ -215,11 +215,11 @@ MRef<MPlugin *> MPluginManager::loadFromLibrary( MRef<Library *> lib,
 				entryPoint ));
 
 	if( creatorFunction ){
-		MRef<MPlugin *> * pp = creatorFunction( lib );
+		MRef<MPlugin *> pp = creatorFunction( lib );
 		
-		if( pp ){
-			mdbg << "MPluginManager: loaded " << (*pp)->getName() << "(" << (*pp)->getDescription() << ")" << end;
-			return *pp;
+		if( !pp.isNull() ){
+			mdbg << "MPluginManager: loaded " << pp->getName() << "(" << pp->getDescription() << ")" << end;
+			return pp;
 		}
 	}
 
@@ -250,6 +250,8 @@ void MPluginManager::removeRegistry( MPluginRegistry * registry ){
 }
 
 bool MPluginManager::setSearchPath( const std::string &searchPath ){
+	mdbg << "MPluginManager: setSearchPath " << searchPath << end;
+
 	bool res = lt_dlsetsearchpath( searchPath.c_str() );
 	return res;
 }

@@ -50,25 +50,32 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 		string name = names[i];
 
 		if( displayCounter != 0 &&
-		    ( name == "sdl" || name == "xv" ) )
+		    ( name == "sdl" || name == "xv" ) ){
 			continue;
+		}
 
 		try{
 			MRef<MPlugin *> plugin;
 			plugin = findPlugin( name );
-			if( !plugin )
+			if( !plugin ){
+				mdbg << "VideoDisplayRegistry: Can't find " << name << end;
 				continue;
+			}
 			
 			MRef<VideoDisplayPlugin *> videoPlugin;
 			
 			videoPlugin = dynamic_cast<VideoDisplayPlugin*>( *plugin );
-			if( !videoPlugin )
+			if( !videoPlugin ){
+				merr << "VideoDisplayPlugin: Not display plugin " << name << end;
 				continue;
+			}
 			
 			display = videoPlugin->create( width, height );
 			
-			if( !display )
+			if( !display ){
+				merr << "VideoDisplayPlugin: Couldn't create display " << name << end;
 				continue;
+			}
 			
 			display->start();
 			displayCounter ++;
@@ -258,6 +265,9 @@ bool VideoDisplay::providesImage(){
 void VideoDisplay::releaseImage( MImage * mimage ){
 }
 
-
 VideoDisplayPlugin::VideoDisplayPlugin( MRef<Library *> lib ): MPlugin( lib ){
+}
+
+std::string VideoDisplayPlugin::getPluginType() const{
+	return "VideoDisplay";
 }

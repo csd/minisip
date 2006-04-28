@@ -34,22 +34,20 @@
 
 static std::list<std::string> pluginList;
 static int initialized;
-static MRef<MPlugin *> plugin;
 
 extern "C"
 std::list<std::string> *mgsm_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
-		
-		plugin = new GsmCodec( lib );
+		initialized = true;
 	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mgsm_LTX_getPlugin( MRef<Library *> lib ){
-	return &plugin;
+MRef<MPlugin *> mgsm_LTX_getPlugin( MRef<Library *> lib ){
+	return new GsmCodec( lib );
 }
 
 GsmCodec::GsmCodec( MRef<Library *> lib ): AudioCodec( lib ){

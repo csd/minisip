@@ -41,20 +41,22 @@ using namespace std;
 
 
 static std::list<std::string> pluginList;
-static MRef<MPlugin *> plugin;
+static bool initialized;
 
 
 extern "C"
 std::list<std::string> *mdc1394_LTX_listPlugins( MRef<Library*> lib ){
-	pluginList.push_back("getPlugin");
-	plugin = new Dc1394Plugin( lib );
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mdc1394_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+MRef<MPlugin *> mdc1394_LTX_getPlugin( MRef<Library*> lib ){
+	return new Dc1394Plugin( lib );
 }
 
 

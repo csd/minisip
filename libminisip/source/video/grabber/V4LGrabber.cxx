@@ -38,6 +38,13 @@
 #include<libmutil/mtime.h>
 #include<libmutil/merror.h>
 
+/*
+  TODO
+  The V4LGrabber contains a unresolved race condition that occurs
+  if it's closed before the initialization has finished.
+  It is triggered if the peer answers a video call and directly terminates it,
+  which results in a crash.
+ */
 
 using namespace std;
 
@@ -48,10 +55,15 @@ V4LGrabber::V4LGrabber( string device ):device(device){
 	imageFormat = NULL;
         imageWindow = NULL;
 	stopped = false;
+	fd = -1;
+
+	mdbg << "V4LGrabber: device " << device << end;
 }
 
 void V4LGrabber::open(){
 	fd = ::open( device.c_str(), O_RDWR );
+
+	mdbg << "V4LGrabber: opened " << fd << endl;
 
 	if( fd == -1 ){
 		merror( "open" );
@@ -448,12 +460,14 @@ void V4LGrabber::read( ImageHandler * handler ){
 }
 
 void V4LGrabber::close(){
+	mdbg << "V4LGrabber: Close" << end;
 	stop();
 
 	grabberLock.lock();
 	unmapMemory();
 
 	::close( fd );
+	fd = -1;
 	grabberLock.unlock();
 }
 

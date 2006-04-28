@@ -36,23 +36,21 @@ using namespace std;
 static const char PA_PREFIX[] = "pa";
 static std::list<std::string> pluginList;
 static int initialized;
-static MRef<MPlugin *> plugin;
 
 
 extern "C"
 std::list<std::string> *mportaudio_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
 		pluginList.push_back("mportaudio_LTX_getPortAudioPlugin");
-		
-		plugin = new PortAudioDriver( lib );
+		initialized = true;
 	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mportaudio_LTX_getPortAudioPlugin( MRef<Library*> lib ){
-	return &plugin;
+MRef<MPlugin *> mportaudio_LTX_getPortAudioPlugin( MRef<Library*> lib ){
+	return new PortAudioDriver( lib );
 }
 
 PortAudioDriver::PortAudioDriver( MRef<Library*> lib ) : SoundDriver( PA_PREFIX, lib ), initialized( false ){

@@ -35,24 +35,22 @@
 using namespace std;
 
 static std::list<std::string> pluginList;
-static int initialized;
-static MRef<MPlugin *> plugin;
+static bool initialized;
 
 
-extern "C"
+extern "C" LIBMINISIP_API
 std::list<std::string> *mxmlconf_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
-		
-		plugin = new MXmlConfigPlugin( lib );
+		initialized = true;
 	}
 
 	return &pluginList;
 }
 
-extern "C"
-MRef<MPlugin *> *mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+extern "C" LIBMINISIP_API
+MRef<MPlugin *> mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
+	return new MXmlConfigPlugin( lib );
 }
 
 MXmlConfBackend::MXmlConfBackend(){

@@ -35,22 +35,20 @@ using namespace std;
 
 static std::list<std::string> pluginList;
 static int initialized;
-static MRef<MPlugin *> plugin;
 
 extern "C"
 std::list<std::string> *mg711_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
-		
-		plugin = new G711Codec( lib );
+		initialized = true;
 	}
 
 	return &pluginList;
 }
 
 extern "C"
-MRef<MPlugin *> *mg711_LTX_getPlugin(){
-	return &plugin;
+MRef<MPlugin *> mg711_LTX_getPlugin( MRef<Library *> lib ){
+	return new G711Codec( lib );
 }
 
 
