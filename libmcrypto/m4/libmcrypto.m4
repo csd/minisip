@@ -56,15 +56,18 @@ AC_SUBST(OPENSSL_LIBS)
 # AM_LIBMCRYPTO_CHECK_GNUTLS(VERSION)
 # ------------------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_GNUTLS], [
-AC_CHECK_LIB([gcrypt], [main],[],[])
+AC_CHECK_LIB([gcrypt], [main],[
+		GNUTLS_LIBS="-lgcrypt"
+	],[])
 AC_CHECK_LIB([gnutls], [main],[
 		AC_CHECK_HEADER(gnutls/x509.h)
 		AC_MSG_NOTICE([Sorry, but gnutls support is not complete.])
+		GNUTLS_LIBS="-lgnutls"
 dnl		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
 dnl		HAVE_GNUTLS=yes
 	],[])
 AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
-AC_SUBST(HAVE_GNUTLS)
+AC_SUBST(GNUTLS_LIBS)
 ])
 # End of AM_LIBMCRYPTO_CHECK_GNUTLS
 #
