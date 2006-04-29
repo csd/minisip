@@ -9,7 +9,6 @@
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/NsLookup.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/StreamSocket.h>
