@@ -84,6 +84,7 @@ do
 		
 	cd ${subdir}
 
+	aclocal_flags="$aclocal_flags -I ../${subdir}/m4"
 	ACLOCAL_FLAGS="$aclocal_flags" ./bootstrap
 	
 	configure_params="$base_configure_params"
@@ -194,8 +195,6 @@ do
 	ACLOCAL_FLAGS="$aclocal_flags" \
 		make $make_options
 	
-	aclocal_flags="$aclocal_flags -I ../${subdir}/m4"
-
 	cd ..
 done
 
