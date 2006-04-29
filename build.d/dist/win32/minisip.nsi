@@ -25,12 +25,10 @@
 !error "VERSION undefined"
 !endif
 
-!ifndef MINISIPDIR
-!error "MINISIPDIR undefined"
-!endif
-
-!ifndef SSLDIR
-!error "SSLDIR undefined"
+!ifndef INSTALLDIR
+!error "INSTALLDIR undefined"
+!else
+!define MINISIPDIR ${INSTALLDIR}
 !endif
 
 ; Use Modern UI
@@ -125,6 +123,7 @@ SectionEnd
 ;
 ; OpenSSL section
 ;
+!ifdef SSLDIR
 Section "OpenSSL"
 SectionIn 1
 
@@ -132,6 +131,7 @@ SetOutPath $INSTDIR
 File ${SSLDIR}/libeay32.dll
 File ${SSLDIR}/ssleay32.dll
 SectionEnd
+!endif
 
 ;
 ; Strings
@@ -153,8 +153,10 @@ Delete "$INSTDIR\libminisip*.dll"
 Delete "$INSTDIR\minisip_*.exe"
 
 ; Delete OpenSSL
+!ifdef SSLDIR
 Delete "$INSTDIR\libeay32.dll"
 Delete "$INSTDIR\ssleay32.dll"
+!endif
 
 ; Delete plugins
 Delete "$INSTDIR\plugins\*.dll"
