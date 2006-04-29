@@ -336,7 +336,7 @@ push @make_args, "DESTDIR=$destdir" if $destdir ne '';
 #######
 # process action and target arguments
 
-my $action = shift @ARGV || $default_action;
+our $action = shift @ARGV || $default_action;
 die "error: No action specified! You must provide at least " .
 	"one valid action.\n       You may combine actions with " .
 	"'+', such as 'bootstrap+configure'.\n\n" . list_actions() .
@@ -404,6 +404,8 @@ sub callact {
 	my $a = shift;
 	die "undefined action" unless $a;
 	die "no action '$a'" unless exists $actions{$a};
+
+	local $action = $a;
 
 	$act_deps{$a}->() if exists $act_deps{$a};
 
@@ -564,6 +566,7 @@ sub set_default_callback {
 }
 sub run_callback { 
 #	print "+callback: ", $_[0], "->", $_[1], "\n"; 
+	local $action = $_[1];
 	$callbacks{$_[0]}->{$_[1]}->(@_) 
 }
 sub try_callback { 
