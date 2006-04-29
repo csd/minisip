@@ -46,65 +46,6 @@ mg711_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 
 
 #
-# iLBC codec plugin
-#
-libcodec_ilbc_src = source/codecs/ILBCCODEC.cxx \
-			source/codecs/ILBCCODEC.h \
-			source/codecs/ilbc/anaFilter.cxx \
-			source/codecs/ilbc/constants.cxx \
-			source/codecs/ilbc/createCB.cxx \
-			source/codecs/ilbc/doCPLC.cxx \
-			source/codecs/ilbc/enhancer.cxx \
-			source/codecs/ilbc/filter.cxx \
-			source/codecs/ilbc/FrameFlassify.cxx \
-			source/codecs/ilbc/gainquant.cxx \
-			source/codecs/ilbc/getCBvec.cxx \
-			source/codecs/ilbc/helpfun.cxx \
-			source/codecs/ilbc/hpInput.cxx \
-			source/codecs/ilbc/hpOutput.cxx \
-			source/codecs/ilbc/iCBConstruct.cxx \
-			source/codecs/ilbc/iCBSearch.cxx \
-			source/codecs/ilbc/iLBC_decode.cxx \
-			source/codecs/ilbc/iLBC_encode.cxx \
-			source/codecs/ilbc/LPCdecode.cxx \
-			source/codecs/ilbc/LPCencode.cxx \
-			source/codecs/ilbc/lsf.cxx \
-			source/codecs/ilbc/packing.cxx \
-			source/codecs/ilbc/StateConstructW.cxx \
-			source/codecs/ilbc/StateSearchW.cxx \
-			source/codecs/ilbc/syntFilter.cxx \
-			source/codecs/ilbc/StateConstructW.h \
-			source/codecs/ilbc/StateSearchW.h \
-			source/codecs/ilbc/helpfun.h \
-			source/codecs/ilbc/iCBConstruct.h \
-			source/codecs/ilbc/syntFilter.h \
-			source/codecs/ilbc/anaFilter.h \
-			source/codecs/ilbc/iLBC_decode.h \
-			source/codecs/ilbc/constants.h \
-			source/codecs/ilbc/getCBvec.h \
-			source/codecs/ilbc/enhancer.h \
-			source/codecs/ilbc/iCBSearch.h \
-			source/codecs/ilbc/hpInput.h \
-			source/codecs/ilbc/gainquant.h \
-			source/codecs/ilbc/LPCencode.h \
-			source/codecs/ilbc/createCB.h \
-			source/codecs/ilbc/doCPLC.h \
-			source/codecs/ilbc/iLBC_define.h \
-			source/codecs/ilbc/packing.h \
-			source/codecs/ilbc/LPCdecode.h \
-			source/codecs/ilbc/hpOutput.h \
-			source/codecs/ilbc/lsf.h \
-			source/codecs/ilbc/filter.h \
-			source/codecs/ilbc/iLBC_encode.h \
-			source/codecs/ilbc/FrameClassify.h
-
-plugins_LTLIBRARIES += milbc.la
-milbc_la_LDFLAGS = $(plugins_LDFLAGS)
-milbc_la_SOURCES = $(libcodec_ilbc_src)
-milbc_la_LIBADD = libminisip.la $(MUTIL_LIBS)
-
-
-#
 # Speex codec plugin
 #
 if HAS_SPEEX
