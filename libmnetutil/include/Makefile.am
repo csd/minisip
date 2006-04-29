@@ -17,7 +17,6 @@ pkginclude_HEADERS =    libmnetutil/IP4Address.h \
 			libmnetutil/StreamSocket.h \
 			libmnetutil/TCPSocket.h \
 			libmnetutil/TLSSocket.h \
-			libmnetutil/NsLookup.h \
 			libmnetutil/NetUtil.h \
 			libmnetutil/UDPSocket.h \
 			libmnetutil/libmnetutil_config.h
