@@ -1,0 +1,111 @@
+build.pl: Build File Reference Guide
+by Zachary T Welch <zw@superlucidity.net>
+Last Updated: April 28, 2006
+
+This document provides an overview as well as detailed explanations of the
+various files used to configure build.pl.
+
+
+Build File Overview
+-------------------
+
+The following directories and files should be present in a project using
+the build.pl script.  The file names are relative to the trunk of the 
+repository containing the projects you wish to build:
+
+build.pl					# main build script
+
+build.d/					# build script configuration
+	build.conf				# per-project definition file
+	build.local.example			# per-project template overrides
+	build.local				# non-revisioned overrides
+
+	arch/					# architecture support
+		<arch>/				# supports the <arch> platform
+			arch.pl			# generic callbacks for <arch>
+			arch.conf		# per-project defs for <arch>
+			arch.local.example	# per-project <arch> overrides
+			arch.local		# non-revisioned overrides
+
+	dist/					# OS/distribution support
+		<dist>/				# supports hosts running <dist>
+			dist.pl			# generic callbacks for <dist>
+			dist.conf		# per-project defs for <dist>
+			dist.local.example	# per-project <dist> overrides
+			dist.local		# non-revisiioned overrides
+
+<project>/					# one directory per project
+	bootstrap				# used to create configure
+	
+
+The build.pl script will warn (and possibly exit) if the files it needs 
+are missing from their expected locations.
+
+
+Callback Scripts
+----------------
+
+The callback Perl scripts may define architecture or distribution specific
+functionality, callbacks, and other code.  The only limitation to the code
+that may be placed in these files is that it must have no direct dependency
+on the projects that it processes.  Any per-project definitions must be 
+placed in the appropriate configuration script.  Users of the build.pl 
+script may generally ignore these files (until they find a bug in them).
+
+
+Configuration Scripts
+---------------------
+
+While the callback scripts aim to work with any project available to it, 
+the configuration files store the definitions, dependencies, and 
+configurable options of targets that will be built as part of one project.
+
+Built by the maintainers of the aggregate project, each target is defined
+using callbacks into the main script, setting the default options required
+to build each project.  These settings should be updated whenever options
+are being added, updated, or removed from the targets' 'configure' scripts.
+
+The build.conf file establishes the primary set-up of these project defaults.
+Each <arch> or <dist> may extend the settings provided there in their own
+arch.conf or dist.conf files, respectively.  These allow the maintainers
+of each platform to define the necessary or preferred defaults for their
+group of users.  This includes alternate dependency installation paths, 
+different default configure parameters, and other appropriate settings.
+
+If the arch.pl or dist.pl callback script defines extended functionality,
+their configuration scripts may contain additional options not found in
+other files.
+
+
+Local Overrides
+---------------
+
+To prevent users from needing to modify versioned resources, the build.pl
+script will look for local configuration files to use to customize the
+settings established by the project maintainers.
+
+The build.local file provides the primary location for overriding settings.
+Each <arch> or <dist> may extend the settings provided there in their own
+arch.conf or dist.conf files, respectively.
+
+
+Example Overrides
+-----------------
+
+The set-up of a new working copy should be facilitied as much as possible;
+while documentation helps new users, the example override files play a
+functional role in the system.  These files - established and updated by the
+project maintainers - will be used to create a fresh *.local file, if one has
+not already exist in the appropriate location.
+
+
+Bootstrap Scripts
+-----------------
+
+Presently, the build.pl script relies on each project to contain its own
+'bootstrap' script, which is used to run the GNU autotools in order to create 
+an initial 'configure' script.
+
+The author has developed a separate component, named a42, to eliminiate this
+troublesome requirement; however, it still requires integration and testing.
+
