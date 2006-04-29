@@ -784,29 +784,39 @@ $ENV{CXXFLAGS} .= " -Wall";
 $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 
 $aclocaldir = "$destdir$prefixdir/share/aclocal";
+$pkgconfigdir = "$destdir$prefixdir/lib/pkgconfig";
 
 sub aclocal_flags {
 	my @m4_paths = map { "$topdir/$_/m4" } @packages;
 	my @aclocal_flags = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
 	return join(' ', '', @aclocal_flags);
 }
-$ENV{ACLOCAL_FLAGS} ||= '';
-$ENV{ACLOCAL_FLAGS} .= aclocal_flags();
+sub setup_aclocal_env {
+	$ENV{ACLOCAL_FLAGS} ||= '';
+	$ENV{ACLOCAL_FLAGS} .= aclocal_flags();
+}
 
 # pkg-config search order (tries to find the "most recent copy"):
 #   1) Project directories
 #   2) Local install directory
 #   3) System directories 
-$pkgconfigdir = "$destdir$prefixdir/lib/pkgconfig";
-my @pkgconfigdirs = ( ( map { "$builddir/$_" } @packages ), $pkgconfigdir );
-push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
-$ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
+sub setup_pkgconfig_env {
+	my @pkgconfigdirs = map { "$builddir/$_" } @packages;
+	push @pkgconfigdirs, $pkgconfigdir;
+	push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
+	$ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
+}
 
-if ($ccache) {
+sub setup_ccache_env {
+	return unless $ccache;
 	$ENV{PATH} = join(':', '/usr/lib/ccache/bin', $ENV{PATH});
 	$ENV{CCACHE_DIR} = easy_mkdir(File::Spec->catdir($topdir, '.ccache'))
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
+
+setup_aclocal_env();
+setup_pkgconfig_env();
+setup_ccache_env();
 
 # special pre-target processing
 try_callback('pre', $_) for @action;
