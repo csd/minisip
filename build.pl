@@ -336,6 +336,10 @@ push @make_args, "DESTDIR=$destdir" if $destdir ne '';
 #######
 # process action and target arguments
 
+our $pkg;
+my %actions;
+my %act_deps;
+
 our $action = shift @ARGV || $default_action;
 die "error: No action specified! You must provide at least " .
 	"one valid action.\n       You may combine actions with " .
@@ -362,13 +366,30 @@ die "error: no target specified!\nYou must specify at least " .
 	"one valid target.\n\n" . list_targets() .
 	"\nFor more information, see '$app_name --help'.\n" unless @targets;
 
+sub current_action { $action }
+sub requested_actions { @action }
+sub current_target { $pkg }
+sub requested_targets { @targets }
+
+sub assert_single_action {
+	return if requested_actions() == 1;
+	die <<SINGLE_ACTION;
+The '$action' action must be called alone; it can not be combined.
+SINGLE_ACTION
+}
+sub assert_single_target {
+	return if requested_targets() == 1;
+	die <<SINGLE_TARGET;
+The '$action' action must be called with a single target.  If you are using
+batch mode by default, you may need to add the '-S' option to use 'one-shot' 
+mode.  If not, then leave out the '-S' option or select the target that 
+contains the program to run.
+SINGLE_TARGET
+}
+
 
 #######
 # common action funtions
-
-our $pkg;
-my %actions;
-my %act_deps;
 
 sub easy_mkdir {
 	my ( $path, $print ) = @_;
