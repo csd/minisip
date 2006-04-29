@@ -234,15 +234,15 @@ string certificate::get_name(){
 
 string certificate::get_cn(){
 	string name = get_name();
-	unsigned pos, pos2;
+	size_t pos, pos2;
 
-	pos = (unsigned int)name.find( "/CN=" );
+	pos = name.find( "/CN=" );
 
 	if( pos == string::npos ){
 		return "No common name";
 	}
 
-	pos2 = (unsigned int)name.find( "/", pos + 1 );
+	pos2 = name.find( "/", pos + 1 );
 
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }
@@ -256,15 +256,15 @@ string certificate::get_issuer(){
 
 string certificate::get_issuer_cn(){
 	string name = get_issuer();
-	unsigned pos, pos2;
+	size_t pos, pos2;
 
-	pos = (unsigned int)name.find( "/CN=" );
+	pos = name.find( "/CN=" );
 
 	if( pos == string::npos ){
 		return "No common name";
 	}
 
-	pos2 = (unsigned int)name.find( "/", pos + 1 );
+	pos2 = name.find( "/", pos + 1 );
 
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }
