@@ -638,6 +638,8 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 
 sub cb_noop { }
 
+sub cb_run_post { act('run', run_app_path()) }
+
 sub cb_confdump {
 	my $spec = $configure_params{$pkg};
 	# XXX: quick and dirty, to see the composite results of loading
@@ -648,13 +650,13 @@ sub cb_confdump {
 	print "\n";
 }
 
+sub cb_hostclean_pre { assert_single_action() }
 sub cb_hostclean { 
 	#  remove but recreate objdir, in case of pending actions
 	easy_chdir($builddir);
 	rmtree($objdir, !$quiet, 0);
 	easy_chdir($objdir);
 }
-
 sub cb_hostclean_post { 
 	easy_chdir($topdir);
 	rmtree( [ $builddir, $installdir ], !$quiet, 0 );
@@ -662,13 +664,17 @@ sub cb_hostclean_post {
 }
 
 # repoclean always operates on all packages
-sub cb_repoclean_pre { @targets = @packages }
+sub cb_repoclean_pre { 
+	assert_single_action();
+	@targets = @packages 
+}
 sub cb_repoclean_post {
 	easy_chdir($topdir);
 	rmtree( [ $top_builddir, $top_installdir ], !$quiet, 0 );
 	exit(0);
 }
 
+sub cb_confclean_pre { assert_single_action() }
 sub cb_confclean_post {
 	# XXX: this could be highly undesirable.  maybe ask to confirm?
 	my @sublocals = bsd_glob("$confdir/*/*/*.local");
@@ -679,14 +685,18 @@ sub cb_confclean_post {
 }
 
 set_pre_callbacks(
+		hostclean => \&cb_repoclean_pre,
 		repoclean => \&cb_repoclean_pre,
+		confclean => \&cb_repoclean_pre,
 	);
 set_build_callbacks(
+		run => \&cb_noop,
 		confdump => \&cb_confdump,
 		hostclean => \&cb_hostclean,
 		confclean => \&cb_noop,
 	);
 set_post_callbacks(
+		run => \&cb_run_post,
 		repoclean => \&cb_repoclean_post,
 		hostclean => \&cb_hostclean_post,
 		confclean => \&cb_confclean_post,
@@ -720,7 +730,6 @@ sub run_app_path {
 	check => sub { act('check', 'make', @make_args, 'check'); },
 	install => sub { act('install', 'make', @make_args, 'install'); },
 	uninstall => sub { act('uninstall', 'make', @make_args, 'uninstall'); },
-	run => sub { act('run', run_app_path()); },
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
 	tarcontents => sub { list_tarballs("$pkg tarball: ", distfiles()) },
 	tarclean => sub { remove_files("tarballs", distfiles()); },
