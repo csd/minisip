@@ -65,10 +65,12 @@ mclean		Run 'make maintainer-clean'.
 dist		Run 'make dist'.
 distcheck	Run 'make distcheck'.
 tarballs	List distribution tarballs.
+tarcontents	List the contents of distribution tarballs.
 tarclean	Remove distribution tarballs.
 
 package		Create distribution packages for merging.
 packages	List distribution packages to be merged.
+pkgcontents	List the contents of distribution packages.
 pkgclean	Remove distribution packages.
 
 merge		Merge distribution packages into system.
@@ -174,6 +176,12 @@ tarballs
 
 List tarball files created by the 'dist' action.
 
+tarcontents
+-----------
+
+Lists the contents of the distribution tarballs; if the verbose option (-v)
+was passed to build.pl, that same flag will be passed to the 'tar' command.
+
 tarclean
 --------
 
@@ -195,6 +203,12 @@ packages
 -------
 
 Lists the distribution packages created by the 'package' action.
+
+pkgcontents
+-----------
+
+Lists the contents of the distribution packages (as listed by 'pacakges').
+If not supported, it essentially runs 'tarcontents' for you.
 
 pkgclean
 --------

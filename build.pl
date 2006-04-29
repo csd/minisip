@@ -466,7 +466,8 @@ sub list_tarballs {
 		my $file = basename($tarball);
 		print "$label$file\n";
 		local *PIPE;
-		open PIPE, "tar -ztf $tarball |" or 
+		my $dash_v = $verbose ? '-v' : '';
+		open PIPE, "tar $dash_v -ztf $tarball |" or 
 			die "unable to open $tarball: $!";
 		while (my $line = <PIPE>) { print "  $line" }
 		close PIPE or die "unable to close $tarball: $!";
