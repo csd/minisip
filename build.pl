@@ -462,7 +462,8 @@ sub remove_files {
 sub list_tarballs {
 	my $label = shift;
 	for my $tarball ( @_ ) {
-		my $file = basename($_);
+		my $file = basename($tarball);
+		print "$label$file\n";
 		open PIPE, "tar -ztf $tarball |";
 		while (<PIPE>) { print "  $_" }
 		close PIPE;
