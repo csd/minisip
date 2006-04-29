@@ -52,6 +52,9 @@ my $force = 0;		# continue despite errors
 my $show_env = 0;	# output environment variables this script changes
 my $localconf = undef;	# local config overrides
 
+my $no_local = 0;	# do not extend environment to no-install development:
+			#  ACLOCAL_FLAGS, PKG_CONFIG_PATH, and LD_LIBRARY_PATH
+
 my $pretend = 0;	# don't actually do anything
 my $verbose = 0;	# enable verbose script output
 my $quiet = 0;		# enable quiet script output
@@ -154,6 +157,7 @@ my $result = GetOptions(
 		"force|f!" => \$force,
 		"show-env|E!" => \$show_env,
 		"localconf|l=s" => \$localconf,
+		"no-local!" => \$no_local,
 
 		"pretend|p!" => \$pretend,
 		"verbose|v!" => \$verbose,
@@ -688,13 +692,7 @@ sub run_app_path {
 	check => sub { act('check', 'make', @make_args, 'check'); },
 	install => sub { act('install', 'make', @make_args, 'install'); },
 	uninstall => sub { act('uninstall', 'make', @make_args, 'uninstall'); },
-	run => sub {
-		 # XXX: This needs to be generalized, but it works for now.
-		 #  For what it's worth, it is "equivalent" to the old .sh
-		return unless $pkg eq 'minisip';
-		$ENV{LD_LIBRARY_PATH} = join(':', ( map { "$builddir/$_/.libs" } @packages ), $libdir);
-		act('run', run_app_path());
-	},
+	run => sub { act('run', run_app_path()); },
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
 	tarcontents => sub { list_tarballs("$pkg tarball: ", distfiles()) },
 	tarclean => sub { remove_files("tarballs", distfiles()); },
@@ -786,14 +784,11 @@ $ENV{CXXFLAGS} .= " -ggdb" if $debug;
 $aclocaldir = "$destdir$prefixdir/share/aclocal";
 $pkgconfigdir = "$destdir$prefixdir/lib/pkgconfig";
 
-sub aclocal_flags {
-	my @m4_paths = map { "$topdir/$_/m4" } @packages;
-	my @aclocal_flags = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
-	return join(' ', '', @aclocal_flags);
-}
 sub setup_aclocal_env {
-	$ENV{ACLOCAL_FLAGS} ||= '';
-	$ENV{ACLOCAL_FLAGS} .= aclocal_flags();
+	my @m4_paths = $no_local ? () : map { "$topdir/$_/m4" } @packages;
+	my @aclocal_flags = map { ( '-I', $_ ) } @m4_paths, $aclocaldir;
+	unshift @aclocal_flags, $ENV{ACLOCAL_FLAGS} if $ENV{ACLOCAL_FLAGS};
+	$ENV{ACLOCAL_FLAGS} = join(' ', '', @aclocal_flags);
 }
 
 # pkg-config search order (tries to find the "most recent copy"):
@@ -801,10 +796,19 @@ sub setup_aclocal_env {
 #   2) Local install directory
 #   3) System directories 
 sub setup_pkgconfig_env {
-	my @pkgconfigdirs = map { "$builddir/$_" } @packages;
+	my @pkgconfigdirs;
+	push @pkgconfigdirs, map { "$builddir/$_" } @packages unless $no_local;
 	push @pkgconfigdirs, $pkgconfigdir;
 	push @pkgconfigdirs, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
 	$ENV{PKG_CONFIG_PATH} = join(':', @pkgconfigdirs);
+}
+
+sub setup_ld_library_env {
+	my @ld_paths;
+	push @ld_paths, map { "$builddir/$_/.libs" } @packages unless $no_local;
+	push @ld_paths, $libdir;
+	push @ld_paths, $ENV{LD_LIBRARY_PATH} if $ENV{LD_LIBRARY_PATH};
+	$ENV{LD_LIBRARY_PATH} = join(':', @ld_paths);
 }
 
 sub setup_ccache_env {
@@ -814,8 +818,10 @@ sub setup_ccache_env {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
+
 setup_aclocal_env();
 setup_pkgconfig_env();
+setup_ld_library_env();
 setup_ccache_env();
 
 # special pre-target processing
@@ -836,7 +842,7 @@ for $pkg ( @targets ) {
 	if ($show_env) {
 		my @envvars = ( qw( 
 				PWD PATH CCACHE_DIR PKG_CONFIG_PATH
-				CPPFLAGS CXXFLAGS LDFLAGS 
+				CPPFLAGS CXXFLAGS LDFLAGS LD_LIBRARY_PATH
 			) );
 		my @env = map { "\n\t$_=" . $ENV{$_} } @envvars;
 		print "Build environment for $pkg: @env\n";
