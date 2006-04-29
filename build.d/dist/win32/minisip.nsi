@@ -32,6 +32,7 @@
 !endif
 
 ; Use Modern UI
+!define MUI_COMPONENTSPAGE_SMALLDESC
 !include "MUI.nsh"
 
 Name "Minisip ${VERSION}"
@@ -48,6 +49,7 @@ Name "Minisip ${VERSION}"
 ;
 ;  StrCpy $INSTDIR "$PROGRAMFILES\Minisip\"
 ;FunctionEnd
+
 
 InstallDir "$PROGRAMFILES\Minisip"
 
@@ -82,13 +84,22 @@ Var STARTMENU_FOLDER
 
 !insertmacro MUI_LANGUAGE "English"
 
+InstType "Minimal"
+InstType "Full"
+
+;
+; Main group
+;
+SectionGroup "Minisip"
+
 ;
 ; Minisip section
 ;
-Section "Minisip"
-SectionIn 1 RO
+Section "Program"
+SectionIn 1 2 RO
 AddSize 500
 
+!ifndef NOFILES
 SetOutPath $INSTDIR
 File ${MINISIPDIR}/bin/*.exe
 File ${MINISIPDIR}/bin/*.dll
@@ -107,6 +118,7 @@ File ${MINISIPDIR}/share/minisip/play.png
 File ${MINISIPDIR}/share/minisip/record.png
 File ${MINISIPDIR}/share/minisip/secure.png
 File ${MINISIPDIR}/share/minisip/tray_icon.png
+!endif
 
 WriteUninstaller "$INSTDIR\Uninstall.exe"
 
@@ -121,15 +133,57 @@ CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall
 SectionEnd
 
 ;
+; Minisip development
+;
+SectionGroup "Development"
+Section "Files"
+SectionIn 2
+
+!ifndef NOFILES
+SetOutPath $INSTDIR\include
+File /r ${MINISIPDIR}/include/*
+
+SetOutPath $INSTDIR\lib
+File ${MINISIPDIR}/lib/*.*a
+
+SetOutPath $INSTDIR\lib\pkgconfig
+File ${MINISIPDIR}/lib/pkgconfig/*
+
+SetOutPath $INSTDIR\share\aclocal
+File ${MINISIPDIR}/share/aclocal/*
+!endif
+; End NOFILES
+
+SectionEnd
+
+;
+; Minisip examples
+;
+Section "Examples"
+SectionIn 2
+
+SetOutPath $INSTDIR\examples
+;File ${MINISIPDIR}/share/*/examples/*
+
+SectionEnd
+; End Extra
+SectionGroupEnd
+; End Minisip
+SectionGroupEnd
+
+;
 ; OpenSSL section
 ;
 !ifdef SSLDIR
 Section "OpenSSL"
-SectionIn 1
+SectionIn 1 2
 
+!ifndef NOFILES
 SetOutPath $INSTDIR
 File ${SSLDIR}/libeay32.dll
 File ${SSLDIR}/ssleay32.dll
+!endif
+
 SectionEnd
 !endif
 
@@ -161,7 +215,6 @@ Delete "$INSTDIR\ssleay32.dll"
 ; Delete plugins
 Delete "$INSTDIR\plugins\*.dll"
 Delete "$INSTDIR\plugins\*.la"
-RMDir "$INSTDIR\plugins"
 
 ; Delete bitmaps
 Delete "$INSTDIR\share\insecure.png"
@@ -173,7 +226,28 @@ Delete "$INSTDIR\share\play.png"
 Delete "$INSTDIR\share\record.png"
 Delete "$INSTDIR\share\secure.png"
 Delete "$INSTDIR\share\tray_icon.png"
+
+; Delete development files
+Delete "$INSTDIR\lib\*.*a"
+Delete "$INSTDIR\lib\pkgconfig\*"
+Delete "$INSTDIR\share\aclocal\*"
+
+; Delete header files
+RMDir /r "$INSTDIR\include\libmutil"
+RMDir /r "$INSTDIR\include\libmcrypto"
+RMDir /r "$INSTDIR\include\libmikey"
+RMDir /r "$INSTDIR\include\libmnetutil"
+RMDir /r "$INSTDIR\include\libmsip"
+RMDir /r "$INSTDIR\include\libminisip"
+
+RMDir "$INSTDIR\include"
+RMDir "$INSTDIR\examples\*"
+RMDir "$INSTDIR\examples"
+RMDir "$INSTDIR\lib\pkgconfig"
+RMDir "$INSTDIR\lib"
+RMDir "$INSTDIR\share\aclocal"
 RMDir "$INSTDIR\share"
+RMDir "$INSTDIR\plugins"
 
 Delete "$INSTDIR\Uninstall.exe"
 RMDir "$INSTDIR"
