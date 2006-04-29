@@ -130,6 +130,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_HEADER_TIME
 
+AM_MINISIP_CHECK_NOTHING
 AM_MINISIP_CHECK_COMPLETE
 
 AC_CONFIG_FILES([ 
