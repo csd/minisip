@@ -51,6 +51,15 @@ Name "Minisip ${VERSION}"
 ;FunctionEnd
 
 
+!macro ForEachPkg command prefix postfix
+${command} "${prefix}libmutil${postfix}"
+${command} "${prefix}libmcrypto${postfix}"
+${command} "${prefix}libmikey${postfix}"
+${command} "${prefix}libmnetutil${postfix}"
+${command} "${prefix}libmsip${postfix}"
+${command} "${prefix}libminisip${postfix}"
+!macroend
+
 InstallDir "$PROGRAMFILES\Minisip"
 
 OutFile ${OUTFILE}
@@ -100,15 +109,15 @@ SectionIn 1 2 RO
 AddSize 500
 
 !ifndef NOFILES
-SetOutPath $INSTDIR
+SetOutPath $INSTDIR\bin
+!insertmacro ForEachPkg File "${MINISIPDIR}/bin/" "*.dll"
 File ${MINISIPDIR}/bin/*.exe
-File ${MINISIPDIR}/bin/*.dll
 
-SetOutPath $INSTDIR\plugins
+SetOutPath $INSTDIR\bin\plugins
 File ${MINISIPDIR}/lib/libminisip/plugins/*.dll
 File ${MINISIPDIR}/lib/libminisip/plugins/*.la
 
-SetOutPath $INSTDIR\share
+SetOutPath $INSTDIR\bin\share
 File ${MINISIPDIR}/share/minisip/insecure.png
 File ${MINISIPDIR}/share/minisip/minisip.glade
 ;File ${MINISIPDIR}/share/minisip/minisip.png
@@ -125,7 +134,7 @@ WriteUninstaller "$INSTDIR\Uninstall.exe"
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 
 CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Minisip.lnk" "$INSTDIR\minisip_gtkgui.exe"
+CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Minisip.lnk" "$INSTDIR\bin\minisip_gtkgui.exe"
 CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
 !insertmacro MUI_STARTMENU_WRITE_END
@@ -144,13 +153,13 @@ SetOutPath $INSTDIR\include
 File /r ${MINISIPDIR}/include/*
 
 SetOutPath $INSTDIR\lib
-File ${MINISIPDIR}/lib/*.*a
+!insertmacro ForEachPkg File "${MINISIPDIR}/lib/" ".*a"
 
 SetOutPath $INSTDIR\lib\pkgconfig
-File ${MINISIPDIR}/lib/pkgconfig/*
+!insertmacro ForEachPkg File "${MINISIPDIR}/lib/pkgconfig/" ".pc"
 
 SetOutPath $INSTDIR\share\aclocal
-File ${MINISIPDIR}/share/aclocal/*
+!insertmacro ForEachPkg File "${MINISIPDIR}/share/aclocal/" ".m4"
 !endif
 ; End NOFILES
 
@@ -162,8 +171,11 @@ SectionEnd
 Section "Examples"
 SectionIn 2
 
-SetOutPath $INSTDIR\examples
-;File ${MINISIPDIR}/share/*/examples/*
+SetOutPath $INSTDIR\share\libmutil\examples
+File ${MINISIPDIR}/share/libmutil/examples/*
+
+SetOutPath $INSTDIR\share\libmnetutil\examples
+File ${MINISIPDIR}/share/libmnetutil/examples/*
 
 SectionEnd
 ; End Extra
@@ -179,7 +191,7 @@ Section "OpenSSL"
 SectionIn 1 2
 
 !ifndef NOFILES
-SetOutPath $INSTDIR
+SetOutPath $INSTDIR\bin
 File ${SSLDIR}/libeay32.dll
 File ${SSLDIR}/ssleay32.dll
 !endif
@@ -198,39 +210,34 @@ SectionEnd
 Section "Uninstall"
 
 ; Delete EXEs and DLLs
-Delete "$INSTDIR\libmutil*.dll"
-Delete "$INSTDIR\libmcrypto*.dll"
-Delete "$INSTDIR\libmikey*.dll"
-Delete "$INSTDIR\libmnetutil*.dll"
-Delete "$INSTDIR\libmsip*.dll"
-Delete "$INSTDIR\libminisip*.dll"
-Delete "$INSTDIR\minisip_*.exe"
+!insertmacro ForEachPkg Delete "$INSTDIR\bin\" "*.dll"
+Delete "$INSTDIR\bin\minisip_*.exe"
 
 ; Delete OpenSSL
 !ifdef SSLDIR
-Delete "$INSTDIR\libeay32.dll"
-Delete "$INSTDIR\ssleay32.dll"
+Delete "$INSTDIR\bin\libeay32.dll"
+Delete "$INSTDIR\bin\ssleay32.dll"
 !endif
 
 ; Delete plugins
-Delete "$INSTDIR\plugins\*.dll"
-Delete "$INSTDIR\plugins\*.la"
+Delete "$INSTDIR\bin\plugins\*.dll"
+Delete "$INSTDIR\bin\plugins\*.la"
 
 ; Delete bitmaps
-Delete "$INSTDIR\share\insecure.png"
-Delete "$INSTDIR\share\minisip.glade"
-;Delete "$INSTDIR\share\minisip.png"
-Delete "$INSTDIR\share\noplay.png"
-Delete "$INSTDIR\share\norecord.png"
-Delete "$INSTDIR\share\play.png"
-Delete "$INSTDIR\share\record.png"
-Delete "$INSTDIR\share\secure.png"
-Delete "$INSTDIR\share\tray_icon.png"
+Delete "$INSTDIR\bin\share\insecure.png"
+Delete "$INSTDIR\bin\share\minisip.glade"
+;Delete "$INSTDIR\bin\share\minisip.png"
+Delete "$INSTDIR\bin\share\noplay.png"
+Delete "$INSTDIR\bin\share\norecord.png"
+Delete "$INSTDIR\bin\share\play.png"
+Delete "$INSTDIR\bin\share\record.png"
+Delete "$INSTDIR\bin\share\secure.png"
+Delete "$INSTDIR\bin\share\tray_icon.png"
 
 ; Delete development files
-Delete "$INSTDIR\lib\*.*a"
-Delete "$INSTDIR\lib\pkgconfig\*"
-Delete "$INSTDIR\share\aclocal\*"
+!insertmacro ForEachPkg Delete "$INSTDIR\lib\" ".*a"
+!insertmacro ForEachPkg Delete "$INSTDIR\lib\pkgconfig\" ".pc"
+!insertmacro ForEachPkg Delete "$INSTDIR\share\aclocal\" ".m4"
 
 ; Delete header files
 RMDir /r "$INSTDIR\include\libmutil"
@@ -240,14 +247,21 @@ RMDir /r "$INSTDIR\include\libmnetutil"
 RMDir /r "$INSTDIR\include\libmsip"
 RMDir /r "$INSTDIR\include\libminisip"
 
+; Delete examples
+!insertmacro ForEachPkg Delete "$INSTDIR\share\" "\examples\*"
+
+RMDir "$INSTDIR\bin\plugins"
+RMDir "$INSTDIR\bin\share"
+RMDir "$INSTDIR\bin"
 RMDir "$INSTDIR\include"
-RMDir "$INSTDIR\examples\*"
-RMDir "$INSTDIR\examples"
 RMDir "$INSTDIR\lib\pkgconfig"
 RMDir "$INSTDIR\lib"
 RMDir "$INSTDIR\share\aclocal"
+RMDir "$INSTDIR\share\libmutil\examples"
+RMDir "$INSTDIR\share\libmutil"
+RMDir "$INSTDIR\share\libmnetutil\examples"
+RMDir "$INSTDIR\share\libmnetutil"
 RMDir "$INSTDIR\share"
-RMDir "$INSTDIR\plugins"
 
 Delete "$INSTDIR\Uninstall.exe"
 RMDir "$INSTDIR"
