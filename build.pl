@@ -701,9 +701,9 @@ sub run_app_path {
 	my $rootpath = $destdir . $prefixdir;
 	for my $path ( @run_paths ) {
 		my $target = "$rootpath/$path/$run_app";
-		print "+checking for $target..." if $verbose;
+#		print "+checking for $target...\n" if $verbose;
 		next unless -x $target;
-		print "+found $target..." unless $quiet;
+#		print "+found $target...\n" unless $quiet;
 		return $target;
 	}
 	return $rootpath . $run_app;
@@ -847,11 +847,22 @@ sub setup_ccache_env {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
+sub show_env {
+	return unless $show_env;
+	my @envvars = qw( CXXFLAGS CPPFLAGS LDFLAGS PATH );
+	push @envvars, qw( PKG_CONFIG_PATH ACLOCAL_FLAGS LD_LIBRARY_PATH )
+		unless $pkg;
+	push @envvars, 'CCACHE_DIR' if $ccache; 
+	my @env = map { "\n\t$_=" . $ENV{$_} } @envvars;
+	my $target_label = $pkg || 'all targets';
+	print "Build environment for $target_label: @env\n";
+}
 
 setup_aclocal_env();
 setup_pkgconfig_env();
 setup_ld_library_env();
 setup_ccache_env();
+show_env();
 
 # special pre-target processing
 try_callback('pre', $_) for @action;
@@ -867,15 +878,6 @@ for $pkg ( @targets ) {
 
 	print "+Source directory: $srcdir\n",
 		"+Object directory: $objdir\n" if $verbose;
-
-	if ($show_env) {
-		my @envvars = ( qw( 
-				PWD PATH CCACHE_DIR PKG_CONFIG_PATH
-				CPPFLAGS CXXFLAGS LDFLAGS LD_LIBRARY_PATH
-			) );
-		my @env = map { "\n\t$_=" . $ENV{$_} } @envvars;
-		print "Build environment for $pkg: @env\n";
-	}
 
 	callact($_) for @action;
 }
