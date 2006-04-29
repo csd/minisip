@@ -206,7 +206,7 @@ my @dist_actions = ( qw( package packages pkgcontents pkgclean merge purge ) );
 our @actions = ( qw( bootstrap configure compile ),
 		qw( install uninstall ),
 		qw( clean dclean mclean ),
-		qw( dist distcheck tarballs tarclean ),
+		qw( dist distcheck tarballs tarcontents tarclean ),
 		@dist_actions, 
 		qw( check run allclean hostclean repoclean ),
 		qw( confdump confclean ),
@@ -398,6 +398,7 @@ sub act {
 }
 sub callact {
 	my $a = shift;
+	die "undefined action" unless $a;
 	die "no action '$a'" unless exists $actions{$a};
 
 	$act_deps{$a}->() if exists $act_deps{$a};
@@ -464,10 +465,13 @@ sub list_tarballs {
 	for my $tarball ( @_ ) {
 		my $file = basename($tarball);
 		print "$label$file\n";
-		open PIPE, "tar -ztf $tarball |";
-		while (<PIPE>) { print "  $_" }
-		close PIPE;
+		local *PIPE;
+		open PIPE, "tar -ztf $tarball |" or 
+			die "unable to open $tarball: $!";
+		while (my $line = <PIPE>) { print "  $line" }
+		close PIPE or die "unable to close $tarball: $!";
 	}
+	return 1;
 }
 
 #######
@@ -691,6 +695,7 @@ sub run_app_path {
 		act('run', run_app_path());
 	},
 	tarballs => sub { list_files("$pkg tarballs: ", distfiles()) },
+	tarcontents => sub { list_tarballs("$pkg tarball: ", distfiles()) },
 	tarclean => sub { remove_files("tarballs", distfiles()); },
 	dist => sub { act('distribution', 'make', @make_args, 'dist'); },
 	distcheck => sub { act('distcheck', 'make', @make_args, 'distcheck'); },
@@ -724,6 +729,7 @@ my $need_allclean = sub { callact('allclean') };
 	run => $need_install,
 	dist => $need_tarclean,
 	distcheck => $need_tarclean,
+	tarcontents => $need_dist,
 	'package' => $need_dist,
 	'packages' => $need_package,
 	pkgcontents => $need_package,
