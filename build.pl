@@ -415,8 +415,9 @@ sub create_working_paths {
 
 sub act {
 	my $label = shift;
-	print "Running $label in $pkg...", $pretend ? ' (dry run)' : '', "\n" 
-		unless $quiet;
+	my $target_label = $pkg ? " in $pkg" : '';
+	my $pretend_label = $pretend ? ' (dry run)' : ''; 
+	print "Running '$label'$target_label...$pretend_label\n" unless $quiet;
 	print '+ ', join(' ', @_), "\n" if $verbose;
 	return if $pretend;
 	system(@_) == 0 or die "system @_ failed: $?";
@@ -569,10 +570,13 @@ my %callbacks;
 sub get_extended_actions { 
 	return map { %$_ } grep !/^(?:pre|post)$/, values %callbacks 
 }
+sub get_extended_deps { $callbacks{dep} ? %{$callbacks{dep}} : () }
+
 
 sub set_pre_callbacks { set_callbacks('pre', @_) }
 sub set_post_callbacks { set_callbacks('post', @_) }
 sub set_build_callbacks { set_callbacks('build', @_) }
+sub set_dependency_callbacks { set_callbacks('dep', @_) }
 sub set_callbacks {
 	my ( $type, %newfuncs ) = @_;
 	$callbacks{$type} = {} unless exists $callbacks{$type};
@@ -745,6 +749,7 @@ my $need_package = sub { callact('package') unless scalar(dist_pkgfiles()) };
 my $need_allclean = sub { callact('allclean') };
 
 %act_deps = (
+	get_extended_deps(),
 	configure => $need_bootstrap,
 	compile => $need_configure,
 	check => $need_compile,
