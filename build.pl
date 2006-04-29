@@ -202,7 +202,7 @@ our @packages; 		# absolute package build order
 our %dependencies; 	# package dependency lists
 our %configure_params;	# package configure parameter tables
 
-my @dist_actions = ( qw( packages package pkgclean merge purge ) );
+my @dist_actions = ( qw( package packages pkgcontents pkgclean merge purge ) );
 our @actions = ( qw( bootstrap configure compile ),
 		qw( install uninstall ),
 		qw( clean dclean mclean ),
@@ -459,6 +459,15 @@ sub remove_files {
 	}
 }
 
+sub list_tarballs {
+	my $label = shift;
+	for my $tarball ( @_ ) {
+		my $file = basename($_);
+		open PIPE, "tar -ztf $tarball |";
+		while (<PIPE>) { print "  $_" }
+		close PIPE;
+	}
+}
 
 #######
 # autodetection helpers
@@ -565,8 +574,12 @@ sub dist_detect { run_callbacks('dist', 'detect') }
 $hostdist = autodetect_probe('dist', $hostdist);
 
 # create standard dist accessor implementations
+set_default_callback(qw( dist pkgcontents ), sub { 
+		list_tarballs("$hostdist: $pkg: ", dist_pkgfiles()) 
+	});
 set_default_callback(qw( dist packages ), sub { 
-		list_files("$hostdist: $pkg packages: ", dist_pkgfiles()) 
+		list_files("$hostdist: $pkg packages: ", dist_pkgfiles());
+		dist_pkgcontents() if $verbose;
 	});
 set_default_callback(qw( dist pkgclean ), sub { 
 		remove_files("$hostdist package", dist_pkgfiles()) 
@@ -712,6 +725,7 @@ my $need_allclean = sub { callact('allclean') };
 	distcheck => $need_tarclean,
 	'package' => $need_dist,
 	'packages' => $need_package,
+	pkgcontents => $need_package,
 	merge => $need_package,
 	clean => $need_configure,
 	dclean => $need_configure,
