@@ -1,11 +1,16 @@
+EXTRA_DIST = run-example.sh.in build-examples.sh.in test-examples.sh.in \
+		mutextest.cxx semaphoretest.cxx threadtest.cxx
 EXAMPLE_SCRIPT_FILES = run-example.sh build-examples.sh
 EXAMPLE_SOURCE_FILES = \
 		mutextest.cpp \
 		semaphoretest.cpp \
 		threadtest.cpp
 
-TESTS = build-examples.sh \
-		test-examples.sh
+BUILD_TESTS = 
+if TEST_SUITE
+BUILD_TESTS += build-examples.sh test-examples.sh
+endif
+TESTS = $(BUILD_TESTS)
 
 exampledir = $(pkgdatadir)/examples
 example_SCRIPTS = $(EXAMPLE_SCRIPT_FILES)
@@ -13,7 +18,7 @@ example_DATA = $(EXAMPLE_SOURCE_FILES)
 
 abs_top_builddir=@abs_top_builddir@/.libs
 MINISIP_CFLAGS += -I$(includedir) $(CFLAGS) $(CPPFLAGS)
-MINISIP_LIBS += -L$(libdir) -L$(abs_top_builddir) -lmutil 
+MINISIP_LIBS += -L$(libdir) -L$(abs_top_builddir)/.libs -lmutil 
 MINISIP_LIBS += $(LDFLAGS) $(LIBS)
 
 %.sh: %.sh.in
