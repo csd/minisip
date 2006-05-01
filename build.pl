@@ -261,13 +261,15 @@ sub replace_missing_conf_file {
 	return if -f $dest;
 	$src = "$dest.example" unless $src;
 	$name = $name ? " for '$name'" : '';
-	my $create_msg = "local $type configuration file$name:\n" . 
-		"\t$dest\n\tfrom $src";
-	print "+Creating new $create_msg\n";
+	my $create_msg = "local $type configuration file$name:\n\t" . 
+		pretty_path($dest) . "\n\tfrom ". pretty_path($src);
+	print "+Creating new $create_msg\n" unless $quiet;
 	unless (-f $src) {
 		my $prep = $name ? 'this ' : '';
-		warn "+warning: '$src' does not exist$name\n" .
-			"+warning: no default settings for $prep$type.\n";
+		print "+warning: '", pretty_path($src), 
+				"' does not exist$name\n" .
+			"+warning: no default settings for $prep$type.\n"
+			unless $quiet;
 		return;
 	}
 	copy($src, $dest) or 
@@ -391,17 +393,19 @@ SINGLE_TARGET
 #######
 # common action funtions
 
+sub pretty_path { $_[0] =~ /^$topdir\/(.*)$/ ? "\${topdir}/$1" : $_[0] }
+
 sub easy_mkdir {
 	my ( $path, $print ) = @_;
 	eval { mkpath($path, $print, 0775) };
-	die "unable to create $path:\n$@" if $@;
+	die "unable to create " . pretty_path($path) . ":\n$@" if $@;
 	return $path;
 }
 sub easy_chdir {
 	my $path = shift;
 	easy_mkdir($path) unless -d $path;
-	print "+Changing to $path...\n" if $verbose;
-	chdir($path) or die "unable to change to $path: $!";
+	print "+Changing to " . pretty_path($path) . "...\n" if $verbose;
+	chdir($path) or die "unable to chdir to " . pretty_path($path) . ": $!";
 }
 
 sub create_working_paths {
@@ -477,7 +481,7 @@ sub configure_params {
 
 sub list_files {
 	my $label = shift;
-	print $label, join(", ", map { basename($_) } @_), "\n";
+	print $label, join(", ", map { pretty_path($_) } @_), "\n";
 	return @_;
 }
 sub remove_files {
@@ -491,7 +495,7 @@ sub remove_files {
 sub list_tarballs {
 	my $label = shift;
 	for my $tarball ( @_ ) {
-		my $file = basename($tarball);
+		my $file = pretty_path($tarball);
 		print "$label$file\n";
 		local *PIPE;
 		my $dash_v = $verbose ? '-v' : '';
@@ -534,7 +538,7 @@ sub autodetect_warning {
 	my $warning = $disable ?
 		'will be disabled until one is created' :
 		'may not work correctly without it';
-	warn <<MISSING unless $quiet;
+	print <<MISSING unless $quiet;
 +warning: The '$type.$ext' script does not exist for '$setting'.
 +warning: '$type' actions $warning.
 MISSING
@@ -679,7 +683,7 @@ sub cb_confclean_post {
 	# XXX: this could be highly undesirable.  maybe ask to confirm?
 	my @sublocals = bsd_glob("$confdir/*/*/*.local");
 	for my $file ( @sublocals, $default_build_local ) {
-		print "+removing $file...\n" unless $quiet;
+		print "+removing ", pretty_path($file), "...\n" unless $quiet;
 		unlink $file or die "unable to remove '$file': $!";
 	}
 }
@@ -796,14 +800,16 @@ $run_app = $_run_app if defined $_run_app;
 
 print "$action: @targets\n" unless $quiet;
 
-if ($verbose) {
+if ($verbose || $show_env) {
 	print "+\n+Top directory:              $topdir\n";
-	print "+Build directory:            $builddir\n";
-	print "+Install \$DESTDIR directory: $destdir\n" if $destdir;
-	print "+Install --prefix directory: $prefixdir\n";
-	print "+Full path to local install: $destdir$prefixdir\n" if $destdir;
-	print "+\n+Make will try to run $njobs parallel build jobs\n+\n";
+	print "+Build directory:            ", pretty_path($builddir), "\n";
+	my $pdestdir = $destdir && pretty_path($destdir);
+	print "+Install \$DESTDIR directory: $pdestdir\n" if $destdir;
+	my $pprefixdir = pretty_path($prefixdir);
+	print "+Install --prefix directory: $pprefixdir\n";
+	print "+Full path to local install: $pdestdir$pprefixdir\n" if $destdir;
 }
+print "+Make will try to run $njobs parallel build jobs\n" if $verbose;
 
 # setup common environment
 #  LDFLAGS: add local install library path
@@ -856,13 +862,18 @@ sub setup_ccache_env {
 		unless $ENV{CCACHE_DIR} && -d $ENV{CCACHE_DIR};
 }
 
+sub pretty_env_paths {
+	my $value = '' . $_[0];
+	$value =~ s/$topdir/\${topdir}/g;
+	return $value;
+}
 sub show_env {
 	return unless $show_env;
 	my @envvars = qw( CXXFLAGS CPPFLAGS LDFLAGS PATH );
 	push @envvars, qw( PKG_CONFIG_PATH ACLOCAL_FLAGS LD_LIBRARY_PATH )
 		unless $pkg;
-	push @envvars, 'CCACHE_DIR' if $ccache; 
-	my @env = map { "\n\t$_=" . $ENV{$_} } @envvars;
+	push @envvars, 'CCACHE_DIR' if $ccache;
+	my @env = map { "\n\t$_=" . pretty_env_paths($ENV{$_}) } @envvars;
 	my $target_label = $pkg || 'all targets';
 	print "Build environment for $target_label: @env\n";
 }
@@ -885,8 +896,8 @@ for $pkg ( @targets ) {
 	local $objdir = File::Spec->catdir($builddir, $pkg);
 	easy_mkdir($objdir);
 
-	print "+Source directory: $srcdir\n",
-		"+Object directory: $objdir\n" if $verbose;
+	print "+Source directory: ", pretty_path($srcdir), "\n",
+		"+Object directory: ", pretty_path($objdir), "\n" if $verbose;
 
 	callact($_) for @action;
 }
