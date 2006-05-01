@@ -27,10 +27,28 @@
 
 #include<config.h>
 
-#ifdef FLOAT_RESAMPLER
 
-#include<libminisip/soundcard/FloatResampler.h>
+#include"FloatResampler.h"
 #include<iostream>
+
+
+static std::list<std::string> pluginList;
+static bool initialized;
+
+extern "C"
+std::list<std::string> *mfloat_resampler_LTX_listPlugins( MRef<Library*> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> mfloat_resampler_LTX_getPlugin( MRef<Library*> lib ){
+	return new FloatResamplerPlugin( lib );
+}
 
 
 FloatResampler::FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 
@@ -73,5 +91,4 @@ void FloatResampler::resample( short * input, short * output ){
 }
 
         
-#endif
 

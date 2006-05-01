@@ -77,7 +77,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	oFrames = ( oDurationMs * oFreq ) / 1000;
 	iFrames = ( oDurationMs * 8000 ) / 1000;
 	
-	resampler = Resampler::create( 8000, oFreq, oDurationMs, oNChannels );
+	resampler = ResamplerRegistry::getInstance()->create( 8000, oFreq, oDurationMs, oNChannels );
 
 	temp = new short[iFrames * oNChannels];
 	

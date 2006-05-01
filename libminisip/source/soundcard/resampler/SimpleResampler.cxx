@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SimpleResampler.h>
+#include"SimpleResampler.h"
 #include<iostream>
 #include<libmutil/print_hex.h>
 

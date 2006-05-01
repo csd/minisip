@@ -26,14 +26,12 @@
 #ifndef FLOAT_RESAMPLER_H
 #define FLOAT_RESAMPLER_H
 
-#ifdef FLOAT_RESAMPLER
-
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/soundcard/Resampler.h>
 #include<samplerate.h>
 
-class LIBMINISIP_API FloatResampler : public Resampler {
+class FloatResampler : public Resampler {
 	public: 
 
 		FloatResampler( uint32_t inputFreq, uint32_t outputFreq, 
@@ -54,8 +52,26 @@ class LIBMINISIP_API FloatResampler : public Resampler {
 
 };
 
+class FloatResamplerPlugin: public ResamplerPlugin{
+	public:
+		FloatResamplerPlugin( MRef<Library *> lib ): ResamplerPlugin( lib ){}
+		
+		virtual std::string getName() const { return "float_resampler"; }
 
-#endif
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "Float resampler"; }
+
+		virtual MRef<Resampler *> createResampler(
+			uint32_t inputFreq, uint32_t outputFreq,
+			uint32_t duration, uint32_t nChannels ) const{
+			return new FloatResampler( inputFreq, outputFreq,
+						   duration, nChannels );
+		}
+
+		virtual std::string getMemObjectType(){ return "FloatResamplerPlugin"; }
+};
+
 
 #endif
 

@@ -119,6 +119,7 @@ static void loadPlugins(const string &argv0){
 	AudioCodecRegistry::getInstance();
 	ConfigRegistry::getInstance();
 	MediaRegistry::getInstance();
+	ResamplerRegistry::getInstance();
 
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
 

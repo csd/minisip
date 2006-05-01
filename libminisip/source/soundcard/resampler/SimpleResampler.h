@@ -30,7 +30,7 @@
 
 #include<libminisip/soundcard/Resampler.h>
 
-class LIBMINISIP_API SimpleResampler : public Resampler {
+class SimpleResampler : public Resampler {
 	public: 
 		virtual void resample( short * input, short * output );
 		SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 
@@ -52,6 +52,25 @@ class LIBMINISIP_API SimpleResampler : public Resampler {
 
 };
 
+class SimpleResamplerPlugin: public ResamplerPlugin{
+	public:
+		SimpleResamplerPlugin( MRef<Library *> lib ): ResamplerPlugin( lib ){}
+		
+		virtual std::string getName() const { return "simple_resampler"; }
+
+		virtual uint32_t getVersion() const { return 0x00000001; }
+
+		virtual std::string getDescription() const { return "Simple resampler"; }
+
+		virtual MRef<Resampler *> createResampler(
+			uint32_t inputFreq, uint32_t outputFreq,
+			uint32_t duration, uint32_t nChannels ) const{
+			return new SimpleResampler( inputFreq, outputFreq,
+						   duration, nChannels );
+		}
+
+		virtual std::string getMemObjectType(){ return "SimpleResamplerPlugin"; }
+};
 
 #endif
 

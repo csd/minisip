@@ -156,11 +156,16 @@ libsip_src = source/sip/SipDialogVoip.cxx \
 
 libsoundcard_libadd = 
 RESAMPLER_SRC = source/soundcard/resampler/Resampler.cxx \
-		source/soundcard/resampler/SimpleResampler.cxx
+		source/soundcard/resampler/SimpleResampler.cxx \
+		source/soundcard/resampler/SimpleResampler.h
+
 if FLOAT_RESAMPLER
-        RESAMPLER_SRC += source/soundcard/resampler/FloatResampler.cxx
-        libsoundcard_libadd += $(SAMPLERATE_LIBS)
-endif
+plugins_LTLIBRARIES += mfloat_resampler.la
+mfloat_resampler_la_LDFLAGS = $(plugins_LDFLAGS)
+mfloat_resampler_la_SOURCES = source/soundcard/resampler/FloatResampler.cxx \
+		source/soundcard/resampler/FloatResampler.h
+mfloat_resampler_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SAMPLERATE_LIBS)
+endif FLOAT_RESAMPLER
 
 AUDIOMIXER_SRC = source/soundcard/AudioMixer.cxx \
 			source/soundcard/AudioMixerSimple.cxx \

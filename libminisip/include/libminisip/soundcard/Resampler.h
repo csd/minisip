@@ -29,18 +29,45 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 
 class LIBMINISIP_API Resampler : public MObject{
 	public: 
-		static MRef<Resampler *> create(
-				    uint32_t inputFreq, uint32_t outputFreq,
-		                    uint32_t duration, uint32_t nChannels );
-
 		virtual void resample( short * input, short * output )=0;
 
 		virtual std::string getMemObjectType(){return "Resampler";};
 
 
+};
+
+class LIBMINISIP_API ResamplerPlugin : public MPlugin{
+	public:
+		ResamplerPlugin(MRef<Library*> lib);
+		virtual ~ResamplerPlugin();
+
+		virtual MRef<Resampler*> createResampler(
+			uint32_t inputFreq, uint32_t outputFreq,
+			uint32_t duration, uint32_t nChannels ) const = 0;
+
+		virtual std::string getPluginType() const{ return "Resampler"; }
+
+};
+
+
+class LIBMINISIP_API ResamplerRegistry : public MPluginRegistry, public MSingleton<ResamplerRegistry>{
+	public:
+		virtual std::string getPluginType(){ return "Resampler"; }
+
+		MRef<Resampler *> create(
+			uint32_t inputFreq, uint32_t outputFreq,
+			uint32_t duration, uint32_t nChannels );
+
+	protected:
+		ResamplerRegistry();
+
+	private:
+		friend class MSingleton<ResamplerRegistry>;
 };
 
 #endif

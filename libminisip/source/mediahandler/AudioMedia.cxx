@@ -89,7 +89,7 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo,
 	seqNo = 0;
 	
 	// NOTE Sampling frequency FIXED to 8000 Hz
-	resampler = Resampler::create( SOUND_CARD_FREQ, 8000, 20, 1 /*Nb channels */);
+	resampler = ResamplerRegistry::getInstance()->create( SOUND_CARD_FREQ, 8000, 20, 1 /*Nb channels */);
 }
 
 string AudioMedia::getSdpMediaType(){

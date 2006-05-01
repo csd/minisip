@@ -24,21 +24,48 @@
 */
 
 #include<config.h>
+#include<libmutil/merror.h>
 #include<libminisip/soundcard/Resampler.h>
-#include<libminisip/soundcard/SimpleResampler.h>
-
-#ifdef FLOAT_RESAMPLER
-#include<libminisip/soundcard/FloatResampler.h>
-#endif
+#include"SimpleResampler.h"
 
 #include<iostream>
 
-MRef<Resampler *> Resampler::create( uint32_t inputFreq, uint32_t outputFreq,
-		                     uint32_t duration, uint32_t nChannels ){
+using namespace std;
 
-#if (defined FLOAT_RESAMPLER) && (!defined IPAQ)
-	return new FloatResampler( inputFreq, outputFreq, duration, nChannels );
-#else
-	return new SimpleResampler( inputFreq, outputFreq, duration, nChannels );
-#endif
+ResamplerPlugin::ResamplerPlugin( MRef<Library*> lib ): MPlugin( lib ){
+}
+
+ResamplerPlugin::~ResamplerPlugin(){
+}
+
+
+ResamplerRegistry::ResamplerRegistry(){
+	registerPlugin( new SimpleResamplerPlugin( NULL ) );
+}
+
+MRef<Resampler *> ResamplerRegistry::create( uint32_t inputFreq, uint32_t outputFreq, uint32_t duration, uint32_t nChannels ){
+
+	MRef<MPlugin *> plugin;
+
+	plugin = findPlugin("float_resampler");
+
+	if( !plugin )
+		plugin = findPlugin("simple_resampler");
+
+	if( !plugin ){
+		merror("Can't create resampler");
+		return NULL;
+	}
+
+	MRef<ResamplerPlugin *> resampler = dynamic_cast<ResamplerPlugin *>(*plugin);
+
+	if( !resampler ){
+		merror("dynamic_cast<ResamplerPlugin *> failed");
+		return NULL;
+	}
+
+	mdbg << "Creating resampler " << resampler->getName() << end;
+
+	return resampler->createResampler( inputFreq, outputFreq,
+					   duration, nChannels );
 }

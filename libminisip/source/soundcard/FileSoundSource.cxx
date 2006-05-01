@@ -100,7 +100,7 @@ FileSoundSource::FileSoundSource(string filename,
 
 	nChannels = outputNChannels;
 
-	resampler = Resampler::create( inputFreq, outputFreq, outputDurationMs, outputNChannels );
+	resampler = ResamplerRegistry::getInstance()->create( inputFreq, outputFreq, outputDurationMs, outputNChannels );
 
 	cerr << "After constructor " << nOutputFrames << endl;
 }

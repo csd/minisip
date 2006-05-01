@@ -77,8 +77,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/sip/SipDialogVoipClient.h \
 			libminisip/sip/SipSoftPhoneConfiguration.h \
 			libminisip/sip/SipDialogPresenceServer.h \
-			libminisip/soundcard/SimpleResampler.h \
-			libminisip/soundcard/FloatResampler.h \
 			libminisip/soundcard/Resampler.h \
 			libminisip/soundcard/SoundRecorderCallback.h \
 			libminisip/soundcard/WaveSoundDevice.h \
