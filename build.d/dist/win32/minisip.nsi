@@ -108,6 +108,9 @@ Section "Program"
 SectionIn 1 2 RO
 AddSize 500
 
+SetOutPath $INSTDIR
+File copying.txt
+
 !ifndef NOFILES
 SetOutPath $INSTDIR\bin
 !insertmacro ForEachPkg File "${MINISIPDIR}/bin/" "*.dll"
@@ -208,6 +211,8 @@ SectionEnd
 ; Uninstaller
 ;
 Section "Uninstall"
+
+Delete "$INSTDIR\copying.txt"
 
 ; Delete EXEs and DLLs
 !insertmacro ForEachPkg Delete "$INSTDIR\bin\" "*.dll"
