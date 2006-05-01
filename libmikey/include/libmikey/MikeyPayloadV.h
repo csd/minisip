@@ -31,8 +31,8 @@
 
 #define MIKEYPAYLOAD_V_PAYLOAD_TYPE 9
 
-#define MIKEY_PAYLOAD_V_MAC_HMAC_SHA1_160 0
-#define MIKEY_PAYLOAD_V_MAC_NULL 1
+#define MIKEY_PAYLOAD_V_MAC_NULL 0
+#define MIKEY_PAYLOAD_V_MAC_HMAC_SHA1_160 1
 /**
  * @author Erik Eliasson, Johan Bilien
 */

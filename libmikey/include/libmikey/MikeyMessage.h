@@ -55,8 +55,8 @@
 #define MIKEY_ENCR_NULL       1
 #define MIKEY_ENCR_AES_KW_128 2
 
-#define MIKEY_MAC_HMAC_SHA1_160 0
-#define MIKEY_MAC_NULL          1
+#define MIKEY_MAC_NULL          0
+#define MIKEY_MAC_HMAC_SHA1_160 1
 
 #define MAX_TIME_OFFSET (int64_t)(0xe100000<<16) //1 hour
 
