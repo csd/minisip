@@ -487,8 +487,8 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 #endif
 	
 	be->save( "account[0]/account_name", "My account" );
-	be->save( "account[0]/sip_uri", "username@domain.org" );
-	be->save( "account[0]/proxy_addr", "sip.domain.org" );
+	be->save( "account[0]/sip_uri", "username@domain.example" );
+	be->save( "account[0]/proxy_addr", "sip.domain.example" );
 	be->save( "account[0]/register", "yes" );
 	be->save( "account[0]/proxy_port", 5060 );
 	be->save( "account[0]/proxy_username", "user" );
