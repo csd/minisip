@@ -42,7 +42,7 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 		virtual std::string getMemObjectType(){return "TCPSocket";};
 
 		virtual int32_t write(std::string);
-		virtual int32_t write(void *buf, int32_t count);
+		virtual int32_t write(const void *buf, int32_t count);
 		virtual int32_t read(void *buf, int32_t count);
 //		void flush();
 

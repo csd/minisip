@@ -126,7 +126,7 @@ int32_t TCPSocket::write(string data){
 #endif
 }
 
-int32_t TCPSocket::write(void *buf, int32_t count){
+int32_t TCPSocket::write(const void *buf, int32_t count){
 	return ::write(fd, buf, count);
 }
 

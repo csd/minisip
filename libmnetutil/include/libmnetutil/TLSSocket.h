@@ -96,7 +96,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 
 		virtual int32_t write(std::string);
 		
-		virtual int32_t write(void *buf, int32_t count);
+		virtual int32_t write(const void *buf, int32_t count);
 		
 		virtual int32_t read(void *buf, int32_t count);
 		static int32_t setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx );

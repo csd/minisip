@@ -203,7 +203,7 @@ int32_t TLSSocket::write( string data ){
 	return SSL_write( ssl, data.c_str(), (int)data.length() );
 }
 
-int32_t TLSSocket::write( void *buf, int32_t count ){
+int32_t TLSSocket::write( const void *buf, int32_t count ){
 	return SSL_write( ssl, buf, count );
 }
 
