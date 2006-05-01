@@ -1,4 +1,3 @@
-abs_top_srcdir = @abs_top_srcdir@
 pkgconfigdir = $(libdir)/pkgconfig
 pluginsdir = $(pkglibdir)/plugins
 
@@ -39,10 +38,14 @@ libcodec_g711_src = source/codecs/G711CODEC.cxx \
 			source/codecs/G711CODEC.h \
 			source/codecs/g711/codec_g711.h
 
+if TRUE
+libcodecs_src += $(libcodec_g711_src)
+else
 plugins_LTLIBRARIES += mg711.la
 mg711_la_LDFLAGS = $(plugins_LDFLAGS)
 mg711_la_SOURCES = $(libcodec_g711_src)
 mg711_la_LIBADD = libminisip.la $(MUTIL_LIBS)
+endif
 
 
 #
@@ -219,6 +222,9 @@ libstun_src = source/stun/STUNAttributes.cxx \
 		source/stun/STUNMessage.cxx \
 		source/stun/STUNTest.cxx
 
+#
+# Video plugin
+#
 if VIDEO_SUPPORT
 pkglib_LTLIBRARIES = libminisip_video.la
 libminisip_video_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)	\
@@ -334,11 +340,16 @@ libconference_src = source/conference/ConferenceControl.cxx \
 
 libconfigbackend_src = source/configbackend/ConfBackend.cxx
 
+if TRUE
+libconfigbackend_src += source/configbackend/MXmlConfBackend.cxx \
+			source/configbackend/MXmlConfBackend.h
+else
 plugins_LTLIBRARIES += mxmlconf.la
 mxmlconf_la_LDFLAGS = $(plugins_LDFLAGS)
 mxmlconf_la_SOURCES = source/configbackend/MXmlConfBackend.cxx \
 			source/configbackend/MXmlConfBackend.h
 mxmlconf_la_LIBADD = libminisip.la $(MUTIL_LIBS)
+endif
 
 
 if OS_WIN

@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libminisip/codecs/Codec.h>
+#include"G711CODEC.h"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ void AudioCodecRegistry::registerPlugin( MRef<MPlugin*> plugin ){
 }
 
 void AudioCodecRegistry::registerBuiltinDrivers(){
-	
+	registerPlugin( new G711Codec( NULL ) );
 }
 
 MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){

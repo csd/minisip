@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libminisip/configbackend/ConfBackend.h>
+#include"MXmlConfBackend.h"
 
 using namespace std;
 
@@ -92,6 +93,7 @@ ConfigRegistry::~ConfigRegistry(){
 }
 
 void ConfigRegistry::registerBuiltins(){
+	registerPlugin( new MXmlConfigPlugin( NULL ) );
 }
 
 MRef<ConfigRegistry *> ConfigRegistry::getInstance(){
