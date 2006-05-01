@@ -26,7 +26,6 @@ if AEC_SUPPORT
         libaec_src = source/aec/aec.cxx
 endif
 
-libcodecs_libadd = 
 libcodecs_src = source/codecs/Codec.cxx
 
 
@@ -390,9 +389,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libspaudio_src) \
 			$(libstun_src)
 
-libminisip_la_LIBADD += $(libcodecs_libadd) \
-			$(libconfigbackend_libadd) \
-			$(libsoundcard_libadd)
+libminisip_la_LIBADD += $(libsoundcard_libadd)
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
