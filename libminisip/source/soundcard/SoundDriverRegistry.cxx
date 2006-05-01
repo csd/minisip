@@ -94,7 +94,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		}
 	}
 
-	merr << "device not found " << deviceName << end;
+	mdbg << "SoundDriverRegistry: device not found " << deviceName << end;
 	return NULL;
 }
 
