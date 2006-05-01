@@ -549,7 +549,10 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 				}
 				destTransport = uri.getTransport();
 				if( destTransport.length() == 0 ){
-					destTransport = "UDP";
+					if( uri.getProtocolId() == "sips" )
+						destTransport = "TLS";
+					else
+						destTransport = "UDP";
 				}
 				return true;
 			}

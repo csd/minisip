@@ -132,7 +132,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 	if (user.substr(0,4)=="sip:")
 		startAddr = 4;
 	
-	if (user.substr(0,4)=="sips:")
+	if (user.substr(0,5)=="sips:")
 		startAddr = 5;
 
 	bool onlydigits=true;

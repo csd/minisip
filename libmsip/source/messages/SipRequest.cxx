@@ -531,6 +531,8 @@ static string buildUri(const string &name)
 
 	if (username.length()>4 && username.substr(0,4)=="sip:")
 		ret = username;
+	else if (username.length()>5 && username.substr(0,5)=="sips:")
+		ret = username;
 	else
 		ret = "sip:"+username;
 
