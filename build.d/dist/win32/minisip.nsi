@@ -117,8 +117,8 @@ SetOutPath $INSTDIR\bin
 File ${MINISIPDIR}/bin/*.exe
 
 SetOutPath $INSTDIR\bin\plugins
-File ${MINISIPDIR}/lib/libminisip/plugins/*.dll
-File ${MINISIPDIR}/lib/libminisip/plugins/*.la
+File /nonfatal ${MINISIPDIR}/lib/libminisip/plugins/*.dll
+File /nonfatal ${MINISIPDIR}/lib/libminisip/plugins/*.la
 
 SetOutPath $INSTDIR\bin\share
 File ${MINISIPDIR}/share/minisip/insecure.png
