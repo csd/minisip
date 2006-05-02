@@ -25,8 +25,9 @@
 #ifndef MIKEYPAYLOADCERT_H
 #define MIKEYPAYLOADCERT_H
 
-#include<libmikey/libmikey_config.h>
+#include<libmutil/MemObject.h>
 
+#include<libmikey/libmikey_config.h>
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_CERT_PAYLOAD_TYPE 7
