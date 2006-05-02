@@ -24,6 +24,8 @@
 #ifndef MSINGLETON_H
 #define MSINGLETON_H
 
+#include <libmutil/MemObject.h>
+
 template<class T>
 class MSingleton{
 	public:
