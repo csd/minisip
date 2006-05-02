@@ -62,25 +62,25 @@ class LogEntry;
 class SipDialogVoipServer100rel: public SipDialogVoipServer{
 	public:
 #ifdef IPSEC_SUPPORT
-		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
+		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
 #else
-		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, string callId="");
+		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 #endif		
 		virtual ~SipDialogVoipServer100rel();
 
 		virtual std::string getMemObjectType(){return "SipDialogVoipServer100rel";}
 		
-		virtual string getName(){return "SipDialogVoipServer100rel[callid="+dialogState.callId +"]";}
+		virtual std::string getName(){return "SipDialogVoipServer100rel[callid="+dialogState.callId +"]";}
 
 	private:
 		int _1xxResendTimer;
 		MRef<SipMessage*> lastProgress;
 		
 		void setUpStateMachine();
-		void sendSessionProgress(const string &branch);
+		void sendSessionProgress(const std::string &branch);
 		void resendSessionProgress();
-		void sendPrackOk(const string &branch, MRef<SipMessage*> prack);
+		void sendPrackOk(const std::string &branch, MRef<SipMessage*> prack);
 		
 		bool a4001_start_100rel_100relINVITE( const SipSMCommand &command);
 		bool a4002_100rel_ringing_PRACK( const SipSMCommand &command);

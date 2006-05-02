@@ -37,11 +37,10 @@
 
 #include<libminisip/sdp/SdpHeader.h>
 
-using namespace std;
 
 class LIBMINISIP_API SdpHeaderT : public SdpHeader{
 	public:
-		SdpHeaderT(string buildFrom);
+		SdpHeaderT(std::string buildFrom);
 		SdpHeaderT(int32_t start_time, int32_t stop_time);
 		~SdpHeaderT();
 
@@ -53,7 +52,7 @@ class LIBMINISIP_API SdpHeaderT : public SdpHeader{
 		int32_t getStopTime();
 		void setStopTime(int32_t time);
 
-		virtual string getString();
+		virtual std::string getString();
 
 	private:
 		int32_t start_time;

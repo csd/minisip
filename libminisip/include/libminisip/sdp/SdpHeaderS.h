@@ -37,22 +37,21 @@
 
 #include<libminisip/sdp/SdpHeader.h>
 
-using namespace std;
 
 class LIBMINISIP_API SdpHeaderS : public SdpHeader{
 	public:
-		SdpHeaderS(string buildFrom);
+		SdpHeaderS(std::string buildFrom);
 		virtual ~SdpHeaderS();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderS";}
 
-		string getSessionName();
-		void setSessionName(string s);
+		std::string getSessionName();
+		void setSessionName(std::string s);
 
-		virtual  string getString();
+		virtual  std::string getString();
 
 	private:
-		string session_name;
+		std::string session_name;
 
 };
 

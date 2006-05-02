@@ -37,43 +37,42 @@
 
 #include<libminisip/sdp/SdpHeader.h>
 
-using namespace std;
 
 class LIBMINISIP_API SdpHeaderO : public SdpHeader{
 	public:
-		SdpHeaderO(string buildFrom);
-		SdpHeaderO(string username, string session_id, string version, string net_type, string addr_type, string addr);
+		SdpHeaderO(std::string buildFrom);
+		SdpHeaderO(std::string username, std::string session_id, std::string version, std::string net_type, std::string addr_type, std::string addr);
 		virtual ~SdpHeaderO();
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderO";}
 
-		string getUsername();
-		void setUsername(string username);
+		std::string getUsername();
+		void setUsername(std::string username);
 
-		string getSessionId();
-		void setSessionId(string session_id);
+		std::string getSessionId();
+		void setSessionId(std::string session_id);
 
-		string getVersion();
-		void setVersion(string version);
+		std::string getVersion();
+		void setVersion(std::string version);
 
-		string getNetType();
-		void setNetType(string netType);
+		std::string getNetType();
+		void setNetType(std::string netType);
 
-		string getAddrType();
-		void setAddrType(string addrType);
+		std::string getAddrType();
+		void setAddrType(std::string addrType);
 
-		string getAddr();
-		void setAddr(string addr);
+		std::string getAddr();
+		void setAddr(std::string addr);
 
-		virtual string getString();
+		virtual std::string getString();
 
 	private:
-		string username;
-		string session_id;
-		string version;
-		string net_type;
-		string addr_type;
-		string addr;
+		std::string username;
+		std::string session_id;
+		std::string version;
+		std::string net_type;
+		std::string addr_type;
+		std::string addr;
 };
 
 #endif

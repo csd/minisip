@@ -39,6 +39,8 @@
 #include<iostream>
 #endif
 
+using namespace std;
+
 SdpHeaderO::SdpHeaderO(string buildFrom):SdpHeader(SDP_HEADER_TYPE_O, 2){
 	if (buildFrom.substr(0,2)!="o="){
 #ifdef DEBUG_OUTPUT

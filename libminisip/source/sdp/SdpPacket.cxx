@@ -52,6 +52,8 @@
 #include<iostream>
 #include<sys/types.h>
 
+using namespace std;
+
 MRef<SipMessageContent*> sdpSipMessageContentFactory(const string &buf, const string &){
 	return new SdpPacket(buf);
 }

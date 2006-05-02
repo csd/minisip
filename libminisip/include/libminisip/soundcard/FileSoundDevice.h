@@ -45,7 +45,6 @@
 #include <fcntl.h>
 #include<iostream>
 
-using namespace std;
 
 #define FILESOUND_TYPE_RAW 0
 #define FILESOUND_TYPE_WAV 1
@@ -84,8 +83,8 @@ NOTE: The output/input of this device for now is RAW. This means that
 */
 class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 	public:
-		FileSoundDevice(string in_file="", 
-				string out_file="", 
+		FileSoundDevice(std::string in_file="", 
+				std::string out_file="", 
 				int32_t filetype=FILESOUND_TYPE_RAW );
 		
 		/**
@@ -152,8 +151,8 @@ class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 		 - inFile is the "record" file, to read from
 		 - outFile is the "playback" file, to write to
 		*/
-                string inFilename;
-                string outFilename;
+                std::string inFilename;
+                std::string outFilename;
 		
 		/**
 		File descriptors
@@ -180,7 +179,7 @@ class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 		/**
 		Print the "errno" variables ... for debug
 		*/
-		void printError( string func );
+		void printError( std::string func );
 		
 		
 		/**

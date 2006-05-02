@@ -36,7 +36,6 @@
 #define DH_GROUP_OAKLEY2 2
 
 
-//using namespace std;
 
 class certificate_chain;
 class certificate;

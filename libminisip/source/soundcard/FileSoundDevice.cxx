@@ -48,6 +48,8 @@
 #	define USE_WIN32_API
 #endif
 
+using namespace std;
+
 int filesleep( unsigned long usec ){
 #ifdef WIN32
 #include<winsock2.h>

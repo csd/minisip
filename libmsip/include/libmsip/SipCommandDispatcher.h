@@ -63,7 +63,6 @@ class SipStack;
 #define LOW_PRIO_QUEUE 4
 
 
-using namespace std;
 
 class LIBMSIP_API SipCommandDispatcher : public MObject{
 	public:
@@ -73,7 +72,7 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
 		MRef<CommandReceiver*> getCallback(){return callback;}
 		
 		void addDialog(MRef<SipDialog*> d);
-		list<MRef<SipDialog *> > getDialogs();
+		std::list<MRef<SipDialog *> > getDialogs();
 
 		void setDialogManagement(MRef<SipDialog*> mgmt){managementHandler=mgmt;}
 

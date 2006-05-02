@@ -37,7 +37,6 @@
 class SipDialog;
 class SipCommandDispatcher;
 
-using namespace std;
 
 class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 	public:
@@ -53,7 +52,7 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
 		
-		list<MRef<SipDialog*> > getDialogs();
+		std::list<MRef<SipDialog*> > getDialogs();
 
 	private:
 		MRef<SipSMCommandReceiver*> defaultHandler;

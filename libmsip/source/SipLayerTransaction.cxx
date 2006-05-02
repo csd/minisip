@@ -33,6 +33,8 @@
 //#include<libmsip/SipTransactionInviteServerUA.h>
 //#include<libmsip/SipTransactionNonInviteServer.h>
 
+using namespace std;
+
 SipLayerTransaction::SipLayerTransaction(
 		MRef<SipCommandDispatcher*> d,
 		MRef<SipLayerTransport*> transp):

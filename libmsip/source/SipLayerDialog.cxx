@@ -31,6 +31,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
 
+using namespace std;
 
 SipLayerDialog::SipLayerDialog(MRef<SipCommandDispatcher*> d):dispatcher(d){
 	

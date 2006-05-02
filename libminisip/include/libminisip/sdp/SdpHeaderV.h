@@ -37,11 +37,10 @@
 
 #include<libminisip/sdp/SdpHeader.h>
 
-using namespace std;
 
 class LIBMINISIP_API SdpHeaderV : public SdpHeader{
 	public:
-		SdpHeaderV(string buildFrom);
+		SdpHeaderV(std::string buildFrom);
 		SdpHeaderV(int32_t ver);
 
 		virtual std::string getMemObjectType(){return "SdpHeaderV";}
@@ -49,7 +48,7 @@ class LIBMINISIP_API SdpHeaderV : public SdpHeader{
 		int32_t getVersion();
 		void setVersion(int32_t ver);
 
-		virtual string getString();
+		virtual std::string getString();
 
 	private:
 		int32_t v;
