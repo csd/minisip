@@ -35,6 +35,7 @@
 #include<libmutil/minilist.h>
 
 class SipDialog;
+class SipCommandDispatcher;
 
 using namespace std;
 
