@@ -13,9 +13,6 @@
 //exception.h(47) : warning C4275: non dll-interface class 'std::exception' used as base for dll-interface class 'Exception'
 #pragma warning (disable: 4275)
 
-/* Define to 1 if you have the <openssl/aes.h> header file. */
-#define HAVE_OPENSSL_AES_H 1
-
 /* Define to 1 if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
 

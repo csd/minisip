@@ -47,9 +47,6 @@ This is for the GetAdaptersInfo ...
 /* Define to 1 if you have the <unistd.h> header file. */
 //#define HAVE_UNISTD_H 1
 
-/* Define to 1 if you have the <openssl/aes.h> header file. */
-#define HAVE_OPENSSL_AES_H 1
-
 /* No Kerberos in OpenSSL */
 #define OPENSSL_NO_KRB5 
 

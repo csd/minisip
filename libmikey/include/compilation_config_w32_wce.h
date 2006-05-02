@@ -9,9 +9,6 @@
 //exception.h(47) : warning C4275: non dll-interface class 'std::exception' used as base for dll-interface class 'Exception'
 #pragma warning (disable: 4275)
 
-/* Define to 1 if you have the <openssl/aes.h> header file. */
-#define HAVE_OPENSSL_AES_H 1
-
 /* No Kerberos in OpenSSL */
 #define OPENSSL_NO_KRB5 
 
