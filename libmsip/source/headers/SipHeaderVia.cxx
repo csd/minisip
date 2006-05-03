@@ -85,10 +85,27 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	protocol = build_from.substr( i, pos - i );
 	i = pos + 1;
 
+	// Search for end of host name
+	pos = build_from.find_first_of( ":;, \t\n\r", i );
+	if( pos == string::npos ){
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine ip address");
+	}
 
-	while (!(build_from[i]==':' || i>=build_from.length())){
-		ip+=build_from[i];
-		i++;
+	ip = build_from.substr( i, pos - i );
+	i = pos;
+
+	pos = build_from.find_first_not_of( " \t\n\r", i );
+	if( pos != string::npos && build_from[pos] == ':' ){
+		i = pos + 1;
+
+		pos = build_from.find_first_of(";, \t\n\r", i );
+		if( pos == string::npos ){
+			pos = build_from.length() + i;
+		}
+		
+		string portstr = build_from.substr( i, pos - i );
+		
+		port = atoi( portstr.c_str() );
 	}
 
 /*
