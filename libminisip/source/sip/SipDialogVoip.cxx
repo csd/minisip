@@ -809,7 +809,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 	
 	//MRef<SipCancel*> cancel = new SipCancel(
 	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
-			branch,
+			lastInvite->getFirstViaBranch(),
 			lastInvite,
 			dialogState.remoteUri
 			);

@@ -98,7 +98,16 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStack*> stack,
 				return new SipTransactionInviteClient(stack,seqNo,seqMethod,callId);
 			}
 		}else{
-			return new SipTransactionNonInviteClient(stack,seqNo,seqMethod,callId);
+			MRef<SipTransaction *> res = new SipTransactionNonInviteClient(stack,seqNo,seqMethod,callId);
+			if( req->getType()=="CANCEL"){
+				// A CANCEL constructed by a client
+				// MUST have only a single Via header
+				// field value matching the top Via
+				// value in the request being
+				// cancelled. (RFC 3261 section 9.1)
+				res->setBranch( branch );
+			}
+			return res;
 		}
 	
 	}else{	//server transaction
