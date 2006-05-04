@@ -39,7 +39,14 @@ class LIBMUTIL_API CondVar : public MObject{
 		~CondVar();
 
 
+		LIBMUTIL_DEPRECATED
 		void wait( uint32_t timeout_ms = 0);
+
+		/**
+		 * @arg mutex - protects the CondVar, must be locked by the
+		 * thread making the call.
+		 */
+		void wait( Mutex &mutex, uint32_t timeout_ms = 0);
 		void broadcast();
 		
 		//void signal(); //Deprecated - use semaphore instead to

@@ -47,6 +47,12 @@ CondVar::~CondVar(){
 	internalStruct=NULL;
 }
 
+void CondVar::wait( Mutex &mutex, uint32_t timeout ){
+	mutex.unlock();
+	wait( timeout );
+	mutex.lock();
+}
+
 void CondVar::wait( uint32_t timeout ){
 	if( timeout == 0 ){
 		if (WaitForSingleObject(*INTERNAL_COND_WAIT, INFINITE)==WAIT_FAILED){
