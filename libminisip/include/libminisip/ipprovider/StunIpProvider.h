@@ -34,7 +34,7 @@ class Gui;
 
 class LIBMINISIP_API StunIpProvider: public IpProvider{
 	public:
-		static MRef<StunIpProvider *> create( MRef<SipSoftPhoneConfiguration *> config );
+		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config );
 		
 		virtual std::string getExternalIp();
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock );

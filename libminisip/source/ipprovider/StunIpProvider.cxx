@@ -108,7 +108,7 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 	return "";
 }
 
-MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> phoneConf ){
+MRef<IpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> phoneConf ){
 
         vector<string> localips = getLocalIPs();
 
@@ -165,7 +165,8 @@ MRef<StunIpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *>
                         externalIp << end;
 #endif
 
-	return new StunIpProvider( natType, externalIp, stunIp, stunPort  );
+	return (IpProvider*) new StunIpProvider( 
+			natType, externalIp, stunIp, stunPort  );
 }
 
 StunIpProvider::StunIpProvider( uint32_t natType, string externalIp, IPAddress * stunIp, uint16_t stunPort ):

@@ -39,10 +39,8 @@ MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config 
 	MRef<IpProvider *> ret;
 
 	if( config->useSTUN ){
-		ret = *(StunIpProvider::create( config ));
-		if( ret ){
-			return ret;
-		}
+		ret = StunIpProvider::create( config );
+		if( !ret.isNull() ) return ret;
 	}
 	
 	ret = new SimpleIpProvider( config );
