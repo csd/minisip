@@ -219,7 +219,8 @@ our @actions = ( qw( bootstrap configure compile ),
 sub load_file_if_exists {
 	my $file = shift;
 	return 0 unless -f $file;
-	do $file or die "error: unable to load '$file':\n$@";
+	do $file or die "error: unable to load '" . 
+				pretty_path($file) . ":\n$@";
 	return 1;
 }
 
@@ -347,9 +348,9 @@ die "error: No action specified! You must provide at least " .
 	"one valid action.\n       You may combine actions with " .
 	"'+', such as 'bootstrap+configure'.\n\n" . list_actions() .
 	"\nFor more information, see '$app_name --help'.\n" unless $action;
-my @action = split(/\+/, $action); 
-for my $a ( @action ) {
-	die "'$a' is not a valid action.\n" unless grep /^$a$/, @actions;
+my @action = split(/\+/, $action);
+for my $act ( @action ) {
+	die "'$act' is not a valid action.\n" unless grep /^$act$/, @actions;
 }
 
 sub add_targets { 
@@ -488,8 +489,9 @@ sub list_files {
 sub remove_files {
 	my ( $label, @files ) = @_;
 	for my $p ( @files ) {
-		print "+removing $pkg $label: $p\n";
-		unlink($p) or die "can't unlink $p: $!"; 
+		my $pp = pretty_path($p);
+		print "+removing $pkg $label: $pp\n";
+		unlink($p) or die "can't unlink $pp: $!"; 
 	}
 }
 
@@ -501,9 +503,9 @@ sub list_tarballs {
 		local *PIPE;
 		my $dash_v = $verbose ? '-v' : '';
 		open PIPE, "tar $dash_v -ztf $tarball |" or 
-			die "unable to open $tarball: $!";
+			die "unable to open $file: $!";
 		while (my $line = <PIPE>) { print "  $line" }
-		close PIPE or die "unable to close $tarball: $!";
+		close PIPE or die "unable to close $file: $!";
 	}
 	return 1;
 }
@@ -631,7 +633,7 @@ set_default_callback(qw( dist pkgclean ), sub {
 # provide debuggable defaults and automatic accessors
 for my $f ( @dist_actions, qw( pkgfiles ) ) {
 	set_default_callback('dist', $f, sub {
-			die "+BUG: unable to $f packages under '$hostdist'\n"
+			die "+BUG: unable to run '$f' under '$hostdist'\n"
 		});
 	no strict 'refs';
 	my $callback = "dist_$f";
@@ -686,7 +688,8 @@ sub cb_confclean_post {
 	my @sublocals = bsd_glob("$confdir/*/*/*.local");
 	for my $file ( @sublocals, $default_build_local ) {
 		print "+removing ", pretty_path($file), "...\n" unless $quiet;
-		unlink $file or die "unable to remove '$file': $!";
+		unlink $file or die "unable to remove '" . 
+					pretty_path($file) . "': $!";
 	}
 }
 
