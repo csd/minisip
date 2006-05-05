@@ -81,6 +81,7 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 			case SIP_HEADER_TYPE_FROM:
 			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:
+			case SIP_HEADER_TYPE_ROUTE:
 				req->addHeader(header);
 				break;
 		}
@@ -145,6 +146,9 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_CALLID:
+				add=true;
+				break;
+			case SIP_HEADER_TYPE_ROUTE:
 				add=true;
 				break;
 		}

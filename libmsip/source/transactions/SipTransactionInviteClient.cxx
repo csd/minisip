@@ -581,12 +581,12 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 
 	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
 	
-	MRef<SipMessage*> ref( *resp);
+// 	MRef<SipMessage*> ref( *resp);
 
 	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
-			ref, 
+			*lastInvite, 
 			//dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
-			ref->getTo().getRequestUriString(),
+			lastInvite->getUri(),
 			provisional
 			);
 

@@ -471,7 +471,9 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	
 	MRef<SipHeaderValue*> hdrVal = 
 		new SipHeaderValueVia(transport, localIP, port);
-	
+
+	// Add rport parameter, defined in RFC 3581
+	hdrVal->addParameter(new SipHeaderParameter("rport", "", false));
 	hdrVal->setParameter("branch",branch);
 	
 	MRef<SipHeader*> hdr = new SipHeader( hdrVal );
