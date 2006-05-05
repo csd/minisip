@@ -83,11 +83,13 @@ Mutex::~Mutex(){
 
 
 void Mutex::lock(){
-	int ret=pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
+	int ret;
+	ret = pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
 	massert( ret == 0 );
 }
 
 void Mutex::unlock(){
-	int ret=pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
+	int ret;
+	ret = pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
 	massert( ret == 0 );
 }
