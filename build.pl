@@ -822,11 +822,11 @@ print "+Make will try to run $njobs parallel build jobs\n" if $verbose;
 #  LDFLAGS: add local install library path
 $ENV{LDFLAGS} ||= '';
 $libdir = "$destdir$prefixdir/lib";
-$ENV{LDFLAGS} .= " -L$libdir";
+#$ENV{LDFLAGS} .= " -L$libdir";
 #  CPPFLAGS: add local install include path (XXX: needed?)
 $ENV{CPPFLAGS} ||= '';
 $includedir = "$destdir$prefixdir/include";
-$ENV{CPPFLAGS} .= " -I$includedir ";
+#$ENV{CPPFLAGS} .= " -I$includedir ";
 #  CXXFLAGS: enabled all warnings and (optionally) debugging
 $ENV{CXXFLAGS} ||= '';
 $ENV{CXXFLAGS} .= " -Wall";
