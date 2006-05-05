@@ -212,7 +212,7 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( clean dclean mclean ),
 		qw( dist distcheck tarballs tarcontents tarclean ),
 		@dist_actions, 
-		qw( check run allclean hostclean repoclean ),
+		qw( check run debug allclean hostclean repoclean ),
 		qw( confdump confclean ),
 	);
 
@@ -643,6 +643,7 @@ for my $f ( @dist_actions, qw( pkgfiles ) ) {
 sub cb_noop { }
 
 sub cb_run_post { act('run', run_app_path()) }
+sub cb_debug_post { act('run', debug_app_path()) }
 
 sub cb_confdump {
 	my $spec = $configure_params{$pkg};
@@ -695,12 +696,14 @@ set_pre_callbacks(
 	);
 set_build_callbacks(
 		run => \&cb_noop,
+		debug => \&cb_noop,
 		confdump => \&cb_confdump,
 		hostclean => \&cb_hostclean,
 		confclean => \&cb_noop,
 	);
 set_post_callbacks(
 		run => \&cb_run_post,
+		debug => \&cb_debug_post,
 		repoclean => \&cb_repoclean_post,
 		hostclean => \&cb_hostclean_post,
 		confclean => \&cb_confclean_post,
@@ -721,7 +724,10 @@ sub run_app_path {
 		return $target;
 	}
 	return $rootpath . $run_app;
-	
+}
+
+sub debug_app_path {
+	return ( 'gdb', run_app_path() );
 }
 
 %actions = (
@@ -768,6 +774,7 @@ my $need_allclean = sub { callact('allclean') };
 	check => $need_compile,
 	install => $need_compile,
 	run => $need_install,
+	debug => $need_install,
 	dist => $need_tarclean,
 	distcheck => $need_tarclean,
 	tarcontents => $need_dist,
