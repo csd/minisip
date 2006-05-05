@@ -464,6 +464,7 @@ sub _package_configure_params {
 sub configure_params {
 	my $spec = $configure_params{$pkg};
 	my @spec = ( 
+			"--cache=$builddir/config.cache",
 			"--srcdir=$srcdir", 
 			"--prefix=$prefixdir",
 			_feature_configure_params($spec),
