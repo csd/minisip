@@ -56,8 +56,8 @@
 using namespace std;
 
 MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
-		MRef<SipMessage*> pack,
-		string to_tel_no, 
+		MRef<SipRequest*> origReq,
+		MRef<SipResponse*> resp,
 		bool provisional)
 {
 	string method;
@@ -67,25 +67,26 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 		method = "ACK";
 	}
 	MRef<SipRequest*> req = new SipRequest(branch, method);
-	req->setUri(to_tel_no);
+	req->setUri(origReq->getUri());
 
 	req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
 	
-	int noHeaders = pack->getNoHeaders();
+	int noHeaders = origReq->getNoHeaders();
 	for (int32_t i=0; i< noHeaders; i++){			//FIX: deep copy?
-		MRef<SipHeader *> header = pack->getHeaderNo(i);
+		MRef<SipHeader *> header = origReq->getHeaderNo(i);
 		int headerType = header->getType();
 		switch (headerType){
 			case SIP_HEADER_TYPE_CSEQ:
 				((SipHeaderValueCSeq*) *(header->getHeaderValue(0)))->setMethod(method);
 			case SIP_HEADER_TYPE_FROM:
-			case SIP_HEADER_TYPE_TO:
 			case SIP_HEADER_TYPE_CALLID:
 			case SIP_HEADER_TYPE_ROUTE:
 				req->addHeader(header);
 				break;
 		}
 	}
+
+	req->addHeader( new SipHeader( *resp->getHeaderValueTo() ) );
 	
 	return req;
 }

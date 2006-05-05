@@ -584,9 +584,9 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 // 	MRef<SipMessage*> ref( *resp);
 
 	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
-			*lastInvite, 
+			lastInvite,
+			resp,
 			//dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
-			lastInvite->getUri(),
 			provisional
 			);
 

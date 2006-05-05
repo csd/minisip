@@ -1501,8 +1501,8 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	//MRef<SipAck *> ack = new SipAck(
 	MRef<SipRequest*> ack = SipRequest::createSipMessageAck(
 		branch, 
-		*lastResponse,
-		dialogState.remoteUri
+		lastInvite,
+		lastResponse
 		);
 
 //      There might be so that there are no SDP. Check!

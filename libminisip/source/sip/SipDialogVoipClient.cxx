@@ -804,8 +804,8 @@ void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
 	
 	MRef<SipRequest*> prack = SipRequest::createSipMessageAck(
 			"",
-			*rel100resp,
-			dialogState.remoteUri,
+			getLastInvite(),
+			rel100resp,
 			true
 			) ;
 

@@ -43,6 +43,7 @@
 #include<libmutil/MemObject.h>
 
 class SipStack;
+class SipResponse;
 
 class LIBMSIP_API SipRequest : public SipMessage{
 
@@ -58,8 +59,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 */
 		static MRef<SipRequest*> createSipMessageAck(
 				std::string branch,
-				MRef<SipMessage*> pack,
-				std::string to_tel_no,
+				MRef<SipRequest*> origReq,
+				MRef<SipResponse*> resp,
 				bool provisional=false);
 
 		static MRef<SipRequest*> createSipMessageBye(
