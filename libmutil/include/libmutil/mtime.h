@@ -52,4 +52,13 @@
 
 LIBMUTIL_API uint64_t mtime();
 
+/**
+ * Purpose: Implement a platform independent way of delaying 
+ *		execution of a thread.
+ * @arg msec	The thread will suspend sleep for at least the 
+ *		requested number of milliseconds.
+ * @return -1 if error, else otherwise
+ */
+LIBMUTIL_API int msleep(int32_t msec);
+
 #endif

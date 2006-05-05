@@ -38,6 +38,7 @@
 #include<libmutil/merror.h>
 #include<libmutil/Exception.h>
 #include<libmutil/massert.h>
+#include<libmutil/mtime.h>
 
 using namespace std;
 
@@ -235,8 +236,7 @@ void Thread::join(const ThreadHandle &handle){
 }
 
 int Thread::msleep(int32_t ms){
-	Sleep(ms); //function returns void
-	return 0;
+	return ::msleep( ms );
 }
 
 

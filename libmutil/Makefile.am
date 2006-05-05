@@ -37,6 +37,12 @@ thread_src = 	source/CondVarWin32.cxx \
 endif OS_WIN
 endif !HAVE_PTHREAD
 
+if OS_WIN
+mtime_src = 	source/mtimeWin32.cxx
+else
+mtime_src = 	source/mtimePosix.cxx
+endif !OS_WIN
+
 mutil_src = \
 		source/MemObject.cxx \
 		source/Library.cxx \
@@ -48,7 +54,7 @@ mutil_src = \
 		source/merror.cxx \
 		source/TextUI.cxx \
 		source/Timestamp.cxx \
-		source/mtime.cxx \
+		$(mtime_src) \
 		source/itoa.cxx \
 		source/print_hex.cxx \
 		source/split_in_lines.cxx \

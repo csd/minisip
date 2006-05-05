@@ -43,6 +43,7 @@
 #include<libmutil/merror.h>
 #include<libmutil/Exception.h>
 #include<libmutil/massert.h>
+#include<libmutil/mtime.h>
 
 using namespace std;
 
@@ -397,10 +398,7 @@ void Thread::join(const ThreadHandle &handle){
 }
 
 int Thread::msleep(int32_t ms){
-	struct timespec request;
-	request.tv_sec = ms/1000;
-	request.tv_nsec = (long) (ms%1000) * 1000 * 1000;
-	return nanosleep( &request, NULL );
+	return ::msleep( ms );
 }
 
 
