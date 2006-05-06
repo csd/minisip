@@ -30,6 +30,24 @@
 #include<string>
 
 #include<libmutil/mtypes.h>
+#include<libmutil/MemObject.h>
+
+class LIBMNETUTIL_API NetworkInterface : public MObject{
+	public:
+		const std::string &getName() const;
+
+		const std::vector<std::string> &getIPStrings( bool ipv6 = false ) const;
+
+		void addIPString( const std::string &ip, bool ipv6 = false );
+
+		NetworkInterface(const std::string &name);
+		~NetworkInterface();
+
+	private:
+		std::string m_name;
+		std::vector<std::string> m_ip4Strs;
+		std::vector<std::string> m_ip6Strs;
+};
 
 /**
 Collection of network utilities
@@ -43,9 +61,15 @@ class LIBMNETUTIL_API NetworkFunctions{
 		
 		/**
 		@return given the name of a network interface (obtained with Network::getAllInterfaces(),
-			for example), it returns a string formatted IP address (numerical).
+			for example), it returns a string formatted IPv4 address (numerical).
 		*/
 		static std::string getInterfaceIPStr(std::string iface);
+
+		/**
+		 * Return a list containing all interfaces.
+		 */
+		static std::vector<MRef<NetworkInterface*> > getInterfaces();
+
 		
 		/**
 		@param ipStr a string containing an ip address

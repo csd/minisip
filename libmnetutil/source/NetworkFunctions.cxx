@@ -48,6 +48,15 @@
 #	include<resolv.h>
 #endif
 
+#ifdef HAVE_NETDB_H
+#include<netdb.h>
+#endif
+#ifdef HAVE_IFADDRS_H
+#include<ifaddrs.h>
+#endif
+#include<map>
+
+
 /**
 libresolv is only for linux ...
 getaddrinfo works for linux and windows ... but in linux it does not correctly do SRV lookups ...and in windows is for xp or higher (and ce)
@@ -106,8 +115,180 @@ using namespace std;
 //W32: Thanks to MSDN documentation:
 //http://msdn.microsoft.com/library/default.asp?url=/library/en-us/iphlp/iphlp/managing_interfaces_using_getinterfaceinfo.asp
 
-//TODO: FIXME: change from ioctl to getifaddrs to support IPv6 -EE
 
+NetworkInterface::NetworkInterface(const string &name)
+{
+	m_name = name;
+}
+
+NetworkInterface::~NetworkInterface()
+{
+}
+
+const string &NetworkInterface::getName() const
+{
+	return m_name;
+}
+
+const vector<string> &NetworkInterface::getIPStrings( bool ipv6 ) const
+{
+	if( ipv6 )
+		return m_ip6Strs;
+	else
+		return m_ip4Strs;
+}
+
+void NetworkInterface::addIPString( const string &ip, bool ipv6 )
+{
+	if( ipv6 )
+		return m_ip6Strs.push_back(ip);
+	else
+		return m_ip4Strs.push_back(ip);
+}
+
+static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
+{
+	char addr[INET6_ADDRSTRLEN] = "";
+	socklen_t len = 0;
+
+	if( sa->sa_family == AF_INET ){
+		len = sizeof(struct sockaddr_in);
+		ipv6 = false;
+	}
+	else if( sa->sa_family == AF_INET6 ){
+		len = sizeof(struct sockaddr_in6);
+		ipv6 = true;
+	}
+	
+	if( getnameinfo(sa, len, addr, sizeof(addr),
+			NULL, 0, NI_NUMERICHOST) ){
+		ip = "";
+		return false;
+	}
+
+	ip = addr;
+	return true;
+}
+
+#ifdef HAVE_GETIFADDRS
+ vector<string> NetworkFunctions::getAllInterfaces(){
+ 	vector<string >res;
+	struct ifaddrs *ifs = NULL;
+	struct ifaddrs *cur;
+
+	if( getifaddrs (&ifs) || !ifs){
+		return res;
+	}
+
+	for( cur = ifs; cur; cur = cur->ifa_next ){
+		if( cur->ifa_flags & IFF_UP ){
+			if( find(res.begin(), res.end(), cur->ifa_name) ==
+			    res.end()){
+				res.push_back( cur->ifa_name );
+			}
+		}
+	}
+
+	freeifaddrs( ifs );
+
+	return res;
+}
+
+string NetworkFunctions::getInterfaceIPStr(string iface){
+	string ret;
+
+	struct ifaddrs *ifs = NULL;
+	struct ifaddrs *cur;
+
+	if( getifaddrs (&ifs) || !ifs ){
+		return "";
+	}
+
+	for( cur = ifs; cur; cur = cur->ifa_next ){
+		if( iface != cur->ifa_name ){
+			continue;
+		}
+
+		if( !( cur->ifa_flags & IFF_UP ) ){
+			continue;
+		}
+
+		bool isIpv6;
+		string addr;
+		
+		if( !sa_get_addr( cur->ifa_addr, isIpv6, addr) )
+			continue;
+
+		if( isIpv6 )
+			continue;
+
+		ret = addr;
+		break;
+	}
+
+	freeifaddrs( ifs );
+
+	return ret;
+}
+
+vector<MRef<NetworkInterface*> > mapToVector( map<string, MRef<NetworkInterface*> > &input )
+{
+	map<string, MRef<NetworkInterface*> >::iterator i;
+	vector<MRef<NetworkInterface*> > res;
+	
+	for( i = input.begin(); i != input.end(); i++ ){
+		MRef<NetworkInterface*> interface = i->second;
+
+		if( !interface ){
+			mdbg << "NetworkFunctions::mapToVector: No interface!" << end;
+			continue;
+		}
+
+		res.push_back( interface );
+	}
+
+	return res;
+}
+
+vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces(){
+	map<string, MRef<NetworkInterface*> > interfaces;
+
+	vector<MRef<NetworkInterface*> > res;
+
+	struct ifaddrs *ifs = NULL;
+	struct ifaddrs *cur;
+
+	if( getifaddrs (&ifs) || !ifs){
+		return res;
+	}
+
+	for( cur = ifs; cur; cur = cur->ifa_next ){
+		if( cur->ifa_flags & IFF_UP ){
+			const char *name = cur->ifa_name;
+
+			MRef<NetworkInterface*> interface = interfaces[ name ];
+
+			if( !interface ){
+				interface = new NetworkInterface( name );
+				interfaces[ name ] = interface;
+			}
+
+			bool ipv6;
+			string addr;
+		
+			if( !sa_get_addr( cur->ifa_addr, ipv6, addr) )
+				continue;
+
+			interface->addIPString( addr, ipv6 );
+		}
+	}
+
+	freeifaddrs( ifs );
+
+	return mapToVector( interfaces );	
+}
+
+#else  // HAVE_GETIFADDRS
 vector<string> NetworkFunctions::getAllInterfaces(){
 	vector<string >res;
 
@@ -264,25 +445,51 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 }
 
-string NetworkFunctions::getInterfaceOf( string ipStr ) {
-	vector<string> ifaces;
-	string ifaceIP;
-	bool ifaceFound = false;
-	unsigned int i;
-	
-	ifaces = NetworkFunctions::getAllInterfaces();
-	for( i=0; i<ifaces.size(); i++ ) {
-		ifaceIP = NetworkFunctions::getInterfaceIPStr( ifaces[i] );
-		if( ifaceIP == ipStr ) {
-			ifaceFound = true;
-			break;
+vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces()
+{
+	vector<string> names = getAllInterfaces();
+	vector<string>::iterator i;
+ 
+	vector<MRef<NetworkInterface*> > interfaces;
+
+	for( i = names.begin(); i != names.end(); i++ ){
+		string name = *i;
+		string ip = getInterfaceIPStr( name );
+
+		if( ip.length() > 0 ){
+			MRef<NetworkInterface*> iface;
+
+			iface = new NetworkInterface(name);
+			iface->addIPString( ip );
+			interfaces.push_back( iface );
 		}
 	}
-	if( ifaceFound ) {
-		return ifaces[i];
-	} else {
-		return "";
+
+	return interfaces;
+}
+
+#endif  // HAVE_GETIFADDRS
+
+string NetworkFunctions::getInterfaceOf( string ipStr ) {
+	vector<MRef<NetworkInterface*> > ifaces;
+	vector<MRef<NetworkInterface*> >::iterator iter;
+	bool isIpv6 = ipStr.find(':');
+	
+	ifaces = NetworkFunctions::getInterfaces();
+	for( iter = ifaces.begin(); iter != ifaces.end(); iter++ ){
+		MRef<NetworkInterface*> iface = *iter;
+		const vector<string> &ipStrs = iface->getIPStrings( isIpv6 );
+
+		unsigned int i;
+		for( i=0; i<ipStrs.size(); i++ ) {
+			string ifaceIP = ipStrs[ i ];
+
+			if( ifaceIP == ipStr ) {
+				return iface->getName();
+			}
+		}
 	}
+	return "";
 }
 
 string NetworkFunctions::getHostHandlingService(string service, string domain, uint16_t &ret_port){
