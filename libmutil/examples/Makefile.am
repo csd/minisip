@@ -22,11 +22,11 @@ MINISIP_LIBS += -L$(libdir) -L$(abs_top_builddir)/.libs -lmutil
 MINISIP_LIBS += $(LDFLAGS) $(LIBS)
 
 %.sh: %.sh.in
-	sed -e 's,@EXAMPLES\@,$(EXAMPLE_SOURCE_FILES),' \
-		-e 's,@MINISIP_CFLAGS\@,"$(MINISIP_CFLAGS)",' \
-		-e 's,@MINISIP_LIBS\@,"$(MINISIP_LIBS)",' \
-		-e 's,@buildlibdir\@,"$(abs_top_builddir)",' \
-		-e 's,@libdir\@,"$(libdir)",' \
+	sed -e 's|@EXAMPLES\@|$(EXAMPLE_SOURCE_FILES)|' \
+		-e 's|@MINISIP_CFLAGS\@|$(MINISIP_CFLAGS)|' \
+		-e 's|@MINISIP_LIBS\@|$(MINISIP_LIBS)|' \
+		-e 's|@buildlibdir\@|$(abs_top_builddir)|' \
+		-e 's|@libdir\@|$(libdir)|' \
 		$< > $@
 	chmod 0755 $@
 
