@@ -18,7 +18,7 @@ dist-hook:
 	done
 
 # maintainer rules
-ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 MAINTAINERCLEANFILES = \
 	$(srcdir)/configure \
 	$(srcdir)/Makefile.in \

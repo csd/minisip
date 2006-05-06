@@ -50,7 +50,7 @@ if test "$libtoolize" = "no"; then
 fi
 
 
-aclocal${amvers} "$@" ${ACLOCAL_FLAGS}
+aclocal${amvers} -I m4 "$@" ${ACLOCAL_FLAGS}
 ${libtoolize} --copy --force
 
 autoconf

@@ -392,7 +392,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 libminisip_la_LIBADD += $(libsoundcard_libadd)
 
 # maintainer rules
-ACLOCAL_AMFLAGS = -I m4 $(ACLOCAL_FLAGS)
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 MAINTAINERCLEANFILES  = $(srcdir)/configure \
 			$(srcdir)/Makefile.in \
 			$(srcdir)/config/depcomp \
