@@ -39,6 +39,7 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/TLSSocket.cxx \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
+		    source/DatagramSocket.cxx \
 		    source/StreamSocket.cxx
 
 # maintainer rules

@@ -21,37 +21,29 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#ifndef UDPSOCKET_H
-#define UDPSOCKET_H
+#ifndef DATAGRAMSOCKET_H
+#define DATAGRAMSOCKET_H
 
 #include<libmnetutil/libmnetutil_config.h>
 
-#include<libmnetutil/DatagramSocket.h>
+#include<libmnetutil/Socket.h>
 #include<libmnetutil/IPAddress.h>
 
-
-class LIBMNETUTIL_API UDPSocket : public DatagramSocket {
+class LIBMNETUTIL_API DatagramSocket : public Socket {
 	public:
 	
-		UDPSocket( int32_t port=0, bool use_ipv6=false );
-//		UDPSocket( int32_t port );
-		
-		virtual ~UDPSocket();
+		virtual ~DatagramSocket();
 
-		virtual std::string getMemObjectType(){return "UDPSocket";}
+		virtual std::string getMemObjectType() = 0;
 
-		int32_t getPort();
+		virtual int32_t getPort() = 0;
 		
-		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
+		virtual int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len) = 0;
 		
-		int32_t recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int32_t &port);
+		virtual int32_t recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int &port) = 0;
 		
-		int32_t recv(void *buf, int32_t len);
+		virtual int32_t recv(void *buf, int32_t len) = 0;
 
-		bool setLowDelay();
-
-	private:
-		bool initUdpSocket( bool use_ipv6, int32_t port );
-		bool use_ipv6;
+		virtual bool setLowDelay() = 0;
 };
 #endif
