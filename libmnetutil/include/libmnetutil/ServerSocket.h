@@ -46,6 +46,7 @@ class LIBMNETUTIL_API ServerSocket : public Socket {
 					   // NAT, someone can create a server socket that accepts 
 					   // connections via a proxy (it would connect as client to 
 					   // this proxy).
+		static ServerSocket * create( int32_t listen_port, bool use_ipv6 = false );
 
 	protected:
 		void listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog);

@@ -36,6 +36,8 @@
 #endif
 
 #include<libmutil/merror.h>
+#include<libmnetutil/IP4ServerSocket.h>
+#include<libmnetutil/IP6ServerSocket.h>
 #include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/NetworkException.h>
 
@@ -116,4 +118,14 @@ int32_t ServerSocket::getPort(){
 	MRef<IPAddress *> addr = IPAddress::create((struct sockaddr*)&sa, sz);
 	int32_t port2 = addr->getPort();
 	return port2;
+}
+
+ServerSocket * ServerSocket::create( int32_t listen_port, bool use_ipv6 )
+{
+	if( use_ipv6 ){
+		return new IP6ServerSocket( listen_port );
+	}
+	else{
+		return new IP4ServerSocket( listen_port );
+	}
 }
