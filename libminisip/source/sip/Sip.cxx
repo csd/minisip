@@ -154,7 +154,9 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 	securityConfig.useIdentity( id );
 
 	gotAtSign = ( user.find("@", startAddr) != string::npos );
-	
+
+#if 0	
+	// Uri check not compatible with IPv6
 	if (user.find(":", startAddr)!=string::npos){
 		string proxy;
 		string port;
@@ -178,6 +180,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 		
 		
 	}
+#endif
 
 	if( !gotAtSign && id ){
 		id->lock();
