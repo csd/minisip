@@ -59,6 +59,20 @@ int32_t Socket::getType(){
 	return type;
 }
 
+int Socket::getAddressFamily()
+{
+	struct sockaddr_storage sa;
+	socklen_t salen = sizeof(sa);
+
+	if( getsockname(fd, (struct sockaddr*)&sa, &salen) < 0 ){
+		return -1;
+	}
+
+	return sa.ss_family;
+}
+
+
+
 
 void Socket::close( void ){
 //#if defined WIN32 && not defined __CYGWIN__

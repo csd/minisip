@@ -54,6 +54,7 @@ class LIBMNETUTIL_API Socket : public MObject {
 		virtual ~Socket();
 		virtual int32_t getFd();
 		int32_t getType();
+		virtual int getAddressFamily();
 
 //#ifdef _WIN32_WCE
 /* Undef this ... it causes a link problem ... */
