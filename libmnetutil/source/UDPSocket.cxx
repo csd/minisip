@@ -110,7 +110,7 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 }
 
 UDPSocket::UDPSocket( int32_t port, bool use_ipv6 ) {
-	initUdpSocket( false, port );
+	initUdpSocket( use_ipv6, port );
 }
 
 /*

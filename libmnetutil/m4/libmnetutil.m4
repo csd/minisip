@@ -22,6 +22,10 @@ then
 #endif
 ])
 fi
+if test "${HAVE_IPV6}" = "yes"
+then
+	AC_DEFINE(HAVE_IPV6, [1], [Define to 1 to enable IPv6 support ])
+fi
 AM_CONDITIONAL(HAVE_IPV6, test "x${HAVE_IPV6}" = "xyes")
   ])
 # End of AM_MINISIP_CHECK_IPV6
