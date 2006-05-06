@@ -15,9 +15,9 @@ run-example.sh: run-example.sh.in
 	sed -e 's,@libdir\@,$(libdir),' $< > $@
 
 build-examples.sh: build-examples.sh.in
-	sed -e 's,@EXAMPLES\@,$(EXAMPLE_SOURCE_FILES),' \
-		-e 's,@MINISIP_CFLAGS\@,$(MINISIP_CFLAGS),' \
-		-e 's,@MINISIP_LIBS\@,$(MINISIP_LIBS),' \
+	sed -e 's|@EXAMPLES\@|$(EXAMPLE_SOURCE_FILES)|' \
+		-e 's|@MINISIP_CFLAGS\@|$(MINISIP_CFLAGS)|' \
+		-e 's|@MINISIP_LIBS\@|$(MINISIP_LIBS)|' \
 		$< > $@
 	chmod 0755 $@
 
