@@ -37,7 +37,8 @@ using namespace std;
 SipDialogSecurityConfig::SipDialogSecurityConfig():
 	secured(false),
 	ka_type(0),
-	use_srtp(false),		
+	use_srtp(false),
+	use_zrtp(false),
 	use_ipsec(false),
 	cert(NULL),
 	cert_db(NULL),
@@ -55,6 +56,9 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 
 	backend->save("use_srtp", use_srtp?string("yes"): string("no"));
 	backend->save("use_ipsec", use_ipsec?string("yes"): string("no"));
+	if (use_srtp) {
+	    backend->save("use_zrtp", use_zrtp ? string("yes") : string("no"));
+	}
 
 	backend->save("psk_enabled", psk_enabled?string("yes"): string("no"));
 	backend->save("dh_enabled", dh_enabled?string("yes"): string("no"));
@@ -139,6 +143,9 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 	secured = backend->loadString("secured","no")=="yes";
 	use_srtp = backend->loadString("use_srtp","no")=="yes";		
 	use_ipsec = backend->loadString("use_ipsec","no")=="yes";
+	if (use_srtp) {
+	    use_zrtp = backend->loadString("use_zrtp", "no") == "yes";
+	}
 	
 	dh_enabled   = backend->loadString("dh_enabled","no")=="yes";
 	psk_enabled  = backend->loadString("psk_enabled","no")=="yes";
