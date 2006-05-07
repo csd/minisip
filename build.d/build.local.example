@@ -131,6 +131,7 @@ $toggle_batch = 1;
 #			portaudio => 1,
 #			p2t => 1,
 #			sdl => 1,
+#			zrtp => 1,	# incomplete!
 #		);
 
 ## override minisip configure parameters

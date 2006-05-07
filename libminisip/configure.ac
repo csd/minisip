@@ -192,6 +192,16 @@ AC_ARG_ENABLE(p2t,
        fi ])
 AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
 
+dnl ZRTP support
+AC_ARG_ENABLE(zrtp,
+    AS_HELP_STRING([--enable-zrtp],
+    	[enable ZRTP support (default disabled)]))
+if test "${enable_zrtp}" = "yes"
+then
+   AC_DEFINE(ZRTP_SUPPORT, [], [ZRTP support])
+fi
+AM_CONDITIONAL(ZRTP_SUPPORT, test "${enabled_zrtp}" = "yes")
+
 dnl AEC support
 AC_ARG_ENABLE(aec,
     AS_HELP_STRING([--enable-aec],

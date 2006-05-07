@@ -130,6 +130,10 @@ librtp_src = source/rtp/RtpHeader.cxx \
 		source/rtp/XRReportBlock.cxx \
 		source/rtp/XRVoIPReportBlock.cxx
 
+if ZRTP_SUPPORT
+libzrtp_src = source/zrtp/ZRtp.cxx
+endif
+
 libsdp_src = source/sdp/SdpPacket.cxx \
 		source/sdp/SdpHeader.cxx \
 		source/sdp/SdpHeaderA.cxx \
@@ -384,6 +388,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libmediahandler_src) \
 			$(libp2t_src) \
 			$(librtp_src) \
+			$(libzrtp_src) \
 			$(libsdp_src) \
 			$(libsoundcard_src) \
 			$(libspaudio_src) \
