@@ -140,13 +140,9 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	// 
 	string branch;
 	string seqMethod;
-	string method;
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
 		branch = c.getCommandPacket()->getDestinationBranch();
 		seqMethod = c.getCommandPacket()->getCSeqMethod();
-		MRef<SipRequest *> req = dynamic_cast<SipRequest*>(*c.getCommandPacket());
-		if( req )
-			method = req->getMethod();
 	}
 	bool hasBranch = (branch!="");
 	bool hasSeqMethod = (seqMethod!="");
@@ -157,9 +153,9 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 
 //	cerr << "SipLayerTransaction: trying "<<transactions.size()<<" transactions"<<endl;
 	for (int i=0; i< transactions.size(); i++){
-		if ( (!hasBranch || transactions[i]->getBranch()== branch) &&
+		if ( (!hasBranch || transactions[i]->getBranch()== branch || seqMethod=="ACK") &&
 				(!hasSeqMethod || transactions[i]->getCSeqMethod()==seqMethod || 
-				 (method == "ACK" && transactions[i]->getCSeqMethod() == "INVITE")) ){
+				 (seqMethod == "ACK" && transactions[i]->getCSeqMethod() == "INVITE")) ){
 
 //			cerr << "SipLayerTransaction: trying message with branch <"<<branch<<"> with transaction with branch <"<<transactions[i]->getBranch()<<">"<<endl;
 			bool ret = transactions[i]->handleCommand(c);
