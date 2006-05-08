@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2005  Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -192,6 +194,22 @@ void SipUri::parseUserInfo( string UriData ) {
 		userName = "";
 	}
 	
+	if( UriData[0] == '[' ){
+		pos = UriData.find(']');
+
+		if( pos != string::npos ){
+			setIp( UriData.substr( 1, pos - 1 ) );
+
+			if( UriData[ pos + 1 ] == ':' ) { //there is port info ...
+				UriData.erase( 0, pos + 2);
+				setPort( atoi(UriData.c_str()) );
+			} else {
+				setPort( 0 );
+			}
+			return;
+		}
+	}
+
 	//now, we get the host/ip ...
 	pos = UriData.find( ':' );
 	if( pos != string::npos ) { //there is port info ...
@@ -230,13 +248,7 @@ string SipUri::getString() const {
 		Uri += "\"" + getDisplayName() + "\" ";
 	}
 	Uri += "<";
-	if( getProtocolId() != "" )
-		 Uri += getProtocolId() + ":";
-	if( getUserName() != "" ) Uri += getUserName() + "@";
-	Uri += getIp();
-	if( getPort() != 0 ) {
-		Uri += ":" + itoa( port );
-	}
+	Uri += getRequestUriString();
 	if( getTransport() != "" ) Uri += ";transport=" + getTransport();
 	if( getUserType() != "" ) Uri += ";user=" + getUserType();
 	Uri += ">";
@@ -258,7 +270,14 @@ string SipUri::getUserIpString() const {
 	}
 	
 	if( getUserName() != "" ) Uri += getUserName() + "@";
-	Uri += getIp();
+
+	if( getIp().find(':') != string::npos ){
+		// IPv6
+		Uri += '[' + getIp() + ']';
+	}
+	else{
+		Uri += getIp();
+	}
 	
 #ifdef DEBUG_OUTPUT
 // 	cerr << "SipUri::getUserIpString() - " << Uri << endl;
@@ -278,8 +297,7 @@ string SipUri::getRequestUriString() const {
 	
 	if( getProtocolId() != "" )
 		 Uri += getProtocolId() + ":";
-	if( getUserName() != "" ) Uri += getUserName() + "@";
-	Uri += getIp();
+	Uri += getUserIpString();
 	if( getPort() != 0 ) {
 		Uri += ":" + itoa( port );
 	}
