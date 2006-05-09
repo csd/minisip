@@ -88,7 +88,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	// Search for end of host name
 	pos = build_from.find_first_of( ":;, \t\n\r", i );
 	if( pos == string::npos ){
-		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine ip address");
+		pos = build_from.size();
 	}
 
 	ip = build_from.substr( i, pos - i );
