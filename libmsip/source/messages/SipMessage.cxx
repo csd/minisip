@@ -303,7 +303,7 @@ SipMessage::SipMessage(int, string &buildFrom)
 		}
 	}
 	
-	branch = getLastViaBranch();
+	branch = getFirstViaBranch();
 }
 
 

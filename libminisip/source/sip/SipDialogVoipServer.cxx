@@ -305,9 +305,9 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 			    SipSMCommand::dialog_layer)) {
 		MRef<SipRequest*> cancel =
 			(SipRequest*)*command.getCommandPacket();
-		const string branch = cancel->getLastViaBranch();
+		const string branch = cancel->getFirstViaBranch();
 
-		if (getLastInvite()->getLastViaBranch() != branch)
+		if (getLastInvite()->getFirstViaBranch() != branch)
 			return false;
 
 #if 0
@@ -317,7 +317,7 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 				//MRef<SipDialog*>(this), 
 				command.getCommandPacket()->getCSeq(), 
 				command.getCommandPacket()->getCSeqMethod(), 
-				command.getCommandPacket()->getLastViaBranch(), 
+				command.getCommandPacket()->getFirstViaBranch(), 
 				dialogState.callId) );
 		dispatcher->getLayerTransaction()->addTransaction(cr);
 		registerTransactionToDialog(cr);
