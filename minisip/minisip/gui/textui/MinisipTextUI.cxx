@@ -216,6 +216,13 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		callId=""; //FIXME: should check the callId of cmd.
 		inCall=false;
 	}
+	else if (cmd.getOp()==SipCommandString::remote_cancelled_invite){
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("Remote user cancelled the call.",red);
+		callId=""; //FIXME: should check the callId of cmd.
+		inCall=false;
+	}
 	
 
 	
