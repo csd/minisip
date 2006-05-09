@@ -146,19 +146,27 @@ void NetworkInterface::addIPString( const string &ip, bool ipv6 )
 		return m_ip4Strs.push_back(ip);
 }
 
+#ifdef HAVE_GETIFADDRS
 static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 {
+#ifdef HAVE_IPV6
 	char addr[INET6_ADDRSTRLEN] = "";
+#else
+	char addr[INET_ADDRSTRLEN] = "";
+#endif
+
 	socklen_t len = 0;
 
 	if( sa->sa_family == AF_INET ){
 		len = sizeof(struct sockaddr_in);
 		ipv6 = false;
 	}
+#ifdef HAVE_IPV6
 	else if( sa->sa_family == AF_INET6 ){
 		len = sizeof(struct sockaddr_in6);
 		ipv6 = true;
 	}
+#endif
 	
 	if( getnameinfo(sa, len, addr, sizeof(addr),
 			NULL, 0, NI_NUMERICHOST) ){
@@ -170,7 +178,6 @@ static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 	return true;
 }
 
-#ifdef HAVE_GETIFADDRS
  vector<string> NetworkFunctions::getAllInterfaces(){
  	vector<string >res;
 	struct ifaddrs *ifs = NULL;
