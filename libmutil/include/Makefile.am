@@ -29,6 +29,7 @@ pkginclude_HEADERS = \
 			libmutil/XMLParser.h \
 			libmutil/MPlugin.h \
 			libmutil/libmutil_config.h \
+			libmutil/MSingleton.h \
 			libmutil/CircularBuffer.h
 
 noinst_HEADERS = 	config.h
