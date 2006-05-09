@@ -183,7 +183,10 @@ class SecuritySettings
 		Gtk::RadioButton * pskRadio;
 		Gtk::RadioButton * dhRadio;
 
-
+		Gtk::RadioButton * requireRadio;
+		Gtk::RadioButton * warningRadio;
+		Gtk::RadioButton * notRequireRadio; 
+		
 		MRef<SipSoftPhoneConfiguration *> config;
 
 };

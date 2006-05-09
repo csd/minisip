@@ -19,6 +19,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Jie Chen <iw03_jch@it.kth.se>
 */
 
 
@@ -29,6 +30,16 @@
 #include<libmutil/itoa.h>
 #include<libmutil/print_hex.h>
 #include<assert.h>
+#include<string>
+
+MikeyPayloadCERT::MikeyPayloadCERT( int type, string url ){
+	
+	this->payloadTypeValue = MIKEYPAYLOAD_CERT_PAYLOAD_TYPE;
+	this->type = type;
+	this->certLengthValue = strlen(url.c_str());
+	this->certDataPtr = new byte_t[ certLengthValue ];
+	memcpy( this->certDataPtr, url.c_str(), certLengthValue );
+}
 
 using namespace std;
 
@@ -38,7 +49,6 @@ MikeyPayloadCERT::MikeyPayloadCERT( int type, int length, byte_t * data ){
 	this->certLengthValue = length;
 	this->certDataPtr = new byte_t[ length ];
 	memcpy( this->certDataPtr, data, length );
-
 }
 
 MikeyPayloadCERT::MikeyPayloadCERT( int type, MRef<certificate *> cert ){
@@ -67,13 +77,19 @@ MikeyPayloadCERT::MikeyPayloadCERT( byte_t *start, int lengthLimit ):
 			"Given data is too short to form a CERT Payload" );
 		return;
 	}
-                
+	
 	certDataPtr = new byte_t[ certLengthValue ];
+	
 	memcpy( certDataPtr, &start[4], certLengthValue );
+
 	endPtr = startPtr + 4 + certLengthValue;
 
 	assert( endPtr - startPtr == length() );
 
+	for (int i=0;i<certLengthValue;i++){
+		certUrl += *(certDataPtr+i);
+	}
+	
 }
 
 MikeyPayloadCERT::~MikeyPayloadCERT(){
@@ -91,7 +107,6 @@ void MikeyPayloadCERT::writeData( byte_t * start, int expectedLength ){
 	start[2] = (byte_t) ((certLengthValue & 0xFF00) >> 8);
 	start[3] = (byte_t) (certLengthValue & 0xFF);
 	memcpy( &start[4], certDataPtr, certLengthValue );
-
 }
 
 int MikeyPayloadCERT::length(){

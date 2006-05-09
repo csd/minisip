@@ -18,6 +18,7 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Jie Chen <iw03_jch@it.kth.se>
 */
 
 #ifndef CERTIFICATEDIALOG_H
@@ -44,7 +45,7 @@ class CertificateDialog
 
 		void setCertChain( MRef<certificate_chain *> chain );
 		void setRootCa( MRef<ca_db *> caDb );
-
+		
 		void run();
 
 	private:
@@ -62,7 +63,7 @@ class CertificateDialog
                 void removeCert();
                 void chooseCert();
                 void choosePKey();
-
+	
 		//Gtk::TreeModel::ColumnRecord certColumns;
 		//Gtk::TreeModelColumn<Glib::ustring> commonNameColumn;
 		//Gtk::TreeModelColumn<Glib::ustring> issuerColumn;
@@ -86,7 +87,7 @@ class CertificateDialog
 		Gtk::Button * addDirCaButton;
 		Gtk::Button * addFileCaButton;
 		Gtk::Button * removeCaButton;
-
+		
 		Gtk::Dialog * certDialog;
 		
 		Gtk::Button * closeButton;
@@ -128,13 +129,14 @@ class CaListStore : public MObject{
 	private:
 		Gtk::TreeModelColumn<Glib::ustring> typeColumn;
 		Gtk::TreeModelColumn<Glib::ustring> nameColumn;
+		Gtk::TreeModelColumn<Glib::ustring> commonNameColumn;
+		Gtk::TreeModelColumn<bool> selfColumn;
+		Gtk::TreeModelColumn<Glib::ustring> issuerColumn; 
 		
 		Gtk::TreeModel::ColumnRecord caColumns;
 		Glib::RefPtr<Gtk::ListStore> listStore;
 	
 };
-
-
 
 
 #endif

@@ -20,6 +20,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Jie Chen <iw03_jch@it.kth.se>
 */
 
 
@@ -38,9 +39,18 @@
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmikey/MikeyPayloadSP.h>
 
+#include<libmnetutil/IP4ServerSocket.h>
+#include<libmnetutil/TCPSocket.h>
 #include<map>
 
+
+
+
+//#define MAX_TIME_OFFSET 0xe1000000000LL //1 hour
+const int64_t MAX_TIME_OFFSET = 0xe100000<<16; //1 hour
+
 using namespace std;
+
 
 MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL){
 
@@ -74,12 +84,30 @@ MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL)
 		certChain->init_index();
 		cert = certChain->get_next();
 		while( ! cert.isNull() ){
+		
+			if (cert->type == 1){ //check certificate type
+		
+			cerr << "send certificate in url format:" << "  " << cert->file << endl;
+		
+			addPayload( new MikeyPayloadCERT(
+				MIKEYPAYLOAD_CERT_TYPE_X509V3URL,
+				cert->file) );
+	
+			}else{	
+		
+			cerr << "send certifiate in file" << endl;
+			
 			addPayload( new MikeyPayloadCERT(
 				MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
 				cert) );
+			}
+		
 			cert = certChain->get_next();
+		
 		}
+		
 		ka->certificateChain()->unlock();
+	
 	}
 
 	addPayload( new MikeyPayloadDH( ka->group(),
@@ -90,7 +118,69 @@ MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL)
 
 }
 //-----------------------------------------------------------------------------------------------//
+MRef <certificate *> downloadPeerCert(string url){
+	string method = url.substr(0,6);
+	
+	//try{ string method = url.substr(0,6); }
+	
+	
+	if( method=="ftp://" ){
+		cerr << "Ftp is not supported.";
+		throw certificate_exception_file(
+			"Could not open the certificate file" );
+	}else
+	if( method=="ldap:/" ){
+		cerr << "Ldap is not supported.";
+		throw certificate_exception_file(
+			"Could not open the certificate file" );
+	}else
+	if( method=="http:/" ){
+					 
+		string uri = url.substr(7);
+		string host = uri.substr(0, uri.find("/"));
+       		string path = uri.substr(uri.find("/"));
+		string FileName = url.substr(url.rfind("/"));
+	
+        	TCPSocket sock(host, 80);       //FiXME: parse port from addr
+        	sock.write("GET "+path+"\r\n\r\n");
+                                         //sock.write(path+"\n");
+        	char buf[4096];
+        	string ret;
+        	int n;
+        	while ((n=sock.read(buf,4095))>0){
+        		buf[n]=0;
+        		ret = ret + string(buf);
+        	}
+
+		FILE *fp, *fp2;
+		char cstring[4096];
+		char *home = getenv("HOME");
+		string DownloadCertFile = string(home)+string("/downloadPeerCerts")+string(FileName);
+		MRef<certificate *> cert;
+		
+		if ((fp = fopen ( DownloadCertFile.c_str(), "w+"))==NULL){
+			cerr << "cannot open the file" << endl;
+		}
+							  
+		strcpy(cstring, ret.c_str());
+		
+		if (fwrite (&cstring, sizeof(cstring), 1, fp)!=1)
+			cerr << "file write error" << endl;
+							                                                                                                                     fclose (fp);
+		/*					                                                                                                             	     if ((fp2 = fopen ( DownloadCertFile.c_str(), "r"))==NULL)
+			cerr << "can not open the file" << endl;
+		*/					  
+		cert = new certificate( DownloadCertFile.c_str() );
+		//fclose (fp2);
+		return cert;
+		
+	}																				     
+}
+                                                                                                          
+
 //-----------------------------------------------------------------------------------------------//
+
+
 
 void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 
@@ -101,6 +191,7 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 	MikeyMessage * errorMessage = new MikeyMessage();
 	MRef<certificate *> cert;
 	MRef<certificate_chain *> certChain;
+	string verifiedCertFile;
 
 	if( i == NULL ){
 		throw MikeyExceptionMessageContent(
@@ -171,18 +262,49 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 
 	if( ka->peerCertificateChain()->get_first().isNull() ){
 		i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
-
+		
 		while( i != NULL )
 		{
-			peerCert = new certificate( 
+			if (((MikeyPayloadCERT *)i)->type == 1 ){
+								
+				verifiedCertFile =  ka->topCaDbPtr->checkVerifiedUrl( ((MikeyPayloadCERT *)i)->certUrl ); 
+				if ( !verifiedCertFile.empty() ){
+					peerCert = new certificate( verifiedCertFile );
+					ka->addPeerCertificate( peerCert );
+					payloads.remove( i );
+					i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+				}else{											
+					cerr << "receive certificate in url format" << endl;
+										
+					peerCert = downloadPeerCert (
+					((MikeyPayloadCERT *)i)->certUrl
+					);
+				
+					peerCert->url = ((MikeyPayloadCERT *)i)->certUrl;
+					cerr << "certPayload->certUrl when setOffer peerCert payload" << peerCert->url << endl;
+				 	ka->addPeerCertificate( peerCert );
+					payloads.remove( i );
+					i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+				}	 
+				
+			}else{
+				peerCert = new certificate( 
 				((MikeyPayloadCERT *)i)->certData(),
 				((MikeyPayloadCERT *)i)->certLength()
 				);
+					
+					
+					ka->addPeerCertificate( peerCert );
+					payloads.remove( i );
+					i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+						  
+			//	peerCert->url = NULL;
+			}
+			//ka->peerCertNamesubordination( peerCert );
+			//ka->addPeerCertificate( peerCert );
+			//payloads.remove( i );
 
-			ka->addPeerCertificate( peerCert );
-			payloads.remove( i );
-
-			i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+			//i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
 		}
 	}
 
@@ -244,9 +366,23 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 		certChain->init_index();
 		cert = certChain->get_next();
 		while( !cert.isNull() ){
+			
+		if (cert->type == 1){ //check certificate type
+			
+			cerr << "respond certificate in url format:  " << cert->file << endl;
+			
+			result->addPayload( new MikeyPayloadCERT(
+				MIKEYPAYLOAD_CERT_TYPE_X509V3URL,
+				cert->file) );
+			}else{
+			
+			cerr << "respond certificate in file" << endl; 
+				
 			result->addPayload( new MikeyPayloadCERT(
 				MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
 				cert) );
+			
+			}
 			cert = certChain->get_next();
 		}
 		ka->certificateChain()->unlock();
@@ -271,10 +407,12 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	bool gotDhi = false;
-	certificate * peerCert;
+	MRef<certificate *> peerCert;
+	//certificate * peerCert;
 	MikeyMessage * errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
+	string verifiedCertFile;
 	
 	if( i == NULL ){
 		throw MikeyExceptionMessageContent(
@@ -329,11 +467,31 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 
 		while( i != NULL )
 		{
-			peerCert = new certificate( 
-				((MikeyPayloadCERT *)i)->certData(),
-				((MikeyPayloadCERT *)i)->certLength()
-				);
+			if (((MikeyPayloadCERT *)i)->type == 1 ){
+				
+				verifiedCertFile = ka->topCaDbPtr->checkVerifiedUrl( ((MikeyPayloadCERT *)i)->certUrl);
+				if ( !verifiedCertFile.empty() ){
+					peerCert = new certificate ( verifiedCertFile );
+				}else{
+					cerr << "parse respond certificate in url format" << endl;
+										
+					peerCert = downloadPeerCert(
+					((MikeyPayloadCERT *)i)->certUrl
+					);
+					
+					peerCert->url = ((MikeyPayloadCERT *)i)->certUrl;
+					cerr << "certPayload->certUrl when parseResponse peerCert payload" << peerCert->url << endl;
+				}	
+			}else{
+				peerCert = new certificate(
+					((MikeyPayloadCERT *)i)->certData(),
+					((MikeyPayloadCERT *)i)->certLength()
+					);
 
+					cerr << "parse respond certificate in file" << endl;
+					
+			}
+			//ka->peerCertNamesubordination( peerCert );
 			ka->addPeerCertificate( peerCert );
 			payloads.remove( i );
 
@@ -411,9 +569,12 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 
 bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
 
+	//MikeyPayload * i2 = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	MikeyPayload * sign = (*lastPayload());
 	list<MikeyPayload *>::iterator i;
+	MRef<certificate *> peercert;
 	MRef<certificate_chain *> peerCert = ka->peerCertificateChain();
+	string verifiedCertFile;
 
 	if( peerCert.isNull() || peerCert->get_first().isNull() )
 	{
@@ -422,11 +583,33 @@ bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
 		while( ( (certPayload) = (MikeyPayloadCERT*)
 				extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE)
 				) != NULL ){
-			ka->addPeerCertificate(
-				new certificate( 
-					certPayload->certData(),
-					certPayload->certLength() ));
-			payloads.remove( certPayload );
+			
+			if ( certPayload->type == 1 ){
+				
+				verifiedCertFile = ka->topCaDbPtr->checkVerifiedUrl( certPayload->certUrl ); 
+				if ( !verifiedCertFile.empty() ){
+					peercert = new certificate( verifiedCertFile );
+					ka->addPeerCertificate( peercert );
+					payloads.remove( certPayload );
+				}else{
+					peercert = downloadPeerCert(
+							certPayload->certUrl
+							);
+				
+					peercert->url = certPayload->certUrl;
+					ka->addPeerCertificate( peercert );
+					payloads.remove( certPayload );
+				}
+			}else{	
+			
+				peercert = new certificate( 
+						certPayload->certData(),
+						certPayload->certLength() );
+
+					ka->addPeerCertificate( peercert );
+					payloads.remove( certPayload );
+			}		
+			//payloads.remove( certPayload );
 		}
 	}
 
