@@ -232,22 +232,22 @@ class TimeoutProvider : public Runnable{
 			massert(subscriber);
 			if (requests.size()==0){
 				requests.push_front(request);
-                                synch_lock.unlock();
                                 wake();
+				synch_lock.unlock();
 				return;
 			}
 
 			if (request.happens_before(requests[0])){
 				requests.push_front(request);
-                                synch_lock.unlock();
                                 wake();
+				synch_lock.unlock();
 				return;
 			}
 
 			if (requests[requests.size()-1].happens_before(request)){
 				requests.push_back(request);
-                                synch_lock.unlock();
                                 wake();
+				synch_lock.unlock();
 				return;
 			}
 
@@ -257,8 +257,8 @@ class TimeoutProvider : public Runnable{
 
 			requests.insert(i,request);             
 
-                        synch_lock.unlock();
                         wake();
+                        synch_lock.unlock();
 		}
 		
 		/**
@@ -282,21 +282,23 @@ class TimeoutProvider : public Runnable{
 
 	private:
 
+		/** Precodition: synch_lock locked */
                 void wake(){
 			waitCond.broadcast();
                 }
 
+		/** Precodition: synch_lock locked */
 		void sleep(int ms){
 			if (ms > 0){
-				waitCond.wait(ms);
+				waitCond.wait(synch_lock, ms);
                         }
 		}
                 
 		void loop(){
 
+			synch_lock.lock();
 			do{
 				int32_t time=3600000;
-                                synch_lock.lock();
 				int32_t size=0;
 				if ((size=requests.size())>0)
 					time = requests[0].get_ms_to_timeout();
@@ -312,15 +314,17 @@ class TimeoutProvider : public Runnable{
                                         synch_lock.unlock();
 					massert(subs);		
 					subs->timeout(command);
+					synch_lock.lock();
 				}else{
-                                        synch_lock.unlock();
 					if (stop){		// If we were told to stop while delivering 
 								// a timeot we will exit here
+						synch_lock.unlock();
 						return;
 					}
 					this->sleep(time);
 					if (stop){		// If we are told to exit while sleeping we
 								// will exit here return;
+						synch_lock.unlock();
 						return;
 					}
 				}
