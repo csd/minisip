@@ -143,12 +143,12 @@ MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
 	
 	req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
 	
-	SipUri fromUri( dialogState.remoteUri );
+	SipUri fromUri( dialogState.localUri );
 	MRef<SipHeaderValueFrom*> from = new SipHeaderValueFrom( fromUri );
 	from->setParameter( "tag", dialogState.localTag );
 	req->addHeader(new SipHeader( *from ));
 
-	SipUri toUri( dialogState.localUri);
+	SipUri toUri( dialogState.remoteUri );
 	MRef<SipHeaderValueTo*> to = new SipHeaderValueTo( toUri );
 	to->setParameter( "tag", dialogState.remoteTag );
 	req->addHeader(new SipHeader( *to ));
