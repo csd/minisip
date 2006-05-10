@@ -268,9 +268,7 @@ int Minisip::startSip() {
 #endif	
 	
 	if( initParseConfig() < 0 ){
-#ifdef DEBUG_OUTPUT
-		cerr << "Minisip::startSip::initParseConfig - fatal error" << endl;
-#endif
+		merr << "Minisip::startSip::initParseConfig - fatal error" << end;
 		return -1;
 	}
 
@@ -387,10 +385,8 @@ int Minisip::startSip() {
 		
 	catch(exception &exc){
 		//FIXME: Display message in GUI
-#ifdef DEBUG_OUTPUT
 		merr << "Minisip caught an exception. Quitting."<< end;
 		merr << exc.what() << end;
-#endif
 		ret = -1;
 	}
 	catch(...){
