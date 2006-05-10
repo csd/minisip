@@ -63,14 +63,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				MRef<SipResponse*> resp,
 				bool provisional=false);
 
-		static MRef<SipRequest*> createSipMessageBye(
-				std::string branch,
-				std::string callId,
-				std::string target,
-				std::string to_uri,
-				std::string from_uri,
-				int32_t seq_no);
-
 		static MRef<SipRequest*> createSipMessageCancel(
 				std::string branch,
 				MRef<SipRequest*> inv,
@@ -124,14 +116,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const SipUri& fromUri,
 				int32_t seq_no
 				);
-
-		static MRef<SipRequest*> createSipMessageRefer(
-				std::string branch,
-				MRef<SipRequest*> inv,
-				std::string to_uri,
-				std::string from_uri,
-				std::string referredUri,
-				int cSeqNo);
 
 		static MRef<SipRequest*> createSipMessageRegister(
 				std::string branch,

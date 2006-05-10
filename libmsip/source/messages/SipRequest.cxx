@@ -92,32 +92,6 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageBye(string branch,
-		string callId,
-		string target,
-                string to_uri,
-                string from_uri,
-                int32_t seq_no)
-{
-	MRef<SipRequest*> req = new SipRequest(branch, "BYE");
-	
-	req->setUri(target);
-	
-        req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
-	
-	SipUri from(from_uri);
-	req->addHeader(new SipHeader(new SipHeaderValueFrom(from)));
-	
-	SipUri to(to_uri);
-	req->addHeader(new SipHeader(new SipHeaderValueTo(to)));
-	
-	req->addHeader(new SipHeader(new SipHeaderValueCSeq("BYE", seq_no)));
-	
-	req->addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
-	return req;
-
-}
-
 MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
                 MRef<SipRequest*> inv,
                 string to_uri
@@ -300,51 +274,6 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(string branch,
 	return req;
 }
 
-
-
-MRef<SipRequest*> SipRequest::createSipMessageRefer(string branch,
-		MRef<SipRequest*> inv,
-		string to_uri,
-		string from_uri,
-		string referredUri,
-		int cSeqNo)
-{
-	MRef<SipRequest*> req = new SipRequest(branch, "REFER");
-	req->setUri(to_uri);
-
-	req->addHeader(new SipHeader( new SipHeaderValueMaxForwards(70)));
-	
-	MRef<SipHeader *> header;
-	int noHeaders = inv->getNoHeaders();
-	for (int32_t i=0; i< noHeaders; i++){
-		header = inv->getHeaderNo(i);
-		int type = header->getType();
-		bool add=false;
-		switch (type){
-			case SIP_HEADER_TYPE_FROM:
-				((SipHeaderValueFrom*)*(header->getHeaderValue(0)))->getUri().setUser(from_uri);//This line can be removed?
-				add=true;
-				break;
-			case SIP_HEADER_TYPE_TO:
-				add=true;
-				break;
-			case SIP_HEADER_TYPE_CALLID:
-				add=true;
-				break;
-		}
-		
-		if (add){
-			req->addHeader(header);
-		}
-	}
-
-	/* Add the CSeq: header */
-	req->addHeader(new SipHeader(new SipHeaderValueCSeq("REFER", cSeqNo)));
-	
-	/* Add the Refer-To: header */
-	req->addHeader(new SipHeader(new SipHeaderValueReferTo(referredUri)));
-	return req;
-}
 
 
 MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,

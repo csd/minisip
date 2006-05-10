@@ -36,6 +36,11 @@
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipHeaderMaxForwards.h>
+#include<libmsip/SipHeaderCSeq.h>
+#include<libmsip/SipHeaderCallID.h>
+#include<libmsip/SipHeaderReferTo.h>
+#include<libmsip/SipHeaderRoute.h>
 #include<libmutil/CommandString.h>
 
 using namespace std;
@@ -130,6 +135,58 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 MRef<SipStack*> SipDialog::getSipStack(){
 	return sipStack;
 }
+
+MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
+	MRef<SipRequest*> req = new SipRequest("", method);
+	
+	req->setUri( dialogState.getRemoteTarget() );
+	
+	req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
+	
+	SipUri fromUri( dialogState.remoteUri );
+	MRef<SipHeaderValueFrom*> from = new SipHeaderValueFrom( fromUri );
+	from->setParameter( "tag", dialogState.localTag );
+	req->addHeader(new SipHeader( *from ));
+
+	SipUri toUri( dialogState.localUri);
+	MRef<SipHeaderValueTo*> to = new SipHeaderValueTo( toUri );
+	to->setParameter( "tag", dialogState.remoteTag );
+	req->addHeader(new SipHeader( *to ));
+	
+	req->addHeader(new SipHeader(new SipHeaderValueCSeq( method, dialogState.seqNo)));
+	
+	req->addHeader(new SipHeader(new SipHeaderValueCallID( dialogState.callId)));
+
+	//add route headers, if needed
+	if( dialogState.routeSet.size() > 0 ) {
+		//merr << "SipDlgVoip:sendBYE : adding header route! " << end;
+		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialogState.routeSet);
+		req->addHeader(new SipHeader(*rset) );
+	} else {
+		//merr << "SipDlgVoip:sendBYE : dialog route set is EMPTY!!! " << end;
+	}
+
+	return req;
+}
+
+MRef<SipRequest*> SipDialog::createSipMessageAck()
+{
+	return createSipMessage("ACK");
+}
+
+MRef<SipRequest*> SipDialog::createSipMessageBye(){
+	return createSipMessage("BYE");
+}
+
+MRef<SipRequest*> SipDialog::createSipMessageRefer( const string &referredUri ){
+	MRef<SipRequest*> req = createSipMessage("REFER");
+
+	/* Add the Refer-To: header */
+	req->addHeader(new SipHeader(new SipHeaderValueReferTo(referredUri)));
+	return req;
+}
+
+
 
 /*
 Establish a dialog acting as a UAS (receive a request)

@@ -1591,16 +1591,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 
 void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 
-	MRef<SipRequest*> bye = SipRequest::createSipMessageBye(
-			branch,
-			dialogState.callId,
-			dialogState.getRemoteTarget(),
-			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			bye_seq_no );
-
-	bye->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-	bye->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+	MRef<SipRequest*> bye = createSipMessageBye();
 
         MRef<SipMessage*> pref(*bye);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);

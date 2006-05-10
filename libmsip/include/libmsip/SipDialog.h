@@ -185,7 +185,20 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
                 std::list<MRef<SipTransaction*> > getTransactions();//{return transactions;}
 
 		SipDialogState dialogState;
-		
+
+		/** Create a request within the dialog */
+		MRef<SipRequest*> createSipMessage( const std::string &method );
+
+		/** Create an ACK request within the dialog */
+		MRef<SipRequest*> createSipMessageAck();
+
+		/** Create a BYE request within the dialog */
+		MRef<SipRequest*> createSipMessageBye();
+
+		/** Create a REFER request within the dialog */
+		MRef<SipRequest*> createSipMessageRefer( const std::string &referredUri );
+
+
 	protected:
 //		///a list containing all transactions
 //		std::list<MRef<SipTransaction*> > transactions;

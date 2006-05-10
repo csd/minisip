@@ -748,26 +748,7 @@ SipDialogVoip::~SipDialogVoip(){
 }
 
 void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
-
-	MRef<SipRequest*> bye = SipRequest::createSipMessageBye(
-			branch,
-			dialogState.callId,
-			dialogState.getRemoteTarget(),
-			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			bye_seq_no );
-
-	//add route headers, if needed
-	if( dialogState.routeSet.size() > 0 ) {
-		//merr << "SipDlgVoip:sendBYE : adding header route! " << end;
-		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialogState.routeSet);
-		bye->addHeader(new SipHeader(*rset) );
-	} else {
-		//merr << "SipDlgVoip:sendBYE : dialog route set is EMPTY!!! " << end;
-	}
-
-	bye->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-	bye->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+	MRef<SipRequest*> bye = createSipMessageBye();
 
 	MRef<SipMessage*> pref(*bye);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -785,17 +766,7 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 		domain = domain+tmp[i];
 */
 	//MRef<SipRefer*> refer = new SipRefer(
-	MRef<SipRequest*> refer = SipRequest::createSipMessageRefer(
-			branch,
-			getLastInvite(),
-			dialogState.getRemoteTarget(),
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
-			referredUri,
-			refer_seq_no
-			);
-
-	refer->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-	refer->getHeaderValueTo()->setParameter("tag",dialogState.remoteTag);
+	MRef<SipRequest*> refer = createSipMessageRefer( referredUri );
 
 	MRef<SipMessage*> pref(*refer);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
