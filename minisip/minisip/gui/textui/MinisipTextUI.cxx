@@ -185,23 +185,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		displayMessage("PROGRESS: the remote UA is ringing...", blue);
 	}
 	
-	if (autoanswer && cmd.getOp()==SipCommandString::incoming_available){
-		CommandString command(callId, SipCommandString::accept_invite);
-		//callback->guicb_handleCommand(command);
-		sendCommand("sip",command);
-		state="INCALL";
-		setPrompt(state);
-		displayMessage("Autoanswered call from "+ cmd.getParam());
-		displayMessage("Unmuting sending of sound.", blue);
-		CommandString cmdstr( callId,
-				MediaCommandString::set_session_sound_settings,
-				"senders", "ON");
-		//callback->guicb_handleMediaCommand(cmdstr);
-		sendCommand("media",cmdstr);
-	
-		return;
-	}
-	
 	if (cmd.getOp()==SipCommandString::remote_user_not_found && !p2tmode){
 		state="IDLE";
 		setPrompt(state);
@@ -482,6 +465,21 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		displayMessage("Received: "+cmd.getOp(), blue);
 	}
 #endif
+
+	if (autoanswer && state=="ANSWER?"){
+		CommandString command(callId, SipCommandString::accept_invite);
+		//callback->guicb_handleCommand(command);
+		sendCommand("sip",command);
+		state="INCALL";
+		setPrompt(state);
+		displayMessage("Autoanswered call from "+ cmd.getParam());
+		displayMessage("Unmuting sending of sound.", blue);
+		CommandString cmdstr( callId,
+				MediaCommandString::set_session_sound_settings,
+				"senders", "ON");
+		//callback->guicb_handleMediaCommand(cmdstr);
+		sendCommand("media",cmdstr);
+	}
 }
 
 bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> /*conf*/ ){
