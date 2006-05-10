@@ -39,7 +39,6 @@
 
 /**
  * @author Erik Eliasson, Johan Bilien
- * Jie Chen <iw03_jch@it.kth.se>
 */
 
 class certificate;
@@ -48,8 +47,6 @@ class certificate_db;
 class LIBMIKEY_API MikeyPayloadCERT : public MikeyPayload{
 	public:
 	
-		MikeyPayloadCERT( int type, string url );
-
 		MikeyPayloadCERT( int type, MRef<certificate *> cert );
 		MikeyPayloadCERT( int type, int length, byte_t *data );
 		MikeyPayloadCERT( byte_t * start, int lengthLimit );
@@ -61,11 +58,9 @@ class LIBMIKEY_API MikeyPayloadCERT : public MikeyPayload{
 
 		byte_t * certData();
 		int certLength();
-		int type;
-		string certUrl;
-		
+
 	private:
-		//int type;
+		int type;
 		int certLengthValue;
 		byte_t * certDataPtr;
 		

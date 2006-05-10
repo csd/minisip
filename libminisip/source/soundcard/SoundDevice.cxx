@@ -53,12 +53,14 @@
 using namespace std;
 
 MRef<SoundDevice *> SoundDevice::create( string devideId ){
+	cerr << "SoundDevice: cesc: (start) deviceId = " << devideId << endl;
 	if( devideId == "" ){
 		return NULL;
 	}
 
 	MRef<SoundDevice*> device = SoundDriverRegistry::getInstance()->createDevice( devideId );
 	if( device ){
+		cerr << "SoundDevice: cesc: device found in registry!" << endl;
 		return device;
 	}
 
@@ -76,7 +78,9 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 				FILESOUND_TYPE_RAW );
 	}
 
+	cerr << "SoundDevice: cesc: (before ALSALIB) deviceId = " << devideId << endl;
 #ifdef HAVE_LIBASOUND
+	cerr << "SoundDevice: cesc: deviceId = " << devideId << endl;
 	if( devideId.substr( 0, 5 ) == "alsa:" ){
 		return new AlsaSoundDevice( devideId.substr( 5, string::npos ) );
 	}
@@ -95,6 +99,7 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 #endif
 
 #ifndef WIN32
+	cerr << "WARNING: cesc: OSS device created ... default ... no other found"<<endl;
 	return new OssSoundDevice( devideId );
 #else
 	cerr << "WARNING: No sound device is created! (BUG?)"<<endl;

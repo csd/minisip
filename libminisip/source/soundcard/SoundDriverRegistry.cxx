@@ -73,6 +73,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 	string driverId;
 	string deviceId;
 
+	merr << "SoundDriverRegistry: deviceName =  " << deviceName << end;
 	size_t pos = deviceName.find( ':', 0 );
 	if( pos == string::npos ){
 		driverId = "oss";
@@ -82,6 +83,8 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		driverId = deviceName.substr( 0, pos );
 		deviceId = deviceName.substr( pos + 1 );
 	}
+	merr << "SoundDriverRegistry: deviceId =  " << deviceId << end;
+	merr << "SoundDriverRegistry: driverId =  " << driverId << end;
 
 	vector< MRef<SoundDriver*> >::iterator iter;
 	vector< MRef<SoundDriver*> >::iterator stop = drivers.end();
@@ -90,6 +93,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		MRef<SoundDriver*> driver = *iter;
 
 		if( driver->getId() == driverId ){
+			merr << "SoundDriverRegistry: device id found!!! =  " << deviceId << end;
 			return driver->createDevice( deviceId );
 		}
 	}

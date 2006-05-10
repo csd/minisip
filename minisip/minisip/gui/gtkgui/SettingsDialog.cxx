@@ -437,10 +437,6 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "kaTypeLabel", kaTypeLabel );
 
-	refXml->get_widget( "requireRadio", requireRadio );
-	refXml->get_widget( "warningRadio", warningRadio );
-	refXml->get_widget( "notRequireRadio", notRequireRadio );
-	  
 	refXml->get_widget( "pskLabel", pskLabel );
 
 	
@@ -479,17 +475,6 @@ void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 	secureCheck->set_active( config->securityConfig.secured );
 	
-	if( config->securityConfig.nameSubordination_type == NAME_SUBORDINATION_REQUIRE ){
-		requireRadio->set_active( true );
-	}
-
-	else if( config->securityConfig.nameSubordination_type == NAME_SUBORDINATION_WARNING ){
-		warningRadio->set_active( true );
-	}
-
-	else if( config->securityConfig.nameSubordination_type == NAME_SUBORDINATION_WARNING ){
-		notRequireRadio->set_active( true );
-	}
 	kaChange();
 	secureChange();
 
@@ -579,17 +564,7 @@ string SecuritySettings::apply(){
 			config->securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 		}
 	}
-	
-	if( requireRadio->get_active() ){
-		config->securityConfig.nameSubordination_type = NAME_SUBORDINATION_REQUIRE;
-	}
-	else if( warningRadio->get_active() ){
-		config->securityConfig.nameSubordination_type = NAME_SUBORDINATION_WARNING;
-	}
-	else if( notRequireRadio->get_active() ){
-		config->securityConfig.nameSubordination_type = NAME_SUBORDINATION_NOTREQUIRE;
-	}
-	
+
 	return err;
 
 }

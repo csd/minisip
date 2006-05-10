@@ -18,7 +18,6 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *          Jie Chen <iw03_jch@it.kth.se>
 */
 
 #include"CertificateDialog.h"
@@ -76,7 +75,6 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	removeCaButton->signal_clicked().connect( SLOT( *this, 
 				&CertificateDialog::removeCa ));
 
-	
 	closeButton->signal_clicked().connect( SLOT( *certDialog,
 				&Gtk::Dialog::hide ));
 
@@ -330,13 +328,6 @@ void CertificateDialog::addFileCa(){
 		ca_db_item item;
 		item.type = CERT_DB_ITEM_TYPE_FILE;
 		item.item = result;
-		item.name = caDb->commonname;
-		item.issuer = caDb->issuer;
-		item.self = ( item.name == item.issuer );
-		/*if( item.name == item.issuer )
-			item.self = " * ";
-		else item.self = "";
-		*/
 		caListStore->addCaItem( &item );
 	}
 	
@@ -403,9 +394,8 @@ void CertificateDialog::removeCa(){
 	caDb->unlock();
 	
 }
-	
-void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 
+void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 	certChain = chain;
 	MRef<certificate *> item;
 
@@ -471,6 +461,7 @@ void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
 }
 
 CertTreeStore::CertTreeStore(){
+
 	certColumns.add( commonNameColumn );
 	certColumns.add( issuerColumn );
 	treeStore = Gtk::TreeStore::create( certColumns );
@@ -517,9 +508,6 @@ CaListStore::CaListStore(){
 
 	caColumns.add( typeColumn );
 	caColumns.add( nameColumn );
-	caColumns.add( commonNameColumn ) ;
-	caColumns.add( selfColumn );
-	caColumns.add( issuerColumn );
 	listStore = Gtk::ListStore::create( caColumns );
 }
 
@@ -540,20 +528,13 @@ void CaListStore::addCaItem( ca_db_item  * caItem ){
 	}
 
 	(*iter)[ nameColumn ] = caItem->item;
-	(*iter)[ commonNameColumn ] = caItem->name;
-	(*iter)[ selfColumn ] = caItem->self;
-	(*iter)[ issuerColumn ] = caItem->issuer;
-		 
 }
 
 void CaListStore::associateTreeView( Gtk::TreeView * treeView ){
 //	const Glib::RefPtr<CertTreeStore> modelPtr( this );
 	treeView->set_model( listStore );
-	//treeView->append_column( "Type", typeColumn );
-	//treeView->append_column( "Name", nameColumn );
-	treeView->append_column( "CommonName", commonNameColumn );
-	treeView->append_column( "Self", selfColumn );
-	treeView->append_column( "Issuer", issuerColumn );
+	treeView->append_column( "Type", typeColumn );
+	treeView->append_column( "Name", nameColumn );
 }
 
 bool CaListStore::isEmpty(){
@@ -573,22 +554,10 @@ ca_db_item * CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
         else{
                 ret->type = CERT_DB_ITEM_TYPE_OTHER;
         }
-	
+
 	Glib::ustring toto = ((*selectedItem)[nameColumn]);
 	ret->item = toto;
-	
-	
-	Glib::ustring thisname = ((*selectedItem)[commonNameColumn]);
-	bool thisself = ((*selectedItem)[selfColumn]);
-	Glib::ustring thisissuer = ((*selectedItem)[issuerColumn]);
-	ret->name = thisname;
-	ret->self = thisself;
-	ret->issuer = thisissuer;			
-	
+
 	listStore->erase( selectedItem );
 	return ret;
 }
-
-
-	                                      
-	                                                                      

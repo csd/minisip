@@ -64,6 +64,7 @@ MRef<Media*> AudioPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config 
 		return NULL;
 	}
 
+	cerr << "AudioPlugin: cesc: soundDev = " << soundDev << endl;
 	MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
 	MRef<SoundIO *> soundIo = new SoundIO( sounddev, 
 					       config->soundIOmixerType, 

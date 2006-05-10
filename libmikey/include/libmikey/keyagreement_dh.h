@@ -19,7 +19,6 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *          Jie Chen <iw03_jch@it.kth.se>
 */
 
 
@@ -45,9 +44,9 @@ class ca_db;
 class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 	public:
 		KeyAgreementDH( MRef<certificate_chain *> cert, 
-				MRef<ca_db *> ca_db, MRef<ca_db *> topCa_db, MRef<ca_db *> crl_db );
+				MRef<ca_db *> ca_db );
 		KeyAgreementDH( MRef<certificate_chain *> cert, 
-				MRef<ca_db *> ca_db, MRef<ca_db *> topCa_db, MRef<ca_db *> crl_db, int group );
+				MRef<ca_db *> ca_db, int group );
 		~KeyAgreementDH();
 
 		int computeTgk();
@@ -61,39 +60,24 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		int publicKeyLength();
 		byte_t * publicKey();
 		
-		MRef<certificate *> cert();
 		MRef<certificate_chain *> certificateChain();
 		MRef<certificate_chain *> peerCertificateChain();
-		ca_db_item * peerCertificateItem();
 		void addPeerCertificate( MRef<certificate *> cert );
-		
-		bool verifiedPeerCert;
-		std::string peerUri();
-		int peerCertVerification();
-		int peerCertChainNamesubordination();
-		int peerCertChainRevocation();
 		int controlPeerCertificate();
-		void savePeerCertificate();
-		void updatePeerCertificateCache( MRef<certificate *> peerCert );
-		void updateCrlCache( MRef<crl *> CRL );
-			
+
 		MikeyMessage * parseResponse( MikeyMessage * response);
 		void setOffer( MikeyMessage * offer );
 		MikeyMessage * buildResponse( MikeyMessage * offer);
 		bool authenticate( MikeyMessage * msg);
-		MRef<ca_db *> topCaDbPtr;
-		MRef<ca_db *> crlDbPtr;
-		
+
 	private:
 		int groupValue;
 		DH * opensslDhPtr;
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
-		MRef<certificate *> CertPtr;
 		MRef<certificate_chain *> certChainPtr;
 		MRef<certificate_chain *> peerCertChainPtr;
 		MRef<ca_db *> certDbPtr;
-		//MRef<ca_db *> topCaDbPtr;
 };
 
 #endif
