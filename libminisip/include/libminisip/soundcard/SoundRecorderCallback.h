@@ -49,7 +49,7 @@ class LIBMINISIP_API SoundRecorderCallback{
 		*/
 		virtual void srcb_handleSound(void *samplearr, int length)=0;
 		#ifdef AEC_SUPPORT
-		virtual void srcb_handleSound(void *samplearr, void *samplearrR)=0;		//hanning
+		virtual void srcb_handleSound(void *samplearr, int length, void *samplearrR)=0;		//hanning
 		#endif
 	//	virtual uint32_t srcb_getSSRC()=0;
 };

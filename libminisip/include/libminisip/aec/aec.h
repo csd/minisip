@@ -142,7 +142,7 @@ public:
  * in   s1: loudspeaker signal
  * return:  echo cancelled microphone signal
  */
-  int AEC::doAEC(int d, int x);
+  int doAEC(int d, int x);
 };
 
 #define _AEC_H
