@@ -54,8 +54,8 @@ NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){
 	#else
 		char buf[256];
 		buf[0]=0;
-		strerror_r( errorNumber, buf, 256 );
-		msg = string((const char *)buf);
+		const char *res = strerror_r( errorNumber, buf, sizeof( buf ) );
+		msg = string( res );
 	#endif
 };
 
