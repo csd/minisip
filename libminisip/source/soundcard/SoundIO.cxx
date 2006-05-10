@@ -356,9 +356,8 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 				i!= sources.end(); 
 				i++){
 		if (source->getId()==(*i)->getId()){
-			queueLock.unlock();
-
 			sourceListCond.broadcast();
+			queueLock.unlock();
 			return;
 		}
 //		(*i)->setPos(spAudio.assignPos(j,nextSize));
@@ -369,9 +368,9 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 	//sources.push_front(source);
 	sources.push_back(source);
 	mixer->setSourcesPosition( sources, true ); //added sources
-	queueLock.unlock();
 
 	sourceListCond.broadcast();
+	queueLock.unlock();
 }
 
 
@@ -443,19 +442,16 @@ void *SoundIO::playerLoop(void *arg){
 
                 soundcard->queueLock.lock();
 		if( soundcard->sources.size() == 0 ){
-			soundcard->queueLock.unlock();
-
 			if( soundcard->soundDev->isOpenedPlayback() ){
 				soundcard->closePlayback();
 			}
 			
 			/* Wait for someone to add a source */
-			soundcard->sourceListCond.wait();
+			soundcard->sourceListCond.wait( soundcard->queueLock );
 
 			soundcard->openPlayback();
 			nChannels = soundcard->soundDev->getNChannelsPlay();
 			soundcard->mixer->init(nChannels);
-			soundcard->queueLock.lock();
 		}
 
 		outbuf = soundcard->mixer->mix( soundcard->sources );
