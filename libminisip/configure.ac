@@ -190,7 +190,7 @@ AC_ARG_ENABLE(p2t,
        then
 	   AC_DEFINE(P2T_SUPPORT, [], [P2T support])
        fi ])
-AM_CONDITIONAL(P2T_SUPPORT, test "${enabled_p2t}" = "yes")
+AM_CONDITIONAL(P2T_SUPPORT, test "${enable_p2t}" = "yes")
 
 dnl ZRTP support
 AC_ARG_ENABLE(zrtp,
@@ -200,7 +200,7 @@ if test "${enable_zrtp}" = "yes"
 then
    AC_DEFINE(ZRTP_SUPPORT, [], [ZRTP support])
 fi
-AM_CONDITIONAL(ZRTP_SUPPORT, test "${enabled_zrtp}" = "yes")
+AM_CONDITIONAL(ZRTP_SUPPORT, test "${enable_zrtp}" = "yes")
 
 dnl AEC support
 AC_ARG_ENABLE(aec,
@@ -210,7 +210,7 @@ AC_ARG_ENABLE(aec,
        then
 	   AC_DEFINE(AEC_SUPPORT, [], [AEC support])
        fi ])
-AM_CONDITIONAL(AEC_SUPPORT, test "${enabled_aec}" = "yes")
+AM_CONDITIONAL(AEC_SUPPORT, test "${enable_aec}" = "yes")
 
 AC_ARG_ENABLE(gconf,
     AS_HELP_STRING([--enable-gconf], 
