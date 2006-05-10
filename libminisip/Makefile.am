@@ -242,7 +242,7 @@ libminisip_video_la_SOURCES = $(libvideo_src)
 libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)
 
 plugins_LTLIBRARIES += mvideo.la
-mvideo_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)
+mvideo_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)
 mvideo_la_LDFLAGS = $(plugins_LDFLAGS)
 mvideo_la_SOURCES = source/video/VideoPlugin.cxx
 mvideo_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS)
@@ -296,7 +296,7 @@ endif
 #
 if DC1394_VIDEO_GRABBER
 plugins_LTLIBRARIES += mdc1394.la
-mdc1394_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS)
+mdc1394_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)
 mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)
 mdc1394_la_SOURCES = source/video/grabber/Dc1394Grabber.cxx
 			source/video/grabber/Dc1394Grabber.h
