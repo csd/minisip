@@ -329,6 +329,12 @@ bool SipDialogVoip::a1003_byerequest_termwait_26( const SipSMCommand &command){
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 
+		//this is for the shutdown dialog 
+		CommandString earlystr( dialogState.callId, SipCommandString::call_terminated_early);
+		SipSMCommand cmd( earlystr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+
+
 #ifdef IPSEC_SUPPORT
 		if(ipsecSession){
 			cerr << "Clearing" << endl;

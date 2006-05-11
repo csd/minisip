@@ -111,7 +111,7 @@ bool SipDialogManagement::a12_terminateCallsSh_timeIsUp( const SipSMCommand &com
 	bool ret = false;
 	if (transitionMatch(command, 
 				"timer_terminate_calls",
-				SipSMCommand::dispatcher,
+				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer) ) {
 		
 		SipSMCommand cmd( CommandString( "", SipCommandString::unregister_all_identities),
@@ -195,7 +195,7 @@ bool SipDialogManagement::a23_deRegAllSh_timeIsUp( const SipSMCommand &command) 
 	bool ret = false;
 	if (transitionMatch(command, 
 				"timer_deRegisterAll",
-				SipSMCommand::dispatcher,
+				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer) ) {
 		
 		shutdownDone( true ); //force shutdown done message
@@ -708,8 +708,8 @@ bool SipDialogManagement::terminateAllCalls() {
 			continue;
 		}
 		SipSMCommand cmd( CommandString( (*it)->dialogState.callId, SipCommandString::hang_up),
-				SipSMCommand::dispatcher,
-				SipSMCommand::dispatcher);
+				SipSMCommand::dialog_layer,
+				SipSMCommand::dialog_layer);
 		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 		pendingHangUps++;
 		merr << "    - Hanging up " << (*it)->dialogState.remoteUri << end;
