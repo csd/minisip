@@ -45,6 +45,9 @@ SipCommandDispatcher::SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerT
 
 }
 
+void SipCommandDispatcher::setDialogManagement(MRef<SipDialog*> mgmt){
+	managementHandler = mgmt;
+}
 MRef<SipStack*> SipCommandDispatcher::getSipStack(){
 	return sipStack;
 }

@@ -75,7 +75,7 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
 		void addDialog(MRef<SipDialog*> d);
 		std::list<MRef<SipDialog *> > getDialogs();
 
-		void setDialogManagement(MRef<SipDialog*> mgmt){managementHandler=mgmt;}
+		void setDialogManagement(MRef<SipDialog*> mgmt);
 
 		virtual void run();
 		void stopRunning(){keepRunning=false;}
