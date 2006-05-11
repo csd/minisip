@@ -51,6 +51,7 @@ supported actions.
 
 Action Name	Description
 -------------	-------------
+envdump		Check your build tools versions and default environment.
 confdump	Check your configure options before building!!!
 bootstrap	Run autotools to create 'configure'.
 configure	Run configure to create Makefiles.
@@ -95,6 +96,15 @@ This section provides tips for using each supported action.
 
                              Bootstrap Actions
 			     ..................
+
+envdump
+-------
+
+The 'envdump' action displays the versions for the following tools used
+by the build system: autoconf, automake, libtool, make, g++, and ld.
+
+In addition, this action will display the environment settings that will
+be used during the build process.
 
 confdump
 --------

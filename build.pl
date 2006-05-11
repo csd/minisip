@@ -213,7 +213,7 @@ our @actions = ( qw( bootstrap configure compile ),
 		qw( dist distcheck tarballs tarcontents tarclean ),
 		@dist_actions, 
 		qw( check run debug allclean hostclean repoclean ),
-		qw( confdump confclean ),
+		qw( confdump confclean envdump ),
 	);
 
 sub load_file_if_exists {
@@ -648,6 +648,20 @@ sub cb_noop { }
 sub cb_run_post { act('run', run_app_path()) }
 sub cb_debug_post { act('run', debug_app_path()) }
 
+sub _first_line { $_[0] }
+sub cb_envdump_pre {
+	print "autoconf: ", _first_line(`autoconf --version`);
+	print "automake: ", _first_line(`automake --version`);
+	print " libtool: ", _first_line(`libtool --version`);
+	print "    make: ", _first_line(`make --version`);
+	print "     g++: ", _first_line(`g++ --version`);
+	print "      ld: ", _first_line(`ld --version`);
+	print "\n";
+	$show_env = 1; 
+	show_env();
+	exit(0);
+}
+
 sub cb_confdump {
 	my $spec = $configure_params{$pkg};
 	# XXX: quick and dirty, to see the composite results of loading
@@ -694,6 +708,7 @@ sub cb_confclean_post {
 }
 
 set_pre_callbacks(
+		envdump => \&cb_envdump_pre,
 		hostclean => \&cb_repoclean_pre,
 		repoclean => \&cb_repoclean_pre,
 		confclean => \&cb_repoclean_pre,
