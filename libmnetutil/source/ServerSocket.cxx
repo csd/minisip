@@ -122,10 +122,14 @@ int32_t ServerSocket::getPort(){
 
 ServerSocket * ServerSocket::create( int32_t listen_port, bool use_ipv6 )
 {
+#ifdef HAVE_IPV6
 	if( use_ipv6 ){
 		return new IP6ServerSocket( listen_port );
 	}
 	else{
+#endif
 		return new IP4ServerSocket( listen_port );
+#ifdef HAVE_IPV6
 	}
+#endif
 }
