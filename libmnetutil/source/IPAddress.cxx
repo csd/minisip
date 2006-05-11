@@ -64,8 +64,8 @@ MRef<IPAddress *> IPAddress::create( sockaddr * addr, int32_t addr_len ){
 		return new IP6Address( (sockaddr_in6 *)addr );
 	}
 #endif
-	// FIXME exception
-	else return NULL;
+	else
+		throw UnknownAddressFamily(addr->sa_family);
 }
 
 MRef<IPAddress *> IPAddress::create(const string &addr){

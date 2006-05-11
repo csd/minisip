@@ -56,6 +56,14 @@ class LIBMNETUTIL_API HostNotFound : public NetworkException{
 		std::string host;
 		std::string msg;
 };
+class LIBMNETUTIL_API UnknownAddressFamily : public NetworkException{
+public:
+	UnknownAddressFamily( int errorNumber );
+	virtual const char*what() {
+		msg = "Unknown address family: " + errorNumber;
+		return msg.c_str();
+	}
+};
 
 class LIBMNETUTIL_API ResolvError : public NetworkException{
 	public:

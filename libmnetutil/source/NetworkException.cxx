@@ -34,6 +34,8 @@ using namespace std;
 
 ConnectFailed::ConnectFailed( int errorNumber ):NetworkException(errorNumber){};
 
+UnknownAddressFamily::UnknownAddressFamily( int errorNumber ) : NetworkException(errorNumber) { }
+
 SendFailed::SendFailed( int errorNumber ):NetworkException(errorNumber){};
 
 ResolvError::ResolvError( int errorNumber ):NetworkException(errorNumber){};
