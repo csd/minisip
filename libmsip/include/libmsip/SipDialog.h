@@ -38,7 +38,7 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
 
-//#include<libmsip/SipCommandDispatcher.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipRequest.h>
 
 class SipStack;
@@ -198,6 +198,10 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		/** Create a REFER request within the dialog */
 		MRef<SipRequest*> createSipMessageRefer( const std::string &referredUri );
 
+		MRef<SipResponse*> createSipResponse( MRef<SipRequest*> req, int32_t status, const std::string &reason );
+
+		/** Send a Sip message to the transaction layer */
+		void sendSipMessage( MRef<SipMessage*> msg, int queue=HIGH_PRIO_QUEUE );
 
 	protected:
 //		///a list containing all transactions

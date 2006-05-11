@@ -35,10 +35,12 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipDialog.h>
+//#include<libmsip/SipDialog.h>
 #include<libmsip/SipLayerDialog.h>
 #include<libmsip/SipLayerTransaction.h>
 #include<libmsip/SipLayerTransport.h>
+
+class SipDialog;
 
 /**
  * queue_type: For internal use only!
@@ -53,7 +55,6 @@ typedef struct queue_type{
 
 class SipLayerDialog;
 class SipLayerTransport;
-class SipDialog;
 class SipStack;
 
 #define TYPE_COMMAND 2
@@ -135,5 +136,7 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
                 bool keepRunning;
 
 };
+
+#include<libmsip/SipDialog.h>
 
 #endif

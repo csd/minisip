@@ -186,6 +186,17 @@ MRef<SipRequest*> SipDialog::createSipMessageRefer( const string &referredUri ){
 	return req;
 }
 
+MRef<SipResponse*> SipDialog::createSipResponse( MRef<SipRequest*> req, int32_t status, const std::string &reason ){
+	MRef<SipResponse*> resp = new SipResponse( req->getDestinationBranch(), status, reason, *req );
+	// FIXME don't change the To tag if it's already present in the request.
+	resp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+	return resp;
+}
+
+void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
+	SipSMCommand cmd( *msg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer );
+	dispatcher->enqueueCommand( cmd, queue );
+}
 
 
 /*

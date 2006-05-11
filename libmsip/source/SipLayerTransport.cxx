@@ -387,8 +387,21 @@ SipLayerTransport::SipLayerTransport(
 //void SipLayerTransport::startUdpServer(){ }
 //void SipLayerTransport::stopUdpServer(){ }
 
-bool SipLayerTransport::handleCommand(const SipSMCommand& ){
-	cerr << "SipLayerTransport::handleCommand: NOT IMPLEMENTED - BUG"<<endl;
+bool SipLayerTransport::handleCommand(const SipSMCommand& command ){
+	if( command.getType()==SipSMCommand::COMMAND_PACKET ){
+		MRef<SipMessage*> pack = command.getCommandPacket();
+
+		string branch = pack->getDestinationBranch();
+		bool addVia = pack->getType() != SipResponse::type;
+
+		if (branch==""){
+			branch = "z9hG4bK" + itoa(rand());		//magic cookie plus random number
+		}
+
+		sendMessage(pack, branch, addVia);
+		return true;
+	}
+
 	return 0;
 }
 
