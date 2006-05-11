@@ -6,6 +6,7 @@ The build.pl script helps automate the process for building the various
 dependencies for minisip.  It builds them under the main repository tree,
 in separate trees, then installs them in a common root.
 
+===========
 Quick Start
 -----------
 
@@ -16,8 +17,22 @@ its dependencies (as the current user):
 	./build.pl run minisip
 
 This command encapsulates many different individual steps, which are
-described in the rest of this document.
+described in the rest of this document and others.
 
+------------------------
+Rebuilding After Updates
+........................
+
+If you have previously tried to build in your working copy, you will
+need to run a more thorough command to ensure everything is re-built:
+
+	./built.pl bootstrap+configure+compile+install+run
+
+This "combined action" can be understood by reading the 'actions.txt' file
+(in the build documentation directory).
+
+
+=============
 Configuration
 -------------
 
@@ -32,8 +47,9 @@ file is loaded immediately after the global build.conf file.
 
 The 'build.pl' will create a 'build.local' if one does not exist.
 
-Batch Mode
 ----------
+Batch Mode
+..........
 
 By default (without '-S'), the script will only apply actions to the 
 targets explicitly specified on the command line.  With '-S', the script 
@@ -46,8 +62,9 @@ default and '-S' will be required to restricts actions to single projects.
 The following instructions assume that you have set $toggle_batch = 1,
 which is set by the default 'build.local' file.
 
-Default Directories
 -------------------
+Default Directories
+...................
 
 The 'build.pl' script stores its own configuration files in the 'build.d'
 directory by default.  This can be overridden by a command line option,
@@ -66,6 +83,8 @@ different "object directories").
 You can change the location of the 'build' and 'install' directories through
 the command line options or your 'build.local' file (see "Configuration").
 
+
+==================
 Usage Instructions
 ------------------
 
@@ -80,8 +99,9 @@ help options that are built into the 'build.pl' script:
 	./build.pl --list-actions
 	./build.pl --list-targets
 
-Basic Instructions
 ------------------
+Basic Instructions
+..................
 
 To build the entire set of projects and install them in a temporary install
 directory for testing, simply issue the following command:
@@ -101,8 +121,9 @@ the build script as well:
 At this point, the repository should contain no extra files, unless you 
 have added them during the process of development.
 
-Building Single Projects
 ------------------------
+Building Single Projects
+........................
 
 The above examples work on all local projects required by minisip, which is
 pretty much all of them.  If you want to work on a single project, you can
@@ -125,13 +146,16 @@ use the equivalent command with dependency resolution:
 Additional options may be passed to the script that alter the build process;
 run './build.pl --help' for a description of all options.
 
+
+=====================
 Advanced Instructions
 ---------------------
 
 cat build.pl | grok --enable-wetware --ignore-pets --allow-caffeine
 
-For More Information
 --------------------
+For More Information
+....................
 
 Additional documentation files can be found in the following directory:
 
