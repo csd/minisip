@@ -58,7 +58,7 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	
 		virtual std::string getMemObjectType(){return "SdpPacket";}
 		
-		IPAddress *getRemoteAddr(int &ret_port);
+		MRef<IPAddress *>getRemoteAddr(int &ret_port);
 		std::string getKeyMgmt();
 		void addHeader(MRef<SdpHeader*> h);
 		virtual std::string getString();

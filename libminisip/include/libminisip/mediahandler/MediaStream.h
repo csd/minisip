@@ -307,7 +307,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * @param remoteAddress a pointer to the IPAddress object
 		 * which represents the peer's contact IP address
 		 */
-		void setRemoteAddress( IPAddress * remoteAddress );
+		void setRemoteAddress( MRef<IPAddress *> remoteAddress );
 		
 		/**
 		 * Used to mute or unmute this sender, resulting
@@ -366,7 +366,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		uint16_t remotePort;
 		uint16_t seqNo;
 		uint32_t lastTs;
-		IPAddress * remoteAddress;
+		MRef<IPAddress *> remoteAddress;
 		Mutex senderLock;
 		
 		uint8_t payloadType;

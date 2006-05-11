@@ -197,7 +197,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	unsigned int i;
 	int j;
 	MRef<MediaStreamReceiver *> receiver;
-	IPAddress * remoteAddress;
+	MRef<IPAddress *> remoteAddress;
 	// Not used
 	int port;
 
@@ -244,7 +244,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 				receiver = matchFormat( m, j, remoteAddress );
 #ifdef DEBUG_OUTPUT
 				if( receiver )
-					cerr << "Session::setSdpAnswer - Found receiver!" << endl;
+					cerr << "Session::setSdpAnswer - Found receiver at " << remoteAddress->getString() << endl;
 #endif
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
@@ -260,7 +260,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	return true;
 }
 
-MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, IPAddress * remoteAddress ){
+MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, MRef<IPAddress *> &remoteAddress ){
 	list< MRef<MediaStreamSender *> >::iterator iSStream;
 	list< MRef<MediaStreamReceiver *> >::iterator iRStream;
 
@@ -315,7 +315,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	int j;
 	MRef<MediaStreamReceiver *> receiver;
 	MRef<SdpPacket *> packet;
-	IPAddress * remoteAddress;
+	MRef<IPAddress *> remoteAddress;
 	// Not used
 	int port;
 	string keyMgmtMessage;

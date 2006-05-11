@@ -360,6 +360,11 @@ uint16_t MediaStreamSender::getPort(){
 static bool first=true;
 
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
+	if (this->remoteAddress.isNull()) {
+		mdbg << " MediaStreamSender::send called before " << 
+			"setRemoteAddress!" << endl;
+		return;
+	}
 	SRtpPacket * packet;
 	if (first){
 #ifdef ENABLE_TS
@@ -398,12 +403,14 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 	packet->protect( getCryptoContext( ssrc, seqNo - 1 ) );
 
-	packet->sendTo( **senderSock, *remoteAddress, remotePort );
+	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();
 }
 
-void MediaStreamSender::setRemoteAddress( IPAddress * remoteAddress ){
+void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> remoteAddress ){
+	mdbg << "MediaStreamSender::setRemoteAddress: " << 
+		remoteAddress->getString() << endl;
 	this->remoteAddress = remoteAddress;
 }
 

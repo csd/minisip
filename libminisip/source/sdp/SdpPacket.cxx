@@ -210,7 +210,7 @@ string SdpPacket::getString(){
 
 
 
-IPAddress *SdpPacket::getRemoteAddr(int &ret_port){
+MRef<IPAddress *> SdpPacket::getRemoteAddr(int &ret_port){
 	string addr="";
 	int32_t port=-1;
 	MRef<SdpHeaderC*> cptr;
@@ -230,7 +230,7 @@ IPAddress *SdpPacket::getRemoteAddr(int &ret_port){
 		}
 	}
 //	cerr << "in SDP packet: Remote addr is "<<addr << ":" << port << endl;
-	IPAddress *a = new IP4Address(addr);
+	MRef<IPAddress *> a(new IP4Address(addr));
         //a->set_port(port);
 #ifdef DEBUG_OUTPUT
 	if (port==-1){

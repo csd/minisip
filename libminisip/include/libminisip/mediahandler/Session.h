@@ -255,7 +255,8 @@ class LIBMINISIP_API Session : public MObject{
 		std::string peerUri;
 		
 		MRef<SdpPacket *> emptySdp();
-		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, IPAddress * remoteAddress );
+		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
+			uint32_t iFormat, MRef<IPAddress *> &remoteAddress );
 
 		std::list< MRef<MediaStreamReceiver *> > mediaStreamReceivers;
 		std::list< MRef<MediaStreamSender *> > mediaStreamSenders;
