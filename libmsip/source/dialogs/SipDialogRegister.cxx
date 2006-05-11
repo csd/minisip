@@ -737,6 +737,12 @@ void SipDialogRegister::send_noauth(string branch){
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 	
+	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
+
+	if( !proxy.isNull() ){
+		reg->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+	}
+
 	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
@@ -759,6 +765,13 @@ void SipDialogRegister::send_auth(string branch){
 		nonce, 
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword
 	);
+
+	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
+
+	if( !proxy.isNull() ){
+		reg->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+	}
+
 	SipSMCommand cmd( *reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
