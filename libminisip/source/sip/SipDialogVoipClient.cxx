@@ -126,6 +126,12 @@ gui(failed)              |              a2015:PRACK +------------------+
                  .               .
                  +. . . . . . . .+
    
+
+                 +---------------+
+      2XX   +----|               |
+      a2017 |    |    anyState   |
+      ACK   +--->|               |
+                 +---------------+
 */
 
 bool SipDialogVoipClient::a2001_start_callingnoauth_invite( const SipSMCommand &command)
@@ -229,6 +235,7 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 			return false;
 
 		dialogState.updateState( resp );
+		sendAck();
 		
 		//string peerUri = resp->getFrom().getString();
 		
@@ -444,6 +451,8 @@ bool SipDialogVoipClient::a2011_callingauth_incall_2xx( const SipSMCommand &comm
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
 		dialogState.updateState( resp );
+		sendAck();
+
 //CESC: for now, route set is updated at the transaction layer		
 		
 		//string peerUri = resp->getFrom().getString().substr(4);
@@ -590,6 +599,34 @@ bool SipDialogVoipClient::a2016_pracksent_calling_2XX( const SipSMCommand &comma
 
 }
 
+bool SipDialogVoipClient::a2017_any_any_2XX( const SipSMCommand &command){
+	if (transitionMatchSipResponse("INVITE",
+				       command,
+				       SipSMCommand::transport_layer,
+				       SipSMCommand::dialog_layer,
+				       "2**")){
+		string state = getCurrentStateName();
+
+		if( state == "terminated" )
+			return false;
+
+		MRef<SipMessage*> pack = command.getCommandPacket();
+
+		if( dialogState.remoteTag != pack->getHeaderValueTo()->getParameter("tag") ){
+			// Acknowledge and terminate 2xx from other fork
+			sendAck();
+			sendSipMessage( *createSipMessageBye() );
+		}
+		else if( state != "termwait" ){
+			sendAck();
+			
+		}
+
+		return true;
+	}
+
+	return false;
+}
 
 
 void SipDialogVoipClient::setUpStateMachine(){
@@ -608,6 +645,10 @@ void SipDialogVoipClient::setUpStateMachine(){
 
 	MRef<State<SipSMCommand,string> *> s_incall = getState("incall");
 	MRef<State<SipSMCommand,string> *> s_termwait= getState("termwait");
+
+	new StateTransition<SipSMCommand,string>(this, "transition_any_any_2XX",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2017_any_any_2XX,
+			anyState, anyState);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_pracksent_100rel",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2015_calling_pracksent_100rel, 
@@ -800,6 +841,20 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 	setLastInvite(inv);
 
+}
+
+void SipDialogVoipClient::sendAck(){
+	MRef<SipRequest*> ack = createSipMessageAck( getLastInvite() );
+
+	// Send ACKs directly to the transport layer bypassing
+	// the transaction layer
+	SipSMCommand scmd(
+			*ack,
+			SipSMCommand::dialog_layer,
+			SipSMCommand::transport_layer
+			);
+	
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){

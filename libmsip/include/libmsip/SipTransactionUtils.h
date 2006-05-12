@@ -50,6 +50,14 @@ bool LIBMSIP_API transitionMatch(
 		int destination/*=IGN*/,
 		const std::string &respFilter="");
 
+/** Match Sip responses */
+bool LIBMSIP_API transitionMatchSipResponse(
+		const std::string& cseqMethod,
+		const SipSMCommand &command,
+		int source/*=IGN*/,
+		int destination/*=IGN*/,
+		const std::string &respFilter="");
+
 bool LIBMSIP_API transitionMatch(
 		const SipSMCommand &command,
 		const std::string &cmd_str,

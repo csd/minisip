@@ -197,7 +197,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		MRef<SipRequest*> createSipMessage( const std::string &method );
 
 		/** Create an ACK request within the dialog */
-		MRef<SipRequest*> createSipMessageAck();
+		MRef<SipRequest*> createSipMessageAck( MRef<SipRequest *> origReq );
 
 		/** Create a BYE request within the dialog */
 		MRef<SipRequest*> createSipMessageBye();
@@ -223,6 +223,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		
 		///the dialog configuration
 		MRef<SipDialogConfig*> callConfig;
+
+		MRef<SipRequest*> createSipMessageSeq( const std::string &method, int seqNo );
 };
 
 #include<libmsip/SipStack.h>

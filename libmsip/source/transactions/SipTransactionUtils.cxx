@@ -83,6 +83,20 @@ bool transitionMatch(
 }
 
 
+bool LIBMSIP_API transitionMatchSipResponse(
+		const std::string& cseqMethod,
+		const SipSMCommand &command,
+		int source,
+		int destination,
+		const std::string &respFilter){
+	if( !transitionMatch( SipResponse::type, command,
+			      source, destination, respFilter ) )
+		return false;
+
+	return command.getCommandPacket()->getCSeqMethod() == cseqMethod;
+}
+
+
 bool transitionMatch(
 		const SipSMCommand &command,
 		const string &cmd_str,

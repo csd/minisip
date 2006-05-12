@@ -243,6 +243,14 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	}else{
 		cerr << "ERROR: SipCommandDispatcher::handleCommand: Unknown destination (layer)"<<endl;
 	}
+
+	// Retransmitted 2xx responses for INVITE are handled directly by
+	// the dialog.
+	if(!ret && c.getSource()==SipSMCommand::transport_layer){
+		SipSMCommand cmd( c );
+		cmd.setDestination( SipSMCommand::dialog_layer );
+		ret=dialogLayer->handleCommand( cmd );
+	}
 	
 	if (!ret){
 #ifdef DEBUG_OUTPUT

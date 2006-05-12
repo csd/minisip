@@ -158,6 +158,10 @@ MRef<SipStack*> SipDialog::getSipStack(){
 }
 
 MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
+	return createSipMessageSeq( method, dialogState.seqNo );
+}
+
+MRef<SipRequest*> SipDialog::createSipMessageSeq( const std::string &method, int seqNo ){
 	MRef<SipRequest*> req = new SipRequest("", method);
 	
 	req->setUri( dialogState.getRemoteTarget() );
@@ -174,7 +178,7 @@ MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
 	to->setParameter( "tag", dialogState.remoteTag );
 	req->addHeader(new SipHeader( *to ));
 	
-	req->addHeader(new SipHeader(new SipHeaderValueCSeq( method, dialogState.seqNo)));
+	req->addHeader(new SipHeader(new SipHeaderValueCSeq( method, seqNo)));
 	
 	req->addHeader(new SipHeader(new SipHeaderValueCallID( dialogState.callId)));
 
@@ -183,9 +187,9 @@ MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
 	return req;
 }
 
-MRef<SipRequest*> SipDialog::createSipMessageAck()
+MRef<SipRequest*> SipDialog::createSipMessageAck( MRef<SipRequest *> origReq )
 {
-	return createSipMessage("ACK");
+	return createSipMessageSeq( "ACK", origReq->getCSeq() );
 }
 
 MRef<SipRequest*> SipDialog::createSipMessageBye(){
