@@ -54,10 +54,10 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 		num+=build_from[i];
 		i++;
 	}
-	seq=atoi(num.c_str());
+	seq=atoll(num.c_str());
 }
 
-SipHeaderValueRSeq::SipHeaderValueRSeq(int32_t n)
+SipHeaderValueRSeq::SipHeaderValueRSeq(uint32_t n)
 		: SipHeaderValue(SIP_HEADER_TYPE_RSEQ,sipHeaderValueRSeqTypeStr)
 {
 	seq=n;
@@ -70,7 +70,10 @@ string SipHeaderValueRSeq::getString(){
 	return itoa(seq);
 }
 
-int32_t SipHeaderValueRSeq::getRSeq(){
+uint32_t SipHeaderValueRSeq::getRSeq(){
 	return seq;
 }
 		
+void SipHeaderValueRSeq::setRSeq( uint32_t rseq ){
+	seq = rseq;
+}
