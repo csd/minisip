@@ -766,8 +766,8 @@ void SipDialogRegister::send_auth(string branch){
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword
 	);
 
+	//Add outbount proxy route
 	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
-
 	if( !proxy.isNull() ){
 		reg->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
 	}
@@ -775,5 +775,4 @@ void SipDialogRegister::send_auth(string branch){
 	SipSMCommand cmd( *reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
-
 

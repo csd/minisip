@@ -979,6 +979,12 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			msg
 			);
 
+	//Add outbount proxy route
+	MRef<SipProxy *> proxy = phoneconf->inherited->sipIdentity->getSipProxy();
+	if( !proxy.isNull() ){
+		im->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+	}
+
 	//FIXME: there should be a SipIMDialog, just like for register messages ...
 	// 	otherwise, we cannot keep track of local/remote tags, callids, etc ... 
 	//	very useful for matching incoming and outgoing IMs ...
