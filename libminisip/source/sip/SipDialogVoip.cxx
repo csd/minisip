@@ -791,6 +791,8 @@ void SipDialogVoip::sendCancel(const string &branch){
 			dialogState.remoteUri
 			);
 
+	addRoute( cancel );
+
 	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	// Don't include to-tag, allowing it to be forked by proxies.
 

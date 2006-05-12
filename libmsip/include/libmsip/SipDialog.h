@@ -108,6 +108,7 @@ class LIBMSIP_API SipDialogState{
 		std::list<std::string> routeSet;
 	
 		bool isEarly;
+		bool isEstablished;
 };
 
 
@@ -177,6 +178,12 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 		std::list<std::string> getRouteSet(){return dialogState.routeSet;}
 		
+		/**
+		 * Add the dialog route set if the dialog is established, 
+		 * or proxy route to a request outside of the dialog
+		 */
+		void addRoute( MRef<SipRequest *> req );
+  
 		/**
 		 * Returns all dialogs within this transaction (all
 		 * transactions that have the same call id as this 

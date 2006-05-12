@@ -57,6 +57,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
 	 				//properly, right?! (this at least does not leave it uninitialized) -EE 
 					
 	dialogState.isEarly=false;	//same as for "secure"?! -EE
+	dialogState.isEstablished = false;
 }
 
 SipDialog::~SipDialog(){
@@ -95,6 +96,26 @@ void SipDialog::signalIfNoTransactions(){
 			// to be deleted even under high load.
 			dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/); 
 		}
+	}
+}
+
+void SipDialog::addRoute( MRef<SipRequest *> req ){
+	if( !dialogState.isEstablished || req->getType() == "CANCEL" ){
+		// Use proxy route for requests outside of the dialog
+		// and for CANCEL requests
+		MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
+
+		if( !proxy.isNull() ){
+			req->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+		}
+	}
+	else if( dialogState.routeSet.size() > 0 ) {
+		//add route headers, if needed
+		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialogState.routeSet);
+		req->addHeader(new SipHeader(*rset) );
+	}
+	else {
+		//merr << "SipDialog:addRoute : dialog route set is EMPTY!!! " << end;
 	}
 }
 
@@ -157,14 +178,7 @@ MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
 	
 	req->addHeader(new SipHeader(new SipHeaderValueCallID( dialogState.callId)));
 
-	//add route headers, if needed
-	if( dialogState.routeSet.size() > 0 ) {
-		//merr << "SipDlgVoip:sendBYE : adding header route! " << end;
-		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialogState.routeSet);
-		req->addHeader(new SipHeader(*rset) );
-	} else {
-		//merr << "SipDlgVoip:sendBYE : dialog route set is EMPTY!!! " << end;
-	}
+	addRoute( req );
 
 	return req;
 }
@@ -316,6 +330,7 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 	//the dialog ... we repeat, just in case
 	callId = resp->getCallId(); 
 	secure = false; //FIXME: check if secure call ... 
+	isEstablished = true;
 	return true;
 }
 

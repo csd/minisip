@@ -727,11 +727,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			getDialogConfig()->inherited->getTransport(),
 			sipStack ) ;
 
-	//Add outbount proxy route
-	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
-	if( !proxy.isNull() ){
-		inv->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
-	}
+	addRoute( inv );
 
 	/* Get the session description from the Session */
 		
@@ -849,13 +845,9 @@ void SipDialogVoipClient::sendAuthInvite(const string &branch){
 		getDialogConfig()->inherited->getTransport(),
 		sipStack);
 
-	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+	addRoute( inv );
 
-	//Add outbount proxy route
-	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
-	if( !proxy.isNull() ){
-		inv->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
-	}
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
