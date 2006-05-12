@@ -93,9 +93,9 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 
 
 MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
-                MRef<SipRequest*> inv,
-                string to_uri
-                )
+							MRef<SipRequest*> inv,
+							string to_uri
+							)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "CANCEL");
 	req->setUri(to_uri);
@@ -138,11 +138,11 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
 
 
 MRef<SipRequest*> SipRequest::createSipMessageIMMessage(string branch,
-                                                string callId,
-                                                std::string toUri,
-						const SipUri& fromUri,
-                                                int32_t seqNo,
-                                                string msg)
+							string callId,
+							std::string toUri,
+							const SipUri& fromUri,
+							int32_t seqNo,
+							string msg)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "MESSAGE");
 	req->setUri(toUri);
@@ -181,7 +181,6 @@ static void addHeaders( MRef<SipRequest*> req,
 	req->addHeader(new SipHeader( new SipHeaderValueTo(toUri) ));
 	
 	req->addHeader(new SipHeader(new SipHeaderValueCallID(call_id)) );
-        
 
 	SipUri uri;
 	uri.setParams(tel_no,proxyAddr,"",proxyPort);
@@ -200,21 +199,17 @@ static void addHeaders( MRef<SipRequest*> req,
 	}
 }
 
-
-
-
-
 MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
-                const string &call_id,
-                const string &tel_no,
-                const string &proxyAddr,
-                int32_t proxyPort,
-                const string &localAddr,
-                int32_t localSipPort,
-                const string &from_tel_no,
-                int32_t seq_no,
-                const string &transport,
-		MRef<SipStack*> stack
+							const string &call_id,
+							const string &tel_no,
+							const string &proxyAddr,
+							int32_t proxyPort,
+							const string &localAddr,
+							int32_t localSipPort,
+							const string &from_tel_no,
+							int32_t seq_no,
+							const string &transport,
+							MRef<SipStack*> stack
                 )
 {
 	MRef<SipRequest*> req = new SipRequest(branch,"INVITE");
@@ -223,27 +218,25 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 			localAddr, localSipPort, 
 			from_tel_no, seq_no, 
 			"","","","",transport, stack);
-	
-	
-	
+
 	return req;
 }
 
 MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
-                const string &call_id,
-                const string &tel_no,
-                const string &proxyAddr,
-                int32_t proxyPort,
-                const string &localAddr,
-                int32_t localSipPort,
-                const string &from_tel_no,
-                int32_t seq_no,
-                const string &username,
-                const string &nonce,
-                const string &realm,
-                const string &password,
-                const string &transport,
-		MRef<SipStack*> stack)
+							const string &call_id,
+							const string &tel_no,
+							const string &proxyAddr,
+							int32_t proxyPort,
+							const string &localAddr,
+							int32_t localSipPort,
+							const string &from_tel_no,
+							int32_t seq_no,
+							const string &username,
+							const string &nonce,
+							const string &realm,
+							const string &password,
+							const string &transport,
+							MRef<SipStack*> stack)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "INVITE");
 	
@@ -260,11 +253,11 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 
 
 MRef<SipRequest*> SipRequest::createSipMessageNotify(string branch,
-                string callId,
-		const SipUri& toUri,
-		const SipUri& fromUri,
-                int32_t seqNo
-                )
+							string callId,
+							const SipUri& toUri,
+							const SipUri& fromUri,
+							int32_t seqNo
+							)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "NOTIFY");
 	req->setUri(toUri.getString());
@@ -274,26 +267,23 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(string branch,
 	return req;
 }
 
-
-
 MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,
-                string call_id,
-                string domain,
-                string localIp,
-                int32_t sip_listen_port,
-                string from_tel_no,	//FIXME: use SipUri
-                int32_t seq_no,
-                string transport,
-		int expires,
-                string auth_id,
-                string realm,
-                string nonce,
-                string password)
+							string call_id,
+							string domain,
+							string localIp,
+							int32_t sip_listen_port,
+							string from_tel_no,	//FIXME: use SipUri
+							int32_t seq_no,
+							string transport,
+							int expires,
+							string auth_id,
+							string realm,
+							string nonce,
+							string password)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
 
 	req->setUri("sip:" + domain);
-
 
 	SipUri fromUri(from_tel_no);
 	SipUri toUri(from_tel_no);
@@ -302,7 +292,6 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,
 	 
 	req->addHeader(new SipHeader(new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport, expires)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
-	
 
 	SipUri uri;
 	uri.setParams("", localIp,"", sip_listen_port);
@@ -327,10 +316,10 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,
 
 
 MRef<SipRequest*> SipRequest::createSipMessageSubscribe(string branch,
-                string call_id,
-		const SipUri &toUri,
-		const SipUri &fromUri,
-                int32_t seq_no)
+							string call_id,
+							const SipUri &toUri,
+							const SipUri &fromUri,
+							int32_t seq_no)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "SUBSCRIBE", toUri.getString() );
 
@@ -350,10 +339,10 @@ void SipRequest::addDefaultHeaders(const SipUri& fromUri,
 		int seqNo,
 		const string& callId)
 {
-        addHeader(new SipHeader(new SipHeaderValueFrom(fromUri)));
-        addHeader(new SipHeader(new SipHeaderValueTo(toUri)));
-        addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
-        addHeader(new SipHeader(new SipHeaderValueCSeq(method, seqNo)));
+	addHeader(new SipHeader(new SipHeaderValueFrom(fromUri)));
+	addHeader(new SipHeader(new SipHeaderValueTo(toUri)));
+	addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
+	addHeader(new SipHeader(new SipHeaderValueCSeq(method, seqNo)));
 	addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
 }
 
