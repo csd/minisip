@@ -172,7 +172,7 @@ bool SipDialogVoipClient::a2001_start_callingnoauth_invite( const SipSMCommand &
 
 bool SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X( const SipSMCommand &command)
 {	
-	if (transitionMatch(SipResponse::type, 
+	if (transitionMatchSipResponse("INVITE", 
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
@@ -209,7 +209,7 @@ bool SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X( const SipSMComm
 bool SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx( const SipSMCommand &command)
 {
 
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
 		dialogState.updateState( MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) );
 		return true;
 	}else{
@@ -220,7 +220,7 @@ bool SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx( const SipSMComm
 
 bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, 
+	if (transitionMatchSipResponse("INVITE", 
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
@@ -331,7 +331,7 @@ bool SipDialogVoipClient::a2006_callingnoauth_termwait_cancel( const SipSMComman
 //Note: This is also used as: callingauth_terminated_36
 bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "3**\n4**\n5**\n6**")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "3**\n4**\n5**\n6**")){
 		
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
 		rejectedLog->start = time( NULL );
@@ -379,7 +379,7 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
 
 bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMCommand &command){
 
-	if (transitionMatch(SipResponse::type, command,SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "407\n401")){
+	if (transitionMatchSipResponse("INVITE", command,SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "407\n401")){
 		
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 
@@ -411,7 +411,7 @@ bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMComman
 
 bool SipDialogVoipClient::a2009_callingauth_callingauth_18X( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "18*")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "18*")){
 		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
 #ifdef ENABLE_TS
 		ts.save( RINGING );
@@ -437,7 +437,7 @@ bool SipDialogVoipClient::a2009_callingauth_callingauth_18X( const SipSMCommand 
 }
 
 bool SipDialogVoipClient::a2010_callingauth_callingauth_1xx( const SipSMCommand &command){
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
 
 		dialogState.updateState( MRef<SipResponse*> ( (SipResponse*)*command.getCommandPacket() ) );
 		return true;
@@ -447,7 +447,7 @@ bool SipDialogVoipClient::a2010_callingauth_callingauth_1xx( const SipSMCommand 
 }
 
 bool SipDialogVoipClient::a2011_callingauth_incall_2xx( const SipSMCommand &command){
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
 		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
 		
 		dialogState.updateState( resp );
@@ -485,7 +485,7 @@ bool SipDialogVoipClient::a2011_callingauth_incall_2xx( const SipSMCommand &comm
 
 bool SipDialogVoipClient::a2012_calling_termwait_2xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
+	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
 
 		++dialogState.seqNo;
 
@@ -566,7 +566,7 @@ bool SipDialogVoipClient::a2014_callingauth_termwait_cancel( const SipSMCommand 
 
 bool SipDialogVoipClient::a2015_calling_pracksent_100rel( const SipSMCommand &command)
 {
-        if (transitionMatch(SipResponse::type,
+        if (transitionMatchSipResponse("INVITE",
                                 command,
                                 SipSMCommand::transaction_layer,
                                 SipSMCommand::dialog_layer,
@@ -587,7 +587,7 @@ bool SipDialogVoipClient::a2015_calling_pracksent_100rel( const SipSMCommand &co
 
 bool SipDialogVoipClient::a2016_pracksent_calling_2XX( const SipSMCommand &command)
 {
-        if (transitionMatch(SipResponse::type,
+        if (transitionMatchSipResponse("PRACK",
                                 command,
                                 SipSMCommand::transaction_layer,
                                 SipSMCommand::dialog_layer,
