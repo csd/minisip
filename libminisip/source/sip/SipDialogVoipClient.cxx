@@ -336,8 +336,10 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
 		rejectedLog->start = time( NULL );
 		rejectedLog->peerSipUri = dialogState.remoteTag;
-		
-		if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"404")){
+
+		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
+
+		if (sipResponseFilterMatch(resp,"404")){
                         CommandString cmdstr(dialogState.callId, SipCommandString::remote_user_not_found);
 			assert(sipStack);
 			assert(sipStack->getCallback());
@@ -347,7 +349,7 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
 			setLogEntry( rejectedLog );
 			rejectedLog->handle();
                         
-		}else if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"606")){
+		}else if (sipResponseFilterMatch(resp,"606")){
 			((LogEntryFailure *)*rejectedLog)->error =
 				"User could not handle the call";
 			setLogEntry( rejectedLog );
@@ -356,7 +358,10 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_unacceptable, command.getCommandPacket()->getWarningMessage());
 			sipStack->getCallback()->handleCommand( "gui", cmdstr );
 		}
-		else if (sipResponseFilterMatch(MRef<SipResponse*>((SipResponse*)*command.getCommandPacket()),"4**")){
+		else if (sipResponseFilterMatch(resp,"3**") ||
+			 sipResponseFilterMatch(resp,"4**") ||
+			 sipResponseFilterMatch(resp,"5**") ||
+			 sipResponseFilterMatch(resp,"6**")){
 			((LogEntryFailure *)*rejectedLog)->error =
 				"User rejected the call";
 			setLogEntry( rejectedLog );
@@ -364,10 +369,6 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_reject);
 			sipStack->getCallback()->handleCommand( "gui",cmdstr );
 		}
-		else{
-			merr << "ERROR: received response in SipDialogVoipClient"
-				" that could not be handled (unimplemented)"<< end;
-                }
 		
 		getMediaSession()->stop();
 		signalIfNoTransactions();
