@@ -21,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -47,6 +48,7 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRequire.h>
+#include<libmsip/SipHeaderRSeq.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
@@ -75,22 +77,23 @@ using namespace std;
  the in_call state.
    
  The "dotted" states are implemented in SipDialogVoip.cxx.
-   
+
+ TODO: Merge calling_noauth and calling_stored to one state
 
 
                  +---------------+
                  |               |
                  |     start     |
                  |               |
-a26transport_err +---------------+      100rel
-gui(failed)              |              a2015:PRACK +------------------+
-  +----------------+     | invite                   |                  |
-  |                |     V a2001: new TransInvite   |    prack_sent    |
-  |              +---------------+----------------->|                  |
-  |         +----|               |<------------(*)--+------------------+
+a26transport_err +---------------+
+gui(failed)              |
+  +----------------+     | invite
+  |                |     V a2001: new TransInvite
+  |              +---------------+
+  |         +----|               |
   |     1xx |    |Calling_noauth |----+ 180
-  |a3:(null)+--->|               |    | a2002: gui(ringing)      (*) 200 OK
-  +--------------+---------------+<---+                          a2016: -
+  |a3:(null)+--->|               |    | a2002: gui(ringing)
+  +--------------+---------------+<---+
   |                      |     |       2xx/a2004:
   |   cancel|hangup      |     +------------------------------+
   |   a2014              |                                    |
@@ -183,12 +186,19 @@ bool SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X( const SipSMComm
 #ifdef ENABLE_TS
 		ts.save( RINGING );
 #endif
+		if (resp->requires("100rel") && resp->getStatusCode()!=100){
+			if( !handleRel1xx( resp ) )
+				// Ignore retransmission
+				return true;
+		}
+		else{
+			//We must maintain the dialog state. 
+			dialogState.updateState( resp );
+		}
+		
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		sipStack->getCallback()->handleCommand("gui", cmdstr);
 	
-		//We must maintain the dialog state. 
-		dialogState.updateState( resp );
-		
 		//string peerUri = command.getCommandPacket()->getTo().getString();
 		string peerUri = dialogState.remoteUri; //use the dialog state ...
 
@@ -211,6 +221,14 @@ bool SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx( const SipSMComm
 
 	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
 		dialogState.updateState( MRef<SipResponse*>((SipResponse *)*command.getCommandPacket()) );
+
+		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
+		if (resp->requires("100rel") && resp->getStatusCode()!=100){
+			if( !handleRel1xx( resp ) )
+				// Ignore retransmission
+				return true;
+		}
+
 		return true;
 	}else{
 		return false;
@@ -418,10 +436,17 @@ bool SipDialogVoipClient::a2009_callingauth_callingauth_18X( const SipSMCommand 
 		ts.save( RINGING );
 #endif
 
+		if (resp->requires("100rel") && resp->getStatusCode()!=100){
+			if( !handleRel1xx( resp ) )
+				// Ignore retransmission
+				return true;
+		}
+		else{
+			dialogState.updateState( resp );
+		}
+
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
-
-		dialogState.updateState( resp );
 
 		string peerUri = dialogState.remoteUri;
 		
@@ -441,6 +466,14 @@ bool SipDialogVoipClient::a2010_callingauth_callingauth_1xx( const SipSMCommand 
 	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
 
 		dialogState.updateState( MRef<SipResponse*> ( (SipResponse*)*command.getCommandPacket() ) );
+
+		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
+		if (resp->requires("100rel") && resp->getStatusCode()!=100){
+			if( !handleRel1xx( resp ) )
+				// Ignore retransmission
+				return true;
+		}
+
 		return true;
 	}else{
 		return false;
@@ -565,41 +598,6 @@ bool SipDialogVoipClient::a2014_callingauth_termwait_cancel( const SipSMCommand 
 }
 
 
-bool SipDialogVoipClient::a2015_calling_pracksent_100rel( const SipSMCommand &command)
-{
-        if (transitionMatchSipResponse("INVITE",
-                                command,
-                                SipSMCommand::transaction_layer,
-                                SipSMCommand::dialog_layer,
-                                "1**")){
-
-                MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
-                if (!(resp->requires("100rel") && resp->getStatusCode()!=100)){
-			return false;
-		}
-		
-		sendPrack(resp);
-		
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogVoipClient::a2016_pracksent_calling_2XX( const SipSMCommand &command)
-{
-        if (transitionMatchSipResponse("PRACK",
-                                command,
-                                SipSMCommand::transaction_layer,
-                                SipSMCommand::dialog_layer,
-                                "2**")){
-		return true;
-	}else{
-		return false;
-	}
-
-}
-
 bool SipDialogVoipClient::a2017_any_any_2XX( const SipSMCommand &command){
 	if (transitionMatchSipResponse("INVITE",
 				       command,
@@ -641,23 +639,12 @@ void SipDialogVoipClient::setUpStateMachine(){
 	State<SipSMCommand,string> *s_callingauth=new State<SipSMCommand,string>(this,"callingauth");
 	addState(s_callingauth);
 
-	State<SipSMCommand,string> *s_pracksent=new State<SipSMCommand,string>(this,"pracksent");
-	addState(s_pracksent);
-
 	MRef<State<SipSMCommand,string> *> s_incall = getState("incall");
 	MRef<State<SipSMCommand,string> *> s_termwait= getState("termwait");
 
 	new StateTransition<SipSMCommand,string>(this, "transition_any_any_2XX",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2017_any_any_2XX,
 			anyState, anyState);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_pracksent_100rel",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2015_calling_pracksent_100rel, 
-			s_callingnoauth, s_pracksent);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_pracksent_callingnoauth_2XX",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2016_pracksent_calling_2XX, 
-			s_pracksent, s_callingnoauth);
 
 
 
@@ -860,21 +847,8 @@ void SipDialogVoipClient::sendAck(){
 
 void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
 	
-	MRef<SipRequest*> prack = SipRequest::createSipMessageAck(
-			"",
-			getLastInvite(),
-			rel100resp,
-			true
-			) ;
-
-	
-	SipSMCommand scmd(
-			*prack, 
-			SipSMCommand::dialog_layer, 
-			SipSMCommand::transaction_layer
-			);
-	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	MRef<SipRequest*> prack = createSipMessagePrack( rel100resp );
+	sendSipMessage( *prack );
 }
 
 void SipDialogVoipClient::sendAuthInvite(const string &branch){
@@ -1053,4 +1027,27 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+}
+
+bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
+	MRef<SipHeaderValue *> value = resp->getHeaderValueNo( SIP_HEADER_TYPE_RSEQ, 0 );
+
+	if( !value )
+		return false;
+
+	MRef<SipHeaderValueRSeq *> rseq = dynamic_cast<SipHeaderValueRSeq*>( *value );
+	uint32_t rseqNo = rseq->getRSeq();
+		
+	// First reliable provisional response
+	// Next in-order reliable provisional response
+	if( !(dialogState.rseqNo == (uint32_t)-1 ||
+	      dialogState.rseqNo > rseqNo ) )
+		return false;
+
+	dialogState.updateState( resp );
+	dialogState.seqNo++;
+	dialogState.rseqNo = rseqNo;
+	sendPrack(resp);
+
+	return true;
 }

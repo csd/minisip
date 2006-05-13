@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -26,6 +27,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #ifndef SIPDIALOG_H
@@ -92,6 +94,7 @@ class LIBMSIP_API SipDialogState{
 		
 		int seqNo;
 		int remoteSeqNo;
+		uint32_t rseqNo;
 		std::string localUri;	// not used yet
 
 		/**
@@ -201,6 +204,9 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 		/** Create a BYE request within the dialog */
 		MRef<SipRequest*> createSipMessageBye();
+
+		/** Create an PRACK request within the dialog */
+		MRef<SipRequest*> createSipMessagePrack( MRef<SipResponse*> resp );
 
 		/** Create a REFER request within the dialog */
 		MRef<SipRequest*> createSipMessageRefer( const std::string &referredUri );

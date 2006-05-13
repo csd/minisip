@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -41,6 +43,8 @@
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderRAck.h>
+#include<libmsip/SipHeaderRSeq.h>
 #include<libmutil/CommandString.h>
 
 using namespace std;
@@ -58,6 +62,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
 					
 	dialogState.isEarly=false;	//same as for "secure"?! -EE
 	dialogState.isEstablished = false;
+	dialogState.rseqNo = -1;
 }
 
 SipDialog::~SipDialog(){
@@ -196,6 +201,22 @@ MRef<SipRequest*> SipDialog::createSipMessageBye(){
 	return createSipMessage("BYE");
 }
 
+MRef<SipRequest*> SipDialog::createSipMessagePrack( MRef<SipResponse*> resp ){
+	MRef<SipHeaderValue *> value = resp->getHeaderValueNo( SIP_HEADER_TYPE_RSEQ, 0 );
+
+	if( !value ){
+		mdbg << "SipDialog: Missing RSeq in response" << end;
+		return NULL;
+	}
+
+	MRef<SipRequest*> req = createSipMessage("PRACK");
+	MRef<SipHeaderValueRSeq *> rseq = dynamic_cast<SipHeaderValueRSeq*>( *value );
+	/* Add RAck header */
+	req->addHeader( new SipHeader( new SipHeaderValueRAck( resp->getCSeqMethod(), rseq->getRSeq(), resp->getCSeq() )));
+
+	return req;
+}
+
 MRef<SipRequest*> SipDialog::createSipMessageRefer( const string &referredUri ){
 	MRef<SipRequest*> req = createSipMessage("REFER");
 
@@ -289,10 +310,10 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 		return false;
 	}
 		
-	remoteTag = resp->getHeaderValueTo()->getParameter("tag");
+	const string toTag = resp->getHeaderValueTo()->getParameter("tag");
 	
 	if( resp->getStatusCode() < 200 ) {
-		if( remoteTag == "" ) {
+		if( toTag == "" ) {
 			return false;
 		}
 		isEarly = true;
@@ -318,6 +339,10 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 	} else {
 		//merr << "dialog state has a routeset" << end;
 	}
+
+	if( isEstablished )
+		// Update route set only for an existing dialog
+		return true;
 	
 	MRef<SipHeaderValueContact *> c = resp->getHeaderValueContact();
 	if( c ){
@@ -326,7 +351,7 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 	remoteUri = resp->getHeaderValueTo()->getUri().getString();
 	localUri = resp->getHeaderValueFrom()->getUri().getString();
 	
-	//remote tag ... updated at the top of this function ... 
+	remoteTag = toTag;
 	localTag = resp->getHeaderValueFrom()->getParameter("tag");
 	
 	seqNo = resp->getCSeq();

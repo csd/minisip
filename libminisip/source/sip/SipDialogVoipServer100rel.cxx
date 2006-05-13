@@ -14,11 +14,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -39,6 +40,7 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRequire.h>
+#include<libmsip/SipHeaderRSeq.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
@@ -203,6 +205,13 @@ bool SipDialogVoipServer100rel::a4002_100rel_ringing_PRACK( const SipSMCommand &
 		
 		sendPrackOk(prack->getDestinationBranch(), *prack);
 		
+		CommandString cmdstr(dialogState.callId, 
+				SipCommandString::incoming_available, 
+				dialogState.remoteUri, 
+				(getMediaSession()->isSecure()?"secure":"unprotected")
+				);
+		dispatcher->getCallback()->handleCommand("gui", cmdstr );
+
 		sendRinging(getLastInvite()->getDestinationBranch(),false); //we don't do th 180 reliably, only the 183
 		
 		return true;
@@ -301,6 +310,10 @@ void SipDialogVoipServer100rel::sendPrackOk(const string &branch, MRef<SipMessag
 }
 
 void SipDialogVoipServer100rel::resendSessionProgress(){
+	MRef<SipHeaderValueRSeq *> rseq = (SipHeaderValueRSeq*)*lastProgress->getHeaderValueNo( SIP_HEADER_TYPE_RSEQ, 0 );
+
+	rseq->setRSeq( rseq->getRSeq() + 1 );
+
 	SipSMCommand cmd( lastProgress, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
@@ -310,7 +323,9 @@ void SipDialogVoipServer100rel::sendSessionProgress(const string &branch){
 
 	progress->addHeader(new SipHeader(new SipHeaderValueRequire("100rel"))); //EEEEEE
 	
-	//progress->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+	progress->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+
+	progress->addHeader(new SipHeader(new SipHeaderValueRSeq( rand() % (1<<31) )));
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 

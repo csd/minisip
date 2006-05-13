@@ -21,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -100,10 +101,9 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 		bool a2013_callingnoauth_termwait_transporterror( const SipSMCommand &command);
 		bool a2014_callingauth_termwait_cancel( const SipSMCommand &command);
 
-		bool a2015_calling_pracksent_100rel( const SipSMCommand &command);
-		bool a2016_pracksent_calling_2XX( const SipSMCommand &command);
-		
 		bool a2017_any_any_2XX( const SipSMCommand &command);
+
+		bool handleRel1xx( MRef<SipResponse*> resp );
 };
 
 #endif
