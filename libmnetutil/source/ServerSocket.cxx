@@ -65,6 +65,10 @@ ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
 	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
 #endif
 
+#ifdef IPV6_V6ONLY
+	if( domain == PF_INET6 )
+		setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof(on));
+#endif
 }
 
 
