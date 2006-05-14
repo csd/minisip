@@ -34,4 +34,13 @@ LIBMCRYPTO_API void hmac_sha1( unsigned char * key, unsigned int key_length,
                 unsigned char * data[], unsigned int data_length[],
                 unsigned char * mac, unsigned int * mac_length );
 
+#ifndef OPENSSL_NO_SHA256
+LIBMCRYPTO_API void hmac_sha256( unsigned char * key, unsigned int key_length,
+                unsigned char * data, unsigned int data_length,
+                unsigned char * mac, unsigned int * mac_length );
+
+LIBMCRYPTO_API void hmac_sha256( unsigned char * key, unsigned int key_length,
+                unsigned char * data[], unsigned int data_length[],
+                unsigned char * mac, unsigned int * mac_length );
+#endif
 #endif

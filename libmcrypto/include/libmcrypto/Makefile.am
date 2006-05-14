@@ -16,6 +16,7 @@ noinst_HEADERS = \
 		aes.h \
 		cert.h \
 		hmac.h \
-		rijndael-alg-fst.h
+		rijndael-alg-fst.h \
+		DH.h
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

@@ -26,6 +26,9 @@
 
 #ifdef HAVE_OPENSSL_AES_H
 #include <openssl/aes.h>
+
+void initializeOpenSSL();
+
 #else
 # define AES_BLOCK_SIZE 16
 typedef struct AES_KEY_s AES_KEY;
@@ -71,6 +74,10 @@ AES::AES():key(NULL){
 }
 
 AES::AES( unsigned char * key, int key_length ){
+
+#ifdef HAVE_OPENSSL_AES_H
+    void initializeOpenSSL();
+#endif
 	this->key = (AES_KEY *) malloc( sizeof( AES_KEY ) );
 	memset( this->key, '\0', sizeof( AES_KEY ) );;
 	AES_set_encrypt_key( key, key_length*8, (AES_KEY *) this->key );
