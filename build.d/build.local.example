@@ -85,6 +85,7 @@ $toggle_batch = 1;
 
 ## Override global configure parameters; also settable via the CLI.
 # set_global_configure_param(
+# 			'maintainer-mode' => 0,
 # 			debug => 1,
 # 			shared => 0,
 # 			static => 1,
