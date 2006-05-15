@@ -53,9 +53,10 @@ fi
 ltvers="`${libtoolize} --version 2>&1 | \
 	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $1'`"
 if test "${ltvers}" -lt 7; then
+  set +x
   echo "$0: your version of libtool (${ltvers}) is too old; we need 1.5.7 (or newer)"
   echo "$0: You may wanna try again with maintainer-mode disabled:"
-  echo "    in build.d/build.local: set maintainer-mode => 0
+  echo "    in build.d/build.local: set maintainer-mode => 0"
   exit 1
 fi
 
