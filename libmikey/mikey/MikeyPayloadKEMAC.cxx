@@ -48,6 +48,7 @@ MikeyPayloadKEMAC::MikeyPayloadKEMAC( int encrAlgValue,
 			break;
 		case MIKEY_PAYLOAD_KEMAC_MAC_NULL:
 			this->macDataPtr = NULL;
+			break;
 		default:
 			throw MikeyExceptionMessageContent(
 					"Unknown MAC algorithm in KEYMAC Payload (1)" );
