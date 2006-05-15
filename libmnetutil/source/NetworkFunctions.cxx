@@ -219,6 +219,9 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 		if( !( cur->ifa_flags & IFF_UP ) ){
 			continue;
 		}
+		/* some interfaces (e.g. DSL modem) don't have an address */
+		if (NULL == cur->ifa_addr) 
+			continue;
 
 		bool isIpv6;
 		string addr;
