@@ -123,18 +123,6 @@ UDPSocket::~UDPSocket(){
 
 }
 
-int32_t UDPSocket::getPort(){
-		struct sockaddr_storage addr;
-		socklen_t sz = sizeof(addr);
-		if (getsockname(fd, (struct sockaddr *)&addr, &sz)){
-			throw GetSockNameFailed( errno );
-		}
-
-		MRef<IPAddress *>ip = IPAddress::create((struct sockaddr*)&addr, sz);
-		int32_t port2 = ip->getPort();
-		return port2;
-}
-
 int32_t UDPSocket::sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len){
 	if (use_ipv6 && ( to_addr.getType() != IP_ADDRESS_TYPE_V6)){
 		cerr << "Error: trying to send to IPv4 address using IPv6 socket" << endl;

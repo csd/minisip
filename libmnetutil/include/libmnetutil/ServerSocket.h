@@ -36,16 +36,6 @@ class LIBMNETUTIL_API ServerSocket : public Socket {
 		ServerSocket(int32_t domain, int32_t listen_port);
 		virtual MRef<StreamSocket *> accept();
 
-		/**
-		* get the port where the socket is listening to incoming
-		* connections.
-		* @return the port number
-		*/
-		virtual int32_t getPort(); // The method is virtual to support exotic sub-classes.
-					   // Example: To support incoming TLS/TCP connections behind 
-					   // NAT, someone can create a server socket that accepts 
-					   // connections via a proxy (it would connect as client to 
-					   // this proxy).
 		static ServerSocket * create( int32_t listen_port, bool use_ipv6 = false );
 
 	protected:

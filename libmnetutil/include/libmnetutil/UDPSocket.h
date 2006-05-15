@@ -40,8 +40,6 @@ class LIBMNETUTIL_API UDPSocket : public DatagramSocket {
 
 		virtual std::string getMemObjectType(){return "UDPSocket";}
 
-		int32_t getPort();
-		
 		int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len);
 		
 		int32_t recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int32_t &port);

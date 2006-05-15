@@ -25,6 +25,8 @@
 #include<config.h>
 
 #include<libmnetutil/Socket.h>
+#include<libmnetutil/NetworkException.h>
+#include<libmnetutil/IPAddress.h>
 
 #if defined _MSC_VER || defined __MINGW32__	// was: if defined WIN32 && not defined __CYGWIN__
 #include<winsock2.h>
@@ -71,6 +73,17 @@ int Socket::getAddressFamily()
 	return sa.ss_family;
 }
 
+int32_t Socket::getPort(){
+	struct sockaddr_storage sa;
+	socklen_t sz = sizeof(sa);
+	if (getsockname(fd, (struct sockaddr *)&sa, &sz)){
+		throw GetSockNameFailed( errno );
+	}
+
+	MRef<IPAddress *> addr = IPAddress::create((struct sockaddr*)&sa, sz);
+	int32_t port2 = addr->getPort();
+	return port2;
+}
 
 
 

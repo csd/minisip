@@ -112,18 +112,6 @@ MRef<StreamSocket *>ServerSocket::accept(){
 	return new TCPSocket(cli,(struct sockaddr*)&sin,sinlen);
 }
 
-int32_t ServerSocket::getPort(){
-	struct sockaddr_storage sa;
-	socklen_t sz = sizeof(sa);
-	if (getsockname(fd, (struct sockaddr *)&sa, &sz)){
-		throw GetSockNameFailed( errno );
-	}
-
-	MRef<IPAddress *> addr = IPAddress::create((struct sockaddr*)&sa, sz);
-	int32_t port2 = addr->getPort();
-	return port2;
-}
-
 ServerSocket * ServerSocket::create( int32_t listen_port, bool use_ipv6 )
 {
 #ifdef HAVE_IPV6

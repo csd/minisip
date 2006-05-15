@@ -54,6 +54,18 @@ class LIBMNETUTIL_API Socket : public MObject {
 		virtual ~Socket();
 		virtual int32_t getFd();
 		int32_t getType();
+
+		/**
+		* get the port where the socket is listening to incoming
+		* connections.
+		* @return the port number
+		*/
+		virtual int32_t getPort(); // The method is virtual to support exotic sub-classes.
+					   // Example: To support incoming TLS/TCP connections behind 
+					   // NAT, someone can create a server socket that accepts 
+					   // connections via a proxy (it would connect as client to 
+					   // this proxy).
+
 		virtual int getAddressFamily();
 
 //#ifdef _WIN32_WCE
