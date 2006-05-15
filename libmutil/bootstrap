@@ -49,6 +49,14 @@ if test "$libtoolize" = "no"; then
   exit 1
 fi
 
+# check libtool version
+ltvers="`${libtoolize} --version 2>&1 | \
+	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $1'`"
+if test "${ltvers}" -lt 7; then
+  echo "$0: your version of libtool (${ltvers}) is too old; we need 1.5.7 (or newer)"
+  exit 1
+fi
+
 aclocal${amvers} -I m4 "$@" ${ACLOCAL_FLAGS} 
 ${libtoolize} --copy --force --ltdl
 
