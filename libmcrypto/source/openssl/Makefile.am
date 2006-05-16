@@ -3,11 +3,11 @@ noinst_LTLIBRARIES = \
 
 libmcopenssl_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmcopenssl_la_SOURCES = \
+		init.cxx \
 		aes.cxx \
-		cert.cxx \
-		hmac.cxx \
 		DH.cxx \
-		initOpenSSL.cxx	
+		cert.cxx \
+		hmac.cxx
 
 libmcopenssl_la_LIBADD = $(OPENSSL_LIBS)
 
