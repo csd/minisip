@@ -31,7 +31,7 @@
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/NetworkException.h>
-#include<libminisip/stun/STUN.h>
+#include<libmstun/STUN.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

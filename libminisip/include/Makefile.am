@@ -97,10 +97,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/soundcard/SoundDriver.h \
 			libminisip/soundcard/SoundDriverRegistry.h \
 			libminisip/spaudio/SpAudio.h \
-			libminisip/stun/STUNTest.h \
-			libminisip/stun/STUN.h \
-			libminisip/stun/STUNMessage.h \
-			libminisip/stun/STUNAttributes.h \
 			libminisip/video/mixer/ImageMixer.h \
 			libminisip/video/grabber/Grabber.h \
 			libminisip/video/display/VideoDisplay.h \

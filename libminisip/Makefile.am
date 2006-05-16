@@ -225,11 +225,6 @@ endif PORTAUDIO_SUPPORT
 
 libspaudio_src = source/spaudio/SpAudio.cxx 
 
-libstun_src = source/stun/STUNAttributes.cxx \
-		source/stun/STUN.cxx \
-		source/stun/STUNMessage.cxx \
-		source/stun/STUNTest.cxx
-
 #
 # Video plugin
 #
@@ -391,8 +386,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libzrtp_src) \
 			$(libsdp_src) \
 			$(libsoundcard_src) \
-			$(libspaudio_src) \
-			$(libstun_src)
+			$(libspaudio_src)
 
 libminisip_la_LIBADD += $(libsoundcard_libadd)
 
