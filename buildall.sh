@@ -19,6 +19,7 @@
 SUBDIRS="${SUBDIRS} libmutil"
 SUBDIRS="${SUBDIRS} libmcrypto"
 SUBDIRS="${SUBDIRS} libmnetutil"
+SUBDIRS="${SUBDIRS} libmstun"
 SUBDIRS="${SUBDIRS} libmikey"
 SUBDIRS="${SUBDIRS} libmsip"
 SUBDIRS="${SUBDIRS} libminisip"
@@ -133,7 +134,19 @@ do
 			CXXFLAGS="-Wall $compiler_debug" 	\
 					./configure $configure_params
 	fi 
-
+	if [ ${subdir} = "libmstun" ]; then 
+		LOC_MSTUN_LIBS=-L$PWD/.libs
+		LOC_MSTUN_CFLAGS=-I$PWD/include
+		ACLOCAL_FLAGS="$aclocal_flags" \
+			MUTIL_LIBS="$LOC_MUTIL_LIBS -lmutil"	\
+			MUTIL_CFLAGS=$LOC_MUTIL_CFLAGS \
+			MCRYPTO_LIBS="$LOC_MCRYPTO_LIBS -lmcrypto" \
+			MCRYPTO_CFLAGS=$LOC_MCRYPTO_CFLAGS \
+			MNETUTIL_LIBS="$LOC_MNETUTIL_LIBS -lmnetutil"	\
+			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
+			CXXFLAGS="-Wall $compiler_debug" 	\
+					./configure $configure_params
+	fi 
 	if [ ${subdir} = "libmsip" ]; then 
 		LOC_MSIP_LIBS=-L$PWD/.libs
 		LOC_MSIP_CFLAGS=-I$PWD/include
@@ -162,6 +175,8 @@ do
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
 			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
 			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
+			MSTUN_LIBS="$LOC_MSTUN_LIBS -lmstun"	\
+			MSTUN_CFLAGS=$LOC_MSTUN_CFLAGS \
 			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
 			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
 			CXXFLAGS="-Wall $compiler_debug" 	\
@@ -180,6 +195,8 @@ do
 			MNETUTIL_CFLAGS=$LOC_MNETUTIL_CFLAGS \
 			MIKEY_LIBS="$LOC_MIKEY_LIBS -lmikey"	\
 			MIKEY_CFLAGS=$LOC_MIKEY_CFLAGS \
+			MSTUN_LIBS="$LOC_MSTUN_LIBS -lmstun"	\
+			MSTUN_CFLAGS=$LOC_MSTUN_CFLAGS \
 			MSIP_LIBS="$LOC_MSIP_LIBS -lmsip"	\
 			MSIP_CFLAGS=$LOC_MSIP_CFLAGS \
 			LIBMINISIP_LIBS="$LOC_LIBMINISIP_LIBS -lminisip"	\
