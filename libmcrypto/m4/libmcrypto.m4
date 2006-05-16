@@ -21,6 +21,9 @@ AC_CHECK_LIB([crypto], [SSLeay], [
 		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
 	])
 
+mcrypto_save_LIBS="${LIBS}"
+LIBS="${OPENSSL_LIBS} ${LIBS}"
+
 dnl header check
 AC_CHECK_HEADER([openssl/crypto.h],[], [
 		AC_MSG_ERROR([Could not the development files for the libcrypto library. Please install the corresponding package (provided by the openssl project).])
@@ -33,7 +36,7 @@ if test x$enable_fast_aes != xyes; then
 fi
 
 AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
-AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = yes)
+AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
 
 dnl OpenSSL libssl
 dnl RedHat fix
@@ -51,6 +54,9 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
  the corresponding development package.])
        ])
 AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
+
+LIBS="${mcrypto_save_LIBS}"
+
 AC_SUBST(OPENSSL_LIBS)
 ])
 # End of AM_LIBMCRYPTO_CHECK_OPENSSL
