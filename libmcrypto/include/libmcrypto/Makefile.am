@@ -12,11 +12,18 @@ pkginclude_HEADERS = \
 		base64.h \
 		config.h
 
+OTHER_FILES =
+
+if HAVE_EVP_SHA256
+OTHER_FILES += hmac256.h
+endif
+
 noinst_HEADERS = \
 		aes.h \
 		cert.h \
+		DH.h \
 		hmac.h \
 		rijndael-alg-fst.h \
-		DH.h
+		$(OTHER_FILES)
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

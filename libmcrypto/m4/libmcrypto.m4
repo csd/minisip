@@ -32,6 +32,9 @@ if test x$enable_fast_aes != xyes; then
 		[Define to 1 if you have the <openssl/aes.h> header file.])])
 fi
 
+AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
+AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = yes)
+
 dnl OpenSSL libssl
 dnl RedHat fix
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])

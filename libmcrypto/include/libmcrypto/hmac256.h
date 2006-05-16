@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+  Copyright (C) 2006 Zachary T Welch
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -17,21 +17,22 @@
 */
 
 /*
- * Authors: Erik Eliasson <eliasson@it.kth.se>
- *          Johan Bilien <jobi@via.ecp.fr>
-*/
+ * Authors: Zachary T Welch <zach-minisip@splitstring.com>
+ */
 
-#ifndef HMAC_H
-#define HMAC_H
+#ifndef MLIBMCRYPTO_HMAC_SHA256_H
+#define MLIBMCRYPTO_HMAC_SHA256_H
 
-#include <libmcrypto/config.h>
+// XXX: replace this forward compatibility layer with a Bridge interface
+#define HAVE_OPENSSL
 
-LIBMCRYPTO_API void hmac_sha1( unsigned char * key, unsigned int key_length,
-                unsigned char * data, unsigned int data_length,
-                unsigned char * mac, unsigned int * mac_length );
+#include<config.h>
+#ifdef HAVE_OPENSSL
+#include<libmcrypto/openssl/hmac256.h>
+#endif // HAVE_OPENSSL
+#ifdef HAVE_GNUTLS
+#error "gnutls hmac256 support is not complete"
+#endif // HAVE_GNUTLS
 
-LIBMCRYPTO_API void hmac_sha1( unsigned char * key, unsigned int key_length,
-                unsigned char * data[], unsigned int data_length[],
-                unsigned char * mac, unsigned int * mac_length );
+#endif	// MLIBMCRYPTO_HMAC_H
 
-#endif

@@ -27,19 +27,19 @@
 #include <openssl/hmac.h>
 #include <libmcrypto/hmac.h>
 
-void hmac_sha1( unsigned char * key, unsigned int key_length,
+void hmac_sha256( unsigned char * key, unsigned int key_length,
 		unsigned char * data, unsigned int data_length,
 		unsigned char * mac, unsigned int * mac_length ){
-	HMAC( EVP_sha1(), key, key_length, data, data_length, mac, mac_length );
+	HMAC( EVP_sha256(), key, key_length, data, data_length, mac, mac_length );
 }
 
-void hmac_sha1( unsigned char * key, unsigned int key_length,
+void hmac_sha256( unsigned char * key, unsigned int key_length,
 		unsigned char * data_chunks[],
 		unsigned int data_chunck_length[],
 		unsigned char * mac, unsigned int * mac_length ){
 	HMAC_CTX ctx;
 	HMAC_CTX_init( &ctx );
-	HMAC_Init_ex( &ctx, key, key_length, EVP_sha1(), NULL );
+	HMAC_Init_ex( &ctx, key, key_length, EVP_sha256(), NULL );
 	while( *data_chunks ){
 		HMAC_Update( &ctx, *data_chunks, *data_chunck_length );
 		data_chunks ++;
@@ -48,4 +48,3 @@ void hmac_sha1( unsigned char * key, unsigned int key_length,
 	HMAC_Final( &ctx, mac, mac_length );
 	HMAC_CTX_cleanup( &ctx );
 }
-
