@@ -285,3 +285,10 @@ MRef<MPlugin*> MPluginRegistry::findPlugin( std::string name ){
 	return NULL;
 }
 
+MPluginRegistry::const_iterator MPluginRegistry::begin() const{
+	return plugins.begin();
+}
+
+MPluginRegistry::const_iterator MPluginRegistry::end() const{
+	return plugins.end();
+}

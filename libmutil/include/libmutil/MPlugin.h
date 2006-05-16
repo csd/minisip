@@ -173,6 +173,8 @@ class LIBMUTIL_API MPluginManager: public MObject{
 
 class LIBMUTIL_API MPluginRegistry: public MObject {
 	public:
+		typedef std::list< MRef<MPlugin*> >::const_iterator const_iterator;
+
 		MPluginRegistry();
 		virtual ~MPluginRegistry();
 
@@ -182,6 +184,9 @@ class LIBMUTIL_API MPluginRegistry: public MObject {
 		virtual std::string getPluginType()=0;
 
 		virtual void registerPlugin( MRef<MPlugin *> p );
+
+		const_iterator begin() const;
+		const_iterator end() const;
 
 	protected:
 		virtual MRef<MPlugin*> findPlugin( std::string name );
