@@ -154,7 +154,7 @@ AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 				# out-of-tree development
 				minisip_lthack=
 				# work around for pre-1.5.7 libtool bug
-				if test -n "${minisip_has_lt157}"; then
+				if test -z "${minisip_has_lt157}"; then
 					minisip_lthack='/.libs'
 				fi
 				$1_LDFLAGS="-L`pwd`/../$2${minisip_lthack}"
