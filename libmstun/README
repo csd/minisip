@@ -1,0 +1,14 @@
+README for libmstun
+===================
+
+The 'libmstun' package provides classes that implement the STUN client, 
+as used by libminisip.  In the future, this package should contain both 
+client and server STUN implementations, which will be used by 'ministun'
+to provide a re-usable CLI and daemon applications.
+
+Copyright
+---------
+
+This library has been released under the GNU Lesser GPL v2.1 license, 
+which has been included in this package as the COPYING.LIB file.
+
