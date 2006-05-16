@@ -153,11 +153,3 @@ MediaPlugin::~MediaPlugin(){
 MediaRegistry::MediaRegistry(){
 	registerPlugin( new AudioPlugin( NULL ) );
 }
-
-std::list< MRef<MPlugin*> >::const_iterator MediaRegistry::begin() const{
-	return plugins.begin();
-}
-
-std::list< MRef<MPlugin*> >::const_iterator MediaRegistry::end() const{
-	return plugins.end();
-}

@@ -69,8 +69,8 @@ void MediaHandler::init(){
 	media.clear();
 
 	MRef<MediaRegistry*> registry = MediaRegistry::getInstance();
-	std::list< MRef<MPlugin*> >::const_iterator i;
-	std::list< MRef<MPlugin*> >::const_iterator last = registry->end();
+	MediaRegistry::const_iterator i;
+	MediaRegistry::const_iterator last = registry->end();
 
 	for( i = registry->begin(); i != last; i++ ){
 		MRef<MPlugin *> plugin = *i;

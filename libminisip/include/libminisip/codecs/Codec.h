@@ -33,6 +33,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 
 class Codec;
 class CodecState;
@@ -122,15 +123,9 @@ class AudioCodec : public Codec{
 };
 
 /** Registry of audio codec plugins */
-class AudioCodecRegistry: public MPluginRegistry{
+class AudioCodecRegistry: public MPluginRegistry, public MSingleton<AudioCodecRegistry>{
 	public:
-		virtual ~AudioCodecRegistry();
-
 		virtual std::string getPluginType(){ return "AudioCodec"; }
-
-		static MRef<AudioCodecRegistry*> getInstance();
-
-		virtual void registerPlugin( MRef<MPlugin*> plugin );
 
 		/**
 		 * @returns A CODEC state for the given payloadType
@@ -146,9 +141,9 @@ class AudioCodecRegistry: public MPluginRegistry{
 
 	protected:
 		AudioCodecRegistry();
-		void registerBuiltinDrivers();
 
-		static MRef<AudioCodecRegistry *> instance;
+	private:
+		friend class MSingleton<AudioCodecRegistry>;
 };
 
 #endif

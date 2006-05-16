@@ -73,7 +73,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 	string driverId;
 	string deviceId;
 
-	merr << "SoundDriverRegistry: deviceName =  " << deviceName << end;
+	merr << "SoundDriverRegistry: deviceName =  " << deviceName << ::end;
 	size_t pos = deviceName.find( ':', 0 );
 	if( pos == string::npos ){
 		driverId = "oss";
@@ -83,8 +83,8 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		driverId = deviceName.substr( 0, pos );
 		deviceId = deviceName.substr( pos + 1 );
 	}
-	merr << "SoundDriverRegistry: deviceId =  " << deviceId << end;
-	merr << "SoundDriverRegistry: driverId =  " << driverId << end;
+	merr << "SoundDriverRegistry: deviceId =  " << deviceId << ::end;
+	merr << "SoundDriverRegistry: driverId =  " << driverId << ::end;
 
 	vector< MRef<SoundDriver*> >::iterator iter;
 	vector< MRef<SoundDriver*> >::iterator stop = drivers.end();
@@ -93,12 +93,12 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		MRef<SoundDriver*> driver = *iter;
 
 		if( driver->getId() == driverId ){
-			merr << "SoundDriverRegistry: device id found!!! =  " << deviceId << end;
+			merr << "SoundDriverRegistry: device id found!!! =  " << deviceId << ::end;
 			return driver->createDevice( deviceId );
 		}
 	}
 
-	mdbg << "SoundDriverRegistry: device not found " << deviceName << end;
+	mdbg << "SoundDriverRegistry: device not found " << deviceName << ::end;
 	return NULL;
 }
 
@@ -111,7 +111,7 @@ void SoundDriverRegistry::registerPlugin( MRef<MPlugin*> plugin ){
 		registerDriver( driver );
 	}
 	else {
-		merr << "Not SoundDriver!" << end;
+		merr << "Not SoundDriver!" << ::end;
 	}
 }
 
@@ -122,11 +122,11 @@ bool SoundDriverRegistry::registerDriver( MRef<SoundDriver*> driver ){
 	iter = find( drivers.begin(), drivers.end(), driver );
 
 	if ( iter != drivers.end() ){
-		merr << "registerDriver: Driver already registered: " << driver->getId() << end;
+		merr << "registerDriver: Driver already registered: " << driver->getId() << ::end;
 		return false;
 	}
 
-	mdbg << "SoundDriverRegistry: registering " << driver->getDescription() << " as " << driver->getId() << end;
+	mdbg << "SoundDriverRegistry: registering " << driver->getDescription() << " as " << driver->getId() << ::end;
 	drivers.push_back( driver );
 	return true;
 }
@@ -137,7 +137,7 @@ bool SoundDriverRegistry::unregisterDriver( MRef<SoundDriver*> driver ){
 	iter = find( drivers.begin(), drivers.end(), driver );
 
 	if ( iter == drivers.end() ){
-		merr << "unregisterDriver: Driver not registered: " << driver->getId() << end;
+		merr << "unregisterDriver: Driver not registered: " << driver->getId() << ::end;
 		return false;
 	}
 

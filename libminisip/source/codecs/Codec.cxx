@@ -29,29 +29,8 @@
 
 using namespace std;
 
-MRef<AudioCodecRegistry*> AudioCodecRegistry::instance;
-
 AudioCodecRegistry::AudioCodecRegistry(){
-}
-
-AudioCodecRegistry::~AudioCodecRegistry(){
-}
-
-MRef<AudioCodecRegistry*> AudioCodecRegistry::getInstance(){
-	if( !instance ){
-		instance = new AudioCodecRegistry();
-		instance->registerBuiltinDrivers();
-	}
-
-	return instance;
-}
-
-void AudioCodecRegistry::registerPlugin( MRef<MPlugin*> plugin ){
-	MPluginRegistry::registerPlugin( plugin );
-}
-
-void AudioCodecRegistry::registerBuiltinDrivers(){
-	registerPlugin( new G711Codec( NULL ) );
+	registerPlugin( new G711Codec( NULL ) );	
 }
 
 MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){
@@ -64,7 +43,7 @@ MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){
 		MRef<AudioCodec*> codec = dynamic_cast<AudioCodec*>(*plugin);
 
 		if( !codec ){
-			merr << "Not an AudioCodec? " << plugin->getName() << end;
+			merr << "Not an AudioCodec? " << plugin->getName() << ::end;
 		}
 
 		if( codec && codec->getSdpMediaType() == payloadType ){
@@ -72,7 +51,7 @@ MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){
 		}
 	}
 
-	merr << "AudioCodec not found pt: " << payloadType << endl;
+	merr << "AudioCodec not found pt: " << payloadType << ::end;
 	return NULL;
 }
 
@@ -87,7 +66,7 @@ MRef<AudioCodec *> AudioCodecRegistry::create( const std::string & description )
 		MRef<AudioCodec*> codec = dynamic_cast<AudioCodec*>(*plugin);
 
 		if( !codec ){
-			merr << "Not an AudioCodec? " << plugin->getName() << end;
+			merr << "Not an AudioCodec? " << plugin->getName() << ::end;
 		} 
 
 		if( codec && codec->getCodecName() == description ){
@@ -95,7 +74,7 @@ MRef<AudioCodec *> AudioCodecRegistry::create( const std::string & description )
 		}
 	}
 
-	merr << "AudioCodec not found name: " << description << endl;
+	merr << "AudioCodec not found name: " << description << ::end;
 	return NULL;
 }
 

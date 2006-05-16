@@ -210,9 +210,6 @@ class LIBMINISIP_API MediaRegistry : public MPluginRegistry, public MSingleton<M
 	public:
 		virtual std::string getPluginType(){ return "Media"; }
 
-		std::list< MRef<MPlugin*> >::const_iterator begin() const;
-		std::list< MRef<MPlugin*> >::const_iterator end() const;
-
 	protected:
 		MediaRegistry();
 

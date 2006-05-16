@@ -46,13 +46,13 @@ MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string b
 		}
 
 		if( !plugin ){
-			merr << "ConfigRegistry: Can't create config backend " << backendName << end;
+			merr << "ConfigRegistry: Can't create config backend " << backendName << ::end;
 			return NULL;
 		}
 		
 		ConfigPlugin *config = dynamic_cast<ConfigPlugin*>(*plugin);
 		if( !config ){
-			merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << end;
+			merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << ::end;
 			return NULL;
 		}
 
@@ -111,6 +111,6 @@ void ConfigRegistry::registerPlugin( MRef<MPlugin*> plugin ){
 		MPluginRegistry::registerPlugin( plugin );
 	}
 	else {
-		merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << end;
+		merr << "ConfigRegistry: Not a config plugin " << plugin->getName() << ::end;
 	}
 }

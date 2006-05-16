@@ -69,7 +69,7 @@ MRef<Grabber *> GrabberRegistry::createGrabber( string device ){
 		MRef<MPlugin *> plugin = findPlugin( name );
 
 		if( !plugin ) {
-			merr << "GrabberRegistry: " << name << " grabber not found " << end;
+			merr << "GrabberRegistry: " << name << " grabber not found " << ::end;
 			return NULL;
 		}
 
@@ -77,7 +77,7 @@ MRef<Grabber *> GrabberRegistry::createGrabber( string device ){
 		result = gPlugin->create( dev );
         }
         catch( VideoException & exc ){
-                merr << exc.error() << end;
+                merr << exc.error() << ::end;
                 return NULL;
         }
 

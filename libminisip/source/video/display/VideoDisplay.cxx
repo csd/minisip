@@ -58,7 +58,7 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 			MRef<MPlugin *> plugin;
 			plugin = findPlugin( name );
 			if( !plugin ){
-				mdbg << "VideoDisplayRegistry: Can't find " << name << end;
+				mdbg << "VideoDisplayRegistry: Can't find " << name << ::end;
 				continue;
 			}
 			
@@ -66,14 +66,14 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 			
 			videoPlugin = dynamic_cast<VideoDisplayPlugin*>( *plugin );
 			if( !videoPlugin ){
-				merr << "VideoDisplayPlugin: Not display plugin " << name << end;
+				merr << "VideoDisplayPlugin: Not display plugin " << name << ::end;
 				continue;
 			}
 			
 			display = videoPlugin->create( width, height );
 			
 			if( !display ){
-				merr << "VideoDisplayPlugin: Couldn't create display " << name << end;
+				merr << "VideoDisplayPlugin: Couldn't create display " << name << ::end;
 				continue;
 			}
 			
@@ -83,7 +83,7 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 		}
 		catch( VideoException & exc ){
 			mdbg << "Error opening the video display: "
-			     << exc.error() << end;
+			     << exc.error() << ::end;
 		}
 	}
 
