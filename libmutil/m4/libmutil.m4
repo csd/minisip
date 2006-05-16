@@ -79,11 +79,25 @@ PKG_PROG_PKG_CONFIG
 dnl  =================================================================
 dnl               minisip configure check helper macros
 
+# AC_MINISIP_CHECK_LIBTOOL()
+# --------------------------
+AC_DEFUN([AC_MINISIP_CHECK_LIBTOOL],[
+  # check for libtool >= 1.5.7
+  minisip_ltvers="`libtoolize --version 2>&1 | \
+	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $1'`"
+  if test "${minisip_ltvers}" -gt 6; then
+    minisip_has_lt157=yes
+  fi
+])
+# End of AC_MINISIP_CHECK_LIBTOOL
+#
+
 # AM_MINISIP_LIBTOOL_EXTRAS()
 # ---------------------------
 AC_DEFUN([AM_MINISIP_LIBTOOL_EXTRAS],[
 AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
+AC_MINISIP_CHECK_LIBTOOL
 ])
 # End of AM_MINISIP_LIBTOOL_EXTRAS
 #
@@ -138,7 +152,12 @@ AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 				$1_LDFLAGS="-L${withval}/.libs"
 			elif test -d "../$2/.libs"; then
 				# out-of-tree development
-				$1_LDFLAGS="-L`pwd`/../$2/.libs"
+				minisip_lthack=
+				# work around for pre-1.5.7 libtool bug
+				if test -n "${minisip_has_lt157}"; then
+					minisip_lthack='/.libs'
+				fi
+				$1_LDFLAGS="-L`pwd`/../$2${minisip_lthack}"
 			else
 				AC_MSG_ERROR([dnl
 Unable to find the required libraries in any of the following locations:
