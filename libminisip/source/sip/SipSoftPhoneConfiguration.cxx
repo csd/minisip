@@ -261,6 +261,36 @@ void SipSoftPhoneConfiguration::save(){
 
 }
 
+void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
+	bool modified = false;
+
+	// Add codecs missing in config.
+	MRef<AudioCodecRegistry*> audioCodecReg = AudioCodecRegistry::getInstance();
+	AudioCodecRegistry::const_iterator i;
+	AudioCodecRegistry::const_iterator last;
+	for( i = audioCodecReg->begin(); i != audioCodecReg->end(); i++ ){
+		MRef<MPlugin *> plugin = *i;
+		MRef<AudioCodec *> codec = dynamic_cast<AudioCodec*>(*plugin);
+
+		string name = codec->getCodecName();
+
+		if( find( audioCodecs.begin(), audioCodecs.end(), name ) == audioCodecs.end() ){
+			audioCodecs.push_back( name );
+			mdbg << "SipSoftPhoneConfiguration: Add codec " << name << endl;
+			modified = true;
+		}
+	}
+
+	if( modified ){
+		int iC = 0;
+		list<string>::iterator iCodec;
+	
+		for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
+			be->save( "codec[" + itoa( iC ) + "]", *iCodec );
+		}
+	}
+}
+
 string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	backend = be;
 
@@ -457,16 +487,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		audioCodecs.push_back( codec );
 		codec = backend->loadString("codec["+ itoa( ++iCodec ) +"]","");
 	}
-	if( audioCodecs.size() == 0 ) { //MEEC!! Error!
-		//This is an error. It can happen, for example, if someone manually
-		//edited the .minisip.conf file, or if it is using an older version
-		mout << "ERROR! ********************************************" << end 
-			<< "***  No codec was found in the .minisip.conf configuration file" << end 
-			<< "***  Adding default G.711 ..." << end
-			<< "ERROR! ********************************************" << end;
-		audioCodecs.push_back( "G.711" );
-		be->save( "codec[0]", "G.711" ); //save the changes ... 
-	}
+
+	addMissingAudioCodecs( backend );
 
 	//add code to load the default network interface
 	//<network_interface> into networkInterfaceName

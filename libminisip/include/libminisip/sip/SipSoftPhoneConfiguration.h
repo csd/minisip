@@ -214,6 +214,8 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 
 	private:
 		MRef<ConfBackend *> backend;
+
+		void addMissingAudioCodecs( MRef<ConfBackend *> be );
 };
 
 #endif
