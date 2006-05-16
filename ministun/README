@@ -1,0 +1,22 @@
+README for ministun
+===================
+
+The 'ministun' package provides a standalone STUN server, based on the
+reference implementation provided by Vovida; however, this package 
+leverages the class libraries that are part of the minisip stack.
+
+The STUN client continues to reside in libmnetutil, where it can be useful
+for other applications.  The core STUN server has also been implemented in 
+its own library, so it may be reused by the different front-end interfaces.
+
+Copyright Notice
+----------------
+
+While the code was developed mostly from scratch, some portions may
+still be covered by The Vovide Software License, Version 1.0.  That
+license has also been included in this package as COPYING.Vovida.
+
+Copyright (c) 2000 Vovida Networks, Inc.  All rights reserved.
+
+All other portions have been released under the GNU GPL v2, which has also
+been included in this package.  See the COPYING file for information.  
