@@ -1,5 +1,5 @@
-# AM_LIBMCRYPTO_ENABLE_FAST_AES(VERSION)
-# ------------------------------------
+# AM_LIBMCRYPTO_ENABLE_FAST_AES()
+# -------------------------------
 AC_DEFUN([AM_LIBMCRYPTO_ENABLE_FAST_AES], [
 AC_ARG_ENABLE(fast-aes,
 	AS_HELP_STRING([--enable-fast-aes],
@@ -9,8 +9,8 @@ AC_ARG_ENABLE(fast-aes,
 # End of AM_LIBMCRYPTO_ENABLE_FAST_AES
 #
 
-# AM_LIBMCRYPTO_CHECK_OPENSSL(VERSION)
-# ------------------------------------
+# AM_LIBMCRYPTO_CHECK_OPENSSL()
+# -----------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_OPENSSL], [
 dnl OpenSSL libcrypto
 dnl library check
@@ -53,8 +53,8 @@ AC_SUBST(OPENSSL_LIBS)
 # End of AM_LIBMCRYPTO_CHECK_OPENSSL
 #
 
-# AM_LIBMCRYPTO_CHECK_GNUTLS(VERSION)
-# ------------------------------------
+# AM_LIBMCRYPTO_CHECK_GNUTLS()
+# ----------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_GNUTLS], [
 AC_CHECK_LIB([gcrypt], [main],[
 		GNUTLS_LIBS="-lgcrypt"
