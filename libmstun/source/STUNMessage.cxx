@@ -31,7 +31,9 @@
 #	include<io.h>
 #else
 #	include<unistd.h>
-#	include<netinet/in.h>
+#	ifdef HAVE_NETINET_IN_H
+#		include<netinet/in.h>
+#	endif
 #endif
 
 #include<assert.h>

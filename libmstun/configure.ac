@@ -26,9 +26,12 @@ AM_MINISIP_CHECK_LIBMCRYPTO([0.3.0])
 AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
+dnl Checks for libraries.
+AC_CHECK_LIB([wsock32], [main])
+
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h netinet/in.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
