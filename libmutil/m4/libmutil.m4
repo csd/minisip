@@ -84,7 +84,7 @@ dnl               minisip configure check helper macros
 AC_DEFUN([AC_MINISIP_CHECK_LIBTOOL],[
   # check for libtool >= 1.5.7
   minisip_ltvers="`libtoolize --version 2>&1 | \
-	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $1'`"
+	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $[]1'`"
   if test "${minisip_ltvers}" && test ${minisip_ltvers} -gt 6; then
     minisip_has_lt157=yes
   fi
