@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+#
+#  dist.local.example - overrides example for minisip on Debian
+#
+#  You can simply remove comments from approriate lines to suit your needs. 
+#  Also, you can remove these fluffy comments if they make your skin crawl.
+#
+#  The settings provided here will override the defaults in 'dist.conf'.
+#
+#######
+
+1
