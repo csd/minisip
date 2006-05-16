@@ -652,7 +652,8 @@ sub cb_debug_post { act('run', debug_app_path()) }
 
 sub _first_line { $_[0] }
 sub cb_envdump_pre {
-	print `svn info | grep ^Rev`;
+	print "Working Copy ", `svn info | grep ^Rev`;
+	print "pkg-config: ", _first_line(`pkg-config --version`);
 	print "autoconf: ", _first_line(`autoconf --version`);
 	print "automake: ", _first_line(`automake --version`);
 	print " libtool: ", _first_line(`libtool --version`);
