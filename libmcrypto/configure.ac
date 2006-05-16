@@ -30,7 +30,7 @@ AM_LIBMCRYPTO_CHECK_OPENSSL
 AM_LIBMCRYPTO_CHECK_GNUTLS
 
 # we need the pthread library as well
-AC_CHECK_LIB([pthread], [pthread_mutex_init], [], AC_MSG_ERROR([pthread library not found.]))
+AC_CHECK_LIB([pthread], [pthread_mutex_init])
 
 dnl Checks for header files.
 AC_HEADER_STDC
