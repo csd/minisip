@@ -299,7 +299,6 @@ sub set_arch_callbacks {
 	set_callbacks('arch', @funcs); 
 }
 sub set_arch_detect { set_callbacks('arch', detect => $_[0]) }
-sub arch_detect { run_callbacks('arch', 'detect') }
 
 sub cross_compiling { return $buildspec ne $hostspec }
 sub autodetect_platform { $_[0] eq 'autodetect' ? $_[1]->() : $_[0] }
@@ -440,7 +439,9 @@ sub callact {
 	if ($tgtdir ne $ENV{PWD}) {
 		easy_chdir($tgtdir);
 	}
+	try_callback($pkg, "$a-pre");
 	$actions{$a}->();
+	try_callback($pkg, "$a-post");
 }
 
 sub distfiles {
@@ -515,7 +516,8 @@ sub list_tarballs {
 
 sub autodetection {
 	my ( $type, $hint ) = @_;
-	return eval { try_callback($type, 'detect') for $hint };
+	local $_ = $hint;
+	return try_callback($type, 'detect') || 0;
 }
 
 sub autodetect_probe_path {
@@ -529,10 +531,11 @@ sub autodetect_probe_path {
 #		print "+Looking for $type called $dir...\n" if $verbose;
 		next unless load_file_if_exists($file);
 #		print "+Probing the $type called $dir...\n" if $verbose;
-		$scores{basename($dir)} = autodetection($type, $hint);
+		my $s = $scores{basename($dir)} = autodetection($type, $hint);
+#		print "+Scoring the $type called $dir: $s\n" if $verbose;
 	}
 	# pick the top scoring probe
-	( $setting ) = sort { $scores{$a} <=> $scores{$b} } keys %scores;
+	( $setting ) = sort { $scores{$b} <=> $scores{$a} } keys %scores;
 	return $setting;
 } 
 
@@ -599,7 +602,7 @@ sub set_default_callback {
 sub run_callback { 
 #	print "+callback: ", $_[0], "->", $_[1], "\n"; 
 	local $action = $_[1];
-	$callbacks{$_[0]}->{$_[1]}->(@_) 
+	return $callbacks{$_[0]}->{$_[1]}->(@_);
 }
 sub try_callback { 
 	return unless exists $callbacks{$_[0] || '_unknown_'};
@@ -613,7 +616,6 @@ sub try_callback {
 
 sub set_dist_callbacks { set_callbacks('dist', @_) }
 sub set_dist_detect { set_callbacks('dist', detect => $_[0]) }
-sub dist_detect { run_callbacks('dist', 'detect') }
 
 # probe the given hostdist; load its configuration files
 $hostdist = autodetect_probe('dist', $hostdist);
@@ -925,7 +927,9 @@ for $pkg ( @targets ) {
 	print "+Source directory: ", pretty_path($srcdir), "\n",
 		"+Object directory: ", pretty_path($objdir), "\n" if $verbose;
 
+	try_callback($pkg, 'pre');
 	callact($_) for @action;
+	try_callback($pkg, 'post');
 }
 
 # special post-target processing
