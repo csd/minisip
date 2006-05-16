@@ -755,7 +755,10 @@ sub debug_app_path {
 
 %actions = (
 	get_extended_actions(),
-	bootstrap => sub { act('bootstrap', './bootstrap') },
+	bootstrap => sub {
+		act('bootstrap', './bootstrap');
+		remove_files('config.cache', "$builddir/config.cache") if -f "$builddir/config.cache";
+	},
 	configure => sub { 
 		act('configure', "$srcdir/configure", configure_params()); 
 	},
