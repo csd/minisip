@@ -1,0 +1,43 @@
+goals.txt: Minisip Sites WG Goals
+==================================
+Created by: Zachary T Welch (zwelch)
+Managed by: Your Name Here (username)
+Created on: May 3, 2006
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document presents the long-term goals for the Sites Working Group.
+These serve to guide the group on a clear path for fulfilling the group's 
+specific functions within The Project.
+
+===========
+Group Goals
+-----------
+
+1) "First impressions last a lifetime, so ours should be good."
+  a) The web site will be the first impression of our project, so it
+     should use multiple servers on various networks (with high uptimes).
+  b) Our test suite may require a public test server, which must perform
+     similarly when users decide to try it.
+
+2) "Organization may be temporary, URLs can be forever."
+  a) All release URLS must be checked periodically for integrity.
+  b) Paths that require encoding should be avoided for readability.
+
+3) ...
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

@@ -1,0 +1,48 @@
+goals.txt: Minisip Ports WG Goals
+=================================
+Created by: Zachary T Welch (zwelch)
+Managed by: Your Name Here (username)
+Created on: May 3, 2006
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document presents the long-term goals for the Ports Working Group.
+These serve to guide the group on a clear path for fulfilling the group'
+s specific functions within The Project.
+
+===========
+Group Goals
+-----------
+
+1) "We want to be platform agnostic, relatively speaking."
+  a) All libraries and applications will be ported to every platform.
+  b) All platforms should be treated equally by other WG, relative to
+     the amount of Porting resources available.
+
+2) "We want to keep the platforms out of the programs." 
+  a) All abstract interfaces must have a fully portable implementation, 
+     except where all implementations must be native (e.g. sound drivers).
+  b) Portability allows selecting an alternate, native implementation.
+  c) Native implementations should work together to maximize common 
+     portability code in their abstraction layer.
+
+3) "Portable is beautiful, except when it isn't"
+  a) Portability occurs at the implementation level (e.g. source files).
+  b) Interfaces (e.g. header files) should never contain portability code.
+  c) This aims to avoid "#ifdef hell" in our public API headers.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

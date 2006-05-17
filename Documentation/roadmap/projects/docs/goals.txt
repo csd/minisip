@@ -1,0 +1,44 @@
+goals.txt: Minisip Documentation WG Goals
+=========================================
+Created by: Zachary T Welch (zwelch)
+Managed by: Your Name Here (username)
+Created on: May 3, 2006
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document presents the long-term goals for the Docs Working Group.
+These serve to guide the group on a clear path for fulfilling the group's 
+specific functions within The Project.
+
+===========
+Group Goals
+-----------
+
+1) "A system is only as useful as its documentation allows it to be."
+  a) Developers require current API documentation.
+  b) Users require current tutorials, use cases, and feature guides.
+  c) Other Minisip Working Groups produce and consume internal documents.
+
+2) "Multiple formats serve the needs of multiple people."
+  a) In general, all documents must be line-based, text files.
+  b) In general, all documents must be transmutable into other formats.
+
+3) "The system is not complete until the documentation is complete."
+  a) Releases may be delayed if critical documents are missing.
+  b) Distribution installations should include user documentation.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

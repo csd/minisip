@@ -1,0 +1,28 @@
+goals.txt: Minisip v1.2 Milestone Goals
+=======================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+       1.0 -> 1.2
+===========================
+v1.2          - Mar 1, 2007
+---------------------------
+
+* API/ABI compatible with 1.2.x branch, maybe 1.0 (if we got it right).
+
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+

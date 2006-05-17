@@ -1,0 +1,34 @@
+goals.txt: Minisip Internationalization WG Goals
+================================================
+Created by: Zachary T Welch (zwelch)
+Managed by: Your Name Here (username)
+Created on: May 3, 2006
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document presents the long-term goals for the I18N Working Group.
+These serve to guide the group on a clear path for fulfilling the group'
+s specific functions within The Project.
+
+===========
+Group Goals
+-----------
+
+1) "All languages deserve an opportunity to be seen and heard."
+  a) English may be first, but it's not the last language.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

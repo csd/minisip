@@ -1,0 +1,119 @@
+process.txt: Minisip Milestone Process Overview
+===============================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+
+===========
+The Prelude
+-----------
+
+0) We all want the following milestones:
+  a) We want to see an fairly immediate 0.8 release.
+  b) We want to reach 1.0 on Jan 1, 2007.
+  c) We want imagine that 2.0 will be on track for 2009 or 2010.
+
+========
+The Plan
+--------
+
+1) "Our plans are only that; still, we should all work together."
+
+  a) The existance of plans do not consitute a contract or assurance 
+     that community members intend to accomplish any of the outlined 
+     work in the time projected, nor intend to limit or direct the 
+     activities or contributions sought by the project.
+
+  b) Notwithstanding (a), contributing community members will recognize:
+
+    i) such plans represent governing articles of all project activities; 
+     that means contributors will be expected to comply with any plans 
+     formally adopted by the group.
+
+    ii) All plans are subject to ratification by voting members of the 
+        community and may be changed only after appropriate mob rule.
+
+    iii) A roadmap should exist for at least two upcoming stable releases,
+         or new managment should be sought.
+
+  c) We reserve the right to change our plans at any time; these changes
+     will be made to increase quality, reallocate resources, or simply
+     to ammuse ourselves.
+
+2) "Once we reach 1.0, we want regular, tested, ABI-compatible stability
+   releases along every x.y branch; feature releases that break the ABI 
+   should occur less frequently."
+
+  a) Like the kernel, x.{odd}.z will be testing releases,
+         and releases x.{even}.z will be stable releases.
+
+  b) Feature releases will bump y, once every three or four months.
+
+  c) Stability releases will bump z, once a month.
+
+  d) Security releases will be identified by 4 digit version (x.y.z.N);
+     these will be released as fast as they can be tested and packaged.
+
+3) "We want monthly stable releases, and security fixes in 24 hours."
+
+  a) We have (or rather, need to have identified) vulnerabilities, and
+     we need a consistent process that will be used to produce releases
+     in a timely manner.  The stable release is a monthly "fire drill".
+
+  b) Distribution maintainers want to provide regular package releases, 
+     particularly in light of (a).  A monthly release is good practice.
+
+  c) freshmeat.net and other resources allow good exposure to a wide
+     variety of potential contributors and users.
+
+4) "We want quartery feature releases; keep the innovation coming!"
+
+  a) We must continue to have the ability to create new technology.
+
+  b) New, previously experimental features should only be exposed to 
+     the average user once they have been adequately documented and
+     the community has been prepared to field problems from the masses.
+
+  c) Quarterly press-releases can provide exposure to the enterprise,
+     provide opportunities for "flash and bang" at tradeshows, and 
+     create other ephemeral positive value.
+
+5) "The release tools should provide the opportunity for vendors to 
+   choose to integrate fixes, package, and maintained past versions."
+
+  a) We will support only the 'trunk' and 'last' branches.
+
+  b) Three or four times per year, the 'last' tree will be archived.
+
+  c) The current 'trunk' will be copied to become the new 'last' tree, 
+     corresponding to the new minor stable release of the trunk.
+
+  d) The new 'trunk' will be re-opened for minor/major development.
+
+  e) For example, we would release fixes 1.0.1, 1.0.2, etc. monthly
+     until 1.2 (and the last 1.0.x) has been stablized.  We then produce 
+     fixes 1.2.1, 1.2.2, and vendors would have to produce 1.0.{x+n} on
+     their own (or through the hereby foretold "minisip-legacy" list).
+
+===========
+The Details
+-----------
+
+1) Our periodic public drop will occur on the first Wednesday of each 
+   month; however, that rule will not be held fast.
+ 
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+

@@ -1,0 +1,94 @@
+mission.txt: Minisip Project Mission Statement
+==============================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+=================
+Mission Statement
+-----------------
+
+The Minisip Project (The Project) seeks to provide the highest quality 
+Free and Open Source internet collaboration technologies by continuing 
+the development, production, and maintenance of the minisip software 
+stack, applications, and surrounding infrastructure.
+
+======================
+Mission Working Groups
+----------------------
+
+That relatively dense statement breaks out into a number of areas of 
+ongoing activity, which can be summarized in a number of deliverables
+that are produced by associated "working groups": Stack and Libraries,
+Applications, Build/Test/Package/Release, Per-Platform Packaging and 
+Porting, On-line Services, and - everyone's favorite - Documentation.
+
+Participants in The Project should recognize the important role that 
+each plays in the successful release of a software product. As such,
+this structure should be been reflected in our ongoing task analysis 
+and resource allocation decisions.
+
+The 'projects' directory contains documents describing these groups in 
+further detail, along with milestone-agnostic process documentation.
+
+==================
+Mission Milestones
+------------------
+
+Given the considerable requirements of the average end-user, these groups 
+must work closely together to deliver new releases on a regular schedule.  
+In order to acheive consistently high quality releases, we should attempt
+to make measurable performance improvements in each these areas.
+
+To achieve these results, a regular milestone release process has been
+implemented.  The 'milestones' directory holds additional documents 
+which contain explanations of how the process should work.  Each active 
+contributor is encouraged to maintain their own individual roadmaps, 
+which can be found in the 'contributors' directory.
+
+=================
+Minisip Customers
+-----------------
+
+The Project activities are managed with the purpose of serving those 
+individuals, organizations, and agencies that have contributed to it.
+While the governing mission and goals seek to provide a generally useful
+platform, the practical day-to-day decisions will be determined by the
+participants who choose (or are paid) to be involved in some capacity.
+
+In order to ensure the daily activities remain on-track, participants
+must acknowledge a certain level of responsibility to The Project goals. 
+To foster this feeling, each contributor to minisip should treat every 
+other as if they were their customer.  This is not far from the truth; 
+their contribution has created new value for everyone who uses the system.
+
+In this capacity, the following general classes of groups deserve to be
+recognized as your customers:
+
+1) Users that report bug reports, provide test case feedback, or otherwise
+   _proactively_ get involved with the project.
+
+2) Developers that write code, documentation, web pages, unit tests, or 
+   provide similar deliverables for the project.
+
+3) Benefactors that donate money, equipment, hosting, bandwidth, or other
+   goods and services to the project.
+
+In general, those are our customers; this breakout does not correlate to 
+influence.   In that capacity, our participants' earn the mutual respect 
+required to come to agreeable compromises that benefit everyone.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+

@@ -1,0 +1,75 @@
+stable.txt: Minisip Stable Milestone Guide
+==========================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 3, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+========
+Overview
+--------
+
+This document provides an overview of the stable milestone release process.
+The policies and procedures described herein should be used by all project
+working groups to ensure each release meets our standards for quality.
+
+==========
+Definition
+----------
+
+Our "stable milestones" serve to provide limited security and bug fixes 
+to a tested and verified version of our software.  These changes should
+never break API/ABI compatibility or add new features.
+
+Some users must necessarily plan to install a given version for extended
+periods of time, as they can not risk a new version introducing problems
+at their installation.
+
+The stable branch also allows the project to continue to attract the
+attention of new users and developers in the times between new feature
+realeases.
+
+=======
+Process
+-------
+
+The following steps should be taken to produce a stable milestone release:
+
+1) The production of stable milestones relies on the BTPR WG to coordinate 
+   all of the other activities into a focused stablization effort.
+
+2) All of the milestone tasks waiting to be accomplished must be addressed
+   or moved to a future milestone.
+
+3) A complete audit of all task must then be performed, which will
+   identify additional tasks that were overlooked until now.
+
+4) Once the audit tasks have been completed, the BTPR coordinator will: 
+  a) tag the repo
+  b) package the release tarballs with 'make distcheck',
+  c) notify the Ports group to finalize each platform's packages
+  d) notify the Docs group to finalize all release materials
+  e) notify the Sites group to prepare to be Dugg, Slashdotted, etc.
+
+5) Upon production of stable tarballs: 
+  a) the Ports group will finalize, tag, package, and release each 
+     platform's distribution packages.
+  b) the Docs group will finalize all materials generated from these, 
+     including the output from Doxygen, packaged README information,
+     press release, and other static deliverables.
+  c) the Sites group will post the tarballs, platform packages, and
+     documentation as they become available.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+

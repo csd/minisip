@@ -1,0 +1,47 @@
+goals.txt: Minisip Build WG Goals
+=================================
+Created by: Zachary T Welch (zwelch)
+Managed by: Your Name Here (username)
+Created on: May 3, 2006
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document presents the long-term goals for the Build Working Group.  
+These serve to guide the group on a clear path for fulfilling the group'
+s specific functions within The Project.
+
+===========
+Group Goals
+-----------
+
+1) "The system must be built before it can be used."
+  a)  The build system must remain stable, even through frenzied changes.
+
+2) "Test suites can validate designs, prevent regressions, and more."
+  a) Every library and application must have a complete test suite.
+  b) Each public interface (API header) must have a unit test covering it.
+  c) Additional test services must be available.
+
+3) "Software gains tremendous value when it gets distributed for use."
+  a) Every package should pass their 'distcheck' tests.
+  b) Package contents must be reviewed before being distributed.
+ 
+4) "Distrubtion requires more than simply tossing tarballs on a website.
+  a) The Build Group oversees the Ports, Sites, and Docs groups through 
+     the release process.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

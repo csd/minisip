@@ -1,0 +1,66 @@
+mission.txt: Minisip Contributor Bootstrap Guide
+================================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+========
+Overview
+--------
+
+This document attempts to provide a guide to working with the milestone
+system.  You should already be familiar with the other documents listed
+in the README file in this directory.  If you have not read those files, 
+you should probably go read them now.
+
+==================================
+How to Participate In This Project
+----------------------------------
+
+Once you are familiar with the existing processes, the following abstract
+directions will ensure you are integrated into the project in the most 
+efficient manner possible.  The concrete goal of these instructions will 
+be to construct a minimal series of SVN commits, incorporating the 
+necessary information in the proper places.
+
+To become an active contributor, you need to do the following things 
+according to the prescribed procceses:
+
+0) Subscribe to the mailing lists; introduce yourself to the community. 
+   See 'policies.txt' for more information about this requirement.
+
+1) Add your own 'contributor' directory (using uppercase initials), with
+   your e-mail/sip contact information.  Add your personal roadmap, if
+   it does not fit into the upcoming project milestone path.
+
+2) For those projects in which you intend to participate, add your name,
+   initials, and intentions in the proper part of the 'people.txt' file.
+
+3) Add your wish list to the "unsorted" milestone, add your ongoing and
+   long-term work to the "assigned" milestone.  Do not list parts of the
+   system which have limited audience (i.e. tasks on your commercial 
+   roadmap), as you should have listed these in step #1.
+
+At this point, you should probably commit your changes to the repository, 
+or send a patch to the -devel list to get someone's attention.  Once you
+have this information in the repository, you can proceed with your work
+or follow-up planning:
+
+1) If you have immediate work that is about to be completed, contact the 
+   most appropriate working group coordinator to see when it may be included.
+
+2) While you are working
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

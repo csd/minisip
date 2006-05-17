@@ -1,0 +1,24 @@
+goals.txt: Zach's Minisip Roadmap
+=================================
+Created on: May 3, 2006
+Updated on: May 3, 2006
+
+============
+Introduction
+------------
+
+This document will outline my plans for using minisip, with specific goals
+required to meet my business needs.  This document will be updated with 
+such information as soon it has be approved for release to the public.
+
+  =========================================================================
+                  Copyright (c) 2006 Zachary T Welch
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+

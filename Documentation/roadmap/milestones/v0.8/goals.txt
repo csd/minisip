@@ -1,0 +1,86 @@
+goals.txt: Minisip v0.8 Milestone Goals
+=======================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 11, 2006
+
+========
+Overview
+--------
+
+The v0.7.5 and v0.8 releases seek to bootstrap a solid release process,
+providing the first publicly packaged versions of the project of 2006.
+The focus should be on stablizing the existing code, working out details 
+of our new release processes, with the goal of recruiting new developers
+and other contributors.  A new release means fresh PR and other material
+can be used to attract other resources to use for subsequent milestones.
+
+============================
+Tasks to get from 0.7 -> 0.8
+----------------------------
+v0.7.5        - May 24, 2006
+v0.8          - Jun  7, 2006
+----------------------------
+
+* Apps/Stack WG: Development clean-up, bug fixing.
+  * Clean-up and refactoring:
+    * Finish isolating all openssl dependencies in libmcrypto.
+    * Isolate (disable in default config) any existing experimental code.
+    + Assigned to: zwelch
+  * Fix any outstanding bugs, if possible, but we will ship what we have.
+  * Except per above, code should receive only clean-up and fixes.
+
+* BTPR WG: 
+  * Build:
+    * Further clean-up and stablization of the build system.
+  * Testing:
+    * Add bare bones test suite with an invitation for QA/QC assistance.
+  * Packaging:
+    * Verify integrity of 'distcheck', clean installations
+  * Release:
+    * Verify release process works by running through the steps w/ 0.7.5
+  + Assigned to: zwelch
+
+* Ports: 
+  * Linux
+    * Debian
+      * Update debian directories, as appropriate.
+      * Add build.pl packaging support (?)
+    * Gentoo
+      * Add portage overlay tree containing "canonical" minisip ebuilds.
+      + Assigned to: zwelch
+    * Red Hat
+      * Update package spec.in files, as appropriate.
+      * Add build.pl packaging support (?)
+  * Win32
+    * Update package installer files, as appropriate.
+    * WinCE
+    * Win32
+    * Mingw32
+    + Assigned to: mikael
+
+* Docs: Build process, configuration guide, (more?)
+  * Add document to cover configuration options.
+    * New build process.
+      + Assigned to: zwelch
+
+* Sites
+  * Deploy donated server 
+    + Assigned to: zwelch
+  * Move existing web site to new IT SVN repository.
+  * Update pages with current documentation.
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+

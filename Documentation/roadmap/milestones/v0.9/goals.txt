@@ -1,0 +1,59 @@
+goals.txt: Minisip v0.9 Milestone Goals
+=======================================
+Created by: Zachary T Welch (zwelch)
+Created on: May 2, 2006
+Managed by: Zachary T Welch (zwelch)
+#Updated by: Your Name Here (username)
+Updated on: May 3, 2006
+
+============================
+Tasks to get from 0.8 -> 0.9
+----------------------------
+v0.8.1        - Jul  6, 2006
+v0.8.2        - Aug  2, 2006
+v0.8.3, v0.9  - Sep  6, 2006
+----------------------------
+
+* Apps/Stack WGs: Push for API/ABI stability
+  * Clean-up and refactoring:
+    * Identify other improper layer violations; begin refactoring efforts.
+    * Normalize all public API names (classes, structs, methods, etc.) 
+      to common coding standards.  It won't be a unified API otherwise.
+      This poses a problem in libmutil, libmcrypto, and elsewhere.
+    * This does not mean the API/ABI will be stable until v1.0, just that 
+      most of hard work should have been done for v0.9.
+    + Assigned to: zwelch
+  * libminisip:
+    * Experimental: ZRTP support - in progress - contact Werner Dittmann
+
+* BTPR WG:
+  * Testing:
+    * Test suite work.
+  * Packaging:
+    * Split GUI packages into separate package. (zwelch)
+
+* Ports WG: 
+  * Linux: integration with all major distributions
+    * Gentoo
+      * Improve support in build.pl for USE flags.
+  * MacOSX: alpha release of native client (who?)
+  * Win32: Mikael, your thoughts? 
+
+* Docs WG:
+
+* I18N WG:
+  * First internationalized versions?
+
+
+  =========================================================================
+                  Copyright (c) 2006 The Minisip Project
+
+  This work is licensed under the Creative Commons Attribution 2.5 License. 
+                  To view a copy of this license, visit: 
+		http://creativecommons.org/licenses/by/2.5/ 
+                        or send a letter to: 
+		Creative Commons
+		543 Howard Street, 5th Floor
+		San Francisco, CA, 94105, USA.
+
+
