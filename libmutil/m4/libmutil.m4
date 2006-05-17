@@ -144,19 +144,21 @@ AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 			# proceed with default installation
 		 	$1_NEEDS_PKG_CHECK=yes
 		else
+			# work around for pre-1.5.7 libtool bug:
+			#  1.5.6 adds .libs by mistake, so only add that
+			#  portion of the path if we have 1.5.7 or later
+			#  After this, we also have to fix the library check.
+			if test -n "${minisip_has_lt157}"; then
+				minisip_lthack='/.libs'
+			fi
 			if test -d "${withval}/lib"; then
 				# specific installation
 				$1_LDFLAGS="-L${withval}/lib"
 			elif test -d "${withval}/.libs"; then
 				# in-tree development
-				$1_LDFLAGS="-L${withval}/.libs"
+				$1_LDFLAGS="-L${withval}${minisip_lthack}"
 			elif test -d "../$2/.libs"; then
 				# out-of-tree development
-				minisip_lthack=
-				# work around for pre-1.5.7 libtool bug
-				if test -z "${minisip_has_lt157}"; then
-					minisip_lthack='/.libs'
-				fi
 				$1_LDFLAGS="-L`pwd`/../$2${minisip_lthack}"
 			else
 				AC_MSG_ERROR([dnl
@@ -233,6 +235,12 @@ AC_DEFUN([AC_MINISIP_CHECK_LIBRARY], [
 			AC_MSG_ERROR([You need the $2 headers/library.
 Try installing the $2-devel package for your distribution."])])
 
+		# fix library check for pre-1.5.7 libtool:
+		#  add the correct path, since the double .libs bug doesn't
+		#  seem to affect us here.
+		if test -n "${minisip_lthack}"; then
+			LIBS="${$1_LDFLAGS}/.libs ${LIBS}"
+		fi
 		AC_CHECK_LIB([$4], [main], [], [ dnl
 				AC_MSG_ERROR([Could not find $2. dnl
 Please install the corresponding package.]) dnl
