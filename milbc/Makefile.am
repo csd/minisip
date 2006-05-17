@@ -75,10 +75,5 @@ MAINTAINERCLEANFILES  = $(srcdir)/configure \
 			$(srcdir)/config/install-sh \
 			$(srcdir)/config/ltmain.sh \
 			$(srcdir)/config/missing \
-			$(srcdir)/depcomp \
-			$(srcdir)/config.guess \
-			$(srcdir)/config.sub \
-			$(srcdir)/ltmain.sh \
-			$(srcdir)/missing \
 			$(srcdir)/aclocal.m4 \
-			$(srcdir)/install-sh
+			$(srcdir)/config/compilation_config.h.in
