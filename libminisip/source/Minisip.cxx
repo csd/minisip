@@ -133,7 +133,8 @@ static void loadPlugins(const string &argv0){
 #endif
 
 #ifdef WIN32
-		pluginPath += ';' + buildPluginPath( argv0 );
+		if( argv0 != "" )
+			pluginPath += ';' + buildPluginPath( argv0 );
 #endif
 	}
 	else
@@ -163,7 +164,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 	mdbg << "Loading plugins"<<end;
 	#endif
 
-	loadPlugins( argv[0] );
+	loadPlugins( argv ? argv[0] : "" );
 
 	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;
