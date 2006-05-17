@@ -526,7 +526,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "psk", "Unspecified PSK" );
 	be->save( "certificate", "" );
 	be->save( "private_key", "" );
-	be->save( "ca_certificate", "" );
+	be->save( "ca_file", "" );
 	be->save( "dh_enabled", "no" );
 	be->save( "psk_enabled", "no" );
 	be->save( "check_cert", "yes" );
