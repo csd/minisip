@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2005  Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -85,18 +87,46 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	protocol = build_from.substr( i, pos - i );
 	i = pos + 1;
 
+	pos = build_from.find_first_not_of(" \t\n\r", i);
+	if( pos == string::npos ){
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine sent-by");
+	}
+	i = pos;
+
+	size_t start = pos;
+
+	// Parse sent-by host
 	// Search for end of host name
-	pos = build_from.find_first_of( ":;, \t\n\r", i );
+	pos = build_from.find_first_of( "[:;, \t\n\r", i );
 	if( pos == string::npos ){
 		pos = build_from.size();
 	}
 
-	ip = build_from.substr( i, pos - i );
+	size_t end = pos;
+
+	if( build_from[pos] == '[' ){
+		// IPv6 address
+		start = pos + 1;
+		pos = build_from.find( ']', start );
+		if( pos == string::npos ){
+			throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine sent-by");
+		}
+
+		end = pos;
+		pos++;
+	}
+
+	ip = build_from.substr( start, end - start );
 	i = pos;
 
 	pos = build_from.find_first_not_of( " \t\n\r", i );
 	if( pos != string::npos && build_from[pos] == ':' ){
 		i = pos + 1;
+
+		i = build_from.find_first_not_of(";, \t\n\r", i );
+		if( i == string::npos ){
+			throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine port number");
+		}
 
 		pos = build_from.find_first_of(";, \t\n\r", i );
 		if( pos == string::npos ){
@@ -159,7 +189,13 @@ SipHeaderValueVia::~SipHeaderValueVia(){
 
 string SipHeaderValueVia::getString(){
 	string via;
-	via = "SIP/2.0/"+protocol+" "+ip;
+	via = "SIP/2.0/"+protocol+" ";
+	if( ip.find(':') != string::npos )
+		// IPv6
+		via += '[' + ip + ']';
+	else
+		via += ip;
+		
 	if (port>0)
 		via=via+":"+itoa(port);
 	
