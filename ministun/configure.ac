@@ -62,5 +62,7 @@ AC_CONFIG_FILES([
 		m4/Makefile
 		source/Makefile
 		win32/Makefile
+		win32/ministun-res.rc
+		win32/ministund-res.rc
 	])
 AC_OUTPUT
