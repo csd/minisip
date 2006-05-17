@@ -1,3 +1,5 @@
+EXTRA_DIST = run-example.sh.in build-examples.sh.in \
+		tcpclient.cxx tcpserver.cxx
 EXAMPLE_SCRIPT_FILES = run-example.sh build-examples.sh
 EXAMPLE_SOURCE_FILES = tcpclient.cpp tcpserver.cpp
 
@@ -26,6 +28,7 @@ build-examples.sh: build-examples.sh.in
 		-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,' \
 		$< > $@
 
-CLEANFILES = $(EXAMPLE_SCRIPT_FILES) $(EXAMPLE_SOURCE_FILES)
+CLEANFILES = $(EXAMPLE_SCRIPT_FILES) $(EXAMPLE_SOURCE_FILES) \
+		tcpclient tcpserver
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
