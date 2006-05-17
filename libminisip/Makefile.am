@@ -322,6 +322,8 @@ libgui_src = source/gui/Gui.cxx \
 
 libipprovider_src = source/ipprovider/IpProvider.cxx \
 			source/ipprovider/SimpleIpProvider.cxx \
+			source/ipprovider/SimpleIp6Provider.cxx \
+			source/ipprovider/SimpleIp6Provider.h \
 			source/ipprovider/StunIpProvider.cxx
 
 if OS_WIN

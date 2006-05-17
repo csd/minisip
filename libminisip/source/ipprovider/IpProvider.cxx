@@ -28,6 +28,7 @@
 #include<libminisip/ipprovider/SimpleIpProvider.h>
 #include<libminisip/ipprovider/StunIpProvider.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include"SimpleIp6Provider.h"
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -35,8 +36,11 @@
 
 using namespace std;
 
-MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config ){
+MRef<IpProvider *> IpProvider::create( MRef<SipSoftPhoneConfiguration *> config , bool useIpv6 ){
 	MRef<IpProvider *> ret;
+
+	if( useIpv6 )
+		return new SimpleIp6Provider( config );
 
 	if( config->useSTUN ){
 		ret = StunIpProvider::create( config );

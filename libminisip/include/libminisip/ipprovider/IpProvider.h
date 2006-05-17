@@ -39,7 +39,7 @@ class LIBMINISIP_API IpProvider: public MObject{
 		virtual std::string getExternalIp()=0;
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock )=0;
 
-		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config );
+		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config, bool useIpv6 = false );
 		
 };
 #endif
