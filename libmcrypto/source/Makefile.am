@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = \
 		libmcrypto_imp.la
 
 libmcrypto_core_la_SOURCES = \
+		init.cxx \
 		base64.cxx \
 		rijndael-alg-fst.cxx
 

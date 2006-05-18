@@ -9,6 +9,7 @@ SUBDIRS = $(BUILD_SUBDIRS)
 DIST_SUBDIRS = gnutls openssl
 
 pkginclude_HEADERS = \
+		init.h \
 		base64.h \
 		config.h
 
