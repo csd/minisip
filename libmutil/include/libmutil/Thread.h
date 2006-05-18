@@ -49,6 +49,10 @@ class LIBMUTIL_API ThreadHandle{
 		ThreadHandle(const ThreadHandle &);
 		~ThreadHandle();
 		
+		unsigned long asLongInt() { 
+			return *((unsigned long*)this->hptr); 
+		};
+
 	private:
 		void *hptr;
 		friend class Thread;
@@ -112,6 +116,7 @@ public:
 	static bool kill( const ThreadHandle& handle );
 
 	ThreadHandle getHandle() {return handle;}
+	static ThreadHandle getCurrent();
 	
 	/**
 	 * Purpose: Implement a platform independent way of delaying 

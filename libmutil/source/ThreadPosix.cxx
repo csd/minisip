@@ -439,6 +439,12 @@ bool Thread::kill( const ThreadHandle &handle) {
 	return true;
 }
 
+ThreadHandle Thread::getCurrent() {
+	ThreadHandle th;
+	*((pthread_t*)th.hptr) = pthread_self();
+        return th;
+}
+
 ThreadHandle::ThreadHandle(){
 	hptr = (void*)new pthread_t;
 }
