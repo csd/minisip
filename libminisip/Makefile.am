@@ -131,7 +131,20 @@ librtp_src = source/rtp/RtpHeader.cxx \
 		source/rtp/XRVoIPReportBlock.cxx
 
 if ZRTP_SUPPORT
-libzrtp_src = source/zrtp/ZRtp.cxx
+libzrtp_src = source/zrtp/ZIDFile.cxx \
+		source/zrtp/ZIDRecord.cxx \
+		source/zrtp/ZRtp.cxx \
+		source/zrtp/ZrtpHostBridgeMinisip.cxx \
+		source/zrtp/ZrtpPacketCommit.cxx \
+		source/zrtp/ZrtpPacketConf2Ack.cxx \
+		source/zrtp/ZrtpPacketConfirm.cxx \
+		source/zrtp/ZrtpPacketDHPart.cxx \
+		source/zrtp/ZrtpPacketError.cxx \
+		source/zrtp/ZrtpPacketHelloAck.cxx \
+		source/zrtp/ZrtpPacketHello.cxx \
+		source/zrtp/ZrtpStateClass.cxx \
+		source/zrtp/ZrtpTextData.cxx
+
 endif
 
 libsdp_src = source/sdp/SdpPacket.cxx \
