@@ -32,7 +32,7 @@
 #include <openssl/evp.h>
 
 #include <libmcrypto/init.h>
-#include <libmcrypto/DH.h>
+#include <libmcrypto/ZrtpDH.h>
 
 static BIGNUM *bnP3072 = NULL;
 static BIGNUM *bnP4096 = NULL;
@@ -124,7 +124,7 @@ static const uint8_t P4096[] =
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-DHMethods::DHMethods(int32_t pkLength) {
+ZrtpDH::ZrtpDH(int32_t pkLength) {
 
     uint8_t random[64];
 
@@ -151,7 +151,7 @@ DHMethods::DHMethods(int32_t pkLength) {
     }
 }
 
-DHMethods::~DHMethods() {
+ZrtpDH::~ZrtpDH() {
     if (ctx != NULL) {
 	if (ctx->g != NULL) {
 	    BN_free(ctx->g);
@@ -164,7 +164,8 @@ DHMethods::~DHMethods() {
     }
 }
 
-int32_t DHMethods::computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret) {
+int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes, 
+			   int32_t length, uint8_t *secret) {
     
     int32_t result;
 

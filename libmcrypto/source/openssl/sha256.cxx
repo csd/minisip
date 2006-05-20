@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2006 Zachary T Welch
-
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -17,22 +17,29 @@
 */
 
 /*
- * Authors: Zachary T Welch <zach-minisip@splitstring.com>
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
  *	    Werner Dittmann <Werner.Dittmann@t-online.de>
- */
+*/
 
-#ifndef MLIBMCRYPTO_DH_H
-#define MLIBMCRYPTO_DH_H
+#include<config.h>
 
-// XXX: replace this forward compatibility layer with a Bridge interface
-#define HAVE_OPENSSL
+#include <libmcrypto/sha256.h>
 
-#include <config.h>
-#ifdef HAVE_OPENSSL
-#include<libmcrypto/openssl/DH.h>
-#endif // HAVE_OPENSSL
-#ifdef HAVE_GNUTLS
-#error "gnutls aes support is not complete"
-#endif // HAVE_GNUTLS
+void sha256(unsigned char *data, unsigned int data_length,
+	    unsigned char *digest ){
+	SHA256(data, data_length, digest);
+}
 
-#endif	// MLIBMCRYPTO_DH_H
+void sha256(unsigned char * data_chunks[],
+	    unsigned int data_chunck_length[],
+	    unsigned char *digest){
+	SHA256_CTX ctx;
+	SHA256_Init( &ctx);
+	while(*data_chunks) {
+		SHA256_Update(&ctx, *data_chunks, *data_chunck_length);
+		data_chunks ++;
+		data_chunck_length ++;
+	}
+	SHA256_Final(digest, &ctx);
+}

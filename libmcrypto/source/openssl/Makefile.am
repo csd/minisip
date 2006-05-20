@@ -4,7 +4,7 @@ noinst_LTLIBRARIES = \
 OTHER_FILES =
 
 if HAVE_EVP_SHA256
-OTHER_FILES += hmac256.cxx
+OTHER_FILES += hmac256.cxx sha256.cxx
 endif
 
 libmcopenssl_la_CPPFLAGS = $(MINISIP_CFLAGS)
@@ -12,7 +12,7 @@ libmcopenssl_la_SOURCES = \
 		init.cxx \
 		aes.cxx \
 		cert.cxx \
-		DH.cxx \
+		ZrtpDH.cxx \
 		hmac.cxx \
 		$(OTHER_FILES)
 

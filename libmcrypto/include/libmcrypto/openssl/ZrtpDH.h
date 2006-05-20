@@ -16,12 +16,12 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* 
+/*
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#ifndef _DH_H__
-#define _DH_H__
+#ifndef _ZRTPDH_H__
+#define _ZRTPDH_H__
 
 #include <libmcrypto/config.h>
 
@@ -32,20 +32,27 @@
 #include <openssl/rand.h>
 #include <openssl/dh.h>
 
-class LIBMCRYPTO_API DHMethods {
+/**
+ * Implementation of Diffie-Helman for ZRTP
+ *
+ * This class uses the OpenSSL fucntions to generate and compute the
+ * Diffie-Helman public and secret data and the shared secret. According to
+ * the ZRTP specification we use the MODP groups as defined by RFC3526 for
+ * length 3072 and 4096.
+ */
+class LIBMCRYPTO_API ZrtpDH {
     
 private:
     DH *ctx;
     
 public:
-    DHMethods(int32_t pkLength);
-    ~DHMethods();
+    ZrtpDH(int32_t pkLength);
+    ~ZrtpDH();
 
-    int32_t generateKey()                    { return DH_generate_key(ctx); };
-    int32_t getPubKeySize()                  { return BN_num_bytes((ctx->pub_key)); };
-    int32_t getPubKeyBytes(uint8_t *buffer)  { return BN_bn2bin(ctx->pub_key, buffer); };
-
+    int32_t generateKey()                { return DH_generate_key(ctx); };
+    int32_t getPubKeySize()              { return BN_num_bytes((ctx->pub_key)); };
+    int32_t getPubKeyBytes(uint8_t *buf) { return BN_bn2bin(ctx->pub_key, buf); };
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);
 };
 
-#endif // DH_H__
+#endif // ZRTPDH_H
