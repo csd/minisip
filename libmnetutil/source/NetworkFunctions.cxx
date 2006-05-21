@@ -167,8 +167,10 @@ static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 		ipv6 = true;
 	}
 #endif
-	else
-		throw UnknownAddressFamily(sa->sa_family);
+	else{
+		// Unsupported address family
+		return false;
+	}
 	
 	if( getnameinfo(sa, len, addr, sizeof(addr),
 			NULL, 0, NI_NUMERICHOST) ){
@@ -231,12 +233,12 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 		if( !sa_get_addr( cur->ifa_addr, isIpv6, addr) )
 			continue;
 
-#ifndef HAVE_IPV6
 		if( isIpv6 ){
+			// getInterfaceIPStr doesn't support IPv6 addresses
 			cerr << "Skipping IPV6 interface: " << addr << endl;
 			continue;
 		}
-#endif
+
 		ret = addr;
 		break;
 	}
