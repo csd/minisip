@@ -25,7 +25,7 @@
 #include<config.h>
 
 #include <openssl/hmac.h>
-#include <libmcrypto/hmac.h>
+#include <libmcrypto/hmac256.h>
 
 void hmac_sha256( unsigned char * key, unsigned int key_length,
 		unsigned char * data, unsigned int data_length,

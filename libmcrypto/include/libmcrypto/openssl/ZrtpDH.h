@@ -53,6 +53,7 @@ public:
     int32_t getPubKeySize()              { return BN_num_bytes((ctx->pub_key)); };
     int32_t getPubKeyBytes(uint8_t *buf) { return BN_bn2bin(ctx->pub_key, buf); };
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);
+    void random(uint8_t *buf, int32_t length) { RAND_bytes(buf, length); };
 };
 
 #endif // ZRTPDH_H
