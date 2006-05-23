@@ -285,6 +285,7 @@ bool SipDialogState::updateState( MRef<SipRequest*> inv ) {
 	//the dialog ... we repeat, just in case
 	callId = inv->getCallId(); 
 	secure = false; //FIXME: check if secure call ...	
+	isEstablished = true;
 	return true;
 }
 
