@@ -57,6 +57,7 @@ ${command} "${prefix}libmcrypto${postfix}"
 ${command} "${prefix}libmikey${postfix}"
 ${command} "${prefix}libmnetutil${postfix}"
 ${command} "${prefix}libmsip${postfix}"
+${command} "${prefix}libmstun${postfix}"
 ${command} "${prefix}libminisip${postfix}"
 !macroend
 
@@ -250,6 +251,7 @@ RMDir /r "$INSTDIR\include\libmcrypto"
 RMDir /r "$INSTDIR\include\libmikey"
 RMDir /r "$INSTDIR\include\libmnetutil"
 RMDir /r "$INSTDIR\include\libmsip"
+RMDir /r "$INSTDIR\include\libmstun"
 RMDir /r "$INSTDIR\include\libminisip"
 
 ; Delete examples
