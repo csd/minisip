@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004, 2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -53,6 +54,7 @@
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/contactdb/ContactDb.h>
 #include<libmsip/SipCommandString.h>
+#include<gtkmm/aboutdialog.h>
 
 
 #ifdef HILDON_SUPPORT
@@ -84,6 +86,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	Gtk::MenuItem * callMenu;
 	Gtk::MenuItem * conferenceMenu;
 	Gtk::MenuItem * imMenu;
+	Gtk::MenuItem * aboutMenu;
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 #ifndef OLDLIBGLADEMM
 	Gtk::Expander * dtmfExpander;
@@ -121,6 +124,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	refXml->get_widget( "callMenu", callMenu );
 	refXml->get_widget( "conferenceMenu", conferenceMenu );
 	refXml->get_widget( "imMenu", imMenu );
+	refXml->get_widget( "aboutMenu", aboutMenu );
 
 #ifndef OLDLIBGLADEMM
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
@@ -253,6 +257,11 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	imButton->signal_clicked().connect( SLOT( *this, &MainWindow::imClick ) );
 	
 	imMenu->signal_activate().connect( SLOT( *this, &MainWindow::imClick ) );
+#ifdef HAVE_LIBGLADEMM_2_6
+	aboutMenu->signal_activate().connect( SLOT( *this, &MainWindow::aboutClick ) );
+#else
+	aboutMenu->set_sensitive( false );
+#endif
 	
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, certificateDialog );
@@ -809,6 +818,24 @@ void MainWindow::im( string uri, string message ){
 	}
 }
 
+void MainWindow::aboutClick( ) {
+#ifdef HAVE_LIBGLADEMM_2_6
+	Gtk::AboutDialog about;
+
+	about.set_name("minisip");
+	about.set_comments("Minisip SIP User Agent");
+	about.set_version(VERSION);
+	about.set_website("http://www.minisip.org/");
+	about.set_copyright("Copyright (c) 2004-2006 The Minisip developer team");
+	about.set_logo( icon );
+
+	//about.set_license("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.");
+	//about.set_authors();
+
+	about.run();
+#endif
+}
+
 bool MainWindow::phoneSelect( const Glib::RefPtr<Gtk::TreeModel>& model,
                   const Gtk::TreeModel::Path& path, bool ){
 	
@@ -1031,6 +1058,13 @@ void MainWindow::registerIcons(){
 	factory->add_default();
 	delete iconSet;
 	delete iconSource;
+
+	icon = Gdk::Pixbuf::create_from_file( getDataFileName( "minisip.png" ) );
+#ifndef WIN32
+	// Use icon embedded in exe file instead since minisip.png
+	// is displayed with black background
+	Gtk::Window::set_default_icon( icon );
+#endif
 }
 
 void MainWindow::dtmfPressed( uint8_t symbol ){

@@ -137,15 +137,23 @@ AC_ARG_ENABLE(gtk,
 
 if test "x${enable_gtk}" != "xno"
 	then
-		PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
-			[AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])],
-			[PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0], 
-				[AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
-					AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])
-				],
-				[AC_MSG_ERROR([Could not find the glademm-2.0 library])]
+		PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4 >= 2.6],
+			[AC_DEFINE(HAVE_LIBGLADEMM_2_6, [1], [Define to 1 if you have libglademm version 2.6 or newer])
+			have_glademm=yes],
+			[PKG_CHECK_MODULES(GLADEMM, [libglademm-2.4], 
+				[have_glademm=yes],
+				[PKG_CHECK_MODULES(GLADEMM, [libglademm-2.0],
+					[AC_DEFINE(OLDLIBGLADEMM, [], [Use libglademm-2.0])
+					have_glademm=yes],
+					[AC_MSG_ERROR([Could not find the glademm-2.0 library])]
+				)]
 			)]
 		)
+
+		if test x${have_glademm} = xyes; then
+			AC_DEFINE(GTK_GUI, [], [Use the GTK GUI])
+		fi
+
 		cf_save_CPPFLAGS="${CPPFLAGS}"
 		CPPFLAGS="${CPPFLAGS} ${GLADEMM_CFLAGS}"
 		AC_CHECK_HEADERS([glibconfig.h])

@@ -124,7 +124,7 @@ File /nonfatal ${MINISIPDIR}/lib/libminisip/plugins/*.la
 SetOutPath $INSTDIR\bin\share
 File ${MINISIPDIR}/share/minisip/insecure.png
 File ${MINISIPDIR}/share/minisip/minisip.glade
-;File ${MINISIPDIR}/share/minisip/minisip.png
+File ${MINISIPDIR}/share/minisip/minisip.png
 File ${MINISIPDIR}/share/minisip/noplay.png
 File ${MINISIPDIR}/share/minisip/norecord.png
 File ${MINISIPDIR}/share/minisip/play.png
@@ -232,7 +232,7 @@ Delete "$INSTDIR\bin\plugins\*.la"
 ; Delete bitmaps
 Delete "$INSTDIR\bin\share\insecure.png"
 Delete "$INSTDIR\bin\share\minisip.glade"
-;Delete "$INSTDIR\bin\share\minisip.png"
+Delete "$INSTDIR\bin\share\minisip.png"
 Delete "$INSTDIR\bin\share\noplay.png"
 Delete "$INSTDIR\bin\share\norecord.png"
 Delete "$INSTDIR\bin\share\play.png"

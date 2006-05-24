@@ -138,6 +138,8 @@ class MainWindow : public GtkMainUI,
 		void imClick( );
 		void im(  std::string uri="",  std::string message="" );
 		
+		void aboutClick();
+
 		void inviteFromTreeview( const Gtk::TreeModel::Path&,
 				         Gtk::TreeViewColumn * );
 		void gotCommand();
@@ -191,6 +193,7 @@ class MainWindow : public GtkMainUI,
 
 		Glib::RefPtr<AccountsList> accountsList;
 		Glib::RefPtr<Gtk::IconFactory> factory;
+		Glib::RefPtr<Gdk::Pixbuf> icon;
 
 		/**
 		* This function is connected to the window close icon

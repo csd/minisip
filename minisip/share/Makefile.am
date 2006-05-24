@@ -1,6 +1,7 @@
 dist_pkgdata_DATA = \
 	insecure.png \
 	minisip.glade \
+	minisip.png \
 	noplay.png \
 	norecord.png \
 	play.png \

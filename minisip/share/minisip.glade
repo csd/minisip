@@ -2328,6 +2328,28 @@
 	      </child>
 	    </widget>
 	  </child>
+
+	  <child>
+	    <widget class="GtkMenuItem" id="helpMenu">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Help</property>
+	      <property name="use_underline">True</property>
+
+	      <child>
+		<widget class="GtkMenu" id="helpMenu_menu">
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="aboutMenu">
+		      <property name="visible">True</property>
+		      <property name="label">gtk-about</property>
+		      <property name="use_stock">True</property>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
