@@ -38,17 +38,17 @@ static std::list<std::string> pluginList;
 static int initialized;
 
 
-extern "C"
+extern "C" LIBMINISIP_API
 std::list<std::string> *mportaudio_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
-		pluginList.push_back("mportaudio_LTX_getPortAudioPlugin");
+		pluginList.push_back("getPortAudioPlugin");
 		initialized = true;
 	}
 
 	return &pluginList;
 }
 
-extern "C"
+extern "C" LIBMINISIP_API
 MRef<MPlugin *> mportaudio_LTX_getPortAudioPlugin( MRef<Library*> lib ){
 	return new PortAudioDriver( lib );
 }
