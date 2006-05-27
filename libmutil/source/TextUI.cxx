@@ -64,7 +64,7 @@ const int TextUI::blue=3;
 const int TextUI::green=4;
 
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(WIN32)
 char *termCodes[]= { "", "", "", "", "" };
 #else
 char *termCodes[]= { "\033[m", "\033[2m\033[1m", "\033[31m", "\033[34m", "\033[42m" };
