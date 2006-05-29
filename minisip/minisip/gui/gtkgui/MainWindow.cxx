@@ -54,8 +54,10 @@
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/contactdb/ContactDb.h>
 #include<libmsip/SipCommandString.h>
-#include<gtkmm/aboutdialog.h>
 
+#ifdef HAVE_LIBGLADEMM_2_6
+#	include<gtkmm/aboutdialog.h>
+#endif
 
 #ifdef HILDON_SUPPORT
 #	include<hildon-lgpl/hildon-widgets/hildon-app.h>
