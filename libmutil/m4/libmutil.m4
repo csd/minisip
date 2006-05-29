@@ -49,6 +49,7 @@ esac
 AM_CONDITIONAL(OS_WIN, test x$os_win = xyes)
 
 dnl Checks for programs.
+AC_C_BIGENDIAN
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -61,7 +62,6 @@ if test x$os_win = xyes; then
         AC_MSG_ERROR([Could not find windres in your PATH.])
     fi
 fi
-AC_C_BIGENDIAN
 AC_LANG(C++)
 dnl For now, STL is made mandatory
 dnl AC_ARG_ENABLE(stl,
