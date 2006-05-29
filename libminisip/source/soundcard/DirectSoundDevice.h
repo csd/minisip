@@ -34,7 +34,7 @@
 
 //#define NUM_PLAY_NOTIFICATIONS  16
 
-class LIBMINISIP_API DirectSoundDevice : public SoundDevice{
+class DirectSoundDevice : public SoundDevice{
 	public:
 		DirectSoundDevice( std::string fileName );
 

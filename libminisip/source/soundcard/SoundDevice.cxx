@@ -37,10 +37,6 @@
 #	include<libminisip/soundcard/AlsaSoundDevice.h>
 #endif
 
-#ifdef DSOUND
-#	include<libminisip/soundcard/DirectSoundDevice.h>
-#endif
-
 #ifdef WAVE_SOUND
 #	include<libminisip/soundcard/WaveSoundDevice.h>
 #endif
@@ -86,12 +82,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	}
 #endif
 	
-#ifdef DSOUND
-	if( devideId.substr( 0, 7 ) == "dsound:" ){
-		return new DirectSoundDevice( devideId.substr( 7, string::npos ) );
-	}
-#endif
-
 #ifdef WAVE_SOUND
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );

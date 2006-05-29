@@ -201,7 +201,10 @@ BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
 ALSA_SRC =	source/soundcard/AlsaCard.cxx \
 		source/soundcard/AlsaSoundDevice.cxx 
 
-DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx 
+DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx  \
+		source/soundcard/DirectSoundDevice.h \
+		source/soundcard/DirectSoundDriver.cxx \
+		source/soundcard/DirectSoundDriver.h
 
 PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx \
 			source/soundcard/PortAudioDriver.cxx \
@@ -220,8 +223,10 @@ if HAVE_LIBASOUND
 endif HAVE_LIBASOUND
 
 if DIRECT_SOUND
-        libsoundcard_src += $(DSOUND_SRC)
-        libsoundcard_libadd += $(DSOUND_LIBS)
+plugins_LTLIBRARIES += mdsound.la
+mdsound_la_LDFLAGS = $(plugins_LDFLAGS)
+mdsound_la_SOURCES = $(DSOUND_SRC)
+mdsound_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(DSOUND_LIBS)
 endif DIRECT_SOUND
 
 
