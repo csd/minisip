@@ -1,0 +1,59 @@
+--- libtool.1.5.6	2006-05-29 01:57:22.898327184 +0200
++++ libtool	2006-05-29 01:57:22.871331288 +0200
+@@ -386,7 +386,7 @@
+ 
+ PROGRAM=ltmain.sh
+ PACKAGE=libtool
+-VERSION=1.5.6
++VERSION=1.5.6.1
+ TIMESTAMP=" (1.1220.2.95 2004/04/11 05:50:42) Debian$Rev: 224 $"
+ 
+ 
+--- libtoolize.1.5.6	2006-05-29 01:57:22.899327032 +0200
++++ libtoolize	2006-05-29 01:57:22.898327184 +0200
+@@ -30,7 +30,7 @@
+ # Constants.
+ PROGRAM=libtoolize
+ PACKAGE=libtool
+-VERSION=1.5.6
++VERSION=1.5.6.1
+ 
+ # Directory names.
+ prefix=/usr
+--- ltmain.sh.1.5.6	2006-05-29 01:57:39.216846392 +0200
++++ ltmain.sh	2006-05-29 01:57:39.128859768 +0200
+@@ -43,7 +43,7 @@
+ 
+ PROGRAM=ltmain.sh
+ PACKAGE=libtool
+-VERSION=1.5.6
++VERSION=1.5.6.1
+ TIMESTAMP=" (1.1220.2.95 2004/04/11 05:50:42) Debian$Rev: 224 $"
+ 
+ 
+@@ -2150,10 +2150,21 @@
+ 	    absdir="$libdir"
+ 	  fi
+ 	else
+-	  dir="$ladir/$objdir"
+-	  absdir="$abs_ladir/$objdir"
+-	  # Remove this search path later
+-	  notinst_path="$notinst_path $abs_ladir"
++#	  dir="$ladir/$objdir"
++#	  absdir="$abs_ladir/$objdir"
++#	  # Remove this search path later
++#	  notinst_path="$notinst_path $abs_ladir"
++         if test ! -f "$ladir/$objdir/$linklib" && test -f "$abs_ladir/$linklib"; then
++           dir="$ladir"
++           absdir="$abs_ladir"
++           # Remove this search path later
++           notinst_path="$notinst_path $abs_ladir"
++         else
++           dir="$ladir/$objdir"
++           absdir="$abs_ladir/$objdir"
++           # Remove this search path later
++           notinst_path="$notinst_path $abs_ladir"
++         fi
+ 	fi # $installed = yes
+ 	name=`$echo "X$laname" | $Xsed -e 's/\.la$//' -e 's/^lib//'`
+ 

@@ -85,8 +85,20 @@ AC_DEFUN([AC_MINISIP_CHECK_LIBTOOL],[
   # check for libtool >= 1.5.7
   minisip_ltvers="`libtoolize --version 2>&1 | \
 	perl -e '$x = scalar(<STDIN>); $x =~ /1\.5\.(\d+)/ && print $[]1'`"
+  minisip_ltvers_patched="`libtoolize --version 2>&1| \
+	perl -e '$y = scalar(<STDIN>); $y =~ /1\.5\.6\.(\d+)/ && print $[]1'`"
+
+  #AC_MSG_WARN([  DEBUG!!!! minisip_ltvers=$minisip_ltvers ])
+  #AC_MSG_WARN([  DEBUG!!!! minisip_ltvers_patched=$minisip_ltvers_patched ])
+  
+  #if >= 1.5.7, or a 1.5.6.1 version (patched), then we won't have problems ...
   if test "${minisip_ltvers}" && test ${minisip_ltvers} -gt 6; then
     minisip_has_lt157=yes
+  else
+	if test "${minisip_ltvers_patched}" && test ${minisip_ltvers_patched} -gt 0; then
+		AC_MSG_WARN([ Detected patched libtool/ltmain.sh (1.5.6.1) ])
+		minisip_has_lt156_patched=yes
+  	fi
   fi
 ])
 # End of AC_MINISIP_CHECK_LIBTOOL
@@ -140,15 +152,21 @@ dnl               minisip `configure --with-m*` argument macros
 # AC_MINISIP_CHECK_WITH_ARG(MACRO, NAME, LIBS)
 # --------------------------------------------
 AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
+		#AC_MSG_WARN([  withval = ${withval} ])
 		if test "x${withval}" = "xyes"; then
 			# proceed with default installation
-		 	$1_NEEDS_PKG_CHECK=yes
+			$1_NEEDS_PKG_CHECK=yes
 		else
 			# work around for pre-1.5.7 libtool bug:
 			#  1.5.6 adds .libs by mistake, so only add that
 			#  portion of the path if we have 1.5.7 or later
 			#  After this, we also have to fix the library check.
 			if test -n "${minisip_has_lt157}"; then
+				#AC_MSG_WARN([  minisip_has_lt157 ])
+				minisip_lthack='/.libs'
+			fi
+			if test -n "${minisip_has_lt156_patched}"; then
+				#AC_MSG_WARN([  minisip_has_lt156_patched ])
 				minisip_lthack='/.libs'
 			fi
 			if test -d "${withval}/lib"; then
@@ -170,6 +188,7 @@ Unable to find the required libraries in any of the following locations:
 Maybe you forgot to compile $2 first?
 ])
 			fi
+			AC_MSG_WARN([  DEBUG_INFO: param1=$1, param2=$2, param3=$3; $1_LDFLAGS=${$1_LDFLAGS} ])
 			$1_CFLAGS="-I${withval}/include"
 			$1_LIBS="${$1_LDFLAGS} $3"
 			AC_SUBST($1_CFLAGS)
