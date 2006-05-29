@@ -35,7 +35,7 @@
 
 #include<vector>
 
-class SoundDeviceName{
+class LIBMINISIP_API SoundDeviceName{
 	public:
 		SoundDeviceName(): maxInputChannels(0), maxOutputChannels(0) {}
 
@@ -65,7 +65,7 @@ class SoundDeviceName{
 /**
  * Abstract base class of loadable sound driver plugins.
  */
-class SoundDriver: public MPlugin{
+class LIBMINISIP_API SoundDriver: public MPlugin{
 	public:
 		SoundDriver( std::string driverId, MRef<Library *> lib = NULL );
 		virtual ~SoundDriver();
