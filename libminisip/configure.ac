@@ -418,9 +418,10 @@ if test ! x$enable_dsound = xno; then
    AC_CHECK_LIB([dsound], [main],,[have_dsound=no])
    AC_CHECK_LIB([uuid], [GUID_NULL],,[have_dsound=no])
    AC_CHECK_LIB([dxguid], [IID_IDirectSoundNotify],,[have_dsound=no])
+   AC_CHECK_LIB([rpcrt4], [main],,[have_dsound=no])
    AC_CHECK_HEADERS([dsound.h],,[have_dsound=no])
    if test x$have_dsound = xyes; then
-      DSOUND_LIBS="-ldxguid -luuid -ldsound"
+      DSOUND_LIBS="-ldxguid -luuid -ldsound -lrpcrt4"
    elif test x$enable_dsound = xyes; then
       AC_MSG_ERROR([Could not find libraries required by DirectSound support])
    fi

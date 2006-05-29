@@ -62,10 +62,38 @@ MRef<SoundDevice*> DirectSoundDriver::createDevice( string deviceId ){
 	return new DirectSoundDevice( deviceId );
 }
 
+static BOOL CALLBACK dsEnumCallback(LPGUID guid, LPCSTR description,
+				    LPCSTR module, LPVOID context){
+	std::vector<SoundDeviceName> *names = (std::vector<SoundDeviceName>*)context;
+	string uuid;
+
+	if( guid ){
+		unsigned char *stringUuid = NULL;
+		if( UuidToString(guid, &stringUuid) != RPC_S_OK ){
+			return true;
+		}
+		uuid = string( (const char*) stringUuid );
+		RpcStringFree( &stringUuid );
+	}
+	else{
+		uuid = "0";
+	}
+
+	string name = DRIVER_PREFIX + ':' + uuid;
+	SoundDeviceName deviceName( name, description );
+
+	names->push_back( deviceName );
+	
+	return true;
+}
+
 std::vector<SoundDeviceName> DirectSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	cerr << "DirectSoundDriver::getDeviceNames unimplemented" << endl;
+	if( DirectSoundEnumerate( dsEnumCallback, &names ) != DS_OK ){
+		cerr << "DirectSoundDriver::getDeviceNames DirectSoundEnumerate failed" << endl;
+	}
+
 	return names;
 }
 

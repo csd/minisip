@@ -52,6 +52,20 @@ using namespace std;
  */
 DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 	HRESULT hr;
+	LPGUID inputDevice = NULL;
+	LPGUID outputDevice = NULL;
+	GUID deviceGuid;
+
+	if( device != "0" ){
+		unsigned char *stringUuid = (unsigned char*)device.c_str();
+		if( UuidFromString( stringUuid, &deviceGuid ) == RPC_S_OK ){
+			inputDevice = &deviceGuid;
+			outputDevice = &deviceGuid;
+		}
+		else{
+			cerr << "DirectSoundDevice: unknown device '" << device << "'" << endl;
+		}
+	}
 
 	// Capture buffer settings
 	WAVEFORMATEX inAudioFormat;
@@ -99,8 +113,8 @@ DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 	//The following requires Windows XP - if not supported, then
 	//DirectSoundCreate can be used (windows echo cancelling filter
 	//will not be possible).
-	if (FAILED(hr=DirectSoundFullDuplexCreate8(NULL,//&DSDEVID_DefaultVoiceCapture,
-					NULL,// &DSDEVID_DefaultVoicePlayback, 
+	if (FAILED(hr=DirectSoundFullDuplexCreate8(inputDevice,
+					outputDevice,
 					&dscbd,
 					&dsbd,
 					GetConsoleWindow(),
