@@ -14,15 +14,17 @@ AC_ARG_ENABLE(fast-aes,
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_OPENSSL], [
 dnl OpenSSL libcrypto
 dnl library check
-AC_CHECK_LIB([crypto], [SSLeay], [
-		OPENSSL_LIBS="-lcrypto"
+PKG_CHECK_MODULES(OPENSSL, [openssl])
+mcrypto_save_LIBS="${LIBS}"
+LIBS="${OPENSSL_LIBS} ${LIBS}"
+mcrypto_save_CPPFLAGS="${CPPFLAGS}"
+CPPFLAGS="${CPPFLAGS} ${OPENSSL_CFLAGS}"
+AC_SEARCH_LIBS([SSLeay], [], [
 		HAVE_OPENSSL=1
 	],[
 		AC_MSG_ERROR([Could not find libcrypto. Please install the corresponding package (provided by the openssl project).])
 	])
 
-mcrypto_save_LIBS="${LIBS}"
-LIBS="${OPENSSL_LIBS} ${LIBS}"
 
 dnl header check
 AC_CHECK_HEADER([openssl/crypto.h],[], [
@@ -41,9 +43,8 @@ AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
 dnl OpenSSL libssl
 dnl RedHat fix
 AC_DEFINE(OPENSSL_NO_KRB5, [], [No Kerberos in OpenSSL])
-AC_CHECK_LIB([ssl], [SSL_library_init],
+AC_SEARCH_LIBS([SSL_library_init], [],
        [
-               OPENSSL_LIBS="${OPENSSL_LIBS} -lssl"
        ],[
                AC_MSG_ERROR([Could not find libssl. Please install the correspo
 nding package.])
@@ -56,8 +57,8 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
 LIBS="${mcrypto_save_LIBS}"
+CPPFLAGS="${mcrypto_save_CPPFLAGS}"
 
-AC_SUBST(OPENSSL_LIBS)
 ])
 # End of AM_LIBMCRYPTO_CHECK_OPENSSL
 #
