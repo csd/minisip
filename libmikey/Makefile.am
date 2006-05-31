@@ -1,7 +1,7 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include m4 tests win32
-DIST_SUBDIRS = $(SUBDIRS) debian
+DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmikey.spec
 
 pkgconfig_DATA = libmikey.pc

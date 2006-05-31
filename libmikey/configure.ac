@@ -36,7 +36,6 @@ AC_HEADER_TIME
 AC_CONFIG_FILES([
 		Makefile 
 		libmikey.pc 
-		debian/Makefile 
 		include/Makefile 
 		m4/Makefile 
 		tests/Makefile
