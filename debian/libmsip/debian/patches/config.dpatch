@@ -1,0 +1,30 @@
+#! /bin/sh -e
+## config.dpatch by Ralf Treinen <treinen@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: replace all config.{guess,sub} by the vesion installed in
+## DP: /usr/share/misc
+
+if [ $# -lt 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+       -patch)	find . -name config.guess -o -name config.sub \
+	 		| tar cf debian/patched/config.guess+sub.tar -T -;
+		find . -name config.guess \
+			-exec ln -sf /usr/share/misc/config.guess '{}' \; ;
+		find . -name config.sub \
+			-exec ln -sf /usr/share/misc/config.sub '{}' \; ;;
+		
+       -unpatch) tar xf debian/patched/config.guess+sub.tar;;
+
+        *)
+                echo >&2 \
+		  "`basename $0`: script expects -patch|-unpatch as argument"
+                exit 1;;
+esac
+
+exit 0
+
+# arch-tag: 8a610a57-687b-4395-8ff2-79265c0a4eb3
