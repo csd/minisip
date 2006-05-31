@@ -1,7 +1,7 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include m4 win32
-DIST_SUBDIRS = $(SUBDIRS) debian
+DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmsip.spec
 
 pkgconfig_DATA = libmsip.pc

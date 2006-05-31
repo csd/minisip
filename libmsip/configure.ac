@@ -57,7 +57,6 @@ AC_HEADER_TIME
 AC_CONFIG_FILES([
 		Makefile 
 		libmsip.pc 
-		debian/Makefile 
 		include/Makefile 
 		m4/Makefile 
 		win32/Makefile 
