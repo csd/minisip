@@ -82,13 +82,14 @@ binary-arch: build install
 	dh_installchangelogs
 #ChangeLog
 	dh_installdocs
+#	dh_installexamples -plibmstun-dev $(CURDIR)/debian/tmp/usr/share/libmstun/examples/*
 	dh_install
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
-#	dh_makeshlibs -V 'libmcrypto0 (>= 0.3.1)'
+#	dh_makeshlibs -V 'libmstun0 (>= 0.5.0)'
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol

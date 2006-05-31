@@ -1,27 +1,30 @@
-Source: libmcrypto
+Source: libmstun
 Priority: optional
 Section: devel
 Maintainer: Minisip developer team <minisip-devel@minisip.org>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
-Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
+ pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1),
+ libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
-Package: libmcrypto0
+Package: libmstun0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: Minisip Cryptography Library - shared library
- The libmcrypto library provides cryptographic encryption and hashing
- interfaces that are leveraged by the Minisip application stack.
+Description: Minisip STUN Protocol Support Library - shared library
+ libmstun implements Simple Traversal of User Datagram Protocol (UDP)
+ Through Network Address Translators (NATs) (STUN), in a C++ library.
  .
- This package contains the libmcrypto0 runtime library.
+ This package contains the libmstun0 runtime library.
 
-Package: libmcrypto-dev
+Package: libmstun-dev
 Architecture: any
-Depends: libmcrypto0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
-Description: Minisip Cryptography Library - development files
- The libmcrypto library provides cryptographic encryption and hashing
- interfaces that are leveraged by the Minisip application stack.
+Depends: libmstun0 (= ${Source-Version}), libmutil-dev (>= 0.3.1),
+ libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
+Description: Minisip STUN Protocol Support Library - development files
+ libmstun implements Simple Traversal of User Datagram Protocol (UDP)
+ Through Network Address Translators (NATs) (STUN), in a C++ library.
  .
  This package contains the header files and static library needed to
- compile applications that use libmcrypto0.
+ compile applications that use libmstun0.

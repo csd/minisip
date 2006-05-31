@@ -1,5 +1,5 @@
-libmcrypto (0.3.1-1~2) UNRELEASED; urgency=low
+libmstun (0.5.0-1~1) UNRELEASED; urgency=low
 
   * Initial Release.
-  
- -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 17:52:49 +0200
+
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 22:21:08 +0200
