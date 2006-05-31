@@ -3,7 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
-Build-Depends: debhelper (>= 4.0.0), libssl-dev (>= 0.9.7)
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev
 Standards-Version: 3.6.1
 
 Package: libmutil0
@@ -19,7 +19,7 @@ Description: different utilities classes for portable C++ development
 
 Package: libmutil-dev
 Architecture: any
-Depends: libmutil0 (= ${Source-Version}), libssl-dev (>= 0.9.7)
+Depends: libmutil0 (= ${Source-Version})
 Description: different utilities classes for portable C++ development
  libmutil contains different classes useful for C++ programming, mostly
  string handling, cryptography and portable thread control. It is used

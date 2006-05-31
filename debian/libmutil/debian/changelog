@@ -1,14 +1,21 @@
-libmutil (0.3.1-3~2) UNRELEASED; urgency=low
+libmutil (0.3.1-3~6) UNRELEASED; urgency=low
 
-  * UNRELEASED
   [ Mikael Magnusson]
   * Add myself to uploaders.
   * Set source section to "devel".
   * Fix old-fsf-address-in-copyright-file lintian warning.
   * Fix copyright-lists-upstream-authors-with-dh_make-boilerplate lintian
     warning.
-
- -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 11:46:47 +0200
+  * Remove libssl-dev dependencies (moved to libmcrypto).
+  * Avoid using --host to configure unless cross-compiling, following
+    autotools-dev recommendation.
+  * Use config.dpatch to replace all config.{sub,guess} with links to
+    /usr/share/misc/config.{sub,guess} in autotools-dev.
+  * Add CXXFLAGS to configure arguments.
+  * Remove empty upstream changelog.
+  * Include examples in libmutil-dev.
+  
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 17:52:49 +0200
 
 libmutil (0.3.1-2) unstable; urgency=low
 
