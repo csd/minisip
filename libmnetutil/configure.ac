@@ -52,7 +52,6 @@ AC_HEADER_TIME
 AC_CONFIG_FILES([
 		Makefile 
 		libmnetutil.pc 
-		debian/Makefile 
 		examples/Makefile
 		include/Makefile 
 		m4/Makefile 
