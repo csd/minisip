@@ -1,4 +1,4 @@
-libmutil (0.3.1-3~6) UNRELEASED; urgency=low
+libmutil (0.3.1-3~7) UNRELEASED; urgency=low
 
   [ Mikael Magnusson]
   * Add myself to uploaders.
@@ -14,8 +14,9 @@ libmutil (0.3.1-3~6) UNRELEASED; urgency=low
   * Add CXXFLAGS to configure arguments.
   * Remove empty upstream changelog.
   * Include examples in libmutil-dev.
+  * Include aclocal macro file(s).
   
- -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 17:52:49 +0200
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 19:06:24 +0200
 
 libmutil (0.3.1-2) unstable; urgency=low
 
