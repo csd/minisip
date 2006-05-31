@@ -1,3 +1,22 @@
+libmikey (0.4.1-3~1) UNRELEASED; urgency=low
+
+  [ Mikael Magnusson ]
+  * Add myself to uploaders.
+  * Set source section to "devel".
+  * Fix old-fsf-address-in-copyright-file lintian warning.
+  * Fix copyright-lists-upstream-authors-with-dh_make-boilerplate lintian
+    warning.
+  * Avoid using --host to configure unless cross-compiling, following
+    autotools-dev recommendation.
+  * Use config.dpatch to replace all config.{sub,guess} with links to
+    /usr/share/misc/config.{sub,guess} in autotools-dev.
+  * Add CXXFLAGS to configure arguments.
+  * Remove empty upstream changelog.
+  * Include aclocal macro file(s).
+  * Add libmcrypto dependencies.
+
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 21:20:14 +0200
+
 libmikey (0.4.1-2) unstable; urgency=low
 
   * Create proper packages, on kind suggestion from Filip Van Raemdonck
