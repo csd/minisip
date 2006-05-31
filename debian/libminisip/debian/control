@@ -1,27 +1,34 @@
-Source: libmcrypto
+Source: libminisip
 Priority: optional
 Section: devel
 Maintainer: Minisip developer team <minisip-devel@minisip.org>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
-Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
+ pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1),
+ libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1), libmstun-dev
+ (>= 0.5.0), libmikey-dev (>= 0.4.1), libgconf2-dev, libglib2.0-dev,
+ libsamplerate0-dev, libspeex-dev, libgsm1-dev, libavcodeccvs51-dev |
+ libavcodec-dev, zlib1g-dev, libdc1394-13-dev, libraw1394-dev,
+ libxv-dev, libsdl1.2-dev, libasound2-dev
 Standards-Version: 3.6.1
 
-Package: libmcrypto0
+Package: libminisip0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: Minisip Cryptography Library - shared library
- The libmcrypto library provides cryptographic encryption and hashing
- interfaces that are leveraged by the Minisip application stack.
+Description: Minisip SIP User Agent library - shared library
+ Minisip SIP User Agent library
  .
- This package contains the libmcrypto0 runtime library.
+ This package contains the libminisip0 runtime library.
 
-Package: libmcrypto-dev
+Package: libminisip-dev
 Architecture: any
-Depends: libmcrypto0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
-Description: Minisip Cryptography Library - development files
- The libmcrypto library provides cryptographic encryption and hashing
- interfaces that are leveraged by the Minisip application stack.
+Depends: libminisip0 (= ${Source-Version}), libssl-dev (>= 0.9.7),
+ libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1), libmnetutil-dev
+ (>= 0.3.1), libmstun-dev (>= 0.5.0), libmikey-dev (>= 0.4.1),
+ libasound2-dev
+Description: Minisip SIP User Agent library - development files
+ Minisip SIP User Agent library
  .
  This package contains the header files and static library needed to
- compile applications that use libmcrypto0.
+ compile applications that use libminisip0.
