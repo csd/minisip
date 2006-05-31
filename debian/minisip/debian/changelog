@@ -1,0 +1,42 @@
+minisip (0.7.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Fri, 18 Mar 2005 10:25:03 +0100
+
+minisip (0.7.0-3) unstable; urgency=low
+
+  * Link against libglademm-2.4, not 2.0
+
+ -- Johan Bilien <jobi@bilien.org>  Tue, 22 Feb 2005 14:53:41 +0100
+
+minisip (0.7.0-2) unstable; urgency=low
+
+  * Fixed a wrong dependency on libglademm.
+
+ -- Johan Bilien <jobi@bilien.org>  Mon, 21 Feb 2005 23:20:38 +0100
+
+minisip (0.7.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Thu, 17 Feb 2005 14:26:18 +0100
+
+minisip (0.6.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:48:16 +0100
+
+minisip (0.6.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Tue, 19 Oct 2004 00:30:12 +0200
+
+minisip (0.6-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Wed, 13 Oct 2004 14:32:03 +0200
+

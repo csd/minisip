@@ -1,0 +1,15 @@
+Source: minisip
+Section: unknown
+Priority: optional
+Maintainer: Johan Bilien <jobi@via.ecp.fr>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.1
+
+Package: minisip
+Architecture: any
+Depends: maemo
+Description: minisip is a SIP user agent, with security enhancements
+ minisip is a soft telephone which uses the SIP protocol. It provides
+ additional security, such as encryption and authentication, by using
+ the SRTP (RFC3711) and MIKEY (RFC 3830) protocols. It uses GTK+ for
+ the graphical interface.
