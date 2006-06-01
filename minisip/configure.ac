@@ -8,7 +8,7 @@ m4_MINISIP_PACKAGE_CONTACT([Erik Eliasson], [eliasson@imit.kth.se])
 
 AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_MACRO_DIR(m4)
+dnl AC_CONFIG_MACRO_DIR(m4)
 AM_INIT_AUTOMAKE(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(include/compilation_config.h)
@@ -318,6 +318,5 @@ AC_CONFIG_FILES([minisip/Makefile
 			minisip/win32/Makefile
 			minisip/win32/minisip-res.rc
 			share/Makefile
-			debian/Makefile
 			Makefile])
 AC_OUTPUT
