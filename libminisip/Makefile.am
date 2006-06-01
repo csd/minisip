@@ -247,7 +247,7 @@ libspaudio_src = source/spaudio/SpAudio.cxx
 # Video plugin
 #
 if VIDEO_SUPPORT
-pkglib_LTLIBRARIES = libminisip_video.la
+lib_LTLIBRARIES += libminisip_video.la
 libminisip_video_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)	\
 		$(FFMPEG_CFLAGS)
 libminisip_video_la_LDFLAGS = $(AVCODEC_LDFLAGS) 
