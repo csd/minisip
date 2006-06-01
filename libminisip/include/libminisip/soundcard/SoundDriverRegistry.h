@@ -35,7 +35,7 @@
 /**
  * Registry of sound driver plugins.
  */
-class SoundDriverRegistry: public MPluginRegistry, public MSingleton<SoundDriverRegistry>{
+class LIBMINISIP_API SoundDriverRegistry: public MPluginRegistry, public MSingleton<SoundDriverRegistry>{
 	public:
 		virtual std::string getPluginType(){ return "SoundDriver"; }
 		const std::vector<MRef<SoundDriver*> > &getDrivers() const;
