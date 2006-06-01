@@ -1,6 +1,6 @@
-libmutil (0.3.1-3~7) UNRELEASED; urgency=low
+libmutil (0.3.1-3~8) unstable; urgency=low
 
-  [ Mikael Magnusson]
+  [ Mikael Magnusson ]
   * Add myself to uploaders.
   * Set source section to "devel".
   * Fix old-fsf-address-in-copyright-file lintian warning.
@@ -15,8 +15,9 @@ libmutil (0.3.1-3~7) UNRELEASED; urgency=low
   * Remove empty upstream changelog.
   * Include examples in libmutil-dev.
   * Include aclocal macro file(s).
+  * Change to correct license (LGPL) in the copyright file.
   
- -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 19:06:24 +0200
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Thu,  1 Jun 2006 20:38:13 +0200
 
 libmutil (0.3.1-2) unstable; urgency=low
 
