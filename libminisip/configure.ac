@@ -154,16 +154,23 @@ AC_ARG_ENABLE(portaudio,
 
 if test ! x$enable_portaudio = xno; then
    have_portaudio=yes
-   AC_CHECK_HEADERS([portaudio.h],,have_portaudio=no)
-   AC_CHECK_LIB([portaudio],[Pa_GetDefaultOutputDevice],[PORTAUDIO_LIBS=-lportaudio],have_portaudio=no)
+   PKG_CHECK_MODULES(PORTAUDIO,[portaudio-2.0],[
+      CPPFLAGS_SAVE="${CPPFLAGS}"
+      CPPFLAGS="${CPPFLAGS} ${PORTAUDIO_CFLAGS}"
+      AC_CHECK_HEADERS([portaudio.h],[
+         LIBS_SAVE="${LIBS}"
+         LIBS="${PORTAUDIO_LIBS} ${LIBS}"
+         AC_SEARCH_LIBS([Pa_GetDefaultOutputDevice],[],[],[have_portaudio=no])
+         LIBS="${LIBS_SAVE}"
+      ],[have_portaudio=no])
+      CPPFLAGS="${CPPFLAGS_SAVE}"
+   ],[have_portaudio=no])
 
    if test x$have_portaudio = xyes; then
       AC_DEFINE(PORTAUDIO_SUPPORT, [1], [PortAudio V19 SoundDevice support.])
    elif test x$enable_portaudio = xyes; then
       AC_MSG_ERROR([Could not find PortAudio requirement(s).])
    fi
-
-   AC_SUBST(PORTAUDIO_LIBS)
 fi
 AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
 
