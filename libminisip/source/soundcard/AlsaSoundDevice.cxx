@@ -129,8 +129,8 @@ int AlsaSoundDevice::calculateAlsaParams( unsigned long &periodSizeMin,
 	unsigned long tmp;
 	uint32_t per;
 	unsigned long siz; 
-	for(  per = periodsMin; per<periodsMax; per++ ) {
-		for(  siz = periodSizeMin; siz < periodSizeMax; siz+=4 ) {
+	for(  per = periodsMin; per <= periodsMax; per++ ) {
+		for(  siz = periodSizeMin; siz <= periodSizeMax; siz+=4 ) {
 			tmp = per * siz;
 			if( tmp >= buffer ) {
 				if(  tmp > bufferMax ) { tmp = bufferMax; }
