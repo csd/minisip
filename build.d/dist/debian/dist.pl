@@ -3,8 +3,10 @@
 
 our $debian_tarballsdir = "$topdir/build/tarballs";
 our $debian_buildareadir = "$topdir/build/build-area";
-our $debian_dir = "$topdir/debian";
+our $debian_dir = "$confdir/dist/debian/src";
 our $svn_url_base = 'minisip+svn://svn.minisip.org/minisip';
+my $debian_tags_url = "${svn_url_base}/tags/build.d/dist/src/debian";
+my $upstream_tags_url = "${svn_url_base}/tags";
 
 #
 # debian_changes
@@ -59,9 +61,9 @@ NEED_TARBALLS
 
 	easy_mkdir($debian_buildareadir);
 
-	my $svn_override = "tagsUrl=${svn_url_base}/tags/debian/${pkg},upsTagUrl=${svn_url_base}/tags/${pkg},buildArea=$debian_buildareadir,origDir=$debian_tarballsdir";
+	my $svn_override = "tagsUrl=$debian_tags_url/${pkg},upsTagUrl=$upstream_tags_url/${pkg},buildArea=$debian_buildareadir,origDir=$debian_tarballsdir";
 
-	easy_chdir("$topdir/debian/$pkg");
+	easy_chdir("$debian_dir/$pkg");
 	act('debian: svn-buildpackage', qw( svn-buildpackage -us -uc -rfakeroot --svn-dont-clean --svn-ignore-new ), "--svn-override=${svn_override}" );
 
 	return debian_pkgfiles();
