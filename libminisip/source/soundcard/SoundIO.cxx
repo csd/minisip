@@ -94,7 +94,8 @@ using namespace std;
 
 SoundIO::SoundIO(
 		//string device, 
-		MRef<SoundDevice *> device,
+		MRef<SoundDevice *> inputDevice,
+		MRef<SoundDevice *> outputDevice,
 		string mixerType,
 		int nChannels, 
 		int32_t samplingRate, 
@@ -104,7 +105,8 @@ SoundIO::SoundIO(
 			format(format),
 			recording(false)
 {
-	soundDev = device;
+	soundDevIn = inputDevice;
+	soundDevOut = outputDevice;
 
 	setMixer( mixerType );
 	/* Create the SoundPlayerLoop */
@@ -123,31 +125,34 @@ SoundIO::~SoundIO(){
 
 
 void SoundIO::closeRecord(){
-	if( soundDev ){
-		soundDev->lockRead();
-		soundDev->closeRecord();
-		soundDev->unlockRead();
+	if( soundDevIn ){
+		soundDevIn->lockRead();
+		soundDevIn->closeRecord();
+		soundDevIn->unlockRead();
 	}
 }
 
 void SoundIO::closePlayback(){
-	if( soundDev ){
-		soundDev->lockWrite();
-		soundDev->closePlayback();
-		soundDev->unlockWrite();
+	if( soundDevOut ){
+		soundDevOut->lockWrite();
+		soundDevOut->closePlayback();
+		soundDevOut->unlockWrite();
 	}
 }
 
 void SoundIO::sync(){
-	if( soundDev ){
-		soundDev->sync();
+	if( soundDevOut ){
+		soundDevOut->sync();
+	}
+	if( soundDevIn ){
+		soundDevIn->sync();
 	}
 }
 
 void SoundIO::play_testtone( int secs ){
 	
-	int nSamples = secs * soundDev->getSamplingRate();
-	short *data = (short*)malloc( nSamples * soundDev->getSampleSize() * soundDev->getNChannelsPlay() );
+	int nSamples = secs * soundDevOut->getSamplingRate();
+	short *data = (short*)malloc( nSamples * soundDevOut->getSampleSize() * soundDevOut->getNChannelsPlay() );
 	for (int32_t i=0; i< nSamples; i++){
 		if (i%4==0)data[i]=0;
 		if (i%4==1)data[i]=10000;
@@ -161,23 +166,23 @@ void SoundIO::play_testtone( int secs ){
 }
 
 void SoundIO::openPlayback(){
-	if( soundDev ){
-		soundDev->lockWrite();
-		if( !soundDev->isOpenedPlayback() ){
-			soundDev->openPlayback( samplingRate, nChannels, format );
+	if( soundDevOut ){
+		soundDevOut->lockWrite();
+		if( !soundDevOut->isOpenedPlayback() ){
+			soundDevOut->openPlayback( samplingRate, nChannels, format );
 		}
-		soundDev->unlockWrite();
+		soundDevOut->unlockWrite();
 	}
 
 }
 
 void SoundIO::openRecord(){
-	if( soundDev ){
-		soundDev->lockRead();
-		if( !soundDev->isOpenedRecord() ){
-			soundDev->openRecord( samplingRate, nChannels, format );
+	if( soundDevIn ){
+		soundDevIn->lockRead();
+		if( !soundDevIn->isOpenedRecord() ){
+			soundDevIn->openRecord( samplingRate, nChannels, format );
 		}
-		soundDev->unlockRead();
+		soundDevIn->unlockRead();
 	}
 
 }
@@ -245,7 +250,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	while( true ){
 
 		if( ! soundcard->recording ){
-			if( soundcard->soundDev->isOpenedRecord() ){
+			if( soundcard->soundDevIn->isOpenedRecord() ){
 				soundcard->closeRecord();
 				if( tempBufferAllocated ){
 					delete [] tempBuffer;
@@ -259,29 +264,29 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			/* sleep until a recorder call back is added */
 			soundcard->recorderCond.wait();
 			
-			if( ! soundcard->soundDev->isOpenedRecord() ){
+			if( ! soundcard->soundDevIn->isOpenedRecord() ){
 				soundcard->openRecord();
-// 				printf( "SoundIO::recLoop: openrecord channels = %d\n", soundcard->soundDev->getNChannelsRecord() );
+// 				printf( "SoundIO::recLoop: openrecord channels = %d\n", soundcard->soundDevIn->getNChannelsRecord() );
 			}
 
 		}
 		
-		soundcard->soundDev->lockRead();
-		if( soundcard->soundDev->isOpenedRecord() ){
+		soundcard->soundDevIn->lockRead();
+		if( soundcard->soundDevIn->isOpenedRecord() ){
 				//soundcard->recorder_buffer_size is, for now, fixed to 960
 				//		(SNDCARD_FREQ * 20 / 1000 )
-				nread = soundcard->soundDev->read( 
+				nread = soundcard->soundDevIn->read( 
 						(byte_t *)buffers[i%2], 
 						soundcard->recorder_buffer_size );
 		}
 				
-		soundcard->soundDev->unlockRead();
+		soundcard->soundDevIn->unlockRead();
 
 		if( nread < 0 ){
 			continue;
 		}
 
-		if( soundcard->soundDev->getNChannelsRecord() > 1 ){
+		if( soundcard->soundDevIn->getNChannelsRecord() > 1 ){
 			if( !tempBuffer ){
 				tempBuffer = new short[soundcard->recorder_buffer_size];
 				#ifdef AEC_SUPPORT
@@ -291,9 +296,9 @@ void *SoundIO::recorderLoop(void *sc_arg){
 			}
 
 			for( int j = 0; j < soundcard->recorder_buffer_size; j++ ){
-				tempBuffer[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() ];
+				tempBuffer[j] = buffers[i%2][j * soundcard->soundDevIn->getNChannelsRecord() ];
 				#ifdef AEC_SUPPORT
-				tempBufferR[j] = buffers[i%2][j * soundcard->soundDev->getNChannelsRecord() + 1];	//hanning
+				tempBufferR[j] = buffers[i%2][j * soundcard->soundDevIn->getNChannelsRecord() + 1];	//hanning
 				#endif
 			}
 		}
@@ -406,11 +411,11 @@ void SoundIO::send_to_card(short *buf, int32_t n_samples){
 	byte_t *ptr = (byte_t *)buf;
 	int32_t nWritten;
 
-	soundDev->lockWrite();
-	if( soundDev->isOpenedPlayback() ){
-		nWritten = soundDev->write( ptr, n_samples );
+	soundDevOut->lockWrite();
+	if( soundDevOut->isOpenedPlayback() ){
+		nWritten = soundDevOut->write( ptr, n_samples );
 	}
-	soundDev->unlockWrite();
+	soundDevOut->unlockWrite();
 }
 
 
@@ -442,7 +447,7 @@ void *SoundIO::playerLoop(void *arg){
 
                 soundcard->queueLock.lock();
 		if( soundcard->sources.size() == 0 ){
-			if( soundcard->soundDev->isOpenedPlayback() ){
+			if( soundcard->soundDevOut->isOpenedPlayback() ){
 				soundcard->closePlayback();
 			}
 			
@@ -450,7 +455,7 @@ void *SoundIO::playerLoop(void *arg){
 			soundcard->sourceListCond.wait( soundcard->queueLock );
 
 			soundcard->openPlayback();
-			nChannels = soundcard->soundDev->getNChannelsPlay();
+			nChannels = soundcard->soundDevOut->getNChannelsPlay();
 			soundcard->mixer->init(nChannels);
 		}
 
@@ -458,7 +463,7 @@ void *SoundIO::playerLoop(void *arg){
  		
 		soundcard->queueLock.unlock();
 
-		if( soundcard->soundDev->isOpenedPlayback() ){
+		if( soundcard->soundDevOut->isOpenedPlayback() ){
 			soundcard->send_to_card(outbuf, soundcard->mixer->getFrameSize());
 		}
 		

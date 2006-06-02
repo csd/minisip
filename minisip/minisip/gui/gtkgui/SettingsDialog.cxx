@@ -331,7 +331,7 @@ void MediaSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	list<string>::iterator iC;
 	Gtk::TreeModel::iterator listIterator;
 	this->config = config;
-	soundEntry->set_text( config->soundDevice );
+	soundEntry->set_text( config->soundDeviceIn );
 #ifdef VIDEO_SUPPORT
 	videoEntry->set_text( config->videoDevice );
 #endif
@@ -395,7 +395,8 @@ void MediaSettings::moveCodec( int8_t upOrDown ){
 
 string MediaSettings::apply(){
 	Gtk::TreeModel::iterator iC;
-	config->soundDevice = soundEntry->get_text();
+	config->soundDeviceIn = soundEntry->get_text();
+	config->soundDeviceOut = soundEntry->get_text();
 	config->audioCodecs.clear();
 
 	for( iC = codecList->children().begin(); iC ; iC ++ ){

@@ -79,7 +79,8 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 //	use_gw_ip(false),
 //	doRegister(false),
 //	doRegisterPSTN(false),
-	soundDevice(""),
+	soundDeviceIn(""),
+	soundDeviceOut(""),
 	videoDevice(""),
 	usePSTNProxy(false),
 	tcp_server(false),
@@ -184,7 +185,10 @@ void SipSoftPhoneConfiguration::save(){
 		accountPath = "account[" + itoa( ++ii ) + "]/";
 	}
 	
-	backend->save( "sound_device", soundDevice );
+	// Save soundDeviceIn in sound_device to be backward compatible.
+	backend->save( "sound_device", soundDeviceIn );
+	backend->save( "sound_device_in", soundDeviceIn );
+	backend->save( "sound_device_out", soundDeviceOut );
 	
 // 	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" ); //not used anymore
 	
@@ -402,7 +406,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	tcp_server = backend->loadString("tcp_server", "yes") == "yes";
 	tls_server = backend->loadString("tls_server", "no") == "yes";
 
-	soundDevice =  backend->loadString("sound_device","");
+	string soundDevice = backend->loadString("sound_device","");
+	soundDeviceIn = backend->loadString("sound_device_in",soundDevice);
+	soundDeviceOut = backend->loadString("sound_device_out",soundDeviceIn);
 	
 	soundIOmixerType = backend->loadString("mixer_type", "spatial");
 // 	cerr << "sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;

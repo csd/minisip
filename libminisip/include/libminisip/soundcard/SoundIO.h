@@ -97,7 +97,8 @@ class LIBMINISIP_API SoundIO : public MObject{
 		 * 		bytes per sample, endiannes). See SoundDevice.h
 		 * 		for a definition of valid types.
 		 */
-		SoundIO(MRef<SoundDevice *>device, 
+		SoundIO(MRef<SoundDevice *> inputDevice, 
+			MRef<SoundDevice *> outputDevice,
 			 std::string mixerType,
                         int nChannels=2, 
                         int32_t speed=8000, 
@@ -178,8 +179,6 @@ class LIBMINISIP_API SoundIO : public MObject{
 		 
 		MRef<SoundSource *> getSoundSource(int32_t id);
 
-		std::string getDevice(){return soundDev?soundDev->dev:"";};
-
 		virtual std::string getMemObjectType(){return "SoundIO";};
 		
 		/**
@@ -244,7 +243,8 @@ class LIBMINISIP_API SoundIO : public MObject{
 
 		bool recording;
 
-		MRef<SoundDevice *> soundDev;
+		MRef<SoundDevice *> soundDevIn;
+		MRef<SoundDevice *> soundDevOut;
 		//AEC aec;
 
 };

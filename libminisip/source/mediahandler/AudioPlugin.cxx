@@ -59,14 +59,23 @@ AudioPlugin::~AudioPlugin(){
 }
 
 MRef<Media*> AudioPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config ){
-	string soundDev = config->soundDevice;
-	if( soundDev == "" ){
+	string soundDevIn = config->soundDeviceIn;
+	string soundDevOut = config->soundDeviceOut;
+	if( soundDevIn == "" || soundDevOut == ""){
 		return NULL;
 	}
 
-	cerr << "AudioPlugin: cesc: soundDev = " << soundDev << endl;
-	MRef<SoundDevice *> sounddev = SoundDevice::create( soundDev );
-	MRef<SoundIO *> soundIo = new SoundIO( sounddev, 
+	cerr << "AudioPlugin: cesc: soundDevIn = " << soundDevIn << endl;
+	cerr << "AudioPlugin: cesc: soundDevOut = " << soundDevOut << endl;
+	MRef<SoundDevice *> sounddevin = SoundDevice::create( soundDevIn );
+	MRef<SoundDevice *> sounddevout;
+
+	if( soundDevIn == soundDevOut )
+		sounddevout = sounddevin;
+	else
+		sounddevout = SoundDevice::create( soundDevOut );
+
+	MRef<SoundIO *> soundIo = new SoundIO( sounddevin, sounddevout,
 					       config->soundIOmixerType, 
 					       2,  //number of channels
 					       48000 ); //sampling rate

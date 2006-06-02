@@ -137,7 +137,8 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 //		bool doRegister; 	//General->Register to proxy
 //		bool doRegisterPSTN; 	//Advanced...
 //		
-		std::string soundDevice;
+		std::string soundDeviceIn;
+		std::string soundDeviceOut;
 		std::string videoDevice;
 		uint32_t frameWidth;
 		uint32_t frameHeight;
