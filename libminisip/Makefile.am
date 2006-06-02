@@ -199,6 +199,10 @@ BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
 			source/soundcard/SoundDriverRegistry.cxx 
 
 ALSA_SRC =	source/soundcard/AlsaCard.cxx \
+		source/soundcard/AlsaCard.h \
+		source/soundcard/AlsaSoundDriver.h \
+		source/soundcard/AlsaSoundDriver.cxx \
+		source/soundcard/AlsaSoundDevice.h \
 		source/soundcard/AlsaSoundDevice.cxx 
 
 DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx  \
@@ -218,8 +222,10 @@ if !OS_WIN
 endif !OS_WIN
 
 if HAVE_LIBASOUND
-        libsoundcard_src += $(ALSA_SRC)
-        libsoundcard_libadd += $(ALSA_LIBS)
+plugins_LTLIBRARIES += malsa.la
+malsa_la_LDFLAGS = $(plugins_LDFLAGS)
+malsa_la_SOURCES = $(ALSA_SRC)
+malsa_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(ALSA_LIBS)
 endif HAVE_LIBASOUND
 
 if DIRECT_SOUND

@@ -84,12 +84,10 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/soundcard/AudioMixer.h \
 			libminisip/soundcard/SoundSource.h \
 			libminisip/soundcard/FileSoundSource.h \
-			libminisip/soundcard/AlsaSoundDevice.h \
 			libminisip/soundcard/AudioMixerSpatial.h \
 			libminisip/soundcard/OssSoundDevice.h \
 			libminisip/soundcard/FileSoundDevice.h \
 			libminisip/soundcard/SoundDevice.h \
-			libminisip/soundcard/AlsaCard.h \
 			libminisip/soundcard/SilenceSensor.h \
 			libminisip/soundcard/SoundIO.h \
 			libminisip/soundcard/AudioMixerSimple.h \

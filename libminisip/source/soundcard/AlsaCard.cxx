@@ -26,7 +26,7 @@
 
 #ifdef HAVE_LIBASOUND
 
-#include<libminisip/soundcard/AlsaCard.h>
+#include"AlsaCard.h"
 
 using namespace std;
 

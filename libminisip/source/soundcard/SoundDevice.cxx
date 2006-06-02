@@ -33,10 +33,6 @@
 #	include<libminisip/soundcard/OssSoundDevice.h>
 #endif
 
-#ifdef HAVE_LIBASOUND
-#	include<libminisip/soundcard/AlsaSoundDevice.h>
-#endif
-
 #ifdef WAVE_SOUND
 #	include<libminisip/soundcard/WaveSoundDevice.h>
 #endif
@@ -74,14 +70,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 				FILESOUND_TYPE_RAW );
 	}
 
-	cerr << "SoundDevice: cesc: (before ALSALIB) deviceId = " << devideId << endl;
-#ifdef HAVE_LIBASOUND
-	cerr << "SoundDevice: cesc: deviceId = " << devideId << endl;
-	if( devideId.substr( 0, 5 ) == "alsa:" ){
-		return new AlsaSoundDevice( devideId.substr( 5, string::npos ) );
-	}
-#endif
-	
 #ifdef WAVE_SOUND
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );

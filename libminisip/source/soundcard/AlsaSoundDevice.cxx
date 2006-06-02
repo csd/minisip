@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/AlsaSoundDevice.h>
+#include"AlsaSoundDevice.h"
 
 #include<libmutil/Thread.h>
 #include<libmutil/mtime.h>
