@@ -1,4 +1,3 @@
-<<<<<<< .mine
 /*
  Copyright (C) 2004-2006 the Minisip Team
  
