@@ -1,3 +1,4 @@
+<<<<<<< .mine
 /*
  Copyright (C) 2004-2006 the Minisip Team
  
@@ -46,7 +47,8 @@
 class LIBMINISIP_API RtpPacket: public MObject {
 	public:
 		RtpPacket();
-		RtpPacket(unsigned char *content, int content_length, int seq_no, unsigned timestamp, unsigned ssrc);
+		RtpPacket(unsigned char *content, int content_length, int seq_no, 
+                          unsigned timestamp, unsigned ssrc);
 		RtpPacket(RtpHeader hdr, unsigned char *content, int content_length);
 		virtual ~RtpPacket();
 		
@@ -58,7 +60,6 @@ class LIBMINISIP_API RtpPacket: public MObject {
 
 		unsigned char *getContent();
 		int getContentLength();
-#ifdef ZRTP_SUPPORT
 		/**
 		 * Get length of extension header in bytes (not in words).
 		 *
@@ -67,7 +68,7 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		 */
 		int getExtensionLength() { return extensionLength; };
 
-		/*
+		/**
 		 * Get pointer to extension header data.
 		 *
 		 * The pointer is returned as unsigned char because the extension
@@ -78,7 +79,7 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		 */
 		unsigned char* getExtensionHeader() { return extensionHeader; };
 
-		/*
+		/**
 		 * Set extension header for this RTP packet.
 		 *
 		 * This method prepends the extension header to data thay may already
@@ -91,7 +92,6 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		 *    Length of extension header data in bytes.
 		 */
 		void setExtHeader(unsigned char* data, int length);
-#endif // ZRTP_SUPPORT
 
 #ifdef DEBUG_OUTPUT
 		void printDebug();
@@ -105,10 +105,8 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		RtpHeader header;
 		int content_length;
 		unsigned char *content;
-#ifdef ZRTP_SUPPORT
 		int extensionLength;
 		unsigned char* extensionHeader;
-#endif
 };
  
 #endif
