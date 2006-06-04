@@ -50,6 +50,7 @@ public:
     ~ZrtpDH();
 
     int32_t generateKey()                { return DH_generate_key(ctx); };
+    int32_t getSecretSize()              { return DH_size(ctx); };
     int32_t getPubKeySize()              { return BN_num_bytes((ctx->pub_key)); };
     int32_t getPubKeyBytes(uint8_t *buf) { return BN_bn2bin(ctx->pub_key, buf); };
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);

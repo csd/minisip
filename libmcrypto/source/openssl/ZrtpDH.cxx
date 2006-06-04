@@ -21,7 +21,7 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#include<config.h>
+// #include<config.h>
 
 #include <openssl/crypto.h>
 #include <openssl/bio.h>
@@ -31,7 +31,7 @@
 #include <openssl/dh.h>
 #include <openssl/evp.h>
 
-#include <libmcrypto/init.h>
+// #include <libmcrypto/init.h>
 #include <libmcrypto/ZrtpDH.h>
 
 static BIGNUM *bnP3072 = NULL;
@@ -39,7 +39,7 @@ static BIGNUM *bnP4096 = NULL;
 
 static uint8_t dhinit = 0;
 
-void initializeOpenSSL();
+// void initializeOpenSSL();
 
 static const uint8_t P3072[] =
 {
@@ -128,7 +128,7 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
 
     uint8_t random[64];
 
-    libmcryptoInit();
+//    libmcryptoInit();
 
     if (!dhinit) {
 	bnP3072 = BN_bin2bn(P3072,sizeof(P3072),NULL);
@@ -137,15 +137,16 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
     }
 
     ctx = DH_new();
+
     ctx->g = BN_new();
     BN_set_word(ctx->g, DH_GENERATOR_2);
     if (pkLength == 3072) {
-	ctx->p = bnP3072;
+	ctx->p = BN_dup(bnP3072);
 	RAND_bytes(random, 32);
 	ctx->priv_key = BN_bin2bn(random, 32, NULL);
     }
     else {
-	ctx->p = bnP4096;
+	ctx->p = BN_dup(bnP4096);
 	RAND_bytes(random, 64);
 	ctx->priv_key = BN_bin2bn(random, 64, NULL);
     }
@@ -153,13 +154,6 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
 
 ZrtpDH::~ZrtpDH() {
     if (ctx != NULL) {
-	if (ctx->g != NULL) {
-	    BN_free(ctx->g);
-	}
-	if (ctx->priv_key != NULL) {
-	    BN_free(ctx->priv_key);
-	}
-	ctx->p = NULL;
 	DH_free(ctx);
     }
 }
