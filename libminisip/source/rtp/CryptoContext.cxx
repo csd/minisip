@@ -47,7 +47,7 @@ ekeyl(0), akeyl(0), skeyl(0),
 encr(1), auth(1){}/*These should be set to 0, but for backward compatability they are set to 1  *///encryption(no_encr),authentication(no_auth)
 
 CryptoContext::CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
-			        int key_deriv_rate,
+			        int64_t key_deriv_rate,
 				//enum encr_method encryption, 
 				uint8_t ealg,
 				//enum auth_method authentication,
@@ -254,14 +254,15 @@ void CryptoContext::rtp_authenticate( RtpPacket * rtp, uint32_t roc, unsigned ch
 }
 
 /* used by the key derivation method */
-static void compute_iv( unsigned char * iv, uint64_t label, uint64_t index, int key_deriv_rate, unsigned char * master_salt ){
+static void compute_iv( unsigned char * iv, uint64_t label, uint64_t index, 
+			int64_t key_deriv_rate, unsigned char * master_salt ){
 
         uint64_t key_id;
 
         if( key_deriv_rate == 0 )
-                key_id = label << 48;
+	    key_id = label << 48;
         else
-                key_id = ((label << 48) || index / key_deriv_rate);
+	    key_id = ((label << 48) | (index / key_deriv_rate));
 
         //printf( "Key_ID: %llx\n", key_id );
 
@@ -295,7 +296,7 @@ void CryptoContext::derive_srtp_keys( uint64_t index ){
 	compute_iv( iv, label, index, key_deriv_rate, master_salt );
 
 
-        aes = new AES( master_key, 16/*master_key_length*/ );
+        aes = new AES( master_key, master_key_length );
         aes->get_ctr_cipher_stream( k_e, n_e, iv );
 
    //     cerr << "Session Encryption Key: " << print_hex( k_e, n_e ) << endl;
@@ -304,7 +305,7 @@ void CryptoContext::derive_srtp_keys( uint64_t index ){
 
         compute_iv( iv, label, index, key_deriv_rate, master_salt );
 
-        aes = new AES( master_key, 16/*master_key_length*/ );
+        aes = new AES( master_key, master_key_length );
         aes->get_ctr_cipher_stream( k_a, n_a, iv );
 
 //        cerr << "Session Authentication Key: " << print_hex( k_a, n_a ) << endl;
@@ -313,7 +314,7 @@ void CryptoContext::derive_srtp_keys( uint64_t index ){
 
         compute_iv( iv, label, index, key_deriv_rate, master_salt );
 
-        aes = new AES( master_key, 16/*master_key_length*/ );
+        aes = new AES( master_key, master_key_length );
         aes->get_ctr_cipher_stream( k_s, n_s, iv );
 
 //        cerr << "Session Salt: " << print_hex( k_s, n_s ) << endl;

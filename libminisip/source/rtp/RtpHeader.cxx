@@ -59,6 +59,10 @@ void RtpHeader::setExtension(int x){
 	this->extension =  x;
 }
 
+int RtpHeader::getExtension() {
+    return extension;
+}
+
 void RtpHeader::setCSRCCount(int cc){
 	this->CSRC_count = cc;
 }
