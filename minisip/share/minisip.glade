@@ -2424,10 +2424,10 @@
 		<widget class="GtkMenu" id="fileMenu_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="prefMenu">
+		    <widget class="GtkImageMenuItem" id="prefMenu">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Preferences</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-preferences</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="prefMenu" last_modification_time="Thu, 05 May 2005 16:52:40 GMT"/>
 		    </widget>
 		  </child>
@@ -2447,10 +2447,10 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkMenuItem" id="quitMenu">
+		    <widget class="GtkImageMenuItem" id="quitMenu">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Quit</property>
-		      <property name="use_underline">True</property>
+		      <property name="label">gtk-quit</property>
+		      <property name="use_stock">True</property>
 		      <signal name="activate" handler="menuQuit" last_modification_time="Thu, 05 May 2005 16:40:12 GMT"/>
 		    </widget>
 		  </child>
@@ -3622,18 +3622,18 @@
 <widget class="GtkMenu" id="trayMenu">
 
   <child>
-    <widget class="GtkMenuItem" id="prefTrayMenu">
+    <widget class="GtkImageMenuItem" id="prefTrayMenu">
       <property name="visible">True</property>
-      <property name="label" translatable="yes">Preferences</property>
-      <property name="use_underline">True</property>
+      <property name="label">gtk-preferences</property>
+      <property name="use_stock">True</property>
     </widget>
   </child>
 
   <child>
-    <widget class="GtkMenuItem" id="quitTrayMenu">
+    <widget class="GtkImageMenuItem" id="quitTrayMenu">
       <property name="visible">True</property>
-      <property name="label" translatable="yes">Quit</property>
-      <property name="use_underline">True</property>
+      <property name="label">gtk-quit</property>
+      <property name="use_stock">True</property>
     </widget>
   </child>
 </widget>
