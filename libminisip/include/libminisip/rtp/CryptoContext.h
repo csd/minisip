@@ -43,7 +43,7 @@ class LIBMINISIP_API CryptoContext : public MObject{
 		CryptoContext( uint32_t ssrc );
 		
 		CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
-			        int key_deriv_rate,
+			        int64_t key_deriv_rate,
 				//enum encr_method encryption, 
 				uint8_t ealg, 
 				//enum auth_method authentication,
@@ -88,7 +88,7 @@ class LIBMINISIP_API CryptoContext : public MObject{
 		unsigned int roc;
 		unsigned int guessed_roc;
 		unsigned short s_l;
-		unsigned int key_deriv_rate;
+		int64_t key_deriv_rate;
 
 		/* bitmask for replay check */
 		uint64_t replay_window;

@@ -35,6 +35,7 @@ class LIBMINISIP_API RtpHeader{
 		RtpHeader();
 		void setVersion(int v);
 		void setExtension(int x);
+		int getExtension();
 		void setCSRCCount(int cc);
 		void setMarker(int m);
 		bool getMarker();

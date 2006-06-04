@@ -34,6 +34,15 @@
 
 #include<libminisip/rtp/RtpHeader.h>
 
+/**
+ * This class implements the RTP header.
+ *
+ * As a specific feature the RTP packet class handles the extension
+ * header feature of RTP. This is because the extension header is not
+ * standard RTP header but contains more application related data.
+ *
+ */
+
 class LIBMINISIP_API RtpPacket: public MObject {
 	public:
 		RtpPacket();
@@ -49,6 +58,40 @@ class LIBMINISIP_API RtpPacket: public MObject {
 
 		unsigned char *getContent();
 		int getContentLength();
+#ifdef ZRTP_SUPPORT
+		/**
+		 * Get length of extension header in bytes (not in words).
+		 *
+		 * @return
+		 *    Length in bytes of extension header
+		 */
+		int getExtensionLength() { return extensionLength; };
+
+		/*
+		 * Get pointer to extension header data.
+		 *
+		 * The pointer is returned as unsigned char because the extension
+		 * header data structure is application dependend.
+		 *
+		 * @return
+		 *    Returns the pointer to the extension header
+		 */
+		unsigned char* getExtensionHeader() { return extensionHeader; };
+
+		/*
+		 * Set extension header for this RTP packet.
+		 *
+		 * This method prepends the extension header to data thay may already
+		 * exist in this packet. The method updates the overall data content 
+		 * as well as the lentgh. Als the extension header flag is set.
+		 *
+		 * @param data
+		 *    Pointer to extensione header data.
+		 * @param length
+		 *    Length of extension header data in bytes.
+		 */
+		void setExtHeader(unsigned char* data, int length);
+#endif // ZRTP_SUPPORT
 
 #ifdef DEBUG_OUTPUT
 		void printDebug();
@@ -62,6 +105,10 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		RtpHeader header;
 		int content_length;
 		unsigned char *content;
+#ifdef ZRTP_SUPPORT
+		int extensionLength;
+		unsigned char* extensionHeader;
+#endif
 };
  
 #endif
