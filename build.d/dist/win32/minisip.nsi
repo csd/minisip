@@ -204,6 +204,21 @@ SectionEnd
 !endif
 
 ;
+; PortAudio V19 section
+;
+!ifdef PORTAUDIODIR
+Section "PortAudio V19"
+SectionIn 1 2
+
+!ifndef NOFILES
+SetOutPath $INSTDIR\bin
+File ${PORTAUDIODIR}/libportaudio-2.dll
+!endif
+
+SectionEnd
+!endif
+
+;
 ; Strings
 ;
 
@@ -223,6 +238,11 @@ Delete "$INSTDIR\bin\minisip_*.exe"
 !ifdef SSLDIR
 Delete "$INSTDIR\bin\libeay32.dll"
 Delete "$INSTDIR\bin\ssleay32.dll"
+!endif
+
+; Delete PortAudio
+!ifdef PORTAUDIODIR
+Delete "$INSTDIR\bin\libportaudio-2.dll"
 !endif
 
 ; Delete plugins
