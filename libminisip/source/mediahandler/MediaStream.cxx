@@ -79,8 +79,11 @@ static int strcasecmp(const char *s1, const char *s2){
 }
 #endif
 
-MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL){
+MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL) {
 	disabled = false;
+#ifdef ZRTP_SUPPORT
+	zrtpBridge = NULL;
+#endif
 }
 
 std::string MediaStream::getSdpMediaType(){
@@ -158,7 +161,7 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 		/* Dummy cryptocontext */
 		cryptoContext = new CryptoContext( ssrc );
 	}
-	else{
+	else {
 		
 		unsigned char * masterKey = new unsigned char[16];
 		unsigned char * masterSalt = new unsigned char[14];
@@ -233,6 +236,33 @@ void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
 	kaLock.unlock();
 }
 
+#ifdef ZRTP_SUPPORT
+/*
+ * The ZRTP implementation (host bridge) calls this to register a new
+ * crypto context context for either the receiver or the sender of
+ * a receiver / sender. Keep in mind that we may have several senders
+ * for one receiver, that is one receiver can handle different 
+ * incomming RTP sessions, they are identified by the SSRC. A sender
+ * handles one stream (media stream) to the remote peer only.
+ */
+void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
+
+    kaLock.lock();
+
+    list< MRef<CryptoContext *> >::iterator i;
+
+    for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == cx->getSsrc() ) {
+	    cryptoContexts.erase(i);
+	    break;
+	}
+    }
+    cryptoContexts.push_back(cx);
+
+    kaLock.unlock();
+}
+#endif
+
 MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media, 
 		MRef<RtpReceiver *> rtpReceiver, MRef<IpProvider *> ipProvider ):
 			MediaStream( media ),
@@ -273,7 +303,27 @@ uint16_t MediaStreamReceiver::getPort(){
 	return rtpReceiver->getPort();
 }
 
-void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
+#ifdef ZRTP_SUPPORT
+void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
+	uint32_t packetSsrc;
+	uint16_t seq_no;
+
+	//if packet is null, we had a read timeout from the rtpReceiver
+	if( !packet ) {
+		return;
+	}
+	packetSsrc = packet->getHeader().getSSRC();
+	seq_no = packet->getHeader().getSeqNo();
+
+	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
+		// Authentication or replay protection failed
+		return;
+	}
+	zrtpBridge->processPacket(packet);
+}
+#endif
+
+void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from ){
 	uint32_t packetSsrc;
 	uint16_t seq_no;
 	
@@ -284,13 +334,60 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet ){
 	
 	packetSsrc = packet->getHeader().getSSRC();
 	seq_no = packet->getHeader().getSeqNo();
-	
-	
+
+#ifdef ZRT_SUPPORT
+	/*
+	 * Check if ZRTP shall handle the packet first. This will be done
+	 * if the packet contains an extension header and our hostbridge's
+	 * remote address matches the from address (sender address). If all
+	 * holds true we also set the SSRC in the host bridge if it was zero
+	 * before.
+	 */
+	if (zrtpBridge && zrtpBridge->isSecureStateReceiver()) {
+	    /*
+	     * Check if this packet belongs to this receiver. To do so
+	     * compare the from IP address with my known remote address
+	     * stored in zrtpBridge.
+	     */
+	    if (zrtpBridge->getRemoteAddress() && 
+		zrtpBridge->getRemoteAddress() == from) {
+
+		/*
+		 * If this is the first received packet of this session store
+		 * the SSRC. Any later modification of the SSRC inside this session
+		 * gives an Alert and switsches back to non-secure mode
+		 */
+		if (zrtpBridge->getSsrcReceiver() == 0) {
+		    zrtpBridge->setSsrcReceiver(packetSsrc);
+		}
+		if (zrtpBridge->getSsrcReceiver() != packetSsrc) {
+		    zhb->rtpSessionError();
+		}
+		if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
+		    // Authentication or replay protection failed
+		    return;
+		}
+		if (packet->getHeader()->getExtension()) {
+		    if (zrtpBridge->processPacket(packet) == 0) {
+			return;
+		    }
+		}
+	    }
+	}
+	else {
+	    if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
+		// Authentication or replay protection failed
+		return;
+	    }
+	}
+#else
 	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
 		// Authentication or replay protection failed
 		return;
 	}
 
+#endif // ZRTP_SUPPORT	
+	
 	//uint16_t seqNo = packet->getHeader().getSeqNo(); //not used
 	//byte_t * data = packet->getContent(); //not used
 	//uint32_t size = packet->getContentLength(); //not used
@@ -339,14 +436,29 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 		senderSock = new UDPSocket;
 		senderSock->setLowDelay();
 	}
+#ifdef ZRTP_SUPPORT
+	if (zrtpBridge) {
+	    zrtpBridge->setSsrcSender(ssrc);
+	}
+#endif
 }
 
 void MediaStreamSender::start(){
 	media->registerMediaSender( this );
+#ifdef ZRTP_SUPPORT
+	if (zrtpBridge) {
+	    zrtpBridge->start();
+	}
+#endif
 }
 
 void MediaStreamSender::stop(){
 	media->unRegisterMediaSender( this );
+#ifdef ZRTP_SUPPORT
+	if (zrtpBridge) {
+	    zrtpBridge->stop();
+	}
+#endif
 }
 
 void MediaStreamSender::setPort( uint16_t port ){
@@ -358,6 +470,39 @@ uint16_t MediaStreamSender::getPort(){
 }
 
 static bool first=true;
+
+#ifdef ZRTP_SUPPORT
+void MediaStreamSender::sendZrtp(unsigned char* data, int length,
+                                unsigned char* payload, int payLen) {
+
+	if (this->remoteAddress.isNull()) {
+		mdbg << " MediaStreamSender::sendZrtp called before " << 
+			"setRemoteAddress!" << endl;
+		return;
+	}
+
+	SRtpPacket * packet;
+	if (first){
+#ifdef ENABLE_TS
+		ts.save("rtp_send");
+#endif
+		first=false;
+	}
+	
+	senderLock.lock();
+	uint32_t ts = time(NULL);
+	packet = new SRtpPacket(payload, payLen, seqNo++, ts, ssrc );
+	packet->getHeader().setPayloadType(13);
+	packet->setExtHeader(data, length);
+
+	packet->protect(getCryptoContext(ssrc, seqNo - 1));
+
+	packet->sendTo( **senderSock, **remoteAddress, remotePort );
+	delete packet;
+	senderLock.unlock();
+
+}
+#endif // ZRTP_SUPPORT
 
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	if (this->remoteAddress.isNull()) {
@@ -412,6 +557,11 @@ void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> remoteAddress ){
 	mdbg << "MediaStreamSender::setRemoteAddress: " << 
 		remoteAddress->getString() << endl;
 	this->remoteAddress = remoteAddress;
+#ifdef ZRTP_SUPPORT
+	if (zrtpBridge) {
+	    zrtpBridge->setRemoteAddress(remoteAddress);
+	}
+#endif // ZRTP_SUPPORT
 }
 
 #ifdef DEBUG_OUTPUT

@@ -217,13 +217,13 @@ void RtpReceiver::run(){
 			//notify the mediaStreams of the timeout
 			for( i = mediaStreams.begin(); 
 					i != mediaStreams.end(); i++ ){
-				(*i)->handleRtpPacket( NULL );
+				(*i)->handleRtpPacket( NULL, NULL );
 			}
 			continue;
 		}
-
+		MRef<IPAddress *> from = NULL;
 		try{
-			packet = SRtpPacket::readPacket( **socket );
+		    packet = SRtpPacket::readPacket( **socket, from);
 		}
 
 		catch (NetworkException &  ){
@@ -238,14 +238,54 @@ void RtpReceiver::run(){
 		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
 			std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
 			std::list<MRef<Codec *> >::iterator iC;
+			int found = 0;
 			//printf( "|" );
 			for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 				if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
-					(*i)->handleRtpPacket( packet );
+					(*i)->handleRtpPacket( packet, from );
+					found = 1;
 					//printf( "~" );
 					break;
 				}
 			}
+#ifdef ZRTP_SUPPORT
+			/*
+			 * If this packet was not already handled
+			 * (!found) and it has an extension header and
+			 * it belongs to this media pair's (receiver
+			 * and sender) remote address then handle it
+			 * accordingly in the ZrtpHostBridge.
+			 *
+			 * TODO: handle list of host bridges because a
+			 * receiver may support several RTP sessions
+			 * from different peers.
+			 */
+			MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
+
+			if (!found && zhb && packet->getHeader().getExtension() && 
+			    zhb->getRemoteAddress() && zhb->getRemoteAddress() == from) {
+
+			    uint32_t packetSsrc = packet->getHeader().getSSRC();
+
+			    /*
+			     * If this is the first received packet of
+			     * this session then store its SSRC. Any
+			     * later modification of the SSRC inside
+			     * this session gives an Alert and
+			     * switsches back to non-secure mode
+			     */
+
+			    if (zhb->getSsrcReceiver() == 0) {
+				zhb->setSsrcReceiver(packetSsrc);
+			    }
+			    if (zhb->getSsrcReceiver() != packetSsrc) {
+				zhb->rtpSessionError();
+			    }
+			    else {
+				(*i)->handleRtpPacketExt(packet);
+			    }
+			}
+#endif // ZRTP_SUPPORT
 		}
 		
 		mediaStreamsLock.unlock();

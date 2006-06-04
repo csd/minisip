@@ -110,6 +110,9 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	MRef<MediaStreamSender *> sStream;
 	MRef<RtpReceiver *> rtpReceiver = NULL;
 	string contactIp;
+#ifdef ZRTP_SUPPORT
+	MRef<ZrtpHostBridgeMinisip *> zhb = NULL;
+#endif
 
 	contactIp = ipProvider->getExternalIp();
 
@@ -123,15 +126,31 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 			rtpReceiver = new RtpReceiver( ipProvider );
 			rStream = new MediaStreamReceiver( media, rtpReceiver, ipProvider );
 			session->addMediaStreamReceiver( rStream );
+#ifdef ZRTP_SUPPORT
+		    if(securityConfig.use_zrtp) {
+			zhb = new ZrtpHostBridgeMinisip();
+			zhb->setReceiver(rStream);
+			rStream->setZrtpHostBridge(zhb);
+		    }
+#endif
 		}
 		
-        if( media->send ){
-            if( !rtpReceiver ){
-                rtpReceiver = new RtpReceiver( ipProvider );
-            }
-            sStream = new MediaStreamSender( media, rtpReceiver->getSocket() );
-            session->addMediaStreamSender( sStream );
-        }
+		if( media->send ){
+		    if( !rtpReceiver ){
+			rtpReceiver = new RtpReceiver( ipProvider );
+		    }
+		    sStream = new MediaStreamSender( media, rtpReceiver->getSocket() );
+		    session->addMediaStreamSender( sStream );
+#ifdef ZRTP_SUPPORT
+		    if(securityConfig.use_zrtp) {
+			if (!zhb) {
+			    zhb = new ZrtpHostBridgeMinisip();
+			}
+			zhb->setSender(sStream);
+			sStream->setZrtpHostBridge(zhb);
+		    }
+#endif
+		}
 	}
 	
 	//set the audio settings for this session ...
