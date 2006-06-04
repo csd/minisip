@@ -127,6 +127,7 @@ else
 	AC_DEFINE(NDEBUG, [], [No debug output])
 fi 
 		])
+AM_CONDITIONAL(DEBUG, test "${enable_debug}" = "yes")
 	])
 # End of AM_MINISIP_ENABLE_DEBUG
 #
