@@ -970,6 +970,17 @@ string MainWindow::getDataFileName( string baseName ){
 		}
 	}
 
+	// Check share sub directory in the program directory
+	string prefixDir = Glib::build_filename( programDir, ".." );
+	string dataDir = Glib::build_filename( prefixDir, "share" );
+	string pkgDataDir = Glib::build_filename( dataDir, PACKAGE );
+	string progDirName = Glib::build_filename( pkgDataDir, baseName );
+
+	if( Glib::file_test( progDirName, Glib::FILE_TEST_EXISTS ) ){
+		lastDataDir = pkgDataDir;
+		return ensureAbsolutePath( progDirName );
+	}
+
 #ifdef MINISIP_DATADIR
 	// Check configured data dir
 	string dataDirName = Glib::build_filename( MINISIP_DATADIR, baseName );
@@ -978,13 +989,6 @@ string MainWindow::getDataFileName( string baseName ){
 		return ensureAbsolutePath( dataDirName );
 	}
 #endif
-
-	// Check share sub directory in the program directory
-	string progDirName = Glib::build_filename( Glib::build_filename( programDir, "share" ), baseName );
-	if( Glib::file_test( progDirName, Glib::FILE_TEST_EXISTS ) ){
-		lastDataDir = Glib::build_filename( programDir, "share" );
-		return ensureAbsolutePath( progDirName );
-	}
 
 	merr << "Can't find data file: " << baseName << end;
 	return "";

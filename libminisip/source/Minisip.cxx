@@ -100,19 +100,27 @@ static void signal_handler( int signal ){
 #endif
 
 #ifdef WIN32
+# define DIR_SEPARATOR "\\"
+# define PATH_SEPARATOR ";"
+#else
+# define DIR_SEPARATOR "/"
+# define PATH_SEPARATOR ":"
+#endif
+
 static string buildPluginPath( const string &argv0 ){
 	string pluginPath;
-	size_t pos = argv0.find_last_of('\\');
+	size_t pos = argv0.find_last_of(DIR_SEPARATOR);
+	string prefixDir;
 
 	if( pos != string::npos )
-		pluginPath += argv0.substr( 0, pos ) + "\\plugins";
+		prefixDir = argv0.substr( 0, pos ) + DIR_SEPARATOR + "..";
 	else{
-		pluginPath += "plugins";
+		prefixDir = "..";
 	}
 
+	pluginPath += prefixDir + DIR_SEPARATOR + "lib" + DIR_SEPARATOR + PACKAGE + DIR_SEPARATOR + "plugins";
 	return pluginPath;
 }
-#endif
 
 static void loadPlugins(const string &argv0){
 	SoundDriverRegistry::getInstance();
@@ -127,15 +135,15 @@ static void loadPlugins(const string &argv0){
 	const char *path = getenv( "MINISIP_PLUGIN_PATH" );
 
 	if( !path ){
+		if( argv0 != "" )
+			pluginPath += buildPluginPath( argv0 );
 
 #ifdef MINISIP_PLUGINDIR
-		pluginPath = string( MINISIP_PLUGINDIR );
+		if( pluginPath.size() > 0 )
+			pluginPath += PATH_SEPARATOR;
+		pluginPath += MINISIP_PLUGINDIR;
 #endif
 
-#ifdef WIN32
-		if( argv0 != "" )
-			pluginPath += ';' + buildPluginPath( argv0 );
-#endif
 	}
 	else
 		pluginPath = path;

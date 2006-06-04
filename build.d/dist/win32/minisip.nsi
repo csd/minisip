@@ -117,11 +117,11 @@ SetOutPath $INSTDIR\bin
 !insertmacro ForEachPkg File "${MINISIPDIR}/bin/" "*.dll"
 File ${MINISIPDIR}/bin/*.exe
 
-SetOutPath $INSTDIR\bin\plugins
+SetOutPath $INSTDIR\lib\libminisip\plugins
 File /nonfatal ${MINISIPDIR}/lib/libminisip/plugins/*.dll
 File /nonfatal ${MINISIPDIR}/lib/libminisip/plugins/*.la
 
-SetOutPath $INSTDIR\bin\share
+SetOutPath $INSTDIR\share\minisip
 File ${MINISIPDIR}/share/minisip/insecure.png
 File ${MINISIPDIR}/share/minisip/minisip.glade
 File ${MINISIPDIR}/share/minisip/minisip.png
@@ -246,19 +246,19 @@ Delete "$INSTDIR\bin\libportaudio-2.dll"
 !endif
 
 ; Delete plugins
-Delete "$INSTDIR\bin\plugins\*.dll"
-Delete "$INSTDIR\bin\plugins\*.la"
+Delete "$INSTDIR\lib\libminisip\plugins\*.dll"
+Delete "$INSTDIR\lib\libminisip\plugins\*.la"
 
 ; Delete bitmaps
-Delete "$INSTDIR\bin\share\insecure.png"
-Delete "$INSTDIR\bin\share\minisip.glade"
-Delete "$INSTDIR\bin\share\minisip.png"
-Delete "$INSTDIR\bin\share\noplay.png"
-Delete "$INSTDIR\bin\share\norecord.png"
-Delete "$INSTDIR\bin\share\play.png"
-Delete "$INSTDIR\bin\share\record.png"
-Delete "$INSTDIR\bin\share\secure.png"
-Delete "$INSTDIR\bin\share\tray_icon.png"
+Delete "$INSTDIR\share\minisip\insecure.png"
+Delete "$INSTDIR\share\minisip\minisip.glade"
+Delete "$INSTDIR\share\minisip\minisip.png"
+Delete "$INSTDIR\share\minisip\noplay.png"
+Delete "$INSTDIR\share\minisip\norecord.png"
+Delete "$INSTDIR\share\minisip\play.png"
+Delete "$INSTDIR\share\minisip\record.png"
+Delete "$INSTDIR\share\minisip\secure.png"
+Delete "$INSTDIR\share\minisip\tray_icon.png"
 
 ; Delete development files
 !insertmacro ForEachPkg Delete "$INSTDIR\lib\" ".*a"
@@ -277,8 +277,9 @@ RMDir /r "$INSTDIR\include\libminisip"
 ; Delete examples
 !insertmacro ForEachPkg Delete "$INSTDIR\share\" "\examples\*"
 
-RMDir "$INSTDIR\bin\plugins"
-RMDir "$INSTDIR\bin\share"
+RMDir "$INSTDIR\lib\libminisip\plugins"
+RMDir "$INSTDIR\lib\libminisip"
+RMDir "$INSTDIR\share\minisip"
 RMDir "$INSTDIR\bin"
 RMDir "$INSTDIR\include"
 RMDir "$INSTDIR\lib\pkgconfig"
