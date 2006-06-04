@@ -52,6 +52,10 @@ class LIBMINISIP_API SoundDriverRegistry: public MPluginRegistry, public MSingle
 		bool registerDriver( MRef<SoundDriver*> driver );
 		bool unregisterDriver( MRef<SoundDriver*> driver );
 
+		/** Work around for Win32, which doesn't support, weak
+		    symbols in DLLs */
+		static MRef<SoundDriverRegistry*> getInstance();
+
 	protected:
 		void registerBuiltinDrivers();
 

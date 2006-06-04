@@ -148,3 +148,9 @@ bool SoundDriverRegistry::unregisterDriver( MRef<SoundDriver*> driver ){
 	drivers.erase( iter, iter + 1 );
 	return true;
 }
+
+/** Work around for Win32, which doesn't support, weak
+    symbols in DLLs */
+MRef<SoundDriverRegistry*> SoundDriverRegistry::getInstance(){
+	return MSingleton<SoundDriverRegistry>::getInstance();
+}
