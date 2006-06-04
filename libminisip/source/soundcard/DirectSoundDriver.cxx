@@ -63,7 +63,8 @@ MRef<SoundDevice*> DirectSoundDriver::createDevice( string deviceId ){
 }
 
 static BOOL CALLBACK dsEnumCallback(LPGUID guid, LPCSTR description,
-				    LPCSTR module, LPVOID context){
+				    LPCSTR module, LPVOID context,
+				    bool capture){
 	std::vector<SoundDeviceName> *names = (std::vector<SoundDeviceName>*)context;
 	string uuid;
 
@@ -79,18 +80,35 @@ static BOOL CALLBACK dsEnumCallback(LPGUID guid, LPCSTR description,
 		uuid = "0";
 	}
 
-	string name = DRIVER_PREFIX + ':' + uuid;
-	SoundDeviceName deviceName( name, description );
+	string name = string( DRIVER_PREFIX ) + ':' + uuid;
+	// FIXME detect channel count.
+	int maxInputChannels = capture ? 2 : 0;
+	int maxOutputChannels = capture ? 0 : 2;
+	SoundDeviceName deviceName( name, description, maxInputChannels, maxOutputChannels );
 
 	names->push_back( deviceName );
 	
 	return true;
 }
 
+static BOOL CALLBACK dsEnumPlaybackCallback(LPGUID guid, LPCSTR description,
+					   LPCSTR module, LPVOID context){
+	return dsEnumCallback(guid, description, module, context, false);
+}
+
+static BOOL CALLBACK dsEnumCaptureCallback(LPGUID guid, LPCSTR description,
+					   LPCSTR module, LPVOID context){
+	return dsEnumCallback(guid, description, module, context, true);
+}
+
 std::vector<SoundDeviceName> DirectSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	if( DirectSoundEnumerate( dsEnumCallback, &names ) != DS_OK ){
+	if( DirectSoundEnumerate( dsEnumPlaybackCallback, &names ) != DS_OK ){
+		cerr << "DirectSoundDriver::getDeviceNames DirectSoundEnumerate failed" << endl;
+	}
+
+	if( DirectSoundCaptureEnumerate( dsEnumCaptureCallback, &names ) != DS_OK ){
 		cerr << "DirectSoundDriver::getDeviceNames DirectSoundEnumerate failed" << endl;
 	}
 
