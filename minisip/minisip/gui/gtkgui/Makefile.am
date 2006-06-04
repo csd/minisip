@@ -50,6 +50,12 @@ noinst_HEADERS  = MainWindow.h \
 			GtkMainUI.h 
 
 if OS_WIN
+
+if !DEBUG
+# Build a GUI application (without console)
+AM_LDFLAGS += -mwindows
+endif !DEBUG
+
         res_obj = ../../win32/minisip-res.o
         minisip_gtkgui_LDADD += $(res_obj)
         minisip_gtkgui_DEPENDENCIES = $(res_obj)
