@@ -35,6 +35,12 @@
 #include<libminisip/mediahandler/RtpReceiver.h>
 #include<libminisip/rtp/SRtpPacket.h>
 
+#ifdef ZRTP_SUPPORT
+#include <libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#include <time.h>
+class ZrtpHostBridgeMinisip;
+#endif
+
 class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
@@ -67,7 +73,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * description (SDP).
 		 * @returns the type as a string
 		 */
-		std::string getSdpMediaType();/* audio, video, appli;ation... */
+		std::string getSdpMediaType();/* audio, video, application... */
 
 		/**
 		 * Returns additional media attributes that are to appear
@@ -114,6 +120,41 @@ class LIBMINISIP_API MediaStream : public MObject{
 		Use with care.
 		*/
 		MRef<Media *> getMedia() { return media; }
+#ifdef ZRTP_SUPPORT
+		/**
+		 * Set the ZRTP implementation host brigde for this media stream.
+		 *
+		 * The ZRTP host bridge implements the Minisip specific functions
+		 * to connect Minisip to the ZRTP protocol / key agreement. Please
+		 * note that the same host bridge instance must be used for a pair
+		 * of sender/receiver objects that form a RTP session.
+		 *
+		 * @param zsb
+		 *    The pointer to the host bridge object for this RTP session.
+		 *
+		 * TODO: make it a list because the receiver may have several hostbridges
+		 * in case of e.g. conferences.
+		 */
+		virtual void setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {zrtpBridge = zsb; };
+
+		/**
+		 * Get the ZRTP implementation host brigde for this media stream.
+		 *
+		 * @return zsb
+		 *    The pointer to the host bridge object for this RTP session.
+		 */
+		virtual MRef<ZrtpHostBridgeMinisip *> getZrtpHostBridge() {return zrtpBridge; };
+
+		/**
+		 * Used by ZRTP host bridge to set the crypto context for this RTP session.
+		 *
+		 * @param cx
+		 *    The initialized CryptoContext to use for this RTP session.
+		 * @param ssrc
+		 *    The ssrc of this RTP stream (sender or receiver)
+		 */
+		virtual void setKeyAgreementZrtp(MRef<CryptoContext *>cx);
+#endif
 		
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
@@ -127,8 +168,9 @@ class LIBMINISIP_API MediaStream : public MObject{
 		MRef<KeyAgreement *> ka;
 		Mutex kaLock;
 		std::list< MRef<CryptoContext *> > cryptoContexts;
-
-
+#ifdef ZRTP_SUPPORT
+		MRef<ZrtpHostBridgeMinisip *> zrtpBridge;
+#endif
 };
 
 /**
@@ -186,7 +228,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * playback.
 		 * @param packet the (S)RTP packet to handle
 		 */
-		virtual void handleRtpPacket( MRef<SRtpPacket *> packet );
+		virtual void handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from );
 
 		/**
 		 * Returns a unique identifier for this Receiver. Used
@@ -199,6 +241,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * Used to query the available CODECs for this media type,
 		 * during this session. Used by the Session to create
 		 * the session description (SDP).
+		 *
 		 * @returns a list of references to Codec objects, sorted
 		 * according to the user's preference, first being preferred
 		 */
@@ -208,6 +251,28 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 			return ssrcList;
 		}
 
+#ifdef ZRTP_SUPPORT
+		/**
+		 * Process a received packet with an extension header
+		 * and unknown payload type.
+		 *
+		 * This packet has an extension header and does not
+		 * contain payload data to process. The method checks
+		 * if it is a ZRTP packet, if yes process
+		 * it. Otherwise just return to the caller.  Because
+		 * the payload type is unknown the caller usually
+		 * dismisses the packet.
+		 *
+		 * <p/>
+		 *
+		 * This method is called only if a ZRTP host bridge is
+		 * enabled.
+		 *
+		 * @param packet
+		 *   A (S)Rtp packet to process
+		 */
+		virtual void handleRtpPacketExt(MRef<SRtpPacket *> packet);
+#endif
 	protected:
 		std::list<MRef<Codec *> > codecList;
 		MRef<RtpReceiver *> rtpReceiver;
@@ -298,6 +363,37 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * @param dtmf whether or not the data is a DTMF signal
 		 */
 		void send( byte_t * data, uint32_t length, uint32_t * ts, bool marker = false, bool dtmf = false );
+
+#ifdef ZRTP_SUPPORT
+		/**
+		 * Used by the ZRTP host bridge to send ZRTP data.
+		 *
+		 * This method sets up a ZRTP packet with a specific
+		 * payload type and sends the data to our peer. These
+		 * packets shall not go into normal payload processing
+		 * at the receiver because of the specific payload
+		 * type setting.
+		 *
+		 * @param data
+		 *    The pointer to the extension header to send.
+		 * @param length
+		 *    Length of the extension header in bytes.
+                 * @param payload
+                 *    Pointer to the payload or NULL if no payload required
+                 * @param payLen
+                 *    Length of payload in bytes
+		 */
+		void sendZrtp(unsigned char* data, int length, 
+                              unsigned char* payload, int payLen);
+		
+		/**
+		 * Get the current Seq number of this packet
+		 * 
+		 * @return
+		 *     The sender current sequence number.
+		 */
+		uint16_t getSeqNo() { return seqNo; };
+#endif
 
 		/**
 		 * Used by the Session to specify the IP address
