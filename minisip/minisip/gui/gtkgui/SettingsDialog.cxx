@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include"SettingsDialog.h"
@@ -26,6 +27,7 @@
 #include<libminisip/gui/Gui.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/soundcard/SoundDriverRegistry.h>
 
 #include<libmnetutil/NetworkFunctions.h>
 
@@ -62,6 +64,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	
 	generalSettings = new GeneralSettings( refXml );
 	mediaSettings = new MediaSettings( refXml );
+	deviceSettings = new DeviceSettings( refXml );
 	securitySettings = new SecuritySettings( refXml );
 	advancedSettings = new AdvancedSettings( refXml );
 
@@ -76,6 +79,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 SettingsDialog::~SettingsDialog(){
 	delete generalSettings;
 	delete mediaSettings;
+	delete deviceSettings;
 	delete securitySettings;
 	delete advancedSettings;
 	delete dialogWindow;
@@ -93,6 +97,7 @@ void SettingsDialog::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	this->config = config;
 	generalSettings->setConfig( config );
 	mediaSettings->setConfig( config );
+	deviceSettings->setConfig( config );
 	securitySettings->setConfig( config );
 	advancedSettings->setConfig( config );
 	
@@ -116,6 +121,7 @@ void SettingsDialog::accept(){
 
 	warning += generalSettings->apply();
 	warning += mediaSettings->apply();
+	warning += deviceSettings->apply();
 	warning += securitySettings->apply();
 	warning += advancedSettings->apply();
 	
@@ -288,14 +294,6 @@ MediaSettings::MediaSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	refXml->get_widget( "codecTreeView", codecTreeView );
 	
-	refXml->get_widget( "soundEntry", soundEntry );
-	refXml->get_widget( "videoEntry", videoEntry );
-	
-	refXml->get_widget( "videoLabel", videoLabel );
-	refXml->get_widget( "videoDeviceLabel", videoDeviceLabel );
-	
-	refXml->get_widget( "spaudioCheck", spaudioCheck );
-
 	/* Build the ListStore */
 	codecColumns = new Gtk::TreeModelColumnRecord();
 	codecColumns->add( codecEnabled );
@@ -314,11 +312,6 @@ MediaSettings::MediaSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	codecDownButton->signal_clicked().connect( BIND<int8_t>(
 		SLOT( *this, &MediaSettings::moveCodec ),
 		1 ) );
-#ifndef VIDEO_SUPPORT
-	videoEntry->hide();
-	videoLabel->hide();
-	videoDeviceLabel->hide();
-#endif
 
 
 }
@@ -331,10 +324,6 @@ void MediaSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	list<string>::iterator iC;
 	Gtk::TreeModel::iterator listIterator;
 	this->config = config;
-	soundEntry->set_text( config->soundDeviceIn );
-#ifdef VIDEO_SUPPORT
-	videoEntry->set_text( config->videoDevice );
-#endif
 
 	codecList->clear();
 
@@ -344,10 +333,6 @@ void MediaSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*listIterator)[codecName] = 
 			Glib::locale_to_utf8( *iC );
 		(*listIterator)[codecEnabled] = true;
-	}
-
-	if( config->soundIOmixerType == "spatial" ){
-		spaudioCheck->set_active( true );
 	}
 
 }
@@ -395,14 +380,158 @@ void MediaSettings::moveCodec( int8_t upOrDown ){
 
 string MediaSettings::apply(){
 	Gtk::TreeModel::iterator iC;
-	config->soundDeviceIn = soundEntry->get_text();
-	config->soundDeviceOut = soundEntry->get_text();
 	config->audioCodecs.clear();
 
 	for( iC = codecList->children().begin(); iC ; iC ++ ){
 		config->audioCodecs.push_back( 
 			Glib::locale_from_utf8( (*iC)[codecName] ) );
 	}
+
+	return "";	
+}
+
+
+DeviceSettings::DeviceSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+	
+	refXml->get_widget( "videoEntry", videoEntry );
+	
+	refXml->get_widget( "soundInputEntry", soundInputEntry );
+	refXml->get_widget( "soundOutputEntry", soundOutputEntry );
+
+	refXml->get_widget( "soundInputList", soundInputView );
+	refXml->get_widget( "soundOutputList", soundOutputView );
+
+	refXml->get_widget( "videoLabel", videoLabel );
+	refXml->get_widget( "videoDeviceLabel", videoDeviceLabel );
+	
+	refXml->get_widget( "spaudioCheck", spaudioCheck );
+
+#ifndef VIDEO_SUPPORT
+	videoEntry->hide();
+	videoLabel->hide();
+	videoDeviceLabel->hide();
+#endif
+
+	deviceColumns = new Gtk::TreeModelColumnRecord();
+	deviceColumns->add( deviceName );
+	deviceColumns->add( deviceDescription );
+
+	soundInputList = Gtk::ListStore::create( *deviceColumns );
+	soundOutputList = Gtk::ListStore::create( *deviceColumns );
+
+	soundInputView->set_model( soundInputList );
+	soundOutputView->set_model( soundOutputList );
+
+	soundInputView->signal_changed().connect( SLOT( *this, &DeviceSettings::soundInputChange ) );
+	soundOutputView->signal_changed().connect( SLOT( *this, &DeviceSettings::soundOutputChange ) );
+
+	Gtk::CellRendererText* crt;
+	crt = new Gtk::CellRendererText();
+	soundInputView->pack_end(*manage(crt), true);
+	soundInputView->add_attribute(crt->property_text(), deviceDescription);
+
+	//crt = new Gtk::CellRendererText();
+	soundOutputView->pack_end(*manage(crt), true);
+	soundOutputView->add_attribute(crt->property_text(), deviceDescription);
+	delete crt;
+}
+
+DeviceSettings::~DeviceSettings(){
+	delete deviceColumns;
+}
+
+void DeviceSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
+	list<string>::iterator iC;
+	Gtk::TreeModel::iterator listIterator;
+	this->config = config;
+#ifdef VIDEO_SUPPORT
+	videoEntry->set_text( config->videoDevice );
+#endif
+
+	if( config->soundIOmixerType == "spatial" ){
+		spaudioCheck->set_active( true );
+	}
+
+
+	MRef<SoundDriverRegistry*> registry = SoundDriverRegistry::getInstance();
+	std::vector<SoundDeviceName> names = registry->getAllDeviceNames();
+
+	vector<SoundDeviceName>::iterator iter;
+	vector<SoundDeviceName>::iterator end = names.end();
+
+	soundInputList->clear();
+	soundOutputList->clear();
+
+	listIterator = soundInputList->append();
+        (*listIterator)[deviceName] = "manual:";
+        (*listIterator)[deviceDescription] = "Manual entry...";
+	soundInputView->set_active(*listIterator);
+	soundInputEntry->set_text( config->soundDeviceIn );
+
+	listIterator = soundOutputList->append();
+        (*listIterator)[deviceName] = "manual:";
+        (*listIterator)[deviceDescription] = "Manual entry...";
+	soundOutputView->set_active(*listIterator);
+	soundOutputEntry->set_text( config->soundDeviceOut );
+
+	for( iter = names.begin(); iter != end; iter++ ){
+		if( iter->getMaxInputChannels() > 0 ){
+			listIterator = soundInputList->append();
+			(*listIterator)[deviceName] = iter->getName();
+			(*listIterator)[deviceDescription] = Glib::locale_to_utf8( iter->getDescription() );
+			if( config->soundDeviceIn == iter->getName() )
+				soundInputView->set_active(*listIterator);
+		}
+
+		if( iter->getMaxOutputChannels() > 0 ){
+			listIterator = soundOutputList->append();
+			(*listIterator)[deviceName] = iter->getName();
+			(*listIterator)[deviceDescription] = Glib::locale_to_utf8( iter->getDescription() );
+			if( config->soundDeviceOut == iter->getName() )
+				soundOutputView->set_active(*listIterator);
+		}
+	}
+
+}
+
+void DeviceSettings::soundInputChange(){
+	Gtk::TreeModel::iterator iter = soundInputView->get_active();
+	if( !iter )
+		return;
+
+	Gtk::TreeModel::Row row = *iter;
+	const string &name = row[deviceName];
+
+	if( name == "manual:" ){
+		soundInputEntry->set_sensitive( true );
+	}
+	else{
+		soundInputEntry->set_sensitive( false );
+		soundInputEntry->set_text( name );
+	}
+}
+
+void DeviceSettings::soundOutputChange(){
+	Gtk::TreeModel::iterator iter = soundOutputView->get_active();
+	if( !iter )
+		return;
+
+	Gtk::TreeModel::Row row = *iter;
+	const string &name = row[deviceName];
+
+	if( name == "manual:" ){
+		soundOutputEntry->set_sensitive( true );
+	}
+	else{
+		soundOutputEntry->set_sensitive( false );
+		soundOutputEntry->set_text( name );
+	}
+}
+
+string DeviceSettings::apply(){
+	Gtk::TreeModel::iterator iC;
+	config->soundDeviceIn = soundInputEntry->get_text();
+	config->soundDeviceOut = soundOutputEntry->get_text();
 
 	if( spaudioCheck->get_active() ){
 		config->soundIOmixerType = "spatial";

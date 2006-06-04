@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #ifndef SETTINGS_DIALOG_GTK_H
@@ -36,6 +37,7 @@
 
 class GeneralSettings;
 class MediaSettings;
+class DeviceSettings;
 class SecuritySettings;
 class AdvancedSettings;
 class SipSoftPhoneConfiguration;
@@ -70,6 +72,7 @@ class SettingsDialog
 		Gtk::Dialog * dialogWindow;
 		GeneralSettings * generalSettings;
 		MediaSettings * mediaSettings;
+		DeviceSettings * deviceSettings;
 		SecuritySettings * securitySettings;
 		AdvancedSettings * advancedSettings;
 		MRef<SipSoftPhoneConfiguration *> config;
@@ -132,14 +135,50 @@ class MediaSettings
 
 		Gtk::TreeView * codecTreeView;
 		
-		Gtk::Entry * soundEntry;
-		Gtk::Entry * videoEntry;
-
 		Glib::RefPtr<Gtk::ListStore> codecList;
 		
 		Gtk::TreeModelColumnRecord * codecColumns;
 		Gtk::TreeModelColumn<bool> codecEnabled;	
 		Gtk::TreeModelColumn<Glib::ustring> codecName;
+
+
+		MRef<SipSoftPhoneConfiguration *> config;
+
+};
+
+class DeviceSettings
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
+
+	public:
+		DeviceSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		~DeviceSettings();
+
+		 std::string apply();
+		
+		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+
+	private:
+
+		void soundInputChange();
+		void soundOutputChange();
+
+		Gtk::Entry * videoEntry;
+
+		Gtk::Entry * soundInputEntry;
+		Gtk::Entry * soundOutputEntry;
+
+		Gtk::ComboBox * soundInputView;
+		Gtk::ComboBox * soundOutputView;
+
+		Gtk::TreeModelColumnRecord * deviceColumns;
+		Gtk::TreeModelColumn<std::string> deviceName;
+		Gtk::TreeModelColumn<Glib::ustring> deviceDescription;
+
+		Glib::RefPtr<Gtk::ListStore> soundInputList;
+		Glib::RefPtr<Gtk::ListStore> soundOutputList;
 
 		Gtk::Label * videoLabel;
 		Gtk::Label * videoDeviceLabel;
