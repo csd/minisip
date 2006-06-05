@@ -1,14 +1,21 @@
 Source: minisip
-Section: unknown
+Section: comm
 Priority: optional
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
-Build-Depends: debhelper (>= 4.0.0)
+Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
+ pkg-config, libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1),
+ libmnetutil-dev (>= 0.3.1), libmsip-dev (>= 0.3.1), libmikey-dev (>=
+ 0.4.1), libminisip-dev (>= 0.3.1), libx11-dev, libxext-dev,
+ libglademm-2.4-dev (>= 2.4), libglib2.0-dev
 Standards-Version: 3.6.1
 
 Package: minisip
 Architecture: any
-Depends: libspeex1 (>=1.1), libmsip0 (>= 0.3.1), libmikey0 (>= 0.4.1), libmnetutil0 (>= 0.3.1), libmutil0 (>= 0.3.1), libssl0.9.7 (>= 0.9.7), libglademm-2.4-1 (>=2.4)
-Description: minisip is a SIP user agent, with security enhancements
+Depends: ${shlibs:Depends}
+Recommends: minisip-plugins, minisip-gconf
+Suggests: minisip-video
+Description: SIP user agent, with security enhancements
  minisip is a soft telephone which uses the SIP protocol. It provides
  additional security, such as encryption and authentication, by using
  the SRTP (RFC3711) and MIKEY (RFC 3830) protocols. It uses GTK+ for

@@ -1,0 +1,3 @@
+debian/tmp/usr/bin/minisip_gtkgui
+debian/tmp/usr/share/minisip/*
+share/minisip.desktop /usr/share/applications
