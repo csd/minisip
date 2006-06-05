@@ -27,7 +27,6 @@
 
 #include<libminisip/soundcard/SoundDevice.h>
 #include<libminisip/soundcard/SoundDriverRegistry.h>
-#include<libminisip/soundcard/FileSoundDevice.h>
 
 #ifndef WIN32
 #	include<libminisip/soundcard/OssSoundDevice.h>
@@ -52,20 +51,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	MRef<SoundDevice*> device = SoundDriverRegistry::getInstance()->createDevice( devideId );
 	if( device ){
 		return device;
-	}
-
-	if( devideId.substr( 0, 5 ) == "file:" ){
-		size_t comaPos = devideId.find( "," );
-		if( comaPos == string::npos ){
-			merr << "Invalid file sound device specified in"
-				"configuration file."
-				"Sound will be disabled." << end;
-			return NULL;
-		}
-		return new FileSoundDevice( 
-				devideId.substr( 5, comaPos-5 ),
-				devideId.substr( comaPos + 1, string::npos ),
-				FILESOUND_TYPE_RAW );
 	}
 
 #ifdef WAVE_SOUND

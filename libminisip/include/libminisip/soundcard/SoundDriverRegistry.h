@@ -57,10 +57,12 @@ class LIBMINISIP_API SoundDriverRegistry: public MPluginRegistry, public MSingle
 		static MRef<SoundDriverRegistry*> getInstance();
 
 	protected:
-		void registerBuiltinDrivers();
+		SoundDriverRegistry();
 
 	private:
 		std::vector< MRef<SoundDriver*> > drivers;
+
+		friend class MSingleton<SoundDriverRegistry>;		
 };
 
 #endif	// SOUNDDRIVERREGISTRY_H

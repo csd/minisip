@@ -192,7 +192,10 @@ BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
 			source/soundcard/SoundSource.cxx \
 			${RESAMPLER_SRC} \
 			${AUDIOMIXER_SRC} \
+			source/soundcard/FileSoundDevice.h \
 			source/soundcard/FileSoundDevice.cxx \
+			source/soundcard/FileSoundDriver.h \
+			source/soundcard/FileSoundDriver.cxx \
 			source/soundcard/FileSoundSource.cxx \
 			source/soundcard/SoundDevice.cxx \
 			source/soundcard/SoundDriver.cxx \

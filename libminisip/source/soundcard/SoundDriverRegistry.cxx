@@ -26,6 +26,7 @@
 
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libmutil/dbg.h>
+#include"FileSoundDriver.h"
 
 // #ifdef PORTAUDIO_SUPPORT
 // #include<libminisip/soundcard/PortAudioDriver.h>
@@ -46,6 +47,10 @@ static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 	}
 }
 #endif
+
+SoundDriverRegistry::SoundDriverRegistry(){
+	registerPlugin( new FileSoundDriver( NULL ) );
+}
 
 const std::vector< MRef<SoundDriver*> > &SoundDriverRegistry::getDrivers() const{
 	return drivers;
