@@ -65,8 +65,6 @@ MRef<Media*> AudioPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config 
 		return NULL;
 	}
 
-	cerr << "AudioPlugin: cesc: soundDevIn = " << soundDevIn << endl;
-	cerr << "AudioPlugin: cesc: soundDevOut = " << soundDevOut << endl;
 	MRef<SoundDevice *> sounddevin = SoundDevice::create( soundDevIn );
 	MRef<SoundDevice *> sounddevout;
 

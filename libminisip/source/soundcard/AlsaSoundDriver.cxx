@@ -65,7 +65,7 @@ MRef<SoundDevice*> AlsaSoundDriver::createDevice( string deviceId ){
 std::vector<SoundDeviceName> AlsaSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	cerr << "AlsaSoundDriver::getDeviceNames not implemented" << endl;
+	mdbg << "AlsaSoundDriver::getDeviceNames not implemented" << end;
 
 	return names;
 }
