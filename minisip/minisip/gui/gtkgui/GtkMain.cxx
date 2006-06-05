@@ -25,19 +25,33 @@
 
 #include"GtkMainUI.h"
 #include<libminisip/Minisip.h>
+#include<libminisip/configbackend/UserConfig.h>
 
 #include<libmnetutil/TCPSocket.h>
 
 using namespace std;
 
+static bool redirectOutput(const char *logName){
+	freopen(logName, "a", stdout);
+	freopen(logName, "a", stderr);
+ 	cerr << "Created log file" << endl;
+
+	return true;
+}
+
 int main( int argc, char *argv[] )
 {
+#if defined(DEBUG_OUTPUT) || !defined(WIN32)
 	cerr << endl << "Starting MiniSIP GTK ... welcome!" << endl << endl;
+#endif
 
 	setupDefaultSignalHandling(); //Signal handlers are created for all 
 				      //threads created with libmutil/Thread.h
 				      //For the main thread we have to
 				      //install them
+#ifndef DEBUG_OUTPUT
+	redirectOutput( UserConfig::getFileName( "minisip.log" ).c_str() );
+#endif
 	
 	cerr << "Creating GTK GUI"<< endl;
 	MRef<Gui *> gui = GtkMainUI::create( argc, argv );
@@ -61,6 +75,12 @@ int main( int argc, char *argv[] )
 #endif	// DEBUG_OUTPUT
 
 		minisip.runGui();
+
+#ifndef DEBUG_OUTPUT
+		merr.setExternalHandler( NULL );
+		mout.setExternalHandler( NULL );
+		mdbg.setExternalHandler( NULL );
+#endif
 	} else {
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;
 	}
