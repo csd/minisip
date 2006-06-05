@@ -13,6 +13,8 @@ minisip (0.7.1-2~2) unstable; urgency=low
   * Move from "unknown" to "comm" section.
   * Include generate_certificates document.
   * Include minsip.desktop file.
+  * Use config.dpatch to replace all config.{sub,guess} with links to
+    /usr/share/misc/config.{sub,guess} in autotools-dev.
 
  -- Mikael Magnusson <mikma@users.sourceforge.net>  Tue,  6 Jun 2006 00:47:17 +0200
 
