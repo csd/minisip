@@ -1,0 +1,5 @@
+debian/tmp/usr/lib/libminisip/plugins/mvideo.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/mx11.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/msdl.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/mxv.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/mdc1394.{la,so}

@@ -1,0 +1,4 @@
+debian/tmp/usr/lib/libminisip/plugins/mfloat_resampler.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/mgsm.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/mspeex.{la,so}
+debian/tmp/usr/lib/libminisip/plugins/malsa.{la,so}

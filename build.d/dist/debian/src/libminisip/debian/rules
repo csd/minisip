@@ -41,7 +41,20 @@ endif
 config: patch config.status
 config.status: configure
 	dh_testdir
-	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" $(CONFFLAGS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	./configure \
+		CFLAGS="$(CFLAGS)" \
+		CXXFLAGS="$(CXXFLAGS)" \
+		$(CONFFLAGS) \
+		--prefix=/usr \
+		--mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		--disable-static \
+		--disable-test-suite \
+		--enable-sdl \
+		--enable-alsa \
+		--enable-avcodec-fixes \
+		--enable-video \
+		--with-avcodec=/usr/include/ffmpeg
 
 
 build: config build-stamp
@@ -82,7 +95,9 @@ binary-arch: build install
 	dh_installchangelogs
 #ChangeLog
 	dh_installdocs
-	dh_install
+	dh_install -plibminisip-dev -Xvideo
+	dh_install -plibminisip0 -Xvideo
+	dh_install -Nlibminisip0 -Nlibminisip-dev
 	dh_link
 	dh_strip
 	dh_compress

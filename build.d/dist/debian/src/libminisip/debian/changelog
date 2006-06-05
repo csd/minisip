@@ -1,5 +1,5 @@
-libminisip (0.3.1-1~1) UNRELEASED; urgency=low
+libminisip (0.3.1-1~2) unstable; urgency=low
 
   * Initial Release.
   
- -- Mikael Magnusson <mikma@users.sourceforge.net>  Wed, 31 May 2006 22:08:25 +0200
+ -- Mikael Magnusson <mikma@users.sourceforge.net>  Thu,  1 Jun 2006 22:48:53 +0200

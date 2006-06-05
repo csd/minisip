@@ -4,7 +4,7 @@ Section: devel
 Maintainer: Minisip developer team <minisip-devel@minisip.org>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
 Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
- pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1),
+ pkg-config, libmutil-dev (>= 0.3.1),
  libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1), libmstun-dev
  (>= 0.5.0), libmikey-dev (>= 0.4.1), libgconf2-dev, libglib2.0-dev,
  libsamplerate0-dev, libspeex-dev, libgsm1-dev, libavcodeccvs51-dev |
@@ -23,12 +23,61 @@ Description: Minisip SIP User Agent library - shared library
 
 Package: libminisip-dev
 Architecture: any
-Depends: libminisip0 (= ${Source-Version}), libssl-dev (>= 0.9.7),
+Depends: libminisip0 (= ${Source-Version}),
  libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1), libmnetutil-dev
- (>= 0.3.1), libmstun-dev (>= 0.5.0), libmikey-dev (>= 0.4.1),
- libasound2-dev
+ (>= 0.3.1), libmstun-dev (>= 0.5.0), libmikey-dev (>= 0.4.1)
 Description: Minisip SIP User Agent library - development files
  Minisip SIP User Agent library
  .
  This package contains the header files and static library needed to
  compile applications that use libminisip0.
+
+Package: libminisip-video0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Minisip video support - shared library
+ The libminisip-video library implements H.263-1998 video codec
+ .
+ This package contains the libminisip-video0 runtime library.
+
+Package: libminisip-video-dev
+Architecture: any
+Depends: libminisip-video0 (= ${Source-Version}), libminisip-dev (=
+ ${Source-Version} ), libavcodeccvs51-dev | libavcodec-dev
+Description: Minisip video support - development files
+ Video support for Minisip.
+ .
+ This package contains the header files and static library needed to
+ compile applications that use libminisip-video0.
+
+Package: minisip-plugins
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Various plugins for plugins
+ The minisip-plugins package contains various plugins for Minisip:
+ .
+ * GSM codec plugin.
+ * Speex codec plugin.
+ * Float audio rate conversion plugin.
+
+Package: minisip-video
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Video plugins for Minisip
+ The minisip-video package contains video plugins for Minisip:
+ .
+ * Video support
+ * Video4linux grabber
+ * IEEE1394 digital camera grabber
+ * X11, SDL and Xv video output drivers
+
+Package: minisip-gconf
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: GConf support for Minisip
+ The minisip-gconf contains a GConf plugin for Minisip.
+
