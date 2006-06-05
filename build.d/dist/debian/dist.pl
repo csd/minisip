@@ -1,5 +1,12 @@
 ###
 # dist.pl - extends support for build.pl for Debian/dpkg
+#
+# Debian packages directly required by the script:
+#
+# * svn-buildpackage
+# * devscripts
+# * dpkg-dev
+#
 
 our $debian_tarballsdir = "$topdir/build/tarballs";
 our $debian_buildareadir = "$topdir/build/build-area";
