@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=Minisip
 Comment=Soft Telephone
-Exec=minisip
+Exec=minisip_gtkgui
 Terminal=false
 Type=Application
 Icon=minisip.png
