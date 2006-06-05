@@ -121,7 +121,7 @@ sub debian_pkgcontents {
 #
 # debian_install
 # install all packages listed in the .changes file
-sub debian_merge {
+sub debian_install {
     my $changes = &debian_changes;
 
     act('debian: debi', qw( debi ), '--debs-dir', $debian_buildareadir, $changes );
