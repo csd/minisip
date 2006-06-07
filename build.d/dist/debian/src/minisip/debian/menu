@@ -1,2 +1,2 @@
-?package(minisip):needs="X11|text|vc|wm" section="Apps/network"\
-  title="minisip" command="/usr/bin/minisip"
+?package(minisip):needs="X11" section="Apps/Net"\
+  title="minisip" command="/usr/bin/minisip_gtkgui"
