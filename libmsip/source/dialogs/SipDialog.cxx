@@ -317,6 +317,11 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 		if( toTag == "" ) {
 			return false;
 		}
+		if( isEstablished && toTag != remoteTag ){
+			cerr << "SipDialogState: Multiple early dialogs unsupported" << endl;
+			return false;
+		}
+
 		isEarly = true;
 	} else {
 		isEarly = false;
@@ -341,7 +346,7 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 		//merr << "dialog state has a routeset" << end;
 	}
 
-	if( isEstablished )
+	if( isEstablished && ( isEarly || toTag == remoteTag ) )
 		// Update route set only for an existing dialog
 		return true;
 	
