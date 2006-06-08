@@ -9,4 +9,30 @@
 #
 #######
 
+## One of sid, etch, sarge, dapper
+#$debian_release_default = 'sid';
+
+##
+## builder callback
+## Adds support for building packages in a pdebuild/pbuilder chroot
+##
+#debian_set_callback('builder', sub {
+#	my ($params) = @_;
+#	my $codename = $params->{'codename'};
+#	my $buildareadir = $params->{'buildareadir'};
+#
+#	return "pdebuild --pbuilderroot sudo --configfile /etc/pbuilder/${codename} --buildresult ${buildareadir}",
+#} );
+#
+##
+## package-post callback
+## Includes the created package in a reprepro repository
+##
+#debian_set_callback('package-post', sub {
+#	my ($params, $changes) = @_;
+#	my $codename = $params->{'codename'};
+#
+#	act('debian: reprepro', qw( reprepro --basedir /var/lib/reprepro/debian include ), $codename, $changes );
+#} );
+
 1

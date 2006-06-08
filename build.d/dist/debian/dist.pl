@@ -9,30 +9,93 @@
 #
 
 our $debian_tarballsdir = "$topdir/build/tarballs";
-our $debian_buildareadir = "$topdir/build/build-area";
+our $default_buildareadir = "$topdir/build/build-area";
 our $debian_dir = "$confdir/dist/debian/src";
 our $svn_url_base = 'minisip+svn://svn.minisip.org/minisip';
 my $debian_tags_url = "${svn_url_base}/tags/build.d/dist/src/debian";
 my $upstream_tags_url = "${svn_url_base}/tags";
+
+
+sub debian_set_callback {
+	my ($name, $callback) = @_;
+
+	$debian_callbacks{$name} = $callback;
+}
+
+sub debian_release {
+	my $release = $debian_release_default;
+	my $params = $debian_releases{$release};
+
+	return $params;
+}
+
+sub debian_buildarea {
+	my $params = &debian_release;
+
+	unless ($params) {
+		warn "warning: Debian release not found\n";
+		return;
+	}
+
+	my $debian_buildareadir = $params->{'buildareadir'} || $default_buildareadir;
+	return $debian_buildareadir;
+}
+
+#
+# debian_version
+#
+sub debian_version {
+	my $versionline = `dpkg-parsechangelog -l${debian_dir}/$pkg/debian/changelog | grep ^Version`;
+
+	$versionline =~ /^Version: (.*)/;
+	my $version = $1;
+
+	return $version;
+}
+
+#
+# debian_version_full
+#
+sub debian_version_full {
+	my ($params) = @_;
+	my $version = &debian_version;
+	
+	if( $suite ne 'unstable' ){
+		my $codename = $params->{'codename'};
+
+		if ( $version !~ /$codename/ ) {
+			$version = "${version}${codename}1";
+		}
+	}
+
+	return $version;
+}
 
 #
 # debian_changes
 # return .changes file
 #
 sub debian_changes {
+	my ($params) = @_;
+	my $debian_buildareadir = &debian_buildarea;
+
     my $arch = `dpkg-architecture -qDEB_BUILD_ARCH`;
 
     $arch =~ s/\s*//g;
 
-    my $versionline = `dpkg-parsechangelog -l${debian_dir}/$pkg/debian/changelog | grep ^Version`;
-
-    $versionline =~ /^Version: (.*)/;
-    my $version = $1;
+    my $version = &debian_version_full($params);
 
     my $changes = "$debian_buildareadir/${pkg}_${version}_${arch}.changes";
-    $changes = "$debian_buildareadir/${pkg}_${version}_source.changes" unless -e $changes;
 
-    return $changes;
+	return $changes if -e $changes;
+
+	$changes = "$debian_buildareadir/${pkg}_${version}_source.changes";
+
+	return $changes if -e $changes;
+
+	print "Changes not found: $changes";
+
+	return undef;
 }
 
 #
@@ -40,6 +103,16 @@ sub debian_changes {
 # build source and binary package
 #
 sub debian_package {
+	my $params = &debian_release;
+
+	unless ($params) {
+		warn "warning: Debian release not found\n";
+		return;
+	}
+
+	my $builder = $debian_callbacks{'builder'};
+	my $buildareadir = $params->{'buildareadir'} || $default_buildaredir;
+
 	my @distfiles = distfiles();
 	unless (@distfiles) {
 		warn <<NEED_TARBALLS;
@@ -66,12 +139,54 @@ NEED_TARBALLS
 	    }
 	}
 
-	easy_mkdir($debian_buildareadir);
+	easy_mkdir($buildareadir);
 
-	my $svn_override = "tagsUrl=$debian_tags_url/${pkg},upsTagUrl=$upstream_tags_url/${pkg},buildArea=$debian_buildareadir,origDir=$debian_tarballsdir";
+	my $svn_override = "tagsUrl=$debian_tags_url/${pkg},upsTagUrl=$upstream_tags_url/${pkg},buildArea=$buildareadir,origDir=$debian_tarballsdir";
+	my @buildpackage_args = qw( --svn-dont-clean --svn-ignore-new );
+
+	push(@buildpackage_args, "--svn-override=${svn_override}");
+
+	my $builder_str;
+	if ($builder) {
+		$builder_str = &$builder($params);
+	}
+
+	if ($builder_str) {
+		push(@buildpackage_args, "--svn-builder=${builder_str}");
+	} else {
+		push(@buildpackage_args, qw( -us -uc -rfakeroot ));
+	}
 
 	easy_chdir("$debian_dir/$pkg");
-	act('debian: svn-buildpackage', qw( svn-buildpackage -us -uc -rfakeroot --svn-dont-clean --svn-ignore-new ), "--svn-override=${svn_override}" );
+
+	my $suite = $params->{'suite'};
+	my $description = $params->{'description'};
+	my $version = &debian_version;
+	my $version_full = &debian_version_full($params);
+	
+	if( $version ne $version_full ){
+		my $codename = $params->{'codename'};
+
+		act('debian: backup changelog',
+		    qw( cp -a debian/changelog debian/changelog.build_bak ) );
+
+		act('debian: update changelog', 'dch',
+		    '--newversion', $version_full,
+		    '--distribution', $suite,
+		    "Package for $description");
+	}
+
+	if( act('debian: svn-buildpackage', 'svn-buildpackage', @buildpackage_args) ){
+		my $changes = &debian_changes($params);
+		my $package_post = $debian_callbacks{'package-post'};
+
+		&$package_post( $params, $changes ) if $package_post;
+	}
+
+	if( $suite ne 'unstable' ){
+		act('debian: restore changelog',
+		    qw( mv -f debian/changelog.build_bak debian/changelog ) );
+	}
 
 	return debian_pkgfiles();
 }
@@ -82,7 +197,17 @@ NEED_TARBALLS
 # all files listed in the .changes file
 #
 sub debian_pkgfiles {
-    my $changes = &debian_changes;
+	my $params = &debian_release;
+
+	unless ($params) {
+		warn "warning: Debian release not found\n";
+		return;
+	}
+
+    my $changes = &debian_changes($params);
+    my $debian_buildareadir = &debian_buildarea;
+
+    die "No changes file found" unless $changes;
 
     open(CHANGES, "< $changes") or die "can't read $changes";
 
@@ -113,7 +238,14 @@ sub debian_pkgfiles {
 # dump contents of all packages listed in .changes file
 #
 sub debian_pkgcontents {
-    my $changes = &debian_changes;
+	my $params = &debian_release;
+
+	unless ($params) {
+		warn "warning: Debian release not found\n";
+		return;
+	}
+
+	my $changes = &debian_changes($params);
 
     act('debian: debc', 'debc', $changes);
 }
@@ -122,7 +254,15 @@ sub debian_pkgcontents {
 # debian_install
 # install all packages listed in the .changes file
 sub debian_install {
-    my $changes = &debian_changes;
+	my $params = &debian_release;
+
+	unless ($params) {
+		warn "warning: Debian release not found\n";
+		return;
+	}
+
+	my $changes = &debian_changes($params);
+    my $debian_buildareadir = &debian_buildarea;
 
     act('debian: debi', qw( debi ), '--debs-dir', $debian_buildareadir, $changes );
 }
