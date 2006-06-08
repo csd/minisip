@@ -7,9 +7,10 @@ Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
  pkg-config, libmutil-dev (>= 0.3.1),
  libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1), libmstun-dev
  (>= 0.5.0), libmikey-dev (>= 0.4.1), libgconf2-dev, libglib2.0-dev,
- libsamplerate0-dev, libspeex-dev, libgsm1-dev, libavcodeccvs51-dev |
- libavcodec-dev, zlib1g-dev, libdc1394-13-dev, libraw1394-dev,
- libxv-dev, libsdl1.2-dev, libasound2-dev
+ libsamplerate0-dev, libspeex-dev, libgsm1-dev, libavcodec-dev |
+ libavcodeccvs51-dev, zlib1g-dev, libdc1394-13-dev | libdc1394-11-dev,
+ libraw1394-dev, 
+ libxv-dev, libsdl1.2-dev, libasound2-dev, libmsip-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
 Package: libminisip0
