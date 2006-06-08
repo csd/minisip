@@ -304,7 +304,7 @@ plugins_LTLIBRARIES += msdl.la
 msdl_la_LDFLAGS = $(plugins_LDFLAGS)
 msdl_la_SOURCES = source/video/display/SdlDisplay.cxx \
 			source/video/display/SdlDisplay.h
-msdl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(SDL_LIBS)
+msdl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(SDL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
         grabber_src = source/video/grabber/Grabber.cxx
