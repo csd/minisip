@@ -36,6 +36,61 @@ m4_define([m4_MINISIP_LIBRARY_VERSION],[
 # End of m4_MINISIP_LIBRARY_VESRION
 #
 
+# AM_MINISIP_VERSION_GEN()
+# ------------------------
+AC_DEFUN([AM_MINISIP_VERSION_GEN],[
+  if test -e ${srcdir}/.svnrevision; then
+    svnrevision=`cat ${srcdir}/.svnrevision`
+  else
+    svnrevision=`LANG=C svnversion -c ${srcdir} | cut -d: -f2`
+  fi
+
+  version="MINISIP_PACKAGE_VERSION+r${svnrevision}"
+  version_old=
+
+  if test -e version; then
+     version_old=`cat version`
+  fi
+
+  if test "$version" != "$version_old"; then
+     cat > "include/version.h" <<EOF
+#define PACKAGE_VERSION_FULL "$version"
+#define PACKAGE_STRING_FULL "${PACKAGE_NAME} $version"
+EOF
+
+     cat > "version" <<EOF
+$version
+EOF
+  else
+     echo "config.status: include/version.h is unchanged"
+  fi
+
+  VERSION_FULL=$version
+])
+# End of AM_MINISIP_VERSION_GEN
+
+# AM_MINISIP_PACKAGE_UNRELEASED()
+# ---------------------------------
+AC_DEFUN([AM_MINISIP_PACKAGE_UNRELEASED], [
+
+AC_CONFIG_COMMANDS([include/version.h], [
+  AM_MINISIP_VERSION_GEN
+],[
+  PACKAGE_NAME=$PACKAGE_NAME
+])
+
+AC_DEFINE([HAVE_VERSION_H], [1], [Define to 1 if you have `include/version.h'])
+AC_DEFINE([VERSION], [PACKAGE_VERSION_FULL], [Version number of package])
+AC_DEFINE([PACKAGE_VERSION], [PACKAGE_VERSION_FULL], [Define to the version of this package.])
+AC_DEFINE([PACKAGE_STRING], [PACKAGE_STRING_FULL], [Define to the full name and version of this package.])
+AM_MINISIP_VERSION_GEN
+
+VERSION=$VERSION_FULL
+PACKAGE_VERSION=$VERSION_FULL
+PACKAGE_STRING="${PACKAGE_NAME} ${VERSION_FULL}"
+])
+# End of AM_MINISIP_PACKAGE_UNRELEASED
+
 # AM_MINISIP_PACKAGE_INIT()
 # -------------------------
 AC_DEFUN([AM_MINISIP_PACKAGE_INIT],[

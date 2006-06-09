@@ -64,6 +64,10 @@
 #	include<hildon-lgpl/hildon-widgets/hildon-appview.h>
 #endif
 
+#ifdef HAVE_VERSION_H
+#	include<version.h>
+#endif
+
 #ifdef OLDLIBGLADEMM
 #	define SLOT(a,b) SigC::slot(a,b)
 #	define BIND SigC::bind 
