@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -38,6 +40,7 @@
 #define SIP_URI_USER_TYPE_DEFAULT "phone"
 
 #include<sys/types.h>
+#include<map>
 
 #include<libmutil/MemObject.h>
 
@@ -50,9 +53,6 @@ or from parameters that can be set.
 The scheme is:
 
 "displayName" <protocolId:userName@ip:port;userType;transport>
-
-FIXME: User and transport are the only understood params ... the rest
-are discarded.
 */
 class LIBMSIP_API SipUri : public MObject{
 	public:
@@ -143,16 +143,39 @@ class LIBMSIP_API SipUri : public MObject{
 		
 		void clear();
 
+		void setParameter(const std::string &key, const std::string &val){
+			parameters[ key ] = val;
+		}
+
+		bool hasParameter(const std::string &key) const{
+			std::map<std::string, std::string>::const_iterator iter;
+			iter = parameters.find( key );
+
+			return iter != parameters.end();
+		}
+
+		std::string getParameter(const std::string &key) const{
+			std::map<std::string, std::string>::const_iterator iter;
+			iter = parameters.find( key );
+			if( iter != parameters.end() )
+				return iter->second;
+			else
+				return "";
+		}
+
+		void removeParameter(const std::string &key){
+			parameters.erase( key );
+		}
+
 	private:
 		std::string displayName;
 		std::string protocolId;
 		std::string userName;
 		std::string ip;
 		int32_t port;
-		std::string userType;
-		std::string transport;
 		
 		bool validUri;
+		std::map<std::string, std::string> parameters;
 };
 
 #endif

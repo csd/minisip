@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  Copyright (C) 2005  Mikael Magnusson
+  Copyright (C) 2005-2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -127,16 +127,8 @@ void SipUri::setUri( string buildFrom ) {
 				paramName = params[idx];
 				params[idx] = "";
 			}
-			
-			if( paramName == "transport" ) {
-				setTransport( params[idx] );
-			} else if( paramName == "user" ) {
-				setUserType( params[idx] );
-			} else {
-		#ifdef DEBUG_OUTPUT
-// 				cerr << "SipUri:: param not understood ... ignore: " << paramName << endl;
-		#endif
-			}
+
+			setParameter( paramName, params[ idx ] );
 		}
 	}
 	
@@ -229,9 +221,8 @@ void SipUri::clear( ) {
 	this->userName = "";
 	this->ip = "";
 	this->port = 0;
-	this->userType = "";
-	this->transport = "";
 	this->validUri = false;
+	this->parameters.clear();
 }
 
 string SipUri::getString() const {
@@ -249,8 +240,19 @@ string SipUri::getString() const {
 	}
 	Uri += "<";
 	Uri += getRequestUriString();
-	if( getTransport() != "" ) Uri += ";transport=" + getTransport();
-	if( getUserType() != "" ) Uri += ";user=" + getUserType();
+
+	map<string, string>::const_iterator iter;
+	map<string, string>::const_iterator last = parameters.end();
+
+	for( iter = parameters.begin(); iter != last; iter++ ){
+		string key = iter->first;
+		string val = iter->second;
+
+		if( val.empty() )
+			Uri += ';' + key ;
+		else
+			Uri += ';' + key + '=' + val;
+	}
 	Uri += ">";
 	
 #ifdef DEBUG_OUTPUT
@@ -366,24 +368,24 @@ int32_t SipUri::getPort() const {
 }
 
 void SipUri::setUserType(string type){
-	this->userType=type;
+	setParameter( "user", type );
 #ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: user type = " << this->userType << endl;
+// 	cerr << "SipUri: user type = " << type << endl;
 #endif
 }
 
 string SipUri::getUserType() const {
-	return userType;
+	return getParameter( "user" );
 }
 
 void SipUri::setTransport(string transp){
-	transport = transp;
+	setParameter( "transport", transp );
 #ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: transport = " << this->transport << endl;
+// 	cerr << "SipUri: transport = " << transp << endl;
 #endif
 }
 
 string SipUri::getTransport() const {
-	return transport;
+	return getParameter( "transport" );
 }
 
