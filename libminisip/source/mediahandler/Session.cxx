@@ -325,6 +325,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	std::list<MRef<Codec *> >::iterator iC;
 // 	uint8_t payloadType;
 	string rtpmap;
+	bool found = false;
 
 	this->peerUri = peerUri;
 // 	cerr << "Session::setSdpOffer" << endl;
@@ -408,11 +409,13 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 						a->setAttributes( *iAttribute );
 						answerM->addAttribute( *a );
 					}
+
+					found = true;
 				}
 			}
 		}
 	}
-	return true;
+	return found;
 }
 
 MRef<SdpPacket *> Session::getSdpAnswer(){
