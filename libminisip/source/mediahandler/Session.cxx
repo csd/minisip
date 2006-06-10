@@ -21,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include <config.h>
@@ -200,6 +201,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	MRef<IPAddress *> remoteAddress;
 	// Not used
 	int port;
+	bool found = false;
 
 	this->peerUri = peerUri;
 #ifdef DEBUG_OUTPUT
@@ -242,22 +244,25 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
+
+				if( !receiver )
+					continue;
 #ifdef DEBUG_OUTPUT
-				if( receiver )
-					cerr << "Session::setSdpAnswer - Found receiver at " << remoteAddress->getString() << endl;
+				cerr << "Session::setSdpAnswer - Found receiver at " << remoteAddress->getString() << endl;
 #endif
-				if( receiver && m->getPort() == 0 ){
+				if( m->getPort() == 0 ){
 					/* This offer was rejected */
 					receiver->disabled = true;
 				}
-				else if( receiver ){
+				else{
 					/* Be ready to receive */
 					receiver->start();
+					found = true;
 				}
 			}
 		}
 	}
-	return true;
+	return found;
 }
 
 MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, MRef<IPAddress *> &remoteAddress ){

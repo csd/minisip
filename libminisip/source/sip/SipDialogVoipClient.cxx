@@ -249,9 +249,6 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		
 		string peerUri = dialogState.remoteUri;
-		if(!sortMIME(*resp->getContent(), peerUri, 3))
-			return false;
-
 		dialogState.updateState( resp );
 		sendAck();
 		
@@ -269,6 +266,9 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 		
 		sipStack->getCallback()->handleCommand("gui", cmdstr);
 		
+		if(!sortMIME(*resp->getContent(), peerUri, 3))
+			return false;
+
 #ifdef IPSEC_SUPPORT
 		// Check if IPSEC was required
 		if (ipsecSession->required() && !ipsecSession->offered)
