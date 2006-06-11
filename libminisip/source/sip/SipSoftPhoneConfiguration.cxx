@@ -140,10 +140,14 @@ void SipSoftPhoneConfiguration::save(){
 		if( (*iIdent) == pstnIdentity ){
 			backend->save( accountPath + "pstn_account", "yes" );
 		}
+		else
+			backend->save( accountPath + "pstn_account", "no" );
 
 		if( (*iIdent) == inherited->sipIdentity ){
 			backend->save( accountPath + "default_account", "yes" );
 		}
+		else
+			backend->save( accountPath + "default_account", "no" );
 		
 		if( (*iIdent)->registerToProxy ) {
 			backend->save( accountPath + "register", "yes" );
