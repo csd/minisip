@@ -141,7 +141,7 @@ dnl		if test "${enable_stl}" = "yes"; then
 AC_DEFINE(USE_STL, [], [STL enabled])
 dnl		fi ])
 PKG_PROG_PKG_CONFIG
-AC_REQUIRE([AM_MINISIP_VERSION_INIT])
+AM_MINISIP_VERSION_INIT
 ])
 # End of AM_MINISIP_PACKAGE_INIT
 #
