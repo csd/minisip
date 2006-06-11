@@ -25,6 +25,14 @@ m4_define([m4_MINISIP_PACKAGE_CONTACT],[
 # End of m4_MINISIP_PACKAGE_CONTACT
 #
 
+# m4_MINISIP_PACKAGE_RELEASED()
+# ---------------------------------------
+m4_define([m4_MINISIP_PACKAGE_RELEASED],[
+		m4_define([MINISIP_PACKAGE_RELEASED],[yes])
+	])
+# End of m4_MINISIP_PACKAGE_RELEASED
+#
+
 # m4_MINISIP_LIBRARY_VERSION(CURRENT, REVISION, AGE)
 # --------------------------------------------------
 m4_define([m4_MINISIP_LIBRARY_VERSION],[
@@ -39,6 +47,9 @@ m4_define([m4_MINISIP_LIBRARY_VERSION],[
 # AM_MINISIP_VERSION_GEN()
 # ------------------------
 AC_DEFUN([AM_MINISIP_VERSION_GEN],[
+ifdef([MINISIP_PACKAGE_RELEASED],[
+  version="MINISIP_PACKAGE_VERSION"
+],[
   if test -e ${srcdir}/.svnrevision; then
     svnrevision=`cat ${srcdir}/.svnrevision`
   else
@@ -46,6 +57,7 @@ AC_DEFUN([AM_MINISIP_VERSION_GEN],[
   fi
 
   version="MINISIP_PACKAGE_VERSION+r${svnrevision}"
+])
   version_old=
 
   if test -e version; then
@@ -69,9 +81,9 @@ EOF
 ])
 # End of AM_MINISIP_VERSION_GEN
 
-# AM_MINISIP_PACKAGE_UNRELEASED()
+# AM_MINISIP_VERSION_INIT()
 # ---------------------------------
-AC_DEFUN([AM_MINISIP_PACKAGE_UNRELEASED], [
+AC_DEFUN([AM_MINISIP_VERSION_INIT], [
 
 AC_CONFIG_COMMANDS([include/version.h], [
   AM_MINISIP_VERSION_GEN
@@ -89,7 +101,7 @@ VERSION=$VERSION_FULL
 PACKAGE_VERSION=$VERSION_FULL
 PACKAGE_STRING="${PACKAGE_NAME} ${VERSION_FULL}"
 ])
-# End of AM_MINISIP_PACKAGE_UNRELEASED
+# End of AM_MINISIP_VERSION_INIT
 
 # AM_MINISIP_PACKAGE_INIT()
 # -------------------------
@@ -127,6 +139,7 @@ dnl		if test "${enable_stl}" = "yes"; then
 AC_DEFINE(USE_STL, [], [STL enabled])
 dnl		fi ])
 PKG_PROG_PKG_CONFIG
+AC_REQUIRE([AM_MINISIP_VERSION_INIT])
 ])
 # End of AM_MINISIP_PACKAGE_INIT
 #

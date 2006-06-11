@@ -4,6 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 m4_MINISIP_PACKAGE_VERSION(libmstun, mstun, 0, 5, 0)
 m4_MINISIP_PACKAGE_CONTACT([Zachary T Welch], [zach-minisip@splitstring.com])
+dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
 
 dnl AC_PREREQ(2.57)
@@ -14,8 +15,6 @@ AM_INIT_AUTOMAKE(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(include/compilation_config.h)
 AM_MINISIP_PACKAGE_INIT
-dnl Remove for released versions
-AM_MINISIP_PACKAGE_UNRELEASED
 
 AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
