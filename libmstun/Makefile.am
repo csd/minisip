@@ -39,3 +39,6 @@ MAINTAINERCLEANFILES = \
 	$(srcdir)/config/install-sh \
 	$(srcdir)/config/ltmain.sh \
 	$(srcdir)/config/missing
+
+dist-hook:
+	cp -a version $(distdir)/.version

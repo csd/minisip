@@ -437,3 +437,6 @@ MAINTAINERCLEANFILES  = $(srcdir)/configure \
 			$(srcdir)/aclocal.m4 \
 			$(srcdir)/install-sh
 
+
+dist-hook:
+	cp -a version $(distdir)/.version

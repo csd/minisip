@@ -16,6 +16,7 @@ dist-hook:
 		cp -a $(srcdir)/$$i $(distdir)/$$i; \
 		find $(distdir)/$$i -name '.svn' -a -type d | xargs -r rm -r; \
 	done
+	cp -a version $(distdir)/.version
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}

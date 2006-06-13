@@ -77,3 +77,6 @@ MAINTAINERCLEANFILES  = $(srcdir)/configure \
 			$(srcdir)/config/missing \
 			$(srcdir)/aclocal.m4 \
 			$(srcdir)/config/compilation_config.h.in
+
+dist-hook:
+	cp -a version $(distdir)/.version

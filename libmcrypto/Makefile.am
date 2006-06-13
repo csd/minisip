@@ -56,3 +56,6 @@ MAINTAINERCLEANFILES = \
 	$(srcdir)/config.guess \
 	$(srcdir)/config.sub \
 	$(srcdir)/ltmain.sh
+
+dist-hook:
+	cp -a version $(distdir)/.version

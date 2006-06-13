@@ -68,3 +68,6 @@ MAINTAINERCLEANFILES = \
 		$(srcdir)/ltmain.sh \
 		$(srcdir)/missing
 
+
+dist-hook:
+	cp -a version $(distdir)/.version

@@ -88,3 +88,5 @@ MAINTAINERCLEANFILES = \
 maintainer-clean-local:
 	rm -rf $(srcdir)/libltdl
 
+dist-hook:
+	cp -a version $(distdir)/.version

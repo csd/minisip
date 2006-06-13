@@ -25,14 +25,6 @@ m4_define([m4_MINISIP_PACKAGE_CONTACT],[
 # End of m4_MINISIP_PACKAGE_CONTACT
 #
 
-# m4_MINISIP_PACKAGE_RELEASED()
-# ---------------------------------------
-m4_define([m4_MINISIP_PACKAGE_RELEASED],[
-		m4_define([MINISIP_PACKAGE_RELEASED],[yes])
-	])
-# End of m4_MINISIP_PACKAGE_RELEASED
-#
-
 # m4_MINISIP_LIBRARY_VERSION(CURRENT, REVISION, AGE)
 # --------------------------------------------------
 m4_define([m4_MINISIP_LIBRARY_VERSION],[
@@ -47,9 +39,11 @@ m4_define([m4_MINISIP_LIBRARY_VERSION],[
 # AM_MINISIP_VERSION_GEN()
 # ------------------------
 AC_DEFUN([AM_MINISIP_VERSION_GEN],[
-ifdef([MINISIP_PACKAGE_RELEASED],[
-  version="MINISIP_PACKAGE_VERSION"
-],[
+if test -e .version; then
+  version=`cat .version`
+elif test -e ${srcdir}/.version; then
+  version=`cat ${srcdir}/.version`
+else
   if test -e ${srcdir}/.svnrevision; then
     svnrevision=`cat ${srcdir}/.svnrevision`
   else
@@ -57,7 +51,8 @@ ifdef([MINISIP_PACKAGE_RELEASED],[
   fi
 
   version="MINISIP_PACKAGE_VERSION+r${svnrevision}"
-])
+fi
+
   version_old=
 
   if test -e version; then
@@ -84,6 +79,8 @@ EOF
 # AM_MINISIP_VERSION_INIT()
 # ---------------------------------
 AC_DEFUN([AM_MINISIP_VERSION_INIT], [
+
+test -d "include" || mkdir "include"
 
 AC_CONFIG_COMMANDS([include/version.h], [
   AM_MINISIP_VERSION_GEN
