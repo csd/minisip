@@ -42,9 +42,9 @@ sub debian_buildarea {
 }
 
 #
-# debian_version
+# debian_changelog_version
 #
-sub debian_version {
+sub debian_changelog_version {
 	my $versionline = `dpkg-parsechangelog -l${debian_dir}/$pkg/debian/changelog | grep ^Version`;
 
 	$versionline =~ /^Version: (.*)/;
@@ -55,10 +55,19 @@ sub debian_version {
 
 #
 # debian_version_full
+# Return debian version of package based on 
 #
 sub debian_version_full {
-	my ($params) = @_;
-	my $version = &debian_version;
+	my ($params, $tar_version) = @_;
+	my $version = &debian_changelog_version;
+	my $suite = $params->{'suite'};
+
+	my $version_base = substr($version, 0, length($tar_version));
+
+	if( $version_base ne $tar_version ) {
+		# New upstream version
+		$version = "${tar_version}-1";
+	}
 	
 	if( $suite ne 'unstable' ){
 		my $codename = $params->{'codename'};
@@ -83,7 +92,7 @@ sub debian_changes {
 
     $arch =~ s/\s*//g;
 
-    my $version = &debian_version_full($params);
+    my $version = &debian_version_full($params, &debian_changelog_version);
 
     my $changes = "$debian_buildareadir/${pkg}_${version}_${arch}.changes";
 
@@ -123,6 +132,10 @@ NEED_TARBALLS
 
 	easy_mkdir($debian_tarballsdir);
 
+	my $tar_version;
+	my $tar_mtime = undef;
+
+	# Search for newest tarball
 	for my $p ( @distfiles ) {
 	    my $base = basename($p);
 
@@ -131,8 +144,23 @@ NEED_TARBALLS
 		my $version = $2;
 		my $orig = "${pkg}_${version}.orig.tar.gz";
 		my $tgt = File::Spec->catdir($debian_tarballsdir, $orig);
+		my $newer;
 
-		act('debian: ln', qw( ln -sf ), $p, $tgt);
+		my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+		    $atime,$mtime,$ctime,$blksize,$blocks) = stat($p);
+
+		if ($tar_mtime) {
+			$newer = $mtime > $tar_mtime;
+		} else {
+			$newer = true;
+		}
+
+		if ($newer) {
+			$tar_mtime = $mtime;
+			$tar_version = $version;
+				
+			act('debian: ln', qw( ln -sf ), $p, $tgt);
+		}
 	    } else {
 		warn "warning: Can't parse tarball version";
 		return;
@@ -161,8 +189,8 @@ NEED_TARBALLS
 
 	my $suite = $params->{'suite'};
 	my $description = $params->{'description'};
-	my $version = &debian_version;
-	my $version_full = &debian_version_full($params);
+	my $version = &debian_changelog_version;
+	my $version_full = &debian_version_full($params, $tar_version);
 	
 	if( $version ne $version_full ){
 		my $codename = $params->{'codename'};
@@ -183,7 +211,7 @@ NEED_TARBALLS
 		&$package_post( $params, $changes ) if $package_post;
 	}
 
-	if( $suite ne 'unstable' ){
+	if( $version ne $version_full ){
 		act('debian: restore changelog',
 		    qw( mv -f debian/changelog.build_bak debian/changelog ) );
 	}
