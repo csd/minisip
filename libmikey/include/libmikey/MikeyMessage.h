@@ -51,8 +51,8 @@
 #define MIKEY_TYPE_DH_RESP     5
 #define MIKEY_TYPE_ERROR       6
 
-#define MIKEY_ENCR_AES_CM_128 0
-#define MIKEY_ENCR_NULL       1
+#define MIKEY_ENCR_NULL       0
+#define MIKEY_ENCR_AES_CM_128 1
 #define MIKEY_ENCR_AES_KW_128 2
 
 #define MIKEY_MAC_NULL          0

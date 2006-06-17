@@ -265,7 +265,7 @@ void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
 			}
 
 			for( j = 6; j < 14; j++ ){
-				iv[j] = (byte_t)(saltKey[j] ^ (ka->t_received >> (13-j)) & 0xFF);
+				iv[j] = (byte_t)(saltKey[j] ^ (ka->t_received >> (13-j)*8) & 0xFF);
 			}
 			iv[14] = 0x00;
 			iv[15] = 0x00;
