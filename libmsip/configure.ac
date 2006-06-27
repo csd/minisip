@@ -58,6 +58,7 @@ AC_CONFIG_FILES([
 		libmsip.pc 
 		include/Makefile 
 		m4/Makefile 
+		tests/Makefile 
 		win32/Makefile 
 		win32/libmsip-res.rc
 	])
