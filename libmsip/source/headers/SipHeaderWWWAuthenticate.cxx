@@ -49,7 +49,7 @@ const string sipHeaderValueWWWAuthenticationTypeStr = "WWW-Authenticate";
 SipHeaderValueWWWAuthenticate::SipHeaderValueWWWAuthenticate(const string &build_from)
 		: SipHeaderValueProxyAuthenticate(SIP_HEADER_TYPE_WWWAUTHENTICATE,sipHeaderValueWWWAuthenticationTypeStr, build_from)
 {
-	cerr << "SipHeaderValueWWWAuthenticate constructor running with <"<<build_from<<">"<<endl;
+//	cerr << "SipHeaderValueWWWAuthenticate constructor running with <"<<build_from<<">"<<endl;
 }
 
 SipHeaderValueWWWAuthenticate::~SipHeaderValueWWWAuthenticate(){

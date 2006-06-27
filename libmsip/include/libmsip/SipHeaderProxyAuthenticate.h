@@ -59,7 +59,7 @@ extern SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory;
 class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 	public:
 		
-		SipHeaderValueProxyAuthenticate(int type, std::string typeStr, const std::string &build_from);
+		SipHeaderValueProxyAuthenticate(int type, const std::string &typeStr, const std::string &build_from);
 		
 		SipHeaderValueProxyAuthenticate(const std::string &build_from);
 

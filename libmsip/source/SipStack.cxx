@@ -58,6 +58,7 @@
 #include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderTo.h>
+#include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipCommandString.h>
 
 #include<libmutil/massert.h>
@@ -118,7 +119,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Via", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("v", sipHeaderViaFactory);
 	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
-	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderProxyAuthenticateFactory);
+	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderWWWAuthenticateFactory);
 
 	addSupportedExtension("100rel");
 

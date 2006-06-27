@@ -46,7 +46,7 @@ SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory=proxyauthFactory;
 
 const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
-SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(int type, string typeStr, const string &build_from)
+SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(int type, const string &typeStr, const string &build_from)
 		: SipHeaderValue(type, typeStr)
 {
 	init(build_from);
