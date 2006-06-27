@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
@@ -227,7 +229,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 				hval = factory(value_zero);
 			}else{
 // 				cerr << "SipHeaderValueUnsupported: "<< line << endl;
-				hval = new SipHeaderValueUnknown(value_zero);
+				hval = new SipHeaderValueUnknown(headerType, value_zero);
 			}	
 			
 			for(unsigned j=1; j<value_params.size(); j++){

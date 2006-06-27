@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -26,6 +28,7 @@
  * 	SipHeaderValueUnknown.cxx
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
+ * 	Mikael Magnusson, mikma@users.sourceforge.net
  * Purpose
  * 
 */
@@ -38,8 +41,8 @@ using namespace std;
 
 const string sipHeaderUnknownTypeString ="";
 
-SipHeaderValueUnknown::SipHeaderValueUnknown(const string &build_from)
-		:SipHeaderValueString(SIP_HEADER_TYPE_UNKNOWN,sipHeaderUnknownTypeString, build_from)
+SipHeaderValueUnknown::SipHeaderValueUnknown(const string &headerName, const string &build_from)
+		:SipHeaderValueString(SIP_HEADER_TYPE_UNKNOWN,headerName, build_from)
 {
 }
 

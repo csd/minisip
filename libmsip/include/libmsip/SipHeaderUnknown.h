@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -26,6 +28,7 @@
  * 	SipHeaderSubject.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se
+ * 	Mikael Magnusson, mikma@users.sourceforge.net
  * Purpose
  * 
 */
@@ -49,7 +52,7 @@
 */
 class LIBMSIP_API SipHeaderValueUnknown: public SipHeaderValueString{
 	public:
-		SipHeaderValueUnknown(const std::string &build_from);
+		SipHeaderValueUnknown(const std::string &headerName, const std::string &build_from);
 
                 virtual std::string getMemObjectType(){return "SipHeaderUnknown";}
 };
