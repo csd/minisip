@@ -72,18 +72,16 @@ class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 		 */
 		std::string getString(); 
 
-		std::string getProperty(){return property;}
-		std::string getValue(){return value;}
+		std::string getAuthMethod();
+
+	protected:
+		char getFirstParameterSeparator(){return ' ';}
+		char getParameterSeparator(){return ',';}
 
 	private:
 		void init(const std::string& build_from);
 
-		bool hasDigest;
-		bool hasQuotes;
-		std::string property;
-		std::string value;
-		
-		
+		std::string authMethod;
 };
 
 #endif

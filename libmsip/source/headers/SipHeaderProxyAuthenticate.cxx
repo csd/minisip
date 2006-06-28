@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -47,7 +49,7 @@ SipHeaderFactoryFuncPtr sipHeaderProxyAuthenticateFactory=proxyauthFactory;
 const string sipHeaderValueProxyAuthenticationTypeStr = "Proxy-Authenticate";
 		
 SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(int type, const string &typeStr, const string &build_from)
-		: SipHeaderValue(type, typeStr)
+		: SipHeaderValue(type, typeStr), authMethod("")
 {
 	init(build_from);
 }
@@ -59,26 +61,12 @@ SipHeaderValueProxyAuthenticate::SipHeaderValueProxyAuthenticate(const string &b
 }
 
 void SipHeaderValueProxyAuthenticate::init(const string &build_from){
-	string line = trim(build_from);
-	if (line.substr(0,6)=="Digest"){
-		hasDigest=true;
-		line = trim(line.substr(6));
-	}else{
-		hasDigest=false;
-	}
+	size_t pos = build_from.find_first_not_of(" \t\r\n");
+	size_t last = build_from.find_first_of(" \t\r\n", pos);
 
-	size_t pos = line.find("=");
-	if (pos==string::npos){
-		cerr << "Warning: could not find key-value parir in authenticate header"<<endl;
-	}else{
-		property = trim(line.substr(0,pos));
-		value = trim(line.substr(pos+1));
-		if (value.size()>=2 && value[0]=='\"' && value[value.size()-1]=='\"'){
-			value = trim(value.substr(1,value.size()-2));
-			hasQuotes=true;
-		}else{
-			hasQuotes=false;
-		}
+	if( last != string::npos ){
+		authMethod = build_from.substr( pos, last - pos );
+		addParameter( new SipHeaderParameter( build_from.substr( last )));
 	}
 }
 
@@ -87,16 +75,9 @@ SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
 }
 		
 string SipHeaderValueProxyAuthenticate::getString(){
-	string ret;
-	if (hasDigest)
-		ret+="Digest ";
-	string v;
-	if (hasQuotes)
-		v="\""+value+"\"";
-	else
-		v=value;
-	ret=ret+property+"="+v;
-	return ret;
+	return getAuthMethod();
 } 
 
-
+string SipHeaderValueProxyAuthenticate::getAuthMethod(){
+	return authMethod;
+}

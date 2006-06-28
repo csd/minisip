@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -166,13 +168,21 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			std::string parameterList;
 			int nparam = parameters.size();
 			for (int i=0; i< nparam; i++){
-				parameterList+=";"+parameters[i]->getString();
+				if( i == 0 )
+					parameterList+=getFirstParameterSeparator();
+				else
+					parameterList+=getParameterSeparator();
+				parameterList+=parameters[i]->getString();
 			}
 			return getString()+parameterList;
 		}
 
 		const std::string &headerName;
 	protected:
+
+		virtual char getFirstParameterSeparator(){return ';';}
+		virtual char getParameterSeparator(){return ';';}
+
 		int type;
 		minilist<MRef<SipHeaderParameter*> > parameters;
 };

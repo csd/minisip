@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -574,6 +576,13 @@ MRef<Socket*> SipMessage::getSocket()
 	return sock;
 }
 
+static string unquote(const string &value){
+	if (value.size()>=2 && value[0]=='\"' && value[value.size()-1]=='\"'){
+		return trim(value.substr(1,value.size()-2));
+	}
+
+	return value;
+}
 
 string SipMessage::getAuthenticateProperty(string prop){
         MRef<SipHeaderValue*> hdr;
@@ -583,8 +592,8 @@ string SipMessage::getAuthenticateProperty(string prop){
                 hdr=getHeaderValueNo(SIP_HEADER_TYPE_WWWAUTHENTICATE, i++);
                 if (hdr){
                         MRef<SipHeaderValueWWWAuthenticate*> whdr = (SipHeaderValueWWWAuthenticate*)*hdr;
-                        if (whdr->getProperty()==prop)
-                                return whdr->getValue();
+                        if (whdr->hasParameter(prop))
+				return unquote(whdr->getParameter(prop));
                 }
         }while(hdr);
 
@@ -593,8 +602,8 @@ string SipMessage::getAuthenticateProperty(string prop){
                 hdr=getHeaderValueNo(SIP_HEADER_TYPE_PROXYAUTHENTICATE, i++);
                 if (hdr){
                         MRef<SipHeaderValueProxyAuthenticate*> phdr = (SipHeaderValueProxyAuthenticate*)*hdr;
-                        if (phdr->getProperty()==prop)
-                                return phdr->getValue();
+                        if (phdr->hasParameter(prop))
+				return unquote(phdr->getParameter(prop));
                 }
         }while(hdr);
 

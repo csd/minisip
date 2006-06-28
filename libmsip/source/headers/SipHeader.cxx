@@ -163,9 +163,22 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	if( valueline.size() == 0 ) { //an empty header??? BUG!
 			cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header in Sip message!:: " << valueline << endl;
 	} else {	
-		vector<string> values = split(valueline,true, ',');
-	
 		string headerType = findHeaderType(line);
+		char valueSeparator;
+		char paramSeparator;
+
+		if( headerType == "WWW-Authenticate" ||
+		    headerType == "Proxy-Authenticate" ||
+		    headerType == "Authorization" ||
+		    headerType == "Proxy-Authorization" ){
+			valueSeparator = '\0';
+			paramSeparator = ',';
+		} else {
+			valueSeparator = ',';
+			paramSeparator = ';';
+		}
+
+		vector<string> values = split(valueline,true, valueSeparator);
 		
 		for (unsigned i=0; i< values.size(); i++){
 			vector<string> value_params;
@@ -216,7 +229,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 					value_zero = value_params[0];
 				}
 			} else {
-				value_params = split(values[i],true,';');
+				value_params = split(values[i],true,paramSeparator);
 				value_zero = value_params[0];
 			}
 			
