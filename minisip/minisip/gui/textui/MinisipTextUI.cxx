@@ -536,7 +536,7 @@ void MinisipTextUI::showTransactions(string command){
 #ifdef _MSC_VER
 							);
 #else
-							+ "  ObjecdId: " + itoa((int)*(*i)));
+							+ "  ObjecdId: " + itoa((int64_t)*(*i)));
 #endif
 					n++;
 				}
@@ -1295,7 +1295,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
 		string arg = command.substr(2);
 		arg = trim(arg);
-		unsigned spos = arg.find(" ");
+		size_t spos = arg.find(" ");
 		if (spos==string::npos){
 			displayMessage("im usage: im <user> <message>",red);
 		}else{
