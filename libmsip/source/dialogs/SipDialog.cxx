@@ -194,7 +194,24 @@ MRef<SipRequest*> SipDialog::createSipMessageSeq( const std::string &method, int
 
 MRef<SipRequest*> SipDialog::createSipMessageAck( MRef<SipRequest *> origReq )
 {
-	return createSipMessageSeq( "ACK", origReq->getCSeq() );
+	MRef<SipRequest*> ack = createSipMessageSeq( "ACK", origReq->getCSeq() );
+
+	// Add all Authorization and Proxy-Authorization headers from
+	// the original INVITE request. Refer to RFC 3261 section 22.1.
+	// FIXME: deep copy?
+	int noHeaders = origReq->getNoHeaders();
+	for (int32_t i=0; i< noHeaders; i++){
+		MRef<SipHeader *> header = origReq->getHeaderNo(i);
+		int headerType = header->getType();
+		switch (headerType){
+			case SIP_HEADER_TYPE_AUTHORIZATION:
+			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
+				ack->addHeader(header);
+				break;
+		}
+	}
+
+	return ack;
 }
 
 MRef<SipRequest*> SipDialog::createSipMessageBye(){

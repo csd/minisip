@@ -81,6 +81,8 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 			case SIP_HEADER_TYPE_FROM:
 			case SIP_HEADER_TYPE_CALLID:
 			case SIP_HEADER_TYPE_ROUTE:
+			case SIP_HEADER_TYPE_AUTHORIZATION:
+			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				req->addHeader(header);
 				break;
 		}
@@ -124,6 +126,8 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
 				add=true;
 				break;
 			case SIP_HEADER_TYPE_ROUTE:
+			case SIP_HEADER_TYPE_AUTHORIZATION:
+			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				add=true;
 				break;
 		}
