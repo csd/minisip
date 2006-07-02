@@ -135,6 +135,10 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 			}
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {
+#ifdef DEBUG_OUTPUT
+		        cerr << "MediaHandler::createSession: enabling ZRTP for receiver" << endl;
+#endif
+
 			zhb = new ZrtpHostBridgeMinisip();
 			zhb->setReceiver(rStream);
 			rStream->setZrtpHostBridge(zhb);
@@ -150,6 +154,9 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		    session->addMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {
+#ifdef DEBUG_OUTPUT
+		        cerr << "MediaHandler::createSession: enabling ZRTP for sender" << endl;
+#endif
 			if (!zhb) {
 			    zhb = new ZrtpHostBridgeMinisip();
 			}

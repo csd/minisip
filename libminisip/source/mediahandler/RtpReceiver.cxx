@@ -233,63 +233,80 @@ void RtpReceiver::run(){
 		if( !packet ){
 			continue;
 		}
-
+                
 		mediaStreamsLock.lock();
-		for( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
-			std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
-			std::list<MRef<Codec *> >::iterator iC;
-			int found = 0;
+		for ( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
+                    std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
+                    std::list<MRef<Codec *> >::iterator iC;
+                    int found = 0;
 			//printf( "|" );
-			for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-				if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
-					(*i)->handleRtpPacket( packet, from );
-					found = 1;
-					//printf( "~" );
-					break;
-				}
+#ifdef ZRTP_SUPPORT
+                    if (packet->getHeader().getSSRC() != 0xdeadbeef) {
+#endif			
+                        for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+                            if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
+                                (*i)->handleRtpPacket( packet, from );
+                                found = 1;
+                                //printf( "~" );
+                                break;
+                            }
 			}
 #ifdef ZRTP_SUPPORT
-			/*
-			 * If this packet was not already handled
-			 * (!found) and it has an extension header and
-			 * it belongs to this media pair's (receiver
-			 * and sender) remote address then handle it
-			 * accordingly in the ZrtpHostBridge.
-			 *
-			 * TODO: handle list of host bridges because a
-			 * receiver may support several RTP sessions
-			 * from different peers.
-			 */
-			MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
+                    }
+                    /*
+                     * Get this media stream's ZHB. If one is allocated
+                     * then check if we already got packet. If this is the
+                     * first packet for this media stream receiver then the 
+                     * ZHB's receiver SSRC is zero. Initialize it with the SSRC
+                     * of the first received packet but only if it's not a ZRTP 
+                     * packet (0xdeadbeef). 
+                     * If it's a ZRTP packet then handle it in a specific
+                     * function. The !found check may come in handy if Phil's 
+                     * implementation will use another way to mark the ZRTP
+                     * packets (this is possible because ZRTP packet must have
+                     * an extension header and the extension header must
+                     * contain the correct signature (ID) ).
+                     *
+                     * TODO: handle list of host bridges because a
+                     * receiver may support several RTP sessions
+                     * from different peers.
+                     */
+                    MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
+                    uint32_t packetSsrc = packet->getHeader().getSSRC();
+                    
+                    if (zhb && packetSsrc != 0xdeadbeef) {
+                        if (zhb->getSsrcReceiver() == 0) {
+                            zhb->setSsrcReceiver(packetSsrc);
+                        }
+                        continue;           // not a ZRTP packet 
+                    }                        
+/*                  cerr << "From: " << from->getString();
+                    cerr << ", zhbFrom: " << zhb->getRemoteAddress()->getString();
+                    cerr << ", found: " << found;
+                    cerr << ", extension: " << packet->getHeader().getExtension() << endl;
+*/                    
+                    if (!found && zhb && packet->getHeader().getExtension() && 
+                         zhb->getRemoteAddress() /* && zhb->getRemoteAddress() == from */) {
 
-			if (!found && zhb && packet->getHeader().getExtension() && 
-			    zhb->getRemoteAddress() && zhb->getRemoteAddress() == from) {
 
-			    uint32_t packetSsrc = packet->getHeader().getSSRC();
+                        /*
+                         * If this is the first received packet of
+                         * this session then store its SSRC. Any
+                         * later modification of the SSRC inside
+                         * this session gives an Alert and
+                         * switches back to non-secure mode
+                         */
+//                        cerr << "ZP " << endl;
 
-			    /*
-			     * If this is the first received packet of
-			     * this session then store its SSRC. Any
-			     * later modification of the SSRC inside
-			     * this session gives an Alert and
-			     * switsches back to non-secure mode
-			     */
-
-			    if (zhb->getSsrcReceiver() == 0) {
-				zhb->setSsrcReceiver(packetSsrc);
-			    }
-			    if (zhb->getSsrcReceiver() != packetSsrc) {
-				zhb->rtpSessionError();
-			    }
-			    else {
-				(*i)->handleRtpPacketExt(packet);
-			    }
-			}
+                        if (packetSsrc == 0xdeadbeef) { // it's a ZRTP packet 
+                            (*i)->handleRtpPacketExt(packet);
+                            continue;
+                        }
+                    }
 #endif // ZRTP_SUPPORT
-		}
-		
-		mediaStreamsLock.unlock();
-		
-		packet = NULL;
+                }
+                mediaStreamsLock.unlock();
+
+                packet = NULL;
 	}
 }

@@ -305,17 +305,17 @@ uint16_t MediaStreamReceiver::getPort(){
 
 #ifdef ZRTP_SUPPORT
 void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
-	uint32_t packetSsrc;
+	uint32_t recvSsrc;
 	uint16_t seq_no;
 
 	//if packet is null, we had a read timeout from the rtpReceiver
 	if( !packet ) {
 		return;
 	}
-	packetSsrc = packet->getHeader().getSSRC();
+        recvSsrc = zrtpBridge->getSsrcReceiver();
 	seq_no = packet->getHeader().getSeqNo();
 
-	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
+	if( packet->unprotect( getCryptoContext( recvSsrc, seq_no ) )){
 		// Authentication or replay protection failed
 		return;
 	}
@@ -357,12 +357,12 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
 		 * the SSRC. Any later modification of the SSRC inside this session
 		 * gives an Alert and switsches back to non-secure mode
 		 */
-		if (zrtpBridge->getSsrcReceiver() == 0) {
-		    zrtpBridge->setSsrcReceiver(packetSsrc);
-		}
-		if (zrtpBridge->getSsrcReceiver() != packetSsrc) {
-		    zhb->rtpSessionError();
-		}
+//		if (zrtpBridge->getSsrcReceiver() == 0) {
+//		    zrtpBridge->setSsrcReceiver(packetSsrc);
+//		}
+//		if (zrtpBridge->getSsrcReceiver() != packetSsrc) {
+//		    zhb->rtpSessionError();
+//		}
 		if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
 		    // Authentication or replay protection failed
 		    return;
@@ -371,7 +371,7 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
 		    if (zrtpBridge->processPacket(packet) == 0) {
 			return;
 		    }
-		}
+                }
 	    }
 	}
 	else {
@@ -436,20 +436,10 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 		senderSock = new UDPSocket;
 		senderSock->setLowDelay();
 	}
-#ifdef ZRTP_SUPPORT
-	if (zrtpBridge) {
-	    zrtpBridge->setSsrcSender(ssrc);
-	}
-#endif
 }
 
 void MediaStreamSender::start(){
 	media->registerMediaSender( this );
-#ifdef ZRTP_SUPPORT
-	if (zrtpBridge) {
-	    zrtpBridge->start();
-	}
-#endif
 }
 
 void MediaStreamSender::stop(){
@@ -471,6 +461,15 @@ uint16_t MediaStreamSender::getPort(){
 
 static bool first=true;
 
+/*
+ * Some of the following stuff was set after looking at the real
+ * wire protocol of the original ZRTP / Zfone
+ * - it uses the current seq no and does not increment it 
+ * - it uses the SSRC of "deadbeef" as hex value. We have to keep
+ *   that in mind when processing protect / unprotect SRTP operations.
+ *   Protect / unprotect use the "real" SSRC to lookup the crypto 
+ *   contexts. 
+ */
 #ifdef ZRTP_SUPPORT
 void MediaStreamSender::sendZrtp(unsigned char* data, int length,
                                 unsigned char* payload, int payLen) {
@@ -491,11 +490,11 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 	
 	senderLock.lock();
 	uint32_t ts = time(NULL);
-	packet = new SRtpPacket(payload, payLen, seqNo++, ts, ssrc );
+	packet = new SRtpPacket(payload, payLen, seqNo, ts, 0xdeadbeef );
 	packet->getHeader().setPayloadType(13);
 	packet->setExtHeader(data, length);
 
-	packet->protect(getCryptoContext(ssrc, seqNo - 1));
+	packet->protect(getCryptoContext(ssrc, seqNo));
 
 	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
@@ -551,6 +550,18 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();
+        
+        /*
+         * Start ZRTP engine only after we sent a first real data packet. This is 
+         * to give the receiver a change to get the real SSRC of us.
+         */
+#ifdef ZRTP_SUPPORT
+	if (zrtpBridge && zrtpBridge->getSsrcSender() == 0) {
+            zrtpBridge->setSsrcSender(ssrc);
+            zrtpBridge->start();
+        }
+#endif
+
 }
 
 void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> remoteAddress ){
