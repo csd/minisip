@@ -153,7 +153,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * @param ssrc
 		 *    The ssrc of this RTP stream (sender or receiver)
 		 */
-		virtual void setKeyAgreementZrtp(MRef<CryptoContext *>cx);
+		void setKeyAgreementZrtp(MRef<CryptoContext *>cx);
 #endif
 		
 	protected:
