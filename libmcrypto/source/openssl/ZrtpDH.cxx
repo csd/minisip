@@ -163,10 +163,11 @@ int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes,
     
     int32_t result;
 
-    BIGNUM *pubKeyPeer = BN_bin2bn(pubKeyBytes, length, NULL);
+    if (ctx->pub_key != NULL) {
+        BN_free(ctx->pub_key);
+    }
+    ctx->pub_key = BN_bin2bn(pubKeyBytes, length, NULL);
+    result = DH_compute_key(secret, ctx->pub_key, ctx);
 
-    result = DH_compute_key(secret, pubKeyPeer, ctx);
-
-    BN_free(pubKeyPeer);
     return result;
 }
