@@ -75,6 +75,10 @@
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 #include<libminisip/codecs/Codec.h>
 
+#ifdef ZRTP_SUPPORT
+#include<libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#endif
+
 #include<stdlib.h>
 
 #ifdef OSSO_SUPPORT
@@ -319,7 +323,8 @@ int Minisip::startSip() {
 
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
-	//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+	//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, 
+        //                phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
@@ -334,7 +339,8 @@ int Minisip::startSip() {
 				phoneConf->inherited->getTransport(),
 				phoneConf->inherited->localTlsPort,
 				phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
-				//TODO: TLS should use the whole chain instead of only the f$                                MRef<ca_db *> cert_db = NULL
+				//TODO: TLS should use the whole chain instead of only the f$
+                                //                               MRef<ca_db *> cert_db = NULL
 				phoneConf->securityConfig.cert_db
 				);
 		//sip->init();
@@ -350,7 +356,9 @@ int Minisip::startSip() {
 		messageRouter->addSubsystem("sip",*sip);
 
 		confMessageRouter->setSip(sip);
-
+#ifdef ZRTP_SUPPORT
+                ZrtpHostBridgeMinisip::initialize(sip->getSipStack()->getTimeoutProvider());
+#endif
 		/* Load the plugins at this stage */
 //		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
 
