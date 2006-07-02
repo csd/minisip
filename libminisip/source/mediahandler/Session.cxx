@@ -624,13 +624,20 @@ void Session::silenceSources ( bool silence ) {
 			}
 		}
 	}
-	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
-	if( !cr ) {
-	#ifdef DEBUG_OUTPUT
-		cerr << "Session::silenceSources - no call recorder?" << endl;
-	#endif
+
+	if( callRecorder ) {
+		MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+		if( !cr ) {
+		#ifdef DEBUG_OUTPUT
+			cerr << "Session::silenceSources - no call recorder? (1)" << endl;
+		#endif
+		} else {
+			cr->setEnabledNetwork( !silence );
+		}
 	} else {
-		cr->setEnabledNetwork( !silence );
+		#ifdef DEBUG_OUTPUT
+			cerr << "Session::silenceSources - no call recorder? (2)" << endl;
+		#endif
 	}
 }
 
