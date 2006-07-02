@@ -29,14 +29,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-
-enum EventReturnCodes {
-    Fail = 0,			// Event processing failed. Process RTP data.
-    Done = 1,			// Event processing ok. Process RTP data.
-    FailDismiss = 2,		// Event processing failed, dismiss RTP data.
-    OkDismiss = 3			// Event Processing ok, dismiss RTP data.
-};
-
+class ZrtpStateClass;
 /**
  * This structure hold the state name as enum (int) number and the pointer to
  * the functions that handles the various triggers that can occur in a state.
@@ -61,6 +54,7 @@ class ZrtpStates {
 	numStates(numStates), states(zstates), state(initialState) {};
 
     int32_t processEvent(ZrtpStateClass& zsc) { 
+	DEBUGOUT((fprintf(stdout, "ZrtpStates::processEvent, state: %d\n", state)));
 	return (zsc.*states[state].handler)(); };
 
     int32_t inState(const int32_t s) { return ((s == state)? true : false); };

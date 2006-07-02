@@ -32,20 +32,21 @@ class ZrtpPacketHello : public ZrtpPacketBase {
 
  public:
     ZrtpPacketHello();		 /* Creates a Hello packet with default data */
-    ZrtpPacketHello(char *data); /* Creates a Hello packet from received data */
+    ZrtpPacketHello(uint8_t *data); /* Creates a Hello packet from received data */
+    virtual ~ZrtpPacketHello();
 
-    char *getVersion()  { return helloHeader->version; };
-    char *getClientId() { return helloHeader->clientId; };
-    bool isPassive()    { return ((helloHeader->flag & 0x1) == 0x1); };
+    uint8_t *getVersion()  { return helloHeader->version; };
+    uint8_t *getClientId() { return helloHeader->clientId; };
+    bool isPassive()       { return ((helloHeader->flag & 0x1) == 0x1); };
 
-    char *getHashType(uint32_t number)    { return helloHeader->hashes[number]; };
-    char *getCipherType(uint32_t number)  { return helloHeader->ciphers[number]; };
-    char *getPubKeysType(uint32_t number) { return helloHeader->pubkeys[number]; };
-    char *getSasType(uint32_t number)     { return helloHeader->sas[number]; };
-    uint8_t *getZid()                     { return helloHeader->zid; };
+    uint8_t *getHashType(uint32_t number)    { return helloHeader->hashes[number]; };
+    uint8_t *getCipherType(uint32_t number)  { return helloHeader->ciphers[number]; };
+    uint8_t *getPubKeysType(uint32_t number) { return helloHeader->pubkeys[number]; };
+    uint8_t *getSasType(uint32_t number)     { return helloHeader->sas[number]; };
+    uint8_t *getZid()                        { return helloHeader->zid; };
 
-    void setVersion(char *text)                      { memcpy(helloHeader->version, text, 4); }
-    void setClientId(char *text)                     { memcpy(helloHeader->clientId, text, 15); }
+    void setVersion(uint8_t *text)                   { memcpy(helloHeader->version, text, 4); }
+    void setClientId(uint8_t *text)                  { memcpy(helloHeader->clientId, text, 15); }
     void setHashType(uint32_t number, char *text)    { memcpy(helloHeader->hashes[number], text, 8); };
     void setCipherType(uint32_t number, char *text)  { memcpy(helloHeader->ciphers[number], text, 8); };
     void setPubKeyType(uint32_t number, char *text)  { memcpy(helloHeader->pubkeys[number], text, 8); };

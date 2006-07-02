@@ -27,29 +27,30 @@
 class ZrtpPacketDHPart : public ZrtpPacketBase {
 
  protected:
-    char *pv;
+    uint8_t *pv;
     DHPart_t *DHPartHeader;
 
  public:
-    ZrtpPacketDHPart(PKType pkt);		/* Creates a DHPart packet with default data */
-    ZrtpPacketDHPart(char *data, PKType pkt);   /* Creates a DHPart packet from received data */
+    ZrtpPacketDHPart(SupportedPubKeys pkt);	/* Creates a DHPart packet with default data */
+    ZrtpPacketDHPart(uint8_t *data);            /* Creates a DHPart packet from received data */
+    virtual ~ZrtpPacketDHPart();
 
-    char *getPv()             { return pv; }
-    char *getRs1Id()          { return DHPartHeader->rs1Id; };
-    char *getRs2Id()          { return DHPartHeader->rs2Id; };
-    char *getSigsId()         { return DHPartHeader->sigsId; };
-    char *getSrtpsId()        { return DHPartHeader->srtpsId; };
-    char *getOtherSecrectId() { return DHPartHeader->otherSecretId; };
+    uint8_t *getPv()             { return pv; }
+    uint8_t *getRs1Id()          { return DHPartHeader->rs1Id; };
+    uint8_t *getRs2Id()          { return DHPartHeader->rs2Id; };
+    uint8_t *getSigsId()         { return DHPartHeader->sigsId; };
+    uint8_t *getSrtpsId()        { return DHPartHeader->srtpsId; };
+    uint8_t *getOtherSecretId() { return DHPartHeader->otherSecretId; };
 
-    void setPv(char *text) 	      { strncpy(pv, text, ((pktype == DH3072) ? 384 :512)); };
-    void setRs1Id(char *text)         { strncpy(DHPartHeader->rs1Id, text, 8); };
-    void setRs2Id(char *text)         { strncpy(DHPartHeader->rs2Id, text, 8); };
-    void setSigsId(char *text)        { strncpy(DHPartHeader->sigsId, text, 8); };
-    void setSrtpsId(char *text)       { strncpy(DHPartHeader->srtpsId, text, 8); };
-    void setOtherSecretId(char *text) { strncpy(DHPartHeader->otherSecretId, text, 8); };
+    void setPv(uint8_t *text) 	         { memcpy(pv, text, ((pktype == Dh3072) ? 384 :512)); };
+    void setRs1Id(uint8_t *text)         { memcpy(DHPartHeader->rs1Id, text, 8); };
+    void setRs2Id(uint8_t *text)         { memcpy(DHPartHeader->rs2Id, text, 8); };
+    void setSigsId(uint8_t *text)        { memcpy(DHPartHeader->sigsId, text, 8); };
+    void setSrtpsId(uint8_t *text)       { memcpy(DHPartHeader->srtpsId, text, 8); };
+    void setOtherSecretId(uint8_t *text) { memcpy(DHPartHeader->otherSecretId, text, 8); };
 
  private:
-    PKType pktype;
+    SupportedPubKeys pktype;
 };
 
 #endif // ZRTPPACKETDHPART

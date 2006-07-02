@@ -31,7 +31,7 @@
 
 typedef struct zidrecord {
     int8_t recValid,		// if 1 record is valid, if 0: invalid
-	recVersion,			// record version, currently unused
+	ownZid,			// if 1 record contains associated ZID, usually 1st record
 	rs1Valid,			// if 1 RS1 contains valid data
 	rs2Valid;			// if 1 RS2 contains valid data
     uint8_t identifier[IDENTIFIER_LEN]; // the peer's ZID
@@ -56,7 +56,7 @@ class ZIDRecord {
     unsigned long position;
 
  public:
-    ZIDRecord(char *idData) {
+    ZIDRecord(uint8_t *idData) {
 	memset(&record, 0, sizeof(zidrecord_t));
 	memcpy(record.identifier, idData, IDENTIFIER_LEN); };
 
@@ -66,7 +66,7 @@ class ZIDRecord {
     const uint8_t *getRs1() { return record.rs1Data; };
     const uint8_t *getRs2() { return record.rs2Data; };
 
-    void setNewRs1(const char *data);
+    void setNewRs1(const uint8_t *data);
 };
 
 #endif // ZIDRECORD

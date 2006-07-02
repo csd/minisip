@@ -43,7 +43,7 @@ class ZIDFile {
 private:
 
     FILE *zidFile;
-
+    uint8_t associatedZid[IDENTIFIER_LEN];
     /**
      * The private ZID file constructor.
      *
@@ -128,6 +128,14 @@ public:
      *    1 on success, 0 on failure
      */
     uint32_t saveRecord(ZIDRecord *zidRecord);
+    
+    /**
+     * Get the ZID associated with this ZID file.
+     *
+     * @return
+     *    Pointer to the ZID
+     */
+    const uint8_t* getZid() { return associatedZid; };
 };
 #endif
 

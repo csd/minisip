@@ -30,29 +30,30 @@
 #include <libminisip/zrtp/zrtpPacket.h>
 #include <libminisip/zrtp/ZrtpTextData.h>
 
-enum PKType {
-	DH3072,
-	DH4096
-};
+// #define DEBUGOUT(deb)   deb
+#define DEBUGOUT(deb)
 
 const uint16_t zrtpId = ZRTP_EXT_PACKET;
 
 class ZrtpPacketBase {
 
+  private:
+	
   protected:
-    zrtpPacketHeader_t *zrtpHeader;
+      void* allocated;
+      zrtpPacketHeader_t *zrtpHeader;
 
   public:
-    bool isZrtpPacket()  { return (ntoh16(zrtpHeader->zrtpId) == zrtpId); };
-    uint16_t getLength() { return ntoh16(zrtpHeader->length); };
-    char *getMessage()   { return zrtpHeader->message; };
+      virtual ~ZrtpPacketBase() {};
+    
+    const uint8_t *getHeaderBase() { return (const uint8_t*)zrtpHeader; };
+    bool isZrtpPacket()            { return (ntoh16(zrtpHeader->zrtpId) == zrtpId); };
+    uint16_t getLength()           { return ntoh16(zrtpHeader->length); };
+    uint8_t *getMessage()          { return zrtpHeader->message; };
 
-    void setLength(uint16_t len) { zrtpHeader->length = hton16(len); };
-    void setMessage(char *msg)   { strncpy(zrtpHeader->message, msg, ZRTP_MSG_SIZE); };
-    void setZrtpId()             { zrtpHeader->zrtpId = hton16(zrtpId); }
-
-    void hexdump(FILE *f, const char *title, int l);
-  private:
+    void setLength(uint16_t len)  { zrtpHeader->length = hton16(len); };
+    void setMessage(uint8_t *msg) { memcpy(zrtpHeader->message, msg, ZRTP_MSG_SIZE); };
+    void setZrtpId()              { zrtpHeader->zrtpId = hton16(zrtpId); }
 };
 
 #endif // ZRTPPACKETBASE

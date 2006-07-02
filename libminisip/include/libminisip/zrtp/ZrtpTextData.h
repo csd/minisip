@@ -56,12 +56,43 @@ extern char *hmacKey;
 extern char *retainedSec;
 extern char *knownPlain;
 
+extern char *sasString;
 /**
  *
  */
+
+// Keep the Hash identifers in supportedHashes in the same order than the
+// following enum, starting with zero.
+typedef enum  SupportedHashes {
+    Sha256,
+    NumSupportedHashes
+};
 extern char *supportedHashes[];
+
+// Keep the Cipher identifers in supportedCipher in the same order than the
+// following enum, starting with zero.
+enum SupportedSymCiphers {
+    Aes256,
+    Aes128,
+    NumSupportedSymCiphers
+};
 extern char *supportedCipher[];
+
+// Keep the PubKey identifers in supportedPubKey in the same order than the
+// following enum, starting with zero.
+enum SupportedPubKeys {
+    Dh4096,
+    Dh3072,
+    NumSupportedPubKeys
+};
 extern char *supportedPubKey[];
+
+// Keep the SAS identifers in supportedSASType in the same order than the
+// following enum, starting with zero.
+enum SupportedSASTypes {
+    Libase32,
+    NumSupportedSASTypes
+};
 extern char *supportedSASType[];
 
 #endif     // _ZRTPTEXTDATA_H_

@@ -24,6 +24,7 @@
 #define ZRTPPACKET_H
 
 #include <config.h>
+#include <stdio.h>
 #include<libminisip/libminisip_config.h>
 
 #define	ZRTP_EXT_PACKET		0x505a
@@ -35,19 +36,19 @@
 typedef struct zrtpPacketHeader {
     uint16_t    zrtpId;
     uint16_t    length;
-    char        message[8];
+    uint8_t     message[8];
 } zrtpPacketHeader_t;
 
 
 #define HELLO_LENGTH            48 /* plus the MESSAGE_LENGTH = 50 */
 typedef struct Hello { 
-    char	version[4];
-    char	clientId[15];
+    uint8_t	version[4];
+    uint8_t	clientId[15];
     uint8_t	flag;
-    char        hashes[5][8];
-    char        ciphers[5][8];
-    char	pubkeys[5][8];
-    char	sas[5][8];
+    uint8_t     hashes[5][8];
+    uint8_t     ciphers[5][8];
+    uint8_t	pubkeys[5][8];
+    uint8_t	sas[5][8];
     uint8_t     zid[12];
 } Hello_t;
 
@@ -62,12 +63,12 @@ typedef struct HelloAck {	/* Length is MESSAGE_LENGTH */
 
 #define COMMIT_LENGTH           19 /* plus MESSAGE_LENGTH = 21 */
 typedef struct Commit {
-    char	zid[12];
-    char        hash[8];
-    char        cipher[8];
-    char	pubkey[8];
-    char	sas[8];
-    char	hvi[32];
+    uint8_t	zid[12];
+    uint8_t     hash[8];
+    uint8_t     cipher[8];
+    uint8_t	pubkey[8];
+    uint8_t	sas[8];
+    uint8_t	hvi[32];
 } Commit_t;
 
 typedef struct CommitPacket {
@@ -77,11 +78,11 @@ typedef struct CommitPacket {
 
 #define DHPART_LENGTH		10 /* plus MESSAGE_LENGTH + pvr length */
 typedef struct DHPart {
-    char rs1Id[8];
-    char rs2Id[8];
-    char sigsId[8];
-    char srtpsId[8];
-    char otherSecretId[8];
+    uint8_t rs1Id[8];
+    uint8_t rs2Id[8];
+    uint8_t sigsId[8];
+    uint8_t srtpsId[8];
+    uint8_t otherSecretId[8];
 }  DHPart_t;
 
 typedef struct DHPartPacket {
@@ -89,15 +90,16 @@ typedef struct DHPartPacket {
 } DHPartPacket_t;
 
 
-#define CONFIRM_LENGTH		12 /* plus MESSAGE_LENGTH = 14 */
+#define CONFIRM_LENGTH		2 /* the rest of Confirm data goes into payload */
 typedef struct Confirm {
-    char	plaintext[15];
+    uint8_t	plaintext[15];
     uint8_t	flag;
-    char	hmac[32];
+    uint8_t	hmac[32];
 } Confirm_t;
 
 typedef struct ConfirmPacket {
     zrtpPacketHeader_t hdr;
+    Confirm_t confirm;
 } ConfirmPacket_t;
 
 #define CONF2ACK_LENGTH         2
@@ -107,7 +109,7 @@ typedef struct Conf2Ack {
 
 #define ERROR_LENGTH		2 /* plus MESSAGE_LENGTH = 4 */
 typedef struct Error {
-    char type[8];
+    uint8_t type[8];
 } Error_t;
 
 typedef struct ErrorPacket {
@@ -115,6 +117,47 @@ typedef struct ErrorPacket {
     Error_t error;
 } ErrorPacket_t;
 
+
+/* big/little endian conversion */
+
+#ifndef hton16
+
+static inline uint16_t U16_AT( void const * _p )
+{
+    const uint8_t * p = (const uint8_t *)_p;
+    return ( ((uint16_t)p[0] << 8) | p[1] );
+}
+static inline uint32_t U32_AT( void const * _p )
+{
+    const uint8_t * p = (const uint8_t *)_p;
+    return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
+              | ((uint32_t)p[2] << 8) | p[3] );
+}
+static inline uint64_t U64_AT( void const * _p )
+{
+    const uint8_t * p = (const uint8_t *)_p;
+    return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)
+              | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32)
+              | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16)
+              | ((uint64_t)p[6] << 8) | p[7] );
+}
+#if defined WORDS_BIGENDIAN
+#   define hton16(i)   ( i )
+#   define hton32(i)   ( i )
+#   define hton64(i)   ( i )
+#   define ntoh16(i)   ( i ) 
+#   define ntoh32(i)   ( i )
+#   define ntoh64(i)   ( i )
+#else
+#   define hton16(i)   U16_AT(&i)
+#   define hton32(i)   U32_AT(&i)
+#   define hton64(i)   U64_AT(&i)
+#   define ntoh16(i)   U16_AT(&i)
+#   define ntoh32(i)   U32_AT(&i)
+#   define ntoh64(i)   U64_AT(&i)
+#endif
+
+#endif //hton16
 
 #endif // ZRTPPACKET_H
 

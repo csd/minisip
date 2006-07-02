@@ -42,18 +42,27 @@ enum zrtpStates {
     numberOfStates
 };
 
+enum EventReturnCodes {
+    Fail = 0,			// Event processing failed. Process RTP data.
+    Done = 1,			// Event processing ok. Process RTP data.
+    FailDismiss = 2,		// Event processing failed, dismiss RTP data.
+    OkDismiss = 3		// Event Processing ok, dismiss RTP data.
+};
 
 enum EventDataType {
-    ZrtpPacket = 1,
+    ZrtpInitial = 1,
+    ZrtpClose,
+    ZrtpPacket,
     Timer
 };
 
 typedef struct Event {
     EventDataType type;
     union {
-	ZrtpPacketBase *packet;
-	int32_t *timer;
+	uint8_t* packet;
+	int32_t* timer;
     } data;
+    uint8_t* content;
 } Event_t;
 
 
@@ -73,8 +82,7 @@ typedef struct zrtpTimer {
 	increment,
 	capping,
 	counter,
-	maxResend,
-	stop;
+	maxResend;
 } zrtpTimer_t;
 
 
@@ -87,6 +95,7 @@ class ZRtp;
  * ZRtp which is the parent of this class.
  *
  * <p/>
+ * 
  * The methods of this class implement the ZRTP state actions.
  */
 class ZrtpStateClass {
@@ -99,7 +108,7 @@ private:
     /**
      * The last packet that was sent.
      *
-     * If we are <e>Initiator</e> then resend this packet in case of
+     * If we are <code>Initiator</code> then resend this packet in case of
      * timeout.
      */
     ZrtpPacketBase *sentPacket;
@@ -153,6 +162,15 @@ public:
      *   -1 resend counter exceeded
      */
     int32_t nextTimer(zrtpTimer_t *t);
+    
+    /**
+     * Cancel the active timer.
+     *
+     * @return
+     *    1 timer was canceled
+     *    0 cancelation failed
+     */
+    int32_t cancelTimer() {return parent->cancelTimer(); };
 
 };
 
