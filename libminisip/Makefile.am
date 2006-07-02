@@ -144,7 +144,8 @@ libzrtp_src = source/zrtp/ZIDFile.cxx \
 		source/zrtp/ZrtpPacketHelloAck.cxx \
 		source/zrtp/ZrtpPacketHello.cxx \
 		source/zrtp/ZrtpStateClass.cxx \
-		source/zrtp/ZrtpTextData.cxx
+		source/zrtp/ZrtpTextData.cxx \
+		source/zrtp/Base32.cxx
 
 endif
 
