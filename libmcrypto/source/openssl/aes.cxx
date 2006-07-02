@@ -102,14 +102,17 @@ void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 	aes_input = (unsigned char *)malloc( AES_BLOCK_SIZE );
 	temp = (unsigned char *)malloc( AES_BLOCK_SIZE );
 
-	memcpy( aes_input, iv, 12 );
-	iv += 12;
+//	memcpy( aes_input, iv, 12 );
+//	iv += 12;
+        memcpy( aes_input, iv, 14 );
+        iv += 14;
 
 	for( ctr = 0; ctr < length/AES_BLOCK_SIZE; ctr++ ){
-		input = ctr + U32_AT(iv);
+//		input = ctr + U32_AT(iv);
+                input = ctr;
 		//compute the cipher stream
-		aes_input[12] = (byte_t)((input & 0xFF000000) >> 24);
-		aes_input[13] = (byte_t)((input & 0x00FF0000) >> 16);
+//		aes_input[12] = (byte_t)((input & 0xFF000000) >> 24);
+//		aes_input[13] = (byte_t)((input & 0x00FF0000) >> 16);
 		aes_input[14] = (byte_t)((input & 0x0000FF00) >>  8);
 		aes_input[15] = (byte_t)((input & 0x000000FF));
 
@@ -117,9 +120,10 @@ void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 	}
 
 	// Treat the last bytes:
-	input = ctr + U32_AT(iv);
-	aes_input[12] = (byte_t)((input & 0xFF000000) >> 24);
-	aes_input[13] = (byte_t)((input & 0x00FF0000) >> 16);
+//	input = ctr + U32_AT(iv);
+        input = ctr;
+//      aes_input[12] = (byte_t)((input & 0xFF000000) >> 24);
+//	aes_input[13] = (byte_t)((input & 0x00FF0000) >> 16);
 	aes_input[14] = (byte_t)((input & 0x0000FF00) >>  8);
 	aes_input[15] = (byte_t)((input & 0x000000FF));
 	
