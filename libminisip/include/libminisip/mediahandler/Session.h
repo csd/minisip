@@ -241,6 +241,12 @@ class LIBMINISIP_API Session : public MObject{
 			return mediaStreamSenders;
 		}
 		
+		/**
+		CallRecorder object ... we store it as MObject because it creates
+		header file dependency problems when building. No comment.
+		*/
+		MRef<MObject *> callRecorder;
+
 	private:
 		/* Key management handling */
 		std::string initiatorCreate();

@@ -56,6 +56,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
 //		audioOutSilenceButton( "Silence for my ears"),
 		monitoringButton( Gtk::StockID( "minisip_record" ), Gtk::StockID( "minisip_norecord" ) ),
 		audioOutSilenceButton( Gtk::StockID( "minisip_play" ), Gtk::StockID( "minisip_noplay" ) ),
+		callRecordButton( Gtk::Stock::MEDIA_RECORD, Gtk::Stock::MEDIA_RECORD ),
 #endif
 		secureImage(),// Gtk::StockID( "minisip_insecure" ), 
 					//   Gtk::ICON_SIZE_DIALOG ),
@@ -115,6 +116,11 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		SLOT( *this, 
 			&CallWidget::audioOutSilenceButtonToggled ) );
 	
+	topBox->pack_start( callRecordButton, false, false );
+	callRecordButton.signal_toggled().connect( 
+		SLOT( *this, 
+			&CallWidget::callRecordButtonToggled ) );
+
 	pack_start( *topBox, false, false, 4 );
 	
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
@@ -270,6 +276,21 @@ void CallWidget::audioOutSilenceButtonToggled () {
 #endif
 }
 
+void CallWidget::callRecordButtonToggled () {
+#ifndef OLDLIBGLADEMM
+	string param;
+	if( callRecordButton.get_active() ) {
+		param = "START";
+	} else {
+		param = "STOP";
+	}
+	CommandString cmdstr( getMainCallId(), 
+			"call_recorder_start_stop",
+			param );
+	mainWindow->getCallback()->handleCommand( "media", cmdstr );
+#endif
+}
+
 void CallWidget::hideAcceptButton(){
 	acceptButton.set_sensitive( false );
 }
@@ -294,6 +315,7 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 			monitoringButton.show();
 			audioOutSilenceButton.show();
+			callRecordButton.show();
 			transferArrow.show_all();
 			dtmfArrow.show_all();
 #endif
@@ -360,6 +382,7 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
+					callRecordButton.hide();
 					transferArrow.hide();
 					dtmfArrow.hide();
 #endif
@@ -377,6 +400,7 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
+					callRecordButton.hide();
 					transferArrow.hide();
 					dtmfArrow.hide();
 #endif

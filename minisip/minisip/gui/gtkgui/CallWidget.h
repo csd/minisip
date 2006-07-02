@@ -105,6 +105,10 @@ class CallWidget : public Gtk::VBox
 		*/
 		void audioOutSilenceButtonToggled ();
 
+		/**
+		Event handler for call recording button ... on toggle()
+		*/
+		void callRecordButtonToggled();
 		
 	protected:
 		void startRinging();
@@ -135,6 +139,7 @@ class CallWidget : public Gtk::VBox
 //		Gtk::CheckButton audioOutSilenceButton;
 		IconToggleButton monitoringButton;
 		IconToggleButton audioOutSilenceButton;
+		IconToggleButton callRecordButton;
 
 #endif
 		Gtk::Image secureImage;

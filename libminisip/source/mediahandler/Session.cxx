@@ -28,6 +28,7 @@
 
 #include<libminisip/mediahandler/Session.h>
 
+#include<libminisip/mediahandler/CallRecorder.h>
 #include<libminisip/mediahandler/MediaStream.h>
 #include<libminisip/mediahandler/Media.h>
 #include<libminisip/mediahandler/AudioMedia.h>
@@ -482,6 +483,10 @@ void Session::start(){
 			(*iS)->start();
 		}
 	}
+	/*	if( callRecorder ) {
+		MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+		cr->setEnabled( f
+	}*/
 	mediaStreamSendersLock.unlock();
 }
 
@@ -501,6 +506,16 @@ void Session::stop(){
 			(*iS)->stop();
 		}
 	}
+	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	if( !cr ) {
+	#ifdef DEBUG_OUTPUT
+		cerr << "Session::stop - no call recorder?" << end;
+	#endif
+	} else {
+		cr->setAllowStart( false );
+	}
+	callRecorder = NULL; //stop the call recorder object
+
 	mediaStreamSendersLock.unlock();
 
 }
@@ -559,8 +574,17 @@ void Session::muteSenders (bool mute) {
 				it !=  mediaStreamSenders.end(); it++ ) {
 		(*it)->setMuted( mute );
 	}
+
+	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	if( !cr ) {
+	#ifdef DEBUG_OUTPUT
+		cerr << "Session::muteSenders - no call recorder?" << endl;
+	#endif
+	} else {
+		cr->setEnabledMic( !mute );
+	}
+
 	mediaStreamSendersLock.unlock();
-	
 }
 
 void Session::silenceSources ( bool silence ) {
@@ -600,13 +624,21 @@ void Session::silenceSources ( bool silence ) {
 			}
 		}
 	}
+	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	if( !cr ) {
+	#ifdef DEBUG_OUTPUT
+		cerr << "Session::silenceSources - no call recorder?" << endl;
+	#endif
+	} else {
+		cr->setEnabledNetwork( !silence );
+	}
 }
 
 #ifdef DEBUG_OUTPUT
 string Session::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + ": this=" + itoa((int64_t)this) +
-		"\n;          callid=" + getCallId() +
+		"\n         ; callid=" + getCallId() +
 		"; peerUri=" + peerUri;
 		
 	ret += "\n          ";
@@ -620,6 +652,13 @@ string Session::getDebugString() {
 		ret += "; silencedSources = true";
 	else 
 		ret += "; silencedSources = false";	
+
+	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	if( cr ) {
+		ret += "\n          ";
+		cr = dynamic_cast<CallRecorder *>( *callRecorder );
+		ret += "; " + cr->getDebugString();
+	}
 	
 	for( std::list< MRef<MediaStreamReceiver *> >::iterator it = mediaStreamReceivers.begin();
 				it != mediaStreamReceivers.end(); it++ ) {

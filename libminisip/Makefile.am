@@ -84,6 +84,7 @@ libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/AudioPlugin.cxx \
 			source/mediahandler/AudioPlugin.h \
 			source/mediahandler/SessionRegistry.cxx \
+			source/mediahandler/CallRecorder.cxx \
 			source/mediahandler/DtmfSender.cxx
 
 if P2T_SUPPORT

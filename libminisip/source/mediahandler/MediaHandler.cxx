@@ -45,6 +45,8 @@
 #include<libminisip/soundcard/SoundDevice.h>
 #include<libminisip/codecs/Codec.h>
 
+#include<libminisip/mediahandler/CallRecorder.h>
+
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
@@ -126,6 +128,11 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 			rtpReceiver = new RtpReceiver( ipProvider );
 			rStream = new MediaStreamReceiver( media, rtpReceiver, ipProvider );
 			session->addMediaStreamReceiver( rStream );
+			if( (*i) == this->audioMedia ) {
+				CallRecorder * cr;
+				cr = new CallRecorder( audioMedia, rtpReceiver, ipProvider );
+				session->callRecorder = cr;
+			}
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {
 			zhb = new ZrtpHostBridgeMinisip();
@@ -192,18 +199,18 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 	}
 	
 	if( command.getOp() == MediaCommandString::session_debug ){
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 		cerr << getDebugString() << endl;
-#endif
+	#endif
 		return;
 	}
 	
 	if( command.getOp() == MediaCommandString::set_session_sound_settings ){
 		bool turnOn;
-#ifdef DEBUG_OUTPUT
+	#ifdef DEBUG_OUTPUT
 		cerr << "MediaHandler::handleCmd: received set session sound settings" 
 				<< endl << "     " << command.getString()  << endl;
-#endif
+	#endif
 		if( command.getParam2() == "ON" ) turnOn = true;
 		else turnOn = false;
 		setSessionSoundSettings( command.getDestinationId(), 
@@ -215,6 +222,15 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 	if( command.getOp() == MediaCommandString::reload ){
 		init();
 		return;
+	}
+	
+	if( command.getOp() == "call_recorder_start_stop" ){
+	#ifdef DEBUG_OUTPUT
+		cerr << "MediaHandler::handleCmd: call_recorder_start_stop" << endl 
+			<< command.getString() << endl;
+	#endif		
+		bool start = (command.getParam() == "START" );
+		sessionCallRecorderStart( command.getDestinationId(), start );
 	}
 }
 
@@ -252,6 +268,24 @@ void MediaHandler::setSessionSoundSettings( std::string callid, std::string side
 	}
 	
 }
+
+void MediaHandler::sessionCallRecorderStart( string callid, bool start ) {
+	CallRecorder * cr;
+	list<MRef<Session *> >::iterator iSession;
+	
+	sessionsLock.lock();
+	for( iSession = sessions.begin(); iSession != sessions.end(); iSession++ ){
+		if( (*iSession)->getCallId() == callid ){
+			cr = dynamic_cast<CallRecorder *>( *((*iSession)->callRecorder) );
+			if( cr ) {
+				cr->setAllowStart( start );
+			}
+		}
+	}
+	sessionsLock.unlock();
+}
+
+
 
 #ifdef DEBUG_OUTPUT	
 string MediaHandler::getDebugString() {

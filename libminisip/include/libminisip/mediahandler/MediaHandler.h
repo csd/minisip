@@ -127,6 +127,10 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		*/
 		void setSessionSoundSettings( std::string callid, std::string side, bool turnOn );
 
+		/**
+		Used to start/stop the call recorder ... 
+		*/
+		void sessionCallRecorderStart( std::string callid, bool start );
 };
 
 #endif

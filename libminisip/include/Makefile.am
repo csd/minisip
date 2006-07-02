@@ -16,6 +16,7 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/mediahandler/MediaHandler.h \
 			libminisip/mediahandler/Media.h \
 			libminisip/mediahandler/Session.h \
+			libminisip/mediahandler/CallRecorder.h \
 			libminisip/p2t/SipDialogP2Tuser.h \
 			libminisip/p2t/SipDialogP2T.h \
 			libminisip/p2t/RtcpTransactionGrantFloor.h \
