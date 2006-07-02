@@ -133,6 +133,7 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/zrtp/ZrtpStateClass.h \
 			libminisip/zrtp/ZrtpStates.h \
 			libminisip/zrtp/ZrtpTextData.h \
+			libminisip/zrtp/Base32.h \
 			libminisip/Minisip.h \
 			libminisip/libminisip_config.h
 
