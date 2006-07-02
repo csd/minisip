@@ -139,6 +139,7 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 	// FIXME: handle f8 mode
 	if( ealg == MIKEY_SRTP_EALG_AESCM )
 	{
+
 		/* Compute the IV:
 		  k_s   XX XX XX XX XX XX XX XX XX XX XX XX XX XX
 		  SSRC              XX XX XX XX
@@ -161,8 +162,8 @@ void CryptoContext::rtp_encrypt( RtpPacket * rtp, uint64_t index ){
 		}
 
 		iv[14] = iv[15] = 0;
-		
-		AES * aes = new AES( k_e, n_e );
+                
+                AES * aes = new AES( k_e, n_e );
 		aes->ctr_encrypt( rtp->getContent(),
 				  rtp->getContentLength(),
 				  iv );
@@ -220,22 +221,32 @@ void CryptoContext::rtp_authenticate( RtpPacket * rtp, uint32_t roc, unsigned ch
 	if( aalg == MIKEY_SRTP_AALG_SHA1HMAC )
 	{
 		unsigned char temp[20];
-		unsigned char * chunks[4];
-		unsigned int chunkLength[4];
+		unsigned char * chunks[6];
+		unsigned int chunkLength[6];
 		uint32_t beRoc = hton32( roc );
 		
 		char * bytes = rtp->getHeader().getBytes();
 		unsigned char * content = rtp->getContent();
+                unsigned char* extension = rtp->getExtensionHeader();
+            
 		unsigned int header_size = rtp->getHeader().size() ;
 		unsigned int content_size = rtp->getContentLength() ;
+                unsigned int extensionSize = rtp->getExtensionLength();
 		
+                int offset = 0;
 		chunks[0] = (unsigned char *)bytes;
 		chunkLength[0] = header_size;
-		chunks[1] = (unsigned char *)content;
-		chunkLength[1] = content_size;
-		chunks[2] = (unsigned char *)&beRoc;
-		chunkLength[2] = 4;
-		chunks[3] = NULL;
+                if (extension != NULL) {
+                    offset = 1;
+                    chunks[1] = extension;
+                    chunkLength[1] = extensionSize;
+                }
+		chunks[1+offset] = (unsigned char *)content;
+		chunkLength[1+offset] = content_size;
+                // TODO check regarding MIKEY
+		chunks[2+offset] = (unsigned char *)&beRoc;
+		chunkLength[2+offset] = 4;
+		chunks[3+offset] = NULL;
 
 //		cerr << "packet no: " << rtp->getHeader().getSeqNo() << endl;
 //		cerr << "HMAC input size: " << header_size + content_size << endl;
@@ -295,11 +306,12 @@ void CryptoContext::derive_srtp_keys( uint64_t index ){
 
 	compute_iv( iv, label, index, key_deriv_rate, master_salt );
 
+//        std::cerr << "Master Key: " << print_hex( master_key, master_key_length ) << std::endl;
 
         aes = new AES( master_key, master_key_length );
         aes->get_ctr_cipher_stream( k_e, n_e, iv );
-
-   //     cerr << "Session Encryption Key: " << print_hex( k_e, n_e ) << endl;
+     
+//        std::cerr << "Session Encryption Key: " << print_hex( k_e, n_e ) << std::endl;
 
         label = 0x01;
 
@@ -317,7 +329,7 @@ void CryptoContext::derive_srtp_keys( uint64_t index ){
         aes = new AES( master_key, master_key_length );
         aes->get_ctr_cipher_stream( k_s, n_s, iv );
 
-//        cerr << "Session Salt: " << print_hex( k_s, n_s ) << endl;
+//        std::cerr << "Session Salt: " << print_hex( k_s, n_s ) << std::endl;
 	delete aes;
 }
 

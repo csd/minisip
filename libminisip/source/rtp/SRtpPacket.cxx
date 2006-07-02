@@ -77,7 +77,6 @@ void SRtpPacket::protect( MRef<CryptoContext *> scontext ){
     tag = new unsigned char[ tag_length ];
 	
     scontext->rtp_authenticate( this, scontext->get_roc(), tag );
-
     /* Update the ROC if necessary */
     if( getHeader().getSeqNo() == 0xFFFF )
 	scontext->set_roc( scontext->get_roc() + 1 );
@@ -114,10 +113,9 @@ int SRtpPacket::unprotect( MRef<CryptoContext *> scontext ){
 
     /* Authentication control */
     int length = get_tag_length();
-	
+
     unsigned char * mac = new unsigned char[length];
     scontext->rtp_authenticate( this, (uint32_t)( guessed_index >> 16 ), mac );
-    //cerr << "MAC computed: " << print_hex( mac, 4 )<< endl;
     for( int i = 0; i < length; i++ ){
 	if( tag[i] != mac[i] )
 	{
@@ -252,10 +250,15 @@ char *SRtpPacket::getBytes(){
     memcpy( ret, hdr, header.size() );
     delete [] hdr;
 
-    memcpy( &ret[header.size()], content, content_length );
-    memcpy( &ret[header.size() + content_length], tag, tag_length );
-    memcpy( &ret[header.size() + content_length + tag_length],
-	    mki, mki_length );
+    int hsize = header.size();
+    if (extensionLength > 0) {
+        memcpy(&ret[hsize], extensionHeader, extensionLength);
+    }        
+    
+    hsize += extensionLength;
+    memcpy( &ret[hsize], content, content_length );
+    memcpy( &ret[hsize + content_length], tag, tag_length );
+    memcpy( &ret[hsize + content_length + tag_length], mki, mki_length);
 
     return ret;
 }
@@ -273,5 +276,5 @@ void SRtpPacket::set_tag(unsigned char *tag){
 }
 
 int SRtpPacket::size(){
-    return header.size() + content_length + tag_length + mki_length;
+    return header.size() + content_length + tag_length + mki_length + extensionLength;
 }

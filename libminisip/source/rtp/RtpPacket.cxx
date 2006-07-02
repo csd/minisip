@@ -53,6 +53,9 @@ RtpPacket::RtpPacket(unsigned char *content, int content_length,
 		     int seq_no, unsigned timestamp, unsigned ssrc):
     content_length(content_length){
 
+    extensionLength = 0;
+    extensionHeader = NULL;
+
     header.setVersion(2);
     header.setSeqNo(seq_no);
     header.setTimestamp(timestamp);
@@ -81,14 +84,15 @@ RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content, int content_length):
 	content_length -= 4;	// minimum size of extension header
 
 	short tmp = *((short *)(content+2));
-	ntoh16(tmp);
-	tmp *= 4;		// ext. header length is in words (4 bytes)
+        tmp = ntoh16(tmp);
+        tmp *= 4;		// ext. header length is in words (4 bytes)
 	extensionLength += tmp;
 	content_length -= tmp;
 	
-	if (content_length >= 0) {
-	    extensionHeader = content;
-	}
+        if (content_length >= 0) {
+            extensionHeader = new unsigned char[extensionLength];
+            memcpy(this->extensionHeader, content, extensionLength);
+        }
     }
     this->content_length = content_length;
 	
@@ -107,17 +111,10 @@ void RtpPacket::setExtHeader(unsigned char* data, int length) {
     if (data == NULL || length == 0) {
 	return;
     }
-    // Need to prepend extension header to packet payload. Get a bigger
-    // buffer.
-    unsigned char* cp = new unsigned char[content_length + length];
-    memcpy(cp, data, length);
+    extensionHeader = new unsigned char[length];
+    memcpy(extensionHeader, data, length);
 
-    if (content != NULL) {
-	memcpy(cp+length, content, content_length);
-	delete [] content;
-    }
-    content = cp;
-    content_length += length;
+    extensionLength = length;
     header.setExtension(1);
 }
 
@@ -128,6 +125,9 @@ RtpHeader &RtpPacket::getHeader(){
 RtpPacket::~RtpPacket(){
     if (content!=NULL)
 	delete [] content;
+    if (extensionHeader != NULL) {
+        delete [] extensionHeader;
+    }
 }
 
 void RtpPacket::sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port){
@@ -175,16 +175,16 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
     cerr << "GOT SEQN" << hdr.getSeqNo() << endl;
 
     int tmp = *((int *)(buf + 4));
-    ntoh32(tmp);
+    tmp = ntoh32(tmp);
     hdr.setTimestamp(tmp);
 
     tmp = *((int *)(buf + 8));
-    ntoh32(tmp);
+    tmp = ntoh32(tmp);
     hdr.setSSRC(tmp);
 
     for( j = 0 ; j < cc ; j++ ) {
 	tmp = *((int *)(buf + 12 + j*4));
-	ntoh32(tmp);
+	tmp = ntoh32(tmp);
 	hdr.setSSRC(tmp);
     }
     int datalen = i - 12 - cc*4;
@@ -197,14 +197,17 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 char *RtpPacket::getBytes(){
 
     int hdrSize = header.size();
-    char *ret = new char[hdrSize+content_length];
+    char *ret = new char[hdrSize + content_length + extensionLength];
 	
     char *hdr = header.getBytes();
 	
     memcpy(ret, hdr, hdrSize);
     delete [] hdr;
-
-    memcpy(&ret[hdrSize], content, content_length);
+    
+    if (extensionLength > 0) {
+        memcpy(&ret[hdrSize], extensionHeader, extensionLength);
+    }        
+    memcpy(&ret[hdrSize+extensionLength], content, content_length);
     return ret;
 }
 
