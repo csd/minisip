@@ -32,7 +32,7 @@ using namespace std;
 static std::list<std::string> pluginList;
 static int initialized;
 
-extern "C"
+extern "C" MILBC_API
 std::list<std::string> *milbc_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
@@ -42,7 +42,7 @@ std::list<std::string> *milbc_LTX_listPlugins( MRef<Library *> lib ){
 	return &pluginList;
 }
 
-extern "C"
+extern "C" MILBC_API
 MRef<MPlugin *> milbc_LTX_getPlugin( MRef<Library *> lib ){
 	return new ILBCCodec( lib );
 }

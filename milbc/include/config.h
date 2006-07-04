@@ -30,12 +30,11 @@
 #	include"compilation_config_w32_wce.h"
 #endif
 
-#ifndef LIBMNETUTIL_EXPORTS
-# ifdef DLL_EXPORT
-#  define LIBMUTIL_IMPORTS
-#  define LIBMNETUTIL_EXPORTS
-# endif  // DLL_EXPORT
-#endif  // LIBMNETUTIL_EXPORTS
+#if defined(WIN32)
+# define MILBC_API __declspec(dllexport)
+#else
+# define MILBC_API
+#endif
 
 #include<libmutil/mtypes.h>
 
