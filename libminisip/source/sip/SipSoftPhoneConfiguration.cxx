@@ -280,6 +280,11 @@ void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
 		MRef<MPlugin *> plugin = *i;
 		MRef<AudioCodec *> codec = dynamic_cast<AudioCodec*>(*plugin);
 
+		if( !codec ){
+			cerr << "SipSoftPhoneConfiguration: Not an AudioCodec: " << plugin->getName() << endl;			
+			continue;
+		}
+
 		string name = codec->getCodecName();
 
 		if( find( audioCodecs.begin(), audioCodecs.end(), name ) == audioCodecs.end() ){
