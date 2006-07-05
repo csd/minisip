@@ -36,7 +36,7 @@ using namespace std;
 static std::list<std::string> pluginList;
 static int initialized;
 
-extern "C"
+extern "C" LIBMINISIP_API
 std::list<std::string> *mspeex_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
@@ -46,7 +46,7 @@ std::list<std::string> *mspeex_LTX_listPlugins( MRef<Library *> lib ){
 	return &pluginList;
 }
 
-extern "C"
+extern "C" LIBMINISIP_API
 MRef<MPlugin *> mspeex_LTX_getPlugin( MRef<Library *> lib ){
 	return new SpeexCodec( lib );
 }

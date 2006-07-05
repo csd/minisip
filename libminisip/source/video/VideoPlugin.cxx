@@ -49,7 +49,7 @@ static std::list<std::string> pluginList;
 static bool initialized;
 
 
-extern "C"
+extern "C" LIBMINISIP_API
 std::list<std::string> *mvideo_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
@@ -59,7 +59,7 @@ std::list<std::string> *mvideo_LTX_listPlugins( MRef<Library*> lib ){
 	return &pluginList;
 }
 
-extern "C"
+extern "C" LIBMINISIP_API
 MRef<MPlugin *> mvideo_LTX_getPlugin( MRef<Library*> lib ){
 	return new VideoPlugin( lib );
 }
