@@ -49,6 +49,8 @@ class SipHeaderValueContact;
 class SipHeaderValueFrom;
 class SipHeaderValueTo;
 class SipHeaderValueVia;
+class SipHeaderValueProxyAuthenticate;
+class SipHeaderValueWWWAuthenticate;
 
 
 MRef<SipMessageContent*> sipSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
@@ -337,6 +339,18 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * @return	First property found from top of message.
 		 */
 		std::string getAuthenticateProperty(std::string prop);
+
+		/**
+		 * @return Returns the i:th Proxy-Authenticate header,
+		 * or NULL if it doesn't exist.
+		 */
+		MRef<SipHeaderValueProxyAuthenticate*> getHeaderValueProxyAuthenticate(int i);
+
+		/**
+		 * @return Returns the i:th WWW-Authenticate header,
+		 * or NULL if it doesn't exist.
+		 */
+		MRef<SipHeaderValueWWWAuthenticate*> getHeaderValueWWWAuthenticate(int i);
 
 	protected:
 		void setDestinationBranch(std::string b){branch = b;}

@@ -612,6 +612,29 @@ string SipMessage::getAuthenticateProperty(string prop){
 }
 
 
+MRef<SipHeaderValueProxyAuthenticate*> SipMessage::getHeaderValueProxyAuthenticate(int i){
+        MRef<SipHeaderValue*> hdr;
+
+	hdr=getHeaderValueNo(SIP_HEADER_TYPE_PROXYAUTHENTICATE, i);
+	if (hdr){
+		MRef<SipHeaderValueProxyAuthenticate*> phdr = (SipHeaderValueProxyAuthenticate*)*hdr;
+		return phdr;
+	}
+	return NULL;
+}
+
+MRef<SipHeaderValueWWWAuthenticate*> SipMessage::getHeaderValueWWWAuthenticate(int i){
+        MRef<SipHeaderValue*> hdr;
+
+	hdr=getHeaderValueNo(SIP_HEADER_TYPE_WWWAUTHENTICATE, i);
+	if (hdr){
+		MRef<SipHeaderValueWWWAuthenticate*> whdr = (SipHeaderValueWWWAuthenticate*)*hdr;
+		return whdr;
+	}
+
+	return NULL;
+}
+
 bool SipMessage::requires(string extension){
 	MRef<SipHeaderValue*> hval;
 	bool ret=false;
