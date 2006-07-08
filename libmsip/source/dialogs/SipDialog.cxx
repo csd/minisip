@@ -34,6 +34,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipAuthenticationDigest.h>
 //#include<libmsip/SipDialogContainer.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
@@ -45,6 +46,9 @@
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRAck.h>
 #include<libmsip/SipHeaderRSeq.h>
+#include<libmsip/SipHeaderProxyAuthenticate.h>
+#include<libmsip/SipHeaderProxyAuthorization.h>
+#include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmutil/CommandString.h>
 
 using namespace std;
@@ -189,6 +193,12 @@ MRef<SipRequest*> SipDialog::createSipMessageSeq( const std::string &method, int
 
 	addRoute( req );
 
+	// Add authorizations unless an ACK or CANCEL request
+	// which should contain the same authorization headers as the INVITE
+	if( method != "ACK" &&
+	    method != "CANCEL" )
+		addAuthorizations( req );
+
 	return req;
 }
 
@@ -254,6 +264,79 @@ void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
 	dispatcher->enqueueCommand( cmd, queue );
 }
 
+bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
+				      MRef<SipHeaderValueProxyAuthenticate*> auth){
+	bool changed = false;
+
+	MRef<SipAuthenticationDigest*> challenge;
+	challenge = new SipAuthenticationDigest( auth );
+
+	bool found = false;
+	list<MRef<SipAuthenticationDigest*> >::iterator j;
+
+	for ( j = dialogState.auths.begin();
+	      j != dialogState.auths.end(); j++ ){
+		MRef<SipAuthenticationDigest*> item = *j;
+			
+		if( item->getRealm() == challenge->getRealm() ){
+			item->update( *auth );
+
+			if( item->getStale() )
+				changed = true;
+			found = true;
+		}
+	}
+		
+	if( !found ){
+		dialogState.auths.push_back( challenge );
+
+		string username = getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername;
+		string password = getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword;
+
+		challenge->setCredential( username, password );
+		changed = true;
+	}
+
+	return changed;
+}
+
+bool SipDialog::updateAuthentications( MRef<SipResponse*> resp ){
+	bool changed = false;
+
+	for( int i = 0;; i++ ){
+		MRef<SipHeaderValueWWWAuthenticate*> auth;
+		auth = resp->getHeaderValueWWWAuthenticate( i );
+
+		if( !auth )
+			break;
+
+		changed |= updateAuthentication(resp, *auth);
+	}
+
+	for( int i = 0;; i++ ){
+		MRef<SipHeaderValueProxyAuthenticate*> auth;
+		auth = resp->getHeaderValueProxyAuthenticate( i );
+
+		if( !auth )
+			break;
+
+		changed |= updateAuthentication(resp, auth);
+	}
+
+	return changed;
+}
+
+void SipDialog::addAuthorizations( MRef<SipRequest*> req ){
+	list<MRef<SipAuthenticationDigest*> >::iterator j;
+
+	for ( j = dialogState.auths.begin();
+	      j != dialogState.auths.end(); j++ ){
+		MRef<SipAuthenticationDigest*> digest = *j;
+
+		MRef<SipHeaderValueAuthorization*> authHeader = digest->createAuthorization( req );
+		req->addHeader( new SipHeader( *authHeader ) );
+	}
+}
 
 /*
 Establish a dialog acting as a UAS (receive a request)

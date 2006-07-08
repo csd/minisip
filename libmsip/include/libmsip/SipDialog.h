@@ -47,6 +47,7 @@ class SipStack;
 class SipTransaction;
 class SipDialogConfig;
 class SipCommandDispatcher;
+class SipAuthenticationDigest;
 //class SipDialogContainer;
 
 
@@ -112,6 +113,8 @@ class LIBMSIP_API SipDialogState{
 	
 		bool isEarly;
 		bool isEstablished;
+
+		std::list<MRef<SipAuthenticationDigest*> > auths;
 };
 
 
@@ -216,6 +219,18 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		/** Send a Sip message to the transaction layer */
 		void sendSipMessage( MRef<SipMessage*> msg, int queue=HIGH_PRIO_QUEUE );
 
+		/**
+		 * Get all WWW-Authenticate and Proxy-Authenticate headers
+		 * in the response and register in the dialog
+		 */
+		bool updateAuthentications( MRef<SipResponse*> resp );
+
+		/**
+		 * Add Authorize or Proxy-Authorize headers for all
+		 * authentications registered in the dialog.
+		 */
+		void addAuthorizations( MRef<SipRequest*> req );
+
 	protected:
 //		///a list containing all transactions
 //		std::list<MRef<SipTransaction*> > transactions;
@@ -225,6 +240,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		
 		MRef<SipCommandDispatcher*> dispatcher;
 
+		bool updateAuthentication( MRef<SipResponse*> resp,
+					   MRef<SipHeaderValueProxyAuthenticate*> auth);
 	private:
 		
 		///the dialog configuration
