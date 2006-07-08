@@ -20,6 +20,7 @@ libmsip_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
 msip_src =           source/SipDialogConfig.cxx \
+		     source/SipAuthenticationDigest.cxx \
 		     source/SipStack.cxx \
 		     source/SipLayerDialog.cxx \
 		     source/SipLayerTransaction.cxx \
