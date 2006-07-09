@@ -25,22 +25,31 @@
 
 
 ZrtpPacketCommit::ZrtpPacketCommit() {
+    DEBUGOUT((fprintf(stdout, "Creating commit packet without data\n")));
 
-    void *p = malloc(sizeof (CommitPacket_t));
+    allocated = malloc(sizeof (CommitPacket_t));
 
-    if ( p == NULL) {
+    if (allocated == NULL) {
     }
 
-    zrtpHeader = (zrtpPacketHeader_t *)&((CommitPacket_t *)p)->hdr;	// the standard header
-    commitHeader = (Commit_t *)&((CommitPacket_t *)p)->commit;
+    zrtpHeader = (zrtpPacketHeader_t *)&((CommitPacket_t *)allocated)->hdr;	// the standard header
+    commitHeader = (Commit_t *)&((CommitPacket_t *)allocated)->commit;
 
     setZrtpId();
     setLength(COMMIT_LENGTH + MESSAGE_LENGTH);
-    setMessage(CommitMsg);
+    setMessage((uint8_t*)CommitMsg);
 }
 
-ZrtpPacketCommit::ZrtpPacketCommit(char *data) {
+ZrtpPacketCommit::ZrtpPacketCommit(uint8_t *data) {
+    DEBUGOUT((fprintf(stdout, "Creating commit packet from data\n")));
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((CommitPacket_t *)data)->hdr;	// the standard header
     commitHeader = (Commit_t *)&((CommitPacket_t *)data)->commit;
 }
 
+ZrtpPacketCommit::~ZrtpPacketCommit() {
+    DEBUGOUT((fprintf(stdout, "Deleting commit packet: alloc: %x\n", allocated)));
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}

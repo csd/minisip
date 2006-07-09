@@ -28,7 +28,7 @@ class ZrtpPacketConf2Ack : public ZrtpPacketBase {
 
  public:
     ZrtpPacketConf2Ack();		/* Creates a Conf2Ack packet with default data */
-    ZrtpPacketConf2Ack(char *data);	/* Creates a Conf2Ack packet from received data */
+    ZrtpPacketConf2Ack(char* data);	/* Creates a Conf2Ack packet from received data */
     virtual ~ZrtpPacketConf2Ack();
 
  private:

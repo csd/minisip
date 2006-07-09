@@ -30,8 +30,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#include<libmutil/StateMachine.h>
-#include<libmsip/SipSMCommand.h>
+#include <libmutil/StateMachine.h>
+#include <libmutil/MessageRouter.h>
+#include <libmsip/SipSMCommand.h>
 
 #include <libminisip/mediahandler/MediaStream.h>
 #include <libminisip/rtp/SRtpPacket.h>
@@ -41,25 +42,25 @@
 #include <libminisip/zrtp/ZRtp.h>
 
 /**
- * The connection between the ZRTP implementation and Minisip
+ * The connection between the ZRTP implementation and Minisip.
  *
- * The ZRPT implementation is fairly independent from the underlying SIP and
- * RTP/SRTP implementation. This class implements specific functions and
- * interfaces that ZRTP uses to link to functions of the host. In this
- * case the host is Minisip.
- *
- * <p/>
- *
- * This bridge class implement the ZrtpCallback interface that ZRTP uses to
- * send data and to activate timer. A very Minisip specific part is the
- * handling of the timeout provider.
+ * The ZRPT implementation is fairly independent from the underlying
+ * SIP and RTP/SRTP implementation. This class implements specific
+ * functions and interfaces that ZRTP uses to call functions of the
+ * hosting SIP client. In this case the host is Minisip.
  *
  * <p/>
  *
- * The minisip <e>startSip</e> method call the bridge's <e>initialize</e>
- * method after the whole SIP was initialized. To avoid a new timeout provider
- * this bridge reuses the timeout provider created by SipStack. Thus the
- * initialize call looks like:
+ * As required by ZRTP base implementation the bridge implements
+ * the ZrtpCallback interface.
+ *
+ * <p/>
+ *
+ * The most minisip specific part is the implementation of the timer.
+ * The minisip <e>startSip</e> method calls the bridge's
+ * <e>initialize</e> method after the whole SIP was initialized. To
+ * avoid a new timeout provider this bridge reuses the timeout
+ * provider created by SipStack. Thus the initialize call looks like:
  *
  * <br>
  *
@@ -67,10 +68,11 @@
  *
  * <br/>
  *
- * The initialize method stores the timeout provider and reuses it for every
- * instance. To do so the bridge inherits from <e>StateMachine<e/> but does use
- * the timeout specific parts only. The destructor frees the StateMachine to
- * maintain the timout provide reference counter.
+ * The <code>initialize</code> method stores the timeout provider and
+ * reuses it for every instance. To do so the bridge inherits from
+ * Minisip's <e>StateMachine<e/> but does use the timeout specific
+ * parts only. The destructor frees the StateMachine to maintain the
+ * timout provider's reference counter.
  */
 
 class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, public ZrtpCallback {
@@ -82,10 +84,10 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     /**
      * Initialize the host bridge.
      *
-     * This static method must be called before any use of the host
-     * bridge. If the caller does not provide a filename for the ZID
-     * file the method opens the ZID file with the default name <e>
-     * ~/.minisip.zid<e/>. This is a binary file.
+     * This static method must be called before <e>any</e> use of the
+     * host bridge. If the caller does not provide a filename for the
+     * ZID file the method opens the ZID file with the default name
+     * <e> ~/.minisip.zid<e/>. This is a binary file.
      *
      * @param tp
      *    The timeout provider to use. In this case it shall be the 
@@ -98,7 +100,7 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     static int32_t initialize(MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
 		     const char *zidFilename =NULL);
 
-    ZrtpHostBridgeMinisip();
+    ZrtpHostBridgeMinisip(std::string id, MRef<CommandReceiver*> callback);
     ~ZrtpHostBridgeMinisip();
 
 
@@ -115,13 +117,14 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     uint32_t getSsrcSender()                        { return senderSsrc; };
     int32_t isSecureStateSender()                   { return senderSecure; }
 
-
+    void setCallId(std::string id)                  { callId = id; }
     /**
      * Set the IP address of our remote peer.
      * 
-     * We use this IP address to find the right ZRTP host
-     * bridge when we receive packets on the receiver port allocated
-     * by the MediaStreamReceiver.
+     * The host (Minisip) shall call this mehtod to set the IP address
+     * of the remote peer. We use the address to find the right ZRTP
+     * host bridge when we receive packets on the receiver port
+     * allocated by the MediaStreamReceiver.
      *
      * This is (fairly) save because one remote peer shall not have
      * several different RTP sessions for one of my receiver ports.
@@ -140,8 +143,7 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     MRef<IPAddress *> getRemoteAddress() { return remoteAddress; };
 
     /**
-     * Process a received packet with an extension header and known
-     * payload type.
+     * Process a received packet with an extension header.
      *
      * This packet has an extension header and may have payload data
      * to process.  The method checks if it is a ZRTP packet, if yes
@@ -162,12 +164,16 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     int32_t processPacket(MRef<SRtpPacket *> packet);
 
     /**
-     * Handle timeout event forwarded by TimeoutProvider.
+     * Handle timeout event forwarded by Minisip's (SipStack)
+     * TimeoutProvider.
      *
      * Just call the ZRTP engine for further processing.
      */
     void handleTimeout(const std::string &c) { zrtpEngine->processTimeout(); };
 
+    /*
+     * Refer to ZrtpCallback.h
+     */
     int32_t sendDataRTP(const unsigned char* data, int32_t length);
 
     int32_t sendDataSRTP(const unsigned char* dataHeader, int32_t lengthHeader,
@@ -193,9 +199,9 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
      * Switch on the security for the defined part.
      *
      * Create an CryproContext with the negotiated ZRTP data and
-     * register it with the repective part (sender or receiver) thus
+     * register it with the respective part (sender or receiver) thus
      * replacing the current active context (usually an empty
-     * context).
+     * context). This effectively enables SRTP.
      *
      * @param secrets
      *    The secret keys and salt negotiated by ZRTP
@@ -209,7 +215,7 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
      *
      * Create an empty CryproContext and register it with the
      * repective part (sender or receiver) thus replacing the current
-     * active context.
+     * active context. This effectively disables SRTP.
      *
      * @param part
      *    An enum that defines sender, receiver, or both.
@@ -222,13 +228,14 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
      *
      * The receiver detected a wrong SSRC during a session with our
      * remote peer. This could indicate a security problem - just
-     * switch security off and Alert the user.
+     * disable SRTP and alert the user.
      */
     void rtpSessionError();
 
  private:
     ZRtp *zrtpEngine;
     SrtpSecret_t secret;
+    int32_t secureParts;
 
     MRef<IPAddress *> remoteAddress;
     
@@ -240,6 +247,13 @@ class ZrtpHostBridgeMinisip : public StateMachine<SipSMCommand,std::string>, pub
     MRef<MediaStreamSender *> sStream;
     uint32_t senderSsrc;
     uint32_t senderSecure;
+    
+    /*
+     * The call id of our call
+    */
+    std::string callId;
+    
+    MRef<CommandReceiver*> messageRouterCallback;
 };
 
 #endif // _ZIDHOSTBRIDGEMINISIP_H_

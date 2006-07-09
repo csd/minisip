@@ -26,37 +26,37 @@
 /**
  *
  */
-extern char *clientId;
-extern char *zrtpVersion;
+extern char* clientId;
+extern char* zrtpVersion;
 
 /**
  *
  */
-extern char *HelloMsg;
-extern char *HelloAckMsg;
-extern char *CommitMsg;
-extern char *DHPart1Msg;
-extern char *DHPart2Msg;
-extern char *Confirm1Msg;
-extern char *Confirm2Msg;
-extern char *Conf2AckMsg;
-extern char *ErrorMsg;
+extern char* HelloMsg;
+extern char* HelloAckMsg;
+extern char* CommitMsg;
+extern char* DHPart1Msg;
+extern char* DHPart2Msg;
+extern char* Confirm1Msg;
+extern char* Confirm2Msg;
+extern char* Conf2AckMsg;
+extern char* ErrorMsg;
 
 /**
  *
  */
-extern char *responder;
-extern char *initiator;
-extern char *iniMasterKey;
-extern char *iniMasterSalt;
-extern char *respMasterKey;
-extern char *respMasterSalt;
+extern char* responder;
+extern char* initiator;
+extern char* iniMasterKey;
+extern char* iniMasterSalt;
+extern char* respMasterKey;
+extern char* respMasterSalt;
 
-extern char *hmacKey;
-extern char *retainedSec;
-extern char *knownPlain;
+extern char* hmacKey;
+extern char* retainedSec;
+extern char* knownPlain;
 
-extern char *sasString;
+extern char* sasString;
 /**
  *
  */
@@ -67,7 +67,7 @@ typedef enum  SupportedHashes {
     Sha256,
     NumSupportedHashes
 };
-extern char *supportedHashes[];
+extern char* supportedHashes[];
 
 // Keep the Cipher identifers in supportedCipher in the same order than the
 // following enum, starting with zero.
@@ -76,7 +76,7 @@ enum SupportedSymCiphers {
     Aes128,
     NumSupportedSymCiphers
 };
-extern char *supportedCipher[];
+extern char* supportedCipher[];
 
 // Keep the PubKey identifers in supportedPubKey in the same order than the
 // following enum, starting with zero.
@@ -85,7 +85,7 @@ enum SupportedPubKeys {
     Dh3072,
     NumSupportedPubKeys
 };
-extern char *supportedPubKey[];
+extern char* supportedPubKey[];
 
 // Keep the SAS identifers in supportedSASType in the same order than the
 // following enum, starting with zero.
@@ -93,7 +93,7 @@ enum SupportedSASTypes {
     Libase32,
     NumSupportedSASTypes
 };
-extern char *supportedSASType[];
+extern char* supportedSASType[];
 
 #endif     // _ZRTPTEXTDATA_H_
 

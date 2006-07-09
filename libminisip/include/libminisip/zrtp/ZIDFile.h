@@ -42,7 +42,7 @@ class ZIDFile {
 
 private:
 
-    FILE *zidFile;
+    FILE* zidFile;
     uint8_t associatedZid[IDENTIFIER_LEN];
     /**
      * The private ZID file constructor.
@@ -63,7 +63,7 @@ public:
      * @return
      *    A pointer to the global ZIDFile singleton instance.
      */
-    static ZIDFile *getInstance();
+    static ZIDFile* getInstance();
     /**
      * Open the named ZID file and return a ZID file class.
      *

@@ -28,22 +28,22 @@
 class ZrtpPacketHello : public ZrtpPacketBase {
 
  protected:
-    Hello_t *helloHeader;
+    Hello_t* helloHeader;
 
  public:
     ZrtpPacketHello();		 /* Creates a Hello packet with default data */
     ZrtpPacketHello(uint8_t *data); /* Creates a Hello packet from received data */
     virtual ~ZrtpPacketHello();
 
-    uint8_t *getVersion()  { return helloHeader->version; };
-    uint8_t *getClientId() { return helloHeader->clientId; };
+    uint8_t* getVersion()  { return helloHeader->version; };
+    uint8_t* getClientId() { return helloHeader->clientId; };
     bool isPassive()       { return ((helloHeader->flag & 0x1) == 0x1); };
 
-    uint8_t *getHashType(uint32_t number)    { return helloHeader->hashes[number]; };
-    uint8_t *getCipherType(uint32_t number)  { return helloHeader->ciphers[number]; };
-    uint8_t *getPubKeysType(uint32_t number) { return helloHeader->pubkeys[number]; };
-    uint8_t *getSasType(uint32_t number)     { return helloHeader->sas[number]; };
-    uint8_t *getZid()                        { return helloHeader->zid; };
+    uint8_t* getHashType(uint32_t number)    { return helloHeader->hashes[number]; };
+    uint8_t* getCipherType(uint32_t number)  { return helloHeader->ciphers[number]; };
+    uint8_t* getPubKeysType(uint32_t number) { return helloHeader->pubkeys[number]; };
+    uint8_t* getSasType(uint32_t number)     { return helloHeader->sas[number]; };
+    uint8_t* getZid()                        { return helloHeader->zid; };
 
     void setVersion(uint8_t *text)                   { memcpy(helloHeader->version, text, 4); }
     void setClientId(uint8_t *text)                  { memcpy(helloHeader->clientId, text, 15); }

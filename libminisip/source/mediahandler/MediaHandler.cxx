@@ -93,7 +93,7 @@ void MediaHandler::init(){
 
 //	muteAllButOne = config->muteAllButOne;
 	
-	ringtoneFile = config->ringtone;
+        ringtoneFile = config->ringtone;
 }
 
 // MediaHandler::~MediaHandler() {
@@ -136,10 +136,10 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {
 #ifdef DEBUG_OUTPUT
-		        cerr << "MediaHandler::createSession: enabling ZRTP for receiver" << endl;
+		        cerr << "MediaHandler::createSession: enabling ZRTP for receiver" << callId << endl;
 #endif
 
-			zhb = new ZrtpHostBridgeMinisip();
+			zhb = new ZrtpHostBridgeMinisip(callId, *messageRouterCallback);
 			zhb->setReceiver(rStream);
 			rStream->setZrtpHostBridge(zhb);
 		    }
@@ -155,10 +155,10 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {
 #ifdef DEBUG_OUTPUT
-		        cerr << "MediaHandler::createSession: enabling ZRTP for sender" << endl;
+		        cerr << "MediaHandler::createSession: enabling ZRTP for sender: " << callId << endl;
 #endif
 			if (!zhb) {
-			    zhb = new ZrtpHostBridgeMinisip();
+                            zhb = new ZrtpHostBridgeMinisip(callId, *messageRouterCallback);
 			}
 			zhb->setSender(sStream);
 			sStream->setZrtpHostBridge(zhb);

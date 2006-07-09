@@ -70,7 +70,7 @@ class ZRtp {
          * Constructor intializes all relevant data but does not start the
          * engine.
          */
-	ZRtp(uint8_t *myZid, ZrtpCallback *cb);
+	ZRtp(uint8_t* myZid, ZrtpCallback* cb);
 
         /**
 	 * Destructor cleans up.
@@ -130,7 +130,7 @@ class ZRtp {
     /**
      * The state engine takes care of protocol processing.
      */
-    ZrtpStateClass *stateEngine;
+    ZrtpStateClass* stateEngine;
 
     /**
      * This is my ZID that I send to the peer.
@@ -146,12 +146,12 @@ class ZRtp {
      * The callback class provides me with the interface to send
      * data and to deal with timer management of the hosting system.
      */
-    ZrtpCallback *callback;
+    ZrtpCallback* callback;
 
     /**
      * My active Diffie-Helman context
      */
-    ZrtpDH *dhContext;
+    ZrtpDH* dhContext;
 
     /**
      * The computed DH shared secret
@@ -236,7 +236,7 @@ class ZRtp {
     /**
      * Pre-initialized packets to start off the whole game.
      */
-    ZrtpPacketHello* zrtpHello;
+    ZrtpPacketHello*    zrtpHello;
     ZrtpPacketHelloAck* zrtpHelloAck;
     ZrtpPacketConf2Ack* zrtpConf2Ack;
     

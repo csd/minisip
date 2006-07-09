@@ -27,26 +27,26 @@
 class ZrtpPacketCommit : public ZrtpPacketBase {
 
  protected:
-    Commit_t *commitHeader;
+    Commit_t* commitHeader;
 
  public:
     ZrtpPacketCommit();		 /* Creates a Commit packet with default data */
-    ZrtpPacketCommit(uint8_t *data); /* Creates a Commit packet from received data */
+    ZrtpPacketCommit(uint8_t* data); /* Creates a Commit packet from received data */
     virtual ~ZrtpPacketCommit();
 
-    uint8_t *getHashType()    { return commitHeader->hash; };
-    uint8_t *getCipherType()  { return commitHeader->cipher; };
-    uint8_t *getPubKeysType() { return commitHeader->pubkey; };
-    uint8_t *getSasType()     { return commitHeader->sas; };
-    uint8_t *getZid()         { return commitHeader->zid; };
-    uint8_t *getHvi()         { return commitHeader->hvi; };
+    uint8_t* getHashType()    { return commitHeader->hash; };
+    uint8_t* getCipherType()  { return commitHeader->cipher; };
+    uint8_t* getPubKeysType() { return commitHeader->pubkey; };
+    uint8_t* getSasType()     { return commitHeader->sas; };
+    uint8_t* getZid()         { return commitHeader->zid; };
+    uint8_t* getHvi()         { return commitHeader->hvi; };
 
-    void setHashType(uint8_t *text)    { memcpy(commitHeader->hash, text, 8); };
-    void setCipherType(uint8_t *text)  { memcpy(commitHeader->cipher, text, 8); };
-    void setPubKeyType(uint8_t *text)  { memcpy(commitHeader->pubkey, text, 8); };
-    void setSasType(uint8_t *text)     { memcpy(commitHeader->sas, text, 8); };
-    void setZid(uint8_t *text)         { memcpy(commitHeader->zid, text, 12); };
-    void setHvi(uint8_t *text)         { memcpy(commitHeader->hvi, text, 32); };
+    void setHashType(uint8_t* text)    { memcpy(commitHeader->hash, text, 8); };
+    void setCipherType(uint8_t* text)  { memcpy(commitHeader->cipher, text, 8); };
+    void setPubKeyType(uint8_t* text)  { memcpy(commitHeader->pubkey, text, 8); };
+    void setSasType(uint8_t* text)     { memcpy(commitHeader->sas, text, 8); };
+    void setZid(uint8_t* text)         { memcpy(commitHeader->zid, text, 12); };
+    void setHvi(uint8_t* text)         { memcpy(commitHeader->hvi, text, 32); };
  private:
 };
 

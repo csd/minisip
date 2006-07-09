@@ -24,18 +24,29 @@
 #include <malloc.h>
 
 ZrtpPacketHelloAck::ZrtpPacketHelloAck() {
+    DEBUGOUT((fprintf(stdout, "Creating HelloAck packet without data\n")));
 
-  void *p = malloc(sizeof (HelloAck_t));
-  if ( p == NULL) {
-  }
-    zrtpHeader = (zrtpPacketHeader_t *)&((HelloAck_t *)p)->hdr;	// the standard header
+    allocated = malloc(sizeof (HelloAck_t));
+    if (allocated == NULL) {
+    }
+    zrtpHeader = (zrtpPacketHeader_t *)&((HelloAck_t *)allocated)->hdr;	// the standard header
 
     setZrtpId();
     setLength(MESSAGE_LENGTH);
-    setMessage(HelloAckMsg);
+    setMessage((uint8_t*)HelloAckMsg);
 }
 
 ZrtpPacketHelloAck::ZrtpPacketHelloAck(char *data) {
+    DEBUGOUT((fprintf(stdout, "Creating HelloAck packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((HelloAck_t *)data)->hdr;	// the standard header
+}
+
+ZrtpPacketHelloAck::~ZrtpPacketHelloAck() {
+    DEBUGOUT((fprintf(stdout, "Deleting HelloAck packet: alloc: %x\n", allocated)));
+    if (allocated != NULL) {
+	free(allocated);
+    }
 }
 

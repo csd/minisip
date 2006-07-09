@@ -296,6 +296,10 @@ void CallWidget::hideAcceptButton(){
 }
 
 bool CallWidget::handleCommand( CommandString command ){
+#ifdef DEBUG_OUTPUT
+	cerr << "handleCommand: " << command.getOp() << ", :" << command.getDestinationId() << endl;
+#endif
+    
 	if( handlesCallId( command.getDestinationId() ) ){
 		if( command.getOp() == SipCommandString::remote_user_not_found ){
 			hideAcceptButton();
@@ -481,6 +485,17 @@ bool CallWidget::handleCommand( CommandString command ){
 			transferButton.set_sensitive( true );
 #endif
 		}
+                if( command.getOp() == "zrtp_security_change") {
+                    secStatus.set_markup( "The call is <b>" + 
+                            command.getParam() + "</b>" );
+
+                    if( command.getParam() == "secure" ){
+                        secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
+                    }
+                    else {
+                        secureImage.set( Gtk::StockID( "minisip_insecure") , Gtk::ICON_SIZE_DIALOG );
+                    }
+                }
 		return true;
 	}
 	return false;

@@ -19,7 +19,7 @@
 /*
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
-
+#include <stdint.h>
 /**
  *
  */
@@ -53,8 +53,11 @@ char *hmacKey = "HMAC key";
 char *retainedSec = "retained secret";
 char *knownPlain = "known plaintext";
 
+char *sasString = "Short Authentication String";
+
 /**
- *
+ * The arrays are sorted: the most secure / best algorithm is first in the
+ * array
  */
 char *supportedHashes[] = { "SHA256  ",
 			    "        ",
@@ -62,14 +65,14 @@ char *supportedHashes[] = { "SHA256  ",
 			    "        ",
 			    "        " };
 
-char *supportedCipher[] = { "AES128  ",
-			    "AES256  ",
+char *supportedCipher[] = { "AES256  ",
+			    "AES128  ",
 			    "        ",
 			    "        ",
 			    "        " };
 
-char *supportedPubKey[] = { "DH3072  ",
-			    "DH4096  ",
+char *supportedPubKey[] = { "DH4096  ",
+			    "DH3072  ",
 			    "        ",
 			    "        ",
 			    "        " };

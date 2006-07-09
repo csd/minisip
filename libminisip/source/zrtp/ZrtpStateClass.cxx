@@ -20,11 +20,13 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#include <iostream.h>
-#include <assert.h>
+#include <iostream>
+#include <cstdlib>
 #include <ctype.h>
 #include <libminisip/zrtp/ZRtp.h>
 #include <libminisip/zrtp/ZrtpStateClass.h>
+
+using namespace std;
 
 state_t states[numberOfStates] = {
     {Initial,      &ZrtpStateClass::evInitial },
@@ -39,6 +41,13 @@ state_t states[numberOfStates] = {
     {SecureState,  &ZrtpStateClass::evSecureState }
 };
 
+static char* sendErrorText = "Cannot send data via RTP - connection or peer down?";
+static char* sendErrorTextSrtp = "Cannot send data via SRTP - connection or peer down?";
+static char* timerError = "Cannot start a timer - internal resources exhausted?";
+static char* resendError = "Too much retries during ZRTP negotiation - connection or peer down?";
+static char* internalProtocolError = "Internal protocol error occured!";
+static char* zrtpClosed = "No more security for this session";
+    
 ZrtpStateClass::ZrtpStateClass(ZRtp *p) {
     parent = p;
     engine = new ZrtpStates(states, numberOfStates, Initial);
@@ -59,10 +68,12 @@ ZrtpStateClass::~ZrtpStateClass(void) {
     }
 }
 
-
 int32_t ZrtpStateClass::processEvent(Event_t *ev) {
 
-    if (inState(Initial)) {
+    /*
+     * Ignore any events if we are not really started yet.
+     */
+    if (inState(Initial) && ev->type != ZrtpInitial) {
 	return (Done);
     }
     event = ev;
@@ -71,32 +82,40 @@ int32_t ZrtpStateClass::processEvent(Event_t *ev) {
 
 
 int32_t ZrtpStateClass::evInitial(void) {
-    cout << "Checking for match in Initial.\n";
+    DEBUGOUT((cout << "Checking for match in Initial.\n"));
 
     ZrtpPacketHello *hello = parent->prepareHello();
     if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(hello))) {
-	// Huston, we have a problem
+	nextState(Initial);
+	parent->sendInfo(Error, sendErrorText);
+	return(Fail);
     }
     nextState(Detect);
 
     // remember packet for easy resend in case timer triggers
     sentPacket = static_cast<ZrtpPacketBase *>(hello);
     if (startTimer(&T1) <= 0) {
-	// Yet another problem
+	nextState(Initial);
+	parent->sendInfo(Error, timerError);
+	return(Fail);
     }
-    return (Done);
+    return(Done);
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains Hello, Hello timer active
+ */
 int32_t ZrtpStateClass::evDetect(void) {
 
-    cout << "Checking for match in Detect.\n";
+    DEBUGOUT((cout << "Checking for match in Detect.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -109,14 +128,24 @@ int32_t ZrtpStateClass::evDetect(void) {
 	 * - don't start timer, we are responder
 	 */
 	if (first == 'c') {
-	    T1.stop = 1;	// stop Hello timer processing
-	    ZrtpPacketDHPart* dhPart1 = 
-		parent->prepareDHPart1(static_cast<ZrtpPacketCommit *>(pkt));
-
-	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))) {
-		// Huston, we have a problem
-	    }
+	    cancelTimer();	// stop Hello timer processing, don't delete a Hello packet
+	    sentPacket = NULL;
+	    
+	    ZrtpPacketCommit *cpkt = new ZrtpPacketCommit(pkt);
+	    ZrtpPacketDHPart* dhPart1 = parent->prepareDHPart1(cpkt);
+	    delete cpkt;
+	    
 	    nextState(WaitDHPart2);
+	    
+	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))) {
+		delete dhPart1;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
+	    }
+	    // remember packet for easy resend in new state
+	    sentPacket = static_cast<ZrtpPacketBase *>(dhPart1);
 	    return (Done);
 	}
 	/*
@@ -125,95 +154,161 @@ int32_t ZrtpStateClass::evDetect(void) {
 	 * - switch to state AckDetected, wait for peer's Hello
 	 */
 	if (first == 'h' && last =='k') {
-	    T1.stop = 1;	// stop Hello timer processing
+	    cancelTimer();	// stop Hello timer processing, don't delete this Hello packet
+	    sentPacket = NULL;
 	    nextState(AckDetected);
 	    return (Done);	  
 	}
 	/*
 	 * Hello:
-	 * - stop resending Hello
+	 * - stop Hello timer
 	 * - prepare and send my Commit, 
-	 * - switch state to CommitSent
-	 * - start timer - we are in Initiator role here
+	 * - switch state to CommitSent, start Commit timer
 	 */
 	if (first == 'h' && last ==' ') {
-	    T1.stop = 1;	// stop Hello timer processing
-	    ZrtpPacketCommit* commit = 
-		parent->prepareCommit(static_cast<ZrtpPacketHello *>(pkt));
+	    cancelTimer();
+	    sentPacket = NULL;
+	    
+	    ZrtpPacketHello *hpkt = new ZrtpPacketHello(pkt);
+	    ZrtpPacketCommit* commit = parent->prepareCommit(hpkt);
+	    delete hpkt;
+	    
+	    nextState(CommitSent);
 
 	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(commit))){
-		// Huston, we have a problem
+		delete commit;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
-	    nextState(CommitSent);
 
 	    // remember packet for easy resend in case timer triggers
 	    sentPacket = static_cast<ZrtpPacketBase *>(commit);
 	    if (startTimer(&T2) <= 0) {
-		// Yet another problem
+		delete sentPacket;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->sendInfo(Error, timerError);
+		return(Fail);
 	    }
 	    return (Done);
 	}
     }
     // Timer event triggered
-    else {
-	// Timer triggered but we got a message during that time that
-	// stopped further timer processing. Ignore the trigger
-	if (T1.stop) {
+    else if (event->type == Timer) {
+	if (sentPacket == NULL) {      // probably a race condition - ignore
 	    return (Done);
 	}
-	if (nextTimer(&T1) > 0 && parent->sendPacketRTP(sentPacket)) {
-	    return (Done);
+	if (nextTimer(&T1) < 0) {
+	    parent->sendInfo(Error, resendError);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    return (Fail);
+	}
+	if (!parent->sendPacketRTP(sentPacket)) {
+	    parent->sendInfo(Error, sendErrorText);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    return (Fail);
 	}
     }
-    // Error packet ??
-    return (Fail);
+    else {      // unknown Event type for this state
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains NULL, Hello timer stopped
+ */
 int32_t ZrtpStateClass::evAckDetected(void) {
 
-    cout << "Checking for match in AckDetected.\n";
+    DEBUGOUT((cout << "Checking for match in AckDetected.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
 	/*
 	 * Hello:
-	 * - stop resending Hello
 	 * - Acknowledge the Hello
 	 * - switch to state WaitCommit, wait for peer's Commit
 	 */
 	if (first == 'h') {
-	    T1.stop = 1;	// stop Hello timer processing
 	    ZrtpPacketHelloAck *helloAck = parent->prepareHelloAck();
-	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(helloAck))) {
-		// Huston, we have a problem
-	    }
+
 	    nextState(WaitCommit);
+
+	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(helloAck))) {
+		nextState(Initial);
+		sentPacket = NULL;
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
+	    }
 	    // remember packet for easy resend
 	    sentPacket = static_cast<ZrtpPacketBase *>(helloAck);
 	    return (Done);
 	}
+       /* 
+        * Commit:  (Actually illegal here)
+        * - go the responder path
+        * - send our DHPart1
+        * - switch to state WaitDHPart2, wait for peer's DHPart2
+        * - don't start timer, we are responder
+                */
+        if (first == 'c') {
+	    
+            ZrtpPacketCommit *cpkt = new ZrtpPacketCommit(pkt);
+            ZrtpPacketDHPart* dhPart1 = parent->prepareDHPart1(cpkt);
+            delete cpkt;
+	    
+            nextState(WaitDHPart2);
+	    
+            if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))) {
+                delete dhPart1;
+                sentPacket = NULL;
+                nextState(Initial);
+                parent->sendInfo(Error, sendErrorText);
+                return(Fail);
+            }
+	    // remember packet for easy resend in new state
+            sentPacket = static_cast<ZrtpPacketBase *>(dhPart1);
+            return (Done);
+        }
     }
-    // TODO: Error packet ??
-    return (Fail);
+    else {
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains a HelloAck packet
+ */
 int32_t ZrtpStateClass::evWaitCommit(void) {
 
-    cout << "Checking for match in WaitCommit.\n";
+    DEBUGOUT((cout << "Checking for match in WaitCommit.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -225,7 +320,10 @@ int32_t ZrtpStateClass::evWaitCommit(void) {
 	 */
 	if (first == 'h') {
 	    if (!parent->sendPacketRTP(sentPacket)) {
-		// Huston, we have a problem
+		nextState(Initial);
+		sentPacket = NULL;    // don't delete HelloAck, it's preconfigured
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
 	    return (Done);
 	}
@@ -237,60 +335,96 @@ int32_t ZrtpStateClass::evWaitCommit(void) {
 	 * - don't start timer, we are responder
 	 */
 	if (first == 'c') {
-	    ZrtpPacketDHPart* dhPart1 = 
-		parent->prepareDHPart1(static_cast<ZrtpPacketCommit *>(pkt));
+	    ZrtpPacketCommit *cpkt = new ZrtpPacketCommit(pkt);
+	    ZrtpPacketDHPart* dhPart1 = parent->prepareDHPart1(cpkt);
+	    delete cpkt;
+
+	    nextState(WaitDHPart2);
 
 	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))){
-		// Huston, we have a problem
+		delete dhPart1;
+		nextState(Initial);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
-	    nextState(WaitDHPart2);
 	    sentPacket = static_cast<ZrtpPacketBase *>(dhPart1);
 	    return (Done);	  
 	}
     }
-    // TODO: Error packet ??
-    return (Fail);
+    else {
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
+
+/*
+ * When entering this transition function
+ * - sentPacket contains Commit packet, Hello timer stopped, Commit timer active
+ */
 
 int32_t ZrtpStateClass::evCommitSent(void) {
 
-    cout << "Checking for match in CommitSend.\n";
+    DEBUGOUT((cout << "Checking for match in CommitSend.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
 
 	/*
 	 * Commit:
-	 * - switch off resending Commit?? probably not
+	 * - switch off resending Commit
 	 * - compare my hvi with peer's hvi
 	 * - if my hvi is greater
 	 *   - I'm Initiator, stay in state
 	 * - else 
-	 *   - stop timer
+	*    - stop timer, we will be triggered by peer (Initiator)
 	 *   - prepare and send DH1Packt, 
 	 *   - switch to state WaitDHPart2, implies Responder path
 	 */
 	if (first == 'c') {
-	    if (parent->compareHvi(static_cast<ZrtpPacketCommit *>(pkt))< 0) {
-		T2.stop = 1;
-		ZrtpPacketDHPart* dhPart1 = 
-		    parent->prepareDHPart1(static_cast<ZrtpPacketCommit *>(pkt));
+	    ZrtpPacketCommit *zpCo = new ZrtpPacketCommit(pkt);
+	    cancelTimer();         // this cancels the Commit timer T2
+	    
+	    // if our hvi is less  that peer's hvi - switch to Responder
+	    // path, send DHPart1. Peer (as Initiator) will retrigger if necessary
+	    if (parent->compareHvi(zpCo) < 0) {
+		cancelTimer();         // this cancels the Commit timer T2
+		delete sentPacket;     // delete the Commit packet
+		sentPacket = NULL;
+		ZrtpPacketDHPart* dhPart1 = parent->prepareDHPart1(zpCo);
 	
-		if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))){
-		    // Huston, we have a problem
-		}
 		nextState(WaitDHPart2);
+
+		if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart1))){
+		    delete dhPart1;
+		    delete zpCo;
+		    nextState(Initial);
+		    parent->sendInfo(Error, sendErrorText);
+		    return(Fail);
+		}
 		sentPacket = static_cast<ZrtpPacketBase *>(dhPart1);
 	    }
-	    // TODO: what about Timer: we depend on that fact that
-	    // peer _will_ send a DHPart1 because it is Responder.
+	    // Stay in state, we are Initiator, resend Commit after timeout until
+	    // we get a DHPart1
+	    else {
+		if (startTimer(&T2) <= 0) { // restart the Commit timer, gives peer more time to react
+                    delete sentPacket;
+                    sentPacket = NULL;
+                    nextState(Initial);
+                    parent->sendInfo(Error, timerError);
+                    return(Fail);
+		}
+	    }
+	    delete zpCo;
 	    return (Done);
 	}
 
@@ -299,46 +433,81 @@ int32_t ZrtpStateClass::evCommitSent(void) {
 	 * - switch off resending Commit
 	 * - Prepare and send DHPart2
 	 * - switch to WaitConfirm1
-	 * - start timer to resend DHPart2 if necessary
+	 * - start timer to resend DHPart2 if necessary, we are Initiator
+	 * - switch on Security for receiver, Confirm1 payload is encrypted
 	 */
 	if (first == 'd') {
-	    T2.stop = 1;
-	    ZrtpPacketDHPart* dhPart2 = 
-		parent->prepareDHPart2(static_cast<ZrtpPacketDHPart *>(pkt));
+	    cancelTimer();
+	    delete sentPacket;     // deletes the Commit packet
+	    sentPacket = NULL;
+	    
+	    ZrtpPacketDHPart* dpkt = new ZrtpPacketDHPart(pkt);
+	    ZrtpPacketDHPart* dhPart2 = parent->prepareDHPart2(dpkt);
+	    delete dpkt;
+
+	    nextState(WaitConfirm1);
+	    parent->srtpSecretsReady(ForReceiver);	// let's try
 
 	    if (!parent->sendPacketRTP(static_cast<ZrtpPacketBase *>(dhPart2))){
-		// Huston, we have a problem
+		delete dhPart2;
+		nextState(Initial);
+		parent->srtpSecretsOff(ForReceiver);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
-	    nextState(WaitConfirm1);
 	    sentPacket = static_cast<ZrtpPacketBase *>(dhPart2);
-	    startTimer(&T2);
+	    if (startTimer(&T2) <= 0) {;
+	       delete sentPacket;
+	       sentPacket = NULL;
+	       nextState(Initial);
+	       parent->srtpSecretsOff(ForReceiver);
+	       parent->sendInfo(Error, timerError);
+	       return(Fail);
+	    }
 	    return (Done);
 	}
     }
-    else {
-	// Timer triggered but we got a message during that time
-	// that stopped further timer processing. Ignore the trigger
-	if (T2.stop) {
+    // Timer event triggered, resend the Commit packet
+    else if (event->type == Timer) {
+	if (sentPacket == NULL) {      // probably a race condition - ignore
 	    return (Done);
 	}
-	if (nextTimer(&T2) > 0 && parent->sendPacketRTP(sentPacket)) {
-	    return (Done);
+	if (nextTimer(&T2) <= 0) {
+	    parent->sendInfo(Error, resendError);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    return (Fail);
+	}
+	if (!parent->sendPacketRTP(sentPacket)) {
+	    parent->sendInfo(Error, sendErrorText);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    return (Fail);
 	}
     }
-    // Error packet ??
-    return (Fail);
+    else {      // unknown Event type for this state
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains DHPart1 packet, no timer active
+ */
 int32_t ZrtpStateClass::evWaitDHPart2(void) {
 
-    cout << "Checking for match in DHPart2.\n";
+    DEBUGOUT((cout << "Checking for match in DHPart2.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -350,42 +519,67 @@ int32_t ZrtpStateClass::evWaitDHPart2(void) {
 	 */
 	if (first == 'c') {
 	    if (!parent->sendPacketRTP(sentPacket)) {
-		// Huston, we have a problem
+		delete sentPacket;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
 	    return (Done);
 	}
 	/*
 	 * DHPart2:
 	 * - prepare Confirm1 packet
-	 * - send it via SRTP
 	 * - switch to WaitConfirm2
+	 * - switch on security for sender, send it via SRTP
 	 * - No timer, we are responder
 	 */
 	if (first == 'd') {
-	    ZrtpPacketConfirm* confirm = 
-		parent->prepareConfirm1(static_cast<ZrtpPacketDHPart *>(pkt));
-	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confirm))){
-		// Huston, we have a problem
-	    }
+	    delete sentPacket;     // delete DHPart1 packet
+	    sentPacket = NULL;
+	    
+	    ZrtpPacketDHPart* dpkt = new ZrtpPacketDHPart(pkt);
+	    ZrtpPacketConfirm* confirm = parent->prepareConfirm1(dpkt);
+	    delete dpkt;
+	    
 	    nextState(WaitConfirm2);
+            parent->srtpSecretsReady((EnableSecurity)(ForSender + ForReceiver));
+
+	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confirm))){
+		delete confirm;
+		nextState(Initial);
+		parent->srtpSecretsOff(ForSender);
+		parent->sendInfo(Error, sendErrorTextSrtp);
+		return(Fail);
+	    }
 	    sentPacket = static_cast<ZrtpPacketBase *>(confirm);
 	    return (Done);
 	}
     }
-    // TODO: Error packet ??
+    else {      // unknown Event type for this state
+        parent->sendInfo(Error, internalProtocolError);
+        sentPacket = NULL;
+        nextState(Initial);
+        // TODO: Error packet ?
+    }
     return (Fail);
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains DHPart2 packet, DHPart2 timer active
+ * - Receiver security switched on
+ */
 int32_t ZrtpStateClass::evWaitConfirm1(void) {
 
-    cout << "Checking for match in WaitConfirm1.\n";
+    DEBUGOUT((cout << "Checking for match in WaitConfirm1.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -394,56 +588,101 @@ int32_t ZrtpStateClass::evWaitConfirm1(void) {
 	 * Confirm1:
 	 * - Switch off resending DHPart2
 	 * - prepare a Confirm2 packet 
-	 * - send via SRTP, 
+	 * - switch on sender security and send via SRTP, 
 	 * - switch to state WaitConfAck
+	 * - set timer to monitor Confirm2 packet, we are initiator
 	 */
 	if (first == 'c' && last == '1') {
-	    ZrtpPacketConfirm* confirm = 
-		parent->prepareConfirm2(static_cast<ZrtpPacketConfirm *>(pkt));
-	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confirm))){
-		// Huston, we have a problem
-	    }
+	    cancelTimer();
+	    delete sentPacket;             // delete DHPart2 packet
+	    sentPacket = NULL;
+	    
+	    ZrtpPacketConfirm* cpkt = new ZrtpPacketConfirm(pkt, event->content);
+	    ZrtpPacketConfirm* confirm = parent->prepareConfirm2(cpkt);
+	    delete cpkt;
+	    
 	    nextState(WaitConfAck);
+	    parent->srtpSecretsReady(ForSender);	// let's try
+
+	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confirm))){
+		delete confirm;
+		nextState(Initial);
+		parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
+	    }
 	    sentPacket = static_cast<ZrtpPacketBase *>(confirm);
-	    startTimer(&T2);
+	    if (startTimer(&T2) <= 0) {		
+		delete sentPacket;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+		parent->sendInfo(Error, timerError);
+		return(Fail);
+	    }
 	    return (OkDismiss);
 	}
     }
-    else {
-	// Nothing received from peer, resend DHPart2 until counter exceeds
-	if (T2.stop) {
+    else if (event->type == Timer) {
+	if (sentPacket == NULL) {      // probably a race condition - ignore
 	    return (Done);
 	}
-	if (nextTimer(&T2) > 0 && parent->sendPacketRTP(sentPacket)) {
-	    return (Done);
+	if (nextTimer(&T2) <= 0) {
+	    parent->sendInfo(Error, resendError);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    parent->srtpSecretsOff(ForReceiver);
+	    return (Fail);
+	}
+	if (!parent->sendPacketRTP(sentPacket)) {
+	    parent->sendInfo(Error, sendErrorText);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    parent->srtpSecretsOff(ForReceiver);
+	    return (Fail);
 	}
     }
-    // TODO: Error packet ??
-    return (Fail);
+    else {      // unknown Event type for this state
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+	parent->srtpSecretsOff(ForReceiver);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains Confirm1 packet, no timer active
+ * - Sender security switched on
+ */
 int32_t ZrtpStateClass::evWaitConfirm2(void) {
 
-    cout << "Checking for match in WaitConfirm2.\n";
+    DEBUGOUT((cout << "Checking for match in WaitConfirm2.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
 
 	/*
 	 * DHPart2:
-	 * - resend Confirm2 packet via SRTP
+	 * - resend Confirm1 packet via SRTP
 	 * - stay in state
 	 */
 	if (first == 'd') {
 	    if (!parent->sendPacketSRTP(sentPacket)) {
-		// Huston, we have a problem
+		delete sentPacket;
+		sentPacket = NULL;
+		nextState(Initial);
+		parent->sendInfo(Error, sendErrorText);
+		return(Fail);
 	    }
 	    return (Done);
 	}
@@ -451,33 +690,59 @@ int32_t ZrtpStateClass::evWaitConfirm2(void) {
 	 * Confirm2:
 	 * - prepare ConfAck 
 	 * - send via SRTP
-	 * - switch to SecureState
+	 * - switch on to receiver security
+	 * - SecureState
 	 */
 	if (first == 'c' && last == '2') {
+	    delete sentPacket;             // delete Confirm1 packet
+	    sentPacket = NULL;
+	    
 	    // send ConfAck via SRTP
-	    ZrtpPacketConf2Ack* confack = 
-		parent->prepareConf2Ack(static_cast<ZrtpPacketConfirm *>(pkt));
-	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confack))){
-		// Huston, we have a problem
-	    }
+	    ZrtpPacketConfirm* cpkt = new ZrtpPacketConfirm(pkt, event->content);
+	    ZrtpPacketConf2Ack* confack = parent->prepareConf2Ack(cpkt);
+	    delete cpkt;
+	    
 	    nextState(SecureState);
+//	    parent->srtpSecretsReady(ForReceiver);	// let's try
+
+	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confack))){
+		sentPacket = NULL;        // don't delete confAck packet, it's preconfigured
+		nextState(Initial);
+		parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+		parent->sendInfo(Error, sendErrorTextSrtp);
+		return(Fail);
+	    }
+	    sentPacket = static_cast<ZrtpPacketBase *>(confack);
+	    parent->sendInfo(Info, "Switching to secure state");
+
 	    return (OkDismiss);
 	}
     }
-    // TODO: Error packet ??
-    return (Fail);
+    else {      // unknown Event type for this state
+        parent->sendInfo(Error, internalProtocolError);
+        sentPacket = NULL;
+	parent->srtpSecretsOff(ForSender);
+        nextState(Initial);
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
+/*
+ * When entering this transition function
+ * - sentPacket contains Confirm2 packet, Confirm2 timer active
+ * - sender and receiver security switched on
+ */
 int32_t ZrtpStateClass::evWaitConfAck(void) {
 
-    cout << "Checking for match in WaitConfAck.\n";
+    DEBUGOUT((cout << "Checking for match in WaitConfAck.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -487,35 +752,52 @@ int32_t ZrtpStateClass::evWaitConfAck(void) {
 	 * - Switch off resending Confirm2
 	 * - switch to SecureState
 	 */
-	if (first == 'c') {
-	    T2.stop = 1;
+//	if (first == 'c') {// TODO - this is temporary until conf2ack is fixed
+	    cancelTimer();
+	    parent->sendInfo(Info, "Switching to secure state");
 	    nextState(SecureState);
-	    return (OkDismiss);
-	}
+	    return (Done);
+//	}
     }
-    else {
-	// Nothing received from peer, resend Confirm2 until counter exceeds
-	if (T2.stop) {
+    else if (event->type == Timer) {
+	if (sentPacket == NULL) {      // probably a race condition - ignore
 	    return (Done);
 	}
-	if (nextTimer(&T2) > 0 && parent->sendPacketSRTP(sentPacket)) {
-	    return (Done);
+	if (nextTimer(&T2) <= 0) {
+	    parent->sendInfo(Error, resendError);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+	    return (Fail);
+	}
+	if (!parent->sendPacketSRTP(sentPacket)) {
+	    parent->sendInfo(Error, sendErrorTextSrtp);
+	    sentPacket = NULL;
+	    nextState(Initial);
+	    parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+	    return (Fail);
 	}
     }
-    // TODO: Error packet ??
-    return (Fail);
+    else {      // unknown Event type for this state
+	parent->sendInfo(Error, internalProtocolError);
+	sentPacket = NULL;
+	nextState(Initial);
+	parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+        // TODO: Error packet ??
+	return (Fail);
+    }
 }
 
 int32_t ZrtpStateClass::evSecureState(void) {
 
-    cout << "Checking for match in SecureState.\n";
+    DEBUGOUT((cout << "Checking for match in SecureState.\n"));
 
     char *msg, first, last;
-    ZrtpPacketBase *pkt;
+    uint8_t *pkt;
 
     if (event->type == ZrtpPacket) {
 	pkt = event->data.packet;
-	msg = pkt->getMessage();
+	msg = (char *)pkt + 4;
 	  
 	first = tolower(*msg);
 	last = tolower(*(msg+7));
@@ -524,16 +806,25 @@ int32_t ZrtpStateClass::evSecureState(void) {
 	 * Confirm2:
 	 * - resend ConfAck packet via SRTP
 	 * - stay in state
+	 * - don't delete this confAck packet - it's preconfigured
 	 */
-	if (first == 'c') {
-	    if (!parent->sendPacketSRTP(sentPacket)) {
-		// Huston, we have a problem
+	if (first == 'c' && last == '2') {
+	    if (sentPacket != NULL && !parent->sendPacketSRTP(sentPacket)) {
+		sentPacket = NULL;        // don't delete confAck packet, it's preconfigured
+		nextState(Initial);
+		parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+		parent->sendInfo(Error, sendErrorTextSrtp);
+		return(Fail);
 	    }
 	    return (Done);
 	}
     }
-    // Perform clean up, switch off SRTP
-    // nextState(Initial) ??
+    else {
+	sentPacket = NULL;
+	parent->srtpSecretsOff((EnableSecurity)(ForReceiver + ForSender));
+	nextState(Initial);
+	parent->sendInfo(Info, zrtpClosed);
+    }
     return (Done);
 }
 
@@ -541,7 +832,6 @@ int32_t ZrtpStateClass::startTimer(zrtpTimer_t *t) {
 
     t->time = t->start;
     t->counter = 0;
-    t->stop = 0;
     return parent->activateTimer(t->time);
 }
 
@@ -555,4 +845,3 @@ int32_t ZrtpStateClass::nextTimer(zrtpTimer_t *t) {
     }
     return parent->activateTimer(t->time);
 }
-

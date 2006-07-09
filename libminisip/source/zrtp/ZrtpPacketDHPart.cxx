@@ -24,33 +24,59 @@
 #include <malloc.h>
 
 
-ZrtpPacketDHPart::ZrtpPacketDHPart(PKType pkt) {
+ZrtpPacketDHPart::ZrtpPacketDHPart(SupportedPubKeys pkt) {
+    DEBUGOUT((fprintf(stdout, "Creating DHPart packet without data\n")));
 
     int length = sizeof(zrtpPacketHeader_t) + sizeof(DHPart_t);
-    void *p;
 
-    length += ((pkt == DH3072) ? 384 : 512); // length according to DH type
-    p = malloc(length);
+    length += ((pkt == Dh3072) ? 384 : 512); // length according to DH type
+    allocated = malloc(length);
+    memset(allocated, 0, length);
 
-    if ( p == NULL) {
+    if (allocated == NULL) {
 	// TODO error handling
     }
 
     pktype = pkt;
     
-    zrtpHeader = (zrtpPacketHeader_t *)&((DHPartPacket_t *)p)->hdr;	// the standard header
-    pv = ((char *)p) + sizeof(zrtpPacketHeader_t); 			// point to the public key value
-    DHPartHeader = (DHPart_t *)(((char *)p) + sizeof(zrtpPacketHeader_t) + ((pkt == DH3072) ? 384 : 512));
+    zrtpHeader = (zrtpPacketHeader_t *)&((DHPartPacket_t *)allocated)->hdr;	// the standard header
+    pv = ((uint8_t *)allocated) + sizeof(zrtpPacketHeader_t); 		// point to the public key value
+    DHPartHeader = (DHPart_t *)(((char *)allocated)+sizeof(zrtpPacketHeader_t)+((pkt == Dh3072) ? 384 : 512));
 
     setZrtpId();
-    setLength(DHPART_LENGTH + MESSAGE_LENGTH + ((pkt == DH3072) ? 96 : 128));
+    setLength(DHPART_LENGTH + MESSAGE_LENGTH + ((pkt == Dh3072) ? 96 : 128));
 }
 
-ZrtpPacketDHPart::ZrtpPacketDHPart(char *data, PKType pkt) {
+ZrtpPacketDHPart::ZrtpPacketDHPart(uint8_t *data) {
+    DEBUGOUT((fprintf(stdout, "Creating DHPart packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((DHPartPacket_t *)data)->hdr;	// the standard header
+    
+    int16_t len = getLength();
+    DEBUGOUT((fprintf(stdout, "DHPart length: %d\n", len)));
+    SupportedPubKeys pkt;
+    if (len == 108) {
+	pkt = Dh3072;
+    }
+    else if (len == 140) {
+	pkt = Dh4096;
+    }
+    else {
+	fprintf(stderr, "Wrong DHPart length: %d\n", len);
+	pv = NULL;
+	return;
+    }
     pv = data + sizeof(zrtpPacketHeader_t);
-    DHPartHeader = (DHPart_t *)(data + sizeof(zrtpPacketHeader_t) + ((pkt == DH3072) ? 384 : 512));
+    DHPartHeader = (DHPart_t *)(data + sizeof(zrtpPacketHeader_t) + ((pkt == Dh3072) ? 384 : 512));
 
     pktype = pkt;
 }
 
+ZrtpPacketDHPart::~ZrtpPacketDHPart() {
+    DEBUGOUT((fprintf(stdout, "Deleting DHPart packet: alloc: %x\n", allocated)));
+
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}

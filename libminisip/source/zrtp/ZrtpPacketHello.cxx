@@ -25,21 +25,22 @@
 
 
 ZrtpPacketHello::ZrtpPacketHello() {
+    DEBUGOUT((fprintf(stdout, "Creating Hello packet without data\n")));
 
-    void *p = malloc(sizeof (HelloPacket_t));
+    allocated = malloc(sizeof (HelloPacket_t));
 
-    if ( p == NULL) {
+    if (allocated == NULL) {
     }
 
-    zrtpHeader = (zrtpPacketHeader_t *)&((HelloPacket_t *)p)->hdr;	// the standard header
-    helloHeader = (Hello_t *)&((HelloPacket_t *)p)->hello;
+    zrtpHeader = (zrtpPacketHeader_t *)&((HelloPacket_t *)allocated)->hdr;	// the standard header
+    helloHeader = (Hello_t *)&((HelloPacket_t *)allocated)->hello;
 
     setZrtpId();
     setLength(HELLO_LENGTH + MESSAGE_LENGTH);
-    setMessage(HelloMsg);
+    setMessage((uint8_t*)HelloMsg);
 
-    setClientId(clientId);
-    setVersion(zrtpVersion);
+    setClientId((uint8_t*)clientId);
+    setVersion((uint8_t*)zrtpVersion);
 
     setHashType(0, supportedHashes[0]);
     setHashType(1, supportedHashes[1]);
@@ -66,8 +67,17 @@ ZrtpPacketHello::ZrtpPacketHello() {
     setSasType(4, supportedSASType[4]);
 }
 
-ZrtpPacketHello::ZrtpPacketHello(char *data) {
+ZrtpPacketHello::ZrtpPacketHello(uint8_t *data) {
+    DEBUGOUT((fprintf(stdout, "Creating Hello packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((HelloPacket_t *)data)->hdr;	// the standard header
     helloHeader = (Hello_t *)&((HelloPacket_t *)data)->hello;
 }
 
+ZrtpPacketHello::~ZrtpPacketHello() {
+    DEBUGOUT((fprintf(stdout, "Deleting Hello packet: alloc: %x\n", allocated)));
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}

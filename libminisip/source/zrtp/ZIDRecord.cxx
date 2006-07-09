@@ -22,7 +22,7 @@
 
 #include <libminisip/zrtp/ZIDRecord.h>
 
-void ZIDRecord::setNewRs1(const char *data) {
+void ZIDRecord::setNewRs1(const uint8_t *data) {
 
   // shift RS1 data and flag into RS2
   memcpy(record.rs2Data, record.rs1Data, RS_LENGTH);

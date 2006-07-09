@@ -50,6 +50,10 @@
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 
+#ifdef ZRTP_SUPPORT
+#include <libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#endif
+
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
@@ -551,6 +555,18 @@ string Session::getCallId(){
 
 void Session::setCallId( const string callId ){
 	this->callId = callId;
+#ifdef ZRTP_SUPPORT
+	mediaStreamSendersLock.lock();
+	for ( std::list< MRef<MediaStreamSender *> >::iterator it =  mediaStreamSenders.begin();
+                     it !=  mediaStreamSenders.end(); it++ ) { // TODO - need better support to set call id in ZHB
+                        MRef<ZrtpHostBridgeMinisip*> zhb = (*it)->getZrtpHostBridge();
+                        if (zhb) {
+                            zhb->setCallId(callId);
+                        }
+        }   
+        mediaStreamSendersLock.unlock();
+
+#endif
 }
 
 void Session::sendDtmf( uint8_t symbol ){

@@ -316,6 +316,7 @@ int Minisip::startSip() {
 		mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		confMessageRouter->setMediaHandler( mediaHandler );
 		messageRouter->addSubsystem("media",*mediaHandler);
+                mediaHandler->setMessageRouterCallback(*messageRouter);
 
 		if( consoleDbg ){
 			consoleDbg->setMediaHandler( mediaHandler );

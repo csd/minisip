@@ -278,7 +278,7 @@ void RtpReceiver::run(){
                         if (zhb->getSsrcReceiver() == 0) {
                             zhb->setSsrcReceiver(packetSsrc);
                         }
-                        continue;           // not a ZRTP packet 
+                        continue;           // not a ZRTP packet TODO check this - need a better way to do it
                     }                        
 /*                  cerr << "From: " << from->getString();
                     cerr << ", zhbFrom: " << zhb->getRemoteAddress()->getString();
@@ -298,9 +298,8 @@ void RtpReceiver::run(){
                          */
 //                        cerr << "ZP " << endl;
 
-                        if (packetSsrc == 0xdeadbeef) { // it's a ZRTP packet 
+                        if (packetSsrc == 0xdeadbeef) { // it's a ZRTP packet TODO check this
                             (*i)->handleRtpPacketExt(packet);
-                            continue;
                         }
                     }
 #endif // ZRTP_SUPPORT

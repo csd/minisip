@@ -28,7 +28,7 @@ class ZrtpPacketHelloAck : public ZrtpPacketBase {
 
  public:
     ZrtpPacketHelloAck();		/* Creates a HelloAck packet with default data */
-    ZrtpPacketHelloAck(char *data);	/* Creates a HelloAck packet from received data */
+    ZrtpPacketHelloAck(char* data);	/* Creates a HelloAck packet from received data */
     virtual ~ZrtpPacketHelloAck();
 
  private:

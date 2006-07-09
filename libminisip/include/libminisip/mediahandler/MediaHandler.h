@@ -86,7 +86,29 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		 */
 		std::string getExtIP();
 		
-		
+                /**
+                 * Set the callback (interface) to Minisip's message router.
+                 * 
+                 * The Media handler uses this callback to send message to other subsystems
+                 * of Minisip. 
+                 * 
+                 * @param callback
+                 *     The pointer to the message router object.
+                 */
+                void setMessageRouterCallback(MRef<CommandReceiver*> callback) {
+                    messageRouterCallback = callback; }        
+                            
+                /**
+                 * Get the callback (interface) to Minisip's message router.
+                 * 
+                 * The Media handler uses this callback to send message to other subsystems
+                 * of Minisip. 
+                 * 
+                 * @returns
+                 *     The pointer to the message router object.
+                 */
+                MRef<CommandReceiver *> getMessageRouterCallback() { return messageRouterCallback;}
+
 		virtual std::string getMemObjectType(){return "MediaHandler";}
 
 #ifdef DEBUG_OUTPUT	
@@ -112,6 +134,8 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
 		MRef<SipSoftPhoneConfiguration *> config;
+                
+                MRef<CommandReceiver*> messageRouterCallback;
 		
 		/**
 		Looks for a Session with callid. If found, set the audio settings

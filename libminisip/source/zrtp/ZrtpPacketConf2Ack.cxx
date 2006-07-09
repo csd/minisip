@@ -24,18 +24,28 @@
 #include <malloc.h>
 
 ZrtpPacketConf2Ack::ZrtpPacketConf2Ack() {
+    DEBUGOUT((fprintf(stdout, "Creating Conf2Ack packet without data\n")));
 
-  void *p = malloc(sizeof (Conf2Ack_t));
-  if ( p == NULL) {
-  }
-    zrtpHeader = (zrtpPacketHeader_t *)&((Conf2Ack_t *)p)->hdr;	// the standard header
+    allocated = malloc(sizeof (Conf2Ack_t));
+    if (allocated == NULL) {
+    }
+    zrtpHeader = (zrtpPacketHeader_t *)&((Conf2Ack_t *)allocated)->hdr;	// the standard header
 
     setZrtpId();
     setLength(MESSAGE_LENGTH);
-    setMessage(Conf2AckMsg);
+    setMessage((uint8_t*)Conf2AckMsg);
 }
 
 ZrtpPacketConf2Ack::ZrtpPacketConf2Ack(char *data) {
+    DEBUGOUT((fprintf(stdout, "Creating Conf2Ack packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((Conf2Ack_t *)data)->hdr;	// the standard header
 }
 
+ZrtpPacketConf2Ack::~ZrtpPacketConf2Ack() {
+    DEBUGOUT((fprintf(stdout, "Deleting Conf2Ack packet: alloc: %x\n", allocated)));
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}

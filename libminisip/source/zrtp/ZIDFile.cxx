@@ -21,6 +21,8 @@
  */
 // #define UNIT_TEST
 
+#include <time.h>
+
 #include <libminisip/zrtp/ZIDFile.h>
 
 static ZIDFile* instance;
@@ -37,13 +39,43 @@ ZIDFile* ZIDFile::getInstance() {
 }
 
 int32_t ZIDFile::open(char *name) {
-
+    zidrecord_t rec;
+    uint32_t t;
+    uint32_t* ip;
+    
     // check for an already active ZID file
     if (zidFile != NULL) {
 	return 0;
     }
     if ((zidFile = fopen(name, "rb+")) == NULL) {
 	zidFile = fopen(name, "wb+");
+	// New file, genere an associated ZID and save it as first record
+	// should use some other randomize but that's good as well.
+	if (zidFile != NULL) {
+	    ip = (uint32_t*)associatedZid;
+	    memset(&rec, 0, sizeof(zidrecord_t));
+	    t = time(NULL);
+	    t += ((uint64_t)&rec & 0xffffffff);
+	    *ip++ = t;
+	    t += ((uint64_t)zidFile & 0xffffffff);
+	    *ip++ = t;
+	    t += ((uint64_t)name  & 0xffffffff);
+	    *ip = t;
+	    memcpy(rec.identifier, associatedZid, IDENTIFIER_LEN);
+	    fseek(zidFile, 0L, SEEK_SET);
+	    rec.ownZid = 1;
+	    fwrite(&rec, sizeof(zidrecord_t), 1, zidFile);
+	}
+    }
+    else {
+	fseek(zidFile, 0L, SEEK_SET);
+	if (fread(&rec, sizeof(zidrecord_t), 1, zidFile) != 1) {
+	    return -1;
+	}
+	if (rec.ownZid != 1) {
+	    return -1;
+	}
+	memcpy(associatedZid, rec.identifier, IDENTIFIER_LEN);
     }
     return ((zidFile == NULL) ? -1 : 1);
 }
@@ -61,14 +93,14 @@ uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
     zidrecord_t rec;
     int numRead;
 
-    fseek(zidFile, 0L, SEEK_SET);
+    fseek(zidFile, (long)(sizeof(zidrecord_t)), SEEK_SET);
 
     do {
 	pos = ftell(zidFile);
 	numRead = fread(&rec, sizeof(zidrecord_t), 1, zidFile);
 
 	// skip invalid records
-	while(rec.recValid == 0 && numRead == 1) {
+	while(rec.ownZid == 1 && rec.recValid == 0 && numRead == 1) {
 	    numRead = fread(&rec, sizeof(zidrecord_t), 1, zidFile);
 	}
 
@@ -77,11 +109,15 @@ uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
 	if (numRead == 0) {
 	    memset(&rec, 0, sizeof(zidrecord_t));
 	    memcpy(rec.identifier, zidRecord->record.identifier, IDENTIFIER_LEN);
+	    rec.recValid = 1;
 	    fwrite(&rec, sizeof(zidrecord_t), 1, zidFile);
 	    break;
 	}
     } while (memcmp(zidRecord->record.identifier, rec.identifier, IDENTIFIER_LEN) != 0);
 
+    // Copy the read data into the record structure
+    memcpy(&zidRecord->record, &rec, sizeof(zidrecord_t));
+    
     //  remember position of record in file for save operation
     zidRecord->position = pos;
     return 1;
@@ -89,7 +125,6 @@ uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
 
 uint32_t ZIDFile::saveRecord(ZIDRecord *zidRecord) {
 
-    zidRecord->record.recValid = 1;
     fseek(zidFile, zidRecord->position, SEEK_SET);
     fwrite(&zidRecord->record, sizeof(zidrecord_t), 1, zidFile);
     return 1;

@@ -41,15 +41,15 @@ class ZrtpPacketBase {
 	
   protected:
       void* allocated;
-      zrtpPacketHeader_t *zrtpHeader;
+      zrtpPacketHeader_t* zrtpHeader;
 
   public:
       virtual ~ZrtpPacketBase() {};
     
-    const uint8_t *getHeaderBase() { return (const uint8_t*)zrtpHeader; };
+    const uint8_t* getHeaderBase() { return (const uint8_t*)zrtpHeader; };
     bool isZrtpPacket()            { return (ntoh16(zrtpHeader->zrtpId) == zrtpId); };
     uint16_t getLength()           { return ntoh16(zrtpHeader->length); };
-    uint8_t *getMessage()          { return zrtpHeader->message; };
+    uint8_t* getMessage()          { return zrtpHeader->message; };
 
     void setLength(uint16_t len)  { zrtpHeader->length = hton16(len); };
     void setMessage(uint8_t *msg) { memcpy(zrtpHeader->message, msg, ZRTP_MSG_SIZE); };

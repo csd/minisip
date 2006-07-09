@@ -101,9 +101,9 @@ class ZRtp;
 class ZrtpStateClass {
 
 private:
-    ZRtp *parent;
-    ZrtpStates *engine;
-    Event_t *event;
+    ZRtp* parent;
+    ZrtpStates* engine;
+    Event_t* event;
 
     /**
      * The last packet that was sent.

@@ -63,7 +63,7 @@ class ZrtpStates {
 
  private:
     const int32_t numStates;
-    const state_t *states;
+    const state_t* states;
     int32_t  state;
 
     ZrtpStates();

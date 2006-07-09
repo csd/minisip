@@ -18,7 +18,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THIS SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THIS SOFTWARE.
  *
- * Converted into C++ by:
+ * Converted to C++ by:
  *
  *	@author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
@@ -52,15 +52,15 @@ static const uint8_t revchars[]= {
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255,  18, 255,  25,  26,  27,  30,  29,
-    7,  31, 255, 255, 255, 255, 255, 255, 
+      7,  31, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255,  24,   1,  12,   3,   8,   5,   6,
-    28,  21,   9,  10, 255,  11,   2,  16,  
-    13,  14,   4,  22,  17,  19, 255,  20,  
-    15,   0,  23, 255, 255, 255, 255, 255, 
+    28,   21,   9,  10, 255,  11,   2,  16,  
+    13,   14,   4,  22,  17,  19, 255,  20,  
+    15,    0,  23, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
     255, 255, 255, 255, 255, 255, 255, 255, 
@@ -172,14 +172,15 @@ void Base32::b2a_l(const uint8_t* os, int32_t len,
 }
 
 void Base32::a2b_l(const string cs, size_t size, const size_t lengthinbits ) {
-    unsigned long x=0;                         // to hold up to 32 bits worth of the input
+    unsigned long x = 0;	// to hold up to 32 bits worth of the input
     
     int32_t len = divceil(size*5, 8);
     
     /* if lengthinbits is not a multiple of 5 then this is
-       allocating space for 0 or 1 extra octets that will be
-       truncated at the end of this function if they are 
-       not needed */
+     * allocating space for 0 or 1 extra octets that will be
+     * truncated at the end of this function if they are 
+     * not needed 
+     */
     
     if (len < 128) {
         binaryResult = smallBuffer;
@@ -189,11 +190,13 @@ void Base32::a2b_l(const string cs, size_t size, const size_t lengthinbits ) {
     }
     
     /* pointer into the result buffer, initially pointing to 
-       the "one-past-the-end" octet */
+     * the "one-past-the-end" octet 
+     */
     uint8_t* resp = binaryResult + len;
         
     /* index into the input buffer, initially pointing to the
-       "one-past-the-end" character */    
+     * "one-past-the-end" character 
+     */    
     int32_t csp = size;
           
     /* Now this is a real live Duff's device.  You gotta love it. */

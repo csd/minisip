@@ -27,19 +27,19 @@
 class ZrtpPacketConfirm : public ZrtpPacketBase {
 
     private:
-	Confirm_t *confirmHeader;
+	Confirm_t* confirmHeader;
  public:
     ZrtpPacketConfirm();		/* Creates a Confirm packet with default data */
-    ZrtpPacketConfirm(uint8_t *data, uint8_t* content);	/* Creates a Confirm packet from received data */
+    ZrtpPacketConfirm(uint8_t* data, uint8_t* content);	/* Creates a Confirm packet from received data */
     virtual ~ZrtpPacketConfirm();
     
-    const uint8_t *getPlainText()     { return confirmHeader->plaintext; };
+    const uint8_t* getPlainText()     { return confirmHeader->plaintext; };
     uint8_t getSASFlag()              { return confirmHeader->flag; }
-    const uint8_t *getHmac()          { return confirmHeader->hmac; };
+    const uint8_t* getHmac()          { return confirmHeader->hmac; };
     
-    void setPlainText(uint8_t *text)  { memcpy(confirmHeader->plaintext, text, 15); };
+    void setPlainText(uint8_t* text)  { memcpy(confirmHeader->plaintext, text, 15); };
     void setSASFlag(uint8_t flg)      { confirmHeader->flag = flg; };
-    void setHmac(uint8_t *text)       { memcpy(confirmHeader->hmac, text, 32); };
+    void setHmac(uint8_t* text)       { memcpy(confirmHeader->hmac, text, 32); };
 
 };
 

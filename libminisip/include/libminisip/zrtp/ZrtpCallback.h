@@ -130,6 +130,9 @@ class ZrtpCallback {
     /**
      * Send a ZRTP packet via RTP.
      *
+     * ZRTP call this method if it needs to send data via RTP. The
+     * data must not be encrypted before transfer.
+     *
      * @param data
      *    Points to ZRTP packet to send as RTP extension header.
      * @param length
@@ -137,10 +140,13 @@ class ZrtpCallback {
      * @return
      *    zero if sending failed, one if packet was send
      */
-    virtual int32_t sendDataRTP(const uint8_t *data, int32_t length) =0;
+    virtual int32_t sendDataRTP(const uint8_t* data, int32_t length) =0;
 
     /**
      * Send a ZRTP packet via SRTP.
+     *
+     * ZRTP call this method if it needs to send data via SRTP. The
+     * data must be encrypted before transfer.
      *
      * @param dataHeader
      *    Points to ZRTP packet to send as RTP extension header
@@ -153,8 +159,8 @@ class ZrtpCallback {
      * @return
      *    zero if sending failed, one if packet was send
      */
-    virtual int32_t sendDataSRTP(const uint8_t *dataHeader, int32_t lengthHeader,
-				 char *dataContent, int32_t lengthContent) =0;
+    virtual int32_t sendDataSRTP(const uint8_t* dataHeader, int32_t lengthHeader,
+				 char* dataContent, int32_t lengthContent) =0;
 
     /**
      * Activate timer.
@@ -177,10 +183,10 @@ class ZrtpCallback {
     /**
      * Send information messages to the hosting environment.
      * 
-     * The ZRTP implementation uses this method to send information messages
-     * to the host. Along with the message ZRTP provides a severity indicator
-     * that defines: Info, Warning, Error, Alert. Refer to the MessageSeverity
-     * enum above.
+     * The ZRTP implementation uses this method to send information
+     * messages to the host. Along with the message ZRTP provides a
+     * severity indicator that defines: Info, Warning, Error,
+     * Alert. Refer to the <code>MessageSeverity</code> enum above.
      *
      * @param severity
      *     This defines the message's severity
@@ -193,17 +199,18 @@ class ZrtpCallback {
     /**
      * This method gets call by ZRTP as soon as the SRTP secrets are available.
      * 
-     * The ZRTP implementation call this method right after all SRTP secrets
-     * are computed and ready to be used. The parameter points to a structure
-     * that contains pointers to the SRTP secrets and a enum Role. The called
-     * host method (the implementation of this abstract method) must save the
-     * pointers to the SRTP secrets it needs into a save place. The 
-     * SrtpSecret_t structure is destroy when the callback nethod returns to
-     * the ZRTP implementation.
+     * The ZRTP implementation calls this method right after all SRTP
+     * secrets are computed and ready to be used. The parameter points
+     * to a structure that contains pointers to the SRTP secrets and a
+     * <code>enum Role</code>. The called host method (the
+     * implementation of this abstract method) must copy the pointers
+     * to the SRTP secrets it needs into a save place. The
+     * SrtpSecret_t structure is destroyed when the callback method
+     * returns to the ZRTP implementation.
      * 
-     * The SRTP secrets themselfs are ontaines in the ZRtp object and are valid
-     * as long as the ZRtp object is active. The destructor the ZRtp clears the
-     * secrets.
+     * The SRTP secrets themselfs are ontained in the ZRtp object and
+     * are valid as long as the ZRtp object is active. TheZRtp's
+     * destructor clears the secrets.
      * 
      * @param secrets
      *     A pointer to a SrtpSecret_t structure that contains all necessary

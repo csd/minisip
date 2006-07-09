@@ -25,20 +25,31 @@
 #include <malloc.h>
 
 ZrtpPacketError::ZrtpPacketError() {
+    DEBUGOUT((fprintf(stdout, "Creating Error packet without data\n")));
 
-  void *p = malloc(sizeof (ErrorPacket_t));
-  if ( p == NULL) {
-  }
-    zrtpHeader = (zrtpPacketHeader_t *)&((ErrorPacket_t *)p)->hdr;	// the standard header
-    errorHeader = (Error_t *)&((ErrorPacket_t *)p)->error;
+    allocated = malloc(sizeof (ErrorPacket_t));
+    if (allocated == NULL) {
+    }
+    zrtpHeader = (zrtpPacketHeader_t *)&((ErrorPacket_t *)allocated)->hdr;	// the standard header
+    errorHeader = (Error_t *)&((ErrorPacket_t *)allocated)->error;
 
     setZrtpId();
     setLength(MESSAGE_LENGTH + ERROR_LENGTH);
-    setMessage(ErrorMsg);
+    setMessage((uint8_t*)ErrorMsg);
 }
 
 ZrtpPacketError::ZrtpPacketError(char *data) {
+    DEBUGOUT((fprintf(stdout, "Creating Error packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((ErrorPacket_t *)data)->hdr;	// the standard header
     errorHeader = (Error_t *)&((ErrorPacket_t *)data)->error;
 }
 
+ZrtpPacketError::~ZrtpPacketError() {
+    DEBUGOUT((fprintf(stdout, "Deleting Error packet: alloc: %x\n", allocated)));
+
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}

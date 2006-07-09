@@ -27,14 +27,14 @@
 class ZrtpPacketError : public ZrtpPacketBase {
 
  protected:
-    Error_t *errorHeader;
+    Error_t* errorHeader;
 
  public:
     ZrtpPacketError();		/* Creates a Error packet with default data */
-    ZrtpPacketError(char *data);	/* Creates a Error packet from received data */
+    ZrtpPacketError(char* data);	/* Creates a Error packet from received data */
     virtual ~ZrtpPacketError();
 
-    uint8_t *getErrorType() { return errorHeader->type; };
+    uint8_t* getErrorType() { return errorHeader->type; };
 
     void setErrorType(uint8_t *text) { memcpy(errorHeader->type, text, 8); };
 

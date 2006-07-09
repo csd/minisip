@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THIS SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THIS SOFTWARE.
  *
- * Edited into C++ by:
+ * Convert to C++ by:
  *
  *	@author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
@@ -42,7 +42,7 @@ class Base32{
  public:
     
     /**
-     * Constructor accepts a string that contains base32 encoded data.
+     * A Constructor that decodes from base32 into binary.
      * 
      * The constructor decodes the base32 encoded data back into binary
      * data. Use <code>getBinaryData(...)</code> to get the binary data.
@@ -53,11 +53,12 @@ class Base32{
     Base32(const string encoded);
     
     /**
-     * Constructor using an encoded string and number of bits to decode.
+     * A Constructor that decodes from base32 into binary.
      * 
-     * he constructor decodes the base32 encoded data back into binary
-     * data. Only noOfBits bits a decoded (should be a multiple of 5).
-     * Use <code>getBinaryData(...)</code> to get the binary data.
+     * This constructor decodes the base32 encoded data back into
+     * binary data. Only the specified number of bits are decoded
+     * (should be a multiple of 5).  Use
+     * <code>getBinaryData(...)</code> to get the binary data.
      * 
      * @param encoded
      *     The string that contains the base32 encoded data.
@@ -67,15 +68,17 @@ class Base32{
     Base32(const string encoded, int32_t noOfBits); 
     
     /**
-     * Constructor accepts a pointer to binary data and a number of bits.
+     * A Constructor that encodes binary data.
      * 
-     * The constructor converts the first number of bits into a base32
-     * presentation. Use <code>getEncoded</code> to get the encoded data. 
+     * The constructor converts the firstspecified number of bits of
+     * the binary data into a base32 presentation. Use
+     * <code>getEncoded</code> to get the encoded data.
      * 
      * @param data
-     *     A pointer to the first bits (byte) of binary data
+     *    A pointer to the first bits (byte) of binary data
      * @param noOfBits
-     *     How many bits to use for encoding. Should be a multiple of 5.
+     *    How many bits to use for encoding. Should be a
+     *    multiple of 5.
      */
     Base32(const uint8_t* data, int32_t noOfBits);
 
@@ -85,9 +88,17 @@ class Base32{
      * Get the decoded binary data and its length.
      * 
      * The method returns the decoded binary data if the appropriate
-     * Constructor was uses. Otherwise we return <code>NULL</code> pointer
-     * and length zero.
+     * Constructor was used. Otherwise we return <code>NULL</code>
+     * pointer and length zero.
+     *
+     * <p/>
      * 
+     * <em>Note:</em> This method returns a pointer to the decoded
+     * binary data. The Base32 object manages this pointer, thus you
+     * may need to copy the data to a save place before deleting this
+     * object. If the object is deleted this pointer is no longer
+     * valid.
+     *
      * @param length
      *     A reference to an integer.
      * @return
@@ -99,8 +110,8 @@ class Base32{
      * Get the encoded base32 string.
      * 
      * The method returns a string that contains the base32 encoded
-     * data if the appropriate constructor was used. Otherwise we return
-     * an empty string.
+     * data if the appropriate constructor was used. Otherwise we
+     * return an empty string.
      * 
      * @return
      *     The string containing the base32 encoded data.
@@ -108,7 +119,8 @@ class Base32{
     const string getEncoded() { return encoded; };
     
     /**
-     * Compute the number of base32 encoded characters given the number of bits.
+     * Compute the number of base32 encoded characters given the
+     * number of bits.
      * 
      * @param lengthInBits 
      *      The length of the data in bits

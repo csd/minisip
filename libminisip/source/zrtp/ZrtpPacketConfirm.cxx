@@ -24,17 +24,29 @@
 #include <malloc.h>
 
 ZrtpPacketConfirm::ZrtpPacketConfirm() {
+    DEBUGOUT((fprintf(stdout, "Creating Confirm packet without data\n")));
 
-  void *p = malloc(sizeof (ConfirmPacket_t));
-  if ( p == NULL) {
-  }
-    zrtpHeader = (zrtpPacketHeader_t *)&((ConfirmPacket_t *)p)->hdr;	// the standard header
+    allocated = malloc(sizeof (ConfirmPacket_t));
+    if (allocated == NULL) {
+    }
+    zrtpHeader = (zrtpPacketHeader_t *)&((ConfirmPacket_t *)allocated)->hdr;	// the standard header
+    confirmHeader = (Confirm_t *)&((ConfirmPacket_t *)allocated)->confirm;
 
     setZrtpId();
     setLength(MESSAGE_LENGTH);
 }
 
-ZrtpPacketConfirm::ZrtpPacketConfirm(char *data) {
+ZrtpPacketConfirm::ZrtpPacketConfirm(uint8_t* data, uint8_t* content) {
+    DEBUGOUT((fprintf(stdout, "Creating Confirm packet from data\n")));
+
+    allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((ConfirmPacket_t *)data)->hdr;	// the standard header
+    confirmHeader = (Confirm_t *)content; 
 }
 
+ZrtpPacketConfirm::~ZrtpPacketConfirm() {
+    DEBUGOUT((fprintf(stdout, "Deleting Confirm packet: alloc: %x\n", allocated)));
+    if (allocated != NULL) {
+	free(allocated);
+    }
+}
