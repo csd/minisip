@@ -127,7 +127,7 @@ string SipHeaderValueAuthorization::getString(){
 	string result = auth_method+
 		" algorithm=\"MD5\""+", username=\""+auth_id+
 		"\", realm=\""+realm+"\", nonce=\""+nonce+
-		"\", uri=\""+uri.getUserIpString()+"\", response=\""+
+		"\", uri=\""+uri.getRequestUriString()+"\", response=\""+
 		calcResponse()+"\"";
 
 	if( opaque != "" )
@@ -158,7 +158,7 @@ string SipHeaderValueAuthorization::calcResponse(){
 	MD5Final(digest,&context);
 	string md5_u_r_p = md5ToString(digest);
 
-	string uri_part = uri.getUserIpString();
+	string uri_part = uri.getRequestUriString();
 	MD5Context c2;
 	MD5Init(&c2);
 	string uristr(sipMethod+":"+/*sip:"+username+"@"+uri.get_ip()*/ uri_part);
