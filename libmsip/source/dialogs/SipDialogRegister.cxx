@@ -201,12 +201,8 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 */
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
-		
-		//setRealm( resp->getRealm() );
-		setRealm(resp->getAuthenticateProperty("realm"));
-		//setNonce( resp->getNonce() );
-		setNonce(resp->getAuthenticateProperty("nonce"));
 
+		updateAuthentications( *resp );
 		send_auth(/*trans->getBranch()*/"");
 		//TODO: inform GUI
 
@@ -233,10 +229,7 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
-		//setRealm( resp->getRealm() );
-		setRealm(resp->getAuthenticateProperty("realm"));
-		//setNonce( resp->getNonce() );
-		setNonce(resp->getAuthenticateProperty("nonce"));
+		updateAuthentications( resp );
 		return true;
 	}else{
 		return false;
@@ -260,10 +253,7 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
-		//setRealm( resp->getRealm() );
-		setRealm(resp->getAuthenticateProperty("realm"));
-		//setNonce( resp->getNonce() );
-		setNonce(resp->getAuthenticateProperty("nonce"));
+		updateAuthentications( resp );
 		
 		return true;
 	}else{
@@ -361,8 +351,7 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 		dispatcher->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
-		setRealm( getRealm() );
-		setNonce( getNonce() );
+		updateAuthentications( resp );
 		return true;
 	}else{
 		return false;
@@ -641,8 +630,6 @@ void SipDialogRegister::setUpStateMachine(){
 
 SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf)
 		: SipDialog(stack, callconf),
-			realm(""),
-			nonce(""),
 			failCount(0),
 			guiFeedback(true)
 {
@@ -737,6 +724,7 @@ void SipDialogRegister::send_noauth(string branch){
 		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 
+	addAuthorizations( reg );
 	addRoute( reg );
 
 	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -744,28 +732,5 @@ void SipDialogRegister::send_noauth(string branch){
 }
 
 void SipDialogRegister::send_auth(string branch){
-
-	//MRef<SipRegister*> reg=new SipRegister(
-	MRef<SipRequest*> reg = SipRequest::createSipMessageRegister(
-		branch, 
-		dialogState.callId, 
-		getDialogConfig()->inherited->sipIdentity->sipDomain, //proxy_domain,
-		getDialogConfig()->inherited->externalContactIP,
-		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
-		getDialogConfig()->inherited->sipIdentity->getSipUri(), 
-		dialogState.seqNo, 
-		getDialogConfig()->inherited->getTransport(),
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int(),
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername, 
-		realm, 
-		nonce, 
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword
-	);
-
-	//Add outbound proxy route
-	addRoute( reg );
-
-	SipSMCommand cmd( *reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	send_noauth( branch );
 }
-

@@ -45,11 +45,6 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		
 		virtual std::string getMemObjectType(){return "SipDialogRegister";}
 		
-		std::string getRealm(){return realm;};
-		std::string getNonce(){return nonce;};
-		void setRealm(std::string r){realm = r;};
-		void setNonce(std::string n){nonce = n;};
-
 		void updateFailCount(){failCount++;};
 		uint32_t getFailCount(){return failCount;};
 
@@ -79,8 +74,6 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		
 		void setUpStateMachine();
 
-		std::string realm;
-		std::string nonce;
 		uint32_t failCount;
 		bool guiFeedback;
 
