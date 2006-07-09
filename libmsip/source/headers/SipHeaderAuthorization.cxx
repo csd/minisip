@@ -72,6 +72,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &sip_metho
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
+		const string &opaque,
 		const SipUri &uri, 
 		const string &auth_id, 
 		const string &password,
@@ -81,6 +82,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &sip_metho
 			username(username),
 			realm(realm),
 			nonce(nonce),
+			opaque(opaque),
 			uri(uri),
 			auth_id(auth_id),
 			password(password),
@@ -94,6 +96,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
+		const string &opaque,
 		const SipUri &uri, 
 		const string &auth_id, 
 		const string &password,
@@ -105,6 +108,7 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
 			username(username),
 			realm(realm),
 			nonce(nonce),
+			opaque(opaque),
 			uri(uri),
 			auth_id(auth_id),
 			password(password),
@@ -119,11 +123,17 @@ SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
 
 string SipHeaderValueAuthorization::getString(){
 	uri.setUserType("");
-	return /*"Authorization: "+*/ auth_method+
+
+	string result = auth_method+
 		" algorithm=\"MD5\""+", username=\""+auth_id+
 		"\", realm=\""+realm+"\", nonce=\""+nonce+
 		"\", uri=\""+uri.getUserIpString()+"\", response=\""+
 		calcResponse()+"\"";
+
+	if( opaque != "" )
+		result += ", opaque=\"" + opaque + "\"";
+
+	return result;
 } 
 
 string SipHeaderValueAuthorization::md5ToString(unsigned char *md5){
@@ -190,6 +200,14 @@ string SipHeaderValueAuthorization::getNonce(){
 
 void SipHeaderValueAuthorization::setNonce(const string &n){
 	this->nonce=n;
+}
+
+string SipHeaderValueAuthorization::getOpaque(){
+	return opaque;
+}
+
+void SipHeaderValueAuthorization::setOpaque(const string &n){
+	this->opaque=n;
 }
 
 string SipHeaderValueAuthorization::getRealm(){

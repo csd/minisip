@@ -56,6 +56,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 				const std::string &username, 
 				const std::string &realm, 
 				const std::string &nonce, 
+				const std::string &opaque,
 				const SipUri &uri, 
 				const std::string &auth_id, 
 				const std::string &password,
@@ -65,6 +66,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 				const std::string &username, 
 				const std::string &realm, 
 				const std::string &nonce, 
+				const std::string &opaque,
 				const SipUri &uri, 
 				const std::string &auth_id, 
 				const std::string &password,
@@ -96,6 +98,9 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		std::string getNonce();
 		void setNonce(const std::string &n);
 
+		std::string getOpaque();
+		void setOpaque(const std::string &n);
+
 		SipUri getUri();
 		void setUri(const SipUri &uri);
 
@@ -110,6 +115,7 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		std::string username;
 		std::string realm;
 		std::string nonce;
+		std::string opaque;
 		SipUri uri;
 		std::string auth_id;
 		std::string password;

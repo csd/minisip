@@ -191,7 +191,7 @@ static void addHeaders( MRef<SipRequest*> req,
 	
 	if ( username.length()>0 || nonce.length()>0 || realm.length()>0 ){
 		req->addHeader(new SipHeader( 
-				new SipHeaderValueProxyAuthorization("INVITE",tel_no,realm, nonce, uri, username, password,"DIGEST") )
+				new SipHeaderValueProxyAuthorization("INVITE",tel_no,realm, nonce, "",uri, username, password,"DIGEST") )
 				);
 	}
 
@@ -306,6 +306,7 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,
 					from_tel_no, 
 					realm, 
 					nonce, 
+					"", 
 					uri, 
 					auth_id, 
 					password,
