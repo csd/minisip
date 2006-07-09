@@ -84,7 +84,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
 	
 	rightTopBox->pack_start( status, false, false, 5 );
 	rightTopBox->pack_start( secStatus, false, false, 5 );
-	
+        rightTopBox->pack_start( sasData, false, false, 5 );
 	pack_start( *topBox, false, false, 5 );
 
 	Pango::AttrList attrList( "<big><b></b></big>" );
@@ -488,7 +488,7 @@ bool CallWidget::handleCommand( CommandString command ){
                 if( command.getOp() == "zrtp_security_change") {
                     secStatus.set_markup( "The call is <b>" + 
                             command.getParam() + "</b>" );
-
+                    sasData.set_text("SAS: " + command.getParam2());
                     if( command.getParam() == "secure" ){
                         secureImage.set( Gtk::StockID( "minisip_secure") , Gtk::ICON_SIZE_DIALOG );
                     }

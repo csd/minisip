@@ -223,12 +223,12 @@ void ZrtpHostBridgeMinisip::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecuri
         // roc << 16 | seqNo
         cryptoContext->derive_srtp_keys( sStream->getSeqNo() );   // TODO check this
         rStream->setKeyAgreementZrtp(cryptoContext);
-        snprintf(buffer, 120, "SAS Value(R): %s\n", secrets->sas.c_str());
+        snprintf(buffer, 120, "SAS Value: %s\n", secrets->sas.c_str());
         sendInfo(Info, buffer);
         secureParts += (int32_t)ForReceiver;
     }
     if (secureParts == ForSender+ForReceiver) {
-        CommandString cmd(callId, "zrtp_security_change", "secure");
+        CommandString cmd(callId, "zrtp_security_change", "secure", secrets->sas);
         messageRouterCallback->handleCommand("gui", cmd);
     }
 }

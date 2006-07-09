@@ -125,6 +125,9 @@ class CallWidget : public Gtk::VBox
 		//Gtk::VBox vBox;
 		Gtk::Label status;
 		Gtk::Label secStatus;
+
+                Gtk::Label sasData;
+
 		Gtk::HBox buttonBox;
 #ifndef OLDLIBGLADEMM
 		Gtk::Expander dtmfArrow;
