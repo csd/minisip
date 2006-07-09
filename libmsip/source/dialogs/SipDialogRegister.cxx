@@ -186,7 +186,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
-				"401")){
+				"401\n407")){
 		++dialogState.seqNo;
 
 /*		MRef<SipTransaction*> trans( 
@@ -218,7 +218,7 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
-				"401")){
+				"401\n407")){
 		
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -242,7 +242,7 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
-				"401")){
+				"401\n407")){
 
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -340,7 +340,7 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
-				"401")){
+				"401\n407")){
 
 		//TODO: Ask password
 		CommandString cmdstr( 
