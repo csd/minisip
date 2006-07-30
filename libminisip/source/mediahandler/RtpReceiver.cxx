@@ -1,22 +1,22 @@
 /*
  Copyright (C) 2004-2006 the Minisip Team
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004, 2005 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -70,7 +70,7 @@ using namespace std;
 RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 
 	socket = NULL;
-	
+
 	int portretry = 0;
 	for (; portretry<RTP_RECEIVER_MAX_RETRIES; portretry++ ) {
 		//generate a random port, even number, in the given range
@@ -102,7 +102,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 			merr << "Check your network settings." << end << "Quitting badly" << end;
 			exit( 1 );
 	}
-	
+
 	externalPort = ipProvider->getExternalPort( socket );
 
 	kill = false;
@@ -134,7 +134,7 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 				found = true;
 			#ifdef DEBUG_OUTPUT
 				cerr << "RtpRcvr::registerMediaStream: media stream already registered. Updating MRef." << endl;
-			#endif				
+			#endif
 				(*iter) = mediaStream;
 				break;
 			}
@@ -149,7 +149,7 @@ void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream )
 void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
 #ifdef DEBUG_OUTPUT
 	// cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
-#endif	
+#endif
 	mediaStreamsLock.lock();
 	mediaStreams.remove( mediaStream );
 	if( mediaStreams.size() == 0 ){
@@ -169,10 +169,10 @@ uint16_t RtpReceiver::getPort(){
 MRef<UDPSocket *> RtpReceiver::getSocket(){
 	return socket;
 }
-			
+
 void RtpReceiver::run(){
 	MRef<SRtpPacket *> packet;
-	
+
 	while( !kill ){
 		list< MRef<MediaStreamReceiver *> >::iterator i;
 		fd_set rfds;
@@ -188,7 +188,7 @@ void RtpReceiver::run(){
 
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;
-		
+
 		while( ret < 0 ){
 			ret = select( socket->getFd() + 1, &rfds, NULL, NULL, &tv );
 			if( ret < 0 ){
@@ -212,10 +212,10 @@ void RtpReceiver::run(){
 		if( kill ) {
 			break;
 		}
-		
+
 		if( ret == 0 /* timeout */ ){
 			//notify the mediaStreams of the timeout
-			for( i = mediaStreams.begin(); 
+			for( i = mediaStreams.begin();
 					i != mediaStreams.end(); i++ ){
 				(*i)->handleRtpPacket( NULL, NULL );
 			}
@@ -233,16 +233,22 @@ void RtpReceiver::run(){
 		if( !packet ){
 			continue;
 		}
-                
+
 		mediaStreamsLock.lock();
-		for ( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ){
+		for ( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ) {
                     std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
                     std::list<MRef<Codec *> >::iterator iC;
                     int found = 0;
 			//printf( "|" );
 #ifdef ZRTP_SUPPORT
+                    /*
+                     * If this packet is a Zfone special packet then don't look
+                     * for a codec. Skip to ZRTP processing. Note: this is Zfone
+                     * specific - other ZRTP implementations can do without this
+                     * specific marker SSRC.
+                    */
                     if (packet->getHeader().getSSRC() != 0xdeadbeef) {
-#endif			
+#endif
                         for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
                             if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
                                 (*i)->handleRtpPacket( packet, from );
@@ -254,18 +260,11 @@ void RtpReceiver::run(){
 #ifdef ZRTP_SUPPORT
                     }
                     /*
-                     * Get this media stream's ZHB. If one is allocated
-                     * then check if we already got packet. If this is the
-                     * first packet for this media stream receiver then the 
-                     * ZHB's receiver SSRC is zero. Initialize it with the SSRC
-                     * of the first received packet but only if it's not a ZRTP 
-                     * packet (0xdeadbeef). 
-                     * If it's a ZRTP packet then handle it in a specific
-                     * function. The !found check may come in handy if Phil's 
-                     * implementation will use another way to mark the ZRTP
-                     * packets (this is possible because ZRTP packet must have
-                     * an extension header and the extension header must
-                     * contain the correct signature (ID) ).
+                     * If we come to this point:
+                     * - this packet contains the special marker SSRC
+                     *    or
+                     * - no codec was found for this packet.
+                     * In both cases we need to check if this is a ZRTP packet.
                      *
                      * TODO: handle list of host bridges because a
                      * receiver may support several RTP sessions
@@ -273,34 +272,38 @@ void RtpReceiver::run(){
                      */
                     MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
                     uint32_t packetSsrc = packet->getHeader().getSSRC();
-                    
-                    if (zhb && packetSsrc != 0xdeadbeef) {
-                        if (zhb->getSsrcReceiver() == 0) {
-                            zhb->setSsrcReceiver(packetSsrc);
+
+                    /*
+                     * In case this is not a special Zfone packet and we
+                     * have not seen a packet with a valid SSRC then set
+                     * the found SSRC as the stream's SSRC. We need the real
+                     * SSRC for encryption/decryption. Thus we rely on the fact
+                     * that we receive at least one real RTP packet, i.e. not
+                     * a Zfone ZRTP packet from our peer before we do some
+                     * SRTP encryption/decryption. This is usually the case
+                     * because RTP clients send data very fast and ZRTP protocl
+                     * handling takes some more milliseconds. ZRTP
+                     * implementations that do not use special marker SSRC
+                     * are always ok.
+                     */
+                    if (zhb) {
+                        if (packetSsrc != 0xdeadbeef) {
+                            if (zhb->getSsrcReceiver() == 0) {
+                                zhb->setSsrcReceiver(packetSsrc);
+                            }
                         }
-                        continue;           // not a ZRTP packet TODO check this - need a better way to do it
-                    }                        
-/*                  cerr << "From: " << from->getString();
-                    cerr << ", zhbFrom: " << zhb->getRemoteAddress()->getString();
-                    cerr << ", found: " << found;
-                    cerr << ", extension: " << packet->getHeader().getExtension() << endl;
-*/                    
-                    if (!found && zhb && packet->getHeader().getExtension() && 
+                        else {
+                            zhb->setZfoneDeadBeef(1);
+                        }
+                    }
+                    /*
+                     * If the packet was not processed above and it contains an
+                     * extension header then check for ZRTP packet.
+                    */
+                    if (!found && zhb && packet->getHeader().getExtension() &&
                          zhb->getRemoteAddress() /* && zhb->getRemoteAddress() == from */) {
-
-
-                        /*
-                         * If this is the first received packet of
-                         * this session then store its SSRC. Any
-                         * later modification of the SSRC inside
-                         * this session gives an Alert and
-                         * switches back to non-secure mode
-                         */
-//                        cerr << "ZP " << endl;
-
-                        if (packetSsrc == 0xdeadbeef) { // it's a ZRTP packet TODO check this
-                            (*i)->handleRtpPacketExt(packet);
-                        }
+                        // TODO: check if SSRC changed if its no a Zfone special packet
+                        (*i)->handleRtpPacketExt(packet);
                     }
 #endif // ZRTP_SUPPORT
                 }
