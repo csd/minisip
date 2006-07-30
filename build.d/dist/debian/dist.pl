@@ -237,14 +237,13 @@ sub debian_pkgfiles {
 
     die "No changes file found" unless $changes;
 
+    local *CHANGES;
     open(CHANGES, "< $changes") or die "can't read $changes";
 
     my @files;
     my $found = 0;
 
-    while(<CHANGES>) {
-	my $line = $_;
-
+    while (my $line = <CHANGES>) {
 	if ( $line =~ /^ / ) {
 	    if ( $found ) {
 		$line =~ s/^\s*//;
