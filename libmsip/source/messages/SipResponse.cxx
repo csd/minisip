@@ -85,29 +85,43 @@ SipResponse::SipResponse(string branch,
 //TODO: This constructor needs rewriting (re-use from sipmessage)
 SipResponse::SipResponse(string &resp): SipMessage(-1, resp)
 {
+	int len = resp.size();
 
-	if(resp.size() < 11){
-#ifdef DEBUG_OUTPUT
-		cerr << "SipResponse::SipResponse: message too short - throwing exception"<< endl;
-#endif
-		throw SipExceptionInvalidMessage("SipResponse too short");
+	int i =0;
+
+	//If stream transport we should allow whitespace before the start
+	//of the message
+	while (i<len &&(resp[i]==' ' || resp[i]=='\r' || resp[i]=='\n' || resp[i]=='\t')){
+		i++;
 	}
 		//strlen(SIP/2.0)==7
-	int afterws=7;
-	while (resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
+	if (!( i+7<=len && resp.substr(i,7)=="SIP/2.0" ) ){
+		throw SipExceptionInvalidMessage("SipResponse header error");
+	}
+	i+=7;
+
+	int afterws=i;
+	while ( afterws<len && resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
 		afterws++;
-	massert(resp[afterws+0]>='0' && resp[afterws+0]<='9');
-	massert(resp[afterws+1]>='0' && resp[afterws+1]<='9');
-	massert(resp[afterws+2]>='0' && resp[afterws+2]<='9');
+	
+	if (afterws+3 >=len){
+		throw SipExceptionInvalidMessage("SipResponse header error");
+	}
+	
+	if (! (resp[afterws+0]>='0' && resp[afterws+0]<='9' &&
+				resp[afterws+1]>='0' && resp[afterws+1]<='9' &&
+				resp[afterws+2]>='0' && resp[afterws+2]<='9' ) ){
+		throw SipExceptionInvalidMessage("SipResponse without status code");
+	}
 	
 	status_code = (resp[afterws+0]-'0')*100 + (resp[afterws+1]-'0')*10 + resp[afterws+2]-'0';
 
 	status_desc="";
-	uint32_t i;
-	for (i=12; resp[i]!='\r' && resp[i]!='\n'; i++){
-		if(resp.size() == i){
+	i=afterws+3;	//go past response code
+	for ( ; resp[i]!='\r' && resp[i]!='\n'; i++){
+		if(len == i){
 #ifdef DEBUG_OUTPUT
-		cerr << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
+		mdbg << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
 #endif
 
 			throw SipExceptionInvalidMessage("SipResponse malformed - could not find end of response description");

@@ -70,18 +70,13 @@ using namespace std;
 
 SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db//,
-		//MRef<TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> > *> tp
+		MRef<ca_db *> cert_db
 		)
 {
 	timers = new SipTimers;
 	this->config = stackConfig;
 
-//	if (tp){
-//		timeoutProvider = tp;
-//	}else{
-		timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
-//	}
+	timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
 
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);

@@ -882,6 +882,7 @@ void SipLayerTransport::udpSocketRead(){
 #ifdef DEBUG_OUTPUT
 				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
+				cerr<< "Invalid data on UDP socket, discarded" << endl;
 				continue;
 			}
 			
