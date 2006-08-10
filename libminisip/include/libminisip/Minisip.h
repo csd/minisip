@@ -34,7 +34,6 @@ class LIBMINISIP_API Minisip : public MObject{
 		
 		int initParseConfig();
 
-		std::string conffile;
 		MRef<MediaHandler *> mediaHandler;
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
