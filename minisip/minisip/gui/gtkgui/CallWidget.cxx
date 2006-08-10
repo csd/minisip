@@ -56,6 +56,8 @@ CallWidget::CallWidget( string callId, string remoteUri,
 //		audioOutSilenceButton( "Silence for my ears"),
 		monitoringButton( Gtk::StockID( "minisip_record" ), Gtk::StockID( "minisip_norecord" ) ),
 		audioOutSilenceButton( Gtk::StockID( "minisip_play" ), Gtk::StockID( "minisip_noplay" ) ),
+#endif
+#ifdef HAVE_LIBGLADEMM_2_6
 		callRecordButton( Gtk::Stock::MEDIA_RECORD, Gtk::Stock::MEDIA_RECORD ),
 #endif
 		secureImage(),// Gtk::StockID( "minisip_insecure" ), 
