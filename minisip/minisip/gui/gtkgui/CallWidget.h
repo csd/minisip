@@ -142,9 +142,11 @@ class CallWidget : public Gtk::VBox
 //		Gtk::CheckButton audioOutSilenceButton;
 		IconToggleButton monitoringButton;
 		IconToggleButton audioOutSilenceButton;
-		IconToggleButton callRecordButton;
-
 #endif
+#ifdef HAVE_LIBGLADEMM_2_6
+		IconToggleButton callRecordButton;
+#endif
+
 		Gtk::Image secureImage;
 		Gtk::Image insecureImage;
 		StockButton acceptButton;

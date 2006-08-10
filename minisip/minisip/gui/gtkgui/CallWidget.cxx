@@ -118,11 +118,12 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		SLOT( *this, 
 			&CallWidget::audioOutSilenceButtonToggled ) );
 	
+#ifdef HAVE_LIBGLADEMM_2_6
 	topBox->pack_start( callRecordButton, false, false );
 	callRecordButton.signal_toggled().connect( 
 		SLOT( *this, 
 			&CallWidget::callRecordButtonToggled ) );
-
+#endif
 	pack_start( *topBox, false, false, 4 );
 	
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
@@ -279,7 +280,7 @@ void CallWidget::audioOutSilenceButtonToggled () {
 }
 
 void CallWidget::callRecordButtonToggled () {
-#ifndef OLDLIBGLADEMM
+#ifdef HAVE_LIBGLADEMM_2_6
 	string param;
 	if( callRecordButton.get_active() ) {
 		param = "START";
@@ -321,7 +322,9 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 			monitoringButton.show();
 			audioOutSilenceButton.show();
+#ifdef HAVE_LIBGLADEMM_2_6
 			callRecordButton.show();
+#endif
 			transferArrow.show_all();
 			dtmfArrow.show_all();
 #endif
@@ -388,7 +391,9 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
+#ifdef HAVE_LIBGLADEMM_2_6
 					callRecordButton.hide();
+#endif
 					transferArrow.hide();
 					dtmfArrow.hide();
 #endif
@@ -406,7 +411,9 @@ bool CallWidget::handleCommand( CommandString command ){
 #ifndef OLDLIBGLADEMM
 					monitoringButton.hide();
 					audioOutSilenceButton.hide();
+#ifdef HAVE_LIBGLADEMM_2_6
 					callRecordButton.hide();
+#endif
 					transferArrow.hide();
 					dtmfArrow.hide();
 #endif
