@@ -70,7 +70,9 @@
 #include<libminisip/soundcard/SoundDevice.h>
 
 #ifndef WIN32
+#	ifdef ENABLE_OSS
 #	include<libminisip/soundcard/OssSoundDevice.h>
+#	endif
 #	ifdef HAVE_LIBASOUND
 #		include<libminisip/soundcard/SoundDevice.h>
 #	endif

@@ -223,7 +223,9 @@ PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx \
 libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
+if ENABLE_OSS
         libsoundcard_src += source/soundcard/OssSoundDevice.cxx 
+endif ENABLE_OSS
 endif !OS_WIN
 
 if HAVE_LIBASOUND

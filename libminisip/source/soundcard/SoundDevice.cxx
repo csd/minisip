@@ -29,7 +29,9 @@
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 
 #ifndef WIN32
+#ifdef ENABLE_OSS
 #	include<libminisip/soundcard/OssSoundDevice.h>
+#endif
 #endif
 
 #ifdef WAVE_SOUND
@@ -54,16 +56,25 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	}
 
 #ifdef WAVE_SOUND
+#define SOUND_DEVICE_IMPLEMENTED
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
 	}
 #endif
 
 #ifndef WIN32
+#ifdef ENABLE_OSS
+#define SOUND_DEVICE_IMPLEMENTED
 	return new OssSoundDevice( devideId );
+#endif
 #else
 	cerr << "WARNING: No sound device is created! (BUG?)"<<endl;
 	return NULL;
+#endif
+
+
+#ifndef SOUND_DEVICE_IMPLEMENTED
+#error Minisip does not have any audio I/O capabilities as the source is configured!
 #endif
 }
 

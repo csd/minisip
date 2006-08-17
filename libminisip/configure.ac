@@ -15,7 +15,11 @@ AM_MINISIP_PACKAGE_INIT
 AM_CONFIG_HEADER(include/compilation_config.h)
 
 AM_MINISIP_LIBTOOL_EXTRAS
+
 AC_PROG_LIBTOOL
+
+
+
 
 dnl
 dnl Linker flags
@@ -84,6 +88,20 @@ AC_ARG_ENABLE(buzzer,
       else
       	AC_DEFINE(NBUZZER, [], [No iPAQ buzzer support])
       fi ])
+
+dnl OSS support
+AC_ARG_ENABLE(oss,
+    AS_HELP_STRING([--disable-oss], 
+    	[disables OSS sound IO support (default enabled)]),
+    [ if test "${enable_oss}" = "no"
+      then
+      	AC_DEFINE(NO_OSS, [], [No OSS support])
+      else
+        AC_DEFINE(ENABLE_OSS, [], [OSS support])
+      fi ])
+
+AM_CONDITIONAL(ENABLE_OSS, [test "${enable_oss}" = "yes"])
+
 
 
 dnl --with-avcodec argument
