@@ -11,7 +11,10 @@ lib_LTLIBRARIES = libmstun.la
 libmstun_la_SOURCES = # no sources; libraries only
 libmstun_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmstun_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) 
-libmstun_la_LIBADD = source/libmstunc.la source/libmstund.la $(MINISIP_LIBS)
+
+#libmstun_la_LIBADD = source/libmstunc.la source/libmstund.la $(MINISIP_LIBS)
+libmstun_la_LIBADD = source/libmstunc.la $(MINISIP_LIBS)
+
 libmstun_la_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CXX) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
