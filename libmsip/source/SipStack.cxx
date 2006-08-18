@@ -116,7 +116,7 @@ SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("Warning", sipHeaderWarningFactory);
 	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderWWWAuthenticateFactory);
 
-	//addSupportedExtension("100rel");
+	addSupportedExtension("100rel");
 
 	MRef<SipLayerTransport*> transp = MRef<SipLayerTransport*>(new
 			SipLayerTransport(
