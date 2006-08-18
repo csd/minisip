@@ -80,7 +80,6 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 		void sendInviteOk(const std::string &branch);
 		
 		void sendInvite(const std::string &branch);
-		void sendAuthInvite(const std::string &branch);
 
 		void sendAck();
 		void sendPrack(MRef<SipResponse*>);

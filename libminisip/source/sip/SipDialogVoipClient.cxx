@@ -420,7 +420,8 @@ bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMComman
 		//nonce = resp->getNonce();
 		nonce = resp->getAuthenticateProperty("nonce");
 
-		sendAuthInvite(""/*trans->getBranch()*/);
+		updateAuthentications( resp );
+		sendInvite(""/*trans->getBranch()*/);
 
 		return true;
 	}else{
@@ -756,6 +757,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			getDialogConfig()->inherited->getTransport(),
 			sipStack ) ;
 
+	addAuthorizations( inv );
 	addRoute( inv );
 
 	/* Get the session description from the Session */
@@ -849,102 +851,6 @@ void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
 	
 	MRef<SipRequest*> prack = createSipMessagePrack( rel100resp );
 	sendSipMessage( *prack );
-}
-
-void SipDialogVoipClient::sendAuthInvite(const string &branch){
-	//	merr << "ERROR: SipDialogVoipClient::sendAuthInvite() UNIMPLEMENTED"<< end;
-	MRef<SipRequest*> inv;
-	string keyAgreementMessage;
-
-	//merr << "SipDialogVoip::sendAuthInv : dialogstate.remoteUri=" << dialogState.remoteUri << end;
-
-	inv = SipRequest::createSipMessageInvite(
-		branch,
-		dialogState.callId,
-		dialogState.remoteUri,
-		getDialogConfig()->inherited->sipIdentity->sipDomain,
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
-		getDialogConfig()->inherited->externalContactIP,
-		getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-		getDialogConfig()->inherited->sipIdentity->getSipUri(),
-		dialogState.seqNo,
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
-		nonce,
-		realm,
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
-		getDialogConfig()->inherited->getTransport(),
-		sipStack);
-
-	addRoute( inv );
-
-	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
-
-	//There might be so that there are no SDP. Check!
-	MRef<SdpPacket *> sdp;
-	if (mediaSession){
-#ifdef ENABLE_TS
-		ts.save("getSdpOffer");
-#endif
-		sdp = mediaSession->getSdpOffer();
-#ifdef ENABLE_TS
-		ts.save("getSdpOffer");
-#endif
-		if( !sdp ){
-		// FIXME: this most probably means that the
-		// creation of the MIKEY message failed, it 
-		// should not happen
-		merr << "Sdp was NULL in sendAuthInvite" << end;
-		return; 
-		}
-	}
-	
-	/* Add the latter to the INVITE message */ // If it exists
-	
-
-//-------------------------------------------------------------------------------------------------------------//
-#ifdef IPSEC_SUPPORT	
-	// Create a MIKEY message for IPSEC if stated in the config file.
-	MRef<SipMimeContent*> mikey;
-	if (getIpsecSession()->required()){
-		ts.save("getMikeyIpsecOffer");
-		mikey = ipsecSession->getMikeyIpsecOffer();
-		ts.save("getMikeyIpsecOffer");
-		if (!mikey){
-			merr << "Mikey was NULL" << end;
-			merr << "Still some errors with IPSEC" << end;
-			//return; 
-		}
-	}
-	else
-		mikey = NULL;
-	MRef<SipMimeContent*> multi;
-	if (mikey && mediaSession){
-		multi = new SipMimeContent("multipart/mixed");
-		multi->addPart(*mikey);
-		multi->addPart(*sdp);
-		inv->setContent( *multi);
-	}
-	if (mikey && !mediaSession)
-		inv->setContent( *mikey);
-	if (!mikey && mediaSession)
-		inv->setContent( *sdp );
-#else
-	
-	inv->setContent( *sdp );
-#endif
-//-------------------------------------------------------------------------------------------------------------//
-
-	//	/* Get the session description from the Session */
-	//	MRef<SdpPacket *> sdp = mediaSession->getSdpOffer();
-	//
-	//	/* Add the latter to the INVITE message */
-	//	inv->setContent( *sdp );
-	
-	MRef<SipMessage*> pref(*inv);
-	SipSMCommand cmd(pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
-	setLastInvite(inv);
-
 }
 
 void SipDialogVoipClient::sendInviteOk(const string &branch){
