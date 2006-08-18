@@ -55,7 +55,7 @@
         +-------------+                            a10 GUI(failed)
                    |  +-----------------------------+---------------------------------+
 cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                        |
-  a0 send_noauth   |  |      a2 send_auth    | S3            |---------------------+  |
+  a0 send_register |  |      a2 send_register| S3            |---------------------+  |
                    |  | +------------------->| Trying_stored |                     |  |
                    V  | |            1xx   +-|               |-+                   |  |
             +-------------+          a15 - +>+---------------+ | 401               |  |
@@ -63,7 +63,7 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
         +-->|Trying_noauth| a3 ask_dialog    +---------------+ |                   |  |
         |   |             |----------------->| S4            |<+                   |  |
         |   +-------------+                  | Ask password  |---+ cmdstr:setpass  |  |
-        |          |  |  ^                   |               |   | a5 send_auth    |  |
+        |          |  |  ^                   |               |   | a5 send_regist..|  |
         |          |  +--+                   +---------------+<--+                 |  |
         |   2xx OK |    1xx                    | |      ^  |cancel +----------+    |  |
         |   a1 -   |    a14 -                  | +------+  +------>| S5       |<---)--+
@@ -72,7 +72,7 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
         |   |  S2         |<-------------------+                   +----------+    |
         +---|  Registred  |                                              |         |
  register   |             |<---------------------------------------------^---------+
- send_noauth+-------------+                   2xx                        V     a13: notransactions
+ send_reg.. +-------------+                   2xx                        V     a13: notransactions
         |       |                             a8                   +----------+
         --------+                                                  |          |
              a12 cmdstr:register <proxy>                           |terminated|
@@ -124,7 +124,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		dispatcher->getLayerTransaction()->addTransaction(trans);
 		registerTransactionToDialog(trans);
 */
-		send_noauth(/*trans->getBranch()*/"");
+		send_register(/*trans->getBranch()*/"");
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
@@ -203,7 +203,7 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 
 		updateAuthentications( *resp );
-		send_auth(/*trans->getBranch()*/"");
+		send_register(/*trans->getBranch()*/"");
 		//TODO: inform GUI
 
 		return true;
@@ -286,7 +286,7 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 		registerTransactionToDialog(trans);
 */
 
-		send_auth(/*trans->getBranch()*/"");
+		send_register(/*trans->getBranch()*/"");
 		return true;
 	}else{
 		return false;
@@ -478,7 +478,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		dispatcher->getLayerTransaction()->addTransaction(trans);
 		registerTransactionToDialog(trans);
 */
-		send_noauth(/*trans->getBranch()*/"");
+		send_register(/*trans->getBranch()*/"");
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
@@ -708,7 +708,7 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 	return ret;
 }
 
-void SipDialogRegister::send_noauth(string branch){
+void SipDialogRegister::send_register(string branch){
 	
 //	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
 	//MRef<SipRegister*> reg= new SipRegister(
@@ -731,6 +731,3 @@ void SipDialogRegister::send_noauth(string branch){
 	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
 }
 
-void SipDialogRegister::send_auth(string branch){
-	send_noauth( branch );
-}

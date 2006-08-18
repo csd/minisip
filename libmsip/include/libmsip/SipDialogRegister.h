@@ -53,8 +53,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		bool getGuiFeedback(){return guiFeedback;}
 		void setGuiFeedback(bool fb){guiFeedback=fb;}
 
-		void send_noauth(std::string branch);
-		void send_auth(std::string branch);
+		void send_register(std::string branch);
 	private:
 		bool a0_start_tryingnoauth_register( const SipSMCommand &command);
 		bool a1_tryingnoauth_registred_2xx( const SipSMCommand &command);
