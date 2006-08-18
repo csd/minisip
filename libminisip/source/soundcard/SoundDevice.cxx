@@ -72,10 +72,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	return NULL;
 #endif
 
-
-#ifndef SOUND_DEVICE_IMPLEMENTED
-#error Minisip does not have any audio I/O capabilities as the source is configured!
-#endif
 }
 
 SoundDevice::SoundDevice( string device ):openedRecord(false),openedPlayback(false){
