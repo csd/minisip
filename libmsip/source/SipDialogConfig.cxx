@@ -229,7 +229,7 @@ SipIdentity::SipIdentity(){
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
-	cerr << "SipIdentity::SipIdentity : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity::SipIdentity : created identity id=" << identityIdx << endl;
 #endif
 	setIsRegistered (false);
 }
@@ -239,7 +239,7 @@ SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(f
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
-	cerr << "SipIdentity::SipIdentity(str) : cretated identity id=" << identityIdx << endl;
+	cerr << "SipIdentity::SipIdentity(str) : created identity id=" << identityIdx << endl;
 #endif	
 	setIsRegistered (false);
 }
