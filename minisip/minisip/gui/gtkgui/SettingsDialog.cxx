@@ -756,7 +756,7 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	transportChange();
 
 	stunCheck->set_active( config->useSTUN );
-	stunAutodetectCheck->set_active( config->useUserDefinedStunServer );
+	stunAutodetectCheck->set_active( !config->useUserDefinedStunServer );
 	stunEntry->set_text( config->userDefinedStunServer );
 
 }
@@ -795,7 +795,7 @@ string AdvancedSettings::apply(){
 	config->tls_server = tlsCheck->get_active();
 
 	config->useSTUN = stunCheck->get_active();
-	config->useUserDefinedStunServer = stunAutodetectCheck->get_active()
+	config->useUserDefinedStunServer = !stunAutodetectCheck->get_active()
 		&& stunEntry->get_text() != "";
 	config->userDefinedStunServer = stunEntry->get_text();
 
