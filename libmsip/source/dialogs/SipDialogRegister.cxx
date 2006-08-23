@@ -36,6 +36,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
+#include<libmsip/SipAuthenticationDigest.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmutil/massert.h>
@@ -268,23 +269,32 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
-	    //TODO: Ask password
 		
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword= command.getCommandString().getParam2();
+		string realm = command.getCommandString()["realm"];
 		
-		++dialogState.seqNo;
+			//We store the new credentials for this dialogs
+			//configuration. Note that it is not saved for the
+			//next time minisip is started.
+		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername = 
+				command.getCommandString().getParam();
+		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword= 
+				command.getCommandString().getParam2();
+		
+		
+			//Update the set of credentials with the new (and hopefully
+			//correct) information.
+		list<MRef<SipAuthenticationDigest*> >::iterator j;
+		for ( j = dialogState.auths.begin();
+				j != dialogState.auths.end(); j++ ){
+			MRef<SipAuthenticationDigest*> digest = *j;
+			if (digest->getRealm()==realm){
+				digest->setCredential(command.getCommandString().getParam(), 
+						command.getCommandString().getParam2());
+			}
+		}
 
-/*		MRef<SipTransaction*> trans( 
-			new SipTransactionNonInviteClient(
-				sipStack, 
-				//this, 
-				dialogState.seqNo, 
-				"REGISTER",
-				dialogState.callId));
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		registerTransactionToDialog(trans);
-*/
+
+		++dialogState.seqNo;
 
 		send_register(/*trans->getBranch()*/"");
 		return true;
