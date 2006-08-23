@@ -154,17 +154,30 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
 	mdbg << FG_MAGENTA << "MinisipTextUI::handleCommand: Got "<<cmd.getString() << PLAIN <<end;
 #endif
-		
+	bool handled = false;
+
+	if (cmd.getOp()==SipCommandString::ask_password){
+		MRef<QuestionDialog*> d= new QuestionDialog;
+		d->questionId = cmd.getDestinationId();
+		d->questionId2 = cmd.getParam();
+		d->questions.push_back("Enter USER NAME for realm <"+cmd.getParam()+">");
+		d->questions.push_back("Enter PASSWORD for realm <"+cmd.getParam()+">");
+		showQuestionDialog(d);
+	}
+
 	if (cmd.getOp()=="register_ok"){
+		handled=true;
 		displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
 	}
 		
 	if (cmd.getOp()==SipCommandString::incoming_im){
+		handled=true;
 		displayMessage("IM to <"+cmd.getParam3()+"> from <"+cmd.getParam2()+">: "+cmd.getParam(), bold);
 	}
 	
 	
 	if (cmd.getOp()=="invite_ok"){
+		handled=true;
 		state="INCALL";
 		inCall = true;
 		setPrompt(state);
@@ -180,12 +193,14 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()=="remote_ringing"){
+		handled=true;
 		state="REMOTE RINGING";
 		setPrompt(state);
 		displayMessage("PROGRESS: the remote UA is ringing...", blue);
 	}
 	
 	if (cmd.getOp()==SipCommandString::remote_user_not_found && !p2tmode){
+		handled=true;
 		state="IDLE";
 		setPrompt(state);
 		displayMessage("User "+cmd.getParam()+" not found.",red);
@@ -193,6 +208,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()==SipCommandString::remote_hang_up){
+		handled=true;
 		state="IDLE";
 		setPrompt(state);
 		displayMessage("Remote user ended the call.",red);
@@ -200,6 +216,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		inCall=false;
 	}
 	else if (cmd.getOp()==SipCommandString::remote_cancelled_invite){
+		handled=true;
 		state="IDLE";
 		setPrompt(state);
 		displayMessage("Remote user cancelled the call.",red);
@@ -210,6 +227,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 
 	
 	if (cmd.getOp()==SipCommandString::transport_error && !p2tmode){
+		handled=true;
 		state="IDLE";
 		setPrompt(state);
 		displayMessage("The call could not be completed because of a network error.", red);
@@ -218,10 +236,12 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	
 	
 	if (cmd.getOp()=="error_message"){
+		handled=true;
 		displayMessage("ERROR: "+cmd.getParam(), red);
 	}
 	
 	if (cmd.getOp()=="remote_reject" && !p2tmode){
+		handled=true;
 		state="IDLE";
 		setPrompt(state);
 		callId="";
@@ -229,6 +249,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()==SipCommandString::incoming_available){
+		handled=true;
 		if(state=="IDLE"){
 			state="ANSWER?";
 			setPrompt(state);
@@ -245,6 +266,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		
 	}
 	if (cmd.getOp()=="conf_join_received"){
+		handled=true;
 		if(state=="IDLE"){
 			state="ANSWER?";
 			setPrompt(state);
@@ -264,7 +286,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 			}
 			string mysipuri = config->inherited->sipIdentity->sipUsername + "@" + config->inherited->sipIdentity->sipDomain;
 			users=trim(users.substr(i));
-			cerr<<"confididididididididididididiidididid "+confid<<endl;
 			currentconf=new ConferenceControl(mysipuri,confid,false);
 			confCallback->setConferenceController(currentconf);
 			displayMessage("The incoming conference call from "+cmd.getParam(), blue);
@@ -282,6 +303,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()==SipCommandString::transfer_pending){
+		handled=true;
 		if(inCall){
 			displayMessage( "Call transfer in progress..." );
 		}
@@ -289,6 +311,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()==SipCommandString::transfer_requested){
+		handled=true;
 		cerr << "TestUI got transfer_requested" << endl;
 		if(inCall){
 			state="TRANSFER?";
@@ -299,6 +322,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 	
 	if (cmd.getOp()==SipCommandString::call_transferred){
+		handled=true;
 		callId = cmd.getParam();
 		state="INCALL";
 		displayMessage("Call transferred ...");
@@ -308,19 +332,23 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	
 	//P2T commands
 	if (cmd.getOp()=="p2tFloorGranted"){
+		handled=true;
 		displayMessage("Floor is granted!!!", blue);
 	
 		
 	}else if (cmd.getOp()=="p2tFloorTaken"){
+		handled=true;
 		displayMessage("Floor is granted to "+cmd.getParam(),blue);
 	
 	}
 	else if (cmd.getOp()=="p2tFloorReleased"){
+		handled=true;
 		displayMessage("Floor available!", blue);
 		state="P2T CONNECTED";
 		setPrompt(state);
 	}
 	else if (cmd.getOp()=="p2tFloorRevokeActive"){
+		handled=true;
 		displayMessage("Maximum Floortime reached. Revoking floor...", red);
 		state="P2T CONNECTED";
 		setPrompt(state);
@@ -334,6 +362,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	* Description:   remote user revoked floor.
 	****/
 	else if (cmd.getOp()=="p2tFloorRevokePassiv"){
+		handled=true;
 		if(cmd.getParam2()=="1"){
 			displayMessage("User " + cmd.getParam() + ":", bold);
 			displayMessage("Please stop talking. Maximum floortime reached.", blue);
@@ -352,6 +381,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	*                is in the RINGING state and waits for an accept.
 	****/
 	else if (cmd.getOp()=="p2tAddUser"){
+		handled=true;
 		if(inCall==true && p2tmode==true){
 			//send automatically an accept back
 			CommandString command(cmd.getDestinationId(),  SipCommandString::accept_invite);
@@ -381,6 +411,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	*                is in the RINGING state and waits for an accept.
 	****/
 	else if (cmd.getOp()=="p2tRemoveUser"){
+		handled=true;
 		if(inCall==true && p2tmode==true){
 			displayMessage("User " + cmd.getParam() + " removed ("+ cmd.getParam2() +").", red);
 			grpList->removeUser(cmd.getParam());
@@ -396,6 +427,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	*                of a user.
 	****/
 	else if (cmd.getOp()=="p2tModifyUser"){
+		handled=true;
 		if(inCall==true && p2tmode==true){
 			
 			int status=0;
@@ -415,6 +447,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	* Description:   an invitation to a P2T Session
 	****/
 	else if (cmd.getOp()=="p2tInvitation"){
+		handled=true;
 		//if already in a call, send DENY back
 		if(inCall){
 		
@@ -454,6 +487,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	* Description:   the P2T Session is set up
 	****/
 	else if (cmd.getOp()=="p2tSessionCreated"){
+		handled=true;
 		p2tGroupId=cmd.getParam();
 		displayMessage("P2T Session "+ p2tGroupId + " created", green);
 		grpList->setGroupIdentity(p2tGroupId);
@@ -462,11 +496,13 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}    
 	
 	else if (cmd.getOp().substr(0,3)=="p2t"){
+		handled=true;
 		displayMessage("Received: "+cmd.getOp(), blue);
 	}
 #endif
 
 	if (autoanswer && state=="ANSWER?"){
+		handled=true;
 		CommandString command(callId, SipCommandString::accept_invite);
 		//callback->guicb_handleCommand(command);
 		sendCommand("sip",command);
@@ -479,6 +515,10 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 				"senders", "ON");
 		//callback->guicb_handleMediaCommand(cmdstr);
 		sendCommand("media",cmdstr);
+	}
+
+	if (!handled){
+		displayMessage("WARNING: Did not handle command: "+ cmd.getString(), red );
 	}
 }
 
@@ -736,6 +776,15 @@ void MinisipTextUI::keyPressed(int key){
 		showStat();
 		break;
 	}
+}
+
+void MinisipTextUI::guiExecute(const MRef<QuestionDialog*> &d){
+	CommandString command(d->questionId,  
+			SipCommandString::setpassword, 
+			d->answers[0], 	//user
+			d->answers[1]); //pass
+	command["realm"]=d->questionId2;
+	sendCommand("sip",command);
 }
 
 void MinisipTextUI::guiExecute(string cmd){

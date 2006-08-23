@@ -62,6 +62,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	
 		virtual void keyPressed(int key);
 		virtual void guiExecute(std::string cmd);
+		virtual void guiExecute(const MRef<QuestionDialog*> &d);
 		virtual minilist<std::string> textuiCompletionSuggestion(std::string match);
 	
 	private:
@@ -83,9 +84,10 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 		bool autoanswer;
 		MRef<Semaphore *> semSipReady;
 		
+		
 		///indicates that the user is in a call and cannot answer any other incoming calls
 		bool inCall;
-		
+
 		///indicates that the TextUI is in the P2T Mode
 		bool p2tmode;
 #ifdef P2T_SUPPORT
