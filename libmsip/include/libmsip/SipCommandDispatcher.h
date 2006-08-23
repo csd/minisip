@@ -35,7 +35,6 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
 #include<libmsip/SipTransaction.h>
-//#include<libmsip/SipDialog.h>
 #include<libmsip/SipLayerDialog.h>
 #include<libmsip/SipLayerTransaction.h>
 #include<libmsip/SipLayerTransport.h>

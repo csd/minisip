@@ -55,10 +55,9 @@ class SipRequest;
 	There is a transition from any state into TERMINATED, defined in 
 	the base class SipTransaction::a1000_xxxx()
 */
-class LIBMSIP_API SipTransactionNonInviteClient: public SipTransactionClient{
+class SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
 		SipTransactionNonInviteClient(MRef<SipStack *> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &callid);

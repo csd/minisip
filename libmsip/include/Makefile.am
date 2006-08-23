@@ -1,11 +1,10 @@
 pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipStack.h \
                      libmsip/SipLayerDialog.h \
-                     libmsip/SipLayerTransaction.h \
-                     libmsip/SipHeaderAccept.h \
-		     libmsip/SipHeaderAcceptContact.h \
                      libmsip/SipUtils.h \
                      libmsip/SipTimers.h \
+                     libmsip/SipHeaderAccept.h \
+		     libmsip/SipHeaderAcceptContact.h \
                      libmsip/SipHeaderAuthorization.h \
                      libmsip/SipHeaderCSeq.h \
                      libmsip/SipHeaderCallID.h \
@@ -35,7 +34,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipHeaderWarning.h \
 		     libmsip/SipHeaderReferTo.h \
 		     libmsip/SipDialogConfig.h \
-		     libmsip/SipCommandDispatcher.h \
 		     libmsip/SipMessageContent.h \
 		     libmsip/SipMessageContentIM.h \
 		     libmsip/SipMessageContentFactory.h \
@@ -46,22 +44,24 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipUri.h \
 		     libmsip/SipException.h \
 		     libmsip/SipTransactionUtils.h \
-		     libmsip/SipTransaction.h \
-		     libmsip/SipTransactionNonInviteClient.h \
-		     libmsip/SipTransactionNonInviteServer.h \
-		     libmsip/SipTransactionInviteClient.h \
-		     libmsip/SipTransactionInviteServer.h \
-		     libmsip/SipTransactionInviteServerUA.h \
 		     libmsip/SipMessage.h \
 		     libmsip/SipResponse.h \
 		     libmsip/SipRequest.h \
 		     libmsip/SipDialog.h \
 		     libmsip/SipDialogRegister.h \
-		     libmsip/SipDialogManagement.h \
 		     libmsip/SipAuthenticationDigest.h \
+		     libmsip/SipCommandDispatcher.h \
+		     libmsip/SipDialogManagement.h \
+                     libmsip/SipLayerTransaction.h \
+		     libmsip/SipTransaction.h \
 		     libmsip/libmsip_config.h
 
-noinst_HEADERS = 	config.h
+noinst_HEADERS = 	libmsip/SipTransactionNonInviteClient.h \
+		     libmsip/SipTransactionNonInviteServer.h \
+		     libmsip/SipTransactionInviteClient.h \
+		     libmsip/SipTransactionInviteServer.h \
+		     libmsip/SipTransactionInviteServerUA.h \
+			config.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
 			$(srcdir)/compilation_config.h.in \

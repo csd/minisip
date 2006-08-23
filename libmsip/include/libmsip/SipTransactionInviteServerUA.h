@@ -57,10 +57,9 @@ class SipResponse;
 	All transitions are the same as for the parent class, except for
 	a5, which is substituted by a1001.
 */
-class LIBMSIP_API SipTransactionInviteServerUA: public SipTransactionInviteServer{
+class SipTransactionInviteServerUA: public SipTransactionInviteServer{
 	public:
 		SipTransactionInviteServerUA(MRef<SipStack*> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

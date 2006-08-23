@@ -54,10 +54,9 @@ class SipResponse;
 	There is a transition from any state into TERMINATED, defined in 
 	the base class SipTransaction::a1000_xxxx()
 */
-class LIBMSIP_API SipTransactionNonInviteServer: public SipTransactionServer{
+class SipTransactionNonInviteServer: public SipTransactionServer{
 	public:
 		SipTransactionNonInviteServer(MRef<SipStack*> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

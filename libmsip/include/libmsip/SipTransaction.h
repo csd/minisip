@@ -134,10 +134,10 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 };
 
 
-class LIBMSIP_API SipTransactionClient: public SipTransaction{
+//All sub-classes of SipTransaction are local to libmsip
+class SipTransactionClient: public SipTransaction{
         public:
                 SipTransactionClient(MRef<SipStack*> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 
@@ -145,10 +145,9 @@ class LIBMSIP_API SipTransactionClient: public SipTransaction{
                 ~SipTransactionClient();
 };
 
-class LIBMSIP_API SipTransactionServer: public SipTransaction{
+class SipTransactionServer: public SipTransaction{
         public:
                 SipTransactionServer(MRef<SipStack*> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

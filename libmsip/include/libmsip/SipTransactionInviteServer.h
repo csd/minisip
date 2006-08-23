@@ -57,10 +57,9 @@ class SipResponse;
 	This is a base class for an INVITE transaction server UA
 	(the handling of 2xx responses changes).
 */
-class LIBMSIP_API SipTransactionInviteServer : public SipTransactionServer{
+class SipTransactionInviteServer : public SipTransactionServer{
 	public:
 		SipTransactionInviteServer(MRef<SipStack *> stack, 
-				//MRef<SipDialog*> d, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 
