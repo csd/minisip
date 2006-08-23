@@ -58,7 +58,6 @@ MRef<MPlugin *> mgconf_LTX_getPlugin( MRef<Library*> lib ){
 
 
 GConfBackend::GConfBackend(){
-	cerr << "EEEE: gconf backend constructor"<<endl;
 
 	g_type_init();
 

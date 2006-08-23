@@ -55,9 +55,6 @@ MRef<MPlugin *> mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
 
 MXmlConfBackend::MXmlConfBackend(){
 
-	cerr << "EEEE: mxml backend constructor"<<endl;
-
-	
 	fileName = getDefaultConfigFilename();
 
 	try{
