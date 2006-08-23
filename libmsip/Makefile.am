@@ -43,7 +43,6 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/transactions/SipTransactionNonInviteServer.cxx \
 		     source/transactions/SipTransactionInviteClient.cxx \
 		     source/transactions/SipTransactionInviteServer.cxx \
-		     source/transactions/SipTransactionInviteClientUA.cxx \
 		     source/transactions/SipTransactionInviteServerUA.cxx \
 		     source/dialogs/SipDialog.cxx \
 		     source/dialogs/SipDialogRegister.cxx \

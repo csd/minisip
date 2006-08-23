@@ -42,7 +42,6 @@
 #include<libmutil/dbg.h>
 
 #include<libmsip/SipTransactionInviteClient.h>
-#include<libmsip/SipTransactionInviteClientUA.h>
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipTransactionNonInviteServer.h>

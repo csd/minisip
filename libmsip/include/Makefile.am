@@ -51,7 +51,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipTransactionNonInviteServer.h \
 		     libmsip/SipTransactionInviteClient.h \
 		     libmsip/SipTransactionInviteServer.h \
-		     libmsip/SipTransactionInviteClientUA.h \
 		     libmsip/SipTransactionInviteServerUA.h \
 		     libmsip/SipMessage.h \
 		     libmsip/SipResponse.h \
