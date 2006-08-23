@@ -130,7 +130,7 @@ void TextUI::restoreStdinBlocking(){
 #endif	
 }
 
-TextUI::TextUI() : maxHints(2000){
+TextUI::TextUI() : maxHints(2000),isAskingDialogQuestion(false){
 #ifdef HAVE_TERMIOS_H
 	terminalSavedState = new struct termios;
 #else
@@ -159,6 +159,47 @@ void TextUI::addCommand(string cmd){
 
 void TextUI::setPrompt(string p){
 	promptText=p;
+}
+
+void TextUI::answerQuestion(string answer){
+	MRef<QuestionDialog *> d = questionDialogs.front();
+	d->answers.push_back(answer);
+	d->nAnswered++;
+	if (d->nAnswered >= d->questions.size()){
+		//all questions now answered
+		guiExecute(d);
+		isAskingDialogQuestion=false;
+		questionDialogs.pop_front();
+		input = savedInput;
+		promptText=savedPromptText;
+		displayMessage("");
+	}
+	askQuestion();
+}
+
+void TextUI::askQuestion(){
+	if (questionDialogs.size()<=0){
+		return;
+	}
+	
+	if (!isAskingDialogQuestion){
+		isAskingDialogQuestion=true;
+		savedPromptText = promptText;
+		savedInput = input;
+	}
+	MRef<QuestionDialog*> dialog = questionDialogs.front();
+	string q = dialog->questions[dialog->nAnswered];
+	promptText = "Question: "+q;
+	input= "";
+	displayMessage(""); //clear screen and input
+}
+
+void TextUI::showQuestionDialog(const MRef<QuestionDialog*> &d){
+	questionDialogs.push_back(d);
+	if (!isAskingDialogQuestion){
+		askQuestion();
+	}
+
 }
 
 void TextUI::addCompletionCallback(string m, TextUICompletionCallback *cb){
@@ -230,6 +271,11 @@ void TextUI::guimain(){
 					if (command.size()>0)
 						cout <<endl;
 					input="";
+
+					if (isAskingDialogQuestion){
+						answerQuestion(command);
+						break;
+					}
 
 					if (command.size()==0){
 						displayMessage("");

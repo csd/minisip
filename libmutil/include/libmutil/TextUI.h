@@ -30,6 +30,8 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
 #include<libmutil/dbg.h>
+#include<list>
+#include<vector>
 
 class LIBMUTIL_API TextUICompletionCallback{
 	public:
@@ -42,6 +44,22 @@ struct completion_cb_item{
 	std::string match;
 	TextUICompletionCallback *callback;
 	
+};
+
+
+/**
+ * A set of questions that the user will be asked to answer.
+ * When the user has answered all questions the object will
+ * be passed back to the GUI super class (guiExecute(...)).
+ */
+class QuestionDialog : public MObject{
+public:
+	QuestionDialog():nAnswered(0){}
+	std::string questionId;
+	std::string questionId2;
+	std::vector<std::string> questions;
+	std::vector<std::string> answers;
+	int nAnswered;
 };
 
 
@@ -70,11 +88,32 @@ public:
 	TextUI();
 	virtual ~TextUI();
 
+
+	/**
+	 * Ask the user a set of questions. If the user is 
+	 * answering questions already, then this dialog
+	 * will be queued.
+	 */
+	void showQuestionDialog(const MRef<QuestionDialog*> &d);
+	
 	/**
 	 * Method to be implemented by a sub-class.
 	 * @param cmd	Command entered by the user (single line)
 	 */
 	virtual void guiExecute(std::string cmd)=0;
+	
+	/**
+	 * Method called when a dialog has been answered by the user.
+	 * The parameter contains a list with the answers to the 
+	 * questions.
+	 *
+	 * The dialog was initiated by calling "showQuestionDialog".
+	 *
+	 * If multiple dialogs are shown at the same time they are
+	 * served (i.e. the user is asked to input answers) in the 
+	 * same order as were passed to showQuestionDialog.
+	 */
+	virtual void guiExecute(const MRef<QuestionDialog*> &questionAnswer)=0;
 	
 	/**
 	 * @param msg	String to be displayed on the screen
@@ -124,6 +163,10 @@ protected:
 
 private:
 
+	// Dialog/question management functions
+	void askQuestion();
+	void answerQuestion(std::string answer);
+
 	/**
 	 * Store the current state of the console to "terminalSavedState"
 	 * and make it non-blocking.
@@ -139,6 +182,18 @@ private:
 	
 	void outputSuggestions(minilist<std::string> &l);
 	std::string displaySuggestions(std::string);
+	
+
+	//dialogs not yet completely answered. First in queue
+	//asked first.
+	std::list<MRef<QuestionDialog*> > questionDialogs;
+	bool isAskingDialogQuestion;
+	
+	//the normal prompt is interrupted, and its state is 
+	//stored in the following two attributes
+	std::string savedPromptText;
+	std::string savedInput;
+
 
 	std::string input;
 
