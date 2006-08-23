@@ -266,24 +266,7 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 			getLogEntry()->handle();
 		}
 
-/*
-		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(sipStack, 
-				//MRef<SipDialog*>(this), 
-				bye->getCSeq(),
-				bye->getCSeqMethod(),
-				bye->getLastViaBranch(), 
-				dialogState.callId); //TODO: remove second argument
-
-		dispatcher->getLayerTransaction()->addTransaction(byeresp);
-		registerTransactionToDialog(byeresp);
-
-		
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-		cmd.setSource(command.getSource());
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
-		sendByeOk(bye, /*byeresp->getBranch()*/"" );
+		sendByeOk(bye, "" );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
 		dispatcher->getCallback()->handleCommand("gui", cmdstr);
@@ -309,24 +292,6 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 
 		if (getLastInvite()->getFirstViaBranch() != branch)
 			return false;
-
-#if 0
-		// Create CANCEL transaction and handle the request
-		MRef<SipTransaction*> cr( 
-			new SipTransactionNonInviteServer(sipStack, 
-				//MRef<SipDialog*>(this), 
-				command.getCommandPacket()->getCSeq(), 
-				command.getCommandPacket()->getCSeqMethod(), 
-				command.getCommandPacket()->getFirstViaBranch(), 
-				dialogState.callId) );
-		dispatcher->getLayerTransaction()->addTransaction(cr);
-		registerTransactionToDialog(cr);
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-
-		cr->handleCommand(cmd);
-#endif
 
 		// Send 487 Request Cancelled for INVITE
 		MRef<SipResponse*> cancelledResp = new SipResponse( 
@@ -394,22 +359,6 @@ bool SipDialogVoipServer::a3006_start_termwait_INVITE( const SipSMCommand &comma
 		
 		dialogState.updateState( getLastInvite() );
 
-#if 0
-		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(sipStack, 
-						//MRef<SipDialog*>(this), 
-						command.getCommandPacket()->getCSeq(), 
-						command.getCommandPacket()->getCSeqMethod(), 
-						command.getCommandPacket()->getLastViaBranch(), 
-						dialogState.callId ));
-
-		dispatcher->getLayerTransaction()->addTransaction(ir);
-		registerTransactionToDialog(ir);
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
-#endif
 		sendNotAcceptable( command.getCommandPacket()->getDestinationBranch() );
 
 		signalIfNoTransactions();

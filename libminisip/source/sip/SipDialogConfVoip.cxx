@@ -152,17 +152,6 @@ bool SipDialogConfVoip::a0_start_callingnoauth_invite( const SipSMCommand &comma
 		//cerr<<"dialogState.callId*************"+dialogState.callId<<endl;
 		//cerr<<"dialogState.seqNo*************"+itoa(dialogState.seqNo)<<endl;
 
-/*		MRef<SipTransaction*> invtrans = new SipTransactionInviteClient(sipStack, 
-				//MRef<SipDialog *>(this), 
-				dialogState.seqNo, 
-				"INVITE", 
-				dialogState.callId);
-		
-		invtrans->setSocket( phoneconf->proxyConnection );
-		//cerr<<"sending invite3*************"<<endl;
-		dispatcher->getLayerTransaction()->addTransaction(invtrans);
-		//registerTransactionToDialog(invtrans);
-*/
 		//cerr<<"sending invite*************"<<endl;
 		/*CommandString cmdstr("", "myuri", getDialogConfig()->inherited.sipIdentity->getSipUri());
 		
@@ -303,27 +292,10 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 			getLogEntry()->handle();
 		}
 
-/*
-		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(sipStack, 
-				//MRef<SipDialog*>(this), 
-				bye->getCSeq(),
-				bye->getLastViaBranch(), 
-				bye->getCSeqMethod(), 
-				dialogState.callId);
-
-		dispatcher->getLayerTransaction()->addTransaction(byeresp);
-		//registerTransactionToDialog(byeresp);
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-		cmd.setSource(command.getSource());
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/		
-		sendByeOk(bye, ""/*byeresp->getBranch()*/ );
+		sendByeOk(bye, "" );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
 		cmdstr.setParam3(confId);
-		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		sipStack->getCallback()->handleCommand("sip_conf", cmdstr );
 
 		getMediaSession()->stop();
@@ -349,16 +321,7 @@ bool SipDialogConfVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 //		setCurrentState(toState);
 		//int bye_seq_no= requestSeqNo();
 		++dialogState.seqNo;
-/*		MRef<SipTransaction*> byetrans( new SipTransactionNonInviteClient(sipStack, 
-					//MRef<SipDialog*>(this), 
-					dialogState.seqNo, 
-					"BYE", 
-					dialogState.callId)); 
-
-		dispatcher->getLayerTransaction()->addTransaction(byetrans);
-		//registerTransactionToDialog(byetrans);
-*/
-		sendBye(""/*byetrans->getBranch()*/, dialogState.seqNo);
+		sendBye("", dialogState.seqNo);
 		
 		if (getLogEntry()){
 			(dynamic_cast< LogEntrySuccess * >(*( getLogEntry() )))->duration = time( NULL ) - getLogEntry()->start; 
@@ -378,25 +341,6 @@ bool SipDialogConfVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 bool SipDialogConfVoip::a7_callingnoauth_termwait_CANCEL( const SipSMCommand &command)
 {
 	if (transitionMatch("CANCEL", command, SipSMCommand::transaction_layer, IGN)){
-//		setCurrentState(toState);
-
-/*		MRef<SipTransaction*> cancelresp( 
-				new SipTransactionNonInviteServer(
-					sipStack,
-					//MRef<SipDialog*>(this), 
-					command.getCommandPacket()->getCSeq(), 
-					command.getCommandPacket()->getCSeqMethod(), 
-					command.getCommandPacket()->getLastViaBranch(), 
-					dialogState.callId ));
-
-		dispatcher->getLayerTransaction()->addTransaction(cancelresp);
-		//registerTransactionToDialog(cancelresp);
-
-		SipSMCommand cmd(command);
-		cmd.setSource(SipSMCommand::dialog_layer);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
 		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
@@ -415,19 +359,8 @@ bool SipDialogConfVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &co
 				SipCommandString::hang_up,
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
-//		setCurrentState(toState);
 
-/*
-		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, 
-					//MRef<SipDialog*>( this ), 
-					dialogState.seqNo, 
-					"CANCEL", 
-					dialogState.callId)); 
-
-		dispatcher->getLayerTransaction()->addTransaction(canceltrans);
-		//registerTransactionToDialog(canceltrans);
-*/
-		sendCancel(""/*canceltrans->getBranch()*/);
+		sendCancel("");
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -525,29 +458,6 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		}
 #endif
 
-/*
-		MRef<SipTransaction*> ir( new SipTransactionInviteServer(
-						sipStack,
-						//MRef<SipDialog*>( this ), 
-						command.getCommandPacket()->getCSeq(),
-						command.getCommandPacket()->getCSeqMethod(),
-						command.getCommandPacket()->getLastViaBranch(), 
-						dialogState.callId) );
-
-		dispatcher->getLayerTransaction()->addTransaction(ir);
-
-		//registerTransactionToDialog(ir);
-
-		//	command.setSource(SipSMCommand::dialog_layer);
-		//	command.setDestination(SipSMCommand::transaction_layer);
-
-		//	mdbg << "^^^^ SipDialogVoip: re-handling packet for transaction to catch:"<<command<<end;
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
 		if(type=="join")
 		{
 			string users=confId+";";
@@ -665,30 +575,13 @@ bool SipDialogConfVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command
 
 	if (transitionMatch("CANCEL", command, IGN, IGN)){
 
-		//FIXME: is this correct - this should probably be handled
-		//in the already existing transaction.
-/*		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(sipStack, 
-					//MRef<SipDialog*>(this), 
-					command.getCommandPacket()->getCSeq(), 
-					command.getCommandPacket()->getCSeqMethod(), 
-					command.getCommandPacket()->getLastViaBranch(), 
-					dialogState.callId) );
-		dispatcher->getLayerTransaction()->addTransaction(cr);
-		//registerTransactionToDialog(cr);
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-
-		//	mdbg << "^^^^ SipDialogVoip: re-handling packet for transaction to catch."<<end;
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
 		//	mdbg << "^^^^ SipDialogVoip: sending ok to cancel packet"<<end;
 		/* Tell the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite);
 		cmdstr.setParam3(confId);
 		//getDialogContainer()->getCallback()->sipcb_handleCommand( cmdstr );
 		sipStack->getCallback()->handleCommand("sip_conf", cmdstr );
-		sendInviteOk(""/*cr->getBranch()*/ ); 
+		sendInviteOk("" ); 
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -729,22 +622,6 @@ bool SipDialogConfVoip::a16_start_termwait_INVITE( const SipSMCommand &command){
 
 		setLastInvite(MRef<SipRequest*>((SipRequest *)*command.getCommandPacket()));
 
-/*
-		MRef<SipTransaction*> ir( new SipTransactionInviteServer(sipStack, 
-					//MRef<SipDialog*>(this), 
-					command.getCommandPacket()->getCSeq(), 
-					command.getCommandPacket()->getCSeqMethod(), 
-					command.getCommandPacket()->getLastViaBranch(), 
-					dialogState.callId ));
-
-		dispatcher->getLayerTransaction()->addTransaction(ir);
-		//registerTransactionToDialog(ir);
-
-		SipSMCommand cmd(command);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
 		sendNotAcceptable( command.getCommandPacket()->getDestinationBranch() );
 
 		signalIfNoTransactions();
@@ -762,23 +639,11 @@ bool SipDialogConfVoip::a20_callingnoauth_callingauth_40X( const SipSMCommand &c
 
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
-		//int seqNo = requestSeqNo();
 		++dialogState.seqNo;
-/*
-		MRef<SipTransaction*> trans( new SipTransactionInviteClient(sipStack, 
-					//MRef<SipDialog*>(this), 
-					dialogState.seqNo, 
-					"INVITE", 
-					dialogState.callId));
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		//registerTransactionToDialog(trans);
-*/		
-		//realm = resp->getRealm();
 		realm=resp->getAuthenticateProperty("realm");
-		//nonce = resp->getNonce();
 		nonce=resp->getAuthenticateProperty("nonce");
 
-		sendAuthInvite(""/*trans->getBranch()*/);
+		sendAuthInvite("");
 
 		return true;
 	}else{
@@ -859,26 +724,12 @@ bool SipDialogConfVoip::a24_calling_termwait_2xx( const SipSMCommand &command){
 	
 	if (transitionMatch(SipResponse::type, command, IGN, SipSMCommand::dialog_layer, "2**")){
 
-		//int bye_seq_no= requestSeqNo();
 		++dialogState.seqNo;
-//		setCurrentState(toState);
 
-/*
-		MRef<SipTransaction*> byetrans = new SipTransactionNonInviteClient(sipStack, 
-				//MRef<SipDialog*>(this), 
-				dialogState.seqNo, 
-				"BYE", 
-				dialogState.callId); 
-
-
-		dispatcher->getLayerTransaction()->addTransaction(byetrans);
-		//registerTransactionToDialog(byetrans);
-*/
-		sendBye(""/*byetrans->getBranch()*/, dialogState.seqNo);
+		sendBye("", dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		cmdstr.setParam3(confId);
-		//getDialogContainer()->getCallback()->sipcb_handleCommand(cmdstr);
 		sipStack->getCallback()->handleCommand("sip_conf", cmdstr );
 
 		getMediaSession()->stop();
@@ -943,17 +794,7 @@ bool SipDialogConfVoip::a26_callingauth_termwait_cancel( const SipSMCommand &com
 				SipCommandString::hang_up,
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
-//		setCurrentState(toState);
-/*
-		MRef<SipTransaction*> canceltrans( new SipTransactionNonInviteClient(sipStack, 
-					//MRef<SipDialog*>(this), 
-					dialogState.seqNo, 
-					"CANCEL", 
-					dialogState.callId)); 
-		dispatcher->getLayerTransaction()->addTransaction(canceltrans);
-		//registerTransactionToDialog(canceltrans);
-*/
-		sendCancel(""/*canceltrans->getBranch()*/);
+		sendCancel("");
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();

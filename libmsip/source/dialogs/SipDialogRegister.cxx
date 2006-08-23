@@ -114,18 +114,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		}
 			
 		++dialogState.seqNo;
-/*
-		MRef<SipTransaction*> trans = 
-			new SipTransactionNonInviteClient(
-				sipStack, 
-				//this, 
-				dialogState.seqNo, 
-				"REGISTER",
-				dialogState.callId);
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		registerTransactionToDialog(trans);
-*/
-		send_register(/*trans->getBranch()*/"");
+		send_register("");
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
@@ -190,21 +179,11 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 				"401\n407")){
 		++dialogState.seqNo;
 
-/*		MRef<SipTransaction*> trans( 
-			new SipTransactionNonInviteClient(
-				sipStack, 
-				//this, 
-				dialogState.seqNo, 
-				"REGISTER",
-				dialogState.callId));
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		registerTransactionToDialog(trans);
-*/
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 
 		updateAuthentications( *resp );
-		send_register(/*trans->getBranch()*/"");
+		send_register("");
 		//TODO: inform GUI
 
 		return true;
@@ -478,17 +457,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		}		
 		
 		++dialogState.seqNo;
-/*		MRef<SipTransaction*> trans = 
-			new SipTransactionNonInviteClient(
-				sipStack, 
-				//this, 
-				dialogState.seqNo, 
-				"REGISTER",
-				dialogState.callId);
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		registerTransactionToDialog(trans);
-*/
-		send_register(/*trans->getBranch()*/"");
+		send_register("");
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();

@@ -108,18 +108,8 @@ stop_presence|    +------+
 
 
 void SipDialogPresenceClient::createSubscribeClientTransaction(){
-	//int seqNo = requestSeqNo();
 	++dialogState.seqNo;
-/*	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, 
-			//MRef<SipDialog *>(this), 
-			dialogState.seqNo, 
-			"SUBSCRIBE", 
-			dialogState.callId);
-//	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
-	dispatcher->getLayerTransaction()->addTransaction(subscribetrans);
-	//registerTransactionToDialog(subscribetrans);
-*/
-	sendSubscribe(""/*subscribetrans->getBranch()*/);
+	sendSubscribe("");
 }
    
 

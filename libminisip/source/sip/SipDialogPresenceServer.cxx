@@ -254,17 +254,9 @@ SipDialogPresenceServer::~SipDialogPresenceServer(){
 }
 
 void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ //FIXME: use onlineStatus 
-	//int seqNo = requestSeqNo();
 	++dialogState.seqNo;
 	string cid = "FIXME"+itoa(rand());
-/*	MRef<SipTransaction*> subscribetrans = new SipTransactionNonInviteClient(sipStack, 
-			//MRef<SipDialog *>(this), 
-			dialogState.seqNo, 
-			"NOTIFY", 
-			cid);
-	dispatcher->getLayerTransaction()->addTransaction(subscribetrans);
-*/	//registerTransactionToDialog(subscribetrans);
-	sendNotify(""/*subscribetrans->getBranch()*/, user, cid);
+	sendNotify("", user, cid);
 
 }
 
@@ -277,26 +269,13 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 }
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
-/*	MRef<SipTransaction*> sr( new SipTransactionNonInviteServer(sipStack, 
-				//MRef<SipDialog*>(this),
-				sub->getCSeq(),
-				sub->getCSeqMethod(),
-				sub->getLastViaBranch(),
-				sub->getCallId()) );
-	dispatcher->getLayerTransaction()->addTransaction(sr);
-	//registerTransactionToDialog(sr);
-
-	MRef<SipMessage*> mref = *sub;
-	SipSMCommand c( mref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(c, HIGH_PRIO_QUEUE);
-*/
 	
-	MRef<SipResponse*> ok= new SipResponse(""/*sr->getBranch()*/, 200,"OK", MRef<SipMessage*>(*sub));
+	MRef<SipResponse*> ok= new SipResponse("", 200,"OK", MRef<SipMessage*>(*sub));
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-        dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+        dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 
 	sendNotice(onlineStatus, sub->getFrom().getUserIpString());

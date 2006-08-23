@@ -151,21 +151,7 @@ bool SipDialogVoipClient::a2001_start_callingnoauth_invite( const SipSMCommand &
 		//set an "early" remoteUri ... we will update this later
 		dialogState.remoteUri= command.getCommandString().getParam();
 
-/*		
-		MRef<SipTransaction*> invtrans = new SipTransactionInviteClientUA(sipStack, 
-				//MRef<SipDialog *>(this), 
-				dialogState.seqNo,
-				"INVITE",
-				dialogState.callId);
-		
-		invtrans->setSocket( phoneconf->proxyConnection );
-		
- 		notifyEarlyTermination = true; // set to true, once sent the first command, set to false
-		
-		dispatcher->getLayerTransaction()->addTransaction(invtrans);
-		//registerTransactionToDialog(invtrans);
-*/
-		sendInvite(""/*invtrans->getBranch()*/);
+		sendInvite("");
 
 		return true;
 	}else{
@@ -283,26 +269,6 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 bool SipDialogVoipClient::a2005_callingnoauth_termwait_CANCEL( const SipSMCommand &command)
 {
 	if (transitionMatch("CANCEL", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
-//		setCurrentState(toState);
-
-/*		MRef<SipTransaction*> cancelresp( 
-				new SipTransactionNonInviteServer(
-					sipStack,
-					//MRef<SipDialog*>(this), 
-					command.getCommandPacket()->getCSeq(), 
-					command.getCommandPacket()->getCSeqMethod(), 
-					command.getCommandPacket()->getLastViaBranch(), 
-					dialogState.callId ));
-
-		dispatcher->getLayerTransaction()->addTransaction(cancelresp);
-		//registerTransactionToDialog(cancelresp);
-
-
-		SipSMCommand cmd(command);
-		cmd.setSource(SipSMCommand::dialog_layer);
-		cmd.setDestination(SipSMCommand::transaction_layer);
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
-*/
 		getMediaSession()->stop();
 		signalIfNoTransactions();
 		return true;
@@ -321,22 +287,8 @@ bool SipDialogVoipClient::a2006_callingnoauth_termwait_cancel( const SipSMComman
 				SipCommandString::hang_up,
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
-//		setCurrentState(toState);
 
-/*
-		string inv_branch = getLastInvite()->getFirstViaBranch();
-		MRef<SipTransaction*> canceltrans( 
-				new SipTransactionNonInviteClient(sipStack, 
-					//MRef<SipDialog*>( this ), 
-					dialogState.seqNo, 
-					"CANCEL", 
-					dialogState.callId)); 
-
-		canceltrans->setBranch(inv_branch);
-		dispatcher->getLayerTransaction()->addTransaction(canceltrans);
-		//registerTransactionToDialog(canceltrans);
-*/
- 		sendCancel(""/*inv_branch*/);
+ 		sendCancel("");
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -405,23 +357,12 @@ bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMComman
 		dialogState.updateState( resp ); //nothing will happen ... 4xx responses do not update ...
 
 		++dialogState.seqNo;
-/*
-		MRef<SipTransaction*> trans( 
-			new SipTransactionInviteClientUA(sipStack, 
-				//MRef<SipDialog*>(this), 
-				dialogState.seqNo, 
-				"INVITE", 
-				dialogState.callId));
-		dispatcher->getLayerTransaction()->addTransaction(trans);
-		//registerTransactionToDialog(trans);
-*/		
-		//realm = resp->getRealm();
+
 		realm = resp->getAuthenticateProperty("realm");
-		//nonce = resp->getNonce();
 		nonce = resp->getAuthenticateProperty("nonce");
 
 		updateAuthentications( resp );
-		sendInvite(""/*trans->getBranch()*/);
+		sendInvite("");
 
 		return true;
 	}else{
@@ -524,18 +465,7 @@ bool SipDialogVoipClient::a2012_calling_termwait_2xx( const SipSMCommand &comman
 
 		++dialogState.seqNo;
 
-/*
-		MRef<SipTransaction*> byetrans = 
-			new SipTransactionNonInviteClient(sipStack, 
-				//MRef<SipDialog*>(this), 
-				dialogState.seqNo, 
-				"BYE", 
-				dialogState.callId); 
-
-		dispatcher->getLayerTransaction()->addTransaction(byetrans);
-		//registerTransactionToDialog(byetrans);
-*/		
-		sendBye(""/*byetrans->getBranch()*/, dialogState.seqNo);
+		sendBye("", dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		sipStack->getCallback()->handleCommand("gui", cmdstr);
@@ -574,21 +504,9 @@ bool SipDialogVoipClient::a2014_callingauth_termwait_cancel( const SipSMCommand 
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
-//		setCurrentState(toState);
 		string inv_branch = getLastInvite()->getFirstViaBranch();
 
-/*	
-		MRef<SipTransaction*> canceltrans( 
-			new SipTransactionNonInviteClient(sipStack, 
-				//MRef<SipDialog*>(this), 
-				dialogState.seqNo, 
-				"CANCEL", 
-				dialogState.callId)); 
-		canceltrans->setBranch(inv_branch);
-		dispatcher->getLayerTransaction()->addTransaction(canceltrans);
-		//registerTransactionToDialog(canceltrans);
-*/
-		sendCancel(""/*inv_branch*/);
+		sendCancel("");
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
