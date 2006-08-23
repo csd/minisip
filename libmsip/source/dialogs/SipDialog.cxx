@@ -103,7 +103,7 @@ void SipDialog::signalIfNoTransactions(){
 			// transactions), and can be placed in the end of the queue. 
 			// It is placed in the high prio queue so that it is guaranteed 
 			// to be deleted even under high load.
-			dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/); 
+			dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE); 
 		}
 	}
 }

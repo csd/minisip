@@ -62,7 +62,7 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 		cmd.setSource(SipSMCommand::transaction_layer);
 		cmd.setDestination(SipSMCommand::dialog_layer);
 		
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		
 		return true;
 	}else{
@@ -170,13 +170,13 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE);
 		
 		
 		return true;
@@ -219,13 +219,13 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE */);
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 
 		
 		return true;
@@ -247,7 +247,7 @@ bool SipTransactionNonInviteServer::a9_completed_terminated_timerJ(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		
 		return true;

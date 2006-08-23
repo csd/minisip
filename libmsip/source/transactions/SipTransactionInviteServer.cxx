@@ -113,7 +113,7 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
 		cmd.setSource(SipSMCommand::transaction_layer);
 		cmd.setDestination(SipSMCommand::dialog_layer);
 //		cmd.setSource(SipSMCommand::transaction);
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		
 		//update dialogs route set ... needed to add route headers to the ACK we are going to send
 		
@@ -233,13 +233,13 @@ bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMComman
 		SipSMCommand cmd( CommandString(callId, SipCommandString::transport_error), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 		return false;
@@ -268,7 +268,7 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 		return false;
@@ -364,13 +364,13 @@ bool SipTransactionInviteServer::a9_completed_terminated_errOrTimerH( const SipS
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -392,7 +392,7 @@ bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCom
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{

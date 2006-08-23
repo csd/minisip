@@ -172,7 +172,7 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 				command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		MRef<SipResponse*> resp =(SipResponse *)*command.getCommandPacket();
 		
@@ -207,7 +207,7 @@ bool SipTransactionInviteClient::a3_calling_completed_resp36( const SipSMCommand
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		//assert(dialog);
 		//TODO/XXX/FIXME: Do this in the TU instead
@@ -243,13 +243,13 @@ bool SipTransactionInviteClient::a4_calling_terminated_ErrOrTimerB( const SipSMC
 			SipSMCommand::dialog_layer
 			);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -271,7 +271,7 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 
 		//FIXME/XXX/TODO: Implement setDialogRouteSet in TU instead
@@ -287,7 +287,7 @@ bool SipTransactionInviteClient::a5_calling_terminated_2xx( const SipSMCommand &
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -308,7 +308,7 @@ bool SipTransactionInviteClient::a6_proceeding_proceeding_1xx( const SipSMComman
 
 		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		//assert(dialog);
 		//TODO/XXX/FIXME: Do this in the TU instead
@@ -337,7 +337,7 @@ bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMComman
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		//update dialogs route set ... needed to add route headers to the ACK we are going to send
 		//setDialogRouteSet( (SipResponse*)*command.getCommandPacket() ); 
@@ -349,7 +349,7 @@ bool SipTransactionInviteClient::a7_proceeding_terminated_2xx( const SipSMComman
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 	
 		return true;
 	}else{
@@ -376,7 +376,7 @@ bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMComm
 		SipSMCommand cmd( command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		//assert(dialog);
 		//IN TU instead TODO/XXX/FIXME
@@ -417,13 +417,13 @@ bool SipTransactionInviteClient::a10_completed_terminated_TErr( const SipSMComma
 		SipSMCommand cmd( CommandString( callId, SipCommandString::transport_error), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 		
 		return true;
 	}else{
@@ -441,7 +441,7 @@ bool SipTransactionInviteClient::a11_completed_terminated_timerD( const SipSMCom
 		    CommandString( callId, SipCommandString::transaction_terminated),
 		    SipSMCommand::transaction_layer,
 		    SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 	    return false;

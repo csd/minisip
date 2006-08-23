@@ -100,7 +100,7 @@ bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand
 				command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer );
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		
 		return true;
 	}else{
@@ -120,13 +120,13 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 				CommandString( callId, SipCommandString::transport_error),
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 		SipSMCommand cmdterminated(
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE */);
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE);
 		
 		
 		return true;
@@ -152,7 +152,7 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 		SipSMCommand cmd(pref, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 		
 		return true;
@@ -192,7 +192,7 @@ bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCom
 				SipSMCommand::dialog_layer);
 		cancelTimeout("timerE");
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		return true;
 	}else{
@@ -218,13 +218,13 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
 
 		
 		return true;
@@ -245,7 +245,7 @@ bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMC
 				command.getCommandPacket(), 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		if( isUnreliable() ) 
 			requestTimeout(sipStack->getTimers()->getK(), "timerK");
@@ -292,7 +292,7 @@ bool SipTransactionNonInviteClient::a9_completed_terminated_timerK( const SipSMC
 			CommandString( callId, SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_FIRST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		return true;
 	}else{

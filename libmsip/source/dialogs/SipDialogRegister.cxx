@@ -154,7 +154,7 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 		
 		//this is for the shutdown dialog 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
 
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
@@ -305,7 +305,7 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		}		
 		//this is for the shutdown dialog 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
 		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
@@ -369,7 +369,7 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 		}
 		//this is for the shutdown dialog 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ ); 
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
 		
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
@@ -483,7 +483,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dispatcher);
 		
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -707,6 +707,6 @@ void SipDialogRegister::send_register(string branch){
 	addRoute( reg );
 
 	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
