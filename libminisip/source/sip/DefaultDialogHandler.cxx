@@ -30,7 +30,6 @@
 #include<libmnetutil/NetworkException.h>
 
 #include<libmsip/SipDialogRegister.h>
-//#include<libmsip/SipDialogContainer.h>
 
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
@@ -38,10 +37,6 @@
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipTransactionInviteServer.h>
-#include<libmsip/SipTransactionInviteServerUA.h>
-#include<libmsip/SipTransactionNonInviteServer.h>
-#include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmutil/massert.h>
 
 #include<libminisip/sip/SipDialogVoipServer.h>

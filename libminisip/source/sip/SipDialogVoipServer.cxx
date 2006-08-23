@@ -36,9 +36,6 @@
 
 #include<libmutil/massert.h>
 
-#include<libmsip/SipTransactionInviteServerUA.h>
-#include<libmsip/SipTransactionNonInviteClient.h>
-#include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
