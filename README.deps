@@ -17,6 +17,7 @@ autoconf		2.13?			2.59
 automake		1.4?			1.9.6
 libtool			1.5.7!?			1.5.22	
 GNU make		3.79?			3.80
+gawk						3.1.5
 
 If the minimum version is suffixed with an exclamation mark ('!'), 
 earlier versions are known to have problems.  You can expect to have
