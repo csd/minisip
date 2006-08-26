@@ -1,7 +1,7 @@
 Minisip Build and Project Dependencies
 --------------------------------------
 by Zachary T Welch <zw@superlucidity.net>
-Last Updated: May 16, 2006
+Last Updated: Aug 25, 2006
 
 ===========
 Build Tools
@@ -12,11 +12,11 @@ that are required to build the minisip projects:
 
 			Minimum Version		Latest Tested
 pkg-config		0.19			0.20
-gcc			2.95?, 3.0?, 4.0?	3.3.6, 3.4.5, 4.1.0
-autoconf		2.13?			2.59
+gcc			2.95?, 3.0?, 4.0?	3.3.6, 3.4.5, 4.1.2
+autoconf		2.13?			2.60
 automake		1.4?			1.9.6
 libtool			1.5.7!?			1.5.22	
-GNU make		3.79?			3.80
+GNU make		3.79?			3.81
 gawk						3.1.5
 
 If the minimum version is suffixed with an exclamation mark ('!'), 
