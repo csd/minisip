@@ -143,13 +143,6 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 			merr << "No MIME match" << end;
 			return false;
 		}
-#ifdef IPSEC_SUPPORT
-		// Check if IPSEC was required
-		if (ipsecSession->required() && !ipsecSession->offered){
-			cerr << "I require IPSEC or nothing at all!" << endl;
-			return false;
-		}
-#endif
 		
 //		cerr << "EEEEEEEE: finding transaction and adding to dialogs set"<<endl;
 //		MRef<SipTransaction*> trans = dispatcher->getLayerTransaction()->findTransaction(branch);
@@ -404,14 +397,8 @@ void SipDialogVoipServer::setUpStateMachine(){
 }
 
 
-#ifdef IPSEC_SUPPORT
-SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-		SipDialogVoip(stack,callconfig,pconf,mediaSession,cid,ipsecSession)
-#else
 SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
 		SipDialogVoip(stack, callconfig, pconf, mediaSession, cid) 
-#endif
-
 {
 	setUpStateMachine();
 }
@@ -457,36 +444,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-#ifdef IPSEC_SUPPORT	
-	// Create a MIKEY message for IPSEC if stated in the config file.
-	MRef<SipMimeContent*> mikey;
-	if (getIpsecSession()->required()){
-		ts.save("getMikeyIpsecAnswer");
-		mikey = ipsecSession->getMikeyIpsecAnswer();
-		ts.save("getMikeyIpsecAnswer");
-		if (!mikey){
-			merr << "Mikey was NULL in sendInviteOk" << end;
-			merr << "Still some errors with IPSEC" << end;
-			//return; 
-		}
-	}
-	else
-		mikey = NULL;
-	MRef<SipMimeContent*> multi;
-	if (mikey && mediaSession){
-		multi = new SipMimeContent("multipart/mixed");
-		multi->addPart(*mikey);
-		multi->addPart(*sdp);
-		ok->setContent( *multi);
-	}
-	if (mikey && !mediaSession)
-		ok->setContent( *mikey);
-	if (!mikey && mediaSession)
-		ok->setContent( *sdp );
-#else
-	
 	ok->setContent( *sdp );
-#endif
 //-------------------------------------------------------------------------------------------------------------//
 //	/* Get the SDP Answer from the MediaSession */
 //	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();

@@ -197,15 +197,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
         cerr << "After new mediaSession" << endl;
 #endif
 	
-#ifdef IPSEC_SUPPORT
-	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
-	string callID = "";
-	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, callconf, phoneconfig, mediaSession, callID, ipsecSession )); 
-	
-#else	
 	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, callconf, phoneconfig, mediaSession)); 
-
-#endif
 
 #ifdef DEBUG_OUTPUT
 	cerr << "Before addDialog" << endl;
@@ -314,15 +306,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 
-#ifdef IPSEC_SUPPORT
-	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
-	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, conflist, confId, callID, ipsecSession)); 
-
-#else	
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
-
-#endif
 
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 
@@ -414,15 +398,7 @@ string Sip::confconnect(string &user, string confId){
 MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 
-#ifdef IPSEC_SUPPORT
-	MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), securityConfig);
-	string callID = "";
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, confId, callID, ipsecSession)); 
-	
-#else	
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, confId)); 
-
-#endif
 
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 	

@@ -44,10 +44,6 @@
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
-#ifdef IPSEC_SUPPORT
-#	include<libminisip/ipsec/MsipIpsecAPI.h>
-#endif
-
 class Session;
 class SipDialogContainer;
 class SipDialogConfig;
@@ -55,20 +51,11 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogVoip: public SipDialog{
 	public:
-/*#ifdef IPSEC_SUPPORT
-		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
-#else
-		SipDialogVoip(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
-
-#endif		*/
 		SipDialogVoip(	MRef<SipStack*> stack,
 						MRef<SipDialogConfig*> callconfig,
 						MRef<SipSoftPhoneConfiguration*> pconf,
 						MRef<Session *> mediaSession,
 						std::string cid=""
-					#ifdef IPSEC_SUPPORT
-						, MRef<MsipIpsecAPI *> ipsecSession = NULL
-					#endif
 					);
 		virtual ~SipDialogVoip();
 
@@ -83,9 +70,6 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 
 	
 		MRef<Session *> getMediaSession();
-#ifdef IPSEC_SUPPORT
-		MRef<MsipIpsecAPI *> getIpsecSession();
-#endif
 
 	protected:
 		void sendBye(const std::string &branch, int);
@@ -143,9 +127,6 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		MRef<SipRequest*> lastInvite;
 		MRef<SipRequest*> lastRefer;
 
-#ifdef IPSEC_SUPPORT
-		MRef<MsipIpsecAPI *> ipsecSession;
-#endif
 };
 
 #endif

@@ -124,13 +124,6 @@ bool SipDialogVoipServer100rel::a4001_start_100rel_100relINVITE( const SipSMComm
 			merr << "No MIME match" << end;
 			return false;
 		}
-#ifdef IPSEC_SUPPORT
-		// Check if IPSEC was required
-		if (ipsecSession->required() && !ipsecSession->offered){
-			cerr << "I require IPSEC or nothing at all!" << endl;
-			return false;
-		}
-#endif
 		
 		//The transaction layer must receive to this message as
 		//well. We re-post it with the transaction layer
@@ -276,14 +269,8 @@ void SipDialogVoipServer100rel::setUpStateMachine(){
 }
 
 
-#ifdef IPSEC_SUPPORT
-SipDialogVoipServer100rel::SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-		SipDialogVoipServer(stack,callconfig,pconf,mediaSession,cid,ipsecSession)
-#else
 SipDialogVoipServer100rel::SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
 		SipDialogVoipServer(stack, callconfig, pconf, mediaSession, cid) 
-#endif
-
 {
 	setUpStateMachine();
 }

@@ -251,11 +251,6 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
 
-#ifdef IPSEC_SUPPORT
-		// Check if IPSEC was required
-		if (ipsecSession->required() && !ipsecSession->offered)
-			return false;
-#endif
 		return true;
 	}else{
 		return false;
@@ -444,11 +439,7 @@ bool SipDialogVoipClient::a2011_callingauth_incall_2xx( const SipSMCommand &comm
 
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
-#ifdef IPSEC_SUPPORT
-		// Check if IPSEC was required
-		if (ipsecSession->required() && !ipsecSession->offered)
-			return false;
-#endif
+
 		return true;
 	}else{
 		return false;
@@ -635,15 +626,8 @@ void SipDialogVoipClient::setUpStateMachine(){
 }
 
 
-#ifdef IPSEC_SUPPORT
-SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid, MRef<MsipIpsecAPI *> ipsecSession) : 
-		SipDialogVoip(stack,callconfig,pconf,mediaSession,cid,ipsecSession), 
-		ipsecSession(ipsecSession)
-#else
 SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
 		SipDialogVoip(stack, callconfig, pconf, mediaSession, cid)  
-#endif
-
 {
 	setUpStateMachine();
 }
@@ -699,35 +683,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-#ifdef IPSEC_SUPPORT	
-	// Create a MIKEY message for IPSEC if stated in the config file.
-	MRef<SipMimeContent*> mikey;
-	if (getIpsecSession()->required()){
-		ts.save("getMikeyIpsecOffer");
-		mikey = ipsecSession->getMikeyIpsecOffer();
-		ts.save("getMikeyIpsecOffer");
-		if (!mikey){
-			merr << "Mikey was NULL" << end;
-			merr << "Still some errors with IPSEC" << end;
-			//return; 
-		}
-	}
-	else
-		mikey = NULL;
-	MRef<SipMimeContent*> multi;
-	if (mikey && mediaSession){
-		multi = new SipMimeContent("multipart/mixed");
-		multi->addPart(*mikey);
-		multi->addPart(*sdp);
-		inv->setContent( *multi);
-	}
-	if (mikey && !mediaSession)
-		inv->setContent( *mikey);
-	if (!mikey && mediaSession)
-		inv->setContent( *sdp );
-#else
 	inv->setContent( *sdp );
-#endif
 //-------------------------------------------------------------------------------------------------------------//
 	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
@@ -803,36 +759,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-#ifdef IPSEC_SUPPORT	
-	// Create a MIKEY message for IPSEC if stated in the config file.
-	MRef<SipMimeContent*> mikey;
-	if (getIpsecSession()->required()){
-		ts.save("getMikeyIpsecAnswer");
-		mikey = ipsecSession->getMikeyIpsecAnswer();
-		ts.save("getMikeyIpsecAnswer");
-		if (!mikey){
-			merr << "Mikey was NULL in sendInviteOk" << end;
-			merr << "Still some errors with IPSEC" << end;
-			//return; 
-		}
-	}
-	else
-		mikey = NULL;
-	MRef<SipMimeContent*> multi;
-	if (mikey && mediaSession){
-		multi = new SipMimeContent("multipart/mixed");
-		multi->addPart(*mikey);
-		multi->addPart(*sdp);
-		ok->setContent( *multi);
-	}
-	if (mikey && !mediaSession)
-		ok->setContent( *mikey);
-	if (!mikey && mediaSession)
-		ok->setContent( *sdp );
-#else
-	
 	ok->setContent( *sdp );
-#endif
 //-------------------------------------------------------------------------------------------------------------//
 //	/* Get the SDP Answer from the MediaSession */
 //	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();

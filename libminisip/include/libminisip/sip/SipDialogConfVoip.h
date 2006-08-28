@@ -45,10 +45,6 @@
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 
-#ifdef IPSEC_SUPPORT
-#	include<libminisip/ipsec/MsipIpsecAPI.h>
-#endif
-
 class Session;
 class SipDialogContainer;
 class SipDialogConfig;
@@ -56,18 +52,10 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 	public:
-#ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
-#else
 		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
-#endif
-#ifdef IPSEC_SUPPORT
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
-#else
+		
 		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
 
-
-#endif		
 		virtual ~SipDialogConfVoip();
 
 		virtual std::string getMemObjectType(){return "SipDialogConfVoip";}
@@ -79,12 +67,9 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 
 	
 		MRef<Session *> getMediaSession();
-#ifdef IPSEC_SUPPORT
-		MRef<MsipIpsecAPI *> getIpsecSession();
-#endif
+		
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
-		//void handleSdp(MRef<SdpPacket*> );
 		MRef<LogEntry *> getLogEntry();
 		void setLogEntry( MRef<LogEntry *> );
 	private:
@@ -154,12 +139,6 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 		std::string realm;
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<Session *> mediaSession;
-
-#ifdef IPSEC_SUPPORT
-		MRef<MsipIpsecAPI *> ipsecSession;
-		string list;
-		
-#endif
 
 };
 

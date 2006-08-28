@@ -5,8 +5,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/gui/Gui.h \
 			libminisip/gui/Bell.h \
 			libminisip/gui/ConsoleDebugger.h \
-			libminisip/ipsec/MsipIpsecAPI.h \
-			libminisip/ipsec/libpfkey.h \
 			libminisip/mediahandler/MediaCommandString.h \
 			libminisip/mediahandler/RtpReceiver.h \
 			libminisip/mediahandler/DtmfSender.h \

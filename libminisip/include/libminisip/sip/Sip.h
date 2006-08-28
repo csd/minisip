@@ -33,10 +33,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipStack.h>
 
-#ifdef IPSEC_SUPPORT
-#	include<libminisip/ipsec/MsipIpsecAPI.h>
-#endif
-
 #include<libminisip/sdp/SdpPacket.h>
 #include<libminisip/conference/ConfMember.h>
 #include<libminisip/gui/LogEntry.h>

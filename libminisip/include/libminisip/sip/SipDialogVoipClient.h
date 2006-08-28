@@ -45,9 +45,6 @@
 
 #include<libminisip/sip/SipDialogVoip.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#ifdef IPSEC_SUPPORT
-#	include<libminisip/ipsec/MsipIpsecAPI.h>
-#endif
 
 class Session;
 class SipDialogContainer;
@@ -56,12 +53,8 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 	public:
-#ifdef IPSEC_SUPPORT
-		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession,  std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
-#else
 		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
-#endif		
 		virtual ~SipDialogVoipClient();
 
 		virtual void dummy(){}

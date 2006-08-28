@@ -192,21 +192,6 @@ if test ! x$enable_portaudio = xno; then
 fi
 AM_CONDITIONAL([PORTAUDIO_SUPPORT], [test x$have_portaudio = xyes])
 
-
-dnl #############
-dnl IPSEC SUPPORT
-dnl #############
-AC_ARG_ENABLE(ipsec-enable,
-    AS_HELP_STRING([--enable-ipsec-enable],
-    	[enable ipsec features (default disabled).]),
-    [	if "${enable_ipsec}" = "yes"
-        then
-	    AC_CHECK_LIB([ipsec], [main], [], [AC_MSG_ERROR(
-	      [Could not locate libipsec, required for ipsec features.])])
-	    AC_DEFINE(IPSEC_SUPPORT, [], [Adding ipsec support])
-        fi ])
-AM_CONDITIONAL(IPSEC_SUPPORT, test "${enable_ipsec}" = "yes")
-
 dnl P2T support
 AC_ARG_ENABLE(p2t,
     AS_HELP_STRING([--enable-p2t],

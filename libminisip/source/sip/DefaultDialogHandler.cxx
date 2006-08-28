@@ -57,10 +57,6 @@
 
 #include<libminisip/mediahandler/MediaHandler.h>
 
-#ifdef IPSEC_SUPPORT
-#	include<../ipsec/MsipIpsecAPI.h>
-#endif
-
 
 #include<libmutil/dbg.h>
 
@@ -211,20 +207,9 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 				callConf->useIdentity( id, false );
 			}
 
-#ifdef IPSEC_SUPPORT
-			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-
-			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
-			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
-			//BM is it safe to pass the list like this?
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack->getConfCallback(),sipStack, callConf, 
-						phoneconf, mediaSession, &connectList,confid, pkt->getCallId(), ipsecSession )); 
-
-#else	
 
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()), sipStack, callConf, 
 						phoneconf, mediaSession, &connectList,confid, pkt->getCallId()));
-#endif
 			sipStack->addDialog(voipConfCall);
 
 			
@@ -266,20 +251,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 				callConf->useIdentity( id, false );
 			}
 
-#ifdef IPSEC_SUPPORT
-			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-
-			//MRef<SipDialogVoip*> voipCall = new SipDialogVoip(getDialogContainer(), callConf, 
-			//					phoneconf, mediaSession, pkt->getCallId(), ipsecSession ); 
-			//BM is it safe to pass the list like this?
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(sipStack, callConf, 
-						phoneconf, mediaSession, confid, pkt->getCallId(), ipsecSession )); 
-
-#else	
-
 			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()),sipStack, callConf, 
 						phoneconf, mediaSession, confid, pkt->getCallId()));
-#endif
 			sipStack->addDialog(voipConfCall);
 
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
@@ -309,13 +282,6 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 				callConf->useIdentity( id, false );
 			}
 
-#ifdef IPSEC_SUPPORT
-			MRef<MsipIpsecAPI *> ipsecSession = new MsipIpsecAPI(mediaHandler->getExtIP(), phoneconf->securityConfig);
-
-			MRef<SipDialog*> voipCall( new SipDialogVoipServer(sipStack, callConf, 
-						phoneconf, mediaSession, pkt->getCallId(), ipsecSession )); 
-
-#else	
 			MRef<SipDialog*> voipCall;
 //			if (pkt->supported("100rel")){
 //				voipCall = new SipDialogVoipServer100rel(sipStack,
@@ -330,7 +296,6 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 						mediaSession,
 						pkt->getCallId());
 //			}
-#endif
 			sipStack->addDialog(voipCall);
 
 

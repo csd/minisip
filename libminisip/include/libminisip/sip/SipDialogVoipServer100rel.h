@@ -50,10 +50,6 @@
 #include"SipSoftPhoneConfiguration.h"
 #include"SipDialogVoipServer.h"
 
-#ifdef IPSEC_SUPPORT
-#include<../ipsec/MsipIpsecAPI.h>
-#endif
-
 class Session;
 class SipDialogContainer;
 class SipDialogConfig;
@@ -61,12 +57,8 @@ class LogEntry;
 
 class SipDialogVoipServer100rel: public SipDialogVoipServer{
 	public:
-#ifdef IPSEC_SUPPORT
-		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="", MRef<MsipIpsecAPI *> ipsecSession=NULL);
-#else
 		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
-#endif		
 		virtual ~SipDialogVoipServer100rel();
 
 		virtual std::string getMemObjectType(){return "SipDialogVoipServer100rel";}

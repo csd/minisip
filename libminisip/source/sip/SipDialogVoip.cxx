@@ -249,14 +249,6 @@ bool SipDialogVoip::a1003_byerequest_termwait_26( const SipSMCommand &command){
 		SipSMCommand cmd( earlystr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
 
-
-#ifdef IPSEC_SUPPORT
-		if(ipsecSession){
-			cerr << "Clearing" << endl;
-			if(ipsecSession->stop() != 0)
-				cerr << "Not all IPSEC parameters were confired cleared. Check and remove manually." << endl;
-		}
-#endif
 		return true;
 	}else{
 		return false;
@@ -281,13 +273,6 @@ bool SipDialogVoip::a1101_termwait_terminated_notransactions( const SipSMCommand
                 //CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
                 //sipStack->getCallback()->handleCommand("gui", cmdstr );
 
-#ifdef IPSEC_SUPPORT
-                if(ipsecSession){
-                        cerr << "Clearing" << endl;
-                        if(ipsecSession->stop() != 0)
-                                cerr << "Not all IPSEC parameters were confired cleared. Check and remove manually." << endl;
-                }
-#endif
                 return true;
         }else{
                 return false;
@@ -596,18 +581,11 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 				MRef<SipDialogConfig*> callconfig, 
 				MRef<SipSoftPhoneConfiguration*> pconf, 
 				MRef<Session *> mediaSession, 
-				string cid
-#ifdef IPSEC_SUPPORT
-				, MRef<MsipIpsecAPI *> ipsecSession
-#endif
-				) :
+				string cid ) :
 		SipDialog(stack,callconfig),
 		phoneconf(pconf),
 		mediaSession(mediaSession),
 		lastInvite(NULL)
-#ifdef IPSEC_SUPPORT
-		, ipsecSession(ipsecSession)
-#endif
 {
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
@@ -787,12 +765,6 @@ MRef<Session *> SipDialogVoip::getMediaSession(){
 	return mediaSession;
 }
 
-#ifdef IPSEC_SUPPORT
-MRef<MsipIpsecAPI *> SipDialogVoip::getIpsecSession(){
-	return ipsecSession;
-}
-#endif
-
 bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
 	if (Offer){
 		if ( Offer->getContentType().substr(0,9) == "multipart"){
@@ -803,26 +775,7 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 				part = ((SipMimeContent*)*Offer)->popFirstPart();
 			}
 		}
-#ifdef IPSEC_SUPPORT
-		if( (Offer->getContentType()).substr(0,17) == "application/mikey"){
-			switch (type){
-				case 10:
-					ts.save("setMikeyIpsecOffer");
-					if(!getIpsecSession()->setMikeyIpsecOffer((SipMimeContent*)*Offer))
-						return false;
-					ts.save("setMikeyIpsecOffer");
-					return true;
-				case 3:
-					ts.save("setMikeyIpsecAnswer");
-					if(!getIpsecSession()->setMikeyIpsecAnswer((SipMimeContent*)*Offer))
-						return false;
-					ts.save("setMikeyIpsecAnswer");
-					return true;
-				default:
-					return false;
-			}
-		}
-#endif
+
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
 			switch (type){
 				case 10:

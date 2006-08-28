@@ -69,10 +69,6 @@ mgsm_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GSM_LIBS)
 endif
 
 
-if IPSEC_SUPPORT
-        libipsecapi_src = source/ipsec/MsipIpsecAPI.cxx
-endif
-
 libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/Session.cxx \
 			source/mediahandler/MediaStream.cxx \
@@ -413,7 +409,6 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libconfigbackend_src) \
 			$(libcontactdb_src) \
 			$(libgui_src) \
-			$(libipsecapi_src) \
 			$(libipprovider_src) \
 			$(libmediahandler_src) \
 			$(libp2t_src) \

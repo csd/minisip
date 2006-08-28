@@ -51,7 +51,6 @@ class LIBMINISIP_API SipDialogSecurityConfig{
 		int ka_type;
 
 		bool use_srtp;		
-		bool use_ipsec;
 		bool use_zrtp;
 		
 		MRef<certificate_chain *> cert;

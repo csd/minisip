@@ -39,7 +39,6 @@ SipDialogSecurityConfig::SipDialogSecurityConfig():
 	ka_type(0),
 	use_srtp(false),
 	use_zrtp(false),
-	use_ipsec(false),
 	cert(NULL),
 	cert_db(NULL),
 	psk_enabled(false),
@@ -55,7 +54,6 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 	backend->save("secured", secured?string("yes"): string("no"));
 
 	backend->save("use_srtp", use_srtp?string("yes"): string("no"));
-	backend->save("use_ipsec", use_ipsec?string("yes"): string("no"));
 	if (use_srtp) {
 	    backend->save("use_zrtp", use_zrtp ? string("yes") : string("no"));
 	}
@@ -142,7 +140,6 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 
 	secured = backend->loadString("secured","no")=="yes";
 	use_srtp = backend->loadString("use_srtp","no")=="yes";		
-	use_ipsec = backend->loadString("use_ipsec","no")=="yes";
 	if (use_srtp) {
 	    use_zrtp = backend->loadString("use_zrtp", "no") == "yes";
 	}
