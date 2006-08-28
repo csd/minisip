@@ -131,8 +131,7 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 		SipStack( MRef<SipCommonConfig*> stackConfig,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
-				MRef<ca_db *> cert_db = NULL//,
-				/*MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> tp= NULL*/
+				MRef<ca_db *> cert_db = NULL
 			  );
 
 		void setTransactionHandlesAck(bool transHandleAck);

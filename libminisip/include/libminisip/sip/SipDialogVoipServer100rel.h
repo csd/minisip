@@ -47,8 +47,8 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
-#include"SipSoftPhoneConfiguration.h"
-#include"SipDialogVoipServer.h"
+#include<libminisip/SipSoftPhoneConfiguration.h>
+#include<libminisip/SipDialogVoipServer.h>
 
 class Session;
 class SipDialogContainer;
