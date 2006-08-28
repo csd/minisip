@@ -1,31 +1,41 @@
 /*
-  Copyright (C) 2006 Werner Dittmann 
- 
+  Copyright (C) 2006 Werner Dittmann
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
- 
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
- 
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
   USA
 */
 
-/*
- * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
- */
-
 #ifndef _ZRTPSTATECLASS_H_
 #define _ZRTPSTATECLASS_H_
 
 #include <libminisip/zrtp/ZrtpStates.h>
 #include <libminisip/zrtp/ZrtpPacketBase.h>
+
+/**
+ * This class is the ZRTP protocol state engine.
+ *
+ * This class is responsible to handle the ZRTP protocol. It does not
+ * handle the ZRTP HMAC, DH, and other data management. This is done in
+ * class ZRtp which is the parent of this class.
+ *
+ * <p/>
+ *
+ * The methods of this class implement the ZRTP state actions.
+ *
+ * @author Werner Dittmann <Werner.Dittmann@t-online.de>
+ */
 
 // The ZRTP states
 enum zrtpStates {
@@ -53,7 +63,8 @@ enum EventDataType {
     ZrtpInitial = 1,
     ZrtpClose,
     ZrtpPacket,
-    Timer
+    Timer,
+    ZrtpGoClear
 };
 
 typedef struct Event {
@@ -88,16 +99,6 @@ typedef struct zrtpTimer {
 
 class ZRtp;
 
-/**
- * This class is the ZRTP protocol state engine.  This class is
- * responsible to handle the ZRTP protocol. It does not handle the
- * ZRTP HMAC, DH, and other data management. This is done in class
- * ZRtp which is the parent of this class.
- *
- * <p/>
- * 
- * The methods of this class implement the ZRTP state actions.
- */
 class ZrtpStateClass {
 
 private:
@@ -162,7 +163,7 @@ public:
      *   -1 resend counter exceeded
      */
     int32_t nextTimer(zrtpTimer_t *t);
-    
+
     /**
      * Cancel the active timer.
      *

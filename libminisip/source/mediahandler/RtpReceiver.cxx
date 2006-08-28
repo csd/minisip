@@ -240,69 +240,26 @@ void RtpReceiver::run(){
                     std::list<MRef<Codec *> >::iterator iC;
                     int found = 0;
 			//printf( "|" );
-#ifdef ZRTP_SUPPORT
-                    /*
-                     * If this packet is a Zfone special packet then don't look
-                     * for a codec. Skip to ZRTP processing. Note: this is Zfone
-                     * specific - other ZRTP implementations can do without this
-                     * specific marker SSRC.
-                    */
-                    if (packet->getHeader().getSSRC() != 0xdeadbeef) {
-#endif
-                        for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-                            if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
-                                (*i)->handleRtpPacket( packet, from );
-                                found = 1;
-                                //printf( "~" );
-                                break;
-                            }
-			}
-#ifdef ZRTP_SUPPORT
+                    for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+                        if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
+                            (*i)->handleRtpPacket( packet, from );
+                            found = 1;
+                            //printf( "~" );
+                            break;
+                        }
                     }
+#ifdef ZRTP_SUPPORT
                     /*
                      * If we come to this point:
-                     * - this packet contains the special marker SSRC
-                     *    or
-                     * - no codec was found for this packet.
-                     * In both cases we need to check if this is a ZRTP packet.
-                     *
-                     * TODO: handle list of host bridges because a
-                     * receiver may support several RTP sessions
-                     * from different peers.
+                     * no codec was found for this packet.
                      */
                     MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
-                    uint32_t packetSsrc = packet->getHeader().getSSRC();
 
-                    /*
-                     * In case this is not a special Zfone packet and we
-                     * have not seen a packet with a valid SSRC then set
-                     * the found SSRC as the stream's SSRC. We need the real
-                     * SSRC for encryption/decryption. Thus we rely on the fact
-                     * that we receive at least one real RTP packet, i.e. not
-                     * a Zfone ZRTP packet from our peer before we do some
-                     * SRTP encryption/decryption. This is usually the case
-                     * because RTP clients send data very fast and ZRTP protocl
-                     * handling takes some more milliseconds. ZRTP
-                     * implementations that do not use special marker SSRC
-                     * are always ok.
-                     */
-                    if (zhb) {
-                        if (packetSsrc != 0xdeadbeef) {
-                            if (zhb->getSsrcReceiver() == 0) {
-                                zhb->setSsrcReceiver(packetSsrc);
-                            }
-                        }
-                        else {
-                            zhb->setZfoneDeadBeef(1);
-                        }
-                    }
                     /*
                      * If the packet was not processed above and it contains an
                      * extension header then check for ZRTP packet.
                     */
-                    if (!found && zhb && packet->getHeader().getExtension() &&
-                         zhb->getRemoteAddress() /* && zhb->getRemoteAddress() == from */) {
-                        // TODO: check if SSRC changed if its no a Zfone special packet
+                    if (!found && zhb && packet->getHeader().getExtension()) {
                         (*i)->handleRtpPacketExt(packet);
                     }
 #endif // ZRTP_SUPPORT

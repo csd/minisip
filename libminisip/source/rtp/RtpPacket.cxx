@@ -1,22 +1,22 @@
 /*
   Copyright (C) 2004-2006 the Minisip Team
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
- 
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
- 
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -44,23 +44,27 @@
 
 using namespace std;
 
-RtpPacket::RtpPacket(){
+RtpPacket::RtpPacket() {
     content_length=0;
-    content=NULL;	
+    content=NULL;
+    extensionLength = 0;
+    extensionHeader = NULL;
+    zrtpChecksum = 0;
 }
 
-RtpPacket::RtpPacket(unsigned char *content, int content_length, 
+RtpPacket::RtpPacket(unsigned char *content, int content_length,
 		     int seq_no, unsigned timestamp, unsigned ssrc):
     content_length(content_length){
 
     extensionLength = 0;
     extensionHeader = NULL;
+    zrtpChecksum = 0;
 
     header.setVersion(2);
     header.setSeqNo(seq_no);
     header.setTimestamp(timestamp);
     header.SSRC = ssrc;
-	
+
     if( content_length ){
 	this->content = new unsigned char[content_length];
 	memcpy(this->content, content, content_length);
@@ -73,6 +77,7 @@ RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content, int content_length):
 
     extensionLength = 0;
     extensionHeader = NULL;
+    zrtpChecksum = 0;
 
     /*
      * Check if packet contains an extension header. If yes
@@ -88,14 +93,14 @@ RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content, int content_length):
         tmp *= 4;		// ext. header length is in words (4 bytes)
 	extensionLength += tmp;
 	content_length -= tmp;
-	
+
         if (content_length >= 0) {
             extensionHeader = new unsigned char[extensionLength];
             memcpy(this->extensionHeader, content, extensionLength);
         }
     }
     this->content_length = content_length;
-	
+
     if( content_length > 0 ){
 	this->content = new unsigned char[content_length];
 	memcpy(this->content, content+extensionLength, content_length);
@@ -143,7 +148,7 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
     uint8_t j;
     uint8_t cc;
 //	memset( buf, '\0', 2048 );
-	
+
     i = rtp_socket.recv( (char *)buf, UDP_SIZE );
 
     if( i < 0 ){
@@ -163,14 +168,14 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	/* too small to contain an RTP header with cc CSRC */
 	return NULL;
     }
-	
+
     RtpHeader hdr;
     hdr.setVersion( ( buf[0] >> 6 ) & 0x03 );
     hdr.setExtension(  ( buf[0] >> 4 ) & 0x01 );
     hdr.setCSRCCount( cc );
     hdr.setMarker( ( buf[1] >> 7 ) & 0x01  );
     hdr.setPayloadType( buf[1] & 0x7F );
-	
+
     hdr.setSeqNo( ( ((uint16_t)buf[2]) << 8 ) | buf[3] );
     cerr << "GOT SEQN" << hdr.getSeqNo() << endl;
 
@@ -188,39 +193,65 @@ RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
 	hdr.setSSRC(tmp);
     }
     int datalen = i - 12 - cc*4;
-	
+
     RtpPacket * rtp = new RtpPacket(hdr, (unsigned char *)&buf[12+4*cc], datalen);
-	
+
     return rtp;
 }
 
 char *RtpPacket::getBytes(){
 
-    int hdrSize = header.size();
-    char *ret = new char[hdrSize + content_length + extensionLength];
-	
+    char *ret = new char[size()];
+
     char *hdr = header.getBytes();
-	
+    int hdrSize = header.size();
     memcpy(ret, hdr, hdrSize);
     delete [] hdr;
-    
+
     if (extensionLength > 0) {
         memcpy(&ret[hdrSize], extensionHeader, extensionLength);
-    }        
-    memcpy(&ret[hdrSize+extensionLength], content, content_length);
+    }
+    hdrSize += extensionLength;
+    memcpy(&ret[hdrSize], content, content_length);
+
+    if (zrtpChecksum) {
+        uint16_t chkSum = computeChecksum((uint16_t*)ret, size()-20);
+        memcpy(&ret[hdrSize + content_length], &chkSum, zrtpChecksum);
+    }
     return ret;
 }
 
-int RtpPacket::size(){
-    return header.size()+content_length;
+int RtpPacket::size() {
+    return header.size() + content_length + extensionLength + zrtpChecksum;
 }
 
-unsigned char *RtpPacket::getContent(){
-    return content;
+bool RtpPacket::checkZrtpChecksum(bool check) {
+    if (content_length >= 2) {
+        content_length -= 2;
+    }
+    // TODO: implement the real recompute and check of checksum
 }
 
-int RtpPacket::getContentLength(){
-    return content_length;
+#define CKSUM_CARRY(x) (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))
+uint16_t RtpPacket::computeChecksum(uint16_t* data, int length)
+{
+        uint32_t sum = 0;
+        uint16_t ans = 0;
+
+        while (length > 1) {
+            sum += *data++;
+            length -= 2;
+        }
+        if (length == 1) {
+            *(uint8_t *)(&ans) = *(uint8_t*)data;
+            sum += ans;
+        }
+
+        uint16_t ret = CKSUM_CARRY(sum);
+        /*
+        * Return the inverted 16-bit result.
+        */
+        return (ret);
 }
 
 #ifdef DEBUG_OUTPUT
@@ -229,7 +260,7 @@ void RtpPacket::printDebug(){
     header.printDebug();
     cerr <<"_Content_"<< endl;
     cerr <<"\tContent length: "<< content_length<< endl;
-	
+
 }
 #endif
 

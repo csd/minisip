@@ -1,16 +1,16 @@
 /*
  Copyright (C) 2006 Werner Dittmann
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
@@ -23,9 +23,10 @@
 #ifndef ZRTPPACKET_H
 #define ZRTPPACKET_H
 
-#include <config.h>
 #include <stdio.h>
-#include<libminisip/libminisip_config.h>
+#include <config.h>
+
+#include <libminisip/libminisip_config.h>
 
 #define	ZRTP_EXT_PACKET		0x505a
 
@@ -40,13 +41,14 @@ typedef struct zrtpPacketHeader {
 } zrtpPacketHeader_t;
 
 
-#define HELLO_LENGTH            48 /* plus the MESSAGE_LENGTH = 50 */
-typedef struct Hello { 
+#define HELLO_LENGTH            62 /* plus the MESSAGE_LENGTH = 64 */
+typedef struct Hello {
     uint8_t	version[4];
-    uint8_t	clientId[15];
+    uint8_t	clientId[31];
     uint8_t	flag;
     uint8_t     hashes[5][8];
     uint8_t     ciphers[5][8];
+    uint8_t     authlengths[5][8];
     uint8_t	pubkeys[5][8];
     uint8_t	sas[5][8];
     uint8_t     zid[12];
@@ -61,11 +63,12 @@ typedef struct HelloAck {	/* Length is MESSAGE_LENGTH */
     zrtpPacketHeader_t hdr;
 } HelloAck_t;
 
-#define COMMIT_LENGTH           19 /* plus MESSAGE_LENGTH = 21 */
+#define COMMIT_LENGTH           21 /* plus MESSAGE_LENGTH = 23 */
 typedef struct Commit {
     uint8_t	zid[12];
     uint8_t     hash[8];
     uint8_t     cipher[8];
+    uint8_t     authlengths[8];
     uint8_t	pubkey[8];
     uint8_t	sas[8];
     uint8_t	hvi[32];
@@ -117,6 +120,21 @@ typedef struct ErrorPacket {
     Error_t error;
 } ErrorPacket_t;
 
+typedef struct GoClear {
+    uint8_t clearHmac[32];
+} GoClear_t;
+
+#define GOCLEAR_LENGTH         8 /* plus MESSAGE_LENGTH = 10 */
+typedef struct GoClearPacket {
+    zrtpPacketHeader_t hdr;
+    GoClear_t goClear;
+} GoClearPacket_t;
+
+#define CLEARACK_LENGTH         2
+typedef struct ClearAck {
+    zrtpPacketHeader_t hdr;
+} ClearAck_t;
+
 
 /* big/little endian conversion */
 
@@ -145,7 +163,7 @@ static inline uint64_t U64_AT( void const * _p )
 #   define hton16(i)   ( i )
 #   define hton32(i)   ( i )
 #   define hton64(i)   ( i )
-#   define ntoh16(i)   ( i ) 
+#   define ntoh16(i)   ( i )
 #   define ntoh32(i)   ( i )
 #   define ntoh64(i)   ( i )
 #else

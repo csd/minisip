@@ -1,16 +1,16 @@
 /*
-  Copyright (C) 2006 Werner Dittmann 
- 
+  Copyright (C) 2006 Werner Dittmann
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
- 
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
- 
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -32,11 +32,13 @@
 #include <libminisip/zrtp/ZrtpPacketDHPart.h>
 #include <libminisip/zrtp/ZrtpPacketConfirm.h>
 #include <libminisip/zrtp/ZrtpPacketConf2Ack.h>
+#include <libminisip/zrtp/ZrtpPacketGoClear.h>
+#include <libminisip/zrtp/ZrtpPacketClearAck.h>
 #include <libminisip/zrtp/ZrtpCallback.h>
 #include <libminisip/zrtp/ZIDRecord.h>
-#include <libmcrypto/ZrtpDH.h>
-#include <libmcrypto/hmac256.h>
-#include <libmcrypto/sha256.h>
+#include <libmcrypto/openssl/ZrtpDH.h>
+#include <libmcrypto/openssl/hmac256.h>
+#include <libmcrypto/openssl/sha256.h>
 
 class ZrtpStateClass;
 
@@ -49,18 +51,20 @@ class ZrtpStateClass;
  * functions to connect to a Timer mechanism and to send data via RTP
  * and SRTP.
  *
- * <p/> 
+ * <p/>
  *
  * The main entry into the ZRTP class is the <code>
  * processExtensionHeader() </code> method.
  *
- * <p/> 
+ * <p/>
  *
  * This class does not directly handle the protocol states, timers,
  * and packet resend. The protocol state engine is responsible for
  * these actions.
- * 
+ *
  * @see ZrtpCallback
+ *
+ * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 class ZRtp {
 
@@ -124,9 +128,90 @@ class ZRtp {
          */
 	int32_t processTimeout();
 
+        /**
+         * Check for and handle GoClear ZRTP packet header.
+         *
+         * This method checks if this is a GoClear packet. If not, just return
+         * false. Otherwise handle it according to the specification.
+         *
+         * @param extHeader
+         *    A pointer to the first byte of the extension header. Refer to
+         *    RFC3550.
+         * @return
+         *    False if not a GoClear, true otherwise.
+         */
+        bool handleGoClear(uint8_t *extHeader);
+
+        /**
+         * Set the sigs secret.
+         *
+         * USe this method to set the sigs secret data. Refer to ZRTP
+         * specification, chapter 3.2.1
+         *
+         * @param data
+         *     Points to the sigs secret data. The data must have a length
+         *     of 32 bytes (length of SHA256 hash)
+         */
+       void setSigsSecret(uint8_t* data)  { }
+
+       /**
+        * Set the srtps secret.
+        *
+        * USe this method to set the srtps secret data. Refer to ZRTP
+        * specification, chapter 3.2.1
+        *
+        * @param data
+        *     Points to the srtps secret data. The data must have a length
+        *      of 32 bytes (length of SHA256 hash)
+        */
+       void setSrtpsSecret(uint8_t* data)  {  }
+
+       /**
+        * Set the other secret.
+        *
+        * USe this method to set the other secret data. Refer to ZRTP
+        * specification, chapter 3.2.1
+        *
+        * @param data
+        *     Points to the other secret data.
+        * @param length
+        *     The length in bytes of the data.
+        */
+       void setOtherSecret(uint8_t* data, int32_t length)  {  }
+
+       /**
+        * Set the client ID for ZRTP Hello message.
+        *
+        * The GNU ccRTP client may set its id to identify itself in the
+        * ZRTP HELLO message. The maximum length is 15 characters. Shorter
+        * id string are allowed, the will be filled with blanks. A Longer id
+        * is truncated to 15 characters.
+        *
+        * @param id
+        *     The client's id
+        */
+        void setClientId(std::string id) {
+            const char* tmp = "                ";
+            if (id.size() < 15) {
+                zrtpHello->setClientId((unsigned char*)tmp);
+            }
+            zrtpHello->setClientId((unsigned char*)id.c_str());
+       }
+
+       /**
+        * Check current state of the ZRTP state engine
+        *
+        * @param state
+        *    The state to check.
+        * @return
+        *    Return true id ZRTP engine is in the given state, false otherwise.
+        */
+       int32_t checkState(int32_t state);
+
+
  private:
      friend class ZrtpStateClass;
-     
+
     /**
      * The state engine takes care of protocol processing.
      */
@@ -141,7 +226,7 @@ class ZRtp {
      * The peer's ZID
      */
     uint8_t peerZid[12];
-    
+
     /**
      * The callback class provides me with the interface to send
      * data and to deal with timer management of the hosting system.
@@ -157,7 +242,7 @@ class ZRtp {
      * The computed DH shared secret
      */
     uint8_t* DHss;
-    
+
     /**
      * My computed public key
      */
@@ -175,7 +260,7 @@ class ZRtp {
      * The SAS value
      */
     std::string SAS;
-    
+
     /**
      * The variables for the retained shared secrets
      */
@@ -184,7 +269,7 @@ class ZRtp {
     uint8_t sigsIDr[SHA256_DIGEST_LENGTH];
     uint8_t srtpsIDr[SHA256_DIGEST_LENGTH];
     uint8_t otherSecretIDr[SHA256_DIGEST_LENGTH];
-    
+
     uint8_t rs1IDi[SHA256_DIGEST_LENGTH];
     uint8_t rs2IDi[SHA256_DIGEST_LENGTH];
     uint8_t sigsIDi[SHA256_DIGEST_LENGTH];
@@ -194,12 +279,12 @@ class ZRtp {
      * My hvi
      */
     uint8_t hvi[SHA256_DIGEST_LENGTH];
-    
+
     /**
      * The peer's hvi
      */
     uint8_t peerHvi[SHA256_DIGEST_LENGTH];
-    
+
     /**
      * Commited Hash, Cipher, and public key algorithms
      */
@@ -212,6 +297,10 @@ class ZRtp {
     SupportedSASTypes sasType;
 
     /**
+     * The selected SAS type.
+     */
+    SupportedAuthLengths authLength;
+    /**
      * The s0
      */
     uint8_t s0[SHA256_DIGEST_LENGTH];
@@ -220,26 +309,26 @@ class ZRtp {
      * The HMAC key
      */
     uint8_t hmacSrtp[SHA256_DIGEST_LENGTH];
-    
+
     /**
      * The Initiator's srtp key and salt
      */
     uint8_t srtpKeyI[SHA256_DIGEST_LENGTH];
     uint8_t srtpSaltI[SHA256_DIGEST_LENGTH];
-    
+
     /**
      * The Responder's srtp key and salt
      */
     uint8_t srtpKeyR[SHA256_DIGEST_LENGTH];
     uint8_t srtpSaltR[SHA256_DIGEST_LENGTH];
-    
+
     /**
      * Pre-initialized packets to start off the whole game.
      */
     ZrtpPacketHello*    zrtpHello;
     ZrtpPacketHelloAck* zrtpHelloAck;
     ZrtpPacketConf2Ack* zrtpConf2Ack;
-    
+
     /**
      * Find the best Hash algorithm that was offered in Hello.
      *
@@ -301,18 +390,33 @@ class ZRtp {
     SupportedSASTypes findBestSASType(ZrtpPacketHello *hello);
 
     /**
+     * Find the best authentication length that was offered in Hello.
+     *
+     * Find the best, that is the strongest, authentication length that our peer
+     * offers in its Hello packet.
+     *
+     * @param hello
+     *    The Hello packet.
+     * @return
+     *    The Enum that identifies the best offered authentication length. Return
+     *    <code>NumSupportedAuthLenghts</code> to signal that no matching length
+     *    was found at all.
+     */
+    SupportedAuthLengths findBestAuthLen(ZrtpPacketHello *hello);
+
+    /**
      * Compute my hvi value according to ZRTP specification.
      */
     void computeHvi(uint8_t *pv, uint32_t pvLength, ZrtpPacketHello *hello);
-    
+
     void computeSharedSecretSet(ZIDRecord& zidRec);
-    
+
     void computeSRTPKeys(ZIDRecord& zidRec);
-    
+
     void generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec);
-    
+
     void generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec);
-    
+
     /**
      * Send a ZRTP packet.
      *
@@ -325,7 +429,7 @@ class ZRtp {
      *    zero if sending failed, one if packet was send
      */
     int32_t sendPacketRTP(ZrtpPacketBase *packet) {
-	return ((packet == NULL) ? 0 : 
+	return ((packet == NULL) ? 0 :
 		callback->sendDataRTP(packet->getHeaderBase(), (packet->getLength() * 4) + 4)); };
 
     /**
@@ -341,7 +445,7 @@ class ZRtp {
      */
     int32_t sendPacketSRTP(ZrtpPacketBase *packet) {
 	return ((packet == NULL) ? 0 :
-		callback->sendDataSRTP(packet->getHeaderBase(), 
+		callback->sendDataSRTP(packet->getHeaderBase(),
 				      (packet->getLength() * 4) + 4,
 			              ((char *)(packet->getHeaderBase()) + (packet->getLength() * 4) + 4),
 				      48)); };
@@ -363,7 +467,7 @@ class ZRtp {
      *    zero if activation failed, one if timer was activated
      */
     int32_t cancelTimer() {return (callback->cancelTimer()); };
-    
+
     /**
      * Prepare a Hello packet.
      *
@@ -393,7 +497,7 @@ class ZRtp {
      * it makes to us and select the most appropriate. Using the
      * selected values prepare a Commit packet and return it to protocol
      * state engine.
-     * 
+     *
      * @param hello
      *    Points to the received Hello packet
      * @return
@@ -411,7 +515,7 @@ class ZRtp {
      * <p/>
      *
      * When we receive a Commit packet we get the selected ciphers, hashes, etc
-     * and cross-check if this is ok. Then we need to initialize a set of DH 
+     * and cross-check if this is ok. Then we need to initialize a set of DH
      * keys according to the selected cipher. Using this data we prepare our DHPart1
      * packet.
      */
@@ -421,7 +525,7 @@ class ZRtp {
      * Prepare the DHPart2 packet.
      *
      * This method prepares a DHPart2 packet. The input to the method is always
-     * a DHPart1 packet received from the peer. Our peer sends the DH1Part as 
+     * a DHPart1 packet received from the peer. Our peer sends the DH1Part as
      * response to our Commit packet. Thus we are in the role of the
      * Initiator.
      *
@@ -430,11 +534,11 @@ class ZRtp {
 
     /**
      * Prepare the Confirm1 packet.
-     * 
+     *
      * This method prepare the Confirm1 packet. The input to this method is the
      * DHPart2 packect received from our peer. The peer sends the DHPart2 packet
      * as response of our DHPart1. Here we are in the role of the Responder
-     * 
+     *
      */
     ZrtpPacketConfirm *prepareConfirm1(ZrtpPacketDHPart *dhPart2);
 
@@ -445,16 +549,30 @@ class ZRtp {
      * Confirm1 packet received from our peer. The peer sends the Confirm1 packet
      * as response of our DHPart2. Here we are in the role of the Initiator
      */
-    ZrtpPacketConfirm *prepareConfirm2(ZrtpPacketConfirm *confirm1);
+    ZrtpPacketConfirm* prepareConfirm2(ZrtpPacketConfirm *confirm1);
 
     /**
      * Prepare the Conf2Ack packet.
-     * 
+     *
      * This method prepare the Conf2Ack packet. The input to this method is the
      * Confirm2 packet received from our peer. The peer sends the Confirm2 packet
      * as response of our Confirm1. Here we are in the role of the Initiator
      */
-    ZrtpPacketConf2Ack *prepareConf2Ack(ZrtpPacketConfirm *confirm2);
+    ZrtpPacketConf2Ack* prepareConf2Ack(ZrtpPacketConfirm *confirm2);
+
+    /**
+     * Prepare a ClearAck packet.
+     *
+     * This method checks if the GoClear message is valid. If yes then switch
+     * off SRTP processing, stop sending of RTP packets (pause transmit) and
+     * inform the user about the fact. Only if user confirms the GoClear message
+     * normal RTP processing is resumed.
+     *
+     * @return
+     *     NULL if GoClear could not be authenticated, a ClearAck packet
+     *     otherwise.
+     */
+    ZrtpPacketClearAck* prepareClearAck(ZrtpPacketGoClear* gpkt);
 
     /**
      * Compare the hvi values.
@@ -477,7 +595,7 @@ class ZRtp {
 
     /**
      * Send information messages to the hosting environment.
-     * 
+     *
      * The ZRTP implementation uses this method to send information messages
      * to the host. Along with the message ZRTP provides a severity indicator
      * that defines: Info, Warning, Error, Alert. Refer to the MessageSeverity
@@ -494,10 +612,10 @@ class ZRtp {
 
     /**
      * Signal SRTP secrets are ready.
-     * 
+     *
      * This method calls a callback method to inform the host that the SRTP
      * secrets are ready.
-     * 
+     *
      * @param part
      *    Defines for which part (sender or receiver) to switch on security
      */
@@ -505,10 +623,10 @@ class ZRtp {
 
     /**
      * Switch off SRTP secrets.
-     * 
+     *
      * This method calls a callback method to inform the host that the SRTP
      * secrets shall be cleared.
-     * 
+     *
      * @param part
      *    Defines for which part (sender or receiver) to clear
      */

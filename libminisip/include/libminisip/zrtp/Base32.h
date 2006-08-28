@@ -38,42 +38,42 @@ using namespace std;
 extern int divceil(int a, int b);
 
 class Base32{
-    
+
  public:
-    
+
     /**
      * A Constructor that decodes from base32 into binary.
-     * 
+     *
      * The constructor decodes the base32 encoded data back into binary
-     * data. Use <code>getBinaryData(...)</code> to get the binary data.
-     * 
+     * data. Use <code>getDecoded(...)</code> to get the binary data.
+     *
      * @param encoded
      *     The string that contains the base32 encoded data.
      */
     Base32(const string encoded);
-    
+
     /**
      * A Constructor that decodes from base32 into binary.
-     * 
+     *
      * This constructor decodes the base32 encoded data back into
      * binary data. Only the specified number of bits are decoded
      * (should be a multiple of 5).  Use
-     * <code>getBinaryData(...)</code> to get the binary data.
-     * 
+     * <code>getDecoded(...)</code> to get the binary data.
+     *
      * @param encoded
      *     The string that contains the base32 encoded data.
      * @param noOfBits
      *     How many bits to decode into binary data.
      */
-    Base32(const string encoded, int32_t noOfBits); 
-    
+    Base32(const string encoded, int32_t noOfBits);
+
     /**
      * A Constructor that encodes binary data.
-     * 
-     * The constructor converts the firstspecified number of bits of
+     *
+     * The constructor converts the first specified number of bits of
      * the binary data into a base32 presentation. Use
      * <code>getEncoded</code> to get the encoded data.
-     * 
+     *
      * @param data
      *    A pointer to the first bits (byte) of binary data
      * @param noOfBits
@@ -86,13 +86,13 @@ class Base32{
 
     /**
      * Get the decoded binary data and its length.
-     * 
+     *
      * The method returns the decoded binary data if the appropriate
      * Constructor was used. Otherwise we return <code>NULL</code>
      * pointer and length zero.
      *
      * <p/>
-     * 
+     *
      * <em>Note:</em> This method returns a pointer to the decoded
      * binary data. The Base32 object manages this pointer, thus you
      * may need to copy the data to a save place before deleting this
@@ -105,33 +105,33 @@ class Base32{
      *     A pointer to the decoded binary data.
      */
     const uint8_t* getDecoded(int32_t &length);
-    
+
     /**
      * Get the encoded base32 string.
-     * 
+     *
      * The method returns a string that contains the base32 encoded
      * data if the appropriate constructor was used. Otherwise we
      * return an empty string.
-     * 
+     *
      * @return
      *     The string containing the base32 encoded data.
      */
     const string getEncoded() { return encoded; };
-    
+
     /**
      * Compute the number of base32 encoded characters given the
      * number of bits.
-     * 
-     * @param lengthInBits 
+     *
+     * @param lengthInBits
      *      The length of the data in bits
-     * @return 
+     * @return
      *      The length of the base-32 encoding of the data in characters
      */
-    static size_t const b2alen(const size_t lengthInBits) { 
+    static size_t const b2alen(const size_t lengthInBits) {
 	return divceil(lengthInBits, 5); };
 
  private:
-    
+
     /**
      * Decodes a string with base32 presentation into binary data.
      *
@@ -151,18 +151,18 @@ class Base32{
      * strings that have a length-in-bits which isn't a multiple of 8 and yet
      * don't have trailing zero bits, as improperly encoded.)
      *
-     * @param cs 
+     * @param cs
      *    The data to be decoded
      * @param size
      *    The length of the input data buffer. Usually divceil(length in bits, 5).
-     * @param lengthinbits 
+     * @param lengthinbits
      *    The number of bits of data in <code>cs</code> to be decoded
      */
     void a2b_l(const string cs, size_t size, const size_t lengthinbits);
-        
+
     /**
      * Encodes binary to to base32 presentation.
-     * 
+     *
      * b2a_l() will generate a base-32 encoded string big enough to encode
      * lengthinbits bits.  So for example if os is 2 bytes long and
      * lengthinbits is 15, then b2a_l() will generate a 3-character- long
@@ -200,17 +200,17 @@ class Base32{
      * Holds the pointer to decoded binary data
      */
     uint8_t *binaryResult;
-        
+
     /**
      * Length of decoding result
      */
     int32_t resultLength;
-        
+
     /**
      * The string containing the base32 encoded data.
      */
     string encoded;
-        
+
     uint8_t smallBuffer[128];
 };
 #endif

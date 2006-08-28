@@ -5,7 +5,7 @@ SUBDIRS = include m4
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
-AM_CPPFLAGS = -I$(top_srcdir)/include $(MINISIP_CFLAGS) 
+AM_CPPFLAGS = -I$(top_srcdir)/include $(MINISIP_CFLAGS)
 
 pkgconfig_DATA = libminisip.pc
 
@@ -14,7 +14,7 @@ lib_LTLIBRARIES = libminisip.la
 libminisip_la_CPPFLAGS = $(AM_CPPFLAGS) -DMINISIP_PLUGINDIR=\"$(pluginsdir)\"
 
 libminisip_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS) \
-		$(RELOC_LDFLAGS) 
+		$(RELOC_LDFLAGS)
 
 libminisip_la_LIBADD = $(MINISIP_LIBS)
 
@@ -70,7 +70,7 @@ endif
 
 
 if IPSEC_SUPPORT
-        libipsecapi_src = source/ipsec/MsipIpsecAPI.cxx 
+        libipsecapi_src = source/ipsec/MsipIpsecAPI.cxx
 endif
 
 libmediahandler_src = source/mediahandler/MediaHandler.cxx \
@@ -143,6 +143,8 @@ libzrtp_src = source/zrtp/ZIDFile.cxx \
 		source/zrtp/ZrtpPacketError.cxx \
 		source/zrtp/ZrtpPacketHelloAck.cxx \
 		source/zrtp/ZrtpPacketHello.cxx \
+		source/zrtp/ZrtpPacketGoClear.cxx \
+		source/zrtp/ZrtpPacketClearAck.cxx \
 		source/zrtp/ZrtpStateClass.cxx \
 		source/zrtp/ZrtpTextData.cxx \
 		source/zrtp/Base32.cxx
@@ -172,7 +174,7 @@ libsip_src = source/sip/SipDialogVoip.cxx \
 		source/sip/SipDialogSecurityConfig.cxx \
 		source/sip/Sip.cxx
 
-libsoundcard_libadd = 
+libsoundcard_libadd =
 RESAMPLER_SRC = source/soundcard/resampler/Resampler.cxx \
 		source/soundcard/resampler/SimpleResampler.cxx \
 		source/soundcard/resampler/SimpleResampler.h
@@ -201,14 +203,14 @@ BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
 			source/soundcard/FileSoundSource.cxx \
 			source/soundcard/SoundDevice.cxx \
 			source/soundcard/SoundDriver.cxx \
-			source/soundcard/SoundDriverRegistry.cxx 
+			source/soundcard/SoundDriverRegistry.cxx
 
 ALSA_SRC =	source/soundcard/AlsaCard.cxx \
 		source/soundcard/AlsaCard.h \
 		source/soundcard/AlsaSoundDriver.h \
 		source/soundcard/AlsaSoundDriver.cxx \
 		source/soundcard/AlsaSoundDevice.h \
-		source/soundcard/AlsaSoundDevice.cxx 
+		source/soundcard/AlsaSoundDevice.cxx
 
 DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx  \
 		source/soundcard/DirectSoundDevice.h \
@@ -224,7 +226,7 @@ libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
 if ENABLE_OSS
-        libsoundcard_src += source/soundcard/OssSoundDevice.cxx 
+        libsoundcard_src += source/soundcard/OssSoundDevice.cxx
 endif ENABLE_OSS
 endif !OS_WIN
 
@@ -254,7 +256,7 @@ mportaudio_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(PORTAUDIO_LIBS)
 endif PORTAUDIO_SUPPORT
 
 
-libspaudio_src = source/spaudio/SpAudio.cxx 
+libspaudio_src = source/spaudio/SpAudio.cxx
 
 #
 # Video plugin
@@ -263,7 +265,7 @@ if VIDEO_SUPPORT
 lib_LTLIBRARIES += libminisip_video.la
 libminisip_video_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)	\
 		$(FFMPEG_CFLAGS)
-libminisip_video_la_LDFLAGS = $(AVCODEC_LDFLAGS) 
+libminisip_video_la_LDFLAGS = $(AVCODEC_LDFLAGS)
 libminisip_video_la_SOURCES = $(libvideo_src)
 libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)
 

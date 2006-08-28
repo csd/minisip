@@ -1,22 +1,22 @@
 /*
  Copyright (C) 2004-2006 the Minisip Team
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004, 2005 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -100,7 +100,7 @@ list<string> MediaStream::getSdpAttributes(){
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         string sdpRtpMap;
 	string sdpFmtpParam;
-	
+
         //	int i;
         uint8_t sdpPayloadType = (uint8_t) m->getFormat( formatIndex );
 
@@ -113,15 +113,15 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
         sdpRtpMap = m->getRtpMap( sdpPayloadType );
 	sdpFmtpParam = m->getFmtpParam( sdpPayloadType );
-	
+
 	std::list<MRef<Codec *> > codecs = media->getAvailableCodecs();
 	std::list<MRef<Codec *> >::iterator iC;
 	string codecRtpMap;
 	uint8_t codecPayloadType;
-	
+
         size_t s1;
         size_t s2 = sdpRtpMap.find("/");
-	
+
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
@@ -140,7 +140,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                         else {
 				continue;
 			}
-				
+
                 }
                 else{
                         if( sdpPayloadType == codecPayloadType ){
@@ -155,17 +155,17 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
 MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 	MRef<CryptoContext *> cryptoContext;
-	
+
 	kaLock.lock();
 	if( !ka ){
 		/* Dummy cryptocontext */
 		cryptoContext = new CryptoContext( ssrc );
 	}
 	else {
-		
+
 		unsigned char * masterKey = new unsigned char[16];
 		unsigned char * masterSalt = new unsigned char[14];
-	
+
 		uint8_t  csId = ka->getSrtpCsId( ssrc );
 		uint32_t roc = ka->getSrtpRoc( ssrc );
 		uint8_t  policyNo = ka->findpolicyNo( ssrc );
@@ -177,13 +177,13 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 		uint8_t skeyl = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_SALTKEYL);
 		//uint8_t prf   = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PRF);	 //Not used
 		uint8_t keydr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_KEY_DERRATE);
-		uint8_t encr  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_ENCR_ON_OFF); 
+		uint8_t encr  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_ENCR_ON_OFF);
 		//uint8_t cencr = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTCP_ENCR_ON_OFF);//Not used
 		//uint8_t fecor = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_FEC_ORDER);	 //Not used
-		uint8_t auth  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_ON_OFF); 
+		uint8_t auth  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_ON_OFF);
 		uint8_t autht = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_TAGL);
 		//uint8_t prefi = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PREFIX);	 //Not used
-		
+
 		ka->genTek( csId,  masterKey,  16 );
 		ka->genSalt( csId, masterSalt, 14 );
 
@@ -196,7 +196,7 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 #endif
 
 		if( csId != 0 ){
-			cryptoContext = new CryptoContext( ssrc, roc, seq_no, keydr, 
+			cryptoContext = new CryptoContext( ssrc, roc, seq_no, keydr,
 			ealg, aalg, masterKey, 16, masterSalt, 14, ekeyl, akeyl, skeyl, encr, auth, autht );
 
 			cryptoContext->derive_srtp_keys( 0 );
@@ -241,7 +241,7 @@ void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
  * The ZRTP implementation (host bridge) calls this to register a new
  * crypto context context for either the receiver or the sender of
  * a receiver / sender. Keep in mind that we may have several senders
- * for one receiver, that is one receiver can handle different 
+ * for one receiver, that is one receiver can handle different
  * incomming RTP sessions, they are identified by the SSRC. A sender
  * handles one stream (media stream) to the remote peer only.
  */
@@ -263,7 +263,7 @@ void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
 }
 #endif
 
-MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media, 
+MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
 		MRef<RtpReceiver *> rtpReceiver, MRef<IpProvider *> ipProvider ):
 			MediaStream( media ),
 			rtpReceiver( rtpReceiver ),
@@ -295,7 +295,7 @@ void MediaStreamReceiver::stop(){
 	}
 	ssrcList.clear();
 	ssrcListLock.unlock();
-	
+
 	running = false;
 }
 
@@ -312,11 +312,16 @@ void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
 	if( !packet ) {
 		return;
 	}
-        recvSsrc = zrtpBridge->getSsrcReceiver();
+        recvSsrc = packet->getHeader().getSSRC();
 	seq_no = packet->getHeader().getSeqNo();
 
-	if( packet->unprotect( getCryptoContext( recvSsrc, seq_no ) )){
-		// Authentication or replay protection failed
+        if (zrtpBridge->isZrtpPacket(packet)) {
+            packet->checkZrtpChecksum(false);
+        }
+        // Look for a CryptoContext for this packet's SSRC
+        MRef<CryptoContext *> pcc = getCryptoContext( recvSsrc, seq_no);
+
+	if( packet->unprotect(pcc)) { // Authentication or replay protection failed
 		return;
 	}
 	zrtpBridge->processPacket(packet);
@@ -326,68 +331,45 @@ void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
 void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from ){
 	uint32_t packetSsrc;
 	uint16_t seq_no;
-	
+
 	//if packet is null, we had a read timeout from the rtpReceiver
 	if( !packet ) {
 		return;
 	}
-	
+
 	packetSsrc = packet->getHeader().getSSRC();
 	seq_no = packet->getHeader().getSeqNo();
 
 #ifdef ZRT_SUPPORT
-	/*
-	 * Check if ZRTP shall handle the packet first. This will be done
-	 * if the packet contains an extension header and our hostbridge's
-	 * remote address matches the from address (sender address). If all
-	 * holds true we also set the SSRC in the host bridge if it was zero
-	 * before.
-	 */
-	if (zrtpBridge && zrtpBridge->isSecureStateReceiver()) {
-	    /*
-	     * Check if this packet belongs to this receiver. To do so
-	     * compare the from IP address with my known remote address
-	     * stored in zrtpBridge.
-	     */
-	    if (zrtpBridge->getRemoteAddress() && 
-		zrtpBridge->getRemoteAddress() == from) {
+        if (zrtpBridge && zrtpBridge->isZrtpPacket(packet) {
+            packet->checkZrtpChecksum(false);
+        }
+        MRef<CryptoContext *> pcc = getCryptoContext(packetSsrc, seq_no);
 
-		/*
-		 * If this is the first received packet of this session store
-		 * the SSRC. Any later modification of the SSRC inside this session
-		 * gives an Alert and switsches back to non-secure mode
-		 */
-//		if (zrtpBridge->getSsrcReceiver() == 0) {
-//		    zrtpBridge->setSsrcReceiver(packetSsrc);
-//		}
-//		if (zrtpBridge->getSsrcReceiver() != packetSsrc) {
-//		    zhb->rtpSessionError();
-//		}
-		if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
-		    // Authentication or replay protection failed
-		    return;
-		}
-		if (packet->getHeader()->getExtension()) {
-		    if (zrtpBridge->processPacket(packet) == 0) {
-			return;
-		    }
-                }
-	    }
-	}
-	else {
-	    if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
-		// Authentication or replay protection failed
-		return;
-	    }
-	}
+        // If empty crypto context for this SSRC but we are already in Secure
+        // state then create a real CryptoContext for this SSRC. Assumption:
+        // every SSRC stream sent via this connection is secured _and_ uses
+        // the same crypto parameters.
+	if (zrtpBridge && zrtpBridge->isSecureState() &&
+                   (pcc->getEalg() == MIKEY_SRTP_EALG_NULL)) {
+            pcc = zrtpBridge->newCryptoContextForRecvSSRC(packetSsrc, 0, seq_no, 0L);
+        }
+        if( packet->unprotect(pcc)) { // Authentication or replay protection failed
+            return;
+        }
+        if (zrtpBridge && packet->getHeader()->getExtension() &&
+            (zrtpBridge->processPacket(packet) == 0)) {
+                return;
+            }
+        }
 #else
 	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){
 		// Authentication or replay protection failed
 		return;
 	}
 
-#endif // ZRTP_SUPPORT	
-	
+#endif // ZRTP_SUPPORT
+
 	//uint16_t seqNo = packet->getHeader().getSeqNo(); //not used
 	//byte_t * data = packet->getContent(); //not used
 	//uint32_t size = packet->getContentLength(); //not used
@@ -409,7 +391,7 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
 			return;
 		}
 	}
-	
+
 	media->registerMediaSource( ssrc );
 	ssrcList.push_back( ssrc );
 	ssrcListLock.unlock();
@@ -422,7 +404,7 @@ std::list<MRef<Codec *> > MediaStreamReceiver::getAvailableCodecs(){
 MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket ):
 	MediaStream( media ){
 	selectedCodec = NULL;
-	remotePort = 0; 
+	remotePort = 0;
 	seqNo = (uint16_t)rand();
 	ssrc = rand();
 	lastTs = rand();
@@ -464,18 +446,18 @@ static bool first=true;
 /*
  * Some of the following stuff was set after looking at the real
  * wire protocol of the original ZRTP / Zfone
- * - it uses the current seq no and does not increment it 
+ * - it uses the current seq no and does not increment it
  * - it uses the SSRC of "deadbeef" as hex value. We have to keep
  *   that in mind when processing protect / unprotect SRTP operations.
- *   Protect / unprotect use the "real" SSRC to lookup the crypto 
- *   contexts. 
+ *   Protect / unprotect use the "real" SSRC to lookup the crypto
+ *   contexts.
  */
 #ifdef ZRTP_SUPPORT
 void MediaStreamSender::sendZrtp(unsigned char* data, int length,
                                 unsigned char* payload, int payLen) {
 
 	if (this->remoteAddress.isNull()) {
-		mdbg << " MediaStreamSender::sendZrtp called before " << 
+		mdbg << " MediaStreamSender::sendZrtp called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -487,15 +469,18 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 #endif
 		first=false;
 	}
-	
+
 	senderLock.lock();
 	uint32_t ts = time(NULL);
-	packet = new SRtpPacket(payload, payLen, seqNo, ts, 0xdeadbeef );
-	packet->getHeader().setPayloadType(13);
+        packet = new SRtpPacket(payload, payLen, zrtpBridge->getZrtpSendSeqNo(),
+                                ts, zrtpBridge->getZrtpSendSsrc() );
+
+        packet->getHeader().setPayloadType(13);
 	packet->setExtHeader(data, length);
 
 	packet->protect(getCryptoContext(ssrc, seqNo));
 
+        packet->enableZrtpChecksum();
 	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();
@@ -505,7 +490,7 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	if (this->remoteAddress.isNull()) {
-		mdbg << " MediaStreamSender::send called before " << 
+		mdbg << " MediaStreamSender::send called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -516,13 +501,13 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 #endif
 		first=false;
 	}
-	
+
 	senderLock.lock();
 	if( !(*givenTs) ){
 		//FIXME! get it from the CODEC,
 		// when we have one CODEC per sender
-		increaseLastTs(); //increase lastTs ... 
-				//lastTs += 160; 
+		increaseLastTs(); //increase lastTs ...
+				//lastTs += 160;
 		*givenTs = lastTs;
 	}
 	else{
@@ -550,9 +535,9 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();
-        
+
         /*
-         * Start ZRTP engine only after we sent a first real data packet. This is 
+         * Start ZRTP engine only after we sent a first real data packet. This is
          * to give the receiver a change to get the real SSRC of us.
          */
 #ifdef ZRTP_SUPPORT
@@ -565,7 +550,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 }
 
 void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> remoteAddress ){
-	mdbg << "MediaStreamSender::setRemoteAddress: " << 
+	mdbg << "MediaStreamSender::setRemoteAddress: " <<
 		remoteAddress->getString() << endl;
 	this->remoteAddress = remoteAddress;
 #ifdef ZRTP_SUPPORT
@@ -596,15 +581,15 @@ string MediaStreamReceiver::getDebugString() {
 }
 string MediaStreamSender::getDebugString() {
 	string ret;
-	
+
 	ret = getMemObjectType() + " this=" + itoa((int64_t)this) +
 		": port=" + itoa(getPort()) +
 		"; remotePort=" + itoa(remotePort);
-	
+
 	if( isMuted() == true )
 		ret += "; isMuted=true";
 	else ret += "; isMuted=false";
-	
+
 	return ret;
 }
 #endif
@@ -615,7 +600,7 @@ string MediaStreamSender::getDebugString() {
 //It returns true if the packet needs to be let through, false otherwise
 bool MediaStreamSender::muteKeepAlive( uint32_t max ) {
 	bool ret = false;
-	
+
 	//if muted, only return true if packet is keep alive
 	if( isMuted() ) {
 		muteCounter++;
@@ -634,7 +619,7 @@ bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	bool result = MediaStream::matches( m, formatIndex );
 
 	if( result && !selectedCodec ){
-		selectedCodec = media->createCodecInstance( 
+		selectedCodec = media->createCodecInstance(
 				localPayloadType  );
 		payloadType = (uint8_t)m->getFormat( formatIndex );
 	}

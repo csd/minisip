@@ -1,16 +1,16 @@
 /*
  Copyright (C) 2006 Werner Dittmann
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
@@ -21,7 +21,6 @@
  */
 
 #include <libminisip/zrtp/ZrtpPacketHello.h>
-#include <malloc.h>
 
 
 ZrtpPacketHello::ZrtpPacketHello() {
@@ -31,6 +30,7 @@ ZrtpPacketHello::ZrtpPacketHello() {
 
     if (allocated == NULL) {
     }
+    memset(allocated, 0, sizeof (HelloPacket_t));
 
     zrtpHeader = (zrtpPacketHeader_t *)&((HelloPacket_t *)allocated)->hdr;	// the standard header
     helloHeader = (Hello_t *)&((HelloPacket_t *)allocated)->hello;
@@ -39,7 +39,6 @@ ZrtpPacketHello::ZrtpPacketHello() {
     setLength(HELLO_LENGTH + MESSAGE_LENGTH);
     setMessage((uint8_t*)HelloMsg);
 
-    setClientId((uint8_t*)clientId);
     setVersion((uint8_t*)zrtpVersion);
 
     setHashType(0, supportedHashes[0]);
@@ -53,6 +52,12 @@ ZrtpPacketHello::ZrtpPacketHello() {
     setCipherType(2, supportedCipher[2]);
     setCipherType(3, supportedCipher[3]);
     setCipherType(4, supportedCipher[4]);
+
+    setAuthLen(0, supportedAuthLen[0]);
+    setAuthLen(1, supportedAuthLen[1]);
+    setAuthLen(2, supportedAuthLen[2]);
+    setAuthLen(3, supportedAuthLen[3]);
+    setAuthLen(4, supportedAuthLen[4]);
 
     setPubKeyType(0, supportedPubKey[0]);
     setPubKeyType(1, supportedPubKey[1]);

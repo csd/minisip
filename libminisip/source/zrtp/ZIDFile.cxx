@@ -1,16 +1,16 @@
 /*
-  Copyright (C) 2006 Werner Dittmann 
- 
+  Copyright (C) 2006 Werner Dittmann
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
- 
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
- 
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
@@ -22,6 +22,7 @@
 // #define UNIT_TEST
 
 #include <time.h>
+#include <stdlib.h>
 
 #include <libminisip/zrtp/ZIDFile.h>
 
@@ -38,29 +39,25 @@ ZIDFile* ZIDFile::getInstance() {
     return instance;
 }
 
-int32_t ZIDFile::open(char *name) {
+int ZIDFile::open(char *name) {
     zidrecord_t rec;
-    uint32_t t;
-    uint32_t* ip;
-    
+    unsigned int* ip;
+
     // check for an already active ZID file
     if (zidFile != NULL) {
 	return 0;
     }
     if ((zidFile = fopen(name, "rb+")) == NULL) {
 	zidFile = fopen(name, "wb+");
-	// New file, genere an associated ZID and save it as first record
-	// should use some other randomize but that's good as well.
+	// New file, generate an associated randomw ZID and save
+        // it as first record
 	if (zidFile != NULL) {
-	    ip = (uint32_t*)associatedZid;
+	    ip = (unsigned int*)associatedZid;
 	    memset(&rec, 0, sizeof(zidrecord_t));
-	    t = time(NULL);
-	    t += ((uint64_t)&rec & 0xffffffff);
-	    *ip++ = t;
-	    t += ((uint64_t)zidFile & 0xffffffff);
-	    *ip++ = t;
-	    t += ((uint64_t)name  & 0xffffffff);
-	    *ip = t;
+            srandom(time(NULL));
+	    *ip++ = random();
+	    *ip++ = random();
+	    *ip = random();
 	    memcpy(rec.identifier, associatedZid, IDENTIFIER_LEN);
 	    fseek(zidFile, 0L, SEEK_SET);
 	    rec.ownZid = 1;
@@ -88,7 +85,7 @@ void ZIDFile::close() {
     }
 }
 
-uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
+unsigned int ZIDFile::getRecord(ZIDRecord *zidRecord) {
     unsigned long pos;
     zidrecord_t rec;
     int numRead;
@@ -104,7 +101,7 @@ uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
 	    numRead = fread(&rec, sizeof(zidrecord_t), 1, zidFile);
 	}
 
-	// check if we are at end, then no record found. Create new
+	// if we are at end of file, then no record found. Create new
 	// record and write its data at end of file.
 	if (numRead == 0) {
 	    memset(&rec, 0, sizeof(zidrecord_t));
@@ -117,13 +114,13 @@ uint32_t ZIDFile::getRecord(ZIDRecord *zidRecord) {
 
     // Copy the read data into the record structure
     memcpy(&zidRecord->record, &rec, sizeof(zidrecord_t));
-    
+
     //  remember position of record in file for save operation
     zidRecord->position = pos;
     return 1;
 }
 
-uint32_t ZIDFile::saveRecord(ZIDRecord *zidRecord) {
+unsigned int ZIDFile::saveRecord(ZIDRecord *zidRecord) {
 
     fseek(zidFile, zidRecord->position, SEEK_SET);
     fwrite(&zidRecord->record, sizeof(zidrecord_t), 1, zidFile);
@@ -135,7 +132,7 @@ uint32_t ZIDFile::saveRecord(ZIDRecord *zidRecord) {
 int main(int argc, char *argv[]) {
 
     ZIDFile *zid = ZIDFile::getInstance();
-  
+
     zid->open("testzid");
     ZIDRecord zr3("123456789012");
     zid->getRecord(&zr3);
@@ -175,8 +172,15 @@ int main(int argc, char *argv[]) {
     zid->saveRecord(&zr6);
 
     zid->close();
-  
+
 }
 
 #endif
 
+/** EMACS **
+ * Local variables:
+ * mode: c++
+ * c-default-style: ellemtel
+ * c-basic-offset: 4
+ * End:
+ */

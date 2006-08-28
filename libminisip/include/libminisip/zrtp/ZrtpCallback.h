@@ -1,42 +1,54 @@
 /*
-  Copyright (C) 2006 Werner Dittmann 
- 
+  Copyright (C) 2006 Werner Dittmann
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
- 
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
- 
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/*
- * @Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
- */
-
 #ifndef _ZRTPCALLBACK_H_
 #define _ZRTPCALLBACK_H_
 
-#include <stdint.h>
 #include <string>
 #include <libminisip/zrtp/ZrtpPacketBase.h>
 
 /**
+ * This class defines the callback functions required by ZRTP.
+ *
+ * This class is a pure abstract class, aka Interface in Java, that specifies
+ * the callback interface for the ZRTP implementation. The ZRTP implementation
+ * uses these functions to communicate with the host environment, for example
+ * to send data via the RTP/SRTP stack, to set timers and cancel timer and so
+ * on.
+ *
+ * <p/>
+ *
+ * This ZRTP needs only eigth callback methods to be implemented by the host
+ * environment.
+ *
+ * @author: Werner Dittmann <Werner.Dittmann@t-online.de>
+ */
+
+/**
  * This enum defines the information message severity.
- * 
+ *
  * The ZRTP implementation issues information messages to inform the user
  * about ongoing processing, unusual behavior, or alerts in case of severe
  * problems. The severity levels and their meaning are:
- * 
+ *
  * <dl>
  * <dt>Info</dt> <dd>keeps the user informed about ongoing processing and
- *     security setup. 
+ *     security setup.
  * </dd>
  * <dt>Warning</dt> <dd>is an information about some security issues, e.g. if
  *     an AES 256 encryption is request but only DH 3072 as public key scheme
@@ -44,14 +56,14 @@
  * </dd>
  * <dt>Error</dt> <dd>is used if an error occured during ZRTP protocol usage. For
  *     example if an unknown or unsupported alogrithm is offerd. In case of
- *     <em>Error</em> ZRTP will <b>not</b> establish a secure session. 
+ *     <em>Error</em> ZRTP will <b>not</b> establish a secure session.
  * </dd>
  * <dt>Alert</dt> <dd>shows a real security problem. This probably falls into
  *     a <em>MitM</em> category. ZRTP of course will <b>not</b> establish a
  *     secure session.
  * </dd>
  * </dl>
- * 
+ *
  */
 enum MessageSeverity {
     Info = 1,
@@ -62,10 +74,10 @@ enum MessageSeverity {
 
 /**
  * This enum defines which role a ZRTP peer has.
- * 
+ *
  * According to the ZRTP specification the role determines which keys to
  * use to encrypt or decrypt SRTP data.
- * 
+ *
  * <ul>
  * <li> The Initiator encrypts SRTP data using the <em>keyInitiator</em> and the
  *      <em>saltInitiator</em> data, the Responder uses these data to decrypt.
@@ -79,11 +91,11 @@ typedef enum  {
     Responder = 1,
     Initiator
 } Role;
-	    
+
 /**
- * This structure contains pointers to the SRTP secrets and the role info. 
- * 
- * About the role and what the meaning of the role is refer to the 
+ * This structure contains pointers to the SRTP secrets and the role info.
+ *
+ * About the role and what the meaning of the role is refer to the
  * of the enum Role. The pointers to the secrets are valid as long as
  * the ZRtp object is active. To use these data after the ZRtp object's
  * lifetime you may copy the data into a save place. The destructor
@@ -109,20 +121,6 @@ enum EnableSecurity {
 };
 
 
-/**
- * This class defines the callback functions required by ZRTP.
- * 
- * This class is a pure abstract class, aka Interface in Java, that specifies
- * the callback interface for the ZRTP implementation. The ZRTP implementation 
- * uses these functions to communicate with the host environment, for example 
- * to send data via the RTP/SRTP stack, to set timers and cancel timer and so 
- * on.
- * 
- * <p/>
- * 
- * This ZRTP needs only six callback methods to be implemented by the host
- * environment. 
- */
 class ZrtpCallback {
 
  public:
@@ -182,7 +180,7 @@ class ZrtpCallback {
 
     /**
      * Send information messages to the hosting environment.
-     * 
+     *
      * The ZRTP implementation uses this method to send information
      * messages to the host. Along with the message ZRTP provides a
      * severity indicator that defines: Info, Warning, Error,
@@ -195,10 +193,10 @@ class ZrtpCallback {
      * @see #MessageSeverity
      */
     virtual void sendInfo(MessageSeverity severity, char* msg) =0;
-    
+
     /**
      * This method gets call by ZRTP as soon as the SRTP secrets are available.
-     * 
+     *
      * The ZRTP implementation calls this method right after all SRTP
      * secrets are computed and ready to be used. The parameter points
      * to a structure that contains pointers to the SRTP secrets and a
@@ -207,11 +205,11 @@ class ZrtpCallback {
      * to the SRTP secrets it needs into a save place. The
      * SrtpSecret_t structure is destroyed when the callback method
      * returns to the ZRTP implementation.
-     * 
+     *
      * The SRTP secrets themselfs are ontained in the ZRtp object and
      * are valid as long as the ZRtp object is active. TheZRtp's
      * destructor clears the secrets.
-     * 
+     *
      * @param secrets
      *     A pointer to a SrtpSecret_t structure that contains all necessary
      *     data.
@@ -227,6 +225,16 @@ class ZrtpCallback {
      *    Defines for which part (sender or receiver) to switch on security
      */
     virtual void srtpSecretsOff(EnableSecurity part) =0;
+
+    /**
+     * This method shall handle GoClear requests.
+     *
+     * According to the ZRTP specification the user must be informed about
+     * this message because the ZRTP implementation switches off security
+     * if it could authenticate the GoClear packet.
+     *
+     */
+    virtual void handleGoClear() =0;
 
 };
 
