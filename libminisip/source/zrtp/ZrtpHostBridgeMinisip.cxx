@@ -75,6 +75,7 @@ ZrtpHostBridgeMinisip::ZrtpHostBridgeMinisip(std::string id, MRef<CommandReceive
 
 ZrtpHostBridgeMinisip::~ZrtpHostBridgeMinisip() {
 
+    cancelTimer();
     freeStateMachine();		// to clean up the TimeoutProvider
     delete zrtpEngine;
 }

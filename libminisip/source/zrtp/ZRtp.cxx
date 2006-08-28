@@ -586,7 +586,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm *confirm1) {
     zpConf->setSASFlag(0);
 
     // The HMAC with length 16 includes the SAS flag inside the Confirm packet
-    hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)confirm1->getPlainText(),
+    hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)zpConf->getPlainText(),
 		16, confMac, &macLen);
 
     zpConf->setHmac(confMac);
