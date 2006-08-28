@@ -71,8 +71,7 @@ class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 		void addUser( std::string user);
 		
 		void sendNotify(const  std::string &branch,  std::string toUri,  std::string callId);
-//		void createNotifyClientTransaction();
-		
+
 		bool a0_start_default_startpresenceserver(const SipSMCommand &command);
 		bool a1_default_default_timerremovesubscriber(const SipSMCommand &command);
 		bool a2_default_default_localpresenceupdated(const SipSMCommand &command);
@@ -84,7 +83,7 @@ class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 		minilist< std::string> subscribing_users;
 		Mutex usersLock;
 
-		 std::string onlineStatus;
+		std::string onlineStatus;
 };
 
 #endif

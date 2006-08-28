@@ -259,3 +259,4 @@ void SipDialogSecurityConfig::useIdentity( MRef<SipIdentity *> identity ){
 	secured = identity->securitySupport;
 	identity->unlock();
 }
+

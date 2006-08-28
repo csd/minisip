@@ -22,7 +22,6 @@
 
 #include<libmutil/termmanip.h>
 #include<libmutil/merror.h>
-//#include<libmutil/Thread.h>
 
 #ifdef SM_DEBUG
 #include<libmutil/StateMachine.h>
@@ -211,7 +210,6 @@ void ConsoleDebugger::sendManagementCommand( string str ) {
 	SipSMCommand cmd( cmdstr, 
 			SipSMCommand::dialog_layer,
 			SipSMCommand::dispatcher);
-	//config->sip->getSipStack()->getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
 	config->sip->getSipStack()->handleCommand(cmd);
 }
 

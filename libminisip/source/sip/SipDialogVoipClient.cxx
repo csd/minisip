@@ -641,7 +641,6 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	
 	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
-	//inv= MRef<SipInvite*>(
 	inv = SipRequest::createSipMessageInvite(
 			branch,
 			dialogState.callId,
@@ -698,7 +697,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			SipSMCommand::transaction_layer
 			);
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 	setLastInvite(inv);
 
 }
@@ -773,7 +772,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
@@ -798,3 +797,4 @@ bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
 
 	return true;
 }
+

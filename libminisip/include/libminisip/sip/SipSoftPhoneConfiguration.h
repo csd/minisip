@@ -111,17 +111,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		 */
 		MRef<SipIdentity *> getIdentity( SipUri &uri );
 		
-		/*
-		IPAddress * pstnProxy;
-		std::string pstnProxyString;
-		std::string pstnSipDomain;
-		int32_t pstnProxyPort;
-		std::string pstnNumber;
-		std::string pstnProxyUsername;	// Advanced->PSTN proxy username
-		std::string pstnProxyPassword;  // Advanced->PSTN proxy password
-		*/
-		
-
 		bool useSTUN;
 		std::string stunServerIpString;
 		uint16_t stunServerPort;
@@ -134,24 +123,16 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		
 		Socket * proxyConnection;
 
-//		bool doRegister; 	//General->Register to proxy
-//		bool doRegisterPSTN; 	//Advanced...
-//		
 		std::string soundDeviceIn;
 		std::string soundDeviceOut;
 		std::string videoDevice;
 		uint32_t frameWidth;
 		uint32_t frameHeight;
 
-// 		bool autodetectProxy; //it is in SipProxy::
 		
 		bool usePSTNProxy;
-// 		std::string manualProxy; //was used in qt interface ... change the qt to be like gtk
-// 		bool dynamicSipPort; //was used in qt interface ... change the qt to be like gtk
 
 		bool tcp_server;
-
-//		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> timeoutProvider;
 
 		bool tls_server;
 

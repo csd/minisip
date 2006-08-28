@@ -138,7 +138,6 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 		
 		getDialogConfig()->inherited->sipIdentity->setSipUri(inv->getHeaderValueTo()->getUri().getUserIpString());
 		
-		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*inv->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
 			return false;
@@ -458,7 +457,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendReject(const string &branch){
@@ -466,7 +465,7 @@ void SipDialogVoipServer::sendReject(const string &branch){
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
@@ -489,7 +488,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
@@ -506,6 +505,6 @@ void SipDialogVoipServer::sendNotAcceptable(const string &branch){
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*not_acceptable);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 

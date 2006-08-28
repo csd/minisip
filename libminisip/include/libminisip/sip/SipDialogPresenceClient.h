@@ -63,37 +63,6 @@ class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 
 		void setUpStateMachine();
 
-/*
-
-		MRef<SipInvite*> getLastInvite();
-		
-		void setLastInvite(MRef<SipInvite*> i);
-		
-		void sendInvite(const  std::string &branch);
-		void sendAuthInvite(const  std::string &branch);
-		void sendBye(const  std::string &branch, int);
-		void sendCancel(const  std::string &branch);
-		void sendInviteOk(const  std::string &branch);
-		void sendByeOk(MRef<SipBye*> bye, const  std::string &branch);
-		void sendReject(const  std::string &branch);
-		void sendRinging(const  std::string &branch);
-		void sendNotAcceptable(const  std::string &branch);
-
-		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
-
-		void handleSdp(MRef<SdpPacket*> );
-
-		void setLocalCalled(bool lc){localCalled=lc;}
-		
-		void setNonce(const  std::string &n){ nonce = n; }
-
-		void setRealm(const  std::string &r){ realm = r; }
-
-		MRef<SipSoftPhoneConfiguration*> getPhoneConfig(){return phoneconf;}
-
-		MRef<LogEntry *> getLogEntry();
-		void setLogEntry( MRef<LogEntry *> );
-*/
 	private:
 		
 		void sendSubscribe(const  std::string &branch);
@@ -106,8 +75,6 @@ class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 		bool a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command);
 		bool a6_subscribing_termwait_stoppresence(const SipSMCommand &command);
 		bool a7_termwait_terminated_notransactions(const SipSMCommand &command);
-
-//		MRef<SipSoftPhoneConfiguration*> phoneconf;
 
 		MRef<SipIdentity *> toUri;
 		bool useSTUN;

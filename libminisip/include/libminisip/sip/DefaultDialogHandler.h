@@ -56,7 +56,6 @@ class LIBMINISIP_API DefaultDialogHandler : public /*SipDialog*/ SipSMCommandRec
 		 * @param pconf      the phone configuration
 		 */
 		DefaultDialogHandler(MRef<SipStack*> stack, 
-				/*MRef<SipDialogConfig*> conf,*/ 
 				MRef<SipSoftPhoneConfiguration*> pconf, 
 				MRef<MediaHandler *> mediaHandler);
 		

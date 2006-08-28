@@ -63,18 +63,14 @@
 using namespace std;
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack, 
-            //SipDialogConfig &conf,
-	    //MRef<SipDialogConfig *> conf,
 	    MRef<SipSoftPhoneConfiguration*> pconf,
 	    MRef<MediaHandler *>mediaHandler): 
 		sipStack(stack),
-                //SipDialog(stack, conf),
 		phoneconf(pconf),
 		mediaHandler(mediaHandler)
 {
 	outsideDialogSeqNo=1;
 
-//	dialogState.callId = string("DCH_")+itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 #ifdef P2T_SUPPORT
 	//Initialize GroupListServer
 	grpListServer=NULL;
@@ -82,7 +78,6 @@ DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack,
 }
 
 DefaultDialogHandler::~DefaultDialogHandler(){
-// 	cerr << "~DefaultDialogHandler" << endl;
 }
 
 string DefaultDialogHandler::getName(){
@@ -91,38 +86,8 @@ string DefaultDialogHandler::getName(){
 
 bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
-#if 0
-	/* First, check if this is a packet that could not be handled by
-	 * any transaction and send 481 response if that is the case */
-	if (source==SipSMCommand::transaction_layer && dispatchCount>=2){ // this is the packets second run of handling.
-		mdbg << "DefaultCallHandler::handleCommand: Detected dispatched already - sending 481"<< end;
-
-		//FIXME: Check what branch parameter to send.
-		MRef<SipResponse*> no_call= new SipResponse("nobranch", 481,"Call Leg/Transaction Does Not Exist", MRef<SipMessage*>(*pkt));
-		MRef<SipMessage*> pref(*no_call);
-
-		sipStack->getDispatcher()->getLayerTransport()->sendMessage(pref,
-				string(""), //branch
-				false
-				);
-
-		return true;
-	}
-
-#ifdef DEBUG_OUTPUT
-	if (source==SipSMCommand::transaction_layer&& dispatchCount>=2){ // this is the packets second run of handling.
-		cerr << "WARNING: INTERNAL ERROR: command was not handled (dispatched flag indication)"<<endl;
-		return true;
-	}
-#endif
-	
-#endif
-
 	if (pkt->getType()=="INVITE"){
-		//type casting
-		//MRef<SipRequest*> inv = MRef<SipRequest*>((SipRequest*)*pkt);
 		MRef<SipRequest*> inv = dynamic_cast<SipRequest*>(*pkt);
-		//inv->checkAcceptContact();
 		//check if it's a regular INVITE or a P2T INVITE
 #ifdef P2T_SUPPORT
 		if(inv->is_P2T()) {
@@ -165,8 +130,6 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
-			//MRef<SipMessage*> pack = command.getCommandPacket();
-			//MRef<SipInvite*> inv = MRef<SipInvite*>((SipInvite*)*pack);
 
 			//get the GroupList from the remote GroupListServer
 			//MRef<GroupList*>grpList;
@@ -220,10 +183,6 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 				cerr<<"Error: DefaultDialogHandler: VoIP dialog refused to handle the incoming INVITE"<<endl;
 			}
 			
-//			cmd.setDispatchCount(dispatchCount);
-
-//			getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
-//			mdbg << cmd << end;
 		}
 		else if(isConfConnect) {
 			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
@@ -256,9 +215,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			sipStack->addDialog(voipConfCall);
 
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-			//cmd.setDispatchCount(dispatchCount);
 
-			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg << cmd << end;
 		}
 		//start SipDialogVoIP
@@ -300,9 +258,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-			//cmd.setDispatchCount(dispatchCount);
 
-			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg << cmd << end;
 		}
 		return true;
@@ -335,21 +292,13 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 	}
 
-	//	if (command.getType()==SipSMCommand::COMMAND_PACKET){
 	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
-	//	}
 
 	return false;
 
 }
 
 bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
-/*	
-	if (dispatchCount>=2){
-		mdbg << "WARNING: Command ["<< cmdstr.getOp()<<"] ignored (dispatched flag indication)"<< end;
-		return true;
-	}
-*/
 	
 	if (cmdstr.getOp() == SipCommandString::start_presence_client){
 		cerr << "DefaultDialogHandler: Creating SipDialogPresenceClient for start_presence_client command"<< endl;
@@ -363,8 +312,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
 		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-		//cmd.setDispatchCount(dispatchCount);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}
@@ -381,8 +329,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
 		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-		//cmd.setDispatchCount(dispatchCount);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}
@@ -418,8 +365,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
-		//cmd.setDispatchCount(dispatchCount);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		return true;
 	}
 
@@ -504,7 +450,6 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 	if ( dst!=SipSMCommand::dialog_layer)
 		return false;
 	
-	//int dispatchCount = command.getDispatchCount();
 	if (command.getType()==SipSMCommand::COMMAND_PACKET){
 		return handleCommandPacket( command.getCommandPacket()/*, dispatchCount*/);
 	}else{
@@ -874,7 +819,6 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			//dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyIpAddr = new IP4Address(proxy);
 			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyAddressString = proxy;
 			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyPort = iport;
 		}catch(HostNotFound & exc){
@@ -891,11 +835,11 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch){
         MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
-        ok->getHeaderValueTo()->setParameter("tag",/*dialogState.localTag*/"libminisip");
+        ok->getHeaderValueTo()->setParameter("tag","libminisip");
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-        sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+        sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 
@@ -940,7 +884,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 
 	MRef<SipMessage*> pref(*im);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 

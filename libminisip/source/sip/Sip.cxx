@@ -104,14 +104,11 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 
 
 Sip::~Sip(){
-// 	cerr << "~Sip" << endl;
 }
 
 void Sip::handleCommand(string subsystem, const CommandString &cmd){
 	assert(subsystem=="sip");
 	sipstack->handleCommand(cmd);
-//	SipSMCommand sipcmd(cmd, SipSMCommand::remote, SipSMCommand::TU);
-//	sipstack->handleCommand(sipcmd);
 }
 
 CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd){
@@ -220,8 +217,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 #ifdef DEBUG_OUTPUT
         cerr << "After handleCommand" << endl;
 #endif
-	//dialogContainer->enqueueCommand( c, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
-	//
+	
 	mediaSession->setCallId( voipCall->getCallId() );
 
 	string cid = voipCall->getCallId();
@@ -318,7 +314,6 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //FIXME: send directly to dialog instead
 
 	sipstack->handleCommand(cmd);
-	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipConfCall->getCallId();
 }
 
@@ -410,7 +405,6 @@ MRef<Session *> mediaSession =
         SipSMCommand cmd(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer));
 	
 	sipstack->handleCommand(cmd);
-	//dialogContainer->enqueueCommand( cmd, LOW_PRIO_QUEUE, PRIO_LAST_IN_QUEUE );
 	return voipConfCall->getCallId();
 }
 

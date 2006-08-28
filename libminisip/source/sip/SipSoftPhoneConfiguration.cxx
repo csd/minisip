@@ -64,11 +64,7 @@ using namespace std;
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
 	securityConfig(),
-//	dialogContainer(NULL),
 	sip(NULL),
-//	pstnProxy(NULL),
-//	pstnProxyPort(0),
-//	pstnNumber(string("")),
 	useSTUN(false),
 	stunServerPort(0),
 	findStunServerFromSipUri(false),
@@ -76,9 +72,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	stunDomain(""),
 	useUserDefinedStunServer(false),
 	proxyConnection(NULL),
-//	use_gw_ip(false),
-//	doRegister(false),
-//	doRegisterPSTN(false),
 	soundDeviceIn(""),
 	soundDeviceOut(""),
 	videoDevice(""),
@@ -92,7 +85,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
-// 	cerr << "~SipSoftPhoneConfiguration" << endl;
 }
 
 void SipSoftPhoneConfiguration::save(){
@@ -630,3 +622,4 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipUri &uri ) {
 
 	return NULL;
 }
+

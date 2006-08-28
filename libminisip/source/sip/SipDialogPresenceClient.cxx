@@ -133,8 +133,6 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
-		//MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)
-		//	*(resp->getHeaderOfType(SIP_HEADER_TYPE_EXPIRES)->getHeaderValue(0));
 		massert(dynamic_cast<SipHeaderValueExpires*>(*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0)));		
 		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0);
 		int timeout;
@@ -212,7 +210,7 @@ bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated),
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 		return false;
@@ -294,7 +292,6 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack,
 			useSTUN(use_stun)
 {
 
-	//setCallId( itoa(rand())+"@"+getDialogConfig().inherited.externalContactIP);
 	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 	
 	dialogState.localTag = itoa(rand());
@@ -327,14 +324,12 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
                 SipSMCommand::transaction_layer
                 );
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
-//	setLastSubsc(inv);
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 
 }
 
 bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << end;
-//	merr << "XXXSipDialogPresenceClient::handleCommand got "<< c << end;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId ){
@@ -354,12 +349,7 @@ bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	
 	}
 	
-//	if (c.getType()!=SipSMCommand::COMMAND_PACKET && 
-//			c.getCommandPacket()->getCSeq()!= command_seq_no)
-//		return false;
-	
 	mdbg << "SipDialogPresenceClient::handlePacket() got "<< c << end;
-	merr << "SipDialogPresenceClient returning dialogs handleCommand"<< end;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){

@@ -161,7 +161,7 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/ );
+		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		return true;
 	}else{
 		return false;
@@ -231,7 +231,6 @@ void SipDialogPresenceServer::setUpStateMachine(){
 
 
 SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipStack*> stack, 
-		//const SipDialogConfig &callconfig, 
 		MRef<SipDialogConfig*> callconfig,
 		bool use_stun) : 
                 	SipDialog(stack,callconfig),
@@ -322,7 +321,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
                 SipSMCommand::transaction_layer
                 );
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 }
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){
