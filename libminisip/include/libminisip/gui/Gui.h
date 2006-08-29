@@ -115,14 +115,6 @@ class LIBMINISIP_API Gui : public Runnable, public CommandReceiver {
 			callback->handleCommand(toSubsystem, cmd);
 		}
 
-
-		// Lesson learned: Doing logging in the GUI is not good
-		// since when ever something interesting happend it is
-		// likely that the GUI has been shut down. 
-//		virtual void log(int type, std::string msg){}; 
-		
-//		virtual void gotPacket(int32_t i)=0;
-
 		virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf )=0;
 
 		virtual void run()=0;
@@ -131,8 +123,6 @@ class LIBMINISIP_API Gui : public Runnable, public CommandReceiver {
 	protected:
 		MRef<CommandReceiver*> callback;
 		MRef<ConfMessageRouter*> confCallback;
-		//ConfCallback *confCallback;
-		//GuiCallback *callback;
 };
 
 
