@@ -95,7 +95,6 @@ using namespace std;
 // SpAudio SoundIO::spAudio(5);
 
 SoundIO::SoundIO(
-		//string device, 
 		MRef<SoundDevice *> inputDevice,
 		MRef<SoundDevice *> outputDevice,
 		string mixerType,
