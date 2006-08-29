@@ -187,7 +187,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		CommandString cmdstr( callId,
 				MediaCommandString::set_session_sound_settings,
 				"senders", "ON");
-		//callback->guicb_handleMediaCommand(cmdstr);
 		sendCommand("media", cmdstr);
 	
 	}
@@ -259,7 +258,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		else{
 			displayMessage("You missed call from "+cmd.getParam(), red);
 			CommandString hup(cmd.getDestinationId(), SipCommandString::reject_invite);
-			//callback->guicb_handleCommand(hup);
 			sendCommand("sip",hup);
 		
 		}
@@ -504,7 +502,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	if (autoanswer && state=="ANSWER?"){
 		handled=true;
 		CommandString command(callId, SipCommandString::accept_invite);
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip",command);
 		state="INCALL";
 		setPrompt(state);
@@ -513,7 +510,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		CommandString cmdstr( callId,
 				MediaCommandString::set_session_sound_settings,
 				"senders", "ON");
-		//callback->guicb_handleMediaCommand(cmdstr);
 		sendCommand("media",cmdstr);
 	}
 
@@ -807,7 +803,6 @@ void MinisipTextUI::guiExecute(string cmd){
 //			command.setDestinationId("pstn");
 
 		command["proxy_domain"] = regproxy;
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip",command);
 		handled=true;
 	}
@@ -872,7 +867,6 @@ void MinisipTextUI::guiExecute(string cmd){
 
 	if (command == "answer"){
 		CommandString command(callId, SipCommandString::accept_invite);
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip", command);
 		displayMessage("A call with the most recent callId will be accepted");
 		handled=true;
@@ -881,7 +875,6 @@ void MinisipTextUI::guiExecute(string cmd){
 		CommandString cmdstr( callId,
 				MediaCommandString::set_session_sound_settings,
 				"senders", "ON");
-		//callback->guicb_handleMediaCommand(cmdstr);
 		sendCommand("media",cmdstr);
 		
 
@@ -906,14 +899,12 @@ void MinisipTextUI::guiExecute(string cmd){
 	
 	if (command == "accept" && state == "TRANSFER?"){
 		CommandString command(callId, SipCommandString::user_transfer_accept);
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip", command);
 		handled=true;
 	}
 	
         if (command == "reject" && state == "TRANSFER?"){
 		CommandString command(callId, SipCommandString::user_transfer_refuse);
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip", command);
 		handled=true;
 	}
@@ -931,7 +922,6 @@ void MinisipTextUI::guiExecute(string cmd){
 
 	if (trim(command) == "hangup"){
 		CommandString hup(callId, SipCommandString::hang_up);
-		//callback->guicb_handleCommand(hup);
 		sendCommand("sip", hup);
 		
 		state="IDLE";
@@ -1012,7 +1002,6 @@ void MinisipTextUI::guiExecute(string cmd){
 			}else{
 				string uri = trim(command.substr(9));
 				CommandString transfer(callId, SipCommandString::user_transfer, uri);
-				//callback->guicb_handleCommand(transfer);
 				sendCommand("sip", transfer);
 				
 			}
@@ -1080,7 +1069,6 @@ void MinisipTextUI::guiExecute(string cmd){
 
 			CommandString command("",s_cmd, s_param);
 			displayMessage("Created cmd=" + s_cmd + " param=" + s_param+" subsystem="+s_subsystem);
-			//callback->guicb_handleCommand(command);
 			sendCommand(s_subsystem, command);
 		}
 		else {
@@ -1103,7 +1091,6 @@ void MinisipTextUI::guiExecute(string cmd){
 			//if session is already going on, establish SIP Session
 			if(p2tmode==true) {
 				CommandString command("", "p2tAddUser",p2tGroupId, uri);
-				//callback->guicb_handleCommand(command);
 				sendCommand("sip", command);
 			}		
 		
@@ -1131,7 +1118,6 @@ void MinisipTextUI::guiExecute(string cmd){
 	
 		//inform DefaultDialogHandler
 		CommandString cmd1("",  "p2tSessionAccepted", p2tGroupId, inviting_user);
-		//callback->guicb_handleCommand(cmd1);
 		sendCommand("sip",cmd1);
 		
 
@@ -1150,7 +1136,6 @@ void MinisipTextUI::guiExecute(string cmd){
 		//Close SipDialogP2T and he will terminate all
 		//SipDialogP2Tuser Sessions.
 		CommandString command(p2tGroupId, "p2tTerminate");
-		//callback->guicb_handleCommand(command);	
 		sendCommand("sip", command);
 			
 		
@@ -1179,7 +1164,6 @@ void MinisipTextUI::guiExecute(string cmd){
 		
 		//start p2tGroupListServer
 		CommandString command("","p2tStartGroupListServer");
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip",command);
 		
 		//initiate Group Member List and add
@@ -1212,12 +1196,10 @@ void MinisipTextUI::guiExecute(string cmd){
 		
 		//stop SipDialogP2T
 		CommandString term(p2tGroupId, "p2tTerminate");
-		//callback->guicb_handleCommand(term);	
 		sendCommand("sip",term);
 
 		//stop p2tGroupListServer
 		CommandString command("","p2tStopGroupListServer");
-		//callback->guicb_handleCommand(command);
 		sendCommand("sip",command);
 		
 				
@@ -1230,7 +1212,6 @@ void MinisipTextUI::guiExecute(string cmd){
 
 	if (command == "connect" && inCall == true){
 		CommandString cmd ("", "p2tStartSession", grpList->print());
-		//callback->guicb_handleCommand(cmd);
 		sendCommand("sip",cmd);
 		p2tmode=true;
 		handled=true;
@@ -1238,7 +1219,6 @@ void MinisipTextUI::guiExecute(string cmd){
 	
 	if (command == "talk" && p2tmode == true){
 		CommandString cmd (p2tGroupId, "p2tGetFloor");
-		//callback->guicb_handleCommand(cmd);
 		sendCommand("sip", cmd);
 		
 		handled=true;
@@ -1246,7 +1226,6 @@ void MinisipTextUI::guiExecute(string cmd){
 
 	if (command == "stop" && p2tmode == true){
 		CommandString cmd (p2tGroupId, "p2tReleaseFloor");
-		//callback->guicb_handleCommand(cmd);
 		sendCommand("sip",cmd);
 		handled=true;
 	}
@@ -1356,7 +1335,6 @@ void MinisipTextUI::guiExecute(string cmd){
 			CommandString command("",SipCommandString::outgoing_im, msg, addr);
 
 			//command["proxy_domain"] = regproxy;
-			//callback->guicb_handleCommand(command);
 			sendCommand("sip",command);
 			
 		}
