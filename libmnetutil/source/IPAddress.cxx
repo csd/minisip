@@ -81,3 +81,17 @@ MRef<IPAddress *> IPAddress::create(const string &addr){
 #endif
 	return NULL;
 }
+
+MRef<IPAddress *> IPAddress::create(const std::string &addr, bool use_ipv6){
+	try {
+		if( !use_ipv6 )
+			return new IP4Address( addr );
+#ifdef HAVE_IPV6
+		else
+			return new IP6Address( addr );
+#endif
+	} catch( HostNotFound & ){
+	}
+
+	return NULL;
+}

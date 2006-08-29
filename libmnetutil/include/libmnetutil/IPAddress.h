@@ -74,6 +74,8 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		 */
 		static MRef<IPAddress *> create(const std::string &addr);
 
+		static MRef<IPAddress *> create(const std::string &addr, bool use_ipv6);
+
 	protected:
 		void setAddressFamily(int af);
 		void setProtocolFamily(int pf);
