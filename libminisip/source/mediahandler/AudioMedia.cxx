@@ -234,7 +234,7 @@ void AudioMedia::stopRinging(){
 #ifdef DEBUG_OUTPUT
 string AudioMedia::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + ": this=" + itoa((int64_t)this);
+	ret = getMemObjectType() + ": this=" + itoa(reinterpret_cast<int64_t>(this));
 	for( std::list< MRef<MediaStreamSender *> >::iterator it = senders.begin();
 				it != senders.end(); it++ ) {
 		ret += (*it)->getDebugString() + ";";
