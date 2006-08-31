@@ -172,7 +172,7 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
      *
      * Just call the ZRTP engine for further processing.
      */
-    void handleTimeout(const std::string &c) {
+    void handleTimeout(const std::string & /* c */ ) {
         if (zrtpEngine != NULL) {
             zrtpEngine->processTimeout();
         }

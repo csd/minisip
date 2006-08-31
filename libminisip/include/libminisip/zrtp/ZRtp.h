@@ -36,9 +36,9 @@
 #include <libminisip/zrtp/ZrtpPacketClearAck.h>
 #include <libminisip/zrtp/ZrtpCallback.h>
 #include <libminisip/zrtp/ZIDRecord.h>
-#include <libmcrypto/openssl/ZrtpDH.h>
-#include <libmcrypto/openssl/hmac256.h>
-#include <libmcrypto/openssl/sha256.h>
+#include <libmcrypto/ZrtpDH.h>
+#include <libmcrypto/hmac256.h>
+#include <libmcrypto/sha256.h>
 
 class ZrtpStateClass;
 
@@ -152,7 +152,7 @@ class ZRtp {
          *     Points to the sigs secret data. The data must have a length
          *     of 32 bytes (length of SHA256 hash)
          */
-       void setSigsSecret(uint8_t* data)  { }
+       void setSigsSecret(uint8_t* /*data*/)  { }
 
        /**
         * Set the srtps secret.
@@ -164,7 +164,7 @@ class ZRtp {
         *     Points to the srtps secret data. The data must have a length
         *      of 32 bytes (length of SHA256 hash)
         */
-       void setSrtpsSecret(uint8_t* data)  {  }
+       void setSrtpsSecret(uint8_t* /*data*/)  {  }
 
        /**
         * Set the other secret.
@@ -177,7 +177,7 @@ class ZRtp {
         * @param length
         *     The length in bytes of the data.
         */
-       void setOtherSecret(uint8_t* data, int32_t length)  {  }
+       void setOtherSecret(uint8_t* /*data*/, int32_t /*length*/)  {  }
 
        /**
         * Set the client ID for ZRTP Hello message.

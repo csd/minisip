@@ -25,7 +25,7 @@
 #include <libminisip/zrtp/ZIDFile.h>
 #include <libminisip/zrtp/ZIDRecord.h>
 #include <libminisip/zrtp/Base32.h>
-#include <libmcrypto/openssl/ZrtpDH.h>
+#include <libmcrypto/ZrtpDH.h>
 
 
 static void hexdump(const char* title, const unsigned char *s, int l) {

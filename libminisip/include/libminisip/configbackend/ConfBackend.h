@@ -42,7 +42,7 @@ class LIBMINISIP_API ConfBackend : public MObject{
 		virtual std::string loadString( const std::string &key, const std::string &defaultValue="" )=0;
 		virtual int32_t loadInt( const std::string &key, const int32_t defaultValue=0 )=0;
 
-		virtual void reset( const std::string &key ){};
+		virtual void reset( const std::string & /* key */ ){};
 
 		virtual void commit()=0;
 
