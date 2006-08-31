@@ -337,7 +337,7 @@ int Minisip::startSip() {
 				phoneConf->inherited->localUdpPort,
 				phoneConf->inherited->localTcpPort,
 				phoneConf->inherited->externalContactUdpPort,
-				phoneConf->inherited->getTransport(),
+//				phoneConf->inherited->getTransport(),
 				phoneConf->inherited->localTlsPort,
 				phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
 				//TODO: TLS should use the whole chain instead of only the f$

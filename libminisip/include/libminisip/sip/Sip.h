@@ -51,7 +51,6 @@ class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
 				int32_t localUdpPort=5060,
 				int32_t localTcpPort=5060,
 				int32_t externalContactUdpPort=5060,
-				std::string defaultTransportProtocol="UDP",
 				int32_t localTlsPort=5061,
 				MRef<certificate_chain *> cert=NULL,    //The certificate chain is used by TLS
 				//TODO: TLS should use the whole chain instead of only the f$

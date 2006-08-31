@@ -61,8 +61,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 		int32_t localUdpPort,
 		int32_t localTcpPort,
 		int32_t externalContactUdpPort,
-		string /*defaultTransportProtocol*/		//Warning: Not used -EE
-		,int32_t localTlsPort,
+		int32_t localTlsPort,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
 		){
