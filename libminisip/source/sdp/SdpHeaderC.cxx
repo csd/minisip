@@ -34,6 +34,7 @@
 
 #include<libminisip/sdp/SdpHeaderC.h>
 #include<libmutil/itoa.h>
+#include<libmnetutil/IPAddress.h>
 #include<iostream>
 
 using namespace std;
@@ -76,7 +77,7 @@ SdpHeaderC::~SdpHeaderC(){
 
 }
 
-string SdpHeaderC::getNetType(){
+const string &SdpHeaderC::getNetType()const{
 	return netType;
 }
 
@@ -84,14 +85,14 @@ void SdpHeaderC::setNetType(string net_type){
 	this->netType=net_type;
 }
 
-string SdpHeaderC::getAddrType(){
+const string &SdpHeaderC::getAddrType()const{
 	return addrType;
 }
 void SdpHeaderC::setAddrType(string addr_type){
 	this->addrType=addr_type;
 }
 
-string SdpHeaderC::getAddr(){
+const string &SdpHeaderC::getAddr()const{
 //	cerr << "Returning addr: "<< addr << endl;
 	return addr;
 }
@@ -119,4 +120,16 @@ string SdpHeaderC::getString(){
 	return ret;
 }
 
+MRef<IPAddress*> SdpHeaderC::getIPAdress(){
+	if( !ipAddr ){
+		if( netType != "IN" )
+			return NULL;
 
+		if( addrType != "IP4" && addrType != "IP6" )
+			return NULL;
+
+		ipAddr = IPAddress::create( addr, addrType == "IP6" );
+	}
+
+	return ipAddr;
+}

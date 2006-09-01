@@ -34,6 +34,7 @@
 
 #include<libminisip/sdp/SdpPacket.h>
 #include<libmnetutil/IP4Address.h>
+#include<libmnetutil/NetworkException.h>
 
 #include<libmutil/trim.h>
 #include<libmutil/itoa.h>
@@ -78,9 +79,14 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 			case 's':
 				addHeader(MRef<SdpHeader*>(new SdpHeaderS(lines[i])));
 				break;
-			case 'c':
-				addHeader(MRef<SdpHeader*>(new SdpHeaderC(lines[i])));
+			case 'c':{
+				MRef<SdpHeaderC*> c = new SdpHeaderC(lines[i]);
+				if( lastM )
+					lastM->setConnection(c);
+				else
+					addHeader(*c);
 				break;
+				}
 			case 't':
 				addHeader(MRef<SdpHeader*>(new SdpHeaderT(lines[i])));
 				break;
@@ -210,35 +216,20 @@ string SdpPacket::getString(){
 
 
 
-MRef<IPAddress *> SdpPacket::getRemoteAddr(int &ret_port){
-	string addr="";
-	int32_t port=-1;
-	MRef<SdpHeaderC*> cptr;
-	MRef<SdpHeaderM*> mptr;
+MRef<SdpHeaderC*> SdpPacket::getSessionLevelConnection(){
 //	cerr << "starting parse of remote addr in SDP packet"<< endl;
 	for (unsigned i=0; i<headers.size(); i++){
 		if ( headers[i].isNull() )
 			cerr <<"WARNING: sdp header is null"<< endl;
 //		cerr << "testing header with prio "<< headers[i]->get_priority()<< endl;
 		if ((headers[i])->getType() == SDP_HEADER_TYPE_C){
+			MRef<SdpHeaderC*> cptr;
 			cptr = MRef<SdpHeaderC*>((SdpHeaderC *)*(headers[i]));
-			addr=cptr->getAddr();
-		}
-		if ((headers[i])->getType() == SDP_HEADER_TYPE_M){
-			mptr = MRef<SdpHeaderM*>((SdpHeaderM *)*(headers[i]));
-			port=mptr->getPort();
+			return cptr;
 		}
 	}
-//	cerr << "in SDP packet: Remote addr is "<<addr << ":" << port << endl;
-	MRef<IPAddress *> a(new IP4Address(addr));
-        //a->set_port(port);
-#ifdef DEBUG_OUTPUT
-	if (port==-1){
-		merr << "WARNING: Did not find remote port (in SdpPacket::getRemoteAddr)"<< end;
-	}
-#endif
-        ret_port = port;
-	return a;
+
+	return NULL;
 }
 
 string SdpPacket::getKeyMgmt(){

@@ -37,6 +37,7 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/sdp/SdpHeader.h>
+#include<libminisip/sdp/SdpHeaderC.h>
 #include<vector>
 
 class SdpHeaderA;
@@ -45,8 +46,11 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 	public:
 		SdpHeaderM(std::string buildFrom);
 		SdpHeaderM(std::string media, int32_t port, int32_t n_ports, std::string transport);
+		SdpHeaderM(const SdpHeaderM &src);
 		virtual ~SdpHeaderM();
 		
+		SdpHeaderM &operator=(const SdpHeaderM &src);
+
 		virtual std::string getMemObjectType(){return "SdpHeaderM";}
 
 		void addFormat(int32_t format);
@@ -74,6 +78,9 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		std::string getRtpMap(uint32_t format);
 		
 		std::string getFmtpParam(uint32_t format);
+
+		void setConnection( MRef<SdpHeaderC*> c );
+		MRef<SdpHeaderC*> getConnection();
 		
 	private:
 		std::string media;
@@ -82,6 +89,7 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		std::string transport;
 		std::vector<int32_t> formats;
 		std::list<MRef<SdpHeaderA*> >attributes;
+		MRef<SdpHeaderC*> connection;
 };
 
 #endif

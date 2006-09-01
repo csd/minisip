@@ -203,9 +203,6 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	unsigned int i;
 	int j;
 	MRef<MediaStreamReceiver *> receiver;
-	MRef<IPAddress *> remoteAddress;
-	// Not used
-	int port;
 	bool found = false;
 
 	this->peerUri = peerUri;
@@ -238,7 +235,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		}
 		*/
 	}
-	remoteAddress = answer->getRemoteAddr( port );
+	MRef<SdpHeaderC*> sessionConn = answer->getSessionLevelConnection();
 
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
 		if( answer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
@@ -247,6 +244,18 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			cerr << "Session::setSdpAnswer - trying media line " << m->getString() << endl;
 #endif
 			
+			MRef<IPAddress *> remoteAddress;
+			MRef<SdpHeaderC *> c = m->getConnection();
+			if( !c )
+				c = sessionConn;
+
+			if( !c ){
+				cerr << "Session::setSdpAnswer - skip missing connection" << endl;
+				continue;
+			}
+
+			remoteAddress = c->getIPAdress();
+
 			for( j = 0; j < m->getNrFormats(); j++ ){
 				receiver = matchFormat( m, j, remoteAddress );
 
@@ -325,9 +334,6 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	int j;
 	MRef<MediaStreamReceiver *> receiver;
 	MRef<SdpPacket *> packet;
-	MRef<IPAddress *> remoteAddress;
-	// Not used
-	int port;
 	string keyMgmtMessage;
 	std::list<std::string>::iterator iAttribute;
 	std::list<std::string> attributes;
@@ -359,9 +365,9 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	}
 		
 
-	remoteAddress = offer->getRemoteAddr( port );
-
 	sdpAnswer = emptySdp();
+
+	MRef<SdpHeaderC*> sessionConn = offer->getSessionLevelConnection();
 
 	for( i = 0; i < offer->getHeaders().size(); i++ ){
 
@@ -383,6 +389,31 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					offerM->getTransport() );
 
 			sdpAnswer->addHeader( *answerM );
+
+			MRef<SdpHeaderC *> c = offerM->getConnection();
+			MRef<IPAddress *> remoteAddress;
+			string addrString;
+
+			if( !c )
+				c = sessionConn;
+
+			if( !c )
+				continue;
+
+			if ( c->getNetType() != "IN" )
+				continue;
+
+			if( c->getAddrType() == "IP4" ){
+				if( localIpString.empty() )
+					continue;
+				addrString = localIpString;
+			}
+			else{
+				continue;
+			}
+
+			remoteAddress = c->getIPAdress();
+			answerM->setConnection( new SdpHeaderC("IN", c->getAddrType(), addrString ));
 
 			for( j = 0; j < offerM->getNrFormats(); j++ ){
 				receiver = matchFormat( offerM, j, remoteAddress );

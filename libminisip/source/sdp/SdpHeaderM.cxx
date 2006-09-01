@@ -114,6 +114,28 @@ SdpHeaderM::SdpHeaderM(string media,
 	this->transport=transport;
 }
 
+SdpHeaderM::SdpHeaderM(const SdpHeaderM &src): SdpHeader( SDP_HEADER_TYPE_M, 8 ){
+	*this = src;
+}
+
+SdpHeaderM &SdpHeaderM::operator=(const SdpHeaderM &src){
+	set_priority( src.getPriority() );
+	media = src.media;
+	port = src.port;
+	nPorts = src.nPorts;
+	transport = src.transport;
+	formats = src.formats;
+	attributes.clear();
+
+	list<MRef<SdpHeaderA *> >::const_iterator i;
+
+	for(i=src.attributes.begin(); i!=src.attributes.end(); i++){
+		addAttribute( new SdpHeaderA( ***i ) );
+	}
+
+	return *this;
+}
+
 SdpHeaderM::~SdpHeaderM(){
 
 }
@@ -176,6 +198,9 @@ string SdpHeaderM::getString(){
 	for (unsigned i=0; i< formats.size(); i++)
 		ret+=" "+itoa(formats[i]);
 
+	if( connection )
+		ret += "\r\n" + connection->getString();
+
 	return ret;
 }
 
@@ -232,4 +257,13 @@ string SdpHeaderM::getFmtpParam(uint32_t format){
 
 list<MRef<SdpHeaderA *> > SdpHeaderM::getAttributes(){
 	return attributes;
+}
+
+
+void SdpHeaderM::setConnection( MRef<SdpHeaderC*> c ){
+	connection = c;
+}
+
+MRef<SdpHeaderC*> SdpHeaderM::getConnection(){
+	return connection;
 }

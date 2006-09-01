@@ -46,6 +46,7 @@
 
 #include<libminisip/sdp/SdpPacket.h>
 #include<libminisip/sdp/SdpHeader.h>
+#include<libminisip/sdp/SdpHeaderC.h>
 
 MRef<SipMessageContent*> sdpSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 
@@ -58,7 +59,7 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	
 		virtual std::string getMemObjectType(){return "SdpPacket";}
 		
-		MRef<IPAddress *>getRemoteAddr(int &ret_port);
+		MRef<SdpHeaderC*> getSessionLevelConnection();
 		std::string getKeyMgmt();
 		void addHeader(MRef<SdpHeader*> h);
 		virtual std::string getString();

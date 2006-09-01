@@ -72,7 +72,7 @@ class LIBMINISIP_API SdpHeader : public MObject{
 		 * @return An integer that determines where in the
 		 *         list of headers this header will be in the
 		 *         SDP message. 		 */
-		int32_t getPriority(){return priority;};
+		int32_t getPriority() const {return priority;};
 
 		/**
 		 * All headers have a type identifier (integer) that is 

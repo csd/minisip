@@ -39,6 +39,8 @@
 
 #include<string>
 
+class IPAddress;
+
 class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 	public:
 		SdpHeaderC(std::string buildFrom);
@@ -47,21 +49,25 @@ class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 		
 		virtual std::string getMemObjectType(){return "SdpHeaderC";}
 
-		std::string getNetType();
+		const std::string &getNetType() const;
 		void setNetType(std::string netType);
 
-		std::string getAddrType();
+		const std::string &getAddrType() const;
 		void setAddrType(std::string addrType);
 
-		std::string getAddr();
+		const std::string &getAddr() const;
 		void setAddr(std::string addr);
 
 		virtual std::string getString();
+
+		MRef<IPAddress*> getIPAdress();
 
 	private:
 		std::string netType;
 		std::string addrType;
 		std::string addr;
+
+		MRef<IPAddress*> ipAddr;
 };
 
 #endif
