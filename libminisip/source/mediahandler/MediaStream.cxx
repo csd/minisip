@@ -340,8 +340,8 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
 	packetSsrc = packet->getHeader().getSSRC();
 	seq_no = packet->getHeader().getSeqNo();
 
-#ifdef ZRT_SUPPORT
-        if (zrtpBridge && zrtpBridge->isZrtpPacket(packet) {
+#ifdef ZRTP_SUPPORT
+        if (zrtpBridge && packet->getHeader().getExtension() && zrtpBridge->isZrtpPacket(packet)) {
             packet->checkZrtpChecksum(false);
         }
         MRef<CryptoContext *> pcc = getCryptoContext(packetSsrc, seq_no);
@@ -350,17 +350,17 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
         // state then create a real CryptoContext for this SSRC. Assumption:
         // every SSRC stream sent via this connection is secured _and_ uses
         // the same crypto parameters.
-	if (zrtpBridge && zrtpBridge->isSecureState() &&
+        if (zrtpBridge && zrtpBridge->getSsrcSender() != 0 &&
+                    zrtpBridge->isSecureState() &&
                    (pcc->getEalg() == MIKEY_SRTP_EALG_NULL)) {
             pcc = zrtpBridge->newCryptoContextForRecvSSRC(packetSsrc, 0, seq_no, 0L);
         }
         if( packet->unprotect(pcc)) { // Authentication or replay protection failed
             return;
         }
-        if (zrtpBridge && packet->getHeader()->getExtension() &&
+        if (zrtpBridge && packet->getHeader().getExtension() &&
             (zrtpBridge->processPacket(packet) == 0)) {
                 return;
-            }
         }
 #else
 	if( packet->unprotect( getCryptoContext( packetSsrc, seq_no ) )){

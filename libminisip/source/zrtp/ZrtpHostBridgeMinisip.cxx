@@ -281,7 +281,7 @@ ZrtpHostBridgeMinisip::newCryptoContextForRecvSSRC(uint32_t ssrc, int roc,
     MRef<CryptoContext *> pcc;
 
     pcc = recvCryptoContext->newCryptoContextForSSRC(ssrc, roc, seq, keyDerivRate);
-    pcc->derive_srtp_keys(recvZrtpSeqNo);
+    pcc->derive_srtp_keys(seq);
     rStream->setKeyAgreementZrtp(pcc);
     return pcc;
 }
