@@ -676,6 +676,10 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			merr << "Sdp was NULL in sendInvite" << end;
 			return; 
 		}
+
+		if( !sdp->getSessionLevelAttribute( "group" ).empty() ){
+			inv->addHeader(new SipHeader(new SipHeaderValueRequire("sdp-anat")));
+		}
 	}
 	
 	/* Add the latter to the INVITE message */ // If it exists
