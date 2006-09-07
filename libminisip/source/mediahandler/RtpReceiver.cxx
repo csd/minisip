@@ -71,6 +71,14 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 
 	socket = NULL;
 
+	string externalIp = ipProvider->getExternalIp();
+	bool useIPv6;
+
+	if( externalIp.find(':') == string::npos )
+		useIPv6 = false;
+	else
+		useIPv6 = true;
+	
 	int portretry = 0;
 	for (; portretry<RTP_RECEIVER_MAX_RETRIES; portretry++ ) {
 		//generate a random port, even number, in the given range
@@ -82,7 +90,7 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 			printf( "RtpReceiver:: final trying port = %d\n", port );
 		#endif
 		try{
-			socket = new UDPSocket( port );
+			socket = new UDPSocket( port, useIPv6 );
 			if( socket ) {
 				break;
 			}
