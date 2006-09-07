@@ -126,7 +126,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 
 		if( media->receive ){
 			rtpReceiver = new RtpReceiver( ipProvider );
-			rStream = new MediaStreamReceiver( media, rtpReceiver, ipProvider );
+			rStream = new MediaStreamReceiver( media, rtpReceiver );
 			session->addMediaStreamReceiver( rStream );
 			if( (*i) == this->audioMedia ) {
 				CallRecorder * cr;

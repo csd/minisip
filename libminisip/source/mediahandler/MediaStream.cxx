@@ -264,10 +264,10 @@ void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
 #endif
 
 MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
-		MRef<RtpReceiver *> rtpReceiver, MRef<IpProvider *> ipProvider ):
+		MRef<RtpReceiver *> rtpReceiver, MRef<RtpReceiver *> rtp6Recv ):
 			MediaStream( media ),
 			rtpReceiver( rtpReceiver ),
-			ipProvider( ipProvider ){
+			rtp6Receiver( rtp6Recv ){
 	id = rand();
 	externalPort = 0;
 	running = false;
@@ -280,14 +280,20 @@ uint32_t MediaStreamReceiver::getId(){
 
 void MediaStreamReceiver::start(){
 	if( !running ){
-		rtpReceiver->registerMediaStream( this );
+		if( rtpReceiver )
+			rtpReceiver->registerMediaStream( this );
+		if( rtp6Receiver )
+			rtp6Receiver->registerMediaStream( this );
 		running = true;
 	}
 }
 
 void MediaStreamReceiver::stop(){
 	list<uint32_t>::iterator i;
-	rtpReceiver->unregisterMediaStream( this );
+	if( rtpReceiver )
+		rtpReceiver->unregisterMediaStream( this );
+	if( rtp6Receiver )
+		rtp6Receiver->unregisterMediaStream( this );
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
@@ -300,7 +306,7 @@ void MediaStreamReceiver::stop(){
 }
 
 uint16_t MediaStreamReceiver::getPort(){
-	return rtpReceiver->getPort();
+	return rtpReceiver ? rtpReceiver->getPort() : ( rtp6Receiver ? rtp6Receiver->getPort() : 0 );
 }
 
 #ifdef ZRTP_SUPPORT
@@ -401,7 +407,17 @@ std::list<MRef<Codec *> > MediaStreamReceiver::getAvailableCodecs(){
 	return codecList;
 }
 
-MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket ):
+
+uint16_t MediaStreamReceiver::getPort( const string &addrType ){
+	if( addrType == "IP4" && rtpReceiver )
+		return rtpReceiver->getPort();
+	else if( addrType == "IP6" && rtp6Receiver )
+		return rtp6Receiver->getPort();
+	return 0;
+}
+
+
+MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket, MRef<UDPSocket *> sender6Socket ):
 	MediaStream( media ){
 	selectedCodec = NULL;
 	remotePort = 0;
@@ -418,6 +434,8 @@ MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> sen
 		senderSock = new UDPSocket;
 		senderSock->setLowDelay();
 	}
+
+	this->sender6Sock = sender6Socket;
 }
 
 void MediaStreamSender::start(){
@@ -532,7 +550,11 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 	packet->protect( getCryptoContext( ssrc, seqNo - 1 ) );
 
-	packet->sendTo( **senderSock, **remoteAddress, remotePort );
+	if( remoteAddress->getAddressFamily() == AF_INET && senderSock )
+		packet->sendTo( **senderSock, **remoteAddress, remotePort );
+	else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )
+		packet->sendTo( **sender6Sock, **remoteAddress, remotePort );
+		
 	delete packet;
 	senderLock.unlock();
 
@@ -571,7 +593,7 @@ string MediaStream::getDebugString() {
 string MediaStreamReceiver::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
-		": listening port=" + itoa(rtpReceiver->getPort());
+		": listening port=" + itoa(getPort());
 	for( std::list<uint32_t>::iterator it = ssrcList.begin();
 				it != ssrcList.end();
 				it++) {

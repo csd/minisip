@@ -195,7 +195,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 */
 		MediaStreamReceiver( MRef<Media *> media, 
 				MRef<RtpReceiver *> rtpReceiver, 
-				MRef<IpProvider *> ipProvider );
+				MRef<RtpReceiver *> rtp6Receiver = NULL );
 
 #ifdef DEBUG_OUTPUT
 		virtual std::string getDebugString();
@@ -221,6 +221,14 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * @returns the port to use
 		 */
 		virtual uint16_t getPort();
+
+		/**
+		 * Used to query which port should be advertised as
+		 * the contact port in the session description.
+		 * @param addrType IP4 or IP6
+		 * @returns the port to use
+		 */
+		uint16_t getPort( const std::string &addrType );
 
 		/**
 		 * Handles incoming RTP packets, decrypts them
@@ -276,8 +284,8 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 	protected:
 		std::list<MRef<Codec *> > codecList;
 		MRef<RtpReceiver *> rtpReceiver;
+		MRef<RtpReceiver *> rtp6Receiver;
 		uint32_t id;
-		MRef<IpProvider *> ipProvider;
 		uint16_t externalPort;
 
 		void gotSsrc( uint32_t ssrc );
@@ -306,7 +314,8 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * is created
 		 */
 		MediaStreamSender( MRef<Media *> media, 
-				   MRef<UDPSocket *> senderSock=NULL );
+				   MRef<UDPSocket *> senderSock=NULL,
+				   MRef<UDPSocket *> sender6Sock=NULL );
 
 #ifdef DEBUG_OUTPUT
 		virtual std::string getDebugString();
@@ -459,6 +468,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 	private:
 		uint32_t ssrc;
 		MRef<UDPSocket *> senderSock;
+		MRef<UDPSocket *> sender6Sock;
 		uint16_t remotePort;
 		uint16_t seqNo;
 		uint32_t lastTs;
