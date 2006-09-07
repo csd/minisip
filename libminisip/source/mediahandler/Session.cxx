@@ -35,7 +35,6 @@
 #include<libminisip/mediahandler/RtpReceiver.h>
 #include<libminisip/mediahandler/DtmfSender.h>
 #include<libminisip/codecs/Codec.h>
-#include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/sdp/SdpPacket.h>
 #include<libminisip/sdp/SdpHeaderV.h>
 #include<libminisip/sdp/SdpHeaderT.h>
@@ -66,7 +65,7 @@ using namespace std;
 SessionRegistry * Session::registry = NULL;
 MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
-Session::Session( string localIp, SipDialogSecurityConfig &securityConfig ):ka(NULL),localIpString(localIp){
+Session::Session( string localIp, SipDialogSecurityConfig &securityConfig, string localIp6 ):ka(NULL),localIpString(localIp), localIp6String(localIp6){
 	this->securityConfig = securityConfig; // hardcopy
 	this->ka = Session::precomputedKa;
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
@@ -94,6 +93,114 @@ Session::~Session(){
 	dtmfTOProvider->stopThread();
 }
 
+
+static string matchAnat(string group, MRef<SdpPacket *> offer, string localIpString, string localIp6String){
+	vector<string> groups;
+
+#ifdef DEBUG_OUTPUT	
+	cerr << "Found group:" << group << endl;
+#endif
+	if( group.substr(0, 5) == "ANAT "){
+		size_t start = 5;
+		for(;;){
+			string id;
+			size_t pos = group.find(' ', start);
+
+			if( pos == string::npos )
+				id = group.substr( start );
+			else
+				id = group.substr( start, pos - start );
+			groups.push_back( id );
+#ifdef DEBUG_OUTPUT	
+			cerr << "Found id: " << id << endl;
+#endif
+			if( pos == string::npos )
+				break;
+			
+			start = pos + 1;
+		}
+	}
+
+	// Search for an ANAT group id with all valid streams.
+	vector<string>::iterator j;
+	for( j = groups.begin(); j != groups.end(); j++ ){
+		string id = *j;
+		bool idOk = false;
+		
+		unsigned int i;
+		for( i = 0; i < offer->getHeaders().size(); i++ ){
+			if( offer->getHeaders()[i]->getType() != SDP_HEADER_TYPE_M )
+				continue;
+			
+			MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*offer->getHeaders()[i];
+			string curId = offerM->getAttribute("mid", 0);
+			if( id != curId ){
+#ifdef DEBUG_OUTPUT	
+				cout << "Skip id:" << curId << endl;
+#endif
+				continue;
+			}
+			
+#ifdef DEBUG_OUTPUT	
+			cout << "Header " << i << endl;
+#endif
+			MRef<SdpHeaderC *> c = offerM->getConnection();
+
+			if( !c ){
+#ifdef DEBUG_OUTPUT	
+				cout << "No connection header:" << endl;
+#endif
+				// Ignore, may be an unsupported media type 
+				continue;
+			}
+
+			if( c->getNetType() != "IN" ){
+#ifdef DEBUG_OUTPUT	
+				cout << "Unsupported net type:" << c->getNetType() << endl;
+#endif
+				idOk = false;
+				break;
+			}
+			
+			if( c->getAddrType() != "IP4" && localIp6String.empty() ){
+#ifdef DEBUG_OUTPUT	
+				cout << "Unsupported addr type:" << c->getAddrType() << endl;
+#endif
+				idOk = false;
+				break;
+			}
+			
+			if( c->getAddrType() != "IP6" && localIpString.empty() ){
+				cout << "Unsupported addr type:" << c->getAddrType() << endl;
+				idOk = false;
+				break;
+			}
+			
+			if( offerM->getPort() == 0 ){
+#ifdef DEBUG_OUTPUT	
+				cout << "Disabled port:" << endl;
+#endif
+				// Ignore, may be an unsupported media type 
+				continue;
+			}
+			
+#ifdef DEBUG_OUTPUT	
+			cerr << "Found valid group id:" << curId << endl;
+#endif
+			idOk = true;
+		}
+		
+		if( idOk ){
+#ifdef DEBUG_OUTPUT	
+			cout << "Return id:" << id << endl;
+#endif
+			return id;
+		}
+	}
+
+	return "";
+}
+
 MRef<SdpPacket *> Session::emptySdp(){
 	MRef<SdpPacket *> result;
 
@@ -102,18 +209,24 @@ MRef<SdpPacket *> Session::emptySdp(){
 	MRef<SdpHeader*> v = new SdpHeaderV(0);
 	result->addHeader(v);
 
-	/* FIXME */
-	string addrtype = "IP4";
+	string ipString;
+	string addrtype;
+
+	if( !localIpString.empty() ){
+		ipString = localIpString;
+		addrtype = "IP4";
+	}
+	else{
+		ipString = localIp6String;
+		addrtype = "IP6";
+	}
 
 	MRef<SdpHeader*> o = new SdpHeaderO("","3344","3344","IN", 
-			addrtype, localIpString );
+			addrtype, ipString );
 	result->addHeader(o);
 
 	MRef<SdpHeader*> s = new SdpHeaderS(SESSION_LINE);
 	result->addHeader(s);
-
-	MRef<SdpHeader*> c = new SdpHeaderC("IN", addrtype, localIpString );
-	result->addHeader(c);
 
 	MRef<SdpHeader*> t = new SdpHeaderT(0,0);
 	result->addHeader(t);
@@ -121,13 +234,13 @@ MRef<SdpPacket *> Session::emptySdp(){
 	return result;
 }
 
-MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating the first message
+MRef<SdpPacket *> Session::getSdpOffer( bool anatSupported ){ // used by the initiator when creating the first message
 	MRef<SdpPacket *> result;
 	list< MRef<MediaStreamReceiver *> >::iterator i;
 	std::list<std::string>::iterator iAttribute;
 	std::list<std::string> attributes;
 	string type;
-	uint16_t localPort;	
+	uint16_t localPort = 0;
 	MRef<SdpHeaderM *> m;
 	string keyMgmtMessage;
 	std::list<MRef<Codec *> > codecs;
@@ -135,6 +248,7 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 	uint8_t payloadType;
 	string rtpmap;
 	const char *transport = NULL;
+	bool anat = false;
 
 // 	cerr << "Session::getSdpOffer" << endl;
 	result = emptySdp();
@@ -152,11 +266,15 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 		transport = "RTP/AVP";
 	}
 
+	if( anatSupported && !localIpString.empty() && !localIp6String.empty() ){
+		anat = true;
+		result->setSessionLevelAttribute( "group", "ANAT 1 2" );
+	}
+
 	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
 		codecs = (*i)->getAvailableCodecs();
 
 		type = (*i)->getSdpMediaType();
-		localPort = (*i)->getPort();
 		m = new SdpHeaderM( type, localPort, 1, transport );
 		
 		for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
@@ -192,6 +310,53 @@ MRef<SdpPacket *> Session::getSdpOffer(){ // used by the initiator when creating
 			a->setAttributes( *iAttribute );
 			m->addAttribute( *a );
 		}
+
+		if( anat ){
+			MRef<SdpHeaderM*> m4 = m;
+			MRef<SdpHeaderM*> m6 = new SdpHeaderM( **m );
+
+			// IPv4
+			m4->setPort( (*i)->getPort("IP4") );
+
+			MRef<SdpHeaderA*> mid2 = new SdpHeaderA( "a=mid:2" );
+
+			m4->addAttribute( mid2 );
+
+			MRef<SdpHeaderC*> conn4 = new SdpHeaderC( "IN", "IP4", localIpString );
+			conn4->set_priority( m4->getPriority() );
+			m4->setConnection( *conn4 );
+
+			// IPv6
+			m6->setPort( (*i)->getPort("IP6") );
+
+			MRef<SdpHeaderA*> mid1 = new SdpHeaderA( "a=mid:1" );
+			m6->addAttribute( mid1 );
+
+
+			MRef<SdpHeaderC*> conn6 = new SdpHeaderC( "IN", "IP6", localIp6String );
+			conn6->set_priority( m6->getPriority() );
+			m6->setConnection( *conn6 );
+
+			result->addHeader( *m6 );
+		}
+		else{
+			string ipString;
+			string addrtype;
+
+			if( !localIpString.empty() ){
+				ipString = localIpString;
+				addrtype = "IP4";
+			}
+			else{
+				ipString = localIp6String;
+				addrtype = "IP6";
+			}
+
+			MRef<SdpHeaderC*> c = new SdpHeaderC("IN", addrtype, ipString );
+			m->setConnection(c);
+			m->setPort( (*i)->getPort( addrtype ) );
+		}
+
 	}
 #ifdef DEBUG_OUTPUT	
 	cerr << "Session::getSdpOffer: " << endl << result->getString() << endl << endl;
@@ -235,6 +400,16 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		}
 		*/
 	}
+
+	string group = answer->getSessionLevelAttribute("group");
+	string selectedId;
+
+	if( !group.empty() )
+		selectedId = matchAnat(group, answer, localIpString, localIp6String);
+#ifdef DEBUG_OUTPUT	
+	cout << "Selected:" << selectedId << endl;
+#endif
+
 	MRef<SdpHeaderC*> sessionConn = answer->getSessionLevelConnection();
 
 	for( i = 0; i < answer->getHeaders().size(); i++ ){
@@ -244,6 +419,22 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 			cerr << "Session::setSdpAnswer - trying media line " << m->getString() << endl;
 #endif
 			
+			if( !group.empty() ){
+#ifdef DEBUG_OUTPUT
+				cout << "Media " << i << endl;
+#endif
+				const string &id = m->getAttribute("mid", 0);
+#ifdef DEBUG_OUTPUT
+				cout << "id: " << id << endl;
+#endif
+				if( id != selectedId ){
+#ifdef DEBUG_OUTPUT
+					cerr << "Skip unselected id:" << id << endl;
+#endif
+					continue;
+				}
+			}
+
 			MRef<IPAddress *> remoteAddress;
 			MRef<SdpHeaderC *> c = m->getConnection();
 			if( !c )
@@ -263,8 +454,10 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 					continue;
 #ifdef DEBUG_OUTPUT
 				cerr << "Session::setSdpAnswer - Found receiver at " << remoteAddress->getString() << endl;
+				cerr << "Receiver found: " << !!receiver << endl;
 #endif
-				if( m->getPort() == 0 ){
+
+				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
 					receiver->disabled = true;
 				}
@@ -306,6 +499,10 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 					2*j/* CSID */
 					);
 			}
+#endif
+
+#ifdef DEBUG_OUTPUT	
+			cerr << "Set remote: " << remoteAddress->getString() << "," << m->getPort() << endl;
 #endif
 	
 			(*iSStream)->setPort( (uint16_t)m->getPort() );
@@ -367,12 +564,52 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 	sdpAnswer = emptySdp();
 
+	string group = offer->getSessionLevelAttribute("group");
+	string selectedId;
+
+	if( !group.empty() ){
+		sdpAnswer->setSessionLevelAttribute("group", group);
+
+		selectedId = matchAnat(group, offer, localIpString, localIp6String);
+	}
+
+#ifdef DEBUG_OUTPUT	
+	cout << "Get remote addr " << endl;
+#endif
 	MRef<SdpHeaderC*> sessionConn = offer->getSessionLevelConnection();
 
+#ifdef DEBUG_OUTPUT	
+	cout << "Built empty sdp" << endl;
+#endif
+
 	for( i = 0; i < offer->getHeaders().size(); i++ ){
+#ifdef DEBUG_OUTPUT	
+		cout << "Header " << i << endl;
+#endif
 
 		if( offer->getHeaders()[i]->getType() == SDP_HEADER_TYPE_M ){
 			MRef<SdpHeaderM *> offerM = (SdpHeaderM*)*(offer->getHeaders()[i]);
+
+			MRef<SdpHeaderM *> answerM = new SdpHeaderM(
+					offerM->getMedia(), 0, 0,
+					offerM->getTransport() );
+
+			sdpAnswer->addHeader( *answerM );
+
+			if( !group.empty() ){
+#ifdef DEBUG_OUTPUT	
+				cout << "Media " << i << endl;
+#endif
+				const string &id = offerM->getAttribute("mid", 0);
+				if(!id.empty())
+					answerM->addAttribute(new SdpHeaderA("a=mid:" + id));
+
+#ifdef DEBUG_OUTPUT	
+				cout << "id: " << id << endl;
+#endif
+				if( id != selectedId )
+					continue;
+			}
 
 			const string &transport = offerM->getTransport();
 
@@ -382,13 +619,6 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 				errorString += "No supported SRTP key exchange method";
 				return false;
 			}
-
-
-			MRef<SdpHeaderM *> answerM = new SdpHeaderM(
-					offerM->getMedia(), 0, 0,
-					offerM->getTransport() );
-
-			sdpAnswer->addHeader( *answerM );
 
 			MRef<SdpHeaderC *> c = offerM->getConnection();
 			MRef<IPAddress *> remoteAddress;
@@ -408,8 +638,10 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					continue;
 				addrString = localIpString;
 			}
-			else{
-				continue;
+			else if( c->getAddrType() == "IP6" ){
+				if( localIp6String.empty() )
+					continue;
+				addrString = localIp6String;
 			}
 
 			remoteAddress = c->getIPAdress();
@@ -420,7 +652,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 				if( receiver ){
 					if( answerM->getPort() == 0 ){
-						answerM->setPort( receiver->getPort() );
+						answerM->setPort( receiver->getPort( c->getAddrType() ) );
 					}
 					else{
 						/* This media has already been treated */

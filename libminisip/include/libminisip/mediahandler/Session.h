@@ -68,7 +68,7 @@ class LIBMINISIP_API Session : public MObject{
 		 * description
 		 * @param config security related configuration for the call
 		 */
-		Session( std::string localIp, SipDialogSecurityConfig &config );
+		Session( std::string localIp, SipDialogSecurityConfig &config, std::string localIp6 = "" );
 		
 		/**
 		 * Destructor.
@@ -93,9 +93,10 @@ class LIBMINISIP_API Session : public MObject{
 		/**
 		 * Used by the SIP stack to query the session description 
 		 * offer (SDP offer), upon session initiation.
+		 * @param anatSupported Use ANAT (RFC 4091)
 		 * @returns a reference to the SDP object
 		 */
-		MRef<SdpPacket *> getSdpOffer();
+		MRef<SdpPacket *> getSdpOffer( bool anatSupported = false );
 		
 		/**
 		 * Used by the SIP stack to query the session description
@@ -270,6 +271,7 @@ class LIBMINISIP_API Session : public MObject{
 
 		MRef<KeyAgreement *> ka;
 		std::string localIpString;
+		std::string localIp6String;
 		MRef<SdpPacket *> sdpAnswer;
 		bool secured;
 
