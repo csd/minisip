@@ -55,7 +55,7 @@
 
 using namespace std;
 
-MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider ){
+MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider, MRef<IpProvider *> ip6Provider ): ip6Provider(ip6Provider){
 
 	this->ipProvider = ipProvider;
 	this->config = config;
@@ -108,25 +108,35 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 
 	list< MRef<Media *> >::iterator i;
 	MRef<Session *> session;
-	MRef<MediaStreamReceiver *> rStream;
-	MRef<MediaStreamSender *> sStream;
 	MRef<RtpReceiver *> rtpReceiver = NULL;
+	MRef<RtpReceiver *> rtp6Receiver;
 	string contactIp;
+	string contactIp6;
 #ifdef ZRTP_SUPPORT
 	MRef<ZrtpHostBridgeMinisip *> zhb = NULL;
 #endif
 
-	contactIp = ipProvider->getExternalIp();
+	if( ipProvider )
+		contactIp = ipProvider->getExternalIp();
 
-	session = new Session( contactIp, securityConfig );
+	if( ip6Provider )
+		contactIp6 = ip6Provider->getExternalIp();
+
+	session = new Session( contactIp, securityConfig, contactIp6 );
 	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
 		MRef<Media *> media = *i;
 
 		if( media->receive ){
-			rtpReceiver = new RtpReceiver( ipProvider );
-			rStream = new MediaStreamReceiver( media, rtpReceiver );
+			if( ipProvider )
+				rtpReceiver = new RtpReceiver( ipProvider );
+
+			if( ip6Provider )
+				rtp6Receiver = new RtpReceiver( ip6Provider );
+
+			MRef<MediaStreamReceiver *> rStream;
+			rStream = new MediaStreamReceiver( media, rtpReceiver, rtp6Receiver );
 			session->addMediaStreamReceiver( rStream );
 			if( (*i) == this->audioMedia ) {
 				CallRecorder * cr;
@@ -147,10 +157,24 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		}
 		
 		if( media->send ){
-		    if( !rtpReceiver ){
+		    if( !rtpReceiver && !ipProvider.isNull() ){
 			rtpReceiver = new RtpReceiver( ipProvider );
 		    }
-		    sStream = new MediaStreamSender( media, rtpReceiver->getSocket() );
+
+		    if( !rtp6Receiver && !ip6Provider.isNull() ){
+		      rtp6Receiver = new RtpReceiver( ip6Provider );
+		    }
+
+		    MRef<UDPSocket *> sock;
+		    MRef<UDPSocket *> sock6;
+
+		    if( rtpReceiver )
+			    sock = rtpReceiver->getSocket();
+		    if( rtp6Receiver )
+			    sock6 = rtp6Receiver->getSocket();
+
+		    MRef<MediaStreamSender *> sStream;
+		    sStream = new MediaStreamSender( media, sock, sock6 );
 		    session->addMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
 		    if(securityConfig.use_zrtp) {

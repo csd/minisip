@@ -52,7 +52,7 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		 * @param ipProvider reference to the public IP provider, used
 		 * for NAT traversal mechanisms
 		 */
-		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider );
+		MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider, MRef<IpProvider *> ip6Provider = NULL );
 		virtual ~MediaHandler();
 		
 		/**
@@ -133,6 +133,7 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
+		MRef<IpProvider *> ip6Provider;
 		MRef<SipSoftPhoneConfiguration *> config;
                 
                 MRef<CommandReceiver*> messageRouterCallback;
