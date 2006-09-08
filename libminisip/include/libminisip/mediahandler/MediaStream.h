@@ -135,7 +135,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * TODO: make it a list because the receiver may have several hostbridges
 		 * in case of e.g. conferences.
 		 */
-		virtual void setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {zrtpBridge = zsb; };
+		virtual void setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb);
 
 		/**
 		 * Get the ZRTP implementation host brigde for this media stream.
@@ -143,7 +143,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * @return zsb
 		 *    The pointer to the host bridge object for this RTP session.
 		 */
-		virtual MRef<ZrtpHostBridgeMinisip *> getZrtpHostBridge() {return zrtpBridge; };
+		virtual MRef<ZrtpHostBridgeMinisip *> getZrtpHostBridge();
 
 		/**
 		 * Used by ZRTP host bridge to set the crypto context for this RTP session.

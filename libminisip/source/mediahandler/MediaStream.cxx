@@ -261,6 +261,15 @@ void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
 
     kaLock.unlock();
 }
+
+void MediaStream::setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {
+	zrtpBridge = zsb; 
+}
+
+MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
+	return zrtpBridge; 
+}
+
 #endif
 
 MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,

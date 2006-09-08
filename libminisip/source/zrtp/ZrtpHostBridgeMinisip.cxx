@@ -80,6 +80,14 @@ ZrtpHostBridgeMinisip::~ZrtpHostBridgeMinisip() {
     delete zrtpEngine;
 }
 
+void ZrtpHostBridgeMinisip::setReceiver(MRef<MediaStreamReceiver *> r) { 
+	rStream = r; 
+}
+
+void ZrtpHostBridgeMinisip::setSender(MRef<MediaStreamSender *> s) { 
+	sStream = s; 
+}
+
 void ZrtpHostBridgeMinisip::start() {
     ZIDFile *zid = ZIDFile::getInstance();
     const uint8_t* ownZid = zid->getZid();

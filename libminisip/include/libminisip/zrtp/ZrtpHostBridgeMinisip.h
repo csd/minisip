@@ -110,11 +110,11 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
     void start();
     void stop();
 
-    void setReceiver(MRef<MediaStreamReceiver *> r) { rStream = r; };
+    void setReceiver(MRef<MediaStreamReceiver *> r);
     void setSsrcReceiver(uint32_t ssrc)             { receiverSsrc = ssrc; };
     uint32_t getSsrcReceiver()                      { return receiverSsrc; };
 
-    void setSender(MRef<MediaStreamSender *> s)     { sStream = s; };
+    void setSender(MRef<MediaStreamSender *> s);
     void setSsrcSender(uint32_t ssrc)               { senderSsrc = ssrc; };
     uint32_t getSsrcSender()                        { return senderSsrc; };
 

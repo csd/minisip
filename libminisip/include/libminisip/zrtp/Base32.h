@@ -26,12 +26,17 @@
  *	@author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+#include<libminisip/libminisip_config.h>
+
+#include<stdint.h>
+
 #include <iostream>
 #include <cstdlib>
 
 #include <string.h>
 #include <assert.h>
 #include <stddef.h>
+
 
 using namespace std;
 
