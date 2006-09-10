@@ -82,7 +82,7 @@
 #include<libmsip/SipTransactionInviteServer.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipTransactionUtils.h>
+#include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>

@@ -46,7 +46,7 @@
 #include<libmsip/SipTransactionInviteServerUA.h>
 #include<libmsip/SipTransactionNonInviteServer.h>
 #include<libmsip/SipTransactionNonInviteClient.h>
-#include<libmsip/SipTransactionUtils.h>
+#include<libmsip/SipTransitionUtils.h>
 
 using namespace std;
 

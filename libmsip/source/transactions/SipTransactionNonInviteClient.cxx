@@ -36,7 +36,7 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipTransactionUtils.h>
+#include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>

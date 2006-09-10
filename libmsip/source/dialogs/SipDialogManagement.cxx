@@ -41,7 +41,7 @@
 
 #include<libmsip/SipSMCommand.h>
 
-#include<libmsip/SipTransactionUtils.h>
+#include<libmsip/SipTransitionUtils.h>
 
 using namespace std;
 

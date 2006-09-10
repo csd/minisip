@@ -21,8 +21,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#ifndef SIPTRANSACTIONUTILS_H
-#define SIPTRANSACTIONUTILS_H
+#ifndef SIPTRANSITIONUTILS_H
+#define SIPTRANSITIONUTILS_H
 
 #include<libmsip/libmsip_config.h>
 
@@ -40,29 +40,28 @@ class SipResponse;
  */
 bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const std::string &pattern);
 	
-
 #define IGN -1
 
 bool LIBMSIP_API transitionMatch(
 		const std::string& packetType,
 		const SipSMCommand &command,
-		int source/*=IGN*/,
-		int destination/*=IGN*/,
+		int source,
+		int destination,
 		const std::string &respFilter="");
 
 /** Match Sip responses */
 bool LIBMSIP_API transitionMatchSipResponse(
 		const std::string& cseqMethod,
 		const SipSMCommand &command,
-		int source/*=IGN*/,
-		int destination/*=IGN*/,
+		int source,
+		int destination,
 		const std::string &respFilter="");
 
 bool LIBMSIP_API transitionMatch(
 		const SipSMCommand &command,
 		const std::string &cmd_str,
-		int source/*=SipSMCommand::dialog_layer*/,
-		int destination/*=SipSMCommand::dialog_layer*/);
+		int source,
+		int destination);
 
 #endif
 

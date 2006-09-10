@@ -36,7 +36,7 @@
 
 #include<libmutil/massert.h>
 
-#include<libmsip/SipTransactionUtils.h>
+#include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipHeaderContact.h>
