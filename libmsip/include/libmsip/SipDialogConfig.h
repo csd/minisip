@@ -42,12 +42,6 @@
 #include<libmutil/Mutex.h>
 #include<libmsip/SipRequest.h>
 
-#define KEY_MGMT_METHOD_NULL            0x00
-#define KEY_MGMT_METHOD_MIKEY           0x10
-#define KEY_MGMT_METHOD_MIKEY_DH        0x11
-#define KEY_MGMT_METHOD_MIKEY_PSK       0x12
-#define KEY_MGMT_METHOD_MIKEY_PK        0x13
-
 #define DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS 1000
 
 #include<string>
