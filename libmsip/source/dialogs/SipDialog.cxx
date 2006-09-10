@@ -66,7 +66,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
 					
 	dialogState.isEarly=false;	//same as for "secure"?! -EE
 	dialogState.isEstablished = false;
-	dialogState.rseqNo = -1;
+	dialogState.rseqNo = 0;
 }
 
 SipDialog::~SipDialog(){
@@ -303,7 +303,8 @@ bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 bool SipDialog::updateAuthentications( MRef<SipResponse*> resp ){
 	bool changed = false;
 
-	for( int i = 0;; i++ ){
+	int i;
+	for( i = 0;; i++ ){
 		MRef<SipHeaderValueWWWAuthenticate*> auth;
 		auth = resp->getHeaderValueWWWAuthenticate( i );
 
@@ -313,7 +314,7 @@ bool SipDialog::updateAuthentications( MRef<SipResponse*> resp ){
 		changed |= updateAuthentication(resp, *auth);
 	}
 
-	for( int i = 0;; i++ ){
+	for( i = 0;; i++ ){
 		MRef<SipHeaderValueProxyAuthenticate*> auth;
 		auth = resp->getHeaderValueProxyAuthenticate( i );
 
