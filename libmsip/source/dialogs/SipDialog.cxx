@@ -66,7 +66,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
 					
 	dialogState.isEarly=false;	//same as for "secure"?! -EE
 	dialogState.isEstablished = false;
-	dialogState.rseqNo = -1;
+	dialogState.rseqNo = (uint32_t)-1;
 }
 
 SipDialog::~SipDialog(){
