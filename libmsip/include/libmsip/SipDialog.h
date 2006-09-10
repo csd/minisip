@@ -95,7 +95,7 @@ class LIBMSIP_API SipDialogState{
 		
 		int seqNo;
 		int remoteSeqNo;
-		uint32_t rseqNo;
+		int32_t rseqNo;
 		std::string localUri;	// not used yet
 
 		/**

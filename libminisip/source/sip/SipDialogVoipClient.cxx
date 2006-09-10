@@ -790,7 +790,7 @@ bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
 		
 	// First reliable provisional response
 	// Next in-order reliable provisional response
-	if( !(dialogState.rseqNo == (uint32_t)-1 ||
+	if( !(dialogState.rseqNo == -1 ||
 	      dialogState.rseqNo > rseqNo ) )
 		return false;
 
