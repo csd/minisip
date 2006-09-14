@@ -34,7 +34,12 @@
 
 using namespace std;
 
-SipCommandDispatcher::SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerTransport*> transp):sipStack(stack),keepRunning(true){
+SipCommandDispatcher::SipCommandDispatcher(
+		MRef<SipStackInternal*> stackInternal, 
+		MRef<SipLayerTransport*> transp)
+			:sipStackInternal(stackInternal),
+			keepRunning(true){
+
 	transportLayer = transp;
 	transactionLayer = new SipLayerTransaction(this,transportLayer);
 	dialogLayer = new SipLayerDialog(this);
@@ -48,8 +53,16 @@ SipCommandDispatcher::SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerT
 void SipCommandDispatcher::setDialogManagement(MRef<SipDialog*> mgmt){
 	managementHandler = mgmt;
 }
-MRef<SipStack*> SipCommandDispatcher::getSipStack(){
-	return sipStack;
+MRef<SipStackInternal*> SipCommandDispatcher::getSipStackInternal(){
+	return sipStackInternal;
+}
+
+MRef<CommandReceiver*> SipCommandDispatcher::getCallback(){
+	return callback;
+}
+
+void SipCommandDispatcher::stopRunning(){
+	keepRunning=false;
 }
 
 list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
@@ -310,7 +323,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 //					SipSMCommand::dispatcher,
 //					SipSMCommand::dispatcher);
 // 			managementHandler->handleCommand(cmd); //process the command, so it moves to terminated state
-			managementHandler->getSipStack()->getDispatcher()->stopRunning();
+			managementHandler->getSipStack()->stopRunning();
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT

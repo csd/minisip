@@ -101,10 +101,10 @@ bool SipTransactionInviteServerUA::a1001_proceeding_completed_2xx( const SipSMCo
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		
 		if( isUnreliable() ) {
-			timerG = sipStack->getTimers()->getG();
+			timerG = sipStackInternal->getTimers()->getG();
 			requestTimeout(timerG, "timerG");
 		}
-		requestTimeout(sipStack->getTimers()->getH(),"timerH");
+		requestTimeout(sipStackInternal->getTimers()->getH(),"timerH");
 		
 		send(command.getCommandPacket(), false);
 
@@ -137,7 +137,7 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 }
 
 
-SipTransactionInviteServerUA::SipTransactionInviteServerUA(MRef<SipStack*> stack,
+SipTransactionInviteServerUA::SipTransactionInviteServerUA(MRef<SipStackInternal*> stack,
 		//MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 

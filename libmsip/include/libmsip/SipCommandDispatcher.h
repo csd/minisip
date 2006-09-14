@@ -38,7 +38,9 @@
 #include<libmsip/SipLayerDialog.h>
 #include<libmsip/SipLayerTransaction.h>
 #include<libmsip/SipLayerTransport.h>
+#include<libmsip/SipStack.h>
 
+class SipStackInternal;
 class SipDialog;
 
 /**
@@ -54,22 +56,17 @@ typedef struct queue_type{
 
 class SipLayerDialog;
 class SipLayerTransport;
-class SipStack;
 
 #define TYPE_COMMAND 2
 #define TYPE_TIMEOUT 3
 
-#define HIGH_PRIO_QUEUE 2
-#define LOW_PRIO_QUEUE 4
 
-
-
-class LIBMSIP_API SipCommandDispatcher : public MObject{
+class SipCommandDispatcher : public MObject{
 	public:
-		SipCommandDispatcher(MRef<SipStack*> stack, MRef<SipLayerTransport*> transport);
+		SipCommandDispatcher(MRef<SipStackInternal*> stack, MRef<SipLayerTransport*> transport);
 
 		void setCallback(MRef<CommandReceiver*> cb);
-		MRef<CommandReceiver*> getCallback(){return callback;}
+		MRef<CommandReceiver*> getCallback();
 		
 		void addDialog(MRef<SipDialog*> d);
 		std::list<MRef<SipDialog *> > getDialogs();
@@ -77,9 +74,9 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
 		void setDialogManagement(MRef<SipDialog*> mgmt);
 
 		virtual void run();
-		void stopRunning(){keepRunning=false;}
+		void stopRunning();
 
-		MRef<SipStack*> getSipStack();
+		MRef<SipStackInternal*> getSipStackInternal();
 		
 //#ifdef DEBUG_OUTPUT
 		virtual std::string getMemObjectType() {return "SipCommandDispatcher";}
@@ -109,7 +106,7 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
 		                
 	private:
 		MRef<CommandReceiver*> callback;
-		MRef<SipStack *> sipStack;
+		MRef<SipStackInternal *> sipStackInternal;
 
 		Semaphore semaphore;
 		Mutex mlock;
@@ -137,5 +134,6 @@ class LIBMSIP_API SipCommandDispatcher : public MObject{
 };
 
 #include<libmsip/SipDialog.h>
+#include<libmsip/SipStackInternal.h>
 
 #endif

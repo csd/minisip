@@ -46,16 +46,16 @@ class SipDialog;
 class SipMessage;
 class SipCommandDispatcher;
 class SipLayerTransport;
-class SipStack;
+class SipStackInternal;
 class Socket;
 
 /**
  * SipTransaction
  */
-class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>{
+class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 	public:
 		
-		SipTransaction(MRef<SipStack*> stack, 
+		SipTransaction(MRef<SipStackInternal*> stackInternal, 
 				//MRef<SipDialog*> d, 
 				int cseq, 
 				const std::string &cseqMethod, 
@@ -78,7 +78,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 		 * @param handleAck  TRUE if the "UA" versions of the
 		 *                   INVITE server transactions should be used.
 		 */
-		static MRef<SipTransaction*> create(MRef<SipStack*> stack, 
+		static MRef<SipTransaction*> create(MRef<SipStackInternal*> stackInternal, 
 				MRef<SipRequest*> msg, 
 				bool fromTU, 
 				bool handleAck=false);
@@ -117,7 +117,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 		
 		void setCSeqNo(int n){cSeqNo=n;}
 		MRef<SipCommandDispatcher*> dispatcher;
-		MRef<SipStack*> sipStack;
+		MRef<SipStackInternal*> sipStackInternal;
 		MRef<SipLayerTransport*> transportLayer;
 		MRef<Socket *> socket;
 		
@@ -137,7 +137,7 @@ class LIBMSIP_API SipTransaction : public StateMachine<SipSMCommand,std::string>
 //All sub-classes of SipTransaction are local to libmsip
 class SipTransactionClient: public SipTransaction{
         public:
-                SipTransactionClient(MRef<SipStack*> stack, 
+                SipTransactionClient(MRef<SipStackInternal*> stackInternal, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 
@@ -147,7 +147,7 @@ class SipTransactionClient: public SipTransaction{
 
 class SipTransactionServer: public SipTransaction{
         public:
-                SipTransactionServer(MRef<SipStack*> stack, 
+                SipTransactionServer(MRef<SipStackInternal*> stackInternal, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

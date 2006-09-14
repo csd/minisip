@@ -51,6 +51,7 @@
 #include<libmutil/dbg.h>
 //#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
+#include<libmsip/SipCommandDispatcher.h>
 
 #include<cctype>
 #include<string>

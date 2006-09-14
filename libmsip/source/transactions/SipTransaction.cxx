@@ -34,7 +34,7 @@
 
 
 #include<libmsip/SipTransaction.h>
-#include<libmsip/SipStack.h>
+#include<libmsip/SipStackInternal.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipLayerTransport.h>
@@ -50,18 +50,18 @@
 
 using namespace std;
 
-SipTransaction::SipTransaction(MRef<SipStack*> stack, 
+SipTransaction::SipTransaction(MRef<SipStackInternal*> stackInternal, 
 		int cseq, 
 		const string &cSeqMethod, 
 		const string &b, 
 		const string &callid): 
-			StateMachine<SipSMCommand, string>(stack->getTimeoutProvider() ), 
-			sipStack(stack),
+			StateMachine<SipSMCommand, string>(stackInternal->getTimeoutProvider() ), 
+			sipStackInternal(stackInternal),
 			cSeqNo(cseq),
 			cSeqMethod(cSeqMethod),
 			branch(b)
 {
-	dispatcher = stack->getDispatcher();
+	dispatcher = stackInternal->getDispatcher();
 	assert(dispatcher);
 	transportLayer = dispatcher->getLayerTransport();
 	assert(transportLayer);
@@ -75,7 +75,7 @@ SipTransaction::SipTransaction(MRef<SipStack*> stack,
 SipTransaction::~SipTransaction(){
 }
 
-MRef<SipTransaction*> SipTransaction::create(MRef<SipStack*> stack, 
+MRef<SipTransaction*> SipTransaction::create(MRef<SipStackInternal*> stackInternal, 
 		MRef<SipRequest*> req, 
 		bool fromTU, 
 		bool handleAck)
@@ -94,10 +94,10 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStack*> stack,
 // 			if (handleAck){	//UA-version
 // 				return new SipTransactionInviteClientUA(stack,seqNo,seqMethod,callId);
 // 			}else{
-				return new SipTransactionInviteClient(stack,seqNo,seqMethod,callId);
+				return new SipTransactionInviteClient(stackInternal,seqNo,seqMethod,callId);
 // 			}
 		}else{
-			MRef<SipTransaction *> res = new SipTransactionNonInviteClient(stack,seqNo,seqMethod,callId);
+			MRef<SipTransaction *> res = new SipTransactionNonInviteClient(stackInternal,seqNo,seqMethod,callId);
 			if( req->getType()=="CANCEL"){
 				// A CANCEL constructed by a client
 				// MUST have only a single Via header
@@ -112,12 +112,12 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStack*> stack,
 	}else{	//server transaction
 		if (req->getType()=="INVITE"){
 			if (handleAck){	//UA-version
-				return new SipTransactionInviteServerUA(stack,seqNo,seqMethod,branch,callId);
+				return new SipTransactionInviteServerUA(stackInternal,seqNo,seqMethod,branch,callId);
 			}else{
-				return new SipTransactionInviteServer(stack,seqNo,seqMethod,branch,callId);
+				return new SipTransactionInviteServer(stackInternal,seqNo,seqMethod,branch,callId);
 			}
 		}else{
-			return new SipTransactionNonInviteServer(stack,seqNo,seqMethod,branch,callId);
+			return new SipTransactionNonInviteServer(stackInternal,seqNo,seqMethod,branch,callId);
 		}
 	}
 	
@@ -217,12 +217,12 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 }
 
 
-SipTransactionClient::SipTransactionClient(MRef<SipStack*> stack, 
+SipTransactionClient::SipTransactionClient(MRef<SipStackInternal*> stackInternal, 
 		int seq_no, 
 		const string &cSeqMethod, 
 		const string &branch, 
 		const string &callid):
-			SipTransaction(stack, seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stackInternal, seq_no,cSeqMethod,branch,callid)
 {
 	
 }
@@ -231,12 +231,12 @@ SipTransactionClient::~SipTransactionClient(){
 
 }
 
-SipTransactionServer::SipTransactionServer(MRef<SipStack*> stack, 
+SipTransactionServer::SipTransactionServer(MRef<SipStackInternal*> stackInternal, 
 		int seq_no, 
 		const string &cSeqMethod, 
 		const string &branch, 
 		const string &callid):
-			SipTransaction(stack,seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stackInternal,seq_no,cSeqMethod,branch,callid)
 {
 	
 }

@@ -59,7 +59,7 @@ class SipResponse;
 */
 class SipTransactionInviteServer : public SipTransactionServer{
 	public:
-		SipTransactionInviteServer(MRef<SipStack *> stack, 
+		SipTransactionInviteServer(MRef<SipStackInternal *> stackInternal, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

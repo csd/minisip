@@ -50,7 +50,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipDialog.h \
 		     libmsip/SipDialogRegister.h \
 		     libmsip/SipAuthenticationDigest.h \
-		     libmsip/SipCommandDispatcher.h \
 		     libmsip/SipDialogManagement.h \
                      libmsip/SipLayerTransaction.h \
 		     libmsip/SipTransaction.h \
@@ -61,6 +60,8 @@ noinst_HEADERS = 	libmsip/SipTransactionNonInviteClient.h \
 		     libmsip/SipTransactionInviteClient.h \
 		     libmsip/SipTransactionInviteServer.h \
 		     libmsip/SipTransactionInviteServerUA.h \
+                     libmsip/SipStackInternal.h \
+		     libmsip/SipCommandDispatcher.h \
 			config.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \

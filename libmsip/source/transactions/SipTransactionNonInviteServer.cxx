@@ -92,7 +92,7 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
-		requestTimeout(/*64 * timerT1*/ sipStack->getTimers()->getJ(), "timerJ");
+		requestTimeout(/*64 * timerT1*/ sipStackInternal->getTimers()->getJ(), "timerJ");
 		
 		return true;
 	}else{
@@ -108,7 +108,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		if( isUnreliable() )
-			requestTimeout(sipStack->getTimers()->getJ(), "timerJ");
+			requestTimeout(sipStackInternal->getTimers()->getJ(), "timerJ");
 		else 
 			requestTimeout( 0, "timerJ");
 		
@@ -329,7 +329,7 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 	setCurrentState(s_start);
 }
 
-SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStack*> stack, 
+SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStackInternal*> stack, 
 	//	MRef<SipDialog*> call, 
 		int seq_no, 
 		const string &cSeqMethod, 

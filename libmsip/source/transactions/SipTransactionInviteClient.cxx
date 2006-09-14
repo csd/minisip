@@ -107,7 +107,7 @@ void SipTransactionInviteClient::rel1xxProcessing(MRef<SipResponse*> resp){
 		if (statusCode>100 && statusCode<200 && resp->requires("100rel")){
 			dialog->dialogState.seqNo++;
 			MRef<SipTransaction*> trans =
-				new SipTransactionNonInviteClient(sipStack, dialog, dialog->dialogState.seqNo, "PRACK", dialog->dialogState.callId);
+				new SipTransactionNonInviteClient(sipStackInternal, dialog, dialog->dialogState.seqNo, "PRACK", dialog->dialogState.callId);
 			dialog->registerTransaction(trans);
 			sendAck(resp,trans->getBranch(), true); //last argument means that yes, we are ack:ing a 1xx -> PRACK
 		}
@@ -119,11 +119,11 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 	if (transitionMatch("INVITE", command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer)){
 		lastInvite = (SipRequest*) *command.getCommandPacket();
 		if( isUnreliable() ) { // retx timer
-			timerA = sipStack->getTimers()->getA();
+			timerA = sipStackInternal->getTimers()->getA();
 			requestTimeout( timerA , "timerA" );
 		}
 		
-		requestTimeout( sipStack->getTimers()->getB(), "timerB" ); //transaction timeout
+		requestTimeout( sipStackInternal->getTimers()->getB(), "timerB" ); //transaction timeout
 
 /* TODO/FIXME: re-implement this functionality
 
@@ -201,7 +201,7 @@ bool SipTransactionInviteClient::a3_calling_completed_resp36( const SipSMCommand
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		if( isUnreliable() )
-			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+			requestTimeout(sipStackInternal->getTimers()->getD(),"timerD");
 		else 
 			requestTimeout( 0,"timerD");
 		SipSMCommand cmd( command.getCommandPacket(), 
@@ -369,7 +369,7 @@ bool SipTransactionInviteClient::a8_proceeding_completed_resp36( const SipSMComm
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");
 		if( isUnreliable() )
-			requestTimeout(sipStack->getTimers()->getD(),"timerD");
+			requestTimeout(sipStackInternal->getTimers()->getD(),"timerD");
 		else 
 			requestTimeout( 0,"timerD");
                 
@@ -526,7 +526,7 @@ void SipTransactionInviteClient::setUpStateMachine(){
 }
 
 
-SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack, 
+SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStackInternal*> stack, 
 		//MRef<SipDialog*> call, 
 		int seq_no, 
 		const string &cSeqMethod, 
@@ -541,7 +541,7 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStack*> stack,
 //		conf = sipStack->getStackConfig();
 //	}
 	
-	timerA=sipStack->getTimers()->getA();
+	timerA=sipStackInternal->getTimers()->getA();
 	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
 	//port = getConfig()->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();

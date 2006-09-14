@@ -30,6 +30,7 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
+#include<libmsip/SipStackInternal.h>
 
 using namespace std;
 

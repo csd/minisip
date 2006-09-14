@@ -55,10 +55,10 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 #endif
 		lastRequest = dynamic_cast<SipRequest*>(*command.getCommandPacket());
 		if( isUnreliable() ) {
-			timerE = sipStack->getTimers()->getE();
+			timerE = sipStackInternal->getTimers()->getE();
 			requestTimeout(timerE, "timerE");
 		}
-		requestTimeout(sipStack->getTimers()->getF(), "timerF");
+		requestTimeout(sipStackInternal->getTimers()->getF(), "timerF");
 
 /* TODO/FIXME: This is a bit tricky - we don't know which identity is
  * currently being used (the getConfig() one will have a null one if
@@ -143,7 +143,7 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		cancelTimeout("timerE"); //no more retx of the request
 		if( isUnreliable() ) //response re-tx timer
-			requestTimeout(sipStack->getTimers()->getT4(),"timerK");
+			requestTimeout(sipStackInternal->getTimers()->getT4(),"timerK");
 		else
 			requestTimeout(0,"timerK");
 		
@@ -166,11 +166,11 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 	
 	if (transitionMatch(command, "timerE",SipSMCommand::transaction_layer,SipSMCommand::transaction_layer)){
 		timerE *= 2;
-		if( timerE > sipStack->getTimers()->getT2() ) 
-			timerE = sipStack->getTimers()->getT2();
+		if( timerE > sipStackInternal->getTimers()->getT2() ) 
+			timerE = sipStackInternal->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		massert(!lastRequest.isNull());
-		timerE = sipStack->getTimers()->getT2();
+		timerE = sipStackInternal->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		lastRequest->removeAllViaHeaders();
 		send( *lastRequest, true);	//add via, we have removed all from previous request
@@ -248,7 +248,7 @@ bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMC
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		if( isUnreliable() ) 
-			requestTimeout(sipStack->getTimers()->getK(), "timerK");
+			requestTimeout(sipStackInternal->getTimers()->getK(), "timerK");
 		else 
 			requestTimeout( 0, "timerK");
 			
@@ -268,8 +268,8 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 				SipSMCommand::transaction_layer)){
 		//no need to check if isUnreliable() ... timerE will never be started anyway
 		timerE *= 2;
-		if( timerE > sipStack->getTimers()->getT2() ) 
-			timerE = sipStack->getTimers()->getT2();
+		if( timerE > sipStackInternal->getTimers()->getT2() ) 
+			timerE = sipStackInternal->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
 		
 		massert( !lastRequest.isNull());
@@ -373,7 +373,7 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 
 
 SipTransactionNonInviteClient::SipTransactionNonInviteClient(
-		MRef<SipStack *> stack,
+		MRef<SipStackInternal *> stack,
 		//MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 

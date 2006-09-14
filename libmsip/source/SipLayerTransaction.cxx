@@ -54,7 +54,7 @@ bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 		MRef<SipRequest*> req = dynamic_cast<SipRequest*>(*cmd.getCommandPacket());
 		massert(req);
 
-		newTransaction = SipTransaction::create(dispatcher->getSipStack(), 
+		newTransaction = SipTransaction::create(dispatcher->getSipStackInternal(), 
 				req, 
 				cmd.getSource()==SipSMCommand::dialog_layer, 
 				handleAck);

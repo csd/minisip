@@ -56,7 +56,7 @@ class SipResponse;
 */
 class SipTransactionNonInviteServer: public SipTransactionServer{
 	public:
-		SipTransactionNonInviteServer(MRef<SipStack*> stack, 
+		SipTransactionNonInviteServer(MRef<SipStackInternal*> stackInternal, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &branch, 

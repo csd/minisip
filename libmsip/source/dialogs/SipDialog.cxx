@@ -32,10 +32,10 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipStack.h>
+#include<libmsip/SipStackInternal.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipAuthenticationDigest.h>
-//#include<libmsip/SipDialogContainer.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
@@ -49,7 +49,9 @@
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
+#include<libmsip/SipCommandDispatcher.h>
 #include<libmutil/CommandString.h>
+#include<libmutil/termmanip.h>
 
 using namespace std;
 
@@ -58,7 +60,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
                 sipStack(stack), 
                 callConfig(callconf)
 {
-	dispatcher = stack->getDispatcher();
+	//dispatcher = stack->getDispatcher();
 	dialogState.seqNo=100 * (rand()%9+1);
 	dialogState.remoteSeqNo=-1;
 	dialogState.secure=false;	//TODO: this variable is not maintained 
@@ -83,7 +85,8 @@ void SipDialog::handleTimeout(const string &c){
 			SipSMCommand::dialog_layer, 
 			SipSMCommand::dialog_layer );
 
-	dispatcher->enqueueTimeout( this, cmd);
+	//sipStack->sipStackInternal->getDispatcher()->enqueueTimeout( this, cmd);
+	(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueTimeout( this, cmd);
 }
 
 void SipDialog::signalIfNoTransactions(){
@@ -103,7 +106,8 @@ void SipDialog::signalIfNoTransactions(){
 			// transactions), and can be placed in the end of the queue. 
 			// It is placed in the high prio queue so that it is guaranteed 
 			// to be deleted even under high load.
-			dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE); 
+			//dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE); 
+			(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueCommand(cmd);
 		}
 	}
 }
@@ -129,7 +133,7 @@ void SipDialog::addRoute( MRef<SipRequest *> req ){
 }
 
 list<MRef<SipTransaction*> > SipDialog::getTransactions(){
-	return sipStack->getDispatcher()->getLayerTransaction()->getTransactionsWithCallId(getCallId());
+	return (*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->getLayerTransaction()->getTransactionsWithCallId(getCallId());
 }
 
 bool SipDialog::handleCommand(const SipSMCommand &command){
@@ -261,7 +265,7 @@ MRef<SipResponse*> SipDialog::createSipResponse( MRef<SipRequest*> req, int32_t 
 
 void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
 	SipSMCommand cmd( *msg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer );
-	dispatcher->enqueueCommand( cmd, queue );
+	(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueCommand( cmd, queue );
 }
 
 bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
@@ -478,5 +482,89 @@ string SipDialogState::getRemoteTarget() {
 		//merr << "SipDialogSTate::getRemoteTarget : remote target empty! returning remote uri .." << end;
 		return remoteUri;
 	}
+}
+
+std::string SipDialog::getDialogStatusString(){
+
+	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
+		sipStack->getTimeoutProvider()->getTimeoutRequests();
+
+	cerr << (getName() + "   State: " + getCurrentStateName())<< endl;
+
+
+	cerr << BOLD << "        SipDialogState: "<< PLAIN << endl;
+	cerr <<         "            secure="<<dialogState.secure 
+			<<"; localTag="<<dialogState.localTag
+			<<"; remoteTag="<<dialogState.remoteTag 
+			<<"; seqNo="<< dialogState.seqNo
+			<<"; remoteSeqNo="<< dialogState.remoteSeqNo
+			<<"; remoteUri="<< dialogState.remoteUri
+			<<"; remoteTarget="<<dialogState.remoteTarget
+			<<"; isEarly="<<dialogState.isEarly
+			<< endl;
+	cerr <<         "            route_set: ";
+	
+	list<string>::iterator i;
+	for (i=dialogState.routeSet.begin(); i!= dialogState.routeSet.end(); i++){
+		if (i!=dialogState.routeSet.begin())
+			cerr << ",";
+		cerr << *i;
+	}
+	cerr <<endl;
+	
+	cerr << BOLD << "        Identity: "<< PLAIN << endl;
+	cerr <<         "            "<< getDialogConfig()->inherited->sipIdentity->getDebugString();
+	cerr <<endl;
+	
+	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
+	int ntimeouts=0;
+	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
+	for (uint32_t j=0; j< torequests.size(); j++,jj++){
+		if ( this == *((*jj).get_subscriber()) ){
+			int ms= (*jj).get_ms_to_timeout();
+			cerr << string("            timeout: ")+ (*jj).get_command()
+				+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
+			ntimeouts++;
+		}
+	}
+	if (ntimeouts==0){
+		cerr << "            (no timeouts)"<< endl;
+	}
+
+
+	cerr << BOLD << "        Transactions:"<< PLAIN << endl;
+	list<MRef<SipTransaction*> > transactions = getTransactions();
+	if (transactions.size()==0)
+		cerr << "            (no transactions)"<< endl;
+	else{
+		int n=0;
+		for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
+				i!=transactions.end(); i++){
+			cerr << string("            (")+itoa(n)+") "+
+				(*i)->getName() 
+				+ "   State: "
+				+ (*i)->getCurrentStateName() << endl;
+			n++;
+
+			cerr << BOLD << "                Timeouts:" << PLAIN << endl;
+
+			int ntimeouts=0;
+			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
+			for (uint32_t j=0; j< torequests.size(); j++, jj++){
+				if ( *((*i)) == *((*jj).get_subscriber()) ){
+					int ms= (*jj).get_ms_to_timeout();
+					cerr << string("                        timeout: ")
+						+ (*jj).get_command()
+						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)<< endl;
+					ntimeouts++;
+				}
+			}
+			if (ntimeouts==0)
+				cerr << "                        (no timeouts)"<< endl;
+		}
+	}
+
+
+	return "";
 }
 

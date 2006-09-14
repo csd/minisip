@@ -75,19 +75,25 @@
 
 #include<libmsip/libmsip_config.h>
 
+class SipStackInternal;
 
-#include<libmutil/minilist.h>
+
 #include<libmutil/CommandString.h>
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>
+#include<libmutil/Thread.h>
 #include<libmsip/SipTimers.h>
-
-#include<libmsip/SipLayerTransport.h>
 #include<libmcrypto/cert.h>
 #include<libmutil/MessageRouter.h>
+#include<libmsip/SipSMCommand.h>
+#include<libmutil/TimeoutProvider.h>
+#include<libmutil/StateMachine.h>
 
 class SipDialog;
-class SipTransaction;
+
+#define HIGH_PRIO_QUEUE 2
+#define LOW_PRIO_QUEUE 4
+
+
 
 //TODO: Enable conference calling
 
@@ -125,8 +131,7 @@ class SipTransaction;
  * See the main documentation document for how to implement application
  * layer support for new header and content types (@see Factories).
 */
-class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
-
+class LIBMSIP_API SipStack : public Runnable{
 	public:
 		SipStack( MRef<SipCommonConfig*> stackConfig,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
@@ -134,57 +139,43 @@ class LIBMSIP_API SipStack: public SipSMCommandReceiver, public Runnable{
 				MRef<ca_db *> cert_db = NULL
 			  );
 
+		~SipStack();
+		
 		void setTransactionHandlesAck(bool transHandleAck);
-
 		void setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb);
-
-		virtual std::string getMemObjectType(){return "SipStack";}
-		
                 virtual void run();
-
-		MRef<SipCommandDispatcher*> getDispatcher();
-
+		virtual void stopRunning();
 		bool handleCommand(const CommandString &cmd);
+		bool handleCommand(const SipSMCommand &cmd);
+		void enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &cmd);
+		void enqueueCommand(const SipSMCommand &cmd, int queue=LOW_PRIO_QUEUE);
 
-		bool handleCommand(const SipSMCommand &command);
-		
 		void setCallback(MRef<CommandReceiver*> callback);	//Rename to setMessageRouterCallback?
-		MRef<CommandReceiver *> getCallback();
-
+		MRef<CommandReceiver*> getCallback();	
 		void setConfCallback(MRef<CommandReceiver*> callback); // Hack to make the conference calling work - should not be here FIXME
 		MRef<CommandReceiver *> getConfCallback();
-		
 		void addDialog(MRef<SipDialog*> d);
-
-		/**
-		 * Each SipStack object creates a TimeoutProvider that with
-		 * a thread of it's own keeps track of timers waiting to
-		 * fire. This method is used by the transactions and
-		 * dialogs that wish to use timeouts to retrieve which
-		 * timeout provider to use.
-		 */
-		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
-
 		MRef<SipTimers*> getTimers();
-		MRef<SipCommonConfig*> getStackConfig(){return config;}
-
+		MRef<SipCommonConfig*> getStackConfig();
 		void addSupportedExtension(std::string extension);
 		std::string getAllSupportedExtensionsStr();
 		bool supports(std::string extension);
-                
+		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
+		void setDialogManagement(MRef<SipDialog*> mgmt);
+
+		std::list<MRef<SipDialog *> > getDialogs();
+
+		void startTcpServer();
+		void startTlsServer();
+
+		void setDebugPrintPackets(bool enable);
+		bool getDebugPrintPackets();
+
 	private:
-		MRef<SipTimers*> timers;
-		MRef<SipCommonConfig *> config;
-		MRef<CommandReceiver*> callback;
-		
-		MRef<CommandReceiver*> confCallback;	//hack to make conference calling work until the ConfMessageRouter is removed
-		
-		//
-		MRef<SipCommandDispatcher*> dispatcher;
+		friend class SipDialog;
+		//SipStackInternal* sipStackInternal;
+		void *sipStackInternal; // MRef<SipStackInternal*> sipStackInternal
 
-		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> timeoutProvider;
-
-		std::list<std::string> sipExtensions;
 };
 
 

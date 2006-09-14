@@ -57,7 +57,7 @@ class SipRequest;
 */
 class SipTransactionNonInviteClient: public SipTransactionClient{
 	public:
-		SipTransactionNonInviteClient(MRef<SipStack *> stack, 
+		SipTransactionNonInviteClient(MRef<SipStackInternal *> stackInternal, 
 				int seq_no, 
 				const std::string &cSeqMethod, 
 				const std::string &callid);

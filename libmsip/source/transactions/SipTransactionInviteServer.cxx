@@ -204,10 +204,10 @@ bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMComm
 		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());		
 		if( isUnreliable() ) {
-			timerG = sipStack->getTimers()->getG();
+			timerG = sipStackInternal->getTimers()->getG();
 			requestTimeout(timerG, "timerG");
 		}
-		requestTimeout(sipStack->getTimers()->getH(),"timerH");
+		requestTimeout(sipStackInternal->getTimers()->getH(),"timerH");
 		
 		//no need for via header, it is copied from the request msg
 		send(command.getCommandPacket(), false);
@@ -309,7 +309,7 @@ bool SipTransactionInviteServer::a7_completed_confirmed_ACK( const SipSMCommand 
 		cancelTimeout("timerG");//response re-tx 
 		cancelTimeout("timerH"); //wait for ACK reception
 		if( isUnreliable() )
-			requestTimeout(sipStack->getTimers()->getI(), "timerI");
+			requestTimeout(sipStackInternal->getTimers()->getI(), "timerI");
 		else
 			requestTimeout( 0, "timerI");
 		return true;
@@ -332,8 +332,8 @@ bool SipTransactionInviteServer::a8_completed_completed_timerG( const SipSMComma
 				SipSMCommand::transaction_layer)){
 		MRef<SipResponse*> resp = lastResponse;
 		timerG *= 2;
-		if( timerG > sipStack->getTimers()->getT2() )
-			timerG = sipStack->getTimers()->getT2();
+		if( timerG > sipStackInternal->getTimers()->getT2() )
+			timerG = sipStackInternal->getTimers()->getT2();
 		requestTimeout( timerG, "timerG");
 		send(MRef<SipMessage*>(*resp), false);
 		return true;
@@ -497,7 +497,7 @@ void SipTransactionInviteServer::setUpStateMachine(){
 }
 
 
-SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStack*> stack, 
+SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStackInternal*> stack, 
 		//MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 

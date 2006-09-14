@@ -22,6 +22,7 @@
 */
 #include<config.h>
 #include<libmsip/SipStack.h>
+#include<libmsip/SipStackInternal.h>
 
 #include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipCommandDispatcher.h>
@@ -67,6 +68,131 @@
 #include<libmcrypto/cert.h>
 
 using namespace std;
+
+#define STACK (*(MRef<SipStackInternal*> *) sipStackInternal)
+
+SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
+		MRef<certificate_chain *> cert_chain,
+		MRef<ca_db *> cert_db
+		){
+	
+	SipStackInternal *istack = new SipStackInternal(stackConfig, cert_chain, cert_db);
+
+	sipStackInternal = new MRef<SipStackInternal*>(istack);
+}
+
+SipStack::~SipStack(){
+	MRef<SipStackInternal*> * mrefPtr = (MRef<SipStackInternal*> *) sipStackInternal;
+	delete mrefPtr;
+}
+
+void SipStack::setTransactionHandlesAck(bool transHandlesAck){
+	//sipStackInternal->setTransactionHandlesAck(transHandlesAck);
+	STACK->setTransactionHandlesAck(transHandlesAck);
+
+}
+
+void SipStack::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
+	STACK->setDefaultDialogCommandHandler(cb);
+}
+
+void SipStack::run(){
+	STACK->run();
+}
+
+void SipStack::stopRunning(){
+	STACK->stopRunning();
+}
+
+bool SipStack::handleCommand(const CommandString &cmd){
+	return STACK->handleCommand(cmd);
+}
+
+void SipStack::setCallback(MRef<CommandReceiver*> callback){
+	STACK->setCallback(callback);
+}
+
+MRef<CommandReceiver*> SipStack::getCallback(){
+	return STACK->getCallback();
+}
+
+void SipStack::setConfCallback(MRef<CommandReceiver*> callback){
+	STACK->setConfCallback(callback);
+}
+
+MRef<CommandReceiver *> SipStack::getConfCallback(){
+	return STACK->getConfCallback();
+}
+
+void SipStack::addDialog(MRef<SipDialog*> d){
+	STACK->addDialog(d);
+}
+
+MRef<SipTimers*> SipStack::getTimers(){
+	return STACK->getTimers();
+}	
+
+MRef<SipCommonConfig*> SipStack::getStackConfig(){
+	return STACK->getStackConfig();
+}
+
+void SipStack::addSupportedExtension(std::string extension){
+	STACK->addSupportedExtension(extension);
+}
+
+std::string SipStack::getAllSupportedExtensionsStr(){
+	return STACK->getAllSupportedExtensionsStr();
+}
+
+bool SipStack::supports(std::string extension){
+	return STACK->supports(extension);
+}
+
+
+MRef<TimeoutProvider<std::string,MRef<StateMachine<SipSMCommand,std::string>*> > *> 
+SipStack::getTimeoutProvider(){
+	return STACK->getTimeoutProvider();
+}
+
+void SipStack::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &cmd){
+	STACK->getDispatcher()->enqueueTimeout(receiver, cmd);
+}
+
+std::list<MRef<SipDialog *> > SipStack::getDialogs(){
+	return STACK->getDispatcher()->getDialogs();
+}
+
+void SipStack::enqueueCommand(const SipSMCommand &cmd, int queue){
+	STACK->getDispatcher()->enqueueCommand(cmd, queue);
+}
+
+bool SipStack::handleCommand(const SipSMCommand &cmd){
+	return STACK->handleCommand(cmd);
+}
+
+void SipStack::setDialogManagement(MRef<SipDialog*> mgmt){
+	STACK->getDispatcher()->setDialogManagement(mgmt);
+}
+
+void SipStack::startTcpServer(){
+	STACK->getDispatcher()->getLayerTransport()->startTcpServer();
+}
+
+void SipStack::startTlsServer(){
+	STACK->getDispatcher()->getLayerTransport()->startTlsServer();
+}
+
+void SipStack::setDebugPrintPackets(bool enable){
+	set_debug_print_packets(enable);	
+}
+
+bool SipStack::getDebugPrintPackets(){
+	return get_debug_print_packets();
+}
+
+
+
+#if 0
 
 SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
@@ -233,4 +359,6 @@ string SipStack::getAllSupportedExtensionsStr(){
 	}
 	return ret;
 }
+
+#endif
 

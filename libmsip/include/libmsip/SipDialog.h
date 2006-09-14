@@ -20,12 +20,6 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
-
-
-/*
- * Authors: Erik Eliasson <eliasson@it.kth.se>
- *          Johan Bilien <jobi@via.ecp.fr>
  *	    Cesc Santasusana, c e s c dot s a n t a A{T g m a i l dot co m; 2005
  *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
@@ -40,15 +34,13 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
 
-#include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipRequest.h>
+#include<libmsip/SipStack.h>
 
-class SipStack;
 class SipTransaction;
 class SipDialogConfig;
 class SipCommandDispatcher;
 class SipAuthenticationDigest;
-//class SipDialogContainer;
 
 
 /**
@@ -167,8 +159,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		std::string getCallId(){return dialogState.callId;}
 		
-		//MRef<SipCommandDispatcher*> getDispatcher();
-
 		MRef<SipStack*> getSipStack();
 
 		void signalIfNoTransactions();
@@ -231,6 +221,8 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		void addAuthorizations( MRef<SipRequest*> req );
 
+		std::string getDialogStatusString();
+
 	protected:
 //		///a list containing all transactions
 //		std::list<MRef<SipTransaction*> > transactions;
@@ -238,8 +230,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		///
 		MRef<SipStack*> sipStack;
 		
-		MRef<SipCommandDispatcher*> dispatcher;
-
 		bool updateAuthentication( MRef<SipResponse*> resp,
 					   MRef<SipHeaderValueProxyAuthenticate*> auth);
 	private:
@@ -252,7 +242,6 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipCommandDispatcher.h>
 
 #endif
 
