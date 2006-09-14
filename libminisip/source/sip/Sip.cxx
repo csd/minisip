@@ -88,7 +88,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 
 	//CESC -- change to use set/get
 	MRef<SipDialogManagement *> shutdown = new SipDialogManagement(sipstack);	
-	sipstack->getDispatcher()->setDialogManagement(*shutdown);
+	sipstack->setDialogManagement(*shutdown);
 
 	//Register content factories that are able to parse the content of
 	//sip messages. text/plain, multipart/mixed, multipart/alternative
@@ -437,7 +437,7 @@ void Sip::run(){
 			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
 #endif
 
-			sipstack->getDispatcher()->getLayerTransport()->startTcpServer();
+			sipstack->startTcpServer();
 
 		}
 
@@ -449,7 +449,7 @@ void Sip::run(){
 #ifdef DEBUG_OUTPUT
 				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
 #endif
-				sipstack->getDispatcher()->getLayerTransport()->startTlsServer();
+				sipstack->startTlsServer();
 			}
 		}
 	}

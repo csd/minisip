@@ -210,7 +210,7 @@ bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated),
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 		return false;
@@ -324,7 +324,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
                 SipSMCommand::transaction_layer
                 );
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 
 }
 

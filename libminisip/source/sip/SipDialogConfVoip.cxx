@@ -447,7 +447,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		if( getDialogConfig()->inherited->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
 			SipSMCommand sipcmd(accept, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-			dispatcher->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE );
+			sipStack->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE );
 		}
 		return true;
 	}else{
@@ -693,7 +693,7 @@ bool SipDialogConfVoip::a25_termwait_terminated_notransactions( const SipSMComma
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dispatcher);
 
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -1057,7 +1057,7 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	
 //	handleCommand(scmd);
 	//cerr<<"SDCV: "+scmd.getCommandString().getString()<<endl;
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE/*, PRIO_LAST_IN_QUEUE*/);
+	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 	setLastInvite(inv);
 	//inv->checkAcceptContact();
 
@@ -1132,7 +1132,7 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 
         MRef<SipMessage*> pref(*inv);
         SipSMCommand cmd(pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 	setLastInvite(inv);
 
 }
@@ -1235,9 +1235,10 @@ void SipDialogConfVoip::sendAck(const string &branch){
 		       proxy->getTransport() );
 
         MRef<SipMessage*> pref(*ack);
-	dispatcher->getLayerTransport()->sendMessage(pref,
-							   string("ACK"),
-							   true);
+	sendSipMessage(pref);
+//	sipStack->getLayerTransport()->sendMessage(pref,
+//							   string("ACK"),
+//							   true);
 	
 	
 }
@@ -1249,7 +1250,7 @@ void SipDialogConfVoip::sendBye(const string &branch, int bye_seq_no){
 
         MRef<SipMessage*> pref(*bye);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendCancel(const string &branch){
@@ -1266,7 +1267,7 @@ void SipDialogConfVoip::sendCancel(const string &branch){
 
         MRef<SipMessage*> pref(*cancel);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendInviteOk(const string &branch){
@@ -1312,7 +1313,7 @@ void SipDialogConfVoip::sendInviteOk(const string &branch){
 //	
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
@@ -1321,7 +1322,7 @@ void SipDialogConfVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendReject(const string &branch){
@@ -1329,7 +1330,7 @@ void SipDialogConfVoip::sendReject(const string &branch){
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendRinging(const string &branch){
@@ -1337,7 +1338,7 @@ void SipDialogConfVoip::sendRinging(const string &branch){
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogConfVoip::sendNotAcceptable(const string &branch){
@@ -1350,7 +1351,7 @@ void SipDialogConfVoip::sendNotAcceptable(const string &branch){
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
         MRef<SipMessage*> pref(*not_acceptable);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 

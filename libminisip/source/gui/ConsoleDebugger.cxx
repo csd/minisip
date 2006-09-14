@@ -144,9 +144,8 @@ void ConsoleDebugger::run(){
 	#ifdef DEBUG_OUTPUT
 			case 'P':
 			case 'p':
-				set_debug_print_packets(!get_debug_print_packets());
-				//sipdebug_print_packets= !sipdebug_print_packets;
-				if (/*sipdebug_print_packets*/ get_debug_print_packets() )
+				config->sip->getSipStack()->setDebugPrintPackets(!config->sip->getSipStack()->getDebugPrintPackets() );
+				if (config->sip->getSipStack()->getDebugPrintPackets() )
 					cerr << "Packets will be displayed to the screen"<< endl;
 				else
 					cerr << "Packets will NOT be displayed to the screen"<< endl;
@@ -230,103 +229,15 @@ void ConsoleDebugger::showMem(){
 }
 
 void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
-
-	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
-
-	if (usesStateMachine){
-		cerr << (/*string("    (")+itoa(ii)+") " +*/ d->getName() + "   State: " + d->getCurrentStateName())<< endl;
-	}else{
-		cerr << d->getName() << endl;
-	}
-	cerr << BOLD << "        SipDialogState: "<< PLAIN << endl;
-	cerr <<         "            secure="<<d->dialogState.secure 
-			<<"; localTag="<<d->dialogState.localTag
-			<<"; remoteTag="<<d->dialogState.remoteTag 
-			<<"; seqNo="<< d->dialogState.seqNo
-			<<"; remoteSeqNo="<< d->dialogState.remoteSeqNo
-			<<"; remoteUri="<< d->dialogState.remoteUri
-			<<"; remoteTarget="<<d->dialogState.remoteTarget
-			<<"; isEarly="<<d->dialogState.isEarly
-			<< endl;
-	cerr <<         "            route_set: ";
-	
-	list<string>::iterator i;
-	for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
-		if (i!=d->dialogState.routeSet.begin())
-			cerr << ",";
-		cerr << *i;
-	}
-	cerr <<endl;
-	
-	cerr << BOLD << "        Identity: "<< PLAIN << endl;
-	cerr <<         "            "<< d->getDialogConfig()->inherited->sipIdentity->getDebugString();
-	cerr <<endl;
-	
-	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
-	int ntimeouts=0;
-	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-	for (uint32_t j=0; j< torequests.size(); j++,jj++){
-		if ( *d == *((*jj).get_subscriber()) ){
-			int ms= (*jj).get_ms_to_timeout();
-			cerr << string("            timeout: ")+ (*jj).get_command()
-				+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
-			ntimeouts++;
-		}
-	}
-	if (ntimeouts==0){
-		cerr << "            (no timeouts)"<< endl;
-	}
-
-
-	cerr << BOLD << "        Transactions:"<< PLAIN << endl;
-	list<MRef<SipTransaction*> > transactions = d->getTransactions();
-	if (transactions.size()==0)
-		cerr << "            (no transactions)"<< endl;
-	else{
-		int n=0;
-		for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-				i!=transactions.end(); i++){
-			cerr << string("            (")+itoa(n)+") "+
-				(*i)->getName() 
-				+ "   State: "
-				+ (*i)->getCurrentStateName() << endl;
-			n++;
-
-			cerr << BOLD << "                Timeouts:" << PLAIN << endl;
-
-			int ntimeouts=0;
-			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-			for (uint32_t j=0; j< torequests.size(); j++, jj++){
-				if ( *((*i)) == *((*jj).get_subscriber()) ){
-					int ms= (*jj).get_ms_to_timeout();
-					cerr << string("                        timeout: ")
-						+ (*jj).get_command()
-						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)<< endl;
-					ntimeouts++;
-				}
-			}
-			if (ntimeouts==0)
-				cerr << "                        (no timeouts)"<< endl;
-		}
-	}
-
-
-
-
-
+		d->getDialogStatusString();
 }
 
 void ConsoleDebugger::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogs();
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
 		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
 
-
-//	cerr << "    (DefaultHandler) ";
-//	showDialogInfo(config->sip->getSipStack()->getDialogContainer()->getDefaultHandler(),false);
-	
 	cerr << BOLD << " Calls:" << PLAIN << endl;
 	if (calls.size()==0)
 		cerr << "    (no calls)"<< endl;
@@ -336,66 +247,8 @@ void ConsoleDebugger::showStat(){
 			cerr << string("    (")+itoa(ii)+") " ;
 			showDialogInfo(*i,true);
 
-#if 0
-			cerr << (string("    (")+itoa(ii)+") "
-					//            displayMessage(string("    ")
-				+ (*i)->getName() 
-				+ "   State: "
-				+ (*i)->getCurrentStateName())<< endl;
+		}
 
-
-					cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
-					int ntimeouts=0;
-					std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-					for (int j=0; j< torequests.size(); j++,jj++){
-					if ( *(*i) == *((*jj).get_subscriber()) ){
-					int ms= (*jj).get_ms_to_timeout();
-					cerr << string("            timeout: ")+ (*jj).get_command()
-						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
-					ntimeouts++;
-					}
-					}
-					if (ntimeouts==0){
-					cerr << "            (no timeouts)"<< endl;
-					}
-
-
-
-					cerr << BOLD << "        Transactions:"<< PLAIN << endl;
-					list<MRef<SipTransaction*> > transactions = (*i)->getTransactions();
-					if (transactions.size()==0)
-						cerr << "            (no transactions)"<< endl;
-					else{
-						int n=0;
-                for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-                        i!=transactions.end(); i++){
-                    cerr << string("            (")+itoa(n)+") "+
-                            (*i)->getName() 
-                            + "   State: "
-                            + (*i)->getCurrentStateName() << endl;
-                    n++;
-
-                    cerr << BOLD << "                Timeouts:" << PLAIN << endl;
-                    
-                    int ntimeouts=0;
-                    std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-                    for (int j=0; j< torequests.size(); j++, jj++){
-                        if ( *((*i)) == *((*jj).get_subscriber()) ){
-                            int ms= (*jj).get_ms_to_timeout();
-                            cerr << string("                        timeout: ")
-                                        + (*jj).get_command()
-                                        + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)<< endl;
-                            ntimeouts++;
-                        }
-                    }
-                    if (ntimeouts==0)
-                        cerr << "                        (no timeouts)"<< endl;
-                }
-            }
-
-#endif
-        }
-		
 	}
 }
 
@@ -447,3 +300,4 @@ void ConsoleDebugger::join() {
 	config = NULL;
 	thread = NULL;
 }
+

@@ -161,7 +161,7 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
+		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		return true;
 	}else{
 		return false;
@@ -271,7 +271,7 @@ void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-        dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+        sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 
 	sendNotice(onlineStatus, sub->getFrom().getUserIpString());
@@ -321,7 +321,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
                 SipSMCommand::transaction_layer
                 );
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
+	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 }
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){

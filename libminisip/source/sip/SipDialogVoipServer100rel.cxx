@@ -203,7 +203,7 @@ bool SipDialogVoipServer100rel::a4002_100rel_ringing_PRACK( const SipSMCommand &
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		dispatcher->getCallback()->handleCommand("gui", cmdstr );
+		sipStack->getCallback()->handleCommand("gui", cmdstr );
 
 		sendRinging(getLastInvite()->getDestinationBranch(),false); //we don't do th 180 reliably, only the 183
 		
@@ -293,7 +293,7 @@ void SipDialogVoipServer100rel::sendPrackOk(const string &branch, MRef<SipMessag
 	
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipServer100rel::resendSessionProgress(){
@@ -302,7 +302,7 @@ void SipDialogVoipServer100rel::resendSessionProgress(){
 	rseq->setRSeq( rseq->getRSeq() + 1 );
 
 	SipSMCommand cmd( lastProgress, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipServer100rel::sendSessionProgress(const string &branch){
@@ -327,6 +327,6 @@ void SipDialogVoipServer100rel::sendSessionProgress(const string &branch){
 
 	MRef<SipMessage*> pref(*progress);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 

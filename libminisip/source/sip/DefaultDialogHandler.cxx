@@ -216,7 +216,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
-			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg << cmd << end;
 		}
 		//start SipDialogVoIP
@@ -259,7 +259,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
-			sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg << cmd << end;
 		}
 		return true;
@@ -312,7 +312,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
 		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}
@@ -329,7 +329,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		CommandString command(cmdstr);
 		cmdstr.setDestinationId(pres->getCallId());
 		SipSMCommand cmd( cmdstr, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}
@@ -365,7 +365,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
-		sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		return true;
 	}
 
@@ -757,8 +757,8 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 
 bool DefaultDialogHandler::getP2TDialog(string GroupId, MRef<SipDialogP2T*>&p2tDialog){
 	bool match=false;
-//	list<MRef<SipDialog*> > *dialogs = getDialogContainer()->getDispatcher()->getDialogs();
-	list<MRef<SipDialog*> > dialogs = getDialogContainer()->getDispatcher()->getDialogs();
+//	list<MRef<SipDialog*> > *dialogs = sipStack->getDialogs();
+	list<MRef<SipDialog*> > dialogs = sipStack->getDialogs();
 	
 	for (list<MRef<SipDialog*> >::iterator i=dialogs.begin(); i!=dialogs.end(); i++){
 		MRef<SipDialog*> tmpd= *i;
@@ -839,7 +839,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch)
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-        sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+        sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 
@@ -884,7 +884,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 
 	MRef<SipMessage*> pref(*im);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->getDispatcher()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 

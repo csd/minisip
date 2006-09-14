@@ -701,7 +701,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			SipSMCommand::transaction_layer
 			);
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 	setLastInvite(inv);
 
 }
@@ -717,7 +717,7 @@ void SipDialogVoipClient::sendAck(){
 			SipSMCommand::transport_layer
 			);
 	
-	dispatcher->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
@@ -776,7 +776,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
