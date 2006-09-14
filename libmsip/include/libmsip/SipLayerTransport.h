@@ -37,7 +37,6 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipCommandDispatcher.h>
 
 #include<list>
 
@@ -66,7 +65,7 @@ class SocketServer : public Runnable{
 };
 
 
-class LIBMSIP_API SipLayerTransport : public SipSMCommandReceiver {
+class SipLayerTransport : public SipSMCommandReceiver {
 	public:
 		SipLayerTransport(std::string local_ip, 
 							std::string contactIP,
@@ -155,8 +154,8 @@ class LIBMSIP_API SipLayerTransport : public SipSMCommandReceiver {
 #include<libmsip/SipMessage.h>
 
 
-LIBMSIP_API void set_debug_print_packets(bool);
-LIBMSIP_API bool get_debug_print_packets();
+void set_debug_print_packets(bool);
+bool get_debug_print_packets();
 
 
 #endif

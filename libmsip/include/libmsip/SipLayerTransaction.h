@@ -37,7 +37,7 @@ class SipCommandDispatcher;
 class SipTransaction;
 class SipLayerTransport;
 
-class LIBMSIP_API SipLayerTransaction: public SipSMCommandReceiver{
+class SipLayerTransaction: public SipSMCommandReceiver{
 	public:
 		SipLayerTransaction(MRef<SipCommandDispatcher*> dispatcher, 
 				MRef<SipLayerTransport*> transp);
