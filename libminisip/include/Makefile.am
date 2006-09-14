@@ -114,27 +114,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/ipprovider/SimpleIpProvider.h \
 			libminisip/ipprovider/StunIpProvider.h \
 			libminisip/ipprovider/IpProvider.h \
-			libminisip/zrtp/ZIDFile.h \
-			libminisip/zrtp/ZIDRecord.h \
-			libminisip/zrtp/ZrtpCallback.h \
-			libminisip/zrtp/ZRtp.h \
-			libminisip/zrtp/ZrtpHostBridgeMinisip.h \
-			libminisip/zrtp/ZrtpPacketBase.h \
-			libminisip/zrtp/ZrtpPacketCommit.h \
-			libminisip/zrtp/ZrtpPacketConf2Ack.h \
-			libminisip/zrtp/ZrtpPacketConfirm.h \
-			libminisip/zrtp/ZrtpPacketDHPart.h \
-			libminisip/zrtp/ZrtpPacketError.h \
-			libminisip/zrtp/zrtpPacket.h \
-			libminisip/zrtp/ZrtpPacketHelloAck.h \
-			libminisip/zrtp/ZrtpPacketHello.h \
-			libminisip/zrtp/ZrtpStateClass.h \
-			libminisip/zrtp/ZrtpStates.h \
-			libminisip/zrtp/ZrtpTextData.h \
-			libminisip/zrtp/Base32.h \
-			libminisip/zrtp/ZrtpPacketGoClear.h \
-			libminisip/zrtp/ZrtpPacketClearAck.h \
-			libminisip/zrtp/ZrtpUserCallback.h \
 			libminisip/Minisip.h \
 			libminisip/libminisip_config.h
 
