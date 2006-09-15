@@ -32,7 +32,6 @@
 #include<libmutil/termmanip.h>
 
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipCommandDispatcher.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
 
 #include<libminisip/conference/ConfMessageRouter.h>
@@ -57,9 +56,6 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 	addCommand("hangup");
 	addCommand("hide packets");
 	addCommand("register");
-	addCommand("show all");
-	addCommand("show calls");
-	addCommand("show transactions");
 	addCommand("show packets");
 	addCommand("cmd");
 	addCommand("transfer");
@@ -523,160 +519,12 @@ bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> /*conf*/ ){
 	return false;
 }
 
-void MinisipTextUI::showCalls(){
-	//list<MRef<SipDialog*> > *calls = config->sip->getDialogContainer()->getDispatcher()->getDialogs();
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
-	displayMessage(string("Calls:"));
-	if (calls.size()==0)
-		displayMessage("    (no calls)");
-	else{
-		int ii=0;	   
-		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!=calls.end(); i++,ii++){
-			displayMessage(string("    (")+itoa(ii)+") "
-					+ (*i)->getName() 
-					+ "   State: "
-					+ (*i)->getCurrentStateName());
-			//                    + "  ObjectId: " + itoa(   (int) (*(((*calls)[i])))    )  );
-		}
-	}
-}
-
-void MinisipTextUI::showTransactions(string command){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
-
-	string tno = trim(command).substr(17);
-	int itno=0;
-	if (trim(tno).size()==0){
-		displayMessage("show transaction <transaction_nr>");
-	}else{
-		itno = atoi(tno.c_str());
-
-		if (((int)calls.size())-1>=itno){
-			list<MRef<SipDialog*> >::iterator call = calls.begin();
-			for (int j=0; j < itno; j++)
-				call++;
-			//            MRef<SipDialog*> call = (*calls)[itno];
-
-			displayMessage(string("Transactions for call ")+(*call)->getName());
-			list<MRef<SipTransaction*> > transactions = (*call)->getTransactions();
-			if (transactions.size()==0)
-				displayMessage("(no transactions)");
-			else{
-				int n=0;
-				for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-						i!=transactions.end(); i++){
-					displayMessage(string("    (")+itoa(n)+") "+
-							(*i)->getName() 
-							+ "   State: "
-							+ (*i)->getCurrentStateName()
-#ifdef _MSC_VER
-							);
-#else
-							+ "  ObjecdId: " + itoa((int64_t)*(*i)));
-#endif
-					n++;
-				}
-			}
-		}else{
-			displayMessage("Call not found", red);
-		}
-	}
-
-}
-
-void MinisipTextUI::showTimeouts(){
-	string to = config->sip->getSipStack()->getTimeoutProvider()->getTimeouts();
-	displayMessage(string("Timeouts: \n")+to);
-}
-
-
 void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header){
-	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-				config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
-		
-	if (usesStateMachine){
-		displayMessage(header + d->getName() + "   State: " + d->getCurrentStateName());
-	}else{
-		displayMessage(header + d->getName());
-	}
-		
-	displayMessage("        SipDialogState:",bold);
-	cerr << BOLD << "        SipDialogState: "<< PLAIN;
-	displayMessage(
-			string("            secure=") + (d->dialogState.secure?string("true"):string("false"))
-				+"; localTag=" + d->dialogState.localTag
-				+"; remoteTag=" + d->dialogState.remoteTag
-				+"; seqNo=" + itoa(d->dialogState.seqNo)
-				+"; remoteSeqNo=" + itoa(d->dialogState.remoteSeqNo)
-				+"; remoteUri=" + d->dialogState.remoteUri
-				+"; remoteTarget=" + d->dialogState.remoteTarget
-				+"; isEarly=" + (d->dialogState.isEarly?string("true"):string("false"))
-			);
-		string routeset;
-		list<string>::iterator i;
-		for (i=d->dialogState.routeSet.begin(); i!= d->dialogState.routeSet.end(); i++){
-			if (i!=d->dialogState.routeSet.begin())
-				routeset+= ",";
-			routeset+= *i;
-		}
-		displayMessage( string("            route_set: ")+routeset);
-		
-	//	displayMessage("        Timeouts:", bold);
-		int ntimeouts=0;
-		std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-		for (uint32_t j=0; j< torequests.size(); j++,jj++){
-			if ( *d == *((*jj).get_subscriber()) ){
-				int ms= (*jj).get_ms_to_timeout();
-				string theader = ntimeouts==0?"        Timeouts: ": "                  ";
-				displayMessage(theader+ (*jj).get_command() + "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-				ntimeouts++;
-			}
-		}
-		if (ntimeouts==0){
-			displayMessage("        (no timeouts)");
-		}
-
-	//	displayMessage( "        Transactions:", bold);
-		list<MRef<SipTransaction*> > transactions = d->getTransactions();
-		if (transactions.size()==0)
-			displayMessage("        (no transactions)");
-		else{
-			int n=0;
-			for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-					i!=transactions.end(); i++){
-				
-				string header =  n==0 ? "        Transactions: " : "                      " ;
-				displayMessage(header +  string("(")+itoa(n)+") "+ (*i)->getName() + "   State: " + (*i)->getCurrentStateName());
-				n++;
-	
-	//			displayMessage("                Timeouts:", bold);
-	
-				int ntimeouts=0;
-				std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-				for (uint32_t j=0; j< torequests.size(); j++, jj++){
-					if ( *((*i)) == *((*jj).get_subscriber()) ){
-						int ms= (*jj).get_ms_to_timeout();
-						string header = ntimeouts==0?"            Timeouts: " : "                      ";
-						displayMessage(header + string("      timeout: ")
-							+ (*jj).get_command()
-							+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000));
-						ntimeouts++;
-					}
-				}
-				if (ntimeouts==0)
-					displayMessage("                        (no timeouts)");
-			}
-		}
-	
+	d->getDialogStatusString();	//TODO: this method should return a string that we output
 }
 
 void MinisipTextUI::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
-
-	list <TPRequest<string, MRef<StateMachine<SipSMCommand,string>*> > > torequests = config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
-
-//	displayMessage(" Default dialog handler:", bold);
-//	showDialogInfo(config->sip->getSipStack()->getDefaultHandler(), false, "  Default dialog handler: ");
+	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogs();
 
 	displayMessage(" Calls:", bold);
 	if (calls.size()==0)
@@ -813,11 +661,6 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
 	}
 
-	if (command == "show calls"){
-		showCalls();
-		handled=true;
-	}
-
 	if (command == "enable autoanswer"){
 		autoanswer=true;
 		displayMessage("Autoanswer is now enabled.");
@@ -839,31 +682,20 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
 	}
 
-	if (command == "show timeouts"){
-		showTimeouts();
-		handled=true;
-	}
 
 #ifdef DEBUG_OUTPUT
 	if (command == "show packets"){
-		set_debug_print_packets(true);
-		//sipdebug_print_packets=true;
+		config->sip->getSipStack()->setDebugPrintPackets(true);
 		displayMessage("SIP messages will be displayed on the screen", blue);
 		handled=true;
 	}
 
 	if (command == "hide packets"){
-		set_debug_print_packets(false);
-		//sipdebug_print_packets=false;
+		config->sip->getSipStack()->setDebugPrintPackets(false);
 		displayMessage("SIP messages will NOT be displayed on the screen", blue);
 		handled=true;
 	}
 #endif
-
-	if (command.substr(0,17) == "show transactions"){
-		showTransactions(command);
-		handled=true;
-	}
 
 	if (command == "answer"){
 		CommandString command(callId, SipCommandString::accept_invite);
@@ -906,17 +738,6 @@ void MinisipTextUI::guiExecute(string cmd){
         if (command == "reject" && state == "TRANSFER?"){
 		CommandString command(callId, SipCommandString::user_transfer_refuse);
 		sendCommand("sip", command);
-		handled=true;
-	}
-
-	if (command == "show all"){
-		showCalls();
-
-		list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDispatcher()->getDialogs();
-		for (uint32_t i=0; i<calls.size(); i++){
-			showTransactions("show transactions "+itoa(i));
-		}
-		showTimeouts();
 		handled=true;
 	}
 
