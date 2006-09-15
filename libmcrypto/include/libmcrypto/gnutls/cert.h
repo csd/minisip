@@ -113,7 +113,7 @@ class Certificate: public MObject{
 		std::string getPkFile();
 
 		void setPk( std::string file );
-
+                void setEncPk(char * pkInput, int length, string password  )
 		//EVP_PKEY * get_openssl_private_key(){return private_key;};
 		//X509 * get_openssl_Certificate(){return cert;};
 	private:

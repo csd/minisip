@@ -464,6 +464,62 @@ void Certificate::setPk( string file ){
 
 }
 
+void Certificate::setEncPk(char * pkInput, int length, string password  )
+{
+   /*Not checked if working correctly*/
+   
+   gnutls_datum pkData;
+   byte_t publicKeyId[20];
+   byte_t privateKeyId[20];
+   size_t idLength;
+   
+   
+   ret = gnutls_x509_privkey_init( &privateKey );
+   
+   if( ret != 0 )
+     {	
+	throw new CertificateExceptionInit(
+					   "Could not initialize the private key structure" );
+     }
+   
+   pkData.data = (unsigned char*)pkInput;
+   pkSize.size = length;
+   
+   
+   ret = gnutls_x509_privkey_import_pkcs8 (privatekey, &pkData, GNUTLS_X509_FMT_DER, password.c_str(), 0);
+   
+   if( ret != 0 )
+     {
+	throw new CertificateExceptionFile("Could not import the given private key" );
+     }
+   
+     /* Check that the private key matches the Certificate */
+   idLength = 20;
+   ret = gnutls_x509_crt_get_key_id( cert, 0, publicKeyId, &idLength );
+   
+   if( ret < 0 )
+     {
+	throw new CertificateException("An error occured when computing the key id" );
+     }
+   
+   ret = gnutls_x509_privkey_get_key_id( cert, 0, privateKeyId, &idLength );
+   
+   if( ret < 0 )
+     {	
+	throw new CertificateException("An error occured when computing the key id" );
+     }
+   for( i = 0; i < idLength; i++ )
+     {	
+	if( privateKeyId[i] != publicKeyId[i] )
+	  {	     
+	     throw new CertificateExceptionPkey("The private key " + 
+						" does not match the certificate " + this->file	);
+	  }
+     }
+}
+
+
+
 
 int Certificate::control( CaDb * certDb ){
 	int result;

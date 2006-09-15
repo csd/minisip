@@ -33,6 +33,8 @@ extern "C"{
 	#include<openssl/err.h>
 	#include<openssl/pem.h>
 	#include<openssl/ssl.h>
+        #include<openssl/bio.h>
+        #include <openssl/pkcs12.h>
 }
 
 
@@ -40,6 +42,7 @@ extern "C"{
 #include<assert.h>
 
 #include<iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -309,6 +312,43 @@ void certificate::set_pk( string file ){
 
 
 }
+
+void certificate::set_encpk(char *derEncPk, int length, string password)
+{
+   BIO *mem;  
+   mem = BIO_new_mem_buf((void *)derEncPk, length);
+   
+   if(mem == NULL )
+     {
+	cerr << "Couldn't initiate bio buffer" << endl;
+	throw certificate_exception_pkey("Couldn't initiate bio buffer" );
+     }
+   
+   
+   
+   
+   SSLeay_add_all_algorithms();
+   
+   //cout<<"l="<<length<<"p="<<password<<endl;
+   
+   private_key = PEM_read_bio_PrivateKey(mem, NULL, 0, (void*)password.c_str());
+ 
+   if(private_key == NULL )
+     {
+	cerr << "Invalid private key data or password" << endl;
+	throw certificate_exception_pkey("The private key is invalid or wrong password was used" );
+     }
+   
+   /* Check that the private key matches the certificate */
+   
+   if( X509_check_private_key( cert, private_key ) != 1 )
+     {
+	cerr << "Private key does not match the certificate" << endl;
+	throw certificate_exception_pkey(
+					 "The private key does not match the certificate" );
+     }
+}
+
 
 
 int certificate::control( ca_db * cert_db ){
