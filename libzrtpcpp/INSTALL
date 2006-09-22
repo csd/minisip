@@ -1,0 +1,5 @@
+See generic installation instructions for minsip
+using the build.pl script.
+
+libzrtpcpp can be built using the build.pl script
+and specifying "libcrtpcpp" as target.

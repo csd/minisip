@@ -49,7 +49,7 @@ AC_CHECK_TYPES([uint])
 
 dnl debug flag
 AC_ARG_ENABLE(autocall,
-    AS_HELP_STRING([--enable-autocall], 
+    AS_HELP_STRING([--enable-autocall],
     	[enables automatic calling for debug purposes (default disabled)]),
     [ if test "${enable_autocall}" = "yes"
       then
@@ -67,8 +67,8 @@ AC_ARG_ENABLE(ipaq,
 
 dnl debug flag
 AC_ARG_ENABLE(memdebug,
-    AS_HELP_STRING([--enable-memdebug], [enables memory debugging code. 
-    WARNING: This changes the MemObject API that is used by both libraries 
+    AS_HELP_STRING([--enable-memdebug], [enables memory debugging code.
+    WARNING: This changes the MemObject API that is used by both libraries
     and applications. Use with care (default disabled)]),
     [ if test "${enable_memdebug}" = "yes"
       then
@@ -80,7 +80,7 @@ AM_MINISIP_ENABLE_TEST_SUITE
 
 dnl ipaq buzzer
 AC_ARG_ENABLE(buzzer,
-    AS_HELP_STRING([--enable-buzzer], 
+    AS_HELP_STRING([--enable-buzzer],
     	[enables IPAQ buzzer (default disabled)]),
     [ if test "${enable_buzzer}" = "yes" -o "${enable_ipaq}" = "yes"
       then
@@ -91,7 +91,7 @@ AC_ARG_ENABLE(buzzer,
 
 dnl OSS support
 AC_ARG_ENABLE(oss,
-    AS_HELP_STRING([--disable-oss], 
+    AS_HELP_STRING([--disable-oss],
     	[disables OSS sound IO support (default enabled)]),
 )
 if test "${enable_oss}" = "no"
@@ -116,7 +116,7 @@ AC_ARG_WITH(avcodec,
 
 
 dnl Check for libsamplerate
-AC_CHECK_HEADER([samplerate.h], 
+AC_CHECK_HEADER([samplerate.h],
 	[
 		AC_CHECK_LIB([samplerate], [main],
 			[SAMPLERATE_LIBS="-lsamplerate"
@@ -130,7 +130,7 @@ AM_CONDITIONAL(FLOAT_RESAMPLER, test "${FLOAT_RESAMPLER}" = "yes")
 AC_SUBST(SAMPLERATE_LIBS)
 
 dnl Check for stack trace support
-AC_CHECK_HEADER([execinfo.h], 
+AC_CHECK_HEADER([execinfo.h],
 	[
 		AC_DEFINE(HAS_EXECINFO, [], [Stack trace functionality found])
 			HAS_EXECINFO="yes"
@@ -139,7 +139,7 @@ AC_CHECK_HEADER([execinfo.h],
 AM_CONDITIONAL(HAS_EXECINFO, test "${HAS_EXECINFO}" = "yes")
 
 dnl Check for libspeex
-AC_CHECK_HEADER([speex/speex.h], 
+AC_CHECK_HEADER([speex/speex.h],
 	[
 		AC_CHECK_LIB([speex], [speex_encoder_init],
 			[SPEEX_LIBS="-lspeex"
@@ -151,7 +151,7 @@ AM_CONDITIONAL(HAS_SPEEX, test "${HAS_SPEEX}" = "yes")
 AC_SUBST(SPEEX_LIBS)
 
 dnl Check for libgsm
-AC_CHECK_HEADER([gsm.h], 
+AC_CHECK_HEADER([gsm.h],
 	[
 		AC_CHECK_LIB([gsm], [gsm_encode],
 			[GSM_LIBS="-lgsm"
@@ -223,7 +223,7 @@ AC_ARG_ENABLE(aec,
 AM_CONDITIONAL(AEC_SUPPORT, test "${enable_aec}" = "yes")
 
 AC_ARG_ENABLE(gconf,
-    AS_HELP_STRING([--enable-gconf], 
+    AS_HELP_STRING([--enable-gconf],
     	[enables support for GConf (default disabled).])
    )
 
@@ -261,7 +261,7 @@ AC_ARG_ENABLE(avcodec-fixes,
        fi ])
 
 AC_ARG_ENABLE(video,
-    AS_HELP_STRING([--enable-video], 
+    AS_HELP_STRING([--enable-video],
     	[enables video features (default disabled)]),
     [ if test "${enable_video}" = "yes"
       then
@@ -279,7 +279,7 @@ dnl first check for libavcodec
 	  FFMPEG_CFLAGS=
 	  FFMPEG_LIBS="-lavcodec -lz"
 	fi
-        
+
 	LIBS="${FFMPEG_LIBS} ${LIBS}"
 	CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS} ${AVCODEC_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
@@ -287,12 +287,12 @@ dnl first check for libavcodec
 	  AC_CHECK_HEADER([avcodec.h], [],
             [
               AC_MSG_ERROR(
-	      [Could not locate avcodec header files. Please install 
+	      [Could not locate avcodec header files. Please install
                the libavcodec-devel package.]
               )
             ]
           )
-            
+
 	  AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
 	    [Could not locate libavcodec, required for video features.])])
 
@@ -302,7 +302,7 @@ dnl first check for libavcodec
 	CPPFLAGS="${CPPFLAGS_SAVE}"
 	LDFLAGS="${LDFLAGS_SAVE}"
 	LIBS="${LIBS_SAVE}"
-        
+
 dnl look for V4L headers
         AC_CHECK_HEADERS([linux/videodev.h],
           [VIDEO_GRABBER="${VIDEO_GRABBER} v4l"
@@ -313,7 +313,7 @@ dnl look for libdc1394
 	   AC_CHECK_LIB([raw1394],[main], [
 	     AC_CHECK_LIB([dc1394_control],[main], [
 	       VIDEO_GRABBER="${VIDEO_GRABBER} dc1394}"
-	       DC1394_VIDEO_GRABBER="yes" 
+	       DC1394_VIDEO_GRABBER="yes"
 	       AC_DEFINE(DC1394_SUPPORT, [], [Compile DC1394 support])
 	       DC1394_LIBS="-ldc1394_control -lraw1394"
 	       ], [], [-lraw1394])
@@ -345,7 +345,7 @@ dnl look for xvideo
 	  XV_LIBS="-lXv"
 	  VIDEO_DISPLAY="${VIDEO_DISPLAY} xv"
 	  AC_DEFINE(XV_SUPPORT, [], [Compile Xvideo support])
-	  XV_VIDEO_DISPLAY="yes" 
+	  XV_VIDEO_DISPLAY="yes"
 	fi
 
 dnl check for SDL
@@ -355,7 +355,7 @@ dnl check for SDL
                if test "x${enable_sdl}" != "xno"
                then
 	         VIDEO_DISPLAY="${VIDEO_DISPLAY} sdl"
-	         SDL_VIDEO_DISPLAY="yes" 
+	         SDL_VIDEO_DISPLAY="yes"
 	         AC_DEFINE(SDL_SUPPORT, [], [Compile SDL support])
                  X_EXTRA_LIBS="${X_EXTRA_LIBS} -lXext"
 		 SDL_LIBS="-lSDL -pthread"
@@ -365,15 +365,15 @@ dnl check for SDL
                fi
 	     ], [], [${X_EXTRA_LIBS} -lXext ${XV_LIBS} ${X_LIBS} -lpthread] )
 	  ])
-	
+
 	CPPFLAGS="${CPPFLAGS_SAVE}"
 	LDFLAGS="${LDFLAGS_SAVE}"
 	LIBS="${LIBS_SAVE}"
-	
+
 	if test "x${VIDEO_DISPLAY}" != "x"
 	then
 	  AC_DEFINE(VIDEO_SUPPORT, [], [Compile video features])
-	  
+
 	  AC_SUBST(FFMPEG_LIBS)
 	  AC_SUBST(FFMPEG_CFLAGS)
 	  AC_SUBST(AVCODEC_LDFLAGS)
@@ -394,11 +394,11 @@ AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 
 
 
-      
+
 
 dnl ALSA sound interface
 AC_ARG_ENABLE(alsa,
-    AS_HELP_STRING([--enable-alsa], 
+    AS_HELP_STRING([--enable-alsa],
     	[enables ALSA sound support (default disabled)]),
     [ if test "${enable_alsa}" = "yes"
       then
@@ -414,11 +414,11 @@ AC_SUBST(ALSA_LIBS)
 
 dnl DirectSound sound interface
 AC_ARG_ENABLE(dsound,
-    AS_HELP_STRING([--enable-dsound], 
+    AS_HELP_STRING([--enable-dsound],
     	[enables DirectSound sound support (default disabled)]),
     [ if test "${enable_dsound}" = "yes"
       then
-        AC_DEFINE(DSOUND, [], [Use DirectSound sound driver]) 
+        AC_DEFINE(DSOUND, [], [Use DirectSound sound driver])
       fi ])
 
 if test ! x$enable_dsound = xno; then
@@ -456,6 +456,7 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMSTUN([0.5.0])
 AM_MINISIP_CHECK_LIBMSIP([0.3.1])
 AM_MINISIP_CHECK_LIBMIKEY([0.4.1])
+AM_MINISIP_CHECK_LIBZRTPCPP([0.9.0])
 
 AM_MINISIP_CHECK_COMPLETE
 

@@ -102,6 +102,10 @@ if P2T_SUPPORT
 			source/p2t/P2T.cxx
 endif
 
+if ZRTP_SUPPORT
+libzrtp_src = source/zrtp/ZrtpHostBridgeMinisip.cxx
+endif
+
 librtp_src = source/rtp/RtpHeader.cxx \
 		source/rtp/RtpPacket.cxx \
 		source/rtp/CryptoContext.cxx \

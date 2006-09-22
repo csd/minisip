@@ -31,7 +31,7 @@
 
 #include <config.h>
 
-void libmcryptoInit() 
+void libmcryptoInit()
 {
 #ifdef HAVE_OPENSSL
 	OpensslThreadGuard::initialize();
@@ -45,16 +45,16 @@ void libmcryptoInit()
 
 std::vector<Mutex*> CryptoThreadGuard::guards;
 
-CryptoThreadGuard::CryptoThreadGuard() 
+CryptoThreadGuard::CryptoThreadGuard()
 {
 	this->changeGuards(1);
 }
-CryptoThreadGuard::~CryptoThreadGuard() 
+CryptoThreadGuard::~CryptoThreadGuard()
 {
 	this->changeGuards(0);
 }
 
-void CryptoThreadGuard::changeGuards(bool onDuty) 
+void CryptoThreadGuard::changeGuards(bool onDuty)
 {
 	int num_locks = this->numLocks();
 	this->guards.reserve(num_locks);
@@ -66,7 +66,7 @@ void CryptoThreadGuard::changeGuards(bool onDuty)
 	}
 }
 
-void CryptoThreadGuard::setLock(int i, bool isSet) 
+void CryptoThreadGuard::setLock(int i, bool isSet)
 {
 	if (isSet) {
 		this->guards[i]->lock();

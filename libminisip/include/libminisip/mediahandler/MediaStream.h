@@ -1,22 +1,22 @@
 /*
  Copyright (C) 2004-2006 the Minisip Team
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004, 2005 
+/* Copyright (C) 2004, 2005
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -57,7 +57,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * Starts the transmission or reception of a the stream.
 		 */
 		virtual void start() = 0;
-		
+
 		/**
 		 * Stops the transmission or reception of a the stream.
 		 */
@@ -66,7 +66,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 #ifdef DEBUG_OUTPUT
 		virtual std::string getDebugString();
 #endif
-		
+
 		/**
 		 * Returns the media type corresponding to this stream
 		 * (video, audio...) as it appears in the session
@@ -85,7 +85,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 		virtual std::string getMemObjectType(){return "MediaStream";}
 		bool disabled;
-		
+
 		/**
 		 * Used to query the port on which the media is received for
 		 * a receiver, respectively where it is sent to for a sender
@@ -104,7 +104,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 * @returns whether or not this media stream corresponds
 		 * to the description in the m: header.
 		 */
-		virtual bool matches( MRef<SdpHeaderM *> m, 
+		virtual bool matches( MRef<SdpHeaderM *> m,
 					uint32_t formatIndex );
 
 		/**
@@ -155,13 +155,13 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 */
 		void setKeyAgreementZrtp(MRef<CryptoContext *>cx);
 #endif
-		
+
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
 		MediaStream( MRef<Media *> );
 		MRef<Media *> media;
 		uint32_t csbId;
-		
+
 		uint8_t localPayloadType;
 
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc, uint16_t seq_no );
@@ -178,12 +178,12 @@ class LIBMINISIP_API MediaStream : public MObject{
  * given session. It is responsible for decryption and replay protection
  * in the case of SRTP.
  */
-class LIBMINISIP_API MediaStreamReceiver : public MediaStream{ 
+class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 	public:
 		/**
 		 * Constructor, called by the MediaHandler when creating
 		 * a new media session.
-		 * @param media a reference to the Media object 
+		 * @param media a reference to the Media object
 		 * that will process
 		 * incoming data on this receiver.
 		 * @param rtpReceiver a reference to the RtpReceiver object
@@ -193,8 +193,8 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * used to obtain contact IP address and port in NAT
 		 * traversal mechanism
 		 */
-		MediaStreamReceiver( MRef<Media *> media, 
-				MRef<RtpReceiver *> rtpReceiver, 
+		MediaStreamReceiver( MRef<Media *> media,
+				MRef<RtpReceiver *> rtpReceiver,
 				MRef<RtpReceiver *> rtp6Receiver = NULL );
 
 #ifdef DEBUG_OUTPUT
@@ -202,19 +202,19 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 #endif
 
 		virtual std::string getMemObjectType(){return "MediaStreamReceiver";}
-	
+
 		/**
 		 * Starts the reception of a the stream, by subscribing to
 		 * the RtpReceiver.
 		 */
 		virtual void start();
-		
+
 		/**
 		 * Stops the reception of a stream, by unsubscribing to
 		 * the RtpReceiver.
 		 */
 		virtual void stop();
-		
+
 		/**
 		 * Used to query which port should be advertised as
 		 * the contact port in the session description.
@@ -254,7 +254,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * according to the user's preference, first being preferred
 		 */
 		std::list<MRef<Codec *> > getAvailableCodecs();
-		
+
 		std::list<uint32_t> getSsrcList() {
 			return ssrcList;
 		}
@@ -294,7 +294,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		Mutex ssrcListLock;
 
 		bool running;
-		
+
 };
 
 /**
@@ -302,7 +302,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
  * a specific media Session. It holds the CODEC instance selected for
  * this peer, and is responsible for encryption.
  */
-class LIBMINISIP_API MediaStreamSender : public MediaStream{ 
+class LIBMINISIP_API MediaStreamSender : public MediaStream{
 	public:
 		/**
 		 * Constructor, used by the MediaHandler during the
@@ -313,14 +313,14 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * to which the data should be sent. If NULL a new one
 		 * is created
 		 */
-		MediaStreamSender( MRef<Media *> media, 
+		MediaStreamSender( MRef<Media *> media,
 				   MRef<UDPSocket *> senderSock=NULL,
 				   MRef<UDPSocket *> sender6Sock=NULL );
 
 #ifdef DEBUG_OUTPUT
 		virtual std::string getDebugString();
 #endif
-		
+
 		virtual std::string getMemObjectType(){return "MediaStreamSender";}
 
 		/**
@@ -329,13 +329,13 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * @returns a reference to the CodecState object
 		 */
 		MRef<CodecState *> getSelectedCodec(){return selectedCodec;};
-		
+
 		/**
 		 * Starts the transmission of the stream, by
 		 * subscribing to the Media for data.
 		 */
 		virtual void start();
-		
+
 		/**
 		 * Stops the transmission, by unsubscribing to the
 		 * Media.
@@ -358,7 +358,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * data, or 0 if it was not set
 		 */
 		virtual uint16_t getPort();
-		
+
 		/**
 		 * Used by the Media to send data, if the MediaStreamSender
 		 * has subscribed to the Media. The data will be encrypted
@@ -392,12 +392,12 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
                  * @param payLen
                  *    Length of payload in bytes
 		 */
-		void sendZrtp(unsigned char* data, int length, 
+		void sendZrtp(unsigned char* data, int length,
                               unsigned char* payload, int payLen);
-		
+
 		/**
 		 * Get the current Seq number of this packet
-		 * 
+		 *
 		 * @return
 		 *     The sender current sequence number.
 		 */
@@ -413,7 +413,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * which represents the peer's contact IP address
 		 */
 		void setRemoteAddress( MRef<IPAddress *> remoteAddress );
-		
+
 		/**
 		 * Used to mute or unmute this sender, resulting
 		 * in it sending or not sending the data it receives
@@ -437,7 +437,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * keep alive packet should be sent
 		 */
 		bool muteKeepAlive( uint32_t max);
-		
+
 		/**
 		 * Used to check a m: header in a session description
 		 * against the media stream for compatibility. In
@@ -461,10 +461,10 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * @returns the SSRC identifier used by this MediaStreamSender
 		 */
 		uint32_t getSsrc();
-		
+
 		void increaseLastTs( ) { lastTs += 160; };
 		uint32_t getLastTs() { return lastTs; };
-		
+
 	private:
 		uint32_t ssrc;
 		MRef<UDPSocket *> senderSock;
@@ -474,14 +474,14 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		uint32_t lastTs;
 		MRef<IPAddress *> remoteAddress;
 		Mutex senderLock;
-		
+
 		uint8_t payloadType;
 		MRef<CodecState *> selectedCodec;
-		
+
 		//Cesc -- does it conflict with bool disabled???
 		bool muted;
 		uint32_t muteCounter;
-		
+
 };
 
 #endif
