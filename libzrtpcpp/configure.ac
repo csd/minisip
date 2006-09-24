@@ -6,8 +6,8 @@ dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
 
 AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
-AC_CONFIG_HEADERS([config.h])
 AM_MINISIP_PACKAGE_INIT
+AC_CONFIG_HEADERS([config.h])
 
 # checks for progs
 AC_PROG_CXX
@@ -27,6 +27,11 @@ case $host in
   *)
     ;;
 esac
+
+dnl
+dnl mingw support
+dnl
+AC_CHECK_LIB([wsock32], [main])
 
 AC_CHECK_LIB([crypto],
              [EVP_CipherInit_ex],
