@@ -9,6 +9,7 @@ pkgconfig_DATA = libzrtpcpp.pc
 
 
 lib_LTLIBRARIES = libzrtpcpp.la
+libzrtpcpp_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 # libzrtpcpp_la_LIBADD = @LIBS@
 
 # http://www.gnu.org/software/libtool/manual.html

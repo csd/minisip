@@ -27,7 +27,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <malloc.h>
+#ifdef WIN32
+#include <windows.h>
+#else
 #include <netinet/in.h>
+#endif
 
 #include <libzrtpcpp/zrtpPacket.h>
 #include <libzrtpcpp/ZrtpTextData.h>
