@@ -24,7 +24,17 @@
 #include <time.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include <libzrtpcpp/ZIDFile.h>
+
+#if !defined(HAVE_SRANDOM) || !defined(HAVE_RANDOM)
+# if defined(HAVE_SRAND) && defined(HAVE_RAND)
+#  define srandom srand
+#  define random rand
+# else
+#  error Needs srandom and random or srand and rand
+# endif
+#endif
 
 static ZIDFile* instance;
 
