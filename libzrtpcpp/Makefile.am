@@ -1,7 +1,7 @@
 # Copyright (C) 2006 Werner Dittmann.
 pkgconfigdir = $(libdir)/pkgconfig
 
-EXTRA_DIST = libzrtpcpp.spec
+#EXTRA_DIST = libzrtpcpp.spec
 
 AM_CPPFLAGS = -I$(top_srcdir)/src $(MINISIP_CFLAGS)
 
@@ -20,11 +20,13 @@ zrtp_src_o =    src/libzrtpcpp/crypto/openssl/ZrtpDH.cxx \
 		src/libzrtpcpp/crypto/openssl/InitializeOpenSSL.cxx
 endif
 
+if FALSE
 if ZRTP_GCRYPT
 zrtp_src_g =	src/libzrtpcpp/crypto/gcrypt/gcryptZrtpDH.cxx \
 		src/libzrtpcpp/crypto/gcrypt/gcrypthmac256.cxx \
 		src/libzrtpcpp/crypto/gcrypt/gcryptsha256.cxx \
 		src/libzrtpcpp/crypto/gcrypt/InitializeGcrypt.cxx
+endif
 endif
 
 
