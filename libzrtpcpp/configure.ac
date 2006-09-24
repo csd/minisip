@@ -28,7 +28,7 @@ AC_CHECK_LIB([crypto],
              [
               CRYPTOBACKEND="openSSL >= 0.9.8"
               LIBS="-lcrypto $LIBS"
-                                ],
+             ],
              [AC_MSG_ERROR([Cannot find libgcrypt or OpenSSL crypto library.])]
              )
 
