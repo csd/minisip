@@ -19,6 +19,11 @@ libmnetutil_la_LDFLAGS += -Wl,$(res_obj)
 libmnetutil_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
+srp_src = 
+if ENABLE_SRP
+srp_src += source/TlsSrpSocket.cxx
+endif
+
 ipv6_src =
 if HAVE_IPV6
 ipv6_src += \
@@ -29,6 +34,7 @@ endif
 mnetutil_src =      source/IPAddress.cxx \
 		    source/IP4Address.cxx \
 		    source/IP4ServerSocket.cxx \
+		    $(srp_src) \
 		    $(ipv6_src) \
 		    source/NetworkException.cxx \
 		    source/NetworkFunctions.cxx \
@@ -41,7 +47,7 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \
 		    source/StreamSocket.cxx
-
+		    
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 MAINTAINERCLEANFILES = \

@@ -1,3 +1,8 @@
+srp_src =
+if ENABLE_SRP
+srp_src += libmnetutil/TlsSrpSocket.h
+endif
+
 ipv6_headers = 
 if HAVE_IPV6
 ipv6_headers += \
@@ -7,6 +12,7 @@ endif
 
 pkginclude_HEADERS =    libmnetutil/IP4Address.h \
 			libmnetutil/IP4ServerSocket.h \
+			$(srp_src) \
 			$(ipv6_headers) \
 			libmnetutil/IPAddress.h \
 			libmnetutil/NetworkException.h \

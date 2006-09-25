@@ -27,14 +27,16 @@ AC_CHECK_HEADERS([ifaddrs.h netdb.h sys/socket.h])
 AC_CHECK_FUNCS([getifaddrs])
 AM_MINISIP_CHECK_IPV6
 
-
 AC_ARG_ENABLE(srp,
     AS_HELP_STRING([--enable-srp],
         [enables TLS-SRP support]),
     [ if test "${enable_srp}" = "yes"
       then
         AC_DEFINE(ENABLE_SRP, [], [TLS-SRP support is enabled])
-      fi  ])
+	ENABLE_SRP="yes"
+      fi  
+      ])
+AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
 
 dnl
 dnl mingw support
