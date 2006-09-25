@@ -457,10 +457,11 @@ AM_MINISIP_CHECK_LIBMSTUN([0.5.0])
 AM_MINISIP_CHECK_LIBMSIP([0.3.1])
 AM_MINISIP_CHECK_LIBMIKEY([0.4.1])
 
-if test "${enable_zrtp}" = "yes"
-then
-AM_MINISIP_CHECK_LIBZRTPCPP([0.9.0])
-fi
+dnl NOTE: Disabled check of ZRTP since it breaks trunk
+dnl if test "${enable_zrtp}" = "yes"
+dnl then
+dnl AM_MINISIP_CHECK_LIBZRTPCPP([0.9.0])
+dnl fi
 
 AM_MINISIP_CHECK_COMPLETE
 
