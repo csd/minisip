@@ -102,6 +102,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 		certificate( const std::string cert_filename,
 			     const std::string private_key_filename );
 		certificate( unsigned char * der_cert, int length );
+                certificate( unsigned char * certData, int length, string path );
 		~certificate();
 		virtual std::string getMemObjectType(){return "certificate";}
 		
@@ -121,9 +122,9 @@ class LIBMCRYPTO_API certificate: public MObject{
 
 		std::string get_file();
 		std::string get_pk_file();
-
+                   
 		void set_pk( std::string file );
-                void set_encpk(char *derEncPk, int length, string password);
+                void set_encpk(char *derEncPk, int length, string password, string path);
 		EVP_PKEY * get_openssl_private_key(){return private_key;};
 		X509 * get_openssl_certificate(){return cert;};
 	private:

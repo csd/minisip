@@ -106,6 +106,30 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	file = cert_filename;
 }
 
+certificate::certificate( unsigned char * certData, int length, string path ):private_key(NULL)
+{
+ /* tries to read a PEM certificate from memory, if that fails it tries to read it as a DER encoded cert*/
+   BIO *mem;
+   mem = BIO_new_mem_buf((void *)certData, length);
+   if( cert == NULL )
+     throw certificate_exception_init(
+				      "Could not create the certificate" );
+   
+   cert = PEM_read_bio_X509(mem, NULL, 0 , NULL);
+   if (cert == NULL)/*check if its a der encoded certificate*/
+     {
+	cert = d2i_X509_bio(mem, NULL);/*FIX, for some reason
+					this does never succeed */
+	if(NULL == cert)
+	  {	     
+	     cerr << "Invalid certificate file" << endl;
+	     throw certificate_exception_file("Invalid certificate" );
+	  }	
+     }
+   file = path;
+}
+
+
 certificate::certificate( unsigned char * der_cert, int length ):private_key(NULL){
 	cert = X509_new();
 
@@ -280,6 +304,7 @@ string certificate::get_pk_file(){
 	return pk_file;
 }
 
+
 void certificate::set_pk( string file ){
 	FILE * fp = NULL;
 	
@@ -313,7 +338,7 @@ void certificate::set_pk( string file ){
 
 }
 
-void certificate::set_encpk(char *derEncPk, int length, string password)
+void certificate::set_encpk(char *derEncPk, int length, string password, string path)
 {
    BIO *mem;  
    mem = BIO_new_mem_buf((void *)derEncPk, length);
@@ -323,13 +348,8 @@ void certificate::set_encpk(char *derEncPk, int length, string password)
 	cerr << "Couldn't initiate bio buffer" << endl;
 	throw certificate_exception_pkey("Couldn't initiate bio buffer" );
      }
-   
-   
-   
-   
+      
    SSLeay_add_all_algorithms();
-   
-   //cout<<"l="<<length<<"p="<<password<<endl;
    
    private_key = PEM_read_bio_PrivateKey(mem, NULL, 0, (void*)password.c_str());
  
@@ -347,6 +367,7 @@ void certificate::set_encpk(char *derEncPk, int length, string password)
 	throw certificate_exception_pkey(
 					 "The private key does not match the certificate" );
      }
+   pk_file=path;
 }
 
 
