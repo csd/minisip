@@ -33,6 +33,8 @@
 #include<libminisip/gui/Gui.h>
 #include<string>
 
+class OnlineConfBack;
+
 class LIBMINISIP_API ConfBackend : public MObject{
 	public:
 		virtual void save( const std::string &key, 
@@ -45,6 +47,8 @@ class LIBMINISIP_API ConfBackend : public MObject{
 		virtual void reset( const std::string & /* key */ ){};
 
 		virtual void commit()=0;
+   
+                virtual OnlineConfBack * getConf(){return NULL;}
 
 		void save( const char * key, const std::string &value );
 		void save( const char * key, const int32_t value );

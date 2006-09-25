@@ -25,8 +25,8 @@
 #include<config.h>
 
 #include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/configbackend/OnlineConfBackend.h>
 #include"MXmlConfBackend.h"
-
 using namespace std;
 
 MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string backendName ){
@@ -38,9 +38,13 @@ MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string b
 			plugin = findPlugin( backendName );
 		}
 		else {
-			plugin = findPlugin( "gconf" );
 
-			if( !plugin ){
+			plugin = findPlugin( "onlineconf" );
+			
+			if( !plugin)
+				plugin = findPlugin( "gconf" );
+			
+			if( !plugin){
 				plugin = findPlugin( "mxmlconf" );
 			}
 		}

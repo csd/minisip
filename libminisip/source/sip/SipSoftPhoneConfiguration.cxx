@@ -43,6 +43,7 @@
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libminisip/contactdb/PhoneBook.h>
 #include<libminisip/contactdb/MXmlPhoneBookIo.h>
+#include<libminisip/contactdb/OnlineMXmlPhoneBookIo.h>
 #include<libminisip/configbackend/ConfBackend.h>
 #include<libminisip/configbackend/UserConfig.h>
 #include<fstream>
@@ -55,6 +56,8 @@
 
 #include<libmutil/dbg.h>
 #include<libmutil/massert.h>
+
+#include<libminisip/configbackend/OnlineConfBackend.h>
 
 //update both!!!! the str define is to avoid including itoa.h
 #define CONFIG_FILE_VERSION_REQUIRED 2
@@ -458,9 +461,19 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		if (s!=""){
 			MRef<PhoneBook *> pb;
-			if (s.substr(0,7)=="file://"){
-				pb = PhoneBook::create(new MXmlPhoneBookIo(s.substr(7)));
-			}
+		   if (s.substr(0,7)=="file://"){
+		      pb = PhoneBook::create(new MXmlPhoneBookIo(s.substr(7)));
+		   }
+#ifdef ONLINECONF_SUPPORT
+		   if (s.substr(0,10)=="httpsrp://")
+		     {
+			OnlineConfBack *conf;
+			conf = backend->getConf(); 
+			pb = PhoneBook::create(new OnlineMXmlPhoneBookIo(conf));
+			
+		     }
+#endif
+		   
 			// FIXME http and other cases should go here
 			if( !pb.isNull() ){
 				phonebooks.push_back(pb);

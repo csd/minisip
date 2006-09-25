@@ -1,26 +1,26 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
- 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
- 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
- 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- */
+   Copyright (C) 2004-2006 the Minisip Team
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+   */
 
 /* Copyright (C) 2004 
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
-*/
+ */
 
 #include<config.h>
 
@@ -32,6 +32,8 @@
 #include<libmutil/itoa.h>
 #include<libmsip/SipDialogConfig.h>
 
+#include<libminisip/configbackend/OnlineConfBackend.h>
+#include<vector>
 using namespace std;
 
 SipDialogSecurityConfig::SipDialogSecurityConfig():
@@ -55,7 +57,7 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 
 	backend->save("use_srtp", use_srtp?string("yes"): string("no"));
 	if (use_srtp) {
-	    backend->save("use_zrtp", use_zrtp ? string("yes") : string("no"));
+		backend->save("use_zrtp", use_zrtp ? string("yes") : string("no"));
 	}
 
 	backend->save("psk_enabled", psk_enabled?string("yes"): string("no"));
@@ -82,8 +84,8 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 	backend->save("ka_type", kaTypeString);
 
 	/***********************************************************
-	* Certificate settings
-	***********************************************************/
+	 * Certificate settings
+	 ***********************************************************/
 
 	/* Update the certificate part of the configuration file */
 	cert->lock();
@@ -91,7 +93,7 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 	MRef<certificate *> certItem = cert->get_next();
 
 	/* The first element is the personal certificate, the next ones
-	* are saved as certificate_chain */
+	 * are saved as certificate_chain */
 	if( !certItem.isNull() ){
 		backend->save("certificate",certItem->get_file());
 		backend->save("private_key",certItem->get_pk_file());
@@ -120,19 +122,19 @@ void SipDialogSecurityConfig::save( MRef<ConfBackend *> backend ){
 		switch( caDbItem->type ){
 			case CERT_DB_ITEM_TYPE_FILE:
 				backend->save("ca_file["+itoa(iFile)+"]",
-					caDbItem->item);
+						caDbItem->item);
 				iFile ++;
 				break;
 			case CERT_DB_ITEM_TYPE_DIR:
 				backend->save("ca_dir["+itoa(iDir)+"]",
-					caDbItem->item);
+						caDbItem->item);
 				iDir ++;
 				break;
 		}
 
 		caDbItem = cert_db->get_next();
 	}
-	
+
 	cert_db->unlock();
 }
 
@@ -141,16 +143,16 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 	secured = backend->loadString("secured","no")=="yes";
 	use_srtp = backend->loadString("use_srtp","no")=="yes";		
 	if (use_srtp) {
-	    use_zrtp = backend->loadString("use_zrtp", "no") == "yes";
+		use_zrtp = backend->loadString("use_zrtp", "no") == "yes";
 	}
-	
+
 	dh_enabled   = backend->loadString("dh_enabled","no")=="yes";
 	psk_enabled  = backend->loadString("psk_enabled","no")=="yes";
 	check_cert   = backend->loadString("check_cert","no")=="yes";
 
 	if( backend->loadString("ka_type", "psk") == "psk" )
 		ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
-	
+
 	else if( backend->loadString("ka_type", "psk") == "dh" )
 		ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 
@@ -177,9 +179,21 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 
 	string certFile = backend->loadString("certificate","");
 	string privateKeyFile = backend->loadString("private_key","");
-	
+
 	cert = new certificate_chain();
 
+#ifdef ONLINECONF_SUPPORT
+	if(certFile.substr(0,10)=="httpsrp://")
+	{
+		OnlineConfBack *conf;
+		conf = backend->getConf();
+		certificate *cert=NULL;
+		cert = conf->getOnlineCert();
+		this->cert->add_certificate( cert );
+	}
+
+	else
+#endif
 	if( certFile != "" ){
 		certificate * cert=NULL;
 
@@ -209,34 +223,82 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 	uint32_t iCertFile = 0;
 	certFile = backend->loadString("certificate_chain[0]","");
 
-	while( certFile != "" ){
-		try{
-			certificate * cert = new certificate( certFile );
-			this->cert->add_certificate( cert );
+#ifdef ONLINECONF_SUPPORT
+	if(certFile.substr(0,10)=="httpsrp://")
+	{	
+		OnlineConfBack *conf;
+		conf = backend->getConf();
+		vector<struct contdata*> res;
+		string user = conf->getUser();
+		conf->downloadReq(user, "certificate_chain",res);/*gets the whole chain*/
+		for(int i=0;i<res.size();i++)
+		{
+			try
+			{
+				certificate *cert = new certificate((unsigned char *)res.at(i)->data,(size_t) res.at(i)->size,
+						"httpsrp:///"+user + "/certificate_chain" );
+				this->cert->add_certificate( cert );
+			}
+			catch(certificate_exception &)
+			{
+				merr << "Could not open the given certificate" << end;
+			}
 		}
-		catch( certificate_exception &){
-			merr << "Could not open the given certificate" << end;
-		}
-		iCertFile ++;
-		certFile = backend->loadString("certificate_chain["+itoa(iCertFile)+"]","");
-
 	}
+
+	       else 
+#endif
+		while( certFile != "" ){
+			try{
+				certificate * cert = new certificate( certFile );
+				this->cert->add_certificate( cert );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the given certificate" << end;
+			}
+			iCertFile ++;
+			certFile = backend->loadString("certificate_chain["+itoa(iCertFile)+"]","");
+
+		}
 
 	cert_db = new ca_db();
 	iCertFile = 0;
 	certFile = backend->loadString("ca_file[0]","");
 
-	while( certFile != ""){
-		try{
-			cert_db->add_file( certFile );
+#ifdef ONLINECONF_SUPPORT
+	if(certFile.substr(0,10)=="httpsrp://")
+	{
+		OnlineConfBack *conf;
+		conf = backend->getConf();
+		vector<struct contdata*> res;
+		string user = conf->getUser(); 
+		conf->downloadReq(user, "certificate_chain",res);
+		for(int i=0;i<res.size();i++)
+		{
+			try{
+				certificate *cert = new certificate((unsigned char *)res.at(i)->data,(size_t) res.at(i)->size,
+						"httpsrp:///"+user + "/root_cert" );
+				cert_db->add_certificate( cert );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the CA certificate" << end;
+			}
 		}
-		catch( certificate_exception &){
-			merr << "Could not open the CA certificate" << end;
-		}
-		iCertFile ++;
-		certFile = backend->loadString("ca_file["+itoa(iCertFile)+"]","");
-
 	}
+
+	else
+#endif
+		while( certFile != ""){
+			try{
+				cert_db->add_file( certFile );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the CA certificate" << end;
+			}
+			iCertFile ++;
+			certFile = backend->loadString("ca_file["+itoa(iCertFile)+"]","");
+
+		}
 	iCertFile = 0;
 
 	certFile = backend->loadString("ca_dir[0]","");
@@ -252,7 +314,7 @@ void SipDialogSecurityConfig::load( MRef<ConfBackend *> backend ){
 		certFile = backend->loadString("ca_dir["+itoa(iCertFile)+"]","");
 	}
 }
-			
+
 
 void SipDialogSecurityConfig::useIdentity( MRef<SipIdentity *> identity ){
 	identity->lock();

@@ -83,6 +83,7 @@ libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/CallRecorder.cxx \
 			source/mediahandler/DtmfSender.cxx
 
+
 if P2T_SUPPORT
         libp2t_src = source/p2t/RtcpAPP.cxx \
 			source/p2t/RtcpAPPHeader.cxx \
@@ -385,7 +386,21 @@ mgconf_la_SOURCES = source/configbackend/GConfBackend.cxx \
 mgconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GCONF_LIBS) $(GOBJECT_LIBS)
 endif
 
+if ONLINECONF_SUPPORT
+plugins_LTLIBRARIES += onlineconf.la
+onlineconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(ONLINECONF_CFLAGS)
+onlineconf_la_LDFLAGS = $(plugins_LDFLAGS) -lmcrypto -lmnetutil
+onlineconf_la_SOURCES = source/configbackend/OnlineMXmlConfBackend.cxx /
+			source/configbackend/OnlineMXmlConfBackend.h
+onlineconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(ONLINECONF_LIBS)
+libonlineconf_src = source/configbackend/OnlineConfBackend.cxx \
+	  	    source/contactdb/OnlineMXmlPhoneBookIo.cxx
+endif
+
+
+
 libminisip_la_SOURCES = source/Minisip.cxx \
+			$(libonlineconf_src) \
 			$(libaec_src) \
 			$(libsip_src) \
 			$(libcodecs_src) \

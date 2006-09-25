@@ -244,6 +244,20 @@ fi
 AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
+AC_ARG_ENABLE(onlineconf,
+    AS_HELP_STRING([--enable-onlineconf], 
+    	[enables support for storing minisip configuration data online (default disabled - under development).])
+   )
+
+
+if test "x${enable_onlineconf}" = "xyes"; then
+   onlineconf_support="yes"
+   AC_DEFINE(ONLINECONF_SUPPORT, [], [Support configuration stored online])
+fi
+AM_CONDITIONAL(ONLINECONF_SUPPORT, [test "x${onlineconf_support}" = "xyes"])
+
+
+
 dnl #############
 dnl VIDEO SUPPORT
 dnl #############

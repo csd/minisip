@@ -108,7 +108,9 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/conference/ConfMessageRouter.h \
 			libminisip/configbackend/ConfBackend.h \
 			libminisip/configbackend/UserConfig.h \
+			libminisip/configbackend/OnlineConfBackend.h \
 			libminisip/contactdb/MXmlPhoneBookIo.h \
+			libminisip/contactdb/OnlineMXmlPhoneBookIo.h \
 			libminisip/contactdb/ContactDb.h \
 			libminisip/contactdb/PhoneBook.h \
 			libminisip/ipprovider/SimpleIpProvider.h \
