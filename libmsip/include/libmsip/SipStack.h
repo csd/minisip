@@ -22,33 +22,34 @@
 
 
 /*
-
+ SipStack proxies requests to SipStackInternal. SipStack is part of 
+ libmsip API while SipStackInternal is not.
  SipStack object figure:
 
- +-----------------------------------------------------------------+
- |SipStack                                                         |
- |                                                                 |
- |                                                                 |              ...................
- | +--------------+------------------+ +----------+                |              .Callback
- | |dialogDefHandl|SipLayerDialog    | |Sip       |                |              .(SipMessageRouter)
- | |(3)           |                  | |Message   |                |       (5)    .
- | |              | (dialogs)        | |Dispatcher| enqueueCommand | handleCommand.
- | |              |                  | |(4)       |<---------------|<-------------.
- | +--------------+------------------+ |          |                |              .
- |                                     |          |                | handleCommand. 
- | +---------------------------------+ |          |                |------------->.
- | |SipLayerTransaction              | |          |                |              . 
- | |                                 | |          |                |              .
- | |                (transactions)   | |          |                |              .
- | |defCHandl. (2)                   | |          |                |              ...................
- | +---------------------------------+ |          |                |
- |                                     |          |                |
- | +---------------------------------+ |          |                |
- | |SipLayerTransport  (1)           | |          |                |
- | |                                 | |          |                |
- | |                                 | |          |                |
- | +---------------------------------+ +----------+                |
- +-----------------------------------------------------------------+
+ +-----------------------------------------------------------------+ +-+
+ |SipStackInternal                                                 | | |
+ |                                                                 | | |
+ |                                                                 | | |               ...................
+ | +--------------+------------------+ +----------+                | | |               .Callback
+ | |dialogDefHandl|SipLayerDialog    | |Sip       |                | | |               .(SipMessageRouter)
+ | |(3)           |                  | |Message   |                | |S|   (5)         .
+ | |              | (dialogs)        | |Dispatcher| enqueueCommand | |i| handleCommand .
+ | |              |                  | |(4)       |<---------------| |p| <-------------.
+ | +--------------+------------------+ |          |                | |S|               .
+ |                                     |          |                | |t| handleCommand . 
+ | +---------------------------------+ |          |                | |a| ------------> .
+ | |SipLayerTransaction              | |          |                | |c|               . 
+ | |                                 | |          |                | |k|               .
+ | |                (transactions)   | |          |                | | |               .
+ | |defCHandl. (2)                   | |          |                | | |               ...................
+ | +---------------------------------+ |          |                | | |
+ |                                     |          |                | | |
+ | +---------------------------------+ |          |                | | |
+ | |SipLayerTransport  (1)           | |          |                | | |
+ | |                                 | |          |                | | |
+ | |                                 | |          |                | | |
+ | +---------------------------------+ +----------+                | | |
+ +-----------------------------------------------------------------+ +-+
 
  Comments:
   (1) Incoming messages are sent to the transaction layer via the dispatcher (placed in 
