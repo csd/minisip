@@ -36,7 +36,6 @@
 #include<libmsip/SipHeaderContentType.h>
 
 #include<libmutil/itoa.h>
-#include<libmutil/trim.h>
 
 #include<iostream>
 using namespace std;

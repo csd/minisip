@@ -27,7 +27,7 @@
 
 #include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipResponse.h>
-#include<libmutil/split_in_lines.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 
@@ -71,7 +71,7 @@ bool transitionMatch(
 		return false;
 	}
 	if (respFilter.size()>0){
-		vector<string> filters = split_in_lines(respFilter);
+		vector<string> filters = splitLines(respFilter);
 		for (vector<string>::iterator i=filters.begin(); i!=filters.end(); i++){
 			if (sipResponseFilterMatch( MRef<SipResponse*> ( (SipResponse *)*command.getCommandPacket() ), *i )){
 				return true;

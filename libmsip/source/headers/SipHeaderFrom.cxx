@@ -34,7 +34,6 @@
 
 #include<libmsip/SipHeaderFrom.h>
 
-#include<libmutil/trim.h>
 
 using namespace std;
 

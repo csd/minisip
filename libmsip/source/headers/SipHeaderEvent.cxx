@@ -35,7 +35,6 @@
 #include<libmsip/SipHeaderEvent.h>
 
 #include<libmutil/itoa.h>
-#include<libmutil/trim.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

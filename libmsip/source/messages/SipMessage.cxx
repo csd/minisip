@@ -65,7 +65,7 @@
 
 #include<libmsip/SipException.h>
 
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/dbg.h>
 #include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
@@ -108,42 +108,6 @@ MRef<SipMessage*> SipMessage::createMessage(string &data){
 	}else{
 		return new SipRequest(data);
 
-#if 0
-		if (n> 7 && data.substr(0, 7) == "MESSAGE"){
-			//return MRef<SipMessage*>(new SipIMMessage(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_IMMESSAGE, data);
-		}
-		if (n> 6 && data.substr(0, 6) == "CANCEL"){
-			//return MRef<SipMessage*>(new SipCancel(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_CANCEL, data);
-		}
-		if (n> 3 && data.substr(0, 3)=="BYE"){
-			//return MRef<SipMessage*>(new SipBye(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_BYE, data);
-		}
-		if (n> 6 && data.substr(0, 6)=="INVITE"){
-			//return MRef<SipMessage*>(new SipInvite(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_INVITE, data);
-		}
-		if (n> 3 && data.substr(0, 3)=="ACK"){
-			//return MRef<SipMessage*>(new SipAck(data));
-			return MRef<SipMessage*>(new SipRequest(TYPE_SIP_MESSAGE_ACK,data));
-		}
-		if (n> 9 && data.substr(0, 9)=="SUBSCRIBE"){
-			//return MRef<SipMessage*>(new SipSubscribe(data));
-			return  new SipRequest(TYPE_SIP_MESSAGE_SUBSCRIBE, data);
-		}
-		if (n> 6 && data.substr(0, 6)=="NOTIFY"){
-			//return MRef<SipMessage*>(new SipNotify(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_NOTIFY, data);
-		}
-		if (n> 5 && data.substr(0, 5)=="REFER"){
-			//return MRef<SipMessage*>(new SipRefer(data));
-			return new SipRequest(TYPE_SIP_MESSAGE_REFER, data);
-		}
-
-		return MRef<SipMessage*>( new SipRequest( data ));
-#endif
 	}
 	return NULL;
 }
@@ -318,24 +282,6 @@ bool SipMessage::addLine(string line){
 	if( hdr.isNull() ) //do not add if null
 		return false;
 	addHeader(hdr);
-#if 0	
-	string ln = line;	//Hack to get realm an nonce... FIXME
-	if (/*getType()==SipResponse::type &&*/ (SipUtils::startsWith(ln,"Proxy-Authenticate:") || SipUtils::startsWith(ln,"WWW-Authenticate")) ){
-		size_t r_pos = ln.find("realm=");
-		size_t n_pos = ln.find("nonce=");
-		if (r_pos == string::npos || n_pos ==string::npos){
-			merr << "ERROR: could not extract nonce and realm in line: " << ln << end;
-		}
-		size_t r_end = ln.find("\"",r_pos+7);
-		size_t n_end = ln.find("\"",n_pos+7);
-		string sub = ln.substr(n_pos+7, n_end-(n_pos+7));
-		setNonce(sub);
-		cerr << "MM: Settin nonce to "<< sub<<endl;
-		sub = ln.substr(r_pos+7, r_end-(r_pos+7));
-		setRealm( sub );
-		cerr << "MM: Settin realm to "<< sub<<endl;
-	}
-#endif
 	return true;
 }
 

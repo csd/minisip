@@ -36,7 +36,7 @@
 #include<libmsip/SipHeaderRAck.h>
 
 #include<libmutil/itoa.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 

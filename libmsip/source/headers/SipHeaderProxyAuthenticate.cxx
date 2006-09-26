@@ -34,7 +34,6 @@
 
 #include<config.h>
 
-#include<libmutil/trim.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 
 using namespace std;

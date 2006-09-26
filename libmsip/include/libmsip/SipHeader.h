@@ -192,8 +192,12 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 class LIBMSIP_API SipHeader : public MObject{
 	public:
 		static SipHeaderFactories headerFactories;
-		
-		
+
+		/**
+		 * @param value	Initial/first header value. The type
+		 * 		if the header is set to the type of the 
+		 * 		header value.
+		 */
                 SipHeader(MRef<SipHeaderValue*> value);
 		virtual ~SipHeader();
 

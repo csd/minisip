@@ -38,8 +38,7 @@
 #include<libmsip/SipException.h>
 #include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
-#include<libmutil/split_in_lines.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 
 #include<vector>
 

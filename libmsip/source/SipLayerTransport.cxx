@@ -339,7 +339,7 @@ void printMessage(string header, string packet){
 		 header;
 	
 	if (sipdebug_print_packets){
-		size_t strlen=packet.size();;
+		size_t strlen=packet.size();
 		mout << header<<": ";
 		for (size_t i=0; i<strlen; i++){
 			mout << packet[i];
@@ -989,7 +989,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 #ifdef DEBUG_OUTPUT
 						printMessage("IN (STREAM)", buffer);
 #endif
-						//					dialogContainer->enqueueMessage( pack );
+						//cerr << "Packet string:\n"<< pack->getString()<< "(end)"<<endl;
 
 						MRef<IPAddress *> peer = socket->getPeerAddress();
 						pack->setSocket( *socket );
@@ -1006,7 +1006,8 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				}
 			}
 			
-			catch(SipExceptionInvalidMessage & ){
+			catch(SipExceptionInvalidMessage &e ){
+				mdbg << "INFO: SipLayerTransport::streamSocketRead: dropping malformed packet: "<<e.what()<<endl;
 #if 0
 				// Check that we received data
 				// is not too big, in which case close

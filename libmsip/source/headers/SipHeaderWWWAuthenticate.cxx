@@ -32,7 +32,6 @@
 
 #include<config.h>
 
-#include<libmutil/trim.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 
 using namespace std;
