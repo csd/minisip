@@ -124,9 +124,6 @@ bool SipDialogP2Tuser::a0_start_callingnoauth_invite( const SipSMCommand &comman
 		//assert(dynamic_cast<SipDialogP2Tuser*>(sipStateMachine)!=NULL);
 		
 		//MRef<SipDialogP2Tuser *>vc= (SipDialogP2Tuser *)sipStateMachine;
-#ifdef MINISIP_MEMDEBUG
-		//vc.setUser("WARNING - transaction");
-#endif
 
 #if 0
 		
@@ -1247,10 +1244,6 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 				/*getDialogConfig().inherited->codecs,*/
 				getDialogConfig()->inherited->transport) );
 	
-#ifdef MINISIP_MEMDEBUG
-	inv.setUser("SipDialogP2Tuser");
-#endif
-	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 	
 	//add P2T stuff to the invite message
@@ -1260,9 +1253,6 @@ void SipDialogP2Tuser::sendInvite(const string &branch){
 //	mdbg << "SipDialogP2Tuser::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
         MRef<SipMessage*> pktr(*inv);
-#ifdef MINISIP_MEMDEBUG
-	pktr.setUser("SipDialogP2Tuser");
-#endif
 
         SipSMCommand scmd(
                 pktr, 
@@ -1501,15 +1491,9 @@ void SipDialogP2Tuser::sendRinging(const string &branch){
 
 void SipDialogP2Tuser::sendNotAcceptable(const string &branch){
 	MRef<SipResponse*> not_acceptable = new SipResponse(branch,606,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
-#ifdef MINISIP_MEMDEBUG
-	not_acceptable.setUser("SipDialogP2Tuser");
-#endif
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 //	setLastResponse(not_acceptable);
         MRef<SipMessage*> pref(*not_acceptable);
-#ifdef MINISIP_MEMDEBUG
-	pref.setUser("SipDialogP2Tuser");
-#endif
         SipSMCommand cmd( pref, SipSMCommand::TU, SipSMCommand::transaction);
 //	handleCommand(cmd);
 	getDialogContainer()->enqueueCommand(cmd, HIGH_PRIO_QUEUE, PRIO_LAST_IN_QUEUE);
@@ -1550,9 +1534,6 @@ MRef<SipInvite*> SipDialogP2Tuser::getLastInvite(){
 
 void SipDialogP2Tuser::setLastInvite(MRef<SipInvite*> i){ 
     lastInvite = i; 
-#ifdef MINISIP_MEMDEBUG
-    lastInvite.setUser("SipDialogP2Tuser::lastInvite");
-#endif
 }
 
 MRef<LogEntry *> SipDialogP2Tuser::getLogEntry(){

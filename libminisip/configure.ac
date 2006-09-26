@@ -65,16 +65,6 @@ AC_ARG_ENABLE(ipaq,
         AC_DEFINE(IPAQ, [], [Compile for iPAQ])
       fi ])
 
-dnl debug flag
-AC_ARG_ENABLE(memdebug,
-    AS_HELP_STRING([--enable-memdebug], [enables memory debugging code.
-    WARNING: This changes the MemObject API that is used by both libraries
-    and applications. Use with care (default disabled)]),
-    [ if test "${enable_memdebug}" = "yes"
-      then
-        AC_DEFINE(MINISIP_MEMDEBUG, [], [Debug memory])
-      fi ])
-
 AM_MINISIP_ENABLE_DEBUG
 AM_MINISIP_ENABLE_TEST_SUITE
 

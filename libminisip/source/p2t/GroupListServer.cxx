@@ -154,9 +154,6 @@ void GroupListServer::stop(){
 
 
 void GroupListServer::addGroupList(MRef<GroupList*> grpList){
-#ifdef MINISIP_MEMDEBUG 
-	grpList.setUser("GroupListServer");
-#endif	
 	grpLists.push_back(grpList);
 }
 

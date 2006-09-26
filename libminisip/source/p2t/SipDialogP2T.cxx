@@ -57,10 +57,6 @@ bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){
 		
 		//start RtcpTransactionGetFloor
 		
-#ifdef MINISIP_MEMDEBUG
-		vc.setUser("WARNING - transaction");
-#endif		
-
 		//time measurement
 #ifndef _MSC_VER
 		if(/*vc->*/p2tPerformance){
@@ -197,10 +193,6 @@ bool SipDialogP2T::a2_talk_releasepend( const SipSMCommand &command){
 		//start RtcpTransactionReleaseFloor
 		//MRef<SipDialogP2T *>vc= (SipDialogP2T *)sipStateMachine;
 		
-#ifdef MINISIP_MEMDEBUG
-		vc.setUser("WARNING - transaction");
-#endif		
-		
 		//start RtcpTransactionReleaseFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
 			//filter out own user
@@ -274,10 +266,6 @@ bool SipDialogP2T::a4_idle_listenreq( const SipSMCommand &command){
 	if (transitionMatch(command, "p2tREQUEST") && /*vc->*/p2tCollisioner==false){
 		//start RtcpTransactionGrantFloor
 		
-#ifdef MINISIP_MEMDEBUG
-		vc.setUser("WARNING - transaction");
-#endif		
-
 
 
 		//uri
@@ -1018,10 +1006,6 @@ bool SipDialogP2T::a19_listenreq_listenreq( const SipSMCommand &command){
 	if (transitionMatch(command, "p2tREQUEST")){
 		//start RtcpTransactionGrantFloor
 		//MRef<SipDialogP2T *>vc= (SipDialogP2T *)sipStateMachine;
-#ifdef MINISIP_MEMDEBUG
-//		vc.setUser("WARNING - transaction");
-#endif		
-
 
 		//uri
 		string uri = command.getCommandString().getParam3();
@@ -1142,9 +1126,6 @@ bool SipDialogP2T::a83_talk_terminated( const SipSMCommand &command){
 
 		//start RtcpTransactionReleaseFloor
 		//MRef<SipDialogP2T *>vc= (SipDialogP2T *)sipStateMachine;
-#ifdef MINISIP_MEMDEBUG
-		//vc.setUser("WARNING - transaction");
-#endif		
 		
 		//start RtcpTransactionReleaseFloor
 		for(uint32_t k=0;k</*vc->*/getGroupList()->getAllUser().size();k++){
@@ -1236,9 +1217,6 @@ bool SipDialogP2T::a97_idle_talkreq_collisioner( const SipSMCommand &command){
 		
 		//start RtcpTransactionGetFloor
 		
-#ifdef MINISIP_MEMDEBUG
-		//vc.setUser("WARNING - transaction");
-#endif		
 
 		//time measurement
 #ifndef _MSC_VER
@@ -1738,10 +1716,6 @@ bool SipDialogP2T::removeUser(string uri, string reason, string callId) {
 
 void SipDialogP2T::setGroupList(MRef<GroupList*> GrpList){
 	this->grpList = GrpList;
-#ifdef MINISIP_MEMDEBUG 
-	this->grpList.setUser("SipDialogP2T");
-#endif
-
 }
 
 bool SipDialogP2T::checkStates(int status){

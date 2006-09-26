@@ -335,9 +335,5 @@ void RtcpReceiver::do_flush_socket(){
 
 void RtcpReceiver::setCall(MRef<SipDialog*> dialog) {
 	this->call=dialog;
-#ifdef MINISIP_MEMDEBUG
-	call.setUser("RtcpReceiver");
-#endif
-	
 }
 

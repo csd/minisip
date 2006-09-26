@@ -130,9 +130,6 @@ void RtcpSender::send_APP_FC(unsigned subtype, unsigned ssrc, string name, IPAdd
 
 void RtcpSender::setCall(MRef<SipDialog*>call) {
 	this->call=call;
-#ifdef MINISIP_MEMDEBUG 
-	call.setUser("RtcpSender");
-#endif
 }
 
 
