@@ -56,7 +56,7 @@ my $no_local = 0;	# do not extend environment to no-install development:
 			#  ACLOCAL_FLAGS, PKG_CONFIG_PATH, and LD_LIBRARY_PATH
 
 my $pretend = 0;	# don't actually do anything
-my $verbose = 0;	# enable verbose script output
+our $verbose = 0;	# enable verbose script output
 my $quiet = 0;		# enable quiet script output
 my $help = 0;
 my $man = 0;
