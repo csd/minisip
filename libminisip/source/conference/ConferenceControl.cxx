@@ -33,7 +33,7 @@
 #include<libminisip/gui/Gui.h>
 
 #include<libmutil/MemObject.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/CommandString.h>
 #include<libmsip/SipCommandString.h>

@@ -36,7 +36,7 @@
 #include<libminisip/sdp/SdpHeaderA.h>
 
 #include<libmutil/itoa.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<iostream>
 
 using namespace std;

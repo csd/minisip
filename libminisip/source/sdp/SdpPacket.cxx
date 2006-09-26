@@ -36,9 +36,9 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/itoa.h>
-#include<libmutil/split_in_lines.h>
+#include<libmutil/stringutils.h>
 
 
 #include<libminisip/sdp/SdpHeaderV.h>
@@ -67,7 +67,7 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 	//content = initstr;
 	MRef<SdpHeaderM *> lastM=NULL;
 	MRef<SdpHeaderA *> attr=NULL;
-	vector<string> lines = split_in_lines(build_from); 
+	vector<string> lines = splitLines(build_from); 
 	for (uint32_t i=0; i< lines.size(); i++){
 		switch (lines[i][0]){
 			case 'v':

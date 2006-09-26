@@ -34,6 +34,7 @@
 #include<libminisip/sdp/SdpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/print_hex.h>
 #include<libminisip/mediahandler/Media.h>
@@ -47,37 +48,6 @@
 #endif
 
 using namespace std;
-
-#ifdef _MSC_VER
-
-static int upcase(char c){
-	if ((c>='a') && (c<='z'))
-		return c - ('a'-'A');
-	else
-		return c;
-}
-
-static int nocaseequal(char c1, char c2){
-	return upcase(c1)==upcase(c2);
-}
-
-static int strcasecmp(const char *s1, const char *s2){
-	int i;
-	for ( i=0; s1[i]!=0 && s2[i]!=0; i++){
-		if ( !nocaseequal(s1[i],s2[i]) ){
-			if (s1[i]<s2[i]){
-				return -1;
-			}else{
-				return 1;
-			}
-		}
-	}
-	if (s2[i]!=0){
-		return -1;
-	}
-	return 0;
-}
-#endif
 
 MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL) {
 	disabled = false;
