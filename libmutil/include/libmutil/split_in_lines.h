@@ -38,8 +38,22 @@
 
 #include <libmutil/libmutil_config.h>
 
+/**
+ * Splits a string into multiple parts.
+ *
+ * @return	If s is an empty string the function will return an empty
+ * 		vector (no matter if includeEmpty is true or false)
+ */
 LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
 
+/**
+ * Splits a string on new line character ('\n').
+ *
+ * @return 	Empty lines are not included in the output. If do_trim is
+ * 		true then lines containing only whitespace will not be
+ * 		included in the output.
+ * 		An empty input string returns an empty vector.
+ */
 LIBMUTIL_API std::vector<std::string> split_in_lines(std::string s, bool do_trim = true);
 
 

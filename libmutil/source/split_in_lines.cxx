@@ -41,50 +41,29 @@ using namespace std;
 
 LIBMUTIL_API std::vector<string> split(string s, bool do_trim, char delim, bool includeEmpty){
 	std::vector<string> ret;
+	
+	if (s.size()==0)
+		return ret;
+
 	unsigned i=0;
 	do{
-		string line="";
-		while (!(i>(s.length()-1)) && s[i]!=delim){	// 1.1
+		string line;
+		while (!(i>(s.length()-1)) && s[i]!=delim)
 			line+=s[i++];
-		}
 		if (do_trim)
 			line=trim(line);
-		if (line.length()>0 || includeEmpty){
-			ret.push_back(line); 		// 1.2
-		}
-							// 1.3
-//		while ((!(i>=s.length()-1)) && s[i]==delim)
-			i++;
+		if (line.length()>0 || includeEmpty)
+			ret.push_back(line);
+		i++;
 	}while (!(i>=s.length()));
+
+	if ( s.size()>0 && s[s.length()-1]==delim && includeEmpty )
+		ret.push_back("");
 	
 	return ret;
 }
 
-/*
- * 1. until end of input stream
- *   1.1 read line until new line
- *   1.2 add line
- *   1.3 move past new line chars
- *
- * */
 LIBMUTIL_API std::vector<string> split_in_lines(string s, bool do_trim){
-	std::vector<string> ret;
-	unsigned i=0;
-	do{
-		string line="";
-		while (!(i>s.length()-1) && s[i]!='\r' && s[i]!='\n'){	// 1.1
-			line+=s[i++];
-		}
-		if (do_trim)
-			line=trim(line);
-		if (line.length()>0){
-			ret.push_back(line);			// 1.2
-		}
-							// 1.3
-		while ((!(i>=s.length()-1)) && (s[i]=='\r' || s[i]=='\n'))
-			i++;
-	}while (!(i>=s.length()-1));
-	
-	return ret;
+	return split(s, do_trim, '\n',false);
 }
 
