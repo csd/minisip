@@ -258,11 +258,9 @@ AC_ARG_ENABLE(sdl,
 
 AC_ARG_ENABLE(avcodec-fixes,
     AS_HELP_STRING([--enable-avcodec-fixes],
-	[enables support for new avcodec abi (default: off)]),
-    [  if test "x${enable_avcodec_fixes}" = "xyes"
-       then
-	   AC_DEFINE(AVCODEC_FIXES, [], [Use new avcodec context abi.])
-       fi ])
+	[enables support for new avcodec abi (default: auto)]),,
+	[enable_avcodec_fixes="auto"])
+
 
 AC_ARG_ENABLE(video,
     AS_HELP_STRING([--enable-video],
@@ -302,6 +300,30 @@ dnl first check for libavcodec
 
 	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
 	    [Could not find zlib, required by libavcodec.])])
+
+	  if test "x${enable_avcodec_fixes}" = "xauto"
+	  then
+		AC_MSG_CHECKING([new avcodec context abi])
+		AC_COMPILE_IFELSE([
+#include<avcodec.h>
+
+int main()
+{
+	struct AVCodecContext * context;
+	AVRational timeBase = { 1, 15 };
+
+	context->time_base = timeBase;
+	context->pix_fmt = PIX_FMT_YUV420P;
+
+	return 0;
+}], [enable_avcodec_fixes="yes"], [enable_avcodec_fixes="no"])
+		AC_MSG_RESULT(${enable_avcodec_fixes})
+	    fi
+
+	if test "x${enable_avcodec_fixes}" = "xyes"
+	then
+	    AC_DEFINE(AVCODEC_FIXES, [], [Use new avcodec context abi.])
+	fi
 
 	CPPFLAGS="${CPPFLAGS_SAVE}"
 	LDFLAGS="${LDFLAGS_SAVE}"
