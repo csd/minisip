@@ -45,8 +45,7 @@
 #include<libmsip/SipHeaderUnknown.h>
 #include<libmsip/SipHeaderWarning.h>
 
-#include<libmutil/split_in_lines.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 
 #include<vector>
 
@@ -98,7 +97,6 @@ SipHeaderFactoryFuncPtr SipHeaderFactories::getFactory(const string headerType){
 	return factories[ht];
 }
 
-
 SipHeader::SipHeader(MRef<SipHeaderValue*> val): headerName(val->headerName){
 //	cerr << "Header name is "<< flush << headerName<< endl;
 	type = val->getType();
@@ -124,6 +122,7 @@ string SipHeader::getString(){
 }
 
 void SipHeader::addHeaderValue(MRef<SipHeaderValue*> v){
+	massert(type == v->getType());
 	headerValues.push_back(v);
 }
 
@@ -154,115 +153,128 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 	MRef<SipHeader*> h;
 	
 	string hdr = getHeader(line,hdrstart);
-// 	cerr<< endl << "PARSEHDR: Sip Header: header"+hdr<<endl;
+ 	//cerr<< endl << "PARSEHDR: Sip Header: header"+hdr<<endl;
 	string valueline = line.substr(hdrstart);
 	
-// 	cerr << "PARSEHDR: hdr parsed to "<< hdr << endl;
-// 	cerr << "PARSEHDR: valueline parsed to "<< valueline<< endl;
+ 	//cerr << "PARSEHDR: hdr parsed to <"<< hdr <<">"<< endl;
+ 	//cerr << "PARSEHDR: valueline parsed to "<< valueline<< endl;
 
-	if( valueline.size() == 0 ) { //an empty header??? BUG!
-			cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header in Sip message!:: " << valueline << endl;
-	} else {	
-		string headerType = findHeaderType(line);
-		char valueSeparator;
-		char paramSeparator;
+	string headerType = findHeaderType(line);
+	char valueSeparator;
+	char paramSeparator;
 
-		if( headerType == "WWW-Authenticate" ||
-		    headerType == "Proxy-Authenticate" ||
-		    headerType == "Authorization" ||
-		    headerType == "Proxy-Authorization" ){
-			valueSeparator = '\0';
-			paramSeparator = ',';
+	if( headerType == "WWW-Authenticate" ||
+			headerType == "Proxy-Authenticate" ||
+			headerType == "Authorization" ||
+			headerType == "Proxy-Authorization" ){
+		valueSeparator = '\0';
+		paramSeparator = ',';
+	} else {
+		valueSeparator = ',';
+		paramSeparator = ';';
+	}
+
+	vector<string> values = split(valueline,true, valueSeparator);
+
+	for (unsigned i=0; i< values.size(); i++){
+		vector<string> value_params;
+		string value_zero; //value zero is the non-parameter part of the header
+		if( values[i].size() == 0 ) { //an empty value??? BUG!
+			// 				cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header value in Sip message!:: " << valueline << endl;
+			continue;
+		}
+		// 			cerr << "PARSER: First value+params line: "<< values[i]<<""<<endl;
+
+		if( headerType == "Accept-Contact" ) {
+			value_params = split(values[i],true,'\n');
+			value_zero = value_params[0];
+			// 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
+		} else if( headerType == "Contact" ) {
+			size_t ltPos = values[i].find( '<' );
+			size_t gtPos = values[i].find( '>' );
+			if( ltPos!=string::npos && gtPos!=string::npos ) {
+				//if the string contains '<' and '>' ...
+				//remove them
+				value_zero = values[i].substr( ltPos + 1, gtPos - ltPos - 1 );
+				//now split the outside parameters ...
+				value_params = split( 
+						//note that it should be gtPos -1, but we need value_params[0] to be 
+						//not a param ...so we take some junk from the uri previous to the first ;
+						values[i].substr( gtPos - 1, values[i].size() - (gtPos - 1) ),
+						true,
+						';' );
+			} else { //if there is no < or >, then just split into parameters ...
+				value_params = split(values[i],true,';');
+				value_zero = value_params[0];
+			}
+		} else if( headerType == "From" ||
+				headerType == "To" ) {
+			size_t ltPos = values[i].find( '<' );
+			size_t gtPos = values[i].find( '>' );
+			if( ltPos!=string::npos && gtPos!=string::npos ) {
+				value_zero = values[i].substr( 0, gtPos + 1 );
+				//now split the outside parameters ...
+				value_params = split( 
+						//note that it should be gtPos -1, but we need value_params[0] to be 
+						//not a param ...so we take some junk from the uri previous to the first ;
+						values[i].substr( gtPos - 1, values[i].size() - (gtPos - 1) ),
+						true,
+						';' );
+			} else { //if there is no < or >, then just split into parameters ...
+				value_params = split(values[i],true,';');
+				value_zero = value_params[0];
+			}
 		} else {
-			valueSeparator = ',';
-			paramSeparator = ';';
+			value_params = split(values[i],true,paramSeparator);
+			value_zero = value_params[0];
 		}
 
-		vector<string> values = split(valueline,true, valueSeparator);
-		
-		for (unsigned i=0; i< values.size(); i++){
-			vector<string> value_params;
-			string value_zero; //value zero is the non-parameter part of the header
-			if( values[i].size() == 0 ) { //an empty value??? BUG!
-// 				cerr << "BUGBUGBUG: SipHeader::parseHeader : Found Empty header value in Sip message!:: " << valueline << endl;
-				continue;
+//		cerr << "PARSER: Header type is: "<< headerType << endl;
+//		cerr << "PARSER: Creating value from string: "<< value_zero <<endl;
+		SipHeaderFactoryFuncPtr factory;
+		factory = SipHeader::headerFactories.getFactory(headerType);
+		MRef<SipHeaderValue *> hval;
+		if (factory){
+			hval = factory(value_zero);
+		}else{
+			hval = new SipHeaderValueUnknown(headerType, value_zero);
+		}	
+
+		for(unsigned j=1; j<value_params.size(); j++){
+			hval->addParameter(new SipHeaderParameter(value_params[j]));
+		}
+		if (i==0){
+			cerr << "EEEE: Creating SipHeader..."<<endl;
+			h= new SipHeader(hval);
+		}else{
+				h->addHeaderValue(hval);
 			}
-// 			cerr << "PARSER: First value+params line: "<< values[i]<<""<<endl;
-			
-			if( headerType == "Accept-Contact" ) {
-				value_params = split(values[i],true,'\n');
-				value_zero = value_params[0];
-// 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
-			} else if( headerType == "Contact" ) {
-				size_t ltPos = values[i].find( '<' );
-				size_t gtPos = values[i].find( '>' );
-				if( ltPos!=string::npos && gtPos!=string::npos ) {
-					//if the string contains '<' and '>' ...
-					//remove them
-					value_zero = values[i].substr( ltPos + 1, gtPos - ltPos - 1 );
-					//now split the outside parameters ...
-					value_params = split( 
-						//note that it should be gtPos -1, but we need value_params[0] to be 
-						//not a param ...so we take some junk from the uri previous to the first ;
-						values[i].substr( gtPos - 1, values[i].size() - (gtPos - 1) ),
-						true,
-						';' );
-				} else { //if there is no < or >, then just split into parameters ...
-					value_params = split(values[i],true,';');
-					value_zero = value_params[0];
-				}
-			} else if( headerType == "From" ||
-				   headerType == "To" ) {
-				size_t ltPos = values[i].find( '<' );
-				size_t gtPos = values[i].find( '>' );
-				if( ltPos!=string::npos && gtPos!=string::npos ) {
-					value_zero = values[i].substr( 0, gtPos + 1 );
-					//now split the outside parameters ...
-					value_params = split( 
-						//note that it should be gtPos -1, but we need value_params[0] to be 
-						//not a param ...so we take some junk from the uri previous to the first ;
-						values[i].substr( gtPos - 1, values[i].size() - (gtPos - 1) ),
-						true,
-						';' );
-				} else { //if there is no < or >, then just split into parameters ...
-					value_params = split(values[i],true,';');
-					value_zero = value_params[0];
-				}
-			} else {
-				value_params = split(values[i],true,paramSeparator);
-				value_zero = value_params[0];
-			}
-			
-// 			cerr << "PARSER: Header type is: "<< headerType << endl;
-// 			cerr << "PARSER: Creating value from string: "<< value_zero <<endl;
+	}
+
+	if (!h){
+		//Special case for headers that are allowed to exist
+		//without any header value. This list is compatibel 
+		//with: RFC3261, RFC3262(none)
+		string ht = upCase(headerType);
+		if ( 		ht=="ACCEPT" || 
+				ht=="ACCEPT-ENCODING" ||
+				ht=="ACCEPT-LANGUAGE" ||
+				ht=="ALLOW" ||
+				ht=="ORGANIZATION" ||
+				ht=="SUBJECT" ||
+				ht=="SUPPORTED") {
 			SipHeaderFactoryFuncPtr factory;
 			factory = SipHeader::headerFactories.getFactory(headerType);
 			MRef<SipHeaderValue *> hval;
 			if (factory){
-				hval = factory(value_zero);
+				hval = factory("");
 			}else{
-// 				cerr << "SipHeaderValueUnsupported: "<< line << endl;
-				hval = new SipHeaderValueUnknown(headerType, value_zero);
+				hval = new SipHeaderValueUnknown(headerType, "");
 			}	
-			
-			for(unsigned j=1; j<value_params.size(); j++){
-// 				cerr << "PARSER: Adding parameter: "<< value_params[j] << endl;
-				hval->addParameter(new SipHeaderParameter(value_params[j]));
-			}
-			if (i==0){
-				h= new SipHeader(hval);
-			}else{
-				h->addHeaderValue(hval);
-			}
-// 			cerr<<"PARSER: hval->getString(): "+hval->getString()<<endl;
-// 			cerr<<"PARSER: h->getString: "+h->getString()<<endl;
+			h= new SipHeader(hval);
 		}
 	}
-	//It may happen that the header contains no values ... then, no point adding it
-	if( h.isNull() || h->getNoValues() == 0 )
-		return NULL;
-	else 
-		return h;
+	return h;
 }
 
 
