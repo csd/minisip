@@ -390,7 +390,7 @@ if ONLINECONF_SUPPORT
 plugins_LTLIBRARIES += onlineconf.la
 onlineconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(ONLINECONF_CFLAGS)
 onlineconf_la_LDFLAGS = $(plugins_LDFLAGS) -lmcrypto -lmnetutil
-onlineconf_la_SOURCES = source/configbackend/OnlineMXmlConfBackend.cxx /
+onlineconf_la_SOURCES = source/configbackend/OnlineMXmlConfBackend.cxx \
 			source/configbackend/OnlineMXmlConfBackend.h
 onlineconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(ONLINECONF_LIBS)
 libonlineconf_src = source/configbackend/OnlineConfBackend.cxx \
