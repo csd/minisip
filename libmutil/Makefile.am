@@ -57,8 +57,7 @@ mutil_src = \
 		$(mtime_src) \
 		source/itoa.cxx \
 		source/print_hex.cxx \
-		source/split_in_lines.cxx \
-		source/trim.cxx \
+		source/stringutils.cxx \
 		source/vmd5.cxx \
 		source/CommandString.cxx \
 		source/XMLParser.cxx \

@@ -32,10 +32,34 @@
 
 #include<config.h>
 
-#include<libmutil/split_in_lines.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<string>
 #include<iostream>
+
+#ifdef _MSC_VER
+
+
+static int strcasecmp(const char *s1, const char *s2){
+	int i;
+	for ( i=0; s1[i]!=0 && s2[i]!=0; i++){
+		if ( !nocaseequal(s1[i],s2[i]) ){
+			if (s1[i]<s2[i]){
+				return -1;
+			}else{
+				return 1;
+			}
+		}
+	}
+	if (s2[i]!=0){
+		return -1;
+	}
+	return 0;
+}
+#else
+#include <strings.h>
+#endif
+
+
 
 using namespace std;
 
@@ -63,7 +87,47 @@ LIBMUTIL_API std::vector<string> split(string s, bool do_trim, char delim, bool 
 	return ret;
 }
 
-LIBMUTIL_API std::vector<string> split_in_lines(string s, bool do_trim){
+LIBMUTIL_API std::vector<string> splitLines(string s, bool do_trim){
 	return split(s, do_trim, '\n',false);
+}
+
+LIBMUTIL_API string upCase(string s){
+	size_t n=s.size();
+	string ret(n,' ');
+	string::iterator i=s.begin();
+	string::iterator j=ret.begin();
+	for ( ; i!=s.end(); i++, j++)
+		*j = upCase(*i);
+	return ret;
+}
+
+LIBMUTIL_API int upCase(char c){
+	if ((c>='a') && (c<='z'))
+		return c - ('a'-'A');
+	else
+		return c;
+}
+
+LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2){
+	return strcasecmp(s1,s2);
+}
+
+LIBMUTIL_API string trim(string line){
+	size_t spacesFront = 0, spacesEnd = 0;
+	int32_t idx;
+
+	idx = 0;
+	while( idx < (int)line.size() && isspace(line[idx]) ) {
+		spacesFront++;
+		idx++;
+	}
+	
+	idx = (int)line.size() - 1 ;
+	while( idx >= 0 && isspace(line[idx]) ) {
+		spacesEnd++;
+		idx--;
+	}
+	line = line.substr( spacesFront, line.size() - ( spacesFront + spacesEnd ) );
+	return line;
 }
 

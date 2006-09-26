@@ -27,7 +27,7 @@
 #include<libmutil/XMLParser.h>
 #include<fstream>
 #include<libmutil/itoa.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<iostream>
 #include<sys/types.h>
 

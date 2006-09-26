@@ -50,7 +50,7 @@
 
 
 #include<libmutil/merror.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/massert.h>
 
 #include<iostream>

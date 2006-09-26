@@ -15,9 +15,8 @@ pkginclude_HEADERS = \
 			libmutil/mtypes.h \
 			libmutil/itoa.h \
 			libmutil/print_hex.h \
-			libmutil/split_in_lines.h \
+			libmutil/stringutils.h \
 			libmutil/TimeoutProvider.h \
-			libmutil/trim.h \
 			libmutil/minilist.h \
 			libmutil/termmanip.h \
 			libmutil/vmd5.h \

@@ -23,20 +23,42 @@
 
 
 /* Name
- * 	trim.h
+ * 	stringutils.h
  * Author
  * 	Erik Eliasson, eliasson@it.kth.se, 2003
- * Purpose
- * 	Removes whitespace in the start and end of a String.
 */
 
+#ifndef SPLIT_IN_LINES
+#define SPLIT_IN_LINES
 
-#ifndef TRIM_H
-#define TRIM_H
+#include<vector>
+#include<string>
 
 #include <libmutil/libmutil_config.h>
 
-#include<string>
+/**
+ * Splits a string into multiple parts.
+ *
+ * @return	If s is an empty string the function will return an empty
+ * 		vector (no matter if includeEmpty is true or false)
+ */
+LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
+
+/**
+ * Splits a string on new line character ('\n').
+ *
+ * @return 	Empty lines are not included in the output. If do_trim is
+ * 		true then lines containing only whitespace will not be
+ * 		included in the output.
+ * 		An empty input string returns an empty vector.
+ */
+LIBMUTIL_API std::vector<std::string> splitLines(std::string s, bool do_trim = true);
+
+LIBMUTIL_API std::string upCase(std::string s);
+
+LIBMUTIL_API int upCase(char c);
+
+LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2);
 
 /**
  * Removes whitespace from beginning and end of Strings.
@@ -46,4 +68,5 @@
 LIBMUTIL_API std::string trim(std::string s);
 
 
-#endif //TRIM_H
+
+#endif
