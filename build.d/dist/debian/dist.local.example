@@ -9,19 +9,27 @@
 #
 #######
 
+## Set to 1 to enable pbuilder
+#my $enable_pbuilder = 1;
+#
 ## One of sid, etch, sarge, dapper
 #$debian_release_default = 'sid';
-
+#
+## Change to the reprepro base directory
+#my $debian_reprepro_basedir = '/var/lib/reprepro/debian';
+#
 ##
 ## builder callback
 ## Adds support for building packages in a pdebuild/pbuilder chroot
 ##
 #debian_set_callback('builder', sub {
+#	return undef unless $enable_pbuilder;
+#
 #	my ($params) = @_;
 #	my $codename = $params->{'codename'};
 #	my $buildareadir = $params->{'buildareadir'};
 #
-#	return "pdebuild --pbuilderroot sudo --configfile /etc/pbuilder/${codename} --buildresult ${buildareadir}",
+#	return "pdebuild --pbuilderroot sudo --configfile /etc/pbuilder/${codename} --buildresult ${buildareadir} --debbuildopts '-b -sa'",
 #} );
 #
 ##
@@ -29,10 +37,15 @@
 ## Includes the created package in a reprepro repository
 ##
 #debian_set_callback('package-post', sub {
-#	my ($params, $changes) = @_;
+#	return unless $enable_pbuilder;
+#
+#	my ($params, $all_changes) = @_;
 #	my $codename = $params->{'codename'};
 #
-#	act('debian: reprepro', qw( reprepro --basedir /var/lib/reprepro/debian include ), $codename, $changes );
+#	for my $changes (@$all_changes) {
+#	    umask(0022);
+#	    act('debian: reprepro', qw( reprepro --basedir ), $debian_reprepro_basedir, 'include', $codename, $changes );
+#	}
 #} );
 
 1
