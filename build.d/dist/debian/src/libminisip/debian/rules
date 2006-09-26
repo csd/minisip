@@ -52,7 +52,6 @@ config.status: configure
 		--disable-test-suite \
 		--enable-sdl \
 		--enable-alsa \
-		--enable-avcodec-fixes \
 		--enable-video \
 		--with-avcodec=/usr/include/ffmpeg
 
