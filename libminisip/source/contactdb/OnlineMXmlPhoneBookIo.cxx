@@ -151,7 +151,8 @@ void OnlineMXmlPhoneBookIo::save( MRef<PhoneBook *> pb){
 	string commit;
 	commit = parser.xmlstring();
 	string enc = conf->base64Encode((char*)commit.c_str(),commit.size());
-	conf->uploadReq(conf->getUser(),"phonebook",enc);
+	string attach = conf->attachFile("", enc);
+	conf->uploadReq(conf->getUser(),"phonebook",attach);
 }
 
 string OnlineMXmlPhoneBookIo::getPhoneBookId(){

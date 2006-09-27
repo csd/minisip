@@ -53,9 +53,9 @@ class LIBMINISIP_API OnlineConfBack
 		}
 		void setOnlineCert(certificate *cer);
 		certificate * getOnlineCert();
+		string attachFile(string mimeheader, string data);
 	private:
 		string readHttpHeader();
-		string attachFile(string mimeheader, string data);
 		string usrname;
 		TlsSrpSocket *tls;
 		certificate *cert;

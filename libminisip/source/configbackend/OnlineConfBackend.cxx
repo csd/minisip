@@ -203,7 +203,6 @@ string OnlineConfBack::attachFile(string mimeheader, string data)
 }
 
 string  OnlineConfBack::base64Encode(char *data, int length){
-
 	gnutls_datum_t gnu;
 	gnutls_datum_t gnures;
 	gnu.data = (unsigned char*)data;								                    
@@ -217,16 +216,16 @@ string  OnlineConfBack::base64Encode(char *data, int length){
 
 void OnlineConfBack::uploadReq(string user, string type, string data)
 {
-	string mimeheaders = attachFile("-----------192345\r\n", data);
+	string mimeheaders = "-----------192345\r\n" + data;
 	char conv[100];
-	sprintf(conv,"%d",mimeheaders.size());
+	sprintf(conv,"%d", mimeheaders.size());
 	string header("PUT /"+ user +"/" + type +" HTTP/1.1\r\n" +"Host: cred.minisip.org:5556\r\n");
 	header = header + "Content-Type: multipart/mixed; boundary=-----------192345\r\n";
 	header = header + "Content-Length: ";
 	header = header + conv;
 	header = header + "\r\n";
 	header = header + "Connection: Keep-Alive\r\n" +"\r\n";
-	tls->write(header+mimeheaders);
+	tls->write(header + mimeheaders);
 }
 
 certificate*  OnlineConfBack::getOnlineCert()

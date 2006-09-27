@@ -65,10 +65,10 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 
 	int port = 5556;
 	int success ;
+	int error=0;
 	string user("test");
 	string pass("qwerty");
 	string addr("127.0.0.1");
-
 	try {
 		conf = new OnlineConfBack(addr, port, user , pass); 
 	}
@@ -92,7 +92,7 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 	/*TLS HANDSHAKE FAILED PROMT USER FOR NEW USERNAME, PASSWORD (AND ADDRESS)*/
 		exit(1);
 	}
-
+	conf->setOnlineCert(NULL);
 	vector<struct contdata*> res;
 	success = conf->downloadReq(user,"credentials", res);
 	if(success>0 && res.size()>1)
@@ -106,26 +106,54 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 			//cout<<"COMMON NAME ********: "<<cert->get_name()<<endl;
 			conf->setOnlineCert(cert);
 		}
-		else
+		else{
 			cout<<"failed to load certificate"<<endl;
+			error =1;
+		}
+
 	}
 	else
 	{
+		error=1;
 		/* Error */
 	}
 
 	res.clear();
 	success =conf->downloadReq(user, "userprofile/default.conf", res);
-	if(success>0)
-	{
-		string profile(res.at(0)->data, res.at(0)->size);
-		pars = new XMLstringParser(profile);
+	if(success>0 && error ==0 )
+		{
+			if(res.size()>2){
+				certificate *cert = conf->getOnlineCert();
+				int outsize =0;
+				unsigned char outbuf[res.at(2)->size];
+
+				int ret =cert->denvelope_data((unsigned char*)(res.at(2)->data), res.at(2)->size , 
+				outbuf, &outsize,(unsigned char*)(res.at(1)->data), res.at(1)->size, 
+				(unsigned char*)(res.at(0)->data));
+				
+				if(ret >=0){
+					string profile((char*)outbuf,outsize);				
+					pars = new XMLstringParser(profile);
+				}
+				else{
+					cout<<"Failed to decrypt the stored information someone"<<endl;
+					cout<<"might have moddifed it or an error occured in transit"<<endl;
+						error=1;
+				}
+			}
+			else{ 
+				error=1;
+			}
+		}
+	else{
+		error=1;
 	}
-	else
+	if(error !=0)
 	{
 		cout<<"failed to download userprofile, creating default one"<<endl;
 		try{	
 			pars = new XMLstringParser( "" );
+			cout<<pars->xmlstring()<<endl;
 		}
 		catch(XMLException &exc ){
 			mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
@@ -149,8 +177,23 @@ OnlineConfBack* OnlineMXmlConfBackend::getConf()
 void OnlineMXmlConfBackend::commit(){
 	string commit;
 	commit = pars->xmlstring();
-	string enc =conf->base64Encode((char*)commit.c_str(), commit.size());
-	conf->uploadReq(conf->getUser(),"userprofile",enc);
+	certificate *cert= conf->getOnlineCert();
+
+	int retsize =0, enckeylgth=0;
+	unsigned char buf[commit.size()+128];
+	unsigned char key[256];
+	unsigned char *iv;
+	if(cert!=NULL){
+		cert->envelope_data((unsigned char*)commit.c_str(), commit.size(), buf, &retsize,key, &enckeylgth, &iv);
+		string enckod =conf->base64Encode((char*)buf, retsize);
+		string ivstr = conf->base64Encode((char*)iv, 16);
+		string keystr = conf->base64Encode((char*)key, enckeylgth);
+		string attach;
+		attach = conf->attachFile("", ivstr);
+		attach = conf->attachFile(attach,keystr);
+		attach = conf->attachFile(attach,enckod);
+		conf->uploadReq(conf->getUser(),"userprofile",attach);
+	}
 }
 
 void OnlineMXmlConfBackend::save( const std::string &key, const std::string &value ){
