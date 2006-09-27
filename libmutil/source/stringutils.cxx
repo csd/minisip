@@ -37,11 +37,19 @@
 #include<iostream>
 
 #ifdef _MSC_VER
+static int nocaseequal(char c1, char c2){
+	if ( ((c1>='A') && (c1<='Z')) ){
+		return (c1==c2) || (c1 == (c2 - ('a'-'A')));
+	}
+	if ( (c1>='a') && (c1<='z') ){
+		return (c1==c2) || (c1 == (c2 + ('a'-'A')));
+	}
+	return c1==c2;
+}
 
-
-static int strcasecmp(const char *s1, const char *s2){
+static int strncasecmp(const char *s1, const char *s2, int n){
 	int i;
-	for ( i=0; s1[i]!=0 && s2[i]!=0; i++){
+	for ( i=0; s1[i]!=0 && s2[i]!=0 && (n==-1 || (n!=-1 && i<n) ); i++){
 		if ( !nocaseequal(s1[i],s2[i]) ){
 			if (s1[i]<s2[i]){
 				return -1;
@@ -55,6 +63,11 @@ static int strcasecmp(const char *s1, const char *s2){
 	}
 	return 0;
 }
+
+static int strcasecmp(const char *s1, const char *s2){
+	return strncasecmp(s1,s2,-1);
+}
+
 #else
 #include <strings.h>
 #endif
@@ -110,6 +123,10 @@ LIBMUTIL_API int upCase(char c){
 
 LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2){
 	return strcasecmp(s1,s2);
+}
+
+LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2, int n){
+	return strncasecmp(s1,s2,n);
 }
 
 LIBMUTIL_API string trim(string line){

@@ -244,7 +244,6 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			hval->addParameter(new SipHeaderParameter(value_params[j]));
 		}
 		if (i==0){
-			cerr << "EEEE: Creating SipHeader..."<<endl;
 			h= new SipHeader(hval);
 		}else{
 				h->addHeaderValue(hval);

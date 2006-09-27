@@ -60,6 +60,8 @@ LIBMUTIL_API int upCase(char c);
 
 LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2);
 
+LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2);
+
 /**
  * Removes whitespace from beginning and end of Strings.
  * 	@param s	String from which to remove whitespace (or rather copy and remove whitespace from)

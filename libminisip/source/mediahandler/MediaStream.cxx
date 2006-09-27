@@ -102,7 +102,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 		}
                 if( sdpRtpMap != "" && codecRtpMap != "" ){
                         s1 = codecRtpMap.find("/");
-                        bool sdpRtpMapEqual = !strcasecmp( codecRtpMap.substr(0, s1).c_str(), sdpRtpMap.substr(0,s2).c_str() );
+                        bool sdpRtpMapEqual = !strCaseCmp( codecRtpMap.substr(0, s1).c_str(), sdpRtpMap.substr(0,s2).c_str() );
                         if ( sdpRtpMapEqual ) {
 				localPayloadType = codecPayloadType;
                                 return true;

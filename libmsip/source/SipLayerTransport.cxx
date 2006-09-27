@@ -67,39 +67,10 @@ using namespace std;
 # define ENABLE_TS
 #endif
 
-#ifdef _MSC_VER
-static int nocaseequal(char c1, char c2){
-	if ( ((c1>='A') && (c1<='Z')) ){
-		return (c1==c2) || (c1 == (c2 - ('a'-'A')));
-	}
-	if ( (c1>='a') && (c1<='z') ){
-		return (c1==c2) || (c1 == (c2 + ('a'-'A')));
-	}
-	return c1==c2;
-}
-static int strncasecmp(const char *s1, const char *s2, int n){
-	int i;
-	for (i=0; s1[i]!=0 && s2[i]!=0 && i<n; i++){
-		if ( nocaseequal(s1[i],s2[i]) ){
-			if (s1[i]<s2[i])
-				return -1;
-			else
-				return 1;
-		}
-			
-	}
-	if (s2[i]!=0)
-		return -1;
-	return 0;
-}
-#endif
-
 
 SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipLayerTransport*> r): ssock(sock), receiver(r),doStop(false){
 
 }
-
-
 
 
 void SocketServer::run(){
