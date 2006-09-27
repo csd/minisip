@@ -28,7 +28,7 @@
 #include<libminisip/conference/ConferenceControl.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
 #include<libmutil/MemObject.h>
-#include<libmutil/trim.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/termmanip.h>
 
 #include<libmsip/SipCommandString.h>
