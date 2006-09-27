@@ -110,6 +110,11 @@ class LIBMCRYPTO_API certificate: public MObject{
 
 		int get_der_length();
 		void get_der( unsigned char * output );
+		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
+		int denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		               unsigned char *enckey, int enckeylgth, unsigned char *iv);
+
 		int sign_data( unsigned char * data, int data_length, 
 			       unsigned char * sign, int * sign_length );
 		int verif_sign( unsigned char * sign, int sign_length,

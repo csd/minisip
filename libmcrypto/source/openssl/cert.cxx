@@ -155,6 +155,69 @@ certificate::~certificate(){
 
 }
 
+int certificate::envelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+				unsigned char *enckey, int* enckeylgth, unsigned char** iv){
+
+	EVP_CIPHER_CTX ctx;
+	*iv = (unsigned char*)malloc(EVP_CIPHER_iv_length(EVP_aes_128_cbc()));
+	EVP_PKEY *public_key;
+	int err;
+	ERR_load_crypto_strings();
+	int temp =0, tmp= 0;
+	if( cert == NULL ){
+#ifdef DEBUG_OUTPUT
+                cerr << "You need a certificate to envelope the data" << endl;
+
+#endif
+                return -1;
+	}
+
+	public_key = X509_get_pubkey( cert );
+	
+	if( public_key == NULL ){
+#ifdef DEBUG_OUTPUT
+                cerr << "Cound not read public key from certificate" << endl;
+#endif
+                return -1;
+	}
+	
+	/*inits*/
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_SealInit(&ctx, EVP_aes_128_cbc(), &enckey, enckeylgth, *iv, &public_key, 1);
+	
+	/*encrypt*/
+	EVP_SealUpdate(&ctx, retdata, &temp, data, size);
+	err = EVP_SealFinal(&ctx, retdata + temp, &tmp);
+	if(err != 1){
+		cout<<"An error occurred when enveloping the data"<<endl;
+		return -1;
+	}
+	*retsize = temp + tmp;
+	return 0;
+}
+
+int certificate::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+                                unsigned char *enckey, int enckeylgth, unsigned char *iv){
+
+        /*begin decrypt*/
+        EVP_CIPHER_CTX ctx;
+        int err, temp=0, tmp=0;
+
+        ERR_load_crypto_strings();
+        EVP_CIPHER_CTX_init(&ctx);
+        EVP_OpenInit(&ctx, EVP_aes_128_cbc(), enckey, enckeylgth, iv, private_key);
+        EVP_OpenUpdate(&ctx, retdata, &temp, data, size);
+        err = EVP_OpenFinal(&ctx, retdata + temp , &tmp);
+        if(err != 1){
+		cout<<"An error occurred when deenevolping the data"<<endl; 		
+		return -1;
+	}
+	*retsize = temp +tmp;
+	/*end decrypt*/
+
+	return 0;
+}
+
 int certificate::sign_data( unsigned char * data, int data_length,
 	    		    unsigned char * sign, int * sign_length ){
 	EVP_MD_CTX     ctx;
