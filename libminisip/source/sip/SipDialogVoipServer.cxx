@@ -492,7 +492,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
-	MRef<SipResponse*> not_acceptable = new SipResponse(branch,606,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> not_acceptable = new SipResponse(branch,406,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
 			new SipHeader(
