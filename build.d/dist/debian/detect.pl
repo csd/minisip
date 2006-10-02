@@ -1,2 +1,2 @@
-# Debian autodetection support (untested)
-set_dist_detect(sub { -e '/etc/debian_version' });
+# Debian autodetection support
+set_dist_detect(sub { -e '/etc/debian_version' || -1 });
