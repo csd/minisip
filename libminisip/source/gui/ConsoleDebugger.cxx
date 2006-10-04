@@ -228,7 +228,7 @@ void ConsoleDebugger::showMem(){
 	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
 }
 
-void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine){
+void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d){
 		d->getDialogStatusString();
 }
 
@@ -245,7 +245,7 @@ void ConsoleDebugger::showStat(){
 		int ii=0;
 		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!= calls.end(); i++, ii++){
 			cerr << string("    (")+itoa(ii)+") " ;
-			showDialogInfo(*i,true);
+			showDialogInfo(*i);
 
 		}
 

@@ -60,7 +60,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		void setMediaHandler( MRef<MediaHandler *> r ) { mediaHandler = r;}
 
 	private:
-		void showDialogInfo(MRef<SipDialog *> d, bool usesSM);
+		void showDialogInfo(MRef<SipDialog *> d);
 		MRef<SipSoftPhoneConfiguration *> config;
 		MRef<MediaHandler *> mediaHandler;
 		
