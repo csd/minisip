@@ -320,7 +320,7 @@ int32_t  SipMessage::getCSeq(){
 			return seq->getCSeq();
 		}
 	}
-	merr << "ERROR: Could not find command sequence number in sip Message."<< end;
+ 	mdbg << "ERROR: Could not find command sequence number in sip Message."<< end;
 	return -1;
 }
 
@@ -378,7 +378,7 @@ string SipMessage::getCSeqMethod(){
 		}
 	
 	}
-	merr << "ERROR: Could not find command sequence method in sip Message."<< end;
+	mdbg << "ERROR: Could not find command sequence method in sip Message."<< end;
 	return "";
 }
 
