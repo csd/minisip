@@ -43,13 +43,13 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 
 		uint32_t getBinaryIP();
 
-		virtual int32_t getPort();
-		virtual std::string getString();
+		virtual int32_t getPort() const;
+		virtual std::string getString() const;
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP4Address &a);
 
-		virtual struct sockaddr * getSockaddrptr(int32_t port=0);
-		virtual int32_t getSockaddrLength();
+		virtual struct sockaddr * getSockaddrptr(int32_t port=0) const;
+		virtual int32_t getSockaddrLength() const;
 
 		virtual bool operator ==(const IP4Address &i4) const;
 		virtual bool operator ==(const IPAddress &i) const;

@@ -49,17 +49,17 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 	public:
 		virtual ~IPAddress();
 
-		int32_t getType() { return type; };
+		int32_t getType() const { return type; };
 
-		int getAddressFamily();
-		int getProtocolFamily();
-		virtual int32_t getPort()=0;
-		virtual std::string getString()=0;
+		int getAddressFamily() const;
+		int getProtocolFamily() const;
+		virtual int32_t getPort() const=0;
+		virtual std::string getString() const=0;
 
 		virtual void connect(Socket &s, int32_t port)=0;
 
-		virtual struct sockaddr* getSockaddrptr(int32_t port=0)=0;
-		virtual int32_t getSockaddrLength()=0;
+		virtual struct sockaddr* getSockaddrptr(int32_t port=0) const=0;
+		virtual int32_t getSockaddrLength() const=0;
 
 		virtual bool operator ==(const IPAddress &i) const =0;
 		virtual MRef<IPAddress *> clone() const =0;

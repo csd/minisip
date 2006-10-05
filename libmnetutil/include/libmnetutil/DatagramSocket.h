@@ -36,7 +36,7 @@ class LIBMNETUTIL_API DatagramSocket : public Socket {
 
 		virtual std::string getMemObjectType() = 0;
 
-		virtual int32_t sendTo(IPAddress &to_addr, int32_t port, const void *msg, int32_t len) = 0;
+		virtual int32_t sendTo(const IPAddress &to_addr, int32_t port, const void *msg, int32_t len) = 0;
 		
 		virtual int32_t recvFrom(void *buf, int32_t len, MRef<IPAddress *>& from, int &port) = 0;
 		

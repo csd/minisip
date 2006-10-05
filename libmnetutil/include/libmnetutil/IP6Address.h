@@ -39,13 +39,13 @@ class LIBMNETUTIL_API IP6Address : public IPAddress {
 		IP6Address(struct sockaddr_in6 *);
 		~IP6Address();
 
-		virtual int32_t getPort();
-		virtual std::string getString();
+		virtual int32_t getPort() const;
+		virtual std::string getString() const;
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP6Address &a);
 
-		virtual struct sockaddr *getSockaddrptr(int32_t port=0);
-		virtual int32_t getSockaddrLength();
+		virtual struct sockaddr *getSockaddrptr(int32_t port=0) const;
+		virtual int32_t getSockaddrLength() const;
 
 		virtual bool operator ==(const IP6Address &i6) const;
 		virtual bool operator ==(const IPAddress &i) const;

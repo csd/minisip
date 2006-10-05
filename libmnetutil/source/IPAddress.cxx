@@ -37,7 +37,7 @@ IPAddress::~IPAddress(){
 
 }
 
-int IPAddress::getAddressFamily(){
+int IPAddress::getAddressFamily() const{
 	return address_family;
 }
 
@@ -45,7 +45,7 @@ void IPAddress::setAddressFamily(int af){
 	address_family=af;
 }
 
-int IPAddress::getProtocolFamily(){
+int IPAddress::getProtocolFamily() const{
 	return protocol_family;
 }
 

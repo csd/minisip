@@ -141,20 +141,20 @@ IP4Address::~IP4Address(){
 	delete sockaddress;
 }
 
-struct sockaddr * IP4Address::getSockaddrptr(int32_t port){
+struct sockaddr * IP4Address::getSockaddrptr(int32_t port) const{
 	sockaddress->sin_port=hton16(port);
 	return (sockaddr *)sockaddress;
 }
 
-int32_t IP4Address::getSockaddrLength(){
+int32_t IP4Address::getSockaddrLength() const{
 	return sizeof(struct sockaddr_in);
 }
 
-string IP4Address::getString(){
+string IP4Address::getString() const{
 	return ipaddr;
 }
 
-int32_t IP4Address::getPort()
+int32_t IP4Address::getPort() const
 {
 	return ntoh16(sockaddress->sin_port);
 }
