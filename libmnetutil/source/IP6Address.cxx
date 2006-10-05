@@ -129,20 +129,20 @@ IP6Address::~IP6Address(){
 	delete sockaddress;
 }
 
-struct sockaddr *IP6Address::getSockaddrptr(int32_t port){
+struct sockaddr *IP6Address::getSockaddrptr(int32_t port) const{
 	sockaddress->sin6_port = htons( (unsigned short)port );
 	return (struct sockaddr *) sockaddress;
 }
 
-int32_t IP6Address::getSockaddrLength(){
+int32_t IP6Address::getSockaddrLength() const{
 	return sizeof(struct sockaddr_in6);
 }
 
-string IP6Address::getString(){
+string IP6Address::getString() const{
 	return ipaddr;
 }
 
-int32_t IP6Address::getPort()
+int32_t IP6Address::getPort() const
 {
 	return ntoh16(sockaddress->sin6_port);
 }
