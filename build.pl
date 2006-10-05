@@ -652,14 +652,27 @@ sub cb_debug_post { act('run', debug_app_path()) }
 
 sub _first_line { $_[0] }
 sub cb_envdump_pre {
+	my $gxx;
+	my $cpp;
+	my $ld;
+	if (cross_compiling()) {
+	    $gxx = "$hostspec-g++";
+	    $cpp = "$hostspec-cpp";
+	    $ld = "$hostspec-ld";
+	} else {
+	    $gxx = $ENV{CXX} || 'g++';
+	    $cpp = $ENV{CPP} || 'cpp';
+	    $ld = 'ld';
+	}
 	print "Working Copy ", `svn info | grep ^Rev`;
 	print "pkg-config: ", _first_line(`pkg-config --version`);
 	print "autoconf: ", _first_line(`autoconf --version`);
 	print "automake: ", _first_line(`automake --version`);
 	print " libtool: ", _first_line(`libtool --version`);
 	print "    make: ", _first_line(`make --version`);
-	print "     g++: ", _first_line(`g++ --version`);
-	print "      ld: ", _first_line(`ld --version`);
+	print "     g++: ", _first_line(`$gxx --version`);
+	print "     cpp: ", _first_line(`$cpp --version`);
+	print "      ld: ", _first_line(`$ld --version`);
 	print "\n";
 	$show_env = 1; 
 	show_env();
@@ -896,13 +909,13 @@ sub setup_ccache_env {
 }
 
 sub pretty_env_paths {
-	my $value = '' . $_[0];
+	my $value = $_[0] || '';
 	$value =~ s/$topdir/\${topdir}/g;
 	return $value;
 }
 sub show_env {
 	return unless $show_env;
-	my @envvars = qw( CXXFLAGS CPPFLAGS LDFLAGS PATH );
+	my @envvars = qw( CXX CPP CXXFLAGS CPPFLAGS LDFLAGS PATH );
 	push @envvars, qw( PKG_CONFIG_PATH ACLOCAL_FLAGS LD_LIBRARY_PATH )
 		unless $pkg;
 	push @envvars, 'CCACHE_DIR' if $ccache;
