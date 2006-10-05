@@ -96,12 +96,13 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 	codec = avcodec_find_encoder( CODEC_ID_H263P );
 
 	if( codec == NULL ){
-		fprintf( stderr, "libavcodec does not support H263" );
+		merr << "libavcodec does not support H263" << end;
 		exit( 1 );
 	}
 
 	int bitRate = 100 * 1000;
 	int bitRateTolerance = 50 * 1000;
+	int frameRate = 15;
 
 	context = avcodec_alloc_context();
 
@@ -111,10 +112,10 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 	context->bit_rate_tolerance = bitRateTolerance;
 
 #ifndef AVCODEC_FIXES
-	context->frame_rate = 15; 
+	context->frame_rate = frameRate; 
 	context->frame_rate_base = 1;
 #else
-	AVRational timeBase = { 1, 15 };
+	AVRational timeBase = { 1, frameRate };
 	context->time_base = timeBase;
 	context->pix_fmt = PIX_FMT_YUV420P;
 #endif
@@ -122,7 +123,7 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
         context->mb_decision = FF_MB_DECISION_RD;
 	context->rc_max_rate = bitRate + bitRateTolerance;
 	context->rc_min_rate = 0;
-	context->rc_buffer_size = bitRate + bitRateTolerance;
+ 	context->rc_buffer_size = bitRate + bitRateTolerance;
 
 
 	context->rtp_mode = 1;
@@ -145,7 +146,7 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 //        context->flags |= CODEC_FLAG_QP_RD;
         context->flags |= CODEC_FLAG_H263P_SLICE_STRUCT;
 	
-	context->gop_size = 60;
+ 	context->gop_size = frameRate * 5;
 
 	context->thread_count = 1;
 
@@ -158,13 +159,13 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
-	fprintf(stderr, "Opening coder with width: %i\n", width );
-	fprintf(stderr, "Opening coder with height: %i\n", height);
+	mdbg << "Opening coder with width: " << width << end;
+	mdbg << "Opening coder with height: " << height << end;
 	context->width =  width;//width;
 	context->height = height; //height;
 
 	if( avcodec_open( context, codec ) != 0 ){
-		fprintf( stderr, "Could not open libavcodec codec\n" );
+		merr << "Could not open libavcodec codec" << end;
 		exit( 1 );
 	}
 
@@ -210,8 +211,7 @@ void AVEncoder::handle( MImage * image ){
 		if( img_convert( (AVPicture*)&frame, context->pix_fmt, 
 					(AVPicture*)image, srcFormat,
 					context->width, context->height ) < 0 ){
-			fprintf( stderr, "Could not convert image to"
-					 "encoding format\n");
+			merr << "Could not convert image to encoding format" << end;
 			exit( 1 );
 		}
 	}

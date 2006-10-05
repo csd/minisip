@@ -128,7 +128,7 @@ void V4LGrabber::mapMemory(){
                 throw VideoException( strerror( errno ) );
 	}
 	
-	cout << "Got " << mBuf.frames << " device buffers" << endl;
+	mdbg << "Got " << mBuf.frames << " device buffers" << end;
 
 	nFrames = mBuf.frames;
 
@@ -180,8 +180,8 @@ bool V4LGrabber::setImageSize( uint32_t width, uint32_t height ){
 		getImageFormat();
         }
 
-        fprintf( stderr, "Trying to set input size to %ix%i\n", width, height);
-        fprintf( stderr, "Clipcount %i\n", imageWindow->clipcount);
+        mdbg << "Trying to set input size to " << width << "x" << height << end;
+        mdbg << "Clipcount " << imageWindow->clipcount << end;
 
         imageWindow->height = height;
         imageWindow->width = width;
@@ -222,7 +222,7 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
                         return false;
 	}
 
-        fprintf( stderr, "Depth: %i\n", imageFormat->depth );
+        mdbg << "Depth: " << imageFormat->depth << end;
 
 	if( ioctl( fd, VIDIOCSPICT,  imageFormat ) != 0 ){
 		merror( "VIDIOCSPICT" );
@@ -323,7 +323,7 @@ void V4LGrabber::stop(){
 }
 
 void V4LGrabber::run(){
-	fprintf( stderr, "Start read()\n" );
+	mdbg << "Start read()" << end;
 	stopped = false;
 	read( handler );
 }
@@ -335,7 +335,7 @@ void V4LGrabber::setHandler( ImageHandler * handler ){
 }
 
 void V4LGrabber::read( ImageHandler * handler ){
-	fprintf( stderr, "Start read( handler )\n" );
+	mdbg << "Start read( handler )" << end;
 	grabberLock.lock();
 	int i;
 	struct video_mmap mMap;
@@ -355,13 +355,13 @@ void V4LGrabber::read( ImageHandler * handler ){
         }
         
         if( ! setImageSize( handlerInputWidth, handlerInputHeight ) ){
-                fprintf( stderr, "Could not set grabber image size.\n" );
-                fprintf( stderr, "Grabber size: %ix%i\n", width, height );
+                merr << "Could not set grabber image size." << end;
+                merr << "Grabber size: " << width << "x" << height << end;
         }
         
 
 
-        fprintf( stderr, "ImageFormat->palette %i\n", imageFormat->palette );
+        mdbg << "ImageFormat->palette " << imageFormat->palette << end;
         
         if( imageFormat->palette == VIDEO_PALETTE_RGB24 ){
                 pixelSize = 3;
@@ -386,7 +386,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 		merror( "VIDIOCMCAPTURE" );
                 throw VideoException( strerror( errno ) );
 	}
-	fprintf( stderr, "before loop\n" );
+	mdbg << "before loop" << end;
 
 
 	if( !handlerProvidesImage ){
@@ -487,13 +487,6 @@ void V4LGrabber::unmapMemory(){
 
 
 }
-
-
-
-
-
-
-
 
 
 
