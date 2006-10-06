@@ -9,7 +9,25 @@
 # * libparse-debianchangelog-perl
 #
 
-use Parse::DebianChangelog;
+
+sub autodetect
+{
+    my ($module) = @_;
+
+    eval "require $module";
+    if ($@) {
+	warn $@ if $verbose;
+	return 0;
+    } else {
+	return 1;
+    }
+}
+
+
+# Auto detect Parse::DebianChangelog
+BEGIN {
+    $debian_changelog_loaded = &autodetect( Parse::DebianChangelog );
+}
 
 our $debian_tarballsdir = "$topdir/build/tarballs";
 our $default_buildareadir = "$topdir/build/build-area";
@@ -468,11 +486,14 @@ sub debian_cb_tarclean_pre {
 	}
 }
 
+if ($debian_changelog_loaded) {
 set_dist_callbacks(
 		'pkgfiles' => \&debian_cb_pkgfiles,
 		'package' => \&debian_cb_package,
 		pkgcontents => \&debian_cb_pkgcontents,
 		merge => \&debian_cb_install,
 		purge => \&debian_cb_purge, 
-	);
-
+		   );
+} else {
+    set_dist_callbacks();
+}
