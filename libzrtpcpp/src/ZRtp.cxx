@@ -67,6 +67,7 @@ ZRtp::ZRtp(uint8_t *myZid, ZrtpCallback *cb):
     zrtpConf2Ack = NULL;
     DHss = NULL;
     pubKeyBytes = NULL;
+    Zfone = 0;
 
     memcpy(zid, myZid, 12);
     zrtpHello = new ZrtpPacketHello();
@@ -78,42 +79,49 @@ ZRtp::ZRtp(uint8_t *myZid, ZrtpCallback *cb):
 }
 
 ZRtp::~ZRtp() {
+    stopZrtp();
+
     if (DHss != NULL) {
 	free(DHss);
+        DHss = NULL;
     }
     if (pubKeyBytes != NULL) {
         free(pubKeyBytes);
+        pubKeyBytes = NULL;
     }
     if (zrtpHello != NULL) {
 	delete zrtpHello;
+        pubKeyBytes = NULL;
     }
     if (zrtpHelloAck != NULL) {
 	delete zrtpHelloAck;
+        zrtpHelloAck = NULL;
     }
     if (zrtpConf2Ack != NULL) {
 	delete zrtpConf2Ack;
+        zrtpConf2Ack = NULL;
     }
     if (stateEngine != NULL) {
 	delete stateEngine;
+        stateEngine = NULL;
     }
     if (dhContext != NULL) {
 	delete dhContext;
+        dhContext = NULL;
     }
-
     memset(hmacSrtp, 0, SHA256_DIGEST_LENGTH);
-
     /*
      * Clear the Initiator's srtp key and salt
      */
     memset(srtpKeyI, 0, SHA256_DIGEST_LENGTH);
     memset(srtpSaltI, 0,  SHA256_DIGEST_LENGTH);
-
     /*
      * Clear he Responder's srtp key and salt
      */
-    memset (srtpKeyR, 0, SHA256_DIGEST_LENGTH);
-    memset (srtpSaltR, 0, SHA256_DIGEST_LENGTH);
+    memset(srtpKeyR, 0, SHA256_DIGEST_LENGTH);
+    memset(srtpSaltR, 0, SHA256_DIGEST_LENGTH);
 
+    memset(s0, 0, SHA256_DIGEST_LENGTH);
 }
 
 int32_t ZRtp::processExtensionHeader(uint8_t *extHeader, uint8_t* content) {
@@ -122,7 +130,12 @@ int32_t ZRtp::processExtensionHeader(uint8_t *extHeader, uint8_t* content) {
     ev.type = ZrtpPacket;
     ev.data.packet = extHeader;
     ev.content = content;
-    return stateEngine->processEvent(&ev);
+
+    int32_t ret;
+    if (stateEngine != NULL) {
+        ret = stateEngine->processEvent(&ev);
+    }
+    return ret;
 }
 
 int32_t ZRtp::processTimeout() {
@@ -131,7 +144,12 @@ int32_t ZRtp::processTimeout() {
     ev.type = Timer;
     ev.data.packet = NULL;
     ev.content = NULL;
-    return stateEngine->processEvent(&ev);
+    int32_t ret;
+    if (stateEngine != NULL) {
+        ret = stateEngine->processEvent(&ev);
+    }
+    return ret;
+
 }
 
 bool ZRtp::handleGoClear(uint8_t *extHeader)
@@ -148,7 +166,9 @@ bool ZRtp::handleGoClear(uint8_t *extHeader)
         ev.type = ZrtpGoClear;
         ev.data.packet = extHeader;
         ev.content = NULL;
-        stateEngine->processEvent(&ev);
+        if (stateEngine != NULL) {
+            stateEngine->processEvent(&ev);
+        }
         return true;
     }
     else {
@@ -171,17 +191,24 @@ void ZRtp::stopZrtp() {
      * reset to initial state only. This state ignores any event except
      * ZrtpInitial and effectively stops the engine.
      */
-    if (!stateEngine->inState(SecureState)) {
-        stateEngine->nextState(Initial);
-        return;
+    if (stateEngine != NULL) {
+        if (!stateEngine->inState(SecureState)) {
+            stateEngine->nextState(Initial);
+            return;
+        }
+        ev.type = ZrtpClose;
+        stateEngine->processEvent(&ev);
     }
-    ev.type = ZrtpClose;
-    stateEngine->processEvent(&ev);
 }
 
 int32_t ZRtp::checkState(int32_t state)
 {
-    return stateEngine->inState(state);
+    if (stateEngine != NULL) {
+        return stateEngine->inState(state);
+    }
+    else {
+        return -1;
+    }
 }
 
 ZrtpPacketCommit* ZRtp::prepareCommit(ZrtpPacketHello *hello) {
@@ -189,6 +216,11 @@ ZrtpPacketCommit* ZRtp::prepareCommit(ZrtpPacketHello *hello) {
     memcpy(peerZid, hello->getZid(), 12);
 
     sendInfo(Info, "Hello received, preparing a Commit");
+
+    uint8_t* cid = hello->getClientId();
+    if (*cid == 'Z') {  // TODO Zfone hack regarding reused sequence numbers
+        Zfone = 1;
+    }
 
     cipher = findBestCipher(hello);
     if (cipher >= NumSupportedSymCiphers) {
@@ -244,10 +276,12 @@ ZrtpPacketCommit* ZRtp::prepareCommit(ZrtpPacketHello *hello) {
     }
     dhContext->getPubKeyBytes(pubKeyBytes);
 
+    // Here we act as Initiator. Take other peer's Hello packet and my
+    // PVI (public value initiator) and compute the HVI (hash value initiator)
     computeHvi(pubKeyBytes, maxPubKeySize, hello);
 
     char buffer[128];
-    snprintf((char *)buffer, 128, "Generated a public DH key of size: %d", dhContext->getPubKeySize());
+    snprintf((char *)buffer, 128, "Commit: Generated a public DH key of size: %d", dhContext->getPubKeySize());
     sendInfo(Info, buffer);
 
     ZrtpPacketCommit *commit = new ZrtpPacketCommit();
@@ -360,7 +394,7 @@ ZrtpPacketDHPart* ZRtp::prepareDHPart1(ZrtpPacketCommit *commit) {
     pubKeyLen = dhContext->getPubKeySize();
 
     char buffer[128];
-    snprintf(buffer, 128, "Generated a public DH key of size: %d", pubKeyLen);
+    snprintf(buffer, 128, "DH1Part: Generated a public DH key of size: %d", pubKeyLen);
     sendInfo(Info, buffer);
 
     if (pubKeyLen > maxPubKeySize) {
@@ -415,7 +449,8 @@ ZrtpPacketDHPart* ZRtp::prepareDHPart2(ZrtpPacketDHPart *dhPart1) {
     uint8_t* pvr;
     uint8_t *data[4];
     unsigned int length[4];
-    uint8_t sas[SHA256_DIGEST_LENGTH];
+    uint8_t sas[SHA256_DIGEST_LENGTH+1];
+    uint32_t sasTemp;
 
     sendInfo(Info, "Initiator: DHPart1 received, preparing DHPart2");
 
@@ -433,20 +468,31 @@ ZrtpPacketDHPart* ZRtp::prepareDHPart2(ZrtpPacketDHPart *dhPart1) {
     length[2] = strlen(sasString);
     data[3] = NULL;
 
-    // TODO Check the pvr to avoid MITM
     if (pubKey == Dh3072) {
+        if (!dhContext->checkPubKey(pvr, 384)) {
+            sendInfo(Alert, "Wrong/weak public key value (pvr) received from other party");
+            return NULL;
+        }
 	dhContext->computeKey(pvr, 384, DHss);
         length[1] = 384;
         sha256(data, length, sas);
 
     }
     else {
+        if (!dhContext->checkPubKey(pvr, 512)) {
+            sendInfo(Alert, "Wrong/weak public key value (pvr) received from other party");
+            return NULL;
+        }
         dhContext->computeKey(pvr, 512, DHss);
         length[1] = 512;
         sha256(data, length, sas);
     }
-    SAS = Base32(sas, SHA256_DIGEST_LENGTH*5).getEncoded();
-    SAS = SAS.substr(SAS.length()-4, 4);
+    sas[SHA256_DIGEST_LENGTH] = 0;
+    sasTemp = *(uint32_t*)(sas + SHA256_DIGEST_LENGTH - 3);
+    sasTemp = ntohl(sasTemp);
+    sasTemp <<= 4;
+    *(uint32_t*)sas = htonl(sasTemp);
+    SAS = Base32(sas, 20).getEncoded();
 
     // Initialize a ZID record to get peer's retained secrets
     ZIDRecord zidRec(peerZid);
@@ -493,7 +539,8 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
     uint8_t* pvi;
     uint8_t *data[4];
     unsigned int length[4];
-    uint8_t sas[SHA256_DIGEST_LENGTH];
+    uint8_t sas[SHA256_DIGEST_LENGTH+1];
+    uint32_t sasTemp;
 
     sendInfo(Info, "Responder: DHPart2 received, preparing Confirm1");
 
@@ -513,19 +560,30 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
     length[2] = strlen(sasString);
     data[3] = NULL;
 
-    // TODO Check the pvi to avoid MITM
     if (pubKey == Dh3072) {
+        if (!dhContext->checkPubKey(pvi, 384)) {
+            sendInfo(Alert, "Wrong/weak public key value (pvi) received from other party");
+            return NULL;
+        }
 	dhContext->computeKey(pvi, 384, DHss);
         length[0] = 384;
         sha256(data, length, sas);
     }
     else {
+        if (!dhContext->checkPubKey(pvi, 512)) {
+            sendInfo(Alert, "Wrong/weak public key value (pvi) received from other party");
+            return NULL;
+        }
         dhContext->computeKey(pvi, 512, DHss);
         length[0] = 512;
         sha256(data, length, sas);
     }
-    SAS = Base32(sas, SHA256_DIGEST_LENGTH*5).getEncoded();
-    SAS = SAS.substr(SAS.length()-4, 4);
+    sas[SHA256_DIGEST_LENGTH] = 0;
+    sasTemp = *(uint32_t*)(sas + SHA256_DIGEST_LENGTH - 3);
+    sasTemp = ntohl(sasTemp);
+    sasTemp <<= 4;
+    *(uint32_t*)sas = htonl(sasTemp);
+    SAS = Base32(sas, 20).getEncoded();
 
     // Here we have the peers pv. Because we are responder re-compute my hvi
     // using my Hello packet and the Initiator's pv and compare with
@@ -544,8 +602,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
     // thus get the singleton instance to the open file
     ZIDFile *zid = ZIDFile::getInstance();
     zid->getRecord(&zidRec);
-//    int sasFlag = zidRec.isSasVerified() ? 1 : 0;
-    int sasFlag = 0;
+    int sasFlag = zidRec.isSasVerified() ? 1 : 0;
 
     /*
      * The expected shared secret Ids were already computed when we built the
@@ -582,11 +639,8 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm *confirm1) {
     sendInfo(Info, "Initiator: Confirm1 received, preparing Confirm2");
 
     uint8_t sasFlag = confirm1->getSASFlag();
-    if (sasFlag & 0x1) {
-    }
 
     if (memcmp(knownPlain, confirm1->getPlainText(), 15) != 0) {
-        fprintf(stderr, "1: %s\n", confirm1->getPlainText());
 	sendInfo(Error, "Cannot read confirm1 message");
 	return NULL;
     }
@@ -598,16 +652,46 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm *confirm1) {
     hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)confirm1->getPlainText(),
 		20, confMac, &macLen);
 
-    if (memcmp(confMac, confirm1->getHmac(), 32) != 0) {
+    if (memcmp(confMac, confirm1->getHmac(), SHA256_DIGEST_LENGTH) != 0) {
 	sendInfo(Error, "HMAC verification of Confirm1 message failed");
 	return NULL;
     }
+    /*
+     * The Confirm1 is ok, handle the Retained secret stuff and inform
+     * GUI about state.
+     */
+
+    // Initialize a ZID record to get peer's retained secrets
+    ZIDRecord zidRec(peerZid);
+
+    ZIDFile *zid = ZIDFile::getInstance();
+    zid->getRecord(&zidRec);
+
+    // Our peer did not confirm the SAS in last session, thus reset
+    // our SAS flag too.
+    if (!(sasFlag & 0x1)) {
+      zidRec.resetSasVerified();
+    }
+
+    // get verified flag from current RS1 before set a new RS1. This
+    // may not be set even if peer's flag is set in confirm1 message.
+    sasFlag = zidRec.isSasVerified() ? 1 : 0;
+
+    // Inform GUI about security state and SAS state
+    const char* c = (cipher == Aes128) ? "AES-CM-128" : "AES-CM-256";
+    const char* s = (zidRec.isSasVerified()) ? NULL : SAS.c_str();
+    callback->srtpSecretsOn(c, s);
+
+    // now we are ready to save the new RS1 which inherits the verified
+    // flag from old RS1
+    zidRec.setNewRs1((const uint8_t*)newRs1);
+    zid->saveRecord(&zidRec);
 
     // now generate my Confirm2 message
     ZrtpPacketConfirm* zpConf = new ZrtpPacketConfirm();
     zpConf->setMessage((uint8_t*)Confirm2Msg);
     zpConf->setPlainText((uint8_t*)knownPlain);
-    zpConf->setSASFlag(0);
+    zpConf->setSASFlag(sasFlag);
     zpConf->setExpTime(0);
 
     // The HMAC with length 16 includes the SAS flag inside the Confirm packet
@@ -624,12 +708,9 @@ ZrtpPacketConf2Ack* ZRtp::prepareConf2Ack(ZrtpPacketConfirm *confirm2) {
     sendInfo(Info, "Respnder: Confirm2 received, preparing Conf2Ack");
 
     uint8_t sasFlag = confirm2->getSASFlag();
-    if (sasFlag & 0x1) {
-	// prepare the SAS data and display to user
-    }
+
     if (memcmp(knownPlain, confirm2->getPlainText(), 15) != 0) {
-        fprintf(stderr, "2: %s\n", confirm2->getPlainText());
-	sendInfo(Error, "Cannot read confirm2 message");
+     	sendInfo(Error, "Cannot read confirm2 message");
 	return NULL;
     }
     uint8_t confMac[SHA256_DIGEST_LENGTH];
@@ -640,10 +721,37 @@ ZrtpPacketConf2Ack* ZRtp::prepareConf2Ack(ZrtpPacketConfirm *confirm2) {
     hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)confirm2->getPlainText(),
 		20, confMac, &macLen);
 
-    if (memcmp(confMac, confirm2->getHmac(), 32) != 0) {
+    if (memcmp(confMac, confirm2->getHmac(), SHA256_DIGEST_LENGTH) != 0) {
 	sendInfo(Error, "HMAC verification of Confirm2 message failed");
 	return NULL;
     }
+
+    /*
+     * The Confirm2 is ok, handle the Retained secret stuff and inform
+     * GUI about state.
+     */
+
+    // Initialize a ZID record to get peer's retained secrets
+    ZIDRecord zidRec(peerZid);
+
+    ZIDFile *zid = ZIDFile::getInstance();
+    zid->getRecord(&zidRec);
+
+    // Our peer did not confirm the SAS in last session, thus reset
+    // our SAS flag too.
+    if (!(sasFlag & 0x1)) {
+      zidRec.resetSasVerified();
+    }
+
+    // Inform GUI about security state and SAS state
+    const char* c = (cipher == Aes128) ? "AES-CM-128" : "AES-CM-256";
+    const char* s = (zidRec.isSasVerified()) ? NULL : SAS.c_str();
+    callback->srtpSecretsOn(c, s);
+
+    // save new RS1, this inherits the verified flag from old RS1
+    zidRec.setNewRs1((const uint8_t*)newRs1);
+    zid->saveRecord(&zidRec);
+
     return zrtpConf2Ack;
 }
 
@@ -839,15 +947,6 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     const uint8_t* setE[5];
     int32_t rsFound = 0;
 
-#if 0
-    hexdump("rs1IDr (I)", rs1IDr, 8);
-    hexdump("rs1IDi (I)", rs1IDi, 8);
-    hexdump("rs2IDr (I)", rs2IDr, 8);
-    hexdump("rs2IDi (I)", rs2IDi, 8);
-    hexdump("rs1Id (recv)) (I)", dhPart->getRs1Id(), 8);
-    hexdump("rs2Id (recv)) (I)", dhPart->getRs2Id(), 8);
-#endif
-
     setC[0] = (memcmp(rs1IDr, dhPart->getRs1Id(), 8) == 0) ? rs1IDr : NULL;
     setC[1] = (memcmp(rs2IDr, dhPart->getRs2Id(), 8) == 0) ? rs2IDr : NULL;
     setC[2] = (memcmp(sigsIDr, dhPart->getSigsId(), 8) == 0) ? sigsIDr : NULL;
@@ -872,7 +971,6 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	setE[matchingSecrets++] = rs1IDi;  // rs1IDi will be sent in DHPart2 message
         rsFound = 0x1;
     }
-
     if (setC[1] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs2 found\n", zid[0])));
         setD[matchingSecrets] = zidRec.getRs2();
@@ -903,7 +1001,9 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
         while (notDone) {
 	   notDone = 0;
 	   for (i = 0; i < matchingSecrets - 1; i++) {
-	       if (memcmp(setE[i], setE[i+1], 32) > 0) {
+//               if (memcmp(setE[i], setE[i+1], 8) > 0) { // as defined in specifcation
+               if (memcmp(setD[i], setD[i+1], SHA256_DIGEST_LENGTH) > 0) { // as implemented in Zfone-beta2
+
 	           tmpP = setE[i];
 	           setE[i] = setE[i+1];
 	           setE[i+1] = tmpP;
@@ -915,11 +1015,6 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	   }
         }
     }
-
-#if 0
-    hexdump("setD0 (I)", setD[0], 32);
-    hexdump("setD1 (I)", setD[1], 32);
-#endif
     /*
      * ready to generate s0 here.
      * Hash the DH shared secret and the available shared secrets (max. 5).
@@ -947,7 +1042,7 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     free(DHss);
     DHss = NULL;
 
-    computeSRTPKeys(zidRec);
+    computeSRTPKeys();
 }
 
 void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
@@ -955,15 +1050,6 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     const uint8_t* setD[5];
     const uint8_t* setE[5];     // Set E is the "compressed" C (no NULLs) for sort
     int32_t rsFound = 0;
-
-#if 0
-    hexdump("rs1IDr (R)", rs1IDr, 8);
-    hexdump("rs1IDi (R)", rs1IDi, 8);
-    hexdump("rs2IDr (R)", rs2IDr, 8);
-    hexdump("rs2IDi (R)", rs2IDi, 8);
-    hexdump("rs1Id (recv)) (R)", dhPart->getRs1Id(), 8);
-    hexdump("rs2Id (recv)) (R)", dhPart->getRs2Id(), 8);
-#endif
 
     setC[0] = (memcmp(rs1IDi, dhPart->getRs1Id(), 8) == 0) ? rs1IDi : NULL;
     setC[1] = (memcmp(rs2IDi, dhPart->getRs2Id(), 8) == 0) ? rs2IDi : NULL;
@@ -1019,7 +1105,8 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	while (notDone) {
 	    notDone = 0;
 	    for (i = 0; i < matchingSecrets - 1; i++) {
-		if (memcmp(setE[i], setE[i+1], 32) > 0) {
+//                if (memcmp(setE[i], setE[i+1], 8) > 0) { // orignal spec
+                if (memcmp(setD[i], setD[i+1], SHA256_DIGEST_LENGTH) > 0) { // as implemented in Zfone beta2
 		    tmpP = setE[i];
 		    setE[i] = setE[i+1];
 		    setE[i+1] = tmpP;
@@ -1031,11 +1118,6 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	    }
         }
     }
-#if 0
-    hexdump("setD0 (R)", setD[0], 32);
-    hexdump("setD1 (R)", setD[1], 32);
-#endif
-
     /*
      * ready to generate s0 here.
      * Hash the DH shared secret and the available shared secrets (max. 5).
@@ -1043,11 +1125,14 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     unsigned char* data[7];
     uint32_t  length[7];
 
+    // first hash the DH secret
     data[0] = DHss;
     length[0] = dhContext->getSecretSize();
     data[1] = NULL;
     sha256(data, length, DHss);
 
+    // now take the hashed DH secret and the retained secrets and hash
+    // them to get S0
     data[0] = DHss;
     length[0] = SHA256_DIGEST_LENGTH;
 
@@ -1063,33 +1148,32 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     free(DHss);
     DHss = NULL;
 
-    computeSRTPKeys(zidRec);
+    computeSRTPKeys();
 }
 
-void ZRtp::computeSRTPKeys(ZIDRecord& zidRec) {
+void ZRtp::computeSRTPKeys() {
 
     unsigned int macLen;
 
-    uint8_t newRs1[RS_LENGTH];
-
+    // Inititiator key and salt
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)iniMasterKey, strlen(iniMasterKey),
 		srtpKeyI, &macLen);
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)iniMasterSalt, strlen(iniMasterSalt),
 		srtpSaltI, &macLen);
 
+    // Responder key and salt
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)respMasterKey, strlen(respMasterKey),
 		srtpKeyR, &macLen);
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)respMasterSalt, strlen(respMasterSalt),
 		srtpSaltR, &macLen);
 
+    // The HMAC key for GoClear
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)hmacKey, strlen(hmacKey),
 		hmacSrtp, &macLen);
 
+    // Compute the new Retained Secret
     hmac_sha256(s0, SHA256_DIGEST_LENGTH, (unsigned char*)retainedSec, strlen(retainedSec),
 		newRs1, &macLen);
-    zidRec.setNewRs1((const uint8_t*)newRs1);
-
-    memset(s0, 0, SHA256_DIGEST_LENGTH);
 }
 
 void ZRtp::srtpSecretsReady(EnableSecurity part) {
@@ -1123,6 +1207,17 @@ void ZRtp::SASVerified()
 
     zid->getRecord(&zidRec);
     zidRec.setSasVerified();
+    zid->saveRecord(&zidRec);
+}
+
+void ZRtp::resetSASVerified()
+{
+    // Initialize a ZID record to get peer's retained secrets
+    ZIDRecord zidRec(peerZid);
+    ZIDFile *zid = ZIDFile::getInstance();
+
+    zid->getRecord(&zidRec);
+    zidRec.resetSasVerified();
     zid->saveRecord(&zidRec);
 }
 

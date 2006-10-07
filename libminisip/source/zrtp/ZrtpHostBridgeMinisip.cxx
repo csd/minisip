@@ -94,6 +94,7 @@ void ZrtpHostBridgeMinisip::start() {
 
     if (zrtpEngine == NULL) {
         zrtpEngine = new ZRtp((uint8_t*)ownZid, (ZrtpCallback*)this);
+        zrtpEngine->setClientId(clientId);
         zrtpEngine->startZrtpEngine();
     }
 }
@@ -275,10 +276,6 @@ void ZrtpHostBridgeMinisip::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecuri
 
         secureParts++;
     }
-    if (secureParts == 2) {
-        CommandString cmd(callId, "zrtp_security_change", "secure", secrets->sas);
-        messageRouterCallback->handleCommand("gui", cmd);
-    }
 }
 
 MRef<CryptoContext *>
@@ -292,6 +289,18 @@ ZrtpHostBridgeMinisip::newCryptoContextForRecvSSRC(uint32_t ssrc, int roc,
     pcc->derive_srtp_keys(seq);
     rStream->setKeyAgreementZrtp(pcc);
     return pcc;
+}
+
+void ZrtpHostBridgeMinisip::srtpSecretsOn(const char* c, const char* s)
+{
+
+    if (s != NULL) {
+        CommandString cmd(callId, "zrtp_security_change", "secure", s);
+        messageRouterCallback->handleCommand("gui", cmd);
+    }
+//    if (s != NULL && zrtpUserCallback != NULL) {
+//        zrtpUserCallback->showSAS(s);
+//    }
 }
 
 void ZrtpHostBridgeMinisip::srtpSecretsOff(EnableSecurity part) {

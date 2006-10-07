@@ -233,11 +233,11 @@ void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
 }
 
 void MediaStream::setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {
-	zrtpBridge = zsb; 
+	zrtpBridge = zsb;
 }
 
 MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
-	return zrtpBridge; 
+	return zrtpBridge;
 }
 
 #endif
@@ -300,11 +300,11 @@ void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
         recvSsrc = packet->getHeader().getSSRC();
 	seq_no = packet->getHeader().getSeqNo();
 
-        if (zrtpBridge->isZrtpPacket(packet)) {
-            packet->checkZrtpChecksum(false);
-        }
+        // if (zrtpBridge->isZrtpPacket(packet)) {
+        //    packet->checkZrtpChecksum(false);
+        // }
         // Look for a CryptoContext for this packet's SSRC
-        MRef<CryptoContext *> pcc = getCryptoContext( recvSsrc, seq_no);
+        MRef<CryptoContext *> pcc = getCryptoContext(recvSsrc, seq_no);
 
 	if( packet->unprotect(pcc)) { // Authentication or replay protection failed
 		return;
@@ -326,9 +326,9 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
 	seq_no = packet->getHeader().getSeqNo();
 
 #ifdef ZRTP_SUPPORT
-        if (zrtpBridge && packet->getHeader().getExtension() && zrtpBridge->isZrtpPacket(packet)) {
-            packet->checkZrtpChecksum(false);
-        }
+        // if (zrtpBridge && packet->getHeader().getExtension() && zrtpBridge->isZrtpPacket(packet)) {
+        //    packet->checkZrtpChecksum(false);
+        // }
         MRef<CryptoContext *> pcc = getCryptoContext(packetSsrc, seq_no);
 
         // If empty crypto context for this SSRC but we are already in Secure
@@ -477,7 +477,7 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 
 	packet->protect(getCryptoContext(ssrc, seqNo));
 
-        packet->enableZrtpChecksum();
+        // packet->enableZrtpChecksum();
 	packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	delete packet;
 	senderLock.unlock();
@@ -533,7 +533,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 		packet->sendTo( **senderSock, **remoteAddress, remotePort );
 	else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )
 		packet->sendTo( **sender6Sock, **remoteAddress, remotePort );
-		
+
 	delete packet;
 	senderLock.unlock();
 

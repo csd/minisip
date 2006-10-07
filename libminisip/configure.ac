@@ -235,7 +235,7 @@ AM_CONDITIONAL(GCONF_SUPPORT, [test "x${gconf_support}" = "xyes"])
 
 
 AC_ARG_ENABLE(onlineconf,
-    AS_HELP_STRING([--enable-onlineconf], 
+    AS_HELP_STRING([--enable-onlineconf],
     	[enables support for storing minisip configuration data online (default disabled - under development).])
    )
 

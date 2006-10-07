@@ -232,6 +232,17 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
     void srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part);
 
     /**
+     * This method shall switch on GUI inidicators.
+     *
+     * @param c
+     *    The name of the used cipher algorithm and mode, or NULL
+     * @param s
+     *    The SAS string or NULL
+     */
+    virtual void srtpSecretsOn(const char* c, const char* s);
+
+
+    /**
      * Switch off the security for the defined part.
      *
      * Create an empty CryproContext and register it with the

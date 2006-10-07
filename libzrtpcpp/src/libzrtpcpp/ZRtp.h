@@ -207,6 +207,14 @@ class ZRtp {
         */
        void SASVerified();
 
+       /**
+        * Reset the SAS verfied flag for the current active user's retained secrets.
+        *
+        */
+       void resetSASVerified();
+
+       int Zfone;
+
  private:
      friend class ZrtpStateClass;
 
@@ -302,6 +310,11 @@ class ZRtp {
      * The s0
      */
     uint8_t s0[SHA256_DIGEST_LENGTH];
+
+    /**
+     * The new Retained Secret
+     */
+    uint8_t newRs1[RS_LENGTH];
 
     /**
      * The HMAC key
@@ -409,7 +422,7 @@ class ZRtp {
 
     void computeSharedSecretSet(ZIDRecord& zidRec);
 
-    void computeSRTPKeys(ZIDRecord& zidRec);
+    void computeSRTPKeys();
 
     void generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec);
 
@@ -484,7 +497,13 @@ class ZRtp {
      * @return
      *    A pointer to the initialized HelloAck packet.
      */
-    ZrtpPacketHelloAck *prepareHelloAck() {return zrtpHelloAck; }
+    ZrtpPacketHelloAck *prepareHelloAck(ZrtpPacketHello *hello) {
+        uint8_t* cid = hello->getClientId();
+        if (*cid == 'Z') {
+            Zfone = 1;
+        }
+        return zrtpHelloAck;
+    }
 
     /**
      * Prepare a Commit packet.
@@ -507,8 +526,6 @@ class ZRtp {
      * This method prepares a DHPart1 packet. The input to the method is always
      * a Commit packet received from the peer. Also we a in the role of the
      * Responder.
-     *
-     * <p/>
      *
      * When we receive a Commit packet we get the selected ciphers, hashes, etc
      * and cross-check if this is ok. Then we need to initialize a set of DH
@@ -607,7 +624,7 @@ class ZRtp {
     }
 
     /**
-     * ZRTP calls this if the negotiation failed.
+     * ZRTP state engine calls this if the negotiation failed.
      *
      * ZRTP calls this method in case ZRTP negotiation failed. The parameters
      * show the severity as well as some explanatory text.
@@ -622,7 +639,7 @@ class ZRtp {
     }
 
     /**
-     * ZRTP calls this method if the other side does not support ZRTP.
+     * ZRTP state engine calls this method if the other side does not support ZRTP.
      *
      * If the other side does not answer the ZRTP <em>Hello</em> packets then
      * ZRTP calls this method,
