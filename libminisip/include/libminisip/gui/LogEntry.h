@@ -36,7 +36,7 @@ class LogEntryHandler;
 class LIBMINISIP_API LogEntry : public MObject{
 	public:
 
-		virtual std::string getMemObjectType(){return "LogEntry";}
+		virtual std::string getMemObjectType() const {return "LogEntry";}
 		
 		int type;
 		 std::string peerSipUri;
@@ -80,7 +80,7 @@ class LIBMINISIP_API LogEntryHandler : public virtual MObject{
 	public:
 		virtual void handle( MRef<LogEntry *> )=0;
 
-		virtual std::string getMemObjectType(){ return "LogEntryHandler";};
+		virtual std::string getMemObjectType() const { return "LogEntryHandler";};
 };
 
 

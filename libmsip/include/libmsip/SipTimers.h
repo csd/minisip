@@ -34,7 +34,7 @@ class LIBMSIP_API SipTimers : public MObject{
 	public:
 		SipTimers();
 
-		std::string getMemObjectType(){return "SipTimers";}
+		std::string getMemObjectType() const {return "SipTimers";}
 		
 		void setT1(int t){A=E=G=T1=t; B=F=H=J=t*64; }
 		void setT2(int t){T2 = t;}

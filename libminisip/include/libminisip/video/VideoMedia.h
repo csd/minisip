@@ -51,7 +51,7 @@ class LIBMINISIP_API VideoMedia : public Media, public VideoEncoderCallback{
 
 	public:
 		VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
-		virtual std::string getMemObjectType(){return "VideoMedia";}
+		virtual std::string getMemObjectType() const {return "VideoMedia";}
 
 		virtual std::string getSdpMediaType();
 
@@ -105,7 +105,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 
 		uint32_t ssrc;
 
-		virtual std::string getMemObjectType(){ return "VideoMediaSource"; };
+		virtual std::string getMemObjectType() const { return "VideoMediaSource"; };
 
 		friend class VideoMedia;
 	private:

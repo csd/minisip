@@ -96,7 +96,7 @@ class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 		void setSocket(Socket * sock){socket=sock;};
 		MRef<Socket *> getSocket(){return socket;};
 
-		virtual std::string getMemObjectType(){return "SipTransaction";}
+		virtual std::string getMemObjectType() const {return "SipTransaction";}
 		void setDebugTransType(std::string t){debugTransType = t;}
 		std::string getDebugTransType(){return debugTransType;}
 

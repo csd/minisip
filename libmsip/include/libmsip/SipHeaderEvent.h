@@ -48,7 +48,7 @@ class LIBMSIP_API SipHeaderValueEvent: public SipHeaderValueString{
 	public:
 		SipHeaderValueEvent(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderEvent";}
+                virtual std::string getMemObjectType() const {return "SipHeaderEvent";}
 		
 		// string getString(); is inherited from
 		// SipHeaderValueString that returns the string

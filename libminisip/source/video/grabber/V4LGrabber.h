@@ -108,7 +108,7 @@ class V4LPlugin : public GrabberPlugin{
 		virtual uint32_t getVersion() const { return 0x00000001; }
 
 		virtual std::string getDescription() const { return "Video4linux grabber"; }
-		virtual std::string getMemObjectType() { return "V4LPlugin"; }
+		virtual std::string getMemObjectType() const { return "V4LPlugin"; }
 };
 
 #endif

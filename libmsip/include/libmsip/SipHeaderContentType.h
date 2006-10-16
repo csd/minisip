@@ -49,7 +49,7 @@ class LIBMSIP_API SipHeaderValueContentType: public SipHeaderValueString{
 	public:
 		SipHeaderValueContentType(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderContentType";}
+                virtual std::string getMemObjectType() const {return "SipHeaderContentType";}
 };
 
 #endif

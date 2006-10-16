@@ -52,7 +52,7 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 		virtual bool providesImage();
 		virtual bool handlesChroma( uint32_t chroma );
 
-		virtual std::string getMemObjectType(){return "AVEncoder";};
+		virtual std::string getMemObjectType() const {return "AVEncoder";};
 
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();

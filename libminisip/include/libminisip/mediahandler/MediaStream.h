@@ -83,7 +83,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 */
 		std::list<std::string> getSdpAttributes();
 
-		virtual std::string getMemObjectType(){return "MediaStream";}
+		virtual std::string getMemObjectType() const {return "MediaStream";}
 		bool disabled;
 
 		/**
@@ -201,7 +201,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		virtual std::string getDebugString();
 #endif
 
-		virtual std::string getMemObjectType(){return "MediaStreamReceiver";}
+		virtual std::string getMemObjectType() const {return "MediaStreamReceiver";}
 
 		/**
 		 * Starts the reception of a the stream, by subscribing to
@@ -321,7 +321,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		virtual std::string getDebugString();
 #endif
 
-		virtual std::string getMemObjectType(){return "MediaStreamSender";}
+		virtual std::string getMemObjectType() const {return "MediaStreamSender";}
 
 		/**
 		 * Returns the CODEC instance currently selected for

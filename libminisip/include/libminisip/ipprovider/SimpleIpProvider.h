@@ -37,7 +37,7 @@ class LIBMINISIP_API SimpleIpProvider: public IpProvider{
 		virtual std::string getLocalIp();
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock );
 
-		virtual std::string getMemObjectType(){return "SimpleIpProvider";};
+		virtual std::string getMemObjectType() const {return "SimpleIpProvider";};
 
 	private:
 		/**

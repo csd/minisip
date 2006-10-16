@@ -64,7 +64,7 @@ class SipTransactionNonInviteServer: public SipTransactionServer{
 		
 		virtual ~SipTransactionNonInviteServer();
 
-		virtual std::string getMemObjectType(){return "SipTransactionNonInvServer";}
+		virtual std::string getMemObjectType() const {return "SipTransactionNonInvServer";}
 		virtual std::string getName(){return "transaction_noninviteserver[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 
 		void setUpStateMachine();

@@ -51,7 +51,7 @@ class Codec: public MPlugin{
 
 		virtual std::string getSdpMediaAttributes()=0;
 
-		virtual std::string getMemObjectType(){return "Codec";}
+		virtual std::string getMemObjectType() const {return "Codec";}
 
 		virtual std::string getName()const {
 			return (const_cast<Codec*>(this))->getCodecName();
@@ -79,7 +79,7 @@ class CodecState: public MObject{
 		 */
 		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf)=0;
 
-		virtual std::string getMemObjectType(){return "CodecState";};
+		virtual std::string getMemObjectType() const {return "CodecState";};
 	
 		uint8_t getSdpMediaType(){ return codec->getSdpMediaType(); };
 

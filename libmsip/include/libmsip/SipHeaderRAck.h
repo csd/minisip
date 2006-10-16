@@ -52,7 +52,7 @@ class LIBMSIP_API SipHeaderValueRAck: public SipHeaderValue{
 
 		virtual ~SipHeaderValueRAck();
 		
-                virtual std::string getMemObjectType(){return "SipHeaderRAck";}
+                virtual std::string getMemObjectType() const {return "SipHeaderRAck";}
 		
 		/**
 		 * returns string representation of the header

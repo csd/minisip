@@ -39,7 +39,7 @@ class LIBMSIP_API SipMimeContent : public SipMessageContent{
 		SipMimeContent(std::string content, std::string ContentTyp);
 		virtual std::string getString();
 		virtual std::string getContentType();
-		virtual std::string getMemObjectType(){return "MSipMimeContent";}
+		virtual std::string getMemObjectType() const {return "MSipMimeContent";}
 		void addPart(MRef<SipMessageContent*> part);
 		MRef<SipMessageContent*> popFirstPart();
 		void setBoundry(std::string boundry);

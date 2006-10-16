@@ -50,7 +50,7 @@ class LIBMSIP_API SipHeaderValueAccept: public SipHeaderValueString{
 		
 		SipHeaderValueAccept(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderAccept";}
+                virtual std::string getMemObjectType() const {return "SipHeaderAccept";}
 		
 		//getString is inherited from SipHeaderValueString
 		//and returns the string passed to the constructor.

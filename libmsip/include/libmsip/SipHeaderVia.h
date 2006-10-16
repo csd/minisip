@@ -53,7 +53,7 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 
 		virtual ~SipHeaderValueVia();
 
-                virtual std::string getMemObjectType(){return "SipHeaderVia";}
+                virtual std::string getMemObjectType() const {return "SipHeaderVia";}
 		
 		/**
 		 * returns string representation of the header

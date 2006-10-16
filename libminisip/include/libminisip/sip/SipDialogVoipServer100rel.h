@@ -61,7 +61,7 @@ class SipDialogVoipServer100rel: public SipDialogVoipServer{
 
 		virtual ~SipDialogVoipServer100rel();
 
-		virtual std::string getMemObjectType(){return "SipDialogVoipServer100rel";}
+		virtual std::string getMemObjectType() const {return "SipDialogVoipServer100rel";}
 		
 		virtual std::string getName(){return "SipDialogVoipServer100rel[callid="+dialogState.callId +"]";}
 

@@ -49,7 +49,7 @@ class LIBMSIP_API SipHeaderValueUserAgent: public SipHeaderValueString{
 	public:
 		SipHeaderValueUserAgent(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderUserAgent";}
+                virtual std::string getMemObjectType() const {return "SipHeaderUserAgent";}
 };
 
 #endif

@@ -64,7 +64,7 @@ class LIBMINISIP_API ContactEntry : public MObject{
 
 		uint32_t getPersonIndex(){return personIndex;}
 
-		virtual std::string getMemObjectType(){return "ContactEntry";}
+		virtual std::string getMemObjectType() const {return "ContactEntry";}
 	private:
 		static MRef<ContactDb *> db;
 
@@ -92,7 +92,7 @@ class LIBMINISIP_API ContactDb : public MObject{
 		void addEntry( ContactEntry * entry );
 		void delEntry( ContactEntry * entry );
 
-		virtual std::string getMemObjectType(){return "ContactDb";}
+		virtual std::string getMemObjectType() const {return "ContactDb";}
 
 	private:
 

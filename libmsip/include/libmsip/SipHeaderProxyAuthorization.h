@@ -61,7 +61,7 @@ class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthori
 
 		virtual ~SipHeaderValueProxyAuthorization();
 
-                virtual std::string getMemObjectType(){return "SipHeaderProxyAuthorization";}
+                virtual std::string getMemObjectType() const {return "SipHeaderProxyAuthorization";}
 		
 		/**
 		 * returns string representation of the header

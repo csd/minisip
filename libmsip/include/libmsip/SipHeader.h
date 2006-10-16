@@ -95,7 +95,7 @@ class LIBMSIP_API SipHeaderParameter:public MObject{
 	public:
 		SipHeaderParameter(std::string parseFrom);
 		SipHeaderParameter(std::string key, std::string value, bool hasEqual);	//hasEqual is there to support ;lr
-		std::string getMemObjectType(){return "SipHeaderParameter";}
+		std::string getMemObjectType() const {return "SipHeaderParameter";}
 		std::string getKey(){return key;}
 		std::string getValue(){return value;}
 		void setValue(std::string v){value=v;}
@@ -204,7 +204,7 @@ class LIBMSIP_API SipHeader : public MObject{
 		std::string getString();
 		void addHeaderValue(MRef<SipHeaderValue*> v);
 
-                virtual std::string getMemObjectType(){return "SipHeader";}
+                virtual std::string getMemObjectType() const {return "SipHeader";}
 
 		int32_t getType(){return type;}
 		int getNoValues(){return headerValues.size();}

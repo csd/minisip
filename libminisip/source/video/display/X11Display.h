@@ -96,7 +96,7 @@ class X11Plugin: public VideoDisplayPlugin{
 			return new X11Display( width, height );
 		}
 
-		virtual std::string getMemObjectType(){ return "X11Plugin"; }
+		virtual std::string getMemObjectType() const { return "X11Plugin"; }
 };
 
 #endif

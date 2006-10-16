@@ -36,7 +36,7 @@ class LIBMINISIP_API Resampler : public MObject{
 	public: 
 		virtual void resample( short * input, short * output )=0;
 
-		virtual std::string getMemObjectType(){return "Resampler";};
+		virtual std::string getMemObjectType() const {return "Resampler";};
 
 
 };

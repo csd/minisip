@@ -58,7 +58,7 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 
 		virtual ~SipDialogConfVoip();
 
-		virtual std::string getMemObjectType(){return "SipDialogConfVoip";}
+		virtual std::string getMemObjectType() const {return "SipDialogConfVoip";}
 		
 		virtual std::string getName(){return "SipDialogConfVoip[callid="+dialogState.callId +"]";}
 

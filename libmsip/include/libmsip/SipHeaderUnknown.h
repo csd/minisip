@@ -54,7 +54,7 @@ class LIBMSIP_API SipHeaderValueUnknown: public SipHeaderValueString{
 	public:
 		SipHeaderValueUnknown(const std::string &headerName, const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderUnknown";}
+                virtual std::string getMemObjectType() const {return "SipHeaderUnknown";}
 };
 
 #endif

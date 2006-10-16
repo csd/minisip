@@ -52,7 +52,7 @@ class LIBMINISIP_API AlsaSoundDevice: public SoundDevice{
 
 		virtual void sync();
 
-		virtual std::string getMemObjectType(){ return "AlsaSoundDevice";};
+		virtual std::string getMemObjectType() const { return "AlsaSoundDevice";};
 
 
 	private:

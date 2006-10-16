@@ -47,7 +47,7 @@ class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 		SdpHeaderC(std::string netType, std::string addrType, std::string addr);
 		virtual ~SdpHeaderC();
 		
-		virtual std::string getMemObjectType(){return "SdpHeaderC";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderC";}
 
 		const std::string &getNetType() const;
 		void setNetType(std::string netType);

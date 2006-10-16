@@ -36,7 +36,7 @@ class LIBMSIP_API SipMessageContentIM : public SipMessageContent{
 public:
 	SipMessageContentIM(std::string m);
 	
-	virtual std::string getMemObjectType(){return "SipMessageContentIM";}
+	virtual std::string getMemObjectType() const {return "SipMessageContentIM";}
 	
 	virtual std::string getString();
 

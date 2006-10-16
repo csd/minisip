@@ -148,7 +148,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 			states.clear();
 		}
 		
-		std::string getMemObjectType(){return "StateMachine";}
+		std::string getMemObjectType() const {return "StateMachine";}
 		
 		/**
 		 * Adds a state that will have no transitions connected to
@@ -269,7 +269,7 @@ class State : public MObject{
 			transitions.clear();	
 		}
 
-		std::string getMemObjectType(){return "State";}
+		std::string getMemObjectType() const {return "State";}
 		
 		void register_transition(MRef<StateTransition<CommandType, TimeoutType> *> transition){
 			transitions.push_back(transition);
@@ -337,7 +337,7 @@ class StateTransition : public MObject{
 			to_state=NULL; 
 		}
 				
-		std::string getMemObjectType(){return "StateTransition";}
+		std::string getMemObjectType() const {return "StateTransition";}
 
 		bool handleCommand(const CommandType &c){
 			bool handled;

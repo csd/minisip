@@ -81,7 +81,7 @@ class XvPlugin: public VideoDisplayPlugin{
 	public:
 		XvPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){}
 		
-		virtual std::string getMemObjectType() { return "XvPlugin"; }
+		virtual std::string getMemObjectType() const { return "XvPlugin"; }
 
 		virtual std::string getName() const { return "xv"; }
 

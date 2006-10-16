@@ -48,7 +48,7 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 		void addDialog(MRef<SipDialog*> d);
 		void removeTerminatedDialogs();
 
-		virtual std::string getMemObjectType() {return "SipLayerDialog";}
+		virtual std::string getMemObjectType() const {return "SipLayerDialog";}
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
 		

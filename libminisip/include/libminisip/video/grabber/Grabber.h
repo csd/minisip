@@ -52,7 +52,7 @@ class LIBMINISIP_API Grabber : public Runnable{
 
 		virtual void setHandler( ImageHandler * handler )=0;
 
-		virtual std::string getMemObjectType(){return "Grabber";}
+		virtual std::string getMemObjectType() const {return "Grabber";}
 		
 };
 

@@ -51,7 +51,7 @@ class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 
 		virtual ~SipHeaderValueWarning();
 
-                virtual std::string getMemObjectType(){return "SipHeaderWarning";}
+                virtual std::string getMemObjectType() const {return "SipHeaderWarning";}
 		
 		/**
 		 * returns string representation of the header

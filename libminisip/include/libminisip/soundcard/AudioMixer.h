@@ -60,7 +60,7 @@ class LIBMINISIP_API AudioMixer: public MObject{
 		AudioMixer();
 		virtual ~AudioMixer();
 		
-		virtual std::string getMemObjectType(){return "AudioMixer";};
+		virtual std::string getMemObjectType() const {return "AudioMixer";};
 		
 		/**
 		Given the list of sources, mix their audio and return

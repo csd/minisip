@@ -64,7 +64,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		SipSoftPhoneConfiguration();
 		virtual ~SipSoftPhoneConfiguration();
 
-		virtual std::string getMemObjectType(){return "SipSoftPhoneConfig";}
+		virtual std::string getMemObjectType() const {return "SipSoftPhoneConfig";}
 
 		void save();
 		std::string load( MRef<ConfBackend *> be );

@@ -106,7 +106,7 @@ class LIBMSIP_API SipUri : public MObject{
 		*/
 		std::string getRequestUriString() const;
 
-		virtual std::string getMemObjectType(){return "SipUri";}
+		virtual std::string getMemObjectType() const {return "SipUri";}
 
 		void setDisplayName(std::string id);
 		std::string getDisplayName() const;

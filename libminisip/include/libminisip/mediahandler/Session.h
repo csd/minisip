@@ -159,7 +159,7 @@ class LIBMINISIP_API Session : public MObject{
 		 */
 		bool isSecure();
 
-		virtual std::string getMemObjectType(){return "Session";}
+		virtual std::string getMemObjectType() const {return "Session";}
 
 		/**
 		 * Returns the CallId identifier shared with the SIP

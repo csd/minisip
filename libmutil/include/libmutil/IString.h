@@ -75,7 +75,7 @@ public:
 	 * Implemented only for debugging purposes (see MObject/MRef for
 	 * more information on this method).
 	 */
-	std::string getMemObjectType(){return "StringAtom";}
+	std::string getMemObjectType() const {return "StringAtom";}
 
 	/**
 	 * @return	The internal character buffer. A user is not
@@ -162,7 +162,7 @@ public:
 	 * Implemented only for debugging purposes (see MObject/MRef for
 	 * more information on this method).
 	 */
-	std::string getMemObjectType(){return "IString";}
+	std::string getMemObjectType() const {return "IString";}
 
 	/**
 	 * Returns a C++ style string (std::string). This method

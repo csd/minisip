@@ -62,7 +62,7 @@ class LIBMINISIP_API VideoCodec : public Codec{
 		void startSend( uint32_t width, uint32_t height );
 		void stopSend();
 
-		virtual std::string getMemObjectType(){return "AVCodec";}
+		virtual std::string getMemObjectType() const {return "AVCodec";}
 
 		virtual std::string getPluginType()const{return "VideoCodec";}
 

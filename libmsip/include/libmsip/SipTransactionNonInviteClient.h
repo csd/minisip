@@ -63,7 +63,7 @@ class SipTransactionNonInviteClient: public SipTransactionClient{
 				const std::string &callid);
                 ~SipTransactionNonInviteClient();
 		
-		virtual std::string getMemObjectType(){return "SipTransactionNonInvCli";}
+		virtual std::string getMemObjectType() const {return "SipTransactionNonInvCli";}
 		
 		virtual std::string getName(){return "transaction_noninviteclient[branch="+getBranch()+",type="+getDebugTransType()+"]";}
 

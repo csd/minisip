@@ -39,7 +39,7 @@ class SimpleIp6Provider: public IpProvider{
 		virtual std::string getLocalIp();
 		virtual uint16_t getExternalPort( MRef<UDPSocket *> sock );
 
-		virtual std::string getMemObjectType(){return "SimpleIp6Provider";};
+		virtual std::string getMemObjectType() const {return "SimpleIp6Provider";};
 
 		enum Scope { INVALID = 0, LINK_LOCAL = 2, SITE_LOCAL = 5, GLOBAL = 0xE };
 

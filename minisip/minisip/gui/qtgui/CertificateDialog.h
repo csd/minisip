@@ -111,7 +111,7 @@ class CertChainItem: public QListViewItem, public MObject{
 
 		MRef<certificate *> getCert(){ return cert; }
 
-		virtual string getMemObjectType(){return "CertChainItem";}
+		virtual string getMemObjectType() const {return "CertChainItem";}
 
 		string fileName;
 		string pkFileName;

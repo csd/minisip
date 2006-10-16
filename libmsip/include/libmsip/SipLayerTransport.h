@@ -53,7 +53,7 @@ class SipCommandDispatcher;
 class SocketServer : public Runnable{
 	public:
 		SocketServer(MRef<ServerSocket*> sock, MRef<SipLayerTransport*> r);
-		std::string getMemObjectType(){return "SocketServer";}
+		std::string getMemObjectType() const {return "SocketServer";}
 		void run();
 		void start();
 		void stop();
@@ -88,7 +88,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		
 		void setDispatcher(MRef<SipCommandDispatcher*> d);
 
-		virtual std::string getMemObjectType(){return "SipLayerTransport";}
+		virtual std::string getMemObjectType() const {return "SipLayerTransport";}
 
 		void sendMessage(MRef<SipMessage*> pack, const std::string &branch,
 				 bool addVia);

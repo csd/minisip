@@ -50,7 +50,7 @@ class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 
 		virtual ~SipHeaderValueExpires();
 		
-                virtual std::string getMemObjectType(){return "SipHeaderExpires";}
+                virtual std::string getMemObjectType() const {return "SipHeaderExpires";}
 		
 		/**
 		 * returns string representation of the header

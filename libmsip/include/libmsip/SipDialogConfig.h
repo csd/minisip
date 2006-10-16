@@ -105,7 +105,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		std::string getTransport(){ return transport; };
 		void setTransport( std::string transport ){this->transport = transport; };
 
-		std::string getMemObjectType(){return "SipProxy";}
+		std::string getMemObjectType() const {return "SipProxy";}
 		
 		/**
 		True to indicate that the proxy settings are to be looked up using DNS SRV
@@ -196,7 +196,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		std::string getDebugString();
 
-		virtual std::string getMemObjectType(){return "SipIdentity";}
+		virtual std::string getMemObjectType() const {return "SipIdentity";}
 		
 		/**
 		This identities index number. Useful to identify it across minisip.
@@ -263,7 +263,7 @@ class LIBMSIP_API SipCommonConfig : public MObject{
 	public:
 		SipCommonConfig();
 
-		virtual std::string getMemObjectType(){return "SipCommonConfig";}
+		virtual std::string getMemObjectType() const {return "SipCommonConfig";}
 		
 		//shared with Dialog config
 //		std::string userUri; 	//General->Users SIP address
@@ -307,7 +307,7 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
 		SipDialogConfig(MRef<SipCommonConfig *> phone_config);
 
-		virtual std::string getMemObjectType(){return "SipDialogConfig";}
+		virtual std::string getMemObjectType() const {return "SipDialogConfig";}
 		
 		MRef<SipCommonConfig *> inherited;
 

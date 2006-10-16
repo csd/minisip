@@ -60,7 +60,7 @@ class CADb: public MObject{
 		~CADb();
 		
 		//X509_STORE * getDb();
-		virtual std::string getMemObjectType(){return "ca_db";}
+		virtual std::string getMemObjectType() const {return "ca_db";}
 		//void addDirectory( std::string dir );
 		void addFile( std::string file );
 		void addCertificate( Certificate * cert );
@@ -94,7 +94,7 @@ class Certificate: public MObject{
 			     const std::string privateKeyFilename );
 		Certificate( unsigned char * derCert, int length );
 		~Certificate();
-		virtual std::string getMemObjectType(){return "Certificate";}
+		virtual std::string getMemObjectType() const {return "Certificate";}
 		
 		int control( CADb * certDb );
 
@@ -132,7 +132,7 @@ class CertificateChain: public MObject{
 		CertificateChain( MRef<Certificate *> cert );
 		~CertificateChain();
 		
-		virtual std::string getMemObjectType(){return "CertificateChain";}
+		virtual std::string getMemObjectType() const {return "CertificateChain";}
 		
 		void addCertificate( MRef<Certificate *> cert );
 		void removeCertificate( MRef<Certificate *> cert );

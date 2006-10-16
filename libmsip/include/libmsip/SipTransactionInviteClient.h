@@ -66,7 +66,7 @@ class SipTransactionInviteClient: public SipTransactionClient{
 		
 		virtual ~SipTransactionInviteClient();
 
-		virtual std::string getMemObjectType(){return "SipTransactionInvCli";}
+		virtual std::string getMemObjectType() const {return "SipTransactionInvCli";}
 		virtual std::string getName(){return "transaction_invite_client[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();

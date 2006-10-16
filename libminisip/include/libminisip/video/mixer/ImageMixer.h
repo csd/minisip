@@ -60,7 +60,7 @@ class LIBMINISIP_API ImageMixer : public ImageHandler, public MObject{
 
 		void setMedia( MRef<VideoMedia *> media );
 
-		virtual std::string getMemObjectType(){return "ImageMixer";};
+		virtual std::string getMemObjectType() const {return "ImageMixer";};
 	private:
 		ImageHandler * output;
 

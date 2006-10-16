@@ -55,7 +55,7 @@ class LIBMINISIP_API PhoneBook : public MObject{
 
 		std::string getPhoneBookId();
 		
-		virtual std::string getMemObjectType(){return "PhoneBook";};
+		virtual std::string getMemObjectType() const {return "PhoneBook";};
 
 	private:
 		MRef<PhoneBookIo *> io;
@@ -86,7 +86,7 @@ class LIBMINISIP_API PhoneBookPerson : public MObject{
 		void addEntry( MRef<ContactEntry *> );
 		void delEntry( MRef<ContactEntry *> );
 		
-		virtual std::string getMemObjectType(){return "PhoneBookPerson";}
+		virtual std::string getMemObjectType() const {return "PhoneBookPerson";}
 	private:
 		std::string name;
 		MRef< PhoneBook * > phoneBook;

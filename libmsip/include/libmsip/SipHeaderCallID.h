@@ -50,7 +50,7 @@ class LIBMSIP_API SipHeaderValueCallID: public SipHeaderValueString{
 		
 		SipHeaderValueCallID(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderCallID";}
+                virtual std::string getMemObjectType() const {return "SipHeaderCallID";}
 };
 
 #endif

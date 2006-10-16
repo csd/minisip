@@ -51,7 +51,7 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 		
 		std::list<MRef<SipTransaction*> > getTransactionsWithCallId(std::string callid);
 		
-		virtual std::string getMemObjectType() {return "SipLayerTransaction";}
+		virtual std::string getMemObjectType() const {return "SipLayerTransaction";}
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
 		

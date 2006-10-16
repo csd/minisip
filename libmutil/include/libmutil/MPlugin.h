@@ -79,7 +79,7 @@ class LIBMUTIL_API MPlugin : public virtual MObject{
 		/**
 		 * @returns the MemObject type.
 		 **/
-		virtual std::string getMemObjectType()=0;
+		virtual std::string getMemObjectType() const =0;
 
 	protected:
 		MPlugin(MRef<Library*> lib);

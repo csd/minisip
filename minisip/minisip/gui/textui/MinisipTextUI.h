@@ -46,7 +46,7 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	public:
 		MinisipTextUI();
 	
-		std::string getMemObjectType(){return "MinisipTextUI";}
+		std::string getMemObjectType() const {return "MinisipTextUI";}
 		
 		virtual void handleCommand(const CommandString&);
 		virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);

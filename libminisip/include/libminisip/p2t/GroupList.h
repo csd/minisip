@@ -89,7 +89,7 @@ class LIBMINISIP_API GroupList: public MObject{
 		 * Used by the Memory Handling of Minisip.
 		 * @return the  std::string 'GroupList'
 		 */
-		virtual std::string getMemObjectType(){return "GroupList";}
+		virtual std::string getMemObjectType() const {return "GroupList";}
 		
 		/**
 		 *get the GroupIdentity

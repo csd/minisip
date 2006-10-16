@@ -65,7 +65,7 @@ public:
 	/**
 	 * Defined in MObject. Used only for monitoring/debugging.
 	 */
-	std::string getMemObjectType(){ return "Library"; }
+	std::string getMemObjectType() const { return "Library"; }
 
 protected:
 	/**

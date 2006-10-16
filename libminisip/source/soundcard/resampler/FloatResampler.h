@@ -69,7 +69,7 @@ class FloatResamplerPlugin: public ResamplerPlugin{
 						   duration, nChannels );
 		}
 
-		virtual std::string getMemObjectType(){ return "FloatResamplerPlugin"; }
+		virtual std::string getMemObjectType() const { return "FloatResamplerPlugin"; }
 };
 
 

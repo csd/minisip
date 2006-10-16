@@ -96,7 +96,7 @@ class CertTreeStore : public MObject{
 	public:
 		CertTreeStore();
 
-		virtual std::string getMemObjectType(){return "CertTreeStore";}
+		virtual std::string getMemObjectType() const {return "CertTreeStore";}
 		void addCertificate( MRef<certificate *> );
 		MRef<certificate_chain *> getCertChain();
 		void associateTreeView( Gtk::TreeView * certTreeView );
@@ -118,7 +118,7 @@ class CaListStore : public MObject{
 		CaListStore();
 
 		void addCaItem( ca_db_item * caItem );
-		virtual std::string getMemObjectType(){return "CaListStore";}
+		virtual std::string getMemObjectType() const {return "CaListStore";}
 		//MRef<certificate_chain *> getCertChain();
 		
 		void associateTreeView( Gtk::TreeView * caTreeView );

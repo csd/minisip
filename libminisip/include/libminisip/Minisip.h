@@ -21,7 +21,7 @@ class LIBMINISIP_API Minisip : public MObject{
 		Minisip( MRef<Gui *> gui, int argc, char**argv );
 		virtual ~Minisip();
 		
-		std::string getMemObjectType(){return "Minisip";}
+		std::string getMemObjectType() const {return "Minisip";}
 
 		int exit();
 		int startSip();

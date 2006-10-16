@@ -39,7 +39,7 @@ class OnlineMXmlPhoneBookIo : public PhoneBookIo{
                 OnlineMXmlPhoneBookIo(OnlineConfBack *confback );
 		virtual void save( MRef< PhoneBook * > book );
 		virtual MRef< PhoneBook * > load();
-		virtual std::string getMemObjectType(){return "PhoneBookIo";}
+		virtual std::string getMemObjectType() const {return "PhoneBookIo";}
 
 		virtual std::string getPhoneBookId();
 

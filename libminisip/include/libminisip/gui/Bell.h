@@ -42,7 +42,7 @@ class LIBMINISIP_API Bell: public MObject{
 		void loop();
 
 		void timeout(const std::string &command);
-		virtual std::string getMemObjectType(){return "Bell";};
+		virtual std::string getMemObjectType() const {return "Bell";};
 	private:
 //		TimeoutProvider<string, MRef<Bell*> > timeout_provider;
 		volatile bool running;

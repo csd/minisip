@@ -59,7 +59,7 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 		*/
 		AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList );
 		
-		virtual std::string getMemObjectType(){return "AudioMedia";}
+		virtual std::string getMemObjectType() const {return "AudioMedia";}
 
 		/**
 		* Returns the media type as used in the SDP (audio or video).

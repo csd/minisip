@@ -65,7 +65,7 @@ class LIBMINISIP_API DtmfSender : public MObject {
 	public:
 		DtmfSender( MRef<Session *> session );
 		void timeout( DtmfEvent * event );
-		virtual std::string getMemObjectType(){ return "DtmfSender"; };
+		virtual std::string getMemObjectType() const { return "DtmfSender"; };
 
 	private:
 		MRef<Session *> session;

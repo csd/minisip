@@ -70,7 +70,7 @@ class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 
 		virtual ~SipHeaderValueAcceptContact();
 
-		std::string getMemObjectType(){return "SipHeaderAcceptContact";}
+		std::string getMemObjectType() const {return "SipHeaderAcceptContact";}
 		
 		/**
 		 * returns string representation of the header

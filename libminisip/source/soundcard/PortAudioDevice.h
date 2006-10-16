@@ -48,7 +48,7 @@ class PortAudioDevice: public SoundDevice{
 
 		virtual void sync();
 
-		virtual std::string getMemObjectType(){ return "PortaudioDevice";};
+		virtual std::string getMemObjectType() const { return "PortaudioDevice";};
 
 	protected:
 		virtual int callback( const void *inputBuffer,

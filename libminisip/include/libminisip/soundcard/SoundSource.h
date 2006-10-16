@@ -52,7 +52,7 @@ class LIBMINISIP_API SoundSource : public MObject{
 	public:
 		SoundSource(int id);
 		virtual ~SoundSource(){};
-		virtual std::string getMemObjectType(){return "SoundSource";};
+		virtual std::string getMemObjectType() const {return "SoundSource";};
 
 		/**
 		* @return Identifier of source that generated the audio.

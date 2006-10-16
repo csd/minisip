@@ -135,7 +135,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		virtual ~SipDialog();
 		
-		virtual std::string getMemObjectType(){return "SipDialog";}
+		virtual std::string getMemObjectType() const {return "SipDialog";}
 
 		/**
 		 * The SipSMCommand handler.

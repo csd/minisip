@@ -59,7 +59,7 @@ class LIBMINISIP_API OssSoundDevice: public SoundDevice{
 
 		virtual void sync();
 
-		virtual std::string getMemObjectType(){ return "OssSoundDevice";};
+		virtual std::string getMemObjectType() const { return "OssSoundDevice";};
 
 	private:
 		int fdPlayback;

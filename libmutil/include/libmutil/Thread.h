@@ -68,7 +68,7 @@ public:
 	Thread(MRef<Runnable *>runnable);
 	~Thread();
 
-	std::string getMemObjectType(){return "Thread";}
+	std::string getMemObjectType() const {return "Thread";}
 
 	/**
 	 * Purpose: Create thread that executes a function and return handle 

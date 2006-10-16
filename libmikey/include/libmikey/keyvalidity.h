@@ -47,7 +47,7 @@ class LIBMIKEY_API KeyValidity : public MObject{
 		int type();
 		virtual void writeData( byte_t * start, int expectedLength );
 		virtual std::string debugDump();
-		virtual std::string getMemObjectType(){ return "KeyValidity"; };
+		virtual std::string getMemObjectType() const { return "KeyValidity"; };
 	protected:
 		int typeValue;
 		

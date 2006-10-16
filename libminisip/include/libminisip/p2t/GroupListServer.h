@@ -80,7 +80,7 @@ class LIBMINISIP_API GroupListServer: public Runnable{
 		 */
 		GroupListServer(MRef<SipSoftPhoneConfiguration*>config, int32_t localPort);
 		
-		virtual std::string getMemObjectType(){return "GroupListServer";}
+		virtual std::string getMemObjectType() const {return "GroupListServer";}
 		
 		/**
 		 * Destructor

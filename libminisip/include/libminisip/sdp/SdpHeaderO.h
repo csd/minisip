@@ -44,7 +44,7 @@ class LIBMINISIP_API SdpHeaderO : public SdpHeader{
 		SdpHeaderO(std::string username, std::string session_id, std::string version, std::string net_type, std::string addr_type, std::string addr);
 		virtual ~SdpHeaderO();
 		
-		virtual std::string getMemObjectType(){return "SdpHeaderO";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderO";}
 
 		std::string getUsername();
 		void setUsername(std::string username);

@@ -55,7 +55,7 @@ class LIBMINISIP_API AudioMixerSpatial: public AudioMixer {
 		AudioMixerSpatial(MRef<SpAudio *> spatial);
 		virtual ~AudioMixerSpatial();
 		
-		virtual std::string getMemObjectType(){return "AudioMixerSpatial";};
+		virtual std::string getMemObjectType() const {return "AudioMixerSpatial";};
 		
 		/**
 		Given the list of sources, mix their audio and return

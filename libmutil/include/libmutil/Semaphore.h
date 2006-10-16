@@ -45,7 +45,7 @@ class LIBMUTIL_API Semaphore : public MObject{
         Semaphore();
         ~Semaphore();
         
-	std::string getMemObjectType(){return "Semaphore";}
+	std::string getMemObjectType() const {return "Semaphore";}
 
         /**
          * Put one resource into the set of resources.

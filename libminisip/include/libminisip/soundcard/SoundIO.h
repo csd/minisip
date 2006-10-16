@@ -179,7 +179,7 @@ class LIBMINISIP_API SoundIO : public MObject{
 		 
 		MRef<SoundSource *> getSoundSource(int32_t id);
 
-		virtual std::string getMemObjectType(){return "SoundIO";};
+		virtual std::string getMemObjectType() const {return "SoundIO";};
 		
 		/**
 		Access the mixer.

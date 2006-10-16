@@ -51,7 +51,7 @@ class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 		virtual ~SipHeaderValueContentLength();
 		
 
-                virtual std::string getMemObjectType(){return "SipHeaderContentLength";}
+                virtual std::string getMemObjectType() const {return "SipHeaderContentLength";}
 		
 		/**
 		 * returns string representation of the header

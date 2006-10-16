@@ -67,7 +67,7 @@ class SipTransactionInviteServer : public SipTransactionServer{
 		
 		virtual ~SipTransactionInviteServer();
 
-		virtual std::string getMemObjectType(){return "SipTransactionInvServer";}
+		virtual std::string getMemObjectType() const {return "SipTransactionInvServer";}
 		virtual std::string getName(){return "transaction_INVITE_responder[branch="+getBranch()+"]";}
 
 		void setUpStateMachine();

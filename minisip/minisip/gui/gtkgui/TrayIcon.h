@@ -42,7 +42,7 @@ class MTrayIcon: public MObject
 			   Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 		~MTrayIcon();
 
-		virtual std::string getMemObjectType(){return "MTrayIcon";}
+		virtual std::string getMemObjectType() const {return "MTrayIcon";}
 
 		Gtk::Window * getWindow();
 	private:

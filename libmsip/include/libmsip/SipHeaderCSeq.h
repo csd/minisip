@@ -52,7 +52,7 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 
 		virtual ~SipHeaderValueCSeq();
 		
-                virtual std::string getMemObjectType(){return "SipHeaderCSeq";}
+                virtual std::string getMemObjectType() const {return "SipHeaderCSeq";}
 		
 		/**
 		 * returns string representation of the header

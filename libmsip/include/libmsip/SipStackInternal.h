@@ -53,7 +53,7 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 		void setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb);
 
-		virtual std::string getMemObjectType(){return "SipStackInternal";}
+		virtual std::string getMemObjectType() const {return "SipStackInternal";}
 		
                 virtual void run();
 		virtual void stopRunning();

@@ -44,7 +44,7 @@ class AccountsList : public MObject, public Gtk::ListStore{
 
 		AccountsListColumns * getColumns();
 
-		virtual std::string getMemObjectType(){return "AccountsList";};
+		virtual std::string getMemObjectType() const {return "AccountsList";};
 		AccountsListColumns *columns;
 
 	private:

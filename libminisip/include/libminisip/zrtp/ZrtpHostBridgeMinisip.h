@@ -83,7 +83,7 @@ public ZrtpCallback {
 
  public:
 
-    virtual std::string getMemObjectType() { return "ZrtpHostBridgeMinisip";}
+    virtual std::string getMemObjectType() const { return "ZrtpHostBridgeMinisip";}
 
     /**
      * Initialize the host bridge.

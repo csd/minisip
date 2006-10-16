@@ -92,7 +92,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		
 		virtual ~TLSSocket();
 
-		virtual std::string getMemObjectType(){return "TLSSocket";};
+		virtual std::string getMemObjectType() const {return "TLSSocket";};
 
 		virtual int32_t write(std::string);
 		

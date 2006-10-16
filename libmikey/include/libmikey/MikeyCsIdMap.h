@@ -59,7 +59,7 @@ class LIBMIKEY_API MikeyCsIdMap : public MObject{
                 virtual void writeData( byte_t * start,
                                          int expectedLength )=0;
 		virtual std::string debugDump()=0;
-		virtual std::string getMemObjectType(){ return "MikeyCsIdMap";};
+		virtual std::string getMemObjectType() const { return "MikeyCsIdMap";};
 };
 
 // Srtp map

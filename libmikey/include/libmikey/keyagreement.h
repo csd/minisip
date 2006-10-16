@@ -142,7 +142,7 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		std::string authError();
 		void setAuthError( std::string error );
 
-		virtual std::string getMemObjectType(){return "KeyAgreement";}
+		virtual std::string getMemObjectType() const {return "KeyAgreement";}
 
 		/* IPSEC Specific */
 		void addIpsecSA( uint32_t spi, uint32_t spiSrcaddr, uint32_t spiDstaddr, 

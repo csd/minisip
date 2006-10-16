@@ -76,7 +76,7 @@ class G711Codec : public AudioCodec{
 
 		virtual std::string getSdpMediaAttributes();
 		
-		virtual std::string getMemObjectType(){return "G711Codec";}		
+		virtual std::string getMemObjectType() const {return "G711Codec";}		
 		
 		virtual uint32_t getVersion()const;
 };

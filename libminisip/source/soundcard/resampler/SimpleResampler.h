@@ -69,7 +69,7 @@ class SimpleResamplerPlugin: public ResamplerPlugin{
 						   duration, nChannels );
 		}
 
-		virtual std::string getMemObjectType(){ return "SimpleResamplerPlugin"; }
+		virtual std::string getMemObjectType() const { return "SimpleResamplerPlugin"; }
 };
 
 #endif

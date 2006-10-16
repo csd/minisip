@@ -287,7 +287,7 @@ class LIBMINISIP_API SipDialogP2T: public SipDialog{
 		 */	
 		virtual std::string getName(){return "SipDialogP2T";}
 
-		virtual std::string getMemObjectType(){return getName();}
+		virtual std::string getMemObjectType() const {return getName();}
 
 		void setCallId(std::string id){dialogState.callId = id;}
 		std::string getCallId(){return dialogState.callId;}

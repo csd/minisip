@@ -120,7 +120,7 @@ class MainWindow : public GtkMainUI,
 		
 		virtual void dtmfPressed( uint8_t symbol );
 
-		virtual std::string getMemObjectType(){return "MainWindow";};
+		virtual std::string getMemObjectType() const {return "MainWindow";};
 
 		std::string getDataFileName( std::string baseName );
 		

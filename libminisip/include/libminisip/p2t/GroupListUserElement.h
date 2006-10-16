@@ -91,7 +91,7 @@ class LIBMINISIP_API GroupListUserElement: public MObject{
 		 * Used by the Memory Handling of Minisip.
 		 * @return the  std::string 'GroupListUserElement'
 		 */
-		virtual std::string getMemObjectType(){return "GroupListUserElement";}
+		virtual std::string getMemObjectType() const {return "GroupListUserElement";}
 
 		/**
 		 * set user's uri

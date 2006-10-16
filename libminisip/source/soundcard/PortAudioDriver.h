@@ -44,7 +44,7 @@ class PortAudioDriver: public SoundDriver{
 			return "PortAudio";
 		}
 
-		virtual std::string getMemObjectType(){ return getName(); }
+		virtual std::string getMemObjectType() const { return getName(); }
 
 		virtual uint32_t getVersion() const;
 

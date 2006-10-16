@@ -96,7 +96,7 @@ class LIBMINISIP_API SipDialogP2Tuser: public SipDialog{
 		 * returns the type of the dialog. Used by the memory management.
 		 * @return "SipDialogP2Tuser" 
 		 */	
-		virtual std::string getMemObjectType(){return "SipDialogP2Tuser";}
+		virtual std::string getMemObjectType() const {return "SipDialogP2Tuser";}
 		
 		/**
 		 * returns the name of the dialog. Used by the memory management.

@@ -109,7 +109,7 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
                  */
                 MRef<CommandReceiver *> getMessageRouterCallback() { return messageRouterCallback;}
 
-		virtual std::string getMemObjectType(){return "MediaHandler";}
+		virtual std::string getMemObjectType() const {return "MediaHandler";}
 
 #ifdef DEBUG_OUTPUT	
 		virtual std::string getDebugString();

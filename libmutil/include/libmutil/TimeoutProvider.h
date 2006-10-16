@@ -145,7 +145,7 @@ template<class TOCommand, class TOSubscriber>
 class TimeoutProvider : public Runnable{
 
 	public:
-		std::string getMemObjectType(){return "TimeoutProvider";}
+		std::string getMemObjectType() const {return "TimeoutProvider";}
 
 		/**
 		 * The purpose of this method is mainly

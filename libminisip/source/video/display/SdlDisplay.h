@@ -81,7 +81,7 @@ class SdlPlugin: public VideoDisplayPlugin{
 		SdlPlugin( MRef<Library *> lib );
 		~SdlPlugin();
 		
-		virtual std::string getMemObjectType() { return "SdlPlugin"; }
+		virtual std::string getMemObjectType() const { return "SdlPlugin"; }
 
 		virtual std::string getName() const { return "sdl"; }
 

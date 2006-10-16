@@ -50,7 +50,7 @@ class LIBMINISIP_API SpAudio: public MObject{
 		
 		void init();
 
-		virtual std::string getMemObjectType() {return "SpAudio";}
+		virtual std::string getMemObjectType() const {return "SpAudio";}
 		int32_t getNumPos();
 		
 		int32_t spatialize (short *input,

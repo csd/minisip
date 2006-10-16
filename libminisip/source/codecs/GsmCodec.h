@@ -40,7 +40,7 @@ class GsmCodec: public AudioCodec{
 		std::string getCodecDescription();
 		uint8_t getSdpMediaType();
 		std::string getSdpMediaAttributes();
-		std::string getMemObjectType(){return "GsmCodec";};
+		std::string getMemObjectType() const {return "GsmCodec";};
 
 //		int32_t getEncodedNrBytes();
 		int32_t getInputNrSamples();
@@ -58,7 +58,7 @@ class GsmCodecState: public CodecState{
 		uint32_t encode( void *inBuf, int32_t inSize, void *outBuf );
 		uint32_t decode( void *inBuf, int32_t inSize, void *outBuf );
 
-		std::string getMemObjectType(){return "GsmCodecState";};
+		std::string getMemObjectType() const {return "GsmCodecState";};
 
 	private:
 		gsm gsmState;

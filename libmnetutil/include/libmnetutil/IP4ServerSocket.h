@@ -33,7 +33,7 @@ class LIBMNETUTIL_API IP4ServerSocket : public ServerSocket {
 	public:
 		IP4ServerSocket(int32_t listenport, int32_t backlog=25);
 
-		virtual std::string getMemObjectType(){return "IP4ServerSocket";}
+		virtual std::string getMemObjectType() const {return "IP4ServerSocket";}
 
 		//inherited: TCPSocket *accept();
 		virtual struct sockaddr *getSockaddrStruct(int32_t &ret_length);

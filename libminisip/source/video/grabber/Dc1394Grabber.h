@@ -87,7 +87,7 @@ class Dc1394Plugin : public GrabberPlugin{
 
 		virtual MRef<Grabber *> create( const std::string &device ) const;
 
-		virtual std::string getMemObjectType() { return "Dc1394Plugin"; }
+		virtual std::string getMemObjectType() const { return "Dc1394Plugin"; }
 
 		virtual std::string getName() const { return "fw"; }
 

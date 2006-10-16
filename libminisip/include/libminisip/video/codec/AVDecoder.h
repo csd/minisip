@@ -45,7 +45,7 @@ class LIBMINISIP_API AVDecoder : public MObject{
 
 		void decodeFrame( uint8_t * data, uint32_t length );
 
-		virtual std::string getMemObjectType(){ return "AVDecoder";};
+		virtual std::string getMemObjectType() const { return "AVDecoder";};
 
 		void close();
 

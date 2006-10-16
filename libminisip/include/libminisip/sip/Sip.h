@@ -59,7 +59,7 @@ class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
 
 		virtual ~Sip();
 
-		virtual std::string getMemObjectType(){return "Sip";}
+		virtual std::string getMemObjectType() const {return "Sip";}
 		
 		MRef<SipSoftPhoneConfiguration*> getPhoneConfig();
 		

@@ -57,7 +57,7 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs);
 	//	SdpPacket(string ipAddr, int32_t local_media_port, vector<CODECInterface *> &codecs, string key_mgmt);
 	
-		virtual std::string getMemObjectType(){return "SdpPacket";}
+		virtual std::string getMemObjectType() const {return "SdpPacket";}
 		
 		MRef<SdpHeaderC*> getSessionLevelConnection();
 		std::string getKeyMgmt();

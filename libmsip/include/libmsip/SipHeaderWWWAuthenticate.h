@@ -56,7 +56,7 @@ class LIBMSIP_API SipHeaderValueWWWAuthenticate: public SipHeaderValueProxyAuthe
 
 		virtual ~SipHeaderValueWWWAuthenticate();
 
-                virtual std::string getMemObjectType(){return "SipHeaderWWWAuthenticate";}
+                virtual std::string getMemObjectType() const {return "SipHeaderWWWAuthenticate";}
 		
 	private:
 };

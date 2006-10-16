@@ -66,7 +66,7 @@ class LIBMSIP_API SipSMCommand : public MObject{
 		 */
 		SipSMCommand(MRef<SipMessage*> cmd, int source, int destination);
 
-		virtual std::string getMemObjectType(){return "SipSMCommand";}
+		virtual std::string getMemObjectType() const {return "SipSMCommand";}
 
 		int getType() const;
 

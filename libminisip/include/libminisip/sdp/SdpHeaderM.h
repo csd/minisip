@@ -51,7 +51,7 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		
 		SdpHeaderM &operator=(const SdpHeaderM &src);
 
-		virtual std::string getMemObjectType(){return "SdpHeaderM";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderM";}
 
 		void addFormat(int32_t format);
 		int32_t getNrFormats();

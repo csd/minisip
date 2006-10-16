@@ -51,7 +51,7 @@ class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 
 		virtual ~SipHeaderValueRoute();
 
-                virtual std::string getMemObjectType(){return "SipHeaderRoute";}
+                virtual std::string getMemObjectType() const {return "SipHeaderRoute";}
 		
 		/**
 		 * returns string representation of the header

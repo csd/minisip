@@ -38,7 +38,7 @@ class LIBMSIP_API SipHeaderValueSupported: public SipHeaderValueString{
 	public:
 		SipHeaderValueSupported(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderSupported";}
+                virtual std::string getMemObjectType() const {return "SipHeaderSupported";}
 };
 
 #endif

@@ -138,7 +138,7 @@ int MObject::getRefCount(){
 	return refCount;
 }
 
-string MObject::getMemObjectType(){
+string MObject::getMemObjectType() const {
 #ifdef MDEBUG
 	return (typeid(*this)).name();
 #else

@@ -35,7 +35,7 @@ class LIBMINISIP_API WaveSoundDevice:public SoundDevice{
 		
 		virtual void sync();
 
-		virtual std::string getMemObjectType(){ return "OssSoundDevice";};
+		virtual std::string getMemObjectType() const { return "OssSoundDevice";};
 
 //		HWND getWindow(){return hWnd;};
 

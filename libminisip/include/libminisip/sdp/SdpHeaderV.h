@@ -43,7 +43,7 @@ class LIBMINISIP_API SdpHeaderV : public SdpHeader{
 		SdpHeaderV(std::string buildFrom);
 		SdpHeaderV(int32_t ver);
 
-		virtual std::string getMemObjectType(){return "SdpHeaderV";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderV";}
 
 		int32_t getVersion();
 		void setVersion(int32_t ver);

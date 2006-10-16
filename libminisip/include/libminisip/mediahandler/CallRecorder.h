@@ -72,7 +72,7 @@ class CallRecorder:
 				MRef<IpProvider *> ipProvider );
 		virtual ~CallRecorder( );
 
-		virtual std::string getMemObjectType(){return "CallRecorder";}
+		virtual std::string getMemObjectType() const {return "CallRecorder";}
 	
 		/**
 		* Inherited from SoundRecorderCallback

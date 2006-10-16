@@ -61,7 +61,7 @@ class LIBMINISIP_API DefaultDialogHandler : public /*SipDialog*/ SipSMCommandRec
 		
 		virtual ~DefaultDialogHandler();
 
-		virtual std::string getMemObjectType(){return "DefaultDialogHandler";}
+		virtual std::string getMemObjectType() const {return "DefaultDialogHandler";}
 
 		virtual std::string getName();
 		

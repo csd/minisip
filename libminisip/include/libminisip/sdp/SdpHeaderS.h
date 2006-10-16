@@ -43,7 +43,7 @@ class LIBMINISIP_API SdpHeaderS : public SdpHeader{
 		SdpHeaderS(std::string buildFrom);
 		virtual ~SdpHeaderS();
 		
-		virtual std::string getMemObjectType(){return "SdpHeaderS";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderS";}
 
 		std::string getSessionName();
 		void setSessionName(std::string s);

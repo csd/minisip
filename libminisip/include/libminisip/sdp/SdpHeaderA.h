@@ -42,7 +42,7 @@ class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 		SdpHeaderA(std::string buildFrom);
 		virtual ~SdpHeaderA();
 
-		virtual std::string getMemObjectType(){return "SdpHeaderA";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderA";}
 
 		std::string getAttributes();
 		void setAttributes(std::string attr);

@@ -101,7 +101,7 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		 */
 		MRef<UDPSocket *> getSocket();
 
-		virtual std::string getMemObjectType(){return "RtpReceiver";}
+		virtual std::string getMemObjectType() const {return "RtpReceiver";}
 
 	private:
 		MRef<UDPSocket *> socket;

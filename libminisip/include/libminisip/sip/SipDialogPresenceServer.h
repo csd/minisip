@@ -55,7 +55,7 @@ class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 		
 		virtual ~SipDialogPresenceServer();
 
-		virtual std::string getMemObjectType(){return "SipDialogPresenceServer";}
+		virtual std::string getMemObjectType() const {return "SipDialogPresenceServer";}
 		
 		virtual  std::string getName(){return "SipDialogPresenceServer[callid="+dialogState.callId +"]";}
 

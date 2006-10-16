@@ -43,7 +43,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		virtual std::string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
 		
-		virtual std::string getMemObjectType(){return "SipDialogRegister";}
+		virtual std::string getMemObjectType() const {return "SipDialogRegister";}
 		
 		void updateFailCount(){failCount++;};
 		uint32_t getFailCount(){return failCount;};

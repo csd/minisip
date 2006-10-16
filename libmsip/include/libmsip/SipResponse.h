@@ -51,7 +51,7 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		SipResponse(std::string branch, int32_t status, std::string status_desc, MRef<SipMessage*> inv);
 
 
-		virtual std::string getMemObjectType(){return "SipResponse";}
+		virtual std::string getMemObjectType() const {return "SipResponse";}
 		
 		/**
 		 * Parses response packet from string representation.

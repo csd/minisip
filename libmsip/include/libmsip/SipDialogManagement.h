@@ -44,7 +44,7 @@ class LIBMSIP_API SipDialogManagement: public SipDialog{
 		
 		virtual ~SipDialogManagement();
 
-		virtual std::string getMemObjectType(){return "SipDialogManagement";}
+		virtual std::string getMemObjectType() const {return "SipDialogManagement";}
 		
 		virtual std::string getName(){return "SipDialogManagement (The one and only)";}
 

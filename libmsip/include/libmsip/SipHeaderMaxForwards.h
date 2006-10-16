@@ -51,7 +51,7 @@ class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 
 		virtual ~SipHeaderValueMaxForwards();
 
-                virtual std::string getMemObjectType(){return "SipHeaderMaxForwards";}
+                virtual std::string getMemObjectType() const {return "SipHeaderMaxForwards";}
 		
 		/**
 		 * returns string representation of the header

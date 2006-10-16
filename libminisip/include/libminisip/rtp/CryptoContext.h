@@ -74,7 +74,7 @@ class LIBMINISIP_API CryptoContext : public MObject{
 		int get_tag_length();
 		int get_mki_length();
 
-		virtual std::string getMemObjectType() {return "CryptoContext";}
+		virtual std::string getMemObjectType() const  {return "CryptoContext";}
 
                 uint32_t getSsrc() { return ssrc; }
 

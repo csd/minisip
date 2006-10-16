@@ -114,7 +114,7 @@ class LIBMUTIL_API MObject{
 		 * The purpose of this method is to allow debugging
 		 * (such as showing which objects are allocated).
 		 */
-		virtual std::string getMemObjectType();
+		virtual std::string getMemObjectType() const;
 
 	private:
 		/**

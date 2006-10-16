@@ -73,7 +73,7 @@ class GConfigPlugin : public ConfigPlugin{
 		 */
 		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
 
-		virtual std::string getMemObjectType() { return "GConfBackend"; }
+		virtual std::string getMemObjectType() const { return "GConfBackend"; }
 
 		virtual std::string getName()const;
 

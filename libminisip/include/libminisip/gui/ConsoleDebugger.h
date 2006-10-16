@@ -40,7 +40,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf);
 		~ConsoleDebugger();
 		
-		std::string getMemObjectType(){return "ConsoleDebugger";}
+		std::string getMemObjectType() const {return "ConsoleDebugger";}
 		
 		void showHelp();
 		void showMem();

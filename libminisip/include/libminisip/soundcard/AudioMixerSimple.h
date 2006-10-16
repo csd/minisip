@@ -56,7 +56,7 @@ class LIBMINISIP_API AudioMixerSimple: public AudioMixer {
 		AudioMixerSimple();
 		virtual ~AudioMixerSimple();
 		
-		virtual std::string getMemObjectType(){return "AudioMixerSimple";};
+		virtual std::string getMemObjectType() const {return "AudioMixerSimple";};
 		
 		/**
 		Given the list of sources, mix their audio and return

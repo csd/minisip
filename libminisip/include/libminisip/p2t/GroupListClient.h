@@ -74,7 +74,7 @@ class LIBMINISIP_API GroupListClient: public MObject{
 		 */
 		virtual ~GroupListClient();
 
-		virtual std::string getMemObjectType(){return "GroupListClient";}
+		virtual std::string getMemObjectType() const {return "GroupListClient";}
 		
 		/**
 		 * connects to the specified GroupList Server and returns

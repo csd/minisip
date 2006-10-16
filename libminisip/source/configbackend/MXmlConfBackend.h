@@ -46,7 +46,7 @@ class MXmlConfBackend : public ConfBackend {
 		virtual void commit();
 
 
-		 std::string getMemObjectType(){return "MXmlConfBackend";}
+		 std::string getMemObjectType() const {return "MXmlConfBackend";}
 	private:
 		std::string getDefaultConfigFilename();
 		std::string fileName;
@@ -69,7 +69,7 @@ class MXmlConfigPlugin : public ConfigPlugin{
 		 */
 		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
 
-		virtual std::string getMemObjectType() { return "MXmlConfBackend"; }
+		virtual std::string getMemObjectType() const { return "MXmlConfBackend"; }
 
 		virtual std::string getName()const;
 

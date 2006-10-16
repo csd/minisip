@@ -149,7 +149,7 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 		virtual ~SipRequest();
 
-		virtual std::string getMemObjectType(){return "SipRequest("+method+")";}
+		virtual std::string getMemObjectType() const {return "SipRequest("+method+")";}
 
 		virtual std::string getString();
 

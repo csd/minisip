@@ -69,7 +69,7 @@ class LIBMCRYPTO_API ca_db: public MObject{
 		~ca_db();
 		
 		X509_STORE * get_db();
-		virtual std::string getMemObjectType(){return "ca_db";}
+		virtual std::string getMemObjectType() const {return "ca_db";}
 		void add_directory( std::string dir );
 		void add_file( std::string file );
 		void add_certificate( certificate * cert );
@@ -104,7 +104,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 		certificate( unsigned char * der_cert, int length );
                 certificate( unsigned char * certData, int length, string path );
 		~certificate();
-		virtual std::string getMemObjectType(){return "certificate";}
+		virtual std::string getMemObjectType() const {return "certificate";}
 		
 		int control( ca_db * cert_db );
 
@@ -146,7 +146,7 @@ class LIBMCRYPTO_API certificate_chain: public MObject{
 		certificate_chain( MRef<certificate *> cert );
 		~certificate_chain();
 		
-		virtual std::string getMemObjectType(){return "certificate_chain";}
+		virtual std::string getMemObjectType() const {return "certificate_chain";}
 		
 		void add_certificate( MRef<certificate *> cert );
 		void remove_certificate( MRef<certificate *> cert );

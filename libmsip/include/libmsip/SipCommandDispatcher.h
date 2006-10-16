@@ -79,7 +79,7 @@ class SipCommandDispatcher : public MObject{
 		MRef<SipStackInternal*> getSipStackInternal();
 		
 //#ifdef DEBUG_OUTPUT
-		virtual std::string getMemObjectType() {return "SipCommandDispatcher";}
+		virtual std::string getMemObjectType() const {return "SipCommandDispatcher";}
 //#endif
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);

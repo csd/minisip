@@ -16,7 +16,7 @@ class LIBMINISIP_API PresenceMessageContent : public SipMessageContent{
 	public:
 		PresenceMessageContent(std::string from, std::string to, std::string onlineStatus, std::string onlineStatusDesc);
 		PresenceMessageContent(const std::string &buildFrom);
-		virtual std::string getMemObjectType(){return "PresenceMessageContent";}
+		virtual std::string getMemObjectType() const {return "PresenceMessageContent";}
 		virtual std::string getString();
 		virtual std::string getContentType(){return "application/xpidf+xml";}
 

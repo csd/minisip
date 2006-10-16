@@ -44,7 +44,7 @@ class LIBMINISIP_API SdpHeaderT : public SdpHeader{
 		SdpHeaderT(int32_t start_time, int32_t stop_time);
 		~SdpHeaderT();
 
-		virtual std::string getMemObjectType(){return "SdpHeaderT";}
+		virtual std::string getMemObjectType() const {return "SdpHeaderT";}
 
 		int32_t getStartTime();
 		void setStartTime(int32_t time);

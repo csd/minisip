@@ -55,7 +55,7 @@ class LIBMSIP_API SipHeaderValueReferTo: public SipHeaderValueString{
 		 */
 		SipHeaderValueReferTo(const std::string &build_from);
 
-                virtual std::string getMemObjectType(){return "SipHeaderReferTo";}
+                virtual std::string getMemObjectType() const {return "SipHeaderReferTo";}
 };
 
 #endif

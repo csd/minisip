@@ -133,7 +133,7 @@ class LIBMINISIP_API FileSoundDevice: public SoundDevice{
 		
 		virtual void sync();
 
-		virtual std::string getMemObjectType(){ return "FileSoundDevice";};
+		virtual std::string getMemObjectType() const { return "FileSoundDevice";};
 
 	protected:
 	

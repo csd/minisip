@@ -40,7 +40,7 @@
 
 class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 	public:
-		virtual std::string getMemObjectType(){ return "VideoDisplay"; };
+		virtual std::string getMemObjectType() const { return "VideoDisplay"; };
 		~VideoDisplay();
 		virtual void start();
 		virtual void stop();
