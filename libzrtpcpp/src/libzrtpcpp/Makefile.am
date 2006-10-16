@@ -8,6 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+SUBDIRS = crypto
+
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ccxxincludedir=$(includedir)/libzrtpcpp
 

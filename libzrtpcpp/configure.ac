@@ -67,5 +67,5 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([srandom random srand rand])
 
 AC_SUBST(CRYPTOBACKEND)
-AC_CONFIG_FILES([Makefile m4/Makefile src/libzrtpcpp/Makefile src/libzrtpcpp/crypto/Makefile])
+AC_CONFIG_FILES([Makefile m4/Makefile src/Makefile src/libzrtpcpp/Makefile src/libzrtpcpp/crypto/Makefile])
 AC_OUTPUT(libzrtpcpp.pc)

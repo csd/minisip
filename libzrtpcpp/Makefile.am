@@ -48,5 +48,5 @@ libzrtpcpp_la_SOURCES = src/ZIDFile.cxx \
 		src/ZrtpTextData.cxx \
 		src/Base32.cxx $(zrtp_src_g) $(zrtp_src_o)
 
-SUBDIRS = src/libzrtpcpp/crypto m4 src/libzrtpcpp
+SUBDIRS = m4 src
 DIST_SUBDIRS = $(SUBDIRS)
