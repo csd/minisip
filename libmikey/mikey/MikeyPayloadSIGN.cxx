@@ -81,7 +81,7 @@ int MikeyPayloadSIGN::length(){
 
 void MikeyPayloadSIGN::writeData( byte_t * start, int expectedLength ){
 	assert( expectedLength == length() );
-	memset( start, expectedLength, 0 );
+	memset( start, 0, expectedLength );
 	start[0] = (byte_t)((( sigLengthValue & 0x0F00 ) >> 8) |
 			((sigTypeValue << 4) & 0xF0)) ;
 	start[1] = (byte_t)( sigLengthValue & 0xFF );

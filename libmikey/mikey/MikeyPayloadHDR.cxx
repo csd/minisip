@@ -109,7 +109,7 @@ int MikeyPayloadHDR::length(){
 
 void MikeyPayloadHDR::writeData( byte_t * start, int expectedLength ){
 	assert( expectedLength == length() );
-	memset( start, expectedLength, 0 );
+	memset( start, 0, expectedLength );
 	start[0] = (byte_t) version;
 	start[1] = (byte_t) dataTypeValue;
 	start[2] = nextPayloadType();

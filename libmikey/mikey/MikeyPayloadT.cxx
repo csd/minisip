@@ -142,7 +142,7 @@ int MikeyPayloadT::length(){
 void MikeyPayloadT::writeData(byte_t *start, int expectedLength){
 	int i;
 	assert( expectedLength == length() );
-	memset( start, expectedLength, 0 );
+	memset( start, 0, expectedLength );
 	start[0] = nextPayloadType();
 	start[1] = (byte_t) tsTypeValue;
 	switch( tsTypeValue ){

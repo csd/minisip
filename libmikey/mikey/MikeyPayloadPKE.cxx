@@ -78,7 +78,7 @@ int MikeyPayloadPKE::length(){
 
 void MikeyPayloadPKE::writeData( byte_t * start, int expectedLength ){
 	assert( expectedLength == length() );
-	memset( start, expectedLength, 0 );
+	memset( start, 0, expectedLength );
 	start[0] = (byte_t)nextPayloadType();
 	start[1] = (byte_t)
 		(( cValue & 0x3 ) << 6 | ( ( dataLengthValue >> 8 ) & 0x3F ));

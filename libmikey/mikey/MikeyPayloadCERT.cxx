@@ -85,7 +85,7 @@ MikeyPayloadCERT::~MikeyPayloadCERT(){
 void MikeyPayloadCERT::writeData( byte_t * start, int expectedLength ){
 
 	assert( expectedLength == length() );
-	memset( start, expectedLength, 0 );
+	memset( start, 0, expectedLength );
 	start[0] = nextPayloadType();
 	start[1] = type;
 	start[2] = (byte_t) ((certLengthValue & 0xFF00) >> 8);
