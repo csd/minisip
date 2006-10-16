@@ -285,7 +285,7 @@ class LIBMINISIP_API SipDialogP2T: public SipDialog{
 		/**
 		 * @return the name "SipDialogP2T"
 		 */	
-		virtual std::string getName(){return "SipDialogP2T";}
+		virtual std::string getName() const {return "SipDialogP2T";}
 
 		virtual std::string getMemObjectType() const {return getName();}
 
