@@ -32,7 +32,7 @@
  |                                                                 | | |               ...................
  | +--------------+------------------+ +----------+                | | |               .Callback
  | |dialogDefHandl|SipLayerDialog    | |Sip       |                | | |               .(SipMessageRouter)
- | |(3)           |                  | |Message   |                | |S|   (5)         .
+ | |(3)           |                  | |Command   |                | |S|   (5)         .
  | |              | (dialogs)        | |Dispatcher| enqueueCommand | |i| handleCommand .
  | |              |                  | |(4)       |<---------------| |p| <-------------.
  | +--------------+------------------+ |          |                | |S|               .
