@@ -48,7 +48,7 @@ MPlugin::MPlugin(): library( NULL ){
 MPlugin::~MPlugin(){
 }
 
-string MPlugin::getMemObjectType(){
+string MPlugin::getMemObjectType() const{
 	return "MPlugin";
 }
 
