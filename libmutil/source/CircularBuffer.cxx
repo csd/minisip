@@ -38,6 +38,18 @@ CircularBuffer::CircularBuffer(int size):
 	buf = new short[size];
 }
 
+CircularBuffer::CircularBuffer(const CircularBuffer &b):
+		maxSize(b->maxSize),
+		size(b->size),
+		readIdx(b->readIdx),
+		writeIdx(b->writeIdx),
+		byteCounter(b->byteCounter) {
+		
+	buf = new short[size];
+	memcpy(buf,d->buf,size*sizeof(short));
+}
+
+
 CircularBuffer::~CircularBuffer()
 {
 	if( buf != NULL ) {

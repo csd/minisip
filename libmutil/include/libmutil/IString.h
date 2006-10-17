@@ -60,6 +60,8 @@ public:
 	 */
 	StringAtom(char *buf, int n);
 
+	StringAtom(const StringAtom &);
+
 	/**
 	 * Avoid using this constructor if possible
 	 */

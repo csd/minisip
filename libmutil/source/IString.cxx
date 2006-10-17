@@ -37,6 +37,11 @@ StringAtom::StringAtom(std::string s){
 	n = (int)s.length();
 }
 
+StringAtom::StringAtom(const StringAtom &a):n(a.n){
+	buf = new char[n];
+	memcpy(buf,a.buf,n);
+}
+
 StringAtom::~StringAtom(){
 	massert(buf);
 	delete []buf;

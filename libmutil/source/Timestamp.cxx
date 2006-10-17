@@ -35,6 +35,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 
 #ifdef WIN32
 	Timestamp::Timestamp(){}
+	Timestamp::Timestamp(const Timestamp &){}
 #else
 	Timestamp::Timestamp(){
 		tz = new struct timezone;
@@ -43,6 +44,26 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 		ids = new int32_t[MAX_TIMESTAMPS];
 		index = 0;
 		auto_id=-1;
+	}
+	Timestamp::Timestamp(const Timestamp &t):
+			index(t.index),
+			auto_id(t.auto_id),
+			startTime(t.startTime),
+			stopTime(t.stopTime),
+			filename(t.filename)
+	{
+		tz = new struct timezone;
+		memcpy(tz, t.tz, sizeof(struct timezone) );
+
+		values = new struct timeval[ MAX_TIMESTAMPS ];
+		memcpy(values, t.values, MAX_TIMESTAMPS* sizeof(struct timeval) );
+
+		strings = new string[ MAX_TIMESTAMPS + 1];
+		for (int i=0; i<MAX_TIMESTAMPS; i++)
+			strings[i]=t.strings[i];
+
+		ids = new int32_t[MAX_TIMESTAMPS];
+		memcpy(ids, t.ids, MAX_TIMESTAMPS*sizeof(int32_t) );
 	}
 #endif
 

@@ -40,6 +40,7 @@ A circular buffer for shorts
 class LIBMUTIL_API CircularBuffer {
 	public:
 		CircularBuffer(int size);
+		CircularBuffer(const CircularBuffer &);
 		virtual ~CircularBuffer();
 	
 		/**

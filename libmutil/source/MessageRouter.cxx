@@ -41,6 +41,10 @@ MessageRouter::MessageRouter(){
 	internal = new MessageRouterInternal;
 }
 
+MessageRouter::MessageRouter(const MessageRouter &mr){
+	internal = new MessageRouterInternal(*mr.internal);
+}
+
 MessageRouter::~MessageRouter(){
 	delete internal;
 }
