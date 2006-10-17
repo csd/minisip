@@ -91,7 +91,7 @@ SipStackInternal::SipStackInternal( MRef<SipCommonConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("c", sipHeaderContentTypeFactory);
 	SipHeader::headerFactories.addFactory("CSeq", sipHeaderCSeqFactory);
 	SipHeader::headerFactories.addFactory("Event", sipHeaderEventFactory);
-	SipHeader::headerFactories.addFactory("Expires", sipHeaderEventFactory);
+	SipHeader::headerFactories.addFactory("Expires", sipHeaderExpiresFactory);
 	SipHeader::headerFactories.addFactory("From", sipHeaderFromFactory);
 	SipHeader::headerFactories.addFactory("f", sipHeaderFromFactory);
 	SipHeader::headerFactories.addFactory("Max-Forwards", sipHeaderMaxForwardsFactory);
