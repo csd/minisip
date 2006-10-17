@@ -87,6 +87,7 @@ class MessageRouterInternal;
 class LIBMUTIL_API MessageRouter : public CommandReceiver{
 	public:
 		MessageRouter();
+		MessageRouter(const MessageRouter &);
 		~MessageRouter();
 
 		/**

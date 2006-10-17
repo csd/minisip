@@ -35,7 +35,7 @@ Exception::Exception(const Exception &e):
 		stackDepth(e.stackDepth)
 {
 	stack = new void*[MAX_STACK_TRACE_DEPTH];
-	memcpy(stack, d.stack, MAX_STACK_TRACE_DEPTH*sizeof(void*));
+	memcpy(stack, e.stack, MAX_STACK_TRACE_DEPTH*sizeof(void*));
 }
 
 /**

@@ -83,6 +83,7 @@ typedef clock_t SystemTime;
 class LIBMUTIL_API Timestamp{
 	public:
 		Timestamp();
+		Timestamp(const Timestamp&);
 		~Timestamp();
 
 		void save( uint32_t id );

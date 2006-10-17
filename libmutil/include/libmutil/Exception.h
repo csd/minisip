@@ -60,7 +60,7 @@ public:
 	 */
 	Exception(char const* what);
 
-	Exception(const Exception &)
+	Exception(const Exception &);
 	
 	~Exception() throw ();
 	
