@@ -33,7 +33,7 @@
 using namespace std;
 
 #ifdef MDEBUG
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 Mutex global;
 minilist<MObject *> objs;
 int ocount=0;

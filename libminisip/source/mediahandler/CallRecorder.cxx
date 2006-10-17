@@ -28,7 +28,7 @@
 #include<libminisip/mediahandler/AudioMedia.h>
 #include"../soundcard/FileSoundDevice.h"
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/mtime.h>
 #include<libmutil/CircularBuffer.h>

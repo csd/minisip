@@ -27,7 +27,7 @@
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyDefs.h>
 #include<assert.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 
@@ -112,7 +112,7 @@ void KeyValiditySPI::writeData( byte_t * start, int expectedLength ){
 
 string KeyValiditySPI::debugDump(){
 	return (const char *)("KeyValiditySPI: spi=<") + 
-		print_hex( spiPtr, spiLength );
+		binToHex( spiPtr, spiLength );
 }
 
 KeyValiditySPI::~KeyValiditySPI(){
@@ -214,6 +214,6 @@ KeyValidityInterval::~KeyValidityInterval(){
 }
 
 string KeyValidityInterval::debugDump(){
-	return "KeyValidityInterval: vf=<"+print_hex( vf, vfLength )+
-		"> vt=<"+print_hex( vt, vtLength );
+	return "KeyValidityInterval: vf=<"+binToHex( vf, vfLength )+
+		"> vt=<"+binToHex( vt, vtLength );
 }

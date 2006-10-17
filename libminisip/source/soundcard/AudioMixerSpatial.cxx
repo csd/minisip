@@ -36,7 +36,7 @@
 #include<libminisip/spaudio/SpAudio.h>
 
 	// cesc ... remove
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

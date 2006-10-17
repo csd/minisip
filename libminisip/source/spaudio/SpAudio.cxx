@@ -30,8 +30,6 @@
 
 #include<libminisip/soundcard/SoundSource.h>
 
-#include<libmutil/itoa.h> //cesc ... remove
-
 SpAudio::SpAudio(int32_t numPos){
 	nPos=numPos;
 }

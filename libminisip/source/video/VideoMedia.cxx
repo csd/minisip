@@ -34,7 +34,7 @@
 #include<libminisip/video/display/VideoDisplay.h>
 #include<libminisip/sdp/SdpHeaderM.h>
 #include<libminisip/sdp/SdpHeaderA.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/massert.h>
 
 #define SOURCE_QUEUE_SIZE 7

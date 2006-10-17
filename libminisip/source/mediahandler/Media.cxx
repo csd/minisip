@@ -31,11 +31,9 @@
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/mediahandler/MediaStream.h>
 #include<libminisip/mediahandler/RtpReceiver.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libminisip/sdp/SdpHeaderM.h>
 #include<libminisip/sdp/SdpHeaderA.h>
-
-#include<libmutil/print_hex.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

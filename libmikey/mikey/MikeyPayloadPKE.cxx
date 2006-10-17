@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadPKE.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;
@@ -102,6 +101,6 @@ byte_t * MikeyPayloadPKE::data(){
 string MikeyPayloadPKE::debugDump(){
 	return "MikeyPayloadPKE: c=<" + itoa( cValue ) + 
 		"> dataLengthValue=<" + itoa( cValue )+
-		"> dataPtr=<" + print_hex( dataPtr, dataLengthValue );
+		"> dataPtr=<" + binToHex( dataPtr, dataLengthValue );
 }
 

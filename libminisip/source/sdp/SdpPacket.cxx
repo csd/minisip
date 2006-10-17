@@ -37,9 +37,6 @@
 #include<libmnetutil/NetworkException.h>
 
 #include<libmutil/stringutils.h>
-#include<libmutil/itoa.h>
-#include<libmutil/stringutils.h>
-
 
 #include<libminisip/sdp/SdpHeaderV.h>
 #include<libminisip/sdp/SdpHeaderO.h>

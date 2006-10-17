@@ -46,11 +46,9 @@
 
 #include<libmutil/massert.h>
 #include<signal.h>
-#include<libmutil/itoa.h>
 #include<libmutil/Thread.h>
 
 #include<libmutil/mtime.h>
-#include<libmutil/print_hex.h>
 
 #include<libminisip/soundcard/AudioMixerSpatial.h>
 #include<libminisip/soundcard/AudioMixerSimple.h>

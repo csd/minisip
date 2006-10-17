@@ -30,7 +30,6 @@
 
 #include<libmutil/massert.h>
 #include<libminisip/rtp/CryptoContext.h>
-#include<libmutil/print_hex.h>
 #include<libmikey/MikeyPayloadSP.h>
 
 CryptoContext::CryptoContext( uint32_t ssrc ):

@@ -37,7 +37,7 @@
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipException.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 

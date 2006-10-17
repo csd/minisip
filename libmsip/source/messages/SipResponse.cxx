@@ -34,7 +34,7 @@
 
 #include<libmsip/SipResponse.h>
 #include<libmutil/massert.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/dbg.h>
 
 #include<libmsip/SipHeaderVia.h>

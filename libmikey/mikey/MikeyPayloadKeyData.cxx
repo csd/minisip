@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadKeyData.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;
@@ -171,9 +170,9 @@ string MikeyPayloadKeyData::debugDump(){
 	return "MikeyPayloadKeyData:" 
 		" nextPayloadType=<" + itoa( nextPayloadType() ) +
 		"> type=<" + itoa( typeValue ) + 
-		"> keyDataPtr=<" + print_hex( keyDataPtr, keyDataLengthValue ) +
+		"> keyDataPtr=<" + binToHex( keyDataPtr, keyDataLengthValue ) +
 		"> saltDataPtr=<" + 
-			print_hex( saltDataPtr, saltDataLengthValue ) +
+			binToHex( saltDataPtr, saltDataLengthValue ) +
 		"> kvPtr_type=<" + itoa( kvPtr->type() ) +
 		"> kvPtr_data=<" + kvPtr->debugDump() + ">";
 }

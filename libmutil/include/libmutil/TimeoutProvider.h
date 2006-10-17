@@ -55,7 +55,7 @@
 #include"Thread.h"
 
 #include<libmutil/minilist.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/CondVar.h>
 

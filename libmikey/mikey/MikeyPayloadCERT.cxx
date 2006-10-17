@@ -26,8 +26,7 @@
 #include<libmikey/MikeyDefs.h>
 #include<libmikey/MikeyPayloadCERT.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;
@@ -105,7 +104,7 @@ string MikeyPayloadCERT::debugDump(){
 		+itoa( nextPayloadType() ) +
 		"> type=<"+itoa(type) +
 		"> length=<" + itoa( certLengthValue )+
-		"> data=<" + print_hex( certDataPtr, certLengthValue )+ ">";
+		"> data=<" + binToHex( certDataPtr, certLengthValue )+ ">";
 }
 
 byte_t * MikeyPayloadCERT::certData(){

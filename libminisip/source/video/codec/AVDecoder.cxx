@@ -27,8 +27,6 @@
 #include<libminisip/video/ImageHandler.h>
 
 #include<iostream>
-#include<libmutil/print_hex.h>
-
 
 
 /* used by ffmpeg to get a frame from the ImageHandler */

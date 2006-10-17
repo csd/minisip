@@ -459,7 +459,7 @@ int Minisip::initParseConfig(){
 #ifdef DEBUG_OUTPUT
 			merr << FG_ERROR << "Element not found: "<< enf.what()<< PLAIN << end;
 #endif
-			merr << "ERROR: Could not parse configuration item: "+enf.what() << end;
+			merr << string("ERROR: Could not parse configuration item: ")+enf.what() << end;
 			gui->configDialog( phoneConf );
 			done=false;
 		}

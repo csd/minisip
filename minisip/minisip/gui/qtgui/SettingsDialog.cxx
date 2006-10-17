@@ -28,7 +28,7 @@
 #include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipCommandString.h>
 #include"../../../sip/DefaultDialogHandler.h"
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/XMLParser.h>
 #include<libmutil/cert.h>
 #include<libmnetutil/IP4Address.h>

@@ -49,7 +49,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>

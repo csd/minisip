@@ -29,7 +29,7 @@
 
 #include<libmsip/SipHeaderRSeq.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 

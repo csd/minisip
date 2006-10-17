@@ -104,7 +104,7 @@ windns is only for windows ... but it is not restricted to xp or higher ... thus
 #include<libmnetutil/NetworkException.h>
 
 #include<libmutil/merror.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #define BUFFER_SIZE 1024 /* bytes */
 

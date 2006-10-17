@@ -28,7 +28,7 @@
 #include <errno.h>
 #include<libminisip/p2t/GroupListClient.h>
 #include <libmutil/dbg.h>
-#include <libmutil/itoa.h>
+#include <libmutil/stringutils.h>
 #include <libmutil/merror.h>
 #include <libmutil/XMLParser.h>
 

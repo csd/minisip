@@ -23,7 +23,7 @@
 #include"LogWidget.h"
 
 #include<libminisip/gui/LogEntry.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libminisip/contactdb/ContactDb.h>
 
 #ifdef OLDLIBGLADEMM

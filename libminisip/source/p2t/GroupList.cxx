@@ -34,7 +34,7 @@
 #include <config.h>
 
 #include<libminisip/p2t/GroupList.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/XMLParser.h>
 
 GroupList::GroupList():MObject(/*"GroupList"*/){

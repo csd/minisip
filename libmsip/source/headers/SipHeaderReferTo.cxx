@@ -35,7 +35,6 @@
 
 #include<libmsip/SipHeaderReferTo.h>
 
-#include<libmutil/itoa.h>
 #include<libmutil/stringutils.h>
 
 #ifdef DEBUG_OUTPUT

@@ -152,3 +152,25 @@ LIBMUTIL_API string trim(string line){
 	return line;
 }
 
+LIBMUTIL_API string binToHex( unsigned char * data, int length ){
+	
+	string result = "";
+	char hex_number[3];
+	
+	for( int i = 0; i < length; i++ ){
+		sprintf( hex_number, "%02x", *(data+i) );
+		result += hex_number;
+	}
+	
+	return result;
+}
+
+
+LIBMUTIL_API string itoa(int64_t i){
+	char buf[30]; //should be enough for a 64 bit integer ...
+	for (int j=0; j<16; j++)
+		buf[j]=0;
+	sprintf(buf,"%ld",i);
+	return string(buf);
+}
+

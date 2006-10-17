@@ -33,7 +33,7 @@
 
 #include<config.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #include<libmsip/SipHeaderContact.h>
 

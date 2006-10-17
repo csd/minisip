@@ -52,7 +52,7 @@
 #include<libminisip/rtp/SRtpPacket.h>
 #include<libminisip/rtp/CryptoContext.h>
 
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/merror.h>
 #include<libmutil/MemObject.h>
 

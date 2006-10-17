@@ -31,7 +31,7 @@
 
 #include<iostream>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 //==================================================================
 //if not win ce, pocket pc ... inherit from iostream and stringbuf

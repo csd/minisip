@@ -149,6 +149,7 @@ string findHeaderType(string s){
 }
 
 MRef<SipHeader *> SipHeader::parseHeader(const string &line){
+	cerr <<"EEEE: 1"<<endl;
 	int hdrstart=0;
 	MRef<SipHeader*> h;
 	
@@ -176,7 +177,9 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 	vector<string> values = split(valueline,true, valueSeparator);
 
+	cerr <<"EEEE: 2"<<endl;
 	for (unsigned i=0; i< values.size(); i++){
+		cerr <<"EEEE: 3"<<endl;
 		vector<string> value_params;
 		string value_zero; //value zero is the non-parameter part of the header
 		if( values[i].size() == 0 ) { //an empty value??? BUG!
@@ -250,6 +253,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			}
 	}
 
+	cerr <<"EEEE: 4"<<endl;
 	if (!h){
 		//Special case for headers that are allowed to exist
 		//without any header value. This list is compatibel 
@@ -273,6 +277,7 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 			h= new SipHeader(hval);
 		}
 	}
+	cerr <<"EEEE: 5"<<endl;
 	return h;
 }
 

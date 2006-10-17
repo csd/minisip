@@ -41,7 +41,7 @@
 
 #include<libmutil/minilist.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/Exception.h>
 
 #ifdef DEBUG_OUTPUT

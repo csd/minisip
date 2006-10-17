@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadDH.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 
 #include<assert.h>
 
@@ -157,7 +156,7 @@ string MikeyPayloadDH::debugDump(){
 	return "MikeyPayloadDH: "
 		"nextPayloadType=<" + itoa( nextPayloadTypeValue ) + 
 		"> dhGroup=<" + itoa( dhGroup ) + 
-		"> dhKeyPtr=<" + print_hex( dhKeyPtr, dhKeyLengthValue ) + 
+		"> dhKeyPtr=<" + binToHex( dhKeyPtr, dhKeyLengthValue ) + 
 		"> kvType=<" + itoa( kvPtr->type() ) +
 		">" + kvPtr->debugDump();
 }

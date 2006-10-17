@@ -36,7 +36,6 @@
 
 #include<libmsip/SipUri.h>
 #include<libmsip/SipException.h>
-#include<libmutil/itoa.h>
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 

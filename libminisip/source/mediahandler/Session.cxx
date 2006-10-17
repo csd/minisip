@@ -46,7 +46,7 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmutil/dbg.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 
 #ifdef ZRTP_SUPPORT

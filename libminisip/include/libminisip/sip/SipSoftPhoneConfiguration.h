@@ -39,7 +39,7 @@
 #include<list>
 
 #include<libmutil/XMLParser.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/MemObject.h>
 
 #include<libmsip/SipDialogConfig.h>

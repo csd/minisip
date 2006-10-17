@@ -54,7 +54,7 @@
 #include<string.h> //for memset
 
 #ifdef DEBUG_OUTPUT
-#include <libmutil/itoa.h>
+#include <libmutil/stringutils.h>
 #endif
 
 class G711CODEC;

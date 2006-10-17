@@ -29,7 +29,7 @@
 #include<libminisip/configbackend/ConfBackend.h>
 #include<libmcrypto/cert.h>
 #include<libmutil/XMLParser.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmsip/SipDialogConfig.h>
 
 #include<libminisip/configbackend/OnlineConfBackend.h>

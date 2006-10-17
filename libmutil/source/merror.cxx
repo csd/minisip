@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 #include<Windows.h>
 #include<iostream>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #else
 #include<stdio.h>
 #endif

@@ -29,7 +29,6 @@
 #include<iostream>
 
 #include<speex/speex.h>
-#include<libmutil/print_hex.h>
 
 using namespace std;
 

@@ -38,7 +38,7 @@
 #include<libminisip/p2t/RtcpTransactionTakenFloor.h>
 #include<libmsip/SipDialog.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<sstream>
 
 

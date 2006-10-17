@@ -33,7 +33,6 @@
 #include<config.h>
 
 #include<libminisip/sdp/SdpHeaderO.h>
-#include<libmutil/itoa.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

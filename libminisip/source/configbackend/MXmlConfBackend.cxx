@@ -28,7 +28,7 @@
 #include<libminisip/configbackend/UserConfig.h>
 
 #include<libmutil/XMLParser.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #include<stdlib.h>
 

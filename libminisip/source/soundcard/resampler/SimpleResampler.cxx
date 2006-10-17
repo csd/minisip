@@ -27,7 +27,6 @@
 
 #include"SimpleResampler.h"
 #include<iostream>
-#include<libmutil/print_hex.h>
 
 
 SimpleResampler::SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 

@@ -44,7 +44,6 @@
 
 #include<stdio.h>
 #include<libminisip/p2t/RtcpAPP.h>
-#include<libmutil/print_hex.h>
 
 #ifndef _MSC_VER
 #include<sys/time.h>

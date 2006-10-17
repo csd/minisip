@@ -48,7 +48,7 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMIMEContent.h>
 #include<libmsip/SipMessageContent.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmcrypto/base64.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -57,7 +57,6 @@
 #include <time.h>
 #include<libminisip/gui/LogEntry.h>
 
-#include<libmutil/print_hex.h>
 #include <iostream>
 #include<time.h>
 

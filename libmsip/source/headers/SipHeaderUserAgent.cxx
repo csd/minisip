@@ -35,7 +35,7 @@
 
 #include<libmsip/SipHeaderUserAgent.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 

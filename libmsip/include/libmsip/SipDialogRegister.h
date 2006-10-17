@@ -30,7 +30,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipResponse.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/MemObject.h>
 
 class LIBMSIP_API SipDialogRegister : public SipDialog{

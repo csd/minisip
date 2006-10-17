@@ -67,7 +67,6 @@
 
 #include<libmutil/stringutils.h>
 #include<libmutil/dbg.h>
-#include<libmutil/itoa.h>
 #include<libmutil/Timestamp.h>
 
 using namespace std;

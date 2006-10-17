@@ -27,8 +27,7 @@
 #include<libmikey/MikeyException.h>
 #include<assert.h>
 #include<libmcrypto/aes.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 
@@ -191,9 +190,9 @@ string MikeyPayloadKEMAC::debugDump(){
 	return "MikeyPayloadKEMAC: encrAlgValue=<" + itoa( encrAlgValue ) +
 		"> encrDataLengthValue=<" + itoa( encrDataLengthValue ) +
 		"> encrDataPtr=<" + 
-		print_hex( encrDataPtr, encrDataLengthValue ) +
+		binToHex( encrDataPtr, encrDataLengthValue ) +
 		"> macAlgValue=<" + itoa( macAlgValue ) +
-		"> macDataPtr=<" + print_hex( macDataPtr, 
+		"> macDataPtr=<" + binToHex( macDataPtr, 
 		((macAlgValue==MIKEY_PAYLOAD_KEMAC_MAC_HMAC_SHA1_160)?20:0)
 		) + ">";
 }

@@ -31,7 +31,7 @@
 #include<stdio.h>
 #include<errno.h>
 #include<libmutil/mtime.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/merror.h>
 
 

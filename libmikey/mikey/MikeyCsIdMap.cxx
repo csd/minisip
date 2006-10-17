@@ -23,7 +23,7 @@
 */
 
 #include<config.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyCsIdMap.h>
 

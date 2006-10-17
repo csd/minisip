@@ -55,8 +55,6 @@ mutil_src = \
 		source/TextUI.cxx \
 		source/Timestamp.cxx \
 		$(mtime_src) \
-		source/itoa.cxx \
-		source/print_hex.cxx \
 		source/stringutils.cxx \
 		source/vmd5.cxx \
 		source/CommandString.cxx \

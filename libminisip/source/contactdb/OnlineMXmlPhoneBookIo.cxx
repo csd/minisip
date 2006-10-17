@@ -30,7 +30,7 @@
 #include<libminisip/contactdb/ContactDb.h>
 
 #include<libmutil/XMLParser.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #include<string>
 #include<fstream>

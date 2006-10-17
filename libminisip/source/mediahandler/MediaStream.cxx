@@ -33,10 +33,8 @@
 #include<libminisip/sdp/SdpHeaderA.h>
 #include<libminisip/sdp/SdpPacket.h>
 #include<libmnetutil/UDPSocket.h>
-#include<libmutil/itoa.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
-#include<libmutil/print_hex.h>
 #include<libminisip/mediahandler/Media.h>
 #include<libminisip/mediahandler/RtpReceiver.h>
 #include<libminisip/codecs/Codec.h>
@@ -160,8 +158,8 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 #ifdef DEBUG_OUTPUT
 #if 0
 		fprintf( stderr, "csId: %i\n", csId );
-		cerr << "SSRC: "<< ssrc <<" - TEK: " << print_hex( masterKey, 16 ) << endl;
-		cerr << "SSRC: "<< ssrc <<" - SALT: " << print_hex( masterSalt, 14 )<< endl;
+		cerr << "SSRC: "<< ssrc <<" - TEK: " << binToHex( masterKey, 16 ) << endl;
+		cerr << "SSRC: "<< ssrc <<" - SALT: " << binToHex( masterSalt, 14 )<< endl;
 #endif
 #endif
 

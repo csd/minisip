@@ -27,7 +27,8 @@
 
 #include<libmstun/config.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
+
 
 #include <sys/types.h>
 

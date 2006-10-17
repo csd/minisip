@@ -35,7 +35,7 @@
 #include<stdio.h>
 #include<signal.h>
 #include<time.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/mtime.h>
 
 #ifdef WIN32

@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadID.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;
@@ -94,5 +93,5 @@ string MikeyPayloadID::debugDump(){
 	return "MikeyPayloadID: nextPayloadType=<" + itoa( nextPayloadType() ) +
 		"> type=<" + itoa( idTypeValue ) +
 		"> length=<" + itoa( idLengthValue ) +
-		"> data=<" + print_hex( idDataPtr, idLengthValue ) + ">";
+		"> data=<" + binToHex( idDataPtr, idLengthValue ) + ">";
 }

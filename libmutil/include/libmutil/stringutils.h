@@ -36,6 +36,13 @@
 
 #include <libmutil/libmutil_config.h>
 
+
+
+/**
+ * Creates a string representing an integer number
+ */
+LIBMUTIL_API std::string itoa(int64_t i);
+
 /**
  * Splits a string into multiple parts.
  *
@@ -74,6 +81,9 @@ LIBMUTIL_API bool isWS(char c);
 */
 LIBMUTIL_API std::string trim(std::string s);
 
-
+/**
+ * Converts an array of raw data to a hex string representation.
+ */
+LIBMUTIL_API std::string binToHex( unsigned char * data, int length );
 
 #endif

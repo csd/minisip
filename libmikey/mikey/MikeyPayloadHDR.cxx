@@ -27,7 +27,7 @@
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyCsIdMap.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;

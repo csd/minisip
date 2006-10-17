@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadSIGN.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 
 using namespace std;
@@ -90,7 +89,7 @@ void MikeyPayloadSIGN::writeData( byte_t * start, int expectedLength ){
 }
 
 string MikeyPayloadSIGN::debugDump(){
-	return "MikeyPayloadSIGN: type=<"+itoa(sigTypeValue)+"> length=<"+itoa(sigLengthValue)+"> signature=<"+print_hex( sigDataPtr, sigLengthValue )+">";
+	return "MikeyPayloadSIGN: type=<"+itoa(sigTypeValue)+"> length=<"+itoa(sigLengthValue)+"> signature=<"+binToHex( sigDataPtr, sigLengthValue )+">";
 
 }
 

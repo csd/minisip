@@ -25,7 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #include<assert.h>
 

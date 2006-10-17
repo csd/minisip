@@ -47,7 +47,7 @@
 #include<libminisip/p2t/RtcpAPPHeader.h>
 
 #include<libmutil/dbg.h>
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 #include<libmutil/merror.h>
 
 RtcpAPP::RtcpAPP() {

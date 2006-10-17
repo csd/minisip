@@ -13,8 +13,6 @@ pkginclude_HEADERS = \
 			libmutil/Timestamp.h \
 			libmutil/mtime.h \
 			libmutil/mtypes.h \
-			libmutil/itoa.h \
-			libmutil/print_hex.h \
 			libmutil/stringutils.h \
 			libmutil/TimeoutProvider.h \
 			libmutil/minilist.h \

@@ -25,8 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyException.h>
-#include<libmutil/itoa.h>
-#include<libmutil/print_hex.h>
+#include<libmutil/stringutils.h>
 #include<assert.h>
 #include<stdlib.h>
 #include<time.h>
@@ -108,7 +107,7 @@ string MikeyPayloadRAND::debugDump(){
 	return "MikeyPayloadRAND: nextPayloadType=<" + 
 		itoa( nextPayloadType() ) +
 		"> randLengthValue=<" + itoa( randLengthValue ) + 
-		"> randDataPtr=<" + print_hex( randDataPtr, randLengthValue ) + 
+		"> randDataPtr=<" + binToHex( randDataPtr, randLengthValue ) + 
 		">";
 }
 

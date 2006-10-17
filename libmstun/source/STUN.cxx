@@ -28,7 +28,7 @@
 #include<libmstun/STUNMessage.h>
 #include<libmstun/STUNTest.h>
 
-#include<libmutil/itoa.h>
+#include<libmutil/stringutils.h>
 
 #include<libmnetutil/NetworkFunctions.h>
 
