@@ -239,3 +239,119 @@ string SipStackInternal::getAllSupportedExtensionsStr(){
 }
 
 
+static std::string getTimeoutDebugString(MRef<StateMachine<SipSMCommand,std::string> *> sm, 
+		list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests,		
+		int indent){
+	string ret;
+	string ind;
+	for (int i=0; i<indent; i++)
+		ind+="\t";
+
+	int ntimeouts=0;
+	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
+	for (uint32_t j=0; j< torequests.size(); j++, jj++){
+		if ( ((*sm)) == *((*jj).getSubscriber()) ){
+			int ms= (*jj).getMsToTimeout();
+			ret+= ind +"timeout: "
+				+ (*jj).getCommand()
+				+ " Time: " + itoa(ms/1000) + "." + itoa(ms%1000)+"\n";
+			ntimeouts++;
+			torequests.erase(jj);
+			jj=torequests.begin();
+		}
+	}
+	if (ntimeouts==0)
+		ret+= ind + "(no timeouts)"+"\n";
+	return ret;
+}
+
+static std::string getTransactionDebugString(MRef<SipTransaction*> t, 
+		list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests, int indent){
+	string ret;
+	string ind;
+	for (int i=0;i<indent; i++)
+		ind+="\t";
+
+	ret = ind+ (*t)->getName() + " State: " + (*t)->getCurrentStateName()+"\n";
+
+	ret+= ind+"Timeouts:\n";
+	ret+=getTimeoutDebugString(*t,torequests,2);
+	return ret;
+
+}
+
+static std::string getDialogDebugString(MRef<SipDialog*> d, 
+		list<MRef<SipTransaction*> > &transactions, // a reference to the list so that transactions can be removed from it 
+		list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests, int indent)
+{
+	string ret;
+	string ind;
+	for (int i=0; i< indent ; i++)
+		ind+="\t";
+
+	ret+= d->getDialogDebugString(/*indent+1*/);
+	
+	ret+= ind + "Timeouts:\n";
+	//cerr << "        Timeouts:"<< endl;
+	ret+= getTimeoutDebugString(*d,torequests,indent+1);
+
+
+	ret+= ind+"Transactions:\n";
+	//cerr << "        Transactions:"<< endl;
+	string did=d->getCallId();
+	int n=0;
+	for (list<MRef<SipTransaction*> >::iterator t = transactions.begin();
+			t!=transactions.end(); t++){
+		if ((*t)->getCallId()==did){
+			ret+=getTransactionDebugString(*t, torequests, indent+1);
+			n++;
+			transactions.erase(t);
+			t=transactions.begin();
+		}
+	}
+
+	return ret;
+}
+
+std::string SipStackInternal::getStackStatusDebugString(){
+
+	string ret;
+	int indent =1;
+
+	string ind;
+	for (int i=0; i< indent; i++)
+		ind+="\t";
+
+	list<MRef<SipDialog*> > calls = getDispatcher()->getLayerDialog()->getDialogs();
+	list<MRef<SipTransaction*> > transactions= getDispatcher()->getLayerTransaction()->getTransactions();
+	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests =
+			getTimeoutProvider()->getTimeoutRequests();
+
+	if (calls.size()==0)
+		ret+=ind+"(no calls)\n";
+	else{
+		int ii=0;
+		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!= calls.end(); i++, ii++){
+			ret+=ind+"("+itoa(ii)+")\n";
+			//cerr << string("    (")+itoa(ii)+") " ;
+			ret+= getDialogDebugString(*i, transactions, torequests, indent+1);
+		}
+		
+	}
+
+	if (transactions.size()==0){
+		ret+=ind+"(no transactions outside dialogs)\n";
+		//cerr << "    (no transactions outside dialogs)"<< endl;
+	}else{
+		// all transactions for the dialogs have been removed
+		ret+=ind+"Transactions outside dialogs:\n";
+		for (list<MRef<SipTransaction*> >::iterator ti=transactions.begin(); ti!=transactions.end(); ti++){
+			ret+=getTransactionDebugString(*ti,torequests,indent+1);
+		}
+	}
+	massert(torequests.size()==0);
+	return ret;
+}
+
+
+

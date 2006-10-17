@@ -37,7 +37,7 @@
 
 class LIBMINISIP_API ConsoleDebugger : public Runnable{
 	public:
-		ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf);
+		ConsoleDebugger(MRef<SipStack*> stack);
 		~ConsoleDebugger();
 		
 		std::string getMemObjectType() const {return "ConsoleDebugger";}
@@ -60,8 +60,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		void setMediaHandler( MRef<MediaHandler *> r ) { mediaHandler = r;}
 
 	private:
-		void showDialogInfo(MRef<SipDialog *> d);
-		MRef<SipSoftPhoneConfiguration *> config;
+		MRef<SipStack*> sipStack;
 		MRef<MediaHandler *> mediaHandler;
 		
 		MRef<Thread *> thread;

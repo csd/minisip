@@ -221,11 +221,9 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		void addAuthorizations( MRef<SipRequest*> req );
 
-		std::string getDialogStatusString();
+		std::string getDialogDebugString();
 
 	protected:
-//		///a list containing all transactions
-//		std::list<MRef<SipTransaction*> > transactions;
 
 		///
 		MRef<SipStack*> sipStack;

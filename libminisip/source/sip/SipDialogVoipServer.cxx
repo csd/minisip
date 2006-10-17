@@ -468,7 +468,7 @@ void SipDialogVoipServer::sendReject(const string &branch){
 }
 
 void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
-	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", *getLastInvite());	
 
 	if (use100Rel){
 		ringing->addHeader(new SipHeader(new SipHeaderValueRequire("100rel")));

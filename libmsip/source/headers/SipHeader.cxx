@@ -282,3 +282,19 @@ SipHeaderValue::SipHeaderValue(int t, const string &hname):headerName(hname),typ
 
 }
 
+
+std::string SipHeaderValue::getStringWithParameters(){
+	std::string parameterList;
+	int nparam = parameters.size();
+	for (int i=0; i< nparam; i++){
+		if( i == 0 )
+			parameterList+=getFirstParameterSeparator();
+		else
+			parameterList+=getParameterSeparator();
+		parameterList+=parameters[i]->getString();
+	}
+
+	return getString()+parameterList;
+}
+
+

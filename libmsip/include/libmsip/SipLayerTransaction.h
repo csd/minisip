@@ -49,6 +49,8 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 
 		void removeTerminatedTransactions();
 		
+		std::list<MRef<SipTransaction*> > getTransactions();
+		
 		std::list<MRef<SipTransaction*> > getTransactionsWithCallId(std::string callid);
 		
 		virtual std::string getMemObjectType() const {return "SipLayerTransaction";}

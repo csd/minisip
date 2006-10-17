@@ -190,4 +190,9 @@ bool SipStack::getDebugPrintPackets(){
 	return get_debug_print_packets();
 }
 
+std::string SipStack::getStackStatusDebugString(){
+	return STACK->getStackStatusDebugString();
+}
+
+
 

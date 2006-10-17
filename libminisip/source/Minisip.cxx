@@ -474,7 +474,7 @@ int Minisip::runGui(){
 
 void Minisip::startDebugger(){
 	cerr << "startDebugger" << endl;
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf->sip->getSipStack()));
 	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 }
 

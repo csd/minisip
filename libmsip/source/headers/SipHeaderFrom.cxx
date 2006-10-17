@@ -46,15 +46,13 @@ SipHeaderFactoryFuncPtr sipHeaderFromFactory=fromFactory;
 const string sipHeaderValueFrom = "From";
 
 SipHeaderValueFrom::SipHeaderValueFrom(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
+		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),uri(build_from)
 {
-	uri = SipUri( build_from );
 }
 
 SipHeaderValueFrom::SipHeaderValueFrom(const SipUri& u)
-		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom)
+		: SipHeaderValue(SIP_HEADER_TYPE_FROM,sipHeaderValueFrom),uri(u)
 {
-	uri = u;
 }
 
 SipHeaderValueFrom::~SipHeaderValueFrom(){

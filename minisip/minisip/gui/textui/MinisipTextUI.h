@@ -68,8 +68,6 @@ class MinisipTextUI: public Gui, public TextUI, public TextUICompletionCallback{
 	private:
 		
 		void showMem();
-		void showStat();
-		void showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, std::string header);
 		
 		ConferenceControl *currentconf;
 		std::string currentconfname;

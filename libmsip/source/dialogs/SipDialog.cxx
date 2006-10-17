@@ -484,7 +484,7 @@ string SipDialogState::getRemoteTarget() {
 	}
 }
 
-std::string SipDialog::getDialogStatusString(){
+std::string SipDialog::getDialogDebugString(){
 
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
 		sipStack->getTimeoutProvider()->getTimeoutRequests();
@@ -515,7 +515,7 @@ std::string SipDialog::getDialogStatusString(){
 	cerr << BOLD << "        Identity: "<< PLAIN << endl;
 	cerr <<         "            "<< getDialogConfig()->inherited->sipIdentity->getDebugString();
 	cerr <<endl;
-	
+/*	
 	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
@@ -563,7 +563,7 @@ std::string SipDialog::getDialogStatusString(){
 				cerr << "                        (no timeouts)"<< endl;
 		}
 	}
-
+*/
 
 	return "";
 }

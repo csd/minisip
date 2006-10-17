@@ -164,18 +164,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 		
 		}
 
-		std::string getStringWithParameters(){
-			std::string parameterList;
-			int nparam = parameters.size();
-			for (int i=0; i< nparam; i++){
-				if( i == 0 )
-					parameterList+=getFirstParameterSeparator();
-				else
-					parameterList+=getParameterSeparator();
-				parameterList+=parameters[i]->getString();
-			}
-			return getString()+parameterList;
-		}
+		std::string getStringWithParameters();
 
 		const std::string &headerName;
 	protected:

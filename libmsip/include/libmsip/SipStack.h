@@ -172,10 +172,11 @@ class LIBMSIP_API SipStack : public Runnable{
 		void setDebugPrintPackets(bool enable);
 		bool getDebugPrintPackets();
 
+		std::string getStackStatusDebugString();
+
 	private:
 		friend class SipDialog;
-		//SipStackInternal* sipStackInternal;
-		void *sipStackInternal; // MRef<SipStackInternal*> sipStackInternal
+		void *sipStackInternal; // This is pointer to a MRef<SipStackInternal*> sipStackInternal
 
 };
 

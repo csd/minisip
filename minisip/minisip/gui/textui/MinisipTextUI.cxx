@@ -519,26 +519,6 @@ bool MinisipTextUI::configDialog( MRef<SipSoftPhoneConfiguration *> /*conf*/ ){
 	return false;
 }
 
-void MinisipTextUI::showDialogInfo(MRef<SipDialog*> d, bool usesStateMachine, string header){
-	d->getDialogStatusString();	//TODO: this method should return a string that we output
-}
-
-void MinisipTextUI::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogs();
-
-	displayMessage(" Calls:", bold);
-	if (calls.size()==0)
-		displayMessage("    (no calls)");
-	else{
-		int ii=0;
-		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!= calls.end(); i++, ii++){
-			showDialogInfo(*i,true, string("    (")+itoa(ii)+") ");
-		}
-	}
-
-}
-
-
 void MinisipTextUI::showMem(){
 	string all;
 	minilist<string> names = getMemObjectNames();
@@ -617,7 +597,7 @@ void MinisipTextUI::keyPressed(int key){
 		showMem();
 		break;
 	case '+':
-		showStat();
+		displayMessage( config->sip->getSipStack()->getStackStatusDebugString() );
 		break;
 	}
 }

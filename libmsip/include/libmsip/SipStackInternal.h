@@ -27,18 +27,17 @@
 
 
 #include<libmutil/CommandString.h>
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
 
 #include<libmsip/SipLayerTransport.h>
+#include<libmsip/SipTransaction.h>
 #include<libmcrypto/cert.h>
 #include<libmutil/MessageRouter.h>
+#include<libmutil/TimeoutProvider.h>
+#include<libmutil/StateMachine.h>
 
 class SipDialog;
-class SipTransaction;
-
-
 
 class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
@@ -88,7 +87,13 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 		std::string getAllSupportedExtensionsStr();
 		bool supports(std::string extension);
                 
+		std::string getStackStatusDebugString();
+
 	private:
+
+//		std::string getDialogDebugString(MRef<SipDialog*> d, list<MRef<SipTransaction*> > &trans,
+//				list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests);
+
 		MRef<SipTimers*> timers;
 		MRef<SipCommonConfig *> config;
 		MRef<CommandReceiver*> callback;

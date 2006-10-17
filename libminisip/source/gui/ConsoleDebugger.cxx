@@ -55,8 +55,8 @@
 
 using namespace std;
 
-ConsoleDebugger::ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf): 
-			config(conf), 
+ConsoleDebugger::ConsoleDebugger(MRef<SipStack*> stack): 
+			sipStack(stack), 
 			mediaHandler(NULL),
 			thread( NULL ) {
 };
@@ -144,8 +144,8 @@ void ConsoleDebugger::run(){
 	#ifdef DEBUG_OUTPUT
 			case 'P':
 			case 'p':
-				config->sip->getSipStack()->setDebugPrintPackets(!config->sip->getSipStack()->getDebugPrintPackets() );
-				if (config->sip->getSipStack()->getDebugPrintPackets() )
+				sipStack->setDebugPrintPackets(!sipStack->getDebugPrintPackets() );
+				if (sipStack->getDebugPrintPackets() )
 					cerr << "Packets will be displayed to the screen"<< endl;
 				else
 					cerr << "Packets will NOT be displayed to the screen"<< endl;
@@ -186,7 +186,7 @@ void ConsoleDebugger::run(){
 				break;
 			case ')': //print all timers ... 
 				cerr << "========= Timeouts still to fire : " << endl;
-				cerr << config->sip->getSipStack()->getTimeoutProvider()->getTimeouts() << endl;
+				cerr << sipStack->getTimeoutProvider()->getTimeouts() << endl;
 				cerr << "=========------------------ " << endl;
 				break;
 			
@@ -209,7 +209,7 @@ void ConsoleDebugger::sendManagementCommand( string str ) {
 	SipSMCommand cmd( cmdstr, 
 			SipSMCommand::dialog_layer,
 			SipSMCommand::dispatcher);
-	config->sip->getSipStack()->handleCommand(cmd);
+	sipStack->handleCommand(cmd);
 }
 
 void ConsoleDebugger::sendCommandToMediaHandler( string str ) {
@@ -228,28 +228,8 @@ void ConsoleDebugger::showMem(){
 	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
 }
 
-void ConsoleDebugger::showDialogInfo(MRef<SipDialog*> d){
-		d->getDialogStatusString();
-}
-
 void ConsoleDebugger::showStat(){
-	list<MRef<SipDialog*> > calls = config->sip->getSipStack()->getDialogs();
-
-	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		config->sip->getSipStack()->getTimeoutProvider()->getTimeoutRequests();
-
-	cerr << BOLD << " Calls:" << PLAIN << endl;
-	if (calls.size()==0)
-		cerr << "    (no calls)"<< endl;
-	else{
-		int ii=0;
-		for (list<MRef<SipDialog*> >::iterator i=calls.begin(); i!= calls.end(); i++, ii++){
-			cerr << string("    (")+itoa(ii)+") " ;
-			showDialogInfo(*i);
-
-		}
-
-	}
+	mout << sipStack->getStackStatusDebugString();
 }
 
 static int nonblockin_stdin()
@@ -297,7 +277,7 @@ void ConsoleDebugger::stop() {
 void ConsoleDebugger::join() {
 	thread->join();
 	mediaHandler = NULL;
-	config = NULL;
+	sipStack = NULL;
 	thread = NULL;
 }
 

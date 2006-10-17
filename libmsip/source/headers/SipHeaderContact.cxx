@@ -61,10 +61,8 @@ SipHeaderValueContact::SipHeaderValueContact()
 */
 
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
+		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri(build_from)
 {
-
-	uri = SipUri( build_from );
 	if( !uri.isValid() ) {
 		cerr << "SipHeaderValueContact::constructor - invalid contact uri" << endl;
 	}
@@ -107,6 +105,7 @@ SipHeaderValueContact::~SipHeaderValueContact(){
 		
 string SipHeaderValueContact::getString(){
 	string user = uri.getString();
+
 //	merr << "SipHeaderValueContact::getString: "<< user <<end;
 #if 0
 	string name;

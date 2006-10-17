@@ -117,6 +117,17 @@ void SipLayerTransaction::removeTerminatedTransactions(){
 	}
 }
 
+list<MRef<SipTransaction*> > SipLayerTransaction::getTransactions(){
+	list<MRef<SipTransaction*> > ret;
+	for (int i=0; i< transactions.size(); i++)
+		ret.push_back(transactions[i]);
+
+	return ret;
+}
+
+
+
+
 list<MRef<SipTransaction*> > SipLayerTransaction::getTransactionsWithCallId(string callid){
 	list<MRef<SipTransaction*> > ret;
 	for (int i=0; i< transactions.size(); i++){

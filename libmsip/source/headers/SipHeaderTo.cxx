@@ -48,16 +48,14 @@ const string sipHeaderValueToTypeStr = "To";
 		
 
 SipHeaderValueTo::SipHeaderValueTo(const string &build_from) 
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),uri(build_from)
 {
-	uri = SipUri( build_from );
 }
 
 
 SipHeaderValueTo::SipHeaderValueTo(const SipUri& u)
-		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr)
+		: SipHeaderValue(SIP_HEADER_TYPE_TO,sipHeaderValueToTypeStr),uri(u)
 {
-	uri = u;
 }
 
 SipHeaderValueTo::~SipHeaderValueTo(){
