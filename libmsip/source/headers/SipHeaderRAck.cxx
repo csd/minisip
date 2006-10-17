@@ -53,7 +53,7 @@ const string sipHeaderValueRAckTypeStr = "RAck";
 SipHeaderValueRAck::SipHeaderValueRAck(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_RACK,sipHeaderValueRAckTypeStr){
 	unsigned i=0;
 	unsigned maxi=build_from.size()-1;
-	while (build_from[i]==' ')
+	while (i<=maxi && isWS(build_from[i]))
 		i++;
 	
 	string respnumstr;
@@ -62,7 +62,7 @@ SipHeaderValueRAck::SipHeaderValueRAck(const string &build_from):SipHeaderValue(
 		i++;
 	}
 	
-	while (i<=maxi && build_from[i]==' ')
+	while (i<=maxi && isWS(build_from[i]) )
 		i++;
 	
 	string cseqnumstr;
@@ -70,13 +70,12 @@ SipHeaderValueRAck::SipHeaderValueRAck(const string &build_from):SipHeaderValue(
 		cseqnumstr+=build_from[i];
 		i++;
 	}
-	
-	
-	method="";
-	while (!(i>=build_from.length())){
-		method+=build_from[i];
+
+	while (i<=maxi && isWS(build_from[i]) )
 		i++;
-	}
+	
+	method = build_from.substr(i);
+	
 	respnum = atoi((trim(respnumstr)).c_str());
 	cseqnum = atoi((trim(cseqnumstr)).c_str());
 }
