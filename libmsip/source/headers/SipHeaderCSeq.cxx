@@ -51,23 +51,23 @@ SipHeaderFactoryFuncPtr sipHeaderCSeqFactory=cseqFactory;
 const string sipHeaderValueCSeqTypeStr = "CSeq";
 
 SipHeaderValueCSeq::SipHeaderValueCSeq(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){
+	unsigned maxlen=build_from.size();
 	unsigned i=0;
-	while (build_from[i]==' ')
+
+	while (i<maxlen && isWS(build_from[i]))
 		i++;
+
 	string num;
-	while ((build_from[i]>='0' && build_from[i]<='9') || build_from[i]=='-'){
+	while (i<maxlen && (build_from[i]>='0' && build_from[i]<='9') || build_from[i]=='-'){
 		num+=build_from[i];
 		i++;
 	}
 	
-	while (build_from[i]==' ')
+	while (i<maxlen && isWS(build_from[i]) )
 		i++;
-	
-	method="";
-	while (!(i>=build_from.length())){
-		method+=build_from[i];
-		i++;
-	}
+
+	method = build_from.substr(i);
+
 	setCSeq(atoi((trim(num)).c_str()));
 }
 
