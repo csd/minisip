@@ -68,7 +68,6 @@
 template<class TOCommand, class TOSubscriber>
 class TPRequest{
 	public:
-//		TPRequest(){}
 
 		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){
 			
@@ -80,36 +79,36 @@ class TPRequest{
 		/**
 		 * @param t  ms since Epoch
 		 */
-		bool happens_before(uint64_t t){
+		bool happensBefore(uint64_t t){
 			if (when_ms < t)
 				return true;
 			if (when_ms > t)
 				return false;
-			return false; //if equal it does not "happens_before"
+			return false; //if equal it does not "happensBefore"
 			
 		}
 		
-		bool happens_before(const TPRequest &req){
-			return happens_before(req.when_ms);
+		bool happensBefore(const TPRequest &req){
+			return happensBefore(req.when_ms);
 		}
 		
 		/**
 		 * Number of milli seconds until timeout from when this method is
 		 * called
 		 */
-		int get_ms_to_timeout(){
+		int getMsToTimeout(){
 			uint64_t now=mtime();
-			if (happens_before(now))
+			if (happensBefore(now))
 				return 0;
 			else
 				return (int)(when_ms - now);
 		}
 		
-		TOCommand get_command(){
+		TOCommand getCommand(){
 			return command;
 		}
 		
-		TOSubscriber get_subscriber(){
+		TOSubscriber getSubscriber(){
 			return subscriber;
 		}
 
@@ -159,10 +158,10 @@ class TimeoutProvider : public Runnable{
 			synch_lock.lock();
 			
 			for (int i=0 ; i<requests.size(); i++){
-				int ms= requests[i].get_ms_to_timeout();
-				TOSubscriber receiver = requests[i].get_subscriber();
+				int ms= requests[i].getMsToTimeout();
+				TOSubscriber receiver = requests[i].getSubscriber();
 				ret = ret + "      " 
-					+ std::string("Command: ") + requests[i].get_command() 
+					+ std::string("Command: ") + requests[i].getCommand() 
 					+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)
 					+ "  Receiver ObjectId: "+itoa((int)receiver)
 					+"\n";
@@ -223,7 +222,7 @@ class TimeoutProvider : public Runnable{
 		 * @param command	Specifies the String command to be passed back in the
 		 * 			callback.
 		 */
-		void request_timeout(int32_t time_ms, TOSubscriber subscriber, const TOCommand &command){
+		void requestTimeout(int32_t time_ms, TOSubscriber subscriber, const TOCommand &command){
 			massert(subscriber);
 			TPRequest<TOCommand, TOSubscriber> request(subscriber, time_ms, command);
 
@@ -237,14 +236,14 @@ class TimeoutProvider : public Runnable{
 				return;
 			}
 
-			if (request.happens_before(requests[0])){
+			if (request.happensBefore(requests[0])){
 				requests.push_front(request);
                                 wake();
 				synch_lock.unlock();
 				return;
 			}
 
-			if (requests[requests.size()-1].happens_before(request)){
+			if (requests[requests.size()-1].happensBefore(request)){
 				requests.push_back(request);
                                 wake();
 				synch_lock.unlock();
@@ -252,7 +251,7 @@ class TimeoutProvider : public Runnable{
 			}
 
 			int i=0;
-			while (requests[i].happens_before(request))
+			while (requests[i].happensBefore(request))
 				i++;
 
 			requests.insert(i,request);             
@@ -264,11 +263,11 @@ class TimeoutProvider : public Runnable{
 		/**
 		 * @see request_timeout
 		 */
-		void cancel_request(TOSubscriber subscriber, const TOCommand &command){
+		void cancelRequest(TOSubscriber subscriber, const TOCommand &command){
                         synch_lock.lock();
 			int loop_count=0;
 			for (int i=0; loop_count<requests.size(); i++){
-				if (requests[i].get_subscriber()==subscriber && requests[i].get_command()==command){
+				if (requests[i].getSubscriber()==subscriber && requests[i].getCommand()==command){
 					requests.remove(i);
 					i=0;
 				}
@@ -301,15 +300,15 @@ class TimeoutProvider : public Runnable{
 				int32_t time=3600000;
 				int32_t size=0;
 				if ((size=requests.size())>0)
-					time = requests[0].get_ms_to_timeout();
+					time = requests[0].getMsToTimeout();
 				if (time==0 && size > 0){
 					if (stop){		//This must be checked so that we will
 								//stop even if we have timeouts to deliver.
 						return;
 					}
 					TPRequest<TOCommand, TOSubscriber> req = requests[0];
-					TOSubscriber subs=req.get_subscriber();
-					TOCommand command=req.get_command();
+					TOSubscriber subs=req.getSubscriber();
+					TOCommand command=req.getCommand();
 					requests.remove(req);
                                         synch_lock.unlock();
 					massert(subs);		

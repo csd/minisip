@@ -222,7 +222,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		 * machine.
 		 */
 		void requestTimeout(int32_t ms, const TimeoutType &command){
-			timeoutProvider->request_timeout(ms, this, command);
+			timeoutProvider->requestTimeout(ms, this, command);
 		}
 
 		/**
@@ -231,7 +231,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		 * call has no effect.
 		 */
 		void cancelTimeout(const TimeoutType &command){
-			timeoutProvider->cancel_request(this, command);
+			timeoutProvider->cancelRequest(this, command);
 		}
 
 		MRef< TimeoutProvider<TimeoutType, MRef<StateMachine<CommandType,TimeoutType> *> > *> getTimeoutProvider(){return timeoutProvider;}

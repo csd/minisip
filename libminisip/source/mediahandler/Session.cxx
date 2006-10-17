@@ -836,13 +836,13 @@ void Session::sendDtmf( uint8_t symbol ){
 	MRef<DtmfSender *> dtmfSender = new DtmfSender( this );
 	uint32_t * ts = new uint32_t;
 	*ts = 0;
-	dtmfTOProvider->request_timeout( 0, dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
-	dtmfTOProvider->request_timeout( 5, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
-	dtmfTOProvider->request_timeout( 10, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
-	
-	dtmfTOProvider->request_timeout( 15, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-	dtmfTOProvider->request_timeout( 20, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
-	dtmfTOProvider->request_timeout( 25, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
+	dtmfTOProvider->requestTimeout( 0, dtmfSender, new DtmfEvent( symbol, 10, 0, false, true, ts ) );
+	dtmfTOProvider->requestTimeout( 5, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+	dtmfTOProvider->requestTimeout( 10, dtmfSender, new DtmfEvent( symbol, 10, 0, false, false, ts ) );
+
+	dtmfTOProvider->requestTimeout( 15, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+	dtmfTOProvider->requestTimeout( 20, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts ) );
+	dtmfTOProvider->requestTimeout( 25, dtmfSender, new DtmfEvent( symbol, 10, 800, true, false, ts, true ) );
 	
 }
 

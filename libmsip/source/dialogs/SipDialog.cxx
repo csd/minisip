@@ -520,9 +520,9 @@ std::string SipDialog::getDialogStatusString(){
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
 	for (uint32_t j=0; j< torequests.size(); j++,jj++){
-		if ( this == *((*jj).get_subscriber()) ){
-			int ms= (*jj).get_ms_to_timeout();
-			cerr << string("            timeout: ")+ (*jj).get_command()
+		if ( this == *((*jj).getSubscriber()) ){
+			int ms= (*jj).getMsToTimeout();
+			cerr << string("            timeout: ")+ (*jj).getCommand()
 				+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
 			ntimeouts++;
 		}
@@ -551,10 +551,10 @@ std::string SipDialog::getDialogStatusString(){
 			int ntimeouts=0;
 			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
 			for (uint32_t j=0; j< torequests.size(); j++, jj++){
-				if ( *((*i)) == *((*jj).get_subscriber()) ){
-					int ms= (*jj).get_ms_to_timeout();
+				if ( *((*i)) == *((*jj).getSubscriber()) ){
+					int ms= (*jj).getMsToTimeout();
 					cerr << string("                        timeout: ")
-						+ (*jj).get_command()
+						+ (*jj).getCommand()
 						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)<< endl;
 					ntimeouts++;
 				}
