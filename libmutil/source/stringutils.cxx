@@ -76,7 +76,7 @@ static int strcasecmp(const char *s1, const char *s2){
 
 using namespace std;
 
-LIBMUTIL_API std::vector<string> split(string s, bool do_trim, char delim, bool includeEmpty){
+LIBMUTIL_API std::vector<string> split(const string &s, bool do_trim, char delim, bool includeEmpty){
 	std::vector<string> ret;
 	
 	if (s.size()==0)
@@ -100,7 +100,7 @@ LIBMUTIL_API std::vector<string> split(string s, bool do_trim, char delim, bool 
 	return ret;
 }
 
-LIBMUTIL_API std::vector<string> splitLines(string s, bool do_trim){
+LIBMUTIL_API std::vector<string> splitLines(const string &s, bool do_trim){
 	return split(s, do_trim, '\n',false);
 }
 
@@ -108,10 +108,10 @@ LIBMUTIL_API bool isWS(char c){
 	return (c==' ' || c=='\t' || c=='\n');
 }
 
-LIBMUTIL_API string upCase(string s){
+LIBMUTIL_API string upCase(const string &s){
 	size_t n=s.size();
 	string ret(n,' ');
-	string::iterator i=s.begin();
+	string::const_iterator i=s.begin();
 	string::iterator j=ret.begin();
 	for ( ; i!=s.end(); i++, j++)
 		*j = upCase(*i);
@@ -133,7 +133,7 @@ LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2, int n){
 	return strncasecmp(s1,s2,n);
 }
 
-LIBMUTIL_API string trim(string line){
+LIBMUTIL_API string trim(const string &line){
 	size_t spacesFront = 0, spacesEnd = 0;
 	int32_t idx;
 
@@ -148,8 +148,7 @@ LIBMUTIL_API string trim(string line){
 		spacesEnd++;
 		idx--;
 	}
-	line = line.substr( spacesFront, line.size() - ( spacesFront + spacesEnd ) );
-	return line;
+	return line.substr( spacesFront, line.size() - ( spacesFront + spacesEnd ) );
 }
 
 LIBMUTIL_API string binToHex( unsigned char * data, int length ){

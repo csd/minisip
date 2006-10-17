@@ -49,7 +49,7 @@ LIBMUTIL_API std::string itoa(int64_t i);
  * @return	If s is an empty string the function will return an empty
  * 		vector (no matter if includeEmpty is true or false)
  */
-LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
+LIBMUTIL_API std::vector<std::string> split(const std::string &s, bool do_trim=true, char delim='\n', bool includeEmpty=false);
 
 /**
  * Splits a string on new line character ('\n').
@@ -59,9 +59,9 @@ LIBMUTIL_API std::vector<std::string> split(std::string s, bool do_trim=true, ch
  * 		included in the output.
  * 		An empty input string returns an empty vector.
  */
-LIBMUTIL_API std::vector<std::string> splitLines(std::string s, bool do_trim = true);
+LIBMUTIL_API std::vector<std::string> splitLines(const std::string &s, bool do_trim = true);
 
-LIBMUTIL_API std::string upCase(std::string s);
+LIBMUTIL_API std::string upCase(const std::string &s);
 
 LIBMUTIL_API int upCase(char c);
 
@@ -79,7 +79,7 @@ LIBMUTIL_API bool isWS(char c);
  * 	@param s	String from which to remove whitespace (or rather copy and remove whitespace from)
  * 	@author Erik Eliasson
 */
-LIBMUTIL_API std::string trim(std::string s);
+LIBMUTIL_API std::string trim(const std::string &s);
 
 /**
  * Converts an array of raw data to a hex string representation.
