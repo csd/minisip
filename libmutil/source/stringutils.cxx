@@ -104,6 +104,10 @@ LIBMUTIL_API std::vector<string> splitLines(string s, bool do_trim){
 	return split(s, do_trim, '\n',false);
 }
 
+LIBMUTIL_API bool isWS(char c){
+	return (c==' ' || c=='\t' || c=='\n');
+}
+
 LIBMUTIL_API string upCase(string s){
 	size_t n=s.size();
 	string ret(n,' ');

@@ -63,6 +63,11 @@ LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2);
 LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2);
 
 /**
+ * @return true if the parameter is a white space (' ', '\n' or '\t')
+ */
+LIBMUTIL_API bool isWS(char c);
+
+/**
  * Removes whitespace from beginning and end of Strings.
  * 	@param s	String from which to remove whitespace (or rather copy and remove whitespace from)
  * 	@author Erik Eliasson
