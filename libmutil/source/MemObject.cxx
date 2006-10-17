@@ -90,7 +90,7 @@ void MObject::operator=(const MObject &){
 }
 	
 
-int MObject::decRefCount(){
+int MObject::decRefCount() const{
 	int refRet;
 #ifdef MDEBUG
 	global.lock();
@@ -113,7 +113,7 @@ int MObject::decRefCount(){
 	return refRet;
 }
 
-void MObject::incRefCount(){
+void MObject::incRefCount() const{
 #ifdef MDEBUG
 	global.lock();
 #else
@@ -134,7 +134,7 @@ void MObject::incRefCount(){
 #endif
 }
 
-int MObject::getRefCount(){
+int MObject::getRefCount() const{
 	return refCount;
 }
 

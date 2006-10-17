@@ -91,17 +91,17 @@ class LIBMUTIL_API MObject{
 		/**
 		Decrease the reference counter (thread-safe)
 		*/
-		int decRefCount();
+		int decRefCount() const;
 		
 		/**
 		Increase the reference counter (thread-safe)
 		*/
-		void incRefCount();
+		void incRefCount() const;
 
 		/**
 		Return the value of the reference counter
 		*/
-		int getRefCount();
+		int getRefCount() const;
 		
 		/**
 		 * If mutil has been configured with --enable-memdebug
@@ -120,7 +120,7 @@ class LIBMUTIL_API MObject{
 		/**
 		Reference counter ... 
 		*/
-		int refCount;
+		mutable int refCount;
 		
 		/**
 		Mutex, provides thread safety. 
