@@ -28,6 +28,7 @@
 #include <libmutil/libmutil_config.h>
 
 #include<libmutil/mtypes.h>
+#include<libmutil/Exception.h>
 
 #include<list>
 
@@ -60,12 +61,13 @@ In the following example "name" is a attribute and FILE is an element
  * TODO: Actually implement XML support ;) 
  */
 
-class LIBMUTIL_API XMLException{
+class LIBMUTIL_API XMLException : public Exception{
 	public:
-		XMLException(std::string msg){this->msg=msg;};
-		std::string what(){return msg;};
+		XMLException(std::string msg):
+				Exception(msg.c_str()) {/*this->msg=msg;*/};
+		//std::string what(){return msg;};
 	private:
-		std::string msg;
+		//std::string msg;
 };
 
 class LIBMUTIL_API XMLElementNotFound: public XMLException{
