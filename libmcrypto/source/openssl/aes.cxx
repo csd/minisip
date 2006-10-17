@@ -40,7 +40,6 @@ typedef struct AES_KEY_s AES_KEY;
 //debug:
 #ifdef DEBUG_OUTPUT
 #include<iostream>
-#include<libmutil/print_hex.h>
 using namespace std;
 #endif
 
