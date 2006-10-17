@@ -49,6 +49,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/mtime.h>
 #include<libmutil/dbg.h>
+#include<libmutil/stringutils.h>
 //#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
@@ -243,7 +244,7 @@ uint32_t SipMessageParser::findContentLength(){
 	const char * contentLengthString = "\nContent-Length: ";
 
 	for( i = 0; i + 17 < index; i++ ){
-		if( strncasecmp( contentLengthString, (char *)(buffer + i) , 17  ) == 0 ){
+		if( strNCaseCmp( contentLengthString, (char *)(buffer + i) , 17  ) == 0 ){
 			uint32_t j = 0;
 			string num;
 			

@@ -60,7 +60,7 @@ LIBMUTIL_API int upCase(char c);
 
 LIBMUTIL_API int strCaseCmp(const char *s1, const char* s2);
 
-LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2);
+LIBMUTIL_API int strNCaseCmp(const char *s1, const char* s2, int n);
 
 /**
  * @return true if the parameter is a white space (' ', '\n' or '\t')
