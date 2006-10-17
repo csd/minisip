@@ -30,6 +30,14 @@ Exception::Exception():exception(){
 #endif
 }
 
+Exception::Exception(const Exception &e): 
+		msg(e.msg), 
+		stackDepth(e.stackDepth)
+{
+	stack = new void*[MAX_STACK_TRACE_DEPTH];
+	memcpy(stack, d.stack, MAX_STACK_TRACE_DEPTH*sizeof(void*));
+}
+
 /**
  * We use "backtrace" in libc to get find out what the 
  * stack looks like.

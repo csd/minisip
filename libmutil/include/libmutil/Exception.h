@@ -59,6 +59,8 @@ public:
 	 * using the "what()" method.
 	 */
 	Exception(char const* what);
+
+	Exception(const Exception &)
 	
 	~Exception() throw ();
 	
