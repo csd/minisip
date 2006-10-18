@@ -76,11 +76,11 @@ SipHeaderValueCSeq::SipHeaderValueCSeq(const string &meth, int s) : SipHeaderVal
 SipHeaderValueCSeq::~SipHeaderValueCSeq(){
 }
 
-string SipHeaderValueCSeq::getString(){
+string SipHeaderValueCSeq::getString() const{
 	return itoa(seq)+" "+method;
 }
 
-string SipHeaderValueCSeq::getMethod(){
+string SipHeaderValueCSeq::getMethod() const{
 	return method;
 }
 		
@@ -92,7 +92,7 @@ void SipHeaderValueCSeq::setCSeq(int32_t n){
 	this->seq = n;
 }
 
-int32_t SipHeaderValueCSeq::getCSeq(){
+int32_t SipHeaderValueCSeq::getCSeq() const{
 	return seq;
 }
 

@@ -55,12 +55,12 @@ class LIBMSIP_API SipHeaderValueExpires: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		int32_t getTimeout();
+		int32_t getTimeout() const;
 		
 //		void setTimeout(int32_t timeout);
 

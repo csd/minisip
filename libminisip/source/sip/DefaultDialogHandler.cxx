@@ -125,7 +125,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = NULL;
 
 			if( to ){
-				id = phoneconf->getIdentity( to->getUri() );
+				SipUri u = to->getUri();
+				id = phoneconf->getIdentity( u );
 			}
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
@@ -190,7 +191,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = NULL;
 
 			if( to ){
-				id = phoneconf->getIdentity( to->getUri() );
+				SipUri u = to->getUri();
+				id = phoneconf->getIdentity( u );
 			}
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
@@ -226,7 +228,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = NULL;
 
 			if( to ){
-				id = phoneconf->getIdentity( to->getUri() );
+				SipUri u = to->getUri();
+				id = phoneconf->getIdentity( u );
 			}
 
 			// get a session from the mediaHandler

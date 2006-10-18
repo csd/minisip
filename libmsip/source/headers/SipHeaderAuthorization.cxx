@@ -121,8 +121,8 @@ SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
 
 }
 
-string SipHeaderValueAuthorization::getString(){
-	uri.setUserType("");
+string SipHeaderValueAuthorization::getString() const{
+	//uri.setUserType("");
 
 	string result = auth_method+
 		" algorithm=\"MD5\""+", username=\""+auth_id+
@@ -149,7 +149,7 @@ string SipHeaderValueAuthorization::md5ToString(unsigned char *md5){
 
 
 
-string SipHeaderValueAuthorization::calcResponse(){
+string SipHeaderValueAuthorization::calcResponse() const{
 	unsigned char digest[16];
 	MD5Context context;
 	MD5Init(&context);
@@ -177,7 +177,7 @@ string SipHeaderValueAuthorization::calcResponse(){
 	return auth_string;
 }
 
-string SipHeaderValueAuthorization::getSipMethod(){
+string SipHeaderValueAuthorization::getSipMethod() const{
 	return sipMethod;
 }
 
@@ -185,7 +185,7 @@ void SipHeaderValueAuthorization::setSipMethod(const string &m){
 	this->sipMethod=m;
 }
 
-string SipHeaderValueAuthorization::getUsername(){
+string SipHeaderValueAuthorization::getUsername() const{
 	return username;
 }
 
@@ -194,7 +194,7 @@ void SipHeaderValueAuthorization::setUsername(const string &un){
 }
 
 
-string SipHeaderValueAuthorization::getNonce(){
+string SipHeaderValueAuthorization::getNonce() const{
 	return nonce;
 }
 
@@ -202,7 +202,7 @@ void SipHeaderValueAuthorization::setNonce(const string &n){
 	this->nonce=n;
 }
 
-string SipHeaderValueAuthorization::getOpaque(){
+string SipHeaderValueAuthorization::getOpaque() const{
 	return opaque;
 }
 
@@ -210,7 +210,7 @@ void SipHeaderValueAuthorization::setOpaque(const string &n){
 	this->opaque=n;
 }
 
-string SipHeaderValueAuthorization::getRealm(){
+string SipHeaderValueAuthorization::getRealm() const{
 	return realm;
 }
 
@@ -218,7 +218,7 @@ void SipHeaderValueAuthorization::setRealm(const string &r){
 	this->realm=r;
 }
 
-SipUri SipHeaderValueAuthorization::getUri(){
+SipUri SipHeaderValueAuthorization::getUri() const{
 	return uri;
 }
 

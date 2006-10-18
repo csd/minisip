@@ -65,12 +65,12 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		SipUri getUri();
+		SipUri getUri() const;
 		void setUri(const SipUri &uri);
 		
 		/**
@@ -85,7 +85,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		  * Using the SipCommands, it can be set to any value (param3),
 		  * for example, to zero for de-registration.
 		  */
-		 int getExpires();
+		 int getExpires() const;
 		 void setExpires(int _expires);
 		 
 	private:

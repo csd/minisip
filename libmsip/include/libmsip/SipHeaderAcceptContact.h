@@ -75,13 +75,13 @@ class LIBMSIP_API SipHeaderValueAcceptContact: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const ; 
 		
 		/**
 		 * returns the featuretag
 		 * @return  a string containing the feature tag
 		 */
-		std::string getFeaturetag(){return featuretag;}
+		std::string getFeaturetag() const {return featuretag;}
 
 	private:
 		

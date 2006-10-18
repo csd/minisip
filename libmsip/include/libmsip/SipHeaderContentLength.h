@@ -56,12 +56,12 @@ class LIBMSIP_API SipHeaderValueContentLength: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		virtual std::string getString(); 
+		virtual std::string getString() const; 
 
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		int32_t getContentLength();
+		int32_t getContentLength() const;
 		
 		void setContentLength(int32_t content_length);
 

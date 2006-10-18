@@ -57,17 +57,17 @@ class LIBMSIP_API SipHeaderValueCSeq: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		int32_t getCSeq();
+		int32_t getCSeq() const;
 		void setCSeq(int32_t n);
 
 
-		std::string getMethod();
+		std::string getMethod() const;
 		void setMethod(const std::string &method);
 
 	private:

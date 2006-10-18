@@ -81,11 +81,11 @@ SipHeaderValueWarning::~SipHeaderValueWarning(){
 
 }
 
-string SipHeaderValueWarning::getString(){
+string SipHeaderValueWarning::getString() const{
 	return /*"Warning: "+*/ itoa(errorCode)+" "+domainName+" \""+warning+"\"";
 }
 
-string SipHeaderValueWarning::getWarning(){
+string SipHeaderValueWarning::getWarning() const{
 	return warning;
 }
 		
@@ -93,7 +93,7 @@ void SipHeaderValueWarning::setWarning(const string &warning){
 	this->warning=warning;
 }
 
-string SipHeaderValueWarning::getDomainName(){
+string SipHeaderValueWarning::getDomainName() const{
 	return domainName;
 }
 
@@ -101,7 +101,7 @@ void SipHeaderValueWarning::setDomainName(const string &domainName){
 	this->domainName=domainName;
 }
 
-uint16_t SipHeaderValueWarning::getErrorCode(){
+uint16_t SipHeaderValueWarning::getErrorCode() const{
 	return errorCode;
 }
 

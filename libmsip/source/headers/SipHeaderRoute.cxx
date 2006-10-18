@@ -78,11 +78,11 @@ SipHeaderValueRoute::SipHeaderValueRoute(list<string> &routeSet)
 SipHeaderValueRoute::~SipHeaderValueRoute(){
 }
 
-string SipHeaderValueRoute::getString(){
+string SipHeaderValueRoute::getString() const{
 	return route;
 }
 
-string SipHeaderValueRoute::getRoute(){
+string SipHeaderValueRoute::getRoute() const{
 	return route;
 }
 

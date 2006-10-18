@@ -56,9 +56,9 @@ class LIBMSIP_API SipHeaderValueRoute: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
-		std::string getRoute();
+		std::string getRoute() const;
 
 	private:
 		std::string route;

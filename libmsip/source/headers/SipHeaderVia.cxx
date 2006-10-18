@@ -187,7 +187,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip, int3
 SipHeaderValueVia::~SipHeaderValueVia(){
 }
 
-string SipHeaderValueVia::getString(){
+string SipHeaderValueVia::getString() const{
 	string via;
 	via = "SIP/2.0/"+protocol+" ";
 	if( ip.find(':') != string::npos )
@@ -202,7 +202,7 @@ string SipHeaderValueVia::getString(){
 	return via;
 }
 
-string SipHeaderValueVia::getProtocol(){
+string SipHeaderValueVia::getProtocol() const{
 	return protocol;
 }
 
@@ -210,7 +210,7 @@ void SipHeaderValueVia::setProtocol(const string &protocol){
 	this->protocol=protocol;
 }
 		
-string SipHeaderValueVia::getIp(){
+string SipHeaderValueVia::getIp() const{
 	return ip;
 }
 		
@@ -218,7 +218,7 @@ void SipHeaderValueVia::setIp(const string &ip){
 	this->ip=ip;
 }
 
-int32_t SipHeaderValueVia::getPort(){
+int32_t SipHeaderValueVia::getPort() const{
 	return port;
 }
 

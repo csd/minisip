@@ -57,14 +57,14 @@ class LIBMSIP_API SipHeaderValueRAck: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
-		int32_t getResponseNum();
+		int32_t getResponseNum() const;
 
-		int32_t getCSeqNum();
+		int32_t getCSeqNum() const;
 
 
-		std::string getMethod();
+		std::string getMethod() const;
 		void setMethod(const std::string &method);
 
 	private:

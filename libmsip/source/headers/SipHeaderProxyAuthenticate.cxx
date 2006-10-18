@@ -73,10 +73,10 @@ SipHeaderValueProxyAuthenticate::~SipHeaderValueProxyAuthenticate(){
 
 }
 		
-string SipHeaderValueProxyAuthenticate::getString(){
+string SipHeaderValueProxyAuthenticate::getString() const{
 	return getAuthMethod();
 } 
 
-string SipHeaderValueProxyAuthenticate::getAuthMethod(){
+string SipHeaderValueProxyAuthenticate::getAuthMethod() const{
 	return authMethod;
 }

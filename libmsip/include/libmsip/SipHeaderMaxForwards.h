@@ -56,12 +56,12 @@ class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		int32_t getMaxForwards();
+		int32_t getMaxForwards() const;
 		
 		//void setMaxForwards(int32_t max);
 

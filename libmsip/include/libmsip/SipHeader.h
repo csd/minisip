@@ -85,7 +85,7 @@ typedef MRef<SipHeaderValue*>(*SipHeaderFactoryFuncPtr)(const std::string & buf)
 class LIBMSIP_API SipHeaderFactories{
 	public:
 		void addFactory(std::string contentType, SipHeaderFactoryFuncPtr);
-		SipHeaderFactoryFuncPtr getFactory(const std::string contentType);
+		SipHeaderFactoryFuncPtr getFactory(const std::string contentType) const;
 
 	private:
 		std::map<std::string, SipHeaderFactoryFuncPtr > factories;
@@ -96,10 +96,10 @@ class LIBMSIP_API SipHeaderParameter:public MObject{
 		SipHeaderParameter(std::string parseFrom);
 		SipHeaderParameter(std::string key, std::string value, bool hasEqual);	//hasEqual is there to support ;lr
 		std::string getMemObjectType() const {return "SipHeaderParameter";}
-		std::string getKey(){return key;}
-		std::string getValue(){return value;}
+		std::string getKey() const {return key;}
+		std::string getValue() const {return value;}
 		void setValue(std::string v){value=v;}
-		std::string getString();
+		std::string getString() const;
 		
 	private:
 		std::string key;
@@ -111,7 +111,7 @@ class LIBMSIP_API SipHeaderParameter:public MObject{
 class LIBMSIP_API SipHeaderValue : public MObject{
 	public:
 		SipHeaderValue(int type, const std::string &hName);
-		virtual std::string getString()=0;	
+		virtual std::string getString() const =0;	
 		int getType(){return type;}
 
 		void setParameter(std::string key, std::string val){
@@ -136,7 +136,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			parameters.push_back(p);
 		}
 
-		bool hasParameter(const std::string &key){
+		bool hasParameter(const std::string &key) const {
 			for (int i=0; i< parameters.size();i++){
 				if (parameters[i]->getKey()==key){
 					return true;
@@ -145,7 +145,7 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 			return false;
 		}
 
-		std::string getParameter(std::string key){
+		std::string getParameter(std::string key) const {
 			for (int i=0; i< parameters.size();i++){
 				if (parameters[i]->getKey()==key){
 					return parameters[i]->getValue();
@@ -164,13 +164,13 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 		
 		}
 
-		std::string getStringWithParameters();
+		std::string getStringWithParameters() const ;
 
 		const std::string &headerName;
 	protected:
 
-		virtual char getFirstParameterSeparator(){return ';';}
-		virtual char getParameterSeparator(){return ';';}
+		virtual char getFirstParameterSeparator() const {return ';';}
+		virtual char getParameterSeparator() const {return ';';}
 
 		int type;
 		minilist<MRef<SipHeaderParameter*> > parameters;
@@ -190,14 +190,14 @@ class LIBMSIP_API SipHeader : public MObject{
                 SipHeader(MRef<SipHeaderValue*> value);
 		virtual ~SipHeader();
 
-		std::string getString();
+		std::string getString() const ;
 		void addHeaderValue(MRef<SipHeaderValue*> v);
 
                 virtual std::string getMemObjectType() const {return "SipHeader";}
 
-		int32_t getType(){return type;}
-		int getNoValues(){return headerValues.size();}
-		MRef<SipHeaderValue *> getHeaderValue(int i){
+		int32_t getType() const {return type;}
+		int getNoValues() const {return headerValues.size();}
+		MRef<SipHeaderValue *> getHeaderValue(int i) const {
 			assert(i < headerValues.size() );
 			return headerValues[i];
 		}

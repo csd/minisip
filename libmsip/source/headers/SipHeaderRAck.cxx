@@ -85,19 +85,19 @@ SipHeaderValueRAck::SipHeaderValueRAck(const string &meth, int rnum, int cseq) :
 SipHeaderValueRAck::~SipHeaderValueRAck(){
 }
 
-string SipHeaderValueRAck::getString(){
+string SipHeaderValueRAck::getString() const{
 	return itoa(respnum)+" "+itoa(cseqnum)+" "+method;
 }
 
-string SipHeaderValueRAck::getMethod(){
+string SipHeaderValueRAck::getMethod() const{
 	return method;
 }
 		
-int32_t SipHeaderValueRAck::getResponseNum(){
+int32_t SipHeaderValueRAck::getResponseNum() const{
 	return respnum;
 }
 
-int32_t SipHeaderValueRAck::getCSeqNum(){
+int32_t SipHeaderValueRAck::getCSeqNum() const{
 	return cseqnum;
 }
 

@@ -64,11 +64,11 @@ SipHeaderValueMaxForwards::SipHeaderValueMaxForwards(int32_t mf)
 SipHeaderValueMaxForwards::~SipHeaderValueMaxForwards(){
 }
 
-string SipHeaderValueMaxForwards::getString(){
-	return /*"Max-Forwards: "+*/itoa(max);
+string SipHeaderValueMaxForwards::getString() const{
+	return itoa(max);
 }
 
-int32_t SipHeaderValueMaxForwards::getMaxForwards(){
+int32_t SipHeaderValueMaxForwards::getMaxForwards() const{
 	return max;
 }
 

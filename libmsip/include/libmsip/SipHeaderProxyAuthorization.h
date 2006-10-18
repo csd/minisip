@@ -66,11 +66,11 @@ class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthori
 		/**
 		 * returns string representation of the header
 		 */
-		virtual std::string getString(); 
+		virtual std::string getString() const; 
 
 	protected:
-		char getFirstParameterSeparator(){return ' ';}
-		char getParameterSeparator(){return ',';}
+		char getFirstParameterSeparator() const {return ' ';}
+		char getParameterSeparator() const {return ',';}
 
 	private:
 	

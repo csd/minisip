@@ -66,11 +66,11 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(uint32_t n)
 SipHeaderValueRSeq::~SipHeaderValueRSeq(){
 }
 
-string SipHeaderValueRSeq::getString(){
+string SipHeaderValueRSeq::getString() const{
 	return itoa(seq);
 }
 
-uint32_t SipHeaderValueRSeq::getRSeq(){
+uint32_t SipHeaderValueRSeq::getRSeq() const{
 	return seq;
 }
 		

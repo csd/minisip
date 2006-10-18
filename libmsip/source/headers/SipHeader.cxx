@@ -71,7 +71,7 @@ SipHeaderParameter::SipHeaderParameter(string k, string val, bool equalSign):key
 
 
 
-string SipHeaderParameter::getString(){
+string SipHeaderParameter::getString() const{
 	if (hasEqual || value.size()>0){
 		return key+"="+value;
 	}else{
@@ -89,12 +89,13 @@ void SipHeaderFactories::addFactory(string headerType, SipHeaderFactoryFuncPtr f
 	factories[ht] = f;
 }
 
-SipHeaderFactoryFuncPtr SipHeaderFactories::getFactory(const string headerType){
+SipHeaderFactoryFuncPtr SipHeaderFactories::getFactory(const string headerType) const{
 	string ht;
 	for (unsigned i=0; i< headerType.size();i++){
 		ht+=toupper(headerType[i]);
 	}
-	return factories[ht];
+
+	return (*factories.find(ht)).second;
 }
 
 SipHeader::SipHeader(MRef<SipHeaderValue*> val): headerName(val->headerName){
@@ -107,7 +108,7 @@ SipHeader::~SipHeader(){
 
 }
 
-string SipHeader::getString(){
+string SipHeader::getString() const{
 	string ret = headerName +": ";
 	bool first=true;
 	for (int i=0; i< headerValues.size(); i++){
@@ -126,7 +127,7 @@ void SipHeader::addHeaderValue(MRef<SipHeaderValue*> v){
 	headerValues.push_back(v);
 }
 
-static string getHeader(const string &line,int &endi){
+static string getHeader(const string &line,int &endi) {
 	string ret;
 	int i;
 	for (i=0;   (i<(int)line.size()) && line[i]!=' ' && line[i]!='\t' && line[i]!=':'   ;  i++){
@@ -283,7 +284,7 @@ SipHeaderValue::SipHeaderValue(int t, const string &hname):headerName(hname),typ
 }
 
 
-std::string SipHeaderValue::getStringWithParameters(){
+std::string SipHeaderValue::getStringWithParameters() const{
 	std::string parameterList;
 	int nparam = parameters.size();
 	for (int i=0; i< nparam; i++){

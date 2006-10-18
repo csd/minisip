@@ -81,7 +81,7 @@ SipHeaderValueProxyAuthorization::~SipHeaderValueProxyAuthorization() {
 
 }
 		
-string SipHeaderValueProxyAuthorization::getString(){
+string SipHeaderValueProxyAuthorization::getString() const{
 	return SipHeaderValueAuthorization::getString();
 } 
 

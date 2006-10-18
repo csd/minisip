@@ -81,35 +81,35 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		std::string getSipMethod();
+		std::string getSipMethod() const;
 		void setSipMethod(const std::string &meth);
 
-		std::string getUsername();
+		std::string getUsername() const;
 		void setUsername(const std::string &username);
 
-		std::string getRealm();
+		std::string getRealm() const;
 		void setRealm(const std::string &r);
 
-		std::string getNonce();
+		std::string getNonce() const;
 		void setNonce(const std::string &n);
 
-		std::string getOpaque();
+		std::string getOpaque() const;
 		void setOpaque(const std::string &n);
 
-		SipUri getUri();
+		SipUri getUri() const;
 		void setUri(const SipUri &uri);
 
-		std::string getResponse();
+		std::string getResponse() const;
 		void setResponse(const std::string &resp);
 
 		static std::string md5ToString(unsigned char *md5);
 	private:
-		std::string calcResponse();
+		std::string calcResponse() const;
 		
 		std::string sipMethod;
 		std::string username;

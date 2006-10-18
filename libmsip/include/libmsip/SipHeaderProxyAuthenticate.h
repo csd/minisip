@@ -70,13 +70,13 @@ class LIBMSIP_API SipHeaderValueProxyAuthenticate: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
-		std::string getAuthMethod();
+		std::string getAuthMethod() const;
 
 	protected:
-		char getFirstParameterSeparator(){return ' ';}
-		char getParameterSeparator(){return ',';}
+		char getFirstParameterSeparator() const {return ' ';}
+		char getParameterSeparator() const {return ',';}
 
 	private:
 		void init(const std::string& build_from);

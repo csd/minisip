@@ -46,9 +46,9 @@ class LIBMSIP_API SipHeaderValueRSeq: public SipHeaderValue{
 
                 virtual std::string getMemObjectType() const {return "SipHeaderRSeq";}
 		
-		virtual std::string getString(); 
+		virtual std::string getString() const; 
 
-		uint32_t getRSeq();
+		uint32_t getRSeq() const;
 		void setRSeq( uint32_t rseq );
 		
 

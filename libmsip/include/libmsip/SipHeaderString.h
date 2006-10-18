@@ -65,7 +65,7 @@ class LIBMSIP_API SipHeaderValueString: public SipHeaderValue{
 		 * 	is the string passed to the constructor
 		 * 	with any white space in the ends removed.
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 	protected:
 		std::string str;

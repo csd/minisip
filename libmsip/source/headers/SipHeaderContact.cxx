@@ -103,7 +103,7 @@ SipHeaderValueContact::~SipHeaderValueContact(){
 
 }
 		
-string SipHeaderValueContact::getString(){
+string SipHeaderValueContact::getString() const{
 	string user = uri.getString();
 
 //	merr << "SipHeaderValueContact::getString: "<< user <<end;
@@ -142,7 +142,7 @@ string SipHeaderValueContact::getString(){
 	return ret;
 } 
 
-SipUri SipHeaderValueContact::getUri(){
+SipUri SipHeaderValueContact::getUri() const{
 	return uri;
 }
 
@@ -151,7 +151,7 @@ void SipHeaderValueContact::setUri(const SipUri &uri){
 }
 
 //CESC
-int SipHeaderValueContact::getExpires() {
+int SipHeaderValueContact::getExpires() const{
 	return atoi( getParameter("expires").c_str() );
 }
 

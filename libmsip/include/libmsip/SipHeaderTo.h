@@ -56,12 +56,12 @@ class LIBMSIP_API SipHeaderValueTo: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		SipUri &getUri();
+		SipUri getUri() const;
 		void setUri(const SipUri &uri);
 		
 	private:

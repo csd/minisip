@@ -48,7 +48,7 @@ SipHeaderValueString::SipHeaderValueString(int type, const string& typeStr, cons
 SipHeaderValueString::~SipHeaderValueString(){
 }
 
-string SipHeaderValueString::getString(){
+string SipHeaderValueString::getString() const{
 	return str;
 }
 

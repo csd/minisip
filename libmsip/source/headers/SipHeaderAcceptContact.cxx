@@ -145,7 +145,7 @@ SipHeaderValueAcceptContact::~SipHeaderValueAcceptContact(){
  * returns the string representation of
  * the Accept-Contact header field
  */
-string SipHeaderValueAcceptContact::getString(){
+string SipHeaderValueAcceptContact::getString() const{
 	string answer;
 	answer = /*"Accept-Contact: */ "*;" + featuretag;
 	

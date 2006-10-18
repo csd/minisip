@@ -59,11 +59,11 @@ SipHeaderValueFrom::~SipHeaderValueFrom(){
 
 }
 		
-string SipHeaderValueFrom::getString(){
+string SipHeaderValueFrom::getString() const{
 	return uri.getString();
 } 
 
-SipUri &SipHeaderValueFrom::getUri(){
+SipUri SipHeaderValueFrom::getUri() const{
 	return uri;
 }
 

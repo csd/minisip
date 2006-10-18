@@ -58,18 +58,18 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		std::string getProtocol();
+		std::string getProtocol() const;
 		void setProtocol(const std::string &protocol);
 		
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		std::string getIp();
+		std::string getIp() const;
 		
 		void setIp(const std::string &ip);
 
@@ -77,7 +77,7 @@ class LIBMSIP_API SipHeaderValueVia: public SipHeaderValue{
 		/**
 		 *
 		 */
-		int32_t getPort();
+		int32_t getPort() const;
 		void setPort(int32_t port);
 		
 	private:

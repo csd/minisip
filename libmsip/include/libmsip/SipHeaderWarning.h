@@ -56,20 +56,20 @@ class LIBMSIP_API SipHeaderValueWarning: public SipHeaderValue{
 		/**
 		 * returns string representation of the header
 		 */
-		std::string getString(); 
+		std::string getString() const; 
 
 		/**
 		 * @return The IP address of the contact header.
 		 */
-		std::string getWarning();
+		std::string getWarning() const;
 		
 		void setWarning(const std::string &ua);
 
-		uint16_t getErrorCode();
+		uint16_t getErrorCode() const;
 
 		void setErrorCode(const uint16_t &errorCodec);
 
-		std::string getDomainName();
+		std::string getDomainName() const;
 
 		void setDomainName(const std::string &domainName);
 		

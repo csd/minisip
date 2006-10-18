@@ -73,11 +73,11 @@ SipHeaderValueExpires::SipHeaderValueExpires(int sec)
 SipHeaderValueExpires::~SipHeaderValueExpires(){
 }
 
-string SipHeaderValueExpires::getString(){
+string SipHeaderValueExpires::getString() const{
 	return itoa(timeout);
 }
 
-int32_t SipHeaderValueExpires::getTimeout(){
+int32_t SipHeaderValueExpires::getTimeout() const{
 	return timeout;
 }
 		
