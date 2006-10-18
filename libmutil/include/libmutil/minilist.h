@@ -279,7 +279,7 @@ class minilist{
 		}
 
 #ifdef MINILIST_VALIDATE
-		void validate(){
+		void validate() const{
 			MiniListNode<T> *cur = head;
 			int i;
 			
@@ -342,7 +342,7 @@ class minilist{
 		}
 
 		
-		T operator[](int i){
+		T operator[](int i) const{
 			MiniListNode<T> *cur = head;
 			massert(i>=0 && i<size());
 			
@@ -362,7 +362,7 @@ class minilist{
 			return cur->getValue();
 		}
 
-		int size(){
+		int size() const{
 			return nelem;
 		}
 		
@@ -371,8 +371,8 @@ class minilist{
 		MiniListNode<T> *end;
 		int nelem;
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
-		int last_index;
-		MiniListNode<T> *last_node;
+		mutable int last_index;
+		mutable MiniListNode<T> *last_node;
 #endif
 };
 
