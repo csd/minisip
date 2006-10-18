@@ -69,7 +69,7 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		 */
 		std::string getStatusDesc();
 
-		std::string getString();
+		std::string getString() const;
 
 		virtual const std::string& getType(){return type;}
 

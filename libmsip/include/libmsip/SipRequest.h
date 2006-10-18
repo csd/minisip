@@ -151,15 +151,15 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 		virtual std::string getMemObjectType() const {return "SipRequest("+method+")";}
 
-		virtual std::string getString();
+		virtual std::string getString() const;
 
 		virtual const std::string& getType();
 
 		virtual void setMethod(const std::string &method);
-		virtual std::string getMethod();
+		virtual std::string getMethod() const;
 
 		virtual void setUri(const std::string &uri);
-		virtual std::string getUri();
+		virtual std::string getUri() const;
 
 		/**
 		 * Insert a route first in the list of routes, forcing

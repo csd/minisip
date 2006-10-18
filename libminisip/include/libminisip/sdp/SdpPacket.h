@@ -62,8 +62,8 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 		MRef<SdpHeaderC*> getSessionLevelConnection();
 		std::string getKeyMgmt();
 		void addHeader(MRef<SdpHeader*> h);
-		virtual std::string getString();
-                virtual std::string getContentType(){return "application/sdp";}
+		virtual std::string getString() const;
+                virtual std::string getContentType() const{return "application/sdp";}
 	
 
 		std::vector<MRef<SdpHeader*> > getHeaders();

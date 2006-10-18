@@ -130,7 +130,7 @@ SipResponse::SipResponse(string &resp): SipMessage(-1, resp)
 	}
 }
 
-string SipResponse::getString(){
+string SipResponse::getString() const{
 	string rep = "SIP/2.0 "+itoa(status_code)+" "+status_desc+"\r\n";
 	rep = rep + getHeadersAndContent();
 	return rep;

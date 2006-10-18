@@ -64,7 +64,7 @@ PresenceMessageContent::PresenceMessageContent(const string &buildFrom){
 	document = buildFrom;
 }
 
-string PresenceMessageContent::getString(){
+string PresenceMessageContent::getString() const{
 	return document;
 }
 

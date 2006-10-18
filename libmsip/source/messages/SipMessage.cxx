@@ -154,7 +154,7 @@ int32_t SipMessage::getContentLength(){
 	return 0;
 }
 
-string SipMessage::getHeadersAndContent(){
+string SipMessage::getHeadersAndContent() const{
 	string req="";
 	int32_t clen=-1;
 

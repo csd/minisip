@@ -191,7 +191,7 @@ void SdpPacket::addHeader(MRef<SdpHeader*> h){
 	headers.push_back(h);
 }
 
-string SdpPacket::getString(){
+string SdpPacket::getString() const{
 	string ret = "";
 	list<MRef<SdpHeaderA*> >::iterator  iAttr;
 	list<MRef<SdpHeaderA*> > attributes;

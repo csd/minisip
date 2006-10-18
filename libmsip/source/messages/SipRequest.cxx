@@ -427,7 +427,7 @@ const string& SipRequest::getType(){
 	return method;
 }
 
-string SipRequest::getString(){
+string SipRequest::getString() const{
 	return getMethod() + " " + getUri() + " SIP/2.0\r\n"
 		+ getHeadersAndContent();
 }
@@ -437,7 +437,7 @@ void SipRequest::setMethod(const string &method){
 	this->method = method;
 }
 
-string SipRequest::getMethod(){
+string SipRequest::getMethod() const{
 	return method;
 }
 
@@ -476,7 +476,7 @@ void SipRequest::setUri(const string &uri){
 	this->uri = buildUri(uri);
 }
 
-string SipRequest::getUri(){
+string SipRequest::getUri() const{
 	return uri;
 }
 

@@ -38,9 +38,9 @@ public:
 	
 	virtual std::string getMemObjectType() const {return "SipMessageContentIM";}
 	
-	virtual std::string getString();
+	virtual std::string getString() const;
 
-	virtual std::string getContentType();
+	virtual std::string getContentType() const;
 private:
 	std::string msg;
 };

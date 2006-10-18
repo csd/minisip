@@ -42,14 +42,14 @@ class LIBMSIP_API SipMessageContent : public virtual MObject{
          * Returns the complete SDP message as a string.
          * @return SDP packet as a string.
          */
-        virtual std::string getString()=0;
+        virtual std::string getString() const =0;
 
         /**
          * Returns the type of the content. For example, a SDP message
          * returns "application/sdp".
          * @return Content type
          */
-        virtual std::string getContentType()=0;
+        virtual std::string getContentType() const =0;
 };
 
 

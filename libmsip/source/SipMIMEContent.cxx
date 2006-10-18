@@ -106,9 +106,9 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
 	}
 }
 
-std::string SipMimeContent::getString() {
+std::string SipMimeContent::getString() const{
 	if(ContentType.substr(0,9) == "multipart"){
-		std::list <MRef<SipMessageContent*> >::iterator iter;
+		std::list <MRef<SipMessageContent*> >::const_iterator iter;
 		std::string mes;
 		if(Message != "")
 			mes = Message + "\r\n\r\n";
@@ -128,7 +128,7 @@ std::string SipMimeContent::getString() {
 	}
 }
 
-std::string SipMimeContent::getContentType() {
+std::string SipMimeContent::getContentType() const{
 	if(ContentType.substr(0,9) == "multipart")
 		return ContentType +"; boundary=" + boundry;
 	else

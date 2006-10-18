@@ -67,7 +67,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 	public:
 		static const std::string anyType;
 		
-		virtual std::string getContentType(){ return "message/sipfrag"; };
+		virtual std::string getContentType() const { return "message/sipfrag"; };
 
 		/**
 		 * Registry of the registred SIP message content parsers.
@@ -263,13 +263,13 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		/**
 		* @return The complete message as a string.
 		*/
-		virtual std::string getString()=0;
+		virtual std::string getString() const =0;
 		
 		/**
 		* @return The headers plus the content as a string. This
 		* is the complete SIP package minus the first line.
 		*/
-		virtual std::string getHeadersAndContent();
+		virtual std::string getHeadersAndContent() const;
 
 		/**
 		* @return The warning message contained in Warning: header

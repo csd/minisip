@@ -35,10 +35,10 @@ SipMessageContentIM::SipMessageContentIM(string m): msg(m){
 
 }
 
-string SipMessageContentIM::getString(){
+string SipMessageContentIM::getString() const{
 	return msg;
 }
 
-string SipMessageContentIM::getContentType(){
+string SipMessageContentIM::getContentType() const{
 	return "text/plain";
 }
