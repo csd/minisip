@@ -116,7 +116,11 @@ void SipTransactionInviteClient::rel1xxProcessing(MRef<SipResponse*> resp){
 
 bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &command){
 
-	if (transitionMatch("INVITE", command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer)){
+	if (transitionMatch("INVITE", 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer))
+	{
 		lastInvite = (SipRequest*) *command.getCommandPacket();
 		if( isUnreliable() ) { // retx timer
 			timerA = sipStackInternal->getTimers()->getA();
@@ -146,7 +150,11 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 
 bool SipTransactionInviteClient::a1_calling_calling_timerA( const SipSMCommand &command){
 	
-	if (transitionMatch(command, "timerA",SipSMCommand::transaction_layer,SipSMCommand::transaction_layer)){
+	if (transitionMatch(command, 
+			"timerA",
+			SipSMCommand::transaction_layer,
+			SipSMCommand::transaction_layer))
+	{
 		timerA *= 2; //no upper limit ... well ... timer B sets it
 		requestTimeout( timerA, "timerA" );
 		
@@ -164,7 +172,8 @@ bool SipTransactionInviteClient::a2_calling_proceeding_1xx( const SipSMCommand &
 				command, 
 				SipSMCommand::transport_layer,
 				SipSMCommand::transaction_layer, 
-				"1**")){
+				"1**"))
+	{
 
 		cancelTimeout("timerA");
 		cancelTimeout("timerB");

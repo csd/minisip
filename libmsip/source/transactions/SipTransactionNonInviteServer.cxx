@@ -47,7 +47,11 @@ using namespace std;
 bool SipTransactionNonInviteServer::a0_start_trying_request(
 		const SipSMCommand &command)
 {
-	if (transitionMatch( getCSeqMethod(), command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer)){
+	if (transitionMatch( getCSeqMethod(), 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer))
+	{
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
@@ -74,7 +78,12 @@ bool SipTransactionNonInviteServer::a0_start_trying_request(
 bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, /*IGN,*/ SipSMCommand::transaction_layer,"1**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer,
+			SipSMCommand::transaction_layer,
+			"1**"))
+	{
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); //Do not add via header to responses
 							//they are copied from the request
@@ -88,7 +97,12 @@ bool SipTransactionNonInviteServer::a1_trying_proceeding_1xx(
 bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer, 
+			"2**\n3**\n4**\n5**\n6**"))
+	{
 		
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
@@ -104,7 +118,12 @@ bool SipTransactionNonInviteServer::a2_trying_completed_non1xxresp(
 bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer, 
+			"2**\n3**\n4**\n5**\n6**"))
+	{
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());
 		send(command.getCommandPacket(), false); 		//Do not add via header to responses
 		if( isUnreliable() )
@@ -145,7 +164,12 @@ bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 bool SipTransactionNonInviteServer::a5_proceeding_proceeding_1xx(
 		const SipSMCommand &command)
 {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "1**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer, 
+			"1**"))
+	{
 		MRef<SipResponse*> pack( (SipResponse *)*command.getCommandPacket());
 		lastResponse = pack;
 		send(MRef<SipMessage*>(*pack), false);

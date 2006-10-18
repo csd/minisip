@@ -101,7 +101,11 @@ using namespace std;
  */
 bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch("INVITE", command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer)){
+	if (transitionMatch("INVITE", 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer))
+	{
 		MRef<Socket*> sock = command.getCommandPacket()->getSocket();
 
 		if( sock )
@@ -136,7 +140,11 @@ bool SipTransactionInviteServer::a0_start_proceeding_INVITE( const SipSMCommand 
  */
 bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCommand &command){
 	
-	if (transitionMatch("INVITE", command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer)){
+	if (transitionMatch("INVITE", 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer))
+	{
 		MRef<SipResponse*> resp = lastResponse;
 		if (resp.isNull()){
 #ifdef DEBUG_OUTPUT
@@ -156,7 +164,12 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
  * remote side and save it in case we need to retransmit it.
  */
 bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMCommand &command){
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "1**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer, 
+			"1**"))
+	{
 		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
 		lastResponse = resp;
 		//no need for via header, it is copied from the request msg
@@ -200,7 +213,12 @@ bool SipTransactionInviteServer::a2_proceeding_proceeding_1xx( const SipSMComman
  */
 bool SipTransactionInviteServer::a3_proceeding_completed_resp36( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer, "3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer, 
+			"3**\n4**\n5**\n6**"))
+	{
 		cancelTimeout("timerRel1xxResend");
 		lastResponse = MRef<SipResponse*>((SipResponse*)*command.getCommandPacket());		
 		if( isUnreliable() ) {
@@ -355,8 +373,9 @@ bool SipTransactionInviteServer::a9_completed_terminated_errOrTimerH( const SipS
 				SipSMCommand::transaction_layer) 
 			|| transitionMatch(command,
 				SipCommandString::transport_error,
-				SipSMCommand::transaction_layer,
-				SipSMCommand::transaction_layer)){
+				SipSMCommand::transport_layer,
+				SipSMCommand::transaction_layer))
+	{
 
 		cancelTimeout("timerG");
 
@@ -387,7 +406,8 @@ bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCom
 	if (transitionMatch(command, 
 				"timerI",
 				SipSMCommand::transaction_layer,
-				SipSMCommand::transaction_layer)){
+				SipSMCommand::transaction_layer))
+	{
 		SipSMCommand cmd(
 				CommandString( callId, SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
