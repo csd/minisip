@@ -47,6 +47,10 @@ static int nocaseequal(char c1, char c2){
 	return c1==c2;
 }
 
+
+
+
+//Fixes by Philippe Torrelli - Thanks
 static int strncasecmp(const char *s1, const char *s2, int n){
 	int i;
 	for ( i=0; s1[i]!=0 && s2[i]!=0 && (n==-1 || (n!=-1 && i<n) ); i++){
@@ -58,11 +62,17 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 			}
 		}
 	}
-	if (s2[i]!=0){
-		return -1;
+
+	if(i != n && (s1[i] != s2[i] )) { 
+		if (s1[i] == '\0' ){
+			return -1;
+		}else{
+			return 1;
+		}
 	}
 	return 0;
 }
+
 
 static int strcasecmp(const char *s1, const char *s2){
 	return strncasecmp(s1,s2,-1);
