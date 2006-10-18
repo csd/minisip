@@ -33,24 +33,24 @@
 using namespace std;
 
 MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const std::string & ContentType) {
-	return new SipMimeContent(buf, ContentType);
+	return new SipContentMime(buf, ContentType);
 }
 
-SipMimeContent::SipMimeContent(std::string ContentType){
+SipContentMime::SipContentMime(std::string ContentType){
 	this->ContentType = ContentType;
 	this->boundry = "boun=_dry";
 	this->Message = "";
 	this->uniqueboundry = "_Minisip";
 }
 
-SipMimeContent::SipMimeContent(std::string ContentType, std::string Message, std::string boundry) {
+SipContentMime::SipContentMime(std::string ContentType, std::string Message, std::string boundry) {
 	this->Message = Message; 
 	this->ContentType = ContentType;
 	this->boundry = boundry;
 	this->uniqueboundry = "_Minisip";
 }
 
-SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
+SipContentMime::SipContentMime(std::string content, std::string ContentType) {
 	size_t index2;
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
@@ -106,7 +106,7 @@ SipMimeContent::SipMimeContent(std::string content, std::string ContentType) {
 	}
 }
 
-std::string SipMimeContent::getString() const{
+std::string SipContentMime::getString() const{
 	if(ContentType.substr(0,9) == "multipart"){
 		std::list <MRef<SipMessageContent*> >::const_iterator iter;
 		std::string mes;
@@ -128,31 +128,31 @@ std::string SipMimeContent::getString() const{
 	}
 }
 
-std::string SipMimeContent::getContentType() const{
+std::string SipContentMime::getContentType() const{
 	if(ContentType.substr(0,9) == "multipart")
 		return ContentType +"; boundary=" + boundry;
 	else
 		return ContentType;
 }
 
-void SipMimeContent::setBoundry(std::string boundry){
+void SipContentMime::setBoundry(std::string boundry){
 	this->boundry = boundry;
 }
 
-std::string SipMimeContent::getBoundry(){
+std::string SipContentMime::getBoundry(){
 	return boundry;
 }
 	
-void SipMimeContent::addPart(MRef<SipMessageContent*> part){
+void SipContentMime::addPart(MRef<SipMessageContent*> part){
 	if( (part->getContentType()).substr(0,9) == "multipart")
-		if(((SipMimeContent*)*part)->getBoundry() == boundry){
-			((SipMimeContent*)*part)->setBoundry(boundry + uniqueboundry);
+		if(((SipContentMime*)*part)->getBoundry() == boundry){
+			((SipContentMime*)*part)->setBoundry(boundry + uniqueboundry);
 			uniqueboundry = uniqueboundry + "_Rules";
 		}
 	parts.push_back(part);
 }
 
-MRef<SipMessageContent*> SipMimeContent::popFirstPart() {
+MRef<SipMessageContent*> SipContentMime::popFirstPart() {
 	if(!parts.empty()){
 		MRef<SipMessageContent*> part = parts.front(); 
 		parts.pop_front();
