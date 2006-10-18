@@ -30,6 +30,57 @@
  * 
 */
 
+/*
+ From RFC3261 with action number added:
+
+                                   |Request from TU
+                                   |a0.send request
+               a8: Timer E         V
+               send request  +-----------+
+                   +---------|           |-------------------+
+                   |         |  Trying   |  a2: Timer F      |
+                   +-------->|           |  or Transport Err.|
+                             +-----------+  inform TU        |
+                a7: 200-699     |  |                         |
+                resp. to TU     |  |a1: 1xx                  |
+                +---------------+  |resp. to TU              |
+                |                  |                         |
+                |   a4: Timer E    V       a6: Timer F       |
+                |   send req +-----------+ or Transport Err. |
+                |  +---------|           | inform TU         |
+                |  |         |Proceeding |------------------>|
+                |  +-------->|           |-----+             |
+                |            +-----------+     |a5: 1xx      |
+                |              |      ^        |resp to TU   |
+                | a3: 200-699  |      +--------+             |
+                | resp. to TU  |                             |
+                |              |                             |
+                |              V                             |
+                |            +-----------+                   |
+                |            |           |                   |
+                |            | Completed |                   |
+                |            |           |                   |
+                |            +-----------+                   |
+                |              ^   |                         |
+                |              |   | a9: Timer K             |
+                +--------------+   | -                       |
+                                   |                         |
+                                   V                         |
+             NOTE:           +-----------+                   |
+                             |           |                   |
+         transitions         | Terminated|<------------------+
+         labeled with        |           |
+         the event           +-----------+
+         over the action
+         to take
+
+                 Figure 6: non-INVITE client transaction
+
+
+
+
+*/
+
 #include<config.h>
 
 #include<libmutil/massert.h>
@@ -93,7 +144,12 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 
 bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer,/*IGN*/ SipSMCommand::transaction_layer, "1**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer, 
+			"1**"))
+	{
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		SipSMCommand cmd(
@@ -111,8 +167,14 @@ bool SipTransactionNonInviteClient::a1_trying_proceeding_1xx( const SipSMCommand
 
 bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipSMCommand &command){
 	
-	if (transitionMatch(command, SipCommandString::transport_error, SipSMCommand::transport_layer, SipSMCommand::transaction_layer) 
-			|| transitionMatch(command, "timerF", SipSMCommand::transaction_layer, SipSMCommand::transaction_layer)){
+	if (transitionMatch(command, 
+				SipCommandString::transport_error, 
+				SipSMCommand::transport_layer, 
+				SipSMCommand::transaction_layer) 
+			|| transitionMatch(command, 
+				"timerF", 
+				SipSMCommand::transport_layer, 
+				SipSMCommand::transaction_layer)){
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
 		
@@ -138,7 +200,12 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 
 bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const SipSMCommand &command){
 
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer, 
+			"2**\n3**\n4**\n5**\n6**"))
+	{
 		
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		cancelTimeout("timerE"); //no more retx of the request
@@ -164,7 +231,11 @@ bool SipTransactionNonInviteClient::a3_proceeding_completed_non1xxresp( const Si
 
 bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSMCommand &command){
 	
-	if (transitionMatch(command, "timerE",SipSMCommand::transaction_layer,SipSMCommand::transaction_layer)){
+	if (transitionMatch(command, 
+			"timerE",
+			SipSMCommand::transaction_layer,
+			SipSMCommand::transaction_layer))
+	{
 		timerE *= 2;
 		if( timerE > sipStackInternal->getTimers()->getT2() ) 
 			timerE = sipStackInternal->getTimers()->getT2();
@@ -184,7 +255,12 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 
 bool SipTransactionNonInviteClient::a5_proceeding_proceeding_1xx( const SipSMCommand &command){
 	
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "1**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer, 
+			"1**"))
+	{
 		MRef<SipResponse*> pack((SipResponse *)*command.getCommandPacket());
 		MRef<SipMessage*> pref(*pack);
 		SipSMCommand cmd( pref, 
@@ -236,7 +312,12 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 
 
 bool SipTransactionNonInviteClient::a7_trying_completed_non1xxresp( const SipSMCommand &command) {
-	if (transitionMatch(SipResponse::type, command, SipSMCommand::transport_layer, SipSMCommand::transaction_layer, "2**\n3**\n4**\n5**\n6**")){
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer, 
+			"2**\n3**\n4**\n5**\n6**"))
+	{
 		
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
