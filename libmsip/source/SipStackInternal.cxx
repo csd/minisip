@@ -249,7 +249,8 @@ static std::string getTimeoutDebugString(MRef<StateMachine<SipSMCommand,std::str
 
 	int ntimeouts=0;
 	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-	for (uint32_t j=0; j< torequests.size(); j++, jj++){
+
+	for (uint32_t j=0; jj!=torequests.end(); j++){
 		if ( ((*sm)) == *((*jj).getSubscriber()) ){
 			int ms= (*jj).getMsToTimeout();
 			ret+= ind +"timeout: "
@@ -258,6 +259,8 @@ static std::string getTimeoutDebugString(MRef<StateMachine<SipSMCommand,std::str
 			ntimeouts++;
 			torequests.erase(jj);
 			jj=torequests.begin();
+		}else{
+			jj++;
 		}
 	}
 	if (ntimeouts==0)
