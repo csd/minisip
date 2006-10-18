@@ -143,7 +143,7 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 			merr << buf << end;
 #endif
 			outMutex.unlock();
-			inCond.wait();
+			outCond.wait();
 			continue;
 		}
 
