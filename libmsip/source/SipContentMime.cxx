@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libmsip/SipMIMEContent.h>
+#include<libmsip/SipContentMime.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentFactory.h>
 #include<libmutil/massert.h>

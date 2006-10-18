@@ -44,7 +44,7 @@
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderTo.h>
-#include<libmsip/SipMIMEContent.h>
+#include<libmsip/SipContentMime.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/stringutils.h>
 #include<libmcrypto/base64.h>

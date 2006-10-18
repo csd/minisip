@@ -38,7 +38,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipMessageContentIM.h \
 		     libmsip/SipMessageContentFactory.h \
 		     libmsip/SipLayerTransport.h \
-		     libmsip/SipMIMEContent.h \
+		     libmsip/SipContentMime.h \
 		     libmsip/SipSMCommand.h \
 		     libmsip/SipCommandString.h \
 		     libmsip/SipUri.h \

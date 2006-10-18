@@ -37,7 +37,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipTimers.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \
-		     source/SipMIMEContent.cxx \
+		     source/SipContentMime.cxx \
                      source/transactions/SipTransaction.cxx \
 		     source/transactions/SipTransactionNonInviteClient.cxx \
 		     source/transactions/SipTransactionNonInviteServer.cxx \
