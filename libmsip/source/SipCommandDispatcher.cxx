@@ -138,7 +138,7 @@ void SipCommandDispatcher::run(){
 		if (handled){
 			//mdbg<<"DISPATCHER: command handled"<<endl;
 		}else{
-			mdbg<<"DISPATCHER: command NOT handled"<<endl;
+			merr<<"DISPATCHER: command NOT handled"<<endl;
 		}
 #endif
 

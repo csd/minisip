@@ -173,7 +173,7 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 				SipSMCommand::transaction_layer) 
 			|| transitionMatch(command, 
 				"timerF", 
-				SipSMCommand::transport_layer, 
+				SipSMCommand::transaction_layer, 
 				SipSMCommand::transaction_layer)){
 		cancelTimeout("timerE");
 		cancelTimeout("timerF");
