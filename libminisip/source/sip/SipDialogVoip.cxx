@@ -44,7 +44,7 @@
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderTo.h>
-#include<libmsip/SipContentMime.h>
+#include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/stringutils.h>
 #include<libmcrypto/base64.h>
@@ -750,10 +750,10 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 	if (Offer){
 		if ( Offer->getContentType().substr(0,9) == "multipart"){
 			MRef<SipMessageContent *> part;
-			part = ((SipContentMime*)*Offer)->popFirstPart();
+			part = ((SipMessageContentMime*)*Offer)->popFirstPart();
 			while( *part != NULL){
 				sortMIME(part, peerUri, type);
-				part = ((SipContentMime*)*Offer)->popFirstPart();
+				part = ((SipMessageContentMime*)*Offer)->popFirstPart();
 			}
 		}
 

@@ -30,7 +30,7 @@
 #include<libmnetutil/NetworkException.h>
 #include<libminisip/sip/DefaultDialogHandler.h>
 #include<libmsip/SipMessageContentIM.h>
-#include<libmsip/SipContentMime.h>
+#include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 
