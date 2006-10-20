@@ -27,7 +27,7 @@
 #include<libmsip/SipLayerTransport.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipMessageContentIM.h>
-#include<libmsip/SipContentMime.h>
+#include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
 
 #include<libmsip/SipHeaderContact.h>

@@ -21,8 +21,8 @@
  * Authors: Joachim Orrblad <joachim[at]orrblad.com>
  *          
 */
-#ifndef _SipContentMime_H
-#define _SipContentMime_H
+#ifndef _SipMessageContentMime_H
+#define _SipMessageContentMime_H
 
 #include<libmsip/libmsip_config.h>
 
@@ -32,14 +32,14 @@
 
 MRef<SipMessageContent*> LIBMSIP_API SipMIMEContentFactory(const std::string & buf, const std::string & ContentType);
 
-class LIBMSIP_API SipContentMime : public SipMessageContent{
+class LIBMSIP_API SipMessageContentMime : public SipMessageContent{
 	public:
-		SipContentMime(std::string ContentType);
-		SipContentMime(std::string ContentType, std::string Message, std::string boundry);
-		SipContentMime(std::string content, std::string ContentTyp);
+		SipMessageContentMime(std::string ContentType);
+		SipMessageContentMime(std::string ContentType, std::string Message, std::string boundry);
+		SipMessageContentMime(std::string content, std::string ContentTyp);
 		virtual std::string getString() const;
 		virtual std::string getContentType() const;
-		virtual std::string getMemObjectType() const {return "SipContentMime";}
+		virtual std::string getMemObjectType() const {return "SipMessageContentMime";}
 		void addPart(MRef<SipMessageContent*> part);
 		MRef<SipMessageContent*> popFirstPart();
 		void setBoundry(std::string boundry);
