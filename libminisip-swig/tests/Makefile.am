@@ -12,7 +12,7 @@ TESTS_ENVIRONMENT =
 #
 
 #MINISIP_TESTS += pygui.py
-TESTS_ENVIRONMENT += PYTHONPATH=..:.
+TESTS_ENVIRONMENT += PYTHONPATH=../source:.
 
 #
 # C#
@@ -20,10 +20,10 @@ TESTS_ENVIRONMENT += PYTHONPATH=..:.
 if MCS
 
 MINISIP_TESTS += test_csharp.exe
-TESTS_ENVIRONMENT += MONO_PATH=.. LD_LIBRARY_PATH=../.libs
+TESTS_ENVIRONMENT += MONO_PATH=../source LD_LIBRARY_PATH=../source/.libs
 CLEANFILES += test_csharp.exe
 
-AM_CSFLAGS = -lib:.. -r:minisip-sharp.dll -r:System.Windows.Forms.dll
+AM_CSFLAGS = -lib:../source -r:minisip-sharp.dll -r:System.Windows.Forms.dll
 
 test_csharp.exe: test_csharp.cs
 	$(MCS) $(CSFLAGS) $(AM_CSFLAGS) -out:$@ $^

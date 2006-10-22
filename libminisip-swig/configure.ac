@@ -55,6 +55,7 @@ AC_HEADER_TIME
 
 AC_CONFIG_FILES([
 		Makefile
+		source/Makefile
 		tests/Makefile
 	])
 AC_OUTPUT

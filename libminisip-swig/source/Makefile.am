@@ -1,5 +1,3 @@
-SUBDIRS = . tests
-
 #if FALSE
 if SWIG
 
@@ -12,7 +10,7 @@ CLEANFILES =
 MAINTAINERCLEANFILES =
 EXTRA_DIST = $(swig_sources) libmutil/CommandString.h
 
-swig_sources = minisip.i csharp/std_list.i
+swig_sources = minisip.i $(top_srcdir)/csharp/std_list.i
 
 #minisip_libs = $(MINISIP_LIBS) -lmcrypto -lcrypto -lssl -lwsock32	\
 #-lwinmm -ldnsapi -liphlpapi -lwinmm -ldxguid -luuid -ldsound -lm
@@ -95,7 +93,7 @@ libminisipsharpglue_la_CXXFLAGS = $(AM_CXXFLAGS) -pthread
 libminisipsharpglue_la_LDFLAGS = $(AM_LDFLAGS)
 libminisipsharpglue_la_LIBADD = $(minisip_libs)
 libminisipsharpglue_la_SOURCES = $(libminisipsharpglue_generated_source)
-libminisipsharpglue_la_CSFLAGS = -I$(srcdir)/csharp $(SWIG_FLAGS) 
+libminisipsharpglue_la_CSFLAGS = -I$(top_srcdir)/csharp $(SWIG_FLAGS) 
 
 libminisipsharpglue_generated_source = libminisipsharpglue.cxx	\
 libminisipsharpglue.h
