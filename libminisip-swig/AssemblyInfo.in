@@ -1,0 +1,16 @@
+//
+// AssemblyInfo.in for project 'minisip-sharp'
+//
+// Authors:
+//	Mikael Magnusson (mikma@users.sourceforge.net)
+//
+
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+[assembly: AssemblyVersion("@MINISIP_SWIG_MAJOR_VERSION@.@MINISIP_SWIG_MINOR_VERSION@.@MINISIP_SWIG_MICRO_VERSION@")]
+[assembly: AssemblyTitle ("minisip-sharp")]
+[assembly: AssemblyDescription ("minisip-sharp - Minisip Mono Library")]
+[assembly: AssemblyProduct ("minisip")]
+[assembly: AssemblyCopyright ("Copyright (c) 2004-2006 The Minisip Team")]
+[assembly: AssemblyCompany ("The Minisip Team")]
