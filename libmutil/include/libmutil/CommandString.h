@@ -33,6 +33,8 @@
 
 class LIBMUTIL_API CommandString : public MObject{
 	public:
+		CommandString();
+
 		CommandString(const std::string destination_id, 
 				const std::string operation, 
 				const std::string parameter="", 

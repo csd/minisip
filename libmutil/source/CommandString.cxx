@@ -26,6 +26,10 @@
 
 using namespace std;
 
+CommandString::CommandString()
+{
+}
+
 CommandString::CommandString(string destination_id, 
 		string operation, 
 		string parameter, 
