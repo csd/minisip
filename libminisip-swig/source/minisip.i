@@ -40,6 +40,7 @@
 %include<stl.i>
 %include<std_string.i>
 %include<std_list.i>
+%include<carrays.i>
 %include"mtypes.i"
 
 /* Director classes, support for virtual method callback */
@@ -112,6 +113,8 @@
 %csmethodmodifiers MediaHandler::handleCommand(std::string, const CommandString &) "public virtual"
 %csmethodmodifiers MediaHandler::handleCommandResp(std::string, const CommandString &) "public virtual"
 #endif
+
+%array_functions(const char *,CStrings)
 
 namespace std {
 class streambuf{

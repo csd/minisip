@@ -79,24 +79,30 @@ endif
 #
 if MCS
 #if FALSE
+
 minisipdir = $(pkglibdir)
-minisip_LTLIBRARIES = libminisipsharpglue.la
 minisip_SCRIPTS = minisip-sharp.dll
 
-BUILT_SOURCES += $(libminisipsharpglue_generated_source) $(minisip_generated_sources)
+BUILT_SOURCES += $(minisipsharpglue_generated_source) $(minisip_generated_sources)
 #MAINTAINER
-CLEANFILES += $(libminisipsharpglue_generated_source)	\
+CLEANFILES += $(minisipsharpglue_generated_source)	\
 $(minisip_generated_sources) minisip-sharp.dll minisip-sharp.dll.mdb
 
-libminisipsharpglue_la_CPPFLAGS = $(AM_CPPFLAGS) $(RUBY_CFLAGS)
+if OS_WIN
+minisip_LTLIBRARIES = minisipsharpglue.la
+minisipsharpglue_la_LIBADD = $(minisip_libs)
+minisipsharpglue_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--kill-at
+minisipsharpglue_la_SOURCES = $(minisipsharpglue_generated_source)
+else
+minisip_LTLIBRARIES = libminisipsharpglue.la
 libminisipsharpglue_la_CXXFLAGS = $(AM_CXXFLAGS) -pthread
-libminisipsharpglue_la_LDFLAGS = $(AM_LDFLAGS)
 libminisipsharpglue_la_LIBADD = $(minisip_libs)
-libminisipsharpglue_la_SOURCES = $(libminisipsharpglue_generated_source)
-libminisipsharpglue_la_CSFLAGS = -I$(top_srcdir)/csharp $(SWIG_FLAGS) 
+libminisipsharpglue_la_SOURCES = $(minisipsharpglue_generated_source)
+endif
+minisipsharpglue_la_CSFLAGS = -I$(top_srcdir)/csharp $(SWIG_FLAGS)
 
-libminisipsharpglue_generated_source = libminisipsharpglue.cxx	\
-libminisipsharpglue.h
+minisipsharpglue_generated_source = minisipsharpglue.cxx	\
+minisipsharpglue.h
 
 minisip_sources_in = AssemblyInfo.cs.in
 minisip_generated_sources = $(minisip_sources_in:.in=) MinisipModule.cs
@@ -107,14 +113,8 @@ $(AM_LDFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 
 %.cs: 
 
-libminisipsharpglue.cxx: $(swig_sources)
-	$(SWIG) -c++ -csharp $(libminisipsharpglue_la_CSFLAGS) -dllimport minisipsharpglue -namespace Minisip -o $@ minisip.i
-
-minisipsharpglue.dll: libminisipsharpglue.o
-	$(CXX) -shared $(libminisipsharpglue_la_CXXFLAGS) $(CXXFLAGS) $(libminisipsharpglue_la_CPPFLAGS) $(CPPFLAGS) $(libminisipsharpglue_la_LDFLAGS) $(LDFLAGS) libminisipsharpglue.o $(libminisipsharpglue_la_LIBADD) -o $@
-
-libminisipsharpglue.so: libminisipsharpglue.o
-	$(CXX) -shared $(libminisipsharpglue_la_CXXFLAGS) $(CXXFLAGS) $(libminisipsharpglue_la_CPPFLAGS) $(CPPFLAGS) $(libminisipsharpglue_la_LDFLAGS) $(LDFLAGS) libminisipsharpglue.o $(libminisipsharpglue_la_LIBADD) -o $@
+minisipsharpglue.cxx: $(swig_sources)
+	$(SWIG) -c++ -csharp $(minisipsharpglue_la_CSFLAGS) -dllimport minisipsharpglue -namespace Minisip -o $@ minisip.i
 
 minisip-sharp.dll: $(minisip_build_sources)
 	mcs -debug -target:library -out:$@ *.cs

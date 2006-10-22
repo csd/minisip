@@ -22,6 +22,7 @@
  */
 
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Minisip;
@@ -166,7 +167,19 @@ public class MyGui : GuiProxy {
 
 
 public class runme {
-  static void Main() {
+  static SWIGTYPE_p_p_char getArgv(string[] args, out int length) {
+    SWIGTYPE_p_p_char argv = MinisipModule.new_CStrings(args.Length+1);
+    MinisipModule.CStrings_setitem(argv, 0, Assembly.GetExecutingAssembly().Location);
+    for (int i = 0; i < args.Length; i++){
+      Console.WriteLine("String: " + i + " = " + args[i]);
+      MinisipModule.CStrings_setitem(argv, i + 1, args[i]);
+    }
+
+    length = args.Length + 1;
+    return argv;
+  }
+
+  static void Main(string[] args) {
     MinisipModule.setupDefaultSignalHandling();
 
     Console.WriteLine("MiniSIP C# GUI ... welcome!");
@@ -179,7 +192,9 @@ public class runme {
     Thread thread = new Thread( job );
     thread.Start();
 
-    MinisipMain sip = new MinisipMain(guiref, 0, null);
+    int length;
+    SWIGTYPE_p_p_char argv = getArgv(args, out length);
+    MinisipMain sip = new MinisipMain(guiref, length, argv);
     
 
     if( sip.startSip() <= 0 ){
