@@ -8,9 +8,9 @@ AM_LDFLAGS = -Wl,-no-undefined -no-undefined $(RELOC_LDFLAGS) -avoid-version -mo
 BUILT_SOURCES = 
 CLEANFILES =
 MAINTAINERCLEANFILES =
-EXTRA_DIST = $(swig_sources) libmutil/CommandString.h
+EXTRA_DIST = $(swig_sources)
 
-swig_sources = minisip.i $(top_srcdir)/csharp/std_list.i
+swig_sources = minisip.i
 
 #minisip_libs = $(MINISIP_LIBS) -lmcrypto -lcrypto -lssl -lwsock32	\
 #-lwinmm -ldnsapi -liphlpapi -lwinmm -ldxguid -luuid -ldsound -lm
