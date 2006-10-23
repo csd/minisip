@@ -617,3 +617,19 @@ bool SipMessage::supported(string extension){
 }
 
 
+void SipMessage::addBefore(MRef<SipHeader*> h){
+	int htype = h->getType();
+	int i;
+	int pos = 0;
+	
+	for( i = 0; i < headers.size(); i++ ) {
+		if( headers[i]->getType() == htype) {
+			pos = i;
+			break;
+		}
+	}
+
+	headers.insert( pos, h );	
+}
+
+

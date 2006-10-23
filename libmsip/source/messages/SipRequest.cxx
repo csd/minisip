@@ -484,17 +484,8 @@ void SipRequest::addRoute(const string &route)
 {
 	MRef<SipHeaderValue*> routeValue = (SipHeaderValue*)new SipHeaderValueRoute( route );
 	MRef<SipHeader*> routeHdr = new SipHeader( routeValue );
-	int i;
-	int pos = 0;
-	
-	for( i = 0; i < headers.size(); i++ ) {
-		if( headers[i]->getType() == SIP_HEADER_TYPE_ROUTE ) {
-			pos = i;
-			break;
-		}
-	}
 
-	headers.insert( pos, routeHdr );	
+	addBefore(routeHdr);
 }
 
 void SipRequest::addRoute(const string &addr, int32_t port,

@@ -343,9 +343,12 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 	protected:
 		void setDestinationBranch(std::string b){branch = b;}
 
-		minilist<MRef<SipHeader*> > *getHeaders(){return &headers;};
+		/**
+		 * Adds header h just before any other header of the same
+		 * type to the message.
+		 */
+		void addBefore(MRef<SipHeader*> h);
 
-		minilist<MRef<SipHeader*> > headers;
 		
 		/**
 		 * Parses one line of text to a SIP header and adds it to
@@ -356,6 +359,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		bool addLine(std::string line);
 		
 	private: 
+		minilist<MRef<SipHeader*> > headers;
 		MRef<SipMessageContent*> content;
 
 		/**
