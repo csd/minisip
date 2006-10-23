@@ -80,7 +80,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 
 
 	// Parse Via transport
-	pos = build_from.find( ' ', i );
+	pos = build_from.find_first_of(" \t\n\t", i);
 	if( pos == string::npos ){
 		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine transport protocol");
 	}
