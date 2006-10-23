@@ -229,18 +229,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipHeaderValueVia*> getFirstVia();
 
 		/**
-		* @return The branch parameter in the last via header in
-		* the message.
-		*/
-		std::string getLastViaBranch();
-		
-		/**
-		* @return The last via header or a null reference
-		* if there is no via header in the message.
-		*/
-		MRef<SipHeaderValueVia*> getLastVia();
-
-		/**
 		* @return Call ID in the SIP message.
 		*/
 		std::string getCallId();

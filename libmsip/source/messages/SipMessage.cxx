@@ -352,16 +352,9 @@ MRef<SipHeaderValueVia*> SipMessage::getFirstVia(){
 	return getViaHeader(true);
 }
 
-MRef<SipHeaderValueVia*> SipMessage::getLastVia(){
-	return getViaHeader(false);
-}
 
 string SipMessage::getFirstViaBranch(){
 	return getViaHeaderBranch(true);
-}
-
-string SipMessage::getLastViaBranch(){
-	return getViaHeaderBranch(false);
 }
 
 string SipMessage::getDestinationBranch(){

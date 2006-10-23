@@ -310,7 +310,9 @@ bool SipDialogP2Tuser::a5_incall_termwait_BYE( const SipSMCommand &command)
 */
 		/*vc->*/getLogEntry()->handle();
 
-		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(getSipStack(), MRef<SipDialog*>(/* *vc */ this), bye->getCSeq(),bye->getLastViaBranch(), dialogState.callId); //TODO: remove second argument
+		MRef<SipTransaction*> byeresp = new SipTransactionNonInviteServer(getSipStack(),
+				MRef<SipDialog*>(/* *vc */ this),
+				bye->getCSeq(),bye->getFirstViaBranch(), dialogState.callId); //TODO: remove second argument
 
 		/*vc->*/registerTransaction(byeresp);
 		SipSMCommand cmd(command);
@@ -413,7 +415,7 @@ bool SipDialogP2Tuser::a7_callingnoauth_termwait_CANCEL(
 					getSipStack(),
 					MRef<SipDialog*>(/* *vc */ this), 
 					command.getCommandPacket()->getCSeq(), 
-					command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
+					command.getCommandPacket()->getFirstViaBranch(), dialogState.callId ));
 
 		/*vc->*/registerTransaction(cancelresp);
 
@@ -537,7 +539,7 @@ bool SipDialogP2Tuser::a10_start_ringing_INVITE( const SipSMCommand &command)
 						getSipStack(),
 						MRef<SipDialog*>(/* *vc */), 
 						command.getCommandPacket()->getCSeq(),
-						command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+						command.getCommandPacket()->getFirstViaBranch(), dialogState.callId) );
 
 		/*vc->*/registerTransaction(ir);
 
@@ -648,7 +650,11 @@ bool SipDialogP2Tuser::a12_ringing_termwait_CANCEL( const SipSMCommand &command)
 
 		//FIXME: is this correct - this should probably be handled
 		//in the already existing transaction.
-		MRef<SipTransaction*> cr( new SipTransactionNonInviteServer(getSipStack(), MRef<SipDialog*>(/* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId) );
+		MRef<SipTransaction*> cr( new
+				SipTransactionNonInviteServer(getSipStack(),
+					MRef<SipDialog*>(/* *vc */ this),
+					command.getCommandPacket()->getCSeq(),
+					command.getCommandPacket()->getFirstViaBranch(), dialogState.callId) );
 		/*vc->*/registerTransaction(cr);
 
 		SipSMCommand cmd(command);
@@ -700,7 +706,10 @@ bool SipDialogP2Tuser::a16_start_termwait_INVITE( const SipSMCommand &command)
 		//MRef<SipDialogP2Tuser *> vc= (SipDialogP2Tuser *)sipStateMachine;
 		/*vc->*/setLastInvite(MRef<SipInvite*>((SipInvite *)*command.getCommandPacket()));
 
-		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(getSipStack(), MRef<SipDialog*>( /* *vc */ this), command.getCommandPacket()->getCSeq(), command.getCommandPacket()->getLastViaBranch(), dialogState.callId ));
+		MRef<SipTransaction*> ir( new SipTransactionInviteServerUA(getSipStack(),
+					MRef<SipDialog*>( /* *vc */ this),
+					command.getCommandPacket()->getCSeq(),
+					command.getCommandPacket()->getFirstViaBranch(), dialogState.callId ));
 
 		/*vc->*/registerTransaction(ir);
 
