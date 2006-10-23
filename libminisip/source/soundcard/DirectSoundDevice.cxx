@@ -222,6 +222,7 @@ int DirectSoundDevice::openPlayback( int samplingRate,
 }
 
 int DirectSoundDevice::closeRecord(){
+	openedRecord= false;
 	if (FAILED(inputBufferHandle->Stop())){
 		merror("Could not stop recording on direct sound input buffer");		
 	}
@@ -229,6 +230,7 @@ int DirectSoundDevice::closeRecord(){
 }
 
 int DirectSoundDevice::closePlayback(){
+	openedPlayback = false;
 	if (FAILED(outputBufferHandle->Stop())){
 		merror("Could not stop recording on direct sound input buffer");		
 	}
