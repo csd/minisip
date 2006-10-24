@@ -48,7 +48,7 @@ CommandString::CommandString(const CommandString &smc){
 }
 
 string CommandString::getDestinationId() const{
-	return (*keys.find("destination_id")).second;
+	return get("destination_id");
 }
 
 void CommandString::setDestinationId(string id){
@@ -56,7 +56,7 @@ void CommandString::setDestinationId(string id){
 }
 
 string CommandString::getOp() const{
-	return (*keys.find("op")).second;
+	return get("op");
 }
 
 void CommandString::setOp(string o){
@@ -64,7 +64,7 @@ void CommandString::setOp(string o){
 }
 
 string CommandString::getParam() const{
-	return (*keys.find("param")).second;
+	return get("param");
 }
 
 void CommandString::setParam(string p){
@@ -72,7 +72,7 @@ void CommandString::setParam(string p){
 }
 
 string CommandString::getParam2() const{
-	return (*keys.find("param2")).second;
+	return get("param2");
 }
 
 void CommandString::setParam2(string p){
@@ -80,7 +80,7 @@ void CommandString::setParam2(string p){
 }
 
 string CommandString::getParam3() const{
-	return (*keys.find("param3")).second;
+	return get("param3");
 }
 
 void CommandString::setParam3(string p){
@@ -91,7 +91,7 @@ string CommandString::getString() const{
 	string ret;
 	map<string,string>::const_iterator it;
 	it = keys.begin();
-	ret = "op=" + get("op") + "; ";
+	ret = "op=" + getOp() + "; ";
 	for( it = keys.begin(); it!=keys.end(); it++ ) {
 		if( it->first != "op" && it->second!="" )
 			ret+= it->first + "=" + it->second + "; ";
@@ -104,5 +104,9 @@ string &CommandString::operator[](string key){
 }
 
 string CommandString::get(const string &key) const{
-	return (*keys.find(key)).second;
+	map<string,string>::const_iterator it = keys.find(key);
+	if( it == keys.end() ){
+		throw Exception("Key not found");
+	}
+	return it->second;
 }
