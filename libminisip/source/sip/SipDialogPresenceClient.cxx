@@ -310,7 +310,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 				branch,
 				dialogState.callId,
 				toUri->getSipUri(),
-				getDialogConfig()->inherited->sipIdentity->getSipUri(),
+				getDialogConfig()->sipIdentity->getSipUri(),
 				dialogState.seqNo
 				);
 

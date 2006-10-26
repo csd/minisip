@@ -83,7 +83,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		 */
 		void saveDefault( MRef<ConfBackend *> backend );
 		
-		MRef<SipCommonConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
+		MRef<SipStackConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
 		
 		SipDialogSecurityConfig securityConfig;
 
@@ -93,11 +93,10 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 	
 //		SipIdentity pstnIdentity;
 		MRef<SipIdentity *> pstnIdentity;
-//		MRef<SipIdentity *> defaultIdentity;
+		MRef<SipIdentity *> defaultIdentity;
 
 		/**
 		List of identities we have extracted from the config file.
-		The default identity is in SipSoftPhoneConfiguration::inherited.sipIdentity
 		*/
 		std::list< MRef<SipIdentity*> > identities;
 		
@@ -121,8 +120,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		bool useUserDefinedStunServer;
 		std::string userDefinedStunServer;
 		
-		Socket * proxyConnection;
-
 		std::string soundDeviceIn;
 		std::string soundDeviceOut;
 		std::string videoDevice;

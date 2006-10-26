@@ -394,7 +394,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 
 		dialogState.remoteUri = command.getCommandPacket()->getHeaderValueFrom()->getUri().getUserName()+"@"+ 
 			command.getCommandPacket()->getHeaderValueFrom()->getUri().getIp();
-		getDialogConfig()->inherited->sipIdentity->setSipUri( 
+		getDialogConfig()->sipIdentity->setSipUri( 
 			command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString() );
 
 		//We must maintain our dialog state. This is the first
@@ -499,7 +499,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		
 		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
-		CommandString cmdstr2("", "myuri", getDialogConfig()->inherited->sipIdentity->getSipUri());
+		CommandString cmdstr2("", "myuri", getDialogConfig()->sipIdentity->getSipUri());
 		
 		
 		cmdstr2.setParam3(confId);
@@ -998,11 +998,11 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 				branch,
 				dialogState.callId,
 				dialogState.remoteUri,
-				getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
+				getDialogConfig()->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
+				getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPort,
 				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-				getDialogConfig()->inherited->sipIdentity->getSipUri(),
+				getDialogConfig()->sipIdentity->getSipUri(),
 				dialogState.seqNo,
 				getDialogConfig()->inherited->getTransport(),
 				sipStack) ;
@@ -1075,16 +1075,16 @@ void SipDialogConfVoip::sendAuthInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->sipDomain,
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
+			getDialogConfig()->sipIdentity->sipDomain,
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPort,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			dialogState.seqNo,
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername,
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername,
 			nonce,
 			realm,
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword,
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword,
 			getDialogConfig()->inherited->getTransport(),
 			sipStack);
 
@@ -1229,7 +1229,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	///modifyConfOk(ack);
 //	setLastResponse(ok);
 	modifyConfAck(ack);
-	MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
+	MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
 
 	ack->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort,
 		       proxy->getTransport() );

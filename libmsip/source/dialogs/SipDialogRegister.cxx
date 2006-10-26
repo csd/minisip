@@ -94,20 +94,20 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
 		} 
 
 		//Set expires param ... in seconds (in param3)
 		if (command.getCommandString().getParam3()!="" ) {
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
+			getDialogConfig()->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
 		}
 		
 		//if it comes with an identity ... use it to filter out commands not for this dialog ...
 		if (command.getCommandString()["identityId"]!="" ) {
 			string identity;
 			identity = command.getCommandString()["identityId"];
-			if( identity != getDialogConfig()->inherited->sipIdentity->getId() ) {
+			if( identity != getDialogConfig()->sipIdentity->getId() ) {
 				//we got a proxy_register not for our identity ... 
 				return false;
 			}
@@ -117,7 +117,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 		send_register("");
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
@@ -140,13 +140,13 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 ///		regcall->getDialogContainer()->getPhoneConfig()->proxyConnection = command.getCommandPacket()->getSocket();
 		
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
-		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
+		getDialogConfig()->sipIdentity->setIsRegistered ( true );
 		
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
 			sipStack->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
@@ -158,9 +158,9 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
-		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
+		if( getDialogConfig()->sipIdentity->isRegistered () ) {
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
+				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 
@@ -204,8 +204,8 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
@@ -228,8 +228,8 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
@@ -254,9 +254,9 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 			//We store the new credentials for this dialogs
 			//configuration. Note that it is not saved for the
 			//next time minisip is started.
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername = 
+		getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = 
 				command.getCommandString().getParam();
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword= 
+		getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword= 
 				command.getCommandString().getParam2();
 		
 		
@@ -291,13 +291,13 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 				"2**")){
 		
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
-		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
+		getDialogConfig()->sipIdentity->setIsRegistered ( true );
 		
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);   
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);   
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		//TODO: inform GUI
 		if (getGuiFeedback()){
 			sipStack->getCallback()->handleCommand("gui", cmdstr );
@@ -310,10 +310,10 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
-		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
+		if( getDialogConfig()->sipIdentity->isRegistered () ) {
 			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
+				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 		
@@ -335,8 +335,8 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
 		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
@@ -355,14 +355,14 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 				SipSMCommand::dialog_layer, 
 				"2**")){
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
-		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( true );
+		getDialogConfig()->sipIdentity->setIsRegistered ( true );
 	
 		//TODO: inform GUI
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyAddressString);   
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);   
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
 			sipStack->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
@@ -374,10 +374,10 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
-		if( getDialogConfig()->inherited->sipIdentity->isRegistered () ) {
+		if( getDialogConfig()->sipIdentity->isRegistered () ) {
 			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
 			requestTimeout(
-				getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
+				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 		
@@ -396,7 +396,7 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 				SipSMCommand::dialog_layer)){
 
 		//Mark the identity as currently un-registered
-		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( false );
+		getDialogConfig()->sipIdentity->setIsRegistered ( false );
 	
 #ifdef DEBUG_OUTPUT
 		mdbg << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<end;
@@ -415,10 +415,10 @@ bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMComma
 				SipSMCommand::dialog_layer)){
 		
 		//Mark the identity as currently un-registered
-		getDialogConfig()->inherited->sipIdentity->setIsRegistered ( false );
+		getDialogConfig()->sipIdentity->setIsRegistered ( false );
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::transport_error);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
@@ -437,20 +437,20 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 
 		//Set proxy username and password
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
 		}
 		
 		//Set expires param ... in seconds
 		if (command.getCommandString().getParam3()!="" ) {
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
+			getDialogConfig()->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
 		}
 		
 		//if it comes with an identity ... use it to filter out commands not for this dialog ...
 		if (command.getCommandString()["identityId"]!="" ) {
 			string identity;
 			identity = command.getCommandString()["identityId"];
-			if( identity != getDialogConfig()->inherited->sipIdentity->getId() ) {
+			if( identity != getDialogConfig()->sipIdentity->getId() ) {
 				//we got a proxy_register not for our identity ... 
 				return false;
 			}
@@ -460,7 +460,7 @@ bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCom
 		send_register("");
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
@@ -478,7 +478,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 
 		CommandString cmdstr ( dialogState.callId, 
 				SipCommandString::call_terminated);
-		cmdstr["identityId"] = getDialogConfig()->inherited->sipIdentity->getId();
+		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		SipSMCommand cmd(cmdstr,
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dispatcher);
@@ -615,9 +615,9 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig
 	setUpStateMachine();
 	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->localIpString;
 
-	if (callconf->inherited->sipIdentity->sipDomain==""){
+	if (callconf->sipIdentity->sipDomain==""){
 		uint32_t i=0;
-		string uri = getDialogConfig()->inherited->sipIdentity->getSipUri();
+		string uri = getDialogConfig()->sipIdentity->getSipUri();
 
 		for ( ; uri[i]!='@' && i<uri.length(); i++)
 			;
@@ -625,22 +625,22 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig
 		i++;
 
 		for ( ; i<uri.length(); i++) { //FIXME: Is this correct? (line below)
-			callconf->inherited->sipIdentity->sipDomain = 
-				callconf->inherited->sipIdentity->sipDomain+uri[i];
+			callconf->sipIdentity->sipDomain = 
+				callconf->sipIdentity->sipDomain+uri[i];
 		}
 	}
 #ifdef DEBUG_OUTPUT
-	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< callconf->inherited->sipIdentity->sipDomain << end;
+	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< callconf->sipIdentity->sipDomain << end;
 #endif
 
-	myDomain = getDialogConfig()->inherited->sipIdentity->sipDomain;
+	myDomain = getDialogConfig()->sipIdentity->sipDomain;
 }
 
 SipDialogRegister::~SipDialogRegister(){
 }
 
 bool SipDialogRegister::hasPassword(){
-	return getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername!="" && getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword!="";
+	return getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername!="" && getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword!="";
 }
 
 bool SipDialogRegister::handleCommand(const SipSMCommand &command){
@@ -656,7 +656,7 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 		&& (command.getDestination()==SipSMCommand::dialog_layer /*|| command.getDestination()==SipSMCommand::ANY*/)
 		&& (command.getCommandString().getOp()==SipCommandString::proxy_register)
 		&& ( command.getCommandString()["proxy_domain"]=="" 
-			 || command.getCommandString()["proxy_domain"]== getDialogConfig()->inherited->sipIdentity->sipDomain)
+			 || command.getCommandString()["proxy_domain"]== getDialogConfig()->sipIdentity->sipDomain)
 			){
 		return SipDialog::handleCommand(command);
 	}
@@ -694,13 +694,13 @@ void SipDialogRegister::send_register(string branch){
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
 		branch, 
 		dialogState.callId,
-		getDialogConfig()->inherited->sipIdentity->sipDomain, //proxy_domain,
+		getDialogConfig()->sipIdentity->sipDomain, //proxy_domain,
 		getDialogConfig()->inherited->externalContactIP,
 		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
-		getDialogConfig()->inherited->sipIdentity->getSipUri(),
+		getDialogConfig()->sipIdentity->getSipUri(),
 		dialogState.seqNo,
 		getDialogConfig()->inherited->getTransport(),
-		getDialogConfig()->inherited->sipIdentity->getSipProxy()->getRegisterExpires_int()
+		getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 
 	addAuthorizations( reg );

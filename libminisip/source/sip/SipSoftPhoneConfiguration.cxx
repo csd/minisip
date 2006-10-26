@@ -74,7 +74,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	findStunServerFromDomain(false),
 	stunDomain(""),
 	useUserDefinedStunServer(false),
-	proxyConnection(NULL),
 	soundDeviceIn(""),
 	soundDeviceOut(""),
 	videoDevice(""),
@@ -84,7 +83,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	ringtone(""),
 	p2tGroupListServerPort(0)
 {
-	inherited = new SipCommonConfig;
+	inherited = new SipStackConfig;
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
@@ -138,7 +137,7 @@ void SipSoftPhoneConfiguration::save(){
 		else
 			backend->save( accountPath + "pstn_account", "no" );
 
-		if( (*iIdent) == inherited->sipIdentity ){
+		if( (*iIdent) == defaultIdentity ){
 			backend->save( accountPath + "default_account", "yes" );
 		}
 		else
@@ -304,7 +303,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	//installConfigFile( this->configFileName );
 
-	proxyConnection = NULL;
 	usePSTNProxy = false;
 
 	string ret = "";
@@ -339,7 +337,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		ident->setIdentityName(account);
 
 		if( ii == 0 ){
-			inherited->sipIdentity = ident;
+			//inherited->sipIdentity = ident;
+			defaultIdentity=ident;
 		}
 
 		ii++;
@@ -399,7 +398,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 
 		if (backend->loadString(accountPath + "default_account","")=="yes"){
-			inherited->sipIdentity = ident;
+			//inherited->sipIdentity = ident;
+			defaultIdentity=ident;
 		}
 
 		identities.push_back(ident);
@@ -495,10 +495,13 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	securityConfig.load( backend );
 
 	// FIXME: per identity security
-	if( inherited->sipIdentity){
+/*	if( inherited->sipIdentity){
 		inherited->sipIdentity->securitySupport = securityConfig.secured;
 	}
-
+*/
+	if ( defaultIdentity){
+		defaultIdentity->securitySupport = securityConfig.secured;
+	}
 	audioCodecs.clear();
 	int iCodec = 0;
 	string codec = backend->loadString("codec["+ itoa( iCodec ) + "]","");

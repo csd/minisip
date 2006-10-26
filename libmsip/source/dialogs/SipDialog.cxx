@@ -116,7 +116,7 @@ void SipDialog::addRoute( MRef<SipRequest *> req ){
 	if( !dialogState.isEstablished || req->getType() == "CANCEL" ){
 		// Use proxy route for requests outside of the dialog
 		// and for CANCEL requests
-		MRef<SipProxy *> proxy = getDialogConfig()->inherited->sipIdentity->getSipProxy();
+		MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
 
 		if( !proxy.isNull() ){
 			req->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
@@ -294,8 +294,8 @@ bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 	if( !found ){
 		dialogState.auths.push_back( challenge );
 
-		string username = getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyUsername;
-		string password = getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPassword;
+		string username = getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername;
+		string password = getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword;
 
 		challenge->setCredential( username, password );
 		changed = true;
@@ -513,7 +513,7 @@ std::string SipDialog::getDialogDebugString(){
 	cerr <<endl;
 	
 	cerr << BOLD << "        Identity: "<< PLAIN << endl;
-	cerr <<         "            "<< getDialogConfig()->inherited->sipIdentity->getDebugString();
+	cerr <<         "            "<< getDialogConfig()->sipIdentity->getDebugString();
 	cerr <<endl;
 /*	
 	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;

@@ -543,7 +543,7 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStackInternal*> s
 			SipTransactionClient(stack, /*call,*/ seq_no, cSeqMethod, "", callid),
 		lastInvite(NULL)
 {
-//	MRef<SipCommonConfig *> conf;
+//	MRef<SipStackConfig *> conf;
 //	if (dialog){
 //		conf = dialog->getDialogConfig()->inherited;
 //	}else{
@@ -581,7 +581,7 @@ void SipTransactionInviteClient::setDialogRouteSet(MRef<SipResponse *> ) {
 
 void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, bool provisional){
 
-//	MRef<SipCommonConfig *> conf;
+//	MRef<SipStackConfig *> conf;
 //	if (dialog){
 //		conf = dialog->getDialogConfig()->inherited;
 //	}else{

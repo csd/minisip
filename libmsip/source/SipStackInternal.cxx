@@ -68,7 +68,7 @@
 
 using namespace std;
 
-SipStackInternal::SipStackInternal( MRef<SipCommonConfig *> stackConfig,
+SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
 		)

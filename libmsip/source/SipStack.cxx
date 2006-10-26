@@ -71,7 +71,7 @@ using namespace std;
 
 #define STACK (*(MRef<SipStackInternal*> *) sipStackInternal)
 
-SipStack::SipStack( MRef<SipCommonConfig *> stackConfig,
+SipStack::SipStack( MRef<SipStackConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
 		MRef<ca_db *> cert_db
 		){
@@ -132,7 +132,7 @@ MRef<SipTimers*> SipStack::getTimers(){
 	return STACK->getTimers();
 }	
 
-MRef<SipCommonConfig*> SipStack::getStackConfig(){
+MRef<SipStackConfig*> SipStack::getStackConfig(){
 	return STACK->getStackConfig();
 }
 

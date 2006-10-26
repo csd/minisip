@@ -465,7 +465,7 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 	
 	//timers are set in the initial transition
 
-//	MRef<SipCommonConfig *> conf = getConfig(); 
+//	MRef<SipStackConfig *> conf = getConfig(); 
 //	if (dialog){
 //		conf = dialog->getDialogConfig()->inherited;
 //	}else{

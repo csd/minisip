@@ -42,7 +42,7 @@ class SipDialog;
 class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 	public:
-		SipStackInternal( MRef<SipCommonConfig*> stackConfig,
+		SipStackInternal( MRef<SipStackConfig*> stackConfig,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
 				MRef<ca_db *> cert_db = NULL
@@ -81,7 +81,7 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
 
 		MRef<SipTimers*> getTimers();
-		MRef<SipCommonConfig*> getStackConfig(){return config;}
+		MRef<SipStackConfig*> getStackConfig(){return config;}
 
 		void addSupportedExtension(std::string extension);
 		std::string getAllSupportedExtensionsStr();
@@ -95,7 +95,7 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 //				list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests);
 
 		MRef<SipTimers*> timers;
-		MRef<SipCommonConfig *> config;
+		MRef<SipStackConfig *> config;
 		MRef<CommandReceiver*> callback;
 		
 		MRef<CommandReceiver*> confCallback;	//hack to make conference calling work until the ConfMessageRouter is removed

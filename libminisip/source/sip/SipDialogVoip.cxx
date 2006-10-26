@@ -642,7 +642,7 @@ void SipDialogVoip::sendReferOk(const string &branch){
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

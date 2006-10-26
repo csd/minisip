@@ -754,13 +754,13 @@ bool SipDialogManagement::deRegisterAll() {
 			//mdbg << "SipDialogManagement::deRegisterAll : non-reg dialog skipped" << end;
 			continue;
 		}
-		if(! (*it)->getDialogConfig()->inherited->sipIdentity->isRegistered() ) {
+		if(! (*it)->getDialogConfig()->sipIdentity->isRegistered() ) {
 			//mdbg << "SipDialogManagement::deRegisterAll : skipping already de-registered identity" << end;
 			continue;
 		}
 		
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
-		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->inherited->sipIdentity->sipDomain;
+		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->sipDomain;
 		cmdstr.setParam3("0"); //expires = 0 ==> de-register
 		
 		SipSMCommand cmd( cmdstr,
@@ -769,7 +769,7 @@ bool SipDialogManagement::deRegisterAll() {
 		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    De-registration request sent (username = " << 
-			(*it)->getDialogConfig()->inherited->sipIdentity->getSipUri() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri() << ")" << end;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered
@@ -795,15 +795,15 @@ bool SipDialogManagement::registerAll() {
 			//mdbg << "SipDialogManagement::registerAll : non-reg dialog skipped" << end;
 			continue;
 		}
-		if( (*it)->getDialogConfig()->inherited->sipIdentity->isRegistered() ) {
+		if( (*it)->getDialogConfig()->sipIdentity->isRegistered() ) {
 			//mdbg << "SipDialogManagement::registerAll : skipping already registered identity" << end;
 			continue;
 		}
 		
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
-		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->inherited->sipIdentity->sipDomain;
+		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->sipDomain;
 		//expires = defaultExpires, read from the config file
-		cmdstr.setParam3((*it)->getDialogConfig()->inherited->sipIdentity->getSipProxy()->getDefaultExpires()); 
+		cmdstr.setParam3((*it)->getDialogConfig()->sipIdentity->getSipProxy()->getDefaultExpires()); 
 		
 		SipSMCommand cmd( cmdstr,
 				SipSMCommand::dialog_layer,
@@ -811,7 +811,7 @@ bool SipDialogManagement::registerAll() {
 		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    Registration request sent (username = " << 
-			(*it)->getDialogConfig()->inherited->sipIdentity->getSipUri() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri() << ")" << end;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered

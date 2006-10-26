@@ -527,7 +527,7 @@ SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStackInternal*> s
 			lastResponse(NULL),
 			timerG(500)
 {
-/*	MRef<SipCommonConfig *> conf;
+/*	MRef<SipStackConfig *> conf;
 	if (dialog){
 		conf = dialog->getDialogConfig()->inherited;
 	}else{

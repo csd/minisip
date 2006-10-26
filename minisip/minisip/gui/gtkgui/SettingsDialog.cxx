@@ -682,8 +682,8 @@ string SecuritySettings::apply(){
         config->securityConfig.psk_length = psk_length;
 
 	config->securityConfig.secured = secureCheck->get_active();
-	if( config->inherited->sipIdentity ){
-		config->inherited->sipIdentity->securitySupport = secureCheck->get_active();
+	if( config->defaultIdentity ){
+		config->defaultIdentity->securitySupport = secureCheck->get_active();
 	}
 
 	if( config->securityConfig.secured ){

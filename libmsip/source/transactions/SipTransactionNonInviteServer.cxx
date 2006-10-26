@@ -362,7 +362,7 @@ SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStackIntern
 			SipTransactionServer(stack, /*call,*/ seq_no, cSeqMethod, branch, callid),
 			lastResponse(NULL)
 {
-//	MRef<SipCommonConfig *> conf;
+//	MRef<SipStackConfig *> conf;
 //	if (dialog){
 //		conf = dialog->getDialogConfig()->inherited;
 //	}else{

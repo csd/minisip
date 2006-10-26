@@ -372,7 +372,7 @@ string SipIdentity::getDebugString(){
 	return ret;
 }
 
-SipCommonConfig::SipCommonConfig():
+SipStackConfig::SipStackConfig():
 	localUdpPort(0),
 	localTcpPort(0),
 	localTlsPort(0),
@@ -381,18 +381,19 @@ SipCommonConfig::SipCommonConfig():
 
 }
 
-string SipCommonConfig::getTransport() {
-	string ret = sipIdentity->getSipProxy()->getTransport();
+string SipStackConfig::getTransport() {
+	string ret;	//XXX TODO: fixme - should this method exist somewhere else?!
+//	string ret = sipIdentity->getSipProxy()->getTransport();
 	if( ret == "" ) {
 		#ifdef DEBUG_OUTPUT
-		cerr << "SipCommonConfig::getTransport(): empty proxy transport ... returning default UDP" << endl;
+		cerr << "SipStackConfig::getTransport(): empty proxy transport ... returning default UDP" << endl;
 		#endif
 		ret = "UDP";
 	}
 	return ret;
 }
 
-int32_t SipCommonConfig::getLocalSipPort(bool usesStun) {
+int32_t SipStackConfig::getLocalSipPort(bool usesStun) {
 	int32_t localSipPort;
 	string transport = getTransport();
 	
@@ -411,8 +412,8 @@ int32_t SipCommonConfig::getLocalSipPort(bool usesStun) {
 }
 
 
-SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig *> commonconf) : proxyConnection(NULL) {
-	inherited = new SipCommonConfig; /// We want do do a "deep copy" here. This is so that
+SipDialogConfig::SipDialogConfig(MRef<SipStackConfig *> commonconf) {
+	inherited = new SipStackConfig; /// We want do do a "deep copy" here. This is so that
 					 /// we have a local copy that we can modify and that 
 					 /// no one else modifies.
 	**inherited = **commonconf;
@@ -425,11 +426,12 @@ SipDialogConfig::SipDialogConfig(MRef<SipCommonConfig *> commonconf) : proxyConn
 }
 
 void SipDialogConfig::useIdentity(
-			MRef<SipIdentity*> identity,
+			MRef<SipIdentity*> id,
 			bool useSecurity,
 			string transport)
 {
-	inherited->sipIdentity = identity;
+	this->sipIdentity=id;
+//	inherited->sipIdentity = identity;
 // 	inherited->transport = transport;
 // 	inherited->transport = inherited->sipIdentity->sipProxy.getTransport();
 }

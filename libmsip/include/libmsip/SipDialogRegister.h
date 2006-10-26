@@ -41,7 +41,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		virtual bool handleCommand(const SipSMCommand &command);
 
-		virtual std::string getName(){return "SipDialogRegister["+getDialogConfig()->inherited->sipIdentity->sipDomain+"]";}
+		virtual std::string getName(){return "SipDialogRegister["+getDialogConfig()->sipIdentity->sipDomain+"]";}
 		
 		virtual std::string getMemObjectType() const {return "SipDialogRegister";}
 		

@@ -41,12 +41,13 @@
 #include<libmutil/mtypes.h>
 #include<libmutil/Mutex.h>
 #include<libmsip/SipRequest.h>
+#include<libmsip/SipStack.h>
 
 #define DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS 1000
 
 #include<string>
 
-class Socket;
+class SipStackConfig;
 
 class LIBMSIP_API SipProxy : public MObject{
 	public:
@@ -258,60 +259,13 @@ class LIBMSIP_API SipIdentity : public MObject{
 		Mutex mutex;
 };
 
-
-class LIBMSIP_API SipCommonConfig : public MObject{
-	public:
-		SipCommonConfig();
-
-		virtual std::string getMemObjectType() const {return "SipCommonConfig";}
-		
-		//shared with Dialog config
-//		std::string userUri; 	//General->Users SIP address
-		std::string localIpString; //GEneral->Network Interface
-		std::string externalContactIP;
-		int32_t externalContactUdpPort;
-                
-		int32_t localUdpPort;	// Advanced -> ...Sip port...
-		int32_t localTcpPort;
-		int32_t localTlsPort;
-		
-// 		std::string transport;
-		/**
-		@return the transport set in the SipProxy (means preferred ... )
-		*/
-		std::string getTransport();
-		
-		/**
-		@return the port in use, depending on the transport.
-		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
-		*/
-		int32_t getLocalSipPort(bool usesStun=false);
-		
-		MRef<SipIdentity*> sipIdentity;
-	
-//		MRef<SipMessageTransport*> sipTransport;	// ? General-> Network Interface ?
-		
-		bool autoAnswer;
-
-
-                /**
-                 * This is the setting telling a dialogwhether it should
-                 * use the 100rel extension if the remote user supports it.
-                 */
-                bool use100Rel;
-
-};
-
-
 class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
-		SipDialogConfig(MRef<SipCommonConfig *> phone_config);
+		SipDialogConfig(MRef<SipStackConfig *> phone_config);
 
 		virtual std::string getMemObjectType() const {return "SipDialogConfig";}
 		
-		MRef<SipCommonConfig *> inherited;
-
-		Socket *proxyConnection; //TODO: verify that this is working ok - it has been moved here from SipSoftPhoneConfiguration
+		MRef<SipStackConfig *> inherited;
 
 		//Specific to calls
 		std::string proxyNonce;
@@ -320,6 +274,8 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		uint32_t local_ssrc;
 
 		MRef<SipRequest*> last_invite;
+
+		MRef<SipIdentity*> sipIdentity;
 
 		/**
 		Set the identity to be used as default.

@@ -95,6 +95,45 @@ class SipDialog;
 #define LOW_PRIO_QUEUE 4
 
 
+class LIBMSIP_API SipStackConfig : public MObject{
+	public:
+		SipStackConfig();
+
+		virtual std::string getMemObjectType() const {return "SipStackConfig";}
+		
+		//shared with Dialog config
+		std::string localIpString; //GEneral->Network Interface
+		std::string externalContactIP;
+		int32_t externalContactUdpPort;
+                
+		int32_t localUdpPort;	// Advanced -> ...Sip port...
+		int32_t localTcpPort;
+		int32_t localTlsPort;
+		
+		/**
+		@return the transport set in the SipProxy (means preferred ... )
+		*/
+		std::string getTransport();
+		
+		/**
+		@return the port in use, depending on the transport.
+		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
+		*/
+		int32_t getLocalSipPort(bool usesStun=false);
+		
+//		MRef<SipIdentity*> sipIdentity;
+	
+		bool autoAnswer;
+
+
+                /**
+                 * This is the setting telling a dialogwhether it should
+                 * use the 100rel extension if the remote user supports it.
+                 */
+                bool use100Rel;
+
+};
+
 
 //TODO: Enable conference calling
 
@@ -134,7 +173,7 @@ class SipDialog;
 */
 class LIBMSIP_API SipStack : public Runnable{
 	public:
-		SipStack( MRef<SipCommonConfig*> stackConfig,
+		SipStack( MRef<SipStackConfig*> stackConfig,
 				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
 								//TODO: TLS should use the whole chain instead of only the first certificate --EE
 				MRef<ca_db *> cert_db = NULL
@@ -157,7 +196,7 @@ class LIBMSIP_API SipStack : public Runnable{
 		MRef<CommandReceiver *> getConfCallback();
 		void addDialog(MRef<SipDialog*> d);
 		MRef<SipTimers*> getTimers();
-		MRef<SipCommonConfig*> getStackConfig();
+		MRef<SipStackConfig*> getStackConfig();
 		void addSupportedExtension(std::string extension);
 		std::string getAllSupportedExtensionsStr();
 		bool supports(std::string extension);
@@ -173,6 +212,8 @@ class LIBMSIP_API SipStack : public Runnable{
 		bool getDebugPrintPackets();
 
 		std::string getStackStatusDebugString();
+
+		MRef<SipStackConfig *> sipStackConfig;
 
 	private:
 		friend class SipDialog;

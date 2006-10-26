@@ -69,7 +69,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandl
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
 
-	MRef<SipCommonConfig *> stackConfig = new SipCommonConfig;
+	MRef<SipStackConfig *> stackConfig = new SipStackConfig;
 	stackConfig->localIpString = localIpString;
 	stackConfig->externalContactIP= externalContactIP;
 	stackConfig->localUdpPort=localUdpPort;
@@ -140,7 +140,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 
 	id = ( onlydigits && phoneconfig->usePSTNProxy )?
 			phoneconfig->pstnIdentity:
-			phoneconfig->inherited->sipIdentity;
+			phoneconfig->defaultIdentity;
 
 	if( !id ){
 		cerr << "id is null" << endl;
@@ -250,7 +250,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
+		securityConfig.useIdentity( phoneconfig->defaultIdentity);
 	}
 
 
@@ -341,7 +341,7 @@ string Sip::confconnect(string &user, string confId){
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->inherited->sipIdentity);
+		securityConfig.useIdentity( phoneconfig->defaultIdentity);
 	}
 
 	

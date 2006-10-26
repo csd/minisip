@@ -117,7 +117,7 @@ bool SipDialogVoipServer100rel::a4001_start_100rel_100relINVITE( const SipSMComm
 		
 		string peerUri = dialogState.remoteUri;
 		
-		getDialogConfig()->inherited->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
+		getDialogConfig()->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
 		
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
@@ -283,7 +283,7 @@ void SipDialogVoipServer100rel::sendPrackOk(const string &branch, MRef<SipMessag
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),
@@ -315,7 +315,7 @@ void SipDialogVoipServer100rel::sendSessionProgress(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

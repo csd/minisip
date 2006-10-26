@@ -644,11 +644,11 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			dialogState.remoteUri,
-			getDialogConfig()->inherited->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-			getDialogConfig()->inherited->sipIdentity->getSipProxy()->sipProxyPort,
+			getDialogConfig()->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
+			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPort,
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			dialogState.seqNo,
 			getDialogConfig()->inherited->getTransport(),
 			sipStack ) ;
@@ -731,7 +731,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->inherited->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

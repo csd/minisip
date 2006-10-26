@@ -727,7 +727,7 @@ void DefaultDialogHandler::startP2TSession(const SipSMCommand &command){
 		
 		//filter out own username
 		//if(user==getDialogConfig().inherited.userUri)
-		if(user==getDialogConfig()->inherited->sipIdentity->getSipUri())
+		if(user==getDialogConfig()->sipIdentity->getSipUri())
 			continue;
 		
 		
@@ -822,8 +822,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyAddressString = proxy;
-			dialogConfig->inherited->sipIdentity->getSipProxy()->sipProxyPort = iport;
+			dialogConfig->sipIdentity->getSipProxy()->sipProxyAddressString = proxy;
+			dialogConfig->sipIdentity->getSipProxy()->sipProxyPort = iport;
 		}catch(HostNotFound & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc.what();
@@ -853,8 +853,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	posAt = toUri.find("@");
 	if( posAt == string::npos ) { //toUri does not have a domain ...
 		//get one, from the default identity
-		if( phoneconf->inherited->sipIdentity->sipDomain != "" ) {
-			toUri += "@" + phoneconf->inherited->sipIdentity->sipDomain;
+		if( phoneconf->defaultIdentity->sipDomain != "" ) {
+			toUri += "@" + phoneconf->defaultIdentity->sipDomain;
 		} else {
 			#ifdef DEBUG_OUTPUT
 			cerr << "DefaultDialogHandler::sendIM - toUri without domain" << endl;
@@ -869,13 +869,13 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			std::string(branch),
 			itoa(rand()),	//Generate random callId
 			toUri, 	
-			phoneconf->inherited->sipIdentity->getSipUri(),
+			phoneconf->defaultIdentity->getSipUri(),
 			im_seq_no,
 			msg
 			);
 
 	//Add outbount proxy route
-	MRef<SipProxy *> proxy = phoneconf->inherited->sipIdentity->getSipProxy();
+	MRef<SipProxy *> proxy = phoneconf->defaultIdentity->getSipProxy();
 	if( !proxy.isNull() ){
 		im->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
 	}

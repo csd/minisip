@@ -76,7 +76,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->username] = (*i)->getSipProxy()->sipProxyUsername;
 		(*iter)[columns->password] = (*i)->getSipProxy()->sipProxyPassword;
 		(*iter)[columns->registerExpires] = (*i)->getSipProxy()->getDefaultExpires_int();
-		(*iter)[columns->defaultProxy] = ( (*i) == config->inherited->sipIdentity );
+		(*iter)[columns->defaultProxy] = ( (*i) == config->defaultIdentity );
 		(*iter)[columns->pstnProxy] = ( (*i) == config->pstnIdentity );
 		(*i)->unlock();
 	}
@@ -85,7 +85,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	config->identities.clear();
-	config->inherited->sipIdentity = NULL;
+	config->defaultIdentity = NULL;
 	config->pstnIdentity = NULL;
 	config->usePSTNProxy = false;
 	Gtk::TreeModel::iterator iter;
@@ -130,9 +130,9 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			config->pstnIdentity = identity;
 		}
 
-		if( !config->inherited->sipIdentity ||
+		if( !config->defaultIdentity ||
 				(*iter)[columns->defaultProxy] ){
-			config->inherited->sipIdentity = identity;
+			config->defaultIdentity = identity;
 		}
 
 		identity->getSipProxy()->setDefaultExpires( (*iter)[columns->registerExpires] );

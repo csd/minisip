@@ -301,13 +301,13 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 				branch,
 				cid,
 				toId->getSipUri(),
-				getDialogConfig()->inherited->sipIdentity->getSipUri(),
+				getDialogConfig()->sipIdentity->getSipUri(),
 				dialogState.seqNo
 				);
 
 	notify->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
-	notify->setContent(new PresenceMessageContent(getDialogConfig()->inherited->sipIdentity->getSipUri(),
+	notify->setContent(new PresenceMessageContent(getDialogConfig()->sipIdentity->getSipUri(),
 				toId->getSipUri(),
 				onlineStatus,
 				onlineStatus
