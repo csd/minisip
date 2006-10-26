@@ -265,7 +265,7 @@ int DirectSoundDevice::readFromDevice( byte_t * buffer, uint32_t nSamples ){
 }
 
 int DirectSoundDevice::writeToDevice( byte_t * buffer, uint32_t nSamples ){
-	static int wait_i=0;
+	static int wait_i=1;
 	HRESULT hr;
 
 	VOID * lockedBuffer;
