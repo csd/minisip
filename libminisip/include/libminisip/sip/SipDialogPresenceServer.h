@@ -51,7 +51,7 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 	public:
-		SipDialogPresenceServer(MRef<SipStack*> dContainer, MRef<SipDialogConfig*> callconfig, bool use_stun);
+		SipDialogPresenceServer(MRef<SipStack*> dContainer, MRef<SipIdentity*> ident, bool use_stun);
 		
 		virtual ~SipDialogPresenceServer();
 

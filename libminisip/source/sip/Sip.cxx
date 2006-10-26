@@ -120,8 +120,6 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
-
 	securityConfig = phoneconfig->securityConfig;
 	
 	int startAddr=0;
@@ -146,7 +144,6 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 		cerr << "id is null" << endl;
 	}
 
-	callconf->useIdentity( id, false);
 	securityConfig.useIdentity( id );
 
 	gotAtSign = ( user.find("@", startAddr) != string::npos );
@@ -193,7 +190,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
         cerr << "After new mediaSession" << endl;
 #endif
 	
-	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, callconf, phoneconfig, mediaSession)); 
+	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, id, phoneconfig, mediaSession)); 
 
 #ifdef DEBUG_OUTPUT
 	cerr << "Before addDialog" << endl;
@@ -230,8 +227,6 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
-
 	securityConfig = phoneconfig->securityConfig;
 
 	int startAddr=0;
@@ -245,8 +240,10 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	for (unsigned i=0; i<user.length(); i++)
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
+
+	MRef<SipIdentity*> identity;
 	if (onlydigits && phoneconfig->usePSTNProxy){
-		callconf->useIdentity( phoneconfig->pstnIdentity, false);
+		identity = phoneconfig->pstnIdentity;
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
@@ -301,7 +298,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, conflist, confId, "")); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, conflist, confId, "")); 
 
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 
@@ -321,8 +318,6 @@ string Sip::confconnect(string &user, string confId){
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	MRef<SipDialogConfig*> callconf = MRef<SipDialogConfig*>(new SipDialogConfig(phoneconfig->inherited) );
-
 	securityConfig = phoneconfig->securityConfig;
 	
 	int startAddr=0;
@@ -333,14 +328,14 @@ string Sip::confconnect(string &user, string confId){
 		startAddr = 5;
 
 	bool onlydigits=true;
+	MRef<SipIdentity*> identity;
 	for (unsigned i=0; i<user.length(); i++)
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
 	if (onlydigits && phoneconfig->usePSTNProxy){
-		callconf->useIdentity( phoneconfig->pstnIdentity, false);
+		identity = phoneconfig->pstnIdentity;
 		securityConfig.useIdentity( phoneconfig->pstnIdentity );
-	}
-	else{
+	}else{
 		securityConfig.useIdentity( phoneconfig->defaultIdentity);
 	}
 
@@ -392,7 +387,7 @@ string Sip::confconnect(string &user, string confId){
 MRef<Session *> mediaSession = 
 		mediaHandler->createSession( securityConfig );
 
-	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, callconf, phoneconfig, mediaSession, confId)); 
+	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, confId)); 
 
 	/*dialogContainer*/sipstack->addDialog(voipConfCall);
 	

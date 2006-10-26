@@ -284,7 +284,6 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		@param transport it is ignored ... transport is set according to the identity->sipProxy->getTransport() value
 		*/
 		void useIdentity( MRef<SipIdentity*> identity,
-				bool useSecurity,
 				std::string transport="UDP_X");
 
 };

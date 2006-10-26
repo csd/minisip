@@ -576,11 +576,11 @@ void SipDialogVoip::setUpStateMachine(){
 
 
 SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack, 
-				MRef<SipDialogConfig*> callconfig, 
+				MRef<SipIdentity*> ident,
 				MRef<SipSoftPhoneConfiguration*> pconf, 
 				MRef<Session *> mediaSession, 
 				string cid ) :
-		SipDialog(stack,callconfig),
+		SipDialog(stack,ident),
 		phoneconf(pconf),
 		mediaSession(mediaSession),
 		lastInvite(NULL)

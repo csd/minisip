@@ -127,8 +127,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * @param dContainer The Dialog Container
 		 * @param callconf   The Dialog Configuration
 		 */
-		SipDialog(MRef<SipStack*> stack, 
-				MRef<SipDialogConfig*> callconf);
+		SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity);
 		
 		/**
 		 * Deconstructor.

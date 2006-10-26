@@ -55,13 +55,17 @@
 
 using namespace std;
 
-SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf):
+SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity):
                 StateMachine<SipSMCommand,string>(stack->getTimeoutProvider()), 
-                sipStack(stack), 
-                callConfig(callconf)
+                sipStack(stack) 
 {
-	//dispatcher = stack->getDispatcher();
-	dialogState.seqNo=100 * (rand()%9+1);
+	callConfig = new SipDialogConfig(stack->sipStackConfig);
+
+	if (identity){
+		callConfig->useIdentity(identity);
+	}
+
+	this->dialogState.seqNo=100 * (rand()%9+1);
 	dialogState.remoteSeqNo=-1;
 	dialogState.secure=false;	//TODO: this variable is not maintained 
 	 				//properly, right?! (this at least does not leave it uninitialized) -EE 

@@ -50,7 +50,7 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 	public:
-		SipDialogPresenceClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, bool use_stun);
+		SipDialogPresenceClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool use_stun);
 		
 		virtual ~SipDialogPresenceClient();
 

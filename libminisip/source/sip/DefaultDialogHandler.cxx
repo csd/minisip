@@ -165,14 +165,14 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
-			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+/*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 			if( id ){
 				cerr << "Got a call from Id " << id->getSipUri() << endl;
-				callConf->useIdentity( id, false );
+				callConf->useIdentity( id );
 			}
+*/
 
-
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()), sipStack, callConf, 
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()), sipStack, id, 
 						phoneconf, mediaSession, &connectList,confid, pkt->getCallId()));
 			sipStack->addDialog(voipConfCall);
 
@@ -205,14 +205,14 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
-			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+/*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
 			if( id ){
 				cerr << "Got a call from Id " << id->getSipUri() << endl;
-				callConf->useIdentity( id, false );
+				callConf->useIdentity( id );
 			}
-
-			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()),sipStack, callConf, 
+*/
+			MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipStack->getConfCallback()),sipStack, id, 
 						phoneconf, mediaSession, confid, pkt->getCallId()));
 			sipStack->addDialog(voipConfCall);
 
@@ -236,13 +236,13 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<Session *> mediaSession = 
 				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
 
-			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+/*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
 			if( id ){
 				cerr << "Got a call from Id " << id->getSipUri() << endl;
-				callConf->useIdentity( id, false );
+				callConf->useIdentity( id );
 			}
-
+*/
 			MRef<SipDialog*> voipCall;
 //			if (pkt->supported("100rel")){
 //				voipCall = new SipDialogVoipServer100rel(sipStack,
@@ -252,7 +252,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 //						pkt->getCallId());
 //			}else{
 				voipCall = new SipDialogVoipServer(sipStack,
-						callConf,
+						id,
 						phoneconf,
 						mediaSession,
 						pkt->getCallId());
@@ -306,9 +306,9 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 	if (cmdstr.getOp() == SipCommandString::start_presence_client){
 		cerr << "DefaultDialogHandler: Creating SipDialogPresenceClient for start_presence_client command"<< endl;
 		
-		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
+//		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 
-		MRef<SipDialogPresenceClient*> pres(new SipDialogPresenceClient(sipStack, conf, phoneconf->useSTUN ));
+		MRef<SipDialogPresenceClient*> pres(new SipDialogPresenceClient(sipStack, phoneconf->defaultIdentity, phoneconf->useSTUN ));
 
 		sipStack->addDialog( MRef<SipDialog*>(*pres) );
 		
@@ -323,9 +323,9 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 	if (cmdstr.getOp() == SipCommandString::start_presence_server){
 		cerr << "DefaultDialogHandler: Creating SipDialogPresenceServer for start_presence_server command"<< endl;
 		
-		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
+		//MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
 
-		MRef<SipDialogPresenceServer*> pres(new SipDialogPresenceServer(sipStack, conf, phoneconf->useSTUN ));
+		MRef<SipDialogPresenceServer*> pres(new SipDialogPresenceServer(sipStack, phoneconf->defaultIdentity, phoneconf->useSTUN ));
 
 		sipStack->addDialog( MRef<SipDialog*>(*pres) );
 		
@@ -347,8 +347,6 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 	if (cmdstr.getOp() == SipCommandString::proxy_register){
 		//merr << end << "CESC: DefaultDialogHandler: got proxy_register: "<< cmdstr.getString() << end << end;
 		
-		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
-		
 		MRef<SipIdentity *> identity;
 		identity = phoneconf->getIdentity( cmdstr["identityId"] );
 		
@@ -357,14 +355,13 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		/* Use appropriate identity ... 
 		*/
 		if( ! identity.isNull() ) {
-			//FIXME: useSecurity is false ... useIdentity doesn't use it anyway ... 
-			conf->useIdentity( identity, false ); 
+			;
 		} else if (phoneconf->pstnIdentity && (cmdstr.getDestinationId()=="pstn" 
 					|| (proxyDomainArg!="" && proxyDomainArg==phoneconf->pstnIdentity->sipDomain))){
-			conf->useIdentity( phoneconf->pstnIdentity, false);
+			identity=phoneconf->pstnIdentity;
 		}
 		
-		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, conf));
+		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, identity));
 		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
@@ -790,7 +787,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
 	if (onlydigits && phoneconf->usePSTNProxy){
-		dialogConfig->useIdentity( phoneconf->pstnIdentity, false);
+		dialogConfig->useIdentity( phoneconf->pstnIdentity );
 	}
 	
 	if (user.find(":", startAddr)!=string::npos){

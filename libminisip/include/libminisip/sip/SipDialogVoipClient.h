@@ -53,7 +53,7 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 	public:
-		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
+		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 		virtual ~SipDialogVoipClient();
 

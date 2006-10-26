@@ -395,8 +395,8 @@ void SipDialogVoipServer::setUpStateMachine(){
 }
 
 
-SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-		SipDialogVoip(stack, callconfig, pconf, mediaSession, cid) 
+SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
+		SipDialogVoip(stack, ident, pconf, mediaSession, cid) 
 {
 	setUpStateMachine();
 }

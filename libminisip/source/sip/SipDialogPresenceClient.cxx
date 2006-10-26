@@ -285,10 +285,9 @@ void SipDialogPresenceClient::setUpStateMachine(){
 
 
 SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack, 
-		//const SipDialogConfig &callconfig, 
-		MRef<SipDialogConfig*> callconfig,
+		MRef<SipIdentity*> ident,
 		bool use_stun) : 
-                	SipDialog(stack,callconfig),
+                	SipDialog(stack,ident),
 			useSTUN(use_stun)
 {
 

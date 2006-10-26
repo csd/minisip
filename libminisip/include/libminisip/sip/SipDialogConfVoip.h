@@ -52,9 +52,9 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 	public:
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
 		
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
 
 		virtual ~SipDialogConfVoip();
 

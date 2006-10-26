@@ -903,8 +903,8 @@ void SipDialogConfVoip::setUpStateMachine(){
 }
 
 
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist,string confid, string cid) : 
-                SipDialog(stack,callconfig),
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist,string confid, string cid) : 
+                SipDialog(stack,ident),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),
@@ -954,8 +954,8 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 
 	setUpStateMachine();
 }
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid) : 
-                SipDialog(stack,callconfig),
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid) : 
+                SipDialog(stack,ident),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),

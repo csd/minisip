@@ -427,7 +427,6 @@ SipDialogConfig::SipDialogConfig(MRef<SipStackConfig *> commonconf) {
 
 void SipDialogConfig::useIdentity(
 			MRef<SipIdentity*> id,
-			bool useSecurity,
 			string transport)
 {
 	this->sipIdentity=id;

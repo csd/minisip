@@ -35,7 +35,7 @@
 
 class LIBMSIP_API SipDialogRegister : public SipDialog{
 	public:
-		SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> conf);
+		SipDialogRegister(MRef<SipStack*> stack, MRef<SipIdentity*> identity);
 		virtual ~SipDialogRegister();
 
 

@@ -57,7 +57,7 @@ class LogEntry;
 
 class SipDialogVoipServer100rel: public SipDialogVoipServer{
 	public:
-		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconfig, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
+		SipDialogVoipServer100rel(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
 
 		virtual ~SipDialogVoipServer100rel();
 

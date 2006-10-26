@@ -607,15 +607,15 @@ void SipDialogRegister::setUpStateMachine(){
 	setCurrentState(s0_start);
 }
 
-SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig*> callconf)
-		: SipDialog(stack, callconf),
+SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConfig*> callconf*/, MRef<SipIdentity*> ident)
+		: SipDialog(stack/*, callconf*/, ident),
 			failCount(0),
 			guiFeedback(true)
 {
 	setUpStateMachine();
 	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->localIpString;
 
-	if (callconf->sipIdentity->sipDomain==""){
+	if (getDialogConfig()->sipIdentity->sipDomain==""){
 		uint32_t i=0;
 		string uri = getDialogConfig()->sipIdentity->getSipUri();
 
@@ -625,12 +625,12 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipDialogConfig
 		i++;
 
 		for ( ; i<uri.length(); i++) { //FIXME: Is this correct? (line below)
-			callconf->sipIdentity->sipDomain = 
-				callconf->sipIdentity->sipDomain+uri[i];
+			getDialogConfig()->sipIdentity->sipDomain = 
+				getDialogConfig()->sipIdentity->sipDomain+uri[i];
 		}
 	}
 #ifdef DEBUG_OUTPUT
-	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< callconf->sipIdentity->sipDomain << end;
+	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< getDialogConfig()->sipIdentity->sipDomain << end;
 #endif
 
 	myDomain = getDialogConfig()->sipIdentity->sipDomain;
