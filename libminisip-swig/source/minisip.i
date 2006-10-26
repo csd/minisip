@@ -234,7 +234,7 @@ REF(SipIdentity);
 REF(SipProxy);
 REF(SipSoftPhoneConfiguration);
 REF(CommandReceiver);
-REF(SipCommonConfig);
+REF(SipStackConfig);
 
 //REF(SipState) State<SipSMCommand, std::string>;
 //REF(SipState);
