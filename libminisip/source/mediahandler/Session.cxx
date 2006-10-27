@@ -854,7 +854,11 @@ void Session::muteSenders (bool mute) {
 		(*it)->setMuted( mute );
 	}
 
-	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	MRef<CallRecorder *> cr;
+	if (callRecorder){
+		cr = dynamic_cast<CallRecorder *>(*callRecorder);
+	}
+
 	if( !cr ) {
 	#ifdef DEBUG_OUTPUT
 		cerr << "Session::muteSenders - no call recorder?" << endl;
