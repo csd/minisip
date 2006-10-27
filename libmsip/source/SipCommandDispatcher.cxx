@@ -289,7 +289,12 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			list<MRef<SipDialog*> > dlgs = getDialogs();
 			list<MRef<SipDialog*> >::iterator i;
 			for ( i=dlgs.begin(); i!=dlgs.end(); i++){
-				if ( (*i)->getCurrentStateName()=="termwait" ){
+
+				string n = (*i)->getCurrentStateName();
+				//If the dialog does not use the state
+				//machine functionality the state name will
+				//be an empty string
+				if ( n =="termwait" || n =="") {
 					(*i)->signalIfNoTransactions();
 				}
 			}

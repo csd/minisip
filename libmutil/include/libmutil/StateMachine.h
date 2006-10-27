@@ -190,7 +190,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		 * assigned to the state that the machine is in.
 		 */
 		std::string getCurrentStateName() const{
-			return current_state->getName();
+			return current_state ? current_state->getName() : "";
 		}
 
 		/**
