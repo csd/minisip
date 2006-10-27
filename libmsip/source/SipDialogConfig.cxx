@@ -364,10 +364,11 @@ void SipIdentity::setIsRegistered( bool registerOk ) {
 }
 string SipIdentity::getDebugString(){
 	lock();
-	string ret = "identity="+identityIdx+"; username="+
-		sipUsername+ "; domain="+sipDomain + 
-		" proxy=["+ getSipProxy()->getDebugString()+ 
-		"]; isRegistered="+itoa(currentlyRegistered);
+	string ret = "identity="+identityIdx+
+			"; username="+sipUsername+ 
+			"; domain="+sipDomain + 
+			" proxy=["+(getSipProxy()?getSipProxy()->getDebugString():"")+
+			"]; isRegistered="+itoa(currentlyRegistered);
 	unlock();
 	return ret;
 }
