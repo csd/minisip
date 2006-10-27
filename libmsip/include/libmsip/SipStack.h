@@ -213,8 +213,6 @@ class LIBMSIP_API SipStack : public Runnable{
 
 		std::string getStackStatusDebugString();
 
-		MRef<SipStackConfig *> sipStackConfig;
-
 	private:
 		friend class SipDialog;
 		void *sipStackInternal; // This is pointer to a MRef<SipStackInternal*> sipStackInternal

@@ -73,8 +73,7 @@ using namespace std;
 
 SipStack::SipStack( MRef<SipStackConfig *> stackConfig,
 		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db
-		):sipStackConfig(stackConfig){
+		MRef<ca_db *> cert_db){
 	
 	SipStackInternal *istack = new SipStackInternal(stackConfig, cert_chain, cert_db);
 

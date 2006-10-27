@@ -59,7 +59,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity):
                 StateMachine<SipSMCommand,string>(stack->getTimeoutProvider()), 
                 sipStack(stack) 
 {
-	callConfig = new SipDialogConfig(stack->sipStackConfig);
+	callConfig = new SipDialogConfig(stack->getStackConfig());
 
 	if (identity){
 		callConfig->useIdentity(identity);
