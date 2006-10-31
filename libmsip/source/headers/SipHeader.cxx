@@ -95,7 +95,13 @@ SipHeaderFactoryFuncPtr SipHeaderFactories::getFactory(const string headerType) 
 		ht+=toupper(headerType[i]);
 	}
 
-	return (*factories.find(ht)).second;
+	std::map<std::string, SipHeaderFactoryFuncPtr >::const_iterator res;
+	res = factories.find(ht);
+	if( res != factories.end()) {
+		return (*factories.find(ht)).second;
+	}else{
+		return NULL;
+	}
 }
 
 SipHeader::SipHeader(MRef<SipHeaderValue*> val): headerName(val->headerName){

@@ -33,6 +33,7 @@
 #include<config.h>
 
 #include<libmutil/stringutils.h>
+#include<libmutil/mtypes.h>
 #include<string>
 #include<iostream>
 
