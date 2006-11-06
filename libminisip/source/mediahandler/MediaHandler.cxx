@@ -29,7 +29,6 @@
 #include<string.h>
 #include<libminisip/sdp/SdpPacket.h>
 #include<libmikey/keyagreement.h>
-#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/codecs/Codec.h>
@@ -104,7 +103,7 @@ void MediaHandler::init(){
 // }
 
 
-MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityConfig, string callId ){
+MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> id, string callId ){
 
 	list< MRef<Media *> >::iterator i;
 	MRef<Session *> session;
@@ -122,7 +121,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 	if( ip6Provider )
 		contactIp6 = ip6Provider->getExternalIp();
 
-	session = new Session( contactIp, securityConfig, contactIp6 );
+	session = new Session( contactIp, /*securityConfig*/ id, contactIp6 );
 	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
@@ -144,7 +143,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 				session->callRecorder = cr;
 			}
 #ifdef ZRTP_SUPPORT
-		    if(securityConfig.use_zrtp) {
+		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
 #ifdef DEBUG_OUTPUT
 		        cerr << "MediaHandler::createSession: enabling ZRTP for receiver" << callId << endl;
 #endif
@@ -177,7 +176,7 @@ MRef<Session *> MediaHandler::createSession( SipDialogSecurityConfig &securityCo
 		    sStream = new MediaStreamSender( media, sock, sock6 );
 		    session->addMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
-		    if(securityConfig.use_zrtp) {
+		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
 #ifdef DEBUG_OUTPUT
 		        cerr << "MediaHandler::createSession: enabling ZRTP for sender: " << callId << endl;
 #endif

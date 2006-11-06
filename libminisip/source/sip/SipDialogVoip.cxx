@@ -583,7 +583,8 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 		SipDialog(stack,ident),
 		phoneconf(pconf),
 		mediaSession(mediaSession),
-		lastInvite(NULL)
+		lastInvite(NULL),
+		notifyEarlyTermination(false)
 {
 	if (cid=="")
 		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;

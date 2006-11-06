@@ -152,7 +152,6 @@ libsip_src = source/sip/SipDialogVoip.cxx \
 		source/sip/SipSoftPhoneConfiguration.cxx \
 		source/sip/DefaultDialogHandler.cxx \
 		source/sip/PresenceMessageContent.cxx \
-		source/sip/SipDialogSecurityConfig.cxx \
 		source/sip/Sip.cxx
 
 libsoundcard_libadd =

@@ -225,7 +225,14 @@ string SipProxy::getDefaultExpires( ) {
 SipIdentity::SipIdentity(){
 	/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ 
 	registerToProxy=false; 
-	securitySupport=false;
+	securityEnabled=false;
+	ka_type=0;
+	//use_srtp=false;
+	use_zrtp=false;
+	pskEnabled=false;
+	dhEnabled=false;
+	checkCert=false;
+
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
@@ -233,9 +240,17 @@ SipIdentity::SipIdentity(){
 #endif
 	setIsRegistered (false);
 }
-SipIdentity::SipIdentity(string addr) : securitySupport(false),registerToProxy(false){
+
+SipIdentity::SipIdentity(string addr) : securityEnabled(false),registerToProxy(false){
 	setSipUri(addr);
-	securitySupport = false;
+	securityEnabled = false;
+	ka_type=0;
+	//use_srtp=false;
+	use_zrtp=false;
+	pskEnabled=false;
+	dhEnabled=false;
+	checkCert=false;
+
 	identityIdx = itoa( globalIndex );
 	globalIndex ++;
 #ifdef DEBUG_OUTPUT	
@@ -362,6 +377,7 @@ void SipIdentity::setIsRegistered( bool registerOk ) {
 		currentlyRegistered = false;
 	}
 }
+
 string SipIdentity::getDebugString(){
 	lock();
 	string ret = "identity="+identityIdx+
@@ -371,6 +387,10 @@ string SipIdentity::getDebugString(){
 			"]; isRegistered="+itoa(currentlyRegistered);
 	unlock();
 	return ret;
+}
+
+void SipIdentity::setPsk( string key ){
+	psk=key;
 }
 
 SipStackConfig::SipStackConfig():

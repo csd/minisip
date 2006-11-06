@@ -48,6 +48,7 @@
 #include<libminisip/configbackend/UserConfig.h>
 #include<fstream>
 #include<libminisip/soundcard/AudioMixer.h>
+#include<libmsip/SipSimSoft.h>
 
 #ifdef _WIN32_WCE
 #	include<stdlib.h>
@@ -60,13 +61,13 @@
 #include<libminisip/configbackend/OnlineConfBackend.h>
 
 //update both!!!! the str define is to avoid including itoa.h
-#define CONFIG_FILE_VERSION_REQUIRED 2
-#define CONFIG_FILE_VERSION_REQUIRED_STR "2"
+#define CONFIG_FILE_VERSION_REQUIRED 3
+#define CONFIG_FILE_VERSION_REQUIRED_STR "3"
 
 using namespace std;
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
-	securityConfig(),
+	//securityConfig(),
 	sip(NULL),
 	useSTUN(false),
 	stunServerPort(0),
@@ -100,7 +101,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "local_tcp_port", inherited->localTcpPort );
 	backend->save( "local_tls_port", inherited->localTlsPort );
 	backend->save( "auto_answer", inherited->autoAnswer?"yes":"no");
-	securityConfig.save( backend );
+	//securityConfig.save( backend );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
 	uint32_t ii = 0;
@@ -117,6 +118,104 @@ void SipSoftPhoneConfiguration::save(){
 		
 		backend->save( accountPath + "sip_uri", (*iIdent)->sipUsername + "@" + (*iIdent)->sipDomain );
 		
+
+/*From SipDialogSecurity below*/
+		backend->save(accountPath + "use_zrtp", /*use_zrtp*/ (*iIdent)->use_zrtp ? string("yes") : string("no"));
+		backend->save(accountPath + "psk_enabled", (*iIdent)->pskEnabled ? string("yes") : string("no"));
+		backend->save(accountPath + "dh_enabled", (*iIdent)->dhEnabled ? string("yes") : string("no"));
+
+		backend->save(accountPath + "psk", (*iIdent)->getPsk() );
+
+
+		string kaTypeString;
+		switch( (*iIdent)->ka_type ){
+		case KEY_MGMT_METHOD_MIKEY_DH:
+			kaTypeString = "dh";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PSK:
+			kaTypeString = "psk";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_PK:
+			kaTypeString = "pk";
+		}
+
+		backend->save(accountPath + "ka_type", kaTypeString);
+
+
+		/***********************************************************
+		 * Certificate settings
+		 ***********************************************************/
+
+		MRef<certificate_chain*> cert;
+		if ((*iIdent)->getSim()){
+			cert = (*iIdent)->getSim()->getCertificateChain();
+		}else{
+			cert = new certificate_chain(); //create an empty chain if no SIM to simplify code below
+		}
+
+		/* Update the certificate part of the configuration file */
+		cert->lock();
+		cert->init_index();
+		MRef<certificate *> certItem = cert->get_next();
+
+		/* The first element is the personal certificate, the next ones
+		 * are saved as certificate_chain */
+		if( !certItem.isNull() ){
+			backend->save(accountPath + "certificate",certItem->get_file());
+			backend->save(accountPath + "private_key",certItem->get_pk_file());
+			certItem = cert->get_next();
+		}
+
+		uint32_t i = 0;
+
+		while( !certItem.isNull() ){
+			backend->save(accountPath + "certificate_chain["+itoa(i)+"]",
+					certItem->get_file() );
+			i++;
+			certItem = cert->get_next();
+		}
+
+		cert->unlock();
+
+		/* CA database saved in the config file */
+		uint32_t iFile = 0;
+		uint32_t iDir  = 0;
+		MRef<ca_db*> cert_db;
+		if ((*iIdent)->getSim())
+			cert_db = (*iIdent)->getSim()->getCAs();
+		else
+			cert_db = new ca_db;
+
+		cert_db->lock();
+		cert_db->init_index();
+		ca_db_item * caDbItem = cert_db->get_next();
+
+
+		while( caDbItem != NULL ){
+			switch( caDbItem->type ){
+			case CERT_DB_ITEM_TYPE_FILE:
+				backend->save(accountPath + "ca_file["+itoa(iFile)+"]",
+						caDbItem->item);
+				iFile ++;
+				break;
+			case CERT_DB_ITEM_TYPE_DIR:
+				backend->save(accountPath + "ca_dir["+itoa(iDir)+"]",
+						caDbItem->item);
+				iDir ++;
+				break;
+			}
+
+			caDbItem = cert_db->get_next();
+		}
+
+		cert_db->unlock();
+
+
+
+/*From SipDialogSecurity above*/
+
+
+
 		if( (*iIdent)->getSipProxy()->autodetectSettings ) {
 			backend->save( accountPath + "auto_detect_proxy", "yes" );
 		} else {
@@ -259,8 +358,6 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "network_interface", networkInterfaceName );
 
 	backend->commit();
-
-
 }
 
 void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
@@ -346,6 +443,186 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		string uri = backend->loadString(accountPath + "sip_uri");
 		ident->setSipUri(uri);
 		
+		
+/*From SipDialogSecurity below*/
+
+		ident->securityEnabled = backend->loadString(accountPath + "secured","no")=="yes";
+		//ident->use_srtp = backend->loadString(accountPath + "use_srtp","no")=="yes";
+		//ident->use_srtp = backend->loadString(accountPath + "use_srtp","no")=="yes";
+		//if (use_srtp) {
+		ident->use_zrtp = backend->loadString(accountPath + "use_zrtp", "no") == "yes";
+		//}
+		ident->dhEnabled   = backend->loadString(accountPath + "dh_enabled","no")=="yes";
+		ident->pskEnabled  = backend->loadString(accountPath + "psk_enabled","no")=="yes";
+		ident->checkCert   = backend->loadString(accountPath + "check_cert","no")=="yes";
+
+
+		if( backend->loadString(accountPath + "ka_type", "psk") == "psk" )
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
+
+		else if( backend->loadString(accountPath + "ka_type", "psk") == "dh" )
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
+		else if( backend->loadString(accountPath + "ka_type", "psk") == "pk" )
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PK;
+		else{
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
+#ifdef DEBUG_OUTPUT
+			merr << "Invalid KA type in config file, default to PSK"<<end;
+#endif
+		}
+
+		string pskString = backend->loadString(accountPath + "psk","Unspecified PSK");
+		ident->setPsk(pskString);
+
+
+
+		/****************************************************************
+		 * Certificate settings
+		 ****************************************************************/
+
+		string certFile = backend->loadString(accountPath + "certificate","");
+		string privateKeyFile = backend->loadString(accountPath + "private_key","");
+
+		MRef<certificate_chain*> certchain = new certificate_chain();
+
+#ifdef ONLINECONF_SUPPORT
+		if(certFile.substr(0,10)=="httpsrp://") {
+			OnlineConfBack *conf;
+			conf = backend->getConf();
+			certificate *cert=NULL;
+			cert = conf->getOnlineCert();
+			certchain->add_certificate( cert );
+		} else
+#endif
+
+		if( certFile != "" ){
+			certificate * cert=NULL;
+
+			try{
+				cert = new certificate( certFile );
+				certchain->add_certificate( cert );
+			}
+			catch( certificate_exception & ){
+				merr << "Could not open the given certificate " << certFile <<end;
+			}
+
+			if( privateKeyFile != "" ){
+
+				try{
+					cert->set_pk( privateKeyFile );
+				}
+				catch( certificate_exception_pkey & ){
+					merr << "The given private key " << privateKeyFile << " does not match the certificate"<<end;                        }
+
+				catch( certificate_exception &){
+					merr << "Could not open the given private key "<< privateKeyFile << end;
+				}
+			}
+		}
+
+		uint32_t iCertFile = 0;
+		certFile = backend->loadString(accountPath + "certificate_chain[0]","");
+
+
+#ifdef ONLINECONF_SUPPORT
+		if(certFile.substr(0,10)=="httpsrp://") {
+			OnlineConfBack *conf;
+			conf = backend->getConf();
+			vector<struct contdata*> res;
+			string user = conf->getUser();
+			conf->downloadReq(user, "certificate_chain",res);/*gets the whole chain*/
+			for(int i=0;i<res.size();i++) {
+				try {
+					certificate *cert = new certificate((unsigned char *)res.at(i)->data,
+							(size_t) res.at(i)->size,
+							"httpsrp:///"+user + "/certificate_chain" );
+					certchain->add_certificate( cert );
+				} catch(certificate_exception &) {
+					merr << "Could not open the given certificate" << end;
+				}
+			}
+		}
+
+		else
+#endif
+
+
+		while( certFile != "" ){
+			try{
+				certificate * cert = new certificate( certFile );
+				certchain->add_certificate( cert );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the given certificate" << end;
+			}
+			iCertFile ++;
+			certFile = backend->loadString(accountPath + "certificate_chain["+itoa(iCertFile)+"]","");
+
+		}
+
+		MRef<ca_db*> cert_db = new ca_db();
+		iCertFile = 0;
+		certFile = backend->loadString(accountPath + "ca_file[0]","");
+
+
+
+#ifdef ONLINECONF_SUPPORT
+		if(certFile.substr(0,10)=="httpsrp://")
+		{
+			OnlineConfBack *conf;
+			conf = backend->getConf();
+			vector<struct contdata*> res;
+			string user = conf->getUser();
+			conf->downloadReq(user, "certificate_chain",res);
+			for(int i=0;i<res.size();i++)
+			{
+				try{
+					certificate *cert = new certificate((unsigned char *)res.at(i)->data,
+							(size_t) res.at(i)->size,
+							"httpsrp:///"+user + "/root_cert" );
+					cert_db->add_certificate( cert );
+				}
+				catch( certificate_exception &){
+					merr << "Could not open the CA certificate" << end;
+				}
+			}
+		}
+
+		else
+#endif
+
+
+		while( certFile != ""){
+			try{
+				cert_db->add_file( certFile );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the CA certificate" << end;
+			}
+			iCertFile ++;
+			certFile = backend->loadString(accountPath + "ca_file["+itoa(iCertFile)+"]","");
+
+		}
+		iCertFile = 0;
+
+		certFile = backend->loadString(accountPath + "ca_dir[0]","");
+
+		while( certFile != ""){
+			try{
+				cert_db->add_directory( certFile );
+			}
+			catch( certificate_exception &){
+				merr << "Could not open the CA certificate directory " << certFile << end;
+			}
+			iCertFile ++;
+			certFile = backend->loadString(accountPath + "ca_dir["+itoa(iCertFile)+"]","");
+		}
+
+		ident->setSim(new SipSimSoft(certchain, cert_db));
+
+/*From SipDialogSecurity above*/
+
+
 		bool autodetect = ( backend->loadString(accountPath + "auto_detect_proxy","no") == "yes" );
 		
 		//these two values we collect them, but if autodetect is true, they are not used
@@ -394,7 +671,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		if (backend->loadString(accountPath + "pstn_account","")=="yes"){
 			pstnIdentity = ident;
 			usePSTNProxy = true;
-			ident->securitySupport = false;
+			ident->securityEnabled= false;
 		}
 
 		if (backend->loadString(accountPath + "default_account","")=="yes"){
@@ -492,16 +769,18 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	inherited->localTlsPort = backend->loadInt("local_tls_port",5061);
 	inherited->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
 
-	securityConfig.load( backend );
+	//securityConfig.load( backend ); //TODO: EEEE Load security per identity
 
 	// FIXME: per identity security
 /*	if( inherited->sipIdentity){
 		inherited->sipIdentity->securitySupport = securityConfig.secured;
 	}
 */
-	if ( defaultIdentity){
-		defaultIdentity->securitySupport = securityConfig.secured;
-	}
+
+//	if ( defaultIdentity){
+//		defaultIdentity->securitySupport = securityConfig.secured;
+//	}
+
 	audioCodecs.clear();
 	int iCodec = 0;
 	string codec = backend->loadString("codec["+ itoa( iCodec ) + "]","");
@@ -540,19 +819,19 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "account[0]/proxy_password", "password" );
 	be->save( "account[0]/pstn_account", "no" );
 	be->save( "account[0]/default_account", "yes" );
+
+	be->save( "account[0]/secured", "no" );
+	be->save( "account[0]/ka_type", "psk" );
+	be->save( "account[0]/psk", "Unspecified PSK" );
+	be->save( "account[0]/certificate", "" );
+	be->save( "account[0]/private_key", "" );
+	be->save( "account[0]/ca_file", "" );
+	be->save( "account[0]/dh_enable", "no" );
+	be->save( "account[0]/psk_enable", "no" );
+	be->save( "account[0]/check_cert", "yes" );
 	
 	be->save( "tcp_server", "yes" );
 	be->save( "tls_server", "no" );
-
-	be->save( "secured", "no" );
-	be->save( "ka_type", "psk" );
-	be->save( "psk", "Unspecified PSK" );
-	be->save( "certificate", "" );
-	be->save( "private_key", "" );
-	be->save( "ca_file", "" );
-	be->save( "dh_enabled", "no" );
-	be->save( "psk_enabled", "no" );
-	be->save( "check_cert", "yes" );
 	be->save( "local_udp_port", 5060 );
 	be->save( "local_tcp_port", 5060 );
 	be->save( "local_tls_port", 5061 );

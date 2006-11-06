@@ -61,7 +61,7 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		 * @param callId identifier shared with the SIP stack
 		 * @returns a reference to the session created
 		 */
-		MRef<Session *> createSession( SipDialogSecurityConfig &config, std::string callId = "" );
+		MRef<Session *> createSession( /*SipDialogSecurityConfig &config*/ MRef<SipIdentity*> ident, std::string callId = "" );
 		
 		/**
 		 * Registers a new media type (audio or video

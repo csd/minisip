@@ -116,11 +116,11 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 	
 	string user = cmd.getParam();
 	bool gotAtSign;
-	SipDialogSecurityConfig securityConfig;
+//	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	securityConfig = phoneconfig->securityConfig;
+//	securityConfig = phoneconfig->securityConfig;
 	
 	int startAddr=0;
 	if (user.substr(0,4)=="sip:")
@@ -141,10 +141,10 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 			phoneconfig->defaultIdentity;
 
 	if( !id ){
-		cerr << "id is null" << endl;
+		merr << "ERROR: could not determine what local identity to use" << endl;
 	}
 
-	securityConfig.useIdentity( id );
+//	securityConfig.useIdentity( id );
 
 	gotAtSign = ( user.find("@", startAddr) != string::npos );
 
@@ -185,7 +185,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
         cerr << "Before new mediaSession" << endl;
 #endif
 	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( securityConfig );
+		mediaHandler->createSession( /*securityConfig*/ id );
 #ifdef DEBUG_OUTPUT
         cerr << "After new mediaSession" << endl;
 #endif
@@ -223,11 +223,11 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 }
 
 string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId){
-	SipDialogSecurityConfig securityConfig;
+//	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	securityConfig = phoneconfig->securityConfig;
+//	securityConfig = phoneconfig->securityConfig;
 
 	int startAddr=0;
 	if (user.substr(0,4)=="sip:")
@@ -241,13 +241,13 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
 
-	MRef<SipIdentity*> identity;
+	MRef<SipIdentity*> identity=phoneconfig->defaultIdentity;
 	if (onlydigits && phoneconfig->usePSTNProxy){
 		identity = phoneconfig->pstnIdentity;
-		securityConfig.useIdentity( phoneconfig->pstnIdentity );
+//		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}
 	else{
-		securityConfig.useIdentity( phoneconfig->defaultIdentity);
+//		securityConfig.useIdentity( phoneconfig->defaultIdentity);
 	}
 
 
@@ -296,7 +296,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 
 
 	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( securityConfig );
+		mediaHandler->createSession( /*securityConfig*/ identity );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, conflist, confId, "")); 
 
@@ -314,11 +314,11 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 }
 
 string Sip::confconnect(string &user, string confId){
-	SipDialogSecurityConfig securityConfig;
+//	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
 	ts.save( INVITE_START );
 #endif
-	securityConfig = phoneconfig->securityConfig;
+//	securityConfig = phoneconfig->securityConfig;
 	
 	int startAddr=0;
 	if (user.substr(0,4)=="sip:")
@@ -328,15 +328,15 @@ string Sip::confconnect(string &user, string confId){
 		startAddr = 5;
 
 	bool onlydigits=true;
-	MRef<SipIdentity*> identity;
+	MRef<SipIdentity*> identity=phoneconfig->defaultIdentity;
 	for (unsigned i=0; i<user.length(); i++)
 		if (user[i]<'0' || user[i]>'9')
 			onlydigits=false;
 	if (onlydigits && phoneconfig->usePSTNProxy){
 		identity = phoneconfig->pstnIdentity;
-		securityConfig.useIdentity( phoneconfig->pstnIdentity );
+//		securityConfig.useIdentity( phoneconfig->pstnIdentity );
 	}else{
-		securityConfig.useIdentity( phoneconfig->defaultIdentity);
+//		securityConfig.useIdentity( phoneconfig->defaultIdentity);
 	}
 
 	
@@ -385,7 +385,7 @@ string Sip::confconnect(string &user, string confId){
 
 
 MRef<Session *> mediaSession = 
-		mediaHandler->createSession( securityConfig );
+		mediaHandler->createSession( /*securityConfig*/ identity );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, confId)); 
 
@@ -437,7 +437,8 @@ void Sip::run(){
 		}
 
 		if (phoneconfig->tls_server){
-			if( phoneconfig->securityConfig.cert.isNull() ){
+			//if( phoneconfig->securityConfig.cert.isNull() ){
+			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
 				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << end;
 			}
 			else{

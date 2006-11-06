@@ -330,6 +330,15 @@ int Minisip::startSip() {
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
 #endif
+
+		MRef<SipSim*> sim = phoneConf->defaultIdentity->getSim();
+		MRef<certificate_chain *> certChain;
+		MRef<ca_db *> certDb;
+		if (sim){
+			certChain = sim->getCertificateChain();
+			certDb = sim->getCAs();
+		}
+
 		//save Sip object in Minisip::sip ...
 		this->sip=new Sip(phoneConf,mediaHandler,
 				localIpString,
@@ -337,12 +346,9 @@ int Minisip::startSip() {
 				phoneConf->inherited->localUdpPort,
 				phoneConf->inherited->localTcpPort,
 				phoneConf->inherited->externalContactUdpPort,
-//				phoneConf->inherited->getTransport(),
 				phoneConf->inherited->localTlsPort,
-				phoneConf->securityConfig.cert,    //The certificate chain is used by TLS
-				//TODO: TLS should use the whole chain instead of only the f$
-                                //                               MRef<ca_db *> cert_db = NULL
-				phoneConf->securityConfig.cert_db
+				certChain,
+				certDb
 				);
 		//sip->init();
 

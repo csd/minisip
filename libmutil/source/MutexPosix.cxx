@@ -56,9 +56,11 @@ Mutex& Mutex::operator=(const Mutex &){
 
 Mutex::Mutex(const Mutex &){
 	createMutex();
+	massert(handle_ptr);
 }
 
 void Mutex::createMutex(){
+
 	pthread_mutexattr_t *attr = NULL;
 
 #ifdef DEBUG_OUTPUT
@@ -77,19 +79,23 @@ void Mutex::createMutex(){
 }
 
 Mutex::~Mutex(){
+	massert(handle_ptr);
 	pthread_mutex_destroy((pthread_mutex_t*)handle_ptr);
 	delete (pthread_mutex_t*)handle_ptr;
+	handle_ptr=NULL;
 }
 
 
 void Mutex::lock(){
 	int ret;
+	massert(handle_ptr);
 	ret = pthread_mutex_lock((pthread_mutex_t*)handle_ptr);
 	massert( ret == 0 );
 }
 
 void Mutex::unlock(){
 	int ret;
+	massert(handle_ptr);
 	ret = pthread_mutex_unlock((pthread_mutex_t*)handle_ptr);
 	massert( ret == 0 );
 }

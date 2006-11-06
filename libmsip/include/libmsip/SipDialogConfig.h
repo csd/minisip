@@ -42,8 +42,15 @@
 #include<libmutil/Mutex.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipStack.h>
+#include<libmsip/SipSim.h>
 
 #define DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS 1000
+
+#define KEY_MGMT_METHOD_NULL            0x00
+#define KEY_MGMT_METHOD_MIKEY           0x10
+#define KEY_MGMT_METHOD_MIKEY_DH        0x11
+#define KEY_MGMT_METHOD_MIKEY_PSK       0x12
+#define KEY_MGMT_METHOD_MIKEY_PK        0x13
 
 #include<string>
 
@@ -214,7 +221,6 @@ class LIBMSIP_API SipIdentity : public MObject{
 
 		std::string identityIdentifier;
 
-		bool securitySupport;
 
 		/**
 		Indicates whether this identity requires to be registered to a proxy.
@@ -239,7 +245,29 @@ class LIBMSIP_API SipIdentity : public MObject{
 			unlock();
 			return ret;}
 		
+		void setSim(MRef<SipSim*> s){sim=s;}
+
+		MRef<SipSim *> getSim(){return sim;}
+
+		std::string getPsk(){return psk;}
+
+		void setPsk( std::string key );
+
+		bool securityEnabled;
+		int ka_type;
+		bool dhEnabled;
+		bool pskEnabled;
+		bool checkCert;
+		bool use_zrtp;
 	private: 
+		MRef<SipSim *> sim;
+
+		//bool use_srtp;
+		//unsigned char *psk;
+		//unsigned int pskLength;
+		std::string psk;
+
+
 		MRef<SipProxy *> sipProxy;
 
 		/**

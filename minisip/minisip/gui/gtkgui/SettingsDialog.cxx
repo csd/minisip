@@ -588,22 +588,24 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
 	this->config = config;
 
-	dhCheck->set_active( config->securityConfig.dh_enabled );
-	pskCheck->set_active( config->securityConfig.psk_enabled );
+	//FIXME: per identity configuration
+	dhCheck->set_active( /*config->securityConfig.dh_enabled*/ config->defaultIdentity->dhEnabled );
+	pskCheck->set_active( /*config->securityConfig.psk_enabled*/ config->defaultIdentity->pskEnabled );
 
-	string psk( (const char *)config->securityConfig.psk, config->securityConfig.psk_length );
+//	string psk( (const char *)config->securityConfig.psk, config->securityConfig.psk_length );
+	string psk=config->defaultIdentity->getPsk();
 	pskEntry->set_text( psk );
 
 
-	if( config->securityConfig.ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
+	if( /*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
 		dhRadio->set_active( true );
 	}
 
-	else if( config->securityConfig.ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
+	else if( /*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
 		pskRadio->set_active( true );
 	}
 
-	secureCheck->set_active( config->securityConfig.secured );
+	secureCheck->set_active( /*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled );
 	
 	kaChange();
 	secureChange();
@@ -651,47 +653,51 @@ void SecuritySettings::secureChange(){
 string SecuritySettings::apply(){
 	string err;
 	if( dhCheck->get_active() ){
-		config->securityConfig.cert->lock();
-		if( config->securityConfig.cert->is_empty() ){
+		/*config->securityConfig.cert->lock()*/ config->defaultIdentity->getSim()->getCertificateChain()->lock();
+		if( /*config->securityConfig.cert->is_empty()*/ config->defaultIdentity->getSim()->getCertificateChain()->is_empty() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a certificate file.\n"
 		       "The D-H key agreement has been disabled.";
 			dhCheck->set_active( false );
 		}
 		
-		else if( !config->securityConfig.cert->get_first()->get_openssl_private_key() ){
+		else if( !config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->get_first()->get_openssl_private_key() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a private key file.\n"
 		       "The D-H key agreement has been disabled.";
 			dhCheck->set_active( false );
 		}
-		config->securityConfig.cert->unlock();
+		config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->unlock();
 	}
 
-	config->securityConfig.dh_enabled = dhCheck->get_active();
-	config->securityConfig.psk_enabled = pskCheck->get_active();
+	config->/*securityConfig*/defaultIdentity->dhEnabled = dhCheck->get_active();
+	config->/*securityConfig*/defaultIdentity->pskEnabled = pskCheck->get_active();
 
 
 	string s = pskEntry->get_text();
-        const unsigned char * psk = (const unsigned char *)s.c_str();
-        unsigned int psk_length = s.size();
+        const char * psk = s.c_str();
+
+#if 0	
         if( config->securityConfig.psk != NULL )
                 delete [] config->securityConfig.psk;
         config->securityConfig.psk = new unsigned char[psk_length];
         memcpy( config->securityConfig.psk, psk, psk_length );
         config->securityConfig.psk_length = psk_length;
+#endif	
+	config->defaultIdentity->setPsk(string(psk));
 
-	config->securityConfig.secured = secureCheck->get_active();
+
+	/*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled = secureCheck->get_active();
 	if( config->defaultIdentity ){
-		config->defaultIdentity->securitySupport = secureCheck->get_active();
+		config->defaultIdentity->securityEnabled = secureCheck->get_active();
 	}
 
-	if( config->securityConfig.secured ){
+	if( /*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled ){
 		if( pskRadio->get_active() ){
-			config->securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
+			/*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 		}
 		else if( dhRadio->get_active() ){
-			config->securityConfig.ka_type = KEY_MGMT_METHOD_MIKEY_DH;
+			/*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 		}
 	}
 

@@ -21,6 +21,8 @@ endif OS_WIN
 
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipAuthenticationDigest.cxx \
+		     source/SipSim.cxx \
+		     source/SipSimSoft.cxx \
 		     source/SipStack.cxx \
 		     source/SipStackInternal.cxx \
 		     source/SipLayerDialog.cxx \

@@ -32,7 +32,8 @@
 
 #include<libmikey/keyagreement.h>
 
-#include<libminisip/sip/SipDialogSecurityConfig.h>
+//#include<libminisip/sip/SipDialogSecurityConfig.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libminisip/mediahandler/DtmfSender.h>
 #include<libminisip/sdp/SdpPacket.h>
 
@@ -68,7 +69,7 @@ class LIBMINISIP_API Session : public MObject{
 		 * description
 		 * @param config security related configuration for the call
 		 */
-		Session( std::string localIp, SipDialogSecurityConfig &config, std::string localIp6 = "" );
+		Session( std::string localIp, /*SipDialogSecurityConfig &config*/ MRef<SipIdentity*> ident, std::string localIp6 = "" );
 		
 		/**
 		 * Destructor.
@@ -260,7 +261,7 @@ class LIBMINISIP_API Session : public MObject{
 		void addStreamsToKa( bool initiating=true );
 		void setMikeyOffer();
 		std::string peerUri;
-		
+
 		MRef<SdpPacket *> emptySdp();
 		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
 			uint32_t iFormat, MRef<IPAddress *> &remoteAddress );
@@ -273,11 +274,15 @@ class LIBMINISIP_API Session : public MObject{
 		std::string localIpString;
 		std::string localIp6String;
 		MRef<SdpPacket *> sdpAnswer;
-		bool secured;
 
 		std::string errorString;
 		uint16_t errorCode;
-		SipDialogSecurityConfig securityConfig;
+		//SipDialogSecurityConfig securityConfig;
+		MRef<SipIdentity*> identity;
+
+		bool secured;
+		int ka_type;
+		
 
 		std::string callId;
 

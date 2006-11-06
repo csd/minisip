@@ -1,5 +1,7 @@
 pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipStack.h \
+                     libmsip/SipSim.h \
+                     libmsip/SipSimSoft.h \
                      libmsip/SipLayerDialog.h \
                      libmsip/SipUtils.h \
                      libmsip/SipTimers.h \

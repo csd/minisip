@@ -127,10 +127,19 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			if( to ){
 				SipUri u = to->getUri();
 				id = phoneconf->getIdentity( u );
+			}else{
+				return true; //handle by ignoring
 			}
+
+			if (!id){
+				merr <<"WARNING: Could not find local identity - using default"<<endl;
+				id = phoneconf->defaultIdentity;
+			}
+
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
+		
 
 			//get the GroupList from the remote GroupListServer
 			//MRef<GroupList*>grpList;
@@ -163,7 +172,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
+				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 /*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 			if( id ){
@@ -193,7 +202,16 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			if( to ){
 				SipUri u = to->getUri();
 				id = phoneconf->getIdentity( u );
+			}else{
+				mdbg <<  "INFO: dropping incoming message without FROM header"<<endl;
+				return true;
 			}
+			
+			if (!id){
+				merr <<"WARNING: Could not find local identity - using default"<<endl;
+				id = phoneconf->defaultIdentity;
+			}
+
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
 #endif			
@@ -203,7 +221,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
+				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 /*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
@@ -230,11 +248,18 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			if( to ){
 				SipUri u = to->getUri();
 				id = phoneconf->getIdentity( u );
+			}else{
+				return true; // We handled it by ignoring the packet
+			}
+
+			if (!id){
+				merr <<"WARNING: Could not find local identity - using default"<<endl;
+				id = phoneconf->defaultIdentity;
 			}
 
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(phoneconf->securityConfig, pkt->getCallId() );
+				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 /*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 

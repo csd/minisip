@@ -125,7 +125,7 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			Glib::locale_from_utf8( (*iter)[columns->password] );
 
 		if( (*iter)[columns->pstnProxy] ){
-			identity->securitySupport = false;
+			identity->securityEnabled= false;
 			config->usePSTNProxy = true;
 			config->pstnIdentity = identity;
 		}

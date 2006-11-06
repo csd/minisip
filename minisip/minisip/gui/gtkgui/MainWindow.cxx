@@ -577,8 +577,9 @@ void MainWindow::updateConfig(){
 	accountsList->loadFromConfig( config );
 	settingsDialog->setAccounts( accountsList );
 	settingsDialog->setConfig( config );
-	certificateDialog->setCertChain( config->securityConfig.cert );
-	certificateDialog->setRootCa( config->securityConfig.cert_db );
+	//FIXME: per identity settings
+	certificateDialog->setCertChain( /*config->securityConfig.cert*/ config->defaultIdentity->getSim()->getCertificateChain() );
+	certificateDialog->setRootCa( /*config->securityConfig.cert_db*/ config->defaultIdentity->getSim()->getCAs() );
 
 	const Glib::RefPtr<PhoneBookModel> modelPtr( phoneBookModel );
 

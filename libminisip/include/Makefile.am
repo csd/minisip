@@ -67,7 +67,6 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/sip/SipDialogConfVoip.h \
 			libminisip/sip/SipDialogVoip.h \
 			libminisip/sip/Sip.h \
-			libminisip/sip/SipDialogSecurityConfig.h \
 			libminisip/sip/SipDialogPresenceClient.h \
 			libminisip/sip/SipDialogVoipServer.h \
 			libminisip/sip/SipDialogVoipServer100rel.h \

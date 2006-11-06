@@ -44,7 +44,6 @@
 
 #include<libmsip/SipDialogConfig.h>
 
-#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libminisip/sip/Sip.h>
 #include<libminisip/contactdb/PhoneBook.h>
 #include<libminisip/configbackend/ConfBackend.h>
@@ -85,7 +84,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		
 		MRef<SipStackConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
 		
-		SipDialogSecurityConfig securityConfig;
+		//SipDialogSecurityConfig securityConfig;
 
 		
 		//Configuration only the phone has and not every call

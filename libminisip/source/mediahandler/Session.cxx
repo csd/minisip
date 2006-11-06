@@ -65,8 +65,12 @@ using namespace std;
 SessionRegistry * Session::registry = NULL;
 MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
-Session::Session( string localIp, SipDialogSecurityConfig &securityConfig, string localIp6 ):ka(NULL),localIpString(localIp), localIp6String(localIp6){
-	this->securityConfig = securityConfig; // hardcopy
+Session::Session( string localIp, /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> ident, string localIp6 ):ka(NULL),localIpString(localIp), localIp6String(localIp6){
+//	this->securityConfig = securityConfig; // hardcopy
+	identity = ident;
+	secured = ident->securityEnabled;
+	ka_type = ident->ka_type;
+
 	this->ka = Session::precomputedKa;
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
 	Session::precomputedKa = NULL;
@@ -85,7 +89,8 @@ void Session::unregister(){
 	}
 
 	if( Session::precomputedKa.isNull() ){
-		Session::precomputedKa = new KeyAgreementDH( securityConfig.cert, securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+		Session::precomputedKa = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
+				/*securityConfig.cert_db*/ identity->getSim()->getCAs(), DH_GROUP_OAKLEY5 );
 	}
 }
 
@@ -252,10 +257,10 @@ MRef<SdpPacket *> Session::getSdpOffer( bool anatSupported ){ // used by the ini
 
 // 	cerr << "Session::getSdpOffer" << endl;
 	result = emptySdp();
-	if( securityConfig.secured ){
+	if( /*securityConfig.secured*/ secured ){
 		MRef<SdpHeaderA *> a;
 		keyMgmtMessage = initiatorCreate();  //in KeyAgreement.cxx
-		if( ! securityConfig.secured ){
+		if( /*! securityConfig.secured*/ !secured ){
 			// something went wrong
 			return NULL;
 		}
@@ -374,7 +379,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 #ifdef DEBUG_OUTPUT
 // 	cerr << "Session::setSdpAnswer" << endl;
 #endif
-	if( securityConfig.secured ){
+	if( /*securityConfig.secured*/ secured ){
 		/* get the keymgt: attribute */
 		string keyMgmtMessage = 
 			answer->getSessionLevelAttribute( "key-mgmt" );
@@ -557,8 +562,8 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 			setMikeyOffer();
 	}
 	else{
-		securityConfig.secured = false;
-		securityConfig.ka_type = KEY_MGMT_METHOD_NULL;
+		/*securityConfig.*/secured = false;
+		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
 	}
 		
 
@@ -614,7 +619,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 			const string &transport = offerM->getTransport();
 
 			if (transport != "RTP/AVP" &&
-			    !securityConfig.secured &&
+			    !/*securityConfig.*/secured &&
 			    transport == "RTP/SAVP") {
 				errorString += "No supported SRTP key exchange method";
 				return false;
@@ -693,12 +698,12 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 MRef<SdpPacket *> Session::getSdpAnswer(){
 // 	cerr << "Session::getSdpAnswer" << endl;
-	if( securityConfig.secured ){
+	if( /*securityConfig.*/secured ){
 		string keyMgmtAnswer;
 		// Generate the key management answer message
 		keyMgmtAnswer = responderParse();
 		
-		if( !securityConfig.secured ){
+		if( !/*securityConfig.*/secured ){
 			// Something went wrong
 			errorString = "Could not parse key management message.";
 			fprintf(stderr, "responderParse failed\n" );
@@ -722,7 +727,7 @@ void Session::start(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
 
-	if( securityConfig.secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+	if( /*securityConfig.*/secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
 #ifdef ENABLE_TS
 	ts.save( TGK_START );
 #endif
@@ -734,7 +739,7 @@ void Session::start(){
 
 	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
-			if( securityConfig.secured ){
+			if( /*securityConfig.*/secured ){
 				(*iR)->setKeyAgreement( ka );
 			}
 			(*iR)->start();
@@ -744,7 +749,7 @@ void Session::start(){
 	mediaStreamSendersLock.lock();
 	for( iS = mediaStreamSenders.begin(); iS != mediaStreamSenders.end(); iS++ ){
 		if( (*iS)->getPort() ){
-			if( securityConfig.secured ){
+			if( /*securityConfig.*/secured ){
 				(*iS)->setKeyAgreement( ka );
 			}
 			(*iS)->start();
@@ -809,7 +814,7 @@ uint16_t Session::getErrorCode(){
 }
 
 bool Session::isSecure(){
-	return securityConfig.secured;
+	return /*securityConfig.*/secured;
 }
 
 string Session::getCallId(){

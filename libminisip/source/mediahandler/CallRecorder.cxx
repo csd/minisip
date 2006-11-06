@@ -43,7 +43,10 @@ CallRecorder::CallRecorder(  MRef<AudioMedia *> aMedia,
 				MRef<IpProvider *> ipProvider ):
 		MediaStreamReceiver( (Media *)*aMedia, rtpReceiver ),
 		fileDev( NULL ),
-		audioMedia( aMedia) {
+		audioMedia( aMedia),
+		enabledMic(false),
+		enabledNtwk(false)
+{
 	static int count = 0;
 	count ++;
 	
