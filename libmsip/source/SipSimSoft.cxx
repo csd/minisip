@@ -1,4 +1,5 @@
 
+#include<config.h>
 #include<libmsip/SipSimSoft.h>
 
 SipSimSoft::SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas){
