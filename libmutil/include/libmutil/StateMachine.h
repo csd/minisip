@@ -138,6 +138,7 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 		void freeStateMachine(){
 			current_state=NULL;
 			timeoutProvider=NULL;
+			anyState->freeState();
 			anyState=NULL;
 
 			for (typename std::list<MRef<State<CommandType,TimeoutType> *> >::iterator i=states.begin(); 
