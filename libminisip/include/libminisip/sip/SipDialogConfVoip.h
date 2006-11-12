@@ -89,7 +89,6 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 		void setLastInvite(MRef<SipRequest*> i);
 		
 		void sendInvite(const std::string &branch);
-		void sendAuthInvite(const std::string &branch);
 		void sendBye(const std::string &branch, int);
 		void sendCancel(const std::string &branch);
 		void sendAck(const std::string &branch);
