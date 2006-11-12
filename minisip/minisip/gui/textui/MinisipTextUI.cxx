@@ -278,7 +278,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 				confid=confid+users[i];
 				i++;
 			}
-			string mysipuri = config->defaultIdentity->sipUsername + "@" + config->defaultIdentity->sipDomain;
+			string mysipuri = config->defaultIdentity->getSipUri().getUserIpString();
 			users=trim(users.substr(i));
 			currentconf=new ConferenceControl(mysipuri,confid,false);
 			confCallback->setConferenceController(currentconf);
@@ -780,7 +780,7 @@ void MinisipTextUI::guiExecute(string cmd){
 			displayMessage("UNIMPLEMENTED - only one call/conference at the time with this UI.", red);
 		}else{
 			currentconfname = itoa(rand());
-			string mysipuri = config->defaultIdentity->sipUsername + "@" + config->defaultIdentity->sipDomain;
+			string mysipuri = config->defaultIdentity->getSipUri().getUserIpString();
 			currentconf=new ConferenceControl(mysipuri,currentconfname, true);
 			//conf->setGui(this);
 			confCallback->setConferenceController(currentconf);

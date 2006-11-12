@@ -56,10 +56,9 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
         mdbg << "Try 1, autodetect"<< end;
 #endif
         if (phoneConf->findStunServerFromSipUri){
-                mdbg << "Using SIP uri: "<<phoneConf->defaultIdentity->getSipUri()<< end;
-                string useruri = phoneConf->defaultIdentity->getSipUri();
-                if (useruri.find("@")!=string::npos){
-                        string uridomain = useruri.substr(useruri.find("@")+1);
+		mdbg << "Using SIP uri: "<<phoneConf->defaultIdentity->getSipUri().getString()<< end;
+                const SipUri &useruri = phoneConf->defaultIdentity->getSipUri();
+		const string &uridomain = useruri.getIp();
                         mdbg << "domain=<"<<uridomain<<">"<< end;
                         if (uridomain.length()>0){
                                 uint16_t port;
@@ -70,7 +69,6 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
                                         return proxy;
                                 }
 			}
-		}
 	}
 
 #ifdef DEBUG_OUTPUT

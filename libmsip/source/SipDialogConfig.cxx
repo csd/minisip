@@ -241,8 +241,7 @@ SipIdentity::SipIdentity(){
 	setIsRegistered (false);
 }
 
-SipIdentity::SipIdentity(string addr) : securityEnabled(false),registerToProxy(false){
-	setSipUri(addr);
+SipIdentity::SipIdentity(const SipUri &addr) : sipUri(addr),securityEnabled(false),registerToProxy(false){
 	securityEnabled = false;
 	ka_type=0;
 	//use_srtp=false;
@@ -259,6 +258,7 @@ SipIdentity::SipIdentity(string addr) : securityEnabled(false),registerToProxy(f
 	setIsRegistered (false);
 }
 
+#if 0
 void SipIdentity::setSipUri(string addr){
 	if (addr.substr(0,4)=="sip:")
 			addr = addr.substr(4);
@@ -290,6 +290,7 @@ string SipIdentity::getSipUri() {
 	unlock();
 	return ret;
 }
+#endif
 
 MRef<SipProxy *> SipIdentity::getSipProxy() {
 	return sipProxy;
@@ -381,8 +382,7 @@ void SipIdentity::setIsRegistered( bool registerOk ) {
 string SipIdentity::getDebugString(){
 	lock();
 	string ret = "identity="+identityIdx+
-			"; username="+sipUsername+ 
-			"; domain="+sipDomain + 
+			"; uri="+sipUri.getString()+ 
 			" proxy=["+(getSipProxy()?getSipProxy()->getDebugString():"")+
 			"]; isRegistered="+itoa(currentlyRegistered);
 	unlock();

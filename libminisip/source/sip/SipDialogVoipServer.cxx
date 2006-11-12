@@ -412,7 +412,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri().getString(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),
@@ -478,7 +478,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri().getString(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

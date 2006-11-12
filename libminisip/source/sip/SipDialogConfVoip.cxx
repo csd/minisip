@@ -499,7 +499,7 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		
 		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
-		CommandString cmdstr2("", "myuri", getDialogConfig()->sipIdentity->getSipUri());
+		CommandString cmdstr2("", "myuri", getDialogConfig()->sipIdentity->getSipUri().getString());
 		
 		
 		cmdstr2.setParam3(confId);

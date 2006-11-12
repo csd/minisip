@@ -116,7 +116,7 @@ void SipSoftPhoneConfiguration::save(){
 
 		backend->save( accountPath + "account_name", (*iIdent)->identityIdentifier );
 		
-		backend->save( accountPath + "sip_uri", (*iIdent)->sipUsername + "@" + (*iIdent)->sipDomain );
+		backend->save( accountPath + "sip_uri", (*iIdent)->getSipUri().getUserIpString() );
 		
 
 /*From SipDialogSecurity below*/
@@ -907,8 +907,8 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipUri &uri ) {
 	
 	for( it = identities.begin(); it!=identities.end(); it++ ) {
 		(*it)->lock();
-		if( (*it)->sipUsername == uri.getUserName() && 
-				(*it)->sipDomain == uri.getIp() ) {
+		if( (*it)->getSipUri().getUserName() == uri.getUserName() && 
+		    (*it)->getSipUri().getIp() == uri.getIp() ) {
 			(*it)->unlock();
 			return (*it);
 		}

@@ -283,7 +283,7 @@ void SipDialogVoipServer100rel::sendPrackOk(const string &branch, MRef<SipMessag
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri().getString(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),
@@ -315,7 +315,7 @@ void SipDialogVoipServer100rel::sendSessionProgress(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri().getString(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

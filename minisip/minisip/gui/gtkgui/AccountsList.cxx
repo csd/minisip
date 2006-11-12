@@ -67,7 +67,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		Gtk::TreeModel::iterator iter = append();
 		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
-		(*iter)[columns->uri] = (*i)->sipUsername + "@" + (*i)->sipDomain;
+		(*iter)[columns->uri] = (*i)->getSipUri().getUserIpString();
 		(*iter)[columns->autodetectSettings] = (*i)->getSipProxy()->autodetectSettings;
 		(*iter)[columns->proxy] = (*i)->getSipProxy()->sipProxyAddressString;
 		(*iter)[columns->port] = (*i)->getSipProxy()->sipProxyPort;

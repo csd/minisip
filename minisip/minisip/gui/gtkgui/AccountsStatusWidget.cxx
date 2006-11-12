@@ -129,7 +129,7 @@ void AccountsStatusWidget::registerClicked(){
 			CommandString reg( "", SipCommandString::proxy_register );
 			reg["identityId"] = id->getId();
 			id->lock();
-			reg["proxy_domain"] = id->sipDomain;
+			reg["proxy_domain"] = id->getSipUri().getIp();
 			reg.setParam3( id->getSipProxy()->getDefaultExpires() );
 			id->unlock();
 			callback->handleCommand("sip", reg );
@@ -149,7 +149,7 @@ void AccountsStatusWidget::unregisterClicked(){
 			CommandString reg( "", SipCommandString::proxy_register );
 			reg["identityId"] = id->getId();
 			id->lock();
-			reg["proxy_domain"] = id->sipDomain;
+			reg["proxy_domain"] = id->getSipUri().getIp();
 			id->unlock();
 			reg.setParam3( "0" );
 			callback->handleCommand("sip", reg );

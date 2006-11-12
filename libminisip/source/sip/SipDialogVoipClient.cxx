@@ -729,7 +729,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->sipIdentity->getSipUri().getString(),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			"", getDialogConfig()->inherited->getTransport(),

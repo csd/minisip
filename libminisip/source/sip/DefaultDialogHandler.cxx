@@ -382,7 +382,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		if( ! identity.isNull() ) {
 			;
 		} else if (phoneconf->pstnIdentity && (cmdstr.getDestinationId()=="pstn" 
-					|| (proxyDomainArg!="" && proxyDomainArg==phoneconf->pstnIdentity->sipDomain))){
+						|| (proxyDomainArg!="" && proxyDomainArg==phoneconf->pstnIdentity->getSipUri().getIp()))){
 			identity=phoneconf->pstnIdentity;
 		}
 		
@@ -875,8 +875,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	posAt = toUri.find("@");
 	if( posAt == string::npos ) { //toUri does not have a domain ...
 		//get one, from the default identity
-		if( phoneconf->defaultIdentity->sipDomain != "" ) {
-			toUri += "@" + phoneconf->defaultIdentity->sipDomain;
+		if( phoneconf->defaultIdentity->getSipUri().getIp() != "" ) {
+			toUri += "@" + phoneconf->defaultIdentity->getSipUri().getIp();
 		} else {
 			#ifdef DEBUG_OUTPUT
 			cerr << "DefaultDialogHandler::sendIM - toUri without domain" << endl;

@@ -156,13 +156,13 @@ class LIBMSIP_API SipProxy : public MObject{
 class LIBMSIP_API SipIdentity : public MObject{
 	public:
 		SipIdentity();
-		SipIdentity(std::string sipuri);
+		SipIdentity(const SipUri &sipuri);
 
 		void setIdentityName(std::string n);//{identityIdentifier = n;}
 		
-		void setSipUri(std::string addr);
+		void setSipUri(const SipUri &addr) { sipUri = addr; }
 		
-		std::string getSipUri();
+		const SipUri &getSipUri() const { return sipUri; }
 
 		/**
 		@returns the sip proxy used by this identity
@@ -216,9 +216,6 @@ class LIBMSIP_API SipIdentity : public MObject{
 			return ret;
 		}
 		
-		std::string sipUsername;
-		std::string sipDomain;       //SipAddress is <sipUsername>@<sipDomain>
-
 		std::string identityIdentifier;
 
 
@@ -260,6 +257,8 @@ class LIBMSIP_API SipIdentity : public MObject{
 		bool checkCert;
 		bool use_zrtp;
 	private: 
+		SipUri sipUri;
+
 		MRef<SipSim *> sim;
 
 		//bool use_srtp;

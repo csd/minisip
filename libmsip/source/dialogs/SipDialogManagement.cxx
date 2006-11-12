@@ -760,7 +760,7 @@ bool SipDialogManagement::deRegisterAll() {
 		}
 		
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
-		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->sipDomain;
+		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->getSipUri().getIp();
 		cmdstr.setParam3("0"); //expires = 0 ==> de-register
 		
 		SipSMCommand cmd( cmdstr,
@@ -769,7 +769,7 @@ bool SipDialogManagement::deRegisterAll() {
 		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    De-registration request sent (username = " << 
-			(*it)->getDialogConfig()->sipIdentity->getSipUri() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << end;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered
@@ -801,7 +801,7 @@ bool SipDialogManagement::registerAll() {
 		}
 		
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
-		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->sipDomain;
+		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->getSipUri().getIp();
 		//expires = defaultExpires, read from the config file
 		cmdstr.setParam3((*it)->getDialogConfig()->sipIdentity->getSipProxy()->getDefaultExpires()); 
 		
@@ -811,7 +811,7 @@ bool SipDialogManagement::registerAll() {
 		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    Registration request sent (username = " << 
-			(*it)->getDialogConfig()->sipIdentity->getSipUri() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << end;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered

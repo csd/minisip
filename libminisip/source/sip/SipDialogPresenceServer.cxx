@@ -307,8 +307,8 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 
 	notify->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
 
-	notify->setContent(new PresenceMessageContent(getDialogConfig()->sipIdentity->getSipUri(),
-				toId->getSipUri(),
+	notify->setContent(new PresenceMessageContent(getDialogConfig()->sipIdentity->getSipUri().getString(),
+				toId->getSipUri().getString(),
 				onlineStatus,
 				onlineStatus
 				));

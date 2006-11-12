@@ -177,7 +177,7 @@ CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd)
 
 	if( !gotAtSign && id ){
 		id->lock();
-		user += "@" + id->sipDomain;
+		user += "@" + id->getSipUri().getIp();
 		id->unlock();
 	}
 
@@ -464,9 +464,9 @@ void Sip::run(){
 	cerr << endl;
 	for (list<MRef<SipIdentity*> >::iterator i=phoneconfig->identities.begin() ; i!=phoneconfig->identities.end(); i++){
 		if ( (*i)->registerToProxy  ){
-			cerr << "Registering user "<< (*i)->getSipUri() << " to proxy " << (*i)->getSipProxy()->sipProxyAddressString<< ", requesting domain " << (*i)->sipDomain << endl;
+			cerr << "Registering user "<< (*i)->getSipUri().getString() << " to proxy " << (*i)->getSipProxy()->sipProxyAddressString<< ", requesting domain " << (*i)->getSipUri().getIp() << endl;
 			CommandString reg("",SipCommandString::proxy_register);
-			reg["proxy_domain"] = (*i)->sipDomain;
+			reg["proxy_domain"] = (*i)->getSipUri().getIp();
 			reg["identityId"] = (*i)->getId();
 			SipSMCommand sipcmd(reg, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
 			sipstack->handleCommand(sipcmd);

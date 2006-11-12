@@ -615,6 +615,7 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConf
 	setUpStateMachine();
 	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->localIpString;
 
+#if 0
 	if (getDialogConfig()->sipIdentity->sipDomain==""){
 		uint32_t i=0;
 		string uri = getDialogConfig()->sipIdentity->getSipUri();
@@ -629,11 +630,13 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConf
 				getDialogConfig()->sipIdentity->sipDomain+uri[i];
 		}
 	}
-#ifdef DEBUG_OUTPUT
-	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< getDialogConfig()->sipIdentity->sipDomain << end;
 #endif
 
-	myDomain = getDialogConfig()->sipIdentity->sipDomain;
+#ifdef DEBUG_OUTPUT
+	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< getDialogConfig()->sipIdentity->getSipUri().getIp() << end;
+#endif
+
+	myDomain = getDialogConfig()->sipIdentity->getSipUri().getIp();
 }
 
 SipDialogRegister::~SipDialogRegister(){
@@ -656,7 +659,7 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 		&& (command.getDestination()==SipSMCommand::dialog_layer /*|| command.getDestination()==SipSMCommand::ANY*/)
 		&& (command.getCommandString().getOp()==SipCommandString::proxy_register)
 		&& ( command.getCommandString()["proxy_domain"]=="" 
-			 || command.getCommandString()["proxy_domain"]== getDialogConfig()->sipIdentity->sipDomain)
+			|| command.getCommandString()["proxy_domain"]== getDialogConfig()->sipIdentity->getSipUri().getIp())
 			){
 		return SipDialog::handleCommand(command);
 	}
@@ -694,7 +697,7 @@ void SipDialogRegister::send_register(string branch){
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
 		branch, 
 		dialogState.callId,
-		getDialogConfig()->sipIdentity->sipDomain, //proxy_domain,
+		getDialogConfig()->sipIdentity->getSipUri().getIp(), //proxy_domain,
 		getDialogConfig()->inherited->externalContactIP,
 		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
 		getDialogConfig()->sipIdentity->getSipUri(),
