@@ -55,7 +55,7 @@
 
 using namespace std;
 
-MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
+MRef<SipRequest*> SipRequest::createSipMessageAck(const string &branch,
 		MRef<SipRequest*> origReq,
 		MRef<SipResponse*> resp,
 		bool provisional)
@@ -94,13 +94,13 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(string branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
-							MRef<SipRequest*> inv,
-							string to_uri
+MRef<SipRequest*> SipRequest::createSipMessageCancel(const string &branch,
+							MRef<SipRequest*> inv
+// 							string to_uri
 							)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "CANCEL");
-	req->setUri(to_uri);
+	req->setUri(inv->getUri());
 
 	req->addHeader(new SipHeader( new SipHeaderValueMaxForwards(70)));
 	
@@ -141,12 +141,12 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(string branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageIMMessage(string branch,
-							string callId,
-							std::string toUri,
+MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
+							const string& callId,
+							const SipUri& toUri,
 							const SipUri& fromUri,
 							int32_t seqNo,
-							string msg)
+							const string& msg)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "MESSAGE");
 	req->setUri(toUri);
@@ -158,45 +158,27 @@ MRef<SipRequest*> SipRequest::createSipMessageIMMessage(string branch,
 
 static void addHeaders( MRef<SipRequest*> req,
 		const string &call_id,
-		const string &tel_no,	//FIXME: Send uris as const SipURI&
-		const string &proxyAddr,
-		int32_t proxyPort,
+		const SipUri &toUri,
 		const string &localAddr,
 		int32_t localSipPort,
-		const string &from_tel_no,
+		const SipUri &fromUri,
 		int32_t seq_no,
-		const string &username,
-		const string &nonce,
-		const string &realm,
-		const string &password,
 		const string &transport,
 		MRef<SipStack*> stack
 		)
 {
 
-	req->setUri(tel_no);
+	req->setUri(toUri);
 
-	MRef<SipHeader*> hdr;
-	
-	SipUri fromUri(from_tel_no);
+// 	SipUri fromUri(from_tel_no);
 	req->addHeader(new SipHeader( new SipHeaderValueFrom(fromUri) ) );
 
-	SipUri toUri(tel_no);
+// 	SipUri toUri(tel_no);
 	req->addHeader(new SipHeader( new SipHeaderValueTo(toUri) ));
 	
 	req->addHeader(new SipHeader(new SipHeaderValueCallID(call_id)) );
-
-	SipUri uri;
-	uri.setParams(tel_no,proxyAddr,"",proxyPort);
-	
-	if ( username.length()>0 || nonce.length()>0 || realm.length()>0 ){
-		req->addHeader(new SipHeader( 
-				new SipHeaderValueProxyAuthorization("INVITE",tel_no,realm, nonce, "",uri, username, password,"DIGEST") )
-				);
-	}
-
 	req->addHeader(new SipHeader(new SipHeaderValueCSeq("INVITE",seq_no)));
-	req->addHeader(new SipHeader(new SipHeaderValueContact(from_tel_no, localAddr, localSipPort,"",transport)));
+	req->addHeader(new SipHeader(new SipHeaderValueContact(fromUri.getUserName(), localAddr, localSipPort,"",transport)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	if (stack){
 		req->addHeader(new SipHeader(new SipHeaderValueSupported(stack->getAllSupportedExtensionsStr())));
@@ -205,130 +187,72 @@ static void addHeaders( MRef<SipRequest*> req,
 
 MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 							const string &call_id,
-							const string &tel_no,
-							const string &proxyAddr,
-							int32_t proxyPort,
+							const SipUri &toUri,
 							const string &localAddr,
 							int32_t localSipPort,
-							const string &from_tel_no,
+							const SipUri &fromUri,
 							int32_t seq_no,
 							const string &transport,
 							MRef<SipStack*> stack
                 )
 {
 	MRef<SipRequest*> req = new SipRequest(branch,"INVITE");
-	addHeaders(req, call_id, tel_no, 
-			proxyAddr, proxyPort, 
+	addHeaders(req, call_id, toUri, 
 			localAddr, localSipPort, 
-			from_tel_no, seq_no, 
-			"","","","",transport, stack);
+			fromUri, seq_no, 
+			transport, stack);
 
 	return req;
 }
 
-MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
-							const string &call_id,
-							const string &tel_no,
-							const string &proxyAddr,
-							int32_t proxyPort,
-							const string &localAddr,
-							int32_t localSipPort,
-							const string &from_tel_no,
-							int32_t seq_no,
-							const string &username,
-							const string &nonce,
-							const string &realm,
-							const string &password,
-							const string &transport,
-							MRef<SipStack*> stack)
-{
-	MRef<SipRequest*> req = new SipRequest(branch, "INVITE");
-	
-	addHeaders(req, call_id, tel_no, 
-			proxyAddr, proxyPort, 
-			localAddr, localSipPort, 
-			from_tel_no, seq_no, 
-			username, nonce, realm, password, transport,stack);
-	return req;
-}
-
-
-
-
-
-MRef<SipRequest*> SipRequest::createSipMessageNotify(string branch,
-							string callId,
+MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
+							const string& callId,
 							const SipUri& toUri,
 							const SipUri& fromUri,
 							int32_t seqNo
 							)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "NOTIFY");
-	req->setUri(toUri.getString());
+	req->setUri(toUri);
 	req->addDefaultHeaders(fromUri, toUri,"NOTIFY",seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	return req;
 }
 
-MRef<SipRequest*> SipRequest::createSipMessageRegister(string branch,
-							string call_id,
-							string domain,
-							string localIp,
+MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
+							const string &call_id,
+							const string &domain,
+							const string &localIp,
 							int32_t sip_listen_port,
-							string from_tel_no,	//FIXME: use SipUri
+							const SipUri &fromUri,
 							int32_t seq_no,
-							string transport,
-							int expires,
-							string auth_id,
-							string realm,
-							string nonce,
-							string password)
+							const string &transport,
+							int expires)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
 
 	req->setUri("sip:" + domain);
 
-	SipUri fromUri(from_tel_no);
-	SipUri toUri(from_tel_no);
-	req->addDefaultHeaders(fromUri,toUri,"REGISTER",seq_no,call_id);
-	
+	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
 	 
-	req->addHeader(new SipHeader(new SipHeaderValueContact(from_tel_no, localIp, sip_listen_port,"",transport, expires)));
+	req->addHeader(new SipHeader(new SipHeaderValueContact(fromUri.getUserName(), localIp, sip_listen_port,"",transport, expires)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
-
-	SipUri uri;
-	uri.setParams("", localIp,"", sip_listen_port);
-	if (auth_id!=""){
-		MRef<SipHeaderValue*> authp = 
-			new SipHeaderValueAuthorization(
-					"REGISTER",
-					from_tel_no, 
-					realm, 
-					nonce, 
-					"", 
-					uri, 
-					auth_id, 
-					password,
-					"Digest");
-		req->addHeader(new SipHeader(*authp));
-	}
-	
 	req->setContent(NULL);
 
 	return req;
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageSubscribe(string branch,
-							string call_id,
+MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
+							const string &call_id,
 							const SipUri &toUri,
 							const SipUri &fromUri,
 							int32_t seq_no)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "SUBSCRIBE", toUri.getString() );
 
-	req->setUri(toUri.getString());
+	req->setUri(toUri);
 
 	req->addDefaultHeaders(fromUri, toUri,"SUBSCRIBE",seq_no, call_id);
 	
@@ -357,8 +281,8 @@ SipRequest::SipRequest(string branch, const string &method,
 		SipMessage(branch), method(method),
 		uri(uri)
 {
-	if( this->uri == "" )
-		this->uri = "sip:";
+// 	if( this->uri == "" )
+// 		this->uri = "sip:";
 }
 
 SipRequest::SipRequest(string &build_from): SipMessage(-1, build_from){
@@ -428,7 +352,7 @@ const string& SipRequest::getType(){
 }
 
 string SipRequest::getString() const{
-	return getMethod() + " " + getUri() + " SIP/2.0\r\n"
+	return getMethod() + " " + getUri().getRequestUriString() + " SIP/2.0\r\n"
 		+ getHeadersAndContent();
 }
 
@@ -472,11 +396,15 @@ static string buildUri(const string &name)
 	return ret;
 }
 
-void SipRequest::setUri(const string &uri){
-	this->uri = buildUri(uri);
+// void SipRequest::setUri(const string &uri){
+// 	setUri(SipUri(buildUri(uri)));
+// }
+
+void SipRequest::setUri(const SipUri &uri){
+	this->uri = uri;
 }
 
-string SipRequest::getUri() const{
+const SipUri &SipRequest::getUri() const{
 	return uri;
 }
 

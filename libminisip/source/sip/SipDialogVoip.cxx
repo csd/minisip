@@ -624,8 +624,8 @@ void SipDialogVoip::sendCancel(const string &branch){
 	
 	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
 			lastInvite->getFirstViaBranch(),
-			lastInvite,
-			dialogState.remoteUri
+			lastInvite
+// 			dialogState.remoteUri
 			);
 
 	addRoute( cancel );

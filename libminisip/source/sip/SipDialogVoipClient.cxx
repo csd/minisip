@@ -643,14 +643,12 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	inv = SipRequest::createSipMessageInvite(
 			branch,
 			dialogState.callId,
-			dialogState.remoteUri,
-			getDialogConfig()->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPort,
+			SipUri(dialogState.remoteUri),
 			getDialogConfig()->inherited->externalContactIP,
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			getDialogConfig()->sipIdentity->getSipUri(),
+			SipUri(getDialogConfig()->sipIdentity->getSipUri()),
 			dialogState.seqNo,
-			getDialogConfig()->inherited->getTransport(),
+			getDialogConfig()->sipIdentity->getSipProxy()->getTransport(),
 			sipStack ) ;
 
 	addAuthorizations( inv );

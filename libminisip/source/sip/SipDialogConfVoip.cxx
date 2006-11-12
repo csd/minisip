@@ -998,12 +998,10 @@ void SipDialogConfVoip::sendInvite(const string &branch){
 	inv = SipRequest::createSipMessageInvite(
 				branch,
 				dialogState.callId,
-				dialogState.remoteUri,
-				getDialogConfig()->sipIdentity->sipDomain,	//TODO: Change API - not sure if proxy or domain
-				getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPort,
+				SipUri(dialogState.remoteUri),
 				getDialogConfig()->inherited->externalContactIP,
 				getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-				getDialogConfig()->sipIdentity->getSipUri(),
+				SipUri(getDialogConfig()->sipIdentity->getSipUri()),
 				dialogState.seqNo,
 				getDialogConfig()->inherited->getTransport(),
 				sipStack) ;
@@ -1188,8 +1186,8 @@ void SipDialogConfVoip::sendCancel(const string &branch){
 	//MRef<SipCancel*> cancel = new SipCancel(
 	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
 			branch,
-			lastInvite,
-			dialogState.remoteUri
+			lastInvite
+// 			dialogState.remoteUri
 			);
 
 	cancel->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);

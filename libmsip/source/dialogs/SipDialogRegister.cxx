@@ -699,7 +699,7 @@ void SipDialogRegister::send_register(string branch){
 		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
 		getDialogConfig()->sipIdentity->getSipUri(),
 		dialogState.seqNo,
-		getDialogConfig()->inherited->getTransport(),
+		getDialogConfig()->sipIdentity->getSipProxy()->getTransport(),
 		getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 

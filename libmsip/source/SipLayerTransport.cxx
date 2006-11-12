@@ -518,7 +518,7 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 		}
 		else {
 			MRef<SipRequest*> req = (SipRequest*)*pack;
-			uri.setUri(req->getUri());
+			uri = req->getUri();
 		}
 
 		if( uri.isValid() ){
