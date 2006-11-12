@@ -220,8 +220,8 @@ void SipSoftPhoneConfiguration::save(){
 			backend->save( accountPath + "auto_detect_proxy", "yes" );
 		} else {
 			backend->save( accountPath + "auto_detect_proxy", "no");		
-			backend->save( accountPath + "proxy_addr", (*iIdent)->getSipProxy()->sipProxyAddressString );
-			backend->save( accountPath + "proxy_port", (*iIdent)->getSipProxy()->sipProxyPort );
+			backend->save( accountPath + "proxy_addr", (*iIdent)->getSipProxy()->getUri().getIp() );
+			backend->save( accountPath + "proxy_port", (*iIdent)->getSipProxy()->getUri().getPort() );
 		}
 
 		if( (*iIdent)->getSipProxy()->sipProxyUsername != "" ){
@@ -249,7 +249,7 @@ void SipSoftPhoneConfiguration::save(){
 			backend->save( accountPath + "register", "no");
 			backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
 		}
-		string transport = (*iIdent)->getSipProxy()->getTransport();
+		string transport = (*iIdent)->getSipProxy()->getUri().getTransport();
 		
 		if( transport == "TCP" ){
 			backend->save( accountPath + "transport", "TCP" );

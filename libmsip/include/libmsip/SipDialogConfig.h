@@ -68,7 +68,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param addr proxy string, it can be a name or an IP, with and without the :port
 		@param port port the proxy addr is set to, it has precedence over the :port in the addr param
 		*/
-		SipProxy(std::string addr, int port = -1);
+		SipProxy(const SipUri &addr, int port = -1);
 		
 		/**
 		Initialize a proxy with automatic discovery of settings via DNS SRV
@@ -76,10 +76,8 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param transport transport to check for (_sip._udp, ... ). If TCP and fails, we will retry 
 		with UDP. If TLS, there is no fallback (they are all unsecured).
 		*/
-		SipProxy(std::string userUri, std::string transport);
+		SipProxy(const SipUri &userUri, std::string transport);
 		
-		void setProxy(std::string addr, int port);
-
 		std::string getDebugString();
 
 		/**
@@ -90,13 +88,8 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param transport transport protocol to find the host:port settings for
 		@return the proxy hostname (the port is returned by reference)
 		*/
-		static std::string findProxy(std::string uri, uint16_t &port, std::string transport="UDP");
+		static SipUri findProxy(const SipUri &uri, const std::string &transport="UDP");
 
-		std::string sipProxyAddressString;
-		//IPAddress * sipProxyIpAddr;
-		
-		int sipProxyPort;
-		
 		std::string sipProxyUsername;
 		std::string sipProxyPassword;
 		
@@ -110,8 +103,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		std::string getDefaultExpires( );
 		int getDefaultExpires_int( ) {return defaultExpires;}
 
-		std::string getTransport(){ return transport; };
-		void setTransport( std::string transport ){this->transport = transport; };
+		const SipUri getUri() const{ return uri; }
 
 		std::string getMemObjectType() const {return "SipProxy";}
 		
@@ -127,7 +119,10 @@ class LIBMSIP_API SipProxy : public MObject{
 		(except for TLS, which will just not connect ... we want security).
 		*/
 		bool autodetectSettings;
-		
+
+	protected:		
+		void setProxy(const SipUri &addr, int port=-1);
+
 	private:
 		/**
 		Default expires value. 
@@ -145,12 +140,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		 */
 		int registerExpires; //in seconds
 
-		/**
-		Transport to use: (if TCP, we can fallback to UDP)
-		- UDP, TCP or TLS
-		*/
-		std::string transport;
-		
+		SipUri uri;
 };
 
 class LIBMSIP_API SipIdentity : public MObject{

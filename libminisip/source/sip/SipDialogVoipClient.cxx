@@ -648,7 +648,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
 			SipUri(getDialogConfig()->sipIdentity->getSipUri()),
 			dialogState.seqNo,
-			getDialogConfig()->sipIdentity->getSipProxy()->getTransport(),
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getTransport(),
 			sipStack ) ;
 
 	addAuthorizations( inv );

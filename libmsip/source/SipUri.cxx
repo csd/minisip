@@ -387,3 +387,7 @@ string SipUri::getTransport() const {
 	return getParameter( "transport" );
 }
 
+ostream& operator << (ostream& os, const SipUri& uri){
+	return os << uri.getString();
+}
+

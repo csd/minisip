@@ -35,16 +35,13 @@ using namespace std;
 
 int SipIdentity::globalIndex = 1; //give an initial value
 
-SipProxy::SipProxy(){
-	sipProxyAddressString = "";
-	//sipProxyIpAddr = NULL;
-	sipProxyPort = 0; 
+SipProxy::SipProxy(): uri(){
 	autodetectSettings = false; //dont autodetect ... the values are invalid
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 
-SipProxy::SipProxy(std::string addr, int port){
+SipProxy::SipProxy(const SipUri &addr, int port){
 	autodetectSettings = false;
 	try {
 		registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
@@ -54,123 +51,84 @@ SipProxy::SipProxy(std::string addr, int port){
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, int) throwing ... " << endl;
 		#endif
-		throw HostNotFound( "[SipProxy " + addr + "]" );
+		throw HostNotFound( "[SipProxy " + addr.getString() + "]" );
 	}
 }
 
-SipProxy::SipProxy(std::string userUri, string transportParam) { //note: this->transport is an class member, do not rename transportParam
-	string addr;
-	uint16_t port;
+SipProxy::SipProxy(const SipUri &userUri, string transportParam) {
+	SipUri addr;
+	bool unknown = true;
 	autodetectSettings = true;
 	
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	
-	if( getTransport() == "" ) {
-		setTransport( transportParam );
-	}
-	
 	try {
-		addr = SipProxy::findProxy( userUri, port, transportParam );
+		addr = SipProxy::findProxy( userUri, transportParam );
+		unknown = false;
 	}catch( NetworkException & ) {
-		if( transportParam == "TCP" ) { 
-			//if tcp doesn't work, try find UDP
-			addr = "unknown";
-		}
 	}
 	
 	//if tcp failed, retry with udp ...
-	if( addr == "unknown" && transportParam == "TCP" ) {
+	if( unknown && transportParam == "TCP" ) {
 		try {
 			cerr << "Autodetect Sip proxy for [" << userUri << "] for transport TCP failed. Retrying with transport UDP." << endl;
 			transportParam = "UDP";
-			addr = SipProxy::findProxy( userUri, port, transportParam );
+			addr = SipProxy::findProxy( userUri, transportParam );
+			unknown = false;
 		}catch( NetworkException & ) {
-				addr = "unknown";
 		}
 	}	
 	
-	if( addr == "unknown" ) {
+	if( unknown ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, str) throwing (1) ... " << endl;
 		#endif
-		throw HostNotFound( "[SipProxy for <" + userUri + ">]" );
+		throw HostNotFound( "[SipProxy for <" + userUri.getString() + ">]" );
 	}
 	
 // 	addr = SipProxy::findProxy( userUri, (uint16_t)port, transportParam );
 	
 	try {
-		setProxy( addr, port );
-		setTransport( transportParam );
+		addr.setTransport( transportParam );
+		setProxy( addr );
 	} catch (NetworkException & ) {
 		#ifdef DEBUG_OUTPUT
 		cerr << "SipProxy(str, str) throwing (2)... " << endl;
 		#endif
-		throw HostNotFound( "[SipProxy <" + addr + "]" );
+		throw HostNotFound( "[SipProxy <" + addr.getString() + "]" );
 	}
 }
 
 //addr could be "IP:port" ... but the port param passed to the function has precedence ...
-void SipProxy::setProxy(std::string addr, int port){
-	massert(addr.find("@")==std::string::npos);
+void SipProxy::setProxy(const SipUri &addr, int port){
+	massert(addr.getUserName()=="");
 	if( port > 65535 || port < 0 ) port = -1; //check the port
 	
 	#ifdef DEBUG_OUTPUT
 	cerr << "SipProxy:setProxy(str) : addr = " << addr << endl;
 	#endif
-	if (addr.find(":")!=std::string::npos){
-		if( port == -1 ) {
-			std::string portstr = addr.substr(addr.find(":")+1);
-			portstr = portstr.substr( 0, portstr.find(":") ); //make sure only one port is there ...
-			mdbg<< "parsed proxy port to <"<< portstr<<">"<<end;
-			sipProxyPort = atoi(portstr.c_str());
-		} else {
-			sipProxyPort = port;
-		}
-		sipProxyAddressString =  addr.substr(0,addr.find(":"));
-		
-	}else{
-		sipProxyAddressString = addr;
-		if( port == -1 ) {
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipProxy: invalid port ... setting 5060" << endl;
-			#endif
-			sipProxyPort = 5060;
-		} else {
-			sipProxyPort = port;
-		}
+
+	uri = addr;
+
+	if( port != -1 ){
+		uri.setPort(port);
 	}
-	
-	//sipProxyIpAddr = new IP4Address(sipProxyAddressString);
+
+	// Lose router
+	uri.setParameter( "lr", "true" );
 }
 
 std::string SipProxy::getDebugString(){
-	return "proxyString="+sipProxyAddressString
-		//+"; proxyIp="+ ((sipProxyIpAddr==NULL)?"NULL":sipProxyIpAddr->getString())
-		+"; proxyString="+sipProxyAddressString
-		+"; port="+itoa(sipProxyPort)
-		+"; transport="+getTransport()
+	return "uri="+uri.getString()
 		+"; autodetect="+ (autodetectSettings?"yes":"no")
 		+"; user="+sipProxyUsername
 		+"; password="+sipProxyPassword
 		+"; expires="+itoa(defaultExpires);
 }
 
-std::string SipProxy::findProxy(std::string uri, uint16_t &port, string transport){
-
-	if (uri.find("@")==std::string::npos){                 
-		return "unknown";
-	}
-	std::string domain = uri.substr(uri.find("@"));
-	domain=domain.substr(1);
-	
-	//check if we find a colon ... and ignore that part
-	if (uri.find(":")!=std::string::npos){
-		uri = uri.substr( 0, uri.find(":") );
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipProxy::findProxy : sanitizing malformed proxy uri ..." << endl;
-		#endif
-	}
+SipUri SipProxy::findProxy(const SipUri &uri, const string &transport){
+	const std::string &domain = uri.getIp();
 	
 	//Do a SRV lookup according to the transport ...
 	string srv;
@@ -180,14 +138,20 @@ std::string SipProxy::findProxy(std::string uri, uint16_t &port, string transpor
 		srv = "_sip._udp"; 
 	}
 
+	uint16_t port = 0;
+	std::string proxy = NetworkFunctions::getHostHandlingService(srv, domain, port);
 	#ifdef DEBUG_OUTPUT
 	cerr << "SipProxy::findProxy : srv=" << srv << "; domain=" << domain << "; port=" << port << endl;
 	#endif
-	std::string proxy = NetworkFunctions::getHostHandlingService(srv, domain, port);
+
 	if (proxy.length()<=0){
-		return "unknown";
+		throw HostNotFound( "[Proxy for <" + uri.getString() + ">]" );
 	}
-	return proxy;
+
+	SipUri proxyUri(proxy);
+	proxyUri.setPort(port);
+
+	return proxyUri;
 }
 
 
@@ -313,28 +277,9 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 	
 	setSipProxy( NULL );
 	
-	if( !autodetect ) {
-		try {
-			this->sipProxy = new SipProxy(proxyAddr, proxyPort);
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipIdentity::setProxy: manual sipproxy success ... " << endl;
-			#endif
-			proxySetSuccess = true;
-		} catch ( NetworkException & exc ){
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipIdentity::setProxy: manual settings for SIP proxy are wrong ... trying autodetect" << endl;
-			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
-			#endif
-		}
-	}
-	
-	if( !proxySetSuccess || autodetect) {
+	if( autodetect ) {
 		try{
 			this->sipProxy = new SipProxy( userUri, transport );
-			//the transport may have fallen back to UDP ...
-			transport = getSipProxy()->getTransport(); 
-			proxyAddr = getSipProxy()->sipProxyAddressString;
-			proxyPort = getSipProxy()->sipProxyPort;
 			proxySetSuccess = true;
 		} catch( NetworkException & exc ){
 			#ifdef DEBUG_OUTPUT
@@ -351,19 +296,30 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 		#endif
 	}
 	
-	MRef<SipProxy *> prox = getSipProxy();
-	if( ! prox ) {	
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipIdentity::setProxy: creating fake proxy ..." << endl;
-		#endif
-		//if creation of proxy failed ... make a fake one, to save some of the data
-		setSipProxy( new SipProxy() );
-		prox = getSipProxy();
-		prox->autodetectSettings = autodetect;
-		prox->sipProxyAddressString = proxyAddr;
+	if( !proxySetSuccess ) {
+		try {
+			SipUri proxyUri( proxyAddr );
+			proxyUri.setPort( proxyPort );
+			proxyUri.setTransport( transport );
+
+			this->sipProxy = new SipProxy( proxyUri );
+			#ifdef DEBUG_OUTPUT
+			if( autodetect )
+				cerr << "SipIdentity::setProxy: creating fake proxy ..." << endl;
+			else
+				cerr << "SipIdentity::setProxy: manual sipproxy success ... " << endl;
+			#endif
+			proxySetSuccess = true;
+		} catch ( NetworkException & exc ){
+			#ifdef DEBUG_OUTPUT
+			cerr << "SipIdentity::setProxy: manual settings for SIP proxy are wrong ... trying autodetect" << endl;
+			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
+			#endif
+		}
 	}
-	prox->sipProxyPort = proxyPort;
-	prox->setTransport( transport );
+	
+	MRef<SipProxy *> prox = getSipProxy();
+	prox->autodetectSettings = autodetect;
 	return ret;
 }
 

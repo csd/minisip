@@ -41,8 +41,10 @@
 
 #include<sys/types.h>
 #include<map>
+#include<iostream>
 
 #include<libmutil/MemObject.h>
+#include<libmutil/dbg.h>
 
 
 /**
@@ -177,5 +179,7 @@ class LIBMSIP_API SipUri : public MObject{
 		bool validUri;
 		std::map<std::string, std::string> parameters;
 };
+
+std::ostream& operator << (std::ostream& os, const SipUri& uri);
 
 #endif

@@ -844,8 +844,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 //		merr << "IN URI PARSER: Parsed port=<"<< port <<"> and proxy=<"<< proxy<<">"<<end;
 		
 		try{
-			dialogConfig->sipIdentity->getSipProxy()->sipProxyAddressString = proxy;
-			dialogConfig->sipIdentity->getSipProxy()->sipProxyPort = iport;
+			// TODO: untested
+			dialogConfig->sipIdentity->setSipProxy(new SipProxy(proxy, iport));
 		}catch(HostNotFound & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc.what();
@@ -899,7 +899,7 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	//Add outbount proxy route
 	MRef<SipProxy *> proxy = phoneconf->defaultIdentity->getSipProxy();
 	if( !proxy.isNull() ){
-		im->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+		im->addRoute( proxy->getUri().getString() );
 	}
 
 	//FIXME: there should be a SipIMDialog, just like for register messages ...

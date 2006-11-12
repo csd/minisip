@@ -123,7 +123,7 @@ void SipDialog::addRoute( MRef<SipRequest *> req ){
 		MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
 
 		if( !proxy.isNull() ){
-			req->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort, proxy->getTransport() );
+			req->addRoute( proxy->getUri().getString() );
 		}
 	}
 	else if( dialogState.routeSet.size() > 0 ) {
@@ -455,14 +455,15 @@ bool SipDialogState::updateState( MRef<SipResponse*> resp) {
 		//merr << "dialog state has a routeset" << end;
 	}
 
-	if( isEstablished && ( isEarly || toTag == remoteTag ) )
-		// Update route set only for an existing dialog
-		return true;
-	
 	MRef<SipHeaderValueContact *> c = resp->getHeaderValueContact();
 	if( c ){
 		remoteTarget = c->getUri().getString();
 	}
+
+	if( isEstablished && ( isEarly || toTag == remoteTag ) )
+		// Update only route set and target for an existing dialog
+		return true;
+	
 	remoteUri = resp->getHeaderValueTo()->getUri().getString();
 	localUri = resp->getHeaderValueFrom()->getUri().getString();
 	

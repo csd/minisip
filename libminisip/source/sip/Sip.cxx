@@ -464,7 +464,7 @@ void Sip::run(){
 	cerr << endl;
 	for (list<MRef<SipIdentity*> >::iterator i=phoneconfig->identities.begin() ; i!=phoneconfig->identities.end(); i++){
 		if ( (*i)->registerToProxy  ){
-			cerr << "Registering user "<< (*i)->getSipUri().getString() << " to proxy " << (*i)->getSipProxy()->sipProxyAddressString<< ", requesting domain " << (*i)->getSipUri().getIp() << endl;
+			cerr << "Registering user "<< (*i)->getSipUri().getString() << " to proxy " << (*i)->getSipProxy()->getUri().getIp()<< ", requesting domain " << (*i)->getSipUri().getIp() << endl;
 			CommandString reg("",SipCommandString::proxy_register);
 			reg["proxy_domain"] = (*i)->getSipUri().getIp();
 			reg["identityId"] = (*i)->getId();

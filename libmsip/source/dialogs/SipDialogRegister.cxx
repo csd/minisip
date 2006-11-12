@@ -145,7 +145,7 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
 			sipStack->getCallback()->handleCommand("gui", cmdstr );
@@ -204,7 +204,7 @@ bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMComman
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
@@ -228,7 +228,7 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
@@ -296,7 +296,7 @@ bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &comman
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);   
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());   
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		//TODO: inform GUI
 		if (getGuiFeedback()){
@@ -335,7 +335,7 @@ bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &comm
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		//extract authentication info from received response
@@ -361,7 +361,7 @@ bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &comma
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyAddressString);   
+			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());   
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
 			sipStack->getCallback()->handleCommand("gui", cmdstr );
@@ -702,7 +702,7 @@ void SipDialogRegister::send_register(string branch){
 		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
 		getDialogConfig()->sipIdentity->getSipUri(),
 		dialogState.seqNo,
-		getDialogConfig()->sipIdentity->getSipProxy()->getTransport(),
+		getDialogConfig()->sipIdentity->getSipProxy()->getUri().getTransport(),
 		getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 

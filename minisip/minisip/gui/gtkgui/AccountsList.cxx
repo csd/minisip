@@ -69,9 +69,9 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->name] = (*i)->identityIdentifier;
 		(*iter)[columns->uri] = (*i)->getSipUri().getUserIpString();
 		(*iter)[columns->autodetectSettings] = (*i)->getSipProxy()->autodetectSettings;
-		(*iter)[columns->proxy] = (*i)->getSipProxy()->sipProxyAddressString;
-		(*iter)[columns->port] = (*i)->getSipProxy()->sipProxyPort;
-		(*iter)[columns->transport] = (*i)->getSipProxy()->getTransport();
+		(*iter)[columns->proxy] = (*i)->getSipProxy()->getUri().getIp();
+		(*iter)[columns->port] = (*i)->getSipProxy()->getUri().getPort();
+		(*iter)[columns->transport] = (*i)->getSipProxy()->getUri().getTransport();
 		(*iter)[columns->doRegister] = (*i)->registerToProxy;
 		(*iter)[columns->username] = (*i)->getSipProxy()->sipProxyUsername;
 		(*iter)[columns->password] = (*i)->getSipProxy()->sipProxyPassword;

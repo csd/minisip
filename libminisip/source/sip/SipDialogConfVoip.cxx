@@ -1159,8 +1159,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	modifyConfAck(ack);
 	MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
 
-	ack->addRoute( proxy->sipProxyAddressString, proxy->sipProxyPort,
-		       proxy->getTransport() );
+	ack->addRoute( proxy->getUri().getString() );
 
         MRef<SipMessage*> pref(*ack);
 	sendSipMessage(pref);

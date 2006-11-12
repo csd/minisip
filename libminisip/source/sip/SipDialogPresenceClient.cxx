@@ -146,7 +146,7 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 		requestTimeout(timeout, "timerDoSubscribe");
 		
 #ifdef DEBUG_OUTPUT
-		merr << "Subscribed for presence for user "<< toUri->getSipUri()<< end;
+		merr << "Subscribed for presence for user "<< toUri->getSipUri.getString()<< end;
 #endif
 		return true;
 	}else{
