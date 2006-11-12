@@ -340,7 +340,7 @@ void SipRequest::init(string &build_from){
 
 	uri = requestLine.substr( pos + 1, pos2 - pos );
 	#ifdef DEBUG_OUTPUT
-	cerr << "SipRequest::init - uri = " << uri << endl;
+	cerr << "SipRequest::init - uri = " << uri.getString() << endl;
 	#endif
 }
 
