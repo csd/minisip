@@ -358,21 +358,8 @@ SipStackConfig::SipStackConfig():
 
 }
 
-string SipStackConfig::getTransport() {
-	string ret;	//XXX TODO: fixme - should this method exist somewhere else?!
-//	string ret = sipIdentity->getSipProxy()->getTransport();
-	if( ret == "" ) {
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipStackConfig::getTransport(): empty proxy transport ... returning default UDP" << endl;
-		#endif
-		ret = "UDP";
-	}
-	return ret;
-}
-
-int32_t SipStackConfig::getLocalSipPort(bool usesStun) {
+int32_t SipStackConfig::getLocalSipPort(bool usesStun, const string &transport ) {
 	int32_t localSipPort;
-	string transport = getTransport();
 	
 	if(transport=="TCP" || transport=="tcp")
 		localSipPort = localTcpPort;
@@ -413,3 +400,22 @@ void SipDialogConfig::useIdentity(
 }
 
 
+SipUri SipDialogConfig::getContactUri(bool useStun) const{
+	SipUri contactUri;
+	const SipUri &fromUri = sipIdentity->getSipUri();
+	string transport;
+
+	if( sipIdentity->getSipProxy() )
+		transport = sipIdentity->getSipProxy()->getUri().getTransport();
+	else
+		transport = fromUri.getTransport();
+
+	contactUri.setParams( fromUri.getUserName(),
+			      inherited->externalContactIP,
+			      "",
+			      inherited->getLocalSipPort(useStun, transport));
+	if( transport != "" )
+		contactUri.setTransport( transport );
+
+	return contactUri;
+}

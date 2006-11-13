@@ -412,10 +412,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri().getString(),
-			getDialogConfig()->inherited->externalContactIP,
-			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->getTransport(),
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 	
@@ -478,10 +475,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri().getString(),
-			getDialogConfig()->inherited->externalContactIP,
-			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->getTransport(),
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			-1); //set expires to -1, we do not use it (only in register)
 	ringing->addHeader( new SipHeader(*contact) );
 

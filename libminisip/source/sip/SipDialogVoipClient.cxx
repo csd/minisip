@@ -644,11 +644,9 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			branch,
 			dialogState.callId,
 			SipUri(dialogState.remoteUri),
-			getDialogConfig()->inherited->externalContactIP,
-			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			SipUri(getDialogConfig()->sipIdentity->getSipUri()),
+			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			dialogState.seqNo,
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getTransport(),
 			sipStack ) ;
 
 	addAuthorizations( inv );
@@ -729,10 +727,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->sipIdentity->getSipUri().getString(),
-			getDialogConfig()->inherited->externalContactIP,
-			getDialogConfig()->inherited->getLocalSipPort(phoneconf->useSTUN),
-			"", getDialogConfig()->inherited->getTransport(),
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 	

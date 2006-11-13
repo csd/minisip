@@ -157,28 +157,12 @@ MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
 }
 
 static void addHeaders( MRef<SipRequest*> req,
-		const string &call_id,
-		const SipUri &toUri,
-		const string &localAddr,
-		int32_t localSipPort,
-		const SipUri &fromUri,
-		int32_t seq_no,
-		const string &transport,
+		const SipUri &contact,
 		MRef<SipStack*> stack
 		)
 {
 
-	req->setUri(toUri);
-
-// 	SipUri fromUri(from_tel_no);
-	req->addHeader(new SipHeader( new SipHeaderValueFrom(fromUri) ) );
-
-// 	SipUri toUri(tel_no);
-	req->addHeader(new SipHeader( new SipHeaderValueTo(toUri) ));
-	
-	req->addHeader(new SipHeader(new SipHeaderValueCallID(call_id)) );
-	req->addHeader(new SipHeader(new SipHeaderValueCSeq("INVITE",seq_no)));
-	req->addHeader(new SipHeader(new SipHeaderValueContact(fromUri.getUserName(), localAddr, localSipPort,"",transport)));
+	req->addHeader(new SipHeader(new SipHeaderValueContact(contact)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	if (stack){
 		req->addHeader(new SipHeader(new SipHeaderValueSupported(stack->getAllSupportedExtensionsStr())));
@@ -188,19 +172,17 @@ static void addHeaders( MRef<SipRequest*> req,
 MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 							const string &call_id,
 							const SipUri &toUri,
-							const string &localAddr,
-							int32_t localSipPort,
 							const SipUri &fromUri,
+							const SipUri &contact,
 							int32_t seq_no,
-							const string &transport,
 							MRef<SipStack*> stack
                 )
 {
 	MRef<SipRequest*> req = new SipRequest(branch,"INVITE");
-	addHeaders(req, call_id, toUri, 
-			localAddr, localSipPort, 
-			fromUri, seq_no, 
-			transport, stack);
+	req->setUri(toUri);
+
+	req->addDefaultHeaders( fromUri, toUri, "INVITE", seq_no, call_id );
+	addHeaders(req, contact, stack);
 
 	return req;
 }
@@ -222,21 +204,18 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 
 MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 							const string &call_id,
-							const string &domain,
-							const string &localIp,
-							int32_t sip_listen_port,
 							const SipUri &fromUri,
+							const SipUri &contact,
 							int32_t seq_no,
-							const string &transport,
 							int expires)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
+	const std::string &domain = fromUri.getIp();
 
-	req->setUri("sip:" + domain);
+	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
 
 	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
 	 
-	req->addHeader(new SipHeader(new SipHeaderValueContact(fromUri.getUserName(), localIp, sip_listen_port,"",transport, expires)));
+	req->addHeader(new SipHeader(new SipHeaderValueContact(contact, expires)));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->setContent(NULL);
 

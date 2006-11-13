@@ -697,12 +697,9 @@ void SipDialogRegister::send_register(string branch){
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
 		branch, 
 		dialogState.callId,
-		getDialogConfig()->sipIdentity->getSipUri().getIp(), //proxy_domain,
-		getDialogConfig()->inherited->externalContactIP,
-		getDialogConfig()->inherited->getLocalSipPort(true), //if udp, use stun
 		getDialogConfig()->sipIdentity->getSipUri(),
+		getDialogConfig()->getContactUri(true), //if udp, use stun
 		dialogState.seqNo,
-		getDialogConfig()->sipIdentity->getSipProxy()->getUri().getTransport(),
 		getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int()
 		);
 

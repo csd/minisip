@@ -82,11 +82,9 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const std::string &branch,
 				const std::string &call_id,
 				const SipUri &toUri,
-				const std::string &localAddr,
-				int32_t localSipPort,
 				const SipUri &fromUri,
+				const SipUri &contact,
 				int32_t seq_no,
-				const std::string &transport,
 				MRef<SipStack*> stack
 				);
 
@@ -101,12 +99,9 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		static MRef<SipRequest*> createSipMessageRegister(
 				const std::string &branch,
 				const std::string &call_id,
-				const std::string &domainarg,
-				const std::string &localIp,
-				int32_t sip_listen_port,
 				const SipUri &fromUri,
+				const SipUri &contact,
 				int32_t seq_no,
-				const std::string &transport,
 				int expires);
 
 		static MRef<SipRequest*> createSipMessageSubscribe(

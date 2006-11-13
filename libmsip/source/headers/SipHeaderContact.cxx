@@ -78,24 +78,17 @@ SipHeaderValueContact::SipHeaderValueContact(const string &build_from)
 #endif
 }
 
-SipHeaderValueContact::SipHeaderValueContact(const string &username, 
-		const string &ip, 
-		int32_t port, 
-		const string &user_type, 
-		const string &transport,
+SipHeaderValueContact::SipHeaderValueContact(const SipUri &contactUri,
 		int expires
 		)
 			:SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
 {
-	uri.setParams(username,ip,user_type,port);
-	uri.setIp( ip ); //fix the domain part to be the ip address ... not the domain name
+	uri = contactUri;
 	
 	if( expires != -1 )
 		this->setExpires(expires);
 	else this->removeParameter("expires" ); //-1 indicates that the expires is not to be used
 	
-	if (transport!="")
-		uri.setTransport(transport);
 	//merr << "SipHeaderValueContact::getString: username="<< username <<end;
 }
 
@@ -142,7 +135,7 @@ string SipHeaderValueContact::getString() const{
 	return ret;
 } 
 
-SipUri SipHeaderValueContact::getUri() const{
+const SipUri &SipHeaderValueContact::getUri() const{
 	return uri;
 }
 

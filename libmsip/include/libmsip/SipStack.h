@@ -111,16 +111,11 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		int32_t localTlsPort;
 		
 		/**
-		@return the transport set in the SipProxy (means preferred ... )
-		*/
-		std::string getTransport();
-		
-		/**
 		@return the port in use, depending on the transport.
 		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
 		*/
-		int32_t getLocalSipPort(bool usesStun=false);
-		
+		int32_t getLocalSipPort(bool usesStun=false, const std::string &transport="UDP");
+
 //		MRef<SipIdentity*> sipIdentity;
 	
 		bool autoAnswer;

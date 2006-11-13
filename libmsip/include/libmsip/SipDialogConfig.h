@@ -303,6 +303,7 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		void useIdentity( MRef<SipIdentity*> identity,
 				std::string transport="UDP_X");
 
+		SipUri getContactUri(bool useStun) const;
 };
 
 #endif

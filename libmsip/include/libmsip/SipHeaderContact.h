@@ -51,11 +51,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		
 //		SipHeaderValueContact();
 		SipHeaderValueContact(const std::string &build_from);
-		SipHeaderValueContact(const std::string &username, 
-				const std::string &ip, 
-				int32_t port, 
-				const std::string &usertype="phone", 
-				const std::string &transport="",
+		SipHeaderValueContact(const SipUri &contactUri,
 				int expires=1000);
 
 		virtual ~SipHeaderValueContact();
@@ -70,7 +66,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		SipUri getUri() const;
+		const SipUri &getUri() const;
 		void setUri(const SipUri &uri);
 		
 		/**
