@@ -126,10 +126,8 @@ public class MyGui : GuiProxy {
   private void dumpIdentity(SipIdentityRef id){
     Console.WriteLine("id     " + id.identityIdentifier);
     Console.WriteLine("id:    " + id.getId());
-    Console.WriteLine("uri:   " + id.getSipUri());
-    Console.WriteLine("name   " + id.sipUsername);
-    Console.WriteLine("domain " + id.sipDomain);
-    Console.WriteLine("sec    " + id.securitySupport);
+    Console.WriteLine("uri:   " + id.getSipUri().getString());
+//     Console.WriteLine("sec    " + id.securitySupport);
     Console.WriteLine("reg    " + id.registerToProxy);
     Console.WriteLine("reg?   " + id.isRegistered());
 
@@ -147,10 +145,7 @@ public class MyGui : GuiProxy {
 
   private void dumpProxy(SipProxyRef proxy){
     Console.WriteLine("SipProxy");
-    Console.WriteLine("addr      " + proxy.sipProxyAddressString);
-    Console.WriteLine("port      " + proxy.sipProxyPort);
-    Console.WriteLine("username  " + proxy.sipProxyUsername);
-    Console.WriteLine("transport " + proxy.getTransport());
+    Console.WriteLine("uri:      " + proxy.getUri().getString());
   }
 
   public override void setContactDb(ContactDbRef contactDb) {
