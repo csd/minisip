@@ -62,42 +62,12 @@ SipProxy::SipProxy(const SipUri &userUri, string transportParam) {
 	
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-	
-	try {
-		addr = SipProxy::findProxy( userUri, transportParam );
-		unknown = false;
-	}catch( NetworkException & ) {
-	}
-	
-	//if tcp failed, retry with udp ...
-	if( unknown && transportParam == "TCP" ) {
-		try {
-			cerr << "Autodetect Sip proxy for [" << userUri << "] for transport TCP failed. Retrying with transport UDP." << endl;
-			transportParam = "UDP";
-			addr = SipProxy::findProxy( userUri, transportParam );
-			unknown = false;
-		}catch( NetworkException & ) {
-		}
-	}	
-	
-	if( unknown ) {
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipProxy(str, str) throwing (1) ... " << endl;
-		#endif
-		throw HostNotFound( "[SipProxy for <" + userUri.getString() + ">]" );
-	}
-	
-// 	addr = SipProxy::findProxy( userUri, (uint16_t)port, transportParam );
-	
-	try {
+
+	addr = userUri;
+	if( transportParam != "" )
 		addr.setTransport( transportParam );
-		setProxy( addr );
-	} catch (NetworkException & ) {
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipProxy(str, str) throwing (2)... " << endl;
-		#endif
-		throw HostNotFound( "[SipProxy <" + addr.getString() + "]" );
-	}
+
+	setProxy( addr );
 }
 
 //addr could be "IP:port" ... but the port param passed to the function has precedence ...

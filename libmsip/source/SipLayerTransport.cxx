@@ -45,6 +45,7 @@
 #include<libmnetutil/TLSServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
+#include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/mtime.h>
@@ -467,11 +468,99 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	pack->addHeader( hdr );
 }
 
+static int32_t getDefaultPort(const string &transport)
+{
+	if( transport == "TLS" ){
+		return 5061;
+	}
+	else{
+		return 5060;
+	}
+}
 
+
+static bool lookupDestSrv(const string &domain, const string &transport,
+			  string &destAddr, int32_t &destPort)
+{
+	//Do a SRV lookup according to the transport ...
+	string srv;
+	uint16_t port = 0;
+
+	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
+	else if( transport == "TCP" || transport == "tls") { srv = "_sip._tcp"; }
+	else { //if( trans == "UDP" || trans == "udp") { 	
+		srv = "_sip._udp"; 
+	}
+
+	string addr = NetworkFunctions::getHostHandlingService(srv, domain, port);
+#ifdef DEBUG_OUTPUT
+	cerr << "getDestIpPort : srv=" << srv << "; domain=" << domain << "; port=" << port << "; target=" << addr << endl;
+#endif
+
+	if( addr.size() > 0 ){
+		destAddr = addr;
+		destPort = port;
+		return true;
+	}
+
+	return false;
+}
+
+// RFC 3263 4.2 Determining Port and IP Address
+static bool lookupDestIpPort(const SipUri &uri, const string &transport,
+			     string &destAddr, int32_t &destPort)
+{
+	bool res = false;
+
+	if( !uri.isValid() )
+		return false;
+
+	string addr = uri.getIp();
+	int32_t port = uri.getPort();
+
+	if( addr.size()>0 ){
+		// TODO: Check if numeric
+#if 0
+		if( isNumericAddr( addr ) ){
+			if( !port ){
+				port = getDefaultPort( transport );
+				res = true;
+			}
+		}
+		// Not numeric	
+		else
+#endif
+		if( port ){
+			// Lookup A or AAAA
+			res = true;
+		}
+		// Lookup SRV
+		else if( lookupDestSrv( uri.getIp(), transport,
+					addr, port )){
+			res = true;
+		}
+		else{
+			// Lookup A or AAAA
+			port = getDefaultPort( transport );
+			res = true;
+		}
+	}
+
+	if( res ){
+		destAddr = addr;
+		destPort = port;
+	}
+
+	return res;
+}
+
+
+// Impl RFC 3263 (partly)
 static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &destAddr,
 			   int32_t &destPort, string &destTransport)
 {
 	if( pack->getType() == SipResponse::type ){
+		// RFC 3263, 5 Server Usage
 		// Send responses to sent by address in top via.
 
 		MRef<SipHeaderValueVia*> via = pack->getFirstVia();
@@ -501,6 +590,8 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 		}
 	}
 	else{
+		// RFC 3263, 4 Client Usage
+
 		// Send requests to address in first route if the route set
 		// is non-empty, or directly to the reqeuest uri if the 
 		// route set is empty.
@@ -522,19 +613,13 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 		}
 
 		if( uri.isValid() ){
+			// RFC 3263, 4.1 Selecting a Transport Protocol
+			// TODO: Support NAPTR
+
 			//destAddr = IPAddress::create( uri.getIp() );
 			destAddr = uri.getIp();
 			
 			if( /*destAddr*/ destAddr.size()>0 ){
-				destPort = uri.getPort();
-				if( !destPort ){
-					if( uri.getProtocolId() == "sips" ){
-						destPort = 5061;
-					}
-					else{
-						destPort = 5060;
-					}
-				}
 				destTransport = uri.getTransport();
 				if( destTransport.length() == 0 ){
 					if( uri.getProtocolId() == "sips" )
@@ -542,7 +627,8 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 					else
 						destTransport = "UDP";
 				}
-				return true;
+				return lookupDestIpPort(uri, destTransport, 
+							destAddr, destPort);
 			}
 		}
 	}
@@ -617,6 +703,10 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 	MRef<Socket *> socket;
 	MRef<IPAddress *> tempAddr;
 	//IPAddress *destAddr = &ip_addr;
+
+#ifdef DEBUG_OUTPUT
+	cerr << "SipLayerTransport:  sendMessage addr=" << ip_addr << ", port=" << port << endl;
+#endif
 
 				
 	try{
