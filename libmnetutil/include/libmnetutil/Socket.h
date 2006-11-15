@@ -48,6 +48,8 @@
 #	endif
 #endif
 
+class IPAddress;
+
 class LIBMNETUTIL_API Socket : public MObject {
 	public:
 		Socket();
@@ -67,6 +69,8 @@ class LIBMNETUTIL_API Socket : public MObject {
 					   // this proxy).
 
 		virtual int getAddressFamily();
+
+		virtual MRef<IPAddress *> getLocalAddress() const;
 
 //#ifdef _WIN32_WCE
 /* Undef this ... it causes a link problem ... */

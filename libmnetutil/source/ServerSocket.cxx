@@ -52,6 +52,7 @@ typedef int socklen_t;
 #endif
 
 ServerSocket::ServerSocket(int32_t domain, int32_t listenport){
+	type = SOCKET_TYPE_TCP;
 	this->domain=domain;
 	this->listen_port=listenport;
 	fd = (int32_t)::socket(domain, SOCK_STREAM, IPPROTO_TCP);

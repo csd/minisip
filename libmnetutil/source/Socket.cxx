@@ -74,6 +74,12 @@ int Socket::getAddressFamily()
 }
 
 int32_t Socket::getPort(){
+	MRef<IPAddress *> addr = getLocalAddress();
+	int32_t port2 = addr->getPort();
+	return port2;
+}
+
+MRef<IPAddress *> Socket::getLocalAddress() const{
 	struct sockaddr_storage sa;
 	socklen_t sz = sizeof(sa);
 	if (getsockname(fd, (struct sockaddr *)&sa, &sz)){
@@ -81,8 +87,7 @@ int32_t Socket::getPort(){
 	}
 
 	MRef<IPAddress *> addr = IPAddress::create((struct sockaddr*)&sa, sz);
-	int32_t port2 = addr->getPort();
-	return port2;
+	return addr;
 }
 
 
