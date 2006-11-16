@@ -42,7 +42,7 @@ class LIBMNETUTIL_API IP6Address : public IPAddress {
 		virtual int32_t getPort() const;
 		virtual std::string getString() const;
 		virtual void connect(Socket &socket, int32_t port);
-		friend std::ostream& operator<<(std::ostream&, IP6Address &a);
+		friend std::ostream& operator<<(std::ostream&, const IP6Address &a);
 
 		virtual struct sockaddr *getSockaddrptr(int32_t port=0) const;
 		virtual int32_t getSockaddrLength() const;

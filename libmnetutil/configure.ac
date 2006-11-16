@@ -24,7 +24,7 @@ AM_MINISIP_ENABLE_IPV6
 dnl networking headers
 AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
 AC_CHECK_HEADERS([ifaddrs.h netdb.h sys/socket.h])
-AC_CHECK_FUNCS([getifaddrs])
+AC_CHECK_FUNCS([getifaddrs getnameinfo])
 AM_MINISIP_CHECK_IPV6
 
 AC_ARG_ENABLE(srp,

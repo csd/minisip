@@ -52,6 +52,26 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 
 using namespace std;
 
+#ifdef HAVE_GETNAMEINFO
+string buildAddressString(const struct sockaddr *sa, socklen_t salen)
+{
+	char buf[INET6_ADDRSTRLEN+1] = "";
+
+	memset(buf, 0, sizeof(buf));
+	int res = getnameinfo( sa, salen, buf, sizeof(buf),
+			       NULL, 0, NI_NUMERICHOST );
+
+	if( res < 0 ){
+		throw ResolvError( res );
+	}
+	else {
+		return buf;
+	}
+}
+#else
+#error getnameinfo required when enabling ipv6
+#endif	// HAVE_GETNAMEINFO
+
 /*
 **
 ** Alg:	1. Convert address to binary format
@@ -61,20 +81,19 @@ using namespace std;
 IP6Address::IP6Address(string addr){
 	sockaddress = new sockaddr_in6;
 	type = IP_ADDRESS_TYPE_V6;
-	ipaddr = addr;
 
 	setAddressFamily(AF_INET6);
 	setProtocolFamily(PF_INET6);
 #ifndef WIN32
-	hostent *hp= gethostbyname2(ipaddr.c_str(), AF_INET6);	
+	hostent *hp= gethostbyname2(addr.c_str(), AF_INET6);	
 #else
-	hostent *hp= gethostbyname(ipaddr.c_str());	
+	hostent *hp= gethostbyname(addr.c_str());	
 #endif
 	if (!hp){ //throw host not found exception here
 #ifdef DEBUG_OUTPUT
-		cerr << "ERROR:(in IP6Address) Unknown host: <" << ipaddr.c_str() <<">"<< endl;
+		cerr << "ERROR:(in IP6Address) Unknown host: <" << addr.c_str() <<">"<< endl;
 #endif
-		throw HostNotFound( ipaddr );
+		throw HostNotFound( addr );
 
 	}
 	unsigned short *ip = (unsigned short *)hp->h_addr;
@@ -82,11 +101,13 @@ IP6Address::IP6Address(string addr){
 		num_ip[i] = ip[i];
 
 	//bzero((char*)&sockaddress, sizeof(sockaddress));
-	memset(sockaddress, '\0', sizeof(sockaddress));
+	memset(sockaddress, '\0', sizeof(*sockaddress));
 	sockaddress->sin6_family=PF_INET6;
 	sockaddress->sin6_port=0;
 	//bcopy(hp->h_addr,(char *)&sockaddress.sin6_addr, hp->h_length);
 	memcpy(&sockaddress->sin6_addr,hp->h_addr, hp->h_length);
+
+ 	ipaddr = buildAddressString((struct sockaddr*)sockaddress, sizeof(struct sockaddr_in6));
 }
 
 IP6Address::IP6Address(struct sockaddr_in6 * addr){
@@ -111,6 +132,7 @@ IP6Address::IP6Address(struct sockaddr_in6 * addr){
 #endif
 #endif
 
+	ipaddr = buildAddressString((struct sockaddr*)addr, sizeof(struct sockaddr_in6));
 }
 
 
@@ -119,7 +141,7 @@ IP6Address::IP6Address(const IP6Address& other){
 	setAddressFamily(AF_INET6);
 	setProtocolFamily(PF_INET6);
 	ipaddr = other.ipaddr;
-	memcpy( num_ip, other.num_ip, 8 );
+	memcpy( num_ip, other.num_ip, sizeof(num_ip) );
 	sockaddress = new sockaddr_in6;
 	memcpy(sockaddress, other.sockaddress, sizeof(sockaddr_in6));
 }
@@ -148,27 +170,10 @@ int32_t IP6Address::getPort() const
 }
 
 void IP6Address::connect(Socket &socket, int32_t port){
-#ifndef WIN32
-	struct hostent *hp = gethostbyname2(ipaddr.c_str(), AF_INET6);
-#else
-	struct hostent *hp = gethostbyname(ipaddr.c_str());
-#endif
-	if (!hp){ //throw host not found exception here
-#ifdef DEBUG_OUTPUT
-		cerr << "ERROR:(in IP6Address::connect) Unknown host: " << ipaddr << endl;
-#endif
-
-		throw HostNotFound( ipaddr );
-	}
-	
 	struct sockaddr_in6 sin;
-	//bzero((char*)&sin, sizeof(sin));
-	memset(&sin,'\0', sizeof(sin));
-	sin.sin6_family = AF_INET6;
-	//bcopy(hp->h_addr, (char *)&sin.sin6_addr, hp->h_length);
-	memcpy( &sin.sin6_addr,hp->h_addr, hp->h_length);
+	memcpy(&sin, sockaddress, sizeof(sin));
 	sin.sin6_port = htons( (unsigned short)port );
-	
+
 	if (::connect(socket.getFd(), (struct sockaddr *)&sin, sizeof(sin)) < 0){
 		merror("(in IP6Address::connect()): connect");
 		socket.close();
@@ -177,7 +182,7 @@ void IP6Address::connect(Socket &socket, int32_t port){
 
 }
 
-ostream& operator<<(ostream& out, IP6Address &a){
+ostream& operator<<(ostream& out, const IP6Address &a){
 	out << a.ipaddr;
 	
 	unsigned short *ip = (unsigned short*)&a.num_ip;
