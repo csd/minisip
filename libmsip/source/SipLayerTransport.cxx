@@ -486,8 +486,8 @@ static bool lookupDestSrv(const string &domain, const string &transport,
 	string srv;
 	uint16_t port = 0;
 
-	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
-	else if( transport == "TCP" || transport == "tls") { srv = "_sip._tcp"; }
+	if( transport == "TLS" || transport == "tls") { srv = "_sips._tls"; }
+	else if( transport == "TCP" || transport == "tcp") { srv = "_sip._tcp"; }
 	else { //if( trans == "UDP" || trans == "udp") { 	
 		srv = "_sip._udp"; 
 	}
