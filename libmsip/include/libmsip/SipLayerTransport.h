@@ -95,15 +95,15 @@ class SipLayerTransport : public SipSMCommandReceiver {
 
 		void addSocket(MRef<StreamSocket *> sock);
 
-		std::string getLocalIP(){return localIP;};
+		std::string getLocalIP();
 
-		int32_t getLocalUDPPort(){return localUDPPort;};
-		int32_t getLocalTCPPort(){return localTCPPort;};
-		int32_t getLocalTLSPort(){return localTLSPort;};
+		int32_t getLocalUDPPort();
+		int32_t getLocalTCPPort();
+		int32_t getLocalTLSPort();
 
-		MRef<certificate_chain *> getCertificateChain(){ return cert_chain; };
-		MRef<certificate*> getMyCertificate(){ return cert_chain->get_first(); };
-		MRef<ca_db *> getCA_db () { return cert_db; };
+		MRef<certificate_chain *> getCertificateChain();
+		MRef<certificate*> getMyCertificate();
+		MRef<ca_db *> getCA_db ();
 
 		void udpSocketRead();
 

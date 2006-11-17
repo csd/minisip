@@ -157,7 +157,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * get the Call-Id of the dialog
 		 * @return string containing the Call-Id
 		 */
-		std::string getCallId(){return dialogState.callId;}
+		std::string getCallId();
 		
 		MRef<SipStack*> getSipStack();
 
@@ -172,7 +172,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 //		void registerTransactionToDialog(MRef<SipTransaction*> trans);
 
-		std::list<std::string> getRouteSet(){return dialogState.routeSet;}
+		std::list<std::string> getRouteSet();
 		
 		/**
 		 * Add the dialog route set if the dialog is established, 
@@ -185,7 +185,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * transactions that have the same call id as this 
 		 * dialog).
 		 */
-                std::list<MRef<SipTransaction*> > getTransactions();//{return transactions;}
+                std::list<MRef<SipTransaction*> > getTransactions();
 
 		SipDialogState dialogState;
 

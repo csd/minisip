@@ -84,6 +84,14 @@ MRef<SipDialogConfig*> SipDialog::getDialogConfig(){
 	return callConfig;
 }
 
+std::list<std::string> SipDialog::getRouteSet(){
+	return dialogState.routeSet;
+}
+
+std::string SipDialog::getCallId(){
+	return dialogState.callId;
+}
+
 void SipDialog::handleTimeout(const string &c){
 	SipSMCommand cmd( 
 			CommandString(dialogState.callId, c), 

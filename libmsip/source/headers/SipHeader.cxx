@@ -69,7 +69,17 @@ SipHeaderParameter::SipHeaderParameter(string k, string val, bool equalSign):key
 	
 }
 
+std::string SipHeaderParameter::getKey() const {
+	return key;
+}
 
+std::string SipHeaderParameter::getValue() const {
+	return value;
+}
+
+void SipHeaderParameter::setValue(std::string v){
+	value=v;
+}
 
 string SipHeaderParameter::getString() const{
 	if (hasEqual || value.size()>0){
@@ -126,6 +136,19 @@ string SipHeader::getString() const{
 		ret+=headerValues[i]->getStringWithParameters();
 	}
 	return ret;
+}
+
+int32_t SipHeader::getType() const {
+	return type;
+}
+
+int SipHeader::getNoValues() const {
+	return headerValues.size();
+}
+
+MRef<SipHeaderValue *> SipHeader::getHeaderValue(int i) const {
+	assert(i < headerValues.size() );
+	return headerValues[i];
 }
 
 void SipHeader::addHeaderValue(MRef<SipHeaderValue*> v){
@@ -287,6 +310,57 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 SipHeaderValue::SipHeaderValue(int t, const string &hname):headerName(hname),type(t){
 
+}
+
+
+void SipHeaderValue::setParameter(std::string key, std::string val){
+	if (val.size()>0){
+		MRef<SipHeaderParameter*> param = new SipHeaderParameter(key,val,true);
+		addParameter(param);
+	}else{
+		removeParameter(key);
+	}
+}
+
+void SipHeaderValue::addParameter(MRef<SipHeaderParameter*> p){
+	//If key already exist, change the existing value
+	//(a key can only exist once)
+	for (int i=0; i< parameters.size();i++){
+		if (parameters[i]->getKey()==p->getKey()){
+			parameters[i]->setValue(p->getValue());
+			//cerr<<"p->getValue() "+p->getValue()<<endl;
+			return;
+		}
+	}
+	parameters.push_back(p);
+}
+
+bool SipHeaderValue::hasParameter(const std::string &key) const {
+	for (int i=0; i< parameters.size();i++){
+		if (parameters[i]->getKey()==key){
+			return true;
+		}
+	}
+	return false;
+}
+
+
+std::string SipHeaderValue::getParameter(std::string key) const {
+	for (int i=0; i< parameters.size();i++){
+		if (parameters[i]->getKey()==key){
+			return parameters[i]->getValue();
+		}
+	}
+	return "";
+}
+
+void SipHeaderValue::removeParameter(std::string key){
+	for (int i=0; i< parameters.size(); i++){
+		if (parameters[i]->getKey()==key){
+			parameters.remove(i);
+			i=0;
+		}
+	}
 }
 
 

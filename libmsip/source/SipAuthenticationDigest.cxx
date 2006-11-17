@@ -37,6 +37,15 @@ SipAuthenticationDigest::SipAuthenticationDigest( MRef<SipHeaderValueProxyAuthen
 	update( auth );
 }
 
+const std::string &SipAuthenticationDigest::getRealm() const{ 
+	return realm; 
+}
+
+bool SipAuthenticationDigest::getStale() const{ 
+	return stale;
+}
+
+
 string unquote(string str){
 	if( str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"' )
 		return str.substr(1, str.length() - 2);

@@ -158,6 +158,39 @@ void SipTransaction::handleTimeout(const string &c){
 }
 
 
+void SipTransaction::setSocket(Socket * sock){
+	socket=sock;
+}
+
+MRef<Socket *> SipTransaction::getSocket(){
+	return socket;
+}
+
+std::string SipTransaction::getMemObjectType() const {
+	return "SipTransaction";
+}
+
+void SipTransaction::setDebugTransType(std::string t){
+	debugTransType = t;
+}
+
+std::string SipTransaction::getDebugTransType(){
+	return debugTransType;
+}
+
+int SipTransaction::getCSeqNo(){
+	return cSeqNo;
+}
+
+std::string SipTransaction::getCSeqMethod(){
+	return cSeqMethod;
+}
+
+std::string SipTransaction::getCallId(){
+	return callId;
+}
+
+
 void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 		if (br=="")
 			br = branch;

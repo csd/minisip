@@ -50,8 +50,8 @@ class LIBMSIP_API SipAuthenticationDigest: public MObject{
 		 */
 		MRef<SipHeaderValueAuthorization*> createAuthorization( MRef<SipRequest*> req) const;
 
-		const std::string &getRealm() const{ return realm; }
-		bool getStale() const{ return stale; }
+		const std::string &getRealm() const;
+		bool getStale() const;
 
 		/**
 		 * @return SIP_HEADER_TYPE_WWWAUTHENTICATE or

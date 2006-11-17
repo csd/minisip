@@ -81,7 +81,7 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 		MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *> getTimeoutProvider();
 
 		MRef<SipTimers*> getTimers();
-		MRef<SipStackConfig*> getStackConfig(){return config;}
+		MRef<SipStackConfig*> getStackConfig();
 
 		void addSupportedExtension(std::string extension);
 		std::string getAllSupportedExtensionsStr();

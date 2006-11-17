@@ -152,6 +152,10 @@ MRef<SipCommandDispatcher*> SipStackInternal::getDispatcher(){
 	return dispatcher;
 }
 
+MRef<SipStackConfig*> SipStackInternal::getStackConfig(){
+	return config;
+}
+
 void SipStackInternal::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
 	dispatcher->getLayerDialog()->setDefaultDialogCommandHandler(cb);
 }

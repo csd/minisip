@@ -93,17 +93,17 @@ class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 		void setBranch(std::string branch);
 				
 		void send(MRef<SipMessage*>  pack, bool addVia, std::string branch=""); // if not specified branch, use the attribute one - ok in most cases.
-		void setSocket(Socket * sock){socket=sock;};
-		MRef<Socket *> getSocket(){return socket;};
+		void setSocket(Socket * sock);
+		MRef<Socket *> getSocket();
 
-		virtual std::string getMemObjectType() const {return "SipTransaction";}
-		void setDebugTransType(std::string t){debugTransType = t;}
-		std::string getDebugTransType(){return debugTransType;}
+		virtual std::string getMemObjectType() const;
+		void setDebugTransType(std::string t);
+		std::string getDebugTransType();
 
-		int getCSeqNo(){return cSeqNo;}
-		std::string getCSeqMethod(){return cSeqMethod;}
+		int getCSeqNo();
+		std::string getCSeqMethod();
                 
-		std::string getCallId(){return callId;}
+		std::string getCallId();
 
 		//The transition to cancel a transaction is common to all
 		//transactions and is defined in this class.

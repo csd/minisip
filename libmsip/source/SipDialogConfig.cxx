@@ -124,6 +124,13 @@ SipUri SipProxy::findProxy(const SipUri &uri, const string &transport){
 	return proxyUri;
 }
 
+int SipProxy::getRegisterExpires_int( ) {
+	return registerExpires;
+}
+
+int SipProxy::getDefaultExpires_int( ) {
+	return defaultExpires;
+}
 
 void SipProxy::setRegisterExpires( string _expires ) {
 	int r;
@@ -192,10 +199,47 @@ SipIdentity::SipIdentity(const SipUri &addr) : sipUri(addr),securityEnabled(fals
 	setIsRegistered (false);
 }
 
+void SipIdentity::setDoRegister(bool f){
+	lock();
+	registerToProxy=f;
+	unlock();
+}
+
+bool SipIdentity::getDoRegister(){
+	lock();
+	bool ret = registerToProxy;
+	unlock();
+	return ret;
+}
+
+void SipIdentity::lock(){
+	mutex.lock();
+}
+
+void SipIdentity::unlock(){
+	mutex.unlock();
+}
+
+std::string SipIdentity::getId() {
+	lock();
+	std::string ret = identityIdx;
+	unlock();
+	return ret;
+}
+
+bool SipIdentity::isRegistered(){
+	lock();
+	bool ret = currentlyRegistered;
+	unlock();
+	return ret;
+}
+
+
+
 #if 0
 void SipIdentity::setSipUri(string addr){
 	if (addr.substr(0,4)=="sip:")
-			addr = addr.substr(4);
+		addr = addr.substr(4);
 	if (addr.find("@")==string::npos){
 			#ifdef DEBUG_OUTPUT	
 			cerr << "WARNING: Incomplete sip address: "<< addr<<endl;

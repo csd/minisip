@@ -46,23 +46,23 @@ bool LIBMSIP_API sipResponseFilterMatch(MRef<SipResponse*> resp, const std::stri
 bool LIBMSIP_API transitionMatch(
 		const std::string& packetType,
 		const SipSMCommand &command,
-		int source/*=IGN*/,
-		int destination/*=IGN*/,
+		int source,
+		int destination,
 		const std::string &respFilter="");
 
 /** Match Sip responses */
 bool LIBMSIP_API transitionMatchSipResponse(
 		const std::string& cseqMethod,
 		const SipSMCommand &command,
-		int source/*=IGN*/,
-		int destination/*=IGN*/,
+		int source,
+		int destination,
 		const std::string &respFilter="");
 
 bool LIBMSIP_API transitionMatch(
 		const SipSMCommand &command,
 		const std::string &cmd_str,
-		int source/*=SipSMCommand::dialog_layer*/,
-		int destination/*=SipSMCommand::dialog_layer*/);
+		int source,
+		int destination);
 
 #endif
 

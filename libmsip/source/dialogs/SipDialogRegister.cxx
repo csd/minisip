@@ -643,6 +643,22 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConf
 SipDialogRegister::~SipDialogRegister(){
 }
 
+void SipDialogRegister::updateFailCount(){
+	failCount++;
+}
+
+uint32_t SipDialogRegister::getFailCount(){
+	return failCount;
+}
+
+bool SipDialogRegister::getGuiFeedback(){
+	return guiFeedback;
+}
+
+void SipDialogRegister::setGuiFeedback(bool fb){
+	guiFeedback=fb;
+}
+
 bool SipDialogRegister::hasPassword(){
 	return getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername!="" && getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword!="";
 }

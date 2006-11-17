@@ -136,38 +136,22 @@ class LIBMSIP_API SipUri : public MObject{
 		don't use if not valid.
 		If invalid and used, the getXXXString functions will return nothing
 		*/
-		bool isValid() const { return validUri; };
+		bool isValid() const;
 		
 		/**
 		Use at your own risk ... forces uri in a (in)valid state
 		*/
-		void makeValid( bool valid ) { validUri = valid; };
+		void makeValid( bool valid );
 		
 		void clear();
 
-		void setParameter(const std::string &key, const std::string &val){
-			parameters[ key ] = val;
-		}
+		void setParameter(const std::string &key, const std::string &val);
 
-		bool hasParameter(const std::string &key) const{
-			std::map<std::string, std::string>::const_iterator iter;
-			iter = parameters.find( key );
+		bool hasParameter(const std::string &key) const;
 
-			return iter != parameters.end();
-		}
+		std::string getParameter(const std::string &key) const;
 
-		std::string getParameter(const std::string &key) const{
-			std::map<std::string, std::string>::const_iterator iter;
-			iter = parameters.find( key );
-			if( iter != parameters.end() )
-				return iter->second;
-			else
-				return "";
-		}
-
-		void removeParameter(const std::string &key){
-			parameters.erase( key );
-		}
+		void removeParameter(const std::string &key);
 
 	private:
 		std::string displayName;

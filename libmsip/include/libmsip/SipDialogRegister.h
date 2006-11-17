@@ -45,13 +45,13 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		
 		virtual std::string getMemObjectType() const {return "SipDialogRegister";}
 		
-		void updateFailCount(){failCount++;};
-		uint32_t getFailCount(){return failCount;};
+		void updateFailCount();
+		uint32_t getFailCount();
 
 		bool hasPassword();
 
-		bool getGuiFeedback(){return guiFeedback;}
-		void setGuiFeedback(bool fb){guiFeedback=fb;}
+		bool getGuiFeedback();
+		void setGuiFeedback(bool fb);
 
 		void send_register(std::string branch);
 	private:

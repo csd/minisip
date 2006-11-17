@@ -96,9 +96,9 @@ class LIBMSIP_API SipHeaderParameter:public MObject{
 		SipHeaderParameter(std::string parseFrom);
 		SipHeaderParameter(std::string key, std::string value, bool hasEqual);	//hasEqual is there to support ;lr
 		std::string getMemObjectType() const {return "SipHeaderParameter";}
-		std::string getKey() const {return key;}
-		std::string getValue() const {return value;}
-		void setValue(std::string v){value=v;}
+		std::string getKey() const;
+		std::string getValue() const;
+		void setValue(std::string v);
 		std::string getString() const;
 		
 	private:
@@ -114,55 +114,15 @@ class LIBMSIP_API SipHeaderValue : public MObject{
 		virtual std::string getString() const =0;	
 		int getType(){return type;}
 
-		void setParameter(std::string key, std::string val){
-			if (val.size()>0){
-				MRef<SipHeaderParameter*> param = new SipHeaderParameter(key,val,true);
-				addParameter(param);
-			}else{
-				removeParameter(key);
-			}
-		}
+		void setParameter(std::string key, std::string val);
 
-		void addParameter(MRef<SipHeaderParameter*> p){
-			//If key already exist, change the existing value
-			//(a key can only exist once)
-			for (int i=0; i< parameters.size();i++){
-				if (parameters[i]->getKey()==p->getKey()){
-					parameters[i]->setValue(p->getValue());
-					//cerr<<"p->getValue() "+p->getValue()<<endl;
-					return;
-				}
-			}
-			parameters.push_back(p);
-		}
+		void addParameter(MRef<SipHeaderParameter*> p);
 
-		bool hasParameter(const std::string &key) const {
-			for (int i=0; i< parameters.size();i++){
-				if (parameters[i]->getKey()==key){
-					return true;
-				}
-			}
-			return false;
-		}
+		bool hasParameter(const std::string &key) const;
 
-		std::string getParameter(std::string key) const {
-			for (int i=0; i< parameters.size();i++){
-				if (parameters[i]->getKey()==key){
-					return parameters[i]->getValue();
-				}
-			}
-			return "";
-		}
+		std::string getParameter(std::string key) const;
 
-		void removeParameter(std::string key){
-			for (int i=0; i< parameters.size(); i++){
-				if (parameters[i]->getKey()==key){
-					parameters.remove(i);
-					i=0;
-				}
-			}
-		
-		}
+		void removeParameter(std::string key);
 
 		std::string getStringWithParameters() const ;
 
@@ -195,12 +155,9 @@ class LIBMSIP_API SipHeader : public MObject{
 
                 virtual std::string getMemObjectType() const {return "SipHeader";}
 
-		int32_t getType() const {return type;}
-		int getNoValues() const {return headerValues.size();}
-		MRef<SipHeaderValue *> getHeaderValue(int i) const {
-			assert(i < headerValues.size() );
-			return headerValues[i];
-		}
+		int32_t getType() const;
+		int getNoValues() const;
+		MRef<SipHeaderValue *> getHeaderValue(int i) const;
 
 		static MRef<SipHeader *> parseHeader(const std::string &buildFrom);
 

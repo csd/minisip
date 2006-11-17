@@ -67,6 +67,10 @@ void SipLayerDialog::addDialog(MRef<SipDialog*> d){
 	dialogListLock.unlock();
 }
 
+void SipLayerDialog::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
+	defaultHandler=cb;
+}
+
 //TODO: Optimize how dialogs are found based on callid parameter.
 bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 	assert(c.getDestination()==SipSMCommand::dialog_layer);

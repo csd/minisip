@@ -96,12 +96,12 @@ class LIBMSIP_API SipProxy : public MObject{
 		void setRegisterExpires( std::string _expires );
 		void setRegisterExpires( int _expires );
 		std::string getRegisterExpires( );
-		int getRegisterExpires_int( ) {return registerExpires;}
+		int getRegisterExpires_int( );
 		
 		void setDefaultExpires( std::string _expires );
 		void setDefaultExpires( int _expires );
 		std::string getDefaultExpires( );
-		int getDefaultExpires_int( ) {return defaultExpires;}
+		int getDefaultExpires_int( );
 
 		const SipUri getUri() const{ return uri; }
 
@@ -148,7 +148,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		SipIdentity();
 		SipIdentity(const SipUri &sipuri);
 
-		void setIdentityName(std::string n);//{identityIdentifier = n;}
+		void setIdentityName(std::string n);
 		
 		void setSipUri(const SipUri &addr) { sipUri = addr; }
 		
@@ -176,21 +176,12 @@ class LIBMSIP_API SipIdentity : public MObject{
 		*/
 		std::string setSipProxy( bool autodetect, std::string userUri, std::string transport, std::string proxyAddr, int port );
 		
-		void setDoRegister(bool f){
-			lock();
-			registerToProxy=f;
-			unlock();
-		}
+		void setDoRegister(bool f);
 
-		bool getDoRegister(){
-			lock();
-			bool ret = registerToProxy;
-			unlock();
-			return ret;
-		}
+		bool getDoRegister();
 
-		void lock(){mutex.lock();};
-		void unlock(){mutex.unlock();};
+		void lock();
+		void unlock();
 		
 		std::string getDebugString();
 
@@ -199,12 +190,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		/**
 		This identities index number. Useful to identify it across minisip.
 		*/
-		std::string getId() { 
-			lock();
-			std::string ret = identityIdx; 
-			unlock();
-			return ret;
-		}
+		std::string getId();
 		
 		std::string identityIdentifier;
 
@@ -226,11 +212,7 @@ class LIBMSIP_API SipIdentity : public MObject{
 		/**
 		True if this identity is currently registered, false otherwise.
 		*/
-		bool isRegistered() {
-			lock();
-			bool ret = currentlyRegistered;
-			unlock();
-			return ret;}
+		bool isRegistered();
 		
 		void setSim(MRef<SipSim*> s){sim=s;}
 

@@ -387,6 +387,39 @@ string SipUri::getTransport() const {
 	return getParameter( "transport" );
 }
 
+void SipUri::setParameter(const std::string &key, const std::string &val){
+	parameters[ key ] = val;
+}
+
+bool SipUri::hasParameter(const std::string &key) const{
+	std::map<std::string, std::string>::const_iterator iter;
+	iter = parameters.find( key );
+
+	return iter != parameters.end();
+}
+
+std::string SipUri::getParameter(const std::string &key) const{
+	std::map<std::string, std::string>::const_iterator iter;
+	iter = parameters.find( key );
+	if( iter != parameters.end() )
+		return iter->second;
+	else
+		return "";
+}
+
+void SipUri::removeParameter(const std::string &key){
+	parameters.erase( key );
+}
+
+bool SipUri::isValid() const { 
+	return validUri;
+}
+
+void SipUri::makeValid( bool valid ) { 
+	validUri = valid; 
+}
+
+
 ostream& operator << (ostream& os, const SipUri& uri){
 	return os << uri.getString();
 }

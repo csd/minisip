@@ -863,6 +863,35 @@ static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
 	}
 }
 
+std::string SipLayerTransport::getLocalIP(){
+	return localIP;
+}
+
+int32_t SipLayerTransport::getLocalUDPPort(){
+	return localUDPPort;
+}
+
+int32_t SipLayerTransport::getLocalTCPPort(){
+	return localTCPPort;
+}
+
+int32_t SipLayerTransport::getLocalTLSPort(){
+	return localTLSPort;
+}
+
+MRef<certificate_chain *> SipLayerTransport::getCertificateChain(){ 
+	return cert_chain; 
+}
+
+MRef<certificate*> SipLayerTransport::getMyCertificate(){ 
+	return cert_chain->get_first();
+}
+
+MRef<ca_db *> SipLayerTransport::getCA_db () {
+	return cert_db;
+}
+
+
 
 #define UDP_MAX_SIZE 65536
 
@@ -1107,4 +1136,6 @@ static void * udpThread( void * arg ){
 	trans->udpSocketRead();
 	return NULL;
 }
+
+
 
