@@ -491,85 +491,37 @@ string SipDialogState::getRemoteTarget() {
 
 std::string SipDialog::getDialogDebugString(){
 
+	string ret;
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
 		sipStack->getTimeoutProvider()->getTimeoutRequests();
 
-	cerr << (getName() + "   State: " + getCurrentStateName())<< endl;
+	ret = getName() + "   State: " + getCurrentStateName()+"\n";
 
 
-	cerr << BOLD << "        SipDialogState: "<< PLAIN << endl;
-	cerr <<         "            secure="<<dialogState.secure 
-			<<"; localTag="<<dialogState.localTag
-			<<"; remoteTag="<<dialogState.remoteTag 
-			<<"; seqNo="<< dialogState.seqNo
-			<<"; remoteSeqNo="<< dialogState.remoteSeqNo
-			<<"; remoteUri="<< dialogState.remoteUri
-			<<"; remoteTarget="<<dialogState.remoteTarget
-			<<"; isEarly="<<dialogState.isEarly
-			<< endl;
-	cerr <<         "            route_set: ";
+	ret+= "        SipDialogState: \n" 
+	      "            secure=" + string(dialogState.secure?"true":"false")
+			+ string("; callId=") + dialogState.callId
+			+ "; localTag=" + dialogState.localTag
+			+ "; remoteTag=" + dialogState.remoteTag 
+			+ "; seqNo=" + itoa(dialogState.seqNo)
+			+ "; remoteSeqNo=" + itoa(dialogState.remoteSeqNo)
+			+ "; remoteUri=" + dialogState.remoteUri
+			+ "; remoteTarget=" + dialogState.remoteTarget
+			+ string("; isEarly=") + string(dialogState.isEarly?"true":"false")
+			+ "\n";
+	ret+= "            route_set: ";
 	
 	list<string>::iterator i;
 	for (i=dialogState.routeSet.begin(); i!= dialogState.routeSet.end(); i++){
 		if (i!=dialogState.routeSet.begin())
-			cerr << ",";
-		cerr << *i;
+			ret += ",";
+		ret+= *i;
 	}
-	cerr <<endl;
+	ret+="\n";
 	
-	cerr << BOLD << "        Identity: "<< PLAIN << endl;
-	cerr <<         "            "<< getDialogConfig()->sipIdentity->getDebugString();
-	cerr <<endl;
-/*	
-	cerr << BOLD << "        Timeouts:"<< PLAIN << endl;
-	int ntimeouts=0;
-	std::list<TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > >::iterator jj=torequests.begin();
-	for (uint32_t j=0; j< torequests.size(); j++,jj++){
-		if ( this == *((*jj).getSubscriber()) ){
-			int ms= (*jj).getMsToTimeout();
-			cerr << string("            timeout: ")+ (*jj).getCommand()
-				+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000) << endl;
-			ntimeouts++;
-		}
-	}
-	if (ntimeouts==0){
-		cerr << "            (no timeouts)"<< endl;
-	}
-
-
-	cerr << BOLD << "        Transactions:"<< PLAIN << endl;
-	list<MRef<SipTransaction*> > transactions = getTransactions();
-	if (transactions.size()==0)
-		cerr << "            (no transactions)"<< endl;
-	else{
-		int n=0;
-		for (list<MRef<SipTransaction*> >::iterator i = transactions.begin();
-				i!=transactions.end(); i++){
-			cerr << string("            (")+itoa(n)+") "+
-				(*i)->getName() 
-				+ "   State: "
-				+ (*i)->getCurrentStateName() << endl;
-			n++;
-
-			cerr << BOLD << "                Timeouts:" << PLAIN << endl;
-
-			int ntimeouts=0;
-			std::list<TPRequest<string,   MRef<StateMachine<SipSMCommand,string>*>  > >::iterator jj=torequests.begin();
-			for (uint32_t j=0; j< torequests.size(); j++, jj++){
-				if ( *((*i)) == *((*jj).getSubscriber()) ){
-					int ms= (*jj).getMsToTimeout();
-					cerr << string("                        timeout: ")
-						+ (*jj).getCommand()
-						+ "  Time: " + itoa(ms/1000) + "." + itoa(ms%1000)<< endl;
-					ntimeouts++;
-				}
-			}
-			if (ntimeouts==0)
-				cerr << "                        (no timeouts)"<< endl;
-		}
-	}
-*/
-
-	return "";
+	ret+= "        Identity: \n";
+	ret+= "            " + getDialogConfig()->sipIdentity->getDebugString();
+	ret+="\n";
+	return ret;
 }
 
