@@ -47,6 +47,10 @@ CondVar::~CondVar(){
 	internalStruct=NULL;
 }
 
+std::string CondVar::getMemObjectType() const {
+	return "StringAtom";
+}
+
 void CondVar::wait( Mutex &mutex, uint32_t timeout ){
 	mutex.unlock();
 	wait( timeout );

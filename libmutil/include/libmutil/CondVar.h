@@ -53,7 +53,7 @@ class LIBMUTIL_API CondVar : public MObject{
 		//get this functionality (this method was deprecated
 		//because of difficulties of supporting it on Windows)
 
-		std::string getMemObjectType() const {return "CondVar";}
+		std::string getMemObjectType() const;
 
 	private:
 		void * internalStruct;

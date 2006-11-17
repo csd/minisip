@@ -49,6 +49,10 @@ StringAtom::~StringAtom(){
 	n=0;
 }
 
+std::string StringAtom::getMemObjectType() const {
+	return "StringAtom";
+}
+
 char *StringAtom::getBuf() const {
 	return buf;
 }
@@ -73,6 +77,10 @@ IString::IString(const IString &s){
 
 IString::~IString(){
 
+}
+
+std::string IString::getMemObjectType() const {
+	return "IString";
 }
 
 MRef<IString*> IString::trim(){

@@ -43,6 +43,10 @@ CommandString::CommandString(string destination_id,
 	keys["param3"] = parameter3;
 }
 
+std::string CommandString::getMemObjectType() const {
+	return "CommandString";
+}
+
 CommandString::CommandString(const CommandString &smc){
 	this->keys = smc.keys;
 }

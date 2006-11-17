@@ -59,7 +59,7 @@ class LIBMUTIL_API CommandString : public MObject{
 		void setParam3(std::string param3);
 		
 		std::string getString() const;
-                virtual std::string getMemObjectType() const {return "CommandString";}
+                virtual std::string getMemObjectType() const;
 
 		std::string &operator[](std::string key);
 

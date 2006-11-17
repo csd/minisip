@@ -64,10 +64,8 @@ In the following example "name" is a attribute and FILE is an element
 class LIBMUTIL_API XMLException : public Exception{
 	public:
 		XMLException(std::string msg):
-				Exception(msg.c_str()) {/*this->msg=msg;*/};
-		//std::string what(){return msg;};
+				Exception(msg.c_str()) {};
 	private:
-		//std::string msg;
 };
 
 class LIBMUTIL_API XMLElementNotFound: public XMLException{

@@ -52,6 +52,10 @@ CondVar::~CondVar(){
 	delete INTERNAL_COND_WAIT;
 }
 
+std::string CondVar::getMemObjectType() const {
+	return "CondVar";
+}
+
 void CondVar::wait( uint32_t timeout ){
 	condvarMutex->lock();
 	wait( *condvarMutex, timeout );
