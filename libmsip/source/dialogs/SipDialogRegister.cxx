@@ -675,9 +675,9 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 	if (command.getType()==SipSMCommand::COMMAND_STRING 
 		&& (command.getDestination()==SipSMCommand::dialog_layer /*|| command.getDestination()==SipSMCommand::ANY*/)
 		&& (command.getCommandString().getOp()==SipCommandString::proxy_register)
-		&& ( command.getCommandString()["proxy_domain"]=="" 
+		&& (command.getCommandString()["identityId"] == getDialogConfig()->sipIdentity->getId() || (command.getCommandString()["identityId"] == "" && (command.getCommandString()["proxy_domain"]=="" 
 			|| command.getCommandString()["proxy_domain"]== getDialogConfig()->sipIdentity->getSipUri().getIp())
-			){
+			    ))){
 		return SipDialog::handleCommand(command);
 	}
 
