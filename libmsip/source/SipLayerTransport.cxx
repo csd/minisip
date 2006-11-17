@@ -1029,9 +1029,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	MRef<SipMessage*> pack;
 	int32_t nread;
 	fd_set set;
-	struct timeval tv;
-	tv.tv_sec = 600;
-	tv.tv_usec = 0;
 
 	
 	while( true ){
@@ -1043,6 +1040,11 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 		#endif
 
 		do{
+			struct timeval tv;
+			// Timeout needs to be set before each call to select since
+			// it should be consider undefined after select() returns.
+			tv.tv_sec = 600;
+			tv.tv_usec = 0;
 			avail = select(socket->getFd()+1,&set,NULL,NULL,&tv );
 		} while( avail <= 0 );
 
