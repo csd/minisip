@@ -80,16 +80,6 @@ class LIBMSIP_API SipProxy : public MObject{
 		
 		std::string getDebugString();
 
-		/**
-		Find the proxy settings for the given uri
-		@param uri user's AOR, from where we extract the hostpart to check for SRV
-		@param port return parameter, where the port used by the service is obtained (the hostname is
-		returned as the return param
-		@param transport transport protocol to find the host:port settings for
-		@return the proxy hostname (the port is returned by reference)
-		*/
-		static SipUri findProxy(const SipUri &uri, const std::string &transport="UDP");
-
 		std::string sipProxyUsername;
 		std::string sipProxyPassword;
 		

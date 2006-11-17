@@ -97,33 +97,6 @@ std::string SipProxy::getDebugString(){
 		+"; expires="+itoa(defaultExpires);
 }
 
-SipUri SipProxy::findProxy(const SipUri &uri, const string &transport){
-	const std::string &domain = uri.getIp();
-	
-	//Do a SRV lookup according to the transport ...
-	string srv;
-	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
-	else if( transport == "TCP" || transport == "tls") { srv = "_sip._tcp"; }
-	else { //if( trans == "UDP" || trans == "udp") { 
-		srv = "_sip._udp"; 
-	}
-
-	uint16_t port = 0;
-	std::string proxy = NetworkFunctions::getHostHandlingService(srv, domain, port);
-	#ifdef DEBUG_OUTPUT
-	cerr << "SipProxy::findProxy : srv=" << srv << "; domain=" << domain << "; port=" << port << endl;
-	#endif
-
-	if (proxy.length()<=0){
-		throw HostNotFound( "[Proxy for <" + uri.getString() + ">]" );
-	}
-
-	SipUri proxyUri(proxy);
-	proxyUri.setPort(port);
-
-	return proxyUri;
-}
-
 int SipProxy::getRegisterExpires_int( ) {
 	return registerExpires;
 }
