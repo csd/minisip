@@ -103,6 +103,7 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		
 		//shared with Dialog config
 		std::string localIpString; //GEneral->Network Interface
+		std::string localIp6String;
 		std::string externalContactIP;
 		int32_t externalContactUdpPort;
                 
@@ -127,6 +128,15 @@ class LIBMSIP_API SipStackConfig : public MObject{
                  */
                 bool use100Rel;
 
+		/**
+		 * The certificate chain is used by TLS
+		 */
+		MRef<certificate_chain *> cert;
+
+		/**
+		* TODO: TLS should use the whole chain instead of only the first certificate --EE
+		*/
+		MRef<ca_db *> cert_db;
 };
 
 
@@ -168,11 +178,7 @@ class LIBMSIP_API SipStackConfig : public MObject{
 */
 class LIBMSIP_API SipStack : public Runnable{
 	public:
-		SipStack( MRef<SipStackConfig*> stackConfig,
-				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
-								//TODO: TLS should use the whole chain instead of only the first certificate --EE
-				MRef<ca_db *> cert_db = NULL
-			  );
+		SipStack( MRef<SipStackConfig*> stackConfig );
 
 		~SipStack();
 		
@@ -200,6 +206,7 @@ class LIBMSIP_API SipStack : public Runnable{
 
 		std::list<MRef<SipDialog *> > getDialogs();
 
+		void startUdpServer();
 		void startTcpServer();
 		void startTlsServer();
 

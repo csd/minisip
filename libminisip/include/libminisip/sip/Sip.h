@@ -45,17 +45,7 @@ class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
-				MRef<MediaHandler*> mediaHandler,
-				std::string localIpString,
-				std::string externalContactIP,
-				int32_t localUdpPort=5060,
-				int32_t localTcpPort=5060,
-				int32_t externalContactUdpPort=5060,
-				int32_t localTlsPort=5061,
-				MRef<certificate_chain *> cert=NULL,    //The certificate chain is used by TLS
-				//TODO: TLS should use the whole chain instead of only the f$
-				MRef<ca_db *> cert_db = NULL
-		    );
+		    MRef<MediaHandler*> mediaHandler);
 
 		virtual ~Sip();
 

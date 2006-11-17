@@ -71,11 +71,8 @@ using namespace std;
 
 #define STACK (*(MRef<SipStackInternal*> *) sipStackInternal)
 
-SipStack::SipStack( MRef<SipStackConfig *> stackConfig,
-		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db){
-	
-	SipStackInternal *istack = new SipStackInternal(stackConfig, cert_chain, cert_db);
+SipStack::SipStack( MRef<SipStackConfig *> stackConfig ){
+	SipStackInternal *istack = new SipStackInternal(stackConfig);
 
 	sipStackInternal = new MRef<SipStackInternal*>(istack);
 }
@@ -173,12 +170,16 @@ void SipStack::setDialogManagement(MRef<SipDialog*> mgmt){
 	STACK->getDispatcher()->setDialogManagement(mgmt);
 }
 
+void SipStack::startUdpServer(){
+	STACK->startUdpServer();
+}
+
 void SipStack::startTcpServer(){
-	STACK->getDispatcher()->getLayerTransport()->startTcpServer();
+	STACK->startTcpServer();
 }
 
 void SipStack::startTlsServer(){
-	STACK->getDispatcher()->getLayerTransport()->startTlsServer();
+	STACK->startTlsServer();
 }
 
 void SipStack::setDebugPrintPackets(bool enable){

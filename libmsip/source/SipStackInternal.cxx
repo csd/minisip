@@ -14,11 +14,12 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 #include<config.h>
 #include<libmsip/SipStackInternal.h>
@@ -60,6 +61,8 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipCommandString.h>
+#include<libmnetutil/UDPSocket.h>
+#include<libmnetutil/TLSServerSocket.h>
 
 #include<libmutil/massert.h>
 
@@ -68,10 +71,7 @@
 
 using namespace std;
 
-SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig,
-		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db
-		)
+SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig )
 {
 	timers = new SipTimers;
 	this->config = stackConfig;
@@ -117,19 +117,11 @@ SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig,
 	SipHeader::headerFactories.addFactory("WWW-Authenticate", sipHeaderWWWAuthenticateFactory);
 
 	addSupportedExtension("100rel");
+	addSupportedExtension("sdp-anat");
 
 	MRef<SipLayerTransport*> transp = MRef<SipLayerTransport*>(new
-			SipLayerTransport(
-				stackConfig->localIpString,
-				stackConfig->externalContactIP,
-				stackConfig->externalContactUdpPort,
-				stackConfig->localUdpPort,
-				stackConfig->localTcpPort,
-				stackConfig->localTlsPort,
-				cert_chain,
-				cert_db
-				)
-			);
+			   SipLayerTransport(stackConfig->cert,
+					     stackConfig->cert_db));
 
 	// Here we need to really know what we are doing since
 	// we are "breaking the law" of not passing this
@@ -361,4 +353,106 @@ std::string SipStackInternal::getStackStatusDebugString(){
 }
 
 
+MRef<SipSocketServer *> SipStackInternal::createUdpServer( bool ipv6, const string &ipString )
+{
+	int32_t port = config->localUdpPort;
 
+	MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+	MRef<SipSocketServer *> server;
+
+	server = new DatagramSocketServer( dispatcher->getLayerTransport(), sock );
+	// IPv6 doesn't need different external udp port
+	// since it never is NATed.
+	if( !ipv6 && config->externalContactUdpPort ){
+		server->setExternalPort( config->externalContactUdpPort );
+	}
+	server->setExternalIp( ipString );
+
+	return server;
+}
+
+MRef<SipSocketServer *> SipStackInternal::createTcpServer( bool ipv6, const string &ipString )
+{
+	MRef<ServerSocket *> sock;
+	MRef<SipSocketServer *> server;
+	int32_t port = config->localTcpPort;
+
+	sock = ServerSocket::create( port, ipv6 );
+	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
+	server->setExternalIp( ipString );
+
+	return server;
+}
+
+MRef<SipSocketServer *> SipStackInternal::createTlsServer( bool ipv6, const string &ipString )
+{
+	MRef<ServerSocket *> sock;
+	MRef<SipSocketServer *> server;
+	int32_t port = config->localTlsPort;
+
+	sock = new TLSServerSocket( ipv6, port, config->cert->get_first(),
+				    config->cert_db );
+	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
+	server->setExternalIp( ipString );
+
+	return server;
+}
+
+void SipStackInternal::startUdpServer()
+{
+	MRef<SipSocketServer *> server;
+	string ipString;
+
+	if( config->externalContactIP.size()>0 )
+		ipString = config->externalContactIP;
+	else
+		ipString = config->localIpString;
+
+	server = createUdpServer( false, ipString );
+	dispatcher->getLayerTransport()->addServer( server );
+
+	if( config->localIp6String != "" ){
+		MRef<SipSocketServer *> server6;
+
+		server6 = createUdpServer( true, config->localIp6String );
+		dispatcher->getLayerTransport()->addServer( server6 );
+	}
+}
+
+
+void SipStackInternal::startTcpServer()
+{
+	MRef<SipSocketServer *> server;
+
+	server = createTcpServer( false, config->localIpString);
+	dispatcher->getLayerTransport()->addServer( server );
+
+	if( config->localIp6String != "" ){
+		MRef<SipSocketServer *> server6;
+
+		server6 = createTcpServer( true, config->localIp6String );
+		dispatcher->getLayerTransport()->addServer( server6 );
+	}
+}
+
+void SipStackInternal::startTlsServer(){
+	MRef<SipSocketServer *> server;
+
+	if( config->cert->get_first().isNull() ){
+		merr << "You need a personal certificate to run "
+			"a TLS server. Please specify one in "
+			"the certificate settings. minisip will "
+			"now disable the TLS server." << end;
+		return;
+	}
+
+	server = createTlsServer( false, config->localIpString );
+	dispatcher->getLayerTransport()->addServer( server );
+
+	if( config->localIp6String != "" ){
+		MRef<SipSocketServer *> server6;
+
+		server6 = createTlsServer( true, config->localIp6String );
+		dispatcher->getLayerTransport()->addServer( server6 );
+	}
+}

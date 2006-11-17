@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2005-2006  Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -39,10 +41,9 @@
 #include<libmsip/SipException.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderRoute.h>
+#include<libmsip/SipHeaderContact.h>
 
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/IP4ServerSocket.h>
-#include<libmnetutil/TLSServerSocket.h>
+#include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
@@ -70,64 +71,9 @@ using namespace std;
 #endif
 
 
-SocketServer::SocketServer(MRef<ServerSocket*> sock, MRef<SipLayerTransport*> r): ssock(sock), receiver(r),doStop(false){
-
-}
-
-
-void SocketServer::run(){
-	struct timeval timeout;
-	fd_set set;
-	int fd = ssock->getFd();
-	while (!doStop){
-
-		int avail;
-		do{
-			FD_ZERO(&set);
-			#ifdef WIN32
-			FD_SET( (uint32_t) fd, &set);
-			#else
-			FD_SET(fd, &set);
-			#endif
-			
-			timeout.tv_sec = 5;
-			timeout.tv_usec= 0;
-			avail = select(fd+1,&set,NULL,NULL,&timeout );
-			if (avail<0){
-				Thread::msleep(500);
-			}
-		} while( avail < 0 );
-		//if (avail==0){
-		//	cerr<< "SocketServer::run(): Timeout"<< endl;
-		//}
-		MRef<SipLayerTransport *> r = receiver;
-		if (avail && !doStop && r){
-			MRef<StreamSocket *> ss;
-
-			try{
-				ss = ssock->accept();
-			} catch( NetworkException &){
-			}
-
-			if (ss){
-				r->addSocket(ss);
-			}else{
-				cerr << "Warning: Failed to accept client"<< endl;
-			}
-		}
-
-	}
-
-} // "myself" will be freed here and the object can be freed.
-
-void SocketServer::start(){
-	Thread t(this);
-}
-
-void SocketServer::stop(){
-	doStop=true;
-}
-
+// 
+// SipMessageParser
+// 
 
 class SipMessageParser{
 	public:
@@ -324,42 +270,19 @@ void printMessage(string header, string packet){
 }
 #endif
 
-static void * udpThread( void * arg );
 static void * streamThread( void * arg );
 
-SipLayerTransport::SipLayerTransport(
-						string local_ip, 
-						string contactIP, 
-						int32_t externalContactUdpPort, 
-						int32_t local_udp_port, 
-						int32_t local_tcp_port,
-						int32_t local_tls_port,
-						MRef<certificate_chain *> cchain, 
-						MRef<ca_db *> cert_db
-			):
-			//udpsock(false,local_udp_port),
-			localIP(local_ip),
-			contactIP(contactIP),
-			externalContactUdpPort(externalContactUdpPort),
-			localUDPPort(local_udp_port),
-			localTCPPort(local_tcp_port),
-			localTLSPort(local_tls_port),
-			cert_chain(cchain), 
-			cert_db(cert_db),
-			tls_ctx(NULL)
+SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
+				     MRef<ca_db *> cert_db):
+		cert_chain(cchain), cert_db(cert_db), tls_ctx(NULL)
 {
-	udpsock = new UDPSocket(local_udp_port, false );
-	
-	Thread::createThread(udpThread, this);
-	
 	int i;
+
 	for( i=0; i < NB_THREADS ; i++ ){
             Thread::createThread(streamThread, new StreamThreadData(this));
 	}
 }
 
-//void SipLayerTransport::startUdpServer(){ }
-//void SipLayerTransport::stopUdpServer(){ }
 
 bool SipLayerTransport::handleCommand(const SipSMCommand& command ){
 	if( command.getType()==SipSMCommand::COMMAND_PACKET ){
@@ -379,46 +302,63 @@ bool SipLayerTransport::handleCommand(const SipSMCommand& command ){
 	return 0;
 }
 
-void SipLayerTransport::startTcpServer(){
-	try{
-		tcpSocketServer = new SocketServer(new IP4ServerSocket(localTCPPort),this);
-		tcpSocketServer->start();
-	}catch( NetworkException & exc ){
-		cerr << exc.what() << endl;
-		return;
+SipLayerTransport::~SipLayerTransport() {
+}
+  
+void SipLayerTransport::stop(){
+	serversLock.lock();
+	list<MRef<SipSocketServer *> >::iterator i;
+
+	for( i=servers.begin(); i != servers.end(); i++ ){
+		MRef<SipSocketServer *> server = *i;
+
+		server->stop();
 	}
+	serversLock.unlock();
 }
 
-void SipLayerTransport::stopTcpServer(){
-	tcpSocketServer->stop();
-	tcpSocketServer=NULL;
+void SipLayerTransport::addServer( MRef<SipSocketServer *> server )
+{
+	serversLock.lock();
+	server->start();
+	servers.push_back( server );
+	serversLock.unlock();
+}
+  
+MRef<SipSocketServer *> SipLayerTransport::findServer(int32_t type, bool ipv6)
+{
+	list<MRef<SipSocketServer *> >::iterator i;
+
+	for( i=servers.begin(); i != servers.end(); i++ ){
+		MRef<SipSocketServer *> server = *i;
+
+		if( server->isIpv6() == ipv6 &&
+		    server->getType() == type ){
+			return server;
+		}
+	}
+#ifdef DEBUG_OUTPUT
+	cerr << "SipLayerTransport::findServer not found type=" << type << " ipv6=" << ipv6 << endl;
+#endif
+	return NULL;
 }
 
-void SipLayerTransport::startTlsServer(){
-	if( getMyCertificate().isNull() ){
-		merr << "You need a personal certificate to run "
-			"a TLS server. Please specify one in "
-			"the certificate settings. minisip will "
-			"now disable the TLS server." << end;
-		return;
+MRef<Socket *> SipLayerTransport::findServerSocket(int32_t type, bool ipv6)
+{
+	MRef<SipSocketServer *> server;
+	serversLock.lock();
+	server = findServer(type, ipv6);
+	serversLock.unlock();
+
+	if( !server ){
+		return NULL;
 	}
 
-	try{
-		tlsSocketServer = new SocketServer(new TLSServerSocket(localTLSPort, getMyCertificate(), getCA_db() ),this);
-		tlsSocketServer->start();
-	}catch( NetworkException & exc ){
-		cerr << "Exception caught when creating TCP server." << endl;
-		cerr << exc.what() << endl;
-		return;
-	}
+	MRef<Socket *> sock = server->getSocket();
 
-
+	return sock;
 }
 
-void SipLayerTransport::stopTlsServer(){
-	tlsSocketServer->stop();
-	tlsSocketServer=NULL;
-}
 
 /*
 void SipLayerTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
@@ -426,38 +366,56 @@ void SipLayerTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec)
 }
 */
 
+string getSocketTransport( MRef<Socket*> socket )
+{
+	switch( socket->getType() ){
+		case SOCKET_TYPE_TLS:
+			return "TLS";
+
+		case SOCKET_TYPE_TCP:
+			return "TCP";
+			
+		case SOCKET_TYPE_UDP:
+			return "UDP";
+
+		default:
+			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<end;
+			// TODO more describing exception and message
+			throw NetworkException();
+	}
+}
+
+void getIpPort( MRef<SipSocketServer*> server, MRef<Socket*> socket,
+		string &ip, uint16_t &port )
+{
+	if( server ){
+		port = server->getExternalPort();
+		ip = server->getExternalIp();
+	}
+	else {
+		port = socket->getPort();
+		ip = socket->getLocalAddress()->getString();
+	}
+}
+
+
 void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
+									MRef<SipSocketServer *> server,
 									MRef<Socket *> socket,
 									string branch ){
 	string transport;
 	uint16_t port;
+	string ip;
 
 	if( !socket )
 		return;
-	
-	switch( socket->getType() ){
-		case SOCKET_TYPE_TLS:
-			transport = "TLS";
-			port = (uint16_t)localTLSPort;
-			break;
-			
-		case SOCKET_TYPE_TCP:
-			transport = "TCP";
-			port = (uint16_t)localTCPPort;
-			break;
-			
-		case SOCKET_TYPE_UDP:
-			transport = "UDP";
-			port = (uint16_t)externalContactUdpPort;
-			break;
 
-		default:
-			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<end;
-			return;
-	}
+	transport = getSocketTransport( socket );
+
+	getIpPort( server, socket, ip, port );
 	
 	MRef<SipHeaderValue*> hdrVal = 
-		new SipHeaderValueVia(transport, localIP, port);
+		new SipHeaderValueVia(transport, ip, port);
 
 	// Add rport parameter, defined in RFC 3581
 	hdrVal->addParameter(new SipHeaderParameter("rport", "", false));
@@ -660,16 +618,32 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 }
 
 
-MRef<Socket*> SipLayerTransport::findSocket(const string &transport,
-					      /*IPAddress &*/ string destAddr,
-					      uint16_t port)
+bool SipLayerTransport::findSocket(const string &transport,
+				   IPAddress &destAddr,
+				   uint16_t port,
+				   MRef<SipSocketServer*> &server,
+				   MRef<Socket*> &socket)
 {
-	MRef<Socket*> socket;
+	bool ipv6 = false;
+	int32_t type = 0;
+
+	ipv6 = (destAddr.getType() == IP_ADDRESS_TYPE_V6);
 
 	if( transport == "UDP" ){
-		socket = (Socket*)*udpsock;
+		type = SOCKET_TYPE_UDP;
 	}
-	else{
+	else if( transport == "TCP" ){
+		type = SOCKET_TYPE_TCP;
+	}
+	else if( transport == "TLS" ){
+		type = SOCKET_TYPE_TLS;
+	}
+
+	serversLock.lock();
+	server = findServer(type, ipv6);
+	serversLock.unlock();
+
+	if( type & SOCKET_TYPE_STREAM ){
 		MRef<StreamSocket*> ssocket = findStreamSocket(destAddr, port);
 		if( ssocket.isNull() ) {
 			/* No existing StreamSocket to that host,
@@ -688,13 +662,47 @@ MRef<Socket*> SipLayerTransport::findSocket(const string &transport,
 		} else cerr << "SipLayerTransport: sendMessage: reusing old socket" << endl;
 		socket = *ssocket;
 	}
+	else{
+		if( server ){
+			socket = server->getSocket();
+		}
+	}
 
-	return socket;
+	if( !socket ){
+		throw NetworkException();
+	}
+
+	return !socket.isNull();
 }
 
 
+// Set contact uri host and port to external ip and port configured
+// on the server or local address and port of the socket
+void updateContact(MRef<SipMessage*> pack,
+		   MRef<SipSocketServer *> server,
+		   MRef<Socket *> socket)
+{
+	MRef<SipHeaderValueContact*> contactp = pack->getHeaderValueContact();
+	uint16_t port;
+	string ip;
+	string transport;
+
+	if( !contactp )
+		return;
+
+	transport = getSocketTransport( socket );
+	getIpPort( server, socket, ip, port );
+
+	SipUri contactUri = contactp->getUri();
+
+	contactUri.setIp( ip );
+	contactUri.setPort( port );
+	contactUri.setTransport( transport );
+	contactp->setUri( contactUri );
+}
+
 void SipLayerTransport::sendMessage(MRef<SipMessage*> pack, 
-				      /*IPAddress &*/ string ip_addr, 
+				    /* IPAddress &*/ const string &ip_addr,
 				      int32_t port, 
 				      string branch,
 				      string preferredTransport,
@@ -702,8 +710,8 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 {
 	MRef<Socket *> socket;
 	MRef<IPAddress *> tempAddr;
-	//IPAddress *destAddr = &ip_addr;
-
+	MRef<IPAddress *> destAddr;
+	MRef<SipSocketServer *> server;
 #ifdef DEBUG_OUTPUT
 	cerr << "SipLayerTransport:  sendMessage addr=" << ip_addr << ", port=" << port << endl;
 #endif
@@ -711,22 +719,41 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 				
 	try{
 		socket = pack->getSocket();
+		MRef<IPAddress *>destAddr;
 
 		if( !socket ){
-			socket = findSocket(preferredTransport, ip_addr, (uint16_t)port);
+			// Lookup IPv4 or IPv6 address
+			destAddr = IPAddress::create(ip_addr);
+		}
+		else{
+			// Lookup IPv4 or IPv6 depending on open socket
+			int32_t type = socket->getLocalAddress()->getType();
+			destAddr = IPAddress::create(ip_addr, type == IP_ADDRESS_TYPE_V6);
+		}
+
+		if( !destAddr ){
+			throw HostNotFound( ip_addr );
+		}
+
+		if( !socket ){
+			findSocket(preferredTransport, **destAddr, (uint16_t)port, server, socket);
 			pack->setSocket( socket );
+
+			if( !socket ){
+				// TODO add sensible message
+				throw NetworkException();
+			}
+
+			updateContact( pack, server, socket );
 		}
 
 		if (addVia){
-			addViaHeader( pack, socket, branch );
+			addViaHeader( pack, server, socket, branch );
 		}
 
 		string packetString = pack->getString();
-		if (!socket){
-			cerr << "EE: NO SOCKET"<<endl<<endl;;
-		}
 
-		MRef<UDPSocket *> dsocket = dynamic_cast<UDPSocket*>(*socket);
+		MRef<DatagramSocket *> dsocket = dynamic_cast<DatagramSocket*>(*socket);
 		MRef<StreamSocket *> ssocket = dynamic_cast<StreamSocket*>(*socket);
 		
 		if( ssocket ){
@@ -758,10 +785,9 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 			ts.save( tmp );
 
 #endif
-			MRef<IPAddress *>destAddr = IPAddress::create(ip_addr);
+// 			MRef<IPAddress *>destAddr = IPAddress::create(ip_addr);
 
 			
-			if (destAddr){
 				if( dsocket->sendTo( **destAddr, port, 
 							(const void*)packetString.c_str(),
 							(int32_t)packetString.length() ) == -1 ){
@@ -769,21 +795,6 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 					throw SendFailed( errno );
 
 				}
-			}else{
-				CommandString transportError( pack->getCallId(), 
-						SipCommandString::transport_error,
-						"SipLayerTransport: host could not be resolved: "+ip_addr);
-				SipSMCommand transportErrorCommand(
-						transportError, 
-						SipSMCommand::transport_layer, 
-						SipSMCommand::transaction_layer);
-
-				if (dispatcher)
-					dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
-				else
-					mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
-
-			}
 		}
 		else{
 			cerr << "No valid socket!" << endl;
@@ -826,7 +837,7 @@ void SipLayerTransport::addSocket(MRef<StreamSocket *> sock){
         semaphore.inc();
 }
 
-MRef<StreamSocket *> SipLayerTransport::findStreamSocket( /*IPAddress &*/ string address, uint16_t port ){
+MRef<StreamSocket *> SipLayerTransport::findStreamSocket( IPAddress &address, uint16_t port ){
 	list<MRef<StreamSocket *> >::iterator i;
 
 	socksLock.lock();
@@ -863,22 +874,6 @@ static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
 	}
 }
 
-std::string SipLayerTransport::getLocalIP(){
-	return localIP;
-}
-
-int32_t SipLayerTransport::getLocalUDPPort(){
-	return localUDPPort;
-}
-
-int32_t SipLayerTransport::getLocalTCPPort(){
-	return localTCPPort;
-}
-
-int32_t SipLayerTransport::getLocalTLSPort(){
-	return localTLSPort;
-}
-
 MRef<certificate_chain *> SipLayerTransport::getCertificateChain(){ 
 	return cert_chain; 
 }
@@ -895,48 +890,30 @@ MRef<ca_db *> SipLayerTransport::getCA_db () {
 
 #define UDP_MAX_SIZE 65536
 
-void SipLayerTransport::udpSocketRead(){
+void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 	char buffer[UDP_MAX_SIZE];
 
-	for (int i=0; i<UDP_MAX_SIZE; i++){
-		buffer[i]=0;
-	}
-	
-	int avail;
 	MRef<SipMessage*> pack;
 	int32_t nread;
-    fd_set set;
 	
-	while( true ){
-		FD_ZERO(&set);
-		#ifdef WIN32
-		FD_SET( (uint32_t) udpsock->getFd(), &set);
-		#else
-		FD_SET(udpsock->getFd(), &set);
-		#endif
-
-		do{
-			avail = select(udpsock->getFd()+1,&set,NULL,NULL,NULL );
-		} while( avail < 0 );
-
-		if( FD_ISSET( udpsock->getFd(), &set )){
+	if( sock ){
 			MRef<IPAddress *> from;
 			int32_t port = 0;
 
-			nread = udpsock->recvFrom((void *)buffer, UDP_MAX_SIZE, from, port);
+			nread = sock->recvFrom((void *)buffer, UDP_MAX_SIZE, from, port);
 			
 			if (nread == -1){
 				mdbg << "Some error occured while reading from UdpSocket"<<end;
-				continue;
+				return;
 			}
 
 			if ( nread == 0){
 				// Connection was closed
-				break;
+				return; // FIXME
 			}
 
 			if (nread < (int)strlen("SIP/2.0")){
-				continue;
+				return;
 			}
 
 			try{
@@ -954,7 +931,7 @@ void SipLayerTransport::udpSocketRead(){
 #endif
 				pack = SipMessage::createMessage( data );
 				
-				pack->setSocket( *udpsock );
+				pack->setSocket( *sock );
 				updateVia(pack, from, (uint16_t)port);
 				
 				SipSMCommand cmd(pack, 
@@ -974,8 +951,7 @@ void SipLayerTransport::udpSocketRead(){
 #ifdef DEBUG_OUTPUT
 				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
-				cerr<< "Invalid data on UDP socket, discarded" << endl;
-				continue;
+				return;
 			}
 			
 			catch(SipExceptionInvalidStart & ){
@@ -985,10 +961,9 @@ void SipLayerTransport::udpSocketRead(){
 #ifdef DEBUG_OUTPUT
 				mdbg << "Invalid data on UDP socket, discarded" << end;
 #endif
-				continue;
+				return;
 			}
 		} // if event
-	}// while true
 }
 
 void StreamThreadData::run(){
@@ -1030,7 +1005,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	int32_t nread;
 	fd_set set;
 
-	
+
 	while( true ){
 		FD_ZERO(&set);
 		#ifdef WIN32
@@ -1065,6 +1040,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 
 			if ( nread == 0){
 				// Connection was closed
+				mdbg << "Connection was closed" << end;
 				break;
 			}
 #ifdef ENABLE_TS
@@ -1118,6 +1094,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// This does not look like a SIP
 				// packet, close the connection
 				
+				mdbg << "This does not look like a SIP packet, close the connection" << endl;
 				break;
 			}
 		} // if event
@@ -1131,13 +1108,4 @@ static void * streamThread( void * arg ){
 	data->run();
 	return NULL;
 }
-
-static void * udpThread( void * arg ){
-	MRef<SipLayerTransport*>  trans( (SipLayerTransport *)arg);
-
-	trans->udpSocketRead();
-	return NULL;
-}
-
-
 

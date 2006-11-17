@@ -55,29 +55,17 @@
 
 using namespace std;
 
-Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mediaHandler,
-		string localIpString, 
-		string externalContactIP, 
-		int32_t localUdpPort,
-		int32_t localTcpPort,
-		int32_t externalContactUdpPort,
-		int32_t localTlsPort,
-		MRef<certificate_chain *> cert_chain,
-		MRef<ca_db *> cert_db
-		){
+Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig,
+	 MRef<MediaHandler*>mediaHandler){
 
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
 
-	MRef<SipStackConfig *> stackConfig = new SipStackConfig;
-	stackConfig->localIpString = localIpString;
-	stackConfig->externalContactIP= externalContactIP;
-	stackConfig->localUdpPort=localUdpPort;
-	stackConfig->localTcpPort=localTcpPort;
-	stackConfig->externalContactUdpPort= externalContactUdpPort;
-	stackConfig->localTlsPort= localTlsPort;
-	
-	sipstack = new SipStack(stackConfig, cert_chain,cert_db);
+	MRef<SipStackConfig *> stackConfig = new SipStackConfig();
+	// Deep copy
+	**stackConfig = **(pconfig->inherited);
+
+	sipstack = new SipStack(stackConfig);
 
 	MRef<DefaultDialogHandler*> defaultDialogHandler = 
 			new DefaultDialogHandler(sipstack,
@@ -427,6 +415,11 @@ void Sip::join() {
 void Sip::run(){
 
 	try{
+#ifdef DEBUG_OUTPUT
+		mout << BOLD << "init 8.1/9: Starting UDP transport worker thread" << PLAIN << end;
+#endif
+		sipstack->startUdpServer();
+
 		if (phoneconfig->tcp_server){
 #ifdef DEBUG_OUTPUT
 			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;

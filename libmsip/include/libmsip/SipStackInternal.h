@@ -42,11 +42,7 @@ class SipDialog;
 class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 	public:
-		SipStackInternal( MRef<SipStackConfig*> stackConfig,
-				MRef<certificate_chain *> cert=NULL,	//The certificate chain is used by TLS 
-								//TODO: TLS should use the whole chain instead of only the first certificate --EE
-				MRef<ca_db *> cert_db = NULL
-			  );
+		SipStackInternal( MRef<SipStackConfig*> stackConfig );
 
 		void setTransactionHandlesAck(bool transHandleAck);
 
@@ -88,6 +84,14 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 		bool supports(std::string extension);
                 
 		std::string getStackStatusDebugString();
+
+		MRef<SipSocketServer *> createUdpServer( bool ipv6, const std::string &ipString );
+		MRef<SipSocketServer *> createTcpServer( bool ipv6, const std::string &ipString );
+		MRef<SipSocketServer *> createTlsServer( bool ipv6, const std::string &ipString );
+
+		void startUdpServer();
+		void startTcpServer();
+		void startTlsServer();
 
 	private:
 

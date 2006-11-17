@@ -243,8 +243,7 @@ bool SipTransactionNonInviteClient::a4_proceeding_proceeding_timerE( const SipSM
 		massert(!lastRequest.isNull());
 		timerE = sipStackInternal->getTimers()->getT2();
 		requestTimeout(timerE,"timerE");
-		lastRequest->removeAllViaHeaders();
-		send( *lastRequest, true);	//add via, we have removed all from previous request
+		send( *lastRequest, false);
 		
 		return true;
 	}else{
@@ -354,8 +353,7 @@ bool SipTransactionNonInviteClient::a8_trying_trying_timerE( const SipSMCommand 
 		requestTimeout(timerE,"timerE");
 		
 		massert( !lastRequest.isNull());
-		lastRequest->removeAllViaHeaders();
-		send( *lastRequest, true);	// add via header because we have removed all previous ones
+		send( *lastRequest, false);
 		
 		return true;
 	}else{

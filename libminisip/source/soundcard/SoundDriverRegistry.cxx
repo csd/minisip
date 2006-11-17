@@ -102,7 +102,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		MRef<SoundDriver*> driver = *iter;
 
 		if( driver->getId() == driverId ){
-			merr << "SoundDriverRegistry: device id found!!! =  " << deviceId << ::end;
+			mdbg << "SoundDriverRegistry: device id found!!! =  " << deviceId << ::end;
 			return driver->createDevice( deviceId );
 		}
 	}

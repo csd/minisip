@@ -294,6 +294,8 @@ int Minisip::startSip() {
 		mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << end;
 #endif
 		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf );
+		MRef<IpProvider *> ip6Provider;
+		ip6Provider = IpProvider::create( phoneConf, true );
 //#ifdef DEBUG_OUTPUT
 //                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
 //#endif
@@ -308,6 +310,8 @@ int Minisip::startSip() {
 		phoneConf->inherited->localUdpPort = ipProvider->getExternalPort( udpSocket );
 		phoneConf->inherited->localIpString = externalContactIP;
 		phoneConf->inherited->externalContactIP = externalContactIP;
+		if( ip6Provider )
+			phoneConf->inherited->localIp6String = ip6Provider->getExternalIp();
 		udpSocket=NULL;
 
 #ifdef DEBUG_OUTPUT
@@ -332,24 +336,13 @@ int Minisip::startSip() {
 #endif
 
 		MRef<SipSim*> sim = phoneConf->defaultIdentity->getSim();
-		MRef<certificate_chain *> certChain;
-		MRef<ca_db *> certDb;
 		if (sim){
-			certChain = sim->getCertificateChain();
-			certDb = sim->getCAs();
+			phoneConf->inherited->cert = sim->getCertificateChain();
+			phoneConf->inherited->cert_db = sim->getCAs();
 		}
 
 		//save Sip object in Minisip::sip ...
-		this->sip=new Sip(phoneConf,mediaHandler,
-				localIpString,
-				externalContactIP,
-				phoneConf->inherited->localUdpPort,
-				phoneConf->inherited->localTcpPort,
-				phoneConf->inherited->externalContactUdpPort,
-				phoneConf->inherited->localTlsPort,
-				certChain,
-				certDb
-				);
+		this->sip=new Sip(phoneConf,mediaHandler);
 		//sip->init();
 
 		phoneConf->sip = sip;
