@@ -126,7 +126,7 @@ State Machine:
                 a1002 gui(cterm)+---------------+         a1305 gui(call_terminated)
                                  v      |
 				a1102 	| no_transactions
-					V a1304
+					V a1101
                                 +---------------+
                                 |               |
                                 |  terminated   |
@@ -239,6 +239,9 @@ bool SipDialogVoip::a1003_byerequest_termwait_26( const SipSMCommand &command){
 
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 */
+
+		dialogState.isTerminated=true;
+
 	/* Tell the GUI */
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
@@ -261,6 +264,7 @@ bool SipDialogVoip::a1101_termwait_terminated_notransactions( const SipSMCommand
                                 SipSMCommand::dialog_layer) ){
                 lastInvite=NULL;
 
+		dialogState.isTerminated=true;
                 SipSMCommand cmd(
                                 CommandString( dialogState.callId,
                                         SipCommandString::call_terminated),

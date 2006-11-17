@@ -476,6 +476,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
+		dialogState.isTerminated=true;
 		CommandString cmdstr ( dialogState.callId, 
 				SipCommandString::call_terminated);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();

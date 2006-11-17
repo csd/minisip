@@ -157,6 +157,8 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 				SipCommandString::no_transactions,
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer) ){
+
+		dialogState.isTerminated=true;
 		
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
 				  SipSMCommand::dialog_layer,

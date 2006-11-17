@@ -51,7 +51,7 @@ list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
 void SipLayerDialog::removeTerminatedDialogs(){
 
 	for (int i=0; i< dialogs.size(); i++){
-		if (dialogs[i]->getCurrentStateName()=="terminated"){
+		if ( dialogs[i]->dialogState.isTerminated || dialogs[i]->getCurrentStateName()=="terminated"){
 			MRef<SipDialog *> dlg = dialogs[i];
 			dialogs.remove(i);
 			//merr << "CESC: SipMsgDispatcher::hdleCmd : breaking the dialog vicious circle" << endl;

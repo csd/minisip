@@ -105,6 +105,7 @@ class LIBMSIP_API SipDialogState{
 	
 		bool isEarly;
 		bool isEstablished;
+		bool isTerminated;
 
 		std::list<MRef<SipAuthenticationDigest*> > auths;
 };

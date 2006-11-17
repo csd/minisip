@@ -72,6 +72,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity):
 					
 	dialogState.isEarly=false;	//same as for "secure"?! -EE
 	dialogState.isEstablished = false;
+	dialogState.isTerminated = false;
 	dialogState.rseqNo = (uint32_t)-1;
 }
 
@@ -95,7 +96,8 @@ void SipDialog::handleTimeout(const string &c){
 
 void SipDialog::signalIfNoTransactions(){
 
-	if (getCurrentStateName()=="termwait"){
+	//State name is used only by dialogs that are StateMachines.
+	if (dialogState.isTerminated || getCurrentStateName()=="termwait"){
 
 		list<MRef<SipTransaction*> > t = getTransactions();
 
@@ -508,6 +510,8 @@ std::string SipDialog::getDialogDebugString(){
 			+ "; remoteUri=" + dialogState.remoteUri
 			+ "; remoteTarget=" + dialogState.remoteTarget
 			+ string("; isEarly=") + string(dialogState.isEarly?"true":"false")
+			+ string("; isEstablished=") + string(dialogState.isEstablished?"true":"false")
+			+ string("; isTerminated=") + string(dialogState.isTerminated?"true":"false")
 			+ "\n";
 	ret+= "            route_set: ";
 	

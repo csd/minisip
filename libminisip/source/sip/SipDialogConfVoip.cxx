@@ -689,6 +689,7 @@ bool SipDialogConfVoip::a25_termwait_terminated_notransactions( const SipSMComma
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer) ){
 		lastInvite=NULL;
+		dialogState.isTerminated=true;
 		SipSMCommand cmd(
 				CommandString( dialogState.callId, SipCommandString::call_terminated),
 				SipSMCommand::dialog_layer,

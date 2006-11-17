@@ -293,6 +293,9 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
 {
 	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "3**\n4**\n5**\n6**")){
 		
+
+		dialogState.isTerminated=true;
+
 		MRef<LogEntry *> rejectedLog( new LogEntryCallRejected() );
 		rejectedLog->start = time( NULL );
 		rejectedLog->peerSipUri = dialogState.remoteTag;
