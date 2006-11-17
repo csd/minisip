@@ -26,6 +26,38 @@
 #include<libminisip/soundcard/SoundDriver.h>
 
 
+SoundDeviceName::SoundDeviceName(std::string name,
+		std::string description,
+		int maxInputChannels,
+		int maxOutputChannels) :
+			name( name ),
+			description( description ),
+			maxInputChannels( maxInputChannels ),
+			maxOutputChannels( maxOutputChannels )
+{
+}
+
+
+std::string SoundDeviceName::getDescription() const { 
+	return description;
+}
+
+int SoundDeviceName::getMaxInputChannels() const { 
+	return maxInputChannels;
+}
+
+int SoundDeviceName::getMaxOutputChannels() const {
+	return maxOutputChannels;
+}
+
+int SoundDeviceName::operator==( const SoundDeviceName &dev ) const {
+	return name == dev.name;
+}
+
+std::string SoundDeviceName::getName() const {
+	return name;
+}
+
 SoundDriver::SoundDriver( std::string driverId,  MRef<Library*> lib ) : MPlugin( lib ), id( driverId ){
 }
 
@@ -35,3 +67,9 @@ SoundDriver::~SoundDriver( ){
 int SoundDriver::operator==( const SoundDriver &driver ) const{
 	return id == driver.id;
 }
+
+std::string SoundDriver::getId() const {
+	return id;
+}
+
+

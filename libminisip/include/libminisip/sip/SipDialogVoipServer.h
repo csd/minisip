@@ -56,8 +56,6 @@ class LIBMINISIP_API SipDialogVoipServer: public SipDialogVoip{
 
 		virtual ~SipDialogVoipServer();
 
-		virtual void dummy(){}
-
 		virtual std::string getMemObjectType() const {return "SipDialogVoipServer";}
 		
 		virtual std::string getName(){return "SipDialogVoipServer[callid="+dialogState.callId +"]";}

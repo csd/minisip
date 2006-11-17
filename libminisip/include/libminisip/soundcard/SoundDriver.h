@@ -39,21 +39,22 @@ class LIBMINISIP_API SoundDeviceName{
 	public:
 		SoundDeviceName(): maxInputChannels(0), maxOutputChannels(0) {}
 
-		SoundDeviceName(std::string name, std::string description, int maxInputChannels = 2, int maxOutputChannels = 2 ): name( name ), description( description ), maxInputChannels( maxInputChannels ), maxOutputChannels( maxOutputChannels ){}
+		SoundDeviceName(std::string name, 
+				std::string description, 
+				int maxInputChannels = 2, 
+				int maxOutputChannels = 2 );
 
 		/** Sound device name including driver id prefix */
-		std::string getName() const { return name; }
+		std::string getName() const;
 
 		/** Human readable string  */
-		std::string getDescription() const { return description; }
+		std::string getDescription() const;
 
-		int getMaxInputChannels() const { return maxInputChannels; }
+		int getMaxInputChannels() const;
 
-		int getMaxOutputChannels() const { return maxOutputChannels; }
+		int getMaxOutputChannels() const;
 
-		int operator==( const SoundDeviceName &dev ) const {
-			return name == dev.name;
-		}
+		int operator==( const SoundDeviceName &dev ) const;
 
 	private:
 		std::string name;
@@ -71,7 +72,7 @@ class LIBMINISIP_API SoundDriver: public MPlugin{
 		virtual ~SoundDriver();
 		virtual MRef<SoundDevice*> createDevice( std::string deviceName ) = 0;
 		/** Identification string used as prefix in device names */
-		std::string getId() const { return id; };
+		std::string getId() const;
 
 		/** Human readable string */
 		virtual std::string getDescription() const = 0;

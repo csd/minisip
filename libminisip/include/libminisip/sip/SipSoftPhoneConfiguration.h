@@ -141,7 +141,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		std::string ringtone;
 		
 		std::list<std::string> audioCodecs;
-		
 		//not used anymore ... it was used in mediahandler ... 
 // 		bool muteAllButOne;
 		
