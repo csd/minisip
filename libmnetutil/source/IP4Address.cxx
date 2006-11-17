@@ -141,6 +141,10 @@ IP4Address::~IP4Address(){
 	delete sockaddress;
 }
 
+MRef<IPAddress *> IP4Address::clone() const{ 
+	return new IP4Address(*this); 
+}
+
 struct sockaddr * IP4Address::getSockaddrptr(int32_t port) const{
 	sockaddress->sin_port=hton16(port);
 	return (sockaddr *)sockaddress;

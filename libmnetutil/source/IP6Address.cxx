@@ -151,6 +151,10 @@ IP6Address::~IP6Address(){
 	delete sockaddress;
 }
 
+MRef<IPAddress *> IP6Address::clone() const { 
+	return new IP6Address(*this); 
+}
+
 struct sockaddr *IP6Address::getSockaddrptr(int32_t port) const{
 	sockaddress->sin6_port = htons( (unsigned short)port );
 	return (struct sockaddr *) sockaddress;

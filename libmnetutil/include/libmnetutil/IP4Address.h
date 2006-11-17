@@ -54,7 +54,7 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 		virtual bool operator ==(const IP4Address &i4) const;
 		virtual bool operator ==(const IPAddress &i) const;
 		
-		virtual MRef<IPAddress *> clone()  const{ return new IP4Address(*this); };
+		virtual MRef<IPAddress *> clone() const;
 
 	private:
 		std::string ipaddr;

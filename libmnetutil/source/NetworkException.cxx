@@ -70,11 +70,34 @@ const char* NetworkException::what()const throw(){
 }
 
 
+const char* HostNotFound::what() {
+	msg = "Host "+host+" not found.";
+	return msg.c_str();
+}
+
+
+const char* UnknownAddressFamily::what() {
+	msg = "Unknown address family: " + errorNumber;
+	return msg.c_str();
+}
+
+
 TLSInitFailed::TLSInitFailed():NetworkException(){
 }
 
 TLSContextInitFailed::TLSContextInitFailed():NetworkException(){
 }
+
+const char *TLSInitFailed::what() {
+	msg = "TLS initialization failed.";
+	return msg.c_str();
+};
+
+const char* TLSContextInitFailed::what() {
+	msg = "TLS context initialization failed.";
+	return msg.c_str();
+};
+
 
 TLSConnectFailed::TLSConnectFailed( int errorNumber, SSL * ssl ):ConnectFailed(errorNumber),ssl(ssl){};
 

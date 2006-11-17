@@ -50,7 +50,7 @@ class LIBMNETUTIL_API IP6Address : public IPAddress {
 		virtual bool operator ==(const IP6Address &i6) const;
 		virtual bool operator ==(const IPAddress &i) const;
 
-		virtual MRef<IPAddress *> clone() const { return new IP6Address(*this); };
+		virtual MRef<IPAddress *> clone() const;
 
 	private:
 		std::string ipaddr;

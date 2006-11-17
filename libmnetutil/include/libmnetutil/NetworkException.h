@@ -48,10 +48,7 @@ class LIBMNETUTIL_API HostNotFound : public NetworkException{
 	public:
 		HostNotFound( std::string host ):NetworkException(-1),host(host){};
 		virtual ~HostNotFound()throw() {}
-		virtual const char*what() {
-			msg = "Host "+host+" not found.";
-			return msg.c_str();
-		}
+		virtual const char*what();
 	private:
 		std::string host;
 		std::string msg;
@@ -59,10 +56,7 @@ class LIBMNETUTIL_API HostNotFound : public NetworkException{
 class LIBMNETUTIL_API UnknownAddressFamily : public NetworkException{
 public:
 	UnknownAddressFamily( int errorNumber );
-	virtual const char*what() {
-		msg = "Unknown address family: " + errorNumber;
-		return msg.c_str();
-	}
+	virtual const char*what();
 };
 
 class LIBMNETUTIL_API ResolvError : public NetworkException{
@@ -120,10 +114,7 @@ class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
 	public:
 		TLSInitFailed();
 		virtual ~TLSInitFailed() throw(){}
-		virtual const char *what() {
-			msg = "TLS initialization failed.";
-			return msg.c_str();
-		};
+		virtual const char *what();
 	private:
 		std::string msg;
 };
@@ -132,11 +123,9 @@ class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
 	public:
 		TLSContextInitFailed();
 		virtual ~TLSContextInitFailed() throw(){}
-		virtual const char*what() {
-			msg = "TLS context initialization failed.";
-			return msg.c_str();
-		};
+		virtual const char*what();
 	private:
 		std::string msg;
 };
 #endif
+
