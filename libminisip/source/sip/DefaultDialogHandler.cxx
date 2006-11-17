@@ -36,6 +36,7 @@
 #include<libmsip/SipHeaderAcceptContact.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentIM.h>
+#include<libmsip/SipRequest.h>
 #include<libmsip/SipCommandString.h>
 #include<libmutil/massert.h>
 
@@ -318,6 +319,37 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 
+	}
+
+	// Reject unimplemented or unhandled request methods
+	if( pkt->getType()!=SipResponse::type ){
+		int statusCode;
+		const char *reasonPhrase;
+
+		if( pkt->getType()=="CANCEL" ){
+			statusCode = 481;
+			reasonPhrase = "Call/Transaction Does Not Exist";
+		}
+// 		else{
+// 			statusCode = 501;
+// 			reasonPhrase = "Not Implemented";
+// 		}
+		else{
+			statusCode = 405;
+			reasonPhrase = "Method Not Allowed";
+		}
+
+		MRef<SipMessage*> req = *pkt;
+		string branch = req->getDestinationBranch();
+		MRef<SipResponse*> resp =
+			new SipResponse(branch, statusCode, reasonPhrase,
+					*req);
+		SipSMCommand cmd( *resp, SipSMCommand::dialog_layer,
+				  SipSMCommand::transaction_layer );
+		// Send responses directly to the transport layer bypassing
+		// the transaction layer
+		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+		return true;
 	}
 
 	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
