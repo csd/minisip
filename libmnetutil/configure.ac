@@ -24,7 +24,6 @@ AM_MINISIP_ENABLE_IPV6
 dnl networking headers
 AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
 AC_CHECK_HEADERS([ifaddrs.h netdb.h sys/socket.h])
-AC_CHECK_FUNCS([getifaddrs getnameinfo])
 AM_MINISIP_CHECK_IPV6
 
 AC_ARG_ENABLE(srp,
@@ -38,12 +37,29 @@ AC_ARG_ENABLE(srp,
       ])
 AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
 
+if test "$os_win" = "yes"; then
 dnl
 dnl mingw support
 dnl
+AC_CHECK_HEADERS([iphlpapi.h],,,[
+#include<windows.h>
+])
+
 AC_CHECK_LIB([wsock32], [main])
 AC_CHECK_LIB([iphlpapi], [main])
 AC_CHECK_LIB([dnsapi], [main])
+AC_CHECK_LIB([ws2_32], [main])
+
+dnl Check if some WinXP function declarations are present in the header files
+AM_MINISIP_CHECK_WINFUNCS(["getaddrinfo(0,0,0,0)" "freeaddrinfo(0)" "GetAdaptersAddresses(0,0,0,0,0)" "getnameinfo(0,0,0,0,0,0,0)"],,,[dnl
+#define _WIN32_WINNT 0x0501
+#include<windows.h>
+#include<iphlpapi.h>
+#include<ws2tcpip.h>
+])
+else
+AC_CHECK_FUNCS([getifaddrs getnameinfo])
+fi
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])

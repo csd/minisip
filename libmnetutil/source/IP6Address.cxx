@@ -23,6 +23,12 @@
 
 #include<config.h>
 
+#ifdef WIN32
+# ifdef HAVE_GETNAMEINFO
+#  define _WIN32_WINNT 0x0501 //XP or later
+# endif
+#endif
+
 #include<libmnetutil/IP6Address.h>
 
 #ifdef WIN32
