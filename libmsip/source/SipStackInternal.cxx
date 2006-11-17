@@ -227,6 +227,8 @@ string SipStackInternal::getAllSupportedExtensionsStr(){
 	for (i=sipExtensions.begin(); i!=sipExtensions.end();i++){
 		if (!first){
 			ret = ret+",";
+		}
+		else {
 			first=false;
 		}
 		ret = ret+(*i);
