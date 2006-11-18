@@ -49,6 +49,7 @@
 #include<fstream>
 #include<libminisip/soundcard/AudioMixer.h>
 #include<libmsip/SipSimSoft.h>
+#include<libmcrypto/uuid.h>
 
 #ifdef _WIN32_WCE
 #	include<stdlib.h>
@@ -101,6 +102,8 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "local_tcp_port", inherited->localTcpPort );
 	backend->save( "local_tls_port", inherited->localTlsPort );
 	backend->save( "auto_answer", inherited->autoAnswer?"yes":"no");
+	backend->save( "instance_id", inherited->instanceId);
+
 	//securityConfig.save( backend );
 	
 	list< MRef<SipIdentity *> >::iterator iIdent;
@@ -768,6 +771,13 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	inherited->localTcpPort = backend->loadInt("local_tcp_port",5060);
 	inherited->localTlsPort = backend->loadInt("local_tls_port",5061);
 	inherited->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
+	inherited->instanceId = backend->loadString("instance_id");
+
+	if( inherited->instanceId.empty() ){
+		MRef<Uuid*> uuid = Uuid::create();
+
+		inherited->instanceId = "\"<urn:uuid:" + uuid->toString() + ">\"";
+	}
 
 	//securityConfig.load( backend ); //TODO: EEEE Load security per identity
 
