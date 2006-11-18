@@ -14,6 +14,7 @@ libmcopenssl_la_SOURCES = \
 		cert.cxx \
 		ZrtpDH.cxx \
 		hmac.cxx \
+		rand.cxx \
 		$(OTHER_FILES)
 
 libmcopenssl_la_LIBADD = $(OPENSSL_LIBS)

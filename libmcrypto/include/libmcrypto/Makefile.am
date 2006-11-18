@@ -25,6 +25,7 @@ noinst_HEADERS = \
 		ZrtpDH.h \
 		hmac.h \
 		rijndael-alg-fst.h \
+		rand.h \
 		$(OTHER_FILES)
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
