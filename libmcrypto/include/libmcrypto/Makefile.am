@@ -12,6 +12,7 @@ pkginclude_HEADERS = \
 		init.h \
 		base64.h \
 		rand.h \
+		uuid.h \
 		config.h
 
 OTHER_FILES =
