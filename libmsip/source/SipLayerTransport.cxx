@@ -70,6 +70,13 @@ using namespace std;
 # define ENABLE_TS
 #endif
 
+#ifndef SOCKET
+# ifdef WIN32
+#  define SOCKET uint32_t
+# else
+#  define SOCKET int32_t
+# endif
+#endif
 
 // 
 // SipMessageParser
@@ -1002,17 +1009,9 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	}
 	int avail;
 	MRef<SipMessage*> pack;
-	int32_t nread;
-	fd_set set;
-
 
 	while( true ){
-		FD_ZERO(&set);
-		#ifdef WIN32
-		FD_SET( (uint32_t) socket->getFd(), &set);
-		#else
-		FD_SET(socket->getFd(), &set);
-		#endif
+		fd_set set;
 
 		do{
 			struct timeval tv;
@@ -1020,6 +1019,11 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			// it should be consider undefined after select() returns.
 			tv.tv_sec = 600;
 			tv.tv_usec = 0;
+
+			// We need update the fd set before call to select()
+			FD_ZERO(&set);
+			FD_SET((SOCKET)socket->getFd(), &set);
+
 			avail = select(socket->getFd()+1,&set,NULL,NULL,&tv );
 		} while( avail <= 0 );
 
@@ -1031,6 +1035,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 		}
 
 		if( FD_ISSET( socket->getFd(), &set )){
+			int32_t nread;
 			nread = socket->read( buffer, STREAM_MAX_PKT_SIZE);
 
 			if (nread == -1){
