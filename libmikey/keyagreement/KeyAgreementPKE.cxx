@@ -1,7 +1,7 @@
 #include <config.h>
 
 #include <libmikey/KeyAgreementPKE.h>
-#include <openssl/rand.h>
+#include <libmcrypto/rand.h>
 
 
 KeyAgreementPKE::KeyAgreementPKE(byte_t* envKeyT, int envKeyLength, EVP_PKEY* pubKeyResponderT)
@@ -34,7 +34,7 @@ void KeyAgreementPKE::generateTgk(uint32_t tgkLength){
 	}
 	
 	tgkPtr = new unsigned char[tgkLength];
-	RAND_bytes(tgkPtr, tgkLength);
+	Rand::randomize(tgkPtr, tgkLength);
 }
 
 void KeyAgreementPKE::genTranspEncrKey(byte_t* encrKey, int encrKeyLength){

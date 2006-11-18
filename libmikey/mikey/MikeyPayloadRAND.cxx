@@ -30,12 +30,11 @@
 #include<stdlib.h>
 #include<time.h>
 #include<sys/types.h>
+#include<libmcrypto/rand.h>
 
 #ifndef _MSC_VER
 #include<unistd.h>
 #endif
-
-#include<openssl/rand.h>
 
 using namespace std;
 
@@ -71,16 +70,14 @@ MikeyPayload( start ){
 
 }
 
-#ifdef OPENSSL
 MikeyPayloadRAND::MikeyPayloadRAND():MikeyPayload(){
 	this->payloadTypeValue = MIKEYPAYLOAD_RAND_PAYLOAD_TYPE;
 	randLengthValue = 16;
 	
 	randDataPtr = new byte_t[ randLengthValue ];
-	RAND_bytes( randDataPtr, randLengthValue );
+	Rand::randomize( randDataPtr, randLengthValue );
 
 }
-#endif
 
 MikeyPayloadRAND::~MikeyPayloadRAND(){
 	if( randDataPtr ){

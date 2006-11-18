@@ -23,6 +23,7 @@
 
 
 #include<config.h>
+#include<libmcrypto/rand.h>
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/keyagreement_psk.h>
 
@@ -51,7 +52,7 @@ void KeyAgreementPSK::generateTgk( uint32_t tgkLength ){
 	}
 	
 	tgkPtr = new unsigned char[ tgkLength ];
-	RAND_bytes( tgkPtr, tgkLength );
+	Rand::randomize( tgkPtr, tgkLength );
 }
 
 void KeyAgreementPSK::genTranspEncrKey( 

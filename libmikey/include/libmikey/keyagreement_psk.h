@@ -27,8 +27,6 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<openssl/dh.h>
-#include<openssl/rand.h>
 #include<libmikey/keyagreement.h>
 #include<libmikey/oakley_groups.h>
 
