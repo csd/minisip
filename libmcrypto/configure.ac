@@ -47,6 +47,7 @@ AC_CONFIG_FILES([
 		source/Makefile
 		source/gnutls/Makefile
 		source/openssl/Makefile
+		source/uuid/Makefile
 		tests/Makefile
 		win32/Makefile
 		win32/libmcrypto-res.rc
