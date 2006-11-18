@@ -34,8 +34,8 @@
 #include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipResponse.h>
-#include<libmsip/SipHeaderWWWAuthenticate.h>
-#include<libmsip/SipHeaderProxyAuthenticate.h>
+#include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderSupported.h>
 #include<libmsip/SipAuthenticationDigest.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipSMCommand.h>
@@ -711,17 +711,37 @@ void SipDialogRegister::send_register(string branch){
 	
 //	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
 	//MRef<SipRegister*> reg= new SipRegister(
+
+	MRef<SipIdentity*> identity = getDialogConfig()->sipIdentity;
+
+	const SipUri &contact = getDialogConfig()->getContactUri(true); //if udp, use stun
+	int expires = identity->getSipProxy()->getRegisterExpires_int();
+	
+	MRef<SipHeaderValueContact *> contactHdr =
+		new SipHeaderValueContact(contact, expires);
+	const string &instanceId = getSipStack()->getStackConfig()->instanceId;
+
+	if( !instanceId.empty() ){
+		contactHdr->setParameter("+sip.instance", instanceId);
+		contactHdr->setParameter("reg-id", identity->getId());
+	}
+
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
 		branch, 
 		dialogState.callId,
-		getDialogConfig()->sipIdentity->getSipUri(),
-		getDialogConfig()->getContactUri(true), //if udp, use stun
-		dialogState.seqNo,
-		getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int()
+		identity->getSipUri(),
+		contactHdr,
+		dialogState.seqNo
 		);
 
 	addAuthorizations( reg );
 	addRoute( reg );
+
+	if( !instanceId.empty() ){
+		// Draft-Outbound needs path support, and
+		// Draft-GRUU needs gruu
+		reg->addHeader(new SipHeader(new SipHeaderValueSupported("path, gruu")));
+	}
 
 	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);

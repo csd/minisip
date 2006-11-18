@@ -100,9 +100,8 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const std::string &branch,
 				const std::string &call_id,
 				const SipUri &fromUri,
-				const SipUri &contact,
-				int32_t seq_no,
-				int expires);
+				MRef<SipHeaderValueContact *> contactHdr,
+				int32_t seq_no);
 
 		static MRef<SipRequest*> createSipMessageSubscribe(
 				const std::string &branch,

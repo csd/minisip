@@ -205,17 +205,16 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 							const string &call_id,
 							const SipUri &fromUri,
-							const SipUri &contact,
-							int32_t seq_no,
-							int expires)
+						       MRef<SipHeaderValueContact *> contactHdr,
+						       int32_t seq_no)
 {
 	const std::string &domain = fromUri.getIp();
 
 	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
 
 	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
-	 
-	req->addHeader(new SipHeader(new SipHeaderValueContact(contact, expires)));
+
+	req->addHeader(new SipHeader(*contactHdr));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->setContent(NULL);
 

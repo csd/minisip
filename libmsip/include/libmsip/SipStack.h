@@ -137,6 +137,14 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		* TODO: TLS should use the whole chain instead of only the first certificate --EE
 		*/
 		MRef<ca_db *> cert_db;
+
+		/**
+		 * "sip.instance" media feature tag in the Contact
+		 * header field.  This is a Uniform Resource Name (URN) that
+		 * uniquely identifies this specific UA instance.
+		 * It's used by draft-Outbound and draft-GRUU.
+		 */
+		string instanceId;
 };
 
 
