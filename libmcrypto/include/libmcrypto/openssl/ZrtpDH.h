@@ -27,11 +27,6 @@
 
 #include <stdint.h>
 
-#include <openssl/crypto.h>
-#include <openssl/bn.h>
-#include <openssl/rand.h>
-#include <openssl/dh.h>
-
 /**
  * Implementation of Diffie-Helman for ZRTP
  *
@@ -40,21 +35,22 @@
  * the ZRTP specification we use the MODP groups as defined by RFC3526 for
  * length 3072 and 4096.
  */
+
 class LIBMCRYPTO_API ZrtpDH {
     
 private:
-    DH *ctx;
+    void *priv;
     
 public:
     ZrtpDH(int32_t pkLength);
     ~ZrtpDH();
 
-    int32_t generateKey()                { return DH_generate_key(ctx); };
-    int32_t getSecretSize()              { return DH_size(ctx); };
-    int32_t getPubKeySize()              { return BN_num_bytes((ctx->pub_key)); };
-    int32_t getPubKeyBytes(uint8_t *buf) { return BN_bn2bin(ctx->pub_key, buf); };
+    int32_t generateKey();
+    int32_t getSecretSize();
+    int32_t getPubKeySize();
+    int32_t getPubKeyBytes(uint8_t *buf);
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);
-    void random(uint8_t *buf, int32_t length) { RAND_bytes(buf, length); };
+    void random(uint8_t *buf, int32_t length);
 };
 
 #endif // ZRTPDH_H

@@ -34,6 +34,8 @@
 // #include <libmcrypto/init.h>
 #include <libmcrypto/ZrtpDH.h>
 
+#define ctx ((DH*)priv)
+
 static BIGNUM *bnP3072 = NULL;
 static BIGNUM *bnP4096 = NULL;
 
@@ -136,7 +138,7 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
 	dhinit = 1;
     }
 
-    ctx = DH_new();
+    priv = DH_new();
 
     ctx->g = BN_new();
     BN_set_word(ctx->g, DH_GENERATOR_2);
@@ -170,4 +172,24 @@ int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes,
     result = DH_compute_key(secret, ctx->pub_key, ctx);
 
     return result;
+}
+
+int32_t ZrtpDH::generateKey() {
+	return DH_generate_key(ctx);
+}
+
+int32_t ZrtpDH::getSecretSize() {
+	return DH_size(ctx);
+}
+
+int32_t ZrtpDH::getPubKeySize() {
+	return BN_num_bytes((ctx->pub_key));
+}
+
+int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) {
+	return BN_bn2bin(ctx->pub_key, buf);
+}
+
+void ZrtpDH::random(uint8_t *buf, int32_t length) {
+	RAND_bytes(buf, length);
 }
