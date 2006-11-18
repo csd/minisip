@@ -3,6 +3,7 @@ SUBDIRS = \
 	include \
 	m4 \
 	source \
+	.
 	tests
 #DIST_SUBDIRS = $(SUBDIRS) debian
 
