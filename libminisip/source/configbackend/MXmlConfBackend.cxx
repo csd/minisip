@@ -64,6 +64,7 @@ string searchReplace(const string &str,
 	while( (pos = tmp.find(search, pos)) != string::npos ){
 		tmp.erase(pos, len);
 		tmp = tmp.insert(pos, replace);
+		pos = pos + replace.length();
 	}
 
 	return tmp;
@@ -97,7 +98,8 @@ void MXmlConfBackend::commit(){
 
 void MXmlConfBackend::save( const std::string &key, const std::string &value ){
 	try{
-		string xmlStr = searchReplace( value, "<", "&lt;" );
+		string tmp = searchReplace( value, "&", "&amp;" );
+		string xmlStr = searchReplace( tmp, "<", "&lt;" );
 		parser->changeValue( key, xmlStr );
 	}
 	catch( XMLException &exc ){
@@ -123,7 +125,8 @@ std::string MXmlConfBackend::loadString( const std::string &key, const std::stri
 	
 	try{
 		string xmlStr = parser->getValue( key, defaultValue );
-		ret = searchReplace( xmlStr, "&lt;", "<" );
+		string tmp = searchReplace( xmlStr, "&lt;", "<" );
+		ret = searchReplace( tmp, "&amp;", "&" );
 	}
 	catch( XMLException &exc ){
 		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
