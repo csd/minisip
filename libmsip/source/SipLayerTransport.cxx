@@ -78,10 +78,59 @@ using namespace std;
 # endif
 #endif
 
+#ifdef DEBUG_UDPPACKETDROPEMUL
+Mutex dropStringLock;
+string dropStringOut;
+string dropStringIn;
+
+void setDropFilterOut(string s){
+	dropStringLock.lock();
+	dropStringOut=s;
+	dropStringLock.unlock();
+}
+
+void setDropFilterIn(string s){
+	dropStringLock.lock();
+	dropStringIn=s;
+	dropStringLock.unlock();
+}
+
+static bool dropOut(){
+	char c='1';
+	dropStringLock.lock();
+	if (dropStringOut.size()>0){
+		c = dropStringOut[0];
+		dropStringOut = dropStringOut.substr(1);
+	}
+	dropStringLock.unlock();
+	if (c=='0'){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+static bool dropIn(){
+	char c='1';
+	dropStringLock.lock();
+	if (dropStringIn.size()>0){
+		c = dropStringIn[0];
+		dropStringIn = dropStringIn.substr(1);
+	}
+	dropStringLock.unlock();
+	if (c=='0'){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+#endif
+
+
 // 
 // SipMessageParser
 // 
-
 class SipMessageParser{
 	public:
 		SipMessageParser();
@@ -242,8 +291,6 @@ bool get_debug_print_packets(){
 	return sipdebug_print_packets;
 }
 
-#ifdef DEBUG_OUTPUT
-
 uint64_t startTime = 0;
 
 void printMessage(string header, string packet){
@@ -253,29 +300,27 @@ void printMessage(string header, string packet){
 	t=mtime();
 	int64_t sec = t / 1000 - startTime / 1000;
 	int64_t msec = t - startTime;
-	
+	msec = msec%1000;
+
 	header = (sec<100?string("0"):string("")) + 
-		 (sec<10?"0":"") + 
-		 itoa((int)(msec/1000))+
-		 ":"+
-		 (msec<10?"0":"")+
-		 (msec<100?"0":"")+
-		 itoa((int)(msec%1000))+ 
-		 " " + 
-		 header;
-	
-	if (sipdebug_print_packets){
-		size_t strlen=packet.size();
-		mout << header<<": ";
-		for (size_t i=0; i<strlen; i++){
-			mout << packet[i];
-			if (packet[i]=='\n')
-				mout << header<<": ";
-		}
-		mout << end;
+		(sec<10?"0":"") + 
+		itoa((int)sec)+
+		":"+
+		(msec<10?"0":"")+
+		(msec<100?"0":"")+
+		itoa((int)msec)+ 
+		" " + 
+		header;
+
+	size_t strlen=packet.size();
+	mout << header<<": ";
+	for (size_t i=0; i<strlen; i++){
+		mout << packet[i];
+		if (packet[i]=='\n')
+			mout << header<<": ";
 	}
+	mout << end;
 }
-#endif
 
 static void * streamThread( void * arg );
 
@@ -366,12 +411,6 @@ MRef<Socket *> SipLayerTransport::findServerSocket(int32_t type, bool ipv6)
 	return sock;
 }
 
-
-/*
-void SipLayerTransport::setSipSMCommandReceiver(MRef<SipSMCommandReceiver*> rec){
-	commandReceiver = rec;
-}
-*/
 
 string getSocketTransport( MRef<Socket*> socket )
 {
@@ -766,9 +805,9 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		if( ssocket ){
 			/* At this point if socket != we send on a 
 			 * streamsocket */
-#ifdef DEBUG_OUTPUT
-			printMessage("OUT (STREAM)", packetString);
-#endif
+			if (sipdebug_print_packets){
+				printMessage("OUT (STREAM)", packetString);
+			}
 #ifdef ENABLE_TS
 			//ts.save( PACKET_OUT );
 			char tmp[12];
@@ -781,9 +820,9 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		}
 		else if( dsocket ){
 			/* otherwise use the UDP socket */
-#ifdef DEBUG_OUTPUT
-			printMessage("OUT (UDP)", packetString);
-#endif
+			if (sipdebug_print_packets){
+				printMessage("OUT (UDP)", packetString);
+			}
 #ifdef ENABLE_TS
 			//ts.save( PACKET_OUT );
 			char tmp[12];
@@ -795,6 +834,9 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 // 			MRef<IPAddress *>destAddr = IPAddress::create(ip_addr);
 
 			
+#ifdef DEBUG_UDPPACKETDROPEMUL
+				if (!dropOut())
+#endif
 				if( dsocket->sendTo( **destAddr, port, 
 							(const void*)packetString.c_str(),
 							(int32_t)packetString.length() ) == -1 ){
@@ -919,9 +961,16 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				return; // FIXME
 			}
 
+#ifdef DEBUG_UDPPACKETDROPEMUL
+			if (dropIn()){
+				return;
+			}
+#endif
+
 			if (nread < (int)strlen("SIP/2.0")){
 				return;
 			}
+
 
 			try{
 #ifdef ENABLE_TS
@@ -933,9 +982,9 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 
 #endif
 				string data = string(buffer, nread);
-#ifdef DEBUG_OUTPUT
-				printMessage("IN (UDP)", data);
-#endif
+				if (sipdebug_print_packets){
+					printMessage("IN (UDP)", data);
+				}
 				pack = SipMessage::createMessage( data );
 				
 				pack->setSocket( *sock );
@@ -1060,9 +1109,9 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 					pack = parser.feed( buffer[i] );
 					
 					if( pack ){
-#ifdef DEBUG_OUTPUT
+						if (sipdebug_print_packets){
 						printMessage("IN (STREAM)", buffer);
-#endif
+						}
 						//cerr << "Packet string:\n"<< pack->getString()<< "(end)"<<endl;
 
 						MRef<IPAddress *> peer = socket->getPeerAddress();
