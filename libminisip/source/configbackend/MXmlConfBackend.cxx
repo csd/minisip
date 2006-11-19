@@ -53,6 +53,22 @@ MRef<MPlugin *> mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
 	return new MXmlConfigPlugin( lib );
 }
 
+string searchReplace(const string &str,
+			  const string &search,
+			  const string &replace)
+{
+	string tmp = str;
+	size_t pos = 0;
+	size_t len = search.length();
+
+	while( (pos = tmp.find(search, pos)) != string::npos ){
+		tmp.erase(pos, len);
+		tmp = tmp.insert(pos, replace);
+	}
+
+	return tmp;
+}
+
 MXmlConfBackend::MXmlConfBackend(){
 
 	fileName = getDefaultConfigFilename();
@@ -81,7 +97,8 @@ void MXmlConfBackend::commit(){
 
 void MXmlConfBackend::save( const std::string &key, const std::string &value ){
 	try{
-		parser->changeValue( key, value );
+		string xmlStr = searchReplace( value, "<", "&lt;" );
+		parser->changeValue( key, xmlStr );
 	}
 	catch( XMLException &exc ){
 		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
@@ -105,7 +122,8 @@ std::string MXmlConfBackend::loadString( const std::string &key, const std::stri
 	std::string ret = "";
 	
 	try{
-		ret = parser->getValue( key, defaultValue );
+		string xmlStr = parser->getValue( key, defaultValue );
+		ret = searchReplace( xmlStr, "&lt;", "<" );
 	}
 	catch( XMLException &exc ){
 		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
