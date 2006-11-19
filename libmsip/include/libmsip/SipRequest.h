@@ -108,6 +108,7 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				const std::string &call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,
+				const SipUri& contact,
 				int32_t seq_no);
 
 

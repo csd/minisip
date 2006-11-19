@@ -226,6 +226,7 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 							const string &call_id,
 							const SipUri &toUri,
 							const SipUri &fromUri,
+							const SipUri &contact,
 							int32_t seq_no)
 {
 	MRef<SipRequest*> req = new SipRequest(branch, "SUBSCRIBE", toUri.getString() );
@@ -233,7 +234,7 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 	req->setUri(toUri);
 
 	req->addDefaultHeaders(fromUri, toUri,"SUBSCRIBE",seq_no, call_id);
-	
+	req->addHeader(new SipHeader(new SipHeaderValueContact(contact)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	req->addHeader(new SipHeader(new SipHeaderValueAccept("application/xpidf+xml")));
 						
