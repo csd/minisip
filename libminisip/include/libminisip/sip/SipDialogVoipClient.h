@@ -63,9 +63,6 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 
 	private:
 		
-		std::string realm;
-		std::string nonce;
-		
 		void setUpStateMachine();
 		
 		void sendInviteOk(const std::string &branch);
@@ -75,22 +72,17 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 		void sendAck();
 		void sendPrack(MRef<SipResponse*>);
 
-		bool a2001_start_callingnoauth_invite( const SipSMCommand &command);
-		bool a2002_callingnoauth_callingnoauth_18X( const SipSMCommand &command);
-		bool a2003_callingnoauth_callingnoauth_1xx( const SipSMCommand &command);
-		bool a2004_callingnoauth_incall_2xx( const SipSMCommand &command);
-		bool a2005_callingnoauth_termwait_CANCEL(const SipSMCommand &command);
-		bool a2006_callingnoauth_termwait_cancel(const SipSMCommand &command);
-		bool a2007_callingnoauth_termwait_36( const SipSMCommand &command);
-		bool a2008_callingnoauth_callingauth_40X( const SipSMCommand &command);
-		bool a2009_callingauth_callingauth_18X( const SipSMCommand &command);
-		bool a2010_callingauth_callingauth_1xx( const SipSMCommand &command);
-		bool a2011_callingauth_incall_2xx( const SipSMCommand &command);
+		bool a2001_start_calling_invite( const SipSMCommand &command);
+		bool a2002_calling_calling_18X( const SipSMCommand &command);
+		bool a2003_calling_calling_1xx( const SipSMCommand &command);
+		bool a2004_calling_incall_2xx( const SipSMCommand &command);
+		bool a2005_calling_termwait_CANCEL(const SipSMCommand &command);
+		bool a2006_calling_termwait_cancel(const SipSMCommand &command);
+		bool a2007_calling_termwait_36( const SipSMCommand &command);
+		bool a2008_calling_calling_40X( const SipSMCommand &command);
 		bool a2012_calling_termwait_2xx(const SipSMCommand &command);
 
-		bool a2013_callingnoauth_termwait_transporterror( const SipSMCommand &command);
-		bool a2014_callingauth_termwait_cancel( const SipSMCommand &command);
-
+		bool a2013_calling_termwait_transporterror( const SipSMCommand &command);
 		bool a2017_any_any_2XX( const SipSMCommand &command);
 
 		bool handleRel1xx( MRef<SipResponse*> resp );

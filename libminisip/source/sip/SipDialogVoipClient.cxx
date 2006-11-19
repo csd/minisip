@@ -73,7 +73,6 @@ using namespace std;
    
  The "dotted" states are implemented in SipDialogVoip.cxx.
 
- TODO: Merge calling_noauth and calling_stored to one state
 
 
                  +---------------+
@@ -86,24 +85,18 @@ gui(failed)              |
   |                |     V a2001: new TransInvite
   |              +---------------+
   |         +----|               |
-  |     1xx |    |Calling_noauth |----+ 180
-  |a3:(null)+--->|               |    | a2002: gui(ringing)
+  |     1xx |    |    calling    |----+ 180
+  |   a2003 +--->|               |    | a2002: gui(ringing)
   +--------------+---------------+<---+
-  |                      |     |       2xx/a2004:
-  |   cancel|hangup      |     +------------------------------+
-  |   a2014              |                                    |
-  +----------------+     |  40X                               | accept_invite
-  |                |     V  a2008: send_auth                  | a11: send 200
-  |              +---------------+                            |
-  |         +----|               |----+                       |
-  |         |    |Calling_stored |    | 180                   |
-  |    1XX  +--->|               |<---+ a2009: gui(ringing)   |
-  |    a2010     +---------------+                            |
-  |                      |                                    |
-  |                      | 2xx                                |
-  |                      v a2011:                             |
-  |              +. . . . . . . .+                            |
-  |              .               .<---------------------------+
+  |                      |  |  ^
+  |                      |  |  | 401/407
+  |                      |  +--+ a2008: auth
+  |                      |
+  |                      | 2xx
+  |                      | a2004: send ACK
+  |                      v        gui(invite_ok)
+  |              +. . . . . . . .+
+  |              .               .
   |              .   in call     .        
   |              .               .        
   |              +. . . . . . . .+        
@@ -132,7 +125,7 @@ gui(failed)              |
                  +---------------+
 */
 
-bool SipDialogVoipClient::a2001_start_callingnoauth_invite( const SipSMCommand &command)
+bool SipDialogVoipClient::a2001_start_calling_invite( const SipSMCommand &command)
 {
 	if (transitionMatch(command, 
 				SipCommandString::invite,
@@ -154,7 +147,7 @@ bool SipDialogVoipClient::a2001_start_callingnoauth_invite( const SipSMCommand &
 	}
 }
 
-bool SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X( const SipSMCommand &command)
+bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command)
 {	
 	if (transitionMatchSipResponse("INVITE", 
 				command, 
@@ -197,7 +190,7 @@ bool SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X( const SipSMComm
 }
 
 
-bool SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx( const SipSMCommand &command)
+bool SipDialogVoipClient::a2003_calling_calling_1xx( const SipSMCommand &command)
 {
 
 	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
@@ -217,7 +210,7 @@ bool SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx( const SipSMComm
     
 }
 
-bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &command)
+bool SipDialogVoipClient::a2004_calling_incall_2xx( const SipSMCommand &command)
 {
 	if (transitionMatchSipResponse("INVITE", 
 				command, 
@@ -256,7 +249,7 @@ bool SipDialogVoipClient::a2004_callingnoauth_incall_2xx( const SipSMCommand &co
 	}
 }
 
-bool SipDialogVoipClient::a2005_callingnoauth_termwait_CANCEL( const SipSMCommand &command)
+bool SipDialogVoipClient::a2005_calling_termwait_CANCEL( const SipSMCommand &command)
 {
 	if (transitionMatch("CANCEL", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		getMediaSession()->stop();
@@ -267,7 +260,7 @@ bool SipDialogVoipClient::a2005_callingnoauth_termwait_CANCEL( const SipSMComman
 	}
 }
 
-bool SipDialogVoipClient::a2006_callingnoauth_termwait_cancel( const SipSMCommand &command)
+bool SipDialogVoipClient::a2006_calling_termwait_cancel( const SipSMCommand &command)
 {
 	if (		transitionMatch(command, 
 				SipCommandString::cancel,
@@ -288,8 +281,7 @@ bool SipDialogVoipClient::a2006_callingnoauth_termwait_cancel( const SipSMComman
 	}
 }
 
-//Note: This is also used as: callingauth_terminated_36
-bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &command)
+bool SipDialogVoipClient::a2007_calling_termwait_36( const SipSMCommand &command)
 {
 	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "3**\n4**\n5**\n6**")){
 		
@@ -341,7 +333,7 @@ bool SipDialogVoipClient::a2007_callingnoauth_termwait_36( const SipSMCommand &c
 	}
 }
 
-bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMCommand &command){
+bool SipDialogVoipClient::a2008_calling_calling_40X( const SipSMCommand &command){
 
 	if (transitionMatchSipResponse("INVITE", command,SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "407\n401")){
 		
@@ -349,98 +341,13 @@ bool SipDialogVoipClient::a2008_callingnoauth_callingauth_40X( const SipSMComman
 
 		dialogState.updateState( resp ); //nothing will happen ... 4xx responses do not update ...
 
-		++dialogState.seqNo;
-
-		realm = resp->getAuthenticateProperty("realm");
-		nonce = resp->getAuthenticateProperty("nonce");
-
-		updateAuthentications( resp );
-		sendInvite("");
-
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogVoipClient::a2009_callingauth_callingauth_18X( const SipSMCommand &command){
-	
-	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "18*")){
-		MRef<SipResponse*> resp (  (SipResponse*)*command.getCommandPacket()  );
-#ifdef ENABLE_TS
-		ts.save( RINGING );
-#endif
-
-		if (resp->requires("100rel") && resp->getStatusCode()!=100){
-			if( !handleRel1xx( resp ) )
-				// Ignore retransmission
-				return true;
-		}
-		else{
-			dialogState.updateState( resp );
-		}
-
-		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
-
-		string peerUri = dialogState.remoteUri;
-		
-		MRef<SdpPacket*> sdp((SdpPacket*)*resp->getContent());
-		if ( !sdp.isNull() ){
-			//Early media
-			getMediaSession()->setSdpAnswer( sdp, peerUri );
-		}
-
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogVoipClient::a2010_callingauth_callingauth_1xx( const SipSMCommand &command){
-	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "1**")){
-
-		dialogState.updateState( MRef<SipResponse*> ( (SipResponse*)*command.getCommandPacket() ) );
-
-		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
-		if (resp->requires("100rel") && resp->getStatusCode()!=100){
-			if( !handleRel1xx( resp ) )
-				// Ignore retransmission
-				return true;
-		}
-
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogVoipClient::a2011_callingauth_incall_2xx( const SipSMCommand &command){
-	if (transitionMatchSipResponse("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "2**")){
-		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
-		
-		dialogState.updateState( resp );
-		sendAck();
-
-//CESC: for now, route set is updated at the transaction layer		
-		
-		//string peerUri = resp->getFrom().getString().substr(4);
-		string peerUri = dialogState.remoteUri;
-		
-		setLogEntry( new LogEntryOutgoingCompletedCall() );
-		getLogEntry()->start = time( NULL );
-		getLogEntry()->peerSipUri = peerUri;
-		
-		CommandString cmdstr(dialogState.callId, 
-				SipCommandString::invite_ok, 
-				"",
-				(getMediaSession()->isSecure()?"secure":"unprotected")
-				);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
-
-
-		if(!sortMIME(*resp->getContent(), peerUri, 3))
+		if( !updateAuthentications( resp ) ){
+			// Fall through to a2007_calling_termwait_36
 			return false;
+		}
+
+		++dialogState.seqNo;
+		sendInvite("");
 
 		return true;
 	}else{
@@ -467,7 +374,7 @@ bool SipDialogVoipClient::a2012_calling_termwait_2xx( const SipSMCommand &comman
 	}
 }
 
-bool SipDialogVoipClient::a2013_callingnoauth_termwait_transporterror( const SipSMCommand &command){
+bool SipDialogVoipClient::a2013_calling_termwait_transporterror( const SipSMCommand &command){
 	if (transitionMatch(command, 
 				SipCommandString::transport_error,
 				SipSMCommand::transaction_layer,
@@ -480,31 +387,6 @@ bool SipDialogVoipClient::a2013_callingnoauth_termwait_transporterror( const Sip
 		return false;
 	}
 }
-
-//Copy of a8!
-bool SipDialogVoipClient::a2014_callingauth_termwait_cancel( const SipSMCommand &command)
-{
-	if (		transitionMatch(command, 
-				SipCommandString::cancel,
-				SipSMCommand::dialog_layer,
-				SipSMCommand::dialog_layer) 
-			|| transitionMatch(command, 
-				SipCommandString::hang_up,
-				SipSMCommand::dialog_layer,
-				SipSMCommand::dialog_layer)){
-
-		string inv_branch = getLastInvite()->getFirstViaBranch();
-
-		sendCancel("");
-
-		getMediaSession()->stop();
-		signalIfNoTransactions();
-		return true;
-	}else{
-		return false;
-	}
-}
-
 
 bool SipDialogVoipClient::a2017_any_any_2XX( const SipSMCommand &command){
 	if (transitionMatchSipResponse("INVITE",
@@ -541,11 +423,8 @@ void SipDialogVoipClient::setUpStateMachine(){
 	State<SipSMCommand,string> *s_start=new State<SipSMCommand,string>(this,"start");
 	addState(s_start);
 
-	State<SipSMCommand,string> *s_callingnoauth=new State<SipSMCommand,string>(this,"callingnoauth");
-	addState(s_callingnoauth);
-
-	State<SipSMCommand,string> *s_callingauth=new State<SipSMCommand,string>(this,"callingauth");
-	addState(s_callingauth);
+	State<SipSMCommand,string> *s_calling=new State<SipSMCommand,string>(this,"calling");
+	addState(s_calling);
 
 	MRef<State<SipSMCommand,string> *> s_incall = getState("incall");
 	MRef<State<SipSMCommand,string> *> s_termwait= getState("termwait");
@@ -557,71 +436,48 @@ void SipDialogVoipClient::setUpStateMachine(){
 
 
 
-	new StateTransition<SipSMCommand,string>(this, "transition_start_callingnoauth_invite",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2001_start_callingnoauth_invite, 
-			s_start, s_callingnoauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_start_calling_invite",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2001_start_calling_invite, 
+			s_start, s_calling);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_callingnoauth_18X",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2002_callingnoauth_callingnoauth_18X, 
-			s_callingnoauth, s_callingnoauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_calling_18X",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2002_calling_calling_18X, 
+			s_calling, s_calling);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_callingnoauth_1xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2003_callingnoauth_callingnoauth_1xx, 
-			s_callingnoauth, s_callingnoauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_calling_1xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2003_calling_calling_1xx, 
+			s_calling, s_calling);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_incall_2xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2004_callingnoauth_incall_2xx, 
-			s_callingnoauth, s_incall);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_incall_2xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2004_calling_incall_2xx, 
+			s_calling, s_incall);
 
-	// Must be added after the noauth->incall transition since this is
+	// Must be added after the calling->incall transition since this is
 	// the "fallback one" if we don't accept the 2XX reply (for example
 	// authentication error)
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_termwait_2xx",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2012_calling_termwait_2xx,
-			s_callingnoauth, s_termwait);
+			s_calling, s_termwait);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_termwait_CANCEL",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2005_callingnoauth_termwait_CANCEL,
-			s_callingnoauth, s_termwait);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_termwait_CANCEL",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2005_calling_termwait_CANCEL,
+			s_calling, s_termwait);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_termwait_cancel",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2006_callingnoauth_termwait_cancel,
-			s_callingnoauth, s_termwait);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_termwait_cancel",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2006_calling_termwait_cancel,
+			s_calling, s_termwait);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_callingauth_40X",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2008_callingnoauth_callingauth_40X,
-			s_callingnoauth, s_callingauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_calling_40X",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2008_calling_calling_40X,
+			s_calling, s_calling);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_termwait_36",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2007_callingnoauth_termwait_36,
-			s_callingnoauth, s_termwait);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_termwait_36",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2007_calling_termwait_36,
+			s_calling, s_termwait);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_callingauth_18X",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2009_callingauth_callingauth_18X, 
-			s_callingauth, s_callingauth);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_callingauth_1xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2010_callingauth_callingauth_1xx, 
-			s_callingauth, s_callingauth);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_incall_2xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2011_callingauth_incall_2xx, 
-			s_callingauth, s_incall);
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_2xx",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2012_calling_termwait_2xx,
-			s_callingauth, s_termwait);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_resp36",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2007_callingnoauth_termwait_36,
-			s_callingauth, s_termwait);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingnoauth_termwait_transporterror",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2013_callingnoauth_termwait_transporterror,
-			s_callingnoauth, s_termwait);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_callingauth_termwait_cancel",
-			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2014_callingauth_termwait_cancel,
-			s_callingauth, s_termwait);
+	new StateTransition<SipSMCommand,string>(this, "transition_calling_termwait_transporterror",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipClient::a2013_calling_termwait_transporterror,
+			s_calling, s_termwait);
 	
 	
 	setCurrentState(s_start);
