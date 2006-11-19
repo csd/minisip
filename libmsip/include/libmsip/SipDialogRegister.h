@@ -55,21 +55,17 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 
 		void send_register(std::string branch);
 	private:
-		bool a0_start_tryingnoauth_register( const SipSMCommand &command);
-		bool a1_tryingnoauth_registred_2xx( const SipSMCommand &command);
-		bool a2_tryingnoauth_tryingstored_401haspass( const SipSMCommand &command);
-		bool a3_tryingnoauth_askpassword_401nopass( const SipSMCommand &command);
-		bool a4_tryingstored_askpassword_401( const SipSMCommand &command);
-		bool a5_askpassword_askpassword_setpassword( const SipSMCommand &command);
+		bool a0_start_trying_register( const SipSMCommand &command);
+		bool a1_trying_registred_2xx( const SipSMCommand &command);
+		bool a2_trying_trying_40x( const SipSMCommand &command);
+		bool a3_trying_askpassword_40x( const SipSMCommand &command);
+		bool a5_askpassword_trying_setpassword( const SipSMCommand &command);
 		bool a6_askpassword_registred_2xx( const SipSMCommand &command);
-		bool a7_askpassword_askpassword_401( const SipSMCommand &command);
-		bool a8_tryingstored_registred_2xx( const SipSMCommand &command);
 		bool a9_askpassword_failed_cancel( const SipSMCommand &command);
-		bool a10_tryingnoauth_failed_transporterror( const SipSMCommand &command);
-		bool a12_registred_tryingnoauth_proxyregister( const SipSMCommand &command);
+		bool a10_trying_failed_transporterror( const SipSMCommand &command);
+		bool a12_registred_trying_proxyregister( const SipSMCommand &command);
 		bool a13_failed_terminated_notransactions( const SipSMCommand &command);
-		bool a14_noauth_noauth_1xx( const SipSMCommand &command);
-		bool a15_stored_stored_1xx( const SipSMCommand &command);
+		bool a14_trying_trying_1xx( const SipSMCommand &command);
 		
 		void setUpStateMachine();
 

@@ -54,27 +54,27 @@
         |    Start    |
         |             |                           transport_error
         +-------------+                            a10 GUI(failed)
-                   |  +-----------------------------+---------------------------------+
-cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                        |
-  a0 send_register |  |      a2 send_register| S3            |---------------------+  |
-                   |  | +------------------->| Trying_stored |                     |  |
-                   V  | |            1xx   +-|               |-+                   |  |
-            +-------------+          a15 - +>+---------------+ | 401               |  |
-            |S1           | 401&&nopass                        | a4 ask_dialog     |  |
-        +-->|Trying_noauth| a3 ask_dialog    +---------------+ |                   |  |
-        |   |             |----------------->| S4            |<+                   |  |
-        |   +-------------+                  | Ask password  |---+ cmdstr:setpass  |  |
-        |          |  |  ^                   |               |   | a5 send_regist..|  |
-        |          |  +--+                   +---------------+<--+                 |  |
-        |   2xx OK |    1xx                    | |      ^  |cancel +----------+    |  |
-        |   a1 -   |    a14 -                  | +------+  +------>| S5       |<---)--+
-        |          V           200             |  401       a9     | Failed   |    |
-        |   +-------------+    a6 -            |  a7 ask_dialog a8 |          |    |
-        |   |  S2         |<-------------------+                   +----------+    |
-        +---|  Registred  |                                              |         |
- register   |             |<---------------------------------------------^---------+
- send_reg.. +-------------+                   2xx                        V     a13: notransactions
-        |       |                             a8                   +----------+
+                   |  +---------------------------------------------------------------+
+cmdstr:proxy_regist|  | 401                                                           |
+  a0 send_register |  | a2 send_register                                              |
+                   |  | +-+              cmdstr:setpass                               |
+                   V  | | V              a5 send_register                             |
+            +-------------+<-------------------------+                                |
+            |   S1        | 401                      |                                |
+        +-->|   Trying    | a3 ask_dialog    +---------------+                        |
+        |   |             |----------------->| S4            |                        |
+        |   +-------------+                  | Ask password  |                        |
+        |          |  |  ^                   |               |                        |
+        |          |  +--+                   +---------------+                        |
+        |   2xx OK |    1xx                                |cancel +----------+       |
+        |   a1 -   |    a14 -                              +------>| S5       |<------+
+        |          V                                        a9     | Failed   |
+        |   +-------------+                                        |          |
+        |   |  S2         |                                        +----------+
+        +---|  Registred  |                                              |
+ register   |             |                                              |
+ send_reg.. +-------------+                                              V     a13: notransactions
+        |       |                                                  +----------+
         --------+                                                  |          |
              a12 cmdstr:register <proxy>                           |terminated|
                                                                    |          |
@@ -85,7 +85,7 @@ cmdstr:proxy_regist|  |      401&&haspass    +------+--------+                  
 using namespace std;
 
 //a12 also deals with proxy_register ... but once it is already registered ...
-bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &command){
+bool SipDialogRegister::a0_start_trying_register( const SipSMCommand &command){
 
 	if (transitionMatch(command, 
 				SipCommandString::proxy_register,
@@ -128,7 +128,7 @@ bool SipDialogRegister::a0_start_tryingnoauth_register( const SipSMCommand &comm
 	}
 }
 
-bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &command){
+bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 	
 	if (transitionMatch(SipResponse::type,
 				command, 
@@ -170,19 +170,22 @@ bool SipDialogRegister::a1_tryingnoauth_registred_2xx( const SipSMCommand &comma
 	}
 }
 
-bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMCommand &command){
-	if ( 		hasPassword() 
-			&& transitionMatch(SipResponse::type, 
+bool SipDialogRegister::a2_trying_trying_40x( const SipSMCommand &command){
+	if (transitionMatch(SipResponse::type, 
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
 				"401\n407")){
-		++dialogState.seqNo;
 
 		//extract authentication info from received response
 		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
 
-		updateAuthentications( *resp );
+		if( !updateAuthentications( *resp ) ){
+			// Fall through to a3
+			return false;
+		}
+
+		++dialogState.seqNo;
 		send_register("");
 		//TODO: inform GUI
 
@@ -192,38 +195,13 @@ bool SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass( const SipSMComm
 	}
 }
 
-bool SipDialogRegister::a3_tryingnoauth_askpassword_401nopass( const SipSMCommand &command){
-	if ( 		!hasPassword() 
-			&& transitionMatch(SipResponse::type, 
-				command, 
-				SipSMCommand::transaction_layer, 
-				SipSMCommand::dialog_layer, 
-				"401\n407")){
-		
-		//TODO: Ask password
-		CommandString cmdstr( 
-			dialogState.callId, 
-			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
-		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
-		//extract authentication info from received response
-		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
-		updateAuthentications( resp );
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &command){
-	
+bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 	if (transitionMatch(SipResponse::type, 
 				command, 
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
 				"401\n407")){
-
+		
 		//TODO: Ask password
 		CommandString cmdstr( 
 			dialogState.callId, 
@@ -231,17 +209,14 @@ bool SipDialogRegister::a4_tryingstored_askpassword_401( const SipSMCommand &com
 			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		sipStack->getCallback()->handleCommand("gui", cmdstr );
-		//extract authentication info from received response
-		MRef<SipResponse*> resp( (SipResponse *)*command.getCommandPacket());
-		updateAuthentications( resp );
-		
+		//authentication info from received response is extracted in a2
 		return true;
 	}else{
 		return false;
 	}
 }
 
-bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMCommand &command){
+bool SipDialogRegister::a5_askpassword_trying_setpassword( const SipSMCommand &command){
 	
 	if (transitionMatch(command, 
 				SipCommandString::setpassword,
@@ -282,111 +257,6 @@ bool SipDialogRegister::a5_askpassword_askpassword_setpassword( const SipSMComma
 	}
 }
 
-bool SipDialogRegister::a6_askpassword_registred_2xx( const SipSMCommand &command){
-	
-	if (transitionMatch(SipResponse::type, 
-				command, 
-				SipSMCommand::transaction_layer,
-				SipSMCommand::dialog_layer, 
-				"2**")){
-		
-		//Mark the identity as currently registered (or not, maybe we are unregistering)
-		getDialogConfig()->sipIdentity->setIsRegistered ( true );
-		
-		CommandString cmdstr( 
-			dialogState.callId, 
-			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());   
-		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		//TODO: inform GUI
-		if (getGuiFeedback()){
-			sipStack->getCallback()->handleCommand("gui", cmdstr );
-			setGuiFeedback(false);
-		}		
-		//this is for the shutdown dialog 
-		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
-		
-		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
-		//request a timeout to retx a proxy_register only if we are registered ... 
-		//otherwise we would just be unregistering every now and then ...
-		if( getDialogConfig()->sipIdentity->isRegistered () ) {
-			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
-			requestTimeout(
-				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
-				SipCommandString::proxy_register);
-		} 
-		
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogRegister::a7_askpassword_askpassword_401( const SipSMCommand &command){
-	
-	if (transitionMatch(SipResponse::type, 
-				command, 
-				SipSMCommand::transaction_layer, 
-				SipSMCommand::dialog_layer, 
-				"401\n407")){
-
-		//TODO: Ask password
-		CommandString cmdstr( 
-			dialogState.callId, 
-			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
-		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
-		//extract authentication info from received response
-		MRef<SipResponse*> resp = (SipResponse *)*command.getCommandPacket();
-		updateAuthentications( resp );
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogRegister::a8_tryingstored_registred_2xx( const SipSMCommand &command){
-	
-	if (transitionMatch(SipResponse::type, 
-				command, 
-				SipSMCommand::transaction_layer, 
-				SipSMCommand::dialog_layer, 
-				"2**")){
-		//Mark the identity as currently registered (or not, maybe we are unregistering)
-		getDialogConfig()->sipIdentity->setIsRegistered ( true );
-	
-		//TODO: inform GUI
-		CommandString cmdstr( 
-			dialogState.callId, 
-			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());   
-		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		if (getGuiFeedback()){
-			sipStack->getCallback()->handleCommand("gui", cmdstr );
-			setGuiFeedback(false);
-		}
-		//this is for the shutdown dialog 
-		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
-		
-		//requestTimeout(1000*60*14,SipCommandString::proxy_register);
-		//request a timeout to retx a proxy_register only if we are registered ... 
-		//otherwise we would just be unregistering every now and then ...
-		if( getDialogConfig()->sipIdentity->isRegistered () ) {
-			//requestTimeout(1000*60*14,SipCommandString::proxy_register);
-			requestTimeout(
-				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
-				SipCommandString::proxy_register);
-		} 
-		
-		return true;
-	}else{
-		return false;
-	}
-}
-
 bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &command){
 	
 	//TODO: implement cancel functionality in GUI
@@ -407,7 +277,7 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 	}
 }
 
-bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMCommand &command){
+bool SipDialogRegister::a10_trying_failed_transporterror( const SipSMCommand &command){
 	
 	if (transitionMatch(command, 
 				SipCommandString::transport_error,
@@ -426,7 +296,7 @@ bool SipDialogRegister::a10_tryingnoauth_failed_transporterror( const SipSMComma
 	}
 }
 
-bool SipDialogRegister::a12_registred_tryingnoauth_proxyregister( const SipSMCommand &command){
+bool SipDialogRegister::a12_registred_trying_proxyregister( const SipSMCommand &command){
 
 	if (transitionMatch(command, 
 				SipCommandString::proxy_register,
@@ -492,20 +362,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 	}
 }
 
-bool SipDialogRegister::a14_noauth_noauth_1xx( const SipSMCommand &command){
-	
-	if (transitionMatch(SipResponse::type, 
-				command, 
-				SipSMCommand::transaction_layer, 
-				SipSMCommand::dialog_layer, 
-				"1**")){
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool SipDialogRegister::a15_stored_stored_1xx( const SipSMCommand &command){
+bool SipDialogRegister::a14_trying_trying_1xx( const SipSMCommand &command){
 	
 	if (transitionMatch(SipResponse::type, 
 				command, 
@@ -524,17 +381,13 @@ void SipDialogRegister::setUpStateMachine(){
 		new State<SipSMCommand,string>(this,"s0_start");
 	addState(s0_start);
 	
-	State<SipSMCommand, string> *s1_tryingnoauth = 
-		new State<SipSMCommand,string>(this,"s1_tryingnoauth");
-	addState(s1_tryingnoauth);
+	State<SipSMCommand, string> *s1_trying = 
+		new State<SipSMCommand,string>(this,"s1_trying");
+	addState(s1_trying);
 	
 	State<SipSMCommand, string> *s2_registred = 
 		new State<SipSMCommand,string>(this,"s2_registred");
 	addState(s2_registred);
-	
-	State<SipSMCommand, string> *s3_tryingstored = 
-		new State<SipSMCommand,string>(this,"s3_tryingstored");
-	addState(s3_tryingstored);
 	
 	State<SipSMCommand, string> *s4_askpassword= 
 		new State<SipSMCommand,string>(this,"s4_askpassword");
@@ -549,61 +402,45 @@ void SipDialogRegister::setUpStateMachine(){
 	addState(terminated);
 	
 
-	new StateTransition<SipSMCommand,string>(this, "transition_start_tryingnoauth_register",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a0_start_tryingnoauth_register,
-		s0_start, s1_tryingnoauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_start_trying_register",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a0_start_trying_register,
+		s0_start, s1_trying);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_registred_2xx",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a1_tryingnoauth_registred_2xx,
-		s1_tryingnoauth, s2_registred);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_registred_2xx",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a1_trying_registred_2xx,
+		s1_trying, s2_registred);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_tryingstored_401haspass",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a2_tryingnoauth_tryingstored_401haspass,
-		s1_tryingnoauth, s3_tryingstored);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_trying_40x",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a2_trying_trying_40x,
+		s1_trying, s1_trying);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingnouath_askpassword_401nopass",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a3_tryingnoauth_askpassword_401nopass,
-		s1_tryingnoauth, s4_askpassword);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingstored_askpassword_401",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a4_tryingstored_askpassword_401,
-		s3_tryingstored, s4_askpassword);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_askpassword_40x",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a3_trying_askpassword_40x,
+		s1_trying, s4_askpassword);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_askpassword_setpass",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a5_askpassword_askpassword_setpassword,
-		s4_askpassword, s4_askpassword);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_registred_2xx",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a6_askpassword_registred_2xx,
-		s4_askpassword, s2_registred);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_askpassword_401",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a7_askpassword_askpassword_401,
-		s4_askpassword, s4_askpassword);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingstored_registred_2xx",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a8_tryingstored_registred_2xx,
-		s3_tryingstored, s2_registred);
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a5_askpassword_trying_setpassword,
+		s4_askpassword, s1_trying);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_askpassword_failed_cancel",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a9_askpassword_failed_cancel,
 		s4_askpassword, s5_failed);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingnoauth_failed_transporterror",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
-		s1_tryingnoauth, s5_failed);
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_failed_transporterror",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_trying_failed_transporterror,
+		s1_trying, s5_failed);
 
-	new StateTransition<SipSMCommand,string>(this, "transition_tryingauth_failed_transporterror",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a10_tryingnoauth_failed_transporterror,
-		s3_tryingstored, s5_failed);
-
-	new StateTransition<SipSMCommand,string>(this, "transition_registred_tryingnoauth_proxyregister",
-		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a12_registred_tryingnoauth_proxyregister,
-		s2_registred, s1_tryingnoauth);
+	new StateTransition<SipSMCommand,string>(this, "transition_registred_trying_proxyregister",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a12_registred_trying_proxyregister,
+		s2_registred, s1_trying);
 
 	new StateTransition<SipSMCommand,string>(this, "transition_failed_terminated_notransactions",
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a13_failed_terminated_notransactions,
 		s5_failed, terminated );
+
+	new StateTransition<SipSMCommand,string>(this, "transition_trying_trying",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogRegister::a14_trying_trying_1xx,
+		s1_trying, s1_trying );
 
 	setCurrentState(s0_start);
 }
