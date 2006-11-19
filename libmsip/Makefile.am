@@ -53,6 +53,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/dialogs/SipDialogManagement.cxx \
 		     source/headers/SipHeader.cxx \
 		     source/headers/SipHeaderAccept.cxx \
+                     source/headers/SipHeaderAllowEvents.cxx \
                      source/headers/SipHeaderAuthorization.cxx \
                      source/headers/SipHeaderCSeq.cxx \
                      source/headers/SipHeaderCallID.cxx \
@@ -74,6 +75,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderRoute.cxx \
                      source/headers/SipHeaderString.cxx \
                      source/headers/SipHeaderSubject.cxx \
+                     source/headers/SipHeaderSubscriptionState.cxx \
                      source/headers/SipHeaderSupported.cxx \
                      source/headers/SipHeaderTo.cxx \
                      source/headers/SipHeaderUnknown.cxx \

@@ -30,6 +30,7 @@
 #include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
 
+#include<libmsip/SipHeaderAllowEvents.h>
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderUnknown.h>
 #include<libmsip/SipHeaderContentLength.h>
@@ -55,6 +56,7 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderSubject.h>
+#include<libmsip/SipHeaderSubscriptionState.h>
 #include<libmsip/SipHeaderSupported.h>
 #include<libmsip/SipHeaderUnsupported.h>
 #include<libmsip/SipHeaderCallID.h>
@@ -79,6 +81,8 @@ SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig )
 	timeoutProvider = new TimeoutProvider<string, MRef<StateMachine<SipSMCommand,string>*> >;
 
 	SipHeader::headerFactories.addFactory("Accept", sipHeaderAcceptFactory);
+	SipHeader::headerFactories.addFactory("Allow-Events", sipHeaderAllowEventsFactory);
+	SipHeader::headerFactories.addFactory("u", sipHeaderAllowEventsFactory);
 	SipHeader::headerFactories.addFactory("Accept-Contact", sipHeaderAcceptContactFactory);
 	SipHeader::headerFactories.addFactory("Authorization", sipHeaderAuthorizationFactory);
 	SipHeader::headerFactories.addFactory("Call-ID", sipHeaderCallIdFactory);
@@ -105,6 +109,7 @@ SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig )
 	SipHeader::headerFactories.addFactory("Route", sipHeaderRouteFactory);
 	SipHeader::headerFactories.addFactory("Subject", sipHeaderSubjectFactory);
 	SipHeader::headerFactories.addFactory("s", sipHeaderSubjectFactory);
+	SipHeader::headerFactories.addFactory("Subscription-State", sipHeaderSubscriptionStateFactory);
 	SipHeader::headerFactories.addFactory("Supported", sipHeaderSupportedFactory);
 	SipHeader::headerFactories.addFactory("k", sipHeaderSupportedFactory);
 	SipHeader::headerFactories.addFactory("To", sipHeaderToFactory);
