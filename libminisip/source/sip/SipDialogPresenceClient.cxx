@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -51,7 +52,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 #include<libmutil/MemObject.h>
-#include<libmsip/SipHeaderExpires.h>
+#include<libmsip/SipHeaderSubscriptionState.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -114,7 +115,7 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 
 	if (transitionMatch(command, 
 				SipCommandString::start_presence_client,
-				SipSMCommand::dialog_layer,
+				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer)){
 #ifdef DEBUG_OUTPUT
 		merr << "SipDialogPresenceClient::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< end;
@@ -133,17 +134,17 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		dialogState.remoteTag = command.getCommandPacket()->getHeaderValueTo()->getParameter("tag");
 
-		massert(dynamic_cast<SipHeaderValueExpires*>(*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0)));		
-		MRef<SipHeaderValueExpires *> expireshdr = (SipHeaderValueExpires*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_EXPIRES,0);
+		MRef<SipHeaderValueSubscriptionState *> statehdr = (SipHeaderValueSubscriptionState*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_SUBSCRIPTIONSTATE,0);
+
 		int timeout;
-		if (expireshdr){
-			timeout = expireshdr->getTimeout();
+		if (statehdr && statehdr->hasParameter("expires")){
+			timeout = atoi(statehdr->getParameter("expires").c_str());
 		}else{
 			mdbg << "WARNING: SipDialogPresenceClient did not contain any expires header - using 300 seconds"<<end;
 			timeout = 300;
 		}
 		
-		requestTimeout(timeout, "timerDoSubscribe");
+		requestTimeout(timeout * 1000, "timerDoSubscribe");
 		
 #ifdef DEBUG_OUTPUT
 		merr << "Subscribed for presence for user "<< toUri->getSipUri().getString()<< end;
@@ -160,7 +161,7 @@ bool SipDialogPresenceClient::a2_trying_retrywait_transperror(const SipSMCommand
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer )){
 		mdbg << "WARNING: Transport error when subscribing - trying again in five minutes"<< end;
-		requestTimeout(300, "timerDoSubscribe");
+		requestTimeout(300 * 1000, "timerDoSubscribe");
 		return true;
 	}else{
 		return false;
@@ -181,6 +182,10 @@ bool SipDialogPresenceClient::a4_X_trying_timerTO(const SipSMCommand &command){
 
 bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command){
 	if (transitionMatch("NOTIFY", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
+
+		MRef<SipRequest*> notify = dynamic_cast<SipRequest*>(*command.getCommandPacket());
+		sendNotifyOk(notify);
+
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
 		sipStack->getCallback()->handleCommand("gui",cmdstr);
 		return true;
@@ -214,6 +219,44 @@ bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMC
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
 		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool SipDialogPresenceClient::a8_trying_trying_40X(const SipSMCommand &command){
+	if (transitionMatchSipResponse("SUBSCRIBE", command,SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "407\n401")){
+		
+		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
+
+		dialogState.updateState( resp ); //nothing will happen ... 4xx responses do not update ...
+
+		++dialogState.seqNo;
+
+		if( !updateAuthentications( resp ) ){
+			mdbg << "Auth failed" << endl;
+			return true;
+		}
+
+		sendSubscribe("");
+
+		return true;
+	}else{
+		return false;
+	}
+}
+
+
+bool SipDialogPresenceClient::a9_trying_retry_wait_failure(const SipSMCommand &command){
+	if (transitionMatchSipResponse("SUBSCRIBE", command,SipSMCommand::transaction_layer, SipSMCommand::dialog_layer, "3**\n4**\n5**\n6**")){
+		
+		MRef<SipResponse*> resp( (SipResponse*)*command.getCommandPacket() );
+
+		dialogState.updateState( resp ); //nothing will happen ...
+
+		++dialogState.seqNo;
+
 		return true;
 	}else{
 		return false;
@@ -282,6 +325,14 @@ void SipDialogPresenceClient::setUpStateMachine(){
 		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a7_termwait_terminated_notransactions,
 		s_termwait, s_terminated);
 
+	new StateTransition<SipSMCommand,string>(this, "transition_termwait_terminated_notransactions",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a8_trying_trying_40X,
+		s_trying, s_trying);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_termwait_terminated_notransactions",
+		(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogPresenceClient::a9_trying_retry_wait_failure,
+		s_trying, s_retry_wait);
+
 	setCurrentState(s_start);
 }
 
@@ -313,10 +364,14 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 				dialogState.callId,
 				toUri->getSipUri(),
 				getDialogConfig()->sipIdentity->getSipUri(),
+				getDialogConfig()->getContactUri(useSTUN),
 				dialogState.seqNo
 				);
 
 	sub->getHeaderValueFrom()->setParameter("tag",dialogState.localTag);
+
+	addAuthorizations( sub );
+	addRoute( sub );
 
         MRef<SipMessage*> pktr(*sub);
 
@@ -328,6 +383,14 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
 	
 	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 
+}
+
+void SipDialogPresenceClient::sendNotifyOk(MRef<SipRequest*> notify){
+	MRef<SipResponse*> ok= createSipResponse(notify, 200, "OK");
+
+	MRef<SipMessage*> pref(*ok);
+	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){

@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2006
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -66,6 +67,7 @@ class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 	private:
 		
 		void sendSubscribe(const  std::string &branch);
+		void sendNotifyOk(MRef<SipRequest*> notify);
 		void createSubscribeClientTransaction();
 		
 		bool a0_start_trying_presence(const SipSMCommand &command);
@@ -75,6 +77,8 @@ class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 		bool a5_subscribing_subscribing_NOTIFY(const SipSMCommand &command);
 		bool a6_subscribing_termwait_stoppresence(const SipSMCommand &command);
 		bool a7_termwait_terminated_notransactions(const SipSMCommand &command);
+		bool a8_trying_trying_40X(const SipSMCommand &command);
+		bool a9_trying_retry_wait_failure(const SipSMCommand &command);
 
 		MRef<SipIdentity *> toUri;
 		bool useSTUN;
