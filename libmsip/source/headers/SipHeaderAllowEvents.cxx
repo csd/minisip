@@ -47,7 +47,7 @@ MRef<SipHeaderValue *> allowEventsFactory(const string &build_from){
 SipHeaderFactoryFuncPtr sipHeaderAllowEventsFactory=allowEventsFactory;
 
 
-const string sipHeaderValueAllowEventsTypeStr = "AllowEvents";
+const string sipHeaderValueAllowEventsTypeStr = "Allow-Events";
 
 SipHeaderValueAllowEvents::SipHeaderValueAllowEvents(const string &build_from)
 		: SipHeaderValueString(SIP_HEADER_TYPE_ALLOWEVENTS,sipHeaderValueAllowEventsTypeStr,build_from)

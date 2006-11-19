@@ -51,7 +51,7 @@ MRef<SipHeaderValue *> subscriptionStateFactory(const string &build_from){
 SipHeaderFactoryFuncPtr sipHeaderSubscriptionStateFactory=subscriptionStateFactory;
 
 
-const string sipHeaderValueSubscriptionStateTypeStr = "SubscriptionState";
+const string sipHeaderValueSubscriptionStateTypeStr = "Subscription-State";
 
 SipHeaderValueSubscriptionState::SipHeaderValueSubscriptionState(const string &build_from)
 		: SipHeaderValueString(SIP_HEADER_TYPE_SUBSCRIPTIONSTATE,sipHeaderValueSubscriptionStateTypeStr,build_from)
