@@ -560,7 +560,7 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 
 
 // Impl RFC 3263 (partly)
-static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &destAddr,
+bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			   int32_t &destPort, string &destTransport)
 {
 	if( pack->getType() == SipResponse::type ){
@@ -628,8 +628,20 @@ static bool getDestination(MRef<SipMessage*> pack, /*MRef<IPAddress*>*/ string &
 				if( destTransport.length() == 0 ){
 					if( uri.getProtocolId() == "sips" )
 						destTransport = "TLS";
-					else
-						destTransport = "UDP";
+					else{
+						if (findServerSocket(SOCKET_TYPE_UDP, false)){
+							destTransport="UDP";
+						}else
+						if (findServerSocket(SOCKET_TYPE_TCP, false)){
+							destTransport="TCP";
+						}else
+						if (findServerSocket(SOCKET_TYPE_TLS, false)){
+							destTransport = "TLS";
+						}else{
+							merr << "SipMessateTransport: Warning: could not find any supported transport - trying UDP"<<endl;
+							destTransport = "UDP"; // this should not happen
+						}
+					}
 				}
 				return lookupDestIpPort(uri, destTransport, 
 							destAddr, destPort);

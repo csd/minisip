@@ -49,10 +49,8 @@ class SipCommandDispatcher;
 
 class SipLayerTransport : public SipSMCommandReceiver {
 	public:
-		SipLayerTransport(
-							MRef<certificate_chain *> cchain=NULL,
-							MRef<ca_db *> cert_db =
-NULL
+		SipLayerTransport( MRef<certificate_chain *> cchain=NULL,
+				   MRef<ca_db *> cert_db = NULL
 		);
 
 		virtual ~SipLayerTransport();
@@ -92,6 +90,8 @@ NULL
 		virtual MRef<Socket *> findServerSocket( int32_t type, bool ipv6);
 
 	private:
+		bool getDestination(MRef<SipMessage*> pack, string &destAddr,
+				int32_t &destPort, string &destTransport);
 		void addViaHeader( MRef<SipMessage*> pack, MRef<SipSocketServer*> server, MRef<Socket *> socket, std::string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
 		bool findSocket(const std::string &transport,
