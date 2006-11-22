@@ -836,8 +836,8 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "account[0]/certificate", "" );
 	be->save( "account[0]/private_key", "" );
 	be->save( "account[0]/ca_file", "" );
-	be->save( "account[0]/dh_enable", "no" );
-	be->save( "account[0]/psk_enable", "no" );
+	be->save( "account[0]/dh_enabled", "no" );
+	be->save( "account[0]/psk_enabled", "no" );
 	be->save( "account[0]/check_cert", "yes" );
 	
 	be->save( "tcp_server", "yes" );
