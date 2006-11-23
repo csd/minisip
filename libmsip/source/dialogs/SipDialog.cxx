@@ -56,10 +56,9 @@
 using namespace std;
 
 SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity):
-                StateMachine<SipSMCommand,string>(stack->getTimeoutProvider()), 
-                sipStack(stack) 
+                StateMachine<SipSMCommand,string>(stack->getTimeoutProvider())
 {
-	callConfig = new SipDialogConfig(stack->getStackConfig());
+	callConfig = new SipDialogConfig(stack);
 
 	if (identity){
 		callConfig->useIdentity(identity);
@@ -99,7 +98,7 @@ void SipDialog::handleTimeout(const string &c){
 			SipSMCommand::dialog_layer );
 
 	//sipStack->sipStackInternal->getDispatcher()->enqueueTimeout( this, cmd);
-	(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueTimeout( this, cmd);
+	(*(MRef<SipStackInternal*> *) callConfig->sipStack->sipStackInternal)->getDispatcher()->enqueueTimeout( this, cmd);
 }
 
 void SipDialog::signalIfNoTransactions(){
@@ -121,7 +120,7 @@ void SipDialog::signalIfNoTransactions(){
 			// It is placed in the high prio queue so that it is guaranteed 
 			// to be deleted even under high load.
 			//dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE); 
-			(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueCommand(cmd);
+			(*(MRef<SipStackInternal*> *) callConfig->sipStack->sipStackInternal)->getDispatcher()->enqueueCommand(cmd);
 		}
 	}
 }
@@ -147,7 +146,7 @@ void SipDialog::addRoute( MRef<SipRequest *> req ){
 }
 
 list<MRef<SipTransaction*> > SipDialog::getTransactions(){
-	return (*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->getLayerTransaction()->getTransactionsWithCallId(getCallId());
+	return (*(MRef<SipStackInternal*> *) callConfig->sipStack->sipStackInternal)->getDispatcher()->getLayerTransaction()->getTransactionsWithCallId(getCallId());
 }
 
 bool SipDialog::handleCommand(const SipSMCommand &command){
@@ -181,7 +180,7 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 
 
 MRef<SipStack*> SipDialog::getSipStack(){
-	return sipStack;
+	return callConfig->sipStack;
 }
 
 MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
@@ -279,7 +278,7 @@ MRef<SipResponse*> SipDialog::createSipResponse( MRef<SipRequest*> req, int32_t 
 
 void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
 	SipSMCommand cmd( *msg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer );
-	(*(MRef<SipStackInternal*> *) sipStack->sipStackInternal)->getDispatcher()->enqueueCommand( cmd, queue );
+	(*(MRef<SipStackInternal*> *) callConfig->sipStack->sipStackInternal)->getDispatcher()->enqueueCommand( cmd, queue );
 }
 
 bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
@@ -503,7 +502,7 @@ std::string SipDialog::getDialogDebugString(){
 
 	string ret;
 	list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > torequests = 
-		sipStack->getTimeoutProvider()->getTimeoutRequests();
+		callConfig->sipStack->getTimeoutProvider()->getTimeoutRequests();
 
 	ret = getName() + "   State: " + getCurrentStateName()+"\n";
 

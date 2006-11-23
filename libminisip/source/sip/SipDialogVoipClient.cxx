@@ -171,7 +171,7 @@ bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command
 		}
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
-		sipStack->getCallback()->handleCommand("gui", cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 	
 		//string peerUri = command.getCommandPacket()->getTo().getString();
 		string peerUri = dialogState.remoteUri; //use the dialog state ...
@@ -238,7 +238,7 @@ bool SipDialogVoipClient::a2004_calling_incall_2xx( const SipSMCommand &command)
 		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",
 							(getMediaSession()->isSecure()?"secure":"unprotected"));
 		
-		sipStack->getCallback()->handleCommand("gui", cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 		
 		if(!sortMIME(*resp->getContent(), peerUri, 3))
 			return false;
@@ -296,9 +296,9 @@ bool SipDialogVoipClient::a2007_calling_termwait_36( const SipSMCommand &command
 
 		if (sipResponseFilterMatch(resp,"404")){
                         CommandString cmdstr(dialogState.callId, SipCommandString::remote_user_not_found);
-			assert(sipStack);
-			assert(sipStack->getCallback());
-			sipStack->getCallback()->handleCommand("gui", cmdstr);
+			assert(getSipStack());
+			assert(getSipStack()->getCallback());
+			getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 			((LogEntryFailure *)*rejectedLog)->error =
 				"User not found";
 			setLogEntry( rejectedLog );
@@ -311,7 +311,7 @@ bool SipDialogVoipClient::a2007_calling_termwait_36( const SipSMCommand &command
 			rejectedLog->handle();
                         
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_unacceptable, command.getCommandPacket()->getWarningMessage());
-			sipStack->getCallback()->handleCommand( "gui", cmdstr );
+			getSipStack()->getCallback()->handleCommand( "gui", cmdstr );
 		}
 		else if (sipResponseFilterMatch(resp,"3**") ||
 			 sipResponseFilterMatch(resp,"4**") ||
@@ -322,7 +322,7 @@ bool SipDialogVoipClient::a2007_calling_termwait_36( const SipSMCommand &command
 			setLogEntry( rejectedLog );
 			rejectedLog->handle();
                         CommandString cmdstr( dialogState.callId, SipCommandString::remote_reject);
-			sipStack->getCallback()->handleCommand( "gui",cmdstr );
+			getSipStack()->getCallback()->handleCommand( "gui",cmdstr );
 		}
 		
 		getMediaSession()->stop();
@@ -364,7 +364,7 @@ bool SipDialogVoipClient::a2012_calling_termwait_2xx( const SipSMCommand &comman
 		sendBye("", dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
-		sipStack->getCallback()->handleCommand("gui", cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -380,7 +380,7 @@ bool SipDialogVoipClient::a2013_calling_termwait_transporterror( const SipSMComm
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer )){
 		CommandString cmdstr(dialogState.callId, SipCommandString::transport_error);
-		sipStack->getCallback()->handleCommand("gui",cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui",cmdstr);
 		signalIfNoTransactions();
 		return true;
 	}else{
@@ -506,7 +506,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			dialogState.seqNo,
-			sipStack ) ;
+			getSipStack() ) ;
 
 	addAuthorizations( inv );
 	addRoute( inv );
@@ -555,7 +555,7 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 			SipSMCommand::transaction_layer
 			);
 	
-	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 	setLastInvite(inv);
 
 }
@@ -571,7 +571,7 @@ void SipDialogVoipClient::sendAck(){
 			SipSMCommand::transport_layer
 			);
 	
-	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
@@ -627,7 +627,7 @@ void SipDialogVoipClient::sendInviteOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){

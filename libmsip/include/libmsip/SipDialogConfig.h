@@ -250,11 +250,11 @@ class LIBMSIP_API SipIdentity : public MObject{
 
 class LIBMSIP_API SipDialogConfig : public MObject{
 	public:
-		SipDialogConfig(MRef<SipStackConfig *> phone_config);
+		SipDialogConfig(MRef<SipStack*> stack);
 
 		virtual std::string getMemObjectType() const {return "SipDialogConfig";}
 		
-		MRef<SipStackConfig *> inherited;
+		MRef<SipStack*> sipStack;
 
 		//Specific to calls
 		std::string proxyNonce;

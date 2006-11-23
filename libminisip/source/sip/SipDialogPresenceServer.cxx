@@ -163,7 +163,7 @@ bool SipDialogPresenceServer::a4_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated), //FIXME: callId is ""
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		return true;
 	}else{
 		return false;
@@ -273,7 +273,7 @@ void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
 
         MRef<SipMessage*> pref(*ok);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-        sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+        getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 
 	sendNotice(onlineStatus, sub->getFrom().getUserIpString());
@@ -296,7 +296,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 	MRef<SipRequest*> notify;
 	int32_t localSipPort;
 	
-	localSipPort = getDialogConfig()->inherited->getLocalSipPort( useSTUN );
+	localSipPort = getSipStack()->getStackConfig()->getLocalSipPort( useSTUN );
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
 	notify = SipRequest::createSipMessageNotify(
@@ -323,7 +323,7 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
                 SipSMCommand::transaction_layer
                 );
 	
-	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 }
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){

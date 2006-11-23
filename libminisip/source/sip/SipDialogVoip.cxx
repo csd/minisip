@@ -182,7 +182,7 @@ bool SipDialogVoip::a1001_incall_termwait_BYE( const SipSMCommand &command)
 		sendByeOk(bye, "" );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
-		sipStack->getCallback()->handleCommand("gui", cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 
@@ -244,12 +244,12 @@ bool SipDialogVoip::a1003_byerequest_termwait_26( const SipSMCommand &command){
 
 	/* Tell the GUI */
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		//this is for the shutdown dialog 
 		CommandString earlystr( dialogState.callId, SipCommandString::call_terminated_early);
 		SipSMCommand cmd( earlystr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -271,7 +271,7 @@ bool SipDialogVoip::a1101_termwait_terminated_notransactions( const SipSMCommand
                                         SipSMCommand::dialog_layer,
                                         SipSMCommand::dispatcher);
 
-                sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+                getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
                 /* Tell the GUI */
                 //CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated);
                 //sipStack->getCallback()->handleCommand("gui", cmdstr );
@@ -298,11 +298,11 @@ bool SipDialogVoip::a1102_termwait_termwait_early( const SipSMCommand &command){
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
 		/* Tell the GUI, once only */
 		if( notifyEarlyTermination ) {
-			sipStack->getCallback()->handleCommand("gui", cmdstr );
+			getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 			notifyEarlyTermination = false;
 		}
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); //this is for the shutdown dialog 
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); //this is for the shutdown dialog 
 		return true;
 	}
 	else if ( notifyEarlyTermination && transitionMatch(SipResponse::type, command, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer, "2**")){
@@ -311,12 +311,12 @@ bool SipDialogVoip::a1102_termwait_termwait_early( const SipSMCommand &command){
 		CommandString cmdstr( dialogState.callId, SipCommandString::call_terminated_early);
 		
 		/* Tell the GUI, once only */
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		notifyEarlyTermination = false;
 		
 		//Tell the dialog container ... 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); //this is for the shutdown dialog 
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); //this is for the shutdown dialog 
 		return true;
 	}else{
 		return false;
@@ -351,7 +351,7 @@ bool SipDialogVoip::a1202_transferrequested_transferpending_202( const SipSMComm
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::transfer_pending
 				);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		
 		/* Minisip does not actually keep track of the transfer ... 
 		if the REFER is accepted by the far end, then shutdown the media
@@ -376,7 +376,7 @@ bool SipDialogVoip::a1203_transferrequested_incall_36( const SipSMCommand &comma
 		CommandString cmdstr( dialogState.callId, 
 			SipCommandString::transfer_refused, 
 			command.getCommandPacket()->getWarningMessage());
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -401,7 +401,7 @@ bool SipDialogVoip::a1204_transferpending_transferpending_notify( const SipSMCom
 		SipSMCommand cmd(command);
 		cmd.setDestination(SipSMCommand::transaction_layer);
 		cmd.setSource(command.getSource());
-		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+		getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 		
 		sendNotifyOk(notif, "" );
 		
@@ -427,7 +427,7 @@ bool SipDialogVoip::a1301_incall_transferaskuser_REFER( const SipSMCommand &comm
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::transfer_requested,
 				referredUri);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -449,12 +449,12 @@ bool SipDialogVoip::a1302_transferaskuser_transferstarted_accept( const SipSMCom
 		string uri = getReferredUri(lastRefer);
 
 		CommandString invite("",SipCommandString::invite, uri);
-		CommandString resp = phoneconf->sipStack->handleCommandResp("sip",invite);
+		CommandString resp = getSipStack()->handleCommandResp("sip",invite);
 		string newCallId=resp.getDestinationId();
 
 		/* Send the new callId to the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::call_transferred, newCallId);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
 	}else{
@@ -591,7 +591,7 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 		notifyEarlyTermination(false)
 {
 	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
+		dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
 	else
 		dialogState.callId = cid;
 	
@@ -612,7 +612,7 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 
 	MRef<SipMessage*> pref(*bye);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const string referredUri){
@@ -620,7 +620,7 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 
 	MRef<SipMessage*> pref(*refer);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoip::sendCancel(const string &branch){
@@ -639,7 +639,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 
 	MRef<SipMessage*> pref(*cancel);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoip::sendReferOk(const string &branch){
@@ -653,7 +653,7 @@ void SipDialogVoip::sendReferOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
@@ -662,7 +662,7 @@ void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
@@ -671,7 +671,7 @@ void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoip::sendReferReject(const string &branch){
@@ -683,7 +683,7 @@ void SipDialogVoip::sendReferReject(const string &branch){
 	forbidden->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*forbidden);
 	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 bool SipDialogVoip::handleCommand(const SipSMCommand &c){

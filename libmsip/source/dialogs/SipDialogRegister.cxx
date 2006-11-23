@@ -118,7 +118,7 @@ bool SipDialogRegister::a0_start_trying_register( const SipSMCommand &command){
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		return true;
 	}else{
@@ -148,13 +148,13 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
-			sipStack->getCallback()->handleCommand("gui", cmdstr );
+			getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 			setGuiFeedback(false);
 		}
 		
 		//this is for the shutdown dialog 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
 
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
@@ -208,7 +208,7 @@ bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 			SipCommandString::ask_password, 
 			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		//authentication info from received response is extracted in a2
 		return true;
 	}else{
@@ -289,7 +289,7 @@ bool SipDialogRegister::a10_trying_failed_transporterror( const SipSMCommand &co
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::transport_error);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -331,7 +331,7 @@ bool SipDialogRegister::a12_registred_trying_proxyregister( const SipSMCommand &
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
 		return false;
@@ -354,7 +354,7 @@ bool SipDialogRegister::a13_failed_terminated_notransactions( const SipSMCommand
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dispatcher);
 		
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		return true;
 	}else{
@@ -451,7 +451,7 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConf
 			guiFeedback(true)
 {
 	setUpStateMachine();
-	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->localIpString;
+	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->sipStack->getStackConfig()->localIpString;
 
 #if 0
 	if (getDialogConfig()->sipIdentity->sipDomain==""){
@@ -581,6 +581,6 @@ void SipDialogRegister::send_register(string branch){
 	}
 
 	SipSMCommand cmd(*reg, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 

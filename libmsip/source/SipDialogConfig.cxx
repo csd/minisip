@@ -363,11 +363,13 @@ int32_t SipStackConfig::getLocalSipPort(bool usesStun, const string &transport )
 }
 
 
-SipDialogConfig::SipDialogConfig(MRef<SipStackConfig *> commonconf) {
-	inherited = new SipStackConfig; /// We want do do a "deep copy" here. This is so that
-					 /// we have a local copy that we can modify and that 
-					 /// no one else modifies.
-	**inherited = **commonconf;
+SipDialogConfig::SipDialogConfig(MRef<SipStack*> stack) {
+//	inherited = new SipStackConfig; /// We want do do a "deep copy" here. This is so that
+//					 /// we have a local copy that we can modify and that 
+//					 /// no one else modifies.
+//	**inherited = **commonconf;
+	
+	sipStack = stack;
 
 
 	last_invite=NULL;
@@ -398,9 +400,9 @@ SipUri SipDialogConfig::getContactUri(bool useStun) const{
 		transport = fromUri.getTransport();
 
 	contactUri.setParams( fromUri.getUserName(),
-			      inherited->externalContactIP,
+			      sipStack->getStackConfig()->externalContactIP,
 			      "",
-			      inherited->getLocalSipPort(useStun, transport));
+			      sipStack->getStackConfig()->getLocalSipPort(useStun, transport));
 	if( transport != "" )
 		contactUri.setTransport( transport );
 

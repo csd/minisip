@@ -187,7 +187,7 @@ bool SipDialogPresenceClient::a5_subscribing_subscribing_NOTIFY(const SipSMComma
 		sendNotifyOk(notify);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_presence_update,"UNIMPLEMENTED_INFO");
-		sipStack->getCallback()->handleCommand("gui",cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui",cmdstr);
 		return true;
 	}else{
 		return false;
@@ -218,7 +218,7 @@ bool SipDialogPresenceClient::a7_termwait_terminated_notransactions(const SipSMC
 		SipSMCommand cmd( CommandString( dialogState.callId, SipCommandString::call_terminated),
 				  SipSMCommand::dialog_layer,
 				  SipSMCommand::dispatcher);
-		sipStack->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
+		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		return true;
 	}else{
 		return false;
@@ -345,7 +345,7 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack,
 			useSTUN(use_stun)
 {
 
-	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
+	dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
 	
 	dialogState.localTag = itoa(rand());
 	
@@ -381,7 +381,7 @@ void SipDialogPresenceClient::sendSubscribe(const string &branch){
                 SipSMCommand::transaction_layer
                 );
 	
-	sipStack->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(scmd, HIGH_PRIO_QUEUE );
 
 }
 
@@ -390,7 +390,7 @@ void SipDialogPresenceClient::sendNotifyOk(MRef<SipRequest*> notify){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
 bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){

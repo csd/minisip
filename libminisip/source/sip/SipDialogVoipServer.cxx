@@ -183,16 +183,16 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 				dialogState.remoteUri, 
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		bool rel100Supported = inv->supported("100rel");
 		
-		sendRinging(branch, rel100Supported && getDialogConfig()->inherited->use100Rel );
+		sendRinging(branch, rel100Supported && getSipStack()->getStackConfig()->use100Rel );
 		
-		if( getDialogConfig()->inherited->autoAnswer ){
+		if( getSipStack()->getStackConfig()->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
 			SipSMCommand sipcmd(accept, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
-			sipStack->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE);
+			getSipStack()->enqueueCommand(sipcmd,HIGH_PRIO_QUEUE);
 		}
 		return true;
 	}else{
@@ -214,7 +214,7 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 				SipCommandString::invite_ok,"",
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		massert( !getLastInvite().isNull() );
 		sendInviteOk(getLastInvite()->getDestinationBranch() );
@@ -255,7 +255,7 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 		sendByeOk(bye, "" );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
-		sipStack->getCallback()->handleCommand("gui", cmdstr);
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 
 		getMediaSession()->stop();
 
@@ -290,7 +290,7 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		MRef<SipMessage*> cancelledMsg(*cancelledResp);
 		SipSMCommand cancelledCmd( cancelledMsg, SipSMCommand::dialog_layer,
 				  SipSMCommand::transaction_layer);
-		sipStack->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE);
+		getSipStack()->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE);
 
 		// Send 200 OK for CANCEL
 		MRef<SipResponse*> okResp = new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*cancel) );
@@ -299,11 +299,11 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		SipSMCommand okCmd( okMsg, SipSMCommand::dialog_layer,
 				  SipSMCommand::transaction_layer);
 		//cr->handleCommand(okCmd);
-		sipStack->enqueueCommand(okCmd, HIGH_PRIO_QUEUE);
+		getSipStack()->enqueueCommand(okCmd, HIGH_PRIO_QUEUE);
 
 		/* Tell the GUI */
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite,"");
-		sipStack->getCallback()->handleCommand("gui", cmdstr );
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -453,7 +453,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendReject(const string &branch){
@@ -461,7 +461,7 @@ void SipDialogVoipServer::sendReject(const string &branch){
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
@@ -481,7 +481,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
@@ -490,7 +490,7 @@ void SipDialogVoipServer::sendNotAcceptable(const string &branch){
 		not_acceptable->addHeader( 
 			new SipHeader(
 				new SipHeaderValueWarning(
-					getDialogConfig()->inherited->externalContactIP, 
+					getSipStack()->getStackConfig()->externalContactIP, 
 					399, 
 					mediaSession->getErrorString() ) ));
 	}
@@ -498,6 +498,6 @@ void SipDialogVoipServer::sendNotAcceptable(const string &branch){
 	not_acceptable->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*not_acceptable);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
