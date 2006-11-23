@@ -153,8 +153,12 @@ MRef<SipStackConfig*> SipStackInternal::getStackConfig(){
 	return config;
 }
 
-void SipStackInternal::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
+void SipStackInternal::setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb){
 	dispatcher->getLayerDialog()->setDefaultDialogCommandHandler(cb);
+}
+
+MRef<SipDefaultHandler*> SipStackInternal::getDefaultDialogCommandHandler(){
+	return dispatcher->getLayerDialog()->getDefaultDialogCommandHandler();
 }
 
 void SipStackInternal::setTransactionHandlesAck(bool transHandleAck){

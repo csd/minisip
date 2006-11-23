@@ -43,7 +43,8 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 
 		SipLayerDialog(MRef<SipCommandDispatcher*> dispatcher);
 		
-		void setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb);
+		void setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb);
+		MRef<SipDefaultHandler*> getDefaultDialogCommandHandler();
 		
 		void addDialog(MRef<SipDialog*> d);
 		void removeTerminatedDialogs();
@@ -55,7 +56,7 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 		std::list<MRef<SipDialog*> > getDialogs();
 
 	private:
-		MRef<SipSMCommandReceiver*> defaultHandler;
+		MRef<SipDefaultHandler*> defaultHandler;
 
 		minilist<MRef<SipDialog*> > dialogs;
 

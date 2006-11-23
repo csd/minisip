@@ -93,6 +93,60 @@ class SipDialog;
 
 #define HIGH_PRIO_QUEUE 2
 #define LOW_PRIO_QUEUE 4
+/**
+ * \brief The SipDefaultHandler of an application is the class
+ *        that decides how the application will behave when
+ *        SIP messages are received or the GUI gives the "sip"
+ *        subsystem a command. A typical task of the default
+ *        handler is to add dialogs to the SIP stack as a 
+ *        reaction to an incoming message or a command from
+ *        the GUI.
+ *
+ * An application needs to "hook into" the SIP stack and decide
+ * how it should handle messages from the network, GUI or commands
+ * generated from within the SIP stack (such as transport error 
+ * messages). The application creates a sub-class of SipDefaultHandler
+ * and implements four handler methods.
+ *
+ * An example of what the default handler could do is:
+ *  - Create a server voip dialog an INVITE message is receved
+ *  - Create a client voip dialog if the GUI sends a command
+ *    indicating that the user wants to make a call
+ */
+class LIBMSIP_API SipDefaultHandler : public SipSMCommandReceiver, public CommandReceiver{
+	public:
+		/**
+		 * If the SIP stack does not handle a command sent to the
+		 * SIP subsystem, then the default handler will receive it.
+		 *
+		 * This method is required to be a "CommandReceiver" that
+		 * receives commands from the MessageRouter.
+		 *
+		 * @param subsystem	This argument will be "sip"
+		 * @param cmd		
+		 */
+		virtual void handleCommand(std::string subsystem, const CommandString &cmd)=0;
+
+		/**
+		 * This method is similar to handleCommand(subsystem, cmd)
+		 * with the difference that it returns a response to the
+		 * caller.
+		 */
+		virtual CommandString handleCommandResp(std::string subsystem, const CommandString &cmd)=0;
+
+		/**
+		 * This method is what the SIP stack uses to communicate
+		 * with the default handler. The handler receives
+		 * SipSMCommand objects that contain either
+		 *  - A SIP message received by the transport layer
+		 *   or
+		 *  - A CommandString object (a string such as
+		 *  "transport_error")
+		 *  plus additional information such as what layer sent
+		 *  the message (transport, transaction or dialog).
+		 */
+		virtual bool handleCommand(const SipSMCommand &cmd)=0;
+};
 
 
 class LIBMSIP_API SipStackConfig : public MObject{
@@ -117,8 +171,6 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		*/
 		int32_t getLocalSipPort(bool usesStun=false, const std::string &transport="UDP");
 
-//		MRef<SipIdentity*> sipIdentity;
-	
 		bool autoAnswer;
 
 
@@ -146,7 +198,6 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		 */
 		string instanceId;
 };
-
 
 //TODO: Enable conference calling
 
@@ -184,16 +235,20 @@ class LIBMSIP_API SipStackConfig : public MObject{
  * See the main documentation document for how to implement application
  * layer support for new header and content types (@see Factories).
 */
-class LIBMSIP_API SipStack : public Runnable{
+class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 	public:
 		SipStack( MRef<SipStackConfig*> stackConfig );
 
 		~SipStack();
 		
 		void setTransactionHandlesAck(bool transHandleAck);
-		void setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb);
+		void setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb);
                 virtual void run();
 		virtual void stopRunning();
+		void handleCommand(std::string subsystem, const CommandString &cmd);
+
+		CommandString handleCommandResp(std::string subsystem, const CommandString &cmd);
+
 		bool handleCommand(const CommandString &cmd);
 		bool handleCommand(const SipSMCommand &cmd);
 		void enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &cmd);

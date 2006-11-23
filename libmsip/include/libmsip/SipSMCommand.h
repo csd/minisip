@@ -39,7 +39,7 @@
  *
  * @author Erik Eliasson <eliasson@it.kth.se>
  */
-class LIBMSIP_API SipSMCommand : public MObject{
+class LIBMSIP_API SipSMCommand : public virtual MObject{
 	public:
 		static const int COMMAND_PACKET;
 		static const int COMMAND_STRING;

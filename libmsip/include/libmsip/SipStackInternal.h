@@ -46,7 +46,8 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 		void setTransactionHandlesAck(bool transHandleAck);
 
-		void setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb);
+		void setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb);
+		MRef<SipDefaultHandler*> getDefaultDialogCommandHandler();
 
 		virtual std::string getMemObjectType() const {return "SipStackInternal";}
 		

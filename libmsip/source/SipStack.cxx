@@ -88,7 +88,7 @@ void SipStack::setTransactionHandlesAck(bool transHandlesAck){
 
 }
 
-void SipStack::setDefaultDialogCommandHandler(MRef<SipSMCommandReceiver*> cb){
+void SipStack::setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb){
 	STACK->setDefaultDialogCommandHandler(cb);
 }
 
@@ -99,6 +99,17 @@ void SipStack::run(){
 void SipStack::stopRunning(){
 	STACK->stopRunning();
 }
+
+void SipStack::handleCommand(std::string subsystem, const CommandString &cmd){
+	massert(subsystem=="sip");
+	if (!handleCommand(cmd))
+		STACK->getDefaultDialogCommandHandler()->handleCommand(subsystem,cmd);
+}
+
+CommandString SipStack::handleCommandResp(std::string subsystem, const CommandString &cmd){
+	return STACK->getDefaultDialogCommandHandler()->handleCommandResp(subsystem, cmd);
+}
+
 
 bool SipStack::handleCommand(const CommandString &cmd){
 	return STACK->handleCommand(cmd);
