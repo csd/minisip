@@ -69,7 +69,7 @@ using namespace std;
 
 SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
 	//securityConfig(),
-	sip(NULL),
+	//sip(NULL),
 	useSTUN(false),
 	stunServerPort(0),
 	findStunServerFromSipUri(false),
@@ -85,7 +85,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	ringtone(""),
 	p2tGroupListServerPort(0)
 {
-	inherited = new SipStackConfig;
+	sipStackConfig = new SipStackConfig;
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
@@ -98,11 +98,11 @@ void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ... 
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 	
-	backend->save( "local_udp_port", inherited->localUdpPort );
-	backend->save( "local_tcp_port", inherited->localTcpPort );
-	backend->save( "local_tls_port", inherited->localTlsPort );
-	backend->save( "auto_answer", inherited->autoAnswer?"yes":"no");
-	backend->save( "instance_id", inherited->instanceId);
+	backend->save( "local_udp_port", sipStackConfig->localUdpPort );
+	backend->save( "local_tcp_port", sipStackConfig->localTcpPort );
+	backend->save( "local_tls_port", sipStackConfig->localTlsPort );
+	backend->save( "auto_answer", sipStackConfig->autoAnswer?"yes":"no");
+	backend->save( "instance_id", sipStackConfig->instanceId);
 
 	//securityConfig.save( backend );
 	
@@ -678,7 +678,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 
 		if (backend->loadString(accountPath + "default_account","")=="yes"){
-			//inherited->sipIdentity = ident;
+			//sipStackConfig->sipIdentity = ident;
 			defaultIdentity=ident;
 		}
 
@@ -766,17 +766,17 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	ringtone = backend->loadString("ringtone","");
 
-	inherited->localUdpPort = backend->loadInt("local_udp_port",5060);
-	inherited->externalContactUdpPort = inherited->localUdpPort; //?
-	inherited->localTcpPort = backend->loadInt("local_tcp_port",5060);
-	inherited->localTlsPort = backend->loadInt("local_tls_port",5061);
-	inherited->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
-	inherited->instanceId = backend->loadString("instance_id");
+	sipStackConfig->localUdpPort = backend->loadInt("local_udp_port",5060);
+	sipStackConfig->externalContactUdpPort = sipStackConfig->localUdpPort; //?
+	sipStackConfig->localTcpPort = backend->loadInt("local_tcp_port",5060);
+	sipStackConfig->localTlsPort = backend->loadInt("local_tls_port",5061);
+	sipStackConfig->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
+	sipStackConfig->instanceId = backend->loadString("instance_id");
 
-	if( inherited->instanceId.empty() ){
+	if( sipStackConfig->instanceId.empty() ){
 		MRef<Uuid*> uuid = Uuid::create();
 
-		inherited->instanceId = "\"<urn:uuid:" + uuid->toString() + ">\"";
+		sipStackConfig->instanceId = "\"<urn:uuid:" + uuid->toString() + ">\"";
 	}
 
 	//securityConfig.load( backend ); //TODO: EEEE Load security per identity

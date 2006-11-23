@@ -61,11 +61,12 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig,
 	this->phoneconfig = pconfig;
 	this->mediaHandler = mediaHandler;
 
-	MRef<SipStackConfig *> stackConfig = new SipStackConfig();
-	// Deep copy
-	**stackConfig = **(pconfig->inherited);
+	MRef<SipStackConfig *> stackConfig /*= new SipStackConfig()*/;
+//	// Deep copy
+//	**stackConfig = **(pconfig->inherited);
+	stackConfig = pconfig->sipStackConfig;
 
-	sipstack = new SipStack(stackConfig);
+	sipstack = new SipStack(stackConfig); //FIXME: stackConfig is not set yet!
 
 	MRef<DefaultDialogHandler*> defaultDialogHandler = 
 			new DefaultDialogHandler(sipstack,
@@ -91,123 +92,6 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig,
 
 
 Sip::~Sip(){
-}
-
-void Sip::handleCommand(string subsystem, const CommandString &cmd){
-	assert(subsystem=="sip");
-	sipstack->handleCommand(cmd);
-}
-
-CommandString Sip::handleCommandResp(string subsystem, const CommandString &cmd){
-	assert(subsystem=="sip");
-	assert(cmd.getOp()=="invite");//TODO: no assert, return error message instead
-	
-	string user = cmd.getParam();
-	bool gotAtSign;
-//	SipDialogSecurityConfig securityConfig;
-#ifdef ENABLE_TS
-	ts.save( INVITE_START );
-#endif
-//	securityConfig = phoneconfig->securityConfig;
-	
-	int startAddr=0;
-	if (user.substr(0,4)=="sip:")
-		startAddr = 4;
-	
-	if (user.substr(0,5)=="sips:")
-		startAddr = 5;
-
-	bool onlydigits=true;
-	MRef<SipIdentity *> id;
-	
-	for (unsigned i=0; i<user.length(); i++)
-		if (user[i]<'0' || user[i]>'9')
-			onlydigits=false;
-
-	id = ( onlydigits && phoneconfig->usePSTNProxy )?
-			phoneconfig->pstnIdentity:
-			phoneconfig->defaultIdentity;
-
-	if( !id ){
-		merr << "ERROR: could not determine what local identity to use" << endl;
-	}
-
-//	securityConfig.useIdentity( id );
-
-	gotAtSign = ( user.find("@", startAddr) != string::npos );
-
-#if 0	
-	// Uri check not compatible with IPv6
-	if (user.find(":", startAddr)!=string::npos){
-		string proxy;
-		string port;
-		uint32_t i=startAddr;
-		while (user[i]!='@')
-			if (user[i]==':'){
-				//return "malformed";
-				return CommandString("malformed","");;
-			}else
-				i++;
-		i++;
-		while (user[i]!=':')
-			proxy = proxy + user[i++];
-		i++;
-		while (i<user.size())
-			if (user[i]<'0' || user[i]>'9'){
-				//return "malformed";
-				return CommandString("malformed","");
-	}else
-				port = port + user[i++];
-		
-		
-	}
-#endif
-
-	if( !gotAtSign && id ){
-		id->lock();
-		user += "@" + id->getSipUri().getIp();
-		id->unlock();
-	}
-
-#ifdef DEBUG_OUTPUT
-        cerr << "Before new mediaSession" << endl;
-#endif
-	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ id );
-#ifdef DEBUG_OUTPUT
-        cerr << "After new mediaSession" << endl;
-#endif
-	
-	MRef<SipDialog*> voipCall( new SipDialogVoipClient(sipstack, id, phoneconfig, mediaSession)); 
-
-#ifdef DEBUG_OUTPUT
-	cerr << "Before addDialog" << endl;
-#endif	
-	/*dialogContainer*/sipstack->addDialog(voipCall);
-#ifdef DEBUG_OUTPUT
-	cerr << "After addDialog" << endl;
-#endif
-	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
-#ifdef ENABLE_TS
-	ts.save( TMP );
-#endif
-	
-        SipSMCommand c(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //TODO: send directly to dialog instead
-	
-#ifdef DEBUG_OUTPUT
-        cerr << "Before handleCommand" << endl;
-#endif
-	sipstack->handleCommand(c);
-#ifdef DEBUG_OUTPUT
-        cerr << "After handleCommand" << endl;
-#endif
-	
-	mediaSession->setCallId( voipCall->getCallId() );
-
-	string cid = voipCall->getCallId();
-
-	CommandString ret(cid,"invite_started");
-	return ret;
 }
 
 string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId){
@@ -410,7 +294,6 @@ void Sip::join() {
 	
 	thread->join();
 }
-
 
 void Sip::run(){
 

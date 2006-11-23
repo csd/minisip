@@ -597,7 +597,7 @@ void MinisipTextUI::keyPressed(int key){
 		showMem();
 		break;
 	case '+':
-		displayMessage( config->sip->getSipStack()->getStackStatusDebugString() );
+		displayMessage( config->sipStack->getStackStatusDebugString() );
 		break;
 	}
 }
@@ -665,13 +665,13 @@ void MinisipTextUI::guiExecute(string cmd){
 
 #ifdef DEBUG_OUTPUT
 	if (command == "show packets"){
-		config->sip->getSipStack()->setDebugPrintPackets(true);
+		config->sipStack->setDebugPrintPackets(true);
 		displayMessage("SIP messages will be displayed on the screen", blue);
 		handled=true;
 	}
 
 	if (command == "hide packets"){
-		config->sip->getSipStack()->setDebugPrintPackets(false);
+		config->sipStack->setDebugPrintPackets(false);
 		displayMessage("SIP messages will NOT be displayed on the screen", blue);
 		handled=true;
 	}

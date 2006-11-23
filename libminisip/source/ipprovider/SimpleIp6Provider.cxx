@@ -35,7 +35,7 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 	bool use_ipv6 = true;
 	Scope curScope = INVALID;
 	
-	localIp = config->inherited->localIpString;
+	localIp = config->sipStackConfig->localIpString;
 
 	mdbg << "SimpleIP6Provider: localIp = " << localIp << endl;
 

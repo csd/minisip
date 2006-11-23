@@ -46,7 +46,7 @@ class SipDialogContainer;
  * If even the DefaultDialogHandler cannot handle the command, it will be
  * discarded.
  */
-class LIBMINISIP_API DefaultDialogHandler : public /*SipDialog*/ SipSMCommandReceiver{
+class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 	public:
 		
 		/**
@@ -66,6 +66,12 @@ class LIBMINISIP_API DefaultDialogHandler : public /*SipDialog*/ SipSMCommandRec
 		virtual std::string getName();
 		
 		virtual bool handleCommand(const SipSMCommand &command);
+
+		void handleCommand(std::string subsystem, const CommandString &cmd);
+
+		CommandString handleCommandResp(std::string subsystem, const CommandString &cmd);
+
+
 		
 	private:
 		minilist<ConfMember> connectList;

@@ -41,7 +41,7 @@
 class SipSoftPhoneConfiguration;
 class MediaHandler;
 
-class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
+class LIBMINISIP_API Sip: public Runnable{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
@@ -84,10 +84,6 @@ class LIBMINISIP_API Sip: public Runnable, public CommandReceiver{
 		MRef<SipStack*> getSipStack(){return sipstack;}
 
 		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
-
-		void handleCommand(std::string subsystem, const CommandString &cmd);
-
-		CommandString handleCommandResp(std::string subsystem, const CommandString &cmd);
 
 	private:
 		MRef<SipStack *> sipstack;

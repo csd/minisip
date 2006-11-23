@@ -40,7 +40,7 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 	unsigned i; //index
 	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
 	
-	localIp = config->inherited->localIpString;
+	localIp = config->sipStackConfig->localIpString;
 	#ifdef DEBUG_OUTPUT
 	cerr << "SimpleIPProvider: localIp = " << localIp << endl;
 	#endif

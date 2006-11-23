@@ -31,7 +31,7 @@
 #include<string>
 #include<map>
 
-class LIBMUTIL_API CommandString : public MObject{
+class LIBMUTIL_API CommandString : public virtual MObject{
 	public:
 		CommandString();
 

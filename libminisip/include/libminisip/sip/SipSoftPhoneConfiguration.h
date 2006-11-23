@@ -82,15 +82,10 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		 */
 		void saveDefault( MRef<ConfBackend *> backend );
 		
-		MRef<SipStackConfig *> inherited;	//inherited.sipIdentity is the default sip identity.
+		MRef<SipStackConfig *> sipStackConfig;	//inherited.sipIdentity is the default sip identity.
+		MRef<SipStack*> sipStack;
 		
-		//SipDialogSecurityConfig securityConfig;
-
-		
-		//Configuration only the phone has and not every call
-		MRef<Sip *> sip;
 	
-//		SipIdentity pstnIdentity;
 		MRef<SipIdentity *> pstnIdentity;
 		MRef<SipIdentity *> defaultIdentity;
 

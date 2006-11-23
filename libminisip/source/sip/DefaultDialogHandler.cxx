@@ -40,6 +40,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmutil/massert.h>
 
+#include<libminisip/sip/SipDialogVoipClient.h>
 #include<libminisip/sip/SipDialogVoipServer.h>
 #include<libminisip/sip/SipDialogVoipServer100rel.h>
 #include<libminisip/sip/SipDialogConfVoip.h>
@@ -515,6 +516,126 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 		return handleCommandString( cmdstr/*, dispatchCount */);
 	}
 }
+
+void DefaultDialogHandler::handleCommand(string subsystem, const CommandString &cmd){
+	assert(subsystem=="sip");
+	merr << "DefaultDialogHandler::handleCommand(subsystem,cmd): Can not handle: "<< cmd.getString() << end;
+}
+
+CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const CommandString &cmd){
+	assert(subsystem=="sip");
+	assert(cmd.getOp()=="invite");//TODO: no assert, return error message instead
+	
+	string user = cmd.getParam();
+	bool gotAtSign;
+//	SipDialogSecurityConfig securityConfig;
+#ifdef ENABLE_TS
+	ts.save( INVITE_START );
+#endif
+//	securityConfig = phoneconf->securityConfig;
+	
+	int startAddr=0;
+	if (user.substr(0,4)=="sip:")
+		startAddr = 4;
+	
+	if (user.substr(0,5)=="sips:")
+		startAddr = 5;
+
+	bool onlydigits=true;
+	MRef<SipIdentity *> id;
+	
+	for (unsigned i=0; i<user.length(); i++)
+		if (user[i]<'0' || user[i]>'9')
+			onlydigits=false;
+
+	id = ( onlydigits && phoneconf->usePSTNProxy )?
+			phoneconf->pstnIdentity:
+			phoneconf->defaultIdentity;
+
+	if( !id ){
+		merr << "ERROR: could not determine what local identity to use" << endl;
+	}
+
+//	securityConfig.useIdentity( id );
+
+	gotAtSign = ( user.find("@", startAddr) != string::npos );
+
+#if 0	
+	// Uri check not compatible with IPv6
+	if (user.find(":", startAddr)!=string::npos){
+		string proxy;
+		string port;
+		uint32_t i=startAddr;
+		while (user[i]!='@')
+			if (user[i]==':'){
+				//return "malformed";
+				return CommandString("malformed","");;
+			}else
+				i++;
+		i++;
+		while (user[i]!=':')
+			proxy = proxy + user[i++];
+		i++;
+		while (i<user.size())
+			if (user[i]<'0' || user[i]>'9'){
+				//return "malformed";
+				return CommandString("malformed","");
+	}else
+				port = port + user[i++];
+		
+		
+	}
+#endif
+
+	if( !gotAtSign && id ){
+		id->lock();
+		user += "@" + id->getSipUri().getIp();
+		id->unlock();
+	}
+
+#ifdef DEBUG_OUTPUT
+        cerr << "Before new mediaSession" << endl;
+#endif
+	MRef<Session *> mediaSession = 
+		mediaHandler->createSession( /*securityConfig*/ id );
+#ifdef DEBUG_OUTPUT
+        cerr << "After new mediaSession" << endl;
+#endif
+	
+	MRef<SipDialog*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf, mediaSession); 
+
+#ifdef DEBUG_OUTPUT
+	cerr << "Before addDialog" << endl;
+#endif	
+	/*dialogContainer*/sipStack->addDialog(voipCall);
+#ifdef DEBUG_OUTPUT
+	cerr << "After addDialog" << endl;
+#endif
+	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
+#ifdef ENABLE_TS
+	ts.save( TMP );
+#endif
+	
+        SipSMCommand c(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //TODO: send directly to dialog instead
+	
+#ifdef DEBUG_OUTPUT
+        cerr << "Before handleCommand" << endl;
+#endif
+	sipStack->handleCommand(c);
+#ifdef DEBUG_OUTPUT
+        cerr << "After handleCommand" << endl;
+#endif
+	
+	mediaSession->setCallId( voipCall->getCallId() );
+
+	string cid = voipCall->getCallId();
+
+	CommandString ret(cid,"invite_started");
+	return ret;
+}
+
+
+
 
 #ifdef P2T_SUPPORT
 void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){

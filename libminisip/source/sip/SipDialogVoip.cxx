@@ -449,7 +449,7 @@ bool SipDialogVoip::a1302_transferaskuser_transferstarted_accept( const SipSMCom
 		string uri = getReferredUri(lastRefer);
 
 		CommandString invite("",SipCommandString::invite, uri);
-		CommandString resp = phoneconf->sip->handleCommandResp("sip",invite);
+		CommandString resp = phoneconf->sipStack->handleCommandResp("sip",invite);
 		string newCallId=resp.getDestinationId();
 
 		/* Send the new callId to the GUI */

@@ -752,9 +752,9 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		networkInterfacesEntry->set_text( preferredIfaceIP );
 	}
 	
-	udpSpin->set_value( config->inherited->localUdpPort );
-	tcpSpin->set_value( config->inherited->localTcpPort );
-	tlsSpin->set_value( config->inherited->localTlsPort );
+	udpSpin->set_value( config->sipStack->getStackConfig()->localUdpPort );
+	tcpSpin->set_value( config->sipStack->getStackConfig()->localTcpPort );
+	tlsSpin->set_value( config->sipStack->getStackConfig()->localTlsPort );
 
 	tcpCheck->set_active( config->tcp_server );
 	tlsCheck->set_active( config->tls_server );
@@ -793,9 +793,9 @@ string AdvancedSettings::apply(){
 		config->networkInterfaceName = ifaceSel;
 	}
 
-	config->inherited->localUdpPort = udpSpin->get_value_as_int();
-	config->inherited->localTcpPort = tcpSpin->get_value_as_int();
-	config->inherited->localTlsPort = tlsSpin->get_value_as_int();
+	config->sipStack->getStackConfig()->localUdpPort = udpSpin->get_value_as_int();
+	config->sipStack->getStackConfig()->localTcpPort = tcpSpin->get_value_as_int();
+	config->sipStack->getStackConfig()->localTlsPort = tlsSpin->get_value_as_int();
 
 	config->tcp_server = tcpCheck->get_active();
 	config->tls_server = tlsCheck->get_active();

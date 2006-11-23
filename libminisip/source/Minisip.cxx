@@ -192,7 +192,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 	cerr << "Creating SipSoftPhoneConfiguration"<< endl;
 	#endif
 	phoneConf =  new SipSoftPhoneConfiguration();
-	phoneConf->sip=NULL;
+	//phoneConf->sip=NULL;
 
 	#ifdef MINISIP_AUTOCALL
 	if (argc==3){
@@ -201,9 +201,8 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 	#endif
 
 	#ifdef DEBUG_OUTPUT
-	mout << BOLD << "init 1/9: Creating timeout provider" << PLAIN << end;
+	mout << BOLD << "init 1/9: Creating contact database" << PLAIN << end;
 	#endif
-//	timeoutprovider = new TimeoutProvider<string,MRef<StateMachine<SipSMCommand,string>*> >;
 
 	/* Create the global contacts database */
 	ContactDb *contactDb = new ContactDb();
@@ -262,7 +261,7 @@ int Minisip::exit(){
 	messageRouter=NULL;
 
 
-	phoneConf->sip = NULL;
+	//phoneConf->sip = NULL;
 	phoneConf = NULL;
 	mediaHandler = NULL;
 	confMessageRouter->setGui(NULL);
@@ -275,11 +274,11 @@ int Minisip::exit(){
 
 int Minisip::startSip() {
 	int ret = 1;
-	
+
 #ifdef DEBUG_OUTPUT
 	cerr << "Thread 2 running - doing initParseConfig"<< endl;
 #endif	
-	
+
 	if( initParseConfig() < 0 ){
 		merr << "Minisip::startSip::initParseConfig - fatal error" << end;
 		return -1;
@@ -288,7 +287,6 @@ int Minisip::startSip() {
 	try{
 		messageRouter =  new MessageRouter();
 		confMessageRouter =  new ConfMessageRouter();
-//		phoneConf->timeoutProvider = timeoutprovider;
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << end;
@@ -296,22 +294,22 @@ int Minisip::startSip() {
 		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf );
 		MRef<IpProvider *> ip6Provider;
 		ip6Provider = IpProvider::create( phoneConf, true );
-//#ifdef DEBUG_OUTPUT
-//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
-//#endif
+		//#ifdef DEBUG_OUTPUT
+		//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
+		//#endif
 		string localIpString;
 		string externalContactIP;
 
 		// FIXME: This should be done more often
 		localIpString = externalContactIP = ipProvider->getExternalIp();                
-		
-		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->inherited->localUdpPort );                
-		
-		phoneConf->inherited->localUdpPort = ipProvider->getExternalPort( udpSocket );
-		phoneConf->inherited->localIpString = externalContactIP;
-		phoneConf->inherited->externalContactIP = externalContactIP;
+
+		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->sipStackConfig->localUdpPort );
+
+		phoneConf->sipStackConfig->localUdpPort = ipProvider->getExternalPort( udpSocket );
+		phoneConf->sipStackConfig->localIpString = externalContactIP;
+		phoneConf->sipStackConfig->externalContactIP = externalContactIP;
 		if( ip6Provider )
-			phoneConf->inherited->localIp6String = ip6Provider->getExternalIp();
+			phoneConf->sipStackConfig->localIp6String = ip6Provider->getExternalIp();
 		udpSocket=NULL;
 
 #ifdef DEBUG_OUTPUT
@@ -320,7 +318,7 @@ int Minisip::startSip() {
 		mediaHandler = new MediaHandler( phoneConf, ipProvider );
 		confMessageRouter->setMediaHandler( mediaHandler );
 		messageRouter->addSubsystem("media",*mediaHandler);
-                mediaHandler->setMessageRouterCallback(*messageRouter);
+		mediaHandler->setMessageRouterCallback(*messageRouter);
 
 		if( consoleDbg ){
 			consoleDbg->setMediaHandler( mediaHandler );
@@ -328,8 +326,8 @@ int Minisip::startSip() {
 
 		Session::registry = *mediaHandler;
 		/* Hack: precompute a KeyAgreementDH */
-	//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, 
-        //                phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
+		//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, 
+		//                phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
@@ -337,32 +335,33 @@ int Minisip::startSip() {
 
 		MRef<SipSim*> sim = phoneConf->defaultIdentity->getSim();
 		if (sim){
-			phoneConf->inherited->cert = sim->getCertificateChain();
-			phoneConf->inherited->cert_db = sim->getCAs();
+			phoneConf->sipStackConfig->cert = sim->getCertificateChain();
+			phoneConf->sipStackConfig->cert_db = sim->getCAs();
 		}
 
 		//save Sip object in Minisip::sip ...
 		this->sip=new Sip(phoneConf,mediaHandler);
 		//sip->init();
 
-		phoneConf->sip = sip;
+//		phoneConf->sip = sip;
+		phoneConf->sipStack = sip->getSipStack();
 
 		sip->getSipStack()->setCallback(*messageRouter);
 		//sip->getSipStack()->setConfCallback(*confMessageRouter);
 		//TODO: Send the callback to the  conference dialog
 		//instead.
 
-		//messageRouter->setSip(sip);
-		messageRouter->addSubsystem("sip",*sip);
+		//messageRouter->addSubsystem("sip",*sip);
+		messageRouter->addSubsystem("sip",*sip->getSipStack());
 
 		confMessageRouter->setSip(sip);
 #ifdef ZRTP_SUPPORT
-                ZrtpHostBridgeMinisip::initialize(sip->getSipStack()->getTimeoutProvider());
+		ZrtpHostBridgeMinisip::initialize(sip->getSipStack()->getTimeoutProvider());
 #endif
 		/* Load the plugins at this stage */
-//		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
+		//		int32_t pluginCount = MPlugin::loadFromDirectory( PLUGINS_PATH );
 
-//		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
+		//		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
 
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
@@ -372,34 +371,34 @@ int Minisip::startSip() {
 		messageRouter->addSubsystem("gui",*gui);
 		confMessageRouter->setGui(gui);
 
-	
-/*
-		mdbg << "Starting presence server"<< end;
-		CommandString subscribeserver("", SipCommandString::start_presence_server);
-		SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
-		sip->handleCommand(sipcmdss);
-*/
 
-/*
-		cerr << "Minisip: starting presence client for johan@bilien.org"<< endl;
-		
-		CommandString subscribe("", SipCommandString::start_presence_client,"johan@bilien.org");
-		SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
-		sip->getSipStack()->handleCommand(sipcmd2);
-*/
-		
+		/*
+		   mdbg << "Starting presence server"<< end;
+		   CommandString subscribeserver("", SipCommandString::start_presence_server);
+		   SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
+		   sip->handleCommand(sipcmdss);
+		   */
+
+		/*
+		   cerr << "Minisip: starting presence client for johan@bilien.org"<< endl;
+
+		   CommandString subscribe("", SipCommandString::start_presence_client,"johan@bilien.org");
+		   SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
+		   sip->getSipStack()->handleCommand(sipcmd2);
+		   */
+
 		gui->setCallback(*messageRouter);
 		gui->setConfCallback(*confMessageRouter);
-		
+
 		sip->start(); //run as a thread ...
-//		sleep(5);
-		
-//		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
-//		gui->handleCommand(pupd);
+		//		sleep(5);
+
+		//		CommandString pupd("", SipCommandString::remote_presence_update,"someone@ssvl.kth.se","online","Working hard");
+		//		gui->handleCommand(pupd);
 
 		//sip->run();
 	}
-		
+
 	catch(exception &exc){
 		//FIXME: Display message in GUI
 		merr << "Minisip caught an exception. Quitting."<< end;
@@ -433,7 +432,6 @@ int Minisip::initParseConfig(){
 				::exit( 1 );
 			}
 			string ret = phoneConf->load( confBackend );
-
 
 			done = true;
 			retGlobal = 1; //for now, we finished ok ... check the return string
@@ -473,7 +471,7 @@ int Minisip::runGui(){
 
 void Minisip::startDebugger(){
 	cerr << "startDebugger" << endl;
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf->sip->getSipStack()));
+	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf->sipStack));
 	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 }
 
@@ -486,3 +484,5 @@ void Minisip::stopDebugger(){
 		consoleDbg = NULL;
 	}
 }
+
+ 
