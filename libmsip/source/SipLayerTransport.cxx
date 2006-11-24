@@ -42,6 +42,7 @@
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderTo.h>
 
 #include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/ServerSocket.h>
@@ -468,8 +469,8 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	hdrVal->setParameter("branch",branch);
 	
 	MRef<SipHeader*> hdr = new SipHeader( hdrVal );
-	
-	pack->addHeader( hdr );
+
+	pack->addBefore( hdr );
 }
 
 static int32_t getDefaultPort(const string &transport)
@@ -646,6 +647,9 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 				return lookupDestIpPort(uri, destTransport, 
 							destAddr, destPort);
 			}
+		}
+		else{
+			mdbg << "SipLayerTransport: URI invalid " << end;
 		}
 	}
 

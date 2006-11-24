@@ -156,6 +156,11 @@ void SipHeader::addHeaderValue(MRef<SipHeaderValue*> v){
 	headerValues.push_back(v);
 }
 
+void SipHeader::removeHeaderValue(int i){
+	assert(i < headerValues.size() );
+	headerValues.remove(i);
+}
+
 static string getHeader(const string &line,int &endi) {
 	string ret;
 	int i;
@@ -238,7 +243,9 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 				value_zero = value_params[0];
 			}
 		} else if( headerType == "From" ||
-				headerType == "To" ) {
+				headerType == "To" ||
+			   headerType == "Route" ||
+			   headerType == "Record-Route" ) {
 			size_t ltPos = values[i].find( '<' );
 			size_t gtPos = values[i].find( '>' );
 			if( ltPos!=string::npos && gtPos!=string::npos ) {

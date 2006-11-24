@@ -64,7 +64,11 @@ class LIBMSIP_API SipAuthenticationDigest: public MObject{
 		 */
 		void setCredential(const std::string &username, const std::string &password);
 
+		static std::string md5ToString(unsigned char *md5);
+
 	private:
+		std::string calcResponse( MRef<SipRequest*> req ) const;
+
 		int type;
 		std::string realm;
 // 		std::string domain;

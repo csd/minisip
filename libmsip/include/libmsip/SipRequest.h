@@ -40,6 +40,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipMessage.h>
+#include<libmsip/SipHeaderRoute.h>
 #include<libmutil/MemObject.h>
 
 class SipStack;
@@ -151,6 +152,13 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		void addRoute(const std::string &addr, int32_t port,
 			      const std::string &transport);
 
+		/**
+		* @return The top most route header, or a null reference
+		* if there is no route headers in the message.
+		*/
+		MRef<SipHeaderValueRoute*> getFirstRoute();
+
+		void removeFirstRoute();
 
 		/**
 		 * Adds From, To, CSeq, MaxForwards and CallId headers to

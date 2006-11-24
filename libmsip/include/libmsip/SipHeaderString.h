@@ -67,6 +67,8 @@ class LIBMSIP_API SipHeaderValueString: public SipHeaderValue{
 		 */
 		std::string getString() const; 
 
+		void setString(const std::string &newStr);
+
 	protected:
 		std::string str;
 };

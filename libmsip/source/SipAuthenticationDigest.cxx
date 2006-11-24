@@ -27,6 +27,7 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
+#include<libmutil/vmd5.h>
 
 using namespace std;
 
@@ -88,34 +89,71 @@ bool SipAuthenticationDigest::update( MRef<SipHeaderValueProxyAuthenticate*> aut
 	return true;
 }
 
+string SipAuthenticationDigest::md5ToString(unsigned char *md5){
+	char *digits = {"0123456789abcdef"};
+	char strsum[33] = {'\0'};
+	for (int i=0 ; i<16; i++){
+		int32_t intval = md5[i];
+		strsum[2*i] = digits[(intval & 0xF0) >>4];
+		strsum[2*i+1] = digits[(intval & 0x0F)];
+	}
+	return string(strsum);
+}
+
+string SipAuthenticationDigest::calcResponse( MRef<SipRequest*> req ) const
+{
+	unsigned char digest[16];
+	MD5Context context;
+	MD5Init(&context);
+	string u_r_p(username+":"+realm+":"+password);
+	MD5Update(&context, (const unsigned char *)u_r_p.c_str(), (unsigned int)u_r_p.length() );
+	MD5Final(digest,&context);
+	string md5_u_r_p = md5ToString(digest);
+
+	string uri_part = req->getUri().getRequestUriString();
+	MD5Context c2;
+	MD5Init(&c2);
+	string uristr(req->getMethod()+":"+ uri_part);
+	//cerr << "DEBUG: uri_part="<< uri_part<< " sip_method = "<<sip_method<< endl;
+	MD5Update(&c2, (const unsigned char *)uristr.c_str(), (unsigned int)uristr.length() );
+	MD5Final(digest,&c2);
+	string md5_uri = md5ToString(digest);
+
+	MD5Context c3;
+	MD5Init(&c3);
+	string all(md5_u_r_p+":"+nonce+":"+md5_uri);
+	MD5Update(&c3,(const unsigned char *)all.c_str(), (unsigned int)all.length() );
+	MD5Final(digest,&c3);
+
+	string auth_string = md5ToString(digest);
+	return auth_string;
+}
+
 MRef<SipHeaderValueAuthorization*> SipAuthenticationDigest::createAuthorization( MRef<SipRequest*> req ) const{
 	MRef<SipHeaderValueAuthorization*> authorization;
 
 	SipUri uri( req->getUri() );
+	string response = calcResponse( req );
 
 	if( type == SIP_HEADER_TYPE_WWWAUTHENTICATE ){
 		authorization = new SipHeaderValueAuthorization(
-			req->getMethod(),
-			"",
+			username,
 			realm,
 			nonce,
 			opaque == nullStr ? "" : opaque,
 			uri,
-			username,
-			password,
+			response,
 			"Digest"
 			);
 	}
 	else {
 		authorization = new SipHeaderValueProxyAuthorization(
-			req->getMethod(),
-			"",
+			username,
 			realm,
 			nonce,
 			opaque == nullStr ? "" : opaque,
 			uri,
-			username,
-			password,
+			response,
 			"Digest"
 			);
 	}

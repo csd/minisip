@@ -54,24 +54,21 @@ SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string 
 
 }
 
-SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(const string &sip_method,
+SipHeaderValueProxyAuthorization::SipHeaderValueProxyAuthorization(
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
 		const string &opaque, 
 		const SipUri &uri, 
-		const string &auth_id, 
-		const string &password,
+		const string &response,
 		const string &auth_method)
 			: SipHeaderValueAuthorization(SIP_HEADER_TYPE_PROXYAUTHORIZATION,
-						sip_method,
 						username,
 						realm,
 						nonce,
 						opaque,
 						uri,
-						auth_id,
-						password,
+						response,
 						auth_method,sipHeaderValueProxyAuthorization)
 {
 

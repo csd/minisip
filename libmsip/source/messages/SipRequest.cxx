@@ -317,7 +317,13 @@ void SipRequest::init(string &build_from){
 		throw SipExceptionInvalidMessage("SipRequest malformed - unknown version");
 	}	  
 
+	pos2 = requestLine.find_last_not_of( ' ', pos2 );
+
 	uri = requestLine.substr( pos + 1, pos2 - pos );
+	if( !uri.isValid() ){
+		throw SipExceptionInvalidMessage("SipRequest malformed - uri");
+	}
+
 	#ifdef DEBUG_OUTPUT
 	cerr << "SipRequest::init - uri = " << uri.getString() << endl;
 	#endif
@@ -415,3 +421,24 @@ void SipRequest::addRoute(const string &addr, int32_t port,
 	addRoute( uri );
 }
 
+MRef<SipHeaderValueRoute*> SipRequest::getFirstRoute()
+{
+	MRef<SipHeaderValueRoute*> route;
+	MRef<SipHeader*> header = getHeaderOfType(SIP_HEADER_TYPE_ROUTE, 0);
+
+	if( header ){
+		route = MRef<SipHeaderValueRoute*>((SipHeaderValueRoute*)*(header->getHeaderValue(0)));
+	}
+	return route;
+}
+
+void SipRequest::removeFirstRoute(){
+	MRef<SipHeader*> hdr = getHeaderOfType(SIP_HEADER_TYPE_ROUTE, 0);
+
+	if( hdr->getNoValues() > 1 ){
+		hdr->removeHeaderValue( 0 );
+	}
+	else{
+		removeHeader( hdr );
+	}
+}

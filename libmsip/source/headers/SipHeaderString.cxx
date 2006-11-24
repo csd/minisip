@@ -52,3 +52,7 @@ string SipHeaderValueString::getString() const{
 	return str;
 }
 
+void SipHeaderValueString::setString(const std::string &newStr)
+{
+	str = newStr;
+}

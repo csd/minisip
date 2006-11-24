@@ -257,7 +257,7 @@ SipMessage::SipMessage(int, string &buildFrom)
 //cerr <<"boundary="<< b <<endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
-				MRef<SipMessageContent*> smcref = contentFactory(content, contentType + "; boundary=boun=_dry");
+				MRef<SipMessageContent*> smcref = contentFactory(content, contentType );
 				setContent(smcref);
 			}else{ //TODO: Better error handling
 				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<end;
@@ -285,13 +285,33 @@ bool SipMessage::addLine(string line){
 }
 
 
+MRef<SipHeaderValue*> findFirstHeaderValue(minilist<MRef<SipHeader*> > headers, int type)
+{
+	for (int32_t i=0; i< headers.size(); i++){
+		if ((headers[i])->getType() == type){
+			return headers[i]->getHeaderValue(0);
+			
+		}
+	}
+	return NULL;
+}
+
 void SipMessage::setContent(MRef<SipMessageContent*> content){
 	this->content=content;
 	if( content ){
 		string contentType = content->getContentType();
 		if( contentType != "" ){
-			MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType( contentType );
-			addHeader(new SipHeader(*contenttypep));
+			MRef<SipHeaderValue*> hdr = findFirstHeaderValue( headers, SIP_HEADER_TYPE_CONTENTTYPE );
+
+			if( hdr ){
+				MRef<SipHeaderValueContentType*> contentTypeHdr = 
+					dynamic_cast<SipHeaderValueContentType*>(*hdr);
+				contentTypeHdr->setString(contentType);
+			}
+			else{
+				MRef<SipHeaderValueContentType*> contenttypep = new SipHeaderValueContentType( contentType );
+				addHeader(new SipHeader(*contenttypep));
+			}
 		}
 	}
 }
@@ -390,6 +410,22 @@ SipUri SipMessage::getTo(){
 		ret = hto->getUri();
 
 	return ret;
+}
+
+void SipMessage::removeFirstVia(){
+	MRef<SipHeader*> hdr = getHeaderOfType( SIP_HEADER_TYPE_VIA, 0 );
+	if( hdr->getNoValues() > 1 ){
+		hdr->removeHeaderValue( 0 );
+	}
+	else{
+		removeHeader( hdr );
+	}
+
+	branch = getFirstViaBranch();
+}
+
+void SipMessage::removeHeader(MRef<SipHeader*> header){
+	headers.remove( header );
 }
 
 void SipMessage::removeAllViaHeaders(){

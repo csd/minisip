@@ -160,6 +160,7 @@ class LIBMSIP_API SipHeader : public MObject{
 		int32_t getType() const;
 		int getNoValues() const;
 		MRef<SipHeaderValue *> getHeaderValue(int i) const;
+		void removeHeaderValue(int i);
 
 		static MRef<SipHeader *> parseHeader(const std::string &buildFrom);
 

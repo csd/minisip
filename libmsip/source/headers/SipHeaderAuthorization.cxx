@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -34,9 +36,12 @@
 
 
 #include<libmsip/SipHeaderAuthorization.h>
-#include<libmutil/vmd5.h>
 
 using namespace std;
+
+string quote(const string &str){
+	return "\"" + str + "\"";
+}
 
 MRef<SipHeaderValue *> authorizationFactory(const string &build_from){
 	return new SipHeaderValueAuthorization(build_from);
@@ -49,72 +54,75 @@ SipHeaderFactoryFuncPtr sipHeaderAuthorizationFactory=authorizationFactory;
 const string sipHeaderValueAuthorizationTypeString="Authorization";
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &typeStr) 
-	: SipHeaderValue(type, typeStr),uri()
+	: SipHeaderValue(type, typeStr)
 {
 	
 }	
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &/*build_from*/)	//TODO: parse authorization header 
-		: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString), 
-		uri()
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &build_from)
+		: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString)
 {
-	
+	init( build_from );
 }
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &/*build_from*/, const string &typeStr) //TODO: parse authorization header
-		: SipHeaderValue(type,typeStr), 
-		uri(){
-//	type = SIP_HEADER_TYPE_AUTHORIZATION;
-
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &build_from, const string &typeStr)
+		: SipHeaderValue(type,typeStr)
+{
+	init( build_from );
 }
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &sip_method,
+void SipHeaderValueAuthorization::init(const string &build_from){
+	size_t pos = build_from.find_first_not_of(" \t\r\n");
+	size_t last = build_from.find_first_of(" \t\r\n", pos);
+
+	if( last != string::npos ){
+		auth_method = build_from.substr( pos, last - pos );
+		addParameter( new SipHeaderParameter( build_from.substr( last )));
+	}
+}
+
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
 		const string &opaque,
 		const SipUri &uri, 
-		const string &auth_id, 
-		const string &password,
+		const string &response,
 		const string &auth_method)
 			: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString),
-                        sipMethod(sip_method),
-			username(username),
-			realm(realm),
-			nonce(nonce),
-			opaque(opaque),
-			uri(uri),
-			auth_id(auth_id),
-			password(password),
 			auth_method(auth_method)
 {
-
+	setParameter("algorithm", "MD5");
+	setParameter("username", quote(username));
+	setParameter("realm", quote(realm));
+	setParameter("nonce", quote(nonce));
+	setParameter("uri", quote(uri.getRequestUriString()));
+	setParameter("response", quote(response));
+	if( opaque != "")
+		setParameter("opaque", quote(opaque));
 }
 
 SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
-		const string &sip_method,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
 		const string &opaque,
 		const SipUri &uri, 
-		const string &auth_id, 
-		const string &password,
+		const string &response,
 		const string &auth_method,
 		const string &typeStr
 		)
 			: SipHeaderValue(type,typeStr),
-                        sipMethod(sip_method),
-			username(username),
-			realm(realm),
-			nonce(nonce),
-			opaque(opaque),
-			uri(uri),
-			auth_id(auth_id),
-			password(password),
 			auth_method(auth_method)
 {
-
+	setParameter("algorithm", "MD5");
+	setParameter("username", quote(username));
+	setParameter("realm", quote(realm));
+	setParameter("nonce", quote(nonce));
+	setParameter("uri", quote(uri.getRequestUriString()));
+	setParameter("response", quote(response));
+	if( opaque != "")
+		setParameter("opaque", quote(opaque));
 }
 
 SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
@@ -122,107 +130,53 @@ SipHeaderValueAuthorization::~SipHeaderValueAuthorization() {
 }
 
 string SipHeaderValueAuthorization::getString() const{
-	//uri.setUserType("");
-
-	string result = auth_method+
-		" algorithm=\"MD5\""+", username=\""+auth_id+
-		"\", realm=\""+realm+"\", nonce=\""+nonce+
-		"\", uri=\""+uri.getRequestUriString()+"\", response=\""+
-		calcResponse()+"\"";
-
-	if( opaque != "" )
-		result += ", opaque=\"" + opaque + "\"";
-
-	return result;
-} 
-
-string SipHeaderValueAuthorization::md5ToString(unsigned char *md5){
-	char *digits = {"0123456789abcdef"};
-	char strsum[33] = {'\0'};
-	for (int i=0 ; i<16; i++){
-		int32_t intval = md5[i];
-		strsum[2*i] = digits[(intval & 0xF0) >>4];
-		strsum[2*i+1] = digits[(intval & 0x0F)];
-	}
-	return string(strsum);
+	return auth_method;
 }
 
-
-
-string SipHeaderValueAuthorization::calcResponse() const{
-	unsigned char digest[16];
-	MD5Context context;
-	MD5Init(&context);
-	string u_r_p(auth_id+":"+realm+":"+password);
-	MD5Update(&context, (const unsigned char *)u_r_p.c_str(), (unsigned int)u_r_p.length() );
-	MD5Final(digest,&context);
-	string md5_u_r_p = md5ToString(digest);
-
-	string uri_part = uri.getRequestUriString();
-	MD5Context c2;
-	MD5Init(&c2);
-	string uristr(sipMethod+":"+/*sip:"+username+"@"+uri.get_ip()*/ uri_part);
-	//cerr << "DEBUG: uri_part="<< uri_part<< " sip_method = "<<sip_method<< endl;
-	MD5Update(&c2, (const unsigned char *)uristr.c_str(), (unsigned int)uristr.length() );
-	MD5Final(digest,&c2);
-	string md5_uri = md5ToString(digest);
-
-	MD5Context c3;
-	MD5Init(&c3);
-	string all(md5_u_r_p+":"+nonce+":"+md5_uri);
-	MD5Update(&c3,(const unsigned char *)all.c_str(), (unsigned int)all.length() );
-	MD5Final(digest,&c3);
-
-	string auth_string = md5ToString(digest);
-	return auth_string;
-}
-
-string SipHeaderValueAuthorization::getSipMethod() const{
-	return sipMethod;
-}
-
-void SipHeaderValueAuthorization::setSipMethod(const string &m){
-	this->sipMethod=m;
+void SipHeaderValueAuthorization::setParameter(const std::string &name,
+					       const std::string &value)
+{
+	addParameter(new SipHeaderParameter(name, value, true));
 }
 
 string SipHeaderValueAuthorization::getUsername() const{
-	return username;
+	return getParameter("username");
 }
 
 void SipHeaderValueAuthorization::setUsername(const string &un){
-	this->username=un;
+	setParameter("username", un);
 }
 
 
 string SipHeaderValueAuthorization::getNonce() const{
-	return nonce;
+	return getParameter("none");
 }
 
 void SipHeaderValueAuthorization::setNonce(const string &n){
-	this->nonce=n;
+	setParameter("nonce", n);
 }
 
 string SipHeaderValueAuthorization::getOpaque() const{
-	return opaque;
+	return getParameter("opaque");
 }
 
 void SipHeaderValueAuthorization::setOpaque(const string &n){
-	this->opaque=n;
+	setParameter("opaque", n);
 }
 
 string SipHeaderValueAuthorization::getRealm() const{
-	return realm;
+	return getParameter("realm");
 }
 
 void SipHeaderValueAuthorization::setRealm(const string &r){
-	this->realm=r;
+	setParameter("realm", r);
 }
 
 SipUri SipHeaderValueAuthorization::getUri() const{
-	return uri;
+	return getParameter("uri");
 }
 
 void SipHeaderValueAuthorization::setUri(const SipUri &uri){
-	this->uri=uri;
+	setParameter("uri", uri.getRequestUriString());
 }
 

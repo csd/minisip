@@ -142,6 +142,12 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		*/
 		void addHeader(MRef<SipHeader*> header);
 
+		/**
+		 * Adds header h just before any other header of the same
+		 * type to the message.
+		 */
+
+		void addBefore(MRef<SipHeader*> h);
 
                 /**
                  * Returns true if the message contains a SIP "Require" header with
@@ -227,6 +233,8 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* if there is no via header in the message.
 		*/
 		MRef<SipHeaderValueVia*> getFirstVia();
+
+		void removeFirstVia();
 
 		/**
 		* @return Call ID in the SIP message.
@@ -344,13 +352,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		void setDestinationBranch(std::string b){branch = b;}
 
 		/**
-		 * Adds header h just before any other header of the same
-		 * type to the message.
-		 */
-		void addBefore(MRef<SipHeader*> h);
-
-		
-		/**
 		 * Parses one line of text to a SIP header and adds it to
 		 * the message. If the message can be parsed depends if a
 		 * "factory" is available for the header type (and if the
@@ -358,16 +359,18 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		bool addLine(std::string line);
 		
-	private: 
-		minilist<MRef<SipHeader*> > headers;
-		MRef<SipMessageContent*> content;
-
 		/**
 		 * Gets the i:th header of a certain type. In most cases,
 		 * users are 
 		 */
 		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		
+		void removeHeader(MRef<SipHeader*> header);
+
+	private: 
+		minilist<MRef<SipHeader*> > headers;
+		MRef<SipMessageContent*> content;
+
 		int parseHeaders(const std::string &buf, int startIndex);
 		MRef<SipHeaderValueVia*> getViaHeader(bool first);
 		std::string getViaHeaderBranch(bool first);

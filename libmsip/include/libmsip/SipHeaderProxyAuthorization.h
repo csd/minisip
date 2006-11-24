@@ -48,14 +48,13 @@ class LIBMSIP_API SipHeaderValueProxyAuthorization: public SipHeaderValueAuthori
 	public:
 		SipHeaderValueProxyAuthorization(const std::string &build_from);
 		
-		SipHeaderValueProxyAuthorization(const std::string &sip_method,
+		SipHeaderValueProxyAuthorization(
 				const std::string &username, 
 				const std::string &realm, 
 				const std::string &nonce, 
 				const std::string &opaque,
 				const SipUri &uri, 
-				const std::string &auth_id, 
-				const std::string &password,
+				const std::string &response,
 				const std::string &auth_method="DIGEST");
 		
 

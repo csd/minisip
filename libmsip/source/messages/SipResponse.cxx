@@ -118,6 +118,10 @@ SipResponse::SipResponse(string &resp): SipMessage(-1, resp)
 
 	status_desc="";
 	i=afterws+3;	//go past response code
+	while( resp[i] == ' ' ){
+	  i++;
+	}
+
 	for ( ; resp[i]!='\r' && resp[i]!='\n'; i++){
 		if(len == i){
 #ifdef DEBUG_OUTPUT

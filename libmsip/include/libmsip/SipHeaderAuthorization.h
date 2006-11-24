@@ -38,6 +38,8 @@
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipUri.h>
 
+#include<list>
+
 /**
  * @author Erik Eliasson
 */
@@ -52,24 +54,22 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		SipHeaderValueAuthorization(const std::string &build_from);
 		SipHeaderValueAuthorization(int type, const std::string &build_from, const std::string &typeStr);
 		
-		SipHeaderValueAuthorization(const std::string &sip_method,
+		SipHeaderValueAuthorization(
 				const std::string &username, 
 				const std::string &realm, 
 				const std::string &nonce, 
 				const std::string &opaque,
 				const SipUri &uri, 
-				const std::string &auth_id, 
-				const std::string &password,
+				const std::string &response,
 				const std::string &auth_method="DIGEST");
 		
-		SipHeaderValueAuthorization(int type, const std::string &sip_method,
+		SipHeaderValueAuthorization(int type,
 				const std::string &username, 
 				const std::string &realm, 
 				const std::string &nonce, 
 				const std::string &opaque,
 				const SipUri &uri, 
-				const std::string &auth_id, 
-				const std::string &password,
+				const std::string &response,
 				const std::string &auth_method,
 				const std::string &typeStr);
 
@@ -83,12 +83,15 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		 */
 		std::string getString() const; 
 
+		const std::string &getAuthMethod() const;
+		void setAuthMethod(const std::string &n);
+
+		void setParameter(const std::string &name,
+				  const std::string &value);
+
 		/**
 		 * returns the protocol used. This can be either UDP or TCP
 		 */
-		std::string getSipMethod() const;
-		void setSipMethod(const std::string &meth);
-
 		std::string getUsername() const;
 		void setUsername(const std::string &username);
 
@@ -107,18 +110,13 @@ class LIBMSIP_API SipHeaderValueAuthorization: public SipHeaderValue{
 		std::string getResponse() const;
 		void setResponse(const std::string &resp);
 
-		static std::string md5ToString(unsigned char *md5);
+	protected:
+		char getFirstParameterSeparator() const {return ' ';}
+		char getParameterSeparator() const {return ',';}
+
 	private:
-		std::string calcResponse() const;
-		
-		std::string sipMethod;
-		std::string username;
-		std::string realm;
-		std::string nonce;
-		std::string opaque;
-		SipUri uri;
-		std::string auth_id;
-		std::string password;
+		void init(const std::string& build_from);
+
 		std::string auth_method;
 };
 
