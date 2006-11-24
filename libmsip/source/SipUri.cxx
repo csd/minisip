@@ -238,19 +238,6 @@ string SipUri::getString() const {
 	}
 	Uri += "<";
 	Uri += getRequestUriString();
-
-	map<string, string>::const_iterator iter;
-	map<string, string>::const_iterator last = parameters.end();
-
-	for( iter = parameters.begin(); iter != last; iter++ ){
-		string key = iter->first;
-		string val = iter->second;
-
-		if( val.empty() )
-			Uri += ';' + key ;
-		else
-			Uri += ';' + key + '=' + val;
-	}
 	Uri += ">";
 	
 #ifdef DEBUG_OUTPUT
@@ -302,6 +289,19 @@ string SipUri::getRequestUriString() const {
 		Uri += ":" + itoa( port );
 	}
 	
+	map<string, string>::const_iterator iter;
+	map<string, string>::const_iterator last = parameters.end();
+
+	for( iter = parameters.begin(); iter != last; iter++ ){
+		string key = iter->first;
+		string val = iter->second;
+
+		if( val.empty() )
+			Uri += ';' + key ;
+		else
+			Uri += ';' + key + '=' + val;
+	}
+
 #ifdef DEBUG_OUTPUT
 // 	cerr << "SipUri::getRequestUristring() - " << Uri << endl;
 #endif
