@@ -542,6 +542,9 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 		hostname = rr->name;
 		break;
 	}
+
+	free(srv);
+	dns_free(ctx);
 	ret_port=port;
 	ret = string(hostname);
 	#ifdef DEBUG_OUTPUT
