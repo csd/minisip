@@ -16,6 +16,7 @@ AM_CONFIG_HEADER(include/compilation_config.h)
 
 AM_MINISIP_LIBTOOL_EXTRAS
 AC_PROG_LIBTOOL
+AC_PROG_AWK
 
 AM_MINISIP_ENABLE_DEBUG
 AM_MINISIP_ENABLE_TEST_SUITE
@@ -65,7 +66,8 @@ AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
-AC_CHECK_LIB([resolv], [main])
+AC_CHECK_FUNCS([poll])
+AC_REPLACE_FUNCS([inet_pton])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -82,6 +84,7 @@ AC_CONFIG_FILES([
 		include/Makefile 
 		m4/Makefile 
 		tests/Makefile
+		udns/Makefile
 		win32/Makefile 
 		win32/libmnetutil-res.rc
 	])

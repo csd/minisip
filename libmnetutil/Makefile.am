@@ -1,22 +1,25 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = win32 . examples include m4 tests
+SUBDIRS = udns win32 . examples include m4 tests
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmnetutil.spec
+
+AM_CPPFLAGS = -I$(srcdir)/include
 
 pkgconfig_DATA = libmnetutil.pc
 
 lib_LTLIBRARIES = libmnetutil.la
-libmnetutil_la_CPPFLAGS = $(MINISIP_CFLAGS)
+libmnetutil_la_CPPFLAGS = $(MINISIP_CFLAGS) -I$(srcdir)/udns/source
 libmnetutil_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
-libmnetutil_la_LIBADD = $(MINISIP_LIBS)
+libmnetutil_la_LIBADD = udns/libudns.la  $(LTLIBOBJS) $(MINISIP_LIBS)
+libmnetutil_la_DEPENDENCIES = $(LTLIBOBJS)
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
 
 if OS_WIN
 res_obj = win32/libmnetutil-res.o
 libmnetutil_la_LDFLAGS += -Wl,$(res_obj)
-libmnetutil_la_DEPENDENCIES = $(res_obj)
+libmnetutil_la_DEPENDENCIES += $(res_obj)
 endif OS_WIN
 
 srp_src = 

@@ -44,8 +44,6 @@
 #	include <netinet/in.h>
 #	include <sys/ioctl.h>
 #	include<unistd.h>
-#	include<arpa/nameser.h>
-#	include<resolv.h>
 #endif
 
 #ifdef HAVE_NETDB_H
@@ -55,6 +53,7 @@
 #include<ifaddrs.h>
 #endif
 #include<map>
+#include<udns.h>
 
 
 /**
@@ -77,28 +76,14 @@ windns is only for windows ... but it is not restricted to xp or higher ... thus
 #	endif
 #	include<windows.h>
 #	include "iphlpapi.h" //to obtain list of interfaces ...
-#	ifdef USE_WIN32_API_WINDNS
-#		include<windns.h> //for the DNS querying ... link with libdnsapi.lib
-#		ifndef DNS_TYPE_SRV
-			//mingw does not define this type ... 
-#			define DNS_TYPE_SRV (33)
-#		endif
-#	endif
 	//do not use getaddrinfo in linux ... it does not do SRV lookup (as of March 2006) ...
 	//in windows, it works fine ... for wce(?); and xp and higher.
 #	ifdef USE_WIN32_API_GETADDRINFO
-#		ifndef WIN32
-#			include<netdb.h> //for addrinfo stuff in linux ...
-#			include <netinet/in.h> //for ntohs ... in linux
-#		else
+#		ifdef WIN32
 #			include<winsock2.h>
 #			include<ws2tcpip.h>
 #		endif
 #	endif
-#endif
-
-#ifdef HAVE_ARPA_NAMESER_COMPAT_H
-#	include<arpa/nameser_compat.h>
 #endif
 
 #include<libmnetutil/NetworkException.h>
@@ -511,236 +496,58 @@ string NetworkFunctions::getInterfaceOf( string ipStr ) {
 
 string NetworkFunctions::getHostHandlingService(string service, string domain, uint16_t &ret_port){
 	string ret;
-	
-#ifndef USE_WIN32_API
+	string hostname;
 	int32_t port=-1;
+	static bool inited=false;
+
 	#ifdef DEBUG_OUTPUT
 	cerr <<"NetworkFunctions::getHostHandlingService - Using LIBRESOLV"<< endl;
 	#endif
-	if (res_init()){
-		throw ResolvError( errno );
-	}
-//	unsigned char answerbuffer[2048]={};
-	unsigned char *answerbuffer=(unsigned char*)calloc(1,2048);
-//	string q = string("_sip._udp.")+argv[1];
-	string q = service+"."+domain;
 
-	int32_t len = res_query(q.c_str(), C_IN, T_SRV, answerbuffer,2048);
-	if (len<=0){
+	string q;
+	if( service == "" )
+		q = domain;
+	else
+		q = service+"."+domain;
+
+	if( !inited ){
+		if( dns_init(0) < 0 )
+			throw ResolvError( errno ); // FIXME
+		inited = true;
+	}
+	dns_ctx *ctx = dns_new(NULL);
+	if( !ctx )
+		throw ResolvError( errno ); // FIXME
+	if( dns_open(ctx) < 0 )
+		throw ResolvError( errno ); // FIXME
+
+	dns_rr_srv *srv = 
+		(dns_rr_srv*) dns_resolve_p(ctx, q.c_str(), DNS_C_IN,
+					    DNS_T_SRV, DNS_NOSRCH,
+					    dns_parse_srv);
+
+	if (!srv){
 		#ifdef DEBUG_OUTPUT
 		cerr <<"SRV Service [" << service << "." << domain << "] not found"<< endl;
 		#endif
 		return "";
 	}
 
-
-	HEADER *hdr = (HEADER*)&answerbuffer[0];
-	int32_t qdcount = ntohs(hdr->qdcount);
-	int32_t ancount = ntohs(hdr->ancount);
-//	cerr << "Query count="<< qdcount << " and answer count="<<ancount <<endl;
-
-	char hostname[256];
-	unsigned char *messageindex = answerbuffer+sizeof(HEADER);
-//	cerr << "Query fields returned:"<<endl;
-	int32_t n,i;
-	for (i=0; i< qdcount; i++){                         // 3.
-		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
-			merror("dn_expand:");
-		}
-		messageindex+=n+QFIXEDSZ;
-//		cerr << "\tName: "<< hostname << endl;
-	}
-
+	// FIXME sort by priority and weight
 //	cerr << "Answer fields returned:"<<endl;
-	for (i=0; i< ancount; i++){                 // 4.
-		if ((n=dn_expand(answerbuffer,answerbuffer+len, messageindex, &hostname[0],256))<0){
-			merror("dn_expand:");
-		}
-		messageindex+=n;                        // 5.
-//		cerr << "\tName: "<< hostname << endl;
+	for (int i=0; i< srv->dnssrv_nrr; i++){
+		dns_srv *rr = &srv->dnssrv_srv[i];
 
-		int32_t type = ntohs(*((short*)messageindex));
-//		cerr << "\tType: "<< type << endl;
-		messageindex+=sizeof(short);
-
-//		int qclass = ntohs(*((short*)messageindex));
-//		cerr << "\tClass: "<< qclass << endl;
-		messageindex+=sizeof(short);
-
-//		unsigned long ttl = ntohl(*((unsigned long*)messageindex));
-//		cerr << "\tTTL: "<< ttl << endl;
-		messageindex+=sizeof(unsigned long);
-
-
-//		int dlen = ntohs(*((short*)messageindex));
-//		cerr << "\tdlen: "<< dlen << endl;
-		messageindex+=sizeof(short);
-
-		if (type!=T_SRV){
-			#ifdef DEBUG_OUTPUT
-			cerr << "Returned type is not a SRV record"<< endl;
-			#endif
-			return "";
-		}
-
-//		int pref = ntohs(*((short*)messageindex));
-//		cerr << "\tpref: "<< pref << endl;
-		messageindex+=sizeof(short);
-
-//		int weight = ntohs(*((short*)messageindex));
-//		cerr << "\tweight: "<< weight << endl;
-		messageindex+=sizeof(short);
-
-		port = ntohs(*((unsigned short*)messageindex));
-//		cerr << "\tport: "<< port << endl;
-		messageindex+=sizeof(short);
-		n= dn_expand(answerbuffer,answerbuffer+len,messageindex, hostname, 256);
-
-		messageindex+=n;
-
-//		cerr << "\tHost: "<< hostname << endl;
+		port = rr->port;
+		hostname = rr->name;
+		break;
 	}
 	ret_port=port;
 	ret = string(hostname);
 	#ifdef DEBUG_OUTPUT
 	cerr << "NetworkFunc:getHostHandlingServ = " << ret << ":" << ret_port << endl;
 	#endif
-#else
-#	ifdef USE_WIN32_API_WINDNS	
-		DNS_STATUS status;
-		DNS_RECORD *result = NULL;
-		DNS_RECORD *resultScan = NULL;
-		
-		string q = service + "." + domain;
-		
-		#ifdef DEBUG_OUTPUT
-		cerr <<"NetworkFunctions::getHostHandlingService - Using WINDNS"<< endl;
-		#endif
-	// 	cerr << "NetworkFunc:getHostHandlingServ: before query ... " << q << endl;
-		status = DnsQuery(
-				q.c_str(),
-				DNS_TYPE_SRV,
-				DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE,
-				NULL,
-				&result,
-				NULL);
-	// 	cerr << "NetworkFunc:getHostHandlingServ: query done ... " << endl;
-		if (status != 0)	{
-			#ifdef DEBUG_OUTPUT
-			cerr << "NetworkFunc:getHostHandlingServ: DnsQuery FAILED ! " << endl;
-			#endif
-			return "";
-		}
-	// 	cerr << "NetworkFunc:getHostHandlingServ: DnsQuery succeeded " << endl;
-		string first_domain = "";
-		
-		for( resultScan = result; resultScan != NULL; resultScan = resultScan->pNext ) {
-	// 			if( stricmp(resultScan->pName, domain.c_str()) != 0 ) {
-	// 				cerr << "NetworkFunc:getHostHandlingServ: different domain name " << endl;
-	// 				continue;
-	// 			} else {
-	// 				cerr << "NetworkFunc:getHostHandlingServ: domain name is the same ...  " << endl;
-	// 			}
-			
-			if( resultScan->wType == DNS_TYPE_SRV ) {
-				cerr << "NetworkFunc:getHostHandlingServ: SRV record found ... " << endl;
-				DNS_SRV_DATA *data;
-				data = &resultScan->Data.SRV;
-				#ifdef DEBUG_OUTPUT
-				cerr << "NetworkFunc:getHostHandlingServ: SRVrecord={" << string(data->pNameTarget) 
-						<< "; " << data->wPriority
-						<< "; " << data->wWeight
-						<< "; port=" << data->wPort 
-						<< "}" << endl;
-				#endif
-				if( first_domain == "" ) {
-					first_domain = string(data->pNameTarget);
-					ret_port = data->wPort;
-					ret = first_domain;
-				}		} else  {
-	// 			cerr << "NetworkFunc:getHostHandlingServ: Non SRV record found ... " << endl;
-				continue;
-			}
-		}
-		// Clean up by freeing up the records
-	// 	cerr << "NetworkFunc:getHostHandlingServ: before dnsrecordlistfree" << endl;
-		DnsRecordListFree(result,DnsFreeRecordList);
-	// 	cerr << "NetworkFunc:getHostHandlingServ: after dnsrecordlistfree" << endl; 
 	
-#	elif USE_WIN32_API_GETADDRINFO
-		#ifdef DEBUG_OUTPUT
-		cerr <<"NetworkFunctions::getHostHandlingService - Using GETADDRINFO (untested for WinCE)"<< endl;
-		#endif
-		/*
-		int getaddrinfo(
-			const TCHAR* nodename,
-			const TCHAR* servname,
-			const struct addrinfo* hints,
-			struct addrinfo** res
-		);
-		*/
-		struct addrinfo hints;
-		struct addrinfo *res = NULL;	
-		struct addrinfo *ai = NULL;	
-		
-		string gettaddr_service = "";
-		
-		if ( service == "_sip._tcp") {
-			hints.ai_socktype = SOCK_STREAM;
-			hints.ai_protocol = IPPROTO_TCP;
-			gettaddr_service = "sip";
-		} else if ( service == "_sip._udp" ) {
-			hints.ai_socktype = SOCK_DGRAM;
-			hints.ai_protocol = IPPROTO_UDP;
-			gettaddr_service = "sip";
-		} else if ( service == "_sips._tcp" ) {
-			hints.ai_socktype = SOCK_STREAM;
-			hints.ai_protocol = IPPROTO_TCP;
-			gettaddr_service = "sips"; //or sip-tls???
-			cerr << "NetworkFunctions::getHostHandlingService - UNTESTED!!!" << endl;
-		}else {
-			cerr << "NetworkFunctions::getHostHandlingService - Warning - unknown service = " << service << endl;
-			return "";
-		}
-		
-		hints.ai_flags = 0; //AI_PASSIVE;
-		hints.ai_family = PF_UNSPEC;
-		hints.ai_addrlen = 0;
-		hints.ai_addr = 0;
-		hints.ai_canonname = 0;
-	
-		int32_t retVal;
-		cerr << "gethosthandling: domain=" << domain << "; service=" << service << endl;
-		retVal = getaddrinfo(	domain.c_str(), 
-					gettaddr_service.c_str(), 
-					&hints, 
-					&res);
-		
-		if ( retVal != 0 ) {
-			cerr << "NetworkFunctions::getHostHandlingService - getaddrinfo() failed" << endl;
-			return "";
-		}
-		
-		ai = res;
-		for (ai = res; ai != NULL; ai = ai->ai_next) {
-			if (	ai->ai_socktype != hints.ai_socktype || ai->ai_protocol != hints.ai_protocol) {
-				cerr << "NetworkFUnctions:: different stuff while looping!" << endl;
-				continue;
-			}
-			sockaddr_in * saServer;
-			saServer = (sockaddr_in *)ai->ai_addr;
-			char tempStr[20];
-			binIp2String( ntohl( saServer->sin_addr.s_addr ), tempStr );
-			cerr << "Resolved to ---- ip=" << string( tempStr );
-			cerr << "; port=" << itoa( ntohs( saServer->sin_port ) ) << endl;
-		}
-
-	//error!
-#	else 
-
-#	endif
-#endif
-
 	return ret;
 }
 
