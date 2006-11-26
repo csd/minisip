@@ -47,7 +47,9 @@
 	//it is sad, but we include winsock2.h just to obtain this structure ... 
 		#include<winsock2.h>
 	#endif
+extern "C" {
 	LIBMUTIL_API void gettimeofday (struct timeval *tv, struct timezone *tz);
+}
 #endif
 
 LIBMUTIL_API uint64_t mtime();

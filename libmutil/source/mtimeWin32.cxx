@@ -43,6 +43,8 @@ LIBMUTIL_API uint64_t mtime(){
 }
 
 
+extern "C" {
+LIBMUTIL_API
 	void gettimeofday (struct timeval *tv, struct timezone *tz){
 		#ifdef _WIN32_WCE
 		struct timeb tb;
@@ -58,7 +60,7 @@ LIBMUTIL_API uint64_t mtime(){
 			tz->tz_dsttime = tb.dstflag;	/* type of dst correction  */
 		}
 	}
-
+}
 
 LIBMUTIL_API int msleep(int32_t ms){
 	Sleep(ms); //function returns void
