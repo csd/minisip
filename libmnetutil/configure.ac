@@ -46,6 +46,13 @@ AC_CHECK_HEADERS([iphlpapi.h],,,[
 #include<windows.h>
 ])
 
+AC_CHECK_TYPES([PIP_ADAPTER_ADDRESSES, PIP_ADAPTER_DNS_SERVER_ADDRESS],,,[
+#include<windows.h>
+#ifdef HAVE_IPHLPAPI_H
+#include<iphlp.h>
+#endif
+])
+
 AC_CHECK_LIB([wsock32], [main])
 AC_CHECK_LIB([iphlpapi], [main])
 AC_CHECK_LIB([dnsapi], [main])
