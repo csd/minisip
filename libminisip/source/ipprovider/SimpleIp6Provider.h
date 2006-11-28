@@ -41,7 +41,13 @@ class SimpleIp6Provider: public IpProvider{
 
 		virtual std::string getMemObjectType() const {return "SimpleIp6Provider";};
 
-		enum Scope { INVALID = 0, LINK_LOCAL = 2, SITE_LOCAL = 5, GLOBAL = 0xE };
+		enum Scope {
+			INVALID = 0,
+			LINK_LOCAL = 2,		// fe80::/10
+			SITE_LOCAL = 5,		// fec0::/10
+			UNIQUE_LOCAL = 7,	// fc00::/7
+			GLOBAL = 0xE		// 2000::/3
+		};
 
 		static Scope ipScope( std::string ip );
 

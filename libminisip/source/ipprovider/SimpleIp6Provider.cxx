@@ -33,7 +33,7 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 	vector<MRef<NetworkInterface*> > ifaces =
 		NetworkFunctions::getInterfaces();
 	bool use_ipv6 = true;
-	Scope curScope = INVALID;
+	Scope curScope = LINK_LOCAL;
 	
 	localIp = config->sipStackConfig->localIpString;
 
@@ -111,21 +111,23 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 SimpleIp6Provider::Scope SimpleIp6Provider::ipScope( string ipstr ) {
 	unsigned int prefix = strtol(ipstr.substr(0, 4).c_str(), NULL, 16);
 
-	printf("Prefix %04x\n", prefix);
-
 	// Global IPv6 address:  |001|TLA|NLA|SLA|Interface
 
-	if( (prefix & 0xfe00) == 0xfe00 ){
-		switch( prefix & 0x00c0 ){
-			case 0x00c0:
-				return SITE_LOCAL;
-			case 0x0080:
-				return LINK_LOCAL;
-		}
+	// fec0::/10
+	if( (prefix & 0xffc0) == 0xfec0 ){
+		return SITE_LOCAL;
 	}
-	else {
-		if( (prefix & 0xE000) == 0x2000 )
-			return GLOBAL;
+	// fe80::/10
+	else if( (prefix & 0xffc0) == 0xfe80 ){
+		return LINK_LOCAL;
+	}
+	// fc00::/7
+	else if( (prefix & 0xfe00) == 0xfc00 ){
+		return UNIQUE_LOCAL;
+	}
+	// 2000::/3
+	else if( (prefix & 0xe000) == 0x2000 ){
+		return GLOBAL;
 	}
 
 	return INVALID;
