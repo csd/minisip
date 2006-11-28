@@ -87,6 +87,23 @@ static int strcasecmp(const char *s1, const char *s2){
 
 using namespace std;
 
+
+LIBMUTIL_API string quote(const string &str){
+	if (str.length()>1 && str[0] == '"' && str[str.length() - 1] == '"')
+		return str;
+	else
+		return "\"" + str + "\"";
+}
+
+
+LIBMUTIL_API string unquote(string str){
+	if( str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"' )
+		return str.substr(1, str.length() - 2);
+	else
+		return str;
+}
+
+
 LIBMUTIL_API std::vector<string> split(const string &s, bool do_trim, char delim, bool includeEmpty){
 	std::vector<string> ret;
 	

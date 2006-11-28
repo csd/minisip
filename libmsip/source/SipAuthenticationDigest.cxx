@@ -28,6 +28,7 @@
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmutil/vmd5.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 
@@ -44,14 +45,6 @@ const std::string &SipAuthenticationDigest::getRealm() const{
 
 bool SipAuthenticationDigest::getStale() const{ 
 	return stale;
-}
-
-
-string unquote(string str){
-	if( str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"' )
-		return str.substr(1, str.length() - 2);
-	else
-		return str;
 }
 
 bool SipAuthenticationDigest::update( MRef<SipHeaderValueProxyAuthenticate*> auth ){

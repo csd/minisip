@@ -36,12 +36,10 @@
 
 
 #include<libmsip/SipHeaderAuthorization.h>
+#include<libmutil/stringutils.h>
 
 using namespace std;
 
-string quote(const string &str){
-	return "\"" + str + "\"";
-}
 
 MRef<SipHeaderValue *> authorizationFactory(const string &build_from){
 	return new SipHeaderValueAuthorization(build_from);

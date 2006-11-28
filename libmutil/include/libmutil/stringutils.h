@@ -37,6 +37,18 @@
 #include <libmutil/libmutil_config.h>
 
 
+/**
+ * If the string does not already start and end with the " character, then
+ * it is appended first and last to the string and the result is returned.
+ */
+LIBMUTIL_API std::string quote(const std::string &str);
+
+/**
+ * If a string starts and ends with the " character, then they are removed
+ * and the retult is returned.
+ */
+LIBMUTIL_API std::string unquote(std::string str);
+
 
 /**
  * Creates a string representing an integer number

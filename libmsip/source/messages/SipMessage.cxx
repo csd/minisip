@@ -550,14 +550,6 @@ MRef<Socket*> SipMessage::getSocket()
 	return sock;
 }
 
-static string unquote(const string &value){
-	if (value.size()>=2 && value[0]=='\"' && value[value.size()-1]=='\"'){
-		return trim(value.substr(1,value.size()-2));
-	}
-
-	return value;
-}
-
 string SipMessage::getAuthenticateProperty(string prop){
         MRef<SipHeaderValue*> hdr;
         int i=0;
