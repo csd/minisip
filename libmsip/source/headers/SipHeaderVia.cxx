@@ -58,7 +58,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 
 	ip="";
 	port=0;
-	while (build_from[i]==' ')
+	while (isWS(build_from[i]))
 		i++;
 
 	// Parse Via protocol (name and version)
@@ -85,6 +85,9 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	}
 	i = pos + 1;
 
+
+	while (isWS(build_from[i]))
+		i++;
 
 	// Parse Via transport
 	pos = build_from.find_first_of(" \t\n\t", i);
@@ -144,34 +147,6 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		
 		port = atoi( portstr.c_str() );
 	}
-
-/*
-	//FIXME: The following code considers parameters -  they are not
-	//part of the header value and should not be parsed here (they
-	//should not be in the string passed to this method)!!
-	string portstr="";
-	if (build_from[i]==':'){
-		i++;
-		while (!(build_from[i]==';' || build_from[i]==' ' || i>=build_from.length())){
-			portstr+=build_from[i];
-			i++;
-		}
-		port=atoi(portstr.c_str());
-	}
-
-	i++;
-	if (build_from.length()-1>i){
-		if (build_from.substr(i,7)==string("branch=")){
-//			int end = i+7;
-			int n=0;
-			while (i+7+n<build_from.length() && build_from[i+7+n]!=';')
-				n++;
-			//branch = build_from.substr(i+7, build_from.length()-7-1);
-			branch = build_from.substr(i+7, n);
-//			cerr << "branch parsed to: "<< branch<< endl;;
-		}
-	}
-*/
 	
 }
 
