@@ -90,6 +90,20 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		virtual MRef<Socket *> findServerSocket( int32_t type, bool ipv6);
 
 	private:
+		
+		/** 
+		 * Checks if the message is valid and 
+		 * the SIP stack should continue processing
+		 * the message.
+		 *
+		 * If the method returns "false" no further
+		 * processing should be made.
+		 * 
+		 * Note that the method itself can send SIP error
+		 * responses.
+		 */
+		bool validateIncoming(MRef<SipMessage *> msg);
+
 		bool getDestination(MRef<SipMessage*> pack, string &destAddr,
 				int32_t &destPort, string &destTransport);
 		void addViaHeader( MRef<SipMessage*> pack, MRef<SipSocketServer*> server, MRef<Socket *> socket, std::string branch );

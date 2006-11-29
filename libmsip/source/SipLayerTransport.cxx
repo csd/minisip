@@ -56,6 +56,7 @@
 //#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
+#include<libmsip/SipHeaderFrom.h>
 
 #include<cctype>
 #include<string>
@@ -737,6 +738,33 @@ bool SipLayerTransport::findSocket(const string &transport,
 	return !socket.isNull();
 }
 
+bool SipLayerTransport::validateIncoming(MRef<SipMessage *> msg){
+	bool isRequest = (msg->getType() != SipResponse::type);
+	bool isInvite = (msg->getType() == "INVITE");
+	// check that required headers are present
+	
+
+/*	if (!msg->getHeaderValueFrom()){
+		//too severely damaged to answer (could try, but why bother?)
+		return false;
+	}
+*/
+
+	if (!msg->getHeaderValueFrom() 
+			|| !msg->getHeaderValueTo()
+			|| (isInvite && !msg->getHeaderValueNo(SIP_HEADER_TYPE_CONTACT,0))){
+		if (isRequest){
+			MRef<SipMessage*> resp = new SipResponse(msg->getFirstViaBranch(),
+				   400, "Required header missing", msg );
+			resp->setSocket(msg->getSocket());
+			sendMessage(resp, "TL", false);
+		}
+
+		return false;
+	}
+
+	return true;
+}
 
 // Set contact uri host and port to external ip and port configured
 // on the server or local address and port of the socket
@@ -1006,14 +1034,15 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				pack->setSocket( *sock );
 				updateVia(pack, from, (uint16_t)port);
 				
-				SipSMCommand cmd(pack, 
-						SipSMCommand::transport_layer, 
-						SipSMCommand::transaction_layer);
-				
-				if (dispatcher)
-					dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
-				else
-					mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+				if (validateIncoming(pack)){ // drop here if it does not look ok
+					SipSMCommand cmd(pack, 
+							SipSMCommand::transport_layer, 
+							SipSMCommand::transaction_layer);
+					if (dispatcher)
+						dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
+					else
+						mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+				}
 				pack=NULL;
 			}
 			
@@ -1133,12 +1162,14 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 						MRef<IPAddress *> peer = socket->getPeerAddress();
 						pack->setSocket( *socket );
 						updateVia( pack, peer, (int16_t)socket->getPeerPort() );
-
-						SipSMCommand cmd(pack, SipSMCommand::transport_layer, /*SipSMCommand::ANY*/ SipSMCommand::transaction_layer);
-						if (transport->dispatcher){
-							transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
-						}else
-							mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+						
+						if (transport->validateIncoming(pack)){ // drop here if it does not look ok
+							SipSMCommand cmd(pack, SipSMCommand::transport_layer, SipSMCommand::transaction_layer);
+							if (transport->dispatcher){
+								transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
+							}else
+								mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+						}
 						pack=NULL;
 					}
 
