@@ -67,14 +67,21 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - via value did not contain version");
 	}
 
-	pos = build_from.find( '/', pos + 1);
+	const string proto = trim(build_from.substr(i,pos-i)); 
+	if (proto != "SIP") {
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - version protocol" );
+	}
+
+	i = pos + 1; 
+
+	pos = build_from.find( '/', i);
 	if( pos == string::npos ){
 		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - via value did not contain version");
 	}
 
-	const string proto = build_from.substr( i, pos - i );
-	if (proto != "SIP/2.0") {
-		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - version unknown");
+	const string ver = trim(build_from.substr( i, pos - i ));
+	if (ver!= "2.0") {
+		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - version unknown" );
 	}
 	i = pos + 1;
 
@@ -84,7 +91,7 @@ SipHeaderValueVia::SipHeaderValueVia(const string &build_from)
 	if( pos == string::npos ){
 		throw SipExceptionInvalidMessage("SipHeaderValueVia malformed - could not determine transport protocol");
 	}
-	protocol = build_from.substr( i, pos - i );
+	protocol = trim(build_from.substr( i, pos - i ));
 	i = pos + 1;
 
 	pos = build_from.find_first_not_of(" \t\n\r", i);
