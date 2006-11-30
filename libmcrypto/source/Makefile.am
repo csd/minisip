@@ -17,8 +17,16 @@ noinst_LTLIBRARIES = \
 		libmcrypto_core.la \
 		libmcrypto_imp.la
 
+scsim_src =
+if ENABLE_SCSIM
+scsim_src += YOURSOURCEHERE.cxx \
+	     YOURSECONDSOURCEHERE.cxx
+endif
+
+
 libmcrypto_core_la_SOURCES = \
 		init.cxx \
+		$(scsim_src) \
 		base64.cxx \
 		uuid.cxx \
 		rijndael-alg-fst.cxx

@@ -28,6 +28,18 @@ dnl Checks for libraries.
 AM_LIBMCRYPTO_CHECK_OPENSSL
 AM_LIBMCRYPTO_CHECK_GNUTLS
 
+AC_ARG_ENABLE(scsim,
+    AS_HELP_STRING([--enable-scsim],
+        [enables hardware authentication token support]),
+    [ if test "${enable_scsim}" = "yes"
+      then
+        AC_DEFINE(ENABLE_SCSIM, [], [hardware SIM support is enabled])
+        ENABLE_SCSIM="yes"
+      fi
+      ])
+AM_CONDITIONAL(ENABLE_SCSIM, test "${ENABLE_SCSIM}" = "yes" )
+
+
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])
