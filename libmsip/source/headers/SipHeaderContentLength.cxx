@@ -34,6 +34,7 @@
 
 
 #include<libmsip/SipHeaderContentLength.h>
+#include<libmsip/SipException.h>
 
 #include<libmutil/stringutils.h>
 
@@ -53,13 +54,22 @@ SipHeaderValueContentLength::SipHeaderValueContentLength(const string &build_fro
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {
 	unsigned i=0;
-	while (build_from[i]==' ')
+	unsigned len = build_from.length();
+	while (isWS(build_from[i]))
 		i++;
 	string num="";
-	while (build_from[i]>='0' && build_from[i]<='9' && !(i>=build_from.length())){
+	while (build_from[i]>='0' && build_from[i]<='9' && !(i>=len) ){
 		num+=build_from[i];
 		i++;
 	}
+
+	while (i<len && isWS(build_from[i]))
+		i++;
+
+	if (num.size()==0 || i<len ){
+		throw SipExceptionInvalidMessage("SipHeaderValueContentLength malformed");
+	}
+
 	content_length=atoi(num.c_str());
 }
 

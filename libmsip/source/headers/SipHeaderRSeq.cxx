@@ -28,6 +28,7 @@
 
 
 #include<libmsip/SipHeaderRSeq.h>
+#include<libmsip/SipException.h>
 
 #include<libmutil/stringutils.h>
 
@@ -47,13 +48,22 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_RSEQ,sipHeaderValueRSeqTypeStr)
 {
 	unsigned i=0;
-	while (build_from[i]==' ')
+	int len=build_from.size();
+	while (isWS(build_from[i]))
 		i++;
 	string num="";
-	while (!(i>=build_from.length()) && build_from[i]>='0' && build_from[i]<='9'){
+	while (i<len && build_from[i]>='0' && build_from[i]<='9'){
 		num+=build_from[i];
 		i++;
 	}
+
+	while (i<len && isWS(build_from[i]))
+		i++;
+
+	if (num.size()==0 || i<len ){ 
+		throw SipExceptionInvalidMessage("SipHeaderValueRSeq malformed");
+	}
+
 	seq=atoll(num.c_str());
 }
 

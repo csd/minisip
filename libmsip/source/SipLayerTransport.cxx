@@ -1178,6 +1178,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			
 			catch(SipExceptionInvalidMessage &e ){
 				mdbg << "INFO: SipLayerTransport::streamSocketRead: dropping malformed packet: "<<e.what()<<endl;
+
 #if 0
 				// Check that we received data
 				// is not too big, in which case close
