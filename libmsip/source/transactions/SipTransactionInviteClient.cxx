@@ -129,18 +129,6 @@ bool SipTransactionInviteClient::a0_start_calling_INVITE( const SipSMCommand &co
 		
 		requestTimeout( sipStackInternal->getTimers()->getB(), "timerB" ); //transaction timeout
 
-/* TODO/FIXME: re-implement this functionality
-
-		if( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString.size()>0 ){
-			MRef<SipHeaderValue*> hdr;
-			hdr = lastInvite->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
-
-			if( !hdr ){
-				lastInvite->addRoute( getConfig()->sipIdentity->getSipProxy()->sipProxyAddressString,
-						      port, transport );
-			}
-		}
-*/
 		send( command.getCommandPacket(), true ); // add via header
 		return true;
 	}else{
@@ -543,16 +531,7 @@ SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStackInternal*> s
 			SipTransactionClient(stack, /*call,*/ seq_no, cSeqMethod, "", callid),
 		lastInvite(NULL)
 {
-//	MRef<SipStackConfig *> conf;
-//	if (dialog){
-//		conf = dialog->getDialogConfig()->inherited;
-//	}else{
-//		conf = sipStack->getStackConfig();
-//	}
-	
 	timerA=sipStackInternal->getTimers()->getA();
-	//toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
-	//port = getConfig()->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
 
@@ -595,7 +574,6 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
 			lastInvite,
 			resp,
-			//dialog->dialogState.getRemoteTarget(), //FIXME: uses dialog here, but it could be NULL
 			provisional
 			);
 
@@ -605,16 +583,6 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 		//((SipHeaderValueCSeq*)*ack->getHeaderValueNo(SIP_HEADER_TYPE_CSEQ, 0))->setCSeq(seq);
 	}
 		
-	//add route headers, if needed
-	//TODO/XXX/FIXME: in TU instead
-/*	if( dialog->dialogState.routeSet.size() > 0 ) {
-		//merr << "CESC: SipTransInvCli:sendACK : adding header route! " << end;
-		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialog->dialogState.routeSet);
-		ack->addHeader(new SipHeader(*rset) );
-	} else {
-		//merr << "CESC: SipTransInvCli::sendACK : dialog route set is EMPTY!!! " << end;
-	}
-*/
 	send(MRef<SipMessage*>(*ack), true, br);
 }
 

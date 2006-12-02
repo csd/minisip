@@ -111,29 +111,6 @@ bool SipTransactionNonInviteClient::a0_start_trying_request( const SipSMCommand 
 		}
 		requestTimeout(sipStackInternal->getTimers()->getF(), "timerF");
 
-/* TODO/FIXME: This is a bit tricky - we don't know which identity is
- * currently being used (the getConfig() one will have a null one if
- * not within a dialog). Maybe the creator of the transaction should
- * explicitely add a route set instead of implicitely specifying it always?
- * -EE
- 
-		massert(getConfig());
-		massert(getConfig()->sipIdentity);
-
-		MRef<SipProxy*> proxy = getConfig()->sipIdentity->getSipProxy();
-		
-		if( proxy->sipProxyAddressString.size()>0){
-			MRef<SipHeaderValue*> hdr;
-
-			hdr = lastRequest->getHeaderValueNo( SIP_HEADER_TYPE_ROUTE, 0 );
-
-			if( !hdr ){
-				lastRequest->addRoute( proxy->sipProxyAddressString,
-						       proxy->sipProxyPort, 
-						       proxy->getTransport() );
-			}
-		}
-*/
 		send(*lastRequest,true);
 		
 		return true;
@@ -463,18 +440,6 @@ SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 	
 	//timers are set in the initial transition
 
-//	MRef<SipStackConfig *> conf = getConfig(); 
-//	if (dialog){
-//		conf = dialog->getDialogConfig()->inherited;
-//	}else{
-//		conf = sipStack->getStackConfig();
-//	}
-
-//	if( !conf ) { cerr << "SipTranNonInvCli: conf null" << endl; massert (0);}
-//	if( !conf->sipIdentity ) { cerr << "SipTranNonInvCli: identity null" << endl; massert (0);}
-//	if( conf->sipIdentity->getSipProxy()->sipProxyAddressString.size()<=0 ) { cerr << "SipTranNonInvCli: no ipaddr" << endl; massert (0);}
-//	toaddr = conf->sipIdentity->getSipProxy()->sipProxyIpAddr->clone();
-	//port = conf->sipIdentity->getSipProxy()->sipProxyPort;
 	setUpStateMachine();
 }
 
