@@ -77,7 +77,7 @@ bool parseRtpMap(string rtpMap, string &name, string &rate, string &param){
 	rate = rtpMap.substr(pos + 1, pos2 - pos - 1);
 
 	if( pos2 != string::npos )
-		param = rtpMap.substr(pos2);
+		param = rtpMap.substr(pos2 + 1);
 	else
 		param = "1";
 
