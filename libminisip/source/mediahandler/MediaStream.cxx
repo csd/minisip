@@ -65,6 +65,25 @@ list<string> MediaStream::getSdpAttributes(){
 	return media->getSdpAttributes();
 }
 
+bool parseRtpMap(string rtpMap, string &name, string &rate, string &param){
+	size_t pos = rtpMap.find('/');
+
+	if( pos == string::npos )
+		return false;
+
+	size_t pos2 = rtpMap.find('/', pos + 1);
+
+	name = rtpMap.substr(0, pos);
+	rate = rtpMap.substr(pos + 1, pos2 - pos - 1);
+
+	if( pos2 != string::npos )
+		param = rtpMap.substr(pos2);
+	else
+		param = "1";
+
+	return true;
+}
+
 bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         string sdpRtpMap;
 	string sdpFmtpParam;
@@ -84,13 +103,16 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
 	std::list<MRef<Codec *> > codecs = media->getAvailableCodecs();
 	std::list<MRef<Codec *> >::iterator iC;
-	string codecRtpMap;
-	uint8_t codecPayloadType;
+	string sdpName;
+	string sdpRate;
+	string sdpParam;
 
-        size_t s1;
-        size_t s2 = sdpRtpMap.find("/");
+	parseRtpMap(sdpRtpMap, sdpName, sdpRate, sdpParam);
 
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+		string codecRtpMap;
+		uint8_t codecPayloadType;
+
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
 		if( (*iC)->getCodecName() == "iLBC" ) {
@@ -99,8 +121,14 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 			} //else ... does not mean we accept it, it still goes through the normal checks ...
 		}
                 if( sdpRtpMap != "" && codecRtpMap != "" ){
-                        s1 = codecRtpMap.find("/");
-                        bool sdpRtpMapEqual = !strCaseCmp( codecRtpMap.substr(0, s1).c_str(), sdpRtpMap.substr(0,s2).c_str() );
+			string codecName;
+			string codecRate;
+			string codecParam;
+
+			if( !parseRtpMap(codecRtpMap, codecName, codecRate, codecParam) )
+				continue;
+
+			bool sdpRtpMapEqual = !strCaseCmp( codecName.c_str(), sdpName.c_str() ) && codecRate == sdpRate && codecParam == sdpParam;
                         if ( sdpRtpMapEqual ) {
 				localPayloadType = codecPayloadType;
                                 return true;
