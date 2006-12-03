@@ -39,7 +39,6 @@
 
 class SipTransaction;
 class SipDialogConfig;
-class SipCommandDispatcher;
 class SipAuthenticationDigest;
 
 

@@ -2,7 +2,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipStack.h \
                      libmsip/SipSim.h \
                      libmsip/SipSimSoft.h \
-                     libmsip/SipLayerDialog.h \
                      libmsip/SipUtils.h \
                      libmsip/SipTimers.h \
                      libmsip/SipHeaderAccept.h \
@@ -41,8 +40,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipMessageContent.h \
 		     libmsip/SipMessageContentIM.h \
 		     libmsip/SipMessageContentFactory.h \
-		     libmsip/SipLayerTransport.h \
-		     libmsip/SipSocketServer.h \
 		     libmsip/SipMessageContentMime.h \
 		     libmsip/SipSMCommand.h \
 		     libmsip/SipCommandString.h \
@@ -56,8 +53,6 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
 		     libmsip/SipDialogRegister.h \
 		     libmsip/SipAuthenticationDigest.h \
 		     libmsip/SipDialogManagement.h \
-                     libmsip/SipLayerTransaction.h \
-		     libmsip/SipTransaction.h \
 		     libmsip/libmsip_config.h
 
 noinst_HEADERS = 	libmsip/SipTransactionNonInviteClient.h \
@@ -67,6 +62,12 @@ noinst_HEADERS = 	libmsip/SipTransactionNonInviteClient.h \
 		     libmsip/SipTransactionInviteServerUA.h \
                      libmsip/SipStackInternal.h \
 		     libmsip/SipCommandDispatcher.h \
+		     libmsip/SipLayerDialog.h \
+		     libmsip/SipLayerTransaction.h \
+		     libmsip/SipLayerTransport.h \
+		     libmsip/SipSocketServer.h \
+		     libmsip/SipTransaction.h \
+		     libmsip/SipTransport.h \
 			config.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
