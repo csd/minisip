@@ -41,6 +41,7 @@ SRCS = source/udns_dn.c				\
 	source/udns_bl.c			\
 	source/udns_rr_srv.c			\
 	source/udns_rr_naptr.c			\
+	source/udns.h				\
 	udns_codes.c
 USRCS  = dnsget.c rblcheck.c ex-rdns.c
 DIST   = COPYING.LGPL udns.h udns.3 dnsget.1 rblcheck.1 $(USRCS) \
