@@ -23,7 +23,7 @@ endif
 
 scsim_src =
 if ENABLE_SCSIM
-scsim_src += YOURHEADER.h
+#scsim_src += YOURHEADER.h
 endif
 
 
