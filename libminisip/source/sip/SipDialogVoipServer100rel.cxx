@@ -241,7 +241,7 @@ void SipDialogVoipServer100rel::setUpStateMachine(){
 	
 	
         if (!success){
-                merr << "ERROR: Could not remove transition from state machine in SipTransactionInviteServerUA (BUGBUG!!)"<<endl;
+                merr << "ERROR: Could not remove transition from state machine in SipDialogVoipServer (BUGBUG!!)"<<endl;
 		massert(0==1);
         }
 

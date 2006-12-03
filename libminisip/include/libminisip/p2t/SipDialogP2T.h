@@ -32,7 +32,6 @@
 
 #include<libmnetutil/IPAddress.h>
 
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipStack.h>
 

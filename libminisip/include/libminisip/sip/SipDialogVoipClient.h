@@ -40,7 +40,6 @@
 #include<libmutil/StateMachine.h>
 
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
 
 #include<libminisip/sip/SipDialogVoip.h>

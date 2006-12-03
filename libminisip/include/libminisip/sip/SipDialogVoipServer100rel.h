@@ -43,7 +43,6 @@
 
 
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 

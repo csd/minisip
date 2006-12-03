@@ -69,7 +69,7 @@ using namespace std;
 	     | a0: -
              |
              | +---+ localPresenceUpdated
-	     | |   | a2: map(new SipTransactionClient, subscribers)
+	     | |   | a2: sendNoticeToAll
              V |   V 
       +-------------+-----+ timerRemoveSubscriber
       |   default   |     | a1: removeSubscriber
@@ -78,7 +78,7 @@ using namespace std;
              | |   |
  stop_presen | +---+
  ce_server   |  SUBSCRIBE
- a3:	     |  a5: new SipTransactionServer ; addSubscribers ; set(timerRemoveSubscriber)
+ a3:	     |  a5: addSubscribers ; sendSubscribeOk ; set(timerRemoveSubscriber)
              V
       +-------------+
       |  term_wait  |
@@ -91,20 +91,10 @@ using namespace std;
       +-------------+
 */
 
-/*
-void SipDialogPresenceServer::createNotifyClientTransaction(){
-	int seqNo = requestSeqNo();
-	MRef<SipTransaction*> subscribetrans = new SipTransactionClient(MRef<SipDialog *>(this), seqNo, callId);
-//	subscribetrans->setSocket( getPhoneConfig()->proxyConnection );
-	registerTransaction(subscribetrans);
-	sendNotify(subscribetrans->getBranch());
-}
-*/
-
 bool SipDialogPresenceServer::a0_start_default_startpresenceserver(const SipSMCommand &command){
 	if (transitionMatch(command, 
 				SipCommandString::start_presence_server,
-				SipSMCommand::dialog_layer,
+				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer)){
 		return true;
 	}else{

@@ -142,11 +142,6 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 			return false;
 		}
 		
-//		cerr << "EEEEEEEE: finding transaction and adding to dialogs set"<<endl;
-//		MRef<SipTransaction*> trans = dispatcher->getLayerTransaction()->findTransaction(branch);
-//		massert(trans);
-//		registerTransactionToDialog(trans);
-		
 /*		MRef<SipHeaderValue*> identity = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITY, 0);
 		MRef<SipHeaderValue*> identityinfo = command.getCommandPacket()->getHeaderValueNo(SIP_HEADER_TYPE_IDENTITYINFO, 0);
 		

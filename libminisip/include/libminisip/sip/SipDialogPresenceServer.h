@@ -39,7 +39,6 @@
 #include<libmutil/minilist.h>
 
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipResponse.h>
 
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
