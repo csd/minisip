@@ -39,10 +39,14 @@
 #include<libminisip/sip/SipDialogVoipClient.h>
 #include<libminisip/sip/SipDialogConfVoip.h>
 #include<libmsip/SipCommandString.h>
+
+#ifdef P2T_SUPPORT
 #include<libminisip/p2t/SipDialogP2T.h>
 #include<libminisip/p2t/GroupListClient.h>
 #include<libminisip/p2t/GroupListServer.h>
 #include<libminisip/p2t/GroupList.h>
+#endif
+
 #include<libminisip/sip/PresenceMessageContent.h>
 #include<libminisip/conference/ConfMessageRouter.h>
 
