@@ -67,7 +67,6 @@ noinst_HEADERS = 	libmsip/SipTransactionNonInviteClient.h \
 		     libmsip/SipLayerTransport.h \
 		     libmsip/SipSocketServer.h \
 		     libmsip/SipTransaction.h \
-		     libmsip/SipTransport.h \
 			config.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
