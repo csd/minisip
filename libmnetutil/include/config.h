@@ -98,5 +98,10 @@ static inline uint64_t U64_AT( void const * _p )
 #   define ntoh64(i)   U64_AT(&i)
 #endif
 
+#if !defined(HAVE_PIP_ADAPTER_ADDRESSES) \
+  || !defined(HAVE_PIP_ADAPTER_DNS_SERVER_ADDRESS)
+// Disable use of GetAdaptersAddresses in udns
+# define NO_IPHLPAPI
+#endif
 
 #endif

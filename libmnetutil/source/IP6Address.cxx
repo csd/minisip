@@ -56,6 +56,10 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #include<exception>
 #include<typeinfo>
 
+#ifndef HAVE_INET_NTOP
+# include<inet_ntop.h>
+#endif
+
 using namespace std;
 
 #ifdef HAVE_GETNAMEINFO
@@ -75,8 +79,27 @@ string buildAddressString(const struct sockaddr *sa, socklen_t salen)
 	}
 }
 #else
-#error getnameinfo required when enabling ipv6
-#endif	// HAVE_GETNAMEINFO
+string buildAddressString(const struct sockaddr *sa, socklen_t salen)
+{
+	char buf[INET6_ADDRSTRLEN+1] = "";
+
+	if( salen != sizeof(struct sockaddr_in6) ){
+		throw ResolvError( 0 );//"Invalid sockaddr size" );
+	}
+
+	const struct sockaddr_in6 *sa6 = (const struct sockaddr_in6*)sa;
+
+	memset(buf, 0, sizeof(buf));
+	const char *res = inet_ntop( AF_INET6, &sa6->sin6_addr, buf, sizeof(buf) );
+
+	if( !res ){
+		throw ResolvError( 0 ); // "Invalid sockaddr_in6" );
+	}
+	else {
+		return buf;
+	}
+}
+#endif	// !HAVE_GETNAMEINFO
 
 /*
 **

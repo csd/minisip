@@ -4,12 +4,12 @@ SUBDIRS = udns win32 . examples include m4 tests
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmnetutil.spec
 
-AM_CPPFLAGS = -I$(srcdir)/include
+AM_CPPFLAGS = $(MINISIP_CFLAGS) -I$(srcdir)/include -I$(srcdir)/udns/source
 
 pkgconfig_DATA = libmnetutil.pc
 
 lib_LTLIBRARIES = libmnetutil.la
-libmnetutil_la_CPPFLAGS = $(MINISIP_CFLAGS) -I$(srcdir)/udns/source
+# libmnetutil_la_CPPFLAGS = 
 libmnetutil_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
 libmnetutil_la_LIBADD = udns/libudns.la  $(LTLIBOBJS) $(MINISIP_LIBS)
 libmnetutil_la_DEPENDENCIES = $(LTLIBOBJS)

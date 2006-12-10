@@ -41,22 +41,21 @@
 #include<exception>
 #include<typeinfo>
 
-#ifdef WIN32
-	#include<winsock2.h>
-
-	// borrowed from tcpdump
-	int
-	inet_aton(const char *cp, struct in_addr *addr)
-	{
-	  addr->s_addr = inet_addr(cp);
-	  return (addr->s_addr == INADDR_NONE) ? 0 : 1;
-	}
-
-#elif defined HAVE_NETINET_IN_H
+#ifdef HAVE_NETDB_H
 	#include<netdb.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
 	#include<netinet/in.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
 	#include<sys/socket.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
 	#include<arpa/inet.h>
+#endif
+
+#ifndef HAVE_INET_ATON
+	#include<inet_aton.h>
 #endif
 
 #include<libmnetutil/NetworkException.h>

@@ -74,7 +74,7 @@ AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 AC_CHECK_FUNCS([poll])
-AC_REPLACE_FUNCS([inet_pton])
+AC_REPLACE_FUNCS([inet_aton inet_pton inet_ntop])
 
 dnl Checks for header files.
 AC_HEADER_STDC
