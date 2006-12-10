@@ -138,9 +138,11 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		identity->getSipProxy()->setDefaultExpires( (*iter)[columns->registerExpires] );
 
 		MRef<SipIdentity *> oldId = (*iter)[columns->identity];
-		// Copy PSK and SipSim from old identity
-		identity->setPsk( oldId->getPsk() );
-		identity->setSim( oldId->getSim() );
+		if( oldId ){
+			// Copy PSK and SipSim from old identity
+			identity->setPsk( oldId->getPsk() );
+			identity->setSim( oldId->getSim() );
+		}
 
 		config->identities.push_back( identity );
 	}
