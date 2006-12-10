@@ -88,7 +88,8 @@ void Session::unregister(){
 		registry->unregisterSession( this );
 	}
 
-	if( Session::precomputedKa.isNull() ){
+	if( Session::precomputedKa.isNull()
+	    && identity && identity->getSim() ){
 		Session::precomputedKa = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
 				/*securityConfig.cert_db*/ identity->getSim()->getCAs(), DH_GROUP_OAKLEY5 );
 	}

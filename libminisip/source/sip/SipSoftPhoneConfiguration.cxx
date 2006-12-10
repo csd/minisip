@@ -123,6 +123,7 @@ void SipSoftPhoneConfiguration::save(){
 		
 
 /*From SipDialogSecurity below*/
+		backend->save(accountPath + "secured", (*iIdent)->securityEnabled ? string("yes") : string("no"));
 		backend->save(accountPath + "use_zrtp", /*use_zrtp*/ (*iIdent)->use_zrtp ? string("yes") : string("no"));
 		backend->save(accountPath + "psk_enabled", (*iIdent)->pskEnabled ? string("yes") : string("no"));
 		backend->save(accountPath + "dh_enabled", (*iIdent)->dhEnabled ? string("yes") : string("no"));
@@ -674,7 +675,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		if (backend->loadString(accountPath + "pstn_account","")=="yes"){
 			pstnIdentity = ident;
 			usePSTNProxy = true;
-			ident->securityEnabled= false;
+// 			ident->securityEnabled= false;
 		}
 
 		if (backend->loadString(accountPath + "default_account","")=="yes"){
