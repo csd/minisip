@@ -104,8 +104,8 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		 */
 		bool validateIncoming(MRef<SipMessage *> msg);
 
-		bool getDestination(MRef<SipMessage*> pack, string &destAddr,
-				int32_t &destPort, string &destTransport);
+		bool getDestination(MRef<SipMessage*> pack, std::string &destAddr,
+				    int32_t &destPort, std::string &destTransport);
 		void addViaHeader( MRef<SipMessage*> pack, MRef<SipSocketServer*> server, MRef<Socket *> socket, std::string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
 		bool findSocket(const std::string &transport,

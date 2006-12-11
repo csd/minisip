@@ -2,6 +2,8 @@
 #include<config.h>
 #include<libmsip/SipSimSoft.h>
 
+using namespace std;
+
 SipSimSoft::SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas){
 	certChain = chain;
 	ca_set = cas;

@@ -196,7 +196,7 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		 * uniquely identifies this specific UA instance.
 		 * It's used by draft-Outbound and draft-GRUU.
 		 */
-		string instanceId;
+		std::string instanceId;
 };
 
 //TODO: Enable conference calling
