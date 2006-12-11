@@ -28,7 +28,7 @@
 
 #include<openssl/ssl.h>
 
-#include<libmnetutil/TCPSocket.h>
+#include<libmnetutil/StreamSocket.h>
 
 #include<libmcrypto/cert.h>
 #include<libmutil/mtypes.h>
@@ -88,7 +88,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 			MRef<certificate *> cert=NULL,
 			MRef<ca_db *> cert_db=NULL );
 		
-		TLSSocket( TCPSocket * tcpSock, SSL_CTX * ssl_ctx );
+		TLSSocket( MRef<StreamSocket *> sock, SSL_CTX * ssl_ctx );
 		
 		virtual ~TLSSocket();
 
@@ -107,10 +107,10 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		friend std::ostream& operator<<(std::ostream&, TLSSocket&);
 
 	private:
-		void TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
+		void TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 			MRef<certificate *> cert, MRef<ca_db *> cert_db );
 		
-		MRef<TCPSocket *> tcp_socket;
+		MRef<StreamSocket *> sock;
 		
 		SSL_CTX* ssl_ctx;
 		

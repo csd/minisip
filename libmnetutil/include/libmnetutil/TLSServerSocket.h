@@ -54,6 +54,5 @@ class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 		 CA db 
 		 */
 		MRef<ca_db *> cert_db;
-		MRef<ServerSocket *> tcp_socket;
 };
 #endif

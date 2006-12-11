@@ -39,6 +39,7 @@
 #endif
 
 #include<libmnetutil/IPAddress.h>
+#include<libmnetutil/TCPSocket.h>
 
 #include<iostream>
 
@@ -51,8 +52,8 @@ int8_t TLSSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphe
 
 
 // When created by a TLS Server
-TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
-		tcp_socket(tcp_socket){
+TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
+		sock(tcp_socket){
 	type = SOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
 	peerAddress = tcp_socket->getPeerAddress()->clone();
@@ -77,18 +78,19 @@ TLSSocket::TLSSocket( TCPSocket * tcp_socket, SSL_CTX * ssl_ctx ):
 TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
 		MRef<certificate *> cert, 
 		MRef<ca_db *> cert_db ){
-	TLSSocket::TLSSocket_init( addr, port, ssl_ctx, cert, cert_db);
+	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
+	TLSSocket::TLSSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
 }
 
 TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx, 
 		MRef<certificate *> cert, 
 		MRef<ca_db *> cert_db ){
-	MRef<IPAddress *> ip_addr = IPAddress::create( addr );
-	TLSSocket::TLSSocket_init( **ip_addr, port, ssl_ctx, cert, cert_db);
+	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
+	TLSSocket::TLSSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */
-void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
+void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 								MRef<certificate *> cert, MRef<ca_db *> cert_db ){
 	type = SOCKET_TYPE_TLS;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
@@ -96,7 +98,7 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	SSL_METHOD *meth = SSLv23_client_method();
 	this->ssl_ctx = (SSL_CTX *)ssl_ctx;
 	this->cert_db = cert_db;
-	peerPort = port;
+	peerPort = ssock->getPeerPort();
 
 	if( this->ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT
@@ -153,8 +155,8 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 		ssl_ctx = this->ssl_ctx;
 	}
 	
-	tcp_socket = new TCPSocket( addr, port );
-	peerAddress = tcp_socket->getPeerAddress()->clone();
+	sock = ssock;
+	peerAddress = sock->getPeerAddress()->clone();
 
 	ssl = SSL_new( this->ssl_ctx );
 	
@@ -164,9 +166,9 @@ void TLSSocket::TLSSocket_init( IPAddress &addr, int32_t port, void * &ssl_ctx,
 	
 	//SSL_set_verify( this->ssl, SSL_VERIFY_PEER, NULL );
 
-	SSL_set_fd( ssl, tcp_socket->getFd() );
+	SSL_set_fd( ssl, sock->getFd() );
 	// FIXME
-	fd = tcp_socket->getFd();
+	fd = sock->getFd();
 
 	int32_t err = SSL_connect( ssl );
 

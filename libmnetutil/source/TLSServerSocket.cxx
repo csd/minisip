@@ -28,11 +28,6 @@
 
 #ifdef WIN32
 #	include<winsock2.h>
-#elif defined HAVE_ARPA_INET_H
-#	include<sys/types.h>
-#	include<sys/socket.h>
-#	include<netinet/in.h>
-#	include<arpa/inet.h>
 #endif
 
 #ifndef _WIN32_WCE
@@ -141,18 +136,8 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 }
 
 MRef<StreamSocket *> TLSServerSocket::accept(){
-	int32_t cli;
-	struct sockaddr_storage sin;
-	socklen_t sinlen=sizeof(sin);
-	//sin = get_sockaddr_struct(sinlen);
-	
-#ifdef WIN32
-	massert(sizeof(SOCKET)==4);
-#endif
-	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
-		merror("in ServerSocket::accept(): accept:");
-	}
+	MRef<StreamSocket *> ssocket = ServerSocket::accept();
 
-	return new TLSSocket( new TCPSocket( cli, (struct sockaddr*)&sin, sinlen), ssl_ctx );
+	return new TLSSocket( ssocket, ssl_ctx );
 }
 
