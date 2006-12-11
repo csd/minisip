@@ -44,7 +44,6 @@ compilation under EVC 4.0 to fail, collision between STLPort and Openssl
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
-using namespace std;
 
 class certificate;
 
@@ -102,7 +101,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 		certificate( const std::string cert_filename,
 			     const std::string private_key_filename );
 		certificate( unsigned char * der_cert, int length );
-                certificate( unsigned char * certData, int length, string path );
+		certificate( unsigned char * certData, int length, std::string path );
 		~certificate();
 		virtual std::string getMemObjectType() const {return "certificate";}
 		
@@ -129,7 +128,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 		std::string get_pk_file();
                    
 		void set_pk( std::string file );
-                void set_encpk(char *derEncPk, int length, string password, string path);
+                void set_encpk(char *derEncPk, int length, std::string password, std::string path);
 		EVP_PKEY * get_openssl_private_key(){return private_key;};
 		X509 * get_openssl_certificate(){return cert;};
 	private:
