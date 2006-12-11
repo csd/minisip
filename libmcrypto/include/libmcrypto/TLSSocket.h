@@ -20,18 +20,17 @@
  * Authors: Zachary T Welch <zach-minisip@splitstring.com>
  */
 
-#ifndef MLIBMCRYPTO_HMAC_SHA256_H
-#define MLIBMCRYPTO_HMAC_SHA256_H
+#ifndef MLIBMCRYPTO_TLSSOCKET_H
+#define MLIBMCRYPTO_TLSSOCKET_H
 
 // XXX: replace this forward compatibility layer with a Bridge interface
 #include<libmcrypto/uninst_config.h>
 
 #include<config.h>
 #ifdef HAVE_OPENSSL
-#include<libmcrypto/openssl/hmac256.h>
+#include<libmcrypto/openssl/TLSSocket.h>
 #elif defined( HAVE_GNUTLS )
-#error "gnutls hmac256 support is not complete"
+#include<libmcrypto/gnutls/TLSSocket.h>
 #endif // HAVE_GNUTLS
 
-#endif	// MLIBMCRYPTO_HMAC_H
-
+#endif // MLIBMCRYPTO_TLSSOCKET_H

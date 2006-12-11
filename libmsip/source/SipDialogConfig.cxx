@@ -85,7 +85,7 @@ void SipProxy::setProxy(const SipUri &addr, int port){
 		uri.setPort(port);
 	}
 
-	// Lose router
+	// Loose router
 	uri.setParameter( "lr", "true" );
 }
 

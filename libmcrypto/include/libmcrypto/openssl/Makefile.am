@@ -10,6 +10,9 @@ pkginclude_HEADERS = \
 		cert.h \
 		ZrtpDH.h \
 		hmac.h \
+		TLSException.h \
+		TLSServerSocket.h \
+		TLSSocket.h \
 		$(OTHER_FILES)
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

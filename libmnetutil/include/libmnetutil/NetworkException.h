@@ -28,8 +28,6 @@
 
 #include<string.h>
 
-#include<openssl/ssl.h>
-
 #include<string>
 #include<libmutil/Exception.h>
 
@@ -97,35 +95,6 @@ class LIBMNETUTIL_API ListenFailed : public NetworkException{
 class LIBMNETUTIL_API GetSockNameFailed : public NetworkException{
 	public:
 		GetSockNameFailed( int errorNumber );
-};
-
-class LIBMNETUTIL_API TLSConnectFailed : public ConnectFailed{
-	public:
-		TLSConnectFailed( int errorNumber, SSL * ssl  );
-		virtual ~TLSConnectFailed() throw(){}
-		virtual const char* what();
-
-	private:
-		SSL * ssl;
-		std::string msg;
-};
-
-class LIBMNETUTIL_API TLSInitFailed : public NetworkException{
-	public:
-		TLSInitFailed();
-		virtual ~TLSInitFailed() throw(){}
-		virtual const char *what();
-	private:
-		std::string msg;
-};
-
-class LIBMNETUTIL_API TLSContextInitFailed : public NetworkException{
-	public:
-		TLSContextInitFailed();
-		virtual ~TLSContextInitFailed() throw(){}
-		virtual const char*what();
-	private:
-		std::string msg;
 };
 #endif
 

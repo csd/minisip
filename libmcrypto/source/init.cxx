@@ -33,11 +33,13 @@
 
 void libmcryptoInit()
 {
+#if 0
 #ifdef HAVE_OPENSSL
 	OpensslThreadGuard::initialize();
 #endif
 #ifdef HAVE_GNUTLS
 	GnutlsThreadGuard::initialize();
+#endif
 #endif
 }
 

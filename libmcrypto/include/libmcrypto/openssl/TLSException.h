@@ -21,38 +21,41 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#ifndef TLSSERVERSOCKET_H
-#define TLSSERVERSOCKET_H
+#ifndef TLS_EXCEPTION_H
+#define TLS_EXCEPTION_H
 
-#include<libmnetutil/libmnetutil_config.h>
+#include<libmcrypto/config.h>
+#include<libmnetutil/NetworkException.h>
 
-#include<libmnetutil/TLSSocket.h>
-#include<libmnetutil/IP4ServerSocket.h>
-#include<libmcrypto/cert.h>
+#include<openssl/ssl.h>
 
-class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
-
+class LIBMCRYPTO_API TLSConnectFailed : public ConnectFailed{
 	public:
-		TLSServerSocket( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
-		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
-		virtual std::string getMemObjectType() const {return "TLSServerSocket";}
-
-		virtual MRef<StreamSocket *> accept();
-
-	protected:
-		virtual void init( bool use_ipv6, int32_t listen_port, 
-				   MRef<certificate *> cert,
-				   MRef<ca_db *> cert_db);
+		TLSConnectFailed( int errorNumber, SSL * ssl  );
+		virtual ~TLSConnectFailed() throw(){}
+		virtual const char* what();
 
 	private:
-		int32_t listen_port;
-
-		SSL_CTX * ssl_ctx;
 		SSL * ssl;
-		
-		/**
-		 CA db 
-		 */
-		MRef<ca_db *> cert_db;
+		std::string msg;
 };
+
+class LIBMCRYPTO_API TLSInitFailed : public NetworkException{
+	public:
+		TLSInitFailed();
+		virtual ~TLSInitFailed() throw(){}
+		virtual const char *what();
+	private:
+		std::string msg;
+};
+
+class LIBMCRYPTO_API TLSContextInitFailed : public NetworkException{
+	public:
+		TLSContextInitFailed();
+		virtual ~TLSContextInitFailed() throw(){}
+		virtual const char*what();
+	private:
+		std::string msg;
+};
+
 #endif

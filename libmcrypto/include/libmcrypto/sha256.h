@@ -25,13 +25,12 @@
 #define MLIBMCRYPTO_SHA256_H
 
 // XXX: replace this forward compatibility layer with a Bridge interface
-#define HAVE_OPENSSL
+#include<libmcrypto/uninst_config.h>
 
 #include<config.h>
 #ifdef HAVE_OPENSSL
 #include<libmcrypto/openssl/sha256.h>
-#endif // HAVE_OPENSSL
-#ifdef HAVE_GNUTLS
+#elif defined( HAVE_GNUTLS )
 #error "gnutls sha256 support is not complete"
 #endif // HAVE_GNUTLS
 

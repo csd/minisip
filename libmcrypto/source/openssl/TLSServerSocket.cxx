@@ -24,10 +24,12 @@
 
 #include<config.h>
 
-#include<libmnetutil/TLSServerSocket.h>
+#include<libmcrypto/openssl/TLSServerSocket.h>
 
 #ifdef WIN32
 #	include<winsock2.h>
+#else
+#include<sys/socket.h>
 #endif
 
 #ifndef _WIN32_WCE

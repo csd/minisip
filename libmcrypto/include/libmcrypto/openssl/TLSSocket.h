@@ -24,7 +24,7 @@
 #ifndef TLSSOCKET_H
 #define TLSSOCKET_H
 
-#include<libmnetutil/libmnetutil_config.h>
+#include<libmcrypto/config.h>
 
 #include<openssl/ssl.h>
 

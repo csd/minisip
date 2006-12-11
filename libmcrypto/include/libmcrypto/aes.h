@@ -24,13 +24,12 @@
 #define MLIBMCRYPTO_AES_H
 
 // XXX: replace this forward compatibility layer with a Bridge interface
-#define HAVE_OPENSSL
+#include<libmcrypto/uninst_config.h>
 
 #include<config.h>
 #ifdef HAVE_OPENSSL
 #include<libmcrypto/openssl/aes.h>
-#endif // HAVE_OPENSSL
-#ifdef HAVE_GNUTLS
+#elif defined(HAVE_GNUTLS)
 #error "gnutls aes support is not complete"
 #endif // HAVE_GNUTLS
 

@@ -64,7 +64,7 @@
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipCommandString.h>
 #include<libmnetutil/UDPSocket.h>
-#include<libmnetutil/TLSServerSocket.h>
+#include<libmcrypto/TLSServerSocket.h>
 
 #include<libmutil/massert.h>
 

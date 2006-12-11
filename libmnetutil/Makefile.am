@@ -42,10 +42,8 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/NetworkException.cxx \
 		    source/NetworkFunctions.cxx \
 		    source/ServerSocket.cxx \
-		    source/TLSServerSocket.cxx \
 		    source/Socket.cxx \
 		    source/TCPSocket.cxx \
-		    source/TLSSocket.cxx \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \

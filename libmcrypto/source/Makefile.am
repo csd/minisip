@@ -3,10 +3,11 @@ BUILD_LIBS = uuid/libuuid.la
 if HAVE_OPENSSL
 BUILD_DIRS += openssl
 BUILD_LIBS += openssl/libmcopenssl.la
-endif
+else
 if HAVE_GNUTLS
 BUILD_DIRS += gnutls
 BUILD_LIBS += gnutls/libmcgnutls.la
+endif
 endif
 
 SUBDIRS = $(BUILD_DIRS) uuid .

@@ -13,8 +13,6 @@
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/StreamSocket.h>
 #include<libmnetutil/TCPSocket.h>
-#include<libmnetutil/TLSServerSocket.h>
-#include<libmnetutil/TLSSocket.h>
 #include<libmnetutil/UDPSocket.h>
 
 int main(int argc, char *argv[]) { }

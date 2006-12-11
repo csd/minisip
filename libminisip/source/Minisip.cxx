@@ -51,7 +51,6 @@
 #include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/TLSServerSocket.h>
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>

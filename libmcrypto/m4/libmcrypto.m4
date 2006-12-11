@@ -54,6 +54,10 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
                AC_MSG_ERROR([Could not find libssl header files. Please install
  the corresponding development package.])
        ])
+
+if test "x${HAVE_OPENSSL}" = "x1"; then
+	AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have OpenSSL.])
+fi
 AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
 LIBS="${mcrypto_save_LIBS}"
@@ -73,8 +77,8 @@ AC_CHECK_LIB([gnutls], [main],[
 		AC_CHECK_HEADER(gnutls/x509.h)
 		AC_MSG_NOTICE([Sorry, but gnutls support is not complete.])
 		GNUTLS_LIBS="-lgnutls"
-dnl		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
-dnl		HAVE_GNUTLS=yes
+		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
+		HAVE_GNUTLS=yes
 	],[])
 AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
 AC_SUBST(GNUTLS_LIBS)
@@ -85,7 +89,7 @@ AC_SUBST(GNUTLS_LIBS)
 # AM_MINISIP_CHECK_LIBMCRYPTO(VERSION)
 # ------------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBMCRYPTO],[ 
-	AC_REQUIRE([AM_MINISIP_CHECK_LIBMUTIL]) dnl
+	AC_REQUIRE([AM_MINISIP_CHECK_LIBMNETUTIL]) dnl
 dnl	AC_REQUIRE([AM_MINISIP_CHECK_OPENSSL]) dnl
 	AC_MINISIP_WITH_ARG(MCRYPTO, mcrypto, libmcrypto, $1, [REQUIRED], [dnl
 dnl if HAVE_OPENSSL

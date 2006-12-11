@@ -23,7 +23,7 @@
 
 #include<config.h>
 
-#include<libmnetutil/TLSSocket.h>
+#include<libmcrypto/openssl/TLSSocket.h>
 
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
@@ -43,7 +43,7 @@
 
 #include<iostream>
 
-#include<libmnetutil/NetworkException.h>
+#include<libmcrypto/openssl/TLSException.h>
 #include<libmutil/MemObject.h>
 
 using namespace std;

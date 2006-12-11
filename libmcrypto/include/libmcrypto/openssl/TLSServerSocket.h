@@ -24,9 +24,9 @@
 #ifndef TLSSERVERSOCKET_H
 #define TLSSERVERSOCKET_H
 
-#include<libmnetutil/libmnetutil_config.h>
+#include<libmcrypto/config.h>
 
-#include<libmnetutil/TLSSocket.h>
+#include<libmcrypto/TLSSocket.h>
 #include<libmnetutil/IP4ServerSocket.h>
 #include<libmcrypto/cert.h>
 
