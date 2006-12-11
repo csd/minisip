@@ -27,9 +27,7 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<openssl/dh.h>
 #include<libmikey/keyagreement.h>
-#include<libmikey/oakley_groups.h>
 
 #define DH_GROUP_OAKLEY5 0
 #define DH_GROUP_OAKLEY1 1
@@ -72,7 +70,7 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 
 	private:
 		int groupValue;
-		DH * opensslDhPtr;
+		void * priv;
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
 		MRef<certificate_chain *> certChainPtr;

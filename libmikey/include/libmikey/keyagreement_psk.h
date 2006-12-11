@@ -28,11 +28,6 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmikey/keyagreement.h>
-#include<libmikey/oakley_groups.h>
-
-#define DH_GROUP_OAKLEY5 0
-#define DH_GROUP_OAKLEY1 1
-#define DH_GROUP_OAKLEY2 2
 
 
 

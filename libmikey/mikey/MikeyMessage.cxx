@@ -47,6 +47,7 @@
 #include<libmcrypto/aes.h>
 #include<libmcrypto/base64.h>
 #include<libmcrypto/hmac.h>
+#include<libmcrypto/cert.h>
 
 #include<map>
 

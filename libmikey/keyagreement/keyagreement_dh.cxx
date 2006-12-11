@@ -25,6 +25,11 @@
 #include<config.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/MikeyException.h>
+#include<openssl/dh.h>
+#include"oakley_groups.h"
+
+#define opensslDhPtr ((DH*)priv)
+
 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
@@ -35,7 +40,8 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certDbPtr( certDbPtr ){
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
-	opensslDhPtr = DH_new();
+	// Store opensslDhPtr in priv
+	priv = DH_new();
 	peerCertChainPtr = new certificate_chain();
 
 }
@@ -56,7 +62,8 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certDbPtr( certDbPtr ){
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
-	opensslDhPtr = DH_new();
+	// Store opensslDhPtr in priv
+	priv = DH_new();
 	if( opensslDhPtr == NULL )
 	{
 		throw MikeyException( "Could not create openssl "

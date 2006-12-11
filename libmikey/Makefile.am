@@ -9,7 +9,7 @@ pkgconfig_DATA = libmikey.pc
 lib_LTLIBRARIES = libmikey.la
 libmikey_la_CXXFLAGS = $(MINISIP_CFLAGS)
 libmikey_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
-		
+
 libmikey_la_LIBADD =  $(MINISIP_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
@@ -47,8 +47,9 @@ ka_src =             keyagreement/keyagreement.cxx \
                      keyagreement/keyagreement_dh.cxx \
 	             keyagreement/keyagreement_psk.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
-		     keyagreement/keyvalidity.cxx
-		     
+		     keyagreement/keyvalidity.cxx \
+		     keyagreement/oakley_groups.h
+
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 MAINTAINERCLEANFILES = \
