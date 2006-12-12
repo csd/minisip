@@ -25,7 +25,6 @@
 #define HMAC_SHA256_H
 
 #include <libmcrypto/config.h>
-#include <openssl/hmac.h>
 
 LIBMCRYPTO_API void hmac_sha256( unsigned char * key, unsigned int key_length,
                 unsigned char * data, unsigned int data_length,

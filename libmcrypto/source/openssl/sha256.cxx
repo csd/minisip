@@ -26,6 +26,12 @@
 
 #include <libmcrypto/sha256.h>
 
+#include <stdlib.h>
+#include <string.h>
+
+#include <openssl/crypto.h>
+#include <openssl/sha.h>
+
 void sha256(unsigned char *data, unsigned int data_length,
 	    unsigned char *digest ){
 	SHA256(data, data_length, digest);
