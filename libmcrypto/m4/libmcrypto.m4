@@ -68,9 +68,11 @@ CPPFLAGS="${mcrypto_save_CPPFLAGS}"
 #
 
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_SCSIM], [
-#SCSIM_LIBS="-lpcsclite"
+AC_CHECK_LIB([pcsclite], [SCardTransmit],[
+		SCSIM_LIBS="-lpcsclite"
+	],[])
 AC_SUBST(SCSIM_LIBS)
-#LIBS="${SCSIM_LIBS} ${LIBS}"
+LIBS="${SCSIM_LIBS} ${LIBS}"
 ])
 
 # AM_LIBMCRYPTO_CHECK_GNUTLS()
