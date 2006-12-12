@@ -178,7 +178,7 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 	if( err <= 0 ){
 		cerr << "SSL: connect failed" << endl;
 		ERR_print_errors_fp(stderr);
-		throw TLSConnectFailed( err, this->ssl );
+		throw TLSConnectFailed( err, ssl );
 	}
 
 	try{
