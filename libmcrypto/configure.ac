@@ -28,6 +28,7 @@ AM_MINISIP_CHECK_COMPLETE
 dnl Checks for libraries.
 AM_LIBMCRYPTO_CHECK_OPENSSL
 AM_LIBMCRYPTO_CHECK_GNUTLS
+AM_LIBMCRYPTO_CHECK_SCSIM
 
 AC_ARG_ENABLE(scsim,
     AS_HELP_STRING([--enable-scsim],
@@ -36,6 +37,7 @@ AC_ARG_ENABLE(scsim,
       then
         AC_DEFINE(ENABLE_SCSIM, [], [hardware SIM support is enabled])
         ENABLE_SCSIM="yes"
+	SCSIM_LIBS="-lpcsclite"
       fi
       ])
 AM_CONDITIONAL(ENABLE_SCSIM, test "${ENABLE_SCSIM}" = "yes" )

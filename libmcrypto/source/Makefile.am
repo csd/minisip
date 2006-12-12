@@ -20,8 +20,12 @@ noinst_LTLIBRARIES = \
 
 scsim_src =
 if ENABLE_SCSIM
-#scsim_src += YOURSOURCEHERE.cxx \
-#	     YOURSECONDSOURCEHERE.cxx
+scsim_src += SipSim.cxx \
+	     SipSimPk.cxx \
+	     SipSimDh.cxx \
+	     SmartCard.cxx \
+	     SipSimSmartCardGD.cxx \
+	     SmartCardException.cxx
 endif
 
 
