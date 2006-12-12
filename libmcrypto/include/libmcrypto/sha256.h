@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2006 Zachary T Welch
-
+  Copyright (C) 2006 Werner Dittmann
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -17,22 +17,50 @@
 */
 
 /*
- * Authors: Zachary T Welch <zach-minisip@splitstring.com>
- *	    Werner Dittmann <Werner.Dittmann@t-online.de>
+ * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#ifndef MLIBMCRYPTO_SHA256_H
-#define MLIBMCRYPTO_SHA256_H
+#ifndef _SHA256_H
+#define _SHA256_H
 
-// XXX: replace this forward compatibility layer with a Bridge interface
-#include<libmcrypto/uninst_config.h>
+#include <libmcrypto/config.h>
 
-#include<config.h>
-#ifdef HAVE_OPENSSL
-#include<libmcrypto/openssl/sha256.h>
-#elif defined( HAVE_GNUTLS )
-#error "gnutls sha256 support is not complete"
-#endif // HAVE_GNUTLS
 
-#endif	// MLIBMCRYPTO_SHA_H
+/**
+ * Compute SHA256 digest.
+ *
+ * This functions takes one data chunk and computes its SHA256 digest. It uses
+ * the openSSL SHA256 implementation as SHA256 engine.
+ *
+ * @param data
+ *    Points to the data chunk.
+ * @param data_length
+ *    Length of the data in bytes
+ * @param digest
+ *    Points to a buffer that receives the computed digest. This
+ *    buffer must have a size of at least 32 bytes (SHA256_DIGEST_LENGTH).
+ */
+LIBMCRYPTO_API void sha256(unsigned char *data, 
+			   unsigned int data_length,
+			   unsigned char *digest);
+
+/**
+ * Compute SHA256 digest over several data cunks.
+ *
+ * This functions takes several data chunk and computes the SHA256 digest. It
+ * uses the openSSL SHA256 implementation as SHA256 engine.
+ *
+ * @param data
+ *    Points to an array of pointers that point to the data chunks. A NULL
+ *    pointer in an array element terminates the data chunks.
+ * @param data_length
+ *    Points to an array of integers that hold the length of each data chunk.
+ * @param digest
+ *    Points to a buffer that receives the computed digest. This
+ *    buffer must have a size of at least 32 bytes (SHA256_DIGEST_LENGTH).
+ */
+LIBMCRYPTO_API void sha256(unsigned char *data[], 
+			   unsigned int data_length[],
+			   unsigned char *digest);
+#endif
 
