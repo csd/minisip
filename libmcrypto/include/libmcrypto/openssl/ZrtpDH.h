@@ -46,11 +46,11 @@ public:
     ~ZrtpDH();
 
     int32_t generateKey();
-    int32_t getSecretSize();
-    int32_t getPubKeySize();
-    int32_t getPubKeyBytes(uint8_t *buf);
+    int32_t getSecretSize() const;
+    int32_t getPubKeySize() const;
+    int32_t getPubKeyBytes(uint8_t *buf) const;
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);
-    void random(uint8_t *buf, int32_t length);
+    void random(uint8_t *buf, int32_t length) const;
 };
 
 #endif // ZRTPDH_H

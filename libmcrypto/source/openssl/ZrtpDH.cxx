@@ -178,18 +178,18 @@ int32_t ZrtpDH::generateKey() {
 	return DH_generate_key(ctx);
 }
 
-int32_t ZrtpDH::getSecretSize() {
+int32_t ZrtpDH::getSecretSize() const{
 	return DH_size(ctx);
 }
 
-int32_t ZrtpDH::getPubKeySize() {
+int32_t ZrtpDH::getPubKeySize() const{
 	return BN_num_bytes((ctx->pub_key));
 }
 
-int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) {
+int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) const{
 	return BN_bn2bin(ctx->pub_key, buf);
 }
 
-void ZrtpDH::random(uint8_t *buf, int32_t length) {
+void ZrtpDH::random(uint8_t *buf, int32_t length) const{
 	RAND_bytes(buf, length);
 }
