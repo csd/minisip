@@ -35,8 +35,13 @@
  *	    Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+#include <config.h>
+#include <libmcrypto/sha256.h>
 #include <gcrypt.h>
-#include <libzrtpcpp/crypto/sha256.h>
+
+#ifndef SHA256_DIGEST_LENGTH
+# define SHA256_DIGEST_LENGTH 20
+#endif
 
 void sha256(uint8_t* data, int32_t dataLength,
             uint8_t* mac)

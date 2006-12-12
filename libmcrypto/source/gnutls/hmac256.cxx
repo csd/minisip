@@ -35,8 +35,13 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
+#include <config.h>
+#include <libmcrypto/hmac256.h>
 #include <gcrypt.h>
-#include <libzrtpcpp/crypto/hmac256.h>
+
+#ifndef SHA256_DIGEST_LENGTH
+# define SHA256_DIGEST_LENGTH 32
+#endif
 
 void hmac_sha256(uint8_t* key, uint32_t keyLength,
 		uint8_t* data, int32_t dataLength,

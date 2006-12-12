@@ -34,8 +34,10 @@
  * @author  Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+#include <config.h>
 #include <gcrypt.h>
-#include <libzrtpcpp/crypto/ZrtpDH.h>
+#include <libmcrypto/ZrtpDH.h>
+#include <libmcrypto/gnutls/init.h>
 
 
 struct gcryptCtx {
@@ -43,8 +45,6 @@ struct gcryptCtx {
     gcry_mpi_t pubKey;
     int32_t pLength;
 };
-
-extern void initializeGcrypt();
 
 static gcry_mpi_t bnP3072 = NULL;
 static gcry_mpi_t bnP4096 = NULL;
@@ -139,12 +139,12 @@ static const uint8_t P4096[] =
 
 ZrtpDH::ZrtpDH(int32_t pl) {
 
-    ctx = static_cast<void*>(new gcryptCtx);
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    priv = static_cast<void*>(new gcryptCtx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
     tmpCtx->privKey = NULL;
     tmpCtx->pubKey = NULL;
 
-    initializeGcrypt();
+    libmcryptoGnutlsInit();
 
     if (!dhinit) {
         gcry_mpi_scan(&bnP3072, GCRYMPI_FMT_USG, P3072, sizeof(P3072), NULL);
@@ -168,7 +168,7 @@ ZrtpDH::ZrtpDH(int32_t pl) {
 }
 
 ZrtpDH::~ZrtpDH() {
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
 
     if (tmpCtx != NULL) {
         gcry_mpi_release(tmpCtx->privKey);
@@ -176,14 +176,14 @@ ZrtpDH::~ZrtpDH() {
         gcry_mpi_release(tmpCtx->pubKey);
         tmpCtx->pubKey = NULL;
         delete tmpCtx;
-        ctx = NULL;
+        priv = NULL;
     }
 }
 
 int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes,
 			   int32_t length, uint8_t *secret) {
 
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
 
     gcry_mpi_t pubKeyOther;
     gcry_mpi_scan(&pubKeyOther, GCRYMPI_FMT_USG, pubKeyBytes, length, NULL);
@@ -201,7 +201,7 @@ int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes,
 
 int32_t ZrtpDH::generateKey()
 {
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
 
     tmpCtx->pubKey = gcry_mpi_new(0);
     gcry_mpi_powm(tmpCtx->pubKey, two, tmpCtx->privKey, ((tmpCtx->pLength == 3072) ? bnP3072 : bnP4096));
@@ -210,7 +210,7 @@ int32_t ZrtpDH::generateKey()
 
 int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) const
 {
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
     int32_t len = getPubKeySize();
 
     size_t i = 0;
@@ -220,22 +220,23 @@ int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) const
 
 int32_t ZrtpDH::getSecretSize() const
 {
-    return ((static_cast<gcryptCtx*>(ctx)->pLength + 7) / 8);
+    return ((static_cast<gcryptCtx*>(priv)->pLength + 7) / 8);
 }
 
 int32_t ZrtpDH::getPubKeySize() const
 {
-    return ((gcry_mpi_get_nbits(static_cast<gcryptCtx*>(ctx)->pubKey) + 7) / 8);
+    return ((gcry_mpi_get_nbits(static_cast<gcryptCtx*>(priv)->pubKey) + 7) / 8);
 }
 
-void ZrtpDH::random(uint8_t *buf, int32_t length) {
+void ZrtpDH::random(uint8_t *buf, int32_t length) const{
     gcry_randomize(buf, length, GCRY_STRONG_RANDOM);
 }
 
+#if 0
 int32_t ZrtpDH::checkPubKey(uint8_t *pubKeyBytes,
                             int32_t length) const
 {
-    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(ctx);
+    gcryptCtx* tmpCtx = static_cast<gcryptCtx*>(priv);
 
     gcry_mpi_t pubKeyOther;
     gcry_mpi_scan(&pubKeyOther, GCRYMPI_FMT_USG, pubKeyBytes, length, NULL);
@@ -254,6 +255,8 @@ int32_t ZrtpDH::checkPubKey(uint8_t *pubKeyBytes,
     gcry_mpi_release(pubKeyOther);
     return 1;
 }
+#endif
+
 /** EMACS **
  * Local variables:
  * mode: c++
