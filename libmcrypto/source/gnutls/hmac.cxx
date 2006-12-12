@@ -36,34 +36,34 @@
  */
 
 #include <config.h>
-#include <libmcrypto/hmac256.h>
+#include <libmcrypto/hmac.h>
 #include <gcrypt.h>
 
-#ifndef SHA256_DIGEST_LENGTH
-# define SHA256_DIGEST_LENGTH 32
+#ifndef SHA1_DIGEST_LENGTH
+# define SHA1_DIGEST_LENGTH 20
 #endif
 
-void hmac_sha256(uint8_t* key, uint32_t keyLength,
-		uint8_t* data, int32_t dataLength,
+void hmac_sha1(uint8_t* key, uint32_t keyLength,
+		uint8_t* data, uint32_t dataLength,
                 uint8_t* mac, uint32_t* macLength)
 {
     gcry_md_hd_t hd;
     gcry_error_t err = 0;
 
-    err = gcry_md_open(&hd, GCRY_MD_SHA256, GCRY_MD_FLAG_HMAC);
+    err = gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(hd, key, keyLength);
 
     gcry_md_write (hd, data, dataLength);
 
-    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA256);
-    memcpy(mac, p, SHA256_DIGEST_LENGTH);
+    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA1);
+    memcpy(mac, p, SHA1_DIGEST_LENGTH);
     if (macLength != NULL) {
-        *macLength = SHA256_DIGEST_LENGTH;
+        *macLength = SHA1_DIGEST_LENGTH;
     }
     gcry_md_close (hd);
 }
 
-void hmac_sha256( uint8_t* key, uint32_t keyLength,
+void hmac_sha1( uint8_t* key, uint32_t keyLength,
                   uint8_t* dataChunks[],
                   uint32_t dataChunkLength[],
                   uint8_t* mac, uint32_t* macLength )
@@ -71,7 +71,7 @@ void hmac_sha256( uint8_t* key, uint32_t keyLength,
     gcry_md_hd_t hd;
     gcry_error_t err = 0;
 
-    err = gcry_md_open(&hd, GCRY_MD_SHA256, GCRY_MD_FLAG_HMAC);
+    err = gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(hd, key, keyLength);
 
     while (*dataChunks) {
@@ -79,10 +79,10 @@ void hmac_sha256( uint8_t* key, uint32_t keyLength,
 	dataChunks++;
 	dataChunkLength++;
     }
-    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA256);
-    memcpy(mac, p, SHA256_DIGEST_LENGTH);
+    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA1);
+    memcpy(mac, p, SHA1_DIGEST_LENGTH);
     if (macLength != NULL) {
-        *macLength = SHA256_DIGEST_LENGTH;
+        *macLength = SHA1_DIGEST_LENGTH;
     }
     gcry_md_close (hd);
 }
