@@ -11,9 +11,12 @@ DIST_SUBDIRS = gnutls openssl
 pkginclude_HEADERS = \
 		init.h \
 		base64.h \
+		hmac.h \
 		rand.h \
 		uuid.h \
-		config.h
+		config.h \
+		ZrtpDH.h \
+		$(OTHER_FILES)
 
 OTHER_FILES =
 
@@ -31,9 +34,6 @@ noinst_HEADERS = \
 		aes.h \
 		$(scsim_src) \
 		cert.h \
-		ZrtpDH.h \
-		hmac.h \
-		rijndael-alg-fst.h \
-		$(OTHER_FILES)
+		rijndael-alg-fst.h
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
