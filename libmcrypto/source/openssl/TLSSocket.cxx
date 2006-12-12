@@ -50,6 +50,7 @@ using namespace std;
 
 int8_t TLSSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphers */
 
+#define ssl ((SSL*)priv)
 
 // When created by a TLS Server
 TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
@@ -60,7 +61,8 @@ TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
 
 	int error;
 	// Copy the SSL parameters, since the server still needs them
-	ssl = SSL_new( ssl_ctx );
+	// Initialize ssl in priv
+	priv = SSL_new( ssl_ctx );
 	this->ssl_ctx = SSL_get_SSL_CTX( ssl );
 
 	SSL_set_fd( ssl, tcp_socket->getFd() );
@@ -158,7 +160,8 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 	sock = ssock;
 	peerAddress = sock->getPeerAddress()->clone();
 
-	ssl = SSL_new( this->ssl_ctx );
+	// Initialize ssl in priv
+	priv = SSL_new( this->ssl_ctx );
 	
 	//FIXME ... this client side cache works?? only if only one host to connect to
 	if( this->ssl_ctx->session_cache_head != NULL )

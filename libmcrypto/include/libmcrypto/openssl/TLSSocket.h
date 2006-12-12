@@ -114,7 +114,7 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		
 		SSL_CTX* ssl_ctx;
 		
-		SSL*     ssl;
+		void*     priv;
 		
 		MRef<certificate *> peer_cert;
 		
