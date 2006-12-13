@@ -34,7 +34,7 @@
 #define DH_GROUP_OAKLEY2 2
 
 
-
+class OakleyDH;
 class certificate_chain;
 class certificate;
 class ca_db;
@@ -69,8 +69,7 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		bool authenticate( MikeyMessage * msg);
 
 	private:
-		int groupValue;
-		void * priv;
+		OakleyDH * dh;
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
 		MRef<certificate_chain *> certChainPtr;

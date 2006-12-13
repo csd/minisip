@@ -12,6 +12,7 @@ libmcopenssl_la_SOURCES = \
 		init.cxx \
 		aes.cxx \
 		cert.cxx \
+		OakleyDH.cxx \
 		ZrtpDH.cxx \
 		hmac.cxx \
 		rand.cxx \

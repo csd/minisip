@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,17 +20,16 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
 #include<config.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/MikeyException.h>
-#include<openssl/dh.h>
-#include"oakley_groups.h"
+#include<libmcrypto/OakleyDH.h>
 
-#define opensslDhPtr ((DH*)priv)
-
+using namespace std;
 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
@@ -40,17 +40,17 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certDbPtr( certDbPtr ){
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
-	// Store opensslDhPtr in priv
-	priv = DH_new();
+	dh = new OakleyDH();
 	peerCertChainPtr = new certificate_chain();
 
 }
 
 KeyAgreementDH::~KeyAgreementDH(){
-	DH_free( opensslDhPtr );
-	if( peerKeyPtr == NULL )
+	delete dh;
+	if( peerKeyPtr != NULL ){
 		delete [] peerKeyPtr;
-
+		peerKeyPtr = NULL;
+	}
 }
 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
@@ -62,54 +62,41 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certDbPtr( certDbPtr ){
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
-	// Store opensslDhPtr in priv
-	priv = DH_new();
-	if( opensslDhPtr == NULL )
+	dh = new OakleyDH();
+	if( dh == NULL )
 	{
-		throw MikeyException( "Could not create openssl "
+		throw MikeyException( "Could not create "
 				          "DH parameters." );
 	}
 
 	if( setGroup( groupValue ) ){
 		throw MikeyException( "Could not set the  "
-				          "DH group." );
+				      "DH group." );
 	}
 	peerCertChainPtr = new certificate_chain();
 }
 
 int KeyAgreementDH::setGroup( int groupValue ){
-	this->groupValue = groupValue;
-	switch( groupValue ) {
-		case DH_GROUP_OAKLEY5:
-			BN_hex2bn( &opensslDhPtr->p, OAKLEY5_P );
-			BN_hex2bn( &opensslDhPtr->g, OAKLEY5_G );
-			tgkLengthValue = OAKLEY5_L;
-			break;
-		case DH_GROUP_OAKLEY1:
-			BN_hex2bn( &opensslDhPtr->p, OAKLEY1_P );
-			BN_hex2bn( &opensslDhPtr->g, OAKLEY1_G );
-			tgkLengthValue = OAKLEY1_L;
-			break;
-		case DH_GROUP_OAKLEY2:
-			BN_hex2bn( &opensslDhPtr->p, OAKLEY2_P );
-			BN_hex2bn( &opensslDhPtr->g, OAKLEY2_G );
-			tgkLengthValue = OAKLEY2_L;
-			break;
-		default:
-			return 1;
-	}
-	if( !DH_generate_key( opensslDhPtr ) )
-	{
+	if( !dh->setGroup( groupValue ) )
 		return 1;
-	}
-			
-	tgkPtr = new unsigned char[ tgkLengthValue ];
 
+	uint32_t len = dh->secretLength();
+
+	if( len != tgkLengthValue || !tgkPtr ){
+		if( tgkPtr )
+			delete[] tgkPtr;
+		tgkPtr = new unsigned char[ len ];
+	}
+
+	tgkLengthValue = len;
 	return 0;
 }
 	
 void KeyAgreementDH::setPeerKey( unsigned char * peerKeyPtr,
 			      int peerKeyLengthValue ){
+	if( this->peerKeyPtr )
+		delete[] this->peerKeyPtr;
+
 	this->peerKeyPtr = new unsigned char[ peerKeyLengthValue ];
 	this->peerKeyLengthValue = peerKeyLengthValue;
 	memcpy( this->peerKeyPtr, peerKeyPtr, peerKeyLengthValue );
@@ -117,35 +104,27 @@ void KeyAgreementDH::setPeerKey( unsigned char * peerKeyPtr,
 }
 
 int KeyAgreementDH::publicKeyLength(){
-	return BN_num_bytes( opensslDhPtr->pub_key );
+	return dh->publicKeyLength();
 }
 
 unsigned char * KeyAgreementDH::publicKey(){
 	unsigned char * publicKey;
-	publicKey = new unsigned char[ publicKeyLength() ];
-	BN_bn2bin( opensslDhPtr->pub_key, publicKey );
+	uint32_t length = publicKeyLength();
+	publicKey = new unsigned char[ length ];
+	dh->getPublicKey( publicKey, length );
 	return publicKey;
 
 }
 
 int KeyAgreementDH::computeTgk(){
-	BIGNUM * bn_peerKeyPtr =  BN_new();;
-	
 	assert( peerKeyPtr );
 
-	BN_bin2bn( peerKeyPtr, peerKeyLengthValue, bn_peerKeyPtr );
-
-	if( DH_compute_key( tgkPtr, bn_peerKeyPtr, opensslDhPtr ) < 0 )
-	{
-		BN_clear_free( bn_peerKeyPtr );
-		throw MikeyException( "Could not create the TGK." );
-	}
-	return 0;
-
+	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgkPtr, tgkLengthValue );
+	return res;
 }
 
 int KeyAgreementDH::group(){
-	return groupValue;
+	return dh->group();
 
 }
 

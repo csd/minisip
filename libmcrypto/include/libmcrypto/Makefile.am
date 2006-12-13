@@ -25,6 +25,7 @@ pkginclude_HEADERS = \
 		$(scsim_src) \
 		base64.h \
 		hmac.h \
+		OakleyDH.h \
 		rand.h \
 		uuid.h \
 		config.h \
