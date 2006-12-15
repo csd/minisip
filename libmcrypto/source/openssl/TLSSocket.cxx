@@ -24,6 +24,7 @@
 #include<config.h>
 
 #include<libmcrypto/openssl/TLSSocket.h>
+#include<libmcrypto/openssl/cert.h>
 
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
@@ -101,6 +102,14 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 	this->ssl_ctx = (SSL_CTX *)ssl_ctx;
 	this->cert_db = cert_db;
 	peerPort = ssock->getPeerPort();
+	MRef<ossl_certificate*> ssl_cert;
+	MRef<ossl_ca_db*> ssl_db;
+
+	if( cert )
+		ssl_cert = (ossl_certificate*)*cert;
+
+	if( cert_db )
+		ssl_db = (ossl_ca_db*)*cert_db;
 
 	if( this->ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT
@@ -131,13 +140,13 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 		if( !cert.isNull() ){
 			/* Add a client certificate */
 			if( SSL_CTX_use_PrivateKey( this->ssl_ctx, 
-			cert->get_openssl_private_key() ) <= 0 ){
+			ssl_cert->get_openssl_private_key() ) <= 0 ){
 				cerr << "SSL: Could not use private key" << endl;
 				ERR_print_errors_fp(stderr);
 				throw TLSContextInitFailed(); 
 			}
 			if( SSL_CTX_use_certificate( this->ssl_ctx,
-			cert->get_openssl_certificate() ) <= 0 ){
+			ssl_cert->get_openssl_certificate() ) <= 0 ){
 				cerr << "SSL: Could not use certificate" << endl;
 				ERR_print_errors_fp(stderr);
 				throw TLSContextInitFailed(); 
@@ -147,7 +156,7 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 		if( !cert_db.isNull() ){
 			/* Use this database for the certificates check */
 			SSL_CTX_set_cert_store( this->ssl_ctx, 
-						cert_db->get_db());
+						ssl_db->get_db());
 		}
 
 		//SSL_CTX_set_session_cache_mode( this->ssl_ctx, SSL_SESS_CACHE_BOTH );
@@ -182,7 +191,7 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 	}
 
 	try{
-		peer_cert = new certificate( SSL_get_peer_certificate (ssl) );
+		peer_cert = new ossl_certificate( SSL_get_peer_certificate (ssl) );
 	}
 	catch( certificate_exception &){
 		//FIXME

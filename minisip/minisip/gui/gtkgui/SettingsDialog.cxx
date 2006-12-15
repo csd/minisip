@@ -661,7 +661,7 @@ string SecuritySettings::apply(){
 			dhCheck->set_active( false );
 		}
 		
-		else if( !config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->get_first()->get_openssl_private_key() ){
+		else if( !config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->get_first()->has_pk() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a private key file.\n"
 		       "The D-H key agreement has been disabled.";

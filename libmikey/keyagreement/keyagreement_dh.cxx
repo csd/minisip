@@ -41,7 +41,7 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
-	peerCertChainPtr = new certificate_chain();
+	peerCertChainPtr = certificate_chain::create();
 
 }
 
@@ -73,7 +73,7 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		throw MikeyException( "Could not set the  "
 				      "DH group." );
 	}
-	peerCertChainPtr = new certificate_chain();
+	peerCertChainPtr = certificate_chain::create();
 }
 
 int KeyAgreementDH::setGroup( int groupValue ){
@@ -146,7 +146,7 @@ MRef<certificate_chain *> KeyAgreementDH::peerCertificateChain(){
 
 void KeyAgreementDH::addPeerCertificate( MRef<certificate *> peerCertPtr ){
 	if( this->peerCertChainPtr.isNull() ){
-		this->peerCertChainPtr = new certificate_chain();
+		this->peerCertChainPtr = certificate_chain::create();
 	}
 	
 	this->peerCertChainPtr->lock();

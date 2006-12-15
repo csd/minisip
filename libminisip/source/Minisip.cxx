@@ -55,6 +55,8 @@
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
 
+#include<libmcrypto/init.h>
+
 #include<libmikey/keyagreement_dh.h>
 
 #include<libmsip/SipUtils.h>
@@ -160,6 +162,8 @@ static void loadPlugins(const string &argv0){
 }
 
 Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
+
+	libmcryptoInit();
 
 	srand((unsigned int)time(0));
 

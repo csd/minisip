@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libmcrypto/openssl/TLSServerSocket.h>
+#include<libmcrypto/openssl/cert.h>
 
 #ifdef WIN32
 #	include<winsock2.h>
@@ -70,6 +71,14 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 	int32_t backlog = 25;
 	SSL_METHOD * meth;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
+	MRef<ossl_certificate*> ssl_cert;
+	MRef<ossl_ca_db*> ssl_db;
+
+	if( cert )
+		ssl_cert = (ossl_certificate*)*cert;
+
+	if( cert_db )
+		ssl_db = (ossl_ca_db*)*cert_db;
 	
 	if( use_ipv6 )
 		listen("::", listen_port, backlog);
@@ -105,11 +114,11 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 
 	if( !cert_db.isNull() ){
 		/* Use this database for the certificates check */
-		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->get_db());
+		SSL_CTX_set_cert_store( this->ssl_ctx, ssl_db->get_db());
 	}
 	
 		
-	if( SSL_CTX_use_PrivateKey( ssl_ctx, cert->get_openssl_private_key() ) <= 0 ){
+	if( SSL_CTX_use_PrivateKey( ssl_ctx, ssl_cert->get_openssl_private_key() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given private key" << endl;
 #endif
@@ -119,7 +128,7 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 	}
 	
 		
-	if( SSL_CTX_use_certificate( ssl_ctx, cert->get_openssl_certificate() ) <= 0 ){
+	if( SSL_CTX_use_certificate( ssl_ctx, ssl_cert->get_openssl_certificate() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given certificate" << endl;
 #endif

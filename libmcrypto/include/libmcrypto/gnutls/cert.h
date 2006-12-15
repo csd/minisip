@@ -18,174 +18,112 @@
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
-#ifndef CERTIFICATE_H
-#define CERTIFICATE_H
 
+#ifndef CERT_H
+#define CERT_H
+
+#include <libmcrypto/config.h>
+
+#include <libmcrypto/cert.h>
 
 #include<string>
 #include<list>
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
+#include<libmutil/Exception.h>
 
 
-class Certificate;
-//struct gnutls_x509_crt_t;
-//struct gnutls_x509_privkey_t;
+#include<gnutls/x509.h>
 
-//struct X509;
-//struct EVP_PKEY;
+class gtls_certificate;
 
-#define CERT_DB_ITEM_TYPE_OTHER  0
-#define CERT_DB_ITEM_TYPE_FILE   1
-#define CERT_DB_ITEM_TYPE_DIR    2
-
-#include<gnutls/openssl.h>
-
-class CADbItem{
+class LIBMCRYPTO_API gtls_ca_db_item: public ca_db_item{
 	public:
-		std::string item;
-		int type;
+		gtls_ca_db_item();
+		virtual ~gtls_ca_db_item();
 
-		bool operator ==(const CADbItem item2){ return (
-				item2.item == item && 
-				item2.type == type);};
+		gnutls_x509_crt_t* certs;
+		unsigned int num_certs;
 };
 
-
-class CADb: public MObject{
+class LIBMCRYPTO_API gtls_ca_db: public ca_db{
 	public:
-		CADb();
-		~CADb();
+		gtls_ca_db();
+		virtual ~gtls_ca_db();
 		
-		//X509_STORE * getDb();
-		virtual std::string getMemObjectType() const {return "ca_db";}
-		//void addDirectory( std::string dir );
-		void addFile( std::string file );
-		void addCertificate( Certificate * cert );
-		std::list<CADbItem *> &get_items();
-		CADbItem * get_next();
-		void initIndex();
-		void lock();
-		void unlock();
+		bool getDb(gnutls_x509_crt_t ** db, size_t * db_length );
+		virtual std::string getMemObjectType() const {return "gtls_ca_db";}
 
-		void remove( CADbItem * removedItem );
-
-	private:
-		//X509_STORE * certDb;
-		gnutls_x509_crt_t * caList;
-
-		std::list<CADbItem *>::iterator itemsIndex;
-
-		std::list<CADbItem *> items;
-
-                Mutex mLock;
-		
-		
-};
-
-class Certificate: public MObject{
-	public:
-		Certificate();
-		//Certificate( X509 * openssl_cert );
-		Certificate( const std::string certFilename );
-		Certificate( const std::string certFilename,
-			     const std::string privateKeyFilename );
-		Certificate( unsigned char * derCert, int length );
-		~Certificate();
-		virtual std::string getMemObjectType() const {return "Certificate";}
-		
-		int control( CADb * certDb );
-
-		void getDer( unsigned char * output, unsigned int * length );
-		int signData( unsigned char * data, int data_length, 
-			      unsigned char * sign, int * sign_length );
-		int verifSign( unsigned char * sign, int sign_length,
-			       unsigned char * data, int data_length );
-
-		std::string getName();
-		std::string getCn();
-		std::string getIssuer();
-		std::string getIssuerCn();
-
-		std::string getFile();
-		std::string getPkFile();
-
-		void setPk( std::string file );
-                void setEncPk(char * pkInput, int length, string password  )
-		//EVP_PKEY * get_openssl_private_key(){return private_key;};
-		//X509 * get_openssl_Certificate(){return cert;};
-	private:
-		EVP_PKEY * private_key;
-		X509 * cert;
-		gnutls_x509_crt_t * cert;
-		gnutls_x509_privkey_t * privateKey;
-
-		std::string file;
-		std::string pkFile;
-};
-
-class CertificateChain: public MObject{
-	public:
-		CertificateChain();
-		CertificateChain( MRef<Certificate *> cert );
-		~CertificateChain();
-		
-		virtual std::string getMemObjectType() const {return "CertificateChain";}
-		
-		void addCertificate( MRef<Certificate *> cert );
-		void removeCertificate( MRef<Certificate *> cert );
-		void removeLast();
-
-		int control( MRef<CADb *> certDb );
-		MRef<Certificate *> getNext();
-		MRef<Certificate *> getFirst();
-
-		void clear();
-
-		int length(){ return certList.size(); };
-		void lock();
-		void unlock();
-
-		bool isEmpty();
-
-		void initIndex();
-	private:
-		std::list< MRef<Certificate *> > certList;
-		std::list< MRef<Certificate *> >::iterator item;
-//		pthread_mutex_t mLock;
-                Mutex mLock;
-};
-
-class CertificateException{
-	public:
-		CertificateException(){};
-		CertificateException( std::string message ):message(message){};
-
-		std::string getMessage(){ return message; };
 	protected:
-		std::string message;
+		ca_db_item* create_dir_item( std::string dir );
+		ca_db_item* create_file_item( std::string file );
+		ca_db_item* create_cert_item( certificate* cert );
+
+	private:
+		gnutls_x509_crt_t * caList;
+		size_t caListLength;
 };
 
-class CertificateExceptionFile : public CertificateException{
+class LIBMCRYPTO_API gtls_certificate: public certificate{
 	public:
-		CertificateExceptionFile( std::string message ):CertificateException(message){};
+		gtls_certificate();
+		//gtls_certificate( X509 * openssl_cert );
+		gtls_certificate( const std::string cert_filename );
+		gtls_certificate( const std::string cert_filename,
+			     const std::string private_key_filename );
+		gtls_certificate( unsigned char * der_cert, int length );
+		~gtls_certificate();
+		virtual std::string getMemObjectType() const {return "gtls_certificate";}
+		
+		int control( ca_db * cert_db );
+
+		int get_der_length();
+		void get_der( unsigned char * output );
+		void get_der( unsigned char * output, unsigned int * length );
+		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
+		int denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		               unsigned char *enckey, int enckeylgth, unsigned char *iv);
+
+		int sign_data( unsigned char * data, int data_length, 
+			       unsigned char * sign, int * sign_length );
+		int verif_sign( unsigned char * sign, int sign_length,
+				unsigned char * data, int data_length );
+
+		std::string get_name();
+		std::string get_cn();
+		std::string get_issuer();
+		std::string get_issuer_cn();
+
+		void set_pk( std::string file );
+		void set_encpk(char * pkInput, int length,
+			       std::string password, std::string path );
+		bool has_pk();
+
+		gnutls_x509_crt_t get_certificate(){return cert;};
+		gnutls_x509_privkey_t get_private_key(){return privateKey;};
+
+	protected:
+		void openFromFile( std::string fileName );
+
+
+	private:
+		gnutls_x509_privkey_t privateKey;
+		gnutls_x509_crt_t cert;
 };
 
-class CertificateExceptionInit : public CertificateException{
+class gtls_certificate_chain: public certificate_chain{
 	public:
-		CertificateExceptionInit( std::string message ):CertificateException(message){};
-};
-
-class CertificateExceptionPkey : public CertificateException{
-	public:
-		CertificateExceptionPkey( std::string message ):CertificateException(message){};
-};
-
-class CertificateExceptionChain : public CertificateException{
-	public:
-		CertificateExceptionChain( std::string message ):CertificateException(message){};
+		gtls_certificate_chain();
+		gtls_certificate_chain( MRef<certificate *> cert );
+		virtual ~gtls_certificate_chain();
+		
+		virtual std::string getMemObjectType() const {return "gtls_certificate_chain";}
+		
+		int control( MRef<ca_db *> cert_db );
 };
 
 #endif

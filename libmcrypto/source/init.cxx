@@ -20,6 +20,7 @@
  * Authors: Zachary T Welch <zach-minisip@splitstring.com>
  */
 
+#include <config.h>
 #include <libmcrypto/init.h>
 #ifdef HAVE_OPENSSL
 #include <libmcrypto/openssl/init.h>
@@ -33,13 +34,13 @@
 
 void libmcryptoInit()
 {
-#if 0
 #ifdef HAVE_OPENSSL
+#if 0
 	OpensslThreadGuard::initialize();
 #endif
-#ifdef HAVE_GNUTLS
+#elif defined(HAVE_GNUTLS)
+	libmcryptoGnutlsInit();
 	GnutlsThreadGuard::initialize();
-#endif
 #endif
 }
 

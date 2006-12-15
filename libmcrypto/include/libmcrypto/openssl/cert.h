@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -26,6 +28,7 @@
 #define CERT_H
 
 #include <libmcrypto/config.h>
+#include<libmcrypto/cert.h>
 
 /*Include openssl/err.h before any <list/map/hash/vector> ... it causes 
 compilation under EVC 4.0 to fail, collision between STLPort and Openssl
@@ -47,68 +50,38 @@ compilation under EVC 4.0 to fail, collision between STLPort and Openssl
 
 class certificate;
 
-#define CERT_DB_ITEM_TYPE_OTHER  0
-#define CERT_DB_ITEM_TYPE_FILE   1
-#define CERT_DB_ITEM_TYPE_DIR    2
-
-class LIBMCRYPTO_API ca_db_item{
+class LIBMCRYPTO_API ossl_ca_db: public ca_db{
 	public:
-		std::string item;
-		int type;
-
-		bool operator ==(const ca_db_item item2){ return (
-				item2.item == item && 
-				item2.type == type);};
-};
-
-
-class LIBMCRYPTO_API ca_db: public MObject{
-	public:
-		ca_db();
-		~ca_db();
+		ossl_ca_db();
+		~ossl_ca_db();
 		
 		X509_STORE * get_db();
-		virtual std::string getMemObjectType() const {return "ca_db";}
+		virtual std::string getMemObjectType() const {return "ossl_ca_db";}
 		void add_directory( std::string dir );
 		void add_file( std::string file );
 		void add_certificate( certificate * cert );
-		std::list<ca_db_item *> &get_items();
-		ca_db_item * get_next();
-		void init_index();
-		void lock();
-		void unlock();
-
-		void remove( ca_db_item * removedItem );
 
 	private:
-		X509_STORE * cert_db;
-
-		std::list<ca_db_item *>::iterator items_index;
-
-		std::list<ca_db_item *> items;
-
-//		pthread_mutex_t mLock;
-                Mutex mLock;
-		
-		
+		X509_STORE * cert_db;		
 };
 
-class LIBMCRYPTO_API certificate: public MObject{
+class LIBMCRYPTO_API ossl_certificate: public certificate{
 	public:
-		certificate();
-		certificate( X509 * openssl_cert );
-		certificate( const std::string cert_filename );
-		certificate( const std::string cert_filename,
+		ossl_certificate();
+		ossl_certificate( X509 * ossl_cert );
+		ossl_certificate( const std::string cert_filename );
+		ossl_certificate( const std::string cert_filename,
 			     const std::string private_key_filename );
-		certificate( unsigned char * der_cert, int length );
-		certificate( unsigned char * certData, int length, std::string path );
-		~certificate();
+		ossl_certificate( unsigned char * der_cert, int length );
+		ossl_certificate( unsigned char * certData, int length, std::string path );
+		~ossl_certificate();
 		virtual std::string getMemObjectType() const {return "certificate";}
 		
 		int control( ca_db * cert_db );
 
 		int get_der_length();
-		void get_der( unsigned char * output );
+		void get_der( unsigned char * output,
+			      unsigned int * length );
 		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
 		int denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
@@ -124,76 +97,25 @@ class LIBMCRYPTO_API certificate: public MObject{
 		std::string get_issuer();
 		std::string get_issuer_cn();
 
-		std::string get_file();
-		std::string get_pk_file();
-                   
 		void set_pk( std::string file );
                 void set_encpk(char *derEncPk, int length, std::string password, std::string path);
+		bool has_pk();
 		EVP_PKEY * get_openssl_private_key(){return private_key;};
 		X509 * get_openssl_certificate(){return cert;};
 	private:
 		EVP_PKEY * private_key;
 		X509 * cert;
-
-		std::string file;
-		std::string pk_file;
 };
 
-class LIBMCRYPTO_API certificate_chain: public MObject{
+class LIBMCRYPTO_API ossl_certificate_chain: public certificate_chain{
 	public:
-		certificate_chain();
-		certificate_chain( MRef<certificate *> cert );
-		~certificate_chain();
+		ossl_certificate_chain();
+		ossl_certificate_chain( MRef<certificate *> cert );
+		virtual ~ossl_certificate_chain();
 		
-		virtual std::string getMemObjectType() const {return "certificate_chain";}
+		virtual std::string getMemObjectType() const {return "ossl_certificate_chain";}
 		
-		void add_certificate( MRef<certificate *> cert );
-		void remove_certificate( MRef<certificate *> cert );
-		void remove_last();
-
 		int control( MRef<ca_db *> cert_db );
-		MRef<certificate *> get_next();
-		MRef<certificate *> get_first();
-
-		void clear();
-
-		int length(){ return (int)cert_list.size(); };
-		void lock();
-		void unlock();
-
-		bool is_empty();
-
-		void init_index();
-	private:
-		std::list< MRef<certificate *> > cert_list;
-		std::list< MRef<certificate *> >::iterator item;
-//		pthread_mutex_t mLock;
-                Mutex mLock;
-};
-
-class LIBMCRYPTO_API certificate_exception : public Exception{
-	public:
-		certificate_exception( const char *desc):Exception(desc){};
-};
-
-class LIBMCRYPTO_API certificate_exception_file : public certificate_exception{
-	public:
-		certificate_exception_file( const char *message ):certificate_exception(message){};
-};
-
-class LIBMCRYPTO_API certificate_exception_init : public certificate_exception{
-	public:
-		certificate_exception_init( const char *message ):certificate_exception(message){};
-};
-
-class LIBMCRYPTO_API certificate_exception_pkey : public certificate_exception{
-	public:
-		certificate_exception_pkey( const char *message ):certificate_exception(message){};
-};
-
-class LIBMCRYPTO_API certificate_exception_chain : public certificate_exception{
-	public:
-		certificate_exception_chain( const char *message ):certificate_exception(message){};
 };
 
 #endif

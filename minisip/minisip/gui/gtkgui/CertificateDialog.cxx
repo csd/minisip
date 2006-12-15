@@ -115,7 +115,7 @@ void CertificateDialog::chooseCert(){
 		result = dialog->get_filename();
 
 		try{
-			chosenCert = new certificate( result );
+			chosenCert = certificate::load( result );
 		}
 		catch( certificate_exception & exc ){
 			Gtk::MessageDialog messageDialog( 
@@ -227,7 +227,7 @@ void CertificateDialog::addCert(){
 		result = dialog->get_filename();
 
 		try{
-			chosenCert = new certificate( result );
+			chosenCert = certificate::load( result );
 
 			certChain->lock();
 			certChain->add_certificate( chosenCert );

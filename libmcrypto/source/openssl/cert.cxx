@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,11 +20,12 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
 
-#include<libmcrypto/cert.h>
+#include<libmcrypto/openssl/cert.h>
 
 extern "C"{
 	#include<openssl/rsa.h>
@@ -46,19 +48,46 @@ extern "C"{
 
 using namespace std;
 
-certificate::certificate():private_key(NULL),cert(NULL){
+//
+// Factory methods
+// 
+
+ca_db *ca_db::create(){
+	return new ossl_ca_db();
+}
+
+certificate* certificate::load( const std::string cert_filename )
+{
+	return new ossl_certificate( cert_filename );
+}
+
+certificate* certificate::load( unsigned char * der_cert,
+				int length ){
+	return new ossl_certificate( der_cert, length );
+}
+
+
+certificate_chain* certificate_chain::create(){
+	return new ossl_certificate_chain();
+}
+
+//
+// ossl_certificate
+// 
+
+ossl_certificate::ossl_certificate():private_key(NULL),cert(NULL){
 
 }
 
-certificate::certificate( X509 * openssl_cert ):private_key(NULL){
-	if( openssl_cert == NULL ){
+ossl_certificate::ossl_certificate( X509 * ossl_cert ):private_key(NULL){
+	if( ossl_cert == NULL ){
 		throw certificate_exception("X509 certificate is NULL");
 	}
 	
-	cert = openssl_cert;
+	cert = ossl_cert;
 }
 
-certificate::certificate( const string cert_filename ):private_key(NULL){
+ossl_certificate::ossl_certificate( const string cert_filename ):private_key(NULL){
 	FILE * fp;
 
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -81,7 +110,7 @@ certificate::certificate( const string cert_filename ):private_key(NULL){
 	file = cert_filename;
 }
 
-certificate::certificate( const string cert_filename, const string private_key_filename ){
+ossl_certificate::ossl_certificate( const string cert_filename, const string private_key_filename ){
 	FILE * fp;
 	
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -106,7 +135,7 @@ certificate::certificate( const string cert_filename, const string private_key_f
 	file = cert_filename;
 }
 
-certificate::certificate( unsigned char * certData, int length, string path ):private_key(NULL)
+ossl_certificate::ossl_certificate( unsigned char * certData, int length, string path ):private_key(NULL)
 {
  /* tries to read a PEM certificate from memory, if that fails it tries to read it as a DER encoded cert*/
    BIO *mem;
@@ -130,7 +159,7 @@ certificate::certificate( unsigned char * certData, int length, string path ):pr
 }
 
 
-certificate::certificate( unsigned char * der_cert, int length ):private_key(NULL){
+ossl_certificate::ossl_certificate( unsigned char * der_cert, int length ):private_key(NULL){
 	cert = X509_new();
 
 	if( cert == NULL )
@@ -144,7 +173,7 @@ certificate::certificate( unsigned char * der_cert, int length ):private_key(NUL
 #endif
 }
 	
-certificate::~certificate(){
+ossl_certificate::~ossl_certificate(){
 	if( cert )
 		X509_free( cert );
 	cert = NULL;
@@ -155,7 +184,7 @@ certificate::~certificate(){
 
 }
 
-int certificate::envelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+int ossl_certificate::envelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
 				unsigned char *enckey, int* enckeylgth, unsigned char** iv){
 
 	EVP_CIPHER_CTX ctx;
@@ -196,7 +225,7 @@ int certificate::envelope_data(unsigned char * data, int size, unsigned char *re
 	return 0;
 }
 
-int certificate::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+int ossl_certificate::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
                                 unsigned char *enckey, int enckeylgth, unsigned char *iv){
 
         /*begin decrypt*/
@@ -218,7 +247,7 @@ int certificate::denvelope_data(unsigned char * data, int size, unsigned char *r
 	return 0;
 }
 
-int certificate::sign_data( unsigned char * data, int data_length,
+int ossl_certificate::sign_data( unsigned char * data, int data_length,
 	    		    unsigned char * sign, int * sign_length ){
 	EVP_MD_CTX     ctx;
 	int err;
@@ -258,7 +287,7 @@ int certificate::sign_data( unsigned char * data, int data_length,
 	return 0;
 }
 
-int certificate::verif_sign( unsigned char * sign, int sign_length,
+int ossl_certificate::verif_sign( unsigned char * sign, int sign_length,
 			     unsigned char * data, int data_length )
 {
 	EVP_PKEY *      public_key;
@@ -303,11 +332,15 @@ int certificate::verif_sign( unsigned char * sign, int sign_length,
 	return err;
 }
 	
-int certificate::get_der_length(){
+int ossl_certificate::get_der_length(){
 	return i2d_X509( cert, NULL );
 }
 
-void certificate::get_der( unsigned char * output ){
+void ossl_certificate::get_der( unsigned char * output, unsigned int * length ){
+	if( *length < get_der_length() ){
+ 		throw certificate_exception(
+			"Given buffer is to short" );
+	}
 	
 	int temp = i2d_X509( cert, &output);
 
@@ -315,14 +348,14 @@ void certificate::get_der( unsigned char * output ){
 	output -= temp;
 }
 
-string certificate::get_name(){
+string ossl_certificate::get_name(){
 	string ret(
 		X509_NAME_oneline( X509_get_subject_name( cert ),0 ,0 ));
 
 	return ret;
 }
 
-string certificate::get_cn(){
+string ossl_certificate::get_cn(){
 	string name = get_name();
 	size_t pos, pos2;
 
@@ -337,14 +370,14 @@ string certificate::get_cn(){
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }
 
-string certificate::get_issuer(){
+string ossl_certificate::get_issuer(){
 	string ret(
 		X509_NAME_oneline( X509_get_issuer_name( cert ),0 ,0 ));
 
 	return ret;
 }
 
-string certificate::get_issuer_cn(){
+string ossl_certificate::get_issuer_cn(){
 	string name = get_issuer();
 	size_t pos, pos2;
 
@@ -359,16 +392,8 @@ string certificate::get_issuer_cn(){
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }
 
-string certificate::get_file(){
-	return file;
-}
 
-string certificate::get_pk_file(){
-	return pk_file;
-}
-
-
-void certificate::set_pk( string file ){
+void ossl_certificate::set_pk( string file ){
 	FILE * fp = NULL;
 	
 	fp = fopen( file.c_str(), "r" );
@@ -401,7 +426,7 @@ void certificate::set_pk( string file ){
 
 }
 
-void certificate::set_encpk(char *derEncPk, int length, string password, string path)
+void ossl_certificate::set_encpk(char *derEncPk, int length, string password, string path)
 {
    BIO *mem;  
    mem = BIO_new_mem_buf((void *)derEncPk, length);
@@ -433,13 +458,16 @@ void certificate::set_encpk(char *derEncPk, int length, string password, string 
    pk_file=path;
 }
 
+bool ossl_certificate::has_pk(){
+	return private_key != NULL;
+}
 
-
-int certificate::control( ca_db * cert_db ){
+int ossl_certificate::control( ca_db * cert_db ){
 	int result;
 	X509_STORE_CTX cert_store_ctx;
+	ossl_ca_db *ssl_db = (ossl_ca_db*)cert_db;
 
-	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert ,NULL );
+	X509_STORE_CTX_init( &cert_store_ctx, ssl_db->get_db(), cert ,NULL );
 	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
 		//fprintf(stderr, "Could not initialize X509_STORE_CTX");
 		cerr << "Could not initialize X509_STORE_CTX" << endl;
@@ -459,35 +487,29 @@ int certificate::control( ca_db * cert_db ){
 }
 	
 
-ca_db::ca_db(){
+// 
+// ossl_ca_db
+// 
+
+ossl_ca_db::ossl_ca_db(){
 	cert_db = X509_STORE_new();
 
 	if( cert_db == NULL ){
 		throw certificate_exception_init(
 				"Could not create the certificate db" );
 	}
-	items_index = items.begin();
 }
 
-ca_db::~ca_db(){
+ossl_ca_db::~ossl_ca_db(){
 	X509_STORE_free( cert_db );
 }
 
-void ca_db::lock(){
-        mLock.lock();
-}
-
-void ca_db::unlock(){
-        mLock.unlock();
-}
-
-X509_STORE * ca_db::get_db(){
+X509_STORE * ossl_ca_db::get_db(){
 	return cert_db;
 }
 
-void ca_db::add_directory( string dir ){
+void ossl_ca_db::add_directory( string dir ){
 	X509_LOOKUP * lookup = NULL;
-	ca_db_item * item = new ca_db_item();
 	
 	lookup = X509_STORE_add_lookup( 
 			cert_db, X509_LOOKUP_hash_dir() );
@@ -499,16 +521,11 @@ void ca_db::add_directory( string dir ){
 		throw certificate_exception_file(
 			(string("Could not open the directory ")+dir).c_str() );
 
-	item->item = dir;
-	item->type = CERT_DB_ITEM_TYPE_DIR;
-	
-	items.push_back( item );
-	items_index = items.begin();
+	ca_db::add_directory( dir );
 }
 
-void ca_db::add_file( string file ){
+void ossl_ca_db::add_file( string file ){
 	X509_LOOKUP * lookup = NULL;
-	ca_db_item * item = new ca_db_item;
 	
 	lookup = X509_STORE_add_lookup( 
 			cert_db, X509_LOOKUP_file() );
@@ -519,116 +536,33 @@ void ca_db::add_file( string file ){
 	if( !X509_LOOKUP_load_file( lookup, file.c_str(), X509_FILETYPE_PEM ) )
 		throw certificate_exception_file(
 			("Could not open the file "+file).c_str() );
-	
-	item->item = file;
-	item->type = CERT_DB_ITEM_TYPE_FILE;
-	
-	items.push_back( item );
-	items_index = items.begin();
+
+	ca_db::add_file( file );
 }
 
-void ca_db::add_certificate( certificate * cert ){
-	ca_db_item * item = new ca_db_item();
-	X509_STORE_add_cert( cert_db, cert->get_openssl_certificate() );
-	
-	item->item = "";
-	item->type = CERT_DB_ITEM_TYPE_OTHER;
-	
-	items.push_back( item );
-	items_index = items.begin();
+void ossl_ca_db::add_certificate( certificate * cert ){
+	ossl_certificate *ssl_cert = (ossl_certificate *)cert;
+	X509_STORE_add_cert( cert_db, ssl_cert->get_openssl_certificate() );
 
-}
-
-void ca_db::remove( ca_db_item * removedItem ){
-	init_index();
-
-	while( items_index != items.end() ){
-		if( *(*items_index) == *removedItem ){
-			items.erase( items_index );
-			init_index();
-			return;
-		}
-		items_index ++;
-	}
-	init_index();
-}
-
-list<ca_db_item *> &ca_db::get_items(){
-	return items;
-}
-
-void ca_db::init_index(){
-	items_index = items.begin();
-}
-
-ca_db_item * ca_db::get_next(){
-	ca_db_item * tmp;
-	
-	if( items_index == items.end() ){
-		items_index = items.begin();
-		return NULL;
-	}
-
-	tmp = *items_index;
-	items_index ++;
-	return tmp;
-}
-
-certificate_chain::certificate_chain(){
-	item = cert_list.begin();
-
-}
-
-certificate_chain::certificate_chain( MRef<certificate *> cert ){
-	
-	cert_list.push_back( cert );
-	item = cert_list.begin();
-}
-
-certificate_chain::~certificate_chain(){
-}
-
-void certificate_chain::lock(){
-        mLock.lock();
-}
-
-void certificate_chain::unlock(){
-        mLock.unlock();
-}
-
-bool certificate_chain::is_empty(){
-	return cert_list.empty();
+	ca_db::add_certificate( cert );
 }
 
 
-void certificate_chain::add_certificate( MRef<certificate *> cert ){
-	
-	if( !cert_list.empty() ){
-		MRef<certificate *> lastCert = *(--cert_list.end());
+//
+// ossl_certificate_chain
+// 
 
-		if( lastCert->get_issuer() != cert->get_name() ){
-			throw certificate_exception_chain(
-			 	"The previous certificate in the chain is not"
-				"issued by the given one" );
-		}
-	}
-	
-	cert_list.push_back( cert );
-	item = cert_list.begin();
+ossl_certificate_chain::ossl_certificate_chain(){
 }
 
-void certificate_chain::remove_last(){
-	cert_list.erase( -- cert_list.end() );
-
-	item = cert_list.begin();
+ossl_certificate_chain::ossl_certificate_chain( MRef<certificate *> cert ): certificate_chain( cert ){
 }
 
-
-void certificate_chain::init_index(){
-	item = cert_list.begin();
+ossl_certificate_chain::~ossl_certificate_chain(){
 }
 
-int certificate_chain::control( MRef<ca_db *> cert_db){
+int ossl_certificate_chain::control( MRef<ca_db *> cert_db){
+	MRef<ossl_ca_db*>ssl_db = (ossl_ca_db*)*cert_db;
 	int result;
 	X509_STORE_CTX cert_store_ctx;
 	/* The first one, the one to verify */
@@ -643,17 +577,19 @@ int certificate_chain::control( MRef<ca_db *> cert_db){
 		return 0;
 	}
 
-	cert = (*i)->get_openssl_certificate();
+	MRef<ossl_certificate*>ssl_cert = (ossl_certificate *)**i;
+
+	cert = ssl_cert->get_openssl_certificate();
 
 	cert_stack = sk_X509_new_null();
 
 	i++;
 
 	for( ; i != cert_list.end(); i++ ){
-		sk_X509_push( cert_stack, (*i)->get_openssl_certificate() );
+		sk_X509_push( cert_stack, ssl_cert->get_openssl_certificate() );
 	}
 
-	X509_STORE_CTX_init( &cert_store_ctx, cert_db->get_db(), cert, cert_stack);
+	X509_STORE_CTX_init( &cert_store_ctx, ssl_db->get_db(), cert, cert_stack);
 	if( X509_STORE_CTX_get_error( &cert_store_ctx) != 0 ){
 		//fprintf(stderr, "Could not initialize X509_STORE_CTX");
 		cerr << "Could not initialize X509_STORE_CTX" << endl;
@@ -670,31 +606,3 @@ int certificate_chain::control( MRef<ca_db *> cert_db){
 #endif
 	return result;
 }
-
-MRef<certificate *> certificate_chain::get_next(){
-	MRef<certificate *> ret;
-	
-	if( item == cert_list.end() ){
-		item = cert_list.begin();
-		return NULL;
-	}
-
-	ret = *item;
-	item ++;
-	return ret;
-}
-
-MRef<certificate *> certificate_chain::get_first(){
-	if( cert_list.size() == 0 ){
-		return NULL;
-	}
-	
-	return *(cert_list.begin());
-}
-
-void certificate_chain::clear(){
-	cert_list.clear();
-
-}
-
-

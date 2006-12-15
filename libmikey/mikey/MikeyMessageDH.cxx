@@ -174,7 +174,7 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 
 		while( i != NULL )
 		{
-			peerCert = new certificate( 
+			peerCert = certificate::load( 
 				((MikeyPayloadCERT *)i)->certData(),
 				((MikeyPayloadCERT *)i)->certLength()
 				);
@@ -329,7 +329,7 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 
 		while( i != NULL )
 		{
-			peerCert = new certificate( 
+			peerCert = certificate::load( 
 				((MikeyPayloadCERT *)i)->certData(),
 				((MikeyPayloadCERT *)i)->certLength()
 				);
@@ -423,7 +423,7 @@ bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
 				extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE)
 				) != NULL ){
 			ka->addPeerCertificate(
-				new certificate( 
+				certificate::load( 
 					certPayload->certData(),
 					certPayload->certLength() ));
 			payloads.remove( certPayload );

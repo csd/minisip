@@ -1,12 +1,14 @@
 OTHER_FILES =
 
 pkginclude_HEADERS = \
-		init.h \
 		aes.h \
-		cert.h \
 		TLSException.h \
 		TLSServerSocket.h \
 		TLSSocket.h \
 		$(OTHER_FILES)
+
+noinst_HEADERS = \
+		cert.h \
+		init.h
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

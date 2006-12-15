@@ -98,7 +98,7 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 	if(success>0 && res.size()>1)
 	{
 
-		certificate *cert = new certificate((unsigned char *)res.at(0)->data,(size_t) res.at(0)->size,
+		certificate *cert = certificate::load((unsigned char *)res.at(0)->data,(size_t) res.at(0)->size,
 				"httpsrp:///"+user + "/credentials/cert.pem" );
 		if (cert != NULL)
 		{
