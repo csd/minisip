@@ -24,7 +24,9 @@
 
 #include <config.h>
 
+#ifdef HAVE_OPENSSL_RSA_H
 #include<openssl/rsa.h>
+#endif
 
 #include <libmikey/MikeyMessage.h>
 #include <libmikey/MikeyPayloadHDR.h>

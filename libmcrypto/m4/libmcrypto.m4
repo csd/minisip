@@ -9,7 +9,7 @@ AC_ARG_ENABLE(fast-aes,
 # End of AM_LIBMCRYPTO_ENABLE_FAST_AES
 #
 
-# AM_LIBMCRYPTO_CHECK_OPENSSL()
+# AM_LIBMCRYPTO_CHECK_OPENSSL([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 # -----------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_OPENSSL], [
 dnl OpenSSL libcrypto
@@ -37,8 +37,8 @@ if test x$enable_fast_aes != xyes; then
 		[Define to 1 if you have the <openssl/aes.h> header file.])])
 fi
 
-AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
-AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
+dnl AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
+dnl AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
 
 dnl OpenSSL libssl
 dnl RedHat fix
@@ -57,8 +57,12 @@ AC_CHECK_HEADER([openssl/ssl.h], [],
 
 if test "x${HAVE_OPENSSL}" = "x1"; then
 	AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have OpenSSL.])
+	ifelse([$1], , :, [$1])
+else
+	ifelse([$2], , :, [$2])
 fi
-AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
+
+dnl AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
 LIBS="${mcrypto_save_LIBS}"
 CPPFLAGS="${mcrypto_save_CPPFLAGS}"
@@ -75,7 +79,7 @@ AC_SUBST(SCSIM_LIBS)
 LIBS="${SCSIM_LIBS} ${LIBS}"
 ])
 
-# AM_LIBMCRYPTO_CHECK_GNUTLS()
+# AM_LIBMCRYPTO_CHECK_GNUTLS([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 # ----------------------------
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_GNUTLS], [
 AC_CHECK_LIB([gcrypt], [main],[
@@ -88,7 +92,13 @@ AC_CHECK_LIB([gnutls], [main],[
 		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
 		HAVE_GNUTLS=yes
 	],[])
-AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
+if test "x${HAVE_GNUTLS}" = "xyes"; then
+	ifelse([$1], , :, [$1])
+else
+	ifelse([$2], , :, [$2])
+fi
+
+dnl AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
 AC_SUBST(GNUTLS_LIBS)
 ])
 # End of AM_LIBMCRYPTO_CHECK_GNUTLS
@@ -101,7 +111,7 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMCRYPTO],[
 dnl	AC_REQUIRE([AM_MINISIP_CHECK_OPENSSL]) dnl
 	AC_MINISIP_WITH_ARG(MCRYPTO, mcrypto, libmcrypto, $1, [REQUIRED], [dnl
 dnl if HAVE_OPENSSL
-			-lssl -lcrypto dnl
+dnl			-lssl -lcrypto dnl
 dnl endif
 dnl if HAVE_GNUTLS
 dnl			-lgnutls

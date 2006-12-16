@@ -14,6 +14,11 @@ libmikey_la_LIBADD =  $(MINISIP_LIBS)
 
 libmikey_la_SOURCES = $(mikey_src) $(ka_src)
 
+if HAVE_OPENSSL
+libmikey_la_SOURCES += $(ossl_src)
+libmikey_la_LIBADD += $(OPENSSL_LIBS)
+endif HAVE_OPENSSL
+
 if OS_WIN
 res_obj = win32/libmikey-res.o
 libmikey_la_LDFLAGS += -Wl,$(res_obj)
@@ -24,7 +29,6 @@ mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyCsIdMap.cxx \
                      mikey/MikeyMessage.cxx \
                      mikey/MikeyMessageDH.cxx \
-                     mikey/MikeyMessagePKE.cxx \
                      mikey/MikeyMessagePSK.cxx \
                      mikey/MikeyPayloadCERT.cxx \
                      mikey/MikeyPayloadCHASH.cxx \
@@ -47,8 +51,10 @@ ka_src =             keyagreement/keyagreement.cxx \
                      keyagreement/keyagreement_dh.cxx \
 	             keyagreement/keyagreement_psk.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
-		     keyagreement/keyvalidity.cxx \
-		     keyagreement/oakley_groups.h
+		     keyagreement/keyvalidity.cxx
+
+ossl_src = \
+		mikey/MikeyMessagePKE.cxx
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}

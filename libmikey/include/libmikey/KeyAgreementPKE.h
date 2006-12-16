@@ -2,7 +2,11 @@
 #define KEYAGREEMENTPKE_H
 
 #include <libmikey/keyagreement.h>
-#include <openssl/evp.h>
+#ifdef HAVE_OPENSSL_EVP_H
+# include <openssl/evp.h>
+#else
+typedef struct evp_pkey_st EVP_PKEY;
+#endif
 
 /**
  * Instances of this class are used to store the necessary information about
