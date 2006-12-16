@@ -30,6 +30,9 @@ pkginclude_HEADERS = \
 		rand.h \
 		uuid.h \
 		config.h \
+		TLSException.h \
+		TLSServerSocket.h \
+		TLSSocket.h \
 		ZrtpDH.h \
 		$(OTHER_FILES)
 
