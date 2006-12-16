@@ -25,7 +25,7 @@
 #ifndef SIPSIMPK_H
 #define SIPSIMPK_H 
 
-#include <PCSC/winscard.h>
+// #include <PCSC/winscard.h>
 #include <libmcrypto/SipSim.h>
 
 class SipSimPk : public virtual SipSim {

@@ -25,7 +25,7 @@
 #ifndef SIPSIM_H
 #define SIPSIM_H 
 
-#include <PCSC/winscard.h>
+// #include <PCSC/winscard.h>
 #include <libmutil/MemObject.h>
 
 class SipSim : public virtual MObject {

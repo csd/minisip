@@ -26,7 +26,7 @@
 #define SIPSIMSMARTCARDGD_H 
 
 #include <vector>
-#include <PCSC/winscard.h>
+// #include <PCSC/winscard.h>
 #include <libmcrypto/SmartCard.h>
 #include <libmcrypto/SipSim.h>
 #include <libmcrypto/SipSimDh.h>
