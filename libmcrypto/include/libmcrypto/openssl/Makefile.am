@@ -1,7 +1,6 @@
 OTHER_FILES =
 
 pkginclude_HEADERS = \
-		aes.h \
 		$(OTHER_FILES)
 
 noinst_HEADERS = \

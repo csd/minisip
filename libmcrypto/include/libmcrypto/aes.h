@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2006 Zachary T Welch
-
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -17,20 +17,73 @@
 */
 
 /*
- * Authors: Zachary T Welch <zach-minisip@splitstring.com>
- */
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+*/
 
-#ifndef MLIBMCRYPTO_AES_H
-#define MLIBMCRYPTO_AES_H
 
-// XXX: replace this forward compatibility layer with a Bridge interface
-#include<libmcrypto/uninst_config.h>
+#ifndef AES_H
+#define AES_H
 
-#include<config.h>
-#ifdef HAVE_OPENSSL
-#include<libmcrypto/openssl/aes.h>
-#elif defined(HAVE_GNUTLS)
-#error "gnutls aes support is not complete"
-#endif // HAVE_GNUTLS
+#include <libmcrypto/config.h>
 
-#endif	// MLIBMCRYPTO_AES_H
+#include <stdlib.h>
+
+typedef struct _f8_ctx {
+    unsigned char *S;
+    unsigned char *ivAccent;
+    uint32_t J;
+} F8_CIPHER_CTX;
+
+
+
+class LIBMCRYPTO_API AES{
+	public:
+		AES();
+		AES( unsigned char * key, int key_length );
+		~AES();
+
+		void encrypt( const unsigned char * input, unsigned char * output );
+		void get_ctr_cipher_stream( unsigned char * output, unsigned int length,
+				unsigned char * iv );
+		/* Counter-mode encryption */
+		void ctr_encrypt( const unsigned char * input, 
+				  unsigned int input_length,
+			 unsigned char * output, unsigned char * iv );
+		
+		/* Counter-mode encryption, in place */
+		void ctr_encrypt( unsigned char * data, 
+				  unsigned int data_length,
+			 	  unsigned char * iv );
+
+		/* f8-mode encryption, in place */
+		void f8_encrypt( unsigned char * data, 
+				 unsigned int data_length,
+				 unsigned char * iv,
+				 unsigned char *key,
+				 unsigned int keyLen,
+				 unsigned char *salt, 
+				 unsigned int saltLen);
+
+		/* f8-mode encryption */
+		void f8_encrypt(unsigned char *in, 
+				unsigned int in_length, 
+				unsigned char *out,
+				unsigned char *iv, 
+				unsigned char *key,
+				unsigned int keyLen,
+				unsigned char *salt, 
+				unsigned int saltLen);
+
+
+	private:
+		void set_encrypt_key( unsigned char *key, int key_nb_bits );
+
+		int processBlock(F8_CIPHER_CTX *f8ctx, 
+			     unsigned char *in, 
+			     int length, 
+			     unsigned char *out);
+		void *m_key;
+};
+
+#endif

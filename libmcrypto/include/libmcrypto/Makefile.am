@@ -21,6 +21,7 @@ endif
 
 
 pkginclude_HEADERS = \
+		aes.h \
 		cert.h \
 		init.h \
 		$(scsim_src) \
@@ -43,7 +44,6 @@ OTHER_FILES += hmac256.h sha256.h
 endif
 
 noinst_HEADERS = \
-		aes.h \
 		rijndael-alg-fst.h
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

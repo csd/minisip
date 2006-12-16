@@ -30,6 +30,7 @@ endif
 
 
 libmcrypto_core_la_SOURCES = \
+		aes.cxx \
 		cert.cxx \
 		init.cxx \
 		$(scsim_src) \
