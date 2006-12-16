@@ -23,29 +23,37 @@
  *          Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#ifndef TLSSOCKET_H
-#define TLSSOCKET_H
+#ifndef GNUTLS_TLSSERVERSOCKET_H
+#define GNUTLS_TLSSERVERSOCKET_H
 
 #include<libmcrypto/config.h>
 
-#include<libmutil/mtypes.h>
-#include<libmutil/MemObject.h>
-#include<libmnetutil/IPAddress.h>
-#include<libmnetutil/StreamSocket.h>
-#include<libmcrypto/cert.h>
+#include<libmcrypto/TLSServerSocket.h>
+#include<libmcrypto/gnutls/cert.h>
 
-class LIBMNETUTIL_API TLSSocket : public StreamSocket {
+class LIBMNETUTIL_API GnutlsServerSocket : public TLSServerSocket {
+
 	public:
-		virtual ~TLSSocket();
+		GnutlsServerSocket( bool use_ipv6, int32_t listen_port,
+				    MRef<gtls_certificate *> cert,
+				    MRef<gtls_ca_db *> cert_db=NULL);
+		~GnutlsServerSocket();
+		virtual std::string getMemObjectType() const {return "GnutlsServerSocket";}
 
-		static TLSSocket* connect( IPAddress &addr,
-					   int32_t port,
-					   MRef<certificate *> cert=NULL,
-					   MRef<ca_db *> cert_db=NULL,
-					   std::string serverName="" );
+		virtual MRef<StreamSocket *> accept();
 
 	protected:
-		TLSSocket();
-};
+		virtual void init( bool use_ipv6, int32_t listen_port, 
+				   MRef<gtls_certificate *> cert,
+				   MRef<gtls_ca_db *> cert_db);
+		gnutls_session_t initialize_tls_session();
 
+	private:
+		MRef<gtls_ca_db *> m_cert_db;
+		MRef<gtls_certificate*> m_cert;
+
+		gnutls_certificate_credentials_t m_xcred;
+		gnutls_x509_crt_t* m_ca_list;
+		size_t m_ca_list_len;
+};
 #endif

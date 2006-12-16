@@ -401,8 +401,8 @@ MRef<SipSocketServer *> SipStackInternal::createTlsServer( bool ipv6, const stri
 	MRef<SipSocketServer *> server;
 	int32_t port = config->localTlsPort;
 
-	sock = new TLSServerSocket( ipv6, port, config->cert->get_first(),
-				    config->cert_db );
+	sock = TLSServerSocket::create( ipv6, port, config->cert->get_first(),
+					config->cert_db );
 	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
 	server->setExternalIp( ipString );
 

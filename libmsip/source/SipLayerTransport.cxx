@@ -713,8 +713,8 @@ bool SipLayerTransport::findSocket(const string &transport,
 			 * create one */
 			cerr << "SipLayerTransport: sendMessage: creating new socket" << endl;
 			if( transport == "TLS" ){
-				ssocket = new TLSSocket( destAddr, 
-							port, tls_ctx, getMyCertificate(),
+				ssocket = TLSSocket::connect( destAddr, 
+							port, getMyCertificate(),
 							cert_db );
 			}
 			else{ /* TCP */

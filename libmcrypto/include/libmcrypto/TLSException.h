@@ -1,6 +1,5 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  Copyright (C) 2006 Mikael Magnusson
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,32 +19,30 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *          Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#ifndef TLSSOCKET_H
-#define TLSSOCKET_H
+#ifndef MLIBMCRYPTO_TLS_EXCEPTION_H
+#define MLIBMCRYPTO_TLS_EXCEPTION_H
 
 #include<libmcrypto/config.h>
+#include<libmnetutil/NetworkException.h>
 
-#include<libmutil/mtypes.h>
-#include<libmutil/MemObject.h>
-#include<libmnetutil/IPAddress.h>
-#include<libmnetutil/StreamSocket.h>
-#include<libmcrypto/cert.h>
-
-class LIBMNETUTIL_API TLSSocket : public StreamSocket {
+class LIBMCRYPTO_API TLSInitFailed : public NetworkException{
 	public:
-		virtual ~TLSSocket();
+		TLSInitFailed();
+		virtual ~TLSInitFailed() throw(){}
+		virtual const char *what();
+	private:
+		std::string msg;
+};
 
-		static TLSSocket* connect( IPAddress &addr,
-					   int32_t port,
-					   MRef<certificate *> cert=NULL,
-					   MRef<ca_db *> cert_db=NULL,
-					   std::string serverName="" );
-
-	protected:
-		TLSSocket();
+class LIBMCRYPTO_API TLSContextInitFailed : public NetworkException{
+	public:
+		TLSContextInitFailed();
+		virtual ~TLSContextInitFailed() throw(){}
+		virtual const char*what();
+	private:
+		std::string msg;
 };
 
 #endif

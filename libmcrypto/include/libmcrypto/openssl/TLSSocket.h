@@ -21,8 +21,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#ifndef TLSSOCKET_H
-#define TLSSOCKET_H
+#ifndef OPENSSL_TLSSOCKET_H
+#define OPENSSL_TLSSOCKET_H
 
 #include<libmcrypto/config.h>
 
@@ -30,12 +30,13 @@
 
 #include<libmnetutil/StreamSocket.h>
 
-#include<libmcrypto/cert.h>
+#include<libmcrypto/openssl/cert.h>
 #include<libmutil/mtypes.h>
 
 #include<libmnetutil/IPAddress.h>
 
 #include<libmutil/MemObject.h>
+#include<libmcrypto/TLSSocket.h>
 
 
 /**
@@ -78,21 +79,21 @@ template class __declspec(dllexport) MRef<ca_db*>;
 #endif
 #endif
 
-class LIBMNETUTIL_API TLSSocket : public StreamSocket {
+class LIBMNETUTIL_API OsslSocket : public TLSSocket {
 	public:
-		TLSSocket(std::string addr, int32_t port, void * &ssl_ctx,
-			MRef<certificate *> cert = NULL,
-			MRef<ca_db *> cert_db=NULL );
+		OsslSocket(std::string addr, int32_t port, void * &ssl_ctx,
+			MRef<ossl_certificate *> cert = NULL,
+			MRef<ossl_ca_db *> cert_db=NULL );
 		
-		TLSSocket(IPAddress &addr, int32_t port, void * &ssl_ctx,
-			MRef<certificate *> cert=NULL,
-			MRef<ca_db *> cert_db=NULL );
+		OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
+			MRef<ossl_certificate *> cert=NULL,
+			MRef<ossl_ca_db *> cert_db=NULL );
 		
-		TLSSocket( MRef<StreamSocket *> sock, SSL_CTX * ssl_ctx );
+		OsslSocket( MRef<StreamSocket *> sock, SSL_CTX * ssl_ctx );
 		
-		virtual ~TLSSocket();
+		virtual ~OsslSocket();
 
-		virtual std::string getMemObjectType() const {return "TLSSocket";};
+		virtual std::string getMemObjectType() const {return "OsslSocket";};
 
 		virtual int32_t write(std::string);
 		
@@ -107,8 +108,9 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		friend std::ostream& operator<<(std::ostream&, TLSSocket&);
 
 	private:
-		void TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
-			MRef<certificate *> cert, MRef<ca_db *> cert_db );
+		void OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
+					 MRef<ossl_certificate *> cert,
+					 MRef<ossl_ca_db *> cert_db );
 		
 		MRef<StreamSocket *> sock;
 		
@@ -116,10 +118,10 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 		
 		void*     priv;
 		
-		MRef<certificate *> peer_cert;
+		MRef<ossl_certificate *> peer_cert;
 		
 		/** CA db */
-		MRef<ca_db *> cert_db;
+		MRef<ossl_ca_db *> cert_db;
 };
 
 TLSSocket& operator<<(TLSSocket& sock, std::string str);

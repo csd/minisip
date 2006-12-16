@@ -21,28 +21,29 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#ifndef TLSSERVERSOCKET_H
-#define TLSSERVERSOCKET_H
+#ifndef OPENSSL_TLSSERVERSOCKET_H
+#define OPENSSL_TLSSERVERSOCKET_H
 
 #include<libmcrypto/config.h>
 
-#include<libmcrypto/TLSSocket.h>
-#include<libmnetutil/IP4ServerSocket.h>
-#include<libmcrypto/cert.h>
+#include<libmcrypto/TLSServerSocket.h>
+#include<libmcrypto/openssl/cert.h>
 
-class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
+#include<openssl/ssl.h>
+
+class LIBMNETUTIL_API OsslServerSocket : public TLSServerSocket {
 
 	public:
-		TLSServerSocket( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
-		TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL);
-		virtual std::string getMemObjectType() const {return "TLSServerSocket";}
+		OsslServerSocket( bool use_ipv6, int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db=NULL);
+		OsslServerSocket( int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db=NULL);
+		virtual std::string getMemObjectType() const {return "OsslServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
 
 	protected:
 		virtual void init( bool use_ipv6, int32_t listen_port, 
-				   MRef<certificate *> cert,
-				   MRef<ca_db *> cert_db);
+				   MRef<ossl_certificate *> cert,
+				   MRef<ossl_ca_db *> cert_db);
 
 	private:
 		int32_t listen_port;
@@ -53,6 +54,6 @@ class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 		/**
 		 CA db 
 		 */
-		MRef<ca_db *> cert_db;
+		MRef<ossl_ca_db *> cert_db;
 };
 #endif

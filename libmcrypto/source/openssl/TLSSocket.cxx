@@ -44,17 +44,48 @@
 
 #include<iostream>
 
+#include<libmcrypto/TLSException.h>
 #include<libmcrypto/openssl/TLSException.h>
 #include<libmutil/MemObject.h>
 
 using namespace std;
 
-int8_t TLSSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphers */
+TLSSocket::TLSSocket()
+{
+}
+
+TLSSocket::~TLSSocket()
+{
+}
+
+TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
+			       MRef<certificate *> cert,
+			       MRef<ca_db *> cert_db,
+			       string serverName )
+{
+	void *ssl_ctx = NULL;
+	MRef<ossl_certificate*> ssl_cert;
+	MRef<ossl_ca_db*> ssl_db;
+
+	if( cert )
+		ssl_cert = (ossl_certificate*)*cert;
+
+	if( cert_db )
+		ssl_db = (ossl_ca_db*)*cert_db;
+
+	return new OsslSocket( addr, port, ssl_ctx, ssl_cert, ssl_db );
+}
+
+
+int8_t OsslSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciphers */
+
 
 #define ssl ((SSL*)priv)
 
+
+
 // When created by a TLS Server
-TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
+OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
 		sock(tcp_socket){
 	type = SOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
@@ -78,23 +109,24 @@ TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
 }
 
 
-TLSSocket::TLSSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
-		MRef<certificate *> cert, 
-		MRef<ca_db *> cert_db ){
+OsslSocket::OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
+			      MRef<ossl_certificate *> cert, 
+			      MRef<ossl_ca_db *> cert_db ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	TLSSocket::TLSSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
+	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
 }
 
-TLSSocket::TLSSocket( string addr, int32_t port, void * &ssl_ctx, 
-		MRef<certificate *> cert, 
-		MRef<ca_db *> cert_db ){
+OsslSocket::OsslSocket( string addr, int32_t port, void * &ssl_ctx, 
+			      MRef<ossl_certificate *> cert, 
+			      MRef<ossl_ca_db *> cert_db ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	TLSSocket::TLSSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
+	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */
-void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
-								MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
+					MRef<ossl_certificate *> cert,
+					MRef<ossl_ca_db *> cert_db ){
 	type = SOCKET_TYPE_TLS;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
@@ -202,7 +234,7 @@ void TLSSocket::TLSSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 }
 
 
-TLSSocket::~TLSSocket(){
+OsslSocket::~OsslSocket(){
 #ifdef DEBUG_OUTPUT
 	cerr << "TLS: Shutting down TLS Socket" << endl;
 #endif	
@@ -213,20 +245,20 @@ TLSSocket::~TLSSocket(){
 	//delete peerAddress;
 }
 
-int32_t TLSSocket::write( string data ){
+int32_t OsslSocket::write( string data ){
 	return SSL_write( ssl, data.c_str(), (int)data.length() );
 }
 
-int32_t TLSSocket::write( const void *buf, int32_t count ){
+int32_t OsslSocket::write( const void *buf, int32_t count ){
 	return SSL_write( ssl, buf, count );
 }
 
-TLSSocket& operator<<(TLSSocket& sock, string str){
+OsslSocket& operator<<(OsslSocket& sock, string str){
 	sock.write(str);
 	return sock;
 }
 
-int32_t TLSSocket::read( void *buf, int32_t count ){
+int32_t OsslSocket::read( void *buf, int32_t count ){
 	//if( SSL_pending( ssl ) == 0 )
 	//	return -1;
 	int ret;
@@ -242,7 +274,7 @@ int32_t TLSSocket::read( void *buf, int32_t count ){
 		return ret;
 }
 
-int32_t TLSSocket::setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx ) {
+int32_t OsslSocket::setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx ) {
 	char *ciphers;
 	
 #ifdef DEBUG_OUTPUT
@@ -262,7 +294,7 @@ int32_t TLSSocket::setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx ) {
 	}
 	if( SSL_CTX_set_cipher_list(_ctx, ciphers) == 0 ) {
 #ifdef DEBUG_OUTPUT
-		cerr << "ERROR: TLSSocket::setSSLCiphers: failed to set cipher list" << endl;
+		cerr << "ERROR: OsslSocket::setSSLCiphers: failed to set cipher list" << endl;
 #endif	
 		return 0;
 	} else return 1;

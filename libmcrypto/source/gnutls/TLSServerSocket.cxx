@@ -23,33 +23,119 @@
 
 #include<config.h>
 
-#include<libmcrypto/openssl/TLSServerSocket.h>
+#include<libmcrypto/gnutls/TLSServerSocket.h>
+#include<libmcrypto/gnutls/TLSSocket.h>
+#include<libmcrypto/TLSException.h>
 
 #include<sys/socket.h>
 
 using namespace std;
 
-TLSServerSocket::TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db):ServerSocket(AF_INET, listen_port)
+TLSServerSocket::TLSServerSocket( int32_t domain, int32_t listen_port )
+		:ServerSocket( domain, listen_port )
 {
-	init(false, listen_port, cert, cert_db);
 }
 
-TLSServerSocket::TLSServerSocket( bool use_ipv6, int32_t listen_port, 
-				 MRef<certificate *> cert,
-				  MRef<ca_db *> cert_db):ServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+TLSServerSocket::~TLSServerSocket()
+{
+}
+
+ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+	MRef<gtls_certificate*> gtls_cert;
+	MRef<gtls_ca_db*> gtls_db;
+
+	if( cert )
+		gtls_cert = (gtls_certificate*)*cert;
+
+	if( cert_db )
+		gtls_db = (gtls_ca_db*)*cert_db;
+
+	return new GnutlsServerSocket( use_ipv6, listen_port,
+				       gtls_cert, gtls_db );
+}
+
+ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+	return create( false, listen_port, cert, cert_db );
+}
+
+
+GnutlsServerSocket::GnutlsServerSocket( bool use_ipv6, int32_t listen_port, 
+					MRef<gtls_certificate *> cert,
+					MRef<gtls_ca_db *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
 {
 	init(use_ipv6, listen_port, cert, cert_db);
 }
 
-void TLSServerSocket::init( bool use_ipv6, int32_t listen_port, 
-			    MRef<certificate *> cert,
-			    MRef<ca_db *> cert_db)
-{
-	throw Exception("TLSServerSocket unimplemented");
+GnutlsServerSocket::~GnutlsServerSocket(){ 
+	if( m_xcred ){
+		gnutls_certificate_free_credentials( m_xcred );
+		m_xcred = NULL;
+	}
+
+	if( m_ca_list ){
+		delete[] m_ca_list;
+		m_ca_list = NULL;
+	}
 }
 
-MRef<StreamSocket *> TLSServerSocket::accept(){
+gnutls_session_t GnutlsServerSocket::initialize_tls_session(){
+	gnutls_session_t session;
+
+	gnutls_init (&session, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_set_default_priority (session);
+
+	gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, m_xcred);
+
+	/* request client certificate if any.
+	 */
+	gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+
+// 	gnutls_dh_set_prime_bits (session, DH_BITS);
+
+	return session;
+}
+
+void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port, 
+			       MRef<gtls_certificate *> cert,
+			       MRef<gtls_ca_db *> cert_db)
+{
+	cerr << "GnutlsServerSocket::init" << endl;
+	m_cert = cert;
+	m_cert_db = cert_db;
+
+	int32_t backlog = 25;
+	
+	gnutls_certificate_allocate_credentials (&m_xcred);
+
+	if( !cert_db->getDb(&m_ca_list, &m_ca_list_len) ){
+		cerr << "ca db failed" << endl;
+		throw TLSContextInitFailed();
+	}
+
+	gnutls_certificate_set_x509_trust(m_xcred, m_ca_list, m_ca_list_len);
+
+	// FIXME support chained certs.
+	gnutls_x509_crt_t gcert = cert->get_certificate();
+	gnutls_x509_privkey_t gkey = cert->get_private_key();
+	
+	gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);
+
+	if( use_ipv6 )
+		listen("::", listen_port, backlog);
+	else
+		listen("0.0.0.0", listen_port, backlog);
+
+	cerr << "GnutlsServerSocket::init ends" << endl;
+}
+
+MRef<StreamSocket *> GnutlsServerSocket::accept(){
 	MRef<StreamSocket *> ssocket = ServerSocket::accept();
 
-	return new TLSSocket( ssocket, ssl_ctx );
+	gnutls_session_t session = initialize_tls_session();
+
+	return new GnutlsSocket( ssocket, session );
 }

@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libmcrypto/openssl/TLSServerSocket.h>
+#include<libmcrypto/openssl/TLSSocket.h>
 #include<libmcrypto/openssl/cert.h>
 
 #ifdef WIN32
@@ -52,25 +53,16 @@ typedef int socklen_t;
 #endif
 
 
-TLSServerSocket::TLSServerSocket( int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db):ServerSocket(AF_INET, listen_port)
+TLSServerSocket::TLSServerSocket( int32_t domain, int32_t listen_port )
+		:ServerSocket( domain, listen_port )
 {
-	init(false, listen_port, cert, cert_db);
 }
 
-TLSServerSocket::TLSServerSocket( bool use_ipv6, int32_t listen_port, 
-				 MRef<certificate *> cert,
-				  MRef<ca_db *> cert_db):ServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+TLSServerSocket::~TLSServerSocket()
 {
-	init(use_ipv6, listen_port, cert, cert_db);
 }
 
-void TLSServerSocket::init( bool use_ipv6, int32_t listen_port, 
-			    MRef<certificate *> cert,
-			    MRef<ca_db *> cert_db)
-{
-	int32_t backlog = 25;
-	SSL_METHOD * meth;
-	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
+ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
 	MRef<ossl_certificate*> ssl_cert;
 	MRef<ossl_ca_db*> ssl_db;
 
@@ -79,6 +71,36 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 
 	if( cert_db )
 		ssl_db = (ossl_ca_db*)*cert_db;
+
+	return new OsslServerSocket( listen_port, ssl_cert, ssl_db );
+}
+
+ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+
+	return create( false, listen_port, cert, cert_db );
+}
+
+
+
+OsslServerSocket::OsslServerSocket( int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db):TLSServerSocket(AF_INET, listen_port)
+{
+	init(false, listen_port, cert, cert_db);
+}
+
+OsslServerSocket::OsslServerSocket( bool use_ipv6, int32_t listen_port, 
+				 MRef<ossl_certificate *> cert,
+				  MRef<ossl_ca_db *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+{
+	init(use_ipv6, listen_port, cert, cert_db);
+}
+
+void OsslServerSocket::init( bool use_ipv6, int32_t listen_port, 
+			    MRef<ossl_certificate *> cert,
+			    MRef<ossl_ca_db *> cert_db)
+{
+	int32_t backlog = 25;
+	SSL_METHOD * meth;
+	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	
 	if( use_ipv6 )
 		listen("::", listen_port, backlog);
@@ -99,8 +121,8 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 		exit( 1 );
 	}
 
-	if( TLSSocket::sslCipherListIndex != 0 ) 
-		TLSSocket::setSSLCTXCiphers ( this->ssl_ctx, TLSSocket::sslCipherListIndex );
+	if( OsslSocket::sslCipherListIndex != 0 ) 
+		OsslSocket::setSSLCTXCiphers ( this->ssl_ctx, OsslSocket::sslCipherListIndex );
 	/* Set options: do not accept SSLv2*/
 	SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2);
 	
@@ -114,11 +136,11 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 
 	if( !cert_db.isNull() ){
 		/* Use this database for the certificates check */
-		SSL_CTX_set_cert_store( this->ssl_ctx, ssl_db->get_db());
+		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->get_db());
 	}
 	
 		
-	if( SSL_CTX_use_PrivateKey( ssl_ctx, ssl_cert->get_openssl_private_key() ) <= 0 ){
+	if( SSL_CTX_use_PrivateKey( ssl_ctx, cert->get_openssl_private_key() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given private key" << endl;
 #endif
@@ -128,7 +150,7 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 	}
 	
 		
-	if( SSL_CTX_use_certificate( ssl_ctx, ssl_cert->get_openssl_certificate() ) <= 0 ){
+	if( SSL_CTX_use_certificate( ssl_ctx, cert->get_openssl_certificate() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given certificate" << endl;
 #endif
@@ -146,9 +168,9 @@ void TLSServerSocket::init( bool use_ipv6, int32_t listen_port,
 	}
 }
 
-MRef<StreamSocket *> TLSServerSocket::accept(){
+MRef<StreamSocket *> OsslServerSocket::accept(){
 	MRef<StreamSocket *> ssocket = ServerSocket::accept();
 
-	return new TLSSocket( ssocket, ssl_ctx );
+	return new OsslSocket( ssocket, ssl_ctx );
 }
 

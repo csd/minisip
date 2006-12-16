@@ -28,12 +28,10 @@
 #include <libmnetutil/TCPSocket.h>
 
 #include <libmcrypto/gnutls/init.h>
-#include <libmcrypto/TLSSocket.h>
-#include <libmcrypto/openssl/TLSException.h>
+#include <libmcrypto/gnutls/TLSSocket.h>
+#include <libmcrypto/TLSException.h>
 
 using namespace std;
-
-#define session ((gnutls_session_t)priv)
 
 /************************************************************************/
 void checkErr(int a)
@@ -46,74 +44,101 @@ void checkErr(int a)
 	}  
 }
 
+
+TLSSocket::TLSSocket()
+{
+}
+
+TLSSocket::~TLSSocket()
+{
+}
+
+TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
+			       MRef<certificate *> cert,
+			       MRef<ca_db *> cert_db,
+			       string serverName )
+{
+	MRef<gtls_ca_db*> gtls_db;
+	MRef<gtls_certificate*> gtls_cert;
+
+	if( cert_db )
+		gtls_db = (gtls_ca_db*)*cert_db;
+
+	if( cert )
+		gtls_cert = (gtls_certificate*)*cert;
+
+	return new GnutlsSocket( addr, port, gtls_db, gtls_cert );
+}
+
+
 /*********************************************************************************/
 /* constructor*/
 // When created by a TLS Server
-TLSSocket::TLSSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx )
+GnutlsSocket::GnutlsSocket( MRef<StreamSocket *> tcp_socket,
+			    gnutls_session_t session )
 		: sock(tcp_socket)
 {
 	type = SOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
 	peerAddress = tcp_socket->getPeerAddress()->clone();
+ 	fd = tcp_socket->getFd();
+	m_session = session;
 
-	throw Exception( "TLSSocket not fully implemented" );
-
-// 	int error;
-// 	// Copy the SSL parameters, since the server still needs them
-// 	// Initialize ssl in priv
-// 	priv = SSL_new( ssl_ctx );
-// 	this->ssl_ctx = SSL_get_SSL_CTX( ssl );
-
-// 	SSL_set_fd( ssl, tcp_socket->getFd() );
-// 	fd = tcp_socket->getFd();
+	gnutls_transport_set_ptr (m_session, (gnutls_transport_ptr_t) fd);
 	
-// 	error = SSL_accept( ssl );
-// 	if( error <= 0 ){
-// 		cerr << "Could not establish an incoming TLS connection" << endl;
-// 		ERR_print_errors_fp(stderr);
-// 		throw TLSConnectFailed( error, ssl );
-// 	}	
+	int ret = gnutls_handshake (m_session);
+	if (ret < 0){
+		gnutls_deinit (m_session);
+		m_session = NULL;
+		fprintf(stderr, "*** Handshake has failed (%s)\n\n",
+			gnutls_strerror (ret));
+		throw TLSInitFailed();
+	}
+	printf("- Handshake was completed\n");
 }
 
-TLSSocket::TLSSocket(string addr, int32_t port, void * &ssl_ctx,
-		     MRef<certificate *> cert,
-		     MRef<ca_db *> cert_db )
+#if 0
+GnutlsSocket::GnutlsSocket(string addr, int32_t port,
+			   MRef<gtls_ca_db *> cert_db,
+			   MRef<gtls_certificate *> cert)
 {
-	TLSSocket::TLSSocket_init(new TCPSocket(addr, port),
-				  ssl_ctx, cert, cert_db);
+	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
+					cert_db, cert);
 }
+#endif
 
-TLSSocket::TLSSocket(IPAddress &addr, int32_t port, void * &ssl_ctx,
-		     MRef<certificate *> cert,
-		     MRef<ca_db *> cert_db )
+GnutlsSocket::GnutlsSocket(IPAddress &addr, int32_t port,
+			   MRef<gtls_ca_db *> cert_db,
+			   MRef<gtls_certificate *> cert)
 {
-	TLSSocket::TLSSocket_init(new TCPSocket(addr, port),
-				  ssl_ctx, cert, cert_db);
+	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
+					cert_db, cert);
 }
 
 /*********************************************************************************/
-TLSSocket::~TLSSocket()
+GnutlsSocket::~GnutlsSocket()
 {  
-	gnutls_bye (session, GNUTLS_SHUT_WR);
-	gnutls_deinit (session);
-	//gnutls_anon_free_client_credentials (anoncred);
+	gnutls_bye (m_session, GNUTLS_SHUT_WR);
+	gnutls_deinit (m_session);
+	if( m_xcred ){
+		gnutls_certificate_free_credentials( m_xcred );
+		m_xcred = NULL;
+	}
+
+	if( m_ca_list ){
+		delete[] m_ca_list;
+		m_ca_list = NULL;
+	}
 
 // 	gnutls_global_deinit ();
 }
 
 const int g_cert_type_priority[3] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
-gnutls_certificate_credentials_t g_xcred;
-MRef<StreamSocket *> g_sock;
-
-//#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
-#define CAFILE "/etc/ssl/certs/ca.hem.za.org"
-
-#define MSG "\r\n\r\n"
 
 /*********************************************************************************/
-void TLSSocket::TLSSocket_init(MRef<StreamSocket*> ssock, void * &ssl_ctx,
-			       MRef<certificate *> cert,
-			       MRef<ca_db *> cert_db)
+void GnutlsSocket::GnutlsSocket_init( MRef<StreamSocket*> ssock,
+				      MRef<gtls_ca_db *> cert_db,
+				      MRef<gtls_certificate *> cert )
 {
 	int err=0;
 
@@ -121,35 +146,49 @@ void TLSSocket::TLSSocket_init(MRef<StreamSocket*> ssock, void * &ssl_ctx,
 	libmcryptoGnutlsInit();
 
 	/* X509 stuff */
-	gnutls_certificate_allocate_credentials (&g_xcred);
-
-	/* sets the trusted cas file
-	 */
-	err = gnutls_certificate_set_x509_trust_file (g_xcred, CAFILE,
-						      GNUTLS_X509_FMT_PEM);
+	err = gnutls_certificate_allocate_credentials (&m_xcred);
 	checkErr(err);
 
+	if( cert_db ){
+		if( !cert_db->getDb(&m_ca_list, &m_ca_list_len) ){
+			cerr << "ca db failed" << endl;
+			throw TLSContextInitFailed();
+		}
+
+		err = gnutls_certificate_set_x509_trust(m_xcred, m_ca_list, m_ca_list_len);
+		checkErr(err);
+	}
+
+	if( cert ){
+		// FIXME support chained certs.
+		gnutls_x509_crt_t gcert = cert->get_certificate();
+		gnutls_x509_privkey_t gkey = cert->get_private_key();
+	
+		err = gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);
+		checkErr(err);
+	}
+
 	// Initialize session in priv
-	err = gnutls_init ((gnutls_session_t*)&priv, GNUTLS_CLIENT);
+	err = gnutls_init (&m_session, GNUTLS_CLIENT);
 	checkErr(err);
 
 	/* Use default priorities */
-	err = gnutls_set_default_priority (session);
+	err = gnutls_set_default_priority (m_session);
 	checkErr(err);
 
-	err = gnutls_certificate_type_set_priority (session, g_cert_type_priority);
+	err = gnutls_certificate_type_set_priority (m_session, g_cert_type_priority);
 	checkErr(err);
 
 
 	/* put the x509 credentials to the current session
 	 */
-	err = gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, g_xcred);
+	err = gnutls_credentials_set (m_session, GNUTLS_CRD_CERTIFICATE, m_xcred);
 	checkErr(err);
 
-	gnutls_transport_set_ptr (session,
+	gnutls_transport_set_ptr (m_session,
 				  (gnutls_transport_ptr_t) ssock->getFd());
 
-	err = gnutls_handshake (session);
+	err = gnutls_handshake (m_session);
 	if (err<0)
 	{
 		perror("****** HANDSHAKE FAILED ********");
@@ -157,41 +196,33 @@ void TLSSocket::TLSSocket_init(MRef<StreamSocket*> ssock, void * &ssl_ctx,
 		throw Exception("handshake failed");
 	}
 
-	err = gnutls_record_send (session, MSG, strlen (MSG));
-	checkErr(err);
-
 	sock = ssock;
 	fd = ssock->getFd();
 	peerPort = ssock->getPeerPort();
 	peerAddress = ssock->getPeerAddress();
 	type = SOCKET_TYPE_TLS;
 
-	cerr << "TLSSocket::TLSSocket_init success";
 	return;
 }
 
 /********************************************************************************/
 
-int32_t TLSSocket::write(const void *msg, int length)
+int32_t GnutlsSocket::write(const void *msg, int length)
 {
 	int a ;
-	cerr << "TLSSocket::write ";
-	cerr.write((const char*)msg, length);
-	cerr << endl;
-	a = gnutls_record_send (session, msg , length);
+	a = gnutls_record_send (m_session, msg , length);
 	return a;
 }
 /*********************************************************************************/
-int32_t TLSSocket::write(string msg)
+int32_t GnutlsSocket::write(string msg)
 {   
-	cerr << "TLSSocket::write str " << msg << endl;
-	return TLSSocket::write(msg.c_str(), msg.size());
+	return GnutlsSocket::write(msg.c_str(), msg.size());
 }
 
 /*********************************************************************************/
-int32_t TLSSocket::read (void *buf, int maxlength)
+int32_t GnutlsSocket::read (void *buf, int maxlength)
 {  
 	int recv;
-	recv = gnutls_record_recv (session, buf, maxlength);
+	recv = gnutls_record_recv (m_session, buf, maxlength);
 	return recv;
 }

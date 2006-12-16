@@ -40,22 +40,4 @@ class LIBMCRYPTO_API TLSConnectFailed : public ConnectFailed{
 		std::string msg;
 };
 
-class LIBMCRYPTO_API TLSInitFailed : public NetworkException{
-	public:
-		TLSInitFailed();
-		virtual ~TLSInitFailed() throw(){}
-		virtual const char *what();
-	private:
-		std::string msg;
-};
-
-class LIBMCRYPTO_API TLSContextInitFailed : public NetworkException{
-	public:
-		TLSContextInitFailed();
-		virtual ~TLSContextInitFailed() throw(){}
-		virtual const char*what();
-	private:
-		std::string msg;
-};
-
 #endif

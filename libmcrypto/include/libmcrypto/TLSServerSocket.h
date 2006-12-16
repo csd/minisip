@@ -1,5 +1,6 @@
 /*
-  Copyright (C) 2006 Zachary T Welch
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006 Mikael Magnusson
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,20 +18,30 @@
 */
 
 /*
- * Authors: Zachary T Welch <zach-minisip@splitstring.com>
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#ifndef MLIBMCRYPTO_TLSSERVERSOCKET_H
-#define MLIBMCRYPTO_TLSSERVERSOCKET_H
+#ifndef TLSSERVERSOCKET_H
+#define TLSSERVERSOCKET_H
 
-// XXX: replace this forward compatibility layer with a Bridge interface
-#include<libmcrypto/uninst_config.h>
+#include<libmcrypto/config.h>
 
-#include<config.h>
-#ifdef HAVE_OPENSSL
-#include<libmcrypto/openssl/TLSServerSocket.h>
-#elif defined( HAVE_GNUTLS )
-#include<libmcrypto/gnutls/TLSServerSocket.h>
-#endif // HAVE_GNUTLS
+#include<libmutil/mtypes.h>
+#include<libmnetutil/ServerSocket.h>
+#include<libmcrypto/cert.h>
 
-#endif // MLIBMCRYPTO_TLSSERVERSOCKET_H
+class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
+
+	public:
+		virtual ~TLSServerSocket();
+
+		static ServerSocket *create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL );
+		static ServerSocket *create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL );
+
+	protected:
+		TLSServerSocket( int32_t domain, int32_t listen_port );
+};
+
+#endif
