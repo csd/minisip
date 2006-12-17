@@ -5,8 +5,8 @@ Maintainer: Johan Bilien <jobi@via.ecp.fr>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
 Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
  pkg-config, libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1),
- libmnetutil-dev (>= 0.3.1), libmsip-dev (>= 0.3.1), libmikey-dev (>=
- 0.4.1), libminisip-dev (>= 0.3.1), libx11-dev, libxext-dev,
+ libmnetutil-dev (>= 0.3.1), libmsip-dev (>= 0.3.1), 
+ libminisip-dev (>= 0.3.1), libx11-dev, libxext-dev,
  libglademm-2.4-dev (>= 2.4), libglib2.0-dev
 Standards-Version: 3.6.1
 

@@ -3,7 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Minisip developer team <minisip-devel@minisip.org>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
-Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libgcrypt-dev, libgnutls-dev, libmutil-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
 Package: libmcrypto0
@@ -18,7 +18,7 @@ Description: Minisip Cryptography Library - shared library
 
 Package: libmcrypto-dev
 Architecture: any
-Depends: libmcrypto0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Depends: libmcrypto0 (= ${Source-Version}), libmutil-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
 Description: Minisip Cryptography Library - development files
  The libmcrypto library provides cryptographic encryption and hashing
  interfaces that are leveraged by the Minisip application stack.

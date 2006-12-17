@@ -41,7 +41,7 @@ endif
 config: patch config.status
 config.status: configure
 	dh_testdir
-	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" $(CONFFLAGS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" $(CONFFLAGS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --with-openssl=no --with-gnutls=yes
 
 
 build: config build-stamp

@@ -3,7 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
-Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev, pkg-config, libmutil-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
 Package: libmnetutil0
@@ -18,7 +18,7 @@ Description: different utilities classes for portable networking C++ development
 
 Package: libmnetutil-dev
 Architecture: any
-Depends: libmnetutil0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1), libmcrypto-dev (>= 0.3.1)
+Depends: libmnetutil0 (= ${Source-Version}), libmutil-dev (>= 0.3.1)
 Description: different utilities classes for portable networking C++ development
  libmnetutil contains different classes useful to write portable networking
  applications in C++. It includes UDP, TCP and TLS sockets, DNS resolving...

@@ -4,8 +4,7 @@ Section: devel
 Maintainer: Minisip developer team <minisip-devel@minisip.org>
 Uploaders: Mikael Magnusson <mikma@users.sourceforge.net>
 Build-Depends: debhelper (>= 4.0.0), dpatch, autotools-dev,
- pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1),
- libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
+ pkg-config, libmutil-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
 Standards-Version: 3.6.1
 
 Package: libmstun0
@@ -21,7 +20,7 @@ Description: Minisip STUN Protocol Support Library - shared library
 Package: libmstun-dev
 Architecture: any
 Depends: libmstun0 (= ${Source-Version}), libmutil-dev (>= 0.3.1),
- libmcrypto-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
+ libmnetutil-dev (>= 0.3.1)
 Description: Minisip STUN Protocol Support Library - development files
  libmstun implements Simple Traversal of User Datagram Protocol (UDP)
  Through Network Address Translators (NATs) (STUN), in a C++ library.

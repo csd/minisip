@@ -1,5 +1,4 @@
 debian/tmp/usr/include/libminisip/video/*
-debian/tmp/usr/lib/libminisip_video*.la
 debian/tmp/usr/lib/libminisip_video*.a
 debian/tmp/usr/lib/libminisip_video*.so
 debian/tmp/usr/lib/pkgconfig/libminisip_video*.pc
