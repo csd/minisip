@@ -40,7 +40,9 @@ void libmcryptoInit()
 #endif
 #elif defined(HAVE_GNUTLS)
 	libmcryptoGnutlsInit();
+#if 0
 	GnutlsThreadGuard::initialize();
+#endif
 #endif
 }
 

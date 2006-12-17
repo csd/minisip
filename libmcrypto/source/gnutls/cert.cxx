@@ -57,11 +57,24 @@ certificate* certificate::load( const std::string cert_filename )
 	return new gtls_certificate( cert_filename );
 }
 
+certificate* certificate::load( const std::string cert_filename,
+				const std::string private_key_filename ){
+	return new gtls_certificate( cert_filename, private_key_filename );  
+}
+
 certificate* certificate::load( unsigned char * der_cert,
 				int length ){
 	return new gtls_certificate( der_cert, length );
 }
 
+#if 0
+// TODO
+certificate* certificate::load( unsigned char * certData,
+				int length,
+				std::string path ){
+	return new gtls_certificate( certData, length, path );
+}
+#endif
 
 certificate_chain* certificate_chain::create(){
 	return new gtls_certificate_chain();
@@ -638,7 +651,7 @@ gtls_ca_db_item::~gtls_ca_db_item(){
 	if( certs ){
 		delete[] certs;
 		certs = NULL;
-		num_certs = 9;
+		num_certs = 0;
 	}
 }
 
@@ -657,7 +670,8 @@ gtls_ca_db::~gtls_ca_db(){
 
 bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 	if( !caList ){
-		lock();
+// 		TODO: Results in deadlock in gtls_certificate_chain::control
+// 		lock();
 
 		std::list<ca_db_item*> &items = get_items();
 		std::list<ca_db_item*>::iterator i;
@@ -681,7 +695,7 @@ bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 			}
 		}
 
-		unlock();
+// 		unlock();
 	}
 
 	*db = caList;
@@ -866,51 +880,77 @@ gtls_certificate_chain::gtls_certificate_chain( MRef<certificate *> cert ){
 gtls_certificate_chain::~gtls_certificate_chain(){
 }
 
-#if 1
-int gtls_certificate_chain::control( MRef<ca_db *> certDb){
-	UNIMPLEMENTED;
-}
-
-#else
 int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 	int result;
-	X509_STORE_CTX cert_store_ctx;
-	/* The first one, the one to verify */
-	X509 * cert;
-	/* Chain of certificates */
-	STACK_OF(X509) * certStack;
-	list< MRef<certificate *> >::iterator i = certList.begin();
+	unsigned int verify = 0;
+	MRef<gtls_ca_db*> gtls_db =
+		dynamic_cast<gtls_ca_db*>(*certDb);
+	gnutls_x509_crt_t* ca_list = NULL;
+	size_t ca_list_length = 0;
+	gnutls_x509_crt_t* gtls_list = NULL;
+	size_t gtls_list_length = 0;
 
-	if( i == certList.end() ){
+	cerr << "gtls_certificate_chain::control" << endl;
+	if( !gtls_db ){
+		cerr << "Not gtls CA db" << endl;
+		return 1;
+	}
+
+// 	lock();
+	gtls_list_length = cert_list.size();
+
+	if( gtls_list_length == 0 ){
 		cerr << "certificate: Empty list of certificates"
 			"to verify" << endl;
 		return 0;
 	}
 
-	cert = (*i)->get_openssl_certificate();
+	cerr << "Cert chain length " << gtls_list_length << endl;
 
-	certStack = sk_X509_new_null();
+	/* Chain of certificates */
+	list< MRef<certificate *> >::iterator i = cert_list.begin();
 
-	i++;
+	gtls_list = new gnutls_x509_crt_t[ gtls_list_length ];
+	memset( gtls_list, 0, gtls_list_length * sizeof( gnutls_x509_crt_t ));
 
-	for( ; i != certList.end(); i++ ){
-		sk_X509_push( certStack, (*i)->get_openssl_certificate() );
+	for( size_t j = 0; j < gtls_list_length; j++,i++ ){
+		MRef<gtls_certificate *> cert =
+			dynamic_cast<gtls_certificate*>(**i);
+
+		if( !cert ){
+// 			unlock();
+			delete[] gtls_list;
+			// Not gtls cert
+			cerr << "Not a gtls cert" << endl;
+			return 1;
+		}
+		
+		gtls_list[j] = cert->get_certificate();
+	}
+// 	unlock();
+
+	if( !gtls_db->getDb( &ca_list, &ca_list_length ) ){
+		delete[] gtls_list;
+		cerr << "No CA db" << endl;
+		return 1;
 	}
 
-	if( X509_STORE_CTX_init( &cert_store_ctx, certDb->getDb(), cert, certStack ) < 0 ){
-		fprintf(stderr, "Could not initialize X509_STORE_CTX");
-		exit( 1 );
+	cerr << "CA db size " << ca_list_length << endl;
+
+	result = gnutls_x509_crt_list_verify( gtls_list, gtls_list_length,
+					      ca_list, ca_list_length,
+// 					      crl_list, crl_list_length,
+					      NULL, 0,
+					      0, &verify);
+
+	delete[] gtls_list;
+	gtls_list = NULL;
+
+	if( result < 0 ){
+		cerr << "gnutls_x509_crt_list_verify failed" << endl;
+		return 1;
 	}
 
-	result = X509_verify_cert( &cert_store_ctx );
-
-#ifdef DEBUG_OUTPUT
-	if( result == 0 ){
-		cerr << result << endl;
-		cerr << X509_verify_cert_error_string( cert_store_ctx.error ) << endl;
-	}
-#endif
-	return result;
+	cerr << "gnutls_x509_crt_list_verify returns " << verify << endl;
+	return verify ? 0 : 1;
 }
-#endif
-
