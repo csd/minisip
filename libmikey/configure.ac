@@ -25,7 +25,7 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
-Checks for libraries.
+dnl Checks for libraries.
 AC_ARG_WITH(openssl,
     AS_HELP_STRING([--with-openssl=PATH], [Use OpenSSL library [default=yes]]),
     [], [with_openssl="yes"])
