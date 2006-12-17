@@ -66,6 +66,8 @@ void AES::encrypt( const unsigned char * input, unsigned char * output ){
   rijndaelEncrypt( ((AES_KEY*)m_key)->key, NB_ROUND, input, output );
 }
 
+#endif	// HAVE_OPENSSL_AES_H
+
 AES::AES():m_key(NULL){
 }
 
@@ -80,7 +82,6 @@ AES::~AES(){
 		free( m_key );
 }
 
-#endif	// HAVE_OPENSSL_AES_H
 #endif	// HAVE_GNUTLS
 
 void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
