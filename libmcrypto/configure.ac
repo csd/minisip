@@ -39,9 +39,9 @@ AC_ARG_WITH(openssl,
     AS_HELP_STRING([--with-openssl=PATH], [Use OpenSSL library [default=yes]]),
     [], 
     [if test "${HAVE_GNUTLS}" = "yes"; then
-	with_openssl="yes"
-     else
 	with_openssl="no"
+     else
+	with_openssl="yes"
      fi])
 
 if test "${with_openssl}" = "yes"; then
