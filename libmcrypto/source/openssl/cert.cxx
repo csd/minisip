@@ -61,11 +61,21 @@ certificate* certificate::load( const std::string cert_filename )
 	return new ossl_certificate( cert_filename );
 }
 
+certificate* certificate::load( const std::string cert_filename,
+				const std::string private_key_filename ){
+	return new ossl_certificate( cert_filename, private_key_filename );  
+}
+
 certificate* certificate::load( unsigned char * der_cert,
 				int length ){
 	return new ossl_certificate( der_cert, length );
 }
 
+certificate* certificate::load( unsigned char * certData,
+				int length,
+				std::string path ){
+	return new ossl_certificate( certData, length, path );
+}
 
 certificate_chain* certificate_chain::create(){
 	return new ossl_certificate_chain();
