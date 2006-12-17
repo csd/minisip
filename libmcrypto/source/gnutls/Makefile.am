@@ -3,6 +3,7 @@ noinst_LTLIBRARIES = \
 
 libmcgnutls_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmcgnutls_la_SOURCES = \
+		aes.cxx \
 		cert.cxx \
 		hmac256.cxx \
 		hmac.cxx \

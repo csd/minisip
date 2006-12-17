@@ -42,6 +42,7 @@ using namespace std;
 
 #include<string.h>
 
+#ifndef HAVE_GNUTLS
 #ifndef HAVE_OPENSSL_AES_H
 
 // Redefinition of this AES type to use Paulo Barreto 
@@ -64,7 +65,6 @@ void AES::set_encrypt_key( unsigned char * key, int key_nb_bits ){
 void AES::encrypt( const unsigned char * input, unsigned char * output ){
   rijndaelEncrypt( ((AES_KEY*)m_key)->key, NB_ROUND, input, output );
 }
-#endif
 
 AES::AES():m_key(NULL){
 }
@@ -79,6 +79,9 @@ AES::~AES(){
 	if( m_key )
 		free( m_key );
 }
+
+#endif	// HAVE_OPENSSL_AES_H
+#endif	// HAVE_GNUTLS
 
 void AES::get_ctr_cipher_stream( unsigned char * output, unsigned int length,
 				unsigned char * iv ){

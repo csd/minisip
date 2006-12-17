@@ -39,7 +39,6 @@ typedef struct _f8_ctx {
 
 class LIBMCRYPTO_API AES{
 	public:
-		AES();
 		AES( unsigned char * key, int key_length );
 		~AES();
 
@@ -84,6 +83,8 @@ class LIBMCRYPTO_API AES{
 			     int length, 
 			     unsigned char *out);
 		void *m_key;
+
+		AES();
 };
 
 #endif
