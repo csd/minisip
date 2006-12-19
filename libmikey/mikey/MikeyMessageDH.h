@@ -1,0 +1,45 @@
+/*
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad
+  Copyright (C) 2006 Mikael Magnusson
+  
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/*
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+ *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
+*/
+
+#ifndef MIKEYMESSAGEDH_H
+#define MIKEYMESSAGEDH_H
+
+#include<libmikey/libmikey_config.h>
+#include<libmikey/MikeyMessage.h>
+#include<libmikey/keyagreement_psk.h>
+
+class LIBMIKEY_API MikeyMessageDH: public MikeyMessage{
+	public:
+		MikeyMessageDH();
+ 		MikeyMessageDH( KeyAgreementDH * ka );
+
+		MikeyMessage * parseResponse( KeyAgreement  * ka );
+		void setOffer( KeyAgreement * ka );
+		MikeyMessage * buildResponse( KeyAgreement * ka );
+		bool authenticate( KeyAgreement  * ka );
+};
+		
+#endif

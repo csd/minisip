@@ -166,11 +166,6 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		void addSrtpStream( uint32_t ssrc, uint32_t roc=0, 
 				    byte_t policyNo=0, byte_t csId=0 );
 
-		virtual MikeyMessage * parseResponse( MikeyMessage * response) = 0;
-		virtual void setOffer( MikeyMessage * offer ) = 0;
-		virtual MikeyMessage * buildResponse( MikeyMessage * offer) = 0;
-		virtual bool authenticate( MikeyMessage * msg) = 0;
-
 	protected:
 		void keyDeriv( byte_t cs_id, unsigned int csb_id,
 		        	byte_t * inkey, unsigned int inkey_length,

@@ -26,23 +26,23 @@
 #include<config.h>
 
 #include<libmikey/MikeyException.h>
-#include<libmikey/MikeyMessage.h>
+#include"MikeyMessageDH.h"
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyPayloadT.h>
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyPayloadCERT.h>
-#include<libmikey/MikeyPayloadID.h>
 #include<libmikey/MikeyPayloadDH.h>
-#include<libmikey/MikeyPayloadSIGN.h>
 #include<libmikey/MikeyPayloadERR.h>
-#include<libmikey/MikeyPayloadSP.h>
 
 #include<map>
 
 using namespace std;
 
-MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL){
+MikeyMessageDH::MikeyMessageDH(){
+}
+
+MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 
 	MRef<certificate_chain *> certChain;
 	MRef<certificate *> cert;
@@ -92,7 +92,13 @@ MikeyMessage::MikeyMessage( KeyAgreementDH * ka ):compiled(false), rawData(NULL)
 //-----------------------------------------------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------//
 
-void MikeyMessage::setOffer( KeyAgreementDH * ka ){
+void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
+	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a DH keyagreement" );
+	}
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
@@ -222,7 +228,14 @@ void MikeyMessage::setOffer( KeyAgreementDH * ka ){
 //
 //-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
+MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
+	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a DH keyagreement" );
+	}
+
 	// Build the response message
 	MRef<certificate *> cert;
 	MRef<certificate_chain *> certChain;
@@ -267,7 +280,14 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementDH * ka ){
 	return result;
 }
 
-MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
+MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
+	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a DH keyagreement" );
+	}
+
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	bool gotDhi = false;
@@ -409,7 +429,13 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementDH * ka ){
 	return NULL;
 }
 
-bool MikeyMessage::authenticate( KeyAgreementDH * ka ){
+bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
+	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a DH keyagreement" );
+	}
 
 	MikeyPayload * sign = (*lastPayload());
 	list<MikeyPayload *>::iterator i;

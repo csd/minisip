@@ -58,7 +58,7 @@ bool Session::responderAuthenticate( string message ){
 			throw MikeyException( "No MIKEY message received" );
 		else {
 			try{
-				MikeyMessage * init_mes = new MikeyMessage(b64Message);
+				MikeyMessage * init_mes = MikeyMessage::parse(b64Message);
 				
 //				MikeyMessage * resp_mes = NULL;
 				switch( init_mes->type() ){
@@ -241,39 +241,16 @@ string Session::responderParse(){
 	}
 	
 	try{
-		switch( /*securityConfig.*/ka_type ){
-			case KEY_MGMT_METHOD_MIKEY_DH:
 #ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_START );
-#endif
-
-				addStreamsToKa( false );
-				responseMessage = initMessage->buildResponse((KeyAgreementDH *)*ka);
-#ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_END );
-#endif
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_START );
+		ts.save( MIKEY_PARSE_START );
 #endif
 				
-				addStreamsToKa( false );
+		addStreamsToKa( false );
 
-				responseMessage = initMessage->buildResponse((KeyAgreementPSK *)*ka);
+		responseMessage = initMessage->buildResponse( *ka );
 #ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_END );
+		ts.save( MIKEY_PARSE_END );
 #endif
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PK:
-				/* Should not happen at that point */
-				throw MikeyExceptionUnimplemented(
-						"Public Key key agreement not implemented" );
-				break;
-			default:
-				throw MikeyExceptionMessageContent(
-						"Unexpected type of message in INVITE" );
-		}
 	}
 	catch( certificate_exception & ){
 		// TODO: Tell the GUI
@@ -343,7 +320,7 @@ string Session::initiatorCreate(){
 #ifdef ENABLE_TS
 				ts.save( DH_PRECOMPUTE_END );
 #endif
-				message = new MikeyMessage( ((KeyAgreementDH *)*ka) );
+				message = MikeyMessage::create( ((KeyAgreementDH *)*ka) );
 #ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_END );
 #endif
@@ -363,7 +340,7 @@ string Session::initiatorCreate(){
 #ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_START );
 #endif
-				message = new MikeyMessage( ((KeyAgreementPSK *)*ka) );
+				message = MikeyMessage::create( ((KeyAgreementPSK *)*ka) );
 #ifdef ENABLE_TS
 				ts.save( MIKEY_CREATE_END );
 #endif
@@ -408,7 +385,7 @@ bool Session::initiatorAuthenticate( string message ){
 			return false;
 		} else {
 			try{
-				MikeyMessage * resp_mes = new MikeyMessage( message );
+				MikeyMessage * resp_mes = MikeyMessage::parse( message );
 				ka->setResponderData( resp_mes );
 
 				switch( /*securityConfig.*/ka_type ){
@@ -533,35 +510,14 @@ string Session::initiatorParse(){
 			return "";
 		}
 			
-		switch( /*securityConfig.*/ka_type ){
-			case KEY_MGMT_METHOD_MIKEY_DH:
 #ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_START );
+		ts.save( MIKEY_PARSE_START );
 #endif
-				responseMessage = initMessage->parseResponse((KeyAgreementDH *)*ka);
+		responseMessage = initMessage->parseResponse( *ka );
 #ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_END );
-#endif
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_START );
-#endif
-				responseMessage = initMessage->parseResponse((KeyAgreementPSK *)*ka);
-#ifdef ENABLE_TS
-				ts.save( MIKEY_PARSE_END );
+		ts.save( MIKEY_PARSE_END );
 #endif
 
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PK:
-				/* Should not happen at that point */
-				throw MikeyExceptionUnimplemented(
-						"Public Key key agreement not implemented" );
-				break;
-			default:
-				throw MikeyExceptionMessageContent(
-						"Unexpected type of message in INVITE" );
-		}
 	}
 	catch( certificate_exception & ){
 		// TODO: Tell the GUI
@@ -624,19 +580,6 @@ void Session::addStreamsToKa( bool initiating ){
 
 void Session::setMikeyOffer(){
 	MikeyMessage * initMessage = (MikeyMessage *)ka->initiatorData();
-	switch( /*securityConfig.*/ka_type ){
-		case KEY_MGMT_METHOD_MIKEY_DH:
-			initMessage->setOffer((KeyAgreementDH *)*ka);
-			break;
-		case KEY_MGMT_METHOD_MIKEY_PSK:
-			initMessage->setOffer((KeyAgreementPSK *)*ka);
-			break;
-		case KEY_MGMT_METHOD_MIKEY_PK:
-		/* Should not happen at that point */
-			throw MikeyExceptionUnimplemented("Public Key key agreement not implemented" );
-			break;
-		default:
-			throw MikeyExceptionMessageContent("Unexpected type of message in INVITE" );
-		}
+	initMessage->setOffer( *ka );
 }
 

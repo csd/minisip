@@ -26,15 +26,15 @@
 #include<config.h>
 
 #include<libmikey/MikeyException.h>
-#include<libmikey/MikeyMessage.h>
+#include"MikeyMessagePSK.h"
 #include<libmikey/MikeyPayload.h>
 #include<libmikey/MikeyPayloadHDR.h>
 #include<libmikey/MikeyPayloadT.h>
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyPayloadKEMAC.h>
 #include<libmikey/MikeyPayloadV.h>
-#include<libmikey/MikeyPayloadID.h>
 #include<libmikey/MikeyPayloadERR.h>
+#include<libmikey/MikeyPayloadID.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
 
@@ -42,10 +42,11 @@
 
 using namespace std;
 
-MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
-		        int encrAlg, int macAlg ):
-			compiled(false), 
-			rawData(NULL){
+MikeyMessagePSK::MikeyMessagePSK(){
+}
+
+MikeyMessagePSK::MikeyMessagePSK( KeyAgreementPSK * ka,
+				  int encrAlg, int macAlg ){
 
 	unsigned int csbId = rand();
 	ka->setCsbId( csbId );
@@ -147,7 +148,13 @@ MikeyMessage::MikeyMessage( KeyAgreementPSK * ka,
 //-----------------------------------------------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------//
 
-void MikeyMessage::setOffer( KeyAgreementPSK * ka ){
+void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
+	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PSK keyagreement" );
+	}
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
@@ -343,7 +350,13 @@ if( saltKey != NULL )
 //-----------------------------------------------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
+MikeyMessage * MikeyMessagePSK::buildResponse( KeyAgreement * kaBase ){
+	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PSK keyagreement" );
+	}
 	
 	if( ka->getV() || ka->getCsIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 		// Build the response message
@@ -373,7 +386,14 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreementPSK * ka ){
 	return NULL;
 }
 
-MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
+MikeyMessage* MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
+	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PSK keyagreement" );
+	}
+
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	MikeyMessage * errorMessage = new MikeyMessage();
@@ -443,7 +463,13 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPSK * ka ){
 	return NULL;
 }
 
-bool MikeyMessage::authenticate( KeyAgreementPSK * ka ){
+bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
+	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PSK keyagreement" );
+	}
 
 	MikeyPayload * payload = *(lastPayload());
 	int i;

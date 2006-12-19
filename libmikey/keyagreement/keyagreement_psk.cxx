@@ -80,25 +80,3 @@ uint64_t KeyAgreementPSK::tSent(){
 void KeyAgreementPSK::setTSent( uint64_t tSent ){
 	this->tSentValue = tSent;
 }
-
-
-MikeyMessage * KeyAgreementPSK::parseResponse( MikeyMessage * response)
-{
-	return response->parseResponse( this );
-}
-
-void KeyAgreementPSK::setOffer( MikeyMessage * offer )
-{
-	offer->setOffer( this );
-	return;
-}
-
-MikeyMessage * KeyAgreementPSK::buildResponse( MikeyMessage * offer)
-{
-	return offer->buildResponse( this );
-}
-
-bool KeyAgreementPSK::authenticate( MikeyMessage * msg)
-{
-	return msg->authenticate( this );
-}

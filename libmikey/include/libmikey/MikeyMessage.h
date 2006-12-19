@@ -64,43 +64,42 @@ class aes;
 class certificate;
 class certificate_db;
 
-
+/**
+ * MikeyMessages can be created in three different ways.
+ * 1. new MikeyMessages creats an empty message
+ * 2. MikeyMessage::create creats a message from a keyagreement
+ * 3. MikeyMessage::parse creats a message from a binary representation
+ */
 class LIBMIKEY_API MikeyMessage{
 	public:
-		MikeyMessage();
-		MikeyMessage( byte_t *message, int lengthLimit );
-		MikeyMessage( std::string b64Message );
-		MikeyMessage( KeyAgreementDH * ka );
-		MikeyMessage( KeyAgreementPSK * ka,
+ 		MikeyMessage();
+		static MikeyMessage* create( KeyAgreementDH * ka );
+		static MikeyMessage* create( KeyAgreementPSK * ka,
 			      int encrAlg = MIKEY_ENCR_AES_CM_128, 
 			      int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );
 		
 		//added by choehn
-		MikeyMessage(KeyAgreementPKE* ka,
+		static MikeyMessage* create(KeyAgreementPKE* ka,
 				  int encrAlg = MIKEY_ENCR_AES_CM_128,
 				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
 				  EVP_PKEY* privKeyInitiator = NULL);
 
-		~MikeyMessage();
+		static MikeyMessage* parse( byte_t *message, int lengthLimit );
+		static MikeyMessage* parse( std::string b64Message );
+
+		virtual ~MikeyMessage();
 		
 		void addPayload( MikeyPayload * payload );
 		void operator+=( MikeyPayload * payload );
 		void addSignaturePayload( MRef<certificate *> cert );
 		void addVPayload( int macAlg, uint64_t receivedT,
 			byte_t * authKey, uint32_t authKeyLength);
-		void addKemacPayload(
+		virtual void addKemacPayload(
 				byte_t * tgk, int tgkLength,
 				byte_t * encrKey, byte_t * iv,
 				byte_t * authKey,
 				int encrAlg, int macAlg );
 				
-		//added by choehn
-		void addKemacPayloadPKE(
-				byte_t * tgk, int tgkLength,
-				byte_t * encrKey, byte_t * iv,
-				byte_t * authKey,
-				int encrAlg, int macAlg );
-		
 		std::string debugDump();
 		byte_t * rawMessageData();
 		int rawMessageLength();
@@ -116,44 +115,25 @@ class LIBMIKEY_API MikeyMessage{
 
 		std::string b64Message();
 
-		MikeyMessage * parseResponse( KeyAgreementDH  * ka );
-		MikeyMessage * parseResponse( KeyAgreementPSK * ka );
-		
-		//added by choehn
-		MikeyMessage * parseResponse( KeyAgreementPKE * ka );
-
-		void setOffer( KeyAgreementDH * ka );
-		void setOffer( KeyAgreementPSK * ka );
-		
-		//added by choehn
-		void setOffer( KeyAgreementPKE * ka );
-
-		MikeyMessage * buildResponse( KeyAgreementDH  * ka );
-		MikeyMessage * buildResponse( KeyAgreementPSK * ka );
-		
-		//added by choehn
-		MikeyMessage * buildResponse( KeyAgreementPKE * ka );
-
-
-		bool authenticate( KeyAgreementDH  * ka );
-		bool authenticate( KeyAgreementPSK * ka );
-		
-		//added by choehn
-		bool authenticate( KeyAgreementPKE * ka );
+		virtual MikeyMessage * parseResponse( KeyAgreement  * ka );
+		virtual void setOffer( KeyAgreement * ka );
+		virtual MikeyMessage * buildResponse( KeyAgreement * ka );
+		virtual bool authenticate( KeyAgreement  * ka );
 
 	protected:
+		void addPolicyToPayload(KeyAgreement * ka);
+		void addPolicyTo_ka(KeyAgreement * ka);
+
 		std::list<MikeyPayload *> payloads;
 
 	private:
-		void parse( byte_t *message, int lengthLimit );
+		static void parse( byte_t *message,
+				   int lengthLimit,
+				   std::list<MikeyPayload *>& payloads);
 		void compile();
-		void addPolicyToPayload(KeyAgreement * ka);
-		void addPolicyTo_ka(KeyAgreement * ka);
 		bool compiled;
 		byte_t *rawData;
 		
 };
-
-
 
 #endif

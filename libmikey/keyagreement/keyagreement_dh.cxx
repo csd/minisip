@@ -159,24 +159,3 @@ int KeyAgreementDH::controlPeerCertificate(){
 		return 0;
 	return peerCertChainPtr->control( certDbPtr );
 }
-
-MikeyMessage * KeyAgreementDH::parseResponse( MikeyMessage * response)
-{
-	return response->parseResponse( this );
-}
-
-void KeyAgreementDH::setOffer( MikeyMessage * offer )
-{
-	offer->setOffer( this );
-	return;
-}
-
-MikeyMessage * KeyAgreementDH::buildResponse( MikeyMessage * offer)
-{
-	return offer->buildResponse( this );
-}
-
-bool KeyAgreementDH::authenticate( MikeyMessage * msg)
-{
-	return msg->authenticate( this );
-}

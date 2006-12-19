@@ -28,7 +28,7 @@
 #include<openssl/rsa.h>
 #endif
 
-#include <libmikey/MikeyMessage.h>
+#include "MikeyMessagePKE.h"
 #include <libmikey/MikeyPayloadHDR.h>
 #include <libmikey/MikeyPayloadT.h>
 #include <libmikey/MikeyPayloadRAND.h>
@@ -44,8 +44,10 @@
 
 using namespace std;
 
-MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKEY* privKeyInitiator):
-												compiled(false), rawData(NULL){
+MikeyMessagePKE::MikeyMessagePKE(){
+}
+
+MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKEY* privKeyInitiator){
 
 	unsigned int csbId = rand();
 	ka->setCsbId(csbId);
@@ -105,7 +107,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 		case MIKEY_ENCR_AES_KW_128:
 			//TODO
 		default:
-			throw new MikeyException( "Unknown encryption algorithm" );
+			throw MikeyException( "Unknown encryption algorithm" );
 	}
 	switch( macAlg ){
 		case MIKEY_MAC_HMAC_SHA1_160:
@@ -118,7 +120,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 			authKey = NULL;
 			break;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 	
 	//adding KEMAC payload
@@ -129,7 +131,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 	byte_t* rawKeyData = new byte_t[ keydata->length() ];
 	keydata->writeData(rawKeyData, keydata->length());
 	
-	addKemacPayloadPKE(rawKeyData, keydata->length(), encrKey, iv, authKey, encrAlg, macAlg);
+	addKemacPayload(rawKeyData, keydata->length(), encrKey, iv, authKey, encrAlg, macAlg);
 	
 	//adding PKE payload
 	RSA* pubKeyResponderRsa = EVP_PKEY_get1_RSA(ka->getPublicKey());
@@ -142,7 +144,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 	
 	//adding SIGN payload
 	if(privKeyInitiator == NULL)
-		throw new MikeyException("Adding SIGN payload: No private key found!");
+		throw MikeyException("Adding SIGN payload: No private key found!");
 	
 	unsigned int* computedMacLength = new unsigned int;
 	*computedMacLength = EVP_PKEY_size(privKeyInitiator);
@@ -157,7 +159,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 	EVP_SignUpdate(ctxt, rawMessageData(), (rawMessageLength() - sig->length()));
 	if(!EVP_SignFinal(ctxt, computedMac, computedMacLength, privKeyInitiator)){
 		EVP_MD_CTX_destroy(ctxt);
-		throw new MikeyException("Create SIGN payload of the Init message failed!");
+		throw MikeyException("Create SIGN payload of the Init message failed!");
 	}
 	EVP_MD_CTX_destroy(ctxt);
 	
@@ -180,7 +182,7 @@ MikeyMessage::MikeyMessage(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKE
 	delete computedMacLength;
 }
 
-void MikeyMessage::addKemacPayloadPKE(byte_t* tgk, int tgkLength, byte_t* encrKey, byte_t* iv,
+void MikeyMessagePKE::addKemacPayload(byte_t* tgk, int tgkLength, byte_t* encrKey, byte_t* iv,
 										byte_t* authKey, int encrAlg, int macAlg ){
 	
 											
@@ -200,7 +202,7 @@ void MikeyMessage::addKemacPayloadPKE(byte_t* tgk, int tgkLength, byte_t* encrKe
 		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_KW_128:
 			//TODO
 		default:
-			throw new MikeyException("No transport encrytption algorithm selected");
+			throw MikeyException("No transport encrytption algorithm selected");
 			break;
 	}
 	
@@ -236,14 +238,20 @@ void MikeyMessage::addKemacPayloadPKE(byte_t* tgk, int tgkLength, byte_t* encrKe
 			addPayload(payload);
 			break;
 		default:
-			throw new MikeyException("No transport mac algorithm selected");
+			throw MikeyException("No transport mac algorithm selected");
 			break;
 	}
-	this->compiled = false;								
+// 	this->compiled = false;								
 	delete [] encrData;
 }
 
-void MikeyMessage::setOffer(KeyAgreementPKE* ka){
+void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
+	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PKE keyagreement" );
+	}
 
 	MikeyPayload* i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
@@ -254,13 +262,13 @@ void MikeyMessage::setOffer(KeyAgreementPKE* ka){
 
 	if( i == NULL || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PKE init message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)(i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PK_INIT ){
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected PKE init message" );
 	}
 
@@ -273,7 +281,7 @@ void MikeyMessage::setOffer(KeyAgreementPKE* ka){
 		ka->setCsIdMapType( hdr->csIdMapType() );
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 	
@@ -291,7 +299,7 @@ void MikeyMessage::setOffer(KeyAgreementPKE* ka){
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
 	if( i == NULL )
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PKE init message had no T payload" );
 
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
@@ -412,7 +420,7 @@ void MikeyMessage::setOffer(KeyAgreementPKE* ka){
 				ka->t_received, authKey, authKeyLength  );
 		
 		delete [] authKey;
-		throw new MikeyExceptionMessageContent( errorMessage );
+		throw MikeyExceptionMessageContent( errorMessage );
 	}
 	
 	// decrypt the TGK
@@ -432,7 +440,13 @@ void MikeyMessage::setOffer(KeyAgreementPKE* ka){
 		delete [] saltKey;
 }
 
-MikeyMessage* MikeyMessage::buildResponse(KeyAgreementPKE* ka){
+MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
+	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PKE keyagreement" );
+	}
 	
 	if( ka->getV() || ka->getCsIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 		// Build the response message
@@ -462,7 +476,14 @@ MikeyMessage* MikeyMessage::buildResponse(KeyAgreementPKE* ka){
 	return NULL;
 }
 
-MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPKE * ka ){
+MikeyMessage * MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
+	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PKE keyagreement" );
+	}
+
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	MikeyMessage * errorMessage = new MikeyMessage();
@@ -472,20 +493,20 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPKE * ka ){
 	if( i == NULL ||
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"PKE response message had no HDR payload" );
 	}
 
 #define hdr ((MikeyPayloadHDR *)(i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PK_RESP )
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Expected PKE response message" );
 
 	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
 		csIdMap = hdr->csIdMap();
 	}
 	else{
-		throw new MikeyExceptionMessageContent( 
+		throw MikeyExceptionMessageContent( 
 				"Unknown type of CS ID map" );
 	}
 
@@ -526,13 +547,19 @@ MikeyMessage * MikeyMessage::parseResponse( KeyAgreementPKE * ka ){
 		errorMessage->addVPayload( MIKEY_MAC_HMAC_SHA1_160, 
 				t_received, authKey, authKeyLength  );
 
-		throw new MikeyExceptionMessageContent( errorMessage );
+		throw MikeyExceptionMessageContent( errorMessage );
 	}
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 	return NULL;
 }
 
-bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
+bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
+	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
+
+	if( !ka ){
+		throw MikeyExceptionMessageContent( 
+				"Not a PKE keyagreement" );
+	}
 	
 	MikeyPayload * payload = *(lastPayload());
 	int i;
@@ -565,7 +592,7 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 	{
 		MikeyPayloadKEMAC * kemac;
 		if( payload->payloadType() != MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE){
-			throw new MikeyException( 
+			throw MikeyException( 
 			   "PKE init did not end with a SIGN payload" );
 		}
 		
@@ -610,7 +637,7 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 		MikeyPayloadV * v;
 		uint64_t t_sent = ka->tSent();
 		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
-			throw new MikeyException( 
+			throw MikeyException( 
 			   "PKE response did not end with a V payload" );
 		}
 
@@ -628,7 +655,7 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 		}
 	}
 	else{
-		throw new MikeyException( "Invalide type for a PKE message" );
+		throw MikeyException( "Invalide type for a PKE message" );
 	}
 
 	byte_t authKey[20];
@@ -657,6 +684,6 @@ bool MikeyMessage::authenticate(KeyAgreementPKE* ka){
 		case MIKEY_MAC_NULL:
 			return false;
 		default:
-			throw new MikeyException( "Unknown MAC algorithm" );
+			throw MikeyException( "Unknown MAC algorithm" );
 	}
 }

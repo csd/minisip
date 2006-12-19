@@ -51,11 +51,32 @@
 
 #include<map>
 
+#include"MikeyMessageDH.h"
+#include"MikeyMessagePSK.h"
+#include"MikeyMessagePKE.h"
+
 using namespace std;
 
 MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
 
 }
+
+MikeyMessage* MikeyMessage::create( KeyAgreementDH * ka ){
+	return new MikeyMessageDH( ka );
+}
+
+MikeyMessage* MikeyMessage::create( KeyAgreementPSK * ka,
+				    int encrAlg, int macAlg ){
+	return new MikeyMessagePSK( ka, encrAlg, macAlg );
+}
+
+#ifdef HAVE_OPENSSL
+MikeyMessage* MikeyMessage::create( KeyAgreementPKE* ka,
+				    int encrAlg, int macAlg,
+				    EVP_PKEY* privKeyInitiator ){
+	return new MikeyMessagePKE( ka, encrAlg, macAlg, privKeyInitiator );
+}
+#endif	// HAVE_OPENSSL
 
 /*
  * Alg.
@@ -64,14 +85,54 @@ MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
  *    2.1 Parse payload (choose right class) and store next payload type.
  *    2.2 Add payload to list of all payloads in message.
 */ 
-MikeyMessage::MikeyMessage( byte_t * message, int lengthLimit ):
-		compiled( true ), 
-		rawData( message ){
-	
-	parse( message, lengthLimit );
+
+MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
+{
+	std::list<MikeyPayload *> payloads;
+
+	parse( message, lengthLimit, payloads );
+
+	MikeyPayloadHDR *hdr =
+		dynamic_cast<MikeyPayloadHDR*>(*payloads.begin());
+
+	if( !hdr ){
+		throw MikeyExceptionMessageContent( 
+			"No header in the payload" );
+	}
+
+	MikeyMessage* msg = NULL;
+
+	switch( hdr->dataType() ){
+		case MIKEY_TYPE_DH_INIT:
+		case MIKEY_TYPE_DH_RESP:
+			msg = new MikeyMessageDH();
+			break;
+		case MIKEY_TYPE_PSK_INIT:
+		case MIKEY_TYPE_PSK_RESP:
+			msg = new MikeyMessagePSK();
+			break;
+#ifdef HAVE_OPENSSL
+		case MIKEY_TYPE_PK_INIT:
+		case MIKEY_TYPE_PK_RESP:
+			msg = new MikeyMessagePKE();
+			break;
+#endif	// HAVE_OPENSSL
+		case MIKEY_TYPE_ERROR:
+			msg = new MikeyMessage();
+			break;
+		default:
+			throw MikeyExceptionUnimplemented(
+				"Unimplemented type of message in INVITE" );
+	}
+
+	msg->compiled = true;
+	msg->rawData = message;
+	msg->payloads = payloads;
+
+	return msg;
 }
 
-MikeyMessage::MikeyMessage( string b64Message ){
+MikeyMessage* MikeyMessage::parse( string b64Message ){
 
 	int messageLength;
 	byte_t * messageData;
@@ -83,10 +144,7 @@ MikeyMessage::MikeyMessage( string b64Message ){
 				"Invalid B64 input message" );
 	}
 
-	compiled = true;
-	rawData = messageData;
-
-	parse( messageData, messageLength );
+	return parse( messageData, messageLength );
 }
 	
 
@@ -106,13 +164,13 @@ MikeyMessage::~MikeyMessage(){
 	}
 }
 
-void MikeyMessage::parse( byte_t * message, int lengthLimit ){
-
+void MikeyMessage::parse( byte_t * message, int lengthLimit,
+			  std::list<MikeyPayload *>& payloads ){
 	MikeyPayloadHDR * hdr;
 	byte_t * msgpos = message;
 	int limit = lengthLimit;
 						
-	addPayload( hdr = new MikeyPayloadHDR(message, limit) );
+	payloads.push_back( hdr = new MikeyPayloadHDR(message, limit) );
 	
 	limit -=  (int)( hdr->end() - msgpos );
 	msgpos = hdr->end();
@@ -489,5 +547,18 @@ void MikeyMessage::addPolicyTo_ka(KeyAgreement * ka){
 #undef SP
 }
 
+MikeyMessage * MikeyMessage::parseResponse( KeyAgreement  * ka ){
+	throw MikeyExceptionUnimplemented( "parseResponse not implemented" );
+}
 
+void MikeyMessage::setOffer( KeyAgreement * ka ){
+	throw MikeyExceptionUnimplemented( "setOffer not implemented" );
+}
 
+MikeyMessage * MikeyMessage::buildResponse( KeyAgreement * ka ){
+	throw MikeyExceptionUnimplemented( "buildResponse not implemented" );
+}
+
+bool MikeyMessage::authenticate( KeyAgreement  * ka ){
+	throw MikeyExceptionUnimplemented( "authenticate not implemented" );
+}
