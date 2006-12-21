@@ -25,6 +25,8 @@
 #ifndef SIPSIM_H
 #define SIPSIM_H 
 
+#include <libmcrypto/config.h>
+
 #include <libmutil/MemObject.h>
 #include <libmcrypto/cert.h>
 

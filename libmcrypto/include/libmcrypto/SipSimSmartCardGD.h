@@ -44,7 +44,7 @@ public:
 
 /* SIM card Pin related functions */
 	bool verifyPin(int verifyMode);
-	bool changePin(unsigned long newPinCode, int pinMode);
+	bool changePin(unsigned char * newPinCode, int pinMode);
 
 /* 
    General SIM functions needed for MIKEYs. Before executing those functions, the host has been verified and

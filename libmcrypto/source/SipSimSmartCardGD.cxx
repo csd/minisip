@@ -61,7 +61,6 @@ void SipSimSmartCardGD::clearBuffer(){
 	}
 }
 
-
 bool SipSimSmartCardGD::selectMikeyApp(){
 	sendBufferLength = 17;
 	recvBufferLength = 2;
@@ -99,10 +98,11 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 	}
 	else 
 		return false;
+	
 }
 
 
-unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
+/*unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
 	unsigned char * pinBuffer;
 	pinBuffer = new unsigned char[4];
 	memset(pinBuffer, 0 ,4);
@@ -116,24 +116,21 @@ unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
 	}
 	return pinBuffer;
 }
-
+*/
 
 bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
- 	
-	unsigned char * tempBuffer;
-	sendBufferLength = 9; // 1+1+1+1+1+4+1 (CLA+INS+P1+P1+LEN+DATA+LRET)
 	recvBufferLength = 2; // status word, 16 bits
 	
 	clearBuffer();
-	sendBuffer = new unsigned char[sendBufferLength];
 	recvBuffer = new unsigned char[recvBufferLength];
-	memset(sendBuffer, 0, sendBufferLength);
 	memset(recvBuffer, 0, recvBufferLength);
 	
 	if(verifyMode == 0 && (userAttemptTimer > 0) && (userAttemptTimer <= 3)  && blockedCard == 0){
 
-		tempBuffer = parsePinCode(userPinCode);
+		sendBufferLength = 10; // 1+1+1+1+1+4 (CLA+INS+P1+P1+LEN+DATA)
+		sendBuffer = new unsigned char[sendBufferLength];
+		memset(sendBuffer, 0, sendBufferLength);
 
 		sendBuffer[0] = 0xB0;
 		sendBuffer[1] = 0x10;
@@ -144,11 +141,8 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 		memory address. The communication between PC and SC remains big-endian convention,which means the most significant bit 
 		will be transmitted to the peer at first */
 
-		memcpy(&sendBuffer[5], tempBuffer, 4);
+		memcpy(&sendBuffer[5], userPinCode, 4);
 		//sendBuffer[9] = 0x00;
-
-		delete [] tempBuffer;
-
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
 		clearBuffer();
@@ -185,19 +179,19 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 	}
 
 	else if(verifyMode == 1 && (adminAttemptTimer > 0 && adminAttemptTimer <= 3) && (blockedCard == 0 || blockedCard == 1)){
-
-			tempBuffer = parsePinCode(adminPinCode);
+			sendBufferLength = 13;
+			sendBuffer = new unsigned char[sendBufferLength];
+			memset(sendBuffer, 0, sendBufferLength);
 			sendBuffer[0] = 0xB0;
 			sendBuffer[1] = 0x10;
 			sendBuffer[2] =	0x00;
 			sendBuffer[3] = 0x01;
-			sendBuffer[4] = 0x04;
+			sendBuffer[4] = 0x08;
 			/* the Intel CPU makes use of little-endian format which means the least significant character is stored on the lowest 
 			memory address. The communication between PC and SC remains big-endian convention,which means the most significant bit 
 			will be transmitted to the peer at first */
 
-			memcpy(&sendBuffer[5], tempBuffer, 4);
-			delete [] tempBuffer;
+			memcpy(&sendBuffer[5], adminPinCode, 8);
 			
 			transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 			sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
@@ -240,7 +234,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 }
 
-bool SipSimSmartCardGD::changePin(unsigned long newPinCode, int pinMode){
+bool SipSimSmartCardGD::changePin(unsigned char * newPinCode, int pinMode){
 	
 	if(establishedConnection == true && verifiedCard == 1 && pinMode == 1){
 		setPin(newPinCode);
@@ -284,7 +278,6 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 		sw_1_2 = recvBuffer[randomLengthInBytes] << 8 | recvBuffer[randomLengthInBytes + 1];
 		switch(sw_1_2){
 			case 0x9000:
-				delete []  sendBuffer;
 				break;
 			case 0x6008:
 				throw SmartCardException("failed to generate random value from G&D smart card");
@@ -294,7 +287,7 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 		
 		memcpy(randomValuePtr, recvBuffer,randomLengthInBytes);
 		
-		delete [] recvBuffer;
+		clearBuffer();
 		return randomValuePtr;
 	}
 	else
@@ -305,7 +298,7 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 									 bool doHash, int hash_alg)
 {
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
-		sendBufferLength = 26;											// sha-1 has 20 bytes (160 bits) output as message digest
+		sendBufferLength = 13;											// sha-1 has 20 bytes (160 bits) output as message digest
 		recvBufferLength = 128;											// this time we don't know the size of the receive buffer. Assume 128 is big enough and we
 																		// send the reference of recvBufferLength to this function and get that actual size from it 
 		clearBuffer();
@@ -318,26 +311,33 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		sendBuffer[1] = 0x42;
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
-		sendBuffer[4] = 0x14;											// sha-1 has 20 bytes (160 bits) output as message digest
-		assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
-		memcpy(&sendBuffer[5], dataPtr, 20);
-		sendBuffer[25] = 0x80;
+	//	sendBuffer[4] = 0x14;											// sha-1 has 20 bytes (160 bits) output as message digest
+		sendBuffer[4] = 0x08;											// sha-1 has 20 bytes (160 bits) output as message digest
+		memcpy(&sendBuffer[5], dataPtr, 8);
+	//	sendBuffer[25] = 0x80;
+		sendBuffer[13] = 0x00;
+
+		//assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
+		
+		//memcpy(&sendBuffer[5], dataPtr, 20);
+		//sendBuffer[25] = 0x80;
 
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 			switch(sw_1_2){
 				case 0x9000:
-					delete [] sendBuffer;
 					break;
 				case 0x6004:
+					clearBuffer();
 					throw SmartCardException("failed to sign the message digest on the smart card");
 				default:
+					clearBuffer();
 		 			throw SmartCardException("Unknown state value was returned when signing the message digest");
 		}
 		signatureLength = recvBufferLength - 2;
 		memcpy(signaturePtr, recvBuffer, signatureLength);
-		delete [] recvBuffer;
+		clearBuffer();
 		return true;
 	}
 	else
@@ -380,16 +380,17 @@ bool SipSimSmartCardGD::getTekDh(unsigned char csId, unsigned long csbIdValue,
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
 			case 0x9000:
-				delete [] sendBuffer;
 				break;
 			case 0x6007:
+				clearBuffer();
 				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
 			default:
+				clearBuffer();
 				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
 		}
 		tekLength = recvBufferLength - 2;
 		memcpy(tekPtr, recvBuffer, tekLength);
-		delete [] recvBuffer;
+		clearBuffer();
 		return true;
 	}
 	else
@@ -426,17 +427,18 @@ bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, un
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
 			case 0x9000:
-				delete [] sendBuffer;
 				break;
 			case 0x6001:
+				clearBuffer();
 				throw SmartCardException("failed to get the TEK from the smart card");
 			default:
+				clearBuffer();
 				throw SmartCardException("Unknown state value was returned when generating TEK from the smart card");
 		}
 		
 		dhPublicValueLength = recvBufferLength - 2;
 		memcpy(dhPublickValuePtr, recvBuffer, dhPublicValueLength);
-		delete [] recvBuffer;
+		clearBuffer();
 		return true;
 	}
 	else

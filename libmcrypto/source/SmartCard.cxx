@@ -21,13 +21,15 @@
  *          Pan Xuan <xuan@kth.se>
 */
 
+#include <config.h>
+
 #include <libmcrypto/SmartCard.h>
 #include <libmcrypto/SmartCardException.h>
 #include <libmutil/stringutils.h>
 
 SmartCard::SmartCard(){
-	this->userPinCode = 0;
-	this->adminPinCode = 0;
+	this -> userPinCode = NULL;
+	this -> adminPinCode = NULL;
 	unsigned long dwProtocol;
 	int readerNumbers;
 	char * tempReaderPtr = NULL;
@@ -110,19 +112,23 @@ SmartCard::~SmartCard()
 		delete (*i).second;
 	}
 
-	free(readerNamesPtr);
 */
+	delete [] userPinCode;
+	delete [] adminPinCode;
 }
 
 
 
-void SmartCard::setPin(unsigned long pinCode){
-	this->userPinCode = pinCode;
+void SmartCard::setPin(unsigned char * pinCode){
+	this->userPinCode = new unsigned char[4];
+	memset(this->userPinCode, 0, 4);
+	memcpy(this->userPinCode, pinCode,4);
 }
 
-void SmartCard::setAdminPin(unsigned long adminPinCode){
-	this->adminPinCode = adminPinCode;
-
+void SmartCard::setAdminPin(unsigned char * adminPinCode){
+	this->adminPinCode = new unsigned char[8];
+	memset(this->adminPinCode, 0, 8);
+	memcpy(this->adminPinCode, adminPinCode, 8);
 }
 
 
