@@ -13,6 +13,7 @@ scsim_src =
 if ENABLE_SCSIM
 scsim_src += SipSim.h \
 	     SipSimPk.h \
+	     SipSimSoft.h \
 	     SipSimDh.h \
 	     SmartCard.h \
 	     SipSimSmartCardGD.h \

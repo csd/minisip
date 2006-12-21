@@ -22,6 +22,7 @@ scsim_src =
 if ENABLE_SCSIM
 scsim_src += SipSim.cxx \
 	     SipSimPk.cxx \
+	     SipSimSoft.cxx \
 	     SipSimDh.cxx \
 	     SmartCard.cxx \
 	     SipSimSmartCardGD.cxx \

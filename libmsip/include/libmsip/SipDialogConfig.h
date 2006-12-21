@@ -42,7 +42,7 @@
 #include<libmutil/Mutex.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipStack.h>
-#include<libmsip/SipSim.h>
+#include<libmcrypto/SipSim.h>
 
 #define DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS 1000
 

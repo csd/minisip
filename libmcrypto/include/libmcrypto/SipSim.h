@@ -25,16 +25,31 @@
 #ifndef SIPSIM_H
 #define SIPSIM_H 
 
-// #include <PCSC/winscard.h>
 #include <libmutil/MemObject.h>
+#include <libmcrypto/cert.h>
+
+#define HASH_SHA1 1
 
 class SipSim : public virtual MObject {
 
 public:
+
 	SipSim();
 	virtual ~SipSim();
-	virtual bool getSignature(unsigned char * hashValuePtr, unsigned long & signatureLength, 
-					  unsigned char * signaturePtr) = 0;
+
+	// Signs a message using RSA as defined in PKCS #1
+	//
+	// @param doHash 	Specifies if a hash of the data should be
+	// 			generated before signing.
+	virtual bool getSignature(unsigned char * data, 
+				int dataLength, 
+				unsigned char * signaturePtr, 
+				int & signatureLength, 
+				bool doHash, 
+				int hash_alg=HASH_SHA1) = 0;
+
+	virtual MRef<certificate_chain *> getCertificateChain() = 0;
+	virtual MRef<ca_db *> getCAs() = 0;
 };
 
 #endif

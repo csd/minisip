@@ -48,7 +48,7 @@
 #include<libminisip/configbackend/UserConfig.h>
 #include<fstream>
 #include<libminisip/soundcard/AudioMixer.h>
-#include<libmsip/SipSimSoft.h>
+#include<libmcrypto/SipSimSoft.h>
 #include<libmcrypto/uuid.h>
 
 #ifdef _WIN32_WCE
