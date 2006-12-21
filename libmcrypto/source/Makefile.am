@@ -20,9 +20,7 @@ noinst_LTLIBRARIES = \
 
 scsim_src =
 if ENABLE_SCSIM
-scsim_src += SipSim.cxx \
-	     SipSimPk.cxx \
-	     SipSimSoft.cxx \
+scsim_src += SipSimPk.cxx \
 	     SipSimDh.cxx \
 	     SmartCard.cxx \
 	     SipSimSmartCardGD.cxx \
@@ -32,6 +30,8 @@ endif
 
 libmcrypto_core_la_SOURCES = \
 		aes.cxx \
+		SipSim.cxx \
+	  	SipSimSoft.cxx \
 		cert.cxx \
 		init.cxx \
 		$(scsim_src) \

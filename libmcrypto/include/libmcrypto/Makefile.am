@@ -11,9 +11,7 @@ DIST_SUBDIRS = gnutls openssl
 
 scsim_src =
 if ENABLE_SCSIM
-scsim_src += SipSim.h \
-	     SipSimPk.h \
-	     SipSimSoft.h \
+scsim_src += SipSimPk.h \
 	     SipSimDh.h \
 	     SmartCard.h \
 	     SipSimSmartCardGD.h \
@@ -23,6 +21,8 @@ endif
 
 pkginclude_HEADERS = \
 		aes.h \
+		SipSim.h \
+		SipSimSoft.h \
 		cert.h \
 		init.h \
 		$(scsim_src) \
