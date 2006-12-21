@@ -63,7 +63,7 @@ void SipSimSmartCardGD::clearBuffer(){
 
 
 bool SipSimSmartCardGD::selectMikeyApp(){
-	sendBufferLength = 11;
+	sendBufferLength = 17;
 	recvBufferLength = 2;
 	clearBuffer();
 	sendBuffer = new unsigned char[sendBufferLength];
@@ -75,13 +75,19 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 	sendBuffer[1] = 0xA4;
 	sendBuffer[2] = 0x04;
 	sendBuffer[3] = 0x00;
-	sendBuffer[4] = 0x06;
-	sendBuffer[5] = 0x31;
-	sendBuffer[6] = 0x32;
-	sendBuffer[7] = 0x33;
-	sendBuffer[8] = 0x34;
-	sendBuffer[9] = 0x35;
-	sendBuffer[10] = 0x36;
+	sendBuffer[4] = 0x0C;
+	sendBuffer[5] = 0xD2;
+	sendBuffer[6] = 0x76;
+	sendBuffer[7] = 0x00;
+	sendBuffer[8] = 0x00;
+	sendBuffer[9] = 0x05;
+	sendBuffer[10] = 0xAC;
+	sendBuffer[11] = 0x04;
+	sendBuffer[12] = 0x03;
+	sendBuffer[13] = 0x11;
+	sendBuffer[14] = 0x01;
+	sendBuffer[15] = 0x01;
+	sendBuffer[16] = 0x01;
 
 	transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 	sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
@@ -97,19 +103,16 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 
 
 unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
-	cerr << "at start of parsePinCode, arg is "<< pinCode<<endl;
 	unsigned char * pinBuffer;
 	pinBuffer = new unsigned char[4];
 	memset(pinBuffer, 0 ,4);
 
-	cerr << "pincode as int: "<< pinCode<<endl;
 	pinBuffer[0] = (unsigned char)(pinCode/1000);
 	pinBuffer[1] = (unsigned char)(pinCode/100 - pinBuffer[0] * 10);
 	pinBuffer[2] = (unsigned char)(pinCode/10 - pinBuffer[0] * 100 - pinBuffer[1] * 10);
 	pinBuffer[3] = (unsigned char)(pinCode - pinBuffer[0] * 1000 - pinBuffer[1] * 100 - pinBuffer[2] * 10);
 	for(int i = 0; i < 4; i++){
 		pinBuffer[i] = pinBuffer[i] + 48;
-		cerr << "pin"<<i<<": "<< pinBuffer[i]<<endl;
 	}
 	return pinBuffer;
 }
@@ -117,10 +120,9 @@ unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
 
 bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
-	cerr << "At start of verifyPin, pin as int is "<< userPinCode<<endl;
  	
 	unsigned char * tempBuffer;
-	sendBufferLength = 10; // 1+1+1+1+1+4+1 (CLA+INS+P1+P1+LEN+DATA+LRET)
+	sendBufferLength = 9; // 1+1+1+1+1+4+1 (CLA+INS+P1+P1+LEN+DATA+LRET)
 	recvBufferLength = 2; // status word, 16 bits
 	
 	clearBuffer();
@@ -131,7 +133,6 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 	
 	if(verifyMode == 0 && (userAttemptTimer > 0) && (userAttemptTimer <= 3)  && blockedCard == 0){
 
-		cerr << "before parsePinCode, argument is "<<userPinCode<<endl;
 		tempBuffer = parsePinCode(userPinCode);
 
 		sendBuffer[0] = 0xB0;
@@ -144,7 +145,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 		will be transmitted to the peer at first */
 
 		memcpy(&sendBuffer[5], tempBuffer, 4);
-		sendBuffer[9] = 0x00;
+		//sendBuffer[9] = 0x00;
 
 		delete [] tempBuffer;
 
@@ -240,7 +241,6 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 }
 
 bool SipSimSmartCardGD::changePin(unsigned long newPinCode, int pinMode){
-	cerr<<"Will change pin to int "<< newPinCode<<endl;
 	
 	if(establishedConnection == true && verifiedCard == 1 && pinMode == 1){
 		setPin(newPinCode);

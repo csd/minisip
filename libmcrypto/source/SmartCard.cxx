@@ -117,9 +117,7 @@ SmartCard::~SmartCard()
 
 
 void SmartCard::setPin(unsigned long pinCode){
-	cerr<<"Will set pin to int "<< pinCode<<endl;
 	this->userPinCode = pinCode;
-	cerr << "pin set to "<< userPinCode<<endl;
 }
 
 void SmartCard::setAdminPin(unsigned long adminPinCode){
@@ -132,11 +130,15 @@ void SmartCard::setAdminPin(unsigned long adminPinCode){
 bool SmartCard::transmitApdu(unsigned long sendLength, unsigned char * sendBufferPtr, 
 							 unsigned long & recvLength, unsigned char * recvBufferPtr)
 {	
-	cerr << "TRANSMIT: "<< binToHex(sendBufferPtr,sendLength)<<endl;
+#ifdef DEBUG_OUTPUT
+	cerr << "TRANSMITAPDU: "<< binToHex(sendBufferPtr,sendLength)<<endl;
+#endif
 	SCARD_IO_REQUEST recvPci;
 	long rvTransmit;
 	rvTransmit = SCardTransmit(hCard, protPci, sendBufferPtr, sendLength, &recvPci, recvBufferPtr, &recvLength);
+#ifdef DEBUG_OUTPUT
 	cerr << "Received "<< recvLength << " bytes: "<< binToHex(recvBufferPtr,recvLength)<<endl;
+#endif
 	if (rvTransmit == SCARD_S_SUCCESS){
 		return true;
 	}
