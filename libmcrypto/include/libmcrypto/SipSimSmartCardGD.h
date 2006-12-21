@@ -26,7 +26,6 @@
 #define SIPSIMSMARTCARDGD_H 
 
 #include <vector>
-// #include <PCSC/winscard.h>
 #include <libmcrypto/SmartCard.h>
 #include <libmcrypto/SipSim.h>
 #include <libmcrypto/SipSimDh.h>
@@ -39,7 +38,6 @@ public:
 	SipSimSmartCardGD();
 	
 	~SipSimSmartCardGD();
-
 
 /* select MIKEY applet APDU */
 	bool selectMikeyApp();
@@ -58,8 +56,8 @@ public:
 	the randomLength is in bits*/
 	unsigned char * getRandomValue(unsigned long randomLength);    
 
-	bool getSignature(unsigned char * hashValuePtr, unsigned long & signatureLength, 
-					  unsigned char * signaturePtr);
+	bool getSignature(unsigned char * dataPtr, int dataLength, unsigned char *signaturePtr, int& signatureLength, 
+			bool doHash, int hash_alg=HASH_SHA1);
 
 /* the first one is for Diffie-Hellman key agreement whereas the second one is for Public key based key agreement*/
 	virtual bool getTekDh(unsigned char csId, unsigned long csbIdValue,

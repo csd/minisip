@@ -48,8 +48,14 @@ public:
 				bool doHash, 
 				int hash_alg=HASH_SHA1) = 0;
 
-	virtual MRef<certificate_chain *> getCertificateChain() = 0;
-	virtual MRef<ca_db *> getCAs() = 0;
+	virtual MRef<certificate_chain *> getCertificateChain(){return certChain;}
+	virtual MRef<ca_db *> getCAs(){return ca_set;}
+	
+
+protected:
+	MRef<certificate_chain *> certChain;
+	MRef<ca_db *> ca_set;
+
 };
 
 #endif

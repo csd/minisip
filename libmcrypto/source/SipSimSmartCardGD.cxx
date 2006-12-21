@@ -301,8 +301,8 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 		throw SmartCardException("unconnected card or the user doesn't have proper access level. Correct userPinCode is required");
 }
 
-bool SipSimSmartCardGD::getSignature(unsigned char * hashValuePtr, unsigned long & signatureLength, 
-									 unsigned char * signaturePtr)
+bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, unsigned char *signaturePtr, int & signatureLength, 
+									 bool doHash, int hash_alg)
 {
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
 		sendBufferLength = 26;											// sha-1 has 20 bytes (160 bits) output as message digest
@@ -319,7 +319,8 @@ bool SipSimSmartCardGD::getSignature(unsigned char * hashValuePtr, unsigned long
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x14;											// sha-1 has 20 bytes (160 bits) output as message digest
-		memcpy(&sendBuffer[5], hashValuePtr, 20);
+		assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
+		memcpy(&sendBuffer[5], dataPtr, 20);
 		sendBuffer[25] = 0x80;
 
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
