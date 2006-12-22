@@ -23,7 +23,6 @@
 
 #include <libmcrypto/SipSimSmartCardGD.h>
 #include <libmcrypto/SmartCardException.h>
-#include <math.h>
 
 SipSimSmartCardGD::SipSimSmartCardGD():SmartCard() {
 	
@@ -126,7 +125,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 		will be transmitted to the peer at first */
 
 		memcpy(&sendBuffer[5], userPinCode, 4);
-		//sendBuffer[9] = 0x00;
+		sendBuffer[9] = 0x00;
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
 		clearBuffer();
@@ -163,7 +162,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 	}
 
 	else if(verifyMode == 1 && (adminAttemptTimer > 0 && adminAttemptTimer <= 3) && (blockedCard == 0 || blockedCard == 1)){
-			sendBufferLength = 13;
+			sendBufferLength = 14;
 			sendBuffer = new unsigned char[sendBufferLength];
 			memset(sendBuffer, 0, sendBufferLength);
 			sendBuffer[0] = 0xB0;
@@ -176,6 +175,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 			will be transmitted to the peer at first */
 
 			memcpy(&sendBuffer[5], adminPinCode, 8);
+			sendBuffer[13] = 0x00;
 			
 			transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 			sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
@@ -218,15 +218,40 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 }
 
-bool SipSimSmartCardGD::changePin(const char * newPinCode, int pinMode){
+bool SipSimSmartCardGD::changePin(unsigned char * newPinCode){
 	
-	if(establishedConnection == true && verifiedCard == 1 && pinMode == 1){
+	if(establishedConnection == true && verifiedCard == 2){
 		setPin(newPinCode);
-		/*Pin update APDU*/
-	}
-	else if(establishedConnection == true && verifiedCard == 1 && pinMode == 2){
-		setAdminPin(newPinCode);
-		/*Pin update APDU*/
+		sendBufferLength = 10;
+		recvBufferLength = 2;
+		clearBuffer();
+		sendBuffer = new unsigned char[sendBufferLength];
+		recvBuffer = new unsigned char[recvBufferLength];
+		memset(sendBuffer, 0, sendBufferLength);
+		memset(recvBuffer, 0, recvBufferLength);
+
+		sendBuffer[0] = 0xB0;
+		sendBuffer[1] = 0xD0;
+		sendBuffer[2] = 0x00;
+		sendBuffer[3] = 0x00;
+		sendBuffer[4] = 0x04;
+		memcpy(&sendBuffer[5], userPinCode, 4);
+		sendBuffer[9] = 0x00;
+		
+		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
+		sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
+		clearBuffer();
+		switch(sw_1_2){
+			case 0x9000:
+				break;
+			case 0x6982:
+				throw SmartCardException("authentication level is not sufficient");
+			case 0x6A88:
+				throw SmartCardException("PIN not found");
+			default:
+				throw SmartCardException("Unknown status code was returned");
+		}
+		return true;
 	}
 	else
 		throw SmartCardException("Either the smart card connection has not been established or access level is not sufficient");
@@ -246,7 +271,7 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 		sendBuffer = new unsigned char[sendBufferLength];
 		recvBuffer = new unsigned char[recvBufferLength];
 		randomValuePtr = new unsigned char[randomLengthInBytes];
-		memset(sendBuffer, 0,sendBufferLength);
+		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 		memset(randomValuePtr, 0, randomLengthInBytes);
 		tempBuffer = (unsigned char *) &randomLengthInBytes;
@@ -264,8 +289,10 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 			case 0x9000:
 				break;
 			case 0x6008:
+				clearBuffer();
 				throw SmartCardException("failed to generate random value from G&D smart card");
 			default:
+				clearBuffer();
 				throw SmartCardException("Unknown state value was returned when generating random value");
 		}
 		
