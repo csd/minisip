@@ -49,6 +49,9 @@
 #include<fstream>
 #include<libminisip/soundcard/AudioMixer.h>
 #include<libmcrypto/SipSimSoft.h>
+#ifdef SCSIM_SUPPORT
+#include<libmcrypto/SipSimSmartCardGD.h>
+#endif
 #include<libmcrypto/uuid.h>
 
 #ifdef _WIN32_WCE
@@ -483,6 +486,19 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		/****************************************************************
 		 * Certificate settings
 		 ****************************************************************/
+#ifdef SCSIM_SUPPORT
+		string pin = backend->loadString(accountPath + "hwsim_pin","");
+
+		if (pin.size()>0){
+			MRef<SipSimSmartCardGD*> sim = new SipSimSmartCardGD;
+			sim ->setPin((unsigned char*)"1000");
+
+			assert(sim->verifyPin(0) /*TODO: FIXME: Today we quit if not correct PIN - very temp. solution*/);
+
+			ident->setSim(*sim);
+
+		}
+#endif
 
 		string certFile = backend->loadString(accountPath + "certificate","");
 		string privateKeyFile = backend->loadString(accountPath + "private_key","");
@@ -622,7 +638,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			certFile = backend->loadString(accountPath + "ca_dir["+itoa(iCertFile)+"]","");
 		}
 
-		ident->setSim(new SipSimSoft(certchain, cert_db));
+		if (!ident->getSim()){
+			ident->setSim(new SipSimSoft(certchain, cert_db));
+		}
 
 /*From SipDialogSecurity above*/
 

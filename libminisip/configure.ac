@@ -202,6 +202,19 @@ then
 fi
 AM_CONDITIONAL(ZRTP_SUPPORT, test "${enable_zrtp}" = "yes")
 
+dnl G-D HW authentication token support
+AC_ARG_ENABLE(scsim,
+    AS_HELP_STRING([--enable-scsim],
+    	[enable G-D HW authentication token (SmartCard) support (default disabled)]))
+if test "${enable_scsim}" = "yes"
+then
+   AC_DEFINE(SCSIM_SUPPORT, [], [SCSIM support])
+fi
+AM_CONDITIONAL(SCSIM_SUPPORT, test "${enable_scsim}" = "yes")
+
+
+
+
 dnl AEC support
 AC_ARG_ENABLE(aec,
     AS_HELP_STRING([--enable-aec],
