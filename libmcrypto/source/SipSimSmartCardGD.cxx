@@ -25,6 +25,7 @@
 #include <libmcrypto/SmartCardException.h>
 
 SipSimSmartCardGD::SipSimSmartCardGD():SmartCard() {
+	cerr << "XXXXXXXXXXXXXX SipSimSmartCardGD::SipSimSmartCardGD() running XXXXXXXXXXXXXXXXXXXx"<<endl;
 	
 	this->sendBufferLength = 0;
 	this->recvBufferLength = 0;
@@ -218,7 +219,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 }
 
-bool SipSimSmartCardGD::changePin(unsigned char * newPinCode){
+bool SipSimSmartCardGD::changePin(const char * newPinCode){
 	
 	if(establishedConnection == true && verifiedCard == 2){
 		setPin(newPinCode);

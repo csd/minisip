@@ -53,7 +53,7 @@ public:
 	void setPin(const char * pinCode);
 	void setAdminPin(const char * adminPinCode);
 	virtual bool verifyPin(int verifyMode) = 0;
-	virtual bool changePin(unsigned char * newPinCode) = 0;
+	virtual bool changePin( const char * newPinCode) = 0;
 
 	/* General smart card member function */
 	virtual unsigned char * getRandomValue(unsigned long randomLength) = 0;
