@@ -61,6 +61,7 @@
 #define MAX_TIME_OFFSET (int64_t)(0xe100000<<16) //1 hour
 
 class aes;
+class SipSim;
 class certificate;
 class certificate_db;
 
@@ -91,6 +92,7 @@ class LIBMIKEY_API MikeyMessage{
 		
 		void addPayload( MikeyPayload * payload );
 		void operator+=( MikeyPayload * payload );
+		void addSignaturePayload( MRef<SipSim*> sim );
 		void addSignaturePayload( MRef<certificate *> cert );
 		void addVPayload( int macAlg, uint64_t receivedT,
 			byte_t * authKey, uint32_t authKeyLength);

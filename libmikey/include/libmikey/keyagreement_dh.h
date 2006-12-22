@@ -38,13 +38,18 @@ class OakleyDH;
 class certificate_chain;
 class certificate;
 class ca_db;
+class SipSim;
 
 class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 	public:
 		KeyAgreementDH( MRef<certificate_chain *> cert, 
 				MRef<ca_db *> ca_db );
-		KeyAgreementDH( MRef<certificate_chain *> cert, 
+		KeyAgreementDH( MRef<certificate_chain *> cert,
 				MRef<ca_db *> ca_db, int group );
+
+
+		KeyAgreementDH( MRef<SipSim *> sim );
+		KeyAgreementDH( MRef<SipSim *> sim, int group );
 		~KeyAgreementDH();
 
 		int computeTgk();
@@ -68,6 +73,9 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		MikeyMessage * buildResponse( MikeyMessage * offer);
 		bool authenticate( MikeyMessage * msg);
 
+		MRef<SipSim*> getSim();
+
+		bool useSim;
 	private:
 		OakleyDH * dh;
 		byte_t * peerKeyPtr;
@@ -75,6 +83,7 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		MRef<certificate_chain *> certChainPtr;
 		MRef<certificate_chain *> peerCertChainPtr;
 		MRef<ca_db *> certDbPtr;
+		MRef<SipSim *> sim;
 };
 
 #endif

@@ -28,6 +28,7 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/MikeyException.h>
 #include<libmcrypto/OakleyDH.h>
+#include<libmcrypto/SipSim.h>
 
 using namespace std;
 
@@ -37,7 +38,25 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	certChainPtr( certChainPtr ),
-	certDbPtr( certDbPtr ){
+	certDbPtr( certDbPtr ),
+	useSim(false)
+{
+	//policy = list<Policy_type *>::list();
+	typeValue = KEY_AGREEMENT_TYPE_DH;
+	dh = new OakleyDH();
+	peerCertChainPtr = certificate_chain::create();
+
+}
+
+KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
+	KeyAgreement(),
+	peerKeyPtr( NULL ),
+	peerKeyLengthValue( 0 ),
+	certChainPtr( NULL ),
+	certDbPtr( NULL ),
+	sim(s),
+	useSim(true)
+{
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
@@ -60,6 +79,32 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certChainPtr( certChainPtr ),
 	peerCertChainPtr( NULL ),
 	certDbPtr( certDbPtr ){
+	//policy = list<Policy_type *>::list();
+	typeValue = KEY_AGREEMENT_TYPE_DH;
+	dh = new OakleyDH();
+	if( dh == NULL )
+	{
+		throw MikeyException( "Could not create "
+				          "DH parameters." );
+	}
+
+	if( setGroup( groupValue ) ){
+		throw MikeyException( "Could not set the  "
+				      "DH group." );
+	}
+	peerCertChainPtr = certificate_chain::create();
+}
+
+
+KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
+	peerKeyPtr( NULL ),
+	peerKeyLengthValue( 0 ),
+	certChainPtr( NULL ),
+	peerCertChainPtr( NULL ),
+	certDbPtr( NULL ),
+	sim(s),
+	useSim(true)
+{
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
@@ -137,7 +182,11 @@ unsigned char * KeyAgreementDH::peerKey(){
 }
 
 MRef<certificate_chain *> KeyAgreementDH::certificateChain(){
-	return certChainPtr;
+	if (useSim){
+		return sim->getCertificateChain();
+	}else{
+		return certChainPtr;
+	}
 }
 
 MRef<certificate_chain *> KeyAgreementDH::peerCertificateChain(){
@@ -158,4 +207,8 @@ int KeyAgreementDH::controlPeerCertificate(){
 	if( peerCertChainPtr.isNull() || certDbPtr.isNull() )
 		return 0;
 	return peerCertChainPtr->control( certDbPtr );
+}
+
+MRef<SipSim*> KeyAgreementDH::getSim(){
+	return sim;
 }

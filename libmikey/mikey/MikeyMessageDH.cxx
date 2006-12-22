@@ -34,6 +34,7 @@
 #include<libmikey/MikeyPayloadCERT.h>
 #include<libmikey/MikeyPayloadDH.h>
 #include<libmikey/MikeyPayloadERR.h>
+#include<libmcrypto/SipSim.h>
 
 #include<map>
 
@@ -86,7 +87,11 @@ MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 					ka->publicKey(),
 					ka->keyValidity() ) );
 
-	addSignaturePayload( ka->certificateChain()->get_first() );
+	if (ka->useSim){
+		addSignaturePayload(ka->getSim());
+	}else{
+		addSignaturePayload( ka->certificateChain()->get_first() );
+	}
 
 }
 //-----------------------------------------------------------------------------------------------//
@@ -275,7 +280,11 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
                                     ka->peerKey(),
 				    ka->keyValidity() ) );
 
-	result->addSignaturePayload( ka->certificateChain()->get_first() );
+	if (ka->useSim){
+		addSignaturePayload(ka->getSim());
+	}else{
+		result->addSignaturePayload( ka->certificateChain()->get_first() );
+	}
 
 	return result;
 }
@@ -419,8 +428,11 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
         //FIXME handle key validity information
 	
 	if( error ){
-		errorMessage->addSignaturePayload( 
-				ka->certificateChain()->get_first() );
+		if (ka->useSim){
+			addSignaturePayload(ka->getSim());
+		}else{
+			errorMessage->addSignaturePayload( ka->certificateChain()->get_first() );
+		}
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
 

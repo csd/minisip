@@ -48,6 +48,7 @@
 #include<libmcrypto/base64.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/cert.h>
+#include<libmcrypto/SipSim.h>
 
 #include<map>
 
@@ -262,6 +263,33 @@ void MikeyMessage::addPayload(MikeyPayload *payload){
 void MikeyMessage::operator +=( MikeyPayload * payload ){
 	addPayload( payload );
 }
+
+
+void MikeyMessage::addSignaturePayload( MRef<SipSim*> sim ){
+	byte_t signature[4096];
+	int signatureLength;
+	MikeyPayloadSIGN * sign;
+	MikeyPayload * last;
+	
+	// set the previous nextPayloadType to signature
+	last = *lastPayload();
+	last->setNextPayloadType( MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE );
+
+	if( sim->getSignature( (unsigned char*)rawMessageData(), (int)rawMessageLength(),
+			 (unsigned char*)signature, signatureLength, true ) ){
+		throw MikeyException( "Could not perform digital signature of the message" );
+	}
+
+	addPayload( ( sign = new MikeyPayloadSIGN( signatureLength, signature,
+				MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
+
+	sim->getSignature( rawMessageData(), 
+			 rawMessageLength() - signatureLength,
+			 signature, signatureLength, true );
+	sign->setSigData( signature );
+	compiled = false;
+}
+
 
 void MikeyMessage::addSignaturePayload( MRef<certificate *> cert ){
 	byte_t signature[4096];
