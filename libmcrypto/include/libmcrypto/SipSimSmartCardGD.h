@@ -44,7 +44,7 @@ public:
 
 /* SIM card Pin related functions */
 	bool verifyPin(int verifyMode);
-	bool changePin(unsigned char * newPinCode, int pinMode);
+	bool changePin(const char * newPinCode, int pinMode);
 
 /* 
    General SIM functions needed for MIKEYs. Before executing those functions, the host has been verified and
@@ -96,9 +96,6 @@ private:
 	/* deallocate the memory assigend for sendBuffer and recvBuffer */
 	void clearBuffer();
 
-	/* convert the 4 digits pin code to a 4 bytes ASCII code */
-	unsigned char * parsePinCode(unsigned long);
-	
 	/* This is used each time right before you read from or write on smart card. 
 	To check out whether user has been verified with a right PIN code 
 	0: unverified   1: user mode   2: admin mode*/

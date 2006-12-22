@@ -50,17 +50,16 @@ public:
 					  unsigned long & recvLength, unsigned char * recvBufferPtr);
 	
 	/* Smart card Pin related functions */
-	void setPin(unsigned char * pinCode);
-	void setAdminPin(unsigned char * adminPinCode);
+	void setPin(const char * pinCode);
+	void setAdminPin(const char * adminPinCode);
 	virtual bool verifyPin(int verifyMode) = 0;
-	virtual bool changePin(unsigned char * newPinCode, int pinMode) = 0;
+	virtual bool changePin(const char * newPinCode, int pinMode) = 0;
 
 	/* General smart card member function */
 	virtual unsigned char * getRandomValue(unsigned long randomLength) = 0;
 	//virtual unsigned char * getCertificate();
 
 protected:
-
 	
 /* This is used each time right before you read from or write on smart card. To check out whether the connection has been established */
 	bool establishedConnection;							

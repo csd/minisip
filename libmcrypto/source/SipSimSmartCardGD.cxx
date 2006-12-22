@@ -102,22 +102,6 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 }
 
 
-/*unsigned char * SipSimSmartCardGD::parsePinCode(unsigned long pinCode){
-	unsigned char * pinBuffer;
-	pinBuffer = new unsigned char[4];
-	memset(pinBuffer, 0 ,4);
-
-	pinBuffer[0] = (unsigned char)(pinCode/1000);
-	pinBuffer[1] = (unsigned char)(pinCode/100 - pinBuffer[0] * 10);
-	pinBuffer[2] = (unsigned char)(pinCode/10 - pinBuffer[0] * 100 - pinBuffer[1] * 10);
-	pinBuffer[3] = (unsigned char)(pinCode - pinBuffer[0] * 1000 - pinBuffer[1] * 100 - pinBuffer[2] * 10);
-	for(int i = 0; i < 4; i++){
-		pinBuffer[i] = pinBuffer[i] + 48;
-	}
-	return pinBuffer;
-}
-*/
-
 bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 	recvBufferLength = 2; // status word, 16 bits
@@ -234,7 +218,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 }
 
-bool SipSimSmartCardGD::changePin(unsigned char * newPinCode, int pinMode){
+bool SipSimSmartCardGD::changePin(const char * newPinCode, int pinMode){
 	
 	if(establishedConnection == true && verifiedCard == 1 && pinMode == 1){
 		setPin(newPinCode);

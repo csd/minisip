@@ -119,13 +119,13 @@ SmartCard::~SmartCard()
 
 
 
-void SmartCard::setPin(unsigned char * pinCode){
+void SmartCard::setPin(const char * pinCode){
 	this->userPinCode = new unsigned char[4];
 	memset(this->userPinCode, 0, 4);
 	memcpy(this->userPinCode, pinCode,4);
 }
 
-void SmartCard::setAdminPin(unsigned char * adminPinCode){
+void SmartCard::setAdminPin(const char * adminPinCode){
 	this->adminPinCode = new unsigned char[8];
 	memset(this->adminPinCode, 0, 8);
 	memcpy(this->adminPinCode, adminPinCode, 8);
