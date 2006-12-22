@@ -491,7 +491,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		if (pin.size()>0){
 			MRef<SipSimSmartCardGD*> sim = new SipSimSmartCardGD;
-			sim ->setPin((unsigned char*)"1000");
+			sim ->setPin(pin.c_str());
 
 			assert(sim->verifyPin(0) /*TODO: FIXME: Today we quit if not correct PIN - very temp. solution*/);
 
