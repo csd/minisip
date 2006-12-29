@@ -72,53 +72,14 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	ka->setRand(randPayload->randData(), randPayload->randLength());
 
 	// Derive the transport keys from the env_key:
-	byte_t* encrKey;
-	byte_t* authKey;
-	byte_t* saltKey;
-	byte_t iv[16];
-	int i;
-
-	switch( encrAlg ){
-		case MIKEY_ENCR_AES_CM_128:
-			encrKey = new byte_t[16];
-			ka->genTranspEncrKey(encrKey, 16);
-			saltKey = new byte_t[14];
-			ka->genTranspSaltKey(saltKey, 14);
-			iv[0] = saltKey[0];
-			iv[1] = saltKey[1];
-			for( i = 2; i < 6; i++ ){
-				iv[i] = saltKey[i] ^ (csbId >> (5-i)*8) & 0xFF;
-			}
-
-			for( i = 6; i < 14; i++ ){
-				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)) & 0xFF);
-			}
-			iv[14] = 0x00;
-			iv[15] = 0x00;
-			break;
-		case MIKEY_ENCR_NULL:
-			encrKey = NULL;
-			saltKey = NULL;
-			break;
-		case MIKEY_ENCR_AES_KW_128:
-			//TODO
-		default:
-			throw MikeyException( "Unknown encryption algorithm" );
-	}
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			ka->authKeyLength = 20;
-			authKey = new byte_t[ka->authKeyLength];
-			ka->genTranspAuthKey(authKey, ka->authKeyLength);
-			ka->authKey = authKey;
-			break;
-		case MIKEY_MAC_NULL:
-			authKey = NULL;
-			break;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
-	}
+	byte_t* encrKey = NULL;
+	byte_t* iv = NULL;
+	unsigned int encrKeyLength = 0;
 	
+	deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+			  encrAlg, macAlg, t,
+			  NULL );
+
 	//adding KEMAC payload
 	MikeyPayloadKeyData* keydata = 
 		new MikeyPayloadKeyData(KEYDATA_TYPE_TGK, ka->tgk(),
@@ -127,7 +88,7 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	byte_t* rawKeyData = new byte_t[ keydata->length() ];
 	keydata->writeData(rawKeyData, keydata->length());
 	
-	addKemacPayload(rawKeyData, keydata->length(), encrKey, iv, authKey, encrAlg, macAlg);
+	addKemacPayload(rawKeyData, keydata->length(), encrKey, iv, ka->authKey, encrAlg, macAlg);
 	
 	//adding PKE payload
 	MRef<certificate*> certResponder = ka->getPublicKey();
@@ -149,12 +110,9 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	if( encrKey != NULL )
 		delete [] encrKey;
 
-	if( saltKey != NULL )
-		delete [] saltKey;
+	if( iv != NULL )
+		delete [] iv;
 	
-	if( authKey != NULL )
-		delete [] authKey;
-
 	delete keydata;
 	delete [] rawKeyData;
 	delete [] encEnvKey;
@@ -326,73 +284,20 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 
 	// Derive the transport keys
 	byte_t * encrKey=NULL;
-	byte_t * authKey=NULL;
-	byte_t * saltKey=NULL;
-	byte_t iv[16];
-	unsigned int authKeyLength = 0;
+	byte_t * iv=NULL;
 	unsigned int encrKeyLength = 0;
-	int j;
 	
-	switch( encrAlg ){
-		case MIKEY_ENCR_AES_CM_128:
-			encrKeyLength = 16;
-			encrKey = new byte_t[16];
-			ka->genTranspEncrKey( encrKey, 16 );
-			saltKey = new byte_t[14];
-			ka->genTranspSaltKey( saltKey, 14 );
-			iv[0] = saltKey[0];
-			iv[1] = saltKey[1];
-			for( j = 2; j < 6; j++ ){
-				iv[j] = saltKey[j] ^ (ka->csbId() >> (5-j)*8) & 0xFF;
-			}
-
-			for( j = 6; j < 14; j++ ){
-				iv[j] = (byte_t)(saltKey[j] ^ (ka->t_received >> (13-j)) & 0xFF);
-			}
-			iv[14] = 0x00;
-			iv[15] = 0x00;
-			break;
-		case MIKEY_ENCR_NULL:
-			encrKey = NULL;
-			saltKey = NULL;
-			break;
-		case MIKEY_ENCR_AES_KW_128:
-			//TODO
-		default:
-			error = true;
-			errorMessage->addPayload( 
-				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_EA ) );
-	}
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			authKeyLength = 20;
-			authKey = new byte_t[20];
-			ka->genTranspAuthKey( authKey, 20 );
-			ka->authKey = authKey;
-			ka->authKeyLength = authKeyLength;
-			break;
-		case MIKEY_MAC_NULL:
-			authKey = NULL;
-			ka->authKey = NULL;
-			break;
-		default:
-			error = true;
-			errorMessage->addPayload( 
-				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_HA ) );
-	}
-
-	if( error ){
-		if( authKey != NULL )
-			delete [] authKey;
+	if( !deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+			      encrAlg, macAlg, ka->t_received,
+			      errorMessage ) ){
 		if( encrKey != NULL )
 			delete [] encrKey;
-		if( saltKey != NULL )
-			delete [] saltKey;
+		if( iv != NULL )
+			delete [] iv;
 
-		authKeyLength = 20;
-		authKey = new byte_t[20];
-		ka->genTranspAuthKey( authKey, 20 );
+		unsigned int authKeyLength = 20;
+		byte_t* authKey = new byte_t[ authKeyLength ];
+		ka->genTranspAuthKey( authKey, authKeyLength );
 		
 		errorMessage->addVPayload( MIKEY_MAC_HMAC_SHA1_160, 
 				ka->t_received, authKey, authKeyLength  );
@@ -414,8 +319,8 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 
 	if( encrKey != NULL )
 		delete [] encrKey;
-	if( saltKey != NULL )
-		delete [] saltKey;
+	if( iv != NULL )
+		delete [] iv;
 }
 
 MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
@@ -437,19 +342,24 @@ MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
 
 		result->addPayload( new MikeyPayloadT() );
 
+		// TODO why do we call addPolicyToPayload here?
 		addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 		result->addVPayload( ka->macAlg, ka->t_received, 
 				ka->authKey, ka->authKeyLength);
 
-		if( ka->authKey != NULL )
+		if( ka->authKey != NULL ){
 			delete [] ka->authKey;
+			ka->authKey = NULL;
+		}
 
 		return result;
 	}
 	
-	if( ka->authKey != NULL )
+	if( ka->authKey != NULL ){
 		delete [] ka->authKey;
+		ka->authKey = NULL;
+	}
 	
 	return NULL;
 }
@@ -672,19 +582,93 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 			for( i = 0; i < 20; i++ ){
 				if( computedMac[i] != receivedMac[i] ){
 					ka->setAuthError(
-						"MAC mismatch: the shared"
-						"key probably differs."
+						"MAC mismatch."
 					);
 					return true;
 				}
 			}
 			return false;
 		case MIKEY_MAC_NULL:
-			ka->setAuthError( "MAC NULL." );
-			return true;
+			return false;
 		default:
 			throw MikeyException( "Unknown MAC algorithm" );
 	}
+}
+
+bool MikeyMessagePKE::deriveTranspKeys( KeyAgreementPKE* ka,
+					byte_t*& encrKey, byte_t *& iv,
+					unsigned int& encrKeyLength,
+					int encrAlg, int macAlg,
+					uint64_t t,
+					MikeyMessage* errorMessage ){
+	// Derive the transport keys from the env_key:
+	byte_t* authKey = NULL;
+	bool error = false;
+	unsigned int authKeyLength = 0;
+	int i;
+
+	encrKey = NULL;
+	iv = NULL;
+	encrKeyLength = 0;
+
+	switch( encrAlg ){
+		case MIKEY_ENCR_AES_CM_128: {
+			byte_t saltKey[14];
+			encrKeyLength = 16;
+			encrKey = new byte_t[ encrKeyLength ];
+			ka->genTranspEncrKey(encrKey, encrKeyLength);
+			ka->genTranspSaltKey(saltKey, sizeof(saltKey));
+			iv = new byte_t[ encrKeyLength ];
+			iv[0] = saltKey[0];
+			iv[1] = saltKey[1];
+			for( i = 2; i < 6; i++ ){
+				iv[i] = saltKey[i] ^ (ka->csbId() >> (5-i)*8) & 0xFF;
+			}
+
+			for( i = 6; i < 14; i++ ){
+				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)) & 0xFF);
+			}
+			iv[14] = 0x00;
+			iv[15] = 0x00;
+			break;
+		}
+		case MIKEY_ENCR_NULL:
+			break;
+		case MIKEY_ENCR_AES_KW_128:
+			//TODO
+		default:
+			error = true;
+			if( errorMessage ){
+				errorMessage->addPayload( 
+					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_EA ) );
+			}
+			else{
+				throw MikeyException( "Unknown encryption algorithm" );
+			}
+	}
+	switch( macAlg ){
+		case MIKEY_MAC_HMAC_SHA1_160:
+			authKeyLength = 20;
+			authKey = new byte_t[ authKeyLength ];
+			ka->genTranspAuthKey(authKey, authKeyLength);
+			break;
+		case MIKEY_MAC_NULL:
+			authKey = NULL;
+			break;
+		default:
+			error = true;
+			if( errorMessage ){
+				errorMessage->addPayload( 
+					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_HA ) );
+			}
+			else{
+				throw MikeyException( "Unknown MAC algorithm" );
+			}
+	}
+
+	ka->authKey = authKey;
+	ka->authKeyLength = authKeyLength;
+	return !error;
 }
 
 bool MikeyMessagePKE::isInitiatorMessage() const{
