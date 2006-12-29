@@ -518,7 +518,7 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 	{
 		if( ka->csbId() != csbId() ){
 			ka->setAuthError( "CSBID mismatch\n" );
-			return false;
+			return true;
 		}
 		MikeyPayloadV * v;
 		uint64_t t_sent = ka->tSent();

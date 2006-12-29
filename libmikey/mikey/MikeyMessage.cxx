@@ -285,7 +285,7 @@ void MikeyMessage::addSignaturePayload( MRef<SipSim*> sim ){
 	last = *lastPayload();
 	last->setNextPayloadType( MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE );
 
-	if( sim->getSignature( (unsigned char*)rawMessageData(), (int)rawMessageLength(),
+	if( !sim->getSignature( (unsigned char*)rawMessageData(), (int)rawMessageLength(),
 			 (unsigned char*)signature, signatureLength, true ) ){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}

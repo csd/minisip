@@ -281,7 +281,7 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 				    ka->keyValidity() ) );
 
 	if (ka->useSim){
-		addSignaturePayload(ka->getSim());
+		result->addSignaturePayload(ka->getSim());
 	}else{
 		result->addSignaturePayload( ka->certificateChain()->get_first() );
 	}
@@ -450,21 +450,26 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 	}
 
 	MikeyPayload * sign = (*lastPayload());
-	list<MikeyPayload *>::iterator i;
 	MRef<certificate_chain *> peerCert = ka->peerCertificateChain();
 
 	if( peerCert.isNull() || peerCert->get_first().isNull() )
 	{
 		/* Try to find the certificate chain in the message */
-		MikeyPayloadCERT * certPayload;
-		while( ( (certPayload) = (MikeyPayloadCERT*)
-				extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE)
-				) != NULL ){
+		list<MikeyPayload *>::iterator i;
+		list<MikeyPayload *>::iterator last = lastPayload();
+
+		for( i = firstPayload(); i != last; i++ ){
+			MikeyPayload *payload = *i;
+
+			if( payload->payloadType() != MIKEYPAYLOAD_CERT_PAYLOAD_TYPE )
+				continue;
+
+			MikeyPayloadCERT * certPayload = (MikeyPayloadCERT*)payload;
 			ka->addPeerCertificate(
 				certificate::load( 
 					certPayload->certData(),
 					certPayload->certLength() ));
-			payloads.remove( certPayload );
+// 			payloads.remove( certPayload );
 		}
 	}
 
@@ -484,8 +489,8 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 												rawMessageLength() - ((MikeyPayloadSIGN *)sign)->sigLength(),
 												((MikeyPayloadSIGN *)sign)->sigData(),
 												((MikeyPayloadSIGN *)sign)->sigLength() );
-	if( res > 0 ) return true;
-	else return false;
+	if( res > 0 ) return false;
+	else return true;
 }
 
 bool MikeyMessageDH::isInitiatorMessage() const{
