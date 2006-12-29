@@ -65,13 +65,44 @@ class LIBMCRYPTO_API ossl_ca_db: public ca_db{
 		X509_STORE * cert_db;		
 };
 
+class LIBMCRYPTO_API ossl_priv_key: public priv_key{
+	public:
+		ossl_priv_key( const std::string &private_key_filename );
+		ossl_priv_key( char *derEncPk, int length,
+			       const std::string &password,
+			       const std::string &path );
+
+		~ossl_priv_key();
+
+		const std::string &get_file() const;
+
+		int sign_data( unsigned char * data, int data_length, 
+			       unsigned char * sign,
+			       int * sign_length );
+
+		int denvelope_data( unsigned char * data,
+				    int size,
+				    unsigned char *retdata,
+				    int *retsize,
+				    unsigned char *enckey,
+				    int enckeylgth,
+				    unsigned char *iv);
+
+		bool private_decrypt(unsigned char *data, int size,
+				     unsigned char *retdata, int *retsize);
+
+		EVP_PKEY * get_openssl_private_key(){return private_key;};
+
+	private:
+		EVP_PKEY * private_key;
+		std::string pk_file;
+};
+
 class LIBMCRYPTO_API ossl_certificate: public certificate{
 	public:
 		ossl_certificate();
 		ossl_certificate( X509 * ossl_cert );
-		ossl_certificate( const std::string cert_filename );
-		ossl_certificate( const std::string cert_filename,
-			     const std::string private_key_filename );
+		ossl_certificate( const std::string &cert_filename );
 		ossl_certificate( unsigned char * der_cert, int length );
 		ossl_certificate( unsigned char * certData, int length, std::string path );
 		~ossl_certificate();
@@ -92,18 +123,18 @@ class LIBMCRYPTO_API ossl_certificate: public certificate{
 		int verif_sign( unsigned char * sign, int sign_length,
 				unsigned char * data, int data_length );
 
+		bool public_encrypt(unsigned char *data, int size,
+				    unsigned char *retdata, int *retsize);
+
 		std::string get_name();
 		std::string get_cn();
 		std::string get_issuer();
 		std::string get_issuer_cn();
 
-		void set_pk( std::string file );
-                void set_encpk(char *derEncPk, int length, std::string password, std::string path);
-		bool has_pk();
-		EVP_PKEY * get_openssl_private_key(){return private_key;};
+		bool check_pk( MRef<priv_key *> pk);
+
 		X509 * get_openssl_certificate(){return cert;};
 	private:
-		EVP_PKEY * private_key;
 		X509 * cert;
 };
 

@@ -162,8 +162,15 @@ void GnutlsSocket::GnutlsSocket_init( MRef<StreamSocket*> ssock,
 	if( cert ){
 		// FIXME support chained certs.
 		gnutls_x509_crt_t gcert = cert->get_certificate();
-		gnutls_x509_privkey_t gkey = cert->get_private_key();
+		gnutls_x509_privkey_t gkey = NULL;
 	
+		MRef<gtls_priv_key*> gtls_pk =
+			dynamic_cast<gtls_priv_key*>( *cert->get_pk() );
+
+		if( gtls_pk ){
+			gkey = gtls_pk->get_private_key();
+		}
+
 		err = gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);
 		checkErr(err);
 	}

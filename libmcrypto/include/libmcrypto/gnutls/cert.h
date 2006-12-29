@@ -67,13 +67,43 @@ class LIBMCRYPTO_API gtls_ca_db: public ca_db{
 		size_t caListLength;
 };
 
+class LIBMCRYPTO_API gtls_priv_key: public priv_key{
+	public:
+		gtls_priv_key( const std::string &private_key_filename );
+		gtls_priv_key( char *derEncPk, int length,
+			       const std::string &password,
+			       const std::string &path );
+
+		~gtls_priv_key();
+
+		const std::string &get_file() const;
+
+		int sign_data( unsigned char * data, int data_length, 
+			       unsigned char * sign,
+			       int * sign_length );
+
+		int denvelope_data( unsigned char * data,
+				    int size,
+				    unsigned char *retdata,
+				    int *retsize,
+				    unsigned char *enckey,
+				    int enckeylgth,
+				    unsigned char *iv);
+
+		bool private_decrypt(unsigned char *data, int size,
+				     unsigned char *retdata, int *retsize);
+
+		gnutls_x509_privkey_t get_private_key(){return privateKey;};
+
+	private:
+		gnutls_x509_privkey_t privateKey;
+		std::string pk_file;
+};
+
 class LIBMCRYPTO_API gtls_certificate: public certificate{
 	public:
 		gtls_certificate();
-		//gtls_certificate( X509 * openssl_cert );
 		gtls_certificate( const std::string cert_filename );
-		gtls_certificate( const std::string cert_filename,
-			     const std::string private_key_filename );
 		gtls_certificate( unsigned char * der_cert, int length );
 		~gtls_certificate();
 		virtual std::string getMemObjectType() const {return "gtls_certificate";}
@@ -85,33 +115,29 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 		void get_der( unsigned char * output, unsigned int * length );
 		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
-		int denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
-		               unsigned char *enckey, int enckeylgth, unsigned char *iv);
 
 		int sign_data( unsigned char * data, int data_length, 
 			       unsigned char * sign, int * sign_length );
 		int verif_sign( unsigned char * sign, int sign_length,
 				unsigned char * data, int data_length );
 
+		bool public_encrypt(unsigned char *data, int size,
+				    unsigned char *retdata, int *retsize);
+
 		std::string get_name();
 		std::string get_cn();
 		std::string get_issuer();
 		std::string get_issuer_cn();
 
-		void set_pk( std::string file );
-		void set_encpk(char * pkInput, int length,
-			       std::string password, std::string path );
-		bool has_pk();
+		bool check_pk( MRef<priv_key*> pk );
 
 		gnutls_x509_crt_t get_certificate(){return cert;};
-		gnutls_x509_privkey_t get_private_key(){return privateKey;};
 
 	protected:
 		void openFromFile( std::string fileName );
 
 
 	private:
-		gnutls_x509_privkey_t privateKey;
 		gnutls_x509_crt_t cert;
 };
 

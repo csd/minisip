@@ -83,6 +83,35 @@ class LIBMCRYPTO_API ca_db: public MObject{
                 Mutex mLock;
 };
 
+class LIBMCRYPTO_API priv_key: public MObject{
+	public:
+		static priv_key* load( const std::string private_key_filename );
+		static priv_key* load( char *derEncPk, int length,
+				       std::string password,
+				       std::string path );
+
+		virtual ~priv_key();
+
+		virtual const std::string &get_file() const = 0;
+
+		virtual int sign_data( unsigned char * data, int data_length, 
+				       unsigned char * sign,
+				       int * sign_length )=0;
+
+		virtual int denvelope_data( unsigned char * data,
+					    int size,
+					    unsigned char *retdata,
+					    int *retsize,
+					    unsigned char *enckey,
+					    int enckeylgth,
+					    unsigned char *iv)=0;
+
+		virtual bool private_decrypt(unsigned char *data, int size,
+					     unsigned char *retdata, int *retsize)=0;
+	protected:
+		priv_key();
+};
+
 class LIBMCRYPTO_API certificate: public MObject{
 	public:
 		static certificate* load( const std::string cert_filename );
@@ -112,20 +141,26 @@ class LIBMCRYPTO_API certificate: public MObject{
 					   int *enckeylgth,
 					   unsigned char** iv)=0;
 
-		virtual int denvelope_data( unsigned char * data,
+		int denvelope_data( unsigned char * data,
 					    int size,
 					    unsigned char *retdata,
 					    int *retsize,
 					    unsigned char *enckey,
 					    int enckeylgth,
-					    unsigned char *iv)=0;
+					    unsigned char *iv);
 
-		virtual int sign_data( unsigned char * data, int data_length, 
+		int sign_data( unsigned char * data, int data_length, 
 				       unsigned char * sign,
-				       int * sign_length )=0;
+				       int * sign_length );
 		virtual int verif_sign( unsigned char * sign, int sign_length,
 					unsigned char * data,
 					int data_length )=0;
+
+		virtual bool public_encrypt(unsigned char *data, int size,
+					    unsigned char *retdata, int *retsize)=0;
+
+		int private_decrypt(unsigned char *data, int size,
+				    unsigned char *retdata, int *retsize);
 
 		virtual std::string get_name()=0;
 		virtual std::string get_cn()=0;
@@ -135,18 +170,23 @@ class LIBMCRYPTO_API certificate: public MObject{
 		std::string get_file();
 		std::string get_pk_file();
                    
-		virtual void set_pk( std::string file )=0;
-                virtual void set_encpk(char *derEncPk, int length,
-				       std::string password,
-				       std::string path)=0;
+		virtual bool check_pk( MRef<priv_key *> pk)=0;
 
-		virtual bool has_pk()=0;
+		MRef<priv_key*> get_pk();
+		void set_pk( MRef<priv_key *> pk);
+		void set_pk( const std::string &file );
+		void set_encpk(char *derEncPk, int length,
+			       const std::string &password,
+			       const std::string &path);
+
+		bool has_pk();
 
 	protected:
  		certificate();
 
 		std::string file;
-		std::string pk_file;
+
+		MRef<priv_key *> m_pk;
 };
 
 class LIBMCRYPTO_API certificate_chain: public MObject{

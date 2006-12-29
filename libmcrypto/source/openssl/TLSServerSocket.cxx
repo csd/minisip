@@ -139,8 +139,10 @@ void OsslServerSocket::init( bool use_ipv6, int32_t listen_port,
 		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->get_db());
 	}
 	
-		
-	if( SSL_CTX_use_PrivateKey( ssl_ctx, cert->get_openssl_private_key() ) <= 0 ){
+	MRef<priv_key *> priv_key = cert->get_pk();
+	MRef<ossl_priv_key *> ossl_pk =
+	  dynamic_cast<ossl_priv_key*>(*priv_key);
+	if( SSL_CTX_use_PrivateKey( ssl_ctx, ossl_pk->get_openssl_private_key() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given private key" << endl;
 #endif

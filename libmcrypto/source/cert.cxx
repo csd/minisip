@@ -35,6 +35,12 @@
 
 using namespace std;
 
+priv_key::priv_key(){
+}
+
+priv_key::~priv_key(){
+}
+
 certificate::certificate(){
 }
 
@@ -47,9 +53,59 @@ string certificate::get_file(){
 }
 
 string certificate::get_pk_file(){
-	return pk_file;
+	return m_pk->get_file();
 }
 
+int certificate::denvelope_data( unsigned char * data,
+				 int size,
+				 unsigned char *retdata,
+				 int *retsize,
+				 unsigned char *enckey,
+				 int enckeylgth,
+				 unsigned char *iv){
+	return m_pk->denvelope_data( data, size, retdata, retsize,
+				     enckey, enckeylgth, iv );
+}
+
+int certificate::sign_data( unsigned char * data, int data_length, 
+			    unsigned char * sign,
+			    int * sign_length ){
+	return m_pk->sign_data( data, data_length, sign, sign_length );
+}
+
+int certificate::private_decrypt(unsigned char *data, int size,
+				 unsigned char *retdata, int *retsize){
+	return m_pk->private_decrypt( data, size, retdata, retsize );
+}
+
+bool certificate::has_pk(){
+	return !m_pk.isNull();
+}
+
+MRef<priv_key*> certificate::get_pk(){
+	return m_pk;
+}
+
+void certificate::set_pk( MRef<priv_key *> priv_key )
+{
+	if( !check_pk( priv_key ) ){
+		cerr << "Private key does not match the certificate" << endl;
+		throw certificate_exception_pkey(
+			"The private key does not match the certificate" );
+	}
+
+	m_pk = priv_key;
+}
+
+void certificate::set_pk( const std::string &file ){
+	set_pk( priv_key::load( file ) );
+}
+
+void certificate::set_encpk(char *derEncPk, int length,
+			    const std::string &password,
+			    const std::string &path){
+	set_pk( priv_key::load( derEncPk, length, password, path ) );
+}
 
 ca_db_item::~ca_db_item(){
 }

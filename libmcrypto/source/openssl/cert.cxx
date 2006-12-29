@@ -56,6 +56,15 @@ ca_db *ca_db::create(){
 	return new ossl_ca_db();
 }
 
+priv_key* priv_key::load( const std::string private_key_filename ){
+	return new ossl_priv_key( private_key_filename );
+}
+
+priv_key* priv_key::load( char *derEncPk, int length,
+			  std::string password, std::string path ){
+	return new ossl_priv_key( derEncPk, length, password, path );
+}
+
 certificate* certificate::load( const std::string cert_filename )
 {
 	return new ossl_certificate( cert_filename );
@@ -63,7 +72,11 @@ certificate* certificate::load( const std::string cert_filename )
 
 certificate* certificate::load( const std::string cert_filename,
 				const std::string private_key_filename ){
-	return new ossl_certificate( cert_filename, private_key_filename );  
+	MRef<priv_key*> priv_key = new ossl_priv_key( private_key_filename );
+	certificate* cert = new ossl_certificate( cert_filename );
+
+	cert->set_pk( priv_key );
+	return cert;
 }
 
 certificate* certificate::load( unsigned char * der_cert,
@@ -82,14 +95,28 @@ certificate_chain* certificate_chain::create(){
 }
 
 //
+// ossl_priv_key
+// 
+ossl_priv_key::~ossl_priv_key(){
+	if( private_key )
+		EVP_PKEY_free( private_key );
+	private_key = NULL;
+}
+
+const string &ossl_priv_key::get_file() const{
+	return pk_file;
+}
+
+
+//
 // ossl_certificate
 // 
 
-ossl_certificate::ossl_certificate():private_key(NULL),cert(NULL){
+ossl_certificate::ossl_certificate():cert(NULL){
 
 }
 
-ossl_certificate::ossl_certificate( X509 * ossl_cert ):private_key(NULL){
+ossl_certificate::ossl_certificate( X509 * ossl_cert ){
 	if( ossl_cert == NULL ){
 		throw certificate_exception("X509 certificate is NULL");
 	}
@@ -97,7 +124,7 @@ ossl_certificate::ossl_certificate( X509 * ossl_cert ):private_key(NULL){
 	cert = ossl_cert;
 }
 
-ossl_certificate::ossl_certificate( const string cert_filename ):private_key(NULL){
+ossl_certificate::ossl_certificate( const string &cert_filename ){
 	FILE * fp;
 
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -120,32 +147,7 @@ ossl_certificate::ossl_certificate( const string cert_filename ):private_key(NUL
 	file = cert_filename;
 }
 
-ossl_certificate::ossl_certificate( const string cert_filename, const string private_key_filename ){
-	FILE * fp;
-	
-	fp = fopen( cert_filename.c_str(), "r" );
-	if( fp == NULL ){
-		cerr << "Could not open the certificate file" << endl;
-		throw certificate_exception_file(
-				"Could not open the certificate file" );
-	}
-
-	cert = PEM_read_X509( fp, NULL, NULL, NULL );
-	
-	fclose( fp );
-	
-	if( cert == NULL ){
-		cerr << "Invalid certificate file" << endl;
-		throw certificate_exception_file(
-				"Invalid certificate file" );
-	}
-
-	set_pk( private_key_filename );
-	
-	file = cert_filename;
-}
-
-ossl_certificate::ossl_certificate( unsigned char * certData, int length, string path ):private_key(NULL)
+ossl_certificate::ossl_certificate( unsigned char * certData, int length, string path )
 {
  /* tries to read a PEM certificate from memory, if that fails it tries to read it as a DER encoded cert*/
    BIO *mem;
@@ -169,7 +171,7 @@ ossl_certificate::ossl_certificate( unsigned char * certData, int length, string
 }
 
 
-ossl_certificate::ossl_certificate( unsigned char * der_cert, int length ):private_key(NULL){
+ossl_certificate::ossl_certificate( unsigned char * der_cert, int length ){
 	cert = X509_new();
 
 	if( cert == NULL )
@@ -188,10 +190,6 @@ ossl_certificate::~ossl_certificate(){
 		X509_free( cert );
 	cert = NULL;
 	
-	if( private_key )
-		EVP_PKEY_free( private_key );
-	private_key = NULL;
-
 }
 
 int ossl_certificate::envelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
@@ -235,7 +233,7 @@ int ossl_certificate::envelope_data(unsigned char * data, int size, unsigned cha
 	return 0;
 }
 
-int ossl_certificate::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+int ossl_priv_key::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
                                 unsigned char *enckey, int enckeylgth, unsigned char *iv){
 
         /*begin decrypt*/
@@ -257,7 +255,7 @@ int ossl_certificate::denvelope_data(unsigned char * data, int size, unsigned ch
 	return 0;
 }
 
-int ossl_certificate::sign_data( unsigned char * data, int data_length,
+int ossl_priv_key::sign_data( unsigned char * data, int data_length,
 	    		    unsigned char * sign, int * sign_length ){
 	EVP_MD_CTX     ctx;
 	int err;
@@ -342,6 +340,37 @@ int ossl_certificate::verif_sign( unsigned char * sign, int sign_length,
 	return err;
 }
 	
+bool ossl_priv_key::private_decrypt( unsigned char *data, int size,
+				    unsigned char *retdata, int *retsize ){
+	// FIXME unimplemented
+	return false;
+}
+
+bool ossl_certificate::public_encrypt( unsigned char *data, int size,
+				      unsigned char *retdata, int *retsize ){
+	//adding PKE payload
+	EVP_PKEY *public_key = X509_get_pubkey( cert );
+	RSA* rsa = EVP_PKEY_get1_RSA( public_key );
+
+// 	if( size >= RSA_size( rsa ) - 11 ){
+// 		return false;
+// 	}
+
+	if( RSA_size( rsa ) > *retsize ){
+		*retsize = RSA_size( rsa );
+		return false;
+	}
+
+	int ret = RSA_public_encrypt( size, data, retdata, rsa, RSA_PKCS1_PADDING );
+
+	if( ret < 0 ){
+		return false;
+	}
+
+	*retsize = ret;
+	return 0;
+}
+
 int ossl_certificate::get_der_length(){
 	return i2d_X509( cert, NULL );
 }
@@ -403,7 +432,7 @@ string ossl_certificate::get_issuer_cn(){
 }
 
 
-void ossl_certificate::set_pk( string file ){
+ossl_priv_key::ossl_priv_key( const string &file ){
 	FILE * fp = NULL;
 	
 	fp = fopen( file.c_str(), "r" );
@@ -422,21 +451,26 @@ void ossl_certificate::set_pk( string file ){
 				"Invalid private key file" );
 	}
 
-	/* Check that the private key matches the certificate */
-
-	if( X509_check_private_key( cert, private_key ) != 1 ){
-		cerr << "Private key does not match the certificate" << endl;
-		throw certificate_exception_pkey(
-			"The private key does not match the certificate" );
-	}
-
 	pk_file = file;
-
-
-
 }
 
-void ossl_certificate::set_encpk(char *derEncPk, int length, string password, string path)
+bool ossl_certificate::check_pk( MRef<priv_key*> pk ){
+	MRef<ossl_priv_key*> ssl_pk =
+		dynamic_cast<ossl_priv_key*>( *pk );
+
+	/* Check that the private key matches the certificate */
+
+	if( X509_check_private_key( cert, ssl_pk->get_openssl_private_key() ) != 1 ){
+		return false;
+	}
+
+	return true;
+}
+
+
+ossl_priv_key::ossl_priv_key( char *derEncPk, int length,
+			      const std::string &password,
+			      const std::string &path )
 {
    BIO *mem;  
    mem = BIO_new_mem_buf((void *)derEncPk, length);
@@ -457,20 +491,9 @@ void ossl_certificate::set_encpk(char *derEncPk, int length, string password, st
 	throw certificate_exception_pkey("The private key is invalid or wrong password was used" );
      }
    
-   /* Check that the private key matches the certificate */
-   
-   if( X509_check_private_key( cert, private_key ) != 1 )
-     {
-	cerr << "Private key does not match the certificate" << endl;
-	throw certificate_exception_pkey(
-					 "The private key does not match the certificate" );
-     }
    pk_file=path;
 }
 
-bool ossl_certificate::has_pk(){
-	return private_key != NULL;
-}
 
 int ossl_certificate::control( ca_db * cert_db ){
 	int result;

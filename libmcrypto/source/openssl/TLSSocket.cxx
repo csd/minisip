@@ -171,8 +171,12 @@ void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
 
 		if( !cert.isNull() ){
 			/* Add a client certificate */
-			if( SSL_CTX_use_PrivateKey( this->ssl_ctx, 
-			ssl_cert->get_openssl_private_key() ) <= 0 ){
+			MRef<priv_key*> pk = ssl_cert->get_pk();
+			MRef<ossl_priv_key*> ssl_pk =
+				dynamic_cast<ossl_priv_key*>(*pk);
+
+			if( !ssl_pk || SSL_CTX_use_PrivateKey( this->ssl_ctx, 
+			ssl_pk->get_openssl_private_key() ) <= 0 ){
 				cerr << "SSL: Could not use private key" << endl;
 				ERR_print_errors_fp(stderr);
 				throw TLSContextInitFailed(); 
