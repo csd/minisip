@@ -687,3 +687,15 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 			throw MikeyException( "Unknown MAC algorithm" );
 	}
 }
+
+bool MikeyMessagePKE::isInitiatorMessage() const{
+	return type() == MIKEY_TYPE_PK_INIT;
+}
+
+bool MikeyMessagePKE::isResponderMessage() const{
+	return type() == MIKEY_TYPE_PK_RESP;
+}
+
+int32_t MikeyMessagePKE::keyAgreementType() const{
+	return KEY_AGREEMENT_TYPE_PK;
+}

@@ -1,6 +1,7 @@
 #include <config.h>
 
 #include <libmikey/KeyAgreementPKE.h>
+#include <libmikey/MikeyMessage.h>
 #include <libmcrypto/rand.h>
 
 
@@ -71,3 +72,13 @@ byte_t* KeyAgreementPKE::getEnvelopeKey(void){
 int KeyAgreementPKE::getEnvelopeKeyLength(){
 	return envKeyLengthValue;	
 }
+
+#ifdef HAVE_OPENSSL
+MikeyMessage* KeyAgreementPKE::createMessage(){
+	return MikeyMessage::create( this );
+}
+#else
+MikeyMessage* KeyAgreementPKE::createMessage(){
+	throw MikeyExceptionUnimplemented("MIKEY PKE not supported");
+}
+#endif	// HAVE_OPENSSL

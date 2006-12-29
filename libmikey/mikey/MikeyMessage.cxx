@@ -500,8 +500,8 @@ uint32_t MikeyMessage::csbId(){
 	return ((MikeyPayloadHDR *)hdr)->csbId();
 }
 
-int MikeyMessage::type(){
-	MikeyPayload * hdr = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+int MikeyMessage::type() const{
+	const MikeyPayload * hdr = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	if( hdr == NULL ){
 		throw MikeyExceptionMessageContent( 
 			"No header in the payload" );
@@ -512,6 +512,17 @@ int MikeyMessage::type(){
 
 MikeyPayload * MikeyMessage::extractPayload( int payloadType ){
 	list<MikeyPayload *>::iterator i;
+
+	for( i = payloads.begin(); i != payloads.end(); i++ ){
+		if( (*i)->payloadType() == payloadType ){
+			return *i;
+		}
+	}
+	return NULL;
+}
+
+const MikeyPayload * MikeyMessage::extractPayload( int payloadType ) const{
+	list<MikeyPayload *>::const_iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
 		if( (*i)->payloadType() == payloadType ){
@@ -589,4 +600,17 @@ MikeyMessage * MikeyMessage::buildResponse( KeyAgreement * ka ){
 
 bool MikeyMessage::authenticate( KeyAgreement  * ka ){
 	throw MikeyExceptionUnimplemented( "authenticate not implemented" );
+}
+
+bool MikeyMessage::isInitiatorMessage() const{
+	return false;
+}
+
+bool MikeyMessage::isResponderMessage() const{
+	return false;
+}
+
+int32_t MikeyMessage::keyAgreementType() const{
+	throw MikeyExceptionUnimplemented(
+		"Unimplemented type of MIKEY message" );
 }

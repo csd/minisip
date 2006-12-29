@@ -487,3 +487,15 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 	if( res > 0 ) return true;
 	else return false;
 }
+
+bool MikeyMessageDH::isInitiatorMessage() const{
+	return type() == MIKEY_TYPE_DH_INIT;
+}
+
+bool MikeyMessageDH::isResponderMessage() const{
+	return type() == MIKEY_TYPE_DH_RESP;
+}
+
+int32_t MikeyMessageDH::keyAgreementType() const{
+	return KEY_AGREEMENT_TYPE_DH;
+}

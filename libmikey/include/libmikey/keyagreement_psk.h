@@ -54,10 +54,7 @@ class LIBMIKEY_API KeyAgreementPSK : public KeyAgreement{
 		int getV() {return v;}
 		int macAlg;
 
-		MikeyMessage * parseResponse( MikeyMessage * response);
-		void setOffer( MikeyMessage * offer );
-		MikeyMessage * buildResponse( MikeyMessage * offer);
-		bool authenticate( MikeyMessage * msg);
+		MikeyMessage* createMessage();
 
 	private:
 		byte_t * pskPtr;

@@ -575,4 +575,14 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 
 }
 
+bool MikeyMessagePSK::isInitiatorMessage() const{
+	return type() == MIKEY_TYPE_PSK_INIT;
+}
 
+bool MikeyMessagePSK::isResponderMessage() const{
+	return type() == MIKEY_TYPE_PSK_RESP;
+}
+
+int32_t MikeyMessagePSK::keyAgreementType() const{
+	return KEY_AGREEMENT_TYPE_PSK;
+}

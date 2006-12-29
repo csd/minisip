@@ -42,6 +42,10 @@ class LIBMIKEY_API MikeyMessagePSK: public MikeyMessage{
 		void setOffer( KeyAgreement * ka );
 		MikeyMessage * buildResponse( KeyAgreement * ka );
 		bool authenticate( KeyAgreement  * ka );
+
+		bool isInitiatorMessage() const;
+		bool isResponderMessage() const;
+		int32_t keyAgreementType() const;
 };
 		
 #endif

@@ -209,6 +209,10 @@ int KeyAgreementDH::controlPeerCertificate(){
 	return peerCertChainPtr->control( certDbPtr );
 }
 
+MikeyMessage* KeyAgreementDH::createMessage(){
+	return MikeyMessage::create( this );
+}
+
 MRef<SipSim*> KeyAgreementDH::getSim(){
 	return sim;
 }

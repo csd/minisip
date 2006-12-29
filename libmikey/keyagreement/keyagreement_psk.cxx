@@ -80,3 +80,7 @@ uint64_t KeyAgreementPSK::tSent(){
 void KeyAgreementPSK::setTSent( uint64_t tSent ){
 	this->tSentValue = tSent;
 }
+
+MikeyMessage* KeyAgreementPSK::createMessage(){
+	return MikeyMessage::create( this );
+}

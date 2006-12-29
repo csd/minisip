@@ -28,7 +28,9 @@ endif OS_WIN
 mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyCsIdMap.cxx \
                      mikey/MikeyMessage.cxx \
+                     mikey/MikeyMessageDH.h \
                      mikey/MikeyMessageDH.cxx \
+                     mikey/MikeyMessagePSK.h \
                      mikey/MikeyMessagePSK.cxx \
                      mikey/MikeyPayloadCERT.cxx \
                      mikey/MikeyPayloadCHASH.cxx \
@@ -54,6 +56,7 @@ ka_src =             keyagreement/keyagreement.cxx \
 		     keyagreement/keyvalidity.cxx
 
 ossl_src = \
+		mikey/MikeyMessagePKE.h \
 		mikey/MikeyMessagePKE.cxx
 
 # maintainer rules

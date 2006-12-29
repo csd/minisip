@@ -106,6 +106,8 @@ class KeyAgreementPKE : public KeyAgreement{
 	     */
 		int macAlg;
 	    
+		MikeyMessage* createMessage();
+
 	private:
 	
 		/**

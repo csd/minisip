@@ -68,10 +68,7 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		void addPeerCertificate( MRef<certificate *> cert );
 		int controlPeerCertificate();
 
-		MikeyMessage * parseResponse( MikeyMessage * response);
-		void setOffer( MikeyMessage * offer );
-		MikeyMessage * buildResponse( MikeyMessage * offer);
-		bool authenticate( MikeyMessage * msg);
+		MikeyMessage* createMessage();
 
 		MRef<SipSim*> getSim();
 

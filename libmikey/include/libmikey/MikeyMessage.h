@@ -110,9 +110,10 @@ class LIBMIKEY_API MikeyMessage{
 		std::list<MikeyPayload *>::iterator lastPayload();
 		
 		MikeyPayload * extractPayload( int type );
+		const MikeyPayload * extractPayload( int type ) const;
 		void remove( MikeyPayload * );
 
-		int type();
+		int type() const;
 		uint32_t csbId();
 
 		std::string b64Message();
@@ -121,6 +122,10 @@ class LIBMIKEY_API MikeyMessage{
 		virtual void setOffer( KeyAgreement * ka );
 		virtual MikeyMessage * buildResponse( KeyAgreement * ka );
 		virtual bool authenticate( KeyAgreement  * ka );
+
+		virtual bool isInitiatorMessage() const;
+		virtual bool isResponderMessage() const;
+		virtual int32_t keyAgreementType() const;
 
 	protected:
 		void addPolicyToPayload(KeyAgreement * ka);
