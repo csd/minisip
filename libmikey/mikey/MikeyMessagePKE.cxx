@@ -133,12 +133,14 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	MRef<certificate*> certResponder = ka->getPublicKey();
 
 	byte_t* env_key = ka->getEnvelopeKey();
-	int encEnvKeyLength = 128; // FIXME get size
+	int encEnvKeyLength = 8192; // TODO autodetect?
 	unsigned char* encEnvKey = new unsigned char[ encEnvKeyLength ];
 
-	certResponder->public_encrypt( env_key, ka->getEnvelopeKeyLength(),
-				       encEnvKey, &encEnvKeyLength );
-	
+	if( !certResponder->public_encrypt( env_key, ka->getEnvelopeKeyLength(),
+					    encEnvKey, &encEnvKeyLength ) ){
+		throw MikeyException( "PKE encryption of envelope key failed" );
+	}
+
 	addPayload(new MikeyPayloadPKE(2, encEnvKey, encEnvKeyLength));
 	
 	addSignaturePayload( certInitiator );
@@ -600,6 +602,29 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 		macInput[3 + kemac->encrDataLength()] = (uint8_t)kemac->macAlg();
 		
 		ka->setCsbId( csbId() );
+
+		MikeyPayload *payloadPke =
+			extractPayload( MIKEYPAYLOAD_PKE_PAYLOAD_TYPE );
+		MikeyPayloadPKE *pke =
+			dynamic_cast<MikeyPayloadPKE*>( payloadPke );
+
+		if( !pke ){
+			throw MikeyException( "PKE init did not contain PKE payload" );
+		}
+
+		MRef<certificate*> cert = ka->getPublicKey();
+		int envKeyLength = pke->dataLength();
+		byte_t *envKey = new byte_t[ envKeyLength ];
+		
+		if( !cert->private_decrypt( pke->data(), pke->dataLength(),
+					    envKey, &envKeyLength ) ){
+			throw MikeyException( "Decryption of envelope key failed" );
+		}
+
+		ka->setEnvelopeKey( envKey, envKeyLength );
+
+		delete[] envKey;
+		envKey = NULL;
 	}
 	else if( type() == HDR_DATA_TYPE_PK_RESP )
 	{

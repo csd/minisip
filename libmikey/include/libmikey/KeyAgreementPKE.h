@@ -73,6 +73,11 @@ class KeyAgreementPKE : public KeyAgreement{
 	    int getEnvelopeKeyLength(void);
 	    
 		/**
+		 * Set the envelope key
+		 */
+		void setEnvelopeKey( const byte_t *aEnvKey, size_t aEnvKeyLength );
+
+		/**
 		 * Returns the timestamp on which the message was sent
 		 */
 	    uint64_t tSent();

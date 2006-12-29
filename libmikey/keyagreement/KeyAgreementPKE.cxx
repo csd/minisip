@@ -7,14 +7,12 @@
 
 
 KeyAgreementPKE::KeyAgreementPKE(byte_t* envKeyT, int envKeyLength, MRef<certificate*> pubKeyResponderT)
-																:KeyAgreement(), tSentValue(0){
+		:KeyAgreement(), envKey(NULL),envKeyLengthValue(0),tSentValue(0){
 										
 	typeValue = KEY_AGREEMENT_TYPE_PK;
 	
 	//envelope key to encrypt KEMAC payload
-	envKeyLengthValue = envKeyLength;
-	envKey = new unsigned char[envKeyLengthValue];
-	memcpy(envKey, envKeyT, envKeyLengthValue);
+	setEnvelopeKey( envKeyT, envKeyLength );
 	
 	//public key to encrypt PKE payload
 	pubKeyResponder = pubKeyResponderT;
@@ -73,6 +71,19 @@ byte_t* KeyAgreementPKE::getEnvelopeKey(void){
 int KeyAgreementPKE::getEnvelopeKeyLength(){
 	return envKeyLengthValue;	
 }
+
+void KeyAgreementPKE::setEnvelopeKey( const byte_t *aEnvKey,
+				      size_t aEnvKeyLength ){
+	if( envKey ){
+		delete[] envKey;
+		envKey = NULL;
+	}
+
+	envKeyLengthValue = aEnvKeyLength;
+	envKey = new byte_t[ envKeyLengthValue ];
+	memcpy( envKey, aEnvKey, aEnvKeyLength );
+}
+	
 
 #ifdef HAVE_OPENSSL
 MikeyMessage* KeyAgreementPKE::createMessage(){
