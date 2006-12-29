@@ -341,8 +341,33 @@ int ossl_certificate::verif_sign( unsigned char * data, int data_length,
 	
 bool ossl_priv_key::private_decrypt( unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize ){
-	// FIXME unimplemented
-	return false;
+	//adding PKE payload
+	RSA* rsa = EVP_PKEY_get1_RSA( private_key );
+
+// 	if( size >= RSA_size( rsa ) - 11 ){
+// 		return false;
+// 	}
+
+	if( RSA_size( rsa ) > *retsize ){
+		*retsize = RSA_size( rsa );
+		return false;
+	}
+
+	int ret = RSA_private_decrypt( size, data, retdata, rsa, RSA_PKCS1_PADDING );
+
+	if( ret < 0 ){
+		unsigned long err = ERR_get_error();
+		char buf[128]="";
+		ERR_error_string_n( err, buf, sizeof(buf) );
+
+		cerr << "RSA_private_decrypt: " << buf << endl;
+		cerr << binToHex( data, size ) << endl;
+
+		return false;
+	}
+
+	*retsize = ret;
+	return true;
 }
 
 bool ossl_certificate::public_encrypt( unsigned char *data, int size,
@@ -356,6 +381,8 @@ bool ossl_certificate::public_encrypt( unsigned char *data, int size,
 // 	}
 
 	if( RSA_size( rsa ) > *retsize ){
+		cerr << "RSA_public_encrypt: buffer to small ("
+		     <<	*retsize << "<" << RSA_size(rsa) << ")" << endl;
 		*retsize = RSA_size( rsa );
 		return false;
 	}
@@ -363,11 +390,18 @@ bool ossl_certificate::public_encrypt( unsigned char *data, int size,
 	int ret = RSA_public_encrypt( size, data, retdata, rsa, RSA_PKCS1_PADDING );
 
 	if( ret < 0 ){
+		unsigned long err = ERR_get_error();
+		char buf[128]="";
+		ERR_error_string_n( err, buf, sizeof(buf) );
+
+		cerr << "RSA_public_encrypt: " << buf << endl;
+		cerr << binToHex( data, size ) << endl;
+
 		return false;
 	}
 
 	*retsize = ret;
-	return 0;
+	return true;
 }
 
 int ossl_certificate::get_der_length(){
