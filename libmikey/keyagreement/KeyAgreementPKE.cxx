@@ -2,10 +2,11 @@
 
 #include <libmikey/KeyAgreementPKE.h>
 #include <libmikey/MikeyMessage.h>
+#include <libmikey/MikeyException.h>
 #include <libmcrypto/rand.h>
 
 
-KeyAgreementPKE::KeyAgreementPKE(byte_t* envKeyT, int envKeyLength, EVP_PKEY* pubKeyResponderT)
+KeyAgreementPKE::KeyAgreementPKE(byte_t* envKeyT, int envKeyLength, MRef<certificate*> pubKeyResponderT)
 																:KeyAgreement(), tSentValue(0){
 										
 	typeValue = KEY_AGREEMENT_TYPE_PK;
@@ -61,7 +62,7 @@ uint64_t KeyAgreementPKE::tSent(){
 	return tSentValue;
 }
 
-EVP_PKEY* KeyAgreementPKE::getPublicKey(void){
+MRef<certificate*> KeyAgreementPKE::getPublicKey(void){
 	return pubKeyResponder;
 }
 

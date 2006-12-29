@@ -49,7 +49,7 @@ MikeyPayload(start){
 	this->payloadTypeValue = MIKEYPAYLOAD_PKE_PAYLOAD_TYPE;
 	setNextPayloadType(start[0]);
 	cValue = ( start[1] >> 6 ) & 0x3;
-	dataLengthValue = (int)( start[1] & 0x3F ) |
+	dataLengthValue = (int)(( start[1] & 0x3F ) << 8 ) |
 		      (int)( start[2] );
 	if( lengthLimit < 3 + dataLengthValue ){	
 		throw MikeyExceptionMessageLengthException(

@@ -24,10 +24,6 @@
 
 #include <config.h>
 
-#ifdef HAVE_OPENSSL_RSA_H
-#include<openssl/rsa.h>
-#endif
-
 #include "MikeyMessagePKE.h"
 #include <libmikey/MikeyPayloadHDR.h>
 #include <libmikey/MikeyPayloadT.h>
@@ -47,7 +43,7 @@ using namespace std;
 MikeyMessagePKE::MikeyMessagePKE(){
 }
 
-MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, EVP_PKEY* privKeyInitiator){
+MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, MRef<certificate*> certInitiator){
 
 	unsigned int csbId = rand();
 	ka->setCsbId(csbId);
@@ -134,36 +130,18 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, E
 	addKemacPayload(rawKeyData, keydata->length(), encrKey, iv, authKey, encrAlg, macAlg);
 	
 	//adding PKE payload
-	RSA* pubKeyResponderRsa = EVP_PKEY_get1_RSA(ka->getPublicKey());
+	MRef<certificate*> certResponder = ka->getPublicKey();
+
 	byte_t* env_key = ka->getEnvelopeKey();
-	unsigned char* encEnvKey = new unsigned char[RSA_size(pubKeyResponderRsa)];
-	RSA_public_encrypt(ka->getEnvelopeKeyLength(), env_key, encEnvKey, pubKeyResponderRsa, RSA_PKCS1_PADDING);
+	int encEnvKeyLength = 128; // FIXME get size
+	unsigned char* encEnvKey = new unsigned char[ encEnvKeyLength ];
+
+	certResponder->public_encrypt( env_key, ka->getEnvelopeKeyLength(),
+				       encEnvKey, &encEnvKeyLength );
 	
-	addPayload(new MikeyPayloadPKE(2, encEnvKey, RSA_size(pubKeyResponderRsa)));
+	addPayload(new MikeyPayloadPKE(2, encEnvKey, encEnvKeyLength));
 	
-	
-	//adding SIGN payload
-	if(privKeyInitiator == NULL)
-		throw MikeyException("Adding SIGN payload: No private key found!");
-	
-	unsigned int* computedMacLength = new unsigned int;
-	*computedMacLength = EVP_PKEY_size(privKeyInitiator);
-	unsigned char* computedMac = new unsigned char[*computedMacLength];
-	
-	MikeyPayloadSIGN* sig = new MikeyPayloadSIGN(*computedMacLength, computedMac,
-											MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS);
-	addPayload(sig);
-	
-	EVP_MD_CTX* ctxt = EVP_MD_CTX_create();
-	EVP_SignInit(ctxt, EVP_sha1());
-	EVP_SignUpdate(ctxt, rawMessageData(), (rawMessageLength() - sig->length()));
-	if(!EVP_SignFinal(ctxt, computedMac, computedMacLength, privKeyInitiator)){
-		EVP_MD_CTX_destroy(ctxt);
-		throw MikeyException("Create SIGN payload of the Init message failed!");
-	}
-	EVP_MD_CTX_destroy(ctxt);
-	
-	sig->setSigData(computedMac);
+	addSignaturePayload( certInitiator );
 
 	//remove garbage
 	if( encrKey != NULL )
@@ -178,8 +156,6 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, E
 	delete keydata;
 	delete [] rawKeyData;
 	delete [] encEnvKey;
-	delete [] computedMac;
-	delete computedMacLength;
 }
 
 void MikeyMessagePKE::addKemacPayload(byte_t* tgk, int tgkLength, byte_t* encrKey, byte_t* iv,
@@ -581,7 +557,7 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 				"RAND payload."
 			);
 			
-			return false;
+			return true;
 		}
 
 		ka->setRand( randPayload->randData(), 
@@ -598,19 +574,16 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 		
 		MikeyPayloadSIGN* sig = (MikeyPayloadSIGN*)extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
 		
-		EVP_MD_CTX* ctx = EVP_MD_CTX_create();
-		EVP_VerifyInit(ctx, EVP_sha1());
-		EVP_VerifyUpdate(ctx, rawMessageData(), (rawMessageLength() - sig->length()));
-		int err = 1;
-		err = EVP_VerifyFinal(ctx, sig->sigData(), sig->sigLength(), ka->getPublicKey());
-		if(!err){
-			cout << "Verification of the PKE init message SIGN payload failed! Code: "  << err << endl;
+		int res;
+		res = ka->getPublicKey()->verif_sign( rawMessageData(),
+						      rawMessageLength() - sig->sigLength(),
+						      sig->sigData(),
+						      sig->sigLength() );
+		if( res <= 0 ){
+			cout << "Verification of the PKE init message SIGN payload failed! Code: "  << res << endl;
 			cout << "Keypair of the initiator probably mismatch!" << endl;
-			EVP_MD_CTX_destroy(ctx);
-			return false;
+			return true;
 		}
-		EVP_MD_CTX_destroy(ctx);
-		
 
 		kemac = (MikeyPayloadKEMAC *) extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE);
 		macAlg = kemac->macAlg();
@@ -632,7 +605,7 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 	{
 		if( ka->csbId() != csbId() ){
 			ka->setAuthError( "CSBID mismatch\n" );
-			return false;
+			return true;
 		}
 		MikeyPayloadV * v;
 		uint64_t t_sent = ka->tSent();
@@ -677,12 +650,13 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 						"MAC mismatch: the shared"
 						"key probably differs."
 					);
-					return false;
+					return true;
 				}
 			}
-			return true;
-		case MIKEY_MAC_NULL:
 			return false;
+		case MIKEY_MAC_NULL:
+			ka->setAuthError( "MAC NULL." );
+			return true;
 		default:
 			throw MikeyException( "Unknown MAC algorithm" );
 	}

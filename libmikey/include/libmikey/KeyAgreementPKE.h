@@ -2,11 +2,7 @@
 #define KEYAGREEMENTPKE_H
 
 #include <libmikey/keyagreement.h>
-#ifdef HAVE_OPENSSL_EVP_H
-# include <openssl/evp.h>
-#else
-typedef struct evp_pkey_st EVP_PKEY;
-#endif
+#include <libmcrypto/cert.h>
 
 /**
  * Instances of this class are used to store the necessary information about
@@ -19,7 +15,7 @@ class KeyAgreementPKE : public KeyAgreement{
 		/**
 		 * Constructor with the keys needed for the encryption
 		 */
-	    KeyAgreementPKE(byte_t* envKey, const int envKeyLength, EVP_PKEY* pubKeyResponder);
+	    KeyAgreementPKE(byte_t* envKey, const int envKeyLength, MRef<certificate*> pubKeyResponder);
 	    
 	    /**
 	     * Destructor deletes some objects to prevent memory leaks
@@ -64,7 +60,7 @@ class KeyAgreementPKE : public KeyAgreement{
 	    /**
 	     * Returns the Public-Key of the responder
 	     */
-	    EVP_PKEY* getPublicKey(void);
+	    MRef<certificate*> getPublicKey(void);
 	    
 		/**
 		 * Returns the envelope key
@@ -123,7 +119,7 @@ class KeyAgreementPKE : public KeyAgreement{
 	    /**
 	     * Public-Key of the responder
 	     */
-	    EVP_PKEY* pubKeyResponder;
+		MRef<certificate*> pubKeyResponder;
 	    
 	    /**
 	     * Timestamp from when the message was sent

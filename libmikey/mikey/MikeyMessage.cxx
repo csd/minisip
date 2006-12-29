@@ -80,8 +80,8 @@ MikeyMessage* MikeyMessage::create( KeyAgreementDHHMAC * ka,
 #ifdef HAVE_OPENSSL
 MikeyMessage* MikeyMessage::create( KeyAgreementPKE* ka,
 				    int encrAlg, int macAlg,
-				    EVP_PKEY* privKeyInitiator ){
-	return new MikeyMessagePKE( ka, encrAlg, macAlg, privKeyInitiator );
+				    MRef<certificate*> certInitiator ){
+	return new MikeyMessagePKE( ka, encrAlg, macAlg, certInitiator );
 }
 #endif	// HAVE_OPENSSL
 

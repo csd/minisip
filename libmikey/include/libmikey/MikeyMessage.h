@@ -40,6 +40,7 @@
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/KeyAgreementPKE.h>
 #include<libmikey/KeyAgreementDHHMAC.h>
+#include<libmcrypto/cert.h>
 
 #include<list>
 #include<iostream>
@@ -88,7 +89,7 @@ class LIBMIKEY_API MikeyMessage{
 		static MikeyMessage* create(KeyAgreementPKE* ka,
 				  int encrAlg = MIKEY_ENCR_AES_CM_128,
 				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
-				  EVP_PKEY* privKeyInitiator = NULL);
+				  MRef<certificate*> certInitiator = NULL);
 
 		static MikeyMessage* parse( byte_t *message, int lengthLimit );
 		static MikeyMessage* parse( std::string b64Message );

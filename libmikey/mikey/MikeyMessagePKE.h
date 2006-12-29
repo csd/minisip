@@ -30,6 +30,7 @@
 #include<libmikey/libmikey_config.h>
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/KeyAgreementPKE.h>
+#include<libmcrypto/cert.h>
 
 class LIBMIKEY_API MikeyMessagePKE: public MikeyMessage{
 	public:
@@ -37,7 +38,7 @@ class LIBMIKEY_API MikeyMessagePKE: public MikeyMessage{
  		MikeyMessagePKE(KeyAgreementPKE* ka,
 				int encrAlg = MIKEY_ENCR_AES_CM_128,
 				int macAlg = MIKEY_MAC_HMAC_SHA1_160,
-				EVP_PKEY* privKeyInitiator = NULL);
+				MRef<certificate*> certInitiator = NULL);
 
 		void addKemacPayload(byte_t* tgk, int tgkLength,
 				     byte_t* encrKey, byte_t* iv,

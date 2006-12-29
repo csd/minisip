@@ -38,7 +38,12 @@ MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,
 	                         // this value
 	this->sigLengthValue = sigLengthValue;
 	this->sigDataPtr = new byte_t[ sigLengthValue ];
-	memcpy( this->sigDataPtr, sigDataPtr, sigLengthValue );
+	if( sigDataPtr ){
+		memcpy( this->sigDataPtr, sigDataPtr, sigLengthValue );
+	}
+	else{
+		memset( this->sigDataPtr, 0, sigLengthValue );
+	}
 	this->sigTypeValue = type;
 
 }
