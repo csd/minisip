@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = include m4 tests win32
+SUBDIRS = include m4 . tests win32
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmikey.spec
 

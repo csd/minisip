@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include $(MINISIP_CFLAGS)
 AM_LDFLAGS = -L$(top_srcdir) $(MINISIP_LIBS)
-LIBADD = libmikey.la
+LDADD = ../libmikey.la
 
 MINISIP_TESTS = \
 	000_compile
