@@ -15,7 +15,8 @@ class KeyAgreementPKE : public KeyAgreement{
 		/**
 		 * Constructor with the keys needed for the encryption
 		 */
-	    KeyAgreementPKE(byte_t* envKey, const int envKeyLength, MRef<certificate*> pubKeyResponder);
+		KeyAgreementPKE( MRef<certificate*> pubKeyResponder,
+				 int envKeyLength = 192);
 	    
 	    /**
 	     * Destructor deletes some objects to prevent memory leaks

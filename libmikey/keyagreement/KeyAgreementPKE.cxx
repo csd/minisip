@@ -6,14 +6,16 @@
 #include <libmcrypto/rand.h>
 
 
-KeyAgreementPKE::KeyAgreementPKE(byte_t* envKeyT, int envKeyLength, MRef<certificate*> pubKeyResponderT)
+KeyAgreementPKE::KeyAgreementPKE( MRef<certificate*> pubKeyResponderT, int envKeyLength )
 		:KeyAgreement(), envKey(NULL),envKeyLengthValue(0),tSentValue(0){
 										
 	typeValue = KEY_AGREEMENT_TYPE_PK;
 	
 	//envelope key to encrypt KEMAC payload
-	setEnvelopeKey( envKeyT, envKeyLength );
-	
+	envKeyLengthValue = envKeyLength;
+	envKey = new byte_t[ envKeyLengthValue ];
+	Rand::randomize( envKey, envKeyLengthValue );
+
 	//public key to encrypt PKE payload
 	pubKeyResponder = pubKeyResponderT;
 	
