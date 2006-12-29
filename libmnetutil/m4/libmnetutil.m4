@@ -31,12 +31,21 @@ AM_CONDITIONAL(HAVE_IPV6, test "x${HAVE_IPV6}" = "xyes")
 # End of AM_MINISIP_CHECK_IPV6
 #
 
-# AM_MINISIP_CHECK_LIBMNETUTIL(VERSION)
+# AM_MINISIP_CHECK_LIBMNETUTIL(VERSION [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
 # -------------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBMNETUTIL],[ 
 	AC_REQUIRE([AM_MINISIP_CHECK_LIBMUTIL]) dnl
-	AC_MINISIP_WITH_ARG(MNETUTIL, mnetutil, libmnetutil, $1, [REQUIRED])
-	AC_MINISIP_CHECK_LIBRARY(MNETUTIL, libmnetutil, libmnetutil_config.h, mnetutil)
+	mnetutil_found=yes
+	AC_MINISIP_WITH_ARG(MNETUTIL, mnetutil, libmnetutil, $1, ifelse([$3], , [REQUIRED], [OPTIONAL]), , ,[mnetutil_found=no])
+	if test ! "${mnetutil_found}" = "no"; then
+		AC_MINISIP_CHECK_LIBRARY(MNETUTIL, libmnetutil, libmnetutil_config.h, mnetutil, ,[mnetutil_found=no])
+	fi
+
+	if test "${mnetutil_found}" = "yes"; then
+		ifelse([$2], , :, [$2])
+	else
+		ifelse([$3], , [AC_MINISIP_REQUIRED_LIB(MNETUTIL, libnetmutil)], [$3])
+	fi
   ])
 # End of AM_MINISIP_CHECK_LIBMNETUTIL
 #

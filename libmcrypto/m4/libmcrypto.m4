@@ -104,20 +104,28 @@ AC_SUBST(GNUTLS_LIBS)
 # End of AM_LIBMCRYPTO_CHECK_GNUTLS
 #
 
-# AM_MINISIP_CHECK_LIBMCRYPTO(VERSION)
+# AM_MINISIP_CHECK_LIBMCRYPTO(VERSION [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]]))
 # ------------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBMCRYPTO],[ 
 	AC_REQUIRE([AM_MINISIP_CHECK_LIBMNETUTIL]) dnl
+	mcrypto_found=yes
 dnl	AC_REQUIRE([AM_MINISIP_CHECK_OPENSSL]) dnl
-	AC_MINISIP_WITH_ARG(MCRYPTO, mcrypto, libmcrypto, $1, [REQUIRED], [dnl
+	AC_MINISIP_WITH_ARG(MCRYPTO, mcrypto, libmcrypto, $1, ifelse([$3], , [REQUIRED], [OPTIONAL]), [dnl
 dnl if HAVE_OPENSSL
 dnl			-lssl -lcrypto dnl
 dnl endif
 dnl if HAVE_GNUTLS
 dnl			-lgnutls
 dnl endif
-		])
-	AC_MINISIP_CHECK_LIBRARY(MCRYPTO, libmcrypto, config.h, mcrypto)
+		], ,[mcrypto_found=no])
+	if test ! "${mcrypto_found}" = "no"; then
+		AC_MINISIP_CHECK_LIBRARY(MCRYPTO, libmcrypto, config.h, mcrypto)
+	fi
+	if test "${mcrypto_found}" = "yes"; then
+		ifelse([$2], , :, [$2])
+	else
+		ifelse([$3], , [AC_MINISIP_REQUIRED_LIB(MCRYPTO, libmcrypto)], [$3])
+	fi
   ])
 # End of AM_MINISIP_CHECK_LIBMCRYPTO
 #

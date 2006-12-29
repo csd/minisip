@@ -217,7 +217,7 @@ AM_CONDITIONAL(TEST_SUITE, test x${enable_test_suite} = xyes)
 dnl  =================================================================
 dnl               minisip `configure --with-m*` argument macros
 
-# AC_MINISIP_CHECK_WITH_ARG(MACRO, NAME, LIBS)
+# AC_MINISIP_CHECK_WITH_ARG(MACRO, NAME, LIBS [, ACTION-IF-NOT-FOUND])
 # --------------------------------------------
 AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 		#AC_MSG_WARN([  withval = ${withval} ])
@@ -247,6 +247,7 @@ AC_DEFUN([AC_MINISIP_CHECK_WITH_ARG],[
 				# out-of-tree development
 				$1_LDFLAGS="-L`pwd`/../$2${minisip_lthack}"
 			else
+				ifelse([$4], ,[
 				AC_MSG_ERROR([dnl
 Unable to find the required libraries in any of the following locations:
 	${withval}/lib
@@ -254,9 +255,9 @@ Unable to find the required libraries in any of the following locations:
 	../$2/.libs
 
 Maybe you forgot to compile $2 first?
-])
+])], [$4])
 			fi
-			AC_MSG_WARN([  DEBUG_INFO: param1=$1, param2=$2, param3=$3; $1_LDFLAGS=${$1_LDFLAGS} ])
+dnl 			AC_MSG_WARN([  DEBUG_INFO: param1=$1, param2=$2, param3=$3; $1_LDFLAGS=${$1_LDFLAGS} ])
 			$1_CFLAGS="-I${withval}/include"
 			$1_LIBS="${$1_LDFLAGS} $3"
 			AC_SUBST($1_CFLAGS)
@@ -266,19 +267,19 @@ Maybe you forgot to compile $2 first?
 # End of AC_MINISIP_CHECK_WITH_ARG
 #
 
-# AC_MINISIP_MAYBE_WITH_ARG(MACRO, WITHARG, NAME, TYPE, LIBS)
+# AC_MINISIP_MAYBE_WITH_ARG(MACRO, WITHARG, NAME, TYPE, LIBS [, ACTION-IF-NOT-FOUND]])
 # -----------------------------------------------------------
 AC_DEFUN([AC_MINISIP_MAYBE_WITH_ARG],[
 		if test "x${withval}" = "no"; then
-			AC_MINISIP_$4_LIB($1, $3)
+			ifelse([$6], , [AC_MINISIP_$4_LIB($1, $3)], [$6])
 		else
-			AC_MINISIP_CHECK_WITH_ARG($1, $3, [-l$2 $5])
+			AC_MINISIP_CHECK_WITH_ARG($1, $3, [-l$2 $5], $6)
 		fi
 	])
 # End of AC_MINISIP_MAYBE_WITH_ARG
 #
 
-# AC_MINISIP_WITH_ARG(MACRO, WITHARG, NAME, VERSION, TYPE, LIBS)
+# AC_MINISIP_WITH_ARG(MACRO, WITHARG, NAME, VERSION, TYPE, LIBS [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 # --------------------------------------------------------------
 AC_DEFUN([AC_MINISIP_WITH_ARG],[
 		AC_BEFORE([AM_MINISIP_CHECK_]m4_translit($3, 'a-z', 'A-Z'),
@@ -286,10 +287,17 @@ AC_DEFUN([AC_MINISIP_WITH_ARG],[
 		AC_PROVIDE([AC_MINISIP_CHECK_PERFORMED]) dnl
 		AC_ARG_WITH($2,
 			AS_HELP_STRING([--with-$2=PATH], [location of $3]),
-			[ AC_MINISIP_MAYBE_WITH_ARG($1, $2, $3, $5, $6) ],
+			[ AC_MINISIP_MAYBE_WITH_ARG($1, $2, $3, $5, $6, $8) ],
 			[ $1_NEEDS_PKG_CHECK=yes ])
 		if test "x${$1_NEEDS_PKG_CHECK}" = "xyes"; then
-			PKG_CHECK_MODULES($1, [$3 >= $4])
+			ifelse([$8], , [dnl
+				echo "Check $1 module"
+				PKG_CHECK_MODULES($1, [$3 >= $4])
+				ifelse([$7], , :, [$7])], [dnl
+				PKG_CHECK_EXISTS([$3 >= $4], [dnl
+					PKG_CHECK_MODULES($1, [$3 >= $4])
+					$7],
+					[$8])])
 		fi
 		MINISIP_CFLAGS="${$1_CFLAGS} ${MINISIP_CFLAGS}"
 		MINISIP_LIBS="${$1_LIBS} ${MINISIP_LIBS}"
@@ -306,12 +314,12 @@ AC_DEFUN([AC_MINISIP_OPTIONAL_LIB], [ dnl
 
 # AC_MINISIP_REQUIRED_LIB(MACRO, NAME)
 # ------------------------------------
-AC_DEFUN([AC_MINISIP_REQUIRED_LIB], [ dnl
+AC_DEFUN([AC_MINISIP_REQUIRED_LIB], [ dnl 
 		AC_MSG_ERROR([$1 is required.]) ])
 # End of AC_MINISIP_REQUIRED_LIB
 #
 
-# AC_MINISIP_CHECK_LIBRARY(MACRO, NAME, HEADER, LIB)
+# AC_MINISIP_CHECK_LIBRARY(MACRO, NAME, HEADER, LIB [,ACTION-IF-NOT-FOUND])
 # --------------------------------------------------
 AC_DEFUN([AC_MINISIP_CHECK_LIBRARY], [
 		save_CPPFLAGS="${CPPFLAGS}"
@@ -400,11 +408,20 @@ AC_DEFUN([AM_MINISIP_CHECK_COMPLETE],[
 dnl  =================================================================
 dnl                          libmutil macros
 
-# AM_MINISIP_CHECK_LIBMUTIL(VERSION)
+# AM_MINISIP_CHECK_LIBMUTIL(VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 # ----------------------------------
-AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[ 
-	AC_MINISIP_WITH_ARG(MUTIL, mutil, libmutil, $1, [REQUIRED])
-	AC_MINISIP_CHECK_LIBRARY(MUTIL, libmutil, libmutil_config.h, mutil)
+AC_DEFUN([AM_MINISIP_CHECK_LIBMUTIL],[
+	mutil_found=yes 
+	AC_MINISIP_WITH_ARG(MUTIL, mutil, libmutil, $1, ifelse([$3], , [REQUIRED], [OPTIONAL]), ,[mutil_found=yes], [mutil_found=no])
+	if test ! "${mutil_found}" = "no"; then
+		AC_MINISIP_CHECK_LIBRARY(MUTIL, libmutil, libmutil_config.h, mutil,, mutil_found=no)
+	fi
+		
+	if test "${mutil_found}" = "yes"; then
+		ifelse([$2], , :, [$2])
+	else
+		ifelse([$3], , [AC_MINISIP_REQUIRED_LIB(MUTIL, libmutil)], [$3])
+	fi
   ])
 # End of AM_MINISIP_CHECK_LIBMUTIL
 #
