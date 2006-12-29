@@ -39,6 +39,7 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/KeyAgreementPKE.h>
+#include<libmikey/KeyAgreementDHHMAC.h>
 
 #include<list>
 #include<iostream>
@@ -50,6 +51,8 @@
 #define MIKEY_TYPE_DH_INIT     4
 #define MIKEY_TYPE_DH_RESP     5
 #define MIKEY_TYPE_ERROR       6
+#define MIKEY_TYPE_DHHMAC_INIT 7
+#define MIKEY_TYPE_DHHMAC_RESP 8
 
 #define MIKEY_ENCR_NULL       0
 #define MIKEY_ENCR_AES_CM_128 1
@@ -75,6 +78,8 @@ class LIBMIKEY_API MikeyMessage{
 	public:
  		MikeyMessage();
 		static MikeyMessage* create( KeyAgreementDH * ka );
+		static MikeyMessage* create( KeyAgreementDHHMAC * ka,
+					     int macAlg = MIKEY_MAC_HMAC_SHA1_160);
 		static MikeyMessage* create( KeyAgreementPSK * ka,
 			      int encrAlg = MIKEY_ENCR_AES_CM_128, 
 			      int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );

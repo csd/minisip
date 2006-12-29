@@ -55,6 +55,7 @@
 #include"MikeyMessageDH.h"
 #include"MikeyMessagePSK.h"
 #include"MikeyMessagePKE.h"
+#include"MikeyMessageDHHMAC.h"
 
 using namespace std;
 
@@ -69,6 +70,11 @@ MikeyMessage* MikeyMessage::create( KeyAgreementDH * ka ){
 MikeyMessage* MikeyMessage::create( KeyAgreementPSK * ka,
 				    int encrAlg, int macAlg ){
 	return new MikeyMessagePSK( ka, encrAlg, macAlg );
+}
+
+MikeyMessage* MikeyMessage::create( KeyAgreementDHHMAC * ka,
+				    int macAlg ){
+	return new MikeyMessageDHHMAC( ka, macAlg );
 }
 
 #ifdef HAVE_OPENSSL
@@ -118,6 +124,10 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 			msg = new MikeyMessagePKE();
 			break;
 #endif	// HAVE_OPENSSL
+		case MIKEY_TYPE_DHHMAC_INIT:
+		case MIKEY_TYPE_DHHMAC_RESP:
+			msg = new MikeyMessageDHHMAC();
+			break;
 		case MIKEY_TYPE_ERROR:
 			msg = new MikeyMessage();
 			break;

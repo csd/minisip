@@ -32,6 +32,8 @@ mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyMessageDH.cxx \
                      mikey/MikeyMessagePSK.h \
                      mikey/MikeyMessagePSK.cxx \
+                     mikey/MikeyMessageDHHMAC.h \
+                     mikey/MikeyMessageDHHMAC.cxx \
                      mikey/MikeyPayloadCERT.cxx \
                      mikey/MikeyPayloadCHASH.cxx \
                      mikey/MikeyPayload.cxx \
@@ -53,6 +55,7 @@ ka_src =             keyagreement/keyagreement.cxx \
                      keyagreement/keyagreement_dh.cxx \
 	             keyagreement/keyagreement_psk.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
+	             keyagreement/KeyAgreementDHHMAC.cxx \
 		     keyagreement/keyvalidity.cxx
 
 ossl_src = \

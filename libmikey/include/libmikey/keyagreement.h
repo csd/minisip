@@ -48,6 +48,7 @@
 #define KEY_AGREEMENT_TYPE_DH 	0
 #define KEY_AGREEMENT_TYPE_PSK 	1
 #define KEY_AGREEMENT_TYPE_PK 	2
+#define KEY_AGREEMENT_TYPE_DHHMAC 3
 
 
 // Class to hold Security Policy (SP) info

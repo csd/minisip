@@ -50,7 +50,11 @@ MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, int csbId,
 		throw MikeyExceptionMessageContent(
 				"Unknown CS ID map type" );
 	}
-	
+
+	if( !csIdMapPtr ){
+		throw MikeyExceptionMessageContent(
+				"Missing CS ID map" );
+	}		
 }
 
 MikeyPayloadHDR::MikeyPayloadHDR( byte_t * start, int lengthLimit ):

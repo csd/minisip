@@ -40,6 +40,8 @@
 #define HDR_DATA_TYPE_DH_INIT     4
 #define HDR_DATA_TYPE_DH_RESP     5
 #define HDR_DATA_TYPE_ERROR       6
+#define HDR_DATA_TYPE_DHHMAC_INIT 7
+#define HDR_DATA_TYPE_DHHMAC_RESP 8
 
 #define HDR_PRF_MIKEY_1   0
 #define HDR_PRF_MIKEY_256 1
