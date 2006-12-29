@@ -295,9 +295,8 @@ int ossl_priv_key::sign_data( unsigned char * data, int data_length,
 	return 0;
 }
 
-int ossl_certificate::verif_sign( unsigned char * sign, int sign_length,
-			     unsigned char * data, int data_length )
-{
+int ossl_certificate::verif_sign( unsigned char * data, int data_length,
+				  unsigned char * sign, int sign_length ){
 	EVP_PKEY *      public_key;
 	EVP_MD_CTX      ctx;
 	int err;

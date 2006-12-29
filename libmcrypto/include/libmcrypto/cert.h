@@ -152,9 +152,8 @@ class LIBMCRYPTO_API certificate: public MObject{
 		int sign_data( unsigned char * data, int data_length, 
 				       unsigned char * sign,
 				       int * sign_length );
-		virtual int verif_sign( unsigned char * sign, int sign_length,
-					unsigned char * data,
-					int data_length )=0;
+		virtual int verif_sign( unsigned char * data, int data_length,
+					unsigned char * sign, int sign_length )=0;
 
 		virtual bool public_encrypt(unsigned char *data, int size,
 					    unsigned char *retdata, int *retsize)=0;

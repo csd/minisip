@@ -118,8 +118,8 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 
 		int sign_data( unsigned char * data, int data_length, 
 			       unsigned char * sign, int * sign_length );
-		int verif_sign( unsigned char * sign, int sign_length,
-				unsigned char * data, int data_length );
+		int verif_sign( unsigned char * data, int data_length,
+				unsigned char * sign, int sign_length );
 
 		bool public_encrypt(unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);

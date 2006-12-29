@@ -243,8 +243,8 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 	return 0;
 }
 
-int gtls_certificate::verif_sign( unsigned char * sign, int signLength,
-			     unsigned char * data, int dataLength )
+int gtls_certificate::verif_sign( unsigned char * data, int data_length,
+				  unsigned char * sign, int sign_length ){
 {
 	int err;
 	gnutls_datum dataStruct;

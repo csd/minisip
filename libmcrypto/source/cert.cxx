@@ -240,7 +240,7 @@ void certificate_chain::add_certificate( MRef<certificate *> cert ){
 		if( lastCert->get_issuer() != cert->get_name() ){
 			throw certificate_exception_chain(
 			 	"The previous certificate in the chain is not"
-				"issued by the given one" );
+				" issued by the given one" );
 		}
 	}
 	
