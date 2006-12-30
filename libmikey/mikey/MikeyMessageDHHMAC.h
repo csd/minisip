@@ -52,11 +52,6 @@ class LIBMIKEY_API MikeyMessageDHHMAC: public MikeyMessage{
 		int32_t keyAgreementType() const;
 
 	private:
-		bool deriveTranspKeys( KeyAgreementDHHMAC* ka,
-				       byte_t*& authKey,
-				       unsigned int& authKeyLength,
-				       int encrAlg, int macAlg,
-				       MikeyMessage* errorMessage = NULL );
 };
 		
 #endif

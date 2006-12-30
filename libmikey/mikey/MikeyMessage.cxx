@@ -755,6 +755,7 @@ bool MikeyMessage::deriveTranspKeys( KeyAgreementPSK* ka,
 			}
 	}
 
+	ka->macAlg = macAlg;
 	ka->authKey = authKey;
 	ka->authKeyLength = authKeyLength;
 	return !error;

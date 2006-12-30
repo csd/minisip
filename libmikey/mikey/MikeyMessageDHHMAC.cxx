@@ -47,52 +47,6 @@ using namespace std;
 MikeyMessageDHHMAC::MikeyMessageDHHMAC(){
 }
 
-bool MikeyMessageDHHMAC::deriveTranspKeys( KeyAgreementDHHMAC* ka,
-					   byte_t*& authKey, unsigned int& authKeyLength,
-					   int encrAlg, int macAlg,
-					   MikeyMessage* errorMessage ){
-	bool error = false;
-
-	authKeyLength = 0;
-	authKey = NULL;
-
-	switch( encrAlg ){
-		case MIKEY_ENCR_NULL:
-			break;
-		default:
-			error = true;
-			if( errorMessage ){
-				errorMessage->addPayload( 
-					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_EA ) );
-			}
-			else{
-				throw MikeyException( "Unknown encryption algorithm" );
-			}
-	}			
-
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			authKeyLength = 20;
-			authKey = new byte_t[ authKeyLength ];
-			ka->genTranspAuthKey( authKey, authKeyLength );
-			break;
-		case MIKEY_MAC_NULL:
-			break;
-		default:
-			error = true;
-			if( errorMessage ){
-				errorMessage->addPayload( 
-					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_HA ) );
-			}
-			else{
-				throw MikeyException( "Unknown MAC algorithm" );
-			}
-				
-	}
-
-	return !error;
-}
-
 MikeyMessageDHHMAC::MikeyMessageDHHMAC( KeyAgreementDHHMAC * ka,
 					int macAlg){
 
@@ -124,12 +78,19 @@ MikeyMessageDHHMAC::MikeyMessageDHHMAC( KeyAgreementDHHMAC * ka,
 					ka->keyValidity() ) );
 
 	// Add KEMAC
-	byte_t* authKey = NULL;
-	unsigned int authKeyLength = 0;
+	byte_t* encrKey = NULL;
+	byte_t* iv = NULL;
+	unsigned int encrKeyLength = 0;
 	int encrAlg = MIKEY_ENCR_NULL;
-	deriveTranspKeys( ka, authKey, authKeyLength, encrAlg, macAlg, NULL );
-	addKemacPayload( NULL, 0, NULL, NULL, authKey,
-			 encrAlg, macAlg );
+	MikeyMessage::deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+					encrAlg, macAlg, 0, NULL );
+	addKemacPayload( NULL, 0, NULL, NULL, ka->authKey,
+			 encrAlg, ka->macAlg );
+	
+	if( encrKey )
+		delete[] encrKey;
+	if( iv )
+		delete[] iv;
 }
 //-----------------------------------------------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------//
@@ -249,15 +210,21 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
 
-	byte_t * authKey = NULL;
-	unsigned int authKeyLength = 0;
+	byte_t* encrKey = NULL;
+	byte_t* iv = NULL;
+	unsigned int encrKeyLength = 0;
 
-	error |= !deriveTranspKeys( ka, authKey, authKeyLength, encrAlg, macAlg, errorMessage );
-	ka->setAuthKey( macAlg, authKey, authKeyLength);
+
+	error |= !deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+				    encrAlg, macAlg, 0, errorMessage );
+// 	ka->setAuthKey( macAlg, authKey, authKeyLength);
+
+	if( encrKey )
+		delete[] encrKey;
+	if( iv )
+		delete[] iv;
 
 	if( error ){
-		if( authKey != NULL )
-			delete [] authKey;
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
 #undef kemac
@@ -297,17 +264,21 @@ MikeyMessage * MikeyMessageDHHMAC::buildResponse( KeyAgreement * kaBase ){
 				    ka->keyValidity() ) );
 
 	// KEMAC
-	byte_t * authKey;
-	unsigned int authKeyLength;
+	byte_t * encrKey = NULL;
+	byte_t * iv = NULL;
+	unsigned int encrKeyLength = 0;
 	int encrAlg = MIKEY_ENCR_NULL;
 
-	deriveTranspKeys( ka, authKey, authKeyLength, encrAlg, ka->getMacAlg(), NULL );
+	deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+			  encrAlg, ka->macAlg, 0, NULL );
 
-	result->addKemacPayload( NULL, 0, NULL, NULL, authKey,
-				 encrAlg, ka->getMacAlg() );
+	result->addKemacPayload( NULL, 0, NULL, NULL, ka->authKey,
+				 encrAlg, ka->macAlg );
 
-	if( authKey )
-		delete[] authKey;
+	if( encrKey )
+		delete[] encrKey;
+	if( iv )
+		delete[] iv;
 
 	return result;
 }

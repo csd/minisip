@@ -37,14 +37,11 @@ using namespace std;
 KeyAgreementDHHMAC::KeyAgreementDHHMAC( unsigned char * pskPtr,
 					int pskLengthValue,
 					int groupValue )
-		:KeyAgreement(), pskPtr( NULL ), pskLengthValue( 0 ),
-		 dh( NULL ), peerKeyPtr( NULL ), peerKeyLengthValue( 0 ),
-		 tSentValue( 0 ), t_received( 0 ), m_authKey( NULL ),
-		 m_authKeyLength( 0 ), m_macAlg( 0 ){
+		:KeyAgreementPSK(pskPtr, pskLengthValue),
+		 dh( NULL ), peerKeyPtr( NULL ), peerKeyLengthValue( 0 ){
+// 		 m_authKey( NULL ),
+// 		 m_authKeyLength( 0 ), m_macAlg( 0 ){
 	typeValue = KEY_AGREEMENT_TYPE_DHHMAC;
-	this->pskLengthValue = pskLengthValue;
-	this->pskPtr = new unsigned char[ pskLengthValue ];
-	memcpy( this->pskPtr, pskPtr, pskLengthValue );
 	dh = new OakleyDH();
 	if( dh == NULL )
 	{
@@ -59,9 +56,6 @@ KeyAgreementDHHMAC::KeyAgreementDHHMAC( unsigned char * pskPtr,
 }
 
 KeyAgreementDHHMAC::~KeyAgreementDHHMAC(){
-	if( pskPtr ){
-		delete [] pskPtr;
-	}
 }
 
 int KeyAgreementDHHMAC::setGroup( int groupValue ){
@@ -85,16 +79,16 @@ int KeyAgreementDHHMAC::group(){
 
 }
 
-void KeyAgreementDHHMAC::setAuthKey( int macAlg, byte_t *authKey,
-				     unsigned int authKeyLength ){
-	m_macAlg = macAlg;
-	m_authKey = authKey;
-	m_authKeyLength = authKeyLength;
-}
+// void KeyAgreementDHHMAC::setAuthKey( int macAlg, byte_t *authKey,
+// 				     unsigned int authKeyLength ){
+// 	m_macAlg = macAlg;
+// 	m_authKey = authKey;
+// 	m_authKeyLength = authKeyLength;
+// }
 
-int KeyAgreementDHHMAC::getMacAlg(){
-	return m_macAlg;
-}
+// int KeyAgreementDHHMAC::getMacAlg(){
+// 	return m_macAlg;
+// }
 
 void KeyAgreementDHHMAC::setPeerKey( unsigned char * peerKeyPtr,
 			      int peerKeyLengthValue ){
@@ -134,20 +128,6 @@ int KeyAgreementDHHMAC::computeTgk(){
 	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue,
 				     tgkPtr, tgkLengthValue );
 	return res;
-}
-
-void KeyAgreementDHHMAC::genTranspAuthKey( 
-		unsigned char * encrKey, int encrKeyLength ){
-	keyDeriv( 0xFF, csbIdValue, pskPtr, pskLengthValue, 
-			encrKey, encrKeyLength, KEY_DERIV_TRANS_AUTH );
-}
-
-uint64_t KeyAgreementDHHMAC::tSent(){
-	return tSentValue;
-}
-
-void KeyAgreementDHHMAC::setTSent( uint64_t tSent ){
-	this->tSentValue = tSent;
 }
 
 MikeyMessage* KeyAgreementDHHMAC::createMessage(){

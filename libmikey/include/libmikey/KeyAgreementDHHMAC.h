@@ -29,7 +29,7 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<libmikey/keyagreement.h>
+#include<libmikey/keyagreement_psk.h>
 #include<libmcrypto/OakleyDH.h>
 #include<libmutil/mtypes.h>
 
@@ -38,7 +38,7 @@
  * for Multimedia Internet KEYing (MIKEY)
  * RFC 4650
  */
-class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreement{
+class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreementPSK{
 	public:
 		KeyAgreementDHHMAC( byte_t * psk, int pskLength,
 				    int groupValue = -1 );
@@ -47,9 +47,9 @@ class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreement{
 		int setGroup( int group );
 		int group();
 
-		void setAuthKey( int macAlg, byte_t *authKey,
-				 unsigned int authKeyLength );
-		int getMacAlg();
+// 		void setAuthKey( int macAlg, byte_t *authKey,
+// 				 unsigned int authKeyLength );
+// 		int getMacAlg();
 
 		void setPeerKey( byte_t * peerKey, int peerKeyLength );
 		int peerKeyLength();
@@ -60,26 +60,17 @@ class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreement{
 
 		int computeTgk();
 
-		void genTranspAuthKey( byte_t * encrKey, int encrKeyLength );
-
-		uint64_t tSent();
-		void setTSent( uint64_t tSent );
-
 		MikeyMessage* createMessage();
 
 	private:
-		byte_t * pskPtr;
-		int pskLengthValue;
 		OakleyDH * dh;
 
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
 
-		uint64_t tSentValue;
-		uint64_t t_received;
-		byte_t * m_authKey;
-		unsigned int m_authKeyLength;
-		int m_macAlg;
+// 		byte_t * m_authKey;
+// 		unsigned int m_authKeyLength;
+// 		int m_macAlg;
 };
 
 #endif
