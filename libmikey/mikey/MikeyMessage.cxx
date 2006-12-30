@@ -683,3 +683,79 @@ int32_t MikeyMessage::keyAgreementType() const{
 	throw MikeyExceptionUnimplemented(
 		"Unimplemented type of MIKEY message" );
 }
+
+bool MikeyMessage::deriveTranspKeys( KeyAgreementPSK* ka,
+					byte_t*& encrKey, byte_t *& iv,
+					unsigned int& encrKeyLength,
+					int encrAlg, int macAlg,
+					uint64_t t,
+					MikeyMessage* errorMessage ){
+	// Derive the transport keys from the env_key:
+	byte_t* authKey = NULL;
+	bool error = false;
+	unsigned int authKeyLength = 0;
+	int i;
+
+	encrKey = NULL;
+	iv = NULL;
+	encrKeyLength = 0;
+
+	switch( encrAlg ){
+		case MIKEY_ENCR_AES_CM_128: {
+			byte_t saltKey[14];
+			encrKeyLength = 16;
+			encrKey = new byte_t[ encrKeyLength ];
+			ka->genTranspEncrKey(encrKey, encrKeyLength);
+			ka->genTranspSaltKey(saltKey, sizeof(saltKey));
+			iv = new byte_t[ encrKeyLength ];
+			iv[0] = saltKey[0];
+			iv[1] = saltKey[1];
+			for( i = 2; i < 6; i++ ){
+				iv[i] = saltKey[i] ^ (ka->csbId() >> (5-i)*8) & 0xFF;
+			}
+
+			for( i = 6; i < 14; i++ ){
+				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)) & 0xFF);
+			}
+			iv[14] = 0x00;
+			iv[15] = 0x00;
+			break;
+		}
+		case MIKEY_ENCR_NULL:
+			break;
+		case MIKEY_ENCR_AES_KW_128:
+			//TODO
+		default:
+			error = true;
+			if( errorMessage ){
+				errorMessage->addPayload( 
+					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_EA ) );
+			}
+			else{
+				throw MikeyException( "Unknown encryption algorithm" );
+			}
+	}
+	switch( macAlg ){
+		case MIKEY_MAC_HMAC_SHA1_160:
+			authKeyLength = 20;
+			authKey = new byte_t[ authKeyLength ];
+			ka->genTranspAuthKey(authKey, authKeyLength);
+			break;
+		case MIKEY_MAC_NULL:
+			authKey = NULL;
+			break;
+		default:
+			error = true;
+			if( errorMessage ){
+				errorMessage->addPayload( 
+					new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_HA ) );
+			}
+			else{
+				throw MikeyException( "Unknown MAC algorithm" );
+			}
+	}
+
+	ka->authKey = authKey;
+	ka->authKeyLength = authKeyLength;
+	return !error;
+}

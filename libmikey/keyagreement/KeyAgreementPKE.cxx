@@ -7,59 +7,23 @@
 
 
 KeyAgreementPKE::KeyAgreementPKE( MRef<certificate*> pubKeyResponderT, int envKeyLength )
-		:KeyAgreement(), envKey(NULL),envKeyLengthValue(0),tSentValue(0){
+		:KeyAgreementPSK(){
 										
 	typeValue = KEY_AGREEMENT_TYPE_PK;
 	
 	//envelope key to encrypt KEMAC payload
-	envKeyLengthValue = envKeyLength;
-	envKey = new byte_t[ envKeyLengthValue ];
-	Rand::randomize( envKey, envKeyLengthValue );
+	byte_t envKey[ envKeyLength ];
+	Rand::randomize( envKey, envKeyLength );
+	setPSK( envKey, envKeyLength );
 
 	//public key to encrypt PKE payload
 	pubKeyResponder = pubKeyResponderT;
 	
 	//verification set
-	v = 1;
+	setV(1);
 }
 
 KeyAgreementPKE::~KeyAgreementPKE(){
-	if(envKey)
-		delete [] envKey;
-}
-
-void KeyAgreementPKE::generateTgk(uint32_t tgkLength){
-	typeValue = KEY_AGREEMENT_TYPE_PK;
-	this->tgkLengthValue = tgkLength;
-	if( tgkPtr ){
-		delete [] tgkPtr;
-	}
-	
-	tgkPtr = new unsigned char[tgkLength];
-	Rand::randomize(tgkPtr, tgkLength);
-}
-
-void KeyAgreementPKE::genTranspEncrKey(byte_t* encrKey, int encrKeyLength){
-	keyDeriv(0xFF, csbIdValue, envKey, envKeyLengthValue, 
-			encrKey, encrKeyLength, KEY_DERIV_TRANS_ENCR);
-}
-
-void KeyAgreementPKE::genTranspSaltKey(byte_t* encrKey, int encrKeyLength){
-	keyDeriv(0xFF, csbIdValue, envKey, envKeyLengthValue, 
-			encrKey, encrKeyLength, KEY_DERIV_TRANS_SALT);
-}
-
-void KeyAgreementPKE::genTranspAuthKey(byte_t* encrKey, int encrKeyLength){
-	keyDeriv(0xFF, csbIdValue, envKey, envKeyLengthValue, 
-			encrKey, encrKeyLength, KEY_DERIV_TRANS_AUTH);
-}
-
-void KeyAgreementPKE::setTSent(uint64_t tSent){
-	tSentValue = tSent;
-}
-
-uint64_t KeyAgreementPKE::tSent(){
-	return tSentValue;
 }
 
 MRef<certificate*> KeyAgreementPKE::getPublicKey(void){
@@ -67,32 +31,19 @@ MRef<certificate*> KeyAgreementPKE::getPublicKey(void){
 }
 
 byte_t* KeyAgreementPKE::getEnvelopeKey(void){
-	return envKey;
+	return getPSK();
 }
 
 int KeyAgreementPKE::getEnvelopeKeyLength(){
-	return envKeyLengthValue;	
+	return getPSKLength();
 }
 
 void KeyAgreementPKE::setEnvelopeKey( const byte_t *aEnvKey,
 				      size_t aEnvKeyLength ){
-	if( envKey ){
-		delete[] envKey;
-		envKey = NULL;
-	}
-
-	envKeyLengthValue = aEnvKeyLength;
-	envKey = new byte_t[ envKeyLengthValue ];
-	memcpy( envKey, aEnvKey, aEnvKeyLength );
+	setPSK( aEnvKey, aEnvKeyLength );
 }
 	
 
-#ifdef HAVE_OPENSSL
 MikeyMessage* KeyAgreementPKE::createMessage(){
 	return MikeyMessage::create( this );
 }
-#else
-MikeyMessage* KeyAgreementPKE::createMessage(){
-	throw MikeyExceptionUnimplemented("MIKEY PKE not supported");
-}
-#endif	// HAVE_OPENSSL

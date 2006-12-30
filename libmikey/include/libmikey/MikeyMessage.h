@@ -172,6 +172,13 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
 		virtual int32_t keyAgreementType() const;
 
 	protected:
+		/** Derive the transport keys from the env_key and set ka auth key */
+		bool deriveTranspKeys( KeyAgreementPSK* ka,
+				       byte_t*& encrKey, byte_t *& iv,
+				       unsigned int& encrKeyLength,
+				       int encrAlg, int macAlg,
+				       uint64_t t,
+				       MikeyMessage* errorMessage );
 
 	private:
 };

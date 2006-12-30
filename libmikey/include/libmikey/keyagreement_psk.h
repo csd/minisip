@@ -34,32 +34,93 @@
 class LIBMIKEY_API KeyAgreementPSK : public KeyAgreement{
 	public:
 		KeyAgreementPSK( byte_t * psk, int pskLength );
-		~KeyAgreementPSK();
+		virtual ~KeyAgreementPSK();
 
+		/**
+		 * Generates a TGK of de given length with the random function from the
+		 * OpenSSL library and stores it in this instance
+		 */
 		void generateTgk( uint32_t tgkLength = 192 );
 
+		/**
+		 * Generates and stores the transport encryption key of the given length.
+		 * It is derived by the envelope key
+		 */
 		void genTranspEncrKey( byte_t * encrKey, int encrKeyLength );
 
-		void genTranspSaltKey( byte_t * encrKey, int encrKeyLength );
+		/**
+		 * Generates and stores the salting key of the given length.
+		 * It is also derived by the envelope key
+		 */
+		void genTranspSaltKey( byte_t * saltKey, int saltKeyLength );
 		
-		void genTranspAuthKey( byte_t * encrKey, int encrKeyLength );
+		/**
+		 * Creates and stores the authentication key to authenticate the MAC/signature
+		 * of the MIKEY message.
+		 */
+		void genTranspAuthKey( byte_t * authKey, int authKeyLength );
 
+		/**
+		 * Returns the timestamp on which the message was sent
+		 */
 		uint64_t tSent();
+
+		/**
+		 * Sets the timestamp
+		 */
 		void setTSent( uint64_t tSent );
 
+		/**
+		 * Timestamp on which the message was received
+		 */
 		uint64_t t_received;
+
+		/**
+		 * Authentication key
+		 */
 		byte_t * authKey;
+
+		/**
+		 * Length of the authentication key
+		 */
 		unsigned int authKeyLength;
+
+		/**
+		 * If the V bit is set by the initiator, the responder has to send a
+		 * verification message.
+		 */
 		void setV(int value) {v=value;}
+
+		/**
+		 * Used to test if the V bit is set.
+		 */
 		int getV() {return v;}
+
+		/**
+		 * MAC algorithmus (HMAC-SHA1)
+		 */
 		int macAlg;
 
-		MikeyMessage* createMessage();
+		virtual MikeyMessage* createMessage();
+
+	protected:
+		KeyAgreementPSK();
+		void setPSK( const byte_t* psk, int pskLength );
+		byte_t* getPSK();
+		int getPSKLength();
 
 	private:
 		byte_t * pskPtr;
 		int pskLengthValue;
+
+		/**
+		 * The V bit
+		 */
 		int v;
+
+		/**
+		 * Timestamp from when the message was sent
+		 */
 		uint64_t tSentValue;
 };
 

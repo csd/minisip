@@ -27,6 +27,11 @@
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/keyagreement_psk.h>
 
+KeyAgreementPSK::KeyAgreementPSK():
+		KeyAgreement(),t_received(0),authKey(NULL),authKeyLength(0),
+		macAlg(0),pskPtr(NULL),pskLengthValue(0),v(0),tSentValue(0){
+}
+
 KeyAgreementPSK::KeyAgreementPSK( unsigned char * pskPtr, int pskLengthValue )
 	:KeyAgreement(), tSentValue( 0 ){
 	//policy = list<Policy_type *>::list();
@@ -45,7 +50,7 @@ KeyAgreementPSK::~KeyAgreementPSK(){
 }
 
 void KeyAgreementPSK::generateTgk( uint32_t tgkLength ){
-	typeValue = KEY_AGREEMENT_TYPE_PSK;
+// 	typeValue = KEY_AGREEMENT_TYPE_PSK;
 	this->tgkLengthValue = tgkLength;
 	if( tgkPtr ){
 		delete [] tgkPtr;
@@ -83,4 +88,23 @@ void KeyAgreementPSK::setTSent( uint64_t tSent ){
 
 MikeyMessage* KeyAgreementPSK::createMessage(){
 	return MikeyMessage::create( this );
+}
+
+void KeyAgreementPSK::setPSK( const byte_t* psk, int pskLength ){
+	if( pskPtr ){
+		delete[] pskPtr;
+		pskPtr = NULL;
+	}
+
+	pskLengthValue = pskLength;
+	pskPtr = new byte_t[ pskLength ];
+	memcpy( pskPtr, psk, pskLength );
+}
+
+int KeyAgreementPSK::getPSKLength(){
+	return pskLengthValue;
+}
+
+byte_t* KeyAgreementPSK::getPSK(){
+	return pskPtr;
 }
