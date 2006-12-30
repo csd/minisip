@@ -73,50 +73,12 @@ MikeyMessagePSK::MikeyMessagePSK( KeyAgreementPSK * ka,
 				randPayload->randLength() );
 
 	// Derive the transport keys from the PSK:
-	byte_t * encrKey;
-	byte_t * authKey;
-	byte_t * saltKey;
-	byte_t iv[16];
-	int i;
+	byte_t * encrKey = NULL;
+	byte_t * iv = NULL;
+	unsigned int encrKeyLength = 0;
 
-	switch( encrAlg ){
-		case MIKEY_ENCR_AES_CM_128:
-			encrKey = new byte_t[16];
-			ka->genTranspEncrKey( encrKey, 16 );
-			saltKey = new byte_t[14];
-			ka->genTranspSaltKey( saltKey, 14 );
-			iv[0] = saltKey[0];
-			iv[1] = saltKey[1];
-			for( i = 2; i < 6; i++ ){
-				iv[i] = saltKey[i] ^ (csbId >> (5-i)*8) & 0xFF;
-			}
-
-			for( i = 6; i < 14; i++ ){
-				iv[i] = (byte_t)(saltKey[i] ^ (t >> (13-i)*8) & 0xFF);
-			}
-			iv[14] = 0x00;
-			iv[15] = 0x00;
-			break;
-		case MIKEY_ENCR_NULL:
-			encrKey = NULL;
-			saltKey = NULL;
-			break;
-		case MIKEY_ENCR_AES_KW_128:
-			//TODO
-		default:
-			throw MikeyException( "Unknown encryption algorithm" );
-	}
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			authKey = new byte_t[20];
-			ka->genTranspAuthKey( authKey, 20 );
-			break;
-		case MIKEY_MAC_NULL:
-			authKey = NULL;
-			break;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
-	}
+	deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+			  encrAlg, macAlg, t, NULL );
 	
 	MikeyPayloadKeyData * keydata = 
 		new MikeyPayloadKeyData( 
@@ -129,18 +91,15 @@ MikeyMessagePSK::MikeyMessagePSK( KeyAgreementPSK * ka,
 	
 	addKemacPayload( rawKeyData,
 			 keydata->length(),
-			 encrKey, iv, authKey,
+			 encrKey, iv, ka->authKey,
 			 encrAlg, macAlg );
 
 	if( encrKey != NULL )
 		delete [] encrKey;
 
-	if( saltKey != NULL )
-		delete [] saltKey;
+	if( iv != NULL )
+		delete [] iv;
 	
-	if( authKey != NULL )
-		delete [] authKey;
-
 	delete keydata;
 	delete [] rawKeyData;
 }
@@ -251,75 +210,21 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 
 	// Derive the transport keys
 	byte_t * encrKey=NULL;
-	byte_t * authKey=NULL;
-	byte_t * saltKey=NULL;
-	byte_t iv[16];
-	unsigned int authKeyLength = 0;
+	byte_t * iv=NULL;
 	unsigned int encrKeyLength = 0;
-	int j;
 	
-	switch( encrAlg ){
-		case MIKEY_ENCR_AES_CM_128:
-			encrKeyLength = 16;
-			encrKey = new byte_t[16];
-			ka->genTranspEncrKey( encrKey, 16 );
-			saltKey = new byte_t[14];
-			ka->genTranspSaltKey( saltKey, 14 );
-			iv[0] = saltKey[0];
-			iv[1] = saltKey[1];
-			for( j = 2; j < 6; j++ ){
-				iv[j] = saltKey[j] ^ (ka->csbId() >> (5-j)*8) & 0xFF;
-			}
-
-			for( j = 6; j < 14; j++ ){
-				iv[j] = (byte_t)(saltKey[j] ^ (ka->t_received >> (13-j)*8) & 0xFF);
-			}
-			iv[14] = 0x00;
-			iv[15] = 0x00;
-			break;
-		case MIKEY_ENCR_NULL:
-			encrKey = NULL;
-			saltKey = NULL;
-			break;
-		case MIKEY_ENCR_AES_KW_128:
-			//TODO
-		default:
-			error = true;
-			errorMessage->addPayload( 
-				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_EA ) );
-	}
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			authKeyLength = 20;
-			authKey = new byte_t[20];
-			ka->genTranspAuthKey( authKey, 20 );
-			ka->authKey = authKey;
-			ka->authKeyLength = authKeyLength;
-			break;
-		case MIKEY_MAC_NULL:
-			authKey = NULL;
-			ka->authKey = NULL;
-			break;
-		default:
-			error = true;
-			errorMessage->addPayload( 
-				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_HA ) );
-	}
-
-	if( error ){
-		if( authKey != NULL )
-			delete [] authKey;
+	if( !deriveTranspKeys( ka, encrKey, iv, encrKeyLength, encrAlg,
+			       macAlg, ka->t_received, errorMessage ) ){
 		if( encrKey != NULL )
 			delete [] encrKey;
-		if( saltKey != NULL )
-			delete [] saltKey;
+		if( iv != NULL )
+			delete [] iv;
 		
 		// We always build the error message with HMAC_SHA1, not
 		// sure about this
 
-		authKeyLength = 20;
-		authKey = new byte_t[20];
+		unsigned int authKeyLength = 20;
+		byte_t* authKey = new byte_t[20];
 		ka->genTranspAuthKey( authKey, 20 );
 		
 		errorMessage->addVPayload( MIKEY_MAC_HMAC_SHA1_160, 
@@ -347,10 +252,10 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 	ka->setKeyValidity( keyData->kv() );
 #undef kemac
 
-if( encrKey != NULL )
-	delete [] encrKey;
-if( saltKey != NULL )
-	delete [] saltKey;
+	if( encrKey != NULL )
+		delete [] encrKey;
+	if( iv != NULL )
+		delete [] iv;
 }
 
 //-----------------------------------------------------------------------------------------------//
