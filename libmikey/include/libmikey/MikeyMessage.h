@@ -54,6 +54,8 @@
 #define MIKEY_TYPE_ERROR       6
 #define MIKEY_TYPE_DHHMAC_INIT 7
 #define MIKEY_TYPE_DHHMAC_RESP 8
+#define MIKEY_TYPE_RSA_R_INIT  9
+#define MIKEY_TYPE_RSA_R_RESP 10
 
 #define MIKEY_ENCR_NULL       0
 #define MIKEY_ENCR_AES_CM_128 1
@@ -69,32 +71,11 @@ class SipSim;
 class certificate;
 class certificate_db;
 
-/**
- * MikeyMessages can be created in three different ways.
- * 1. new MikeyMessages creats an empty message
- * 2. MikeyMessage::create creats a message from a keyagreement
- * 3. MikeyMessage::parse creats a message from a binary representation
- */
-class LIBMIKEY_API MikeyMessage{
+class LIBMIKEY_API MikeyPayloads{
 	public:
- 		MikeyMessage();
-		static MikeyMessage* create( KeyAgreementDH * ka );
-		static MikeyMessage* create( KeyAgreementDHHMAC * ka,
-					     int macAlg = MIKEY_MAC_HMAC_SHA1_160);
-		static MikeyMessage* create( KeyAgreementPSK * ka,
-			      int encrAlg = MIKEY_ENCR_AES_CM_128, 
-			      int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );
-		
-		//added by choehn
-		static MikeyMessage* create(KeyAgreementPKE* ka,
-				  int encrAlg = MIKEY_ENCR_AES_CM_128,
-				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
-				  MRef<certificate*> certInitiator = NULL);
-
-		static MikeyMessage* parse( byte_t *message, int lengthLimit );
-		static MikeyMessage* parse( std::string b64Message );
-
-		virtual ~MikeyMessage();
+ 		MikeyPayloads();
+		MikeyPayloads( int firstPayloadType, byte_t *message, int lengthLimit );
+		virtual ~MikeyPayloads();
 		
 		void addPayload( MikeyPayload * payload );
 		void operator+=( MikeyPayload * payload );
@@ -119,10 +100,66 @@ class LIBMIKEY_API MikeyMessage{
 		const MikeyPayload * extractPayload( int type ) const;
 		void remove( MikeyPayload * );
 
+		std::string b64Message();
+
+	protected:
+		static void parse( int firstPayloadType,
+				   byte_t *message, int lengthLimit, 
+				   std::list<MikeyPayload *>& payloads);
+
+		void addPolicyToPayload(KeyAgreement * ka);
+		void addPolicyTo_ka(KeyAgreement * ka);
+
+		/**
+		 * Store pointer to raw data.
+		 * It's owned by this object,
+		 * and will be deleted in destructor.
+		 */
+		void setRawMessageData( byte_t *data );
+
+		std::list<MikeyPayload *> payloads;
+
+	private:
+		void compile();
+		bool compiled;
+		byte_t *rawData;
+
+};
+
+/**
+ * MikeyMessages can be created in three different ways.
+ * 1. new MikeyMessages creats an empty message
+ * 2. MikeyMessage::create creats a message from a keyagreement
+ * 3. MikeyMessage::parse creats a message from a binary representation
+ */
+class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
+	public:
+ 		MikeyMessage();
+		static MikeyMessage* create( KeyAgreementDH * ka );
+		static MikeyMessage* create( KeyAgreementDHHMAC * ka,
+					     int macAlg = MIKEY_MAC_HMAC_SHA1_160);
+		static MikeyMessage* create( KeyAgreementPSK * ka,
+			      int encrAlg = MIKEY_ENCR_AES_CM_128, 
+			      int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );
+		
+		//added by choehn
+		static MikeyMessage* create(KeyAgreementPKE* ka,
+				  int encrAlg = MIKEY_ENCR_AES_CM_128,
+				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
+				  MRef<certificate*> certInitiator = NULL);
+
+		/**
+		 * Parse MIKEY message from binary representation
+		 * @arg message is owned by this object,
+		 * and will be deleted in destructor.
+		 */
+		static MikeyMessage* parse( byte_t *message, int lengthLimit );
+		static MikeyMessage* parse( std::string b64Message );
+
+		virtual ~MikeyMessage();
+		
 		int type() const;
 		uint32_t csbId();
-
-		std::string b64Message();
 
 		virtual MikeyMessage * parseResponse( KeyAgreement  * ka );
 		virtual void setOffer( KeyAgreement * ka );
@@ -134,19 +171,8 @@ class LIBMIKEY_API MikeyMessage{
 		virtual int32_t keyAgreementType() const;
 
 	protected:
-		void addPolicyToPayload(KeyAgreement * ka);
-		void addPolicyTo_ka(KeyAgreement * ka);
-
-		std::list<MikeyPayload *> payloads;
 
 	private:
-		static void parse( byte_t *message,
-				   int lengthLimit,
-				   std::list<MikeyPayload *>& payloads);
-		void compile();
-		bool compiled;
-		byte_t *rawData;
-		
 };
 
 #endif

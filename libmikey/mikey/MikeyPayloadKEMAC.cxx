@@ -146,15 +146,12 @@ byte_t * MikeyPayloadKEMAC::macData(){
 	return macDataPtr;
 }
 
-list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData( 
+MikeyPayloads* MikeyPayloadKEMAC::decodePayloads( int firstPayloadType,
 		byte_t * encrKey, int encrKeyLength,
 		byte_t * iv){
 	
 	byte_t * decrData = new byte_t[ encrDataLengthValue ];
 	AES * aes;
-	int limit = encrDataLengthValue;
-	list<MikeyPayloadKeyData *> output;
-	MikeyPayloadKeyData * payload;
 
 	switch( encrAlgValue ){
 		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_CM_128:
@@ -175,13 +172,9 @@ list<MikeyPayloadKeyData *> MikeyPayloadKEMAC::keyData(
 			break;
 	}
 
-	do{
-	output.push_back( 
-		payload = new MikeyPayloadKeyData( decrData, limit ) );
-	limit -= payload->length();
-	} while( payload->nextPayloadType() != MIKEYPAYLOAD_LAST_PAYLOAD );
-
-	assert( limit == 0 );
+	MikeyPayloads *output =
+		new MikeyPayloads( firstPayloadType, decrData,
+				   encrDataLengthValue );
 	delete [] decrData;
 	return output;
 }

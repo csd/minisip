@@ -40,6 +40,8 @@
 #define MIKEY_PAYLOAD_KEMAC_ENCR_AES_CM_128 1
 #define MIKEY_PAYLOAD_KEMAC_ENCR_AES_KW_128 2
 
+class MikeyPayloads;
+
 /**
  * @author Erik Eliasson, Johan Bilien
 */
@@ -61,7 +63,10 @@ class LIBMIKEY_API MikeyPayloadKEMAC : public MikeyPayload{
 		int encrDataLength();
 		byte_t * encrData();
 
-		std::list<MikeyPayloadKeyData *> keyData(
+		/**
+		 * @return MikeyPayloads object owned by the caller.
+		 */
+		MikeyPayloads* decodePayloads( int firstPayloadType,
 			      byte_t * encrKey, int encrKeyLength,
 			      byte_t * iv );
 

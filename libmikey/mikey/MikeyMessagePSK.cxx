@@ -330,15 +330,21 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 	}
 
 	// decrypt the TGK
-	list<MikeyPayloadKeyData *>::iterator iKeyData = 
-		kemac->keyData( encrKey, encrKeyLength, iv ).begin();
+	// TODO handle parse failure.
+	MikeyPayloads* subPayloads = 
+		kemac->decodePayloads( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE,
+				 encrKey, encrKeyLength, iv );
+	list<MikeyPayload *>::iterator iPayload =
+		subPayloads->firstPayload();
+	MikeyPayloadKeyData *keyData =
+		dynamic_cast<MikeyPayloadKeyData*>(*iPayload);
 	// FIXME: assume only one KeyData subpayload, I don't know what
 	// to do of more keys. Ask Ericsson
-	int tgkLength = (*iKeyData)->keyDataLength();
-	byte_t * tgk = (*iKeyData)->keyData();
+	int tgkLength = keyData->keyDataLength();
+	byte_t * tgk = keyData->keyData();
 
 	ka->setTgk( tgk, tgkLength );
-	ka->setKeyValidity( (*iKeyData)->kv() );
+	ka->setKeyValidity( keyData->kv() );
 #undef kemac
 
 if( encrKey != NULL )

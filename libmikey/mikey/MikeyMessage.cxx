@@ -59,7 +59,17 @@
 
 using namespace std;
 
-MikeyMessage::MikeyMessage():compiled(false), rawData(NULL){
+
+MikeyPayloads::MikeyPayloads():compiled(false), rawData(NULL){
+}
+
+MikeyPayloads::MikeyPayloads( int firstPayloadType, byte_t *message, int lengthLimit )
+		:compiled(true), rawData(message)
+{
+	parse( firstPayloadType, message, lengthLimit, payloads );
+}
+
+MikeyMessage::MikeyMessage(){
 
 }
 
@@ -97,7 +107,8 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 {
 	std::list<MikeyPayload *> payloads;
 
-	parse( message, lengthLimit, payloads );
+	MikeyPayloads::parse( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE,
+			      message, lengthLimit, payloads );
 
 	MikeyPayloadHDR *hdr =
 		dynamic_cast<MikeyPayloadHDR*>(*payloads.begin());
@@ -136,8 +147,7 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 				"Unimplemented type of message in INVITE" );
 	}
 
-	msg->compiled = true;
-	msg->rawData = message;
+	msg->setRawMessageData( message );
 	msg->payloads = payloads;
 
 	return msg;
@@ -160,6 +170,9 @@ MikeyMessage* MikeyMessage::parse( string b64Message ){
 	
 
 MikeyMessage::~MikeyMessage(){
+}
+
+MikeyPayloads::~MikeyPayloads(){
 	
 	if( rawData ){
 		delete [] rawData;
@@ -175,13 +188,76 @@ MikeyMessage::~MikeyMessage(){
 	}
 }
 
-void MikeyMessage::parse( byte_t * message, int lengthLimit,
+static MikeyPayload* parsePayload( int payloadType,
+				   byte_t * msgpos, int limit ){
+	MikeyPayload* payload = NULL;
+
+	switch (payloadType){
+		case MIKEYPAYLOAD_HDR_PAYLOAD_TYPE:
+			payload = new MikeyPayloadHDR(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE:
+			payload = new MikeyPayloadKEMAC(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_PKE_PAYLOAD_TYPE:
+			payload = new MikeyPayloadPKE(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_DH_PAYLOAD_TYPE:
+			payload = new MikeyPayloadDH(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE:
+			payload = new MikeyPayloadSIGN(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_T_PAYLOAD_TYPE:
+			payload = new MikeyPayloadT(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_ID_PAYLOAD_TYPE:
+			payload = new MikeyPayloadID(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_CERT_PAYLOAD_TYPE:
+			payload = new MikeyPayloadCERT(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_CHASH_PAYLOAD_TYPE:
+			payload = new MikeyPayloadCHASH(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_V_PAYLOAD_TYPE:
+			payload = new MikeyPayloadV(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_SP_PAYLOAD_TYPE:
+			payload = new MikeyPayloadSP(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_RAND_PAYLOAD_TYPE:
+			payload = new MikeyPayloadRAND(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_ERR_PAYLOAD_TYPE:
+			payload = new MikeyPayloadERR(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE:
+			payload = new MikeyPayloadKeyData(msgpos, limit);
+			break;
+		case MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE:
+			payload = new MikeyPayloadGeneralExtensions(msgpos, limit);
+			break;
+			
+		case MIKEYPAYLOAD_LAST_PAYLOAD:
+			break;
+		default:
+			throw MikeyExceptionMessageContent(
+				"Payload of unrecognized type." );
+	}
+
+	return payload;
+}
+
+void MikeyPayloads::parse( int firstPayloadType,
+			   byte_t * message, int lengthLimit,
 			  std::list<MikeyPayload *>& payloads ){
-	MikeyPayloadHDR * hdr;
+	MikeyPayload * hdr;
 	byte_t * msgpos = message;
 	int limit = lengthLimit;
 						
-	payloads.push_back( hdr = new MikeyPayloadHDR(message, limit) );
+	payloads.push_back( hdr = parsePayload( firstPayloadType,
+						message, limit ) );
 	
 	limit -=  (int)( hdr->end() - msgpos );
 	msgpos = hdr->end();
@@ -191,57 +267,9 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit,
 	while( !(msgpos >= message + lengthLimit ) && 
 			nextPayloadType != MikeyPayload::LastPayload){
 	
-		MikeyPayload *payload;
-		switch (nextPayloadType){
-			case MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE:
-				payload = new MikeyPayloadKEMAC(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_PKE_PAYLOAD_TYPE:
-				payload = new MikeyPayloadPKE(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_DH_PAYLOAD_TYPE:
-				payload = new MikeyPayloadDH(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE:
-				payload = new MikeyPayloadSIGN(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_T_PAYLOAD_TYPE:
-				payload = new MikeyPayloadT(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_ID_PAYLOAD_TYPE:
-				payload = new MikeyPayloadID(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_CERT_PAYLOAD_TYPE:
-				payload = new MikeyPayloadCERT(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_CHASH_PAYLOAD_TYPE:
-				payload = new MikeyPayloadCHASH(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_V_PAYLOAD_TYPE:
-				payload = new MikeyPayloadV(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_SP_PAYLOAD_TYPE:
-				payload = new MikeyPayloadSP(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_RAND_PAYLOAD_TYPE:
-				payload = new MikeyPayloadRAND(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_ERR_PAYLOAD_TYPE:
-				payload = new MikeyPayloadERR(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE:
-				payload = new MikeyPayloadKeyData(msgpos, limit);
-				break;
-			case MIKEYPAYLOAD_GENERALEXTENSIONS_PAYLOAD_TYPE:
-				payload = new MikeyPayloadGeneralExtensions(msgpos, limit);
-				break;
+		MikeyPayload *payload = parsePayload( nextPayloadType,
+						      msgpos, limit );
 
-			case MIKEYPAYLOAD_LAST_PAYLOAD:
-				break;
-			default:
-				throw MikeyExceptionMessageContent(
-					"Payload of unrecognized type." );
-		}
 		nextPayloadType = payload->nextPayloadType();	
 		payloads.push_back( payload );
 		
@@ -257,25 +285,27 @@ void MikeyMessage::parse( byte_t * message, int lengthLimit,
 			"the total length of payloads." );
 }
 
-void MikeyMessage::addPayload(MikeyPayload *payload){
+void MikeyPayloads::addPayload(MikeyPayload *payload){
 
 	compiled = false;
 	// Put the nextPayloadType in the previous payload */
 	if( payload->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		list<MikeyPayload *>::reverse_iterator i = payloads.rbegin();
 
-		(*i)->setNextPayloadType( payload->payloadType() );
+		if( i != payloads.rend() ){
+			(*i)->setNextPayloadType( payload->payloadType() );
+		}
 	}
 
 	payloads.push_back( payload );
 }
 
-void MikeyMessage::operator +=( MikeyPayload * payload ){
+void MikeyPayloads::operator +=( MikeyPayload * payload ){
 	addPayload( payload );
 }
 
 
-void MikeyMessage::addSignaturePayload( MRef<SipSim*> sim ){
+void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	byte_t signature[4096];
 	int signatureLength;
 	MikeyPayloadSIGN * sign;
@@ -301,7 +331,7 @@ void MikeyMessage::addSignaturePayload( MRef<SipSim*> sim ){
 }
 
 
-void MikeyMessage::addSignaturePayload( MRef<certificate *> cert ){
+void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	byte_t signature[4096];
 	int signatureLength;
 	MikeyPayloadSIGN * sign;
@@ -326,7 +356,7 @@ void MikeyMessage::addSignaturePayload( MRef<certificate *> cert ){
 	compiled = false;
 }
 
-void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
+void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
 		                      byte_t * encrKey,
 				      byte_t * iv,
 				      byte_t * authKey,
@@ -387,7 +417,7 @@ void MikeyMessage::addKemacPayload( byte_t * tgk, int tgkLength,
 	delete [] encrData;
 }
 
-void MikeyMessage::addVPayload( int macAlg, uint64_t t,
+void MikeyPayloads::addVPayload( int macAlg, uint64_t t,
 		byte_t * authKey, uint32_t authKeyLength ){
 		MikeyPayloadV * payload;
 		unsigned int hmacOutputLength;
@@ -442,7 +472,7 @@ void MikeyMessage::addVPayload( int macAlg, uint64_t t,
 }
 
 
-void MikeyMessage::compile(){
+void MikeyPayloads::compile(){
 	if (compiled){
 		throw MikeyExceptionMessageContent("BUG: trying to compile already compiled message.");
 	}
@@ -461,14 +491,14 @@ void MikeyMessage::compile(){
 
 }
 
-byte_t *MikeyMessage::rawMessageData(){
+byte_t *MikeyPayloads::rawMessageData(){
 	
 	if (!compiled)
 		compile();
 	return rawData;
 }
 
-int MikeyMessage::rawMessageLength(){
+int MikeyPayloads::rawMessageLength(){
 	list<MikeyPayload *>::iterator i;
 	int length=0;
 	for (i=payloads.begin(); i!=payloads.end(); i++){
@@ -478,7 +508,17 @@ int MikeyMessage::rawMessageLength(){
 	return length;
 }
 
-string MikeyMessage::debugDump(){
+void MikeyPayloads::setRawMessageData( byte_t *data ){
+	if( rawData ){
+		delete[] rawData;
+		rawData = NULL;
+	}
+
+	rawData = data;
+	compiled = true;
+}
+
+string MikeyPayloads::debugDump(){
 	string ret="";
 	list<MikeyPayload *>::iterator i;
 	for (i=payloads.begin(); i!=payloads.end(); i++)
@@ -489,15 +529,15 @@ string MikeyMessage::debugDump(){
 	return ret;
 }
 
-list<MikeyPayload *>::iterator MikeyMessage::firstPayload(){
+list<MikeyPayload *>::iterator MikeyPayloads::firstPayload(){
 	return payloads.begin();
 }
 
-list<MikeyPayload *>::iterator MikeyMessage::lastPayload(){
+list<MikeyPayload *>::iterator MikeyPayloads::lastPayload(){
 	return --payloads.end();
 }
 
-string MikeyMessage::b64Message(){
+string MikeyPayloads::b64Message(){
 	return base64_encode( rawMessageData(), rawMessageLength() );
 }
 
@@ -520,7 +560,7 @@ int MikeyMessage::type() const{
 	return ((MikeyPayloadHDR *)hdr)->dataType();
 }
 
-MikeyPayload * MikeyMessage::extractPayload( int payloadType ){
+MikeyPayload * MikeyPayloads::extractPayload( int payloadType ){
 	list<MikeyPayload *>::iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
@@ -531,7 +571,7 @@ MikeyPayload * MikeyMessage::extractPayload( int payloadType ){
 	return NULL;
 }
 
-const MikeyPayload * MikeyMessage::extractPayload( int payloadType ) const{
+const MikeyPayload * MikeyPayloads::extractPayload( int payloadType ) const{
 	list<MikeyPayload *>::const_iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
@@ -542,7 +582,7 @@ const MikeyPayload * MikeyMessage::extractPayload( int payloadType ) const{
 	return NULL;
 }
 
-void MikeyMessage::remove( MikeyPayload * payload ){
+void MikeyPayloads::remove( MikeyPayload * payload ){
 	list<MikeyPayload *>::iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
@@ -553,7 +593,7 @@ void MikeyMessage::remove( MikeyPayload * payload ){
 	}
 }
 
-void MikeyMessage::addPolicyToPayload(KeyAgreement * ka){
+void MikeyPayloads::addPolicyToPayload(KeyAgreement * ka){
 #define comp (uint16_t)((*iter)->policy_No) << 8 | (uint16_t)((*iter)->prot_type)
 	// Adding policy to payload
 	MikeyPayloadSP *PSP;
@@ -575,7 +615,7 @@ void MikeyMessage::addPolicyToPayload(KeyAgreement * ka){
 #undef comp
 }
 
-void MikeyMessage::addPolicyTo_ka(KeyAgreement * ka){
+void MikeyPayloads::addPolicyTo_ka(KeyAgreement * ka){
 #define SP ((MikeyPayloadSP *)i)
 	// Adding policy to ka
 	int policy_i, policy_j;

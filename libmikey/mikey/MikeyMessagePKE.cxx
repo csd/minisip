@@ -81,15 +81,30 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 			  NULL );
 
 	//adding KEMAC payload
+	MikeyPayloads* subPayloads = new MikeyPayloads();
 	MikeyPayloadKeyData* keydata = 
 		new MikeyPayloadKeyData(KEYDATA_TYPE_TGK, ka->tgk(),
 							ka->tgkLength(), ka->keyValidity());
+	// FIXME get uri from certificate.
+	const char uri[] = "sip:test";
+	MikeyPayloadID* initId =
+		new MikeyPayloadID( MIKEYPAYLOAD_ID_TYPE_URI, strlen( uri ), (byte_t*)uri );
+
+	subPayloads->addPayload( initId );
+	subPayloads->addPayload( keydata );
+	initId = NULL;
+	keydata = NULL;
+
+	unsigned int rawKeyDataLength = subPayloads->rawMessageLength();
+	byte_t* rawKeyData = new byte_t[ rawKeyDataLength ];
+	memcpy( rawKeyData, subPayloads->rawMessageData(), rawKeyDataLength );
 	
-	byte_t* rawKeyData = new byte_t[ keydata->length() ];
-	keydata->writeData(rawKeyData, keydata->length());
-	
-	addKemacPayload(rawKeyData, keydata->length(), encrKey, iv, ka->authKey, encrAlg, macAlg);
-	
+	addKemacPayload(rawKeyData, rawKeyDataLength,
+			encrKey, iv, ka->authKey, encrAlg, macAlg);
+
+	delete subPayloads;
+	subPayloads = NULL;
+
 	//adding PKE payload
 	MRef<certificate*> certResponder = ka->getPublicKey();
 
@@ -113,7 +128,6 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	if( iv != NULL )
 		delete [] iv;
 	
-	delete keydata;
 	delete [] rawKeyData;
 	delete [] encEnvKey;
 }
@@ -307,14 +321,18 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 	}
 	
 	// decrypt the TGK
-	list<MikeyPayloadKeyData *>::iterator iKeyData = 
-		kemac->keyData( encrKey, encrKeyLength, iv ).begin();
+	MikeyPayloads* subPayloads = 
+		kemac->decodePayloads( MIKEYPAYLOAD_ID_PAYLOAD_TYPE,
+				 encrKey, encrKeyLength, iv );
 	
-	int tgkLength = (*iKeyData)->keyDataLength();
-	byte_t * tgk = (*iKeyData)->keyData();
+	MikeyPayloadKeyData *keyData =
+		dynamic_cast<MikeyPayloadKeyData*>(subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE ));
+
+	int tgkLength = keyData->keyDataLength();
+	byte_t * tgk = keyData->keyData();
 
 	ka->setTgk( tgk, tgkLength );
-	ka->setKeyValidity( (*iKeyData)->kv() );
+	ka->setKeyValidity( keyData->kv() );
 #undef kemac
 
 	if( encrKey != NULL )
