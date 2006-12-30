@@ -360,7 +360,8 @@ void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
 		                      byte_t * encrKey,
 				      byte_t * iv,
 				      byte_t * authKey,
-				      int encrAlg, int macAlg ){
+				     int encrAlg, int macAlg,
+				     bool kemacOnly ){
 	byte_t * encrData = new byte_t[ tgkLength ];
 	AES * aes;
 	MikeyPayload * last;
@@ -388,26 +389,40 @@ void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
 	MikeyPayloadKEMAC * payload;
 	byte_t macData[20];
 	unsigned int macDataLength;
+	byte_t* macInput = NULL;
+	byte_t* macInputPtr = NULL;
+	unsigned int macInputLength = 0;
 	
+	payload = new MikeyPayloadKEMAC( encrAlg, tgkLength, encrData,
+					 macAlg, macData );
+	addPayload( payload );
+
+	if( kemacOnly ){
+		macInputLength = payload->length();
+		macInput = new byte_t[ macInputLength ];
+		payload->writeData( macInput, macInputLength );
+		macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
+		macInputPtr = macInput;
+	}
+	else{
+		macInputPtr = rawMessageData();
+		macInputLength = rawMessageLength();
+	}
+
 	switch( macAlg ){
-		case MIKEY_PAYLOAD_KEMAC_MAC_HMAC_SHA1_160:
-			addPayload( payload = new MikeyPayloadKEMAC( encrAlg, 
-				tgkLength, encrData, macAlg, macData ) );
-			
-			
+		case MIKEY_PAYLOAD_KEMAC_MAC_HMAC_SHA1_160:{
 			hmac_sha1( authKey, 20,
-				rawMessageData(),
-				// Compute the MAC over the whole message,
+				macInputPtr,
+				// Compute the MAC over the mac input,
 				// MAC field excluded
-				rawMessageLength() - 20,
+				macInputLength - 20,
 				macData, &macDataLength );
 			
 			//assert( macDataLength == 20 );
 			payload->setMac( macData );
 			break;
+		}
 		case MIKEY_PAYLOAD_KEMAC_MAC_NULL:
-			addPayload( payload = new MikeyPayloadKEMAC( encrAlg, 
-				tgkLength, encrData, macAlg, NULL ) );
 			break;
 		default:
 			delete [] encrData;
@@ -415,6 +430,10 @@ void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
 	}
 	compiled = false;
 	delete [] encrData;
+	if( macInput ){
+		delete[] macInput;
+		macInput = NULL;
+	}
 }
 
 void MikeyPayloads::addVPayload( int macAlg, uint64_t t,

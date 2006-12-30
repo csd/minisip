@@ -40,11 +40,6 @@ class LIBMIKEY_API MikeyMessagePKE: public MikeyMessage{
 				int macAlg = MIKEY_MAC_HMAC_SHA1_160,
 				MRef<certificate*> certInitiator = NULL);
 
-		void addKemacPayload(byte_t* tgk, int tgkLength,
-				     byte_t* encrKey, byte_t* iv,
-				     byte_t* authKey, int encrAlg,
-				     int macAlg );
-	
 		MikeyMessage * parseResponse( KeyAgreement  * ka );
 		void setOffer( KeyAgreement * ka );
 		MikeyMessage * buildResponse( KeyAgreement * ka );

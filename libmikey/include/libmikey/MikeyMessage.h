@@ -87,7 +87,8 @@ class LIBMIKEY_API MikeyPayloads{
 				byte_t * tgk, int tgkLength,
 				byte_t * encrKey, byte_t * iv,
 				byte_t * authKey,
-				int encrAlg, int macAlg );
+				int encrAlg, int macAlg,
+				bool kemacOnly = false );
 				
 		std::string debugDump();
 		byte_t * rawMessageData();

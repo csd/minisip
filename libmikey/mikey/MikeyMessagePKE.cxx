@@ -100,7 +100,7 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	memcpy( rawKeyData, subPayloads->rawMessageData(), rawKeyDataLength );
 	
 	addKemacPayload(rawKeyData, rawKeyDataLength,
-			encrKey, iv, ka->authKey, encrAlg, macAlg);
+			encrKey, iv, ka->authKey, encrAlg, macAlg, true );
 
 	delete subPayloads;
 	subPayloads = NULL;
@@ -130,69 +130,6 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	
 	delete [] rawKeyData;
 	delete [] encEnvKey;
-}
-
-void MikeyMessagePKE::addKemacPayload(byte_t* tgk, int tgkLength, byte_t* encrKey, byte_t* iv,
-										byte_t* authKey, int encrAlg, int macAlg ){
-	
-											
-	byte_t* encrData = new byte_t[tgkLength];
-	MikeyPayloadKEMAC * payload;
-	
-	switch(encrAlg){
-		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_CM_128: {
-			AES* aes = new AES(encrKey, 16);
-			aes->ctr_encrypt(tgk, tgkLength, encrData, iv);
-			delete aes;
-			break;
-		}
-		case MIKEY_PAYLOAD_KEMAC_ENCR_NULL:
-			memcpy(encrData, tgk, tgkLength);
-			break;
-		case MIKEY_PAYLOAD_KEMAC_ENCR_AES_KW_128:
-			//TODO
-		default:
-			throw MikeyException("No transport encrytption algorithm selected");
-			break;
-	}
-	
-	//generating MAC for KEMAC payload
-	switch(macAlg){
-		case MIKEY_PAYLOAD_KEMAC_MAC_HMAC_SHA1_160:
-		{
-			unsigned int computedMacLength;
-			unsigned char* computedMac = new unsigned char[20];
-			
-			payload = new MikeyPayloadKEMAC(encrAlg, tgkLength, encrData, macAlg, computedMac);
-		 	this->addPayload(payload);
-		 	
-			const int macInputLength = (payload->encrDataLength() + 4);
-			unsigned char* macInput = new unsigned char[macInputLength];
-			macInput[0] = (uint8_t)payload->encrAlg();
-			uint16_t ip = (uint16_t)payload->encrDataLength();
-			memcpy(macInput + 1, &ip, 2);
-			macInput[1] = 0;  //TODO
-			macInput[2] = 0x22;
-			memcpy(macInput + 3, payload->encrData(), payload->encrDataLength());
-			macInput[3 + payload->encrDataLength()] = (uint8_t)payload->macAlg();
-						
-			hmac_sha1(authKey, 20, macInput, macInputLength, computedMac, &computedMacLength );
-			payload->setMac(computedMac);
-			
-			delete [] computedMac;
-			delete [] macInput;
-			break;
-		}
-		case MIKEY_PAYLOAD_KEMAC_MAC_NULL:
-			payload = new MikeyPayloadKEMAC(encrAlg, tgkLength, encrData, macAlg, NULL);
-			addPayload(payload);
-			break;
-		default:
-			throw MikeyException("No transport mac algorithm selected");
-			break;
-	}
-// 	this->compiled = false;								
-	delete [] encrData;
 }
 
 void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
@@ -519,16 +456,13 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 		macAlg = kemac->macAlg();
 		receivedMac = kemac->macData();
 		
-		macInputLength = (kemac->encrDataLength() + 4);
+		macInputLength = kemac->length();
 		macInput = new byte_t[macInputLength];
-		macInput[0] = (uint8_t)kemac->encrAlg();
-		uint16_t ip = (uint16_t)kemac->encrDataLength();
-		memcpy(macInput + 1, &ip, 2);
-		macInput[1] = 0;   //TODO
-		macInput[2] = 0x22;
-		memcpy(macInput + 3, kemac->encrData(), kemac->encrDataLength());
-		macInput[3 + kemac->encrDataLength()] = (uint8_t)kemac->macAlg();
-		
+
+		kemac->writeData( macInput, macInputLength );
+		macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
+		macInputLength -= 20; // Subtract mac data
+
 		ka->setCsbId( csbId() );
 
 		MikeyPayload *payloadPke =
