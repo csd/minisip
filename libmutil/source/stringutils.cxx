@@ -179,7 +179,7 @@ LIBMUTIL_API string trim(const string &line){
 	return line.substr( spacesFront, line.size() - ( spacesFront + spacesEnd ) );
 }
 
-LIBMUTIL_API string binToHex( unsigned char * data, int length ){
+LIBMUTIL_API string binToHex( const unsigned char * data, int length ){
 	
 	string result = "";
 	char hex_number[3];

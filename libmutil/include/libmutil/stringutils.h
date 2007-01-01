@@ -96,6 +96,6 @@ LIBMUTIL_API std::string trim(const std::string &s);
 /**
  * Converts an array of raw data to a hex string representation.
  */
-LIBMUTIL_API std::string binToHex( unsigned char * data, int length );
+LIBMUTIL_API std::string binToHex( const unsigned char * data, int length );
 
 #endif
