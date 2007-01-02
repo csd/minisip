@@ -35,11 +35,11 @@ using namespace std;
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
 	KeyAgreement(),
+	useSim(false),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	certChainPtr( certChainPtr ),
-	certDbPtr( certDbPtr ),
-	useSim(false)
+	certDbPtr( certDbPtr )
 {
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
@@ -50,12 +50,12 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
 	KeyAgreement(),
+	useSim(true),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	certChainPtr( NULL ),
 	certDbPtr( NULL ),
-	sim(s),
-	useSim(true)
+	sim(s)
 {
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
@@ -74,6 +74,7 @@ KeyAgreementDH::~KeyAgreementDH(){
 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr, int groupValue ):
+	useSim(false),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	certChainPtr( certChainPtr ),
@@ -97,13 +98,13 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
+	useSim(true),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	certChainPtr( NULL ),
 	peerCertChainPtr( NULL ),
 	certDbPtr( NULL ),
-	sim(s),
-	useSim(true)
+	sim(s)
 {
 	//policy = list<Policy_type *>::list();
 	typeValue = KEY_AGREEMENT_TYPE_DH;
