@@ -27,7 +27,6 @@
 
 #include<libmikey/libmikey_config.h>
 
-#define OPENSSL
 #include<libmikey/MikeyPayload.h>
 
 #define MIKEYPAYLOAD_RAND_PAYLOAD_TYPE 11
@@ -38,9 +37,7 @@
 */
 class LIBMIKEY_API MikeyPayloadRAND : public MikeyPayload{
 	public:
-#ifdef OPENSSL
 		MikeyPayloadRAND(); // computes a 128 bits random value
-#endif
 		// FIXME almost same prototype, leads to mistake!!
 		MikeyPayloadRAND( int randlen, byte_t * rand_data );
 		MikeyPayloadRAND( byte_t * start, int lengthLimit );

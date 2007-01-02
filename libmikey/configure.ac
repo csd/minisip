@@ -26,15 +26,6 @@ AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 dnl Checks for libraries.
-AC_ARG_WITH(openssl,
-    AS_HELP_STRING([--with-openssl=PATH], [Use OpenSSL library [default=yes]]),
-    [], [with_openssl="yes"])
-
-if test "${with_openssl}" = "yes"; then
-    AM_LIBMCRYPTO_CHECK_OPENSSL([HAVE_OPENSSL=yes],[HAVE_OPENSSL=no])
-    AC_CHECK_HEADERS([openssl/rsa.h openssl/evp.h])
-fi
-AM_CONDITIONAL(HAVE_OPENSSL, test "${HAVE_OPENSSL}" = "yes")
 
 dnl Checks for header files.
 AC_HEADER_STDC

@@ -87,13 +87,11 @@ MikeyMessage* MikeyMessage::create( KeyAgreementDHHMAC * ka,
 	return new MikeyMessageDHHMAC( ka, macAlg );
 }
 
-#ifdef HAVE_OPENSSL
 MikeyMessage* MikeyMessage::create( KeyAgreementPKE* ka,
 				    int encrAlg, int macAlg,
 				    MRef<certificate*> certInitiator ){
 	return new MikeyMessagePKE( ka, encrAlg, macAlg, certInitiator );
 }
-#endif	// HAVE_OPENSSL
 
 /*
  * Alg.
@@ -129,12 +127,10 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 		case MIKEY_TYPE_PSK_RESP:
 			msg = new MikeyMessagePSK();
 			break;
-#ifdef HAVE_OPENSSL
 		case MIKEY_TYPE_PK_INIT:
 		case MIKEY_TYPE_PK_RESP:
 			msg = new MikeyMessagePKE();
 			break;
-#endif	// HAVE_OPENSSL
 		case MIKEY_TYPE_DHHMAC_INIT:
 		case MIKEY_TYPE_DHHMAC_RESP:
 			msg = new MikeyMessageDHHMAC();
