@@ -73,7 +73,7 @@ int certificate::sign_data( unsigned char * data, int data_length,
 	return m_pk->sign_data( data, data_length, sign, sign_length );
 }
 
-int certificate::private_decrypt(unsigned char *data, int size,
+int certificate::private_decrypt(const unsigned char *data, int size,
 				 unsigned char *retdata, int *retsize){
 	return m_pk->private_decrypt( data, size, retdata, retsize );
 }

@@ -26,6 +26,7 @@
 
 #include<libmcrypto/gnutls/cert.h>
 #include<gnutls/x509.h>
+#include<gcrypt.h>
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -41,7 +42,7 @@ using namespace std;
 	throw Exception(msg.c_str());
 
 
-gtls_certificate::gtls_certificate():cert(NULL){
+gtls_certificate::gtls_certificate():cert(NULL),rsaKey(NULL){
         gnutls_global_init();
 }
 
@@ -99,12 +100,319 @@ certificate_chain* certificate_chain::create(){
 	return new gtls_certificate_chain();
 }
 
+
+// 
+// gtls_rsa_priv
+// 
+gtls_rsa_priv::gtls_rsa_priv( gnutls_x509_privkey_t aKey ):m_key(NULL){
+	gcry_error_t err;
+	gnutls_datum_t n[6];
+	int i;
+
+	memset(n, 0, sizeof(n));
+
+	if( gnutls_x509_privkey_export_rsa_raw( aKey, &n[0], &n[1], &n[2],
+						&n[3], &n[4], &n[5] )){
+		// TODO change to gtls_exception
+		throw certificate_exception_pkey("Private key invalid" );
+	}
+
+	gcry_mpi_t mpi[6];
+
+	memset(mpi, 0, sizeof(mpi));
+	for( i = 0; i < 6; i++ ){
+		size_t nscanned = 0;
+
+		err = gcry_mpi_scan( &mpi[i], GCRYMPI_FMT_USG,
+				     n[i].data, n[i].size, &nscanned );
+		gnutls_free( n[i].data );
+		n[i].data = NULL;
+		if( err ){
+			for( int j = 0; j < 6; j++ ){
+				if( n[j].data ){
+					gnutls_free( n[j].data );
+					n[j].data = NULL;
+				}
+			}
+
+			throw certificate_exception_pkey("Private key parameter invalid" );
+		}
+	}
+
+//      RSA private-key sexp format
+// 	(private-key
+// 	 (rsa
+// 	  (n n-mpi)
+// 	  (e e-mpi)
+// 	  (d d-mpi)
+// 	  (p p-mpi)
+// 	  (q q-mpi)
+// 	  (u u-mpi)
+
+	err = gcry_sexp_build( &m_key, NULL,
+			       "(private-key(rsa (n %m)(e %m)(d %m)(p %m)(q %m)(u %m)))",
+			       mpi[0], mpi[1], mpi[2], mpi[4], mpi[3], mpi[5]);
+
+	for( i = 0; i < 6; i++ ){
+		gcry_mpi_release( mpi[i] );
+		mpi[i] = NULL;
+	}
+
+	if( err ){
+		throw certificate_exception_pkey("Private key parameters invalid" );
+	}
+}
+
+gtls_rsa_priv::~gtls_rsa_priv(){
+	if( m_key ){
+		gcry_sexp_release( m_key );
+		m_key = NULL;
+	}
+}
+
+bool gtls_rsa_priv::decrypt( const unsigned char *data, int size,
+			     unsigned char *retdata, int *retsize) const{
+	gcry_error_t err;
+	bool ret = false;
+	gcry_mpi_t cipher_mpi = NULL;
+	gcry_sexp_t cipher = NULL;
+	gcry_sexp_t plain = NULL;
+	gcry_mpi_t datampi = NULL;
+	unsigned char *ptr = NULL;
+	size_t ptrsize = 0;
+	size_t pos = 0;
+	int len = 0;
+
+	err = gcry_mpi_scan(&cipher_mpi, GCRYMPI_FMT_USG, data, size, NULL);
+	if( err ){
+		goto error;
+	}
+
+	err = gcry_sexp_build( &cipher, NULL,
+			       "(enc-val(flags)(rsa(a %m)))",
+			       cipher_mpi );
+
+	if( err ){
+		goto error;
+	}
+
+	err = gcry_pk_decrypt( &plain, cipher, m_key );
+
+	if( err ){
+		goto error;
+	}
+
+	// gcry_pk_decrypt result:
+	// (value plaintext)
+
+	datampi = gcry_sexp_nth_mpi( plain, 1, GCRYMPI_FMT_NONE );
+
+	if( !datampi ){
+		goto error;
+	}
+
+	err = gcry_mpi_aprint( GCRYMPI_FMT_USG, &ptr, &ptrsize, datampi );
+
+	if( err ){
+		goto error;
+	}
+
+	// PKCS1 version 1.5 padding (RFC 2313)
+	// RSA input value = 00 || BT || PS || 00 || D.
+	// BT = 02 (public-key operation)
+	// PS = k-3-||D|| random octets
+
+	if( ptr[0] != 0x02 ){
+		goto error;
+	}
+
+	if( ptrsize < 4 ){
+		goto error;
+	}
+
+	pos = strnlen( (char*)ptr + 1, ptrsize - 1 ) + 2;
+	len = ptrsize - pos;
+
+	// Skip zeros at the beginning
+	while( !ptr[pos] && len > 0 ){
+		len--;
+		pos++;
+	}
+
+	if( *retsize < len ){
+		goto error;
+	}
+
+	*retsize = len;
+	memcpy( retdata, ptr + pos, len );
+
+	ret = true;
+
+  error:
+	if( cipher_mpi ){
+		gcry_mpi_release( cipher_mpi );
+	}
+	if( cipher ){
+		gcry_sexp_release( cipher );
+	}
+	if( plain ){
+		gcry_sexp_release( plain );
+	}
+	if( datampi ){
+		gcry_mpi_release( datampi );
+	}
+	if( ptr ){
+		gcry_free( ptr );
+	}
+
+	return ret;
+}
+
+//
+// gtls_rsa_pub
+// 
+gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
+	gcry_error_t err;
+	gnutls_datum_t n;
+	gnutls_datum_t e;
+
+	memset(&n, 0, sizeof(n));
+	memset(&e, 0, sizeof(e));
+
+	if( gnutls_x509_crt_get_pk_rsa_raw( aCert, &n, &e ) ){
+		throw certificate_exception_init( "Can't get RSA key from cert" );
+	}
+
+	gcry_mpi_t n_mpi = NULL;
+	size_t nscanned = 0;
+	err = gcry_mpi_scan( &n_mpi, GCRYMPI_FMT_USG,
+			     n.data, n.size, &nscanned );
+
+	gcry_free( n.data );
+	n.data = NULL;
+
+	if( err ){
+		gcry_free( e.data );
+		throw certificate_exception_init( "Invalid public key m parameter" );
+	}
+
+	gcry_mpi_t e_mpi = NULL;
+	err = gcry_mpi_scan( &e_mpi, GCRYMPI_FMT_USG,
+			     e.data, e.size, &nscanned );
+	gcry_free( e.data );
+	e.data = NULL;
+
+	if( err ){
+		gcry_mpi_release( e_mpi );
+		throw certificate_exception_init( "Invalid public key e parameter" );
+	}
+
+	size_t erroff = 0;
+	
+	err = gcry_sexp_build( &m_key, &erroff,
+			       "(key-data(public-key(rsa (n %m)(e %m))))",
+			       n_mpi, e_mpi );
+
+	gcry_mpi_release( n_mpi );
+	n_mpi = NULL;
+	gcry_mpi_release( e_mpi );
+	e_mpi = NULL;
+
+	if( err ){
+		throw certificate_exception_init( "Invalid public key parameters" );
+	}
+}
+
+gtls_rsa_pub::~gtls_rsa_pub(){
+	if( m_key ){
+		gcry_sexp_release( m_key );
+		m_key = NULL;
+	}
+}
+
+bool gtls_rsa_pub::encrypt( const unsigned char *data, int size,
+			    unsigned char *retdata, int *retsize) const{
+	bool ret = false;
+	gcry_error_t err;
+	gcry_mpi_t data_mpi = NULL;
+	gcry_sexp_t cipher = NULL;
+	gcry_sexp_t data_sexp = NULL;
+	gcry_sexp_t rsa = NULL;
+	gcry_sexp_t a = NULL;
+	gcry_mpi_t datampi = NULL;
+	size_t erroff = 0;
+	size_t len = 0;
+
+	if( gcry_mpi_scan(&data_mpi, GCRYMPI_FMT_USG, data, size, NULL ) ){
+		goto error;
+	}
+
+	if( gcry_sexp_build( &data_sexp, &erroff,
+			     "(data(flags pkcs1)(value %m))",
+			     data_mpi ) ){
+		goto error;
+	}
+
+	if( err = gcry_pk_encrypt( &cipher, data_sexp, m_key ) ){
+		goto error;
+	}
+
+// 	(enc-val
+// 	 (rsa
+// 	  (a a-mpi)))
+
+	rsa = gcry_sexp_nth( cipher, 1 );
+	if( !rsa ){
+		goto error;
+	}
+
+	a = gcry_sexp_nth( rsa, 1 );
+	if( !a ){
+		goto error;
+	}
+
+	if( !(datampi = gcry_sexp_nth_mpi( a, 1, GCRYMPI_FMT_USG )) ){
+		goto error;
+	}
+
+	if( gcry_mpi_print( GCRYMPI_FMT_USG, 
+			    (unsigned char*)retdata,
+			    *retsize, &len, datampi ) ){
+		goto error;
+	}
+
+	*retsize = len;
+	ret = true;
+
+  error:
+	if( data_mpi )
+		gcry_mpi_release( data_mpi );
+	if( cipher )
+		gcry_sexp_release( cipher );
+	if( data_sexp )
+		gcry_sexp_release( data_sexp );
+	if( rsa )
+		gcry_sexp_release( rsa );
+	if( a )
+		gcry_sexp_release( a );
+	if( datampi )
+		gcry_mpi_release( datampi );
+
+	return ret;
+}
+
+
 gtls_priv_key::~gtls_priv_key(){
 	if( privateKey != NULL ){
 		gnutls_x509_privkey_deinit( privateKey );
 	}
 	
 	privateKey = NULL;
+
+	if( rsaPriv ){
+		delete rsaPriv;
+		rsaPriv = NULL;
+	}
 }
 
 const string &gtls_priv_key::get_file() const{
@@ -113,13 +421,13 @@ const string &gtls_priv_key::get_file() const{
 
 
 // Read PEM-encoded certificate from a file
-gtls_certificate::gtls_certificate( const string certFilename ){
+gtls_certificate::gtls_certificate( const string certFilename ):rsaKey(NULL){
         gnutls_global_init();
 	openFromFile( certFilename );
 }
 
 // Import DER-encoded certificate from memory
-gtls_certificate::gtls_certificate( unsigned char * derCert, int length ){
+gtls_certificate::gtls_certificate( unsigned char * derCert, int length ):rsaKey(NULL){
         int ret;
         gnutls_datum certData;
 	
@@ -142,6 +450,12 @@ gtls_certificate::gtls_certificate( unsigned char * derCert, int length ){
 			"Could not import the given certificate" );
         }
 
+	if( rsaKey ){
+		delete rsaKey;
+		rsaKey = NULL;
+	}
+
+	rsaKey = new gtls_rsa_pub( cert );
 }
 	
 gtls_certificate::~gtls_certificate(){
@@ -150,7 +464,11 @@ gtls_certificate::~gtls_certificate(){
 	}
 	
 	cert = NULL;
-	
+
+	if( rsaKey ){
+		delete rsaKey;
+		rsaKey = NULL;
+	}
 }
 
 // Read PEM-encoded certificate from a file
@@ -207,6 +525,13 @@ void gtls_certificate::openFromFile( string fileName ){
         close( fd );
 
 	file = fileName;
+
+	if( rsaKey ){
+		delete rsaKey;
+		rsaKey = NULL;
+	}
+
+	rsaKey = new gtls_rsa_pub( cert );
 }
 
 int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
@@ -244,17 +569,17 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 }
 
 int gtls_certificate::verif_sign( unsigned char * data, int data_length,
-				  unsigned char * sign, int sign_length ){
+				  unsigned char * sign, int sign_length )
 {
 	int err;
 	gnutls_datum dataStruct;
 	gnutls_datum signStruct;
 
 	dataStruct.data = data;
-	dataStruct.size = dataLength;
+	dataStruct.size = data_length;
 	
 	signStruct.data = sign;
-	signStruct.size = signLength;
+	signStruct.size = sign_length;
 	
 	if( cert == NULL ){
 		throw certificate_exception(
@@ -264,11 +589,14 @@ int gtls_certificate::verif_sign( unsigned char * data, int data_length,
 	err = gnutls_x509_crt_verify_data( cert, 0, &dataStruct, &signStruct );
 
 	return err;
-}
+ }
 
-bool gtls_certificate::public_encrypt(unsigned char *data, int size,
+bool gtls_certificate::public_encrypt( const unsigned char *data, int size,
 				      unsigned char *retdata, int *retsize){
-	UNIMPLEMENTED;
+	if( !rsaKey )
+		return false;
+
+	return rsaKey->encrypt( data, size, retdata, retsize );
 }
 
 int gtls_certificate::get_der_length(){
@@ -516,6 +844,7 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         close( fd );
 
 	pk_file = file;
+	rsaPriv = new gtls_rsa_priv( privateKey );
 }
 
 // Import DER-encoded private key from memory
@@ -600,11 +929,13 @@ int gtls_priv_key::denvelope_data(unsigned char * data, int size, unsigned char 
 	UNIMPLEMENTED;
 }
 
-bool gtls_priv_key::private_decrypt(unsigned char *data, int size,
+bool gtls_priv_key::private_decrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize){
-	UNIMPLEMENTED;
+	if( !rsaPriv )
+		return false;
+	
+	return rsaPriv->decrypt( data, size, retdata, retsize );
 }
-
 
 // 
 // End of gtls_certificate

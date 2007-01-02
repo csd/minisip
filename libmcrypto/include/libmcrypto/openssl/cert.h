@@ -88,7 +88,7 @@ class LIBMCRYPTO_API ossl_priv_key: public priv_key{
 				    int enckeylgth,
 				    unsigned char *iv);
 
-		bool private_decrypt(unsigned char *data, int size,
+		bool private_decrypt(const unsigned char *data, int size,
 				     unsigned char *retdata, int *retsize);
 
 		EVP_PKEY * get_openssl_private_key(){return private_key;};
@@ -123,7 +123,7 @@ class LIBMCRYPTO_API ossl_certificate: public certificate{
 		int verif_sign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
 
-		bool public_encrypt(unsigned char *data, int size,
+		bool public_encrypt(const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
 		std::string get_name();

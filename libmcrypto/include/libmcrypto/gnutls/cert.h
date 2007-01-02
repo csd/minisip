@@ -37,8 +37,33 @@
 
 
 #include<gnutls/x509.h>
+#include<gcrypt.h>
 
 class gtls_certificate;
+
+class gtls_rsa_priv{
+	public:
+		gtls_rsa_priv( gnutls_x509_privkey_t aKey );
+		~gtls_rsa_priv();
+
+		bool decrypt( const unsigned char *data, int size,
+			      unsigned char *retdata, int *retsize) const;
+
+	private:
+		gcry_sexp_t m_key;
+};
+
+class gtls_rsa_pub{
+	public:
+		gtls_rsa_pub( gnutls_x509_crt_t aCert );
+		~gtls_rsa_pub();
+
+		bool encrypt( const unsigned char *data, int size,
+			      unsigned char *retdata, int *retsize) const;
+
+	private:
+		gcry_sexp_t m_key;
+};
 
 class LIBMCRYPTO_API gtls_ca_db_item: public ca_db_item{
 	public:
@@ -90,13 +115,14 @@ class LIBMCRYPTO_API gtls_priv_key: public priv_key{
 				    int enckeylgth,
 				    unsigned char *iv);
 
-		bool private_decrypt(unsigned char *data, int size,
+		bool private_decrypt( const unsigned char *data, int size,
 				     unsigned char *retdata, int *retsize);
 
 		gnutls_x509_privkey_t get_private_key(){return privateKey;};
 
 	private:
 		gnutls_x509_privkey_t privateKey;
+		gtls_rsa_priv *rsaPriv;
 		std::string pk_file;
 };
 
@@ -121,7 +147,7 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 		int verif_sign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
 
-		bool public_encrypt(unsigned char *data, int size,
+		bool public_encrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
 		std::string get_name();
@@ -139,6 +165,7 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 
 	private:
 		gnutls_x509_crt_t cert;
+		gtls_rsa_pub *rsaKey;
 };
 
 class gtls_certificate_chain: public certificate_chain{

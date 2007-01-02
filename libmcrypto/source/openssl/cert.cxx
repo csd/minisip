@@ -339,7 +339,7 @@ int ossl_certificate::verif_sign( unsigned char * data, int data_length,
 	return err;
 }
 	
-bool ossl_priv_key::private_decrypt( unsigned char *data, int size,
+bool ossl_priv_key::private_decrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize ){
 	//adding PKE payload
 	RSA* rsa = EVP_PKEY_get1_RSA( private_key );
@@ -370,15 +370,16 @@ bool ossl_priv_key::private_decrypt( unsigned char *data, int size,
 	return true;
 }
 
-bool ossl_certificate::public_encrypt( unsigned char *data, int size,
+bool ossl_certificate::public_encrypt( const unsigned char *data, int size,
 				      unsigned char *retdata, int *retsize ){
 	//adding PKE payload
 	EVP_PKEY *public_key = X509_get_pubkey( cert );
 	RSA* rsa = EVP_PKEY_get1_RSA( public_key );
 
-// 	if( size >= RSA_size( rsa ) - 11 ){
-// 		return false;
-// 	}
+	if( size >= RSA_size( rsa ) - 11 ){
+		cerr << "RSA_public_encrypt: data size to large: " << size << ">=" << RSA_size(rsa)-11 << endl;
+		return false;
+	}
 
 	if( RSA_size( rsa ) > *retsize ){
 		cerr << "RSA_public_encrypt: buffer to small ("

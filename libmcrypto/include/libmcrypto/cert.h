@@ -106,7 +106,7 @@ class LIBMCRYPTO_API priv_key: public MObject{
 					    int enckeylgth,
 					    unsigned char *iv)=0;
 
-		virtual bool private_decrypt(unsigned char *data, int size,
+		virtual bool private_decrypt(const unsigned char *data, int size,
 					     unsigned char *retdata, int *retsize)=0;
 	protected:
 		priv_key();
@@ -155,10 +155,10 @@ class LIBMCRYPTO_API certificate: public MObject{
 		virtual int verif_sign( unsigned char * data, int data_length,
 					unsigned char * sign, int sign_length )=0;
 
-		virtual bool public_encrypt(unsigned char *data, int size,
+		virtual bool public_encrypt(const unsigned char *data, int size,
 					    unsigned char *retdata, int *retsize)=0;
 
-		int private_decrypt(unsigned char *data, int size,
+		int private_decrypt(const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
 		virtual std::string get_name()=0;
