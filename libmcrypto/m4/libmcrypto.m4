@@ -72,11 +72,12 @@ CPPFLAGS="${mcrypto_save_CPPFLAGS}"
 #
 
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_SCSIM], [
-AC_CHECK_LIB([pcsclite], [SCardTransmit],[
-		SCSIM_LIBS="-lpcsclite"
-	],[])
-AC_SUBST(SCSIM_LIBS)
+PKG_CHECK_MODULES([SCSIM], [libpcsclite])
+
+mcrypto_save_LIBS="${LIBS}"
 LIBS="${SCSIM_LIBS} ${LIBS}"
+AC_CHECK_FUNCS([SCardTransmit],,[AC_MSG_ERROR([PCSC lite not found])])
+LIBS="${mcrypto_save_LIBS}"
 ])
 
 # AM_LIBMCRYPTO_CHECK_GNUTLS([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])

@@ -13,7 +13,7 @@ endif
 SUBDIRS = $(BUILD_DIRS) uuid .
 DIST_SUBDIRS = openssl gnutls uuid
 
-AM_CPPFLAGS = $(MINISIP_CFLAGS)
+AM_CPPFLAGS = $(MINISIP_CFLAGS) $(SCSIM_CFLAGS)
 noinst_LTLIBRARIES = \
 		libmcrypto_core.la \
 		libmcrypto_imp.la
@@ -39,6 +39,8 @@ libmcrypto_core_la_SOURCES = \
 		TLSException.cxx \
 		uuid.cxx \
 		rijndael-alg-fst.cxx
+
+libmcrypto_core_la_LIBADD = $(SCSIM_LIBS)
 
 libmcrypto_imp_la_SOURCES = # none
 libmcrypto_imp_la_LIBADD = $(BUILD_LIBS)
