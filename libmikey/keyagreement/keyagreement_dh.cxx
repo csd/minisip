@@ -32,34 +32,52 @@
 
 using namespace std;
 
+// 
+// PeerCertificates
+// 
+PeerCertificates::PeerCertificates( MRef<certificate_chain *> aCert,
+				    MRef<ca_db *> aCaDb ):
+		certChainPtr( aCert ),
+		certDbPtr( aCaDb )
+{
+	peerCertChainPtr = certificate_chain::create();
+}
+
+PeerCertificates::PeerCertificates( MRef<certificate_chain *> aCert,
+				    MRef<certificate_chain *> aPeerCert ):
+		certChainPtr( aCert ),
+		peerCertChainPtr( aPeerCert )
+{
+}
+
+PeerCertificates::~PeerCertificates(){
+}
+
+// 
+// KeyAgreementDH
+// 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
 	KeyAgreement(),
+	PeerCertificates( certChainPtr, certDbPtr ),
 	useSim(false),
 	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 ),
-	certChainPtr( certChainPtr ),
-	certDbPtr( certDbPtr )
+	peerKeyLengthValue( 0 )
 {
 	//policy = list<Policy_type *>::list();
 	dh = new OakleyDH();
-	peerCertChainPtr = certificate_chain::create();
-
 }
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
 	KeyAgreement(),
+	PeerCertificates( s->getCertificateChain(), s->getCAs() ),
 	useSim(true),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
-	certChainPtr( NULL ),
-	certDbPtr( NULL ),
 	sim(s)
 {
 	//policy = list<Policy_type *>::list();
 	dh = new OakleyDH();
-	peerCertChainPtr = certificate_chain::create();
-
 }
 
 KeyAgreementDH::~KeyAgreementDH(){
@@ -72,12 +90,11 @@ KeyAgreementDH::~KeyAgreementDH(){
 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr, int groupValue ):
+		PeerCertificates( certChainPtr, certDbPtr ),
 	useSim(false),
 	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 ),
-	certChainPtr( certChainPtr ),
-	peerCertChainPtr( NULL ),
-	certDbPtr( certDbPtr ){
+	peerKeyLengthValue( 0 )
+{
 	//policy = list<Policy_type *>::list();
 	dh = new OakleyDH();
 	if( dh == NULL )
@@ -90,17 +107,14 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		throw MikeyException( "Could not set the  "
 				      "DH group." );
 	}
-	peerCertChainPtr = certificate_chain::create();
 }
 
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
+		PeerCertificates( s->getCertificateChain(), s->getCAs() ),
 	useSim(true),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
-	certChainPtr( NULL ),
-	peerCertChainPtr( NULL ),
-	certDbPtr( NULL ),
 	sim(s)
 {
 	//policy = list<Policy_type *>::list();
@@ -115,7 +129,6 @@ KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
 		throw MikeyException( "Could not set the  "
 				      "DH group." );
 	}
-	peerCertChainPtr = certificate_chain::create();
 }
 
 int32_t KeyAgreementDH::type(){
@@ -179,29 +192,19 @@ unsigned char * KeyAgreementDH::peerKey(){
 	return peerKeyPtr;
 }
 
-MRef<certificate_chain *> KeyAgreementDH::certificateChain(){
-	if (useSim){
-		return sim->getCertificateChain();
-	}else{
-		return certChainPtr;
-	}
+MRef<certificate_chain *> PeerCertificates::certificateChain(){
+	return certChainPtr;
 }
 
-MRef<certificate_chain *> KeyAgreementDH::peerCertificateChain(){
+MRef<certificate_chain *> PeerCertificates::peerCertificateChain(){
 	return peerCertChainPtr;
 }
 
-void KeyAgreementDH::addPeerCertificate( MRef<certificate *> peerCertPtr ){
-	if( this->peerCertChainPtr.isNull() ){
-		this->peerCertChainPtr = certificate_chain::create();
-	}
-	
-	this->peerCertChainPtr->lock();
-	this->peerCertChainPtr->add_certificate( peerCertPtr );
-	this->peerCertChainPtr->unlock();
+void PeerCertificates::setPeerCertificateChain( MRef<certificate_chain *> peerChain ){
+	peerCertChainPtr = peerChain;
 }
 
-int KeyAgreementDH::controlPeerCertificate(){
+int PeerCertificates::controlPeerCertificate(){
 	if( peerCertChainPtr.isNull() || certDbPtr.isNull() )
 		return 0;
 	return peerCertChainPtr->control( certDbPtr );

@@ -40,7 +40,26 @@ class certificate;
 class ca_db;
 class SipSim;
 
-class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
+class LIBMIKEY_API PeerCertificates {
+	public:
+		PeerCertificates( MRef<certificate_chain*> aCert,
+				  MRef<ca_db *> aCaDb );
+		PeerCertificates( MRef<certificate_chain*> aCert,
+				  MRef<certificate_chain*> aPeerCert );
+		virtual ~PeerCertificates();
+		virtual MRef<certificate_chain *> certificateChain();
+		virtual MRef<certificate_chain *> peerCertificateChain();
+		virtual void setPeerCertificateChain( MRef<certificate_chain *> chain );
+		virtual int controlPeerCertificate();
+
+	private:
+		MRef<certificate_chain *> certChainPtr;
+		MRef<certificate_chain *> peerCertChainPtr;
+		MRef<ca_db *> certDbPtr;
+};
+
+class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
+				    public PeerCertificates{
 	public:
 		KeyAgreementDH( MRef<certificate_chain *> cert, 
 				MRef<ca_db *> ca_db );
@@ -65,11 +84,6 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		int publicKeyLength();
 		byte_t * publicKey();
 		
-		MRef<certificate_chain *> certificateChain();
-		MRef<certificate_chain *> peerCertificateChain();
-		void addPeerCertificate( MRef<certificate *> cert );
-		int controlPeerCertificate();
-
 		MikeyMessage* createMessage();
 
 		MRef<SipSim*> getSim();
@@ -79,9 +93,6 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		OakleyDH * dh;
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
-		MRef<certificate_chain *> certChainPtr;
-		MRef<certificate_chain *> peerCertChainPtr;
-		MRef<ca_db *> certDbPtr;
 		MRef<SipSim *> sim;
 };
 

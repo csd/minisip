@@ -90,10 +90,15 @@ class LIBMIKEY_API MikeyPayloads{
 				int encrAlg, int macAlg,
 				bool kemacOnly = false );
 				
+		MRef<certificate_chain*> extractCertificateChain() const;
+
 		std::string debugDump();
 		byte_t * rawMessageData();
 		int rawMessageLength();
 		
+		std::list<MikeyPayload *>::const_iterator firstPayload() const;
+		std::list<MikeyPayload *>::const_iterator lastPayload() const;
+
 		std::list<MikeyPayload *>::iterator firstPayload();
 		std::list<MikeyPayload *>::iterator lastPayload();
 		

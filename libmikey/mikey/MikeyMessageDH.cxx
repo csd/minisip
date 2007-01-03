@@ -180,20 +180,13 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 	 * (for instance during authentication of the message),
 	 * try to get it now */
 
-	if( ka->peerCertificateChain()->get_first().isNull() ){
-		i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+	// Fetch peer certificate chain
+	MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
+	if( peerChain.isNull() || peerChain->get_first().isNull() ){
+		peerChain = extractCertificateChain();
 
-		while( i != NULL )
-		{
-			peerCert = certificate::load( 
-				((MikeyPayloadCERT *)i)->certData(),
-				((MikeyPayloadCERT *)i)->certLength()
-				);
-
-			ka->addPeerCertificate( peerCert );
-			payloads.remove( i );
-
-			i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+		if( !peerChain.isNull() ){
+			ka->setPeerCertificateChain( peerChain );
 		}
 	}
 
@@ -353,20 +346,13 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
-	if( ka->peerCertificateChain()->get_first().isNull() ){
-		i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+	// Fetch peer certificate chain
+	MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
+	if( peerChain.isNull() || peerChain->get_first().isNull() ){
+		peerChain = extractCertificateChain();
 
-		while( i != NULL )
-		{
-			peerCert = certificate::load( 
-				((MikeyPayloadCERT *)i)->certData(),
-				((MikeyPayloadCERT *)i)->certLength()
-				);
-
-			ka->addPeerCertificate( peerCert );
-			payloads.remove( i );
-
-			i = extractPayload( MIKEYPAYLOAD_CERT_PAYLOAD_TYPE );
+		if( !peerChain.isNull() ){
+			ka->setPeerCertificateChain( peerChain );
 		}
 	}
 
@@ -450,34 +436,19 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 	}
 
 	MikeyPayload * sign = (*lastPayload());
+
+	// Fetch peer certificate chain
 	MRef<certificate_chain *> peerCert = ka->peerCertificateChain();
+	if( peerCert.isNull() || peerCert->get_first().isNull() ){
+		peerCert = extractCertificateChain();
 
-	if( peerCert.isNull() || peerCert->get_first().isNull() )
-	{
-		/* Try to find the certificate chain in the message */
-		list<MikeyPayload *>::iterator i;
-		list<MikeyPayload *>::iterator last = lastPayload();
-
-		for( i = firstPayload(); i != last; i++ ){
-			MikeyPayload *payload = *i;
-
-			if( payload->payloadType() != MIKEYPAYLOAD_CERT_PAYLOAD_TYPE )
-				continue;
-
-			MikeyPayloadCERT * certPayload = (MikeyPayloadCERT*)payload;
-			ka->addPeerCertificate(
-				certificate::load( 
-					certPayload->certData(),
-					certPayload->certLength() ));
-// 			payloads.remove( certPayload );
+		if( peerCert.isNull() ){
+			ka->setAuthError( "No certificate was found" );
+			return true;
 		}
-	}
 
-	if( peerCert->get_first().isNull() ){
-		ka->setAuthError( "No certificate was found" );
-		return true;
+		ka->setPeerCertificateChain( peerCert );
 	}
-
 
 	if( sign->payloadType() != MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE ){
 		ka->setAuthError( "No signature payload found" );

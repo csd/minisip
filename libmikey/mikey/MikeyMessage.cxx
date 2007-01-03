@@ -544,6 +544,14 @@ string MikeyPayloads::debugDump(){
 	return ret;
 }
 
+list<MikeyPayload *>::const_iterator MikeyPayloads::firstPayload() const{
+	return payloads.begin();
+}
+
+list<MikeyPayload *>::const_iterator MikeyPayloads::lastPayload() const{
+	return --payloads.end();
+}
+
 list<MikeyPayload *>::iterator MikeyPayloads::firstPayload(){
 	return payloads.begin();
 }
@@ -755,4 +763,35 @@ bool MikeyMessage::deriveTranspKeys( KeyAgreementPSK* ka,
 	ka->authKey = authKey;
 	ka->authKeyLength = authKeyLength;
 	return !error;
+}
+
+MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
+	MRef<certificate_chain *> peerChain;
+
+	/* Try to find the certificate chain in the message */
+	list<MikeyPayload *>::const_iterator i;
+	list<MikeyPayload *>::const_iterator last = lastPayload();
+
+	for( i = firstPayload(); i != last; i++ ){
+		MikeyPayload *payload = *i;
+
+		if( payload->payloadType() != MIKEYPAYLOAD_CERT_PAYLOAD_TYPE )
+			continue;
+
+		MikeyPayloadCERT * certPayload =
+			dynamic_cast<MikeyPayloadCERT*>(payload);
+		MRef<certificate*> peerCert = 
+			certificate::load( certPayload->certData(),
+					   certPayload->certLength() );
+
+		if( peerChain.isNull() ){
+			peerChain = certificate_chain::create();
+		}
+
+// 		cerr << "Add certificate: " << peerCert->get_name() << endl;
+
+		peerChain->add_certificate( peerCert );
+	}
+
+	return peerChain;
 }
