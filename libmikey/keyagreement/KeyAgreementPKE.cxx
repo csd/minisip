@@ -5,20 +5,35 @@
 #include <libmikey/MikeyException.h>
 #include <libmcrypto/rand.h>
 
+using namespace std;
 
-KeyAgreementPKE::KeyAgreementPKE( MRef<certificate*> pubKeyResponderT, int envKeyLength )
-		:KeyAgreementPSK(){
-										
+KeyAgreementPKE::KeyAgreementPKE( MRef<certificate_chain*> cert,
+				  MRef<certificate_chain*> peerCert )
+		:KeyAgreementPSK(),
+		 PeerCertificates(cert, peerCert){
+	// TODO autodetect length from RSA size
+	int envKeyLength = 112;
+
 	//envelope key to encrypt KEMAC payload
 	byte_t envKey[ envKeyLength ];
 	Rand::randomize( envKey, envKeyLength );
 	setPSK( envKey, envKeyLength );
 
-	//public key to encrypt PKE payload
-	pubKeyResponder = pubKeyResponderT;
-	
 	//verification set
 	setV(1);
+}
+
+KeyAgreementPKE::KeyAgreementPKE( MRef<certificate_chain *> cert, 
+				  MRef<ca_db *> ca_db )
+		:KeyAgreementPSK(),
+		 PeerCertificates(cert, ca_db){
+
+	int envKeyLength = 112;
+
+	//envelope key to encrypt KEMAC payload
+	byte_t envKey[ envKeyLength ];
+	Rand::randomize( envKey, envKeyLength );
+	setPSK( envKey, envKeyLength );
 }
 
 KeyAgreementPKE::~KeyAgreementPKE(){
@@ -26,10 +41,6 @@ KeyAgreementPKE::~KeyAgreementPKE(){
 
 int32_t KeyAgreementPKE::type(){
 	return KEY_AGREEMENT_TYPE_PK;
-}
-
-MRef<certificate*> KeyAgreementPKE::getPublicKey(void){
-	return pubKeyResponder;
 }
 
 byte_t* KeyAgreementPKE::getEnvelopeKey(void){
@@ -45,7 +56,6 @@ void KeyAgreementPKE::setEnvelopeKey( const byte_t *aEnvKey,
 	setPSK( aEnvKey, aEnvKeyLength );
 }
 	
-
 MikeyMessage* KeyAgreementPKE::createMessage(){
 	return MikeyMessage::create( this );
 }

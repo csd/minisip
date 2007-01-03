@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include <config.h>
@@ -29,6 +31,7 @@
 #include <libmikey/MikeyPayloadT.h>
 #include <libmikey/MikeyPayloadRAND.h>
 #include <libmikey/MikeyException.h>
+#include <libmikey/MikeyPayloadCERT.h>
 #include <libmikey/MikeyPayloadKeyData.h>
 #include <libmikey/MikeyPayloadERR.h>
 #include <libmikey/MikeyPayloadID.h>
@@ -43,7 +46,7 @@ using namespace std;
 MikeyMessagePKE::MikeyMessagePKE(){
 }
 
-MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, MRef<certificate*> certInitiator){
+MikeyMessagePKE::MikeyMessagePKE( KeyAgreementPKE* ka, int encrAlg, int macAlg ){
 
 	unsigned int csbId = rand();
 	ka->setCsbId(csbId);
@@ -70,6 +73,9 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	
 	//keep a copy of the random value
 	ka->setRand(randPayload->randData(), randPayload->randLength());
+
+	// Add certificate chain
+	addCertificatePayloads( ka->certificateChain() );
 
 	// Derive the transport keys from the env_key:
 	byte_t* encrKey = NULL;
@@ -106,7 +112,8 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 	subPayloads = NULL;
 
 	//adding PKE payload
-	MRef<certificate*> certResponder = ka->getPublicKey();
+	MRef<certificate*> certResponder =
+		ka->peerCertificateChain()->get_first();
 
 	byte_t* env_key = ka->getEnvelopeKey();
 	int encEnvKeyLength = 8192; // TODO autodetect?
@@ -119,7 +126,7 @@ MikeyMessagePKE::MikeyMessagePKE(KeyAgreementPKE* ka, int encrAlg, int macAlg, M
 
 	addPayload(new MikeyPayloadPKE(2, encEnvKey, encEnvKeyLength));
 	
-	addSignaturePayload( certInitiator );
+	addSignaturePayload( ka->certificateChain()->get_first() );
 
 	//remove garbage
 	if( encrKey != NULL )
@@ -209,6 +216,7 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
 			((MikeyPayloadRAND *)i)->randLength() );
 
@@ -228,6 +236,7 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 #define kemac ((MikeyPayloadKEMAC *)i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
@@ -373,6 +382,7 @@ MikeyMessage * MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
@@ -405,11 +415,6 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 	}
 	
 	MikeyPayload * payload = *(lastPayload());
-	int i;
-	int macAlg;
-	byte_t * receivedMac;
-	byte_t * macInput;
-	unsigned int macInputLength;
 	list<MikeyPayload *>::iterator payload_i;
  
 	if( ka->rand() == NULL ){
@@ -433,118 +438,65 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 
 	if( type() == HDR_DATA_TYPE_PK_INIT )
 	{
-		MikeyPayloadKEMAC * kemac;
 		if( payload->payloadType() != MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE){
 			throw MikeyException( 
 			   "PKE init did not end with a SIGN payload" );
 		}
-		
-		MikeyPayloadSIGN* sig = (MikeyPayloadSIGN*)extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
-		
-		int res;
-		res = ka->getPublicKey()->verif_sign( rawMessageData(),
-						      rawMessageLength() - sig->sigLength(),
-						      sig->sigData(),
-						      sig->sigLength() );
-		if( res <= 0 ){
-			cout << "Verification of the PKE init message SIGN payload failed! Code: "  << res << endl;
+
+		// Fetch peer certificate chain
+		MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
+		if( peerChain.isNull() || peerChain->get_first().isNull() ){
+			peerChain = extractCertificateChain();
+
+			if( peerChain.isNull() ){
+				ka->setAuthError( "No certificate was found" );
+				return true;
+			}
+
+			ka->setPeerCertificateChain( peerChain );
+		}
+
+ 		if( !verifySignature( peerChain->get_first() ) ){
+			cout << "Verification of the PKE init message SIGN payload failed!"  << endl;
 			cout << "Keypair of the initiator probably mismatch!" << endl;
 			return true;
 		}
 
-		kemac = (MikeyPayloadKEMAC *) extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE);
-		macAlg = kemac->macAlg();
-		receivedMac = kemac->macData();
-		
-		macInputLength = kemac->length();
-		macInput = new byte_t[macInputLength];
-
-		kemac->writeData( macInput, macInputLength );
-		macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
-		macInputLength -= 20; // Subtract mac data
-
 		ka->setCsbId( csbId() );
 
-		MikeyPayload *payloadPke =
-			extractPayload( MIKEYPAYLOAD_PKE_PAYLOAD_TYPE );
-		MikeyPayloadPKE *pke =
-			dynamic_cast<MikeyPayloadPKE*>( payloadPke );
-
-		if( !pke ){
-			throw MikeyException( "PKE init did not contain PKE payload" );
-		}
-
-		MRef<certificate*> cert = ka->getPublicKey();
-		int envKeyLength = pke->dataLength();
-		byte_t *envKey = new byte_t[ envKeyLength ];
-		
-		if( !cert->private_decrypt( pke->data(), pke->dataLength(),
-					    envKey, &envKeyLength ) ){
+		if( !extractPkeEnvKey( ka ) ){
 			throw MikeyException( "Decryption of envelope key failed" );
 		}
 
-		ka->setEnvelopeKey( envKey, envKeyLength );
+		if( !verifyKemac( ka ) ){
+			return true;
+		}
 
-		delete[] envKey;
-		envKey = NULL;
+		return false;
 	}
 	else if( type() == HDR_DATA_TYPE_PK_RESP )
 	{
+		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
+			throw MikeyException( 
+				"PKE response did not end with a V payload" );
+		}
+
 		if( ka->csbId() != csbId() ){
 			ka->setAuthError( "CSBID mismatch\n" );
 			return true;
 		}
-		MikeyPayloadV * v;
-		uint64_t t_sent = ka->tSent();
-		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
-			throw MikeyException( 
-			   "PKE response did not end with a V payload" );
+
+		if( !verifyV( ka ) ){
+			return true;
 		}
 
-		v = (MikeyPayloadV *)payload;
-		macAlg = v->macAlg();
-		receivedMac = v->verData();
-		// macInput = raw_messsage without mac / sent_t
-		macInputLength = rawMessageLength() - 20 + 8;
-		macInput = new byte_t[macInputLength];
-		memcpy( macInput, rawMessageData(), rawMessageLength() - 20 );
-		
-		for( i = 0; i < 8; i++ ){
-			macInput[ macInputLength - i - 1 ] = 
-				(byte_t)((t_sent >> (i*8))&0xFF);
-		}
+		return false;
+
 	}
 	else{
 		throw MikeyException( "Invalide type for a PKE message" );
 	}
 
-	byte_t authKey[20];
-	byte_t computedMac[20];
-	unsigned int computedMacLength;
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			ka->genTranspAuthKey( authKey, 20 );
-
-			hmac_sha1( authKey, 20,
-				   macInput,
-				   macInputLength,
-				   computedMac, &computedMacLength );
-
-			for( i = 0; i < 20; i++ ){
-				if( computedMac[i] != receivedMac[i] ){
-					ka->setAuthError(
-						"MAC mismatch."
-					);
-					return true;
-				}
-			}
-			return false;
-		case MIKEY_MAC_NULL:
-			return false;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
-	}
 }
 
 bool MikeyMessagePKE::isInitiatorMessage() const{

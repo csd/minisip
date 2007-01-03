@@ -3,6 +3,7 @@
 
 #include <libmikey/keyagreement.h>
 #include <libmikey/keyagreement_psk.h>
+#include <libmikey/keyagreement_dh.h>
 #include <libmcrypto/cert.h>
 
 /**
@@ -10,15 +11,23 @@
  * the keys used in the security protocol SRTP
  * It contains the necessary methods to derive the keys used
  */
-class KeyAgreementPKE : public KeyAgreementPSK{
+class KeyAgreementPKE : public KeyAgreementPSK,
+			public PeerCertificates
+{
 	public:
 	
 		/**
-		 * Constructor with the keys needed for the encryption
+		 * Initiator
 		 */
-		KeyAgreementPKE( MRef<certificate*> pubKeyResponder,
-				 int envKeyLength = 192);
-	    
+		KeyAgreementPKE( MRef<certificate_chain*> cert,
+				 MRef<certificate_chain*> peerCert );
+
+		/**
+		 * Responder
+		 */
+		KeyAgreementPKE( MRef<certificate_chain *> cert, 
+				 MRef<ca_db *> ca_db );
+
 	    /**
 	     * Destructor deletes some objects to prevent memory leaks
 	     */
@@ -26,11 +35,6 @@ class KeyAgreementPKE : public KeyAgreementPSK{
 	
 		int32_t type();
 
-	    /**
-	     * Returns the Public-Key of the responder
-	     */
-	    MRef<certificate*> getPublicKey(void);
-	    
 		/**
 		 * Returns the envelope key
 		 */
@@ -49,10 +53,5 @@ class KeyAgreementPKE : public KeyAgreementPSK{
 		MikeyMessage* createMessage();
 
 	private:
-	    
-	    /**
-	     * Public-Key of the responder
-	     */
-		MRef<certificate*> pubKeyResponder;
 };
 #endif //KEYAGREEMENTPKE_H

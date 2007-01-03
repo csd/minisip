@@ -88,9 +88,8 @@ MikeyMessage* MikeyMessage::create( KeyAgreementDHHMAC * ka,
 }
 
 MikeyMessage* MikeyMessage::create( KeyAgreementPKE* ka,
-				    int encrAlg, int macAlg,
-				    MRef<certificate*> certInitiator ){
-	return new MikeyMessagePKE( ka, encrAlg, macAlg, certInitiator );
+				    int encrAlg, int macAlg ){
+	return new MikeyMessagePKE( ka, encrAlg, macAlg );
 }
 
 /*
@@ -329,7 +328,7 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 
 void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	byte_t signature[4096];
-	int signatureLength;
+	int signatureLength = sizeof(signature);
 	MikeyPayloadSIGN * sign;
 	MikeyPayload * last;
 	
@@ -765,6 +764,27 @@ bool MikeyMessage::deriveTranspKeys( KeyAgreementPSK* ka,
 	return !error;
 }
 
+void MikeyPayloads::addCertificatePayloads( MRef<certificate_chain *> certChain ){
+	if( certChain.isNull() ){
+		cerr << "No certificates" << endl;
+		return;
+	}
+
+	certChain->lock();
+	certChain->init_index();
+	MRef<certificate*> cert = certChain->get_next();
+	while( ! cert.isNull() ){
+		MikeyPayload* payload =
+			new MikeyPayloadCERT( MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
+					      cert);
+		addPayload( payload );
+		cert = certChain->get_next();
+	}
+
+	certChain->unlock();
+}
+
+
 MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 	MRef<certificate_chain *> peerChain;
 
@@ -794,4 +814,143 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 	}
 
 	return peerChain;
+}
+
+bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
+	MikeyPayloadSIGN* sig = (MikeyPayloadSIGN*)extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
+
+	if( !sig ){
+		return false;
+	}
+		
+	int res = cert->verif_sign( rawMessageData(),
+				    rawMessageLength() - sig->sigLength(),
+				    sig->sigData(),
+				    sig->sigLength() );
+	return res > 0;
+}
+
+bool MikeyPayloads::verifyKemac( KeyAgreementPSK* ka ) const{
+	int macAlg;
+	byte_t * receivedMac;
+	byte_t * macInput;
+	unsigned int macInputLength;
+	MikeyPayloadKEMAC * kemac;
+
+	kemac = (MikeyPayloadKEMAC *) extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE);
+	macAlg = kemac->macAlg();
+	receivedMac = kemac->macData();
+		
+	macInputLength = kemac->length();
+	macInput = new byte_t[macInputLength];
+
+	kemac->writeData( macInput, macInputLength );
+	macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
+	macInputLength -= 20; // Subtract mac data
+
+	byte_t authKey[20];
+	byte_t computedMac[20];
+	unsigned int computedMacLength;
+	
+	switch( macAlg ){
+		case MIKEY_MAC_HMAC_SHA1_160:
+			ka->genTranspAuthKey( authKey, 20 );
+
+			hmac_sha1( authKey, 20,
+				   macInput,
+				   macInputLength,
+				   computedMac, &computedMacLength );
+
+			for( int i = 0; i < 20; i++ ){
+				if( computedMac[i] != receivedMac[i] ){
+					ka->setAuthError(
+						"MAC mismatch."
+					);
+					return false;
+				}
+			}
+			return true;
+		case MIKEY_MAC_NULL:
+			return true;
+		default:
+			throw MikeyException( "Unknown MAC algorithm" );
+	}
+}
+
+bool MikeyPayloads::verifyV( KeyAgreementPSK* ka ){
+	int macAlg;
+	byte_t * receivedMac;
+	byte_t * macInput;
+	unsigned int macInputLength;
+	MikeyPayloadV * v;
+	uint64_t t_sent = ka->tSent();
+
+	v = (MikeyPayloadV *)extractPayload(MIKEYPAYLOAD_V_PAYLOAD_TYPE );
+	macAlg = v->macAlg();
+	receivedMac = v->verData();
+	// macInput = raw_messsage without mac / sent_t
+	macInputLength = rawMessageLength() - 20 + 8;
+	macInput = new byte_t[macInputLength];
+	memcpy( macInput, rawMessageData(), rawMessageLength() - 20 );
+	
+	for( int i = 0; i < 8; i++ ){
+		macInput[ macInputLength - i - 1 ] = 
+			(byte_t)((t_sent >> (i*8))&0xFF);
+	}
+
+	// TODO Refactor code duplication
+
+	byte_t authKey[20];
+	byte_t computedMac[20];
+	unsigned int computedMacLength;
+	
+	switch( macAlg ){
+		case MIKEY_MAC_HMAC_SHA1_160:
+			ka->genTranspAuthKey( authKey, 20 );
+
+			hmac_sha1( authKey, 20,
+				   macInput,
+				   macInputLength,
+				   computedMac, &computedMacLength );
+
+			for( int i = 0; i < 20; i++ ){
+				if( computedMac[i] != receivedMac[i] ){
+					ka->setAuthError(
+						"MAC mismatch."
+					);
+					return false;
+				}
+			}
+			return true;
+		case MIKEY_MAC_NULL:
+			return true;
+		default:
+			throw MikeyException( "Unknown MAC algorithm" );
+	}
+}
+
+bool MikeyPayloads::extractPkeEnvKey( KeyAgreementPKE* ka ) const{
+	const MikeyPayload *payloadPke =
+		extractPayload( MIKEYPAYLOAD_PKE_PAYLOAD_TYPE );
+	const MikeyPayloadPKE *pke =
+		dynamic_cast<const MikeyPayloadPKE*>( payloadPke );
+
+	if( !pke ){
+		throw MikeyException( "PKE init did not contain PKE payload" );
+	}
+
+	MRef<certificate*> cert = ka->certificateChain()->get_first();
+	int envKeyLength = pke->dataLength();
+	byte_t *envKey = new byte_t[ envKeyLength ];
+		
+	if( !cert->private_decrypt( pke->data(), pke->dataLength(),
+				    envKey, &envKeyLength ) ){
+		throw MikeyException( "Decryption of envelope key failed" );
+	}
+
+	ka->setEnvelopeKey( envKey, envKeyLength );
+
+	delete[] envKey;
+	envKey = NULL;
+	return true;
 }

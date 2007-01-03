@@ -90,11 +90,11 @@ int MikeyPayloadPKE::c(){
 	return cValue;
 }
 
-int MikeyPayloadPKE::dataLength(){
+int MikeyPayloadPKE::dataLength() const{
 	return dataLengthValue;
 }
 
-byte_t * MikeyPayloadPKE::data(){
+const byte_t * MikeyPayloadPKE::data() const{
 	return dataPtr;
 }
 

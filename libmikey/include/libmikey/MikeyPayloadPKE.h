@@ -46,8 +46,8 @@ class LIBMIKEY_API MikeyPayloadPKE : public MikeyPayload{
 		virtual void writeData( byte_t * start, int expectedLength );
 		virtual std::string debugDump();
 		int c();
-		int dataLength();
-		byte_t * data();
+		int dataLength() const;
+		const byte_t * data() const;
 
 	private:
 		int cValue;

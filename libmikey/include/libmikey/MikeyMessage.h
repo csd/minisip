@@ -38,8 +38,6 @@
 #include<libmikey/keyagreement.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
-#include<libmikey/KeyAgreementPKE.h>
-#include<libmikey/KeyAgreementDHHMAC.h>
 #include<libmcrypto/cert.h>
 
 #include<list>
@@ -70,6 +68,8 @@ class aes;
 class SipSim;
 class certificate;
 class certificate_db;
+class KeyAgreementDHHMAC;
+class KeyAgreementPKE;
 
 class LIBMIKEY_API MikeyPayloads{
 	public:
@@ -81,16 +81,24 @@ class LIBMIKEY_API MikeyPayloads{
 		void operator+=( MikeyPayload * payload );
 		void addSignaturePayload( MRef<SipSim*> sim );
 		void addSignaturePayload( MRef<certificate *> cert );
+		bool verifySignature( MRef<certificate*> cert );
+
 		void addVPayload( int macAlg, uint64_t receivedT,
 			byte_t * authKey, uint32_t authKeyLength);
-		virtual void addKemacPayload(
+		bool verifyV( KeyAgreementPSK* ka );
+
+		void addKemacPayload(
 				byte_t * tgk, int tgkLength,
 				byte_t * encrKey, byte_t * iv,
 				byte_t * authKey,
 				int encrAlg, int macAlg,
 				bool kemacOnly = false );
-				
+		bool verifyKemac( KeyAgreementPSK* ka ) const;
+
+		void addCertificatePayloads( MRef<certificate_chain *> certChain );
 		MRef<certificate_chain*> extractCertificateChain() const;
+
+		bool extractPkeEnvKey( KeyAgreementPKE* ka ) const;
 
 		std::string debugDump();
 		byte_t * rawMessageData();
@@ -151,8 +159,7 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
 		//added by choehn
 		static MikeyMessage* create(KeyAgreementPKE* ka,
 				  int encrAlg = MIKEY_ENCR_AES_CM_128,
-				  int macAlg = MIKEY_MAC_HMAC_SHA1_160,
-				  MRef<certificate*> certInitiator = NULL);
+					    int macAlg = MIKEY_MAC_HMAC_SHA1_160 );
 
 		/**
 		 * Parse MIKEY message from binary representation
