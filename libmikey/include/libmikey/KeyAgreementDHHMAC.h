@@ -44,6 +44,8 @@ class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreementPSK{
 				    int groupValue = -1 );
 		~KeyAgreementDHHMAC();
 
+		int32_t type();
+
 		int setGroup( int group );
 		int group();
 

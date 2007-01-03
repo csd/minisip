@@ -24,6 +24,8 @@ class KeyAgreementPKE : public KeyAgreementPSK{
 	     */
 	    ~KeyAgreementPKE();
 	
+		int32_t type();
+
 	    /**
 	     * Returns the Public-Key of the responder
 	     */

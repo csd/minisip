@@ -28,6 +28,7 @@
 #include<libmikey/MikeyPayloadSP.h>
 #include<string.h>
 #include<libmcrypto/hmac.h>
+#include<libmcrypto/rand.h>
 
 using namespace std;
 
@@ -280,7 +281,12 @@ void KeyAgreement::setTgk( unsigned char * tgk, unsigned int tgkLengthValue ){
 		delete [] this->tgkPtr;
 	this->tgkLengthValue = tgkLengthValue;
 	this->tgkPtr = new unsigned char[ tgkLengthValue ];
-	memcpy( this->tgkPtr, tgk, tgkLengthValue );
+	if( tgk ){
+		memcpy( this->tgkPtr, tgk, tgkLengthValue );
+	}
+	else{
+		Rand::randomize( this->tgkPtr, tgkLengthValue );
+	}
 }
 
 void * KeyAgreement::initiatorData(){

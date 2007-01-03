@@ -23,7 +23,6 @@
 
 
 #include<config.h>
-#include<libmcrypto/rand.h>
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/keyagreement_psk.h>
 
@@ -35,7 +34,6 @@ KeyAgreementPSK::KeyAgreementPSK():
 KeyAgreementPSK::KeyAgreementPSK( unsigned char * pskPtr, int pskLengthValue )
 	:KeyAgreement(), tSentValue( 0 ){
 	//policy = list<Policy_type *>::list();
-	typeValue = KEY_AGREEMENT_TYPE_PSK;
 	this->pskLengthValue = pskLengthValue;
 	this->pskPtr = new unsigned char[ pskLengthValue ];
 	memcpy( this->pskPtr, pskPtr, pskLengthValue );
@@ -49,32 +47,30 @@ KeyAgreementPSK::~KeyAgreementPSK(){
 
 }
 
+int32_t KeyAgreementPSK::type(){
+	return KEY_AGREEMENT_TYPE_PSK;
+}
+
 void KeyAgreementPSK::generateTgk( uint32_t tgkLength ){
-// 	typeValue = KEY_AGREEMENT_TYPE_PSK;
-	this->tgkLengthValue = tgkLength;
-	if( tgkPtr ){
-		delete [] tgkPtr;
-	}
-	
-	tgkPtr = new unsigned char[ tgkLength ];
-	Rand::randomize( tgkPtr, tgkLength );
+	// Generate random TGK
+	setTgk( NULL, tgkLength );
 }
 
 void KeyAgreementPSK::genTranspEncrKey( 
 		unsigned char * encrKey, int encrKeyLength ){
-	keyDeriv( 0xFF, csbIdValue, pskPtr, pskLengthValue, 
+	keyDeriv( 0xFF, csbId(), pskPtr, pskLengthValue, 
 			encrKey, encrKeyLength, KEY_DERIV_TRANS_ENCR );
 }
 	
 void KeyAgreementPSK::genTranspSaltKey( 
 		unsigned char * encrKey, int encrKeyLength ){
-	keyDeriv( 0xFF, csbIdValue, pskPtr, pskLengthValue, 
+	keyDeriv( 0xFF, csbId(), pskPtr, pskLengthValue, 
 			encrKey, encrKeyLength, KEY_DERIV_TRANS_SALT );
 }
 
 void KeyAgreementPSK::genTranspAuthKey( 
 		unsigned char * encrKey, int encrKeyLength ){
-	keyDeriv( 0xFF, csbIdValue, pskPtr, pskLengthValue, 
+	keyDeriv( 0xFF, csbId(), pskPtr, pskLengthValue, 
 			encrKey, encrKeyLength, KEY_DERIV_TRANS_AUTH );
 }
 

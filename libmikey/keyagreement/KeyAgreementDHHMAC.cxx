@@ -41,7 +41,6 @@ KeyAgreementDHHMAC::KeyAgreementDHHMAC( unsigned char * pskPtr,
 		 dh( NULL ), peerKeyPtr( NULL ), peerKeyLengthValue( 0 ){
 // 		 m_authKey( NULL ),
 // 		 m_authKeyLength( 0 ), m_macAlg( 0 ){
-	typeValue = KEY_AGREEMENT_TYPE_DHHMAC;
 	dh = new OakleyDH();
 	if( dh == NULL )
 	{
@@ -58,19 +57,20 @@ KeyAgreementDHHMAC::KeyAgreementDHHMAC( unsigned char * pskPtr,
 KeyAgreementDHHMAC::~KeyAgreementDHHMAC(){
 }
 
+int32_t KeyAgreementDHHMAC::type(){
+	return KEY_AGREEMENT_TYPE_DHHMAC;
+}
+
 int KeyAgreementDHHMAC::setGroup( int groupValue ){
 	if( !dh->setGroup( groupValue ) )
 		return 1;
 
 	uint32_t len = dh->secretLength();
 
-	if( len != tgkLengthValue || !tgkPtr ){
-		if( tgkPtr )
-			delete[] tgkPtr;
-		tgkPtr = new unsigned char[ len ];
+	if( len != tgkLength() || !tgk() ){
+		setTgk( NULL, len );
 	}
 
-	tgkLengthValue = len;
 	return 0;
 }
 
@@ -126,7 +126,7 @@ int KeyAgreementDHHMAC::computeTgk(){
 	assert( peerKeyPtr );
 
 	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue,
-				     tgkPtr, tgkLengthValue );
+				     tgk(), tgkLength() );
 	return res;
 }
 

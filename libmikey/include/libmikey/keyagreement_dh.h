@@ -52,6 +52,8 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement{
 		KeyAgreementDH( MRef<SipSim *> sim, int group );
 		~KeyAgreementDH();
 
+		int32_t type();
+
 		int computeTgk();
 		int setGroup( int group );
 		int group();

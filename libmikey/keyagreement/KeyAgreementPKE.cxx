@@ -9,8 +9,6 @@
 KeyAgreementPKE::KeyAgreementPKE( MRef<certificate*> pubKeyResponderT, int envKeyLength )
 		:KeyAgreementPSK(){
 										
-	typeValue = KEY_AGREEMENT_TYPE_PK;
-	
 	//envelope key to encrypt KEMAC payload
 	byte_t envKey[ envKeyLength ];
 	Rand::randomize( envKey, envKeyLength );
@@ -24,6 +22,10 @@ KeyAgreementPKE::KeyAgreementPKE( MRef<certificate*> pubKeyResponderT, int envKe
 }
 
 KeyAgreementPKE::~KeyAgreementPKE(){
+}
+
+int32_t KeyAgreementPKE::type(){
+	return KEY_AGREEMENT_TYPE_PK;
 }
 
 MRef<certificate*> KeyAgreementPKE::getPublicKey(void){

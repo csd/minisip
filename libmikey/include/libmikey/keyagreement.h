@@ -73,7 +73,7 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		~KeyAgreement();
 
 		/* Type of key agreement (DH, PSK, PKE) */
-		int32_t type(){ return typeValue; };
+		virtual int32_t type()=0;
 
 		/* RAND value exchanged during the key agreement */
 		unsigned int randLength();
@@ -106,6 +106,9 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		void setnCs(uint8_t value);
 
 		/* TGK */
+		/**
+		 * If tgk == NULL, generate random TGK of specified size
+		 */
 		void setTgk( byte_t * tgk, unsigned int tgkLength );
 		unsigned int tgkLength();
 		byte_t * tgk();
@@ -124,9 +127,6 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		void setResponderData( void * );
 
 
-		/* Security Policy 
-		 */	
-		std::list <Policy_type *> policy; //Contains the security policy
 		//Set the first Parameter Type in a new security policy. Returns the new Policy number.
 		uint8_t setPolicyParamType(uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value);
 		//Add or modify a parameter in an existing policy
@@ -175,13 +175,18 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 		        	byte_t * inkey, unsigned int inkey_length,
 		        	byte_t * key, unsigned int key_length,
 			   	int type );
+
+	private:
+		/* Security Policy 
+		 */	
+		std::list <Policy_type *> policy; //Contains the security policy
+
 		byte_t * tgkPtr;
 		unsigned int tgkLengthValue;
 		byte_t * randPtr;
 		unsigned int randLengthValue;
 
 		unsigned int csbIdValue;
-		int32_t typeValue;
 
 		MRef<KeyValidity *> kvPtr;
 		MRef<MikeyCsIdMap *> csIdMapPtr;

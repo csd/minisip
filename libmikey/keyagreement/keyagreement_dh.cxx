@@ -42,7 +42,6 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	certDbPtr( certDbPtr )
 {
 	//policy = list<Policy_type *>::list();
-	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
 	peerCertChainPtr = certificate_chain::create();
 
@@ -58,7 +57,6 @@ KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
 	sim(s)
 {
 	//policy = list<Policy_type *>::list();
-	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
 	peerCertChainPtr = certificate_chain::create();
 
@@ -81,7 +79,6 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 	peerCertChainPtr( NULL ),
 	certDbPtr( certDbPtr ){
 	//policy = list<Policy_type *>::list();
-	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
 	if( dh == NULL )
 	{
@@ -107,7 +104,6 @@ KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
 	sim(s)
 {
 	//policy = list<Policy_type *>::list();
-	typeValue = KEY_AGREEMENT_TYPE_DH;
 	dh = new OakleyDH();
 	if( dh == NULL )
 	{
@@ -122,19 +118,20 @@ KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
 	peerCertChainPtr = certificate_chain::create();
 }
 
+int32_t KeyAgreementDH::type(){
+	return KEY_AGREEMENT_TYPE_DH;
+}
+
 int KeyAgreementDH::setGroup( int groupValue ){
 	if( !dh->setGroup( groupValue ) )
 		return 1;
 
 	uint32_t len = dh->secretLength();
 
-	if( len != tgkLengthValue || !tgkPtr ){
-		if( tgkPtr )
-			delete[] tgkPtr;
-		tgkPtr = new unsigned char[ len ];
+	if( len != tgkLength() || !tgk() ){
+		setTgk( NULL, len );
 	}
 
-	tgkLengthValue = len;
 	return 0;
 }
 	
@@ -165,7 +162,7 @@ unsigned char * KeyAgreementDH::publicKey(){
 int KeyAgreementDH::computeTgk(){
 	assert( peerKeyPtr );
 
-	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgkPtr, tgkLengthValue );
+	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgk(), tgkLength() );
 	return res;
 }
 

@@ -36,6 +36,8 @@ class LIBMIKEY_API KeyAgreementPSK : public KeyAgreement{
 		KeyAgreementPSK( byte_t * psk, int pskLength );
 		virtual ~KeyAgreementPSK();
 
+		int32_t type();
+
 		/**
 		 * Generates a TGK of de given length with the random function from the
 		 * OpenSSL library and stores it in this instance
