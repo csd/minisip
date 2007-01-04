@@ -9,6 +9,6 @@ Name: @PACKAGE@
 Description: Minisip Cryptography Library (AES, base64, HMAC, X509)
 Version: @VERSION@
 Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1
-Libs: -L${libdir} -lmcrypto @SCSIM_LIBS@
-Libs.private: @MINISIP_LIBS@ @OPENSSL_LIBS@ @GNUTLS_LIBS@ @LIBS@
+Libs: -L${libdir} -lmcrypto
+Libs.private: @MINISIP_LIBS@ @OPENSSL_LIBS@ @GNUTLS_LIBS@ @SCSIM_LIBS@ @LIBS@
 Cflags: -I${includedir}

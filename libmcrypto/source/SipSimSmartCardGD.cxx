@@ -24,6 +24,8 @@
 #include <libmcrypto/SipSimSmartCardGD.h>
 #include <libmcrypto/SmartCardException.h>
 
+using namespace std;
+
 SipSimSmartCardGD::SipSimSmartCardGD():SmartCard() {
 	cerr << "XXXXXXXXXXXXXX SipSimSmartCardGD::SipSimSmartCardGD() running XXXXXXXXXXXXXXXXXXXx"<<endl;
 	

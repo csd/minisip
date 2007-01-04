@@ -27,13 +27,14 @@
 
 #include <libmcrypto/config.h>
 
-#include <PCSC/winscard.h>
 #include <libmutil/MemObject.h>
 #include <map>
 
-using namespace std;
+typedef long SCARDCONTEXT;
+typedef long SCARDHANDLE;
+typedef struct _SCARD_IO_REQUEST SCARD_IO_REQUEST;
 
-class SmartCard : public virtual MObject {
+class LIBMCRYPTO_API SmartCard : public virtual MObject {
 public:
 	/* constructor is called to connect to the smart card */
 	SmartCard();
@@ -71,7 +72,7 @@ protected:
 	char * readerNamesPtr;
 
 /* This map is used to store the index and reader names: map<int index, char * readerNames> */
-	map <int,char *> readerMap;
+	std::map <int,char *> readerMap;
 
 /* The resource manager handler */
 	SCARDCONTEXT hContext;

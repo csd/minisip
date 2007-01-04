@@ -27,6 +27,10 @@
 #include <libmcrypto/SmartCardException.h>
 #include <libmutil/stringutils.h>
 
+#include <winscard.h>
+
+using namespace std;
+
 SmartCard::SmartCard(){
 	this -> userPinCode = NULL;
 	this -> adminPinCode = NULL;
