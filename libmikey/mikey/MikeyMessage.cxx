@@ -817,7 +817,7 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 }
 
 bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
-	MikeyPayloadSIGN* sig = (MikeyPayloadSIGN*)extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
+	MikeyPayloadSIGN* sig = dynamic_cast<MikeyPayloadSIGN*>(extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE));
 
 	if( !sig ){
 		return false;
@@ -830,51 +830,41 @@ bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
 	return res > 0;
 }
 
-bool MikeyPayloads::verifyKemac( KeyAgreementPSK* ka ) const{
+bool MikeyPayloads::verifyKemac( KeyAgreementPSK* ka,
+				 bool kemacOnly ){
 	int macAlg;
 	byte_t * receivedMac;
 	byte_t * macInput;
 	unsigned int macInputLength;
 	MikeyPayloadKEMAC * kemac;
 
-	kemac = (MikeyPayloadKEMAC *) extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE);
+	kemac = dynamic_cast<MikeyPayloadKEMAC *>(extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE));
+
+	if( !kemac ){
+		return false;
+	}
+
 	macAlg = kemac->macAlg();
 	receivedMac = kemac->macData();
 		
-	macInputLength = kemac->length();
-	macInput = new byte_t[macInputLength];
-
-	kemac->writeData( macInput, macInputLength );
-	macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
-	macInputLength -= 20; // Subtract mac data
-
-	byte_t authKey[20];
-	byte_t computedMac[20];
-	unsigned int computedMacLength;
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			ka->genTranspAuthKey( authKey, 20 );
-
-			hmac_sha1( authKey, 20,
-				   macInput,
-				   macInputLength,
-				   computedMac, &computedMacLength );
-
-			for( int i = 0; i < 20; i++ ){
-				if( computedMac[i] != receivedMac[i] ){
-					ka->setAuthError(
-						"MAC mismatch."
-					);
-					return false;
-				}
-			}
-			return true;
-		case MIKEY_MAC_NULL:
-			return true;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
+	if( kemacOnly ){
+		macInputLength = kemac->length();
+		macInput = new byte_t[macInputLength];
+		kemac->writeData( macInput, macInputLength );
+		macInput[0] = MIKEYPAYLOAD_LAST_PAYLOAD;
 	}
+	else{
+		macInputLength = rawMessageLength();
+		macInput = new byte_t[macInputLength];
+		memcpy( macInput, rawMessageData(), rawMessageLength() );
+	}
+
+	macInputLength -= 20; // Subtract mac data
+	bool ret = verifyMac( ka, macAlg, receivedMac,
+			      macInput, macInputLength );
+
+	delete[] macInput;
+	return ret;
 }
 
 bool MikeyPayloads::verifyV( KeyAgreementPSK* ka ){
@@ -885,7 +875,12 @@ bool MikeyPayloads::verifyV( KeyAgreementPSK* ka ){
 	MikeyPayloadV * v;
 	uint64_t t_sent = ka->tSent();
 
-	v = (MikeyPayloadV *)extractPayload(MIKEYPAYLOAD_V_PAYLOAD_TYPE );
+	v = dynamic_cast<MikeyPayloadV*>(extractPayload(MIKEYPAYLOAD_V_PAYLOAD_TYPE));
+
+	if( !v ){
+		return false;
+	}
+
 	macAlg = v->macAlg();
 	receivedMac = v->verData();
 	// macInput = raw_messsage without mac / sent_t
@@ -898,8 +893,17 @@ bool MikeyPayloads::verifyV( KeyAgreementPSK* ka ){
 			(byte_t)((t_sent >> (i*8))&0xFF);
 	}
 
-	// TODO Refactor code duplication
+	bool ret = verifyMac( ka, macAlg, receivedMac,
+			      macInput, macInputLength );
 
+	delete[] macInput;
+	return ret;
+}
+
+bool MikeyPayloads::verifyMac( KeyAgreementPSK* ka, int macAlg,
+			       const byte_t* receivedMac,
+			       const byte_t* macInput,
+			       unsigned int macInputLength ) const{
 	byte_t authKey[20];
 	byte_t computedMac[20];
 	unsigned int computedMacLength;

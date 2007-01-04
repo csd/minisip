@@ -93,7 +93,8 @@ class LIBMIKEY_API MikeyPayloads{
 				byte_t * authKey,
 				int encrAlg, int macAlg,
 				bool kemacOnly = false );
-		bool verifyKemac( KeyAgreementPSK* ka ) const;
+		bool verifyKemac( KeyAgreementPSK* ka,
+				  bool kemacOnly = false );
 
 		void addCertificatePayloads( MRef<certificate_chain *> certChain );
 		MRef<certificate_chain*> extractCertificateChain() const;
@@ -130,6 +131,11 @@ class LIBMIKEY_API MikeyPayloads{
 		 * and will be deleted in destructor.
 		 */
 		void setRawMessageData( byte_t *data );
+
+		bool verifyMac( KeyAgreementPSK* ka, int macAlg,
+				const byte_t* receivedMac,
+				const byte_t* macInput,
+				unsigned int macInputLength ) const;
 
 		std::list<MikeyPayload *> payloads;
 

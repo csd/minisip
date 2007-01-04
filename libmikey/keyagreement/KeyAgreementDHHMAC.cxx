@@ -24,34 +24,18 @@
 */
 
 #include<config.h>
-#include<libmcrypto/rand.h>
 #include<libmikey/MikeyMessage.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/KeyAgreementDHHMAC.h>
-#include<libmcrypto/OakleyDH.h>
 
 #include<string>
 
 using namespace std;
 
 KeyAgreementDHHMAC::KeyAgreementDHHMAC( unsigned char * pskPtr,
-					int pskLengthValue,
-					int groupValue )
+					int pskLengthValue )
 		:KeyAgreementPSK(pskPtr, pskLengthValue),
-		 dh( NULL ), peerKeyPtr( NULL ), peerKeyLengthValue( 0 ){
-// 		 m_authKey( NULL ),
-// 		 m_authKeyLength( 0 ), m_macAlg( 0 ){
-	dh = new OakleyDH();
-	if( dh == NULL )
-	{
-		throw MikeyException( "Could not create "
-				          "DH parameters." );
-	}
-
-	if( groupValue >= 0 && setGroup( groupValue ) ){
-		throw MikeyException( "Could not set the  "
-				      "DH group." );
-	}
+		 KeyAgreementDHBase(){
 }
 
 KeyAgreementDHHMAC::~KeyAgreementDHHMAC(){
@@ -59,75 +43,6 @@ KeyAgreementDHHMAC::~KeyAgreementDHHMAC(){
 
 int32_t KeyAgreementDHHMAC::type(){
 	return KEY_AGREEMENT_TYPE_DHHMAC;
-}
-
-int KeyAgreementDHHMAC::setGroup( int groupValue ){
-	if( !dh->setGroup( groupValue ) )
-		return 1;
-
-	uint32_t len = dh->secretLength();
-
-	if( len != tgkLength() || !tgk() ){
-		setTgk( NULL, len );
-	}
-
-	return 0;
-}
-
-int KeyAgreementDHHMAC::group(){
-	return dh->group();
-
-}
-
-// void KeyAgreementDHHMAC::setAuthKey( int macAlg, byte_t *authKey,
-// 				     unsigned int authKeyLength ){
-// 	m_macAlg = macAlg;
-// 	m_authKey = authKey;
-// 	m_authKeyLength = authKeyLength;
-// }
-
-// int KeyAgreementDHHMAC::getMacAlg(){
-// 	return m_macAlg;
-// }
-
-void KeyAgreementDHHMAC::setPeerKey( unsigned char * peerKeyPtr,
-			      int peerKeyLengthValue ){
-	if( this->peerKeyPtr )
-		delete[] this->peerKeyPtr;
-
-	this->peerKeyPtr = new unsigned char[ peerKeyLengthValue ];
-	this->peerKeyLengthValue = peerKeyLengthValue;
-	memcpy( this->peerKeyPtr, peerKeyPtr, peerKeyLengthValue );
-
-}
-
-int KeyAgreementDHHMAC::peerKeyLength(){
-	return peerKeyLengthValue;
-}
-
-unsigned char * KeyAgreementDHHMAC::peerKey(){
-	return peerKeyPtr;
-}
-
-int KeyAgreementDHHMAC::publicKeyLength(){
-	return dh->publicKeyLength();
-}
-
-unsigned char * KeyAgreementDHHMAC::publicKey(){
-	unsigned char * publicKey;
-	uint32_t length = publicKeyLength();
-	publicKey = new unsigned char[ length ];
-	dh->getPublicKey( publicKey, length );
-	return publicKey;
-
-}
-
-int KeyAgreementDHHMAC::computeTgk(){
-	assert( peerKeyPtr );
-
-	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue,
-				     tgk(), tgkLength() );
-	return res;
 }
 
 MikeyMessage* KeyAgreementDHHMAC::createMessage(){

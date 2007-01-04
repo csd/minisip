@@ -38,8 +38,6 @@
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
 
-#include<libmcrypto/hmac.h>
-
 using namespace std;
 
 MikeyMessagePSK::MikeyMessagePSK(){
@@ -184,6 +182,7 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
 			((MikeyPayloadRAND *)i)->randLength() );
 
@@ -203,6 +202,7 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 #define kemac ((MikeyPayloadKEMAC *)i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
@@ -351,6 +351,7 @@ MikeyMessage* MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+	// FIXME i can be NULL
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
@@ -383,12 +384,6 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 	}
 
 	MikeyPayload * payload = *(lastPayload());
-	int i;
-	int macAlg;
-	byte_t * receivedMac;
-	byte_t * macInput;
-	unsigned int macInputLength;
-	list<MikeyPayload *>::iterator payload_i;
  
 	if( ka->rand() == NULL ){
 		
@@ -409,81 +404,38 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 			     randPayload->randLength() );
 	}
 
-	if( type() == HDR_DATA_TYPE_PSK_INIT )
+	if( isInitiatorMessage() )
 	{
-		MikeyPayloadKEMAC * kemac;
 		if( payload->payloadType() != MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE){
 			throw MikeyException( 
 			   "PSK init did not end with a KEMAC payload" );
 		}
 		
-
-		kemac = (MikeyPayloadKEMAC *)payload;
-		macAlg = kemac->macAlg();
-		receivedMac = kemac->macData();
-		macInput = rawMessageData();
-		macInputLength = rawMessageLength() - 20;
 		ka->setCsbId( csbId() );
+
+		if( !verifyKemac( ka, false ) ){
+			return true;
+		}
+
+		return false;
+
 	}
-	else if( type() == HDR_DATA_TYPE_PSK_RESP )
+	else if( isResponderMessage() )
 	{
 		if( ka->csbId() != csbId() ){
 			ka->setAuthError( "CSBID mismatch\n" );
 			return true;
 		}
-		MikeyPayloadV * v;
-		uint64_t t_sent = ka->tSent();
-		if( payload->payloadType() != MIKEYPAYLOAD_V_PAYLOAD_TYPE ){
-			throw MikeyException( 
-			   "PSK response did not end with a V payload" );
+
+		if( !verifyV( ka ) ){
+			return true;
 		}
 
-		v = (MikeyPayloadV *)payload;
-		macAlg = v->macAlg();
-		receivedMac = v->verData();
-		// macInput = raw_messsage without mac / sent_t
-		macInputLength = rawMessageLength() - 20 + 8;
-		macInput = new byte_t[macInputLength];
-		memcpy( macInput, rawMessageData(), rawMessageLength() - 20 );
-		
-		for( i = 0; i < 8; i++ ){
-			macInput[ macInputLength - i - 1 ] = 
-				(byte_t)((t_sent >> (i*8))&0xFF);
-		}
+		return false;
 	}
 	else{
 		throw MikeyException( "Invalide type for a PSK message" );
 	}
-
-	byte_t authKey[20];
-	byte_t computedMac[20];
-	unsigned int computedMacLength;
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			ka->genTranspAuthKey( authKey, 20 );
-
-			hmac_sha1( authKey, 20,
-				   macInput,
-				   macInputLength,
-				   computedMac, &computedMacLength );
-
-			for( i = 0; i < 20; i++ ){
-				if( computedMac[i] != receivedMac[i] ){
-					ka->setAuthError(
-						"MAC mismatch: the shared"
-						"key probably differs."
-					);
-					return true;
-				}
-			}
-			return false;
-		case MIKEY_MAC_NULL:
-			return false;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
-	}
-
 }
 
 bool MikeyMessagePSK::isInitiatorMessage() const{

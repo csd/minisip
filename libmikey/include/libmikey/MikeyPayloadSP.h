@@ -139,6 +139,8 @@ class LIBMIKEY_API MikeyPayloadSP : public MikeyPayload{
 		virtual int length();
 		//Return number of policy param entries
 		int noOfPolicyParam();
+		std::string debugDump();
+
 		uint8_t policy_no;
 		uint8_t prot_type;
 		

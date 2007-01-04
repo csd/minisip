@@ -38,8 +38,6 @@
 #include <libmikey/MikeyPayloadKEMAC.h>
 #include <libmikey/MikeyPayloadV.h>
 #include <libmikey/MikeyPayloadPKE.h>
-#include <libmcrypto/aes.h>
-#include <libmcrypto/hmac.h>
 
 using namespace std;
 
@@ -114,6 +112,10 @@ MikeyMessagePKE::MikeyMessagePKE( KeyAgreementPKE* ka, int encrAlg, int macAlg )
 	//adding PKE payload
 	MRef<certificate*> certResponder =
 		ka->peerCertificateChain()->get_first();
+
+	if( !certResponder ){
+		throw MikeyException( "PKE requires peer certificate" );
+	}
 
 	byte_t* env_key = ka->getEnvelopeKey();
 	int encEnvKeyLength = 8192; // TODO autodetect?
@@ -468,7 +470,7 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 			throw MikeyException( "Decryption of envelope key failed" );
 		}
 
-		if( !verifyKemac( ka ) ){
+		if( !verifyKemac( ka, true ) ){
 			return true;
 		}
 

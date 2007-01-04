@@ -132,3 +132,19 @@ void MikeyPayloadSP::deleteMikeyPolicyParam(uint8_t type){
 			i=param.erase(i);
 		}
 }
+
+std::string MikeyPayloadSP::debugDump(){
+	string ret = "MikeyPayloadSP: next_payload<" + itoa( nextPayloadTypeValue ) + "> ";
+
+	ret += string("policyNo: <") + itoa( policy_no ) + "> ";
+	ret += string("protType: <") + itoa( prot_type ) + ">\n";
+
+	list<MikeyPolicyParam *>::iterator i = param.begin();
+	for( ; i != param.end(); i++ ){
+		ret += string("type: <") + itoa( (*i)->type ) + "> ";
+		ret += string("value: <")
+		       + binToHex( (*i)->value, (*i)->length ) + ">\n";
+	}
+	
+	return ret;
+}

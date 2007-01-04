@@ -23,6 +23,7 @@
 
 
 #include<config.h>
+#include<libmikey/MikeyMessage.h>
 #include<libmikey/MikeyPayloadKEMAC.h>
 #include<libmikey/MikeyException.h>
 #include<assert.h>

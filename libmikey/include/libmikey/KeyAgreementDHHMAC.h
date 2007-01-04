@@ -30,7 +30,7 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmikey/keyagreement_psk.h>
-#include<libmcrypto/OakleyDH.h>
+#include<libmikey/keyagreement_dh.h>
 #include<libmutil/mtypes.h>
 
 /**
@@ -38,41 +38,15 @@
  * for Multimedia Internet KEYing (MIKEY)
  * RFC 4650
  */
-class LIBMIKEY_API KeyAgreementDHHMAC : public KeyAgreementPSK{
+class LIBMIKEY_API KeyAgreementDHHMAC : public virtual KeyAgreementPSK,
+					public virtual KeyAgreementDHBase{
 	public:
-		KeyAgreementDHHMAC( byte_t * psk, int pskLength,
-				    int groupValue = -1 );
+		KeyAgreementDHHMAC( byte_t * psk, int pskLength );
 		~KeyAgreementDHHMAC();
 
 		int32_t type();
 
-		int setGroup( int group );
-		int group();
-
-// 		void setAuthKey( int macAlg, byte_t *authKey,
-// 				 unsigned int authKeyLength );
-// 		int getMacAlg();
-
-		void setPeerKey( byte_t * peerKey, int peerKeyLength );
-		int peerKeyLength();
-		byte_t * peerKey();
-
-		int publicKeyLength();
-		byte_t * publicKey();
-
-		int computeTgk();
-
 		MikeyMessage* createMessage();
-
-	private:
-		OakleyDH * dh;
-
-		byte_t * peerKeyPtr;
-		int peerKeyLengthValue;
-
-// 		byte_t * m_authKey;
-// 		unsigned int m_authKeyLength;
-// 		int m_macAlg;
 };
 
 #endif

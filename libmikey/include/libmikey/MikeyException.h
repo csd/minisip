@@ -34,9 +34,9 @@
  * @version 0.01
  */
 
-#include<libmikey/MikeyMessage.h>
 #include<libmutil/Exception.h>
 
+class MikeyMessage;
 
 
 class LIBMIKEY_API MikeyException : public Exception{

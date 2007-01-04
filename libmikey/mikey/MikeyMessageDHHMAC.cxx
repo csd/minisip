@@ -38,8 +38,6 @@
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyPayloadT.h>
 
-#include<libmcrypto/hmac.h>
-
 #include<map>
 
 using namespace std;
@@ -185,9 +183,12 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-
 	if( ka->group() != ((MikeyPayloadDH *)i)->group() ){
-		ka->setGroup( ((MikeyPayloadDH *)i)->group() );
+		if( ka->setGroup( ((MikeyPayloadDH *)i)->group() ) ){
+			error = true;
+			errorMessage->addPayload(
+				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_DH ) );
+		}
 	}
 
 	ka->setPeerKey( ((MikeyPayloadDH *)i)->dhKey(),
@@ -204,30 +205,15 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
-
-	// KMAC
-#define kemac ((MikeyPayloadKEMAC *)i)
-	int encrAlg = kemac->encrAlg();
-	int macAlg  = kemac->macAlg();
-
-	byte_t* encrKey = NULL;
-	byte_t* iv = NULL;
-	unsigned int encrKeyLength = 0;
-
-
-	error |= !deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
-				    encrAlg, macAlg, 0, errorMessage );
-// 	ka->setAuthKey( macAlg, authKey, authKeyLength);
-
-	if( encrKey )
-		delete[] encrKey;
-	if( iv )
-		delete[] iv;
+	else{
+		ka->macAlg = ((MikeyPayloadKEMAC*)i)->macAlg();;
+	}
 
 	if( error ){
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
-#undef kemac
+
+// 	ka->computeTgk();
 }
 //-----------------------------------------------------------------------------------------------//
 //
@@ -404,6 +390,8 @@ MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 
 	delete errorMessage;
 
+// 	ka->computeTgk();
+
 	return NULL;
 }
 
@@ -416,12 +404,6 @@ bool MikeyMessageDHHMAC::authenticate( KeyAgreement * kaBase ){
 	}
 
 	MikeyPayload * payload = *(lastPayload());
-	int i;
-	int macAlg;
-	byte_t * receivedMac;
-	byte_t * macInput;
-	unsigned int macInputLength;
-	list<MikeyPayload *>::iterator payload_i;
  
 	if( ka->rand() == NULL ){
 		
@@ -443,54 +425,22 @@ bool MikeyMessageDHHMAC::authenticate( KeyAgreement * kaBase ){
 	}
 
 	
-	if( type() == HDR_DATA_TYPE_DHHMAC_INIT ||
-	    type() == HDR_DATA_TYPE_DHHMAC_RESP ){
-		MikeyPayloadKEMAC * kemac;
+	if( isInitiatorMessage() || isResponderMessage() ){
 		if( payload->payloadType() != MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE){
 			cerr << "Last payload type = " << (int)payload->payloadType() << endl;
 			throw MikeyException( 
 			   "DHHMAC init did not end with a KEMAC payload" );
 		}
 		
-
-		kemac = (MikeyPayloadKEMAC *)payload;
-		macAlg = kemac->macAlg();
-		receivedMac = kemac->macData();
-		macInput = rawMessageData();
-		macInputLength = rawMessageLength() - 20;
 		ka->setCsbId( csbId() );
+
+		if( !verifyKemac( ka, false ) ){
+			return true;
+		}
+		return false;
 	}
 	else{
 		throw MikeyException( "Invalide type for a DHHMAC message" );
-	}
-
-	byte_t authKey[20];
-	byte_t computedMac[20];
-	unsigned int computedMacLength;
-	
-	switch( macAlg ){
-		case MIKEY_MAC_HMAC_SHA1_160:
-			ka->genTranspAuthKey( authKey, 20 );
-
-			hmac_sha1( authKey, 20,
-				   macInput,
-				   macInputLength,
-				   computedMac, &computedMacLength );
-
-			for( i = 0; i < 20; i++ ){
-				if( computedMac[i] != receivedMac[i] ){
-					ka->setAuthError(
-						"MAC mismatch: the shared"
-						"key probably differs."
-					);
-					return true;
-				}
-			}
-			return false;
-		case MIKEY_MAC_NULL:
-			return false;
-		default:
-			throw MikeyException( "Unknown MAC algorithm" );
 	}
 
 }
