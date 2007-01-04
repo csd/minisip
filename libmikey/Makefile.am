@@ -31,6 +31,8 @@ mikey_src =          mikey/MikeyException.cxx \
                      mikey/MikeyMessageDHHMAC.cxx \
                      mikey/MikeyMessagePKE.h \
                      mikey/MikeyMessagePKE.cxx \
+                     mikey/MikeyMessageRSAR.h \
+                     mikey/MikeyMessageRSAR.cxx \
                      mikey/MikeyPayloadCERT.cxx \
                      mikey/MikeyPayloadCHASH.cxx \
                      mikey/MikeyPayload.cxx \
@@ -53,6 +55,7 @@ ka_src =             keyagreement/keyagreement.cxx \
 	             keyagreement/keyagreement_psk.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
 	             keyagreement/KeyAgreementDHHMAC.cxx \
+	             keyagreement/KeyAgreementRSAR.cxx \
 		     keyagreement/keyvalidity.cxx
 
 # maintainer rules

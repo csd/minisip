@@ -151,16 +151,16 @@ string MikeyPayloadHDR::debugDump(){
 			ret=ret+"<D-H resp>";
 			break;
 		case HDR_DATA_TYPE_DHHMAC_INIT:
-			ret=ret+"<D-H init>";
+			ret=ret+"<DHMAC init>";
 			break;
 		case HDR_DATA_TYPE_DHHMAC_RESP:
-			ret=ret+"<D-H resp>";
+			ret=ret+"<DHMAC resp>";
 			break;
 		case HDR_DATA_TYPE_RSA_R_INIT:
-			ret=ret+"<RSA-R init>";
+			ret=ret+"<RSA-R I_MSG>";
 			break;
 		case HDR_DATA_TYPE_RSA_R_RESP:
-			ret=ret+"<RSA-R resp>";
+			ret=ret+"<RSA-R R_MSG>";
 			break;
 		case HDR_DATA_TYPE_ERROR:
 			ret=ret+"<Error>";

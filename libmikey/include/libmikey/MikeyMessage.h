@@ -70,6 +70,7 @@ class certificate;
 class certificate_db;
 class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
+class KeyAgreementRSAR;
 
 class LIBMIKEY_API MikeyPayloads{
 	public:
@@ -99,6 +100,8 @@ class LIBMIKEY_API MikeyPayloads{
 		void addCertificatePayloads( MRef<certificate_chain *> certChain );
 		MRef<certificate_chain*> extractCertificateChain() const;
 
+		void addPkeKemac( KeyAgreementPKE* ka,
+				  int encrAlg, int macAlg );
 		bool extractPkeEnvKey( KeyAgreementPKE* ka ) const;
 
 		std::string debugDump();
@@ -137,6 +140,14 @@ class LIBMIKEY_API MikeyPayloads{
 				const byte_t* macInput,
 				unsigned int macInputLength ) const;
 
+		/** Derive the transport keys from the env_key and set ka auth key */
+		bool deriveTranspKeys( KeyAgreementPSK* ka,
+				       byte_t*& encrKey, byte_t *& iv,
+				       unsigned int& encrKeyLength,
+				       int encrAlg, int macAlg,
+				       uint64_t t,
+				       MikeyMessage* errorMessage );
+
 		std::list<MikeyPayload *> payloads;
 
 	private:
@@ -166,6 +177,7 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
 		static MikeyMessage* create(KeyAgreementPKE* ka,
 				  int encrAlg = MIKEY_ENCR_AES_CM_128,
 					    int macAlg = MIKEY_MAC_HMAC_SHA1_160 );
+		static MikeyMessage* create(KeyAgreementRSAR* ka);
 
 		/**
 		 * Parse MIKEY message from binary representation
@@ -188,15 +200,6 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
 		virtual bool isInitiatorMessage() const;
 		virtual bool isResponderMessage() const;
 		virtual int32_t keyAgreementType() const;
-
-	protected:
-		/** Derive the transport keys from the env_key and set ka auth key */
-		bool deriveTranspKeys( KeyAgreementPSK* ka,
-				       byte_t*& encrKey, byte_t *& iv,
-				       unsigned int& encrKeyLength,
-				       int encrAlg, int macAlg,
-				       uint64_t t,
-				       MikeyMessage* errorMessage );
 
 	private:
 };

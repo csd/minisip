@@ -56,6 +56,7 @@
 #include"MikeyMessagePSK.h"
 #include"MikeyMessagePKE.h"
 #include"MikeyMessageDHHMAC.h"
+#include"MikeyMessageRSAR.h"
 
 using namespace std;
 
@@ -90,6 +91,10 @@ MikeyMessage* MikeyMessage::create( KeyAgreementDHHMAC * ka,
 MikeyMessage* MikeyMessage::create( KeyAgreementPKE* ka,
 				    int encrAlg, int macAlg ){
 	return new MikeyMessagePKE( ka, encrAlg, macAlg );
+}
+
+MikeyMessage* MikeyMessage::create( KeyAgreementRSAR* ka ){
+	return new MikeyMessageRSAR( ka );
 }
 
 /*
@@ -133,6 +138,10 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 		case MIKEY_TYPE_DHHMAC_INIT:
 		case MIKEY_TYPE_DHHMAC_RESP:
 			msg = new MikeyMessageDHHMAC();
+			break;
+		case MIKEY_TYPE_RSA_R_INIT:
+		case MIKEY_TYPE_RSA_R_RESP:
+			msg = new MikeyMessageRSAR();
 			break;
 		case MIKEY_TYPE_ERROR:
 			msg = new MikeyMessage();
@@ -687,7 +696,7 @@ int32_t MikeyMessage::keyAgreementType() const{
 		"Unimplemented type of MIKEY message" );
 }
 
-bool MikeyMessage::deriveTranspKeys( KeyAgreementPSK* ka,
+bool MikeyPayloads::deriveTranspKeys( KeyAgreementPSK* ka,
 					byte_t*& encrKey, byte_t *& iv,
 					unsigned int& encrKeyLength,
 					int encrAlg, int macAlg,
@@ -931,6 +940,65 @@ bool MikeyPayloads::verifyMac( KeyAgreementPSK* ka, int macAlg,
 		default:
 			throw MikeyException( "Unknown MAC algorithm" );
 	}
+}
+
+void MikeyPayloads::addPkeKemac( KeyAgreementPKE* ka,
+				    int encrAlg, int macAlg ){
+
+	// Derive the transport keys from the env_key:
+	byte_t* encrKey = NULL;
+	byte_t* iv = NULL;
+	unsigned int encrKeyLength = 0;
+	
+	deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
+			  encrAlg, macAlg, ka->tSent(),
+			  NULL );
+
+	//adding KEMAC payload
+	MikeyPayloads* subPayloads = new MikeyPayloads();
+	MikeyPayloadKeyData* keydata = 
+		new MikeyPayloadKeyData(KEYDATA_TYPE_TGK, ka->tgk(),
+							ka->tgkLength(), ka->keyValidity());
+	// FIXME get uri from certificate.
+	const char uri[] = "sip:test";
+	MikeyPayloadID* initId =
+		new MikeyPayloadID( MIKEYPAYLOAD_ID_TYPE_URI, strlen( uri ), (byte_t*)uri );
+
+	subPayloads->addPayload( initId );
+ 	subPayloads->addPayload( keydata );
+	initId = NULL;
+	keydata = NULL;
+
+	unsigned int rawKeyDataLength = subPayloads->rawMessageLength();
+	byte_t* rawKeyData = new byte_t[ rawKeyDataLength ];
+	memcpy( rawKeyData, subPayloads->rawMessageData(), rawKeyDataLength );
+
+	addKemacPayload(rawKeyData, rawKeyDataLength,
+			encrKey, iv, ka->authKey, encrAlg, macAlg, true );
+
+	delete subPayloads;
+	subPayloads = NULL;
+
+ 	delete [] rawKeyData;
+	rawKeyData = NULL;
+
+	//adding PKE payload
+	MRef<certificate*> certResponder =
+		ka->peerCertificateChain()->get_first();
+
+	byte_t* env_key = ka->getEnvelopeKey();
+	int encEnvKeyLength = 8192; // TODO autodetect?
+	unsigned char* encEnvKey = new unsigned char[ encEnvKeyLength ];
+
+	if( !certResponder->public_encrypt( env_key, ka->getEnvelopeKeyLength(),
+					    encEnvKey, &encEnvKeyLength ) ){
+		throw MikeyException( "PKE encryption of envelope key failed" );
+	}
+
+	addPayload(new MikeyPayloadPKE(2, encEnvKey, encEnvKeyLength));
+
+ 	delete [] encEnvKey;
+	encEnvKey = NULL;
 }
 
 bool MikeyPayloads::extractPkeEnvKey( KeyAgreementPKE* ka ) const{
