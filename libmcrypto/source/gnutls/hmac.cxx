@@ -64,7 +64,7 @@ void hmac_sha1(const uint8_t* key, uint32_t keyLength,
 }
 
 void hmac_sha1( const uint8_t* key, uint32_t keyLength,
-                const uint8_t* dataChunks[],
+                uint8_t* dataChunks[],
                   uint32_t dataChunkLength[],
                   uint8_t* mac, uint32_t* macLength )
 {

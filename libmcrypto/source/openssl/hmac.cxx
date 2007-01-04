@@ -34,7 +34,7 @@ void hmac_sha1( const unsigned char * key, unsigned int key_length,
 }
 
 void hmac_sha1( const unsigned char * key, unsigned int key_length,
-		const unsigned char * data_chunks[],
+		unsigned char * data_chunks[],
 		unsigned int data_chunck_length[],
 		unsigned char * mac, unsigned int * mac_length ){
 	HMAC_CTX ctx;
