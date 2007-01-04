@@ -90,8 +90,11 @@ void Session::unregister(){
 
 	if( Session::precomputedKa.isNull()
 	    && identity && identity->getSim() ){
-		Session::precomputedKa = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
-				/*securityConfig.cert_db*/ identity->getSim()->getCAs(), DH_GROUP_OAKLEY5 );
+		KeyAgreementDH* ka = NULL;
+		ka = new KeyAgreementDH( identity->getSim()->getCertificateChain(), 
+					 identity->getSim()->getCAs() );
+		ka->setGroup( DH_GROUP_OAKLEY5 );
+		Session::precomputedKa = ka;
 	}
 }
 

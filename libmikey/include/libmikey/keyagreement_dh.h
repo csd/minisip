@@ -58,20 +58,10 @@ class LIBMIKEY_API PeerCertificates {
 		MRef<ca_db *> certDbPtr;
 };
 
-class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
-				    public PeerCertificates{
+class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
 	public:
-		KeyAgreementDH( MRef<certificate_chain *> cert, 
-				MRef<ca_db *> ca_db );
-		KeyAgreementDH( MRef<certificate_chain *> cert,
-				MRef<ca_db *> ca_db, int group );
-
-
-		KeyAgreementDH( MRef<SipSim *> sim );
-		KeyAgreementDH( MRef<SipSim *> sim, int group );
-		~KeyAgreementDH();
-
-		int32_t type();
+		KeyAgreementDHBase();
+		~KeyAgreementDHBase();
 
 		int computeTgk();
 		int setGroup( int group );
@@ -83,16 +73,30 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
 		
 		int publicKeyLength();
 		byte_t * publicKey();
-		
+
+	private:
+		OakleyDH * dh;
+		byte_t * peerKeyPtr;
+		int peerKeyLengthValue;
+};
+
+class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
+				    public KeyAgreementDHBase,
+				    public PeerCertificates{
+	public:
+		KeyAgreementDH( MRef<certificate_chain *> cert, 
+				MRef<ca_db *> ca_db );
+		KeyAgreementDH( MRef<SipSim *> sim );
+		~KeyAgreementDH();
+
+		int32_t type();
+
 		MikeyMessage* createMessage();
 
 		MRef<SipSim*> getSim();
 
 		bool useSim;
 	private:
-		OakleyDH * dh;
-		byte_t * peerKeyPtr;
-		int peerKeyLengthValue;
 		MRef<SipSim *> sim;
 };
 

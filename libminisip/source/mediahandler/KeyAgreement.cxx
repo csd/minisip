@@ -35,6 +35,7 @@
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyException.h>
+#include<libmikey/MikeyMessage.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -85,7 +86,8 @@ bool Session::responderAuthenticate( string message ){
 
 						if( !ka ){
 							ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
-									/*securityConfig.cert_db*/ identity->getSim()->getCAs(), DH_GROUP_OAKLEY5 );
+										 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+							((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
 						}
 						ka->setInitiatorData( init_mes );
 
@@ -313,8 +315,8 @@ string Session::initiatorCreate(){
 				}
 				if( !ka ){
 					ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain() , 
-							/*securityConfig.cert_db*/ identity->getSim()->getCAs(), 
-							DH_GROUP_OAKLEY5 );
+								 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+					((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
 				}
 				addStreamsToKa();
 #ifdef ENABLE_TS

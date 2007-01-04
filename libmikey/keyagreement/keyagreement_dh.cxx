@@ -27,6 +27,7 @@
 #include<config.h>
 #include<libmikey/keyagreement_dh.h>
 #include<libmikey/MikeyException.h>
+#include<libmikey/MikeyMessage.h>
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
 
@@ -54,33 +55,21 @@ PeerCertificates::~PeerCertificates(){
 }
 
 // 
-// KeyAgreementDH
-// 
-KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
-		MRef<ca_db *> certDbPtr ):
-	KeyAgreement(),
-	PeerCertificates( certChainPtr, certDbPtr ),
-	useSim(false),
+// KeyAgreementDHBase
+//
+KeyAgreementDHBase::KeyAgreementDHBase():
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 )
 {
-	//policy = list<Policy_type *>::list();
 	dh = new OakleyDH();
+	if( dh == NULL )
+	{
+		throw MikeyException( "Could not create "
+				          "DH parameters." );
+	}
 }
 
-KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
-	KeyAgreement(),
-	PeerCertificates( s->getCertificateChain(), s->getCAs() ),
-	useSim(true),
-	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 ),
-	sim(s)
-{
-	//policy = list<Policy_type *>::list();
-	dh = new OakleyDH();
-}
-
-KeyAgreementDH::~KeyAgreementDH(){
+KeyAgreementDHBase::~KeyAgreementDHBase(){
 	delete dh;
 	if( peerKeyPtr != NULL ){
 		delete [] peerKeyPtr;
@@ -88,54 +77,33 @@ KeyAgreementDH::~KeyAgreementDH(){
 	}
 }
 
+// 
+// KeyAgreementDH
+// 
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
-		MRef<ca_db *> certDbPtr, int groupValue ):
-		PeerCertificates( certChainPtr, certDbPtr ),
-	useSim(false),
-	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 )
+		MRef<ca_db *> certDbPtr ):
+	KeyAgreement(),
+	PeerCertificates( certChainPtr, certDbPtr ),
+	useSim(false)
 {
-	//policy = list<Policy_type *>::list();
-	dh = new OakleyDH();
-	if( dh == NULL )
-	{
-		throw MikeyException( "Could not create "
-				          "DH parameters." );
-	}
-
-	if( setGroup( groupValue ) ){
-		throw MikeyException( "Could not set the  "
-				      "DH group." );
-	}
 }
 
-
-KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s, int groupValue ):
-		PeerCertificates( s->getCertificateChain(), s->getCAs() ),
+KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
+	KeyAgreementDHBase(),
+	PeerCertificates( s->getCertificateChain(), s->getCAs() ),
 	useSim(true),
-	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 ),
 	sim(s)
 {
-	//policy = list<Policy_type *>::list();
-	dh = new OakleyDH();
-	if( dh == NULL )
-	{
-		throw MikeyException( "Could not create "
-				          "DH parameters." );
-	}
+}
 
-	if( setGroup( groupValue ) ){
-		throw MikeyException( "Could not set the  "
-				      "DH group." );
-	}
+KeyAgreementDH::~KeyAgreementDH(){
 }
 
 int32_t KeyAgreementDH::type(){
 	return KEY_AGREEMENT_TYPE_DH;
 }
 
-int KeyAgreementDH::setGroup( int groupValue ){
+int KeyAgreementDHBase::setGroup( int groupValue ){
 	if( !dh->setGroup( groupValue ) )
 		return 1;
 
@@ -148,7 +116,7 @@ int KeyAgreementDH::setGroup( int groupValue ){
 	return 0;
 }
 	
-void KeyAgreementDH::setPeerKey( unsigned char * peerKeyPtr,
+void KeyAgreementDHBase::setPeerKey( unsigned char * peerKeyPtr,
 			      int peerKeyLengthValue ){
 	if( this->peerKeyPtr )
 		delete[] this->peerKeyPtr;
@@ -159,11 +127,11 @@ void KeyAgreementDH::setPeerKey( unsigned char * peerKeyPtr,
 
 }
 
-int KeyAgreementDH::publicKeyLength(){
+int KeyAgreementDHBase::publicKeyLength(){
 	return dh->publicKeyLength();
 }
 
-unsigned char * KeyAgreementDH::publicKey(){
+unsigned char * KeyAgreementDHBase::publicKey(){
 	unsigned char * publicKey;
 	uint32_t length = publicKeyLength();
 	publicKey = new unsigned char[ length ];
@@ -172,23 +140,23 @@ unsigned char * KeyAgreementDH::publicKey(){
 
 }
 
-int KeyAgreementDH::computeTgk(){
+int KeyAgreementDHBase::computeTgk(){
 	assert( peerKeyPtr );
 
 	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgk(), tgkLength() );
 	return res;
 }
 
-int KeyAgreementDH::group(){
+int KeyAgreementDHBase::group(){
 	return dh->group();
 
 }
 
-int KeyAgreementDH::peerKeyLength(){
+int KeyAgreementDHBase::peerKeyLength(){
 	return peerKeyLengthValue;
 }
 
-unsigned char * KeyAgreementDH::peerKey(){
+unsigned char * KeyAgreementDHBase::peerKey(){
 	return peerKeyPtr;
 }
 

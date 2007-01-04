@@ -45,8 +45,6 @@ MikeyMessageDH::MikeyMessageDH(){
 
 MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 
-	MRef<certificate_chain *> certChain;
-	MRef<certificate *> cert;
 	/* generate random a CryptoSessionBundle ID */
 	unsigned int csbId = rand();
 	ka->setCsbId( csbId );
@@ -69,19 +67,7 @@ MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 		     payload->randLength() );
 
 	/* Include the list of certificates if available */
-	certChain = ka->certificateChain();
-	if( !certChain.isNull() ){
-		ka->certificateChain()->lock();
-		certChain->init_index();
-		cert = certChain->get_next();
-		while( ! cert.isNull() ){
-			addPayload( new MikeyPayloadCERT(
-				MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
-				cert) );
-			cert = certChain->get_next();
-		}
-		ka->certificateChain()->unlock();
-	}
+	addCertificatePayloads( ka->certificateChain() );
 
 	addPayload( new MikeyPayloadDH( ka->group(),
 					ka->publicKey(),
@@ -107,11 +93,7 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MRef<certificate *> peerCert;
-	peerCert = NULL;
 	MikeyMessage * errorMessage = new MikeyMessage();
-	MRef<certificate *> cert;
-	MRef<certificate_chain *> certChain;
 
 	if( i == NULL ){
 		throw MikeyExceptionMessageContent(
@@ -153,6 +135,7 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
+	// FIXME i can be NULL
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
@@ -171,6 +154,7 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
+	// FIXME i can be NULL
 	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
 		     ((MikeyPayloadRAND *)i)->randLength() );
 
@@ -210,6 +194,7 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 	}
 
 
+	// FIXME i can be NULL
 	if( ka->group() != ((MikeyPayloadDH *)i)->group() ){
 		ka->setGroup( ((MikeyPayloadDH *)i)->group() );
 	}
@@ -235,8 +220,6 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	}
 
 	// Build the response message
-	MRef<certificate *> cert;
-	MRef<certificate_chain *> certChain;
 	MikeyMessage * result = new MikeyMessage();
 	result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_DH_RESP, 0, 
@@ -249,19 +232,7 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 	/* Include the list of certificates if available */
-	certChain = ka->certificateChain();
-	if( !certChain.isNull() ){
-		ka->certificateChain()->lock();
-		certChain->init_index();
-		cert = certChain->get_next();
-		while( !cert.isNull() ){
-			result->addPayload( new MikeyPayloadCERT(
-				MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
-				cert) );
-			cert = certChain->get_next();
-		}
-		ka->certificateChain()->unlock();
-	}
+	result->addCertificatePayloads( ka->certificateChain() );
 
 	result->addPayload( new MikeyPayloadDH( 
 				    ka->group(),
@@ -293,7 +264,6 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	bool gotDhi = false;
-	certificate * peerCert;
 	MikeyMessage * errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
@@ -336,6 +306,7 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
+	// FIXME i can be NULL
 	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
@@ -372,6 +343,7 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
+	// FIXME i can be NULL
 #define dh ((MikeyPayloadDH *)i)
 	if( string( (const char *)dh->dhKey(), 
 				  dh->dhKeyLength() ) ==

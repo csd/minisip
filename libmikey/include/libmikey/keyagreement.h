@@ -67,7 +67,19 @@ class LIBMIKEY_API Policy_type {
 
 class LIBMIKEY_API MikeyMessage;
 
-class LIBMIKEY_API KeyAgreement : public MObject{
+class LIBMIKEY_API ITgk{
+	public:
+		virtual ~ITgk();
+		/**
+		 * If tgk == NULL, generate random TGK of specified size
+		 */
+		virtual void setTgk( byte_t * tgk, unsigned int tgkLength )=0;
+		virtual unsigned int tgkLength()=0;
+		virtual byte_t * tgk()=0;
+};
+
+class LIBMIKEY_API KeyAgreement : public MObject,
+				  public virtual ITgk{
 	public:
 		KeyAgreement();
 		~KeyAgreement();
@@ -199,7 +211,5 @@ class LIBMIKEY_API KeyAgreement : public MObject{
 
 		std::string authErrorValue;
 };
-
-
 
 #endif

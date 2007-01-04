@@ -32,6 +32,9 @@
 
 using namespace std;
 
+ITgk::~ITgk(){
+}
+
 KeyAgreement::KeyAgreement():
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),
