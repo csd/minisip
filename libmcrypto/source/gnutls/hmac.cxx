@@ -43,8 +43,8 @@
 # define SHA1_DIGEST_LENGTH 20
 #endif
 
-void hmac_sha1(uint8_t* key, uint32_t keyLength,
-		uint8_t* data, uint32_t dataLength,
+void hmac_sha1(const uint8_t* key, uint32_t keyLength,
+	       const uint8_t* data, uint32_t dataLength,
                 uint8_t* mac, uint32_t* macLength)
 {
     gcry_md_hd_t hd;
@@ -63,8 +63,8 @@ void hmac_sha1(uint8_t* key, uint32_t keyLength,
     gcry_md_close (hd);
 }
 
-void hmac_sha1( uint8_t* key, uint32_t keyLength,
-                  uint8_t* dataChunks[],
+void hmac_sha1( const uint8_t* key, uint32_t keyLength,
+                const uint8_t* dataChunks[],
                   uint32_t dataChunkLength[],
                   uint8_t* mac, uint32_t* macLength )
 {

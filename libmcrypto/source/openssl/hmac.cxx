@@ -27,14 +27,14 @@
 #include <openssl/hmac.h>
 #include <libmcrypto/hmac.h>
 
-void hmac_sha1( unsigned char * key, unsigned int key_length,
-		unsigned char * data, unsigned int data_length,
+void hmac_sha1( const unsigned char * key, unsigned int key_length,
+		const unsigned char * data, unsigned int data_length,
 		unsigned char * mac, unsigned int * mac_length ){
 	HMAC( EVP_sha1(), key, key_length, data, data_length, mac, mac_length );
 }
 
-void hmac_sha1( unsigned char * key, unsigned int key_length,
-		unsigned char * data_chunks[],
+void hmac_sha1( const unsigned char * key, unsigned int key_length,
+		const unsigned char * data_chunks[],
 		unsigned int data_chunck_length[],
 		unsigned char * mac, unsigned int * mac_length ){
 	HMAC_CTX ctx;
