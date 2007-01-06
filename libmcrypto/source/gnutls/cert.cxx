@@ -353,7 +353,7 @@ bool gtls_rsa_pub::encrypt( const unsigned char *data, int size,
 		goto error;
 	}
 
-	if( err = gcry_pk_encrypt( &cipher, data_sexp, m_key ) ){
+	if( (err = gcry_pk_encrypt( &cipher, data_sexp, m_key ) ) ){
 		goto error;
 	}
 
@@ -942,11 +942,9 @@ bool gtls_priv_key::private_decrypt( const unsigned char *data, int size,
 // 
 
 gtls_ca_db_item::gtls_ca_db_item(): certs(NULL), num_certs(0){
-	cerr << "gtls_ca_db_item ctor" << endl;
 }
 
 gtls_ca_db_item::~gtls_ca_db_item(){
-	cerr << "gtls_ca_db_item dtor" << endl;
 	if( certs ){
 		delete[] certs;
 		certs = NULL;
@@ -955,11 +953,9 @@ gtls_ca_db_item::~gtls_ca_db_item(){
 }
 
 gtls_ca_db::gtls_ca_db(): caList(NULL), caListLength(0){
-	cerr << "gtls_ca_db ctor" << endl;
 }
 
 gtls_ca_db::~gtls_ca_db(){
-	cerr << "gtls_ca_db dtor" << endl;
 	if( caList != NULL ){
 		delete[] caList;
 		caList = NULL;
@@ -1147,7 +1143,9 @@ ca_db_item* gtls_ca_db::create_file_item( std::string file ){
 // 		return NULL;
 	}
 
+#ifdef DEBUG_OUTPUT
 	cerr << "Loaded " << res << " certificates" << endl;
+#endif
 
 	gtls_ca_db_item * item = new gtls_ca_db_item();
 	item->item = file;
@@ -1189,22 +1187,22 @@ int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 	gnutls_x509_crt_t* gtls_list = NULL;
 	size_t gtls_list_length = 0;
 
-	cerr << "gtls_certificate_chain::control" << endl;
 	if( !gtls_db ){
 		cerr << "Not gtls CA db" << endl;
-		return 1;
+		return 0;
 	}
 
 // 	lock();
 	gtls_list_length = cert_list.size();
 
 	if( gtls_list_length == 0 ){
+#ifdef DEBUG_OUTPUT
 		cerr << "certificate: Empty list of certificates"
 			"to verify" << endl;
-		return 0;
+#endif
+		// Return success
+		return 1;
 	}
-
-	cerr << "Cert chain length " << gtls_list_length << endl;
 
 	/* Chain of certificates */
 	list< MRef<certificate *> >::iterator i = cert_list.begin();
@@ -1221,7 +1219,7 @@ int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 			delete[] gtls_list;
 			// Not gtls cert
 			cerr << "Not a gtls cert" << endl;
-			return 1;
+			return 0;
 		}
 		
 		gtls_list[j] = cert->get_certificate();
@@ -1231,10 +1229,8 @@ int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 	if( !gtls_db->getDb( &ca_list, &ca_list_length ) ){
 		delete[] gtls_list;
 		cerr << "No CA db" << endl;
-		return 1;
+		return 0;
 	}
-
-	cerr << "CA db size " << ca_list_length << endl;
 
 	result = gnutls_x509_crt_list_verify( gtls_list, gtls_list_length,
 					      ca_list, ca_list_length,
@@ -1247,9 +1243,11 @@ int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 
 	if( result < 0 ){
 		cerr << "gnutls_x509_crt_list_verify failed" << endl;
-		return 1;
+		return 0;
 	}
 
+#ifdef DEBUG_OUTPUT
 	cerr << "gnutls_x509_crt_list_verify returns " << verify << endl;
+#endif
 	return verify ? 0 : 1;
 }
