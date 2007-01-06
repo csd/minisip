@@ -31,7 +31,7 @@ KeyAgreementPSK::KeyAgreementPSK():
 		macAlg(0),pskPtr(NULL),pskLengthValue(0),v(0),tSentValue(0){
 }
 
-KeyAgreementPSK::KeyAgreementPSK( unsigned char * pskPtr, int pskLengthValue )
+KeyAgreementPSK::KeyAgreementPSK( const unsigned char * pskPtr, int pskLengthValue )
 	:KeyAgreement(), tSentValue( 0 ){
 	//policy = list<Policy_type *>::list();
 	this->pskLengthValue = pskLengthValue;

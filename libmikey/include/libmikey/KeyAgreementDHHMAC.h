@@ -41,7 +41,7 @@
 class LIBMIKEY_API KeyAgreementDHHMAC : public virtual KeyAgreementPSK,
 					public virtual KeyAgreementDHBase{
 	public:
-		KeyAgreementDHHMAC( byte_t * psk, int pskLength );
+		KeyAgreementDHHMAC( const byte_t * psk, int pskLength );
 		~KeyAgreementDHHMAC();
 
 		int32_t type();

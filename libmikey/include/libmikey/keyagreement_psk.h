@@ -33,7 +33,7 @@
 
 class LIBMIKEY_API KeyAgreementPSK : public KeyAgreement{
 	public:
-		KeyAgreementPSK( byte_t * psk, int pskLength );
+		KeyAgreementPSK( const byte_t * psk, int pskLength );
 		virtual ~KeyAgreementPSK();
 
 		int32_t type();
