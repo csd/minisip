@@ -63,7 +63,7 @@ class LIBMIKEY_API MikeyPayloadHDR : public MikeyPayload{
 		
 		MikeyPayloadHDR( byte_t *start_of_header, int lengthLimit );
 		MikeyPayloadHDR( int data_type, int V, int PRF_func, 
-				 int CSB_id, int n_cs, int map_type, 
+				 uint32_t CSB_id, int n_cs, int map_type, 
 				 MRef<MikeyCsIdMap *> map );
 
 
@@ -75,7 +75,7 @@ class LIBMIKEY_API MikeyPayloadHDR : public MikeyPayload{
 
 		int dataType();
 		int v();
-		unsigned int csbId();
+		uint32_t csbId();
 		int csIdMapType();
 		MRef<MikeyCsIdMap *> csIdMap();
 		uint8_t nCs();
@@ -85,7 +85,7 @@ class LIBMIKEY_API MikeyPayloadHDR : public MikeyPayload{
 		int dataTypeValue;
 		int vValue;
 		int prfFunc;
-		int csbIdValue;
+		uint32_t csbIdValue;
 		int nCsValue;
 		int csIdMapTypeValue;
 		MRef<MikeyCsIdMap *> csIdMapPtr;

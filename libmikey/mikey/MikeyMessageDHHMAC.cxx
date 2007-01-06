@@ -37,6 +37,7 @@
 #include<libmikey/MikeyPayloadKEMAC.h>
 #include<libmikey/MikeyPayloadRAND.h>
 #include<libmikey/MikeyPayloadT.h>
+#include<libmcrypto/rand.h>
 
 #include<map>
 
@@ -49,8 +50,12 @@ MikeyMessageDHHMAC::MikeyMessageDHHMAC( KeyAgreementDHHMAC * ka,
 					int macAlg){
 
 	/* generate random a CryptoSessionBundle ID */
-	unsigned int csbId = rand();
-	ka->setCsbId( csbId );
+	unsigned int csbId = ka->csbId();
+
+	if( !csbId ){
+		Rand::randomize( &csbId, sizeof( csbId ));
+		ka->setCsbId( csbId );
+	}
 
 	addPayload( 
 		new MikeyPayloadHDR( HDR_DATA_TYPE_DHHMAC_INIT, 1, 

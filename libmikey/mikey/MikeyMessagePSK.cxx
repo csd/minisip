@@ -37,6 +37,7 @@
 #include<libmikey/MikeyPayloadID.h>
 #include<libmikey/keyagreement_psk.h>
 #include<libmikey/MikeyPayloadSP.h>
+#include<libmcrypto/rand.h>
 
 using namespace std;
 
@@ -46,10 +47,14 @@ MikeyMessagePSK::MikeyMessagePSK(){
 MikeyMessagePSK::MikeyMessagePSK( KeyAgreementPSK * ka,
 				  int encrAlg, int macAlg ){
 
-	unsigned int csbId = rand();
-	ka->setCsbId( csbId );
+	unsigned int csbId = ka->csbId();
 	MikeyPayloadT * tPayload;
 	MikeyPayloadRAND * randPayload;
+
+	if( !csbId ){
+		Rand::randomize( &csbId, sizeof( csbId ));
+		ka->setCsbId( csbId );
+	}
 
 	addPayload( 
 		new MikeyPayloadHDR( HDR_DATA_TYPE_PSK_INIT, 1, 

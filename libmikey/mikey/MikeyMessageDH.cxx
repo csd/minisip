@@ -35,6 +35,7 @@
 #include<libmikey/MikeyPayloadDH.h>
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmcrypto/SipSim.h>
+#include<libmcrypto/rand.h>
 
 #include<map>
 
@@ -46,8 +47,12 @@ MikeyMessageDH::MikeyMessageDH(){
 MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 
 	/* generate random a CryptoSessionBundle ID */
-	unsigned int csbId = rand();
-	ka->setCsbId( csbId );
+	unsigned int csbId = ka->csbId();
+
+	if( !csbId ){
+		Rand::randomize( &csbId, sizeof( csbId ));
+		ka->setCsbId( csbId );
+	}
 
 	addPayload( 
 		new MikeyPayloadHDR( HDR_DATA_TYPE_DH_INIT, 1, 

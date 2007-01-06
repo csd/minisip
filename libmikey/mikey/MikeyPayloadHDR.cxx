@@ -32,7 +32,7 @@
 
 using namespace std;
 
-MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, int csbId, 
+MikeyPayloadHDR::MikeyPayloadHDR( int dataType, int v, int prfFunc, uint32_t csbId, 
 		int nCs, int mapType, MRef<MikeyCsIdMap *> map ) {
 
 	this->payloadTypeValue = MIKEYPAYLOAD_HDR_PAYLOAD_TYPE;

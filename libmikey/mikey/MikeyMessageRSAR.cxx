@@ -39,6 +39,7 @@
 #include <libmikey/MikeyPayloadKEMAC.h>
 #include <libmikey/MikeyPayloadV.h>
 #include <libmikey/MikeyPayloadPKE.h>
+#include<libmcrypto/rand.h>
 
 using namespace std;
 
@@ -47,8 +48,13 @@ MikeyMessageRSAR::MikeyMessageRSAR(){
 
 MikeyMessageRSAR::MikeyMessageRSAR( KeyAgreementRSAR* ka ){
 
-	unsigned int csbId = rand();
-	ka->setCsbId(csbId);
+	unsigned int csbId = ka->csbId();
+
+	if( !csbId ){
+		Rand::randomize( &csbId, sizeof( csbId ));
+		ka->setCsbId( csbId );
+	}
+
 	MikeyPayloadT* tPayload;
 	MikeyPayloadRAND* randPayload;
 
