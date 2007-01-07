@@ -946,6 +946,11 @@ gtls_ca_db_item::gtls_ca_db_item(): certs(NULL), num_certs(0){
 
 gtls_ca_db_item::~gtls_ca_db_item(){
 	if( certs ){
+		for( unsigned int i=0; i < num_certs; i++ ){
+			gnutls_x509_crt_deinit( certs[i] );
+			certs[i] = NULL;
+		}
+
 		delete[] certs;
 		certs = NULL;
 		num_certs = 0;
@@ -1164,7 +1169,31 @@ ca_db_item* gtls_ca_db::create_cert_item( certificate* cert ){
 	item->type = CERT_DB_ITEM_TYPE_OTHER;
 	item->num_certs = 1;
 	item->certs = new gnutls_x509_crt_t[item->num_certs];
-	item->certs[0] = dynamic_cast<gtls_certificate*>(cert)->get_certificate();
+	item->certs[0] = NULL;
+
+	int ret = gnutls_x509_crt_init( &item->certs[0] );
+
+	if( ret != 0 ){
+		throw certificate_exception_init( 
+		 	"Could not initialize the certificate structure" );
+	}
+        
+	gnutls_datum der;
+
+	der.size = cert->get_der_length();
+	der.data = new byte_t[ der.size ];
+	cert->get_der( der.data, &der.size );
+
+	ret = gnutls_x509_crt_import( item->certs[0], &der, GNUTLS_X509_FMT_DER );
+
+	delete[] der.data;
+	der.data = NULL;
+
+	if( ret != 0 ){
+	 	throw certificate_exception( 
+		 	"Could not import the given certificate" );
+	}
+
 	return item;
 }
 

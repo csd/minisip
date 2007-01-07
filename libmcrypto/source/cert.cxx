@@ -116,6 +116,13 @@ ca_db::ca_db(){
 }
 
 ca_db::~ca_db(){
+	std::list<ca_db_item *>::iterator i;
+	std::list<ca_db_item *>::iterator last = items.end();
+
+	for( i = items.begin(); i != last; i++ ){
+		ca_db_item* item = *i;
+		delete item;
+	}
 }
 
 void ca_db::lock(){
