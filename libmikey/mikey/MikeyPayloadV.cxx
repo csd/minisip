@@ -80,6 +80,13 @@ MikeyPayload( start ){
 	}	
 }
 
+MikeyPayloadV::~MikeyPayloadV(){
+	if( verDataPtr ){
+		delete[] verDataPtr;
+		verDataPtr = NULL;
+	}
+}
+
 int MikeyPayloadV::length(){
 	
 	return 2 + (( macAlgValue == MIKEY_PAYLOAD_V_MAC_HMAC_SHA1_160 )?20:0) ;

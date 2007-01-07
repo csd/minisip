@@ -176,7 +176,7 @@ MikeyPayloads* MikeyPayloadKEMAC::decodePayloads( int firstPayloadType,
 	MikeyPayloads *output =
 		new MikeyPayloads( firstPayloadType, decrData,
 				   encrDataLengthValue );
-	delete [] decrData;
+	// decrData is owned and deleted by MikeyPayloads
 	return output;
 }
 

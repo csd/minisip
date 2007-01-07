@@ -31,8 +31,9 @@ KeyAgreementPSK::KeyAgreementPSK():
 		macAlg(0),pskPtr(NULL),pskLengthValue(0),v(0),tSentValue(0){
 }
 
-KeyAgreementPSK::KeyAgreementPSK( const unsigned char * pskPtr, int pskLengthValue )
-	:KeyAgreement(), tSentValue( 0 ){
+KeyAgreementPSK::KeyAgreementPSK( const unsigned char * pskPtr, int pskLengthValue ):
+		KeyAgreement(),t_received(0),authKey(NULL),authKeyLength(0),
+		macAlg(0),pskPtr(NULL),pskLengthValue(0),v(0),tSentValue(0){
 	//policy = list<Policy_type *>::list();
 	this->pskLengthValue = pskLengthValue;
 	this->pskPtr = new unsigned char[ pskLengthValue ];
@@ -45,6 +46,10 @@ KeyAgreementPSK::~KeyAgreementPSK(){
 		delete [] pskPtr;
 	}
 
+	if( authKey ){
+		delete[] authKey;
+		authKey = NULL;
+	}
 }
 
 int32_t KeyAgreementPSK::type(){

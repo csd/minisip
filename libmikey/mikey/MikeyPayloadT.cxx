@@ -172,22 +172,22 @@ int64_t MikeyPayloadT::offset( int type, uint64_t tsValue ){
 
 bool MikeyPayloadT::checkOffset( uint64_t max ){
 	
-	struct timeval *tv;
-        struct timezone *tz;
+	struct timeval tv;
+	struct timezone tz;
 	uint64_t current_time;
 
-	tv = new struct timeval;
-	tz = new struct timezone;
+	memset( &tv, 0, sizeof( tv ));
+	memset( &tz, 0, sizeof( tz ));
 
-	gettimeofday( tv, tz );
+	gettimeofday( &tv, &tz );
 
 	//10^-6 / 2^-32 = 4294.967296
-	uint32_t ts_frac = (uint32_t)( tv->tv_usec * 4294.967296 );
+	uint32_t ts_frac = (uint32_t)( tv.tv_usec * 4294.967296 );
 	uint32_t ts_sec;
 	switch( tsTypeValue ){
 		case T_TYPE_NTP_UTC:
-			ts_sec = tv->tv_sec + NTP_EPOCH_OFFSET 
-				+ 60 * tz->tz_minuteswest;
+			ts_sec = tv.tv_sec + NTP_EPOCH_OFFSET 
+				+ 60 * tz.tz_minuteswest;
 			current_time = ((uint64_t)ts_sec << 32) 
 			    	     | ((uint64_t)ts_frac);
 		/*	if( current_time > tsValue ){
@@ -198,8 +198,8 @@ bool MikeyPayloadT::checkOffset( uint64_t max ){
 			}*/
 			return false;
 		case T_TYPE_NTP:
-			ts_sec = tv->tv_sec + NTP_EPOCH_OFFSET 
-				/*+ 60 * tz->tz_minuteswest*/;
+			ts_sec = tv.tv_sec + NTP_EPOCH_OFFSET 
+				/*+ 60 * tz.tz_minuteswest*/;
 			current_time = ((uint64_t)ts_sec << 32) 
 			    	     | ((uint64_t)ts_frac);
 			/*if( current_time > tsValue ){

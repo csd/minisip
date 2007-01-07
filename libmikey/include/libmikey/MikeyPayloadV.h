@@ -40,6 +40,7 @@ class LIBMIKEY_API MikeyPayloadV : public MikeyPayload{
 	public:
 		MikeyPayloadV( int mac_alg, byte_t * verData );
 		MikeyPayloadV( byte_t * start, int lengthLimit );
+		~MikeyPayloadV();
 
 		virtual void writeData( byte_t * start, int expectedLength );
 		virtual int length();
