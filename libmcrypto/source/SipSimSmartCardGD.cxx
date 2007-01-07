@@ -312,8 +312,8 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 									 bool doHash, int hash_alg)
 {
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
-		sendBufferLength = 13;											// sha-1 has 20 bytes (160 bits) output as message digest
-		recvBufferLength = 128;											// this time we don't know the size of the receive buffer. Assume 128 is big enough and we
+		sendBufferLength = 26;											// sha-1 has 20 bytes (160 bits) output as message digest
+		recvBufferLength = 130;											// this time we don't know the size of the receive buffer. Assume 128 is big enough and we
 																		// send the reference of recvBufferLength to this function and get that actual size from it 
 		clearBuffer();
 		sendBuffer = new unsigned char[sendBufferLength];
@@ -325,16 +325,14 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		sendBuffer[1] = 0x42;
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
-	//	sendBuffer[4] = 0x14;											// sha-1 has 20 bytes (160 bits) output as message digest
-		sendBuffer[4] = 0x08;											// sha-1 has 20 bytes (160 bits) output as message digest
-		memcpy(&sendBuffer[5], dataPtr, 8);
-	//	sendBuffer[25] = 0x80;
-		sendBuffer[13] = 0x00;
+		sendBuffer[4] = 0x14;				// sha-1 has 20 bytes (160 bits) output as message digest
+		memcpy(&sendBuffer[5], dataPtr, 20);
+		sendBuffer[25] = 0x80;
+	//	sendBuffer[13] = 0x00;
 
 		//assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
 		
 		//memcpy(&sendBuffer[5], dataPtr, 20);
-		//sendBuffer[25] = 0x80;
 
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		
@@ -472,7 +470,7 @@ bool SipSimSmartCardGD::generateKeyPair(){
 		memset(recvBuffer, 0, 2);
 		
 		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0xD0;
+		sendBuffer[1] = 0xD3;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		

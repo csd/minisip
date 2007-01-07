@@ -153,6 +153,7 @@ bool SmartCard::transmitApdu(unsigned long sendLength, unsigned char * sendBuffe
 		return true;
 	}
 	else
+		cerr << "the return code is: " << rvTransmit  << endl;
 		throw SmartCardException("APDU transmission failure");
 }
 

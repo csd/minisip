@@ -38,23 +38,23 @@ class LIBMCRYPTO_API SmartCard : public virtual MObject {
 public:
 	/* constructor is called to connect to the smart card */
 	SmartCard();
-	
-	/* destructor is called to disconnect from smart card */
-	~SmartCard();
+		
+		/* destructor is called to disconnect from smart card */
+		~SmartCard();
 
-	/* smart card transaction */
-	void startTransaction();
-	void endTransaction();
+		/* smart card transaction */
+		void startTransaction();
+		void endTransaction();
 
-	/* one round trip of APDU exchange */
-	bool transmitApdu(unsigned long sendLength, unsigned char * sendBufferPtr, 
-					  unsigned long & recvLength, unsigned char * recvBufferPtr);
-	
-	/* Smart card Pin related functions */
-	void setPin(const char * pinCode);
-	void setAdminPin(const char * adminPinCode);
-	virtual bool verifyPin(int verifyMode) = 0;
-	virtual bool changePin( const char * newPinCode) = 0;
+		/* one round trip of APDU exchange */
+		bool transmitApdu(unsigned long sendLength, unsigned char * sendBufferPtr, 
+						  unsigned long & recvLength, unsigned char * recvBufferPtr);
+		
+		/* Smart card Pin related functions */
+		void setPin(const char * pinCode);
+		void setAdminPin(const char * adminPinCode);
+		virtual bool verifyPin(int verifyMode) = 0;
+		virtual bool changePin( const char * newPinCode) = 0;
 
 	/* General smart card member function */
 	virtual unsigned char * getRandomValue(unsigned long randomLength) = 0;
