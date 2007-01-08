@@ -133,10 +133,10 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 
 		/* Access the initiator and responder key agreement data
 		 * (MIKEY messages when using MIKEY) */
-		void * initiatorData();
-		void setInitiatorData( void * );
-		void * responderData();
-		void setResponderData( void * );
+		MRef<MikeyMessage *> initiatorData();
+		void setInitiatorData( MRef<MikeyMessage *> );
+		MRef<MikeyMessage *> responderData();
+		void setResponderData( MRef<MikeyMessage *> );
 
 
 		//Set the first Parameter Type in a new security policy. Returns the new Policy number.
@@ -206,8 +206,8 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		uint8_t	CsIdMapType;
 
 
-		void * initiatorDataPtr;
-		void * responderDataPtr;
+		MRef<MikeyMessage *> initiatorDataPtr;
+		MRef<MikeyMessage *> responderDataPtr;
 
 		std::string authErrorValue;
 };

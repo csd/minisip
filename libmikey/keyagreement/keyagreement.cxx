@@ -26,6 +26,7 @@
 #include<config.h>
 #include<libmikey/keyagreement.h>
 #include<libmikey/MikeyPayloadSP.h>
+#include<libmikey/MikeyMessage.h>
 #include<string.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/rand.h>
@@ -39,8 +40,7 @@ KeyAgreement::KeyAgreement():
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),
 	csbIdValue(0), 
-	csIdMapPtr(NULL), nCsValue(0),
-	initiatorDataPtr(NULL), responderDataPtr(NULL){
+	csIdMapPtr(NULL), nCsValue(0){
 	//policy = list<Policy_type *>::list();
 	kvPtr = new KeyValidityNull();
 
@@ -292,19 +292,19 @@ void KeyAgreement::setTgk( unsigned char * tgk, unsigned int tgkLengthValue ){
 	}
 }
 
-void * KeyAgreement::initiatorData(){
+MRef<MikeyMessage *> KeyAgreement::initiatorData(){
 	return initiatorDataPtr;
 }
 
-void KeyAgreement::setInitiatorData( void * data ){
+void KeyAgreement::setInitiatorData( MRef<MikeyMessage *> data ){
 	initiatorDataPtr = data;
 }
 
-void * KeyAgreement::responderData(){
+MRef<MikeyMessage *> KeyAgreement::responderData(){
 	return responderDataPtr;
 }
 
-void KeyAgreement::setResponderData( void * data ){
+void KeyAgreement::setResponderData( MRef<MikeyMessage *> data ){
 	responderDataPtr = data;
 }
 

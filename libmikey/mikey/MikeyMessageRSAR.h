@@ -37,9 +37,9 @@ class LIBMIKEY_API MikeyMessageRSAR: public MikeyMessage{
 		MikeyMessageRSAR();
 		MikeyMessageRSAR( KeyAgreementRSAR* ka );
 
-		MikeyMessage * parseResponse( KeyAgreement  * ka );
+		MRef<MikeyMessage *> parseResponse( KeyAgreement  * ka );
 		void setOffer( KeyAgreement * ka );
-		MikeyMessage * buildResponse( KeyAgreement * ka );
+		MRef<MikeyMessage *> buildResponse( KeyAgreement * ka );
 		bool authenticate( KeyAgreement  * ka );
 
 		bool isInitiatorMessage() const;

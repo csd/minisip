@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -96,16 +98,16 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 				"Not a DH keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		throw MikeyExceptionMessageContent(
 				"DH init message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)i)
+#define hdr ((MikeyPayloadHDR *)*i)
 	if( hdr->dataType() != HDR_DATA_TYPE_DH_INIT )
 		throw MikeyExceptionMessageContent( 
 				"Expected DH init message" );
@@ -134,14 +136,14 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 	
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+	if( ((MikeyPayloadT*)*i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
@@ -153,15 +155,14 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-	// FIXME i can be NULL
-	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
-		     ((MikeyPayloadRAND *)i)->randLength() );
+	ka->setRand( ((MikeyPayloadRAND *)*i)->randData(),
+		     ((MikeyPayloadRAND *)*i)->randLength() );
 
 	payloads.remove( i );
 
@@ -192,31 +193,33 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
+#define dh ((MikeyPayloadDH*)*i)
 
 	// FIXME i can be NULL
-	if( ka->group() != ((MikeyPayloadDH *)i)->group() ){
-		ka->setGroup( ((MikeyPayloadDH *)i)->group() );
+	if( ka->group() != dh->group() ){
+		ka->setGroup( dh->group() );
 	}
 
-	ka->setPeerKey( ((MikeyPayloadDH *)i)->dhKey(),
-		        ((MikeyPayloadDH *)i)->dhKeyLength() );
+	ka->setPeerKey( dh->dhKey(),
+		        dh->dhKeyLength() );
 	
-	ka->setKeyValidity( ((MikeyPayloadDH *)i)->kv() );
+	ka->setKeyValidity( dh->kv() );
 	
 	payloads.remove( i );
+#undef dh
 
 }
 //-----------------------------------------------------------------------------------------------//
 //
 //-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
 
 	if( !ka ){
@@ -225,7 +228,7 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	}
 
 	// Build the response message
-	MikeyMessage * result = new MikeyMessage();
+	MRef<MikeyMessage *> result = new MikeyMessage();
 	result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_DH_RESP, 0, 
 			HDR_PRF_MIKEY_1, ka->csbId(),
@@ -258,7 +261,7 @@ MikeyMessage * MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	return result;
 }
 
-MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
 
 	if( !ka ){
@@ -266,19 +269,19 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 				"Not a DH keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	bool gotDhi = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
-	if( i == NULL ){
+	if( i.isNull() ){
 		throw MikeyExceptionMessageContent(
 				"DH resp message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_DH_RESP ){
 		throw MikeyExceptionMessageContent( 
 				"Expected DH resp message" );
@@ -305,14 +308,14 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	payloads.remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+	if( ((MikeyPayloadT*)*i)->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
@@ -342,14 +345,14 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 	
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload(
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
 	// FIXME i can be NULL
-#define dh ((MikeyPayloadDH *)i)
+#define dh ((MikeyPayloadDH *)*i)
 	if( string( (const char *)dh->dhKey(), 
 				  dh->dhKeyLength() ) ==
 	    string( (const char *)ka->publicKey(), 
@@ -366,7 +369,7 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	payloads.remove( i );
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload(
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
@@ -399,8 +402,6 @@ MikeyMessage * MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
 
-	delete errorMessage;
-
 	return NULL;
 }
 
@@ -412,7 +413,7 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 				"Not a DH keyagreement" );
 	}
 
-	MikeyPayload * sign = (*lastPayload());
+	MRef<MikeyPayload *> sign = (*lastPayload());
 
 	// Fetch peer certificate chain
 	MRef<certificate_chain *> peerCert = ka->peerCertificateChain();
@@ -432,11 +433,12 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 		return true;
 	}
 
+#define signPl ((MikeyPayloadSIGN*)*sign)
 	int res; 
 	res = peerCert->get_first()->verif_sign( rawMessageData(),
-												rawMessageLength() - ((MikeyPayloadSIGN *)sign)->sigLength(),
-												((MikeyPayloadSIGN *)sign)->sigData(),
-												((MikeyPayloadSIGN *)sign)->sigLength() );
+												rawMessageLength() - signPl->sigLength(),
+												signPl->sigData(),
+												signPl->sigLength() );
 	if( res > 0 ) return false;
 	else return true;
 }

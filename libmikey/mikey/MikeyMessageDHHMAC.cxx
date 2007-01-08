@@ -106,16 +106,16 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 				"Not a DHHMAC keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		throw MikeyExceptionMessageContent(
 				"DHHMAC init message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)i)
+#define hdr ((MikeyPayloadHDR *)*i)
 	if( hdr->dataType() != HDR_DATA_TYPE_DHHMAC_INIT )
 		throw MikeyExceptionMessageContent( 
 				"Expected DHHMAC init message" );
@@ -144,75 +144,83 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 	
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT*)*i)
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}
 	
 	payloads.remove( i );
+#undef plT
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
-		     ((MikeyPayloadRAND *)i)->randLength() );
+#define plRand ((MikeyPayloadRAND*)*i)
+	ka->setRand( plRand->randData(),
+		     plRand->randLength() );
 
 	payloads.remove( i );
+#undef plRand
 
 
 	//FIXME treat the case of an ID payload
 	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
-	if( i != NULL ){
+	if( !i.isNull() ){
 		payloads.remove( i );
 	}
 
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-	if( ka->group() != ((MikeyPayloadDH *)i)->group() ){
-		if( ka->setGroup( ((MikeyPayloadDH *)i)->group() ) ){
+#define plDH ((MikeyPayloadDH*)*i)
+	if( ka->group() != plDH->group() ){
+		if( ka->setGroup( plDH->group() ) ){
 			error = true;
 			errorMessage->addPayload(
 				new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_DH ) );
 		}
 	}
 
-	ka->setPeerKey( ((MikeyPayloadDH *)i)->dhKey(),
-		        ((MikeyPayloadDH *)i)->dhKeyLength() );
+	ka->setPeerKey( plDH->dhKey(),
+		        plDH->dhKeyLength() );
 	
-	ka->setKeyValidity( ((MikeyPayloadDH *)i)->kv() );
+	ka->setKeyValidity( plDH->kv() );
 	
 	payloads.remove( i );
+#undef plDH
 
 	i = extractPayload( MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+#define plKemac ((MikeyPayloadKEMAC*)*i)
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 	else{
-		ka->macAlg = ((MikeyPayloadKEMAC*)i)->macAlg();;
+		ka->macAlg = plKemac->macAlg();;
 	}
+#undef plKemac
 
 	if( error ){
 		throw MikeyExceptionMessageContent( errorMessage );
@@ -224,7 +232,7 @@ void MikeyMessageDHHMAC::setOffer( KeyAgreement * kaBase ){
 //
 //-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessageDHHMAC::buildResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessageDHHMAC::buildResponse( KeyAgreement * kaBase ){
 	KeyAgreementDHHMAC* ka = dynamic_cast<KeyAgreementDHHMAC*>(kaBase);
 
 	if( !ka ){
@@ -233,7 +241,7 @@ MikeyMessage * MikeyMessageDHHMAC::buildResponse( KeyAgreement * kaBase ){
 	}
 
 	// Build the response message
-	MikeyMessage * result = new MikeyMessage();
+	MRef<MikeyMessage *> result = new MikeyMessage();
 	result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_DHHMAC_RESP, 0, 
 			HDR_PRF_MIKEY_1, ka->csbId(),
@@ -274,7 +282,7 @@ MikeyMessage * MikeyMessageDHHMAC::buildResponse( KeyAgreement * kaBase ){
 	return result;
 }
 
-MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 	KeyAgreementDHHMAC* ka = dynamic_cast<KeyAgreementDHHMAC*>(kaBase);
 
 	if( !ka ){
@@ -282,19 +290,19 @@ MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 				"Not a DHHMAC keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	bool gotDhi = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
-	if( i == NULL ){
+	if( i.isNull() ){
 		throw MikeyExceptionMessageContent(
 				"DHHMAC resp message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_DHHMAC_RESP ){
 		throw MikeyExceptionMessageContent( 
 				"Expected DHHMAC resp message" );
@@ -321,36 +329,38 @@ MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 	payloads.remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT *)(*i))
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}
 
 	payloads.remove( i );
+#undef plT
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
-	if( i != NULL ){
+	if( !i.isNull() ){
 		payloads.remove( i );
 	}
 
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 	
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload(
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}
 
-#define dh ((MikeyPayloadDH *)i)
+#define dh ((MikeyPayloadDH *)*i)
 	if( string( (const char *)dh->dhKey(), 
 				  dh->dhKeyLength() ) ==
 	    string( (const char *)ka->publicKey(), 
@@ -367,7 +377,7 @@ MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 	payloads.remove( i );
 	i = extractPayload( MIKEYPAYLOAD_DH_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload(
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
@@ -393,8 +403,6 @@ MikeyMessage * MikeyMessageDHHMAC::parseResponse( KeyAgreement * kaBase ){
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
 
-	delete errorMessage;
-
 // 	ka->computeTgk();
 
 	return NULL;
@@ -408,15 +416,13 @@ bool MikeyMessageDHHMAC::authenticate( KeyAgreement * kaBase ){
 				"Not a DHHMAC keyagreement" );
 	}
 
-	MikeyPayload * payload = *(lastPayload());
+	MRef<MikeyPayload *> payload = *(lastPayload());
  
 	if( ka->rand() == NULL ){
+		MRef<MikeyPayload *> pl =
+			extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 		
-		MikeyPayloadRAND * randPayload;
-		
-		randPayload = (MikeyPayloadRAND*) extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
-		
-		if( randPayload == NULL ){
+		if( pl.isNull() ){
 			ka->setAuthError(
 				"The MIKEY init has no"
 				"RAND payload."
@@ -425,6 +431,10 @@ bool MikeyMessageDHHMAC::authenticate( KeyAgreement * kaBase ){
 			return true;
 		}
 
+		MikeyPayloadRAND * randPayload;
+		
+		randPayload = (MikeyPayloadRAND*)*pl;
+		
 		ka->setRand( randPayload->randData(), 
 			     randPayload->randLength() );
 	}

@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad
+  Copyright (C) 2006 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -118,20 +120,20 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 				"Not a PSK keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	//uint32_t csbId;
 	MRef<MikeyCsIdMap *> csIdMap;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	//uint8_t nCs;
 
-	if( i == NULL || 
+	if( i.isNull() || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		throw MikeyExceptionMessageContent( 
 				"PSK init message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PSK_INIT ){
 		throw MikeyExceptionMessageContent( 
 				"Expected PSK init message" );
@@ -163,52 +165,57 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL )
+	if( i.isNull() )
 		throw MikeyExceptionMessageContent( 
 				"PSK init message had no T payload" );
 
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT*)*i)
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	ka->t_received = ((MikeyPayloadT*)i)->ts();
+	ka->t_received = plT->ts();
 	
 	remove( i );
+#undef plT
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
+#define plRand ((MikeyPayloadRAND*)*i)
 
 	// FIXME i can be NULL
-	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
-			((MikeyPayloadRAND *)i)->randLength() );
+	ka->setRand( plRand->randData(),
+			plRand->randLength() );
 
 	remove( i );
+#undef plRand
+
 	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
 
 	//FIXME treat the case of an ID payload
-	if( i != NULL ){
+	if( !i.isNull() ){
 		remove( i );
 	}
 
 	i = extractPayload( MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
 	// FIXME i can be NULL
-#define kemac ((MikeyPayloadKEMAC *)i)
+#define kemac ((MikeyPayloadKEMAC *)*i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
 	ka->macAlg = macAlg;
@@ -219,7 +226,7 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 	unsigned int encrKeyLength = 0;
 	
 	if( !deriveTranspKeys( ka, encrKey, iv, encrKeyLength, encrAlg,
-			       macAlg, ka->t_received, errorMessage ) ){
+			       macAlg, ka->t_received, *errorMessage ) ){
 		if( encrKey != NULL )
 			delete [] encrKey;
 		if( iv != NULL )
@@ -241,13 +248,13 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 
 	// decrypt the TGK
 	// TODO handle parse failure.
-	MikeyPayloads* subPayloads = 
+	MRef<MikeyPayloads*> subPayloads = 
 		kemac->decodePayloads( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE,
 				 encrKey, encrKeyLength, iv );
-	list<MikeyPayload *>::iterator iPayload =
+	list<MRef<MikeyPayload *> >::iterator iPayload =
 		subPayloads->firstPayload();
 	MikeyPayloadKeyData *keyData =
-		dynamic_cast<MikeyPayloadKeyData*>(*iPayload);
+		dynamic_cast<MikeyPayloadKeyData*>(**iPayload);
 	// FIXME: assume only one KeyData subpayload, I don't know what
 	// to do of more keys. Ask Ericsson
 	int tgkLength = keyData->keyDataLength();
@@ -266,7 +273,7 @@ void MikeyMessagePSK::setOffer( KeyAgreement * kaBase ){
 //-----------------------------------------------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------//
 
-MikeyMessage * MikeyMessagePSK::buildResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessagePSK::buildResponse( KeyAgreement * kaBase ){
 	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
 
 	if( !ka ){
@@ -276,7 +283,7 @@ MikeyMessage * MikeyMessagePSK::buildResponse( KeyAgreement * kaBase ){
 	
 	if( ka->getV() || ka->getCsIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 		// Build the response message
-		MikeyMessage * result = new MikeyMessage();
+		MRef<MikeyMessage *> result = new MikeyMessage();
 		result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_PSK_RESP, 0, 
 			HDR_PRF_MIKEY_1, ka->csbId(),
@@ -290,19 +297,23 @@ MikeyMessage * MikeyMessagePSK::buildResponse( KeyAgreement * kaBase ){
 		result->addVPayload( ka->macAlg, ka->t_received, 
 				ka->authKey, ka->authKeyLength );
 
-		if( ka->authKey != NULL )
+		if( ka->authKey != NULL ){
 			delete [] ka->authKey;
+			ka->authKey = NULL;
+		}
 
 		return result;
 	}
 	
-	if( ka->authKey != NULL )
+	if( ka->authKey != NULL ){
 		delete [] ka->authKey;
+		ka->authKey = NULL;
+	}
 	
 	return NULL;
 }
 
-MikeyMessage* MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage*> MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
 	KeyAgreementPSK* ka = dynamic_cast<KeyAgreementPSK*>(kaBase);
 
 	if( !ka ){
@@ -310,20 +321,20 @@ MikeyMessage* MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
 				"Not a PSK keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
-	if( i == NULL ||
+	if( i.isNull() ||
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 
 		throw MikeyExceptionMessageContent( 
 				"PSK response message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PSK_RESP )
 		throw MikeyExceptionMessageContent( 
 				"Expected PSK response message" );
@@ -350,20 +361,22 @@ MikeyMessage* MikeyMessagePSK::parseResponse( KeyAgreement * kaBase ){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT*)*i)
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	uint64_t t_received = ((MikeyPayloadT*)i)->ts();
+	uint64_t t_received = plT->ts();
+#undef plT
 
 	if( error ){
 		byte_t authKey[20];
@@ -388,15 +401,13 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 				"Not a PSK keyagreement" );
 	}
 
-	MikeyPayload * payload = *(lastPayload());
+	MRef<MikeyPayload *> payload = *(lastPayload());
  
 	if( ka->rand() == NULL ){
+		MRef<MikeyPayload *> pl =
+			extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 		
-		MikeyPayloadRAND * randPayload;
-		
-		randPayload = (MikeyPayloadRAND*) extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
-		
-		if( randPayload == NULL ){
+		if( pl.isNull() ){
 			ka->setAuthError(
 				"The MIKEY init has no"
 				"RAND payload."
@@ -405,6 +416,9 @@ bool MikeyMessagePSK::authenticate( KeyAgreement * kaBase ){
 			return true;
 		}
 
+		MikeyPayloadRAND * randPayload;
+		randPayload = (MikeyPayloadRAND*)*pl;
+		
 		ka->setRand( randPayload->randData(), 
 			     randPayload->randLength() );
 	}

@@ -28,6 +28,7 @@
 
 #include<libmikey/libmikey_config.h>
 
+#include<libmutil/MemObject.h>
 #include<libmikey/MikeyDefs.h>
 
 #include<assert.h>
@@ -72,14 +73,14 @@ class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
 class KeyAgreementRSAR;
 
-class LIBMIKEY_API MikeyPayloads{
+class LIBMIKEY_API MikeyPayloads: public MObject{
 	public:
  		MikeyPayloads();
 		MikeyPayloads( int firstPayloadType, byte_t *message, int lengthLimit );
 		virtual ~MikeyPayloads();
 		
-		void addPayload( MikeyPayload * payload );
-		void operator+=( MikeyPayload * payload );
+		void addPayload( MRef<MikeyPayload*> payload );
+		void operator+=( MRef<MikeyPayload*> payload );
 		void addSignaturePayload( MRef<SipSim*> sim );
 		void addSignaturePayload( MRef<certificate *> cert );
 		bool verifySignature( MRef<certificate*> cert );
@@ -108,22 +109,22 @@ class LIBMIKEY_API MikeyPayloads{
 		byte_t * rawMessageData();
 		int rawMessageLength();
 		
-		std::list<MikeyPayload *>::const_iterator firstPayload() const;
-		std::list<MikeyPayload *>::const_iterator lastPayload() const;
+		std::list<MRef<MikeyPayload*> >::const_iterator firstPayload() const;
+		std::list<MRef<MikeyPayload*> >::const_iterator lastPayload() const;
 
-		std::list<MikeyPayload *>::iterator firstPayload();
-		std::list<MikeyPayload *>::iterator lastPayload();
+		std::list<MRef<MikeyPayload*> >::iterator firstPayload();
+		std::list<MRef<MikeyPayload*> >::iterator lastPayload();
 		
-		MikeyPayload * extractPayload( int type );
-		const MikeyPayload * extractPayload( int type ) const;
-		void remove( MikeyPayload * );
+		MRef<MikeyPayload*> extractPayload( int type );
+		MRef<const MikeyPayload*> extractPayload( int type ) const;
+		void remove( MRef<MikeyPayload*> );
 
 		std::string b64Message();
 
 	protected:
 		static void parse( int firstPayloadType,
 				   byte_t *message, int lengthLimit, 
-				   std::list<MikeyPayload *>& payloads);
+				   std::list<MRef<MikeyPayload*> >& payloads);
 
 		void addPolicyToPayload(KeyAgreement * ka);
 		void addPolicyTo_ka(KeyAgreement * ka);
@@ -148,7 +149,7 @@ class LIBMIKEY_API MikeyPayloads{
 				       uint64_t t,
 				       MikeyMessage* errorMessage );
 
-		std::list<MikeyPayload *> payloads;
+		std::list<MRef<MikeyPayload*> > payloads;
 
 	private:
 		void compile();
@@ -192,9 +193,9 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
 		int type() const;
 		uint32_t csbId();
 
-		virtual MikeyMessage * parseResponse( KeyAgreement  * ka );
+		virtual MRef<MikeyMessage *> parseResponse( KeyAgreement  * ka );
 		virtual void setOffer( KeyAgreement * ka );
-		virtual MikeyMessage * buildResponse( KeyAgreement * ka );
+		virtual MRef<MikeyMessage *> buildResponse( KeyAgreement * ka );
 		virtual bool authenticate( KeyAgreement  * ka );
 
 		virtual bool isInitiatorMessage() const;

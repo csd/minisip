@@ -28,12 +28,13 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmutil/mtypes.h>
+#include<libmutil/MemObject.h>
 
 #include<string>
 
 #define MIKEYPAYLOAD_LAST_PAYLOAD 0
 
-class LIBMIKEY_API MikeyPayload{
+class LIBMIKEY_API MikeyPayload: public MObject{
 	public:
 		static const int LastPayload;
 

@@ -59,9 +59,9 @@ bool Session::responderAuthenticate( string message ){
 			throw MikeyException( "No MIKEY message received" );
 		else {
 			try{
-				MikeyMessage * init_mes = MikeyMessage::parse(b64Message);
+				MRef<MikeyMessage *> init_mes = MikeyMessage::parse(b64Message);
 				
-//				MikeyMessage * resp_mes = NULL;
+//				MRef<MikeyMessage *> resp_mes = NULL;
 				switch( init_mes->type() ){
 					case MIKEY_TYPE_DH_INIT:
 
@@ -198,9 +198,10 @@ bool Session::responderAuthenticate( string message ){
 			}
 			// Message was invalid
 			catch( MikeyExceptionMessageContent &exc ){
-				MikeyMessage * error_mes;
+				MRef<MikeyMessage *> error_mes;
 				merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
-				if( ( error_mes = exc.errorMessage() ) != NULL ){
+				error_mes = exc.errorMessage();
+				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
 				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
@@ -233,10 +234,10 @@ string Session::responderParse(){
 		return "";
 	}
 	
-	MikeyMessage * responseMessage = NULL;
-	MikeyMessage * initMessage = (MikeyMessage *)ka->initiatorData();
+	MRef<MikeyMessage *> responseMessage = NULL;
+	MRef<MikeyMessage *> initMessage = ka->initiatorData();
 
-	if( initMessage == NULL ){
+	if( initMessage.isNull() ){
 		merr << "Uninitialized message, this is a bug" << end;
 		/*securityConfig.*/secured = false;
 		return "";
@@ -268,9 +269,10 @@ string Session::responderParse(){
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent & exc ){
-		MikeyMessage * error_mes;
+		MRef<MikeyMessage *> error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
-		if( ( error_mes = exc.errorMessage() ) != NULL ){
+		error_mes = exc.errorMessage();
+		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
 		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
@@ -282,7 +284,7 @@ string Session::responderParse(){
 		/*securityConfig.*/secured = false;
 	}
 
-	if( responseMessage != NULL ){
+	if( !responseMessage.isNull() ){
 		//merr << "Created response message" << responseMessage->get_string() << end;
 		return responseMessage->b64Message();
 	}
@@ -296,7 +298,7 @@ string Session::responderParse(){
 
 
 string Session::initiatorCreate(){
-	MikeyMessage * message;
+	MRef<MikeyMessage *> message;
 	
 	
 	try{
@@ -355,7 +357,6 @@ string Session::initiatorCreate(){
 		}
 		
 		string b64Message = message->b64Message();
-		delete message;
 		return "mikey "+b64Message;
 	}
 	catch( certificate_exception & ){
@@ -387,7 +388,7 @@ bool Session::initiatorAuthenticate( string message ){
 			return false;
 		} else {
 			try{
-				MikeyMessage * resp_mes = MikeyMessage::parse( message );
+				MRef<MikeyMessage *> resp_mes = MikeyMessage::parse( message );
 				ka->setResponderData( resp_mes );
 
 				switch( /*securityConfig.*/ka_type ){
@@ -465,9 +466,10 @@ bool Session::initiatorAuthenticate( string message ){
 				return false;
 			}
 			catch(MikeyExceptionMessageContent &exc){
-				MikeyMessage * error_mes;
+				MRef<MikeyMessage *> error_mes;
 				merr << "MikeyExceptionMessageContent caught: " << exc.what() << end;
-				if( ( error_mes = exc.errorMessage() ) != NULL ){
+				error_mes = exc.errorMessage();
+				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
 				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
@@ -500,12 +502,12 @@ string Session::initiatorParse(){
 		return "";
 	}
 	
-	MikeyMessage * responseMessage = NULL;
+	MRef<MikeyMessage *> responseMessage = NULL;
 	
 	try{
-		MikeyMessage * initMessage = (MikeyMessage *)ka->responderData();
+		MRef<MikeyMessage *> initMessage = ka->responderData();
 
-		if( initMessage == NULL ){
+		if( initMessage.isNull() ){
 			merr << "Uninitialized MIKEY init message, this is a bug" << end;
 			/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
 			/*securityConfig.*/secured = false;
@@ -535,9 +537,10 @@ string Session::initiatorParse(){
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent &exc ){
-		MikeyMessage * error_mes;
+		MRef<MikeyMessage *> error_mes;
 		merr << "MikeyExceptionMesageContent caught: " << exc.what() << end;
-		if( ( error_mes = exc.errorMessage() ) != NULL ){
+		error_mes = exc.errorMessage();
+		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
 		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
@@ -549,7 +552,7 @@ string Session::initiatorParse(){
 		/*securityConfig.*/secured = false;
 	}
 
-	if( responseMessage != NULL )
+	if( !responseMessage.isNull() )
 		return responseMessage->b64Message();
 	else
 		return string("");
@@ -581,7 +584,7 @@ void Session::addStreamsToKa( bool initiating ){
 }
 
 void Session::setMikeyOffer(){
-	MikeyMessage * initMessage = (MikeyMessage *)ka->initiatorData();
+	MRef<MikeyMessage *> initMessage = ka->initiatorData();
 	initMessage->setOffer( *ka );
 }
 

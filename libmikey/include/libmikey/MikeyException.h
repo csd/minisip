@@ -26,6 +26,8 @@
 #define MIKEYEXCEPTION_H
 
 #include<libmikey/libmikey_config.h>
+#include<libmikey/MikeyMessage.h>
+#include<libmutil/MemObject.h>
 
 
 /**
@@ -62,12 +64,12 @@ class LIBMIKEY_API MikeyExceptionUninitialized: public MikeyException{
 class LIBMIKEY_API MikeyExceptionMessageContent: public MikeyException{
 	public:
 		MikeyExceptionMessageContent(const char* msg);
-		MikeyExceptionMessageContent(MikeyMessage * errMsg, const char* msg="");
+		MikeyExceptionMessageContent(MRef<MikeyMessage *> errMsg, const char* msg="");
 		virtual ~MikeyExceptionMessageContent()throw();
 
-		MikeyMessage * errorMessage();
+		MRef<MikeyMessage *> errorMessage();
 	private:
-		MikeyMessage * errorMessageValue;
+		MRef<MikeyMessage *> errorMessageValue;
 
 };
 

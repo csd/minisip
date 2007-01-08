@@ -94,20 +94,20 @@ void MikeyMessageRSAR::setOffer(KeyAgreement* kaBase){
 				"Not a RSAR keyagreement" );
 	}
 
-	MikeyPayload* i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload*> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	//uint32_t csbId;
 	MRef<MikeyCsIdMap*> csIdMap;
-	MikeyMessage* errorMessage = new MikeyMessage();
+	MRef<MikeyMessage*> errorMessage = new MikeyMessage();
 	//uint8_t nCs;
 
-	if( i == NULL || 
+	if( i.isNull() || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		throw MikeyExceptionMessageContent( 
 				"RSAR init message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_RSA_R_INIT ){
 		throw MikeyExceptionMessageContent( 
 				"Expected RSAR init message" );
@@ -139,46 +139,50 @@ void MikeyMessageRSAR::setOffer(KeyAgreement* kaBase){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL )
+	if( i.isNull() )
 		throw MikeyExceptionMessageContent( 
 				"RSAR init message had no T payload" );
 
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT *)(*i))
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	ka->t_received = ((MikeyPayloadT*)i)->ts();
+	ka->t_received = plT->ts();
 	
 	remove( i );
+#undef plT
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+#define plRand ((MikeyPayloadRAND *)*i)
 	// FIXME i can be NULL
-	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
-			((MikeyPayloadRAND *)i)->randLength() );
+	ka->setRand( plRand->randData(),
+			plRand->randLength() );
 
 	remove( i );
+#undef plRand
 	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
 
 	//FIXME treat the case of an ID payload
-	if( i != NULL ){
+	if( !i.isNull() ){
 		remove( i );
 	}
 
 }
 
-MikeyMessage* MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
+MRef<MikeyMessage*> MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 	KeyAgreementRSAR* ka = dynamic_cast<KeyAgreementRSAR*>(kaBase);
 
 	if( !ka ){
@@ -187,7 +191,7 @@ MikeyMessage* MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 	}
 	
 	// Build the response message
-	MikeyMessageRSAR * result = new MikeyMessageRSAR();
+	MRef<MikeyMessageRSAR *> result = new MikeyMessageRSAR();
 	result->addPayload( 
 			   new MikeyPayloadHDR( HDR_DATA_TYPE_RSA_R_RESP, 0, 
 						HDR_PRF_MIKEY_1, ka->csbId(),
@@ -216,10 +220,10 @@ MikeyMessage* MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 
 	result->addSignaturePayload( ka->certificateChain()->get_first() );
 
-	return result;
+	return *result;
 }
 
-MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 	KeyAgreementRSAR* ka = dynamic_cast<KeyAgreementRSAR*>(kaBase);
 
 	if( !ka ){
@@ -227,20 +231,20 @@ MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 				"Not a RSAR keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
-	if( i == NULL ||
+	if( i.isNull() ||
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 
 		throw MikeyExceptionMessageContent( 
 				"RSAR response message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_RSA_R_RESP )
 		throw MikeyExceptionMessageContent( 
 				"Expected RSAR response message" );
@@ -267,31 +271,33 @@ MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT*)*i)
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	uint64_t t_received = ((MikeyPayloadT*)i)->ts();
+	uint64_t t_received = plT->ts();
+#undef plT
 
 	i = extractPayload( MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
 	// FIXME handle i == NULL
-#define kemac ((MikeyPayloadKEMAC *)i)
+#define kemac ((MikeyPayloadKEMAC *)*i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
 	ka->macAlg = macAlg;
@@ -303,7 +309,7 @@ MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 	
 	if( !deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
 			      encrAlg, macAlg, t_received,
-			      errorMessage ) ){
+			      *errorMessage ) ){
 		if( encrKey != NULL )
 			delete [] encrKey;
 		if( iv != NULL )
@@ -321,7 +327,7 @@ MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 	}
 	
 	// decrypt the TGK
-	MikeyPayloads* subPayloads = 
+	MRef<MikeyPayloads*> subPayloads = 
 		kemac->decodePayloads( MIKEYPAYLOAD_ID_PAYLOAD_TYPE,
 				 encrKey, encrKeyLength, iv );
 	
@@ -334,8 +340,11 @@ MikeyMessage * MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 		iv = NULL;
 	}
 
+	MRef<MikeyPayload *> plKeyData =
+		subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE );
+
 	MikeyPayloadKeyData *keyData =
-		dynamic_cast<MikeyPayloadKeyData*>(subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE ));
+		dynamic_cast<MikeyPayloadKeyData*>(*plKeyData);
 
 	int tgkLength = keyData->keyDataLength();
 	byte_t * tgk = keyData->keyData();
@@ -368,16 +377,15 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 				"Not a RSAR keyagreement" );
 	}
 	
-	MikeyPayload * payload = *(lastPayload());
+	MRef<MikeyPayload *> payload = *(lastPayload());
 	list<MikeyPayload *>::iterator payload_i;
  
 	if( ka->rand() == NULL ){
 		
-		MikeyPayloadRAND * randPayload;
+		MRef<MikeyPayload *> pl =
+			extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 		
-		randPayload = (MikeyPayloadRAND*) extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
-		
-		if( randPayload == NULL ){
+		if( pl.isNull() ){
 			ka->setAuthError(
 				"The MIKEY init has no"
 				"RAND payload."
@@ -386,6 +394,10 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 			return true;
 		}
 
+		MikeyPayloadRAND * randPayload;
+		
+		randPayload = (MikeyPayloadRAND*)*pl;
+		
 		ka->setRand( randPayload->randData(), 
 			     randPayload->randLength() );
 	}

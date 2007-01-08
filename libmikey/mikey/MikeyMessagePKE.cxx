@@ -101,20 +101,20 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 				"Not a PKE keyagreement" );
 	}
 
-	MikeyPayload* i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload*> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
 	//uint32_t csbId;
 	MRef<MikeyCsIdMap*> csIdMap;
-	MikeyMessage* errorMessage = new MikeyMessage();
+	MRef<MikeyMessage*> errorMessage = new MikeyMessage();
 	//uint8_t nCs;
 
-	if( i == NULL || 
+	if( i.isNull() || 
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		throw MikeyExceptionMessageContent( 
 				"PKE init message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PK_INIT ){
 		throw MikeyExceptionMessageContent( 
 				"Expected PKE init message" );
@@ -146,52 +146,56 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL )
+	if( i.isNull() )
 		throw MikeyExceptionMessageContent( 
 				"PKE init message had no T payload" );
 
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+#define plT ((MikeyPayloadT *)(*i))
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	ka->t_received = ((MikeyPayloadT*)i)->ts();
+	ka->t_received = plT->ts();
 	
 	remove( i );
+#undef plT
 
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+#define plRand ((MikeyPayloadRAND *)*i)
 	// FIXME i can be NULL
-	ka->setRand( ((MikeyPayloadRAND *)i)->randData(),
-			((MikeyPayloadRAND *)i)->randLength() );
+	ka->setRand( plRand->randData(),
+			plRand->randLength() );
 
 	remove( i );
+#undef plRand
 	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
 
 	//FIXME treat the case of an ID payload
-	if( i != NULL ){
+	if( !i.isNull() ){
 		remove( i );
 	}
 
 	i = extractPayload( MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
 	// FIXME i can be NULL
-#define kemac ((MikeyPayloadKEMAC *)i)
+#define kemac ((MikeyPayloadKEMAC *)*i)
 	int encrAlg = kemac->encrAlg();
 	int macAlg  = kemac->macAlg();
 	ka->macAlg = macAlg;
@@ -203,7 +207,7 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 	
 	if( !deriveTranspKeys( ka, encrKey, iv, encrKeyLength,
 			      encrAlg, macAlg, ka->t_received,
-			      errorMessage ) ){
+			      *errorMessage ) ){
 		if( encrKey != NULL )
 			delete [] encrKey;
 		if( iv != NULL )
@@ -221,12 +225,16 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 	}
 	
 	// decrypt the TGK
-	MikeyPayloads* subPayloads = 
+	MRef<MikeyPayloads*> subPayloads = 
 		kemac->decodePayloads( MIKEYPAYLOAD_ID_PAYLOAD_TYPE,
 				 encrKey, encrKeyLength, iv );
-	
+
+	MRef<MikeyPayload *> plKeyData =
+		subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE );
+
+	// FIXME check null
 	MikeyPayloadKeyData *keyData =
-		dynamic_cast<MikeyPayloadKeyData*>(subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE ));
+		dynamic_cast<MikeyPayloadKeyData*>(*plKeyData);
 
 	int tgkLength = keyData->keyDataLength();
 	byte_t * tgk = keyData->keyData();
@@ -241,7 +249,7 @@ void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
 		delete [] iv;
 }
 
-MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
+MRef<MikeyMessage*> MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
 	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
 
 	if( !ka ){
@@ -251,7 +259,7 @@ MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
 	
 	if( ka->getV() || ka->getCsIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
 		// Build the response message
-		MikeyMessage * result = new MikeyMessage();
+		MRef<MikeyMessage *> result = new MikeyMessage();
 		result->addPayload( 
 			new MikeyPayloadHDR( HDR_DATA_TYPE_PK_RESP, 0, 
 			HDR_PRF_MIKEY_1, ka->csbId(),
@@ -282,7 +290,7 @@ MikeyMessage* MikeyMessagePKE::buildResponse(KeyAgreement* kaBase){
 	return NULL;
 }
 
-MikeyMessage * MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
+MRef<MikeyMessage *> MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
 	KeyAgreementPKE* ka = dynamic_cast<KeyAgreementPKE*>(kaBase);
 
 	if( !ka ){
@@ -290,20 +298,20 @@ MikeyMessage * MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
 				"Not a PKE keyagreement" );
 	}
 
-	MikeyPayload * i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
 	bool error = false;
-	MikeyMessage * errorMessage = new MikeyMessage();
+	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
 	MRef<MikeyCsIdMap *> csIdMap;
 	uint8_t nCs;
 	
-	if( i == NULL ||
+	if( i.isNull() ||
 		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 
 		throw MikeyExceptionMessageContent( 
 				"PKE response message had no HDR payload" );
 	}
 
-#define hdr ((MikeyPayloadHDR *)(i))
+#define hdr ((MikeyPayloadHDR *)(*i))
 	if( hdr->dataType() != HDR_DATA_TYPE_PK_RESP )
 		throw MikeyExceptionMessageContent( 
 				"Expected PKE response message" );
@@ -330,20 +338,22 @@ MikeyMessage * MikeyMessagePKE::parseResponse( KeyAgreement * kaBase ){
 	remove( i );
 	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
 
-	if( i == NULL ){
+	if( i.isNull() ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
 	}	
 
+#define plT ((MikeyPayloadT*)*i)
 	// FIXME i can be NULL
-	if( ((MikeyPayloadT*)i)->checkOffset( MAX_TIME_OFFSET ) ){
+	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
 		error = true;
 		errorMessage->addPayload( 
 			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
 	}	
 
-	uint64_t t_received = ((MikeyPayloadT*)i)->ts();
+	uint64_t t_received = plT->ts();
+#undef plT
 
 	if( error ){
 		byte_t authKey[20];
@@ -368,16 +378,15 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 				"Not a PKE keyagreement" );
 	}
 	
-	MikeyPayload * payload = *(lastPayload());
+	MRef<MikeyPayload *> payload = *(lastPayload());
 	list<MikeyPayload *>::iterator payload_i;
  
 	if( ka->rand() == NULL ){
 		
-		MikeyPayloadRAND * randPayload;
+		MRef<MikeyPayload *> pl =
+			extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
 		
-		randPayload = (MikeyPayloadRAND*) extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
-		
-		if( randPayload == NULL ){
+		if( pl.isNull() ){
 			ka->setAuthError(
 				"The MIKEY init has no"
 				"RAND payload."
@@ -385,6 +394,10 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 			
 			return true;
 		}
+
+		MikeyPayloadRAND * randPayload;
+		
+		randPayload = (MikeyPayloadRAND*)*pl;
 
 		ka->setRand( randPayload->randData(), 
 			     randPayload->randLength() );

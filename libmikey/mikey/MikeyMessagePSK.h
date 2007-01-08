@@ -38,9 +38,9 @@ class LIBMIKEY_API MikeyMessagePSK: public MikeyMessage{
 				 int encrAlg = MIKEY_ENCR_AES_CM_128, 
 				 int macAlg  = MIKEY_MAC_HMAC_SHA1_160 );
 
-		MikeyMessage * parseResponse( KeyAgreement  * ka );
+		MRef<MikeyMessage *> parseResponse( KeyAgreement  * ka );
 		void setOffer( KeyAgreement * ka );
-		MikeyMessage * buildResponse( KeyAgreement * ka );
+		MRef<MikeyMessage *> buildResponse( KeyAgreement * ka );
 		bool authenticate( KeyAgreement  * ka );
 
 		bool isInitiatorMessage() const;

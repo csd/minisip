@@ -107,13 +107,18 @@ MikeyMessage* MikeyMessage::create( KeyAgreementRSAR* ka ){
 
 MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
 {
-	std::list<MikeyPayload *> payloads;
+	std::list<MRef<MikeyPayload*> > payloads;
 
 	MikeyPayloads::parse( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE,
 			      message, lengthLimit, payloads );
 
+	if( payloads.size() == 0 ){
+		throw MikeyExceptionMessageContent( 
+			"No payloads" );
+	}
+
 	MikeyPayloadHDR *hdr =
-		dynamic_cast<MikeyPayloadHDR*>(*payloads.begin());
+		dynamic_cast<MikeyPayloadHDR*>(**payloads.begin());
 
 	if( !hdr ){
 		throw MikeyExceptionMessageContent( 
@@ -183,18 +188,12 @@ MikeyPayloads::~MikeyPayloads(){
 	}
 	
 	rawData = NULL;
-	
-	list<MikeyPayload *>::iterator i;
 
-	for( i = payloads.begin() ; i != payloads.end() ; i++ ){
-		delete *i;
-		
-	}
 }
 
-static MikeyPayload* parsePayload( int payloadType,
+static MRef<MikeyPayload*> parsePayload( int payloadType,
 				   byte_t * msgpos, int limit ){
-	MikeyPayload* payload = NULL;
+	MRef<MikeyPayload*> payload = NULL;
 
 	switch (payloadType){
 		case MIKEYPAYLOAD_HDR_PAYLOAD_TYPE:
@@ -255,14 +254,16 @@ static MikeyPayload* parsePayload( int payloadType,
 
 void MikeyPayloads::parse( int firstPayloadType,
 			   byte_t * message, int lengthLimit,
-			  std::list<MikeyPayload *>& payloads ){
-	MikeyPayload * hdr;
+			  std::list<MRef<MikeyPayload*> >& payloads ){
+	MRef<MikeyPayload*> hdr;
 	byte_t * msgpos = message;
 	int limit = lengthLimit;
 						
-	payloads.push_back( hdr = parsePayload( firstPayloadType,
-						message, limit ) );
+	hdr = parsePayload( firstPayloadType,
+			    message, limit );
 	
+	payloads.push_back( hdr );	
+
 	limit -=  (int)( hdr->end() - msgpos );
 	msgpos = hdr->end();
 
@@ -271,7 +272,7 @@ void MikeyPayloads::parse( int firstPayloadType,
 	while( !(msgpos >= message + lengthLimit ) && 
 			nextPayloadType != MikeyPayload::LastPayload){
 	
-		MikeyPayload *payload = parsePayload( nextPayloadType,
+		MRef<MikeyPayload*>payload = parsePayload( nextPayloadType,
 						      msgpos, limit );
 
 		nextPayloadType = payload->nextPayloadType();	
@@ -289,12 +290,12 @@ void MikeyPayloads::parse( int firstPayloadType,
 			"the total length of payloads." );
 }
 
-void MikeyPayloads::addPayload(MikeyPayload *payload){
+void MikeyPayloads::addPayload(MRef<MikeyPayload*>payload){
 
 	compiled = false;
 	// Put the nextPayloadType in the previous payload */
 	if( payload->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
-		list<MikeyPayload *>::reverse_iterator i = payloads.rbegin();
+		list<MRef<MikeyPayload*> >::reverse_iterator i = payloads.rbegin();
 
 		if( i != payloads.rend() ){
 			(*i)->setNextPayloadType( payload->payloadType() );
@@ -304,7 +305,7 @@ void MikeyPayloads::addPayload(MikeyPayload *payload){
 	payloads.push_back( payload );
 }
 
-void MikeyPayloads::operator +=( MikeyPayload * payload ){
+void MikeyPayloads::operator +=( MRef<MikeyPayload*> payload ){
 	addPayload( payload );
 }
 
@@ -313,7 +314,7 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	byte_t signature[4096];
 	int signatureLength;
 	MikeyPayloadSIGN * sign;
-	MikeyPayload * last;
+	MRef<MikeyPayload*> last;
 	
 	// set the previous nextPayloadType to signature
 	last = *lastPayload();
@@ -339,7 +340,7 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	byte_t signature[4096];
 	int signatureLength = sizeof(signature);
 	MikeyPayloadSIGN * sign;
-	MikeyPayload * last;
+	MRef<MikeyPayload*> last;
 	
 	// set the previous nextPayloadType to signature
 	last = *lastPayload();
@@ -368,7 +369,7 @@ void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
 				     bool kemacOnly ){
 	byte_t * encrData = new byte_t[ tgkLength ];
 	AES * aes;
-	MikeyPayload * last;
+	MRef<MikeyPayload*> last;
 	
 	// set the previous nextPayloadType to KEMAC
 	last = * lastPayload();
@@ -449,7 +450,7 @@ void MikeyPayloads::addVPayload( int macAlg, uint64_t t,
 		unsigned int messageLength;
 		byte_t * messageData;
 
-	MikeyPayload * last;
+	MRef<MikeyPayload*> last;
 	// set the previous nextPayloadType to V
 	last = *lastPayload();
 	last->setNextPayloadType( MIKEYPAYLOAD_V_PAYLOAD_TYPE );
@@ -504,7 +505,7 @@ void MikeyPayloads::compile(){
 
 	rawData = new byte_t[ rawMessageLength() ];	
 	
-	list<MikeyPayload *>::iterator i;
+	list<MRef<MikeyPayload*> >::iterator i;
 	byte_t *pos = rawData;
 	for (i=payloads.begin(); i!=payloads.end(); i++){
 		int len = (*i)->length();
@@ -522,7 +523,7 @@ byte_t *MikeyPayloads::rawMessageData(){
 }
 
 int MikeyPayloads::rawMessageLength(){
-	list<MikeyPayload *>::iterator i;
+	list<MRef<MikeyPayload*> >::iterator i;
 	int length=0;
 	for (i=payloads.begin(); i!=payloads.end(); i++){
 		length+=(*i)->length();
@@ -543,7 +544,7 @@ void MikeyPayloads::setRawMessageData( byte_t *data ){
 
 string MikeyPayloads::debugDump(){
 	string ret="";
-	list<MikeyPayload *>::iterator i;
+	list<MRef<MikeyPayload*> >::iterator i;
 	for (i=payloads.begin(); i!=payloads.end(); i++)
 	{
 		ret=ret+"\n\n"+(*i)->debugDump();
@@ -552,19 +553,19 @@ string MikeyPayloads::debugDump(){
 	return ret;
 }
 
-list<MikeyPayload *>::const_iterator MikeyPayloads::firstPayload() const{
+list<MRef<MikeyPayload*> >::const_iterator MikeyPayloads::firstPayload() const{
 	return payloads.begin();
 }
 
-list<MikeyPayload *>::const_iterator MikeyPayloads::lastPayload() const{
+list<MRef<MikeyPayload*> >::const_iterator MikeyPayloads::lastPayload() const{
 	return --payloads.end();
 }
 
-list<MikeyPayload *>::iterator MikeyPayloads::firstPayload(){
+list<MRef<MikeyPayload*> >::iterator MikeyPayloads::firstPayload(){
 	return payloads.begin();
 }
 
-list<MikeyPayload *>::iterator MikeyPayloads::lastPayload(){
+list<MRef<MikeyPayload*> >::iterator MikeyPayloads::lastPayload(){
 	return --payloads.end();
 }
 
@@ -573,26 +574,26 @@ string MikeyPayloads::b64Message(){
 }
 
 uint32_t MikeyMessage::csbId(){
-	MikeyPayload * hdr = * firstPayload();
+	MRef<MikeyPayload*> hdr = * firstPayload();
 	if( hdr->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
 		throw MikeyExceptionMessageContent( 
 				"First payload was not a header" );
 	}
-	return ((MikeyPayloadHDR *)hdr)->csbId();
+	return dynamic_cast<MikeyPayloadHDR *>(*hdr)->csbId();
 }
 
 int MikeyMessage::type() const{
-	const MikeyPayload * hdr = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
-	if( hdr == NULL ){
+	MRef<const MikeyPayload*> hdr = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
+	if( hdr.isNull() ){
 		throw MikeyExceptionMessageContent( 
 			"No header in the payload" );
 	}
 
-	return ((MikeyPayloadHDR *)hdr)->dataType();
+	return dynamic_cast<const MikeyPayloadHDR *>(*hdr)->dataType();
 }
 
-MikeyPayload * MikeyPayloads::extractPayload( int payloadType ){
-	list<MikeyPayload *>::iterator i;
+MRef<MikeyPayload*> MikeyPayloads::extractPayload( int payloadType ){
+	list<MRef<MikeyPayload*> >::iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
 		if( (*i)->payloadType() == payloadType ){
@@ -602,19 +603,19 @@ MikeyPayload * MikeyPayloads::extractPayload( int payloadType ){
 	return NULL;
 }
 
-const MikeyPayload * MikeyPayloads::extractPayload( int payloadType ) const{
-	list<MikeyPayload *>::const_iterator i;
+MRef<const MikeyPayload*> MikeyPayloads::extractPayload( int payloadType ) const{
+	list<MRef<MikeyPayload*> >::const_iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
 		if( (*i)->payloadType() == payloadType ){
-			return *i;
+			return **i;
 		}
 	}
 	return NULL;
 }
 
-void MikeyPayloads::remove( MikeyPayload * payload ){
-	list<MikeyPayload *>::iterator i;
+void MikeyPayloads::remove( MRef<MikeyPayload*> payload ){
+	list<MRef<MikeyPayload*> >::iterator i;
 
 	for( i = payloads.begin(); i != payloads.end(); i++ ){
 		if( *i == payload ){
@@ -647,12 +648,16 @@ void MikeyPayloads::addPolicyToPayload(KeyAgreement * ka){
 }
 
 void MikeyPayloads::addPolicyTo_ka(KeyAgreement * ka){
-#define SP ((MikeyPayloadSP *)i)
+#define SP dynamic_cast<MikeyPayloadSP *>(*i)
 	// Adding policy to ka
 	int policy_i, policy_j;
 	MikeyPolicyParam * PParam;
-	MikeyPayload * i;
-	while ((i = extractPayload( MIKEYPAYLOAD_SP_PAYLOAD_TYPE )) != NULL){
+	MRef<MikeyPayload*> i;
+	while ( 1 ){
+		i = extractPayload( MIKEYPAYLOAD_SP_PAYLOAD_TYPE );
+		if( i.isNull() ){
+			break;
+		}
 		policy_i = 0;
 		policy_j = 0;
 		while (policy_i < SP->noOfPolicyParam()){
@@ -667,7 +672,7 @@ void MikeyPayloads::addPolicyTo_ka(KeyAgreement * ka){
 #undef SP
 }
 
-MikeyMessage * MikeyMessage::parseResponse( KeyAgreement  * ka ){
+MRef<MikeyMessage *> MikeyMessage::parseResponse( KeyAgreement  * ka ){
 	throw MikeyExceptionUnimplemented( "parseResponse not implemented" );
 }
 
@@ -675,7 +680,7 @@ void MikeyMessage::setOffer( KeyAgreement * ka ){
 	throw MikeyExceptionUnimplemented( "setOffer not implemented" );
 }
 
-MikeyMessage * MikeyMessage::buildResponse( KeyAgreement * ka ){
+MRef<MikeyMessage *> MikeyMessage::buildResponse( KeyAgreement * ka ){
 	throw MikeyExceptionUnimplemented( "buildResponse not implemented" );
 }
 
@@ -768,6 +773,9 @@ bool MikeyPayloads::deriveTranspKeys( KeyAgreementPSK* ka,
 	}
 
 	ka->macAlg = macAlg;
+	if( ka->authKey ){
+		delete[] ka->authKey;
+	}
 	ka->authKey = authKey;
 	ka->authKeyLength = authKeyLength;
 	return !error;
@@ -783,7 +791,7 @@ void MikeyPayloads::addCertificatePayloads( MRef<certificate_chain *> certChain 
 	certChain->init_index();
 	MRef<certificate*> cert = certChain->get_next();
 	while( ! cert.isNull() ){
-		MikeyPayload* payload =
+		MRef<MikeyPayload*> payload =
 			new MikeyPayloadCERT( MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
 					      cert);
 		addPayload( payload );
@@ -798,17 +806,17 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 	MRef<certificate_chain *> peerChain;
 
 	/* Try to find the certificate chain in the message */
-	list<MikeyPayload *>::const_iterator i;
-	list<MikeyPayload *>::const_iterator last = lastPayload();
+	list<MRef<MikeyPayload*> >::const_iterator i;
+	list<MRef<MikeyPayload*> >::const_iterator last = lastPayload();
 
 	for( i = firstPayload(); i != last; i++ ){
-		MikeyPayload *payload = *i;
+		MRef<MikeyPayload*> payload = *i;
 
 		if( payload->payloadType() != MIKEYPAYLOAD_CERT_PAYLOAD_TYPE )
 			continue;
 
 		MikeyPayloadCERT * certPayload =
-			dynamic_cast<MikeyPayloadCERT*>(payload);
+			dynamic_cast<MikeyPayloadCERT*>(*payload);
 		MRef<certificate*> peerCert = 
 			certificate::load( certPayload->certData(),
 					   certPayload->certLength() );
@@ -826,12 +834,15 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 }
 
 bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
-	MikeyPayloadSIGN* sig = dynamic_cast<MikeyPayloadSIGN*>(extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE));
+	MRef<MikeyPayload*> payload =
+		extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
 
-	if( !sig ){
-		return false;
+	if( !payload ){
+		throw MikeyExceptionMessageContent( "No SIGN payload" );
 	}
-		
+
+	MikeyPayloadSIGN* sig = dynamic_cast<MikeyPayloadSIGN*>(*payload);
+
 	int res = cert->verif_sign( rawMessageData(),
 				    rawMessageLength() - sig->sigLength(),
 				    sig->sigData(),
@@ -845,13 +856,17 @@ bool MikeyPayloads::verifyKemac( KeyAgreementPSK* ka,
 	byte_t * receivedMac;
 	byte_t * macInput;
 	unsigned int macInputLength;
+
+	MRef<MikeyPayload*> payload =
+		extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE);
+
+	if( !payload ){
+		throw MikeyExceptionMessageContent("No KEMAC payload");
+	}
+
 	MikeyPayloadKEMAC * kemac;
 
-	kemac = dynamic_cast<MikeyPayloadKEMAC *>(extractPayload(MIKEYPAYLOAD_KEMAC_PAYLOAD_TYPE));
-
-	if( !kemac ){
-		return false;
-	}
+	kemac = dynamic_cast<MikeyPayloadKEMAC *>(*payload);
 
 	macAlg = kemac->macAlg();
 	receivedMac = kemac->macData();
@@ -883,12 +898,14 @@ bool MikeyPayloads::verifyV( KeyAgreementPSK* ka ){
 	unsigned int macInputLength;
 	MikeyPayloadV * v;
 	uint64_t t_sent = ka->tSent();
+	MRef<MikeyPayload*> payload =
+		extractPayload(MIKEYPAYLOAD_V_PAYLOAD_TYPE);
 
-	v = dynamic_cast<MikeyPayloadV*>(extractPayload(MIKEYPAYLOAD_V_PAYLOAD_TYPE));
-
-	if( !v ){
-		return false;
+	if( !payload ){
+		throw MikeyExceptionMessageContent("No V payload");
 	}
+
+	v = dynamic_cast<MikeyPayloadV*>(*payload);
 
 	macAlg = v->macAlg();
 	receivedMac = v->verData();
@@ -976,6 +993,16 @@ void MikeyPayloads::addPkeKemac( KeyAgreementPKE* ka,
 	addKemacPayload(rawKeyData, rawKeyDataLength,
 			encrKey, iv, ka->authKey, encrAlg, macAlg, true );
 
+	if( encrKey ){
+		delete[] encrKey;
+		encrKey = NULL;
+	}
+
+	if( iv ){
+		delete[] iv;
+		iv = NULL;
+	}
+
 	delete subPayloads;
 	subPayloads = NULL;
 
@@ -1002,10 +1029,14 @@ void MikeyPayloads::addPkeKemac( KeyAgreementPKE* ka,
 }
 
 bool MikeyPayloads::extractPkeEnvKey( KeyAgreementPKE* ka ) const{
-	const MikeyPayload *payloadPke =
+	MRef<const MikeyPayload*> payloadPke =
 		extractPayload( MIKEYPAYLOAD_PKE_PAYLOAD_TYPE );
+	if( !payloadPke ){
+		throw MikeyException( "PKE init did not contain PKE payload" );
+	}
+
 	const MikeyPayloadPKE *pke =
-		dynamic_cast<const MikeyPayloadPKE*>( payloadPke );
+		dynamic_cast<const MikeyPayloadPKE*>( *payloadPke );
 
 	if( !pke ){
 		throw MikeyException( "PKE init did not contain PKE payload" );

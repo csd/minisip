@@ -54,7 +54,7 @@ MikeyExceptionMessageContent::MikeyExceptionMessageContent(const char* msg): Mik
 
 }
 
-MikeyExceptionMessageContent::MikeyExceptionMessageContent(MikeyMessage * errMsg, const char* msg):MikeyException(msg),errorMessageValue(errMsg){
+MikeyExceptionMessageContent::MikeyExceptionMessageContent(MRef<MikeyMessage *> errMsg, const char* msg):MikeyException(msg),errorMessageValue(errMsg){
 
 }
 
@@ -63,7 +63,7 @@ MikeyExceptionMessageContent::~MikeyExceptionMessageContent() throw(){
 }
 
 
-MikeyMessage * MikeyExceptionMessageContent::errorMessage(){
+MRef<MikeyMessage *> MikeyExceptionMessageContent::errorMessage(){
         return errorMessageValue;
 }
 
