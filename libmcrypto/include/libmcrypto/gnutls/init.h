@@ -19,3 +19,4 @@
 #include <libmcrypto/config.h>
 
 void libmcryptoGnutlsInit();
+void libmcryptoGnutlsUninit();

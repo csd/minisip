@@ -21,14 +21,17 @@
 #include<gnutls/gnutls.h>
 #include<errno.h>
 #include<pthread.h>
+#include<iostream>
 
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
-static bool g_initialized;
+using namespace std;
+
+static unsigned int g_initialized;
 
 void libmcryptoGnutlsInit()
 {
-	if( g_initialized )
+	if( g_initialized++ )
 		return;
 
 	/* The order matters.
@@ -36,4 +39,12 @@ void libmcryptoGnutlsInit()
 	gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
 	gnutls_global_init();
 	g_initialized = true;
+}
+
+void libmcryptoGnutlsUninit()
+{
+	if( --g_initialized )
+		return;
+
+	gnutls_global_deinit();
 }

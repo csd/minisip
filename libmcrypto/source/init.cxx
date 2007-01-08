@@ -46,6 +46,13 @@ void libmcryptoInit()
 #endif
 }
 
+void libmcryptoUninit()
+{
+#if defined(HAVE_GNUTLS)
+	libmcryptoGnutlsUninit();
+#endif
+}
+
 // ====================================================================
 
 std::vector<Mutex*> CryptoThreadGuard::guards;

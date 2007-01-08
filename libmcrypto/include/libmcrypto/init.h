@@ -29,6 +29,7 @@
 
 // libmcryptoInit must be called before other APIs
 LIBMCRYPTO_API void libmcryptoInit();
+LIBMCRYPTO_API void libmcryptoUninit();
 
 class LIBMCRYPTO_API CryptoThreadGuard : public virtual MObject 
 {
