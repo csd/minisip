@@ -78,6 +78,8 @@ class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
 		OakleyDH * dh;
 		byte_t * peerKeyPtr;
 		int peerKeyLengthValue;
+		byte_t * publicKeyPtr;
+		int publicKeyLengthValue;
 };
 
 class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,

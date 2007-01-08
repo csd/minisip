@@ -59,7 +59,9 @@ PeerCertificates::~PeerCertificates(){
 //
 KeyAgreementDHBase::KeyAgreementDHBase():
 	peerKeyPtr( NULL ),
-	peerKeyLengthValue( 0 )
+	peerKeyLengthValue( 0 ),
+	publicKeyPtr( NULL ),
+	publicKeyLengthValue( 0 )
 {
 	dh = new OakleyDH();
 	if( dh == NULL )
@@ -74,6 +76,10 @@ KeyAgreementDHBase::~KeyAgreementDHBase(){
 	if( peerKeyPtr != NULL ){
 		delete [] peerKeyPtr;
 		peerKeyPtr = NULL;
+	}
+	if( publicKeyPtr != NULL ){
+		delete [] publicKeyPtr;
+		publicKeyPtr = NULL;
 	}
 }
 
@@ -113,6 +119,16 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 		setTgk( NULL, len );
 	}
 
+	int32_t length = dh->publicKeyLength();
+	if( length != publicKeyLengthValue ){
+		if( publicKeyPtr ){
+			delete[] publicKeyPtr;
+		}
+		publicKeyLengthValue = length;
+		publicKeyPtr = new unsigned char[ length ];
+	}
+	dh->getPublicKey( publicKeyPtr, length );
+
 	return 0;
 }
 	
@@ -128,16 +144,11 @@ void KeyAgreementDHBase::setPeerKey( unsigned char * peerKeyPtr,
 }
 
 int KeyAgreementDHBase::publicKeyLength(){
-	return dh->publicKeyLength();
+	return publicKeyLengthValue;
 }
 
 unsigned char * KeyAgreementDHBase::publicKey(){
-	unsigned char * publicKey;
-	uint32_t length = publicKeyLength();
-	publicKey = new unsigned char[ length ];
-	dh->getPublicKey( publicKey, length );
-	return publicKey;
-
+	return publicKeyPtr;
 }
 
 int KeyAgreementDHBase::computeTgk(){
@@ -148,8 +159,10 @@ int KeyAgreementDHBase::computeTgk(){
 }
 
 int KeyAgreementDHBase::group(){
-	return dh->group();
+	if( !publicKeyPtr )
+		return -1;
 
+	return dh->group();
 }
 
 int KeyAgreementDHBase::peerKeyLength(){
