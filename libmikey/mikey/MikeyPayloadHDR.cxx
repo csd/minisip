@@ -204,23 +204,23 @@ string MikeyPayloadHDR::debugDump(){
 	return ret;
 }
 
-int MikeyPayloadHDR::dataType(){
+int MikeyPayloadHDR::dataType() const{
 	return dataTypeValue;
 }
 
-int MikeyPayloadHDR::v(){
+int MikeyPayloadHDR::v() const{
 	return vValue;
 }
 
-uint8_t MikeyPayloadHDR::nCs(){
+uint8_t MikeyPayloadHDR::nCs() const{
 	return nCsValue;
 }
 
-unsigned int MikeyPayloadHDR::csbId(){
+unsigned int MikeyPayloadHDR::csbId() const{
 	return csbIdValue;
 }
 
-int MikeyPayloadHDR::csIdMapType(){
+int MikeyPayloadHDR::csIdMapType() const{
 	return csIdMapTypeValue;
 }
 

@@ -73,12 +73,12 @@ class LIBMIKEY_API MikeyPayloadHDR : public MikeyPayload{
 		virtual void writeData( byte_t * start, int expectedLength );
 		virtual std::string debugDump();
 
-		int dataType();
-		int v();
-		uint32_t csbId();
-		int csIdMapType();
+		int dataType() const;
+		int v() const;
+		uint32_t csbId() const;
+		int csIdMapType() const;
 		MRef<MikeyCsIdMap *> csIdMap();
-		uint8_t nCs();
+		uint8_t nCs() const;
 
 	private:
 		int version;
