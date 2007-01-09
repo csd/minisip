@@ -361,7 +361,7 @@ bool ossl_priv_key::private_decrypt( const unsigned char *data, int size,
 		ERR_error_string_n( err, buf, sizeof(buf) );
 
 		cerr << "RSA_private_decrypt: " << buf << endl;
-		cerr << binToHex( data, size ) << endl;
+		//cerr << binToHex( data, size ) << endl;
 
 		return false;
 	}
@@ -396,7 +396,7 @@ bool ossl_certificate::public_encrypt( const unsigned char *data, int size,
 		ERR_error_string_n( err, buf, sizeof(buf) );
 
 		cerr << "RSA_public_encrypt: " << buf << endl;
-		cerr << binToHex( data, size ) << endl;
+		//cerr << binToHex( data, size ) << endl;
 
 		return false;
 	}

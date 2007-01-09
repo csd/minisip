@@ -23,6 +23,7 @@
 
 #include <libmcrypto/SipSimSmartCardGD.h>
 #include <libmcrypto/SmartCardException.h>
+#include <libmcrypto/sha1.h>
 
 using namespace std;
 
@@ -61,6 +62,14 @@ void SipSimSmartCardGD::clearBuffer(){
 		delete [] recvBuffer;
 		recvBuffer=NULL;
 	}
+}
+
+void SipSimSmartCardGD::setCertificateChain(MRef<certificate_chain *> c){
+	certChain = c;
+}
+
+void SipSimSmartCardGD::setCA(MRef<ca_db *> ca){
+	ca_set = ca;
 }
 
 bool SipSimSmartCardGD::selectMikeyApp(){
@@ -312,7 +321,14 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 									 bool doHash, int hash_alg)
 {
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
-		sendBufferLength = 26;											// sha-1 has 20 bytes (160 bits) output as message digest
+		unsigned char * messageDigestPtr = NULL;
+		unsigned long messageDigestLengh = 20;
+		if (doHash){
+			messageDigestPtr = new unsigned char[20];
+			sha1(dataPtr, dataLength, messageDigestPtr);
+		}
+		
+		sendBufferLength = 26;
 		recvBufferLength = 130;											// this time we don't know the size of the receive buffer. Assume 128 is big enough and we
 																		// send the reference of recvBufferLength to this function and get that actual size from it 
 		clearBuffer();
@@ -326,14 +342,11 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x14;				// sha-1 has 20 bytes (160 bits) output as message digest
-		memcpy(&sendBuffer[5], dataPtr, 20);
+		memcpy(&sendBuffer[5], messageDigestPtr, 20);
 		sendBuffer[25] = 0x80;
-	//	sendBuffer[13] = 0x00;
 
 		//assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
 		
-		//memcpy(&sendBuffer[5], dataPtr, 20);
-
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
@@ -342,14 +355,19 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 					break;
 				case 0x6004:
 					clearBuffer();
-					throw SmartCardException("failed to sign the message digest on the smart card");
+					return false;
+					//throw SmartCardException("failed to sign the message digest on the smart card");
 				default:
 					clearBuffer();
-		 			throw SmartCardException("Unknown state value was returned when signing the message digest");
+					return false;
+		 			//throw SmartCardException("Unknown state value was returned when signing the message digest");
 		}
 		signatureLength = recvBufferLength - 2;
 		memcpy(signaturePtr, recvBuffer, signatureLength);
 		clearBuffer();
+		if (messageDigestPtr)
+			delete [] messageDigestPtr;
+		
 		return true;
 	}
 	else

@@ -30,6 +30,7 @@ pkginclude_HEADERS = \
 		hmac.h \
 		OakleyDH.h \
 		rand.h \
+		sha1.h \
 		uuid.h \
 		config.h \
 		TLSException.h \

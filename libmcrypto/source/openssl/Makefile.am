@@ -16,6 +16,7 @@ libmcopenssl_la_SOURCES = \
 		ZrtpDH.cxx \
 		hmac.cxx \
 		rand.cxx \
+		sha1.cxx \
 		TLSException.cxx \
 		TLSServerSocket.cxx \
 		TLSSocket.cxx \

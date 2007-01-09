@@ -95,11 +95,11 @@ KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 }
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
-	KeyAgreementDHBase(),
 	PeerCertificates( s->getCertificateChain(), s->getCAs() ),
 	useSim(true),
 	sim(s)
 {
+
 }
 
 KeyAgreementDH::~KeyAgreementDH(){
