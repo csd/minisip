@@ -85,9 +85,12 @@ bool Session::responderAuthenticate( string message ){
 						}
 
 						if( !ka ){
-							ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
-										 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+							//ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
+							//			 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+							ka = new KeyAgreementDH( identity->getSim() );
+
 							((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
+
 						}
 						ka->setInitiatorData( init_mes );
 
@@ -316,8 +319,9 @@ string Session::initiatorCreate(){
 					ka = NULL;
 				}
 				if( !ka ){
-					ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain() , 
-								 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+					//ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain() , 
+					//			 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
+					ka = new KeyAgreementDH( identity->getSim() );
 					((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
 				}
 				addStreamsToKa();
