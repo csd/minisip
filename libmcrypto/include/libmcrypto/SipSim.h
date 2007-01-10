@@ -50,7 +50,10 @@ public:
 				bool doHash, 
 				int hash_alg=HASH_SHA1) = 0;
 
+	virtual void setCertificateChain(MRef<certificate_chain *> c){certChain = c;}
 	virtual MRef<certificate_chain *> getCertificateChain(){return certChain;}
+
+	virtual void setCAs(MRef<ca_db*> c){ca_set=c;}
 	virtual MRef<ca_db *> getCAs(){return ca_set;}
 	
 

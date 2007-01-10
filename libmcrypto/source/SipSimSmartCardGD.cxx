@@ -63,13 +63,6 @@ void SipSimSmartCardGD::clearBuffer(){
 	}
 }
 
-void SipSimSmartCardGD::setCertificateChain(MRef<certificate_chain *> c){
-	certChain = c;
-}
-
-void SipSimSmartCardGD::setCA(MRef<ca_db *> ca){
-	ca_set = ca;
-}
 
 bool SipSimSmartCardGD::selectMikeyApp(){
 	sendBufferLength = 17;
@@ -320,14 +313,19 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 									 bool doHash, int hash_alg)
 {
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
-		unsigned char * messageDigestPtr = NULL;
-		unsigned long messageDigestLengh = 20;
-		if (doHash){
+		unsigned char * messageDigestPtr;
+		unsigned long messageDigestLength;
+		if (doHash){ 
+			assert( hash_alg == HASH_SHA1 );
 			messageDigestPtr = new unsigned char[20];
 			sha1(dataPtr, dataLength, messageDigestPtr);
+			messageDigestLength=20;
+		}else{
+			messageDigestPtr = dataPtr;
+			messageDigestLength=dataLength;
 		}
 		
-		sendBufferLength = 26;
+		sendBufferLength = 6+messageDigestLength;
 		recvBufferLength = 130;											// this time we don't know the size of the receive buffer. Assume 128 is big enough and we
 																		// send the reference of recvBufferLength to this function and get that actual size from it 
 		clearBuffer();
@@ -341,11 +339,9 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x14;				// sha-1 has 20 bytes (160 bits) output as message digest
-		memcpy(&sendBuffer[5], messageDigestPtr, 20);
-		sendBuffer[25] = 0x80;
+		memcpy(&sendBuffer[5], messageDigestPtr, messageDigestLength);
+		sendBuffer[5+messageDigestLength] = 0x80;
 
-		//assert(dataLength==20); //TODO: FIXME: do not assert this - use doHash, and compute hash if necessary -EE
-		
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];

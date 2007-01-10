@@ -39,9 +39,6 @@ public:
 	
 	~SipSimSmartCardGD();
 
-	void setCertificateChain(MRef<certificate_chain*> c);
-	void setCA(MRef<ca_db *> ca);
-
 /* select MIKEY applet APDU */
 	bool selectMikeyApp();
 
