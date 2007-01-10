@@ -10,6 +10,7 @@ libmcgnutls_la_SOURCES = \
 		init.cxx \
 		OakleyDH.cxx \
 		rand.cxx \
+		sha1.cxx \
 		sha256.cxx \
 		TLSServerSocket.cxx \
 		TLSSocket.cxx \
