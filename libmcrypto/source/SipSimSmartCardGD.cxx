@@ -28,7 +28,6 @@
 using namespace std;
 
 SipSimSmartCardGD::SipSimSmartCardGD():SmartCard() {
-	cerr << "XXXXXXXXXXXXXX SipSimSmartCardGD::SipSimSmartCardGD() running XXXXXXXXXXXXXXXXXXXx"<<endl;
 	
 	this->sendBufferLength = 0;
 	this->recvBufferLength = 0;
