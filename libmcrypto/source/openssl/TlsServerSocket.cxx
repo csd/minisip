@@ -24,8 +24,8 @@
 
 #include<config.h>
 
-#include<libmcrypto/openssl/TLSServerSocket.h>
-#include<libmcrypto/openssl/TLSSocket.h>
+#include<libmcrypto/openssl/TlsServerSocket.h>
+#include<libmcrypto/openssl/TlsSocket.h>
 #include<libmcrypto/openssl/cert.h>
 
 #ifdef WIN32

@@ -1,9 +1,9 @@
 #ifndef KEYAGREEMENTPKE_H
 #define KEYAGREEMENTPKE_H
 
-#include <libmikey/keyagreement.h>
-#include <libmikey/keyagreement_psk.h>
-#include <libmikey/keyagreement_dh.h>
+#include <libmikey/KeyAgreement.h>
+#include <libmikey/KeyAgreementPSK.h>
+#include <libmikey/KeyAgreementDH.h>
 #include <libmcrypto/cert.h>
 
 /**

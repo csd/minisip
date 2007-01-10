@@ -27,7 +27,7 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 
 
 

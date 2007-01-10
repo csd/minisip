@@ -23,7 +23,7 @@
 
 
 #include<config.h>
-#include<libmikey/keyvalidity.h>
+#include<libmikey/KeyValidity.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyDefs.h>
 #include<assert.h>

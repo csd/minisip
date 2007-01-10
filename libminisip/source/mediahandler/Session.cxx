@@ -43,8 +43,8 @@
 #include<libminisip/sdp/SdpHeaderM.h>
 #include<libminisip/sdp/SdpHeaderS.h>
 #include<libminisip/sdp/SdpHeaderO.h>
-#include<libmikey/keyagreement.h>
-#include<libmikey/keyagreement_dh.h>
+#include<libmikey/KeyAgreement.h>
+#include<libmikey/KeyAgreementDH.h>
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>

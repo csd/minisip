@@ -50,13 +50,13 @@ mikey_src =          mikey/MikeyException.cxx \
 		     mikey/MikeyPayloadT.cxx \
 		     mikey/MikeyPayloadV.cxx
 
-ka_src =             keyagreement/keyagreement.cxx \
-                     keyagreement/keyagreement_dh.cxx \
-	             keyagreement/keyagreement_psk.cxx \
+ka_src =             keyagreement/KeyAgreement.cxx \
+                     keyagreement/KeyAgreementDH.cxx \
+	             keyagreement/KeyAgreementPSK.cxx \
 	             keyagreement/KeyAgreementPKE.cxx \
 	             keyagreement/KeyAgreementDHHMAC.cxx \
 	             keyagreement/KeyAgreementRSAR.cxx \
-		     keyagreement/keyvalidity.cxx
+		     keyagreement/KeyValidity.cxx
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}

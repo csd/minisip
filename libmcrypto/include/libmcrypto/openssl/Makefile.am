@@ -6,8 +6,8 @@ pkginclude_HEADERS = \
 noinst_HEADERS = \
 		cert.h \
 		init.h \
-		TLSException.h \
-		TLSServerSocket.h \
-		TLSSocket.h
+		TlsException.h \
+		TlsServerSocket.h \
+		TlsSocket.h
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in

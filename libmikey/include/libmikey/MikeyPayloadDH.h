@@ -28,7 +28,7 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmikey/MikeyPayload.h>
-#include<libmikey/keyvalidity.h>
+#include<libmikey/KeyValidity.h>
 #include<libmikey/MikeyMessage.h>
 
 #define MIKEYPAYLOAD_DH_PAYLOAD_TYPE 3

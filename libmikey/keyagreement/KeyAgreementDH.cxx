@@ -25,7 +25,7 @@
 
 
 #include<config.h>
-#include<libmikey/keyagreement_dh.h>
+#include<libmikey/KeyAgreementDH.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
 #include<libmcrypto/OakleyDH.h>

@@ -32,7 +32,7 @@
 #include<assert.h>
 
 #include<libmutil/MemObject.h>
-#include<libmikey/keyvalidity.h>
+#include<libmikey/KeyValidity.h>
 #include<libmikey/MikeyCsIdMap.h>
 
 #include<iostream>

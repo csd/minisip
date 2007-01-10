@@ -28,8 +28,8 @@
 #include <libmnetutil/TCPSocket.h>
 
 #include <libmcrypto/gnutls/init.h>
-#include <libmcrypto/gnutls/TLSSocket.h>
-#include <libmcrypto/TLSException.h>
+#include <libmcrypto/gnutls/TlsSocket.h>
+#include <libmcrypto/TlsException.h>
 
 using namespace std;
 

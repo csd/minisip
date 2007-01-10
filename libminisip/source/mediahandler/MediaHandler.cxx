@@ -28,7 +28,7 @@
 
 #include<string.h>
 #include<libminisip/sdp/SdpPacket.h>
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/codecs/Codec.h>

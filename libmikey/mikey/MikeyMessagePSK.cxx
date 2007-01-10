@@ -37,7 +37,7 @@
 #include<libmikey/MikeyPayloadV.h>
 #include<libmikey/MikeyPayloadERR.h>
 #include<libmikey/MikeyPayloadID.h>
-#include<libmikey/keyagreement_psk.h>
+#include<libmikey/KeyAgreementPSK.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmcrypto/rand.h>
 

@@ -23,9 +23,9 @@
 
 #include<config.h>
 
-#include<libmcrypto/gnutls/TLSServerSocket.h>
-#include<libmcrypto/gnutls/TLSSocket.h>
-#include<libmcrypto/TLSException.h>
+#include<libmcrypto/gnutls/TlsServerSocket.h>
+#include<libmcrypto/gnutls/TlsSocket.h>
+#include<libmcrypto/TlsException.h>
 
 #include<sys/socket.h>
 

@@ -24,7 +24,7 @@
 
 
 #include<config.h>
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/MikeyMessage.h>
 #include<string.h>

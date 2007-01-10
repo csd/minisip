@@ -31,9 +31,9 @@
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 
-#include<libmikey/keyagreement.h>
-#include<libmikey/keyagreement_dh.h>
-#include<libmikey/keyagreement_psk.h>
+#include<libmikey/KeyAgreement.h>
+#include<libmikey/KeyAgreementDH.h>
+#include<libmikey/KeyAgreementPSK.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
 

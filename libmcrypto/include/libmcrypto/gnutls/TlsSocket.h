@@ -23,36 +23,57 @@
  *          Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#ifndef GNUTLS_TLSSERVERSOCKET_H
-#define GNUTLS_TLSSERVERSOCKET_H
+#ifndef GNUTLS_TLSSOCKET_H
+#define GNUTLS_TLSSOCKET_H
 
 #include<libmcrypto/config.h>
 
-#include<libmcrypto/TLSServerSocket.h>
+#include<libmnetutil/StreamSocket.h>
+
 #include<libmcrypto/gnutls/cert.h>
+#include<libmutil/mtypes.h>
 
-class LIBMNETUTIL_API GnutlsServerSocket : public TLSServerSocket {
+#include<libmnetutil/IPAddress.h>
 
+#include<libmutil/MemObject.h>
+#include<libmcrypto/TlsSocket.h>
+
+#include<gnutls/gnutls.h>
+
+class LIBMNETUTIL_API GnutlsSocket : public TLSSocket {
 	public:
-		GnutlsServerSocket( bool use_ipv6, int32_t listen_port,
-				    MRef<gtls_certificate *> cert,
-				    MRef<gtls_ca_db *> cert_db=NULL);
-		~GnutlsServerSocket();
-		virtual std::string getMemObjectType() const {return "GnutlsServerSocket";}
+		GnutlsSocket( IPAddress &addr, int32_t port,
+			      MRef<gtls_ca_db *> cert_db=NULL,
+			      MRef<gtls_certificate *> cert=NULL);
 
-		virtual MRef<StreamSocket *> accept();
+		GnutlsSocket( MRef<StreamSocket *> sock,
+			      gnutls_session_t session );
+		
+		virtual ~GnutlsSocket();
 
-	protected:
-		virtual void init( bool use_ipv6, int32_t listen_port, 
-				   MRef<gtls_certificate *> cert,
-				   MRef<gtls_ca_db *> cert_db);
-		gnutls_session_t initialize_tls_session();
+		virtual std::string getMemObjectType() const {return "GnutlsSocket";};
+
+		virtual int32_t write(std::string);
+		
+		virtual int32_t write(const void *buf, int32_t count);
+		
+		virtual int32_t read(void *buf, int32_t count);
 
 	private:
-		MRef<gtls_ca_db *> m_cert_db;
-		MRef<gtls_certificate*> m_cert;
+		void GnutlsSocket_init( MRef<StreamSocket*> ssock,
+					MRef<gtls_ca_db *> cert_db,
+					MRef<gtls_certificate *> cert);
 
 		gnutls_certificate_credentials_t m_xcred;
+		gnutls_session_t m_session;
+		
+		MRef<StreamSocket *> sock;
+		
+		MRef<certificate *> peer_cert;
+		
+		/** CA db */
+		MRef<ca_db *> cert_db;
+
 		gnutls_x509_crt_t* m_ca_list;
 		size_t m_ca_list_len;
 };

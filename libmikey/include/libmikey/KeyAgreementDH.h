@@ -27,7 +27,7 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 
 #define DH_GROUP_OAKLEY5 0
 #define DH_GROUP_OAKLEY1 1

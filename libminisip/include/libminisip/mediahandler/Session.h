@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
 
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 
 //#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libmsip/SipDialogConfig.h>

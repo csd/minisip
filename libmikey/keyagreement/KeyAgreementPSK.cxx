@@ -24,7 +24,7 @@
 
 #include<config.h>
 #include<libmikey/MikeyMessage.h>
-#include<libmikey/keyagreement_psk.h>
+#include<libmikey/KeyAgreementPSK.h>
 
 KeyAgreementPSK::KeyAgreementPSK():
 		KeyAgreement(),t_received(0),authKey(NULL),authKeyLength(0),

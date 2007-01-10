@@ -23,7 +23,7 @@
 
 #include<config.h>
 
-#include<libmcrypto/openssl/TLSSocket.h>
+#include<libmcrypto/openssl/TlsSocket.h>
 #include<libmcrypto/openssl/cert.h>
 
 #include <openssl/crypto.h>
@@ -44,8 +44,8 @@
 
 #include<iostream>
 
-#include<libmcrypto/TLSException.h>
-#include<libmcrypto/openssl/TLSException.h>
+#include<libmcrypto/TlsException.h>
+#include<libmcrypto/openssl/TlsException.h>
 #include<libmutil/MemObject.h>
 
 using namespace std;

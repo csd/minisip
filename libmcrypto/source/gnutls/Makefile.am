@@ -12,8 +12,8 @@ libmcgnutls_la_SOURCES = \
 		rand.cxx \
 		sha1.cxx \
 		sha256.cxx \
-		TLSServerSocket.cxx \
-		TLSSocket.cxx \
+		TlsServerSocket.cxx \
+		TlsSocket.cxx \
 		ZrtpDH.cxx
 
 

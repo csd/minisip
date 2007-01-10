@@ -57,7 +57,7 @@
 
 #include<libmcrypto/init.h>
 
-#include<libmikey/keyagreement_dh.h>
+#include<libmikey/KeyAgreementDH.h>
 
 #include<libmsip/SipUtils.h>
 #include<libmsip/SipCommandString.h>

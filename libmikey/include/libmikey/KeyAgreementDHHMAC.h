@@ -29,8 +29,8 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<libmikey/keyagreement_psk.h>
-#include<libmikey/keyagreement_dh.h>
+#include<libmikey/KeyAgreementPSK.h>
+#include<libmikey/KeyAgreementDH.h>
 #include<libmutil/mtypes.h>
 
 /**

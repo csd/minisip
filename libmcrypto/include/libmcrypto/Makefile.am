@@ -33,9 +33,9 @@ pkginclude_HEADERS = \
 		sha1.h \
 		uuid.h \
 		config.h \
-		TLSException.h \
-		TLSServerSocket.h \
-		TLSSocket.h \
+		TlsException.h \
+		TlsServerSocket.h \
+		TlsSocket.h \
 		ZrtpDH.h \
 		$(OTHER_FILES)
 

@@ -29,7 +29,7 @@
 
 #include<libmikey/libmikey_config.h>
 #include<libmikey/MikeyMessage.h>
-#include<libmikey/keyagreement_psk.h>
+#include<libmikey/KeyAgreementPSK.h>
 
 class LIBMIKEY_API MikeyMessageDH: public MikeyMessage{
 	public:

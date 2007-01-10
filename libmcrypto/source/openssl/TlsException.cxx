@@ -26,7 +26,7 @@
 
 #include<config.h>
 
-#include<libmcrypto/openssl/TLSException.h>
+#include<libmcrypto/openssl/TlsException.h>
 
 using namespace std;
 

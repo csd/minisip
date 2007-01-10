@@ -17,9 +17,9 @@ libmcopenssl_la_SOURCES = \
 		hmac.cxx \
 		rand.cxx \
 		sha1.cxx \
-		TLSException.cxx \
-		TLSServerSocket.cxx \
-		TLSSocket.cxx \
+		TlsException.cxx \
+		TlsServerSocket.cxx \
+		TlsSocket.cxx \
 		$(OTHER_FILES)
 
 libmcopenssl_la_LIBADD = $(OPENSSL_LIBS)

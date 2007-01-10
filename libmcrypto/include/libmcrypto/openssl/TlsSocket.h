@@ -36,7 +36,7 @@
 #include<libmnetutil/IPAddress.h>
 
 #include<libmutil/MemObject.h>
-#include<libmcrypto/TLSSocket.h>
+#include<libmcrypto/TlsSocket.h>
 
 
 /**

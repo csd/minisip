@@ -44,7 +44,7 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderTo.h>
 
-#include<libmcrypto/TLSSocket.h>
+#include<libmcrypto/TlsSocket.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>

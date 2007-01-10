@@ -26,7 +26,7 @@
 
 #include<libmcrypto/config.h>
 
-#include<libmcrypto/TLSServerSocket.h>
+#include<libmcrypto/TlsServerSocket.h>
 #include<libmcrypto/openssl/cert.h>
 
 #include<openssl/ssl.h>

@@ -28,7 +28,7 @@
 #include<libminisip/mediahandler/MediaStream.h>
 
 #include<libmikey/MikeyPayloadSP.h>
-#include<libmikey/keyagreement.h>
+#include<libmikey/KeyAgreement.h>
 #include<libminisip/sdp/SdpHeaderM.h>
 #include<libminisip/sdp/SdpHeaderA.h>
 #include<libminisip/sdp/SdpPacket.h>
