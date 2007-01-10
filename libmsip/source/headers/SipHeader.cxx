@@ -195,13 +195,14 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
  	//cerr << "PARSEHDR: valueline parsed to "<< valueline<< endl;
 
 	string headerType = findHeaderType(line);
+	string ht = upCase(headerType);
 	char valueSeparator;
 	char paramSeparator;
 
-	if( headerType == "WWW-Authenticate" ||
-			headerType == "Proxy-Authenticate" ||
-			headerType == "Authorization" ||
-			headerType == "Proxy-Authorization" ){
+	if( ht == "WWW-AUTHENTICATE" ||
+			ht == "PROXY-AUTHENTICATE" ||
+			ht == "AUTHORIZATION" ||
+			ht == "PROXY-AUTHORIZATION" ){
 		valueSeparator = '\0';
 		paramSeparator = ',';
 	} else {
@@ -220,11 +221,11 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 		}
 		// 			cerr << "PARSER: First value+params line: "<< values[i]<<""<<endl;
 
-		if( headerType == "Accept-Contact" ) {
+		if( ht == "ACCEPT-CONTACT" ) {
 			value_params = split(values[i],true,'\n');
 			value_zero = value_params[0];
 			// 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
-		} else if( headerType == "Contact" ) {
+		} else if( ht == "CONTACT" ) {
 			size_t ltPos = values[i].find( '<' );
 			size_t gtPos = values[i].find( '>' );
 			if( ltPos!=string::npos && gtPos!=string::npos ) {
@@ -242,10 +243,10 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 				value_params = split(values[i],true,';');
 				value_zero = value_params[0];
 			}
-		} else if( headerType == "From" ||
-				headerType == "To" ||
-			   headerType == "Route" ||
-			   headerType == "Record-Route" ) {
+		} else if( ht == "FROM" ||
+				ht == "TO" ||
+			   ht == "ROUTE" ||
+			   ht == "RECORD-ROUTE" ) {
 			size_t ltPos = values[i].find( '<' );
 			size_t gtPos = values[i].find( '>' );
 			if( ltPos!=string::npos && gtPos!=string::npos ) {
@@ -291,7 +292,6 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 		//Special case for headers that are allowed to exist
 		//without any header value. This list is compatibel 
 		//with: RFC3261, RFC3262(none)
-		string ht = upCase(headerType);
 		if ( 		ht=="ACCEPT" || 
 				ht=="ACCEPT-ENCODING" ||
 				ht=="ACCEPT-LANGUAGE" ||
