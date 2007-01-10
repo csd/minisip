@@ -27,24 +27,16 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 using namespace std;
 
-static unsigned int g_initialized;
-
 void libmcryptoGnutlsInit()
 {
-	if( g_initialized++ )
-		return;
-
 	/* The order matters.
 	 */
 	gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
 	gnutls_global_init();
-	g_initialized = true;
 }
 
 void libmcryptoGnutlsUninit()
 {
-	if( --g_initialized )
-		return;
 
 	gnutls_global_deinit();
 }

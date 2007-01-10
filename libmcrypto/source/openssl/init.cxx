@@ -27,17 +27,24 @@
 #include <vector>
 
 #include <openssl/crypto.h>
+#include <openssl/evp.h>
 #ifdef OPENSSL_SYS_WIN32
 #include <windows.h>
 #endif
 
 #include <config.h>
 
+using namespace std;
+
 void libmcryptoOpensslInit() {
-	MRef<OpenSSLThreadGuard *> instance = OpenSSLThreadGuard::getInstance();
+// 	MRef<OpenSSLThreadGuard *> instance = OpenSSLThreadGuard::getInstance();
 	// instance will be saved by singleton
+	OpenSSL_add_all_algorithms();
 }
 
+void libmcryptoOpensslUninit(){
+	EVP_cleanup();
+}
 
 OpenSSLThreadGuard::OpenSSLThreadGuard() : CryptoThreadGuard()
 {

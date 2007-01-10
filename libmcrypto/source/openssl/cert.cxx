@@ -515,8 +515,6 @@ ossl_priv_key::ossl_priv_key( char *derEncPk, int length,
 	throw certificate_exception_pkey("Couldn't initiate bio buffer" );
      }
       
-   SSLeay_add_all_algorithms();
-   
    private_key = PEM_read_bio_PrivateKey(mem, NULL, 0, (void*)password.c_str());
  
    if(private_key == NULL )

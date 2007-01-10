@@ -26,6 +26,9 @@
 #include <libmcrypto/init.h>
 #include <libmutil/MSingleton.h>
 
+void libmcryptoOpensslInit();
+void libmcryptoOpensslUninit();
+
 class LIBMCRYPTO_API OpenSSLThreadGuard : public CryptoThreadGuard, 
 			public MSingleton<OpenSSLThreadGuard> 
 {

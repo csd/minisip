@@ -36,7 +36,6 @@
 
 using namespace std;
 
-
 #define UNIMPLEMENTED \
 	string msg = string( __FUNCTION__ ) + " unimplemented"; \
 	throw Exception(msg.c_str());
@@ -914,9 +913,38 @@ bool gtls_certificate::check_pk( MRef<priv_key*> pk ){
 }
 
 
-// TODO convert to gnutls
 int gtls_certificate::control( ca_db * certDb ){
-	UNIMPLEMENTED;
+	int result;
+	unsigned int verify = 0;
+	MRef<gtls_ca_db*> gtls_db =
+		dynamic_cast<gtls_ca_db*>( certDb );
+	gnutls_x509_crt_t* ca_list = NULL;
+	size_t ca_list_length = 0;
+
+	if( !gtls_db ){
+		cerr << "Not gtls CA db" << endl;
+		return 0;
+	}
+
+	if( !gtls_db->getDb( &ca_list, &ca_list_length ) ){
+		cerr << "No CA db" << endl;
+		return 0;
+	}
+
+	result = gnutls_x509_crt_verify( cert,
+					 ca_list, ca_list_length,
+					 GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+					 &verify);
+
+	if( result < 0 ){
+		cerr << "gnutls_x509_crt_verify failed" << endl;
+		return 0;
+	}
+
+#ifdef DEBUG_OUTPUT
+	cerr << "gnutls_x509_crt_verify returns " << verify << endl;
+#endif
+	return verify ? 0 : 1;
 }
 
 int gtls_certificate::envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
@@ -1265,7 +1293,8 @@ int gtls_certificate_chain::control( MRef<ca_db *> certDb){
 					      ca_list, ca_list_length,
 // 					      crl_list, crl_list_length,
 					      NULL, 0,
-					      0, &verify);
+					      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+					      &verify);
 
 	delete[] gtls_list;
 	gtls_list = NULL;

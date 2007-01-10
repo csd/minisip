@@ -32,9 +32,15 @@
 
 #include <config.h>
 
+static unsigned int g_initialized;
+
 void libmcryptoInit()
 {
+	if( g_initialized++ )
+		return;
+
 #ifdef HAVE_OPENSSL
+	libmcryptoOpensslInit();
 #if 0
 	OpensslThreadGuard::initialize();
 #endif
@@ -48,8 +54,13 @@ void libmcryptoInit()
 
 void libmcryptoUninit()
 {
+	if( --g_initialized )
+		return;
+
 #if defined(HAVE_GNUTLS)
 	libmcryptoGnutlsUninit();
+#elif defined(HAVE_OPENSSL)
+	libmcryptoOpensslUninit();
 #endif
 }
 
