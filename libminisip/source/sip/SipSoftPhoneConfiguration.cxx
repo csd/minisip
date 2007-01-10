@@ -488,7 +488,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		 ****************************************************************/
 #ifdef SCSIM_SUPPORT
 		string pin = backend->loadString(accountPath + "hwsim_pin","");
-
 		if (pin.size()>0){
 			MRef<SipSimSmartCardGD*> sim = new SipSimSmartCardGD;
 			sim ->setPin(pin.c_str());
@@ -542,6 +541,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		uint32_t iCertFile = 0;
 		certFile = backend->loadString(accountPath + "certificate_chain[0]","");
+
 
 
 #ifdef ONLINECONF_SUPPORT
@@ -640,6 +640,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		if (!ident->getSim()){
 			ident->setSim(new SipSimSoft(certchain, cert_db));
+		}else{
+			ident->getSim()->setCertificateChain(certchain);	//TODO: certchain and cert_db should not be attributes in SipSoftPhoneConfig any more?!
+			ident->getSim()->setCAs(cert_db);
 		}
 
 /*From SipDialogSecurity above*/
