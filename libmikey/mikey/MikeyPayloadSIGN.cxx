@@ -30,7 +30,7 @@
 
 using namespace std;
 
-MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,
+MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue,
 				    int type){
 
 	this->payloadTypeValue = MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE;
@@ -38,12 +38,7 @@ MikeyPayloadSIGN::MikeyPayloadSIGN( int sigLengthValue, byte_t * sigDataPtr,
 	                         // this value
 	this->sigLengthValue = sigLengthValue;
 	this->sigDataPtr = new byte_t[ sigLengthValue ];
-	if( sigDataPtr ){
-		memcpy( this->sigDataPtr, sigDataPtr, sigLengthValue );
-	}
-	else{
-		memset( this->sigDataPtr, 0, sigLengthValue );
-	}
+	memset( this->sigDataPtr, 0, sigLengthValue );
 	this->sigTypeValue = type;
 
 }
@@ -110,10 +105,11 @@ int MikeyPayloadSIGN::sigType(){
 	return sigTypeValue;
 }
 
-void MikeyPayloadSIGN::setSigData( byte_t * data ){
+void MikeyPayloadSIGN::setSigData( byte_t * data, int len ){
 	if( sigDataPtr )
 		delete [] sigDataPtr;
 
+	sigLengthValue = len;
 	sigDataPtr = new byte_t[ sigLengthValue ];
 	memcpy( sigDataPtr, data, sigLengthValue );
 }

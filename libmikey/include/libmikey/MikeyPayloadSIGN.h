@@ -40,7 +40,7 @@
 class LIBMIKEY_API MikeyPayloadSIGN : public MikeyPayload{
 	public:
 	
-		MikeyPayloadSIGN( int sigLength, byte_t * data, int type );
+		MikeyPayloadSIGN( int sigLength, int type );
 		MikeyPayloadSIGN( byte_t * start, int lengthLimit );
 		~MikeyPayloadSIGN();
 
@@ -52,7 +52,7 @@ class LIBMIKEY_API MikeyPayloadSIGN : public MikeyPayload{
 		byte_t * sigData();
 		int sigType();
 
-		void setSigData( byte_t * data );
+		void setSigData( byte_t * data, int sigLength);
 
 	private:
 		int sigTypeValue;

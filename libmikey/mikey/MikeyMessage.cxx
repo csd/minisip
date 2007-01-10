@@ -58,6 +58,10 @@
 #include"MikeyMessageDHHMAC.h"
 #include"MikeyMessageRSAR.h"
 
+/// The signature calculation will be factor two faster if this 
+/// guess is correct (128 bytes == 1024 bits)
+#define GUESSED_SIGNATURE_LENGTH 128
+
 using namespace std;
 
 
@@ -312,7 +316,7 @@ void MikeyPayloads::operator +=( MRef<MikeyPayload*> payload ){
 
 void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	byte_t signature[4096];
-	int signatureLength;
+	int signatureLength=4096;
 	MikeyPayloadSIGN * sign;
 	MRef<MikeyPayload*> last;
 	
@@ -320,25 +324,35 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	last = *lastPayload();
 	last->setNextPayloadType( MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE );
 
-	if( !sim->getSignature( (unsigned char*)rawMessageData(), (int)rawMessageLength(),
-			 (unsigned char*)signature, signatureLength, true ) ){
+	// See the comment in addSignaturePayload(cert) for explanation of
+	// the following steps.
+
+	addPayload( ( sign = new MikeyPayloadSIGN( GUESSED_SIGNATURE_LENGTH, 
+						   MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
+
+	if (!sim->getSignature( rawMessageData(), 
+			 rawMessageLength() - GUESSED_SIGNATURE_LENGTH,
+			 signature, signatureLength, true )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
 
-	addPayload( ( sign = new MikeyPayloadSIGN( signatureLength, signature,
-				MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
+	if (signatureLength!=GUESSED_SIGNATURE_LENGTH){	// if the length field in the signature payload was 
+							// wrong, we have to redo the signature
+		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
 
-	sim->getSignature( rawMessageData(), 
-			 rawMessageLength() - signatureLength,
-			 signature, signatureLength, true );
-	sign->setSigData( signature );
+		sim->getSignature( rawMessageData(), 
+				rawMessageLength() - signatureLength,
+				signature, signatureLength, true );
+	}
+
+	sign->setSigData( signature, signatureLength );
 	compiled = false;
 }
 
 
 void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	byte_t signature[4096];
-	int signatureLength = sizeof(signature);
+	int signatureLength = 128;
 	MikeyPayloadSIGN * sign;
 	MRef<MikeyPayload*> last;
 	
@@ -346,18 +360,38 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	last = *lastPayload();
 	last->setNextPayloadType( MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE );
 
-	if( cert->sign_data( rawMessageData(), rawMessageLength(),
-			 signature, &signatureLength ) ){
+	//The SIGN payload constructor can not take the signature as
+	//parameter. This is because it can not be computed before
+	//the SIGN payload has been added to the MIKEY message (the next
+	//payload field in the payload before SIGN is not set).
+	//
+	//We guess that the length of the signature is 1024 bits. We then
+	//calculate the signature, and if it turns out that it was not
+	//1024, we have to re-do the signature calculation with the correct
+	//length.
+	//
+	//Double-signatures would be avoided if the certificate had a 
+	//method to find out the length of the signature.
+	
+	addPayload( ( sign = new MikeyPayloadSIGN(GUESSED_SIGNATURE_LENGTH, MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
+
+	if (cert->sign_data( rawMessageData(), 
+			 rawMessageLength() - GUESSED_SIGNATURE_LENGTH,
+			 signature, &signatureLength )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
 
-	addPayload( ( sign = new MikeyPayloadSIGN( signatureLength, signature,
-				MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
 
-	cert->sign_data( rawMessageData(), 
-			 rawMessageLength() - signatureLength,
-			 signature, &signatureLength );
-	sign->setSigData( signature );
+	if (signatureLength!=GUESSED_SIGNATURE_LENGTH){	// if the length field in the signature payload was 
+							// wrong, we have to redo the signature
+		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
+
+		cert->sign_data( rawMessageData(), 
+				rawMessageLength() - signatureLength,
+				signature, &signatureLength );
+	}
+
+	sign->setSigData( signature, signatureLength ); // the payload signature is a dummy value until we do this
 	compiled = false;
 }
 
