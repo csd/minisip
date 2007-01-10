@@ -63,13 +63,13 @@ void sha1(uint8_t* dataChunks[],
     gcry_md_hd_t hd;
     gcry_error_t err = 0;
 
-    err = gcry_md_open(&hd, GCRY_MD_SHA256, 0);
+    err = gcry_md_open(&hd, GCRY_MD_SHA1, 0);
     while (*dataChunks) {
         gcry_md_write (hd, *dataChunks, (uint32_t)(*dataChunkLength));
         dataChunks++;
         dataChunkLength++;
     }
-    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA256);
-    memcpy(mac, p, SHA256_DIGEST_LENGTH);
+    uint8_t* p = gcry_md_read (hd, GCRY_MD_SHA1);
+    memcpy(mac, p, SHA1_DIGEST_LENGTH);
     gcry_md_close (hd);
 }
