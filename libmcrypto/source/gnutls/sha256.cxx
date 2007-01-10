@@ -40,7 +40,7 @@
 #include <gcrypt.h>
 
 #ifndef SHA256_DIGEST_LENGTH
-# define SHA256_DIGEST_LENGTH 20
+# define SHA256_DIGEST_LENGTH 32
 #endif
 
 void sha256(uint8_t* data, int32_t dataLength,
