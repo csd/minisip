@@ -557,7 +557,13 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 			&dataStruct,
 			sign, &length );
 
-	if( err < 0 ){
+	if( err == GNUTLS_E_SHORT_MEMORY_BUFFER ){
+		memset( sign, 0, *sign_length );
+		*sign_length = length;
+		return 0;
+	}
+	else if( err < 0 ){
+		cerr << "GNUTLS error " << gnutls_strerror( err ) << endl;
 		throw certificate_exception(
 			"Signature of data failed" );
 	}
@@ -1171,7 +1177,7 @@ ca_db_item* gtls_ca_db::create_file_item( std::string file ){
 	data.data = NULL;
 
 	if( res < 0 ){
-		cerr << "Error " << res << endl;
+		cerr << "GNUTLS error " << gnutls_strerror( res ) << endl;
 		throw certificate_exception( "Can't load certificate file (2)" );
 // 		return NULL;
 	}

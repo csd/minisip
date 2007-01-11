@@ -6,8 +6,7 @@ interfaces that are leveraged by the Minisip application stack.
 
 Requirements:
 	libmutil
-	OpenSSL v0.9.6+
-	GNUTLS	(optional, not yet supported)
+	OpenSSL v0.9.6+ or GNU TLS
 
 Installation:
    Please refer to the INSTALL file for installation instructions.

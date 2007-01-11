@@ -88,7 +88,6 @@ AC_CHECK_LIB([gcrypt], [main],[
 	],[])
 AC_CHECK_LIB([gnutls], [main],[
 		AC_CHECK_HEADER(gnutls/x509.h)
-		AC_MSG_NOTICE([Sorry, but gnutls support is not complete.])
 		GNUTLS_LIBS="-lgnutls"
 		AC_DEFINE([HAVE_GNUTLS], 1, [Define to 1 if you have gnutls.])
 		HAVE_GNUTLS=yes
