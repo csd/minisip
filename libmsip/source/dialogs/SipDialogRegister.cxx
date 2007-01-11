@@ -35,6 +35,7 @@
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderContact.h>
+#include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderSupported.h>
 #include<libmsip/SipAuthenticationDigest.h>
 #include<libmsip/SipCommandString.h>
@@ -452,6 +453,7 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConf
 {
 	setUpStateMachine();
 	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->sipStack->getStackConfig()->localIpString;
+	dialogState.localTag = itoa(rand());
 
 #if 0
 	if (getDialogConfig()->sipIdentity->sipDomain==""){
@@ -570,6 +572,8 @@ void SipDialogRegister::send_register(string branch){
 		contactHdr,
 		dialogState.seqNo
 		);
+
+	reg->getHeaderValueFrom()->setParameter( "tag", dialogState.localTag );
 
 	addAuthorizations( reg );
 	addRoute( reg );
