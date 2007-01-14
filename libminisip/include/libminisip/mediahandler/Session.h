@@ -43,6 +43,71 @@ class SdpHeaderM;
 class IPAddress;
 class SessionRegistry;
 
+class LIBMINISIP_API IMikeyConfig: public virtual MObject{
+	public:
+		virtual ~IMikeyConfig();
+
+		virtual const std::string getUri() const=0;
+
+		virtual MRef<SipSim*> getSim() const=0;
+
+		virtual size_t getPskLength() const=0;
+		virtual const byte_t* getPsk() const=0;
+
+		virtual bool isMethodEnabled( int kaType ) const=0;
+
+		virtual bool isCertCheckEnabled() const=0;
+};
+
+class LIBMINISIP_API Mikey: public MObject{
+	public:
+		enum State {
+			NONE = 0,
+			INITIATOR,
+			RESPONDER,
+			AUTHENTICATED,
+			ERROR
+		};
+
+		typedef std::vector<uint32_t> Streams;
+
+		Mikey( MRef<IMikeyConfig*> config );
+		~Mikey();
+
+		/* Key management handling */
+		// Initiator methods
+		std::string initiatorCreate( int kaType );
+		bool initiatorAuthenticate( std::string message );
+		std::string initiatorParse();
+
+		// Responder methods
+		bool responderAuthenticate( std::string message );
+		std::string responderParse();
+
+		void setMikeyOffer();
+
+		bool isSecured() const;
+		bool isInitiator() const;
+		bool error() const;
+		std::string authError() const;
+		MRef<KeyAgreement*> getKeyAgreement() const;
+
+		void addSender( uint32_t ssrc );
+
+	protected:
+		void setState( State newState );
+
+	private:
+		void createKeyAgreement( int type );
+		void addStreamsToKa();
+
+		State state;
+		bool secured;
+		MRef<IMikeyConfig*> config;
+		Streams mediaStreamSenders;
+		MRef<KeyAgreement *> ka;
+};
+
 /**
  * The session class is a representation of the media session associated
  * with a VoIP call. It holds MediaStreams that handles incoming and
@@ -250,27 +315,21 @@ class LIBMINISIP_API Session : public MObject{
 		MRef<MObject *> callRecorder;
 
 	private:
-		/* Key management handling */
-		std::string initiatorCreate();
-		bool initiatorAuthenticate( std::string message );
-		std::string initiatorParse();
+		void addStreams();
 
-		bool responderAuthenticate( std::string message );
-		std::string responderParse();
-
-		void addStreamsToKa( bool initiating=true );
-		void setMikeyOffer();
 		std::string peerUri;
+
 
 		MRef<SdpPacket *> emptySdp();
 		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
 			uint32_t iFormat, MRef<IPAddress *> &remoteAddress );
 
+		typedef std::list< MRef<MediaStreamSender *> > MediaStreamSenders;
 		std::list< MRef<MediaStreamReceiver *> > mediaStreamReceivers;
 		std::list< MRef<MediaStreamSender *> > mediaStreamSenders;
 		Mutex mediaStreamSendersLock;
 
-		MRef<KeyAgreement *> ka;
+		MRef<Mikey *> mikey;
 		std::string localIpString;
 		std::string localIp6String;
 		MRef<SdpPacket *> sdpAnswer;
@@ -280,7 +339,6 @@ class LIBMINISIP_API Session : public MObject{
 		//SipDialogSecurityConfig securityConfig;
 		MRef<SipIdentity*> identity;
 
-		bool secured;
 		int ka_type;
 		
 

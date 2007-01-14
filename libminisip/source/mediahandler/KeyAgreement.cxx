@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,11 +16,12 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004 - 2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim@orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include <config.h>
@@ -34,6 +35,9 @@
 #include<libmikey/KeyAgreement.h>
 #include<libmikey/KeyAgreementDH.h>
 #include<libmikey/KeyAgreementPSK.h>
+#include<libmikey/KeyAgreementPKE.h>
+#include<libmikey/KeyAgreementDHHMAC.h>
+#include<libmikey/KeyAgreementRSAR.h>
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyMessage.h>
 
@@ -43,14 +47,29 @@
 
 #define MIKEY_PROTO_SRTP	0
 
+/*
+ * TODO
+ * Cache D-H
+ * Add support for initiating Public-Key method
+ */
 
 using namespace std;
 
+IMikeyConfig::~IMikeyConfig(){
+}
 
-bool Session::responderAuthenticate( string message ){
+Mikey::Mikey( MRef<IMikeyConfig*> aConfig ):state(NONE),
+					    config(aConfig)
+{
+}
+
+Mikey::~Mikey(){
+}
+
+bool Mikey::responderAuthenticate( string message ){
 	
-	bool authenticated;
-	
+	setState( RESPONDER );
+
 	if(message.substr(0,6) == "mikey "){
 
 		string b64Message = message.substr(6, message.length()-6);
@@ -61,143 +80,60 @@ bool Session::responderAuthenticate( string message ){
 			try{
 				MRef<MikeyMessage *> init_mes = MikeyMessage::parse(b64Message);
 				
-//				MRef<MikeyMessage *> resp_mes = NULL;
-				switch( init_mes->type() ){
-					case MIKEY_TYPE_DH_INIT:
-
-						if( !identity->getSim() || identity->getSim()->getCertificateChain().isNull() /*securityConfig.cert.isNull()*/ ){
-							merr << "No certificate available" << end;
-						//	throw MikeyExceptionUnacceptable(
-						//			"Cannot handle DH key agreement, no certificate" );
-							/*securityConfig.*/secured = false;
-							/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-							return false;
-						}
-							
-
-						if( /*!securityConfig.dh_enabled*/ !identity->dhEnabled ){
-							merr << "Cannot handle DH key agreement" << end;
-							//throw MikeyExceptionUnacceptable(
-							//		"Cannot handle DH key agreement" );
-							/*securityConfig.*/secured = false;
-							/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-							return false;
-						}
-
-						if( !ka ){
-							//ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain(), 
-							//			 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
-							ka = new KeyAgreementDH( identity->getSim() );
-
-							((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
-
-						}
-						ka->setInitiatorData( init_mes );
-
-#ifdef ENABLE_TS
-						ts.save( AUTH_START );
-#endif
-						if( init_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
-							merr << "Authentication of the DH init message failed" << end;
-//							throw MikeyExceptionAuthentication(
-//								"Authentication of the DH init message failed" );
-							merr << ka->authError() << end;
-							/*securityConfig.*/secured = false;
-							/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-							return false;
-						}
-
-						merr << "Authentication successful, controling the certificate" << end;
-
-#ifdef ENABLE_TS
-						ts.save( TMP );
-#endif
-						if( /*securityConfig.check_cert*/ identity->checkCert ){
-							if( ((KeyAgreementDH *)*ka)->controlPeerCertificate() == 0){
-#ifdef DEBUG_OUTPUT
-								merr << "Certificate check failed in the incoming MIKEY message" << end;
-#endif
-								/*securityConfig.*/secured = false;
-								/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-								return false;
-							}
-						}
-#ifdef ENABLE_TS
-						ts.save( AUTH_END );
-#endif
-
-						/*securityConfig.*/ka_type = KEY_MGMT_METHOD_MIKEY_DH;
-
-						break;
-					case MIKEY_TYPE_PSK_INIT:
-						if( /*!securityConfig.psk_enabled*/ !identity->pskEnabled ){
-							//throw MikeyExceptionUnacceptable(
-							//		"Cannot handle PSK key agreement" );
-
-							/*securityConfig.*/secured = false;
-							/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-							return false;
-						}
-
-							// ka keeps own local copy of private key
-						ka = new KeyAgreementPSK( /*securityConfig.psk*/ (byte_t*)identity->getPsk().c_str(), /*securityConfig.psk_length*/ identity->getPsk().size() );
-						ka->setInitiatorData( init_mes );
-						
-#ifdef ENABLE_TS
-						ts.save( AUTH_START );
-#endif
-
-						if( init_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
-//							throw MikeyExceptionAuthentication(
-//								"Authentication of the PSK init message failed" );
-							/*securityConfig.*/secured = false;
-							/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-							return false;
-						}
-						
-#ifdef ENABLE_TS
-						ts.save( AUTH_END );
-#endif
-
-						/*securityConfig.*/ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
-						break;
-					case MIKEY_TYPE_PK_INIT:
-						//throw MikeyExceptionUnimplemented(
-						//	"Public Key key agreement not implemented" );
-						/*securityConfig.*/secured = false;
-						/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-						return false;
-					default:
-						merr << "Unexpected type of message in INVITE" << end;
-						/*securityConfig.*/secured = false;
-						/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-						return false;
+				createKeyAgreement( init_mes->keyAgreementType() );
+				if( !ka ){
+					throw MikeyException(
+						"Can't handle key agreement" );
 				}
 
-				/*securityConfig.*/secured = true;
-				authenticated = true;
+				ka->setInitiatorData( init_mes );
+						
+#ifdef ENABLE_TS
+				ts.save( AUTH_START );
+#endif
+
+				if( init_mes->authenticate( *ka ) ){
+					string msg = "Authentication of the MIKEY init message failed: " + ka->authError();
+
+					throw MikeyExceptionAuthentication(
+						msg.c_str() );
+				}
+						
+#ifdef ENABLE_TS
+				ts.save( TMP );
+#endif
+
+				if( config->isCertCheckEnabled() ){
+					PeerCertificates *peers =
+						dynamic_cast<PeerCertificates*>(*ka);
+					if( peers ){
+						if( peers->controlPeerCertificate() == 0){
+							throw MikeyExceptionAuthentication(
+								"Certificate check failed in the incoming MIKEY message" );
+						}
+					}
+				}
+#ifdef ENABLE_TS
+				ts.save( AUTH_END );
+#endif
+				secured = true;
+				setState( AUTHENTICATED );
 			}
-			catch( certificate_exception & ){
+			catch( certificate_exception &e ){
 				// TODO: Tell the GUI
-				merr << "Could not open certificate" <<end;
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured = false;
-				authenticated = false;
+				merr << "Could not open certificate " << e.what() << end;
+				setState( ERROR );
 			}
 			catch( MikeyExceptionUnacceptable &exc ){
 				merr << "MikeyException caught: "<<exc.what()<<end;
 				//FIXME! send SIP Unacceptable with Mikey Error message
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured = false;
-				authenticated = false;
+				setState( ERROR );
 			}
 			// Authentication failed
 			catch( MikeyExceptionAuthentication &exc ){
 				merr << "MikeyExceptionAuthentication caught: "<<exc.what()<<end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured = false;
-				authenticated = false;
+				setState( ERROR );
 			}
 			// Message was invalid
 			catch( MikeyExceptionMessageContent &exc ){
@@ -207,33 +143,29 @@ bool Session::responderAuthenticate( string message ){
 				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured = false;
-				authenticated = false;
+				setState( ERROR );
 			}
 			catch( MikeyException & exc ){
 				merr << "MikeyException caught: " << exc.what() << end;
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured = false;
-				authenticated = false;
+				setState( ERROR );
 			}
 		
 		}
 	}
 	else {
 		merr << "Unknown type of key agreement" << end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
-		authenticated = true;
+		secured = false;
+		setState( AUTHENTICATED );
 	}
-	return authenticated;
+
+	return state == AUTHENTICATED;
 }
 
-string Session::responderParse(){
+string Mikey::responderParse(){
 	
-	if( ! ( /*securityConfig.*/ka_type & KEY_MGMT_METHOD_MIKEY ) ){
+	if( !ka ){
 		merr << "Unknown type of key agreement" << end;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 		return "";
 	}
 	
@@ -242,7 +174,7 @@ string Session::responderParse(){
 
 	if( initMessage.isNull() ){
 		merr << "Uninitialized message, this is a bug" << end;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 		return "";
 	}
 	
@@ -251,24 +183,22 @@ string Session::responderParse(){
 		ts.save( MIKEY_PARSE_START );
 #endif
 				
-		addStreamsToKa( false );
+		addStreamsToKa();
 
 		responseMessage = initMessage->buildResponse( *ka );
 #ifdef ENABLE_TS
 		ts.save( MIKEY_PARSE_END );
 #endif
 	}
-	catch( certificate_exception & ){
+	catch( certificate_exception &e ){
 		// TODO: Tell the GUI
-		merr << "Could not open certificate" <<end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		merr << "Could not open certificate " << e.what() << end;
+		setState( ERROR );
 	}
 	catch( MikeyExceptionUnacceptable & exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent & exc ){
@@ -278,13 +208,11 @@ string Session::responderParse(){
 		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 
 	if( !responseMessage.isNull() ){
@@ -300,85 +228,36 @@ string Session::responderParse(){
 }
 
 
-string Session::initiatorCreate(){
+string Mikey::initiatorCreate( int type ){
 	MRef<MikeyMessage *> message;
-	
+
+	setState( INITIATOR );
 	
 	try{
-		switch( /*securityConfig.*/ka_type ){
-			case KEY_MGMT_METHOD_MIKEY_DH:
-				//if( !securityConfig.cert || securityConfig.cert->is_empty() ){
-				if( !identity->getSim() || !identity->getSim()->getCertificateChain() ){
-					throw MikeyException( "No certificate provided for DH key agreement" );
-				}
-#ifdef ENABLE_TS
-				ts.save( DH_PRECOMPUTE_START );
-#endif
-
-				if( ka && ka->type() != KEY_AGREEMENT_TYPE_DH ){
-					ka = NULL;
-				}
-				if( !ka ){
-					//ka = new KeyAgreementDH( /*securityConfig.cert*/ identity->getSim()->getCertificateChain() , 
-					//			 /*securityConfig.cert_db*/ identity->getSim()->getCAs() );
-					ka = new KeyAgreementDH( identity->getSim() );
-					((KeyAgreementDH*)*ka)->setGroup( DH_GROUP_OAKLEY5 );
-				}
-				addStreamsToKa();
-#ifdef ENABLE_TS
-				ts.save( DH_PRECOMPUTE_END );
-#endif
-				message = MikeyMessage::create( ((KeyAgreementDH *)*ka) );
-#ifdef ENABLE_TS
-				ts.save( MIKEY_CREATE_END );
-#endif
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PSK:
-#ifdef ENABLE_TS
-				ts.save( DH_PRECOMPUTE_START );
-#endif
-					//ka stores local copy of key
-				ka = new KeyAgreementPSK( /*securityConfig.psk*/ (byte_t*)identity->getPsk().c_str(), 
-						/*securityConfig.psk_length*/ identity->getPsk().size() );
-				addStreamsToKa();
-#ifdef ENABLE_TS
-				ts.save( DH_PRECOMPUTE_END );
-#endif
-				((KeyAgreementPSK *)*ka)->generateTgk();
-#ifdef ENABLE_TS
-				ts.save( MIKEY_CREATE_START );
-#endif
-				message = MikeyMessage::create( ((KeyAgreementPSK *)*ka) );
-#ifdef ENABLE_TS
-				ts.save( MIKEY_CREATE_END );
-#endif
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PK:
-				throw MikeyExceptionUnimplemented(
-						"PK KA type not implemented" );
-			default:
-				throw MikeyException( "Invalid type of KA" );
+		createKeyAgreement( type );
+		if( !ka ){
+			throw MikeyException( "Can't create key agreement" );
 		}
-		
+
+		message = ka->createMessage();
+
 		string b64Message = message->b64Message();
 		return "mikey "+b64Message;
 	}
-	catch( certificate_exception & ){
+	catch( certificate_exception &e ){
 		// FIXME: tell the GUI
-		merr << "Could not open certificate" <<end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		merr << "Could not open certificate " << e.what() << end;
+		setState( ERROR );
 		return "";
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured=false;
+		setState( ERROR );
 		return "";
 	}
 }
 			
-bool Session::initiatorAuthenticate( string message ){
+bool Mikey::initiatorAuthenticate( string message ){
 
 		
 	if (message.substr(0,6) == "mikey ")
@@ -388,86 +267,43 @@ bool Session::initiatorAuthenticate( string message ){
 		message = message.substr(6,message.length()-6);
 		if(message == ""){
 			merr << "No MIKEY message received" << end;
-			/*securityConfig.*/secured = false;
 			return false;
 		} else {
 			try{
 				MRef<MikeyMessage *> resp_mes = MikeyMessage::parse( message );
 				ka->setResponderData( resp_mes );
 
-				switch( /*securityConfig.*/ka_type ){
-					case KEY_MGMT_METHOD_MIKEY_DH:
-						
 #ifdef ENABLE_TS
-						ts.save( AUTH_START );
+				ts.save( AUTH_START );
 #endif
-						if( resp_mes->authenticate( ((KeyAgreementDH *)*ka) ) ){
-							throw MikeyExceptionAuthentication(
-							  "Authentication of the DH response message failed" );
-						}
-						
-#ifdef ENABLE_TS
-						ts.save( TMP );
-#endif
-						if( /*securityConfig.check_cert*/ identity->checkCert ){
-							if( ((KeyAgreementDH *)*ka)->controlPeerCertificate() == 0)
-								throw MikeyExceptionAuthentication(
-									"Certificate control failed" );
-						}
-#ifdef ENABLE_TS
-						ts.save( AUTH_END );
-#endif
-						/*securityConfig.*/secured = true;
-						return true;
-
-						/*
-						if( resp_mes->get_type() == MIKEY_TYPE_DH_RESP )
-							((MikeyMessageDH*)resp_mes)->parse_response((KeyAgreementDH *)(key_agreement));
-						else
-							throw MikeyExceptionMessageContent(
-								"Unexpected MIKEY Message type" );
-						
-						((KeyAgreementDH *)key_agreement)->compute_tgk();*/
-						
-					case KEY_MGMT_METHOD_MIKEY_PSK:
-
-#ifdef ENABLE_TS
-						ts.save( AUTH_START );
-#endif
-						if( resp_mes->authenticate( ((KeyAgreementPSK *)*ka) ) ){
-							throw MikeyExceptionAuthentication(
-							"Authentication of the PSK verification message failed" );
-						}
-#ifdef ENABLE_TS
-						ts.save( AUTH_END );
-#endif
-					/*	
-						if( resp_mes->get_type() == MIKEY_TYPE_PSK_RESP )
-							((MikeyMessagePSK*)resp_mes)->parse_response((KeyAgreementPSK *)(key_agreement));
-						else
-							throw MikeyExceptionMessageContent(
-								"Unexpected MIKEY Message type" );
-						
-						break;*/
-						/*securityConfig.*/secured = true;
-						return true;
-
-					case KEY_MGMT_METHOD_MIKEY_PK:
-						throw MikeyExceptionUnimplemented(
-								"PK type of KA unimplemented" );
-					default:
-						throw MikeyException(
-								"Invalid type of KA" );
+				if( resp_mes->authenticate( *ka ) ){
+					throw MikeyExceptionAuthentication(
+						"Authentication of the response message failed" );
 				}
-
-				//transii->getDialog()->getPhone()->log(LOG_INFO, "Negociated the TGK: " + print_hex( key_agreement->get_tgk(), key_agreement->get_tgk_length() ) );
+						
+#ifdef ENABLE_TS
+				ts.save( TMP );
+#endif
+				if( config->isCertCheckEnabled() ){
+					PeerCertificates *peers =
+						dynamic_cast<PeerCertificates*>(*ka);
+					if( peers ){
+						if( peers->controlPeerCertificate() == 0){
+							throw MikeyExceptionAuthentication(
+								"Certificate control failed" );
+						}
+					}
+				}
+#ifdef ENABLE_TS
+				ts.save( AUTH_END );
+#endif
+				secured = true;
+				setState( AUTHENTICATED );
 			}
 			catch(MikeyExceptionAuthentication &exc){
 				merr << "MikeyException caught: " << exc.what() << end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured=false;
-				return false;
+				setState( ERROR );
 			}
 			catch(MikeyExceptionMessageContent &exc){
 				MRef<MikeyMessage *> error_mes;
@@ -476,33 +312,29 @@ bool Session::initiatorAuthenticate( string message ){
 				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured=false;
-				return false;
+				setState( ERROR );
 			}
 				
 			catch(MikeyException &exc){
 				merr << "MikeyException caught: " << exc.what() << end;
-				/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-				/*securityConfig.*/secured=false;
-				return false;
+				setState( ERROR );
 			}
 		}
 	}
 	else{
 		merr << "Unknown key management method" << end;
-		/*securityConfig.*/secured = false;
-		return false;
+		setState( ERROR );
 	}
 
+	return state == AUTHENTICATED;
 }
 
-string Session::initiatorParse(){
+string Mikey::initiatorParse(){
 
 
-	if( ! ( /*securityConfig.*/ka_type & KEY_MGMT_METHOD_MIKEY ) ){
+	if( !ka ){
 		merr << "Unknown type of key agreement" << end;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 		return "";
 	}
 	
@@ -513,8 +345,7 @@ string Session::initiatorParse(){
 
 		if( initMessage.isNull() ){
 			merr << "Uninitialized MIKEY init message, this is a bug" << end;
-			/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-			/*securityConfig.*/secured = false;
+			setState( ERROR );
 			return "";
 		}
 			
@@ -527,17 +358,15 @@ string Session::initiatorParse(){
 #endif
 
 	}
-	catch( certificate_exception & ){
+	catch( certificate_exception &e ){
 		// TODO: Tell the GUI
-		merr << "Could not open certificate" <<end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		merr << "Could not open certificate " << e.what() << end;
+		setState( ERROR );
 	}
 	catch( MikeyExceptionUnacceptable &exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent &exc ){
@@ -547,48 +376,178 @@ string Session::initiatorParse(){
 		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
-		/*securityConfig.*/secured = false;
+		setState( ERROR );
 	}
 
-	if( !responseMessage.isNull() )
+	if( !responseMessage.isNull() ){
 		return responseMessage->b64Message();
+	}
 	else
 		return string("");
 
 }
 
-void Session::addStreamsToKa( bool initiating ){
-	list< MRef<MediaStreamSender *> >::iterator iSender;
+void Mikey::addStreamsToKa(){
+	Streams::iterator iSender;
 	ka->setCsIdMapType(HDR_CS_ID_MAP_TYPE_SRTP_ID);
 	uint8_t j = 1;
 	for( iSender = mediaStreamSenders.begin(); 
 	     iSender != mediaStreamSenders.end();
 	     iSender ++, j++ ){
 
-		if( initiating ){ 
+		uint32_t ssrc = *iSender;
+
+		if( initiator ){ 
 			uint8_t policyNo = ka->setdefaultPolicy( MIKEY_PROTO_SRTP );
-			ka->addSrtpStream( (*iSender)->getSsrc(), 0/*ROC*/, 
+			ka->addSrtpStream( ssrc, 0/*ROC*/, 
 					policyNo );
 			/* Placeholder for the receiver to place his SSRC */
 			ka->addSrtpStream( 0, 0/*ROC*/, 
 					policyNo );
 		}
 		else{
-			ka->setSrtpStreamSsrc( (*iSender)->getSsrc(), 2*j );
+			ka->setSrtpStreamSsrc( ssrc, 2*j );
 			ka->setSrtpStreamRoc ( 0, 2*j );
 		}
 
 	}
 }
 
-void Session::setMikeyOffer(){
+void Mikey::setMikeyOffer(){
 	MRef<MikeyMessage *> initMessage = ka->initiatorData();
 	initMessage->setOffer( *ka );
+}
+
+bool Mikey::error() const{
+	return state == ERROR;
+}
+
+bool Mikey::isSecured() const{
+	return secured && !error();
+}
+
+bool Mikey::isInitiator() const{
+	return state == INITIATOR;
+}
+
+MRef<KeyAgreement*> Mikey::getKeyAgreement() const{
+	return ka;
+}
+
+void Mikey::addSender( uint32_t ssrc ){
+	mediaStreamSenders.push_back( ssrc );
+}
+
+string Mikey::authError() const{
+	return ka ? ka->authError() : "";
+}
+
+void Mikey::setState( State newState ){
+	state = newState;
+}
+
+void Mikey::createKeyAgreement( int type )
+{
+	ka = NULL;
+
+	if( !config->isMethodEnabled( type ) ){
+		throw MikeyException( "Cannot handle key agreement method" );
+	}
+
+	MRef<SipSim*> sim = config->getSim();
+	MRef<certificate_chain*> cert_chain =
+		sim->getCertificateChain();
+	MRef<certificate_chain*> peer_chain;
+// 		config->getPeerCertificate();
+	MRef<ca_db*> cert_db =
+		sim->getCAs();
+	const byte_t* psk = config->getPsk();
+	size_t psk_len = config->getPskLength();
+
+	switch( type ){
+		case KEY_AGREEMENT_TYPE_DH:{
+			if ( cert_chain.isNull() ){
+				throw MikeyException( "No certificate provided for DH key agreement" );
+			}
+
+			KeyAgreementDH *kaDH =
+				new KeyAgreementDH( sim );
+
+			if( isInitiator() ){
+				kaDH->setGroup( DH_GROUP_OAKLEY5 );
+			}
+
+			ka = kaDH;
+			break;
+		}
+		case KEY_AGREEMENT_TYPE_PK:
+			if( cert_chain.isNull() ){
+				throw MikeyException( "No certificate provided for Public-Key method" );
+			}
+
+			if( isInitiator() ){
+				if( peer_chain.isNull() ){
+					throw MikeyException( "No peer certificate provided for Public-Key init" );
+				}
+				ka = new KeyAgreementPKE( cert_chain, peer_chain );
+			}
+			else{
+				if( cert_db.isNull() ){
+					throw MikeyException( "No CA db provided for Public-Key responce" );
+				}
+				ka = new KeyAgreementPKE( cert_chain, cert_db );
+			}
+			break;
+		case KEY_AGREEMENT_TYPE_RSA_R:
+			if( cert_chain.isNull() ){
+				throw MikeyException( "No certificate provided for RSA-R method" );
+			}
+
+			if( cert_db.isNull() ){
+				throw MikeyException( "No CA db provided for RSA-R method" );
+			}
+
+			ka = new KeyAgreementRSAR( cert_chain, cert_db );
+			break;
+		case KEY_AGREEMENT_TYPE_PSK:
+		case KEY_AGREEMENT_TYPE_DHHMAC:
+			if (!psk || psk_len <= 0) {
+				throw MikeyException( "No pre-shared key provided" );
+			}
+
+			if( type == KEY_AGREEMENT_TYPE_PSK ){
+				ka = new KeyAgreementPSK(psk, psk_len);
+			}
+			else{
+				KeyAgreementDHHMAC *kaDH =
+					new KeyAgreementDHHMAC(psk, psk_len);
+				if( isInitiator() ){
+					kaDH->setGroup( DH_GROUP_OAKLEY5 );
+				}
+
+				ka = kaDH;
+			}
+			break;
+		default:
+			throw MikeyExceptionUnimplemented( "Unsupported type of KA" );
+	}
+
+	if( ka->type() != KEY_AGREEMENT_TYPE_DHHMAC ){
+		// Generate TGK for PSK, PK and RSA-R
+		KeyAgreementPSK* pskKa =
+			dynamic_cast<KeyAgreementPSK*>(*ka);
+		if( pskKa ){
+			cerr << "Generate Tgk" << endl;
+			pskKa->generateTgk();
+		}
+	}
+
+	if( isInitiator() ){
+		addStreamsToKa();
+	}
 }
 

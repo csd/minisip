@@ -62,17 +62,62 @@
 // pn501 Added for multicodec list operations
 using namespace std;
 
+class MikeyConfig: public IMikeyConfig{
+	public:
+		MikeyConfig( MRef<SipIdentity*> aIdentity ):
+				identity(aIdentity) {}
+
+		const std::string getUri() const{
+			return identity->getSipUri().getString();
+		}
+
+		MRef<SipSim*> getSim() const{
+			return identity->getSim();
+		}
+		MRef<certificate_chain*> getPeerCertificate() const{
+			return NULL;
+		}
+		size_t getPskLength() const{
+			return identity->getPsk().size();
+		}
+
+		const byte_t* getPsk() const{
+			return (byte_t*)identity->getPsk().c_str();
+		}
+
+		bool isMethodEnabled( int kaType ) const{
+			switch( kaType ){
+				case KEY_AGREEMENT_TYPE_DH:
+				case KEY_AGREEMENT_TYPE_PK:
+				case KEY_AGREEMENT_TYPE_RSA_R:
+					return identity->dhEnabled;
+				case KEY_AGREEMENT_TYPE_PSK:
+				case KEY_AGREEMENT_TYPE_DHHMAC:
+					return identity->pskEnabled;
+				default:
+					return false;
+			}
+		}
+
+		bool isCertCheckEnabled() const{
+			return identity->checkCert;
+		}
+	private:
+		MRef<SipIdentity*> identity;
+};
+
+
 SessionRegistry * Session::registry = NULL;
 MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
-Session::Session( string localIp, /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> ident, string localIp6 ):ka(NULL),localIpString(localIp), localIp6String(localIp6){
+Session::Session( string localIp, /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> ident, string localIp6 ):localIpString(localIp), localIp6String(localIp6){
 //	this->securityConfig = securityConfig; // hardcopy
 	identity = ident;
-	secured = ident->securityEnabled;
+// 	secured = ident->securityEnabled;
 	ka_type = ident->ka_type;
 
-	this->ka = Session::precomputedKa;
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
+// 	this->ka = Session::precomputedKa;
 	Session::precomputedKa = NULL;
 
 	mutedSenders = true;
@@ -262,10 +307,40 @@ MRef<SdpPacket *> Session::getSdpOffer( bool anatSupported ){ // used by the ini
 
 // 	cerr << "Session::getSdpOffer" << endl;
 	result = emptySdp();
-	if( /*securityConfig.secured*/ secured ){
+	if( identity->securityEnabled ){
+		int type = 0;
+
+		// FIXME
+		switch( ka_type ){
+			case KEY_MGMT_METHOD_MIKEY_DH:
+				type = KEY_AGREEMENT_TYPE_DH;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PSK:
+				type = KEY_AGREEMENT_TYPE_PSK;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PK:
+				type = KEY_AGREEMENT_TYPE_PK;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_DHHMAC:
+				type = KEY_AGREEMENT_TYPE_DHHMAC;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_RSA_R:
+				type = KEY_AGREEMENT_TYPE_RSA_R;
+				break;
+			default:
+				mikey = NULL;
+				return NULL;
+		}
+
 		MRef<SdpHeaderA *> a;
-		keyMgmtMessage = initiatorCreate();  //in KeyAgreement.cxx
-		if( /*! securityConfig.secured*/ !secured ){
+		MikeyConfig *config = new MikeyConfig( identity );
+		// FIXME free config
+		mikey = new Mikey( config );
+
+		addStreams();
+
+		keyMgmtMessage = mikey->initiatorCreate( type );
+		if( mikey->error() ){
 			// something went wrong
 			return NULL;
 		}
@@ -384,17 +459,17 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 #ifdef DEBUG_OUTPUT
 // 	cerr << "Session::setSdpAnswer" << endl;
 #endif
-	if( /*securityConfig.secured*/ secured ){
+	if( mikey ){
 		/* get the keymgt: attribute */
 		string keyMgmtMessage = 
 			answer->getSessionLevelAttribute( "key-mgmt" );
-		if( !initiatorAuthenticate( keyMgmtMessage ) ){
+		if( !mikey->initiatorAuthenticate( keyMgmtMessage ) ){
 			errorString = "Could not authenticate the key management message";
 			fprintf( stderr, "Auth failed\n");
 			return false;
 		}
 
-		string mikeyErrorMsg = initiatorParse();
+		string mikeyErrorMsg = mikey->initiatorParse();
 		if( mikeyErrorMsg != "" ){
 			errorString = "Could not parse the key management message. ";
 			errorString += mikeyErrorMsg;
@@ -556,18 +631,23 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 	keyMgmtMessage = offer->getSessionLevelAttribute( "key-mgmt" );
 
 	if( keyMgmtMessage != "" ){
-		if( !responderAuthenticate( keyMgmtMessage ) ){
+		MikeyConfig *config = new MikeyConfig( identity );
+		// FIXME free config
+		mikey = new Mikey( config );
+
+		addStreams();
+
+		if( !mikey->responderAuthenticate( keyMgmtMessage ) ){
 			errorString =  "Incoming key management message could not be authenticated";
-			if( ka ){
-				errorString += ka->authError();
-			}
+// 			if( ka ){
+				errorString += mikey->authError();
+// 			}
 			return false;
 		}
 		else //Here we set the offer in ka
-			setMikeyOffer();
+			mikey->setMikeyOffer();
 	}
 	else{
-		/*securityConfig.*/secured = false;
 		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
 	}
 		
@@ -624,7 +704,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 			const string &transport = offerM->getTransport();
 
 			if (transport != "RTP/AVP" &&
-			    !/*securityConfig.*/secured &&
+			    !identity->securityEnabled &&
 			    transport == "RTP/SAVP") {
 				errorString += "No supported SRTP key exchange method";
 				return false;
@@ -703,12 +783,12 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 MRef<SdpPacket *> Session::getSdpAnswer(){
 // 	cerr << "Session::getSdpAnswer" << endl;
-	if( /*securityConfig.*/secured ){
+	if( mikey ){
 		string keyMgmtAnswer;
 		// Generate the key management answer message
-		keyMgmtAnswer = responderParse();
+		keyMgmtAnswer = mikey->responderParse();
 		
-		if( !/*securityConfig.*/secured ){
+		if( mikey->error() ){
 			// Something went wrong
 			errorString = "Could not parse key management message.";
 			fprintf(stderr, "responderParse failed\n" );
@@ -732,11 +812,21 @@ void Session::start(){
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
 
-	if( /*securityConfig.*/secured && ka && ka->type() == KEY_AGREEMENT_TYPE_DH ){
+	MRef<KeyAgreement*> ka;
+
+	if( isSecure() ){
+		ka = mikey->getKeyAgreement();
+	}
+
+	if( ka ){
 #ifdef ENABLE_TS
 	ts.save( TGK_START );
 #endif
-	((KeyAgreementDH *)*ka)->computeTgk();
+	KeyAgreementDHBase *kaDH =
+	  dynamic_cast<KeyAgreementDHBase*>(*ka);
+	if( kaDH ){
+		kaDH->computeTgk();
+	}
 #ifdef ENABLE_TS
 	ts.save( TGK_END );
 #endif
@@ -744,7 +834,7 @@ void Session::start(){
 
 	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
-			if( /*securityConfig.*/secured ){
+			if( ka ){
 				(*iR)->setKeyAgreement( ka );
 			}
 			(*iR)->start();
@@ -754,7 +844,7 @@ void Session::start(){
 	mediaStreamSendersLock.lock();
 	for( iS = mediaStreamSenders.begin(); iS != mediaStreamSenders.end(); iS++ ){
 		if( (*iS)->getPort() ){
-			if( /*securityConfig.*/secured ){
+			if( ka ){
 				(*iS)->setKeyAgreement( ka );
 			}
 			(*iS)->start();
@@ -819,7 +909,8 @@ uint16_t Session::getErrorCode(){
 }
 
 bool Session::isSecure(){
-	return /*securityConfig.*/secured;
+	// 	return /*securityConfig.*/secured;
+	return mikey && mikey->isSecured();
 }
 
 string Session::getCallId(){
@@ -976,3 +1067,12 @@ void Session::clearMediaStreamReceivers() {
 	mediaStreamReceivers.clear();
 }
 
+void Session::addStreams() {
+	MediaStreamSenders::iterator i;
+	MediaStreamSenders::iterator last = mediaStreamSenders.end();
+
+	for( i = mediaStreamSenders.begin(); i != last; i++ ){
+		uint32_t ssrc = (*i)->getSsrc();
+		mikey->addSender( ssrc );
+	}
+}
