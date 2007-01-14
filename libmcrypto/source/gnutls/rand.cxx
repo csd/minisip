@@ -31,3 +31,8 @@ bool Rand::randomize(void *buffer, size_t length)
 	gcry_randomize(buffer, length, GCRY_STRONG_RANDOM);
 	return true;
 }
+
+bool Rand::randomize(void *buffer, size_t length, MRef<SipSim *> sim)
+{	
+	return sim->getRandomValue((unsigned char *) buffer, length);
+}

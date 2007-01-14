@@ -49,6 +49,8 @@ public:
 				int & signatureLength, 
 				bool doHash, 
 				int hash_alg=HASH_SHA1) = 0;
+	
+	virtual bool getRandomValue(unsigned char * randomPtr, unsigned long randomLength) = 0;
 
 	virtual void setCertificateChain(MRef<certificate_chain *> c){certChain = c;}
 	virtual MRef<certificate_chain *> getCertificateChain(){return certChain;}

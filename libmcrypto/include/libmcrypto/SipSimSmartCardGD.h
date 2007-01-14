@@ -54,7 +54,7 @@ public:
 /* This method returns pointer which points to an expected length of random value 
 	It is the user's responsibility to free the allocated memory by calling delete.
 	the randomLength is in bits*/
-	unsigned char * getRandomValue(unsigned long randomLength);    
+	bool getRandomValue(unsigned char * randomPtr, unsigned long randomLength);    
 
 	bool getSignature(unsigned char * dataPtr, int dataLength, unsigned char *signaturePtr, int& signatureLength, 
 			bool doHash, int hash_alg=HASH_SHA1);

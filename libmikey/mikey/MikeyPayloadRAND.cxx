@@ -79,6 +79,13 @@ MikeyPayloadRAND::MikeyPayloadRAND():MikeyPayload(){
 
 }
 
+MikeyPayloadRAND::MikeyPayloadRAND(MRef<SipSim *> sim):MikeyPayload(){
+	this->payloadTypeValue = MIKEYPAYLOAD_RAND_PAYLOAD_TYPE;
+	randLengthValue = 16;
+	randDataPtr = new byte_t[ randLengthValue ];
+	Rand::randomize(randDataPtr, randLengthValue, sim);
+}
+
 MikeyPayloadRAND::~MikeyPayloadRAND(){
 	if( randDataPtr ){
 		delete [] randDataPtr;

@@ -30,3 +30,8 @@ bool Rand::randomize(void *buffer, size_t length)
 {
 	return RAND_bytes((unsigned char*)buffer, length);
 }
+
+bool Rand::randomize(void * buffer, size_t length, MRef<SipSim *> sim)
+{
+	return sim->getRandomValue((unsigned char*)buffer, length);
+}

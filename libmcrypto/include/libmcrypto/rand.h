@@ -26,6 +26,8 @@
 
 #include <libmcrypto/config.h>
 #include <stddef.h>
+#include <libmutil/MemObject.h>
+#include <libmcrypto/SipSim.h>
 
 class LIBMCRYPTO_API Rand {
 	public:
@@ -35,6 +37,7 @@ class LIBMCRYPTO_API Rand {
 		 * Generate cryptographically strong random data
 		 */
 		static bool randomize(void *buffer, size_t length);
+		static bool randomize(void *buffer, size_t length, MRef<SipSim *> sim);
 };
 
 #endif

@@ -1,6 +1,7 @@
 
-#include<config.h>
-#include<libmcrypto/SipSimSoft.h>
+#include <config.h>
+#include <libmcrypto/SipSimSoft.h>
+#include <libmcrypto/rand.h>
 
 using namespace std;
 
@@ -28,4 +29,8 @@ bool SipSimSoft::getSignature(unsigned char * data,
 	return true;
 }
 
+bool SipSimSoft::getRandomValue(unsigned char * randomPtr, unsigned long randomLength)
+{
+	Rand::randomize(randomPtr, randomLength);
+}
 

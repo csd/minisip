@@ -28,6 +28,7 @@
 #include<libmikey/libmikey_config.h>
 
 #include<libmikey/MikeyPayload.h>
+#include<libmcrypto/SipSim.h>
 
 #define MIKEYPAYLOAD_RAND_PAYLOAD_TYPE 11
 
@@ -41,6 +42,7 @@ class LIBMIKEY_API MikeyPayloadRAND : public MikeyPayload{
 		// FIXME almost same prototype, leads to mistake!!
 		MikeyPayloadRAND( int randlen, byte_t * rand_data );
 		MikeyPayloadRAND( byte_t * start, int lengthLimit );
+		MikeyPayloadRAND(MRef<SipSim *> sim);
 		~MikeyPayloadRAND();
 
 		virtual int length();

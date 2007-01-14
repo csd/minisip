@@ -261,24 +261,19 @@ bool SipSimSmartCardGD::changePin(const char * newPinCode){
 		throw SmartCardException("Either the smart card connection has not been established or access level is not sufficient");
 }
 
-unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
+bool SipSimSmartCardGD::getRandomValue(unsigned char * randomPtr, unsigned long randomLength){
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+
 		unsigned char * tempBuffer;
-		unsigned char * randomValuePtr;
-		
-		unsigned long randomLengthInBytes;
-		randomLengthInBytes = randomLength/8;
 		sendBufferLength = 5;
-		recvBufferLength = 2 + randomLengthInBytes;
+		recvBufferLength = 2 + randomLength;
 
 		clearBuffer();
 		sendBuffer = new unsigned char[sendBufferLength];
 		recvBuffer = new unsigned char[recvBufferLength];
-		randomValuePtr = new unsigned char[randomLengthInBytes];
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
-		memset(randomValuePtr, 0, randomLengthInBytes);
-		tempBuffer = (unsigned char *) &randomLengthInBytes;
+		tempBuffer = (unsigned char *) &randomLength;
 
 		sendBuffer[0] = 0xB0;
 		sendBuffer[1] = 0x40;
@@ -288,22 +283,24 @@ unsigned char * SipSimSmartCardGD::getRandomValue(unsigned long randomLength){
 
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		
-		sw_1_2 = recvBuffer[randomLengthInBytes] << 8 | recvBuffer[randomLengthInBytes + 1];
+		sw_1_2 = recvBuffer[randomLength] << 8 | recvBuffer[randomLength + 1];
 		switch(sw_1_2){
 			case 0x9000:
 				break;
 			case 0x6008:
 				clearBuffer();
-				throw SmartCardException("failed to generate random value from G&D smart card");
+				return false;
+				//throw SmartCardException("failed to generate random value from G&D smart card");
 			default:
 				clearBuffer();
-				throw SmartCardException("Unknown state value was returned when generating random value");
+				return false;
+				//throw SmartCardException("Unknown state value was returned when generating random value");
 		}
 		
-		memcpy(randomValuePtr, recvBuffer,randomLengthInBytes);
+		memcpy(randomPtr, recvBuffer,randomLength);
 		
 		clearBuffer();
-		return randomValuePtr;
+		return true;
 	}
 	else
 		throw SmartCardException("unconnected card or the user doesn't have proper access level. Correct userPinCode is required");

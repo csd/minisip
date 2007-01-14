@@ -56,10 +56,6 @@ public:
 		virtual bool verifyPin(int verifyMode) = 0;
 		virtual bool changePin( const char * newPinCode) = 0;
 
-	/* General smart card member function */
-	virtual unsigned char * getRandomValue(unsigned long randomLength) = 0;
-	//virtual unsigned char * getCertificate();
-
 protected:
 	
 /* This is used each time right before you read from or write on smart card. To check out whether the connection has been established */

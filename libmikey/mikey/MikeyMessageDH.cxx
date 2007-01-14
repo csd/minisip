@@ -52,7 +52,10 @@ MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 	unsigned int csbId = ka->csbId();
 
 	if( !csbId ){
-		Rand::randomize( &csbId, sizeof( csbId ));
+		if(ka->useSim)
+			Rand::randomize( &csbId, sizeof( csbId ), ka->getSim());
+		else
+			Rand::randomize( &csbId, sizeof( csbId ));
 		ka->setCsbId( csbId );
 	}
 
@@ -67,7 +70,11 @@ MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 	addPolicyToPayload( ka ); //Is in MikeyMessage.cxx
 
 	MikeyPayloadRAND * payload;
-	addPayload( payload = new MikeyPayloadRAND() );
+
+	if(ka->useSim)
+		addPayload(payload = new MikeyPayloadRAND(ka->getSim()));
+	else
+		addPayload( payload = new MikeyPayloadRAND() );
 	
 	//keep a copy of the random value!
 	ka->setRand( payload->randData(), 
