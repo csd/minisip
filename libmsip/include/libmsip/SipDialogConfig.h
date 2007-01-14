@@ -51,6 +51,8 @@
 #define KEY_MGMT_METHOD_MIKEY_DH        0x11
 #define KEY_MGMT_METHOD_MIKEY_PSK       0x12
 #define KEY_MGMT_METHOD_MIKEY_PK        0x13
+#define KEY_MGMT_METHOD_MIKEY_DHHMAC    0x14
+#define KEY_MGMT_METHOD_MIKEY_RSA_R     0x15
 
 #include<string>
 
