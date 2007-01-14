@@ -1,0 +1,2 @@
+* Remove the ugly externals (initiator etc.) in
+  include/libzrtpcpp/ZrtpTextData.h

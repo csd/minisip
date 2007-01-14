@@ -401,7 +401,7 @@ void Mikey::addStreamsToKa(){
 
 		uint32_t ssrc = *iSender;
 
-		if( initiator ){ 
+		if( isInitiator() ){ 
 			uint8_t policyNo = ka->setdefaultPolicy( MIKEY_PROTO_SRTP );
 			ka->addSrtpStream( ssrc, 0/*ROC*/, 
 					policyNo );
