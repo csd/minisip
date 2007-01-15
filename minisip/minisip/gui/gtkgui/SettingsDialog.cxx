@@ -550,6 +550,7 @@ string DeviceSettings::apply(){
 SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "dhCheck", dhCheck );
+	refXml->get_widget( "certCheck", certCheck );
 	refXml->get_widget( "pskCheck", pskCheck );
 
 	refXml->get_widget( "pskEntry", pskEntry );
@@ -564,6 +565,8 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 //	refXml->get_widget( "pskBox", pskBox );
 	refXml->get_widget( "pskRadio", pskRadio );
 	refXml->get_widget( "dhRadio", dhRadio );
+	refXml->get_widget( "dhhmacRadio", dhhmacRadio );
+	refXml->get_widget( "rsarRadio", rsarRadio );
 	
 	refXml->get_widget( "kaTypeLabel", kaTypeLabel );
 
@@ -590,6 +593,7 @@ void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 	//FIXME: per identity configuration
 	dhCheck->set_active( /*config->securityConfig.dh_enabled*/ config->defaultIdentity->dhEnabled );
+	certCheck->set_active( config->defaultIdentity->checkCert );
 	pskCheck->set_active( /*config->securityConfig.psk_enabled*/ config->defaultIdentity->pskEnabled );
 
 //	string psk( (const char *)config->securityConfig.psk, config->securityConfig.psk_length );
@@ -603,6 +607,12 @@ void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 	else if( /*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
 		pskRadio->set_active( true );
+	}
+	else if( config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_DHHMAC ){
+		dhhmacRadio->set_active( true );
+	}
+	else if( config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_RSA_R ){
+		rsarRadio->set_active( true );
 	}
 
 	secureCheck->set_active( /*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled );
@@ -629,14 +639,24 @@ void SecuritySettings::kaChange(){
 			         pskCheck->get_active() );
 	dhRadio->set_sensitive( secureCheck->get_active() && 
 			        dhCheck->get_active() );
+	dhhmacRadio->set_sensitive( secureCheck->get_active() && 
+			        pskCheck->get_active() );
+	rsarRadio->set_sensitive( secureCheck->get_active() && 
+			        dhCheck->get_active() );
 
 	if( dhCheck->get_active() && ! pskCheck->get_active() ){
-		dhRadio->set_active( true );
+		if( !rsarRadio->get_active() ){
+			dhRadio->set_active( true );
+		}
 	}
 
 	if( pskCheck->get_active() && ! dhCheck->get_active() ){
-		pskRadio->set_active( true );
+		if( !dhhmacRadio->get_active() ){
+			pskRadio->set_active( true );
+		}
 	}
+
+	certCheck->set_sensitive( dhCheck->get_active() );
 }
 
 void SecuritySettings::secureChange(){
@@ -645,6 +665,10 @@ void SecuritySettings::secureChange(){
 	pskRadio->set_sensitive( secureCheck->get_active() && 
 			         pskCheck->get_active() );
 	dhRadio->set_sensitive( secureCheck->get_active() && 
+			        dhCheck->get_active() );
+	dhhmacRadio->set_sensitive( secureCheck->get_active() && 
+			        pskCheck->get_active() );
+	rsarRadio->set_sensitive( secureCheck->get_active() && 
 			        dhCheck->get_active() );
 
 }
@@ -672,6 +696,7 @@ string SecuritySettings::apply(){
 
 	config->/*securityConfig*/defaultIdentity->dhEnabled = dhCheck->get_active();
 	config->/*securityConfig*/defaultIdentity->pskEnabled = pskCheck->get_active();
+	config->defaultIdentity->checkCert = certCheck->get_active();
 
 
 	string s = pskEntry->get_text();
@@ -698,6 +723,12 @@ string SecuritySettings::apply(){
 		}
 		else if( dhRadio->get_active() ){
 			/*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
+		}
+		else if( dhhmacRadio->get_active() ){
+			config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_DHHMAC;
+		}
+		else if( rsarRadio->get_active() ){
+			config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_RSA_R;
 		}
 	}
 

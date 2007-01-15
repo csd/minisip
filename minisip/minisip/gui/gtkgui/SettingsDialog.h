@@ -209,6 +209,7 @@ class SecuritySettings
 		void secureChange();
 
 		Gtk::CheckButton * dhCheck;
+		Gtk::CheckButton * certCheck;
 		Gtk::CheckButton * pskCheck;
 		
 		Gtk::Entry * pskEntry;
@@ -221,6 +222,8 @@ class SecuritySettings
 		Gtk::Label * pskLabel;
 		Gtk::RadioButton * pskRadio;
 		Gtk::RadioButton * dhRadio;
+		Gtk::RadioButton * dhhmacRadio;
+		Gtk::RadioButton * rsarRadio;
 
 
 		MRef<SipSoftPhoneConfiguration *> config;

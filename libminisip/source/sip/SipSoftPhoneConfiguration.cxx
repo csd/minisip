@@ -144,6 +144,13 @@ void SipSoftPhoneConfiguration::save(){
 			break;
 		case KEY_MGMT_METHOD_MIKEY_PK:
 			kaTypeString = "pk";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_DHHMAC:
+			kaTypeString = "dhhmac";
+			break;
+		case KEY_MGMT_METHOD_MIKEY_RSA_R:
+			kaTypeString = "rsa-r";
+			break;
 		}
 
 		backend->save(accountPath + "ka_type", kaTypeString);
@@ -471,6 +478,10 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			ident->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 		else if( backend->loadString(accountPath + "ka_type", "psk") == "pk" )
 			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PK;
+		else if( backend->loadString(accountPath + "ka_type", "psk") == "dhhmac" )
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_DHHMAC;
+		else if( backend->loadString(accountPath + "ka_type", "psk") == "rsa-r" )
+			ident->ka_type = KEY_MGMT_METHOD_MIKEY_RSA_R;
 		else{
 			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 #ifdef DEBUG_OUTPUT
