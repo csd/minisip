@@ -23,13 +23,15 @@
 #ifndef ACCOUNT_DIALOG
 #define ACCOUNT_DIALOG
 
+#include<libglademm/xml.h>
 #include<gtkmm.h>
 
 class AccountsList;
 
-class AccountDialog: public Gtk::Dialog{
+class AccountDialog{
 	public:
-		AccountDialog( AccountsList * list );
+		AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			       AccountsList * list );
 		~AccountDialog();
 
 		void addAccount();
@@ -38,6 +40,8 @@ class AccountDialog: public Gtk::Dialog{
 
 		void requiresAuthCheckChanged();
 		void autodetectProxyCheckChanged();
+
+		Gtk::Dialog * dialogWindow;
 
 		Gtk::Entry * nameEntry;
 		Gtk::Entry * uriEntry;

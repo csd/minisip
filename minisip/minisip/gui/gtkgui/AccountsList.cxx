@@ -46,14 +46,17 @@ AccountsListColumns::AccountsListColumns(){
 	add( pstnProxy );
 }
 
-Glib::RefPtr<AccountsList> AccountsList::create( AccountsListColumns * columns ){
+Glib::RefPtr<AccountsList> AccountsList::create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+						 AccountsListColumns * columns ){
 	return Glib::RefPtr<AccountsList>::RefPtr<AccountsList>( 
-			new AccountsList( columns ) );
+			new AccountsList( refXml, columns ) );
 }
 	
-AccountsList::AccountsList( AccountsListColumns * columns ):
+AccountsList::AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			    AccountsListColumns * columns ):
 	Gtk::ListStore( *columns ),
-	columns( columns ){
+	columns( columns ),
+	refXml( refXml ){
 	
 
 }
@@ -151,12 +154,12 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 }
 
 void AccountsList::addAccount(){
-	AccountDialog dialog( this );
+	AccountDialog dialog( refXml, this );
 	dialog.addAccount();
 }
 
 void AccountsList::editAccount( Gtk::TreeModel::iterator iter ){
-	AccountDialog dialog( this );
+	AccountDialog dialog( refXml, this );
 	dialog.editAccount( iter );
 }
 

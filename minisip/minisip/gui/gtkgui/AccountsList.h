@@ -23,6 +23,7 @@
 #ifndef ACCOUNTS_LIST_H
 #define ACCOUNTS_LIST_H
 
+#include<libglademm/xml.h>
 #include<gtkmm.h>
 #include<libmutil/MemObject.h>
 
@@ -33,7 +34,8 @@ class SipIdentity;
 
 class AccountsList : public MObject, public Gtk::ListStore{
 	public:
-		static Glib::RefPtr<AccountsList> create( AccountsListColumns * columns );
+		static Glib::RefPtr<AccountsList> create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+							  AccountsListColumns * columns );
 		void loadFromConfig( MRef<SipSoftPhoneConfiguration *> config );
 		std::string saveToConfig( MRef<SipSoftPhoneConfiguration *> config );
 
@@ -48,8 +50,10 @@ class AccountsList : public MObject, public Gtk::ListStore{
 		AccountsListColumns *columns;
 
 	private:
-		AccountsList( AccountsListColumns * columns );
+		AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			      AccountsListColumns * columns );
 
+		Glib::RefPtr<Gnome::Glade::Xml> refXml;
 };
 
 

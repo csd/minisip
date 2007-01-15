@@ -313,7 +313,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	//mainTabWidget->append_page( *logWidget, "Call list" );
 
-	accountsList = AccountsList::create( new AccountsListColumns() );
+	accountsList = AccountsList::create( refXml,
+					     new AccountsListColumns() );
 
 	statusWidget = new AccountsStatusWidget( accountsList);
 	//mainTabWidget->append_page( *statusWidget, "Accounts" );

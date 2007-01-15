@@ -33,199 +33,49 @@
 #define BIND sigc::bind
 #endif
 
-#define ADD_FIRST_COLUMN( w ) table->attach( *w, 0, 1, row, row+1 );
-#define ADD_SECOND_COLUMN( w ) table->attach( *w, 1, 2, row, row+1 );row++;
-#define ADD( w ) table->attach( *w, 0, 2, row, row+1 );row++;
-
 using namespace std;
 
-AccountDialog::AccountDialog( AccountsList * list ):Gtk::Dialog( "Sip account settings", false ){
-#ifdef HILDON_SUPPORT
-	// FIXME
-	set_size_request( -1, 400 );
-#else
-	set_size_request( -1, 600 );
-#endif
+AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			      AccountsList * list ):
+		list(list){
+
+	refXml->get_widget( "accountDialog", dialogWindow );
+
+	dialogWindow->set_size_request( -1, 300 );
 
 	// Create the active widgets
-	nameEntry = manage( new Gtk::Entry );
-	uriEntry = manage( new Gtk::Entry );
-	autodetectProxyCheck = manage( new Gtk::CheckButton( "Autodetect SIP proxy" ) );
-	proxyEntry = manage( new Gtk::Entry );
-	requiresAuthCheck = manage( new Gtk::CheckButton( "Requires authentication" ) );
-	usernameEntry = manage( new Gtk::Entry );
-	passwordEntry = manage( new Gtk::Entry );
-	udpRadio = manage( new Gtk::RadioButton( "UDP" ) );
-	Gtk::RadioButton::Group group = udpRadio->get_group();
-	tcpRadio = manage( new Gtk::RadioButton( group, "TCP" ) );
-	tlsRadio = manage( new Gtk::RadioButton( group, "TLS" ) );
-	
-	registerTimeSpin = manage( new Gtk::SpinButton() );
-	proxyPortSpin = manage( new Gtk::SpinButton() );
+	refXml->get_widget( "nameEntry", nameEntry );
+	refXml->get_widget( "uriEntry", uriEntry );
+	refXml->get_widget( "autodetectProxyCheck", autodetectProxyCheck );
+	refXml->get_widget( "proxyLabel", proxyLabel );
+	refXml->get_widget( "proxyEntry", proxyEntry );
+	refXml->get_widget( "requiresAuthCheck", requiresAuthCheck );
+	refXml->get_widget( "usernameEntry", usernameEntry );
+	refXml->get_widget( "usernameLabel", usernameLabel );
+	refXml->get_widget( "passwordEntry", passwordEntry );
+	refXml->get_widget( "passwordLabel", passwordLabel );
+	refXml->get_widget( "udpRadio", udpRadio );
+	refXml->get_widget( "tcpRadio", tcpRadio );
+	refXml->get_widget( "tlsRadio", tlsRadio );
+	refXml->get_widget( "registerTimeSpin", registerTimeSpin );
+	refXml->get_widget( "proxyPortSpin", proxyPortSpin );
+	refXml->get_widget( "proxyPortLabel", proxyPortLabel );
 
-	proxyPortSpin->set_range( 1, 65535 );
-	proxyPortSpin->set_increments( 1, 10 );
-	proxyPortSpin->set_value( 5060 );
-	
-	registerTimeSpin->set_range( 1, 36000 );
-	registerTimeSpin->set_increments( 1, 10 );
-	registerTimeSpin->set_value( 1000 );
-	
+	requiresAuthCheck->signal_toggled().connect(
+		SLOT( *this, &AccountDialog::requiresAuthCheckChanged ) );
+	autodetectProxyCheck->signal_toggled().connect(
+		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
 
-
-	uint8_t row = 0;
-	this->list = list;
-	Gtk::VBox * vbox = get_vbox();
-	Gtk::ScrolledWindow * scrolledWindow = 
-		manage( new Gtk::ScrolledWindow() );
-	scrolledWindow->set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
-	scrolledWindow->set_shadow_type( Gtk::SHADOW_NONE );
-	vbox->pack_start( *scrolledWindow, true, true );
-	vbox->set_spacing( 12 );
-	
-	Gtk::HBox * hbox = manage( new Gtk::HBox( false, 12 ) );
-	scrolledWindow->add( *hbox );
-
-	// Access the viewport
-	dynamic_cast<Gtk::Viewport *>( hbox->get_parent() )
-		->set_shadow_type( Gtk::SHADOW_NONE );
-	
-	Gtk::Table * table = manage( new Gtk::Table( 10, 2, false ) );
-	table->set_col_spacings( 6 );
-	table->set_row_spacings( 6 );
-	table->set_homogeneous( true );
-	Gtk::Label * label;
-
-	label = manage( new Gtk::Label( "" ) );
-	hbox->pack_start( *label, false, false );
-
-	vbox = manage( new Gtk::VBox( false, 6 ) );
-	hbox->pack_start( *vbox, true, true );
-	
-	label = manage( new Gtk::Label( "" ) );
-	hbox->pack_start( *label, false, false );
-
-	label = manage( new Gtk::Label( "<b><big>General</big></b>" , 0.0, 0.0 ) );
-	label->set_use_markup( true );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-
-//	vbox->pack_start( *label, false, false, 12 );
-
-	vbox->pack_start( *table, true, true, 12 );
-
-	ADD( label )
-
-	label = manage(  new Gtk::Label( "Account name:", 0.0, 0.0 ) );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	label->set_padding( 12, 0 );
-	ADD_FIRST_COLUMN( label )
-	ADD_SECOND_COLUMN( nameEntry );
-
-	label = manage( new Gtk::Label( "SIP URI:", 0.0, 0.0 ) );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	label->set_padding( 12, 0 );
-	ADD_FIRST_COLUMN( label )
-	ADD_SECOND_COLUMN( uriEntry )
-	
-	label = manage( new Gtk::Label( "<b><big>SIP proxy</big></b>" , 0.0, 0.0 ) );
-	label->set_use_markup( true );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	ADD( label )
-	
-	hbox = manage( new Gtk::HBox( false, 12 ) );
-	label = manage( new Gtk::Label( "" ) );
-	hbox->pack_start( *label, false, false );
-	hbox->pack_start( *autodetectProxyCheck, false, false );
-	ADD( hbox )
-	
-	proxyLabel = manage( new Gtk::Label( "SIP proxy:", 0.0, 0.0 ) );
-	proxyLabel->set_justify( Gtk::JUSTIFY_LEFT );
-	proxyLabel->set_padding( 24, 0 );
-	
-	ADD_FIRST_COLUMN( proxyLabel )
-	ADD_SECOND_COLUMN( proxyEntry )
-	
-	proxyPortLabel = manage( new Gtk::Label( "Network port:", 0.0, 0.0 ) );
-	proxyPortLabel->set_justify( Gtk::JUSTIFY_LEFT );
-	proxyPortLabel->set_padding( 24, 0 );
-	
-	ADD_FIRST_COLUMN( proxyPortLabel )
-	
-	Gtk::Alignment * alignment = 
-		manage( new Gtk::Alignment( 1.0 ) );
-	alignment->add( *proxyPortSpin );
-	table->attach( *alignment, 1, 2, row, row+1, Gtk::FILL );row++;
-//	ADD_SECOND_COLUMN( proxyPortSpin )
-	
-	label = manage( new Gtk::Label( "Transport method:", 0.0, 0.0 ) );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	label->set_padding( 12, 0 );
-	
-	ADD_FIRST_COLUMN( label )
-	ADD_SECOND_COLUMN( udpRadio )
-	ADD_SECOND_COLUMN( tcpRadio )
-	ADD_SECOND_COLUMN( tlsRadio )
-
-	
-
-	label = manage( new Gtk::Label( "<b><big>Registration</big></b>" , 0.0, 0.0 ) );
-	label->set_use_markup( true );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	ADD( label )
-
-	hbox = manage( new Gtk::HBox( false, 12 ) );
-	label = manage( new Gtk::Label( "" ) );
-	hbox->pack_start( *label, false, false );
-	hbox->pack_start( *requiresAuthCheck, false, false );
-
-	ADD( hbox )
-
-	
-	usernameLabel = manage( new Gtk::Label( "Username:", 0.0, 0.0 ) );
-	usernameLabel->set_justify( Gtk::JUSTIFY_LEFT );
-	usernameLabel->set_padding( 24, 0 );
-	
-	ADD_FIRST_COLUMN( usernameLabel )
-	ADD_SECOND_COLUMN( usernameEntry )
-	
-	passwordLabel = manage( new Gtk::Label( "Password:", 0.0, 0.0 ) );
-	passwordLabel->set_justify( Gtk::JUSTIFY_LEFT );
-	passwordLabel->set_padding( 24, 0 );
-	
-	ADD_FIRST_COLUMN( passwordLabel )
-	ADD_SECOND_COLUMN( passwordEntry )
-
-
-	requiresAuthCheck->signal_toggled().connect( SLOT(
-		*this, &AccountDialog::requiresAuthCheckChanged ) );
-	autodetectProxyCheck->signal_toggled().connect( SLOT(
-		*this, &AccountDialog::autodetectProxyCheckChanged ) );
-	
-	autodetectProxyCheck->set_active( true );
-
-	label = manage( new Gtk::Label( "Registration time (in s):", 0.0, 0.0 ) );
-	label->set_justify( Gtk::JUSTIFY_LEFT );
-	label->set_padding( 12, 0 );
-
-	ADD_FIRST_COLUMN( label )
-
-	ADD_SECOND_COLUMN( registerTimeSpin )
-	
-
-	requiresAuthCheckChanged();
 	autodetectProxyCheckChanged();
-	
-	add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
-	add_button( Gtk::Stock::OK, Gtk::RESPONSE_OK );
 
-	show_all();
+	dialogWindow->show_all();
 }
 
 AccountDialog::~AccountDialog(){
 }
 
 void AccountDialog::addAccount(){
-	if( run() == Gtk::RESPONSE_OK ){
+	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
 		Gtk::TreeModel::iterator iter = list->append();
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
@@ -253,6 +103,8 @@ void AccountDialog::addAccount(){
 			(*iter)[list->columns->transport] = "UDP";
 		}
 	}
+
+	dialogWindow->hide();
 }
 
 void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
@@ -276,7 +128,7 @@ void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	} else{
 		udpRadio->set_active( true );
 	}
-	if( run() == Gtk::RESPONSE_OK ){
+	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
 		
@@ -303,6 +155,7 @@ void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 			(*iter)[list->columns->transport] = "UDP";
 		}
 	}
+	dialogWindow->hide();
 }
 
 void AccountDialog::requiresAuthCheckChanged(){
