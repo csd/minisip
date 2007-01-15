@@ -42,7 +42,7 @@
 # define SHA1_DIGEST_LENGTH 20
 #endif
 
-void sha1(uint8_t* data, int32_t dataLength,
+void sha1(uint8_t* data, uint32_t dataLength,
             uint8_t* mac)
 {
     gcry_md_hd_t hd;
