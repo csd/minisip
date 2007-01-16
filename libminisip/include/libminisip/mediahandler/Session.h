@@ -62,11 +62,11 @@ class LIBMINISIP_API IMikeyConfig: public virtual MObject{
 class LIBMINISIP_API Mikey: public MObject{
 	public:
 		enum State {
-			NONE = 0,
-			INITIATOR,
-			RESPONDER,
-			AUTHENTICATED,
-			ERROR
+			STATE_START = 0,
+			STATE_INITIATOR,
+			STATE_RESPONDER,
+			STATE_AUTHENTICATED,
+			STATE_ERROR
 		};
 
 		typedef std::vector<uint32_t> Streams;

@@ -58,7 +58,7 @@ using namespace std;
 IMikeyConfig::~IMikeyConfig(){
 }
 
-Mikey::Mikey( MRef<IMikeyConfig*> aConfig ):state(NONE),
+Mikey::Mikey( MRef<IMikeyConfig*> aConfig ):state(STATE_START),
 					    config(aConfig)
 {
 }
@@ -68,7 +68,7 @@ Mikey::~Mikey(){
 
 bool Mikey::responderAuthenticate( string message ){
 	
-	setState( RESPONDER );
+	setState( STATE_RESPONDER );
 
 	if(message.substr(0,6) == "mikey "){
 
@@ -117,23 +117,23 @@ bool Mikey::responderAuthenticate( string message ){
 				ts.save( AUTH_END );
 #endif
 				secured = true;
-				setState( AUTHENTICATED );
+				setState( STATE_AUTHENTICATED );
 			}
 			catch( certificate_exception &e ){
 				// TODO: Tell the GUI
 				merr << "Could not open certificate " << e.what() << end;
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 			catch( MikeyExceptionUnacceptable &exc ){
 				merr << "MikeyException caught: "<<exc.what()<<end;
 				//FIXME! send SIP Unacceptable with Mikey Error message
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 			// Authentication failed
 			catch( MikeyExceptionAuthentication &exc ){
 				merr << "MikeyExceptionAuthentication caught: "<<exc.what()<<end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 			// Message was invalid
 			catch( MikeyExceptionMessageContent &exc ){
@@ -143,11 +143,11 @@ bool Mikey::responderAuthenticate( string message ){
 				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 			catch( MikeyException & exc ){
 				merr << "MikeyException caught: " << exc.what() << end;
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 		
 		}
@@ -155,17 +155,17 @@ bool Mikey::responderAuthenticate( string message ){
 	else {
 		merr << "Unknown type of key agreement" << end;
 		secured = false;
-		setState( AUTHENTICATED );
+		setState( STATE_AUTHENTICATED );
 	}
 
-	return state == AUTHENTICATED;
+	return state == STATE_AUTHENTICATED;
 }
 
 string Mikey::responderParse(){
 	
 	if( !ka ){
 		merr << "Unknown type of key agreement" << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 		return "";
 	}
 	
@@ -174,7 +174,7 @@ string Mikey::responderParse(){
 
 	if( initMessage.isNull() ){
 		merr << "Uninitialized message, this is a bug" << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 		return "";
 	}
 	
@@ -193,12 +193,12 @@ string Mikey::responderParse(){
 	catch( certificate_exception &e ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate " << e.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	catch( MikeyExceptionUnacceptable & exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent & exc ){
@@ -208,11 +208,11 @@ string Mikey::responderParse(){
 		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 
 	if( !responseMessage.isNull() ){
@@ -231,7 +231,7 @@ string Mikey::responderParse(){
 string Mikey::initiatorCreate( int type ){
 	MRef<MikeyMessage *> message;
 
-	setState( INITIATOR );
+	setState( STATE_INITIATOR );
 	
 	try{
 		createKeyAgreement( type );
@@ -247,12 +247,12 @@ string Mikey::initiatorCreate( int type ){
 	catch( certificate_exception &e ){
 		// FIXME: tell the GUI
 		merr << "Could not open certificate " << e.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 		return "";
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 		return "";
 	}
 }
@@ -298,12 +298,12 @@ bool Mikey::initiatorAuthenticate( string message ){
 				ts.save( AUTH_END );
 #endif
 				secured = true;
-				setState( AUTHENTICATED );
+				setState( STATE_AUTHENTICATED );
 			}
 			catch(MikeyExceptionAuthentication &exc){
 				merr << "MikeyException caught: " << exc.what() << end;
 				//FIXME! send SIP Authorization failed with Mikey Error message
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 			catch(MikeyExceptionMessageContent &exc){
 				MRef<MikeyMessage *> error_mes;
@@ -312,21 +312,21 @@ bool Mikey::initiatorAuthenticate( string message ){
 				if( !error_mes.isNull() ){
 					//FIXME: send the error message!
 				}
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 				
 			catch(MikeyException &exc){
 				merr << "MikeyException caught: " << exc.what() << end;
-				setState( ERROR );
+				setState( STATE_ERROR );
 			}
 		}
 	}
 	else{
 		merr << "Unknown key management method" << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 
-	return state == AUTHENTICATED;
+	return state == STATE_AUTHENTICATED;
 }
 
 string Mikey::initiatorParse(){
@@ -334,7 +334,7 @@ string Mikey::initiatorParse(){
 
 	if( !ka ){
 		merr << "Unknown type of key agreement" << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 		return "";
 	}
 	
@@ -345,7 +345,7 @@ string Mikey::initiatorParse(){
 
 		if( initMessage.isNull() ){
 			merr << "Uninitialized MIKEY init message, this is a bug" << end;
-			setState( ERROR );
+			setState( STATE_ERROR );
 			return "";
 		}
 			
@@ -361,12 +361,12 @@ string Mikey::initiatorParse(){
 	catch( certificate_exception &e ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate " << e.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	catch( MikeyExceptionUnacceptable &exc ){
 		merr << "MikeyException caught: "<<exc.what()<<end;
 		//FIXME! send SIP Unacceptable with Mikey Error message
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	// Message was invalid
 	catch( MikeyExceptionMessageContent &exc ){
@@ -376,11 +376,11 @@ string Mikey::initiatorParse(){
 		if( !error_mes.isNull() ){
 			responseMessage = error_mes;
 		}
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 	catch( MikeyException & exc ){
 		merr << "MikeyException caught: " << exc.what() << end;
-		setState( ERROR );
+		setState( STATE_ERROR );
 	}
 
 	if( !responseMessage.isNull() ){
@@ -423,7 +423,7 @@ void Mikey::setMikeyOffer(){
 }
 
 bool Mikey::error() const{
-	return state == ERROR;
+	return state == STATE_ERROR;
 }
 
 bool Mikey::isSecured() const{
@@ -431,7 +431,7 @@ bool Mikey::isSecured() const{
 }
 
 bool Mikey::isInitiator() const{
-	return state == INITIATOR;
+	return state == STATE_INITIATOR;
 }
 
 MRef<KeyAgreement*> Mikey::getKeyAgreement() const{
