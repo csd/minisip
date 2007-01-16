@@ -11,8 +11,8 @@
  * the keys used in the security protocol SRTP
  * It contains the necessary methods to derive the keys used
  */
-class KeyAgreementPKE : public KeyAgreementPSK,
-			public PeerCertificates
+class LIBMIKEY_API KeyAgreementPKE : public KeyAgreementPSK,
+				     public PeerCertificates
 {
 	public:
 	

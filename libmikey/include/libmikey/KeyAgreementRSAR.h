@@ -31,7 +31,7 @@
  * the keys used in the security protocol SRTP
  * It contains the necessary methods to derive the keys used
  */
-class KeyAgreementRSAR : public KeyAgreementPKE{
+class LIBMIKEY_API KeyAgreementRSAR : public KeyAgreementPKE{
 	public:
 	
 		KeyAgreementRSAR( MRef<certificate_chain *> cert, 
