@@ -74,7 +74,6 @@ libmediahandler_src = source/mediahandler/MediaHandler.cxx \
 			source/mediahandler/MediaStream.cxx \
 			source/mediahandler/Media.cxx \
 			source/mediahandler/RtpReceiver.cxx \
-			source/mediahandler/KeyAgreement.cxx \
 			source/mediahandler/MediaCommandString.cxx \
 			source/mediahandler/AudioMedia.cxx \
 			source/mediahandler/AudioPlugin.cxx \

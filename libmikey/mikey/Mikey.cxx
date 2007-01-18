@@ -26,11 +26,12 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libmikey/Mikey.h>
 
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
+
+#include<libmcrypto/SipSim.h>
 
 #include<libmikey/KeyAgreement.h>
 #include<libmikey/KeyAgreementDH.h>

@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/TimeoutProvider.h>
 
-#include<libmikey/KeyAgreement.h>
+#include<libmikey/Mikey.h>
 
 //#include<libminisip/sip/SipDialogSecurityConfig.h>
 #include<libmsip/SipDialogConfig.h>
@@ -42,71 +42,6 @@ class MediaStreamSender;
 class SdpHeaderM;
 class IPAddress;
 class SessionRegistry;
-
-class LIBMINISIP_API IMikeyConfig: public virtual MObject{
-	public:
-		virtual ~IMikeyConfig();
-
-		virtual const std::string getUri() const=0;
-
-		virtual MRef<SipSim*> getSim() const=0;
-
-		virtual size_t getPskLength() const=0;
-		virtual const byte_t* getPsk() const=0;
-
-		virtual bool isMethodEnabled( int kaType ) const=0;
-
-		virtual bool isCertCheckEnabled() const=0;
-};
-
-class LIBMINISIP_API Mikey: public MObject{
-	public:
-		enum State {
-			STATE_START = 0,
-			STATE_INITIATOR,
-			STATE_RESPONDER,
-			STATE_AUTHENTICATED,
-			STATE_ERROR
-		};
-
-		typedef std::vector<uint32_t> Streams;
-
-		Mikey( MRef<IMikeyConfig*> config );
-		~Mikey();
-
-		/* Key management handling */
-		// Initiator methods
-		std::string initiatorCreate( int kaType );
-		bool initiatorAuthenticate( std::string message );
-		std::string initiatorParse();
-
-		// Responder methods
-		bool responderAuthenticate( std::string message );
-		std::string responderParse();
-
-		void setMikeyOffer();
-
-		bool isSecured() const;
-		bool isInitiator() const;
-		bool error() const;
-		std::string authError() const;
-		MRef<KeyAgreement*> getKeyAgreement() const;
-
-		void addSender( uint32_t ssrc );
-
-	protected:
-		void setState( State newState );
-
-	private:
-		void createKeyAgreement( int type );
-		void addStreamsToKa();
-
-		State state;
-		bool secured;
-		MRef<IMikeyConfig*> config;
-		Streams mediaStreamSenders;
-		MRef<KeyAgreement *> ka;
-};
 
 /**
  * The session class is a representation of the media session associated

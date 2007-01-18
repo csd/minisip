@@ -6,6 +6,7 @@ pkginclude_HEADERS =    libmikey/exception.h \
 			libmikey/KeyAgreementPSK.h \
 			libmikey/KeyAgreementRSAR.h \
 			libmikey/KeyValidity.h \
+			libmikey/Mikey.h \
 			libmikey/MikeyDefs.h \
 			libmikey/MikeyException.h \
 			libmikey/MikeyMessage.h \

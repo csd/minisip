@@ -20,7 +20,9 @@ libmikey_la_LDFLAGS += -Wl,$(res_obj)
 libmikey_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
-mikey_src =          mikey/MikeyException.cxx \
+mikey_src = \
+                     mikey/Mikey.cxx \
+                     mikey/MikeyException.cxx \
                      mikey/MikeyCsIdMap.cxx \
                      mikey/MikeyMessage.cxx \
                      mikey/MikeyMessageDH.h \
