@@ -267,7 +267,8 @@ bool Thread::kill( const ThreadHandle &handle) {
 
 ThreadHandle Thread::getCurrent() {
 	ThreadHandle th;
-	*((HANDLE*)th.hptr) = GetCurrentProcess();
+// 	*((HANDLE*)th.hptr) = GetCurrentProcess();
+	th.handle = (unsigned long)GetCurrentProcess();
         return th;
 }
 
