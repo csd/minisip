@@ -160,8 +160,8 @@ Thread::Thread(MRef<Runnable *> runnable){
                 delete self;
 		throw ThreadException("Could not create thread.");
         }
-	*((HANDLE*)handle.hptr) = h;
-//	printf("In Thread, windows part - thread created\n");
+	//*((HANDLE*)handle.hptr) = h;
+	handle.handle = (unsigned long)h;
 
 }
 
@@ -186,7 +186,9 @@ ThreadHandle Thread::createThread(void f()){
 		merror("Thread::Thread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
-	*((HANDLE*)handle.hptr) = h;
+	//*((HANDLE*)handle.hptr) = h;
+	handle.handle = (unsigned long)h;
+
 	return handle;
 }
 
@@ -219,7 +221,8 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 		merror("Thread::createThread: CreateThread");
 		throw ThreadException("Could not create thread.");
 	}
-	*((HANDLE*)handle.hptr) = h;
+	//*((HANDLE*)handle.hptr) = h;
+	handle.handle=(unsigned long)h;
 	return handle;
 }
 
@@ -229,7 +232,8 @@ void * Thread::join(){
 }
 
 void Thread::join(const ThreadHandle &handle){
-	HANDLE h = *((HANDLE*)handle.hptr);
+	//HANDLE h = *((HANDLE*)handle.hptr);
+	HANDLE h = (HANDLE)handle.handle;
 	if (WaitForSingleObject( h, INFINITE )==WAIT_FAILED){
 		merror("Thread::join:WaitForSingleObject");
 	}
@@ -245,7 +249,8 @@ bool Thread::kill( ) {
 }
 
 bool Thread::kill( const ThreadHandle &handle) {
-	HANDLE h = *((HANDLE*)handle.hptr);
+	//HANDLE h = *((HANDLE*)handle.hptr);
+	HANDLE h = (HANDLE)handle.handle;
 	BOOL ret;
 	DWORD lpExitCode;
 	
@@ -267,17 +272,19 @@ ThreadHandle Thread::getCurrent() {
 }
 
 ThreadHandle::ThreadHandle(){
-	hptr = (void*) new HANDLE;
+	//hptr = (void*) new HANDLE;
+	handle=0;
 }
 
 ThreadHandle::~ThreadHandle(){
-	delete (HANDLE*)hptr;
-	hptr=NULL;
+//	delete (HANDLE*)hptr;
+//	hptr=NULL;
 }
 
 ThreadHandle::ThreadHandle(const ThreadHandle &h){
-	hptr = (void*)new HANDLE;
-	*((HANDLE*)hptr)= *((HANDLE*)h.hptr);
+	//hptr = (void*)new HANDLE;
+	//*((HANDLE*)hptr)= *((HANDLE*)h.hptr);
+	handle=h.handle;
 }
 
 
