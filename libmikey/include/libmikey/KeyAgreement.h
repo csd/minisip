@@ -97,8 +97,6 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		/* TEK and SALT values, derived from the TGK */
 		void genTek( byte_t cs_id,
 			     byte_t * tek, unsigned int tek_length );
-		void genTekFromCard(byte_t cs_id, byte_t * tek, unsigned int tek_length);
-		
 		void genSalt( byte_t cs_id,
 			      byte_t * salt, unsigned int salt_length );
 		

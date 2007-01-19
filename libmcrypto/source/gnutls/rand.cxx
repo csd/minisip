@@ -49,7 +49,7 @@ bool Rand::randomize(void *buffer, size_t length, MRef<SipSim *> sim)
 	        }
 	}
 	if(sim->getRandomValue(tempBufferPtr, 16)){
-	        memcpy(&((unsigned char *))buffer[index], tempBufferPtr, left);
+	        memcpy(&((unsigned char *)buffer)[index], tempBufferPtr, left);
 		delete [] tempBufferPtr;
 		return true;
 	}
