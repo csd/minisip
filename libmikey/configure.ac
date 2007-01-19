@@ -25,6 +25,17 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
+dnl G-D HW authentication token support
+AC_ARG_ENABLE(scsim,
+    AS_HELP_STRING([--enable-scsim],
+            [enable G-D HW authentication token (SmartCard) support (default disabled)]))
+    if test "${enable_scsim}" = "yes" 
+    then
+        AC_DEFINE(SCSIM_SUPPORT, [], [SCSIM support])
+    fi
+AM_CONDITIONAL(SCSIM_SUPPORT, test "${enable_scsim}" = "yes")
+
+
 dnl Checks for libraries.
 
 dnl Checks for header files.

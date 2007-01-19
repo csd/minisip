@@ -30,7 +30,11 @@
 #include<string.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/rand.h>
+
+#ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>
+#warning hello world
+#endif
 
 using namespace std;
 
@@ -263,9 +267,13 @@ void KeyAgreement::genTek( unsigned char csId,
 			tek, tekLength, KEY_DERIV_TEK );
 }
 
+#ifdef SCSIM_SUPPORT
+
 void KeyAgreement::genTekFromCard(unsigned char csId, unsigned char * tek, unsigned int tekLength){
 	dynamic_cast<SipSimSmartCardGD *>(*sim)->getTek(csId, csbIdValue, tgkPtr, tgkLengthValue, tek, tekLength);
+
 }
+#endif
 
 void KeyAgreement::genSalt( unsigned char csId,
 			     unsigned char * salt, unsigned int saltLength ){
