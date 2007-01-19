@@ -714,6 +714,69 @@ string gtls_certificate::get_cn(){
 	
 }
 
+std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
+	int ret;
+	char * buf;
+	size_t bufSize = 1024;
+	gnutls_x509_subject_alt_name_t gType;
+	vector<string> output;
+
+	switch( type ){
+		case SAN_DNSNAME: gType = GNUTLS_SAN_DNSNAME; break;
+		case SAN_RFC822NAME: gType = GNUTLS_SAN_RFC822NAME; break;
+		case SAN_URI: gType = GNUTLS_SAN_URI; break;
+		case SAN_IPADDRESS: gType = GNUTLS_SAN_IPADDRESS; break;
+		default:
+			throw certificate_exception( "Unsupported SubjectAltName type" );
+	}
+
+	buf = (char *)malloc( bufSize );
+	if( buf == NULL ){
+		throw certificate_exception_init(
+			"Not enough memory" );
+	}
+
+	for( int i = 0;;i++ ){
+		size_t size = bufSize;
+		ret = gnutls_x509_crt_get_subject_alt_name( cert, i,
+							    buf, &size, NULL );
+
+		/* This should not happen very often */
+		if( ret == GNUTLS_E_SHORT_MEMORY_BUFFER ){
+			bufSize = size;
+			buf = (char *) realloc( buf, bufSize );
+			if( buf == NULL ){
+				throw certificate_exception_init(
+					"Not enough memory" );
+			}
+
+			ret = gnutls_x509_crt_get_subject_alt_name( cert, i,
+								    buf, &size,
+								    NULL );
+		}
+
+		if( ret == gType ){
+			string name( buf, size );
+
+			output.push_back( name );
+		}
+		else if( ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE ){
+			break;
+		}
+		else if( ret == GNUTLS_E_X509_UNKNOWN_SAN ){
+			continue;
+		}
+		else if( ret < 0 ){
+			cerr << "GNUTLS error " << gnutls_strerror( ret ) << endl;
+			throw certificate_exception(
+				"An error occured in get_alt_name()" );
+		}
+	}
+
+	free( buf );
+	return output;
+}
+
 string gtls_certificate::get_issuer(){
 	int ret;
 	char * buf;

@@ -128,6 +128,7 @@ class LIBMCRYPTO_API ossl_certificate: public certificate{
 
 		std::string get_name();
 		std::string get_cn();
+		std::vector<std::string> get_alt_name( SubjectAltName type );
 		std::string get_issuer();
 		std::string get_issuer_cn();
 

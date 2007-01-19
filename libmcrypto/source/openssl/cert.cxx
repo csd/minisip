@@ -32,6 +32,7 @@ extern "C"{
 	#include<openssl/evp.h>
 	#include<openssl/objects.h>
 	#include<openssl/x509.h>
+	#include<openssl/x509v3.h>
 	#include<openssl/err.h>
 	#include<openssl/pem.h>
 	#include<openssl/ssl.h>
@@ -47,6 +48,16 @@ extern "C"{
 #include <fstream>
 
 using namespace std;
+
+static string NAME_to_string( X509_NAME * x509Name ){
+	char *name = X509_NAME_oneline( x509Name, 0, 0 );
+	string ret( name );
+
+	CRYPTO_free( name );
+	name = NULL;
+	return ret;
+}
+
 
 //
 // Factory methods
@@ -422,10 +433,7 @@ void ossl_certificate::get_der( unsigned char * output, unsigned int * length ){
 }
 
 string ossl_certificate::get_name(){
-	string ret(
-		X509_NAME_oneline( X509_get_subject_name( cert ),0 ,0 ));
-
-	return ret;
+	return NAME_to_string( X509_get_subject_name( cert ) );
 }
 
 string ossl_certificate::get_cn(){
@@ -443,11 +451,74 @@ string ossl_certificate::get_cn(){
 	return name.substr( pos + 4, pos2 - pos - 4 );
 }
 
-string ossl_certificate::get_issuer(){
-	string ret(
-		X509_NAME_oneline( X509_get_issuer_name( cert ),0 ,0 ));
+vector<string> ossl_certificate::get_alt_name( SubjectAltName type ){
+	vector<string> output;
 
-	return ret;
+	int genType = -1;
+	switch( type ){
+		case SAN_DNSNAME:
+			genType = GEN_DNS;
+			break;
+		case SAN_RFC822NAME:
+			genType = GEN_EMAIL;
+			break;
+		case SAN_URI:
+			genType = GEN_URI;
+			break;
+		case SAN_IPADDRESS:
+			// Unsupported
+// 			genType = GEN_IPADD;
+// 			break;
+		default:
+			return output;
+	}
+
+	int pos = -1;
+ 	pos = X509_get_ext_by_NID(cert, NID_subject_alt_name, -1);
+	if( pos == -1 ){
+		return output;
+	}
+
+	X509_EXTENSION * ext = X509_get_ext( cert, pos );
+	if( !ext ){
+		return output;
+	}
+
+	STACK_OF(GENERAL_NAMES) * altNames = NULL;
+	altNames = (STACK_OF(GENERAL_NAMES)*) X509V3_EXT_d2i( ext );
+	if( !altNames ){
+		return output;
+	}
+
+	int altNamesCount = sk_GENERAL_NAME_num( altNames );
+	for( int i=0; i < altNamesCount; i++ ){
+		GENERAL_NAME * name = sk_GENERAL_NAME_value( altNames, i );
+
+		if( name->type == genType ){
+			ASN1_IA5STRING * ia5 = NULL;
+
+			ia5 = name->d.ia5;
+			
+			size_t len = ASN1_STRING_length( ia5 );
+			char buf[ len + 1 ];
+			strncpy( buf, (const char*)ASN1_STRING_data( ia5 ),
+				 len );
+
+			string str( buf, len );
+
+			output.push_back( str );
+		}
+
+	}
+
+	GENERAL_NAMES_free( altNames );
+	altNames = NULL;
+
+	return output;
+}
+
+string ossl_certificate::get_issuer(){
+	return NAME_to_string( X509_get_issuer_name( cert ) );
 }
 
 string ossl_certificate::get_issuer_cn(){
@@ -548,6 +619,9 @@ int ossl_certificate::control( ca_db * cert_db ){
 		cerr << X509_verify_cert_error_string( cert_store_ctx.error ) << endl;
 	}
 #endif
+
+	X509_STORE_CTX_cleanup( &cert_store_ctx );
+
 	return result;
 }
 	
@@ -669,5 +743,10 @@ int ossl_certificate_chain::control( MRef<ca_db *> cert_db){
 		cerr << X509_verify_cert_error_string( cert_store_ctx.error ) << endl;
 	}
 #endif
+
+	X509_STORE_CTX_cleanup( &cert_store_ctx );
+	sk_X509_free( cert_stack );
+	cert_stack = NULL;
+
 	return result;
 }

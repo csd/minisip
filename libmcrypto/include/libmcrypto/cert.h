@@ -114,6 +114,13 @@ class LIBMCRYPTO_API priv_key: public MObject{
 
 class LIBMCRYPTO_API certificate: public MObject{
 	public:
+		enum SubjectAltName{
+			SAN_DNSNAME = 1,
+			SAN_RFC822NAME,
+			SAN_URI,
+			SAN_IPADDRESS
+		};
+
 		static certificate* load( const std::string cert_filename );
 		static certificate* load( const std::string cert_filename,
 					  const std::string private_key_filename );
@@ -163,6 +170,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 
 		virtual std::string get_name()=0;
 		virtual std::string get_cn()=0;
+		virtual std::vector<std::string> get_alt_name( SubjectAltName type )=0;
 		virtual std::string get_issuer()=0;
 		virtual std::string get_issuer_cn()=0;
 
