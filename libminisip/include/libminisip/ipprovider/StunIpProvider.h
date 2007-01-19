@@ -42,9 +42,10 @@ class LIBMINISIP_API StunIpProvider: public IpProvider{
 		virtual std::string getMemObjectType() const {return "StunIpProvider";};
 
 	private:
-		StunIpProvider( uint32_t natType, std::string externalIp, IPAddress * stunIp, uint16_t stunPort );
+		StunIpProvider( uint32_t natType, std::string externalIp, MRef<IPAddress *> stunIp, uint16_t stunPort );
+		virtual ~StunIpProvider();
 
-		IPAddress * stunIp;
+		MRef<IPAddress *> stunIp;
 		uint16_t stunPort;
 		std::string externalIp;
 		uint32_t natType;

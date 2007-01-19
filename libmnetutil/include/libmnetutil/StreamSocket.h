@@ -32,7 +32,6 @@
 
 
 class IPAddress;
-class IP4Address;
 
 class LIBMNETUTIL_API StreamSocket : public Socket {
 	public:

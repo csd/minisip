@@ -49,7 +49,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 #include<vector>
 #include<libminisip/stun/STUN.h>
 #include<libminisip/p2t/RtcpAPP.h>
@@ -88,18 +88,20 @@ RtcpReceiver::RtcpReceiver(MRef<SipSoftPhoneConfiguration*> config, int RTPport)
 	//set contact ip and port with STUN    
 	if (config->useSTUN){
             uint16_t stunPort = config->stunServerPort;
-            IP4Address localAddr(config->inherited->localIpString);
-            IP4Address stunAddr(config->stunServerIpString);
+            MRef<IPAddress*> localAddr =
+		    IPAddress::create(config->inherited->localIpString, false);
+            MRef<IPAddress*> stunAddr =
+		    IPAddress::create(config->stunServerIpString, false);
 ///            cerr << "local ip="<<phoneConf->inherited.localIpString<< endl;
 //            uint16_t localPort = rtcp_sock->getPort();
             char mappedip[16];
             uint16_t mappedport;
 #ifdef DEBUG_OUTOUT
-            cerr << BREW <<"Doing STUN request from "<<localAddr.get_String()<<":"<<
+            cerr << BREW <<"Doing STUN request from "<<localAddr->get_String()<<":"<<
                 localPort<<" to STUN server "<<stunIp.get_String()<<":"<<
                 stunPort<<"."<< PLAIN<< endl;
 #endif
-            STUN::getExternalMapping(   stunAddr, 
+            STUN::getExternalMapping(   **stunAddr, 
                                         stunPort, 
                                         *rtcp_sock,
                                         mappedip, 

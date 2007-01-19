@@ -28,8 +28,7 @@
 #include<libminisip/p2t/GroupListServer.h>
 #include <ctype.h>
 #include<libmutil/dbg.h>
-#include<libmnetutil/IP4Address.h>
-#include<libmnetutil/IP4ServerSocket.h>
+#include<libmnetutil/ServerSocket.h>
 #include<libminisip/mediahandler/MediaHandler.h>
 
 GroupListServer::GroupListServer(MRef<SipSoftPhoneConfiguration*>config,  int32_t localPort){
@@ -37,7 +36,7 @@ GroupListServer::GroupListServer(MRef<SipSoftPhoneConfiguration*>config,  int32_
 
 	
 	//initialize the socket
-	srv_socket = new IP4ServerSocket(localPort);
+	srv_socket = ServerSocket::create(localPort);
 	//srv_socket->listen(config->inherited.externalContactIP, localPort, 20);
 	
 	//set local variables

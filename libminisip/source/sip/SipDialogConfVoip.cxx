@@ -61,7 +61,6 @@
 #include<libmutil/MemObject.h>
 #include <iostream>
 #include<time.h>
-#include<libmnetutil/IP4Address.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

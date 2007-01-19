@@ -141,7 +141,7 @@ static bool isLocalIP(uint32_t ip, vector<string> &localIPs){
 }
 */
 
-void STUN::getExternalMapping(IP4Address &stunAddr, 
+void STUN::getExternalMapping(IPAddress &stunAddr, 
 		uint16_t stunPort, 
 		UDPSocket &socket, 
 		char *bufferMappedIP, 
@@ -168,10 +168,10 @@ void STUN::getExternalMapping(IP4Address &stunAddr,
 }
 
 
-int STUN::getNatType(IP4Address &stunAddr, 
+int STUN::getNatType(IPAddress &stunAddr, 
                 uint16_t stunPort, 
                 UDPSocket &socket, 
-//                IP4Address &localIP, 
+//                IPAddress &localIP, 
                 vector<string> localIPs,
                 uint16_t localPort)
 {
@@ -180,10 +180,10 @@ int STUN::getNatType(IP4Address &stunAddr,
 }
 
 
-int STUN::getNatType(IP4Address &stunAddr, 
+int STUN::getNatType(IPAddress &stunAddr, 
                     uint16_t stunPort, 
                     UDPSocket &socket, 
-//                    IP4Address &localIP, 
+//                    IPAddress &localIP, 
                     vector<string> localIPs,
                     uint16_t localPort, 
                     char* bufferMappedIP, 
@@ -237,10 +237,10 @@ int STUN::getNatType(IP4Address &stunAddr,
 			char tmp[16];
 			NetworkFunctions::binIp2String(firstTestChangedIP, tmp);
 //			IP4Address changedAddr(binIp2String(firstTestChangedIP));
-			IP4Address changedAddr(tmp);
+			MRef<IPAddress*> changedAddr = IPAddress::create(tmp);
 
 			
-			message = STUNTest::test(&changedAddr, firstTestChangedPort, socket, true, true);
+			message = STUNTest::test(*changedAddr, firstTestChangedPort, socket, true, true);
 			if (message==NULL)
 				return STUN_ERROR;
 

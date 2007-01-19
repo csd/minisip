@@ -21,7 +21,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/TimeoutProvider.h>

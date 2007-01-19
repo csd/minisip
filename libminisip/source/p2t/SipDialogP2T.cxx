@@ -46,7 +46,6 @@
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
-#include<libmnetutil/IP4Address.h>
 
 
 bool SipDialogP2T::a0_idle_talkreq( const SipSMCommand &command){

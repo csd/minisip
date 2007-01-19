@@ -21,7 +21,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/TimeoutProvider.h>
@@ -31,7 +31,8 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-	IP4Address addr("stun.fwdnet.net");
+	MRef<IPAddress *> addr =
+		IPAddress::create("stun.fwdnet.net", false);
 	unsigned short stunPort = 3478;
 	UDPSocket sock;
 
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
 	unsigned short testPort = 5060;
 	char tmp[16];
 	uint16_t mappedPort;
-	int type = STUN::getNatType(addr, stunPort, sock, 
+	int type = STUN::getNatType(**addr, stunPort, sock, 
 			localAddr, testPort, tmp, mappedPort);
 	cerr << "The NAT type is "<< STUN::typeToString(type)<< endl;
 	cerr << "External mapping is: "<< tmp << ":" << mappedPort << endl;

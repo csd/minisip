@@ -27,7 +27,7 @@
 #include<libmstun/STUNTest.h>
 
 #include<libmutil/merror.h>
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
 
 #ifdef LINUX
@@ -42,7 +42,7 @@
 #include<stdio.h>
 
 STUNMessage *STUNTest::test(
-		IP4Address *addr, 
+		IPAddress *addr, 
 		uint16_t port, 
 		UDPSocket &sock, 
 		bool changeIP, 

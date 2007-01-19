@@ -3,17 +3,8 @@ if ENABLE_SRP
 srp_src += libmnetutil/TlsSrpSocket.h
 endif
 
-ipv6_headers = 
-if HAVE_IPV6
-ipv6_headers += \
-			libmnetutil/IP6Address.h \
-			libmnetutil/IP6ServerSocket.h
-endif
-
-pkginclude_HEADERS =    libmnetutil/IP4Address.h \
-			libmnetutil/IP4ServerSocket.h \
+pkginclude_HEADERS =    \
 			$(srp_src) \
-			$(ipv6_headers) \
 			libmnetutil/IPAddress.h \
 			libmnetutil/NetworkException.h \
 			libmnetutil/NetworkFunctions.h \
@@ -26,7 +17,12 @@ pkginclude_HEADERS =    libmnetutil/IP4Address.h \
 			libmnetutil/DatagramSocket.h \
 			libmnetutil/libmnetutil_config.h
 
-noinst_HEADERS = 	config.h
+noinst_HEADERS = 	\
+			config.h \
+			libmnetutil/IP4Address.h \
+			libmnetutil/IP4ServerSocket.h \
+			libmnetutil/IP6Address.h \
+			libmnetutil/IP6ServerSocket.h
 
 MAINTAINERCLEANFILES =	$(srcdir)/Makefile.in \
 			$(srcdir)/compilation_config.h.in \

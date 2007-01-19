@@ -30,7 +30,7 @@
 #include<libmstun/STUNMessage.h>
 
 #include<libmnetutil/UDPSocket.h>
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 
 /**
  * Declares the test used by the STUN client to determine the type of NAT.
@@ -55,7 +55,7 @@ class LIBMSTUN_API STUNTest{
 		 * @return	Returns the STUN message received from the
 		 * 		server.
 		*/
-		static STUNMessage *test(IP4Address *addr, uint16_t port, UDPSocket &sock, bool changeIP, bool changePort);
+		static STUNMessage *test(IPAddress *addr, uint16_t port, UDPSocket &sock, bool changeIP, bool changePort);
 };
 
 #endif

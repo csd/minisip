@@ -26,7 +26,6 @@
 
 #include<libminisip/sip/DefaultDialogHandler.h>
 
-#include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
 #include<libmsip/SipDialogRegister.h>

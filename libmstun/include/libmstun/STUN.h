@@ -31,7 +31,7 @@
 #include<stdint.h>
 #endif
 
-#include<libmnetutil/IP4Address.h>
+#include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
 #include<vector>
 
@@ -105,10 +105,10 @@ class LIBMSTUN_API STUN{
 		 * @return 		Integer representing what kind of 
 		 * 			NAT is detected in the network.
 		*/
-		static int getNatType(IP4Address &stunAddr, 
+		static int getNatType(IPAddress &stunAddr, 
 				uint16_t stunPort, 
 				UDPSocket &socket,
-//				IP4Address &localAddr,
+//				IPAddress &localAddr,
                                 std::vector<std::string> localIPs,
 				uint16_t localPort,
 				char *mappedIPBuffer,
@@ -118,10 +118,10 @@ class LIBMSTUN_API STUN{
 		 * Same as above, but the mapping arguments are left out.
 		 * @see getNatType(stunAddr, stunPort, socket, localAddr, localPort, mappedIPBuffer, mappedPort)
 		*/
-		static int getNatType(IP4Address &stunAddr, 
+		static int getNatType(IPAddress &stunAddr, 
 				uint16_t stunPort, 
 				UDPSocket &socket,
-//				IP4Address &localAddr,
+//				IPAddress &localAddr,
                                 std::vector<std::string> localIPs,
 				uint16_t localPort);
 		
@@ -131,7 +131,7 @@ class LIBMSTUN_API STUN{
 		 * The external IP/port mapping done by a firewall for 
 		 * a specific local IP/port can be found using this function.
 		*/
-		static void getExternalMapping(IP4Address &stunAddr, 
+		static void getExternalMapping(IPAddress &stunAddr, 
 				uint16_t stunPort, 
 				UDPSocket &socket, 
 				char *mappedIPBuffer, 

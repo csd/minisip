@@ -26,7 +26,6 @@
 #include<config.h>
 
 #include<libmsip/SipDialogConfig.h>
-#include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/massert.h>

@@ -33,7 +33,6 @@
 #include<config.h>
 
 #include<libminisip/sdp/SdpPacket.h>
-#include<libmnetutil/IP4Address.h>
 #include<libmnetutil/NetworkException.h>
 
 #include<libmutil/stringutils.h>

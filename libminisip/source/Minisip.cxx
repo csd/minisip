@@ -48,10 +48,8 @@
 #include<libmutil/MPlugin.h>
 #include<libmutil/Library.h>
 
-#include<libmnetutil/IP4Address.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/IP4ServerSocket.h>
 #include<libmnetutil/NetUtil.h>
 #include<libmnetutil/NetworkException.h>
 
