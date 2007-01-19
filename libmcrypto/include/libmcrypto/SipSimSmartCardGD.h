@@ -59,14 +59,14 @@ public:
 	bool getSignature(unsigned char * dataPtr, int dataLength, unsigned char *signaturePtr, int& signatureLength, 
 			bool doHash, int hash_alg=HASH_SHA1);
 
-/* the first one is for Diffie-Hellman key agreement whereas the second one is for Public key based key agreement*/
-	virtual bool getTekDh(unsigned char csId, unsigned long csbIdValue,
-						  unsigned long dhPublicValueLength, unsigned char * dhPublicValuePtr,
-						  unsigned long & tekLength, unsigned char * tekPtr);
+/* this method returns the tek which is calculated in the pseudo random function implemented on smart card*/
+	bool getTek(unsigned char csId, unsigned long csbIdValue,
+		    unsigned char * tgkPtr, unsigned long tgkLength,
+		    unsigned char * tekPtr, unsigned long tekLength);
 
-	virtual bool getTekPk(unsigned char csId, unsigned long csbIdValue,
+	/*virtual bool getTekPk(unsigned char csId, unsigned long csbIdValue,
 						  unsigned long tgkLength, unsigned char * tgkPtr,
-	                      unsigned long & tekLength, unsigned char * tekPtr);
+	                      unsigned long & tekLength, unsigned char * tekPtr);*/
 	           
 
 /* Diffie-Hellman specific SIM functions */

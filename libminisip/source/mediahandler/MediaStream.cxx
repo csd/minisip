@@ -179,8 +179,17 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 		uint8_t auth  = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_ON_OFF);
 		uint8_t autht = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_AUTH_TAGL);
 		//uint8_t prefi = ka->getPolicyParamTypeValue(policyNo, MIKEY_PROTO_SRTP, MIKEY_SRTP_PREFIX);	 //Not used
-
-		ka->genTek( csId,  masterKey,  16 );
+		if(!ka->useSim)
+			ka->genTek( csId,  masterKey,  16 );
+		else{
+#ifdef ENABLE_TS
+			ts.save(TEK_START);
+#endif
+			ka->genTekFromCard(csId, masterKey, 16);
+#ifdef ENABLE_TS	
+			ts.save(TEK_STOP);
+#endif
+		}
 		ka->genSalt( csId, masterSalt, 14 );
 
 #ifdef DEBUG_OUTPUT

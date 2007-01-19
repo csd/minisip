@@ -32,9 +32,9 @@ class SipSimPk : public virtual SipSim {
 public:
 	SipSimPk();
 	~SipSimPk();
-	virtual bool getTekPk(unsigned char csId, unsigned long csbIdValue,
+     /*	virtual bool getTekPk(unsigned char csId, unsigned long csbIdValue,
 						  unsigned long tgkLength, unsigned char * tgkPtr, 
-						  unsigned long & tekLength, unsigned char * tekPtr) = 0;
+						  unsigned long & tekLength, unsigned char * tekPtr) = 0;*/
 };
 
 #endif

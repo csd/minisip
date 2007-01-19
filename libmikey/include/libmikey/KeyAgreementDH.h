@@ -38,7 +38,6 @@ class OakleyDH;
 class certificate_chain;
 class certificate;
 class ca_db;
-class SipSim;
 
 class LIBMIKEY_API PeerCertificates {
 	public:
@@ -95,11 +94,7 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
 
 		MikeyMessage* createMessage();
 
-		MRef<SipSim*> getSim();
-
-		bool useSim;
 	private:
-		MRef<SipSim *> sim;
 };
 
 #endif

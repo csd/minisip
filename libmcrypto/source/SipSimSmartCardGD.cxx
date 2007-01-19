@@ -367,16 +367,16 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 }
 
 
-bool SipSimSmartCardGD::getTekDh(unsigned char csId, unsigned long csbIdValue,
-					 unsigned long dhPublicValueLength, unsigned char * dhPublicValuePtr,
-					 unsigned long & tekLength, unsigned char * tekPtr){
+bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
+			       unsigned char * tgkPtr, unsigned long tgkLength,
+			       unsigned char * tekPtr, unsigned long tekLength){
 
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
 		
-		unsigned char * tempPublicVauleLength;
-		tempPublicVauleLength = (unsigned char *) & dhPublicValueLength;
+		unsigned char * tempLength;
+		tempLength = (unsigned char *) & tgkLength;
 		
-		sendBufferLength = dhPublicValueLength + 6;
+		sendBufferLength = tgkLength + 11;
 		recvBufferLength = 255;
 		
 		clearBuffer();
@@ -389,14 +389,14 @@ bool SipSimSmartCardGD::getTekDh(unsigned char csId, unsigned long csbIdValue,
 		sendBuffer[1] = 0x44;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
-		sendBuffer[4] = tempPublicVauleLength[0];
+		sendBuffer[4] = tempLength[0];
 		sendBuffer[5] = csId;
 		sendBuffer[6] = (unsigned char)((csbIdValue) >> 24 & 0xFF);
 		sendBuffer[7] = (unsigned char)((csbIdValue) >> 16 & 0xFF);
 		sendBuffer[8] = (unsigned char)((csbIdValue) >> 8 & 0xFF);
 		sendBuffer[9] = (unsigned char)(csbIdValue & 0xFF);
-		memcpy(&sendBuffer[10], dhPublicValuePtr, dhPublicValueLength);
-		sendBuffer[dhPublicValueLength + 10] = 0xFF;
+		memcpy(&sendBuffer[10], tgkPtr, tgkLength);
+		sendBuffer[tgkLength + 10] = 0xFF;
 		
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
@@ -410,7 +410,7 @@ bool SipSimSmartCardGD::getTekDh(unsigned char csId, unsigned long csbIdValue,
 				clearBuffer();
 				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
 		}
-		tekLength = recvBufferLength - 2;
+	//	tekLength = recvBufferLength - 2;
 		memcpy(tekPtr, recvBuffer, tekLength);
 		clearBuffer();
 		return true;
@@ -421,11 +421,11 @@ bool SipSimSmartCardGD::getTekDh(unsigned char csId, unsigned long csbIdValue,
 }
 
 
-bool SipSimSmartCardGD::getTekPk(unsigned char csId, unsigned long csbIdValue,
-								 unsigned long tgkLength, unsigned char * tgkPtr,
-                                 unsigned long & tekLength, unsigned char * tekPtr){
+/*bool SipSimSmartCardGD::getTekPk(unsigned char csId, unsigned long csbIdValue,
+				    unsigned long tgkLength, unsigned char * tgkPtr,
+                                   unsigned long & tekLength, unsigned char * tekPtr){
 	return true;
-}
+}*/
 
 bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr){
 

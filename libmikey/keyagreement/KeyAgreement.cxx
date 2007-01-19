@@ -30,6 +30,7 @@
 #include<string.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/rand.h>
+#include<libmcrypto/SipSimSmartCardGD.h>
 
 using namespace std;
 
@@ -40,10 +41,19 @@ KeyAgreement::KeyAgreement():
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),
 	csbIdValue(0), 
-	csIdMapPtr(NULL), nCsValue(0){
+	csIdMapPtr(NULL), nCsValue(0), useSim(false){
 	//policy = list<Policy_type *>::list();
 	kvPtr = new KeyValidityNull();
 
+}
+
+KeyAgreement::KeyAgreement(MRef<SipSim *> sim):
+	tgkPtr(NULL), tgkLengthValue(0),
+	randPtr(NULL), randLengthValue(0),
+	csbIdValue(0), 
+	csIdMapPtr(NULL), nCsValue(0), useSim(true){
+		kvPtr = new KeyValidityNull();
+		this->sim = sim;
 }
 
 KeyAgreement::~KeyAgreement(){
@@ -251,6 +261,10 @@ void KeyAgreement::genTek( unsigned char csId,
 			    unsigned char * tek, unsigned int tekLength ){
 	keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, 
 			tek, tekLength, KEY_DERIV_TEK );
+}
+
+void KeyAgreement::genTekFromCard(unsigned char csId, unsigned char * tek, unsigned int tekLength){
+	dynamic_cast<SipSimSmartCardGD *>(*sim)->getTek(csId, csbIdValue, tgkPtr, tgkLengthValue, tek, tekLength);
 }
 
 void KeyAgreement::genSalt( unsigned char csId,
@@ -505,6 +519,10 @@ uint8_t KeyAgreement::getPolicyParamTypeValue(uint8_t policy_No, uint8_t prot_ty
 		break;
 	}
 	return 0;
+}
+
+MRef<SipSim *> KeyAgreement::getSim(){
+	return sim;
 }
 
 Policy_type::Policy_type(uint8_t policy_No, uint8_t prot_type, uint8_t policy_type, uint8_t length, byte_t * value){

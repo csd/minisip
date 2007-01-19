@@ -33,9 +33,9 @@ public:
 	SipSimDh();
 	~SipSimDh();
 	virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValue) = 0;
-	virtual bool getTekDh(unsigned char csId, unsigned long csbIdValue,
+	/*virtual bool getTekDh(unsigned char csId, unsigned long csbIdValue,
 						  unsigned long dhPublicValueLength, unsigned char * dhPublicValuePtr, 
-						  unsigned long & tekLength, unsigned char * tekPtr) = 0;
+						  unsigned long & tekLength, unsigned char * tekPtr) = 0;*/
 };
 
 #endif

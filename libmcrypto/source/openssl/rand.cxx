@@ -33,5 +33,27 @@ bool Rand::randomize(void *buffer, size_t length)
 
 bool Rand::randomize(void * buffer, size_t length, MRef<SipSim *> sim)
 {
-	return sim->getRandomValue((unsigned char*)buffer, length);
+	unsigned char * tempBufferPtr = new unsigned char[16];
+	int index = 0;
+	int left = length;
+	while(left > 16){
+		if(sim->getRandomValue(tempBufferPtr, 16)){
+			memcpy(&((unsigned char *)buffer)[index], tempBufferPtr, 16);
+			index += 16;
+			left -= 16;
+		}
+		else{
+			delete [] tempBufferPtr;
+			return false;
+		}
+	}
+	if(sim->getRandomValue(tempBufferPtr, 16)){
+		memcpy(&((unsigned char *)buffer)[index], tempBufferPtr, left);
+		delete [] tempBufferPtr;
+		return true;
+	}
+	else{
+		delete [] tempBufferPtr;
+		return false;
+	}
 }

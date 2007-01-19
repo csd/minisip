@@ -34,6 +34,7 @@
 #include<libmutil/MemObject.h>
 #include<libmikey/KeyValidity.h>
 #include<libmikey/MikeyCsIdMap.h>
+#include<libmcrypto/SipSim.h>
 
 #include<iostream>
 // different type of key derivation defined in MIKEY
@@ -82,6 +83,7 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 				  public virtual ITgk{
 	public:
 		KeyAgreement();
+		KeyAgreement(MRef<SipSim *> s);
 		~KeyAgreement();
 
 		/* Type of key agreement (DH, PSK, PKE) */
@@ -95,6 +97,8 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		/* TEK and SALT values, derived from the TGK */
 		void genTek( byte_t cs_id,
 			     byte_t * tek, unsigned int tek_length );
+		void genTekFromCard(byte_t cs_id, byte_t * tek, unsigned int tek_length);
+		
 		void genSalt( byte_t cs_id,
 			      byte_t * salt, unsigned int salt_length );
 		
@@ -181,12 +185,17 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 				    byte_t policyNo=0, byte_t csId=0 );
 
 		virtual MikeyMessage* createMessage()=0;
+		
+		bool useSim;
+		MRef<SipSim *> getSim();
 
 	protected:
 		void keyDeriv( byte_t cs_id, unsigned int csb_id,
 		        	byte_t * inkey, unsigned int inkey_length,
 		        	byte_t * key, unsigned int key_length,
 			   	int type );
+
+		MRef<SipSim *> sim;
 
 	private:
 		/* Security Policy 

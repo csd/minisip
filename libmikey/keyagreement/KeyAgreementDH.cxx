@@ -89,15 +89,13 @@ KeyAgreementDHBase::~KeyAgreementDHBase(){
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
 	KeyAgreement(),
-	PeerCertificates( certChainPtr, certDbPtr ),
-	useSim(false)
+	PeerCertificates( certChainPtr, certDbPtr )
 {
 }
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
-	PeerCertificates( s->getCertificateChain(), s->getCAs() ),
-	useSim(true),
-	sim(s)
+	KeyAgreement(s),
+	PeerCertificates( s->getCertificateChain(), s->getCAs() )
 {
 
 }
@@ -195,6 +193,3 @@ MikeyMessage* KeyAgreementDH::createMessage(){
 	return MikeyMessage::create( this );
 }
 
-MRef<SipSim*> KeyAgreementDH::getSim(){
-	return sim;
-}
