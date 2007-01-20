@@ -23,14 +23,19 @@
 #ifndef ACCOUNT_DIALOG
 #define ACCOUNT_DIALOG
 
+#include<libmutil/MemObject.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libglademm/xml.h>
 #include<gtkmm.h>
 
 class AccountsList;
+class CertificateDialog;
+class SecuritySettings;
 
 class AccountDialog{
 	public:
 		AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			       CertificateDialog * certDialog,
 			       AccountsList * list );
 		~AccountDialog();
 
@@ -38,8 +43,13 @@ class AccountDialog{
 		void editAccount( Gtk::TreeModel::iterator iter );
 	private:
 
+		void reset();
+		void apply( Gtk::TreeModel::iterator iter );
 		void requiresAuthCheckChanged();
 		void autodetectProxyCheckChanged();
+
+		Glib::RefPtr<Gnome::Glade::Xml> refXml;
+		CertificateDialog * certificateDialog;
 
 		Gtk::Dialog * dialogWindow;
 
@@ -67,10 +77,10 @@ class AccountDialog{
 		Gtk::SpinButton * registerTimeSpin;
 		
 		AccountsList * list;
+		SecuritySettings * securitySettings;
 
+		sigc::connection requiresAuthConn;
+		sigc::connection autodetectProxyConn;
 };
-
-
-
 
 #endif

@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004, 2005
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include"CertificateDialog.h"
@@ -396,6 +397,7 @@ void CertificateDialog::removeCa(){
 
 void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 	certChain = chain;
+	certTreeStore->clear();
 	MRef<certificate *> item;
 
 	if( chain.isNull() ){
@@ -406,6 +408,7 @@ void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 	item = chain->get_first();
         if( !item.isNull() ){
                 cert = item;
+		certTreeView->set_sensitive( true );
                 addCertButton->set_sensitive( true );
                 removeCertButton->set_sensitive( true );
                 pkeyButton->set_sensitive( true );
@@ -444,6 +447,7 @@ void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
 	MRef<ca_db_item*> item = NULL;
 
         this->caDb = caDb;
+	caListStore->clear();
         if( caDb.isNull() ){
                 return;
         }
@@ -457,6 +461,14 @@ void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
                 item = caDb->get_next();
         }
         caDb->unlock();
+}
+
+MRef<certificate_chain*> CertificateDialog::getCertChain() const{
+	return certChain;
+}
+
+MRef<ca_db*> CertificateDialog::getRootCa() const{
+	return caDb;
 }
 
 CertTreeStore::CertTreeStore(){
@@ -559,4 +571,8 @@ MRef<ca_db_item*> CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
 
 	listStore->erase( selectedItem );
 	return ret;
+}
+
+void CaListStore::clear(){
+	listStore->clear();
 }

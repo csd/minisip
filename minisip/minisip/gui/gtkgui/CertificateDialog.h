@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #ifndef CERTIFICATEDIALOG_H
@@ -41,6 +42,9 @@ class CertificateDialog
 	public:
 		CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 		~CertificateDialog();
+
+		MRef<certificate_chain*> getCertChain() const;
+		MRef<ca_db*> getRootCa() const;
 
 		void setCertChain( MRef<certificate_chain *> chain );
 		void setRootCa( MRef<ca_db *> caDb );
@@ -124,6 +128,7 @@ class CaListStore : public MObject{
 		void associateTreeView( Gtk::TreeView * caTreeView );
 		bool isEmpty();
 		MRef<ca_db_item*> remove( Gtk::TreeModel::iterator );
+		void clear();
 
 	private:
 		Gtk::TreeModelColumn<Glib::ustring> typeColumn;

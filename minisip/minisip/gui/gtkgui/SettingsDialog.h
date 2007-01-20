@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004-2006
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -49,8 +49,7 @@ class SettingsDialog
 #endif
 {
 	public:
-		SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml, 
-				CertificateDialog * certDialog );
+		SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 		~SettingsDialog();
 
 		int run();
@@ -67,8 +66,6 @@ class SettingsDialog
 		MRef<CommandReceiver*> callback;
 		//GuiCallback * callback;
 
-		CertificateDialog * certificateDialog;
-		Gtk::Button * certificateButton;
 		Gtk::Dialog * dialogWindow;
 		GeneralSettings * generalSettings;
 		MediaSettings * mediaSettings;
@@ -197,16 +194,22 @@ class SecuritySettings
 {
 
 	public:
-		SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+				  CertificateDialog * certDialog );
+		~SecuritySettings();
 
 		 std::string apply();
 		
-		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+		void setConfig( MRef<SipIdentity *> identity );
+
+		void reset();
 
 	private:
 
 		void kaChange();
 		void secureChange();
+
+		CertificateDialog * certDialog;
 
 		Gtk::CheckButton * dhCheck;
 		Gtk::CheckButton * certCheck;
@@ -225,9 +228,14 @@ class SecuritySettings
 		Gtk::RadioButton * dhhmacRadio;
 		Gtk::RadioButton * rsarRadio;
 
+		Gtk::Button * certificateButton;
 
-		MRef<SipSoftPhoneConfiguration *> config;
+		MRef<SipIdentity *> identity;
 
+		sigc::connection dhConn;
+		sigc::connection pskConn;
+		sigc::connection secureConn;
+		sigc::connection certificateConn;
 };
 
 class AdvancedSettings

@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #ifndef ACCOUNTS_LIST_H
@@ -29,12 +30,14 @@
 
 
 class AccountsListColumns;
+class CertificateDialog;
 class SipSoftPhoneConfiguration;
 class SipIdentity;
 
 class AccountsList : public MObject, public Gtk::ListStore{
 	public:
 		static Glib::RefPtr<AccountsList> create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+							  CertificateDialog * certDialog,
 							  AccountsListColumns * columns );
 		void loadFromConfig( MRef<SipSoftPhoneConfiguration *> config );
 		std::string saveToConfig( MRef<SipSoftPhoneConfiguration *> config );
@@ -51,9 +54,11 @@ class AccountsList : public MObject, public Gtk::ListStore{
 
 	private:
 		AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			      CertificateDialog * certDialog,
 			      AccountsListColumns * columns );
 
 		Glib::RefPtr<Gnome::Glade::Xml> refXml;
+		CertificateDialog * certDialog;
 };
 
 

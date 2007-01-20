@@ -14,16 +14,19 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004, 2005 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
 
 #include"AccountDialog.h"
 #include"AccountsList.h"
+#include"CertificateDialog.h"
+#include"SettingsDialog.h"
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -33,15 +36,25 @@
 #define BIND sigc::bind
 #endif
 
+#ifdef HILDON_SUPPORT
+const int DEFAULT_HEIGHT = 300;
+#else
+const int DEFAULT_HEIGHT = 425;
+#endif
+
 using namespace std;
 
-AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
+			      CertificateDialog * certDialog,
 			      AccountsList * list ):
-		list(list){
-
+		refXml( theRefXml ),
+		certificateDialog( certDialog ),
+		list(list),
+		securitySettings(NULL)
+{
 	refXml->get_widget( "accountDialog", dialogWindow );
 
-	dialogWindow->set_size_request( -1, 300 );
+	dialogWindow->set_size_request( -1, DEFAULT_HEIGHT );
 
 	// Create the active widgets
 	refXml->get_widget( "nameEntry", nameEntry );
@@ -61,10 +74,12 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	refXml->get_widget( "proxyPortSpin", proxyPortSpin );
 	refXml->get_widget( "proxyPortLabel", proxyPortLabel );
 
-	requiresAuthCheck->signal_toggled().connect(
+	requiresAuthConn = requiresAuthCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::requiresAuthCheckChanged ) );
-	autodetectProxyCheck->signal_toggled().connect(
+	autodetectProxyConn = autodetectProxyCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
+	
+	securitySettings = new SecuritySettings( refXml, certDialog );
 
 	autodetectProxyCheckChanged();
 
@@ -72,20 +87,48 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 }
 
 AccountDialog::~AccountDialog(){
+	requiresAuthConn.disconnect();
+	autodetectProxyConn.disconnect();
+
+	delete securitySettings;
+	securitySettings = NULL;
 }
 
 void AccountDialog::addAccount(){
+	reset();
 	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
 		Gtk::TreeModel::iterator iter = list->append();
+		apply( iter );
+	}
+	dialogWindow->hide();
+}
+
+void AccountDialog::reset(){
+	nameEntry->set_text( "" );
+	uriEntry->set_text( "" );
+	
+	autodetectProxyCheck->set_active( false );
+	proxyEntry->set_text( "" );
+	proxyPortSpin->set_value( 5060 );
+	udpRadio->set_active( true );
+
+	requiresAuthCheck->set_active( true );
+	usernameEntry->set_text( "" );
+	passwordEntry->set_text( "" );
+	registerTimeSpin->set_value( 1000 );
+
+	securitySettings->reset();
+}
+
+void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
 		
+		(*iter)[list->columns->autodetectSettings] = autodetectProxyCheck->get_active();
 		if( autodetectProxyCheck->get_active() ){
-			(*iter)[list->columns->autodetectSettings] = true;
 			(*iter)[list->columns->proxy] = "";
 			(*iter)[list->columns->port] = 5060;
 		} else{
-			(*iter)[list->columns->autodetectSettings] = false;
 			(*iter)[list->columns->proxy] = proxyEntry->get_text();
 			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
@@ -102,9 +145,8 @@ void AccountDialog::addAccount(){
 		} else{
 			(*iter)[list->columns->transport] = "UDP";
 		}
-	}
 
-	dialogWindow->hide();
+		securitySettings->apply();
 }
 
 void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
@@ -128,33 +170,17 @@ void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	} else{
 		udpRadio->set_active( true );
 	}
-	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
-		(*iter)[list->columns->name] = nameEntry->get_text();
-		(*iter)[list->columns->uri] = uriEntry->get_text();
-		
-		(*iter)[list->columns->autodetectSettings] = autodetectProxyCheck->get_active();
-		if( autodetectProxyCheck->get_active() ){
-			(*iter)[list->columns->proxy] = "";
-			(*iter)[list->columns->port] = 5060;
-		} else{
-			(*iter)[list->columns->proxy] = proxyEntry->get_text();
-			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
-		}
-		
-		(*iter)[list->columns->defaultProxy] = false;
-		(*iter)[list->columns->pstnProxy] = false;
-		(*iter)[list->columns->username] = usernameEntry->get_text();
-		(*iter)[list->columns->password] = passwordEntry->get_text();
-		(*iter)[list->columns->registerExpires] = registerTimeSpin->get_value_as_int();
-		
-		if( tcpRadio->get_active() ){
-			(*iter)[list->columns->transport] = "TCP";
-		} else if( tlsRadio->get_active() ){
-			(*iter)[list->columns->transport] = "TLS";
-		}else{
-			(*iter)[list->columns->transport] = "UDP";
-		}
+
+	MRef<SipIdentity*> identity = (*iter)[list->columns->identity]; 
+
+	if( identity ){
+		securitySettings->setConfig( identity );
 	}
+
+	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
+		apply( iter );
+	}
+
 	dialogWindow->hide();
 }
 

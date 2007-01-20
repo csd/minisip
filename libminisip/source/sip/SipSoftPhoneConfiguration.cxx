@@ -224,6 +224,28 @@ void SipSoftPhoneConfiguration::save(){
 
 		cert_db->unlock();
 
+		// Remove old ca_file entries
+		for( i = iFile; ; i++ ){
+			string key = accountPath + "ca_file["+itoa(i)+"]";
+
+			if( backend->loadString( key ) == "" ){
+				break;
+			}
+
+			backend->reset( key );
+		}
+
+		// Remove old ca_dir entries
+		for( i = iDir; ; i++ ){
+			string key = accountPath + "ca_dir["+itoa(i)+"]";
+
+			if( backend->loadString( key ) == "" ){
+				break;
+			}
+
+			backend->reset( key );
+		}
+
 
 
 /*From SipDialogSecurity above*/

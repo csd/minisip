@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004-2006
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -22,8 +22,8 @@
 */
 
 #include"SettingsDialog.h"
-#include"CertificateDialog.h"
 #include"AccountsList.h"
+#include"CertificateDialog.h"
 #include<libminisip/gui/Gui.h>
 #include<libminisip/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/mediahandler/MediaCommandString.h>
@@ -41,9 +41,7 @@
 
 using namespace std;
 
-SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
-		                CertificateDialog * certificateDialog){
-	this->certificateDialog = certificateDialog;
+SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "settingsDialog", dialogWindow );
 
 	Gtk::Button * settingsOkButton;
@@ -58,14 +56,9 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	settingsCancelButton->signal_clicked().connect( SLOT( *this, &SettingsDialog::reject ) );
 
 
-	refXml->get_widget( "certificateButton", certificateButton );
-
-	certificateButton->signal_clicked().connect( SLOT( *certificateDialog, &CertificateDialog::run ) );
-	
 	generalSettings = new GeneralSettings( refXml );
 	mediaSettings = new MediaSettings( refXml );
 	deviceSettings = new DeviceSettings( refXml );
-	securitySettings = new SecuritySettings( refXml );
 	advancedSettings = new AdvancedSettings( refXml );
 
 
@@ -80,7 +73,6 @@ SettingsDialog::~SettingsDialog(){
 	delete generalSettings;
 	delete mediaSettings;
 	delete deviceSettings;
-	delete securitySettings;
 	delete advancedSettings;
 	delete dialogWindow;
 }
@@ -98,7 +90,6 @@ void SettingsDialog::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	generalSettings->setConfig( config );
 	mediaSettings->setConfig( config );
 	deviceSettings->setConfig( config );
-	securitySettings->setConfig( config );
 	advancedSettings->setConfig( config );
 	
 }
@@ -122,7 +113,6 @@ void SettingsDialog::accept(){
 	warning += generalSettings->apply();
 	warning += mediaSettings->apply();
 	warning += deviceSettings->apply();
-	warning += securitySettings->apply();
 	warning += advancedSettings->apply();
 	
 	config->save();
@@ -547,7 +537,10 @@ string DeviceSettings::apply(){
 }
 
 
-SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml> refXml,
+				    CertificateDialog * certDialog):
+		certDialog( certDialog ),
+		identity( NULL ){
 	
 	refXml->get_widget( "dhCheck", dhCheck );
 	refXml->get_widget( "certCheck", certCheck );
@@ -571,52 +564,98 @@ SecuritySettings::SecuritySettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "kaTypeLabel", kaTypeLabel );
 
 	refXml->get_widget( "pskLabel", pskLabel );
+	refXml->get_widget( "certificateButton", certificateButton );
 
 	
-	dhCheck->signal_toggled().connect( SLOT( 
+	dhConn = dhCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::kaChange ) );
 	
-	pskCheck->signal_toggled().connect( SLOT( 
+	pskConn = pskCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::kaChange ) );
 
-	secureCheck->signal_toggled().connect( SLOT( 
+	secureConn = secureCheck->signal_toggled().connect( SLOT( 
 		*this, &SecuritySettings::secureChange ) );
 
+	certificateConn = certificateButton->signal_clicked().connect( SLOT( *certDialog, &CertificateDialog::run ) );
 	
 	//kaCombo->set_value_in_list( true );
 //	kaEntry->set_editable( false );
 	
+	reset();
 }
 
-void SecuritySettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
-	this->config = config;
+SecuritySettings::~SecuritySettings(){
+	// Need to disconnect the signals since the GTK dialog
+	// will be reused by other instances of SecuritySettings.
+	dhConn.disconnect();
+	pskConn.disconnect();
+	secureConn.disconnect();
+	certificateConn.disconnect();
+}
 
-	//FIXME: per identity configuration
-	dhCheck->set_active( /*config->securityConfig.dh_enabled*/ config->defaultIdentity->dhEnabled );
-	certCheck->set_active( config->defaultIdentity->checkCert );
-	pskCheck->set_active( /*config->securityConfig.psk_enabled*/ config->defaultIdentity->pskEnabled );
+void SecuritySettings::reset(){
+	identity = NULL;
+
+	dhCheck->set_active( false );
+	certCheck->set_active( false );
+	pskCheck->set_active( false );
+
+	pskEntry->set_text( "" );
+	dhRadio->set_active( true );
+
+	secureCheck->set_active( false );
+
+	MRef<ca_db*> caDb = ca_db::create();
+	MRef<certificate_chain*> certChain = certificate_chain::create();
+
+	certDialog->setRootCa( caDb );
+	certDialog->setCertChain( certChain );
+
+	kaChange();
+	secureChange();
+}
+
+void SecuritySettings::setConfig( MRef<SipIdentity *> theIdentity ){
+	if( !theIdentity ){
+		reset();
+		return;
+	}
+
+	identity = theIdentity;
+
+	dhCheck->set_active( identity->dhEnabled );
+	certCheck->set_active( identity->checkCert );
+	pskCheck->set_active( identity->pskEnabled );
 
 //	string psk( (const char *)config->securityConfig.psk, config->securityConfig.psk_length );
-	string psk=config->defaultIdentity->getPsk();
+	string psk=identity->getPsk();
 	pskEntry->set_text( psk );
 
 
-	if( /*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
+	if( identity->ka_type == KEY_MGMT_METHOD_MIKEY_DH ){
 		dhRadio->set_active( true );
 	}
-
-	else if( /*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
+	else if( identity->ka_type == KEY_MGMT_METHOD_MIKEY_PSK ){
 		pskRadio->set_active( true );
 	}
-	else if( config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_DHHMAC ){
+	else if( identity->ka_type == KEY_MGMT_METHOD_MIKEY_DHHMAC ){
 		dhhmacRadio->set_active( true );
 	}
-	else if( config->defaultIdentity->ka_type == KEY_MGMT_METHOD_MIKEY_RSA_R ){
+	else if( identity->ka_type == KEY_MGMT_METHOD_MIKEY_RSA_R ){
 		rsarRadio->set_active( true );
 	}
 
-	secureCheck->set_active( /*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled );
-	
+	secureCheck->set_active( identity->securityEnabled );
+
+	MRef<ca_db*> caDb =
+		identity->getSim()->getCAs()->clone();
+
+	MRef<certificate_chain*> certChain = 
+		identity->getSim()->getCertificateChain()->clone();
+
+	certDialog->setRootCa( caDb );
+	certDialog->setCertChain( certChain );
+
 	kaChange();
 	secureChange();
 
@@ -660,7 +699,6 @@ void SecuritySettings::kaChange(){
 }
 
 void SecuritySettings::secureChange(){
-//	secureTable->set_sensitive( secureCheck->get_active() );
 	kaTypeLabel->set_sensitive( secureCheck->get_active() );
 	pskRadio->set_sensitive( secureCheck->get_active() && 
 			         pskCheck->get_active() );
@@ -677,26 +715,26 @@ void SecuritySettings::secureChange(){
 string SecuritySettings::apply(){
 	string err;
 	if( dhCheck->get_active() ){
-		/*config->securityConfig.cert->lock()*/ config->defaultIdentity->getSim()->getCertificateChain()->lock();
-		if( /*config->securityConfig.cert->is_empty()*/ config->defaultIdentity->getSim()->getCertificateChain()->is_empty() ){
+		identity->getSim()->getCertificateChain()->lock();
+		if( identity->getSim()->getCertificateChain()->is_empty() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a certificate file.\n"
 		       "The D-H key agreement has been disabled.";
 			dhCheck->set_active( false );
 		}
 		
-		else if( !config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->get_first()->has_pk() ){
+		else if( !identity->getSim()->getCertificateChain()->get_first()->has_pk() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a private key file.\n"
 		       "The D-H key agreement has been disabled.";
 			dhCheck->set_active( false );
 		}
-		config->/*securityConfig.cert*/defaultIdentity->getSim()->getCertificateChain()->unlock();
+		identity->getSim()->getCertificateChain()->unlock();
 	}
 
-	config->/*securityConfig*/defaultIdentity->dhEnabled = dhCheck->get_active();
-	config->/*securityConfig*/defaultIdentity->pskEnabled = pskCheck->get_active();
-	config->defaultIdentity->checkCert = certCheck->get_active();
+	identity->dhEnabled = dhCheck->get_active();
+	identity->pskEnabled = pskCheck->get_active();
+	identity->checkCert = certCheck->get_active();
 
 
 	string s = pskEntry->get_text();
@@ -709,28 +747,31 @@ string SecuritySettings::apply(){
         memcpy( config->securityConfig.psk, psk, psk_length );
         config->securityConfig.psk_length = psk_length;
 #endif	
-	config->defaultIdentity->setPsk(string(psk));
+	identity->setPsk(string(psk));
 
 
-	/*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled = secureCheck->get_active();
-	if( config->defaultIdentity ){
-		config->defaultIdentity->securityEnabled = secureCheck->get_active();
+	 identity->securityEnabled = secureCheck->get_active();
+	if( identity ){
+		identity->securityEnabled = secureCheck->get_active();
 	}
 
-	if( /*config->securityConfig.secured*/ config->defaultIdentity->securityEnabled ){
+	if( identity->securityEnabled ){
 		if( pskRadio->get_active() ){
-			/*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
+			identity->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 		}
 		else if( dhRadio->get_active() ){
-			/*config->securityConfig.ka_type*/ config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
+			identity->ka_type = KEY_MGMT_METHOD_MIKEY_DH;
 		}
 		else if( dhhmacRadio->get_active() ){
-			config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_DHHMAC;
+			identity->ka_type = KEY_MGMT_METHOD_MIKEY_DHHMAC;
 		}
 		else if( rsarRadio->get_active() ){
-			config->defaultIdentity->ka_type = KEY_MGMT_METHOD_MIKEY_RSA_R;
+			identity->ka_type = KEY_MGMT_METHOD_MIKEY_RSA_R;
 		}
 	}
+
+	identity->getSim()->setCAs( certDialog->getRootCa() );
+	identity->getSim()->setCertificateChain( certDialog->getCertChain() );
 
 	return err;
 

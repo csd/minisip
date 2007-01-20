@@ -14,10 +14,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
@@ -47,16 +48,19 @@ AccountsListColumns::AccountsListColumns(){
 }
 
 Glib::RefPtr<AccountsList> AccountsList::create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+						 CertificateDialog * certDialog,
 						 AccountsListColumns * columns ){
 	return Glib::RefPtr<AccountsList>::RefPtr<AccountsList>( 
-			new AccountsList( refXml, columns ) );
+			new AccountsList( refXml, certDialog, columns ) );
 }
 	
 AccountsList::AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+			    CertificateDialog * certDialog,
 			    AccountsListColumns * columns ):
 	Gtk::ListStore( *columns ),
 	columns( columns ),
-	refXml( refXml ){
+	refXml( refXml ),
+	certDialog( certDialog ){
 	
 
 }
@@ -145,6 +149,12 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			// Copy PSK and SipSim from old identity
 			identity->setPsk( oldId->getPsk() );
 			identity->setSim( oldId->getSim() );
+
+			identity->dhEnabled = oldId->dhEnabled;
+			identity->checkCert = oldId->checkCert;
+			identity->pskEnabled = oldId->pskEnabled;
+			identity->ka_type = oldId->ka_type;
+			identity->securityEnabled = oldId->securityEnabled;
 		}
 
 		config->identities.push_back( identity );
@@ -154,12 +164,12 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 }
 
 void AccountsList::addAccount(){
-	AccountDialog dialog( refXml, this );
+	AccountDialog dialog( refXml, certDialog, this );
 	dialog.addAccount();
 }
 
 void AccountsList::editAccount( Gtk::TreeModel::iterator iter ){
-	AccountDialog dialog( refXml, this );
+	AccountDialog dialog( refXml, certDialog, this );
 	dialog.editAccount( iter );
 }
 

@@ -14,7 +14,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Copyright (C) 2004, 2006
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -269,7 +269,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 #endif
 	
 	certificateDialog = new CertificateDialog( refXml );
-	settingsDialog = new SettingsDialog( refXml, certificateDialog );
+	settingsDialog = new SettingsDialog( refXml );
 	
 	refXml->get_widget( "uriEntry", uriEntry );
 
@@ -313,7 +313,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	//mainTabWidget->append_page( *logWidget, "Call list" );
 
-	accountsList = AccountsList::create( refXml,
+	accountsList = AccountsList::create( refXml, certificateDialog,
 					     new AccountsListColumns() );
 
 	statusWidget = new AccountsStatusWidget( accountsList);
@@ -578,9 +578,6 @@ void MainWindow::updateConfig(){
 	accountsList->loadFromConfig( config );
 	settingsDialog->setAccounts( accountsList );
 	settingsDialog->setConfig( config );
-	//FIXME: per identity settings
-	certificateDialog->setCertChain( /*config->securityConfig.cert*/ config->defaultIdentity->getSim()->getCertificateChain() );
-	certificateDialog->setRootCa( /*config->securityConfig.cert_db*/ config->defaultIdentity->getSim()->getCAs() );
 
 	const Glib::RefPtr<PhoneBookModel> modelPtr( phoneBookModel );
 
@@ -952,6 +949,8 @@ void MainWindow::setCallback( MRef<CommandReceiver*> callback ){
 }
 
 void MainWindow::runCertificateSettings(){
+	certificateDialog->setCertChain(  config->defaultIdentity->getSim()->getCertificateChain() );
+	certificateDialog->setRootCa( config->defaultIdentity->getSim()->getCAs() );
 	certificateDialog->run();
 	config->save();
 }
