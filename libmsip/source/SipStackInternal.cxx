@@ -150,6 +150,15 @@ MRef<SipCommandDispatcher*> SipStackInternal::getDispatcher(){
 	return dispatcher;
 }
 
+void SipStackInternal::free(){
+	setCallback(NULL);
+	setConfCallback(NULL);
+	dispatcher->free();
+	dispatcher=NULL;
+	timeoutProvider->stopThread();
+	timeoutProvider=NULL;
+}
+
 MRef<SipStackConfig*> SipStackInternal::getStackConfig(){
 	return config;
 }

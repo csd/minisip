@@ -37,6 +37,7 @@ using namespace std;
 // SipSocketServer
 // 
 
+
 SipSocketServer::SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock): ssock(sock), receiver(r),doStop(false){
 	externalPort = ssock->getPort();
 }

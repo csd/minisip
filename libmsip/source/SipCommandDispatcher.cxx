@@ -50,6 +50,16 @@ SipCommandDispatcher::SipCommandDispatcher(
 
 }
 
+void SipCommandDispatcher::free(){
+	sipStackInternal=NULL;
+	callback=NULL;
+	managementHandler=NULL;
+	transportLayer->setDispatcher(NULL);
+	transportLayer=NULL;
+	dialogLayer=NULL;
+	transactionLayer=NULL;
+}
+
 void SipCommandDispatcher::setDialogManagement(MRef<SipDialog*> mgmt){
 	managementHandler = mgmt;
 }
@@ -63,6 +73,17 @@ MRef<CommandReceiver*> SipCommandDispatcher::getCallback(){
 
 void SipCommandDispatcher::stopRunning(){
 	keepRunning=false;
+
+	transportLayer->stop();
+
+	//The SIP stack is blocking on a semaphore waiting for
+	//something to process. We wake it by sending it a
+	//no-operation command. It will then check
+	//the "keepRunning" flag and exit
+	CommandString c("",SipCommandString::no_op);
+	SipSMCommand sc(c, SipSMCommand::dispatcher, SipSMCommand::dispatcher);
+	enqueueCommand(sc, LOW_PRIO_QUEUE);
+
 }
 
 list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
@@ -120,7 +141,7 @@ void SipCommandDispatcher::run(){
 #endif
 		
 		if (item.type == TYPE_COMMAND){
-		
+
 			handled=handleCommand(**(item.command));
 			
 		}else{  // item.type == TYPE_TIMEOUT
@@ -278,6 +299,9 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING){	
+		if (c.getCommandString().getOp()==SipCommandString::no_op){
+			return true;
+		}
 
 		if (c.getCommandString().getOp()==SipCommandString::transaction_terminated){
 			transactionLayer->removeTerminatedTransactions();

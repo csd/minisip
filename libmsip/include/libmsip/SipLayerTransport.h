@@ -32,7 +32,6 @@
 #include<libmnetutil/DatagramSocket.h>
 #include<libmnetutil/StreamSocket.h>
 #include<libmutil/Mutex.h>
-#include<libmutil/Thread.h>
 #include<libmutil/Semaphore.h>
 #include<libmutil/MemObject.h>
 #include<libmcrypto/cert.h>
@@ -46,6 +45,7 @@ class SipMessage;
 
 class SipLayerTransport;
 class SipCommandDispatcher;
+class StreamThreadData;
 
 class SipLayerTransport : public SipSMCommandReceiver {
 	public:
@@ -117,6 +117,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
                 
 		Mutex serversLock;
 		std::list<MRef<SipSocketServer *> > servers;
+		std::list<MRef<StreamThreadData *> > workers;
 
 		Mutex socksLock;
 		std::list<MRef<StreamSocket *> > socks;

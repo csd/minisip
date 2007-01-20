@@ -269,17 +269,43 @@ uint32_t SipMessageParser::findContentLength(){
 	return 0;
 }
 
-class StreamThreadData{
+class StreamThreadData : public MObject{
 	public:
 		StreamThreadData( MRef<SipLayerTransport *> );
+		void run();
+		void stop();
+		void join();
+		void streamSocketRead( MRef<StreamSocket *> socket );
+	private:
 		SipMessageParser parser;
 		MRef<SipLayerTransport  *> transport;
-		void run();
-		void streamSocketRead( MRef<StreamSocket *> socket );
+		bool doStop;
+		ThreadHandle th;
 };
 
+static void * streamThread( void * arg ){
+	StreamThreadData * data;
+	data = (StreamThreadData *)arg;
+
+		// We want to keep a reference to the object so that it
+		// exist (at least) until we exit this function.
+	MRef<StreamThreadData *> ref=data;
+
+	ref->run();
+	return NULL;
+}
+
 StreamThreadData::StreamThreadData( MRef<SipLayerTransport *> transport){
+	doStop=false;
 	this->transport = transport;
+	cerr << "Creating thread"<<endl;
+	th=Thread::createThread(streamThread, this);
+	cerr << "threadhandle is as long int: "<<th.asLongInt()<<endl;
+}
+
+void StreamThreadData::join(){
+	cerr << "threadhandle is as long int: "<<th.asLongInt()<<endl;
+	Thread::join(th);
 }
 
 
@@ -333,7 +359,8 @@ SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
 	int i;
 
 	for( i=0; i < NB_THREADS ; i++ ){
-            Thread::createThread(streamThread, new StreamThreadData(this));
+		StreamThreadData *worker = new StreamThreadData(this);
+		workers.push_back(worker);
 	}
 }
 
@@ -361,13 +388,36 @@ SipLayerTransport::~SipLayerTransport() {
   
 void SipLayerTransport::stop(){
 	serversLock.lock();
-	list<MRef<SipSocketServer *> >::iterator i;
+	list<MRef<StreamThreadData*> >::iterator j;
 
+
+	for( j=workers.begin(); j != workers.end(); j++ ){
+		MRef<StreamThreadData*> w = *j;
+		w->stop();
+	}
+
+	list<MRef<SipSocketServer *> >::iterator i;
 	for( i=servers.begin(); i != servers.end(); i++ ){
 		MRef<SipSocketServer *> server = *i;
 
 		server->stop();
+		*i=NULL;
 	}
+
+		//wake up blocking threads
+	int n;
+	for (n=0; n< NB_THREADS; n++){
+		semaphore.inc();
+	}
+
+	for( j=workers.begin(); j != workers.end(); j++ ){
+		MRef<StreamThreadData*> w = *j;
+		w->join();
+		*j=NULL;
+	}
+
+	workers.clear();
+	servers.clear();
 	serversLock.unlock();
 }
 
@@ -1067,25 +1117,38 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 		} // if event
 }
 
+void StreamThreadData::stop(){
+	doStop=true;
+	transport=NULL;
+}
+
 void StreamThreadData::run(){
-	while(true){
+	while(!doStop){
 
 		MRef<StreamSocket *> socket;
-                transport->semaphore.dec();
+		
+			//Keep a local reference of transport so that
+			//it is not deleted until we are done with it.
+		MRef<SipLayerTransport*> transp = transport;
+		if (!transp)
+			break;
+                transp->semaphore.dec();
+		if (doStop)
+			break;
                 
 		/* Take the last socket pending to be read */
-		transport->socksPendingLock.lock();
-		socket = transport->socksPending.front();
-		transport->socksPending.pop_front();
-		transport->socksPendingLock.unlock();
+		transp->socksPendingLock.lock();
+		socket = transp->socksPending.front();
+		transp->socksPending.pop_front();
+		transp->socksPendingLock.unlock();
                 
 		/* Read from it until it gets closed */
 		streamSocketRead( socket );
 
 		/* The socket was closed */
-		transport->socksLock.lock();
-		transport->socks.remove( socket );
-		transport->socksLock.unlock();
+		transp->socksLock.lock();
+		transp->socks.remove( socket );
+		transp->socksLock.unlock();
 #ifdef DEBUG_OUTPUT
 		mdbg << "StreamSocket closed" << end;
 #endif
@@ -1104,7 +1167,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	int avail;
 	MRef<SipMessage*> pack;
 
-	while( true ){
+	while( !doStop){
 		fd_set set;
 
 		do{
@@ -1203,11 +1266,5 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	}// while true
 }
 
-static void * streamThread( void * arg ){
-	StreamThreadData * data;
-	data = (StreamThreadData *)arg;
 
-	data->run();
-	return NULL;
-}
 

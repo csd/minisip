@@ -65,6 +65,8 @@ class SipCommandDispatcher : public MObject{
 	public:
 		SipCommandDispatcher(MRef<SipStackInternal*> stack, MRef<SipLayerTransport*> transport);
 
+		void free();
+
 		void setCallback(MRef<CommandReceiver*> cb);
 		MRef<CommandReceiver*> getCallback();
 		

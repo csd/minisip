@@ -94,6 +94,8 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 		void startTcpServer();
 		void startTlsServer();
 
+		void free();
+
 	private:
 
 //		std::string getDialogDebugString(MRef<SipDialog*> d, list<MRef<SipTransaction*> > &trans,

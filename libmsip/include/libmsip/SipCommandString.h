@@ -41,6 +41,7 @@ class LIBMSIP_API SipCommandString{
 		*/
 		static const std::string sip_stack_shutdown;
 		static const std::string sip_stack_shutdown_done;
+		static const std::string no_op;
 		static const std::string register_all_identities;
 		static const std::string register_all_identities_done;
 		static const std::string unregister_all_identities;

@@ -79,6 +79,9 @@ SipStack::SipStack( MRef<SipStackConfig *> stackConfig ){
 
 SipStack::~SipStack(){
 	MRef<SipStackInternal*> * mrefPtr = (MRef<SipStackInternal*> *) sipStackInternal;
+	
+	(*mrefPtr)->free();
+
 	delete mrefPtr;
 }
 

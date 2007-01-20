@@ -28,6 +28,7 @@ using namespace std;
 
 const string SipCommandString::sip_stack_shutdown="sip_stack_shutdown";
 const string SipCommandString::sip_stack_shutdown_done="sip_stack_shutdown_done";
+const string SipCommandString::no_op="no_op";
 const string SipCommandString::register_all_identities="register_all_identities";
 const string SipCommandString::register_all_identities_done="register_all_identities_done";
 const string SipCommandString::unregister_all_identities="unregister_all_identities";
