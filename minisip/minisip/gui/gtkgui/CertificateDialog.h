@@ -117,13 +117,13 @@ class CaListStore : public MObject{
 	public:
 		CaListStore();
 
-		void addCaItem( ca_db_item * caItem );
+		void addCaItem( MRef<ca_db_item*> caItem );
 		virtual std::string getMemObjectType() const {return "CaListStore";}
 		//MRef<certificate_chain *> getCertChain();
 		
 		void associateTreeView( Gtk::TreeView * caTreeView );
 		bool isEmpty();
-		ca_db_item * remove( Gtk::TreeModel::iterator );
+		MRef<ca_db_item*> remove( Gtk::TreeModel::iterator );
 
 	private:
 		Gtk::TreeModelColumn<Glib::ustring> typeColumn;

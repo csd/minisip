@@ -116,13 +116,25 @@ ca_db::ca_db(){
 }
 
 ca_db::~ca_db(){
-	std::list<ca_db_item *>::iterator i;
-	std::list<ca_db_item *>::iterator last = items.end();
+	std::list<MRef<ca_db_item*> >::iterator i;
+	std::list<MRef<ca_db_item*> >::iterator last = items.end();
+
+	items.clear();
+}
+
+ca_db* ca_db::clone(){
+	ca_db * db = create();
+
+	lock();
+	std::list<MRef<ca_db_item*> >::iterator i;
+	std::list<MRef<ca_db_item*> >::iterator last = items.end();
 
 	for( i = items.begin(); i != last; i++ ){
-		ca_db_item* item = *i;
-		delete item;
+		db->add_item( *i );
 	}
+	
+	unlock();
+	return db;
 }
 
 void ca_db::lock(){
@@ -133,29 +145,29 @@ void ca_db::unlock(){
         mLock.unlock();
 }
 
-void ca_db::add_item( ca_db_item* item ){
+void ca_db::add_item( MRef<ca_db_item*> item ){
 	items.push_back( item );
 	items_index = items.begin();
 }
 
-ca_db_item* ca_db::create_dir_item( std::string dir ){
-	ca_db_item * item = new ca_db_item();
+MRef<ca_db_item*> ca_db::create_dir_item( std::string dir ){
+	MRef<ca_db_item*> item = new ca_db_item();
 	
 	item->item = dir;
 	item->type = CERT_DB_ITEM_TYPE_DIR;
 	return item;
 }
 
-ca_db_item* ca_db::create_file_item( std::string file ){
-	ca_db_item * item = new ca_db_item;
+MRef<ca_db_item*> ca_db::create_file_item( std::string file ){
+	MRef<ca_db_item*> item = new ca_db_item;
 	
 	item->item = file;
 	item->type = CERT_DB_ITEM_TYPE_FILE;
 	return item;
 }
 
-ca_db_item* ca_db::create_cert_item( certificate* cert ){
-	ca_db_item * item = new ca_db_item();
+MRef<ca_db_item*> ca_db::create_cert_item( certificate* cert ){
+	MRef<ca_db_item*> item = new ca_db_item();
 	
 	item->item = "";
 	item->type = CERT_DB_ITEM_TYPE_OTHER;
@@ -163,25 +175,25 @@ ca_db_item* ca_db::create_cert_item( certificate* cert ){
 }
 
 void ca_db::add_directory( string dir ){
-	ca_db_item * item = create_dir_item( dir );
+	MRef<ca_db_item*> item = create_dir_item( dir );
 	add_item( item );
 }
 
 void ca_db::add_file( string file ){
-	ca_db_item * item = create_file_item( file );
+	MRef<ca_db_item*> item = create_file_item( file );
 	add_item( item );
 }
 
 void ca_db::add_certificate( certificate * cert ){
-	ca_db_item * item = create_cert_item( cert );
+	MRef<ca_db_item*> item = create_cert_item( cert );
 	add_item( item );
 }
 
-void ca_db::remove( ca_db_item * removedItem ){
+void ca_db::remove( MRef<ca_db_item*> removedItem ){
 	init_index();
 
 	while( items_index != items.end() ){
-		if( *(*items_index) == *removedItem ){
+		if( **(*items_index) == **removedItem ){
 			items.erase( items_index );
 			init_index();
 			return;
@@ -191,7 +203,7 @@ void ca_db::remove( ca_db_item * removedItem ){
 	init_index();
 }
 
-list<ca_db_item *> &ca_db::get_items(){
+list<MRef<ca_db_item*> > &ca_db::get_items(){
 	return items;
 }
 
@@ -199,8 +211,8 @@ void ca_db::init_index(){
 	items_index = items.begin();
 }
 
-ca_db_item * ca_db::get_next(){
-	ca_db_item * tmp;
+MRef<ca_db_item*> ca_db::get_next(){
+	MRef<ca_db_item*> tmp;
 	
 	if( items_index == items.end() ){
 		items_index = items.begin();
@@ -224,6 +236,21 @@ certificate_chain::certificate_chain( MRef<certificate *> cert ){
 }
 
 certificate_chain::~certificate_chain(){
+}
+
+certificate_chain* certificate_chain::clone(){
+	certificate_chain * chain = create();
+
+	lock();
+	std::list<MRef<certificate*> >::iterator i;
+	std::list<MRef<certificate*> >::iterator last = cert_list.end();
+
+	for( i = cert_list.begin(); i != last; i++ ){
+		chain->add_certificate( *i );
+	}
+	
+	unlock();
+	return chain;
 }
 
 void certificate_chain::lock(){

@@ -325,10 +325,10 @@ void CertificateDialog::addFileCa(){
 		}
 
 		/* Update the GUI */
-		ca_db_item item;
-		item.type = CERT_DB_ITEM_TYPE_FILE;
-		item.item = result;
-		caListStore->addCaItem( &item );
+		MRef<ca_db_item*> item = new ca_db_item();
+		item->type = CERT_DB_ITEM_TYPE_FILE;
+		item->item = result;
+		caListStore->addCaItem( item );
 	}
 	
 	delete dialog;
@@ -366,18 +366,17 @@ void CertificateDialog::addDirCa(){
 		caDb->unlock();
 
 		/* Update the GUI */
-		ca_db_item item;
-		item.type = CERT_DB_ITEM_TYPE_DIR;
-		item.item = result;
-		caListStore->addCaItem( &item );
-
+		MRef<ca_db_item*> item = new ca_db_item();
+		item->type = CERT_DB_ITEM_TYPE_DIR;
+		item->item = result;
+		caListStore->addCaItem( item );
 	}
 
 	delete dialog;
 }
 
 void CertificateDialog::removeCa(){
-	ca_db_item * removed;
+	MRef<ca_db_item*> removed;
 	 Glib::RefPtr<Gtk::TreeSelection> selection;
 	
 	selection = caTreeView->get_selection();
@@ -442,7 +441,7 @@ void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
 
 
-    	ca_db_item * item = NULL;
+	MRef<ca_db_item*> item = NULL;
 
         this->caDb = caDb;
         if( caDb.isNull() ){
@@ -511,7 +510,7 @@ CaListStore::CaListStore(){
 	listStore = Gtk::ListStore::create( caColumns );
 }
 
-void CaListStore::addCaItem( ca_db_item  * caItem ){
+void CaListStore::addCaItem( MRef<ca_db_item*> caItem ){
 		
 	Gtk::TreeModel::iterator iter = listStore->append();
 
@@ -541,7 +540,7 @@ bool CaListStore::isEmpty(){
 	return listStore->children().empty();
 }
 
-ca_db_item * CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
+MRef<ca_db_item*> CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
 	ca_db_item * ret = new ca_db_item;
 
 

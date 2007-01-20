@@ -202,7 +202,7 @@ void SipSoftPhoneConfiguration::save(){
 
 		cert_db->lock();
 		cert_db->init_index();
-		ca_db_item * caDbItem = cert_db->get_next();
+		MRef<ca_db_item*> caDbItem = cert_db->get_next();
 
 
 		while( caDbItem != NULL ){

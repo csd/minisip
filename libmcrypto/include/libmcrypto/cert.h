@@ -41,7 +41,7 @@ class certificate;
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
 
-class LIBMCRYPTO_API ca_db_item{
+class LIBMCRYPTO_API ca_db_item: public MObject{
 	public:
 		std::string item;
 		int type;
@@ -59,27 +59,28 @@ class LIBMCRYPTO_API ca_db: public MObject{
 		virtual ~ca_db();
 		static ca_db *create();
 		
+		virtual ca_db* clone();
 		virtual void add_directory( std::string dir );
 		virtual void add_file( std::string file );
 		virtual void add_certificate( certificate * cert );
-		virtual std::list<ca_db_item *> &get_items();
-		virtual ca_db_item * get_next();
+		virtual std::list<MRef<ca_db_item*> > &get_items();
+		virtual MRef<ca_db_item*> get_next();
 		virtual void init_index();
 		virtual void lock();
 		virtual void unlock();
 
-		virtual void remove( ca_db_item * removedItem );
+		virtual void remove( MRef<ca_db_item*> removedItem );
 
 	protected:
 		ca_db();
-		virtual void add_item( ca_db_item* item );
-		virtual ca_db_item* create_dir_item( std::string dir );
-		virtual ca_db_item* create_file_item( std::string file );
-		virtual ca_db_item* create_cert_item( certificate* cert );
+		virtual void add_item( MRef<ca_db_item*> item );
+		virtual MRef<ca_db_item*> create_dir_item( std::string dir );
+		virtual MRef<ca_db_item*> create_file_item( std::string file );
+		virtual MRef<ca_db_item*> create_cert_item( certificate* cert );
 
 	private:
-		std::list<ca_db_item *>::iterator items_index;
-		std::list<ca_db_item *> items;
+		std::list<MRef<ca_db_item*> >::iterator items_index;
+		std::list<MRef<ca_db_item*> > items;
                 Mutex mLock;
 };
 
@@ -200,7 +201,8 @@ class LIBMCRYPTO_API certificate_chain: public MObject{
 	public:
 		static certificate_chain* create();
 		virtual ~certificate_chain();
-		
+
+		virtual certificate_chain* clone();
 		virtual void add_certificate( MRef<certificate *> cert );
 // 		virtual void remove_certificate( MRef<certificate *> cert );
 		virtual void remove_last();

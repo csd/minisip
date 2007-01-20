@@ -83,9 +83,9 @@ class LIBMCRYPTO_API gtls_ca_db: public ca_db{
 		virtual std::string getMemObjectType() const {return "gtls_ca_db";}
 
 	protected:
-		ca_db_item* create_dir_item( std::string dir );
-		ca_db_item* create_file_item( std::string file );
-		ca_db_item* create_cert_item( certificate* cert );
+		MRef<ca_db_item*> create_dir_item( std::string dir );
+		MRef<ca_db_item*> create_file_item( std::string file );
+		MRef<ca_db_item*> create_cert_item( certificate* cert );
 
 	private:
 		gnutls_x509_crt_t * caList;

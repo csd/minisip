@@ -1070,14 +1070,15 @@ bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 // 		TODO: Results in deadlock in gtls_certificate_chain::control
 // 		lock();
 
-		std::list<ca_db_item*> &items = get_items();
-		std::list<ca_db_item*>::iterator i;
-		std::list<ca_db_item*>::iterator last = items.end();
+		std::list<MRef<ca_db_item*> > &items = get_items();
+		std::list<MRef<ca_db_item*> >::iterator i;
+		std::list<MRef<ca_db_item*> >::iterator last = items.end();
 
 		caListLength = 0;
 
 		for( i = items.begin(); i != last; i++ ){
-			gtls_ca_db_item *item = (gtls_ca_db_item*)*i;
+			gtls_ca_db_item *item =
+				dynamic_cast<gtls_ca_db_item*>(**i);
 			caListLength += item->num_certs;
 		}
 
@@ -1085,7 +1086,8 @@ bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 
 		size_t pos = 0;
 		for( i = items.begin(); i != last; i++ ){
-			gtls_ca_db_item *item = (gtls_ca_db_item*)*i;
+			gtls_ca_db_item *item =
+				dynamic_cast<gtls_ca_db_item*>(**i);
 
 			for( size_t k = 0; k < item->num_certs; k++ ){
 				caList[ pos++ ] = item->certs[ k ];
@@ -1204,7 +1206,7 @@ bool read_file( string file, gnutls_datum* data ){
 }
 */
 
-ca_db_item* gtls_ca_db::create_dir_item( std::string dir ){
+MRef<ca_db_item*> gtls_ca_db::create_dir_item( std::string dir ){
 	ca_db_item * item = new gtls_ca_db_item();
 	
 	item->item = dir;
@@ -1212,7 +1214,7 @@ ca_db_item* gtls_ca_db::create_dir_item( std::string dir ){
 	return item;
 }
 
-ca_db_item* gtls_ca_db::create_file_item( std::string file ){
+MRef<ca_db_item*> gtls_ca_db::create_file_item( std::string file ){
 	gnutls_datum_t data;
 
 	memset(&data, 0, sizeof(data));
@@ -1259,7 +1261,7 @@ ca_db_item* gtls_ca_db::create_file_item( std::string file ){
 	return item;
 }
 
-ca_db_item* gtls_ca_db::create_cert_item( certificate* cert ){
+MRef<ca_db_item*> gtls_ca_db::create_cert_item( certificate* cert ){
 	gtls_ca_db_item * item = new gtls_ca_db_item();
 	
 	item->item = "";
