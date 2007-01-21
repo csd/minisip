@@ -35,6 +35,8 @@
 #	define KEY_ROOT "/apps/minisip/"
 #endif
 
+//#define GCONF_BOOL_AS_STRINGS
+
 using namespace std;
 
 static std::list<std::string> pluginList;
@@ -108,6 +110,25 @@ void GConfBackend::save( const std::string &key, const int32_t value ){
 
 }
 
+void GConfBackend::saveBool( const std::string &key, bool value ){
+#ifdef GCONF_BOOL_AS_STRINGS
+	ConfBackend::saveBool( key, value );
+#else
+	GError * err = NULL;
+	string skey = key;
+	sanitizeKey( skey );
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
+	gboolean gvalue = (gboolean)value;
+
+	if( !gconf_client_set_bool( client, gkey, gvalue, &err ) ){
+		g_clear_error( &err );
+		throw ConfBackendException();
+	}
+#endif
+}
+
 std::string GConfBackend::loadString( const std::string &key, 
 		                      const std::string &defaultValue ){
 	GError * err = NULL;
@@ -160,6 +181,30 @@ int32_t GConfBackend::loadInt( const std::string &key,
 
 	return (int32_t)( gconf_value_get_int( gvalue ) );
 
+}
+
+bool GConfBackend::loadBool( const std::string &key, bool defaultValue ){
+	GError * err = NULL;
+	string skey = key;
+	sanitizeKey( skey );
+
+	string rkey = KEY_ROOT + skey;
+	const gchar * gkey = (const gchar *)rkey.c_str();
+	GConfValue * gvalue;
+
+	gvalue = gconf_client_get_without_default( client, gkey, &err );
+	if( !gvalue ){
+		return defaultValue;
+	}
+
+	if( gvalue->type == GCONF_VALUE_BOOL ){
+		return gconf_value_get_bool( gvalue );
+	}
+	else if( gvalue->type == GCONF_VALUE_STRING ){
+		return strcmp( gconf_value_get_string( gvalue ), "yes" ) == 0;
+	}
+
+	throw ConfBackendException();
 }
 
 void GConfBackend::reset( const string &key ){

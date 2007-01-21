@@ -40,9 +40,11 @@ class LIBMINISIP_API ConfBackend : public MObject{
 		virtual void save( const std::string &key, 
 				const std::string &value )=0;
 		virtual void save( const std::string &key, const int32_t value )=0;
+		virtual void saveBool( const std::string &key, bool value );
 
 		virtual std::string loadString( const std::string &key, const std::string &defaultValue="" )=0;
 		virtual int32_t loadInt( const std::string &key, const int32_t defaultValue=0 )=0;
+		virtual bool loadBool( const std::string &key, bool defaultValue=false );
 
 		virtual void reset( const std::string & /* key */ ){};
 
@@ -52,6 +54,7 @@ class LIBMINISIP_API ConfBackend : public MObject{
 
 		void save( const char * key, const std::string &value );
 		void save( const char * key, const int32_t value );
+		void saveBool( const char * key, bool value );
 		
 		std::string loadString( const char * key, const std::string &defaultValue="" );
 		int32_t loadInt( const char * key, const int32_t defaultValue=0 );

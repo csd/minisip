@@ -67,6 +67,14 @@ MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string b
 	}
 }
 
+void ConfBackend::saveBool( const std::string &key, bool value ){
+	save( key, value ? string("yes") : string("no") );
+}
+
+bool ConfBackend::loadBool( const std::string &key, bool defaultValue ){
+	return loadString( key, defaultValue ? "yes" : "no" ) == "yes";
+}
+
 int32_t ConfBackend::loadInt( const char * key, const int32_t defaultValue ){
 	return loadInt( std::string( key ), defaultValue );
 }
@@ -83,6 +91,9 @@ void ConfBackend::save( const char * key, const string &value ){
 	save( std::string( key ), value );
 }
 
+void ConfBackend::saveBool( const char * key, bool value ){
+	saveBool( std::string( key ), value );
+}
 
 ConfigPlugin::ConfigPlugin( MRef<Library *> lib ): MPlugin( lib ){
 }

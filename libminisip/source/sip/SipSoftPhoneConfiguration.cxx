@@ -104,7 +104,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "local_udp_port", sipStackConfig->localUdpPort );
 	backend->save( "local_tcp_port", sipStackConfig->localTcpPort );
 	backend->save( "local_tls_port", sipStackConfig->localTlsPort );
-	backend->save( "auto_answer", sipStackConfig->autoAnswer?"yes":"no");
+	backend->saveBool( "auto_answer", sipStackConfig->autoAnswer );
 	backend->save( "instance_id", sipStackConfig->instanceId);
 
 	//securityConfig.save( backend );
@@ -126,10 +126,10 @@ void SipSoftPhoneConfiguration::save(){
 		
 
 /*From SipDialogSecurity below*/
-		backend->save(accountPath + "secured", (*iIdent)->securityEnabled ? string("yes") : string("no"));
-		backend->save(accountPath + "use_zrtp", /*use_zrtp*/ (*iIdent)->use_zrtp ? string("yes") : string("no"));
-		backend->save(accountPath + "psk_enabled", (*iIdent)->pskEnabled ? string("yes") : string("no"));
-		backend->save(accountPath + "dh_enabled", (*iIdent)->dhEnabled ? string("yes") : string("no"));
+		backend->saveBool(accountPath + "secured", (*iIdent)->securityEnabled);
+		backend->saveBool(accountPath + "use_zrtp", /*use_zrtp*/ (*iIdent)->use_zrtp);
+		backend->saveBool(accountPath + "psk_enabled", (*iIdent)->pskEnabled);
+		backend->saveBool(accountPath + "dh_enabled", (*iIdent)->dhEnabled);
 
 		backend->save(accountPath + "psk", (*iIdent)->getPsk() );
 
@@ -205,7 +205,7 @@ void SipSoftPhoneConfiguration::save(){
 		MRef<ca_db_item*> caDbItem = cert_db->get_next();
 
 
-		while( caDbItem != NULL ){
+		while( !caDbItem.isNull() ){
 			switch( caDbItem->type ){
 			case CERT_DB_ITEM_TYPE_FILE:
 				backend->save(accountPath + "ca_file["+itoa(iFile)+"]",
@@ -253,9 +253,9 @@ void SipSoftPhoneConfiguration::save(){
 
 
 		if( (*iIdent)->getSipProxy()->autodetectSettings ) {
-			backend->save( accountPath + "auto_detect_proxy", "yes" );
+			backend->saveBool( accountPath + "auto_detect_proxy", true );
 		} else {
-			backend->save( accountPath + "auto_detect_proxy", "no");		
+			backend->saveBool( accountPath + "auto_detect_proxy", false);
 			backend->save( accountPath + "proxy_addr", (*iIdent)->getSipProxy()->getUri().getIp() );
 			backend->save( accountPath + "proxy_port", (*iIdent)->getSipProxy()->getUri().getPort() );
 		}
@@ -266,25 +266,16 @@ void SipSoftPhoneConfiguration::save(){
 			backend->save( accountPath + "proxy_password", (*iIdent)->getSipProxy()->sipProxyPassword );
 		}
 
-		if( (*iIdent) == pstnIdentity ){
-			backend->save( accountPath + "pstn_account", "yes" );
-		}
-		else
-			backend->save( accountPath + "pstn_account", "no" );
+		backend->saveBool( accountPath + "pstn_account",
+			       (*iIdent) == pstnIdentity );
 
-		if( (*iIdent) == defaultIdentity ){
-			backend->save( accountPath + "default_account", "yes" );
-		}
-		else
-			backend->save( accountPath + "default_account", "no" );
+		backend->saveBool( accountPath + "default_account",
+				   (*iIdent) == defaultIdentity );
 		
-		if( (*iIdent)->registerToProxy ) {
-			backend->save( accountPath + "register", "yes" );
-			backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
-		} else {
-			backend->save( accountPath + "register", "no");
-			backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
-		}
+		backend->saveBool( accountPath + "register",
+				   (*iIdent)->registerToProxy );
+
+		backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
 		string transport = (*iIdent)->getSipProxy()->getUri().getTransport();
 		
 		if( transport == "TCP" ){
@@ -323,7 +314,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "sound_device_in", soundDeviceIn );
 	backend->save( "sound_device_out", soundDeviceOut );
 	
-// 	backend->save( "mute_all_but_one", muteAllButOne? "yes":"no" ); //not used anymore
+// 	backend->saveBool( "mute_all_but_one", muteAllButOne ); //not used anymore
 	
 	backend->save( "mixer_type", soundIOmixerType );
 
@@ -369,8 +360,8 @@ void SipSoftPhoneConfiguration::save(){
 	/************************************************************
 	 * STUN settings
 	 ************************************************************/
-	backend->save("use_stun", (useSTUN ? "yes" : "no") );
-	backend->save("stun_server_autodetect", findStunServerFromSipUri?"yes":"no");
+	backend->saveBool("use_stun", useSTUN );
+	backend->saveBool("stun_server_autodetect", findStunServerFromSipUri );
 	if (findStunServerFromDomain){
 		backend->save("stun_server_domain", stunDomain );
 	}
@@ -383,8 +374,8 @@ void SipSoftPhoneConfiguration::save(){
 	/************************************************************
 	 * Advanced settings
 	 ************************************************************/
-	backend->save("tcp_server", tcp_server? "yes":"no");
-	backend->save("tls_server", tls_server? "yes":"no");
+	backend->saveBool("tcp_server", tcp_server);
+	backend->saveBool("tls_server", tls_server);
 
 	backend->save("ringtone", ringtone);
 	
@@ -482,15 +473,15 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		
 /*From SipDialogSecurity below*/
 
-		ident->securityEnabled = backend->loadString(accountPath + "secured","no")=="yes";
-		//ident->use_srtp = backend->loadString(accountPath + "use_srtp","no")=="yes";
-		//ident->use_srtp = backend->loadString(accountPath + "use_srtp","no")=="yes";
+		ident->securityEnabled = backend->loadBool(accountPath + "secured");
+		//ident->use_srtp = backend->loadBool(accountPath + "use_srtp");
+		//ident->use_srtp = backend->loadBool(accountPath + "use_srtp");
 		//if (use_srtp) {
-		ident->use_zrtp = backend->loadString(accountPath + "use_zrtp", "no") == "yes";
+		ident->use_zrtp = backend->loadBool(accountPath + "use_zrtp");
 		//}
-		ident->dhEnabled   = backend->loadString(accountPath + "dh_enabled","no")=="yes";
-		ident->pskEnabled  = backend->loadString(accountPath + "psk_enabled","no")=="yes";
-		ident->checkCert   = backend->loadString(accountPath + "check_cert","no")=="yes";
+		ident->dhEnabled   = backend->loadBool(accountPath + "dh_enabled");
+		ident->pskEnabled  = backend->loadBool(accountPath + "psk_enabled");
+		ident->checkCert   = backend->loadBool(accountPath + "check_cert");
 
 
 		if( backend->loadString(accountPath + "ka_type", "psk") == "psk" )
@@ -681,7 +672,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 /*From SipDialogSecurity above*/
 
 
-		bool autodetect = ( backend->loadString(accountPath + "auto_detect_proxy","no") == "yes" );
+		bool autodetect = backend->loadBool(accountPath + "auto_detect_proxy");
 		
 		//these two values we collect them, but if autodetect is true, they are not used
 		string proxy = backend->loadString(accountPath + "proxy_addr","");
@@ -693,7 +684,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 		uint16_t proxyPort = (uint16_t)backend->loadInt(accountPath +"proxy_port", 5060);
 
-		ident->setDoRegister(backend->loadString(accountPath + "register","")=="yes");
+		ident->setDoRegister(backend->loadBool(accountPath + "register"));
 		
 		string preferredTransport = backend->loadString(accountPath +"transport", "UDP");
 		
@@ -726,13 +717,13 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->getSipProxy()->getDefaultExpires() << endl;
 #endif
 
-		if (backend->loadString(accountPath + "pstn_account","")=="yes"){
+		if (backend->loadBool(accountPath + "pstn_account")){
 			pstnIdentity = ident;
 			usePSTNProxy = true;
 // 			ident->securityEnabled= false;
 		}
 
-		if (backend->loadString(accountPath + "default_account","")=="yes"){
+		if (backend->loadBool(accountPath + "default_account")){
 			//sipStackConfig->sipIdentity = ident;
 			defaultIdentity=ident;
 		}
@@ -742,8 +733,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	}while( true );
 
-	tcp_server = backend->loadString("tcp_server", "yes") == "yes";
-	tls_server = backend->loadString("tls_server", "no") == "yes";
+	tcp_server = backend->loadBool("tcp_server", true);
+	tls_server = backend->loadBool("tls_server");
 
 	string soundDevice = backend->loadString("sound_device","");
 	soundDeviceIn = backend->loadString("sound_device_in",soundDevice);
@@ -779,8 +770,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	frameHeight = backend->loadInt( "frame_height", 144 );
 #endif
 
-	useSTUN = backend->loadString("use_stun","no")=="yes";
-	findStunServerFromSipUri = backend->loadString("stun_server_autodetect","no")==string("yes");
+	useSTUN = backend->loadBool("use_stun");
+	findStunServerFromSipUri = backend->loadBool("stun_server_autodetect");
 
 	findStunServerFromDomain = backend->loadString("stun_server_domain","")!="";
 	stunDomain = backend->loadString("stun_server_domain","");
@@ -825,7 +816,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	sipStackConfig->externalContactUdpPort = sipStackConfig->localUdpPort; //?
 	sipStackConfig->localTcpPort = backend->loadInt("local_tcp_port",5060);
 	sipStackConfig->localTlsPort = backend->loadInt("local_tls_port",5061);
-	sipStackConfig->autoAnswer = backend->loadString("auto_answer", "no") == "yes";
+	sipStackConfig->autoAnswer = backend->loadBool("auto_answer");
 	sipStackConfig->instanceId = backend->loadString("instance_id");
 
 	if( sipStackConfig->instanceId.empty() ){
@@ -878,25 +869,25 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "account[0]/account_name", "My account" );
 	be->save( "account[0]/sip_uri", "username@domain.example" );
 	be->save( "account[0]/proxy_addr", "sip.domain.example" );
-	be->save( "account[0]/register", "yes" );
+	be->saveBool( "account[0]/register", true );
 	be->save( "account[0]/proxy_port", 5060 );
 	be->save( "account[0]/proxy_username", "user" );
 	be->save( "account[0]/proxy_password", "password" );
-	be->save( "account[0]/pstn_account", "no" );
-	be->save( "account[0]/default_account", "yes" );
+	be->saveBool( "account[0]/pstn_account", false );
+	be->saveBool( "account[0]/default_account", true );
 
-	be->save( "account[0]/secured", "no" );
+	be->saveBool( "account[0]/secured", false );
 	be->save( "account[0]/ka_type", "psk" );
 	be->save( "account[0]/psk", "Unspecified PSK" );
 	be->save( "account[0]/certificate", "" );
 	be->save( "account[0]/private_key", "" );
 	be->save( "account[0]/ca_file", "" );
-	be->save( "account[0]/dh_enabled", "no" );
-	be->save( "account[0]/psk_enabled", "no" );
-	be->save( "account[0]/check_cert", "yes" );
+	be->saveBool( "account[0]/dh_enabled", false );
+	be->saveBool( "account[0]/psk_enabled", false );
+	be->saveBool( "account[0]/check_cert", true );
 	
-	be->save( "tcp_server", "yes" );
-	be->save( "tls_server", "no" );
+	be->saveBool( "tcp_server", true );
+	be->saveBool( "tls_server", false );
 	be->save( "local_udp_port", 5060 );
 	be->save( "local_tcp_port", 5060 );
 	be->save( "local_tls_port", 5061 );

@@ -37,11 +37,14 @@ class GConfBackend : public ConfBackend {
 				const std::string &value );
 		virtual void save( const std::string &key, 
 				const int32_t value );
+		void saveBool( const std::string &key, bool value );
+
 
 		virtual std::string loadString( const std::string &key, 
 				const std::string &defaultValue="" );
 		virtual int32_t loadInt( const std::string &key, 
 				const int32_t defaultValue=0 );
+		bool loadBool( const std::string &key, bool defaultValue=false );
 
 		void reset( const std::string &key );
 
