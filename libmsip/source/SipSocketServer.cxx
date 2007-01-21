@@ -93,7 +93,6 @@ void SipSocketServer::run(){
 
 	}
 
-	cerr << "SipSocketServer stopped" << endl;
 } // "myself" will be freed here and the object can be freed.
 
 void SipSocketServer::start(){

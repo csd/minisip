@@ -336,6 +336,7 @@ void SipIdentity::setPsk( string key ){
 }
 
 SipStackConfig::SipStackConfig():
+	externalContactUdpPort(0),
 	localUdpPort(0),
 	localTcpPort(0),
 	localTlsPort(0),

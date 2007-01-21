@@ -298,13 +298,10 @@ static void * streamThread( void * arg ){
 StreamThreadData::StreamThreadData( MRef<SipLayerTransport *> transport){
 	doStop=false;
 	this->transport = transport;
-	cerr << "Creating thread"<<endl;
 	th=Thread::createThread(streamThread, this);
-	cerr << "threadhandle is as long int: "<<th.asLongInt()<<endl;
 }
 
 void StreamThreadData::join(){
-	cerr << "threadhandle is as long int: "<<th.asLongInt()<<endl;
 	Thread::join(th);
 }
 
