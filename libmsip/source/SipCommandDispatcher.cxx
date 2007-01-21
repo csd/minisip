@@ -47,7 +47,6 @@ SipCommandDispatcher::SipCommandDispatcher(
 	//transportLayer->setSipSMCommandReceiver(this);
 	transportLayer->setDispatcher(this);
 
-
 }
 
 void SipCommandDispatcher::free(){
@@ -91,22 +90,11 @@ list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
 }
 
 void SipCommandDispatcher::run(){
-#ifdef DEBUG_OUTPUT
-	static int runcount = 1;
-#endif
 
 	while (keepRunning){
-#ifdef DEBUG_OUTPUT
-		runcount--;
-#endif
 		mdbg << "DIALOG CONTAINER: waiting for command"<< end;
                 semaphore.dec();
 
-#ifdef DEBUG_OUTPUT
-		runcount++;
-		massert(runcount==1);
-#endif
-		
 		struct queue_type item;
                 
                 mlock.lock();
