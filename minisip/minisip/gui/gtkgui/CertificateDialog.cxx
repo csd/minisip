@@ -456,7 +456,7 @@ void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
         caDb->init_index();
         item = caDb->get_next();
 
-        while( item != NULL ){
+        while( item ){
 		caListStore->addCaItem( item );
                 item = caDb->get_next();
         }
