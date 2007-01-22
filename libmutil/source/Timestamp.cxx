@@ -99,8 +99,8 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	//	cerr << "Placing string "<< s << " on index " << -(auto_id+1) << endl;
 		strings[-(auto_id+1)] = s;
 	//	cerr << "strings[1]="<<strings[1]<< endl;
-		index = ( index + 1 ) % MAX_TIMESTAMPS;
 		gettimeofday( &values[index], tz );
+		index = ( index + 1 ) % MAX_TIMESTAMPS;
 		//values[ index++ ] = ((uint64_t)tv->tv_sec << 32) |tv->tv_usec;
 	}
 #endif
