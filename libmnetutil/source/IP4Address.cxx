@@ -89,6 +89,7 @@ IP4Address::IP4Address(string addr){
 	setAddressFamily(AF_INET);
 	setProtocolFamily(PF_INET);
 	struct in_addr ip_data;
+	char *auxbuf=NULL;
 	if (inet_aton(addr.c_str(),&ip_data)){
 		numIp = ntoh32(ip_data.s_addr);
 	}else{
@@ -96,7 +97,35 @@ IP4Address::IP4Address(string addr){
 		//unsigned char *ip;
 		
 #ifndef WIN32
-		struct hostent *hp= gethostbyname2(ipaddr.c_str(), AF_INET);	
+//Non-reentrant version:
+//		struct hostent *hp= gethostbyname2(ipaddr.c_str(), AF_INET);	
+
+		struct hostent *hp;
+		struct hostent hbuf;
+		size_t buflen=1024;
+
+		auxbuf = (char*)malloc(1024);
+
+		int herr;
+		int res;
+		while ((res=gethostbyname2_r(ipaddr.c_str(),
+						AF_INET,
+						&hbuf,
+						auxbuf,
+						buflen,
+						&hp,
+						&herr
+						))==ERANGE){
+			buflen*=2;
+			auxbuf=(char*)realloc(auxbuf,buflen);
+		}
+
+		if (res!=0 || hp==NULL){
+			free(auxbuf);
+			throw ResolvError( herr );
+		}
+
+		
 #else
 		struct hostent *hp= gethostbyname(ipaddr.c_str());	
 //		struct hostent *hp= gethostbyaddr(ipaddr.c_str(), 4, AF_INET);	
@@ -124,6 +153,9 @@ IP4Address::IP4Address(string addr){
 	sockaddress->sin_family=AF_INET;
 	sockaddress->sin_addr.s_addr = hton32(numIp);
 	sockaddress->sin_port=0;
+
+	if (auxbuf)
+		free(auxbuf);
 }
 
 IP4Address::IP4Address(const IP4Address& other){

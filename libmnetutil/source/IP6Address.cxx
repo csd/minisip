@@ -114,7 +114,32 @@ IP6Address::IP6Address(string addr){
 	setAddressFamily(AF_INET6);
 	setProtocolFamily(PF_INET6);
 #ifndef WIN32
-	hostent *hp= gethostbyname2(addr.c_str(), AF_INET6);	
+//	hostent *hp= gethostbyname2(addr.c_str(), AF_INET6);	
+	struct hostent *hp;
+	struct hostent hbuf;
+	size_t buflen=1024;
+
+	char *auxbuf = (char*)malloc(1024);
+
+	int herr;
+	int res;
+	while ((res=gethostbyname2_r(addr.c_str(),
+					AF_INET,
+					&hbuf,
+					auxbuf,
+					buflen,
+					&hp,
+					&herr
+				    ))==ERANGE){
+		buflen*=2;
+		auxbuf=(char*)realloc(auxbuf,buflen);
+	}
+
+	if (res!=0 || hp==NULL){
+		free(auxbuf);
+		throw ResolvError( herr );
+	}
+
 #else
 	hostent *hp= gethostbyname(addr.c_str());	
 #endif
@@ -137,6 +162,10 @@ IP6Address::IP6Address(string addr){
 	memcpy(&sockaddress->sin6_addr,hp->h_addr, hp->h_length);
 
  	ipaddr = buildAddressString((struct sockaddr*)sockaddress, sizeof(struct sockaddr_in6));
+
+#ifndef WIN32
+	free(auxbuf);
+#endif
 }
 
 IP6Address::IP6Address(struct sockaddr_in6 * addr){
