@@ -196,12 +196,12 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				state = 2;
 				contentLength = findContentLength();
 				if( contentLength == 0 ){
-					char tmp[12];
-					tmp[11]=0;
-					memcpy(&tmp[0], buffer , 11);
 					string messageString( (char *)buffer, index );
 					init();
 #ifdef ENABLE_TS
+					char tmp[12];
+					tmp[11]=0;
+					memcpy(&tmp[0], buffer , 11);
 					ts.save(tmp);
 #endif
 					MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
