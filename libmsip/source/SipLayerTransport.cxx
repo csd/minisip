@@ -197,7 +197,6 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				contentLength = findContentLength();
 				if( contentLength == 0 ){
 					string messageString( (char *)buffer, index );
-					init();
 #ifdef ENABLE_TS
 					char tmp[12];
 					tmp[11]=0;
@@ -208,6 +207,7 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 #ifdef ENABLE_TS
 					ts.save("createMessage end");
 #endif
+					init();
 					return msg;
 					
 					//return SipMessage::createMessage( messageString );
@@ -219,18 +219,18 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 			break;
 		case 2:
 			if( ++contentIndex == contentLength ){
+#ifdef ENABLE_TS
 				char tmp[12];
 				tmp[11]=0;
 				memcpy(&tmp[0], buffer , 11);
 				string messageString( (char*)buffer, index );
-				init();
-#ifdef ENABLE_TS
 				ts.save(tmp);
 #endif
 				MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
 #ifdef ENABLE_TS
 				ts.save("createMessage end");
 #endif
+				init();
 				return msg;
 				//return SipMessage::createMessage( messageString );
 			}
@@ -916,6 +916,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 			char tmp[12];
 			tmp[11]=0;
 			memcpy(&tmp[0], packetString.c_str() , 11);
+			ts.save( tmp );
 #endif
 			if( ssocket->write( packetString ) == -1 ){
 				throw SendFailed( errno );
