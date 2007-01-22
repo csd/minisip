@@ -271,7 +271,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml );
 	
-	refXml->get_widget( "uriEntry", uriEntry );
+	refXml->get_widget( "callUriEntry", uriEntry );
 
 	refXml->get_widget( "prefMenu", prefMenu );
 	refXml->get_widget( "certMenu", certMenu );

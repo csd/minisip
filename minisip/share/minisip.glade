@@ -2289,7 +2289,7 @@
 		      <property name="spacing">6</property>
 
 		      <child>
-			<widget class="GtkEntry" id="uriEntry">
+			<widget class="GtkEntry" id="callUriEntry">
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="editable">True</property>
