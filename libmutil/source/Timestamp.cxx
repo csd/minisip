@@ -119,14 +119,21 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 			if (ids[i]<0){
 				string val = strings[-ids[i]];
 	//			cerr << "will write "<<val<< endl;
-				file << "  " << val << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
+				file << "  " << val << ":\t" 
+					<< values[i].tv_sec << ":\t" 
+					<< values[i].tv_usec <<"\t"
+					<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
 			}else
-				file << "  " << id_names[ ids[i] ] << ":\t" << values[i].tv_sec << ":\t" << values[i].tv_usec <<"\t"<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
+				file << "  " << id_names[ ids[i] ] << ":\t" 
+					<< values[i].tv_sec << ":\t" 
+					<< values[i].tv_usec <<"\t"
+					<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
 			temp = values[i];
 		}
 	}
 #endif
 
+#if 0
 #ifdef WIN32
 	void Timestamp::init(std::string filename, std::string init_data){}
 #else
@@ -159,8 +166,8 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	gettimeofday(&tim, NULL);
 	stopTime=tim.tv_sec + (tim.tv_usec/1000000.0);
 }
-
 #endif
+
 
 #ifdef WIN32
 	string Timestamp::writeElapsedTime(std::string descr){ return "1"; }
@@ -181,3 +188,6 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 	return s_elapsedTime;
 }
 #endif
+
+#endif
+

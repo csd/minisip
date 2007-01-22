@@ -90,6 +90,7 @@ class LIBMUTIL_API Timestamp{
 		void save(std::string descr);
 		void print();
 		
+#if 0
 		/**
 		 * initialize the file and writes the init_data
 		 * in it.
@@ -117,7 +118,7 @@ class LIBMUTIL_API Timestamp{
 		 * @return the elapsed time as string
 		 */
 		std::string writeElapsedTime(std::string descr);
-
+#endif
 	private:
 		uint32_t index;
 		
