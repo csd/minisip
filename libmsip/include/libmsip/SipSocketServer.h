@@ -62,6 +62,7 @@ class SipSocketServer : public Runnable{
 		void run();
 		void start();
 		void stop();
+		void join();
 
 		virtual void inputReady();
 
@@ -71,6 +72,7 @@ class SipSocketServer : public Runnable{
 		bool doStop;
 		std::string externalIp;
 		int32_t externalPort;
+		ThreadHandle th;
 };
 
 

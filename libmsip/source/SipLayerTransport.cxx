@@ -393,12 +393,13 @@ void SipLayerTransport::stop(){
 		w->stop();
 	}
 
+		//tell the threads to stop. Don't "join" just yet
+		//since that might take some time and we want that
+		//time to be spent in parallel for all servers.
 	list<MRef<SipSocketServer *> >::iterator i;
 	for( i=servers.begin(); i != servers.end(); i++ ){
 		MRef<SipSocketServer *> server = *i;
-
 		server->stop();
-		*i=NULL;
 	}
 
 		//wake up blocking threads
@@ -411,6 +412,17 @@ void SipLayerTransport::stop(){
 		MRef<StreamThreadData*> w = *j;
 		w->join();
 		*j=NULL;
+	}
+
+		//wait for the threads in the servers.
+		//NOTE: this can take about five seconds
+		//(that is the read timeout in the socket
+		//server). To improve this, check out
+		//SipSocketServer.cxx
+	for( i=servers.begin(); i != servers.end(); i++ ){
+		MRef<SipSocketServer *> server = *i;
+		server->join();
+		*i=NULL;
 	}
 
 	workers.clear();

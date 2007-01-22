@@ -97,10 +97,15 @@ void SipSocketServer::run(){
 
 void SipSocketServer::start(){
 	Thread t(this);
+	th=t.getHandle();
 }
 
 void SipSocketServer::stop(){
 	doStop=true;
+}
+
+void SipSocketServer::join(){
+	Thread::join(th);
 }
 
 void SipSocketServer::inputReady(){
