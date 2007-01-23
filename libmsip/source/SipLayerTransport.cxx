@@ -223,9 +223,9 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				char tmp[12];
 				tmp[11]=0;
 				memcpy(&tmp[0], buffer , 11);
-				string messageString( (char*)buffer, index );
 				ts.save(tmp);
 #endif
+				string messageString( (char*)buffer, index );
 				MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
 #ifdef ENABLE_TS
 				ts.save("createMessage end");
