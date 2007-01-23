@@ -100,6 +100,7 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		static MRef<SipRequest*> createSipMessageRegister(
 				const std::string &branch,
 				const std::string &call_id,
+				const SipUri &registrar,
 				const SipUri &fromUri,
 				MRef<SipHeaderValueContact *> contactHdr,
 				int32_t seq_no);
@@ -151,6 +152,12 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 */
 		void addRoute(const std::string &addr, int32_t port,
 			      const std::string &transport);
+
+		/**
+		 * Insert routes first in the list of routes, forcing
+		 * the request through the proxy.
+		 */
+		void addRoutes(const std::list<SipUri> &routes);
 
 		/**
 		* @return The top most route header, or a null reference

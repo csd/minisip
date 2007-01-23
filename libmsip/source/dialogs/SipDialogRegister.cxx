@@ -95,13 +95,16 @@ bool SipDialogRegister::a0_start_trying_register( const SipSMCommand &command){
 
 		//Set user and password for the register
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
+			MRef<SipCredential*> cred;
+			cred = getDialogConfig()->sipIdentity->getCredential();
+
+			cred->set( command.getCommandString().getParam(),
+				   command.getCommandString().getParam2() );
 		} 
 
 		//Set expires param ... in seconds (in param3)
 		if (command.getCommandString().getParam3()!="" ) {
-			getDialogConfig()->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
+			getDialogConfig()->sipIdentity->getSipRegistrar()->setRegisterExpires( command.getCommandString().getParam3() );
 		}
 		
 		//if it comes with an identity ... use it to filter out commands not for this dialog ...
@@ -146,7 +149,7 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::register_ok, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
+			getDialogConfig()->sipIdentity->getSipRegistrar()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		if (getGuiFeedback()){
 			getSipStack()->getCallback()->handleCommand("gui", cmdstr );
@@ -161,7 +164,7 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 		//otherwise we would just be unregistering every now and then ...
 		if( getDialogConfig()->sipIdentity->isRegistered () ) {
 			requestTimeout(
-				getDialogConfig()->sipIdentity->getSipProxy()->getRegisterExpires_int() * 1000,
+				getDialogConfig()->sipIdentity->getSipRegistrar()->getRegisterExpires_int() * 1000,
 				SipCommandString::proxy_register);
 		} 
 
@@ -207,7 +210,7 @@ bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 		CommandString cmdstr( 
 			dialogState.callId, 
 			SipCommandString::ask_password, 
-			getDialogConfig()->sipIdentity->getSipProxy()->getUri().getIp());
+			getDialogConfig()->sipIdentity->getSipRegistrar()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		//authentication info from received response is extracted in a2
@@ -230,12 +233,12 @@ bool SipDialogRegister::a5_askpassword_trying_setpassword( const SipSMCommand &c
 			//We store the new credentials for this dialogs
 			//configuration. Note that it is not saved for the
 			//next time minisip is started.
-		getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = 
-				command.getCommandString().getParam();
-		getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword= 
-				command.getCommandString().getParam2();
-		
-		
+		MRef<SipCredential*> cred;
+		cred = getDialogConfig()->sipIdentity->getCredential();
+
+		cred->set( command.getCommandString().getParam(),
+			   command.getCommandString().getParam2() );
+
 			//Update the set of credentials with the new (and hopefully
 			//correct) information.
 		list<MRef<SipAuthenticationDigest*> >::iterator j;
@@ -308,13 +311,16 @@ bool SipDialogRegister::a12_registred_trying_proxyregister( const SipSMCommand &
 
 		//Set proxy username and password
 		if (command.getCommandString().getParam()!="" && command.getCommandString().getParam2()!=""){
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername = command.getCommandString().getParam();
-			getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword = command.getCommandString().getParam2();
+			MRef<SipCredential*> cred;
+			cred = getDialogConfig()->sipIdentity->getCredential();
+
+			cred->set( command.getCommandString().getParam(),
+				   command.getCommandString().getParam2() );
 		}
 		
 		//Set expires param ... in seconds
 		if (command.getCommandString().getParam3()!="" ) {
-			getDialogConfig()->sipIdentity->getSipProxy()->setRegisterExpires( command.getCommandString().getParam3() );
+			getDialogConfig()->sipIdentity->getSipRegistrar()->setRegisterExpires( command.getCommandString().getParam3() );
 		}
 		
 		//if it comes with an identity ... use it to filter out commands not for this dialog ...
@@ -498,9 +504,11 @@ void SipDialogRegister::setGuiFeedback(bool fb){
 	guiFeedback=fb;
 }
 
+#if 0
 bool SipDialogRegister::hasPassword(){
-	return getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername!="" && getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword!="";
+	return getDialogConfig()->sipIdentity->getSipRegistrar()->sipProxyUsername!="" && getDialogConfig()->sipIdentity->getSipRegistrar()->sipProxyPassword!="";
 }
+#endif
 
 bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 
@@ -554,7 +562,7 @@ void SipDialogRegister::send_register(string branch){
 	MRef<SipIdentity*> identity = getDialogConfig()->sipIdentity;
 
 	const SipUri &contact = getDialogConfig()->getContactUri(true); //if udp, use stun
-	int expires = identity->getSipProxy()->getRegisterExpires_int();
+	int expires = identity->getSipRegistrar()->getRegisterExpires_int();
 	
 	MRef<SipHeaderValueContact *> contactHdr =
 		new SipHeaderValueContact(contact, expires);
@@ -568,6 +576,7 @@ void SipDialogRegister::send_register(string branch){
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
 		branch, 
 		dialogState.callId,
+		identity->getSipRegistrar()->getUri(),
 		identity->getSipUri(),
 		contactHdr,
 		dialogState.seqNo

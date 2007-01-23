@@ -204,13 +204,13 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 
 MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 							const string &call_id,
+							const SipUri &registrar,
 							const SipUri &fromUri,
 						       MRef<SipHeaderValueContact *> contactHdr,
 						       int32_t seq_no)
 {
-	const std::string &domain = fromUri.getIp();
-
-	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER","sip:"+domain);
+	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER");
+	req->setUri( registrar );
 
 	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
 
@@ -419,6 +419,17 @@ void SipRequest::addRoute(const string &addr, int32_t port,
 	uri = uri + ";lr>";
 	
 	addRoute( uri );
+}
+
+void SipRequest::addRoutes(const list<SipUri> &routes){
+	list<SipUri>::const_reverse_iterator i;
+	list<SipUri>::const_reverse_iterator first=routes.rend();
+
+	for( i = routes.rbegin(); i != first; i-- ){
+		const SipUri &route = *i;
+
+		addRoute( route.getString() );
+	}
 }
 
 MRef<SipHeaderValueRoute*> SipRequest::getFirstRoute()

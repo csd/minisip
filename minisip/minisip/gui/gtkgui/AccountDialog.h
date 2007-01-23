@@ -55,12 +55,14 @@ class AccountDialog{
 
 		Gtk::Entry * nameEntry;
 		Gtk::Entry * uriEntry;
-		
+
+		Gtk::CheckButton * proxyCheck;
 		Gtk::CheckButton * autodetectProxyCheck;
 		Gtk::Label * proxyLabel;
 		Gtk::Entry * proxyEntry;
 		Gtk::Label * proxyPortLabel;
 		Gtk::SpinButton * proxyPortSpin;
+		Gtk::CheckButton * proxyPortCheck;
 
 		Gtk::RadioButton * udpRadio;
 		Gtk::RadioButton * tcpRadio;
@@ -81,6 +83,8 @@ class AccountDialog{
 
 		sigc::connection requiresAuthConn;
 		sigc::connection autodetectProxyConn;
+		sigc::connection proxyConn;
+		sigc::connection proxyPortConn;
 };
 
 #endif

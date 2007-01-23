@@ -60,6 +60,7 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 	refXml->get_widget( "nameEntry", nameEntry );
 	refXml->get_widget( "uriEntry", uriEntry );
 	refXml->get_widget( "autodetectProxyCheck", autodetectProxyCheck );
+	refXml->get_widget( "proxyCheck", proxyCheck );
 	refXml->get_widget( "proxyLabel", proxyLabel );
 	refXml->get_widget( "proxyEntry", proxyEntry );
 	refXml->get_widget( "requiresAuthCheck", requiresAuthCheck );
@@ -70,13 +71,19 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 	refXml->get_widget( "udpRadio", udpRadio );
 	refXml->get_widget( "tcpRadio", tcpRadio );
 	refXml->get_widget( "tlsRadio", tlsRadio );
+	refXml->get_widget( "registerCheck", registerCheck );
 	refXml->get_widget( "registerTimeSpin", registerTimeSpin );
 	refXml->get_widget( "proxyPortSpin", proxyPortSpin );
 	refXml->get_widget( "proxyPortLabel", proxyPortLabel );
+	refXml->get_widget( "proxyPortCheck", proxyPortCheck );
 
 	requiresAuthConn = requiresAuthCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::requiresAuthCheckChanged ) );
 	autodetectProxyConn = autodetectProxyCheck->signal_toggled().connect(
+		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
+	proxyConn = proxyCheck->signal_toggled().connect(
+		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
+	proxyPortConn = proxyPortCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
 	
 	securitySettings = new SecuritySettings( refXml, certDialog );
@@ -89,6 +96,8 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 AccountDialog::~AccountDialog(){
 	requiresAuthConn.disconnect();
 	autodetectProxyConn.disconnect();
+	proxyConn.disconnect();
+	proxyPortConn.disconnect();
 
 	delete securitySettings;
 	securitySettings = NULL;
@@ -107,14 +116,17 @@ void AccountDialog::reset(){
 	nameEntry->set_text( "" );
 	uriEntry->set_text( "" );
 	
+	proxyCheck->set_active( false );
 	autodetectProxyCheck->set_active( false );
 	proxyEntry->set_text( "" );
 	proxyPortSpin->set_value( 5060 );
+	proxyPortCheck->set_active( true );
 	udpRadio->set_active( true );
 
 	requiresAuthCheck->set_active( true );
 	usernameEntry->set_text( "" );
 	passwordEntry->set_text( "" );
+	registerCheck->set_active( false );
 	registerTimeSpin->set_value( 1000 );
 
 	securitySettings->reset();
@@ -124,11 +136,26 @@ void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 		(*iter)[list->columns->name] = nameEntry->get_text();
 		(*iter)[list->columns->uri] = uriEntry->get_text();
 		
-		(*iter)[list->columns->autodetectSettings] = autodetectProxyCheck->get_active();
-		if( autodetectProxyCheck->get_active() ){
+		if( !proxyCheck->get_active() ){
+			// No proxy
+			(*iter)[list->columns->autodetectSettings] = false;
 			(*iter)[list->columns->proxy] = "";
-			(*iter)[list->columns->port] = 5060;
+			(*iter)[list->columns->port] = 0;
+		}
+		else if( autodetectProxyCheck->get_active() ){
+			// No address and port
+			(*iter)[list->columns->autodetectSettings] = true;
+			(*iter)[list->columns->proxy] = "";
+			(*iter)[list->columns->port] = 0;
+		}
+		else if( proxyPortCheck->get_active() ){
+			// No port
+			(*iter)[list->columns->autodetectSettings] = false;
+			(*iter)[list->columns->proxy] = proxyEntry->get_text();
+			(*iter)[list->columns->port] = 0;
 		} else{
+			// Address and port
+			(*iter)[list->columns->autodetectSettings] = false;
 			(*iter)[list->columns->proxy] = proxyEntry->get_text();
 			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
@@ -137,6 +164,7 @@ void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();
 		(*iter)[list->columns->password] = passwordEntry->get_text();
+		(*iter)[list->columns->doRegister] = registerCheck->get_active();
 		(*iter)[list->columns->registerExpires] = registerTimeSpin->get_value_as_int();
 		if( tcpRadio->get_active() ){
 			(*iter)[list->columns->transport] = "TCP";
@@ -152,15 +180,29 @@ void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 	nameEntry->set_text( (*iter)[list->columns->name] );
 	uriEntry->set_text( (*iter)[list->columns->uri] );
-	
-	autodetectProxyCheck->set_active(  (*iter)[list->columns->autodetectSettings] ); //(*iter)[list->columns->proxy] != "" );
+
+	bool autodetect = (*iter)[list->columns->autodetectSettings];
+	autodetectProxyCheck->set_active( autodetect );
 	//note ... the values for proxy and port will show whatever we found ... even in autodetect mode
-	proxyEntry->set_text( (*iter)[list->columns->proxy] );
-	proxyPortSpin->set_value( (double)((*iter)[list->columns->port]) );
+
+	Glib::ustring proxy = (*iter)[list->columns->proxy];
+	proxyCheck->set_active( proxy != "" );
+	proxyEntry->set_text( proxy );
+
+	int port = (*iter)[list->columns->port];
+	if( port > 0 ){
+		proxyPortSpin->set_value( (double)(port) );
+		proxyPortCheck->set_active( false );
+	}
+	else{
+		proxyPortSpin->set_value( (double)(5060) );
+		proxyPortCheck->set_active( true );
+	}
 	
 	requiresAuthCheck->set_active( (*iter)[list->columns->username] != "" );
 	usernameEntry->set_text( (*iter)[list->columns->username] );
 	passwordEntry->set_text( (*iter)[list->columns->password] );
+	registerCheck->set_active( (*iter)[list->columns->doRegister] );
 	registerTimeSpin->set_value( (*iter)[list->columns->registerExpires] );
 	
 	if( (*iter)[list->columns->transport] == "TCP" ){
@@ -197,9 +239,18 @@ void AccountDialog::requiresAuthCheckChanged(){
 }
 		
 void AccountDialog::autodetectProxyCheckChanged(){
-	bool setTo = autodetectProxyCheck->get_active();
+	bool proxyEnabled = proxyCheck->get_active();
+// 	proxyLabel->set_sensitive( proxyEnabled );
+	autodetectProxyCheck->set_sensitive( proxyEnabled );
+	udpRadio->set_sensitive( proxyEnabled );
+	tcpRadio->set_sensitive( proxyEnabled );
+	tlsRadio->set_sensitive( proxyEnabled );
+
+	bool setTo = !proxyEnabled || autodetectProxyCheck->get_active();
 	proxyEntry->set_sensitive( ! setTo  );
-	proxyLabel->set_sensitive( ! setTo  );
-	proxyPortSpin->set_sensitive( ! setTo  );
-	proxyPortLabel->set_sensitive( ! setTo  );
+// 	proxyPortLabel->set_sensitive( ! setTo  );
+ 	proxyPortCheck->set_sensitive( ! setTo  );
+
+	bool autoPort = setTo || proxyPortCheck->get_active();
+	proxyPortSpin->set_sensitive( ! autoPort  );
 }

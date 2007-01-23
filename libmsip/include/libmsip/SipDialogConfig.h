@@ -58,19 +58,39 @@
 
 class SipStackConfig;
 
-class LIBMSIP_API SipProxy : public MObject{
+class LIBMSIP_API SipCredential : public MObject{
+	public:
+		SipCredential( const std::string &username,
+			       const std::string &password,
+			       const std::string &realm = "" );
+
+		std::string getRealm() const;
+		std::string getUsername() const;
+		std::string getPassword() const;
+
+		void set( const std::string &username,
+			  const std::string &password,
+			  const std::string &realm = "" );
+
+	private:
+		std::string realm;
+		std::string username;
+		std::string password;
+};
+
+class LIBMSIP_API SipRegistrar : public MObject{
 	public:
 		/**
 		Initialize an empty proxy ... invalid
 		*/
-		SipProxy();
+		SipRegistrar();
 
 		/**
 		Initialize a proxy with manual settings
 		@param addr proxy string, it can be a name or an IP, with and without the :port
 		@param port port the proxy addr is set to, it has precedence over the :port in the addr param
 		*/
-		SipProxy(const SipUri &addr, int port = -1);
+		SipRegistrar(const SipUri &addr, int port = -1);
 		
 		/**
 		Initialize a proxy with automatic discovery of settings via DNS SRV
@@ -78,13 +98,10 @@ class LIBMSIP_API SipProxy : public MObject{
 		@param transport transport to check for (_sip._udp, ... ). If TCP and fails, we will retry 
 		with UDP. If TLS, there is no fallback (they are all unsecured).
 		*/
-		SipProxy(const SipUri &userUri, std::string transport);
+		SipRegistrar(const SipUri &userUri, std::string transport);
 		
 		std::string getDebugString();
 
-		std::string sipProxyUsername;
-		std::string sipProxyPassword;
-		
 		void setRegisterExpires( std::string _expires );
 		void setRegisterExpires( int _expires );
 		std::string getRegisterExpires( );
@@ -97,7 +114,7 @@ class LIBMSIP_API SipProxy : public MObject{
 
 		const SipUri getUri() const{ return uri; }
 
-		std::string getMemObjectType() const {return "SipProxy";}
+		std::string getMemObjectType() const {return "SipRegistrar";}
 		
 		/**
 		True to indicate that the proxy settings are to be looked up using DNS SRV
@@ -113,7 +130,7 @@ class LIBMSIP_API SipProxy : public MObject{
 		bool autodetectSettings;
 
 	protected:		
-		void setProxy(const SipUri &addr, int port=-1);
+		void setRegistrar(const SipUri &addr, int port=-1);
 
 	private:
 		/**
@@ -146,16 +163,19 @@ class LIBMSIP_API SipIdentity : public MObject{
 		
 		const SipUri &getSipUri() const { return sipUri; }
 
+		MRef<SipCredential*> getCredential() const;
+		void setCredential( MRef<SipCredential*> credential );
+
 		/**
-		@returns the sip proxy used by this identity
+		@returns the sip registrar used by this identity
 		*/
-		MRef<SipProxy *> getSipProxy();
+		MRef<SipRegistrar *> getSipRegistrar();
 		
 		/**
-		@param proxy sip proxy to be used by this identity
+		@param proxy sip registrar to be used by this identity
 		@returns true if it was ok, false otherwise
 		*/
-		bool setSipProxy( MRef<SipProxy *> proxy );
+		bool setSipRegistrar( MRef<SipRegistrar *> proxy );
 		
 		/**
 		Set the proxy to be used by this identity, given the following params
@@ -168,6 +188,10 @@ class LIBMSIP_API SipIdentity : public MObject{
 		*/
 		std::string setSipProxy( bool autodetect, std::string userUri, std::string transport, std::string proxyAddr, int port );
 		
+		const std::list<SipUri> &getRouteSet() const;
+		void setRouteSet( const std::list<SipUri> &routeSet );
+		void addRoute( const SipUri &route );
+
 		void setDoRegister(bool f);
 
 		bool getDoRegister();
@@ -231,7 +255,11 @@ class LIBMSIP_API SipIdentity : public MObject{
 		std::string psk;
 
 
-		MRef<SipProxy *> sipProxy;
+		MRef<SipRegistrar *> sipProxy;
+
+		MRef<SipCredential *> credential;
+
+		std::list<SipUri> routeSet;
 
 		/**
 		We will use this index to be able to identify the identities
@@ -259,12 +287,12 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		MRef<SipStack*> sipStack;
 
 		//Specific to calls
-		std::string proxyNonce;
-		std::string proxyRealm;
+// 		std::string proxyNonce;
+// 		std::string proxyRealm;
 
 		uint32_t local_ssrc;
 
-		MRef<SipRequest*> last_invite;
+// 		MRef<SipRequest*> last_invite;
 
 		MRef<SipIdentity*> sipIdentity;
 

@@ -252,19 +252,39 @@ void SipSoftPhoneConfiguration::save(){
 
 
 
-		if( (*iIdent)->getSipProxy()->autodetectSettings ) {
-			backend->saveBool( accountPath + "auto_detect_proxy", true );
-		} else {
-			backend->saveBool( accountPath + "auto_detect_proxy", false);
-			backend->save( accountPath + "proxy_addr", (*iIdent)->getSipProxy()->getUri().getIp() );
-			backend->save( accountPath + "proxy_port", (*iIdent)->getSipProxy()->getUri().getPort() );
+		backend->saveBool( accountPath + "auto_detect_proxy", false);
+
+		const list<SipUri> &routeSet = (*iIdent)->getRouteSet();
+
+		if( !routeSet.empty() ){
+			SipUri proxyUri = *routeSet.begin();
+
+			backend->save( accountPath + "proxy_addr",
+				       proxyUri.getIp() );
+			backend->save( accountPath + "proxy_port",
+				       proxyUri.getPort() );
+
+			string transport = proxyUri.getTransport();
+
+			backend->save( accountPath + "transport", transport );
+		}
+		else {
+			backend->save( accountPath + "proxy_addr", "" );
+			backend->save( accountPath + "proxy_port", 0 );
 		}
 
-		if( (*iIdent)->getSipProxy()->sipProxyUsername != "" ){
-			backend->save( accountPath + "proxy_username", (*iIdent)->getSipProxy()->sipProxyUsername );
-		
-			backend->save( accountPath + "proxy_password", (*iIdent)->getSipProxy()->sipProxyPassword );
+		MRef<SipCredential*> cred = (*iIdent)->getCredential();
+
+		string username;
+		string password;
+
+		if( cred ){
+			username = cred->getUsername();
+			password = cred->getPassword();
 		}
+
+		backend->save( accountPath + "proxy_username", username );
+		backend->save( accountPath + "proxy_password", password );
 
 		backend->saveBool( accountPath + "pstn_account",
 			       (*iIdent) == pstnIdentity );
@@ -275,18 +295,7 @@ void SipSoftPhoneConfiguration::save(){
 		backend->saveBool( accountPath + "register",
 				   (*iIdent)->registerToProxy );
 
-		backend->save( accountPath + "register_expires", (*iIdent)->getSipProxy()->getDefaultExpires() );
-		string transport = (*iIdent)->getSipProxy()->getUri().getTransport();
-		
-		if( transport == "TCP" ){
-			backend->save( accountPath + "transport", "TCP" );
-		}
-		else if( transport == "TLS" ){
-			backend->save( accountPath + "transport", "TLS" );
-		}
-		else{
-			backend->save( accountPath + "transport", "UDP" );
-		}
+		backend->save( accountPath + "register_expires", (*iIdent)->getSipRegistrar()->getDefaultExpires() );
 
 		(*iIdent)->unlock();
 
@@ -671,50 +680,52 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 /*From SipDialogSecurity above*/
 
-
+		// 
+		// Outbound proxy
+		// 
 		bool autodetect = backend->loadBool(accountPath + "auto_detect_proxy");
 		
 		//these two values we collect them, but if autodetect is true, they are not used
 		string proxy = backend->loadString(accountPath + "proxy_addr","");
-		if( proxy == "" ) {
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipSoftPhoneConfig::load - empty proxy address ... setting autodetect = true " << endl;
-			#endif
-			autodetect = true; //empty proxy .. then autodetect ... just doing some checks ...
-		}
 		uint16_t proxyPort = (uint16_t)backend->loadInt(accountPath +"proxy_port", 5060);
 
-		ident->setDoRegister(backend->loadBool(accountPath + "register"));
-		
 		string preferredTransport = backend->loadString(accountPath +"transport", "UDP");
-		
-		string proxret = ident->setSipProxy( autodetect, uri,  preferredTransport, proxy, proxyPort );
-		
-		if( proxret != "" ) {
-			ret += "\n" + proxret ;
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipSoftConfig::load - Identity::setSipProxy return = " << proxret << endl;
-			#endif
-		}
-		
+
+		ident->setSipProxy( autodetect, uri, preferredTransport, proxy, proxyPort );
+
 		string proxyUser = backend->loadString(accountPath +"proxy_username", "");
 
-		ident->getSipProxy()->sipProxyUsername = proxyUser;
 		string proxyPass = backend->loadString(accountPath +"proxy_password", "");
-		ident->getSipProxy()->sipProxyPassword = proxyPass;
+		MRef<SipCredential*> cred;
 
+		if( proxyUser != "" ){
+			cred = new SipCredential( proxyUser, proxyPass );
+		}
+
+		ident->setCredential( cred );
+
+		SipUri registrarUri;
+
+		registrarUri.setProtocolId(ident->getSipUri().getProtocolId());
+		registrarUri.setIp( ident->getSipUri().getIp() );
+		registrarUri.makeValid( true );
+		MRef<SipRegistrar*> registrar = new SipRegistrar( registrarUri );
+
+		ident->setSipRegistrar( registrar );
+
+		ident->setDoRegister(backend->loadBool(accountPath + "register"));
 		string registerExpires = backend->loadString(accountPath +"register_expires", "");
 		if (registerExpires != ""){
-			ident->getSipProxy()->setRegisterExpires( registerExpires );
+			ident->getSipRegistrar()->setRegisterExpires( registerExpires );
 			//set the default value ... do not change this value anymore
-			ident->getSipProxy()->setDefaultExpires( registerExpires ); 
+			ident->getSipRegistrar()->setDefaultExpires( registerExpires ); 
 		} 
 #ifdef DEBUG_OUTPUT
 		else {
 			//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
 		}
-		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->getSipProxy()->getRegisterExpires() << endl;
-		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->getSipProxy()->getDefaultExpires() << endl;
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) " << ident->getSipRegistrar()->getRegisterExpires() << endl;
+		//cerr << "CESC: SipSoftPhoneConf::load : ident expires every (seconds) [default] " << ident->getSipRegistrar()->getDefaultExpires() << endl;
 #endif
 
 		if (backend->loadBool(accountPath + "pstn_account")){

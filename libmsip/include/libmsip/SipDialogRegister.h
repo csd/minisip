@@ -48,7 +48,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		void updateFailCount();
 		uint32_t getFailCount();
 
-		bool hasPassword();
+// 		bool hasPassword();
 
 		bool getGuiFeedback();
 		void setGuiFeedback(bool fb);

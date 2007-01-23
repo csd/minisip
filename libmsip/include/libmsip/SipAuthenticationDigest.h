@@ -28,6 +28,7 @@
 
 #include<string>
 
+class SipCredential;
 class SipHeaderValueProxyAuthenticate;
 class SipHeaderValueAuthorization;
 class SipRequest;
@@ -63,6 +64,11 @@ class LIBMSIP_API SipAuthenticationDigest: public MObject{
 		 * Set credential used when creating authorization headers.
 		 */
 		void setCredential(const std::string &username, const std::string &password);
+
+		/**
+		 * Set credential used when creating authorization headers.
+		 */
+		void setCredential( MRef<SipCredential*> credential );
 
 		static std::string md5ToString(unsigned char *md5);
 

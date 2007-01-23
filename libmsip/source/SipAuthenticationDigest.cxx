@@ -23,6 +23,7 @@
 #include<config.h>
 
 #include<libmsip/SipAuthenticationDigest.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmsip/SipHeaderProxyAuthenticate.h>
@@ -157,4 +158,9 @@ MRef<SipHeaderValueAuthorization*> SipAuthenticationDigest::createAuthorization(
 void SipAuthenticationDigest::setCredential(const std::string &username, const std::string &password){
 	this->username = username;
 	this->password = password;
+}
+
+void SipAuthenticationDigest::setCredential( MRef<SipCredential*> credential ){
+	this->username = credential->getUsername();
+	this->password = credential->getPassword();
 }

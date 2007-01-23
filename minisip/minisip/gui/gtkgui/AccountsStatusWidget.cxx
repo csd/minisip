@@ -130,7 +130,7 @@ void AccountsStatusWidget::registerClicked(){
 			reg["identityId"] = id->getId();
 			id->lock();
 			reg["proxy_domain"] = id->getSipUri().getIp();
-			reg.setParam3( id->getSipProxy()->getDefaultExpires() );
+			reg.setParam3( id->getSipRegistrar()->getDefaultExpires() );
 			id->unlock();
 			callback->handleCommand("sip", reg );
 		}

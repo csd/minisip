@@ -127,14 +127,13 @@ void SipDialog::signalIfNoTransactions(){
 
 void SipDialog::addRoute( MRef<SipRequest *> req ){
 	if( !dialogState.isEstablished || req->getType() == "CANCEL" ){
-		// Use proxy route for requests outside of the dialog
+		// Use pre-set routes for requests outside of the dialog
 		// and for CANCEL requests
-		MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
+		const list<SipUri> & routeSet =
+			getDialogConfig()->sipIdentity->getRouteSet();
 
-		if( !proxy.isNull() ){
-			req->addRoute( proxy->getUri().getString() );
-		}
-	}
+		req->addRoutes( routeSet );
+ 	}
 	else if( dialogState.routeSet.size() > 0 ) {
 		//add route headers, if needed
 		MRef<SipHeaderValueRoute *> rset = new SipHeaderValueRoute (dialogState.routeSet);
@@ -307,10 +306,7 @@ bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 	if( !found ){
 		dialogState.auths.push_back( challenge );
 
-		string username = getDialogConfig()->sipIdentity->getSipProxy()->sipProxyUsername;
-		string password = getDialogConfig()->sipIdentity->getSipProxy()->sipProxyPassword;
-
-		challenge->setCredential( username, password );
+		challenge->setCredential( getDialogConfig()->sipIdentity->getCredential()  );
 		changed = true;
 	}
 

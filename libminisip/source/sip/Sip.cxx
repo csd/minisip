@@ -158,7 +158,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 
 		/*
 		   try{
-		   callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
+		   callconf->inherited.sipIdentity->sipProxy = SipRegistrar(proxy);
 		//			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
 		//			callconf->inherited.sipIdentity->sipProxyPort = iport;
 		}catch(IPAddressHostNotFoundException & exc){
@@ -247,7 +247,7 @@ string Sip::confconnect(string &user, string confId){
 		
 /*
 		try{
-			callconf->inherited.sipIdentity->sipProxy = SipProxy(proxy);
+			callconf->inherited.sipIdentity->sipProxy = SipRegistrar(proxy);
 //			callconf->inherited.sipIdentity->sipProxyIpAddr = new IP4Address(proxy);
 //			callconf->inherited.sipIdentity->sipProxyPort = iport;
 		}catch(IPAddressHostNotFoundException & exc){
@@ -344,7 +344,7 @@ void Sip::run(){
 	cerr << endl;
 	for (list<MRef<SipIdentity*> >::iterator i=phoneconfig->identities.begin() ; i!=phoneconfig->identities.end(); i++){
 		if ( (*i)->registerToProxy  ){
-			cerr << "Registering user "<< (*i)->getSipUri().getString() << " to proxy " << (*i)->getSipProxy()->getUri().getIp()<< ", requesting domain " << (*i)->getSipUri().getIp() << endl;
+			cerr << "Registering user "<< (*i)->getSipUri().getString() << " to proxy " << (*i)->getSipRegistrar()->getUri().getIp()<< ", requesting domain " << (*i)->getSipUri().getIp() << endl;
 			CommandString reg("",SipCommandString::proxy_register);
 			reg["proxy_domain"] = (*i)->getSipUri().getIp();
 			reg["identityId"] = (*i)->getId();

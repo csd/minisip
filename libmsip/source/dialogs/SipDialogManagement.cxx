@@ -803,7 +803,7 @@ bool SipDialogManagement::registerAll() {
 		CommandString cmdstr( (*it)->dialogState.callId, SipCommandString::proxy_register);
 		cmdstr["proxy_domain"] = (*it)->getDialogConfig()->sipIdentity->getSipUri().getIp();
 		//expires = defaultExpires, read from the config file
-		cmdstr.setParam3((*it)->getDialogConfig()->sipIdentity->getSipProxy()->getDefaultExpires()); 
+		cmdstr.setParam3((*it)->getDialogConfig()->sipIdentity->getSipRegistrar()->getDefaultExpires()); 
 		
 		SipSMCommand cmd( cmdstr,
 				SipSMCommand::dialog_layer,

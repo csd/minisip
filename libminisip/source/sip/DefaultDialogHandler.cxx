@@ -997,7 +997,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 		
 		try{
 			// TODO: untested
-			dialogConfig->sipIdentity->setSipProxy(new SipProxy(proxy, iport));
+			dialogConfig->sipIdentity->setSipRegistrar(new SipRegistrar(proxy, iport));
 		}catch(HostNotFound & exc){
 			merr << "Could not resolve PSTN proxy address:" << end;
 			merr << exc.what();
@@ -1049,10 +1049,8 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 			);
 
 	//Add outbount proxy route
-	MRef<SipProxy *> proxy = phoneconf->defaultIdentity->getSipProxy();
-	if( !proxy.isNull() ){
-		im->addRoute( proxy->getUri().getString() );
-	}
+	const list<SipUri> &routes = phoneconf->defaultIdentity->getRouteSet();
+	im->addRoutes( routes );
 
 	//FIXME: there should be a SipIMDialog, just like for register messages ...
 	// 	otherwise, we cannot keep track of local/remote tags, callids, etc ... 

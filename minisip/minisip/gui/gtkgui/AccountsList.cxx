@@ -75,14 +75,34 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
 		(*iter)[columns->uri] = (*i)->getSipUri().getUserIpString();
-		(*iter)[columns->autodetectSettings] = (*i)->getSipProxy()->autodetectSettings;
-		(*iter)[columns->proxy] = (*i)->getSipProxy()->getUri().getIp();
-		(*iter)[columns->port] = (*i)->getSipProxy()->getUri().getPort();
-		(*iter)[columns->transport] = (*i)->getSipProxy()->getUri().getTransport();
+		(*iter)[columns->autodetectSettings] = false;
+
+		const list<SipUri> & routeSet = (*i)->getRouteSet();
+
+		if( !routeSet.empty() ){
+			SipUri proxyUri = *routeSet.begin();
+
+			(*iter)[columns->proxy] = proxyUri.getIp();
+			(*iter)[columns->port] = proxyUri.getPort();
+			(*iter)[columns->transport] = proxyUri.getTransport();
+		}
+		else {
+			(*iter)[columns->proxy] = "";
+			(*iter)[columns->port] = 0;
+			(*iter)[columns->transport] = "";
+		}
+
 		(*iter)[columns->doRegister] = (*i)->registerToProxy;
-		(*iter)[columns->username] = (*i)->getSipProxy()->sipProxyUsername;
-		(*iter)[columns->password] = (*i)->getSipProxy()->sipProxyPassword;
-		(*iter)[columns->registerExpires] = (*i)->getSipProxy()->getDefaultExpires_int();
+		MRef<SipCredential*> cred = (*i)->getCredential();
+		if( cred ){
+			(*iter)[columns->username] = cred->getUsername();
+			(*iter)[columns->password] = cred->getPassword();
+		}
+		else {
+			(*iter)[columns->username] = "";
+			(*iter)[columns->password] = "";
+		}
+		(*iter)[columns->registerExpires] = (*i)->getSipRegistrar()->getDefaultExpires_int();
 		(*iter)[columns->defaultProxy] = ( (*i) == config->defaultIdentity );
 		(*iter)[columns->pstnProxy] = ( (*i) == config->pstnIdentity );
 		(*i)->unlock();
@@ -125,11 +145,17 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			merr << retProxy << end; 
 		}
 
-		identity->getSipProxy()->sipProxyUsername = 
+		string username = 
 			Glib::locale_from_utf8( (*iter)[columns->username] );
-		
-		identity->getSipProxy()->sipProxyPassword = 
+		string password =
 			Glib::locale_from_utf8( (*iter)[columns->password] );
+		MRef<SipCredential*> cred;
+
+		if( username != "" ){
+			cred = new SipCredential( username, password );
+		}
+
+		identity->setCredential( cred );
 
 		if( (*iter)[columns->pstnProxy] ){
 			identity->securityEnabled= false;
@@ -142,7 +168,10 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			config->defaultIdentity = identity;
 		}
 
-		identity->getSipProxy()->setDefaultExpires( (*iter)[columns->registerExpires] );
+		MRef<SipRegistrar*> registrar =
+			new SipRegistrar( identity->getSipUri().getIp() );
+		identity->setSipRegistrar( registrar );
+		identity->getSipRegistrar()->setDefaultExpires( (*iter)[columns->registerExpires] );
 
 		MRef<SipIdentity *> oldId = (*iter)[columns->identity];
 		if( oldId ){

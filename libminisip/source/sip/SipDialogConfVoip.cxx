@@ -1075,7 +1075,7 @@ void SipDialogConfVoip::sendAck(const string &branch){
 			branch, 
 			*lastResponse,
 			dialogState.remoteUri,
-			//getDialogConfig().inherited.sipIdentity->getSipProxy()->sipProxyIpAddr->getString());
+			//getDialogConfig().inherited.sipIdentity->getSipRegistrar()->sipProxyIpAddr->getString());
 			getDialogConfig()->inherited.sipIdentity->sipDomain);
 	//TODO:
 	//	ack.add_header( new SipHeaderRoute(getDialog()->getRouteSet() ) );
@@ -1155,9 +1155,9 @@ void SipDialogConfVoip::sendAck(const string &branch){
 	///modifyConfOk(ack);
 //	setLastResponse(ok);
 	modifyConfAck(ack);
-	MRef<SipProxy *> proxy = getDialogConfig()->sipIdentity->getSipProxy();
+	const list<SipUri> &routes = getDialogConfig()->sipIdentity->getRouteSet();
 
-	ack->addRoute( proxy->getUri().getString() );
+	ack->addRoutes( routes );
 
         MRef<SipMessage*> pref(*ack);
 	sendSipMessage(pref);

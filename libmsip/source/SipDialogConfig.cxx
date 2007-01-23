@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2007 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Cesc Santasusana < cesc Dot santa at@ gmail dOT com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -32,29 +34,62 @@
 
 using namespace std;
 
+#define DEBUG_OUTPUT
+
 int SipIdentity::globalIndex = 1; //give an initial value
 
-SipProxy::SipProxy(): uri(){
+SipCredential::SipCredential( const std::string &username,
+			      const std::string &password,
+			      const std::string &realm ):
+		realm( realm ),
+		username( username ),
+		password( password )
+{
+}
+
+std::string SipCredential::getRealm() const{
+	return realm;
+}
+
+std::string SipCredential::getUsername() const{
+	return username;
+}
+
+std::string SipCredential::getPassword() const{
+	return password;
+}
+
+void SipCredential::set( const std::string &aUsername,
+			 const std::string &aPassword,
+			 const std::string &aRealm ){
+	realm = aRealm;
+	username = aUsername;
+	password = aPassword;
+}
+
+
+
+SipRegistrar::SipRegistrar(): uri(){
 	autodetectSettings = false; //dont autodetect ... the values are invalid
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 	defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 
-SipProxy::SipProxy(const SipUri &addr, int port){
+SipRegistrar::SipRegistrar(const SipUri &addr, int port){
 	autodetectSettings = false;
 	try {
 		registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 		defaultExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
-		setProxy( addr, port );
+		setRegistrar( addr, port );
 	} catch (NetworkException & ) {
 		#ifdef DEBUG_OUTPUT
-		cerr << "SipProxy(str, int) throwing ... " << endl;
+		cerr << "SipRegistrar(str, int) throwing ... " << endl;
 		#endif
-		throw HostNotFound( "[SipProxy " + addr.getString() + "]" );
+		throw HostNotFound( "[SipRegistrar " + addr.getString() + "]" );
 	}
 }
 
-SipProxy::SipProxy(const SipUri &userUri, string transportParam) {
+SipRegistrar::SipRegistrar(const SipUri &userUri, string transportParam) {
 	SipUri addr;
 	bool unknown = true;
 	autodetectSettings = true;
@@ -66,16 +101,16 @@ SipProxy::SipProxy(const SipUri &userUri, string transportParam) {
 	if( transportParam != "" )
 		addr.setTransport( transportParam );
 
-	setProxy( addr );
+	setRegistrar( addr );
 }
 
 //addr could be "IP:port" ... but the port param passed to the function has precedence ...
-void SipProxy::setProxy(const SipUri &addr, int port){
+void SipRegistrar::setRegistrar(const SipUri &addr, int port){
 	massert(addr.getUserName()=="");
 	if( port > 65535 || port < 0 ) port = -1; //check the port
 	
 	#ifdef DEBUG_OUTPUT
-	cerr << "SipProxy:setProxy(str) : addr = " << addr << endl;
+	cerr << "SipRegistrar:setProxy(str) : addr = " << addr << endl;
 	#endif
 
 	uri = addr;
@@ -83,54 +118,51 @@ void SipProxy::setProxy(const SipUri &addr, int port){
 	if( port != -1 ){
 		uri.setPort(port);
 	}
-
-	// Loose router
-	uri.setParameter( "lr", "true" );
 }
 
-std::string SipProxy::getDebugString(){
+std::string SipRegistrar::getDebugString(){
 	return "uri="+uri.getString()
 		+"; autodetect="+ (autodetectSettings?"yes":"no")
-		+"; user="+sipProxyUsername
-		+"; password="+sipProxyPassword
+// 		+"; user="+sipProxyUsername
+// 		+"; password="+sipProxyPassword
 		+"; expires="+itoa(defaultExpires);
 }
 
-int SipProxy::getRegisterExpires_int( ) {
+int SipRegistrar::getRegisterExpires_int( ) {
 	return registerExpires;
 }
 
-int SipProxy::getDefaultExpires_int( ) {
+int SipRegistrar::getDefaultExpires_int( ) {
 	return defaultExpires;
 }
 
-void SipProxy::setRegisterExpires( string _expires ) {
+void SipRegistrar::setRegisterExpires( string _expires ) {
 	int r;
 	r = atoi( _expires.c_str() );
 	setRegisterExpires( r );
 }
 
-void SipProxy::setRegisterExpires( int _expires ) {
+void SipRegistrar::setRegisterExpires( int _expires ) {
 	if( _expires >= 0 && _expires < 100000 ) //sanity check ...
 		registerExpires = _expires;
 	else registerExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
 
-string SipProxy::getRegisterExpires( ) {
+string SipRegistrar::getRegisterExpires( ) {
 	return itoa(registerExpires); 
 }
 
-void SipProxy::setDefaultExpires( string _expires ) {
+void SipRegistrar::setDefaultExpires( string _expires ) {
 	int r;
 	r = atoi( _expires.c_str() );
 	setDefaultExpires( r );
 }
-void SipProxy::setDefaultExpires( int _expires ) {
+void SipRegistrar::setDefaultExpires( int _expires ) {
 	if( _expires >= 0 && _expires < 100000 ) //sanity check ...
 		defaultExpires = _expires;
 	else defaultExpires = DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;
 }
-string SipProxy::getDefaultExpires( ) {
+string SipRegistrar::getDefaultExpires( ) {
 	return itoa(defaultExpires); 
 }
 
@@ -242,79 +274,82 @@ string SipIdentity::getSipUri() {
 }
 #endif
 
-MRef<SipProxy *> SipIdentity::getSipProxy() {
+MRef<SipRegistrar *> SipIdentity::getSipRegistrar() {
 	return sipProxy;
 }
 
-bool SipIdentity::setSipProxy( MRef<SipProxy *> proxy ){
+bool SipIdentity::setSipRegistrar( MRef<SipRegistrar *> proxy ){
 	sipProxy = proxy;
 	return true;
 }
 
 string SipIdentity::setSipProxy( bool autodetect, string userUri, string transport, string proxyAddr, int proxyPort ) {
-	bool proxySetSuccess = false;
 	string ret = "";
+	routeSet.clear();
 	
 	#ifdef DEBUG_OUTPUT
 	if( autodetect ) cerr << "SipIdentity::setSipProxy: autodetect is true";
 	else 		cerr << "SipIdentity::setSipProxy: autodetect is false";
 	cerr << "; userUri=" << userUri << "; transport = "<< transport << "; proxyAddr=" << proxyAddr << "; proxyPort=" << proxyPort << endl;
 	#endif	
-	
-	setSipProxy( NULL );
-	
-	if( autodetect ) {
-		try{
-			this->sipProxy = new SipProxy( userUri, transport );
-			proxySetSuccess = true;
-		} catch( NetworkException & exc ){
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipIdentity::setProxy: autodetect failed to fetch proxy settings ..." << endl;
-			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
-			#endif
-			ret +="The SIP proxy for the account ["
-				+ this->identityIdentifier + "] could no be resolved.";
-			this->setDoRegister( false );
-		}
-	} else { 
-		#ifdef DEBUG_OUTPUT
-		cerr << "SipIdentity::setProxy: else ..." << endl;
-		#endif
-	}
-	
-	if( !proxySetSuccess ) {
-		try {
-			SipUri proxyUri( proxyAddr );
-			proxyUri.setPort( proxyPort );
-			proxyUri.setTransport( transport );
 
-			this->sipProxy = new SipProxy( proxyUri );
-			#ifdef DEBUG_OUTPUT
-			if( autodetect )
-				cerr << "SipIdentity::setProxy: creating fake proxy ..." << endl;
-			else
-				cerr << "SipIdentity::setProxy: manual sipproxy success ... " << endl;
-			#endif
-			proxySetSuccess = true;
-		} catch ( NetworkException & exc ){
-			#ifdef DEBUG_OUTPUT
-			cerr << "SipIdentity::setProxy: manual settings for SIP proxy are wrong ... trying autodetect" << endl;
-			cerr << "SipIdentity::setProxy: error = " << exc.what() << endl;
-			#endif
-		}
+	if( autodetect ){
+		SipUri proxyUri;
+		SipUri aor( userUri );
+
+		proxyUri.setProtocolId( aor.getProtocolId() );
+		proxyUri.setIp( aor.getIp() );
+		if( transport != "" )
+			proxyUri.setTransport( transport );
+		proxyUri.setParameter( "lr", "true" );
+		proxyUri.makeValid( true );
+
+		routeSet.push_back( proxyUri );
 	}
-	
-	MRef<SipProxy *> prox = getSipProxy();
-	prox->autodetectSettings = autodetect;
+	else if( proxyAddr != "" ){
+		SipUri proxyUri;
+		
+		proxyUri.setProtocolId( "sip" );
+		proxyUri.setIp( proxyAddr );
+		proxyUri.setPort( proxyPort );
+		if( transport != "" )
+			proxyUri.setTransport( transport );
+		proxyUri.setParameter( "lr", "true" );
+		proxyUri.makeValid( true );
+
+		routeSet.push_back( proxyUri );
+	}
+
 	return ret;
 }
+
+MRef<SipCredential*> SipIdentity::getCredential() const{
+	return credential;
+}
+
+void SipIdentity::setCredential( MRef<SipCredential*> aCredential ){
+	credential = aCredential;
+}
+
+const list<SipUri> &SipIdentity::getRouteSet() const {
+	return routeSet;
+}
+
+void SipIdentity::setRouteSet( const list<SipUri> &aRouteSet ){
+	routeSet = aRouteSet;
+}
+
+void SipIdentity::addRoute( const SipUri &route ){
+	routeSet.push_back( route );
+}
+
 
 void SipIdentity::setIdentityName(string n){
 	identityIdentifier = n;
 }
 
 void SipIdentity::setIsRegistered( bool registerOk ) {
-	if( registerOk == true && getSipProxy()->getRegisterExpires_int() != 0 ) {
+	if( registerOk == true && getSipRegistrar()->getRegisterExpires_int() != 0 ) {
 		currentlyRegistered = true;
 	} else {
 		currentlyRegistered = false;
@@ -325,7 +360,7 @@ string SipIdentity::getDebugString(){
 	lock();
 	string ret = "identity="+identityIdx+
 			"; uri="+sipUri.getString()+ 
-			" proxy=["+(getSipProxy()?getSipProxy()->getDebugString():"")+
+			" proxy=["+(getSipRegistrar()?getSipRegistrar()->getDebugString():"")+
 			"]; isRegistered="+itoa(currentlyRegistered);
 	unlock();
 	return ret;
@@ -372,7 +407,7 @@ SipDialogConfig::SipDialogConfig(MRef<SipStack*> stack) {
 	sipStack = stack;
 
 
-	last_invite=NULL;
+// 	last_invite=NULL;
 
 
 	local_ssrc = rand();
@@ -394,8 +429,13 @@ SipUri SipDialogConfig::getContactUri(bool useStun) const{
 	const SipUri &fromUri = sipIdentity->getSipUri();
 	string transport;
 
-	if( sipIdentity->getSipProxy() )
-		transport = sipIdentity->getSipProxy()->getUri().getTransport();
+	const list<SipUri> &routes = sipIdentity->getRouteSet();
+
+	if( !routes.empty() ){
+		SipUri proxy = *routes.begin();
+
+		transport = proxy.getTransport();
+	}
 	else
 		transport = fromUri.getTransport();
 
