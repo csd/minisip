@@ -211,6 +211,7 @@ class MainWindow : public GtkMainUI,
 		
 		LogWidget * logWidget;
 		AccountsStatusWidget * statusWidget;
+		Gtk::ScrolledWindow * statusWindow;
 
 		list<CallWidget *> callWidgets;
 		list<ConferenceWidget *> conferenceWidgets;

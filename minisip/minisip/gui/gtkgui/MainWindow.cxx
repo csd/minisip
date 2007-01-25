@@ -317,6 +317,12 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 					     new AccountsListColumns() );
 
 	statusWidget = new AccountsStatusWidget( accountsList);
+	statusWindow = new Gtk::ScrolledWindow();
+
+	statusWindow->add( *statusWidget );
+	statusWindow->set_shadow_type( Gtk::SHADOW_NONE );
+	statusWindow->set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
+
 	//mainTabWidget->append_page( *statusWidget, "Accounts" );
 
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
@@ -335,6 +341,7 @@ MainWindow::~MainWindow(){
 	factory->remove_default();
 	delete settingsDialog;
 	delete certificateDialog;
+	delete statusWindow;
 	delete statusWidget;
 	delete logWidget;
 	delete phoneMenu;
@@ -924,7 +931,7 @@ void MainWindow::viewToggle( uint8_t w ){
 			title = "Call list";
 			break;
 		case 1:
-			widget = statusWidget;
+			widget = statusWindow;
 			title = "Accounts";
 			break;
 		default:
