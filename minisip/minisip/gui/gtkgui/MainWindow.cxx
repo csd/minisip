@@ -630,11 +630,13 @@ CallWidget * MainWindow::addCall( string callId, string remoteUri, bool incoming
 	Gtk::HBox * hbox = manage( new Gtk::HBox );
 	Glib::ustring tabLabelText;
 
+	SipUri remote( remoteUri );
+
 	CallWidget * callWidget = new CallWidget( callId, remoteUri, this, incoming, securityStatus );
 
 	callWidgets.push_back( callWidget );
 
-	entry = contactDb->lookUp( remoteUri );
+	entry = contactDb->lookUp( remote.getRequestUriString() );
 
 	if( entry != NULL ){
 		tabLabelText = Glib::locale_to_utf8( entry->getName() );
