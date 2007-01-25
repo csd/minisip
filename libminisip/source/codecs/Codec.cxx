@@ -30,7 +30,8 @@
 using namespace std;
 
 AudioCodecRegistry::AudioCodecRegistry(){
-	registerPlugin( new G711Codec( NULL ) );	
+	registerPlugin( new G711Codec( NULL, G711U ) );
+	registerPlugin( new G711Codec( NULL, G711A ) );
 }
 
 MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
@@ -40,6 +41,7 @@ extern "C"
 std::list<std::string> *mg711_LTX_listPlugins( MRef<Library *> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
+		pluginList.push_back("getPluginG711a");
 		initialized = true;
 	}
 
@@ -48,16 +50,24 @@ std::list<std::string> *mg711_LTX_listPlugins( MRef<Library *> lib ){
 
 extern "C"
 MRef<MPlugin *> mg711_LTX_getPlugin( MRef<Library *> lib ){
-	return new G711Codec( lib );
+	return new G711Codec( lib, G711U );
 }
 
+extern "C"
+MRef<MPlugin *> mg711_LTX_getPluginG711a( MRef<Library *> lib ){
+	return new G711Codec( lib, G711A );
+}
 
-G711Codec::G711Codec( MRef<Library *> lib ): AudioCodec( lib ){
+G711Codec::G711Codec( MRef<Library *> lib, G711Version version ): AudioCodec( lib ), version( version ){
 
 }
 
 G711Codec::~G711Codec(){
 
+}
+
+
+G711CodecState::G711CodecState( G711Version version ): version( version ){
 }
 
 uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
@@ -66,8 +76,12 @@ uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf
 	short *in_data = (short*)in_buf;
 	unsigned char *out_data = (unsigned char*)out_buf;
 
-	for (int32_t i=0; i< 160; i++)
-		out_data[i]=linear2ulaw(in_data[i]);
+	for (int32_t i=0; i< 160; i++){
+		if( version == G711A )
+			out_data[i]=linear2alaw(in_data[i]);
+		else
+			out_data[i]=linear2ulaw(in_data[i]);
+	}
 	
 	// pn430 Added to account for change in return value
 	return 160;
@@ -79,8 +93,12 @@ uint32_t G711CodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf
 	unsigned char *in_data = (unsigned char*)in_buf;
 	short *out_data = (short*)out_buf;
 	
-	for (int32_t i=0; i< in_buf_size; i++)
-		out_data[i]=ulaw2linear(in_data[i]);
+	for (int32_t i=0; i< in_buf_size; i++){
+		if( version == G711A )
+			out_data[i]=alaw2linear(in_data[i]);
+		else
+			out_data[i]=ulaw2linear(in_data[i]);
+	}
 
 	return in_buf_size;
 }
@@ -104,23 +122,35 @@ int32_t G711Codec::getInputNrSamples(){
 }
 
 string G711Codec::getCodecName(){
-	return "G.711";
+	if( version == G711A )
+		return "G.711a";
+	else
+		return "G.711";
 }
 
 string G711Codec::getCodecDescription(){
-	return "G.711 8kHz, PCMu";
+	if( version == G711A )
+		return "G.711 8kHz, PCMa";
+	else
+		return "G.711 8kHz, PCMu";
 }
 
 uint8_t G711Codec::getSdpMediaType(){
-	return 0;		
+	if( version == G711A )
+		return 8;
+	else
+		return 0;
 }
 
 string G711Codec::getSdpMediaAttributes(){
-	return "PCMU/8000/1";
+	if( version == G711A )
+		return "PCMA/8000/1";
+	else
+		return "PCMU/8000/1";
 }
 
 MRef<CodecState *> G711Codec::newInstance(){
-	MRef<CodecState *> ret = new G711CodecState();
+	MRef<CodecState *> ret = new G711CodecState( version );
 	ret->setCodec( this );
 	return ret;
 }

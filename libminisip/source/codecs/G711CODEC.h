@@ -29,8 +29,14 @@
 
 #include<libminisip/codecs/Codec.h>
 
+enum G711Version {
+	G711U = 1,
+	G711A = 2
+};
+
 class G711CodecState : public CodecState{
 	public:
+		G711CodecState( G711Version version );
 
 		/**
 		* @returns Number of bytes in output buffer
@@ -42,13 +48,16 @@ class G711CodecState : public CodecState{
 		* @returns Number of frames in output buffer
 		*/
 		virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+
+	private:
+		G711Version version;
 };
 
 class G711Codec : public AudioCodec{
 	public:
 		virtual MRef<CodecState *> newInstance();
 		
-		G711Codec( MRef<Library *> lib );
+		G711Codec( MRef<Library *> lib, G711Version version );
 		virtual ~G711Codec();
 	
 		/**
@@ -79,6 +88,9 @@ class G711Codec : public AudioCodec{
 		virtual std::string getMemObjectType() const {return "G711Codec";}		
 		
 		virtual uint32_t getVersion()const;
+
+	private:
+		G711Version version;
 };
 
 #endif

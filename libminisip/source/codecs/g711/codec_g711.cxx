@@ -53,10 +53,10 @@
 #define	SEG_SHIFT	(4)		/* Left shift for segment number. */
 #define	SEG_MASK	(0x70)		/* Segment field mask. */
 
-/*
+
 static short seg_aend[8] = {0x1F, 0x3F, 0x7F, 0xFF,
 			    0x1FF, 0x3FF, 0x7FF, 0xFFF};
-*/
+
 
 static short seg_uend[8] = {0x3F, 0x7F, 0xFF, 0x1FF,
 			    0x3FF, 0x7FF, 0xFFF, 0x1FFF};
@@ -141,44 +141,44 @@ static short search(
  * John Wiley & Sons, pps 98-111 and 472-476.
  */
 
-//unsigned char
-//linear2alaw(short pcm_val)	/* 2's complement (16-bit range) */
-//{
-//   short	 mask;
-//   short	 seg;
-//   unsigned char aval;
-//   
-//   pcm_val = pcm_val >> 3;
-//
-//   if (pcm_val >= 0) {
-//      mask = 0xD5;		/* sign (7th) bit = 1 */
-//   } else {
-//      mask = 0x55;		/* sign bit = 0 */
-//      pcm_val = -pcm_val - 1;
-//   }
+unsigned char
+linear2alaw(short pcm_val)	/* 2's complement (16-bit range) */
+{
+  short	 mask;
+  short	 seg;
+  unsigned char aval;
+  
+  pcm_val = pcm_val >> 3;
+
+  if (pcm_val >= 0) {
+     mask = 0xD5;		/* sign (7th) bit = 1 */
+  } else {
+     mask = 0x55;		/* sign bit = 0 */
+     pcm_val = -pcm_val - 1;
+  }
    
    /* Convert the scaled magnitude to segment number. */
-//   seg = search(pcm_val, seg_aend, 8);
+  seg = search(pcm_val, seg_aend, 8);
    
    /* Combine the sign, segment, and quantization bits. */
    
-//   if (seg >= 8)		/* out of range, return maximum value. */
-//      return (unsigned char) (0x7F ^ mask);
-//   else {
-//      aval = (unsigned char) seg << SEG_SHIFT;
-//      if (seg < 2)
-//	 aval |= (pcm_val >> 1) & QUANT_MASK;
-//      else
-//	 aval |= (pcm_val >> seg) & QUANT_MASK;
-//      return (aval ^ mask);
-//   }
-//}
+  if (seg >= 8)		/* out of range, return maximum value. */
+     return (unsigned char) (0x7F ^ mask);
+  else {
+     aval = (unsigned char) seg << SEG_SHIFT;
+     if (seg < 2)
+	 aval |= (pcm_val >> 1) & QUANT_MASK;
+     else
+	 aval |= (pcm_val >> seg) & QUANT_MASK;
+     return (aval ^ mask);
+  }
+}
 
 /*
  * alaw2linear() - Convert an A-law value to 16-bit linear PCM
  *
  */
-/*
+
 short
 alaw2linear(
    unsigned char	a_val)
@@ -204,7 +204,7 @@ alaw2linear(
    return ((a_val & SIGN_BIT) ? t : -t);
 }
 
-*/
+
 #define	BIAS		(0x84)		/* Bias for linear code. */
 #define CLIP            8159
 
