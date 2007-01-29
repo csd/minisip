@@ -37,6 +37,11 @@
 
 using namespace std;
 
+/* serves as define to split inkey in 256 bit chunks */
+#define PRF_KEY_CHUNK_LENGTH		32
+/* 160 bit of SHA1 take 20 bytes */
+#define SHA_DIGEST_SIZE			20
+
 ITgk::~ITgk(){
 }
 
@@ -120,7 +125,7 @@ void KeyAgreement::setRand( unsigned char * rand, int randLengthValue ){
 	memcpy( this->randPtr, rand, randLengthValue );
 }
 
-/* Described in draft-ietf-msec-mikey-07.txt Section 4.1.2 */
+/* Described in rfc3830.txt Section 4.1.2 */
 void p( unsigned char * s, unsigned int sLength, 
         unsigned char * label, unsigned int labelLength,
 	unsigned int m,
@@ -128,39 +133,55 @@ void p( unsigned char * s, unsigned int sLength,
 {
 	unsigned int i;
 	unsigned int hmac_output_length;
-	byte_t * hmac_input = new byte_t[ labelLength + 20 ];
+	byte_t * hmac_input = new byte_t[ labelLength + SHA_DIGEST_SIZE ];
 
-	/* initial step */
+	/* initial step 
+	 * calculate A_1 and store in hmac_input */
+
 	hmac_sha1( s, sLength,
 	      label, labelLength,
 	      hmac_input, &hmac_output_length );
-	assert( hmac_output_length == 20 );
-	memcpy( &hmac_input[20], label, labelLength );
+	assert( hmac_output_length == SHA_DIGEST_SIZE );
+	memcpy( &hmac_input[SHA_DIGEST_SIZE], label, labelLength );
+
+	/* calculate P(s,label,1)
+	 * and store in output[0 ... SHA_DIGEST_SIZE -1] */
 
 	hmac_sha1( s, sLength, 
-	      hmac_input, labelLength + 20,
+	      hmac_input, labelLength + SHA_DIGEST_SIZE,
 	      output, &hmac_output_length );
-	assert( hmac_output_length == 20 );
+	assert( hmac_output_length == SHA_DIGEST_SIZE );
 
+	/* need key-length > SHA_DIGEST_SIZE * 8 bits? */
 	for( i = 2; i <= m ; i++ )
 	{
-		/* Update the first part of the hmac_input (A_i)
-		 * with the MAC of the previous one (A_(i-1)) */
+		/* calculate A_i = HMAC (s, A_(i-1))
+		 * A_(i-1) is found in hmac_input 
+		 * and A_i is stored in hmac_input, 
+		 * important: label in upper indices [SHA_DIGEST_SIZE ... labelLength + SHA_DIGEST_SIZE -1]
+		 * stays untouched and is repetitively reused! */
+
 		hmac_sha1( s, sLength, 
-		      hmac_input, 20,
+		      hmac_input, SHA_DIGEST_SIZE,
 		      hmac_input, &hmac_output_length );
-		assert( hmac_output_length == 20 );
-		
+		assert( hmac_output_length == SHA_DIGEST_SIZE );
+
+		/* calculate P(s,label,i), which is stored in 
+		 * output[0 ... (i * SHA_DIGEST_SIZE) -1] */
+
 		hmac_sha1( s, sLength, 
-	      	      hmac_input, labelLength + 20,
-	      	      &output[ 20 * (i-1) ], &hmac_output_length );
-		assert( hmac_output_length == 20 );
+	      	      hmac_input, labelLength + SHA_DIGEST_SIZE,
+	      	      &output[ SHA_DIGEST_SIZE * (i-1) ], &hmac_output_length );
+		assert( hmac_output_length == SHA_DIGEST_SIZE );
 	}
 
+	/* output now contains complete P(s,label,m)
+	 * in output[0 ... (m * SHA_DIGEST_SIZE) -1] */
 	delete [] hmac_input;
 }
 
-/* Described in draft-ietf-msec-mikey-07.txt Section 4.1.3 */
+/* Described in rfc3830.txt Section 4.1.2 */
+
 void prf( unsigned char * inkey,  unsigned int inkeyLength,
 	  unsigned char * label,  unsigned int labelLength,
 	  unsigned char * outkey, unsigned int outkeyLength )
@@ -170,15 +191,15 @@ void prf( unsigned char * inkey,  unsigned int inkeyLength,
 	unsigned int i;
 	unsigned int j;
 	unsigned char * p_output;
-	n = ( inkeyLength + 63 )/ 64;
-	m = ( outkeyLength + 19 )/ 20;
+	n = ( inkeyLength + PRF_KEY_CHUNK_LENGTH -1 )/ PRF_KEY_CHUNK_LENGTH;
+	m = ( outkeyLength + SHA_DIGEST_SIZE -1 )/ SHA_DIGEST_SIZE;
 	
-	p_output = new unsigned char[ m * 20 ];
+	p_output = new unsigned char[ m * SHA_DIGEST_SIZE ];
 
 	memset( outkey, 0, outkeyLength );
 	for( i = 1; i <= n-1; i++ )
 	{
-		p( &inkey[ (i-1)*64 ], 64, label, labelLength, m, p_output );
+		p( &inkey[ (i-1)*PRF_KEY_CHUNK_LENGTH ], PRF_KEY_CHUNK_LENGTH, label, labelLength, m, p_output );
 		for( j = 0; j < outkeyLength; j++ )
 		{
 			outkey[j] ^= p_output[j];
@@ -186,7 +207,7 @@ void prf( unsigned char * inkey,  unsigned int inkeyLength,
 	}
 
 	/* Last step */
-	p( &inkey[ (n-1)*64 ], inkeyLength % 64, 
+	p( &inkey[ (n-1)*PRF_KEY_CHUNK_LENGTH ], inkeyLength % PRF_KEY_CHUNK_LENGTH, 
 			label, labelLength, m, p_output );
 	
 	for( j = 0; j < outkeyLength; j++ )
