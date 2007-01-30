@@ -28,6 +28,8 @@
 #include"CertificateDialog.h"
 #include"SettingsDialog.h"
 
+#include<libmcrypto/SipSimSoft.h>
+
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
 #define BIND SigC::bind
@@ -105,8 +107,17 @@ AccountDialog::~AccountDialog(){
 
 void AccountDialog::addAccount(){
 	reset();
+	MRef<SipIdentity*> identity = new SipIdentity;
+	MRef<ca_db*> ca = ca_db::create();
+	MRef<certificate_chain*> cert = certificate_chain::create();
+	MRef<SipSim*> sim =
+		new SipSimSoft( cert, ca );
+	identity->setSim( sim );
+	securitySettings->setConfig( identity );
+
 	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
 		Gtk::TreeModel::iterator iter = list->append();
+		(*iter)[list->columns->identity] = identity;
 		apply( iter );
 	}
 	dialogWindow->hide();

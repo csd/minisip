@@ -30,6 +30,7 @@
 #include<libminisip/soundcard/SoundDriverRegistry.h>
 
 #include<libmnetutil/NetworkFunctions.h>
+#include<libmcrypto/SipSimSoft.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -770,8 +771,16 @@ string SecuritySettings::apply(){
 		}
 	}
 
-	identity->getSim()->setCAs( certDialog->getRootCa() );
-	identity->getSim()->setCertificateChain( certDialog->getCertChain() );
+	if( identity->getSim() ){
+		identity->getSim()->setCAs( certDialog->getRootCa() );
+		identity->getSim()->setCertificateChain( certDialog->getCertChain() );
+	}
+	else{
+		MRef<SipSim*> sim =
+			new SipSimSoft( certDialog->getCertChain(),
+					certDialog->getRootCa() );
+		identity->setSim( sim );
+	}
 
 	return err;
 
