@@ -85,6 +85,19 @@ string DefaultDialogHandler::getName(){
 	return "DefaultDialogHandler";
 }
 
+MRef<SipIdentity *> DefaultDialogHandler::lookupTarget(const SipUri &uri){
+	MRef<SipIdentity *> id = NULL;
+
+	id = phoneconf->getIdentity( uri );
+
+	if (!id){
+		merr <<"WARNING: Could not find local identity - using default"<<endl;
+		id = phoneconf->defaultIdentity;
+	}
+
+	return id;
+}
+
 bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 	if (pkt->getType()=="INVITE"){
@@ -121,21 +134,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		}while(hdr);
 
 		if(isConfJoin) {
-			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
-			string uri;
-			MRef<SipIdentity *> id = NULL;
-
-			if( to ){
-				SipUri u = to->getUri();
-				id = phoneconf->getIdentity( u );
-			}else{
-				return true; //handle by ignoring
-			}
-
-			if (!id){
-				merr <<"WARNING: Could not find local identity - using default"<<endl;
-				id = phoneconf->defaultIdentity;
-			}
+			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
@@ -196,22 +195,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			
 		}
 		else if(isConfConnect) {
-			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
-			string uri;
-			MRef<SipIdentity *> id = NULL;
-
-			if( to ){
-				SipUri u = to->getUri();
-				id = phoneconf->getIdentity( u );
-			}else{
-				mdbg <<  "INFO: dropping incoming message without FROM header"<<endl;
-				return true;
-			}
-			
-			if (!id){
-				merr <<"WARNING: Could not find local identity - using default"<<endl;
-				id = phoneconf->defaultIdentity;
-			}
+			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
 			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
@@ -242,21 +226,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		}
 		//start SipDialogVoIP
 		else{
-			MRef<SipHeaderValueTo*> to = pkt->getHeaderValueTo();
-			string uri;
-			MRef<SipIdentity *> id = NULL;
-
-			if( to ){
-				SipUri u = to->getUri();
-				id = phoneconf->getIdentity( u );
-			}else{
-				return true; // We handled it by ignoring the packet
-			}
-
-			if (!id){
-				merr <<"WARNING: Could not find local identity - using default"<<endl;
-				id = phoneconf->defaultIdentity;
-			}
+			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 

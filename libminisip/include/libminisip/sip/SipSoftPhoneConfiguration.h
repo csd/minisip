@@ -102,7 +102,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		/**
 		 * Returns the identity when getUri() == uri
 		 */
-		MRef<SipIdentity *> getIdentity( SipUri &uri );
+		MRef<SipIdentity *> getIdentity( const SipUri &uri );
 		
 		bool useSTUN;
 		std::string stunServerIpString;

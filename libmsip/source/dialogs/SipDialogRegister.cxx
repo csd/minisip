@@ -144,6 +144,14 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 ///		regcall->getDialogContainer()->getPhoneConfig()->proxyConnection = command.getCommandPacket()->getSocket();
 		
 		//Mark the identity as currently registered (or not, maybe we are unregistering)
+
+		MRef<SipMessage*> pkt = command.getCommandPacket();
+		MRef<SipHeaderValueContact *> c = pkt->getHeaderValueContact();
+		list<SipUri> contacts;
+
+		// TODO add all contacts from the response
+		contacts.push_back( c->getUri() );
+		getDialogConfig()->sipIdentity->setRegisteredContacts ( contacts );
 		getDialogConfig()->sipIdentity->setIsRegistered ( true );
 		
 		CommandString cmdstr( 

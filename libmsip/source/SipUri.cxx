@@ -40,6 +40,7 @@
 #include<libmutil/stringutils.h>
 
 #include<vector>
+#include<locale>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>
@@ -315,7 +316,7 @@ void SipUri::setDisplayName(string dispName) {
 #endif
 }
 
-string SipUri::getDisplayName() const {
+const string & SipUri::getDisplayName() const {
 	return displayName;
 }
 
@@ -326,7 +327,7 @@ void SipUri::setProtocolId(string id){
 #endif
 }
 
-string SipUri::getProtocolId() const {
+const string & SipUri::getProtocolId() const {
 	return protocolId;
 }
 
@@ -339,7 +340,7 @@ void SipUri::setUser(string name){
 #endif
 }
 
-string SipUri::getUserName() const {
+const string & SipUri::getUserName() const {
 	return userName;
 }
 
@@ -350,7 +351,7 @@ void SipUri::setIp(string ip){
 #endif
 }
 
-string SipUri::getIp() const {
+const string & SipUri::getIp() const {
 	return ip;
 }
 
@@ -372,7 +373,7 @@ void SipUri::setUserType(string type){
 #endif
 }
 
-string SipUri::getUserType() const {
+const string & SipUri::getUserType() const {
 	return getParameter( "user" );
 }
 
@@ -383,7 +384,7 @@ void SipUri::setTransport(string transp){
 #endif
 }
 
-string SipUri::getTransport() const {
+const string & SipUri::getTransport() const {
 	return getParameter( "transport" );
 }
 
@@ -398,17 +399,75 @@ bool SipUri::hasParameter(const std::string &key) const{
 	return iter != parameters.end();
 }
 
-std::string SipUri::getParameter(const std::string &key) const{
+const std::string & SipUri::getParameter(const std::string &key) const{
+	static const string empty = "";
+
 	std::map<std::string, std::string>::const_iterator iter;
 	iter = parameters.find( key );
 	if( iter != parameters.end() )
 		return iter->second;
 	else
-		return "";
+		return empty;
 }
 
 void SipUri::removeParameter(const std::string &key){
 	parameters.erase( key );
+}
+
+int SipUri::operator==(const SipUri &uri) const{
+	locale loc("");
+
+	if( getProtocolId() != uri.getProtocolId() ||
+	    getUserName() != uri.getUserName() ||
+	    strCaseCmp(getIp(), uri.getIp(), loc) ||
+	    getPort() != uri.getPort() ){
+		return false;
+	}
+
+	// RFC 3261 19.1.4
+	// A URI omitting any component with a default value will not
+        // match a URI explicitly containing that component with its
+        // default value.
+	const char *keys[] = { "transport", "user", "ttl",
+			      "method", "maddr", NULL };
+
+	for( int j = 0; keys[j]; j++ ){
+		const char *key = keys[j];
+		const string & value = getParameter( key );
+
+		if( strCaseCmp( value, uri.getParameter( key ), loc) ){
+			return false;
+		}
+	}
+
+	map<string,string>::const_iterator i;
+	map<string,string>::const_iterator last = parameters.end();
+
+	for( i = parameters.begin(); i != last; i++ ){
+		const string &key = i->first;
+		const string &value = i->second;
+
+		if( uri.hasParameter( key ) ){
+			if( strCaseCmp( value, uri.getParameter( key ), loc ) ){
+				return false;
+			}
+		}
+	}
+
+	last = uri.parameters.end();
+
+	for( i = uri.parameters.begin(); i != last; i++ ){
+		const string &key = i->first;
+		const string &value = i->second;
+
+		if( hasParameter( key ) ){
+			if( strCaseCmp( value, getParameter( key ), loc ) ){
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 bool SipUri::isValid() const { 
@@ -423,4 +482,3 @@ void SipUri::makeValid( bool valid ) {
 ostream& operator << (ostream& os, const SipUri& uri){
 	return os << uri.getString();
 }
-

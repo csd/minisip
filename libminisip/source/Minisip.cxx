@@ -376,7 +376,7 @@ int Minisip::startSip() {
 		   mdbg << "Starting presence server"<< end;
 		   CommandString subscribeserver("", SipCommandString::start_presence_server);
 		   SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
-		   sip->handleCommand(sipcmdss);
+		   sip->getSipStack()->handleCommand(sipcmdss);
 		   */
 
 		/*

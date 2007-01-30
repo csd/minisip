@@ -149,7 +149,7 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 		
 		void sendIM(const std::string &branch, std::string msg, int seqno, std::string toUri);
 			
-
+		MRef<SipIdentity *> lookupTarget(const SipUri &uri);
 };
 
 #endif

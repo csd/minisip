@@ -230,6 +230,10 @@ class LIBMSIP_API SipIdentity : public MObject{
 		*/
 		bool isRegistered();
 		
+		void setRegisteredContacts( const std::list<SipUri> &contacts );
+
+		const std::list<SipUri>& getRegisteredContacts() const;
+
 		void setSim(MRef<SipSim*> s){sim=s;}
 
 		MRef<SipSim *> getSim(){return sim;}
@@ -237,6 +241,9 @@ class LIBMSIP_API SipIdentity : public MObject{
 		std::string getPsk(){return psk;}
 
 		void setPsk( std::string key );
+
+		SipUri getContactUri( MRef<SipStack*> sipStack,
+				      bool useStun ) const;
 
 		bool securityEnabled;
 		int ka_type;
@@ -272,10 +279,17 @@ class LIBMSIP_API SipIdentity : public MObject{
 		*/
 		bool currentlyRegistered;
 
+		std::list<SipUri> registeredContacts;
+
 		/**
 		Mutex for use in different threads
 		*/
 		Mutex mutex;
+
+		/**
+		 * Common initializer for all constructors
+		 */
+		void init();
 };
 
 class LIBMSIP_API SipDialogConfig : public MObject{
@@ -305,7 +319,7 @@ class LIBMSIP_API SipDialogConfig : public MObject{
 		void useIdentity( MRef<SipIdentity*> identity,
 				std::string transport="UDP_X");
 
-		SipUri getContactUri(bool useStun) const;
+		SipUri getContactUri( bool useStun ) const;
 };
 
 #endif

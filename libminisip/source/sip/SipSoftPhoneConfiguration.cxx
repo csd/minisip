@@ -969,17 +969,47 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( string id ) {
 	return NULL;
 }
 
-MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( SipUri &uri ) {
+MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( const SipUri &uri ) {
 	list< MRef<SipIdentity*> >::iterator it;
-	
+	SipUri tmpUri = uri;
+
+	// Search registered contact addresses
 	for( it = identities.begin(); it!=identities.end(); it++ ) {
-		(*it)->lock();
-		if( (*it)->getSipUri().getUserName() == uri.getUserName() && 
-		    (*it)->getSipUri().getIp() == uri.getIp() ) {
-			(*it)->unlock();
-			return (*it);
+		MRef<SipIdentity*> &identity =  *it;
+
+		identity->lock();
+		const list<SipUri> &contacts =
+			identity->getRegisteredContacts();
+
+		if( find( contacts.begin(), contacts.end(), tmpUri ) !=
+		    contacts.end() ){
+#ifdef DEBUG_OUTPUT
+			cerr << "Found registered identity " << identity->identityIdentifier << endl;
+#endif
+			identity->unlock();
+			return identity;
 		}
-		(*it)->unlock();
+
+		identity->unlock();
+	}
+
+	// Search identity AOR user names
+	for( it = identities.begin(); it!=identities.end(); it++ ) {
+		MRef<SipIdentity*> &identity =  *it;
+
+		identity->lock();
+
+		SipUri identityUri = 
+			identity->getSipUri();
+
+		if( identityUri.getUserName() == tmpUri.getUserName() ){
+#ifdef DEBUG_OUTPUT
+			cerr << "Found AOR identity " << identity->identityIdentifier << endl;
+#endif
+			identity->unlock();
+			return identity;
+		}
+		identity->unlock();
 	}
 
 	return NULL;

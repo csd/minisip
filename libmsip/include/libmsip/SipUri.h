@@ -111,25 +111,25 @@ class LIBMSIP_API SipUri : public MObject{
 		virtual std::string getMemObjectType() const {return "SipUri";}
 
 		void setDisplayName(std::string id);
-		std::string getDisplayName() const;
+		const std::string & getDisplayName() const;
 		
 		void setProtocolId(std::string protocolId);
-		std::string getProtocolId() const;
+		const std::string & getProtocolId() const;
 	
 		void setUser(std::string id);
-		std::string getUserName() const;
+		const std::string & getUserName() const;
 
 		void setIp(std::string ip);
-		std::string getIp() const;
+		const std::string & getIp() const;
 
 		void setPort(int32_t port);
 		int32_t getPort() const;
 
 		void setUserType(std::string userType);
-		std::string getUserType() const;
+		const std::string & getUserType() const;
 
 		void setTransport(std::string transp);
-		std::string getTransport() const;
+		const std::string & getTransport() const;
 		
 		/**
 		Use it to check whether the uri has valid stuff in it ... 
@@ -149,9 +149,14 @@ class LIBMSIP_API SipUri : public MObject{
 
 		bool hasParameter(const std::string &key) const;
 
-		std::string getParameter(const std::string &key) const;
+		const std::string & getParameter(const std::string &key) const;
 
 		void removeParameter(const std::string &key);
+
+		/**
+		 * Compare two SIP URI:s according to RFC 3261 19.1.4
+		 */
+		int operator==( const SipUri &uri ) const;
 
 	private:
 		std::string displayName;

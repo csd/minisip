@@ -114,6 +114,14 @@ class SipLayerTransport : public SipSMCommandReceiver {
 					 MRef<SipSocketServer*> &server,
 					 MRef<Socket*> &socket);
 		
+		/**
+		 * Set contact uri host and port to external ip and
+		 * port configured on the server or local address and
+		 * port of the socket it if contains "minisip" param.
+		 */
+		void updateContact(MRef<SipMessage*> pack,
+				   MRef<SipSocketServer *> server,
+				   MRef<Socket *> socket);
                 
 		Mutex serversLock;
 		std::list<MRef<SipSocketServer *> > servers;

@@ -167,7 +167,7 @@ string SipRegistrar::getDefaultExpires( ) {
 }
 
 
-SipIdentity::SipIdentity(){
+void SipIdentity::init(){
 	/*sipProxyPort=0; sipProxyIpAddr=NULL;*/ 
 	registerToProxy=false; 
 	securityEnabled=false;
@@ -186,21 +186,12 @@ SipIdentity::SipIdentity(){
 	setIsRegistered (false);
 }
 
-SipIdentity::SipIdentity(const SipUri &addr) : sipUri(addr),securityEnabled(false),registerToProxy(false){
-	securityEnabled = false;
-	ka_type=0;
-	//use_srtp=false;
-	use_zrtp=false;
-	pskEnabled=false;
-	dhEnabled=false;
-	checkCert=false;
+SipIdentity::SipIdentity(){
+	init();
+}
 
-	identityIdx = itoa( globalIndex );
-	globalIndex ++;
-#ifdef DEBUG_OUTPUT	
-	cerr << "SipIdentity::SipIdentity(str) : created identity id=" << identityIdx << endl;
-#endif	
-	setIsRegistered (false);
+SipIdentity::SipIdentity(const SipUri &addr) : sipUri(addr){
+	init();
 }
 
 void SipIdentity::setDoRegister(bool f){
@@ -356,6 +347,14 @@ void SipIdentity::setIsRegistered( bool registerOk ) {
 	}
 }
 
+void SipIdentity::setRegisteredContacts( const list<SipUri> &contacts ){
+	registeredContacts = contacts;
+}
+
+const list<SipUri>& SipIdentity::getRegisteredContacts() const{
+	return registeredContacts;
+}
+
 string SipIdentity::getDebugString(){
 	lock();
 	string ret = "identity="+identityIdx+
@@ -424,10 +423,17 @@ void SipDialogConfig::useIdentity(
 }
 
 
-SipUri SipDialogConfig::getContactUri(bool useStun) const{
+SipUri SipDialogConfig::getContactUri( bool useStun ) const{
+	return sipIdentity->getContactUri( sipStack, useStun );
+}
+
+SipUri SipIdentity::getContactUri( MRef<SipStack*> sipStack,
+				   bool useStun ) const{
+	const SipIdentity * sipIdentity = this;
 	SipUri contactUri;
 	const SipUri &fromUri = sipIdentity->getSipUri();
 	string transport;
+	int port = 0;
 
 	const list<SipUri> &routes = sipIdentity->getRouteSet();
 
@@ -439,12 +445,16 @@ SipUri SipDialogConfig::getContactUri(bool useStun) const{
 	else
 		transport = fromUri.getTransport();
 
+	port =sipStack->getStackConfig()->getLocalSipPort(useStun, transport);
+
 	contactUri.setParams( fromUri.getUserName(),
 			      sipStack->getStackConfig()->externalContactIP,
 			      "",
-			      sipStack->getStackConfig()->getLocalSipPort(useStun, transport));
+			      port);
 	if( transport != "" )
 		contactUri.setTransport( transport );
+
+	contactUri.setParameter("minisip", "true");
 
 	return contactUri;
 }

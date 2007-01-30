@@ -825,11 +825,9 @@ bool SipLayerTransport::validateIncoming(MRef<SipMessage *> msg){
 	return true;
 }
 
-// Set contact uri host and port to external ip and port configured
-// on the server or local address and port of the socket
-void updateContact(MRef<SipMessage*> pack,
-		   MRef<SipSocketServer *> server,
-		   MRef<Socket *> socket)
+void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
+				      MRef<SipSocketServer *> server,
+				      MRef<Socket *> socket)
 {
 	MRef<SipHeaderValueContact*> contactp = pack->getHeaderValueContact();
 	uint16_t port;
@@ -839,15 +837,31 @@ void updateContact(MRef<SipMessage*> pack,
 	if( !contactp )
 		return;
 
-	transport = getSocketTransport( socket );
-	getIpPort( server, socket, ip, port );
-
 	SipUri contactUri = contactp->getUri();
 
-	contactUri.setIp( ip );
-	contactUri.setPort( port );
-	contactUri.setTransport( transport );
-	contactp->setUri( contactUri );
+	if( contactUri.hasParameter("minisip") ){
+
+		bool ipv6 = socket->getLocalAddress()->getType() == IP_ADDRESS_TYPE_V6;
+
+		if( !server ){
+			server = findServer(socket->getType(), ipv6);
+		}
+
+		transport = getSocketTransport( socket );
+		getIpPort( server, socket, ip, port );
+
+		contactUri.setIp( ip );
+		contactUri.setTransport( transport );
+
+		if(ipv6 || socket->getType() != SOCKET_TYPE_UDP){
+
+			// Update port if not UDP and IPv4
+			contactUri.setPort( port );
+		}
+
+		contactUri.removeParameter("minisip");
+		contactp->setUri( contactUri );
+	}
 }
 
 void SipLayerTransport::sendMessage(MRef<SipMessage*> pack, 
@@ -890,11 +904,12 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 
 			if( !socket ){
 				// TODO add sensible message
+				cerr << "No socket!!" << endl;
 				throw NetworkException();
 			}
-
-			updateContact( pack, server, socket );
 		}
+
+ 		updateContact( pack, server, socket );
 
 		if (addVia){
 			addViaHeader( pack, server, socket, branch );
@@ -958,7 +973,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
 		mdbg << "Transport error in SipLayerTransport: " << message << end;
-		cerr << "SipLayerTransport: sendMessage: exception thrown!" << endl;
+		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
 		CommandString transportError( callId, 
 					      SipCommandString::transport_error,
