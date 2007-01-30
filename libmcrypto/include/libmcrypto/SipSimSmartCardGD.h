@@ -46,6 +46,12 @@ public:
 	bool verifyPin(int verifyMode);
 	bool changePin(const char * newPinCode);
 
+	/*
+	 * @return 0: unverified   1: user mode   2: admin mode
+	*/
+	int isVerified(){return verifiedCard;}
+
+
 /* 
    General SIM functions needed for MIKEYs. Before executing those functions, the host has been verified and
    a smart card connection has been established.
@@ -61,8 +67,10 @@ public:
 
 /* this method returns the tek which is calculated in the pseudo random function implemented on smart card*/
 	bool getTek(unsigned char csId, unsigned long csbIdValue,
-		    unsigned char * tgkPtr, unsigned long tgkLength,
+		    unsigned char * randPtr, unsigned long randLength,
 		    unsigned char * tekPtr, unsigned long tekLength);
+
+	bool genTgk( unsigned char * dhpubPtr, unsigned long dhpubLength ); 
 
 	/*virtual bool getTekPk(unsigned char csId, unsigned long csbIdValue,
 						  unsigned long tgkLength, unsigned char * tgkPtr,
@@ -70,7 +78,7 @@ public:
 	           
 
 /* Diffie-Hellman specific SIM functions */
-	bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr);
+	virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr);
 	
 
 /* Public key based SIM functions */
@@ -91,6 +99,7 @@ public:
 
 	/*type: 0 get modulus; 1 get exponent*/
 	bool getPublicKey(unsigned long publicKeyLength, unsigned char * publicKeyPtr, int keyPairType);
+
 
 private:
 	/* deallocate the memory assigend for sendBuffer and recvBuffer */

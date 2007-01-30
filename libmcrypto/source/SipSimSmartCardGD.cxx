@@ -367,17 +367,53 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 }
 
 
+bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLength ) {
+
+	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+		sendBufferLength = 4+dhpubLength+1; 
+		recvBufferLength = 257;
+		
+		clearBuffer();
+		sendBuffer = new unsigned char[sendBufferLength];
+		recvBuffer = new unsigned char[recvBufferLength];
+		memset(sendBuffer, 0, sendBufferLength);
+		memset(recvBuffer, 0, recvBufferLength);
+
+		sendBuffer[0] = 0xB0;
+		sendBuffer[1] = 0x45;
+		sendBuffer[2] = 0x00;
+		sendBuffer[3] = 0x00;
+		sendBuffer[5] = dhpubLength;
+		memcpy(&sendBuffer[6], dhpubPtr, dhpubLength);
+	
+		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
+		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
+		switch(sw_1_2){
+			case 0x9000:
+				break;
+			case 0x6007:
+				clearBuffer();
+				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
+			default:
+				clearBuffer();
+				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
+		}
+		return true;
+	}
+	else
+		throw SmartCardException("unconnected card or unauthorized card");
+
+}
+
+
+
 bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
-			       unsigned char * tgkPtr, unsigned long tgkLength,
+			       unsigned char * randPtr, unsigned long randLength,
 			       unsigned char * tekPtr, unsigned long tekLength){
 
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
-		
-		unsigned char * tempLength;
-		tempLength = (unsigned char *) & tgkLength;
-		
-		sendBufferLength = tgkLength + 11;
-		recvBufferLength = 255;
+		sendBufferLength = 4+randLength+7; 
+		recvBufferLength = 257;
 		
 		clearBuffer();
 		sendBuffer = new unsigned char[sendBufferLength];
@@ -389,16 +425,18 @@ bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
 		sendBuffer[1] = 0x44;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
-		sendBuffer[4] = tempLength[0];
-		sendBuffer[5] = csId;
-		sendBuffer[6] = (unsigned char)((csbIdValue) >> 24 & 0xFF);
-		sendBuffer[7] = (unsigned char)((csbIdValue) >> 16 & 0xFF);
-		sendBuffer[8] = (unsigned char)((csbIdValue) >> 8 & 0xFF);
-		sendBuffer[9] = (unsigned char)(csbIdValue & 0xFF);
-		memcpy(&sendBuffer[10], tgkPtr, tgkLength);
-		sendBuffer[tgkLength + 10] = 0xFF;
+		int i=5;
+		sendBuffer[i]= randLength;
+		i++;
+		memcpy(&sendBuffer[i], randPtr, randLength);
+		i+=randLength;
+		sendBuffer[i++] = (unsigned char)((csbIdValue) >> 24 & 0xFF);
+		sendBuffer[i++] = (unsigned char)((csbIdValue) >> 16 & 0xFF);
+		sendBuffer[i++] = (unsigned char)((csbIdValue) >> 8 & 0xFF);
+		sendBuffer[i++] = (unsigned char)(csbIdValue & 0xFF);
+		sendBuffer[4]=i-4;
 		
-		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
+		transmitApdu(i, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
 			case 0x9000:
