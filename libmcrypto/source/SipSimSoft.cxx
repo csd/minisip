@@ -5,16 +5,11 @@
 
 using namespace std;
 
-SipSimSoft::SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas){
+SipSimSoft::SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas)
+{
 	certChain = chain;
 	ca_set = cas;
 }
-
-/*
-SipSimSoft::SipSimSoft(string certfilepath, string pkeyfilepath){
-
-}
-*/
 
 bool SipSimSoft::getSignature(unsigned char * data,
 		int dataLength,
