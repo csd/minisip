@@ -35,6 +35,7 @@
 #include<string>
 
 #include <libmutil/libmutil_config.h>
+#include<locale>
 
 
 /**
@@ -97,5 +98,13 @@ LIBMUTIL_API std::string trim(const std::string &s);
  * Converts an array of raw data to a hex string representation.
  */
 LIBMUTIL_API std::string binToHex( const unsigned char * data, int length );
+
+/**
+ * Available instantiations: string
+ */
+template <class charT, class traits, class Alloc>
+int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
+		const std::basic_string<charT, traits, Alloc>& s2,
+		const std::locale& loc );
 
 #endif

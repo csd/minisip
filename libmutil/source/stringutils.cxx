@@ -201,3 +201,37 @@ LIBMUTIL_API string itoa(int64_t i){
 	return string(buf);
 }
 
+
+LIBMUTIL_API 
+template <class charT, class traits, class Alloc>
+int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
+		const std::basic_string<charT, traits, Alloc>& s2,
+		const std::locale& loc )
+{
+	typedef typename std::basic_string<charT, traits, Alloc>::const_iterator iterator;
+
+	const std::ctype<charT>& facet = std::use_facet<std::ctype<charT> >(loc);
+
+	if( s1.size() < s2.size() ){
+		return 1;
+	}
+	else if( s1.size() > s2.size() ){
+		return -1;
+	}
+
+	iterator i;
+	iterator last = s1.end();
+
+	for (iterator i = s1.begin(), j = s2.begin(); i != last; ++i, ++j){
+		const charT c1 = *i;
+		const charT c2 = *j;
+		if ( !(c1 == c2) &&
+		     !(facet.toupper(c1) == facet.toupper(c2)) ){
+			return (int(c1 < c2) - int(c2 < c1));
+		}
+	}
+	return 0;
+}
+
+LIBMUTIL_API
+template int strCaseCmp<char, char_traits<char>, allocator<char> >(const string&, const string&, const locale&);
