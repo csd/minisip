@@ -60,6 +60,8 @@ public:
 	 */
 	Exception(char const* what);
 
+	Exception(const std::string& what);
+
 	Exception(const Exception &);
 	
 	~Exception() throw ();

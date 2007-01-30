@@ -63,6 +63,24 @@ Exception::Exception(char const* what):exception(){
 #endif
 }
 
+/**
+ * Same as Exception(char*) except that it takes a string instead.
+*/
+Exception::Exception(const std::string &what):exception(){
+	msg = what;
+#ifdef HAVE_EXECINFO_H
+	stack = new void*[MAX_STACK_TRACE_DEPTH];
+	if (stack){
+		stackDepth = backtrace(stack, MAX_STACK_TRACE_DEPTH);
+	}else{
+		stackDepth=0;
+	}
+#else
+	stackDepth=-1;
+	stack=NULL;
+#endif
+}
+
 
 Exception::~Exception() throw() {
 	if (stack)
