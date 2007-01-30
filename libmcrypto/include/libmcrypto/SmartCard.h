@@ -28,6 +28,8 @@
 #include <libmcrypto/config.h>
 
 #include <libmutil/MemObject.h>
+#include <libmutil/Thread.h>
+#include <libmutil/MessageRouter.h>
 #include <map>
 
 typedef long SCARDCONTEXT;
@@ -41,6 +43,8 @@ public:
 		
 		/* destructor is called to disconnect from smart card */
 		~SmartCard();
+
+		void close();
 
 		/* smart card transaction */
 		void startTransaction();
@@ -83,6 +87,33 @@ protected:
 	const SCARD_IO_REQUEST * protPci; 
 
 };
+
+class CommandReceiver;
+
+class SmartCardDetector : public virtual Runnable, public virtual CommandReceiver{
+public:
+	SmartCardDetector(MRef<CommandReceiver*> callback);
+
+	virtual void handleCommand(std::string subsystem, const CommandString& command);
+	virtual CommandString handleCommandResp(std::string subsystem, const CommandString&);
+
+	void run();
+	void start();
+	void join();
+
+private:
+	void connect();
+	std::string reader;
+	MRef<CommandReceiver*> callback;
+	bool doStop;
+	ThreadHandle th;
+	bool pinVerified;
+
+
+};
+
+
+
 
 #endif
 

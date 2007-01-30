@@ -26,6 +26,7 @@
 #include <libmcrypto/SmartCard.h>
 #include <libmcrypto/SmartCardException.h>
 #include <libmutil/stringutils.h>
+#include <libmutil/MessageRouter.h>
 
 #include <winscard.h>
 
@@ -117,8 +118,19 @@ SmartCard::~SmartCard()
 	}
 
 */
-	delete [] userPinCode;
-	delete [] adminPinCode;
+	if (userPinCode)
+		delete [] userPinCode;
+	if (adminPinCode)
+		delete [] adminPinCode;
+}
+
+void SmartCard::close(){
+	if (establishedConnection){
+		long rvDisconnect, rvRelease;
+		rvDisconnect = SCardDisconnect(hCard, SCARD_UNPOWER_CARD);
+		rvRelease = SCardReleaseContext(hContext);
+	}	
+	establishedConnection=false;
 }
 
 
@@ -163,5 +175,120 @@ void SmartCard::startTransaction(){
 
 void SmartCard::endTransaction(){
 		SCardEndTransaction(hCard, SCARD_LEAVE_CARD);
+}
+
+
+SmartCardDetector::SmartCardDetector(MRef<CommandReceiver*> cb)
+		: callback(cb),
+		doStop(false)
+{
+}
+
+void SmartCardDetector::handleCommand(std::string subsystem, const CommandString& command){
+	
+}
+
+CommandString SmartCardDetector::handleCommandResp(std::string subsystem, const CommandString&){
+	CommandString nul;
+	return nul;
+}
+
+static SCARDCONTEXT hContext;
+void SmartCardDetector::connect(){
+	LONG rv;
+
+	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
+
+	if(rv != SCARD_S_SUCCESS){
+		throw SmartCardException("couldn't communicate with the PS/SC resource manager");
+	}
+
+	unsigned long  readerLength;
+
+	rv = SCardListReaders(hContext, NULL, NULL, &readerLength);
+	cerr << "reader length: "<< readerLength << endl;
+	if(rv != SCARD_S_SUCCESS)
+	{
+		throw SmartCardException("rv");
+	}
+
+	char * readerNamesPtr;
+
+	readerNamesPtr = (char *) malloc (readerLength * sizeof(char));
+	rv = SCardListReaders(hContext, NULL, readerNamesPtr, &readerLength);
+	if(rv != SCARD_S_SUCCESS){
+		throw SmartCardException("rv");
+	}
+
+	/* Extract readers from the '\0' separated string and get the total number of readers */
+	int readerNumbers = 0;
+	char *tempReaderPtr = readerNamesPtr;
+	while (*tempReaderPtr != '\0')
+	{
+		tempReaderPtr += strlen(tempReaderPtr) + 1;
+		readerNumbers++;
+	}
+
+	/*Fill in the map with the reader's number and name*/
+
+	if (readerNumbers == 0){
+		throw SmartCardException("no supported card reader found");
+	}
+
+	std::map <int,char *> readerMap;
+	readerNumbers = 1;
+	tempReaderPtr = readerNamesPtr;
+	while (*tempReaderPtr != '\0')
+	{
+		if (reader=="")
+			reader=tempReaderPtr;
+		readerMap.insert(make_pair(readerNumbers,tempReaderPtr));
+		tempReaderPtr += strlen(tempReaderPtr) + 1;
+		readerNumbers++;
+	}
+}
+
+void SmartCardDetector::run(){
+	connect();
+	bool inserted = false;
+	SCARD_READERSTATE_A rgReaderStates[1];
+	rgReaderStates[0].dwEventState=0;
+	while (!doStop){
+//		cerr << "SmartCardDetector::run: inserted="<<inserted<<endl;
+
+//		cerr << "using reader "<< reader << endl;
+		rgReaderStates[0].szReader = reader.c_str();
+		rgReaderStates[0].dwCurrentState = SCARD_STATE_UNAWARE;
+
+		int rv = SCardGetStatusChange(hContext, INFINITE, rgReaderStates, 1);
+//		printf("reader state: 0x%04X\n", rgReaderStates[0].dwEventState);
+
+		
+		if (!inserted && (rgReaderStates[0].dwEventState & SCARD_STATE_PRESENT) ){
+			inserted=true;
+			CommandString cmd("","card_inserted");
+//			cerr << "sending card_inserted command" <<endl;
+			callback->handleCommand("gui",cmd);
+		}
+
+		if (inserted && (rgReaderStates[0].dwEventState & SCARD_STATE_EMPTY)){
+			inserted=false;
+			CommandString cmd("","card_removed");
+//			cerr << "sending card_removed command" <<endl;
+			callback->handleCommand("gui",cmd);
+		}
+
+		
+		Thread::msleep(500);
+	}
+}
+
+void SmartCardDetector::start(){
+	Thread t(this);
+	th = t.getHandle();
+}
+
+void SmartCardDetector::join(){
+	Thread::join(th);
 }
 
