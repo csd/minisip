@@ -202,8 +202,8 @@ LIBMUTIL_API string itoa(int64_t i){
 }
 
 
-LIBMUTIL_API 
 template <class charT, class traits, class Alloc>
+LIBMUTIL_API 
 int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 		const std::basic_string<charT, traits, Alloc>& s2,
 		const std::locale& loc )
@@ -233,5 +233,4 @@ int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 	return 0;
 }
 
-LIBMUTIL_API
-template int strCaseCmp<char, char_traits<char>, allocator<char> >(const string&, const string&, const locale&);
+template LIBMUTIL_API int strCaseCmp<char, char_traits<char>, allocator<char> >(const string&, const string&, const locale&);

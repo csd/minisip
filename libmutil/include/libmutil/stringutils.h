@@ -103,8 +103,8 @@ LIBMUTIL_API std::string binToHex( const unsigned char * data, int length );
  * Available instantiations: string
  */
 template <class charT, class traits, class Alloc>
-int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
-		const std::basic_string<charT, traits, Alloc>& s2,
-		const std::locale& loc );
+LIBMUTIL_API int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
+			     const std::basic_string<charT, traits, Alloc>& s2,
+			     const std::locale& loc );
 
 #endif
