@@ -30,6 +30,7 @@
 #include<libmikey/MikeyMessage.h>
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
+#include<libmcrypto/SipSimSmartCardGD.h>
 
 using namespace std;
 
@@ -57,22 +58,29 @@ PeerCertificates::~PeerCertificates(){
 // 
 // KeyAgreementDHBase
 //
-KeyAgreementDHBase::KeyAgreementDHBase():
+KeyAgreementDHBase::KeyAgreementDHBase(MRef<SipSim *> s):
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	publicKeyPtr( NULL ),
-	publicKeyLengthValue( 0 )
+	publicKeyLengthValue( 0 ),
+	sim(s),
+	dh(NULL)
+
 {
-	dh = new OakleyDH();
-	if( dh == NULL )
-	{
-		throw MikeyException( "Could not create "
-				          "DH parameters." );
+	if (!sim){
+		dh = new OakleyDH();
+		if( dh == NULL )
+		{
+			throw MikeyException( "Could not create "
+					"DH parameters." );
+		}
 	}
+
 }
 
 KeyAgreementDHBase::~KeyAgreementDHBase(){
-	delete dh;
+	if (dh)
+		delete dh;
 	if( peerKeyPtr != NULL ){
 		delete [] peerKeyPtr;
 		peerKeyPtr = NULL;
@@ -107,25 +115,39 @@ int32_t KeyAgreementDH::type(){
 	return KEY_AGREEMENT_TYPE_DH;
 }
 
+
 int KeyAgreementDHBase::setGroup( int groupValue ){
-	if( !dh->setGroup( groupValue ) )
-		return 1;
+	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
+		SipSimSmartCardGD* gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
 
-	uint32_t len = dh->secretLength();
+		assert (groupValue==DH_GROUP_OAKLEY5);
 
-	if( len != tgkLength() || !tgk() ){
-		setTgk( NULL, len );
-	}
+		publicKeyPtr = new unsigned char[192];
 
-	int32_t length = dh->publicKeyLength();
-	if( length != publicKeyLengthValue ){
-		if( publicKeyPtr ){
-			delete[] publicKeyPtr;
+		unsigned long length;
+		gd->getDHPublicValue(length, publicKeyPtr);
+	}else{
+
+		if( !dh->setGroup( groupValue ) )
+			return 1;
+
+		uint32_t len = dh->secretLength();
+
+		if( len != tgkLength() || !tgk() ){
+			setTgk( NULL, len );
 		}
-		publicKeyLengthValue = length;
-		publicKeyPtr = new unsigned char[ length ];
+
+		int32_t length = dh->publicKeyLength();
+		if( length != publicKeyLengthValue ){
+			if( publicKeyPtr ){
+				delete[] publicKeyPtr;
+			}
+			publicKeyLengthValue = length;
+			publicKeyPtr = new unsigned char[ length ];
+		}
+		dh->getPublicKey( publicKeyPtr, length );
+
 	}
-	dh->getPublicKey( publicKeyPtr, length );
 
 	return 0;
 }
@@ -149,18 +171,32 @@ unsigned char * KeyAgreementDHBase::publicKey(){
 	return publicKeyPtr;
 }
 
+
 int KeyAgreementDHBase::computeTgk(){
 	assert( peerKeyPtr );
 
-	int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgk(), tgkLength() );
-	return res;
+	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
+		SipSimSmartCardGD *gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
+		unsigned long len;
+		unsigned char *dhval = new unsigned char[192];	//FIXME: fix API to work with unknown key lengths
+		gd->getDHPublicValue(len, dhval);
+		gd->genTgk( dhval, len );
+		return true;
+	}else{
+		int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgk(), tgkLength() );
+		return res;
+	}
+
 }
 
 int KeyAgreementDHBase::group(){
 	if( !publicKeyPtr )
 		return -1;
 
-	return dh->group();
+	if (sim){
+		return DH_GROUP_OAKLEY5;
+	}else
+		return dh->group();
 }
 
 int KeyAgreementDHBase::peerKeyLength(){

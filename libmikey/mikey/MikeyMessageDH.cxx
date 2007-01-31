@@ -402,7 +402,7 @@ MRef<MikeyMessage *> MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	
 	if( error ){
 		if (ka->useSim){
-			addSignaturePayload(ka->getSim());
+			errorMessage->addSignaturePayload(ka->getSim());
 		}else{
 			errorMessage->addSignaturePayload( ka->certificateChain()->get_first() );
 		}
