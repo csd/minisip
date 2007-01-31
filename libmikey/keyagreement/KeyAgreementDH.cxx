@@ -30,7 +30,10 @@
 #include<libmikey/MikeyMessage.h>
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
+
+#ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>
+#endif
 
 using namespace std;
 
@@ -117,6 +120,7 @@ int32_t KeyAgreementDH::type(){
 
 
 int KeyAgreementDHBase::setGroup( int groupValue ){
+#ifdef SCSIM_SUPPORT
 	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
 		SipSimSmartCardGD* gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
 
@@ -126,7 +130,10 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 
 		unsigned long length;
 		gd->getDHPublicValue(length, publicKeyPtr);
-	}else{
+	}
+	else
+#endif
+	{
 
 		if( !dh->setGroup( groupValue ) )
 			return 1;
@@ -175,6 +182,7 @@ unsigned char * KeyAgreementDHBase::publicKey(){
 int KeyAgreementDHBase::computeTgk(){
 	assert( peerKeyPtr );
 
+#ifdef SCSIM_SUPPORT
 	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
 		SipSimSmartCardGD *gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
 		unsigned long len;
@@ -182,7 +190,10 @@ int KeyAgreementDHBase::computeTgk(){
 		gd->getDHPublicValue(len, dhval);
 		gd->genTgk( dhval, len );
 		return true;
-	}else{
+	}
+	else
+#endif
+	{
 		int res = dh->computeSecret( peerKeyPtr, peerKeyLengthValue, tgk(), tgkLength() );
 		return res;
 	}
