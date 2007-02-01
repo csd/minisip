@@ -60,7 +60,7 @@ class LIBMIKEY_API PeerCertificates {
 
 class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
 	public:
-		KeyAgreementDHBase(MRef<SipSim* > sim=NULL);
+		KeyAgreementDHBase(MRef<SipSim* > sim);
 		~KeyAgreementDHBase();
 
 		int computeTgk();

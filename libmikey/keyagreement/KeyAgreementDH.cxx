@@ -70,7 +70,9 @@ KeyAgreementDHBase::KeyAgreementDHBase(MRef<SipSim *> s):
 	dh(NULL)
 
 {
+	
 	if (!sim){
+		cerr << "EEEE: DHBase created WITHOUT SIM"<<endl;
 		dh = new OakleyDH();
 		if( dh == NULL )
 		{
@@ -78,6 +80,8 @@ KeyAgreementDHBase::KeyAgreementDHBase(MRef<SipSim *> s):
 					"DH parameters." );
 		}
 	}
+	else
+		cerr << "EEEE: DHBase created with SIM"<<endl;
 
 }
 
@@ -100,12 +104,14 @@ KeyAgreementDHBase::~KeyAgreementDHBase(){
 KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
 		MRef<ca_db *> certDbPtr ):
 	KeyAgreement(),
+	KeyAgreementDHBase(NULL),
 	PeerCertificates( certChainPtr, certDbPtr )
 {
 }
 
 KeyAgreementDH::KeyAgreementDH( MRef<SipSim*> s ):
 	KeyAgreement(s),
+	KeyAgreementDHBase(s),
 	PeerCertificates( s->getCertificateChain(), s->getCAs() )
 {
 
@@ -121,9 +127,9 @@ int32_t KeyAgreementDH::type(){
 
 int KeyAgreementDHBase::setGroup( int groupValue ){
 #ifdef SCSIM_SUPPORT
-	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
+	if (sim && dynamic_cast<SipSimSmartCardGD*>(*sim)){
 		SipSimSmartCardGD* gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
-
+		cerr<<"EEEE: the public key is generated+++++++++++"<<endl;
 		assert (groupValue==DH_GROUP_OAKLEY5);
 
 		publicKeyPtr = new unsigned char[192];
@@ -134,6 +140,7 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 	else
 #endif
 	{
+		cerr <<"EEEE: KeyAgreementDHBase: sim is NULL or not GD sim"<< endl;
 
 		if( !dh->setGroup( groupValue ) )
 			return 1;

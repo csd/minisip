@@ -35,7 +35,7 @@ using namespace std;
 KeyAgreementDHHMAC::KeyAgreementDHHMAC( const unsigned char * pskPtr,
 					int pskLengthValue )
 		:KeyAgreementPSK(pskPtr, pskLengthValue),
-		 KeyAgreementDHBase(){
+		 KeyAgreementDHBase(NULL){
 }
 
 KeyAgreementDHHMAC::~KeyAgreementDHHMAC(){
