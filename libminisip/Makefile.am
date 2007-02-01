@@ -144,7 +144,6 @@ libsdp_src = source/sdp/SdpPacket.cxx \
 libsip_src = source/sip/SipDialogVoip.cxx \
 		source/sip/SipDialogVoipClient.cxx \
 		source/sip/SipDialogVoipServer.cxx \
-		source/sip/SipDialogVoipServer100rel.cxx \
 		source/sip/SipDialogConfVoip.cxx \
 		source/sip/SipDialogPresenceClient.cxx \
 		source/sip/SipDialogPresenceServer.cxx \

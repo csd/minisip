@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,11 +16,12 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 /* Name
@@ -41,8 +42,10 @@
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderFrom.h>
+#include<libmsip/SipHeaderRAck.h>
 #include<libmsip/SipHeaderRoute.h>
 #include<libmsip/SipHeaderRequire.h>
+#include<libmsip/SipHeaderRSeq.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
@@ -78,19 +81,29 @@ using namespace std;
 
  The "dotted" states are implemented in SipDialogVoip.cxx.
 
- 
-                 +---------------+
-                 |               |
-                 |     start     |
-                 |               |
-                 +---------------+
-                         | 
-                         | INVITE
-		         | a3001:transIR; send 180
-		         V
-                 +---------------+
-                 |               |
-                 |    ringing    |----------+  reject
+ INVITE & !100rel
+ a3001:transIR;  +---------------+
+       send 180  |               |
+      +----------|     start     |
+      |          |               |
+      |          +---------------+
+      |                  |
+      |                  | INVITE && supports 100rel
+      |                  | a3007:transIR; send 183
+      |                  |
+      |                  V
+      |          +---------------+
+      |          |               |
+      |          |    100rel     |----------+
+      |          |               |          |
+      |          +---------------+          |
+      |                  | PRACK & 100rel   |
+      |                  | a3008: send 200  |
+      |                  |        send 180  |
+      |                  V                  |
+      |          +---------------+          |
+      |          |               |          | 
+      +--------->|    ringing    |----------+  reject
                  |               |          |  a3005:send40X
                  +---------------+          |
                          |                  |  CANCEL
@@ -119,16 +132,65 @@ using namespace std;
                  .  terminated   .
                  .               .
                  + . . . . . . . +
+
+
+                 +---------------+
+           +---->|               |<----+  ResendTimer1xx
+           |     |      ANY      |     |  a3009: resend 1XX
+           +-----|               |-----+
+ PRACK & 100rel  +---------------+
+ a3010: send 200 &
+        cancel timer
    
 */
 
+bool SipDialogVoipServer::a3007_start_100rel_INVITE( const SipSMCommand &command){
+	if( !transitionMatch("INVITE", 
+			     command, 
+			     SipSMCommand::transaction_layer, 
+			     SipSMCommand::dialog_layer) ||
+	    !getSipStack()->getStackConfig()->use100Rel ){
+		return false;
+	}
+		
+	MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
+
+	if( !inv->supported("100rel") && !inv->requires("100rel") ){
+		return false;
+	}
+
+	use100Rel = true;
+	resendTimer1xx=getSipStack()->getTimers()->getA();
+	requestTimeout(resendTimer1xx,"ResendTimer1xx");
+	dialogState.rseqNo = rand() % (1<<31);
+		
+	setLastInvite(inv);
+	dialogState.updateState( getLastInvite() );
+		
+	string peerUri = dialogState.remoteUri;
+		
+	getDialogConfig()->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
+		
+	if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
+		merr << "No MIME match" << end;
+		return false;
+	}
+
+	sendSessionProgress();
+
+	return true;
+}
 
 bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &command)
 {
 	if (transitionMatch("INVITE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
-		string branch = inv->getDestinationBranch();
 		
+		if( inv->requires("100rel") ){
+			// TODO reject unsupported extension
+			return false;
+		}
+
 		setLastInvite(inv);
 		dialogState.updateState( inv );
 		
@@ -180,9 +242,7 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 				);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
-		bool rel100Supported = inv->supported("100rel");
-		
-		sendRinging(branch, rel100Supported && getSipStack()->getStackConfig()->use100Rel );
+		sendRinging();
 		
 		if( getSipStack()->getStackConfig()->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
@@ -349,18 +409,148 @@ bool SipDialogVoipServer::a3006_start_termwait_INVITE( const SipSMCommand &comma
 	}
 }
 
+bool SipDialogVoipServer::isMatchingPrack( MRef<SipMessage*> provisional,
+					   MRef<SipRequest*> prack ){
+	MRef<SipHeaderValue *> value = prack->getHeaderValueNo( SIP_HEADER_TYPE_RACK, 0 );
+	if( !value ){
+		// TODO reject 481
+		cerr << "No RAck" << endl;
+		return false;
+	}
+
+	MRef<SipHeaderValueRAck *> rack = dynamic_cast<SipHeaderValueRAck*>(*value);
+	if( !rack ){
+		// TODO reject 481
+		cerr << "Bad RAck" << endl;
+		return false;
+	}
+
+	if( rack->getMethod() != provisional->getCSeqMethod() ||
+	    rack->getCSeqNum() != provisional->getCSeq() ||
+	    rack->getResponseNum() != dialogState.rseqNo ){
+		// TODO reject 481
+		cerr << "Non matching RAck" << endl;
+		return false;
+	}
+
+	return true;
+}
+
+bool SipDialogVoipServer::a3008_100rel_ringing_PRACK( const SipSMCommand &command){
+	if( use100Rel &&
+	    lastProvisional &&
+	    !transitionMatch("PRACK", 
+			     command, 
+			     SipSMCommand::transaction_layer, 
+			     SipSMCommand::dialog_layer) ){
+		return false;
+	}
+
+	MRef<SipRequest*> prack =
+		dynamic_cast<SipRequest *>(*command.getCommandPacket());
+	dialogState.updateState( prack );
+
+	if( !isMatchingPrack( lastProvisional, prack ) ){
+		return false;
+	}
+
+// 	cerr << "RAck ok, send 200 Ok" << endl;
+
+	lastProvisional = NULL;
+	sendPrackOk( prack );
+		
+	CommandString cmdstr(dialogState.callId, 
+			     SipCommandString::incoming_available, 
+			     dialogState.remoteUri, 
+			     (getMediaSession()->isSecure()?"secure":"unprotected")
+		);
+	getSipStack()->getCallback()->handleCommand("gui", cmdstr );
+
+	sendRinging();
+		
+	return true;
+}
+
+bool SipDialogVoipServer::a3009_any_any_ResendTimer1xx( const SipSMCommand &command){
+	if( !transitionMatch(command, 
+			     "ResendTimer1xx", 
+			     SipSMCommand::dialog_layer, 
+			     SipSMCommand::dialog_layer) ){
+		return false;
+	}
+
+	if( !lastProvisional ){
+		// Stop retransmissions.
+		return true;
+	}
+
+	resendTimer1xx *=2;
+
+	// Stop retransmissions after 64*T1
+	if( resendTimer1xx >= 64 * getSipStack()->getTimers()->getA() ){
+		MRef<SipResponse*> reject =
+			createSipResponse( getLastInvite(), 504,
+					   "Server Time-out" );
+		sendSipMessage( *reject );
+		CommandString cmdstr(dialogState.callId, SipCommandString::remote_cancelled_invite,"");
+		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
+
+		getMediaSession()->stop();
+		signalIfNoTransactions();
+		return true;
+	}
+
+	sendSipMessage( lastProvisional );
+	requestTimeout(resendTimer1xx,"ResendTimer1xx");
+	return true;
+}
+
+bool SipDialogVoipServer::a3010_any_any_PRACK( const SipSMCommand &command){
+	if( use100Rel &&
+	    !transitionMatch("PRACK", 
+			     command, 
+			     SipSMCommand::transaction_layer, 
+			     SipSMCommand::dialog_layer) ){
+		return false;
+	}
+		
+	MRef<SipRequest*> prack =
+		dynamic_cast<SipRequest *>(*command.getCommandPacket());
+	dialogState.updateState( prack );
+
+	if( !isMatchingPrack( lastProvisional, prack ) ){
+		return false;
+	}
+		
+// 	cerr << "RAck ok, send 200 Ok" << endl;
+
+	lastProvisional = NULL;
+	sendPrackOk( prack );
+
+	return true;
+}
+
 void SipDialogVoipServer::setUpStateMachine(){
 
 	State<SipSMCommand,string> *s_start=new State<SipSMCommand,string>(this,"start");
 	addState(s_start);
+
+	State<SipSMCommand,string> *s_100rel=new State<SipSMCommand,string>(this,"100rel");
+	addState(s_100rel);
 
 	State<SipSMCommand,string> *s_ringing=new State<SipSMCommand,string>(this,"ringing");
 	addState(s_ringing);
 
 	MRef<State<SipSMCommand,string> *> s_incall = getState("incall");
 	MRef<State<SipSMCommand,string> *> s_termwait= getState("termwait");
+	MRef<State<SipSMCommand,string> *> s_any = anyState;
 
 
+	new StateTransition<SipSMCommand,string>(this, "transition_start_100rel_INVITE",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3007_start_100rel_INVITE,
+			s_start, s_100rel);
+
+	// Fallback to unreliable provisinal responses
 	new StateTransition<SipSMCommand,string>(this, "transition_start_ringing_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3001_start_ringing_INVITE,
 			s_start, s_ringing);
@@ -385,13 +575,34 @@ void SipDialogVoipServer::setUpStateMachine(){
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3006_start_termwait_INVITE,
 			s_start, s_termwait);
 
+	new StateTransition<SipSMCommand,string>(this, "transition_100rel_ringing_PRACK",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3008_100rel_ringing_PRACK,
+			s_100rel, s_ringing);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_100rel_100rel_ResendTimer1xx",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3009_any_any_ResendTimer1xx,
+			s_any, s_any);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_ringing_ringing_PRACK",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3010_any_any_PRACK,
+			s_any, s_any);
+
+	// 100rel -> termwait
+	new StateTransition<SipSMCommand,string>(this, "transition_100rel_termwait_CANCEL",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3004_ringing_termwait_CANCEL,
+			s_100rel, s_termwait);
 	
+	new StateTransition<SipSMCommand,string>(this, "transition_100rel_termwait_reject",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoipServer::a3005_ringing_termwait_reject,
+			s_100rel, s_termwait);
+
 	setCurrentState(s_start);
 }
 
 
 SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-		SipDialogVoip(stack, ident, pconf, mediaSession, cid) 
+		SipDialogVoip(stack, ident, pconf, mediaSession, cid),
+		use100Rel( false ), resendTimer1xx( 0 )
 {
 	setUpStateMachine();
 }
@@ -410,7 +621,9 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 			getDialogConfig()->getContactUri(phoneconf->useSTUN),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
-	
+
+	if( !use100Rel ){
+
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
@@ -445,6 +658,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 //	/* if sdp is NULL, the offer was refused, send 606 */
 //	// FIXME
 //	else return; 
+	}
 
 	MRef<SipMessage*> pref(*ok);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -459,14 +673,16 @@ void SipDialogVoipServer::sendReject(const string &branch){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
-	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", *getLastInvite());	
+void SipDialogVoipServer::sendRinging(){
+  MRef<SipResponse*> ringing =
+	  createSipResponse( getLastInvite(), 180, "Ringing" );
 
 	if (use100Rel){
 		ringing->addHeader(new SipHeader(new SipHeaderValueRequire("100rel")));
+		dialogState.rseqNo++;
+		ringing->addHeader(new SipHeader(new SipHeaderValueRSeq( dialogState.rseqNo )));
+		lastProvisional = *ringing;
 	}
-	
-	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
@@ -474,9 +690,7 @@ void SipDialogVoipServer::sendRinging(const string &branch, bool use100Rel){
 			-1); //set expires to -1, we do not use it (only in register)
 	ringing->addHeader( new SipHeader(*contact) );
 
-	MRef<SipMessage*> pref(*ringing);
-	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
-	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+	sendSipMessage( *ringing );
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
@@ -494,5 +708,57 @@ void SipDialogVoipServer::sendNotAcceptable(const string &branch){
 	MRef<SipMessage*> pref(*not_acceptable);
 	SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+}
+
+void SipDialogVoipServer::sendPrackOk( MRef<SipRequest*> prack ){
+	MRef<SipResponse*> ok = createSipResponse( prack, 200, "OK" );
+	MRef<SipHeaderValue *> contact = 
+		new SipHeaderValueContact( 
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			-1); //set expires to -1, we do not use it (only in register)
+	ok->addHeader( new SipHeader(*contact) );
+
+	sendSipMessage( *ok );
+}
+
+void SipDialogVoipServer::sendSessionProgress(){
+	MRef<SipResponse*> progress =
+		createSipResponse( getLastInvite(), 183,"Session progress" );
+
+	progress->addHeader(new SipHeader(new SipHeaderValueRequire("100rel")));
+
+	dialogState.rseqNo++;
+	progress->addHeader(new SipHeader(new SipHeaderValueRSeq( dialogState.rseqNo )));
+	
+	MRef<SipHeaderValue *> contact = 
+		new SipHeaderValueContact( 
+			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			-1); //set expires to -1, we do not use it (only in register)
+	progress->addHeader( new SipHeader(*contact) );
+
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+#ifdef ENABLE_TS
+		ts.save("getSdpAnswer");
+#endif
+		sdp = mediaSession->getSdpAnswer();
+#ifdef ENABLE_TS
+		ts.save("getSdpAnswer");
+#endif
+		if( !sdp ){
+			// FIXME: this most probably means that the
+			// creation of the MIKEY message failed, it 
+			// should not happen
+			merr << "Sdp was NULL in sendInviteOk" << end;
+			return; 
+		}
+	}
+	
+	/* Add the latter to the INVITE message */ // If it exists
+	progress->setContent( *sdp );
+
+	lastProvisional = *progress;
+
+	sendSipMessage( lastProvisional );
 }
 

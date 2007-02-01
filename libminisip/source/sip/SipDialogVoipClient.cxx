@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004,2005,2006
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -160,29 +160,47 @@ bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command
 #ifdef ENABLE_TS
 		ts.save( RINGING );
 #endif
+		bool doPrack = false;
 		if (resp->requires("100rel") && resp->getStatusCode()!=100){
-			if( !handleRel1xx( resp ) )
+			if( !handleRel1xx( resp ) ){
 				// Ignore retransmission
+// 				cerr << "Ignore 18x retransmission" << endl;
 				return true;
+			}
+			doPrack = true;
 		}
 		else{
 			//We must maintain the dialog state. 
 			dialogState.updateState( resp );
 		}
-		
-		CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing);
-		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
-	
+
 		//string peerUri = command.getCommandPacket()->getTo().getString();
 		string peerUri = dialogState.remoteUri; //use the dialog state ...
-
 		MRef<SipMessageContent *> content = resp->getContent();
 		if( !content.isNull() ){
 			MRef<SdpPacket*> sdp((SdpPacket*)*content);
 			//Early media	
-			getMediaSession()->setSdpAnswer( sdp, peerUri );
+  			if( !sortMIME( content , peerUri, 3) ){
+				// MIKEY failed
+				// TODO reason header
+				sendCancel("");
+
+				getMediaSession()->stop();
+				signalIfNoTransactions();
+				// Skip prack
+// 				cerr << "Send cancel, skip prack" << endl;
+				return true;
+			}
 		}
 
+		if( doPrack )
+			sendPrack(resp);
+
+		if( resp->getStatusCode() == 180 ){
+			CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing, peerUri, (getMediaSession()->isSecure()?"secure":"unprotected"));
+			getSipStack()->getCallback()->handleCommand("gui", cmdstr);
+		}
+	
 		return true;
 	}else{
 		return false;
@@ -198,9 +216,13 @@ bool SipDialogVoipClient::a2003_calling_calling_1xx( const SipSMCommand &command
 
 		MRef<SipResponse*> resp = (SipResponse*)*command.getCommandPacket();
 		if (resp->requires("100rel") && resp->getStatusCode()!=100){
-			if( !handleRel1xx( resp ) )
+			if( !handleRel1xx( resp ) ){
 				// Ignore retransmission
+// 				cerr << "Ignore 1xx retransmission" << endl;
 				return true;
+			}
+
+			sendPrack(resp);
 		}
 
 		return true;
@@ -641,13 +663,12 @@ bool SipDialogVoipClient::handleRel1xx( MRef<SipResponse*> resp ){
 	// First reliable provisional response
 	// Next in-order reliable provisional response
 	if( !(dialogState.rseqNo == (uint32_t)-1 ||
-	      dialogState.rseqNo > rseqNo ) )
+	      rseqNo > dialogState.rseqNo ) )
 		return false;
 
 	dialogState.updateState( resp );
 	dialogState.seqNo++;
 	dialogState.rseqNo = rseqNo;
-	sendPrack(resp);
 
 	return true;
 }

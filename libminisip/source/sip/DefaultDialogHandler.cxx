@@ -41,7 +41,6 @@
 
 #include<libminisip/sip/SipDialogVoipClient.h>
 #include<libminisip/sip/SipDialogVoipServer.h>
-#include<libminisip/sip/SipDialogVoipServer100rel.h>
 #include<libminisip/sip/SipDialogConfVoip.h>
 #include<libminisip/sip/SipDialogPresenceClient.h>
 #include<libminisip/sip/SipDialogPresenceServer.h>
@@ -240,19 +239,11 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			}
 */
 			MRef<SipDialog*> voipCall;
-//			if (pkt->supported("100rel")){
-//				voipCall = new SipDialogVoipServer100rel(sipStack,
-//						callConf,
-//						phoneconf,
-//						mediaSession,
-//						pkt->getCallId());
-//			}else{
 				voipCall = new SipDialogVoipServer(sipStack,
 						id,
 						phoneconf,
 						mediaSession,
 						pkt->getCallId());
-//			}
 			sipStack->addDialog(voipCall);
 
 
