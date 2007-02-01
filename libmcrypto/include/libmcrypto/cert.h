@@ -95,6 +95,8 @@ class LIBMCRYPTO_API priv_key: public MObject{
 
 		virtual const std::string &get_file() const = 0;
 
+		virtual bool check_cert( MRef<certificate *> cert)=0;
+
 		virtual int sign_data( unsigned char * data, int data_length, 
 				       unsigned char * sign,
 				       int * sign_length )=0;
@@ -178,8 +180,6 @@ class LIBMCRYPTO_API certificate: public MObject{
 		std::string get_file();
 		std::string get_pk_file();
                    
-		virtual bool check_pk( MRef<priv_key *> pk)=0;
-
 		MRef<priv_key*> get_pk();
 		void set_pk( MRef<priv_key *> pk);
 		void set_pk( const std::string &file );

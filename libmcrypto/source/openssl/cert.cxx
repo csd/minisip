@@ -559,13 +559,20 @@ ossl_priv_key::ossl_priv_key( const string &file ){
 	pk_file = file;
 }
 
-bool ossl_certificate::check_pk( MRef<priv_key*> pk ){
-	MRef<ossl_priv_key*> ssl_pk =
-		dynamic_cast<ossl_priv_key*>( *pk );
+
+bool ossl_priv_key::check_cert( MRef<certificate*> cert ){
+	MRef<ossl_certificate*> ssl_cert =
+		dynamic_cast<ossl_certificate*>( *cert );
+
+	if( !ssl_cert ){
+		// Not an OpenSSL certificate!
+		return false;
+	}
 
 	/* Check that the private key matches the certificate */
 
-	if( X509_check_private_key( cert, ssl_pk->get_openssl_private_key() ) != 1 ){
+	if( X509_check_private_key( ssl_cert->get_openssl_certificate(),
+				    private_key ) != 1 ){
 		return false;
 	}
 

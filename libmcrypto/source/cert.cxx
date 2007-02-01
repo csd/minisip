@@ -88,7 +88,7 @@ MRef<priv_key*> certificate::get_pk(){
 
 void certificate::set_pk( MRef<priv_key *> priv_key )
 {
-	if( !check_pk( priv_key ) ){
+	if( !priv_key->check_cert( this ) ){
 		cerr << "Private key does not match the certificate" << endl;
 		throw certificate_exception_pkey(
 			"The private key does not match the certificate" );

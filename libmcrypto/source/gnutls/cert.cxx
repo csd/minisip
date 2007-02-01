@@ -946,22 +946,23 @@ gtls_priv_key::gtls_priv_key(char * pkInput, int length,
    pk_file = path;
 }
 
-bool gtls_certificate::check_pk( MRef<priv_key*> pk ){
-	MRef<gtls_priv_key*> gtls_pk =
-		dynamic_cast<gtls_priv_key*>( *pk );
 
-	if( !gtls_pk ){
+bool gtls_priv_key::check_cert( MRef<certificate*> cert ){
+	MRef<gtls_certificate*> gtls_cert =
+		dynamic_cast<gtls_certificate*>( *cert );
+
+	if( !gtls_cert ){
 		return false;
 	}
 
-	gnutls_x509_privkey_t privateKey = gtls_pk->get_private_key();
 	byte_t publicKeyId[20];
 	byte_t privateKeyId[20];
 	size_t idLength;
 
 	/* Check that the private key matches the certificate */
 	idLength = 20;
-	int ret = gnutls_x509_crt_get_key_id( cert, 0, publicKeyId, &idLength );
+	int ret = gnutls_x509_crt_get_key_id( gtls_cert->get_certificate(),
+					      0, publicKeyId, &idLength );
    
 	if( ret < 0 ){
 		throw certificate_exception("An error occured when computing the key id" );

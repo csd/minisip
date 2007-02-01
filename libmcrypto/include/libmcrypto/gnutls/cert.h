@@ -103,6 +103,8 @@ class LIBMCRYPTO_API gtls_priv_key: public priv_key{
 
 		const std::string &get_file() const;
 
+		bool check_cert( MRef<certificate*> cert );
+
 		int sign_data( unsigned char * data, int data_length, 
 			       unsigned char * sign,
 			       int * sign_length );
@@ -155,8 +157,6 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 		std::vector<std::string> get_alt_name( SubjectAltName type );
 		std::string get_issuer();
 		std::string get_issuer_cn();
-
-		bool check_pk( MRef<priv_key*> pk );
 
 		gnutls_x509_crt_t get_certificate(){return cert;};
 
