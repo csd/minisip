@@ -37,14 +37,16 @@
 
 class LIBMINISIP_API ConsoleDebugger : public Runnable{
 	public:
-		ConsoleDebugger(MRef<SipStack*> stack);
+		ConsoleDebugger(MRef<SipSoftPhoneConfiguration*> conf);
 		~ConsoleDebugger();
 		
 		std::string getMemObjectType() const {return "ConsoleDebugger";}
 		
 		void showHelp();
 		void showMem();
+		void showMemSummary();
 		void showStat();
+		void showConfig();
 
 		void sendManagementCommand( std::string str );
 		void sendCommandToMediaHandler( std::string str );
@@ -57,7 +59,13 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		
 		void join();
 		
-		void setMediaHandler( MRef<MediaHandler *> r ) { mediaHandler = r;}
+		void setMediaHandler( MRef<MediaHandler *> r ) {
+			mediaHandler = r; 
+			if (mediaHandler) 
+				std::cerr << "EEEE: mediaHandler set!"<<std::endl; 
+			else 
+				std::cerr << "EEEE: mediaHandler set to NULL"<<std::endl;
+		}
 
 	private:
 		MRef<SipStack*> sipStack;
@@ -65,6 +73,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		
 		MRef<Thread *> thread;
 		bool keepRunning;
+		MRef<SipSoftPhoneConfiguration*> config;
 };
 
 #endif

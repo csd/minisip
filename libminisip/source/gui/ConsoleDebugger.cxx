@@ -55,11 +55,13 @@
 
 using namespace std;
 
-ConsoleDebugger::ConsoleDebugger(MRef<SipStack*> stack): 
-			sipStack(stack), 
+ConsoleDebugger::ConsoleDebugger(MRef<SipSoftPhoneConfiguration *> conf): 
 			mediaHandler(NULL),
-			thread( NULL ) {
-};
+			thread( NULL ),
+			config(conf)
+{
+	this->sipStack = conf->sipStack;
+}
 
 ConsoleDebugger::~ConsoleDebugger() {
 #ifdef DEBUG_OUTPUT
@@ -88,6 +90,8 @@ void ConsoleDebugger::showHelp() {
 	cerr << "        - + : Print info on all currently registered SipDialogs" << endl;
 	cerr << endl;
 	cerr << "        - m/M : Print info on MediaSessions currently running" << endl;
+	cerr << endl;
+	cerr << "        - c/C : Print info on internal configuration state" << endl;
 	cerr << endl;
 	cerr << "   Note: only h/+/u/r/t commands are always available. The rest, only if --enable-debug is configured" << endl;
 	cerr << endl;
@@ -125,6 +129,10 @@ void ConsoleDebugger::run(){
 			case '+'://show sip stack state
 				showStat();
 				break;
+			case 'c': //print mediahandler session info
+			case 'C':
+				showConfig();
+				break;
 			case 'h':
 			case 'H': //list help
 				showHelp();
@@ -141,6 +149,7 @@ void ConsoleDebugger::run(){
 			case 'R': //Deregister all identities
 				sendManagementCommand( SipCommandString::register_all_identities );
 				break;
+
 	#ifdef DEBUG_OUTPUT
 			case 'P':
 			case 'p':
@@ -161,8 +170,13 @@ void ConsoleDebugger::run(){
 				}
 				break;
 	
+			case '<':
 			case '*':
 				showMem();
+				break;
+
+			case '>':
+				showMemSummary();
 				break;
 			
 			case ';': //output message when object is destroyed
@@ -194,6 +208,7 @@ void ConsoleDebugger::run(){
 			case 'M':
 				sendCommandToMediaHandler(MediaCommandString::session_debug);
 				break;
+
 	#endif
 			default:
 				cerr << "Unknown command: "<< c << endl;
@@ -215,7 +230,11 @@ void ConsoleDebugger::sendManagementCommand( string str ) {
 void ConsoleDebugger::sendCommandToMediaHandler( string str ) {
 	CommandString cmdstr ("", str);
 	cerr << "========= MediaHandler Debug info : " << endl;
-	mediaHandler->handleCommand("media", cmdstr );
+	if (mediaHandler)
+		mediaHandler->handleCommand("media", cmdstr );
+	else{
+		cerr << "(no media handler registred)"<<endl;
+	}
 	cerr << "=========" << endl;
 }
 
@@ -228,8 +247,101 @@ void ConsoleDebugger::showMem(){
 	cerr << all << itoa(getMemObjectCount()) <<" objects"<< endl;
 }
 
+void ConsoleDebugger::showMemSummary(){
+	string all;
+	minilist<string> names = getMemObjectNamesSummary();
+	int i;
+	for (i=0; i<names.size();i++){
+		all = all+names[i]+"\n";
+	}
+	cerr << all << i <<" types of objects"<< endl;
+}
+
 void ConsoleDebugger::showStat(){
 	mout << sipStack->getStackStatusDebugString();
+}
+
+void ConsoleDebugger::showConfig(){
+	cerr <<    "SipSoftPhoneConfiguration:"<<endl
+		<< "  Minisip:" << endl
+		<< "    useSTUN="<<config->useSTUN<<endl
+		<< "    stunServerIpString="<<config->stunServerIpString<<endl
+		<< "    stunServerPort="<<config->stunServerPort<<endl
+		<< "    findStunServerFromSipUri="<<config->findStunServerFromSipUri<<endl
+		<< "    findStunServerFromDomain="<<config->findStunServerFromDomain<<endl
+		<< "    stunDomain="<<config->stunDomain<<endl
+		<< "    useUserDefinedStunServer="<< config->useUserDefinedStunServer <<endl
+		<< "    userDefinedStunServer=" << config->userDefinedStunServer << endl
+		<< "    soundDeviceIn="<< config->soundDeviceIn  <<endl
+		<< "    soundDeviceOut="<< config->soundDeviceOut<< endl
+		<< "    videoDevice="<< config->videoDevice << endl
+		<< "    frameWidth=" << config->frameWidth << endl
+		<< "    frameHeight="<< config->frameHeight << endl
+		<< "    usePSTNProxy="<< config->usePSTNProxy <<endl
+		<< "    tcp_server="<< config->tcp_server<<  endl
+		<< "    tls_server="<< config->tls_server << endl
+		<< "    ringtone="<< config->ringtone << endl
+		<< "    soundIOmixerType="<<config->soundIOmixerType <<endl
+		<< "    networkInterfaceName="<< config->networkInterfaceName <<endl
+		<< "  SipStackConfig:"<<endl
+		<< "    localIpString="<<config->sipStackConfig->localIpString<<endl
+		<< "    localIp6String="<< config->sipStackConfig->localIp6String << endl
+		<< "    externalContactIP=" << config->sipStackConfig->externalContactIP << endl
+		<< "    externalContactUdpPort=" << config->sipStackConfig->externalContactUdpPort << endl
+		<< "    localUdpPort="<< config->sipStackConfig->localUdpPort << endl
+		<< "    localTcpPort="<< config->sipStackConfig->localTcpPort << endl
+		<< "    localTlsPort="<< config->sipStackConfig->localTlsPort << endl
+		<< "    autoAnswer="<< config->sipStackConfig->autoAnswer<<endl
+		<< "    use100Rel="<< config->sipStackConfig->use100Rel<< endl
+		<< "    instanceId="<< config->sipStackConfig->instanceId<<endl
+		<< "    Certificates:"<<endl;
+		
+	if (config->sipStackConfig->cert)
+		config->sipStackConfig->cert->lock();
+	if (config->sipStackConfig->cert && config->sipStackConfig->cert->length()>0){
+		int n=1;
+		MRef<certificate *> crt=config->sipStackConfig->cert->get_first();
+		while (crt){
+			cerr << "      certificate "<<n<<end
+			     << "        name="<<crt->get_name()<<endl
+			     << "        cn="<<crt->get_cn()<<endl
+			     << "        issuer="<<crt->get_issuer()<<endl
+			     << "        issuer_cn="<< crt->get_issuer_cn()<<endl
+			     << "        has_pk="<< crt->has_pk()<<endl
+			     << "        SubjectAltName,"<< endl;
+#if 0
+//Print all subjectAltName here - FIXME
+			//Note: if the enum declaration in cert.h changes
+			//we get a bug here.
+			char *types[]={0,"SAN_DNSNAME", "SAN_RFC822NAME", "SAN_URI", "SAN_IPADDRESS",0};
+			certificate::SubjectAltName san= certificate::SAN_DNSNAME;
+
+			// there are four alt name types, and each can be
+			// multiple values.
+			for (int i=1; types[i]; i++){
+				cerr << "          type "<< types[i]<<": ";
+				vector<string> alt = crt->get_alt_name(san);
+				vector<string>::iterator j;
+				int n=0;
+				for (j=alt.begin(); j!=alt.end(); j++,n++){
+					if (n){
+						cerr << ", "; // do not output before first element
+					}
+					cerr << *j;
+				}
+				cerr << endl;
+				san=san+1;
+			}
+#endif
+			crt = config->sipStackConfig->cert->get_next();
+			n++;
+		}
+	}else{
+		cerr    <<      "        (no certificate)"<<endl;
+	}
+	if (config->sipStackConfig->cert)
+		config->sipStackConfig->cert->unlock();
+
 }
 
 static int nonblockin_stdin()
