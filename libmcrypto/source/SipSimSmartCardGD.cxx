@@ -393,10 +393,10 @@ bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLen
 				break;
 			case 0x6007:
 				clearBuffer();
-				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
+				throw SmartCardException("failed to generate the Diffie-Hellman priavte key in the smart card");
 			default:
 				clearBuffer();
-				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
+				throw SmartCardException("Unknown state value was returned when generating the Diffie-Hellman priavte key in the smart card");
 		}
 		return true;
 	}
@@ -424,7 +424,8 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 		sendBuffer[1] = 0x44;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = keyType;
-		int i=5;
+		
+		int i = 5;
 		sendBuffer[i]= randLength;
 		i++;
 		memcpy(&sendBuffer[i], randPtr, randLength);
@@ -433,7 +434,8 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 		sendBuffer[i++] = (unsigned char)((csbIdValue) >> 16 & 0xFF);
 		sendBuffer[i++] = (unsigned char)((csbIdValue) >> 8 & 0xFF);
 		sendBuffer[i++] = (unsigned char)(csbIdValue & 0xFF);
-		sendBuffer[4]=i-4;
+		sendBuffer[i++] = csId;
+		sendBuffer[4]= i - 5;
 		
 		transmitApdu(i, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
@@ -442,10 +444,10 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 				break;
 			case 0x6007:
 				clearBuffer();
-				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
+				throw SmartCardException("failed to get the TEK from the smart card");
 			default:
 				clearBuffer();
-				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
+				throw SmartCardException("Unknown state value was returned when generating TEK from the smart card");
 		}
 	//	tekLength = recvBufferLength - 2;
 		memcpy(key, recvBuffer, keyLength);
@@ -467,7 +469,7 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr){
 
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){	
-		sendBufferLength = 	5;
+		sendBufferLength = 5;
 		recvBufferLength = 255;
 
 		clearBuffer();
@@ -489,10 +491,10 @@ bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, un
 				break;
 			case 0x6001:
 				clearBuffer();
-				throw SmartCardException("failed to get the TEK from the smart card");
+				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
 			default:
 				clearBuffer();
-				throw SmartCardException("Unknown state value was returned when generating TEK from the smart card");
+				throw SmartCardException("Unknown state value was returned when getting DH publice key from the smart card");
 		}
 		
 		dhPublicValueLength = recvBufferLength - 2;
@@ -540,23 +542,59 @@ bool SipSimSmartCardGD::generateKeyPair(){
 
 }
 
-bool SipSimSmartCardGD::getPublicKey(unsigned long publicKeyLength, unsigned char * publicKeyPtr, int keyPairType){
-
-	//if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){	
-	//	sendBufferLength = 4;
-	//	
-	//	switch(keyPairType){
-	//		case 0:
-	//			recvBufferLength = 154;
-	//		case 1:
-	//			recvBufferLength = 26;
-	//		default:
-	//			throw SmartCardException(Unknown key pair type value);
-	//	}
-
-	//}
-	//else
-	//	throw SmartCardException("unconnected card or the user doesn't have proper access level. Correct userPinCode is required");
-		
-
+bool SipSimSmartCardGD::getPublicKey(unsigned char * publicKeyPtr, int keyPairType){
+	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+		sendBufferLength = 5;
+	        switch(keyPairType){
+	        	case 0:
+	                	recvBufferLength = 131;
+	                        break;
+	                case 1:
+	                        recvBufferLength = 6;
+	                        break;
+	                default:
+	                        throw SmartCardException("Unknown key pair type value");
+	        }
+		clearBuffer();
+		sendBuffer = new unsigned char[sendBufferLength];
+		recvBuffer = new unsigned char[recvBufferLength];
+		memset(sendBuffer, 0, sendBufferLength);
+		memset(recvBuffer, 0, recvBufferLength);
+		sendBuffer[0] = 0xB0;
+		sendBuffer[1] = 0xD5;
+		sendBuffer[2] = 0x00;
+		switch(keyPairType){
+	        	case 0:
+		  	      sendBuffer[3] = 0x00;
+		              transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
+		              sw_1_2 = recvBuffer[129] << 8 | recvBuffer[130];
+		              break;
+		        case 1:
+		              sendBuffer[3] = 0x01;
+		              transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
+		              sw_1_2 = recvBuffer[4] << 8 | recvBuffer[5];
+		              break;
+		        default:
+		              throw SmartCardException("Unknown key pair type value");
+		 }
+ 
+                 switch(sw_1_2){
+		 	case 0x9000:
+				memcpy(publicKeyPtr, recvBuffer, (recvBufferLength - 2));
+ 		 		cerr << "recv buffer length is: +++++++"<< recvBufferLength <<endl;
+				cerr << "the length of publicKeyPtr is: +++++++"<<strlen((char *)publicKeyPtr)<<endl;
+				cerr << "the length of recvBuffer is: +++++++"<<strlen((char *)recvBuffer)<<endl;
+				clearBuffer();
+		        	return true;
+		        case 0x6982:
+				clearBuffer();
+		                return false;
+		        default:
+ 		 		clearBuffer();
+		                throw SmartCardException("Unknown state value was returned when fetching public key from the smart card");
+		 }
+	}
+	else
+		throw SmartCardException("unconnected card or the user doesn't have proper access level. Correct userPinCode is required");
 }
+
