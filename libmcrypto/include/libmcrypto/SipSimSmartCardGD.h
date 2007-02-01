@@ -96,8 +96,9 @@ public:
       /* public key relevant functions*/
 	bool generateKeyPair();
 
-	/*type: 0 get modulus; 1 get exponent*/
-	bool getPublicKey(unsigned long publicKeyLength, unsigned char * publicKeyPtr, int keyPairType);
+	/*keyPairType: 0 get modulus; 1 get exponent*/
+	//bool getPublicKey(unsigned long publicKeyLength, unsigned char * publicKeyPtr, int keyPairType);
+   	bool getPublicKey(unsigned char * publicKeyPtr, int keyPairType);
 
 
 private:
