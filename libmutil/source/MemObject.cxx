@@ -188,3 +188,75 @@ bool getDebugOutputEnabled(){
 #endif
 }
 
+minilist<string> getMemObjectNamesSummary(){
+#ifdef MDEBUG
+	minilist<string> ret;
+	std::list<string> str;	// unique names
+	std::list<int> count;   // count for corresponding name in str
+	std::list<string>::iterator si;
+	std::list<string>::iterator js;
+	std::list<int>::iterator jc;
+	global.lock();
+	// get list of unique names, and count
+	int i;
+	for (i=0; i< objs.size(); i++){
+		string oname = objs[i]->getMemObjectType();
+		bool found=false;
+		for (  jc=count.begin(), js=str.begin();  js!=str.end();  jc++, js++  ){
+			if (*js==oname){
+				(*jc)=*jc+1;
+				found=true;
+				break;
+			}
+		}
+		if (!found){
+			str.push_back(oname);
+			count.push_back(1);
+		}
+
+	}
+
+	// Bubble sort to arrange names is ascending order
+	bool done;
+	do {
+		done=true;
+		std::list<int>::iterator jc_last;
+		std::list<string>::iterator js_last;
+		jc_last = count.begin();
+		js_last = str.begin();
+		js=str.begin();
+		jc=count.begin();
+		if (js!=str.end()){ //start from second item
+			js++;
+			jc++;
+		}
+
+		for ( ; js!=str.end(); jc++, js++, jc_last++, js_last++){
+			if ( (*jc) < (*jc_last) ){
+				int tmpc=*jc;
+				*jc = *jc_last;
+				*jc_last=tmpc;
+
+				string tmps=*js;
+				*js = *js_last;
+				*js_last=tmps;
+				done=false;
+
+			}
+		}
+	}while (!done);
+
+	for (jc=count.begin(), js=str.begin(); js!=str.end(); jc++, js++){
+		ret.push_back( *js + " " + itoa( *jc ) );
+	}
+
+	global.unlock();
+	return ret;
+#else
+	minilist<string> ret;
+	return ret;
+#endif
+}
+
+
+

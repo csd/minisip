@@ -460,6 +460,25 @@ LIBMUTIL_API int getMemObjectCount();
  */
 LIBMUTIL_API minilist<std::string> getMemObjectNames();
 
+/**
+ * Same as getMemObjectNames() except that it reports the objects
+ * as a count for each type.
+ * Example:
+ *   If getMemObjectNames would report the following objects:
+ *     Name  Ref count
+ *     TypeA 2
+ *     TypeA 4
+ *     TypeB 1
+ *     TypeA <stack>
+ *     TypeB 4
+ *   then this function will report:
+ *     Name  Count
+ *     TypeA 3
+ *     TypeB 2 
+ */
+LIBMUTIL_API minilist<std::string> getMemObjectNamesSummary();
+
+
 
 
 #endif
