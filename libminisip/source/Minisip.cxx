@@ -35,6 +35,7 @@
 #include<libmutil/Timestamp.h>
 #include<libmutil/TextUI.h>
 #include<libmutil/Thread.h>
+#include<libminisip/MinisipExceptions.h>
 
 #ifndef WIN32
 #	ifdef DEBUG_OUTPUT
@@ -83,9 +84,11 @@
 #include<libosso.h>
 #endif
 
-using namespace std;
+#ifdef SCSIM_SUPPORT
+#include<libmcrypto/SmartCard.h>
+#endif
 
-extern Mutex global;
+using namespace std;
 
 #ifndef WIN32
 #ifdef DEBUG_OUTPUT
@@ -159,7 +162,42 @@ static void loadPlugins(const string &argv0){
 	pluginManager->loadFromDirectory( pluginPath );
 }
 
+/**
+ *
+ * -p <plugin path>
+ * -c <configuration file>
+*/
 Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
+
+	string pluginPath;
+	int i=0;
+	char *a;
+	do{	
+		char *path;
+		a = argv[i++];
+		if (a && a[0]=='-'){
+			switch (a[1]){
+				case 'p':
+					path = argv[i++];
+					if (path)
+						pluginPath = path;
+					else
+						throw MinisipBadArgument("bad argument for -p");
+					break;
+
+				case 'c':
+					path = argv[i++];
+					if (path)
+						confPath = path;
+					else
+						throw
+						MinisipBadArgument("bad argument for -c");
+					break;
+			}
+		
+		}
+
+	}while(a);
 
 	libmcryptoInit();
 
@@ -176,7 +214,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 	mdbg << "Loading plugins"<<end;
 	#endif
 
-	loadPlugins( argv ? argv[0] : "" );
+	loadPlugins( pluginPath );
 
 	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<end;
@@ -193,12 +231,6 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 	#endif
 	phoneConf =  new SipSoftPhoneConfiguration();
 	//phoneConf->sip=NULL;
-
-	#ifdef MINISIP_AUTOCALL
-	if (argc==3){
-		phoneConf->autoCall = string(argv[2]);
-	}
-	#endif
 
 	#ifdef DEBUG_OUTPUT
 	mout << BOLD << "init 1/9: Creating contact database" << PLAIN << end;
@@ -372,6 +404,13 @@ int Minisip::startSip() {
 		confMessageRouter->setGui(gui);
 
 
+
+#ifdef SCSIM_SUPPORT
+		MRef<SmartCardDetector*> scdetect = new SmartCardDetector(*messageRouter);
+		messageRouter->addSubsystem("smartcard",*scdetect);
+		scdetect->start();
+#endif
+
 		/*
 		   mdbg << "Starting presence server"<< end;
 		   CommandString subscribeserver("", SipCommandString::start_presence_server);
@@ -424,12 +463,14 @@ int Minisip::initParseConfig(){
 #ifdef DEBUG_OUTPUT
 			mout << BOLD << "init 3/9: Parsing configuration" << PLAIN << end;
 #endif
-			MRef<ConfBackend *> confBackend = ConfigRegistry::getInstance()->createBackend( gui );
+			MRef<ConfBackend *> confBackend =
+			ConfigRegistry::getInstance()->createBackend( gui, confPath);
 			if( !confBackend ){
 				merr << "Minisip could not load a configuration" << end << 
 					"back end. The application will now" << end <<
 					"exit." << end;
-				::exit( 1 );
+				throw new MinisipBadArgument("The configured backend could not be loaded");
+				//::exit( 1 );
 			}
 			string ret = phoneConf->load( confBackend );
 
@@ -471,7 +512,7 @@ int Minisip::runGui(){
 
 void Minisip::startDebugger(){
 	cerr << "startDebugger" << endl;
-	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf->sipStack));
+	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
 	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 }
 

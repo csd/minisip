@@ -23,6 +23,10 @@ class LIBMINISIP_API Minisip : public MObject{
 		
 		std::string getMemObjectType() const {return "Minisip";}
 
+		void setConfigurationLocation(std::string c){
+			confPath = c;
+		}
+
 		int exit();
 		int startSip();
 		int runGui();
@@ -34,6 +38,7 @@ class LIBMINISIP_API Minisip : public MObject{
 		
 		int initParseConfig();
 
+		std::string confPath;
 		MRef<MediaHandler *> mediaHandler;
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
