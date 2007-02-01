@@ -222,10 +222,13 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 			      unsigned char * key, unsigned int keyLength ,
 			      int type ){
 
+#ifdef SCSIM_SUPPORT
 	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
 		SipSimSmartCardGD *gd=dynamic_cast<SipSimSmartCardGD*>(*sim);
 		gd->getKey(csId, csbIdValue, (byte_t*)randPtr, randLengthValue, key, keyLength, type);
-	}else{
+	}else
+#endif
+	{
 		byte_t * label = new byte_t[4+4+1+randLengthValue];
 	
 		switch( type ){
