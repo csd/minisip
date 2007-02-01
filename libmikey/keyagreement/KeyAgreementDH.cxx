@@ -70,19 +70,20 @@ KeyAgreementDHBase::KeyAgreementDHBase(MRef<SipSim *> s):
 	dh(NULL)
 
 {
-	
-	if (!sim){
-		cerr << "EEEE: DHBase created WITHOUT SIM"<<endl;
-		dh = new OakleyDH();
-		if( dh == NULL )
-		{
-			throw MikeyException( "Could not create "
-					"DH parameters." );
-		}
+#ifdef SCSIM_SUPPORT
+	if (sim && dynamic_cast<SipSimSmartCardGD*>(*sim)){
+		// done - DH is implemented on-card
 	}
 	else
-		cerr << "EEEE: DHBase created with SIM"<<endl;
-
+#endif
+		{
+			dh = new OakleyDH();
+			if( dh == NULL )
+			{
+				throw MikeyException( "Could not create "
+						"DH parameters." );
+			}
+		}
 }
 
 KeyAgreementDHBase::~KeyAgreementDHBase(){
@@ -140,8 +141,6 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 	else
 #endif
 	{
-		cerr <<"EEEE: KeyAgreementDHBase: sim is NULL or not GD sim"<< endl;
-
 		if( !dh->setGroup( groupValue ) )
 			return 1;
 
@@ -160,7 +159,6 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 			publicKeyPtr = new unsigned char[ length ];
 		}
 		dh->getPublicKey( publicKeyPtr, length );
-
 	}
 
 	return 0;
