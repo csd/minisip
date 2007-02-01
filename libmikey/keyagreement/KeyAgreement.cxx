@@ -222,63 +222,68 @@ void KeyAgreement::keyDeriv( unsigned char csId, unsigned int csbIdValue,
 			      unsigned char * key, unsigned int keyLength ,
 			      int type ){
 
-	byte_t * label = new byte_t[4+4+1+randLengthValue];
-
-	switch( type ){
-		case KEY_DERIV_SALT:
-			label[0] = 0x39;
-			label[1] = 0xA2;
-			label[2] = 0xC1;
-			label[3] = 0x4B;
-			break;
-		case KEY_DERIV_TEK:
-			label[0] = 0x2A;
-			label[1] = 0xD0;
-			label[2] = 0x1C;
-			label[3] = 0x64;
-			break;
-		case KEY_DERIV_TRANS_ENCR:
-			label[0] = 0x15;
-			label[1] = 0x05;
-			label[2] = 0x33;
-			label[3] = 0xE1;
-			break;
-		case KEY_DERIV_TRANS_SALT:
-			label[0] = 0x29;
-			label[1] = 0xB8;
-			label[2] = 0x89;
-			label[3] = 0x16;
-			break;
-		case KEY_DERIV_TRANS_AUTH:
-			label[0] = 0x2D;
-			label[1] = 0x22;
-			label[2] = 0xAC;
-			label[3] = 0x75;
-			break;
-		case KEY_DERIV_ENCR:
-			label[0] = 0x15;
-			label[1] = 0x79;
-			label[2] = 0x8C;
-			label[3] = 0xEF;  
-			break;
-		case KEY_DERIV_AUTH:
-			label[0] = 0x1B;
-			label[1] = 0x5C;
-			label[2] = 0x79;
-			label[3] = 0x73;
-			break;
+	if (dynamic_cast<SipSimSmartCardGD*>(*sim)){
+		SipSimSmartCardGD *gd=dynamic_cast<SipSimSmartCardGD*>(*sim);
+		gd->getKey(csId, csbIdValue, (byte_t*)randPtr, randLengthValue, key, keyLength, type);
+	}else{
+		byte_t * label = new byte_t[4+4+1+randLengthValue];
+	
+		switch( type ){
+			case KEY_DERIV_SALT:
+				label[0] = 0x39;
+				label[1] = 0xA2;
+				label[2] = 0xC1;
+				label[3] = 0x4B;
+				break;
+			case KEY_DERIV_TEK:
+				label[0] = 0x2A;
+				label[1] = 0xD0;
+				label[2] = 0x1C;
+				label[3] = 0x64;
+				break;
+			case KEY_DERIV_TRANS_ENCR:
+				label[0] = 0x15;
+				label[1] = 0x05;
+				label[2] = 0x33;
+				label[3] = 0xE1;
+				break;
+			case KEY_DERIV_TRANS_SALT:
+				label[0] = 0x29;
+				label[1] = 0xB8;
+				label[2] = 0x89;
+				label[3] = 0x16;
+				break;
+			case KEY_DERIV_TRANS_AUTH:
+				label[0] = 0x2D;
+				label[1] = 0x22;
+				label[2] = 0xAC;
+				label[3] = 0x75;
+				break;
+			case KEY_DERIV_ENCR:
+				label[0] = 0x15;
+				label[1] = 0x79;
+				label[2] = 0x8C;
+				label[3] = 0xEF;  
+				break;
+			case KEY_DERIV_AUTH:
+				label[0] = 0x1B;
+				label[1] = 0x5C;
+				label[2] = 0x79;
+				label[3] = 0x73;
+				break;
+		}
+		
+		label[4] = csId;
+		
+		label[5] = (unsigned char)((csbIdValue>>24) & 0xFF);
+		label[6] = (unsigned char)((csbIdValue>>16) & 0xFF);
+		label[7] = (unsigned char)((csbIdValue>>8) & 0xFF);
+		label[8] = (unsigned char)(csbIdValue & 0xFF);
+		memcpy( &label[9], randPtr, randLengthValue );
+		prf( inkey, inkeyLength, label, 9 + randLengthValue, key, keyLength );
+	
+		delete [] label;
 	}
-	
-	label[4] = csId;
-	
-	label[5] = (unsigned char)((csbIdValue>>24) & 0xFF);
-	label[6] = (unsigned char)((csbIdValue>>16) & 0xFF);
-	label[7] = (unsigned char)((csbIdValue>>8) & 0xFF);
-	label[8] = (unsigned char)(csbIdValue & 0xFF);
-	memcpy( &label[9], randPtr, randLengthValue );
-	prf( inkey, inkeyLength, label, 9 + randLengthValue, key, keyLength );
-
-	delete [] label;
 }
 
 void KeyAgreement::genTek( unsigned char csId,
@@ -286,7 +291,7 @@ void KeyAgreement::genTek( unsigned char csId,
 #ifdef SCSIM_SUPPORT
 	SipSimSmartCardGD *gdSim =dynamic_cast<SipSimSmartCardGD*>(*sim);
 	if (gdSim){
-		gdSim->getTek(csId, csbIdValue, tgkPtr, tgkLengthValue, tek, tekLength);
+		gdSim->getKey(csId, csbIdValue, randPtr, randLengthValue, tek, tekLength, KEY_DERIV_TEK);
 	}else
 #endif	
 		keyDeriv( csId, csbIdValue, tgkPtr, tgkLengthValue, tek, tekLength, KEY_DERIV_TEK );
@@ -326,6 +331,9 @@ void KeyAgreement::setTgk( unsigned char * tgk, unsigned int tgkLengthValue ){
 	this->tgkPtr = new unsigned char[ tgkLengthValue ];
 	if( tgk ){
 		memcpy( this->tgkPtr, tgk, tgkLengthValue );
+	}
+	else if(sim){
+		Rand::randomize( this->tgkPtr, tgkLengthValue, sim );
 	}
 	else{
 		Rand::randomize( this->tgkPtr, tgkLengthValue );
