@@ -48,6 +48,7 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 	//#endif
 	
 	addCommand("quit");
+	addCommand("sleep");
 	addCommand("answer");
 	addCommand("disable autoanswer");
 	addCommand("enable autoanswer");
@@ -676,6 +677,13 @@ void MinisipTextUI::guiExecute(string cmd){
 		handled=true;
 	}
 #endif
+	
+	if (command.substr(0,5)=="sleep"){
+		string time = command.substr(5);
+		int t = atoi(time.c_str());
+		if (t>0)
+			Thread::msleep(t*1000);
+	}
 
 	if (command == "answer"){
 		CommandString command(callId, SipCommandString::accept_invite);
