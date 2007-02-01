@@ -129,10 +129,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 
 		std::list<MRef<PhoneBook *> > phonebooks;
 
-#ifdef MINISIP_AUTOCALL
-		std::string autoCall;
-#endif
-
 		std::string ringtone;
 		
 		std::list<std::string> audioCodecs;

@@ -47,15 +47,6 @@ LDFLAGS="${LDFLAGS} -rdynamic"
 dnl Check types
 AC_CHECK_TYPES([uint])
 
-dnl debug flag
-AC_ARG_ENABLE(autocall,
-    AS_HELP_STRING([--enable-autocall],
-    	[enables automatic calling for debug purposes (default disabled)]),
-    [ if test "${enable_autocall}" = "yes"
-      then
-        AC_DEFINE(MINISIP_AUTOCALL, [], [Debug autocalling])
-      fi ])
-
 dnl compile for iPAQ
 AC_ARG_ENABLE(ipaq,
     AS_HELP_STRING([--enable-ipaq],

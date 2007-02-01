@@ -42,17 +42,6 @@ class LIBMINISIP_API Gui : public Runnable, public CommandReceiver {
 		virtual ~Gui();
 
 		/**
-		* Purpose: Displays an error message to the user. This
-		* method must be able to display messages before the GUI
-		* is "run" (because of errors when initializing the
-		* application). (Error handling method)
-		* 
-		* @param s     Message that will be displayed to the
-		* user.
-		*/
-		//virtual void displayErrorMessage(std::string s)=0;
-
-		/**
 		* Purpose: The user interface will probably need a
 		* reference to the SipSoftPhone. After the GUI has
 		* been created and before it is "run" a pointer to
