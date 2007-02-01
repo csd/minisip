@@ -255,7 +255,7 @@ string OnlineMXmlConfBackend::getDefaultConfigFilename(){
 OnlineMXmlConfigPlugin::OnlineMXmlConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
 }
 
-MRef<ConfBackend *> OnlineMXmlConfigPlugin::createBackend(MRef<Gui*> gui)const{
+MRef<ConfBackend *> OnlineMXmlConfigPlugin::createBackend(MRef<Gui*> gui, const string &)const{
 	return new OnlineMXmlConfBackend();
 }
 

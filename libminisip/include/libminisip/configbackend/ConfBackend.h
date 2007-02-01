@@ -73,8 +73,12 @@ class LIBMINISIP_API ConfigPlugin : public MPlugin{
 		 * 		This is for example the case of the
 		 * 		configuration is stored on server instead
 		 * 		of on the local device.
+		 * @param argument  A configuration backend might want
+		 *		to be started with an argument. An example
+		 *		is a path to a file containing the 
+		 *		configuration data.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const=0;
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string& argument=NULL )const=0;
 
 		virtual std::string getPluginType()const{ return "Config"; }
 

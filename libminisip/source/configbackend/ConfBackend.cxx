@@ -30,6 +30,12 @@
 using namespace std;
 
 MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string backendName ){
+	string backendArgument;
+	if (backendName.find(':')!=string::npos){
+		backendArgument = backendName.substr(backendName.find(':')+1);
+		backendName = backendName.substr(0, backendName.find(':') );
+		
+	}
 						     
 	try{
 		MRef<MPlugin *> plugin;
@@ -60,7 +66,7 @@ MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string b
 			return NULL;
 		}
 
-		return config->createBackend( gui );
+		return config->createBackend( gui, backendArgument );
 	}
 	catch( ConfBackendException & ){
 		return NULL;

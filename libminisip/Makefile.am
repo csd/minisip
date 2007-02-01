@@ -398,6 +398,7 @@ endif
 
 
 libminisip_la_SOURCES = source/Minisip.cxx \
+			source/MinisipExceptions.cxx \
 			$(libonlineconf_src) \
 			$(libaec_src) \
 			$(libsip_src) \

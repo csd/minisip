@@ -31,7 +31,7 @@ class XMLFileParser;
 
 class MXmlConfBackend : public ConfBackend {
 	public:
-		MXmlConfBackend();
+		MXmlConfBackend(const std::string &path);
 		~MXmlConfBackend();
 		virtual void save( const std::string &key, 
 				const std::string &value );
@@ -67,7 +67,7 @@ class MXmlConfigPlugin : public ConfigPlugin{
 		 * 		configuration is stored on server instead
 		 * 		of on the local device.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &configFilePath=NULL)const;
 
 		virtual std::string getMemObjectType() const { return "MXmlConfBackend"; }
 

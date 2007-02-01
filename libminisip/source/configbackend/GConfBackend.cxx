@@ -243,7 +243,7 @@ void GConfBackend::sanitizeKey( string &key ){
 GConfigPlugin::GConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
 }
 
-MRef<ConfBackend *> GConfigPlugin::createBackend(MRef<Gui*> gui)const{
+MRef<ConfBackend *> GConfigPlugin::createBackend(MRef<Gui*> gui, const string & /*arg*/)const{
 	return new GConfBackend();
 }
 

@@ -73,8 +73,9 @@ class GConfigPlugin : public ConfigPlugin{
 		 * 		This is for example the case of the
 		 * 		configuration is stored on server instead
 		 * 		of on the local device.
+		 * @param arg	Not used by this backend.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &arg)const;
 
 		virtual std::string getMemObjectType() const { return "GConfBackend"; }
 

@@ -74,8 +74,9 @@ class OnlineMXmlConfigPlugin : public ConfigPlugin{
 		 * 		This is for example the case of the
 		 * 		configuration is stored on server instead
 		 * 		of on the local device.
+		 * @param arg	Currently not used by this backend.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui)const;
+		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &arg=NULL)const;
 
 		virtual std::string getMemObjectType() const { return "OnlineMXmlConfigPlugin"; }
 

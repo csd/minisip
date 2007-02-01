@@ -70,9 +70,12 @@ string searchReplace(const string &str,
 	return tmp;
 }
 
-MXmlConfBackend::MXmlConfBackend(){
+MXmlConfBackend::MXmlConfBackend( const string& path ){
 
-	fileName = getDefaultConfigFilename();
+	if (path.size()>0)
+		fileName = path;
+	else
+		fileName = getDefaultConfigFilename();
 
 	try{
 		parser = new XMLFileParser( fileName );
@@ -159,8 +162,8 @@ string MXmlConfBackend::getDefaultConfigFilename(){
 MXmlConfigPlugin::MXmlConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
 }
 
-MRef<ConfBackend *> MXmlConfigPlugin::createBackend(MRef<Gui*> gui)const{
-	return new MXmlConfBackend();
+MRef<ConfBackend *> MXmlConfigPlugin::createBackend(MRef<Gui*> gui, const string &configPath)const{
+	return new MXmlConfBackend(configPath);
 }
 
 std::string MXmlConfigPlugin::getName()const{
