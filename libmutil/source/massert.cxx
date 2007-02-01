@@ -10,7 +10,6 @@
 
 void massertFailed(char *expr, char *file, char *baseFile, int line) {
 	if (!strcmp(file, baseFile)) {
-		printf("hello");
 		fprintf(stderr,"massert(%s) failed in file %s, line %d\n", expr, file, line);
 	} else {
 		fprintf(stderr,"massert(%s) failed in file %s (included from %s), line %d\n", 
