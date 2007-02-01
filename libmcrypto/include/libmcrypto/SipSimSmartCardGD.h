@@ -64,11 +64,10 @@ public:
 
 	bool getSignature(unsigned char * dataPtr, int dataLength, unsigned char *signaturePtr, int& signatureLength, 
 			bool doHash, int hash_alg=HASH_SHA1);
-
 /* this method returns the tek which is calculated in the pseudo random function implemented on smart card*/
-	bool getTek(unsigned char csId, unsigned long csbIdValue,
+	bool getKey(unsigned char csId, unsigned long csbIdValue,
 		    unsigned char * randPtr, unsigned long randLength,
-		    unsigned char * tekPtr, unsigned long tekLength);
+		    unsigned char * tekPtr, unsigned long tekLength, int keyType);
 
 	bool genTgk( unsigned char * dhpubPtr, unsigned long dhpubLength ); 
 

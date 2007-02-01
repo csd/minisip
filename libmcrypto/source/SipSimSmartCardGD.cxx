@@ -383,8 +383,8 @@ bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLen
 		sendBuffer[1] = 0x45;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
-		sendBuffer[5] = dhpubLength;
-		memcpy(&sendBuffer[6], dhpubPtr, dhpubLength);
+		sendBuffer[4] = dhpubLength;
+		memcpy(&sendBuffer[5], dhpubPtr, dhpubLength);
 	
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
@@ -406,10 +406,9 @@ bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLen
 }
 
 
-
-bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
+bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 			       unsigned char * randPtr, unsigned long randLength,
-			       unsigned char * tekPtr, unsigned long tekLength){
+			       unsigned char * key, unsigned long keyLength, int keyType){
 
 	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
 		sendBufferLength = 4+randLength+7; 
@@ -424,7 +423,7 @@ bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
 		sendBuffer[0] = 0xB0;
 		sendBuffer[1] = 0x44;
 		sendBuffer[2] = 0x00;
-		sendBuffer[3] = 0x00;
+		sendBuffer[3] = keyType;
 		int i=5;
 		sendBuffer[i]= randLength;
 		i++;
@@ -449,7 +448,7 @@ bool SipSimSmartCardGD::getTek(unsigned char csId, unsigned long csbIdValue,
 				throw SmartCardException("Unknown state value was returned when getting the Diffie-Hellman public key from the smart card");
 		}
 	//	tekLength = recvBufferLength - 2;
-		memcpy(tekPtr, recvBuffer, tekLength);
+		memcpy(key, recvBuffer, keyLength);
 		clearBuffer();
 		return true;
 	}

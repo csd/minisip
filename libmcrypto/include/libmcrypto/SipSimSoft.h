@@ -21,10 +21,15 @@ class LIBMCRYPTO_API SipSimSoft : public SipSim{
 				int & signatureLength,
 				bool doHash,
 				int hash_alg=HASH_SHA1);
+
+
+		//virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr);
 		
 		virtual bool getRandomValue(unsigned char * randomPtr, unsigned long randomLength);
 
 	private:
+
+		//OakleyDH * dh;
 
 };
 
