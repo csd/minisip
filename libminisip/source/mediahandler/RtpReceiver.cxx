@@ -176,6 +176,14 @@ MRef<UDPSocket *> RtpReceiver::getSocket(){
 	return socket;
 }
 
+void RtpReceiver::stop(){
+	kill=true;
+}
+
+void RtpReceiver::join(){
+	thread->join();
+}
+
 void RtpReceiver::run(){
 	MRef<SRtpPacket *> packet;
 

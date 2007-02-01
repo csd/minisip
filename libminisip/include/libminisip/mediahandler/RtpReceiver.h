@@ -79,6 +79,10 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		 */
 		virtual void run();
 
+		void stop();
+
+		void join();
+
 		/**
 		 * Used to query the port that should be given as contact
 		 * information to the peer in the session description (SDP).
