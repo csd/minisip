@@ -116,6 +116,7 @@ nobase_include_HEADERS =    libminisip/aec/aecfix.h \
 			libminisip/ipprovider/StunIpProvider.h \
 			libminisip/ipprovider/IpProvider.h \
 			libminisip/Minisip.h \
+			libminisip/MinisipExceptions.h \
 			libminisip/libminisip_config.h \
 			libminisip/zrtp/ZrtpHostBridgeMinisip.h
 
