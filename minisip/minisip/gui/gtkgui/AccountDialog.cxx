@@ -117,6 +117,8 @@ void AccountDialog::addAccount(){
 
 	if( dialogWindow->run() == Gtk::RESPONSE_OK ){
 		Gtk::TreeModel::iterator iter = list->append();
+		(*iter)[list->columns->defaultProxy] = false;
+		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->identity] = identity;
 		apply( iter );
 	}
@@ -171,8 +173,6 @@ void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
 		
-		(*iter)[list->columns->defaultProxy] = false;
-		(*iter)[list->columns->pstnProxy] = false;
 		(*iter)[list->columns->username] = usernameEntry->get_text();
 		(*iter)[list->columns->password] = passwordEntry->get_text();
 		(*iter)[list->columns->doRegister] = registerCheck->get_active();
