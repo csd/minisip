@@ -169,8 +169,6 @@ bool SipDialogVoipServer::a3007_start_100rel_INVITE( const SipSMCommand &command
 		
 	string peerUri = dialogState.remoteUri;
 		
-	getDialogConfig()->sipIdentity->setSipUri(command.getCommandPacket()->getHeaderValueTo()->getUri().getUserIpString());
-		
 	if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 		merr << "No MIME match" << end;
 		return false;
@@ -196,8 +194,6 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 		
 		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
 		string peerUri = dialogState.remoteUri;
-		
-		getDialogConfig()->sipIdentity->setSipUri(inv->getHeaderValueTo()->getUri().getUserIpString());
 		
 		if(!sortMIME(*inv->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
