@@ -158,6 +158,12 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		std::string authError();
 		void setAuthError( std::string error );
 
+		const std::string &uri() const;
+		void setUri( const std::string &uri );
+
+		const std::string &peerUri() const;
+		void setPeerUri( const std::string &peerUri );
+
 		virtual std::string getMemObjectType() const {return "KeyAgreement";}
 
 		/* IPSEC Specific */
@@ -217,6 +223,9 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		MRef<MikeyMessage *> responderDataPtr;
 
 		std::string authErrorValue;
+
+		std::string uriValue;
+		std::string peerUriValue;
 };
 
 #endif

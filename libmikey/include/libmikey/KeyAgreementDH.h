@@ -50,7 +50,7 @@ class LIBMIKEY_API PeerCertificates {
 		virtual MRef<certificate_chain *> certificateChain();
 		virtual MRef<certificate_chain *> peerCertificateChain();
 		virtual void setPeerCertificateChain( MRef<certificate_chain *> chain );
-		virtual int controlPeerCertificate();
+		virtual int controlPeerCertificate( const std::string &peerUri );
 
 	private:
 		MRef<certificate_chain *> certChainPtr;

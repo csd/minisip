@@ -367,6 +367,22 @@ void KeyAgreement::setAuthError( string error ){
 	authErrorValue = error;
 }
 
+const std::string & KeyAgreement::uri() const{
+	return uriValue;
+}
+
+void KeyAgreement::setUri( const std::string &theUri ){
+	uriValue = theUri;
+}
+
+const std::string &KeyAgreement::peerUri() const{
+	return peerUriValue;
+}
+
+void KeyAgreement::setPeerUri( const std::string &thePeerUri ){
+	peerUriValue = thePeerUri;
+}
+
 void KeyAgreement::setCsIdMap( MRef<MikeyCsIdMap *> idMap ){
 	csIdMapPtr = idMap;
 }

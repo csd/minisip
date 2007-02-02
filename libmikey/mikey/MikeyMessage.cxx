@@ -313,12 +313,55 @@ void MikeyPayloads::operator +=( MRef<MikeyPayload*> payload ){
 	addPayload( payload );
 }
 
+static vector<byte_t> tsToVec( uint64_t ts ){
+	vector<byte_t> vec;
 
-void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
+	vec.resize( 8 );
+	for( int i = 0; i < 8; i++ ){
+		vec[ 8 - i - 1 ] = 
+			(byte_t)((ts >> (i*8))&0xFF);
+	}
+
+	return vec;
+}
+
+vector<byte_t> MikeyPayloads::buildSignData( size_t sigLength,
+					     bool useIdsT ){
+	vector<byte_t> signData;
+
+// 	signData.reserve( signDataLen );
+	signData.insert( signData.end(), rawMessageData(),
+			 rawMessageData() + rawMessageLength() - sigLength );
+
+	if( useIdsT ){
+		vector<byte_t> vecIDi = extractIdVec( 0 );
+		vector<byte_t> vecIDr = extractIdVec( 1 );
+		MRef<MikeyPayload*> i;
+
+		i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
+		if( !i ){
+			throw MikeyException( "Could not perform digital signature of the message, no T" );
+		}
+
+		MRef<MikeyPayloadT*> plT = dynamic_cast<MikeyPayloadT*>(*i);
+		vector<byte_t> vecTs = tsToVec( plT->ts() );
+	
+		signData.insert( signData.end(), vecIDi.begin(), vecIDi.end() );
+		signData.insert( signData.end(), vecIDr.begin(), vecIDr.end() );
+		signData.insert( signData.end(), vecTs.begin(), vecTs.end() );
+	}
+
+	return signData;
+}
+
+
+void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim,
+					 bool addIdsAndT ){
 	byte_t signature[4096];
 	int signatureLength=4096;
 	MikeyPayloadSIGN * sign;
 	MRef<MikeyPayload*> last;
+	vector<byte_t> signData;
 	
 	// set the previous nextPayloadType to signature
 	last = *lastPayload();
@@ -330,8 +373,9 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	addPayload( ( sign = new MikeyPayloadSIGN( GUESSED_SIGNATURE_LENGTH, 
 						   MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
 
-	if (!sim->getSignature( rawMessageData(), 
-			 rawMessageLength() - GUESSED_SIGNATURE_LENGTH,
+	signData = buildSignData( GUESSED_SIGNATURE_LENGTH, addIdsAndT );
+
+	if (!sim->getSignature( &signData.front(), signData.size(), 
 			 signature, signatureLength, true )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
@@ -339,9 +383,9 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 	if (signatureLength!=GUESSED_SIGNATURE_LENGTH){	// if the length field in the signature payload was 
 							// wrong, we have to redo the signature
 		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
+		signData = buildSignData( signatureLength, addIdsAndT );
 
-		sim->getSignature( rawMessageData(), 
-				rawMessageLength() - signatureLength,
+		sim->getSignature( &signData.front(), signData.size(),
 				signature, signatureLength, true );
 	}
 
@@ -350,11 +394,13 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim ){
 }
 
 
-void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
+void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert,
+					 bool addIdsAndT ){
 	byte_t signature[4096];
 	int signatureLength = 128;
 	MikeyPayloadSIGN * sign;
 	MRef<MikeyPayload*> last;
+	vector<byte_t> signData;
 	
 	// set the previous nextPayloadType to signature
 	last = *lastPayload();
@@ -375,8 +421,9 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	
 	addPayload( ( sign = new MikeyPayloadSIGN(GUESSED_SIGNATURE_LENGTH, MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
 
-	if (cert->sign_data( rawMessageData(), 
-			 rawMessageLength() - GUESSED_SIGNATURE_LENGTH,
+	signData = buildSignData( GUESSED_SIGNATURE_LENGTH, addIdsAndT );
+
+	if (cert->sign_data( &signData.front(), signData.size(),
 			 signature, &signatureLength )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
@@ -385,10 +432,10 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert ){
 	if (signatureLength!=GUESSED_SIGNATURE_LENGTH){	// if the length field in the signature payload was 
 							// wrong, we have to redo the signature
 		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
+		signData = buildSignData( signatureLength, addIdsAndT );
 
-		cert->sign_data( rawMessageData(), 
-				rawMessageLength() - signatureLength,
-				signature, &signatureLength );
+		cert->sign_data( &signData.front(), signData.size(),
+				 signature, &signatureLength );
 	}
 
 	sign->setSigData( signature, signatureLength ); // the payload signature is a dummy value until we do this
@@ -867,7 +914,8 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 	return peerChain;
 }
 
-bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
+bool MikeyPayloads::verifySignature( MRef<certificate*> cert,
+				     bool addIdsAndT ){
 	MRef<MikeyPayload*> payload =
 		extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
 
@@ -876,9 +924,11 @@ bool MikeyPayloads::verifySignature( MRef<certificate*> cert ){
 	}
 
 	MikeyPayloadSIGN* sig = dynamic_cast<MikeyPayloadSIGN*>(*payload);
+	vector<byte_t> signData;
 
-	int res = cert->verif_sign( rawMessageData(),
-				    rawMessageLength() - sig->sigLength(),
+	signData = buildSignData( sig->sigLength(), addIdsAndT );
+
+	int res = cert->verif_sign( &signData.front(), signData.size(),
 				    sig->sigData(),
 				    sig->sigLength() );
 	return res > 0;
@@ -1010,14 +1060,9 @@ void MikeyPayloads::addPkeKemac( KeyAgreementPKE* ka,
 	MikeyPayloadKeyData* keydata = 
 		new MikeyPayloadKeyData(KEYDATA_TYPE_TGK, ka->tgk(),
 							ka->tgkLength(), ka->keyValidity());
-	// FIXME get uri from certificate.
-	const char uri[] = "sip:test";
-	MikeyPayloadID* initId =
-		new MikeyPayloadID( MIKEYPAYLOAD_ID_TYPE_URI, strlen( uri ), (byte_t*)uri );
 
-	subPayloads->addPayload( initId );
+	subPayloads->addId( ka->uri() );
  	subPayloads->addPayload( keydata );
-	initId = NULL;
 	keydata = NULL;
 
 	unsigned int rawKeyDataLength = subPayloads->rawMessageLength();
@@ -1090,4 +1135,81 @@ bool MikeyPayloads::extractPkeEnvKey( KeyAgreementPKE* ka ) const{
 	delete[] envKey;
 	envKey = NULL;
 	return true;
+}
+
+void MikeyPayloads::addId( const string &theId ){
+ 	int type = MIKEYPAYLOAD_ID_TYPE_URI;
+	string id = theId;
+
+	if( id.substr( 0, 4 ) == "nai:" ){
+		type = MIKEYPAYLOAD_ID_TYPE_NAI;
+		id = id.substr( 4 );
+	}
+
+	MikeyPayloadID* initId =
+		new MikeyPayloadID( type, id.size(), (byte_t*)id.c_str() );
+	addPayload( initId );
+}
+
+const MikeyPayloadID* MikeyPayloads::extractId( int index ) const{
+	const MikeyPayloadID *id = NULL;
+	list<MRef<MikeyPayload*> >::const_iterator i;
+	list<MRef<MikeyPayload*> >::const_iterator last = lastPayload();
+	int j;
+	
+	for( i = firstPayload(), j = 0; i != last; i++ ){
+		MRef<MikeyPayload*> payload = *i;
+
+		if( payload->payloadType() == MIKEYPAYLOAD_ID_PAYLOAD_TYPE ){
+			if( j == index ){
+				id = dynamic_cast<const MikeyPayloadID*>(*payload);
+				break;
+			}
+
+			j++;
+		}
+	}
+
+	return id;
+}
+
+
+string MikeyPayloads::extractIdStr( int index ) const{
+	const MikeyPayloadID *id = extractId( index );
+
+	if( !id ){
+		return "";
+	}
+
+	string idData = string( (const char*)id->idData(), id->idLength() );
+	string idStr;
+
+	switch( id->idType() ){
+		case MIKEYPAYLOAD_ID_TYPE_NAI:
+			idStr = "nai:" + idData;
+			break;
+
+		case MIKEYPAYLOAD_ID_TYPE_URI:
+			idStr = idData;
+			break;
+			
+		default:
+			return "";
+	}
+
+	return idStr;
+}
+
+
+vector<byte_t> MikeyPayloads::extractIdVec( int index ) const{
+	const MikeyPayloadID *id = extractId( index );
+	vector<byte_t> result;
+
+	if( !id ){
+		return result;
+	}
+
+	result.resize( id->idLength() );
+	memcpy( &result.front(), id->idData(), id->idLength() );
+	return result;
 }

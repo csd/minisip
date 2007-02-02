@@ -95,3 +95,15 @@ string MikeyPayloadID::debugDump(){
 		"> length=<" + itoa( idLengthValue ) +
 		"> data=<" + binToHex( idDataPtr, idLengthValue ) + ">";
 }
+
+int MikeyPayloadID::idType() const{
+	return idTypeValue;
+}
+
+int MikeyPayloadID::idLength() const{
+	return idLengthValue;
+}
+
+const byte_t * MikeyPayloadID::idData() const{
+	return idDataPtr;
+}

@@ -235,10 +235,51 @@ void PeerCertificates::setPeerCertificateChain( MRef<certificate_chain *> peerCh
 	peerCertChainPtr = peerChain;
 }
 
-int PeerCertificates::controlPeerCertificate(){
+int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
 	if( peerCertChainPtr.isNull() || certDbPtr.isNull() )
 		return 0;
-	return peerCertChainPtr->control( certDbPtr );
+
+	int res = peerCertChainPtr->control( certDbPtr );
+	if( !res ){
+		return res;
+	}
+
+	if( peerUri == "" ){
+		return 1;
+	}
+
+	MRef<certificate *> peerCert = peerCertChainPtr->get_first();
+	vector<string> altNames;
+
+	altNames = peerCert->get_alt_name( certificate::SAN_URI );
+	if( find( altNames.begin(), altNames.end(), peerUri ) != altNames.end() ){
+		return 1;
+	}
+
+	string id = peerUri;
+	size_t pos = peerUri.find(':');
+
+	if( pos != string::npos ){
+		id = peerUri.substr( pos + 1 );
+	}
+
+	altNames = peerCert->get_alt_name( certificate::SAN_RFC822NAME );
+	if( find( altNames.begin(), altNames.end(), id ) != altNames.end() ){
+		return 1;
+	}
+
+	pos = id.find('@');
+	if( pos != string::npos ){
+		id = id.substr( pos + 1 );
+	}
+
+	altNames = peerCert->get_alt_name( certificate::SAN_DNSNAME );
+	if( find( altNames.begin(), altNames.end(), id ) != altNames.end() ){
+		return 1;
+	}
+
+	cerr << "Peer URI " << peerUri << " not found in subject alt names." << endl;
+	return 0;
 }
 
 MikeyMessage* KeyAgreementDH::createMessage(){

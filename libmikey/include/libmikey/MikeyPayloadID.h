@@ -48,6 +48,10 @@ class LIBMIKEY_API MikeyPayloadID : public MikeyPayload{
 		virtual int length();
 		virtual std::string debugDump();
 
+		int idType() const;
+		int idLength() const;
+		const byte_t * idData() const;
+
 	private:
 		int idTypeValue;
 		int idLengthValue;

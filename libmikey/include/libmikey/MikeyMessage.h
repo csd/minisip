@@ -72,6 +72,7 @@ class certificate_db;
 class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
 class KeyAgreementRSAR;
+class MikeyPayloadID;
 
 class LIBMIKEY_API MikeyPayloads: public MObject{
 	public:
@@ -81,9 +82,12 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
 		
 		void addPayload( MRef<MikeyPayload*> payload );
 		void operator+=( MRef<MikeyPayload*> payload );
-		void addSignaturePayload( MRef<SipSim*> sim );
-		void addSignaturePayload( MRef<certificate *> cert );
-		bool verifySignature( MRef<certificate*> cert );
+		void addSignaturePayload( MRef<SipSim*> sim,
+					  bool addIdsAndT = false );
+		void addSignaturePayload( MRef<certificate *> cert,
+					  bool addIdsAndT = false );
+		bool verifySignature( MRef<certificate*> cert,
+				      bool addIdsAndT = false );
 
 		void addVPayload( int macAlg, uint64_t receivedT,
 			byte_t * authKey, uint32_t authKeyLength);
@@ -104,6 +108,11 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
 		void addPkeKemac( KeyAgreementPKE* ka,
 				  int encrAlg, int macAlg );
 		bool extractPkeEnvKey( KeyAgreementPKE* ka ) const;
+
+		void addId( const std::string &id );
+		const MikeyPayloadID* extractId( int index ) const;
+		std::string extractIdStr( int index ) const;
+		std::vector<byte_t> extractIdVec( int index ) const;
 
 		std::string debugDump();
 		byte_t * rawMessageData();
@@ -128,6 +137,8 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
 
 		void addPolicyToPayload(KeyAgreement * ka);
 		void addPolicyTo_ka(KeyAgreement * ka);
+		std::vector<byte_t> buildSignData( size_t sigLength,
+						   bool addIdsAndT = false );
 
 		/**
 		 * Store pointer to raw data.

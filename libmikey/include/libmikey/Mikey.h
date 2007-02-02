@@ -66,12 +66,14 @@ class LIBMIKEY_API Mikey: public MObject{
 
 		/* Key management handling */
 		// Initiator methods
-		std::string initiatorCreate( int kaType );
+		std::string initiatorCreate( int kaType,
+					     const std::string &peerUri="" );
 		bool initiatorAuthenticate( std::string message );
 		std::string initiatorParse();
 
 		// Responder methods
-		bool responderAuthenticate( std::string message );
+		bool responderAuthenticate( const std::string &message,
+					    const std::string &peerUri="" );
 		std::string responderParse();
 
 		void setMikeyOffer();
@@ -83,6 +85,8 @@ class LIBMIKEY_API Mikey: public MObject{
 		MRef<KeyAgreement*> getKeyAgreement() const;
 
 		void addSender( uint32_t ssrc );
+
+		const std::string &peerUri() const;
 
 	protected:
 		void setState( State newState );

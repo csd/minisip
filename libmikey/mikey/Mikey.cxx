@@ -67,7 +67,8 @@ Mikey::Mikey( MRef<IMikeyConfig*> aConfig ):state(STATE_START),
 Mikey::~Mikey(){
 }
 
-bool Mikey::responderAuthenticate( string message ){
+bool Mikey::responderAuthenticate( const string &message,
+				   const string &peerUri ){
 	
 	setState( STATE_RESPONDER );
 
@@ -86,6 +87,7 @@ bool Mikey::responderAuthenticate( string message ){
 						"Can't handle key agreement" );
 				}
 
+				ka->setPeerUri( peerUri );
 				ka->setInitiatorData( init_mes );
 						
 #ifdef ENABLE_TS
@@ -107,7 +109,7 @@ bool Mikey::responderAuthenticate( string message ){
 					PeerCertificates *peers =
 						dynamic_cast<PeerCertificates*>(*ka);
 					if( peers ){
-						if( peers->controlPeerCertificate() == 0){
+						if( peers->controlPeerCertificate( ka->peerUri() ) == 0){
 							throw MikeyExceptionAuthentication(
 								"Certificate check failed in the incoming MIKEY message" );
 						}
@@ -228,7 +230,7 @@ string Mikey::responderParse(){
 }
 
 
-string Mikey::initiatorCreate( int type ){
+string Mikey::initiatorCreate( int type, const string &peerUri ){
 	MRef<MikeyMessage *> message;
 
 	setState( STATE_INITIATOR );
@@ -239,6 +241,7 @@ string Mikey::initiatorCreate( int type ){
 			throw MikeyException( "Can't create key agreement" );
 		}
 
+		ka->setPeerUri( peerUri );
 		message = ka->createMessage();
 
 		string b64Message = message->b64Message();
@@ -288,7 +291,7 @@ bool Mikey::initiatorAuthenticate( string message ){
 					PeerCertificates *peers =
 						dynamic_cast<PeerCertificates*>(*ka);
 					if( peers ){
-						if( peers->controlPeerCertificate() == 0){
+						if( peers->controlPeerCertificate( ka->peerUri() ) == 0){
 							throw MikeyExceptionAuthentication(
 								"Certificate control failed" );
 						}
@@ -446,6 +449,15 @@ string Mikey::authError() const{
 	return ka ? ka->authError() : "";
 }
 
+const std::string &Mikey::peerUri() const{
+	static string empty;
+
+	if( state != STATE_AUTHENTICATED )
+		return empty;
+
+	return ka->peerUri();
+}
+
 void Mikey::setState( State newState ){
 	state = newState;
 }
@@ -545,6 +557,8 @@ void Mikey::createKeyAgreement( int type )
 			pskKa->generateTgk();
 		}
 	}
+
+	ka->setUri( config->getUri() );
 
 	if( isInitiator() ){
 		addStreamsToKa();

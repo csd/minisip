@@ -1,7 +1,7 @@
 
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien, Joachim Orrblad
-  Copyright (C) 2006 Mikael Magnusson
+  Copyright (C) 2006-2007 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -79,8 +79,16 @@ MikeyMessageRSAR::MikeyMessageRSAR( KeyAgreementRSAR* ka ){
 	//keep a copy of the random value
 	ka->setRand(randPayload->randData(), randPayload->randLength());
 
+	// Add initiator identity (IDi)
+	addId( ka->uri() );
+
 	// Add certificate chain (SIGN)
 	addCertificatePayloads( ka->certificateChain() );
+
+	// Add responder identity (IDr)
+	if( !ka->peerUri().empty() ){
+		addId( ka->peerUri() );
+	}
 
 	// Add signature (T)
 	addSignaturePayload( ka->certificateChain()->get_first() );
@@ -209,6 +217,9 @@ MRef<MikeyMessage*> MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 	MikeyPayloadRAND* randPayload = NULL;
 	result->addPayload(randPayload = new MikeyPayloadRAND());
 
+	// Add IDr
+	result->addId( ka->uri() );
+
 	// Add certificate chain
 	result->addCertificatePayloads( ka->certificateChain() );
 
@@ -218,7 +229,9 @@ MRef<MikeyMessage*> MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 
 	result->addPkeKemac( ka, encrAlg, macAlg );
 
-	result->addSignaturePayload( ka->certificateChain()->get_first() );
+	result->addSignaturePayload( ka->certificateChain()->get_first(),
+// 				     false );
+				     true );
 
 	return *result;
 }
@@ -340,9 +353,18 @@ MRef<MikeyMessage *> MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 		iv = NULL;
 	}
 
+	string peerUri = subPayloads->extractIdStr( 0 );
+	if( peerUri.empty() || peerUri != ka->peerUri()  ){
+		cerr << "Encrypted IDr mismatch" << endl;
+
+		error = true;
+		errorMessage->addPayload( 
+			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_ID ) );
+	}
+
 	MRef<MikeyPayload *> plKeyData =
 		subPayloads->extractPayload( MIKEYPAYLOAD_KEYDATA_PAYLOAD_TYPE );
-
+	if( plKeyData ){
 	MikeyPayloadKeyData *keyData =
 		dynamic_cast<MikeyPayloadKeyData*>(*plKeyData);
 
@@ -351,6 +373,12 @@ MRef<MikeyMessage *> MikeyMessageRSAR::parseResponse( KeyAgreement * kaBase ){
 
 	ka->setTgk( tgk, tgkLength );
 	ka->setKeyValidity( keyData->kv() );
+	}
+	else{
+		error = true;
+		errorMessage->addPayload( 
+			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
+	}
 #undef kemac
 
 	if( error ){
@@ -414,6 +442,39 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 			return true;
 		}
 
+		// Check Peer ID (IDi resp IDr)
+		string peerUri = extractIdStr( 0 );
+		if( !peerUri.empty() ){
+			if( !ka->peerUri().empty() ){
+				if( peerUri != ka->peerUri() ){
+					cerr << "Peer ID mismatch " + peerUri + " != " + ka->peerUri() << endl;
+					ka->setAuthError( "Peer ID mismatch" );
+					return true;
+				}
+#ifdef DEBUG_OUTPUT
+				cerr << "Peer ID authenticated " << peerUri << endl;
+#endif
+			}
+			else{
+				ka->setPeerUri( peerUri );
+			}
+		}
+
+		// Check My ID (IDr)
+		if( isInitiatorMessage() ){
+			string uri = extractIdStr( 1 );
+			if( !uri.empty() ){
+				if( uri != ka->uri() ){
+					cerr << "ID mismatch" << endl;
+					ka->setAuthError( "ID mismatch" );
+					return true;
+				}
+#ifdef DEBUG_OUTPUT
+				cerr << "ID match" << endl;
+#endif
+			}
+		}
+
 		// Fetch peer certificate chain
 		MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
 		if( peerChain.isNull() || peerChain->get_first().isNull() ){
@@ -427,7 +488,8 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 			ka->setPeerCertificateChain( peerChain );
 		}
 
- 		if( !verifySignature( peerChain->get_first() ) ){
+ 		if( !verifySignature( peerChain->get_first(),
+				      isResponderMessage() ) ){
 			cout << "Verification of the RSAR init message SIGN payload failed!"  << endl;
 			cout << "Keypair of the initiator probably mismatch!" << endl;
 			return true;
