@@ -38,6 +38,7 @@
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipCommandString.h>
 #include<libmutil/massert.h>
+#include<libmutil/Timestamp.h>
 
 #include<libminisip/sip/SipDialogVoipClient.h>
 #include<libminisip/sip/SipDialogVoipServer.h>

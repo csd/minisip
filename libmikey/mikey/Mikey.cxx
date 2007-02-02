@@ -80,7 +80,6 @@ bool Mikey::responderAuthenticate( string message ){
 		else {
 			try{
 				MRef<MikeyMessage *> init_mes = MikeyMessage::parse(b64Message);
-				
 				createKeyAgreement( init_mes->keyAgreementType() );
 				if( !ka ){
 					throw MikeyException(

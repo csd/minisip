@@ -346,7 +346,6 @@ int ossl_certificate::verif_sign( unsigned char * data, int data_length,
 
 		ERR_print_errors_fp( stderr );
 	}
-
 	return err;
 }
 	

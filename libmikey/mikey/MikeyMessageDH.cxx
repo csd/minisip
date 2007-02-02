@@ -414,7 +414,6 @@ MRef<MikeyMessage *> MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 
 bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 	KeyAgreementDH* ka = dynamic_cast<KeyAgreementDH*>(kaBase);
-
 	if( !ka ){
 		throw MikeyExceptionMessageContent( 
 				"Not a DH keyagreement" );

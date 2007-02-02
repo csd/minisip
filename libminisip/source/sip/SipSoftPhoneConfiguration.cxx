@@ -864,6 +864,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	//<network_interface> into networkInterfaceName
 	networkInterfaceName = backend->loadString("network_interface", "");
 	
+	//cerr << "EEEE: SIM: sim is "<< (sipStackConfig?"not NULL":"NULL")<< endl;
 	return ret;
 
 }

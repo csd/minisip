@@ -580,7 +580,7 @@ bool SipSimSmartCardGD::getPublicKey(unsigned char * publicKeyPtr, int keyPairTy
  
                  switch(sw_1_2){
 		 	case 0x9000:
-				memcpy(publicKeyPtr, recvBuffer, (recvBufferLength - 2));
+				memcpy(publicKeyPtr, &recvBuffer[1], recvBuffer[0]);
 				clearBuffer();
 		        	return true;
 		        case 0x6982:
