@@ -425,7 +425,7 @@ void SipRequest::addRoutes(const list<SipUri> &routes){
 	list<SipUri>::const_reverse_iterator i;
 	list<SipUri>::const_reverse_iterator first=routes.rend();
 
-	for( i = routes.rbegin(); i != first; i-- ){
+	for( i = routes.rbegin(); i != first; i++ ){
 		const SipUri &route = *i;
 
 		addRoute( route.getString() );
