@@ -130,6 +130,7 @@ void SipSoftPhoneConfiguration::save(){
 		backend->saveBool(accountPath + "use_zrtp", /*use_zrtp*/ (*iIdent)->use_zrtp);
 		backend->saveBool(accountPath + "psk_enabled", (*iIdent)->pskEnabled);
 		backend->saveBool(accountPath + "dh_enabled", (*iIdent)->dhEnabled);
+		backend->saveBool(accountPath + "check_cert", (*iIdent)->checkCert);
 
 		backend->save(accountPath + "psk", (*iIdent)->getPsk() );
 
