@@ -150,7 +150,9 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 		list<SipUri> contacts;
 
 		// TODO add all contacts from the response
-		contacts.push_back( c->getUri() );
+		if( c ){
+			contacts.push_back( c->getUri() );
+		}
 		getDialogConfig()->sipIdentity->setRegisteredContacts ( contacts );
 		getDialogConfig()->sipIdentity->setIsRegistered ( true );
 		
