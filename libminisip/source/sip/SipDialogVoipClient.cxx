@@ -261,13 +261,18 @@ bool SipDialogVoipClient::a2004_calling_incall_2xx( const SipSMCommand &command)
 //FIXME: CESC: for now, route set is updated at the transaction layer		
 		
 		bool ret = sortMIME(*resp->getContent(), peerUri, 3);
+		if( !ret ) {
+			// Fall through to a2012 terminating the
+			// call and sending security_failed to the gui
+			return false;
+		}
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, getMediaSession()->getPeerUri(),
 							(getMediaSession()->isSecure()?"secure":"unprotected"));
 		
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 		
-		return ret;
+		return true;
 	}else{
 		return false;
 	}

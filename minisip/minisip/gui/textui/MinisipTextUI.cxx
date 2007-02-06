@@ -187,6 +187,13 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		sendCommand("media", cmdstr);
 	
 	}
+	else if (cmd.getOp()=="security_failed"){
+		handled=true;
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("Security is not handled by the receiver", red);
+		inCall=false;
+	}
 	
 	if (cmd.getOp()=="remote_ringing"){
 		handled=true;
