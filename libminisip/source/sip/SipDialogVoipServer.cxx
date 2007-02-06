@@ -166,8 +166,11 @@ bool SipDialogVoipServer::a3007_start_100rel_INVITE( const SipSMCommand &command
 		
 	setLastInvite(inv);
 	dialogState.updateState( getLastInvite() );
-		
-	string peerUri = dialogState.remoteUri;
+
+	// Build peer uri used for authentication from remote uri,
+	// but containing user and host only.
+	SipUri peer(dialogState.remoteUri);
+	string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		
 	if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
 		merr << "No MIME match" << end;
@@ -191,9 +194,11 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 
 		setLastInvite(inv);
 		dialogState.updateState( inv );
-		
-		//string peerUri = command.getCommandPacket()->getFrom().getString().substr(4);
-		string peerUri = dialogState.remoteUri;
+
+		// Build peer uri used for authentication from remote uri,
+		// but containing user and host only.
+		SipUri peer(dialogState.remoteUri);
+		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		
 		if(!sortMIME(*inv->getContent(), peerUri, 10)){
 			merr << "No MIME match" << end;
@@ -233,7 +238,7 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 */		
 		CommandString cmdstr(dialogState.callId, 
 				SipCommandString::incoming_available, 
-				dialogState.remoteUri, 
+				     getMediaSession()->getPeerUri(),
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
@@ -262,7 +267,8 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 #endif
 
 		CommandString cmdstr(dialogState.callId, 
-				SipCommandString::invite_ok,"",
+				SipCommandString::invite_ok,
+				     getMediaSession()->getPeerUri(),
 				(getMediaSession()->isSecure()?"secure":"unprotected")
 				);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
@@ -457,7 +463,7 @@ bool SipDialogVoipServer::a3008_100rel_ringing_PRACK( const SipSMCommand &comman
 		
 	CommandString cmdstr(dialogState.callId, 
 			     SipCommandString::incoming_available, 
-			     dialogState.remoteUri, 
+			     getMediaSession()->getPeerUri(),
 			     (getMediaSession()->isSecure()?"secure":"unprotected")
 		);
 	getSipStack()->getCallback()->handleCommand("gui", cmdstr );

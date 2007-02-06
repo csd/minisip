@@ -174,8 +174,10 @@ bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command
 			dialogState.updateState( resp );
 		}
 
-		//string peerUri = command.getCommandPacket()->getTo().getString();
-		string peerUri = dialogState.remoteUri; //use the dialog state ...
+		// Build peer uri used for authentication from remote uri,
+		// but containing user and host only.
+		SipUri peer(dialogState.remoteUri);
+		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		MRef<SipMessageContent *> content = resp->getContent();
 		if( !content.isNull() ){
 			MRef<SdpPacket*> sdp((SdpPacket*)*content);
@@ -197,7 +199,7 @@ bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command
 			sendPrack(resp);
 
 		if( resp->getStatusCode() == 180 ){
-			CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing, peerUri, (getMediaSession()->isSecure()?"secure":"unprotected"));
+			CommandString cmdstr(dialogState.callId, SipCommandString::remote_ringing, getMediaSession()->getPeerUri(), (getMediaSession()->isSecure()?"secure":"unprotected"));
 			getSipStack()->getCallback()->handleCommand("gui", cmdstr);
 		}
 	
@@ -244,11 +246,12 @@ bool SipDialogVoipClient::a2004_calling_incall_2xx( const SipSMCommand &command)
 #endif
 		MRef<SipResponse*> resp(  (SipResponse*)*command.getCommandPacket() );
 		
-		string peerUri = dialogState.remoteUri;
+		// Build peer uri used for authentication from remote uri,
+		// but containing user and host only.
+		SipUri peer(dialogState.remoteUri);
+		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		dialogState.updateState( resp );
 		sendAck();
-		
-		//string peerUri = resp->getFrom().getString();
 		
 		setLogEntry( new LogEntryOutgoingCompletedCall() );
 		getLogEntry()->start = time( NULL );
@@ -259,7 +262,7 @@ bool SipDialogVoipClient::a2004_calling_incall_2xx( const SipSMCommand &command)
 		
 		bool ret = sortMIME(*resp->getContent(), peerUri, 3);
 
-		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, "",
+		CommandString cmdstr(dialogState.callId, SipCommandString::invite_ok, getMediaSession()->getPeerUri(),
 							(getMediaSession()->isSecure()?"secure":"unprotected"));
 		
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
@@ -537,10 +540,14 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 	if (mediaSession){
+		// Build peer uri used for authentication from remote uri,
+		// but containing user and host only.
+		SipUri peer(dialogState.remoteUri);
+		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
-		sdp = mediaSession->getSdpOffer();
+		sdp = mediaSession->getSdpOffer( peerUri );
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
