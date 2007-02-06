@@ -197,7 +197,7 @@ LIBMUTIL_API string itoa(int64_t i){
 	char buf[30]; //should be enough for a 64 bit integer ...
 	for (int j=0; j<16; j++)
 		buf[j]=0;
-	sprintf(buf,"%ld",i);
+	sprintf(buf,"%lld",i);
 	return string(buf);
 }
 
