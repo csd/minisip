@@ -97,7 +97,8 @@ class LIBMINISIP_API Session : public MObject{
 		 * @param anatSupported Use ANAT (RFC 4091)
 		 * @returns a reference to the SDP object
 		 */
-		MRef<SdpPacket *> getSdpOffer( bool anatSupported = false );
+		MRef<SdpPacket *> getSdpOffer( const std::string &peerUri = "",
+					       bool anatSupported = false );
 		
 		/**
 		 * Used by the SIP stack to query the session description
@@ -242,6 +243,11 @@ class LIBMINISIP_API Session : public MObject{
 		std::list< MRef<MediaStreamSender *> > getMediaStreamSenders() {
 			return mediaStreamSenders;
 		}
+
+		/**
+		 * Return authenticated peer URI
+		 */
+		const std::string &getPeerUri() const;
 		
 		/**
 		CallRecorder object ... we store it as MObject because it creates

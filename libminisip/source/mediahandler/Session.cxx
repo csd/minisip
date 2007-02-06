@@ -68,7 +68,8 @@ class MikeyConfig: public IMikeyConfig{
 				identity(aIdentity) {}
 
 		const std::string getUri() const{
-			return identity->getSipUri().getString();
+			return identity->getSipUri().getProtocolId() + ":" +
+				identity->getSipUri().getUserIpString();
 		}
 
 		MRef<SipSim*> getSim() const{
@@ -289,7 +290,7 @@ MRef<SdpPacket *> Session::emptySdp(){
 	return result;
 }
 
-MRef<SdpPacket *> Session::getSdpOffer( bool anatSupported ){ // used by the initiator when creating the first message
+MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupported ){ // used by the initiator when creating the first message
 	MRef<SdpPacket *> result;
 	list< MRef<MediaStreamReceiver *> >::iterator i;
 	std::list<std::string>::iterator iAttribute;
@@ -339,7 +340,7 @@ MRef<SdpPacket *> Session::getSdpOffer( bool anatSupported ){ // used by the ini
 
 		addStreams();
 
-		keyMgmtMessage = mikey->initiatorCreate( type );
+		keyMgmtMessage = mikey->initiatorCreate( type, peerUri );
 		if( mikey->error() ){
 			// something went wrong
 			return NULL;
@@ -463,11 +464,17 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 		/* get the keymgt: attribute */
 		string keyMgmtMessage = 
 			answer->getSessionLevelAttribute( "key-mgmt" );
+
+		if( !peerUri.empty() ){
+			mikey->getKeyAgreement()->setPeerUri( peerUri );
+		}
+
 		if( !mikey->initiatorAuthenticate( keyMgmtMessage ) ){
 			errorString = "Could not authenticate the key management message";
 			fprintf( stderr, "Auth failed\n");
 			return false;
 		}
+		this->peerUri = mikey->peerUri();
 
 		string mikeyErrorMsg = mikey->initiatorParse();
 		if( mikeyErrorMsg != "" ){
@@ -637,15 +644,16 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 
 		addStreams();
 
-		if( !mikey->responderAuthenticate( keyMgmtMessage ) ){
+		if( !mikey->responderAuthenticate( keyMgmtMessage, peerUri ) ){
 			errorString =  "Incoming key management message could not be authenticated";
 // 			if( ka ){
 				errorString += mikey->authError();
 // 			}
 			return false;
 		}
-		else //Here we set the offer in ka
-			mikey->setMikeyOffer();
+		this->peerUri = mikey->peerUri();
+		//Here we set the offer in ka
+		mikey->setMikeyOffer();
 	}
 	else{
 		/*securityConfig.*/ka_type = KEY_MGMT_METHOD_NULL;
@@ -1065,6 +1073,10 @@ string Session::getDebugString() {
 
 void Session::clearMediaStreamReceivers() {
 	mediaStreamReceivers.clear();
+}
+
+const std::string &Session::getPeerUri() const{
+	return peerUri;
 }
 
 void Session::addStreams() {
