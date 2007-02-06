@@ -265,6 +265,9 @@ vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces(){
 	}
 
 	for( cur = ifs; cur; cur = cur->ifa_next ){
+		if( !cur->ifa_addr )
+			continue;
+
 		if( cur->ifa_flags & IFF_UP ){
 			const char *name = cur->ifa_name;
 
