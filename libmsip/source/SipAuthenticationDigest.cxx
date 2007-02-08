@@ -161,6 +161,12 @@ void SipAuthenticationDigest::setCredential(const std::string &username, const s
 }
 
 void SipAuthenticationDigest::setCredential( MRef<SipCredential*> credential ){
+	if( credential.isNull() ){
+		username = "anonymous";
+		password = "";
+		return;
+	}
+
 	this->username = credential->getUsername();
 	this->password = credential->getPassword();
 }
