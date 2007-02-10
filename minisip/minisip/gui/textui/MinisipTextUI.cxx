@@ -156,9 +156,9 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	if (cmd.getOp()==SipCommandString::ask_password){
 		MRef<QuestionDialog*> d= new QuestionDialog;
 		d->questionId = cmd.getDestinationId();
-		d->questionId2 = cmd.getParam();
-		d->questions.push_back("Enter USER NAME for realm <"+cmd.getParam()+">");
-		d->questions.push_back("Enter PASSWORD for realm <"+cmd.getParam()+">");
+		d->questionId2 = cmd.get("realm");
+		d->questions.push_back("Enter USER NAME for realm <"+d->questionId2+">");
+		d->questions.push_back("Enter PASSWORD for realm <"+d->questionId2+">");
 		showQuestionDialog(d);
 	}
 

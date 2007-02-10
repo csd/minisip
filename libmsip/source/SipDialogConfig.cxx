@@ -47,15 +47,15 @@ SipCredential::SipCredential( const std::string &username,
 {
 }
 
-std::string SipCredential::getRealm() const{
+const std::string &SipCredential::getRealm() const{
 	return realm;
 }
 
-std::string SipCredential::getUsername() const{
+const std::string &SipCredential::getUsername() const{
 	return username;
 }
 
-std::string SipCredential::getPassword() const{
+const std::string &SipCredential::getPassword() const{
 	return password;
 }
 

@@ -64,9 +64,9 @@ class LIBMSIP_API SipCredential : public MObject{
 			       const std::string &password,
 			       const std::string &realm = "" );
 
-		std::string getRealm() const;
-		std::string getUsername() const;
-		std::string getPassword() const;
+		const std::string &getRealm() const;
+		const std::string &getUsername() const;
+		const std::string &getPassword() const;
 
 		void set( const std::string &username,
 			  const std::string &password,

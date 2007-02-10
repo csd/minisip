@@ -99,7 +99,7 @@ string SipAuthenticationDigest::calcResponse( MRef<SipRequest*> req ) const
 	unsigned char digest[16];
 	MD5Context context;
 	MD5Init(&context);
-	string u_r_p(username+":"+realm+":"+password);
+	string u_r_p(getUsername()+":"+realm+":"+getPassword());
 	MD5Update(&context, (const unsigned char *)u_r_p.c_str(), (unsigned int)u_r_p.length() );
 	MD5Final(digest,&context);
 	string md5_u_r_p = md5ToString(digest);
@@ -131,7 +131,7 @@ MRef<SipHeaderValueAuthorization*> SipAuthenticationDigest::createAuthorization(
 
 	if( type == SIP_HEADER_TYPE_WWWAUTHENTICATE ){
 		authorization = new SipHeaderValueAuthorization(
-			username,
+			getUsername(),
 			realm,
 			nonce,
 			opaque == nullStr ? "" : opaque,
@@ -142,7 +142,7 @@ MRef<SipHeaderValueAuthorization*> SipAuthenticationDigest::createAuthorization(
 	}
 	else {
 		authorization = new SipHeaderValueProxyAuthorization(
-			username,
+			getUsername(),
 			realm,
 			nonce,
 			opaque == nullStr ? "" : opaque,
@@ -155,18 +155,28 @@ MRef<SipHeaderValueAuthorization*> SipAuthenticationDigest::createAuthorization(
 	return authorization;
 }
 
-void SipAuthenticationDigest::setCredential(const std::string &username, const std::string &password){
-	this->username = username;
-	this->password = password;
+void SipAuthenticationDigest::setCredential( MRef<SipCredential*> credential ){
+	cred = credential;
 }
 
-void SipAuthenticationDigest::setCredential( MRef<SipCredential*> credential ){
-	if( credential.isNull() ){
-		username = "anonymous";
-		password = "";
-		return;
-	}
+MRef<SipCredential*> SipAuthenticationDigest::getCredential() const{
+	return cred;
+}
 
-	this->username = credential->getUsername();
-	this->password = credential->getPassword();
+const string &SipAuthenticationDigest::getUsername() const{
+	static string anonymous = "anonymous";
+
+	if( cred.isNull() )
+		return anonymous;
+	else
+		return cred->getUsername();
+}
+
+const string &SipAuthenticationDigest::getPassword() const{
+	static string empty = "";
+
+	if( cred.isNull() )
+		return empty;
+	else
+		return cred->getPassword();
 }

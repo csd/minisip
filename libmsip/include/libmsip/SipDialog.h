@@ -220,6 +220,15 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 */
 		void addAuthorizations( MRef<SipRequest*> req );
 
+		/**
+		 * Find realm of WWW-Authenticate or Proxy-Authenticate
+		 * header without valid credential.
+		 * Returns "" if there are none
+		 */
+		const std::string &findUnauthenticatedRealm() const;
+
+		bool addCredential( MRef<SipCredential*> credential );
+
 		std::string getDialogDebugString();
 
 	protected:

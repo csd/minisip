@@ -215,6 +215,8 @@ bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 				SipSMCommand::transaction_layer, 
 				SipSMCommand::dialog_layer, 
 				"401\n407")){
+
+		string realm = findUnauthenticatedRealm();
 		
 		//TODO: Ask password
 		CommandString cmdstr( 
@@ -222,6 +224,8 @@ bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 			SipCommandString::ask_password, 
 			getDialogConfig()->sipIdentity->getSipRegistrar()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
+		cmdstr["realm"] = realm;
+
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		//authentication info from received response is extracted in a2
 		return true;
@@ -243,24 +247,13 @@ bool SipDialogRegister::a5_askpassword_trying_setpassword( const SipSMCommand &c
 			//We store the new credentials for this dialogs
 			//configuration. Note that it is not saved for the
 			//next time minisip is started.
-		MRef<SipCredential*> cred;
-		cred = getDialogConfig()->sipIdentity->getCredential();
+		const string &user = command.getCommandString().getParam();
+		const string &pass = command.getCommandString().getParam2() ;
 
-		cred->set( command.getCommandString().getParam(),
-			   command.getCommandString().getParam2() );
+		MRef<SipCredential*> cred =
+			new SipCredential( user, pass, realm );
 
-			//Update the set of credentials with the new (and hopefully
-			//correct) information.
-		list<MRef<SipAuthenticationDigest*> >::iterator j;
-		for ( j = dialogState.auths.begin();
-				j != dialogState.auths.end(); j++ ){
-			MRef<SipAuthenticationDigest*> digest = *j;
-			if (digest->getRealm()==realm){
-				digest->setCredential(command.getCommandString().getParam(), 
-						command.getCommandString().getParam2());
-			}
-		}
-
+		addCredential( cred );
 
 		++dialogState.seqNo;
 

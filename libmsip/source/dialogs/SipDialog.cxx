@@ -297,16 +297,26 @@ bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 		if( item->getRealm() == challenge->getRealm() ){
 			item->update( *auth );
 
-			if( item->getStale() )
+			if( item->getStale() ){
 				changed = true;
+			}
+			else{
+				// Clear invalid credential
+				item->setCredential( NULL );
+			}
+
 			found = true;
+			break;
 		}
 	}
-		
+
 	if( !found ){
 		dialogState.auths.push_back( challenge );
 
-		challenge->setCredential( getDialogConfig()->sipIdentity->getCredential()  );
+		MRef<SipCredential*> cred =
+			getDialogConfig()->sipIdentity->getCredential();
+
+		challenge->setCredential( cred );
 		changed = true;
 	}
 
@@ -351,6 +361,45 @@ void SipDialog::addAuthorizations( MRef<SipRequest*> req ){
 		req->addHeader( new SipHeader( *authHeader ) );
 	}
 }
+
+const string &SipDialog::findUnauthenticatedRealm() const{
+	static const string empty;
+	list<MRef<SipAuthenticationDigest*> >::const_iterator j;
+
+	for ( j = dialogState.auths.begin();
+	      j != dialogState.auths.end(); j++ ){
+		MRef<SipAuthenticationDigest*> digest = *j;
+
+		if( digest->getCredential().isNull() ){
+			return digest->getRealm();
+		}
+	}
+
+	return empty;
+}
+
+bool SipDialog::addCredential( MRef<SipCredential*> credential ){
+	bool found = false;
+	list<MRef<SipAuthenticationDigest*> >::iterator j;
+
+	for ( j = dialogState.auths.begin();
+	      j != dialogState.auths.end(); j++ ){
+		MRef<SipAuthenticationDigest*> digest = *j;
+
+		if( digest->getCredential().isNull() ){
+			// Needs update
+			if( credential->getRealm() == "" ||
+			    credential->getRealm() == digest->getRealm() ){
+				digest->setCredential( credential );
+				found = true;
+			}
+		}
+	}
+
+	return found;
+}
+
+
 
 /*
 Establish a dialog acting as a UAS (receive a request)

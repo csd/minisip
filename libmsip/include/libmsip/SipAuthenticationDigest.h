@@ -63,17 +63,18 @@ class LIBMSIP_API SipAuthenticationDigest: public MObject{
 		/**
 		 * Set credential used when creating authorization headers.
 		 */
-		void setCredential(const std::string &username, const std::string &password);
-
-		/**
-		 * Set credential used when creating authorization headers.
-		 */
 		void setCredential( MRef<SipCredential*> credential );
+		/**
+		 * @return SIP credential or NULL
+		 */
+		MRef<SipCredential*> getCredential() const;
 
 		static std::string md5ToString(unsigned char *md5);
 
 	private:
 		std::string calcResponse( MRef<SipRequest*> req ) const;
+		const std::string &getUsername() const;
+		const std::string &getPassword() const;
 
 		int type;
 		std::string realm;
@@ -84,8 +85,7 @@ class LIBMSIP_API SipAuthenticationDigest: public MObject{
 		std::string algorithm;
 		std::string qop;
 
-		std::string username;
-		std::string password;
+		MRef<SipCredential*> cred;
 
 		static std::string nullStr;
 };
