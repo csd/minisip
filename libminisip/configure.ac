@@ -535,6 +535,7 @@ AC_CONFIG_FILES([
 		libminisip.pc
 		include/Makefile
 		m4/Makefile
+		tests/Makefile
 		source/win32/libminisip-res.rc
 	])
 AC_OUTPUT
