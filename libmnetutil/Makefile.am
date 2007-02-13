@@ -34,7 +34,10 @@ ipv6_src += \
 		    source/IP6ServerSocket.cxx
 endif
 
-mnetutil_src =      source/IPAddress.cxx \
+mnetutil_src = \
+		    source/init.cxx \
+		    source/DnsNaptr.cxx \
+		    source/IPAddress.cxx \
 		    source/IP4Address.cxx \
 		    source/IP4ServerSocket.cxx \
 		    $(srp_src) \
@@ -48,7 +51,7 @@ mnetutil_src =      source/IPAddress.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \
 		    source/StreamSocket.cxx
-		    
+
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 MAINTAINERCLEANFILES = \

@@ -501,7 +501,6 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	string ret;
 	string hostname;
 	int32_t port=-1;
-	static bool inited=false;
 
 	#ifdef DEBUG_OUTPUT
 	cerr <<"NetworkFunctions::getHostHandlingService - Using LIBRESOLV"<< endl;
@@ -513,11 +512,6 @@ string NetworkFunctions::getHostHandlingService(string service, string domain, u
 	else
 		q = service+"."+domain;
 
-	if( !inited ){
-		if( dns_init(0) < 0 )
-			throw ResolvError( errno ); // FIXME
-		inited = true;
-	}
 	dns_ctx *ctx = dns_new(NULL);
 	if( !ctx )
 		throw ResolvError( errno ); // FIXME

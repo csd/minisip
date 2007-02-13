@@ -5,6 +5,8 @@ endif
 
 pkginclude_HEADERS =    \
 			$(srp_src) \
+			libmnetutil/init.h \
+			libmnetutil/DnsNaptr.h \
 			libmnetutil/IPAddress.h \
 			libmnetutil/NetworkException.h \
 			libmnetutil/NetworkFunctions.h \

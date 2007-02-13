@@ -38,6 +38,9 @@ AC_ARG_ENABLE(srp,
       ])
 AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
 
+AG_CHECK_POSIX_REGCOMP
+AM_CONDITIONAL(HAVE_POSIX_REGCOMP, test "${ag_cv_posix_regcomp}" = "yes")
+
 if test "$os_win" = "yes"; then
 dnl
 dnl mingw support
@@ -77,7 +80,7 @@ AC_REPLACE_FUNCS([inet_aton inet_pton inet_ntop])
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h sys/types.h sys/socket.h netdb.h netinet/in.h arpa/inet.h netinet/tcp.h linux/sockios.h arpa/nameser_compat.h])
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h sys/types.h sys/socket.h netdb.h netinet/in.h arpa/inet.h netinet/tcp.h linux/sockios.h arpa/nameser_compat.h regex.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

@@ -29,6 +29,7 @@
 #include <libmcrypto/gnutls/init.h>
 #endif
 #include <libmutil/Mutex.h>
+#include <libmnetutil/init.h>
 
 #include <config.h>
 
@@ -39,6 +40,7 @@ void libmcryptoInit()
 	if( g_initialized++ )
 		return;
 
+	libmnetutilInit();
 #ifdef HAVE_OPENSSL
 	libmcryptoOpensslInit();
 #if 0
@@ -62,6 +64,7 @@ void libmcryptoUninit()
 #elif defined(HAVE_OPENSSL)
 	libmcryptoOpensslUninit();
 #endif
+	libmnetutilUninit();
 }
 
 // ====================================================================
