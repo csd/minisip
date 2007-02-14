@@ -33,7 +33,6 @@
 #include<libminisip/mediahandler/AudioMedia.h>
 #include<libminisip/mediahandler/MediaStream.h>
 #include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>

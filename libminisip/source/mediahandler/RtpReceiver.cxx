@@ -203,7 +203,7 @@ void RtpReceiver::run(){
 		tv.tv_sec = 0;
 		tv.tv_usec = 100000;
 
-		while( ret < 0 ){
+		while( !kill && ret < 0 ){
 			ret = select( socket->getFd() + 1, &rfds, NULL, NULL, &tv );
 			if( ret < 0 ){
 				#ifdef DEBUG_OUTPUT
@@ -282,4 +282,5 @@ void RtpReceiver::run(){
 
                 packet = NULL;
 	}
+	socket=NULL;
 }

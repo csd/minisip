@@ -304,10 +304,19 @@ void MediaStreamReceiver::start(){
 
 void MediaStreamReceiver::stop(){
 	list<uint32_t>::iterator i;
-	if( rtpReceiver )
+	if( rtpReceiver ){
 		rtpReceiver->unregisterMediaStream( this );
-	if( rtp6Receiver )
+		rtpReceiver->stop();
+	}
+	if( rtp6Receiver ){
 		rtp6Receiver->unregisterMediaStream( this );
+		rtp6Receiver->stop();
+	}
+	if( rtpReceiver )
+		rtpReceiver->join();
+
+	if( rtp6Receiver )
+		rtp6Receiver->join();
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
