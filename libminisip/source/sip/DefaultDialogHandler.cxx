@@ -27,6 +27,7 @@
 #include<libminisip/sip/DefaultDialogHandler.h>
 
 #include<libmnetutil/NetworkException.h>
+#include<libmnetutil/DnsNaptr.h>
 
 #include<libmsip/SipDialogRegister.h>
 
@@ -498,9 +499,18 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 	int startAddr=0;
 	if (user.substr(0,4)=="sip:")
 		startAddr = 4;
-	
-	if (user.substr(0,5)=="sips:")
+	else if (user.substr(0,5)=="sips:")
 		startAddr = 5;
+	else if( user.substr(0, 4) == "isn:"){
+		MRef<DnsNaptrQuery*> query = DnsNaptrQuery::create();
+		if( query->resolveIsn( user.substr( 4 )))
+			user = query->getResult();
+	}
+	else if( user.substr(0, 5) == "enum:" ){
+		MRef<DnsNaptrQuery*> query = DnsNaptrQuery::create();
+		if( query->resolveEnum( user.substr( 5 )))
+			user = query->getResult();
+	}
 
 	bool onlydigits=true;
 	MRef<SipIdentity *> id;
