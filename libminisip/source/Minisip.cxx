@@ -347,7 +347,7 @@ int Minisip::startSip() {
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
 #endif
-		mediaHandler = new MediaHandler( phoneConf, ipProvider );
+		mediaHandler = new MediaHandler( phoneConf, ipProvider, ip6Provider );
 		confMessageRouter->setMediaHandler( mediaHandler );
 		messageRouter->addSubsystem("media",*mediaHandler);
 		mediaHandler->setMessageRouterCallback(*messageRouter);
