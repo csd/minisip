@@ -45,8 +45,17 @@ class Codec: public MPlugin{
 		
 		virtual std::string getCodecName()=0;
 		
+		/**
+		 * This should be a single line that can be presented to
+		 * in the GUI describing what the codec is (name, bandwidth
+		 * usage, HZ or what ever is found necessary)
+		 */
 		virtual std::string getCodecDescription()=0;
 		
+		/**
+		 * Returns the number assigned to this CODEC.
+		 * Example: 0 for PCMu and 8 for PCMa
+		 */
 		virtual uint8_t getSdpMediaType()=0;
 
 		virtual std::string getSdpMediaAttributes()=0;
