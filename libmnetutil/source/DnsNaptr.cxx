@@ -148,6 +148,7 @@ class DnsNaptrQueryPriv: public DnsNaptrQuery
 
 		virtual ResultType getResultType() const;
 		virtual const std::string &getResult() const;
+		virtual const std::string &getService() const;
 
 		virtual bool resolve( const std::string &domain,
 				      const std::string &target );
@@ -166,6 +167,7 @@ class DnsNaptrQueryPriv: public DnsNaptrQuery
 		std::string target;
 		ResultType resultType;
 		std::string result;
+		string service;
 };
 
 
@@ -205,6 +207,10 @@ const std::string &DnsNaptrQueryPriv::getResult() const
 	return result;
 }
 
+const std::string &DnsNaptrQueryPriv::getService() const
+{
+	return service;
+}
 
 
 #ifdef DEBUG_OUTPUT
@@ -381,7 +387,12 @@ bool DnsNaptrQueryPriv::process( const NaptrList &lst )
 					resultType = URI;
 					break;
 			}
+
+			service = rr->service;
 			
+			transform( service.begin(), service.end(),
+				   service.begin(), (int(*)(int))toupper );
+
 #ifdef DEBUG_OUTPUT			       
 			dump_naptr_entry(rr);
 #endif

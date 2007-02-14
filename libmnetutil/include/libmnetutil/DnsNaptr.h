@@ -55,6 +55,7 @@ class LIBMNETUTIL_API DnsNaptrQuery: public MObject{
 		virtual void setAccept( const std::list<std::string> &acceptServices )=0;
 		virtual ResultType getResultType() const=0;
 		virtual const std::string &getResult() const=0;
+		virtual const std::string &getService() const=0;
 
 		/**
 		 * @arg domain  The domain to retrieve NAPTR RRs for
