@@ -117,9 +117,8 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 }
 
 RtpReceiver::~RtpReceiver(){
-	thread->join();
-	delete thread;
-	socket->close();
+	stop();
+	join();
 }
 
 /**
@@ -181,7 +180,12 @@ void RtpReceiver::stop(){
 }
 
 void RtpReceiver::join(){
+	if( !thread )
+		return;
+
 	thread->join();
+	delete thread;
+	thread = NULL;
 }
 
 void RtpReceiver::run(){

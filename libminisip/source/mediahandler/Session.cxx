@@ -552,6 +552,7 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 				if( receiver && m->getPort() == 0 ){
 					/* This offer was rejected */
 					receiver->disabled = true;
+					// FIXME close socket
 				}
 				else{
 					/* Be ready to receive */

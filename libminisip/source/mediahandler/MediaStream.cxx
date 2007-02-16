@@ -467,6 +467,9 @@ void MediaStreamSender::start(){
 
 void MediaStreamSender::stop(){
 	media->unRegisterMediaSender( this );
+	senderSock = NULL;
+	sender6Sock = NULL;
+
 #ifdef ZRTP_SUPPORT
 	if (zrtpBridge) {
 	    zrtpBridge->stop();
