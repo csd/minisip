@@ -169,7 +169,7 @@ static void loadPlugins(const string &argv0){
 */
 Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 
-	string pluginPath;
+	string pluginPath = argv ? argv[0] : "";
 	int i=0;
 	char *a;
 	do{	
