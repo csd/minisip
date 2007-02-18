@@ -12,6 +12,7 @@ pkginclude_HEADERS =    \
 			libmnetutil/NetworkFunctions.h \
 			libmnetutil/ServerSocket.h \
 			libmnetutil/Socket.h \
+			libmnetutil/SocketServer.h \
 			libmnetutil/StreamSocket.h \
 			libmnetutil/TCPSocket.h \
 			libmnetutil/NetUtil.h \

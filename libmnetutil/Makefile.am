@@ -46,6 +46,7 @@ mnetutil_src = \
 		    source/NetworkFunctions.cxx \
 		    source/ServerSocket.cxx \
 		    source/Socket.cxx \
+		    source/SocketServer.cxx \
 		    source/TCPSocket.cxx \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
