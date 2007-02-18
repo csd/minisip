@@ -43,11 +43,11 @@ class LIBMNETUTIL_API StreamSocket : public Socket {
 		// Buffer of the received data;
 		std::string received;
 
-		bool matchesPeer(IPAddress& address, int32_t port);
-		bool matchesPeer(std::string address, int32_t port);
+		bool matchesPeer(const IPAddress& address, int32_t port) const;
+		bool matchesPeer(const std::string &address, int32_t port) const;
 
 		MRef<IPAddress *> getPeerAddress();
-		int32_t getPeerPort();
+		int32_t getPeerPort() const;
 	protected:
 		MRef<IPAddress *> peerAddress;
 		std::string remoteHostUnresolved;

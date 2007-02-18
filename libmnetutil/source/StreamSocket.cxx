@@ -32,7 +32,7 @@ using namespace std;
 StreamSocket::~StreamSocket(){
 }
 
-bool StreamSocket::matchesPeer(IPAddress& address, int32_t port){
+bool StreamSocket::matchesPeer(const IPAddress& address, int32_t port) const{
 	#ifdef DEBUG_OUTPUT
 // 	cerr << "StreamSocket:matchesPeer: 1 - " << address.getString() << ":" << port << endl;
 // 	cerr << "StreamSocket:matchesPeer: 2 - " << getPeerAddress()->getString() << ":" << getPeerPort() << endl;
@@ -40,7 +40,7 @@ bool StreamSocket::matchesPeer(IPAddress& address, int32_t port){
 	return **peerAddress == address && port == peerPort;
 }
 
-bool StreamSocket::matchesPeer(string address, int32_t port){
+bool StreamSocket::matchesPeer(const string &address, int32_t port) const{
 	#ifdef DEBUG_OUTPUT
 // 	cerr << "StreamSocket:matchesPeer: 1 - " << address.getString() << ":" << port << endl;
 // 	cerr << "StreamSocket:matchesPeer: 2 - " << getPeerAddress()->getString() << ":" << getPeerPort() << endl;
@@ -56,7 +56,7 @@ MRef<IPAddress *> StreamSocket::getPeerAddress(){
 	return peerAddress;
 }
 
-int32_t StreamSocket::getPeerPort(){
+int32_t StreamSocket::getPeerPort() const{
 	return peerPort;
 }
 
