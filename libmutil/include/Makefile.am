@@ -1,4 +1,5 @@
 pkginclude_HEADERS = \
+			libmutil/CriticalSection.h \
 			libmutil/Exception.h \
 			libmutil/MessageRouter.h \
 			libmutil/massert.h \

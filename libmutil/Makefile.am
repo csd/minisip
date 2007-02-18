@@ -44,6 +44,7 @@ mtime_src = 	source/mtimePosix.cxx
 endif !OS_WIN
 
 mutil_src = \
+		source/CriticalSection.cxx \
 		source/MemObject.cxx \
 		source/Library.cxx \
 		source/MessageRouter.cxx \
