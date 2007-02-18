@@ -16,7 +16,7 @@ exampledir = $(pkgdatadir)/examples
 example_SCRIPTS = $(EXAMPLE_SCRIPT_FILES)
 example_DATA = $(EXAMPLE_SOURCE_FILES)
 
-abs_top_builddir=@abs_top_builddir@/.libs
+abs_top_builddir=@abs_top_builddir@
 MINISIP_CFLAGS += -I$(includedir) $(CFLAGS) $(CPPFLAGS)
 MINISIP_LIBS += -L$(libdir) -L$(abs_top_builddir)/.libs -lmutil 
 MINISIP_LIBS += $(LDFLAGS) $(LIBS)

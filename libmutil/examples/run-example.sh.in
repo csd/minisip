@@ -1,6 +1,6 @@
 #!/bin/bash -i
 
-export LD_LIBRARY_PATH=@libdir@
+export LD_LIBRARY_PATH=@buildlibdir@/.libs:@libdir@:$LD_LIBRARY_PATH
 
 echo ---------------------------------------
 echo A new shell has just been started, with
