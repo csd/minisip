@@ -210,9 +210,8 @@ void SocketServer::run()
 
 	csMutex.unlock();
 
-	maxFd = buildFdSet( &tmpl, pipeFds[0] );
-
 	while (!doStop){
+		maxFd = buildFdSet( &tmpl, pipeFds[0] );
 
 		int avail;
 		do{
@@ -237,7 +236,6 @@ void SocketServer::run()
 				throw NetworkException( errno );
 			}
 
-			maxFd = buildFdSet( &tmpl, pipeFds[0] );
 		}
 
 		for( i = sockets.begin(); i != sockets.end(); i++ ){
