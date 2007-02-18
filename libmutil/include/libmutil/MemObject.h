@@ -388,7 +388,7 @@ bool MRef<OPType>::operator ==(const MRef<OPType> r) const {
 
 template<class OPType>
 bool MRef<OPType>::operator <(const MRef<OPType> r) const {
-	return getPointer() > r.getPointer();
+	return getPointer() < r.getPointer();
 }
 
 template<class OPType>
