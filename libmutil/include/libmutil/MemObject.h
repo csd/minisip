@@ -259,6 +259,12 @@ class MRef{
 		inline bool operator ==(const MRef<OPType> r) const;
 		
 		/**
+		Overload the < operator (between MRefs).
+		True if the referred objects are equal (not the MRefs)
+		*/
+		inline bool operator <(const MRef<OPType> r) const;
+
+		/**
 		Return true if contained object is null
 		*/
 		inline bool isNull() const;
@@ -378,6 +384,11 @@ void MRef<OPType>::operator=(const MRef<OPType> &r){
 template<class OPType>
 bool MRef<OPType>::operator ==(const MRef<OPType> r) const {
 	return getPointer() == r.getPointer();
+}
+
+template<class OPType>
+bool MRef<OPType>::operator <(const MRef<OPType> r) const {
+	return getPointer() > r.getPointer();
 }
 
 template<class OPType>
