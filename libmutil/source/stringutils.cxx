@@ -185,7 +185,11 @@ LIBMUTIL_API string binToHex( const unsigned char * data, int length ){
 	char hex_number[3];
 	
 	for( int i = 0; i < length; i++ ){
-		sprintf( hex_number, "%02x", *(data+i) );
+#ifdef _MSC_VER
+		_snprintf_s( hex_number, 3, 2, "%02x", *(data+i) );		
+#else
+		snprintf( hex_number, 3, "%02x", *(data+i) );
+#endif
 		result += hex_number;
 	}
 	
@@ -197,7 +201,11 @@ LIBMUTIL_API string itoa(int64_t i){
 	char buf[30]; //should be enough for a 64 bit integer ...
 	for (int j=0; j<16; j++)
 		buf[j]=0;
-	sprintf(buf,"%lld",i);
+#ifdef _MSC_VER
+	_snprintf_s( buf, 30, 29, "%11d", i);
+#else
+	snprintf(buf, 30, "%lld",i);
+#endif
 	return string(buf);
 }
 

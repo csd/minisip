@@ -165,7 +165,7 @@ void TextUI::answerQuestion(string answer){
 	MRef<QuestionDialog *> d = questionDialogs.front();
 	d->answers.push_back(answer);
 	d->nAnswered++;
-	if (d->nAnswered >= d->questions.size()){
+	if (d->nAnswered >= (int)d->questions.size()){
 		//all questions now answered
 		guiExecute(d);
 		isAskingDialogQuestion=false;

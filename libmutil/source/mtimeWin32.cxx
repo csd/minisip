@@ -34,10 +34,11 @@
 LIBMUTIL_API uint64_t mtime(){
 	#ifdef _WIN32_WCE
 		struct timeb tb;
+		_ftime (&tb);
 	#else
 		struct _timeb tb;
+		_ftime64_s (&tb);
 	#endif
-		_ftime (&tb);
 
 	return ((uint64_t)tb.time) * (int64_t)1000 + ((uint64_t)tb.millitm);
 }
@@ -48,12 +49,13 @@ LIBMUTIL_API
 	void gettimeofday (struct timeval *tv, struct timezone *tz){
 		#ifdef _WIN32_WCE
 		struct timeb tb;
+		_ftime (&tb);
 		#else
 		struct _timeb tb;
+		_ftime64_s (&tb);
 		#endif
-		_ftime (&tb);
 
-		tv->tv_sec = tb.time;
+		tv->tv_sec = (long)tb.time; // Fix: tv_sec wraps year 2038 (tv.time is ok though)
 		tv->tv_usec = tb.millitm * 1000L;
 		if( tz ){
 			tz->tz_minuteswest = tb.timezone;	/* minutes west of Greenwich  */

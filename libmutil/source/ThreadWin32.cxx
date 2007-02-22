@@ -161,7 +161,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 		throw ThreadException("Could not create thread.");
         }
 	//*((HANDLE*)handle.hptr) = h;
-	handle.handle = (unsigned long)h;
+	handle.handle = (uint64_t)h;
 
 }
 
@@ -187,7 +187,7 @@ ThreadHandle Thread::createThread(void f()){
 		throw ThreadException("Could not create thread.");
 	}
 	//*((HANDLE*)handle.hptr) = h;
-	handle.handle = (unsigned long)h;
+	handle.handle = (uint64_t)h;
 
 	return handle;
 }
@@ -222,7 +222,7 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 		throw ThreadException("Could not create thread.");
 	}
 	//*((HANDLE*)handle.hptr) = h;
-	handle.handle=(unsigned long)h;
+	handle.handle=(uint64_t)h;
 	return handle;
 }
 
@@ -268,7 +268,7 @@ bool Thread::kill( const ThreadHandle &handle) {
 ThreadHandle Thread::getCurrent() {
 	ThreadHandle th;
 // 	*((HANDLE*)th.hptr) = GetCurrentProcess();
-	th.handle = (unsigned long)GetCurrentProcess();
+	th.handle = (uint64_t)GetCurrentProcess();
         return th;
 }
 

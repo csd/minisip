@@ -38,7 +38,7 @@ typedef __int64  int64_t;
 #endif
 
 #ifndef uint64_t
-	#ifdef _WIN32_WCE
+	#ifdef _MSC_VER
 		typedef unsigned __int64 uint64_t;
 	#else
 		typedef unsigned long long  uint64_t;

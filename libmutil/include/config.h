@@ -24,7 +24,7 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
+#ifndef _MSC_VER
 #	include"compilation_config.h"
 #else
 #	include"compilation_config_w32_wce.h"
