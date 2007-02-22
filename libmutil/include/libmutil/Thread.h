@@ -49,9 +49,8 @@ class LIBMUTIL_API ThreadHandle{
 		ThreadHandle(const ThreadHandle &);
 		~ThreadHandle();
 		
-		uint64_t asInt64() const{ 
-			//return *((unsigned long*)this->hptr); 
-			return handle;
+		unsigned long asLongInt() const{ 
+			return (unsigned long)handle;
 		};
 
 	private:
