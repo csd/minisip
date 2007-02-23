@@ -166,8 +166,10 @@ CallWidget::CallWidget( string callId, string remoteUri,
 //		acceptButton.show();
 		//Using the markup, when receiving a call (full uri), the < and > make gtk complain ... s
 		string sanitizedUri = remoteUri;
-		sanitizedUri.replace( sanitizedUri.find('<'), 1, " " );
-		sanitizedUri.replace( sanitizedUri.find('>'), 1, " " );
+		if (sanitizedUri.find('<') != string::npos)
+			sanitizedUri.replace( sanitizedUri.find('<'), 1, " " );
+		if (sanitizedUri.find('>') != string::npos)
+			sanitizedUri.replace( sanitizedUri.find('>'), 1, " " );
 		status.set_markup( "<big><b>Incoming call from \n" + sanitizedUri
 				+ "</b></big>");
 		
