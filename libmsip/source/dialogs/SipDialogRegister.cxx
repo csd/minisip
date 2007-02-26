@@ -455,8 +455,8 @@ void SipDialogRegister::setUpStateMachine(){
 	setCurrentState(s0_start);
 }
 
-SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack/*, MRef<SipDialogConfig*> callconf*/, MRef<SipIdentity*> ident)
-		: SipDialog(stack/*, callconf*/, ident),
+SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipIdentity*> ident)
+		: SipDialog(stack, ident),
 			failCount(0),
 			guiFeedback(true)
 {
@@ -507,12 +507,6 @@ void SipDialogRegister::setGuiFeedback(bool fb){
 	guiFeedback=fb;
 }
 
-#if 0
-bool SipDialogRegister::hasPassword(){
-	return getDialogConfig()->sipIdentity->getSipRegistrar()->sipProxyUsername!="" && getDialogConfig()->sipIdentity->getSipRegistrar()->sipProxyPassword!="";
-}
-#endif
-
 bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 
 	if (command.getType()==SipSMCommand::COMMAND_PACKET 
@@ -560,7 +554,6 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 void SipDialogRegister::send_register(string branch){
 	
 //	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
-	//MRef<SipRegister*> reg= new SipRegister(
 
 	MRef<SipIdentity*> identity = getDialogConfig()->sipIdentity;
 
