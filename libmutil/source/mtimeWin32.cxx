@@ -32,20 +32,17 @@
 #include <winsock2.h>
 
 
-static mutil_ftime( struct timeb *tb ){
-#ifdef _WIN32_WCE
-		_ftime (&tb);
-#elif defined(__MINGW32__)
-		_ftime64 (&tb);
-#else
-		_ftime64_s (&tb);
-#endif
-
-}
-
 LIBMUTIL_API uint64_t mtime(){
-		struct timeb tb;
-		mutil_ftime (&tb);
+#ifdef _WIN32_WCE
+	struct _timeb tb;
+	_ftime (&tb);
+#elif defined(__MINGW32__)
+	struct __timeb64 tb;
+	_ftime64 (&tb);
+#else
+	struct __timeb64 tb;
+	_ftime64_s (&tb);
+#endif
 
 	return ((uint64_t)tb.time) * (int64_t)1000 + ((uint64_t)tb.millitm);
 }
@@ -54,8 +51,16 @@ LIBMUTIL_API uint64_t mtime(){
 extern "C" {
 LIBMUTIL_API
 	void gettimeofday (struct timeval *tv, struct timezone *tz){
-		struct timeb tb;
-		mutil_ftime (&tb);
+#ifdef _WIN32_WCE
+		struct _timeb tb;
+		_ftime (&tb);
+#elif defined(__MINGW32__)
+		struct __timeb64 tb;
+		_ftime64 (&tb);
+#else
+		struct __timeb64 tb;
+		_ftime64_s (&tb);
+#endif
 
 		tv->tv_sec = (long)tb.time; // Fix: tv_sec wraps year 2038 (tv.time is ok though)
 		tv->tv_usec = tb.millitm * 1000L;
