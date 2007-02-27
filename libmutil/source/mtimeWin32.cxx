@@ -37,8 +37,10 @@ LIBMUTIL_API uint64_t mtime(){
 	struct _timeb tb;
 	_ftime (&tb);
 #elif defined(__MINGW32__)
-	struct __timeb64 tb;
-	_ftime64 (&tb);
+	// struct __timeb64 tb;  // requires v.61 or higher or msvcrt.dll
+	// _ftime64 (&tb); 
+	struct _timeb tb;
+	_ftime (&tb);
 #else
 	struct __timeb64 tb;
 	_ftime64_s (&tb);
