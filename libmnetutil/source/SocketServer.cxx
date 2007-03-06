@@ -30,8 +30,9 @@
 #ifdef WIN32
 # include<io.h>
 # include<fcntl.h>
-# define write _write
-# define pipe(fds) _pipe((fds), 256, O_BINARY)
+typedef int socklen_t;
+#else
+#define closesocket close
 #endif
 
 #ifndef SOCKET
@@ -158,7 +159,11 @@ void SocketServer::signal()
 	if( fdSignal < 0 )
 		return;
 
+#ifdef WIN32
+ 	if( send( fdSignal, &c, sizeof( c ), 0) < 0 ) {
+#else
 	if( write( fdSignal, &c, sizeof( c )) < 0 ) {
+#endif
 		cerr << "Write failed " << fdSignal << endl;
 		throw NetworkException( errno );
 	}
@@ -166,7 +171,7 @@ void SocketServer::signal()
 
 int SocketServer::buildFdSet( fd_set *set, int pipeFd )
 {
-	SOCKET maxFd;
+	SOCKET maxFd = -1;
 	Sockets::const_iterator i;
 
 	FD_ZERO( set );
@@ -186,13 +191,72 @@ int SocketServer::buildFdSet( fd_set *set, int pipeFd )
 	return maxFd;
 }
 
+#ifdef WIN32
+static int createTcpPipe( int fds[2] )
+{
+	SOCKET sd;
+	struct sockaddr_in sa;
+	socklen_t sz = sizeof(sa);
+	u_long nonBlocking = 1;
+
+	sd = socket( AF_INET, SOCK_STREAM, 0 );
+	if( sd < 0 ){
+		throw NetworkException( errno );
+	}
+
+	memset( &sa, 0, sz );
+	sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+	sa.sin_family = AF_INET;
+
+	bind( sd, (struct sockaddr *)&sa, sz );
+
+	if( listen( sd, 1 ) < 0 ){
+		closesocket( sd );
+		throw NetworkException( errno );
+	}
+
+	if( getsockname( sd, (struct sockaddr *)&sa, &sz )){
+		closesocket( sd );
+		closesocket( fds[0] );
+		throw GetSockNameFailed( errno );
+	}
+
+	fds[0] = socket( AF_INET, SOCK_STREAM, 0 );
+	if( fds[0] < 0 ){
+		closesocket( sd );
+		throw NetworkException( errno );
+	}
+
+	if( connect( fds[0], (struct sockaddr *)&sa, sz ) < 0 ){
+		closesocket( sd );
+		closesocket( fds[0] );
+		throw GetSockNameFailed( errno );
+	}		
+
+	sz = sizeof( sa );
+	fds[1] = accept( sd, (struct sockaddr *)&sa, &sz );
+
+	if( fds[1] < 0 ){
+		closesocket( sd );
+		closesocket( fds[0] );
+		throw NetworkException( errno );
+	}
+
+	ioctlsocket( fds[0], FIONBIO, &nonBlocking);
+	ioctlsocket( fds[1], FIONBIO, &nonBlocking);
+
+	closesocket( sd );
+	return 0;
+}
+#endif	// WIN32
+
 void SocketServer::run()
 {
 	struct timeval timeout;
 	fd_set tmpl;
 	fd_set set;
 	int pipeFds[2] = {-1,-1};
-	int maxFd;
+	int maxFd = -1;
 	Sockets::const_iterator i;
 
 	csMutex.lock();
@@ -202,7 +266,12 @@ void SocketServer::run()
 		fdSignal = -1;
 	}
 
+#ifdef WIN32
+	// Use TCP sockets since Windows pipes don't support select
+	if( createTcpPipe( pipeFds )) {
+#else
 	if( ::pipe( pipeFds ) ){
+#endif
 		throw Exception( "Can't create pipe" );
 	}
 
@@ -231,7 +300,11 @@ void SocketServer::run()
 		if( FD_ISSET( pipeFds[0], &set ) ){
 			char buf[255];
 
+#ifdef WIN32
+			if( recv( pipeFds[0], buf, sizeof(buf), 0 ) < 0){
+#else
 			if( read( pipeFds[0], buf, sizeof(buf) ) < 0){
+#endif
 				cerr << "Read failed" << endl;
 				throw NetworkException( errno );
 			}
@@ -253,8 +326,8 @@ void SocketServer::run()
 // 	csMutex.lock();
 
 	fdSignal = -1;
-	close( pipeFds[0] );
-	close( pipeFds[1] );
+	closesocket( pipeFds[0] );
+	closesocket( pipeFds[1] );
 	doStop = false;
 
 // 	csMutex.unlock();
