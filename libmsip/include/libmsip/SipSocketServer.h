@@ -31,6 +31,7 @@
 
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/ServerSocket.h>
+#include<libmnetutil/SocketServer.h>
 #include<libmutil/Thread.h>
 
 class SipLayerTransport;
@@ -40,7 +41,7 @@ class SipLayerTransport;
  * when a client connects to it.
  *
  */
-class SipSocketServer : public Runnable{
+class SipSocketServer : public SocketServer, InputReadyHandler {
 	public:
 		SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock );
 		virtual ~SipSocketServer();
@@ -59,20 +60,16 @@ class SipSocketServer : public Runnable{
 		void setExternalPort(int32_t port) { externalPort = port; }
 		int32_t getExternalPort() const { return externalPort; }
 
-		void run();
-		void start();
-		void stop();
-		void join();
-
 		virtual void inputReady();
+
+	protected:
+		virtual void inputReady( MRef<Socket*> socket );
 
 	private:
 		MRef<Socket *> ssock;
 		MRef<SipLayerTransport *> receiver;
-		bool doStop;
 		std::string externalIp;
 		int32_t externalPort;
-		ThreadHandle th;
 };
 
 

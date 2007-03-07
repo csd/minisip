@@ -38,8 +38,10 @@ using namespace std;
 // 
 
 
-SipSocketServer::SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock): ssock(sock), receiver(r),doStop(false){
+SipSocketServer::SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock): ssock(sock), receiver(r){
 	externalPort = ssock->getPort();
+
+	addSocket( sock, this );
 }
 
 SipSocketServer::~SipSocketServer(){
@@ -61,51 +63,8 @@ MRef<SipLayerTransport *> SipSocketServer::getReceiver() const {
 	return receiver;
 }
 
-void SipSocketServer::run(){
-	struct timeval timeout;
-	fd_set set;
-	int fd = ssock->getFd();
-	while (!doStop){
-
-		int avail;
-		do{
-			FD_ZERO(&set);
-			#ifdef WIN32
-			FD_SET( (uint32_t) fd, &set);
-			#else
-			FD_SET(fd, &set);
-			#endif
-			
-			timeout.tv_sec = 5;
-			timeout.tv_usec= 0;
-			avail = select(fd+1,&set,NULL,NULL,&timeout );
-			if (avail<0){
-				Thread::msleep(500);
-			}
-		} while( avail < 0 );
-		if (avail==0){
-// 			cerr<< "SipSocketServer::run(): Timeout"<< endl;
-		}
-		MRef<SipLayerTransport *> r = receiver;
-		if (avail && !doStop && r){
-			inputReady();
-		}
-
-	}
-
-} // "myself" will be freed here and the object can be freed.
-
-void SipSocketServer::start(){
-	Thread t(this);
-	th=t.getHandle();
-}
-
-void SipSocketServer::stop(){
-	doStop=true;
-}
-
-void SipSocketServer::join(){
-	Thread::join(th);
+void SipSocketServer::inputReady( MRef<Socket*> socket ){
+	inputReady();
 }
 
 void SipSocketServer::inputReady(){

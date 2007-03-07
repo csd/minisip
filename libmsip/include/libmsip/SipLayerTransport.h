@@ -46,6 +46,7 @@ class SipMessage;
 class SipLayerTransport;
 class SipCommandDispatcher;
 class StreamThreadData;
+class StreamThreadServer;
 
 class SipLayerTransport : public SipSMCommandReceiver {
 	public:
@@ -68,6 +69,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 				 bool addVia);
 
 		void addSocket(MRef<StreamSocket *> sock);
+		void removeSocket(MRef<StreamSocket *> sock);
 
 		void addServer(MRef<SipSocketServer *> server);
 
@@ -125,20 +127,13 @@ class SipLayerTransport : public SipSMCommandReceiver {
                 
 		Mutex serversLock;
 		std::list<MRef<SipSocketServer *> > servers;
-		std::list<MRef<StreamThreadData *> > workers;
-
-		Mutex socksLock;
-		std::list<MRef<StreamSocket *> > socks;
-		Mutex socksPendingLock;
-		std::list<MRef<StreamSocket *> > socksPending;
+		MRef<SocketServer*> manager;
 
 		MRef<certificate_chain *> cert_chain;
 		MRef<ca_db *> cert_db;
 		void * tls_ctx;
 
 		MRef<SipCommandDispatcher*> dispatcher;
-
-		Semaphore semaphore;
 
 		friend class StreamThreadData;
 

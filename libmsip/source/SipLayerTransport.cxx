@@ -269,40 +269,26 @@ uint32_t SipMessageParser::findContentLength(){
 	return 0;
 }
 
-class StreamThreadData : public MObject{
+class StreamThreadData : public InputReadyHandler{
 	public:
-		StreamThreadData( MRef<SipLayerTransport *> );
-		void run();
-		void stop();
-		void join();
+		StreamThreadData( MRef<StreamSocket*>,
+				  MRef<SipLayerTransport *> );
+		void inputReady( MRef<Socket*> socket );
+
+	protected:
 		void streamSocketRead( MRef<StreamSocket *> socket );
+
 	private:
 		SipMessageParser parser;
 		MRef<SipLayerTransport  *> transport;
-		bool doStop;
-		ThreadHandle th;
+		MRef<StreamSocket *> ssocket;
 };
 
-static void * streamThread( void * arg ){
-	StreamThreadData * data;
-	data = (StreamThreadData *)arg;
 
-		// We want to keep a reference to the object so that it
-		// exist (at least) until we exit this function.
-	MRef<StreamThreadData *> ref=data;
-
-	ref->run();
-	return NULL;
-}
-
-StreamThreadData::StreamThreadData( MRef<SipLayerTransport *> transport){
-	doStop=false;
+StreamThreadData::StreamThreadData( MRef<StreamSocket *> theSocket,
+				    MRef<SipLayerTransport *> transport)
+		:ssocket( theSocket ){
 	this->transport = transport;
-	th=Thread::createThread(streamThread, this);
-}
-
-void StreamThreadData::join(){
-	Thread::join(th);
 }
 
 
@@ -347,18 +333,12 @@ void printMessage(string header, string packet){
 	mout << end;
 }
 
-static void * streamThread( void * arg );
-
 SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
 				     MRef<ca_db *> cert_db):
 		cert_chain(cchain), cert_db(cert_db), tls_ctx(NULL)
 {
-	int i;
-
-	for( i=0; i < NB_THREADS ; i++ ){
-		StreamThreadData *worker = new StreamThreadData(this);
-		workers.push_back(worker);
-	}
+	manager = new SocketServer();
+	manager->start();
 }
 
 
@@ -387,11 +367,7 @@ void SipLayerTransport::stop(){
 	serversLock.lock();
 	list<MRef<StreamThreadData*> >::iterator j;
 
-
-	for( j=workers.begin(); j != workers.end(); j++ ){
-		MRef<StreamThreadData*> w = *j;
-		w->stop();
-	}
+	manager->stop();
 
 		//tell the threads to stop. Don't "join" just yet
 		//since that might take some time and we want that
@@ -402,17 +378,8 @@ void SipLayerTransport::stop(){
 		server->stop();
 	}
 
-		//wake up blocking threads
-	int n;
-	for (n=0; n< NB_THREADS; n++){
-		semaphore.inc();
-	}
-
-	for( j=workers.begin(); j != workers.end(); j++ ){
-		MRef<StreamThreadData*> w = *j;
-		w->join();
-		*j=NULL;
-	}
+	manager->join();
+	manager = NULL;
 
 		//wait for the threads in the servers.
 		//NOTE: this can take about five seconds
@@ -425,7 +392,6 @@ void SipLayerTransport::stop(){
 		*i=NULL;
 	}
 
-	workers.clear();
 	servers.clear();
 	serversLock.unlock();
 }
@@ -996,27 +962,25 @@ void SipLayerTransport::setDispatcher(MRef<SipCommandDispatcher*> d){
 }
 
 void SipLayerTransport::addSocket(MRef<StreamSocket *> sock){
-	socksLock.lock();
-	this->socks.push_back(sock);
-	socksLock.unlock();
-	socksPendingLock.lock();
-	this->socksPending.push_back(sock);
-	socksPendingLock.unlock();
-        semaphore.inc();
+	MRef<StreamThreadData*> worker = new StreamThreadData( sock, this );
+
+	manager->addSocket( *sock, dynamic_cast<InputReadyHandler*>(*worker) );
 }
 
-MRef<StreamSocket *> SipLayerTransport::findStreamSocket( IPAddress &address, uint16_t port ){
-	list<MRef<StreamSocket *> >::iterator i;
+void SipLayerTransport::removeSocket( MRef<StreamSocket *> sock ){
+	manager->removeSocket( *sock );
+}
 
-	socksLock.lock();
-	for( i=socks.begin(); i != socks.end(); i++ ){
-		if( (*i)->matchesPeer(address, port) ){
-			socksLock.unlock();
-			return *i;
-		}
+
+MRef<StreamSocket *> SipLayerTransport::findStreamSocket( IPAddress &address, uint16_t port ){
+	MRef<Socket *> sock =
+		manager->findStreamSocketPeer( address, port );
+
+	if( !sock ){
+		return NULL;
 	}
-	socksLock.unlock();
-	return NULL;
+
+	return dynamic_cast<StreamSocket*>(*sock);
 }
 
 static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
@@ -1142,44 +1106,8 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 		} // if event
 }
 
-void StreamThreadData::stop(){
-	doStop=true;
-	transport=NULL;
-}
-
-void StreamThreadData::run(){
-	while(!doStop){
-
-		MRef<StreamSocket *> socket;
-		
-			//Keep a local reference of transport so that
-			//it is not deleted until we are done with it.
-		MRef<SipLayerTransport*> transp = transport;
-		if (!transp)
-			break;
-                transp->semaphore.dec();
-		if (doStop)
-			break;
-                
-		/* Take the last socket pending to be read */
-		transp->socksPendingLock.lock();
-		socket = transp->socksPending.front();
-		transp->socksPending.pop_front();
-		transp->socksPendingLock.unlock();
-                
-		/* Read from it until it gets closed */
-		streamSocketRead( socket );
-
-		/* The socket was closed */
-		transp->socksLock.lock();
-		transp->socks.remove( socket );
-		transp->socksLock.unlock();
-#ifdef DEBUG_OUTPUT
-		mdbg << "StreamSocket closed" << end;
-#endif
-
-		parser.init();
-	}
+void StreamThreadData::inputReady( MRef<Socket*> socket ){
+	streamSocketRead( ssocket );
 }
 
 #define STREAM_MAX_PKT_SIZE 65536
@@ -1189,46 +1117,21 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 	for (int i=0; i< STREAM_MAX_PKT_SIZE+1; i++){
 		buffer[i]=0;
 	}
-	int avail;
 	MRef<SipMessage*> pack;
 
-	while( !doStop){
-		fd_set set;
-
-		do{
-			struct timeval tv;
-			// Timeout needs to be set before each call to select since
-			// it should be consider undefined after select() returns.
-			tv.tv_sec = 600;
-			tv.tv_usec = 0;
-
-			// We need update the fd set before call to select()
-			FD_ZERO(&set);
-			FD_SET((SOCKET)socket->getFd(), &set);
-
-			avail = select(socket->getFd()+1,&set,NULL,NULL,&tv );
-		} while( avail <= 0 );
-
-		if( avail == 0 ){
-#ifdef DEBUG_OUTPUT
-			mdbg << "Closing Stream socket due to inactivity" << end;
-#endif
-			break;
-		}
-
-		if( FD_ISSET( socket->getFd(), &set )){
 			int32_t nread;
 			nread = socket->read( buffer, STREAM_MAX_PKT_SIZE);
 
 			if (nread == -1){
 				mdbg << "Some error occured while reading from StreamSocket" << end;
-				continue;
+				return;
 			}
 
 			if ( nread == 0){
 				// Connection was closed
 				mdbg << "Connection was closed" << end;
-				break;
+				transport->removeSocket( socket );
+				return;
 			}
 #ifdef ENABLE_TS
 			//ts.save( PACKET_IN );
@@ -1277,7 +1180,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 #endif
 				/* Probably we don't have enough data
 				 * so go back to reading */
-				continue;
+// 				continue;
 			}
 			
 			catch(SipExceptionInvalidStart & ){
@@ -1285,10 +1188,9 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// packet, close the connection
 				
 				mdbg << "This does not look like a SIP packet, close the connection" << endl;
-				break;
+				socket->close();
+				transport->removeSocket( socket );
 			}
-		} // if event
-	}// while true
 }
 
 
