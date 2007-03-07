@@ -84,27 +84,6 @@ SocketServer::~SocketServer()
 	stop();
 }
 
-void SocketServer::createSignalPipe(){
-	int pipeFds[2] = {-1,-1};
-
-	if( fdSignal >= 0 ){
-		close( fdSignal );
-		fdSignal = -1;
-	}
-
-#ifdef WIN32
-	// Use TCP sockets since Windows pipes don't support select
-	if( createTcpPipe( pipeFds )) {
-#else
-	if( ::pipe( pipeFds ) ){
-#endif
-		throw Exception( "Can't create pipe" );
-	}
-
-	fdSignal = pipeFds[1];
-	fdSignalInternal = pipeFds[0];
-}
-
 void SocketServer::start()
 {
 	CriticalSection cs( csMutex );
@@ -273,6 +252,27 @@ static int createTcpPipe( int fds[2] )
 	return 0;
 }
 #endif	// WIN32
+
+void SocketServer::createSignalPipe(){
+	int pipeFds[2] = {-1,-1};
+
+	if( fdSignal >= 0 ){
+		close( fdSignal );
+		fdSignal = -1;
+	}
+
+#ifdef WIN32
+	// Use TCP sockets since Windows pipes don't support select
+	if( createTcpPipe( pipeFds )) {
+#else
+	if( ::pipe( pipeFds ) ){
+#endif
+		throw Exception( "Can't create pipe" );
+	}
+
+	fdSignal = pipeFds[1];
+	fdSignalInternal = pipeFds[0];
+}
 
 void SocketServer::closeSockets(){
 	Sockets::const_iterator i;
