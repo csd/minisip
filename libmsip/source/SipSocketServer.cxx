@@ -63,18 +63,19 @@ MRef<SipLayerTransport *> SipSocketServer::getReceiver() const {
 	return receiver;
 }
 
+void SipSocketServer::setReceiver(MRef<SipLayerTransport*> r){
+	receiver=r;
+}
+
+
+//
+// StreamSocketServer
+//
+StreamSocketServer::StreamSocketServer(MRef<SipLayerTransport*> r, MRef<ServerSocket*> sock): SipSocketServer(r, *sock){
+}
+
 void SipSocketServer::inputReady( MRef<Socket*> socket ){
 	inputReady();
-}
-
-void SipSocketServer::inputReady(){
-}
-
-
-// 
-// StreamSocketServer
-// 
-StreamSocketServer::StreamSocketServer(MRef<SipLayerTransport*> r, MRef<ServerSocket*> sock): SipSocketServer(r, *sock){
 }
 
 void StreamSocketServer::inputReady(){
@@ -114,3 +115,4 @@ void DatagramSocketServer::inputReady(){
 		transport->datagramSocketRead(dsock);
 	}
 }
+

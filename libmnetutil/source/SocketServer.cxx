@@ -274,6 +274,14 @@ static int createTcpPipe( int fds[2] )
 }
 #endif	// WIN32
 
+void SocketServer::closeSockets(){
+	Sockets::const_iterator i;
+	for( i = sockets.begin(); i != sockets.end(); i++ ){
+		MRef<Socket*> socket = i->first;
+		socket->close();
+	}
+}
+
 void SocketServer::run()
 {
 	struct timeval timeout;
@@ -338,3 +346,4 @@ void SocketServer::run()
 
 // 	csMutex.unlock();
 }
+

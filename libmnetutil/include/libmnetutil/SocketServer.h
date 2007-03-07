@@ -47,8 +47,29 @@ class LIBMNETUTIL_API SocketServer : public Runnable {
 		SocketServer();
 		virtual ~SocketServer();
 
+		/**
+		 * Closes all sockets this server references.
+		 */
+		void closeSockets();
+
+		/**
+		 * Creates a thread that runs the "run" method that
+		 * listens to all sockets registred to the object.
+		 */
 		void start();
+
+		/**
+		 *
+		 * Signals the method running the "run" method to stop.
+		 * This will not close the sockets.
+		 *
+		 */
 		void stop();
+
+		/**
+		 * Waits until the thread created by "start" that runs the
+		 * "run" method has stopped.
+		 */
 		void join();
 
 		void addSocket( MRef<Socket*> socket, MRef<InputReadyHandler*> handler );

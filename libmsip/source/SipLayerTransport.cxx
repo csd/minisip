@@ -389,6 +389,8 @@ void SipLayerTransport::stop(){
 	for( i=servers.begin(); i != servers.end(); i++ ){
 		MRef<SipSocketServer *> server = *i;
 		server->join();
+		server->closeSockets();
+		server->setReceiver(NULL);
 		*i=NULL;
 	}
 
@@ -831,7 +833,7 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 }
 
 void SipLayerTransport::sendMessage(MRef<SipMessage*> pack, 
-				    /* IPAddress &*/ const string &ip_addr,
+				      const string &ip_addr,
 				      int32_t port, 
 				      string branch,
 				      string preferredTransport,

@@ -49,6 +49,7 @@ class SipSocketServer : public SocketServer, InputReadyHandler {
 
 		MRef<Socket *> getSocket() const;
 		MRef<SipLayerTransport *> getReceiver() const;
+		void setReceiver(MRef<SipLayerTransport *> r);
 
 		bool isIpv6() const;
 		int32_t getType() const;
@@ -60,7 +61,7 @@ class SipSocketServer : public SocketServer, InputReadyHandler {
 		void setExternalPort(int32_t port) { externalPort = port; }
 		int32_t getExternalPort() const { return externalPort; }
 
-		virtual void inputReady();
+		virtual void inputReady()=0;
 
 	protected:
 		virtual void inputReady( MRef<Socket*> socket );
