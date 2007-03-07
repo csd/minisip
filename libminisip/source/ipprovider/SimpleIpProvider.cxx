@@ -131,8 +131,10 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 }
 
 bool SimpleIpProvider::isInPrivateIpRange( string ipstr ) {
-	//check the easy ones first ... 10.x.x.x and 192.168.x.x
+	//check the easy ones first ... 10.x.x.x, 127.x.x.x,
+	//192.168.x.x and 0.x.x.x
 	if (ipstr.substr(0,3)=="10." 
+			|| ipstr.substr(0,4)=="127."
 			|| ipstr.substr(0,7)=="192.168" 
 			|| ipstr.substr(0,2)=="0.") {	//Found local interfaces in Windows XP used to communicate only
 							//internally with a web camera that started with "0."

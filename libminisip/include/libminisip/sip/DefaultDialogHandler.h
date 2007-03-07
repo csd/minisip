@@ -131,7 +131,7 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 		 * @param p2tDialog the reference to the call
 		 * return true if a dialog was found
 		 */
-		bool getP2TDialog(string GroupId, MRef<SipDialogP2T*> &p2tDialog);
+		bool getP2TDialog(std::string GroupId, MRef<SipDialogP2T*> &p2tDialog);
 #endif
 		
 		/**

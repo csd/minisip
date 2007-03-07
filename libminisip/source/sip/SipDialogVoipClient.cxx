@@ -552,7 +552,8 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
-		sdp = mediaSession->getSdpOffer( peerUri );
+		bool anat = phoneconf->useAnat;
+		sdp = mediaSession->getSdpOffer( peerUri, anat );
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif

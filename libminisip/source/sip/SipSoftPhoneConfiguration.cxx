@@ -79,6 +79,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	findStunServerFromDomain(false),
 	stunDomain(""),
 	useUserDefinedStunServer(false),
+	useAnat(false),
 	soundDeviceIn(""),
 	soundDeviceOut(""),
 	videoDevice(""),
@@ -381,6 +382,12 @@ void SipSoftPhoneConfiguration::save(){
 
 	backend->save("stun_manual_server", userDefinedStunServer);
 	
+	/************************************************************
+	 * SIP extensions
+	 ************************************************************/
+	backend->saveBool( "use_100rel", sipStackConfig->use100Rel );
+	backend->saveBool( "use_anat", useAnat );
+
 	/************************************************************
 	 * Advanced settings
 	 ************************************************************/
@@ -781,6 +788,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	frameWidth = backend->loadInt( "frame_width", 176 );
 	frameHeight = backend->loadInt( "frame_height", 144 );
 #endif
+
+	sipStackConfig->use100Rel = backend->loadBool("use_100rel");
+	useAnat = backend->loadBool("use_anat");
 
 	useSTUN = backend->loadBool("use_stun");
 	findStunServerFromSipUri = backend->loadBool("stun_server_autodetect");

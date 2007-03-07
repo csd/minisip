@@ -113,6 +113,8 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		std::string stunDomain;
 		bool useUserDefinedStunServer;
 		std::string userDefinedStunServer;
+
+		bool useAnat;
 		
 		std::string soundDeviceIn;
 		std::string soundDeviceOut;
