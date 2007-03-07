@@ -390,8 +390,8 @@ void SipLayerTransport::stop(){
 		MRef<SipSocketServer *> server = *i;
 		server->join();
 		server->closeSockets();
+		server->free();
 		server->setReceiver(NULL);
-		*i=NULL;
 	}
 
 	servers.clear();

@@ -45,6 +45,7 @@ class SipSocketServer : public SocketServer, InputReadyHandler {
 	public:
 		SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock );
 		virtual ~SipSocketServer();
+		void free();
 		std::string getMemObjectType() const {return "SipSocketServer";}
 
 		MRef<Socket *> getSocket() const;

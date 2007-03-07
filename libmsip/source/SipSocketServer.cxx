@@ -47,6 +47,10 @@ SipSocketServer::SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock)
 SipSocketServer::~SipSocketServer(){
 }
 
+void SipSocketServer::free(){
+	removeSocket(ssock);
+}
+
 bool SipSocketServer::isIpv6() const{
 	return ssock->getLocalAddress()->getType() == IP_ADDRESS_TYPE_V6;
 }
