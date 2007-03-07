@@ -29,7 +29,7 @@ using namespace std;
 
 static unsigned int g_initialized;
 
-void libmnetutilInit()
+LIBMNETUTIL_API void libmnetutilInit()
 {
 	if( g_initialized++ > 0 )
 		return;
@@ -40,8 +40,10 @@ void libmnetutilInit()
 	}
 }
 
-void libmnetutilUninit()
+LIBMNETUTIL_API void libmnetutilUninit()
 {
 	if( --g_initialized )
 		return;
 }
+
+

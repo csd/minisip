@@ -84,11 +84,34 @@ SocketServer::~SocketServer()
 	stop();
 }
 
+void SocketServer::createSignalPipe(){
+	int pipeFds[2] = {-1,-1};
+
+	if( fdSignal >= 0 ){
+		close( fdSignal );
+		fdSignal = -1;
+	}
+
+#ifdef WIN32
+	// Use TCP sockets since Windows pipes don't support select
+	if( createTcpPipe( pipeFds )) {
+#else
+	if( ::pipe( pipeFds ) ){
+#endif
+		throw Exception( "Can't create pipe" );
+	}
+
+	fdSignal = pipeFds[1];
+	fdSignalInternal = pipeFds[0];
+}
+
 void SocketServer::start()
 {
 	CriticalSection cs( csMutex );
 	if( !thread.isNull() )
 		return;
+	if (fdSignal < 0)
+		createSignalPipe();
 
 	thread = new Thread( this );
 }
@@ -154,6 +177,7 @@ MRef<Socket*> SocketServer::findStreamSocketPeer( const IPAddress &addr,
 
 void SocketServer::signal()
 {
+
 	char c = 0;
 
 	if( fdSignal < 0 )
@@ -255,32 +279,14 @@ void SocketServer::run()
 	struct timeval timeout;
 	fd_set tmpl;
 	fd_set set;
-	int pipeFds[2] = {-1,-1};
 	int maxFd = -1;
 	Sockets::const_iterator i;
 
-	csMutex.lock();
-
-	if( fdSignal >= 0 ){
-		close( fdSignal );
-		fdSignal = -1;
-	}
-
-#ifdef WIN32
-	// Use TCP sockets since Windows pipes don't support select
-	if( createTcpPipe( pipeFds )) {
-#else
-	if( ::pipe( pipeFds ) ){
-#endif
-		throw Exception( "Can't create pipe" );
-	}
-
-	fdSignal = pipeFds[1];
-
-	csMutex.unlock();
+	if (fdSignal < 0)
+		createSignalPipe();
 
 	while (!doStop){
-		maxFd = buildFdSet( &tmpl, pipeFds[0] );
+		maxFd = buildFdSet( &tmpl, fdSignalInternal );
 
 		int avail;
 		do{
@@ -297,13 +303,13 @@ void SocketServer::run()
 // 			cerr<< "SipSocketServer::run(): Timeout"<< endl;
 		}
 
-		if( FD_ISSET( pipeFds[0], &set ) ){
+		if( FD_ISSET( fdSignalInternal, &set ) ){
 			char buf[255];
 
 #ifdef WIN32
-			if( recv( pipeFds[0], buf, sizeof(buf), 0 ) < 0){
+			if( recv( fdSignalInternal, buf, sizeof(buf), 0 ) < 0){
 #else
-			if( read( pipeFds[0], buf, sizeof(buf) ) < 0){
+			if( read( fdSignalInternal, buf, sizeof(buf) ) < 0){
 #endif
 				cerr << "Read failed" << endl;
 				throw NetworkException( errno );
@@ -325,9 +331,9 @@ void SocketServer::run()
 
 // 	csMutex.lock();
 
+	closesocket( fdSignalInternal );
+	closesocket( fdSignal );
 	fdSignal = -1;
-	closesocket( pipeFds[0] );
-	closesocket( pipeFds[1] );
 	doStop = false;
 
 // 	csMutex.unlock();

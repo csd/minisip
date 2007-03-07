@@ -63,11 +63,16 @@ class LIBMNETUTIL_API SocketServer : public Runnable {
 		int buildFdSet( fd_set *set, int pipeFd );
 
 	private:
+		void createSignalPipe();
 		typedef std::map< MRef<Socket*>, MRef<InputReadyHandler*> > Sockets;
 		Mutex csMutex;
 		MRef<Thread *> thread;
 		Sockets sockets;
-		int fdSignal;
+
+		int fdSignal;		///Socket pair used to wake thread running run()
+		int fdSignalInternal;	///from its select. This is typically used to
+					///to tell the thread to stop.
+
 		bool doStop;
 };
 #endif
