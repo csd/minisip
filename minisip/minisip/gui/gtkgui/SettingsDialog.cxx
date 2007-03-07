@@ -61,6 +61,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	mediaSettings = new MediaSettings( refXml );
 	deviceSettings = new DeviceSettings( refXml );
 	advancedSettings = new AdvancedSettings( refXml );
+	sipSettings = new SipSettings( refXml );
 
 
 	dialogWindow->hide();
@@ -75,6 +76,7 @@ SettingsDialog::~SettingsDialog(){
 	delete mediaSettings;
 	delete deviceSettings;
 	delete advancedSettings;
+	delete sipSettings;
 	delete dialogWindow;
 }
 
@@ -92,6 +94,7 @@ void SettingsDialog::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	mediaSettings->setConfig( config );
 	deviceSettings->setConfig( config );
 	advancedSettings->setConfig( config );
+	sipSettings->setConfig( config );
 	
 }
 
@@ -115,6 +118,7 @@ void SettingsDialog::accept(){
 	warning += mediaSettings->apply();
 	warning += deviceSettings->apply();
 	warning += advancedSettings->apply();
+	warning += sipSettings->apply();
 	
 	config->save();
 	// FIXME: only reload the mediahandler when something actually
@@ -888,4 +892,28 @@ string AdvancedSettings::apply(){
 
 	return "";
 
+}
+
+// SipSettings
+SipSettings::SipSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+	refXml->get_widget( "anatCheck", anatCheck );
+	refXml->get_widget( "100relCheck", use100RelCheck );
+}
+
+void SipSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
+	this->config = config;
+
+	MRef<SipStackConfig*> stackConfig = config->sipStack->getStackConfig();
+
+	anatCheck->set_active( config->useAnat );
+	use100RelCheck->set_active( stackConfig->use100Rel );
+}
+
+string SipSettings::apply(){
+	MRef<SipStackConfig*> stackConfig = config->sipStack->getStackConfig();
+
+	config->useAnat = anatCheck->get_active();
+	stackConfig->use100Rel = use100RelCheck->get_active();
+
+	return "";
 }

@@ -40,6 +40,7 @@ class MediaSettings;
 class DeviceSettings;
 class SecuritySettings;
 class AdvancedSettings;
+class SipSettings;
 class SipSoftPhoneConfiguration;
 class CertificateDialog;
 
@@ -65,13 +66,14 @@ class SettingsDialog
 	private:
 		MRef<CommandReceiver*> callback;
 		//GuiCallback * callback;
-
+		
 		Gtk::Dialog * dialogWindow;
 		GeneralSettings * generalSettings;
 		MediaSettings * mediaSettings;
 		DeviceSettings * deviceSettings;
 		SecuritySettings * securitySettings;
 		AdvancedSettings * advancedSettings;
+		SipSettings * sipSettings;
 		MRef<SipSoftPhoneConfiguration *> config;
 };
 
@@ -277,5 +279,25 @@ class AdvancedSettings
 
 };
 
+class SipSettings
+#ifdef OLDLIBGLADEMM
+: public SigC::Object
+#endif
+{
+
+	public:
+		SipSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+
+		std::string apply();
+		
+		void setConfig( MRef<SipSoftPhoneConfiguration *> config );
+
+	private:
+		Gtk::CheckButton * use100RelCheck;
+		Gtk::CheckButton * anatCheck;
+
+		MRef<SipSoftPhoneConfiguration *> config;
+
+};
 
 #endif
