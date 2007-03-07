@@ -20,6 +20,9 @@ if OS_WIN
 res_obj = win32/libmnetutil-res.o
 libmnetutil_la_LDFLAGS += -Wl,$(res_obj)
 libmnetutil_la_DEPENDENCIES += $(res_obj)
+win32_src = \
+		source/NetworkFunctionsWin32.h \
+		source/NetworkFunctionsWin32.cxx
 endif OS_WIN
 
 srp_src = 
@@ -51,6 +54,7 @@ mnetutil_src = \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \
+		    $(win32_src) \
 		    source/StreamSocket.cxx
 
 # maintainer rules

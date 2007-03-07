@@ -69,7 +69,7 @@ AM_MINISIP_CHECK_WINFUNCS(["getaddrinfo(0,0,0,0)" "freeaddrinfo(0)" "GetAdapters
 #include<ws2tcpip.h>
 ])
 else
-AC_CHECK_FUNCS([getifaddrs getnameinfo])
+AC_CHECK_FUNCS([getifaddrs getnameinfo getaddrinfo freeaddrinfo])
 fi
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])

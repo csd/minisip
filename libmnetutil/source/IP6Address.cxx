@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006-2007 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
@@ -27,6 +29,12 @@
 # ifdef HAVE_GETNAMEINFO
 #  define _WIN32_WINNT 0x0501 //XP or later
 # endif
+#endif
+
+#include<libmnetutil/IP6Address.h>
+
+#ifdef WIN32
+# define _WIN32_WINNT 0x0501
 #endif
 
 #include<libmnetutil/IP6Address.h>
@@ -59,8 +67,56 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #ifndef HAVE_INET_NTOP
 # include<inet_ntop.h>
 #endif
+#ifdef WIN32
+#include"NetworkFunctionsWin32.h"
+#endif
 
 using namespace std;
+
+#define MAKE_UINT16(x,y) ((x)<<8+(y))
+
+#ifdef HAVE_GETADDRINFO
+void initIp6Address( const string &ipaddr, struct sockaddr_in6 *sockaddress,
+		     unsigned short num_ip[8] ){
+	struct addrinfo hints;
+	struct addrinfo *ai = NULL;
+
+	memset( &hints, 0, sizeof(hints) );
+	hints.ai_family = AF_INET6;
+	
+	if( getaddrinfo( ipaddr.c_str(), NULL, &hints, &ai ) || !ai )
+		throw HostNotFound( ipaddr );
+
+	struct addrinfo *cur;
+	bool found=false;
+
+	for( cur = ai; cur; cur=cur->ai_next ){
+		if( cur->ai_family != AF_INET6 )
+			continue;
+
+		if( cur->ai_addrlen != sizeof(*sockaddress) )
+			continue;
+
+		memset(sockaddress, '\0', sizeof(*sockaddress));
+		memcpy(sockaddress, cur->ai_addr, cur->ai_addrlen);
+
+		for (int32_t i=0; i<8; i++){
+			uint8_t x = sockaddress->sin6_addr.s6_addr[2 * i];
+			uint8_t y = sockaddress->sin6_addr.s6_addr[2 * i + 1];
+
+			num_ip[i] = MAKE_UINT16(x, y);
+		}
+
+		found=true;
+		break;
+	}
+
+	freeaddrinfo( ai );
+
+	if( !found )
+		throw HostNotFound( ipaddr );
+}
+#endif	// HAVE_GETADDRINFO
 
 #ifdef HAVE_GETNAMEINFO
 string buildAddressString(const struct sockaddr *sa, socklen_t salen)
@@ -113,6 +169,19 @@ IP6Address::IP6Address(string addr){
 
 	setAddressFamily(AF_INET6);
 	setProtocolFamily(PF_INET6);
+
+#ifdef HAVE_GETADDRINFO
+	bool use_getaddrinfo = true;
+#ifdef WIN32
+	if( !(hgetaddrinfo && hfreeaddrinfo ) )
+		use_getaddrinfo = false;
+#endif
+	if( use_getaddrinfo ){
+		initIp6Address( addr, sockaddress, num_ip );
+		return;
+	}
+
+#endif // !HAVE_GETADDRINFO
 #ifndef WIN32
 	hostent *hp= gethostbyname2(addr.c_str(), AF_INET6);	
 #else

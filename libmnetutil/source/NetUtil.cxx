@@ -25,6 +25,7 @@
 #include<config.h>
 
 #include<libmnetutil/NetUtil.h>
+#include<libmnetutil/NetworkFunctions.h>
 
 #ifdef WIN32
 #include<winsock2.h>
@@ -60,6 +61,8 @@ bool NetUtil::init() {
 		return false; 
 	}
 #endif
+
+	NetworkFunctions::init();
 	return true;
 	
 }

@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+  Copyright (C) 2006-2007 Mikael Magnusson
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@
 /*
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 
@@ -55,6 +57,7 @@
 #include<map>
 #include<udns.h>
 
+#define _WIN32_WINNT 0x0501
 
 /**
 libresolv is only for linux ...
@@ -95,6 +98,11 @@ windns is only for windows ... but it is not restricted to xp or higher ... thus
 
 using namespace std;
 
+#ifdef USE_WIN32_API
+#include"NetworkFunctionsWin32.h"
+#endif
+
+
 //Linux: Thanks to linuxgazette tips, http://www.linuxgazette.com/issue84/misc/tips/interfaces.c.txt,
 //seems to be public domain.
 //W32: Thanks to MSDN documentation:
@@ -131,7 +139,7 @@ void NetworkInterface::addIPString( const string &ip, bool ipv6 )
 		return m_ip4Strs.push_back(ip);
 }
 
-#ifdef HAVE_GETIFADDRS
+#ifdef HAVE_GETNAMEINFO
 static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 {
 #ifdef HAVE_IPV6
@@ -153,7 +161,7 @@ static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 	}
 #endif
 	else{
-		// Unsupported address family
+		cerr << "sa_get_addr: unsupported address family: " << sa->sa_family << endl;
 		return false;
 	}
 	
@@ -166,6 +174,12 @@ static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 	ip = addr;
 	return true;
 }
+#endif
+
+#if HAVE_GETIFADDRS && HAVE_GETNAMEINFO
+// 
+// Implementation 1. getifaddrs
+// 
 
  vector<string> NetworkFunctions::getAllInterfaces(){
  	vector<string >res;
@@ -294,10 +308,195 @@ vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces(){
 }
 
 #else  // HAVE_GETIFADDRS
+#ifdef USE_WIN32_API
+
+#ifdef HAVE_GETADAPTERSADDRESSES
+IP_ADAPTER_ADDRESSES *WINXP_getAdaptersAddresses(){
+	IP_ADAPTER_ADDRESSES *pAdapters = NULL;
+	DWORD flags = GAA_FLAG_SKIP_ANYCAST|GAA_FLAG_SKIP_FRIENDLY_NAME|GAA_FLAG_SKIP_MULTICAST|GAA_FLAG_SKIP_DNS_SERVER;
+	ULONG bufLen = 0;
+
+	//cerr << "getAllInterfaces " << endl;
+	if( GetAdaptersAddresses( AF_UNSPEC, flags, NULL, NULL, &bufLen ) != ERROR_BUFFER_OVERFLOW ){
+// 		cerr << "getAllInterfaces 1" << endl;
+		return NULL;
+	}
+
+	pAdapters = (IP_ADAPTER_ADDRESSES*)malloc( bufLen );
+	memset( pAdapters, 0, bufLen );
+
+	if( GetAdaptersAddresses( AF_UNSPEC, flags, NULL, pAdapters, &bufLen ) != ERROR_SUCCESS ){
+// 		cerr << "getAllInterfaces 2" << endl;
+		return NULL;
+	}
+
+	return pAdapters;
+}
+
+
+
+vector<string> WINXP_getAllInterfaces(){
+	vector<string> res;
+	IP_ADAPTER_ADDRESSES *pAdapters = WINXP_getAdaptersAddresses();
+
+	if( !pAdapters ){
+		return res;
+	}
+
+	IP_ADAPTER_ADDRESSES *adapt;
+	for( adapt = pAdapters; adapt; adapt = adapt->Next ){
+		if( adapt->OperStatus != IfOperStatusUp ){
+// 			cerr << "Not up" << adapt->AdapterName << endl;
+			continue;
+		}
+
+		IP_ADAPTER_UNICAST_ADDRESS *addr;
+		for( addr = adapt->FirstUnicastAddress; addr; addr=addr->Next ){
+
+			if( !addr ){
+// 				cerr << "No unicast address" << endl;
+				break;
+			}
+
+			struct sockaddr *sa = addr->Address.lpSockaddr;
+
+			if( !sa ){
+// 				cerr << "No socket" << endl;
+				continue;
+			}
+
+			if( sa->sa_family != AF_INET ){
+				continue;
+			}
+
+			res.push_back( adapt->AdapterName );
+			break;
+		}
+	}
+
+	return res;
+}
+
+string WINXP_getInterfaceIPStr(string iface){
+	string ret;
+
+	IP_ADAPTER_ADDRESSES *pAdapters = WINXP_getAdaptersAddresses();
+
+	if( !pAdapters ){
+		return ret;
+	}
+
+	//cerr << "WINXP_getAdaptersAddresses" << endl;
+
+	IP_ADAPTER_ADDRESSES *adapt;
+	for( adapt = pAdapters; adapt; adapt=adapt->Next ){
+		//cerr << "Adapt: " << adapt->AdapterName << endl;
+
+		if( iface != string(adapt->AdapterName) ){
+			continue;
+		}
+
+		if( adapt->OperStatus != IfOperStatusUp ){
+// 			cerr << "Not up" << adapt->AdapterName << endl;
+			return false;
+		}
+
+		IP_ADAPTER_UNICAST_ADDRESS *addr;
+		for( addr = adapt->FirstUnicastAddress; addr; addr=addr->Next ){
+
+			if( !addr ){
+				cerr << "No unicast address" << endl;
+				break;
+			}
+
+			struct sockaddr *sa = addr->Address.lpSockaddr;
+
+			if( !sa ){
+				cerr << "No socket" << endl;
+				continue;
+			}
+
+			if( sa->sa_family != AF_INET ){
+				cerr << "Not IPv4 addr: " << adapt->AdapterName << endl;
+				return ret;
+			}
+
+			bool isIpv6;
+			if( sa_get_addr(sa, isIpv6, ret) ){
+				//cerr << "WINXP_getAdaptersAddresses: " << ret << endl;
+				return ret;
+			}
+			else{
+				cerr << "WINXP_getAdaptersAddresses error" << adapt->AdapterName << endl;
+			}
+		}
+
+		//cerr << "Not found: " << iface << endl;
+		return ret;
+	}
+
+	//cerr << "Not found: " << iface << endl;
+	return ret;
+}
+
+vector<MRef<NetworkInterface*> > WINXP_getInterfaces()
+{
+	vector<MRef<NetworkInterface*> > interfaces;
+
+	IP_ADAPTER_ADDRESSES *pAdapters = WINXP_getAdaptersAddresses();
+
+	if( !pAdapters ){
+		cerr << "WINXP_getInterfaces no adapters" << endl;
+		return interfaces;
+	}
+
+	IP_ADAPTER_ADDRESSES *adapt;
+	for( adapt = pAdapters; adapt; adapt = adapt->Next ){
+		if( adapt->OperStatus != IfOperStatusUp ){
+			cerr << "Not up" << adapt->AdapterName << endl;
+			continue;
+		}
+
+		IP_ADAPTER_UNICAST_ADDRESS *addr;
+		for( addr = adapt->FirstUnicastAddress; addr; addr=addr->Next ){
+			//cerr << "Unicast address" << endl;
+			struct sockaddr *sa = addr->Address.lpSockaddr;
+
+			bool isIpv6 = false;
+			string ip;
+			if( !sa_get_addr(sa, isIpv6, ip) ){
+				cerr << "sa_get_addr failed" << endl;
+				continue;
+			}
+
+			MRef<NetworkInterface*> iface;
+
+			iface = new NetworkInterface( adapt->AdapterName );
+			iface->addIPString( ip, isIpv6 );
+			interfaces.push_back( iface );
+
+			cerr << "Add: " << ip << "," << isIpv6 << endl;
+		}
+	}
+
+	return interfaces;
+}
+
+
+#endif // HAVE_GETADAPTERSADDRESSES
+
+// 
+// Implementation 2. WIN32
+// 
+
 vector<string> NetworkFunctions::getAllInterfaces(){
+#ifdef HAVE_GETADAPTERSADDRESSES
+	if( hGetAdaptersAddresses )
+		return WINXP_getAllInterfaces();
+#endif
+
 	vector<string >res;
 
-#ifdef USE_WIN32_API
 	ULONG           ulOutBufLen;
 	DWORD           dwRetVal;
 
@@ -330,7 +529,18 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	}
 	free(pAdapterInfo);
 
-#else
+	return res;
+}
+
+#else // !USE_WIN32_API
+
+// 
+// Implementation 2. !WIN32
+// 
+
+vector<string> NetworkFunctions::getAllInterfaces(){
+	vector<string >res;
+
 	int32_t sockfd;
 	char *buf, *ptr;
 	struct ifconf ifc;
@@ -375,10 +585,10 @@ vector<string> NetworkFunctions::getAllInterfaces(){
 	/* release resources */
 	free(buf);
 	close(sockfd);
-#endif //USE_WIN32_API
 
 	return res;
 }
+#endif //USE_WIN32_API
 
 #ifndef IF_NAMESIZE
 #define IF_NAMESIZE 16
@@ -388,6 +598,12 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 	string ret;
 
 #ifdef USE_WIN32_API
+
+#if defined (HAVE_GETADAPTERSADDRESSES) && defined (HAVE_GETNAMEINFO)
+	if( hGetAdaptersAddresses && hgetnameinfo )
+		return WINXP_getInterfaceIPStr( iface );
+#endif
+
 	ULONG           ulOutBufLen;
 	DWORD           dwRetVal;
 	
@@ -452,6 +668,11 @@ string NetworkFunctions::getInterfaceIPStr(string iface){
 
 vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces()
 {
+#if defined(USE_WIN32_API) && defined(HAVE_GETADAPTERSADDRESSES) && defined (HAVE_GETNAMEINFO)
+	if( hGetAdaptersAddresses && hgetnameinfo )
+		return WINXP_getInterfaces();
+#endif
+
 	vector<string> names = getAllInterfaces();
 	vector<string>::iterator i;
  
@@ -575,3 +796,10 @@ bool NetworkFunctions::isLocalIP(uint32_t ip, vector<string> &localIPs){
 	return false;
 }
 
+
+
+void NetworkFunctions::init(){
+#if defined(WIN32) && HAVE_GETADAPTERSADDRESSES
+	WINXP_init();
+#endif
+}

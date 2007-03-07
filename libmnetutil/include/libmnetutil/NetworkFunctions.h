@@ -54,6 +54,9 @@ Collection of network utilities
 */
 class LIBMNETUTIL_API NetworkFunctions{
 	public:
+
+		static void init();
+
 		/**
 		@return a string vector with all available network interfaces
 		*/
