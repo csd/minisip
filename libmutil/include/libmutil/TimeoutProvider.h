@@ -211,6 +211,7 @@ class TimeoutProvider : public Runnable{
 			stop=true;
 			wake();
 			thread->join();
+			requests.empty();
 		}
 
 		/**
