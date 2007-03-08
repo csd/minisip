@@ -39,10 +39,10 @@ public:
 	
 	~SipSimSmartCardGD();
 
-/* select MIKEY applet APDU */
+	/* select MIKEY applet APDU */
 	bool selectMikeyApp();
 
-/* SIM card Pin related functions */
+	/* SIM card Pin related functions */
 	bool verifyPin(int verifyMode);
 	bool changePin(const char * newPinCode);
 
@@ -57,14 +57,20 @@ public:
    a smart card connection has been established.
 */
 
-/* This method returns pointer which points to an expected length of random value 
-	It is the user's responsibility to free the allocated memory by calling delete.
-	the randomLength is in bits*/
+	/** 
+	 * This method returns pointer which points to an expected length of random value 
+	 * It is the user's responsibility to free the allocated memory by calling delete.
+	 * the randomLength is in bits
+	 */
 	bool getRandomValue(unsigned char * randomPtr, unsigned long randomLength);    
 
 	bool getSignature(unsigned char * dataPtr, int dataLength, unsigned char *signaturePtr, int& signatureLength, 
 			bool doHash, int hash_alg=HASH_SHA1);
-/* this method returns the tek which is calculated in the pseudo random function implemented on smart card*/
+
+	/** 
+	 * This method returns the tek which is calculated in the pseudo random function 
+	 * implemented on smart card
+	 */
 	bool getKey(unsigned char csId, unsigned long csbIdValue,
 		    unsigned char * randPtr, unsigned long randLength,
 		    unsigned char * tekPtr, unsigned long tekLength, int keyType);
@@ -76,7 +82,9 @@ public:
 	                      unsigned long & tekLength, unsigned char * tekPtr);*/
 	           
 
-/* Diffie-Hellman specific SIM functions */
+	/** 
+	 * Diffie-Hellman specific SIM functions 
+	 */
 	virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr);
 	
 
