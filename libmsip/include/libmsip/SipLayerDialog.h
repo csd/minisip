@@ -42,6 +42,8 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 	public:
 
 		SipLayerDialog(MRef<SipCommandDispatcher*> dispatcher);
+
+		~SipLayerDialog();
 		
 		void setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb);
 		MRef<SipDefaultHandler*> getDefaultDialogCommandHandler();

@@ -42,6 +42,8 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 		SipLayerTransaction(MRef<SipCommandDispatcher*> dispatcher, 
 				MRef<SipLayerTransport*> transp);
 
+		~SipLayerTransaction();
+
 		void doHandleAck(bool b);
 		
 		void removeTransaction(MRef<SipTransaction*> t);

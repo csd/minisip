@@ -78,11 +78,16 @@ SipStack::SipStack( MRef<SipStackConfig *> stackConfig ){
 }
 
 SipStack::~SipStack(){
-	MRef<SipStackInternal*> * mrefPtr = (MRef<SipStackInternal*> *) sipStackInternal;
-	
-	(*mrefPtr)->free();
+	free();
+}
 
-	delete mrefPtr;
+void SipStack::free(){
+	if (sipStackInternal){
+		MRef<SipStackInternal*> * mrefPtr = (MRef<SipStackInternal*> *) sipStackInternal;
+		(*mrefPtr)->free();
+		delete mrefPtr;
+		sipStackInternal=NULL;
+	}
 }
 
 void SipStack::setTransactionHandlesAck(bool transHandlesAck){

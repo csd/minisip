@@ -379,6 +379,7 @@ void SipLayerTransport::stop(){
 	}
 
 	manager->join();
+	manager->closeSockets();
 	manager = NULL;
 
 		//wait for the threads in the servers.

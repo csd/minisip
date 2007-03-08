@@ -240,6 +240,8 @@ class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 		SipStack( MRef<SipStackConfig*> stackConfig );
 
 		~SipStack();
+
+		void free();
 		
 		void setTransactionHandlesAck(bool transHandleAck);
 		void setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb);

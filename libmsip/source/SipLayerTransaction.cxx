@@ -45,6 +45,13 @@ SipLayerTransaction::SipLayerTransaction(
 	
 }
 
+SipLayerTransaction::~SipLayerTransaction(){
+	MRef<SipTransaction*> trans;
+	for (int i=0; i<transactions.size(); i++){
+		transactions[i]->freeStateMachine();
+	}
+}
+
 bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 	
 	MRef<SipTransaction*> newTransaction;

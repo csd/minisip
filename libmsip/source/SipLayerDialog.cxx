@@ -38,6 +38,15 @@ SipLayerDialog::SipLayerDialog(MRef<SipCommandDispatcher*> d):dispatcher(d){
 	
 }
 
+SipLayerDialog::~SipLayerDialog(){
+	list<MRef<SipDialog*> > l;
+	dialogListLock.lock();
+	for (int i=0; i< dialogs.size(); i++)
+		dialogs[i]->freeStateMachine();;
+	dialogListLock.unlock();
+
+}
+
 list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
 	list<MRef<SipDialog*> > l;
 	dialogListLock.lock();
