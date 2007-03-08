@@ -118,6 +118,9 @@ class minilist{
 				cur = cur->getNext();
 				delete tmp;
 			}
+			nelem=0;
+			head=NULL;
+			end=NULL;
 		}
 
 		/**
