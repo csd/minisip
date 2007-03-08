@@ -33,7 +33,8 @@
 #include<libminisip/gui/Gui.h>
 #include<libminisip/conference/ConferenceControl.h> 
 #include<libminisip/conference/ConfCallback.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+
+class Gui;
 
 class LIBMINISIP_API ConfMessageRouter: 	//public SipCallback, 
 			//public GuiCallback, 

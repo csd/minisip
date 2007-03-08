@@ -52,6 +52,7 @@ class IPAddress;
 class Socket;
 class SoundIO;
 class PhoneBook;
+class ConfBackend;
 //FIXME: XXX Deep copy needed for for example psk
 
 

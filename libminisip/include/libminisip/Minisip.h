@@ -27,7 +27,30 @@ class LIBMINISIP_API Minisip : public MObject{
 			confPath = c;
 		}
 
+
+		/**
+		 * Tells minisip that it better prepare to be shut down.
+		 */
+		int stop();
+
+#if 0
+		/**
+		 * Tell the internal worker threads to stop execution.
+		 */
+		int kill();
+#endif 
+
+		/**
+		 * Wait for internal worker threads to exit (this is 
+		 * normally called after "kill").
+		 */
+		int join();
+
+		/**
+		 * equal to stop() followed by kill and join()
+		 */
 		int exit();
+
 		int startSip();
 		int runGui();
 

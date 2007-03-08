@@ -257,10 +257,7 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 Minisip::~Minisip(){
 }
 
-int Minisip::exit(){
-	int ret = 1;
-	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
-	
+int Minisip::stop(){
 	if( ! sip.isNull() ) { //it may not be initialized ... 
 		//Send a shutdown command to the sip stack ... 
 		//it will take care of de-registering and closing on-going calls
@@ -268,40 +265,44 @@ int Minisip::exit(){
 		SipSMCommand sipcmd(cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher);
 		sip->getSipStack()->handleCommand(sipcmd);
 		sip->stop();
-	
-#ifdef DEBUG_OUTPUT
-		mout << "Waiting for the SipStack to close ..." << end;
-#endif
+	}
+}
+
+int Minisip::join(){
+	if( ! sip.isNull() ) { //it may not be initialized ... 
 		sip->join();
-		sip->getSipStack()->setCallback( NULL );
-		sip->getSipStack()->setDefaultDialogCommandHandler( NULL );
+		sip->getSipStack()->free();
 		sip = NULL;
 	}
-
 	gui->setCallback( NULL );
 	gui->setSipSoftPhoneConfiguration( NULL );
 
 	stopDebugger();
-	
-/*	if( messageRouter){
-		mout << "Delete messageRouter" << end;
-		delete messageRouter;
-	}
-*/
-	
+
 	messageRouter->clear();
 	messageRouter=NULL;
 
-
-	//phoneConf->sip = NULL;
 	phoneConf = NULL;
 	mediaHandler = NULL;
 	confMessageRouter->setGui(NULL);
 	confMessageRouter = NULL;
 	gui = NULL;
 
+}
+
+
+int Minisip::exit(){
+	int ret = 1;
+	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
+
+	stop();
+#ifdef DEBUG_OUTPUT
+		mout << "Waiting for the SipStack to close ..." << end;
+#endif
+	join();
+	
 	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
-	return ret;
+	return 1;
 }
 
 int Minisip::startSip() {
@@ -406,9 +407,9 @@ int Minisip::startSip() {
 
 
 #ifdef SCSIM_SUPPORT
-		MRef<SmartCardDetector*> scdetect = new SmartCardDetector(*messageRouter);
-		messageRouter->addSubsystem("smartcard",*scdetect);
-		scdetect->start();
+//		MRef<SmartCardDetector*> scdetect = new SmartCardDetector(*messageRouter);
+//		messageRouter->addSubsystem("smartcard",*scdetect);
+//		scdetect->start();
 #endif
 
 		/*

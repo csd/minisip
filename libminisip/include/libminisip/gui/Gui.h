@@ -30,6 +30,7 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/Thread.h>
 #include<libmutil/MessageRouter.h>
+#include<libminisip/conference/ConfMessageRouter.h>
 
 #include<libminisip/gui/LogEntry.h>
 

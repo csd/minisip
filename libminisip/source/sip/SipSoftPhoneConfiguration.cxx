@@ -93,6 +93,10 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
+	std::list<MRef<PhoneBook *> >::iterator i;
+	for (i=phonebooks.begin(); i!=phonebooks.end() ; i++){
+		(*i)->free();
+	}
 }
 
 void SipSoftPhoneConfiguration::save(){
