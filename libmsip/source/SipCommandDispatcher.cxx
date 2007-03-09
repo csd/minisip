@@ -50,11 +50,12 @@ SipCommandDispatcher::SipCommandDispatcher(
 }
 
 void SipCommandDispatcher::free(){
-	cerr << "EEEE: Running SipCommandDispatcher::free"<<endl;
 	sipStackInternal=NULL;
 	callback=NULL;
-	managementHandler->freeStateMachine();
-	managementHandler=NULL;
+	if (managementHandler){
+		managementHandler->freeStateMachine();
+		managementHandler=NULL;
+	}
 	transportLayer->setDispatcher(NULL);
 	transportLayer=NULL;
 	dialogLayer=NULL;
@@ -157,7 +158,6 @@ void SipCommandDispatcher::run(){
                 item.transaction_receiver=NULL;
                 item.call_receiver=NULL;
 	}
-	cerr << "EEEE: SipCommandDispatcher::run done - EXITING"<<endl;
 }
 
 void SipCommandDispatcher::setCallback(MRef<CommandReceiver*> callback){

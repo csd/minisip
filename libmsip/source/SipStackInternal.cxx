@@ -151,7 +151,6 @@ MRef<SipCommandDispatcher*> SipStackInternal::getDispatcher(){
 }
 
 void SipStackInternal::free(){
-	cerr << "EEEE: running SipStackInternal::free"<<endl;
 	timeoutProvider->stopThread();
 	timeoutProvider=NULL;
 	setCallback(NULL);
