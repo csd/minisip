@@ -1,0 +1,13 @@
+amixer  set 'Master',0 70% unmute
+amixer  set 'PCM',0 80% unmute
+amixer  set 'Line',0 0% mute
+amixer  set 'CD',0 0% mute
+amixer  set 'Mic',0 0% mute
+amixer  set 'Video',0 0% mute
+amixer  set 'Phone',0 0% mute
+#amixer -q set 'PC Speaker',0 0% mute
+amixer  set 'Aux',0 0% mute
+amixer  set 'Capture',0 60%,0%
+amixer  set 'Mic Boost (+20dB)',0 1
+amixer  cset iface=MIXER,name='Capture Source' 0,5
+amixer  cset iface=MIXER,name='Capture Switch' 1

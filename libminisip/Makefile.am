@@ -23,19 +23,19 @@ plugins_LTLIBRARIES =
 plugins_LDFLAGS = -Wl,--no-undefined -no-undefined $(RELOC_LDFLAGS) -avoid-version -export-dynamic -module
 
 if AEC_SUPPORT
-        libaec_src = source/aec/aec.cxx
+        libaec_src = source/subsystem_media/aec/aec.cxx
 endif
 
-libcodecs_src = source/codecs/Codec.cxx
+libcodecs_src = source/subsystem_media/codecs/Codec.cxx
 
 
 #
 # G.711 codec plugin
 #
-libcodec_g711_src = source/codecs/G711CODEC.cxx \
-			source/codecs/g711/codec_g711.cxx \
-			source/codecs/G711CODEC.h \
-			source/codecs/g711/codec_g711.h
+libcodec_g711_src = source/subsystem_media/codecs/G711CODEC.cxx \
+			source/subsystem_media/codecs/g711/codec_g711.cxx \
+			source/subsystem_media/codecs/G711CODEC.h \
+			source/subsystem_media/codecs/g711/codec_g711.h
 
 if TRUE
 libcodecs_src += $(libcodec_g711_src)
@@ -53,7 +53,7 @@ endif
 if HAS_SPEEX
 plugins_LTLIBRARIES += mspeex.la
 mspeex_la_LDFLAGS = $(plugins_LDFLAGS)
-mspeex_la_SOURCES = source/codecs/SPEEXCODEC.cxx source/codecs/SPEEXCODEC.h
+mspeex_la_SOURCES = source/subsystem_media/codecs/SPEEXCODEC.cxx source/subsystem_media/codecs/SPEEXCODEC.h
 mspeex_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SPEEX_LIBS)
 endif
 
@@ -64,147 +64,147 @@ endif
 if HAS_GSM
 plugins_LTLIBRARIES += mgsm.la
 mgsm_la_LDFLAGS = $(plugins_LDFLAGS)
-mgsm_la_SOURCES = source/codecs/GsmCodec.cxx source/codecs/GsmCodec.h
+mgsm_la_SOURCES = source/subsystem_media/codecs/GsmCodec.cxx source/codecs/GsmCodec.h
 mgsm_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GSM_LIBS)
 endif
 
 
-libmediahandler_src = source/mediahandler/MediaHandler.cxx \
-			source/mediahandler/Session.cxx \
-			source/mediahandler/MediaStream.cxx \
-			source/mediahandler/Media.cxx \
-			source/mediahandler/RtpReceiver.cxx \
-			source/mediahandler/MediaCommandString.cxx \
-			source/mediahandler/AudioMedia.cxx \
-			source/mediahandler/AudioPlugin.cxx \
-			source/mediahandler/AudioPlugin.h \
-			source/mediahandler/SessionRegistry.cxx \
-			source/mediahandler/CallRecorder.cxx \
-			source/mediahandler/DtmfSender.cxx
+libmediahandler_src = source/subsystem_media/MediaHandler.cxx \
+			source/subsystem_media/Session.cxx \
+			source/subsystem_media//MediaStream.cxx \
+			source/subsystem_media//Media.cxx \
+			source/subsystem_media//RtpReceiver.cxx \
+			source/subsystem_media//MediaCommandString.cxx \
+			source/subsystem_media/AudioMedia.cxx \
+			source/subsystem_media/AudioPlugin.cxx \
+			source/subsystem_media/AudioPlugin.h \
+			source/subsystem_media/SessionRegistry.cxx \
+			source/subsystem_media/CallRecorder.cxx \
+			source/subsystem_media/DtmfSender.cxx
 
 
 if P2T_SUPPORT
-        libp2t_src = source/p2t/RtcpAPP.cxx \
-			source/p2t/RtcpAPPHeader.cxx \
-			source/p2t/RtcpTransactionGetFloor.cxx \
-			source/p2t/RtcpTransactionGrantFloor.cxx \
-			source/p2t/RtcpTransactionIdleFloor.cxx \
-			source/p2t/RtcpTransactionReleaseFloor.cxx \
-			source/p2t/RtcpTransactionTakenFloor.cxx \
-			source/p2t/SipDialogP2T.cxx \
-			source/p2t/SipDialogP2Tuser.cxx \
-			source/p2t/GroupList.cxx \
-			source/p2t/GroupListUserElement.cxx \
-			source/p2t/GroupListClient.cxx \
-			source/p2t/GroupListServer.cxx \
-			source/p2t/RtcpReceiver.cxx \
-			source/p2t/RtcpSender.cxx \
-			source/p2t/P2T.cxx
+        libp2t_src = source/subsystem_signaling/p2t/RtcpAPP.cxx \
+			source/subsystem_signaling/p2t/RtcpAPPHeader.cxx \
+			source/subsystem_signaling/p2t/RtcpTransactionGetFloor.cxx \
+			source/subsystem_signaling/p2t/RtcpTransactionGrantFloor.cxx \
+			source/subsystem_signaling/p2t/RtcpTransactionIdleFloor.cxx \
+			source/subsystem_signaling/p2t/RtcpTransactionReleaseFloor.cxx \
+			source/subsystem_signaling/p2t/RtcpTransactionTakenFloor.cxx \
+			source/subsystem_signaling/p2t/SipDialogP2T.cxx \
+			source/subsystem_signaling/p2t/SipDialogP2Tuser.cxx \
+			source/subsystem_signaling/p2t/GroupList.cxx \
+			source/subsystem_signaling/p2t/GroupListUserElement.cxx \
+			source/subsystem_signaling/p2t/GroupListClient.cxx \
+			source/subsystem_signaling/p2t/GroupListServer.cxx \
+			source/subsystem_signaling/p2t/RtcpReceiver.cxx \
+			source/subsystem_signaling/p2t/RtcpSender.cxx \
+			source/subsystem_signaling/p2t/P2T.cxx
 endif
 
 if ZRTP_SUPPORT
-libzrtp_src = source/zrtp/ZrtpHostBridgeMinisip.cxx
+libzrtp_src = source/subsystem_media/zrtp/ZrtpHostBridgeMinisip.cxx
 endif
 
-librtp_src = source/rtp/RtpHeader.cxx \
-		source/rtp/RtpPacket.cxx \
-		source/rtp/CryptoContext.cxx \
-		source/rtp/SRtpPacket.cxx \
-		source/rtp/SDESChunk.cxx \
-		source/rtp/SDES_CNAME.cxx \
-		source/rtp/SDES_EMAIL.cxx \
-		source/rtp/SDESItem.cxx \
-		source/rtp/SDES_LOC.cxx \
-		source/rtp/SDES_NAME.cxx \
-		source/rtp/SDES_NOTE.cxx \
-		source/rtp/SDES_PHONE.cxx \
-		source/rtp/SDES_TOOL.cxx \
-		source/rtp/RtcpPacket.cxx \
-		source/rtp/RtcpReport.cxx \
-		source/rtp/RtcpDebugMonitor.cxx \
-		source/rtp/RtcpReportReceptionBlock.cxx \
-		source/rtp/RtcpReportRR.cxx \
-		source/rtp/RtcpReportSDES.cxx \
-		source/rtp/RtcpReportSenderInfo.cxx \
-		source/rtp/RtcpReportSR.cxx \
-		source/rtp/RtcpReportXR.cxx \
-		source/rtp/XRReportBlock.cxx \
-		source/rtp/XRVoIPReportBlock.cxx
+librtp_src = source/subsystem_media/rtp/RtpHeader.cxx \
+		source/subsystem_media/rtp/RtpPacket.cxx \
+		source/subsystem_media/rtp/CryptoContext.cxx \
+		source/subsystem_media/rtp/SRtpPacket.cxx \
+		source/subsystem_media/rtp/SDESChunk.cxx \
+		source/subsystem_media/rtp/SDES_CNAME.cxx \
+		source/subsystem_media/rtp/SDES_EMAIL.cxx \
+		source/subsystem_media/rtp/SDESItem.cxx \
+		source/subsystem_media/rtp/SDES_LOC.cxx \
+		source/subsystem_media/rtp/SDES_NAME.cxx \
+		source/subsystem_media/rtp/SDES_NOTE.cxx \
+		source/subsystem_media/rtp/SDES_PHONE.cxx \
+		source/subsystem_media/rtp/SDES_TOOL.cxx \
+		source/subsystem_media/rtp/RtcpPacket.cxx \
+		source/subsystem_media/rtp/RtcpReport.cxx \
+		source/subsystem_media/rtp/RtcpDebugMonitor.cxx \
+		source/subsystem_media/rtp/RtcpReportReceptionBlock.cxx \
+		source/subsystem_media/rtp/RtcpReportRR.cxx \
+		source/subsystem_media/rtp/RtcpReportSDES.cxx \
+		source/subsystem_media/rtp/RtcpReportSenderInfo.cxx \
+		source/subsystem_media/rtp/RtcpReportSR.cxx \
+		source/subsystem_media/rtp/RtcpReportXR.cxx \
+		source/subsystem_media/rtp/XRReportBlock.cxx \
+		source/subsystem_media/rtp/XRVoIPReportBlock.cxx
 
-libsdp_src = source/sdp/SdpPacket.cxx \
-		source/sdp/SdpHeader.cxx \
-		source/sdp/SdpHeaderA.cxx \
-		source/sdp/SdpHeaderC.cxx \
-		source/sdp/SdpHeaderM.cxx \
-		source/sdp/SdpHeaderO.cxx \
-		source/sdp/SdpHeaderS.cxx \
-		source/sdp/SdpHeaderT.cxx \
-		source/sdp/SdpHeaderV.cxx
+libsdp_src = source/subsystem_signaling/sdp/SdpPacket.cxx \
+		source/subsystem_signaling/sdp/SdpHeader.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderA.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderC.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderM.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderO.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderS.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderT.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderV.cxx
 
-libsip_src = source/sip/SipDialogVoip.cxx \
-		source/sip/SipDialogVoipClient.cxx \
-		source/sip/SipDialogVoipServer.cxx \
-		source/sip/SipDialogConfVoip.cxx \
-		source/sip/SipDialogPresenceClient.cxx \
-		source/sip/SipDialogPresenceServer.cxx \
-		source/sip/SipSoftPhoneConfiguration.cxx \
-		source/sip/DefaultDialogHandler.cxx \
-		source/sip/PresenceMessageContent.cxx \
-		source/sip/Sip.cxx
+libsip_src = source/subsystem_signaling/sip/SipDialogVoip.cxx \
+		source/subsystem_signaling/sip/SipDialogVoipClient.cxx \
+		source/subsystem_signaling/sip/SipDialogVoipServer.cxx \
+		source/subsystem_signaling/sip/SipDialogConfVoip.cxx \
+		source/subsystem_signaling/sip/SipDialogPresenceClient.cxx \
+		source/subsystem_signaling/sip/SipDialogPresenceServer.cxx \
+		source/subsystem_signaling/sip/SipSoftPhoneConfiguration.cxx \
+		source/subsystem_signaling/sip/DefaultDialogHandler.cxx \
+		source/subsystem_signaling/sip/PresenceMessageContent.cxx \
+		source/subsystem_signaling/sip/Sip.cxx
 
 libsoundcard_libadd =
-RESAMPLER_SRC = source/soundcard/resampler/Resampler.cxx \
-		source/soundcard/resampler/SimpleResampler.cxx \
-		source/soundcard/resampler/SimpleResampler.h
+RESAMPLER_SRC = source/subsystem_media/soundcard/resampler/Resampler.cxx \
+		source/subsystem_media/soundcard/resampler/SimpleResampler.cxx \
+		source/subsystem_media/soundcard/resampler/SimpleResampler.h
 
 if FLOAT_RESAMPLER
 plugins_LTLIBRARIES += mfloat_resampler.la
 mfloat_resampler_la_LDFLAGS = $(plugins_LDFLAGS)
-mfloat_resampler_la_SOURCES = source/soundcard/resampler/FloatResampler.cxx \
-		source/soundcard/resampler/FloatResampler.h
+mfloat_resampler_la_SOURCES = source/subsystem_media/soundcard/resampler/FloatResampler.cxx \
+		source/subsystem_media/soundcard/resampler/FloatResampler.h
 mfloat_resampler_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(SAMPLERATE_LIBS)
 endif FLOAT_RESAMPLER
 
-AUDIOMIXER_SRC = source/soundcard/AudioMixer.cxx \
-			source/soundcard/AudioMixerSimple.cxx \
-			source/soundcard/AudioMixerSpatial.cxx
+AUDIOMIXER_SRC = source/subsystem_media/soundcard/AudioMixer.cxx \
+			source/subsystem_media/soundcard/AudioMixerSimple.cxx \
+			source/subsystem_media/soundcard/AudioMixerSpatial.cxx
 
-BASIC_SOUNDCARD_SRC = source/soundcard/SilenceSensor.cxx \
-			source/soundcard/SoundIO.cxx \
-			source/soundcard/SoundSource.cxx \
+BASIC_SOUNDCARD_SRC = source/subsystem_media/soundcard/SilenceSensor.cxx \
+			source/subsystem_media/soundcard/SoundIO.cxx \
+			source/subsystem_media/soundcard/SoundSource.cxx \
 			${RESAMPLER_SRC} \
 			${AUDIOMIXER_SRC} \
-			source/soundcard/FileSoundDevice.h \
-			source/soundcard/FileSoundDevice.cxx \
-			source/soundcard/FileSoundDriver.h \
-			source/soundcard/FileSoundDriver.cxx \
-			source/soundcard/FileSoundSource.cxx \
-			source/soundcard/SoundDevice.cxx \
-			source/soundcard/SoundDriver.cxx \
-			source/soundcard/SoundDriverRegistry.cxx
+			source/subsystem_media/soundcard/FileSoundDevice.h \
+			source/subsystem_media/soundcard/FileSoundDevice.cxx \
+			source/subsystem_media/soundcard/FileSoundDriver.h \
+			source/subsystem_media/soundcard/FileSoundDriver.cxx \
+			source/subsystem_media/soundcard/FileSoundSource.cxx \
+			source/subsystem_media/soundcard/SoundDevice.cxx \
+			source/subsystem_media/soundcard/SoundDriver.cxx \
+			source/subsystem_media/soundcard/SoundDriverRegistry.cxx
 
-ALSA_SRC =	source/soundcard/AlsaCard.cxx \
-		source/soundcard/AlsaCard.h \
-		source/soundcard/AlsaSoundDriver.h \
-		source/soundcard/AlsaSoundDriver.cxx \
-		source/soundcard/AlsaSoundDevice.h \
-		source/soundcard/AlsaSoundDevice.cxx
+ALSA_SRC =	source/subsystem_media/soundcard/AlsaCard.cxx \
+		source/subsystem_media/soundcard/AlsaCard.h \
+		source/subsystem_media/soundcard/AlsaSoundDriver.h \
+		source/subsystem_media/soundcard/AlsaSoundDriver.cxx \
+		source/subsystem_media/soundcard/AlsaSoundDevice.h \
+		source/subsystem_media/soundcard/AlsaSoundDevice.cxx
 
-DSOUND_SRC = 	source/soundcard/DirectSoundDevice.cxx  \
-		source/soundcard/DirectSoundDevice.h \
-		source/soundcard/DirectSoundDriver.cxx \
-		source/soundcard/DirectSoundDriver.h
+DSOUND_SRC = 	source/subsystem_media/soundcard/DirectSoundDevice.cxx  \
+		source/subsystem_media/soundcard/DirectSoundDevice.h \
+		source/subsystem_media/soundcard/DirectSoundDriver.cxx \
+		source/subsystem_media/soundcard/DirectSoundDriver.h
 
-PORTAUDIO_SRC = source/soundcard/PortAudioDevice.cxx \
-			source/soundcard/PortAudioDriver.cxx \
-			source/soundcard/PortAudioDevice.h \
-			source/soundcard/PortAudioDriver.h
+PORTAUDIO_SRC = source/subsystem_media/soundcard/PortAudioDevice.cxx \
+			source/subsystem_media/soundcard/PortAudioDriver.cxx \
+			source/subsystem_media/soundcard/PortAudioDevice.h \
+			source/subsystem_media/soundcard/PortAudioDriver.h
 
 libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
 if ENABLE_OSS
-        libsoundcard_src += source/soundcard/OssSoundDevice.cxx
+        libsoundcard_src += source/subsystem_media/soundcard/OssSoundDevice.cxx
 endif ENABLE_OSS
 endif !OS_WIN
 
@@ -234,7 +234,7 @@ mportaudio_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(PORTAUDIO_LIBS)
 endif PORTAUDIO_SUPPORT
 
 
-libspaudio_src = source/spaudio/SpAudio.cxx
+libspaudio_src = source/subsystem_media/spaudio/SpAudio.cxx
 
 #
 # Video plugin
@@ -250,11 +250,11 @@ libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)
 plugins_LTLIBRARIES += mvideo.la
 mvideo_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)
 mvideo_la_LDFLAGS = $(plugins_LDFLAGS)
-mvideo_la_SOURCES = source/video/VideoPlugin.cxx
+mvideo_la_SOURCES = source/subsystem_media/video/VideoPlugin.cxx
 mvideo_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS)
 
         libvideo_libadd =
-        display_src = source/video/display/VideoDisplay.cxx
+        display_src = source/subsystem_media/video/display/VideoDisplay.cxx
 
 #
 # X11 display plugin
@@ -262,8 +262,8 @@ mvideo_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS)
 plugins_LTLIBRARIES += mx11.la
 mx11_la_CXXFLAGS = $(AM_CXXFLAGS) $(X_CFLAGS)
 mx11_la_LDFLAGS = $(plugins_LDFLAGS)
-mx11_la_SOURCES = source/video/display/X11Display.cxx \
-			source/video/display/X11Display.h
+mx11_la_SOURCES = source/subsystem_media/video/display/X11Display.cxx \
+			source/subsystem_media/video/display/X11Display.h
 mx11_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 
 #
@@ -273,10 +273,10 @@ if XV_VIDEO_DISPLAY
 plugins_LTLIBRARIES += mxv.la
 mxv_la_CXXFLAGS = $(AM_CXXFLAGS) $(X_CFLAGS)
 mxv_la_LDFLAGS = $(plugins_LDFLAGS)
-mxv_la_SOURCES = source/video/display/XvDisplay.cxx \
-			source/video/display/XvDisplay.h \
-			source/video/display/X11Display.cxx \
-			source/video/display/X11Display.h
+mxv_la_SOURCES = source/subsystem_media/video/display/XvDisplay.cxx \
+			source/subsystem_media/video/display/XvDisplay.h \
+			source/subsystem_media/video/display/X11Display.cxx \
+			source/subsystem_media/video/display/X11Display.h
 mxv_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
@@ -286,15 +286,15 @@ endif
 if SDL_VIDEO_DISPLAY
 plugins_LTLIBRARIES += msdl.la
 msdl_la_LDFLAGS = $(plugins_LDFLAGS)
-msdl_la_SOURCES = source/video/display/SdlDisplay.cxx \
-			source/video/display/SdlDisplay.h
+msdl_la_SOURCES = source/subsystem_media/video/display/SdlDisplay.cxx \
+			source/subsystem_media/video/display/SdlDisplay.h
 msdl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(SDL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
-        grabber_src = source/video/grabber/Grabber.cxx
+        grabber_src = source/subsystem_media/video/grabber/Grabber.cxx
 if V4L_VIDEO_GRABBER
-        grabber_src += source/video/grabber/V4LGrabber.cxx \
-			source/video/grabber/V4LGrabber.h
+        grabber_src += source/subsystem_media/video/grabber/V4LGrabber.cxx \
+			source/subsystem_media/video/grabber/V4LGrabber.h
 endif
 
 #
@@ -304,32 +304,32 @@ if DC1394_VIDEO_GRABBER
 plugins_LTLIBRARIES += mdc1394.la
 mdc1394_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)
 mdc1394_la_LDFLAGS = $(plugins_LDFLAGS)
-mdc1394_la_SOURCES = source/video/grabber/Dc1394Grabber.cxx \
-			source/video/grabber/Dc1394Grabber.h
+mdc1394_la_SOURCES = source/subsystem_media/video/grabber/Dc1394Grabber.cxx \
+			source/subsystem_media/video/grabber/Dc1394Grabber.h
 mdc1394_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
 endif
 
-        mixer_src = source/video/mixer/ImageMixer.cxx
+        mixer_src = source/subsystem_media/video/mixer/ImageMixer.cxx
 
-        codec_src = source/video/codec/AVCoder.cxx \
-			source/video/codec/AVDecoder.cxx \
-			source/video/codec/VideoCodec.cxx
+        codec_src = source/subsystem_media/video/codec/AVCoder.cxx \
+			source/subsystem_media/video/codec/AVDecoder.cxx \
+			source/subsystem_media/video/codec/VideoCodec.cxx
 
         libvideo_src = $(display_src) \
 			$(grabber_src) \
 			$(codec_src) \
 			$(mixer_src) \
-			source/video/VideoMedia.cxx
+			source/subsystem_media/video/VideoMedia.cxx
 endif VIDEO_SUPPORT
 
-libcontactdb_src = source/contactdb/ContactDb.cxx \
-			source/contactdb/PhoneBook.cxx \
-			source/contactdb/MXmlPhoneBookIo.cxx
+libcontactdb_src = source/subsystem_contacts/ContactDb.cxx \
+			source/subsystem_contacts/PhoneBook.cxx \
+			source/subsystem_contacts/MXmlPhoneBookIo.cxx
 
-libgui_src = source/gui/Gui.cxx \
-			source/gui/LogEntry.cxx \
-			source/gui/Bell.cxx \
-			source/gui/ConsoleDebugger.cxx
+libgui_src = source/subsystem_gui/Gui.cxx \
+			source/subsystem_gui/LogEntry.cxx \
+			source/subsystem_gui/Bell.cxx \
+			source/subsystem_gui/ConsoleDebugger.cxx
 
 libipprovider_src = source/ipprovider/IpProvider.cxx \
 			source/ipprovider/SimpleIpProvider.cxx \
@@ -354,32 +354,32 @@ libconference_src = source/conference/ConferenceControl.cxx \
 			source/conference/ConfCallback.cxx \
 			source/conference/ConfMessageRouter.cxx
 
-libconfigbackend_src = source/configbackend/ConfBackend.cxx
+libconfigbackend_src = source/subsystem_config/ConfBackend.cxx
 
 if TRUE
-libconfigbackend_src += source/configbackend/MXmlConfBackend.cxx \
-			source/configbackend/MXmlConfBackend.h
+libconfigbackend_src += source/subsystem_config/MXmlConfBackend.cxx \
+			source/subsystem_config/MXmlConfBackend.h
 else
 plugins_LTLIBRARIES += mxmlconf.la
 mxmlconf_la_LDFLAGS = $(plugins_LDFLAGS)
-mxmlconf_la_SOURCES = source/configbackend/MXmlConfBackend.cxx \
-			source/configbackend/MXmlConfBackend.h
+mxmlconf_la_SOURCES = source/subsystem_config/MXmlConfBackend.cxx \
+			source/subsystem_config/MXmlConfBackend.h
 mxmlconf_la_LIBADD = libminisip.la $(MUTIL_LIBS)
 endif
 
 
 if OS_WIN
-        libconfigbackend_src += source/configbackend/UserConfigWin32.cxx
+        libconfigbackend_src += source/subsystem_config/UserConfigWin32.cxx
 else
-        libconfigbackend_src += source/configbackend/UserConfigPosix.cxx
+        libconfigbackend_src += source/subsystem_config/UserConfigPosix.cxx
 endif
 
 if GCONF_SUPPORT
 plugins_LTLIBRARIES += mgconf.la
 mgconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(GCONF_CFLAGS)
 mgconf_la_LDFLAGS = $(plugins_LDFLAGS)
-mgconf_la_SOURCES = source/configbackend/GConfBackend.cxx \
-			source/configbackend/GConfBackend.h
+mgconf_la_SOURCES = source/subsystem_config/GConfBackend.cxx \
+			source/subsystem_config/GConfBackend.h
 mgconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GCONF_LIBS) $(GOBJECT_LIBS)
 endif
 
@@ -387,11 +387,11 @@ if ONLINECONF_SUPPORT
 plugins_LTLIBRARIES += onlineconf.la
 onlineconf_la_CPPFLAGS = $(AM_CPPFLAGS) $(ONLINECONF_CFLAGS)
 onlineconf_la_LDFLAGS = $(plugins_LDFLAGS) -lmcrypto -lmnetutil
-onlineconf_la_SOURCES = source/configbackend/OnlineMXmlConfBackend.cxx \
-			source/configbackend/OnlineMXmlConfBackend.h
+onlineconf_la_SOURCES = source/subsystem_config/OnlineMXmlConfBackend.cxx \
+			source/subsystem_config/OnlineMXmlConfBackend.h
 onlineconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(ONLINECONF_LIBS)
-libonlineconf_src = source/configbackend/OnlineConfBackend.cxx \
-	  	    source/contactdb/OnlineMXmlPhoneBookIo.cxx
+libonlineconf_src = source/subsystem_config/OnlineConfBackend.cxx \
+	  	    source/subsystem_contacts/OnlineMXmlPhoneBookIo.cxx
 endif
 
 

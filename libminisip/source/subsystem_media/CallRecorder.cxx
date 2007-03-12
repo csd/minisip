@@ -26,7 +26,7 @@
 #include<libminisip/mediahandler/CallRecorder.h>
 
 #include<libminisip/mediahandler/AudioMedia.h>
-#include"../soundcard/FileSoundDevice.h"
+#include"soundcard/FileSoundDevice.h"
 
 #include<libmutil/stringutils.h>
 #include<libmutil/Mutex.h>
