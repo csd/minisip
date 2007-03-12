@@ -32,7 +32,7 @@
 */
 #include<config.h>
 
-#include<libminisip/sip/SipDialogVoip.h>
+#include<libminisip/signaling/sip/SipDialogVoip.h>
 
 #include<libmutil/massert.h>
 

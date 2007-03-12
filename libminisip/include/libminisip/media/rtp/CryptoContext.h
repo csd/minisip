@@ -34,7 +34,7 @@
 #include<libmcrypto/hmac.h>
 #include<libmutil/MemObject.h>
 
-#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/media/rtp/RtpPacket.h>
 
 #define REPLAY_WINDOW_SIZE 64
 

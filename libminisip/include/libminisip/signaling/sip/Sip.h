@@ -33,10 +33,10 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipStack.h>
 
-#include<libminisip/sdp/SdpPacket.h>
-#include<libminisip/conference/ConfMember.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
+#include<libminisip/signaling/conference/ConfMember.h>
 #include<libminisip/gui/LogEntry.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 
 class SipSoftPhoneConfiguration;
 class MediaHandler;

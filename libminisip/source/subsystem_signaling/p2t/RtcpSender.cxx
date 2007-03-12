@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/RtcpSender.h>
+#include<libminisip/signaling/p2t/RtcpSender.h>
 
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipDialogConfig.h>
@@ -43,7 +43,7 @@
 #endif
 
 #include<stdio.h>
-#include<libminisip/p2t/RtcpAPP.h>
+#include<libminisip/signaling/p2t/RtcpAPP.h>
 
 #ifndef _MSC_VER
 #include<sys/time.h>

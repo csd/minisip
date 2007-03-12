@@ -29,7 +29,7 @@
 #include<string>
 #include<libmutil/MemObject.h>
 
-#include<libminisip/soundcard/SoundDriver.h>
+#include<libminisip/media/soundcard/SoundDriver.h>
 
 class PortAudioDriver: public SoundDriver{
 	public:

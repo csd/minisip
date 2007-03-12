@@ -33,7 +33,7 @@
 #include<config.h>
 
 #include<libmutil/massert.h>
-#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
 
 #include<iostream>
 

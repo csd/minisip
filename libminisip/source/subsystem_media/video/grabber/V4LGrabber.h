@@ -33,7 +33,7 @@
 
 #include<linux/types.h>
 #include<linux/videodev.h>
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/media/video/grabber/Grabber.h>
 #define N_BUFFERS 20
 
 struct v4l2_capability;

@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpReportReceptionBlock.h>
+#include<libminisip/media/rtp/RtcpReportReceptionBlock.h>
 
 #include<stdlib.h>
 #include<iostream>

@@ -31,8 +31,8 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/AudioMixerSimple.h>
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/AudioMixerSimple.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
 using namespace std;
 

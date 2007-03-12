@@ -27,9 +27,9 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/gui/Bell.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/media/MediaCommandString.h>
+#include<libminisip/media/Session.h>
+#include<libminisip/media/MediaStream.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

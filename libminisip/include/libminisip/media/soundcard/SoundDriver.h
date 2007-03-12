@@ -31,7 +31,7 @@
 #include<iterator>
 #include<libmutil/MemObject.h>
 
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 #include<vector>
 

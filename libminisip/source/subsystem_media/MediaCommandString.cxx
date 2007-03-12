@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/media/MediaCommandString.h>
 
 using namespace std;
 

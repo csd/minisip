@@ -34,7 +34,7 @@
 #include <config.h>
 
 #include<assert.h>
-#include<libminisip/p2t/SipDialogP2Tuser.h>
+#include<libminisip/signaling/p2t/SipDialogP2Tuser.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipBye.h>
@@ -48,7 +48,7 @@
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>

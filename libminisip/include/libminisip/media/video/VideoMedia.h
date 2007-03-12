@@ -27,14 +27,14 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/mediahandler/MediaHandler.h>
-#include<libminisip/video/ImageHandler.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/codec/AVDecoder.h>
-#include<libminisip/video/codec/VideoEncoderCallback.h>
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
+#include<libminisip/media/video/codec/AVDecoder.h>
+#include<libminisip/media/video/codec/VideoEncoderCallback.h>
+#include<libminisip/media/video/grabber/Grabber.h>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 
 #define MAX_SOURCES 256
 

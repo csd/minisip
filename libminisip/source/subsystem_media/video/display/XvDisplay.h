@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
@@ -38,7 +38,7 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
-#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
 #include"X11Display.h"
 
 class XvDisplay: public X11Display{

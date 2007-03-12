@@ -26,23 +26,23 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/Session.h>
+#include<libminisip/media/Session.h>
 
-#include<libminisip/mediahandler/CallRecorder.h>
-#include<libminisip/mediahandler/MediaStream.h>
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/mediahandler/AudioMedia.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
-#include<libminisip/mediahandler/DtmfSender.h>
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/sdp/SdpPacket.h>
-#include<libminisip/sdp/SdpHeaderV.h>
-#include<libminisip/sdp/SdpHeaderT.h>
-#include<libminisip/sdp/SdpHeaderC.h>
-#include<libminisip/sdp/SdpHeaderA.h>
-#include<libminisip/sdp/SdpHeaderM.h>
-#include<libminisip/sdp/SdpHeaderS.h>
-#include<libminisip/sdp/SdpHeaderO.h>
+#include<libminisip/media/CallRecorder.h>
+#include<libminisip/media/MediaStream.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/AudioMedia.h>
+#include<libminisip/media/RtpReceiver.h>
+#include<libminisip/media/DtmfSender.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
+#include<libminisip/signaling/sdp/SdpHeaderV.h>
+#include<libminisip/signaling/sdp/SdpHeaderT.h>
+#include<libminisip/signaling/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpHeaderM.h>
+#include<libminisip/signaling/sdp/SdpHeaderS.h>
+#include<libminisip/signaling/sdp/SdpHeaderO.h>
 #include<libmikey/KeyAgreement.h>
 #include<libmikey/KeyAgreementDH.h>
 #include<libmutil/dbg.h>
@@ -50,7 +50,7 @@
 #include<libmutil/Timestamp.h>
 
 #ifdef ZRTP_SUPPORT
-#include <libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#include <libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
 #endif
 
 #ifdef _WIN32_WCE

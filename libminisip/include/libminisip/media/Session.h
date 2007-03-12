@@ -32,10 +32,10 @@
 
 #include<libmikey/Mikey.h>
 
-//#include<libminisip/sip/SipDialogSecurityConfig.h>
+//#include<libminisip/signaling/sip/SipDialogSecurityConfig.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libminisip/mediahandler/DtmfSender.h>
-#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/media/DtmfSender.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
 
 class MediaStreamReceiver;
 class MediaStreamSender;
@@ -290,6 +290,6 @@ class LIBMINISIP_API Session : public MObject{
 };
 
 
-#include<libminisip/mediahandler/SessionRegistry.h>
+#include<libminisip/media/SessionRegistry.h>
 
 #endif

@@ -29,8 +29,8 @@
 
 #include<vector>
 
-#include<libminisip/rtp/XRReportBlock.h>
-#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/media/rtp/XRReportBlock.h>
+#include<libminisip/media/rtp/RtcpReport.h>
 
 class LIBMINISIP_API RtcpReportXR : public RtcpReport{
 	public:

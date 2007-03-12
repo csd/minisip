@@ -24,9 +24,9 @@
 #include<config.h>
 #include"AudioPlugin.h"
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 
 using namespace std;

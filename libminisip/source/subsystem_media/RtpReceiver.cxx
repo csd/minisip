@@ -24,16 +24,16 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/media/RtpReceiver.h>
 
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/Thread.h>
 
-#include<libminisip/rtp/SRtpPacket.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/rtp/SRtpPacket.h>
+#include<libminisip/media/codecs/Codec.h>
 #include<iostream>
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/media/MediaStream.h>
 #include<libminisip/ipprovider/IpProvider.h>
 
 #include<stdio.h>

@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/SDES_CNAME.h>
+#include<libminisip/media/rtp/SDES_CNAME.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

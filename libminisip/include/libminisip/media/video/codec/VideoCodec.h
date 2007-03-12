@@ -27,8 +27,8 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/ImageHandler.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/codecs/Codec.h>
 
 class MediaStreamSender;
 class AVEncoder;

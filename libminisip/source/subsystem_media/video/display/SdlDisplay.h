@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
 
 #include<SDL/SDL.h>
 #include<X11/Xlib.h>

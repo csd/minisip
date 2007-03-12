@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpReportSDES.h>
+#include<libminisip/media/rtp/RtcpReportSDES.h>
 
 #include<libmutil/massert.h>
 #include<iostream>

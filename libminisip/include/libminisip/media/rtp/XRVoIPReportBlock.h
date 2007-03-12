@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/rtp/XRReportBlock.h>
+#include<libminisip/media/rtp/XRReportBlock.h>
 
 class LIBMINISIP_API XRVoIPReportBlock : public XRReportBlock{
 	public:

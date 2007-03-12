@@ -25,8 +25,8 @@
 
 #include<config.h>
 #include<libmutil/dbg.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/VideoException.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
+#include<libminisip/media/video/VideoException.h>
 
 #include<iostream>
 #define NB_IMAGES 3

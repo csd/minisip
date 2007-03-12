@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/MPlugin.h>
 #include<libmutil/MSingleton.h>
-#include<libminisip/soundcard/SoundDriver.h>
+#include<libminisip/media/soundcard/SoundDriver.h>
 
 /**
  * Registry of sound driver plugins.

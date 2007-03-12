@@ -22,7 +22,7 @@
 
 #include"ConferenceWidget.h"
 
-#include <libminisip/conference/ConferenceControl.h>
+#include <libminisip/signaling/conference/ConferenceControl.h>
 
 #include"MainWindow.h"
 //#include<libminisip/sip/state_machines/SipSMCommand.h>
@@ -30,10 +30,10 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/gui/Bell.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/MediaStream.h>
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/media/MediaCommandString.h>
+#include<libminisip/media/Session.h>
+#include<libminisip/media/MediaStream.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

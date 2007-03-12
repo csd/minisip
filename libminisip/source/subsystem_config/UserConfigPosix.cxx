@@ -22,7 +22,7 @@
 
 #include<config.h>
 
-#include<libminisip/configbackend/UserConfig.h>
+#include<libminisip/config/UserConfig.h>
 #include<libmutil/dbg.h>
 
 #include<stdlib.h>

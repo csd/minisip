@@ -35,7 +35,7 @@
 #ifndef SDPHEADERA_H
 #define SDPHEADERA_H
 
-#include<libminisip/sdp/SdpHeader.h>
+#include<libminisip/signaling/sdp/SdpHeader.h>
 
 class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 	public:

@@ -44,9 +44,9 @@
 
 #include<libmsip/SipDialogConfig.h>
 
-#include<libminisip/sip/Sip.h>
-#include<libminisip/contactdb/PhoneBook.h>
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/signaling/sip/Sip.h>
+#include<libminisip/contacts/PhoneBook.h>
+#include<libminisip/config/ConfBackend.h>
 
 class IPAddress;
 class Socket;

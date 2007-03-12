@@ -24,10 +24,10 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/DtmfSender.h>
+#include<libminisip/media/DtmfSender.h>
 
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/media/Session.h>
+#include<libminisip/media/MediaStream.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

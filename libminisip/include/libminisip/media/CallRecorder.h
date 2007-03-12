@@ -27,8 +27,8 @@
 
 #define CALLREC_BUFF_SIZE 16000
 
-#include<libminisip/mediahandler/MediaStream.h>
-#include<libminisip/soundcard/SoundRecorderCallback.h>
+#include<libminisip/media/MediaStream.h>
+#include<libminisip/media/soundcard/SoundRecorderCallback.h>
 
 template <class T> class MRef;
 class MediaStreamReceiver;

@@ -24,11 +24,11 @@
 
 #include<config.h>
 
-#include<libminisip/spaudio/SpAudio.h>
+#include<libminisip/media/spaudio/SpAudio.h>
 
 #include<string.h> //for memset
 
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
 SpAudio::SpAudio(int32_t numPos){
 	nPos=numPos;

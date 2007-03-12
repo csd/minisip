@@ -37,17 +37,17 @@
 
 #include<config.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
-#include<libminisip/soundcard/SoundIO.h>
-#include<libminisip/mediahandler/MediaHandler.h>
-#include<libminisip/contactdb/PhoneBook.h>
-#include<libminisip/contactdb/MXmlPhoneBookIo.h>
-#include<libminisip/contactdb/OnlineMXmlPhoneBookIo.h>
-#include<libminisip/configbackend/ConfBackend.h>
-#include<libminisip/configbackend/UserConfig.h>
+#include<libminisip/media/soundcard/SoundIO.h>
+#include<libminisip/media/MediaHandler.h>
+#include<libminisip/contacts/PhoneBook.h>
+#include<libminisip/contacts/MXmlPhoneBookIo.h>
+#include<libminisip/contacts/OnlineMXmlPhoneBookIo.h>
+#include<libminisip/config/ConfBackend.h>
+#include<libminisip/config/UserConfig.h>
 #include<fstream>
-#include<libminisip/soundcard/AudioMixer.h>
+#include<libminisip/media/soundcard/AudioMixer.h>
 #include<libmcrypto/SipSimSoft.h>
 #ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>
@@ -62,7 +62,7 @@
 #include<libmutil/dbg.h>
 #include<libmutil/massert.h>
 
-#include<libminisip/configbackend/OnlineConfBackend.h>
+#include<libminisip/config/OnlineConfBackend.h>
 
 //update both!!!! the str define is to avoid including itoa.h
 #define CONFIG_FILE_VERSION_REQUIRED 3

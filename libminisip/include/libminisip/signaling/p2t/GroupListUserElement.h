@@ -33,8 +33,8 @@
 
 #include<libmnetutil/IPAddress.h>
 
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/signaling/p2t/P2T.h>
 
 /**
  * contains all information about a participating user in a <code>GroupList</code>.

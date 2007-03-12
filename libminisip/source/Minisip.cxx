@@ -63,19 +63,19 @@
 
 #include<libminisip/gui/Gui.h>
 #include<libminisip/gui/ConsoleDebugger.h>
-#include<libminisip/sip/Sip.h>
+#include<libminisip/signaling/sip/Sip.h>
 #include<libminisip/gui/LogEntry.h>
-#include<libminisip/contactdb/ContactDb.h>
-#include<libminisip/mediahandler/MediaHandler.h>
-#include<libminisip/conference/ConferenceControl.h>
-#include<libminisip/conference/ConfCallback.h>
-#include<libminisip/configbackend/ConfBackend.h>
-#include<libminisip/conference/ConfMessageRouter.h>
-#include<libminisip/soundcard/SoundDriverRegistry.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/contacts/ContactDb.h>
+#include<libminisip/media/MediaHandler.h>
+#include<libminisip/signaling/conference/ConferenceControl.h>
+#include<libminisip/signaling/conference/ConfCallback.h>
+#include<libminisip/config/ConfBackend.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
+#include<libminisip/media/codecs/Codec.h>
 
 #ifdef ZRTP_SUPPORT
-#include<libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#include<libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
 #endif
 
 #include<stdlib.h>

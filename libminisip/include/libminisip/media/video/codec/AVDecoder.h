@@ -30,7 +30,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 class ImageHandler;
 class MImage;

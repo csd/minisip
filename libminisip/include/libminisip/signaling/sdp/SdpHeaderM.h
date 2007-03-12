@@ -36,8 +36,8 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/sdp/SdpHeader.h>
-#include<libminisip/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpHeader.h>
+#include<libminisip/signaling/sdp/SdpHeaderC.h>
 #include<vector>
 
 class SdpHeaderA;

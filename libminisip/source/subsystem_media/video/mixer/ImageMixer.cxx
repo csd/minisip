@@ -23,11 +23,11 @@
 */
 
 #include<config.h>
-#include<libminisip/video/mixer/ImageMixer.h>
-#include<libminisip/video/VideoMedia.h>
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/video/codec/VideoCodec.h>
-#include<libminisip/video/codec/AVCoder.h>
+#include<libminisip/media/video/mixer/ImageMixer.h>
+#include<libminisip/media/video/VideoMedia.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/media/video/codec/VideoCodec.h>
+#include<libminisip/media/video/codec/AVCoder.h>
 
 #define MAX_SOURCE 256
 

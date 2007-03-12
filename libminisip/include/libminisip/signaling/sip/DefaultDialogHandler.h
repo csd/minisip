@@ -33,10 +33,10 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipDialogConfig.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #ifdef P2T_SUPPORT
-#	include<libminisip/p2t/GroupListServer.h>
-#	include<libminisip/p2t/SipDialogP2T.h>
+#	include<libminisip/signaling/p2t/GroupListServer.h>
+#	include<libminisip/signaling/p2t/SipDialogP2T.h>
 #endif
 
 class SipDialogContainer;

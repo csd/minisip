@@ -36,7 +36,7 @@
 #include<libmutil/MPlugin.h>
 #include<libmutil/MSingleton.h>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 	public:

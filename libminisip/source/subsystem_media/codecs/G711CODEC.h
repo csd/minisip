@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 
 enum G711Version {
 	G711U = 1,

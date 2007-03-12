@@ -37,9 +37,9 @@
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/TCPSocket.h>
 
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/GroupList.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/p2t/P2T.h>
+#include<libminisip/signaling/p2t/GroupList.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 
 

@@ -28,14 +28,14 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include<libminisip/video/display/VideoDisplay.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
 
 class X11Display: public VideoDisplay{
 	public: 

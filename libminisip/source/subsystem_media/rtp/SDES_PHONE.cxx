@@ -25,7 +25,7 @@
 #include <config.h>
 
 #include<libmutil/massert.h>
-#include<libminisip/rtp/SDES_PHONE.h>
+#include<libminisip/media/rtp/SDES_PHONE.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

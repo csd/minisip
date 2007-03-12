@@ -27,9 +27,9 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/rtp/RtcpReport.h>
-#include<libminisip/rtp/RtcpReportReceptionBlock.h>
-#include<libminisip/rtp/RtcpReportSenderInfo.h>
+#include<libminisip/media/rtp/RtcpReport.h>
+#include<libminisip/media/rtp/RtcpReportReceptionBlock.h>
+#include<libminisip/media/rtp/RtcpReportSenderInfo.h>
 
 #include<vector>
 

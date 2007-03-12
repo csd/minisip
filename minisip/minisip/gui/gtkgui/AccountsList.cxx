@@ -26,7 +26,7 @@
 #include"AccountsList.h"
 #include"AccountDialog.h"
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 using namespace std;
 

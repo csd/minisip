@@ -30,8 +30,8 @@
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
-#include<libminisip/rtp/CryptoContext.h>
-#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/media/rtp/CryptoContext.h>
+#include<libminisip/media/rtp/RtpPacket.h>
 
 RtpPacket * readRtpPacket( MRef<CryptoContext *>, UDPSocket * socket );
 

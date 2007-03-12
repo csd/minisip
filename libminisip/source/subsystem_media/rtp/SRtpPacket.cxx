@@ -49,8 +49,8 @@
 
 #include<errno.h>
 
-#include<libminisip/rtp/SRtpPacket.h>
-#include<libminisip/rtp/CryptoContext.h>
+#include<libminisip/media/rtp/SRtpPacket.h>
+#include<libminisip/media/rtp/CryptoContext.h>
 
 #include<libmutil/stringutils.h>
 #include<libmutil/merror.h>

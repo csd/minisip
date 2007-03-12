@@ -25,19 +25,19 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/media/MediaStream.h>
 
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/KeyAgreement.h>
-#include<libminisip/sdp/SdpHeaderM.h>
-#include<libminisip/sdp/SdpHeaderA.h>
-#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/signaling/sdp/SdpHeaderM.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/RtpReceiver.h>
+#include<libminisip/media/codecs/Codec.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<iostream>
 

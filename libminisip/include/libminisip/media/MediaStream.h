@@ -29,14 +29,14 @@
 
 #include<libmutil/MemObject.h>
 
-#include<libminisip/rtp/CryptoContext.h>
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
-#include<libminisip/rtp/SRtpPacket.h>
+#include<libminisip/media/rtp/CryptoContext.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/Session.h>
+#include<libminisip/media/RtpReceiver.h>
+#include<libminisip/media/rtp/SRtpPacket.h>
 
 #ifdef ZRTP_SUPPORT
-#include <libminisip/zrtp/ZrtpHostBridgeMinisip.h>
+#include <libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
 #include <time.h>
 class ZrtpHostBridgeMinisip;
 #endif

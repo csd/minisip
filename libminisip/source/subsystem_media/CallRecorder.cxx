@@ -23,9 +23,9 @@
 
 #include<config.h>
 
-#include<libminisip/mediahandler/CallRecorder.h>
+#include<libminisip/media/CallRecorder.h>
 
-#include<libminisip/mediahandler/AudioMedia.h>
+#include<libminisip/media/AudioMedia.h>
 #include"soundcard/FileSoundDevice.h"
 
 #include<libmutil/stringutils.h>

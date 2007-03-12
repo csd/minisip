@@ -29,7 +29,7 @@
 
 #include<vector>
 
-#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/media/rtp/RtcpReport.h>
 
 #include<config.h>
 

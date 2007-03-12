@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/media/soundcard/Resampler.h>
 #include<samplerate.h>
 
 class FloatResampler : public Resampler {

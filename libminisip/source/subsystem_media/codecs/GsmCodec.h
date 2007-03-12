@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 
 typedef struct gsm_state *      gsm;
 

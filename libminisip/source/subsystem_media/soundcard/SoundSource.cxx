@@ -26,7 +26,7 @@
 #include<config.h>
 
 #include<iostream>
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 #include<libmutil/mtime.h>
 
 #include<iostream>

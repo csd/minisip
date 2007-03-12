@@ -33,7 +33,7 @@
 */
 #include<config.h>
 
-#include<libminisip/sip/SipDialogVoipClient.h>
+#include<libminisip/signaling/sip/SipDialogVoipClient.h>
 
 #include<libmutil/massert.h>
 

@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpReportRR.h>
+#include<libminisip/media/rtp/RtcpReportRR.h>
 #include<config.h>
 //#include <netinet/in.h>
 #include<iostream>

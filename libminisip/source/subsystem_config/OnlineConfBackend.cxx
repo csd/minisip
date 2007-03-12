@@ -22,7 +22,7 @@
 */
 
 #include<stdlib.h>
-#include<libminisip/configbackend/OnlineConfBackend.h>
+#include<libminisip/config/OnlineConfBackend.h>
 #include<libmnetutil/TlsSrpSocket.h>
 #include<libmcrypto/cert.h>
 #include<libmnetutil/NetworkException.h>

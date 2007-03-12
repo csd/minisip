@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/XRVoIPReportBlock.h>
+#include<libminisip/media/rtp/XRVoIPReportBlock.h>
 
 #include<libmutil/massert.h>
 //#include<netinet/in.h>

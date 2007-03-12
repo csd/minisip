@@ -30,7 +30,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipSMCommand.h>
 
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/media/MediaCommandString.h>
 
 #include<iostream>
 

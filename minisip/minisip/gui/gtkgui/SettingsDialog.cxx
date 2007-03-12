@@ -25,9 +25,9 @@
 #include"AccountsList.h"
 #include"CertificateDialog.h"
 #include<libminisip/gui/Gui.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
-#include<libminisip/soundcard/SoundDriverRegistry.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/MediaCommandString.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
 
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmcrypto/SipSimSoft.h>

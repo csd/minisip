@@ -23,7 +23,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SoundDriver.h>
+#include<libminisip/media/soundcard/SoundDriver.h>
 
 
 SoundDeviceName::SoundDeviceName(std::string name,

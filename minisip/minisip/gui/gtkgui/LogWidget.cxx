@@ -24,7 +24,7 @@
 
 #include<libminisip/gui/LogEntry.h>
 #include<libmutil/stringutils.h>
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/ContactDb.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)

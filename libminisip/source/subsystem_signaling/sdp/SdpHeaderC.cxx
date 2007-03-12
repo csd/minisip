@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<libminisip/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpHeaderC.h>
 #include<libmnetutil/IPAddress.h>
 #include<iostream>
 

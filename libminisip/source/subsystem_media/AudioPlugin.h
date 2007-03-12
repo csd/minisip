@@ -25,7 +25,7 @@
 #define AUDIO_MEDIA_PLUGIN_H
 
 #include<libminisip/libminisip_config.h>
-#include<libminisip/mediahandler/Media.h>
+#include<libminisip/media/Media.h>
 
 class Media;
 class SipSoftPhoneConfiguration;

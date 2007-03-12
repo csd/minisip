@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 #include"G711CODEC.h"
 
 using namespace std;

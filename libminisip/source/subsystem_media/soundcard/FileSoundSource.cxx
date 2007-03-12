@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/FileSoundSource.h>
+#include<libminisip/media/soundcard/FileSoundSource.h>
 #include<fstream>
 
 using namespace std;

@@ -39,7 +39,7 @@
 #	include<unistd.h>
 #endif
 
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 #include<stdio.h>
 #include <fcntl.h>

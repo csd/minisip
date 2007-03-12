@@ -24,14 +24,14 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/SDESItem.h>
-#include<libminisip/rtp/SDES_CNAME.h>
-#include<libminisip/rtp/SDES_NAME.h>
-#include<libminisip/rtp/SDES_EMAIL.h>
-#include<libminisip/rtp/SDES_PHONE.h>
-#include<libminisip/rtp/SDES_LOC.h>
-#include<libminisip/rtp/SDES_TOOL.h>
-#include<libminisip/rtp/SDES_NOTE.h>
+#include<libminisip/media/rtp/SDESItem.h>
+#include<libminisip/media/rtp/SDES_CNAME.h>
+#include<libminisip/media/rtp/SDES_NAME.h>
+#include<libminisip/media/rtp/SDES_EMAIL.h>
+#include<libminisip/media/rtp/SDES_PHONE.h>
+#include<libminisip/media/rtp/SDES_LOC.h>
+#include<libminisip/media/rtp/SDES_TOOL.h>
+#include<libminisip/media/rtp/SDES_NOTE.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

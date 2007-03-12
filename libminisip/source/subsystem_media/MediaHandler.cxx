@@ -24,27 +24,27 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 
 #include<string.h>
-#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
 #include<libmikey/KeyAgreement.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/mediahandler/Session.h>
-#include<libminisip/mediahandler/MediaStream.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/media/Session.h>
+#include<libminisip/media/MediaStream.h>
 
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/RtpReceiver.h>
+#include<libminisip/media/MediaCommandString.h>
 #include<libmnetutil/UDPSocket.h>
 
-#include<libminisip/soundcard/SoundIO.h>
-#include<libminisip/soundcard/SoundDevice.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/soundcard/SoundIO.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
+#include<libminisip/media/codecs/Codec.h>
 
-#include<libminisip/mediahandler/CallRecorder.h>
+#include<libminisip/media/CallRecorder.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

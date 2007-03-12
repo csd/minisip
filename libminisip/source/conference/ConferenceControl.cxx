@@ -24,12 +24,12 @@
 
 #include<config.h>
 
-#include<libminisip/conference/ConferenceControl.h>
+#include<libminisip/signaling/conference/ConferenceControl.h>
 
 #include<assert.h>
 #include<stdio.h>
 #include<vector>
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libminisip/gui/Gui.h>
 
 #include<libmutil/MemObject.h>

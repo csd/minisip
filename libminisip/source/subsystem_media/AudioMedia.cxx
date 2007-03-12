@@ -24,16 +24,16 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/AudioMedia.h>
+#include<libminisip/media/AudioMedia.h>
 
-#include<libminisip/rtp/RtpHeader.h>
-#include<libminisip/mediahandler/MediaStream.h>
-#include<libminisip/soundcard/FileSoundSource.h>
+#include<libminisip/media/rtp/RtpHeader.h>
+#include<libminisip/media/MediaStream.h>
+#include<libminisip/media/soundcard/FileSoundSource.h>
 
-#include<libminisip/soundcard/Resampler.h>
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/Resampler.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
-#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/media/rtp/RtpPacket.h>
 
 #define RINGTONE_SOURCE_ID 0x42124212
 

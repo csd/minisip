@@ -23,8 +23,8 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SoundDriver.h>
-#include<libminisip/soundcard/SoundDriverRegistry.h>
+#include<libminisip/media/soundcard/SoundDriver.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/MPlugin.h>
 #include<portaudio.h>
 

@@ -24,12 +24,12 @@
 #include<config.h>
 #include<iostream>
 
-#include<libminisip/soundcard/SoundDriverRegistry.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/dbg.h>
 #include"FileSoundDriver.h"
 
 // #ifdef PORTAUDIO_SUPPORT
-// #include<libminisip/soundcard/PortAudioDriver.h>
+// #include<libminisip/media/soundcard/PortAudioDriver.h>
 // #endif
 
 using namespace std;

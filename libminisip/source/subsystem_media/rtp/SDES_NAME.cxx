@@ -25,7 +25,7 @@
 #include <config.h>
 
 #include<libmutil/massert.h>
-#include<libminisip/rtp/SDES_NAME.h>
+#include<libminisip/media/rtp/SDES_NAME.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

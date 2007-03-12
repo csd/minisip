@@ -32,8 +32,8 @@
 
 #include<libmnetutil/IPAddress.h>
 
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/GroupList.h>
+#include<libminisip/signaling/p2t/P2T.h>
+#include<libminisip/signaling/p2t/GroupList.h>
 
 
 /**

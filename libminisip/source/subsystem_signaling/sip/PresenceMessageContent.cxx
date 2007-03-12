@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<libminisip/sip/PresenceMessageContent.h>
+#include<libminisip/signaling/sip/PresenceMessageContent.h>
 
 using namespace std;
 

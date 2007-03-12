@@ -25,7 +25,7 @@
 
 #include"X11Display.h"
 #include<sys/time.h>
-#include<libminisip/video/VideoException.h>
+#include<libminisip/media/video/VideoException.h>
 #include<X11/Xatom.h>
 
 using namespace std;

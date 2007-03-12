@@ -25,7 +25,7 @@
 
 #include<config.h>
 #include<libmutil/merror.h>
-#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/media/soundcard/Resampler.h>
 #include"SimpleResampler.h"
 
 #include<iostream>

@@ -24,16 +24,16 @@
 
 #include <config.h>
 
-#include<libminisip/mediahandler/Media.h>
+#include<libminisip/media/Media.h>
 
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/soundcard/SoundIO.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/media/soundcard/SoundIO.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include<libminisip/mediahandler/MediaStream.h>
-#include<libminisip/mediahandler/RtpReceiver.h>
+#include<libminisip/media/MediaStream.h>
+#include<libminisip/media/RtpReceiver.h>
 #include<libmutil/stringutils.h>
-#include<libminisip/sdp/SdpHeaderM.h>
-#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpHeaderM.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

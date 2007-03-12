@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/media/soundcard/Resampler.h>
 
 class SimpleResampler : public Resampler {
 	public: 

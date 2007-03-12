@@ -32,7 +32,7 @@
 #include<list>
 #include<string>
 
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/ContactDb.h>
 
 class PhoneBookPerson;
 class PhoneBookIo;

@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SilenceSensor.h>
+#include<libminisip/media/soundcard/SilenceSensor.h>
 
 static int iabs(int i){
     if (i<0)

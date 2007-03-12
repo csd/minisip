@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 
-#include<libminisip/mediahandler/Session.h>
+#include<libminisip/media/Session.h>
 
 
 class LIBMINISIP_API SessionRegistry{

@@ -24,8 +24,8 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtpHeader.h>
-#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/media/rtp/RtpHeader.h>
+#include<libminisip/media/rtp/RtpPacket.h>
 
 #ifdef DEBUG_OUTPUT
 #	include<iostream>

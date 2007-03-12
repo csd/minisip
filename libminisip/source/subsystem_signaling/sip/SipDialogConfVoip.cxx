@@ -33,7 +33,7 @@
 
 #include<config.h>
 
-#include<libminisip/sip/SipDialogConfVoip.h>
+#include<libminisip/signaling/sip/SipDialogConfVoip.h>
 
 #include<libmutil/massert.h>
 
@@ -47,8 +47,8 @@
 #include<libmsip/SipHeaderWarning.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -57,7 +57,7 @@
 #include <time.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 #include<libmutil/MemObject.h>
 #include <iostream>
 #include<time.h>

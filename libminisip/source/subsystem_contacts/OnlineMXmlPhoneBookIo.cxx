@@ -24,10 +24,10 @@
 
 #include<config.h>
 
-#include<libminisip/contactdb/OnlineMXmlPhoneBookIo.h>
+#include<libminisip/contacts/OnlineMXmlPhoneBookIo.h>
 
-#include<libminisip/contactdb/PhoneBook.h>
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/PhoneBook.h>
+#include<libminisip/contacts/ContactDb.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/stringutils.h>
@@ -35,7 +35,7 @@
 #include<string>
 #include<fstream>
 #include<vector>
-#include<libminisip/configbackend/OnlineConfBackend.h>
+#include<libminisip/config/OnlineConfBackend.h>
 using namespace std;
 
 OnlineMXmlPhoneBookIo::OnlineMXmlPhoneBookIo(OnlineConfBack *confback)

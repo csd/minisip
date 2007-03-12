@@ -44,11 +44,11 @@
 #include<libmsip/SipBye.h>
 #include<libmsip/SipResponse.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 //P2T//
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/SipDialogP2T.h>
+#include<libminisip/signaling/p2t/P2T.h>
+#include<libminisip/signaling/p2t/SipDialogP2T.h>
 
 
 /** 

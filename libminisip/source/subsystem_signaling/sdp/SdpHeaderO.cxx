@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<libminisip/sdp/SdpHeaderO.h>
+#include<libminisip/signaling/sdp/SdpHeaderO.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

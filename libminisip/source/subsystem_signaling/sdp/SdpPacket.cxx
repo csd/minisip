@@ -32,18 +32,18 @@
 
 #include<config.h>
 
-#include<libminisip/sdp/SdpPacket.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
 #include<libmnetutil/NetworkException.h>
 
 #include<libmutil/stringutils.h>
 
-#include<libminisip/sdp/SdpHeaderV.h>
-#include<libminisip/sdp/SdpHeaderO.h>
-#include<libminisip/sdp/SdpHeaderS.h>
-#include<libminisip/sdp/SdpHeaderC.h>
-#include<libminisip/sdp/SdpHeaderT.h>
-#include<libminisip/sdp/SdpHeaderM.h>
-#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpHeaderV.h>
+#include<libminisip/signaling/sdp/SdpHeaderO.h>
+#include<libminisip/signaling/sdp/SdpHeaderS.h>
+#include<libminisip/signaling/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpHeaderT.h>
+#include<libminisip/signaling/sdp/SdpHeaderM.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
 
 
 #include<iostream>

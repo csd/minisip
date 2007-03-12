@@ -29,10 +29,10 @@
 
 #include<libmutil/minilist.h>
 
-#include<libminisip/sip/Sip.h>
+#include<libminisip/signaling/sip/Sip.h>
 #include<libminisip/gui/Gui.h>
-#include<libminisip/conference/ConferenceControl.h> 
-#include<libminisip/conference/ConfCallback.h>
+#include<libminisip/signaling/conference/ConferenceControl.h> 
+#include<libminisip/signaling/conference/ConfCallback.h>
 
 class Gui;
 

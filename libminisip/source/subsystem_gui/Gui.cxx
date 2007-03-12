@@ -26,7 +26,7 @@
 
 #include<libminisip/gui/Gui.h>
 
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

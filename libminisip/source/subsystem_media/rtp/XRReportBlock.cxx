@@ -24,8 +24,8 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/XRReportBlock.h>
-#include<libminisip/rtp/XRVoIPReportBlock.h>
+#include<libminisip/media/rtp/XRReportBlock.h>
+#include<libminisip/media/rtp/XRVoIPReportBlock.h>
 
 #include<stdlib.h>
 //#include<netinet/in.h>

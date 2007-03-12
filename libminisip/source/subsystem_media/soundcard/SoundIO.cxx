@@ -41,8 +41,8 @@
 #include<iostream>
 #include<stdio.h>
 
-#include<libminisip/soundcard/SoundIO.h>
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/SoundIO.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
 #include<libmutil/massert.h>
 #include<signal.h>
@@ -50,12 +50,12 @@
 
 #include<libmutil/mtime.h>
 
-#include<libminisip/soundcard/AudioMixerSpatial.h>
-#include<libminisip/soundcard/AudioMixerSimple.h>
-#include<libminisip/spaudio/SpAudio.h>
+#include<libminisip/media/soundcard/AudioMixerSpatial.h>
+#include<libminisip/media/soundcard/AudioMixerSimple.h>
+#include<libminisip/media/spaudio/SpAudio.h>
 
 #ifdef AEC_SUPPORT
-#	include<libminisip/aec/aec.h>
+#	include<libminisip/media/aec/aec.h>
 #endif
 
 #ifdef _MSC_VER
@@ -65,20 +65,20 @@
 #	include<unistd.h>
 #endif
 
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 #ifndef WIN32
 #	ifdef ENABLE_OSS
-#	include<libminisip/soundcard/OssSoundDevice.h>
+#	include<libminisip/media/soundcard/OssSoundDevice.h>
 #	endif
 #	ifdef HAVE_LIBASOUND
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/media/soundcard/SoundDevice.h>
 #	endif
 #else
 #	ifdef DSOUND
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/media/soundcard/SoundDevice.h>
 #	elif defined(WAVE_SOUND)
-#		include<libminisip/soundcard/SoundDevice.h>
+#		include<libminisip/media/soundcard/SoundDevice.h>
 #	else
 #		error "NO Windows AUDIO Defined!"
 #	endif

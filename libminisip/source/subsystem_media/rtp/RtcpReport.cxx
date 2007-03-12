@@ -24,11 +24,11 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpReport.h>
-#include<libminisip/rtp/RtcpReportSR.h>
-#include<libminisip/rtp/RtcpReportRR.h>
-#include<libminisip/rtp/RtcpReportSDES.h>
-#include<libminisip/rtp/RtcpReportXR.h>
+#include<libminisip/media/rtp/RtcpReport.h>
+#include<libminisip/media/rtp/RtcpReportSR.h>
+#include<libminisip/media/rtp/RtcpReportRR.h>
+#include<libminisip/media/rtp/RtcpReportSDES.h>
+#include<libminisip/media/rtp/RtcpReportXR.h>
 
 #ifdef DEBUG_OUTPUT
 #	include<iostream>

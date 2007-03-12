@@ -41,8 +41,8 @@
 #	include<unistd.h>
 #endif
 
-#include<libminisip/rtp/RtcpDebugMonitor.h>
-#include<libminisip/rtp/RtcpPacket.h>
+#include<libminisip/media/rtp/RtcpDebugMonitor.h>
+#include<libminisip/media/rtp/RtcpPacket.h>
 #include<libmutil/Thread.h>
 
 #ifdef DEBUG_OUTPUT

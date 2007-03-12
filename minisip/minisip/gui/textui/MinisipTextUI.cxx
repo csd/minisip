@@ -25,16 +25,16 @@
 #include<stdio.h>
 #include<vector>
 #include"MinisipTextUI.h"
-#include<libminisip/conference/ConferenceControl.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/signaling/conference/ConferenceControl.h>
+#include<libminisip/media/MediaCommandString.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/termmanip.h>
 
 #include<libmsip/SipCommandString.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 using namespace std;
 

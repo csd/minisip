@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/soundcard/SoundSource.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
 class Resampler;
 

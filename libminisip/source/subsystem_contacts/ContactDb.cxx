@@ -24,9 +24,9 @@
 
 #include<config.h>
 
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/ContactDb.h>
 
-#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/contacts/PhoneBook.h>
 
 using namespace std;
 

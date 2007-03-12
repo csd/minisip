@@ -30,8 +30,8 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/Thread.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/MediaHandler.h>
 
 #include<string>
 

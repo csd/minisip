@@ -25,9 +25,9 @@
 #include<config.h>
 
 #include"Dc1394Grabber.h"
-#include<libminisip/video/ImageHandler.h>
-#include<libminisip/video/VideoMedia.h>
-#include<libminisip/video/VideoException.h>
+#include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/video/VideoMedia.h>
+#include<libminisip/media/video/VideoException.h>
 #include<stdio.h>
 #include<errno.h>
 #include<libmutil/mtime.h>

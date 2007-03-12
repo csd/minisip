@@ -7,8 +7,8 @@
 #include <commctrl.h>
 #include <iostream>
 #include <mmsystem.h>
-#include<libminisip/soundcard/SoundDevice.h>
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 class LIBMINISIP_API WaveSoundDevice:public SoundDevice{
 

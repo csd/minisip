@@ -334,7 +334,7 @@ ulaw2alaw(
 //#include "memory.h"
 //#include "audio_types.h"
 //#include "codec_types.h"
-//#include<libminisip/codecs/g711/codec_g711.h>
+//#include<libminisip/media/codecs/g711/codec_g711.h>
 
 /*
 short         mulawtolin[256];

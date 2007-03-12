@@ -24,8 +24,8 @@
 
 #include<config.h>
 
-#include<libminisip/configbackend/ConfBackend.h>
-#include<libminisip/configbackend/OnlineConfBackend.h>
+#include<libminisip/config/ConfBackend.h>
+#include<libminisip/config/OnlineConfBackend.h>
 #include"MXmlConfBackend.h"
 using namespace std;
 

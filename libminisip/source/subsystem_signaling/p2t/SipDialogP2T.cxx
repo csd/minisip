@@ -26,18 +26,18 @@
 
 #include<assert.h>
 #include<time.h>
-#include<libminisip/p2t/SipDialogP2T.h>
+#include<libminisip/signaling/p2t/SipDialogP2T.h>
 #include<libmsip/SipDialogContainer.h>
 //#include<libmsip/SipMessageTransport.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/p2t/RtcpTransactionGetFloor.h>
-#include<libminisip/p2t/RtcpTransactionGrantFloor.h>
-#include<libminisip/p2t/RtcpTransactionReleaseFloor.h>
-#include<libminisip/p2t/RtcpTransactionIdleFloor.h>
-#include<libminisip/p2t/RtcpTransactionTakenFloor.h>
+#include<libminisip/signaling/p2t/RtcpTransactionGetFloor.h>
+#include<libminisip/signaling/p2t/RtcpTransactionGrantFloor.h>
+#include<libminisip/signaling/p2t/RtcpTransactionReleaseFloor.h>
+#include<libminisip/signaling/p2t/RtcpTransactionIdleFloor.h>
+#include<libminisip/signaling/p2t/RtcpTransactionTakenFloor.h>
 #include<libmsip/SipDialog.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 #include<libmutil/stringutils.h>
 #include<sstream>
 

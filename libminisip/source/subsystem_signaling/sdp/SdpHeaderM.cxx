@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<libminisip/sdp/SdpHeaderM.h>
+#include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libmutil/stringutils.h>
 
 #ifdef DEBUG_OUTPUT
@@ -41,7 +41,7 @@
 
 using namespace std;
 
-#include<libminisip/sdp/SdpHeaderA.h>
+#include<libminisip/signaling/sdp/SdpHeaderA.h>
 
 SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 

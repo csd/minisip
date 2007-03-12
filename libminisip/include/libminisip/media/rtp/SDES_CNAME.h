@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/rtp/SDESItem.h>
+#include<libminisip/media/rtp/SDESItem.h>
 
 #include<string>
 

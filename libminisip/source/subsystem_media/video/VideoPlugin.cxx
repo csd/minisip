@@ -22,13 +22,13 @@
 */
 
 #include<config.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/mediahandler/Media.h>
-#include<libminisip/video/VideoMedia.h>
-#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/codec/AVCoder.h>
-#include<libminisip/video/codec/VideoCodec.h>
-#include<libminisip/video/mixer/ImageMixer.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/media/video/VideoMedia.h>
+#include<libminisip/media/video/grabber/Grabber.h>
+#include<libminisip/media/video/codec/AVCoder.h>
+#include<libminisip/media/video/codec/VideoCodec.h>
+#include<libminisip/media/video/mixer/ImageMixer.h>
 
 class VideoPlugin : public MediaPlugin{
 	public:

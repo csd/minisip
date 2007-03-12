@@ -25,7 +25,7 @@
 
 #include"GtkMainUI.h"
 #include<libminisip/Minisip.h>
-#include<libminisip/configbackend/UserConfig.h>
+#include<libminisip/config/UserConfig.h>
 
 #include<libmnetutil/TCPSocket.h>
 

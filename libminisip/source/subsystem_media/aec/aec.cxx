@@ -17,7 +17,7 @@
 #include <math.h>
 #include <string.h>
 
-#include<libminisip/aec/aec.h>
+#include<libminisip/media/aec/aec.h>
 
 #ifdef _WIN32_WCE
 # define M_PI           3.14159265358979323846  /* pi */

@@ -25,7 +25,7 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/RtcpReceiver.h>
+#include<libminisip/signaling/p2t/RtcpReceiver.h>
 
 #ifndef _MSC_VER
 #include<unistd.h>
@@ -52,10 +52,10 @@
 #include<libmnetutil/IPAddress.h>
 #include<vector>
 #include<libminisip/stun/STUN.h>
-#include<libminisip/p2t/RtcpAPP.h>
+#include<libminisip/signaling/p2t/RtcpAPP.h>
 #include<libmutil/dbg.h>
 
-//#include<libminisip/sip/DefaultCallHandler.h>
+//#include<libminisip/signaling/sip/DefaultCallHandler.h>
 //#include<libmsip/SipDialogContainer.h>
 //#include<libmsip/SipInvite.h>
 #include<libmsip/SipSMCommand.h>

@@ -29,7 +29,7 @@
 
 #include<libmutil/CommandString.h>
 
-#include<libminisip/conference/ConfMember.h>
+#include<libminisip/signaling/conference/ConfMember.h>
 
 #include<string>
 

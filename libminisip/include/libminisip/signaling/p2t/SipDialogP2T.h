@@ -35,15 +35,15 @@
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipStack.h>
 
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/p2t/RtcpReceiver.h>
-#include<libminisip/p2t/RtcpSender.h>
-#include<libminisip/p2t/GroupList.h>
-#include<libminisip/p2t/GroupListUserElement.h>
-#include<libminisip/p2t/GroupListClient.h>
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/mediahandler/MediaHandler.h>
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/signaling/p2t/RtcpReceiver.h>
+#include<libminisip/signaling/p2t/RtcpSender.h>
+#include<libminisip/signaling/p2t/GroupList.h>
+#include<libminisip/signaling/p2t/GroupListUserElement.h>
+#include<libminisip/signaling/p2t/GroupListClient.h>
+#include<libminisip/signaling/p2t/P2T.h>
+#include<libminisip/media/MediaHandler.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 
 /**

@@ -29,7 +29,7 @@
 
 #include<vector>
 
-#include<libminisip/rtp/SDESItem.h>
+#include<libminisip/media/rtp/SDESItem.h>
 
 class LIBMINISIP_API SDESChunk{
 	public:

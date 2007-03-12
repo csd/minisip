@@ -27,11 +27,11 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
-#include<libminisip/video/VideoMedia.h>
+#include<libminisip/media/video/VideoMedia.h>
 
 class LIBMINISIP_API ImageMixer : public ImageHandler, public MObject{
 	public:

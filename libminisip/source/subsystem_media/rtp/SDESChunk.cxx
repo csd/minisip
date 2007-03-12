@@ -24,8 +24,8 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/SDESChunk.h>
-#include<libminisip/rtp/SDESItem.h>
+#include<libminisip/media/rtp/SDESChunk.h>
+#include<libminisip/media/rtp/SDESItem.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

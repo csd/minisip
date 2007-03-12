@@ -25,11 +25,11 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/GroupListServer.h>
+#include<libminisip/signaling/p2t/GroupListServer.h>
 #include <ctype.h>
 #include<libmutil/dbg.h>
 #include<libmnetutil/ServerSocket.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 
 GroupListServer::GroupListServer(MRef<SipSoftPhoneConfiguration*>config,  int32_t localPort){
 	

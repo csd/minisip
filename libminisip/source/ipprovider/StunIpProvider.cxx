@@ -26,7 +26,7 @@
 
 #include<libminisip/ipprovider/StunIpProvider.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/IPAddress.h>
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkFunctions.h>

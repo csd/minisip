@@ -25,17 +25,17 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/SoundDevice.h>
-#include<libminisip/soundcard/SoundDriverRegistry.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
 
 #ifndef WIN32
 #ifdef ENABLE_OSS
-#	include<libminisip/soundcard/OssSoundDevice.h>
+#	include<libminisip/media/soundcard/OssSoundDevice.h>
 #endif
 #endif
 
 #ifdef WAVE_SOUND
-#	include<libminisip/soundcard/WaveSoundDevice.h>
+#	include<libminisip/media/soundcard/WaveSoundDevice.h>
 #endif
 
 #include<stdio.h>

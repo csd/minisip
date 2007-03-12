@@ -24,10 +24,10 @@
 
 #include<config.h>
 
-#include<libminisip/contactdb/MXmlPhoneBookIo.h>
+#include<libminisip/contacts/MXmlPhoneBookIo.h>
 
-#include<libminisip/contactdb/PhoneBook.h>
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/PhoneBook.h>
+#include<libminisip/contacts/ContactDb.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/stringutils.h>

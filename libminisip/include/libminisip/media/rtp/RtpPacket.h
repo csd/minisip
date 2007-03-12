@@ -32,7 +32,7 @@
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/IPAddress.h>
 
-#include<libminisip/rtp/RtpHeader.h>
+#include<libminisip/media/rtp/RtpHeader.h>
 
 /**
  * This class implements the RTP header.

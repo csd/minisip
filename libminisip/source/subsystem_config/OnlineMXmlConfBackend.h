@@ -30,7 +30,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/configbackend/ConfBackend.h>
+#include<libminisip/config/ConfBackend.h>
 #include<vector>
 using namespace std;
 class XMLFileParser;

@@ -35,7 +35,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/sdp/SdpHeader.h>
+#include<libminisip/signaling/sdp/SdpHeader.h>
 
 
 class LIBMINISIP_API SdpHeaderO : public SdpHeader{

@@ -32,8 +32,8 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/minilist.h>
 
-#include<libminisip/conference/ConfCallback.h>
-#include<libminisip/conference/ConfMember.h>
+#include<libminisip/signaling/conference/ConfCallback.h>
+#include<libminisip/signaling/conference/ConfMember.h>
 
 /**
  * A text user interface. 

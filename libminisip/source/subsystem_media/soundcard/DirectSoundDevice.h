@@ -28,7 +28,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/soundcard/SoundDevice.h>
+#include<libminisip/media/soundcard/SoundDevice.h>
 
 #include<dsound.h>
 

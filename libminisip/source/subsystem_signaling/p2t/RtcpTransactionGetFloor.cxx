@@ -33,13 +33,13 @@
 #include <config.h>
 
 #include<assert.h>
-#include<libminisip/p2t/RtcpTransactionGetFloor.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/signaling/p2t/RtcpTransactionGetFloor.h>
+#include<libminisip/signaling/p2t/P2T.h>
 #include<libmsip/SipTransactionUtils.h>
 #include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipDialog.h>
 #include<libmutil/stringutils.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 
 
 bool RtcpTransactionGetFloor::a0_start_reqsent( const SipSMCommand &command)

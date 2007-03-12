@@ -23,8 +23,8 @@
 #include<config.h>
 #include"PhoneBook.h"
 #include"ContactDialog.h"
-#include<libminisip/contactdb/PhoneBook.h>
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/contacts/PhoneBook.h>
+#include<libminisip/contacts/ContactDb.h>
 
 using namespace std;
 

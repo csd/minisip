@@ -24,12 +24,12 @@
 
 #include<config.h>
 #include<libmutil/dbg.h>
-#include<libminisip/video/VideoMedia.h>
-#include<libminisip/video/VideoException.h>
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/codec/AVDecoder.h>
-#include<libminisip/video/grabber/Grabber.h>
+#include<libminisip/media/video/VideoMedia.h>
+#include<libminisip/media/video/VideoException.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
+#include<libminisip/media/video/codec/AVDecoder.h>
+#include<libminisip/media/video/grabber/Grabber.h>
 #ifdef HAVE_LINUX_VIDEODEV_H
 #include"V4LGrabber.h"
 #endif

@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/AudioMixer.h>
+#include<libminisip/media/soundcard/AudioMixer.h>
 
 using namespace std;
 

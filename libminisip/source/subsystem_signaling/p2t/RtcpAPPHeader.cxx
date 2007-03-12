@@ -24,8 +24,8 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/RtcpAPPHeader.h>
-#include<libminisip/p2t/RtcpAPP.h>
+#include<libminisip/signaling/p2t/RtcpAPPHeader.h>
+#include<libminisip/signaling/p2t/RtcpAPP.h>
 #include<libmutil/dbg.h>
 
 RtcpAPPHeader::RtcpAPPHeader(){

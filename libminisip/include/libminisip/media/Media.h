@@ -31,12 +31,12 @@
 #include<libmutil/MPlugin.h>
 #include<libmutil/MSingleton.h>
 
-#include<libminisip/soundcard/SoundRecorderCallback.h>
-#include<libminisip/soundcard/SoundIO.h>
+#include<libminisip/media/soundcard/SoundRecorderCallback.h>
+#include<libminisip/media/soundcard/SoundIO.h>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 
-#include<libminisip/rtp/RtpPacket.h>
+#include<libminisip/media/rtp/RtpPacket.h>
 
 class SoundIO;
 class MediaStreamSender;

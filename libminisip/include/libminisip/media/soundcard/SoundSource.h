@@ -31,8 +31,8 @@
 
 #include<libmutil/Mutex.h>
 
-#include<libminisip/soundcard/SoundIOPLCInterface.h>
-#include<libminisip/soundcard/Resampler.h>
+#include<libminisip/media/soundcard/SoundIOPLCInterface.h>
+#include<libminisip/media/soundcard/Resampler.h>
 
 #define LEFT 1
 #define RIGHT 5

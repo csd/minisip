@@ -26,7 +26,7 @@
 
 #include<libminisip/ipprovider/SimpleIpProvider.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/UDPSocket.h>
 

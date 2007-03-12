@@ -22,14 +22,14 @@
  *          Johan Bilien <jobi@via.ecp.fr>
 */
 
-#include<libminisip/video/codec/VideoCodec.h>
-#include<libminisip/video/codec/AVCoder.h>
-#include<libminisip/video/codec/AVDecoder.h>
-#include<libminisip/mediahandler/MediaHandler.h>
-#include<libminisip/codecs/Codec.h>
-#include<libminisip/video/grabber/Grabber.h>
-#include<libminisip/video/display/VideoDisplay.h>
-#include<libminisip/video/VideoException.h>
+#include<libminisip/media/video/codec/VideoCodec.h>
+#include<libminisip/media/video/codec/AVCoder.h>
+#include<libminisip/media/video/codec/AVDecoder.h>
+#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/codecs/Codec.h>
+#include<libminisip/media/video/grabber/Grabber.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
+#include<libminisip/media/video/VideoException.h>
 
 #include<libmutil/dbg.h>
 

@@ -32,7 +32,7 @@
 */
 #include<config.h>
 
-#include<libminisip/sip/SipDialogPresenceClient.h>
+#include<libminisip/signaling/sip/SipDialogPresenceClient.h>
 
 #include<libmutil/massert.h>
 #include<libmsip/SipHeaderFrom.h>
@@ -41,7 +41,7 @@
 #include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/termmanip.h>
@@ -50,7 +50,7 @@
 #include <time.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipHeaderSubscriptionState.h>
 

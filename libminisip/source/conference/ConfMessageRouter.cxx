@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #include<iostream>
 

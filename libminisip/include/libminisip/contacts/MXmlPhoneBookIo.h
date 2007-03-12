@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/contacts/PhoneBook.h>
 
 #include<string>
 

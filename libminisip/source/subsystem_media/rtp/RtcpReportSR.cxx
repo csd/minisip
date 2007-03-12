@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpReportSR.h>
+#include<libminisip/media/rtp/RtcpReportSR.h>
 #include<iostream>
 
 using namespace std;

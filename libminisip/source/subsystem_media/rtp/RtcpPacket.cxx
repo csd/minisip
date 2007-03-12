@@ -24,8 +24,8 @@
 
 #include <config.h>
 
-#include<libminisip/rtp/RtcpPacket.h>
-#include<libminisip/rtp/RtcpReport.h>
+#include<libminisip/media/rtp/RtcpPacket.h>
+#include<libminisip/media/rtp/RtcpReport.h>
 
 #ifdef DEBUG_OUTPUT
 #include<iostream>

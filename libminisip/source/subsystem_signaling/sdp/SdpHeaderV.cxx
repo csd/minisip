@@ -32,7 +32,7 @@
 
 #include<config.h>
 
-#include<libminisip/sdp/SdpHeaderV.h>
+#include<libminisip/signaling/sdp/SdpHeaderV.h>
 #include<libmutil/stringutils.h>
 #include<stdlib.h>
 

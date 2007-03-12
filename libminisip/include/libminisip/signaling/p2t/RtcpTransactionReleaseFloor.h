@@ -40,7 +40,7 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipTransaction.h>
 
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/signaling/p2t/P2T.h>
 
 /** 
  * implements the Floor Release Procedure if the local user releases the floor.

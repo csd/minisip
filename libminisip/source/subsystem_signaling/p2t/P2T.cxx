@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/signaling/p2t/P2T.h>
 
 //Performance measurements
 const string P2T::PERFORMANCE_FILE = "/home/erik/florian_performance/result";

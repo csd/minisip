@@ -25,30 +25,30 @@
 
 #include<config.h>
 
-#include<libminisip/sip/Sip.h>
+#include<libminisip/signaling/sip/Sip.h>
 
 #include<libmnetutil/NetworkException.h>
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/dbg.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libmsip/SipDialogManagement.h>
-#include<libminisip/sip/SipDialogVoipClient.h>
-#include<libminisip/sip/SipDialogConfVoip.h>
+#include<libminisip/signaling/sip/SipDialogVoipClient.h>
+#include<libminisip/signaling/sip/SipDialogConfVoip.h>
 #include<libmsip/SipCommandString.h>
 
 #ifdef P2T_SUPPORT
-#include<libminisip/p2t/SipDialogP2T.h>
-#include<libminisip/p2t/GroupListClient.h>
-#include<libminisip/p2t/GroupListServer.h>
-#include<libminisip/p2t/GroupList.h>
+#include<libminisip/signaling/p2t/SipDialogP2T.h>
+#include<libminisip/signaling/p2t/GroupListClient.h>
+#include<libminisip/signaling/p2t/GroupListServer.h>
+#include<libminisip/signaling/p2t/GroupList.h>
 #endif
 
-#include<libminisip/sip/PresenceMessageContent.h>
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/sip/PresenceMessageContent.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #include<libmutil/dbg.h>
 #include<libmutil/termmanip.h>

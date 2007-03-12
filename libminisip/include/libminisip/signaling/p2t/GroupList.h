@@ -33,9 +33,9 @@
 
 #include<libmnetutil/IPAddress.h>
 
-#include<libminisip/p2t/P2T.h>
-#include<libminisip/p2t/GroupListUserElement.h>
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/signaling/p2t/P2T.h>
+#include<libminisip/signaling/p2t/GroupListUserElement.h>
+#include<libminisip/media/codecs/Codec.h>
 
 /**
  * the GroupList contains all information about a P2T Session

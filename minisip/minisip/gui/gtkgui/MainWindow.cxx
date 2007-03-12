@@ -24,15 +24,15 @@
 
 #include"MainWindow.h"
 
-#include <libminisip/conference/ConferenceControl.h>
+#include <libminisip/signaling/conference/ConferenceControl.h>
 
 #include<libmutil/stringutils.h>
 
 #include<libmsip/SipCommandString.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/contactdb/ContactDb.h>
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/contacts/ContactDb.h>
+#include<libminisip/media/MediaCommandString.h>
 
 #include"CallWidget.h"
 #include"ConferenceWidget.h"
@@ -50,8 +50,8 @@
 #include"AccountsList.h"
 #include"AccountsStatusWidget.h"
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/contactdb/ContactDb.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/contacts/ContactDb.h>
 #include<libmsip/SipCommandString.h>
 
 #ifdef HAVE_LIBGLADEMM_2_6

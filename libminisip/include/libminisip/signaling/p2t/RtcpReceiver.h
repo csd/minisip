@@ -33,9 +33,9 @@
 
 #include<libmsip/SipDialog.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/gui/Gui.h>
-#include<libminisip/p2t/P2T.h>
+#include<libminisip/signaling/p2t/P2T.h>
 
 /**
  * receives RTCP packets.

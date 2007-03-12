@@ -33,7 +33,7 @@
 
 #include <config.h>
 
-#include<libminisip/p2t/GroupList.h>
+#include<libminisip/signaling/p2t/GroupList.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/XMLParser.h>
 

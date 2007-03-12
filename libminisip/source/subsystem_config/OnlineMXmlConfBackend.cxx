@@ -26,8 +26,8 @@
 #include<config.h>
 
 #include"OnlineMXmlConfBackend.h"
-#include"libminisip/configbackend/OnlineConfBackend.h"
-#include<libminisip/configbackend/UserConfig.h>
+#include"libminisip/config/OnlineConfBackend.h"
+#include<libminisip/config/UserConfig.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/stringutils.h>

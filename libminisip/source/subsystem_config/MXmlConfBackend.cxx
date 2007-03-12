@@ -25,7 +25,7 @@
 #include<config.h>
 
 #include"MXmlConfBackend.h"
-#include<libminisip/configbackend/UserConfig.h>
+#include<libminisip/config/UserConfig.h>
 
 #include<libmutil/XMLParser.h>
 #include<libmutil/stringutils.h>

@@ -36,9 +36,9 @@
 #include <libmutil/MessageRouter.h>
 #include <libmsip/SipSMCommand.h>
 
-#include <libminisip/mediahandler/MediaStream.h>
-#include <libminisip/rtp/SRtpPacket.h>
-#include <libminisip/rtp/CryptoContext.h>
+#include <libminisip/media/MediaStream.h>
+#include <libminisip/media/rtp/SRtpPacket.h>
+#include <libminisip/media/rtp/CryptoContext.h>
 
 #include <libzrtpcpp/ZrtpCallback.h>
 #include <libzrtpcpp/ZRtp.h>

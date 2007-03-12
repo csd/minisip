@@ -30,7 +30,7 @@
 
 #include<string>
 
-#include<libminisip/video/ImageHandler.h>
+#include<libminisip/media/video/ImageHandler.h>
 
 #include<libmutil/MemObject.h>
 #include<avcodec.h>

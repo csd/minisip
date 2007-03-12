@@ -35,7 +35,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/soundcard/AudioMixer.h>
+#include<libminisip/media/soundcard/AudioMixer.h>
 
 class SoundSource;
 class SpAudio;

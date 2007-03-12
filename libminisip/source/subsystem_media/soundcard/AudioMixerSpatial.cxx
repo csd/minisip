@@ -31,9 +31,9 @@
 
 #include<config.h>
 
-#include<libminisip/soundcard/AudioMixerSpatial.h>
-#include<libminisip/soundcard/SoundSource.h>
-#include<libminisip/spaudio/SpAudio.h>
+#include<libminisip/media/soundcard/AudioMixerSpatial.h>
+#include<libminisip/media/soundcard/SoundSource.h>
+#include<libminisip/media/spaudio/SpAudio.h>
 
 	// cesc ... remove
 #include<libmutil/stringutils.h>

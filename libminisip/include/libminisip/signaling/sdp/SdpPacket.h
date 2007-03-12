@@ -44,9 +44,9 @@
 #include<libmsip/SipMessageContent.h>
 #include<libmsip/SipMessageContentFactory.h>
 
-#include<libminisip/sdp/SdpPacket.h>
-#include<libminisip/sdp/SdpHeader.h>
-#include<libminisip/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpPacket.h>
+#include<libminisip/signaling/sdp/SdpHeader.h>
+#include<libminisip/signaling/sdp/SdpHeaderC.h>
 
 MRef<SipMessageContent*> sdpSipMessageContentFactory(const std::string & buf, const std::string & ContentType);
 

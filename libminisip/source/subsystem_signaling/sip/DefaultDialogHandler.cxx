@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/sip/DefaultDialogHandler.h>
+#include<libminisip/signaling/sip/DefaultDialogHandler.h>
 
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/DnsNaptr.h>
@@ -41,23 +41,23 @@
 #include<libmutil/massert.h>
 #include<libmutil/Timestamp.h>
 
-#include<libminisip/sip/SipDialogVoipClient.h>
-#include<libminisip/sip/SipDialogVoipServer.h>
-#include<libminisip/sip/SipDialogConfVoip.h>
-#include<libminisip/sip/SipDialogPresenceClient.h>
-#include<libminisip/sip/SipDialogPresenceServer.h>
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/sip/SipDialogVoipClient.h>
+#include<libminisip/signaling/sip/SipDialogVoipServer.h>
+#include<libminisip/signaling/sip/SipDialogConfVoip.h>
+#include<libminisip/signaling/sip/SipDialogPresenceClient.h>
+#include<libminisip/signaling/sip/SipDialogPresenceServer.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
 #ifdef P2T_SUPPORT
-#	include<libminisip/p2t/P2T.h>
-#	include<libminisip/p2t/SipDialogP2Tuser.h>
+#	include<libminisip/signaling/p2t/P2T.h>
+#	include<libminisip/signaling/p2t/SipDialogP2Tuser.h>
 #endif
 
-#include<libminisip/mediahandler/MediaHandler.h>
+#include<libminisip/media/MediaHandler.h>
 
 
 #include<libmutil/dbg.h>
