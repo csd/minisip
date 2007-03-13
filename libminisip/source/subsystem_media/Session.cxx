@@ -50,7 +50,7 @@
 #include<libmutil/Timestamp.h>
 
 #ifdef ZRTP_SUPPORT
-#include <libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
+#include <libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #endif
 
 #ifdef _WIN32_WCE

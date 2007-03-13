@@ -36,7 +36,7 @@
 #include<libminisip/media/rtp/SRtpPacket.h>
 
 #ifdef ZRTP_SUPPORT
-#include <libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
+#include <libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include <time.h>
 class ZrtpHostBridgeMinisip;
 #endif

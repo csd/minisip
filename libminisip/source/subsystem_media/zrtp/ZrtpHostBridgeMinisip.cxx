@@ -22,7 +22,7 @@
 
 #include <config.h>
 
-#include <libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
+#include <libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include <libzrtpcpp/ZIDFile.h>
 #include <libzrtpcpp/ZrtpStateClass.h>
 

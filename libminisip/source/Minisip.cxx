@@ -75,7 +75,7 @@
 #include<libminisip/media/codecs/Codec.h>
 
 #ifdef ZRTP_SUPPORT
-#include<libminisip/signaling/zrtp/ZrtpHostBridgeMinisip.h>
+#include<libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #endif
 
 #include<stdlib.h>
