@@ -176,6 +176,7 @@ void BasicSoundSource::pushSound(short * samples,
 				temp[ tempVal ] = samples[i];
 			}
 			writeRet = cbuff->write( temp, cur * 2, true );
+			samples += cur;
 			nSamples -= cur;
 		}
 	}
