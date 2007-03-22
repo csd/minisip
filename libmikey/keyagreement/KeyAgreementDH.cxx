@@ -236,7 +236,6 @@ void PeerCertificates::setPeerCertificateChain( MRef<certificate_chain *> peerCh
 }
 
 int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
-	cerr << "start0000000000000000 peerUri is: " << peerUri <<endl;
 	if( peerCertChainPtr.isNull() || certDbPtr.isNull() )
 		return 0;
 
