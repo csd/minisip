@@ -72,11 +72,19 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 				break;
 			}
 		}
+
+
 	#ifdef DEBUG_OUTPUT
 		cerr << "SimpleIPProvider: preferred network interface = " << config->networkInterfaceName  << endl;
 		if( ipFound ) cerr << "SimpleIPProvider: preferred interface found" << endl;
 		else cerr << "SimpleIPProvider: preferred interface NOT found" << endl;
+		if ( ipFound && localIp=="" ){
+			cerr << "SimpleIPProvider: WARNING: prefered interface has no IP address configured"<<endl;
+		}
 	#endif
+		//If the preferred interface is without IP, continue searching...
+		if (localIp=="")
+			ipFound=false;
 	} 
 
 	//if ip is not found (either not specified or the adapter is not good ... 
