@@ -137,23 +137,23 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 			switch (sw_1_2){
 			case GDEnum::SUCCESS:
 				userAttemptTimer = 3;
-				blockedCard = GDEunm::UNBLOCKED;
+				blockedCard = GDEnum::UNBLOCKED;
 				verifiedCard = GDEnum::USER_VERIFIED;
 				return true;
 			
 			case GDEnum::PIN_RETRY_TIMER_2:
 				userAttemptTimer = 2;
-				blockedCard = GDEunm::UNBLOCKED;
+				blockedCard = GDEnum::UNBLOCKED;
 				break;
 			
 			case GDEnum::PIN_RETRY_TIMER_1:
 				userAttemptTimer = 1;
-				blockedCard = GDEunm::UNBLOCKED;
+				blockedCard = GDEnum::UNBLOCKED;
 				break;
 			
 			case GDEnum::PIN_RETRY_TIMER_0:
 				userAttemptTimer = 0;
-				blockedCard = GDEunm::USER_BLOCKED;
+				blockedCard = GDEnum::USER_BLOCKED;
 				break;
 
 			case GDEnum::PIN_NOT_FOUND:
@@ -191,23 +191,23 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 			case GDEnum::SUCCESS:
 				adminAttemptTimer = 3;
 				userAttemptTimer = 3;
-				blockedCard = GDEunm::UNBLOCKED;								// to validate the userPinCode by a right adminPinCode
+				blockedCard = GDEnum::UNBLOCKED;								// to validate the userPinCode by a right adminPinCode
 				verifiedCard = GDEnum::ADMIN_VERIFIED;
 				return true;
 
 			case GDEnum::PIN_RETRY_TIMER_2:
 				adminAttemptTimer = 2;
-				blockedCard = GDEunm::USER_BLOCKED;
+				blockedCard = GDEnum::USER_BLOCKED;
 				break;
 
 			case GDEnum::PIN_RETRY_TIMER_1:
 				adminAttemptTimer = 1;
-				blockedCard = GDEunm::USER_BLOCKED;
+				blockedCard = GDEnum::USER_BLOCKED;
 				break;
 
 			case GDEnum::PIN_RETRY_TIMER_0:
 				adminAttemptTimer = 0;
-				blockedCard = GDEunm::ADMIN_BLOCKED;;
+				blockedCard = GDEnum::ADMIN_BLOCKED;;
 				break;
 
 			case GDEnum::PIN_NOT_FOUND:
