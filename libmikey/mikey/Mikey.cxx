@@ -93,10 +93,8 @@ bool Mikey::responderAuthenticate( const string &message,
 #ifdef ENABLE_TS
 				ts.save( AUTH_START );
 #endif
-
 				if( init_mes->authenticate( *ka ) ){
 					string msg = "Authentication of the MIKEY init message failed: " + ka->authError();
-
 					throw MikeyExceptionAuthentication(
 						msg.c_str() );
 				}
@@ -104,7 +102,6 @@ bool Mikey::responderAuthenticate( const string &message,
 #ifdef ENABLE_TS
 				ts.save( TMP );
 #endif
-
 				if( config->isCertCheckEnabled() ){
 					PeerCertificates *peers =
 						dynamic_cast<PeerCertificates*>(*ka);

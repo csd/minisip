@@ -31,6 +31,7 @@
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
 
+
 #ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>
 #endif
@@ -130,7 +131,6 @@ int KeyAgreementDHBase::setGroup( int groupValue ){
 #ifdef SCSIM_SUPPORT
 	if (sim && dynamic_cast<SipSimSmartCardGD*>(*sim)){
 		SipSimSmartCardGD* gd = dynamic_cast<SipSimSmartCardGD*>(*sim);
-		cerr<<"EEEE: the public key is generated+++++++++++"<<endl;
 		assert (groupValue==DH_GROUP_OAKLEY5);
 
 		publicKeyPtr = new unsigned char[192];
@@ -236,6 +236,7 @@ void PeerCertificates::setPeerCertificateChain( MRef<certificate_chain *> peerCh
 }
 
 int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
+	cerr << "start0000000000000000 peerUri is: " << peerUri <<endl;
 	if( peerCertChainPtr.isNull() || certDbPtr.isNull() )
 		return 0;
 
@@ -250,7 +251,6 @@ int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
 
 	MRef<certificate *> peerCert = peerCertChainPtr->get_first();
 	vector<string> altNames;
-
 	altNames = peerCert->get_alt_name( certificate::SAN_URI );
 	if( find( altNames.begin(), altNames.end(), peerUri ) != altNames.end() ){
 		return 1;

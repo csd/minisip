@@ -21,6 +21,7 @@
  *          Pan Xuan <xuan@kth.se>
 */
 
+#include <libmcrypto/GDEnum.h>
 #include <libmcrypto/SipSimSmartCardGD.h>
 #include <libmcrypto/SmartCardException.h>
 #include <libmcrypto/sha1.h>
@@ -33,9 +34,9 @@ SipSimSmartCardGD::SipSimSmartCardGD():SmartCard() {
 	this->recvBufferLength = 0;
 	this->sendBuffer = NULL;
 	this->recvBuffer = NULL;
-	this->verifiedCard = 0;
+	this->verifiedCard = GDEnum::UNVERIFIED;
 	this->sw_1_2 = 0x0000;
-	this->blockedCard = 0;
+	this->blockedCard = GDEnum::UNBLOCKED;
 	this->userAttemptTimer = 3;
 	this->adminAttemptTimer = 3;
 
@@ -73,7 +74,7 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 	memset(sendBuffer, 0, sendBufferLength);
 	memset(recvBuffer, 0, recvBufferLength);
 	 
-	sendBuffer[0] = 0x00;
+	sendBuffer[0] = GDEnum::GD_CLA;
 	sendBuffer[1] = 0xA4;
 	sendBuffer[2] = 0x04;
 	sendBuffer[3] = 0x00;
@@ -94,9 +95,9 @@ bool SipSimSmartCardGD::selectMikeyApp(){
 	transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 	sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
 	clearBuffer();
-	if(sw_1_2 == 0x9000)
+	if(sw_1_2 == GDEnum::SUCCESS)
 		return true;
-	else if(sw_1_2 == 0x6999){
+	else if(sw_1_2 == GDEnum::APPLET_SELECT_FAILURE){
 		throw SmartCardException("Mikey Applet selection failed");
 	}
 	else 
@@ -113,14 +114,14 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 	recvBuffer = new unsigned char[recvBufferLength];
 	memset(recvBuffer, 0, recvBufferLength);
 	
-	if(verifyMode == 0 && (userAttemptTimer > 0) && (userAttemptTimer <= 3)  && blockedCard == 0){
+	if(verifyMode == GDEnum::USER_PIN_VERIFY && (userAttemptTimer > 0) && (userAttemptTimer <= 3)  && blockedCard == GDEnum::UNBLOCKED){
 
 		sendBufferLength = 10; // 1+1+1+1+1+4 (CLA+INS+P1+P1+LEN+DATA)
 		sendBuffer = new unsigned char[sendBufferLength];
 		memset(sendBuffer, 0, sendBufferLength);
 
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x10;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::VERIFY_INS;
 		sendBuffer[2] =	0x00;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x04;
@@ -134,28 +135,28 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 		sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
 		clearBuffer();
 			switch (sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				userAttemptTimer = 3;
 				blockedCard = 0;
-				verifiedCard = 1;
+				verifiedCard = GDEnum::USER_VERIFIED;
 				return true;
 			
-			case 0x63C2:
+			case GDEnum::PIN_RETRY_TIMER_2:
 				userAttemptTimer = 2;
 				blockedCard = 0;
 				break;
 			
-			case 0x63C1:
+			case GDEnum::PIN_RETRY_TIMER_1:
 				userAttemptTimer = 1;
 				blockedCard = 0;
 				break;
 			
-			case 0x63C0:
+			case GDEnum::PIN_RETRY_TIMER_0:
 				userAttemptTimer = 0;
 				blockedCard = 1;
 				break;
 
-			case  0x6A88:
+			case GDEnum::PIN_NOT_FOUND:
 				throw SmartCardException("Pin not found. Wrong P2 value");
 				
 			default:
@@ -165,12 +166,12 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 			return false;
 	}
 
-	else if(verifyMode == 1 && (adminAttemptTimer > 0 && adminAttemptTimer <= 3) && (blockedCard == 0 || blockedCard == 1)){
+	else if(verifyMode == GDEnum::ADMIN_PIN_VERIFY  && (adminAttemptTimer > 0 && adminAttemptTimer <= 3) && (blockedCard == GDEnum::UNBLOCKED || blockedCard == GDEnum::USER_BLOCKED)){
 			sendBufferLength = 14;
 			sendBuffer = new unsigned char[sendBufferLength];
 			memset(sendBuffer, 0, sendBufferLength);
-			sendBuffer[0] = 0xB0;
-			sendBuffer[1] = 0x10;
+			sendBuffer[0] = GDEnum::MIKEY_CLA;
+			sendBuffer[1] = GDEnum::VERIFY_INS;
 			sendBuffer[2] =	0x00;
 			sendBuffer[3] = 0x01;
 			sendBuffer[4] = 0x08;
@@ -187,29 +188,29 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 			clearBuffer();
 						
 			switch (sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				adminAttemptTimer = 3;
 				userAttemptTimer = 3;
 				blockedCard = 0;								// to validate the userPinCode by a right adminPinCode
-				verifiedCard = 2;
+				verifiedCard = GDEnum::ADMIN_VERIFIED;
 				return true;
 
-			case 0x63C2:
+			case GDEnum::PIN_RETRY_TIMER_2:
 				adminAttemptTimer = 2;
 				blockedCard = 1;
 				break;
 
-			case 0x63C1:
+			case GDEnum::PIN_RETRY_TIMER_1:
 				adminAttemptTimer = 1;
 				blockedCard = 1;
 				break;
 
-			case 0x63C0:
+			case GDEnum::PIN_RETRY_TIMER_0:
 				adminAttemptTimer = 0;
 				blockedCard = 2;
 				break;
 
-			case  0x6A88:
+			case GDEnum::PIN_NOT_FOUND:
 				throw SmartCardException("Pin not found. Wrong P2 value");
 				
 			default:
@@ -224,7 +225,7 @@ bool SipSimSmartCardGD::verifyPin(int verifyMode){
 
 bool SipSimSmartCardGD::changePin(const char * newPinCode){
 	
-	if(establishedConnection == true && verifiedCard == 2){
+	if(establishedConnection == true && verifiedCard == GDEnum::ADMIN_VERIFIED){
 		setPin(newPinCode);
 		sendBufferLength = 10;
 		recvBufferLength = 2;
@@ -234,8 +235,8 @@ bool SipSimSmartCardGD::changePin(const char * newPinCode){
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0xD0;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::UPDATE_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x04;
@@ -246,11 +247,11 @@ bool SipSimSmartCardGD::changePin(const char * newPinCode){
 		sw_1_2 = recvBuffer[0] << 8 | recvBuffer[1];
 		clearBuffer();
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				break;
-			case 0x6982:
+			case GDEnum::AUTH_LEVEL_INSUFFICIENT:
 				throw SmartCardException("authentication level is not sufficient");
-			case 0x6A88:
+			case GDEnum::PIN_NOT_FOUND:
 				throw SmartCardException("PIN not found");
 			default:
 				throw SmartCardException("Unknown status code was returned");
@@ -262,7 +263,7 @@ bool SipSimSmartCardGD::changePin(const char * newPinCode){
 }
 
 bool SipSimSmartCardGD::getRandomValue(unsigned char * randomPtr, unsigned long randomLength){
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+	if(establishedConnection == true && verifiedCard ==  GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){
 
 		unsigned char * tempBuffer;
 		sendBufferLength = 5;
@@ -275,8 +276,8 @@ bool SipSimSmartCardGD::getRandomValue(unsigned char * randomPtr, unsigned long 
 		memset(recvBuffer, 0, recvBufferLength);
 		tempBuffer = (unsigned char *) &randomLength;
 
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x40;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::GDEnum::RAND_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = *tempBuffer;
@@ -285,9 +286,9 @@ bool SipSimSmartCardGD::getRandomValue(unsigned char * randomPtr, unsigned long 
 		
 		sw_1_2 = recvBuffer[randomLength] << 8 | recvBuffer[randomLength + 1];
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				break;
-			case 0x6008:
+			case GDEnum::RANDOM_GEN_FAILURE:
 				clearBuffer();
 				return false;
 				//throw SmartCardException("failed to generate random value from G&D smart card");
@@ -309,7 +310,7 @@ bool SipSimSmartCardGD::getRandomValue(unsigned char * randomPtr, unsigned long 
 bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, unsigned char *signaturePtr, int & signatureLength, 
 									 bool doHash, int hash_alg)
 {
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard ==0){	
+	if(establishedConnection == true && verifiedCard == GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){	
 		unsigned char * messageDigestPtr;
 		unsigned long messageDigestLength;
 		if (doHash){ 
@@ -331,8 +332,8 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 		
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x42;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::SIGMAC_INS;
 		sendBuffer[2] = 0x10;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0x14;				// sha-1 has 20 bytes (160 bits) output as message digest
@@ -343,9 +344,9 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 		
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 			switch(sw_1_2){
-				case 0x9000:
+				case GDEnum::SUCCESS:
 					break;
-				case 0x6004:
+				case GDEnum::SIGNING_FAILURE:
 					clearBuffer();
 					return false;
 					//throw SmartCardException("failed to sign the message digest on the smart card");
@@ -369,7 +370,7 @@ bool SipSimSmartCardGD::getSignature(unsigned char *dataPtr, int dataLength, uns
 
 bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLength ) {
 
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+	if(establishedConnection == true && verifiedCard == GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){
 		sendBufferLength = 4+dhpubLength+1; 
 		recvBufferLength = 257;
 		
@@ -379,8 +380,8 @@ bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLen
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x45;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::TGK_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = dhpubLength;
@@ -389,9 +390,9 @@ bool SipSimSmartCardGD::genTgk( unsigned char * dhpubPtr, unsigned long dhpubLen
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				break;
-			case 0x6007:
+			case GDEnum::DH_PRIKEY_GEN_FAILURE:
 				clearBuffer();
 				throw SmartCardException("failed to generate the Diffie-Hellman priavte key in the smart card");
 			default:
@@ -410,7 +411,7 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 			       unsigned char * randPtr, unsigned long randLength,
 			       unsigned char * key, unsigned long keyLength, int keyType){
 
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+	if(establishedConnection == true && verifiedCard == GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){
 		sendBufferLength = 4+randLength+7; 
 		recvBufferLength = 257;
 		
@@ -420,8 +421,8 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x44;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::DERIVE_KEY_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = keyType;
 		
@@ -440,11 +441,13 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 		transmitApdu(i, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				break;
-			case 0x6007:
+			case GDEnum::DH_TEK_GEN_FAILURE: 
 				clearBuffer();
-				throw SmartCardException("failed to get the TEK from the smart card");
+				throw SmartCardException("failed to generate the TEK (DH key agreement) from the smart card");
+			case GDEnum::PK_TEK_GEN_FAILURE:
+              			throw SmartCardException("failed to generate the TEK (PK key agreement) from the smart card");
 			default:
 				clearBuffer();
 				throw SmartCardException("Unknown state value was returned when generating TEK from the smart card");
@@ -468,7 +471,7 @@ bool SipSimSmartCardGD::getKey(unsigned char csId, unsigned long csbIdValue,
 
 bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtr){
 
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){	
+	if(establishedConnection == true && verifiedCard == GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){	
 		sendBufferLength = 5;
 		recvBufferLength = 255;
 
@@ -478,8 +481,8 @@ bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, un
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
 		
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0x20;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::DH_PARA_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		sendBuffer[4] = 0xFF;
@@ -487,9 +490,9 @@ bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, un
 		transmitApdu(sendBufferLength, sendBuffer, recvBufferLength, recvBuffer);
 		sw_1_2 = recvBuffer[recvBufferLength - 2] << 8 | recvBuffer[recvBufferLength - 1];
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				break;
-			case 0x6001:
+			case GDEnum::GET_DH_PUBKEY_FAILURE:
 				clearBuffer();
 				throw SmartCardException("failed to get the Diffie-Hellman public key from the smart card");
 			default:
@@ -508,7 +511,7 @@ bool SipSimSmartCardGD::getDHPublicValue(unsigned long & dhPublicValueLength, un
 
 bool SipSimSmartCardGD::generateKeyPair(){
 	
-	if(establishedConnection == true && verifiedCard == 2 && blockedCard == 0){	
+	if(establishedConnection == true && verifiedCard == GDEnum::ADMIN_VERIFIED && blockedCard == GDEnum::UNBLOCKED){	
 		
 		sendBufferLength = 4;
 		recvBufferLength = 2;
@@ -518,8 +521,8 @@ bool SipSimSmartCardGD::generateKeyPair(){
 		memset(sendBuffer, 0, 4);
 		memset(recvBuffer, 0, 2);
 		
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0xD3;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::GEN_KEYPAIR_INS;
 		sendBuffer[2] = 0x00;
 		sendBuffer[3] = 0x00;
 		
@@ -529,9 +532,9 @@ bool SipSimSmartCardGD::generateKeyPair(){
 		clearBuffer();
 		
 		switch(sw_1_2){
-			case 0x9000:
+			case GDEnum::SUCCESS:
 				return true;
-			case 0x6982:
+			case GDEnum::AUTH_LEVEL_INSUFFICIENT:
 				throw SmartCardException("authorization level insufficient");
 			default:
 				throw SmartCardException("Unknown state value was returned when generating the key pair on the smart card");
@@ -543,7 +546,7 @@ bool SipSimSmartCardGD::generateKeyPair(){
 }
 
 bool SipSimSmartCardGD::getPublicKey(unsigned char * publicKeyPtr, int keyPairType){
-	if(establishedConnection == true && verifiedCard == 1 && blockedCard == 0){
+	if(establishedConnection == true && verifiedCard == GDEnum::USER_VERIFIED && blockedCard == GDEnum::UNBLOCKED){
 		sendBufferLength = 5;
 	        switch(keyPairType){
 	        	case 0:
@@ -560,8 +563,8 @@ bool SipSimSmartCardGD::getPublicKey(unsigned char * publicKeyPtr, int keyPairTy
 		recvBuffer = new unsigned char[recvBufferLength];
 		memset(sendBuffer, 0, sendBufferLength);
 		memset(recvBuffer, 0, recvBufferLength);
-		sendBuffer[0] = 0xB0;
-		sendBuffer[1] = 0xD5;
+		sendBuffer[0] = GDEnum::MIKEY_CLA;
+		sendBuffer[1] = GDEnum::GET_PUBKEY_INS;
 		sendBuffer[2] = 0x00;
 		switch(keyPairType){
 	        	case 0:
@@ -579,11 +582,11 @@ bool SipSimSmartCardGD::getPublicKey(unsigned char * publicKeyPtr, int keyPairTy
 		 }
  
                  switch(sw_1_2){
-		 	case 0x9000:
+		 	case GDEnum::SUCCESS:
 				memcpy(publicKeyPtr, &recvBuffer[1], recvBuffer[0]);
 				clearBuffer();
 		        	return true;
-		        case 0x6982:
+		        case GDEnum::AUTH_LEVEL_INSUFFICIENT:
 				clearBuffer();
 		                return false;
 		        default:

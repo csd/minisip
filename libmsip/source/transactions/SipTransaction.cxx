@@ -197,7 +197,6 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 
 		if( pack->getType() == SipResponse::type )
 			pack->setSocket( getSocket() );
-
 		transportLayer->sendMessage(pack, br, addVia);
 
 		if( pack->getType() != SipResponse::type && pack->getSocket() )

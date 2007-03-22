@@ -15,6 +15,7 @@ scsim_src += SipSimPk.h \
 	     SipSimDh.h \
 	     SmartCard.h \
 	     SipSimSmartCardGD.h \
+	     GDEnum.h \
 	     SmartCardException.h
 endif
 

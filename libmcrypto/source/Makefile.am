@@ -24,6 +24,7 @@ scsim_src += SipSimPk.cxx \
 	     SipSimDh.cxx \
 	     SmartCard.cxx \
 	     SipSimSmartCardGD.cxx \
+	     GDEnum.cxx \
 	     SmartCardException.cxx
 endif
 

@@ -304,7 +304,6 @@ bool SipTransactionInviteServer::a6_completed_completed_INVITE( const SipSMComma
 				SipSMCommand::transport_layer, 
 				SipSMCommand::transaction_layer)){
 		MRef<SipResponse*> resp = lastResponse;
-		
 		send(MRef<SipMessage*>(*resp), false);
 		return true;
 	}else{
@@ -429,7 +428,6 @@ bool SipTransactionInviteServer::a20_proceeding_proceeding_timerRel1xxResend( co
 
 		timerRel1xxResend*=2;
 		requestTimeout(timerRel1xxResend, "timerRel1xxResend");
-		
 		send(*lastResponse, false); // second parameter is "bool addVia"
 		
 		return true;
@@ -468,7 +466,6 @@ void SipTransactionInviteServer::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_start_proceeding_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a0_start_proceeding_INVITE, 
 			s_start, s_proceeding);
-
 	new StateTransition<SipSMCommand,string>(this, "transition_proceeding_proceeding_INVITE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionInviteServer::a1_proceeding_proceeding_INVITE, 
 			s_proceeding, s_proceeding);

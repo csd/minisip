@@ -852,7 +852,6 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 	try{
 		socket = pack->getSocket();
 		MRef<IPAddress *>destAddr;
-
 		if( !socket ){
 			// Lookup IPv4 or IPv6 address
 			destAddr = IPAddress::create(ip_addr);
@@ -927,10 +926,10 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 #endif
 				if( dsocket->sendTo( **destAddr, port, 
 							(const void*)packetString.c_str(),
-							(int32_t)packetString.length() ) == -1 ){
+							(int32_t)packetString.length() ) == -1 )
+				{
 
 					throw SendFailed( errno );
-
 				}
 		}
 		else{
