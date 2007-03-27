@@ -76,12 +76,17 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 		throw SocketFailed( errno );
 		#endif
 	}
-	int32_t on=1;
-#ifndef WIN32
-	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
-#else
-	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
-#endif
+
+// I believe the following code should be removed, or enabled using a
+// parameter. I think we should fail if the port is busy by default. 
+//	int32_t on=1;
+//#ifndef WIN32
+//	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (void *) (&on),sizeof(on));
+//#else
+//	setsockopt(fd,SOL_SOCKET,SO_REUSEADDR, (const char *) (&on),sizeof(on));
+//#endif
+
+
 #ifdef HAVE_IPV6
 	if (use_ipv6){
 		struct sockaddr_in6 addr;
