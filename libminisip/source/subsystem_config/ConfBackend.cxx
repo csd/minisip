@@ -29,7 +29,7 @@
 #include"MXmlConfBackend.h"
 using namespace std;
 
-MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string backendName ){
+MRef<ConfBackend *> ConfigRegistry::createBackend( std::string backendName ){
 	string backendArgument;
 	if (backendName.find(':')!=string::npos){
 		backendArgument = backendName.substr(backendName.find(':')+1);
@@ -66,7 +66,7 @@ MRef<ConfBackend *> ConfigRegistry::createBackend( MRef<Gui*> gui, std::string b
 			return NULL;
 		}
 
-		return config->createBackend( gui, backendArgument );
+		return config->createBackend( backendArgument );
 	}
 	catch( ConfBackendException & ){
 		return NULL;

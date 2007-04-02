@@ -30,7 +30,6 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>
 #include<libmutil/MPlugin.h>
-#include<libminisip/gui/Gui.h>
 #include<string>
 
 class OnlineConfBack;
@@ -65,20 +64,12 @@ class LIBMINISIP_API ConfBackendException{};
 class LIBMINISIP_API ConfigPlugin : public MPlugin{
 	public:
 		/**
-		 * @param gui	A configuration backend can need to provide
-		 * 		authentication information in order to 
-		 * 		access the configuration. In that case it
-		 * 		will ask the user via the gui object passed
-		 * 		to this method for username and password.
-		 * 		This is for example the case of the
-		 * 		configuration is stored on server instead
-		 * 		of on the local device.
 		 * @param argument  A configuration backend might want
 		 *		to be started with an argument. An example
 		 *		is a path to a file containing the 
 		 *		configuration data.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string& argument=NULL )const=0;
+		virtual MRef<ConfBackend *> createBackend( const std::string& argument=NULL )const=0;
 
 		virtual std::string getPluginType()const{ return "Config"; }
 
@@ -97,7 +88,7 @@ class ConfigRegistry: public MPluginRegistry{
 
 		static MRef<ConfigRegistry*> getInstance();
 
-		MRef<ConfBackend*> createBackend( MRef<Gui*> gui, std::string backendName="" );
+		MRef<ConfBackend*> createBackend( std::string backendName="" );
 
 		virtual void registerPlugin( MRef<MPlugin*> plugin );
 
