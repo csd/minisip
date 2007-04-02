@@ -110,7 +110,7 @@ string &CommandString::operator[](string key){
 string CommandString::get(const string &key) const{
 	map<string,string>::const_iterator it = keys.find(key);
 	if( it == keys.end() ){
-		throw Exception("Key not found");
+		throw Exception("Key not found: "+key);
 	}
 	return it->second;
 }
