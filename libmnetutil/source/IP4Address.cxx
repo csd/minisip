@@ -120,7 +120,7 @@ IP4Address::IP4Address(string addr){
 		#endif
 	}
 
-	memset(sockaddress, '\0', sizeof(sockaddress));
+	memset(sockaddress, '\0', sizeof(struct sockaddr_in));
 	sockaddress->sin_family=AF_INET;
 	sockaddress->sin_addr.s_addr = hton32(numIp);
 	sockaddress->sin_port=0;
