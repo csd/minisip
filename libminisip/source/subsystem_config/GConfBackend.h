@@ -75,7 +75,7 @@ class GConfigPlugin : public ConfigPlugin{
 		 * 		of on the local device.
 		 * @param arg	Not used by this backend.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &arg)const;
+		virtual MRef<ConfBackend *> createBackend(const std::string &arg)const;
 
 		virtual std::string getMemObjectType() const { return "GConfBackend"; }
 
