@@ -43,6 +43,8 @@
 #include<libmsip/SipResponse.h>
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
+
 
 class Session;
 class SipDialogContainer;

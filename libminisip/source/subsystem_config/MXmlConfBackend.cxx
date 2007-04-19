@@ -162,7 +162,7 @@ string MXmlConfBackend::getDefaultConfigFilename(){
 MXmlConfigPlugin::MXmlConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
 }
 
-MRef<ConfBackend *> MXmlConfigPlugin::createBackend(MRef<Gui*> gui, const string &configPath)const{
+MRef<ConfBackend *> MXmlConfigPlugin::createBackend(const string &configPath)const{
 	return new MXmlConfBackend(configPath);
 }
 

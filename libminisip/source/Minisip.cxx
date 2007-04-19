@@ -465,7 +465,7 @@ int Minisip::initParseConfig(){
 			mout << BOLD << "init 3/9: Parsing configuration" << PLAIN << end;
 #endif
 			MRef<ConfBackend *> confBackend =
-			ConfigRegistry::getInstance()->createBackend( gui, confPath);
+			ConfigRegistry::getInstance()->createBackend( confPath);
 			if( !confBackend ){
 				merr << "Minisip could not load a configuration" << end << 
 					"back end. The application will now" << end <<

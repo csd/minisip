@@ -67,7 +67,7 @@ class MXmlConfigPlugin : public ConfigPlugin{
 		 * 		configuration is stored on server instead
 		 * 		of on the local device.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &configFilePath=NULL)const;
+		virtual MRef<ConfBackend *> createBackend(const std::string &configFilePath=NULL)const;
 
 		virtual std::string getMemObjectType() const { return "MXmlConfBackend"; }
 
