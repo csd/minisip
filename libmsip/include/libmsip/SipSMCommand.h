@@ -73,8 +73,18 @@ class LIBMSIP_API SipSMCommand : public virtual MObject{
 		int getSource() const;
 		void setSource(int s);
 
+                /**
+                 * This is one of transport_layer, dialog_layer,
+                 * transaction_layer or dispatcher
+                */
 		int getDestination() const;
 		void setDestination(int s);
+
+		/**
+		 * The destiationId of a SIP message is the callId. The
+		 * destinationId is CommandString::getDestinationId().
+		 */
+		std::string getDestinationId() const;
 
 		MRef<SipMessage*> getCommandPacket() const;
 		CommandString getCommandString() const;

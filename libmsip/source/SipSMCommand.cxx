@@ -73,6 +73,13 @@ void SipSMCommand::setDestination(int i){
 	destination=i;
 }
 
+string SipSMCommand::getDestinationId() const{
+	if (type==SipSMCommand::COMMAND_PACKET)
+		return cmdpkt->getCallId();
+	else
+		return cmdstr.getDestinationId();
+}
+
 int SipSMCommand::getSource() const{
 	return source;
 }

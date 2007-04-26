@@ -317,9 +317,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			return true;
 
 		}else if (c.getCommandString().getOp()==SipCommandString::call_terminated){
-			dialogLayer->removeTerminatedDialogs();
-			return true;
-			
+			return dialogLayer->removeDialog(c.getDestinationId());
 		}else if ( 	c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||
 				c.getCommandString().getOp() == SipCommandString::register_all_identities ||
 				c.getCommandString().getOp() == SipCommandString::register_all_identities_done ||

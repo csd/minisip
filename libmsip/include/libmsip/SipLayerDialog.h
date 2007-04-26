@@ -32,7 +32,7 @@
 #include<list>
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
-#include<libmutil/minilist.h>
+#include<map>
 
 class SipDialog;
 class SipCommandDispatcher;
@@ -49,7 +49,7 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 		MRef<SipDefaultHandler*> getDefaultDialogCommandHandler();
 		
 		void addDialog(MRef<SipDialog*> d);
-		void removeTerminatedDialogs();
+		bool removeDialog(std::string callId);
 
 		virtual std::string getMemObjectType() const {return "SipLayerDialog";}
 		
@@ -60,7 +60,7 @@ class LIBMSIP_API SipLayerDialog : public SipSMCommandReceiver{
 	private:
 		MRef<SipDefaultHandler*> defaultHandler;
 
-		minilist<MRef<SipDialog*> > dialogs;
+		std::map<std::string, MRef<SipDialog*> > dialogs;
 
                 MRef<SipCommandDispatcher*> dispatcher;
 

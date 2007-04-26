@@ -39,40 +39,37 @@ SipLayerDialog::SipLayerDialog(MRef<SipCommandDispatcher*> d):dispatcher(d){
 }
 
 SipLayerDialog::~SipLayerDialog(){
-	list<MRef<SipDialog*> > l;
+	std::map<std::string, MRef<SipDialog*> >::iterator i;
 	dialogListLock.lock();
-	for (int i=0; i< dialogs.size(); i++)
-		dialogs[i]->freeStateMachine();;
+	for (i=dialogs.begin(); i!= dialogs.end(); i++)
+		(*i).second->freeStateMachine();
 	dialogListLock.unlock();
-
 }
 
 list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
 	list<MRef<SipDialog*> > l;
+	std::map<std::string, MRef<SipDialog*> >::iterator i;
 	dialogListLock.lock();
-	for (int i=0; i< dialogs.size(); i++)
-		l.push_back(dialogs[i]);
+	for (i=dialogs.begin(); i!=dialogs.end(); i++)
+		l.push_back( (*i).second );
 	dialogListLock.unlock();
 	return l;
 }
 
-
-void SipLayerDialog::removeTerminatedDialogs(){
-
-	for (int i=0; i< dialogs.size(); i++){
-		if ( dialogs[i]->dialogState.isTerminated || dialogs[i]->getCurrentStateName()=="terminated"){
-			MRef<SipDialog *> dlg = dialogs[i];
-			dialogs.remove(i);
-			//merr << "CESC: SipMsgDispatcher::hdleCmd : breaking the dialog vicious circle" << endl;
-			dlg->freeStateMachine();
-			i=0;
-		}
+bool SipLayerDialog::removeDialog(string callId){
+	size_t n = dialogs.erase(callId);
+#ifdef DEBUG_OUTPUT
+	if (n!=1){
+		merr << "WARNING: dialogs.erase should return 1, but returned "<< n<<endl;
 	}
+#endif
+	return n==1;
 }
 
 void SipLayerDialog::addDialog(MRef<SipDialog*> d){
+	massert(d->dialogState.callId!="");
 	dialogListLock.lock();
-	dialogs.push_front(d);
+	dialogs[d->dialogState.callId] = d;
 	dialogListLock.unlock();
 }
 
@@ -90,34 +87,44 @@ bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 #ifdef DEBUG_OUTPUT
 	mdbg<< "SipLayerDialog: got command: "<< c <<end;
 #endif
+	cerr << "EEEE: command: "<< c << endl;
 
-	dialogListLock.lock();
-	// 2. If not any branch parameter or the transaction was not found, try with each dialog
-	//int j=0; //unused??
-        MRef<SipDialog *> dialog;
-	int i;
+	string cid = c.getDestinationId();
+
 	try{
-		for (i=0; i<dialogs.size(); i++){
-			dialog = dialogs[i];
-			dialogListLock.unlock();
-
-			if ( dialog->handleCommand(c) ){
-				//dialogListLock.unlock();
-				return true;
-			}
+		MRef<SipDialog *> dialog;
+		if (cid.size()>0){
 			dialogListLock.lock();
+			dialog = dialogs[cid];
+			dialogListLock.unlock();
+			if ( dialog && dialog->handleCommand(c) )
+				return true;
+		}else{
+
+			std::map<std::string, MRef<SipDialog*> >::iterator i;
+			dialogListLock.lock();
+			for (i=dialogs.begin(); i!=dialogs.end(); i++){
+				dialog = (*i).second;
+				dialogListLock.unlock();
+
+				if ( dialog->handleCommand(c) ){
+					return true;
+				}
+				dialogListLock.lock();
+			}
+			dialogListLock.unlock();
 		}
+
+		if (defaultHandler){
+			//cerr << "SipLayerDialog: No dialog handled the message - sending to default handler"<<endl;
+			return defaultHandler->handleCommand(c);
+		}else{
+			cerr << "ERROR: libmsip: SipLayerDialog::handleCommand: No default handler for dialog commands set!"<<endl;
+			return false;
+		}
+
 	}catch(exception &e){
-		cerr << "SipLayerDialog: caught exception i="<< i<<" what: "<< e.what() << endl;
-	}
-
-	dialogListLock.unlock();
-
-	if (defaultHandler){
-		//cerr << "SipLayerDialog: No dialog handled the message - sending to default handler"<<endl;
-		return defaultHandler->handleCommand(c);
-	}else{
-		cerr << "ERROR: libmsip: SipLayerDialog::handleCommand: No default handler for dialog commands set!"<<endl;
+		cerr << "SipLayerDialog: caught exception: "<< e.what() << endl;
 		return false;
 	}
 }
