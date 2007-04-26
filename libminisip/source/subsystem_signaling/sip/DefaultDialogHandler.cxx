@@ -384,6 +384,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		MRef<SipDialogRegister*> reg(new SipDialogRegister(sipStack, identity));
 		
 		sipStack->addDialog( MRef<SipDialog*>(*reg) );
+		cmd.setDestinationId( reg->getCallId() );
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
 		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		return true;
