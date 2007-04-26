@@ -690,6 +690,7 @@ void MinisipTextUI::guiExecute(string cmd){
 		int t = atoi(time.c_str());
 		if (t>0)
 			Thread::msleep(t*1000);
+		handled=true;
 	}
 
 	if (command == "answer"){
