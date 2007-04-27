@@ -133,6 +133,16 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * Deconstructor.
 		 */
 		virtual ~SipDialog();
+
+		/**
+		 * This method is called when the SIP stack removes a
+		 * terminated dialog. The default behavour is to do
+		 * nothing.
+		 *
+		 * Typical use is to override this method to implement
+		 * clean up code.
+		 */
+		virtual void free();
 		
 		virtual std::string getMemObjectType() const {return "SipDialog";}
 

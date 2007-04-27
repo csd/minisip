@@ -57,6 +57,11 @@ list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
 }
 
 bool SipLayerDialog::removeDialog(string callId){
+	MRef<SipDialog*> d = dialogs[callId];
+	if (d){
+		d->free();
+		d->freeStateMachine();
+	}
 	size_t n = dialogs.erase(callId);
 #ifdef DEBUG_OUTPUT
 	if (n!=1){
@@ -87,7 +92,6 @@ bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 #ifdef DEBUG_OUTPUT
 	mdbg<< "SipLayerDialog: got command: "<< c <<end;
 #endif
-	cerr << "EEEE: command: "<< c << endl;
 
 	string cid = c.getDestinationId();
 

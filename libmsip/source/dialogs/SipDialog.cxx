@@ -79,6 +79,9 @@ SipDialog::~SipDialog(){
 
 }
 
+void SipDialog::free(){
+}
+
 MRef<SipDialogConfig*> SipDialog::getDialogConfig(){
 	return callConfig;
 }
