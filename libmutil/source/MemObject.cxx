@@ -153,7 +153,7 @@ minilist<string> getMemObjectNames(){
 	for (int i=0; i< objs.size(); i++){
 		int count = objs[i]->getRefCount();
 		string countstr = count?itoa(count):"on stack"; 
-		ret.push_back(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]) );
+		ret.push_front(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]) );
 	}
 	global.unlock();
 	return ret;
