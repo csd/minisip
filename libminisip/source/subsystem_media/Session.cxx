@@ -43,6 +43,7 @@
 #include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libminisip/signaling/sdp/SdpHeaderS.h>
 #include<libminisip/signaling/sdp/SdpHeaderO.h>
+#include<libmsip/SipDialogConfig.h>
 #include<libmikey/KeyAgreement.h>
 #include<libmikey/KeyAgreementDH.h>
 #include<libmutil/dbg.h>
@@ -889,6 +890,7 @@ void Session::stop(){
 	#endif
 	} else {
 		cr->setAllowStart( false );
+		cr->free();
 	}
 	callRecorder = NULL; //stop the call recorder object
 

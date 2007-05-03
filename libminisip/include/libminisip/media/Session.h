@@ -32,8 +32,6 @@
 
 #include<libmikey/Mikey.h>
 
-//#include<libminisip/signaling/sip/SipDialogSecurityConfig.h>
-#include<libmsip/SipDialogConfig.h>
 #include<libminisip/media/DtmfSender.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>
 
@@ -42,6 +40,7 @@ class MediaStreamSender;
 class SdpHeaderM;
 class IPAddress;
 class SessionRegistry;
+class SipIdentity;
 
 /**
  * The session class is a representation of the media session associated
@@ -69,7 +68,7 @@ class LIBMINISIP_API Session : public MObject{
 		 * description
 		 * @param config security related configuration for the call
 		 */
-		Session( std::string localIp, /*SipDialogSecurityConfig &config*/ MRef<SipIdentity*> ident, std::string localIp6 = "" );
+		Session( std::string localIp, MRef<SipIdentity*> ident, std::string localIp6 = "" );
 		
 		/**
 		 * Destructor.
@@ -277,7 +276,6 @@ class LIBMINISIP_API Session : public MObject{
 
 		std::string errorString;
 		uint16_t errorCode;
-		//SipDialogSecurityConfig securityConfig;
 		MRef<SipIdentity*> identity;
 
 		int ka_type;

@@ -72,8 +72,15 @@ class CallRecorder:
 				MRef<IpProvider *> ipProvider );
 		virtual ~CallRecorder( );
 
+		/**
+		 * Removes reference loops (needs to be called to let the 
+		 * garbage collector remove this object)
+		 */
+		void free();
+
 		virtual std::string getMemObjectType() const {return "CallRecorder";}
-	
+
+
 		/**
 		* Inherited from SoundRecorderCallback
 		* Function that will be called when sound data is available from

@@ -91,10 +91,21 @@ CallRecorder::~CallRecorder( ) {
 			cerr << "CallRecorder::destroy - closing file opened to record = " << filename << endl;
 		}
 	}
-	audioMedia->getSoundIO()->unRegisterRecorderReceiver( this );
+	if (audioMedia)
+		audioMedia->getSoundIO()->unRegisterRecorderReceiver( this );
 	if( micData!=NULL ) delete micData;
 	if( ntwkData!=NULL ) delete ntwkData;
 // 
+}
+
+void CallRecorder::free(){
+	if (audioMedia)
+		audioMedia->getSoundIO()->unRegisterRecorderReceiver( this );
+	audioMedia=NULL;
+
+	//free inherited references
+	rtpReceiver=NULL;
+	rtp6Receiver=NULL;
 }
 
 void CallRecorder::setFilename( string name, int ssrc ) {
