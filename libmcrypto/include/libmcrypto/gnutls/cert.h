@@ -85,7 +85,7 @@ class LIBMCRYPTO_API gtls_ca_db: public ca_db{
 	protected:
 		MRef<ca_db_item*> create_dir_item( std::string dir );
 		MRef<ca_db_item*> create_file_item( std::string file );
-		MRef<ca_db_item*> create_cert_item( certificate* cert );
+		MRef<ca_db_item*> create_cert_item( MRef<certificate*> cert );
 
 	private:
 		gnutls_x509_crt_t * caList;

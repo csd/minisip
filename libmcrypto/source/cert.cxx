@@ -166,7 +166,7 @@ MRef<ca_db_item*> ca_db::create_file_item( std::string file ){
 	return item;
 }
 
-MRef<ca_db_item*> ca_db::create_cert_item( certificate* cert ){
+MRef<ca_db_item*> ca_db::create_cert_item( MRef<certificate*> cert ){
 	MRef<ca_db_item*> item = new ca_db_item();
 	
 	item->item = "";
@@ -184,7 +184,7 @@ void ca_db::add_file( string file ){
 	add_item( item );
 }
 
-void ca_db::add_certificate( certificate * cert ){
+void ca_db::add_certificate( MRef<certificate *> cert ){
 	MRef<ca_db_item*> item = create_cert_item( cert );
 	add_item( item );
 }

@@ -685,8 +685,8 @@ void ossl_ca_db::add_file( string file ){
 	ca_db::add_file( file );
 }
 
-void ossl_ca_db::add_certificate( certificate * cert ){
-	ossl_certificate *ssl_cert = (ossl_certificate *)cert;
+void ossl_ca_db::add_certificate( MRef<certificate *> cert ){
+	ossl_certificate *ssl_cert = (ossl_certificate *)*cert;
 	X509_STORE_add_cert( cert_db, ssl_cert->get_openssl_certificate() );
 
 	ca_db::add_certificate( cert );

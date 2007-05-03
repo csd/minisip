@@ -74,10 +74,13 @@ certificate* certificate::load( const std::string cert_filename )
 certificate* certificate::load( const std::string cert_filename,
 				const std::string private_key_filename ){
 	MRef<priv_key*> priv_key = new gtls_priv_key( private_key_filename );
-	certificate* cert = new gtls_certificate( cert_filename );
+	MRef<certificate*> cert = new gtls_certificate( cert_filename );
 
 	cert->set_pk( priv_key );
-	return cert;
+
+	// The caller is responsible for deleting cert
+	cert->incRefCount();
+	return *cert;
 }
 
 // Import DER-encoded certificate from memory
@@ -1262,7 +1265,7 @@ MRef<ca_db_item*> gtls_ca_db::create_file_item( std::string file ){
 	return item;
 }
 
-MRef<ca_db_item*> gtls_ca_db::create_cert_item( certificate* cert ){
+MRef<ca_db_item*> gtls_ca_db::create_cert_item( MRef<certificate*> cert ){
 	gtls_ca_db_item * item = new gtls_ca_db_item();
 	
 	item->item = "";

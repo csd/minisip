@@ -62,7 +62,7 @@ class LIBMCRYPTO_API ca_db: public MObject{
 		virtual ca_db* clone();
 		virtual void add_directory( std::string dir );
 		virtual void add_file( std::string file );
-		virtual void add_certificate( certificate * cert );
+		virtual void add_certificate( MRef<certificate *> cert );
 		virtual std::list<MRef<ca_db_item*> > &get_items();
 		virtual MRef<ca_db_item*> get_next();
 		virtual void init_index();
@@ -76,7 +76,7 @@ class LIBMCRYPTO_API ca_db: public MObject{
 		virtual void add_item( MRef<ca_db_item*> item );
 		virtual MRef<ca_db_item*> create_dir_item( std::string dir );
 		virtual MRef<ca_db_item*> create_file_item( std::string file );
-		virtual MRef<ca_db_item*> create_cert_item( certificate* cert );
+		virtual MRef<ca_db_item*> create_cert_item( MRef<certificate*> cert );
 
 	private:
 		std::list<MRef<ca_db_item*> >::iterator items_index;

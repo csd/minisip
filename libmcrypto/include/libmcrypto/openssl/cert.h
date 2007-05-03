@@ -59,7 +59,7 @@ class LIBMCRYPTO_API ossl_ca_db: public ca_db{
 		virtual std::string getMemObjectType() const {return "ossl_ca_db";}
 		void add_directory( std::string dir );
 		void add_file( std::string file );
-		void add_certificate( certificate * cert );
+		void add_certificate( MRef<certificate *> cert );
 
 	private:
 		X509_STORE * cert_db;		
