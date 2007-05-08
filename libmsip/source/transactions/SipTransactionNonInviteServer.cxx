@@ -200,7 +200,7 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		SipSMCommand cmdterminated(
-			CommandString( getBranch(), SipCommandString::transaction_terminated),
+			CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE);
@@ -252,7 +252,7 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		
 		SipSMCommand cmdterminated(
-			CommandString( getBranch(), SipCommandString::transaction_terminated),
+			CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
@@ -274,7 +274,7 @@ bool SipTransactionNonInviteServer::a9_completed_terminated_timerJ(
 				SipSMCommand::transaction_layer,
 				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
-			CommandString( getBranch(), SipCommandString::transaction_terminated),
+			CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );

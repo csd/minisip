@@ -46,9 +46,17 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 
 		void doHandleAck(bool b);
 		
-		void removeTransaction(std::string branch);
+		/**
+		 * @param A transaction ID is composed of the branch
+		 * 	parameter AND the CSeq method part concatenated
+		 */
+		void removeTransaction(std::string transactionId);
 
-		MRef<SipTransaction*> getTransaction(std::string branch);
+		/**
+		 * @param A transaction ID is composed of the branch
+		 * 	parameter AND the CSeq method part concatenated
+		 */
+		MRef<SipTransaction*> getTransaction(std::string transactionId);
 
 		std::list<MRef<SipTransaction*> > getTransactions();
 		

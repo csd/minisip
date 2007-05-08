@@ -132,7 +132,7 @@ bool SipTransaction::a1000_anyState_terminated_canceltransaction(const SipSMComm
 {
 		//Notify the TU that the transaction is terminated
 		SipSMCommand cmdterminated(
-			CommandString( getBranch(), SipCommandString::transaction_terminated),
+			CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::transaction_layer);
 		
@@ -153,7 +153,10 @@ void SipTransaction::setBranch(string b) {
 }
 
 void SipTransaction::handleTimeout(const string &c){
-        SipSMCommand cmd(CommandString(callId,c),SipSMCommand::transaction_layer,SipSMCommand::transaction_layer); //Is the second parameter ignored? --EE
+        SipSMCommand cmd(
+			CommandString(getBranch()+getCSeqMethod(),c),
+			SipSMCommand::transaction_layer,
+			SipSMCommand::transaction_layer);
         dispatcher->enqueueTimeout( this, cmd);
 }
 

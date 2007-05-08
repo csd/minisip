@@ -143,12 +143,11 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 
 
 SipTransactionInviteServerUA::SipTransactionInviteServerUA(MRef<SipStackInternal*> stack,
-		//MRef<SipDialog*> d, 
 		int seq_no, 
 		const string &cSeqMethod, 
 		const string &branch,
 		const string &callid) : 
-			SipTransactionInviteServer(stack, /*d,*/ seq_no, cSeqMethod, branch, callid)
+			SipTransactionInviteServer(stack, seq_no, cSeqMethod, branch, callid)
 {
 	changeStateMachine();
 }

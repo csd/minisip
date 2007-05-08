@@ -56,7 +56,6 @@ class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 	public:
 		
 		SipTransaction(MRef<SipStackInternal*> stackInternal, 
-				//MRef<SipDialog*> d, 
 				int cseq, 
 				const std::string &cseqMethod, 
 				const std::string &branch, 

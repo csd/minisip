@@ -88,8 +88,8 @@ void SipLayerTransaction::doHandleAck(bool b){
 	handleAck=b;
 }
 
-MRef<SipTransaction*> SipLayerTransaction::getTransaction(std::string branch){
-	map<string, MRef<SipTransaction*> >::iterator i = transactions.find(branch);
+MRef<SipTransaction*> SipLayerTransaction::getTransaction(string tid){
+	map<string, MRef<SipTransaction*> >::iterator i = transactions.find(tid);
 	if (i==transactions.end()){
 		MRef<SipTransaction*> null;
 		return null;
@@ -100,12 +100,12 @@ MRef<SipTransaction*> SipLayerTransaction::getTransaction(std::string branch){
 
 void SipLayerTransaction::addTransaction(MRef<SipTransaction*> t){
 	massert(t->getBranch().size()>0);
-	transactions[t->getBranch()]=t;
+	transactions[t->getBranch()+t->getCSeqMethod()]=t;
 }
 
-void SipLayerTransaction::removeTransaction(string branch){
-	transactions[branch]->freeStateMachine();
-	int n = transactions.erase(branch);
+void SipLayerTransaction::removeTransaction(string tid){
+	transactions[tid]->freeStateMachine();
+	int n = transactions.erase(tid);
 	massert(n==1);
 }
 
