@@ -104,7 +104,15 @@ void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
 		sendersLock.lock();
 	}
 
-	senders.push_back( sender );
+	//Don't add if it's already in the list. This is so that we support
+	//multiple calls to MediaStream::start().
+	bool found=false;
+	list<MRef<MediaStreamSender *> >::iterator i;
+	for (i=senders.begin(); i!=senders.end(); i++)
+		if ( *i == sender)
+			found = true;
+	if (!found)
+		senders.push_back( sender );
 	sendersLock.unlock();
 }
 
