@@ -162,7 +162,7 @@ bool SipTransactionNonInviteClient::a2_trying_terminated_TimerFOrErr( const SipS
 		dispatcher->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 
 		SipSMCommand cmdterminated(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE);
@@ -265,6 +265,9 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 				SipSMCommand::transaction_layer,
 				SipSMCommand::transaction_layer)){
 
+		cancelTimeout("timerE");
+		cancelTimeout("timerF");
+
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
 				SipSMCommand::transaction_layer, 
@@ -273,7 +276,7 @@ bool SipTransactionNonInviteClient::a6_proceeding_terminated_transperrOrTimerF( 
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
-				CommandString( callId, SipCommandString::transaction_terminated),
+				CommandString( getBranch(), SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
@@ -345,7 +348,7 @@ bool SipTransactionNonInviteClient::a9_completed_terminated_timerK( const SipSMC
 				SipSMCommand::transaction_layer,
 				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );

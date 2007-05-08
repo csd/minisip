@@ -295,27 +295,18 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 		}
 
 		if (c.getCommandString().getOp()==SipCommandString::transaction_terminated){
-			transactionLayer->removeTerminatedTransactions();
-
-			// All transactions will be tried every time a transaction terminates
-			// This can be improved, but is perfectly ok for an
-			// UA. An application with a large number of
-			// dialogs might want to optimize.
-			list<MRef<SipDialog*> > dlgs = getDialogs();
-			list<MRef<SipDialog*> >::iterator i;
-			for ( i=dlgs.begin(); i!=dlgs.end(); i++){
-
-				string n = (*i)->getCurrentStateName();
-				//If the dialog does not use the state
-				//machine functionality the state name will
-				//be an empty string
-				if ( n =="termwait" || n =="") {
-					(*i)->signalIfNoTransactions();
-				}
+			string tid = c.getCommandString().getDestinationId();
+			MRef<SipTransaction *> t = transactionLayer->getTransaction(tid);
+			string cid = t->getCallId();
+			t=NULL;
+			transactionLayer->removeTransaction(tid);
+			MRef<SipDialog*> d = dialogLayer->getDialog(cid);
+			//It is ok to not find a dialog (transaction
+			//without dialog).
+			if (d){
+				d->signalIfNoTransactions();
 			}
-
 			return true;
-
 		}else if (c.getCommandString().getOp()==SipCommandString::call_terminated){
 			return dialogLayer->removeDialog(c.getDestinationId());
 		}else if ( 	c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||

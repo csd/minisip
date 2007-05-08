@@ -369,6 +369,11 @@ std::string SipStackInternal::getStackStatusDebugString(){
 			ret+=getTransactionDebugString(*ti,torequests,indent+1);
 		}
 	}
+
+	// If the following assertion fails it is likely to be because a 
+	// timer was not cancelled correctly in a transaction.
+	// (a timer exists for a transaction or dialog that is no longer
+	// used by the stack)
 	massert(torequests.size()==0);
 	return ret;
 }

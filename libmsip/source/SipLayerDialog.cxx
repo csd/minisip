@@ -50,8 +50,10 @@ list<MRef<SipDialog*> > SipLayerDialog::getDialogs() {
 	list<MRef<SipDialog*> > l;
 	std::map<std::string, MRef<SipDialog*> >::iterator i;
 	dialogListLock.lock();
-	for (i=dialogs.begin(); i!=dialogs.end(); i++)
+	for (i=dialogs.begin(); i!=dialogs.end(); i++){
 		l.push_back( (*i).second );
+		massert( (*i).second );
+	}
 	dialogListLock.unlock();
 	return l;
 }
@@ -72,10 +74,24 @@ bool SipLayerDialog::removeDialog(string callId){
 }
 
 void SipLayerDialog::addDialog(MRef<SipDialog*> d){
+	massert(d);
 	massert(d->dialogState.callId!="");
 	dialogListLock.lock();
 	dialogs[d->dialogState.callId] = d;
 	dialogListLock.unlock();
+}
+
+/**
+ *
+ * @return If the dialog was not found, then a null reference is returned.
+ *
+ */
+MRef<SipDialog*> SipLayerDialog::getDialog(string cid){
+	MRef<SipDialog*> ret;
+	map<string, MRef<SipDialog*> >::iterator i = dialogs.find(cid);
+	if (i!=dialogs.end())
+		ret = (*i).second;	
+	return ret;
 }
 
 void SipLayerDialog::setDefaultDialogCommandHandler(MRef<SipDefaultHandler*> cb){
@@ -99,7 +115,10 @@ bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 		MRef<SipDialog *> dialog;
 		if (cid.size()>0){
 			dialogListLock.lock();
-			dialog = dialogs[cid];
+			map<string, MRef<SipDialog*> >::iterator d = dialogs.find(cid);
+			if (d != dialogs.end()){
+				dialog = (*d).second;
+			}
 			dialogListLock.unlock();
 			if ( dialog && dialog->handleCommand(c) )
 				return true;

@@ -46,10 +46,9 @@ SipLayerTransaction::SipLayerTransaction(
 }
 
 SipLayerTransaction::~SipLayerTransaction(){
-	MRef<SipTransaction*> trans;
-	for (int i=0; i<transactions.size(); i++){
-		transactions[i]->freeStateMachine();
-	}
+	map<string, MRef<SipTransaction*> >::iterator i;
+	for (i=transactions.begin(); i!=transactions.end(); i++)
+		(*i).second->freeStateMachine();
 }
 
 bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
@@ -83,56 +82,39 @@ bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 		cerr <<"ERROR: TransactionLayer::defaultCommandHandler: Could not handle: "<<cmd<<endl;
 		return false;
 	}
-
-
 }
 
 void SipLayerTransaction::doHandleAck(bool b){
 	handleAck=b;
 }
 
-MRef<SipTransaction*> SipLayerTransaction::findTransaction(std::string branch){
-	for (int i=0; i<transactions.size();i++)
-		if (transactions[i]->getBranch()==branch)
-			return transactions[i];
-	mdbg << "Warning: SipLayerTransaction::findTransaction: could not find transaction "<< branch<<endl;
-	MRef<SipTransaction*> null;
-	return null;
+MRef<SipTransaction*> SipLayerTransaction::getTransaction(std::string branch){
+	map<string, MRef<SipTransaction*> >::iterator i = transactions.find(branch);
+	if (i==transactions.end()){
+		MRef<SipTransaction*> null;
+		return null;
+	}else{
+		return (*i).second;
+	}
 }
 
 void SipLayerTransaction::addTransaction(MRef<SipTransaction*> t){
-	//cerr << "EE: SipLayerTransaction::addTransaction: new transaction with branch id "<< t->getBranch()<<" added"<<endl;
-	transactions.push_front(t);
+	massert(t->getBranch().size()>0);
+	transactions[t->getBranch()]=t;
 }
 
-void SipLayerTransaction::removeTransaction(MRef<SipTransaction*> t){
-
-	for (int i=0; i< transactions.size(); i++){
-		if (transactions[i]==t){
-			transactions.remove(i);
-			return;
-		}
-	}
-	mdbg << "WARNING: BUG? Cound not remove transaction from SipLayerTransaction!!!!!"<< end;
-}
-
-void SipLayerTransaction::removeTerminatedTransactions(){
-	MRef<SipTransaction*> trans;
-	for (int i=0; i<transactions.size(); i++){
-		if (transactions[i]->getCurrentStateName()=="terminated"){
-			trans = transactions[i];
-			transactions.remove(i);
-			i--;
-			trans->freeStateMachine(); //let's break the cyclic references ...
-		}
-	}
+void SipLayerTransaction::removeTransaction(string branch){
+	transactions[branch]->freeStateMachine();
+	int n = transactions.erase(branch);
+	massert(n==1);
 }
 
 list<MRef<SipTransaction*> > SipLayerTransaction::getTransactions(){
 	list<MRef<SipTransaction*> > ret;
-	for (int i=0; i< transactions.size(); i++)
-		ret.push_back(transactions[i]);
-
+	map<string, MRef<SipTransaction*> >::iterator i;
+	for (i=transactions.begin(); i!=transactions.end(); i++){
+		ret.push_back((*i).second);
+	}
 	return ret;
 }
 
@@ -141,10 +123,10 @@ list<MRef<SipTransaction*> > SipLayerTransaction::getTransactions(){
 
 list<MRef<SipTransaction*> > SipLayerTransaction::getTransactionsWithCallId(string callid){
 	list<MRef<SipTransaction*> > ret;
-	for (int i=0; i< transactions.size(); i++){
-		if (transactions[i]->getCallId()==callid){
-			ret.push_back(transactions[i]);
-		}
+	map<string, MRef<SipTransaction*> >::iterator i;
+	for (i=transactions.begin(); i!=transactions.end(); i++){
+		ret.push_back( (*i).second );
+	
 	}
 	return ret;
 }
@@ -174,13 +156,14 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	}
 
 //	cerr << "SipLayerTransaction: trying "<<transactions.size()<<" transactions"<<endl;
-	for (int i=0; i< transactions.size(); i++){
-		if ( (!hasBranch || transactions[i]->getBranch()== branch || seqMethod=="ACK") &&
-				(!hasSeqMethod || transactions[i]->getCSeqMethod()==seqMethod || 
-				 (seqMethod == "ACK" && transactions[i]->getCSeqMethod() == "INVITE")) ){
+	map<string, MRef<SipTransaction*> >::iterator i;
+	for (i=transactions.begin(); i!=transactions.end(); i++){
+		if ( (!hasBranch || (*i).second->getBranch()== branch || seqMethod=="ACK") &&
+				(!hasSeqMethod || (*i).second->getCSeqMethod()==seqMethod || 
+				 (seqMethod == "ACK" && (*i).second->getCSeqMethod() == "INVITE")) ){
 
 //			cerr << "SipLayerTransaction: trying message with branch <"<<branch<<"> with transaction with branch <"<<transactions[i]->getBranch()<<">"<<endl;
-			bool ret = transactions[i]->handleCommand(c);
+			bool ret = (*i).second->handleCommand(c);
 //			cerr << "SipLayerTransaction: transaction returned "<<ret<<endl;
 #ifdef DEBUG_OUTPUT
 			if (!ret && hasBranch){

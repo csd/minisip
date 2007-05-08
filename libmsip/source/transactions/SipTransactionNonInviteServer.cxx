@@ -188,6 +188,9 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 				SipCommandString::transport_error,
 				SipSMCommand::transport_layer,
 				SipSMCommand::transaction_layer)){
+
+		
+
 		//inform TU
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
@@ -197,7 +200,7 @@ bool SipTransactionNonInviteServer::a6_proceeding_terminated_transperr(
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 		
 		SipSMCommand cmdterminated(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE);
@@ -238,6 +241,9 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 				SipCommandString::transport_error,
 				SipSMCommand::transport_layer,
 				SipSMCommand::transaction_layer)){
+
+		cancelTimeout("timerJ");
+
 		SipSMCommand cmd(
 				CommandString(callId,SipCommandString::transport_error), 
 				SipSMCommand::transaction_layer, 
@@ -246,7 +252,7 @@ bool SipTransactionNonInviteServer::a8_completed_terminated_transperr(
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE);
 		
 		SipSMCommand cmdterminated(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
@@ -268,7 +274,7 @@ bool SipTransactionNonInviteServer::a9_completed_terminated_timerJ(
 				SipSMCommand::transaction_layer,
 				SipSMCommand::transaction_layer)){
 		SipSMCommand cmd(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );

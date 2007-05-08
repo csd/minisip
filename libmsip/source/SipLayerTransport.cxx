@@ -33,7 +33,6 @@
 
 #ifdef WIN32
 #include<winsock2.h>
-//#include<io.h>
 #endif
 
 #include<libmsip/SipResponse.h>
@@ -53,7 +52,6 @@
 #include<libmutil/mtime.h>
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
-//#include<libmsip/SipDialogContainer.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
 #include<libmsip/SipHeaderFrom.h>
@@ -943,7 +941,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		mdbg << "Transport error in SipLayerTransport: " << message << end;
 		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
-		CommandString transportError( callId, 
+		CommandString transportError( pack->getDestinationBranch(), 
 					      SipCommandString::transport_error,
 					      "SipLayerTransport: "+message );
 		SipSMCommand transportErrorCommand(

@@ -132,7 +132,7 @@ bool SipTransaction::a1000_anyState_terminated_canceltransaction(const SipSMComm
 {
 		//Notify the TU that the transaction is terminated
 		SipSMCommand cmdterminated(
-			CommandString( callId, SipCommandString::transaction_terminated),
+			CommandString( getBranch(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::transaction_layer);
 		

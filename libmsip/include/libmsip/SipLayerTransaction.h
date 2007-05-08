@@ -31,7 +31,7 @@
 #include<list>
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
-#include<libmutil/minilist.h>
+#include<map>
 
 class SipCommandDispatcher;
 class SipTransaction;
@@ -46,11 +46,10 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 
 		void doHandleAck(bool b);
 		
-		void removeTransaction(MRef<SipTransaction*> t);
-		MRef<SipTransaction*> findTransaction(std::string branch);
+		void removeTransaction(std::string branch);
 
-		void removeTerminatedTransactions();
-		
+		MRef<SipTransaction*> getTransaction(std::string branch);
+
 		std::list<MRef<SipTransaction*> > getTransactions();
 		
 		std::list<MRef<SipTransaction*> > getTransactionsWithCallId(std::string callid);
@@ -66,7 +65,7 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 		
 		bool handleAck;
 		
-		minilist<MRef<SipTransaction*> > transactions;
+		std::map<std::string, MRef<SipTransaction*> > transactions;
 
 		MRef<SipCommandDispatcher*> dispatcher;
 		MRef<SipLayerTransport*> transportLayer;
