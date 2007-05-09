@@ -270,8 +270,7 @@ static std::string getTimeoutDebugString(MRef<StateMachine<SipSMCommand,std::str
 	for (uint32_t j=0; jj!=torequests.end(); j++){
 		if ( ((*sm)) == *((*jj).getSubscriber()) ){
 			int ms= (*jj).getMsToTimeout();
-			ret+= ind +"timeout: "
-				+ (*jj).getCommand()
+			ret+= ind + (*jj).getCommand()
 				+ " Time: " + itoa(ms/1000) + "." + itoa(ms%1000)+"\n";
 			ntimeouts++;
 			torequests.erase(jj);
@@ -295,7 +294,7 @@ static std::string getTransactionDebugString(MRef<SipTransaction*> t,
 	ret = ind+ (*t)->getName() + " State: " + (*t)->getCurrentStateName()+"\n";
 
 	ret+= ind+"Timeouts:\n";
-	ret+=getTimeoutDebugString(*t,torequests,2);
+	ret+= ind+getTimeoutDebugString(*t,torequests,2);
 	return ret;
 
 }
@@ -320,13 +319,15 @@ static std::string getDialogDebugString(MRef<SipDialog*> d,
 	//cerr << "        Transactions:"<< endl;
 	string did=d->getCallId();
 	int n=0;
+	bool restart;
 	for (list<MRef<SipTransaction*> >::iterator t = transactions.begin();
-			t!=transactions.end(); t++){
+			t!=transactions.end(); restart ? t=transactions.begin() : t++){
+		restart=false;
 		if ((*t)->getCallId()==did){
 			ret+=getTransactionDebugString(*t, torequests, indent+1);
 			n++;
 			transactions.erase(t);
-			t=transactions.begin();
+			restart=true; // t is invalidated, and we'll restart the loop
 		}
 	}
 
