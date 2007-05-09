@@ -46,20 +46,22 @@ ITgk::~ITgk(){
 }
 
 KeyAgreement::KeyAgreement():
+	useSim(false),
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),
 	csbIdValue(0), 
-	csIdMapPtr(NULL), nCsValue(0), useSim(false){
+	csIdMapPtr(NULL), nCsValue(0) {
 	//policy = list<Policy_type *>::list();
 	kvPtr = new KeyValidityNull();
 
 }
 
 KeyAgreement::KeyAgreement(MRef<SipSim *> sim):
+	useSim(true),
 	tgkPtr(NULL), tgkLengthValue(0),
 	randPtr(NULL), randLengthValue(0),
 	csbIdValue(0), 
-	csIdMapPtr(NULL), nCsValue(0), useSim(true){
+	csIdMapPtr(NULL), nCsValue(0){
 		kvPtr = new KeyValidityNull();
 		this->sim = sim;
 }

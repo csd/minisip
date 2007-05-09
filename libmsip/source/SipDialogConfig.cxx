@@ -91,7 +91,7 @@ SipRegistrar::SipRegistrar(const SipUri &addr, int port){
 
 SipRegistrar::SipRegistrar(const SipUri &userUri, string transportParam) {
 	SipUri addr;
-	bool unknown = true;
+//	bool unknown = true; //unused
 	autodetectSettings = true;
 	
 	registerExpires=DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS;

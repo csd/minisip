@@ -420,7 +420,7 @@ int ossl_certificate::get_der_length(){
 }
 
 void ossl_certificate::get_der( unsigned char * output, unsigned int * length ){
-	if( *length < get_der_length() ){
+	if( *length < (unsigned int)get_der_length() ){
  		throw certificate_exception(
 			"Given buffer is to short" );
 	}

@@ -27,5 +27,6 @@ bool SipSimSoft::getSignature(unsigned char * data,
 bool SipSimSoft::getRandomValue(unsigned char * randomPtr, unsigned long randomLength)
 {
 	Rand::randomize(randomPtr, randomLength);
+	return false;
 }
 

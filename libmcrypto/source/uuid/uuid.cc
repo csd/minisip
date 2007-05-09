@@ -25,10 +25,14 @@
 #include <libmcrypto/rand.h>
 
 /* various forward declarations */
+#if 0
+     /* forward declarations used in an if 0 part below ... */
 static int read_state(unsigned16 *clockseq, uuid_time_t *timestamp,
     uuid_node_t *node);
 static void write_state(unsigned16 clockseq, uuid_time_t timestamp,
     uuid_node_t node);
+#endif
+
 static void format_uuid_v1(uuid_t *uuid, unsigned16 clockseq,
     uuid_time_t timestamp, uuid_node_t node);
 static void get_current_time(uuid_time_t *timestamp);
@@ -37,11 +41,9 @@ static unsigned16 true_random(void);
 /* uuid_create -- generator a UUID */
 int uuid_create(uuid_t *uuid)
 {
-     uuid_time_t timestamp, last_time;
+     uuid_time_t timestamp;
      unsigned16 clockseq;
      uuid_node_t node;
-     uuid_node_t last_node;
-     int f;
 
      /* acquire system-wide lock so we're alone */
      LOCK;
@@ -52,6 +54,9 @@ int uuid_create(uuid_t *uuid)
 #if 1
      clockseq = true_random();
 #else
+     uuid_time last_time;
+     uuid_node_t last_node;
+     int f;
      f = read_state(&clockseq, &last_time, &last_node);
 
      /* if no NV state, or if clock went backwards, or node ID
