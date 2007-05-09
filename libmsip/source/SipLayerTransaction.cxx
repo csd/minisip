@@ -125,8 +125,8 @@ list<MRef<SipTransaction*> > SipLayerTransaction::getTransactionsWithCallId(stri
 	list<MRef<SipTransaction*> > ret;
 	map<string, MRef<SipTransaction*> >::iterator i;
 	for (i=transactions.begin(); i!=transactions.end(); i++){
-		ret.push_back( (*i).second );
-	
+		if ((*i).second->getCallId() == callid)
+			ret.push_back( (*i).second );
 	}
 	return ret;
 }
@@ -139,39 +139,52 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 #ifdef DEBUG_OUTPUT	
 	mdbg << "SipLayerTransaction: handleCommand got: "<< c<<endl;
 #endif
-	
-	// Find transaction based on branch parameter
-	// 
-	string branch;
-	string seqMethod;
+	string tid;
+	if (c.getType()==SipSMCommand::COMMAND_STRING){
+		tid = c.getCommandString().getDestinationId();
+	}
+
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
-		branch = c.getCommandPacket()->getDestinationBranch();
-		seqMethod = c.getCommandPacket()->getCSeqMethod();
-	}
-	bool hasBranch = (branch!="");
-	bool hasSeqMethod = (seqMethod!="");
-
-	if (!hasBranch){
-		mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
+		string branch = c.getCommandPacket()->getDestinationBranch();
+		if (branch.size()>0)
+			tid = branch + c.getCommandPacket()->getCSeqMethod();
 	}
 
-//	cerr << "SipLayerTransaction: trying "<<transactions.size()<<" transactions"<<endl;
-	map<string, MRef<SipTransaction*> >::iterator i;
-	for (i=transactions.begin(); i!=transactions.end(); i++){
-		if ( (!hasBranch || (*i).second->getBranch()== branch || seqMethod=="ACK") &&
-				(!hasSeqMethod || (*i).second->getCSeqMethod()==seqMethod || 
-				 (seqMethod == "ACK" && (*i).second->getCSeqMethod() == "INVITE")) ){
 
-//			cerr << "SipLayerTransaction: trying message with branch <"<<branch<<"> with transaction with branch <"<<transactions[i]->getBranch()<<">"<<endl;
-			bool ret = (*i).second->handleCommand(c);
-//			cerr << "SipLayerTransaction: transaction returned "<<ret<<endl;
-#ifdef DEBUG_OUTPUT
-			if (!ret && hasBranch){
-				mdbg << "WARNING: SipLayerTransaction: transaction did not handle message with matching branch id"<<end;
-			}
-#endif
-			if (ret){
-				return true;
+	
+	MRef<SipTransaction*> t;
+	if (tid.size()>0)
+		t = getTransaction(tid);
+
+	if (t){ // This should be the normal way to handle a command
+		bool ret = t->handleCommand(c);
+		if (ret)
+			return true;
+	}else{
+		// Fall back to try all transactions...
+		//
+		string branch;
+		string seqMethod;
+		if (c.getType()==SipSMCommand::COMMAND_PACKET){
+			branch = c.getCommandPacket()->getDestinationBranch();
+			seqMethod = c.getCommandPacket()->getCSeqMethod();
+		}
+		bool hasBranch = (branch!="");
+		bool hasSeqMethod = (seqMethod!="");
+
+		if (!hasBranch){
+			mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
+		}
+
+		map<string, MRef<SipTransaction*> >::iterator i;
+		for (i=transactions.begin(); i!=transactions.end(); i++){
+			if ( (!hasBranch || (*i).second->getBranch()== branch || seqMethod=="ACK") &&
+					(!hasSeqMethod || (*i).second->getCSeqMethod()==seqMethod || 
+					 (seqMethod == "ACK" && (*i).second->getCSeqMethod() == "INVITE")) ){
+				bool ret = (*i).second->handleCommand(c);
+				if (ret){
+					return true;
+				}
 			}
 		}
 	}
