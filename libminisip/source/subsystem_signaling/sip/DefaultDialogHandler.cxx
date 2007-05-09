@@ -290,15 +290,13 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		int statusCode;
 		const char *reasonPhrase;
 
-		if( pkt->getType()=="CANCEL" ){
+		if (pkt->getType()=="BYE" || 
+				pkt->getType()=="CANCEL" || 
+				pkt->getType()=="ACK")
+		{
 			statusCode = 481;
-			reasonPhrase = "Call/Transaction Does Not Exist";
-		}
-// 		else{
-// 			statusCode = 501;
-// 			reasonPhrase = "Not Implemented";
-// 		}
-		else{
+			reasonPhrase = "Call/transaction does not exist";
+		}else {
 			statusCode = 405;
 			reasonPhrase = "Method Not Allowed";
 		}
