@@ -3,6 +3,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipUtils.h \
                      libmsip/SipTimers.h \
                      libmsip/SipHeaderAccept.h \
+                     libmsip/SipHeaderAllow.h \
                      libmsip/SipHeaderAllowEvents.h \
 		     libmsip/SipHeaderAcceptContact.h \
                      libmsip/SipHeaderAuthorization.h \

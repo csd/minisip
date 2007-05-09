@@ -51,6 +51,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/dialogs/SipDialogManagement.cxx \
 		     source/headers/SipHeader.cxx \
 		     source/headers/SipHeaderAccept.cxx \
+                     source/headers/SipHeaderAllow.cxx \
                      source/headers/SipHeaderAllowEvents.cxx \
                      source/headers/SipHeaderAuthorization.cxx \
                      source/headers/SipHeaderCSeq.cxx \

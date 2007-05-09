@@ -34,6 +34,7 @@
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipHeaderAcceptContact.h>
+#include<libmsip/SipHeaderAllow.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipRequest.h>
@@ -307,6 +308,10 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		MRef<SipResponse*> resp =
 			new SipResponse(branch, statusCode, reasonPhrase,
 					*req);
+
+		if (statusCode==405)
+			resp->addHeader(new SipHeader(new SipHeaderValueAllow("INVITE,MESSAGE,BYE,ACK,OPTIONS,PRACK") ));
+
 		SipSMCommand cmd( *resp, SipSMCommand::dialog_layer,
 				  SipSMCommand::transaction_layer );
 		// Send responses directly to the transport layer bypassing
@@ -565,24 +570,10 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 		id->unlock();
 	}
 
-#ifdef DEBUG_OUTPUT
-        cerr << "Before new mediaSession" << endl;
-#endif
-	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ id );
-#ifdef DEBUG_OUTPUT
-        cerr << "After new mediaSession" << endl;
-#endif
+	MRef<Session *> mediaSession = mediaHandler->createSession( id );
 	
 	MRef<SipDialog*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf, mediaSession); 
-
-#ifdef DEBUG_OUTPUT
-	cerr << "Before addDialog" << endl;
-#endif	
-	/*dialogContainer*/sipStack->addDialog(voipCall);
-#ifdef DEBUG_OUTPUT
-	cerr << "After addDialog" << endl;
-#endif
+	sipStack->addDialog(voipCall);
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifdef ENABLE_TS
 	ts.save( TMP );
@@ -590,13 +581,7 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 	
         SipSMCommand c(SipSMCommand(inv, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer)); //TODO: send directly to dialog instead
 	
-#ifdef DEBUG_OUTPUT
-        cerr << "Before handleCommand" << endl;
-#endif
 	sipStack->handleCommand(c);
-#ifdef DEBUG_OUTPUT
-        cerr << "After handleCommand" << endl;
-#endif
 	
 	mediaSession->setCallId( voipCall->getCallId() );
 
