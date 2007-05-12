@@ -1002,6 +1002,26 @@ string MainWindow::getDataFileName( string baseName ){
 		return ensureAbsolutePath( dataDirName );
 	}
 #endif
+#ifdef LINUX
+	// Check typical linux folders ... 
+	prefixDir = "/usr/";
+	dataDir = Glib::build_filename( prefixDir, "share" );
+	pkgDataDir = Glib::build_filename( dataDir, PACKAGE );
+	progDirName = Glib::build_filename( pkgDataDir, baseName );
+	if( Glib::file_test( progDirName, Glib::FILE_TEST_EXISTS ) ){
+		lastDataDir = pkgDataDir;
+		return ensureAbsolutePath( progDirName );
+	}
+
+	prefixDir = "/usr/local";
+	dataDir = Glib::build_filename( prefixDir, "share" );
+	pkgDataDir = Glib::build_filename( dataDir, PACKAGE );
+	progDirName = Glib::build_filename( pkgDataDir, baseName );
+	if( Glib::file_test( progDirName, Glib::FILE_TEST_EXISTS ) ){
+		lastDataDir = pkgDataDir;
+		return ensureAbsolutePath( progDirName );
+	}
+#endif
 
 	merr << "Can't find data file: " << baseName << end;
 	return "";
