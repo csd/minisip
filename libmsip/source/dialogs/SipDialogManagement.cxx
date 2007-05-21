@@ -684,12 +684,9 @@ void SipDialogManagement::setUpStateMachine_dialogops(State<SipSMCommand,string>
 }
 
 SipDialogManagement::SipDialogManagement(MRef<SipStack*> stack):
-					SipDialog(stack, NULL)
+					SipDialog(stack, NULL, "shutdown_dialog")
 {
-	dialogState.callId = "shutdown_dialog";
-
 	setUpStateMachine();
-	//cerr << "SipDialogManagement hello!"<<endl;
 	pendingHangUps = 0;
 	pendingDeRegs = 0;
 }

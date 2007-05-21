@@ -584,17 +584,12 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 				MRef<SipSoftPhoneConfiguration*> pconf, 
 				MRef<Session *> mediaSession, 
 				string cid ) :
-		SipDialog(stack,ident),
+		SipDialog(stack,ident, cid),
 		phoneconf(pconf),
 		mediaSession(mediaSession),
 		notifyEarlyTermination(false),
 		lastInvite(NULL)
 {
-	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
-	else
-		dialogState.callId = cid;
-	
 	dialogState.localTag = itoa(rand());
 	
 	/* We will fill that later, once we know if that succeeded */

@@ -341,14 +341,10 @@ void SipDialogPresenceClient::setUpStateMachine(){
 SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack, 
 		MRef<SipIdentity*> ident,
 		bool use_stun) : 
-                	SipDialog(stack,ident),
+                	SipDialog(stack,ident, ""),
 			useSTUN(use_stun)
 {
-
-	dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
-	
 	dialogState.localTag = itoa(rand());
-	
 	setUpStateMachine();
 }
 

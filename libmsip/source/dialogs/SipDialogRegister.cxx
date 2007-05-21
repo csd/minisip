@@ -456,35 +456,12 @@ void SipDialogRegister::setUpStateMachine(){
 }
 
 SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipIdentity*> ident)
-		: SipDialog(stack, ident),
+		: SipDialog(stack, ident, ""),
 			failCount(0),
 			guiFeedback(true)
 {
 	setUpStateMachine();
-	dialogState.callId = itoa(rand())+"@"+getDialogConfig()->sipStack->getStackConfig()->localIpString;
 	dialogState.localTag = itoa(rand());
-
-#if 0
-	if (getDialogConfig()->sipIdentity->sipDomain==""){
-		uint32_t i=0;
-		string uri = getDialogConfig()->sipIdentity->getSipUri();
-
-		for ( ; uri[i]!='@' && i<uri.length(); i++)
-			;
-		massert(uri[i]=='@');
-		i++;
-
-		for ( ; i<uri.length(); i++) { //FIXME: Is this correct? (line below)
-			getDialogConfig()->sipIdentity->sipDomain = 
-				getDialogConfig()->sipIdentity->sipDomain+uri[i];
-		}
-	}
-#endif
-
-#ifdef DEBUG_OUTPUT
-	mdbg << "SipDialogRegister::SipDialogRegister: DEBUG - domain set to "<< getDialogConfig()->sipIdentity->getSipUri().getIp() << end;
-#endif
-
 	myDomain = getDialogConfig()->sipIdentity->getSipUri().getIp();
 }
 

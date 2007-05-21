@@ -225,16 +225,11 @@ void SipDialogPresenceServer::setUpStateMachine(){
 SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipStack*> stack, 
 		MRef<SipIdentity*> ident,
 		bool use_stun) : 
-                	SipDialog(stack,ident),
+                	SipDialog(stack,ident,""),
 			useSTUN(use_stun),
 			onlineStatus("online")
 {
-
-//	callId = itoa(rand())+"@"+getDialogConfig()->inherited.externalContactIP;
-	dialogState.callId="";
-	
 	dialogState.localTag=itoa(rand());
-	
 	setUpStateMachine();
 }
 

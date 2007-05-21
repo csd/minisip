@@ -905,7 +905,7 @@ void SipDialogConfVoip::setUpStateMachine(){
 
 
 SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist,string confid, string cid) : 
-                SipDialog(stack,ident),
+                SipDialog(stack,ident,cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),
@@ -943,11 +943,6 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 	//cerr << "CONFDIALOG: "+ ((*list)[1]).uri << endl;
 	//cerr << "CONFDIALOG: "+itoa(numConnected)<< endl;
 	
-	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
-	else
-		dialogState.callId = cid;
-	
 	dialogState.localTag = itoa(rand());
 	
 	/* We will fill that later, once we know if that succeeded */
@@ -956,7 +951,7 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 	setUpStateMachine();
 }
 SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid) : 
-                SipDialog(stack,ident),
+                SipDialog(stack,ident, cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),
@@ -966,10 +961,6 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 	//cerr<<"SDCVididididididididididdididi "+confId<<endl;
 	//cerr << "CONFDIALOG: received"<< endl;
 	type="connect";
-	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
-	else
-		dialogState.callId = cid;
 	
 	dialogState.localTag = itoa(rand());
 	

@@ -126,8 +126,11 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		 * Constructor.
 		 * @param dContainer The Dialog Container
 		 * @param callconf   The Dialog Configuration
+		 * @param callId     If an empty string is given as the
+		 * 		     CallId, then a random callId will be
+		 * 		     generated.
 		 */
-		SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity);
+		SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity, std::string callId);
 		
 		/**
 		 * Deconstructor.
