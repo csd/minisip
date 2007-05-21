@@ -58,13 +58,13 @@ using namespace std;
 SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity, string cid):
                 StateMachine<SipSMCommand,string>(stack->getTimeoutProvider())
 {
+	massert(stack);
+	callConfig = new SipDialogConfig(stack);
+
 	if (cid=="")
-		dialogState.callId = itoa(rand())+"@"+getSipStack()->getStackConfig()->externalContactIP;
+		dialogState.callId = itoa(rand())+"@"+stack->getStackConfig()->externalContactIP;
 	else
 		dialogState.callId = cid;
-
-
-	callConfig = new SipDialogConfig(stack);
 
 	if (identity){
 		callConfig->useIdentity(identity);
