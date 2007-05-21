@@ -33,7 +33,7 @@
 
 class LIBMUTIL_API ThreadException : public Exception{
 public:
-	ThreadException(char* description);
+	ThreadException(const char* description);
 };
 
 

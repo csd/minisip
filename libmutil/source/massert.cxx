@@ -8,7 +8,7 @@
 #include<stdio.h>
 #include<libmutil/Exception.h>
 
-void massertFailed(char *expr, char *file, char *baseFile, int line) {
+void massertFailed(const char *expr, const char *file, const char *baseFile, int line) {
 	if (!strcmp(file, baseFile)) {
 		fprintf(stderr,"massert(%s) failed in file %s, line %d\n", expr, file, line);
 	} else {

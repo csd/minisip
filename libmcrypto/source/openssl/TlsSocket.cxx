@@ -279,7 +279,7 @@ int32_t OsslSocket::read( void *buf, int32_t count ){
 }
 
 int32_t OsslSocket::setSSLCTXCiphers ( SSL_CTX *_ctx, int8_t listIdx ) {
-	char *ciphers;
+	const char *ciphers;
 	
 #ifdef DEBUG_OUTPUT
 		cerr << "Modifying SSL_CTX ciphers list" << endl;

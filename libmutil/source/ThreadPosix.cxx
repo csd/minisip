@@ -47,7 +47,7 @@
 
 using namespace std;
 
-ThreadException::ThreadException(char *desc):Exception(desc){
+ThreadException::ThreadException(const char *desc):Exception(desc){
 
 }
 

@@ -5,7 +5,7 @@
 
 
 
-LIBMUTIL_API void massertFailed(char *expr, char *file, char *baseFile, int line);
+LIBMUTIL_API void massertFailed(const char *expr, const char *file, const char *baseFile, int line);
 
 #ifdef NDEBUG
 #define massert(exp)

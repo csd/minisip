@@ -43,7 +43,7 @@ const int STUN::STUNTYPE_PORT_RESTRICTED=5;
 const int STUN::STUNTYPE_RESTRICTED=6;
 const int STUN::STUNTYPE_SYMMETRIC_FIREWALL=7;
 
-static char *msgs[]={
+static const char *msgs[]={
 	"ERROR",
 	"BLOCKED",
 	"OpenInternet",

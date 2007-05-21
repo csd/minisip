@@ -45,7 +45,7 @@ Dbg & operator<<(Dbg &o, const SipSMCommand &c){
 #else
 ostream & operator<<(ostream &o, const SipSMCommand &c){
 #endif
-	char *s[6]={"(illegal)","dialog_layer","transaction_layer","(illegal)","dispatcher","transport_layer"};
+	const char *s[6]={"(illegal)","dialog_layer","transaction_layer","(illegal)","dispatcher","transport_layer"};
 	if (c.type==SipSMCommand::COMMAND_PACKET){
                 
 		o <<"COMMAND_PACKET:"
