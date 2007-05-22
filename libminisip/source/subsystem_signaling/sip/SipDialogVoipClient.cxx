@@ -615,7 +615,7 @@ void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
 }
 
 void SipDialogVoipClient::sendInviteOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", getLastInvite());	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	
 	MRef<SipHeaderValue *> contact = 

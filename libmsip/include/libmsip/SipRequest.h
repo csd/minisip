@@ -118,8 +118,7 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 		SipRequest(std::string &build_from);
 
-		SipRequest(std::string branch, const std::string &method,
-				const std::string &uri = "");
+		SipRequest(const std::string &method, const SipUri &uri);
 
 		virtual ~SipRequest();
 
@@ -131,8 +130,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 		virtual void setMethod(const std::string &method);
 		virtual std::string getMethod() const;
-
-// 		virtual void setUri(const std::string &uri);
 
 		virtual void setUri(const SipUri &uri);
 		virtual const SipUri& getUri() const;

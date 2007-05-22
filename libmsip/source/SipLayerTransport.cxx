@@ -781,7 +781,7 @@ bool SipLayerTransport::validateIncoming(MRef<SipMessage *> msg){
 			|| (isInvite && !msg->getHeaderValueNo(SIP_HEADER_TYPE_CONTACT,0))){
 		if (isRequest){
 			MRef<SipMessage*> resp = new SipResponse(msg->getFirstViaBranch(),
-				   400, "Required header missing", msg );
+				   400, "Required header missing", (SipRequest*)*msg );
 			resp->setSocket(msg->getSocket());
 			sendMessage(resp, "TL", false);
 		}

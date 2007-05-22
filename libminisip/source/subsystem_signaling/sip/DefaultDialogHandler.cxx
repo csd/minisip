@@ -301,11 +301,10 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			reasonPhrase = "Method Not Allowed";
 		}
 
-		MRef<SipMessage*> req = *pkt;
+		MRef<SipRequest*> req = (SipRequest*)*pkt;
 		string branch = req->getDestinationBranch();
 		MRef<SipResponse*> resp =
-			new SipResponse(branch, statusCode, reasonPhrase,
-					*req);
+			new SipResponse(branch, statusCode, reasonPhrase, req);
 
 		if (statusCode==405)
 			resp->addHeader(new SipHeader(new SipHeaderValueAllow("INVITE,MESSAGE,BYE,ACK,OPTIONS,PRACK") ));
@@ -967,7 +966,7 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 
 
 void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch){
-        MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
+        MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", bye );
         ok->getHeaderValueTo()->setParameter("tag","libminisip");
 
         MRef<SipMessage*> pref(*ok);

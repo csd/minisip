@@ -1187,7 +1187,7 @@ void SipDialogConfVoip::sendCancel(const string &branch){
 }
 
 void SipDialogConfVoip::sendInviteOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", getLastInvite());	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 //      There might be so that there are no SDP. Check!
@@ -1233,7 +1233,7 @@ void SipDialogConfVoip::sendInviteOk(const string &branch){
 }
 
 void SipDialogConfVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
-	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
+	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", bye );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
@@ -1242,7 +1242,7 @@ void SipDialogConfVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 }
 
 void SipDialogConfVoip::sendReject(const string &branch){
-	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", getLastInvite());	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -1250,7 +1250,7 @@ void SipDialogConfVoip::sendReject(const string &branch){
 }
 
 void SipDialogConfVoip::sendRinging(const string &branch){
-	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ringing = new SipResponse(branch,180,"Ringing", getLastInvite());	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
         MRef<SipMessage*> pref(*ringing);
         SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -1258,7 +1258,7 @@ void SipDialogConfVoip::sendRinging(const string &branch){
 }
 
 void SipDialogConfVoip::sendNotAcceptable(const string &branch){
-	MRef<SipResponse*> not_acceptable = new SipResponse(branch,606,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> not_acceptable = new SipResponse(branch,606,"Not Acceptable", getLastInvite());	
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
 			new SipHeader(new SipHeaderValueWarning(getSipStack()->getStackConfig()->externalContactIP, 399, mediaSession->getErrorString() ) ));

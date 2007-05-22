@@ -66,8 +66,7 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(const string &branch,
 	}else{
 		method = "ACK";
 	}
-	MRef<SipRequest*> req = new SipRequest(branch, method);
-	req->setUri(origReq->getUri());
+	MRef<SipRequest*> req = new SipRequest(method, origReq->getUri() );
 
 	req->addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
 	
@@ -99,8 +98,7 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(const string &branch,
 // 							string to_uri
 							)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "CANCEL");
-	req->setUri(inv->getUri());
+	MRef<SipRequest*> req = new SipRequest("CANCEL", inv->getUri());
 
 	req->addHeader(new SipHeader( new SipHeaderValueMaxForwards(70)));
 	
@@ -148,8 +146,7 @@ MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
 							int32_t seqNo,
 							const string& msg)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "MESSAGE");
-	req->setUri(toUri);
+	MRef<SipRequest*> req = new SipRequest("MESSAGE", toUri);
 	req->addDefaultHeaders(fromUri,toUri,"MESSAGE",seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->setContent(new SipMessageContentIM(msg));
@@ -178,8 +175,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 							MRef<SipStack*> stack
                 )
 {
-	MRef<SipRequest*> req = new SipRequest(branch,"INVITE");
-	req->setUri(toUri);
+	MRef<SipRequest*> req = new SipRequest("INVITE", toUri);
 
 	req->addDefaultHeaders( fromUri, toUri, "INVITE", seq_no, call_id );
 	addHeaders(req, contact, stack);
@@ -194,8 +190,7 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 							int32_t seqNo
 							)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "NOTIFY");
-	req->setUri(toUri);
+	MRef<SipRequest*> req = new SipRequest("NOTIFY", toUri);
 	req->addDefaultHeaders(fromUri, toUri,"NOTIFY",seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
@@ -209,8 +204,7 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 						       MRef<SipHeaderValueContact *> contactHdr,
 						       int32_t seq_no)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "REGISTER");
-	req->setUri( registrar );
+	MRef<SipRequest*> req = new SipRequest("REGISTER", registrar);
 
 	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
 
@@ -229,9 +223,7 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 							const SipUri &contact,
 							int32_t seq_no)
 {
-	MRef<SipRequest*> req = new SipRequest(branch, "SUBSCRIBE", toUri.getString() );
-
-	req->setUri(toUri);
+	MRef<SipRequest*> req = new SipRequest("SUBSCRIBE", toUri );
 
 	req->addDefaultHeaders(fromUri, toUri,"SUBSCRIBE",seq_no, call_id);
 	req->addHeader(new SipHeader(new SipHeaderValueContact(contact)));
@@ -255,16 +247,14 @@ void SipRequest::addDefaultHeaders(const SipUri& fromUri,
 }
 
 
-SipRequest::SipRequest(string branch, const string &method,
-		       const string &uri) :
-		SipMessage(branch), method(method),
+SipRequest::SipRequest(const string &method,
+		       const SipUri &uri) :
+		method(method),
 		uri(uri)
 {
-// 	if( this->uri == "" )
-// 		this->uri = "sip:";
 }
 
-SipRequest::SipRequest(string &build_from): SipMessage(-1, build_from){
+SipRequest::SipRequest(string &build_from): SipMessage(build_from){
 	init(build_from);
 }
 

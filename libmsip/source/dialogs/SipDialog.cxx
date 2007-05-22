@@ -196,7 +196,7 @@ MRef<SipRequest*> SipDialog::createSipMessage( const std::string &method ){
 }
 
 MRef<SipRequest*> SipDialog::createSipMessageSeq( const std::string &method, int seqNo ){
-	MRef<SipRequest*> req = new SipRequest("", method);
+	MRef<SipRequest*> req = new SipRequest(method, dialogState.getRemoteTarget());
 	
 	req->setUri( dialogState.getRemoteTarget() );
 	

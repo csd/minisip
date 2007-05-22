@@ -93,7 +93,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * 			"INVITE"), and for a response it
 		 * 			is the string in SipResponse::type.
 		 */
-		SipMessage(std::string branch);
+		SipMessage();
 
 
 
@@ -102,7 +102,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * Creates a SIP message from a buffer. This superclass
 		 * parses the buffer and creates headers and content.
 		 */
-		SipMessage(int dummy, std::string &build_from);
+		SipMessage(std::string &build_from);
 	public:
 		
 		virtual ~SipMessage();
@@ -349,7 +349,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipHeaderValueWWWAuthenticate*> getHeaderValueWWWAuthenticate(int i);
 
 	protected:
-		void setDestinationBranch(std::string b){branch = b;}
+		void setBranch(std::string b){branch = b;}
 
 		/**
 		 * Parses one line of text to a SIP header and adds it to

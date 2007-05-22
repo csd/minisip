@@ -253,7 +253,7 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
 	
-	MRef<SipResponse*> ok= new SipResponse("", 200,"OK", MRef<SipMessage*>(*sub));
+	MRef<SipResponse*> ok= new SipResponse("", 200,"OK", sub);
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);

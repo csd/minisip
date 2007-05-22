@@ -54,9 +54,9 @@ const string SipResponse::type="RESPONSE";
 SipResponse::SipResponse(string branch, 
 		int32_t status, 
 		string status_desc, 
-		MRef<SipMessage*> inv)
-			:SipMessage(branch)
+		MRef<SipRequest*> req)
 {
+	setBranch(branch);
 	setContent(NULL);
 
 	this->status_code=status;
@@ -65,9 +65,9 @@ SipResponse::SipResponse(string branch,
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
 	
-	int noHeaders = inv->getNoHeaders();
+	int noHeaders = req->getNoHeaders();
 	for (int i=0 ; i < noHeaders; i++){			//FIX: deep copy
-		MRef<SipHeader*> header = inv->getHeaderNo(i);
+		MRef<SipHeader*> header = req->getHeaderNo(i);
 		int headerType = header->getType();
 		switch (headerType){
 			case SIP_HEADER_TYPE_VIA:
@@ -83,7 +83,7 @@ SipResponse::SipResponse(string branch,
 }
 
 //TODO: This constructor needs rewriting (re-use from sipmessage)
-SipResponse::SipResponse(string &resp): SipMessage(-1, resp)
+SipResponse::SipResponse(string &resp): SipMessage(resp)
 {
 	int len = resp.size();
 

@@ -638,7 +638,7 @@ void SipDialogVoip::sendCancel(const string &branch){
 }
 
 void SipDialogVoip::sendReferOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 202,"OK", MRef<SipMessage*>(*lastRefer));	
+	MRef<SipResponse*> ok= new SipResponse(branch, 202,"OK", lastRefer);	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
@@ -652,7 +652,7 @@ void SipDialogVoip::sendReferOk(const string &branch){
 }
 
 void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
-	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*bye) );
+	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", bye );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 	MRef<SipMessage*> pref(*ok);
@@ -661,7 +661,7 @@ void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 }
 
 void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
-	MRef<SipResponse*> ok= new SipResponse( branch, 200, "OK", MRef<SipMessage*>(*notif) );
+	MRef<SipResponse*> ok= new SipResponse( branch, 200, "OK", notif );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 	MRef<SipMessage*> pref(*ok);

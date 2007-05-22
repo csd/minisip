@@ -118,8 +118,7 @@ ostream & operator<<(ostream &out, SipMessage &p){
 
 
 
-SipMessage::SipMessage(string b):branch(b){
-	content=NULL;
+SipMessage::SipMessage(){
 }
 
 
@@ -226,7 +225,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	return i;
 }
 
-SipMessage::SipMessage(int, string &buildFrom)
+SipMessage::SipMessage(string &buildFrom)
 {
 	uint32_t i;
 

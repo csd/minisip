@@ -350,7 +350,7 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		getSipStack()->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE);
 
 		// Send 200 OK for CANCEL
-		MRef<SipResponse*> okResp = new SipResponse( branch, 200,"OK", MRef<SipMessage*>(*cancel) );
+		MRef<SipResponse*> okResp = new SipResponse( branch, 200,"OK", cancel );
 		okResp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 		MRef<SipMessage*> okMsg(*okResp);
 		SipSMCommand okCmd( okMsg, SipSMCommand::dialog_layer,
@@ -615,7 +615,7 @@ SipDialogVoipServer::~SipDialogVoipServer(){
 
 
 void SipDialogVoipServer::sendInviteOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", getLastInvite() );	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	
 	MRef<SipHeaderValue *> contact = 
@@ -668,7 +668,7 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 }
 
 void SipDialogVoipServer::sendReject(const string &branch){
-	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", getLastInvite());	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -696,7 +696,7 @@ void SipDialogVoipServer::sendRinging(){
 }
 
 void SipDialogVoipServer::sendNotAcceptable(const string &branch){
-	MRef<SipResponse*> not_acceptable = new SipResponse(branch,406,"Not Acceptable", MRef<SipMessage*>(*getLastInvite()));	
+	MRef<SipResponse*> not_acceptable = new SipResponse(branch,406,"Not Acceptable", getLastInvite());	
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
 			new SipHeader(
