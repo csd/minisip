@@ -242,7 +242,7 @@ class MRef{
 		that is why first we decrease, then copy "o", then increase
 		the counter.
 		*/
-		inline void operator=(const OPType o);
+		inline MRef<OPType>& operator=(const OPType o);
 
 		/**
 		Assign operator overloaded (copying an exhisting MRef)
@@ -250,7 +250,7 @@ class MRef{
 		that is why first we decrease, then copy "o", then increase
 		the counter.
 		*/
-		inline void operator=(const MRef<OPType> &r);
+		inline MRef<OPType>& operator=(const MRef<OPType> &r);
 
 		/**
 		Overload the comparison operator (between MRefs).
@@ -368,17 +368,19 @@ MRef<OPType>::~MRef(){
 }
 
 template<class OPType>
-void MRef<OPType>::operator=(const OPType o){
+MRef<OPType>& MRef<OPType>::operator=(const OPType o){
 	decrease();
 	setPointer( o );
 	increase();
+	return *this;
 }
 
 template<class OPType>
-void MRef<OPType>::operator=(const MRef<OPType> &r){
+MRef<OPType>& MRef<OPType>::operator=(const MRef<OPType> &r){
 	decrease();
 	setPointer( r.getPointer() );
 	increase();
+	return *this;
 }
 
 template<class OPType>
