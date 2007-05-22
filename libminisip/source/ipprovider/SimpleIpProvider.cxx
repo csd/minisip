@@ -65,7 +65,7 @@ SimpleIpProvider::SimpleIpProvider( MRef<SipSoftPhoneConfiguration *> config ){
 		
 	//if a preferred network interface is specified in the config file ... 
 	if( config->networkInterfaceName != "") {
-		for (unsigned i=0; i<ifaces.size(); i++){
+		for (i=0; i<ifaces.size(); i++){
 			if ( config->networkInterfaceName == ifaces[i] ) {
 				localIp = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
 				ipFound=true;

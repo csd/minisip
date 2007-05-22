@@ -48,7 +48,7 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_RSEQ,sipHeaderValueRSeqTypeStr)
 {
 	unsigned i=0;
-	int len=build_from.size();
+	unsigned len=build_from.size();
 	while (isWS(build_from[i]))
 		i++;
 	string num="";

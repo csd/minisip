@@ -176,8 +176,8 @@ void SipStackInternal::setTransactionHandlesAck(bool transHandleAck){
 }
 
 
-void SipStackInternal::setCallback(MRef<CommandReceiver*> callback){
-	this->callback = callback;
+void SipStackInternal::setCallback(MRef<CommandReceiver*> cb){
+	this->callback = cb;
 	dispatcher->setCallback(callback);
 }
 
@@ -185,8 +185,8 @@ MRef<CommandReceiver*> SipStackInternal::getCallback(){
 	return callback;
 }
 
-void SipStackInternal::setConfCallback(MRef<CommandReceiver*> callback){
-	this->confCallback = callback;
+void SipStackInternal::setConfCallback(MRef<CommandReceiver*> cb){
+	this->confCallback = cb;
 }
 
 MRef<CommandReceiver*> SipStackInternal::getConfCallback(){

@@ -41,11 +41,11 @@ ContactEntry::ContactEntry():person(NULL), onlineStatus(CONTACT_STATUS_UNKNOWN){
 
 }
 
-ContactEntry::ContactEntry( string uri, string desc, 
-		MRef<PhoneBookPerson *> person ):
-	uri(uri),
-	desc(desc),
-	person(person),
+ContactEntry::ContactEntry( string uri_, string desc_, 
+		MRef<PhoneBookPerson *> p):
+	uri(uri_),
+	desc(desc_),
+	person(p),
 	onlineStatus(CONTACT_STATUS_UNKNOWN){
 	
 	
@@ -64,8 +64,8 @@ ContactEntry::~ContactEntry(){
 
 }
 
-void ContactEntry::setDb( MRef<ContactDb *> db ){
-	ContactEntry::db = db;
+void ContactEntry::setDb( MRef<ContactDb *> d){
+	ContactEntry::db = d;
 }
 
 string ContactEntry::getName(){
@@ -86,12 +86,12 @@ uint32_t ContactEntry::getId(){
 	return id;
 }
 
-void ContactEntry::setDesc( string desc ){
-	this->desc = desc;
+void ContactEntry::setDesc( string d ){
+	this->desc = d;
 }
 
-void ContactEntry::setUri( string uri ){
-	this->uri = uri;
+void ContactEntry::setUri( string u ){
+	this->uri = u;
 }
 
 

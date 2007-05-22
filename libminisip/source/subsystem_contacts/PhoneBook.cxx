@@ -48,12 +48,12 @@ MRef<PhoneBook * > PhoneBook::create( MRef<PhoneBookIo *> io ){
 	return NULL;
 }
 
-void PhoneBook::setIo( MRef<PhoneBookIo *> io ){
-	this->io = io;
+void PhoneBook::setIo( MRef<PhoneBookIo *> io_ ){
+	this->io = io_;
 }
 
-void PhoneBook::setName( string name ){
-	this->name = name;
+void PhoneBook::setName( string n ){
+	this->name = n;
 }
 
 string PhoneBook::getName(){
@@ -83,7 +83,7 @@ string PhoneBook::getPhoneBookId(){
 	return io->getPhoneBookId();
 }
 
-PhoneBookPerson::PhoneBookPerson( std::string name ):name(name){
+PhoneBookPerson::PhoneBookPerson( std::string n ):name( n ){
 }
 
 PhoneBookPerson::~PhoneBookPerson(){
@@ -100,8 +100,8 @@ PhoneBookPerson::~PhoneBookPerson(){
 	}*/
 }
 
-void PhoneBookPerson::setName( string name ){
-	this->name = name;
+void PhoneBookPerson::setName( string n){
+	this->name = n;
 }
 
 string PhoneBookPerson::getName(){

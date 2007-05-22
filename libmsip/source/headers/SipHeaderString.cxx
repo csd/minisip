@@ -39,8 +39,8 @@
 
 using namespace std;
 
-SipHeaderValueString::SipHeaderValueString(int type, const string& typeStr, const string &build_from)
-		: SipHeaderValue(type, typeStr)
+SipHeaderValueString::SipHeaderValueString(int type_, const string& typeStr, const string &build_from)
+		: SipHeaderValue(type_, typeStr)
 {
 	str=build_from;
 }

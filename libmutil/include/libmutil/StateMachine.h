@@ -255,10 +255,10 @@ template<class CommandType, class TimeoutType> class StateMachine : public virtu
 template<class CommandType, class TimeoutType>
 class State : public MObject{
 	public:
-		State(MRef<StateMachine<CommandType,TimeoutType> *> stateMachine, 
-				const std::string &name):
-					stateMachine(stateMachine),
-					name(name)
+		State(MRef<StateMachine<CommandType,TimeoutType> *> stateMachine_, 
+				const std::string &name_):
+					stateMachine(stateMachine_),
+					name(name_)
 		{}
 
 		~State(){
@@ -276,16 +276,16 @@ class State : public MObject{
 			transitions.push_back(transition);
 		}
 
-		MRef<StateTransition<CommandType, TimeoutType> *> getTransition(const std::string &name){
+		MRef<StateTransition<CommandType, TimeoutType> *> getTransition(const std::string &name_){
 			for (typename std::list<MRef<StateTransition<CommandType,TimeoutType> *> >::iterator i=transitions.begin(); i!=transitions.end(); i++)
-				if ((*i)->getName()==name)
+				if ((*i)->getName()==name_)
 					return *i;
 			return NULL;
 		}
 
-		bool removeTransition(const std::string &name){
+		bool removeTransition(const std::string &name_){
 			for (typename std::list<MRef<StateTransition<CommandType,TimeoutType> *> >::iterator i=transitions.begin(); i!=transitions.end(); i++){
-				if ((*i)->getName()==name){
+				if ((*i)->getName()==name_){
 					transitions.erase(i);
 					return true;
 				}
@@ -318,16 +318,16 @@ template<class CommandType, class TimeoutType>
 class StateTransition : public MObject{
 	public:
 	
-		StateTransition(MRef<StateMachine<CommandType, TimeoutType> *> stateMachine, 
-				const std::string &name, 
+		StateTransition(MRef<StateMachine<CommandType, TimeoutType> *> stateMachine_,
+				const std::string &name_,
 				bool (StateMachine<CommandType, TimeoutType>::*a)(const CommandType& ),
-				MRef<State<CommandType,TimeoutType> *> from_state, 
-				MRef<State<CommandType,TimeoutType> *> to_state):
-					stateMachine(stateMachine), 
-					name(name), 
+				MRef<State<CommandType,TimeoutType> *> from_state_, 
+				MRef<State<CommandType,TimeoutType> *> to_state_):
+					stateMachine(stateMachine_), 
+					name(name_), 
 					action(a),
-					from_state(from_state),
-					to_state(to_state)
+					from_state(from_state_),
+					to_state(to_state_)
 		{
 			from_state->register_transition(this);
 		}

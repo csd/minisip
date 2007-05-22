@@ -38,7 +38,7 @@ using namespace std;
 
 int Library::refCount;
 
-Library::Library(const string &path):path(path){
+Library::Library(const string &path_):path(path_){
 
 	if( refCount == 0 )
 		lt_dlinit();

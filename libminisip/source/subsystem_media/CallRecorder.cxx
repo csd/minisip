@@ -39,13 +39,13 @@ using namespace std;
 
 
 CallRecorder::CallRecorder(  MRef<AudioMedia *> aMedia, 
-				MRef<RtpReceiver *> rtpReceiver,
+				MRef<RtpReceiver *> rtpReceiver_,
 				MRef<IpProvider *> ipProvider ):
-		MediaStreamReceiver( (Media *)*aMedia, rtpReceiver ),
-		fileDev( NULL ),
-		audioMedia( aMedia),
+		MediaStreamReceiver( (Media *)*aMedia, rtpReceiver_ ),
 		enabledMic(false),
-		enabledNtwk(false)
+		enabledNtwk(false),
+		fileDev( NULL ),
+		audioMedia( aMedia)
 {
 	static int count = 0;
 	count ++;

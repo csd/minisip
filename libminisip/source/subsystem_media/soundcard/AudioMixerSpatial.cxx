@@ -108,6 +108,7 @@ bool AudioMixerSpatial::setSourcesPosition(
 				case 5: newPosition = 3; break;
 				case 2: newPosition = 5; break;
 				case 4: newPosition = 4; break;
+
 			}
 		} else {
 			if( SPATIAL_POS % 2 ) { //if odd number of positions

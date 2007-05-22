@@ -86,9 +86,9 @@ void TCPSocket::initTCPSocket(IPAddress &ipaddress, int32_t port){
 	ipaddress.connect(*this, port);
 }
 
-TCPSocket::TCPSocket(int32_t fd, struct sockaddr * addr, int32_t addr_len){
+TCPSocket::TCPSocket(int32_t fd_, struct sockaddr * addr, int32_t addr_len){
 	type = SOCKET_TYPE_TCP;
-	this->fd=fd;
+	this->fd=fd_;
 	peerAddress = IPAddress::create( addr, addr_len );
 	peerPort = peerAddress->getPort();
 }

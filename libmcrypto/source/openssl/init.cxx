@@ -69,7 +69,7 @@ unsigned long OpenSSLThreadGuard::openssl_thread_id()
 void OpenSSLThreadGuard::openssl_locker(int mode, int i, 
 		const char *file, int line) 
 {
-	MRef<OpenSSLThreadGuard *> instance = OpenSSLThreadGuard::getInstance();
-	instance->setLock(i, mode & CRYPTO_LOCK);
+	MRef<OpenSSLThreadGuard *> inst = OpenSSLThreadGuard::getInstance();
+	inst->setLock(i, mode & CRYPTO_LOCK);
 }
 

@@ -102,16 +102,16 @@ SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 	}
 }
 
-SdpHeaderM::SdpHeaderM(string media, 
-			int32_t port, 
+SdpHeaderM::SdpHeaderM(string media_, 
+			int32_t port_, 
 			int32_t n_ports, 
-			string transport) 
+			string transp) 
 				: SdpHeader(SDP_HEADER_TYPE_M, 8)
 {
-	this->media=media;
-	this->port=port;
+	this->media=media_;
+	this->port=port_;
 	this->nPorts=n_ports;
-	this->transport=transport;
+	this->transport=transp;
 }
 
 SdpHeaderM::SdpHeaderM(const SdpHeaderM &src): SdpHeader( SDP_HEADER_TYPE_M, 8 ){
@@ -153,8 +153,8 @@ int32_t SdpHeaderM::getPort(){
 	return port;
 }
 
-void SdpHeaderM::setPort(int32_t port){
-	this->port=port;
+void SdpHeaderM::setPort(int32_t p){
+	this->port=p;
 }
 
 int32_t SdpHeaderM::getNrPorts(){

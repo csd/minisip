@@ -281,6 +281,8 @@ int FileSoundDevice::readFromDevice(byte_t *buf, uint32_t nSamples){
 		case FILESOUND_TYPE_MP3:
 			cerr << "FileSoundDevice::readFromDevice - filetype not implemented" << endl;
 			break;
+		default:
+			cerr << "FileSoundDevice::readFromDevice - filetype unknown" << endl;
 	}
 	return retValue;
 }
@@ -368,6 +370,8 @@ int FileSoundDevice::writeToDevice( byte_t *buf, uint32_t nSamples ){
 		case FILESOUND_TYPE_MP3:
 			cerr << "FileSoundDevice::write - filetype not implemented" << endl;
 			break;
+		default:
+			cerr << "FileSoundDevice::write - filetype unknown" << endl;
 	}
 
 	return retValue;

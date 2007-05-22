@@ -55,7 +55,7 @@ struct reportheader{
 };
 */
 
-RtcpReport::RtcpReport(unsigned packet_type):packet_type(packet_type){
+RtcpReport::RtcpReport(unsigned ptype):packet_type(ptype){
 	this->version=2;
 	this->padding=0;
 	this->length=0;

@@ -58,8 +58,8 @@ int32_t SoundSource::getPos(){
 	return position;
 }
 
-void SoundSource::setPos(int32_t position){
-	this->position=position;
+void SoundSource::setPos(int32_t p){
+	this->position=p;
 }
 
 BasicSoundSource::BasicSoundSource(int32_t id,

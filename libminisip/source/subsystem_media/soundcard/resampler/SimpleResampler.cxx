@@ -30,14 +30,14 @@
 
 
 SimpleResampler::SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 
-		      uint32_t duration, uint32_t nChannels ){
+		      uint32_t duration, uint32_t nChannels_ ){
 
 	sampleRatio = 10000*inputFreq/outputFreq;
 
         inputFrames  = inputFreq * duration / 1000;
         outputFrames = outputFreq * duration / 1000;
 
-	this->nChannels = nChannels;
+	this->nChannels = nChannels_;
 
 	previousFrame = new short[ nChannels ];
 	memset( previousFrame, '\0', nChannels * sizeof( short ) );

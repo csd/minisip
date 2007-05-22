@@ -232,6 +232,10 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				return msg;
 				//return SipMessage::createMessage( messageString );
 			}
+		default:
+			/*never reached*/
+			massert(0);
+			break;
 	}
 	return NULL;
 }
@@ -284,9 +288,9 @@ class StreamThreadData : public InputReadyHandler{
 
 
 StreamThreadData::StreamThreadData( MRef<StreamSocket *> theSocket,
-				    MRef<SipLayerTransport *> transport)
+				    MRef<SipLayerTransport *> t)
 		:ssocket( theSocket ){
-	this->transport = transport;
+	this->transport = t;
 }
 
 
@@ -332,8 +336,8 @@ void printMessage(string header, string packet){
 }
 
 SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
-				     MRef<ca_db *> cert_db):
-		cert_chain(cchain), cert_db(cert_db), tls_ctx(NULL)
+				     MRef<ca_db *> cert_db_):
+		cert_chain(cchain), cert_db(cert_db_), tls_ctx(NULL)
 {
 	manager = new SocketServer();
 	manager->start();
@@ -840,7 +844,6 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 {
 	MRef<Socket *> socket;
 	MRef<IPAddress *> tempAddr;
-	MRef<IPAddress *> destAddr;
 	MRef<SipSocketServer *> server;
 #ifdef DEBUG_OUTPUT
 	cerr << "SipLayerTransport:  sendMessage addr=" << ip_addr << ", port=" << port << endl;

@@ -31,7 +31,7 @@
 using namespace std;
 
 
-TLSConnectFailed::TLSConnectFailed( int errorNumber, SSL * ssl ):ConnectFailed(errorNumber),ssl(ssl){};
+TLSConnectFailed::TLSConnectFailed( int errorNumber_, SSL * ssl_ ):ConnectFailed(errorNumber_),ssl(ssl_){};
 
 const char *TLSConnectFailed::what(){
 	
@@ -56,6 +56,8 @@ const char *TLSConnectFailed::what(){
 			msg = "SSL Error: I/O error" ; break;
 		case SSL_ERROR_SSL:
 			msg = "SSL Error: Error in the SSL protocol" ; break;
+		default:
+			msg = "SSL Error: Unknown SSL error";
 	}
 	return msg.c_str();
 }

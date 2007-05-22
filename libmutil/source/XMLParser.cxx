@@ -172,7 +172,7 @@ string XMLNode::generatestring(int32_t indent, XMLNode *cur){
 	if (indent>=0)
 		ret = ret+">\n";
 	if (cur->getValue().length()>0){
-		for (int32_t j=0; j<indent+1; j++)
+		for (j=0; j<indent+1; j++)
 			ret = ret+"\t";
 		ret = ret +cur->getValue()+"";
 		ret = ret+'\n';
@@ -199,7 +199,7 @@ string XMLParser::xmlstring(){
 
 }
 
-XMLFileParser::XMLFileParser(string filename, XMLParserCallback *cb):XMLParser(cb), filename(filename){
+XMLFileParser::XMLFileParser(string filename_, XMLParserCallback *cb):XMLParser(cb), filename(filename_){
 	
 	string s = "";
 	if (filename != ""){
@@ -407,7 +407,7 @@ void XMLParser::print(){
 	xmlprint("", root);
 }
 
-XMLNode::XMLNode(int32_t type, string name, string value):name(name), value(value),type(type){
+XMLNode::XMLNode(int32_t type_, string name_, string value_):name(name_), value(value_),type(type_){
 
 }
 
@@ -427,7 +427,7 @@ void XMLNode::addNode(XMLNode *n){
 	subnodes.push_back(n);
 }
 
-XMLElement::XMLElement(string name):XMLNode(XML_NODE_TYPE_ELEMENT, name){
+XMLElement::XMLElement(string name_):XMLNode(XML_NODE_TYPE_ELEMENT, name_){
 	
 }
 
@@ -447,7 +447,7 @@ void XMLElement::print(){
 
 }
 */
-XMLAttribute::XMLAttribute(string name, string value):XMLNode(XML_NODE_TYPE_ATTRIBUTE,name,value){
+XMLAttribute::XMLAttribute(string name_, string value_):XMLNode(XML_NODE_TYPE_ATTRIBUTE,name_,value_){
 
 }
 

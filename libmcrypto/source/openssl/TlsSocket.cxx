@@ -85,7 +85,7 @@ int8_t OsslSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciph
 
 
 // When created by a TLS Server
-OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
+OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx_ ):
 		sock(tcp_socket){
 	type = SOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
@@ -94,7 +94,7 @@ OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
 	int error;
 	// Copy the SSL parameters, since the server still needs them
 	// Initialize ssl in priv
-	priv = SSL_new( ssl_ctx );
+	priv = SSL_new( ssl_ctx_ );
 	this->ssl_ctx = SSL_get_SSL_CTX( ssl );
 
 	SSL_set_fd( ssl, tcp_socket->getFd() );
@@ -109,30 +109,30 @@ OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx ):
 }
 
 
-OsslSocket::OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
+OsslSocket::OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx_,
 			      MRef<ossl_certificate *> cert, 
-			      MRef<ossl_ca_db *> cert_db ){
+			      MRef<ossl_ca_db *> cert_db_ ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
+	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
 }
 
-OsslSocket::OsslSocket( string addr, int32_t port, void * &ssl_ctx, 
+OsslSocket::OsslSocket( string addr, int32_t port, void * &ssl_ctx_, 
 			      MRef<ossl_certificate *> cert, 
-			      MRef<ossl_ca_db *> cert_db ){
+			      MRef<ossl_ca_db *> cert_db_ ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx, cert, cert_db);
+	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */
-void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
+void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 					MRef<ossl_certificate *> cert,
-					MRef<ossl_ca_db *> cert_db ){
+					MRef<ossl_ca_db *> cert_db_ ){
 	type = SOCKET_TYPE_TLS;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
 	SSL_METHOD *meth = SSLv23_client_method();
-	this->ssl_ctx = (SSL_CTX *)ssl_ctx;
-	this->cert_db = cert_db;
+	this->ssl_ctx = (SSL_CTX *)ssl_ctx_;
+	this->cert_db = cert_db_;
 	peerPort = ssock->getPeerPort();
 	MRef<ossl_certificate*> ssl_cert;
 	MRef<ossl_ca_db*> ssl_db;

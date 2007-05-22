@@ -27,15 +27,15 @@ See Note in the header file about the source.
 
 #include <string.h> //for memcpy
 
-CircularBuffer::CircularBuffer(int size):
-		maxSize(size),
+CircularBuffer::CircularBuffer(int size_):
+		maxSize(size_),
 		size(0),
 		readIdx(0),
 		writeIdx(0),
 		byteCounter(0) {
 		
 	buf = NULL;
-	buf = new short[size];
+	buf = new short[size_];
 }
 
 CircularBuffer::CircularBuffer(const CircularBuffer &b):

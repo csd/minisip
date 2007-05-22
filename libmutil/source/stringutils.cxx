@@ -227,10 +227,10 @@ int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 		return -1;
 	}
 
-	iterator i;
+	iterator i,j;
 	iterator last = s1.end();
 
-	for (iterator i = s1.begin(), j = s2.begin(); i != last; ++i, ++j){
+	for (i = s1.begin(), j = s2.begin(); i != last; ++i, ++j){
 		const charT c1 = *i;
 		const charT c2 = *j;
 		if ( !(c1 == c2) &&

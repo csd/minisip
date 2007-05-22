@@ -26,14 +26,14 @@
 #include<libminisip/media/soundcard/SoundDriver.h>
 
 
-SoundDeviceName::SoundDeviceName(std::string name,
-		std::string description,
-		int maxInputChannels,
-		int maxOutputChannels) :
-			name( name ),
-			description( description ),
-			maxInputChannels( maxInputChannels ),
-			maxOutputChannels( maxOutputChannels )
+SoundDeviceName::SoundDeviceName(std::string name_,
+		std::string descr,
+		int maxInputChannels_,
+		int maxOutputChannels_) :
+			name( name_ ),
+			description( descr ),
+			maxInputChannels( maxInputChannels_ ),
+			maxOutputChannels( maxOutputChannels_ )
 {
 }
 

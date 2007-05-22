@@ -48,8 +48,8 @@ Exception::Exception(const Exception &e):
  * See:
  *  http://www.gnu.org/software/libc/manual/html_node/Backtraces.html
  */
-Exception::Exception(char const* what):exception(){
-	msg = string(what);
+Exception::Exception(char const* m):exception(){
+	msg = string(m);
 #ifdef HAVE_EXECINFO_H
 	stack = new void*[MAX_STACK_TRACE_DEPTH];
 	if (stack){
@@ -66,8 +66,8 @@ Exception::Exception(char const* what):exception(){
 /**
  * Same as Exception(char*) except that it takes a string instead.
 */
-Exception::Exception(const std::string &what):exception(){
-	msg = what;
+Exception::Exception(const std::string &m):exception(){
+	msg = m;
 #ifdef HAVE_EXECINFO_H
 	stack = new void*[MAX_STACK_TRACE_DEPTH];
 	if (stack){

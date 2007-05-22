@@ -58,7 +58,7 @@ MRef<MPlugin *> mg711_LTX_getPluginG711a( MRef<Library *> lib ){
 	return new G711Codec( lib, G711A );
 }
 
-G711Codec::G711Codec( MRef<Library *> lib, G711Version version ): AudioCodec( lib ), version( version ){
+G711Codec::G711Codec( MRef<Library *> lib, G711Version v): AudioCodec( lib ), version( v ){
 
 }
 
@@ -67,7 +67,7 @@ G711Codec::~G711Codec(){
 }
 
 
-G711CodecState::G711CodecState( G711Version version ): version( version ){
+G711CodecState::G711CodecState( G711Version v): version( v ){
 }
 
 uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){

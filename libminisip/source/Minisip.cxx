@@ -167,7 +167,7 @@ static void loadPlugins(const string &argv0){
  * -p <plugin path>
  * -c <configuration file>
 */
-Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
+Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 
 	string pluginPath = argv ? argv[0] : "";
 	int i=0;
@@ -190,8 +190,10 @@ Minisip::Minisip( MRef<Gui *> gui, int /*argc*/, char **argv ) : gui(gui){
 					if (path)
 						confPath = path;
 					else
-						throw
-						MinisipBadArgument("bad argument for -c");
+						throw MinisipBadArgument("bad argument for -c");
+					break;
+				default:
+					throw MinisipBadArgument((string("bad argument: ") + a[1]).c_str());
 					break;
 			}
 		
@@ -266,6 +268,7 @@ int Minisip::stop(){
 		sip->getSipStack()->handleCommand(sipcmd);
 		sip->stop();
 	}
+	return 1;
 }
 
 int Minisip::join(){
@@ -288,11 +291,11 @@ int Minisip::join(){
 	confMessageRouter = NULL;
 	gui = NULL;
 
+	return 1;
 }
 
 
 int Minisip::exit(){
-	int ret = 1;
 	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
 
 	stop();

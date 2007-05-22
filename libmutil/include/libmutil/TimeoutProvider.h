@@ -69,11 +69,10 @@ template<class TOCommand, class TOSubscriber>
 class TPRequest{
 	public:
 
-		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &command):subscriber(tsi){
+		TPRequest( TOSubscriber tsi, int timeout_ms, const TOCommand &cmd):subscriber(tsi),command(cmd){
 			
 			when_ms = mtime();
 			when_ms += timeout_ms;
-			this->command=command;
 		}
 		
 		/**

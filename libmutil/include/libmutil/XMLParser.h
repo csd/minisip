@@ -63,19 +63,19 @@ In the following example "name" is a attribute and FILE is an element
 
 class LIBMUTIL_API XMLException : public Exception{
 	public:
-		XMLException(std::string msg):
-				Exception(msg.c_str()) {};
+		XMLException(std::string m):
+				Exception(m.c_str()) {};
 	private:
 };
 
 class LIBMUTIL_API XMLElementNotFound: public XMLException{
 	public:
-		XMLElementNotFound(std::string msg):XMLException(msg){};
+		XMLElementNotFound(std::string m):XMLException(m){};
 };
 
 class LIBMUTIL_API XMLFileNotFound: public XMLException{
 	public:
-		XMLFileNotFound(std::string msg):XMLException(msg){};
+		XMLFileNotFound(std::string m):XMLException(m){};
 };
 
 

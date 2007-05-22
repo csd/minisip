@@ -135,24 +135,24 @@ void SipUri::setUri( string buildFrom ) {
 	
 }
 
-void SipUri::setParams(string userName, string ip, string type, int32_t port){
+void SipUri::setParams(string userName_, string ip_, string type, int32_t port_){
 	clear();
 	
 #ifdef DEBUG_OUTPUT
 // 	cerr << "SipUri::setParams " << endl;
 #endif	
-	parseUserInfo( userName );
+	parseUserInfo( userName_ );
 	if( getUserName() == "" && getIp() != "" ) {
 		setUser( getIp() );
 		setIp( "" );
 		setPort( 0 );
 	}
 	
-	if( getIp() == "" && ip != "" ) {
-		setIp( ip );
+	if( getIp() == "" && ip_ != "" ) {
+		setIp( ip_ );
 	}
 	
-	if( port != 0 ) setPort( port );
+	if( port_ != 0 ) setPort( port );
 	if( type != "" ) setUserType( type );
 	validUri = true;
 }
@@ -344,22 +344,16 @@ const string & SipUri::getUserName() const {
 	return userName;
 }
 
-void SipUri::setIp(string ip){
-	this->ip=ip;
-#ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: ip = " << this->ip << endl;
-#endif
+void SipUri::setIp(string i){
+	this->ip=i;
 }
 
 const string & SipUri::getIp() const {
 	return ip;
 }
 
-void SipUri::setPort(int32_t port){
-	this->port=port;
-#ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: port = " << itoa( this->port ) << endl;
-#endif
+void SipUri::setPort(int32_t p){
+	this->port=p;
 }
 
 int32_t SipUri::getPort() const {
@@ -368,9 +362,6 @@ int32_t SipUri::getPort() const {
 
 void SipUri::setUserType(string type){
 	setParameter( "user", type );
-#ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: user type = " << type << endl;
-#endif
 }
 
 const string & SipUri::getUserType() const {
@@ -379,9 +370,6 @@ const string & SipUri::getUserType() const {
 
 void SipUri::setTransport(string transp){
 	setParameter( "transport", transp );
-#ifdef DEBUG_OUTPUT
-// 	cerr << "SipUri: transport = " << transp << endl;
-#endif
 }
 
 const string & SipUri::getTransport() const {

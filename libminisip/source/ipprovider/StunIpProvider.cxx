@@ -167,11 +167,11 @@ MRef<IpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> pho
 			natType, externalIp, stunIp, stunPort  );
 }
 
-StunIpProvider::StunIpProvider( uint32_t natType, string externalIp, MRef<IPAddress *> stunIp, uint16_t stunPort ):
-		stunIp(stunIp),
-		stunPort(stunPort),
-		externalIp(externalIp),
-		natType(natType)
+StunIpProvider::StunIpProvider( uint32_t natType_, string externalIp_, MRef<IPAddress *> stunIp_, uint16_t stunPort_ ):
+		stunIp(stunIp_),
+		stunPort(stunPort_),
+		externalIp(externalIp_),
+		natType(natType_)
 {
 }
 

@@ -505,12 +505,12 @@ bool SipDialogConfVoip::a11_ringing_incall_accept( const SipSMCommand &command)
 		getSipStack()->getCallback()->handleCommand("sip_conf", cmdstr2 );
 		getMediaSession()->start();
 
-		MRef<LogEntry *> logEntry = new LogEntryIncomingCompletedCall();
+		MRef<LogEntry *> log= new LogEntryIncomingCompletedCall();
 
-		logEntry->start = time( NULL );
-		logEntry->peerSipUri = getLastInvite()->getFrom().getString();
+		log->start = time( NULL );
+		log->peerSipUri = getLastInvite()->getFrom().getString();
 		
-		setLogEntry( logEntry );
+		setLogEntry( log );
 		
 		return true;
 	}else{
@@ -904,12 +904,12 @@ void SipDialogConfVoip::setUpStateMachine(){
 }
 
 
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist,string confid, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, minilist<ConfMember> *conflist,string confid, string cid) : 
                 SipDialog(stack,ident,cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),
-		mediaSession(mediaSession)
+		mediaSession(s)
 {
 	confId=confid;
 	numConnected= conflist->size();
@@ -950,12 +950,12 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 
 	setUpStateMachine();
 }
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string confid, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, string confid, string cid) : 
                 SipDialog(stack,ident, cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
 		phoneconf(pconf),
-		mediaSession(mediaSession)
+		mediaSession(s)
 {
 	confId=confid;
 	//cerr<<"SDCVididididididididididdididi "+confId<<endl;
@@ -972,12 +972,6 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 
 SipDialogConfVoip::~SipDialogConfVoip(){	
 }
-
-/*
-void SipDialogVoip::handleSdp(MRef<SdpPacket*> sdp){
-
-}
-*/
 
 void SipDialogConfVoip::sendInvite(const string &branch){
 	//	mdbg << "ERROR: SipDialogVoip::sendInvite() UNIMPLEMENTED"<< end;
@@ -1330,8 +1324,8 @@ MRef<LogEntry *> SipDialogConfVoip::getLogEntry(){
 	return logEntry;
 }
 
-void SipDialogConfVoip::setLogEntry( MRef<LogEntry *> logEntry ){
-	this->logEntry = logEntry;
+void SipDialogConfVoip::setLogEntry( MRef<LogEntry *> l){
+	this->logEntry = l;
 }
 
 MRef<Session *> SipDialogConfVoip::getMediaSession(){
@@ -1339,19 +1333,19 @@ MRef<Session *> SipDialogConfVoip::getMediaSession(){
 }
 
 
-bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
+bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type_){
 	if (Offer){
 		if ( Offer->getContentType().substr(0,9) == "multipart"){
 			MRef<SipMessageContent *> part;
 			part = ((SipMessageContentMime*)*Offer)->popFirstPart();
 			while( *part != NULL){
-				sortMIME(part, peerUri, type);
+				sortMIME(part, peerUri, type_);
 				part = ((SipMessageContentMime*)*Offer)->popFirstPart();
 			}
 		}
 
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
-			switch (type){
+			switch (type_){
 				case 10:
 #ifdef ENABLE_TS
 					ts.save("setSdpOffer");

@@ -244,19 +244,18 @@ SipMessage::SipMessage(string &buildFrom)
 	int contentStart = parseHeaders(buildFrom, i);
 	int clen = getContentLength();
 	if (clen>0){
-		string content=buildFrom.substr(contentStart, clen);
-		if ((int)content.length() != clen){
-			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<(int)content.length()<<")"<<endl;
+		string contentbuf=buildFrom.substr(contentStart, clen);
+		if ((int)contentbuf.length() != clen){
+			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<(int)contentbuf.length()<<")"<<endl;
 		}
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
 		if (h){	
-			MRef<SipMessageContent*> smcref;
 			string contentType = ((SipHeaderValueString*)*(h->getHeaderValue(0) ))->getString();
 //			string b = (SipHeaderValueContentType*)*(h->getHeaderValue(0) )->getParameter("boundary");
 //cerr <<"boundary="<< b <<endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
-				MRef<SipMessageContent*> smcref = contentFactory(content, contentType );
+				MRef<SipMessageContent*> smcref = contentFactory(contentbuf, contentType );
 				setContent(smcref);
 			}else{ //TODO: Better error handling
 				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<end;
@@ -295,8 +294,8 @@ MRef<SipHeaderValue*> findFirstHeaderValue(minilist<MRef<SipHeader*> > headers, 
 	return NULL;
 }
 
-void SipMessage::setContent(MRef<SipMessageContent*> content){
-	this->content=content;
+void SipMessage::setContent(MRef<SipMessageContent*> c){
+	this->content=c;
 	if( content ){
 		string contentType = content->getContentType();
 		if( contentType != "" ){
@@ -539,9 +538,9 @@ list<string> SipMessage::getRouteSet() {
 }
 
 
-void SipMessage::setSocket(MRef<Socket*> sock)
+void SipMessage::setSocket(MRef<Socket*> s)
 {
-	this->sock = sock;
+	this->sock = s;
 }
 
 MRef<Socket*> SipMessage::getSocket()

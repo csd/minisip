@@ -59,11 +59,11 @@ class LIBMINISIP_API ConfMessageRouter: 	//public SipCallback,
 		}
 		
 		void setSip(MRef<Sip*> ssp);
-		void setGui(MRef<Gui *> guiptr){gui = guiptr;};
+		void setGui(MRef<Gui *> g){gui = g;};
 		virtual void setConferenceController(ConferenceControl *conf);
 		virtual void removeConferenceController(ConferenceControl *conf);
-		void setMediaHandler(MRef<MediaHandler *> mediaHandler){
-			this->mediaHandler = mediaHandler;}
+		void setMediaHandler(MRef<MediaHandler *> mh){
+			this->mediaHandler = mh;}
 
 		virtual void sipcb_handleCommand(const CommandString &command);
 		virtual void sipcb_handleConfCommand(const CommandString &command);

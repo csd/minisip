@@ -158,12 +158,12 @@ SipHeaderValueVia::SipHeaderValueVia()
 	ip="UNKNOWN_IP";
 }
 
-SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip, int32_t port/*, const string &branch*/)
+SipHeaderValueVia::SipHeaderValueVia(const string &proto, const string &ip_, int32_t port_)
 		: SipHeaderValue(SIP_HEADER_TYPE_VIA,sipHeaderValueViaTypeStr)
 {
 	setProtocol(proto);
-	setIp(ip);
-	setPort(port);
+	setIp(ip_);
+	setPort(port_);
 }
 
 SipHeaderValueVia::~SipHeaderValueVia(){
@@ -188,16 +188,16 @@ string SipHeaderValueVia::getProtocol() const{
 	return protocol;
 }
 
-void SipHeaderValueVia::setProtocol(const string &protocol){
-	this->protocol=protocol;
+void SipHeaderValueVia::setProtocol(const string &p){
+	this->protocol=p;
 }
 		
 string SipHeaderValueVia::getIp() const{
 	return ip;
 }
 		
-void SipHeaderValueVia::setIp(const string &ip){
-	this->ip=ip;
+void SipHeaderValueVia::setIp(const string &i){
+	this->ip=i;
 }
 
 int32_t SipHeaderValueVia::getPort() const{

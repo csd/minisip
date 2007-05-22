@@ -69,12 +69,12 @@ SipHeaderValueWarning::SipHeaderValueWarning(const string &build_from)
 }
 
 
-SipHeaderValueWarning::SipHeaderValueWarning(string domainName, uint16_t errorCode, string warning)
+SipHeaderValueWarning::SipHeaderValueWarning(string dn, uint16_t ec, string warn)
 		: SipHeaderValue(SIP_HEADER_TYPE_WARNING,sipHeaderValueWarningTypeStr)
 {
-	this->errorCode=errorCode;
-	this->domainName=domainName;
-	this->warning=warning;
+	this->errorCode=ec;
+	this->domainName=dn;
+	this->warning=warn;
 }
 
 SipHeaderValueWarning::~SipHeaderValueWarning(){
@@ -89,22 +89,23 @@ string SipHeaderValueWarning::getWarning() const{
 	return warning;
 }
 		
-void SipHeaderValueWarning::setWarning(const string &warning){
-	this->warning=warning;
+void SipHeaderValueWarning::setWarning(const string &w){
+	this->warning=w;
 }
 
 string SipHeaderValueWarning::getDomainName() const{
 	return domainName;
 }
 
-void SipHeaderValueWarning::setDomainName(const string &domainName){
-	this->domainName=domainName;
+void SipHeaderValueWarning::setDomainName(const string &d){
+	this->domainName=d;
 }
 
 uint16_t SipHeaderValueWarning::getErrorCode() const{
 	return errorCode;
 }
 
-void SipHeaderValueWarning::setErrorCode(const uint16_t& errorCode){
-	this->errorCode=errorCode;
+void SipHeaderValueWarning::setErrorCode(const uint16_t& e){
+	this->errorCode=e;
 }
+

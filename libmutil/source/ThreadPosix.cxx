@@ -313,7 +313,7 @@ Thread::Thread(MRef<Runnable *> runnable){
 	
 	ret = pthread_create(
 			//(pthread_t*)handle.hptr, 
-			(pthread_t*)&handle.handle,
+			(pthread_t*)((void*)&handle.handle),
 			NULL, // either NULL or &attr,
 			LinuxThreadStarter, 
 			self);
@@ -348,7 +348,7 @@ ThreadHandle Thread::createThread(void f()){
 	#ifdef DEBUG_OUTPUT
  		mdbg << "Running createThread"<< end;
 	#endif	// DEBUG_OUTPUT
-	pthread_create( /* (pthread_t*)h.hptr*/ (pthread_t*)&h.handle, NULL, LinuxStaticThreadStarter, (void*)f);
+	pthread_create( /* (pthread_t*)h.hptr*/ (pthread_t*)((void*)&h.handle), NULL, LinuxStaticThreadStarter, (void*)f);
 	return h;
 }
 
@@ -361,7 +361,7 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 	#ifdef DEBUG_OUTPUT
 		mdbg << "Running createThread" << end;
 	#endif	// DEBUG_OUTPUT
-	pthread_create(/* (pthread_t*)h.hptr*/ (pthread_t*)&h.handle, NULL, LinuxStaticThreadStarterArg, argptr);
+	pthread_create(/* (pthread_t*)h.hptr*/ (pthread_t*)((void*)&h.handle), NULL, LinuxStaticThreadStarterArg, argptr);
 	return h;
 }
 

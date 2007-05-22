@@ -67,10 +67,10 @@ using namespace std;
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack, 
 	    MRef<SipSoftPhoneConfiguration*> pconf,
-	    MRef<MediaHandler *>mediaHandler): 
+	    MRef<MediaHandler *>mh): 
 		sipStack(stack),
 		phoneconf(pconf),
-		mediaHandler(mediaHandler)
+		mediaHandler(mh)
 {
 	outsideDialogSeqNo=1;
 
@@ -115,7 +115,6 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		bool isConfJoin=false;
 		bool isP2T=false;
 		bool isConfConnect=false;
-		MRef<SipHeaderValueAcceptContact*> acp;
 		int i=0;
 		MRef<SipHeaderValue*> hdr=inv->getHeaderValueNo(SIP_HEADER_TYPE_ACCEPTCONTACT, i);
 		do{

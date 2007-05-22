@@ -524,11 +524,10 @@ void SipTransactionInviteClient::setUpStateMachine(){
 
 
 SipTransactionInviteClient::SipTransactionInviteClient(MRef<SipStackInternal*> stack, 
-		//MRef<SipDialog*> call, 
 		int seq_no, 
-		const string &cSeqMethod, 
+		const string &cseqm, 
 		const string &callid): 
-			SipTransactionClient(stack, /*call,*/ seq_no, cSeqMethod, "", callid),
+			SipTransactionClient(stack, seq_no, cseqm, "", callid),
 		lastInvite(NULL)
 {
 	timerA=sipStackInternal->getTimers()->getA();

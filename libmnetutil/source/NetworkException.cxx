@@ -32,25 +32,25 @@
 
 using namespace std;
 
-ConnectFailed::ConnectFailed( int errorNumber ):NetworkException(errorNumber){};
+ConnectFailed::ConnectFailed( int errorNr ):NetworkException(errorNr){};
 
-UnknownAddressFamily::UnknownAddressFamily( int errorNumber ) : NetworkException(errorNumber) { }
+UnknownAddressFamily::UnknownAddressFamily( int errorNr ) : NetworkException(errorNr) { }
 
-SendFailed::SendFailed( int errorNumber ):NetworkException(errorNumber){};
+SendFailed::SendFailed( int errorNr ):NetworkException(errorNr){};
 
-ResolvError::ResolvError( int errorNumber ):NetworkException(errorNumber){};
+ResolvError::ResolvError( int errorNr ):NetworkException(errorNr){};
 
-SocketFailed::SocketFailed( int errorNumber ):NetworkException(errorNumber){};
+SocketFailed::SocketFailed( int errorNr ):NetworkException(errorNr){};
 
-ListenFailed::ListenFailed( int errorNumber ):NetworkException(errorNumber){};
+ListenFailed::ListenFailed( int errorNr ):NetworkException(errorNr){};
 
-BindFailed::BindFailed( int errorNumber ):NetworkException(errorNumber){};
+BindFailed::BindFailed( int errorNr ):NetworkException(errorNr){};
 
-GetSockNameFailed::GetSockNameFailed( int errorNumber ):NetworkException(errorNumber){};
+GetSockNameFailed::GetSockNameFailed( int errorNr ):NetworkException(errorNr){};
 
-SetSockOptFailed::SetSockOptFailed( int errorNumber ):NetworkException(errorNumber){};
+SetSockOptFailed::SetSockOptFailed( int errorNr ):NetworkException(errorNr){};
 
-NetworkException::NetworkException( int errorNumber ):errorNumber(errorNumber){
+NetworkException::NetworkException( int errorNr ):errorNumber(errorNr){
 	#ifdef WIN32
 		msg = string( strerror( errorNumber ));
 	#else

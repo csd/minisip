@@ -36,29 +36,29 @@ MRef<SipMessageContent*> SipMIMEContentFactory(const std::string & buf, const st
 	return new SipMessageContentMime(buf, ContentType);
 }
 
-SipMessageContentMime::SipMessageContentMime(std::string ContentType){
-	this->ContentType = ContentType;
+SipMessageContentMime::SipMessageContentMime(std::string t){
+	this->ContentType = t;
 	this->boundry = "boun=_dry";
 	this->Message = "";
 	this->uniqueboundry = "_Minisip";
 }
 
-SipMessageContentMime::SipMessageContentMime(std::string ContentType, std::string Message, std::string boundry) {
-	this->Message = Message; 
-	this->ContentType = ContentType;
-	this->boundry = boundry;
+SipMessageContentMime::SipMessageContentMime(std::string t, std::string m, std::string b) {
+	this->Message = m; 
+	this->ContentType = t;
+	this->boundry = b;
 	this->uniqueboundry = "_Minisip";
 }
 
-SipMessageContentMime::SipMessageContentMime(std::string content, std::string ContentType) {
+SipMessageContentMime::SipMessageContentMime(std::string content, std::string t) {
 	size_t index2;
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
-	if(ContentType.substr(0,9) == "multipart"){
-		this->ContentType = ContentType.substr(0 , ContentType.find("; ",0) );
-		index2 = ContentType.find("; boundary=",0);
+	if(t.substr(0,9) == "multipart"){
+		this->ContentType = t.substr(0 , ContentType.find("; ",0) );
+		index2 = t.find("; boundary=",0);
 		massert(index2 != string::npos);
-		this->boundry = ContentType.substr(index2 + 11 , ContentType.find(";",index2 + 11));
+		this->boundry = t.substr(index2 + 11 , t.find(";",index2 + 11));
 		// Find first bodypart
 		index2 = content.find("--"+this->boundry, 0);
 		massert(index2 != string::npos);
@@ -100,7 +100,7 @@ SipMessageContentMime::SipMessageContentMime(std::string content, std::string Co
 		}
 	}
 	else{
-		this->ContentType = ContentType;
+		this->ContentType = t;
 		this->Message = content;
 		this->boundry = "";
 	}
@@ -135,8 +135,8 @@ std::string SipMessageContentMime::getContentType() const{
 		return ContentType;
 }
 
-void SipMessageContentMime::setBoundry(std::string boundry){
-	this->boundry = boundry;
+void SipMessageContentMime::setBoundry(std::string b){
+	this->boundry = b;
 }
 
 std::string SipMessageContentMime::getBoundry(){

@@ -38,12 +38,12 @@ using namespace std;
 
 int SipIdentity::globalIndex = 1; //give an initial value
 
-SipCredential::SipCredential( const std::string &username,
-			      const std::string &password,
-			      const std::string &realm ):
-		realm( realm ),
-		username( username ),
-		password( password )
+SipCredential::SipCredential( const std::string &u,
+			      const std::string &p,
+			      const std::string &r):
+		realm( r ),
+		username( u ),
+		password( p )
 {
 }
 

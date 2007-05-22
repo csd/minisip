@@ -41,8 +41,8 @@ using namespace std;
 
 const string sipHeaderUnknownTypeString ="";
 
-SipHeaderValueUnknown::SipHeaderValueUnknown(const string &headerName, const string &build_from)
-		:SipHeaderValueString(SIP_HEADER_TYPE_UNKNOWN,headerName, build_from)
+SipHeaderValueUnknown::SipHeaderValueUnknown(const string &headerName_, const string &build_from)
+		:SipHeaderValueString(SIP_HEADER_TYPE_UNKNOWN,headerName_, build_from)
 {
 }
 

@@ -184,8 +184,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 * 
 		 */
 		void addDefaultHeaders(const SipUri& fromUri, 
-				const SipUri& toUri, 
-				const std::string& method, 
 				int seqNo, 
 				const std::string& callId="");
 		

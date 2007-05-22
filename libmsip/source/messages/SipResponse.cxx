@@ -51,16 +51,16 @@ using namespace std;
 
 const string SipResponse::type="RESPONSE";
 
-SipResponse::SipResponse(string branch, 
+SipResponse::SipResponse(string branch_, 
 		int32_t status, 
-		string status_desc, 
+		string status_desc_, 
 		MRef<SipRequest*> req)
 {
-	setBranch(branch);
-	setContent(NULL);
-
 	this->status_code=status;
-	this->status_desc=status_desc;
+	this->status_desc=status_desc_;
+
+	setBranch(branch_);
+	setContent(NULL);
 
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);
 	addHeader(new SipHeader(*mf));
@@ -76,7 +76,10 @@ SipResponse::SipResponse(string branch,
 			case SIP_HEADER_TYPE_CALLID:
 			case SIP_HEADER_TYPE_CSEQ:
 			case SIP_HEADER_TYPE_RECORDROUTE: //if it exhists in the request, it is copied to response
-				addHeader(header);	//FIXME: Other headers should be copies as well (?)
+				addHeader(header);
+				break;
+			default:
+				/*don't copy any other header*/
 				break;
 		}
 	}

@@ -33,20 +33,20 @@ class Session;
 
 class LIBMINISIP_API DtmfEvent{
 	public:
-		DtmfEvent( uint8_t symbol, 
-				uint8_t volume, 
-				uint16_t duration, 
-				bool endOfEvent, 
-				bool startOfEvent, 
-				uint32_t * ts, 
-				bool lastBlock = false ):
-					symbol(symbol),
-					volume(volume),
-					duration(duration),
-					endOfEvent(endOfEvent),
-					startOfEvent(startOfEvent),
-					ts(ts),
-					lastBlock(lastBlock){
+		DtmfEvent( uint8_t symbol_, 
+				uint8_t volume_, 
+				uint16_t duration_, 
+				bool endOfEvent_, 
+				bool startOfEvent_, 
+				uint32_t * ts_, 
+				bool lastBlock_ = false ):
+					symbol(symbol_),
+					volume(volume_),
+					duration(duration_),
+					endOfEvent(endOfEvent_),
+					startOfEvent(startOfEvent_),
+					ts(ts_),
+					lastBlock(lastBlock_){
 	};
 
 	private:

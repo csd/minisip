@@ -352,7 +352,7 @@ string TextUI::displaySuggestions(string hint){
 	}
 	
 	if (cbSuggest.size()==0){
-		for (int i=0; i<completionCallbacks.size(); i++){
+		for (i=0; i<completionCallbacks.size(); i++){
 			if (hint=="" || 
 					(completionCallbacks[i].match.size()>=hint.size() && 
 					 completionCallbacks[i].match.substr(0,hint.size())==hint )){

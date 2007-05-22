@@ -160,8 +160,8 @@ void SipCommandDispatcher::run(){
 	}
 }
 
-void SipCommandDispatcher::setCallback(MRef<CommandReceiver*> callback){
-        this->callback = callback;
+void SipCommandDispatcher::setCallback(MRef<CommandReceiver*> cb){
+        this->callback = cb;
 }
 
 

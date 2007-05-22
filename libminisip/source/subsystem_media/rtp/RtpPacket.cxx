@@ -52,10 +52,10 @@ RtpPacket::RtpPacket() {
     zrtpChecksum = 0;
 }
 
-RtpPacket::RtpPacket(unsigned char *content, int content_length,
+RtpPacket::RtpPacket(unsigned char *content_, int cl,
 		     int seq_no, unsigned timestamp, unsigned ssrc):
-    content_length(content_length){
-
+	    content_length(cl)
+{
     extensionLength = 0;
     extensionHeader = NULL;
     zrtpChecksum = 0;
@@ -67,13 +67,13 @@ RtpPacket::RtpPacket(unsigned char *content, int content_length,
 
     if( content_length ){
 	this->content = new unsigned char[content_length];
-	memcpy(this->content, content, content_length);
+	memcpy(this->content, content_, content_length);
     }
     else
 	this->content = NULL;
 }
 
-RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content, int content_length): header(hdr) {
+RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content_, int cl): header(hdr) {
 
     extensionLength = 0;
     extensionHeader = NULL;
@@ -84,26 +84,26 @@ RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content, int content_length):
      * set pointer to extension header, compute length and
      * adjust content pointer and content_length
      */
-    if (header.getExtension() && content_length >= 4) {
+    if (header.getExtension() && cl >= 4) {
 	extensionLength = 4;
-	content_length -= 4;	// minimum size of extension header
+	cl -= 4;	// minimum size of extension header
 
-	short tmp = *((short *)(content+2));
+	short tmp = *((short *)(content_+2));
         tmp = ntoh16(tmp);
         tmp *= 4;		// ext. header length is in words (4 bytes)
 	extensionLength += tmp;
-	content_length -= tmp;
+	cl -= tmp;
 
-        if (content_length >= 0) {
+        if (cl >= 0) {
             extensionHeader = new unsigned char[extensionLength];
-            memcpy(this->extensionHeader, content, extensionLength);
+            memcpy(this->extensionHeader, content_, extensionLength);
         }
     }
-    this->content_length = content_length;
+    this->content_length = cl;
 
     if( content_length > 0 ){
 	this->content = new unsigned char[content_length];
-	memcpy(this->content, content+extensionLength, content_length);
+	memcpy(this->content, content_ + extensionLength, content_length);
     }
     else
 	this->content = NULL;
@@ -230,6 +230,7 @@ bool RtpPacket::checkZrtpChecksum(bool check) {
         content_length -= 2;
     }
     // TODO: implement the real recompute and check of checksum
+    return true; 
 }
 
 #define CKSUM_CARRY(x) (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))

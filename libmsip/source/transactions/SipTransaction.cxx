@@ -52,13 +52,13 @@ using namespace std;
 
 SipTransaction::SipTransaction(MRef<SipStackInternal*> stackInternal, 
 		int cseq, 
-		const string &cSeqMethod, 
+		const string &cseqm, 
 		const string &b, 
 		const string &callid): 
 			StateMachine<SipSMCommand, string>(stackInternal->getTimeoutProvider() ), 
 			sipStackInternal(stackInternal),
 			cSeqNo(cseq),
-			cSeqMethod(cSeqMethod),
+			cSeqMethod(cseqm),
 			branch(b)
 {
 	dispatcher = stackInternal->getDispatcher();
@@ -254,10 +254,10 @@ bool SipTransaction::handleCommand(const SipSMCommand &command){
 
 SipTransactionClient::SipTransactionClient(MRef<SipStackInternal*> stackInternal, 
 		int seq_no, 
-		const string &cSeqMethod, 
-		const string &branch, 
+		const string &cseqm, 
+		const string &branch_, 
 		const string &callid):
-			SipTransaction(stackInternal, seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stackInternal, seq_no, cseqm, branch_, callid)
 {
 	
 }
@@ -268,10 +268,10 @@ SipTransactionClient::~SipTransactionClient(){
 
 SipTransactionServer::SipTransactionServer(MRef<SipStackInternal*> stackInternal, 
 		int seq_no, 
-		const string &cSeqMethod, 
-		const string &branch, 
+		const string &cseqm, 
+		const string &branch_,
 		const string &callid):
-			SipTransaction(stackInternal,seq_no,cSeqMethod,branch,callid)
+			SipTransaction(stackInternal,seq_no,cseqm,branch_,callid)
 {
 	
 }

@@ -89,25 +89,25 @@ void SipSMCommand::setSource(int i){
 }
 
 SipSMCommand::SipSMCommand(MRef<SipMessage*> p, 
-		int source, 
-		int destination): 
+		int s, 
+		int d): 
 			type(COMMAND_PACKET), 
 			cmdstr("",""), 
 			cmdpkt(p), 
-			source(source), 
-			destination(destination)
+			source(s), 
+			destination(d)
 {
 
 }
 
-SipSMCommand::SipSMCommand(const CommandString &s, 
-		int source, 
-		int destination): 
+SipSMCommand::SipSMCommand(const CommandString &cs, 
+		int s, 
+		int d): 
 			type(COMMAND_STRING), 
-			cmdstr(s),
+			cmdstr(cs),
 			cmdpkt(NULL),
-			source(source), 
-			destination(destination)
+			source(s), 
+			destination(d)
 {
 
 }

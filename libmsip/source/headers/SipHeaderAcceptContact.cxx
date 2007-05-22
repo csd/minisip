@@ -126,12 +126,12 @@ SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string build_from):SipH
  * @param set_explicit set the explicit flag
  */
 
-SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string featuretag, 
-		bool set_require, bool set_explicit)
+SipHeaderValueAcceptContact::SipHeaderValueAcceptContact(string ft, 
+		bool sr, bool se)
 		:SipHeaderValue(SIP_HEADER_TYPE_ACCEPTCONTACT,sipHeaderValueValueTypeStr){
-	this->featuretag = featuretag;
-	this->set_require = set_require;
-	this->set_explicit = set_explicit;
+	this->featuretag = ft;
+	this->set_require = sr;
+	this->set_explicit = se;
 }
 
 /**

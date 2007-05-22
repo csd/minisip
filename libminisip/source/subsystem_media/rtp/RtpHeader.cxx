@@ -93,8 +93,8 @@ uint16_t RtpHeader::getSeqNo(){
 }
 
 
-void RtpHeader::setTimestamp(uint32_t timestamp){
-	this->timestamp = timestamp;
+void RtpHeader::setTimestamp(uint32_t t){
+	this->timestamp = t;
 }
 
 uint32_t RtpHeader::getTimestamp(){

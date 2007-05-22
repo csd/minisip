@@ -97,8 +97,8 @@ void certificate::set_pk( MRef<priv_key *> priv_key )
 	m_pk = priv_key;
 }
 
-void certificate::set_pk( const std::string &file ){
-	set_pk( priv_key::load( file ) );
+void certificate::set_pk( const std::string &file_ ){
+	set_pk( priv_key::load( file_ ) );
 }
 
 void certificate::set_encpk(char *derEncPk, int length,

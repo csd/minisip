@@ -243,6 +243,9 @@ MRef<SipRequest*> SipDialog::createSipMessageAck( MRef<SipRequest *> origReq )
 			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				ack->addHeader(header);
 				break;
+			default:
+				/*don't copy other headers*/
+				break;
 		}
 	}
 

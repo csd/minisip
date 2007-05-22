@@ -139,8 +139,8 @@ const SipUri &SipHeaderValueContact::getUri() const{
 	return uri;
 }
 
-void SipHeaderValueContact::setUri(const SipUri &uri){
-	this->uri=uri;
+void SipHeaderValueContact::setUri(const SipUri &u){
+	this->uri=u;
 }
 
 //CESC

@@ -44,8 +44,8 @@ struct receptionblock{
 
 */
 
-RtcpReportReceptionBlock::RtcpReportReceptionBlock(unsigned ssrc){
-	this->ssrc = ssrc;
+RtcpReportReceptionBlock::RtcpReportReceptionBlock(unsigned ssrc_){
+	this->ssrc = ssrc_;
 	this->fraction_lost=0;
 	this->cumulative_n_lost = 0;
 	this->seq_high = 0;

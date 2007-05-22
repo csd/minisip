@@ -40,7 +40,7 @@
 template<class T>
 class MiniListNode{
 	public:
-		MiniListNode( T v, MiniListNode *next=NULL):value(v), next(next){}
+		MiniListNode( T v, MiniListNode *nxt=NULL):value(v), next(nxt){}
 		MiniListNode * getNext(){ return next;} 
 		void setNext( MiniListNode *n ){ next = n; }
 		T getValue(){return value;}
@@ -67,7 +67,7 @@ class minilist{
 		 */
 		minilist():head(NULL),end(NULL),nelem(0)
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
-			,last_index(-2)
+			,last_index(-2),last_node(NULL)
 #endif
 			{}
 
@@ -79,7 +79,7 @@ class minilist{
 		 */
 		minilist(const minilist &l2)
 #ifdef MINILIST_FORWARD_ITERATOR_OPTIMIZE
-			:last_index(-2)
+			:last_index(-2),last_node(NULL)
 #endif
 		{
 			head=end=NULL;

@@ -18,7 +18,7 @@ using namespace std;
  */
 
 
-SubsystemNotFoundException::SubsystemNotFoundException(const char *what):Exception(what){
+SubsystemNotFoundException::SubsystemNotFoundException(const char *m):Exception(m){
 
 }
 

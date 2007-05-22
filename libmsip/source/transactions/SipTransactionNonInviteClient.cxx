@@ -433,11 +433,10 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 
 SipTransactionNonInviteClient::SipTransactionNonInviteClient(
 		MRef<SipStackInternal *> stack,
-		//MRef<SipDialog*> d, 
 		int seq_no, 
-		const string &cSeqMethod, 
+		const string &cseqm, 
 		const string &callid) : 
-			SipTransactionClient(stack, /*d,*/ seq_no, cSeqMethod, "", callid),
+			SipTransactionClient(stack, seq_no, cseqm, "", callid),
 			lastRequest(NULL)
 {
 	

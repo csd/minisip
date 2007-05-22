@@ -51,8 +51,8 @@ SipHeaderFactoryFuncPtr sipHeaderAuthorizationFactory=authorizationFactory;
 
 const string sipHeaderValueAuthorizationTypeString="Authorization";
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &typeStr) 
-	: SipHeaderValue(type, typeStr)
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type_, const string &typeStr) 
+	: SipHeaderValue(type_, typeStr)
 {
 	
 }	
@@ -63,8 +63,8 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(const string &build_fro
 	init( build_from );
 }
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type, const string &build_from, const string &typeStr)
-		: SipHeaderValue(type,typeStr)
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type_, const string &build_from, const string &typeStr)
+		: SipHeaderValue(type_,typeStr)
 {
 	init( build_from );
 }
@@ -86,9 +86,9 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(
 		const string &opaque,
 		const SipUri &uri, 
 		const string &response,
-		const string &auth_method)
+		const string &auth_meth)
 			: SipHeaderValue(SIP_HEADER_TYPE_AUTHORIZATION, sipHeaderValueAuthorizationTypeString),
-			auth_method(auth_method)
+			auth_method(auth_meth)
 {
 	setParameter("algorithm", "MD5");
 	setParameter("username", quote(username));
@@ -100,18 +100,18 @@ SipHeaderValueAuthorization::SipHeaderValueAuthorization(
 		setParameter("opaque", quote(opaque));
 }
 
-SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type,
+SipHeaderValueAuthorization::SipHeaderValueAuthorization(int type_,
 		const string &username, 
 		const string &realm, 
 		const string &nonce, 
 		const string &opaque,
 		const SipUri &uri, 
 		const string &response,
-		const string &auth_method,
+		const string &auth_meth,
 		const string &typeStr
 		)
-			: SipHeaderValue(type,typeStr),
-			auth_method(auth_method)
+			: SipHeaderValue(type_,typeStr),
+			auth_method(auth_meth)
 {
 	setParameter("algorithm", "MD5");
 	setParameter("username", quote(username));

@@ -74,7 +74,7 @@ class LIBMSIP_API SipHeaderValueContact: public SipHeaderValue{
 		 * SIP REGISTER message
 		 * @param featuretag
 		 */
-		 void setFeatureTag(std::string featuretag){this->featuretag=featuretag;}
+		 void setFeatureTag(std::string ft){this->featuretag=ft;}
 		
 		 /**
 		  * Used to get/set the expires for this contact in the registrar.

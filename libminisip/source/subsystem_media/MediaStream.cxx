@@ -47,7 +47,7 @@
 
 using namespace std;
 
-MediaStream::MediaStream( MRef<Media *> media ):media(media),ka(NULL) {
+MediaStream::MediaStream( MRef<Media *> m):media(m),ka(NULL) {
 	disabled = false;
 #ifdef ZRTP_SUPPORT
 	zrtpBridge = NULL;
@@ -231,9 +231,9 @@ MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc, uint16_t seq
 	return initCrypto( ssrc, seq_no );
 }
 
-void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka ){
+void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka_ ){
 	kaLock.lock();
-	this->ka = ka;
+	this->ka = ka_;
 
 	/* Reset the CryptoContext since we have a new KeyAgreement */
 	cryptoContexts.clear();
@@ -277,15 +277,16 @@ MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
 
 #endif
 
-MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> media,
-		MRef<RtpReceiver *> rtpReceiver, MRef<RtpReceiver *> rtp6Recv ):
-			MediaStream( media ),
-			rtpReceiver( rtpReceiver ),
+MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> m,
+		MRef<RtpReceiver *> rtpRecv, 
+		MRef<RtpReceiver *> rtp6Recv ):
+			MediaStream( m ),
+			rtpReceiver( rtpRecv ),
 			rtp6Receiver( rtp6Recv ){
 	id = rand();
 	externalPort = 0;
 	running = false;
-	codecList = media->getAvailableCodecs();
+	codecList = m->getAvailableCodecs();
 }
 
 uint32_t MediaStreamReceiver::getId(){
@@ -440,8 +441,10 @@ uint16_t MediaStreamReceiver::getPort( const string &addrType ){
 }
 
 
-MediaStreamSender::MediaStreamSender( MRef<Media *> media, MRef<UDPSocket *> senderSocket, MRef<UDPSocket *> sender6Socket ):
-	MediaStream( media ){
+MediaStreamSender::MediaStreamSender( MRef<Media *> m, 
+		MRef<UDPSocket *> senderSocket, 
+		MRef<UDPSocket *> sender6Socket ):
+			MediaStream( m ){
 	selectedCodec = NULL;
 	remotePort = 0;
 	seqNo = (uint16_t)rand();
@@ -597,13 +600,13 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 }
 
-void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> remoteAddress ){
+void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
 	mdbg << "MediaStreamSender::setRemoteAddress: " <<
-		remoteAddress->getString() << endl;
-	this->remoteAddress = remoteAddress;
+		ra->getString() << endl;
+	this->remoteAddress = ra;
 #ifdef ZRTP_SUPPORT
 	if (zrtpBridge) {
-	    zrtpBridge->setRemoteAddress(remoteAddress);
+	    zrtpBridge->setRemoteAddress(ra);
 	}
 #endif // ZRTP_SUPPORT
 }

@@ -53,8 +53,8 @@ typedef int socklen_t;
 #endif
 
 
-TLSServerSocket::TLSServerSocket( int32_t domain, int32_t listen_port )
-		:ServerSocket( domain, listen_port )
+TLSServerSocket::TLSServerSocket( int32_t domain_, int32_t listen_port_ )
+		:ServerSocket( domain_, listen_port_ )
 {
 }
 
@@ -82,36 +82,36 @@ ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<certificate *> c
 
 
 
-OsslServerSocket::OsslServerSocket( int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db):TLSServerSocket(AF_INET, listen_port)
+OsslServerSocket::OsslServerSocket( int32_t listen_port_, MRef<ossl_certificate *> cert_, MRef<ossl_ca_db *> cert_db_):TLSServerSocket(AF_INET, listen_port)
 {
-	init(false, listen_port, cert, cert_db);
+	init(false, listen_port_, cert_, cert_db_);
 }
 
-OsslServerSocket::OsslServerSocket( bool use_ipv6, int32_t listen_port, 
-				 MRef<ossl_certificate *> cert,
-				  MRef<ossl_ca_db *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+OsslServerSocket::OsslServerSocket( bool use_ipv6_, int32_t listen_port_, 
+				 MRef<ossl_certificate *> cert_,
+				  MRef<ossl_ca_db *> cert_db_):TLSServerSocket(use_ipv6_?AF_INET6:AF_INET, listen_port_)
 {
-	init(use_ipv6, listen_port, cert, cert_db);
+	init(use_ipv6_, listen_port_, cert_, cert_db_);
 }
 
-void OsslServerSocket::init( bool use_ipv6, int32_t listen_port, 
+void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_, 
 			    MRef<ossl_certificate *> cert,
-			    MRef<ossl_ca_db *> cert_db)
+			    MRef<ossl_ca_db *> cert_db_)
 {
+	this->cert_db = cert_db_;
 	int32_t backlog = 25;
 	SSL_METHOD * meth;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	
-	if( use_ipv6 )
-		listen("::", listen_port, backlog);
+	if( use_ipv6_ )
+		listen("::", listen_port_, backlog);
 	else
-		listen("0.0.0.0", listen_port, backlog);
+		listen("0.0.0.0", listen_port_, backlog);
 
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
 	meth = SSLv23_server_method();
 	this->ssl_ctx = SSL_CTX_new( meth );
-	this->cert_db = cert_db;
 
 	if( ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT

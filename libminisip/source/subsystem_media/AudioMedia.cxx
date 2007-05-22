@@ -72,10 +72,10 @@ using namespace std;
 //AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, MRef<Codec *> codec ):
 //                Media(codec),
 //                soundIo(soundIo){
-AudioMedia::AudioMedia( MRef<SoundIO *> soundIo, 
-			std::list<MRef<Codec *> > codecList ):
-							Media(codecList),
-							soundIo(soundIo){
+AudioMedia::AudioMedia( MRef<SoundIO *> soundIo_, 
+			std::list<MRef<Codec *> > codecList_ ):
+							Media(codecList_),
+							soundIo(soundIo_){
 						
 	// for audio media, we assume that we can both send and receive
 	receive = true;
@@ -263,7 +263,7 @@ MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
 }
 
 
-AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
+AudioMediaSource::AudioMediaSource( uint32_t ssrc_, MRef<Media *> m):
 	BasicSoundSource( ssrc, 
 			NULL, //plc
 			0/*position*/, 
@@ -272,8 +272,8 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc, MRef<Media *> media ):
 			2 //number of channels (numChannels)
 			//buffer size defaults to 16000 * numChannels
 			),
-	media(media),
-	ssrc(ssrc)
+	media(m),
+	ssrc(ssrc_)
 {
 }
 

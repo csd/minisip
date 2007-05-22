@@ -582,11 +582,11 @@ void SipDialogVoip::setUpStateMachine(){
 SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack, 
 				MRef<SipIdentity*> ident,
 				MRef<SipSoftPhoneConfiguration*> pconf, 
-				MRef<Session *> mediaSession, 
+				MRef<Session *> s, 
 				string cid ) :
 		SipDialog(stack,ident, cid),
 		phoneconf(pconf),
-		mediaSession(mediaSession),
+		mediaSession(s),
 		notifyEarlyTermination(false),
 		lastInvite(NULL)
 {
@@ -735,8 +735,8 @@ MRef<LogEntry *> SipDialogVoip::getLogEntry(){
 	return logEntry;
 }
 
-void SipDialogVoip::setLogEntry( MRef<LogEntry *> logEntry ){
-	this->logEntry = logEntry;
+void SipDialogVoip::setLogEntry( MRef<LogEntry *> l){
+	this->logEntry = l;
 }
 
 MRef<Session *> SipDialogVoip::getMediaSession(){

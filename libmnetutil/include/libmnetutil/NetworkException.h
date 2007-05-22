@@ -44,7 +44,7 @@ class LIBMNETUTIL_API NetworkException : public Exception{
 
 class LIBMNETUTIL_API HostNotFound : public NetworkException{
 	public:
-		HostNotFound( std::string host ):NetworkException(-1),host(host){};
+		HostNotFound( std::string host_ ):NetworkException(-1),host(host_){};
 		virtual ~HostNotFound()throw() {}
 		virtual const char*what();
 	private:

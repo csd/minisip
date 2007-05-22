@@ -360,12 +360,11 @@ void SipTransactionNonInviteServer::setUpStateMachine(){
 }
 
 SipTransactionNonInviteServer::SipTransactionNonInviteServer(MRef<SipStackInternal*> stack, 
-	//	MRef<SipDialog*> call, 
 		int seq_no, 
-		const string &cSeqMethod, 
-		const string &branch,
+		const string &cseqm, 
+		const string &branch_,
 		const string &callid) : 
-			SipTransactionServer(stack, /*call,*/ seq_no, cSeqMethod, branch, callid),
+			SipTransactionServer(stack, seq_no, cseqm, branch_, callid),
 			lastResponse(NULL)
 {
 	setUpStateMachine();

@@ -32,18 +32,22 @@
 #include<libminisip/media/rtp/CryptoContext.h>
 #include<libmikey/MikeyPayloadSP.h>
 
-CryptoContext::CryptoContext( uint32_t ssrc ):
-ssrc(ssrc),
-using_mki(false),mki_length(0),mki(NULL),
-roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
-replay_window(0),
-master_key(NULL), master_key_length(0),
-master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
-master_salt(NULL), master_salt_length(0),
-n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
-ealg(MIKEY_SRTP_EALG_NULL), aalg(MIKEY_SRTP_AALG_NULL),
-ekeyl(0), akeyl(0), skeyl(0),
-encr(1), auth(1){}/*These should be set to 0, but for backward compatability they are set to 1  *///encryption(no_encr),authentication(no_auth)
+CryptoContext::CryptoContext( uint32_t ssrc_ ):
+	ssrc(ssrc_),
+	using_mki(false),mki_length(0),mki(NULL),
+	roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
+	replay_window(0),
+	master_key(NULL), master_key_length(0),
+	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
+	master_salt(NULL), master_salt_length(0),
+	n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
+	ealg(MIKEY_SRTP_EALG_NULL), aalg(MIKEY_SRTP_AALG_NULL),
+	ekeyl(0), akeyl(0), skeyl(0),
+	encr(1), auth(1) /*These should be set to 0, but for backward compatability they are set to 1  */
+	//encryption(no_encr),authentication(no_auth)
+
+{
+}
 
 CryptoContext::CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
 			        int64_t key_deriv_rate,
@@ -60,13 +64,13 @@ CryptoContext::CryptoContext( uint32_t ssrc, int roc, uint16_t seq_no,
 				uint8_t skeyl,
 				uint8_t encr,
 				uint8_t auth,
-				uint8_t tag_length):
+				uint8_t tag_length_):
 
-ssrc(ssrc),using_mki(false),mki_length(0),mki(NULL),
-roc(roc),guessed_roc(0),s_l(seq_no),key_deriv_rate(key_deriv_rate),
-replay_window(0),
-master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
-//encryption(encryption),authentication(authentication)
+	ssrc(ssrc),using_mki(false),mki_length(0),mki(NULL),
+	roc(roc),guessed_roc(0),s_l(seq_no),key_deriv_rate(key_deriv_rate),
+	replay_window(0),
+	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
+	//encryption(encryption),authentication(authentication)
 {
 	this->ealg = ealg;
 	this->aalg = aalg;
@@ -108,7 +112,7 @@ master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0)
 		case MIKEY_SRTP_AALG_SHA1HMAC:
 			n_a = akeyl;
 			k_a = new unsigned char[ n_a ];
-			this->tag_length = tag_length;
+			this->tag_length = tag_length_;
 			break;
 	}
 }

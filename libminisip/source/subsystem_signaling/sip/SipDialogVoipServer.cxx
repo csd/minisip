@@ -278,12 +278,12 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 
 		getMediaSession()->start();
 
-		MRef<LogEntry *> logEntry = new LogEntryIncomingCompletedCall();
+		MRef<LogEntry *> log= new LogEntryIncomingCompletedCall();
 
-		logEntry->start = time( NULL );
-		logEntry->peerSipUri = getLastInvite()->getFrom().getString();
+		log->start = time( NULL );
+		log->peerSipUri = getLastInvite()->getFrom().getString();
 		
-		setLogEntry( logEntry );
+		setLogEntry( log );
 		
 		return true;
 	}else{
@@ -429,7 +429,7 @@ bool SipDialogVoipServer::isMatchingPrack( MRef<SipMessage*> provisional,
 
 	if( rack->getMethod() != provisional->getCSeqMethod() ||
 	    rack->getCSeqNum() != provisional->getCSeq() ||
-	    rack->getResponseNum() != dialogState.rseqNo ){
+	    (unsigned)rack->getResponseNum() != dialogState.rseqNo ){
 		// TODO reject 481
 		cerr << "Non matching RAck" << endl;
 		return false;
@@ -602,8 +602,8 @@ void SipDialogVoipServer::setUpStateMachine(){
 }
 
 
-SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> mediaSession, string cid) : 
-		SipDialogVoip(stack, ident, pconf, mediaSession, cid),
+SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, string cid) : 
+		SipDialogVoip(stack, ident, pconf, s, cid),
 		use100Rel( false ), resendTimer1xx( 0 )
 {
 	setUpStateMachine();

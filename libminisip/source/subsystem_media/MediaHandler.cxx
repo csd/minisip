@@ -54,15 +54,14 @@
 
 using namespace std;
 
-MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> config, MRef<IpProvider *> ipProvider, MRef<IpProvider *> ip6Provider ): ip6Provider(ip6Provider){
+MediaHandler::MediaHandler( MRef<SipSoftPhoneConfiguration *> conf, MRef<IpProvider *> ipp, MRef<IpProvider *> ip6p ): ip6Provider(ip6p){
 
-	this->ipProvider = ipProvider;
-	this->config = config;
+	this->ipProvider = ipp;
+	this->config = conf;
 	init();
 }
 
 MediaHandler::~MediaHandler(){
-// 	cerr << "~MediaHandler" << end;
 }
 
 void MediaHandler::init(){
@@ -77,11 +76,11 @@ void MediaHandler::init(){
 		MRef<MPlugin *> plugin = *i;
 		MRef<MediaPlugin *> mediaPlugin = dynamic_cast<MediaPlugin*>( *plugin );
 		if( mediaPlugin ){
-			MRef<Media *> media = mediaPlugin->createMedia( config );
-			MRef<AudioMedia *> audio = dynamic_cast<AudioMedia *>( *media );
+			MRef<Media *> m = mediaPlugin->createMedia( config );
+			MRef<AudioMedia *> audio = dynamic_cast<AudioMedia *>( *m );
 
-			if( media ){
-				registerMedia( media );
+			if( m ){
+				registerMedia( m );
 			}
 
 			if( !audioMedia && audio ){
@@ -95,15 +94,7 @@ void MediaHandler::init(){
         ringtoneFile = config->ringtone;
 }
 
-// MediaHandler::~MediaHandler() {
-// 	cerr << "~MediaHandler" << endl;
-// 	if( ! Session::registry ){
-// 		cerr << "deleting session::registry" << endl;
-// 	}
-// }
-
-
-MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> id, string callId ){
+MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callId ){
 
 	list< MRef<Media *> >::iterator i;
 	MRef<Session *> session;
@@ -125,9 +116,9 @@ MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &security
 	session->setCallId( callId );
 
 	for( i = media.begin(); i != media.end(); i++ ){
-		MRef<Media *> media = *i;
+		MRef<Media *> m = *i;
 
-		if( media->receive ){
+		if( m->receive ){
 			if( ipProvider )
 				rtpReceiver = new RtpReceiver( ipProvider );
 
@@ -135,7 +126,7 @@ MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &security
 				rtp6Receiver = new RtpReceiver( ip6Provider );
 
 			MRef<MediaStreamReceiver *> rStream;
-			rStream = new MediaStreamReceiver( media, rtpReceiver, rtp6Receiver );
+			rStream = new MediaStreamReceiver( m, rtpReceiver, rtp6Receiver );
 			session->addMediaStreamReceiver( rStream );
 			if( (*i) == this->audioMedia ) {
 				CallRecorder * cr;
@@ -155,7 +146,7 @@ MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &security
 #endif
 		}
 		
-		if( media->send ){
+		if( m->send ){
 		    if( !rtpReceiver && !ipProvider.isNull() ){
 			rtpReceiver = new RtpReceiver( ipProvider );
 		    }
@@ -173,7 +164,7 @@ MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &security
 			    sock6 = rtp6Receiver->getSocket();
 
 		    MRef<MediaStreamSender *> sStream;
-		    sStream = new MediaStreamSender( media, sock, sock6 );
+		    sStream = new MediaStreamSender( m, sock, sock6 );
 		    session->addMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
 		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
@@ -199,8 +190,8 @@ MRef<Session *> MediaHandler::createSession( /*SipDialogSecurityConfig &security
 }
 
 
-void MediaHandler::registerMedia( MRef<Media*> media ){
-	this->media.push_back( media );
+void MediaHandler::registerMedia( MRef<Media*> m){
+	this->media.push_back( m );
 }
 
 CommandString MediaHandler::handleCommandResp(string, const CommandString& c){

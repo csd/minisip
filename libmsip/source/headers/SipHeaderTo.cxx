@@ -70,7 +70,7 @@ SipUri SipHeaderValueTo::getUri() const{
 	return uri;
 }
 
-void SipHeaderValueTo::setUri(const SipUri &uri){
-	this->uri=uri;
+void SipHeaderValueTo::setUri(const SipUri &u){
+	this->uri=u;
 }
 

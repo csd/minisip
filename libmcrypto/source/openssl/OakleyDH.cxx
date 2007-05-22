@@ -44,7 +44,7 @@ OakleyDH::OakleyDH(): groupValue(-1){
 	}
 }
 
-OakleyDH::OakleyDH( int groupValue ){
+OakleyDH::OakleyDH( int groupValue_ ){
 	// Store opensslDhPtr in priv
 	priv = DH_new();
 	if( opensslDhPtr == NULL )
@@ -53,7 +53,7 @@ OakleyDH::OakleyDH( int groupValue ){
 				          "DH parameters." );
 	}
 
-	if( !setGroup( groupValue ) ){
+	if( !setGroup( groupValue_ ) ){
 		throw Exception( "Could not set the openssl "
 				          "DH group." );
 	}
@@ -63,8 +63,8 @@ OakleyDH::~OakleyDH(){
 	DH_free( opensslDhPtr );
 }
 
-bool OakleyDH::setGroup( int groupValue ){
-	this->groupValue = groupValue;
+bool OakleyDH::setGroup( int groupValue_ ){
+	this->groupValue = groupValue_;
 	switch( groupValue ) {
 		case DH_GROUP_OAKLEY5:
 			BN_hex2bn( &opensslDhPtr->p, OAKLEY5_P );

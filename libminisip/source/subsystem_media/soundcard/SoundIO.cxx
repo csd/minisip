@@ -96,12 +96,12 @@ SoundIO::SoundIO(
 		MRef<SoundDevice *> inputDevice,
 		MRef<SoundDevice *> outputDevice,
 		string mixerType,
-		int nChannels, 
-		int32_t samplingRate, 
-		int format): 
-			nChannels(nChannels),
-			samplingRate(samplingRate),
-			format(format),
+		int nChannels_, 
+		int32_t samplingRate_, 
+		int format_): 
+			nChannels(nChannels_),
+			samplingRate(samplingRate_),
+			format(format_),
 			recording(false)
 {
 	soundDevIn = inputDevice;

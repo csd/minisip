@@ -66,10 +66,10 @@ SdpHeaderC::SdpHeaderC(string buildFrom):SdpHeader(SDP_HEADER_TYPE_C, 4){
 
 }
 
-SdpHeaderC::SdpHeaderC(string net_type, string addr_type, string addr):SdpHeader(SDP_HEADER_TYPE_C, 4){
+SdpHeaderC::SdpHeaderC(string net_type, string addr_type, string addr_):SdpHeader(SDP_HEADER_TYPE_C, 4){
 	this->netType=net_type;
 	this->addrType = addr_type;
-	this->addr=addr;
+	this->addr=addr_;
 }
 
 SdpHeaderC::~SdpHeaderC(){
@@ -96,8 +96,8 @@ const string &SdpHeaderC::getAddr()const{
 	return addr;
 }
 
-void SdpHeaderC::setAddr(string addr){
-	this->addr=addr;
+void SdpHeaderC::setAddr(string a){
+	this->addr=a;
 }
 
 string SdpHeaderC::getString(){

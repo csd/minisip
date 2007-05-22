@@ -83,14 +83,14 @@ SipHeaderValueContentLength::~SipHeaderValueContentLength(){
 }
 
 string SipHeaderValueContentLength::getString() const{
-	return /*"Content-Length: "+*/itoa(content_length);
+	return itoa(content_length);
 }
 
 int32_t SipHeaderValueContentLength::getContentLength() const{
 	return content_length;
 }
 		
-void SipHeaderValueContentLength::setContentLength(int32_t content_length){
-	this->content_length=content_length;
+void SipHeaderValueContentLength::setContentLength(int32_t l){
+	this->content_length=l;
 }
 

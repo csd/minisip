@@ -516,12 +516,11 @@ void SipTransactionInviteServer::setUpStateMachine(){
 
 
 SipTransactionInviteServer::SipTransactionInviteServer(MRef<SipStackInternal*> stack, 
-		//MRef<SipDialog*> d, 
 		int seq_no, 
-		const string &cSeqMethod, 
-		const string &branch,
+		const string &cseqm, 
+		const string &branch_,
 		const string &callid) : 
-			SipTransactionServer(stack, /*d,*/ seq_no, cSeqMethod, branch,callid),
+			SipTransactionServer(stack, seq_no, cseqm, branch_, callid),
 			lastResponse(NULL),
 			timerG(500)
 {

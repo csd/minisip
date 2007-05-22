@@ -61,9 +61,9 @@ typedef int socklen_t;
 
 using namespace std;
 
-bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
+bool UDPSocket::initUdpSocket( bool use_ipv6_, int32_t port ) {
 	type = SOCKET_TYPE_UDP;
-	this->use_ipv6 = use_ipv6;
+	this->use_ipv6 = use_ipv6_;
 	
 #ifdef _MSC_VER
 	massert(sizeof(SOCKET)==4);
@@ -114,8 +114,8 @@ bool UDPSocket::initUdpSocket( bool use_ipv6, int32_t port ) {
 	return true;
 }
 
-UDPSocket::UDPSocket( int32_t port, bool use_ipv6 ) {
-	initUdpSocket( use_ipv6, port );
+UDPSocket::UDPSocket( int32_t port, bool use_ipv6_ ) {
+	initUdpSocket( use_ipv6_, port );
 }
 
 /*

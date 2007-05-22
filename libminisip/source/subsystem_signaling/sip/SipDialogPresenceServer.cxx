@@ -243,10 +243,10 @@ void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ 
 
 }
 
-void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus){
+void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus_){
 	usersLock.lock();
 	for (int i=0; i<subscribing_users.size(); i++){
-		sendNotice(onlineStatus, subscribing_users[i]);
+		sendNotice(onlineStatus_, subscribing_users[i]);
 	}
 	usersLock.unlock();
 }

@@ -84,6 +84,8 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(const string &branch,
 			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				req->addHeader(header);
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -128,6 +130,8 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(const string &branch,
 			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				add=true;
 				break;
+			default:
+				break;
 		}
 		if (add){
 			req->addHeader(header);
@@ -147,7 +151,7 @@ MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
 							const string& msg)
 {
 	MRef<SipRequest*> req = new SipRequest("MESSAGE", toUri);
-	req->addDefaultHeaders(fromUri,toUri,"MESSAGE",seqNo,callId);
+	req->addDefaultHeaders(fromUri,seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->setContent(new SipMessageContentIM(msg));
 	return req;
@@ -177,7 +181,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("INVITE", toUri);
 
-	req->addDefaultHeaders( fromUri, toUri, "INVITE", seq_no, call_id );
+	req->addDefaultHeaders( fromUri, seq_no, call_id );
 	addHeaders(req, contact, stack);
 
 	return req;
@@ -191,7 +195,7 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 							)
 {
 	MRef<SipRequest*> req = new SipRequest("NOTIFY", toUri);
-	req->addDefaultHeaders(fromUri, toUri,"NOTIFY",seqNo,callId);
+	req->addDefaultHeaders(fromUri, seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	return req;
@@ -206,7 +210,7 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("REGISTER", registrar);
 
-	req->addDefaultHeaders(fromUri,fromUri,"REGISTER",seq_no,call_id);
+	req->addDefaultHeaders(fromUri,seq_no,call_id);
 
 	req->addHeader(new SipHeader(*contactHdr));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
@@ -225,7 +229,7 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("SUBSCRIBE", toUri );
 
-	req->addDefaultHeaders(fromUri, toUri,"SUBSCRIBE",seq_no, call_id);
+	req->addDefaultHeaders(fromUri, seq_no, call_id);
 	req->addHeader(new SipHeader(new SipHeaderValueContact(contact)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	req->addHeader(new SipHeader(new SipHeaderValueAccept("application/xpidf+xml")));
@@ -234,23 +238,21 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 }
 
 void SipRequest::addDefaultHeaders(const SipUri& fromUri,
-		const SipUri& toUri,
-		const string& method,
 		int seqNo,
 		const string& callId)
 {
 	addHeader(new SipHeader(new SipHeaderValueFrom(fromUri)));
-	addHeader(new SipHeader(new SipHeaderValueTo(toUri)));
+	addHeader(new SipHeader(new SipHeaderValueTo(uri)));
 	addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
 	addHeader(new SipHeader(new SipHeaderValueCSeq(method, seqNo)));
 	addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
 }
 
 
-SipRequest::SipRequest(const string &method,
-		       const SipUri &uri) :
-		method(method),
-		uri(uri)
+SipRequest::SipRequest(const string &method_,
+		       const SipUri &uri_) :
+		method(method_),
+		uri(uri_)
 {
 }
 
@@ -332,51 +334,16 @@ string SipRequest::getString() const{
 }
 
 
-void SipRequest::setMethod(const string &method){
-	this->method = method;
+void SipRequest::setMethod(const string &m){
+	this->method = m;
 }
 
 string SipRequest::getMethod() const{
 	return method;
 }
 
-static string buildUri(const string &name)
-{
-	string ret ="";
-	
-	//FIXME sanitize the request uri ... if we used a SipURI object, this would not be needed
-	string username; //hide the class::username ... carefull
-	size_t pos;
-	username = name;
-	
-	pos = username.find('<');
-	if( pos != string::npos ) {
-		username.erase( 0, pos + 1 ); //erase the part in front of the '<'
-		pos = username.find('>');
-		username.erase( pos );
-	}
-
-	if (username.length()>4 && username.substr(0,4)=="sip:")
-		ret = username;
-	else if (username.length()>5 && username.substr(0,5)=="sips:")
-		ret = username;
-	else
-		ret = "sip:"+username;
-
-#if 0
-	if (username.find("@")==string::npos)
-		ret = ret+"@"+ip;
-#endif
-
-	return ret;
-}
-
-// void SipRequest::setUri(const string &uri){
-// 	setUri(SipUri(buildUri(uri)));
-// }
-
-void SipRequest::setUri(const SipUri &uri){
-	this->uri = uri;
+void SipRequest::setUri(const SipUri &u){
+	this->uri = u;
 }
 
 const SipUri &SipRequest::getUri() const{
@@ -394,21 +361,21 @@ void SipRequest::addRoute(const string &route)
 void SipRequest::addRoute(const string &addr, int32_t port,
 			  const string &transport)
 {
-	string uri = "<sip:" + addr;
+	string u = "<sip:" + addr;
 
 	if( port ){
 		char buf[20];
 		sprintf(buf, "%d", port);
-		uri = uri + ":" + buf;
+		u = u + ":" + buf;
 	}
 
 	if( transport != "" ){
-		uri = uri + ";transport=" + transport;
+		u = u + ";transport=" + transport;
 	}
 
-	uri = uri + ";lr>";
+	u = u + ";lr>";
 	
-	addRoute( uri );
+	addRoute( u );
 }
 
 void SipRequest::addRoutes(const list<SipUri> &routes){

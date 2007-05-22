@@ -37,7 +37,7 @@
 
 using namespace std;
 
-MXmlPhoneBookIo::MXmlPhoneBookIo( string fileName ):fileName(fileName){
+MXmlPhoneBookIo::MXmlPhoneBookIo( string fn ):fileName( fn ){
 	
 }
 

@@ -136,15 +136,15 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 
 		MRef<SipHeaderValueSubscriptionState *> statehdr = (SipHeaderValueSubscriptionState*)*resp->getHeaderValueNo(SIP_HEADER_TYPE_SUBSCRIPTIONSTATE,0);
 
-		int timeout;
+		int to;
 		if (statehdr && statehdr->hasParameter("expires")){
-			timeout = atoi(statehdr->getParameter("expires").c_str());
+			to = atoi(statehdr->getParameter("expires").c_str());
 		}else{
 			mdbg << "WARNING: SipDialogPresenceClient did not contain any expires header - using 300 seconds"<<end;
-			timeout = 300;
+			to = 300;
 		}
 		
-		requestTimeout(timeout * 1000, "timerDoSubscribe");
+		requestTimeout(to * 1000, "timerDoSubscribe");
 		
 #ifdef DEBUG_OUTPUT
 		merr << "Subscribed for presence for user "<< toUri->getSipUri().getString()<< end;

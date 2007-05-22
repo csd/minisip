@@ -84,8 +84,8 @@ string SipHeaderValueCSeq::getMethod() const{
 	return method;
 }
 		
-void SipHeaderValueCSeq::setMethod(const string &method){
-	this->method=method;
+void SipHeaderValueCSeq::setMethod(const string &m){
+	this->method=m;
 }
 
 void SipHeaderValueCSeq::setCSeq(int32_t n){

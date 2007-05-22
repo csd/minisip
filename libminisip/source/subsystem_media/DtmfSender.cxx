@@ -33,8 +33,8 @@
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
-DtmfSender::DtmfSender( MRef<Session *> session ){
-        this->session = session;
+DtmfSender::DtmfSender( MRef<Session *> session_ ){
+        this->session = session_;
 }
 
 void DtmfSender::timeout( DtmfEvent * event ){

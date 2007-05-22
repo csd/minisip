@@ -166,7 +166,7 @@ void IP4Address::connect(Socket &socket, int32_t port){
 
 	unsigned char *ip;
 	unsigned long int ip_data;
-	if (inet_aton(ipaddr.c_str(),(struct in_addr *)&ip_data)){
+	if (inet_aton(ipaddr.c_str(),(struct in_addr *)((void*)&ip_data) )){
 		ip = (unsigned char *)&ip_data;
 	}else{
 	

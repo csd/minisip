@@ -124,7 +124,7 @@ int SRtpPacket::unprotect( MRef<CryptoContext *> scontext ){
 
     unsigned char * mac = new unsigned char[tag_length];
     scontext->rtp_authenticate( this, (uint32_t)( guessed_index >> 16 ), mac );
-    for( int i = 0; i < tag_length; i++ ){
+    for( unsigned i = 0; i < tag_length; i++ ){
 	if( tag[i] != mac[i] )
 	{
 #ifdef DEBUG_OUTPUT
@@ -160,16 +160,16 @@ SRtpPacket::SRtpPacket(){
     tag_length=0;
 }
 
-SRtpPacket::SRtpPacket( unsigned char *content, int content_length,
+SRtpPacket::SRtpPacket( unsigned char *content_, int clen,
 			int seq_no, unsigned timestamp, unsigned ssrc):
-    RtpPacket( content, content_length, seq_no, timestamp, ssrc ), tag(NULL), tag_length(0), mki(NULL), mki_length(0){
+    RtpPacket( content_, clen, seq_no, timestamp, ssrc ), tag(NULL), tag_length(0), mki(NULL), mki_length(0){
 
 }
 
 SRtpPacket::SRtpPacket(RtpHeader hdr, unsigned char *content, int content_length,
-		       unsigned char * tag, int tag_length,
-		       unsigned char * mki, int mki_length):
-    RtpPacket(hdr, content, content_length ), encrypted(true), tag_length(tag_length), mki_length(mki_length){
+		       unsigned char * tag, int tag_length_,
+		       unsigned char * mki, int mki_length_):
+    RtpPacket(hdr, content, content_length ), encrypted(true), tag_length(tag_length_), mki_length(mki_length_){
 
     if(tag_length){
 	this->tag = new unsigned char[tag_length];

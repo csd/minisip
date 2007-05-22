@@ -59,11 +59,10 @@
 
 using namespace std;
 
-Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig,
-	 MRef<MediaHandler*>mediaHandler){
+Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mh){
 
 	this->phoneconfig = pconfig;
-	this->mediaHandler = mediaHandler;
+	this->mediaHandler = mh;
 
 	MRef<SipStackConfig *> stackConfig /*= new SipStackConfig()*/;
 //	// Deep copy
@@ -357,6 +356,6 @@ void Sip::run(){
 	sipstack->run();
 }
 
-void Sip::setMediaHandler( MRef<MediaHandler *> mediaHandler ){
-	this->mediaHandler = mediaHandler;
+void Sip::setMediaHandler( MRef<MediaHandler *> mh ){
+	this->mediaHandler = mh;
 }

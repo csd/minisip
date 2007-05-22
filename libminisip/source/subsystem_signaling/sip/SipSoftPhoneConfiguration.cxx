@@ -142,21 +142,24 @@ void SipSoftPhoneConfiguration::save(){
 
 		string kaTypeString;
 		switch( (*iIdent)->ka_type ){
-		case KEY_MGMT_METHOD_MIKEY_DH:
-			kaTypeString = "dh";
-			break;
-		case KEY_MGMT_METHOD_MIKEY_PSK:
-			kaTypeString = "psk";
-			break;
-		case KEY_MGMT_METHOD_MIKEY_PK:
-			kaTypeString = "pk";
-			break;
-		case KEY_MGMT_METHOD_MIKEY_DHHMAC:
-			kaTypeString = "dhhmac";
-			break;
-		case KEY_MGMT_METHOD_MIKEY_RSA_R:
-			kaTypeString = "rsa-r";
-			break;
+			case KEY_MGMT_METHOD_MIKEY_DH:
+				kaTypeString = "dh";
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PSK:
+				kaTypeString = "psk";
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PK:
+				kaTypeString = "pk";
+				break;
+			case KEY_MGMT_METHOD_MIKEY_DHHMAC:
+				kaTypeString = "dhhmac";
+				break;
+			case KEY_MGMT_METHOD_MIKEY_RSA_R:
+				kaTypeString = "rsa-r";
+				break;
+			default:
+				kaTypeString = "";
+				break;
 		}
 
 		backend->save(accountPath + "ka_type", kaTypeString);
@@ -213,16 +216,18 @@ void SipSoftPhoneConfiguration::save(){
 
 		while( !caDbItem.isNull() ){
 			switch( caDbItem->type ){
-			case CERT_DB_ITEM_TYPE_FILE:
-				backend->save(accountPath + "ca_file["+itoa(iFile)+"]",
-						caDbItem->item);
-				iFile ++;
-				break;
-			case CERT_DB_ITEM_TYPE_DIR:
-				backend->save(accountPath + "ca_dir["+itoa(iDir)+"]",
-						caDbItem->item);
-				iDir ++;
-				break;
+				case CERT_DB_ITEM_TYPE_FILE:
+					backend->save(accountPath + "ca_file["+itoa(iFile)+"]",
+							caDbItem->item);
+					iFile ++;
+					break;
+				case CERT_DB_ITEM_TYPE_DIR:
+					backend->save(accountPath + "ca_dir["+itoa(iDir)+"]",
+							caDbItem->item);
+					iDir ++;
+					break;
+				default:
+					merr<< "Warning: unknown certificate object type"<<end;
 			}
 
 			caDbItem = cert_db->get_next();
