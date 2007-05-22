@@ -151,7 +151,7 @@ MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
 							const string& msg)
 {
 	MRef<SipRequest*> req = new SipRequest("MESSAGE", toUri);
-	req->addDefaultHeaders(fromUri,seqNo,callId);
+	req->addDefaultHeaders(fromUri, toUri, seqNo, callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->setContent(new SipMessageContentIM(msg));
 	return req;
@@ -181,7 +181,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("INVITE", toUri);
 
-	req->addDefaultHeaders( fromUri, seq_no, call_id );
+	req->addDefaultHeaders( fromUri, toUri, seq_no, call_id );
 	addHeaders(req, contact, stack);
 
 	return req;
@@ -195,7 +195,7 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 							)
 {
 	MRef<SipRequest*> req = new SipRequest("NOTIFY", toUri);
-	req->addDefaultHeaders(fromUri, seqNo,callId);
+	req->addDefaultHeaders(fromUri, toUri, seqNo,callId);
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	return req;
@@ -210,7 +210,7 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("REGISTER", registrar);
 
-	req->addDefaultHeaders(fromUri,seq_no,call_id);
+	req->addDefaultHeaders(fromUri, fromUri, seq_no, call_id);
 
 	req->addHeader(new SipHeader(*contactHdr));
 	req->addHeader(new SipHeader(new SipHeaderValueUserAgent(HEADER_USER_AGENT_DEFAULT)));
@@ -229,7 +229,7 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 {
 	MRef<SipRequest*> req = new SipRequest("SUBSCRIBE", toUri );
 
-	req->addDefaultHeaders(fromUri, seq_no, call_id);
+	req->addDefaultHeaders(fromUri, toUri, seq_no, call_id);
 	req->addHeader(new SipHeader(new SipHeaderValueContact(contact)));
 	req->addHeader(new SipHeader(new SipHeaderValueEvent("presence")));
 	req->addHeader(new SipHeader(new SipHeaderValueAccept("application/xpidf+xml")));
@@ -238,11 +238,12 @@ MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
 }
 
 void SipRequest::addDefaultHeaders(const SipUri& fromUri,
+		const SipUri& toUri,
 		int seqNo,
 		const string& callId)
 {
 	addHeader(new SipHeader(new SipHeaderValueFrom(fromUri)));
-	addHeader(new SipHeader(new SipHeaderValueTo(uri)));
+	addHeader(new SipHeader(new SipHeaderValueTo(toUri)));
 	addHeader(new SipHeader(new SipHeaderValueCallID(callId)));
 	addHeader(new SipHeader(new SipHeaderValueCSeq(method, seqNo)));
 	addHeader(new SipHeader(new SipHeaderValueMaxForwards(70)));
