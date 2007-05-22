@@ -152,7 +152,7 @@ void SipUri::setParams(string userName_, string ip_, string type, int32_t port_)
 		setIp( ip_ );
 	}
 	
-	if( port_ != 0 ) setPort( port );
+	if( port_ != 0 ) setPort( port_ );
 	if( type != "" ) setUserType( type );
 	validUri = true;
 }

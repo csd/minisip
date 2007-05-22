@@ -229,42 +229,6 @@ bool SipIdentity::isRegistered(){
 	return ret;
 }
 
-
-
-#if 0
-void SipIdentity::setSipUri(string addr){
-	if (addr.substr(0,4)=="sip:")
-		addr = addr.substr(4);
-	if (addr.find("@")==string::npos){
-			#ifdef DEBUG_OUTPUT	
-			cerr << "WARNING: Incomplete sip address: "<< addr<<endl;
-			#endif
-		sipUsername = addr.substr(0, addr.find("@"));
-		sipDomain = "";
-	} else {
-		sipUsername = addr.substr(0, addr.find("@"));
-		sipDomain = addr.substr(addr.find("@")+1);
-	}
-
-#ifdef DEBUG_OUTPUT	
-	cerr << "SipIdentity::setSipUri: sipUsername=<"<< sipUsername << "> sipDomain=<" << sipDomain << ">"<< endl;
-#endif
-}
-
-string SipIdentity::getSipUri() {
-	string ret;
-	lock();
-	if( sipUsername != "" && sipDomain !="" ) {
-		ret = sipUsername + "@" + sipDomain;
-	} else {
-		//one of the two is empty, so do not add the @ ... 
-		ret = sipUsername + sipDomain;
-	}
-	unlock();
-	return ret;
-}
-#endif
-
 MRef<SipRegistrar *> SipIdentity::getSipRegistrar() {
 	return sipProxy;
 }

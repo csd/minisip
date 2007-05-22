@@ -51,15 +51,6 @@ SipHeaderFactoryFuncPtr sipHeaderContactFactory=contactFactory;
 
 const string sipHeaderValueContactTypeStr = "Contact";
 		
-/*
-SipHeaderValueContact::SipHeaderValueContact()
-	: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr)
-{
-	featuretag= "";
-	setExpires( DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS ); //always set a default value for contact expiration
-}
-*/
-
 SipHeaderValueContact::SipHeaderValueContact(const string &build_from) 
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTACT,sipHeaderValueContactTypeStr),uri(build_from)
 {
