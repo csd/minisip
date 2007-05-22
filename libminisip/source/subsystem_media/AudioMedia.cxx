@@ -139,7 +139,6 @@ void AudioMedia::registerMediaSource( uint32_t ssrc ){
 
 void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
 	std::list< MRef<AudioMediaSource *> >::iterator iSource;
-	//cerr << "AudioMedia::unRegisterMediaSource" << endl;
 
 	soundIo->unRegisterSource( ssrc );
 
@@ -264,7 +263,7 @@ MRef<AudioMediaSource *> AudioMedia::getSource( uint32_t ssrc ){
 
 
 AudioMediaSource::AudioMediaSource( uint32_t ssrc_, MRef<Media *> m):
-	BasicSoundSource( ssrc, 
+	BasicSoundSource( ssrc_, 
 			NULL, //plc
 			0/*position*/, 
 			SOUND_CARD_FREQ, 

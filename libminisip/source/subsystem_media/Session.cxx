@@ -112,14 +112,15 @@ class MikeyConfig: public IMikeyConfig{
 SessionRegistry * Session::registry = NULL;
 MRef<KeyAgreement *> Session::precomputedKa = NULL;
 
-Session::Session( string localIp, /*SipDialogSecurityConfig &securityConfig*/ MRef<SipIdentity*> ident, string localIp6 ):localIpString(localIp), localIp6String(localIp6){
-//	this->securityConfig = securityConfig; // hardcopy
+Session::Session( string localIp, MRef<SipIdentity*> ident, string localIp6 ):
+		started(false),
+		localIpString(localIp), 
+		localIp6String(localIp6)
+{
 	identity = ident;
-// 	secured = ident->securityEnabled;
 	ka_type = ident->ka_type;
 
 	dtmfTOProvider = new TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> >;
-// 	this->ka = Session::precomputedKa;
 	Session::precomputedKa = NULL;
 
 	mutedSenders = true;
@@ -819,6 +820,10 @@ MRef<SdpPacket *> Session::getSdpAnswer(){
 }
 
 void Session::start(){
+	if (started)
+		return;
+	started=true;
+	
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
 
@@ -868,6 +873,7 @@ void Session::start(){
 }
 
 void Session::stop(){
+	started=false;
 	list< MRef<MediaStreamSender * > >::iterator iS;
 	list< MRef<MediaStreamReceiver * > >::iterator iR;
 

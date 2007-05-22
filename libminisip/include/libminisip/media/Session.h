@@ -255,6 +255,7 @@ class LIBMINISIP_API Session : public MObject{
 		MRef<MObject *> callRecorder;
 
 	private:
+		bool started;
 		void addStreams();
 
 		std::string peerUri;
