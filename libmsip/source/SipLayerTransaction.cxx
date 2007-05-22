@@ -145,7 +145,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	}
 
 	if (c.getType()==SipSMCommand::COMMAND_PACKET){
-		string branch = c.getCommandPacket()->getDestinationBranch();
+		string branch = c.getCommandPacket()->getBranch();
 		if (branch.size()>0)
 			tid = branch + c.getCommandPacket()->getCSeqMethod();
 	}
@@ -166,7 +166,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 		string branch;
 		string seqMethod;
 		if (c.getType()==SipSMCommand::COMMAND_PACKET){
-			branch = c.getCommandPacket()->getDestinationBranch();
+			branch = c.getCommandPacket()->getBranch();
 			seqMethod = c.getCommandPacket()->getCSeqMethod();
 		}
 		bool hasBranch = (branch!="");

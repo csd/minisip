@@ -348,7 +348,7 @@ bool SipLayerTransport::handleCommand(const SipSMCommand& command ){
 	if( command.getType()==SipSMCommand::COMMAND_PACKET ){
 		MRef<SipMessage*> pack = command.getCommandPacket();
 
-		string branch = pack->getDestinationBranch();
+		string branch = pack->getBranch();
 		bool addVia = pack->getType() != SipResponse::type;
 
 		if (branch==""){
@@ -784,8 +784,7 @@ bool SipLayerTransport::validateIncoming(MRef<SipMessage *> msg){
 			|| !msg->getHeaderValueTo()
 			|| (isInvite && !msg->getHeaderValueNo(SIP_HEADER_TYPE_CONTACT,0))){
 		if (isRequest){
-			MRef<SipMessage*> resp = new SipResponse(msg->getFirstViaBranch(),
-				   400, "Required header missing", (SipRequest*)*msg );
+			MRef<SipMessage*> resp = new SipResponse( 400, "Required header missing", (SipRequest*)*msg );
 			resp->setSocket(msg->getSocket());
 			sendMessage(resp, "TL", false);
 		}
@@ -944,7 +943,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		mdbg << "Transport error in SipLayerTransport: " << message << end;
 		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
-		CommandString transportError( pack->getDestinationBranch()+pack->getCSeqMethod(), 
+		CommandString transportError( pack->getBranch()+pack->getCSeqMethod(), 
 					      SipCommandString::transport_error,
 					      "SipLayerTransport: "+message );
 		SipSMCommand transportErrorCommand(

@@ -69,9 +69,9 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		MRef<Session *> getMediaSession();
 
 	protected:
-		void sendBye(const std::string &branch, int);
-		void sendByeOk(MRef<SipRequest*> bye, const std::string &branch);
-		void sendCancel(const std::string &branch);
+		void sendBye(int);
+		void sendByeOk(MRef<SipRequest*> bye);
+		void sendCancel();
 		MRef<SipRequest*> getLastInvite();
 		void setLastInvite(MRef<SipRequest*> i);
 		bool sortMIME(MRef<SipMessageContent *> Offer, std::string peerUri, int type);		
@@ -95,10 +95,10 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		void setUpStateMachine();
 		
 		
-		void sendReferOk(const std::string &branch);
-		void sendNotifyOk(MRef<SipRequest*> notif, const std::string &branch);
-		void sendReferReject(const std::string &branch);
-		void sendRefer(const std::string &branch, int, const std::string referredUri);
+		void sendReferOk();
+		void sendNotifyOk(MRef<SipRequest*> notif);
+		void sendReferReject();
+		void sendRefer(int, const std::string referredUri);
 		
 		/* Ending a call */
 		bool a1001_incall_termwait_BYE( const SipSMCommand &command);

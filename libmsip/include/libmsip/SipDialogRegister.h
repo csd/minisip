@@ -53,7 +53,7 @@ class LIBMSIP_API SipDialogRegister : public SipDialog{
 		bool getGuiFeedback();
 		void setGuiFeedback(bool fb);
 
-		void send_register(std::string branch);
+		void sendRegister();
 	private:
 		bool a0_start_trying_register( const SipSMCommand &command);
 		bool a1_trying_registred_2xx( const SipSMCommand &command);

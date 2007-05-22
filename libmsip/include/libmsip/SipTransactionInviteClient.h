@@ -81,7 +81,7 @@ class SipTransactionInviteClient: public SipTransactionClient{
 		*/
 		void setDialogRouteSet(MRef<SipResponse *> resp);
 
-		void sendAck(MRef<SipResponse *>, std::string branch="", bool provisional=false); //if no branch specified, use transaction branch attribute
+		void sendAck(MRef<SipResponse *>, bool provisional=false); //if no branch specified, use transaction branch attribute
 
 	private:
 		

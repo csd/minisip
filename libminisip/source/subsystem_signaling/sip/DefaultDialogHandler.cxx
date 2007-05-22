@@ -265,9 +265,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 #ifdef DEBUG_OUTPUT			
 		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << end;
 #endif			
-		string branch = im->getDestinationBranch();
-
-		sendIMOk(im, branch);
+		sendIMOk( im );
 
 		massert(dynamic_cast<SipMessageContentIM*>(*im->getContent())!=NULL);
 
@@ -301,9 +299,8 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		}
 
 		MRef<SipRequest*> req = (SipRequest*)*pkt;
-		string branch = req->getDestinationBranch();
 		MRef<SipResponse*> resp =
-			new SipResponse(branch, statusCode, reasonPhrase, req);
+			new SipResponse( statusCode, reasonPhrase, req );
 
 		if (statusCode==405)
 			resp->addHeader(new SipHeader(new SipHeaderValueAllow("INVITE,MESSAGE,BYE,ACK,OPTIONS,PRACK") ));
@@ -361,7 +358,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 
 	if (cmdstr.getOp() == SipCommandString::outgoing_im){
 		++outsideDialogSeqNo;
-		sendIM( "", cmdstr.getParam(), outsideDialogSeqNo, cmdstr.getParam2() );
+		sendIM( cmdstr.getParam(), outsideDialogSeqNo, cmdstr.getParam2() );
 		return true;
 	}
 
@@ -964,8 +961,8 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 }
 
 
-void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch){
-        MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", bye );
+void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye){
+        MRef<SipResponse*> ok= new SipResponse( 200,"OK", bye );
         ok->getHeaderValueTo()->setParameter("tag","libminisip");
 
         MRef<SipMessage*> pref(*ok);
@@ -974,7 +971,7 @@ void DefaultDialogHandler::sendIMOk(MRef<SipRequest*> bye, const string &branch)
 }
 
 
-void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_no, string toUri){
+void DefaultDialogHandler::sendIM( string msg, int im_seq_no, string toUri ){
 	
 	size_t posAt;
 	
@@ -994,7 +991,6 @@ void DefaultDialogHandler::sendIM(const string &branch, string msg, int im_seq_n
 	#endif
 	
 	MRef<SipRequest*> im = SipRequest::createSipMessageIMMessage(
-			std::string(branch),
 			itoa(rand()),	//Generate random callId
 			toUri, 	
 			phoneconf->defaultIdentity->getSipUri(),

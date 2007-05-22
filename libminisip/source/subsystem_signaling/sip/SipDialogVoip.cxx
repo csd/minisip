@@ -179,7 +179,7 @@ bool SipDialogVoip::a1001_incall_termwait_BYE( const SipSMCommand &command)
 			getLogEntry()->handle();
 		}
 
-		sendByeOk(bye, "" );
+		sendByeOk(bye);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
@@ -207,7 +207,7 @@ bool SipDialogVoip::a1002_incall_byerequest_hangup( const SipSMCommand &command)
 				SipSMCommand::dialog_layer)){
 		++dialogState.seqNo;
 		
-		sendBye("", dialogState.seqNo);
+		sendBye(dialogState.seqNo);
 		
 		if (getLogEntry()){
 			(dynamic_cast< LogEntrySuccess * >(*( getLogEntry() )))->duration = time( NULL ) - getLogEntry()->start; 
@@ -332,7 +332,7 @@ bool SipDialogVoip::a1201_incall_transferrequested_transfer( const SipSMCommand 
 
 		string referredUri = command.getCommandString().getParam();
 		++dialogState.seqNo;
-		sendRefer("", dialogState.seqNo, referredUri);
+		sendRefer(dialogState.seqNo, referredUri);
 		
 		return true;
 	}else{
@@ -403,7 +403,7 @@ bool SipDialogVoip::a1204_transferpending_transferpending_notify( const SipSMCom
 		cmd.setSource(command.getSource());
 		getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 		
-		sendNotifyOk(notif, "" );
+		sendNotifyOk( notif );
 		
 		ret = true;
 	}
@@ -443,7 +443,7 @@ bool SipDialogVoip::a1302_transferaskuser_transferstarted_accept( const SipSMCom
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
-		sendReferOk(lastRefer->getDestinationBranch() );
+		sendReferOk();
 
 		/* start a new call ... */
 		string uri = getReferredUri(lastRefer);
@@ -469,7 +469,7 @@ bool SipDialogVoip::a1303_transferaskuser_incall_refuse( const SipSMCommand &com
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
-		sendReferReject(lastRefer->getDestinationBranch());
+		sendReferReject();
 
 		return true;
 	}else{
@@ -602,7 +602,7 @@ SipDialogVoip::~SipDialogVoip(){
 	mediaSession->unregister();
 }
 
-void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
+void SipDialogVoip::sendBye(int bye_seq_no){
 	MRef<SipRequest*> bye = createSipMessageBye();
 
 	MRef<SipMessage*> pref(*bye);
@@ -610,7 +610,7 @@ void SipDialogVoip::sendBye(const string &branch, int bye_seq_no){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 }
 
-void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const string referredUri){
+void SipDialogVoip::sendRefer(int refer_seq_no, const string referredUri){
 	MRef<SipRequest*> refer = createSipMessageRefer( referredUri );
 
 	MRef<SipMessage*> pref(*refer);
@@ -618,14 +618,10 @@ void SipDialogVoip::sendRefer(const string &branch, int refer_seq_no, const stri
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoip::sendCancel(const string &branch){
+void SipDialogVoip::sendCancel(){
 	massert( !lastInvite.isNull());
 	
-	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel(
-			lastInvite->getFirstViaBranch(),
-			lastInvite
-// 			dialogState.remoteUri
-			);
+	MRef<SipRequest*> cancel = SipRequest::createSipMessageCancel( lastInvite );
 
 	addRoute( cancel );
 
@@ -637,8 +633,8 @@ void SipDialogVoip::sendCancel(const string &branch){
 	getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoip::sendReferOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 202,"OK", lastRefer);	
+void SipDialogVoip::sendReferOk(){
+	MRef<SipResponse*> ok= new SipResponse( 202,"OK", lastRefer);	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
@@ -651,8 +647,8 @@ void SipDialogVoip::sendReferOk(const string &branch){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
-	MRef<SipResponse*> ok= new SipResponse( branch, 200,"OK", bye );
+void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye){
+	MRef<SipResponse*> ok= new SipResponse( 200,"OK", bye );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 	MRef<SipMessage*> pref(*ok);
@@ -660,8 +656,8 @@ void SipDialogVoip::sendByeOk(MRef<SipRequest*> bye, const string &branch){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
-	MRef<SipResponse*> ok= new SipResponse( branch, 200, "OK", notif );
+void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif){
+	MRef<SipResponse*> ok= new SipResponse( 200, "OK", notif );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
 	MRef<SipMessage*> pref(*ok);
@@ -669,10 +665,9 @@ void SipDialogVoip::sendNotifyOk(MRef<SipRequest*> notif, const string &branch){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoip::sendReferReject(const string &branch){
+void SipDialogVoip::sendReferReject(){
 	MRef<SipResponse*> forbidden = 
-		new SipResponse(branch,
-				403,"Forbidden", 
+		new SipResponse( 403,"Forbidden", 
 				*lastRefer
 				);	
 	forbidden->getHeaderValueTo()->setParameter("tag",dialogState.localTag);

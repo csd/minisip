@@ -139,7 +139,7 @@ bool SipDialogVoipClient::a2001_start_calling_invite( const SipSMCommand &comman
 		//set an "early" remoteUri ... we will update this later
 		dialogState.remoteUri= command.getCommandString().getParam();
 
-		sendInvite("");
+		sendInvite();
 
 		return true;
 	}else{
@@ -185,7 +185,7 @@ bool SipDialogVoipClient::a2002_calling_calling_18X( const SipSMCommand &command
   			if( !sortMIME( content , peerUri, 3) ){
 				// MIKEY failed
 				// TODO reason header
-				sendCancel("");
+				sendCancel();
 
 				getMediaSession()->stop();
 				signalIfNoTransactions();
@@ -300,7 +300,7 @@ bool SipDialogVoipClient::a2006_calling_termwait_cancel( const SipSMCommand &com
 				SipSMCommand::dialog_layer,
 				SipSMCommand::dialog_layer)){
 
- 		sendCancel("");
+ 		sendCancel();
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -376,7 +376,7 @@ bool SipDialogVoipClient::a2008_calling_calling_40X( const SipSMCommand &command
 		}
 
 		++dialogState.seqNo;
-		sendInvite("");
+		sendInvite();
 
 		return true;
 	}else{
@@ -390,7 +390,7 @@ bool SipDialogVoipClient::a2012_calling_termwait_2xx( const SipSMCommand &comman
 
 		++dialogState.seqNo;
 
-		sendBye("", dialogState.seqNo);
+		sendBye(dialogState.seqNo);
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::security_failed);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
@@ -523,13 +523,10 @@ SipDialogVoipClient::~SipDialogVoipClient(){
 }
 
 
-void SipDialogVoipClient::sendInvite(const string &branch){
-	//	mdbg << "ERROR: SipDialogVoipClient::sendInvite() UNIMPLEMENTED"<< end;
-	
+void SipDialogVoipClient::sendInvite(){
 	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
 	inv = SipRequest::createSipMessageInvite(
-			branch,
 			dialogState.callId,
 			SipUri(dialogState.remoteUri),
 			getDialogConfig()->sipIdentity->getSipUri(),
@@ -579,7 +576,6 @@ void SipDialogVoipClient::sendInvite(const string &branch){
 	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
 
-//	mdbg << "SipDialogVoipClient::sendInvite(): sending INVITE to transaction"<<end;
 //	ts.save( INVITE_END );
 	MRef<SipMessage*> pktr(*inv);
 
@@ -614,8 +610,8 @@ void SipDialogVoipClient::sendPrack(MRef<SipResponse*> rel100resp){
 	sendSipMessage( *prack );
 }
 
-void SipDialogVoipClient::sendInviteOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", getLastInvite());	
+void SipDialogVoipClient::sendInviteOk(){
+	MRef<SipResponse*> ok= new SipResponse(200,"OK", getLastInvite());	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	
 	MRef<SipHeaderValue *> contact = 

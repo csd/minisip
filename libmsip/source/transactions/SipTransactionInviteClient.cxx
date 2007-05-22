@@ -557,20 +557,9 @@ void SipTransactionInviteClient::setDialogRouteSet(MRef<SipResponse *> ) {
 }
 
 
-void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, bool provisional){
+void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, bool provisional){
 
-//	MRef<SipStackConfig *> conf;
-//	if (dialog){
-//		conf = dialog->getDialogConfig()->inherited;
-//	}else{
-//		conf = sipStack->getStackConfig();
-//	}
-
-	//merr << "CESC: SipTransInvClie:sendACK : dialogstate.remoteUri=" << dialog->dialogState.remoteUri << end;
-	
-// 	MRef<SipMessage*> ref( *resp);
-
-	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( br, 
+	MRef<SipRequest*> ack= SipRequest::createSipMessageAck( 
 			lastInvite,
 			resp,
 			provisional
@@ -582,7 +571,7 @@ void SipTransactionInviteClient::sendAck(MRef<SipResponse*> resp, string br, boo
 		//((SipHeaderValueCSeq*)*ack->getHeaderValueNo(SIP_HEADER_TYPE_CSEQ, 0))->setCSeq(seq);
 	}
 		
-	send(MRef<SipMessage*>(*ack), true, br);
+	send(MRef<SipMessage*>(*ack), true, lastInvite->getBranch() );
 }
 
 

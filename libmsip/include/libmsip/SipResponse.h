@@ -49,7 +49,7 @@ class LIBMSIP_API SipResponse : public SipMessage{
 	public:
 		static const std::string type;
 
-		SipResponse(std::string branch, int32_t status, std::string status_desc, MRef<SipRequest*> inv);
+		SipResponse(int32_t status, std::string status_desc, MRef<SipRequest*> inv);
 
 
 		virtual std::string getMemObjectType() const {return "SipResponse";}

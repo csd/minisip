@@ -145,9 +145,9 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 		 */
 		bool modifyDialogConfig(std::string user, MRef<SipDialogConfig *> dialogConfig);
 
-		void sendIMOk(MRef<SipRequest*> immessage, const std::string &branch);
+		void sendIMOk(MRef<SipRequest*> immessage);
 		
-		void sendIM(const std::string &branch, std::string msg, int seqno, std::string toUri);
+		void sendIM(std::string msg, int seqno, std::string toUri);
 			
 		MRef<SipIdentity *> lookupTarget(const SipUri &uri);
 };

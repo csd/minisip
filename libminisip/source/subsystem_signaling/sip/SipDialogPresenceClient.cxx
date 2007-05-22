@@ -107,7 +107,7 @@ stop_presence|    +------+
 
 void SipDialogPresenceClient::createSubscribeClientTransaction(){
 	++dialogState.seqNo;
-	sendSubscribe("");
+	sendSubscribe();
 }
    
 
@@ -239,7 +239,7 @@ bool SipDialogPresenceClient::a8_trying_trying_40X(const SipSMCommand &command){
 			return true;
 		}
 
-		sendSubscribe("");
+		sendSubscribe();
 
 		return true;
 	}else{
@@ -351,12 +351,11 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack,
 SipDialogPresenceClient::~SipDialogPresenceClient(){	
 }
 
-void SipDialogPresenceClient::sendSubscribe(const string &branch){
+void SipDialogPresenceClient::sendSubscribe(){
 	
 	MRef<SipRequest*> sub ;
 	
 	sub = SipRequest::createSipMessageSubscribe(
-				branch,
 				dialogState.callId,
 				toUri->getSipUri(),
 				getDialogConfig()->sipIdentity->getSipUri(),

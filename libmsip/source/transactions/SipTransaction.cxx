@@ -83,7 +83,7 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStackInternal*> stackIntern
 	int seqNo = req->getCSeq();
 	string seqMethod = req->getCSeqMethod();
 	string callId = req->getCallId();
-	string branch= req->getDestinationBranch();
+	string branch= req->getBranch();
 	
 #ifdef DEBUG_OUTPUT
 	mdbg << "TRANSACTION_CREATE: "<< seqMethod<<" "<<seqNo<<" branch="<<branch<<" callid=" << callId<<" client="<<fromTU<< endl;

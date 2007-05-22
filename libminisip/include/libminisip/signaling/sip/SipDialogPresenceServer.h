@@ -69,7 +69,7 @@ class LIBMINISIP_API SipDialogPresenceServer: public SipDialog{
 		void removeUser( std::string user);
 		void addUser( std::string user);
 		
-		void sendNotify(const  std::string &branch,  std::string toUri,  std::string callId);
+		void sendNotify(std::string toUri,  std::string callId);
 
 		bool a0_start_default_startpresenceserver(const SipSMCommand &command);
 		bool a1_default_default_timerremovesubscriber(const SipSMCommand &command);

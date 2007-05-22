@@ -274,7 +274,7 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		massert( !getLastInvite().isNull() );
-		sendInviteOk(getLastInvite()->getDestinationBranch() );
+		sendInviteOk();
 
 		getMediaSession()->start();
 
@@ -309,7 +309,7 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 			getLogEntry()->handle();
 		}
 
-		sendByeOk(bye, "" );
+		sendByeOk( bye );
 
 		CommandString cmdstr(dialogState.callId, SipCommandString::remote_hang_up);
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr);
@@ -331,14 +331,14 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 			    SipSMCommand::dialog_layer)) {
 		MRef<SipRequest*> cancel =
 			(SipRequest*)*command.getCommandPacket();
-		const string branch = cancel->getFirstViaBranch();
 
-		if (getLastInvite()->getFirstViaBranch() != branch)
-			return false;
+///		const string branch = cancel->getFirstViaBranch();
+///
+///		if (getLastInvite()->getFirstViaBranch() != branch)
+///			return false;
 
 		// Send 487 Request Cancelled for INVITE
 		MRef<SipResponse*> cancelledResp = new SipResponse( 
-				branch, 
 				487,
 				"Request Cancelled", 
 				*getLastInvite() 
@@ -350,7 +350,7 @@ bool SipDialogVoipServer::a3004_ringing_termwait_CANCEL( const SipSMCommand &com
 		getSipStack()->enqueueCommand(cancelledCmd, HIGH_PRIO_QUEUE);
 
 		// Send 200 OK for CANCEL
-		MRef<SipResponse*> okResp = new SipResponse( branch, 200,"OK", cancel );
+		MRef<SipResponse*> okResp = new SipResponse( 200,"OK", cancel );
 		okResp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 		MRef<SipMessage*> okMsg(*okResp);
 		SipSMCommand okCmd( okMsg, SipSMCommand::dialog_layer,
@@ -383,7 +383,7 @@ bool SipDialogVoipServer::a3005_ringing_termwait_reject( const SipSMCommand &com
 				SipSMCommand::dialog_layer)){
 
 
-		sendReject( getLastInvite()->getDestinationBranch() );
+		sendReject();
 
 		getMediaSession()->stop();
 		signalIfNoTransactions();
@@ -402,7 +402,7 @@ bool SipDialogVoipServer::a3006_start_termwait_INVITE( const SipSMCommand &comma
 		
 		dialogState.updateState( getLastInvite() );
 
-		sendNotAcceptable( command.getCommandPacket()->getDestinationBranch() );
+		sendNotAcceptable( );
 
 		signalIfNoTransactions();
 		return true;
@@ -614,8 +614,8 @@ SipDialogVoipServer::~SipDialogVoipServer(){
 }
 
 
-void SipDialogVoipServer::sendInviteOk(const string &branch){
-	MRef<SipResponse*> ok= new SipResponse(branch, 200,"OK", getLastInvite() );	
+void SipDialogVoipServer::sendInviteOk(){
+	MRef<SipResponse*> ok= new SipResponse(200,"OK", getLastInvite() );	
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	
 	MRef<SipHeaderValue *> contact = 
@@ -667,8 +667,8 @@ void SipDialogVoipServer::sendInviteOk(const string &branch){
 	getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 }
 
-void SipDialogVoipServer::sendReject(const string &branch){
-	MRef<SipResponse*> ringing = new SipResponse(branch,486,"Temporary unavailable", getLastInvite());	
+void SipDialogVoipServer::sendReject(){
+	MRef<SipResponse*> ringing = new SipResponse(486,"Temporary unavailable", getLastInvite());	
 	ringing->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipMessage*> pref(*ringing);
 	SipSMCommand cmd( pref,SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
@@ -695,8 +695,8 @@ void SipDialogVoipServer::sendRinging(){
 	sendSipMessage( *ringing );
 }
 
-void SipDialogVoipServer::sendNotAcceptable(const string &branch){
-	MRef<SipResponse*> not_acceptable = new SipResponse(branch,406,"Not Acceptable", getLastInvite());	
+void SipDialogVoipServer::sendNotAcceptable(){
+	MRef<SipResponse*> not_acceptable = new SipResponse(406,"Not Acceptable", getLastInvite());	
 	if( mediaSession && mediaSession->getErrorString() != "" ){
 		not_acceptable->addHeader( 
 			new SipHeader(

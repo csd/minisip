@@ -281,7 +281,7 @@ MRef<SipRequest*> SipDialog::createSipMessageRefer( const string &referredUri ){
 }
 
 MRef<SipResponse*> SipDialog::createSipResponse( MRef<SipRequest*> req, int32_t status, const std::string &reason ){
-	MRef<SipResponse*> resp = new SipResponse( req->getDestinationBranch(), status, reason, *req );
+	MRef<SipResponse*> resp = new SipResponse( status, reason, *req );
 	// FIXME don't change the To tag if it's already present in the request.
 	resp->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	return resp;

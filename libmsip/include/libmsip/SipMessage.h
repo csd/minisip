@@ -83,15 +83,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 * type. Headers and content must be added to the message
 		 * to make it a valid SIP message. This is typically done
 		 * in the constructor of the sub-class.
-		 * @param branch	All SIP messages have a branch
-		 * 			value (which transaction they
-		 * 			belong to). This argument may be an
-		 * 			empty string.
-		 * @param type		Each SIP message has a type. It 
-		 * 			is a string that for a method
-		 * 			is the method string (for example
-		 * 			"INVITE"), and for a response it
-		 * 			is the string in SipResponse::type.
 		 */
 		SipMessage();
 
@@ -221,14 +212,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		std::string getCSeqMethod();
 		
 		/**
-		* @return The branch parameter associated with the top
-		* most via header, or an empty string if there is no via
-		* header or if the branch is not set in the topmost via
-		* header.
-		*/
-		std::string getFirstViaBranch();
-
-		/**
 		* @return The top most via header, or a null reference
 		* if there is no via header in the message.
 		*/
@@ -251,11 +234,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		*/
 		SipUri getTo();
                 
-		/**
-		 * Removes all via headers that may be in the message.
-		 */
-		void removeAllViaHeaders();
-		
 		/**
 		* @return The complete message as a string.
 		*/
@@ -282,7 +260,7 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		* If it is non empty string it identifies which
 		* transaction it belongs to.
 		*/
-		std::string getDestinationBranch();
+		std::string getBranch();
 
 		/**
 		* @return Number of headers in this message. Notice that
@@ -349,7 +327,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipHeaderValueWWWAuthenticate*> getHeaderValueWWWAuthenticate(int i);
 
 	protected:
-		void setBranch(std::string b){branch = b;}
 
 		/**
 		 * Parses one line of text to a SIP header and adds it to
@@ -372,9 +349,6 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		MRef<SipMessageContent*> content;
 
 		int parseHeaders(const std::string &buf, int startIndex);
-		MRef<SipHeaderValueVia*> getViaHeader(bool first);
-		std::string getViaHeaderBranch(bool first);
-		std::string branch;
 
 		MRef<Socket*> sock;
 };

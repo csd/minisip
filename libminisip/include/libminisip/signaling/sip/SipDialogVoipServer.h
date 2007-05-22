@@ -75,9 +75,9 @@ class LIBMINISIP_API SipDialogVoipServer: public SipDialogVoip{
 		
 		void setUpStateMachine();
 		
-		void sendInviteOk(const std::string &branch);
-		void sendReject(const std::string &branch);
-		void sendNotAcceptable(const std::string &branch);
+		void sendInviteOk();
+		void sendReject();
+		void sendNotAcceptable();
 		void sendSessionProgress();
 		void sendPrackOk( MRef<SipRequest*> prack );
 

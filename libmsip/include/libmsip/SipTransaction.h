@@ -123,8 +123,6 @@ class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 		std::string callId;
 		
 	private:
-		
-		//std::string command;
 		int cSeqNo;
 		std::string cSeqMethod;
 		std::string branch;

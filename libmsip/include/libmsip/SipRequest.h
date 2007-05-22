@@ -59,19 +59,13 @@ class LIBMSIP_API SipRequest : public SipMessage{
 		 * but for PRACK requests you will have to adjust it.
 		 */
 		static MRef<SipRequest*> createSipMessageAck(
-				const std::string &branch,
 				MRef<SipRequest*> origReq,
 				MRef<SipResponse*> resp,
 				bool provisional=false);
 
-		static MRef<SipRequest*> createSipMessageCancel(
-				const std::string &branch,
-				MRef<SipRequest*> inv
-// 				std::string to_uri
-				);
+		static MRef<SipRequest*> createSipMessageCancel( MRef<SipRequest*> inv );
 
 		static MRef<SipRequest*> createSipMessageIMMessage(
-				const std::string &branch,
 				const std::string &call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,
@@ -80,7 +74,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 
 
 		static MRef<SipRequest*> createSipMessageInvite(
-				const std::string &branch,
 				const std::string &call_id,
 				const SipUri &toUri,
 				const SipUri &fromUri,
@@ -90,7 +83,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				);
 
 		static MRef<SipRequest*> createSipMessageNotify(
-				const std::string &branch,
 				const std::string &call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,
@@ -98,7 +90,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				);
 
 		static MRef<SipRequest*> createSipMessageRegister(
-				const std::string &branch,
 				const std::string &call_id,
 				const SipUri &registrar,
 				const SipUri &fromUri,
@@ -106,7 +97,6 @@ class LIBMSIP_API SipRequest : public SipMessage{
 				int32_t seq_no);
 
 		static MRef<SipRequest*> createSipMessageSubscribe(
-				const std::string &branch,
 				const std::string &call_id,
 				const SipUri& toUri,
 				const SipUri& fromUri,

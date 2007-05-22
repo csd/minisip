@@ -65,7 +65,7 @@ class LIBMINISIP_API SipDialogPresenceClient: public SipDialog{
 
 	private:
 		
-		void sendSubscribe(const  std::string &branch);
+		void sendSubscribe();
 		void sendNotifyOk(MRef<SipRequest*> notify);
 		void createSubscribeClientTransaction();
 		

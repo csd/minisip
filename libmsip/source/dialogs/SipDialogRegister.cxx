@@ -57,9 +57,9 @@
         +-------------+                            a10 GUI(failed)
                    |  +---------------------------------------------------------------+
 cmdstr:proxy_regist|  | 401                                                           |
-  a0 send_register |  | a2 send_register                                              |
+  a0 sendRegister  |  | a2 sendRegister                                               |
                    |  | +-+              cmdstr:setpass                               |
-                   V  | | V              a5 send_register                             |
+                   V  | | V              a5 sendRegister                              |
             +-------------+<-------------------------+                                |
             |   S1        | 401                      |                                |
         +-->|   Trying    | a3 ask_dialog    +---------------+                        |
@@ -74,7 +74,7 @@ cmdstr:proxy_regist|  | 401                                                     
         |   |  S2         |                                        +----------+
         +---|  Registred  |                                              |
  register   |             |                                              |
- send_reg.. +-------------+                                              V     a13: notransactions
+ sendRegist +-------------+                                              V     a13: notransactions
         |       |                                                  +----------+
         --------+                                                  |          |
              a12 cmdstr:register <proxy>                           |terminated|
@@ -118,7 +118,7 @@ bool SipDialogRegister::a0_start_trying_register( const SipSMCommand &command){
 		}
 			
 		++dialogState.seqNo;
-		send_register("");
+		sendRegister();
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
@@ -200,7 +200,7 @@ bool SipDialogRegister::a2_trying_trying_40x( const SipSMCommand &command){
 		}
 
 		++dialogState.seqNo;
-		send_register("");
+		sendRegister();
 		//TODO: inform GUI
 
 		return true;
@@ -257,7 +257,7 @@ bool SipDialogRegister::a5_askpassword_trying_setpassword( const SipSMCommand &c
 
 		++dialogState.seqNo;
 
-		send_register(/*trans->getBranch()*/"");
+		sendRegister();
 		return true;
 	}else{
 		return false;
@@ -337,7 +337,7 @@ bool SipDialogRegister::a12_registred_trying_proxyregister( const SipSMCommand &
 		}		
 		
 		++dialogState.seqNo;
-		send_register("");
+		sendRegister();
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
@@ -528,7 +528,7 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 	return ret;
 }
 
-void SipDialogRegister::send_register(string branch){
+void SipDialogRegister::sendRegister(){
 	
 //	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
 
@@ -547,7 +547,6 @@ void SipDialogRegister::send_register(string branch){
 	}
 
 	MRef<SipRequest*> reg= SipRequest::createSipMessageRegister(
-		branch, 
 		dialogState.callId,
 		identity->getSipRegistrar()->getUri(),
 		identity->getSipUri(),

@@ -239,7 +239,7 @@ SipDialogPresenceServer::~SipDialogPresenceServer(){
 void SipDialogPresenceServer::sendNotice(string /*onlineStatus*/, string user){ //FIXME: use onlineStatus 
 	++dialogState.seqNo;
 	string cid = "FIXME"+itoa(rand());
-	sendNotify("", user, cid);
+	sendNotify( user, cid );
 
 }
 
@@ -253,7 +253,7 @@ void SipDialogPresenceServer::sendNoticeToAll(string onlineStatus_){
 
 void SipDialogPresenceServer::sendSubscribeOk(MRef<SipRequest*> sub){
 	
-	MRef<SipResponse*> ok= new SipResponse("", 200,"OK", sub);
+	MRef<SipResponse*> ok= new SipResponse( 200,"OK", sub );
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 
         MRef<SipMessage*> pref(*ok);
@@ -276,7 +276,7 @@ void SipDialogPresenceServer::addUser(string user){
 	usersLock.unlock();
 }
 
-void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, string cid){
+void SipDialogPresenceServer::sendNotify( string toUri, string cid ){
 	
 	MRef<SipRequest*> notify;
 	int32_t localSipPort;
@@ -285,7 +285,6 @@ void SipDialogPresenceServer::sendNotify(const string &branch, string toUri, str
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
 	notify = SipRequest::createSipMessageNotify(
-				branch,
 				cid,
 				toId->getSipUri(),
 				getDialogConfig()->sipIdentity->getSipUri(),

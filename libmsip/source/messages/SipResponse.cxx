@@ -51,15 +51,13 @@ using namespace std;
 
 const string SipResponse::type="RESPONSE";
 
-SipResponse::SipResponse(string branch_, 
-		int32_t status, 
+SipResponse::SipResponse( int32_t status, 
 		string status_desc_, 
 		MRef<SipRequest*> req)
 {
 	this->status_code=status;
 	this->status_desc=status_desc_;
 
-	setBranch(branch_);
 	setContent(NULL);
 
 	MRef<SipHeaderValue*> mf = new SipHeaderValueMaxForwards(70);

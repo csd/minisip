@@ -55,8 +55,7 @@
 
 using namespace std;
 
-MRef<SipRequest*> SipRequest::createSipMessageAck(const string &branch,
-		MRef<SipRequest*> origReq,
+MRef<SipRequest*> SipRequest::createSipMessageAck( MRef<SipRequest*> origReq,
 		MRef<SipResponse*> resp,
 		bool provisional)
 {
@@ -95,19 +94,16 @@ MRef<SipRequest*> SipRequest::createSipMessageAck(const string &branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageCancel(const string &branch,
-							MRef<SipRequest*> inv
-// 							string to_uri
-							)
+MRef<SipRequest*> SipRequest::createSipMessageCancel( MRef<SipRequest*> r )
 {
-	MRef<SipRequest*> req = new SipRequest("CANCEL", inv->getUri());
+	MRef<SipRequest*> req = new SipRequest("CANCEL", r->getUri());
 
 	req->addHeader(new SipHeader( new SipHeaderValueMaxForwards(70)));
 	
 	MRef<SipHeader *> header;
-	int noHeaders = inv->getNoHeaders();
+	int noHeaders = r->getNoHeaders();
 	for (int32_t i=0; i< noHeaders; i++){
-		header = inv->getHeaderNo(i);
+		header = r->getHeaderNo(i);
 		int type = header->getType();
 		bool add=false;
 		switch (type){
@@ -143,8 +139,7 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel(const string &branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& branch,
-							const string& callId,
+MRef<SipRequest*> SipRequest::createSipMessageIMMessage(const string& callId,
 							const SipUri& toUri,
 							const SipUri& fromUri,
 							int32_t seqNo,
@@ -170,8 +165,7 @@ static void addHeaders( MRef<SipRequest*> req,
 	}
 }
 
-MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
-							const string &call_id,
+MRef<SipRequest*> SipRequest::createSipMessageInvite( const string &call_id,
 							const SipUri &toUri,
 							const SipUri &fromUri,
 							const SipUri &contact,
@@ -187,8 +181,7 @@ MRef<SipRequest*> SipRequest::createSipMessageInvite(const string &branch,
 	return req;
 }
 
-MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
-							const string& callId,
+MRef<SipRequest*> SipRequest::createSipMessageNotify( const string& callId,
 							const SipUri& toUri,
 							const SipUri& fromUri,
 							int32_t seqNo
@@ -201,8 +194,7 @@ MRef<SipRequest*> SipRequest::createSipMessageNotify(const string& branch,
 	return req;
 }
 
-MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
-							const string &call_id,
+MRef<SipRequest*> SipRequest::createSipMessageRegister( const string &call_id,
 							const SipUri &registrar,
 							const SipUri &fromUri,
 						       MRef<SipHeaderValueContact *> contactHdr,
@@ -220,8 +212,7 @@ MRef<SipRequest*> SipRequest::createSipMessageRegister(const string &branch,
 }
 
 
-MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &branch,
-							const string &call_id,
+MRef<SipRequest*> SipRequest::createSipMessageSubscribe(const string &call_id,
 							const SipUri &toUri,
 							const SipUri &fromUri,
 							const SipUri &contact,
