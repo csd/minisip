@@ -34,7 +34,7 @@ pkginclude_HEADERS = \
 		init.h \
 		$(scsim_src) \
 		base64.h \
-		$(srp_src)
+		$(srp_src) \
 		hmac.h \
 		OakleyDH.h \
 		rand.h \
