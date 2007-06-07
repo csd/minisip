@@ -29,9 +29,6 @@
 #include<libmsip/SipTransaction.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipCommandDispatcher.h>
-//#include<libmsip/SipTransactionInviteServer.h>
-//#include<libmsip/SipTransactionInviteServerUA.h>
-//#include<libmsip/SipTransactionNonInviteServer.h>
 
 using namespace std;
 

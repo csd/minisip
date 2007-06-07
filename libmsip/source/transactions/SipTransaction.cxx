@@ -91,11 +91,7 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStackInternal*> stackIntern
 
 	if (fromTU){ //client transaction
 		if (req->getType()=="INVITE"){
-// 			if (handleAck){	//UA-version
-// 				return new SipTransactionInviteClientUA(stack,seqNo,seqMethod,callId);
-// 			}else{
-				return new SipTransactionInviteClient(stackInternal,seqNo,seqMethod,callId);
-// 			}
+			return new SipTransactionInviteClient(stackInternal,seqNo,seqMethod,callId);
 		}else{
 			MRef<SipTransaction *> res = new SipTransactionNonInviteClient(stackInternal,seqNo,seqMethod,callId);
 			if( req->getType()=="CANCEL"){
