@@ -27,17 +27,6 @@ AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
 AC_CHECK_HEADERS([ifaddrs.h netdb.h sys/socket.h])
 AM_MINISIP_CHECK_IPV6
 
-AC_ARG_ENABLE(srp,
-    AS_HELP_STRING([--enable-srp],
-        [enables TLS-SRP support]),
-    [ if test "${enable_srp}" = "yes"
-      then
-        AC_DEFINE(ENABLE_SRP, [], [TLS-SRP support is enabled])
-	ENABLE_SRP="yes"
-      fi  
-      ])
-AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
-
 AG_CHECK_POSIX_REGCOMP
 AM_CONDITIONAL(HAVE_POSIX_REGCOMP, test "${ag_cv_posix_regcomp}" = "yes")
 

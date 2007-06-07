@@ -53,6 +53,7 @@ string certificate::get_file(){
 }
 
 string certificate::get_pk_file(){
+	massert(m_pk);
 	return m_pk->get_file();
 }
 
@@ -63,6 +64,11 @@ int certificate::denvelope_data( unsigned char * data,
 				 unsigned char *enckey,
 				 int enckeylgth,
 				 unsigned char *iv){
+	massert(m_pk);
+	massert(data);
+	massert(retdata);
+	massert(enckey);
+	massert(iv);
 	return m_pk->denvelope_data( data, size, retdata, retsize,
 				     enckey, enckeylgth, iv );
 }
@@ -70,11 +76,13 @@ int certificate::denvelope_data( unsigned char * data,
 int certificate::sign_data( unsigned char * data, int data_length, 
 			    unsigned char * sign,
 			    int * sign_length ){
+	massert(m_pk);
 	return m_pk->sign_data( data, data_length, sign, sign_length );
 }
 
 int certificate::private_decrypt(const unsigned char *data, int size,
 				 unsigned char *retdata, int *retsize){
+	massert(m_pk);
 	return m_pk->private_decrypt( data, size, retdata, retsize );
 }
 

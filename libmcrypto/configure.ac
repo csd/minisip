@@ -63,6 +63,19 @@ AC_ARG_ENABLE(scsim,
       ])
 AM_CONDITIONAL(ENABLE_SCSIM, test "${ENABLE_SCSIM}" = "yes" )
 
+AC_ARG_ENABLE(srp,
+    AS_HELP_STRING([--enable-srp],
+        [enables TLS-SRP support]),
+    [ if test "${enable_srp}" = "yes"
+      then
+        AC_DEFINE(ENABLE_SRP, [], [TLS-SRP support is enabled])
+	ENABLE_SRP="yes"
+      fi  
+      ])
+AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
+
+
+
 
 dnl Checks for header files.
 AC_HEADER_STDC

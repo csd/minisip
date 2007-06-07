@@ -36,7 +36,8 @@
 #include <errno.h>
 #include <netdb.h>
 
-#include <libmnetutil/TlsSrpSocket.h>
+#include<libmcrypto/TlsSrpSocket.h>
+#include<libmcrypto/TlsException.h>
 #include<libmnetutil/NetworkException.h>
 using namespace std;
 

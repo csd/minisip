@@ -19,6 +19,12 @@ scsim_src += SipSimPk.h \
 	     SmartCardException.h
 endif
 
+srp_src =
+if ENABLE_SRP
+srp_src += TlsSrpSocket.h
+endif
+
+
 
 pkginclude_HEADERS = \
 		aes.h \
@@ -28,6 +34,7 @@ pkginclude_HEADERS = \
 		init.h \
 		$(scsim_src) \
 		base64.h \
+		$(srp_src)
 		hmac.h \
 		OakleyDH.h \
 		rand.h \

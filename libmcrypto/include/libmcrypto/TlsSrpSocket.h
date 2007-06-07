@@ -27,7 +27,7 @@
 #include <gnutls/extra.h>
 #include <string>
 #include <libmnetutil/StreamSocket.h>
-#include <libmnetutil/IP4Address.h>
+#include <libmnetutil/IPAddress.h>
 
 class TlsSrpSocket : public StreamSocket
 {

@@ -25,11 +25,6 @@ win32_src = \
 		source/NetworkFunctionsWin32.cxx
 endif OS_WIN
 
-srp_src = 
-if ENABLE_SRP
-srp_src += source/TlsSrpSocket.cxx
-endif
-
 ipv6_src =
 if HAVE_IPV6
 ipv6_src += \
@@ -43,7 +38,6 @@ mnetutil_src = \
 		    source/IPAddress.cxx \
 		    source/IP4Address.cxx \
 		    source/IP4ServerSocket.cxx \
-		    $(srp_src) \
 		    $(ipv6_src) \
 		    source/NetworkException.cxx \
 		    source/NetworkFunctions.cxx \

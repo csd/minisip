@@ -1,10 +1,4 @@
-srp_src =
-if ENABLE_SRP
-srp_src += libmnetutil/TlsSrpSocket.h
-endif
-
 pkginclude_HEADERS =    \
-			$(srp_src) \
 			libmnetutil/init.h \
 			libmnetutil/DnsNaptr.h \
 			libmnetutil/IPAddress.h \

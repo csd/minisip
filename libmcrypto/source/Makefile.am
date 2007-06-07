@@ -28,6 +28,11 @@ scsim_src += SipSimPk.cxx \
 	     SmartCardException.cxx
 endif
 
+srp_src =
+if ENABLE_SRP
+srp_src += TlsSrpSocket.cxx
+endif
+
 
 libmcrypto_core_la_SOURCES = \
 		aes.cxx \
@@ -37,6 +42,7 @@ libmcrypto_core_la_SOURCES = \
 		init.cxx \
 		$(scsim_src) \
 		base64.cxx \
+		$(srp_src) \
 		TlsException.cxx \
 		uuid.cxx \
 		rijndael-alg-fst.cxx
