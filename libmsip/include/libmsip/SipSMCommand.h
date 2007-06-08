@@ -88,11 +88,10 @@ class LIBMSIP_API SipSMCommand : public virtual MObject{
 
 		MRef<SipMessage*> getCommandPacket() const;
 		CommandString getCommandString() const;
-#ifdef _WIN32_WCE
         friend LIBMSIP_API Dbg & operator<<(Dbg &, const SipSMCommand &);	
-#else
+//#ifdef _WIN32_WCE
         friend LIBMSIP_API std::ostream & operator<<(std::ostream &, const SipSMCommand &);
-#endif
+//#endif
 
 	private:
 		int type;

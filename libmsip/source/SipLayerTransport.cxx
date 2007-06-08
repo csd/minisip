@@ -332,7 +332,7 @@ void printMessage(string header, string packet){
 		if (packet[i]=='\n')
 			mout << header<<": ";
 	}
-	mout << end;
+	mout << endl;
 }
 
 SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
@@ -457,7 +457,7 @@ string getSocketTransport( MRef<Socket*> socket )
 			return "UDP";
 
 		default:
-			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<end;
+			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<endl;
 			// TODO more describing exception and message
 			throw NetworkException();
 	}
@@ -680,7 +680,7 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			}
 		}
 		else{
-			mdbg << "SipLayerTransport: URI invalid " << end;
+			mdbg << "SipLayerTransport: URI invalid " << endl;
 		}
 	}
 
@@ -940,7 +940,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc.what();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		mdbg << "Transport error in SipLayerTransport: " << message << end;
+		mdbg << "Transport error in SipLayerTransport: " << message << endl;
 		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
 		CommandString transportError( pack->getBranch()+pack->getCSeqMethod(), 
@@ -954,7 +954,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		if (dispatcher)
 			dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 		else
-			mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<end;
+			mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<endl;
 	}
 	
 }
@@ -992,7 +992,7 @@ static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
 	string peerAddr = from->getString();
 
 	if( !via ){
-		merr << "No Via header in incoming message!" << end;
+		merr << "No Via header in incoming message!" << endl;
 		return;
 	}
 
@@ -1037,7 +1037,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 			nread = sock->recvFrom((void *)buffer, UDP_MAX_SIZE, from, port);
 			
 			if (nread == -1){
-				mdbg << "Some error occured while reading from UdpSocket"<<end;
+				mdbg << "Some error occured while reading from UdpSocket"<<endl;
 				return;
 			}
 
@@ -1082,7 +1082,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 					if (dispatcher)
 						dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 					else
-						mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+						mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
 				}
 				pack=NULL;
 			}
@@ -1091,7 +1091,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << end;
+				mdbg << "Invalid data on UDP socket, discarded" << endl;
 #endif
 				return;
 			}
@@ -1101,7 +1101,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				// packet, close the connection
 				
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << end;
+				mdbg << "Invalid data on UDP socket, discarded" << endl;
 #endif
 				return;
 			}
@@ -1125,13 +1125,13 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			nread = socket->read( buffer, STREAM_MAX_PKT_SIZE);
 
 			if (nread == -1){
-				mdbg << "Some error occured while reading from StreamSocket" << end;
+				mdbg << "Some error occured while reading from StreamSocket" << endl;
 				return;
 			}
 
 			if ( nread == 0){
 				// Connection was closed
-				mdbg << "Connection was closed" << end;
+				mdbg << "Connection was closed" << endl;
 				transport->removeSocket( socket );
 				return;
 			}
@@ -1161,7 +1161,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 							if (transport->dispatcher){
 								transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 							}else
-								mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<end;
+								mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
 						}
 						pack=NULL;
 					}

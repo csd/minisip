@@ -677,7 +677,7 @@ void SipDialogVoip::sendReferReject(){
 }
 
 bool SipDialogVoip::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogVoip::handleCommand got "<< c << end;
+	mdbg << "SipDialogVoip::handleCommand got "<< c << endl;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId )
@@ -695,7 +695,7 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	
 	}
 	
-	mdbg << "SipDialogVoip::handleCommand() sending command to Dialog: "<< c << end;
+	mdbg << "SipDialogVoip::handleCommand() sending command to Dialog: "<< c << endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -704,13 +704,13 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (!handled && c.getCommandString().getDestinationId() == dialogState.callId ){
-			mdbg << "Warning: SipDialogVoIP ignoring command with matching call id"<< end;
+			mdbg << "Warning: SipDialogVoIP ignoring command with matching call id"<< endl;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
 		if (!handled && c.getCommandPacket()->getCallId() == dialogState.callId){
-			mdbg << "Warning: SipDialogVoIP ignoring packet with matching call id"<< end;
+			mdbg << "Warning: SipDialogVoIP ignoring packet with matching call id"<< endl;
 			return true;
 		}
 	}
@@ -775,7 +775,7 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 #endif
 					return true;
 				default:
-					merr << "No SDP match" << end;
+					merr << "No SDP match" << endl;
 					return false;
 			}
 		}

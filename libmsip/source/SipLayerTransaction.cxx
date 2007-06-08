@@ -170,7 +170,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 		bool hasSeqMethod = (seqMethod!="");
 
 		if (!hasBranch){
-			mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<end;
+			mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<endl;
 		}
 
 		map<string, MRef<SipTransaction*> >::iterator i;

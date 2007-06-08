@@ -173,7 +173,7 @@ bool SipDialogVoipServer::a3007_start_100rel_INVITE( const SipSMCommand &command
 	string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		
 	if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
-		merr << "No MIME match" << end;
+		merr << "No MIME match" << endl;
 		return false;
 	}
 
@@ -201,7 +201,7 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
 		
 		if(!sortMIME(*inv->getContent(), peerUri, 10)){
-			merr << "No MIME match" << end;
+			merr << "No MIME match" << endl;
 			return false;
 		}
 		
@@ -640,7 +640,7 @@ void SipDialogVoipServer::sendInviteOk(){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInviteOk" << end;
+		merr << "Sdp was NULL in sendInviteOk" << endl;
 		return; 
 		}
 	}
@@ -751,7 +751,7 @@ void SipDialogVoipServer::sendSessionProgress(){
 			// FIXME: this most probably means that the
 			// creation of the MIKEY message failed, it 
 			// should not happen
-			merr << "Sdp was NULL in sendInviteOk" << end;
+			merr << "Sdp was NULL in sendInviteOk" << endl;
 			return; 
 		}
 	}

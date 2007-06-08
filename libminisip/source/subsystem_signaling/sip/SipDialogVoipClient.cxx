@@ -558,7 +558,7 @@ void SipDialogVoipClient::sendInvite(){
 			// FIXME: this most probably means that the
 			// creation of the MIKEY message failed, it 
 			// should not happen
-			merr << "Sdp was NULL in sendInvite" << end;
+			merr << "Sdp was NULL in sendInvite" << endl;
 			return; 
 		}
 
@@ -634,7 +634,7 @@ void SipDialogVoipClient::sendInviteOk(){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInviteOk" << end;
+		merr << "Sdp was NULL in sendInviteOk" << endl;
 		return; 
 		}
 	}

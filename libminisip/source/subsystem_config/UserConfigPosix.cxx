@@ -39,7 +39,7 @@ std::string UserConfig::getFileName(std::string baseName)
 		return string(home)+ string("/.") + baseName;
 	}
 
-	merr << "WARNING: Could not determine home directory"<<end;
+	merr << "WARNING: Could not determine home directory"<<endl;
 
 	return string("/.") + baseName;
 }

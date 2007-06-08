@@ -64,7 +64,7 @@ MRef<Resampler *> ResamplerRegistry::create( uint32_t inputFreq, uint32_t output
 		return NULL;
 	}
 
-	mdbg << "Creating resampler " << resampler->getName() << ::end;
+	mdbg << "Creating resampler " << resampler->getName() << endl;
 
 	return resampler->createResampler( inputFreq, outputFreq,
 					   duration, nChannels );

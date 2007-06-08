@@ -50,14 +50,14 @@ bool SipAuthenticationDigest::getStale() const{
 
 bool SipAuthenticationDigest::update( MRef<SipHeaderValueProxyAuthenticate*> auth ){
 	if( type > -1 && type != auth->getType() ){
-		mdbg << "SipAuthenticationDigest::update non-matching header type" << end;
+		mdbg << "SipAuthenticationDigest::update non-matching header type" << endl;
 		return false;
 	}
 	type = auth->getType();
 
 	string realmParam = unquote( auth->getParameter("realm") );
 	if( realm != nullStr && realm != realmParam ){
-		mdbg << "SipAuthenticationDigest::update non-matching realm" << end;
+		mdbg << "SipAuthenticationDigest::update non-matching realm" << endl;
 		return false;
 	}
 	realm = realmParam;

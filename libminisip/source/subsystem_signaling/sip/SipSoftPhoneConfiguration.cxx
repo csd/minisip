@@ -227,7 +227,7 @@ void SipSoftPhoneConfiguration::save(){
 					iDir ++;
 					break;
 				default:
-					merr<< "Warning: unknown certificate object type"<<end;
+					merr<< "Warning: unknown certificate object type"<<endl;
 			}
 
 			caDbItem = cert_db->get_next();
@@ -524,7 +524,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		else{
 			ident->ka_type = KEY_MGMT_METHOD_MIKEY_PSK;
 #ifdef DEBUG_OUTPUT
-			merr << "Invalid KA type in config file, default to PSK"<<end;
+			merr << "Invalid KA type in config file, default to PSK"<<endl;
 #endif
 		}
 
@@ -572,7 +572,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 				certchain->add_certificate( cert );
 			}
 			catch( certificate_exception & ){
-				merr << "Could not open the given certificate " << certFile <<end;
+				merr << "Could not open the given certificate " << certFile <<endl;
 			}
 
 			if( privateKeyFile != "" ){
@@ -581,10 +581,11 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 					cert->set_pk( privateKeyFile );
 				}
 				catch( certificate_exception_pkey & ){
-					merr << "The given private key " << privateKeyFile << " does not match the certificate"<<end;                        }
+					merr << "The given private key " << privateKeyFile << " does not match the certificate"<<endl; 
+				}
 
 				catch( certificate_exception &){
-					merr << "Could not open the given private key "<< privateKeyFile << end;
+					merr << "Could not open the given private key "<< privateKeyFile << endl;
 				}
 			}
 		}
@@ -608,7 +609,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 							"httpsrp:///"+user + "/certificate_chain" );
 					certchain->add_certificate( cert );
 				} catch(certificate_exception &) {
-					merr << "Could not open the given certificate" << end;
+					merr << "Could not open the given certificate" << endl;
 				}
 			}
 		}
@@ -623,7 +624,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 				certchain->add_certificate( cert );
 			}
 			catch( certificate_exception &){
-				merr << "Could not open the given certificate" << end;
+				merr << "Could not open the given certificate" << endl;
 			}
 			iCertFile ++;
 			certFile = backend->loadString(accountPath + "certificate_chain["+itoa(iCertFile)+"]","");
@@ -653,7 +654,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 					cert_db->add_certificate( cert );
 				}
 				catch( certificate_exception &){
-					merr << "Could not open the CA certificate" << end;
+					merr << "Could not open the CA certificate" << endl;
 				}
 			}
 		}
@@ -667,7 +668,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 				cert_db->add_file( certFile );
 			}
 			catch( certificate_exception &e){
-				merr << "Could not open the CA certificate " << e.what() << end;
+				merr << "Could not open the CA certificate " << e.what() << endl;
 			}
 			iCertFile ++;
 			certFile = backend->loadString(accountPath + "ca_file["+itoa(iCertFile)+"]","");
@@ -682,7 +683,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 				cert_db->add_directory( certFile );
 			}
 			catch( certificate_exception &){
-				merr << "Could not open the CA certificate directory " << certFile << end;
+				merr << "Could not open the CA certificate directory " << certFile << endl;
 			}
 			iCertFile ++;
 			certFile = backend->loadString(accountPath + "ca_dir["+itoa(iCertFile)+"]","");
@@ -835,7 +836,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			if( !pb.isNull() ){
 				phonebooks.push_back(pb);
 			} else{
-				merr << "Could not open the phonebook " << end;
+				merr << "Could not open the phonebook " << endl;
 			}
 		}
 		i++;

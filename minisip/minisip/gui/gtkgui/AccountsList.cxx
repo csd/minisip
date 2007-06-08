@@ -142,7 +142,7 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			#ifdef DEBUG_OUTPUT
 			cerr << "AccountList::saveToConfig:: Account <" << name << "> warning: " << retProxy << endl; 
 			#endif
-			merr << retProxy << end; 
+			merr << retProxy << endl; 
 		}
 
 		string username = 

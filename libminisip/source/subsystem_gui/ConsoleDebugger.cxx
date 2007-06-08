@@ -302,7 +302,7 @@ void ConsoleDebugger::showConfig(){
 		int n=1;
 		MRef<certificate *> crt=config->sipStackConfig->cert->get_first();
 		while (crt){
-			cerr << "      certificate "<<n<<end
+			cerr << "      certificate "<<n<<endl
 			     << "        name="<<crt->get_name()<<endl
 			     << "        cn="<<crt->get_cn()<<endl
 			     << "        issuer="<<crt->get_issuer()<<endl

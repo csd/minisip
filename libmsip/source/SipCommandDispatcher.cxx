@@ -95,7 +95,7 @@ list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
 void SipCommandDispatcher::run(){
 
 	while (keepRunning){
-		mdbg << "DIALOG CONTAINER: waiting for command"<< end;
+		mdbg << "DIALOG CONTAINER: waiting for command"<< endl;
                 semaphore.dec();
 
 		struct queue_type item;
@@ -109,11 +109,11 @@ void SipCommandDispatcher::run(){
 		}
                 mlock.unlock();
 #ifdef DEBUG_OUTPUT
-		mdbg << "DISPATCHER: got command!"<<end;
+		mdbg << "DISPATCHER: got command!"<<endl;
 		if (item.type==TYPE_COMMAND)
-			mdbg << "command: "<< **item.command << end;
+			mdbg << "command: "<< **item.command << endl;
 		else
-			mdbg << "timeout: "<< **item.command << end;
+			mdbg << "timeout: "<< **item.command << endl;
 #endif
 
 
@@ -125,9 +125,9 @@ void SipCommandDispatcher::run(){
 		// Timeouts have a known receiver set in the queue item.
 #ifdef DEBUG_OUTPUT
 		if (item.type==TYPE_COMMAND){
-			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << end;
+			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << endl;
 		}else{
-			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << end;
+			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << endl;
 		}
 #endif
 		
@@ -336,7 +336,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
-			mdbg << "SipCommandDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << end;
+			mdbg << "SipCommandDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << endl;
 #endif
 			return false;
 		}

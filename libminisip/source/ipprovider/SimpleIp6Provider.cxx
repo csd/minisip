@@ -47,7 +47,7 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 			vector<string> addrs = iface->getIPStrings( true );
 			vector<string>::iterator iter;
 
-			mdbg << "Simple6IP: checking interface = " << iface->getName() << end;
+			mdbg << "Simple6IP: checking interface = " << iface->getName() << endl;
 
 			iter = find( addrs.begin(), addrs.end(), localIp );
 			if ( iter != addrs.end() ){
@@ -57,7 +57,7 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 		if (!ok){
 			merr << "Error: The IP address specified in the"
 				"configuration file ("<<localIp<<
-				") is not configured on any local interface."<< end;
+				") is not configured on any local interface."<< endl;
 			localIp = "";
                 }
 		else return;
@@ -66,17 +66,17 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 	for (unsigned i=0; i<ifaces.size(); i++){
 		void *ptr = &ifaces[i];
 
-		mdbg << "SimpleIP6Provider: checking ptr = " << ptr << end;
+		mdbg << "SimpleIP6Provider: checking ptr = " << ptr << endl;
 
 		MRef<NetworkInterface *> iface = ifaces[i];
 
 		if( iface ){
-			mdbg << "SimpleIP6Provider: checking interface = " << *iface << end;
+			mdbg << "SimpleIP6Provider: checking interface = " << *iface << endl;
 
 			vector<string> addrs = iface->getIPStrings( use_ipv6 );
 			vector<string>::iterator iter;
 
-			mdbg << "SimpleIP6Provider: checking interface = " << iface->getName() << end;
+			mdbg << "SimpleIP6Provider: checking interface = " << iface->getName() << endl;
 
 			for( iter = addrs.begin(); iter != addrs.end(); iter++ ){
 				string ipstr = *iter;
@@ -89,7 +89,7 @@ SimpleIp6Provider::SimpleIp6Provider( MRef<SipSoftPhoneConfiguration *> config )
 
 				Scope scope = ipScope( ipstr );
 
-				mdbg << "SimpleIP6Provider: checking interface = " << ifaces[i] << " with IP=" << ipstr << " scope=" << scope << end;
+				mdbg << "SimpleIP6Provider: checking interface = " << ifaces[i] << " with IP=" << ipstr << " scope=" << scope << endl;
 				//only update the local ip i	f it is the first interface with a private
 				//ip different from localhost or a publi	c ip
 

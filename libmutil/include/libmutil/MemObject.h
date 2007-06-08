@@ -338,7 +338,7 @@ bool MRef<OPType>::decrease() {
 #ifndef _MSC_VER
 				merr << "MRef::~MRef: WARNING: deleteing object with negative reference count (" 
 					<< rc
-					<< ") - created without reference?" << end;
+					<< ") - created without reference?" << std::endl;
 #endif
 			}       
 			delete getPointer();

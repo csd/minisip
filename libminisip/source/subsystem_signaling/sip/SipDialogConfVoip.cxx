@@ -375,7 +375,7 @@ bool SipDialogConfVoip::a9_callingnoauth_termwait_36( const SipSMCommand &comman
 		}
 		else{
 			merr << "ERROR: received response in SipDialogConfVoip"
-				" that could not be handled (unimplemented)"<< end;
+				" that could not be handled (unimplemented)"<< endl;
                 }
 		
 		getMediaSession()->stop();
@@ -408,7 +408,7 @@ bool SipDialogConfVoip::a10_start_ringing_INVITE( const SipSMCommand &command)
 		string peerUri = command.getCommandPacket()->getFrom().getString();
 		//MRef<SipMessageContent *> Offer = *command.getCommandPacket()->getContent();
 		if(!sortMIME(*command.getCommandPacket()->getContent(), peerUri, 10)){
-			merr << "No MIME match" << end;
+			merr << "No MIME match" << endl;
 			return false;
 		}
 
@@ -1007,7 +1007,7 @@ void SipDialogConfVoip::sendInvite(){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInvite" << end;
+		merr << "Sdp was NULL in sendInvite" << endl;
 		return; 
 		}
 	}
@@ -1115,7 +1115,7 @@ void SipDialogConfVoip::sendAck(){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInvite" << end;
+		merr << "Sdp was NULL in sendInvite" << endl;
 		return; 
 		}
 	}
@@ -1195,7 +1195,7 @@ void SipDialogConfVoip::sendInviteOk(){
 		// FIXME: this most probably means that the
 		// creation of the MIKEY message failed, it 
 		// should not happen
-		merr << "Sdp was NULL in sendInvite" << end;
+		merr << "Sdp was NULL in sendInvite" << endl;
 		return; 
 		}
 	}
@@ -1263,7 +1263,7 @@ void SipDialogConfVoip::sendNotAcceptable(){
 
 
 bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogConfVoip::handleCommand got "<< c << end;
+	mdbg << "SipDialogConfVoip::handleCommand got "<< c << endl;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId )
@@ -1285,7 +1285,7 @@ bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
 //			c.getCommandPacket()->getCSeq()!= command_seq_no)
 //		return false;
 	
-	mdbg << "SipDialogConfVoip::handlePacket() got "<< c << end;
+	mdbg << "SipDialogConfVoip::handlePacket() got "<< c << endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -1294,13 +1294,13 @@ bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() == dialogState.callId ){
-			mdbg << "Warning: SipDialogConfVoip ignoring command with matching call id"<< end;
+			mdbg << "Warning: SipDialogConfVoip ignoring command with matching call id"<< endl;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
 		if (c.getCommandPacket()->getCallId() == dialogState.callId){
-			mdbg << "Warning: SipDialogConfVoip ignoring packet with matching call id"<< end;
+			mdbg << "Warning: SipDialogConfVoip ignoring packet with matching call id"<< endl;
 			return true;
 		}
 	}
@@ -1365,7 +1365,7 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 #endif
 					return true;
 				default:
-					merr << "No SDP match" << end;
+					merr << "No SDP match" << endl;
 					return false;
 			}
 		}

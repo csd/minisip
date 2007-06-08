@@ -44,7 +44,7 @@ MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){
 		MRef<AudioCodec*> codec = dynamic_cast<AudioCodec*>(*plugin);
 
 		if( !codec ){
-			merr << "Not an AudioCodec? " << plugin->getName() << ::end;
+			merr << "Not an AudioCodec? " << plugin->getName() << endl;
 		}
 
 		if( codec && codec->getSdpMediaType() == payloadType ){
@@ -52,7 +52,7 @@ MRef<CodecState *> AudioCodecRegistry::createState( uint8_t payloadType ){
 		}
 	}
 
-	merr << "AudioCodec not found pt: " << payloadType << ::end;
+	merr << "AudioCodec not found pt: " << payloadType << endl;
 	return NULL;
 }
 
@@ -67,7 +67,7 @@ MRef<AudioCodec *> AudioCodecRegistry::create( const std::string & description )
 		MRef<AudioCodec*> codec = dynamic_cast<AudioCodec*>(*plugin);
 
 		if( !codec ){
-			merr << "Not an AudioCodec? " << plugin->getName() << ::end;
+			merr << "Not an AudioCodec? " << plugin->getName() << endl;
 		} 
 
 		if( codec && codec->getCodecName() == description ){
@@ -75,7 +75,7 @@ MRef<AudioCodec *> AudioCodecRegistry::create( const std::string & description )
 		}
 	}
 
-	merr << "AudioCodec not found name: " << description << ::end;
+	merr << "AudioCodec not found name: " << description << endl;
 	return NULL;
 }
 

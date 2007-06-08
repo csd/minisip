@@ -128,7 +128,7 @@ void SipTransactionInviteServerUA::changeStateMachine(){
 	
 	bool success = s_proceeding->removeTransition("transition_proceeding_terminated_2xx");
 	if (!success){
-		merr << "ERROR: Could not remove transition from state machine in SipTransactionInviteServerUA (BUGBUG!!)"<<end;
+		merr << "ERROR: Could not remove transition from state machine in SipTransactionInviteServerUA (BUGBUG!!)"<<endl;
 		massert(0==1);
 	}
 	

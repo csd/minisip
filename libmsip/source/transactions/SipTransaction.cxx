@@ -202,7 +202,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 			setSocket( *pack->getSocket() );
 
 #ifdef DEBUG_OUTPUT
-		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<end;
+		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<endl;
 #endif
 		
 		return;
@@ -211,7 +211,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 //FIXME: set the reliability ...
 bool SipTransaction::isUnreliable() { 
 	if( !socket ) {
-		mdbg << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << end;
+		mdbg << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << endl;
 		return true;
 	}
 	if( socket->getType() == SOCKET_TYPE_UDP )

@@ -148,7 +148,7 @@ bool SipTransactionInviteServer::a1_proceeding_proceeding_INVITE( const SipSMCom
 		MRef<SipResponse*> resp = lastResponse;
 		if (resp.isNull()){
 #ifdef DEBUG_OUTPUT
-			merr << FG_ERROR << "Invite server transaction failed to deliver response before remote side retransmitted. Bug?"<< PLAIN << end;
+			merr << FG_ERROR << "Invite server transaction failed to deliver response before remote side retransmitted. Bug?"<< PLAIN << endl;
 #endif
 		}else{
 			send(MRef<SipMessage*>(*resp), false);

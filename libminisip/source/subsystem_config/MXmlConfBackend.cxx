@@ -85,7 +85,7 @@ MXmlConfBackend::MXmlConfBackend( const string& path ){
 		parser = new XMLFileParser( "" );
 	}
 	catch( XMLException &exc ){
-		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << endl;
 		cerr << "Caught XMLException" << endl;
 		throw ConfBackendException();
 	}
@@ -106,7 +106,7 @@ void MXmlConfBackend::save( const std::string &key, const std::string &value ){
 		parser->changeValue( key, xmlStr );
 	}
 	catch( XMLException &exc ){
-		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 	
@@ -117,7 +117,7 @@ void MXmlConfBackend::save( const std::string &key, const int32_t value ){
 		parser->changeValue( key, itoa( value ) );
 	}
 	catch( XMLException &exc ){
-		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 }
@@ -132,7 +132,7 @@ std::string MXmlConfBackend::loadString( const std::string &key, const std::stri
 		ret = searchReplace( tmp, "&amp;", "&" );
 	}
 	catch( XMLException &exc ){
-		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 
@@ -148,7 +148,7 @@ int32_t MXmlConfBackend::loadInt( const std::string &key,
 		ret = parser->getIntValue( key, defaultValue );
 	}
 	catch( XMLException &exc ){
-		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "MXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 

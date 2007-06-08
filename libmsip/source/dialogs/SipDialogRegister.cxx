@@ -276,7 +276,7 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 		getDialogConfig()->sipIdentity->setIsRegistered ( false );
 	
 #ifdef DEBUG_OUTPUT
-		mdbg << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<end;
+		mdbg << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<endl;
 #endif
 		return true;
 	}else{
@@ -489,7 +489,7 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 	if (command.getType()==SipSMCommand::COMMAND_PACKET 
 			&& !(command.getDestination()==SipSMCommand::dialog_layer 
 			/*|| command.getDestination()==SipSMCommand::ANY*/)){
-		merr << "WARNING: UNEXPECTED: received packet in SipDialogRegister: "<<command.getCommandPacket()->getDescription() << end;
+		merr << "WARNING: UNEXPECTED: received packet in SipDialogRegister: "<<command.getCommandPacket()->getDescription() << endl;
 		return false;
 	}
 

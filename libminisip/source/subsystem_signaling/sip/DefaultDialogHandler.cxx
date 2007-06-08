@@ -138,7 +138,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
-			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
+			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
 #endif			
 		
 
@@ -199,7 +199,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
-			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << end;
+			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
 #endif			
 
 
@@ -223,7 +223,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			mdbg << cmd << end;
+			mdbg << cmd << endl;
 		}
 		//start SipDialogVoIP
 		else{
@@ -252,7 +252,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			mdbg << cmd << end;
+			mdbg << cmd << endl;
 		}
 		return true;
 	}
@@ -263,7 +263,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		MRef<SipRequest*> im = (SipRequest*)*pkt;
 
 #ifdef DEBUG_OUTPUT			
-		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << end;
+		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << endl;
 #endif			
 		sendIMOk( im );
 
@@ -313,7 +313,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		return true;
 	}
 
-	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << end; 
+	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << endl; 
 
 	return false;
 
@@ -457,14 +457,14 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 	}
 #endif
 
-	mdbg << "DefaultDialogHandler ignoring command " << cmdstr.getString() << end; 
+	mdbg << "DefaultDialogHandler ignoring command " << cmdstr.getString() << endl; 
 
 	return false;
 }
 
 
 bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
-	mdbg << "DefaultDialogHandler: got command "<< command << end;
+	mdbg << "DefaultDialogHandler: got command "<< command << endl;
 	int dst = command.getDestination();
 	if ( dst!=SipSMCommand::dialog_layer)
 		return false;
@@ -480,7 +480,7 @@ bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
 
 void DefaultDialogHandler::handleCommand(string subsystem, const CommandString &cmd){
 	assert(subsystem=="sip");
-	merr << "DefaultDialogHandler::handleCommand(subsystem,cmd): Can not handle: "<< cmd.getString() << end;
+	merr << "DefaultDialogHandler::handleCommand(subsystem,cmd): Can not handle: "<< cmd.getString() << endl;
 }
 
 CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const CommandString &cmd){
@@ -625,7 +625,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	}
 	else{
 #ifdef DEBUG_OUTPUT			
-		mdbg << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< end;
+		mdbg << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< endl;
 #endif
 		return;
 	}
@@ -756,7 +756,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	//get P2TDialog
 	MRef<SipDialogP2T*> p2tDialog;
 	if(getP2TDialog(command.getCommandString().getParam(), p2tDialog)==false){	
-		mdbg<<"DefaultDialogHandler::Couldn't find SipDialogP2T!"<<end;
+		mdbg<<"DefaultDialogHandler::Couldn't find SipDialogP2T!"<<endl;
 		return;
 	}
 
@@ -950,9 +950,9 @@ bool DefaultDialogHandler::modifyDialogConfig(string user, MRef<SipDialogConfig 
 			// TODO: untested
 			dialogConfig->sipIdentity->setSipRegistrar(new SipRegistrar(proxy, iport));
 		}catch(HostNotFound & exc){
-			merr << "Could not resolve PSTN proxy address:" << end;
+			merr << "Could not resolve PSTN proxy address:" << endl;
 			merr << exc.what();
-			merr << "Will use default proxy instead" << end;
+			merr << "Will use default proxy instead" << endl;
 		}
 	
 	}

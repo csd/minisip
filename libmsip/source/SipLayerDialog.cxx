@@ -106,7 +106,7 @@ bool SipLayerDialog::handleCommand(const SipSMCommand &c){
 	assert(c.getDestination()==SipSMCommand::dialog_layer);
 
 #ifdef DEBUG_OUTPUT
-	mdbg<< "SipLayerDialog: got command: "<< c <<end;
+	mdbg<< "SipLayerDialog: got command: "<< c <<endl;
 #endif
 
 	string cid = c.getDestinationId();

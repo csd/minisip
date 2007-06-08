@@ -256,7 +256,7 @@ vector<MRef<NetworkInterface*> > mapToVector( map<string, MRef<NetworkInterface*
 		MRef<NetworkInterface*> interface = i->second;
 
 		if( !interface ){
-			mdbg << "NetworkFunctions::mapToVector: No interface!" << end;
+			mdbg << "NetworkFunctions::mapToVector: No interface!" << endl;
 			continue;
 		}
 

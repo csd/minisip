@@ -311,7 +311,7 @@ void SipDialogPresenceServer::sendNotify( string toUri, string cid ){
 }
 
 bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogPresenceServer::handleCommand got "<< c << end;
+	mdbg << "SipDialogPresenceServer::handleCommand got "<< c << endl;
 
 /*	if (c.getType()==SipSMCommand::COMMAND_STRING && callId.length()>0){
 		if (c.getCommandString().getDestinationId() != callId ){
@@ -340,7 +340,7 @@ bool SipDialogPresenceServer::handleCommand(const SipSMCommand &c){
 //		return false;
 	
 //	mdbg << "SipDialogPresenceServer::handlePacket() got "<< c << end;
-	merr << "SipDialogPresenceServer returning dialogs handleCommand"<< end;
+	merr << "SipDialogPresenceServer returning dialogs handleCommand"<< endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){

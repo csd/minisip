@@ -59,7 +59,7 @@ SipHeaderValueExpires::SipHeaderValueExpires(const string &build_from)
 	if (*endptr==0){
 		timeout=n;
 	}else{
-		merr << "WARNING: Could not parse Expires header - setting to 300 instead"<<end;
+		merr << "WARNING: Could not parse Expires header - setting to 300 instead"<<endl;
 		timeout=300;
 	}
 }

@@ -64,9 +64,9 @@ bool SipDialogManagement::a0_start_startShutdown_startShutdown( const SipSMComma
 				SipSMCommand::dialog_layer)) {
 
 		pendingHangUps = pendingDeRegs = 0;
-		merr << end;
-		merr << "MiniSIP's SipStack is shutting down ... " << end;
-		merr << "     ... it won't take long to finish, be patient. Thanks!" << end;
+		merr << endl;
+		merr << "MiniSIP's SipStack is shutting down ... " << endl;
+		merr << "     ... it won't take long to finish, be patient. Thanks!" << endl;
 		SipSMCommand cmd( CommandString( "", SipCommandString::terminate_all_calls),
 			SipSMCommand::dispatcher,
 			SipSMCommand::dispatcher);
@@ -698,8 +698,8 @@ bool SipDialogManagement::terminateAllCalls() {
 	list<MRef<SipDialog *> > dlgs;
 	dlgs = getSipStack()->getDialogs();
 
-	merr << end; 
-	merr << "Terminating all ongoing calls:" << end;
+	merr << endl; 
+	merr << "Terminating all ongoing calls:" << endl;
 	for( list<MRef<SipDialog *> >::iterator it = dlgs.begin();
 							it != dlgs.end();
 							it ++  ) {
@@ -713,10 +713,10 @@ bool SipDialogManagement::terminateAllCalls() {
 				SipSMCommand::dialog_layer);
 		getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingHangUps++;
-		merr << "    - Hanging up " << (*it)->dialogState.remoteUri << end;
+		merr << "    - Hanging up " << (*it)->dialogState.remoteUri << endl;
 	}
 	if( pendingHangUps <= 0 ) {
-		merr << "    CALLS: No ongoing calls!" << end;
+		merr << "    CALLS: No ongoing calls!" << endl;
 		//if we have not sent any hang_ups ... notify all calls terminated
 		SipSMCommand cmd( CommandString( "", SipCommandString::terminate_all_calls_done),
 				SipSMCommand::dispatcher,
@@ -729,7 +729,7 @@ bool SipDialogManagement::terminateAllCalls() {
 bool SipDialogManagement::receivedCallTerminateEarly() {
 	pendingHangUps --;
 	if( pendingHangUps <= 0 ) {
-		merr << "    CALLS: all calls have been terminated!" << end;
+		merr << "    CALLS: all calls have been terminated!" << endl;
 		SipSMCommand cmd( CommandString( "", SipCommandString::terminate_all_calls_done),
 				SipSMCommand::dispatcher,
 				SipSMCommand::dispatcher);
@@ -741,8 +741,8 @@ bool SipDialogManagement::receivedCallTerminateEarly() {
 bool SipDialogManagement::deRegisterAll() {
 	list<MRef<SipDialog *> > dlgs;
 	dlgs = getSipStack()->getDialogs();
-	merr << end; 
-	merr << "De-Registering all identities from their registrar:" << end;
+	merr << endl; 
+	merr << "De-Registering all identities from their registrar:" << endl;
 	for( list<MRef<SipDialog *> >::iterator it = dlgs.begin();
 							it != dlgs.end();
 							it ++  ) {
@@ -766,11 +766,11 @@ bool SipDialogManagement::deRegisterAll() {
 		getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    De-registration request sent (username = " << 
-			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << endl;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered
-		merr << "    DE-REGISTER: all identities were already not registered!" << end;
+		merr << "    DE-REGISTER: all identities were already not registered!" << endl;
 		SipSMCommand cmd( CommandString( "", SipCommandString::unregister_all_identities_done),
 				SipSMCommand::dispatcher,
 				SipSMCommand::dispatcher);
@@ -782,8 +782,8 @@ bool SipDialogManagement::deRegisterAll() {
 bool SipDialogManagement::registerAll() {
 	list<MRef<SipDialog *> > dlgs;
 	dlgs = getSipStack()->getDialogs();
-	merr << end; 
-	merr << "Registering all identities to their registrar:" << end;
+	merr << endl; 
+	merr << "Registering all identities to their registrar:" << endl;
 	for( list<MRef<SipDialog *> >::iterator it = dlgs.begin();
 							it != dlgs.end();
 							it ++  ) {
@@ -808,11 +808,11 @@ bool SipDialogManagement::registerAll() {
 		getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		pendingDeRegs++;
 		merr << "    Registration request sent (username = " << 
-			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << end;
+			(*it)->getDialogConfig()->sipIdentity->getSipUri().getString() << ")" << endl;
 	}
 	if( pendingDeRegs == 0 ) {
 		//if we have not sent any de-regs ... notify all un-registered
-		merr << "    REGISTER: all identities were already registered!" << end;
+		merr << "    REGISTER: all identities were already registered!" << endl;
 		SipSMCommand cmd( CommandString( "", SipCommandString::unregister_all_identities_done),
 				SipSMCommand::dispatcher,
 				SipSMCommand::dispatcher);
@@ -827,13 +827,13 @@ bool SipDialogManagement::receivedRegisterOk(bool deregistering){
 	pendingDeRegs--;
 	if( pendingDeRegs <= 0 ) {
 		if( deregistering ) {
-			merr << "    DE-REGISTER: all identities have been de-registered correctly!" << end;
+			merr << "    DE-REGISTER: all identities have been de-registered correctly!" << endl;
 			SipSMCommand cmd( CommandString( "", SipCommandString::unregister_all_identities_done),
 				SipSMCommand::dispatcher,
 				SipSMCommand::dispatcher);
 			getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
 		} else {
-			merr << "    REGISTER: all identities have been registered correctly!" << end;
+			merr << "    REGISTER: all identities have been registered correctly!" << endl;
 			SipSMCommand cmd( CommandString( "", SipCommandString::register_all_identities_done),
 				SipSMCommand::dispatcher,
 				SipSMCommand::dispatcher);
@@ -851,14 +851,14 @@ bool SipDialogManagement::shutdownDone( bool force ) {
 			return false;
 		} 
 		//else ... shutdown ... nothing else to do ...
-		merr << end << "SipStack Shutdown process is completed."<< end;
+		merr << endl << "SipStack Shutdown process is completed."<< endl;
 	} else {
-		merr << "Shutdown process timed out (there was some problem): "<< end;
+		merr << "Shutdown process timed out (there was some problem): "<< endl;
 		if( pendingHangUps > 0 ) {
-			merr << "      CALLS: Not all calls could be correctly hung up."<< end;
+			merr << "      CALLS: Not all calls could be correctly hung up."<< endl;
 		}
 		if( pendingDeRegs > 0 ) {
-			merr << "      DE-REGISTER: Not all identities were correctly de-registered."<< end;
+			merr << "      DE-REGISTER: Not all identities were correctly de-registered."<< endl;
 		}
 	}
 	

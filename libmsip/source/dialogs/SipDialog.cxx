@@ -159,10 +159,10 @@ list<MRef<SipTransaction*> > SipDialog::getTransactions(){
 
 bool SipDialog::handleCommand(const SipSMCommand &command){
 
-	mdbg << "SipDialog("<<getMemObjectType()<<")::handleCommand got command "<< command << "("<<getName()<<")"<<end;
+	mdbg << "SipDialog("<<getMemObjectType()<<")::handleCommand got command "<< command << "("<<getName()<<")"<<endl;
 	
 	if (! (command.getDestination()==SipSMCommand::dialog_layer) ){
-		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< end;
+		mdbg << "SipDialog::handleCommand: returning false based on command destination"<< endl;
 		
 		return false;
 	}
@@ -170,17 +170,17 @@ bool SipDialog::handleCommand(const SipSMCommand &command){
 	if (command.getType()==SipSMCommand::COMMAND_PACKET 
 			&& dialogState.callId != "" 
 			&& dialogState.callId != command.getCommandPacket()->getCallId()){
-		mdbg << "SipDialog: denying command based on destination id"<< end;
+		mdbg << "SipDialog: denying command based on destination id"<< endl;
 		
 		return false;
 	}
 
-	mdbg << "SipDialog::handleCommand: sending command to state machine"<< end;
+	mdbg << "SipDialog::handleCommand: sending command to state machine"<< endl;
 	
 	bool ret;
 	ret=StateMachine<SipSMCommand,string>::handleCommand(command);
 	
-	mdbg << "SipDialog::handleCommand returning "<< ret << end;
+	mdbg << "SipDialog::handleCommand returning "<< ret << endl;
 	
 
 	return ret;
@@ -260,7 +260,7 @@ MRef<SipRequest*> SipDialog::createSipMessagePrack( MRef<SipResponse*> resp ){
 	MRef<SipHeaderValue *> value = resp->getHeaderValueNo( SIP_HEADER_TYPE_RSEQ, 0 );
 
 	if( !value ){
-		mdbg << "SipDialog: Missing RSeq in response" << end;
+		mdbg << "SipDialog: Missing RSeq in response" << endl;
 		return NULL;
 	}
 

@@ -32,112 +32,82 @@
 #include<string>
 #include<iostream>
 #include<sstream>
-
-#define DBG_INFO 0
-#define DBG_ERROR 1
-
-//==================================================================
-//if not win ce, pocket pc ... inherit from iostream and stringbuf
-//otherwise, use an old version of the debug class (release 1923)
-#ifndef _WIN32_WCE
-
-	class LIBMUTIL_API DbgHandler {
-		public:
-			virtual ~DbgHandler(){}
-		protected:
-			virtual void displayMessage(std::string output,int style=-1)=0;
-		private:
-			friend class Dbg;
-			friend class DbgBuf;
-	};
-
-	class LIBMUTIL_API DbgBuf : public std::stringbuf {
-		public:
-			DbgBuf( DbgHandler * dbgHandler );
-			virtual ~DbgBuf();
-			virtual void setExternalHandler(DbgHandler * dbgHandler);
-		protected:
-			virtual int sync();
-		private:
-			DbgHandler * debugHandler;
-	};
-
-	class LIBMUTIL_API Dbg: public std::ostream {
-		public:
-		Dbg(bool error_output=false, bool enabled=true);
-		virtual ~Dbg();
-		void setEnabled(bool enabled);
-		bool getEnabled();
-		void setExternalHandler(DbgHandler * dbgHandler);
-
-		protected:
-		void updateBuf();
-
-		private:
-		bool error_out;
-		bool enabled;
-		bool external_out;
-		DbgBuf dbgBuf;
-	};
+#include<set>
 
 
-	extern LIBMUTIL_API Dbg mout;
-	extern LIBMUTIL_API Dbg merr;
-	extern LIBMUTIL_API Dbg mdbg;
+/**
+ * Normal operation:
+ *   merr << "hello"<<endl;
+ *   mdbg << "hello"<<endl;
+ * Filters:
+ *   You can filter what output you want to include/exclude.
+ *   Example 1, make output with a "output class" associated with it:
+ *      dbg("myapp/gui") << "Gui started"<<endl;
+ *
+ *   Example 2, set dbg to default exclude anything that is not explicitely
+ *   included: 
+ *      dbg.exclude("");
+ * 
+ *   Example 3, make dbg default include everything
+ *      dbg.include("");
+ *
+ *   Example 4, make dgb include "myapp/gui" and all sub-classes.
+ *      dbg.include("myapp/gui");
+ *    
+*/
 
-	extern LIBMUTIL_API bool outputStateMachineDebug;
-	
-	extern LIBMUTIL_API std::ostream &end(std::ostream &os);
+class LIBMUTIL_API DbgEndl{
+public:
+	DbgEndl(){}
+private:
+	int i;
+};
 
-//==================================================================
-//if wince, use the old interface ... ======================
-#else
 
-	class LIBMUTIL_API DbgEndl{
-		public:
-			DbgEndl(){}
-		private:
-			int i;
-	};
+class LIBMUTIL_API DbgHandler{
+public:
+	virtual ~DbgHandler(){}
+protected:
+	virtual void displayMessage(std::string output,int style=-1)=0;
+private:
+	friend class Dbg;
+};
 
-	class LIBMUTIL_API DbgHandler{
-		public:
-			virtual ~DbgHandler(){}
-		protected:
-			virtual void displayMessage(std::string output,int style=-1)=0;
-		private:
-			friend class Dbg;
-	};
+class LIBMUTIL_API Dbg{
+public:
+	Dbg(bool error_output=false, bool enabled=true);
 
-	class LIBMUTIL_API Dbg{
-		public:
-			static const DbgEndl endl;
-			Dbg(bool error_output=false, bool enabled=true);
+	Dbg &operator<<( const std::string& );
+	Dbg &operator<<( int );
+	Dbg &operator<<( unsigned int );
+	Dbg &operator<<( long long );
+	Dbg &operator<<( char );
+	Dbg &operator<<( void *);
 
-			Dbg &operator<<(std::string);
-			Dbg &operator<<(int);
-			Dbg &operator<<(char);
-			Dbg &operator<<(DbgEndl &endl);
+	LIBMUTIL_DEPRECATED
+	Dbg& operator<<(const DbgEndl &);
 
-			void setEnabled(bool enabled);
-			bool getEnabled();
-			void setExternalHandler(DbgHandler * dbgHandler);
+	//accepts std::endl as parameter
+	Dbg &operator<<( std::ostream&(*arg)(std::ostream&) );
 
-		private:
-			bool error_out;
-			bool enabled;
-			std::string str;
-			DbgHandler * debugHandler;
-	};
+	void setEnabled(bool enabled);
+	bool getEnabled();
+	void setExternalHandler(DbgHandler * dbgHandler);
 
-	extern LIBMUTIL_API Dbg mout;
-	extern LIBMUTIL_API Dbg merr;
-	extern LIBMUTIL_API Dbg mdbg;
-	extern LIBMUTIL_API DbgEndl end;
+private:
+	bool error_out;
+	bool enabled;
+	std::string str;
+	DbgHandler * debugHandler;
+};
 
-	extern LIBMUTIL_API bool outputStateMachineDebug;
+extern LIBMUTIL_API Dbg mout;
+extern LIBMUTIL_API Dbg merr;
+extern LIBMUTIL_API Dbg mdbg;
 
-#endif
+extern LIBMUTIL_API DbgEndl end; /// DEPRECATED - use std::endl instead
+
+extern LIBMUTIL_API bool outputStateMachineDebug;
 
 #endif
 

@@ -33,103 +33,13 @@
 
 #include<libmutil/stringutils.h>
 
-//==================================================================
-//if not win ce, pocket pc ... inherit from iostream and stringbuf
-//otherwise, use an old version of the debug class (release 1923)
-#ifndef _WIN32_WCE
 
 Dbg mout;
 Dbg merr(false);
 Dbg mdbg(true, false);
 
-//#ifdef SM_DEBUG
-LIBMUTIL_API bool outputStateMachineDebug = false;
-//#endif
-
-DbgBuf::DbgBuf( DbgHandler * dbgHandler ) : 
-		std::stringbuf( std::ios_base::out ),
-		debugHandler( dbgHandler )
-{
-}
-
-DbgBuf::~DbgBuf()
-{
-}
-
-void DbgBuf::setExternalHandler( DbgHandler * dbgHandler )
-{
-	sync();
-	debugHandler = dbgHandler;
-}
-
-int DbgBuf::sync()
-{
-	if( debugHandler ){
-		std::string curStr = str();
-
-		debugHandler->displayMessage(curStr, 0);
-		str("");
-	}
-	return 1;
-}
-
-Dbg::Dbg(bool error_output, bool isEnabled):
-			std::ostream(NULL), 
-			error_out(error_output), 
-			enabled(isEnabled), 
-			external_out( false ), 
-			dbgBuf( NULL ){
-	updateBuf();
-}
-
-Dbg::~Dbg()
-{
-}
-
-void Dbg::updateBuf()
-{
-	std::streambuf *buf = NULL;
-
-	if( enabled ){
-		if( external_out )
-			buf = &dbgBuf;
-		else if( error_out )
-			buf = std::cerr.rdbuf();
-		else
-			buf = std::cout.rdbuf();
-	}
-	rdbuf( buf );
-}
-
-void Dbg::setEnabled(bool e){
-	enabled = e;
-	updateBuf();
-}
-
-bool Dbg::getEnabled(){
-	return enabled;
-}
-
-void Dbg::setExternalHandler(DbgHandler * dbgHandler )
-{
-	dbgBuf.setExternalHandler( dbgHandler );
-	external_out = dbgHandler != NULL;
-	updateBuf();
-}
-
-std::ostream &end(std::ostream &os)
-{
-	return std::endl( os );
-}
-
-//==================================================================
-//if wince, use the old interface ... ======================
-#else
-
-Dbg mout;
-Dbg merr(false);
-Dbg mdbg(true, false);
 DbgEndl end;
+
 
 LIBMUTIL_API bool outputStateMachineDebug = false;
 
@@ -144,14 +54,15 @@ bool Dbg::getEnabled(){
 	return enabled;
 }
 
-Dbg &Dbg::operator<<(std::string s){
+Dbg &Dbg::operator<<(const std::string& s){
 	if (!enabled)
 		return *this;
-	//    std::cerr << "Doing textui output"<< std::endl;
 	
+	bool doFlush = s.size()>0 && (s[s.size()-1]=='\n');
+
 	if (debugHandler!=NULL){
-		str +=s;
-		if (str[str.size()-1]=='\n'){
+		str += s;
+		if (doFlush){
 			if (error_out)
 				std::cerr << str << std::flush;
 			else
@@ -159,66 +70,49 @@ Dbg &Dbg::operator<<(std::string s){
 			str="";
 		}
 	}else{
-		if (error_out)
+		if (error_out){
 			std::cerr << s;
-		else
+			if (doFlush)
+				std::cerr << std::flush;
+		}else{
 			std::cout<<s;
+			if (doFlush)
+				std::cout << std::flush;
+		}
 	}
 	return *this;
 }
 
-Dbg &Dbg::operator<<(DbgEndl &){
+Dbg &Dbg::operator<<( std::ostream&(*)(std::ostream&) ){
+	return (*this)<<"\n";
+}
 
-	if (!enabled)
-		return *this;
-	//    std::cerr << "DbgEndl called"<< std::endl;
-	if (debugHandler!=NULL){
-		str+="\n";
-		(*this)<< "";
-	}else{
-		if (error_out)
-			std::cerr << std::endl;
-		else
-			std::cout << std::endl;
-	}
-
-	return *this;
+Dbg &Dbg::operator<<(const DbgEndl &){
+	return (*this)<<"\n";
 }
 
 Dbg& Dbg::operator<<(int i){
+	return (*this)<<itoa(i);
+}
 
-	if (!enabled)
-		return *this;
-    
-    if (debugHandler!=NULL)
-        str += itoa(i);
-    else{
-	if (error_out)
-		std::cerr << i;
-	else
-		std::cout << i;
-    }
-    return (*this);
+
+Dbg& Dbg::operator<<(unsigned int i){
+	return (*this)<<itoa(i);
+}
+
+Dbg& Dbg::operator<<(long long ll){
+	return (*this)<<itoa(ll);
 }
 
 Dbg& Dbg::operator<<(char c){
-
-	if (!enabled)
-		return *this;
-
-	if (debugHandler!=NULL)
-		str += c;
-	else{
-		if (error_out)
-			std::cerr << c;
-		else
-			std::cout << c;
-	}
-	return *this;
+	return (*this)<<std::string("")+c;
 }
 
-void Dbg::setExternalHandler(DbgHandler * debugHandler){
-	this->debugHandler = debugHandler;
+Dbg& Dbg::operator<<(void *p){
+	return (*this)<<(long long)p;
 }
 
-#endif
+void Dbg::setExternalHandler(DbgHandler * dh){
+	this->debugHandler = dh;
+}
+

@@ -40,11 +40,8 @@ const int SipSMCommand::transaction_layer=3;
 const int SipSMCommand::dispatcher=5;
 const int SipSMCommand::transport_layer=6;
 
-#ifdef _WIN32_WCE
+
 Dbg & operator<<(Dbg &o, const SipSMCommand &c){
-#else
-ostream & operator<<(ostream &o, const SipSMCommand &c){
-#endif
 	const char *s[6]={"(illegal)","dialog_layer","transaction_layer","(illegal)","dispatcher","transport_layer"};
 	if (c.type==SipSMCommand::COMMAND_PACKET){
                 
@@ -60,6 +57,25 @@ ostream & operator<<(ostream &o, const SipSMCommand &c){
         }
 	return o;
 }
+
+#ifndef _WIN32_WCE
+ostream & operator<<(ostream &o, const SipSMCommand &c){
+	const char *s[6]={"(illegal)","dialog_layer","transaction_layer","(illegal)","dispatcher","transport_layer"};
+	if (c.type==SipSMCommand::COMMAND_PACKET){
+                
+		o <<"COMMAND_PACKET:"
+                    << (**c.getCommandPacket()).getDescription() 
+                    <<" source="<< s[c.source-1]
+                    <<" dest="<<s[c.destination-1];
+        }else{
+		o <<"COMMAND_STRING:"<<c.getCommandString().getString()
+                    <<",source="<< s[c.source-1]
+                    <<" dest="<<s[c.destination-1];
+		
+        }
+	return o;
+}
+#endif
 
 int SipSMCommand::getType() const {
 	return type;

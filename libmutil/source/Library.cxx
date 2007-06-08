@@ -48,7 +48,7 @@ Library::Library(const string &path_):path(path_){
 	handle = lt_dlopenext(path.c_str());
 #ifdef DEBUG_OUTPUT
 	if( !handle ){
-		cerr << "Library: " << lt_dlerror() << end;
+		cerr << "Library: " << lt_dlerror() << endl;
 	}
 #endif
 }

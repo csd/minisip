@@ -66,7 +66,7 @@ int OssSoundDevice::openPlayback( int32_t samplingRate, int nChannels, int forma
 	if( fdPlayback == -1 ){
 		merr << "Could not open the sound device " << dev << 
 			" for playback: "
-			<< strerror( errno ) << end;
+			<< strerror( errno ) << endl;
 		return -1;
 	}
 
@@ -199,7 +199,7 @@ int OssSoundDevice::openRecord( int32_t samplingRate, int nChannels, int format 
 		#ifdef DEBUG_OUTPUT
 		merr << "Could not open the sound device " << dev << 
 			" for recording: "
-			<< strerror( errno ) << end;
+			<< strerror( errno ) << endl;
 		#endif
 		return -1;
 	}

@@ -130,24 +130,24 @@ class CallRecorder:
 		void setEnabledMic( bool en ) { 
 			enabledMic = en; 
 			#ifdef DEBUG_OUTPUT
-			std::cerr << getDebugString() << "[1]"  << end;
+			std::cerr << getDebugString() << "[1]"  << std::endl;
 			#endif
 		};
 		void setEnabledNetwork( bool en ) { 
 			enabledNtwk = en; 
 			#ifdef DEBUG_OUTPUT
-			std::cerr << getDebugString() << "[2]"  << end;
+			std::cerr << getDebugString() << "[2]"  << std::endl;
 			#endif
 		};
 		
 		void setAllowStart( bool allow ) { 
 			allowStart = allow; 
 			#ifdef DEBUG_OUTPUT
-			std::cerr << getDebugString() << "[3]" << end; 
+			std::cerr << getDebugString() << "[3]" << std::endl;
 			#endif
 			if( getFilename() != "" ) {
 				std::cerr << "CallRecorder: Stopped recording to file <" 
-					<< getFilename() << ">" << end;
+					<< getFilename() << ">" << std::endl;
 			}
 		};
 		

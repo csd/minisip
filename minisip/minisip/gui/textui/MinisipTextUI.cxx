@@ -149,7 +149,7 @@ minilist<std::string> MinisipTextUI::textuiCompletionSuggestion(string /*match*/
 
 void MinisipTextUI::handleCommand(const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
-	mdbg << FG_MAGENTA << "MinisipTextUI::handleCommand: Got "<<cmd.getString() << PLAIN <<end;
+	mdbg << FG_MAGENTA << "MinisipTextUI::handleCommand: Got "<<cmd.getString() << PLAIN <<endl;
 #endif
 	bool handled = false;
 
@@ -632,7 +632,7 @@ void MinisipTextUI::guiExecute(string cmd){
 	if (command.substr(0,8) == "register"){
 		displayMessage("Registering to proxy", blue);
 		regproxy = trim(command.substr(8));
-		mdbg << "Regproxy=<"<<regproxy<<">"<< end;
+		mdbg << "Regproxy=<"<<regproxy<<">"<< endl;
 		CommandString command("",SipCommandString::proxy_register/*, regproxy*/);
 
 //		if (regproxy=="pstn")

@@ -232,14 +232,14 @@ static void *LinuxThreadStarter(void *arg){
 	MRef<Runnable *> self = *(static_cast<MRef <Runnable *> *>(arg));
 	delete (static_cast<MRef <Runnable *> *>(arg));
 #ifdef DEBUG_OUTPUT
-	mdbg << "LinuxThreadStarter: thread created"<< end;
+	mdbg << "LinuxThreadStarter: thread created"<< endl;
 #endif	// DEBUG_OUTPUT
 
 	startRunnable(self);
 	//self->run();
 
 #ifdef DEBUG_OUTPUT
-	mdbg <<"LinuxThreadStarter: thread terminated"<< end;
+	mdbg <<"LinuxThreadStarter: thread terminated"<< endl;
 #endif	// DEBUG_OUTPUT
 	return NULL;
 	//pthread_exit( (void *) 0 ); //cesc
@@ -250,14 +250,14 @@ static void *LinuxStaticThreadStarter(void *arg){
 	setupDefaultSignalHandling();
 #endif	// HAVE_EXECINFO_H
 	#ifdef DEBUG_OUTPUT
-		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
+		mdbg << "LinuxStaticThreadStarter: thread created"<< endl;
 	#endif
 	void* (*f)();
 	f=(void* (*)())arg;
 	//(*f)();
 	startFunction(f);
 	#ifdef DEBUG_OUTPUT
-		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
+		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< endl;
 	#endif	// DEBUG_OUTPUT
 	return NULL;
 }
@@ -267,7 +267,7 @@ static void *LinuxStaticThreadStarterArg(void *arg){
 	setupDefaultSignalHandling();
 #endif	// HAVE_EXECINFO_H
 	#ifdef DEBUG_OUTPUT
-		mdbg << "LinuxStaticThreadStarter: thread created"<< end;
+		mdbg << "LinuxStaticThreadStarter: thread created"<< endl;
 	#endif	// DEBUG_OUTPUT
         tmpstruct *tmp = (tmpstruct*)arg;
         void* (*f)(void*);
@@ -277,7 +277,7 @@ static void *LinuxStaticThreadStarterArg(void *arg){
         startFunctionArg(f, argptr);
 
 	#ifdef DEBUG_OUTPUT
-		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< end;
+		mdbg <<"LinuxStaticThreadStarter: thread terminated"<< endl;
 	#endif	// DEBUG_OUTPUT
 	return NULL;
 }
@@ -324,12 +324,12 @@ Thread::Thread(MRef<Runnable *> runnable){
 		merror("Thread::Thread: pthread_create");
                 delete self;
 		#ifdef DEBUG_OUTPUT
-			merr << "In Thread, linux part - thread NOT created" << end;
+			merr << "In Thread, linux part - thread NOT created" << endl;
 		#endif	// DEBUG_OUTPUT
 		throw ThreadException("Could not create thread.");
 	}
 	#ifdef DEBUG_OUTPUT
-		mdbg << "In Thread, linux part - thread created" << end;
+		mdbg << "In Thread, linux part - thread created" << endl;
 	#endif	// DEBUG_OUTPUT
 
 }
@@ -346,7 +346,7 @@ ThreadHandle Thread::createThread(void f()){
 	//pthread_t threadHandle;
 	ThreadHandle h;
 	#ifdef DEBUG_OUTPUT
- 		mdbg << "Running createThread"<< end;
+ 		mdbg << "Running createThread"<< endl;
 	#endif	// DEBUG_OUTPUT
 	pthread_create( /* (pthread_t*)h.hptr*/ (pthread_t*)((void*)&h.handle), NULL, LinuxStaticThreadStarter, (void*)f);
 	return h;
@@ -359,7 +359,7 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
  
 	ThreadHandle h;
 	#ifdef DEBUG_OUTPUT
-		mdbg << "Running createThread" << end;
+		mdbg << "Running createThread" << endl;
 	#endif	// DEBUG_OUTPUT
 	pthread_create(/* (pthread_t*)h.hptr*/ (pthread_t*)((void*)&h.handle), NULL, LinuxStaticThreadStarterArg, argptr);
 	return h;
@@ -370,7 +370,7 @@ void * Thread::join(){
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
-		mdbg << "Thread::join(): before join" << end;
+		mdbg << "Thread::join(): before join" << endl;
 	#endif	// DEBUG_OUTPUT
 	ret = pthread_join( 
 			//*((pthread_t *)handle.hptr), 
@@ -405,14 +405,14 @@ bool Thread::kill( ) {
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
-		mdbg << "Thread::kill(): before cancel" << end;
+		mdbg << "Thread::kill(): before cancel" << endl;
 	#endif	// DEBUG_OUTPUT
 	//ret = pthread_cancel( *( (pthread_t *)handle) );
 	ret = pthread_cancel( /* *( (pthread_t *)handle.hptr)*/ (pthread_t)handle.handle );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
-			merr << "Thread::kill(): ERROR" << end;
+			merr << "Thread::kill(): ERROR" << endl;
 		#endif	// DEBUG_OUTPUT
 		return false;
 	} 
@@ -424,13 +424,13 @@ bool Thread::kill( const ThreadHandle &h) {
 	int ret;
 	
 	#ifdef DEBUG_OUTPUT
-		mdbg << "Thread::kill(): before cancel" << end;
+		mdbg << "Thread::kill(): before cancel" << endl;
 	#endif	// DEBUG_OUTPUT
 	ret = pthread_cancel( /* *((pthread_t*)h.hptr) */ (pthread_t)h.handle );
 	
 	if( ret != 0 ){
 		#ifdef DEBUG_OUTPUT
-			merr << "Thread::kill(): ERROR" << end;
+			merr << "Thread::kill(): ERROR" << endl;
 		#endif	// DEBUG_OUTPUT
 		return false;
 	} 

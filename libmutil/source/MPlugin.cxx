@@ -92,7 +92,7 @@ int32_t MPluginManager::loadFromFile( const std::string &filename ){
 	lib = Library::open( filename );
 
 	if( !lib ){
-		mdbg << "MPluginManager: Can't load " << filename << end;
+		mdbg << "MPluginManager: Can't load " << filename << endl;
 		// Continue;
 		return -1;
 	}
@@ -101,7 +101,7 @@ int32_t MPluginManager::loadFromFile( const std::string &filename ){
 		MRef<Library *> cur = *iLib;
 
 		if( cur->getPath() == lib->getPath() ){
-			mdbg << "MPluginManager: Already loaded " << filename << end;
+			mdbg << "MPluginManager: Already loaded " << filename << endl;
 			return -1;
 		}
 	}
@@ -122,19 +122,19 @@ int32_t MPluginManager::loadFromFile( const std::string &filename ){
 				}
 			}
 			else {
-				merr << "MPluginManager: No plugin for ep: " << *iEP << end;
+				merr << "MPluginManager: No plugin for ep: " << *iEP << endl;
 			}
 		}
 	}
 	else{
-		merr << "MPluginManager: No entrypoints in " << filename << end;
+		merr << "MPluginManager: No entrypoints in " << filename << endl;
 	}
 
 	if( nPlugins > 0 ){
 		libraries.push_back( lib );
 	}
 	else {
-		mdbg << "MPluginManager: No plugins loaded from " << lib->getPath() << end;
+		mdbg << "MPluginManager: No plugins loaded from " << lib->getPath() << endl;
 	}
 	return nPlugins;
 }
@@ -166,7 +166,7 @@ int32_t MPluginManager::loadFromDirectory( const string &path ){
 
 	int res = lt_dlforeachfile(path.c_str(), ltdl_callback, &info);
 	if( res < 0 ){
-		merr << lt_dlerror() << end;
+		merr << lt_dlerror() << endl;
 	}
 	return info.nTotalPlugins;
 }
@@ -218,7 +218,7 @@ MRef<MPlugin *> MPluginManager::loadFromLibrary( MRef<Library *> lib,
 		MRef<MPlugin *> pp = creatorFunction( lib );
 		
 		if( !pp.isNull() ){
-			mdbg << "MPluginManager: loaded " << pp->getName() << "(" << pp->getDescription() << ")" << end;
+			mdbg << "MPluginManager: loaded " << pp->getName() << "(" << pp->getDescription() << ")" << endl;
 			return pp;
 		}
 	}
@@ -250,7 +250,7 @@ void MPluginManager::removeRegistry( MPluginRegistry * registry ){
 }
 
 bool MPluginManager::setSearchPath( const std::string &searchPath ){
-	mdbg << "MPluginManager: setSearchPath " << searchPath << end;
+	mdbg << "MPluginManager: setSearchPath " << searchPath << endl;
 
 	bool res = lt_dlsetsearchpath( searchPath.c_str() );
 	return res;

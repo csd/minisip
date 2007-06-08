@@ -302,13 +302,13 @@ void Sip::run(){
 
 	try{
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 8.1/9: Starting UDP transport worker thread" << PLAIN << end;
+		mout << BOLD << "init 8.1/9: Starting UDP transport worker thread" << PLAIN << endl;
 #endif
 		sipstack->startUdpServer();
 
 		if (phoneconfig->tcp_server){
 #ifdef DEBUG_OUTPUT
-			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << end;
+			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << endl;
 #endif
 
 			sipstack->startTcpServer();
@@ -318,11 +318,11 @@ void Sip::run(){
 		if (phoneconfig->tls_server){
 			//if( phoneconfig->securityConfig.cert.isNull() ){
 			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
-				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << end;
+				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << endl;
 			}
 			else{
 #ifdef DEBUG_OUTPUT
-				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << end;
+				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << endl;
 #endif
 				sipstack->startTlsServer();
 			}
@@ -335,7 +335,7 @@ void Sip::run(){
 	}
 
 #ifdef DEBUG_OUTPUT
-	mout << BOLD << "init 9/9: Registering Identities to registrar server" << PLAIN << end;
+	mout << BOLD << "init 9/9: Registering Identities to registrar server" << PLAIN << endl;
 #endif
 
 	//We would like to use the SipSMCommand::register_all_identities, which is managed by the

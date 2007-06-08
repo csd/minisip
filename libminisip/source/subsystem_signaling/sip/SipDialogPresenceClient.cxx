@@ -118,7 +118,7 @@ bool SipDialogPresenceClient::a0_start_trying_presence(const SipSMCommand &comma
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer)){
 #ifdef DEBUG_OUTPUT
-		merr << "SipDialogPresenceClient::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< end;
+		merr << "SipDialogPresenceClient::a0: Presence toUri is: <"<< command.getCommandString().getParam()<< ">"<< endl;
 #endif
 		toUri = MRef<SipIdentity*>( new SipIdentity(command.getCommandString().getParam()) );
 		createSubscribeClientTransaction();
@@ -140,14 +140,14 @@ bool SipDialogPresenceClient::a1_X_subscribing_200OK(const SipSMCommand &command
 		if (statehdr && statehdr->hasParameter("expires")){
 			to = atoi(statehdr->getParameter("expires").c_str());
 		}else{
-			mdbg << "WARNING: SipDialogPresenceClient did not contain any expires header - using 300 seconds"<<end;
+			mdbg << "WARNING: SipDialogPresenceClient did not contain any expires header - using 300 seconds"<<endl;
 			to = 300;
 		}
 		
 		requestTimeout(to * 1000, "timerDoSubscribe");
 		
 #ifdef DEBUG_OUTPUT
-		merr << "Subscribed for presence for user "<< toUri->getSipUri().getString()<< end;
+		merr << "Subscribed for presence for user "<< toUri->getSipUri().getString()<< endl;
 #endif
 		return true;
 	}else{
@@ -160,7 +160,7 @@ bool SipDialogPresenceClient::a2_trying_retrywait_transperror(const SipSMCommand
 				SipCommandString::transport_error,
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dialog_layer )){
-		mdbg << "WARNING: Transport error when subscribing - trying again in five minutes"<< end;
+		mdbg << "WARNING: Transport error when subscribing - trying again in five minutes"<< endl;
 		requestTimeout(300 * 1000, "timerDoSubscribe");
 		return true;
 	}else{
@@ -389,7 +389,7 @@ void SipDialogPresenceClient::sendNotifyOk(MRef<SipRequest*> notify){
 }
 
 bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << end;
+	mdbg << "SipDialogPresenceClient::handleCommand got "<< c << endl;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId ){
@@ -409,7 +409,7 @@ bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	
 	}
 	
-	mdbg << "SipDialogPresenceClient::handlePacket() got "<< c << end;
+	mdbg << "SipDialogPresenceClient::handlePacket() got "<< c << endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -418,13 +418,13 @@ bool SipDialogPresenceClient::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() == dialogState.callId ){
-			mdbg << "Warning: SipDialogPresenceClient ignoring command with matching call id"<< end;
+			mdbg << "Warning: SipDialogPresenceClient ignoring command with matching call id"<< endl;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
 		if (c.getCommandPacket()->getCallId() == dialogState.callId){
-			mdbg << "Warning: SipDialogPresenceClient ignoring packet with matching call id"<< end;
+			mdbg << "Warning: SipDialogPresenceClient ignoring packet with matching call id"<< endl;
 			return true;
 		}
 	}

@@ -573,17 +573,17 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 
 	/* If we have a sender for this format, activate it */
 #ifdef DEBUG_OUTPUT
-	mdbg << "Session::matchFormat: Starting senders loop" << end;
+	mdbg << "Session::matchFormat: Starting senders loop" << endl;
 #endif
 	uint8_t j = 1;
 	mediaStreamSendersLock.lock();
 	for( iSStream =  mediaStreamSenders.begin(); iSStream != mediaStreamSenders.end(); iSStream++,j++ ){
 #ifdef DEBUG_OUTPUT
-		mdbg << "Trying a sender"<< end;
+		mdbg << "Trying a sender"<< endl;
 #endif
 		if( (*iSStream)->matches( m, iFormat ) ){
 #ifdef DEBUG_OUTPUT
-			mdbg << "Found sender for " << (*iSStream)->getSdpMediaType()<< end;
+			mdbg << "Found sender for " << (*iSStream)->getSdpMediaType()<< endl;
 #endif
 
 #if 0
@@ -607,12 +607,12 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 	mediaStreamSendersLock.unlock();
 	/* Look for a receiver */
 #ifdef DEBUG_OUTPUT
-	mdbg << "Starting receivers loop"<< end;
+	mdbg << "Starting receivers loop"<< endl;
 #endif
 	for( iRStream =  mediaStreamReceivers.begin(); iRStream != mediaStreamReceivers.end(); iRStream ++ ){
 		if( (*iRStream)->matches( m, iFormat ) ){
 #ifdef DEBUG_OUTPUT
-			mdbg << "Found receiver for " << (*iRStream)->getSdpMediaType()<< end;
+			mdbg << "Found receiver for " << (*iRStream)->getSdpMediaType()<< endl;
 #endif
 			return (*iRStream);
 		}
@@ -892,7 +892,7 @@ void Session::stop(){
 	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
 	if( !cr ) {
 	#ifdef DEBUG_OUTPUT
-		cerr << "Session::stop - no call recorder?" << end;
+		cerr << "Session::stop - no call recorder?" << endl;
 	#endif
 	} else {
 		cr->setAllowStart( false );

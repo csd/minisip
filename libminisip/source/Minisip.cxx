@@ -94,11 +94,11 @@ using namespace std;
 #ifdef DEBUG_OUTPUT
 static void signal_handler( int signal ){
 	if( signal == SIGUSR1 ){
-		merr << "ERROR: Minisip was stopped (signal SIGUSR1 caught)" << end;
+		merr << "ERROR: Minisip was stopped (signal SIGUSR1 caught)" << endl;
 		ts.print();
 		exit( 1 );
 	} else {
-		merr << "ERROR: Minisip was stopped (some signal caught)" << end;
+		merr << "ERROR: Minisip was stopped (some signal caught)" << endl;
 	}
 }
 #endif
@@ -213,18 +213,18 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 	
 
 	#ifdef DEBUG_OUTPUT
-	mdbg << "Loading plugins"<<end;
+	mdbg << "Loading plugins"<<endl;
 	#endif
 
 	loadPlugins( pluginPath );
 
 	#ifdef DEBUG_OUTPUT
-	mout << "Initializing NetUtil"<<end;
+	mout << "Initializing NetUtil"<<endl;
 	#endif
 
 	if ( ! NetUtil::init()){
 		//printf("ERROR: Could not initialize Netutil package\n");
-		merr << "ERROR: Could not initialize NetUtil package"<<end;
+		merr << "ERROR: Could not initialize NetUtil package"<<endl;
 		exit();
 	}
 
@@ -235,7 +235,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 	//phoneConf->sip=NULL;
 
 	#ifdef DEBUG_OUTPUT
-	mout << BOLD << "init 1/9: Creating contact database" << PLAIN << end;
+	mout << BOLD << "init 1/9: Creating contact database" << PLAIN << endl;
 	#endif
 
 	/* Create the global contacts database */
@@ -296,15 +296,15 @@ int Minisip::join(){
 
 
 int Minisip::exit(){
-	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << end;
+	mout << BOLD << "Minisip is Shutting down!!!" << PLAIN << endl;
 
 	stop();
 #ifdef DEBUG_OUTPUT
-		mout << "Waiting for the SipStack to close ..." << end;
+		mout << "Waiting for the SipStack to close ..." << endl;
 #endif
 	join();
 	
-	mout << end << end << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << end << end << end;
+	mout << endl << endl << BOLD << "Minisip can't wait to see you again! Bye!" << PLAIN << endl << endl << endl;
 	return 1;
 }
 
@@ -316,7 +316,7 @@ int Minisip::startSip() {
 #endif	
 
 	if( initParseConfig() < 0 ){
-		merr << "Minisip::startSip::initParseConfig - fatal error" << end;
+		merr << "Minisip::startSip::initParseConfig - fatal error" << endl;
 		return -1;
 	}
 
@@ -325,7 +325,7 @@ int Minisip::startSip() {
 		confMessageRouter =  new ConfMessageRouter();
 
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << end;
+		mout << BOLD << "init 4/9: Creating IP provider" << PLAIN << endl;
 #endif
 		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf );
 		MRef<IpProvider *> ip6Provider;
@@ -349,7 +349,7 @@ int Minisip::startSip() {
 		udpSocket=NULL;
 
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << end;
+		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << endl;
 #endif
 		mediaHandler = new MediaHandler( phoneConf, ipProvider, ip6Provider );
 		confMessageRouter->setMediaHandler( mediaHandler );
@@ -366,7 +366,7 @@ int Minisip::startSip() {
 		//                phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
 
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << end;
+		mout << BOLD << "init 6/9: Creating MSip SIP stack" << PLAIN << endl;
 #endif
 
 		MRef<SipSim*> sim = phoneConf->defaultIdentity->getSim();
@@ -400,7 +400,7 @@ int Minisip::startSip() {
 		//		cerr << "Loaded " << pluginCount << " plugins from " << PLUGINS_PATH << endl;
 
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << end;
+		mout << BOLD << "init 7/9: Connecting GUI to SIP logic" << PLAIN << endl;
 #endif
 		gui->setSipSoftPhoneConfiguration(phoneConf);
 		//messageRouter->setGui(gui);
@@ -444,14 +444,14 @@ int Minisip::startSip() {
 
 	catch(exception &exc){
 		//FIXME: Display message in GUI
-		merr << "Minisip caught an exception. Quitting."<< end;
-		merr << exc.what() << end;
+		merr << "Minisip caught an exception. Quitting."<< endl;
+		merr << exc.what() << endl;
 		ret = -1;
 	}
 	catch(...){
 		//FIXME: Display message in GUI
 #ifdef DEBUG_OUTPUT
-		merr << "Minisip caught an unknown exception (default). Quitting."<< end;
+		merr << "Minisip caught an unknown exception (default). Quitting."<< endl;
 #endif
 		ret = -1;
 	};
@@ -465,14 +465,14 @@ int Minisip::initParseConfig(){
 	do{
 		try{
 #ifdef DEBUG_OUTPUT
-			mout << BOLD << "init 3/9: Parsing configuration" << PLAIN << end;
+			mout << BOLD << "init 3/9: Parsing configuration" << PLAIN << endl;
 #endif
 			MRef<ConfBackend *> confBackend =
 			ConfigRegistry::getInstance()->createBackend( confPath);
 			if( !confBackend ){
-				merr << "Minisip could not load a configuration" << end << 
-					"back end. The application will now" << end <<
-					"exit." << end;
+				merr << "Minisip could not load a configuration" << endl << 
+					"back end. The application will now" << endl <<
+					"exit." << endl;
 				throw new MinisipBadArgument("The configured backend could not be loaded");
 				//::exit( 1 );
 			}
@@ -484,7 +484,7 @@ int Minisip::initParseConfig(){
 				if( ret == "ERROR" ) { //severe error
 					retGlobal = -1;
 				} else { //error, but not severe
-					merr << ret << end;
+					merr << ret << endl;
 				}
 			}
 #ifdef DEBUG_OUTPUT
@@ -499,9 +499,9 @@ int Minisip::initParseConfig(){
 
 		}catch(XMLElementNotFound & enf){
 #ifdef DEBUG_OUTPUT
-			merr << FG_ERROR << "Element not found: "<< enf.what()<< PLAIN << end;
+			merr << FG_ERROR << "Element not found: "<< enf.what()<< PLAIN << endl;
 #endif
-			merr << string("ERROR: Could not parse configuration item: ")+enf.what() << end;
+			merr << string("ERROR: Could not parse configuration item: ")+enf.what() << endl;
 			gui->configDialog( phoneConf );
 			done=false;
 		}
@@ -522,7 +522,7 @@ void Minisip::startDebugger(){
 
 void Minisip::stopDebugger(){
 	if( ! consoleDbg.isNull() ) {
-		mout << end << "Stopping the Console Debugger thread" << end;
+		mout << endl << "Stopping the Console Debugger thread" << endl;
 		consoleDbg->stop(); //uufff ... we are killing the thread, not nice ...
 		consoleDbg->join();
 		consoleDbg->setMediaHandler( NULL );

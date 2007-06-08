@@ -141,7 +141,7 @@ bool SipTransactionNonInviteServer::a3_proceeding_completed_non1xxresp(
 bool SipTransactionNonInviteServer::a4_proceeding_proceeding_request(
 		const SipSMCommand &command)
 {
-	merr << "CESC: SipTransNIS::a4 ... " << end;
+	merr << "CESC: SipTransNIS::a4 ... " << endl;
 	if (command.getSource()!=SipSMCommand::transport_layer)
 		return false;
 	

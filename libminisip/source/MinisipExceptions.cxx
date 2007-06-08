@@ -27,7 +27,7 @@
 
 using namespace std;
 
-MinisipException::MinisipException( const std::string& msg ) : Exception(msg){
+MinisipException::MinisipException( const std::string& m ) : Exception(m){
 
 }
 

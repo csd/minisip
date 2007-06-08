@@ -41,9 +41,9 @@ static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 	vector<SoundDeviceName>::iterator iter;
 	vector<SoundDeviceName>::iterator stop = names.end();
 
-	mdbg << "Dumping sound device names:" << end;
+	mdbg << "Dumping sound device names:" << endl;
 	for( iter = names.begin(); iter != stop; iter++ ){
-		mdbg << iter->getName() << " " << iter->getDescription() << " in:" << iter->getMaxInputChannels() << ", out:" << iter->getMaxOutputChannels() << end;
+		mdbg << iter->getName() << " " << iter->getDescription() << " in:" << iter->getMaxInputChannels() << ", out:" << iter->getMaxOutputChannels() << endl;
 	}
 }
 #endif
@@ -79,7 +79,7 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 	string deviceId;
 
 #ifdef DEBUG_OUTPUT
-	mdbg << "SoundDriverRegistry: deviceName =  " << deviceName << ::end;
+	mdbg << "SoundDriverRegistry: deviceName =  " << deviceName << endl;
 #endif
 	size_t pos = deviceName.find( ':', 0 );
 	if( pos == string::npos ){
@@ -91,8 +91,8 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		deviceId = deviceName.substr( pos + 1 );
 	}
 #ifdef DEBUG_OUTPUT
-	mdbg << "SoundDriverRegistry: deviceId =  " << deviceId << ::end;
-	mdbg << "SoundDriverRegistry: driverId =  " << driverId << ::end;
+	mdbg << "SoundDriverRegistry: deviceId =  " << deviceId << endl;
+	mdbg << "SoundDriverRegistry: driverId =  " << driverId << endl;
 #endif
 
 	vector< MRef<SoundDriver*> >::iterator iter;
@@ -102,12 +102,12 @@ MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 		MRef<SoundDriver*> driver = *iter;
 
 		if( driver->getId() == driverId ){
-			mdbg << "SoundDriverRegistry: device id found!!! =  " << deviceId << ::end;
+			mdbg << "SoundDriverRegistry: device id found!!! =  " << deviceId << endl;
 			return driver->createDevice( deviceId );
 		}
 	}
 
-	mdbg << "SoundDriverRegistry: device not found " << deviceName << ::end;
+	mdbg << "SoundDriverRegistry: device not found " << deviceName << endl;
 	return NULL;
 }
 
@@ -120,7 +120,7 @@ void SoundDriverRegistry::registerPlugin( MRef<MPlugin*> plugin ){
 		registerDriver( driver );
 	}
 	else {
-		merr << "Not SoundDriver!" << ::end;
+		merr << "Not SoundDriver!" << endl;
 	}
 }
 
@@ -131,11 +131,11 @@ bool SoundDriverRegistry::registerDriver( MRef<SoundDriver*> driver ){
 	iter = find( drivers.begin(), drivers.end(), driver );
 
 	if ( iter != drivers.end() ){
-		merr << "registerDriver: Driver already registered: " << driver->getId() << ::end;
+		merr << "registerDriver: Driver already registered: " << driver->getId() << endl;
 		return false;
 	}
 
-	mdbg << "SoundDriverRegistry: registering " << driver->getDescription() << " as " << driver->getId() << ::end;
+	mdbg << "SoundDriverRegistry: registering " << driver->getDescription() << " as " << driver->getId() << endl;
 	drivers.push_back( driver );
 	return true;
 }
@@ -146,7 +146,7 @@ bool SoundDriverRegistry::unregisterDriver( MRef<SoundDriver*> driver ){
 	iter = find( drivers.begin(), drivers.end(), driver );
 
 	if ( iter == drivers.end() ){
-		merr << "unregisterDriver: Driver not registered: " << driver->getId() << ::end;
+		merr << "unregisterDriver: Driver not registered: " << driver->getId() << endl;
 		return false;
 	}
 

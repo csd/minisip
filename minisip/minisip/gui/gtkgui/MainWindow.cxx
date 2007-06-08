@@ -1023,7 +1023,7 @@ string MainWindow::getDataFileName( string baseName ){
 	}
 #endif
 
-	merr << "Can't find data file: " << baseName << end;
+	merr << "Can't find data file: " << baseName << endl;
 	return "";
 }
 

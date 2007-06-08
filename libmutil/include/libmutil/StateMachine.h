@@ -352,7 +352,7 @@ class StateTransition : public MObject{
 		#ifdef MSM_DEBUG_COMMAND
 					merr << " ("<< c << ")";
 		#endif
-					merr << end;
+					merr << std::endl;
 				}
 #endif
 			}

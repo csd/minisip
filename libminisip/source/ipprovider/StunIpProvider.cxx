@@ -44,7 +44,7 @@ static vector<string> getLocalIPs(){
         vector<string> ifaces = NetworkFunctions::getAllInterfaces();
         for (unsigned i=0; i<ifaces.size(); i++){
 		string ip = NetworkFunctions::getInterfaceIPStr(ifaces[i]);
-		mdbg << "Adding local ip: "<< ip <<  end;
+		mdbg << "Adding local ip: "<< ip <<  endl;
 		ret.push_back(ip);
         }
         return ret;
@@ -53,13 +53,13 @@ static vector<string> getLocalIPs(){
 static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint16_t stunPort ){
 	
 #ifdef DEBUG_OUTPUT
-        mdbg << "Try 1, autodetect"<< end;
+        mdbg << "Try 1, autodetect"<< endl;
 #endif
         if (phoneConf->findStunServerFromSipUri){
-		mdbg << "Using SIP uri: "<<phoneConf->defaultIdentity->getSipUri().getString()<< end;
+		mdbg << "Using SIP uri: "<<phoneConf->defaultIdentity->getSipUri().getString()<< endl;
                 const SipUri &useruri = phoneConf->defaultIdentity->getSipUri();
 		const string &uridomain = useruri.getIp();
-                        mdbg << "domain=<"<<uridomain<<">"<< end;
+                        mdbg << "domain=<"<<uridomain<<">"<< endl;
                         if (uridomain.length()>0){
                                 uint16_t port;
                                 string proxy = NetworkFunctions::getHostHandlingService("_stun._udp",uridomain, port);
@@ -72,7 +72,7 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 	}
 
 #ifdef DEBUG_OUTPUT
-	mout << "Try 2, checkig if configured to use domain"<< end;
+	mout << "Try 2, checkig if configured to use domain"<< endl;
 #endif
 	if (phoneConf->findStunServerFromDomain && phoneConf->stunDomain.length()>0){
 		 uint16_t port;
@@ -85,18 +85,18 @@ static string findStunServer( MRef<SipSoftPhoneConfiguration *> phoneConf, uint1
 		 }
 	}
 #ifdef DEBUG_OUTPUT
-	mout << "Try 3, checking if user defined"<< end;
+	mout << "Try 3, checking if user defined"<< endl;
 #endif
 	if (phoneConf->useUserDefinedStunServer && 
 			phoneConf->userDefinedStunServer.length()>0){
 		uint16_t port=3478;
 		string addr = phoneConf->userDefinedStunServer;
 		if (addr.find(":")!=string::npos){
-			mdbg << "Found port"<< end;
+			mdbg << "Found port"<< endl;
 			string portstr = addr.substr(addr.find(":")+1);
 			addr = addr.substr(0,addr.find(":")-1);
-			mdbg << "Port parsed to <"<< portstr<<">"<< end;
-			mdbg << "Addr is now <"<< addr<<">" <<end;;
+			mdbg << "Port parsed to <"<< portstr<<">"<< endl;
+			mdbg << "Addr is now <"<< addr<<">" <<endl;
 			port = atoi(portstr.c_str());
 		}
 		phoneConf->stunServerIpString = addr;
@@ -123,7 +123,7 @@ MRef<IpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> pho
 		}
 		catch(HostNotFound & ){
 			merr << "Could not find your STUN server. "
-			        "STUN will be disabled." << end;
+			        "STUN will be disabled." << endl;
 			return NULL;
 			done = false;
 		}
@@ -146,13 +146,13 @@ MRef<IpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> pho
 	if( natType == STUN::STUN_ERROR ){
 		merr << "An error occured while minisip tried to "
 			"discover the NAT type with STUN. "
-			"STUN support will be disabled." << end;
+			"STUN support will be disabled." << endl;
 		return NULL;
 	}
 
 	if( natType == STUN::STUNTYPE_BLOCKED ){
 		merr << "minisip could not contact your STUN server. "
-			"STUN support will be disabled." << end;
+			"STUN support will be disabled." << endl;
 		return NULL;
 	}
 	
@@ -160,7 +160,7 @@ MRef<IpProvider *> StunIpProvider::create( MRef<SipSoftPhoneConfiguration *> pho
 #ifdef DEBUG_OUTPUT
 	mout << "NAT type is: " << STUN::typeToString( natType ) <<
                         " and the external contact IP is set to "<<
-                        externalIp << end;
+                        externalIp << endl;
 #endif
 
 	return (IpProvider*) new StunIpProvider( 

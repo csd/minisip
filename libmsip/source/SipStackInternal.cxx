@@ -469,7 +469,7 @@ void SipStackInternal::startTlsServer(){
 		merr << "You need a personal certificate to run "
 			"a TLS server. Please specify one in "
 			"the certificate settings. minisip will "
-			"now disable the TLS server." << end;
+			"now disable the TLS server." << endl;
 		return;
 	}
 

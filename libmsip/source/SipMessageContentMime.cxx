@@ -94,7 +94,7 @@ SipMessageContentMime::SipMessageContentMime(std::string content, std::string t)
 			if (contentFactory)
 				addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
 			else //TODO: Better error handling
-				merr << "WARNING: No SipMessageContentFactory found for content type "<<cont <<end;
+				merr << "WARNING: No SipMessageContentFactory found for content type "<<cont <<endl;
 			//End of one bodypart becomes beginning of the next
 			index1 = index2 + 5;	
 		}

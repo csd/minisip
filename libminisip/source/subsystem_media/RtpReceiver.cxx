@@ -104,8 +104,8 @@ RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
 		}
 	}
 	if( portretry == RTP_RECEIVER_MAX_RETRIES && !socket ) {
-			merr << "Minisip could not create a UDP socket!" << end;
-			merr << "Check your network settings." << end << "Quitting badly" << end;
+			merr << "Minisip could not create a UDP socket!" << endl;
+			merr << "Check your network settings." << endl << "Quitting badly" << endl;
 			exit( 1 );
 	}
 
