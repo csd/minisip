@@ -29,6 +29,7 @@
 #include <libmnetutil/IPAddress.h>
 
 #include<libmutil/mtypes.h>
+#include<libmutil/dbg.h>
 
 #include<string>
 
@@ -47,6 +48,7 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 		virtual std::string getString() const;
 		virtual void connect(Socket &socket, int32_t port);
 		friend std::ostream& operator<<(std::ostream&, IP4Address &a);
+		friend Dbg& operator<<(Dbg&, IP4Address &a);
 
 		virtual struct sockaddr * getSockaddrptr(int32_t port=0) const;
 		virtual int32_t getSockaddrLength() const;

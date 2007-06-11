@@ -66,6 +66,32 @@
 
 using namespace std;
 
+static std::string toStr(uint32_t numIp){
+	unsigned char ip[4];
+	ip[0] = (unsigned char)(numIp >> 24);
+	ip[1] = (unsigned char)(numIp >> 16);
+	ip[2] = (unsigned char)(numIp >>  8);
+	ip[3] = (unsigned char)(numIp);
+	std::string ret="(";
+	for (int32_t i=0; i<4; i++){
+		if (i>0)
+			ret=ret+".";
+		ret = ret + itoa( (unsigned)ip[i] );
+	}
+	ret = ret+")";
+	return ret;
+}
+
+std::ostream& operator<<(std::ostream& out, IP4Address &a){
+	return out<<toStr(a.numIp);
+}
+
+
+Dbg& operator<<(Dbg& out, IP4Address &a){
+	return out << toStr(a.numIp);
+}
+
+
 IP4Address::IP4Address(struct sockaddr_in *sin){
 	sockaddress = new sockaddr_in;
 	type = IP_ADDRESS_TYPE_V4;
@@ -116,7 +142,7 @@ IP4Address::IP4Address(string addr){
 
 		massert(hp->h_length==4);
 		#ifdef DEBUG_OUTPUT
-		cerr << "IP4Address(string): " << *this << endl;
+		mdbg("net") << "IP4Address(string): " << *this << endl;
 		#endif
 	}
 
@@ -195,29 +221,6 @@ void IP4Address::connect(Socket &socket, int32_t port){
 		throw ConnectFailed( error );
 	}
 
-}
-
-std::ostream& operator<<(std::ostream& out, IP4Address &a){
-	out << a.ipaddr;
-	
-	unsigned char ip[4];
-	//uint32_t beIp = hton32(a.numIp);
-	ip[0] = (unsigned char)(a.numIp >> 24);
-	ip[1] = (unsigned char)(a.numIp >> 16);
-	ip[2] = (unsigned char)(a.numIp >>  8);
-	ip[3] = (unsigned char)(a.numIp);
-	cerr << " (";
-
-	for (int32_t i=0; i<4; i++){
-		if (i>0)
-			cerr << ".";
-
-		cerr << (unsigned)ip[i];
-
-	}
-	cerr << ")";
-
-	return out;
 }
 
 bool IP4Address::operator ==(const IP4Address &i4) const{
