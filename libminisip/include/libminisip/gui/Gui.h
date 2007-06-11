@@ -105,6 +105,10 @@ class LIBMINISIP_API Gui : public Runnable, public CommandReceiver {
 			callback->handleCommand(toSubsystem, cmd);
 		}
 
+		CommandString sendCommandResp(std::string toSubsystem, const CommandString &cmd){
+			return callback->handleCommandResp(toSubsystem, cmd);
+		}
+
 		virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf )=0;
 
 		virtual void run()=0;
