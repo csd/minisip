@@ -457,7 +457,7 @@ string getSocketTransport( MRef<Socket*> socket )
 			return "UDP";
 
 		default:
-			mdbg<< "SipLayerTransport: Unknown transport protocol " + socket->getType() <<endl;
+			mdbg("signaling/sip") << "SipLayerTransport: Unknown transport protocol " + socket->getType() <<endl;
 			// TODO more describing exception and message
 			throw NetworkException();
 	}
@@ -680,7 +680,7 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			}
 		}
 		else{
-			mdbg << "SipLayerTransport: URI invalid " << endl;
+			mdbg("signaling/sip") << "SipLayerTransport: URI invalid " << endl;
 		}
 	}
 
@@ -940,7 +940,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		string message = exc.what();
 		string callId = pack->getCallId();
 #ifdef DEBUG_OUTPUT
-		mdbg << "Transport error in SipLayerTransport: " << message << endl;
+		mdbg("signaling/sip") << "Transport error in SipLayerTransport: " << message << endl;
 		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
 		CommandString transportError( pack->getBranch()+pack->getCSeqMethod(), 
@@ -954,7 +954,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		if (dispatcher)
 			dispatcher->enqueueCommand( transportErrorCommand, LOW_PRIO_QUEUE );
 		else
-			mdbg<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<endl;
+			mdbg("signaling/sip")<< "SipLayerTransport: ERROR: NO SIP COMMAND RECEIVER - DROPPING COMMAND"<<endl;
 	}
 	
 }
@@ -1037,7 +1037,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 			nread = sock->recvFrom((void *)buffer, UDP_MAX_SIZE, from, port);
 			
 			if (nread == -1){
-				mdbg << "Some error occured while reading from UdpSocket"<<endl;
+				mdbg("signaling/sip") << "Some error occured while reading from UdpSocket"<<endl;
 				return;
 			}
 
@@ -1082,7 +1082,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 					if (dispatcher)
 						dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 					else
-						mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
+						mdbg("signaling/sip") << "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
 				}
 				pack=NULL;
 			}
@@ -1091,7 +1091,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				/* Probably we don't have enough data
 				 * so go back to reading */
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << endl;
+				mdbg("signaling/sip") << "Invalid data on UDP socket, discarded" << endl;
 #endif
 				return;
 			}
@@ -1101,7 +1101,7 @@ void SipLayerTransport::datagramSocketRead(MRef<DatagramSocket *> sock){
 				// packet, close the connection
 				
 #ifdef DEBUG_OUTPUT
-				mdbg << "Invalid data on UDP socket, discarded" << endl;
+				mdbg("signaling/sip") << "Invalid data on UDP socket, discarded" << endl;
 #endif
 				return;
 			}
@@ -1125,13 +1125,13 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			nread = socket->read( buffer, STREAM_MAX_PKT_SIZE);
 
 			if (nread == -1){
-				mdbg << "Some error occured while reading from StreamSocket" << endl;
+				mdbg("signaling/sip") << "Some error occured while reading from StreamSocket" << endl;
 				return;
 			}
 
 			if ( nread == 0){
 				// Connection was closed
-				mdbg << "Connection was closed" << endl;
+				mdbg("signaling/sip") << "Connection was closed" << endl;
 				transport->removeSocket( socket );
 				return;
 			}
@@ -1161,7 +1161,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 							if (transport->dispatcher){
 								transport->dispatcher->enqueueCommand( cmd, LOW_PRIO_QUEUE );
 							}else
-								mdbg<< "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
+								mdbg("signaling/sip") << "SipLayerTransport: ERROR: NO SIP MESSAGE RECEIVER - DROPPING MESSAGE"<<endl;
 						}
 						pack=NULL;
 					}
@@ -1170,7 +1170,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			}
 			
 			catch(SipExceptionInvalidMessage &e ){
-				mdbg << "INFO: SipLayerTransport::streamSocketRead: dropping malformed packet: "<<e.what()<<endl;
+				mdbg("signaling/sip") << "INFO: SipLayerTransport::streamSocketRead: dropping malformed packet: "<<e.what()<<endl;
 
 #if 0
 				// Check that we received data
@@ -1189,7 +1189,7 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 				// This does not look like a SIP
 				// packet, close the connection
 				
-				mdbg << "This does not look like a SIP packet, close the connection" << endl;
+				mdbg("signaling/sip") << "This does not look like a SIP packet, close the connection" << endl;
 				socket->close();
 				transport->removeSocket( socket );
 			}

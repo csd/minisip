@@ -86,7 +86,7 @@ MRef<SipTransaction*> SipTransaction::create(MRef<SipStackInternal*> stackIntern
 	string branch= req->getBranch();
 	
 #ifdef DEBUG_OUTPUT
-	mdbg << "TRANSACTION_CREATE: "<< seqMethod<<" "<<seqNo<<" branch="<<branch<<" callid=" << callId<<" client="<<fromTU<< endl;
+	mdbg("signaling/sip") << "TRANSACTION_CREATE: "<< seqMethod<<" "<<seqNo<<" branch="<<branch<<" callid=" << callId<<" client="<<fromTU<< endl;
 #endif
 
 	if (fromTU){ //client transaction
@@ -202,7 +202,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 			setSocket( *pack->getSocket() );
 
 #ifdef DEBUG_OUTPUT
-		mdbg<< "SipTransaction::send: WARNING: Ignoring created socket"<<endl;
+		mdbg("signaling/sip") << "SipTransaction::send: WARNING: Ignoring created socket"<<endl;
 #endif
 		
 		return;
@@ -211,7 +211,7 @@ void SipTransaction::send(MRef<SipMessage*> pack, bool addVia, string br){
 //FIXME: set the reliability ...
 bool SipTransaction::isUnreliable() { 
 	if( !socket ) {
-		mdbg << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << endl;
+		mdbg("signaling/sip") << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << endl;
 		return true;
 	}
 	if( socket->getType() == SOCKET_TYPE_UDP )
@@ -222,7 +222,7 @@ bool SipTransaction::isUnreliable() {
 
 bool SipTransaction::handleCommand(const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
-	mdbg << "SipTransaction:handleCommand: branch <"<< getBranch()<< "> got command "<<command<<endl;
+	mdbg("signaling/sip") << "SipTransaction:handleCommand: branch <"<< getBranch()<< "> got command "<<command<<endl;
 #endif
         if (! (command.getDestination()==SipSMCommand::transaction_layer
 				/*|| command.getDestination()==SipSMCommand::ANY*/)){

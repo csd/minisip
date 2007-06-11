@@ -64,7 +64,7 @@ void SipUri::setUri( string buildFrom ) {
 	clear();
 	
 #ifdef DEBUG_OUTPUT
-	mdbg << "SipUri::fromString = " << buildFrom << endl;
+	mdbg("signaling/sip") << "SipUri::fromString = " << buildFrom << endl;
 #endif
 
 	//look for the full name ... 	

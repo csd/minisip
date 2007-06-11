@@ -126,7 +126,7 @@ SipResponse::SipResponse(string &resp): SipMessage(resp)
 	for ( ; resp[i]!='\r' && resp[i]!='\n'; i++){
 		if(len == i){
 #ifdef DEBUG_OUTPUT
-		mdbg << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
+		mdbg("signaling/sip") << "SipResponse::SipResponse: message did not end correctly - throwing exception"<< endl;
 #endif
 
 			throw SipExceptionInvalidMessage("SipResponse malformed - could not find end of response description");

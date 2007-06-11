@@ -95,7 +95,7 @@ list<MRef<SipDialog *> > SipCommandDispatcher::getDialogs(){
 void SipCommandDispatcher::run(){
 
 	while (keepRunning){
-		mdbg << "DIALOG CONTAINER: waiting for command"<< endl;
+		mdbg("signaling/sip") << "DIALOG CONTAINER: waiting for command"<< endl;
                 semaphore.dec();
 
 		struct queue_type item;
@@ -109,11 +109,11 @@ void SipCommandDispatcher::run(){
 		}
                 mlock.unlock();
 #ifdef DEBUG_OUTPUT
-		mdbg << "DISPATCHER: got command!"<<endl;
+		mdbg("signaling/sip") << "DISPATCHER: got command!"<<endl;
 		if (item.type==TYPE_COMMAND)
-			mdbg << "command: "<< **item.command << endl;
+			mdbg("signaling/sip") << "command: "<< **item.command << endl;
 		else
-			mdbg << "timeout: "<< **item.command << endl;
+			mdbg("signaling/sip") << "timeout: "<< **item.command << endl;
 #endif
 
 
@@ -125,9 +125,9 @@ void SipCommandDispatcher::run(){
 		// Timeouts have a known receiver set in the queue item.
 #ifdef DEBUG_OUTPUT
 		if (item.type==TYPE_COMMAND){
-			mdbg << "SipDialogContainer::run delivering command :: "<< **item.command << endl;
+			mdbg("signaling/sip") << "SipDialogContainer::run delivering command :: "<< **item.command << endl;
 		}else{
-			mdbg << "SipDialogContainer::run delivering timeout :: "<< **item.command << endl;
+			mdbg("signaling/sip") << "SipDialogContainer::run delivering timeout :: "<< **item.command << endl;
 		}
 #endif
 		
@@ -148,7 +148,7 @@ void SipCommandDispatcher::run(){
 
 #ifdef DEBUG_OUTPUT			
 		if (handled){
-			//mdbg<<"DISPATCHER: command handled"<<endl;
+
 		}else{
 			merr<<"DISPATCHER: command NOT handled"<<endl;
 		}
@@ -183,7 +183,7 @@ void SipCommandDispatcher::addDialog(MRef<SipDialog*> d){
 
 void SipCommandDispatcher::enqueueCommand(const SipSMCommand &command, int queue){
 #ifdef DEBUG_OUTPUT
-	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+	mdbg("signaling/sip") << "Dispatcher: enqueue(" << command << ")" << endl;
 #endif
 	struct queue_type item;
 	item.type = TYPE_COMMAND;
@@ -202,7 +202,7 @@ void SipCommandDispatcher::enqueueCommand(const SipSMCommand &command, int queue
 
 void SipCommandDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
-	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+	mdbg("signaling/sip") << "Dispatcher: enqueue(" << command << ")" << endl;
 #endif
 
         struct queue_type item;
@@ -220,7 +220,7 @@ void SipCommandDispatcher::enqueueTimeout(MRef<SipTransaction*> receiver, const 
 
 void SipCommandDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
-	mdbg<<"Dispatcher: enqueue("<<command<<")"<<endl;
+	mdbg("signaling/sip") << "Dispatcher: enqueue(" << command << ")" << endl;
 #endif
 
         struct queue_type item;
@@ -241,7 +241,7 @@ void SipCommandDispatcher::enqueueTimeout(MRef<SipDialog*> receiver, const SipSM
 bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 
 #ifdef DEBUG_OUTPUT
-	mdbg << "DISPATCHER: SipCommandDispatcher got command "<< c<<endl;
+	mdbg("signaling/sip") << "DISPATCHER: SipCommandDispatcher got command "<< c<<endl;
 #endif
 	
 	int dst = c.getDestination();
@@ -249,7 +249,7 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	bool ret=false;
 	if (dst==SipSMCommand::dialog_layer){
 		if (c.getSource()!=SipSMCommand::dialog_layer && c.getSource()!=SipSMCommand::transaction_layer){
-			mdbg<< "DISPATCHER: WARNING: Dialog layer is expected to receive commands only from dialog or trasaction"<<endl;
+			mdbg("signaling/sip") << "DISPATCHER: WARNING: Dialog layer is expected to receive commands only from dialog or trasaction"<<endl;
 		}
 		ret=dialogLayer->handleCommand(c);
 	}else
@@ -258,7 +258,7 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	}else
 	if (dst==SipSMCommand::transport_layer){
 		if (c.getSource()!=SipSMCommand::transaction_layer){
-			mdbg<< "DISPATCHER: WARNING: Transport layer is expected to receive commands only from trasaction"<<endl;
+			mdbg("signaling/sip") << "DISPATCHER: WARNING: Transport layer is expected to receive commands only from trasaction"<<endl;
 		}
 		ret=transportLayer->handleCommand(c);
 	}else
@@ -279,7 +279,7 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	
 	if (!ret){
 #ifdef DEBUG_OUTPUT
-		mdbg <<"WARNING SipCommandDispatcher: The destination layer did not handle the command!"<<endl;
+		mdbg("signaling/sip") <<"WARNING SipCommandDispatcher: The destination layer did not handle the command!"<<endl;
 #endif
 	}
 
@@ -336,7 +336,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			return true;
 		}else{
 #ifdef DEBUG_OUTPUT
-			mdbg << "SipCommandDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << endl;
+			mdbg("signaling/sip") << "SipCommandDispatcher: Error: maintainenceHandleCommand did not understand command: "<< c << endl;
 #endif
 			return false;
 		}

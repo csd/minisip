@@ -134,7 +134,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 	assert(c.getDestination()==SipSMCommand::transaction_layer);
 
 #ifdef DEBUG_OUTPUT	
-	mdbg << "SipLayerTransaction: handleCommand got: "<< c<<endl;
+	mdbg("signaling/sip") << "SipLayerTransaction: handleCommand got: "<< c<<endl;
 #endif
 	string tid;
 	if (c.getType()==SipSMCommand::COMMAND_STRING){
@@ -170,7 +170,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 		bool hasSeqMethod = (seqMethod!="");
 
 		if (!hasBranch){
-			mdbg <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<endl;
+			mdbg("signaling/sip") <<  "WARNING: SipLayerTransaction::handleCommand could not find branch parameter from packet - trying all transactions"<<endl;
 		}
 
 		map<string, MRef<SipTransaction*> >::iterator i;

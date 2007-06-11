@@ -276,7 +276,7 @@ bool SipDialogRegister::a9_askpassword_failed_cancel( const SipSMCommand &comman
 		getDialogConfig()->sipIdentity->setIsRegistered ( false );
 	
 #ifdef DEBUG_OUTPUT
-		mdbg << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<endl;
+		mdbg("signaling/sip") << "WARNING: SipDialogRegister::a9: unimplemented section reached"<<endl;
 #endif
 		return true;
 	}else{
@@ -530,8 +530,6 @@ bool SipDialogRegister::handleCommand(const SipSMCommand &command){
 
 void SipDialogRegister::sendRegister(){
 	
-//	mdbg << "SipDialogRegister: domain is "<< proxy_domain<< end;
-
 	MRef<SipIdentity*> identity = getDialogConfig()->sipIdentity;
 
 	const SipUri &contact = getDialogConfig()->getContactUri(true); //if udp, use stun

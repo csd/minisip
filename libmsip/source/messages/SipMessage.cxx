@@ -186,7 +186,7 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 	//This filters the sipfrag messages we receive ... like in NOTIFY ... which most of the times come without any header
 	if( startIndex + 4 >= endBuf ) {
 		#ifdef DEBUG_OUTPUT
-		mdbg << "SipMessage::parseHeaders: Info: SipMessage without headers ... only request line" << endl;
+		mdbg("signaling/sip") << "SipMessage::parseHeaders: Info: SipMessage without headers ... only request line" << endl;
 		#endif
 		return i;
 	}
@@ -210,11 +210,11 @@ int SipMessage::parseHeaders(const string &buf, int startIndex){
 // 			<< eoh-i+1 << "]" << end;
 		if( header == "" ) {
 			#ifdef DEBUG_OUTPUT
-			mdbg << "SipMessage::parseHeaders: Info: Could not copy line to new Message: (empty line)" << endl;
+			mdbg("signaling/sip") << "SipMessage::parseHeaders: Info: Could not copy line to new Message: (empty line)" << endl;
 			#endif
 		} else if (!addLine(header)){
 			#ifdef DEBUG_OUTPUT
-			mdbg << "SipMessage::parseHeaders: Info: Could not copy line to new Message: " << header << " (unknown)" << endl;
+			mdbg("signaling/sip") << "SipMessage::parseHeaders: Info: Could not copy line to new Message: " << header << " (unknown)" << endl;
 			#endif
 		}
 		i=eoh+1;
@@ -310,7 +310,7 @@ int32_t  SipMessage::getCSeq(){
 	if (seq){
 		return ((SipHeaderValueCSeq*)*seq)->getCSeq();
 	}else{
-		mdbg << "ERROR: Could not find command sequence number in sip Message."<< endl;
+		mdbg("signaling/sip") << "ERROR: Could not find command sequence number in sip Message."<< endl;
 		return -1;
 	}
 }
@@ -345,7 +345,7 @@ string SipMessage::getCSeqMethod(){
 	if (seq){
 		return ((SipHeaderValueCSeq*)*seq)->getMethod();
 	}else{
-		mdbg << "ERROR: Could not find command sequence method in sip Message."<< endl;
+		mdbg("signaling/sip") << "ERROR: Could not find command sequence method in sip Message."<< endl;
 		return "";
 	}
 }
