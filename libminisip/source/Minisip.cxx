@@ -213,7 +213,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 	
 
 	#ifdef DEBUG_OUTPUT
-	mdbg << "Loading plugins"<<endl;
+	mdbg("init") << "Loading plugins"<<endl;
 	#endif
 
 	loadPlugins( pluginPath );
@@ -246,7 +246,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 		osso_context_t * ossoCtxt = NULL;
 		ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
 		if( !ossoCtxt ){
-			mdbg << "Could not initialize osso context" << end;
+			mdbg("init") << "Could not initialize osso context" << end;
 		}
 	#endif
 
@@ -416,7 +416,7 @@ int Minisip::startSip() {
 #endif
 
 		/*
-		   mdbg << "Starting presence server"<< end;
+		   mdbg("init") << "Starting presence server"<< end;
 		   CommandString subscribeserver("", SipCommandString::start_presence_server);
 		   SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
 		   sip->getSipStack()->handleCommand(sipcmdss);

@@ -301,7 +301,6 @@ bool SipDialogVoipServer::a3003_ringing_termwait_BYE( const SipSMCommand &comman
 	    dialogState.remoteTag != ""){
 		MRef<SipRequest*> bye = (SipRequest*) *command.getCommandPacket();
 
-		//mdbg << "log stuff"<< end;
 		if( getLogEntry() ){
 			((LogEntrySuccess *)(*( getLogEntry() )))->duration = 
 			time( NULL ) - getLogEntry()->start; 

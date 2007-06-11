@@ -171,7 +171,6 @@ bool SipDialogVoip::a1001_incall_termwait_BYE( const SipSMCommand &command)
 	    dialogState.remoteTag != ""){
 		MRef<SipRequest*> bye = (SipRequest*) *command.getCommandPacket();
 
-		//mdbg << "log stuff"<< end;
 		if( getLogEntry() ){
 			((LogEntrySuccess *)(*( getLogEntry() )))->duration = 
 			time( NULL ) - getLogEntry()->start; 
@@ -677,7 +676,7 @@ void SipDialogVoip::sendReferReject(){
 }
 
 bool SipDialogVoip::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogVoip::handleCommand got "<< c << endl;
+	mdbg("signaling/sip") << "SipDialogVoip::handleCommand got "<< c << endl;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId )
@@ -695,7 +694,7 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	
 	}
 	
-	mdbg << "SipDialogVoip::handleCommand() sending command to Dialog: "<< c << endl;
+	mdbg("signaling/sip") << "SipDialogVoip::handleCommand() sending command to Dialog: "<< c << endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -704,13 +703,13 @@ bool SipDialogVoip::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (!handled && c.getCommandString().getDestinationId() == dialogState.callId ){
-			mdbg << "Warning: SipDialogVoIP ignoring command with matching call id"<< endl;
+			mdbg("signaling/sip") << "Warning: SipDialogVoIP ignoring command with matching call id"<< endl;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
 		if (!handled && c.getCommandPacket()->getCallId() == dialogState.callId){
-			mdbg << "Warning: SipDialogVoIP ignoring packet with matching call id"<< endl;
+			mdbg("signaling/sip") << "Warning: SipDialogVoIP ignoring packet with matching call id"<< endl;
 			return true;
 		}
 	}

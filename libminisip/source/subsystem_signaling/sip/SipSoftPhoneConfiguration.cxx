@@ -433,7 +433,7 @@ void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
 
 		if( find( audioCodecs.begin(), audioCodecs.end(), name ) == audioCodecs.end() ){
 			audioCodecs.push_back( name );
-			mdbg << "SipSoftPhoneConfiguration: Add codec " << name << endl;
+			mdbg("signaling/sip") << "SipSoftPhoneConfiguration: Add codec " << name << endl;
 			modified = true;
 		}
 	}

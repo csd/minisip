@@ -573,17 +573,17 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 
 	/* If we have a sender for this format, activate it */
 #ifdef DEBUG_OUTPUT
-	mdbg << "Session::matchFormat: Starting senders loop" << endl;
+	mdbg("media") << "Session::matchFormat: Starting senders loop" << endl;
 #endif
 	uint8_t j = 1;
 	mediaStreamSendersLock.lock();
 	for( iSStream =  mediaStreamSenders.begin(); iSStream != mediaStreamSenders.end(); iSStream++,j++ ){
 #ifdef DEBUG_OUTPUT
-		mdbg << "Trying a sender"<< endl;
+		mdbg("media") << "Trying a sender"<< endl;
 #endif
 		if( (*iSStream)->matches( m, iFormat ) ){
 #ifdef DEBUG_OUTPUT
-			mdbg << "Found sender for " << (*iSStream)->getSdpMediaType()<< endl;
+			mdbg("media") << "Found sender for " << (*iSStream)->getSdpMediaType()<< endl;
 #endif
 
 #if 0
@@ -607,12 +607,12 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 	mediaStreamSendersLock.unlock();
 	/* Look for a receiver */
 #ifdef DEBUG_OUTPUT
-	mdbg << "Starting receivers loop"<< endl;
+	mdbg("media") << "Starting receivers loop"<< endl;
 #endif
 	for( iRStream =  mediaStreamReceivers.begin(); iRStream != mediaStreamReceivers.end(); iRStream ++ ){
 		if( (*iRStream)->matches( m, iFormat ) ){
 #ifdef DEBUG_OUTPUT
-			mdbg << "Found receiver for " << (*iRStream)->getSdpMediaType()<< endl;
+			mdbg("media") << "Found receiver for " << (*iRStream)->getSdpMediaType()<< endl;
 #endif
 			return (*iRStream);
 		}

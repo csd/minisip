@@ -138,7 +138,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
-			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
+			mdbg("signaling/sip") << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
 #endif			
 		
 
@@ -199,7 +199,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 #ifdef DEBUG_OUTPUT			
-			mdbg << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
+			mdbg("signaling/sip") << "DefaultDialogHandler:: creating new SipDialogConfVoip" << endl;
 #endif			
 
 
@@ -223,7 +223,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			mdbg << cmd << endl;
+			mdbg("signaling/sip") << cmd << endl;
 		}
 		//start SipDialogVoIP
 		else{
@@ -252,7 +252,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			mdbg << cmd << endl;
+			mdbg("signaling/sip") << cmd << endl;
 		}
 		return true;
 	}
@@ -263,7 +263,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		MRef<SipRequest*> im = (SipRequest*)*pkt;
 
 #ifdef DEBUG_OUTPUT			
-		mdbg << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << endl;
+		mdbg("signaling/sip") << "DefaultDialogHandler:: creating new server transaction for incoming SipIMMessage" << endl;
 #endif			
 		sendIMOk( im );
 
@@ -313,7 +313,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 		return true;
 	}
 
-	mdbg << "DefaultDialogHandler ignoring " << pkt->getString() << endl; 
+	mdbg("signaling/sip") << "DefaultDialogHandler ignoring " << pkt->getString() << endl; 
 
 	return false;
 
@@ -457,14 +457,14 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 	}
 #endif
 
-	mdbg << "DefaultDialogHandler ignoring command " << cmdstr.getString() << endl; 
+	mdbg("signaling/sip") << "DefaultDialogHandler ignoring command " << cmdstr.getString() << endl; 
 
 	return false;
 }
 
 
 bool DefaultDialogHandler::handleCommand(const SipSMCommand &command){
-	mdbg << "DefaultDialogHandler: got command "<< command << endl;
+	mdbg("signaling/sip") << "DefaultDialogHandler: got command "<< command << endl;
 	int dst = command.getDestination();
 	if ( dst!=SipSMCommand::dialog_layer)
 		return false;
@@ -625,7 +625,7 @@ void DefaultDialogHandler::inviteP2Treceived(const SipSMCommand &command){
 	}
 	else{
 #ifdef DEBUG_OUTPUT			
-		mdbg << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< endl;
+		mdbg("signaling/sip") << "DefaultDialogHandler:: Unknown GroupListProtocol "<<prot<< endl;
 #endif
 		return;
 	}
@@ -756,7 +756,7 @@ void DefaultDialogHandler::inviteP2Taccepted(const SipSMCommand &command){
 	//get P2TDialog
 	MRef<SipDialogP2T*> p2tDialog;
 	if(getP2TDialog(command.getCommandString().getParam(), p2tDialog)==false){	
-		mdbg<<"DefaultDialogHandler::Couldn't find SipDialogP2T!"<<endl;
+		mdbg("signaling/sip") << "DefaultDialogHandler::Couldn't find SipDialogP2T!"<<endl;
 		return;
 	}
 

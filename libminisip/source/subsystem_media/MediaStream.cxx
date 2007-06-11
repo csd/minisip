@@ -504,7 +504,7 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
                                 unsigned char* payload, int payLen) {
 
 	if (this->remoteAddress.isNull()) {
-		mdbg << " MediaStreamSender::sendZrtp called before " <<
+		mdbg("media/zrtp") << " MediaStreamSender::sendZrtp called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -537,7 +537,7 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 
 void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	if (this->remoteAddress.isNull()) {
-		mdbg << " MediaStreamSender::send called before " <<
+		mdbg("media") << " MediaStreamSender::send called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -601,7 +601,7 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 }
 
 void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
-	mdbg << "MediaStreamSender::setRemoteAddress: " <<
+	mdbg("media") << "MediaStreamSender::setRemoteAddress: " <<
 		ra->getString() << endl;
 	this->remoteAddress = ra;
 #ifdef ZRTP_SUPPORT

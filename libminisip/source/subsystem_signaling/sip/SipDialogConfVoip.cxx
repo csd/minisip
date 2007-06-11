@@ -256,7 +256,6 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 	if (transitionMatch("BYE", command, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer)){
 		MRef<SipRequest*> bye = (SipRequest*) *command.getCommandPacket();
 
-		//mdbg << "log stuff"<< end;
 		if( getLogEntry() ){
 			((LogEntrySuccess *)(*( getLogEntry() )))->duration = 
 			time( NULL ) - getLogEntry()->start; 
@@ -974,8 +973,6 @@ SipDialogConfVoip::~SipDialogConfVoip(){
 }
 
 void SipDialogConfVoip::sendInvite(){
-	//	mdbg << "ERROR: SipDialogVoip::sendInvite() UNIMPLEMENTED"<< end;
-	
 	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
 
@@ -1263,7 +1260,7 @@ void SipDialogConfVoip::sendNotAcceptable(){
 
 
 bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
-	mdbg << "SipDialogConfVoip::handleCommand got "<< c << endl;
+	mdbg("signaling/sip") << "SipDialogConfVoip::handleCommand got "<< c << endl;
 
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() != dialogState.callId )
@@ -1285,7 +1282,7 @@ bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
 //			c.getCommandPacket()->getCSeq()!= command_seq_no)
 //		return false;
 	
-	mdbg << "SipDialogConfVoip::handlePacket() got "<< c << endl;
+	mdbg("signaling/sip") << "SipDialogConfVoip::handlePacket() got "<< c << endl;
 	bool handled = SipDialog::handleCommand(c);
 	
 	if (!handled && c.getType()==SipSMCommand::COMMAND_STRING && c.getCommandString().getOp()==SipCommandString::no_transactions){
@@ -1294,13 +1291,13 @@ bool SipDialogConfVoip::handleCommand(const SipSMCommand &c){
 	
 	if (c.getType()==SipSMCommand::COMMAND_STRING && dialogState.callId.length()>0){
 		if (c.getCommandString().getDestinationId() == dialogState.callId ){
-			mdbg << "Warning: SipDialogConfVoip ignoring command with matching call id"<< endl;
+			mdbg("signaling/sip") << "Warning: SipDialogConfVoip ignoring command with matching call id"<< endl;
 			return true;
 		}
 	}
 	if (c.getType()==SipSMCommand::COMMAND_PACKET && dialogState.callId.length()>0){
 		if (c.getCommandPacket()->getCallId() == dialogState.callId){
-			mdbg << "Warning: SipDialogConfVoip ignoring packet with matching call id"<< endl;
+			mdbg("signaling/sip") << "Warning: SipDialogConfVoip ignoring packet with matching call id"<< endl;
 			return true;
 		}
 	}
