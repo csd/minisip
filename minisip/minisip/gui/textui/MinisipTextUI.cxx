@@ -48,6 +48,8 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 	//#endif
 	
 	addCommand("quit");
+	addCommand("filter in");
+	addCommand("filter out");
 	addCommand("sleep");
 	addCommand("answer");
 	addCommand("disable autoanswer");
@@ -686,10 +688,22 @@ void MinisipTextUI::guiExecute(string cmd){
 #endif
 	
 	if (command.substr(0,5)=="sleep"){
-		string time = command.substr(5);
+		string time = trim(command.substr(5));
 		int t = atoi(time.c_str());
 		if (t>0)
 			Thread::msleep(t*1000);
+		handled=true;
+	}
+
+	if (command.substr(0,9)=="filter in"){
+		string f = trim(command.substr(9));
+		mdbg.include(f);
+		handled=true;
+	}
+
+	if (command.substr(0,10)=="filter out"){
+		string f = trim(command.substr(10));
+		mdbg.include(f);
 		handled=true;
 	}
 
