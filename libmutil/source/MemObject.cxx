@@ -26,6 +26,7 @@
 
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
+#include<libmutil/dbg.h>
 #include<string>
 
 #include<typeinfo>
@@ -105,7 +106,7 @@ int MObject::decRefCount() const{
 	global.unlock();
 	if (refRet==0 && outputOnDestructor){
 		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(refRet) + "; ptr=" + itoa((int)this);
-		cerr << output << endl;
+		mdbg("memobject") << output << endl;
 	}
 #else
 	refLock->unlock();
@@ -124,10 +125,9 @@ void MObject::incRefCount() const{
 	
 #ifdef MDEBUG
 	global.unlock();
-	//if (outputOnDestructor ){
 	if (refCount == 1 && outputOnDestructor ){
 		string output = "MO (++):"+getMemObjectType()+ "; count=" + itoa(refCount);
-		cerr << output << endl;
+		mdbg("memobject") << output << endl;
 	}
 #else
 	refLock->unlock();

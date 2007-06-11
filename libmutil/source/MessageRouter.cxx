@@ -73,12 +73,11 @@ bool MessageRouter::addSubsystem(string name, MRef<CommandReceiver*> rcvr){
 
 void MessageRouter::handleCommand(string subsystem, const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
-	cerr << "MessageRouter:  To:"<<subsystem<<" Command:"<<cmd.getString()<<endl;
+	mdbg("messagerouter") << "MessageRouter:  To:"<<subsystem<<" Command:"<<cmd.getString()<<endl;
 #endif
 	list<Route>::iterator i;
 	for (i=internal->subsystems.begin(); i!=internal->subsystems.end(); i++){
 		if ((*i).ssname==subsystem){
-			//cerr << "Comparing <"<<subsystem <<"> with <"<<(*i).ssname<<">"<<endl;
 			(*i).dest->handleCommand(subsystem, cmd);
 			return;
 		}
@@ -88,14 +87,14 @@ void MessageRouter::handleCommand(string subsystem, const CommandString &cmd){
 
 CommandString MessageRouter::handleCommandResp(string subsystem, const CommandString &cmd){
 #ifdef DEBUG_OUTPUT
-	mdbg << "MessageRouter:  To(request):"<<subsystem<<" Command:"<<cmd.getString()<<endl;
+	mdbg("messagerouter") << "MessageRouter:  To(request):"<<subsystem<<" Command:"<< cmd.getString()<< endl;
 #endif
 	list<Route>::iterator i;
 	for (i=internal->subsystems.begin(); i!=internal->subsystems.end(); i++){
 		if ((*i).ssname==subsystem){
 			CommandString ret =(*i).dest->handleCommandResp(subsystem, cmd);
 #ifdef DEBUG_OUTPUT
-			mdbg << "MessageRouter:  Response from:"<<subsystem<<" Command:"<<ret.getString()<<endl;
+			mdbg("messagerouter") << "MessageRouter:  Response from:"<<subsystem<<" Command:"<<ret.getString()<<endl;
 #endif
 			return ret;
 		}
