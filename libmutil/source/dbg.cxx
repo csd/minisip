@@ -43,7 +43,13 @@ DbgEndl end;
 
 LIBMUTIL_API bool outputStateMachineDebug = false;
 
-Dbg::Dbg(bool error_output, bool isEnabled):error_out(error_output), enabled(isEnabled), debugHandler(NULL){
+Dbg::Dbg(bool error_output, bool isEnabled):
+		error_out(error_output),
+		enabled(isEnabled),
+		debugHandler(NULL),
+		defaultInclude(true),
+		filterBlocking(false)
+{
 }
 
 void Dbg::setEnabled(bool e){
@@ -55,7 +61,8 @@ bool Dbg::getEnabled(){
 }
 
 Dbg &Dbg::operator<<(const std::string& s){
-	if (!enabled)
+
+	if (!enabled || filterBlocking)
 		return *this;
 	
 	bool doFlush = s.size()>0 && (s[s.size()-1]=='\n');
@@ -84,11 +91,17 @@ Dbg &Dbg::operator<<(const std::string& s){
 }
 
 Dbg &Dbg::operator<<( std::ostream&(*)(std::ostream&) ){
-	return (*this)<<"\n";
+	(*this)<<"\n";
+	curClass="";
+	updateFilter();
+	return (*this);
 }
 
 Dbg &Dbg::operator<<(const DbgEndl &){
-	return (*this)<<"\n";
+	(*this)<<"\n";
+	curClass="";
+	updateFilter();
+	return (*this);
 }
 
 Dbg& Dbg::operator<<(int i){
@@ -114,5 +127,122 @@ Dbg& Dbg::operator<<(void *p){
 
 void Dbg::setExternalHandler(DbgHandler * dh){
 	this->debugHandler = dh;
+}
+
+/*
+   merr("media/rtp") << "hello" << endl;
+
+
+
+
+
+
+*/
+
+
+/**
+ *
+ * set contains
+ *   a/b
+ * filter
+ *   a
+ * result: false
+ *
+ * set contains
+ *  a
+ * filter 
+ *  a/b
+ * result: true
+ */
+static bool inSet( std::set< std::string > &set, std::string filter ){
+	std::set< std::string >::const_iterator i;
+	for (i=set.begin() ; i!=set.end(); i++){
+		std::string setfilt = (*i);
+		if ( setfilt[0]=='/' )
+			setfilt = setfilt.substr(1);
+		if ( filter.substr(0,setfilt.size()) == setfilt ){
+			return true;
+		}
+	}
+	return false;
+}
+
+void Dbg::updateFilter(){
+	if (inSet( excludeSet, curClass ))
+		filterBlocking=true;
+	else if (inSet( includeSet, curClass ))
+		filterBlocking=false;
+	else 
+		filterBlocking = ! defaultInclude;
+}
+
+Dbg& Dbg::operator()(std::string oClass){
+	curClass = oClass;
+	updateFilter();
+	return *this;
+}
+
+
+/**
+ * 
+ * Removes all filters from a set that is equal to or begins with
+ * a string.
+ * Example:
+ *   If the set contains
+ *      a
+ *      a/b
+ *      a/c
+ *      b
+ *   And you remove
+ *      a
+ *   then the resulting set contains
+ *      b
+ */
+static void removeStartingWith( std::set< std::string > &set, std::string filter ){
+	std::set< std::string >::iterator i;
+	if (filter.size()<=0)
+		return;
+
+	if (filter[0]=='/')
+		filter = filter.substr(1);
+
+	if (filter[filter.size()-1]=='/')
+		filter = filter.substr(0, filter.size()-1);
+
+	for (i=set.begin() ; i!=set.end(); i++){
+		std::string tmp = (*i);
+		if ( tmp[0]=='/' )
+			tmp = tmp.substr(1);
+		if ( tmp.substr( 0, filter.size() ) == filter ){
+			set.erase(i);
+			i=set.begin();
+		}
+		if (i==set.end())
+			break;
+	}
+}
+
+void Dbg::include(std::string s){
+	if (s==""){
+		defaultInclude=true;
+		includeSet.clear();
+		excludeSet.clear();
+	}else{
+		includeSet.insert(s);
+		removeStartingWith(excludeSet, s);
+	}
+	updateFilter();
+}
+
+void Dbg::exclude(std::string s){
+	if (s==""){
+		defaultInclude=false;
+		includeSet.clear();
+		excludeSet.clear();
+	}else{
+		excludeSet.insert(s);
+		removeStartingWith(includeSet, s);
+	}
+	updateFilter();
 }
 

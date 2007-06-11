@@ -94,11 +94,23 @@ public:
 	bool getEnabled();
 	void setExternalHandler(DbgHandler * dbgHandler);
 
+	Dbg& operator()(std::string oClass);
+	void include(std::string);
+	void exclude(std::string);
+
+
 private:
+	void updateFilter();
 	bool error_out;
 	bool enabled;
 	std::string str;
 	DbgHandler * debugHandler;
+
+	bool defaultInclude;            // include or exclude by default
+	std::string curClass;           // currently set output class. Reset by endl.
+	std::set< std::string > includeSet;
+	std::set< std::string > excludeSet;
+	bool filterBlocking;
 };
 
 extern LIBMUTIL_API Dbg mout;
