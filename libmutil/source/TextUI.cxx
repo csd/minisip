@@ -63,6 +63,10 @@ const int TextUI::red=2;
 const int TextUI::blue=3;
 const int TextUI::green=4;
 
+const int TextUI::KEY_UP=0x5b41;
+const int TextUI::KEY_DOWN=0x5b42;
+const int TextUI::KEY_RIGHT=0x5b43;
+const int TextUI::KEY_LEFT=0x5b44;
 
 #if defined(_MSC_VER) || defined(WIN32)
 const char *termCodes[]= { "", "", "", "", "" };
@@ -237,18 +241,45 @@ void TextUI::displayMessage(string msg, int style){
     cout << termCodes[bold]<< input << termCodes[plain] << flush;
 }
 
+int readChar(){
+	int err;
+	int ret;
+	char tmpc;
+#if defined WIN32 || defined _MSC_VER
+	tmpc = getchar();
+	err=1;
+#else
+	err = read(STDIN_FILENO, &tmpc, 1);
+#endif
+	ret = tmpc;
+
+	if (err!=1)
+		return -1;
+
+	//handle special keys prefixed with escape
+	if (tmpc==27){
+		char c1,c2;
+#if defined WIN32 || defined _MSC_VER
+		c1 = getchar();
+		c2 = getchar();
+		err=1;
+#else
+		read(STDIN_FILENO, &c1, 1);
+		err = read(STDIN_FILENO, &c2, 1);
+		if (err!=1)
+			return -1;
+#endif
+		ret = c1<<8 | c2;
+	}
+
+	return ret;
+}
+
 void TextUI::guimain(){
 	cout << promptText << "$ "<< flush;
 	while (running){
-		char c = ' ';
-		int err;
-#if defined WIN32 || defined _MSC_VER
-		c= getchar();
-		err=1;
-#else
-		err = read(STDIN_FILENO, &c, 1);
-#endif
-		if(err > 0){
+		int c = readChar();
+		if(c >= 0){
 			keyPressed(c);
 
 
@@ -297,8 +328,8 @@ void TextUI::guimain(){
 				default:
 					//     @A-Z               a-z                  . / 0-9 :           space     .
 					if ( (c>=64 && c<=90) || (c>=97 && c<=122) || (c>=46 && c<=58) || c==32  || c=='-' || c=='_' || c=='.' ){
-						input+=c;
-						cout << termCodes[bold]<< c << termCodes[plain] << flush;
+						input+=(char)c;
+						cout << termCodes[bold]<< (char)c << termCodes[plain] << flush;
 					}
 			}
 		}

@@ -84,6 +84,11 @@ public:
 	static const int blue;
 	static const int green;
 
+	static const int KEY_LEFT;
+	static const int KEY_RIGHT;
+	static const int KEY_UP;
+	static const int KEY_DOWN;
+
 
 	TextUI();
 	virtual ~TextUI();
