@@ -367,6 +367,11 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		
 		MRef<SipIdentity *> identity;
 		identity = phoneconf->getIdentity( cmdstr["identityId"] );
+
+		if (!identity){
+			mdbg("signaling/sip")<< "WARNING: unknown identity"<<endl;
+			return true;
+		}
 		
 		string proxyDomainArg = cmdstr["proxy_domain"];
 		
