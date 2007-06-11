@@ -73,9 +73,12 @@ private:
 	friend class Dbg;
 };
 
+class Mutex;
+
 class LIBMUTIL_API Dbg{
 public:
-	Dbg(bool error_output=false, bool enabled=true);
+	Dbg(std::string name="", bool error_output=false, bool enabled=true);
+	~Dbg();
 
 	Dbg &operator<<( const std::string& );
 	Dbg &operator<<( int );
@@ -101,6 +104,7 @@ public:
 
 private:
 	void updateFilter();
+	std::string name;
 	bool error_out;
 	bool enabled;
 	std::string str;
@@ -111,6 +115,7 @@ private:
 	std::set< std::string > includeSet;
 	std::set< std::string > excludeSet;
 	bool filterBlocking;
+	Mutex *setLock;
 };
 
 extern LIBMUTIL_API Dbg mout;
