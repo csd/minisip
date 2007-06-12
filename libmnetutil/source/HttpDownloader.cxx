@@ -66,7 +66,7 @@ int HttpDownloader::fetch(string request, ostream & bodyStream) {
 
 	stringstream headerStream;
 	int fp = 0;
-	unsigned int bytesWritten = 0, bytesRead = 0;
+	int32_t bytesWritten = 0, bytesRead = 0;
 	struct sockaddr_in remoteAddr;
 	/*
 	This is what the hostent struct looks like:
