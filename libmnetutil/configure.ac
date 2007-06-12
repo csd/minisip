@@ -27,6 +27,19 @@ AC_CHECK_HEADERS([netinet/in.h ws2tcpip.h])
 AC_CHECK_HEADERS([ifaddrs.h netdb.h sys/socket.h])
 AM_MINISIP_CHECK_IPV6
 
+AC_ARG_ENABLE(ldap,
+    AS_HELP_STRING([--enable-ldap],
+        [enables LDAP support]),
+    [ if test "${enable_ldap}" = "yes"
+      then
+	AM_MINISIP_CHECK_LDAP
+        AC_DEFINE(ENABLE_LDAP, [], [LDAP support is enabled])
+	ENABLE_LDAP="yes"
+      fi  
+      ])
+AM_CONDITIONAL(ENABLE_LDAP, test "${ENABLE_LDAP}" = "yes" )
+AC_SUBST(LDAP_LIBS)
+
 AG_CHECK_POSIX_REGCOMP
 AM_CONDITIONAL(HAVE_POSIX_REGCOMP, test "${ag_cv_posix_regcomp}" = "yes")
 

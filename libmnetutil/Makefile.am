@@ -11,7 +11,7 @@ pkgconfig_DATA = libmnetutil.pc
 lib_LTLIBRARIES = libmnetutil.la
 # libmnetutil_la_CPPFLAGS = 
 libmnetutil_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
-libmnetutil_la_LIBADD = udns/libudns.la  $(LTLIBOBJS) $(MINISIP_LIBS)
+libmnetutil_la_LIBADD = udns/libudns.la  $(LTLIBOBJS) $(MINISIP_LIBS) $(LDAP_LIBS)
 libmnetutil_la_DEPENDENCIES = $(LTLIBOBJS)
 
 libmnetutil_la_SOURCES = $(mnetutil_src)
@@ -32,6 +32,14 @@ ipv6_src += \
 		    source/IP6ServerSocket.cxx
 endif
 
+ldap_src =
+if ENABLE_LDAP
+ldap_src += \
+		    source/LdapConnection.cxx \
+                    source/LdapEntry.cxx \
+                    source/LdapException.cxx
+endif
+
 mnetutil_src = \
 		    source/init.cxx \
 		    source/DnsNaptr.cxx \
@@ -39,6 +47,7 @@ mnetutil_src = \
 		    source/IP4Address.cxx \
 		    source/IP4ServerSocket.cxx \
 		    $(ipv6_src) \
+		    $(ldap_src) \
 		    source/NetworkException.cxx \
 		    source/NetworkFunctions.cxx \
 		    source/ServerSocket.cxx \
@@ -49,7 +58,9 @@ mnetutil_src = \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \
 		    $(win32_src) \
-		    source/StreamSocket.cxx
+		    source/StreamSocket.cxx \
+		    source/Downloader.cxx \
+		    source/HttpDownloader.cxx
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}

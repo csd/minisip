@@ -1,3 +1,16 @@
+# AM_MINISIP_CHECK_LDAP
+#-----------------------
+AC_DEFUN([AM_MINISIP_CHECK_LDAP], [
+	# PKG_CHECK_MODULES([LDAP], [libldap], [liblber])
+
+	mnetutil_save_LIBS="${LIBS}"
+	LDAP_LIBS="-lldap -llber"
+	LIBS="${LDAP_LIBS} ${LIBS}"
+	AC_CHECK_FUNCS([ldap_init],,[AC_MSG_ERROR([OpenLDAP not found])])
+	LIBS="${mnetutil_save_LIBS}"
+])
+
+
 # AM_MINISIP_ENABLE_IPV6(VERSION)
 # -------------------------------
 AC_DEFUN([AM_MINISIP_ENABLE_IPV6],[ 

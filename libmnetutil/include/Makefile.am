@@ -1,4 +1,15 @@
+ldap_src =
+if ENABLE_LDAP
+ldap_src += \
+			libmnetutil/LdapConnection.h \
+			libmnetutil/LdapCredentials.h \
+			libmnetutil/LdapDirectoryLocator.h \
+			libmnetutil/LdapEntry.h \
+			libmnetutil/LdapException.h
+endif
+
 pkginclude_HEADERS =    \
+			$(ldap_src) \
 			libmnetutil/init.h \
 			libmnetutil/DnsNaptr.h \
 			libmnetutil/IPAddress.h \
@@ -12,7 +23,9 @@ pkginclude_HEADERS =    \
 			libmnetutil/NetUtil.h \
 			libmnetutil/UDPSocket.h \
 			libmnetutil/DatagramSocket.h \
-			libmnetutil/libmnetutil_config.h
+			libmnetutil/libmnetutil_config.h \
+			libmnetutil/Downloader.h \
+			libmnetutil/HttpDownloader.h
 
 noinst_HEADERS = 	\
 			config.h \
