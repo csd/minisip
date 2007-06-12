@@ -294,6 +294,9 @@ void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
 
 bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 				      MRef<SipHeaderValueProxyAuthenticate*> auth){
+	if (strCaseCmp(auth->getAuthMethod().c_str(), "DIGEST"))
+		return false;
+
 	bool changed = false;
 
 	MRef<SipAuthenticationDigest*> challenge;
