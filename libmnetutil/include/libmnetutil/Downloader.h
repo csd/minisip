@@ -22,8 +22,6 @@
 #include <libmutil/MemObject.h>
 #include <string>
 
-using namespace std;
-
 /**
  * Creates objects for downloading documents specified by and URI.
  *
@@ -46,7 +44,7 @@ class Downloader : public MObject {
 		 *
 		 * @param	uri	Full URI for a remote document (e.g. "http://www.kth.se/index.html")
 		 */
-		static MRef<Downloader*> create(string const uri);
+		static MRef<Downloader*> create(std::string const uri);
 
 		virtual std::string getMemObjectType() const {return "Downloader";};
 

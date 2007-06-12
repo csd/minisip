@@ -46,8 +46,6 @@
 
 #define HTTP_HEADER_CRLF			"\r\n"
 
-using namespace std;
-
 /**
  * This class is a very simple HTTP user agent that fetches web pages using the HTTP 1.0 (not 1.1) protocol.
  *
@@ -74,13 +72,7 @@ class HttpDownloader : public Downloader {
 		 *
 		 * @param	url	File/document to fetch.
 		 */
-		HttpDownloader(string url) : url (url), remotePort(80), respCode(-1), followRedirect(true), sock(NULL), internalSocketObject(false) {
-			parseUrl();
-			if (remotePort > 0 && remoteHostname != "") {
-				sock = new TCPSocket(remoteHostname, remotePort);
-				internalSocketObject = true;
-			}
-		}
+		HttpDownloader(std::string url);
 
 		/**
 		 * This constructor is useful when tunneling HTTP over other protocols than pure TCP.
@@ -94,29 +86,23 @@ class HttpDownloader : public Downloader {
 		 * @param	url	File/document to fetch.
 		 * @param	sock	Pre-existing socket to use for communicating with HTTP server.
 		 */
-		HttpDownloader(string url, StreamSocket * sock): url (url), remotePort(80), respCode(-1), followRedirect(true), sock(sock), internalSocketObject(false) {
-			parseUrl();
-		}
+		HttpDownloader(std::string url, StreamSocket * sock);
 
 		/**
 		 * The default constructor deallocates memory, if allocated.
 		 */
-		~HttpDownloader() {
-			if (internalSocketObject)
-				delete sock;
-		}
-
+		virtual ~HttpDownloader();
 
 		const char*	getChars();
 		/**
 		 * Fetch remote file and save as file on local computer.
 		 */
-		bool 	downloadToFile(string filename);
+		bool 	downloadToFile(std::string filename);
 
 		/**
 		 * Fetch remote file and return it as a single string
 		 */
-		string 	downloadToString();
+		std::string 	downloadToString();
 
 		/**
 		 * Fetch only HTTP headers for remote file.
@@ -131,7 +117,7 @@ class HttpDownloader : public Downloader {
 		 * @note	This function relies on that either downloadHeaders(), downloadToFile() or downloadToString() has been called prior.
 		 * @param	header	Name of header to fetch.
 		 */
-		string 	getHeader(string header);
+		std::string 	getHeader(std::string header);
 
 		/**
 		 * Returns the response code.
@@ -152,33 +138,33 @@ class HttpDownloader : public Downloader {
 
 	private:
 		// Variables
-		string 	url;
-		string 	remoteHostname;
-		string 	remoteProtocol;
-		string 	remoteFile;
+		std::string 	url;
+		std::string 	remoteHostname;
+		std::string 	remoteProtocol;
+		std::string 	remoteFile;
 		int 	remotePort;
-		map<string, string> headers;
+		std::map<std::string, std::string> headers;
 		int 	respCode;
 		bool	followRedirect;
 		StreamSocket * sock;
 		bool 	internalSocketObject;
 
 		// Functions
-		int 	fetch(string request, ostream & bodyStream);
+		int 	fetch(std::string request, std::ostream & bodyStream);
 
 		/**
 		 * Parse a line of the HTTP response and store the line as a key/value pair in the map of headers.
 		 *
 		 * Note that the header value is trimmed for white-space both from the right and left.
 		 */
-		void 	parseHeader(string line);
+		void 	parseHeader(std::string line);
 
 		/**
 		 * Does not take into account the following things:
 		 * - Header values might be split into multiple lines
 		 * - Header lines can end with \\n instead of \\r\\n
 		 */
-		int 	parseHeaders(stringstream & headers);
+		int 	parseHeaders(std::stringstream & headers);
 
 		/**
 		 * Used to parse the URL supplied in the constructor.
@@ -198,15 +184,15 @@ class HttpDownloader : public Downloader {
 		 * @author	Erik Ehrlund
 		 * @author	Mikael Svensson
 		 */
-		void	split(string data, string token, vector<string> &res, int maxChars = -1); // Copyright Erik Ehrlund
+		void	split(std::string data, std::string token, std::vector<std::string> &res, int maxChars = -1); // Copyright Erik Ehrlund
 
 		/**
 		 * This function removes any spaces, line feeds, carrige returns and tabs from the beginning and end of the specified string.
 		 *
 		 * @deprecated	Use the very similar trim() from libmutil/stringutils.h instead.
 		 */
-		string	trim(string s);
-		string	buildRequestString(string method, string file);
+		std::string	trim(std::string s);
+		std::string	buildRequestString(std::string method, std::string file);
 };
 
 #endif

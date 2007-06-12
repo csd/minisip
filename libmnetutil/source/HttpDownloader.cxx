@@ -1,7 +1,4 @@
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 #include <libmutil/MemObject.h>
 #include <libmnetutil/HttpDownloader.h>
@@ -21,6 +18,23 @@
 #define BUFFERSIZE 4096
 
 using namespace std;
+
+HttpDownloader::HttpDownloader(string url) : url (url), remotePort(80), respCode(-1), followRedirect(true), sock(NULL), internalSocketObject(false) {
+	parseUrl();
+	if (remotePort > 0 && remoteHostname != "") {
+		sock = new TCPSocket(remoteHostname, remotePort);
+		internalSocketObject = true;
+	}
+}
+
+HttpDownloader::HttpDownloader(string url, StreamSocket * sock): url (url), remotePort(80), respCode(-1), followRedirect(true), sock(sock), internalSocketObject(false) {
+	parseUrl();
+}
+
+HttpDownloader::~HttpDownloader() {
+	if (internalSocketObject)
+		delete sock;
+}
 
 const char* HttpDownloader::getChars() {
 	int tries = 3;
@@ -65,9 +79,8 @@ int HttpDownloader::fetch(string request, ostream & bodyStream) {
 	}
 
 	stringstream headerStream;
-	int fp = 0;
 	int32_t bytesWritten = 0, bytesRead = 0;
-	struct sockaddr_in remoteAddr;
+// 	struct sockaddr_in remoteAddr;
 	/*
 	This is what the hostent struct looks like:
 
@@ -81,31 +94,25 @@ int HttpDownloader::fetch(string request, ostream & bodyStream) {
 	#define h_addr  h_addr_list[0]  // address, for backward compatiblity
 	};
 	*/
-	struct hostent *remoteHost;
+// 	struct hostent *remoteHost;
 
 	/* Buffer for holding data read from the network stream */
 	char buffer[BUFFERSIZE];
 	memset(buffer, 0, sizeof(buffer)); // Zero out the buffer used when recieving data
 
-	/* Create socket */
-	fp = socket(AF_INET, SOCK_STREAM, 0);
-	if (fp == -1) {
-		cerr << "Error: Could not create socket" << endl;
-		return false;
-	}
 	//memset(remoteAddr, 0, sizeof(remoteAddr)); // Zero the data structure containing information about the remote host
 
 	/* Fetch information about the remote host */
-	remoteHost = gethostbyname(remoteHostname.c_str()); // Use host name stored in class instance
-	if (remoteHost == NULL) {
-		cerr << "Error: Could not resolve host name" << endl;
-		return false;
-	}
-	remoteAddr.sin_family = AF_INET;
-	remoteAddr.sin_port = htons(remotePort); // Use port number stored in class instance
+// 	remoteHost = gethostbyname(remoteHostname.c_str()); // Use host name stored in class instance
+// 	if (remoteHost == NULL) {
+// 		cerr << "Error: Could not resolve host name" << endl;
+// 		return false;
+// 	}
+// 	remoteAddr.sin_family = AF_INET;
+// 	remoteAddr.sin_port = htons(remotePort); // Use port number stored in class instance
 
 	// Copy information about remote host's IP address from one structure to another (to the one used by "connect()")
-	bcopy((char *)remoteHost->h_addr, (char *)&remoteAddr.sin_addr.s_addr, sizeof(remoteHost->h_length));
+// 	bcopy((char *)remoteHost->h_addr, (char *)&remoteAddr.sin_addr.s_addr, sizeof(remoteHost->h_length));
 
 	/* Send request */
 	bytesWritten = sock->write(request.c_str(), request.length());
@@ -147,7 +154,6 @@ int HttpDownloader::fetch(string request, ostream & bodyStream) {
 					case HTTP_RESPONSECODE_OK:
 						break;
 					default:
-						close(fp);
 						return headerParseResult;
 						break;
 
@@ -179,8 +185,8 @@ int HttpDownloader::fetch(string request, ostream & bodyStream) {
 }
 
 void HttpDownloader::parseUrl() {
-	int pos = 0;
-	int lastPos = 0;
+	size_t pos = 0;
+	size_t lastPos = 0;
 	// Find protocol
 	if ((pos = url.find("://", 0)) != string::npos) {
 		remoteProtocol = url.substr(lastPos, pos - lastPos);
@@ -206,9 +212,9 @@ void HttpDownloader::parseUrl() {
 void HttpDownloader::split(string data, string token, vector<string> &res, int maxChars)
 {
 	int count = 0;
-	int lastpos = 0;
+	size_t lastpos = 0;
 	int tokenlen = token.length();
-	int pos = data.find(token,lastpos);
+	size_t pos = data.find(token,lastpos);
 	while(string::npos != pos && ((maxChars > 0 && pos < maxChars) || maxChars <= 0))
 	{
 		count = pos - lastpos;
@@ -227,9 +233,9 @@ void HttpDownloader::split(string data, string token, vector<string> &res, int m
 }
 
 string HttpDownloader::trim(string s) {
-	int trimLeftPos = s.find_first_not_of(" \n\t\r");
-	int trimRightPos = s.find_last_not_of(" \n\t\r");
-	int pos = 0;
+	size_t trimLeftPos = s.find_first_not_of(" \n\t\r");
+	size_t trimRightPos = s.find_last_not_of(" \n\t\r");
+	size_t pos = 0;
 	int len = 0;
 
 	if (trimLeftPos != string::npos)
@@ -322,7 +328,7 @@ int HttpDownloader::parseHeaders(stringstream & headers) {
 
 	respCode = atoi(initialLine[1].c_str());
 
-	for (int i=1; i<lines.size(); i++) {
+	for (size_t i=1; i<lines.size(); i++) {
 		parseHeader(lines.at(i));
 	}
 
@@ -330,7 +336,7 @@ int HttpDownloader::parseHeaders(stringstream & headers) {
 }
 
 void HttpDownloader::parseHeader(string line) {
-	int pos = line.find(':');
+	size_t pos = line.find(':');
 	if (pos != string::npos) {
 		cout << "Found header: [" << line.substr(0, pos) << " = " << trim(line.substr(pos+1)) << "]" << endl;
 		headers[line.substr(0, pos)] = trim(line.substr(pos+1));
