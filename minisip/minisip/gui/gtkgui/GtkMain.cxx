@@ -41,6 +41,10 @@ static bool redirectOutput(const char *logName){
 
 int main( int argc, char *argv[] )
 {
+	merr.setPrintStreamName(true);
+	mout.setPrintStreamName(true);
+	mdbg.setPrintStreamName(true);
+
 #if defined(DEBUG_OUTPUT) || !defined(WIN32)
 	cerr << endl << "Starting MiniSIP GTK ... welcome!" << endl << endl;
 #endif

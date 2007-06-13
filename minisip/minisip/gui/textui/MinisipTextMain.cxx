@@ -30,6 +30,10 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+	merr.setPrintStreamName(true);
+	mout.setPrintStreamName(true);
+	mdbg.setPrintStreamName(true);
+
 	cerr << endl << "Starting MiniSIP TextUI ... welcome!" << endl << endl;
 	setupDefaultSignalHandling(); //Signal handlers are created for all 
 				      //threads created with libmutil/Thread.h
