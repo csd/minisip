@@ -97,6 +97,20 @@ public:
 	bool getEnabled();
 	void setExternalHandler(DbgHandler * dbgHandler);
 
+	/**
+	 * Set to true to make the output stream prefix all lines with
+	 * the name of the stream.
+	 * Example if true
+	 *     mout << "hello" << endl;
+	 *   results in
+	 *     [mout] hello
+	 * Example if false
+	 *     mout << "hello" << endl;
+	 *   results in
+	 *     hello
+	 */
+	void setPrintStreamName(bool b);
+
 	Dbg& operator()(std::string oClass);
 	void include(std::string);
 	void exclude(std::string);
@@ -116,6 +130,7 @@ private:
 	std::set< std::string > excludeSet;
 	bool filterBlocking;
 	Mutex *setLock;
+	bool printName;
 };
 
 extern LIBMUTIL_API Dbg mout;

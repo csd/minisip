@@ -52,7 +52,8 @@ Dbg::Dbg(std::string name_, bool error_output, bool isEnabled):
 		debugHandler(NULL),
 		defaultInclude(true),
 		filterBlocking(false),
-		setLock(NULL)
+		setLock(NULL),
+		printName(false)
 
 {
 	setLock = new Mutex;
@@ -83,11 +84,13 @@ Dbg &Dbg::operator<<(const std::string& s){
 
 	if (doFlush){
 		std::string prefix;
-		if (curClass.size()>0)
-			prefix = "[" + curClass + "] ";
-		else
-			prefix = "[" + name + "] ";
-			
+		if (printName){
+			if (curClass.size()>0)
+				prefix = "[" + curClass + "] ";
+			else
+				prefix = "[" + name + "] ";
+		}
+
 		if (debugHandler!=NULL){
 			debugHandler->displayMessage(prefix+str,0);
 			str="";
