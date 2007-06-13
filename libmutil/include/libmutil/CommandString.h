@@ -31,6 +31,8 @@
 #include<string>
 #include<map>
 
+#define LIBMUTIL_DEFAULT "LIBMUTIL_DEFAULT_RVAL_7D1PPX9Q"
+
 class LIBMUTIL_API CommandString : public virtual MObject{
 	public:
 		CommandString();
@@ -63,7 +65,7 @@ class LIBMUTIL_API CommandString : public virtual MObject{
 
 		std::string &operator[](std::string key);
 
-		std::string get(const std::string &key) const;
+		std::string get(const std::string &key, const std::string &dfltval=LIBMUTIL_DEFAULT) const;
 
 	private:
 		std::map<std::string, std::string> keys;

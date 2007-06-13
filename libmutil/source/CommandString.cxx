@@ -107,10 +107,13 @@ string &CommandString::operator[](string key){
 	return keys[key];
 }
 
-string CommandString::get(const string &key) const{
+string CommandString::get(const string &key, const string &dfltval) const{
 	map<string,string>::const_iterator it = keys.find(key);
 	if( it == keys.end() ){
-		throw Exception("Key not found: "+key);
+		if (dfltval==LIBMUTIL_DEFAULT)
+			throw Exception(("Key not found ("+key+")").c_str());
+		else 
+			return dfltval;
 	}
 	return it->second;
 }
