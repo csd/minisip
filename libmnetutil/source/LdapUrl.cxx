@@ -5,12 +5,12 @@
 #include <ldap.h>
 
 LdapUrl::LdapUrl(std::string url) {
-	clear();
-	setUrl(url);
+	clear(); // Reset URL parts to default values
+	setUrl(url); // Parse supplied URL
 }
 
 LdapUrl::LdapUrl() {
-	clear();
+	clear(); // Reset URL parts to default values
 }
 
 void LdapUrl::clear() {
@@ -23,16 +23,22 @@ void LdapUrl::clear() {
 	attributes = std::vector<std::string>();
 	extensions = std::vector<LdapUrlExtension>();
 }
+
 std::string LdapUrl::getString() const {
 
+	// Start off with the schema and host name
 	std::string url("ldap://");
 	url += host;
 	if (port > 0) {
 		url += ':';
 		url += itoa(port);
 	}
+
+	// Append distinguished name (base DN)
 	url += '/';
 	url += percentEncode(dn, false, true);
+
+	// Append attributes
 	url += '?';
 	if (attributes.size() > 0) {
 		for (int i=0; i<attributes.size(); i++) {
@@ -41,12 +47,18 @@ std::string LdapUrl::getString() const {
 			url += percentEncode(attributes.at(i), false, true);
 		}
 	}
+
+	// Append scope
 	url += '?';
 	url += (scope == LDAP_SCOPE_BASE ? "base" : (scope == LDAP_SCOPE_SUBTREE ? "sub" : "one"));
+
+	// Append filter
 	url += '?';
 	if (filter.length() > 0) {
 		url += filter;
 	}
+
+	// Append extensions
 	if (extensions.size() > 0) {
 		url += '?';
 		for (int i=0; i<extensions.size(); i++) {
@@ -81,12 +93,7 @@ bool LdapUrl::isReservedChar(char in) const {
 	}
 	return false;
 }
-/*
-      ldapurl     = scheme COLON SLASH SLASH [host [COLON port]]
-                       [SLASH dn [QUESTION [attributes]
-                       [QUESTION [scope] [QUESTION [filter]
-                       [QUESTION extensions]]]]]
-*/
+
 void LdapUrl::setUrl(const std::string url) {
 	std::string::size_type lastPos = 0, pos = 0, posTemp = 0;
 
@@ -99,13 +106,11 @@ void LdapUrl::setUrl(const std::string url) {
 
 		pos = url.find('/', lastPos);
 
-		// lastPos = <first char after schema specifier>, pos = <first "/" after schema specifier>
-
 		if (pos == std::string::npos) {
 			// No slash after schema specifier. This means that the URL at most specified a host and a port.
 			pos = url.length();
-			//lastPos = pos;
 		}
+
 		if (pos != lastPos) {
 			// Host or port found
 			posTemp = url.find(':', lastPos);
@@ -121,7 +126,6 @@ void LdapUrl::setUrl(const std::string url) {
 
 		if (lastPos < url.length()) {
 			std::string restOfUrl = url.substr(lastPos);
-			//std::cerr << restOfUrl;
 
 			std::vector<std::string> parts = split(restOfUrl, false, '?', true);
 
