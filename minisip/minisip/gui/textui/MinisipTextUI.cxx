@@ -168,6 +168,11 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		handled=true;
 		displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
 	}
+
+	if (cmd.getOp()=="register_sent"){
+		handled=true; // we don't need to inform the user
+	}
+
 		
 	if (cmd.getOp()==SipCommandString::incoming_im){
 		handled=true;
@@ -520,7 +525,7 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 	}
 
 	if (!handled){
-		displayMessage("WARNING: Did not handle command: "+ cmd.getString(), red );
+		displayMessage("WARNING: Gui did not handle command: "+ cmd.getString(), red );
 	}
 }
 
