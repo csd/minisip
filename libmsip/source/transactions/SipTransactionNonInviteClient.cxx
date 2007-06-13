@@ -57,9 +57,9 @@
                 |              |                             |
                 |              V                             |
                 |            +-----------+                   |
-                |            |           |                   |
-                |            | Completed |                   |
-                |            |           |                   |
+                |            |           |----+ a10:***      |
+                |            | Completed |    |     -        |
+                |            |           |<---+              |
                 |            +-----------+                   |
                 |              ^   |                         |
                 |              |   | a9: Timer K             |
@@ -360,6 +360,18 @@ bool SipTransactionNonInviteClient::a9_completed_terminated_timerK( const SipSMC
 	}
 }
 
+bool SipTransactionNonInviteClient::a10_completed_completed_anyresp( const SipSMCommand &command) {
+	if (transitionMatch(SipResponse::type, 
+			command, 
+			SipSMCommand::transport_layer, 
+			SipSMCommand::transaction_layer, 
+			"1**\n2**\n3**\n4**\n5**\n6**"))
+	{
+		return true;
+	}else{
+		return false;
+	}
+}
 
 void SipTransactionNonInviteClient::setUpStateMachine(){
 	
@@ -425,6 +437,11 @@ void SipTransactionNonInviteClient::setUpStateMachine(){
 	new StateTransition<SipSMCommand,string>(this, "transition_completed_terminated_timerK",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a9_completed_terminated_timerK,
 			s_completed, s_terminated);
+
+	new StateTransition<SipSMCommand,string>(this, "transition_completed_completed_anyresp",
+			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipTransactionNonInviteClient::a10_completed_completed_anyresp,
+			s_completed, s_completed);
+
 
 	setCurrentState(s_start);
 }

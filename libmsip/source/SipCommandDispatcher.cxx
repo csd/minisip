@@ -147,10 +147,8 @@ void SipCommandDispatcher::run(){
 		
 
 #ifdef DEBUG_OUTPUT			
-		if (handled){
-
-		}else{
-			merr<<"DISPATCHER: command NOT handled"<<endl;
+		if (!handled){
+			merr << "DISPATCHER: command NOT handled:" << **(item.command) << endl;
 		}
 #endif
 
@@ -248,7 +246,8 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 	
 	bool ret=false;
 	if (dst==SipSMCommand::dialog_layer){
-		if (c.getSource()!=SipSMCommand::dialog_layer && c.getSource()!=SipSMCommand::transaction_layer){
+		if (c.getSource()!=SipSMCommand::dialog_layer &&
+				c.getSource()!=SipSMCommand::transaction_layer){
 			mdbg("signaling/sip") << "DISPATCHER: WARNING: Dialog layer is expected to receive commands only from dialog or trasaction"<<endl;
 		}
 		ret=dialogLayer->handleCommand(c);
@@ -257,7 +256,10 @@ bool SipCommandDispatcher::handleCommand(const SipSMCommand &c){
 		ret=transactionLayer->handleCommand(c);
 	}else
 	if (dst==SipSMCommand::transport_layer){
-		if (c.getSource()!=SipSMCommand::transaction_layer){
+		if (c.getSource()!=SipSMCommand::transaction_layer
+				&& c.getSource()!=SipSMCommand::transaction_layer
+				&& !(c.getType()==SipSMCommand::COMMAND_PACKET
+					&& c.getCommandPacket()->getType()=="ACK")){
 			mdbg("signaling/sip") << "DISPATCHER: WARNING: Transport layer is expected to receive commands only from trasaction"<<endl;
 		}
 		ret=transportLayer->handleCommand(c);

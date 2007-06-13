@@ -59,9 +59,9 @@
                             |        Timer H fires    |
                             V        or Transport Err.|
                          +-----------+ a9:Inform TU   |
-                         |           |                |
-                         | Confirmed |                |
-                         |           |                |
+                    +----|           |                |
+          a11:ACK   |    | Confirmed |                |
+              -     +--->|           |                |
                          +-----------+                |
                                |                      |
                                |Timer I fires         |
@@ -419,6 +419,24 @@ bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCom
 		return false;
 	}
 }
+
+
+/**
+In the Confirmed state we absorb any ACK messages.
+*/
+bool SipTransactionInviteServer::a11_confirmed_confirmed_ACK( const SipSMCommand &command){
+	
+	if (transitionMatch("ACK",
+				command, 
+				SipSMCommand::transport_layer, 
+				SipSMCommand::transaction_layer)){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+
 
 bool SipTransactionInviteServer::a20_proceeding_proceeding_timerRel1xxResend( const SipSMCommand &command){
 	

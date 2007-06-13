@@ -194,6 +194,11 @@ class SipTransactionInviteServer : public SipTransactionServer{
 		bool a10_confirmed_terminated_timerI( const SipSMCommand &command);
 
 		/**
+		Absorb ACKs while in confirmed state.
+		*/
+		bool a11_confirmed_confirmed_ACK(const SipSMCommand&);
+
+		/**
 		Transition from PROCEEDING to PROCEEDING
 		When timer timerRel1xxResend fires, we resend the 1XX response
 		and double the timer value.

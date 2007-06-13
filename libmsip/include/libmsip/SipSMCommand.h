@@ -73,10 +73,10 @@ class LIBMSIP_API SipSMCommand : public virtual MObject{
 		int getSource() const;
 		void setSource(int s);
 
-                /**
-                 * This is one of transport_layer, dialog_layer,
-                 * transaction_layer or dispatcher
-                */
+		/**
+		 * This is one of transport_layer, dialog_layer,
+		 * transaction_layer or dispatcher
+		*/
 		int getDestination() const;
 		void setDestination(int s);
 

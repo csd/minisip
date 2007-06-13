@@ -154,6 +154,8 @@ class SipTransactionNonInviteClient: public SipTransactionClient{
 		*/
 		bool a9_completed_terminated_timerK(const SipSMCommand &command);
 
+		bool a10_completed_completed_anyresp(const SipSMCommand &);
+
 		MRef<SipRequest*> lastRequest;
 		
 		int timerE; //retransmission of the initial request
