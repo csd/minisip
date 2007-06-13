@@ -19,6 +19,8 @@
 #ifndef LDAPDIRECTORYLOCATOR_H_
 #define LDAPDIRECTORYLOCATOR_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <libmutil/MemObject.h>
 
 /**

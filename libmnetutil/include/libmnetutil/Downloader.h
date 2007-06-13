@@ -19,6 +19,8 @@
 #ifndef DOWNLOADER_H
 #define DOWNLOADER_H
 
+#include <libmnetutil/libmnetutil_config.h>
+
 #include <libmutil/MemObject.h>
 #include <string>
 
@@ -54,7 +56,7 @@ class Downloader : public MObject {
 		 * retrieving the remote document as a string (this would not
 		 * work well with binary data).
 		 */
-		virtual const char* getChars() = 0;
+		virtual char* getChars(int *length) = 0;
 
 };
 

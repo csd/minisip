@@ -19,6 +19,8 @@
 #ifndef LDAPEXCEPTION_H_
 #define LDAPEXCEPTION_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <libmutil/Exception.h>
 #include <libmnetutil/libmnetutil_config.h>
 #include <string>

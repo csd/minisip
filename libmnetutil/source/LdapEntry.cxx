@@ -1,5 +1,4 @@
 #include <libmnetutil/LdapEntry.h>
-#include <libmutil/stringutils.h>
 
 LdapEntry::LdapEntry(LDAP* ld, LDAPMessage* entry) {
 	BerElement* ber;

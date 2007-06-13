@@ -19,10 +19,13 @@
 #ifndef LDAPENTRY_H_
 #define LDAPENTRY_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <ldap.h>
 #include <lber.h>
 #include <libmnetutil/LdapException.h>
 #include <libmutil/MemObject.h>
+#include <libmutil/stringutils.h>
 
 #include <string>
 #include <map>

@@ -19,6 +19,8 @@
 #ifndef LDAPCONNECTION_H_
 #define LDAPCONNECTION_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <ldap.h>
 
 #include <libmutil/MemObject.h>

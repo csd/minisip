@@ -19,6 +19,8 @@
 #ifndef LDAPCREDENTIALS_H_
 #define LDAPCREDENTIALS_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <libmutil/MemObject.h>
 #include <libmcrypto/cert.h>
 

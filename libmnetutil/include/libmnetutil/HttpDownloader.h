@@ -19,6 +19,8 @@
 #ifndef _HTTPDOWNLOAD_H_
 #define _HTTPDOWNLOAD_H_
 
+#include<libmnetutil/libmnetutil_config.h>
+
 #include <libmutil/MemObject.h>
 #include <libmnetutil/StreamSocket.h>
 #include <libmnetutil/TCPSocket.h>
@@ -26,8 +28,6 @@
 #include <string>
 #include <vector>
 #include <map>
-
-#define HTTP_METHOD_1_0 			"HTTP/1.0"
 
 #define HTTP_RESPONSECODE_OK 			200
 #define HTTP_RESPONSECODE_NOTFOUND 		404
@@ -44,8 +44,6 @@
 #define HTTP_HEADER_CONTENTLENGTH 		"Content-Length"
 #define HTTP_HEADER_LASTMODIFIED 		"Last-Modified"
 
-#define HTTP_HEADER_CRLF			"\r\n"
-
 /**
  * This class is a very simple HTTP user agent that fetches web pages using the HTTP 1.0 (not 1.1) protocol.
  *
@@ -57,11 +55,23 @@
  *  - Only handles HTTP (not HTTPS)
  *
  * Usage:
- *  # Initialize the class instance by calling the constructor
- *  # Call either downloadToFile(string), downloadToString() or requestHeaders()
- *  # Work with the document using the functions getHeader(string), getBody() and getResponseCode()
+ *  - Initialize the class instance by calling the constructor
+ *  - Call either fetch(int &length), downloadToFile(std::string), downloadToString() or downloadHeaders()
+ *  - Work with the document using the functions getHeader(std::string), getBody() and getResponseCode()
  *
- * Constructors and descructors are defined in HEADER FILE!
+ * This small example shows how to use the class:
+ * @code
+const string url("http://localhost/apache2-default/");
+
+MRef<Downloader*> d = Downloader::create(url);
+if (!d.isNull()) {
+	int len;
+	char* res = d->getChars(&len);
+	string page(res, len);
+	cout << page;
+	cout << "Downloaded " << len << " bytes." << endl;
+}
+ * @endcode
  *
  * @author	Mikael Svensson
  */
@@ -77,7 +87,7 @@ class HttpDownloader : public Downloader {
 		/**
 		 * This constructor is useful when tunneling HTTP over other protocols than pure TCP.
 		 *
-		 * Since the constructor HttpDownload(string) opens up an new TCP connection directly it is not
+		 * Since the constructor HttpDownload(std::string) opens up an new TCP connection directly it is not
 		 * useful when encryption is needed (e.g. when using the TlsSrpSocket). In these cases
 		 * a StreamSocket object can be created outside the HttpDownloader object and passed to this
 		 * constructor for use by the download functions later on.
@@ -93,14 +103,14 @@ class HttpDownloader : public Downloader {
 		 */
 		virtual ~HttpDownloader();
 
-		const char*	getChars();
+		char*	getChars(int *length);
 		/**
 		 * Fetch remote file and save as file on local computer.
 		 */
 		bool 	downloadToFile(std::string filename);
 
 		/**
-		 * Fetch remote file and return it as a single string
+		 * Fetch remote file and return it as a single std::string
 		 */
 		std::string 	downloadToString();
 
@@ -180,18 +190,19 @@ class HttpDownloader : public Downloader {
 		 * @param	data		String to be split
 		 * @param	token		Separator
 		 * @param	res		The string vector where the strings found will be stored
-		 * @param	maxChars	The maximum number of characters of data that will be scanned (-1 disables feature and entire string is scanned).
+		 * @param	maxChars	The maximum number of characters of data that will be scanned (-1 disables feature and entire std::string is scanned).
 		 * @author	Erik Ehrlund
 		 * @author	Mikael Svensson
 		 */
 		void	split(std::string data, std::string token, std::vector<std::string> &res, int maxChars = -1); // Copyright Erik Ehrlund
 
 		/**
-		 * This function removes any spaces, line feeds, carrige returns and tabs from the beginning and end of the specified string.
+		 * This function removes any spaces, line feeds, carrige returns and tabs from the beginning and end of the specified std::string.
 		 *
 		 * @deprecated	Use the very similar trim() from libmutil/stringutils.h instead.
 		 */
 		std::string	trim(std::string s);
+
 		std::string	buildRequestString(std::string method, std::string file);
 };
 
