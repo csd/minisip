@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -106,5 +106,7 @@ template <class charT, class traits, class Alloc>
 LIBMUTIL_API int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 			     const std::basic_string<charT, traits, Alloc>& s2,
 			     const std::locale& loc );
+
+LIBMUTIL_API bool stringEndsWith(const std::string & haystack, const std::string & needle);
 
 #endif

@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -64,7 +64,7 @@ static int strncasecmp(const char *s1, const char *s2, int n){
 		}
 	}
 
-	if(i != n && (s1[i] != s2[i] )) { 
+	if(i != n && (s1[i] != s2[i] )) {
 		if (s1[i] == '\0' ){
 			return -1;
 		}else{
@@ -106,7 +106,7 @@ LIBMUTIL_API string unquote(string str){
 
 LIBMUTIL_API std::vector<string> split(const string &s, bool do_trim, char delim, bool includeEmpty){
 	std::vector<string> ret;
-	
+
 	if (s.size()==0)
 		return ret;
 
@@ -124,7 +124,7 @@ LIBMUTIL_API std::vector<string> split(const string &s, bool do_trim, char delim
 
 	if ( s.size()>0 && s[s.length()-1]==delim && includeEmpty )
 		ret.push_back("");
-	
+
 	return ret;
 }
 
@@ -170,7 +170,7 @@ LIBMUTIL_API string trim(const string &line){
 		spacesFront++;
 		idx++;
 	}
-	
+
 	idx = (int)line.size() - 1 ;
 	while( idx >= 0 && isspace(line[idx]) ) {
 		spacesEnd++;
@@ -180,19 +180,19 @@ LIBMUTIL_API string trim(const string &line){
 }
 
 LIBMUTIL_API string binToHex( const unsigned char * data, int length ){
-	
+
 	string result = "";
 	char hex_number[3];
-	
+
 	for( int i = 0; i < length; i++ ){
 #ifdef _MSC_VER
-		_snprintf_s( hex_number, 3, 2, "%02x", *(data+i) );		
+		_snprintf_s( hex_number, 3, 2, "%02x", *(data+i) );
 #else
 		snprintf( hex_number, 3, "%02x", *(data+i) );
 #endif
 		result += hex_number;
 	}
-	
+
 	return result;
 }
 
@@ -211,7 +211,7 @@ LIBMUTIL_API string itoa(int64_t i){
 
 
 template <class charT, class traits, class Alloc>
-LIBMUTIL_API 
+LIBMUTIL_API
 int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 		const std::basic_string<charT, traits, Alloc>& s2,
 		const std::locale& loc )
@@ -242,3 +242,10 @@ int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 }
 
 template LIBMUTIL_API int strCaseCmp<char, char_traits<char>, allocator<char> >(const string&, const string&, const locale&);
+
+LIBMUTIL_API bool stringEndsWith(const std::string & haystack, const std::string & needle) {
+	if (haystack.length() >= needle.length()) {
+		return (haystack.substr(haystack.length() - needle.length(), needle.length()) == needle);
+	} else
+		return false;
+}
