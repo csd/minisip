@@ -37,7 +37,8 @@ if ENABLE_LDAP
 ldap_src += \
 		    source/LdapConnection.cxx \
                     source/LdapEntry.cxx \
-                    source/LdapException.cxx
+                    source/LdapException.cxx \
+		    source/LdapUrl.cxx
 endif
 
 mnetutil_src = \

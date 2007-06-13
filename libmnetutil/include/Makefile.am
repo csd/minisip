@@ -5,7 +5,8 @@ ldap_src += \
 			libmnetutil/LdapCredentials.h \
 			libmnetutil/LdapDirectoryLocator.h \
 			libmnetutil/LdapEntry.h \
-			libmnetutil/LdapException.h
+			libmnetutil/LdapException.h \
+			libmnetutil/LdapUrl.h
 endif
 
 pkginclude_HEADERS =    \
