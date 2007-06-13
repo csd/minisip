@@ -41,7 +41,6 @@ class TlsSrpSocket : public StreamSocket
  private:
    void TlsSrpSocketSrp_init(std::string addrs, int32_t port, std::string user, std::string pass);
    gnutls_session_t session;
-   int fd;
    gnutls_srp_client_credentials_t srp_cred;
    
 };

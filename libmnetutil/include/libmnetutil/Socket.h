@@ -29,6 +29,7 @@
 #define SOCKET_TYPE_STREAM      0x10
 #define SOCKET_TYPE_TCP         0x11
 #define SOCKET_TYPE_TLS         0x12
+#define SOCKET_TYPE_TLSSRP      0x13
 
 #define SOCKET_TYPE_UDP         0x20
 
