@@ -64,6 +64,10 @@ Dbg::~Dbg(){
 	setLock=NULL;
 }
 
+void Dbg::setPrintStreamName(bool b){
+	printName=b;
+}
+
 void Dbg::setEnabled(bool e){
 	enabled = e;
 }
