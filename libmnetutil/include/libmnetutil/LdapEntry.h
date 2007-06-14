@@ -75,7 +75,7 @@ class LdapEntry : public MObject {
 		/**
 		 * Return THE FIRST string value for a given attribute.
 		 */
-		std::string			getAttrValueString(std::string attr) throw (LdapAttributeNotFoundException);
+		std::string getAttrValueString(std::string attr) throw (LdapAttributeNotFoundException);
 
 		/**
 		 * Return all binary values for a given attribute.
@@ -85,24 +85,24 @@ class LdapEntry : public MObject {
 		/**
 		 * Return ALL string values for a given attribute.
 		 */
-		std::vector<std::string>	getAttrValuesStrings(std::string attr) throw (LdapAttributeNotFoundException);
+		std::vector<std::string> getAttrValuesStrings(std::string attr) throw (LdapAttributeNotFoundException);
 
 		/**
 		 * Specialized method that returns all certificate pair attribute values (given a specific attribute name).
 		 */
-		std::vector<MRef<certificate_pair*> >	getAttrValuesCertificatePairs(std::string attr) throw (LdapAttributeNotFoundException);
+		std::vector<MRef<certificate_pair*> > getAttrValuesCertificatePairs(std::string attr) throw (LdapAttributeNotFoundException);
 
-		//std::string 			getDn();
+		//std::string getDn();
 
 		/**
 		 * Returns list of all attribute names.
 		 */
-		std::vector<std::string> 	getAttrNames();
+		std::vector<std::string> getAttrNames();
 
 		/**
 		 * Tests if the directory entry/object has a specific attribute.
 		 */
-		bool 				hasAttribute(std::string attr);
+		bool hasAttribute(std::string attr);
 	private:
 		std::map<std::string, std::vector<MRef<LdapEntryBinaryValue*> > > valuesBinary;
 		std::map<std::string, std::vector<std::string> > valuesStrings;

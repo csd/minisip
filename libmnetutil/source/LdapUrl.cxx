@@ -24,6 +24,10 @@ void LdapUrl::clear() {
 	extensions = std::vector<LdapUrlExtension>();
 }
 
+bool LdapUrl::isValid() {
+	return validUrl;
+}
+
 std::string LdapUrl::getString() const {
 
 	// Start off with the schema and host name
@@ -199,6 +203,51 @@ bool LdapUrl::hasCriticalExtension() const {
 		if (extensions.at(i).critical)
 			return true;
 	return false;
+}
+std::string LdapUrl::getHost() const {
+	return host;
+}
+void LdapUrl::setHost(std::string host) {
+	this->host = host;
+}
+
+int32_t LdapUrl::getPort() const {
+	return port;
+}
+void LdapUrl::setPort(int32_t port) {
+	this->port = port;
+}
+
+std::vector<std::string> LdapUrl::getAttributes() const {
+	return attributes;
+}
+void LdapUrl::setAttributes(std::vector<std::string> attributes) {
+	this->attributes = attributes;
+}
+
+std::vector<LdapUrlExtension> LdapUrl::getExtensions() const {
+	return extensions;
+}
+
+std::string LdapUrl::getFilter() const {
+	return filter;
+}
+void LdapUrl::setFilter(std::string filter) {
+	this->filter = filter;
+}
+
+std::string LdapUrl::getDn() const {
+	return dn;
+}
+void LdapUrl::setDn(std::string dn) {
+	this->dn = dn;
+}
+
+int32_t LdapUrl::getScope() const {
+	return scope;
+}
+void LdapUrl::setScope(int32_t scope) {
+	this->scope = scope;
 }
 
 std::string LdapUrl::encodeChar(const char in) const {

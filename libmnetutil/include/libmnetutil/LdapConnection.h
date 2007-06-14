@@ -39,8 +39,8 @@
  */
 class LdapConnection : public MObject {
 	public:
-		LdapConnection(std::string host, int port);
-		LdapConnection(std::string host, int port, MRef<LdapCredentials*> cred);
+		LdapConnection(std::string host, int32_t port);
+		LdapConnection(std::string host, int32_t port, MRef<LdapCredentials*> cred);
 		LdapConnection(std::string host);
 		LdapConnection(std::string host, MRef<LdapCredentials*> cred);
 		~LdapConnection();
@@ -99,7 +99,7 @@ class LdapConnection : public MObject {
 	private:
 		LDAP* 			ld;
 		std::string 		hostname;
-		int 			port;
+		int32_t			port;
 		MRef<LdapCredentials*> 	cred;
 
 		/**

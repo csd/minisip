@@ -1,10 +1,10 @@
 #include <libmnetutil/LdapConnection.h>
 
-LdapConnection::LdapConnection(std::string host, int port) : hostname(host), port(port), ld(NULL), isBound(false) {
+LdapConnection::LdapConnection(std::string host, int32_t port) : hostname(host), port(port), ld(NULL), isBound(false) {
 }
 LdapConnection::LdapConnection(std::string host) : hostname(host), port(LDAP_PORT), ld(NULL), isBound(false) {
 }
-LdapConnection::LdapConnection(std::string host, int port, MRef<LdapCredentials*> cred) : hostname(host), port(port), ld(NULL), isBound(false) {
+LdapConnection::LdapConnection(std::string host, int32_t port, MRef<LdapCredentials*> cred) : hostname(host), port(port), ld(NULL), isBound(false) {
 	setCredentials(cred);
 	try {
 		connect();

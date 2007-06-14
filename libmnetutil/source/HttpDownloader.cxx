@@ -39,6 +39,7 @@ HttpDownloader::~HttpDownloader() {
 
 char* HttpDownloader::getChars(int *length) {
 	int tries = 3;
+	*length = 0;
 	while (tries) {
 		std::ostringstream body;
 		int fetchRes = fetch(buildRequestString("GET ", remoteFile), body);

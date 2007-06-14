@@ -107,6 +107,9 @@ LIBMUTIL_API int strCaseCmp( const std::basic_string<charT, traits, Alloc>& s1,
 			     const std::basic_string<charT, traits, Alloc>& s2,
 			     const std::locale& loc );
 
+/**
+ * Tests if "haystack" ends with "needle".
+ */
 LIBMUTIL_API bool stringEndsWith(const std::string & haystack, const std::string & needle);
 
 #endif
