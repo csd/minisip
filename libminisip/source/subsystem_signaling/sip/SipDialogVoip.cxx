@@ -580,13 +580,13 @@ void SipDialogVoip::setUpStateMachine(){
 
 SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack, 
 				MRef<SipIdentity*> ident,
-				MRef<SipSoftPhoneConfiguration*> pconf, 
+				bool stun,
 				MRef<Session *> s, 
 				string cid ) :
 		SipDialog(stack,ident, cid),
-		phoneconf(pconf),
 		mediaSession(s),
 		notifyEarlyTermination(false),
+		useStun(stun),
 		lastInvite(NULL)
 {
 	dialogState.localTag = itoa(rand());
@@ -637,7 +637,7 @@ void SipDialogVoip::sendReferOk(){
 	ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 

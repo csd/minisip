@@ -529,6 +529,8 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 
 	if( !id ){
 		merr << "ERROR: could not determine what local identity to use" << endl;
+		CommandString err("","error", "No matching local identity");
+		return err;
 	}
 
 //	securityConfig.useIdentity( id );
@@ -570,7 +572,7 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 
 	MRef<Session *> mediaSession = mediaHandler->createSession( id );
 	
-	MRef<SipDialog*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf, mediaSession); 
+	MRef<SipDialog*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, mediaSession); 
 	sipStack->addDialog(voipCall);
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifdef ENABLE_TS

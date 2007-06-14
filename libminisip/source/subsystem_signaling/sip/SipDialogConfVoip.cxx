@@ -903,12 +903,12 @@ void SipDialogConfVoip::setUpStateMachine(){
 }
 
 
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, minilist<ConfMember> *conflist,string confid, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, MRef<Session *> s, minilist<ConfMember> *conflist,string confid, string cid) : 
                 SipDialog(stack,ident,cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
-		phoneconf(pconf),
-		mediaSession(s)
+		mediaSession(s),
+		useStun(stun)
 {
 	confId=confid;
 	numConnected= conflist->size();
@@ -949,12 +949,12 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 
 	setUpStateMachine();
 }
-SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, string confid, string cid) : 
+SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, MRef<Session *> s, string confid, string cid) : 
                 SipDialog(stack,ident, cid),
 		confCallback(confCb),
                 lastInvite(NULL), 
-		phoneconf(pconf),
-		mediaSession(s)
+		mediaSession(s),
+		useStun(stun)
 {
 	confId=confid;
 	//cerr<<"SDCVididididididididididdididi "+confId<<endl;
@@ -981,7 +981,7 @@ void SipDialogConfVoip::sendInvite(){
 				dialogState.callId,
 				SipUri(dialogState.remoteUri),
 				getDialogConfig()->sipIdentity->getSipUri(),
-				getDialogConfig()->getContactUri(phoneconf->useSTUN),
+				getDialogConfig()->getContactUri(useStun),
 				dialogState.seqNo,
 				getSipStack()) ;
 

@@ -601,8 +601,8 @@ void SipDialogVoipServer::setUpStateMachine(){
 }
 
 
-SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, string cid) : 
-		SipDialogVoip(stack, ident, pconf, s, cid),
+SipDialogVoipServer::SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, MRef<Session *> s, string cid) : 
+		SipDialogVoip(stack, ident, /*pconf*/ stun, s, cid),
 		use100Rel( false ), resendTimer1xx( 0 )
 {
 	setUpStateMachine();
@@ -619,7 +619,7 @@ void SipDialogVoipServer::sendInviteOk(){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 
@@ -687,7 +687,7 @@ void SipDialogVoipServer::sendRinging(){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ringing->addHeader( new SipHeader(*contact) );
 
@@ -715,7 +715,7 @@ void SipDialogVoipServer::sendPrackOk( MRef<SipRequest*> prack ){
 	MRef<SipResponse*> ok = createSipResponse( prack, 200, "OK" );
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 
@@ -733,7 +733,7 @@ void SipDialogVoipServer::sendSessionProgress(){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	progress->addHeader( new SipHeader(*contact) );
 

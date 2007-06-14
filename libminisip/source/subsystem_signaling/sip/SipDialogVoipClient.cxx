@@ -513,8 +513,9 @@ void SipDialogVoipClient::setUpStateMachine(){
 }
 
 
-SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> pconf, MRef<Session *> s, string cid) : 
-		SipDialogVoip(stack, ident, pconf, s, cid)  
+SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, bool anat, MRef<Session *> s, string cid) : 
+		SipDialogVoip(stack, ident, stun, s, cid),
+		useAnat(anat)
 {
 	setUpStateMachine();
 }
@@ -530,7 +531,7 @@ void SipDialogVoipClient::sendInvite(){
 			dialogState.callId,
 			SipUri(dialogState.remoteUri),
 			getDialogConfig()->sipIdentity->getSipUri(),
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			dialogState.seqNo,
 			getSipStack() ) ;
 
@@ -549,7 +550,7 @@ void SipDialogVoipClient::sendInvite(){
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
-		bool anat = phoneconf->useAnat;
+		bool anat =  useAnat;
 		sdp = mediaSession->getSdpOffer( peerUri, anat );
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
@@ -616,7 +617,7 @@ void SipDialogVoipClient::sendInviteOk(){
 	
 	MRef<SipHeaderValue *> contact = 
 		new SipHeaderValueContact( 
-			getDialogConfig()->getContactUri(phoneconf->useSTUN),
+			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
 	
