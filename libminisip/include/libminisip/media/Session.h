@@ -34,6 +34,7 @@
 
 #include<libminisip/media/DtmfSender.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>
+#include<libminisip/media/MediaStream.h>
 
 class MediaStreamReceiver;
 class MediaStreamSender;
