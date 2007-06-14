@@ -6,7 +6,8 @@ ldap_src += \
 			libmnetutil/LdapDirectoryLocator.h \
 			libmnetutil/LdapEntry.h \
 			libmnetutil/LdapException.h \
-			libmnetutil/LdapUrl.h
+			libmnetutil/LdapUrl.h \
+			libmnetutil/LdapDownloader.h
 endif
 
 pkginclude_HEADERS =    \
@@ -26,8 +27,7 @@ pkginclude_HEADERS =    \
 			libmnetutil/DatagramSocket.h \
 			libmnetutil/libmnetutil_config.h \
 			libmnetutil/Downloader.h \
-			libmnetutil/HttpDownloader.h \
-			libmnetutil/LdapDownloader.h
+			libmnetutil/HttpDownloader.h
 
 noinst_HEADERS = 	\
 			config.h \
