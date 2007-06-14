@@ -41,7 +41,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipResponse.h>
 
-#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 class Session;
 class SipDialogContainer;

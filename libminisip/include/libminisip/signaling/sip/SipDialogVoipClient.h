@@ -52,7 +52,7 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 	public:
-		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
+		SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity*> ident, /*MRef<SipSoftPhoneConfiguration*> phoneconf*/ bool useStun, bool useAnat, MRef<Session *> mediaSession, std::string callId="");
 
 		virtual ~SipDialogVoipClient();
 
@@ -61,6 +61,7 @@ class LIBMINISIP_API SipDialogVoipClient: public SipDialogVoip{
 		virtual std::string getName(){return "SipDialogVoipClient[callid="+dialogState.callId +"]";}
 
 	private:
+		bool useAnat;
 		
 		void setUpStateMachine();
 		

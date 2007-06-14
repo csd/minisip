@@ -49,7 +49,6 @@
 #include<libmsip/SipResponse.h>
 
 #include<libminisip/signaling/sip/SipDialogVoip.h>
-#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 class Session;
 class SipDialogContainer;
@@ -58,7 +57,11 @@ class LogEntry;
 
 class LIBMINISIP_API SipDialogVoipServer: public SipDialogVoip{
 	public:
-		SipDialogVoipServer(MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string callId="");
+		SipDialogVoipServer(MRef<SipStack*> stack, 
+				MRef<SipIdentity*> ident, 
+				bool useStun,
+				MRef<Session *> mediaSession, 
+				std::string callId="");
 
 		virtual ~SipDialogVoipServer();
 

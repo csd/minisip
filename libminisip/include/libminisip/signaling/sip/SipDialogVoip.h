@@ -41,18 +41,15 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
-#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/Session.h>
 
-class Session;
-class SipDialogContainer;
-class SipDialogConfig;
 class LogEntry;
 
 class LIBMINISIP_API SipDialogVoip: public SipDialog{
 	public:
 		SipDialogVoip(	MRef<SipStack*> stack,
 						MRef<SipIdentity*> ident,
-						MRef<SipSoftPhoneConfiguration*> pconf,
+						bool useStun,
 						MRef<Session *> mediaSession,
 						std::string cid=""
 					);
@@ -81,7 +78,6 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		void registerSDP(uint32_t sourceId, MRef<SdpPacket*> sdppack);
 
 		
-		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<Session *> mediaSession;
 		
 		/**
@@ -90,6 +86,7 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		*/
 		bool notifyEarlyTermination;
 		
+		bool useStun;
 	private:
 		
 		void setUpStateMachine();

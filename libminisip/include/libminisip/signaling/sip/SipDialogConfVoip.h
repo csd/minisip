@@ -42,7 +42,6 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipResponse.h>
 
-#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 
@@ -50,12 +49,13 @@ class Session;
 class SipDialogContainer;
 class SipDialogConfig;
 class LogEntry;
+class ConfMessageRouter;
 
 class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 	public:
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, MRef<Session *> mediaSession, minilist<ConfMember> *conflist, std::string confid, std::string callId="");
 		
-		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, MRef<SipSoftPhoneConfiguration*> phoneconf, MRef<Session *> mediaSession, std::string confid, std::string callId="");
+		SipDialogConfVoip(MRef<ConfMessageRouter*> confCallback, MRef<SipStack*> stack, MRef<SipIdentity*> ident, bool stun, MRef<Session *> mediaSession, std::string confid, std::string callId="");
 
 		virtual ~SipDialogConfVoip();
 
@@ -137,8 +137,8 @@ class LIBMINISIP_API SipDialogConfVoip: public SipDialog{
 		bool localCalled;
 		std::string nonce;
 		std::string realm;
-		MRef<SipSoftPhoneConfiguration*> phoneconf;
 		MRef<Session *> mediaSession;
+		bool useStun;
 
 };
 
