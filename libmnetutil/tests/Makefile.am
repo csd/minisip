@@ -3,7 +3,8 @@ AM_LDFLAGS = -L$(top_srcdir) $(MINISIP_LIBS)
 LDADD = ../libmnetutil.la
 
 MINISIP_TESTS = \
-	000_compile
+	000_compile \
+	002_naptr
 
 if ENABLE_LDAP
 MINISIP_TESTS += \
