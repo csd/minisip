@@ -22,7 +22,7 @@
 #include<libmnetutil/libmnetutil_config.h>
 
 #include <libmutil/MemObject.h>
-#include <libmcrypto/cert.h>
+// #include <libmcrypto/cert.h>
 
 #include <string>
 
@@ -33,7 +33,7 @@
  */
 class LdapCredentials : public MObject {
 	public:
-		MRef<certificate*> cert;
+// 		MRef<certificate*> cert;
 		std::string username;
 		std::string password;
 

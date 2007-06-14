@@ -38,8 +38,8 @@ ldap_src += \
 		    source/LdapConnection.cxx \
                     source/LdapEntry.cxx \
                     source/LdapException.cxx \
-		    source/LdapUrl.cxx \
-		    source/LdapDownloader.cxx
+		    source/LdapUrl.cxx
+# 		    source/LdapDownloader.cxx
 endif
 
 mnetutil_src = \

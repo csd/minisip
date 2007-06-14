@@ -1,18 +1,24 @@
 #include <libmnetutil/LdapConnection.h>
 
-LdapConnection::LdapConnection(std::string host, int32_t port) : hostname(host), port(port), ld(NULL), isBound(false) {
+LdapConnection::LdapConnection(std::string host, int32_t port) {
+	init(host, port, NULL);
 }
-LdapConnection::LdapConnection(std::string host) : hostname(host), port(LDAP_PORT), ld(NULL), isBound(false) {
+LdapConnection::LdapConnection(std::string host) {
+	init(host, LDAP_PORT, NULL);
 }
-LdapConnection::LdapConnection(std::string host, int32_t port, MRef<LdapCredentials*> cred) : hostname(host), port(port), ld(NULL), isBound(false) {
-	setCredentials(cred);
-	try {
-		connect();
-	} catch (LdapException & e) {
-		//std::cerr << e.what() << std::endl;
-	}
+LdapConnection::LdapConnection(std::string host, int32_t port, MRef<LdapCredentials*> cred) {
+	init(host, port, cred);
 }
-LdapConnection::LdapConnection(std::string host, MRef<LdapCredentials*> cred) : hostname(host), port(LDAP_PORT), ld(NULL), isBound(false) {
+LdapConnection::LdapConnection(std::string host, MRef<LdapCredentials*> cred) {
+	init(host, LDAP_PORT, cred);
+}
+
+void LdapConnection::init(std::string host, int aPort, MRef<LdapCredentials*> aCred){
+	hostname = host;
+	port = aPort;
+	cred = aCred;
+	ld = NULL;
+	isBound = false;
 	setCredentials(cred);
 	try {
 		connect();
@@ -47,9 +53,6 @@ void LdapConnection::connect() throw (LdapException) {
 	if (isConnected()) {
 		disconnect();
 	}
-	if (cred.isNull()) {
-		throw LdapException("Could not connect since no credentials have been specified");
-	}
 
 	// Initialize LDAP library and open connection
 	if ((ld = ldap_init(hostname.c_str(), port)) == NULL ) {
@@ -62,7 +65,15 @@ void LdapConnection::connect() throw (LdapException) {
 	}
 
 	// Create LDAP bind
-	if (ldap_bind_s(ld, cred->username.c_str(), cred->password.c_str(), auth_method) != LDAP_SUCCESS) {
+	const char *user = NULL;
+	const char *pass = NULL;
+
+	if (cred) {
+		user = cred->username.c_str();
+		pass = cred->password.c_str();
+	}
+
+	if (ldap_bind_s(ld, user, pass, auth_method) != LDAP_SUCCESS) {
 		throw LdapException("Could not bind to connected server");
 	}
 

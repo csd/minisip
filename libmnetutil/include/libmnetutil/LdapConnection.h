@@ -107,6 +107,8 @@ class LdapConnection : public MObject {
 		 */
 		bool			isBound;
 
+	protected:
+		void init(std::string host, int32_t port, MRef<LdapCredentials*> cred);
 };
 
 #endif
