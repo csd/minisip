@@ -151,11 +151,12 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 	if (internalSocketObject)
 		sock->close();
 
+/*
 	if (bytesRead < 0) {
 		//cerr << "Error: Could not receive response" << endl;
 		return 0;
 	}
-
+*/
 	return HTTP_RESPONSECODE_OK;
 }
 

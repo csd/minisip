@@ -59,7 +59,7 @@ bool WINXP_init(){
 	hiphlpapi = LoadLibrary("iphlpapi");
 
 	if( !hiphlpapi ){
-		mdbg << "NetworkFunctionsWin32: no hiphlpapi" << end;
+		mdbg << "NetworkFunctionsWin32: no hiphlpapi" << endl;
 		WINXP_exit();
 		return false;
 	}
@@ -68,7 +68,7 @@ bool WINXP_init(){
 	hGetAdaptersAddresses = (PGETADAPTERSADDRESSES)GetProcAddress(hiphlpapi, "GetAdaptersAddresses");
 	
 	if( !hGetAdaptersAddresses ){
-		mdbg << "NetworkFunctionsWin32: no GetAdaptersAddresses" << end;
+		mdbg << "NetworkFunctionsWin32: no GetAdaptersAddresses" << endl;
 		WINXP_exit();
 		return false;
 	}
@@ -76,7 +76,7 @@ bool WINXP_init(){
 
 	hws2tcpip = LoadLibrary("ws2_32");
 	if( !hws2tcpip ){
-		mdbg << "NetworkFunctionsWin32: no ws2tcpip" << end;
+		mdbg << "NetworkFunctionsWin32: no ws2tcpip" << endl;
 		WINXP_exit();
 		return false;
 	}
@@ -84,7 +84,7 @@ bool WINXP_init(){
 	hgetaddrinfo = (PGETADDRINFO)GetProcAddress(hws2tcpip, "getaddrinfo");
 
 	if( !hgetaddrinfo ){
-		mdbg << "NetworkFunctionsWin32: no getaddrinfo" << end;
+		mdbg << "NetworkFunctionsWin32: no getaddrinfo" << endl;
 		WINXP_exit();
 		return false;
 	}
@@ -92,7 +92,7 @@ bool WINXP_init(){
 	hfreeaddrinfo = (PFREEADDRINFO)GetProcAddress(hws2tcpip, "freeaddrinfo");
 
 	if( !hfreeaddrinfo ){
-		mdbg << "NetworkFunctionsWin32: no freeaddrinfo" << end;
+		mdbg << "NetworkFunctionsWin32: no freeaddrinfo" << endl;
 		WINXP_exit();
 		return false;
 	}
@@ -100,11 +100,11 @@ bool WINXP_init(){
 	hgetnameinfo = (PGETNAMEINFO)GetProcAddress(hws2tcpip, "getnameinfo");
 
 	if( !hgetnameinfo ){
-		mdbg << "NetworkFunctionsWin32: no getnameinfo" << end;
+		mdbg << "NetworkFunctionsWin32: no getnameinfo" << endl;
 		WINXP_exit();
 		return false;
 	}
 
-	mdbg << "NetworkFunctionsWin32: functions loaded ok" << end;
+	mdbg << "NetworkFunctionsWin32: functions loaded ok" << endl;
 	return true;
 }
