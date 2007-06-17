@@ -32,6 +32,7 @@ AC_ARG_WITH(gnutls,
 
 if test "${with_gnutls}" = "yes"; then
     AM_LIBMCRYPTO_CHECK_GNUTLS([HAVE_GNUTLS=yes],[HAVE_GNUTLS=no])
+    have_sha256=${HAVE_GNUTLS}
 fi
 AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
 
@@ -46,7 +47,10 @@ AC_ARG_WITH(openssl,
 
 if test "${with_openssl}" = "yes"; then
     AM_LIBMCRYPTO_CHECK_OPENSSL([HAVE_OPENSSL=yes],[HAVE_OPENSSL=no])
+    save_LIBS=${LIBS}
+    LIBS="${LIBS} ${OPENSSL_LIBS}"
     AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
+    LIBS=$save_LIBS
 fi
 AM_CONDITIONAL(HAVE_OPENSSL, test "${HAVE_OPENSSL}" = "yes")
 AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
