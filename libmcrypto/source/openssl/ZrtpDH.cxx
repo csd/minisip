@@ -39,6 +39,9 @@
 static BIGNUM *bnP3072 = NULL;
 static BIGNUM *bnP4096 = NULL;
 
+static BIGNUM* bnP3072MinusOne = NULL;
+static BIGNUM* bnP4096MinusOne = NULL;
+
 static uint8_t dhinit = 0;
 
 // void initializeOpenSSL();
@@ -135,6 +138,10 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
     if (!dhinit) {
 	bnP3072 = BN_bin2bn(P3072,sizeof(P3072),NULL);
 	bnP4096 = BN_bin2bn(P4096,sizeof(P4096),NULL);
+        bnP3072MinusOne = BN_dup(bnP3072);
+        BN_sub_word(bnP3072MinusOne, 1);
+        bnP4096MinusOne = BN_dup(bnP4096);
+        BN_sub_word(bnP4096MinusOne, 1);
 	dhinit = 1;
     }
 
