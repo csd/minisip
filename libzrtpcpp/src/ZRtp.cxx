@@ -20,9 +20,9 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#include <libzrtpcpp/crypto/ZrtpDH.h>
-#include <libzrtpcpp/crypto/hmac256.h>
-#include <libzrtpcpp/crypto/sha256.h>
+#include <libmcrypto/ZrtpDH.h>
+#include <libmcrypto/hmac256.h>
+#include <libmcrypto/sha256.h>
 
 #include <libzrtpcpp/ZRtp.h>
 #include <libzrtpcpp/ZrtpStateClass.h>

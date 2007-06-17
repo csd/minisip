@@ -43,9 +43,9 @@
 # define SHA256_DIGEST_LENGTH 32
 #endif
 
-void hmac_sha256(uint8_t* key, uint32_t keyLength,
-		uint8_t* data, int32_t dataLength,
-                uint8_t* mac, uint32_t* macLength)
+void hmac_sha256( unsigned char * key, unsigned int keyLength,
+		unsigned char * data, unsigned int dataLength,
+		unsigned char * mac, unsigned int * macLength )
 {
     gcry_md_hd_t hd;
     gcry_error_t err = 0;
@@ -63,10 +63,10 @@ void hmac_sha256(uint8_t* key, uint32_t keyLength,
     gcry_md_close (hd);
 }
 
-void hmac_sha256( uint8_t* key, uint32_t keyLength,
-                  uint8_t* dataChunks[],
-                  uint32_t dataChunkLength[],
-                  uint8_t* mac, uint32_t* macLength )
+void hmac_sha256( unsigned char * key, unsigned int keyLength,
+		unsigned char * dataChunks[],
+		unsigned int dataChunkLength[],
+		unsigned char * mac, unsigned int * macLength )
 {
     gcry_md_hd_t hd;
     gcry_error_t err = 0;

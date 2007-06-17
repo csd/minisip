@@ -33,18 +33,6 @@ dnl mingw support
 dnl
 AC_CHECK_LIB([wsock32], [main])
 
-AC_CHECK_LIB([crypto],
-             [EVP_CipherInit_ex],
-             [
-              CRYPTOBACKEND="openssl >= 0.9.8"
-              LIBS="-lcrypto $LIBS"
-             ],
-             [AC_MSG_ERROR([Cannot find libgcrypt or OpenSSL crypto library.])]
-             )
-
-AM_CONDITIONAL(ZRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
-AM_CONDITIONAL(ZRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
-
 if test $GCC = yes ; then
         WARN_FLAGS="-Wall -ansi -pedantic"
 else
@@ -53,6 +41,8 @@ fi
 AC_SUBST(WARN_FLAGS)
 
 AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMCRYPTO([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 # Checks for header files.

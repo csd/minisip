@@ -1,7 +1,7 @@
 # AM_MINISIP_CHECK_LIBZRTP(VERSION)
 # ----------------------------------
 AC_DEFUN([AM_MINISIP_CHECK_LIBZRTPCPP],[
-    AC_REQUIRE([AM_MINISIP_CHECK_LIBMUTIL]) dnl
+    AC_REQUIRE([AM_MINISIP_CHECK_LIBMCRYPTO]) dnl
     AC_MINISIP_WITH_ARG(ZRTP, zrtpcpp, libzrtpcpp, $1, [REQUIRED])
     AC_MINISIP_CHECK_LIBRARY(ZRTP, libzrtpcpp, ZRtp.h, zrtpcpp)
   ])

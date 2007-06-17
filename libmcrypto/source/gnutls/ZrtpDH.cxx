@@ -232,7 +232,6 @@ void ZrtpDH::random(uint8_t *buf, int32_t length) const{
     gcry_randomize(buf, length, GCRY_STRONG_RANDOM);
 }
 
-#if 0
 int32_t ZrtpDH::checkPubKey(uint8_t *pubKeyBytes,
                             int32_t length) const
 {
@@ -255,7 +254,6 @@ int32_t ZrtpDH::checkPubKey(uint8_t *pubKeyBytes,
     gcry_mpi_release(pubKeyOther);
     return 1;
 }
-#endif
 
 /** EMACS **
  * Local variables:

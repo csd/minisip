@@ -51,6 +51,7 @@ public:
     int32_t getPubKeyBytes(uint8_t *buf) const;
     int32_t computeKey(uint8_t *pubKeyBytes, int32_t length, uint8_t *secret);
     void random(uint8_t *buf, int32_t length) const;
+    int32_t checkPubKey(uint8_t *pubKeyBytes, int32_t length) const;
 };
 
 #endif // ZRTPDH_H

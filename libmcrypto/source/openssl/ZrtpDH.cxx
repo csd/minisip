@@ -193,3 +193,24 @@ int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) const{
 void ZrtpDH::random(uint8_t *buf, int32_t length) const{
 	RAND_bytes(buf, length);
 }
+
+int32_t ZrtpDH::checkPubKey(uint8_t *pubKeyBytes,
+                            int32_t length) const
+{
+    BIGNUM* pubKeyOther = BN_bin2bn(pubKeyBytes, length, NULL);
+
+    int one = BN_is_one(pubKeyOther);
+    if (one == 1)
+        return 0;
+
+    if (length == 384) {
+        if (BN_cmp(bnP3072MinusOne, pubKeyOther) == 0)
+            return 0;
+    }
+    else {
+        if (BN_cmp(bnP4096MinusOne, pubKeyOther) == 0)
+            return 0;
+    }
+    BN_free(pubKeyOther);
+    return 1;
+}
