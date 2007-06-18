@@ -43,7 +43,7 @@ using namespace std;
 
 
 /************************************************************************/
-void checkErr(int a)
+static void checkErr(int a)
 {
 	if(a<0)
 	{	

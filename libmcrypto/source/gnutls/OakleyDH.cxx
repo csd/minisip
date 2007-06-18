@@ -37,7 +37,7 @@ using namespace std;
 
 #define CHECK_GCRY(err) if(err)	{ checkErr(err); }
 
-void checkErr(gcry_error_t a)
+static void checkErr(gcry_error_t a)
 {
 	if(a)
 	{	
