@@ -1,22 +1,30 @@
 #include <libmnetutil/LdapConnection.h>
+#include <libmnetutil/LdapCredentials.h>
+#include <libmnetutil/LdapUrl.h>
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if( argc != 3 ){
-		cerr << "Usage: " << argv[0] << " <ldap server> <base dn>" << endl;
+	if( argc != 2 ){
+		cerr << "Usage: " << argv[0] << " ldap://<host>/<dn>[?[<attributes>][?[<scope>][?[<filter>]]]]" << endl;
 		return 1;
 	}
 
-	const char *server_name = argv[1];
-	const char *base_dn = argv[2];
+	const char *url_str = argv[1];
 
-	MRef<LdapConnection*> conn = new LdapConnection(server_name);
+	LdapUrl url(url_str);
+
+	url.printDebug();
+
+	MRef<LdapCredentials*> cred = new LdapCredentials("","");
+	MRef<LdapConnection*> conn = new LdapConnection(url.getHost(), url.getPort(), cred);
 
 	std::vector<MRef<LdapEntry*> > entries;
-	vector<string> attrs;
-	entries = conn->find(base_dn, "(objectclass=*)", attrs);
+	vector<string> attrs = url.getAttributes();
+	string label = attrs[0];
+
+	entries = conn->find(url.getDn(), url.getFilter(), attrs);
 	
 	std::vector<MRef<LdapEntry*> >::iterator i;
 	for (i = entries.begin(); i != entries.end(); i++) {
