@@ -31,6 +31,7 @@ endif
 srp_src =
 if ENABLE_SRP
 srp_src += TlsSrpSocket.cxx
+srp_libs = $(GNUTLS_LIBS)
 endif
 
 
@@ -47,7 +48,7 @@ libmcrypto_core_la_SOURCES = \
 		uuid.cxx \
 		rijndael-alg-fst.cxx
 
-libmcrypto_core_la_LIBADD = $(SCSIM_LIBS)
+libmcrypto_core_la_LIBADD = $(srp_libs) $(SCSIM_LIBS)
 
 libmcrypto_imp_la_SOURCES = # none
 libmcrypto_imp_la_LIBADD = $(BUILD_LIBS)
