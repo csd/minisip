@@ -35,19 +35,27 @@ using namespace std;
 
 #ifdef MDEBUG
 #include<libmutil/stringutils.h>
-Mutex global;
+Mutex *globalLock=NULL;
 minilist<MObject *> objs;
 int ocount=0;
 bool outputOnDestructor=false;
+
+Mutex &global(){
+	if (!globalLock)
+		globalLock = new Mutex;
+	return *globalLock;
+}
 #endif
 
 MObject::MObject() : refCount(0){
-	refLock = new Mutex();
 #ifdef MDEBUG
-	global.lock();
+	global().lock();
 	ocount++;
 	objs.push_front(this);
-	global.unlock();
+	refLock=NULL;
+	global().unlock();
+#else
+	refLock = new Mutex();
 #endif
 }
 
@@ -56,18 +64,20 @@ MObject::MObject() : refCount(0){
 // any references to the argument object
 // are not referencing us.
 MObject::MObject(const MObject &):refCount(0){
-	refLock = new Mutex();	//We don't want to share the mutex
 #ifdef MDEBUG
-	global.lock();
+	global().lock();
 	ocount++;
 	objs.push_front(this);
-	global.unlock();
+	refLock=NULL;
+	global().unlock();
+#else
+	refLock = new Mutex();	//We don't want to share the mutex
 #endif
 }
 
 MObject::~MObject(){
 #ifdef MDEBUG
-	global.lock();
+	global().lock();
 	for (int i=0; i<objs.size(); i++){
 		if (this == objs[i]){
 			objs.remove(i);
@@ -75,10 +85,12 @@ MObject::~MObject(){
 			break;
 		}
 	}
-	global.unlock();
-#endif
+	global().unlock();
+#else
+	massert(refLock);
 	delete refLock;
 	refLock=NULL;
+#endif
 }
 
 void MObject::operator=(const MObject &){
@@ -94,7 +106,7 @@ void MObject::operator=(const MObject &){
 int MObject::decRefCount() const{
 	int refRet;
 #ifdef MDEBUG
-	global.lock();
+	global().lock();
 #else
 	refLock->lock();
 #endif
@@ -103,7 +115,7 @@ int MObject::decRefCount() const{
 	refRet = refCount;
 	
 #ifdef MDEBUG
-	global.unlock();
+	global().unlock();
 	if (refRet==0 && outputOnDestructor){
 		string output = "MO (--):"+getMemObjectType()+ "; count=" + itoa(refRet) + "; ptr=" + itoa((int)this);
 		mdbg("memobject") << output << endl;
@@ -116,7 +128,7 @@ int MObject::decRefCount() const{
 
 void MObject::incRefCount() const{
 #ifdef MDEBUG
-	global.lock();
+	global().lock();
 #else
 	refLock->lock();
 #endif
@@ -124,7 +136,7 @@ void MObject::incRefCount() const{
 	refCount++;
 	
 #ifdef MDEBUG
-	global.unlock();
+	global().unlock();
 	if (refCount == 1 && outputOnDestructor ){
 		string output = "MO (++):"+getMemObjectType()+ "; count=" + itoa(refCount);
 		mdbg("memobject") << output << endl;
@@ -149,13 +161,13 @@ string MObject::getMemObjectType() const {
 minilist<string> getMemObjectNames(){
 #ifdef MDEBUG
 	minilist<string> ret;
-	global.lock();
+	global().lock();
 	for (int i=0; i< objs.size(); i++){
 		int count = objs[i]->getRefCount();
 		string countstr = count?itoa(count):"on stack"; 
 		ret.push_front(objs[i]->getMemObjectType()+"("+countstr+")" + "; ptr=" + itoa((int)objs[i]) );
 	}
-	global.unlock();
+	global().unlock();
 	return ret;
 #else
 	minilist<string> ret;
@@ -196,7 +208,7 @@ minilist<string> getMemObjectNamesSummary(){
 	std::list<string>::iterator si;
 	std::list<string>::iterator js;
 	std::list<int>::iterator jc;
-	global.lock();
+	global().lock();
 	// get list of unique names, and count
 	int i;
 	for (i=0; i< objs.size(); i++){
@@ -250,7 +262,7 @@ minilist<string> getMemObjectNamesSummary(){
 		ret.push_back( *js + " " + itoa( *jc ) );
 	}
 
-	global.unlock();
+	global().unlock();
 	return ret;
 #else
 	minilist<string> ret;

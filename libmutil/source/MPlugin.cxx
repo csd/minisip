@@ -140,6 +140,9 @@ int32_t MPluginManager::loadFromFile( const std::string &filename ){
 }
 
 struct ltdl_info {
+		ltdl_info() : manager(NULL),nTotalPlugins(0){}
+		~ltdl_info(){manager=NULL;}
+
 		MRef<MPluginManager *> manager;
 		int32_t nTotalPlugins;
 };
@@ -160,8 +163,6 @@ static int ltdl_callback(const char *filename, lt_ptr data){
 
 int32_t MPluginManager::loadFromDirectory( const string &path ){
 	ltdl_info info;
-
-	memset(&info, 0, sizeof(info));
 	info.manager = this;
 
 	int res = lt_dlforeachfile(path.c_str(), ltdl_callback, &info);
