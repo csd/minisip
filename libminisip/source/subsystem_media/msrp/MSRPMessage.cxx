@@ -169,25 +169,20 @@ void MSRPSender::run(){
 			num_chunks--;
 			setchunk();
 
-			cerr<<"number of chunks "<<num_chunks<<endl;
+			//cerr<<"number of chunks "<<num_chunks<<endl;
 
 			MSRPMessageSend new_msg(chunk, chunkSize);
 			//cerr<<"MAFE:  created new object... "<<endl;
 			msg = new_msg.CreateMSRPSend(pktLen);
-			cerr<<"MAFE:     MSRPMessage created! "<<endl;
 
 			//int aux = htonl(chunkSize);
 			if (sock==NULL)
 				cerr<<"MAFE: socket is NULL"<<endl;
 			//int sendtam=sock->write((char*)&aux,sizeof(chunkSize));
 
-			cerr <<"will send " << pktLen<< " bytes"<<endl;
 			assert(sock);
 
 			int nsent=sock->write(msg, pktLen);
-
-			//cerr<<msg<<endl;
-			cerr <<"EEEEEEEEEEEEE: sent "<< nsent<<" bytes"<<endl; 
 
 			//int reprec = sock->read(report_rec, 1024);
 
@@ -200,16 +195,9 @@ void MSRPSender::run(){
 			//string byterange = new_msg.UpdateByteRange();
 		}
 		
-		//int aux = htonl(0);
-		//int lastsent=sock->write((char*)&aux, sizeof(int));
-
-		//finalstring = sock->write("server quit", 12);
-		//cerr<<"final de fichero"<<finalstring<<endl;
 	}
 	CommandString cmd(callid, "MSRP_DONE");
 	sipstack->handleCommand(cmd);
-	
-	//cerr <<"MAFE: server shutting down..."<<endl;
 }
 			
 void MSRPSender::setchunk(){
@@ -268,22 +256,13 @@ void MSRPReceiver::run(){
 		chunkRcv=chunkRcv+1;
 
 	do{
-		cerr <<"chunks "<<chunkRcv<<endl;	
-		//cerr<<"sizeblock"<<lng<<endl;
 		//if(chunkRcv>0){
 
 			int nrecv = client_sock->read(receive_buf,10000);
-			cerr <<"EEEEEEEEEEEEEEEE: read "<< nrecv <<" bytes."<<endl;
-		
-			//cerr<<"buffer recibido "<<receive_buf<<endl;
-			
-			//receive_buf[nrecv]=0;				//it makes sure that this is a null-terminated string
-			//from_client=trim(string(receive_buf)); 		//trim away any leading or trailing whitespace
 		
 			loc = strstr(receive_buf,"Content-Type: ");
-			//loc2 = strstr(receive_buf, "-------");
 			
-			cerr<<"localizador del content type: "<<loc<<endl;
+			//cerr<<"localizador del content type: "<<loc<<endl;
 
 			while(*loc != '\n'){
 				loc++;
@@ -293,7 +272,7 @@ void MSRPReceiver::run(){
 				chunk_buffer_prov[j]=*loc;
 				loc++;
 			}	
-			cerr<<"buffer provisional "<<chunk_buffer_prov<<endl;
+			//cerr<<"buffer provisional "<<chunk_buffer_prov<<endl;
 			SaveFile.write(chunk_buffer_prov,1024);
 			}
 			else{
@@ -301,17 +280,11 @@ void MSRPReceiver::run(){
 				chunk_buffer_prov[j]=*loc;
 				loc++;
 			}	
-			cerr<<"buffer provisional "<<chunk_buffer_prov<<endl;
+			//cerr<<"buffer provisional "<<chunk_buffer_prov<<endl;
 			SaveFile.write(chunk_buffer_prov,aux);
 			}
-
 	
-			//MSRPMessageReport new_rep(chunk_buffer_prov,lng);
-			//string_rep = new_rep.CreateMSRPReport();
-			//cerr<<"MAFE: Report created: "<<string_rep<<endl;
 			chunkRcv--;
-			//client_sock->write(string_rep.c_str(), string_rep.length());
-			//cerr<<"after write report"<<endl;
 		//}else;
 	}while(chunkRcv>0);
 }
