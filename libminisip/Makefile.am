@@ -102,6 +102,13 @@ if P2T_SUPPORT
 			source/subsystem_signaling/p2t/P2T.cxx
 endif
 
+libmsrp_src = 
+if MSRP_SUPPORT
+libmsrp_src = source/subsystem_media/msrp/MSRPMessage.cxx \
+ 			source/subsystem_media/msrp/MSRPMessage.h 
+endif
+
+
 if ZRTP_SUPPORT
 libzrtp_src = source/subsystem_media/zrtp/ZrtpHostBridgeMinisip.cxx
 endif
@@ -135,6 +142,7 @@ libsdp_src = source/subsystem_signaling/sdp/SdpPacket.cxx \
 		source/subsystem_signaling/sdp/SdpHeader.cxx \
 		source/subsystem_signaling/sdp/SdpHeaderA.cxx \
 		source/subsystem_signaling/sdp/SdpHeaderC.cxx \
+		source/subsystem_signaling/sdp/SdpHeaderI.cxx \
 		source/subsystem_signaling/sdp/SdpHeaderM.cxx \
 		source/subsystem_signaling/sdp/SdpHeaderO.cxx \
 		source/subsystem_signaling/sdp/SdpHeaderS.cxx \
@@ -147,6 +155,10 @@ libsip_src = source/subsystem_signaling/sip/SipDialogVoip.cxx \
 		source/subsystem_signaling/sip/SipDialogConfVoip.cxx \
 		source/subsystem_signaling/sip/SipDialogPresenceClient.cxx \
 		source/subsystem_signaling/sip/SipDialogPresenceServer.cxx \
+		source/subsystem_signaling/sip/SipDialogFileTransferClient.cxx \
+		source/subsystem_signaling/sip/SipDialogFileTransferClient.h \
+		source/subsystem_signaling/sip/SipDialogFileTransferServer.cxx \
+		source/subsystem_signaling/sip/SipDialogFileTransferServer.h \
 		source/subsystem_signaling/sip/SipSoftPhoneConfiguration.cxx \
 		source/subsystem_signaling/sip/DefaultDialogHandler.cxx \
 		source/subsystem_signaling/sip/PresenceMessageContent.cxx \
@@ -410,6 +422,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libmediahandler_src) \
 			$(libp2t_src) \
 			$(librtp_src) \
+			$(libmsrp_src) \
 			$(libzrtp_src) \
 			$(libsdp_src) \
 			$(libsoundcard_src) \

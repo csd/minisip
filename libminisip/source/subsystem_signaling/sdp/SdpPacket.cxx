@@ -44,7 +44,7 @@
 #include<libminisip/signaling/sdp/SdpHeaderT.h>
 #include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libminisip/signaling/sdp/SdpHeaderA.h>
-
+#include<libminisip/signaling/sdp/SdpHeaderI.h>
 
 #include<iostream>
 #include<sys/types.h>
@@ -74,6 +74,9 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 				break;
 			case 's':
 				addHeader(MRef<SdpHeader*>(new SdpHeaderS(lines[i])));
+				break;
+			case 'i':
+				addHeader(MRef<SdpHeader*>(new SdpHeaderI(lines[i])));
 				break;
 			case 'c':{
 				MRef<SdpHeaderC*> c = new SdpHeaderC(lines[i]);

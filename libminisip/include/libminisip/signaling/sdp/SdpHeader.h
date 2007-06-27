@@ -45,6 +45,7 @@
 #define SDP_HEADER_TYPE_S	4
 #define SDP_HEADER_TYPE_T	5
 #define SDP_HEADER_TYPE_V	6
+#define SDP_HEADER_TYPE_I	7
 
 #include<string>
 

@@ -39,7 +39,7 @@
 
 using namespace std;
 
-SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 9){
+SdpHeaderA::SdpHeaderA(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_A, 10){
 	massert(buildFrom.substr(0,2)=="a=");
 	attributes= trim(buildFrom.substr(2, buildFrom.length()-2));
 }
@@ -67,6 +67,82 @@ string SdpHeaderA::getAttributeType(){
 	return attributes.substr( 0, pos );
 }
 
+void SdpHeaderA::getAttFromFileSelector(){
+	size_t pos;
+	size_t pos2;
+	
+	name = false;
+	type = false;
+	size = false;
+	hash = false;
+	
+	pos=14;
+	pos2=14;
+	
+	int searchname;
+	int searchtype;
+	int searchsize;
+	int poshash;
+	int iter;
+	int counter=0;
+
+	for(iter=15; iter<strlen(attributes.c_str()); iter++){
+		if(attributes[iter] == ':')
+			counter++;
+	}
+	//cerr<<counter<<endl;
+
+	while(counter!=1){
+		
+		counter --;
+		pos2 = attributes.find( ":",pos);
+		
+		//cerr<<pos2<<endl;
+		
+		pos= pos2-4;
+
+		//cerr<<( attributes.substr(pos, 4) )<<endl;
+
+		if( attributes.substr(pos, 4) == "name"){
+			name = true;
+			searchname = attributes.find('"',pos2+2);
+			//cerr<<searchname<<endl;
+			filename = ( attributes.substr(pos2+2,(searchname-pos2-2)) );
+			//cerr<<filename<<endl;
+		}	
+		else;
+		if( attributes.substr(pos, 4) == "type"){
+			type = true;
+			searchtype = attributes.find(" ",pos2);
+			//cerr<<searchtype<<endl;
+			filetype = ( attributes.substr(pos2+1,(searchtype-pos2)) );
+			//cerr<<filetype<<endl;
+		}
+		else;
+		if( attributes.substr(pos, 4) == "size"){
+			size = true;
+			searchsize = attributes.find(" ", pos2);
+			//cerr<<searchsize<<endl;
+			filesizes = ( attributes.substr(pos2+1,(searchsize-pos2)) );
+			//cerr<<filesizes<<endl;
+		}	
+		else;
+		if( attributes.substr(pos, 4) == "hash"){
+			hash = true;
+			poshash = attributes.find( ":", pos2+1);
+			hashused = ( attributes.substr(pos2+1,poshash-pos2-1));
+			hashforfile = ( attributes.substr(poshash+1,(strlen(attributes.c_str())-poshash)) );
+			//cerr<<"used hash "<<hashused<<endl;
+			//cerr<<"hash "<<hashforfile<<endl;
+		}
+		else;
+	
+		pos2++;
+		pos = pos2;
+	}
+}
+
+
 string SdpHeaderA::getAttributeValue(){
 	if( getAttributeType() == "property" )
 		return attributes;
@@ -78,4 +154,5 @@ string SdpHeaderA::getAttributeValue(){
 	}
 	return attributes.substr( pos + 1, attributes.length() - 2 );
 }
+
 

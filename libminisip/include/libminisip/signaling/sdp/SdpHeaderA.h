@@ -52,7 +52,20 @@ class LIBMINISIP_API SdpHeaderA : public SdpHeader{
 		std::string getAttributeType();
 		std::string getAttributeValue();
 
+		void getAttFromFileSelector();
+		
 		std::string getRtpMap(int format);
+
+		bool name;
+		bool type;
+		bool size;
+		bool hash;
+		
+		std::string filename;
+		std::string filetype;
+		std::string filesizes;
+		std::string hashused;
+		std::string hashforfile;
 
 	private:
 		std::string attributes;

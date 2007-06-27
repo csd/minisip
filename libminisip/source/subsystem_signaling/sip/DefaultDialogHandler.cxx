@@ -47,6 +47,8 @@
 #include<libminisip/signaling/sip/SipDialogConfVoip.h>
 #include<libminisip/signaling/sip/SipDialogPresenceClient.h>
 #include<libminisip/signaling/sip/SipDialogPresenceServer.h>
+#include"SipDialogFileTransferClient.h"
+#include"SipDialogFileTransferServer.h"
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
@@ -224,35 +226,37 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg("signaling/sip") << cmd << endl;
-		}
-		//start SipDialogVoIP
-		else{
-			MRef<SipIdentity *> id = lookupTarget(inv->getUri());
+		}else{
+			//...extract something you need for the test...
+			if  (/*invite contains file transfer session*/ true){
 
-			// get a session from the mediaHandler
-			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
+				MRef<SipIdentity *> id = lookupTarget(inv->getUri());
+				cerr << "MAFE: creating file transfer server"<<endl;
 
-/*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
+				MRef<SipDialog *> ftransf = new SipDialogFileTransferServer(sipStack, phoneconf, id, phoneconf, pkt->getCallId() );
+				sipStack->addDialog( ftransf );
+				SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+				sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+			}else{
+				MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
-			if( id ){
-				cerr << "Got a call from Id " << id->getSipUri() << endl;
-				callConf->useIdentity( id );
-			}
-*/
-			MRef<SipDialog*> voipCall;
+				// get a session from the mediaHandler
+				MRef<Session *> mediaSession = 
+					mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
+
+				MRef<SipDialog*> voipCall;
 				voipCall = new SipDialogVoipServer(sipStack,
 						id,
 						phoneconf,
 						mediaSession,
 						pkt->getCallId());
-			sipStack->addDialog(voipCall);
+				sipStack->addDialog(voipCall);
 
 
-			SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
-
-			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			mdbg("signaling/sip") << cmd << endl;
+				SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
+				sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+				mdbg("signaling/sip") << cmd << endl;
+			}
 		}
 		return true;
 	}
@@ -337,6 +341,25 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 
 		return true;
 	}
+
+
+	if (cmdstr.getOp() == "start_filetransfer"){
+		cerr << "DefaultDialogHandler: Creating SipDialogFileTransferClient for start_filetransfer_client command"<< endl;
+		
+//		MRef<SipDialogConfig*> conf = new SipDialogConfig(phoneconf->inherited);
+
+		MRef<SipDialogFileTransferClient*> pres(new SipDialogFileTransferClient(sipStack, phoneconf, phoneconf->defaultIdentity, phoneconf->useSTUN ));
+
+		sipStack->addDialog( MRef<SipDialog*>(*pres) );
+		
+		CommandString command(cmdstr);
+		cmdstr.setDestinationId(pres->getCallId());
+		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dialog_layer);
+		sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE);
+
+		return true;
+	}
+
 	
 	if (cmdstr.getOp() == SipCommandString::start_presence_server){
 		cerr << "DefaultDialogHandler: Creating SipDialogPresenceServer for start_presence_server command"<< endl;

@@ -143,6 +143,18 @@ AC_CHECK_HEADER([gsm.h],
 AM_CONDITIONAL(HAS_GSM, test "${HAS_GSM}" = "yes")
 AC_SUBST(GSM_LIBS)
 
+dnl MSRP support
+AC_ARG_ENABLE(msrp,
+    AS_HELP_STRING([--enable-msrp],
+		   [enable MSRP file transfer protocol (default disabled)]),
+    [  if test "${enable_msrp}" = "yes"
+       then
+	   AC_DEFINE(MSRP_SUPPORT, [], [MSRP support])
+       fi ])
+AM_CONDITIONAL(MSRP_SUPPORT, test "${enable_msrp}" = "yes")
+
+
+
 dnl
 dnl PortAudio V19 support
 dnl

@@ -58,6 +58,7 @@ nobase_include_HEADERS =    libminisip/media/aec/aecfix.h \
 			libminisip/signaling/sdp/SdpHeader.h \
 			libminisip/signaling/sdp/SdpHeaderA.h \
 			libminisip/signaling/sdp/SdpHeaderC.h \
+			libminisip/signaling/sdp/SdpHeaderI.h \
 			libminisip/signaling/sdp/SdpHeaderM.h \
 			libminisip/signaling/sdp/SdpHeaderO.h \
 			libminisip/signaling/sdp/SdpPacket.h \
