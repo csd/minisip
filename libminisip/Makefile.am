@@ -105,7 +105,12 @@ endif
 libmsrp_src = 
 if MSRP_SUPPORT
 libmsrp_src = source/subsystem_media/msrp/MSRPMessage.cxx \
- 			source/subsystem_media/msrp/MSRPMessage.h 
+ 		source/subsystem_media/msrp/MSRPMessage.h \
+		source/subsystem_signaling/sip/SipDialogFileTransferClient.cxx \
+		source/subsystem_signaling/sip/SipDialogFileTransferClient.h \
+		source/subsystem_signaling/sip/SipDialogFileTransferServer.cxx \
+		source/subsystem_signaling/sip/SipDialogFileTransferServer.h
+
 endif
 
 
@@ -155,10 +160,6 @@ libsip_src = source/subsystem_signaling/sip/SipDialogVoip.cxx \
 		source/subsystem_signaling/sip/SipDialogConfVoip.cxx \
 		source/subsystem_signaling/sip/SipDialogPresenceClient.cxx \
 		source/subsystem_signaling/sip/SipDialogPresenceServer.cxx \
-		source/subsystem_signaling/sip/SipDialogFileTransferClient.cxx \
-		source/subsystem_signaling/sip/SipDialogFileTransferClient.h \
-		source/subsystem_signaling/sip/SipDialogFileTransferServer.cxx \
-		source/subsystem_signaling/sip/SipDialogFileTransferServer.h \
 		source/subsystem_signaling/sip/SipSoftPhoneConfiguration.cxx \
 		source/subsystem_signaling/sip/DefaultDialogHandler.cxx \
 		source/subsystem_signaling/sip/PresenceMessageContent.cxx \
