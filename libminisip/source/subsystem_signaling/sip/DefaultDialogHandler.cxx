@@ -47,8 +47,6 @@
 #include<libminisip/signaling/sip/SipDialogConfVoip.h>
 #include<libminisip/signaling/sip/SipDialogPresenceClient.h>
 #include<libminisip/signaling/sip/SipDialogPresenceServer.h>
-#include"SipDialogFileTransferClient.h"
-#include"SipDialogFileTransferServer.h"
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef _WIN32_WCE
@@ -59,6 +57,12 @@
 #	include<libminisip/signaling/p2t/P2T.h>
 #	include<libminisip/signaling/p2t/SipDialogP2Tuser.h>
 #endif
+
+#ifdef MSRP_SUPPORT
+#include"SipDialogFileTransferClient.h"
+#include"SipDialogFileTransferServer.h"
+#endif
+
 
 #include<libminisip/media/MediaHandler.h>
 
@@ -227,6 +231,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
 			mdbg("signaling/sip") << cmd << endl;
 		}else{
+#ifdef MSRP_SUPPORT
 			//...extract something you need for the test...
 			if  (/*invite contains file transfer session*/ true){
 
@@ -237,7 +242,9 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 				sipStack->addDialog( ftransf );
 				SipSMCommand cmd(pkt, SipSMCommand::transaction_layer, SipSMCommand::dialog_layer);
 				sipStack->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
-			}else{
+			}else
+#endif
+			{
 				MRef<SipIdentity *> id = lookupTarget(inv->getUri());
 
 				// get a session from the mediaHandler
@@ -342,7 +349,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 		return true;
 	}
 
-
+#ifdef MSRP_SUPPORT
 	if (cmdstr.getOp() == "start_filetransfer"){
 		cerr << "DefaultDialogHandler: Creating SipDialogFileTransferClient for start_filetransfer_client command"<< endl;
 		
@@ -359,6 +366,7 @@ bool DefaultDialogHandler::handleCommandString( CommandString &cmdstr){
 
 		return true;
 	}
+#endif
 
 	
 	if (cmdstr.getOp() == SipCommandString::start_presence_server){
