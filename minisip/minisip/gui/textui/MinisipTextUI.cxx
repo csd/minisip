@@ -56,6 +56,8 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 	addCommand("enable autoanswer");
 	addCommand("enable debugmsgs");
 	addCommand("disable debugmsgs");
+	addCommand("send"); //sends a file. Give file name as argument
+	addCommand("receive"); //accepts incoming files
 	addCommand("hangup");
 	addCommand("hide packets");
 	addCommand("register");
@@ -168,6 +170,27 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		handled=true;
 		displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
 	}
+
+	if (cmd.getOp()=="file_transfer_done"){
+		handled=true;
+		state="IDLE";
+		setPrompt(state);
+		displayMessage("File transfer done.",red);
+		callId=""; //FIXME: should check the callId of cmd.
+		inCall=false;
+	}
+
+	if (cmd.getOp()=="incoming_filetransfer_accept"){
+		handled=true;
+		if(state=="IDLE"){
+			state="RECEIVE?";
+			setPrompt(state);
+			callId=cmd.getDestinationId();
+			displayMessage("The file transfer from "+cmd.getParam(), blue);
+		}
+	}
+
+
 
 	if (cmd.getOp()=="register_sent"){
 		handled=true; // we don't need to inform the user
@@ -726,6 +749,35 @@ void MinisipTextUI::guiExecute(string cmd){
 		
 
 	}
+
+	if (command == "receive"){
+		CommandString c(callId, "accept_file_transfer");
+		sendCommand("sip", c);
+		displayMessage("Sent accept files command");
+		handled=true;
+                inCall = true;
+		state="RECEIVEING";
+	}
+
+
+
+	if (command.substr(0,4) == "send"){
+		string param = trim(command.substr(5));
+		vector<string> params = split(param, true, ' ');
+		if (params.size()<2){
+			displayMessage("Syntax: send <uri> <file1> [<file2> ...] ");
+		}else{
+			string uri=params[0];
+			CommandString command(callId, "start_filetransfer", uri);
+			for (int f=1; f< params.size(); f++)
+				command["filename"+itoa(f-1)]= params[f];
+			sendCommand("sip", command);
+			displayMessage("Starting file transfer...");
+		}
+		handled=true;
+	}
+
+
 	if (command == "join"){
 		CommandString command(callId, SipCommandString::accept_invite, currentcaller);
 		command.setParam3(currentconfname);
