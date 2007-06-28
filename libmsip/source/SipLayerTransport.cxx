@@ -555,18 +555,14 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 	int32_t port = uri.getPort();
 
 	if( addr.size()>0 ){
-		// TODO: Check if numeric
-#if 0
-		if( isNumericAddr( addr ) ){
+		if( IPAddress::isNumeric( addr ) ){
 			if( !port ){
 				port = getDefaultPort( transport );
 				res = true;
 			}
 		}
 		// Not numeric	
-		else
-#endif
-		if( port ){
+		else if( port ){
 			// Lookup A or AAAA
 			res = true;
 		}

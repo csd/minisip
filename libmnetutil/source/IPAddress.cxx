@@ -31,6 +31,18 @@
 #endif
 #include<libmnetutil/NetworkException.h>
 
+#ifdef WIN32
+# include<winsock2.h>
+# include<ws2tcpip.h>
+#elif defined HAVE_NETDB_H
+# include<sys/types.h>
+# include<sys/socket.h>
+# include<arpa/inet.h>
+#endif
+#ifndef HAVE_INET_PTON
+# include<inet_pton.h>
+#endif
+
 using namespace std;
 
 IPAddress::~IPAddress(){
@@ -94,4 +106,15 @@ MRef<IPAddress *> IPAddress::create(const std::string &addr, bool use_ipv6){
 	}
 
 	return NULL;
+}
+
+bool IPAddress::isNumeric(const string &addr){
+	char tmp[sizeof(struct in6_addr)];
+
+	if( (inet_pton(AF_INET, addr.c_str(), &tmp) > 0) ||
+	    (inet_pton(AF_INET6, addr.c_str(), &tmp) > 0) ){
+		return true;
+	}
+
+	return false;
 }
