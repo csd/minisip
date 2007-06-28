@@ -118,7 +118,7 @@ bool Mikey::responderAuthenticate( const string &message,
 				secured = true;
 				setState( STATE_AUTHENTICATED );
 			}
-			catch( certificate_exception &e ){
+			catch( CertificateException &e ){
 				// TODO: Tell the GUI
 				merr << "Could not open certificate " << e.what() << endl;
 				setState( STATE_ERROR );
@@ -189,7 +189,7 @@ string Mikey::responderParse(){
 		ts.save( MIKEY_PARSE_END );
 #endif
 	}
-	catch( certificate_exception &e ){
+	catch( CertificateException &e ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate " << e.what() << endl;
 		setState( STATE_ERROR );
@@ -244,7 +244,7 @@ string Mikey::initiatorCreate( int type, const string &peerUri ){
 		string b64Message = message->b64Message();
 		return "mikey "+b64Message;
 	}
-	catch( certificate_exception &e ){
+	catch( CertificateException &e ){
 		// FIXME: tell the GUI
 		merr << "Could not open certificate " << e.what() << endl;
 		setState( STATE_ERROR );
@@ -358,7 +358,7 @@ string Mikey::initiatorParse(){
 #endif
 
 	}
-	catch( certificate_exception &e ){
+	catch( CertificateException &e ){
 		// TODO: Tell the GUI
 		merr << "Could not open certificate " << e.what() << endl;
 		setState( STATE_ERROR );
@@ -468,11 +468,11 @@ void Mikey::createKeyAgreement( int type )
 	}
 
 	MRef<SipSim*> sim = config->getSim();
-	MRef<certificate_chain*> cert_chain =
+	MRef<CertificateChain*> cert_chain =
 		sim->getCertificateChain();
-	MRef<certificate_chain*> peer_chain;
+	MRef<CertificateChain*> peer_chain;
 // 		config->getPeerCertificate();
-	MRef<ca_db*> cert_db =
+	MRef<CertificateSet*> cert_db =
 		sim->getCAs();
 	const byte_t* psk = config->getPsk();
 	size_t psk_len = config->getPskLength();

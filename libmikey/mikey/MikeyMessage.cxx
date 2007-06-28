@@ -394,7 +394,7 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim,
 }
 
 
-void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert,
+void MikeyPayloads::addSignaturePayload( MRef<Certificate *> cert,
 					 bool addIdsAndT ){
 	byte_t signature[4096];
 	int signatureLength = 128;
@@ -416,14 +416,14 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert,
 	//1024, we have to re-do the signature calculation with the correct
 	//length.
 	//
-	//Double-signatures would be avoided if the certificate had a 
+	//Double-signatures would be avoided if the Certificate had a 
 	//method to find out the length of the signature.
 	
 	addPayload( ( sign = new MikeyPayloadSIGN(GUESSED_SIGNATURE_LENGTH, MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS ) ) );
 
 	signData = buildSignData( GUESSED_SIGNATURE_LENGTH, addIdsAndT );
 
-	if (cert->sign_data( &signData.front(), signData.size(),
+	if (cert->signData( &signData.front(), signData.size(),
 			 signature, &signatureLength )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
@@ -434,7 +434,7 @@ void MikeyPayloads::addSignaturePayload( MRef<certificate *> cert,
 		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
 		signData = buildSignData( signatureLength, addIdsAndT );
 
-		cert->sign_data( &signData.front(), signData.size(),
+		cert->signData( &signData.front(), signData.size(),
 				 signature, &signatureLength );
 	}
 
@@ -862,31 +862,31 @@ bool MikeyPayloads::deriveTranspKeys( KeyAgreementPSK* ka,
 	return !error;
 }
 
-void MikeyPayloads::addCertificatePayloads( MRef<certificate_chain *> certChain ){
+void MikeyPayloads::addCertificatePayloads( MRef<CertificateChain *> certChain ){
 	if( certChain.isNull() ){
-		cerr << "No certificates" << endl;
+		cerr << "No Certificates" << endl;
 		return;
 	}
 
 	certChain->lock();
-	certChain->init_index();
-	MRef<certificate*> cert = certChain->get_next();
+	certChain->initIndex();
+	MRef<Certificate*> cert = certChain->getNext();
 	while( ! cert.isNull() ){
 		MRef<MikeyPayload*> payload =
 			new MikeyPayloadCERT( MIKEYPAYLOAD_CERT_TYPE_X509V3SIGN,
 					      cert);
 		addPayload( payload );
-		cert = certChain->get_next();
+		cert = certChain->getNext();
 	}
 
 	certChain->unlock();
 }
 
 
-MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
-	MRef<certificate_chain *> peerChain;
+MRef<CertificateChain*> MikeyPayloads::extractCertificateChain() const{
+	MRef<CertificateChain *> peerChain;
 
-	/* Try to find the certificate chain in the message */
+	/* Try to find the Certificate chain in the message */
 	list<MRef<MikeyPayload*> >::const_iterator i;
 	list<MRef<MikeyPayload*> >::const_iterator last = lastPayload();
 
@@ -898,23 +898,23 @@ MRef<certificate_chain*> MikeyPayloads::extractCertificateChain() const{
 
 		MikeyPayloadCERT * certPayload =
 			dynamic_cast<MikeyPayloadCERT*>(*payload);
-		MRef<certificate*> peerCert = 
-			certificate::load( certPayload->certData(),
+		MRef<Certificate*> peerCert = 
+			Certificate::load( certPayload->certData(),
 					   certPayload->certLength() );
 
 		if( peerChain.isNull() ){
-			peerChain = certificate_chain::create();
+			peerChain = CertificateChain::create();
 		}
 
-// 		cerr << "Add certificate: " << peerCert->get_name() << endl;
+// 		cerr << "Add Certificate: " << peerCert->get_name() << endl;
 
-		peerChain->add_certificate( peerCert );
+		peerChain->addCertificate( peerCert );
 	}
 
 	return peerChain;
 }
 
-bool MikeyPayloads::verifySignature( MRef<certificate*> cert,
+bool MikeyPayloads::verifySignature( MRef<Certificate*> cert,
 				     bool addIdsAndT ){
 	MRef<MikeyPayload*> payload =
 		extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
@@ -928,7 +928,7 @@ bool MikeyPayloads::verifySignature( MRef<certificate*> cert,
 
 	signData = buildSignData( sig->sigLength(), addIdsAndT );
 
-	int res = cert->verif_sign( &signData.front(), signData.size(),
+	int res = cert->verifSign( &signData.front(), signData.size(),
 				    sig->sigData(),
 				    sig->sigLength() );
 	return res > 0;
@@ -1089,14 +1089,14 @@ void MikeyPayloads::addPkeKemac( KeyAgreementPKE* ka,
 	rawKeyData = NULL;
 
 	//adding PKE payload
-	MRef<certificate*> certResponder =
-		ka->peerCertificateChain()->get_first();
+	MRef<Certificate*> certResponder =
+		ka->peerCertificateChain()->getFirst();
 
 	byte_t* env_key = ka->getEnvelopeKey();
 	int encEnvKeyLength = 8192; // TODO autodetect?
 	unsigned char* encEnvKey = new unsigned char[ encEnvKeyLength ];
 
-	if( !certResponder->public_encrypt( env_key, ka->getEnvelopeKeyLength(),
+	if( !certResponder->publicEncrypt( env_key, ka->getEnvelopeKeyLength(),
 					    encEnvKey, &encEnvKeyLength ) ){
 		throw MikeyException( "PKE encryption of envelope key failed" );
 	}
@@ -1121,11 +1121,11 @@ bool MikeyPayloads::extractPkeEnvKey( KeyAgreementPKE* ka ) const{
 		throw MikeyException( "PKE init did not contain PKE payload" );
 	}
 
-	MRef<certificate*> cert = ka->certificateChain()->get_first();
+	MRef<Certificate*> cert = ka->certificateChain()->getFirst();
 	int envKeyLength = pke->dataLength();
 	byte_t *envKey = new byte_t[ envKeyLength ];
 		
-	if( !cert->private_decrypt( pke->data(), pke->dataLength(),
+	if( !cert->privateDecrypt( pke->data(), pke->dataLength(),
 				    envKey, &envKeyLength ) ){
 		throw MikeyException( "Decryption of envelope key failed" );
 	}

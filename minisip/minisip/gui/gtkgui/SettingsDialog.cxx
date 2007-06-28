@@ -610,8 +610,8 @@ void SecuritySettings::reset(){
 
 	secureCheck->set_active( false );
 
-	MRef<ca_db*> caDb = ca_db::create();
-	MRef<certificate_chain*> certChain = certificate_chain::create();
+	MRef<CertificateSet*> caDb = CertificateSet::create();
+	MRef<CertificateChain*> certChain = CertificateChain::create();
 
 	certDialog->setRootCa( caDb );
 	certDialog->setCertChain( certChain );
@@ -652,10 +652,10 @@ void SecuritySettings::setConfig( MRef<SipIdentity *> theIdentity ){
 
 	secureCheck->set_active( identity->securityEnabled );
 
-	MRef<ca_db*> caDb =
+	MRef<CertificateSet*> caDb =
 		identity->getSim()->getCAs()->clone();
 
-	MRef<certificate_chain*> certChain = 
+	MRef<CertificateChain*> certChain = 
 		identity->getSim()->getCertificateChain()->clone();
 
 	certDialog->setRootCa( caDb );
@@ -721,14 +721,14 @@ string SecuritySettings::apply(){
 	string err;
 	if( dhCheck->get_active() ){
 		identity->getSim()->getCertificateChain()->lock();
-		if( identity->getSim()->getCertificateChain()->is_empty() ){
+		if( identity->getSim()->getCertificateChain()->isEmpty() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a certificate file.\n"
 		       "The D-H key agreement has been disabled.";
 			dhCheck->set_active( false );
 		}
 		
-		else if( !identity->getSim()->getCertificateChain()->get_first()->has_pk() ){
+		else if( !identity->getSim()->getCertificateChain()->getFirst()->hasPk() ){
 			err += "You have selected the Diffie-Hellman key agreement\n"
 		       "but have not selected a private key file.\n"
 		       "The D-H key agreement has been disabled.";

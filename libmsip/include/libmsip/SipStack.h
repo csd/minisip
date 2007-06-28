@@ -183,12 +183,12 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		/**
 		 * The certificate chain is used by TLS
 		 */
-		MRef<certificate_chain *> cert;
+		MRef<CertificateChain *> cert;
 
 		/**
 		* TODO: TLS should use the whole chain instead of only the first certificate --EE
 		*/
-		MRef<ca_db *> cert_db;
+		MRef<CertificateSet *> cert_db;
 
 		/**
 		 * "sip.instance" media feature tag in the Contact

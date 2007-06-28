@@ -34,8 +34,8 @@
 class LIBMIKEY_API KeyAgreementRSAR : public KeyAgreementPKE{
 	public:
 	
-		KeyAgreementRSAR( MRef<certificate_chain *> cert, 
-				  MRef<ca_db *> ca_db );
+		KeyAgreementRSAR( MRef<CertificateChain *> cert, 
+				  MRef<CertificateSet *> CertificateSet );
 	    
 		/**
 		 * Destructor deletes some objects to prevent memory leaks

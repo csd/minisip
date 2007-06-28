@@ -417,7 +417,7 @@ MRef<SipSocketServer *> SipStackInternal::createTlsServer( bool ipv6, const stri
 	MRef<SipSocketServer *> server;
 	int32_t port = config->localTlsPort;
 
-	sock = TLSServerSocket::create( ipv6, port, config->cert->get_first(),
+	sock = TLSServerSocket::create( ipv6, port, config->cert->getFirst(),
 					config->cert_db );
 	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
 	server->setExternalIp( ipString );
@@ -465,7 +465,7 @@ void SipStackInternal::startTcpServer()
 void SipStackInternal::startTlsServer(){
 	MRef<SipSocketServer *> server;
 
-	if( config->cert->get_first().isNull() ){
+	if( config->cert->getFirst().isNull() ){
 		merr << "You need a personal certificate to run "
 			"a TLS server. Please specify one in "
 			"the certificate settings. minisip will "

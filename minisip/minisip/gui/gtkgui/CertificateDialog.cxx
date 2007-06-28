@@ -99,7 +99,7 @@ void CertificateDialog::run(){
 
 void CertificateDialog::chooseCert(){
 	string result;
-	MRef<certificate *> chosenCert;
+	MRef<Certificate *> chosenCert;
 #ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
 			"Choose your certificate file" );
@@ -116,9 +116,9 @@ void CertificateDialog::chooseCert(){
 		result = dialog->get_filename();
 
 		try{
-			chosenCert = certificate::load( result );
+			chosenCert = Certificate::load( result );
 		}
-		catch( certificate_exception & exc ){
+		catch( CertificateException & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that certificate file. "
 			"Please check that the file is a correct "
@@ -136,7 +136,7 @@ void CertificateDialog::chooseCert(){
 
 		certChain->lock();
 		certChain->clear();
-		certChain->add_certificate( chosenCert );
+		certChain->addCertificate( chosenCert );
 		certChain->unlock();
 		
 		/* Update the tree consequently */
@@ -174,9 +174,9 @@ void CertificateDialog::choosePKey(){
 		result = dialog->get_filename();
 
 		try{
-			cert->set_pk( result );
+			cert->setPk( result );
 		}
-		catch( certificate_exception_pkey & exc ){
+		catch( CertificateExceptionPkey & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"The private key file you selected does not. "
 			"match the selected certificate ",
@@ -186,7 +186,7 @@ void CertificateDialog::choosePKey(){
 			delete dialog;
 			return;
 		}
-		catch( certificate_exception & exc ){
+		catch( CertificateException & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
@@ -210,7 +210,7 @@ void CertificateDialog::choosePKey(){
 
 void CertificateDialog::addCert(){
 	string result;
-	MRef<certificate *> chosenCert;
+	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
@@ -228,13 +228,13 @@ void CertificateDialog::addCert(){
 		result = dialog->get_filename();
 
 		try{
-			chosenCert = certificate::load( result );
+			chosenCert = Certificate::load( result );
 
 			certChain->lock();
-			certChain->add_certificate( chosenCert );
+			certChain->addCertificate( chosenCert );
 			certChain->unlock();
 		}
-		catch( certificate_exception_chain & exc ){
+		catch( CertificateExceptionChain & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"The selected certificate is not "
 			"assigned to the issuer of the previous "
@@ -246,7 +246,7 @@ void CertificateDialog::addCert(){
 			delete dialog;
 			return;
 		}
-		catch( certificate_exception & exc ){
+		catch( CertificateException & exc ){
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
@@ -270,11 +270,11 @@ void CertificateDialog::removeCert(){
 	
 	/* update the internal chain */
 	certChain->lock();
-	certChain->remove_last();
+	certChain->removeLast();
 	certChain->unlock();
 
 	/* update the GUI */
-	if( certChain->is_empty() ){
+	if( certChain->isEmpty() ){
 		pkeyButton->set_sensitive( false );
 		certTreeView->set_sensitive( false );
 		addCertButton->set_sensitive( false );
@@ -289,7 +289,7 @@ void CertificateDialog::removeCert(){
 
 void CertificateDialog::addFileCa(){
 	string result;
-	MRef<certificate *> chosenCert;
+	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
@@ -309,10 +309,10 @@ void CertificateDialog::addFileCa(){
 		try{
 			/* Update the internal DB */
 			caDb->lock();
-			caDb->add_file( result );
+			caDb->addFile( result );
 			caDb->unlock();
 		}
-		catch( certificate_exception & exc ){
+		catch( CertificateException & exc ){
 			caDb->unlock();
 			Gtk::MessageDialog messageDialog( 
 			"Minisip could not open that file. "
@@ -326,7 +326,7 @@ void CertificateDialog::addFileCa(){
 		}
 
 		/* Update the GUI */
-		MRef<ca_db_item*> item = new ca_db_item();
+		MRef<CertificateSetItem*> item = new CertificateSetItem();
 		item->type = CERT_DB_ITEM_TYPE_FILE;
 		item->item = result;
 		caListStore->addCaItem( item );
@@ -337,7 +337,7 @@ void CertificateDialog::addFileCa(){
 
 void CertificateDialog::addDirCa(){
 	string result;
-	MRef<certificate *> chosenCert;
+	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
 	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
@@ -363,11 +363,11 @@ void CertificateDialog::addDirCa(){
 
 		/* Update CA internal db */
 		caDb->lock();
-		caDb->add_directory( result );
+		caDb->addDirectory( result );
 		caDb->unlock();
 
 		/* Update the GUI */
-		MRef<ca_db_item*> item = new ca_db_item();
+		MRef<CertificateSetItem*> item = new CertificateSetItem();
 		item->type = CERT_DB_ITEM_TYPE_DIR;
 		item->item = result;
 		caListStore->addCaItem( item );
@@ -377,7 +377,7 @@ void CertificateDialog::addDirCa(){
 }
 
 void CertificateDialog::removeCa(){
-	MRef<ca_db_item*> removed;
+	MRef<CertificateSetItem*> removed;
 	 Glib::RefPtr<Gtk::TreeSelection> selection;
 	
 	selection = caTreeView->get_selection();
@@ -395,25 +395,25 @@ void CertificateDialog::removeCa(){
 	
 }
 
-void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
+void CertificateDialog::setCertChain( MRef<CertificateChain *> chain ){
 	certChain = chain;
 	certTreeStore->clear();
-	MRef<certificate *> item;
+	MRef<Certificate *> item;
 
 	if( chain.isNull() ){
 		return;
 	}
 
 
-	item = chain->get_first();
+	item = chain->getFirst();
         if( !item.isNull() ){
                 cert = item;
 		certTreeView->set_sensitive( true );
                 addCertButton->set_sensitive( true );
                 removeCertButton->set_sensitive( true );
                 pkeyButton->set_sensitive( true );
-                certLabel->set_text( cert->get_file() );
-                pkeyLabel->set_text( cert->get_pk_file() );
+                certLabel->set_text( cert->getFile() );
+                pkeyLabel->set_text( cert->getPkFile() );
         }
 	else{
 		certTreeView->set_sensitive( false );
@@ -428,11 +428,11 @@ void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 
 	chain->lock();
 
-	item = chain->get_next();
+	item = chain->getNext();
         while( !item.isNull() ){
 
 		certTreeStore->addCertificate( item );
-		item = chain->get_next();
+		item = chain->getNext();
         }
         chain->unlock();
 
@@ -441,10 +441,10 @@ void CertificateDialog::setCertChain( MRef<certificate_chain *> chain ){
 }
 
                 
-void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
+void CertificateDialog::setRootCa( MRef<CertificateSet *> caDb ){
 
 
-	MRef<ca_db_item*> item = NULL;
+	MRef<CertificateSetItem*> item = NULL;
 
         this->caDb = caDb;
 	caListStore->clear();
@@ -453,21 +453,21 @@ void CertificateDialog::setRootCa( MRef<ca_db *> caDb ){
         }
 
         caDb->lock();
-        caDb->init_index();
-        item = caDb->get_next();
+        caDb->initIndex();
+        item = caDb->getNext();
 
         while( item ){
 		caListStore->addCaItem( item );
-                item = caDb->get_next();
+                item = caDb->getNext();
         }
         caDb->unlock();
 }
 
-MRef<certificate_chain*> CertificateDialog::getCertChain() const{
+MRef<CertificateChain*> CertificateDialog::getCertChain() const{
 	return certChain;
 }
 
-MRef<ca_db*> CertificateDialog::getRootCa() const{
+MRef<CertificateSet*> CertificateDialog::getRootCa() const{
 	return caDb;
 }
 
@@ -478,7 +478,7 @@ CertTreeStore::CertTreeStore(){
 	treeStore = Gtk::TreeStore::create( certColumns );
 }
 
-void CertTreeStore::addCertificate( MRef<certificate *> cert ){
+void CertTreeStore::addCertificate( MRef<Certificate *> cert ){
 	if( isEmpty() ){
 		lastElement = treeStore->append();
 	}
@@ -487,8 +487,8 @@ void CertTreeStore::addCertificate( MRef<certificate *> cert ){
 		lastElement = treeStore->append( (*lastElement).children() );
 	}
 
-	(*lastElement)[ commonNameColumn ] = cert->get_cn();
-	(*lastElement)[ issuerColumn ] = cert->get_issuer_cn();
+	(*lastElement)[ commonNameColumn ] = cert->getCn();
+	(*lastElement)[ issuerColumn ] = cert->getIssuerCn();
 }
 
 void CertTreeStore::associateTreeView( Gtk::TreeView * treeView ){
@@ -522,7 +522,7 @@ CaListStore::CaListStore(){
 	listStore = Gtk::ListStore::create( caColumns );
 }
 
-void CaListStore::addCaItem( MRef<ca_db_item*> caItem ){
+void CaListStore::addCaItem( MRef<CertificateSetItem*> caItem ){
 		
 	Gtk::TreeModel::iterator iter = listStore->append();
 
@@ -552,8 +552,8 @@ bool CaListStore::isEmpty(){
 	return listStore->children().empty();
 }
 
-MRef<ca_db_item*> CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
-	ca_db_item * ret = new ca_db_item;
+MRef<CertificateSetItem*> CaListStore::remove( Gtk::TreeModel::iterator selectedItem ){
+	CertificateSetItem * ret = new CertificateSetItem;
 
 
 	if( (*selectedItem)[typeColumn] == "file"  ){

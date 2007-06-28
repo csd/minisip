@@ -19,14 +19,14 @@ class LIBMIKEY_API KeyAgreementPKE : public KeyAgreementPSK,
 		/**
 		 * Initiator
 		 */
-		KeyAgreementPKE( MRef<certificate_chain*> cert,
-				 MRef<certificate_chain*> peerCert );
+		KeyAgreementPKE( MRef<CertificateChain*> cert,
+				 MRef<CertificateChain*> peerCert );
 
 		/**
 		 * Responder
 		 */
-		KeyAgreementPKE( MRef<certificate_chain *> cert, 
-				 MRef<ca_db *> ca_db );
+		KeyAgreementPKE( MRef<CertificateChain *> cert, 
+				 MRef<CertificateSet *> ca_db );
 
 	    /**
 	     * Destructor deletes some objects to prevent memory leaks

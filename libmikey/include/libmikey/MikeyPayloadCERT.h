@@ -41,13 +41,13 @@
  * @author Erik Eliasson, Johan Bilien
 */
 
-class certificate;
-class certificate_db;
+class Certificate;
+class CertificateSet;
 
 class LIBMIKEY_API MikeyPayloadCERT : public MikeyPayload{
 	public:
 	
-		MikeyPayloadCERT( int type, MRef<certificate *> cert );
+		MikeyPayloadCERT( int type, MRef<Certificate *> cert );
 		MikeyPayloadCERT( int type, int length, byte_t *data );
 		MikeyPayloadCERT( byte_t * start, int lengthLimit );
 		~MikeyPayloadCERT();

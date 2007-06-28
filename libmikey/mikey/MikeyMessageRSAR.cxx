@@ -91,7 +91,7 @@ MikeyMessageRSAR::MikeyMessageRSAR( KeyAgreementRSAR* ka ){
 	}
 
 	// Add signature (T)
-	addSignaturePayload( ka->certificateChain()->get_first() );
+	addSignaturePayload( ka->certificateChain()->getFirst() );
 }
 
 void MikeyMessageRSAR::setOffer(KeyAgreement* kaBase){
@@ -229,7 +229,7 @@ MRef<MikeyMessage*> MikeyMessageRSAR::buildResponse(KeyAgreement* kaBase){
 
 	result->addPkeKemac( ka, encrAlg, macAlg );
 
-	result->addSignaturePayload( ka->certificateChain()->get_first(),
+	result->addSignaturePayload( ka->certificateChain()->getFirst(),
 // 				     false );
 				     true );
 
@@ -476,8 +476,8 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 		}
 
 		// Fetch peer certificate chain
-		MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
-		if( peerChain.isNull() || peerChain->get_first().isNull() ){
+		MRef<CertificateChain *> peerChain = ka->peerCertificateChain();
+		if( peerChain.isNull() || peerChain->getFirst().isNull() ){
 			peerChain = extractCertificateChain();
 
 			if( peerChain.isNull() ){
@@ -488,7 +488,7 @@ bool MikeyMessageRSAR::authenticate(KeyAgreement* kaBase){
 			ka->setPeerCertificateChain( peerChain );
 		}
 
- 		if( !verifySignature( peerChain->get_first(),
+ 		if( !verifySignature( peerChain->getFirst(),
 				      isResponderMessage() ) ){
 			cout << "Verification of the RSAR init message SIGN payload failed!"  << endl;
 			cout << "Keypair of the initiator probably mismatch!" << endl;

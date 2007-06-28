@@ -108,8 +108,8 @@ AccountDialog::~AccountDialog(){
 void AccountDialog::addAccount(){
 	reset();
 	MRef<SipIdentity*> identity = new SipIdentity;
-	MRef<ca_db*> ca = ca_db::create();
-	MRef<certificate_chain*> cert = certificate_chain::create();
+	MRef<CertificateSet*> ca = CertificateSet::create();
+	MRef<CertificateChain*> cert = CertificateChain::create();
 	MRef<SipSim*> sim =
 		new SipSimSoft( cert, ca );
 	identity->setSim( sim );

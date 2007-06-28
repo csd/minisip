@@ -50,8 +50,8 @@ class StreamThreadServer;
 
 class SipLayerTransport : public SipSMCommandReceiver {
 	public:
-		SipLayerTransport( MRef<certificate_chain *> cchain=NULL,
-				   MRef<ca_db *> cert_db = NULL
+		SipLayerTransport( MRef<CertificateChain *> cchain=NULL,
+				   MRef<CertificateSet *> cert_db = NULL
 		);
 
 		virtual ~SipLayerTransport();
@@ -73,9 +73,9 @@ class SipLayerTransport : public SipSMCommandReceiver {
 
 		void addServer(MRef<SipSocketServer *> server);
 
-		MRef<certificate_chain *> getCertificateChain();
-		MRef<certificate*> getMyCertificate();
-		MRef<ca_db *> getCA_db ();
+		MRef<CertificateChain *> getCertificateChain();
+		MRef<Certificate*> getMyCertificate();
+		MRef<CertificateSet *> getCertificateSet ();
 
 		void datagramSocketRead(MRef<DatagramSocket *> sock);
 
@@ -129,8 +129,8 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		std::list<MRef<SipSocketServer *> > servers;
 		MRef<SocketServer*> manager;
 
-		MRef<certificate_chain *> cert_chain;
-		MRef<ca_db *> cert_db;
+		MRef<CertificateChain *> cert_chain;
+		MRef<CertificateSet *> cert_db;
 		void * tls_ctx;
 
 		MRef<SipCommandDispatcher*> dispatcher;

@@ -40,13 +40,13 @@ MikeyPayloadCERT::MikeyPayloadCERT( int type, int length, byte_t * data ){
 
 }
 
-MikeyPayloadCERT::MikeyPayloadCERT( int type, MRef<certificate *> cert ){
+MikeyPayloadCERT::MikeyPayloadCERT( int type, MRef<Certificate *> cert ){
 	this->payloadTypeValue = MIKEYPAYLOAD_CERT_PAYLOAD_TYPE;
 	this->type = type;
-	this->certLengthValue = cert->get_der_length();
+	this->certLengthValue = cert->getDerLength();
 	this->certDataPtr = new byte_t[ certLengthValue ];
 	size_t size = certLengthValue;
-	cert->get_der( this->certDataPtr, &size );
+	cert->getDer( this->certDataPtr, &size );
 }
 
 MikeyPayloadCERT::MikeyPayloadCERT( byte_t *start, int lengthLimit ):

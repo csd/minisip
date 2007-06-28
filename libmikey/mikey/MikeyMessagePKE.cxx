@@ -57,9 +57,9 @@ MikeyMessagePKE::MikeyMessagePKE( KeyAgreementPKE* ka, int encrAlg, int macAlg )
 	MikeyPayloadT* tPayload;
 	MikeyPayloadRAND* randPayload;
 
-	MRef<certificate_chain*> peerChain =
+	MRef<CertificateChain*> peerChain =
 		ka->peerCertificateChain();
-	if( !peerChain || !peerChain->get_first() ){
+	if( !peerChain || !peerChain->getFirst() ){
 		throw MikeyException( "PKE requires peer certificate" );
 	}
 
@@ -90,7 +90,7 @@ MikeyMessagePKE::MikeyMessagePKE( KeyAgreementPKE* ka, int encrAlg, int macAlg )
 	// Derive the transport keys from the env_key:
 	addPkeKemac( ka, encrAlg, macAlg );
 
-	addSignaturePayload( ka->certificateChain()->get_first() );
+	addSignaturePayload( ka->certificateChain()->getFirst() );
 }
 
 void MikeyMessagePKE::setOffer(KeyAgreement* kaBase){
@@ -411,8 +411,8 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 		}
 
 		// Fetch peer certificate chain
-		MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
-		if( peerChain.isNull() || peerChain->get_first().isNull() ){
+		MRef<CertificateChain *> peerChain = ka->peerCertificateChain();
+		if( peerChain.isNull() || peerChain->getFirst().isNull() ){
 			peerChain = extractCertificateChain();
 
 			if( peerChain.isNull() ){
@@ -423,7 +423,7 @@ bool MikeyMessagePKE::authenticate(KeyAgreement* kaBase){
 			ka->setPeerCertificateChain( peerChain );
 		}
 
- 		if( !verifySignature( peerChain->get_first() ) ){
+ 		if( !verifySignature( peerChain->getFirst() ) ){
 			cout << "Verification of the PKE init message SIGN payload failed!"  << endl;
 			cout << "Keypair of the initiator probably mismatch!" << endl;
 			return true;

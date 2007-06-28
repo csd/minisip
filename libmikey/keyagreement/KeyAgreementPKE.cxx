@@ -7,8 +7,8 @@
 
 using namespace std;
 
-KeyAgreementPKE::KeyAgreementPKE( MRef<certificate_chain*> cert,
-				  MRef<certificate_chain*> peerCert )
+KeyAgreementPKE::KeyAgreementPKE( MRef<CertificateChain*> cert,
+				  MRef<CertificateChain*> peerCert )
 		:KeyAgreementPSK(),
 		 PeerCertificates(cert, peerCert){
 	// TODO autodetect length from RSA size
@@ -23,8 +23,8 @@ KeyAgreementPKE::KeyAgreementPKE( MRef<certificate_chain*> cert,
 	setV(1);
 }
 
-KeyAgreementPKE::KeyAgreementPKE( MRef<certificate_chain *> cert, 
-				  MRef<ca_db *> ca_db )
+KeyAgreementPKE::KeyAgreementPKE( MRef<CertificateChain *> cert, 
+				  MRef<CertificateSet *> ca_db)
 		:KeyAgreementPSK(),
 		 PeerCertificates(cert, ca_db){
 

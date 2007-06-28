@@ -36,26 +36,26 @@
 
 
 class OakleyDH;
-class certificate_chain;
+class CertificateChain;
 class certificate;
-class ca_db;
+class CertificateSet;
 
 class LIBMIKEY_API PeerCertificates {
 	public:
-		PeerCertificates( MRef<certificate_chain*> aCert,
-				  MRef<ca_db *> aCaDb );
-		PeerCertificates( MRef<certificate_chain*> aCert,
-				  MRef<certificate_chain*> aPeerCert );
+		PeerCertificates( MRef<CertificateChain*> aCert,
+				  MRef<CertificateSet *> aCaDb );
+		PeerCertificates( MRef<CertificateChain*> aCert,
+				  MRef<CertificateChain*> aPeerCert );
 		virtual ~PeerCertificates();
-		virtual MRef<certificate_chain *> certificateChain();
-		virtual MRef<certificate_chain *> peerCertificateChain();
-		virtual void setPeerCertificateChain( MRef<certificate_chain *> chain );
+		virtual MRef<CertificateChain *> certificateChain();
+		virtual MRef<CertificateChain *> peerCertificateChain();
+		virtual void setPeerCertificateChain( MRef<CertificateChain *> chain );
 		virtual int controlPeerCertificate( const std::string &peerUri );
 
 	private:
-		MRef<certificate_chain *> certChainPtr;
-		MRef<certificate_chain *> peerCertChainPtr;
-		MRef<ca_db *> certDbPtr;
+		MRef<CertificateChain *> certChainPtr;
+		MRef<CertificateChain *> peerCertChainPtr;
+		MRef<CertificateSet *> certDbPtr;
 };
 
 class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
@@ -87,8 +87,8 @@ class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
 				    public KeyAgreementDHBase,
 				    public PeerCertificates{
 	public:
-		KeyAgreementDH( MRef<certificate_chain *> cert, 
-				MRef<ca_db *> ca_db );
+		KeyAgreementDH( MRef<CertificateChain *> cert, 
+				MRef<CertificateSet *> CertificateSet );
 		KeyAgreementDH( MRef<SipSim *> sim );
 		~KeyAgreementDH();
 

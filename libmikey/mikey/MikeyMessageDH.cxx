@@ -90,7 +90,7 @@ MikeyMessageDH::MikeyMessageDH( KeyAgreementDH * ka ){
 	if (ka->useSim){
 		addSignaturePayload(ka->getSim());
 	}else{
-		addSignaturePayload( ka->certificateChain()->get_first() );
+		addSignaturePayload( ka->certificateChain()->getFirst() );
 	}
 
 }
@@ -178,8 +178,8 @@ void MikeyMessageDH::setOffer( KeyAgreement * kaBase ){
 	 * try to get it now */
 
 	// Fetch peer certificate chain
-	MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
-	if( peerChain.isNull() || peerChain->get_first().isNull() ){
+	MRef<CertificateChain *> peerChain = ka->peerCertificateChain();
+	if( peerChain.isNull() || peerChain->getFirst().isNull() ){
 		peerChain = extractCertificateChain();
 
 		if( !peerChain.isNull() ){
@@ -262,7 +262,7 @@ MRef<MikeyMessage *> MikeyMessageDH::buildResponse( KeyAgreement * kaBase ){
 	if (ka->useSim){
 		result->addSignaturePayload(ka->getSim());
 	}else{
-		result->addSignaturePayload( ka->certificateChain()->get_first() );
+		result->addSignaturePayload( ka->certificateChain()->getFirst() );
 	}
 
 	return result;
@@ -333,8 +333,8 @@ MRef<MikeyMessage *> MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
 
 	// Fetch peer certificate chain
-	MRef<certificate_chain *> peerChain = ka->peerCertificateChain();
-	if( peerChain.isNull() || peerChain->get_first().isNull() ){
+	MRef<CertificateChain *> peerChain = ka->peerCertificateChain();
+	if( peerChain.isNull() || peerChain->getFirst().isNull() ){
 		peerChain = extractCertificateChain();
 
 		if( !peerChain.isNull() ){
@@ -404,7 +404,7 @@ MRef<MikeyMessage *> MikeyMessageDH::parseResponse( KeyAgreement * kaBase ){
 		if (ka->useSim){
 			errorMessage->addSignaturePayload(ka->getSim());
 		}else{
-			errorMessage->addSignaturePayload( ka->certificateChain()->get_first() );
+			errorMessage->addSignaturePayload( ka->certificateChain()->getFirst() );
 		}
 		throw MikeyExceptionMessageContent( errorMessage );
 	}
@@ -422,8 +422,8 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 	MRef<MikeyPayload *> sign = (*lastPayload());
 
 	// Fetch peer certificate chain
-	MRef<certificate_chain *> peerCert = ka->peerCertificateChain();
-	if( peerCert.isNull() || peerCert->get_first().isNull() ){
+	MRef<CertificateChain *> peerCert = ka->peerCertificateChain();
+	if( peerCert.isNull() || peerCert->getFirst().isNull() ){
 		peerCert = extractCertificateChain();
 
 		if( peerCert.isNull() ){
@@ -441,10 +441,10 @@ bool MikeyMessageDH::authenticate( KeyAgreement * kaBase ){
 
 #define signPl ((MikeyPayloadSIGN*)*sign)
 	int res; 
-	res = peerCert->get_first()->verif_sign( rawMessageData(),
-												rawMessageLength() - signPl->sigLength(),
-												signPl->sigData(),
-												signPl->sigLength() );
+	res = peerCert->getFirst()->verifSign( rawMessageData(),
+						rawMessageLength() - signPl->sigLength(),
+						signPl->sigData(),
+						signPl->sigLength() );
 	if( res > 0 ) return false;
 	else return true;
 }

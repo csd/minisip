@@ -300,14 +300,14 @@ void ConsoleDebugger::showConfig(){
 		config->sipStackConfig->cert->lock();
 	if (config->sipStackConfig->cert && config->sipStackConfig->cert->length()>0){
 		int n=1;
-		MRef<certificate *> crt=config->sipStackConfig->cert->get_first();
+		MRef<Certificate *> crt=config->sipStackConfig->cert->getFirst();
 		while (crt){
 			cerr << "      certificate "<<n<<endl
-			     << "        name="<<crt->get_name()<<endl
-			     << "        cn="<<crt->get_cn()<<endl
-			     << "        issuer="<<crt->get_issuer()<<endl
-			     << "        issuer_cn="<< crt->get_issuer_cn()<<endl
-			     << "        has_pk="<< crt->has_pk()<<endl
+			     << "        name="<<crt->getName()<<endl
+			     << "        cn="<<crt->getCn()<<endl
+			     << "        issuer="<<crt->getIssuer()<<endl
+			     << "        issuer_cn="<< crt->getIssuerCn()<<endl
+			     << "        has_pk="<< crt->hasPk()<<endl
 			     << "        SubjectAltName,"<< endl;
 #if 0
 //Print all subjectAltName here - FIXME
@@ -320,7 +320,7 @@ void ConsoleDebugger::showConfig(){
 			// multiple values.
 			for (int i=1; types[i]; i++){
 				cerr << "          type "<< types[i]<<": ";
-				vector<string> alt = crt->get_alt_name(san);
+				vector<string> alt = crt->getAltName(san);
 				vector<string>::iterator j;
 				int n=0;
 				for (j=alt.begin(); j!=alt.end(); j++,n++){
@@ -333,7 +333,7 @@ void ConsoleDebugger::showConfig(){
 				san=san+1;
 			}
 #endif
-			crt = config->sipStackConfig->cert->get_next();
+			crt = config->sipStackConfig->cert->getNext();
 			n++;
 		}
 	}else{

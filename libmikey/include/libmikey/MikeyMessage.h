@@ -67,8 +67,8 @@
 
 class aes;
 class SipSim;
-class certificate;
-class certificate_db;
+class Certificate;
+class CertificateSet;
 class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
 class KeyAgreementRSAR;
@@ -84,9 +84,9 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
 		void operator+=( MRef<MikeyPayload*> payload );
 		void addSignaturePayload( MRef<SipSim*> sim,
 					  bool addIdsAndT = false );
-		void addSignaturePayload( MRef<certificate *> cert,
+		void addSignaturePayload( MRef<Certificate *> cert,
 					  bool addIdsAndT = false );
-		bool verifySignature( MRef<certificate*> cert,
+		bool verifySignature( MRef<Certificate*> cert,
 				      bool addIdsAndT = false );
 
 		void addVPayload( int macAlg, uint64_t receivedT,
@@ -102,8 +102,8 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
 		bool verifyKemac( KeyAgreementPSK* ka,
 				  bool kemacOnly = false );
 
-		void addCertificatePayloads( MRef<certificate_chain *> certChain );
-		MRef<certificate_chain*> extractCertificateChain() const;
+		void addCertificatePayloads( MRef<CertificateChain *> certChain );
+		MRef<CertificateChain*> extractCertificateChain() const;
 
 		void addPkeKemac( KeyAgreementPKE* ka,
 				  int encrAlg, int macAlg );

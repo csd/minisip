@@ -26,9 +26,9 @@
 #include <libmikey/MikeyMessage.h>
 
 
-KeyAgreementRSAR::KeyAgreementRSAR( MRef<certificate_chain *> cert, 
-				    MRef<ca_db *> ca_db )
-		:KeyAgreementPKE(cert, ca_db)
+KeyAgreementRSAR::KeyAgreementRSAR( MRef<CertificateChain *> cert, 
+				    MRef<CertificateSet *> CertificateSet )
+		:KeyAgreementPKE(cert, CertificateSet)
 {
 }
 

@@ -76,7 +76,7 @@ class MikeyConfig: public IMikeyConfig{
 		MRef<SipSim*> getSim() const{
 			return identity->getSim();
 		}
-		MRef<certificate_chain*> getPeerCertificate() const{
+		MRef<CertificateChain*> getPeerCertificate() const{
 			return NULL;
 		}
 		size_t getPskLength() const{

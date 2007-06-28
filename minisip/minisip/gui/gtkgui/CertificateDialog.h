@@ -43,11 +43,11 @@ class CertificateDialog
 		CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
 		~CertificateDialog();
 
-		MRef<certificate_chain*> getCertChain() const;
-		MRef<ca_db*> getRootCa() const;
+		MRef<CertificateChain*> getCertChain() const;
+		MRef<CertificateSet*> getRootCa() const;
 
-		void setCertChain( MRef<certificate_chain *> chain );
-		void setRootCa( MRef<ca_db *> caDb );
+		void setCertChain( MRef<CertificateChain *> chain );
+		void setRootCa( MRef<CertificateSet *> caDb );
 
 		void run();
 
@@ -55,9 +55,9 @@ class CertificateDialog
 
 	//	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 
-		MRef<certificate_chain *> certChain;
-		MRef<ca_db *> caDb;
-		MRef<certificate *> cert;
+		MRef<CertificateChain *> certChain;
+		MRef<CertificateSet *> caDb;
+		MRef<Certificate *> cert;
 
 		void addDirCa();
                 void addFileCa();
@@ -101,8 +101,8 @@ class CertTreeStore : public MObject{
 		CertTreeStore();
 
 		virtual std::string getMemObjectType() const {return "CertTreeStore";}
-		void addCertificate( MRef<certificate *> );
-		MRef<certificate_chain *> getCertChain();
+		void addCertificate( MRef<Certificate *> );
+		MRef<CertificateChain *> getCertChain();
 		void associateTreeView( Gtk::TreeView * certTreeView );
 		bool isEmpty();
 		void clear();
@@ -121,13 +121,13 @@ class CaListStore : public MObject{
 	public:
 		CaListStore();
 
-		void addCaItem( MRef<ca_db_item*> caItem );
+		void addCaItem( MRef<CertificateSetItem*> caItem );
 		virtual std::string getMemObjectType() const {return "CaListStore";}
-		//MRef<certificate_chain *> getCertChain();
+		//MRef<CertificateChain *> getCertChain();
 		
 		void associateTreeView( Gtk::TreeView * caTreeView );
 		bool isEmpty();
-		MRef<ca_db_item*> remove( Gtk::TreeModel::iterator );
+		MRef<CertificateSetItem*> remove( Gtk::TreeModel::iterator );
 		void clear();
 
 	private:

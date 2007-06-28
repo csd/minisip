@@ -335,8 +335,8 @@ void printMessage(string header, string packet){
 	mout << endl;
 }
 
-SipLayerTransport::SipLayerTransport(MRef<certificate_chain *> cchain,
-				     MRef<ca_db *> cert_db_):
+SipLayerTransport::SipLayerTransport(MRef<CertificateChain *> cchain,
+				     MRef<CertificateSet *> cert_db_):
 		cert_chain(cchain), cert_db(cert_db_), tls_ctx(NULL)
 {
 	manager = new SocketServer();
@@ -1008,15 +1008,15 @@ static void updateVia(MRef<SipMessage*> pack, MRef<IPAddress *>from,
 	}
 }
 
-MRef<certificate_chain *> SipLayerTransport::getCertificateChain(){ 
+MRef<CertificateChain *> SipLayerTransport::getCertificateChain(){ 
 	return cert_chain; 
 }
 
-MRef<certificate*> SipLayerTransport::getMyCertificate(){ 
-	return cert_chain->get_first();
+MRef<Certificate*> SipLayerTransport::getMyCertificate(){ 
+	return cert_chain->getFirst();
 }
 
-MRef<ca_db *> SipLayerTransport::getCA_db () {
+MRef<CertificateSet *> SipLayerTransport::getCertificateSet () {
 	return cert_db;
 }
 

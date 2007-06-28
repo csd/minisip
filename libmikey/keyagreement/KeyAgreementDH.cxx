@@ -41,16 +41,16 @@ using namespace std;
 // 
 // PeerCertificates
 // 
-PeerCertificates::PeerCertificates( MRef<certificate_chain *> aCert,
-				    MRef<ca_db *> aCaDb ):
+PeerCertificates::PeerCertificates( MRef<CertificateChain *> aCert,
+				    MRef<CertificateSet *> aCaDb ):
 		certChainPtr( aCert ),
 		certDbPtr( aCaDb )
 {
-	peerCertChainPtr = certificate_chain::create();
+	peerCertChainPtr = CertificateChain::create();
 }
 
-PeerCertificates::PeerCertificates( MRef<certificate_chain *> aCert,
-				    MRef<certificate_chain *> aPeerCert ):
+PeerCertificates::PeerCertificates( MRef<CertificateChain *> aCert,
+				    MRef<CertificateChain *> aPeerCert ):
 		certChainPtr( aCert ),
 		peerCertChainPtr( aPeerCert )
 {
@@ -63,12 +63,12 @@ PeerCertificates::~PeerCertificates(){
 // KeyAgreementDHBase
 //
 KeyAgreementDHBase::KeyAgreementDHBase(MRef<SipSim *> s):
+	sim(s),
+	dh(NULL),
 	peerKeyPtr( NULL ),
 	peerKeyLengthValue( 0 ),
 	publicKeyPtr( NULL ),
-	publicKeyLengthValue( 0 ),
-	sim(s),
-	dh(NULL)
+	publicKeyLengthValue( 0 )
 
 {
 #ifdef SCSIM_SUPPORT
@@ -103,8 +103,8 @@ KeyAgreementDHBase::~KeyAgreementDHBase(){
 // 
 // KeyAgreementDH
 // 
-KeyAgreementDH::KeyAgreementDH( MRef<certificate_chain *> certChainPtr,
-		MRef<ca_db *> certDbPtr ):
+KeyAgreementDH::KeyAgreementDH( MRef<CertificateChain *> certChainPtr,
+		MRef<CertificateSet *> certDbPtr ):
 	KeyAgreement(),
 	KeyAgreementDHBase(NULL),
 	PeerCertificates( certChainPtr, certDbPtr )
@@ -223,15 +223,15 @@ unsigned char * KeyAgreementDHBase::peerKey(){
 	return peerKeyPtr;
 }
 
-MRef<certificate_chain *> PeerCertificates::certificateChain(){
+MRef<CertificateChain *> PeerCertificates::certificateChain(){
 	return certChainPtr;
 }
 
-MRef<certificate_chain *> PeerCertificates::peerCertificateChain(){
+MRef<CertificateChain *> PeerCertificates::peerCertificateChain(){
 	return peerCertChainPtr;
 }
 
-void PeerCertificates::setPeerCertificateChain( MRef<certificate_chain *> peerChain ){
+void PeerCertificates::setPeerCertificateChain( MRef<CertificateChain *> peerChain ){
 	peerCertChainPtr = peerChain;
 }
 
@@ -248,9 +248,9 @@ int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
 		return 1;
 	}
 
-	MRef<certificate *> peerCert = peerCertChainPtr->get_first();
+	MRef<Certificate *> peerCert = peerCertChainPtr->getFirst();
 	vector<string> altNames;
-	altNames = peerCert->get_alt_name( certificate::SAN_URI );
+	altNames = peerCert->getAltName( Certificate::SAN_URI );
 	if( find( altNames.begin(), altNames.end(), peerUri ) != altNames.end() ){
 		return 1;
 	}
@@ -262,7 +262,7 @@ int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
 		id = peerUri.substr( pos + 1 );
 	}
 
-	altNames = peerCert->get_alt_name( certificate::SAN_RFC822NAME );
+	altNames = peerCert->getAltName( Certificate::SAN_RFC822NAME );
 	if( find( altNames.begin(), altNames.end(), id ) != altNames.end() ){
 		return 1;
 	}
@@ -272,7 +272,7 @@ int PeerCertificates::controlPeerCertificate( const std::string &peerUri ){
 		id = id.substr( pos + 1 );
 	}
 
-	altNames = peerCert->get_alt_name( certificate::SAN_DNSNAME );
+	altNames = peerCert->getAltName( Certificate::SAN_DNSNAME );
 	if( find( altNames.begin(), altNames.end(), id ) != altNames.end() ){
 		return 1;
 	}
