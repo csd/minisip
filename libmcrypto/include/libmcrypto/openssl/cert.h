@@ -48,41 +48,41 @@ compilation under EVC 4.0 to fail, collision between STLPort and Openssl
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-class certificate;
+class Certificate;
 
-class LIBMCRYPTO_API ossl_ca_db: public ca_db{
+class LIBMCRYPTO_API OsslCertificateSet: public CertificateSet{
 	public:
-		ossl_ca_db();
-		~ossl_ca_db();
+		OsslCertificateSet();
+		~OsslCertificateSet();
 		
-		X509_STORE * get_db();
-		virtual std::string getMemObjectType() const {return "ossl_ca_db";}
-		void add_directory( std::string dir );
-		void add_file( std::string file );
-		void add_certificate( MRef<certificate *> cert );
+		X509_STORE * getDb();
+		virtual std::string getMemObjectType() const {return "OsslCertificateSet";}
+		void addDirectory( std::string dir );
+		void addFile( std::string file );
+		void addCertificate( MRef<Certificate *> cert );
 
 	private:
 		X509_STORE * cert_db;		
 };
 
-class LIBMCRYPTO_API ossl_priv_key: public priv_key{
+class LIBMCRYPTO_API OsslPrivateKey: public PrivateKey{
 	public:
-		ossl_priv_key( const std::string &private_key_filename );
-		ossl_priv_key( char *derEncPk, int length,
+		OsslPrivateKey( const std::string &private_key_filename );
+		OsslPrivateKey( char *derEncPk, int length,
 			       const std::string &password,
 			       const std::string &path );
 
-		~ossl_priv_key();
+		~OsslPrivateKey();
 
-		const std::string &get_file() const;
+		const std::string &getFile() const;
 
-		bool check_cert( MRef<certificate *> cert);
+		bool checkCert( MRef<Certificate *> cert);
 
-		int sign_data( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length, 
 			       unsigned char * sign,
 			       int * sign_length );
 
-		int denvelope_data( unsigned char * data,
+		int denvelopeData( unsigned char * data,
 				    int size,
 				    unsigned char *retdata,
 				    int *retsize,
@@ -90,64 +90,64 @@ class LIBMCRYPTO_API ossl_priv_key: public priv_key{
 				    int enckeylgth,
 				    unsigned char *iv);
 
-		bool private_decrypt(const unsigned char *data, int size,
+		bool privateDecrypt(const unsigned char *data, int size,
 				     unsigned char *retdata, int *retsize);
 
-		EVP_PKEY * get_openssl_private_key(){return private_key;};
+		EVP_PKEY * getOpensslPrivateKey(){return private_key;};
 
 	private:
 		EVP_PKEY * private_key;
 		std::string pk_file;
 };
 
-class LIBMCRYPTO_API ossl_certificate: public certificate{
+class LIBMCRYPTO_API OsslCertificate: public Certificate{
 	public:
-		ossl_certificate();
-		ossl_certificate( X509 * ossl_cert );
-		ossl_certificate( const std::string &cert_filename );
-		ossl_certificate( unsigned char * der_cert, int length );
-		ossl_certificate( unsigned char * certData, int length, std::string path );
-		~ossl_certificate();
-		virtual std::string getMemObjectType() const {return "certificate";}
+		OsslCertificate();
+		OsslCertificate( X509 * Osslcert );
+		OsslCertificate( const std::string &cert_filename );
+		OsslCertificate( unsigned char * der_cert, int length );
+		OsslCertificate( unsigned char * certData, int length, std::string path );
+		~OsslCertificate();
+		virtual std::string getMemObjectType() const {return "Certificate";}
 		
-		int control( ca_db * cert_db );
+		int control( CertificateSet * cert_db );
 
-		int get_der_length();
-		void get_der( unsigned char * output,
+		int getDerLength();
+		void getDer( unsigned char * output,
 			      unsigned int * length );
-		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		int envelopeData( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
-		int denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		int denvelopeData(unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		               unsigned char *enckey, int enckeylgth, unsigned char *iv);
 
-		int sign_data( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length, 
 			       unsigned char * sign, int * sign_length );
-		int verif_sign( unsigned char * data, int data_length,
+		int verifSign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
 
-		bool public_encrypt(const unsigned char *data, int size,
+		bool publicEncrypt(const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
-		std::string get_name();
-		std::string get_cn();
-		std::vector<std::string> get_alt_name( SubjectAltName type );
-		std::string get_issuer();
-		std::string get_issuer_cn();
+		std::string getName();
+		std::string getCn();
+		std::vector<std::string> getAltName( SubjectAltName type );
+		std::string getIssuer();
+		std::string getIssuerCn();
 
-		X509 * get_openssl_certificate(){return cert;};
+		X509 * getOpensslCertificate(){return cert;};
 	private:
 		X509 * cert;
 };
 
-class LIBMCRYPTO_API ossl_certificate_chain: public certificate_chain{
+class LIBMCRYPTO_API OsslCertificateChain: public CertificateChain{
 	public:
-		ossl_certificate_chain();
-		ossl_certificate_chain( MRef<certificate *> cert );
-		virtual ~ossl_certificate_chain();
+		OsslCertificateChain();
+		OsslCertificateChain( MRef<Certificate *> cert );
+		virtual ~OsslCertificateChain();
 		
-		virtual std::string getMemObjectType() const {return "ossl_certificate_chain";}
+		virtual std::string getMemObjectType() const {return "OsslCertificateChain";}
 		
-		int control( MRef<ca_db *> cert_db );
+		int control( MRef<CertificateSet *> cert_db );
 };
 
 #endif

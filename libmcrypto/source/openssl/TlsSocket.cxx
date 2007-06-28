@@ -59,19 +59,19 @@ TLSSocket::~TLSSocket()
 }
 
 TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
-			       MRef<certificate *> cert,
-			       MRef<ca_db *> cert_db,
+			       MRef<Certificate *> cert,
+			       MRef<CertificateSet *> cert_db,
 			       string serverName )
 {
 	void *ssl_ctx = NULL;
-	MRef<ossl_certificate*> ssl_cert;
-	MRef<ossl_ca_db*> ssl_db;
+	MRef<OsslCertificate*> ssl_cert;
+	MRef<OsslCertificateSet*> ssl_db;
 
 	if( cert )
-		ssl_cert = (ossl_certificate*)*cert;
+		ssl_cert = (OsslCertificate*)*cert;
 
 	if( cert_db )
-		ssl_db = (ossl_ca_db*)*cert_db;
+		ssl_db = (OsslCertificateSet*)*cert_db;
 
 	return new OsslSocket( addr, port, ssl_ctx, ssl_cert, ssl_db );
 }
@@ -110,23 +110,23 @@ OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx_ ):
 
 
 OsslSocket::OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx_,
-			      MRef<ossl_certificate *> cert, 
-			      MRef<ossl_ca_db *> cert_db_ ){
+			      MRef<OsslCertificate *> cert, 
+			      MRef<OsslCertificateSet *> cert_db_ ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
 	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
 }
 
 OsslSocket::OsslSocket( string addr, int32_t port, void * &ssl_ctx_, 
-			      MRef<ossl_certificate *> cert, 
-			      MRef<ossl_ca_db *> cert_db_ ){
+			      MRef<OsslCertificate *> cert, 
+			      MRef<OsslCertificateSet *> cert_db_ ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
 	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */
 void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
-					MRef<ossl_certificate *> cert,
-					MRef<ossl_ca_db *> cert_db_ ){
+					MRef<OsslCertificate *> cert,
+					MRef<OsslCertificateSet *> cert_db_ ){
 	type = SOCKET_TYPE_TLS;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
@@ -134,14 +134,14 @@ void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 	this->ssl_ctx = (SSL_CTX *)ssl_ctx_;
 	this->cert_db = cert_db_;
 	peerPort = ssock->getPeerPort();
-	MRef<ossl_certificate*> ssl_cert;
-	MRef<ossl_ca_db*> ssl_db;
+	MRef<OsslCertificate*> ssl_cert;
+	MRef<OsslCertificateSet*> ssl_db;
 
 	if( cert )
-		ssl_cert = (ossl_certificate*)*cert;
+		ssl_cert = (OsslCertificate*)*cert;
 
 	if( cert_db )
-		ssl_db = (ossl_ca_db*)*cert_db;
+		ssl_db = (OsslCertificateSet*)*cert_db;
 
 	if( this->ssl_ctx == NULL ){
 #ifdef DEBUG_OUTPUT
@@ -170,29 +170,29 @@ void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 		SSL_CTX_set_verify_depth( this->ssl_ctx, 5);
 
 		if( !cert.isNull() ){
-			/* Add a client certificate */
-			MRef<priv_key*> pk = ssl_cert->get_pk();
-			MRef<ossl_priv_key*> ssl_pk =
-				dynamic_cast<ossl_priv_key*>(*pk);
+			/* Add a client Certificate */
+			MRef<PrivateKey*> pk = ssl_cert->getPk();
+			MRef<OsslPrivateKey*> ssl_pk =
+				dynamic_cast<OsslPrivateKey*>(*pk);
 
 			if( !ssl_pk || SSL_CTX_use_PrivateKey( this->ssl_ctx, 
-			ssl_pk->get_openssl_private_key() ) <= 0 ){
+			ssl_pk->getOpensslPrivateKey() ) <= 0 ){
 				cerr << "SSL: Could not use private key" << endl;
 				ERR_print_errors_fp(stderr);
 				throw TLSContextInitFailed(); 
 			}
 			if( SSL_CTX_use_certificate( this->ssl_ctx,
-			ssl_cert->get_openssl_certificate() ) <= 0 ){
-				cerr << "SSL: Could not use certificate" << endl;
+			ssl_cert->getOpensslCertificate() ) <= 0 ){
+				cerr << "SSL: Could not use Certificate" << endl;
 				ERR_print_errors_fp(stderr);
 				throw TLSContextInitFailed(); 
 			}
 		}
 
 		if( !cert_db.isNull() ){
-			/* Use this database for the certificates check */
+			/* Use this database for the Certificates check */
 			SSL_CTX_set_cert_store( this->ssl_ctx, 
-						ssl_db->get_db());
+						ssl_db->getDb());
 		}
 
 		//SSL_CTX_set_session_cache_mode( this->ssl_ctx, SSL_SESS_CACHE_BOTH );
@@ -227,11 +227,11 @@ void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 	}
 
 	try{
-		peer_cert = new ossl_certificate( SSL_get_peer_certificate (ssl) );
+		peer_cert = new OsslCertificate( SSL_get_peer_certificate (ssl) );
 	}
-	catch( certificate_exception &){
+	catch( CertificateException &){
 		//FIXME
-		cerr << "Could not get server certificate" << endl;
+		cerr << "Could not get server Certificate" << endl;
 		peer_cert = NULL;
 	}
 	

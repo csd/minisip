@@ -62,41 +62,41 @@ TLSServerSocket::~TLSServerSocket()
 {
 }
 
-ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
-	MRef<ossl_certificate*> ssl_cert;
-	MRef<ossl_ca_db*> ssl_db;
+ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
+	MRef<OsslCertificate*> ssl_cert;
+	MRef<OsslCertificateSet*> ssl_db;
 
 	if( cert )
-		ssl_cert = (ossl_certificate*)*cert;
+		ssl_cert = (OsslCertificate*)*cert;
 
 	if( cert_db )
-		ssl_db = (ossl_ca_db*)*cert_db;
+		ssl_db = (OsslCertificateSet*)*cert_db;
 
 	return new OsslServerSocket( listen_port, ssl_cert, ssl_db );
 }
 
-ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
 
 	return create( false, listen_port, cert, cert_db );
 }
 
 
 
-OsslServerSocket::OsslServerSocket( int32_t listen_port_, MRef<ossl_certificate *> cert_, MRef<ossl_ca_db *> cert_db_):TLSServerSocket(AF_INET, listen_port)
+OsslServerSocket::OsslServerSocket( int32_t listen_port_, MRef<OsslCertificate *> cert_, MRef<OsslCertificateSet *> cert_db_):TLSServerSocket(AF_INET, listen_port)
 {
 	init(false, listen_port_, cert_, cert_db_);
 }
 
 OsslServerSocket::OsslServerSocket( bool use_ipv6_, int32_t listen_port_, 
-				 MRef<ossl_certificate *> cert_,
-				  MRef<ossl_ca_db *> cert_db_):TLSServerSocket(use_ipv6_?AF_INET6:AF_INET, listen_port_)
+				 MRef<OsslCertificate *> cert_,
+				  MRef<OsslCertificateSet *> cert_db_):TLSServerSocket(use_ipv6_?AF_INET6:AF_INET, listen_port_)
 {
 	init(use_ipv6_, listen_port_, cert_, cert_db_);
 }
 
 void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_, 
-			    MRef<ossl_certificate *> cert,
-			    MRef<ossl_ca_db *> cert_db_)
+			    MRef<OsslCertificate *> cert,
+			    MRef<OsslCertificateSet *> cert_db_)
 {
 	this->cert_db = cert_db_;
 	int32_t backlog = 25;
@@ -135,14 +135,14 @@ void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_,
 	SSL_CTX_set_session_id_context( ssl_ctx, sid_ctx, (unsigned int)strlen( (const char *)sid_ctx ) );
 
 	if( !cert_db.isNull() ){
-		/* Use this database for the certificates check */
-		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->get_db());
+		/* Use this database for the Certificates check */
+		SSL_CTX_set_cert_store( this->ssl_ctx, this->cert_db->getDb());
 	}
 	
-	MRef<priv_key *> priv_key = cert->get_pk();
-	MRef<ossl_priv_key *> ossl_pk =
-	  dynamic_cast<ossl_priv_key*>(*priv_key);
-	if( SSL_CTX_use_PrivateKey( ssl_ctx, ossl_pk->get_openssl_private_key() ) <= 0 ){
+	MRef<PrivateKey *> PrivateKey = cert->getPk();
+	MRef<OsslPrivateKey *> Osslpk =
+	  dynamic_cast<OsslPrivateKey*>(*PrivateKey);
+	if( SSL_CTX_use_PrivateKey( ssl_ctx, Osslpk->getOpensslPrivateKey() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
 		cerr << "Could not use the given private key" << endl;
 #endif
@@ -152,9 +152,9 @@ void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_,
 	}
 	
 		
-	if( SSL_CTX_use_certificate( ssl_ctx, cert->get_openssl_certificate() ) <= 0 ){
+	if( SSL_CTX_use_certificate( ssl_ctx, cert->getOpensslCertificate() ) <= 0 ){
 #ifdef DEBUG_OUTPUT
-		cerr << "Could not use the given certificate" << endl;
+		cerr << "Could not use the given Certificate" << endl;
 #endif
 
 		ERR_print_errors_fp(stderr);
@@ -163,7 +163,7 @@ void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_,
 
 	if( !SSL_CTX_check_private_key( ssl_ctx ) ){
 #ifdef DEBUG_OUTPUT
-		cerr << "Given private key does not match the certificate"<<endl;
+		cerr << "Given private key does not match the Certificate"<<endl;
 #endif
 
 		exit( 1 );

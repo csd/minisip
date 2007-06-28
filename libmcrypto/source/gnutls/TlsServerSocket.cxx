@@ -40,28 +40,28 @@ TLSServerSocket::~TLSServerSocket()
 {
 }
 
-ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
-	MRef<gtls_certificate*> gtls_cert;
-	MRef<gtls_ca_db*> gtls_db;
+ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
+	MRef<GtlsCertificate*> Gtlscert;
+	MRef<GtlsCertificateSet*> Gtlsdb;
 
 	if( cert )
-		gtls_cert = (gtls_certificate*)*cert;
+		Gtlscert = (GtlsCertificate*)*cert;
 
 	if( cert_db )
-		gtls_db = (gtls_ca_db*)*cert_db;
+		Gtlsdb = (GtlsCertificateSet*)*cert_db;
 
 	return new GnutlsServerSocket( use_ipv6, listen_port,
-				       gtls_cert, gtls_db );
+				       Gtlscert, Gtlsdb );
 }
 
-ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db ){
+ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
 	return create( false, listen_port, cert, cert_db );
 }
 
 
 GnutlsServerSocket::GnutlsServerSocket( bool use_ipv6, int32_t listen_port, 
-					MRef<gtls_certificate *> cert,
-					MRef<gtls_ca_db *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+					MRef<GtlsCertificate *> cert,
+					MRef<GtlsCertificateSet *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
 {
 	init(use_ipv6, listen_port, cert, cert_db);
 }
@@ -90,7 +90,7 @@ gnutls_session_t GnutlsServerSocket::initialize_tls_session(){
 
 	gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, m_xcred);
 
-	/* request client certificate if any.
+	/* request client Certificate if any.
 	 */
 	gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
@@ -100,8 +100,8 @@ gnutls_session_t GnutlsServerSocket::initialize_tls_session(){
 }
 
 void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port, 
-			       MRef<gtls_certificate *> cert,
-			       MRef<gtls_ca_db *> cert_db)
+			       MRef<GtlsCertificate *> cert,
+			       MRef<GtlsCertificateSet *> cert_db)
 {
 	cerr << "GnutlsServerSocket::init" << endl;
 	m_cert = cert;
@@ -119,14 +119,14 @@ void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port,
 	gnutls_certificate_set_x509_trust(m_xcred, m_ca_list, m_ca_list_len);
 
 	// FIXME support chained certs.
-	gnutls_x509_crt_t gcert = cert->get_certificate();
+	gnutls_x509_crt_t gcert = cert->getCertificate();
 	gnutls_x509_privkey_t gkey = NULL;
 	
-	MRef<gtls_priv_key*> gtls_pk =
-		dynamic_cast<gtls_priv_key*>( *cert->get_pk() );
+	MRef<GtlsPrivateKey*> Gtlspk =
+		dynamic_cast<GtlsPrivateKey*>( *cert->getPk() );
 
-	if( gtls_pk ){
-		gkey = gtls_pk->get_private_key();
+	if( Gtlspk ){
+		gkey = Gtlspk->getPrivateKey();
 	}
 
 	gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);

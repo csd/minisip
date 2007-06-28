@@ -5,7 +5,7 @@
 
 using namespace std;
 
-SipSimSoft::SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas)
+SipSimSoft::SipSimSoft(MRef<CertificateChain*> chain, MRef<CertificateSet*> cas)
 {
 	certChain = chain;
 	ca_set = cas;
@@ -18,9 +18,9 @@ bool SipSimSoft::getSignature(unsigned char * data,
 		bool doHash,
 		int hash_alg)
 {
-	MRef<certificate*> myCert = certChain->get_first();
+	MRef<Certificate*> myCert = certChain->getFirst();
 	assert(doHash /*we don't support not hashing in SipSimSoft yet...*/);
-	myCert->sign_data(data, dataLength, signaturePtr, &signatureLength);
+	myCert->signData(data, dataLength, signaturePtr, &signatureLength);
 	return true;
 }
 

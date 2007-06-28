@@ -35,29 +35,29 @@
 
 using namespace std;
 
-priv_key::priv_key(){
+PrivateKey::PrivateKey(){
 }
 
-priv_key::~priv_key(){
+PrivateKey::~PrivateKey(){
 }
 
-certificate::certificate(){
+Certificate::Certificate(){
 }
 
-certificate::~certificate(){
+Certificate::~Certificate(){
 }
 
 
-string certificate::get_file(){
+string Certificate::getFile(){
 	return file;
 }
 
-string certificate::get_pk_file(){
+string Certificate::getPkFile(){
 	massert(m_pk);
-	return m_pk->get_file();
+	return m_pk->getFile();
 }
 
-int certificate::denvelope_data( unsigned char * data,
+int Certificate::denvelopeData( unsigned char * data,
 				 int size,
 				 unsigned char *retdata,
 				 int *retsize,
@@ -69,158 +69,158 @@ int certificate::denvelope_data( unsigned char * data,
 	massert(retdata);
 	massert(enckey);
 	massert(iv);
-	return m_pk->denvelope_data( data, size, retdata, retsize,
+	return m_pk->denvelopeData( data, size, retdata, retsize,
 				     enckey, enckeylgth, iv );
 }
 
-int certificate::sign_data( unsigned char * data, int data_length, 
+int Certificate::signData( unsigned char * data, int data_length, 
 			    unsigned char * sign,
 			    int * sign_length ){
 	massert(m_pk);
-	return m_pk->sign_data( data, data_length, sign, sign_length );
+	return m_pk->signData( data, data_length, sign, sign_length );
 }
 
-int certificate::private_decrypt(const unsigned char *data, int size,
+int Certificate::privateDecrypt(const unsigned char *data, int size,
 				 unsigned char *retdata, int *retsize){
 	massert(m_pk);
-	return m_pk->private_decrypt( data, size, retdata, retsize );
+	return m_pk->privateDecrypt( data, size, retdata, retsize );
 }
 
-bool certificate::has_pk(){
+bool Certificate::hasPk(){
 	return !m_pk.isNull();
 }
 
-MRef<priv_key*> certificate::get_pk(){
+MRef<PrivateKey*> Certificate::getPk(){
 	return m_pk;
 }
 
-void certificate::set_pk( MRef<priv_key *> priv_key )
+void Certificate::setPk( MRef<PrivateKey *> PrivateKey )
 {
-	if( !priv_key->check_cert( this ) ){
-		cerr << "Private key does not match the certificate" << endl;
-		throw certificate_exception_pkey(
-			"The private key does not match the certificate" );
+	if( !PrivateKey->checkCert( this ) ){
+		cerr << "Private key does not match the Certificate" << endl;
+		throw CertificateExceptionPkey(
+			"The private key does not match the Certificate" );
 	}
 
-	m_pk = priv_key;
+	m_pk = PrivateKey;
 }
 
-void certificate::set_pk( const std::string &file_ ){
-	set_pk( priv_key::load( file_ ) );
+void Certificate::setPk( const std::string &file_ ){
+	setPk( PrivateKey::load( file_ ) );
 }
 
-void certificate::set_encpk(char *derEncPk, int length,
+void Certificate::setEncpk(char *derEncPk, int length,
 			    const std::string &password,
 			    const std::string &path){
-	set_pk( priv_key::load( derEncPk, length, password, path ) );
+	setPk( PrivateKey::load( derEncPk, length, password, path ) );
 }
 
-ca_db_item::~ca_db_item(){
+CertificateSetItem::~CertificateSetItem(){
 }
 
 
-ca_db::ca_db(){
+CertificateSet::CertificateSet(){
 	items_index = items.begin();
 }
 
-ca_db::~ca_db(){
-	std::list<MRef<ca_db_item*> >::iterator i;
-	std::list<MRef<ca_db_item*> >::iterator last = items.end();
+CertificateSet::~CertificateSet(){
+	std::list<MRef<CertificateSetItem*> >::iterator i;
+	std::list<MRef<CertificateSetItem*> >::iterator last = items.end();
 
 	items.clear();
 }
 
-ca_db* ca_db::clone(){
-	ca_db * db = create();
+CertificateSet* CertificateSet::clone(){
+	CertificateSet * db = create();
 
 	lock();
-	std::list<MRef<ca_db_item*> >::iterator i;
-	std::list<MRef<ca_db_item*> >::iterator last = items.end();
+	std::list<MRef<CertificateSetItem*> >::iterator i;
+	std::list<MRef<CertificateSetItem*> >::iterator last = items.end();
 
 	for( i = items.begin(); i != last; i++ ){
-		db->add_item( *i );
+		db->addItem( *i );
 	}
 	
 	unlock();
 	return db;
 }
 
-void ca_db::lock(){
+void CertificateSet::lock(){
         mLock.lock();
 }
 
-void ca_db::unlock(){
+void CertificateSet::unlock(){
         mLock.unlock();
 }
 
-void ca_db::add_item( MRef<ca_db_item*> item ){
+void CertificateSet::addItem( MRef<CertificateSetItem*> item ){
 	items.push_back( item );
 	items_index = items.begin();
 }
 
-MRef<ca_db_item*> ca_db::create_dir_item( std::string dir ){
-	MRef<ca_db_item*> item = new ca_db_item();
+MRef<CertificateSetItem*> CertificateSet::createDirItem( std::string dir ){
+	MRef<CertificateSetItem*> item = new CertificateSetItem();
 	
 	item->item = dir;
 	item->type = CERT_DB_ITEM_TYPE_DIR;
 	return item;
 }
 
-MRef<ca_db_item*> ca_db::create_file_item( std::string file ){
-	MRef<ca_db_item*> item = new ca_db_item;
+MRef<CertificateSetItem*> CertificateSet::createFileItem( std::string file ){
+	MRef<CertificateSetItem*> item = new CertificateSetItem;
 	
 	item->item = file;
 	item->type = CERT_DB_ITEM_TYPE_FILE;
 	return item;
 }
 
-MRef<ca_db_item*> ca_db::create_cert_item( MRef<certificate*> cert ){
-	MRef<ca_db_item*> item = new ca_db_item();
+MRef<CertificateSetItem*> CertificateSet::createCertItem( MRef<Certificate*> cert ){
+	MRef<CertificateSetItem*> item = new CertificateSetItem();
 	
 	item->item = "";
 	item->type = CERT_DB_ITEM_TYPE_OTHER;
 	return item;
 }
 
-void ca_db::add_directory( string dir ){
-	MRef<ca_db_item*> item = create_dir_item( dir );
-	add_item( item );
+void CertificateSet::addDirectory( string dir ){
+	MRef<CertificateSetItem*> item = createDirItem( dir );
+	addItem( item );
 }
 
-void ca_db::add_file( string file ){
-	MRef<ca_db_item*> item = create_file_item( file );
-	add_item( item );
+void CertificateSet::addFile( string file ){
+	MRef<CertificateSetItem*> item = createFileItem( file );
+	addItem( item );
 }
 
-void ca_db::add_certificate( MRef<certificate *> cert ){
-	MRef<ca_db_item*> item = create_cert_item( cert );
-	add_item( item );
+void CertificateSet::addCertificate( MRef<Certificate *> cert ){
+	MRef<CertificateSetItem*> item = createCertItem( cert );
+	addItem( item );
 }
 
-void ca_db::remove( MRef<ca_db_item*> removedItem ){
-	init_index();
+void CertificateSet::remove( MRef<CertificateSetItem*> removedItem ){
+	initIndex();
 
 	while( items_index != items.end() ){
 		if( **(*items_index) == **removedItem ){
 			items.erase( items_index );
-			init_index();
+			initIndex();
 			return;
 		}
 		items_index ++;
 	}
-	init_index();
+	initIndex();
 }
 
-list<MRef<ca_db_item*> > &ca_db::get_items(){
+list<MRef<CertificateSetItem*> > &CertificateSet::getItems(){
 	return items;
 }
 
-void ca_db::init_index(){
+void CertificateSet::initIndex(){
 	items_index = items.begin();
 }
 
-MRef<ca_db_item*> ca_db::get_next(){
-	MRef<ca_db_item*> tmp;
+MRef<CertificateSetItem*> CertificateSet::getNext(){
+	MRef<CertificateSetItem*> tmp;
 	
 	if( items_index == items.end() ){
 		items_index = items.begin();
@@ -232,56 +232,56 @@ MRef<ca_db_item*> ca_db::get_next(){
 	return tmp;
 }
 
-certificate_chain::certificate_chain(){
+CertificateChain::CertificateChain(){
 	item = cert_list.begin();
 
 }
 
-certificate_chain::certificate_chain( MRef<certificate *> cert ){
+CertificateChain::CertificateChain( MRef<Certificate *> cert ){
 	
 	cert_list.push_back( cert );
 	item = cert_list.begin();
 }
 
-certificate_chain::~certificate_chain(){
+CertificateChain::~CertificateChain(){
 }
 
-certificate_chain* certificate_chain::clone(){
-	certificate_chain * chain = create();
+CertificateChain* CertificateChain::clone(){
+	CertificateChain * chain = create();
 
 	lock();
-	std::list<MRef<certificate*> >::iterator i;
-	std::list<MRef<certificate*> >::iterator last = cert_list.end();
+	std::list<MRef<Certificate*> >::iterator i;
+	std::list<MRef<Certificate*> >::iterator last = cert_list.end();
 
 	for( i = cert_list.begin(); i != last; i++ ){
-		chain->add_certificate( *i );
+		chain->addCertificate( *i );
 	}
 	
 	unlock();
 	return chain;
 }
 
-void certificate_chain::lock(){
+void CertificateChain::lock(){
         mLock.lock();
 }
 
-void certificate_chain::unlock(){
+void CertificateChain::unlock(){
         mLock.unlock();
 }
 
-bool certificate_chain::is_empty(){
+bool CertificateChain::isEmpty(){
 	return cert_list.empty();
 }
 
 
-void certificate_chain::add_certificate( MRef<certificate *> cert ){
+void CertificateChain::addCertificate( MRef<Certificate *> cert ){
 	
 	if( !cert_list.empty() ){
-		MRef<certificate *> lastCert = *(--cert_list.end());
+		MRef<Certificate *> lastCert = *(--cert_list.end());
 
-		if( lastCert->get_issuer() != cert->get_name() ){
-			throw certificate_exception_chain(
-			 	"The previous certificate in the chain is not"
+		if( lastCert->getIssuer() != cert->getName() ){
+			throw CertificateExceptionChain(
+			 	"The previous Certificate in the chain is not"
 				" issued by the given one" );
 		}
 	}
@@ -290,19 +290,19 @@ void certificate_chain::add_certificate( MRef<certificate *> cert ){
 	item = cert_list.begin();
 }
 
-void certificate_chain::remove_last(){
+void CertificateChain::removeLast(){
 	cert_list.erase( -- cert_list.end() );
 
 	item = cert_list.begin();
 }
 
 
-void certificate_chain::init_index(){
+void CertificateChain::initIndex(){
 	item = cert_list.begin();
 }
 
-MRef<certificate *> certificate_chain::get_next(){
-	MRef<certificate *> ret;
+MRef<Certificate *> CertificateChain::getNext(){
+	MRef<Certificate *> ret;
 	
 	if( item == cert_list.end() ){
 		item = cert_list.begin();
@@ -314,7 +314,7 @@ MRef<certificate *> certificate_chain::get_next(){
 	return ret;
 }
 
-MRef<certificate *> certificate_chain::get_first(){
+MRef<Certificate *> CertificateChain::getFirst(){
 	if( cert_list.size() == 0 ){
 		return NULL;
 	}
@@ -322,11 +322,11 @@ MRef<certificate *> certificate_chain::get_first(){
 	return *(cert_list.begin());
 }
 
-void certificate_chain::clear(){
+void CertificateChain::clear(){
 	cert_list.clear();
 
 }
 
-int certificate_chain::length(){
+int CertificateChain::length(){
 	return (int)cert_list.size();
 }

@@ -40,8 +40,8 @@ class LIBMNETUTIL_API TLSSocket : public StreamSocket {
 
 		static TLSSocket* connect( IPAddress &addr,
 					   int32_t port,
-					   MRef<certificate *> cert=NULL,
-					   MRef<ca_db *> cert_db=NULL,
+					   MRef<Certificate *> cert=NULL,
+					   MRef<CertificateSet *> cert_db=NULL,
 					   std::string serverName="" );
 
 	protected:

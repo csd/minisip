@@ -39,12 +39,12 @@
 #include<gnutls/x509.h>
 #include<gcrypt.h>
 
-class gtls_certificate;
+class GtlsCertificate;
 
-class gtls_rsa_priv{
+class GtlsRsaPriv{
 	public:
-		gtls_rsa_priv( gnutls_x509_privkey_t aKey );
-		~gtls_rsa_priv();
+		GtlsRsaPriv( gnutls_x509_privkey_t aKey );
+		~GtlsRsaPriv();
 
 		bool decrypt( const unsigned char *data, int size,
 			      unsigned char *retdata, int *retsize) const;
@@ -53,10 +53,10 @@ class gtls_rsa_priv{
 		gcry_sexp_t m_key;
 };
 
-class gtls_rsa_pub{
+class Gtlsrsa_pub{
 	public:
-		gtls_rsa_pub( gnutls_x509_crt_t aCert );
-		~gtls_rsa_pub();
+		Gtlsrsa_pub( gnutls_x509_crt_t aCert );
+		~Gtlsrsa_pub();
 
 		bool encrypt( const unsigned char *data, int size,
 			      unsigned char *retdata, int *retsize) const;
@@ -65,51 +65,51 @@ class gtls_rsa_pub{
 		gcry_sexp_t m_key;
 };
 
-class LIBMCRYPTO_API gtls_ca_db_item: public ca_db_item{
+class LIBMCRYPTO_API GtlsCertificateSetItem: public CertificateSetItem{
 	public:
-		gtls_ca_db_item();
-		virtual ~gtls_ca_db_item();
+		GtlsCertificateSetItem();
+		virtual ~GtlsCertificateSetItem();
 
 		gnutls_x509_crt_t* certs;
 		unsigned int num_certs;
 };
 
-class LIBMCRYPTO_API gtls_ca_db: public ca_db{
+class LIBMCRYPTO_API GtlsCertificateSet: public CertificateSet{
 	public:
-		gtls_ca_db();
-		virtual ~gtls_ca_db();
+		GtlsCertificateSet();
+		virtual ~GtlsCertificateSet();
 		
 		bool getDb(gnutls_x509_crt_t ** db, size_t * db_length );
-		virtual std::string getMemObjectType() const {return "gtls_ca_db";}
+		virtual std::string getMemObjectType() const {return "GtlsCertificateSet";}
 
 	protected:
-		MRef<ca_db_item*> create_dir_item( std::string dir );
-		MRef<ca_db_item*> create_file_item( std::string file );
-		MRef<ca_db_item*> create_cert_item( MRef<certificate*> cert );
+		MRef<CertificateSetItem*> createDirItem( std::string dir );
+		MRef<CertificateSetItem*> createFileItem( std::string file );
+		MRef<CertificateSetItem*> createCertItem( MRef<Certificate*> cert );
 
 	private:
 		gnutls_x509_crt_t * caList;
 		size_t caListLength;
 };
 
-class LIBMCRYPTO_API gtls_priv_key: public priv_key{
+class LIBMCRYPTO_API GtlsPrivateKey: public PrivateKey{
 	public:
-		gtls_priv_key( const std::string &private_key_filename );
-		gtls_priv_key( char *derEncPk, int length,
+		GtlsPrivateKey( const std::string &private_key_filename );
+		GtlsPrivateKey( char *derEncPk, int length,
 			       const std::string &password,
 			       const std::string &path );
 
-		~gtls_priv_key();
+		~GtlsPrivateKey();
 
-		const std::string &get_file() const;
+		const std::string &getFile() const;
 
-		bool check_cert( MRef<certificate*> cert );
+		bool checkCert( MRef<Certificate*> cert );
 
-		int sign_data( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length, 
 			       unsigned char * sign,
 			       int * sign_length );
 
-		int denvelope_data( unsigned char * data,
+		int denvelopeData( unsigned char * data,
 				    int size,
 				    unsigned char *retdata,
 				    int *retsize,
@@ -117,48 +117,48 @@ class LIBMCRYPTO_API gtls_priv_key: public priv_key{
 				    int enckeylgth,
 				    unsigned char *iv);
 
-		bool private_decrypt( const unsigned char *data, int size,
+		bool privateDecrypt( const unsigned char *data, int size,
 				     unsigned char *retdata, int *retsize);
 
-		gnutls_x509_privkey_t get_private_key(){return privateKey;};
+		gnutls_x509_privkey_t getPrivateKey(){return privateKey;};
 
 	private:
 		gnutls_x509_privkey_t privateKey;
-		gtls_rsa_priv *rsaPriv;
+		GtlsRsaPriv *rsaPriv;
 		std::string pk_file;
 };
 
-class LIBMCRYPTO_API gtls_certificate: public certificate{
+class LIBMCRYPTO_API GtlsCertificate: public Certificate{
 	public:
-		gtls_certificate();
-		gtls_certificate( const std::string cert_filename );
-		gtls_certificate( unsigned char * der_cert, int length );
-		~gtls_certificate();
-		virtual std::string getMemObjectType() const {return "gtls_certificate";}
+		GtlsCertificate();
+		GtlsCertificate( const std::string cert_filename );
+		GtlsCertificate( unsigned char * der_cert, int length );
+		~GtlsCertificate();
+		virtual std::string getMemObjectType() const {return "GtlsCertificate";}
 		
-		int control( ca_db * cert_db );
+		int control( CertificateSet * cert_db );
 
-		int get_der_length();
-		void get_der( unsigned char * output );
-		void get_der( unsigned char * output, unsigned int * length );
-		int envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
+		int getDerLength();
+		void getDer( unsigned char * output );
+		void getDer( unsigned char * output, unsigned int * length );
+		int envelopeData( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
 
-		int sign_data( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length, 
 			       unsigned char * sign, int * sign_length );
-		int verif_sign( unsigned char * data, int data_length,
+		int verifSign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
 
-		bool public_encrypt( const unsigned char *data, int size,
+		bool publicEncrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
-		std::string get_name();
-		std::string get_cn();
-		std::vector<std::string> get_alt_name( SubjectAltName type );
-		std::string get_issuer();
-		std::string get_issuer_cn();
+		std::string getName();
+		std::string getCn();
+		std::vector<std::string> getAltName( SubjectAltName type );
+		std::string getIssuer();
+		std::string getIssuerCn();
 
-		gnutls_x509_crt_t get_certificate(){return cert;};
+		gnutls_x509_crt_t getCertificate(){return cert;};
 
 	protected:
 		void openFromFile( std::string fileName );
@@ -166,18 +166,18 @@ class LIBMCRYPTO_API gtls_certificate: public certificate{
 
 	private:
 		gnutls_x509_crt_t cert;
-		gtls_rsa_pub *rsaKey;
+		Gtlsrsa_pub *rsaKey;
 };
 
-class gtls_certificate_chain: public certificate_chain{
+class GtlsCertificateChain: public CertificateChain{
 	public:
-		gtls_certificate_chain();
-		gtls_certificate_chain( MRef<certificate *> cert );
-		virtual ~gtls_certificate_chain();
+		GtlsCertificateChain();
+		GtlsCertificateChain( MRef<Certificate *> cert );
+		virtual ~GtlsCertificateChain();
 		
-		virtual std::string getMemObjectType() const {return "gtls_certificate_chain";}
+		virtual std::string getMemObjectType() const {return "GtlsCertificateChain";}
 		
-		int control( MRef<ca_db *> cert_db );
+		int control( MRef<CertificateSet *> cert_db );
 };
 
 #endif

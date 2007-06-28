@@ -41,7 +41,7 @@ using namespace std;
 	throw Exception(msg.c_str());
 
 
-gtls_certificate::gtls_certificate():cert(NULL),rsaKey(NULL){
+GtlsCertificate::GtlsCertificate():cert(NULL),rsaKey(NULL){
         gnutls_global_init();
 }
 
@@ -49,64 +49,64 @@ gtls_certificate::gtls_certificate():cert(NULL),rsaKey(NULL){
 // Factory methods
 // 
 
-ca_db *ca_db::create(){
-	return new gtls_ca_db();
+CertificateSet *CertificateSet::create(){
+	return new GtlsCertificateSet();
 }
 
-priv_key* priv_key::load( const std::string private_key_filename ){
-	return new gtls_priv_key( private_key_filename );
+PrivateKey* PrivateKey::load( const std::string private_key_filename ){
+	return new GtlsPrivateKey( private_key_filename );
 }
 
-priv_key* priv_key::load( char *derEncPk, int length,
+PrivateKey* PrivateKey::load( char *derEncPk, int length,
 			  std::string password,
 			  std::string path ){
-	return new gtls_priv_key( derEncPk, length, password, path );
+	return new GtlsPrivateKey( derEncPk, length, password, path );
 }
 
 
-// Read PEM-encoded certificate from a file
-certificate* certificate::load( const std::string cert_filename )
+// Read PEM-encoded Certificate from a file
+Certificate* Certificate::load( const std::string cert_filename )
 {
-	return new gtls_certificate( cert_filename );
+	return new GtlsCertificate( cert_filename );
 }
 
-// Read PEM-encoded certificate private key from a file
-certificate* certificate::load( const std::string cert_filename,
+// Read PEM-encoded Certificate private key from a file
+Certificate* Certificate::load( const std::string cert_filename,
 				const std::string private_key_filename ){
-	MRef<priv_key*> priv_key = new gtls_priv_key( private_key_filename );
-	MRef<certificate*> cert = new gtls_certificate( cert_filename );
+	MRef<PrivateKey*> PrivateKey = new GtlsPrivateKey( private_key_filename );
+	MRef<Certificate*> cert = new GtlsCertificate( cert_filename );
 
-	cert->set_pk( priv_key );
+	cert->setPk( PrivateKey );
 
 	// The caller is responsible for deleting cert
 	cert->incRefCount();
 	return *cert;
 }
 
-// Import DER-encoded certificate from memory
-certificate* certificate::load( unsigned char * der_cert,
+// Import DER-encoded Certificate from memory
+Certificate* Certificate::load( unsigned char * der_cert,
 				int length ){
-	return new gtls_certificate( der_cert, length );
+	return new GtlsCertificate( der_cert, length );
 }
 
 #if 0
 // TODO
-certificate* certificate::load( unsigned char * certData,
+Certificate* Certificate::load( unsigned char * certData,
 				int length,
 				std::string path ){
-	return new gtls_certificate( certData, length, path );
+	return new GtlsCertificate( certData, length, path );
 }
 #endif
 
-certificate_chain* certificate_chain::create(){
-	return new gtls_certificate_chain();
+CertificateChain* CertificateChain::create(){
+	return new GtlsCertificateChain();
 }
 
 
 // 
-// gtls_rsa_priv
+// GtlsRsaPriv
 // 
-gtls_rsa_priv::gtls_rsa_priv( gnutls_x509_privkey_t aKey ):m_key(NULL){
+GtlsRsaPriv::GtlsRsaPriv( gnutls_x509_privkey_t aKey ):m_key(NULL){
 	gcry_error_t err;
 	gnutls_datum_t n[6];
 	int i;
@@ -115,8 +115,8 @@ gtls_rsa_priv::gtls_rsa_priv( gnutls_x509_privkey_t aKey ):m_key(NULL){
 
 	if( gnutls_x509_privkey_export_rsa_raw( aKey, &n[0], &n[1], &n[2],
 						&n[3], &n[4], &n[5] )){
-		// TODO change to gtls_exception
-		throw certificate_exception_pkey("Private key invalid" );
+		// TODO change to Gtlsexception
+		throw CertificateExceptionPkey("Private key invalid" );
 	}
 
 	gcry_mpi_t mpi[6];
@@ -137,7 +137,7 @@ gtls_rsa_priv::gtls_rsa_priv( gnutls_x509_privkey_t aKey ):m_key(NULL){
 				}
 			}
 
-			throw certificate_exception_pkey("Private key parameter invalid" );
+			throw CertificateExceptionPkey("Private key parameter invalid" );
 		}
 	}
 
@@ -161,18 +161,18 @@ gtls_rsa_priv::gtls_rsa_priv( gnutls_x509_privkey_t aKey ):m_key(NULL){
 	}
 
 	if( err ){
-		throw certificate_exception_pkey("Private key parameters invalid" );
+		throw CertificateExceptionPkey("Private key parameters invalid" );
 	}
 }
 
-gtls_rsa_priv::~gtls_rsa_priv(){
+GtlsRsaPriv::~GtlsRsaPriv(){
 	if( m_key ){
 		gcry_sexp_release( m_key );
 		m_key = NULL;
 	}
 }
 
-bool gtls_rsa_priv::decrypt( const unsigned char *data, int size,
+bool GtlsRsaPriv::decrypt( const unsigned char *data, int size,
 			     unsigned char *retdata, int *retsize) const{
 	gcry_error_t err;
 	bool ret = false;
@@ -271,9 +271,9 @@ bool gtls_rsa_priv::decrypt( const unsigned char *data, int size,
 }
 
 //
-// gtls_rsa_pub
+// Gtlsrsa_pub
 // 
-gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
+Gtlsrsa_pub::Gtlsrsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
 	gcry_error_t err;
 	gnutls_datum_t n;
 	gnutls_datum_t e;
@@ -282,7 +282,7 @@ gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
 	memset(&e, 0, sizeof(e));
 
 	if( gnutls_x509_crt_get_pk_rsa_raw( aCert, &n, &e ) ){
-		throw certificate_exception_init( "Can't get RSA key from cert" );
+		throw CertificateExceptionInit( "Can't get RSA key from cert" );
 	}
 
 	gcry_mpi_t n_mpi = NULL;
@@ -295,7 +295,7 @@ gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
 
 	if( err ){
 		gcry_free( e.data );
-		throw certificate_exception_init( "Invalid public key m parameter" );
+		throw CertificateExceptionInit( "Invalid public key m parameter" );
 	}
 
 	gcry_mpi_t e_mpi = NULL;
@@ -306,7 +306,7 @@ gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
 
 	if( err ){
 		gcry_mpi_release( e_mpi );
-		throw certificate_exception_init( "Invalid public key e parameter" );
+		throw CertificateExceptionInit( "Invalid public key e parameter" );
 	}
 
 	size_t erroff = 0;
@@ -321,18 +321,18 @@ gtls_rsa_pub::gtls_rsa_pub( gnutls_x509_crt_t aCert ):m_key(NULL){
 	e_mpi = NULL;
 
 	if( err ){
-		throw certificate_exception_init( "Invalid public key parameters" );
+		throw CertificateExceptionInit( "Invalid public key parameters" );
 	}
 }
 
-gtls_rsa_pub::~gtls_rsa_pub(){
+Gtlsrsa_pub::~Gtlsrsa_pub(){
 	if( m_key ){
 		gcry_sexp_release( m_key );
 		m_key = NULL;
 	}
 }
 
-bool gtls_rsa_pub::encrypt( const unsigned char *data, int size,
+bool Gtlsrsa_pub::encrypt( const unsigned char *data, int size,
 			    unsigned char *retdata, int *retsize) const{
 	bool ret = false;
 	gcry_error_t err;
@@ -404,7 +404,7 @@ bool gtls_rsa_pub::encrypt( const unsigned char *data, int size,
 }
 
 
-gtls_priv_key::~gtls_priv_key(){
+GtlsPrivateKey::~GtlsPrivateKey(){
 	if( privateKey != NULL ){
 		gnutls_x509_privkey_deinit( privateKey );
 	}
@@ -417,19 +417,19 @@ gtls_priv_key::~gtls_priv_key(){
 	}
 }
 
-const string &gtls_priv_key::get_file() const{
+const string &GtlsPrivateKey::getFile() const{
 	return pk_file;
 }
 
 
-// Read PEM-encoded certificate from a file
-gtls_certificate::gtls_certificate( const string certFilename ):rsaKey(NULL){
+// Read PEM-encoded Certificate from a file
+GtlsCertificate::GtlsCertificate( const string certFilename ):rsaKey(NULL){
         gnutls_global_init();
 	openFromFile( certFilename );
 }
 
-// Import DER-encoded certificate from memory
-gtls_certificate::gtls_certificate( unsigned char * derCert, int length ):rsaKey(NULL){
+// Import DER-encoded Certificate from memory
+GtlsCertificate::GtlsCertificate( unsigned char * derCert, int length ):rsaKey(NULL){
         int ret;
         gnutls_datum certData;
 	
@@ -438,8 +438,8 @@ gtls_certificate::gtls_certificate( unsigned char * derCert, int length ):rsaKey
 	ret = gnutls_x509_crt_init( (gnutls_x509_crt_t*)&cert );
 
         if( ret != 0 ){
-		throw certificate_exception_init( 
-			"Could not initialize the certificate structure" );
+		throw CertificateExceptionInit( 
+			"Could not initialize the Certificate structure" );
         }
 
 	certData.data = derCert;
@@ -448,8 +448,8 @@ gtls_certificate::gtls_certificate( unsigned char * derCert, int length ):rsaKey
 	ret = gnutls_x509_crt_import( cert, &certData, GNUTLS_X509_FMT_DER );
 
         if( ret != 0 ){
-		throw certificate_exception( 
-			"Could not import the given certificate" );
+		throw CertificateException( 
+			"Could not import the given Certificate" );
         }
 
 	if( rsaKey ){
@@ -457,10 +457,10 @@ gtls_certificate::gtls_certificate( unsigned char * derCert, int length ):rsaKey
 		rsaKey = NULL;
 	}
 
-	rsaKey = new gtls_rsa_pub( cert );
+	rsaKey = new Gtlsrsa_pub( cert );
 }
 	
-gtls_certificate::~gtls_certificate(){
+GtlsCertificate::~GtlsCertificate(){
 	if( cert != NULL ){
 		gnutls_x509_crt_deinit( cert );
 	}
@@ -473,8 +473,8 @@ gtls_certificate::~gtls_certificate(){
 	}
 }
 
-// Read PEM-encoded certificate from a file
-void gtls_certificate::openFromFile( string fileName ){
+// Read PEM-encoded Certificate from a file
+void GtlsCertificate::openFromFile( string fileName ){
 	int fd;
         void * certBuf = NULL;
         size_t length;
@@ -484,16 +484,16 @@ void gtls_certificate::openFromFile( string fileName ){
         fd = open( fileName.c_str(), O_RDONLY );
 
         if( fd == -1 ){
-		throw certificate_exception_file( 
-			"Could not open the given certificate file" );
+		throw CertificateExceptionFile( 
+			"Could not open the given Certificate file" );
 
         }
 
         int ret = fstat( fd, &fileStat );
 
         if( ret == -1 ){
-		throw certificate_exception_file( 
-			"Could not stat the given certificate file" );
+		throw CertificateExceptionFile( 
+			"Could not stat the given Certificate file" );
         }
 
         length = fileStat.st_size;
@@ -501,8 +501,8 @@ void gtls_certificate::openFromFile( string fileName ){
         certBuf = mmap( 0, length, PROT_READ, MAP_SHARED, fd, 0 );
 
         if( certBuf == NULL ){
-		throw certificate_exception_init( 
-			"Could not mmap the certificate file" );
+		throw CertificateExceptionInit( 
+			"Could not mmap the Certificate file" );
         }
 
         certData.data = (unsigned char*)certBuf;
@@ -512,15 +512,15 @@ void gtls_certificate::openFromFile( string fileName ){
         ret = gnutls_x509_crt_init( (gnutls_x509_crt_t*)&cert );
 
         if( ret != 0 ){
-		throw certificate_exception_init( 
-			"Could not initialize the certificate structure" );
+		throw CertificateExceptionInit( 
+			"Could not initialize the Certificate structure" );
         }
 
         ret = gnutls_x509_crt_import( cert, &certData, GNUTLS_X509_FMT_PEM );
 
         if( ret != 0 ){
-		throw certificate_exception_file( 
-			"Could not import the given certificate" );
+		throw CertificateExceptionFile( 
+			"Could not import the given Certificate" );
         }
 
         munmap( certBuf, length );
@@ -533,10 +533,10 @@ void gtls_certificate::openFromFile( string fileName ){
 		rsaKey = NULL;
 	}
 
-	rsaKey = new gtls_rsa_pub( cert );
+	rsaKey = new Gtlsrsa_pub( cert );
 }
 
-int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
+int GtlsPrivateKey::signData( unsigned char * data, int dataLength,
 			    unsigned char * sign, int * sign_length ){
 	int err;
 	size_t length = *sign_length;
@@ -544,7 +544,7 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 	if( privateKey == NULL ){
 		sign = NULL;
 		*sign_length = 0;
-		throw certificate_exception(
+		throw CertificateException(
 			"A private key is needed to sign data" );
 	}
 
@@ -567,7 +567,7 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 	}
 	else if( err < 0 ){
 		cerr << "GNUTLS error " << gnutls_strerror( err ) << endl;
-		throw certificate_exception(
+		throw CertificateException(
 			"Signature of data failed" );
 	}
 
@@ -576,7 +576,7 @@ int gtls_priv_key::sign_data( unsigned char * data, int dataLength,
 	return 0;
 }
 
-int gtls_certificate::verif_sign( unsigned char * data, int data_length,
+int GtlsCertificate::verifSign( unsigned char * data, int data_length,
 				  unsigned char * sign, int sign_length )
 {
 	int err;
@@ -590,8 +590,8 @@ int gtls_certificate::verif_sign( unsigned char * data, int data_length,
 	signStruct.size = sign_length;
 	
 	if( cert == NULL ){
-		throw certificate_exception(
-			"No certificate open while verifying a signature" );
+		throw CertificateException(
+			"No Certificate open while verifying a signature" );
 	}
 	
 	err = gnutls_x509_crt_verify_data( cert, 0, &dataStruct, &signStruct );
@@ -599,7 +599,7 @@ int gtls_certificate::verif_sign( unsigned char * data, int data_length,
 	return err;
  }
 
-bool gtls_certificate::public_encrypt( const unsigned char *data, int size,
+bool GtlsCertificate::publicEncrypt( const unsigned char *data, int size,
 				      unsigned char *retdata, int *retsize){
 	if( !rsaKey )
 		return false;
@@ -607,7 +607,7 @@ bool gtls_certificate::public_encrypt( const unsigned char *data, int size,
 	return rsaKey->encrypt( data, size, retdata, retsize );
 }
 
-int gtls_certificate::get_der_length(){
+int GtlsCertificate::getDerLength(){
 	size_t size = 0;
 
 	int ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, 
@@ -619,31 +619,31 @@ int gtls_certificate::get_der_length(){
 		return -1;
 }
 
-void gtls_certificate::get_der( unsigned char * output, unsigned int * length ){
+void GtlsCertificate::getDer( unsigned char * output, unsigned int * length ){
 	
 	int ret;
 
 	ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, 
 			output, length );
 	if( ret == GNUTLS_E_SHORT_MEMORY_BUFFER ){
-		throw certificate_exception(
+		throw CertificateException(
 			"Given buffer is to short" );
 	}
 
 	if( ret < 0 ){
-		throw certificate_exception(
-			"An error occured while exporting the certificate" );
+		throw CertificateException(
+			"An error occured while exporting the Certificate" );
 	}
 }
 
-string gtls_certificate::get_name(){
+string GtlsCertificate::getName(){
 	int ret;
 	char * buf;
 	size_t size = 1024;
 
 	buf = (char *)malloc( size );
 	if( buf == NULL ){
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			"Not enough memory" );
 	}
 	
@@ -656,14 +656,14 @@ string gtls_certificate::get_name(){
 		gnutls_x509_crt_get_dn( cert, NULL, &size );
 		buf = (char *) malloc( size );
 		if( buf == NULL ){
-			throw certificate_exception_init(
+			throw CertificateExceptionInit(
 				"Not enough memory" );
 		}
 		ret = gnutls_x509_crt_get_dn( cert, buf, &size );
 	}
 
 	if( ret < 0 ){
-		throw certificate_exception(
+		throw CertificateException(
 			"An error occured in getName()" );
 	}
 
@@ -673,14 +673,14 @@ string gtls_certificate::get_name(){
 	return output;
 }
 
-string gtls_certificate::get_cn(){
+string GtlsCertificate::getCn(){
 	int ret;
 	char * buf;
 	size_t size = 1024;
 
 	buf = (char *)malloc( size );
 	if( buf == NULL ){
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			"Not enough memory" );
 	}
 	
@@ -697,7 +697,7 @@ string gtls_certificate::get_cn(){
 					       0, 0, NULL, &size );
 		buf = (char *) malloc( size );
 		if( buf == NULL ){
-			throw certificate_exception_init(
+			throw CertificateExceptionInit(
 				"Not enough memory" );
 		}
 		ret = gnutls_x509_crt_get_dn_by_oid( cert, 
@@ -706,7 +706,7 @@ string gtls_certificate::get_cn(){
 	}
 
 	if( ret < 0 ){
-		throw certificate_exception(
+		throw CertificateException(
 			"An error occured in getName()" );
 	}
 
@@ -717,7 +717,7 @@ string gtls_certificate::get_cn(){
 	
 }
 
-std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
+std::vector<std::string> GtlsCertificate::getAltName( SubjectAltName type ){
 	int ret;
 	char * buf;
 	size_t bufSize = 1024;
@@ -730,12 +730,12 @@ std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
 		case SAN_URI: gType = GNUTLS_SAN_URI; break;
 		case SAN_IPADDRESS: gType = GNUTLS_SAN_IPADDRESS; break;
 		default:
-			throw certificate_exception( "Unsupported SubjectAltName type" );
+			throw CertificateException( "Unsupported SubjectAltName type" );
 	}
 
 	buf = (char *)malloc( bufSize );
 	if( buf == NULL ){
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			"Not enough memory" );
 	}
 
@@ -749,7 +749,7 @@ std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
 			bufSize = size;
 			buf = (char *) realloc( buf, bufSize );
 			if( buf == NULL ){
-				throw certificate_exception_init(
+				throw CertificateExceptionInit(
 					"Not enough memory" );
 			}
 
@@ -771,7 +771,7 @@ std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
 		}
 		else if( ret < 0 ){
 			cerr << "GNUTLS error " << gnutls_strerror( ret ) << endl;
-			throw certificate_exception(
+			throw CertificateException(
 				"An error occured in get_alt_name()" );
 		}
 	}
@@ -780,14 +780,14 @@ std::vector<std::string> gtls_certificate::get_alt_name( SubjectAltName type ){
 	return output;
 }
 
-string gtls_certificate::get_issuer(){
+string GtlsCertificate::getIssuer(){
 	int ret;
 	char * buf;
 	size_t size = 1024;
 
 	buf = (char *)malloc( size );
 	if( buf == NULL ){
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			"Not enough memory" );
 	}
 	
@@ -800,14 +800,14 @@ string gtls_certificate::get_issuer(){
 		gnutls_x509_crt_get_issuer_dn( cert, NULL, &size );
 		buf = (char *) malloc( size );
 		if( buf == NULL ){
-			throw certificate_exception_init(
+			throw CertificateExceptionInit(
 				"Not enough memory" );
 		}
 		ret = gnutls_x509_crt_get_issuer_dn( cert, buf, &size );
 	}
 
 	if( ret < 0 ){
-		throw certificate_exception(
+		throw CertificateException(
 			"An error occured in getName()" );
 	}
 
@@ -817,14 +817,14 @@ string gtls_certificate::get_issuer(){
 	return output;
 }
 
-string gtls_certificate::get_issuer_cn(){
+string GtlsCertificate::getIssuerCn(){
 	int ret;
 	char * buf;
 	size_t size = 1024;
 
 	buf = (char *)malloc( size );
 	if( buf == NULL ){
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			"Not enough memory" );
 	}
 	
@@ -841,7 +841,7 @@ string gtls_certificate::get_issuer_cn(){
 						      0, 0, NULL, &size );
 		buf = (char *) malloc( size );
 		if( buf == NULL ){
-			throw certificate_exception_init(
+			throw CertificateExceptionInit(
 				"Not enough memory" );
 		}
 		ret = gnutls_x509_crt_get_issuer_dn_by_oid( cert, 
@@ -850,7 +850,7 @@ string gtls_certificate::get_issuer_cn(){
 	}
 
 	if( ret < 0 ){
-		throw certificate_exception(
+		throw CertificateException(
 			"An error occured in getName()" );
 	}
 
@@ -861,7 +861,7 @@ string gtls_certificate::get_issuer_cn(){
 }
 
 // Read PEM-encoded private key from a file
-gtls_priv_key::gtls_priv_key( const string &file ){
+GtlsPrivateKey::GtlsPrivateKey( const string &file ){
 	int fd;
         void * pkBuf = NULL;
         size_t length;
@@ -871,7 +871,7 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         fd = open( file.c_str(), O_RDONLY );
 
         if( fd == -1 ){
-		throw certificate_exception_file( 
+		throw CertificateExceptionFile( 
 			"Could not open the given private key file" );
 
         }
@@ -879,7 +879,7 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         int ret = fstat( fd, &fileStat );
 
         if( ret == -1 ){
-		throw certificate_exception_file( 
+		throw CertificateExceptionFile( 
 			"Could not stat the given private key file" );
         }
 
@@ -888,8 +888,8 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         pkBuf = mmap( 0, length, PROT_READ, MAP_SHARED, fd, 0 );
 
         if( pkBuf == NULL ){
-		throw certificate_exception_init( 
-			"Could not mmap the certificate file" );
+		throw CertificateExceptionInit( 
+			"Could not mmap the Certificate file" );
         }
 
         pkData.data = (unsigned char*)pkBuf;
@@ -899,7 +899,7 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         ret = gnutls_x509_privkey_init( (gnutls_x509_privkey_t*)&privateKey );
 
         if( ret != 0 ){
-		throw certificate_exception_init( 
+		throw CertificateExceptionInit( 
 			"Could not initialize the private key structure" );
         }
 
@@ -907,7 +907,7 @@ gtls_priv_key::gtls_priv_key( const string &file ){
 			GNUTLS_X509_FMT_PEM );
 
         if( ret != 0 ){
-		throw certificate_exception_file( 
+		throw CertificateExceptionFile( 
 			"Could not import the given private key" );
         }
 
@@ -915,11 +915,11 @@ gtls_priv_key::gtls_priv_key( const string &file ){
         close( fd );
 
 	pk_file = file;
-	rsaPriv = new gtls_rsa_priv( privateKey );
+	rsaPriv = new GtlsRsaPriv( privateKey );
 }
 
 // Import DER-encoded private key from memory
-gtls_priv_key::gtls_priv_key(char * pkInput, int length,
+GtlsPrivateKey::GtlsPrivateKey(char * pkInput, int length,
 			     const string &password,
 			     const string &path )
 {
@@ -931,7 +931,7 @@ gtls_priv_key::gtls_priv_key(char * pkInput, int length,
    
    if( ret != 0 )
      {	
-	throw certificate_exception_init(
+	throw CertificateExceptionInit(
 					   "Could not initialize the private key structure" );
      }
    
@@ -943,18 +943,18 @@ gtls_priv_key::gtls_priv_key(char * pkInput, int length,
    
    if( ret != 0 )
      {
-	throw certificate_exception_file("Could not import the given private key" );
+	throw CertificateExceptionFile("Could not import the given private key" );
      }
    
    pk_file = path;
 }
 
 
-bool gtls_priv_key::check_cert( MRef<certificate*> cert ){
-	MRef<gtls_certificate*> gtls_cert =
-		dynamic_cast<gtls_certificate*>( *cert );
+bool GtlsPrivateKey::checkCert( MRef<Certificate*> cert ){
+	MRef<GtlsCertificate*> Gtlscert =
+		dynamic_cast<GtlsCertificate*>( *cert );
 
-	if( !gtls_cert ){
+	if( !Gtlscert ){
 		return false;
 	}
 
@@ -962,19 +962,19 @@ bool gtls_priv_key::check_cert( MRef<certificate*> cert ){
 	byte_t privateKeyId[20];
 	size_t idLength;
 
-	/* Check that the private key matches the certificate */
+	/* Check that the private key matches the Certificate */
 	idLength = 20;
-	int ret = gnutls_x509_crt_get_key_id( gtls_cert->get_certificate(),
+	int ret = gnutls_x509_crt_get_key_id( Gtlscert->getCertificate(),
 					      0, publicKeyId, &idLength );
    
 	if( ret < 0 ){
-		throw certificate_exception("An error occured when computing the key id" );
+		throw CertificateException("An error occured when computing the key id" );
 	}
    
 	ret = gnutls_x509_privkey_get_key_id( privateKey, 0, privateKeyId, &idLength );
    
 	if( ret < 0 ){	
-		throw certificate_exception("An error occured when computing the key id" );
+		throw CertificateException("An error occured when computing the key id" );
 	}
 	for( unsigned int i = 0; i < idLength; i++ ){
 		if( privateKeyId[i] != publicKeyId[i] ){
@@ -986,20 +986,20 @@ bool gtls_priv_key::check_cert( MRef<certificate*> cert ){
 }
 
 
-int gtls_certificate::control( ca_db * certDb ){
+int GtlsCertificate::control( CertificateSet * certDb ){
 	int result;
 	unsigned int verify = 0;
-	MRef<gtls_ca_db*> gtls_db =
-		dynamic_cast<gtls_ca_db*>( certDb );
+	MRef<GtlsCertificateSet*> Gtlsdb =
+		dynamic_cast<GtlsCertificateSet*>( certDb );
 	gnutls_x509_crt_t* ca_list = NULL;
 	size_t ca_list_length = 0;
 
-	if( !gtls_db ){
+	if( !Gtlsdb ){
 		cerr << "Not gtls CA db" << endl;
 		return 0;
 	}
 
-	if( !gtls_db->getDb( &ca_list, &ca_list_length ) ){
+	if( !Gtlsdb->getDb( &ca_list, &ca_list_length ) ){
 		cerr << "No CA db" << endl;
 		return 0;
 	}
@@ -1020,17 +1020,17 @@ int gtls_certificate::control( ca_db * certDb ){
 	return verify ? 0 : 1;
 }
 
-int gtls_certificate::envelope_data( unsigned char * data, int size, unsigned char *retdata, int *retsize,
+int GtlsCertificate::envelopeData( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 				     unsigned char *enckey, int *enckeylgth, unsigned char **iv){
 	UNIMPLEMENTED;
 }
 
-int gtls_priv_key::denvelope_data(unsigned char * data, int size, unsigned char *retdata, int *retsize,
+int GtlsPrivateKey::denvelopeData(unsigned char * data, int size, unsigned char *retdata, int *retsize,
 				     unsigned char *enckey, int enckeylgth, unsigned char *iv){
 	UNIMPLEMENTED;
 }
 
-bool gtls_priv_key::private_decrypt( const unsigned char *data, int size,
+bool GtlsPrivateKey::privateDecrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize){
 	if( !rsaPriv )
 		return false;
@@ -1039,13 +1039,13 @@ bool gtls_priv_key::private_decrypt( const unsigned char *data, int size,
 }
 
 // 
-// End of gtls_certificate
+// End of GtlsCertificate
 // 
 
-gtls_ca_db_item::gtls_ca_db_item(): certs(NULL), num_certs(0){
+GtlsCertificateSetItem::GtlsCertificateSetItem(): certs(NULL), num_certs(0){
 }
 
-gtls_ca_db_item::~gtls_ca_db_item(){
+GtlsCertificateSetItem::~GtlsCertificateSetItem(){
 	if( certs ){
 		for( unsigned int i=0; i < num_certs; i++ ){
 			gnutls_x509_crt_deinit( certs[i] );
@@ -1058,10 +1058,10 @@ gtls_ca_db_item::~gtls_ca_db_item(){
 	}
 }
 
-gtls_ca_db::gtls_ca_db(): caList(NULL), caListLength(0){
+GtlsCertificateSet::GtlsCertificateSet(): caList(NULL), caListLength(0){
 }
 
-gtls_ca_db::~gtls_ca_db(){
+GtlsCertificateSet::~GtlsCertificateSet(){
 	if( caList != NULL ){
 		delete[] caList;
 		caList = NULL;
@@ -1069,20 +1069,20 @@ gtls_ca_db::~gtls_ca_db(){
 	}
 }
 
-bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
+bool GtlsCertificateSet::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 	if( !caList ){
-// 		TODO: Results in deadlock in gtls_certificate_chain::control
+// 		TODO: Results in deadlock in GtlsCertificateChain::control
 // 		lock();
 
-		std::list<MRef<ca_db_item*> > &items = get_items();
-		std::list<MRef<ca_db_item*> >::iterator i;
-		std::list<MRef<ca_db_item*> >::iterator last = items.end();
+		std::list<MRef<CertificateSetItem*> > &items = getItems();
+		std::list<MRef<CertificateSetItem*> >::iterator i;
+		std::list<MRef<CertificateSetItem*> >::iterator last = items.end();
 
 		caListLength = 0;
 
 		for( i = items.begin(); i != last; i++ ){
-			gtls_ca_db_item *item =
-				dynamic_cast<gtls_ca_db_item*>(**i);
+			GtlsCertificateSetItem *item =
+				dynamic_cast<GtlsCertificateSetItem*>(**i);
 			caListLength += item->num_certs;
 		}
 
@@ -1090,8 +1090,8 @@ bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 
 		size_t pos = 0;
 		for( i = items.begin(); i != last; i++ ){
-			gtls_ca_db_item *item =
-				dynamic_cast<gtls_ca_db_item*>(**i);
+			GtlsCertificateSetItem *item =
+				dynamic_cast<GtlsCertificateSetItem*>(**i);
 
 			for( size_t k = 0; k < item->num_certs; k++ ){
 				caList[ pos++ ] = item->certs[ k ];
@@ -1107,18 +1107,18 @@ bool gtls_ca_db::getDb(gnutls_x509_crt_t ** db, size_t * db_length){
 }
 
 #if 0
-void gtls_ca_db::addDirectory( string dir ){
+void GtlsCertificateSet::addDirectory( string dir ){
 	X509_LOOKUP * lookup = NULL;
-	ca_dbItem * item = new ca_dbItem();
+	CertificateSetItem * item = new CertificateSetItem();
 	
 	lookup = X509_STORE_add_lookup( 
 			certDb, X509_LOOKUP_hash_dir() );
 	if( lookup == NULL )
-		throw certificate_exception_init(
+		throw CertificateExceptionInit(
 			string("Could not create a directory lookup") );
 	
 	if( !X509_LOOKUP_add_dir( lookup, dir.c_str(), X509_FILETYPE_PEM ) )
-		throw certificate_exception_file(
+		throw CertificateExceptionFile(
 			"Could not open the directory "+dir );
 
 	item->item = dir;
@@ -1131,7 +1131,7 @@ void gtls_ca_db::addDirectory( string dir ){
 
 
 
-bool read_file( string file, gnutls_datum* data ){
+bool readFile( string file, gnutls_datum* data ){
 	int fd;
         unsigned char* buf = NULL;
         size_t length;
@@ -1167,7 +1167,7 @@ bool read_file( string file, gnutls_datum* data ){
 
 		if( res < 0 ){
 			perror("read");
-			throw certificate_exception("Read file error");
+			throw CertificateException("Read file error");
 		}
 		else if( res == 0 ){
 			break;
@@ -1192,15 +1192,15 @@ bool read_file( string file, gnutls_datum* data ){
         ret = gnutls_x509_crt_init( (gnutls_x509_crt_t*)&cert );
 
         if( ret != 0 ){
-		throw certificate_exception_init( 
-			"Could not initialize the certificate structure" );
+		throw CertificateExceptionInit( 
+			"Could not initialize the Certificate structure" );
         }
 
         ret = gnutls_x509_crt_import( cert, &certData, GNUTLS_X509_FMT_PEM );
 
         if( ret != 0 ){
-		throw certificate_exception_file( 
-			"Could not import the given certificate" );
+		throw CertificateExceptionFile( 
+			"Could not import the given Certificate" );
         }
 
         munmap( buf, length );
@@ -1210,29 +1210,29 @@ bool read_file( string file, gnutls_datum* data ){
 }
 */
 
-MRef<ca_db_item*> gtls_ca_db::create_dir_item( std::string dir ){
-	ca_db_item * item = new gtls_ca_db_item();
+MRef<CertificateSetItem*> GtlsCertificateSet::createDirItem( std::string dir ){
+	CertificateSetItem * item = new GtlsCertificateSetItem();
 	
 	item->item = dir;
 	item->type = CERT_DB_ITEM_TYPE_DIR;
 	return item;
 }
 
-MRef<ca_db_item*> gtls_ca_db::create_file_item( std::string file ){
+MRef<CertificateSetItem*> GtlsCertificateSet::createFileItem( std::string file ){
 	gnutls_datum_t data;
 
 	memset(&data, 0, sizeof(data));
 	
-	if( !read_file( file, &data ) ){
-		string msg = string("Can't find certificate file ") + file;
-		throw certificate_exception( msg.c_str() );
+	if( !readFile( file, &data ) ){
+		string msg = string("Can't find Certificate file ") + file;
+		throw CertificateException( msg.c_str() );
 	}
 
 	size_t num_certs = 0;
 
 	if( !gnutls_x509_crt_list_import(NULL, &num_certs, &data, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED ) ){
 		delete[] data.data;
-		throw certificate_exception( "Can't load certificate file" );
+		throw CertificateException( "Can't load Certificate file" );
 // 		return NULL;
 	}
 
@@ -1247,15 +1247,15 @@ MRef<ca_db_item*> gtls_ca_db::create_file_item( std::string file ){
 
 	if( res < 0 ){
 		cerr << "GNUTLS error " << gnutls_strerror( res ) << endl;
-		throw certificate_exception( "Can't load certificate file (2)" );
+		throw CertificateException( "Can't load Certificate file (2)" );
 // 		return NULL;
 	}
 
 #ifdef DEBUG_OUTPUT
-	cerr << "Loaded " << res << " certificates" << endl;
+	cerr << "Loaded " << res << " Certificates" << endl;
 #endif
 
-	gtls_ca_db_item * item = new gtls_ca_db_item();
+	GtlsCertificateSetItem * item = new GtlsCertificateSetItem();
 	item->item = file;
 	item->type = CERT_DB_ITEM_TYPE_FILE;
 	item->certs = certs;
@@ -1265,8 +1265,8 @@ MRef<ca_db_item*> gtls_ca_db::create_file_item( std::string file ){
 	return item;
 }
 
-MRef<ca_db_item*> gtls_ca_db::create_cert_item( MRef<certificate*> cert ){
-	gtls_ca_db_item * item = new gtls_ca_db_item();
+MRef<CertificateSetItem*> GtlsCertificateSet::createCertItem( MRef<Certificate*> cert ){
+	GtlsCertificateSetItem * item = new GtlsCertificateSetItem();
 	
 	item->item = "";
 	item->type = CERT_DB_ITEM_TYPE_OTHER;
@@ -1277,15 +1277,15 @@ MRef<ca_db_item*> gtls_ca_db::create_cert_item( MRef<certificate*> cert ){
 	int ret = gnutls_x509_crt_init( &item->certs[0] );
 
 	if( ret != 0 ){
-		throw certificate_exception_init( 
-		 	"Could not initialize the certificate structure" );
+		throw CertificateExceptionInit( 
+		 	"Could not initialize the Certificate structure" );
 	}
         
 	gnutls_datum der;
 
-	der.size = cert->get_der_length();
+	der.size = cert->getDerLength();
 	der.data = new byte_t[ der.size ];
-	cert->get_der( der.data, &der.size );
+	cert->getDer( der.data, &der.size );
 
 	ret = gnutls_x509_crt_import( item->certs[0], &der, GNUTLS_X509_FMT_DER );
 
@@ -1293,86 +1293,86 @@ MRef<ca_db_item*> gtls_ca_db::create_cert_item( MRef<certificate*> cert ){
 	der.data = NULL;
 
 	if( ret != 0 ){
-	 	throw certificate_exception( 
-		 	"Could not import the given certificate" );
+	 	throw CertificateException( 
+		 	"Could not import the given Certificate" );
 	}
 
 	return item;
 }
 
-gtls_certificate_chain::gtls_certificate_chain(){
+GtlsCertificateChain::GtlsCertificateChain(){
 }
 
-gtls_certificate_chain::gtls_certificate_chain( MRef<certificate *> cert ){
+GtlsCertificateChain::GtlsCertificateChain( MRef<Certificate *> cert ){
 }
 
-gtls_certificate_chain::~gtls_certificate_chain(){
+GtlsCertificateChain::~GtlsCertificateChain(){
 }
 
-int gtls_certificate_chain::control( MRef<ca_db *> certDb){
+int GtlsCertificateChain::control( MRef<CertificateSet *> certDb){
 	int result;
 	unsigned int verify = 0;
-	MRef<gtls_ca_db*> gtls_db =
-		dynamic_cast<gtls_ca_db*>(*certDb);
+	MRef<GtlsCertificateSet*> Gtlsdb =
+		dynamic_cast<GtlsCertificateSet*>(*certDb);
 	gnutls_x509_crt_t* ca_list = NULL;
 	size_t ca_list_length = 0;
-	gnutls_x509_crt_t* gtls_list = NULL;
-	size_t gtls_list_length = 0;
+	gnutls_x509_crt_t* Gtlslist = NULL;
+	size_t Gtlslist_length = 0;
 
-	if( !gtls_db ){
+	if( !Gtlsdb ){
 		cerr << "Not gtls CA db" << endl;
 		return 0;
 	}
 
 // 	lock();
-	gtls_list_length = cert_list.size();
+	Gtlslist_length = cert_list.size();
 
-	if( gtls_list_length == 0 ){
+	if( Gtlslist_length == 0 ){
 #ifdef DEBUG_OUTPUT
-		cerr << "certificate: Empty list of certificates"
+		cerr << "Certificate: Empty list of Certificates"
 			"to verify" << endl;
 #endif
 		// Return success
 		return 1;
 	}
 
-	/* Chain of certificates */
-	list< MRef<certificate *> >::iterator i = cert_list.begin();
+	/* Chain of Certificates */
+	list< MRef<Certificate *> >::iterator i = cert_list.begin();
 
-	gtls_list = new gnutls_x509_crt_t[ gtls_list_length ];
-	memset( gtls_list, 0, gtls_list_length * sizeof( gnutls_x509_crt_t ));
+	Gtlslist = new gnutls_x509_crt_t[ Gtlslist_length ];
+	memset( Gtlslist, 0, Gtlslist_length * sizeof( gnutls_x509_crt_t ));
 
-	for( size_t j = 0; j < gtls_list_length; j++,i++ ){
-		MRef<gtls_certificate *> cert =
-			dynamic_cast<gtls_certificate*>(**i);
+	for( size_t j = 0; j < Gtlslist_length; j++,i++ ){
+		MRef<GtlsCertificate *> cert =
+			dynamic_cast<GtlsCertificate*>(**i);
 
 		if( !cert ){
 // 			unlock();
-			delete[] gtls_list;
+			delete[] Gtlslist;
 			// Not gtls cert
 			cerr << "Not a gtls cert" << endl;
 			return 0;
 		}
 		
-		gtls_list[j] = cert->get_certificate();
+		Gtlslist[j] = cert->getCertificate();
 	}
 // 	unlock();
 
-	if( !gtls_db->getDb( &ca_list, &ca_list_length ) ){
-		delete[] gtls_list;
+	if( !Gtlsdb->getDb( &ca_list, &ca_list_length ) ){
+		delete[] Gtlslist;
 		cerr << "No CA db" << endl;
 		return 0;
 	}
 
-	result = gnutls_x509_crt_list_verify( gtls_list, gtls_list_length,
+	result = gnutls_x509_crt_list_verify( Gtlslist, Gtlslist_length,
 					      ca_list, ca_list_length,
 // 					      crl_list, crl_list_length,
 					      NULL, 0,
 					      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
 					      &verify);
 
-	delete[] gtls_list;
-	gtls_list = NULL;
+	delete[] Gtlslist;
+	Gtlslist = NULL;
 
 	if( result < 0 ){
 		cerr << "gnutls_x509_crt_list_verify failed" << endl;

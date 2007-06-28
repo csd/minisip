@@ -54,20 +54,20 @@ TLSSocket::~TLSSocket()
 }
 
 TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
-			       MRef<certificate *> cert,
-			       MRef<ca_db *> cert_db,
+			       MRef<Certificate *> cert,
+			       MRef<CertificateSet *> cert_db,
 			       string serverName )
 {
-	MRef<gtls_ca_db*> gtls_db;
-	MRef<gtls_certificate*> gtls_cert;
+	MRef<GtlsCertificateSet*> Gtlsdb;
+	MRef<GtlsCertificate*> Gtlscert;
 
 	if( cert_db )
-		gtls_db = (gtls_ca_db*)*cert_db;
+		Gtlsdb = (GtlsCertificateSet*)*cert_db;
 
 	if( cert )
-		gtls_cert = (gtls_certificate*)*cert;
+		Gtlscert = (GtlsCertificate*)*cert;
 
-	return new GnutlsSocket( addr, port, gtls_db, gtls_cert );
+	return new GnutlsSocket( addr, port, Gtlsdb, Gtlscert );
 }
 
 
@@ -99,8 +99,8 @@ GnutlsSocket::GnutlsSocket( MRef<StreamSocket *> tcp_socket,
 
 #if 0
 GnutlsSocket::GnutlsSocket(string addr, int32_t port,
-			   MRef<gtls_ca_db *> cert_db,
-			   MRef<gtls_certificate *> cert)
+			   MRef<GtlsCertificateSet *> cert_db,
+			   MRef<GtlsCertificate *> cert)
 {
 	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
 					cert_db, cert);
@@ -108,8 +108,8 @@ GnutlsSocket::GnutlsSocket(string addr, int32_t port,
 #endif
 
 GnutlsSocket::GnutlsSocket(IPAddress &addr, int32_t port,
-			   MRef<gtls_ca_db *> cert_db,
-			   MRef<gtls_certificate *> cert)
+			   MRef<GtlsCertificateSet *> cert_db,
+			   MRef<GtlsCertificate *> cert)
 {
 	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
 					cert_db, cert);
@@ -137,8 +137,8 @@ const int g_cert_type_priority[3] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 /*********************************************************************************/
 void GnutlsSocket::GnutlsSocket_init( MRef<StreamSocket*> ssock,
-				      MRef<gtls_ca_db *> cert_db,
-				      MRef<gtls_certificate *> cert )
+				      MRef<GtlsCertificateSet *> cert_db,
+				      MRef<GtlsCertificate *> cert )
 {
 	int err=0;
 
@@ -161,14 +161,14 @@ void GnutlsSocket::GnutlsSocket_init( MRef<StreamSocket*> ssock,
 
 	if( cert ){
 		// FIXME support chained certs.
-		gnutls_x509_crt_t gcert = cert->get_certificate();
+		gnutls_x509_crt_t gcert = cert->getCertificate();
 		gnutls_x509_privkey_t gkey = NULL;
 	
-		MRef<gtls_priv_key*> gtls_pk =
-			dynamic_cast<gtls_priv_key*>( *cert->get_pk() );
+		MRef<GtlsPrivateKey*> Gtlspk =
+			dynamic_cast<GtlsPrivateKey*>( *cert->getPk() );
 
-		if( gtls_pk ){
-			gkey = gtls_pk->get_private_key();
+		if( Gtlspk ){
+			gkey = Gtlspk->getPrivateKey();
 		}
 
 		err = gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);

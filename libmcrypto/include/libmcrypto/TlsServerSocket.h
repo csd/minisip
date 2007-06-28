@@ -37,8 +37,8 @@ class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
 	public:
 		virtual ~TLSServerSocket();
 
-		static ServerSocket *create( bool use_ipv6, int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL );
-		static ServerSocket *create(int32_t listen_port, MRef<certificate *> cert, MRef<ca_db *> cert_db=NULL );
+		static ServerSocket *create( bool use_ipv6, int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db=NULL );
+		static ServerSocket *create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db=NULL );
 
 	protected:
 		TLSServerSocket( int32_t domain, int32_t listen_port );

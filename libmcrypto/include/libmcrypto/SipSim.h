@@ -54,16 +54,16 @@ public:
 
 	//virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtra)=0;
 
-	virtual void setCertificateChain(MRef<certificate_chain *> c){certChain = c;}
-	virtual MRef<certificate_chain *> getCertificateChain(){return certChain;}
+	virtual void setCertificateChain(MRef<CertificateChain *> c){certChain = c;}
+	virtual MRef<CertificateChain *> getCertificateChain(){return certChain;}
 
-	virtual void setCAs(MRef<ca_db*> c){ca_set=c;}
-	virtual MRef<ca_db *> getCAs(){return ca_set;}
+	virtual void setCAs(MRef<CertificateSet*> c){ca_set=c;}
+	virtual MRef<CertificateSet *> getCAs(){return ca_set;}
 	
 
 protected:
-	MRef<certificate_chain *> certChain;
-	MRef<ca_db *> ca_set;
+	MRef<CertificateChain *> certChain;
+	MRef<CertificateSet *> ca_set;
 
 };
 

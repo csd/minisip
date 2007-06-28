@@ -35,8 +35,8 @@ class LIBMNETUTIL_API GnutlsServerSocket : public TLSServerSocket {
 
 	public:
 		GnutlsServerSocket( bool use_ipv6, int32_t listen_port,
-				    MRef<gtls_certificate *> cert,
-				    MRef<gtls_ca_db *> cert_db=NULL);
+				    MRef<GtlsCertificate *> cert,
+				    MRef<GtlsCertificateSet *> cert_db=NULL);
 		~GnutlsServerSocket();
 		virtual std::string getMemObjectType() const {return "GnutlsServerSocket";}
 
@@ -44,13 +44,13 @@ class LIBMNETUTIL_API GnutlsServerSocket : public TLSServerSocket {
 
 	protected:
 		virtual void init( bool use_ipv6, int32_t listen_port, 
-				   MRef<gtls_certificate *> cert,
-				   MRef<gtls_ca_db *> cert_db);
+				   MRef<GtlsCertificate *> cert,
+				   MRef<GtlsCertificateSet *> cert_db);
 		gnutls_session_t initialize_tls_session();
 
 	private:
-		MRef<gtls_ca_db *> m_cert_db;
-		MRef<gtls_certificate*> m_cert;
+		MRef<GtlsCertificateSet *> m_cert_db;
+		MRef<GtlsCertificate*> m_cert;
 
 		gnutls_certificate_credentials_t m_xcred;
 		gnutls_x509_crt_t* m_ca_list;

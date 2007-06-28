@@ -13,7 +13,7 @@
  */
 class LIBMCRYPTO_API SipSimSoft : public SipSim{
 	public:
-		SipSimSoft(MRef<certificate_chain*> chain, MRef<ca_db*> cas);
+		SipSimSoft(MRef<CertificateChain*> chain, MRef<CertificateSet*> cas);
 
 		virtual bool getSignature(unsigned char * data,
 				int dataLength,

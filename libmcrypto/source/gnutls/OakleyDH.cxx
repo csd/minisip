@@ -89,7 +89,7 @@ void OakleyDH_init(){
 	if( g_init++ > 0 )
 		return;
 
-	gcry_error_t res;
+//	gcry_error_t res;
 
 	g_dhParameters[DH_GROUP_OAKLEY1].init( OAKLEY1_P, OAKLEY1_G, OAKLEY1_L );
 	g_dhParameters[DH_GROUP_OAKLEY2].init( OAKLEY2_P, OAKLEY2_G, OAKLEY2_L );

@@ -74,20 +74,20 @@ NULL-SHA:NULL-MD5
 // In Microsoft Embedded VC 4.0 this causes a warning ... remove
 #ifdef _MSC_VER
 #ifndef _WIN32_WCE
-template class __declspec(dllexport) MRef<certificate*>;
-template class __declspec(dllexport) MRef<ca_db*>;
+template class __declspec(dllexport) MRef<Certificate*>;
+template class __declspec(dllexport) MRef<CertificateSet*>;
 #endif
 #endif
 
 class LIBMNETUTIL_API OsslSocket : public TLSSocket {
 	public:
 		OsslSocket(std::string addr, int32_t port, void * &ssl_ctx,
-			MRef<ossl_certificate *> cert = NULL,
-			MRef<ossl_ca_db *> cert_db=NULL );
+			MRef<OsslCertificate *> cert = NULL,
+			MRef<OsslCertificateSet *> cert_db=NULL );
 		
 		OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
-			MRef<ossl_certificate *> cert=NULL,
-			MRef<ossl_ca_db *> cert_db=NULL );
+			MRef<OsslCertificate *> cert=NULL,
+			MRef<OsslCertificateSet *> cert_db=NULL );
 		
 		OsslSocket( MRef<StreamSocket *> sock, SSL_CTX * ssl_ctx );
 		
@@ -109,8 +109,8 @@ class LIBMNETUTIL_API OsslSocket : public TLSSocket {
 
 	private:
 		void OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx,
-					 MRef<ossl_certificate *> cert,
-					 MRef<ossl_ca_db *> cert_db );
+					 MRef<OsslCertificate *> cert,
+					 MRef<OsslCertificateSet *> cert_db );
 		
 		MRef<StreamSocket *> sock;
 		
@@ -118,10 +118,10 @@ class LIBMNETUTIL_API OsslSocket : public TLSSocket {
 		
 		void*     priv;
 		
-		MRef<ossl_certificate *> peer_cert;
+		MRef<OsslCertificate *> peer_cert;
 		
 		/** CA db */
-		MRef<ossl_ca_db *> cert_db;
+		MRef<OsslCertificateSet *> cert_db;
 };
 
 TLSSocket& operator<<(TLSSocket& sock, std::string str);

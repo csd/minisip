@@ -35,73 +35,73 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
-class certificate;
+class Certificate;
 
 #define CERT_DB_ITEM_TYPE_OTHER  0
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
 
-class LIBMCRYPTO_API ca_db_item: public MObject{
+class LIBMCRYPTO_API CertificateSetItem: public MObject{
 	public:
 		std::string item;
 		int type;
 
-		virtual ~ca_db_item();
+		virtual ~CertificateSetItem();
 
-		bool operator ==(const ca_db_item item2){ return (
+		bool operator ==(const CertificateSetItem item2){ return (
 				item2.item == item && 
 				item2.type == type);};
 };
 
 
-class LIBMCRYPTO_API ca_db: public MObject{
+class LIBMCRYPTO_API CertificateSet: public MObject{
 	public:
-		virtual ~ca_db();
-		static ca_db *create();
+		virtual ~CertificateSet();
+		static CertificateSet *create();
 		
-		virtual ca_db* clone();
-		virtual void add_directory( std::string dir );
-		virtual void add_file( std::string file );
-		virtual void add_certificate( MRef<certificate *> cert );
-		virtual std::list<MRef<ca_db_item*> > &get_items();
-		virtual MRef<ca_db_item*> get_next();
-		virtual void init_index();
+		virtual CertificateSet* clone();
+		virtual void addDirectory( std::string dir );
+		virtual void addFile( std::string file );
+		virtual void addCertificate( MRef<Certificate *> cert );
+		virtual std::list<MRef<CertificateSetItem*> > &getItems();
+		virtual MRef<CertificateSetItem*> getNext();
+		virtual void initIndex();
 		virtual void lock();
 		virtual void unlock();
 
-		virtual void remove( MRef<ca_db_item*> removedItem );
+		virtual void remove( MRef<CertificateSetItem*> removedItem );
 
 	protected:
-		ca_db();
-		virtual void add_item( MRef<ca_db_item*> item );
-		virtual MRef<ca_db_item*> create_dir_item( std::string dir );
-		virtual MRef<ca_db_item*> create_file_item( std::string file );
-		virtual MRef<ca_db_item*> create_cert_item( MRef<certificate*> cert );
+		CertificateSet();
+		virtual void addItem( MRef<CertificateSetItem*> item );
+		virtual MRef<CertificateSetItem*> createDirItem( std::string dir );
+		virtual MRef<CertificateSetItem*> createFileItem( std::string file );
+		virtual MRef<CertificateSetItem*> createCertItem( MRef<Certificate*> cert );
 
 	private:
-		std::list<MRef<ca_db_item*> >::iterator items_index;
-		std::list<MRef<ca_db_item*> > items;
+		std::list<MRef<CertificateSetItem*> >::iterator items_index;
+		std::list<MRef<CertificateSetItem*> > items;
                 Mutex mLock;
 };
 
-class LIBMCRYPTO_API priv_key: public MObject{
+class LIBMCRYPTO_API PrivateKey: public MObject{
 	public:
-		static priv_key* load( const std::string private_key_filename );
-		static priv_key* load( char *derEncPk, int length,
+		static PrivateKey* load( const std::string private_key_filename );
+		static PrivateKey* load( char *derEncPk, int length,
 				       std::string password,
 				       std::string path );
 
-		virtual ~priv_key();
+		virtual ~PrivateKey();
 
-		virtual const std::string &get_file() const = 0;
+		virtual const std::string &getFile() const = 0;
 
-		virtual bool check_cert( MRef<certificate *> cert)=0;
+		virtual bool checkCert( MRef<Certificate *> cert)=0;
 
-		virtual int sign_data( unsigned char * data, int data_length, 
+		virtual int signData( unsigned char * data, int data_length, 
 				       unsigned char * sign,
 				       int * sign_length )=0;
 
-		virtual int denvelope_data( unsigned char * data,
+		virtual int denvelopeData( unsigned char * data,
 					    int size,
 					    unsigned char *retdata,
 					    int *retsize,
@@ -109,13 +109,13 @@ class LIBMCRYPTO_API priv_key: public MObject{
 					    int enckeylgth,
 					    unsigned char *iv)=0;
 
-		virtual bool private_decrypt(const unsigned char *data, int size,
+		virtual bool privateDecrypt(const unsigned char *data, int size,
 					     unsigned char *retdata, int *retsize)=0;
 	protected:
-		priv_key();
+		PrivateKey();
 };
 
-class LIBMCRYPTO_API certificate: public MObject{
+class LIBMCRYPTO_API Certificate: public MObject{
 	public:
 		enum SubjectAltName{
 			SAN_DNSNAME = 1,
@@ -124,26 +124,26 @@ class LIBMCRYPTO_API certificate: public MObject{
 			SAN_IPADDRESS
 		};
 
-		static certificate* load( const std::string cert_filename );
-		static certificate* load( const std::string cert_filename,
+		static Certificate* load( const std::string cert_filename );
+		static Certificate* load( const std::string cert_filename,
 					  const std::string private_key_filename );
-		static certificate* load( unsigned char * der_cert,
+		static Certificate* load( unsigned char * der_cert,
 					  int length );
-		static certificate* load( unsigned char * certData,
+		static Certificate* load( unsigned char * certData,
 					  int length,
 					  std::string path );
-// 		static certificate *create();
+// 		static Certificate *create();
 
-		virtual ~certificate();
+		virtual ~Certificate();
 		
 
-		virtual int control( ca_db * cert_db )=0;
+		virtual int control( CertificateSet * cert_db )=0;
 
-		virtual int get_der_length()=0;
-		virtual void get_der( unsigned char * output,
+		virtual int getDerLength()=0;
+		virtual void getDer( unsigned char * output,
 				      unsigned int * length )=0;
 
-		virtual int envelope_data( unsigned char * data,
+		virtual int envelopeData( unsigned char * data,
 					   int size,
 					   unsigned char *retdata,
 					   int *retsize,
@@ -151,7 +151,7 @@ class LIBMCRYPTO_API certificate: public MObject{
 					   int *enckeylgth,
 					   unsigned char** iv)=0;
 
-		int denvelope_data( unsigned char * data,
+		int denvelopeData( unsigned char * data,
 					    int size,
 					    unsigned char *retdata,
 					    int *retsize,
@@ -159,57 +159,57 @@ class LIBMCRYPTO_API certificate: public MObject{
 					    int enckeylgth,
 					    unsigned char *iv);
 
-		int sign_data( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length, 
 				       unsigned char * sign,
 				       int * sign_length );
-		virtual int verif_sign( unsigned char * data, int data_length,
+		virtual int verifSign( unsigned char * data, int data_length,
 					unsigned char * sign, int sign_length )=0;
 
-		virtual bool public_encrypt(const unsigned char *data, int size,
+		virtual bool publicEncrypt(const unsigned char *data, int size,
 					    unsigned char *retdata, int *retsize)=0;
 
-		int private_decrypt(const unsigned char *data, int size,
+		int privateDecrypt(const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize);
 
-		virtual std::string get_name()=0;
-		virtual std::string get_cn()=0;
-		virtual std::vector<std::string> get_alt_name( SubjectAltName type )=0;
-		virtual std::string get_issuer()=0;
-		virtual std::string get_issuer_cn()=0;
+		virtual std::string getName()=0;
+		virtual std::string getCn()=0;
+		virtual std::vector<std::string> getAltName( SubjectAltName type )=0;
+		virtual std::string getIssuer()=0;
+		virtual std::string getIssuerCn()=0;
 
-		std::string get_file();
-		std::string get_pk_file();
+		std::string getFile();
+		std::string getPkFile();
                    
-		MRef<priv_key*> get_pk();
-		void set_pk( MRef<priv_key *> pk);
-		void set_pk( const std::string &file );
-		void set_encpk(char *derEncPk, int length,
+		MRef<PrivateKey*> getPk();
+		void setPk( MRef<PrivateKey *> pk);
+		void setPk( const std::string &file );
+		void setEncpk(char *derEncPk, int length,
 			       const std::string &password,
 			       const std::string &path);
 
-		bool has_pk();
+		bool hasPk();
 
 	protected:
- 		certificate();
+ 		Certificate();
 
 		std::string file;
 
-		MRef<priv_key *> m_pk;
+		MRef<PrivateKey *> m_pk;
 };
 
-class LIBMCRYPTO_API certificate_chain: public MObject{
+class LIBMCRYPTO_API CertificateChain: public MObject{
 	public:
-		static certificate_chain* create();
-		virtual ~certificate_chain();
+		static CertificateChain* create();
+		virtual ~CertificateChain();
 
-		virtual certificate_chain* clone();
-		virtual void add_certificate( MRef<certificate *> cert );
-// 		virtual void remove_certificate( MRef<certificate *> cert );
-		virtual void remove_last();
+		virtual CertificateChain* clone();
+		virtual void addCertificate( MRef<Certificate *> cert );
+// 		virtual void remove_Certificate( MRef<Certificate *> cert );
+		virtual void removeLast();
 
-		virtual int control( MRef<ca_db *> cert_db )=0;
-		virtual MRef<certificate *> get_next();
-		virtual MRef<certificate *> get_first();
+		virtual int control( MRef<CertificateSet *> cert_db )=0;
+		virtual MRef<Certificate *> getNext();
+		virtual MRef<Certificate *> getFirst();
 
 		virtual void clear();
 
@@ -217,42 +217,42 @@ class LIBMCRYPTO_API certificate_chain: public MObject{
 		virtual void lock();
 		virtual void unlock();
 
-		virtual bool is_empty();
+		virtual bool isEmpty();
 
-		virtual void init_index();
+		virtual void initIndex();
 
 	protected:
-		certificate_chain();
-		certificate_chain( MRef<certificate *> cert );
+		CertificateChain();
+		CertificateChain( MRef<Certificate *> cert );
 
-		std::list< MRef<certificate *> > cert_list;
-		std::list< MRef<certificate *> >::iterator item;
+		std::list< MRef<Certificate *> > cert_list;
+		std::list< MRef<Certificate *> >::iterator item;
                 Mutex mLock;
 };
 
-class LIBMCRYPTO_API certificate_exception : public Exception{
+class LIBMCRYPTO_API CertificateException : public Exception{
 	public:
-		certificate_exception( const char *desc):Exception(desc){};
+		CertificateException( const char *desc):Exception(desc){};
 };
 
-class LIBMCRYPTO_API certificate_exception_file : public certificate_exception{
+class LIBMCRYPTO_API CertificateExceptionFile : public CertificateException{
 	public:
-		certificate_exception_file( const char *message ):certificate_exception(message){};
+		CertificateExceptionFile( const char *message ):CertificateException(message){};
 };
 
-class LIBMCRYPTO_API certificate_exception_init : public certificate_exception{
+class LIBMCRYPTO_API CertificateExceptionInit : public CertificateException{
 	public:
-		certificate_exception_init( const char *message ):certificate_exception(message){};
+		CertificateExceptionInit( const char *message ):CertificateException(message){};
 };
 
-class LIBMCRYPTO_API certificate_exception_pkey : public certificate_exception{
+class LIBMCRYPTO_API CertificateExceptionPkey : public CertificateException{
 	public:
-		certificate_exception_pkey( const char *message ):certificate_exception(message){};
+		CertificateExceptionPkey( const char *message ):CertificateException(message){};
 };
 
-class LIBMCRYPTO_API certificate_exception_chain : public certificate_exception{
+class LIBMCRYPTO_API CertificateExceptionChain : public CertificateException{
 	public:
-		certificate_exception_chain( const char *message ):certificate_exception(message){};
+		CertificateExceptionChain( const char *message ):CertificateException(message){};
 };
 
 #endif // MLIBMCRYPTO_CERT_H

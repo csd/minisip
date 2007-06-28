@@ -34,16 +34,16 @@
 class LIBMNETUTIL_API OsslServerSocket : public TLSServerSocket {
 
 	public:
-		OsslServerSocket( bool use_ipv6, int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db=NULL);
-		OsslServerSocket( int32_t listen_port, MRef<ossl_certificate *> cert, MRef<ossl_ca_db *> cert_db=NULL);
+		OsslServerSocket( bool use_ipv6, int32_t listen_port, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);
+		OsslServerSocket( int32_t listen_port, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);
 		virtual std::string getMemObjectType() const {return "OsslServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
 
 	protected:
 		virtual void init( bool use_ipv6, int32_t listen_port, 
-				   MRef<ossl_certificate *> cert,
-				   MRef<ossl_ca_db *> cert_db);
+				   MRef<OsslCertificate *> cert,
+				   MRef<OsslCertificateSet *> cert_db);
 
 	private:
 		int32_t listen_port;
@@ -54,6 +54,6 @@ class LIBMNETUTIL_API OsslServerSocket : public TLSServerSocket {
 		/**
 		 CA db 
 		 */
-		MRef<ossl_ca_db *> cert_db;
+		MRef<OsslCertificateSet *> cert_db;
 };
 #endif

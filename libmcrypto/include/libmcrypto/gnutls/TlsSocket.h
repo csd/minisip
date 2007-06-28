@@ -43,8 +43,8 @@
 class LIBMNETUTIL_API GnutlsSocket : public TLSSocket {
 	public:
 		GnutlsSocket( IPAddress &addr, int32_t port,
-			      MRef<gtls_ca_db *> cert_db=NULL,
-			      MRef<gtls_certificate *> cert=NULL);
+			      MRef<GtlsCertificateSet *> cert_db=NULL,
+			      MRef<GtlsCertificate *> cert=NULL);
 
 		GnutlsSocket( MRef<StreamSocket *> sock,
 			      gnutls_session_t session );
@@ -61,18 +61,18 @@ class LIBMNETUTIL_API GnutlsSocket : public TLSSocket {
 
 	private:
 		void GnutlsSocket_init( MRef<StreamSocket*> ssock,
-					MRef<gtls_ca_db *> cert_db,
-					MRef<gtls_certificate *> cert);
+					MRef<GtlsCertificateSet *> cert_db,
+					MRef<GtlsCertificate *> cert);
 
 		gnutls_certificate_credentials_t m_xcred;
 		gnutls_session_t m_session;
 		
 		MRef<StreamSocket *> sock;
 		
-		MRef<certificate *> peer_cert;
+		MRef<Certificate *> peer_cert;
 		
 		/** CA db */
-		MRef<ca_db *> cert_db;
+		MRef<CertificateSet *> cert_db;
 
 		gnutls_x509_crt_t* m_ca_list;
 		size_t m_ca_list_len;
