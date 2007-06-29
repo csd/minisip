@@ -36,6 +36,10 @@
  * incorrect URI "file:////applib/products/a%2Db/abc%5F9/4148.920a/media/start.swf"
  * is one exampel of this, as the URI considered valid by the class.
  *
+ * When it says that this class handles "Windows and UNIX addresses" it means that the
+ * class converts the URI to paths appropriate for each operating system. For Windows
+ * URLs this means that all forward-slashes ("/") are converted to back-slashes ("\").
+ *
  * The type attribute must be set to FILEURL_TYPE_WINDOWS in order for the function to
  * properly handle Windows file paths. Otherwise UNIX paths are assumed/returned.
  *
@@ -43,8 +47,21 @@
  */
 class FileUrl {
 	public:
+		/**
+		 * Constructor when we already have a URL but it is unclear for which system
+		 * (e.g. Windows or Unix) the file adheres.
+		 */
 		FileUrl(const std::string url);
+
+		/**
+		 * Constructor when we already have a URL and we know it points to a file in
+		 * on a Windows system or Unix system.
+		 */
 		FileUrl(const std::string url, const int32_t type);
+
+		/**
+		 * Generic constructor when we want to create a new URL from scratch.
+		 */
 		FileUrl();
 
 		/**
@@ -55,7 +72,10 @@ class FileUrl {
 		/**
 		 * Tests whether or not the currenct FileUrl instance represents a valid file URL.
 		 *
-		 * At the moment a file URL is considered invalid only if it doesn't start with "file://".
+		 * A URL is considered invalid if:
+		 *  - it doesn't start with "file://".
+		 *  - it doesn't have a "host part"
+		 *  - it doesn't have a "path part"
 		 */
 		bool isValid() const;
 
@@ -79,6 +99,13 @@ class FileUrl {
 		std::string getHost() const;
 		void setHost(const std::string host);
 
+		/**
+		 * Returns the path part of the URL. The returned value conforms to the
+		 * path syntax of the operating system specified by the \c type property.
+		 *
+		 * Thus, if \c type = \c FILEURL_TYPE_WINDOWS then the function may return something like this:
+		 * <tt>C:\Program Files\Music\funky_tune.mp3</tt>
+		 */
 		std::string getPath() const;
 		void setPath(const std::string path);
 

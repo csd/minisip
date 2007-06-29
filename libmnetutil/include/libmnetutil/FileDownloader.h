@@ -49,6 +49,8 @@ class FileDownloader : public Downloader {
 		/**
 		 * Returns the data pointed to by the URL supplied to the constructor.
 		 *
+		 * This function allocates enough memory to keep the entire source file in memory.
+		 *
 		 * @param	length	Pointer to integer that will be used to return
 		 * 			the length of the returned character array.
 		 */
@@ -56,6 +58,9 @@ class FileDownloader : public Downloader {
 
 		/**
 		 * Fetches \em binary data from LDAP server and saves as files on local computer.
+		 *
+		 * This functions has a small memory-footprint as it copies one "chunk" at a time
+		 * from the source file.
 		 *
 		 * @note	The function replaces existing files without informing the user.
 		 * @param	filename	The path to where the retrieved file should be stored.

@@ -38,13 +38,17 @@ std::string FileUrl::getString() const {
 	// Append distinguished name (base DN)
 	url += '/';
 
+	// Split path into parts using "\" in Windows and "/" on other system
 	char sep = (type == FILEURL_TYPE_WINDOWS ? '\\' : '/');
 	std::vector<std::string> parts = split(path, false, sep, true);
 
+	// Glue together each "path part" again
 	for (int i=0; i<parts.size(); i++) {
 		std::string decPart = percentEncode(parts.at(i));
 		url += decPart + '/';
 	}
+
+	// Strip away the final trailing "/"
 	url = url.substr(0, url.length() - 1);
 
 	return url;
@@ -94,8 +98,10 @@ void FileUrl::setUrl(const std::string url) {
 		if (lastPos < url.length()) {
 			std::string restOfUrl = url.substr(lastPos);
 
+			// Split the "path part of the URL" into pieces, each piece separated by "/" as specified by RFC 1738.
 			std::vector<std::string> parts = split(restOfUrl, false, '/', true);
 
+			// Glue the pieces together using an operating-system specific separator
 			for (int i=0; i<parts.size(); i++) {
 				std::string decPart = percentDecode(parts.at(i));
 				if (type == FILEURL_TYPE_WINDOWS) {
@@ -105,6 +111,7 @@ void FileUrl::setUrl(const std::string url) {
 				}
 			}
 			if (path.length() > 1) {
+				// Remove trailing "path separator character"
 				path = path.substr(0, path.length() - 1);
 			} else {
 				validUrl = false;
