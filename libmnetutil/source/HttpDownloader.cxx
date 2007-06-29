@@ -12,9 +12,6 @@
 #include <map>
 #include <iostream>
 
-/**
- * The buffer size is set to a constant value to simplify the implementation. A production version of this class cannot have this limitation.
- */
 #define BUFFERSIZE 4096
 
 #define HTTP_METHOD_1_0                         "HTTP/1.0"

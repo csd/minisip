@@ -27,7 +27,10 @@ pkginclude_HEADERS =    \
 			libmnetutil/DatagramSocket.h \
 			libmnetutil/libmnetutil_config.h \
 			libmnetutil/Downloader.h \
-			libmnetutil/HttpDownloader.h
+			libmnetutil/HttpDownloader.h \
+			libmnetutil/FileUrl.h \
+			libmnetutil/FileDownloaderException.h \
+			libmnetutil/FileDownloader.h
 
 noinst_HEADERS = 	\
 			config.h \

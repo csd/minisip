@@ -1,5 +1,6 @@
 #include <libmnetutil/Downloader.h>
 #include <libmnetutil/HttpDownloader.h>
+#include <libmnetutil/FileDownloader.h>
 
 #ifdef ENABLE_LDAP
 #include <libmnetutil/LdapDownloader.h>
@@ -13,6 +14,8 @@ MRef<Downloader*> Downloader::create(std::string const uri) {
 		std::string protocol = uri.substr(0, pos);
 		if (protocol == "http")
 			return MRef<Downloader*>(dynamic_cast<Downloader*>(new HttpDownloader(uri)));
+		else if (protocol == "file")
+			return MRef<Downloader*>(dynamic_cast<Downloader*>(new FileDownloader(uri)));
 #ifdef ENABLE_LDAP
 		else if (protocol == "ldap")
 			return MRef<Downloader*>(dynamic_cast<Downloader*>(new LdapDownloader(uri)));

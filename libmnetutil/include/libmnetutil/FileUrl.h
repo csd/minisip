@@ -16,44 +16,36 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef _LDAPURL_H_
-#define _LDAPURL_H_
+#ifndef _FILEURL_H_
+#define _FILEURL_H_
 
 #include<libmnetutil/libmnetutil_config.h>
 
 #include <string>
 #include <vector>
 
-/**
- * Represents an LDAP URL Extension.
- *
- * Does not have any methods, only data members.
- */
-class LdapUrlExtension {
-	public:
-		LdapUrlExtension(std::string type, std::string value, bool critical) : type(type), value(value), critical(critical) {}
-
-		bool critical;
-		std::string type;
-		std::string value;
-};
+#define FILEURL_TYPE_UNKNOWN 	0
+#define FILEURL_TYPE_UNIX 	1
+#define FILEURL_TYPE_WINDOWS 	2
 
 /**
- * Represents and parsed LDAP URLs.
+ * Represents and parses file URLs.
  *
- * Known problems with respect to LDAP URL specification (RFC 4516):
- *  - Does not handle case-insensitive URL parts correctly (requires lower-cased reserved words)
- *  - It is not known if the distinguished name and attribute selectors are parsed correctly
+ * The class correctly handles Windows and UNIX addresses, with one exception: The class
+ * incorrectly considers paths string with additional slashes ("/") as valid. The
+ * incorrect URI "file:////applib/products/a%2Db/abc%5F9/4148.920a/media/start.swf"
+ * is one exampel of this, as the URI considered valid by the class.
  *
- * Other fancy notes:
- *  - There is not setExtension method
+ * The type attribute must be set to FILEURL_TYPE_WINDOWS in order for the function to
+ * properly handle Windows file paths. Otherwise UNIX paths are assumed/returned.
  *
  * @author	Mikael Svensson
  */
-class LdapUrl {
+class FileUrl {
 	public:
-		LdapUrl(std::string url);
-		LdapUrl();
+		FileUrl(const std::string url);
+		FileUrl(const std::string url, const int32_t type);
+		FileUrl();
 
 		/**
 		 * Restore URL parts to their default values
@@ -61,33 +53,20 @@ class LdapUrl {
 		void clear();
 
 		/**
-		 * Tests whether or not the currenct LdapUrl instance represents a valid LDAP URL.
+		 * Tests whether or not the currenct FileUrl instance represents a valid file URL.
 		 *
-		 * At the moment an LDAP URL is considered invalid only if it doesn't start with "ldap://".
+		 * At the moment a file URL is considered invalid only if it doesn't start with "file://".
 		 */
-		bool isValid();
+		bool isValid() const;
 
 		/**
 		 * Parse URL
 		 */
 		void setUrl(const std::string url);
+		void setUrl(const std::string url, const int32_t type);
 
 		/**
 		 * Get string representation of URL, e.g. the actual URL.
-		 *
-		 * This representation may not look exactly the same as the original URL as the parser
-		 * replaces omitted values with default values. This is not a problem in itself as
-		 * the generated URLs are still valid, albeit more explicit than the original ones.
-		 *
-		 * An example of this:
-		 * @code
-LdapUrl url("ldap://ldap.example.net/?");
-cout << url.getString();
-		 * @endcode
-		 * Output:
-		 * @code
-ldap://ldap.example.net:389/??base?(objectClass=*)
-		 * @endcode
 		 */
 		std::string getString() const;
 
@@ -98,46 +77,31 @@ ldap://ldap.example.net:389/??base?(objectClass=*)
 
 		/* Getters and setters */
 		std::string getHost() const;
-		void setHost(std::string host_);
+		void setHost(const std::string host);
 
-		int32_t getPort() const;
-		void setPort(int32_t);
+		std::string getPath() const;
+		void setPath(const std::string path);
 
-		std::vector<std::string> getAttributes() const;
-		void setAttributes(std::vector<std::string>);
-
-		std::vector<LdapUrlExtension> getExtensions() const;
-
-		/**
-		 * Returns whether or not the LDAP URL has a critical extension.
-		 *
-		 * The LDAP URL RFC describes why this is important:
-		 *
-		 * "If an LDAP URL extension is implemented (that is, if the
-		 * implementation understands it and is able to use it), the
-		 * implementation MUST make use of it.  If an extension is not
-		 * implemented and is marked critical, the implementation MUST NOT
-		 * process the URL.  If an extension is not implemented and is not
-		 * marked critical, the implementation MUST ignore the extension."
-		 */
-		bool hasCriticalExtension() const;
-
-		std::string getFilter() const;
-		void setFilter(std::string);
-
-		std::string getDn() const;
-		void setDn(std::string);
-
-		int32_t getScope() const;
-		void setScope(int32_t);
+		int32_t getType() const;
+		void setType(const int32_t type);
 	private:
+		/**
+		 * The type property is used to differentiate between URLs designed for
+		 * different operating systems.
+		 *
+		 * This allows for automatic conversion of file paths that are not well-suited
+		 * for simple "slash separation" (each part of the file path should be
+		 * separated using the "/" character as specified by RFC 1738).
+		 *
+		 * Well-suited paths are e.g. UNIX and Windows paths.Not so well-suited paths
+		 * are e.g. VMS paths (although this class currently does not support VMS paths).
+		 *
+		 * @note	Windows file URLs are interpreted as noted on http://blogs.msdn.com/ie/archive/2006/12/06/file-uris-in-windows.aspx
+		 */
+		int32_t 			type;
+
 		std::string			host;
-		int32_t 			port;
-		std::vector<std::string> 	attributes;
-		std::vector<LdapUrlExtension> 	extensions;
-		std::string 			filter;
-		std::string 			dn;
-		int32_t				scope;
+		std::string 			path;
 
 		/**
 		 * Tests whether or not a character is an "unreserved character".
@@ -193,6 +157,7 @@ ldap://ldap.example.net:389/??base?(objectClass=*)
 		/**
 		 * Percent-encodes string according to rules stated in section 2.1 of RFC 4516.
 		 */
+		std::string percentEncode(const std::string & in) const;
 		std::string percentEncode(const std::string & in, bool escapeComma, bool escapeQuestionmark = true) const;
 
 		bool validUrl;

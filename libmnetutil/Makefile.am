@@ -62,7 +62,10 @@ mnetutil_src = \
 		    $(win32_src) \
 		    source/StreamSocket.cxx \
 		    source/Downloader.cxx \
-		    source/HttpDownloader.cxx
+		    source/HttpDownloader.cxx \
+		    source/FileUrl.cxx \
+		    source/FileDownloaderException.cxx \
+		    source/FileDownloader.cxx
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
