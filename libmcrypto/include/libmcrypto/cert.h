@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   Copyright (C) 2006 Mikael Magnusson
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -49,7 +49,7 @@ class LIBMCRYPTO_API CertificateSetItem: public MObject{
 		virtual ~CertificateSetItem();
 
 		bool operator ==(const CertificateSetItem item2){ return (
-				item2.item == item && 
+				item2.item == item &&
 				item2.type == type);};
 };
 
@@ -58,7 +58,7 @@ class LIBMCRYPTO_API CertificateSet: public MObject{
 	public:
 		virtual ~CertificateSet();
 		static CertificateSet *create();
-		
+
 		virtual CertificateSet* clone();
 		virtual void addDirectory( std::string dir );
 		virtual void addFile( std::string file );
@@ -97,7 +97,7 @@ class LIBMCRYPTO_API PrivateKey: public MObject{
 
 		virtual bool checkCert( MRef<Certificate *> cert)=0;
 
-		virtual int signData( unsigned char * data, int data_length, 
+		virtual int signData( unsigned char * data, int data_length,
 				       unsigned char * sign,
 				       int * sign_length )=0;
 
@@ -135,7 +135,7 @@ class LIBMCRYPTO_API Certificate: public MObject{
 // 		static Certificate *create();
 
 		virtual ~Certificate();
-		
+
 
 		virtual int control( CertificateSet * cert_db )=0;
 
@@ -159,7 +159,7 @@ class LIBMCRYPTO_API Certificate: public MObject{
 					    int enckeylgth,
 					    unsigned char *iv);
 
-		int signData( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length,
 				       unsigned char * sign,
 				       int * sign_length );
 		virtual int verifSign( unsigned char * data, int data_length,
@@ -174,12 +174,13 @@ class LIBMCRYPTO_API Certificate: public MObject{
 		virtual std::string getName()=0;
 		virtual std::string getCn()=0;
 		virtual std::vector<std::string> getAltName( SubjectAltName type )=0;
+		virtual std::vector<std::string> getSubjectInfoAccess()=0;
 		virtual std::string getIssuer()=0;
 		virtual std::string getIssuerCn()=0;
 
 		std::string getFile();
 		std::string getPkFile();
-                   
+
 		MRef<PrivateKey*> getPk();
 		void setPk( MRef<PrivateKey *> pk);
 		void setPk( const std::string &file );

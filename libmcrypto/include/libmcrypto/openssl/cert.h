@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   Copyright (C) 2006 Mikael Magnusson
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -30,7 +30,7 @@
 #include <libmcrypto/config.h>
 #include<libmcrypto/cert.h>
 
-/*Include openssl/err.h before any <list/map/hash/vector> ... it causes 
+/*Include openssl/err.h before any <list/map/hash/vector> ... it causes
 compilation under EVC 4.0 to fail, collision between STLPort and Openssl
 .....\minisip.evc4\openssl098a\inc32\openssl\err.h(297) : error C2955: 'hash' : use of class template requires template argument list
         ....\minisip.evc4\stlport501\stlport\stl\_hash_fun.h(40) : see declaration of 'hash'
@@ -54,7 +54,7 @@ class LIBMCRYPTO_API OsslCertificateSet: public CertificateSet{
 	public:
 		OsslCertificateSet();
 		~OsslCertificateSet();
-		
+
 		X509_STORE * getDb();
 		virtual std::string getMemObjectType() const {return "OsslCertificateSet";}
 		void addDirectory( std::string dir );
@@ -62,7 +62,7 @@ class LIBMCRYPTO_API OsslCertificateSet: public CertificateSet{
 		void addCertificate( MRef<Certificate *> cert );
 
 	private:
-		X509_STORE * cert_db;		
+		X509_STORE * cert_db;
 };
 
 class LIBMCRYPTO_API OsslPrivateKey: public PrivateKey{
@@ -78,7 +78,7 @@ class LIBMCRYPTO_API OsslPrivateKey: public PrivateKey{
 
 		bool checkCert( MRef<Certificate *> cert);
 
-		int signData( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length,
 			       unsigned char * sign,
 			       int * sign_length );
 
@@ -109,7 +109,7 @@ class LIBMCRYPTO_API OsslCertificate: public Certificate{
 		OsslCertificate( unsigned char * certData, int length, std::string path );
 		~OsslCertificate();
 		virtual std::string getMemObjectType() const {return "Certificate";}
-		
+
 		int control( CertificateSet * cert_db );
 
 		int getDerLength();
@@ -120,7 +120,7 @@ class LIBMCRYPTO_API OsslCertificate: public Certificate{
 		int denvelopeData(unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		               unsigned char *enckey, int enckeylgth, unsigned char *iv);
 
-		int signData( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length,
 			       unsigned char * sign, int * sign_length );
 		int verifSign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
@@ -131,6 +131,7 @@ class LIBMCRYPTO_API OsslCertificate: public Certificate{
 		std::string getName();
 		std::string getCn();
 		std::vector<std::string> getAltName( SubjectAltName type );
+		std::vector<std::string> getSubjectInfoAccess();
 		std::string getIssuer();
 		std::string getIssuerCn();
 
@@ -144,9 +145,9 @@ class LIBMCRYPTO_API OsslCertificateChain: public CertificateChain{
 		OsslCertificateChain();
 		OsslCertificateChain( MRef<Certificate *> cert );
 		virtual ~OsslCertificateChain();
-		
+
 		virtual std::string getMemObjectType() const {return "OsslCertificateChain";}
-		
+
 		int control( MRef<CertificateSet *> cert_db );
 };
 

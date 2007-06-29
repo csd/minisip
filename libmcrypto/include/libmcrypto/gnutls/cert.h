@@ -3,18 +3,18 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -78,7 +78,7 @@ class LIBMCRYPTO_API GtlsCertificateSet: public CertificateSet{
 	public:
 		GtlsCertificateSet();
 		virtual ~GtlsCertificateSet();
-		
+
 		bool getDb(gnutls_x509_crt_t ** db, size_t * db_length );
 		virtual std::string getMemObjectType() const {return "GtlsCertificateSet";}
 
@@ -105,7 +105,7 @@ class LIBMCRYPTO_API GtlsPrivateKey: public PrivateKey{
 
 		bool checkCert( MRef<Certificate*> cert );
 
-		int signData( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length,
 			       unsigned char * sign,
 			       int * sign_length );
 
@@ -135,7 +135,7 @@ class LIBMCRYPTO_API GtlsCertificate: public Certificate{
 		GtlsCertificate( unsigned char * der_cert, int length );
 		~GtlsCertificate();
 		virtual std::string getMemObjectType() const {return "GtlsCertificate";}
-		
+
 		int control( CertificateSet * cert_db );
 
 		int getDerLength();
@@ -144,7 +144,7 @@ class LIBMCRYPTO_API GtlsCertificate: public Certificate{
 		int envelopeData( unsigned char * data, int size, unsigned char *retdata, int *retsize,
 		              unsigned char *enckey, int *enckeylgth, unsigned char** iv);
 
-		int signData( unsigned char * data, int data_length, 
+		int signData( unsigned char * data, int data_length,
 			       unsigned char * sign, int * sign_length );
 		int verifSign( unsigned char * data, int data_length,
 				unsigned char * sign, int sign_length );
@@ -155,6 +155,7 @@ class LIBMCRYPTO_API GtlsCertificate: public Certificate{
 		std::string getName();
 		std::string getCn();
 		std::vector<std::string> getAltName( SubjectAltName type );
+		std::vector<std::string> getSubjectInfoAccess();
 		std::string getIssuer();
 		std::string getIssuerCn();
 
@@ -174,9 +175,9 @@ class GtlsCertificateChain: public CertificateChain{
 		GtlsCertificateChain();
 		GtlsCertificateChain( MRef<Certificate *> cert );
 		virtual ~GtlsCertificateChain();
-		
+
 		virtual std::string getMemObjectType() const {return "GtlsCertificateChain";}
-		
+
 		int control( MRef<CertificateSet *> cert_db );
 };
 

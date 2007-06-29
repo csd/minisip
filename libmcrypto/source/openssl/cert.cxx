@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
   Copyright (C) 2006 Mikael Magnusson
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -61,7 +61,7 @@ static string NAME_to_string( X509_NAME * x509Name ){
 
 //
 // Factory methods
-// 
+//
 
 CertificateSet *CertificateSet::create(){
 	return new OsslCertificateSet();
@@ -107,7 +107,7 @@ CertificateChain* CertificateChain::create(){
 
 //
 // OsslPrivateKey
-// 
+//
 OsslPrivateKey::~OsslPrivateKey(){
 	if( private_key )
 		EVP_PKEY_free( private_key );
@@ -121,7 +121,7 @@ const string &OsslPrivateKey::getFile() const{
 
 //
 // OsslCertificate
-// 
+//
 
 OsslCertificate::OsslCertificate():cert(NULL){
 
@@ -131,7 +131,7 @@ OsslCertificate::OsslCertificate( X509 * Osslcert ){
 	if( Osslcert == NULL ){
 		throw CertificateException("X509 Certificate is NULL");
 	}
-	
+
 	cert = Osslcert;
 }
 
@@ -146,9 +146,9 @@ OsslCertificate::OsslCertificate( const string &cert_filename ){
 	}
 
 	cert = PEM_read_X509( fp, NULL, NULL, NULL );
-	
+
 	fclose( fp );
-	
+
 	if( cert == NULL ){
 		cerr << "Invalid Certificate file" << endl;
 		throw CertificateExceptionFile(
@@ -166,17 +166,17 @@ OsslCertificate::OsslCertificate( unsigned char * certData, int length, string p
    if( cert == NULL )
      throw CertificateExceptionInit(
 				      "Could not create the Certificate" );
-   
+
    cert = PEM_read_bio_X509(mem, NULL, 0 , NULL);
    if (cert == NULL)/*check if its a der encoded Certificate*/
      {
 	cert = d2i_X509_bio(mem, NULL);/*FIX, for some reason
 					this does never succeed */
 	if(NULL == cert)
-	  {	     
+	  {
 	     cerr << "Invalid Certificate file" << endl;
 	     throw CertificateExceptionFile("Invalid Certificate" );
-	  }	
+	  }
      }
    file = path;
 }
@@ -189,18 +189,18 @@ OsslCertificate::OsslCertificate( unsigned char * der_cert, int length ){
 		throw CertificateExceptionInit(
 				"Could not create the Certificate" );
 
-#if OPENSSL_VERSION_NUMBER >= 0x00908000L 
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
 	d2i_X509( &cert, (const unsigned char**)&der_cert, length );
 #else
 	d2i_X509( &cert, (unsigned char**)&der_cert, length );
 #endif
 }
-	
+
 OsslCertificate::~OsslCertificate(){
 	if( cert )
 		X509_free( cert );
 	cert = NULL;
-	
+
 }
 
 int OsslCertificate::envelopeData(unsigned char * data, int size, unsigned char *retdata, int *retsize,
@@ -221,18 +221,18 @@ int OsslCertificate::envelopeData(unsigned char * data, int size, unsigned char 
 	}
 
 	public_key = X509_get_pubkey( cert );
-	
+
 	if( public_key == NULL ){
 #ifdef DEBUG_OUTPUT
                 cerr << "Cound not read public key from Certificate" << endl;
 #endif
                 return -1;
 	}
-	
+
 	/*inits*/
 	EVP_CIPHER_CTX_init(&ctx);
 	EVP_SealInit(&ctx, EVP_aes_128_cbc(), &enckey, enckeylgth, *iv, &public_key, 1);
-	
+
 	/*encrypt*/
 	EVP_SealUpdate(&ctx, retdata, &temp, data, size);
 	err = EVP_SealFinal(&ctx, retdata + temp, &tmp);
@@ -257,7 +257,7 @@ int OsslPrivateKey::denvelopeData(unsigned char * data, int size, unsigned char 
         EVP_OpenUpdate(&ctx, retdata, &temp, data, size);
         err = EVP_OpenFinal(&ctx, retdata + temp , &tmp);
         if(err != 1){
-		cout<<"An error occurred when deenevolping the data"<<endl; 		
+		cout<<"An error occurred when deenevolping the data"<<endl;
 		return -1;
 	}
 	*retsize = temp +tmp;
@@ -272,7 +272,7 @@ int OsslPrivateKey::signData( unsigned char * data, int data_length,
 	int err;
 
 	ERR_load_crypto_strings();
-	
+
 	if( private_key == NULL )
 	{
 		sign = NULL;
@@ -283,12 +283,12 @@ int OsslPrivateKey::signData( unsigned char * data, int data_length,
 
 		return 1;
 	}
-	
+
 	// FIXME
 	EVP_SignInit( &ctx, EVP_sha1() );
 	EVP_SignUpdate( &ctx, data, data_length );
-	err = EVP_SignFinal( &ctx, sign, 
-			(unsigned int*)sign_length, 
+	err = EVP_SignFinal( &ctx, sign,
+			(unsigned int*)sign_length,
 			private_key );
 
 	//EVP_MD_CTX_cleanup( &ctx );
@@ -311,9 +311,9 @@ int OsslCertificate::verifSign( unsigned char * data, int data_length,
 	EVP_PKEY *      public_key;
 	EVP_MD_CTX      ctx;
 	int err;
-	
+
 	ERR_load_crypto_strings();
-	
+
 	if( cert == NULL )
 	{
 #ifdef DEBUG_OUTPUT
@@ -348,7 +348,7 @@ int OsslCertificate::verifSign( unsigned char * data, int data_length,
 	}
 	return err;
 }
-	
+
 bool OsslPrivateKey::privateDecrypt( const unsigned char *data, int size,
 				    unsigned char *retdata, int *retsize ){
 	//adding PKE payload
@@ -424,7 +424,7 @@ void OsslCertificate::getDer( unsigned char * output, unsigned int * length ){
  		throw CertificateException(
 			"Given buffer is to short" );
 	}
-	
+
 	int temp = i2d_X509( cert, &output);
 
 	// don't want it to be incremented:
@@ -497,7 +497,7 @@ vector<string> OsslCertificate::getAltName( SubjectAltName type ){
 			ASN1_IA5STRING * ia5 = NULL;
 
 			ia5 = name->d.ia5;
-			
+
 			size_t len = ASN1_STRING_length( ia5 );
 			char buf[ len + 1 ];
 			strncpy( buf, (const char*)ASN1_STRING_data( ia5 ),
@@ -512,6 +512,83 @@ vector<string> OsslCertificate::getAltName( SubjectAltName type ){
 
 	GENERAL_NAMES_free( altNames );
 	altNames = NULL;
+
+	return output;
+}
+
+/**
+ * @todo	Verify that there are no memory leaks! getAltName() uses GENERAL_NAMES_free() after the main loop but this
+ * 		function uses ACCESS_DESCRIPTION_free() at each iteration instead. This may lead to leaks as the stack
+ * 		used to store the ACCESS_DESCRIPTIONs is never explicitly freed using OpenSSL functions.
+ */
+vector<string> OsslCertificate::getSubjectInfoAccess() {
+	vector<string> output;
+
+	/*
+	int genType = -1;
+	switch( type ){
+	case SAN_DNSNAME:
+	genType = GEN_DNS;
+	break;
+	case SAN_RFC822NAME:
+	genType = GEN_EMAIL;
+	break;
+	case SAN_URI:
+	genType = GEN_URI;
+	break;
+	case SAN_IPADDRESS:
+			// Unsupported
+// 			genType = GEN_IPADD;
+// 			break;
+	default:
+	return output;
+}
+	*/
+	int pos = -1;
+	pos = X509_get_ext_by_NID(cert, NID_sinfo_access, -1);
+	if( pos == -1 ){
+		return output;
+	}
+
+	X509_EXTENSION * ext = X509_get_ext( cert, pos );
+	if( !ext ){
+		return output;
+	}
+
+
+	STACK_OF(ACCESS_DESCRIPTION) *adRecords = NULL;
+	adRecords = (STACK_OF(ACCESS_DESCRIPTION)*) X509V3_EXT_d2i( ext );
+
+	if( !adRecords ){
+		return output;
+	}
+
+	int adRecordsCount = sk_ACCESS_DESCRIPTION_num( adRecords );
+	for( int i=0; i < adRecordsCount; i++ ){
+		ACCESS_DESCRIPTION * ad = sk_ACCESS_DESCRIPTION_value(adRecords, i);
+		GENERAL_NAME * siaRecord = ad->location;
+
+		//if( siaRecord->type == genType ){
+		ASN1_IA5STRING * ia5 = NULL;
+
+		ia5 = siaRecord->d.ia5;
+
+		size_t len = ASN1_STRING_length( ia5 );
+
+		char buf[ len + 1 ];
+		strncpy( buf, (const char*)ASN1_STRING_data( ia5 ),
+			 len );
+
+		string str( buf, len );
+
+		output.push_back( str );
+		//}
+
+		ACCESS_DESCRIPTION_free(ad);
+
+	}
+
+	adRecords = NULL;
 
 	return output;
 }
@@ -538,7 +615,7 @@ string OsslCertificate::getIssuerCn(){
 
 OsslPrivateKey::OsslPrivateKey( const string &file ){
 	FILE * fp = NULL;
-	
+
 	fp = fopen( file.c_str(), "r" );
 	if( fp == NULL ){
 		cerr << "Could not open the private key file" << endl;
@@ -548,7 +625,7 @@ OsslPrivateKey::OsslPrivateKey( const string &file ){
 
 	private_key = PEM_read_PrivateKey(fp, NULL, NULL, NULL);
 	fclose( fp );
-	
+
 	if( private_key == NULL ){
 		cerr << "Invalid private key file" << endl;
 		throw CertificateExceptionFile(
@@ -583,23 +660,23 @@ OsslPrivateKey::OsslPrivateKey( char *derEncPk, int length,
 			      const std::string &password,
 			      const std::string &path )
 {
-   BIO *mem;  
+   BIO *mem;
    mem = BIO_new_mem_buf((void *)derEncPk, length);
-   
+
    if(mem == NULL )
      {
 	cerr << "Couldn't initiate bio buffer" << endl;
 	throw CertificateExceptionPkey("Couldn't initiate bio buffer" );
      }
-      
+
    private_key = PEM_read_bio_PrivateKey(mem, NULL, 0, (void*)password.c_str());
- 
+
    if(private_key == NULL )
      {
 	cerr << "Invalid private key data or password" << endl;
 	throw CertificateExceptionPkey("The private key is invalid or wrong password was used" );
      }
-   
+
    pk_file=path;
 }
 
@@ -630,11 +707,11 @@ int OsslCertificate::control( CertificateSet * cert_db ){
 
 	return result;
 }
-	
 
-// 
+
+//
 // OsslCertificateSet
-// 
+//
 
 OsslCertificateSet::OsslCertificateSet(){
 	cert_db = X509_STORE_new();
@@ -655,13 +732,13 @@ X509_STORE * OsslCertificateSet::getDb(){
 
 void OsslCertificateSet::addDirectory( string dir ){
 	X509_LOOKUP * lookup = NULL;
-	
-	lookup = X509_STORE_add_lookup( 
+
+	lookup = X509_STORE_add_lookup(
 			cert_db, X509_LOOKUP_hash_dir() );
 	if( lookup == NULL )
 		throw CertificateExceptionInit(
 			"Could not create a directory lookup");
-	
+
 	if( !X509_LOOKUP_add_dir( lookup, dir.c_str(), X509_FILETYPE_PEM ) )
 		throw CertificateExceptionFile(
 			(string("Could not open the directory ")+dir).c_str() );
@@ -671,13 +748,13 @@ void OsslCertificateSet::addDirectory( string dir ){
 
 void OsslCertificateSet::addFile( string file ){
 	X509_LOOKUP * lookup = NULL;
-	
-	lookup = X509_STORE_add_lookup( 
+
+	lookup = X509_STORE_add_lookup(
 			cert_db, X509_LOOKUP_file() );
 	if( lookup == NULL )
 		throw CertificateExceptionInit(
 			"Could not create a file lookup" );
-	
+
 	if( !X509_LOOKUP_load_file( lookup, file.c_str(), X509_FILETYPE_PEM ) )
 		throw CertificateExceptionFile(
 			("Could not open the file "+file).c_str() );
@@ -695,7 +772,7 @@ void OsslCertificateSet::addCertificate( MRef<Certificate *> cert ){
 
 //
 // OsslCertificateChain
-// 
+//
 
 OsslCertificateChain::OsslCertificateChain(){
 }
