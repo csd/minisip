@@ -31,7 +31,10 @@
 
 #include<list>
 #include<string>
+#include<vector>
 
+#include<libmutil/MPlugin.h>
+#include<libmutil/MSingleton.h>
 #include<libminisip/contacts/ContactDb.h>
 
 class PhoneBookPerson;
@@ -93,5 +96,36 @@ class LIBMINISIP_API PhoneBookPerson : public MObject{
 		MRef< ContactEntry * > defaultEntry;
 		std::list< MRef<ContactEntry *> > entries;
 
+};
+
+/**
+ * Phone book IO driver plugin base class.
+ */
+class LIBMINISIP_API PhoneBookIoDriver : public MPlugin{
+	public:
+		virtual std::string getPrefix()const=0;
+		virtual MRef<PhoneBookIo*> createPhoneBookIo( const std::string &name )const=0;
+
+		std::string getPluginType() const { return "PhoneBookIo"; }
+
+	protected:
+		PhoneBookIoDriver( MRef<Library *> lib );
+		PhoneBookIoDriver();
+};
+
+/**
+ * Registry of phone book Io plugins.
+ */
+class LIBMINISIP_API PhoneBookIoRegistry: public MPluginRegistry, public MSingleton<PhoneBookIoRegistry>{
+	public:
+		virtual std::string getPluginType(){ return "PhoneBookIo"; }
+
+		MRef<PhoneBook*> createPhoneBook( const std::string &name );
+
+	protected:
+		PhoneBookIoRegistry();
+
+	private:
+		friend class MSingleton<PhoneBookIoRegistry>;		
 };
 #endif

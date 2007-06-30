@@ -70,6 +70,7 @@
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfCallback.h>
 #include<libminisip/config/ConfBackend.h>
+#include<libminisip/contacts/PhoneBook.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libminisip/media/codecs/Codec.h>
@@ -133,6 +134,7 @@ static void loadPlugins(const string &argv0){
 	ConfigRegistry::getInstance();
 	MediaRegistry::getInstance();
 	ResamplerRegistry::getInstance();
+	PhoneBookIoRegistry::getInstance();
 
 	MRef<MPluginManager *> pluginManager = MPluginManager::getInstance();
 

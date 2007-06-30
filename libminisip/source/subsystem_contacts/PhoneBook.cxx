@@ -27,6 +27,7 @@
 #include<libminisip/contacts/PhoneBook.h>
 
 #include<libminisip/contacts/ContactDb.h>
+#include"MXmlPhoneBookIo.h"
 
 using namespace std;
 
@@ -139,4 +140,60 @@ std::list< MRef<ContactEntry *> > PhoneBookPerson::getEntries(){
 
 void PhoneBookPerson::setPhoneBook( MRef<PhoneBook *> phonebook ){
 	this->phoneBook = phonebook;
+}
+
+
+PhoneBookIoDriver::PhoneBookIoDriver( MRef<Library *> lib ): MPlugin( lib ) {}
+PhoneBookIoDriver::PhoneBookIoDriver(): MPlugin() {}
+
+PhoneBookIoRegistry::PhoneBookIoRegistry(){
+	registerPlugin( new MXmlPhoneBookIoDriver( NULL ) );
+}
+
+MRef<PhoneBook*> PhoneBookIoRegistry::createPhoneBook( const string &name )
+{
+	string driverId;
+	string deviceId;
+
+#ifdef DEBUG_OUTPUT
+	mdbg << "PhoneBookIoRegistry: name =  " << name << endl;
+#endif
+	size_t pos = name.find( ':', 0 );
+	if( pos == string::npos ){
+		return NULL;
+	}
+
+	driverId = name.substr( 0, pos );
+
+#ifdef DEBUG_OUTPUT
+	mdbg << "PhoneBookIoRegistry: driverId =  " << driverId << endl;
+#endif
+
+	list< MRef<MPlugin*> >::iterator iter;
+	list< MRef<MPlugin*> >::iterator stop = plugins.end();
+
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		MRef<PhoneBookIoDriver*> driver = dynamic_cast<PhoneBookIoDriver*>(*plugin);
+
+		if( !driver ){
+			merr << "Not a PhoneBookIoDriver? " << plugin->getName() << endl;
+		}
+
+		if( driver && driver->getPrefix() == driverId ){
+			MRef<PhoneBookIo*> io =
+				driver->createPhoneBookIo( name );
+
+			if( io ){
+				return io->load();
+			}
+			else{
+				mdbg << "PhoneBookIoRegistry: no io" << name << endl;
+			}
+		}
+	}
+
+	mdbg << "PhoneBookIoRegistry: device not found " << name << endl;
+	return NULL;
 }

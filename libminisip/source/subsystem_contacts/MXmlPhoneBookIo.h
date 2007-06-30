@@ -49,4 +49,21 @@ class LIBMINISIP_API MXmlPhoneBookIo : public PhoneBookIo{
 		std::string fileName;
 };
 
+class LIBMINISIP_API MXmlPhoneBookIoDriver : public PhoneBookIoDriver{
+	public:
+		MXmlPhoneBookIoDriver( MRef<Library *> lib );
+		virtual ~MXmlPhoneBookIoDriver();
+
+		// MObject Impl
+		virtual std::string getMemObjectType() const {return "PhoneBookIo";}
+		// MPlugin impl
+		virtual std::string getDescription() const { return "MXml PhoneBook IO driver"; };
+		virtual std::string getName() const { return "MXmlPhoneBookIo"; }
+		virtual uint32_t getVersion() const {return 0x00000001;}
+
+		// PhoneBookIo Impl
+		virtual std::string getPrefix() const { return "file"; }
+		virtual MRef<PhoneBookIo*> createPhoneBookIo(const std::string &name) const;
+};
+
 #endif

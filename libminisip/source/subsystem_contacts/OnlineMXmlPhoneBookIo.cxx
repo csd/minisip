@@ -24,7 +24,7 @@
 
 #include<config.h>
 
-#include<libminisip/contacts/OnlineMXmlPhoneBookIo.h>
+#include"OnlineMXmlPhoneBookIo.h"
 
 #include<libminisip/contacts/PhoneBook.h>
 #include<libminisip/contacts/ContactDb.h>

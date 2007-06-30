@@ -42,8 +42,6 @@
 #include<libminisip/media/soundcard/SoundIO.h>
 #include<libminisip/media/MediaHandler.h>
 #include<libminisip/contacts/PhoneBook.h>
-#include<libminisip/contacts/MXmlPhoneBookIo.h>
-#include<libminisip/contacts/OnlineMXmlPhoneBookIo.h>
 #include<libminisip/config/ConfBackend.h>
 #include<libminisip/config/UserConfig.h>
 #include<fstream>
@@ -818,19 +816,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		s = backend->loadString("phonebook["+itoa(i)+"]","");
 
 		if (s!=""){
-			MRef<PhoneBook *> pb;
-		   if (s.substr(0,7)=="file://"){
-		      pb = PhoneBook::create(new MXmlPhoneBookIo(s.substr(7)));
-		   }
-#ifdef ONLINECONF_SUPPORT
-		   if (s.substr(0,10)=="httpsrp://")
-		     {
-			OnlineConfBack *conf;
-			conf = backend->getConf(); 
-			pb = PhoneBook::create(new OnlineMXmlPhoneBookIo(conf));
-			
-		     }
-#endif
+			MRef<PhoneBook *> pb;	
+			pb = PhoneBookIoRegistry::getInstance()->createPhoneBook( s );
 		   
 			// FIXME http and other cases should go here
 			if( !pb.isNull() ){

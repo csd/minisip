@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,15 +16,16 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2004 
+/* Copyright (C) 2004-2007
  *
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
+ *          Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
 
-#include<libminisip/contacts/MXmlPhoneBookIo.h>
+#include"MXmlPhoneBookIo.h"
 
 #include<libminisip/contacts/PhoneBook.h>
 #include<libminisip/contacts/ContactDb.h>
@@ -37,14 +38,54 @@
 
 using namespace std;
 
-MXmlPhoneBookIo::MXmlPhoneBookIo( string fn ):fileName( fn ){
-	
+#if 0
+// Linked in PhoneBookIoDriver
+static std::list<std::string> pluginList;
+static int initialized;
+
+extern "C"
+std::list<std::string> *mxmlpb_LTX_listPlugins( MRef<Library *> lib ){
+	if( !initialized ){
+		pluginList.push_back("getPlugin");
+		initialized = true;
+	}
+
+	return &pluginList;
+}
+
+extern "C"
+MRef<MPlugin *> mxmlpb_LTX_getPlugin( MRef<Library *> lib ){
+	return new MXmlPhoneBookIoDriver( lib );
+}
+#endif
+
+MRef<PhoneBookIo*> MXmlPhoneBookIoDriver::createPhoneBookIo( const string &name ) const
+{
+	return new MXmlPhoneBookIo( name );
+}
+
+MXmlPhoneBookIoDriver::MXmlPhoneBookIoDriver( MRef<Library *> lib ): PhoneBookIoDriver( lib )
+{
+}
+
+MXmlPhoneBookIoDriver::~MXmlPhoneBookIoDriver()
+{
+}
+
+MXmlPhoneBookIo::MXmlPhoneBookIo( string fn ){
+	if (fn.substr(0,7)=="file://"){
+		fileName = fn.substr(7);
+	}
 }
 
 MRef<PhoneBook *> MXmlPhoneBookIo::load(){
 	MRef<PhoneBook *> phonebook = new PhoneBook;
 	ContactEntry * entry;
 	XMLParser * parser;
+
+	if( fileName.empty() ){
+		return NULL;
+	}
 
 	try{
 		parser = new XMLFileParser( fileName ); 
