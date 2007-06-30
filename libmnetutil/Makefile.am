@@ -65,7 +65,9 @@ mnetutil_src = \
 		    source/HttpDownloader.cxx \
 		    source/FileUrl.cxx \
 		    source/FileDownloaderException.cxx \
-		    source/FileDownloader.cxx
+		    source/FileDownloader.cxx \
+		    source/DirectorySet.cxx \
+		    source/DirectorySetItem.cxx
 
 # maintainer rules
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}

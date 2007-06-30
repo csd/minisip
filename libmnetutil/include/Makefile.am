@@ -30,7 +30,9 @@ pkginclude_HEADERS =    \
 			libmnetutil/HttpDownloader.h \
 			libmnetutil/FileUrl.h \
 			libmnetutil/FileDownloaderException.h \
-			libmnetutil/FileDownloader.h
+			libmnetutil/FileDownloader.h \
+			libmnetutil/DirectorySet.h \
+			libmnetutil/DirectorySetItem.h
 
 noinst_HEADERS = 	\
 			config.h \

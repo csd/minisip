@@ -28,7 +28,8 @@ pkginclude_HEADERS = \
 			libmutil/MPlugin.h \
 			libmutil/libmutil_config.h \
 			libmutil/MSingleton.h \
-			libmutil/CircularBuffer.h
+			libmutil/CircularBuffer.h \
+			libmutil/CacheItem.h
 
 noinst_HEADERS = 	config.h
 

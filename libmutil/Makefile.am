@@ -62,6 +62,7 @@ mutil_src = \
 		source/XMLParser.cxx \
 		source/MPlugin.cxx \
 		source/CircularBuffer.cxx \
+		source/CacheItem.cxx \
 		$(thread_src)
 
 # maintainer rules
