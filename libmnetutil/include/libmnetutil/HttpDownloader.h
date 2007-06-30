@@ -75,7 +75,7 @@ if (!d.isNull()) {
  *
  * @author	Mikael Svensson
  */
-class HttpDownloader : public Downloader {
+class LIBMNETUTIL_API HttpDownloader : public Downloader {
 	public:
 		/**
 		 * Connects to HTTP server but does not fetch file.

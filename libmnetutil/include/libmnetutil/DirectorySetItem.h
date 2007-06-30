@@ -34,7 +34,7 @@
 /**
  * Represents a single directory service.
  */
-class DirectorySetItem : public CacheItem {
+class LIBMNETUTIL_API DirectorySetItem : public CacheItem {
 	public:
 		DirectorySetItem();
 		DirectorySetItem(std::string url, std::string subTree);

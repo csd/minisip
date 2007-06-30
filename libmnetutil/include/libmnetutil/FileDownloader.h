@@ -37,7 +37,7 @@
  *
  * @author	Mikael Svensson
  */
-class FileDownloader : public Downloader {
+class LIBMNETUTIL_API FileDownloader : public Downloader {
 	public:
 		/**
 		* Connects to LDAP server but does not fetch file.

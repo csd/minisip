@@ -88,7 +88,7 @@ int main (int argc, char* argv[]) {
  * @endcode
  * @author	Mikael Svensson
  */
-class DirectorySet : public MObject {
+class LIBMNETUTIL_API DirectorySet : public MObject {
 	public:
 		DirectorySet();
 		~DirectorySet();

@@ -20,6 +20,7 @@
  * Authors:	Mikael Svensson
 */
 
+#include <config.h>
 #include <libmnetutil/DirectorySetItem.h>
 
 DirectorySetItem::DirectorySetItem() : type(DIRECTORYSETITEM_TYPE_LDAP), url(""), subTree("") {}

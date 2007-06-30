@@ -28,7 +28,7 @@
  *
  * @author	Mikael Svensson
  */
-class LdapDirectoryLocator : public MObject {
+class LIBMNETUTIL_API LdapDirectoryLocator : public MObject {
 	public:
 		static std::string findDnsSrv();
 		static std::string findDnsAlias();

@@ -31,14 +31,14 @@
 #include <map>
 #include <vector>
 
-class certificate_pair {}; //Dummy entry
+class LIBMNETUTIL_API certificate_pair {}; //Dummy entry
 
 /**
  * Class used internally by LdapEntry
  *
  * @author	Mikael Svensson
  */
-class LdapEntryBinaryValue : public MObject {
+class LIBMNETUTIL_API LdapEntryBinaryValue : public MObject {
 	public:
 		LdapEntryBinaryValue(char* v, int l) : length(l) {
 			value = new char[length];

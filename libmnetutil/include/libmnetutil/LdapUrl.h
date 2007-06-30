@@ -29,7 +29,7 @@
  *
  * Does not have any methods, only data members.
  */
-class LdapUrlExtension {
+class LIBMNETUTIL_API LdapUrlExtension {
 	public:
 		LdapUrlExtension(std::string type, std::string value, bool critical) : type(type), value(value), critical(critical) {}
 
@@ -50,7 +50,7 @@ class LdapUrlExtension {
  *
  * @author	Mikael Svensson
  */
-class LdapUrl {
+class LIBMNETUTIL_API LdapUrl {
 	public:
 		LdapUrl(std::string url);
 		LdapUrl();

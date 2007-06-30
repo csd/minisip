@@ -31,7 +31,7 @@
  *
  * @author	Mikael Svensson
  */
-class LdapCredentials : public MObject {
+class LIBMNETUTIL_API LdapCredentials : public MObject {
 	public:
 // 		MRef<certificate*> cert;
 		std::string username;

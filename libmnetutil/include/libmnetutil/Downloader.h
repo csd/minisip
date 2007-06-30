@@ -35,7 +35,7 @@
  * cannot be instantiated by itself.
  *
  */
-class Downloader : public MObject {
+class LIBMNETUTIL_API Downloader : public MObject {
 
 	public:
 		/**

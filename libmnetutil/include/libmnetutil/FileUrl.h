@@ -45,7 +45,7 @@
  *
  * @author	Mikael Svensson
  */
-class FileUrl {
+class LIBMNETUTIL_API FileUrl {
 	public:
 		/**
 		 * Constructor when we already have a URL but it is unclear for which system

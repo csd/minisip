@@ -37,7 +37,7 @@
  *
  * @author	Mikael Svensson
  */
-class LdapConnection : public MObject {
+class LIBMNETUTIL_API LdapConnection : public MObject {
 	public:
 		LdapConnection(std::string host, int32_t port);
 		LdapConnection(std::string host, int32_t port, MRef<LdapCredentials*> cred);

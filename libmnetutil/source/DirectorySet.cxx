@@ -23,6 +23,7 @@
  *          	Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
+#include <config.h>
 #include <libmnetutil/libmnetutil_config.h>
 #include <libmutil/MemObject.h>
 

@@ -20,6 +20,7 @@
  * Authors:	Mikael Svensson
 */
 
+#include <config.h>
 #include <libmutil/CacheItem.h>
 
 CacheItem::CacheItem() {
