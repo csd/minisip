@@ -30,6 +30,8 @@
 #include <libmnetutil/DirectorySet.h>
 #include <libmutil/stringutils.h>
 
+#include <algorithm>
+
 DirectorySet::DirectorySet(){
 	itemsIndex = items.begin();
 }
@@ -41,7 +43,7 @@ DirectorySet::~DirectorySet(){
 	items.clear();
 }
 
-DirectorySet* DirectorySet::clone(){
+DirectorySet* DirectorySet::clone() {
 	DirectorySet * db = create();
 
 	lock();
@@ -68,7 +70,7 @@ void DirectorySet::unlock(){
 	mLock.unlock();
 }
 
-void DirectorySet::addItem( MRef<DirectorySetItem*> item ){
+void DirectorySet::addItem(const MRef<DirectorySetItem*> item ){
 	items.push_back( item );
 	itemsIndex = items.begin();
 }
@@ -98,16 +100,15 @@ void DirectorySet::remove( MRef<DirectorySetItem*> removedItem ){
 	initIndex();
 }
 
-std::list<MRef<DirectorySetItem*> > &DirectorySet::getItems(){
+std::list<MRef<DirectorySetItem*> > &DirectorySet::getItems() {
 	return items;
 }
-std::list<MRef<DirectorySetItem*> > DirectorySet::findItems(const std::string subTree, bool endsWithIsEnough) {
+std::list<MRef<DirectorySetItem*> > DirectorySet::findItems(const std::string subTree, const bool endsWithIsEnough) {
 	std::list<MRef<DirectorySetItem*> > res;
 	initIndex();
 
 	while( itemsIndex != items.end() ){
 		MRef<DirectorySetItem*> item = *itemsIndex;
-		bool addThis = false;
 
 		if ((endsWithIsEnough && stringEndsWith(item->getSubTree(), subTree)) || item->getSubTree() == subTree)
 			res.push_back(item);
@@ -118,12 +119,50 @@ std::list<MRef<DirectorySetItem*> > DirectorySet::findItems(const std::string su
 	return res;
 }
 
+/**
+ * This function is placed outside of DirectorySet class since I couldn't
+ * get the sort function to use it when it was a part of a class.
+ *
+ * @author	Mikael Svensson
+ */
+bool directorySetItemUrlComparator(MRef<DirectorySetItem*> a, MRef<DirectorySetItem*> b) {
+	return (a->getSubTree().length() > b->getSubTree().length());
+}
+
+std::vector<MRef<DirectorySetItem*> > DirectorySet::findItemsPrioritized(const std::string domain) {
+
+	std::vector<MRef<DirectorySetItem*> > res;
+	/*
+	PHASE 1: Picking out candidate directory server.
+	*/
+	initIndex();
+
+	while( itemsIndex != items.end() ){
+		MRef<DirectorySetItem*> item = *itemsIndex;
+		if (stringEndsWith(domain, item->getSubTree()))
+			res.push_back(item);
+
+		itemsIndex++;
+	}
+
+	/*
+	PHASE 2: Sorting the candidates. Longest URL first.
+	*/
+	sort(res.begin(), res.end(), directorySetItemUrlComparator);
+
+	/*
+	CONCLUDE =)
+	*/
+	initIndex();
+	return res;
+}
+
 
 void DirectorySet::initIndex(){
 	itemsIndex = items.begin();
 }
 
-MRef<DirectorySetItem*> DirectorySet::getNext(){
+MRef<DirectorySetItem*> DirectorySet::getNext() {
 	MRef<DirectorySetItem*> tmp;
 
 	if( itemsIndex == items.end() ){

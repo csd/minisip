@@ -95,7 +95,7 @@ class LIBMNETUTIL_API DirectorySet : public MObject {
 		static DirectorySet *create();
 
 		DirectorySet* clone();
-		void addLdap (std::string url, std::string subTree);
+		void addLdap (const std::string url, const std::string subTree);
 
 		/**
 		 * Returns \em reference to the list of all directory items in the set
@@ -112,6 +112,7 @@ class LIBMNETUTIL_API DirectorySet : public MObject {
 		 * subTree = "ssvl.kth.se" and you want to retrieve both of them: then you just set the
 		 * first function parameter to "kth.se" and the second to "true".
 		 *
+		 * @deprecated	I see no use for this function. findItemsPrioritized() provides a more useful functionality.
 		 * @note	This function does \em not return a reference variable, which getItems() do.
 		 * 		However, even though it returns a new list, each of the list items still refer
 		 * 		to the exact same items that are stored in the set (i.e. items are not cloned
@@ -124,7 +125,30 @@ class LIBMNETUTIL_API DirectorySet : public MObject {
 		 * 					If false: function returns only items where there is and
 		 * 					exact matching of \p subTree.
 		 */
-		std::list<MRef<DirectorySetItem*> > findItems(const std::string subTree, bool endsWithIsEnough = true);
+		std::list<MRef<DirectorySetItem*> > findItems(const std::string subTree, const bool endsWithIsEnough = true);
+
+		/**
+		 * Returns a list of directory items where the first item in the list represents the
+		 * directory most likely to maintain information about users in \p domain.
+		 *
+		 * The function works like this:
+		 * - First and foremost all directory items are scanned and those that have some
+		 *   part of their domain name in common with \p domain make it to the next step.
+		 *
+		 *   A directory URL \c i have "something in common" with \p domain if the string
+		 *   \p domain ends with the string \c i. This means that if we are looking for
+		 *   directories with information about alice@ssvl.kth.se and there is a cached
+		 *   directory item for "kth.se", then that cached item should be returned. If,
+		 *   however, we are looking for "alice@kth.se" it would not be OK to return a
+		 *   cached directory item for "ssvl.kth.se".
+		 *
+		 * - The second phase is simply a sorting of the result from phase 1: the longest
+		 *   match should be at the beginning of the list ("ssvl.kth.se" outranks "kth.se"
+		 *   as it is more probable that the former has information about "alice@ssvl.kth.se"
+		 *   than the latter).
+		 */
+		std::vector<MRef<DirectorySetItem*> > findItemsPrioritized(const std::string domain);
+
 		MRef<DirectorySetItem*> getNext();
 
 		void initIndex();
@@ -133,12 +157,12 @@ class LIBMNETUTIL_API DirectorySet : public MObject {
 
 		void remove (MRef<DirectorySetItem*> removedItem);
 
-		void addItem (MRef<DirectorySetItem*> item);
+		void addItem (const MRef<DirectorySetItem*> item);
 
 		/**
 		 * Create directory item refering to an LDAP directory
 		 */
-		MRef<DirectorySetItem*> createItemLdap(std::string url, std::string subTree);
+		MRef<DirectorySetItem*> createItemLdap(const std::string url, const std::string subTree);
 
 	private:
 		std::list<MRef<DirectorySetItem*> >::iterator itemsIndex;

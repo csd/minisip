@@ -416,6 +416,7 @@ ldappb_la_SOURCES = source/subsystem_contacts/LdapPhoneBookIo.cxx
 ldappb_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(MNETUTIL_LIBS)
 endif
 
+libcachemanager_src = 	source/subsystem_config/CacheManager.cxx
 
 libminisip_la_SOURCES = source/Minisip.cxx \
 			source/MinisipExceptions.cxx \
@@ -435,7 +436,8 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libzrtp_src) \
 			$(libsdp_src) \
 			$(libsoundcard_src) \
-			$(libspaudio_src)
+			$(libspaudio_src) \
+			$(libcachemanager_src)
 
 libminisip_la_LIBADD += $(libsoundcard_libadd)
 
