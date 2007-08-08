@@ -46,7 +46,10 @@ libmcrypto_core_la_SOURCES = \
 		$(srp_src) \
 		TlsException.cxx \
 		uuid.cxx \
-		rijndael-alg-fst.cxx
+		rijndael-alg-fst.cxx \
+		CacheManager.cxx \
+		CertificateFinder.cxx \
+		CertificatePathFinderUcd.cxx
 
 libmcrypto_core_la_LIBADD = $(srp_libs) $(SCSIM_LIBS)
 

@@ -47,7 +47,9 @@ pkginclude_HEADERS = \
 		ZrtpDH.h \
 		$(OTHER_FILES)
 
-OTHER_FILES =
+OTHER_FILES = 	CacheManager.h \
+		CertificateFinder.h \
+		CertificatePathFinderUcd.h
 
 if HAVE_EVP_SHA256
 OTHER_FILES += hmac256.h sha256.h

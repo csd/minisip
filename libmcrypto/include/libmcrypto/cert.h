@@ -34,6 +34,7 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
+#include<libmutil/CacheItem.h>
 
 class Certificate;
 
@@ -41,16 +42,93 @@ class Certificate;
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
 
-class LIBMCRYPTO_API CertificateSetItem: public MObject{
+class LIBMCRYPTO_API CertificatePair: public MObject {
+	public:
+		CertificatePair();
+		CertificatePair(MRef<Certificate*> issuedToThisCA);
+		CertificatePair(MRef<Certificate*> issuedToThisCA, MRef<Certificate*> issuedByThisCA);
+		MRef<Certificate*> issuedToThisCA;
+		MRef<Certificate*> issuedByThisCA;
+};
+
+class LIBMCRYPTO_API CertificateSetItem: public CacheItem {
 	public:
 		std::string item;
 		int type;
 
 		virtual ~CertificateSetItem();
 
+		CertificateSetItem();
+		CertificateSetItem(std::string certUri);
+		CertificateSetItem(MRef<Certificate*> cert);
+
+		/*
+		Getters
+		*/
+		std::string getSubject();
+		std::vector<std::string> getSubjectAltNames();
+		std::string getSubjectKeyIdentifier();
+
+		std::string getIssuer();
+		std::vector<std::string> getIssuerAltNames();
+		std::string getIssuerKeyIdentifier();
+
+		bool isSelfSigned();
+
+		std::string getCertificateUri();
+		MRef<Certificate*> getCertificate();
+
+		/**
+		 * Loads certificates specified by private variables \c certificateUri or \c certificate.
+		 */
+		void loadCertAndIndex();
+
+		/**
+		 * Load certificate contained in \p cert.
+		 */
+		//void loadToMemory(MRef<Certificate*> cert);
+
+		/**
+		 * Frees memory allocated by associated certificate data. The indexed information
+		 * it still kept. This function is useful when loading an entire folder of
+		 * certificates -- it is then probably not necessary/wanted to keep all certificates
+		 * in memory. Thus, when a certificates has been loaded and indexes this function
+		 * is called and the excess memory used by the actual certificate is released.
+		 *
+		 * If the \c certificateUri property has been set the certificate data can be reloaded
+		 * later using the loadToMemory() function.
+		 */
+		void unloadCertificateFromMemory();
+
 		bool operator ==(const CertificateSetItem item2){ return (
 				item2.item == item &&
 				item2.type == type);};
+
+	private:
+		/*
+		Indexed attributes
+		*/
+		std::string subject;
+		std::vector<std::string> subjectAltNames;
+		std::string subjectKeyIdentifier;
+
+		std::string issuer;
+		std::vector<std::string> issuerAltNames;
+		std::string issuerKeyIdentifier;
+
+		/*
+		Certificate status
+		*/
+		bool selfSigned;
+
+		/*
+		Information either linking directly to a instantiated certificate or providing
+		an URI to where the certificate can be found.
+		*/
+		std::string certificateUri;
+		MRef<Certificate*> certificate;
+
+		void reindexCert();
 };
 
 
@@ -177,6 +255,14 @@ class LIBMCRYPTO_API Certificate: public MObject{
 		virtual std::vector<std::string> getSubjectInfoAccess()=0;
 		virtual std::string getIssuer()=0;
 		virtual std::string getIssuerCn()=0;
+
+		/**
+		 * Returns whether or not at least one of the certificate's subjectAltNames
+		 * are equal to \p uri.
+		 */
+		bool hasAltNameSipUri(std::string uri);
+		bool hasAltName(std::string uri);
+		bool hasAltName(std::string uri, SubjectAltName type);
 
 		std::string getFile();
 		std::string getPkFile();
