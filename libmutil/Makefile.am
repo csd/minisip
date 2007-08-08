@@ -64,6 +64,7 @@ mutil_src = \
 		source/CircularBuffer.cxx \
 		source/SipUri.cxx \
 		source/CacheItem.cxx \
+		source/FileSystemUtils.cxx \
 		$(thread_src)
 
 # maintainer rules

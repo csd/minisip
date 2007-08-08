@@ -30,7 +30,8 @@ pkginclude_HEADERS = \
 			libmutil/MSingleton.h \
 			libmutil/CircularBuffer.h \
 			libmutil/SipUri.h \
-			libmutil/CacheItem.h
+			libmutil/CacheItem.h \
+			libmutil/FileSystemUtils.h
 
 noinst_HEADERS = 	config.h
 
