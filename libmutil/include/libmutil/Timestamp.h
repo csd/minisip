@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -89,7 +89,8 @@ class LIBMUTIL_API Timestamp{
 		void save( uint32_t id );
 		void save(std::string descr);
 		void print();
-		
+		void print(std::string fileName);
+
 #if 0
 		/**
 		 * initialize the file and writes the init_data
@@ -100,17 +101,17 @@ class LIBMUTIL_API Timestamp{
 		 *                  file before the measurement results.
 		 */
 		void init(std::string filename, std::string init_data);
-		
+
 		/**
 		 * start the timer
 		 */
 		void start();
-		
+
 		/**
 		 * stop the timer
 		 */
 		void stop();
-		
+
 		/**
 		 * compute the elapsed time in seconds and write it to the
 		 * file defined in init().
@@ -121,25 +122,25 @@ class LIBMUTIL_API Timestamp{
 #endif
 	private:
 		uint32_t index;
-		
+
 		struct timezone * tz;
-		
+
 		struct timeval * values;
 		int32_t * ids;
-		
+
 		int auto_id;
 		std::string *strings;
-		
-		
+
+
 		///Time that the timer was started
 		double startTime;
-		
+
 		///Time that the timer was stopped
 		double stopTime;
-		
+
 		///the name of the file for saving the results
 		std::string filename;
-		
+
 
 };
 

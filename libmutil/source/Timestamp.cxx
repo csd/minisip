@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -106,12 +106,20 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 #endif
 
 #ifdef WIN32
-	void Timestamp::print(){}
+	void Timestamp::print(std::string fileName){}
 #else
-	void Timestamp::print(){
+	void Timestamp::print() {
+		print(FILE_NAME);
+	}
+#endif
+
+#ifdef WIN32
+	void Timestamp::print(std::string fileName){}
+#else
+	void Timestamp::print(std::string fileName){
 		uint32_t i;
 		struct timeval temp;
-		ofstream file( FILE_NAME );
+		ofstream file( fileName.c_str() );
 		file << "Saved timestamps: " << endl;
 		temp = values[0];
 		for( i = 0 ; i < index && i < MAX_TIMESTAMPS; i++ ){
@@ -119,13 +127,13 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 			if (ids[i]<0){
 				string val = strings[-ids[i]];
 	//			cerr << "will write "<<val<< endl;
-				file << "  " << val << ":\t" 
-					<< values[i].tv_sec << ":\t" 
+				file << "  " << val << ":\t"
+					<< values[i].tv_sec << ":\t"
 					<< values[i].tv_usec <<"\t"
 					<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
 			}else
-				file << "  " << id_names[ ids[i] ] << ":\t" 
-					<< values[i].tv_sec << ":\t" 
+				file << "  " << id_names[ ids[i] ] << ":\t"
+					<< values[i].tv_sec << ":\t"
 					<< values[i].tv_usec <<"\t"
 					<< (values[i].tv_sec - temp.tv_sec)*1000000 + values[i].tv_usec - temp.tv_usec <<endl;
 			temp = values[i];
@@ -139,7 +147,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 #else
 	void Timestamp::init(std::string filename, std::string init_data){
 		this->filename=filename;
-		
+
 		ofstream file (&filename[0]);
 		//write init_data in file
 		file << init_data << endl;
@@ -174,17 +182,17 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 #else
 	string Timestamp::writeElapsedTime(std::string descr){
 	double elapsedTime = stopTime-startTime;
-	
+
 	//convert to string
 	ostringstream Str;
 	Str<<elapsedTime;
 	string s_elapsedTime(Str.str());
-	
+
 	//enter value into file
 	ofstream file (&this->filename[0], ios::app);
 	file << descr << ";" << s_elapsedTime <<endl;
 	file.close();
-	
+
 	return s_elapsedTime;
 }
 #endif
