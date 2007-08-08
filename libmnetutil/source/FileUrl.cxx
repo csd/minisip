@@ -176,7 +176,11 @@ void FileUrl::setHost(std::string host) {
 	this->host = host;
 }
 std::string FileUrl::getPath() const {
+#ifdef WIN32
 	return path;
+#else
+	return "/" + path;
+#endif
 }
 void FileUrl::setPath(std::string path) {
 	this->path = path;

@@ -31,8 +31,6 @@
 #include <map>
 #include <vector>
 
-class LIBMNETUTIL_API certificate_pair {}; //Dummy entry
-
 /**
  * Class used internally by LdapEntry
  *
@@ -51,6 +49,16 @@ class LIBMNETUTIL_API LdapEntryBinaryValue : public MObject {
 		int length;
 };
 
+class LIBMNETUTIL_API LdapEntryBinaryPairValue : public MObject {
+	public:
+		LdapEntryBinaryPairValue(MRef<LdapEntryBinaryValue*> first, MRef<LdapEntryBinaryValue*> second) {
+			this->first = first;
+			this->second = second;
+		}
+		MRef<LdapEntryBinaryValue*> first;
+		MRef<LdapEntryBinaryValue*> second;
+};
+
 /**
  * Represents one object in the LDAP directory, including its attribute values.
  *
@@ -67,7 +75,7 @@ class LIBMNETUTIL_API LdapEntryBinaryValue : public MObject {
  *
  * @author	Mikael Svensson
  */
-class LdapEntry : public MObject {
+class LIBMNETUTIL_API LdapEntry : public MObject {
 	public:
 		LdapEntry(LDAP* ld, LDAPMessage* entry);
 		//~LdapEntry();
@@ -80,19 +88,32 @@ class LdapEntry : public MObject {
 		/**
 		 * Return all binary values for a given attribute.
 		 */
-
 		std::vector< MRef<LdapEntryBinaryValue*> > getAttrValuesBinary(std::string attr) throw (LdapAttributeNotFoundException);
+
+		/**
+		 * Return all "binary pair values" for a given attribute.
+		 *
+		 * This function is tailored to aid in the retrieval of crossCertificatePair attributes
+		 * stored in certificationAuthority objects in LDAP directories.
+		 *
+		 * What the function does is this:
+		 *  - Read the raw binary attribute into internal LdapEntryBinaryValue variable
+		 *  - Assume that the raw data represents this ASN.1 data structure:
+		 * 	CertificatePair        ::=  SEQUENCE {
+		 *		issuedToThisCA        [0]  Certificate OPTIONAL,
+		 * 		issuedByThisCA        [1]  Certificate OPTIONAL
+		 * 	}
+		 *  - Read the two "array elements" and store them as new LdapEntryBinaryValue objects
+		 *  - Put the two "entry objects" in a LdapEntryBinaryPairValue ojbect
+		 *
+		 * @note	This function does not return parsed certificates, only the raw bytes constituting the certificates!
+		 */
+		std::vector< MRef<LdapEntryBinaryPairValue*> > getAttrValuesBinaryPairs(std::string attr) throw (LdapAttributeNotFoundException);
+
 		/**
 		 * Return ALL string values for a given attribute.
 		 */
 		std::vector<std::string> getAttrValuesStrings(std::string attr) throw (LdapAttributeNotFoundException);
-
-		/**
-		 * Specialized method that returns all certificate pair attribute values (given a specific attribute name).
-		 */
-		std::vector<MRef<certificate_pair*> > getAttrValuesCertificatePairs(std::string attr) throw (LdapAttributeNotFoundException);
-
-		//std::string getDn();
 
 		/**
 		 * Returns list of all attribute names.

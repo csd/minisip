@@ -65,7 +65,7 @@ class LIBMNETUTIL_API LdapUrl {
 		 *
 		 * At the moment an LDAP URL is considered invalid only if it doesn't start with "ldap://".
 		 */
-		bool isValid();
+		bool isValid() const;
 
 		/**
 		 * Parse URL

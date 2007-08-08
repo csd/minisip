@@ -48,7 +48,7 @@ void LdapUrl::clear() {
 	extensions = std::vector<LdapUrlExtension>();
 }
 
-bool LdapUrl::isValid() {
+bool LdapUrl::isValid() const {
 	return validUrl;
 }
 
