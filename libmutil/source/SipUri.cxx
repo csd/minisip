@@ -34,8 +34,8 @@
 
 #include<config.h>
 
-#include<libmsip/SipUri.h>
-#include<libmsip/SipException.h>
+#include<libmutil/SipUri.h>
+//#include<libmsip/SipException.h>
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 

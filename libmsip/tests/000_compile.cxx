@@ -41,7 +41,7 @@
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipUri.h>
+#include<libmutil/SipUri.h>
 #include<libmsip/SipException.h>
 #include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipMessage.h>

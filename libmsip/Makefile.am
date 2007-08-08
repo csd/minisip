@@ -34,7 +34,6 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipSocketServer.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
-		     source/SipUri.cxx \
 		     source/SipTimers.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \

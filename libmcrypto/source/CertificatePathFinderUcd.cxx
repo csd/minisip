@@ -23,7 +23,7 @@
 
 #include <config.h>
 #include <libminisip/config/CertificatePathFinderUcd.h>
-#include <libmsip/SipUri.h>
+#include<libmutil/SipUri.h>
 
 #include <iostream>
 

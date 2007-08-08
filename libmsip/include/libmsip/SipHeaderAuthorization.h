@@ -36,7 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeader.h>
-#include<libmsip/SipUri.h>
+#include.libmutil/SipUri.h.
 
 #include<list>
 

@@ -34,7 +34,7 @@
 #ifndef SIPURI_H
 #define SIPURI_H
 
-#include<libmsip/libmsip_config.h>
+#include<libmutil/libmutil_config.h>
 
 #define SIP_URI_USERNAME_DEFAULT "UNKNOWN"
 #define SIP_URI_USER_TYPE_DEFAULT "phone"
@@ -56,7 +56,7 @@ The scheme is:
 
 "displayName" <protocolId:userName@ip:port;userType;transport>
 */
-class LIBMSIP_API SipUri : public MObject{
+class LIBMUTIL_API SipUri : public MObject{
 	public:
 		/**
 		Basic constructor ... it creates an invalid uri

@@ -26,7 +26,7 @@
 #include <libmutil/stringutils.h>
 #include <libmcrypto/cert.h>
 #include <libmnetutil/FileDownloader.h>
-#include <libmsip/SipUri.h>
+#include<libmutil/SipUri.h>
 
 #include <list>
 #include <stack>
