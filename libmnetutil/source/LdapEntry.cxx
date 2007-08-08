@@ -23,9 +23,16 @@
 
 #include <config.h>
 #include <libmnetutil/LdapEntry.h>
+
+#ifdef ENABLE_LDAP
+	#include <ldap.h>
+	#include <lber.h>
+#endif
+
 #include <string>
 
-LdapEntry::LdapEntry(LDAP* ld, LDAPMessage* entry) {
+LdapEntry::LdapEntry(void* ld, void* entry) {
+#ifdef ENABLE_LDAP
 	BerElement* ber;
 	struct berval** binaries;
 	char* attr;
@@ -35,14 +42,14 @@ LdapEntry::LdapEntry(LDAP* ld, LDAPMessage* entry) {
 	valuesBinary.clear();
 	valuesStrings.clear();
 
-	for( attr = ldap_first_attribute(ld, entry, &ber); attr != NULL; attr = ldap_next_attribute(ld, entry, ber)) {
+	for( attr = ldap_first_attribute((LDAP*)ld, (LDAPMessage*)entry, &ber); attr != NULL; attr = ldap_next_attribute((LDAP*)ld, (LDAPMessage*)entry, ber)) {
 
 		std::string attrName(attr);
 
 		// Separate binary attributes from the rest simply to testing what the returned attribute is called. Simple and effective.
 		if (stringEndsWith(attr, ";binary")) {
 			// Process binary attributes
-			if ((binaries = ldap_get_values_len(ld, entry, attr)) != NULL) {
+			if ((binaries = ldap_get_values_len((LDAP*)ld, (LDAPMessage*)entry, attr)) != NULL) {
 				for (i=0; binaries[i] != NULL; i++) {
 					valuesBinary[attrName].push_back(MRef<LdapEntryBinaryValue*>(new LdapEntryBinaryValue(binaries[i]->bv_val, binaries[i]->bv_len)));
 				}
@@ -50,7 +57,7 @@ LdapEntry::LdapEntry(LDAP* ld, LDAPMessage* entry) {
 			}
 		} else {
 			// Process string attributes
-			if ((strings = ldap_get_values(ld, entry, attr)) != NULL) {
+			if ((strings = ldap_get_values((LDAP*)ld, (LDAPMessage*)entry, attr)) != NULL) {
 				for (i = 0; strings[i] != NULL; i++) {
 					valuesStrings[attrName].push_back(std::string(strings[i]));
 				}
@@ -62,9 +69,13 @@ LdapEntry::LdapEntry(LDAP* ld, LDAPMessage* entry) {
 	if (ber != NULL) {
 		ber_free(ber,0);
 	}
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 bool LdapEntry::hasAttribute(std::string attr) {
+#ifdef ENABLE_LDAP
 	std::map<std::string, std::vector<MRef<LdapEntryBinaryValue*> > >::iterator binaryIter = valuesBinary.find(attr);
 	std::map<std::string, std::vector<std::string> >::iterator stringIter = valuesStrings.find(attr);
 
@@ -73,9 +84,13 @@ bool LdapEntry::hasAttribute(std::string attr) {
 	}
 
 	return false;
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 std::string LdapEntry::getAttrValueString(std::string attr) throw (LdapAttributeNotFoundException) {
+#ifdef ENABLE_LDAP
 	std::map<std::string, std::vector<std::string> >::iterator stringIter = valuesStrings.find(attr);
 
 	if (stringIter != valuesStrings.end()) {
@@ -83,8 +98,12 @@ std::string LdapEntry::getAttrValueString(std::string attr) throw (LdapAttribute
 	}
 
 	throw LdapAttributeNotFoundException(attr);
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 std::vector<std::string> LdapEntry::getAttrValuesStrings(std::string attr) throw (LdapAttributeNotFoundException) {
+#ifdef ENABLE_LDAP
 	std::map<std::string, std::vector<std::string> >::iterator i = valuesStrings.find(attr);
 
 	if (i != valuesStrings.end()) {
@@ -92,8 +111,12 @@ std::vector<std::string> LdapEntry::getAttrValuesStrings(std::string attr) throw
 	}
 
 	throw LdapAttributeNotFoundException(attr);
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 std::vector< MRef<LdapEntryBinaryValue*> > LdapEntry::getAttrValuesBinary(std::string attr) throw (LdapAttributeNotFoundException) {
+#ifdef ENABLE_LDAP
 	std::map<std::string, std::vector<MRef<LdapEntryBinaryValue*> > >::iterator i = valuesBinary.find(attr);
 
 	if (i != valuesBinary.end()) {
@@ -102,8 +125,12 @@ std::vector< MRef<LdapEntryBinaryValue*> > LdapEntry::getAttrValuesBinary(std::s
 
 	throw LdapAttributeNotFoundException(attr);
 
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 std::vector< MRef<LdapEntryBinaryPairValue*> > LdapEntry::getAttrValuesBinaryPairs(std::string attr) throw (LdapAttributeNotFoundException) {
+#ifdef ENABLE_LDAP
 	std::vector< MRef<LdapEntryBinaryValue*> > rawBinary;
 	std::vector< MRef<LdapEntryBinaryValue*> >::iterator rawIter;
 	std::vector< MRef<LdapEntryBinaryPairValue*> > result;
@@ -167,9 +194,13 @@ std::vector< MRef<LdapEntryBinaryPairValue*> > LdapEntry::getAttrValuesBinaryPai
 		throw; // Re-throw exception
 	}
 	return result;
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 std::vector<std::string> LdapEntry::getAttrNames() {
+#ifdef ENABLE_LDAP
 	std::vector<std::string> res;
 	std::map<std::string, std::vector<std::string> >::iterator i;
 	std::map<std::string, std::vector<MRef<LdapEntryBinaryValue*> > >::iterator j;
@@ -181,4 +212,7 @@ std::vector<std::string> LdapEntry::getAttrNames() {
 		res.push_back(j->first);
 
 	return res;
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }

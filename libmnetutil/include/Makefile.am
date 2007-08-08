@@ -1,6 +1,4 @@
-ldap_src =
-if ENABLE_LDAP
-ldap_src += \
+ldap_src = \
 			libmnetutil/LdapConnection.h \
 			libmnetutil/LdapCredentials.h \
 			libmnetutil/LdapDirectoryLocator.h \
@@ -8,7 +6,6 @@ ldap_src += \
 			libmnetutil/LdapException.h \
 			libmnetutil/LdapUrl.h \
  			libmnetutil/LdapDownloader.h
-endif
 
 pkginclude_HEADERS =    \
 			$(ldap_src) \

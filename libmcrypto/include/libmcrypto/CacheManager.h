@@ -24,13 +24,13 @@
 #ifndef _CACHEMANAGER_H_
 #define _CACHEMANAGER_H_
 
-#include <libminisip/libminisip_config.h>
+#include <libmcrypto/config.h>
 
+#include <libmcrypto/cert.h>
 #include <libmutil/MemObject.h>
 #include <libmutil/CacheItem.h>
 #include <libmnetutil/DirectorySet.h>
 #include <libmnetutil/DirectorySetItem.h>
-#include <libmcrypto/cert.h>
 
 #include <string>
 #include <map>
@@ -38,11 +38,11 @@
 #define CACHEMANAGER_CERTSET_ROOTCAS "rootcas"
 #define CACHEMANAGER_DIRSET_MAIN "main"
 
-class LIBMINISIP_API CacheManager : public MObject {
+class LIBMCRYPTO_API CacheManager : public MObject {
 	public:
 		CacheManager();
 
-		//MRef<CertificateSetItem*> findCertificate();
+		MRef<Certificate*> findCertificate();
 
 		/**
 		 * Returns a directory set item responsible for a particular domain.
@@ -88,9 +88,9 @@ class LIBMINISIP_API CacheManager : public MObject {
 		//void removeFromCache(MRef<CacheItem*> item);
 
 		/**
-		 * @param	searchText	Can be either a SIP URI or an X.509 DN. If the parameter is a SIP URI then
-		 * 				the function will match the URI against the certificate's subjectAltNames.
-		 * 				Otherwise (if the parameter is not a SIP URI) the subject field is matched.
+		 * @param       searchText      Can be either a SIP URI or an X.509 DN. If the parameter is a SIP URI then
+		 *                              the function will match the URI against the certificate's subjectAltNames.
+		 *                              Otherwise (if the parameter is not a SIP URI) the subject field is matched.
 		 */
 		std::vector<MRef<Certificate*> > findCertificate(const std::string searchText, const std::string issuer);
 	private:
@@ -99,7 +99,6 @@ class LIBMINISIP_API CacheManager : public MObject {
 		std::map<std::string, MRef<DirectorySet*> > directorySets;
 
 		std::vector<MRef<Certificate*> > fakeCache;
-
 };
 
 #endif

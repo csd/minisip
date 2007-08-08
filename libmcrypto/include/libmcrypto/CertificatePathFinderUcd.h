@@ -24,13 +24,13 @@
 #ifndef _CERTIFICATEPATHFINDERUCD_H_
 #define _CERTIFICATEPATHFINDERUCD_H_
 
-#include <libminisip/libminisip_config.h>
+#include <libmcrypto/config.h>
 
 #include <libmutil/MemObject.h>
 #include <libmutil/Timestamp.h>
 #include <libmcrypto/cert.h>
-#include <libminisip/config/CertificateFinder.h>
-#include <libminisip/config/CacheManager.h>
+#include <libmcrypto/CertificateFinder.h>
+#include <libmcrypto/CacheManager.h>
 
 #include <vector>
 #include <string>
@@ -39,7 +39,7 @@
 #define MAX_EFFORT -1
 #endif
 
-class LIBMINISIP_API CertificatePathFinderUcd : public MObject {
+class LIBMCRYPTO_API CertificatePathFinderUcd : public MObject {
 	public:
 		CertificatePathFinderUcd(MRef<CacheManager*> cm);
 		~CertificatePathFinderUcd();

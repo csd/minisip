@@ -21,14 +21,11 @@
 
 #include<libmnetutil/libmnetutil_config.h>
 
-#include <ldap.h>
-
 #include <libmutil/MemObject.h>
 #include <libmnetutil/LdapException.h>
 #include <libmnetutil/LdapCredentials.h>
 #include <libmnetutil/LdapEntry.h>
 
-#include <ldap.h>
 #include <string>
 #include <vector>
 
@@ -72,7 +69,8 @@ class LIBMNETUTIL_API LdapConnection : public MObject {
 		 * @param	scope	The scope of the search. Possible values: LDAP_SCOPE_SUBTREE, LDAP_SCOPE_BASE or LDAP_SCOPE_ONE.
 		 * @return	A vector containing LdapEntry instances. Each LdapEntry represents a returned object and each instance is already populated with the appropriate values when returned.
 		 */
-		std::vector<MRef<LdapEntry*> > find(std::string baseDn, std::string query, std::vector<std::string> & attrs, int scope = LDAP_SCOPE_SUBTREE) throw (LdapNotConnectedException, LdapException);
+		std::vector<MRef<LdapEntry*> > find(std::string baseDn, std::string query, std::vector<std::string> & attrs) throw (LdapNotConnectedException, LdapException);
+		std::vector<MRef<LdapEntry*> > find(std::string baseDn, std::string query, std::vector<std::string> & attrs, int scope) throw (LdapNotConnectedException, LdapException);
 
 		/**
 		 * Determine the base DN of the connected server.
@@ -97,7 +95,8 @@ class LIBMNETUTIL_API LdapConnection : public MObject {
 		 */
 		//LDAP*			getLdapObject();
 	private:
-		LDAP* 			ld;
+		//LDAP* 			ld;
+		void*			ld;
 		std::string 		hostname;
 		int32_t			port;
 		MRef<LdapCredentials*> 	cred;

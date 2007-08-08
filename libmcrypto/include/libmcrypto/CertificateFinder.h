@@ -24,14 +24,14 @@
 #ifndef _CERTIFICATEFINDER_H_
 #define _CERTIFICATEFINDER_H_
 
-#include <libminisip/libminisip_config.h>
+#include <libmcrypto/config.h>
 
 #include <libmutil/MemObject.h>
 #include <libmutil/Timestamp.h>
 #include <libmcrypto/cert.h>
 #include <libmnetutil/Downloader.h>
 #include <libmnetutil/LdapDownloader.h>
-#include <libminisip/config/CacheManager.h>
+#include <libmcrypto/CacheManager.h>
 
 #include <string>
 #include <vector>
@@ -40,7 +40,7 @@
 #define MAX_EFFORT -1
 #endif
 
-class LIBMINISIP_API CertificateFinderStats : public MObject {
+class LIBMCRYPTO_API CertificateFinderStats : public MObject {
 	public:
 
 		CertificateFinderStats() : ldapQueries (0), ldapQueriesNoResult (0), ldapQueriesNoDirectory (0), ldapCertsDownloaded (0), dnsQueries (0), dnsQueriesNoResult (0), dnsSrvQueries (0), dnsSrvQueriesNoResult (0), certsProcessed (0), certsUseful (0), cacheQueries (0), cacheQueriesNoResult (0) { }
@@ -63,7 +63,7 @@ class LIBMINISIP_API CertificateFinderStats : public MObject {
 /**
  * Finds certificates mathching certain subjects and issuers.
  */
-class LIBMINISIP_API CertificateFinder : public MObject {
+class LIBMCRYPTO_API CertificateFinder : public MObject {
 
 	public:
 		CertificateFinder();

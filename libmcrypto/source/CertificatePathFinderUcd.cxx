@@ -22,7 +22,7 @@
 */
 
 #include <config.h>
-#include <libminisip/config/CertificatePathFinderUcd.h>
+#include <libmcrypto/CertificatePathFinderUcd.h>
 #include<libmutil/SipUri.h>
 
 #include <iostream>

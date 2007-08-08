@@ -32,15 +32,12 @@ ipv6_src += \
 		    source/IP6ServerSocket.cxx
 endif
 
-ldap_src =
-if ENABLE_LDAP
-ldap_src += \
+ldap_src = \
 		    source/LdapConnection.cxx \
                     source/LdapEntry.cxx \
                     source/LdapException.cxx \
 		    source/LdapUrl.cxx \
  		    source/LdapDownloader.cxx
-endif
 
 mnetutil_src = \
 		    source/init.cxx \

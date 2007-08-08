@@ -22,7 +22,7 @@
 */
 
 #include <config.h>
-#include <libminisip/config/CertificateFinder.h>
+#include <libmcrypto/CertificateFinder.h>
 
 #include <libmnetutil/LdapConnection.h>
 #include <libmnetutil/LdapUrl.h>

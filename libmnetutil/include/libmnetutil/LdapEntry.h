@@ -21,8 +21,6 @@
 
 #include<libmnetutil/libmnetutil_config.h>
 
-#include <ldap.h>
-#include <lber.h>
 #include <libmnetutil/LdapException.h>
 #include <libmutil/MemObject.h>
 #include <libmutil/stringutils.h>
@@ -77,7 +75,7 @@ class LIBMNETUTIL_API LdapEntryBinaryPairValue : public MObject {
  */
 class LIBMNETUTIL_API LdapEntry : public MObject {
 	public:
-		LdapEntry(LDAP* ld, LDAPMessage* entry);
+		LdapEntry(void* ld, void* entry);
 		//~LdapEntry();
 
 		/**

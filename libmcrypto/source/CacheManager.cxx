@@ -22,7 +22,7 @@
 */
 
 #include <config.h>
-#include <libminisip/config/CacheManager.h>
+#include <libmcrypto/CacheManager.h>
 #include <libmutil/stringutils.h>
 #include <libmcrypto/cert.h>
 #include <libmnetutil/FileDownloader.h>
