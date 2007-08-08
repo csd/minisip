@@ -39,7 +39,7 @@
 
 #include<libmutil/minilist.h>
 #include<libmsip/SipHeader.h>
-#include.libmutil/SipUri.h.
+#include<libmutil/SipUri.h>
 #include<libmsip/SipMessageContent.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipMessageContentFactory.h>

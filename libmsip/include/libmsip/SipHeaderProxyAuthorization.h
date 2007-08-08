@@ -36,7 +36,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipHeaderAuthorization.h>
-#include.libmutil/SipUri.h.
+#include<libmutil/SipUri.h>
 
 /**
  * @author Erik Eliasson
