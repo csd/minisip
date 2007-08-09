@@ -256,6 +256,9 @@ class LIBMCRYPTO_API Certificate: public MObject{
 		virtual std::string getIssuer()=0;
 		virtual std::string getIssuerCn()=0;
 
+
+		bool verifySignedBy(MRef<Certificate*> cert);
+
 		/**
 		 * Returns whether or not at least one of the certificate's subjectAltNames
 		 * are equal to \p uri.

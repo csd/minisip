@@ -680,7 +680,6 @@ OsslPrivateKey::OsslPrivateKey( char *derEncPk, int length,
    pk_file=path;
 }
 
-
 int OsslCertificate::control( CertificateSet * cert_db ){
 	int result;
 	X509_STORE_CTX cert_store_ctx;

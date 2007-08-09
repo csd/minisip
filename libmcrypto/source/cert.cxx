@@ -121,6 +121,15 @@ int Certificate::privateDecrypt(const unsigned char *data, int size,
 	return m_pk->privateDecrypt( data, size, retdata, retsize );
 }
 
+
+bool Certificate::verifySignedBy( MRef<Certificate*> cert ){
+	massert(cert);
+	MRef<CertificateSet*> set = CertificateSet::create();;
+	set->addCertificate(cert);
+	return cert->control(*set);
+}
+
+
 bool Certificate::hasPk(){
 	return !m_pk.isNull();
 }
