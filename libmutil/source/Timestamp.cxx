@@ -106,7 +106,7 @@ string id_names[25] = { "invite_start", "invite_end", "mikey_start", "mikey_end"
 #endif
 
 #ifdef WIN32
-	void Timestamp::print(std::string fileName){}
+	void Timestamp::print() {}
 #else
 	void Timestamp::print() {
 		print(FILE_NAME);

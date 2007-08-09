@@ -83,8 +83,8 @@ class LIBMCRYPTO_API GtlsCertificateSet: public CertificateSet{
 		virtual std::string getMemObjectType() const {return "GtlsCertificateSet";}
 
 	protected:
-		MRef<CertificateSetItem*> createDirItem( std::string dir );
-		MRef<CertificateSetItem*> createFileItem( std::string file );
+		//MRef<CertificateSetItem*> createDirItem( std::string dir );
+		//MRef<CertificateSetItem*> createFileItem( std::string file );
 		MRef<CertificateSetItem*> createCertItem( MRef<Certificate*> cert );
 
 	private:

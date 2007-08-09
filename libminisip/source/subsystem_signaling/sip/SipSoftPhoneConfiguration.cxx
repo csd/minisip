@@ -1,16 +1,16 @@
 /*
  Copyright (C) 2004-2006 the Minisip Team
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
@@ -25,7 +25,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  *          Cesc Santasusana < cesc Dot santa at@ gmail dOT com>
  * Purpose
- *          Read and write from the configuration file. 
+ *          Read and write from the configuration file.
  *
 */
 
@@ -68,7 +68,7 @@
 
 using namespace std;
 
-SipSoftPhoneConfiguration::SipSoftPhoneConfiguration(): 
+SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	//securityConfig(),
 	//sip(NULL),
 	useSTUN(false),
@@ -98,12 +98,12 @@ SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
 }
 
 void SipSoftPhoneConfiguration::save(){
-	massert(backend); // This will happen if save() is done without first 
+	massert(backend); // This will happen if save() is done without first
 			 // having done a load() (bug).
-			 
-	//Set the version of the file ... 
+
+	//Set the version of the file ...
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
-	
+
 	backend->save( "local_udp_port", sipStackConfig->localUdpPort );
 	backend->save( "local_tcp_port", sipStackConfig->localTcpPort );
 	backend->save( "local_tls_port", sipStackConfig->localTlsPort );
@@ -111,7 +111,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "instance_id", sipStackConfig->instanceId);
 
 	//securityConfig.save( backend );
-	
+
 	list< MRef<SipIdentity *> >::iterator iIdent;
 	uint32_t ii = 0;
 
@@ -120,13 +120,13 @@ void SipSoftPhoneConfiguration::save(){
 	for( iIdent = identities.begin(); iIdent != identities.end(); ii++, iIdent ++){
 		//cerr << "Saving identity: " << (*iIdent)->getDebugString() << endl;
 		accountPath = string("account[")+itoa(ii)+"]/";
-		
+
 		(*iIdent)->lock();
 
 		backend->save( accountPath + "account_name", (*iIdent)->identityIdentifier );
-		
+
 		backend->save( accountPath + "sip_uri", (*iIdent)->getSipUri().getUserIpString() );
-		
+
 
 /*From SipDialogSecurity below*/
 		backend->saveBool(accountPath + "secured", (*iIdent)->securityEnabled);
@@ -212,17 +212,31 @@ void SipSoftPhoneConfiguration::save(){
 		MRef<CertificateSetItem*> caDbItem = cert_db->getNext();
 
 
+		/*
+		Since each item in caDbItem represents a single certificate it is important
+		to keep track of which certificate directories have been saved, since it is
+		otherwise very likely that the same directory name will be added multiple
+		times (as it is very likely that several of the loaded certificates are
+		stored in the same directory).
+		*/
+		std::set<std::string> processedCertDirs;
+
 		while( !caDbItem.isNull() ){
-			switch( caDbItem->type ){
-				case CERT_DB_ITEM_TYPE_FILE:
+			switch( caDbItem->getImportMethod() ){
+				case CertificateSetItem::IMPORTMETHOD_FILE:
 					backend->save(accountPath + "ca_file["+itoa(iFile)+"]",
-							caDbItem->item);
-					iFile ++;
+							caDbItem->getImportParameter());
+					iFile++;
 					break;
-				case CERT_DB_ITEM_TYPE_DIR:
-					backend->save(accountPath + "ca_dir["+itoa(iDir)+"]",
-							caDbItem->item);
-					iDir ++;
+				case CertificateSetItem::IMPORTMETHOD_DIRECTORY:
+					if (processedCertDirs.find(caDbItem->getImportParameter()) != processedCertDirs.end()) {
+						// The directory that the current certificate belongs to
+						// has not been preivously saved.
+						backend->save(accountPath + "ca_dir["+itoa(iDir)+"]",
+								caDbItem->getImportParameter());
+						processedCertDirs.insert(caDbItem->getImportParameter());
+						iDir++;
+					}
 					break;
 				default:
 					merr<< "Warning: unknown Certificate object type"<<endl;
@@ -300,7 +314,7 @@ void SipSoftPhoneConfiguration::save(){
 
 		backend->saveBool( accountPath + "default_account",
 				   (*iIdent) == defaultIdentity );
-		
+
 		backend->saveBool( accountPath + "register",
 				   (*iIdent)->registerToProxy );
 
@@ -309,7 +323,7 @@ void SipSoftPhoneConfiguration::save(){
 		(*iIdent)->unlock();
 
 	}
-	
+
 	accountPath = "account[" + itoa( ii ) + "]/";
 	/* Remove old identities remaining */
 	while( backend->loadString( accountPath + "account_name" ) != "" ){
@@ -326,23 +340,23 @@ void SipSoftPhoneConfiguration::save(){
 		backend->reset( accountPath + "transport" );
 		accountPath = "account[" + itoa( ++ii ) + "]/";
 	}
-	
+
 	// Save soundDeviceIn in sound_device to be backward compatible.
 	backend->save( "sound_device", soundDeviceIn );
 	backend->save( "sound_device_in", soundDeviceIn );
 	backend->save( "sound_device_out", soundDeviceOut );
-	
+
 // 	backend->saveBool( "mute_all_but_one", muteAllButOne ); //not used anymore
-	
+
 	backend->save( "mixer_type", soundIOmixerType );
 
 	//Save the startup commands
-	list<string>::iterator iter; 
+	list<string>::iterator iter;
 	int idx;
 	for( idx=0,  iter = startupActions.begin();
 			iter != startupActions.end();
 			iter++, idx++ ) {
-		int pos; 
+		int pos;
 		string cmdActionsPath = string("startup_cmd[")+itoa(idx)+"]/";
 		pos = (*iter).find(' ');
 		string cmd = (*iter).substr( 0, pos );
@@ -351,7 +365,7 @@ void SipSoftPhoneConfiguration::save(){
 		string params = (*iter).substr( pos, (*iter).size() - pos );
 		backend->save( cmdActionsPath + "params", params );
 	}
-		
+
 #ifdef VIDEO_SUPPORT
 	backend->save( "video_device", videoDevice );
 	backend->save( "frame_width", frameWidth );
@@ -367,11 +381,11 @@ void SipSoftPhoneConfiguration::save(){
 
 	/************************************************************
 	 * PhoneBooks
-	 ************************************************************/	
+	 ************************************************************/
 	ii = 0;
 	list< MRef<PhoneBook *> >::iterator iPb;
 	for( iPb = phonebooks.begin(); iPb != phonebooks.end(); ii++, iPb ++ ){
-		backend->save( "phonebook[" + itoa(ii) + "]", 
+		backend->save( "phonebook[" + itoa(ii) + "]",
 				     (*iPb)->getPhoneBookId() );
 	}
 
@@ -388,7 +402,7 @@ void SipSoftPhoneConfiguration::save(){
 	}
 
 	backend->save("stun_manual_server", userDefinedStunServer);
-	
+
 	/************************************************************
 	 * SIP extensions
 	 ************************************************************/
@@ -402,7 +416,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->saveBool("tls_server", tls_server);
 
 	backend->save("ringtone", ringtone);
-	
+
 	//add code to load the default network interface
 	//<network_interface> into networkInterfaceName
 	//We are not saving the interface name of the current localIP ...
@@ -423,7 +437,7 @@ void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
 		MRef<AudioCodec *> codec = dynamic_cast<AudioCodec*>(*plugin);
 
 		if( !codec ){
-			cerr << "SipSoftPhoneConfiguration: Not an AudioCodec: " << plugin->getName() << endl;			
+			cerr << "SipSoftPhoneConfiguration: Not an AudioCodec: " << plugin->getName() << endl;
 			continue;
 		}
 
@@ -439,7 +453,7 @@ void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
 	if( modified ){
 		int iC = 0;
 		list<string>::iterator iCodec;
-	
+
 		for( iCodec = audioCodecs.begin(); iCodec != audioCodecs.end(); iCodec ++, iC++ ){
 			be->save( "codec[" + itoa( iC ) + "]", *iCodec );
 		}
@@ -465,13 +479,13 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		//get the string version also ... don't use the itoa.h
 //	fileVersion_str = backend->loadString("version", "0");
 	if( !checkVersion( fileVersion /*, fileVersion_str*/ ) ) {
-		//check version prints a message ... 
+		//check version prints a message ...
 		//here, deal with the error
 //		ret = "ERROR";
 		saveDefault( backend );
 //		return ret;
 	}
-	
+
 	do{
 
 
@@ -493,8 +507,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 		string uri = backend->loadString(accountPath + "sip_uri");
 		ident->setSipUri(uri);
-		
-		
+
+
 /*From SipDialogSecurity below*/
 
 		ident->securityEnabled = backend->loadBool(accountPath + "secured");
@@ -579,7 +593,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 					cert->setPk( privateKeyFile );
 				}
 				catch( CertificateExceptionPkey & ){
-					merr << "The given private key " << privateKeyFile << " does not match the Certificate"<<endl; 
+					merr << "The given private key " << privateKeyFile << " does not match the Certificate"<<endl;
 				}
 
 				catch( CertificateException &){
@@ -696,11 +710,11 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 /*From SipDialogSecurity above*/
 
-		// 
+		//
 		// Outbound proxy
-		// 
+		//
 		bool autodetect = backend->loadBool(accountPath + "auto_detect_proxy");
-		
+
 		//these two values we collect them, but if autodetect is true, they are not used
 		string proxy = backend->loadString(accountPath + "proxy_addr","");
 		uint16_t proxyPort = (uint16_t)backend->loadInt(accountPath +"proxy_port", 5060);
@@ -734,8 +748,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		if (registerExpires != ""){
 			ident->getSipRegistrar()->setRegisterExpires( registerExpires );
 			//set the default value ... do not change this value anymore
-			ident->getSipRegistrar()->setDefaultExpires( registerExpires ); 
-		} 
+			ident->getSipRegistrar()->setDefaultExpires( registerExpires );
+		}
 #ifdef DEBUG_OUTPUT
 		else {
 			//cerr << "CESC: SipSoftPhoneConf::load : NO ident expires" << endl;
@@ -766,7 +780,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	string soundDevice = backend->loadString("sound_device","");
 	soundDeviceIn = backend->loadString("sound_device_in",soundDevice);
 	soundDeviceOut = backend->loadString("sound_device_out",soundDeviceIn);
-	
+
 	soundIOmixerType = backend->loadString("mixer_type", "spatial");
 // 	cerr << "sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
@@ -789,7 +803,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 // 		cerr << "CONFIG: startup command: " << cmd << " " << params << endl;
 		ii++;
 	}while( true );
-	
+
 #ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
 	cerr << "Loaded video_device" << videoDevice << endl;
@@ -816,9 +830,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		s = backend->loadString("phonebook["+itoa(i)+"]","");
 
 		if (s!=""){
-			MRef<PhoneBook *> pb;	
+			MRef<PhoneBook *> pb;
 			pb = PhoneBookIoRegistry::getInstance()->createPhoneBook( s );
-		   
+
 			// FIXME http and other cases should go here
 			if( !pb.isNull() ){
 				phonebooks.push_back(pb);
@@ -870,7 +884,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	//add code to load the default network interface
 	//<network_interface> into networkInterfaceName
 	networkInterfaceName = backend->loadString("network_interface", "");
-	
+
 	//cerr << "EEEE: SIM: sim is "<< (sipStackConfig?"not NULL":"NULL")<< endl;
 	return ret;
 
@@ -879,13 +893,13 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	//be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	be->save( "version", CONFIG_FILE_VERSION_REQUIRED );
-	
+
 #ifdef WIN32
 	be->save( "network_interface", "{12345678-1234-1234-12345678}" );
 #else
 	be->save( "network_interface", "eth0" );
 #endif
-	
+
 	be->save( "account[0]/account_name", "My account" );
 	be->save( "account[0]/sip_uri", "username@domain.example" );
 	be->save( "account[0]/proxy_addr", "sip.domain.example" );
@@ -905,7 +919,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->saveBool( "account[0]/dh_enabled", false );
 	be->saveBool( "account[0]/psk_enabled", false );
 	be->saveBool( "account[0]/check_cert", true );
-	
+
 	be->saveBool( "tcp_server", true );
 	be->saveBool( "tls_server", false );
 	be->save( "local_udp_port", 5060 );
@@ -917,7 +931,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 #else
 	be->save( "sound_device", "/dev/dsp" );
 #endif
-	
+
 	be->save( "mixer_type", "spatial" );
 
 #if defined HAS_SPEEX && defined HAS_GSM
@@ -938,9 +952,9 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 //we can save startup commands ... but do nothing by default ...
 //<startup_cmd><command>call</command><params>uri</params></startup_cmd>
-	
+
 	be->commit();
-	
+
 }
 
 
@@ -1008,7 +1022,7 @@ MRef<SipIdentity *> SipSoftPhoneConfiguration::getIdentity( const SipUri &uri ) 
 
 		identity->lock();
 
-		SipUri identityUri = 
+		SipUri identityUri =
 			identity->getSipUri();
 
 		if( identityUri.getUserName() == tmpUri.getUserName() ){

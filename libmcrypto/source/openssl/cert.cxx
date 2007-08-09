@@ -728,7 +728,7 @@ OsslCertificateSet::~OsslCertificateSet(){
 X509_STORE * OsslCertificateSet::getDb(){
 	return cert_db;
 }
-
+/*
 void OsslCertificateSet::addDirectory( string dir ){
 	X509_LOOKUP * lookup = NULL;
 
@@ -760,12 +760,13 @@ void OsslCertificateSet::addFile( string file ){
 
 	CertificateSet::addFile( file );
 }
+*/
 
-void OsslCertificateSet::addCertificate( MRef<Certificate *> cert ){
+MRef<CertificateSetItem*> OsslCertificateSet::addCertificate( MRef<Certificate *> cert ){
 	OsslCertificate *ssl_cert = (OsslCertificate *)*cert;
 	X509_STORE_add_cert( cert_db, ssl_cert->getOpensslCertificate() );
 
-	CertificateSet::addCertificate( cert );
+	return CertificateSet::addCertificate( cert );
 }
 
 

@@ -37,11 +37,11 @@
 #include<libmutil/CacheItem.h>
 
 class Certificate;
-
+#if 0
 #define CERT_DB_ITEM_TYPE_OTHER  0
 #define CERT_DB_ITEM_TYPE_FILE   1
 #define CERT_DB_ITEM_TYPE_DIR    2
-
+#endif
 class LIBMCRYPTO_API CertificatePair: public MObject {
 	public:
 		CertificatePair();
@@ -53,8 +53,13 @@ class LIBMCRYPTO_API CertificatePair: public MObject {
 
 class LIBMCRYPTO_API CertificateSetItem: public CacheItem {
 	public:
-		std::string item;
-		int type;
+		enum CERTSETITEM_IMPORTMETHOD {
+			IMPORTMETHOD_OTHER = 0,
+			IMPORTMETHOD_FILE = 1,
+			IMPORTMETHOD_DIRECTORY = 2
+		};
+		//std::string item;
+		//int type;
 
 		virtual ~CertificateSetItem();
 
@@ -65,18 +70,30 @@ class LIBMCRYPTO_API CertificateSetItem: public CacheItem {
 		/*
 		Getters
 		*/
-		std::string getSubject();
-		std::vector<std::string> getSubjectAltNames();
-		std::string getSubjectKeyIdentifier();
+		std::string getSubject() const;
+		std::vector<std::string> getSubjectAltNames() const;
+		std::string getSubjectKeyIdentifier() const;
 
-		std::string getIssuer();
-		std::vector<std::string> getIssuerAltNames();
-		std::string getIssuerKeyIdentifier();
+		std::string getIssuer() const;
+		std::vector<std::string> getIssuerAltNames() const;
+		std::string getIssuerKeyIdentifier() const;
 
-		bool isSelfSigned();
+		bool isSelfSigned() const;
 
-		std::string getCertificateUri();
+		std::string getCertificateUri() const;
 		MRef<Certificate*> getCertificate();
+
+		CERTSETITEM_IMPORTMETHOD getImportMethod() const;
+		std::string getImportParameter() const;
+
+		/*
+		Setters
+		*/
+		void setCertificate(const MRef<Certificate*> cert);
+		void setCertificateUri(const std::string);
+
+		void setImportMethod(const CERTSETITEM_IMPORTMETHOD type);
+		void setImportParameter(const std::string param);
 
 		/**
 		 * Loads certificates specified by private variables \c certificateUri or \c certificate.
@@ -101,8 +118,10 @@ class LIBMCRYPTO_API CertificateSetItem: public CacheItem {
 		void unloadCertificateFromMemory();
 
 		bool operator ==(const CertificateSetItem item2){ return (
-				item2.item == item &&
-				item2.type == type);};
+				item2.getImportMethod() == getImportMethod() &&
+				item2.getImportParameter() == getImportParameter());};
+
+		void reindexCert();
 
 	private:
 		/*
@@ -128,7 +147,41 @@ class LIBMCRYPTO_API CertificateSetItem: public CacheItem {
 		std::string certificateUri;
 		MRef<Certificate*> certificate;
 
-		void reindexCert();
+		/**
+		 * Defines what method was used to load the Certificate in this CertificateSetItem.
+		 *
+		 * The methods can be described as "stored in file", "stored in directory" or "stored
+		 * in memory". The idea behind storing this information is to simplify retrieval of
+		 * user settings.
+		 *
+		 * When the Minisip application loads it automatically creates a certificate set
+		 * containing all the client's trusted root certificates. Users can, in the GUI,
+		 * specify either single certificate files or entire directories. The problem is that
+		 * certificates are loaded one by one (certificates in a directory are not batch-added)
+		 * and that when the user settings are to be written back to the user's configuration
+		 * file there is no longer possible to determine if a particular certificate was loaded
+		 * in a "directory batch" or a "single file".
+		 *
+		 * Since we still want to keep track of this kind of information, so that the
+		 * configuration file can be properly created, we have this work-around that allows us
+		 * to store additional information about "which method was used" to load the certificate.
+		 */
+		CERTSETITEM_IMPORTMETHOD importMethod;
+
+		/**
+		 * The interpretation of this property is dependent on the \c importMethod property.
+		 *
+		 * If \c importMethod is "file" then \c importParameter is the absolut path to the
+		 * certifcate (meaning that it specifies the same file as \c certificateUri, but
+		 * using a simpler format).
+		 *
+		 * If \c importMethod is "directory" then \c importParameters is the directory that
+		 * the user has selected.
+		 *
+		 * If \c importMethod id "memory" then \c importParameter is ignored.
+		 */
+		std::string importParameter;
+
 };
 
 
@@ -138,9 +191,9 @@ class LIBMCRYPTO_API CertificateSet: public MObject{
 		static CertificateSet *create();
 
 		virtual CertificateSet* clone();
-		virtual void addDirectory( std::string dir );
-		virtual void addFile( std::string file );
-		virtual void addCertificate( MRef<Certificate *> cert );
+		void addDirectory( std::string dir );
+		MRef<CertificateSetItem*> addFile( std::string file );
+		virtual MRef<CertificateSetItem*> addCertificate( MRef<Certificate *> cert );
 		virtual std::list<MRef<CertificateSetItem*> > &getItems();
 		virtual MRef<CertificateSetItem*> getNext();
 		virtual void initIndex();
@@ -152,8 +205,8 @@ class LIBMCRYPTO_API CertificateSet: public MObject{
 	protected:
 		CertificateSet();
 		virtual void addItem( MRef<CertificateSetItem*> item );
-		virtual MRef<CertificateSetItem*> createDirItem( std::string dir );
-		virtual MRef<CertificateSetItem*> createFileItem( std::string file );
+		//virtual MRef<CertificateSetItem*> createDirItem( std::string dir );
+		//virtual MRef<CertificateSetItem*> createFileItem( std::string file );
 		virtual MRef<CertificateSetItem*> createCertItem( MRef<Certificate*> cert );
 
 	private:

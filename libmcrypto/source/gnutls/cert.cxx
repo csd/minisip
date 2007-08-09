@@ -1265,7 +1265,7 @@ bool readFile( string file, gnutls_datum* data ){
 	file = fileName;
 }
 */
-
+/*
 MRef<CertificateSetItem*> GtlsCertificateSet::createDirItem( std::string dir ){
 	CertificateSetItem * item = new GtlsCertificateSetItem();
 
@@ -1320,15 +1320,17 @@ MRef<CertificateSetItem*> GtlsCertificateSet::createFileItem( std::string file )
 // 	return NULL;
 	return item;
 }
-
+*/
 MRef<CertificateSetItem*> GtlsCertificateSet::createCertItem( MRef<Certificate*> cert ){
 	GtlsCertificateSetItem * item = new GtlsCertificateSetItem();
 
-	item->item = "";
-	item->type = CERT_DB_ITEM_TYPE_OTHER;
+	//item->item = "";
+	//item->type = CERT_DB_ITEM_TYPE_OTHER;
 	item->num_certs = 1;
 	item->certs = new gnutls_x509_crt_t[item->num_certs];
 	item->certs[0] = NULL;
+	item->setCertificate(cert);
+	item->reindexCert();
 
 	int ret = gnutls_x509_crt_init( &item->certs[0] );
 

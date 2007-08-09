@@ -34,6 +34,8 @@
 #include <fstream>
 
 #include <libmnetutil/Downloader.h>
+#include <libmnetutil/FileUrl.h>
+#include <libmutil/FileSystemUtils.h>
 
 using namespace std;
 
@@ -172,7 +174,12 @@ CertificateSetItem::CertificateSetItem(MRef<Certificate*> cert) : certificateUri
 
 CertificateSetItem::~CertificateSetItem(){
 }
-
+void CertificateSetItem::setCertificate(const MRef<Certificate*> cert) {
+	certificate = cert;
+}
+void CertificateSetItem::setCertificateUri(const std::string uri) {
+	certificateUri = uri;
+}
 void CertificateSetItem::loadCertAndIndex() {
 	if (!certificate.isNull()) {
 		reindexCert();
@@ -188,31 +195,31 @@ void CertificateSetItem::loadCertAndIndex() {
 	}
 }
 
-std::string CertificateSetItem::getSubject() {
+std::string CertificateSetItem::getSubject() const {
 	return subject;
 }
-std::vector<std::string> CertificateSetItem::getSubjectAltNames() {
+std::vector<std::string> CertificateSetItem::getSubjectAltNames() const {
 	return subjectAltNames;
 }
-std::string CertificateSetItem::getSubjectKeyIdentifier() {
+std::string CertificateSetItem::getSubjectKeyIdentifier() const {
 	return subjectKeyIdentifier;
 }
 
-std::string CertificateSetItem::getIssuer() {
+std::string CertificateSetItem::getIssuer() const {
 	return issuer;
 }
-std::vector<std::string> CertificateSetItem::getIssuerAltNames() {
+std::vector<std::string> CertificateSetItem::getIssuerAltNames() const {
 	return issuerAltNames;
 }
-std::string CertificateSetItem::getIssuerKeyIdentifier() {
+std::string CertificateSetItem::getIssuerKeyIdentifier() const {
 	return issuerKeyIdentifier;
 }
 
-bool CertificateSetItem::isSelfSigned() {
+bool CertificateSetItem::isSelfSigned() const {
 	return selfSigned;
 }
 
-std::string CertificateSetItem::getCertificateUri() {
+std::string CertificateSetItem::getCertificateUri() const {
 	return certificateUri;
 }
 MRef<Certificate*> CertificateSetItem::getCertificate() {
@@ -220,10 +227,25 @@ MRef<Certificate*> CertificateSetItem::getCertificate() {
 		loadCertAndIndex();
 	return certificate;
 }
+void CertificateSetItem::setImportMethod(const CertificateSetItem::CERTSETITEM_IMPORTMETHOD type) {
+	importMethod = type;
+}
+void CertificateSetItem::setImportParameter(const std::string param) {
+	importParameter = param;
+}
+CertificateSetItem::CERTSETITEM_IMPORTMETHOD CertificateSetItem::getImportMethod() const {
+	return importMethod;
+}
+std::string CertificateSetItem::getImportParameter() const {
+	return importParameter;
+}
 
 void CertificateSetItem::reindexCert() {
 	if (!certificate.isNull()) {
+		std::cerr << "REINDEX CERTIFICATE" << std::endl;
 		subject = certificate->getName();
+		std::cerr << "   " << subject << std::endl;
+
 		std::vector<std::string> subjectAltNames;
 
 		Certificate::SubjectAltName altTypes[] = {Certificate::SAN_DNSNAME, Certificate::SAN_RFC822NAME, Certificate::SAN_URI, Certificate::SAN_IPADDRESS};
@@ -276,11 +298,34 @@ void CertificateSet::unlock(){
         mLock.unlock();
 }
 
+void CertificateSet::addDirectory(std::string dir) {
+	std::list<std::string> certs = FileSystemUtils::directoryContents(dir, false);
+	for (std::list<std::string>::iterator i = certs.begin(); i != certs.end(); i++) {
+		std::cerr << "File: " << *i << std::endl;
+		MRef<CertificateSetItem*> item = addFile(*i);
+		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_DIRECTORY);
+		item->setImportParameter(dir);
+	}
+}
+MRef<CertificateSetItem*> CertificateSet::addFile(std::string file) {
+	try {
+		MRef<Certificate*> cert = Certificate::load(file);
+		MRef<CertificateSetItem*> item = addCertificate(cert);
+		FileUrl uri;
+		uri.setPath(file);
+		item->setCertificateUri(uri.getString());
+		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_FILE);
+		item->setImportParameter(uri.getString());
+	} catch (CertificateException & ex) {
+	}
+}
+
 void CertificateSet::addItem( MRef<CertificateSetItem*> item ){
 	items.push_back( item );
 	items_index = items.begin();
 }
 
+/*
 MRef<CertificateSetItem*> CertificateSet::createDirItem( std::string dir ){
 	MRef<CertificateSetItem*> item = new CertificateSetItem();
 
@@ -296,15 +341,18 @@ MRef<CertificateSetItem*> CertificateSet::createFileItem( std::string file ){
 	item->type = CERT_DB_ITEM_TYPE_FILE;
 	return item;
 }
+*/
 
 MRef<CertificateSetItem*> CertificateSet::createCertItem( MRef<Certificate*> cert ){
-	MRef<CertificateSetItem*> item = new CertificateSetItem();
+	MRef<CertificateSetItem*> item = new CertificateSetItem(cert);
 
-	item->item = "";
-	item->type = CERT_DB_ITEM_TYPE_OTHER;
+	//item->item = "";
+	//item->type = CERT_DB_ITEM_TYPE_OTHER;
+	item->setCertificate(cert);
+	item->reindexCert();
 	return item;
 }
-
+/*
 void CertificateSet::addDirectory( string dir ){
 	MRef<CertificateSetItem*> item = createDirItem( dir );
 	addItem( item );
@@ -314,10 +362,13 @@ void CertificateSet::addFile( string file ){
 	MRef<CertificateSetItem*> item = createFileItem( file );
 	addItem( item );
 }
-
-void CertificateSet::addCertificate( MRef<Certificate *> cert ){
-	MRef<CertificateSetItem*> item = createCertItem( cert );
-	addItem( item );
+*/
+MRef<CertificateSetItem*> CertificateSet::addCertificate(MRef<Certificate *> cert){
+	MRef<CertificateSetItem*> item = createCertItem(cert);
+	addItem(item);
+	item->setImportMethod(CertificateSetItem::IMPORTMETHOD_OTHER);
+	item->setImportParameter("");
+	return item;
 }
 
 void CertificateSet::remove( MRef<CertificateSetItem*> removedItem ){

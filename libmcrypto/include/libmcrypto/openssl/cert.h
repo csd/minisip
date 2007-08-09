@@ -57,9 +57,9 @@ class LIBMCRYPTO_API OsslCertificateSet: public CertificateSet{
 
 		X509_STORE * getDb();
 		virtual std::string getMemObjectType() const {return "OsslCertificateSet";}
-		void addDirectory( std::string dir );
-		void addFile( std::string file );
-		void addCertificate( MRef<Certificate *> cert );
+		//void addDirectory( std::string dir );
+		//void addFile( std::string file );
+		MRef<CertificateSetItem*> addCertificate( MRef<Certificate *> cert );
 
 	private:
 		X509_STORE * cert_db;

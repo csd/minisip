@@ -26,11 +26,11 @@
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
 #define BIND SigC::bind
-#define MESSAGE_DIALOG_ARG Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,false,true 
+#define MESSAGE_DIALOG_ARG Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,false,true
 #else
 #define SLOT(a,b) sigc::mem_fun(a,b)
 #define BIND sigc::bind
-#define MESSAGE_DIALOG_ARG false,Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,true 
+#define MESSAGE_DIALOG_ARG false,Gtk::MESSAGE_WARNING,Gtk::BUTTONS_OK,true
 #endif
 
 using namespace std;
@@ -45,35 +45,35 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "pkeyButton", pkeyButton );
 
 	refXml->get_widget( "certTreeView", certTreeView );
-	
+
 	refXml->get_widget( "addCertButton", addCertButton );
 	refXml->get_widget( "removeCertButton", removeCertButton );
-	
+
 	refXml->get_widget( "caTreeView", caTreeView );
 
 	refXml->get_widget( "addFileCaButton", addFileCaButton );
 	refXml->get_widget( "addDirCaButton", addDirCaButton );
 	refXml->get_widget( "removeCaButton", removeCaButton );
-	
+
 	refXml->get_widget( "certDialog", certDialog );
-	
+
 	refXml->get_widget( "closeButton", closeButton );
 
-	certButton->signal_clicked().connect( SLOT( *this, 
+	certButton->signal_clicked().connect( SLOT( *this,
 				&CertificateDialog::chooseCert ));
-	pkeyButton->signal_clicked().connect( SLOT( *this, 
+	pkeyButton->signal_clicked().connect( SLOT( *this,
 				&CertificateDialog::choosePKey ));
 
-	addCertButton->signal_clicked().connect(  SLOT( *this, 
+	addCertButton->signal_clicked().connect(  SLOT( *this,
 				&CertificateDialog::addCert ));
-	removeCertButton->signal_clicked().connect(  SLOT( *this, 
+	removeCertButton->signal_clicked().connect(  SLOT( *this,
 				&CertificateDialog::removeCert ));
 
-	addFileCaButton->signal_clicked().connect( SLOT( *this, 
+	addFileCaButton->signal_clicked().connect( SLOT( *this,
 				&CertificateDialog::addFileCa ));
-	addDirCaButton->signal_clicked().connect( SLOT( *this, 
+	addDirCaButton->signal_clicked().connect( SLOT( *this,
 				&CertificateDialog::addDirCa ));
-	removeCaButton->signal_clicked().connect( SLOT( *this, 
+	removeCaButton->signal_clicked().connect( SLOT( *this,
 				&CertificateDialog::removeCa ));
 
 	closeButton->signal_clicked().connect( SLOT( *certDialog,
@@ -81,7 +81,7 @@ CertificateDialog::CertificateDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	certTreeStore = new CertTreeStore();
 	certTreeStore->associateTreeView( certTreeView );
-	
+
 	caListStore = new CaListStore();
 	caListStore->associateTreeView( caTreeView );
 
@@ -101,7 +101,7 @@ void CertificateDialog::chooseCert(){
 	string result;
 	MRef<Certificate *> chosenCert;
 #ifdef OLDLIBGLADEMM
-	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
+	Gtk::FileSelection * dialog = new Gtk::FileSelection(
 			"Choose your certificate file" );
 #else
 	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
@@ -119,7 +119,7 @@ void CertificateDialog::chooseCert(){
 			chosenCert = Certificate::load( result );
 		}
 		catch( CertificateException & exc ){
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"Minisip could not open that certificate file. "
 			"Please check that the file is a correct "
                         "PEM-encoded certificate.", MESSAGE_DIALOG_ARG );
@@ -138,7 +138,7 @@ void CertificateDialog::chooseCert(){
 		certChain->clear();
 		certChain->addCertificate( chosenCert );
 		certChain->unlock();
-		
+
 		/* Update the tree consequently */
 		certTreeStore->clear();
 		certTreeStore->addCertificate( chosenCert );
@@ -153,13 +153,13 @@ void CertificateDialog::chooseCert(){
 	}
 
 	delete dialog;
-	
+
 }
 
 void CertificateDialog::choosePKey(){
 	string result;
 #ifdef OLDLIBGLADEMM
-	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
+	Gtk::FileSelection * dialog = new Gtk::FileSelection(
 			"Choose your private key file" );
 #else
 	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
@@ -177,7 +177,7 @@ void CertificateDialog::choosePKey(){
 			cert->setPk( result );
 		}
 		catch( CertificateExceptionPkey & exc ){
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"The private key file you selected does not. "
 			"match the selected certificate ",
 			MESSAGE_DIALOG_ARG );
@@ -187,7 +187,7 @@ void CertificateDialog::choosePKey(){
 			return;
 		}
 		catch( CertificateException & exc ){
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
                         "PEM-encoded private key.",
@@ -213,7 +213,7 @@ void CertificateDialog::addCert(){
 	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
-	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
+	Gtk::FileSelection * dialog = new Gtk::FileSelection(
 			"Choose a certificate file" );
 #else
 	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
@@ -235,7 +235,7 @@ void CertificateDialog::addCert(){
 			certChain->unlock();
 		}
 		catch( CertificateExceptionChain & exc ){
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"The selected certificate is not "
 			"assigned to the issuer of the previous "
 			"one.",
@@ -247,10 +247,10 @@ void CertificateDialog::addCert(){
 			return;
 		}
 		catch( CertificateException & exc ){
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded certificate.", 
+                        "PEM-encoded certificate.",
 			MESSAGE_DIALOG_ARG );
 
 			certChain->unlock();
@@ -267,7 +267,7 @@ void CertificateDialog::addCert(){
 }
 
 void CertificateDialog::removeCert(){
-	
+
 	/* update the internal chain */
 	certChain->lock();
 	certChain->removeLast();
@@ -282,7 +282,7 @@ void CertificateDialog::removeCert(){
 		certLabel->set_text( "Choose a certificate..." );
 		pkeyLabel->set_text( "Choose a private key" );
 	}
-		
+
 	certTreeStore->removeLast();
 
 }
@@ -292,7 +292,7 @@ void CertificateDialog::addFileCa(){
 	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
-	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
+	Gtk::FileSelection * dialog = new Gtk::FileSelection(
 			"Choose a CA file" );
 #else
 	Gtk::FileChooserDialog * dialog = new Gtk::FileChooserDialog(
@@ -314,10 +314,10 @@ void CertificateDialog::addFileCa(){
 		}
 		catch( CertificateException & exc ){
 			caDb->unlock();
-			Gtk::MessageDialog messageDialog( 
+			Gtk::MessageDialog messageDialog(
 			"Minisip could not open that file. "
 			"Please check that the file is a correct "
-                        "PEM-encoded certificate.", 
+                        "PEM-encoded certificate.",
 			MESSAGE_DIALOG_ARG );
 
 			messageDialog.run();
@@ -327,11 +327,11 @@ void CertificateDialog::addFileCa(){
 
 		/* Update the GUI */
 		MRef<CertificateSetItem*> item = new CertificateSetItem();
-		item->type = CERT_DB_ITEM_TYPE_FILE;
-		item->item = result;
+		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_FILE);
+		item->setImportParameter(result);
 		caListStore->addCaItem( item );
 	}
-	
+
 	delete dialog;
 }
 
@@ -340,7 +340,7 @@ void CertificateDialog::addDirCa(){
 	MRef<Certificate *> chosenCert;
 
 #ifdef OLDLIBGLADEMM
-	Gtk::FileSelection * dialog = new Gtk::FileSelection( 
+	Gtk::FileSelection * dialog = new Gtk::FileSelection(
 			"Choose a CA directory" );
 	if( dialog->get_file_list() ){
 		dialog->get_file_list()->get_parent()->hide();
@@ -368,9 +368,9 @@ void CertificateDialog::addDirCa(){
 
 		/* Update the GUI */
 		MRef<CertificateSetItem*> item = new CertificateSetItem();
-		item->type = CERT_DB_ITEM_TYPE_DIR;
-		item->item = result;
-		caListStore->addCaItem( item );
+		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_DIRECTORY);
+		item->setImportParameter(result);
+		caListStore->addCaItem(item);
 	}
 
 	delete dialog;
@@ -379,20 +379,20 @@ void CertificateDialog::addDirCa(){
 void CertificateDialog::removeCa(){
 	MRef<CertificateSetItem*> removed;
 	 Glib::RefPtr<Gtk::TreeSelection> selection;
-	
+
 	selection = caTreeView->get_selection();
 
 	if( selection->count_selected_rows () == 0 ){
 		return;
 	}
-	
+
 	Gtk::TreeModel::iterator selectedItem = selection->get_selected();
 	removed = caListStore->remove( selectedItem );
 
 	caDb->lock();
 	caDb->remove( removed );
 	caDb->unlock();
-	
+
 }
 
 void CertificateDialog::setCertChain( MRef<CertificateChain *> chain ){
@@ -437,10 +437,10 @@ void CertificateDialog::setCertChain( MRef<CertificateChain *> chain ){
         chain->unlock();
 
 	certTreeView->expand_all();
-	
+
 }
 
-                
+
 void CertificateDialog::setRootCa( MRef<CertificateSet *> caDb ){
 
 
@@ -505,7 +505,7 @@ bool CertTreeStore::isEmpty(){
 void CertTreeStore::removeLast(){
 	Gtk::TreeModel::iterator tmp = (*lastElement).parent();
 
-	
+
 	treeStore->erase( lastElement );
 	lastElement = tmp;
 }
@@ -523,14 +523,14 @@ CaListStore::CaListStore(){
 }
 
 void CaListStore::addCaItem( MRef<CertificateSetItem*> caItem ){
-		
+
 	Gtk::TreeModel::iterator iter = listStore->append();
 
-	switch( caItem->type ){
-		case CERT_DB_ITEM_TYPE_FILE:
+	switch( caItem->getImportMethod() ){
+		case CertificateSetItem::IMPORTMETHOD_FILE:
 			(*iter)[ typeColumn ] = "file";
 			break;
-		case CERT_DB_ITEM_TYPE_DIR:
+		case CertificateSetItem::IMPORTMETHOD_DIRECTORY:
 			(*iter)[ typeColumn ] = "directory";
 			break;
 		default:
@@ -538,7 +538,7 @@ void CaListStore::addCaItem( MRef<CertificateSetItem*> caItem ){
 			(*iter)[ typeColumn ] = "other";
 	}
 
-	(*iter)[ nameColumn ] = caItem->item;
+	(*iter)[ nameColumn ] = caItem->getImportParameter();
 }
 
 void CaListStore::associateTreeView( Gtk::TreeView * treeView ){
@@ -557,17 +557,15 @@ MRef<CertificateSetItem*> CaListStore::remove( Gtk::TreeModel::iterator selected
 
 
 	if( (*selectedItem)[typeColumn] == "file"  ){
-                ret->type = CERT_DB_ITEM_TYPE_FILE;
-        }
-	else if( (*selectedItem)[typeColumn] == "directory"  ){
-                ret->type = CERT_DB_ITEM_TYPE_DIR;
-        }
-        else{
-                ret->type = CERT_DB_ITEM_TYPE_OTHER;
+		ret->setImportMethod(CertificateSetItem::IMPORTMETHOD_FILE);
+        } else if( (*selectedItem)[typeColumn] == "directory"  ){
+		ret->setImportMethod(CertificateSetItem::IMPORTMETHOD_DIRECTORY);
+        } else {
+		ret->setImportMethod(CertificateSetItem::IMPORTMETHOD_OTHER);
         }
 
 	Glib::ustring toto = ((*selectedItem)[nameColumn]);
-	ret->item = toto;
+	ret->setImportParameter(toto);
 
 	listStore->erase( selectedItem );
 	return ret;
