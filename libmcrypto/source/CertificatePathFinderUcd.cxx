@@ -463,8 +463,15 @@ std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certi
  */
 bool CertificatePathFinderUcd::verifyLastPair(std::vector<MRef<Certificate*> > & certList) {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	bool res = true;
+	if (certList.size() > 1) {
+		MRef<Certificate*> last = certList[certList.size()-1];
+		MRef<Certificate*> secondToLast = certList[certList.size()-2];
+		std::cerr << "    Verifying if " << last->getName() << " was signed by " << secondToLast->getName() << std::endl;
+		res = last->verifySignedBy(secondToLast);
+	}
 	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
-	return true;
+	return res;
 }
 
 void CertificatePathFinderUcd::printStats(std::string prefix, std::string timeStampFile) {

@@ -25,18 +25,29 @@
 #define _CACHEMANAGER_H_
 
 #include <libmcrypto/config.h>
+#include <libmutil/MemObject.h>
 
 #include <libmcrypto/cert.h>
-#include <libmutil/MemObject.h>
 #include <libmutil/CacheItem.h>
 #include <libmnetutil/DirectorySet.h>
 #include <libmnetutil/DirectorySetItem.h>
 
 #include <string>
 #include <map>
+#include <list>
+#include <vector>
 
+#define CACHEMANAGER_CERTSET_DOWNLOADED "downloadedcerts"
 #define CACHEMANAGER_CERTSET_ROOTCAS "rootcas"
 #define CACHEMANAGER_DIRSET_MAIN "main"
+
+class LIBMCRYPTO_API CertFindSettings : public MObject {
+	public:
+		CertFindSettings(const std::string s, const std::string i) : searchText(s), issuer(i) {}
+		//CertFindSettings();
+		std::string searchText;
+		std::string issuer;
+};
 
 class LIBMCRYPTO_API CacheManager : public MObject {
 	public:
@@ -92,13 +103,43 @@ class LIBMCRYPTO_API CacheManager : public MObject {
 		 *                              the function will match the URI against the certificate's subjectAltNames.
 		 *                              Otherwise (if the parameter is not a SIP URI) the subject field is matched.
 		 */
-		std::vector<MRef<Certificate*> > findCertificate(const std::string searchText, const std::string issuer);
+		std::vector<MRef<Certificate*> > findCertificates(const std::string searchText, const std::string issuer, const std::string defaultSet = "");
+
+		void addCertificateSet(const MRef<CertificateSet*> certSet, const std::string setKey);
+		std::string addCertificate(const MRef<Certificate*> certItem, std::string setKey);
+
+		bool findCertsFailedBefore(const std::string searchText, const std::string issuer);
+		void addFindCertsFailed(const std::string searchText, const std::string issuer);
+
 	private:
-		std::string getNewDirectoryKey() const;
+		std::string getNewDirectorySetKey() const;
+		std::string getNewCertificateSetKey() const;
+
+		//std::string test;
 
 		std::map<std::string, MRef<DirectorySet*> > directorySets;
+		std::map<std::string, MRef<CertificateSet*> > certificateSets;
+		//std::map<std::string, MRef<CertificateSet*> > certificateSets2;
+		std::list<MRef<CertFindSettings*> > failedCertSearches;
 
-		std::vector<MRef<Certificate*> > fakeCache;
+		//std::vector<MRef<Certificate*> > fakeCache;
+		//std::string test;
+		//int test;
+		/*
+		int a;
+		int b;
+		int c;
+		int d;
+		int e;
+		int f;
+		int g;
+		int h;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		*/
 };
 
 #endif

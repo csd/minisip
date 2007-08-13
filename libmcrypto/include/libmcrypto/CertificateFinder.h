@@ -40,6 +40,17 @@
 #define MAX_EFFORT -1
 #endif
 
+/* Don't cache any certificates, don't even try to use the cache */
+#define CERTCACHEUSE_NONE 0
+/* Cache only certificates in the path, no irrelevant certificates */
+#define CERTCACHEUSE_LOW 1
+/* Cache all downloaded certificates */
+#define CERTCACHEUSE_NORMAL 2
+/* The constant used to determine the cache level */
+#define USE_CERTIFICATE_CACHE CERTCACHEUSE_NORMAL
+
+#define USE_FINDCERTSFAILED_CACHE 0
+
 class LIBMCRYPTO_API CertificateFinderStats : public MObject {
 	public:
 

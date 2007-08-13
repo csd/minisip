@@ -123,14 +123,12 @@ int Certificate::privateDecrypt(const unsigned char *data, int size,
 	return m_pk->privateDecrypt( data, size, retdata, retsize );
 }
 
-
 bool Certificate::verifySignedBy( MRef<Certificate*> cert ){
 	massert(cert);
 	MRef<CertificateSet*> set = CertificateSet::create();;
 	set->addCertificate(cert);
 	return control(*set);
 }
-
 
 bool Certificate::hasPk(){
 	return !m_pk.isNull();
@@ -242,15 +240,14 @@ std::string CertificateSetItem::getImportParameter() const {
 
 void CertificateSetItem::reindexCert() {
 	if (!certificate.isNull()) {
-		std::cerr << "REINDEX CERTIFICATE" << std::endl;
+		//std::cerr << "REINDEX CERTIFICATE" << std::endl;
 		subject = certificate->getName();
-		std::cerr << "   " << subject << std::endl;
-
-		std::vector<std::string> subjectAltNames;
+		//std::cerr << "   " << subject << std::endl;
 
 		Certificate::SubjectAltName altTypes[] = {Certificate::SAN_DNSNAME, Certificate::SAN_RFC822NAME, Certificate::SAN_URI, Certificate::SAN_IPADDRESS};
 		for (int i=0; i < 4; i++) {
 			std::vector<std::string> tempNames = certificate->getAltName(altTypes[i]);
+			//std::cerr << "Found " << tempNames.size() << " alternative names in certificate." << std::endl;
 			subjectAltNames.insert(subjectAltNames.end(), tempNames.begin(), tempNames.end());
 		}
 
@@ -298,13 +295,51 @@ void CertificateSet::unlock(){
         mLock.unlock();
 }
 
+std::vector<MRef<CertificateSetItem*> > CertificateSet::findItems(const std::string searchFor, const std::string issuer) {
+	initIndex();
+
+	std::vector<MRef<CertificateSetItem*> > res;
+	MRef<CertificateSetItem*> item;
+	while( items_index != items.end() ){
+		item = (*items_index);
+		//std::cerr << "findItems: testing " << item->getSubject() << std::endl;
+		// If an issuer has been specified and this certificate has another issuer then the certificate is not a match.
+		if (issuer == "" || item->getIssuer() == issuer) {
+			if (searchFor != "") {
+				if (item->getSubject() == searchFor) {
+					// Certificate subject matches "search condition"
+					res.push_back(item);
+				} else {
+					std::vector<std::string> altNames = item->getSubjectAltNames();
+					//std::cerr << "findItems: number of subjectAltNames is " << altNames.size() << std::endl;
+					for (std::vector<std::string>::iterator i = altNames.begin(); i != altNames.end(); i++) {
+						if ((*i) == searchFor) {
+							std::cerr << "findItems: found matching subjectAltName " << (*i) << " in certificates issued to " << item->getSubject() << std::endl;
+							// Certificate subject alternative name matches "search condition"
+							res.push_back(item);
+							break;
+						}
+					}
+				}
+			} else {
+				res.push_back(item);
+			}
+		}
+		items_index++;
+	}
+	initIndex();
+	return res;
+}
+
 void CertificateSet::addDirectory(std::string dir) {
 	std::list<std::string> certs = FileSystemUtils::directoryContents(dir, false);
 	for (std::list<std::string>::iterator i = certs.begin(); i != certs.end(); i++) {
-		std::cerr << "File: " << *i << std::endl;
+		//std::cerr << "File: " << *i << std::endl;
 		MRef<CertificateSetItem*> item = addFile(*i);
-		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_DIRECTORY);
-		item->setImportParameter(dir);
+		if (!item.isNull()) {
+			item->setImportMethod(CertificateSetItem::IMPORTMETHOD_DIRECTORY);
+			item->setImportParameter(dir);
+		}
 	}
 }
 MRef<CertificateSetItem*> CertificateSet::addFile(std::string file) {
@@ -316,8 +351,10 @@ MRef<CertificateSetItem*> CertificateSet::addFile(std::string file) {
 		item->setCertificateUri(uri.getString());
 		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_FILE);
 		item->setImportParameter(uri.getString());
+		return item;
 	} catch (CertificateException & ex) {
 	}
+	return MRef<CertificateSetItem*>();
 }
 
 void CertificateSet::addItem( MRef<CertificateSetItem*> item ){
@@ -348,8 +385,8 @@ MRef<CertificateSetItem*> CertificateSet::createCertItem( MRef<Certificate*> cer
 
 	//item->item = "";
 	//item->type = CERT_DB_ITEM_TYPE_OTHER;
-	item->setCertificate(cert);
-	item->reindexCert();
+	//item->setCertificate(cert);
+	//item->reindexCert();
 	return item;
 }
 /*

@@ -35,6 +35,7 @@
 
 CacheManager::CacheManager() {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	/*
 	Certificate* cert;
 
 	std::stack<std::string> certFiles;
@@ -51,14 +52,13 @@ CacheManager::CacheManager() {
 
 		certFiles.pop();
 	}
+	*/
 }
 MRef<DirectorySetItem*> CacheManager::findDirectory(const std::string domain, const std::string defaultSet) {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::vector<MRef<DirectorySetItem*> > res;
 	if (defaultSet.length() == 0) {
 		// Scan all directory sets
-		//std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin();
-		//while (i != directorySets.end()) {
 		for (std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
 			res = i->second->findItemsPrioritized(domain);
 			if (!res.empty())
@@ -87,7 +87,7 @@ MRef<DirectorySet*> CacheManager::getDirectorySet(std::string key) {
 std::string CacheManager::addDirectory(const MRef<DirectorySetItem*> dirItem, std::string setKey) {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
 	if (0 == setKey.length()) {
-		setKey = getNewDirectoryKey();
+		setKey = getNewDirectorySetKey();
 	}
 	if (directorySets.find(setKey) == directorySets.end()) {
 		directorySets[setKey] = MRef<DirectorySet*>(new DirectorySet());
@@ -98,13 +98,13 @@ std::string CacheManager::addDirectory(const MRef<DirectorySetItem*> dirItem, st
 
 std::string CacheManager::addDirectoryLdap(std::string url, std::string subTree, const std::string setKey) {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
-	return addDirectory(MRef<DirectorySetItem*>(new DirectorySetItem(url, subTree)), setKey != "" ? setKey : getNewDirectoryKey());
+	return addDirectory(MRef<DirectorySetItem*>(new DirectorySetItem(url, subTree)), setKey != "" ? setKey : getNewDirectorySetKey());
 }
 
 //void CacheManager::purgeCache();
 //void CacheManager::removeFromCache(MRef<CacheItem*> item);
 
-std::string CacheManager::getNewDirectoryKey() const {
+std::string CacheManager::getNewDirectorySetKey() const {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::string newName = "dirset";
 	int num = 1;
@@ -112,13 +112,54 @@ std::string CacheManager::getNewDirectoryKey() const {
 		num++;
 	return newName;
 }
+std::string CacheManager::getNewCertificateSetKey() const {
+	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	std::string newName = "certset";
+	int num = 1;
+	while (certificateSets.find(newName + itoa(num)) != certificateSets.end())
+		num++;
+	return newName;
+}
 
 /**
+ * @note	If a certificate has been index and unloaded from memory, this function will indirectly
+ * 		(through its use of CertificateSetItem.getCertificate()) try to load the certifcate
+ * 		once more. This may entain downloading the certificate from a remote host.
  * @todo	Subject and Issuer should NOT be used to identify certificates. Use *KeyIdentifier (?) and ??? instead.
  */
-std::vector<MRef<Certificate*> > CacheManager::findCertificate(const std::string searchText, const std::string issuer) {
+std::vector<MRef<Certificate*> > CacheManager::findCertificates(const std::string searchText, const std::string issuer, const std::string defaultSet) {
 	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
 
+	std::vector<MRef<CertificateSetItem*> > tempRes;
+	std::vector<MRef<Certificate*> > res;
+	std::vector<MRef<CertificateSetItem*> >::iterator iRes;
+
+	if (defaultSet.length() == 0) {
+		// Scan all directory sets
+		for (std::map<const std::string, MRef<CertificateSet*> >::iterator i = certificateSets.begin(); i != certificateSets.end(); i++) {
+			tempRes = i->second->findItems(searchText, issuer);
+			if (!tempRes.empty()) {
+				for (iRes = tempRes.begin(); iRes != tempRes.end(); iRes++) {
+					res.push_back((*iRes)->getCertificate());
+				}
+			}
+		}
+
+	} else {
+		// Scan only one directory set, the one mentioned in the function parameters.
+		if (certificateSets.find(defaultSet) != certificateSets.end()) {
+			tempRes = certificateSets[defaultSet]->findItems(searchText, issuer);
+			if (!tempRes.empty()) {
+				for (iRes = tempRes.begin(); iRes != tempRes.end(); iRes++) {
+					res.push_back((*iRes)->getCertificate());
+				}
+			}
+		}
+	}
+	// Return empty item if no result found
+	return res;
+
+	/*
 	std::vector<MRef<Certificate*> > res;
 	SipUri uri(searchText);
 	for (std::vector<MRef<Certificate*> >::iterator i = fakeCache.begin(); i != fakeCache.end(); i++) {
@@ -133,4 +174,37 @@ std::vector<MRef<Certificate*> > CacheManager::findCertificate(const std::string
 		}
 	}
 	return res;
+	*/
+}
+
+void CacheManager::addCertificateSet(const MRef<CertificateSet*> certSet, const std::string setKey) {
+	if (certificateSets.find(setKey) == certificateSets.end()) {
+		certificateSets[setKey] = CertificateSet::create();
+	}
+	certificateSets[setKey] = certSet;
+}
+
+std::string CacheManager::addCertificate(const MRef<Certificate*> cert, std::string setKey) {
+	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	if (0 == setKey.length()) {
+		setKey = getNewCertificateSetKey();
+	}
+	if (certificateSets.find(setKey) == certificateSets.end()) {
+		certificateSets[setKey] = CertificateSet::create();
+	}
+	certificateSets[setKey]->addCertificate(cert);
+	return setKey;
+}
+
+
+bool CacheManager::findCertsFailedBefore(const std::string searchText, const std::string issuer) {
+	for (std::list<MRef<CertFindSettings*> >::iterator i = failedCertSearches.begin(); i != failedCertSearches.end(); i++) {
+		if ((*i)->searchText == searchText && (*i)->issuer == issuer)
+			return true;
+	}
+	return false;
+}
+void CacheManager::addFindCertsFailed(const std::string searchText, const std::string issuer) {
+	failedCertSearches.push_back(MRef<CertFindSettings*>(new CertFindSettings(searchText, issuer)));
+	std::cerr << "Look-up failure using (" << searchText <<", "<<issuer << std::endl;
 }

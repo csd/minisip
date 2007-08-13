@@ -159,6 +159,8 @@ class LIBMCRYPTO_API GtlsCertificate: public Certificate{
 		std::string getIssuer();
 		std::string getIssuerCn();
 
+		bool verifySignedBy(MRef<Certificate*> cert);
+
 		gnutls_x509_crt_t getCertificate(){return cert;};
 
 	protected:

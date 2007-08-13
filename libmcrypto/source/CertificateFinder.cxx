@@ -68,16 +68,29 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 	std::string issuer = curCert->getName();
 
 	/*
+	Test to see if this query has failed before. If so, abort immediately.
+	*/
+	if (USE_FINDCERTSFAILED_CACHE) {
+		if (cacheManager->findCertsFailedBefore(subjectUri, issuer)) {
+			effort=MAX_EFFORT;
+			return std::vector<MRef<Certificate*> >();
+		}
+	}
+	/*
 	Scan the local certificate cache
 	*/
 	if (effort == 0){
-		stats->cacheQueries++;
-		ret = cacheManager->findCertificate(subjectUri, issuer);
-		std::cerr << "    Found certificates in local cache: " << ret.size() << std::endl;
-		if (!ret.empty()){
-			return ret;
+		if (USE_CERTIFICATE_CACHE != CERTCACHEUSE_NONE) {
+			stats->cacheQueries++;
+			ret = cacheManager->findCertificates(subjectUri, issuer);
+			std::cerr << "    Found certificates in local cache: " << ret.size() << std::endl;
+			if (!ret.empty()){
+				return ret;
+			} else {
+				stats->cacheQueriesNoResult++;
+				effort = 1;
+			}
 		} else {
-			stats->cacheQueriesNoResult++;
 			effort = 1;
 		}
 	}
@@ -145,6 +158,9 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 			effort = MAX_EFFORT;
 			return ret;
 		}
+	}
+	if (USE_FINDCERTSFAILED_CACHE) {
+		cacheManager->addFindCertsFailed(subjectUri, issuer);
 	}
 
 	effort=MAX_EFFORT;
@@ -282,7 +298,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 					certs = (*iter)->getAttrValuesBinary("userCertificate;binary");
 				}
 
-				Certificate* cert;
+				MRef<Certificate*> cert;
 
 				/*
 				Load/parse each retrieved certificate and test if they match the conditions.
@@ -294,7 +310,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 					if (stats != NULL) stats->certsProcessed++;
 
 					std::cerr << "    Found binary attribute in LDAP database" << std::endl;
-					if (NULL != cert) {
+					if (!cert.isNull()) {
 						if (stats != NULL) stats->ldapCertsDownloaded++;
 
 						std::cerr << "    Found certificate in LDAP database" << std::endl;
@@ -313,7 +329,20 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 							*/
 							if (stats != NULL) stats->certsUseful++;
 							std::cerr << "        Found MATCHING certificate in LDAP database" << std::endl;
-							res.push_back(MRef<Certificate*>(cert));
+							if (USE_CERTIFICATE_CACHE == CERTCACHEUSE_LOW) {
+								std::vector<MRef<Certificate*> > temp = cacheManager->findCertificates(cert->getName(), cert->getIssuer(), CACHEMANAGER_CERTSET_DOWNLOADED);
+								if (temp.size() == 0) {
+									cacheManager->addCertificate(cert, CACHEMANAGER_CERTSET_DOWNLOADED);
+								}
+							}
+							res.push_back(cert);
+						}
+
+						if (USE_CERTIFICATE_CACHE == CERTCACHEUSE_NORMAL) {
+							std::vector<MRef<Certificate*> > temp = cacheManager->findCertificates(cert->getName(), cert->getIssuer(), CACHEMANAGER_CERTSET_DOWNLOADED);
+							if (temp.size() == 0) {
+								cacheManager->addCertificate(cert, CACHEMANAGER_CERTSET_DOWNLOADED);
+							}
 						}
 					}
 				}

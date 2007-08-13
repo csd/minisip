@@ -135,6 +135,8 @@ class LIBMCRYPTO_API OsslCertificate: public Certificate{
 		std::string getIssuer();
 		std::string getIssuerCn();
 
+		bool verifySignedBy(MRef<Certificate*> cert);
+
 		X509 * getOpensslCertificate(){return cert;};
 	private:
 		X509 * cert;

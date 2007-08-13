@@ -191,9 +191,19 @@ class LIBMCRYPTO_API CertificateSet: public MObject{
 		static CertificateSet *create();
 
 		virtual CertificateSet* clone();
+
 		void addDirectory( std::string dir );
 		MRef<CertificateSetItem*> addFile( std::string file );
 		virtual MRef<CertificateSetItem*> addCertificate( MRef<Certificate *> cert );
+
+		/**
+		 * Returns the certificates within the set "matching the parameter \p searchFor".
+		 *
+		 * A certificate is considered to match the query if the subject or any of the
+		 * subject alternative names contain the text \p searchFor.
+		 */
+		std::vector<MRef<CertificateSetItem*> > findItems(const std::string searchFor, const std::string issuer = "");
+
 		virtual std::list<MRef<CertificateSetItem*> > &getItems();
 		virtual MRef<CertificateSetItem*> getNext();
 		virtual void initIndex();
