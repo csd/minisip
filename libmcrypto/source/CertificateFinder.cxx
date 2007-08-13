@@ -29,6 +29,7 @@
 #include <libmnetutil/LdapEntry.h>
 #include <libmnetutil/LdapCredentials.h>
 
+#include<libmutil/SipUri.h>
 #include <iostream>
 
 CertificateFinder::CertificateFinder() : stats(NULL) {
@@ -376,4 +377,23 @@ void CertificateFinder::setAutoCacheCerts(const bool value) {
 }
 bool CertificateFinder::getAutoCacheCerts() const {
 	return autoAddToCache;
+}
+std::string CertificateFinder::getSubjectDomain(MRef<Certificate*> cert) {
+	std::vector<std::string> curAltNames = cert->getAltName(Certificate::SAN_URI);
+	if (curAltNames.size() > 0) {
+		// First try to determine the "current domain" by analyzing the subjectAltNames and assuming that the "current certificate" is an end-user certificate
+		for (std::vector<std::string>::iterator nameIter = curAltNames.begin(); nameIter != curAltNames.end(); nameIter++) {
+			SipUri uri(*nameIter);
+			if (uri.isValid()) {
+				return uri.getIp();
+			}
+		}
+
+	} else {
+		// No SIP URIs were found in the subjectAltNames. Try looking for DNS names instead (i.e. assume that the current certificate is a CA certificate instead of an end-user certificate)
+		curAltNames = cert->getAltName(Certificate::SAN_DNSNAME);
+		if (curAltNames.size() > 0)
+			return curAltNames.at(0);
+	}
+	return "";
 }

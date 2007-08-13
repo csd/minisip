@@ -136,13 +136,6 @@ class LIBMCRYPTO_API CertificatePathFinderUcd : public MObject {
 		 */
 		bool verifyLastPair(std::vector<MRef<Certificate*> > & certList);
 
-		/**
-		 * Get the (first found) domain name specified in the subjectAltName extensions of certificate \p cert.
-		 *
-		 * Handles both DNS names (obviously) and URIs of SIP type.
-		 */
-		std::string getSubjectDomain(MRef<Certificate*> cert);
-
 		MRef<CertificateFinder*> certFinder;
 		CertificateFinderStats* stats;
 };

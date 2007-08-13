@@ -423,7 +423,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certi
 	When looking for down-certificates we must know where in the hierarchy
 	we are right now (so that we don't accidentally "mark" a parent as a child).
 	*/
-	std::string curDomain = getSubjectDomain(curCert);
+	std::string curDomain = certFinder->getSubjectDomain(curCert);
 
 	std::vector<std::string> resDomains;
 
@@ -494,23 +494,4 @@ void CertificatePathFinderUcd::printStats(std::string prefix, std::string timeSt
 	} else {
 		std::cout << "No stats collected." << std::endl;
 	}
-}
-std::string CertificatePathFinderUcd::getSubjectDomain(MRef<Certificate*> cert) {
-	std::vector<std::string> curAltNames = cert->getAltName(Certificate::SAN_URI);
-	if (curAltNames.size() > 0) {
-		// First try to determine the "current domain" by analyzing the subjectAltNames and assuming that the "current certificate" is an end-user certificate
-		for (std::vector<std::string>::iterator nameIter = curAltNames.begin(); nameIter != curAltNames.end(); nameIter++) {
-			SipUri uri(*nameIter);
-			if (uri.isValid()) {
-				return uri.getIp();
-			}
-		}
-
-	} else {
-		// No SIP URIs were found in the subjectAltNames. Try looking for DNS names instead (i.e. assume that the current certificate is a CA certificate instead of an end-user certificate)
-		curAltNames = cert->getAltName(Certificate::SAN_DNSNAME);
-		if (curAltNames.size() > 0)
-			return curAltNames.at(0);
-	}
-	return "";
 }

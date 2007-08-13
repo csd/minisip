@@ -110,7 +110,15 @@ class LIBMCRYPTO_API CertificateFinder : public MObject {
 		//std::vector<MRef<Certificate*> > findDnsGuessing(const std::string subjectUri);
 
 		void setAutoCacheCerts(const bool value);
+
 		bool getAutoCacheCerts() const;
+		/**
+		 * Get the (first found) domain name specified in the subjectAltName extensions of certificate \p cert.
+		 *
+		 * Handles both DNS names (obviously) and URIs of SIP type.
+		 */
+		std::string getSubjectDomain(MRef<Certificate*> cert);
+
 	private:
 		std::vector<MRef<Certificate*> > downloadFromLdap(const LdapUrl & url, const std::string sipUri, const std::string issuer, const bool typeCrossCert);
 
