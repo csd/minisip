@@ -18,7 +18,7 @@
 
 /* Copyright (C) 2007
  *
- * Authors: Mikael Svensson
+ * Authors: Mikael Svensson, Erik Eliasson
 */
 
 #include <config.h>
@@ -28,6 +28,7 @@
 #include <libmnetutil/LdapUrl.h>
 #include <libmnetutil/LdapEntry.h>
 #include <libmnetutil/LdapCredentials.h>
+#include <libmnetutil/NetworkFunctions.h>
 
 #include<libmutil/SipUri.h>
 #include <iostream>
@@ -124,13 +125,20 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 	Try to find DNS SRV records specifying LDAP servers in the domain of the issuer.
 	*/
 	if (effort == 2){
-		//ret = ....
-		ret = std::vector<MRef<Certificate*> >();
-		std::cerr << "    Found certificates using SRV records: " << ret.size() << std::endl;
+		std::string domain = getSubjectDomain(curCert);
+		uint16_t port;
+		std::string server=NetworkFunctions::getHostHandlingService("_ldap._tcp",   
+				domain,port);
+
+		server = "ldap://"+server;
+		if (port!=0)
+			server = server+":"+itoa(port);
+
+		LdapUrl url(server);
+		ret = downloadFromLdap(url, subjectUri, issuer, typeCrossCert);
+		std::cerr << "    Found certificates using SRV: " << ret.size() << std::endl;
 		if (!ret.empty()) {
 			return ret;
-		} else {
-			effort = 3;
 		}
 	}
 
