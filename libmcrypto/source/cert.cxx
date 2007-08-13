@@ -128,7 +128,7 @@ bool Certificate::verifySignedBy( MRef<Certificate*> cert ){
 	massert(cert);
 	MRef<CertificateSet*> set = CertificateSet::create();;
 	set->addCertificate(cert);
-	return cert->control(*set);
+	return control(*set);
 }
 
 

@@ -697,7 +697,6 @@ int OsslCertificate::control( CertificateSet * cert_db ){
 	//fprintf(stderr, "result: %d\n", result );
 #ifdef DEBUG_OUTPUT
 	if( result == 0 ){
-		cerr << result << endl;
 		cerr << X509_verify_cert_error_string( cert_store_ctx.error ) << endl;
 	}
 #endif
