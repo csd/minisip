@@ -33,9 +33,9 @@ class LIBMNETUTIL_API LdapUrlExtension {
 	public:
 		LdapUrlExtension(std::string type, std::string value, bool critical) : type(type), value(value), critical(critical) {}
 
-		bool critical;
 		std::string type;
 		std::string value;
+		bool critical;
 };
 
 /**

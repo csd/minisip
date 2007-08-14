@@ -67,7 +67,7 @@ std::string FileUrl::getString() const {
 	std::vector<std::string> parts = split(path, false, sep, true);
 
 	// Glue together each "path part" again
-	for (int i=0; i<parts.size(); i++) {
+	for (size_t i=0; i<parts.size(); i++) {
 		std::string decPart = percentEncode(parts.at(i));
 		url += decPart + '/';
 	}
@@ -96,7 +96,7 @@ bool FileUrl::isReservedChar(char in) const {
 }
 
 void FileUrl::setUrl(const std::string url) {
-	std::string::size_type lastPos = 0, pos = 0, posTemp = 0;
+	std::string::size_type lastPos = 0, pos = 0;
 
 	if (strCaseCmp(url.substr(0, 7).c_str(), "file://") == 0) {
 		lastPos = 7;
@@ -126,7 +126,7 @@ void FileUrl::setUrl(const std::string url) {
 			std::vector<std::string> parts = split(restOfUrl, false, '/', true);
 
 			// Glue the pieces together using an operating-system specific separator
-			for (int i=0; i<parts.size(); i++) {
+			for (size_t i=0; i<parts.size(); i++) {
 				std::string decPart = percentDecode(parts.at(i));
 				if (type == FILEURL_TYPE_WINDOWS) {
 					path += decPart + '\\';
@@ -226,7 +226,7 @@ std::string FileUrl::percentEncode(const std::string & in) const {
 
 std::string FileUrl::percentEncode(const std::string & in, bool escapeComma, bool escapeQuestionmark) const {
 	std::string res;
-	for (int i=0; i < in.length(); i++) {
+	for (size_t i=0; i < in.length(); i++) {
 		if ((!isReservedChar(in[i]) && !isUnreservedChar(in[i])) || (escapeQuestionmark && in[i] == '?') || (escapeComma && in[i] == ','))
 			res += encodeChar(in[i]);
 		else
@@ -236,7 +236,7 @@ std::string FileUrl::percentEncode(const std::string & in, bool escapeComma, boo
 }
 std::string FileUrl::percentDecode(const std::string & in) const {
 	std::string res;
-	for (int i=0; i < in.length(); i++) {
+	for (size_t i=0; i < in.length(); i++) {
 		if ('%' == in[i]) {
 			res += decodeChar(in.substr(i, 3));
 			i+=2;
@@ -245,3 +245,4 @@ std::string FileUrl::percentDecode(const std::string & in) const {
 	}
 	return res;
 }
+

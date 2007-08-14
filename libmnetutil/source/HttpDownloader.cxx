@@ -115,7 +115,7 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 	if (bytesWritten < 0) {
 		//cerr << "Error: Could not send request" << endl;
 		return false;
-	} else if (bytesWritten < request.length()) {
+	} else if (bytesWritten < (int32_t)request.length()) {
 		return false;
 	}
 

@@ -69,7 +69,7 @@ std::string LdapUrl::getString() const {
 	// Append attributes
 	url += '?';
 	if (attributes.size() > 0) {
-		for (int i=0; i<attributes.size(); i++) {
+		for (size_t i=0; i<attributes.size(); i++) {
 			if (i>0)
 				url += ',';
 			url += percentEncode(attributes.at(i), false, true);
@@ -89,7 +89,7 @@ std::string LdapUrl::getString() const {
 	// Append extensions
 	if (extensions.size() > 0) {
 		url += '?';
-		for (int i=0; i<extensions.size(); i++) {
+		for (size_t i=0; i<extensions.size(); i++) {
 			if (i>0)
 				url += ',';
 
@@ -160,7 +160,7 @@ void LdapUrl::setUrl(const std::string url) {
 			switch (parts.size()) {
 				case 5: {
 					std::vector<std::string> exts = split(parts.at(4), false, ',', true);
-					for (int i=0; i<exts.size(); i++) {
+					for (size_t i=0; i<exts.size(); i++) {
 						std::string ext = exts.at(i);
 						std::string::size_type colonPos = ext.find('=', 0);
 						bool critical = (ext[0] == '!');
@@ -187,7 +187,7 @@ void LdapUrl::setUrl(const std::string url) {
 
 				case 2:
 					attributes = split(parts.at(1), false, ',', true);
-					for (int i=0; i<attributes.size(); i++) {
+					for (size_t i=0; i<attributes.size(); i++) {
 						attributes.at(i) = percentDecode(attributes.at(i));
 					}
 				case 1:
@@ -208,11 +208,11 @@ void LdapUrl::printDebug() {
 	std::cerr <<  "     Port:       [" << port << "]" << std::endl;
 
 	std::cerr <<  "     Attributes: " << std::endl;
-	for (int i=0; i<attributes.size(); i++)
+	for (size_t i=0; i<attributes.size(); i++)
 		std::cerr <<  "                 [" << attributes.at(i) << "]" << std::endl;
 
 	std::cerr <<  "     Extensions: " << std::endl;
-	for (int i=0; i<extensions.size(); i++)
+	for (size_t i=0; i<extensions.size(); i++)
 		std::cerr <<  "                 [" << extensions.at(i).type << "=" << extensions.at(i).value << "]" << (extensions.at(i).critical ? " (critical!)" : "") << std::endl;
 
 	std::cerr <<  "     Filter:     [" << filter << "]" << std::endl;
@@ -223,7 +223,7 @@ void LdapUrl::printDebug() {
 }
 
 bool LdapUrl::hasCriticalExtension() const {
-	for (int i=0; i<extensions.size(); i++)
+	for (size_t i=0; i<extensions.size(); i++)
 		if (extensions.at(i).critical)
 			return true;
 	return false;
@@ -304,7 +304,7 @@ int32_t LdapUrl::charToNum(const char in) const {
 
 std::string LdapUrl::percentEncode(const std::string & in, bool escapeComma, bool escapeQuestionmark) const {
 	std::string res;
-	for (int i=0; i < in.length(); i++) {
+	for (size_t i=0; i < in.length(); i++) {
 		if ((!isReservedChar(in[i]) && !isUnreservedChar(in[i])) || (escapeQuestionmark && in[i] == '?') || (escapeComma && in[i] == ','))
 			res += encodeChar(in[i]);
 		else
@@ -314,7 +314,7 @@ std::string LdapUrl::percentEncode(const std::string & in, bool escapeComma, boo
 }
 std::string LdapUrl::percentDecode(const std::string & in) const {
 	std::string res;
-	for (int i=0; i < in.length(); i++) {
+	for (size_t i=0; i < in.length(); i++) {
 		if ('%' == in[i]) {
 			res += decodeChar(in.substr(i, 3));
 			i+=2;

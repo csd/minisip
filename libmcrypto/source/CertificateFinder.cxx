@@ -237,7 +237,6 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 			std::vector<MRef<LdapEntry*> > result;
 			std::vector<MRef<LdapEntry*> >::iterator iter;
 			std::vector<std::string> attrs;
-			int i=0;
 
 			std::cerr << "    Base: " << base << std::endl;
 			try {
@@ -312,7 +311,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 				/*
 				Load/parse each retrieved certificate and test if they match the conditions.
 				*/
-				for (int x=0; x<certs.size(); x++) {
+				for (size_t x=0; x<certs.size(); x++) {
 					MRef<LdapEntryBinaryValue*> val = certs.at(x);
 					cert = Certificate::load(reinterpret_cast<unsigned char*>(val->value), val->length);
 

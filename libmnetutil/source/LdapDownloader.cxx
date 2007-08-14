@@ -103,7 +103,7 @@ std::vector<std::string> LdapDownloader::saveToFiles(std::string attr, std::stri
 			try {
 				std::vector< MRef<LdapEntryBinaryValue*> > binaryData = entry->getAttrValuesBinary(attr);
 
-				for (int i=0; i<binaryData.size(); i++) {
+				for (size_t i=0; i<binaryData.size(); i++) {
 					std::string fileName = nextFilename(filenameBase, i+1);
 					std::ofstream file(fileName.c_str());
 					if (file.good()) {

@@ -251,7 +251,7 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findCerts	(std::vecto
 		which of the candidates that should be tested first) exceed the number of
 		candidates then we should abort the function because there is nothing more to be done.
 		*/
-		if (candidates.empty() || phaseEffort >= candidates.size()) {
+		if (candidates.empty() || phaseEffort >= (int)candidates.size()) {
 			phaseEffort = MAX_EFFORT;
 			findEffort = MAX_EFFORT;
 			break;

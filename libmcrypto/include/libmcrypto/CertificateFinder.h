@@ -54,7 +54,19 @@
 class LIBMCRYPTO_API CertificateFinderStats : public MObject {
 	public:
 
-		CertificateFinderStats() : ldapQueries (0), ldapQueriesNoResult (0), ldapQueriesNoDirectory (0), ldapCertsDownloaded (0), dnsQueries (0), dnsQueriesNoResult (0), dnsSrvQueries (0), dnsSrvQueriesNoResult (0), certsProcessed (0), certsUseful (0), cacheQueries (0), cacheQueriesNoResult (0) { }
+		CertificateFinderStats() : ldapQueries (0), 
+					ldapQueriesNoResult (0), 
+					ldapQueriesNoDirectory (0), 
+					ldapCertsDownloaded (0), 
+					dnsQueries (0), 
+					dnsQueriesNoResult (0), 
+					dnsSrvQueries (0), 
+					dnsSrvQueriesNoResult (0), 
+					cacheQueries (0), 
+					cacheQueriesNoResult (0),
+					certsProcessed (0), 
+					certsUseful (0)
+		{ }
 
 		int ldapQueries;
 		int ldapQueriesNoResult;
