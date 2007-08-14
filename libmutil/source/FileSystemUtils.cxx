@@ -54,7 +54,7 @@ void FileSystemUtils::directoryContentsInternal(std::string dir, bool includeSub
 	// error it returns a handle greater than -1.
 	long h = _findfirsti64(dirComplete.c_str(), &data);
 	if(h >= 0) {
-		FILELIST thisList;
+		//FILELIST thisList;
 		// add empty FILELIST structure to the linked list argument
 		//theList.push_back(thisList);
 		// get pointer to the FILELIST just added to the linked list above.
