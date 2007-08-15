@@ -329,9 +329,12 @@ vector<byte_t> MikeyPayloads::buildSignData( size_t sigLength,
 					     bool useIdsT ){
 	vector<byte_t> signData;
 
-// 	signData.reserve( signDataLen );
-	signData.insert( signData.end(), rawMessageData(),
-			 rawMessageData() + rawMessageLength() - sigLength );
+	byte_t * start = rawMessageData();
+	byte_t * end = start;
+	uint32_t diff=rawMessageLength() - sigLength;
+	end+=diff;
+
+	signData.insert( signData.end(), start, end);
 
 	if( useIdsT ){
 		vector<byte_t> vecIDi = extractIdVec( 0 );
