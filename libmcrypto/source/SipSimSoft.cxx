@@ -7,6 +7,8 @@ using namespace std;
 
 SipSimSoft::SipSimSoft(MRef<CertificateChain*> chain, MRef<CertificateSet*> cas)
 {
+	massert(chain);
+	massert(chain->getFirst());
 	certChain = chain;
 	ca_set = cas;
 }
@@ -18,15 +20,16 @@ bool SipSimSoft::getSignature(unsigned char * data,
 		bool doHash,
 		int hash_alg)
 {
+	massert(doHash /*we don't support not hashing in SipSimSoft yet...*/);
+	massert(certChain);
 	MRef<Certificate*> myCert = certChain->getFirst();
-	assert(doHash /*we don't support not hashing in SipSimSoft yet...*/);
+	massert(myCert);
 	myCert->signData(data, dataLength, signaturePtr, &signatureLength);
 	return true;
 }
 
 bool SipSimSoft::getRandomValue(unsigned char * randomPtr, unsigned long randomLength)
 {
-	Rand::randomize(randomPtr, randomLength);
-	return false;
+	return Rand::randomize(randomPtr, randomLength);
 }
 

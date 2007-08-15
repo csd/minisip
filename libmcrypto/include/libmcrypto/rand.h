@@ -35,6 +35,7 @@ class LIBMCRYPTO_API Rand {
 
 		/**
 		 * Generate cryptographically strong random data
+		 * @return true on success, false otherwise
 		 */
 		static bool randomize(void *buffer, size_t length);
 		static bool randomize(void *buffer, size_t length, MRef<SipSim *> sim);

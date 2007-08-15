@@ -50,6 +50,10 @@ public:
 				bool doHash, 
 				int hash_alg=HASH_SHA1) = 0;
 	
+	/**
+	 * Returns cryptographically strong random data 
+	 * @return true of success, false otherwise
+	 */
 	virtual bool getRandomValue(unsigned char * randomPtr, unsigned long randomLength) = 0;
 
 	//virtual bool getDHPublicValue(unsigned long & dhPublicValueLength, unsigned char * dhPublickValuePtra)=0;
