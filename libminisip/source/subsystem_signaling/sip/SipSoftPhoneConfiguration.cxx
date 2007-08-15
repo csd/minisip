@@ -182,7 +182,7 @@ void SipSoftPhoneConfiguration::save(){
 		/* The first element is the personal Certificate, the next ones
 		 * are saved as CertificateChain */
 		if( !certItem.isNull() ){
-			backend->save(accountPath + "Certificate",certItem->getFile());
+			backend->save(accountPath + "certificate",certItem->getFile());
 			backend->save(accountPath + "private_key",certItem->getPkFile());
 			certItem = cert->getNext();
 		}
@@ -190,7 +190,7 @@ void SipSoftPhoneConfiguration::save(){
 		uint32_t i = 0;
 
 		while( !certItem.isNull() ){
-			backend->save(accountPath + "CertificateChain["+itoa(i)+"]",
+			backend->save(accountPath + "certificate_chain["+itoa(i)+"]",
 					certItem->getFile() );
 			i++;
 			certItem = cert->getNext();
@@ -561,7 +561,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 #endif
 
-		string certFile = backend->loadString(accountPath + "Certificate","");
+		string certFile = backend->loadString(accountPath + "certificate","");
 		string privateKeyFile = backend->loadString(accountPath + "private_key","");
 
 		MRef<CertificateChain*> certchain = CertificateChain::create();
@@ -593,7 +593,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 					cert->setPk( privateKeyFile );
 				}
 				catch( CertificateExceptionPkey & ){
-					merr << "The given private key " << privateKeyFile << " does not match the Certificate"<<endl;
+					merr << "The given private key " << privateKeyFile << " does not match the certificate"<<endl;
 				}
 
 				catch( CertificateException &){
@@ -603,7 +603,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		}
 
 		uint32_t iCertFile = 0;
-		certFile = backend->loadString(accountPath + "CertificateChain[0]","");
+		certFile = backend->loadString(accountPath + "certificate_chain[0]","");
 
 
 
@@ -613,12 +613,12 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			conf = backend->getConf();
 			vector<struct contdata*> res;
 			string user = conf->getUser();
-			conf->downloadReq(user, "CertificateChain",res);/*gets the whole chain*/
+			conf->downloadReq(user, "certificate_chain",res);/*gets the whole chain*/
 			for(int i=0;i<res.size();i++) {
 				try {
 					Certificate *cert = Certificate::load((unsigned char *)res.at(i)->data,
 							(size_t) res.at(i)->size,
-							"httpsrp:///"+user + "/CertificateChain" );
+							"httpsrp:///"+user + "/certificate_chain" );
 					certchain->addCertificate( cert );
 				} catch(CertificateException &) {
 					merr << "Could not open the given Certificate" << endl;
@@ -633,13 +633,15 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		while( certFile != "" ){
 			try{
 				Certificate * cert = Certificate::load( certFile );
+				massert(cert);
+				cerr << "EEEE: adding certificate to certchain"<<endl;
 				certchain->addCertificate( cert );
 			}
 			catch( CertificateException &){
 				merr << "Could not open the given Certificate" << endl;
 			}
 			iCertFile ++;
-			certFile = backend->loadString(accountPath + "CertificateChain["+itoa(iCertFile)+"]","");
+			certFile = backend->loadString(accountPath + "certificate_chain["+itoa(iCertFile)+"]","");
 
 		}
 
@@ -656,7 +658,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			conf = backend->getConf();
 			vector<struct contdata*> res;
 			string user = conf->getUser();
-			conf->downloadReq(user, "CertificateChain",res);
+			conf->downloadReq(user, "certificate_chain",res);
 			for(int i=0;i<res.size();i++)
 			{
 				try{
@@ -913,7 +915,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->saveBool( "account[0]/secured", false );
 	be->save( "account[0]/ka_type", "psk" );
 	be->save( "account[0]/psk", "Unspecified PSK" );
-	be->save( "account[0]/Certificate", "" );
+	be->save( "account[0]/certificate", "" );
 	be->save( "account[0]/private_key", "" );
 	be->save( "account[0]/ca_file", "" );
 	be->saveBool( "account[0]/dh_enabled", false );
