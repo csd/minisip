@@ -46,7 +46,7 @@ endif !OS_WIN
 mutil_src = \
 		source/CriticalSection.cxx \
 		source/MemObject.cxx \
-		source/Library.cxx \
+		source/LibraryPosix.cxx \
 		source/MessageRouter.cxx \
 		source/Exception.cxx \
 		source/massert.cxx \
@@ -60,7 +60,7 @@ mutil_src = \
 		source/vmd5.cxx \
 		source/CommandString.cxx \
 		source/XMLParser.cxx \
-		source/MPlugin.cxx \
+		source/MPluginPosix.cxx \
 		source/CircularBuffer.cxx \
 		source/SipUri.cxx \
 		source/CacheItem.cxx \
