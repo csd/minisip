@@ -36,7 +36,7 @@
 
 using namespace std;
 
-int Library::refCount;
+int Library::refCount = 0;
 
 Library::Library(const string &path_):path(path_){
 
