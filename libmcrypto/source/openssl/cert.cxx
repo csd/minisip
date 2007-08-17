@@ -807,7 +807,8 @@ int OsslCertificateChain::control( MRef<CertificateSet *> cert_db){
 	i++;
 
 	for( ; i != cert_list.end(); i++ ){
-		sk_X509_push( cert_stack, ssl_cert->getOpensslCertificate() );
+		sk_X509_push( cert_stack, ((OsslCertificate *)**i)->getOpensslCertificate() );
+		//sk_X509_push( cert_stack, ssl_cert->getOpensslCertificate() );
 	}
 
 	X509_STORE_CTX_init( &cert_store_ctx, ssl_db->getDb(), cert, cert_stack);
