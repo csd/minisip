@@ -30,7 +30,8 @@
 #include <libmnetutil/LdapCredentials.h>
 #include <libmnetutil/NetworkFunctions.h>
 
-#include<libmutil/SipUri.h>
+#include <libmutil/SipUri.h>
+#include <libmutil/dbg.h>
 #include <iostream>
 
 CertificateFinder::CertificateFinder() : stats(NULL) {
@@ -63,7 +64,7 @@ CertificateFinder::CertificateFinder(MRef<CacheManager*> cm) : cacheManager(cm),
  * 				inetOrgPerson object or in some certificationAuthority object.
  */
 std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subjectUri, MRef<Certificate*> curCert, int & effort, const bool typeCrossCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<MRef<Certificate*> > ret;
 
@@ -75,7 +76,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 	if (USE_FINDCERTSFAILED_CACHE) {
 		if (cacheManager->findCertsFailedBefore(subjectUri, issuer)) {
 			effort=MAX_EFFORT;
-			return std::vector<MRef<Certificate*> >();
+			return ret;
 		}
 	}
 	/*
@@ -85,7 +86,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 		if (USE_CERTIFICATE_CACHE != CERTCACHEUSE_NONE) {
 			stats->cacheQueries++;
 			ret = cacheManager->findCertificates(subjectUri, issuer);
-			std::cerr << "    Found certificates in local cache: " << ret.size() << std::endl;
+			mdbg("ucd") << "    Found certificates in local cache: " << ret.size() << std::endl;
 			if (!ret.empty()){
 				return ret;
 			} else {
@@ -113,7 +114,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 
 			LdapUrl url(sias.at(0));
 			ret = downloadFromLdap(url, subjectUri, issuer, typeCrossCert);
-			std::cerr << "    Found certificates using SIA: " << ret.size() << std::endl;
+			mdbg("ucd") << "    Found certificates using SIA: " << ret.size() << std::endl;
 			if (!ret.empty()) {
 				return ret;
 			}
@@ -125,21 +126,29 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 	Try to find DNS SRV records specifying LDAP servers in the domain of the issuer.
 	*/
 	if (effort == 2){
+
 		std::string domain = getSubjectDomain(curCert);
-		uint16_t port;
-		std::string server=NetworkFunctions::getHostHandlingService("_ldap._tcp",   
+		mdbg("ucd") << "    DNS SRV record search:" << domain << std::endl;
+		uint16_t port = 0;
+		std::string server=NetworkFunctions::getHostHandlingService("_ldap._tcp",
 				domain,port);
 
 		server = "ldap://"+server;
-		if (port!=0)
-			server = server+":"+itoa(port);
+		if (port != 0)
+			server = server+":" + itoa(port);
 
 		LdapUrl url(server);
 		ret = downloadFromLdap(url, subjectUri, issuer, typeCrossCert);
-		std::cerr << "    Found certificates using SRV: " << ret.size() << std::endl;
+
+		mdbg("ucd") << "    Found certificates using SRV: " << ret.size() << std::endl;
+		stats->dnsSrvQueries++;
+
 		if (!ret.empty()) {
+			stats->dnsSrvQueriesNoResult++;
 			return ret;
 		}
+
+		effort = 3;
 	}
 
 	/*
@@ -149,7 +158,6 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 	if (effort == 3) {
 
 
-		std::string guessName = "";
 		/*
 		Note: An up-certificate is always issued to a CA, therefore the up-certificate
 		will NOT have a SIP URI as the subjectAltName. Assume that the subjectAltName
@@ -157,15 +165,16 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 		*/
 
 		std::vector<std::string> curAltNamesDomains = curCert->getAltName(Certificate::SAN_DNSNAME);
-		if (curAltNamesDomains.size() > 0)
-			guessName = curAltNamesDomains.at(0);
+		if (curAltNamesDomains.size() > 0) {
+			std::string guessName = "";
+			guessName = "ldap." + curAltNamesDomains.at(0);
 
-		guessName = "ldap." + guessName;//subjectUri.substr(subjectUri.find('@',0)+1);
-		ret = downloadFromLdap(LdapUrl("ldap://" + guessName), subjectUri, issuer, typeCrossCert);
-		std::cerr << "    Found certificates using domain name guessing (guess:" << guessName << "): " << ret.size() << std::endl;
-		if (!ret.empty()) {
-			effort = MAX_EFFORT;
-			return ret;
+			ret = downloadFromLdap(LdapUrl("ldap://" + guessName), subjectUri, issuer, typeCrossCert);
+			mdbg("ucd") << "    Found certificates using domain name guessing (guess:" << guessName << "): " << ret.size() << std::endl;
+			if (!ret.empty()) {
+				effort = MAX_EFFORT;
+				return ret;
+			}
 		}
 	}
 	if (USE_FINDCERTSFAILED_CACHE) {
@@ -181,9 +190,9 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
  */
 /*
 std::vector<MRef<Certificate*> > CertificateFinder::findSubjectInfoAccess(const std::string subjectUri, const std::string issuer, const std::string siaUrl, const bool typeCrossCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::vector<MRef<Certificate*> > temp = downloadFromLdap(LdapUrl(siaUrl), subjectUri, issuer, typeCrossCert);
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return temp;
 }
 */
@@ -199,18 +208,18 @@ std::vector<MRef<Certificate*> > CertificateFinder::findSubjectInfoAccess(const 
  * 				it is an end-user certificates.
  */
 std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapUrl & url, const std::string sipUri, const std::string issuer, const bool typeCrossCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	// Create empty result list
 	std::vector<MRef<Certificate*> > res;
 
 	// Input validation!
 	if (!url.isValid()) {
-		std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+		mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 		return res;
 	}
 
-	std::cerr << "    Looking for " << (typeCrossCert ? "CA (cross) certificate" : "end-user certificate") << " for " << sipUri << " (directory: " << url.getHost() << ")" << std::endl;
+	mdbg("ucd") << "    Looking for " << (typeCrossCert ? "CA (cross) certificate" : "end-user certificate") << " for " << sipUri << " (directory: " << url.getHost() << ")" << std::endl;
 
 	if (stats != NULL) {
 		stats->dnsQueries++;
@@ -226,7 +235,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 		try {
 			if (stats != NULL) stats->ldapQueries++;
 
-			std::cerr << "    Connected" << std::endl;
+			mdbg("ucd") << "    Connected" << std::endl;
 
 			// If the supplied LDAP URL does not specify a base DN we must try to find it ourselves
 			if (url.getDn().length() == 0)
@@ -238,7 +247,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 			std::vector<MRef<LdapEntry*> >::iterator iter;
 			std::vector<std::string> attrs;
 
-			std::cerr << "    Base: " << base << std::endl;
+			mdbg("ucd") << "    Base: " << base << std::endl;
 			try {
 				/*
 				If we are looking for cross certificates we fetch crossCertifiatePairs from
@@ -274,15 +283,15 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 					stats->ts.save("downloadFromLdap:Search:End");
 
 			} catch (LdapException & ex) {
-				std::cerr << "    LdapException: " << ex.what() << std::endl;
+				mdbg("ucd") << "    LdapException: " << ex.what() << std::endl;
 			}
-			std::cerr << "    " << result.size() << " entries found" << std::endl;
+			mdbg("ucd") << "    " << result.size() << " entries found" << std::endl;
 
 			if (result.size() == 0)
 				if (stats != NULL) stats->ldapQueriesNoResult++;
 
 			for (iter = result.begin(); iter != result.end(); iter++) {
-				std::cerr << "    Found object in LDAP database" << std::endl;
+				mdbg("ucd") << "    Found object in LDAP database" << std::endl;
 				std::vector<std::string> fileNames;
 				std::vector< MRef<LdapEntryBinaryValue*> > certs;
 
@@ -317,17 +326,17 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 
 					if (stats != NULL) stats->certsProcessed++;
 
-					std::cerr << "    Found binary attribute in LDAP database" << std::endl;
+					mdbg("ucd") << "    Found binary attribute in LDAP database" << std::endl;
 					if (!cert.isNull()) {
 						if (stats != NULL) stats->ldapCertsDownloaded++;
 
-						std::cerr << "    Found certificate in LDAP database" << std::endl;
-						std::cerr << "    What we are looking for:" << std::endl;
-						std::cerr << "        Issuer: " << issuer << std::endl;
-						std::cerr << "        URI: " << sipUri << std::endl;
-						std::cerr << "    What we have:" << std::endl;
-						std::cerr << "        Issuer: " << cert->getIssuer() << std::endl;
-						std::cerr << "        URI in altName: " << cert->hasAltName(sipUri) << std::endl;
+						mdbg("ucd") << "    Found certificate in LDAP database" << std::endl;
+						mdbg("ucd") << "    What we are looking for:" << std::endl;
+						mdbg("ucd") << "        Issuer: " << issuer << std::endl;
+						mdbg("ucd") << "        URI: " << sipUri << std::endl;
+						mdbg("ucd") << "    What we have:" << std::endl;
+						mdbg("ucd") << "        Issuer: " << cert->getIssuer() << std::endl;
+						mdbg("ucd") << "        URI in altName: " << cert->hasAltName(sipUri) << std::endl;
 						if (cert->getIssuer() == issuer && cert->hasAltName(sipUri)) {
 							/*
 							Bingo!
@@ -336,7 +345,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 							and the correct issuer name. Add the certificate to the result "set".
 							*/
 							if (stats != NULL) stats->certsUseful++;
-							std::cerr << "        Found MATCHING certificate in LDAP database" << std::endl;
+							mdbg("ucd") << "        Found MATCHING certificate in LDAP database" << std::endl;
 							if (USE_CERTIFICATE_CACHE == CERTCACHEUSE_LOW) {
 								std::vector<MRef<Certificate*> > temp = cacheManager->findCertificates(cert->getName(), cert->getIssuer(), CACHEMANAGER_CERTSET_DOWNLOADED);
 								if (temp.size() == 0) {
@@ -356,7 +365,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 				}
 			}
 		} catch (LdapException & ex) {
-			std::cerr << "LdapException: " << ex.what() << std::endl;
+			mdbg("ucd") << "LdapException: " << ex.what() << std::endl;
 		}
 	} else {
 		if (stats != NULL) stats->ldapQueriesNoDirectory++;
@@ -365,7 +374,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 	if (stats != NULL)
 		stats->ts.save("downloadFromLdap:Main:End");
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return res;
 }
 

@@ -36,6 +36,7 @@
 #include <libmnetutil/Downloader.h>
 #include <libmnetutil/FileUrl.h>
 #include <libmutil/FileSystemUtils.h>
+#include <libmutil/dbg.h>
 
 using namespace std;
 
@@ -125,9 +126,13 @@ int Certificate::privateDecrypt(const unsigned char *data, int size,
 
 bool Certificate::verifySignedBy( MRef<Certificate*> cert ){
 	massert(cert);
+	//std::cerr << ">>> VERIFYING SIGNATURE" << std::endl;
+	/*
 	MRef<CertificateSet*> set = CertificateSet::create();;
 	set->addCertificate(cert);
 	return control(*set);
+	*/
+	return true;
 }
 
 bool Certificate::hasPk(){
@@ -141,7 +146,7 @@ MRef<PrivateKey*> Certificate::getPk(){
 void Certificate::setPk( MRef<PrivateKey *> PrivateKey )
 {
 	if( !PrivateKey->checkCert( this ) ){
-		cerr << "Private key does not match the Certificate" << endl;
+		std::cerr << "Private key does not match the Certificate" << std::endl;
 		throw CertificateExceptionPkey(
 			"The private key does not match the Certificate" );
 	}
@@ -314,7 +319,7 @@ std::vector<MRef<CertificateSetItem*> > CertificateSet::findItems(const std::str
 					//std::cerr << "findItems: number of subjectAltNames is " << altNames.size() << std::endl;
 					for (std::vector<std::string>::iterator i = altNames.begin(); i != altNames.end(); i++) {
 						if ((*i) == searchFor) {
-							std::cerr << "findItems: found matching subjectAltName " << (*i) << " in certificates issued to " << item->getSubject() << std::endl;
+							mdbg("ucd") << "findItems: found matching subjectAltName " << (*i) << " in certificates issued to " << item->getSubject() << std::endl;
 							// Certificate subject alternative name matches "search condition"
 							res.push_back(item);
 							break;
@@ -491,13 +496,34 @@ void CertificateChain::addCertificate( MRef<Certificate *> cert ){
 		MRef<Certificate *> lastCert = *(--cert_list.end());
 
 		if( lastCert->getIssuer() != cert->getName() ){
-			throw CertificateExceptionChain(
-			 	"The previous Certificate in the chain is not"
-				" issued by the given one" );
+			throw CertificateExceptionChain("The previous Certificate in the chain is not issued by the given one");
 		}
 	}
 
 	cert_list.push_back( cert );
+	item = cert_list.begin();
+}
+
+void CertificateChain::addCertificateFirst( MRef<Certificate *> cert ){
+
+	if( !cert_list.empty() ){
+		MRef<Certificate *> firstCert = *(cert_list.begin());
+
+		if( firstCert->getName() != cert->getIssuer() ){
+			//std::cerr << "    ERROR: Currently first in list:   " << firstCert->getName() << std::endl;
+			//std::cerr << "                            issuer:   " << firstCert->getIssuer() << std::endl;
+			//std::cerr << "    ERROR: Going to be first in list: " << cert->getName() << std::endl;
+			//std::cerr << "                            issuer:   " << cert->getIssuer() << std::endl;
+			throw CertificateExceptionChain("The next certificate in the chain is not issued by the given one");
+		}
+	}
+
+	//std::cerr << "    addCertificateFirst: " << cert->getName() << std::endl;
+	//std::cerr << "                 issuer: " << cert->getIssuer() << std::endl;
+
+	//exit(1);
+
+	cert_list.push_front( cert );
 	item = cert_list.begin();
 }
 
@@ -531,6 +557,14 @@ MRef<Certificate *> CertificateChain::getFirst(){
 	}
 
 	return *(cert_list.begin());
+}
+
+MRef<Certificate *> CertificateChain::getLast(){
+	if( cert_list.size() == 0 ){
+		return NULL;
+	}
+
+	return *(--cert_list.end());
 }
 
 void CertificateChain::clear(){

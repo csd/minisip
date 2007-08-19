@@ -26,7 +26,8 @@
 #include <libmutil/stringutils.h>
 #include <libmcrypto/cert.h>
 #include <libmnetutil/FileDownloader.h>
-#include<libmutil/SipUri.h>
+#include <libmutil/SipUri.h>
+#include <libmutil/dbg.h>
 
 #include <list>
 #include <stack>
@@ -34,7 +35,7 @@
 #include <iostream>
 
 CacheManager::CacheManager() {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	/*
 	Certificate* cert;
 
@@ -53,39 +54,48 @@ CacheManager::CacheManager() {
 		certFiles.pop();
 	}
 	*/
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 }
 MRef<DirectorySetItem*> CacheManager::findDirectory(const std::string domain, const std::string defaultSet) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::vector<MRef<DirectorySetItem*> > res;
 	if (defaultSet.length() == 0) {
 		// Scan all directory sets
 		for (std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
 			res = i->second->findItemsPrioritized(domain);
-			if (!res.empty())
+			if (!res.empty()) {
+				mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 				return res.front();
+			}
 		}
 
 	} else {
 		// Scan only one directory set, the one mentioned in the function parameters.
 		if (directorySets.find(defaultSet) != directorySets.end()) {
 			res = directorySets[defaultSet]->findItemsPrioritized(domain);
-			if (!res.empty())
+			if (!res.empty()) {
+				mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 				return res.front();
+			}
 		}
 	}
 	// Return empty item if no result found
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return MRef<DirectorySetItem*>();
 }
 
 MRef<DirectorySet*> CacheManager::getDirectorySet(std::string key) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
-	if (directorySets.find(key) != directorySets.end())
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
+	if (directorySets.find(key) != directorySets.end()) {
+		mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 		return directorySets[key];
+	}
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return MRef<DirectorySet*>();
 }
 
 std::string CacheManager::addDirectory(const MRef<DirectorySetItem*> dirItem, std::string setKey) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	if (0 == setKey.length()) {
 		setKey = getNewDirectorySetKey();
 	}
@@ -93,11 +103,13 @@ std::string CacheManager::addDirectory(const MRef<DirectorySetItem*> dirItem, st
 		directorySets[setKey] = MRef<DirectorySet*>(new DirectorySet());
 	}
 	directorySets[setKey]->addItem(dirItem);
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return setKey;
 }
 
 std::string CacheManager::addDirectoryLdap(std::string url, std::string subTree, const std::string setKey) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return addDirectory(MRef<DirectorySetItem*>(new DirectorySetItem(url, subTree)), setKey != "" ? setKey : getNewDirectorySetKey());
 }
 
@@ -105,19 +117,23 @@ std::string CacheManager::addDirectoryLdap(std::string url, std::string subTree,
 //void CacheManager::removeFromCache(MRef<CacheItem*> item);
 
 std::string CacheManager::getNewDirectorySetKey() const {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::string newName = "dirset";
 	int num = 1;
 	while (directorySets.find(newName + itoa(num)) != directorySets.end())
 		num++;
+
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return newName;
 }
 std::string CacheManager::getNewCertificateSetKey() const {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::string newName = "certset";
 	int num = 1;
 	while (certificateSets.find(newName + itoa(num)) != certificateSets.end())
 		num++;
+
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return newName;
 }
 
@@ -128,7 +144,7 @@ std::string CacheManager::getNewCertificateSetKey() const {
  * @todo	Subject and Issuer should NOT be used to identify certificates. Use *KeyIdentifier (?) and ??? instead.
  */
 std::vector<MRef<Certificate*> > CacheManager::findCertificates(const std::string searchText, const std::string issuer, const std::string defaultSet) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<MRef<CertificateSetItem*> > tempRes;
 	std::vector<MRef<Certificate*> > res;
@@ -157,6 +173,7 @@ std::vector<MRef<Certificate*> > CacheManager::findCertificates(const std::strin
 		}
 	}
 	// Return empty item if no result found
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return res;
 
 	/*
@@ -185,7 +202,7 @@ void CacheManager::addCertificateSet(const MRef<CertificateSet*> certSet, const 
 }
 
 std::string CacheManager::addCertificate(const MRef<Certificate*> cert, std::string setKey) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	if (0 == setKey.length()) {
 		setKey = getNewCertificateSetKey();
 	}
@@ -193,18 +210,22 @@ std::string CacheManager::addCertificate(const MRef<Certificate*> cert, std::str
 		certificateSets[setKey] = CertificateSet::create();
 	}
 	certificateSets[setKey]->addCertificate(cert);
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return setKey;
 }
 
 
 bool CacheManager::findCertsFailedBefore(const std::string searchText, const std::string issuer) {
 	for (std::list<MRef<CertFindSettings*> >::iterator i = failedCertSearches.begin(); i != failedCertSearches.end(); i++) {
-		if ((*i)->searchText == searchText && (*i)->issuer == issuer)
+		if ((*i)->searchText == searchText && (*i)->issuer == issuer) {
+			mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 			return true;
+		}
 	}
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return false;
 }
 void CacheManager::addFindCertsFailed(const std::string searchText, const std::string issuer) {
 	failedCertSearches.push_back(MRef<CertFindSettings*>(new CertFindSettings(searchText, issuer)));
-	std::cerr << "Look-up failure using (" << searchText <<", "<<issuer << std::endl;
+	mdbg("ucd") << ">>> Look-up failure using {" << searchText << ", " << issuer << "}" << std::endl;
 }

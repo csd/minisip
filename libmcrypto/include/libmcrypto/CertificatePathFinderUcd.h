@@ -75,7 +75,10 @@ class LIBMCRYPTO_API CertificatePathFinderUcd : public MObject {
 		 * @param	curPath		Vector containing the user's own certificates (the start of the chain).
 		 * @param	toCert		The certificate that the algorithm should find a path to.
 		 */
-		std::vector<MRef<Certificate*> > findUcdPath(std::vector<MRef<Certificate*> > curPath, MRef<Certificate*> toCert);
+		//std::vector<MRef<Certificate*> > findUcdPath(std::vector<MRef<Certificate*> > curPath, MRef<Certificate*> toCert);
+		MRef<CertificateChain*> findUcdPath(MRef<CertificateChain*> curPath, MRef<CertificateSet*> & rootCerts, MRef<Certificate*> & toCert);
+
+		MRef<CertificateChain*> findUcdPath(MRef<Certificate*> selfCert, MRef<Certificate*> upCert, MRef<Certificate*> toCert);
 
 		/**
 		 * Prints statistics for the current CertificatePathFinderUcd instance.

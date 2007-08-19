@@ -357,12 +357,14 @@ class LIBMCRYPTO_API CertificateChain: public MObject{
 
 		virtual CertificateChain* clone();
 		virtual void addCertificate( MRef<Certificate *> cert );
+		virtual void addCertificateFirst( MRef<Certificate *> cert );
 // 		virtual void remove_Certificate( MRef<Certificate *> cert );
 		virtual void removeLast();
 
 		virtual int control( MRef<CertificateSet *> cert_db )=0;
 		virtual MRef<Certificate *> getNext();
 		virtual MRef<Certificate *> getFirst();
+		virtual MRef<Certificate *> getLast();
 
 		virtual void clear();
 

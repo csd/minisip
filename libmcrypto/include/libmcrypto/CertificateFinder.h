@@ -49,22 +49,22 @@
 /* The constant used to determine the cache level */
 #define USE_CERTIFICATE_CACHE CERTCACHEUSE_NORMAL
 
-#define USE_FINDCERTSFAILED_CACHE 0
+#define USE_FINDCERTSFAILED_CACHE 1
 
 class LIBMCRYPTO_API CertificateFinderStats : public MObject {
 	public:
 
-		CertificateFinderStats() : ldapQueries (0), 
-					ldapQueriesNoResult (0), 
-					ldapQueriesNoDirectory (0), 
-					ldapCertsDownloaded (0), 
-					dnsQueries (0), 
-					dnsQueriesNoResult (0), 
-					dnsSrvQueries (0), 
-					dnsSrvQueriesNoResult (0), 
-					cacheQueries (0), 
+		CertificateFinderStats() : ldapQueries (0),
+					ldapQueriesNoResult (0),
+					ldapQueriesNoDirectory (0),
+					ldapCertsDownloaded (0),
+					dnsQueries (0),
+					dnsQueriesNoResult (0),
+					dnsSrvQueries (0),
+					dnsSrvQueriesNoResult (0),
+					cacheQueries (0),
 					cacheQueriesNoResult (0),
-					certsProcessed (0), 
+					certsProcessed (0),
 					certsUseful (0)
 		{ }
 

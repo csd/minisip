@@ -23,32 +23,46 @@
 
 #include <config.h>
 #include <libmcrypto/CertificatePathFinderUcd.h>
-#include<libmutil/SipUri.h>
+#include <libmutil/SipUri.h>
+#include <libmutil/dbg.h>
 
 #include <iostream>
 
 CertificatePathFinderUcd::CertificatePathFinderUcd(MRef<CacheManager*> cm) : stats (new CertificateFinderStats()) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	certFinder = MRef<CertificateFinder*>(new CertificateFinder(cm));
 	certFinder->setStatsObject(stats);
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 }
 CertificatePathFinderUcd::~CertificatePathFinderUcd() {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	delete stats;
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 }
-std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUcdPath(std::vector<MRef<Certificate*> > curPath, MRef<Certificate*> toCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+MRef<CertificateChain*> CertificatePathFinderUcd::findUcdPath(MRef<Certificate*> selfCert, MRef<Certificate*> upCert, MRef<Certificate*> toCert) {
 
-	std::vector<MRef<Certificate*> > res;
-	if (curPath.size() == 0)
+	MRef<CertificateSet*> roots = CertificateSet::create();
+	MRef<CertificateChain*> chain = CertificateChain::create();
+	roots->addCertificate(selfCert);
+	chain->addCertificate(upCert);
+
+	return findUcdPath(chain, roots, toCert);
+}
+
+MRef<CertificateChain*> CertificatePathFinderUcd::findUcdPath(MRef<CertificateChain*> curPath, MRef<CertificateSet*> & rootCerts, MRef<Certificate*> & toCert) {
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
+
+	mdbg("ucd") << "    curPath is " << curPath->length() << " certificates long." << std::endl;
+
+	MRef<CertificateChain*> res = MRef<CertificateChain*>(CertificateChain::create());
+	if (curPath->length() == 0)
 		return res;
 
 	// Choose first subjectAltName that is a valid SIP URI
-	std::cerr << "    Pick out SIP URIs (or DNS names) from subjectAltName" << std::endl;
+	mdbg("ucd") << "    Pick out SIP URIs (or DNS names) from subjectAltName" << std::endl;
 
-	MRef<Certificate*> curCert = curPath.back();
+	//MRef<Certificate*> curCert = curPath->getLast();
+	MRef<Certificate*> curCert = curPath->getFirst();
 
 	stats->ts.save("findUcdPath:Main:Start");
 
@@ -82,39 +96,49 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUcdPath(std::vect
 		}
 	}
 	if (!curUri.isValid() || !toUri.isValid()) {
-		std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+		mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 		stats->ts.save("findUcdPath:Main:End");
 		return res;
 	}
 
-	std::cerr << "    Found SIP URIs:" << std::endl;
-	std::cerr << "        curUri=" << curUri << std::endl << "        toUri=" << toUri << std::endl;
+	mdbg("ucd") << "    Found SIP URIs:" << std::endl;
+	mdbg("ucd") << "        curUri=" << curUri.getString() << std::endl << "        toUri=" << toUri.getString() << std::endl;
 
 	// Test if the last certificate in the chain can be verified using the second-to-last certificates.
 	// If that cannot be done we abort the search as the chain is broken. An empty list is returned
 	// to signify this fact.
 
-	if (!verifyLastPair(curPath)) {
-		std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
-		stats->ts.save("findUcdPath:Main:End");
-		return res;
+	//if (!verifyLastPair(curPath)) {
+	mdbg("ucd") << "    curPath:" << std::endl;
+	for (MRef<Certificate*> i = curPath->getFirst(); !i.isNull(); i = curPath->getNext()) {
+		mdbg("ucd") << "        " << i->getName() << std::endl;
+	}
+	if (curPath->length() > 1) {
+		stats->ts.save("findUcdPath:ChainVerification:Start");
+		if (!curPath->control(rootCerts)) {
+			stats->ts.save("findUcdPath:ChainVerification:End");
+			mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
+			stats->ts.save("findUcdPath:Main:End");
+			return res;
+		}
+		stats->ts.save("findUcdPath:ChainVerification:End");
 	}
 
 	// Test if the subject name of the last found certificate matches the issuer name
 	// of the certificate that we are trying to get to. If so, we have found a (possible)
 	// path and we must only verify it before we can return the entire chain to the user!
 
-	if (toCert->getIssuer() == curCert->getName() ){
-		curPath.push_back(toCert);
-		if (verifyLastPair(curPath)) {
+	if (toCert->getIssuer() == curCert->getName()){
+		curPath->addCertificateFirst(toCert);
+		if (curPath->control(rootCerts)) {
 			// Bingo!
-			std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+			mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 			stats->ts.save("findUcdPath:Main:End");
 			return curPath;
 		} else {
-			std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+			mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 			stats->ts.save("findUcdPath:Main:End");
-			return std::vector<MRef<Certificate*> >();
+			return MRef<CertificateChain*>(CertificateChain::create());
 		}
 	}
 
@@ -151,14 +175,14 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUcdPath(std::vect
 
 			for (i = nextCertCandidates.begin(); i != nextCertCandidates.end(); i++) {
 
-				std::cerr << "    DOWN-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
+				mdbg("ucd") << "    DOWN-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
 
-				std::vector<MRef<Certificate*> > testPath = curPath;
-				testPath.push_back(*i);
-				std::vector<MRef<Certificate*> > retPath = findUcdPath(testPath, toCert);
-				if (!retPath.empty()) {
+				MRef<CertificateChain*> testPath = curPath->clone();
+				testPath->addCertificateFirst(*i);
+				MRef<CertificateChain*> retPath = findUcdPath(testPath, rootCerts, toCert);
+				if (!retPath->isEmpty()) {
 					stats->ts.save("findUcdPath:Main:End");
-					std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+					mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 					return retPath;
 				}
 			}
@@ -174,13 +198,13 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUcdPath(std::vect
 
 			for (i = nextCertCandidates.begin(); i != nextCertCandidates.end(); i++) {
 
-				std::cerr << "    CROSS-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
+				mdbg("ucd") << "    CROSS-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
 
-				std::vector<MRef<Certificate*> > testPath = curPath;
-				testPath.push_back(*i);
-				std::vector<MRef<Certificate*> > retPath = findUcdPath(testPath, toCert);
-				if (!retPath.empty()) {
-					std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+				MRef<CertificateChain*> testPath = curPath->clone();
+				testPath->addCertificateFirst(*i);
+				MRef<CertificateChain*> retPath = findUcdPath(testPath, rootCerts, toCert);
+				if (!retPath->isEmpty()) {
+					mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 					stats->ts.save("findUcdPath:Main:End");
 					return retPath;
 				}
@@ -194,54 +218,54 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUcdPath(std::vect
 			nextCertCandidates = findUpCerts(curCert, toCert, upEffort, findEffort);
 			for (i = nextCertCandidates.begin(); i != nextCertCandidates.end(); i++) {
 
-				std::cerr << "    UP-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
+				mdbg("ucd") << "    UP-mode testing with " << (*i)->getCn() << " as last node in chain." << std::endl;
 
-				std::vector<MRef<Certificate*> > testPath = curPath;
-				testPath.push_back(*i);
-				std::vector<MRef<Certificate*> > retPath = findUcdPath(testPath, toCert);
-				if (!retPath.empty()) {
+				MRef<CertificateChain*> testPath = curPath->clone();
+				testPath->addCertificateFirst(*i);
+				MRef<CertificateChain*> retPath = findUcdPath(testPath, rootCerts, toCert);
+				if (!retPath->isEmpty()) {
 					stats->ts.save("findUcdPath:Main:End");
-					std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+					mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 					return retPath;
 				}
 			}
 		//} while ( ! (upEffort==MAX_EFFORT && findEffort==MAX_EFFORT) );
 	}
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	stats->ts.save("findUcdPath:Main:End");
-	return std::vector<MRef<Certificate*> >();
+	return MRef<CertificateChain*>(CertificateChain::create());
 }
 
 std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findCrossCerts	(MRef<Certificate*> curCert, MRef<Certificate*> toCert, int& crossEffort,	int& findEffort) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<std::string> candidates = candidateCrossPaths(toCert);
 	std::vector<MRef<Certificate*> > temp = findCerts(candidates, curCert, toCert, crossEffort, findEffort);
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return temp;
 }
 std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findUpCerts		(MRef<Certificate*> curCert, MRef<Certificate*> toCert,	int& upEffort, 	int& findEffort) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<std::string> candidates = candidateUpPaths(curCert, toCert);
 	std::vector<MRef<Certificate*> > temp = findCerts(candidates, curCert, toCert, upEffort, findEffort);
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return temp;
 }
 std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findDownCerts	(MRef<Certificate*> curCert, MRef<Certificate*> toCert, int& downEffort, 	int& findEffort) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<std::string> candidates = candidateDownPaths(curCert, toCert);
 	std::vector<MRef<Certificate*> > temp = findCerts(candidates, curCert, toCert, downEffort, findEffort);
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return temp;
 }
 
 std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findCerts	(std::vector<std::string> candidates, MRef<Certificate*> curCert, MRef<Certificate*> toCert, int& phaseEffort, int& findEffort) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	stats->ts.save("findCerts:Main:Start");
 
@@ -269,7 +293,7 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findCerts	(std::vecto
 			std::vector<MRef<Certificate*> > foundCerts = certFinder->find(candidates.at(phaseEffort), curCert, findEffort, true);
 			if (!foundCerts.empty()) {
 				// If any certificate where found we return them and feel happy about it!
-				std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+				mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 				stats->ts.save("findCerts:Main:End");
 				return foundCerts;
 			}
@@ -293,14 +317,14 @@ std::vector<MRef<Certificate*> > CertificatePathFinderUcd::findCerts	(std::vecto
 		// Will the loop EVER break using this condition????
 	} while (! (phaseEffort==MAX_EFFORT && findEffort==MAX_EFFORT));
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	stats->ts.save("findCerts:Main:End");
 	return std::vector<MRef<Certificate*> >();
 }
 
 
 std::vector<std::string> CertificatePathFinderUcd::candidateUpPaths(MRef<Certificate*> curCert, MRef<Certificate*> toCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	std::vector<std::string> tempCurrent = candidateCrossPaths(curCert);
 	std::vector<std::string> tempTo = candidateCrossPaths(toCert);
 
@@ -314,7 +338,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateUpPaths(MRef<Certifi
 	interested in what lies *above* curCert.domain.
 	*/
 
-	std::cerr << "    tempCurrent.size()=" << tempCurrent.size() << ", tempTo.size()=" << tempTo.size() << std::endl;
+	mdbg("ucd") << "    tempCurrent.size()=" << tempCurrent.size() << ", tempTo.size()=" << tempTo.size() << std::endl;
 
 	if (tempCurrent.size() > 0)
 		tempCurrent.erase(tempCurrent.begin());
@@ -342,7 +366,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateUpPaths(MRef<Certifi
 		}
 	}
 
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return tempCurrent;
 }
 
@@ -351,7 +375,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateUpPaths(MRef<Certifi
  * 		point to the same domain (this function will resturn duplicates in the result...)
  */
 std::vector<std::string> CertificatePathFinderUcd::candidateCrossPaths(MRef<Certificate*> toCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	/*
 	Get list of alternative names of the intended target. Since the target can be both a
@@ -364,7 +388,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateCrossPaths(MRef<Cert
 	std::vector<std::string>::iterator nameIter;
 	std::vector<std::string> resDomains;
 
-	std::cerr << "    Certificate belonging to " << toCert->getCn() << " has " << altNames.size() << " subjectAltNames" << std::endl;
+	mdbg("ucd") << "    Certificate belonging to " << toCert->getCn() << " has " << altNames.size() << " subjectAltNames" << std::endl;
 	/*
 	For each of the alt. names we calculate all possible "parent name". Note that it is
 	VERY unlikely that a CA certificate has multiple alternative names, an end-user may
@@ -377,7 +401,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateCrossPaths(MRef<Cert
 	*/
 	for (nameIter = altNames.begin(); nameIter != altNames.end(); nameIter++) {
 		SipUri uri(*nameIter);
-		std::cerr << "    Processing URI " << (*nameIter) << (uri.isValid() ? " (valid)" : " (NOT valid)") << std::endl;
+		mdbg("ucd") << "    Processing URI " << (*nameIter) << (uri.isValid() ? " (valid)" : " (NOT valid)") << std::endl;
 
 		/*
 		The SipUri class, for some reason, accepts DNS names as valid SIP URIs. This behavious
@@ -410,12 +434,12 @@ std::vector<std::string> CertificatePathFinderUcd::candidateCrossPaths(MRef<Cert
 			}
 		}
 	}
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return resDomains;
 }
 
 std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certificate*> curCert, MRef<Certificate*> toCert) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 
 	std::vector<std::string> toAltNames = toCert->getAltName(Certificate::SAN_URI);
 
@@ -430,8 +454,8 @@ std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certi
 	if (curDomain.length() > 0) {
 		for (std::vector<std::string>::iterator nameIter = toAltNames.begin(); nameIter != toAltNames.end(); nameIter++) {
 			SipUri uri(*nameIter);
-			std::cerr << "    Testing subjectAltName " << *nameIter << " and extracting domain names:" << std::endl;
-			std::cerr << "        uri.isValid() = " << uri.isValid() << ", stringEndsWith(uri.getIp(), curDomain) = " << stringEndsWith(uri.getIp(), curDomain) << std::endl;
+			mdbg("ucd") << "    Testing subjectAltName " << *nameIter << " and extracting domain names:" << std::endl;
+			mdbg("ucd") << "        uri.isValid() = " << uri.isValid() << ", stringEndsWith(uri.getIp(), curDomain) = " << stringEndsWith(uri.getIp(), curDomain) << std::endl;
 
 			/*
 			Test if the current alt. name is a proper one AND that it represents
@@ -447,14 +471,14 @@ std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certi
 						break;
 
 					resDomains.push_back(newDomain);
-					std::cerr << "    candidateDownPath: " << newDomain << std::endl;
+					mdbg("ucd") << "    candidateDownPath: " << newDomain << std::endl;
 
 					pos = host.find('.', pos)+1;
 				}
 			}
 		}
 	}
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return resDomains;
 }
 
@@ -462,15 +486,17 @@ std::vector<std::string> CertificatePathFinderUcd::candidateDownPaths(MRef<Certi
  * @todo	Implement the function!
  */
 bool CertificatePathFinderUcd::verifyLastPair(std::vector<MRef<Certificate*> > & certList) {
-	std::cerr << "^^^ Start of " << __FUNCTION__ << std::endl;
+	mdbg("ucd") << "^^^ Start of " << __FUNCTION__ << std::endl;
 	bool res = true;
+
 	if (certList.size() > 1) {
 		MRef<Certificate*> last = certList[certList.size()-1];
 		MRef<Certificate*> secondToLast = certList[certList.size()-2];
-		std::cerr << "    Verifying if " << last->getName() << " was signed by " << secondToLast->getName() << std::endl;
+		mdbg("ucd") << "    Verifying if " << last->getIssuerCn() << " = " << secondToLast->getCn() << std::endl;
 		res = last->verifySignedBy(secondToLast);
 	}
-	std::cerr << "$$$ End of " << __FUNCTION__ << std::endl;
+
+	mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
 	return res;
 }
 
@@ -483,9 +509,9 @@ void CertificatePathFinderUcd::printStats(std::string prefix, std::string timeSt
 		std::cout << prefix << "ldapQueriesNoResult:     " << stats->ldapQueriesNoResult << std::endl;
 		std::cout << prefix << "ldapQueriesNoDirectory:  " << stats->ldapQueriesNoDirectory << std::endl;
 		std::cout << prefix << "ldapCertsDownloaded:     " << stats->ldapCertsDownloaded << std::endl;
-		//std::cout << "dnsQueriesNoResult:      " << stats->dnsQueriesNoResult << std::endl;
-		//std::cout << "dnsSrvQueries:           " << stats->dnsSrvQueries << std::endl;
-		//std::cout << "dnsSrvQueriesNoResult:   " << stats->dnsSrvQueriesNoResult << std::endl;
+		//std::cout << prefix << "dnsQueriesNoResult:      " << stats->dnsQueriesNoResult << std::endl;
+		std::cout << prefix << "dnsSrvQueries:           " << stats->dnsSrvQueries << std::endl;
+		std::cout << prefix << "dnsSrvQueriesNoResult:   " << stats->dnsSrvQueriesNoResult << std::endl;
 		//std::cout << "certsProcessed:          " << stats->certsProcessed << std::endl;
 		//std::cout << "certsUseful:             " << stats->certsUseful << std::endl;
 		if (timeStampFile.length() > 0) {
