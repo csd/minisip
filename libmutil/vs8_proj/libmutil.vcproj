@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\libmutil\FileSystemUtils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmutil\Exception.h"
 				>
 			</File>
@@ -202,6 +206,10 @@
 			</File>
 			<File
 				RelativePath="..\include\libmutil\libmutil_config.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libmutil\Library.h"
 				>
 			</File>
 			<File
@@ -222,6 +230,10 @@
 			</File>
 			<File
 				RelativePath="..\include\libmutil\minilist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libmutil\MPlugin.h"
 				>
 			</File>
 			<File
@@ -313,7 +325,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\FileSystemUtils.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\IString.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\LibraryWin32.cxx"
 				>
 			</File>
 			<File
@@ -334,6 +354,10 @@
 			</File>
 			<File
 				RelativePath="..\source\mtimeWin32.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MPluginWin32.cxx"
 				>
 			</File>
 			<File
