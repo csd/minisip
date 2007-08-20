@@ -153,6 +153,9 @@ class LIBMUTIL_API MPluginManager: public MObject{
 		/**
 		 * Set directory search path used by loadFromLibrary,
 		 * and loadFromFile.
+		 * Win32: On pre-WXPSP1 this method changes
+		 *        the applications current working directory.
+		 *        
 		 **/
 		bool setSearchPath( const std::string &searchPath );
 

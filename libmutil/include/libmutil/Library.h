@@ -59,6 +59,7 @@ public:
 
 	/**
 	 * @returns the file name from which the library was loaded.
+	 *	    On Win32 this is the same as the argument given to open( ).
 	 */
 	const std::string &getPath();
 
