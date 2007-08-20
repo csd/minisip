@@ -36,6 +36,7 @@
 
 #include <libmutil/libmutil_config.h>
 #include<locale>
+#include<libmutil/mtypes.h>
 
 
 /**
