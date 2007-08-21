@@ -173,6 +173,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\include\libmutil\CacheItem.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmutil\CircularBuffer.h"
 				>
 			</File>
@@ -189,15 +193,20 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\libmutil\CriticalSection.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmutil\dbg.h"
+				>
+			</File>
+
+			<File
+				RelativePath="..\include\libmutil\Exception.h"
 				>
 			</File>
 			<File
 				RelativePath="..\include\libmutil\FileSystemUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\libmutil\Exception.h"
 				>
 			</File>
 			<File
@@ -305,6 +314,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\source\CacheItem.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\CircularBuffer.cxx"
 				>
 			</File>
@@ -314,6 +327,10 @@
 			</File>
 			<File
 				RelativePath="..\source\CondVarWin32.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\CriticalSection.cxx"
 				>
 			</File>
 			<File
