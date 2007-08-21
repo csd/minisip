@@ -73,20 +73,24 @@ windns is only for windows ... but it is not restricted to xp or higher ... thus
 #	endif
 #endif
 
+
 #ifdef USE_WIN32_API
 #	if defined USE_WIN32_API_GETADDRINFO && !_WIN32_WCE
 #		define _WIN32_WINNT 0x0501 //eeee ... XP only! ... use if "getaddrinfo" ... with windns, not needed
 #	endif
+#	ifdef USE_WIN32_API_GETADDRINFO
+#		ifdef WIN32
+#			include<winsock2.h>
+#			include<windows.h>
+#			include<ws2tcpip.h>
+#		endif
+#	endif
+#	include<winsock2.h>
 #	include<windows.h>
 #	include "iphlpapi.h" //to obtain list of interfaces ...
 	//do not use getaddrinfo in linux ... it does not do SRV lookup (as of March 2006) ...
 	//in windows, it works fine ... for wce(?); and xp and higher.
-#	ifdef USE_WIN32_API_GETADDRINFO
-#		ifdef WIN32
-#			include<winsock2.h>
-#			include<ws2tcpip.h>
-#		endif
-#	endif
+
 #endif
 
 #include<libmnetutil/NetworkException.h>

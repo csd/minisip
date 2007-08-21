@@ -26,6 +26,9 @@
 #include<libmutil/CriticalSection.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/StreamSocket.h>
+#include<libmnetutil/IPAddress.h>
+
+#include<algorithm> /* find_if */
 
 #ifdef WIN32
 # include<io.h>

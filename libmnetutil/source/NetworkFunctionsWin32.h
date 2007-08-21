@@ -24,13 +24,15 @@
 #define NETWORKFUNCTIONSWIN32_H
 
 #include<libmnetutil/libmnetutil_config.h>
+//#ifdef HAVE_IPHLPAPI_H
+//# include<iphlpapi.h>
+//#endif
+//#ifdef HAVE_WS2TCPIP_H
+//# include<ws2tcpip.h>
+//#endif
+#include<winsock2.h>
 #include<windows.h>
-#ifdef HAVE_IPHLPAPI_H
-# include<iphlpapi.h>
-#endif
-#ifdef HAVE_WS2TCPIP_H
-# include<ws2tcpip.h>
-#endif
+#include<Ws2tcpip.h>
 
 extern HINSTANCE hiphlpapi;
 extern HINSTANCE hws2tcpip;
@@ -42,18 +44,22 @@ extern PGETADAPTERSADDRESSES hGetAdaptersAddresses;
 #define GetAdaptersAddresses hGetAdaptersAddresses
 #endif // HAVE_GETADAPTERSADDRESSES
 
-typedef int WSAAPI (*PGETNAMEINFO)(const struct sockaddr*,socklen_t,char*,
+#ifndef WSAAPI
+#error NO WSAPI
+#endif
+
+typedef int (WSAAPI * PGETNAMEINFO)(const struct sockaddr*,socklen_t,char*,
 				   DWORD,char*,DWORD,int);
 extern PGETNAMEINFO hgetnameinfo;
 #define getnameinfo hgetnameinfo
 #define HAVE_GETNAMEINFO 1
 
-typedef int WSAAPI (*PGETADDRINFO)(const char*,const char*,const struct addrinfo*, struct addrinfo**);
+typedef int (WSAAPI *PGETADDRINFO)(const char*,const char*,const struct addrinfo*, struct addrinfo**);
 extern PGETADDRINFO hgetaddrinfo;
 #define getaddrinfo hgetaddrinfo
 #define HAVE_GETADDRINFO 1
 
-typedef void WSAAPI (*PFREEADDRINFO)(struct addrinfo*);
+typedef void (WSAAPI *PFREEADDRINFO)(struct addrinfo*);
 extern PFREEADDRINFO hfreeaddrinfo;
 #define freeaddrinfo hfreeaddrinfo
 #define HAVE_FREEADDRINFO 1

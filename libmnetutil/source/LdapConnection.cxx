@@ -25,7 +25,16 @@
 #include <libmnetutil/LdapConnection.h>
 
 #ifdef ENABLE_LDAP
-	#include <ldap.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#include <winldap.h>
+#else
+#include <ldap.h>
+#endif
+#endif
+
+#ifndef LDAP_OPT_SUCCESS
+#define LDAP_OPT_SUCCESS 0
 #endif
 
 LdapConnection::LdapConnection(std::string host, int32_t port) {
@@ -67,7 +76,7 @@ void LdapConnection::init(std::string host, int aPort, MRef<LdapCredentials*> aC
 	setCredentials(cred);
 	try {
 		connect();
-	} catch (LdapException & e) {
+	} catch (LdapException & /*e*/ ) {
 		//std::cerr << e.what() << std::endl;
 	}
 #else
@@ -120,7 +129,7 @@ void LdapConnection::connect() throw (LdapException) {
 	}
 
 	// Initialize LDAP library and open connection
-	if ((ld = ldap_init(hostname.c_str(), port)) == NULL ) {
+	if ((ld = ldap_init((char*)hostname.c_str(), port)) == NULL ) {
 		throw LdapException("Could not connect to server");
 	}
 
@@ -138,7 +147,16 @@ void LdapConnection::connect() throw (LdapException) {
 		pass = cred->password.c_str();
 	}
 
-	if (ldap_bind_s((LDAP*)ld, user, pass, auth_method) != LDAP_SUCCESS) {
+	if (ldap_bind_s( (LDAP*)ld, 
+#ifdef _MSC_VER
+			(const PCHAR)
+#endif
+			user,
+#ifdef _MSC_VER
+			(const PCHAR)
+#endif
+			pass, 
+			auth_method) != LDAP_SUCCESS) {
 		throw LdapException("Could not bind to connected server");
 	}
 
@@ -151,8 +169,9 @@ void LdapConnection::connect() throw (LdapException) {
 bool LdapConnection::disconnect() {
 #ifdef ENABLE_LDAP
 	if (isBound) {
-		ldap_unbind((LDAP*)ld);
-	}
+		return ldap_unbind((LDAP*)ld) != 0;
+	}else
+		return false;
 #else
 	throw LdapException("LDAP support not enabled");
 #endif
@@ -172,9 +191,8 @@ std::vector<MRef<LdapEntry*> > LdapConnection::find(std::string baseDn, std::str
 #ifdef ENABLE_LDAP
 	LDAPMessage* msg;
 	std::vector<MRef<LdapEntry*> > entries = std::vector<MRef<LdapEntry*> >();
-	char* searchAttrs[attrs.size()+1];
+	char **searchAttrs = new char*[attrs.size()+1];
 	LDAPMessage* entry;
-	char* attr;
 	int i=0;
 
 	// Test if client is connected
@@ -183,7 +201,7 @@ std::vector<MRef<LdapEntry*> > LdapConnection::find(std::string baseDn, std::str
 	}
 
 	// Convert vector of C++ strings to array of C-style strings
-	for(i = 0; i < attrs.size(); i++ ) {
+	for(i = 0; i < (int)attrs.size(); i++ ) {
 		searchAttrs[i] = const_cast<char*>(attrs.at(i).c_str());
 	}
 
@@ -191,8 +209,22 @@ std::vector<MRef<LdapEntry*> > LdapConnection::find(std::string baseDn, std::str
 	searchAttrs[attrs.size()] = NULL;
 
 	// Send query (note that it is blocking!)
-	if (ldap_search_s((LDAP*)ld, baseDn.c_str(), scope, query.c_str(), searchAttrs, 0, &msg) != LDAP_SUCCESS)
+	if (ldap_search_s(
+			(LDAP*)ld, 
+#ifdef _MSC_VER
+			(PCHAR)
+#endif
+			baseDn.c_str(), 
+			scope,
+#ifdef _MSC_VER
+			(PCHAR)
+#endif
+			query.c_str(), 
+			searchAttrs, 
+			0, 
+			&msg) != LDAP_SUCCESS)
 	{
+		delete []searchAttrs;
 		// Return empty list
 		throw LdapException("LdapException: Could not execute query");
 	}
@@ -208,6 +240,8 @@ std::vector<MRef<LdapEntry*> > LdapConnection::find(std::string baseDn, std::str
 
 	// Clear up some memory
 	ldap_msgfree(msg);
+
+	delete []searchAttrs;
 
 	return std::vector<MRef<LdapEntry*> >(entries);
 #else
@@ -233,7 +267,7 @@ std::string LdapConnection::getBaseDn() throw (LdapNotConnectedException, LdapUn
 	} else {
 		try {
 			return entries.at(0)->getAttrValueString("namingContexts");
-		} catch (LdapAttributeNotFoundException & e) {
+		} catch (LdapAttributeNotFoundException & /*e*/ ) {
 			throw LdapUnsupportedException("Retrieving base DN");
 		}
 	}

@@ -25,8 +25,14 @@
 #include <libmnetutil/LdapEntry.h>
 
 #ifdef ENABLE_LDAP
-	#include <ldap.h>
-	#include <lber.h>
+#ifdef _MSC_VER
+#include <windows.h>
+#include <winldap.h>
+#include <winber.h>
+#else
+#include <ldap.h>
+#include <lber.h>
+#endif
 #endif
 
 #include <string>
@@ -190,7 +196,7 @@ std::vector< MRef<LdapEntryBinaryPairValue*> > LdapEntry::getAttrValuesBinaryPai
 				ber_free(berPair, 1);
 			}
 		}
-	} catch (LdapAttributeNotFoundException & ex) {
+	} catch (LdapAttributeNotFoundException & /*ex*/) {
 		throw; // Re-throw exception
 	}
 	return result;

@@ -24,7 +24,7 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
+#ifndef _MSC_VER
 #	include"compilation_config.h"
 #else
 #	include"compilation_config_w32_wce.h"
@@ -40,8 +40,17 @@
 #include<libmutil/mtypes.h>
 
 #ifdef _MSC_VER
-	#define WIN32
+
+	#ifndef WIN32	
+		#define WIN32
+	#endif
+
 	#pragma warning (disable: 4251)
+	
+	//Warning 4290 is that Microsofts compiler is
+	//is ignoring throw() declarations in the class
+	//definition.
+	#pragma warning (disable: 4290)
 
 	#ifndef LIBMNETUTIL_EXPORTS
 		#error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMNETUTIL_EXPORTS not defined).
@@ -62,18 +71,18 @@
 #endif
 
 /*big/little endian conversion*/
-static inline uint16_t U16_AT( void const * _p )
+static uint16_t U16_AT( void const * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[0] << 8) | p[1] );
 }
-static inline uint32_t U32_AT( void const * _p )
+static uint32_t U32_AT( void const * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
               | ((uint32_t)p[2] << 8) | p[3] );
 }
-static inline uint64_t U64_AT( void const * _p )
+static uint64_t U64_AT( void const * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)

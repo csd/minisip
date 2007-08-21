@@ -71,7 +71,7 @@ char* HttpDownloader::getChars(int *length) {
 				return NULL;
 			}
 		} else if (fetchRes == HTTP_RESPONSECODE_OK) {
-			*length = body.str().length();
+			*length = (int)body.str().length();
 			char* res = new char[*length];
 			memcpy(res, body.str().c_str(), *length);
 			return res;
@@ -111,7 +111,7 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 
 
 	/* Send request */
-	bytesWritten = sock->write(request.c_str(), request.length());
+	bytesWritten = sock->write(request.c_str(), (int32_t)request.length());
 	if (bytesWritten < 0) {
 		//cerr << "Error: Could not send request" << endl;
 		return false;
@@ -127,7 +127,7 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 		if (headerMode) {
 			// Search for headers/body boundary in lastly fetched data
 			char* bodyStr = strstr(buffer, "\r\n\r\n");
-			int bodyLen = buffer + bytesRead - bodyStr;
+			int bodyLen = ((int)(buffer-bodyStr)) + bytesRead;
 
 			if (bodyStr != NULL) {
 				// Found boundary

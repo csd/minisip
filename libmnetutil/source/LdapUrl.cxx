@@ -26,7 +26,13 @@
 
 #include <iostream>
 #include <libmutil/stringutils.h>
+
+#ifdef _MSC_VER
+#include <windows.h>
+#include <winldap.h>
+#else
 #include <ldap.h>
+#endif
 
 LdapUrl::LdapUrl(std::string url) {
 	clear(); // Reset URL parts to default values

@@ -57,6 +57,8 @@ class LIBMNETUTIL_API LdapConnection : public MObject {
 
 		/**
 		 * Disconnect from server (unbind).
+		 * @return true if successful, false othervise.
+		 *	If not connected, then false will be returned.
 		 */
 		bool 			disconnect();
 

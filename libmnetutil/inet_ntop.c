@@ -27,6 +27,10 @@
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
+#ifdef _MSC_VER
+#include <stdio.h>
+#endif
+
 #define	IN6ADDRSZ	16
 #define	INT16SZ		 2
 

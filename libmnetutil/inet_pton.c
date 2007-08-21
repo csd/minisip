@@ -19,7 +19,12 @@
 #ifndef HAVE_INET_PTON
 #include "inet_pton.h"
 
+#ifdef _MSC_VER
+#include <libmutil/mtypes.h>
+#else
 #include <stdint.h>
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
