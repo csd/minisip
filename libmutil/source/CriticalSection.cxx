@@ -24,8 +24,6 @@
 #include <config.h>
 #include <libmutil/CriticalSection.h>
 
-using namespace std;
-
 CriticalSection::CriticalSection(Mutex &theMutex)
 		:mutex( theMutex )
 {
