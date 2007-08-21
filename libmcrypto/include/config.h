@@ -30,12 +30,12 @@
 #	include"compilation_config_w32_wce.h"
 #endif
 
-#ifndef LIBMUTIL_EXPORTS
+#ifndef LIBMCRYPTO_EXPORTS
 # ifdef DLL_EXPORT
-#  define LIBMUTIL_EXPORTS
+#  define LIBMCRYPTO_EXPORTS
 #  define OPENSSL_OPT_WINDLL	// import Windows dll
 # endif	 // DLL_EXPORT
-#endif	// LIBMUTIL_EXPORTS
+#endif	// LIBCRYPTO_EXPORTS
 
 #include<libmutil/mtypes.h>
 
@@ -43,8 +43,8 @@
 	#define WIN32
 	#pragma warning (disable: 4251)
 
-	#ifndef LIBMUTIL_EXPORTS
-		#error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMUTIL_EXPORTS not defined).
+	#ifndef LIBMCRYPTO_EXPORTS
+		#error Visual Studio is not set up correctly to compile libcrypto to a .dll (LIBMCRYPTO_EXPORTS not defined).
 	#endif
 #endif
 
@@ -97,10 +97,5 @@ static inline uint64_t U64_AT( void const * _p )
 #   define ntoh64(i)   U64_AT(&i)
 #endif
 
-
-#ifdef DEBUG_OUTPUT
-#define MSM_DEBUG
-#define MSM_DEBUG_COMMAND
-#endif
 
 #endif
